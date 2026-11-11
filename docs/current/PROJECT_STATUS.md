@@ -4,7 +4,32 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual DOC-B_BAL
+## Incremento atual DOC-B_BAL_CORRECTIONS
+
+DOC-B_BAL_CORRECTIONS conclui localmente o vínculo dos atos posteriores no
+fluxo nativo do BAL. Tela e PDF mostram reconto, contador, instante, quantidade
+e aplicação próprios do mesmo material/ficha, sem substituir valores anteriores.
+Produto é identidade textual preservada; nome ou quantidade não geram vínculo.
+V12 congela os atos no corte escolhido, e V11 permanece íntegra/recuperável.
+A restrição de estoque abrange também aplicações antigas, mesmo com contagem
+atual pendente. Resposta200 com vínculo de outra ficha é recusada na interface.
+
+Três cenários Auth, três testes unitários/PDF e três cenários de navegador nos
+três perfis estão qualificados. Cinco larguras, axe completo e capturas foram
+conferidos. Falhas iniciais foram preservadas e corrigidas; só os afetados
+foram repetidos. Tipos/lint passaram. As três migrations213–215 foram aplicadas
+no remoto autorizado:215 versões iguais às locais, dry-run vazio e grants
+conferidos. O manifesto mantém84 arquivos históricos inalterados. Sem reset,
+fixtures remotas, produção, transporte externo ou backup redundante.
+
+DOC-B continua parcial, estimado30%; próximo ponto:saldo histórico da COM,
+seguido de devolução cotidiana e cancelamento/complemento. DOC-A/C/D, os105
+estados originais(57PASS/48PARTIAL),18 UI e estimativa visual85% permanecem.
+CI do SHA publicado, instalação limpa/evolução legada, integração completa,
+humanos, AT e aparelho físico continuam gates. Sonar adiado; produção NO-GO.
+[Resultados e limites](../audits/D/D-B/BAL_REVIEW_APPLICATION.md).
+
+## Incremento anterior DOC-B_BAL
 
 DOC-B_BAL implementa o núcleo da separação entre parecer e aplicação do BAL,
 com resultados individuais explícitos, confirmação de estoque própria,

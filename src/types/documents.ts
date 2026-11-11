@@ -162,6 +162,7 @@ export type BalanceReviewContext = BalanceReviewFacts & {
   hasItemDifferences?: boolean;
   applicationGroups?: ("family" | "supervisor")[];
   application?: BalanceApplicationFacts;
+  corrections?: import("@/lib/validation/balance-corrections").BalanceCorrectionFacts;
 };
 export type PurchaseReceipt = {
   id: string;

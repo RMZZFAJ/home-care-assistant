@@ -252,7 +252,7 @@ export function BalanceReview({
             <p className="whitespace-pre-wrap wrap-break-word">
               {row.comment || "Parecer sem comentário adicional."}
             </p>
-            <BalanceReviewItemFacts review={row} />
+            <BalanceReviewItemFacts review={row} corrections={context.corrections} documentId={data.id} documentVersion={data.version} />
             <p>
               {row.reviewed_snapshot.opinionOnly
                 ? "Parecer registrado sem aplicar a contagem ao estoque."

@@ -33,8 +33,8 @@ revogação de leitura mantém a referência sem expor o conteúdo.
 ## Saldo no exemplar
 
 A aplicação registra saldos exatos em tabela privada, sem acrescentá-los aos
-eventos e snapshots públicos. A nova revisão11 do BAL congela o fato pertinente
-ao corte documental escolhido. Os demais tipos continuam na revisão10.
+eventos e snapshots públicos. A revisão11 do BAL introduziu o congelamento
+do fato pertinente ao corte documental escolhido. Os demais tipos continuam na revisão10.
 Nenhuma intenção ou arquivo anterior é refeito. O mesmo pedido nas entradas
 antigas/novas recupera a identidade, revisão e fonte que já estavam congeladas.
 
@@ -45,7 +45,32 @@ com quantidade nula, sem valor oculto no PDF. Após perda dessa leitura, o
 exemplar anterior com valor privado não é entregue; pode ser solicitada outra
 emissão mascarada. Concessão posterior não altera o exemplar já mascarado.
 
-## Verificação e contraprovas
+## Atos posteriores vinculados
+
+A projeção somente de leitura relaciona a diferença declarada aos recontos
+nativos da mesma ficha e à identidade textual exata do produto preservado.
+Não exige UUID para produto nem usa nome, quantidade ou catálogo atual para
+reconstruir identidade. Outro BAL, ENT ou consumo não é presumido como correção
+daquele parecer. Não foi criado fluxo paralelo de escrita ou ajuste direto de
+saldo: o caminho nativo continua reconto e sua aplicação autorizada.
+
+A tela mostra evento/versão consultáveis, contador, instante, resultado contado
+e aplicação própria de cada ato. Preserva todos os recontos posteriores, sem
+converter contagem pendente em efeito aplicado ou encaminhamento em resolução.
+Contado e saldo da contagem anterior permanecem nos registros originais. Um
+reconto já aplicado usa seu saldo daquele momento, mesmo após outros movimentos.
+Identidade antiga ausente é indisponibilidade explícita, nunca vínculo presumido.
+
+A emissão V12 congela balanceReviewCorrections no corte de versão escolhido.
+O PDF apresenta autoria, momento, resultado e referência ao ato. A origem é
+conferida independentemente do pintor: parecer, linha, ficha, ordem e corte.
+V11 continua com os mesmos bytes e as intenções antigas conservam a revisão
+original. A perda de leitura de estoque impede acessar valores de uma correção
+anterior, inclusive quando a contagem atual ainda não foi aplicada. A alternativa
+mascarada não transporta o valor privado. Interface recusa vínculo de outra
+ficha/versão recebido em resposta200 incompatível.
+
+## Verificação e contraprovas — núcleo inicial
 
 Qualificados36 cenários Auth distintos por união das rodadas dirigidas:32 de
 parecer, preparação e aplicação; dois de emissão/corte/permissões; um consumidor
@@ -82,7 +107,35 @@ O consumidor foi restaurado e sua regressão histórica passou.
 As verificações gerais, instalação limpa e evolução legada ficam na CI do SHA
 publicado, conforme a regra de validação proporcional do repositório.
 
-## Banco remoto
+## Verificação dos vínculos posteriores
+
+Três cenários Auth reais passaram: identidade/reconto/aplicação/corte; exclusão
+de outra ficha e cronologia de vários recontos; perda de leitura de estoque em
+correção antiga com contagem atual pendente. Este último usa designação e
+contagem físicas nativas; não força revisão de BAL aprovado pelo caminho legado.
+Três testes unitários/PDF passaram: apresentação e fatos independentes;
+origem/ato/ordem/corte inválidos recusados; mesmos bytes V11 após o acréscimo.
+
+Três cenários de navegador foram qualificados por união das rodadas: iOS passou
+na primeira; Chromium e mobile passaram na repetição dirigida. As duas falhas
+iniciais foram no encerramento de interceptações ainda em voo, após todas as
+asserções de negócio; afterEach agora aguarda sua conclusão antes de fechar o
+contexto. Uma repetição interrompida durante preparo não representa qualificação.
+Relatórios ficam em bal-corrections-browser-first/final, dentro de
+output/phase-d-work. Cinco larguras, axe completo, hrefs da versão exata,
+mascaramento e resposta200 incompatível foram preservados. Capturas Chromium e
+mobile e todas as cinco páginas do PDF nativo Chromium foram inspecionadas,
+além das quatro páginas controladas. O pipeline real usou certificado/TSA de
+teste; não é homologação externa nem aprovação da aparência DOC-A.
+
+As primeiras falhas SQL42702 e a suposição indevida de UUID para produto foram
+corrigidas em migrations incrementais, sem reescrever as aplicadas. O mapa das
+linhas de aplicação é calculado uma vez por reconto. Logs Auth iniciais/final
+ficam em bal-correction-links.log,bal-correction-links-final.log e
+bal-correction-links-identity.log. Tipos e lint afetados passaram. O manifesto
+continua com84 migrations protegidas inalteradas.
+
+## Banco remoto — núcleo inicial208–212
 
 As migrations20261111183942,20261111192340,20261111193015,
 20261111194511 e20261111201053 foram aplicadas uma vez ao alvo
@@ -108,11 +161,25 @@ A checagem de performance posterior à primeira aplicação apontou ausência de
 isolado. Não repete suítes funcionais cujo comportamento não mudou. Os índices
 novos ainda sem uso são INFO esperado antes de tráfego representativo.
 
+## Banco remoto — vínculos213–215
+
+As migrations20261111202159,20261111203047 e20261111203626 foram aplicadas
+uma vez ao mesmo projeto autorizado. Preflight212 confirmou os contratos-alvo
+e ausência da projeção/entrada novas. Dry-run isolou essas três pendências;
+pós-validação confirmou215 versões iguais às locais e dry-run vazio.
+As duas auxiliares novas são privadas e sem execução Auth/anon/service_role;
+a reserva V12 é somente authenticated. As três são definer com search_path
+vazio. A proteção de estoque nas correções e o tratamento de identidade textual
+foram conferidos no remoto. Não houve tabela nova, reset, Auth/fixtures remotos,
+backup redundante ou ativação externa. Advisors mantêm as mesmas classes;
+a ocorrência adicional de definer authenticated é a nova RPC(210→211).
+Os demais totais permanecem63/1/3/1, sem aprovação dos alertas preexistentes.
+
 ## Pendências finitas do complemento
 
-Este lote não conclui DOC-B nem a fase: falta mostrar vínculo, momento e
-resultado dos atos posteriores de correção de cada diferença, sem inferi-los
-do simples encaminhamento. Seguem depois saldo COM, devolução cotidiana e
+As novas regras do BAL estão concluídas localmente no fluxo nativo existente,
+incluindo vínculo/momento/resultado, sem inferir correção do encaminhamento.
+Isso não conclui DOC-B nem a fase. Seguem saldo COM, devolução cotidiana e
 cancelamento/complemento, na ordem já consolidada. Aparência aprovada dos PDFs
 é DOC-A; modalidades, Andamentos, acessos agrupados e retomada simples são
 DOC-C. Integração completa e amostras finais são DOC-D. Provas locais com Auth

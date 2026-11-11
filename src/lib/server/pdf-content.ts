@@ -20,6 +20,7 @@ import { validatePdfStructure } from "./pdf-structure-validation";
 import { formatStockObservation, formatStockObservationTime } from "../stock-observation";
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 import { balanceApplicationFacts } from "@/lib/validation/balance-application";
+import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
 
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
 export type PdfContentPlan = {
@@ -67,6 +68,17 @@ export async function composeIssuance(
     if (application.data.documentVersion > snapshot.version || application.data.countVersion !== snapshot.workflow?.countVersion
       || expected.length !== actual.length || new Set(actual).size !== actual.length || expected.some(id => !actual.includes(id)))
       throw invalid("balance-application-source");
+  }
+  const corrections = revision >= 12 && snapshot.type === "BAL" ? balanceCorrectionFacts.safeParse(snapshot.balanceReviewCorrections) : null;
+  if (corrections && !corrections.success) throw invalid("balance-corrections-schema");
+  if (corrections?.success) {
+    const required = (snapshot.balanceReviews?.reviews ?? []).flatMap(review => (review.item_results ?? []).filter(item => item.result === "difference").map(item => review.id + ":" + item.lineId));
+    if (required.length !== corrections.data.length || corrections.data.some(entry => !required.includes(entry.reviewId + ":" + entry.sourceLineId))) throw invalid("balance-corrections-scope");
+    for (const entry of corrections.data) {
+      const review = snapshot.balanceReviews!.reviews.find(row => row.id === entry.reviewId)!;
+      if (entry.acts.some(act => act.documentId !== snapshot.id || act.version > snapshot.version || act.version <= review.reviewed_document_version
+        || act.countVersion <= review.count_version || (act.application.state === "applied" && act.application.documentVersion > snapshot.version))) throw invalid("balance-corrections-cutoff");
+    }
   }
   let bytes: Buffer;
   try {
@@ -136,6 +148,17 @@ export async function composeIssuance(
         const source = snapshot.lines.find(item => item.id === line.lineId)!;
         semanticFacts["fidelity/balance/after/" + line.lineId] = line.state === "restricted" ? "Acesso restrito" : formatQuantity(line.quantity, String(source.unit_snapshot ?? ""));
       }
+    }
+  }
+  if (corrections?.success) for (const entry of corrections.data) {
+    const prefix = "fidelity/correction/" + entry.reviewId + "/" + entry.sourceLineId;
+    semanticFacts[prefix + "/scope"] = entry.sourceState === "unavailable" ? "Identidade histórica do material indisponível; nenhum vínculo presumido." : entry.acts.length ? "Atos posteriores da mesma ficha e material." : "Nenhum reconto posterior vinculado a este material nesta ficha.";
+    for (const act of entry.acts) {
+      const key = prefix + "/" + act.eventId;
+      semanticFacts[key + "/count"] = "Reconto " + act.countVersion + " · versão " + act.version + " · " + act.line.name + " · " + formatQuantity(act.line.quantity, act.line.unit);
+      semanticFacts[key + "/actor"] = (act.actorName ?? "Nome histórico não preservado") + " · " + formatBrazilDate(act.recordedAt);
+      semanticFacts[key + "/application"] = act.application.state === "not_applied" ? "Reconto registrado; contagem não aplicada ao estoque." : act.application.state === "unavailable" ? "Saldo após a aplicação: Não disponível no registro." : "Aplicado por " + act.application.actorName + " · " + formatBrazilDate(act.application.appliedAt) + " · versão " + act.application.documentVersion;
+      if (act.application.state === "applied") semanticFacts[key + "/after"] = act.application.lines[0].state === "restricted" ? "Acesso restrito" : formatQuantity(act.application.lines[0].quantity, act.line.unit);
     }
   }
   if (sourceFacts) {

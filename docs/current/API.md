@@ -25,7 +25,7 @@ recupera a mesma intenção; mudança de seletor documental conflita. Cada nova
 chave explícita cria outra emissão, sem alterar documento, SCI ou estoque.
 Resposta200 exige ready;202 representa processamento ainda não concluído.
 
-A reserva atual usa reserve_pdf_issuance_v11: BAL novo recebe revisão11; outros
+A reserva atual usa reserve_pdf_issuance_v12: BAL novo recebe revisão12; outros
 tipos recebem10. Além da fonte canônica preservada, balanceApplication congela
 o ato correspondente à contagem e ao corte de versão escolhidos. not_applied,
 unavailable e applied com linhas known/restricted são distintos; quantidade
@@ -395,6 +395,19 @@ Hash/versão obsoletos exigem consulta e adoção explícita da referência.
 O contrato antigo com somente group continua aceito; a UI envia a referência
 e expectedVersion. balanceReview distingue reviewSatisfied,hasItemDifferences,
 applicationGroups e application, além de contador, contagem e pareceres.
+corrections acrescenta referências de atos posteriores por reviewId/sourceLineId.
+Cada referência distingue origem known/unavailable e uma cronologia de atos.
+Somente reconto da mesma ficha, identidade textual exata do produto e contagem
+posterior geram vínculo. Nomes, quantidades parecidas, outra ficha, ENT ou consumo
+não são presumidos como correção daquele parecer. Cada ato preserva evento,
+versão, contador, instante, linha congelada e aplicação correspondente ao corte.
+A aplicação é filtrada ao material e mascarada pela permissão atual de estoque.
+A leitura não muda estoque, parecer, protocolo, hash ou snapshots públicos.
+
+A emissão BAL V12 congela balanceReviewCorrections no corte selecionado;
+versões anteriores não recebem atos futuros. A leitura de exemplar com valores
+privados de uma correção também exige stock.team.read, ainda que a contagem
+atual não tenha sido aplicada. V11 e anteriores conservam sua fonte/revisão.
 
 BAL apply_balance exige idempotencyKey,expectedVersion e body com group e
 reviewReference. Requer revisões previstas, grupo/pessoa autorizados distintos

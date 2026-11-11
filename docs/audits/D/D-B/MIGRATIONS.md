@@ -3,7 +3,30 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — DOC-B_BAL
+## Estado atual — DOC-B_BAL_CORRECTIONS
+
+Local e remoto com215 versões, sem pendências. As migrations20261111202159,
+20261111203047 e20261111203626 acrescentam somente projeção de atos nativos e
+emissão BAL V12 com correções congeladas no corte documental. Recontos usam a
+identidade textual exata do produto da contagem preservada. Não há nova escrita
+de estoque, tabela ou alteração de snapshot/hash/exemplar anterior.
+
+Preflight212 confirmou contratos-alvo e ausência das novas funções. Preparo
+local sem reset e regressões Auth/PDF/navegador precederam o push linked/skip-vault.
+Dry-run isolou três pendências e terminou vazio após aplicação. As215 versões
+coincidem com os arquivos locais. Auxiliares fechadas, RPC authenticated-only,
+SECURITY DEFINER/search_path e proteção dos saldos nas correções conferidos.
+84 arquivos históricos protegidos permanecem inalterados. Sem fixtures/Auth
+remotos, reset, produção, transportes ou backups redundantes.
+
+Advisors mantêm as mesmas cinco classes:63 INFO sem política, extensão1 WARN,
+definer anon3 WARN, definer authenticated211 WARN e senhas1 WARN. O único
+acréscimo é a nova reserva autenticada(+1); sua autorização e negativas foram
+conferidas. Alertas antigos continuam sem aprovação genérica. Instalação limpa,
+evolução legada e integração completa permanecem na CI do SHA publicado.
+[Resultados e limites](BAL_REVIEW_APPLICATION.md).
+
+## Núcleo inicial DOC-B_BAL — registro histórico
 
 Local e remoto com212 versões, sem pendências. As migrations20261111183942,
 20261111192340,20261111193015 e20261111194511 separam parecer/aplicação BAL,

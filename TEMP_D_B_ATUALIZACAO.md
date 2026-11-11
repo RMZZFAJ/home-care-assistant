@@ -44,14 +44,15 @@ As etapas 01 a 07 estão concluídas localmente em seus escopos anteriores. A et
 visual do sistema inteiro permanece estimada em 85%; restam outras 20
 composições e a conferência completa das 171 relações.
 
-**Trabalho atual:** DOC-B, no BAL. Parecer por material, aplicação separada ao
-estoque, recuperação após resposta perdida e saldo no PDF foram implementados
-e conferidos. Falta vincular e mostrar o resultado das correções posteriores de
-cada diferença. O complemento DOC-B passa de 10% para aproximadamente 20%; ele
-continua parcial. A ordem restante está somente na seção 5, ao final.
+**Trabalho atual:** DOC-B. As novas regras do BAL foram implementadas e
+conferidas no fluxo atual: parecer por material, aplicação separada, recuperação,
+saldo histórico e vínculo dos atos posteriores com momento e resultado. O
+complemento DOC-B está em aproximadamente 30%; continua parcial. O próximo
+ponto é o saldo histórico por material da COM. A ordem restante está somente
+na seção 5, ao final.
 
-O banco remoto recebeu as cinco atualizações deste lote e está sincronizado.
-As verificações locais do lote passaram. A validação automática do commit
+O banco remoto está sincronizado, incluindo as três atualizações dos vínculos
+posteriores. As verificações locais passaram. A validação automática do commit
 publicado continua sendo um gate separado. Sonar permanece adiado por sua
 decisão.
 
@@ -311,13 +312,16 @@ não transforma os quatro resultados novos em concluídos.
   Source Sans 3, cores, bandeira lateral quando aplicável, autores, macroetapas,
   tabelas, observações e avisos completos. Conteúdo longo continuará em novas
   páginas com cabeçalhos e rodapés legíveis. Responsável: Codex.
-- **DOC-B — Fatos, saldos e atos específicos.** Em execução · ≈20% do acréscimo.
+- **DOC-B — Fatos, saldos e atos específicos.** Em execução · ≈30% do acréscimo.
   No BAL, o parecer por material e a aplicação ao estoque agora são atos
   separados. A aplicação tem confirmação, autoria e momento próprios; uma
   resposta perdida pode ser recuperada sem repetir movimentos. O PDF mostra o
   saldo daquela aplicação, com seu momento, ou Acesso restrito. Movimentos
-  posteriores não substituem esse saldo. **Falta no BAL:** vincular as correções
-  posteriores das diferenças e mostrar momento e resultado de cada ato.
+  posteriores não substituem esse saldo. **BAL concluído neste acréscimo:**
+  os atos posteriores do mesmo material têm vínculo, autoria, momento, resultado
+  e aplicação próprios na tela e no PDF. A contagem anterior é preservada;
+  encaminhamento não é confundido com correção realizada. A nova aparência
+  documental continua em DOC-A.
   Na preparação bilateral, entrega e devolução já têm nomes próprios; a
   devolução não exige entrega de origem, e concordância, expedição e recebimento
   foram conferidos separadamente. **Restante:** concluir as outras telas e a
@@ -879,12 +883,12 @@ outra missão nem substituir as 20 etapas. Depois seguem os blocos ainda abertos
 abaixo. As atividades externas continuam separadas e podem ser preparadas em
 paralelo quando independentes.
 
-**Agora — DOC-B · ≈20%, terminando as regras do BAL.** Vincular correções
-posteriores de cada diferença e mostrar momento/resultado sem alterar a
-contagem anterior. Parecer, aplicação própria, recuperação e saldo do BAL no
-exemplar já foram implementados e conferidos. Depois seguem saldo histórico
-autorizado da COM, devolução autônoma cotidiana e preservação de fichas com
-cancelamento/complemento e confirmações próprias.
+**Agora — DOC-B · ≈30%, saldo histórico da COM.** Mostrar o saldo autorizado de
+cada material imediatamente após sua última entrada validada naquela COM, com
+data e parcelas separadas. As novas regras do BAL estão concluídas no fluxo
+atual, incluindo os vínculos posteriores. Depois seguem devolução autônoma
+cotidiana e preservação de fichas com cancelamento/complemento e confirmações
+próprias.
 
 **Depois — DOC-A · 0%.** Composição documental compartilhada; requisição;
 compra/doação; entrega/devolução; BAL; conteúdo longo.

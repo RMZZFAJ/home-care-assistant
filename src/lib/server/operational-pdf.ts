@@ -46,6 +46,7 @@ import { documentVariant } from "@/lib/documents/variant";
 import type { PdfFidelityFacts } from "@/lib/documents/pdf-fidelity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
 import { balanceApplicationFacts } from "@/lib/validation/balance-application";
+import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
 
 type Person = {
   id?: string;
@@ -65,6 +66,7 @@ export type DocumentSnapshot = {
   sourceFacts?: unknown;
   documentFacts?: unknown;
   balanceApplication?: unknown;
+  balanceReviewCorrections?: unknown;
   materialIdentity?: string;
   materialIdentitySource?: string;
   purchaseProgress?: PurchaseProgress;
@@ -167,7 +169,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11;
+  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -196,6 +198,7 @@ export async function renderDocumentPdf(
   const revision = emission?.rendererRevision ?? 5;
   const sourceFacts = revision >= 6 ? emission?.sourceFacts : undefined;
   const fidelity = revision >= 7 ? emission?.fidelityFacts : undefined;
+  const corrections = revision >= 12 && snapshot.type === "BAL" ? balanceCorrectionFacts.parse(snapshot.balanceReviewCorrections) : undefined;
   const cancelledV6 = Boolean(sourceFacts && snapshot.status === "cancelled");
   const entState = revision >= 9 && snapshot.type === "ENT" ? entReceiptState(snapshot.status,Boolean(sourceFacts?.historical),typeof snapshot.workflow?.acceptedAt === "string" ? snapshot.workflow.acceptedAt : null,emission?.representation) : null;
   if (emission && revision >= 6 && !sourceFacts)
@@ -1590,6 +1593,23 @@ export async function renderDocumentPdf(
           if (fidelity) for (const item of items) {
             const source = review.reviewed_snapshot.lines.find(line => line.id === item.lineId);
             fidelityFact(`review/${review.id}/item/${item.lineId}`, "Parecer individual preservado", `${source?.name_snapshot ?? "Material não identificado"} · ${item.result === "confirmed" ? "Confirmado" : "Diferença apontada"} · ${item.forwarding === "none" ? "Sem encaminhamento" : item.forwarding === "recount" ? "Reconto indicado" : "Ajuste autorizado indicado"} · ${item.comment || "Sem comentário adicional"}`);
+          }
+          if (corrections) for (const item of items.filter(item => item.result === "difference")) {
+            const entry = corrections.find(row => row.reviewId === review.id && row.sourceLineId === item.lineId);
+            if (!entry) throw new Error("BAL correction reference missing");
+            const source = review.reviewed_snapshot.lines.find(line => line.id === item.lineId);
+            const prefix = "correction/" + review.id + "/" + item.lineId;
+            section("Atos posteriores — " + (source?.name_snapshot ?? "Material não identificado"));
+            fidelityFact(prefix + "/scope", "Vínculo demonstrado", entry.sourceState === "unavailable" ? "Identidade histórica do material indisponível; nenhum vínculo presumido." : entry.acts.length ? "Atos posteriores da mesma ficha e material." : "Nenhum reconto posterior vinculado a este material nesta ficha.");
+            for (const act of entry.acts) {
+              const key = prefix + "/" + act.eventId;
+              fidelityFact(key + "/count", "Reconto próprio", "Reconto " + act.countVersion + " · versão " + act.version + " · " + act.line.name + " · " + formatQuantity(act.line.quantity, act.line.unit));
+              fidelityFact(key + "/actor", "Autoria e momento", (act.actorName ?? "Nome histórico não preservado") + " · " + formatBrazilDate(act.recordedAt));
+              text("Vínculo: " + act.documentId + " · evento " + act.eventId + " · versão " + act.version, 8);
+              fidelityFact(key + "/application", "Resultado do ato posterior", act.application.state === "not_applied" ? "Reconto registrado; contagem não aplicada ao estoque." : act.application.state === "unavailable" ? "Saldo após a aplicação: Não disponível no registro." : "Aplicado por " + act.application.actorName + " · " + formatBrazilDate(act.application.appliedAt) + " · versão " + act.application.documentVersion);
+              if (act.application.state === "applied") fidelityFact(key + "/after", "Saldo após a aplicação deste reconto", act.application.lines[0].state === "restricted" ? "Acesso restrito" : formatQuantity(act.application.lines[0].quantity, act.line.unit));
+            }
+            text("Esses atos não substituem o Contado nem o saldo da contagem anterior. Este parecer não confirma as contagens seguintes.", 8);
           }
         } else text("Parecer geral; nenhum resultado individual por material foi declarado.", 8);
       }
