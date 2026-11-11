@@ -230,3 +230,63 @@ banco, contratos de comando ou permissões; dry-run remoto vazio em205. Ponto
 04.3 qualificado no escopo declarado; próximo04.4. CI do novo SHA necessária.
 DOC-A/B/C/D, incluindo devolução autônoma, novos atos de cancelamento,
 aparência documental e retomada simplificada, conservam implementação pendente.
+
+## D3.66 — preparação bilateral, entrega e devolução
+
+Base fa017a7. O ponto fixo 04.4 trata da direção, concordância, expedição e
+encerramento da preparação bilateral. A aparência e os componentes continuam
+os do Modelo Integral. Entrega de materiais identifica família→equipe;
+Devolução de materiais identifica equipe→família. Pares incompletos ou iguais
+não recebem sentido presumido. Os tipos persistidos, protocolos, versões e
+identificadores permanecem os existentes.
+
+O console, a preparação, a revisão, os fatos e o cabeçalho da ficha bilateral
+mostram o processo correspondente. O vínculo documental de origem permanece
+opcional e sua ausência na devolução não é apresentada como erro ou pendência.
+A capacidade de declarar sem vínculo já pertencia ao contrato nativo; a
+implementação aproveita esse processo, sem tornar devolução um cancelamento
+ou compensação de outra ENT. Os registros anteriores não são reescritos.
+
+Antes da expedição, os marcos agora são Declaração, Concordância, Expedição e
+Recebimento. Declaração registrada não é emissão ENT; concordância não expede
+nem recebe materiais. Recusa ou retirada encerra a preparação sem criar fatos
+físicos. Após expedir, os marcos e a orientação usam os fatos próprios da ENT,
+preservando a distinção entre recebimento integral e conciliação com diferenças.
+A orientação da devolução conserva esse nome no recebimento e divergência.
+Os atalhos selecionam e focam a aba real, sem executar comandos.
+
+Passaram31 unitários em quatro arquivos, tipos e lint dirigido. Os27 cenários
+da coorte de produção passaram nos três perfis, sem falhas ou repetições por
+erro. Após a inspeção a320px, o texto genérico do cabeçalho antes da expedição
+foi substituído por uma explicação própria da preparação. O cenário completo
+de devolução foi repetido nos três perfis, passando com build de produção e
+nova inspeção visual. No conjunto:27 casos distintos qualificados,30 execuções
+aprovadas. O ajuste final é exclusivamente esse texto compartilhado; os demais
+ramos e consumidores conservam a prova da coorte inicial.
+
+Os cenários novos registram pela tela entrega e devolução sem vínculo de origem,
+com Auth real, API e banco local guardado. Declaração/concordância conservam o
+ledger; expedição cria trânsito e recebimento tem autoria pessoal distinta.
+A contraparte de uma devolução não recebe em nome do recebedor designado.
+SQL independente compara documentos, linhas, eventos, transferências e ledger;
+os dados, eventos e hash da entrega anterior permanecem intactos. Navegar e
+seguir a próxima providência não enviam comando oficial nem alteram esses fatos.
+Recusa e retirada preservam a preparação sem criar tarefa de recebimento.
+
+Os consumidores existentes conservam declaração incerta com perda de escrita,
+três autores, material inativo com saldo, recebimento parcial, PDFs, conflito,
+retomada de campos nas duas direções e decisões agree/dispatch recuperáveis.
+Os nomes de seletores afetados foram atualizados antes da execução, sem reduzir
+suas verificações. Axe/overflow a320px passou nas duas direções e três perfis;
+a inspeção visual final verifica a identificação e o texto da devolução. Não
+é aprovação de toda a aparência ou prova de aparelho físico.
+
+Sem alteração de banco, API ou autorização; dry-run remoto vazio em205.
+O terminal PowerShell ficou sem pwsh.dll; a execução continuou com Node24.22.0
+explícito via CMD, mantendo o mesmo runner, guardas, build e stack local.
+Ponto04.4 qualificado no escopo declarado; próximo04.5. CI do novo SHA necessária.
+DOC-B tem avanço parcial na nomenclatura e preparação bilateral. O complemento
+ainda exige os novos PDFs, o ajuste da criação cotidiana ENT e a apresentação
+das variantes em outras superfícies. Rascunhos simplificados, novos atos de
+cancelamento e demais DOC-A/B/C/D continuam separados; essas partes não são
+aprovadas pela existência do fluxo bilateral.

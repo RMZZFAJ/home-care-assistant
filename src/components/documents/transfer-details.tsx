@@ -10,6 +10,7 @@ import {
 import { TransferDecisionEditor } from "./transfer-decision-editor";
 import { RelatedDocument } from "./related-document";
 import { TransferFactsDisplay } from "./transfer-facts";
+import { materialTransferDirection, materialTransferLabel } from "@/lib/documents/transfer-follow-up";
 
 export function TransferDetails({
   data,
@@ -41,7 +42,7 @@ export function TransferDetails({
       aria-label="Declaração e concordância da transferência"
     >
       <h2 ref={headerRef} tabIndex={-1}>
-        Atos da transferência física
+        Atos da {materialTransferLabel(facts.declaration.source, facts.declaration.destination).toLocaleLowerCase("pt-BR")}
       </h2>
       <TransferFactsDisplay facts={facts} />
       {facts.originDocumentId ? (
@@ -51,7 +52,9 @@ export function TransferDetails({
           label="Consultar ENT documental de origem"
         />
       ) : (
-        <p>Origem documental não informada.</p>
+        <p>{materialTransferDirection(facts.declaration.source, facts.declaration.destination) === "return"
+          ? "Sem entrega de origem vinculada. Esta devolução pode ser registrada de forma autônoma."
+          : "Sem vínculo documental de origem; esse vínculo é opcional."}</p>
       )}
       <p className="text-sm">
         O vínculo documental preserva a origem conhecida. Não individualiza

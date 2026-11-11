@@ -1692,5 +1692,99 @@
       "physical/human/provider/operational gates distinct",
       "owner-deferred Sonar"
     ]
+  },
+  "D3.66": {
+    "baseSha": "fa017a73697aa1daf34f9d0bfac6b2bf5f45f132",
+    "scope": "04.4 bilateral direction,agreement,shipment,receipt and closure;DOC-B partial nomenclature/preparation",
+    "unit": {
+      "distinctPassed": 31,
+      "files": [
+        "tests/transfer-follow-up.test.ts",
+        "tests/delivery-follow-up.test.ts",
+        "tests/document-milestones.test.ts",
+        "tests/purchase-follow-up.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "cohort": {
+        "startTime": "2026-11-11T05:35:00.236Z",
+        "duration": 436232.42699999997,
+        "expected": 27,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "captionFinal": {
+        "startTime": "2026-11-11T05:45:07.212Z",
+        "duration": 81059.314,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 27,
+      "executions": 30,
+      "failures": 0,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "reports": [
+        "output/phase-d-work/ui-canonical/transfer-follow-up-qualified.json",
+        "output/phase-d-work/ui-canonical/transfer-follow-up-caption-final.json"
+      ]
+    },
+    "scopeReuse": "Final source change is only the shared pre-shipment header help text;repeated the complete CARE_TEAM flow in all3profiles after production build and inspected its new caption.No behavioral assertions or rules reduced.",
+    "proofs": [
+      "UI/API creates FAMILY→CARE_TEAM delivery and CARE_TEAM→FAMILY return with originDocumentId null",
+      "No new technical document type or historical renumbering;native ENT identifiers/protocol assignment retained",
+      "Recorded declaration and agreement do not alter ledger;pre-shipment milestones do not claim issued dispatch or receipt",
+      "Shipment creates quantity2 transit;receipt uses the designated personal author;counterparty alone is refused42501 for third-person receipt",
+      "Independent SQL snapshots of documents,lines,events,transfers and stock unchanged by read/navigation/next-step",
+      "Original older document,lines and complete event rows/content_hash remain byte-equivalent through the unlinked lifecycle",
+      "Refusal/withdrawal preserve preparation without shipment,receipt task or stock movement",
+      "Original three-author/inactive/partial/PDF,conflict,private declaration both directions and agree/dispatch recovery consumers pass with updated visible names",
+      "After dispatch,return guidance retains its name and delegates to existing ENT personal receipt/reconciliation rules"
+    ],
+    "validation": {
+      "typecheck": "PASS",
+      "directedEslint": "PASS",
+      "axeOverflow": "320px both directions and3profiles;CARE_TEAM repeated after caption",
+      "visual": "final CARE_TEAM Chromium320 identification/status/caption inspected;long header requires normal page scrolling;not full UI/human approval",
+      "reactReview": "derived presentation only;no new effects,requests,dependencies or auth decisions",
+      "shell": "PowerShell pwsh.dll unavailable;explicit pinned Node24.22.0 via CMD,unchanged guarded runner"
+    },
+    "remote": {
+      "project": "qwfrqychokvhdzakibid",
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "completedCheckpoints": [
+        "04.1",
+        "04.2",
+        "04.3",
+        "04.4"
+      ],
+      "nextCheckpoint": "04.5"
+    },
+    "approvedComplement": {
+      "DOC-B": "partial bilateral nomenclature/preparation;estimated10%;daily ENT path,other surfaces,PDFs and other rules remain"
+    },
+    "limits": [
+      "own published SHA CI required",
+      "04.5/04.6 and joint UI/list validation remain",
+      "DOC-A/C/D and remaining DOC-B not approved by existing bilateral flow",
+      "human/physical/provider/operational gates distinct",
+      "owner-deferred Sonar"
+    ]
   }
 }

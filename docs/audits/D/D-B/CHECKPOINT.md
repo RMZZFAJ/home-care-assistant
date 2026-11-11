@@ -1,5 +1,19 @@
 # Checkpoint D-B
 
+D3.66 fechou localmente o ponto fixo04.4 no escopo declarado. A preparação
+bilateral distingue entrega e devolução, com vínculo documental opcional.
+Declaração/concordância não aparecem como expedição ou recebimento. Depois
+da expedição, a devolução conserva nome próprio e segue os atos pessoais ENT.
+Passaram31 unitários e27 cenários distintos de navegador, sem falhas; três
+repetições dirigidas conferiram o texto final do cabeçalho a320px nos três
+perfis. Tipos, lint e inspeção visual dirigidos passaram. Contraprovas:
+concordância sem estoque, contraparte sem aceite por terceiro e origem antiga
+intacta. Sem SQL novo; dry-run remoto vazio em205. CI do novo SHA necessária.
+04.1–04.4 qualificados; próximo04.5, consumo. Matriz56 PASS locais/49 PARTIAL.
+DOC-B avança parcialmente na nomenclatura/preparação bilateral; criação ENT
+cotidiana, outras superfícies, PDFs e demais regras continuam pendentes.
+[Resultados](DOCUMENT_TABS_VALIDATION.json).
+
 D3.65 fechou localmente o ponto fixo 04.3 no escopo declarado da ENT.
 Conferência encerrada com diferenças não equivale a recebimento integral.
 O atendimento REQ conserva a parcela aceita, sem quantidade solicitada

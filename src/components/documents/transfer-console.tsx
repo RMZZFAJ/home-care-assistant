@@ -52,12 +52,13 @@ import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import type { Custody, SupplyDocument } from "@/types/documents";
 import type { TransferPreparation } from "@/types/transfers";
+import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
 
 export const custodyName = (source: Custody) =>
   source === "FAMILY" ? "Família" : "Equipe";
 export function TransferConsole() {
   return (
-    <Workspace title="Transferência entre custódias">
+    <Workspace title="Entregas e devoluções de materiais">
       {(context) =>
         context.patient && can(context, "ent.read") ? (
           <PatientTransfers key={context.patient.id} context={context} />
@@ -77,11 +78,12 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
     <div className="mx-auto max-w-4xl space-y-5">
       <section className="ui-card space-y-4">
         <h2 ref={headingRef} tabIndex={-1}>
-          Declarar uma transferência física
+          Declarar entrega ou devolução de materiais
         </h2>
         <p>
-          Use para mover materiais entre família e equipe, inclusive uma
-          devolução. A contraparte concorda primeiro. A expedição coloca os
+          A entrega segue da família para a equipe. A devolução de materiais
+          segue da equipe para a família e pode ser autônoma, sem uma entrega
+          de origem vinculada. A contraparte concorda primeiro. A expedição coloca os
           materiais em trânsito; somente o recebimento pessoal credita o
           destino.
         </p>
@@ -100,10 +102,10 @@ function PatientTransfers({ context }: { context: WorkspaceContext }) {
               >
                 <option value="">Escolha a origem</option>
                 {can(context, "stock.family.read") ? (
-                  <option value="FAMILY">Família → Equipe</option>
+                  <option value="FAMILY">Entrega de materiais · Família → Equipe</option>
                 ) : null}
                 {can(context, "stock.team.read") ? (
-                  <option value="CARE_TEAM">Equipe → Família</option>
+                  <option value="CARE_TEAM">Devolução de materiais · Equipe → Família</option>
                 ) : null}
               </SelectField>
             </FormField>
@@ -198,6 +200,7 @@ function TransferDeclarationEditor({
     reasonFieldRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef(false);
   const patientId = context.patient!.id;
+  const processName = materialTransferLabel(source, source === "FAMILY" ? "CARE_TEAM" : "FAMILY").toLocaleLowerCase("pt-BR");
   const restoredRef = useRef(false);
   const returnFocusRef = useRef(false);
   const [baseline, setBaseline] = useState<TransferDeclarationDraftContent>(
@@ -631,8 +634,8 @@ function TransferDeclarationEditor({
         result
           ? "Declaração registrada"
           : packet
-            ? "Revisar declaração da transferência"
-            : "Preparar transferência física"
+            ? `Revisar declaração da ${processName}`
+            : `Preparar ${processName}`
       }
       busy={busy || privateDraft.busy}
       preventClose={uncertain || !!privateDraft.pending}
@@ -751,7 +754,7 @@ function TransferDeclarationEditor({
                 </ActionButton>
               </fieldset>
             ))}
-            <FormField label="Sua justificativa para a transferência" required>
+            <FormField label={`Sua justificativa para a ${processName}`} required>
               <TextAreaField
                 ref={reasonFieldRef}
                 minLength={3}
@@ -1023,13 +1026,14 @@ function TransferDeclarationEditor({
                   </SelectField>
                 </FormField>
                 <p className="text-sm">
-                  A seleção contém até 100 ENT recentes com aceite na custódia
+                  O vínculo é opcional: uma devolução não exige entrega de origem.
+                  {" "}A seleção contém até 100 ENT recentes com aceite na custódia
                   de origem ({reference!.originTotal} no total). O vínculo
                   documenta a origem conhecida; não identifica lotes ou presume
                   disponibilidade dessas unidades.
                 </p>
                 <FormField
-                  label="Sua justificativa para a transferência"
+                  label={`Sua justificativa para a ${processName}`}
                   required
                 >
                   <TextAreaField

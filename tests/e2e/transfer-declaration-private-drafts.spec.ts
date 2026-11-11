@@ -67,7 +67,7 @@ async function fill(page: Page, f: Fixture, amount = "0,") {
       .getByRole("combobox", { name: /^ENT documental de origem/ })
       .selectOption(f.originId);
   await dialog(page)
-    .getByRole("textbox", { name: /^Sua justificativa para a transferência/ })
+    .getByRole("textbox", { name: /^Sua justificativa para a (entrega|devolução) de materiais/ })
     .fill("\uFEFF\n Declaração própria preservada entre sessões\u00A0");
 }
 async function save(page: Page) {
@@ -245,7 +245,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
         ).toHaveValue("0,");
         await expect(
           dialog(peer).getByRole("textbox", {
-            name: /^Sua justificativa para a transferência/,
+            name: /^Sua justificativa para a (entrega|devolução) de materiais/,
           }),
         ).toHaveValue(packet.content.fields.reason);
         await expect(

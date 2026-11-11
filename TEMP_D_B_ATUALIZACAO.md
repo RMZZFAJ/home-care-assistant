@@ -35,8 +35,8 @@ A fase continua em execução.
 
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03 e 07 estão concluídas localmente.
-A etapa 04 tem seis pontos. Os pontos 04.1, 04.2 e 04.3 estão concluídos
-localmente no escopo declarado; o próximo é 04.4, transferências.
+A etapa 04 tem seis pontos. Os pontos 04.1 a 04.4 estão concluídos localmente
+no escopo declarado; o próximo é 04.5, consumo.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -268,7 +268,11 @@ aproveitados. Os resultados anteriores continuam registrados.
   macroetapas, tabelas, observações e avisos completos. Conteúdo longo
   continuará em novas páginas com cabeçalhos e rodapés legíveis.
   Responsável: Codex.
-- **DOC-B — Fatos, saldos e atos específicos.** A iniciar · 0% do acréscimo.
+- **DOC-B — Fatos, saldos e atos específicos.** Em execução · 10% do acréscimo.
+  Na preparação bilateral, entrega e devolução têm nomes próprios. A devolução
+  pode ser registrada sem vincular entrega de origem; concordância, expedição
+  e recebimento foram conferidos separadamente. Restam as outras telas, o
+  ajuste da criação cotidiana ENT e as novas regras dos arquivos abaixo.
   Mostrar saldo histórico de cada material da COM após sua última entrada
   validada, parcelas separadas e saldo do BAL após a aplicação correspondente.
   Revisão não altera estoque. Mostrar Acesso restrito quando necessário.
@@ -780,8 +784,8 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
 
 ### Próxima etapa — 04, estados e vínculos das fichas
 
-Os pontos 04.1, 04.2 e 04.3 estão concluídos no escopo declarado. Restam os
-pontos 04.4 a 04.6. Cada um terá seu próprio fechamento. As novas
+Os pontos 04.1 a 04.4 estão concluídos no escopo declarado. Restam os pontos
+04.5 e 04.6. Cada um terá seu próprio fechamento. As novas
 regras documentais estão identificadas em DOC-A a DOC-D.
 
 - **04.1 — Requisição — estados, atendimento, cancelamento e vínculos.**
@@ -805,7 +809,12 @@ regras documentais estão identificadas em DOC-A a DOC-D.
   A nova devolução autônoma e os novos atos do complemento continuam no
   bloco DOC-B. Responsável — Codex.
 - **04.4 — Transferências — origem, destino, aceite e encerramento.**
-  Implementado; conferência conjunta pendente. Responsável — Codex.
+  Concluído localmente · 100% deste ponto. A preparação bilateral identifica
+  entrega e devolução, aceita vínculo de origem opcional e separa declaração,
+  concordância, expedição e recebimento. Recusa e retirada não movimentam
+  materiais. Recuperação, conflitos e autorias foram conferidos. As demais
+  telas e os novos arquivos de devolução continuam em DOC-B/DOC-D.
+  Responsável — Codex.
 - **04.5 — Consumo — relato, complemento, decisão e origem do desconto.**
   Implementado; conferência conjunta pendente. Responsável — Codex.
 - **04.6 — BAL — agendado, sem regime, revisão, reconto e contagens.**

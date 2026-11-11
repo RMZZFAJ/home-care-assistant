@@ -38,7 +38,7 @@ async function fillDeclaration(
     .getByRole("button", { name: "Preparar declaração", exact: true })
     .click();
   const drawer = page.getByRole("dialog", {
-    name: "Preparar transferência física",
+    name: "Preparar devolução de materiais",
     exact: true,
   });
   await drawer
@@ -62,7 +62,7 @@ async function fillDeclaration(
     .getByRole("combobox", { name: /^ENT documental de origem/ })
     .selectOption(f.origin.id);
   await drawer
-    .getByRole("textbox", { name: /^Sua justificativa para a transferência/ })
+    .getByRole("textbox", { name: /^Sua justificativa para a (entrega|devolução) de materiais/ })
     .fill(
       "Devolução física de cinco unidades, com Ana como contraparte e Bruno como recebedor pessoal.",
     );
@@ -100,7 +100,7 @@ test("transferência separa três autores, recupera declaração incerta com per
     .getByRole("button", { name: "Revisar declaração", exact: true })
     .click();
   const review = page.getByRole("dialog", {
-    name: "Revisar declaração da transferência",
+    name: "Revisar declaração da devolução de materiais",
     exact: true,
   });
   const packets: unknown[] = [];
@@ -154,7 +154,7 @@ test("transferência separa três autores, recupera declaração incerta com per
   await selectDocumentSection(page, "workflow");
   await expect(
     page.getByRole("heading", {
-      name: "Atos da transferência física",
+      name: "Atos da devolução de materiais",
       exact: true,
     }),
   ).toBeVisible();
@@ -385,12 +385,12 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
   expect(officialPosts).toHaveLength(0);
   expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);
   editor = page.getByRole("dialog", {
-    name: "Preparar transferência física",
+    name: "Preparar devolução de materiais",
     exact: true,
   });
   await expect(
     editor.getByRole("textbox", {
-      name: /^Sua justificativa para a transferência/,
+      name: /^Sua justificativa para a (entrega|devolução) de materiais/,
     }),
   ).toHaveValue(/Devolução física de cinco/);
   await expect(

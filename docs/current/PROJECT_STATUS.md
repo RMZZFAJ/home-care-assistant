@@ -4,7 +4,22 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.65
+## Incremento atual D3.66
+
+Entrega e devolução têm identificação própria na preparação bilateral e na
+ficha correspondente. O vínculo documental de origem é opcional, sem exigir
+uma entrega vinculada para declarar a devolução. Declaração, concordância,
+expedição e recebimento permanecem atos distintos. Recusa/retirada não movem
+materiais; depois de expedir, os atos seguem o contrato ENT existente.
+Passaram31 unitários e27 cenários distintos de navegador, sem falhas, mais
+três repetições de composição após ajustar o texto de preparação a320px.
+Tipos e lint passaram. Sem SQL novo; dry-run remoto vazio. CI própria necessária.
+Ponto04.4 qualificado localmente no escopo declarado; próximo04.5, consumo.
+DOC-B tem avanço parcial; criação cotidiana ENT, outras superfícies, novos
+PDFs e demais regras continuam pendentes.
+[Implementação e limites](../audits/D/D-B/DOCUMENT_TABS.md).
+
+## Incremento anterior D3.65
 
 A ENT distingue recebimento integral de conferência encerrada com diferenças.
 O atendimento REQ já sustentado pela quantidade aceita não é desfeito pela

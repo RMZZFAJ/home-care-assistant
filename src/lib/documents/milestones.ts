@@ -29,6 +29,7 @@ type MilestoneFacts = Pick<
     NonNullable<SupplyDocument["balanceRecount"]>,
     "activeAssignment" | "requiresDesignation"
   >;
+  transfer?: Pick<NonNullable<SupplyDocument["transfer"]>, "state" | "agreement">;
 };
 
 export function requisitionMilestones(input: {
@@ -107,6 +108,17 @@ export function requisitionMilestones(input: {
 }
 
 export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
+  if (data.type === "ENT" && data.transfer && data.transfer.state !== "dispatched") {
+    const transfer = data.transfer;
+    const ended = ["declined", "withdrawn"].includes(transfer.state);
+    return [
+      { label: "Declaração", state: "done", detail: "Preparação registrada; ainda sem emissão ENT" },
+      { label: "Concordância", state: transfer.agreement?.decision === "agree" ? "done" : ended ? "closed" : "pending",
+        detail: transfer.agreement?.decision === "agree" ? "Decisão própria registrada; não é recebimento" : transfer.state === "declined" ? "Contraparte recusou a declaração" : ended ? "Encerrada sem nova decisão" : "Aguardando a contraparte designada" },
+      { label: "Expedição", state: ended ? "closed" : "pending", detail: ended ? "Encerrada sem expedir materiais" : "Concordância não expede materiais" },
+      { label: "Recebimento", state: ended ? "closed" : "pending", detail: "Sem expedição; nenhum recebimento presumido" },
+    ];
+  }
   const issued: DocumentMilestone = {
     label: "Emissão",
     state: data.protocol ? "done" : "pending",

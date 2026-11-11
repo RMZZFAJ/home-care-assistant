@@ -57,6 +57,7 @@ import { DocumentNextStep } from "@/components/documents/document-next-step";
 import { supplyMilestones } from "@/lib/documents/milestones";
 import { purchaseFollowUp } from "@/lib/documents/purchase-follow-up";
 import { deliveryFollowUp } from "@/lib/documents/delivery-follow-up";
+import { materialTransferDirection, materialTransferLabel, transferFollowUp } from "@/lib/documents/transfer-follow-up";
 import { DocumentProgress } from "./document-progress";
 import {
   PurchaseDetails,
@@ -387,8 +388,9 @@ export function SupplyDocumentContent({
   const purchaseStep = data?.type === "COM" ? purchaseFollowUp({
     status: data.status, origin: data.payload.origin, progress: data.purchaseProgress,
   }) : null;
-  const deliveryStep = data?.type === "ENT" && (!data.transfer || data.transfer.state === "dispatched")
-    ? deliveryFollowUp(data) : null;
+  const deliveryStep = data?.type === "ENT"
+    ? data.transfer ? transferFollowUp(data) : deliveryFollowUp(data,
+      materialTransferDirection(data.payload.source, data.payload.destination) === "return" ? "return" : "delivery") : null;
   const followUpStep = purchaseStep ?? deliveryStep;
   const operationOpen = Boolean(action || review || uncertain || regularizationEditing || balanceReviewEditing || transferEditing);
   const allowed = (cap: string) => Boolean(activeContext && can(context, cap));
@@ -854,6 +856,8 @@ export function SupplyDocumentContent({
                   : data.payload.origin === "purchase"
                     ? "Compra de insumos"
                     : "Compra ou doação de insumos"
+                : data.transfer
+                  ? materialTransferLabel(data.transfer.declaration.source, data.transfer.declaration.destination)
                 : data.type === "BAL"
                   ? documentVariant(data.type, data.payload, data.workflow_data)
                   : undefined
@@ -909,7 +913,9 @@ export function SupplyDocumentContent({
                     "Pessoa designada no documento"}
                 </p>
                 <p className="text-xs text-(--muted)">
-                  {data.status === "cancelled"
+                  {data.transfer && data.transfer.state !== "dispatched"
+                    ? "Esta preparação ainda não expediu materiais. Concordância, expedição e recebimento são atos separados; não há entrada no destino nesta preparação."
+                    : data.status === "cancelled"
                     ? "Os fatos anteriores permanecem preservados. Consulte as devoluções e o consumo efetivamente conciliados, quando existentes."
                     : data.status === "administratively_closed"
                       ? "O aceite pessoal, quando existente, permanece preservado. O dossiê distingue os efeitos administrativos comprovados da parcela física ainda desconhecida."

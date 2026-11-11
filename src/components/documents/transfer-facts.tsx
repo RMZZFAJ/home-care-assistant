@@ -1,11 +1,14 @@
 import { formatBrazilDate } from "@/lib/receipt";
 import type { TransferFacts } from "@/types/transfers";
 import { custodyName } from "./transfer-console";
+import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
 export function TransferFactsDisplay({ facts }: { facts: TransferFacts }) {
   const declaration = facts.declaration;
   return (
     <div className="space-y-3 wrap-break-word text-sm">
       <p>
+        <strong>{materialTransferLabel(declaration.source, declaration.destination)}</strong>
+        {" · "}
         <strong>
           {custodyName(declaration.source)} →{" "}
           {custodyName(declaration.destination)}
