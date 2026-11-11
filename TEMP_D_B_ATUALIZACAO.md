@@ -36,10 +36,10 @@ A fase continua em execução.
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
 conclusão definidos. As etapas 01, 02, 03, 04, 05 e 07 estão concluídas
 localmente. Os dez pontos de listas da etapa05 foram conferidos.
-A etapa06 continua em execução. O ponto06.1, aparência de REQ e COM,
-está concluído localmente. O ponto06.2, entregas e transferências, está em
-85%: seis das sete composições previstas foram conferidas. Falta terminar
-a caixa de tarefas, com pessoas, caminho dos materiais e próxima ação.
+A etapa06 continua em execução. Os pontos06.1, requisição e compra, e06.2,
+entregas e transferências, estão concluídos localmente. A caixa de tarefas
+agora mostra pessoas, caminho dos materiais e próxima ação, mantendo os
+filtros e a página ao voltar. O próximo ponto é06.3, balanços e agenda.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -543,8 +543,9 @@ adicionais DOC-A a DOC-D, acompanhados no bloco documental.
   aplicado: Abas, cabeçalho, ações e painéis reais; seleção, revisão e materiais
   de requisição e compra conferidos. Entregas agora separam declaração,
   expedição, aceite, conciliação e pendência; recebimento, cancelamento e
-  apuração mantêm seus fatos. Falta: Caixa de tarefas, balanços e as demais
-  composições e variantes. Responsável: Codex.
+  apuração mantêm seus fatos. A caixa mostra autoria, percurso e tarefa
+  com filtros recuperáveis. Falta: Balanços e as demais composições e
+  variantes. Responsável: Codex.
 - **Andamentos nas quatro fichas** — 80%. Já aplicado: Registro salvo,
   autoria, data, categoria, etapa, preenchimento privado entre aparelhos,
   comparação e recuperação, com resumos próprios para cada situação.
@@ -686,16 +687,16 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    recuperação e resposta atrasada foram conferidos.
    Responsável — Codex.
 
-6. **06 — Aparência da operação diária.** Em execução · 80%.
+6. **06 — Aparência da operação diária.** Em execução · 85%.
 
    Concluído — 06.1, as nove composições de requisição e compra: seleção,
    revisão, consulta, ciência, lista frequente, aquisição, parcelas e
    encerramento da expectativa, com funções e dados preservados.
 
-   Em execução — 06.2 entregas e transferências, 85%. Preparação, revisão,
-   materiais, recebimento pessoal, cancelamento, apuração e fatos da
-   transferência foram conferidos. Falta uma das sete composições: a caixa
-   de tarefas, com pessoas, caminho dos materiais e ação de cada registro.
+   Concluído — 06.2 entregas e transferências, 100% deste ponto local.
+   As sete composições foram conferidas: preparação, revisão, caixa de
+   tarefas, materiais, recebimento pessoal, cancelamento, apuração e fatos
+   da transferência, sem confundir declaração com entrega realizada.
 
    Depois — 06.3 balanços e agenda;
    06.4 estoque, catálogo e consumo; 06.5 arquivos, rascunhos e seções

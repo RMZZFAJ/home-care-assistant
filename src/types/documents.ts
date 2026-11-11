@@ -469,3 +469,16 @@ export type DocumentSummary = {
     quantity: string;
   }[];
 };
+export type DeliveryListFacts = {
+  source: "FAMILY" | "CARE_TEAM" | null;
+  destination: "FAMILY" | "CARE_TEAM" | null;
+  recordedByName: string | null;
+  recipientName: string | null;
+  counterpartyName: string | null;
+  receivedByName: string | null;
+};
+export type DeliveryListItem = DocumentSummary & {
+  type: "ENT";
+  deliverySummary: DeliveryListFacts;
+  document_lines: NonNullable<DocumentSummary["document_lines"]>;
+};

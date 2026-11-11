@@ -9,8 +9,8 @@ import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
-const rows = (page: Page) => page.locator("a.document-row");
-const ids = (page: Page) => rows(page).evaluateAll(nodes => nodes.map(node => node.getAttribute("href")!.split("/").at(-1)));
+const rows = (page: Page) => page.locator("[data-delivery-id]");
+const ids = (page: Page) => rows(page).evaluateAll(nodes => nodes.map(node => node.getAttribute("data-delivery-id")));
 const facts = (patient: string) => sql(`select encode(sha256(convert_to(jsonb_build_object('documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${q(patient)}),'events',(select jsonb_agg(to_jsonb(e) order by id) from public.document_events e where care_recipient_id=${q(patient)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)}))::text,'UTF8')),'hex');`);
 async function login(page: Page, patient: string) {
   await page.goto("/login");
@@ -27,6 +27,13 @@ async function traverse(page: Page, order: string[]) {
   const seen: string[] = [];
   for (let offset = 0; offset < order.length; offset += 20) {
     await expect.poll(() => ids(page)).toEqual(order.slice(offset, offset + 20));
+    if (offset === 20) {
+      const url = page.url(); await page.reload();
+      await expect.poll(() => ids(page)).toEqual(order.slice(offset, offset + 20));
+      await page.goBack(); await expect.poll(() => ids(page)).toEqual(order.slice(0, 20));
+      await page.goForward(); await expect(page).toHaveURL(url);
+      await expect.poll(() => ids(page)).toEqual(order.slice(offset, offset + 20));
+    }
     seen.push(...await ids(page) as string[]);
     const next = page.getByRole("navigation", { name: "Páginas das entregas", exact: true }).getByRole("button", { name: "Próxima", exact: true });
     if (offset + 20 < order.length) await next.click(); else await expect(next).toBeDisabled();
@@ -72,12 +79,14 @@ test("delivery list refuses corrupt successful reads,preserves only matching sco
     if (mode === "status") body.filters.status = "confirmed";
     if (mode === "scope") body.filters.scope = "team";
     if (mode === "total") body.total = 0;
+    if (mode === "summary") body.data[0].deliverySummary = null;
+    if (mode === "direction") body.data[0].deliverySummary.destination = body.data[0].deliverySummary.source;
     return route.fulfill({ response, json: body });
   });
   await page.goto(`/entregas?careRecipientId=${f.patient}`);
   await expect(rows(page).first()).toContainText(doc.code);
   // Realtime invalidation starts a read of the same selection, not an operation.
-  for (const invalid of ["incomplete", "patient", "page", "status", "scope", "total"]) {
+  for (const invalid of ["incomplete", "patient", "page", "status", "scope", "total", "summary", "direction"]) {
     mode = invalid;
     await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await expect(page.getByRole("alert").filter({ hasText: "resposta" })).toBeVisible();

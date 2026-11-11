@@ -84,6 +84,14 @@ separados, com unidade. Antes da expedição bilateral apresenta só declarado.
 Recebimento, cancelamento e apuração usam DefinitionGrid para seus fatos em
 leitura; consumo confirmado não ganha input nem novo débito na apresentação.
 
+DeliveryTaskRow reproduz o registro e ícone das entregas do modelo, com nomes
+históricos, percurso, situação e ação nativa. Fatos ausentes recebem texto
+explícito; declaração, concordância e conferência pessoal continuam distintas.
+As três visões preservam filtros e páginas na URL. Tarefa desatualizada fica
+suspensa, preservando foco; consulta da ficha permanece disponível sob sua
+autorização própria. Abas inativas usam o token muted acessível da paleta:
+o tom literal do HTML falhou AA. As novas superfícies respeitam cores forçadas.
+
 ## Aceite
 
 Comparar produto e modelo em cinco viewports; testar teclado, retorno de foco,

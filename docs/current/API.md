@@ -533,6 +533,18 @@ filters(scope,status). Servidor e consumidor conferem estrutura, identidade
 única, total e âmbito antes de adotar a resposta. A tarefa própria continua
 calculada no banco, sem derivar autorização de recipient_id no navegador.
 
+Cada ENT inclui deliverySummary com source,destination,recordedByName,
+recipientName,counterpartyName e receivedByName, todos anuláveis. O percurso
+é oposto entre FAMILY/CARE_TEAM ou ambos nulos. Nomes vêm dos snapshots de
+declaração, seleção e eventos, nunca do perfil atual. O recebedor designado
+precisa corresponder ao recipient_id atual; sem snapshot compatível, o nome
+fica ausente. Conferência pessoal não implica aceite integral. A consulta
+enriquece somente a página autorizada, sem diretório ou saldos adicionais.
+Resumo ausente/corrompido gera erro recuperável. Na interface, filtros/página
+usam deliveryScope,deliveryStatus,deliveryPage e deliveryPatient na URL; esses
+parâmetros não conferem autoridade. O atalho da tarefa abre Atendimento e fica
+suspenso enquanto a consulta estiver desatualizada ou falhar.
+
 ## Coleções completas de catálogo e contas globais
 
 GET /api/catalog conserva data e os campos de seleção anteriores, incluindo

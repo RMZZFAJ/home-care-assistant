@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { DocumentSummary } from "@/types/documents";
+import type { DocumentSummary, DeliveryListItem } from "@/types/documents";
 
 const count = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const amount = z.string().regex(/^\d+(?:\.\d+)?$/);
@@ -45,7 +45,18 @@ export function parseDocumentListRead(value: unknown, expected: DocumentListScop
   return { ...result, data: result.data.map(item => ({ ...item, fulfillment: item.fulfillment ?? undefined, document_lines: item.document_lines ?? undefined })) };
 }
 
+const preservedName = z.string().refine(value => value.trim().length > 0).nullable();
+const deliveryFacts = z.object({
+  source: z.enum(["FAMILY", "CARE_TEAM"]).nullable(),
+  destination: z.enum(["FAMILY", "CARE_TEAM"]).nullable(),
+  recordedByName: preservedName, recipientName: preservedName,
+  counterpartyName: preservedName, receivedByName: preservedName,
+}).refine(value => value.source === null ? value.destination === null : value.destination !== null && value.destination !== value.source);
 const deliveryResponse = response.extend({
+  data: z.array(row.extend({
+    type: z.literal("ENT"), deliverySummary: deliveryFacts,
+    document_lines: z.array(z.object({ id: z.uuid(), fully_checked: z.boolean(), accepted_quantity: amount, quantity: amount })),
+  })),
   filters: z.object({
     scope: z.enum(["own", "team"]),
     status: z.enum(["", "tasks", "transfer_pending", "transfer_ready", "pending_receipt", "disputed", "cancellation_pending", "confirmed", "cancelled", "administratively_closed"]),
@@ -53,7 +64,7 @@ const deliveryResponse = response.extend({
 });
 export type DeliveryListScope = { careRecipientId: string; scope: string; status: string; page: number; pageSize: number };
 export function parseDeliveryListRead(value: unknown, expected: DeliveryListScope): {
-  data: DocumentSummary[]; total: number; page: number; pageSize: number;
+  data: DeliveryListItem[]; total: number; page: number; pageSize: number;
 } {
   const parsed = deliveryResponse.safeParse(value);
   if (!parsed.success) throw new Error("A resposta das entregas não pôde ser conferida. Consulte a lista novamente.");

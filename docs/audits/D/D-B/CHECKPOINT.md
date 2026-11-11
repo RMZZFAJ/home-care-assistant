@@ -1,5 +1,27 @@
 # Checkpoint D-B
 
+D3.81 concluiu ENT-02 e fechou06.2 localmente: as sete composições previstas
+estão conferidas no escopo deste ponto. A caixa de entregas usa cartões e
+navegação canônicos,com nomes preservados da emissão/designação,percurso e
+próxima ação nativa. Concordância,recebedor e conferência pessoal permanecem
+fatos distintos; dados históricos ausentes recebem texto explícito. O resumo
+é calculado somente para a página autorizada,sem consultar o diretório de
+pessoas nem mudar tarefas,ordem,páginas ou permissões. Filtros e página ficam
+na URL,com recarga,Voltar/Avançar; tarefa desatualizada fica suspensa com foco
+preservado e recuperação. A consulta não altera estoque nem ficha.
+Passaram nove unitários,três casos com Auth real e15 cenários distintos de
+navegador nos três perfis:seis aprovações iniciais e nove finais afetadas.
+As nove falhas iniciais foram preservadas; corrigidos contraste de navegação
+e seletor ambíguo,sem desativar regras do axe. Cinco larguras,teclado,nomes
+longos,cores forçadas e movimento reduzido conferidos; captura320 inspecionada.
+Tipos e lint passaram. Migration207 aplicada localmente sem reset e no remoto;
+definição/ACL reconciliadas,último dry-run vazio e classes/contagens dos avisos
+remotos inalteradas. Instalação limpa/evolução legada seguem na CI própria.
+06.1 e06.2 concluídos; próximo06.3,BAL e agenda. Etapa06 parcial85%; estimativa
+visual global70% mantida. Matriz57/48 e18 estados UI preservados. DOC-A/B/C/D,
+conferência conjunta,gates humanos/físicos e CI do SHA publicado permanecem.
+[Resultados e limites](DELIVERY_INBOX_CANONICAL.md).
+
 D3.80 avançou06.2: seis das sete composições previstas foram implementadas e
 conferidas no escopo visual. Preparação e revisão ENT usam os componentes
 canônicos; materiais separam expedido,aceito,conciliado e pendente. Uma

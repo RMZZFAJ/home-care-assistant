@@ -399,9 +399,9 @@ test("C043 caixa padrão oferece decisão pessoal de cancelamento e remove a tar
   await expect(
     page.getByText("Decidir pedido de cancelamento", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("link", { name: new RegExp(f.document.code) }).click();
+  await page.getByRole("link", { name: "Abrir tarefa", exact: true }).click();
   await expect(page).toHaveURL(
-    new RegExp("/documentos/" + f.document.id + "$"),
+    new RegExp("/documentos/" + f.document.id + "\\?documentTab=workflow$"),
   );
   await page
     .getByRole("button", {

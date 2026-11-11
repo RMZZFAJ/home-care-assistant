@@ -1,6 +1,7 @@
 "use client";
-import { ActionButton, LoadingIndicator, SelectField } from "@/components/ui/controls";
+import { ActionButton, FormField, LoadingIndicator, SelectField } from "@/components/ui/controls";
 import { useCallback, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import {
   can,
@@ -8,7 +9,8 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
-import { DocumentRow } from "./document-history";
+import { DeliveryTaskRow } from "./delivery-task-row";
+import { deliveryInboxHref, deliveryInboxSelection, type DeliveryInboxSelection } from "@/lib/documents/delivery-inbox";
 import { EmptyState } from "@/components/ui/primitives";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
@@ -30,10 +32,12 @@ export function DeliveryInbox() {
   );
 }
 function Inbox({ context }: { context: WorkspaceContext }) {
-  const [scope, setScope] = useState("own"),
-    [status, setStatus] = useState("tasks"),
-    [page, setPage] = useState(1);
   const patientId = context.patient!.id;
+  const urlParams = useSearchParams(), urlValues = deliveryInboxSelection(urlParams, patientId);
+  const urlKey = JSON.stringify(urlValues);
+  const [selection, setSelection] = useState({ urlKey, values: urlValues });
+  if (selection.urlKey !== urlKey) setSelection({ urlKey, values: urlValues });
+  const { scope, status, page } = selection.values;
   const revision = useLiveRevision(),
     params = new URLSearchParams({
       careRecipientId: patientId,
@@ -48,6 +52,18 @@ function Inbox({ context }: { context: WorkspaceContext }) {
   const read = useScopedRead("/api/deliveries?" + params, String(revision), decode);
   const { loading, error } = read;
   const rows = read.data?.data ?? [], total = read.data?.total ?? 0;
+  const fresh = Boolean(read.data && !loading && !error);
+  const navigate = (values: DeliveryInboxSelection) => {
+    setSelection({ urlKey, values });
+    const href = deliveryInboxHref(urlParams.toString(), patientId, values);
+    if (href !== window.location.pathname + window.location.search) window.history.pushState(null, "", href);
+  };
+  const presets = [
+    { id: "tasks", label: "Acompanhar", scope: "own", status: "tasks" },
+    { id: "own", label: "Minhas participações", scope: "own", status: "" },
+    { id: "history", label: "Histórico", scope: "team", status: "" },
+  ];
+  const activeView = status === "tasks" ? "tasks" : scope === "own" ? "own" : "history";
   return (
     <>
       <p className="text-sm text-(--muted)">
@@ -57,16 +73,22 @@ function Inbox({ context }: { context: WorkspaceContext }) {
         recebimento.
       </p>
       {can(context, "ent.create") ? <Link href="/transferencias" className="ui-button ui-button-secondary">Declarar transferência entre custódias</Link> : null}
+      <nav className="hca-delivery-views" aria-label="Visões das entregas">
+        {presets.map(view => <Link key={view.id} href={deliveryInboxHref(urlParams.toString(), patientId, { scope: view.scope, status: view.status, page: 1 })}
+          prefetch={false} aria-current={activeView === view.id ? "page" : undefined}
+          onClick={event => { if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey && event.button === 0) { event.preventDefault(); navigate({ scope: view.scope, status: view.status, page: 1 }); } }}>
+          {view.label}
+        </Link>)}
+      </nav>
       <div className="hca-toolbar">
+        <FormField label="Situação das entregas">
         <SelectField
           style={{ minWidth: 0, maxWidth: "100%" }}
 
           aria-label="Situação das entregas"
           value={status}
           onChange={(event) => {
-            setStatus(event.target.value);
-            if (event.target.value === "tasks") setScope("own");
-            setPage(1);
+            navigate({ status: event.target.value, scope: event.target.value === "tasks" ? "own" : scope, page: 1 });
           }}
         >
           <option value="tasks">Minhas tarefas executáveis</option>
@@ -82,6 +104,8 @@ function Inbox({ context }: { context: WorkspaceContext }) {
           <option value="cancelled">Canceladas</option>
           <option value="">Todas</option>
         </SelectField>
+        </FormField>
+        <FormField label="Responsável pelas entregas">
         <SelectField
           style={{ minWidth: 0, maxWidth: "100%" }}
 
@@ -89,13 +113,13 @@ function Inbox({ context }: { context: WorkspaceContext }) {
           value={scope}
           disabled={status === "tasks"}
           onChange={(event) => {
-            setScope(event.target.value);
-            setPage(1);
+            navigate({ scope: event.target.value, status, page: 1 });
           }}
         >
-          <option value="own">Destinadas a mim</option>
+          <option value="own">Minhas participações</option>
           <option value="team">Histórico autorizado do paciente</option>
         </SelectField>
+        </FormField>
       </div>
       {error ? (
         <Notice error>
@@ -112,9 +136,9 @@ function Inbox({ context }: { context: WorkspaceContext }) {
       </p> : null}
       {rows.length ? (
         <section aria-label="Entregas da consulta" aria-busy={loading}>
-          <div className="hca-records">
+          <div className="hca-delivery-task-list">
             {rows.map((row) => (
-              <DocumentRow key={row.id} row={row} />
+              <DeliveryTaskRow key={row.id} row={row} fresh={fresh} />
             ))}
           </div>
         </section>
@@ -129,7 +153,7 @@ function Inbox({ context }: { context: WorkspaceContext }) {
         <nav className="hca-toolbar" aria-label="Páginas das entregas">
           <ActionButton
             disabled={page === 1 || loading || Boolean(error)}
-            onClick={() => setPage((value) => value - 1)}
+            onClick={() => navigate({ scope, status, page: page - 1 })}
           >
             Anterior
           </ActionButton>
@@ -138,7 +162,7 @@ function Inbox({ context }: { context: WorkspaceContext }) {
           </span>
           <ActionButton
             disabled={page * 20 >= total || loading || Boolean(error)}
-            onClick={() => setPage((value) => value + 1)}
+            onClick={() => navigate({ scope, status, page: page + 1 })}
           >
             Próxima
           </ActionButton>

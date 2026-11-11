@@ -1,4 +1,7 @@
-# Entregas e transferências — ponto 06.2 parcial
+# Entregas e transferências — histórico D3.80
+
+O texto abaixo registra o estado parcial de D3.80. D3.81 concluiu ENT-02 e
+fechou06.2 localmente; consultar o [fechamento](DELIVERY_INBOX_CANONICAL.md).
 
 D3.80 implementa e confere seis das sete composições deste ponto, no escopo
 visual. O ponto permanece em85%; a caixa de tarefas ENT-02 continua pendente.
