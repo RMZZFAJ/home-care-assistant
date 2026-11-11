@@ -445,3 +445,67 @@ incluindo o limite nativo100 de eventos da agenda. Os105 critérios continuam
 56 PASS locais/49 PARTIAL. DOC-B10%,DOC-A/C/D pendentes e demais gates
 preservados. PR7 Draft, sem merge, produção ou ativação externa.
 [Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
+## D3.78 — auditoria e históricos, ponto05.10; etapa05 fechada localmente
+
+Base926a26d. A auditoria usa o mesmo RPC nativo e acrescenta paciente/filtros
+ao envelope, preservando página e tamanho retornados pelo banco. Servidor e
+cliente conferem metadados, comprimento esperado, identidade única, paciente
+de cada evento e seleção de recurso/evento/tipo. O nome segue identificado
+como cadastro atual, sem convertê-lo em autoria histórica congelada.
+
+AuditHistory reutiliza useScopedRead. Falha mantém apenas a leitura válida
+da mesma seleção, com instante e paginação suspensa; recusa retira conteúdo.
+Outra seleção não herda dados, e erro não inventa vazio. O formulário fica
+montado, com campos controlados, foco, remoção individual de filtros, URL,
+recarga e Voltar. Consultar os mesmos filtros continua provocando nova leitura.
+
+A agenda ganha GET /api/schedules/events, usando SELECT autenticado e RLS
+existentes de shift_events, sem service role, grants ou SQL novos. A API exige
+capacidade de leitura pessoal ou de equipe na sessão selecionada, limita
+explicitamente a visão pessoal ao próprio profissional e reconfere contexto
+e alcance depois da consulta. Redução de alcance ou recusa não vira vazio.
+Página de20, total exato, ordem por created_at/ID decrescentes, busca literal
+por motivo, tipo, referência UUID e período usam os registros nativos.
+
+O histórico abre no mesmo detalhe e consulta somente quando aberto; reabrir
+faz nova leitura. A URL restaura a consulta na recarga. Autoria preservada,
+motivo e instante continuam explícitos, incluindo fallback de legado/ação
+desconhecida; não se afirma presença ou efeito de estoque. O snapshot antigo
+de100 eventos permanece no RPC para compatibilidade das referências privadas.
+A tela não depende mais dele:202 eventos da equipe e101 pessoais estão
+alcançáveis. Não se reescrevem eventos, programação ou snapshots para ampliar
+a consulta. Filtros não viram rascunhos nem recebem replay offline.
+
+Passaram40 unitários/de contrato e18 cenários distintos nos três perfis.
+A coorte inicial aprovou18; a repetição exclusiva dos três casos da captura
+também passou. São21 execuções sem falhas, flakes ou skips, com15 aprovações
+iniciais reaproveitadas e três finais. A captura de elemento alto deslocava
+o cabeçalho fixo sobre o painel; foi preservada e substituída por captura da
+região da página completa, mantendo origem no topo. Produto e regras do axe
+não mudaram após a coorte inicial. Captura320 final inspecionada.
+
+Os históricos sintéticos são linhas nativas locais, não prova de plantões,
+convites ou alterações operacionais efetivamente realizados. Os leitores usam
+Auth real. SQL independente confere201 eventos de auditoria e202/101 de agenda,
+com todas as páginas e o mais antigo. Busca literal por percentagem/underscore,
+dia de São Paulo, limites400, URL/foco/Voltar/recarga, erros, duplicações,
+paciente/leitor errado e linha de outro profissional são conferidos.
+
+Há revogação real de audit.read e schedule.read.own, negativas401/403/404,
+isolamento pessoal, resposta real retida e recusa de dados inconsistentes.
+Snapshots completos de auditoria, eventos, plantões, séries e ledger ficam
+iguais após leitura; não há POST operacional nesses casos. Revogações são
+intervenções negativas deliberadas e não são apresentadas como consultas.
+Os consumidores antigos mantêm os201 eventos, período/referência, transporte
+que ignora abort, criação real da programação e conflito de sobreposição.
+
+Preparação da stack local206 sem reset, tipos/lint e axe passaram. Sem nova
+migration; dry-run remoto vazio em206. Os dez pontos05.1–05.10 completam o
+critério D-B-AC-002 no escopo local. A matriz passa de56/49 para57/48; somente
+esse estado muda, com os30 campos de origem/decisão preservados. C-NEW-AC-016
+continua parcial pela conferência conjunta entre sessões na etapa19; não se
+declara aprovação universal de66 composições/171 relações, novo PDF, aparelho
+físico, provedor ou produção. Próximo06.1. DOC-B10%,DOC-A/C/D pendentes e
+Sonar adiado. PR7 Draft, sem merge ou ativação externa.
+[Resultados](OPERATIONAL_LISTS_VALIDATION.json).

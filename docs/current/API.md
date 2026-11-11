@@ -314,6 +314,11 @@ os metadados ficam em changePage. Servidor e lista conferem paciente, seleção,
 comprimento esperado e identidades, preservando campos e tipos futuros seguros.
 Isso não altera permissões, proposta original ou autorização para decidir.
 
+Na leitura section=audit de /api/admin, a resposta preserva o RPC nativo e
+identifica careRecipientId e filters. Servidor e lista conferem paciente,
+seleção, página, tamanho, comprimento esperado e identidades únicas. Erro
+não vira vazio; autoria continua explicitamente como nome atual do cadastro.
+
 ## Documentos e quantidades
 
 REQ recebe currentStock como valor exato ou NULL e stockObservation como
@@ -731,6 +736,21 @@ Flows usa /api/whatsapp/flows para envelope cifrado e webhook autenticado,
 /api/whatsapp/flows/submissions para revisão autenticada. O aceite do Flow
 cria relato pendente, não uma movimentação. Ausência de configuração responde
 de forma controlada e não simula entrega externa.
+
+## Histórico completo da agenda
+
+GET /api/schedules/events exige careRecipientId e sessão de paciente, com
+schedule.read.team ou schedule.read.own. Consulta shift_events com Auth/RLS
+originais; a visão pessoal acrescenta professional_id igual ao usuário.
+Contexto e alcance são conferidos novamente após a leitura. Não há service
+role, grant novo, escrita ou replay. Sem capacidade retorna403; sem Auth401.
+
+Aceita query literal no motivo, action, reference UUID do evento/plantão/série,
+from/to em dias de São Paulo, page1–100000 e pageSize1–100, padrão20. Ordem por
+created_at/ID decrescentes e total exato. Resposta inclui data,total,page,
+pageSize,careRecipientId,readerId,scope e filters. Campos e metadados são
+conferidos no servidor e cliente. O snapshot100 do RPC anterior continua
+compatível; o histórico ativo usa esta consulta completa.
 
 ## Escalas e BAL por plantão
 

@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { governanceIntentFields } from "@/lib/validation/governance";
-import { auditQuerySchema } from "@/lib/validation/audit";
+import { auditQuerySchema, parseAuditListRead } from "@/lib/validation/audit";
 import { parseCatalogueCollectionRead, parseProfilesPage } from "@/lib/validation/catalogue-list";
 import { readCompleteCatalogue } from "@/lib/server/catalogue-read";
 import { catalogueAttempt } from "@/lib/validation/catalogue-preparation";
@@ -279,11 +279,15 @@ export async function GET(request: Request) {
     }
     if (section === "audit") {
       const query = parseQuery(auditQuerySchema, Object.fromEntries(["query", "reference", "action", "entityType", "from", "to", "page", "pageSize"].filter(key => params.has(key) && params.get(key) !== "").map(key => [key, params.get(key)])));
-      return NextResponse.json(await rpc(auth.client, "patient_audit_page", {
+      const result = await rpc(auth.client, "patient_audit_page", {
         p_patient: patient.id, p_query: query.query, p_reference: query.reference ?? null, p_action: query.action ?? null,
         p_entity_type: query.entityType ?? null, p_from: query.from ? saoPauloDateBoundary(query.from) : null,
         p_to: query.to ? saoPauloDateBoundary(query.to, true) : null, p_page: query.page, p_size: query.pageSize,
-      }));
+      });
+      const filters = { query: query.query, reference: query.reference ?? "", action: query.action ?? "", entityType: query.entityType ?? "", from: query.from ?? "", to: query.to ?? "" };
+      const body = { ...result as object, careRecipientId: patient.id, filters };
+      parseAuditListRead(body, { careRecipientId: patient.id, page: query.page, pageSize: query.pageSize, ...filters });
+      return NextResponse.json(body);
     }
     if (section === "memberships") {
       const members = (await rpc(auth.client, "admin_list_memberships", {

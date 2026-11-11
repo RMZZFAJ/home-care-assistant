@@ -810,5 +810,106 @@
       "DOC-B10percent;DOC-A/C/D pending;Sonar deferred;human/physical/provider gates separate",
       "No merge,production,remote mutation or external activation"
     ]
+  },
+  "D3.78": {
+    "baseSha": "926a26d2313f7b68a4ed42b1e884db8014453334",
+    "scope": "05.10 audit and schedule history;fixed stage05 locally closed",
+    "unit": {
+      "passed": 40,
+      "files": [
+        "tests/operational-history.test.ts",
+        "tests/read-history.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuthReaders": true,
+      "syntheticHistoryRows": "Native local SQL records;not actual shift/attendance/invitation proof",
+      "initial": {
+        "startTime": "2026-11-11T11:45:26.022Z",
+        "duration": 339796.402,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "captureFinal": {
+        "startTime": "2026-11-11T11:51:59.847Z",
+        "duration": 129471.772,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 18,
+      "executions": 21,
+      "qualifiedBy": "15 initial unaffected cases retained;3 history volume cases final correct screenshot framing only;product unchanged",
+      "reports": [
+        "operational-history-first.json",
+        "operational-history-capture-final.json"
+      ],
+      "initialCaptures": "operational-history-first-captures",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "implementation": [
+      "Audit server/client verify native page,patient,filters,unique IDs and exact window;controlled mounted query retains focus and URL/Back",
+      "Schedule GET events uses existing authenticated SELECT/RLS;own predicate and actual selected capabilities,post-read scope recheck;no schema/grant changes",
+      "Complete paged history separate from legacy100-event compatibility snapshot;preserved authors/reasons/instants and all native identities;no business draft/cache/replay"
+    ],
+    "counterproofs": [
+      "201audit events and202team/101own schedule events compared with independent SQL;all relevant pages and oldest reachable beyond old100 snapshot",
+      "Wrong context,reader,page,filters,short page,duplicate andforeign own row refused;503 retains only valid same selection;403 clears;old response ignored",
+      "Native audit.read and schedule.read.own revocations;anonymous401,denied403,foreign patient404;literal LIKE percent/underscore and SaoPaulo day filters;bad dates/ranges/page/reference400",
+      "Read/navigation preserve full audit/events/shifts/series/ledger with no operational POST;negative authorization fixtures deliberate",
+      "Original audit201,reference/date,unabortable late response and native schedule creation/overlap assertions retained"
+    ],
+    "validation": {
+      "localPrepare": "home-care-assistant54321/54322;206 migrations without reset",
+      "types": "PASS",
+      "directedLint": "PASS without suppression;query builders complete before stable decoder",
+      "axe": "All rules retained;new320 plus original four widths",
+      "visual": "Fresh320 complete-page clipped region inspected;initial auto-scrolled element capture preserved;full visual gate remains"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 206,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 57,
+      "partial": 48,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6",
+        "05.7",
+        "05.8",
+        "05.9",
+        "05.10"
+      ],
+      "stage05": "CONCLUIDO_LOCAL",
+      "promoted": [
+        "D-B-AC-002"
+      ],
+      "retainedPartial": "C-NEW-AC-016;cross-session joint check remains19",
+      "next": "06.1"
+    },
+    "limits": [
+      "Own SHA CI,stage19 joint cross-session and full phase gates remain",
+      "Legacy schedule_workspace100 snapshot retained for compatibility;active UI uses complete independently authorized paginated read",
+      "DOC-B10percent;DOC-A/C/D pending;full model appearance remains06 and15;Sonar deferred",
+      "No new SQL,remote data/Auth/Vault/reset,merge,production or external activation"
+    ]
   }
 }

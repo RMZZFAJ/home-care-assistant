@@ -18,10 +18,30 @@ const auditPageSchema = z.object({
   })),
   total: z.number().int().nonnegative(), page: z.number().int().positive(), pageSize: z.number().int().min(1).max(100),
   actions: z.array(z.string()), entityTypes: z.array(z.string()),
+}).superRefine((page, context) => {
+  const length = Math.min(page.pageSize, Math.max(0, page.total - (page.page - 1) * page.pageSize));
+  if (page.data.length !== length || new Set(page.data.map(row => row.id)).size !== length)
+    context.addIssue({ code: "custom", message: "Incomplete audit page" });
 });
 export type AuditPage = z.infer<typeof auditPageSchema>;
 export function parseAuditPage(value: unknown): AuditPage {
   const parsed = auditPageSchema.safeParse(value);
   if (!parsed.success) throw new Error("A resposta da consulta do histórico não pôde ser lida. Atualize esta seção.");
   return parsed.data;
+}
+const filterSchema = z.object({ query: z.string(), reference: z.string(), action: z.string(), entityType: z.string(), from: z.string(), to: z.string() });
+const readSchema = auditPageSchema.safeExtend({ careRecipientId: z.string().uuid(), filters: filterSchema });
+export type AuditFilters = z.infer<typeof filterSchema>;
+export type AuditReadSelection = AuditFilters & { careRecipientId: string; page: number; pageSize: number };
+export function parseAuditListRead(value: unknown, expected: AuditReadSelection) {
+  const parsed = readSchema.safeParse(value);
+  if (parsed.success) {
+    const page = parsed.data;
+    const filtersMatch = Object.entries(page.filters).every(([name, value]) => value === expected[name as keyof AuditFilters]);
+    const rowsMatch = page.data.every(row => row.metadata.care_recipient_id === expected.careRecipientId &&
+      (!expected.action || row.action === expected.action) && (!expected.entityType || row.entity_type === expected.entityType) &&
+      (!expected.reference || row.id === expected.reference || row.entity_id === expected.reference));
+    if (page.careRecipientId === expected.careRecipientId && page.page === expected.page && page.pageSize === expected.pageSize && filtersMatch && rowsMatch) return page;
+  }
+  throw new Error("A resposta da consulta do histórico não pôde ser lida. Atualize esta seção.");
 }

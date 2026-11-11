@@ -8,8 +8,8 @@ produção.
 
 Abreviações: COM é compra; ENT é entrega; BAL é balanço de estoque.
 
-São 105 critérios da D-B: 56 com implementação e verificações locais
-concluídas e 49 parcialmente executados. Nenhum critério inteiro está sem
+São 105 critérios da D-B: 57 com implementação e verificações locais
+concluídas e 48 parcialmente executados. Nenhum critério inteiro está sem
 início, mas há subtarefas ainda não iniciadas, indicadas abaixo. Critérios
 semelhantes aparecem separados porque cobrem exigências distintas da fase.
 
@@ -34,12 +34,9 @@ O banco remoto já recebeu as atualizações desta etapa, sem pendências.
 A fase continua em execução.
 
 **Plano de fechamento reorganizado.** Há 20 etapas com escopo e condição de
-conclusão definidos. As etapas 01, 02, 03, 04 e 07 estão concluídas localmente.
-Os seis pontos da etapa 04 estão fechados no escopo anterior. A próxima etapa
-é a 05, busca, filtros e históricos. O ponto 05.1, estoques e movimentos,
-também está concluído localmente, assim como os pontos 05.2 a 05.9.
-São nove dos dez pontos de listas conferidos. Resta o ponto 05.10, auditoria
-e históricos.
+conclusão definidos. As etapas 01, 02, 03, 04, 05 e 07 estão concluídas
+localmente. Os dez pontos de listas da etapa05 foram conferidos. A próxima
+é a etapa06, aparência da operação diária, começando por REQ e COM.
 Os nove grupos de formulários estão enumerados na etapa 14. A sequência e
 os pontos individuais estão ao final.
 
@@ -368,11 +365,11 @@ concluído; os quatro resultados novos ainda não estão implementados.
 - **Atualizar consumo e filas entre sessões sem perder edição** — Concluído ·
   100%.
 - **Busca e listas alcançarem todos os registros permitidos** — Em execução ·
-  ≈70%. Falta: Completar listas e situações de consulta ainda parciais.
+  ≈90%. Falta: Conferência conjunta entre sessões na etapa19.
   Responsável: Codex.
-- **Buscar, ordenar e filtrar listas grandes sem resultados trocados** — Em
-  execução · ≈70%. Falta: Completar listas restantes, inclusive com mais de
-  100 registros. Responsável: Codex.
+- **Buscar, ordenar e filtrar listas grandes sem resultados trocados** —
+  Concluído · 100%. Os dez grupos de listas foram conferidos, inclusive
+  registros antigos e mais de100 resultados. Responsável: Codex.
 
 ### Administração e permissões
 
@@ -676,11 +673,11 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    complemento continuam nos blocos DOC-A a DOC-D; a revisão geral permanece.
    Responsável — Codex.
 
-5. **05 — Busca, filtros e históricos.** Em execução · 90%.
+5. **05 — Busca, filtros e históricos.** Concluído localmente · 100%.
 
-   Para concluir — Todas as listas previstas alcançam os registros permitidos,
-   inclusive listas grandes e pendências antigas, com ordenação e resposta
-   corretas.
+   Concluído — Os dez pontos de listas alcançam os registros permitidos,
+   inclusive pendências antigas e históricos extensos. Filtros, ordem, falha,
+   recuperação e resposta atrasada foram conferidos.
    Responsável — Codex.
 
 6. **06 — Aparência da operação diária.** Em execução · 70%.
@@ -832,13 +829,11 @@ documentais continuam identificadas em DOC-A a DOC-D.
   A nova regra que separa parecer e alteração de estoque continua em DOC-B.
   Responsável — Codex.
 
-### Próxima etapa — 05, busca, filtros e históricos
+### Etapa05 concluída — busca, filtros e históricos
 
-Estes são os dez pontos já previstos no plano fixo. O bloco está em execução,
-com estimativa de90%; seu fechamento ainda está pendente. Os pontos05.1 a05.9
-estão concluídos: nove dos dez pontos. O próximo é05.10. Vou reaproveitar
-verificações anteriores válidas e corrigir as lacunas de cada lista.
-Responsável por todos os pontos — Codex.
+Os dez pontos já previstos no plano fixo foram concluídos localmente:100%
+deste bloco. A conferência conjunta permanece na etapa19. O próximo bloco
+é06, aparência da operação diária. Responsável — Codex.
 
 1. **05.1 — Estoques e movimentos.** Concluído localmente · 100% deste ponto.
    Foram conferidos os materiais e o histórico com mais de100 movimentos,
@@ -869,7 +864,7 @@ Responsável por todos os pontos — Codex.
    Um plantão iniciado antes do período continua visível quando ainda o
    alcança, sem duplicação. Falha identifica a consulta anterior e suspende
    alterações; perda de acesso retira os dados. O histórico completo de
-   mudanças permanece no ponto 05.10.
+   mudanças foi concluído no ponto05.10.
 7. **05.7 — Catálogo e contas.** Concluído localmente · 100% deste ponto.
    O catálogo completo e as contas globais alcançam registros além do limite
    antigo de 1.000 linhas. Foram conferidos busca, todas as páginas dos
@@ -887,7 +882,12 @@ Responsável por todos os pontos — Codex.
    incluindo a mais antiga. Busca, foco, recarga e Voltar foram conferidos.
    Falha mantém apenas a consulta válida da mesma seleção, identificada e
    com decisões suspensas. Consultar não aprova nem altera configurações.
-10. **05.10 — Auditoria e históricos.** Conferir filtros, ordem e paginação.
+10. **05.10 — Auditoria e históricos.** Concluído localmente · 100% deste ponto.
+    O histórico da agenda permite alcançar todos os registros autorizados,
+    incluindo os anteriores ao limite antigo de100. A visão pessoal fica
+    restrita ao próprio profissional. Auditoria e agenda mantêm campos,
+    filtros, recarga e Voltar. Falhas não inventam vazio; perda de acesso
+    retira o conteúdo. Consultar não altera registros nem estoque.
 
 ### Escopo restante dos formulários — etapa 14
 

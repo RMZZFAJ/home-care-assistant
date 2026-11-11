@@ -48,7 +48,7 @@ const stateLabels: Record<string, string> = {
   rejected: "Recusado",
   obsolete: "Obsoleto",
 };
-import { scheduleEventLabel } from "@/lib/schedules/presentation";
+import { ScheduleHistory } from "./schedule-history";
 export function ScheduleConsole() {
   return (
     <Workspace title="Escalas e plantões">
@@ -660,18 +660,7 @@ function Agenda({
                 </div>
               ))}
           </details>
-          <details className="ui-card">
-            <summary>Histórico de mudanças</summary>
-            {currentData.events.map((event) => (
-              <p key={event.id}>
-                {stamp(event.created_at, "America/Sao_Paulo")} ·{" "}
-                {scheduleEventLabel(event.action)} ·{" "}
-                {event.actor_name_snapshot ??
-                  "Nome do autor não preservado no evento antigo"}{" "}
-                · {event.reason || "Sem motivo adicional"}
-              </p>
-            ))}
-          </details>
+          <ScheduleHistory patientId={patient.id} readerId={context.userId} />
         </>
       ) : null}
     </div>

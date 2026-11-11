@@ -1,5 +1,23 @@
 # Checkpoint D-B
 
+D3.78 fechou05.10 e a etapa05: os dez pontos de listas estão concluídos
+localmente. Auditoria confere paciente, seleção e página, mantém foco e URL,
+identifica leitura anterior e retira dados após recusa. A agenda agora tem
+histórico paginado completo, sob Auth e RLS originais, com visão pessoal/equipe,
+motivo, autoria preservada, datas, busca, referência e período. O snapshot
+anterior de100 eventos continua compatível; a tela usa a nova consulta completa.
+Passaram40 unitários e18 cenários distintos nos três perfis, por15 aprovações
+iniciais reaproveitadas e três finais. As21 execuções passaram. A repetição
+exclusiva corrigiu o enquadramento da captura, sem alterar produto ou axe.
+Auth real,202 eventos de equipe/101 pessoais e201 de auditoria em todas as
+páginas por SQL independente; escopo,503,403/404/401, datas, atraso e fatos
+oficiais preservados. Preparação local sem reset, tipos e lint passaram.
+Sem SQL novo; remoto206 com dry-run vazio. D-B-AC-002 passa a PASS local após
+os dez pontos; matriz57/48. C-NEW-AC-016 mantém conferência conjunta entre
+sessões na etapa19. Próximo06.1, aparência REQ/COM; DOC-A/B/C/D e demais
+gates preservados. CI própria necessária; produção NO-GO.
+[Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
 D3.77 fechou05.9. Todas as101 pendências antigas e202 propostas do histórico
 permanecem alcançáveis em páginas completas, na ordem SQL nativa. Servidor
 e cliente conferem paciente, seleção, página, tamanho e identidades. Uma
