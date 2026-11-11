@@ -1,5 +1,35 @@
 # Checkpoint D-B
 
+DOC-B_COM conclui localmente o ponto DOC-B.2: saldo FAMILY de cada material
+imediatamente após sua última entrada validada naquela COM, com parcela,
+validação, autoria e instante próprios. Aquisição, total validado e quantidade
+da última parcela permanecem distintos. Captura nativa transacional imutável,
+sem recompor saldo pelo estoque atual e sem alterar o conteúdo canônico.
+COM nova usa emissão V13; BAL permanece12 e REQ/ENT10. Intenções anteriores
+continuam recuperáveis. Valor restrito é null; perder stock.family.read impede
+obter exemplar antigo conhecido por qualquer entrada de recuperação.
+
+Qualificados cinco cenários Auth,31 testes unitários/API/PDF, uma regressão SQL
+dirigida e três casos de navegador em build de produção, nos três perfis.
+Cinco larguras, axe e teclado; quatro páginas controladas e cinco nativas
+inspecionadas. A falha da CI anterior estava na contraprova BAL antiga, que
+confundia parecer e aplicação. Agora verifica parecer sem estoque, PT409 na
+aplicação obsoleta e aplicação explícita do reconto; passou sem reset local.
+Primeira prontidão sem casos e falha de seletor preservadas; corrigido somente
+o seletor da aba Materiais. Tipos/lint passaram.
+
+As migrations216/217 foram aplicadas no remoto autorizado:217 versões iguais
+às locais, dry-run vazio, RLS/grants/índices e auxiliares conferidos. As84
+migrations protegidas não mudaram. Sem reset, fixtures/Auth remotos, produção,
+transportes ou backup redundante. CI do SHA publicado, instalação limpa,
+evolução legada e integração completa continuam gates próprios.
+
+DOC-B está parcial, estimado50%; próximo ponto DOC-B.3, devolução autônoma
+cotidiana, depois DOC-B.4, cancelamento/complemento. DOC-A/C/D,105 estados
+originais(57PASS/48PARTIAL),18 UI e visual global85% permanecem. Sonar adiado;
+humanos, AT, aparelhos reais e liberação operacional continuam pendentes.
+[Resultados e limites](PURCHASE_ENTRY_BALANCES.md).
+
 DOC-B_BAL_CORRECTIONS conclui localmente o vínculo dos atos posteriores no
 fluxo nativo do BAL. Tela e PDF mostram reconto, contador, instante, quantidade
 e aplicação próprios do mesmo material/ficha, sem substituir valores anteriores.

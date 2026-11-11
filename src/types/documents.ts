@@ -372,6 +372,7 @@ export type SupplyDocument = {
   events: DocumentEvent[];
   receipts: PurchaseReceipt[];
   purchaseProgress?: PurchaseProgress;
+  purchaseEntryBalances?: import("@/lib/validation/purchase-entry-balances").PurchaseEntryBalances;
   balanceReview?: BalanceReviewContext;
   balanceRecount?: import("./balances").BalanceRecountContext;
   deliveryCancellation?: DeliveryCancellationContext | null;

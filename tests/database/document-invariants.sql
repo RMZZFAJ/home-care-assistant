@@ -79,7 +79,16 @@ begin
  perform pg_temp.login('adminA');
  c:=public.create_supply_document(p,'ENT',jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',(select id from actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId',first_product,'quantity','1'))),gen_random_uuid(),false);
  perform pg_temp.login('supervisor');
- perform pg_temp.denied(format('select public.supply_document_command(%L,''approve'',''{"group":"supervisor"}'',gen_random_uuid(),%s)',b->>'id',b->>'version'),'movement after BAL reference requires recount');
+ select count(*) into before_count from public.stock_movements where care_recipient_id=p;
+ b:=public.supply_document_command((b->>'id')::uuid,'approve','{"group":"supervisor"}',gen_random_uuid(),(b->>'version')::integer);
+ perform pg_temp.assert_true(b->>'status'='submitted' and b#>>'{balanceReview,reviewSatisfied}'='true' and b#>>'{balanceReview,referenceState}'='historical','both opinions remain stock-free even after reference changes');
+ perform pg_temp.assert_true((select count(*)=before_count from public.stock_movements where care_recipient_id=p),'historical opinion does not apply or reconstruct stock');
+ f:=jsonb_build_object('group','supervisor','reviewReference',b#>>'{balanceReview,referenceHash}');
+ begin
+  perform public.supply_document_command((b->>'id')::uuid,'apply_balance',f,gen_random_uuid(),(b->>'version')::integer);
+  raise exception 'ASSERTION: stale reference application must conflict';
+ exception when sqlstate 'PT409' then null;end;
+ perform pg_temp.assert_true((select count(*)=before_count from public.stock_movements where care_recipient_id=p),'refused stale application leaves no stock movement');
  perform pg_temp.login('professional');
  b:=public.revise_supply_document((b->>'id')::uuid,payload,gen_random_uuid(),(b->>'version')::integer,true);
  perform pg_temp.login('supervisor');
@@ -87,7 +96,9 @@ begin
  perform pg_temp.assert_true(b->>'status'='submitted','prior count approval does not approve recount');
  perform pg_temp.login('family');
  b:=public.supply_document_command((b->>'id')::uuid,'approve','{"group":"family"}',gen_random_uuid(),(b->>'version')::integer);
- perform pg_temp.assert_true(b->>'status'='approved','distinct groups approve current recount');
+ perform pg_temp.assert_true(b->>'status'='submitted' and b#>>'{balanceReview,reviewSatisfied}'='true','distinct groups review current recount without applying it');
+ b:=public.supply_document_command((b->>'id')::uuid,'apply_balance',jsonb_build_object('group','family','reviewReference',b#>>'{balanceReview,referenceHash}'),gen_random_uuid(),(b->>'version')::integer);
+ perform pg_temp.assert_true(b->>'status'='approved' and b#>>'{balanceReview,application,state}'='applied','current reviewed recount requires an explicit stock application');
  perform pg_temp.login('professional');
  report_id:=public.report_extraordinary_consumption(p,'consumption','CARE_TEAM','Consumo confirmado de teste',jsonb_build_array(jsonb_build_object('productId',first_product,'quantity','2')),gen_random_uuid());
  perform pg_temp.assert_true((select balance=7 from public.current_stock_balances where care_recipient_id=p and product_id=first_product and location='CARE_TEAM'),'unconfirmed report does not debit');

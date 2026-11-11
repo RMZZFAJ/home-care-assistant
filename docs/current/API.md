@@ -25,14 +25,32 @@ recupera a mesma intenção; mudança de seletor documental conflita. Cada nova
 chave explícita cria outra emissão, sem alterar documento, SCI ou estoque.
 Resposta200 exige ready;202 representa processamento ainda não concluído.
 
-A reserva atual usa reserve_pdf_issuance_v12: BAL novo recebe revisão12; outros
-tipos recebem10. Além da fonte canônica preservada, balanceApplication congela
+A reserva atual usa reserve_pdf_issuance_v13: COM nova recebe revisão13, BAL
+recebe12 e REQ/ENT recebem10. Além da fonte canônica preservada,
+balanceApplication congela
 o ato correspondente à contagem e ao corte de versão escolhidos. not_applied,
 unavailable e applied com linhas known/restricted são distintos; quantidade
 restrita é null e não transporta o valor. Perda de stock.team.read impede
 retornar snapshot ou baixar emissão anterior com saldo known, inclusive por
 entradas antigas que recuperam a mesma intenção. Pode ser emitido outro exemplar
 mascarado. Ganho de acesso não altera o mascaramento já congelado.
+
+Na COM V13, purchaseEntryBalances congela por material o saldo FAMILY após a
+última entrada validada naquela COM até o corte escolhido. Cada linha contém
+lineId, state, quantity e entry. Os estados são known, restricted,
+not_validated e unavailable; somente known contém quantidade. entry identifica
+parcela, primeiro evento de validação, versão, quantidade da entrada, autores e
+instantes de declaração/validação. O total accepted_quantity continua acumulado.
+Dados legados sem captura não são aproximados pelo estoque atual. A captura
+ocorre na validação nativa e reverte com a transação, sem escrita do cliente.
+
+GET /api/documents/:id acrescenta a mesma projeção autorizada para a versão
+atual da COM. A interface confere materiais, parcelas, eventos e corte antes de
+mostrar o saldo. Os fatos privados ficam fora do conteúdo canônico. Perda de
+stock.family.read impede obter emissão antiga com linha known, inclusive pelas
+entradas anteriores de recuperação. Outra emissão pode congelar o mascaramento;
+ganho posterior de acesso não altera os bytes ou a fonte já preservados.
+[Implementação e limites](../audits/D/D-B/PURCHASE_ENTRY_BALANCES.md).
 
 A orquestração obtém claim de serviço com lease de cinco minutos e token
 aleatório que nunca vai ao navegador. Composição/oráculo precedem assinatura

@@ -21,6 +21,7 @@ import { formatStockObservation, formatStockObservationTime } from "../stock-obs
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 import { balanceApplicationFacts } from "@/lib/validation/balance-application";
 import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
+import { requirePurchaseEntryBalances, type PurchaseEntryBalances } from "@/lib/validation/purchase-entry-balances";
 
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
 export type PdfContentPlan = {
@@ -79,6 +80,15 @@ export async function composeIssuance(
       if (entry.acts.some(act => act.documentId !== snapshot.id || act.version > snapshot.version || act.version <= review.reviewed_document_version
         || act.countVersion <= review.count_version || (act.application.state === "applied" && act.application.documentVersion > snapshot.version))) throw invalid("balance-corrections-cutoff");
     }
+  }
+  let entries: PurchaseEntryBalances | undefined;
+  if (revision >= 13 && snapshot.type === "COM") {
+    try {
+      entries = requirePurchaseEntryBalances(snapshot.purchaseEntryBalances, {
+        version: snapshot.version, lines: snapshot.lines, receipts: snapshot.purchaseReceipts ?? [],
+        events: fidelity?.success ? fidelity.data.purchaseReceiptEvents.map(event => ({ ...event, id: event.eventId })) : [],
+      });
+    } catch { throw invalid("purchase-entry-balances-source"); }
   }
   let bytes: Buffer;
   try {
@@ -139,6 +149,22 @@ export async function composeIssuance(
     ]),
   ];
   const semanticFacts: Record<string, string> = {};
+  if (entries) for (const fact of entries) {
+    const source = snapshot.lines.find(item => item.id === fact.lineId)!;
+    const unit = String(source.unit_snapshot ?? "");
+    const name = String(source.name_snapshot ?? source.product_name_snapshot ?? source.custom_name ?? source.product_id ?? "Material");
+    const prefix = "purchase-entry/" + fact.lineId;
+    semanticFacts[prefix + "/0"] = name + " · " + String(source.unit_snapshot ?? "Unidade não preservada");
+    semanticFacts[prefix + "/1"] = formatQuantity(String(source.purchased_quantity ?? 0), unit);
+    semanticFacts[prefix + "/2"] = formatQuantity(String(source.accepted_quantity ?? 0), unit);
+    semanticFacts[prefix + "/3"] = fact.state === "known" ? formatQuantity(fact.quantity, unit) : fact.state === "restricted" ? "Acesso restrito" : fact.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro";
+    if (fact.entry) {
+      const entry = fact.entry;
+      semanticFacts["fidelity/" + prefix + "/source"] = entry.receiptId + " · evento " + entry.eventId + " · versão " + entry.eventVersion + " · entrada de " + formatQuantity(entry.enteredQuantity, unit);
+      semanticFacts["fidelity/" + prefix + "/submitted"] = (entry.submittedName ?? "Nome histórico não preservado") + " · " + formatBrazilDate(entry.submittedAt);
+      semanticFacts["fidelity/" + prefix + "/validated"] = (entry.validatorName ?? "Nome histórico não preservado") + " · " + (entry.validatorId ?? "Identidade não preservada") + " · " + formatBrazilDate(entry.validatedAt);
+    }
+  }
   if (application?.success) {
     const a = application.data;
     semanticFacts["fidelity/balance/application-state"] = a.state === "not_applied" ? "Não aplicado" : a.state === "unavailable" ? "Não disponível no registro" : "Aplicação registrada";

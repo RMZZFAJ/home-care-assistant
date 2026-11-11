@@ -60,23 +60,24 @@ sequência final. Os percentuais desses níveis medem escopos diferentes.
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
-| Complemento documental | DOC-B ≈30%; DOC-A, DOC-C e DOC-D em 0% do acréscimo |
-| Trabalho em andamento | DOC-B: saldo histórico por material da COM |
+| Complemento documental | DOC-B ≈50%; DOC-A, DOC-C e DOC-D em 0% do acréscimo |
+| Próximo ponto | DOC-B.3: devolução autônoma cotidiana |
 
-**Última entrega encerrada:** novas regras do BAL no fluxo atual. Parecer por
-material, aplicação separada, recuperação, saldo histórico e vínculos dos atos
-posteriores têm momento e resultado próprios. Isso não conclui o restante de
-DOC-B nem a nova aparência dos PDFs.
+**Última entrega encerrada:** DOC-B.2, saldo histórico por material da COM.
+A ficha e o PDF mostram o saldo após a última entrada validada daquele material,
+com parcela, data e responsável próprios. Os totais adquirido e validado ficam
+separados da quantidade da última parcela. As novas regras do BAL também estão
+concluídas no fluxo atual, conforme o histórico e o grupo 3.3.
 
-**Lote atual:** a base do saldo histórico da COM está em implementação local,
-com verificações iniciais concluídas. Ainda faltam sua apresentação na ficha, o
-PDF e a conferência integrada. O percentual de DOC-B permanece em ≈30%.
+**O que falta em DOC-B:** criação cotidiana de devolução autônoma e preservação
+de fichas com cancelamento/complemento e confirmações próprias. O complemento
+permanece parcial, estimado em ≈50%; a nova aparência dos PDFs segue em DOC-A.
 
-**Banco e validações:** o remoto acompanha as entregas publicadas, inclusive as
-três atualizações dos vínculos posteriores do BAL. As duas atualizações locais
-da COM ainda não fazem parte desse fechamento. As verificações locais das
-entregas encerradas passaram; a validação automática do commit publicado e a
-revisão final continuam separadas. Sonar permanece adiado por sua decisão.
+**Banco e validações:** as duas atualizações da COM foram aplicadas no remoto;
+o histórico está igual ao local, com 217 atualizações e sem pendências deste
+lote. As verificações locais passaram nos três perfis de navegador. A validação
+automática do novo commit e a revisão final da fase continuam separadas. Sonar
+permanece adiado por sua decisão.
 
 ## 3. Funcionalidades e critérios
 
@@ -346,7 +347,7 @@ Modelo Integral da aplicação.
 
 ##### DOC-B — Fatos, saldos e atos específicos
 
-**Em execução · ≈30% do acréscimo. Responsável: Codex.**
+**Em execução · ≈50% do acréscimo. Responsável: Codex.**
 
 **Concluído no BAL, no fluxo atual:** parecer por material e aplicação ao
 estoque são atos separados. A aplicação tem confirmação, autoria e momento
@@ -357,10 +358,12 @@ material têm vínculo, autoria, momento, resultado e aplicação próprios na t
 no PDF. A contagem anterior é preservada; encaminhamento não é confundido com
 correção realizada. A nova aparência documental continua em DOC-A.
 
-**Em implementação local na COM:** saldo de cada material imediatamente após sua
-última entrada validada naquela COM, com a data própria e as parcelas separadas.
-A base já teve verificações iniciais; tela, PDF e integração ainda não estão
-concluídos. Não se trata do saldo atual nem de somar entradas para estimá-lo.
+**Concluído na COM, no fluxo atual:** a ficha e o PDF mostram o saldo de cada
+material imediatamente após sua última entrada validada naquela COM, com data,
+responsável e parcela próprios. Os totais adquirido e validado permanecem
+separados da quantidade da última parcela. Movimentos posteriores preservam esse
+saldo; dados antigos indisponíveis e Acesso restrito recebem indicação própria.
+Respostas divergentes permitem consultar novamente, sem movimentar estoque.
 
 **Preparação de entrega/devolução já existente:** no fluxo bilateral, os dois
 sentidos têm nomes próprios; devolução não exige entrega de origem.
@@ -729,8 +732,10 @@ rolagem identificados nesse lote foram corrigidos. A troca das classes de quebra
 de texto também está concluída.
 
 Depois, o núcleo do parecer/aplicação do BAL foi encerrado e, na entrega mais
-recente, seus vínculos posteriores também. Ambos pertencem a DOC-B, que continua
-parcial. Novos formulários seguem na etapa 14 e a retomada simples segue em
+recente do BAL, seus vínculos posteriores também. Depois foi concluído o saldo
+histórico por material da COM, na ficha e no PDF. Essas entregas pertencem a
+DOC-B, que continua parcial. Novos formulários seguem na etapa 14 e a retomada
+simples segue em
 DOC-C; esses acréscimos não reabrem silenciosamente as etapas anteriores.
 
 Os pontos abaixo conservam o conteúdo de cada fechamento. Novas regras e
@@ -955,17 +960,17 @@ própria.
 
 ### Primeiro — DOC-B: fatos, saldos e atos específicos
 
-**Em execução · ≈30% do acréscimo. Responsável: Codex.** Grupo funcional: 3.3 —
+**Em execução · ≈50% do acréscimo. Responsável: Codex.** Grupo funcional: 3.3 —
 complemento de fichas e PDFs.
 
 1. **DOC-B.1 — BAL: concluído localmente no fluxo atual.** Parecer por
    material, aplicação separada, recuperação, saldo histórico e vínculos
    posteriores na ficha e no PDF. A aparência nova continua em DOC-A.
-2. **DOC-B.2 — COM: em execução local, ponto atual.** Entregar na ficha e no
-   PDF o saldo autorizado de cada material após sua última entrada validada
-   naquela COM, com data própria e parcelas separadas. A base teve verificações
-   iniciais; apresentação e conferência integrada ainda faltam.
-3. **DOC-B.3 — Devolução autônoma: restante.** Concluir criação cotidiana e
+2. **DOC-B.2 — COM: concluído localmente no fluxo atual.** Saldo autorizado
+   por material na ficha e no PDF, com última entrada validada, parcela, data e
+   responsável próprios. Quantidade da parcela e total validado continuam
+   distintos; a nova aparência documental permanece em DOC-A.
+3. **DOC-B.3 — Devolução autônoma: próximo ponto.** Concluir criação cotidiana e
    demais telas do percurso equipe para família, sem exigir entrega de origem.
    Preservar os atos distintos de concordância, expedição e recebimento já
    existentes na preparação bilateral.

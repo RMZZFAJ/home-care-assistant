@@ -3,7 +3,33 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — DOC-B_BAL_CORRECTIONS
+## Estado atual — DOC-B_COM
+
+Local e remoto com217 versões, sem pendências. As migrations20261111210737 e
+20261111212303 acrescentam captura privada imutável do saldo FAMILY na transição
+nativa de validação COM, projeção por material/versão e emissão COM V13.
+Preservam eventos/hash/snapshots canônicos, créditos existentes, BAL V12,
+REQ/ENT10 e todas as intenções anteriores. Sem reconstrução de saldos legados.
+
+Preflight confirmou215 versões como prefixo exato do histórico local e isolou
+somente as duas pendências. Preparo local sem reset, cinco cenários Auth,
+conferência PDF e três perfis de navegador precederam push linked/skip-vault.
+Após aplicação,217 versões coincidem; dry-run vazio. Tabela com RLS e sem grants
+para anon/authenticated/service; quatro auxiliares fechadas e reserva V13
+somente authenticated. search_path vazio, constraints e índices válidos.
+As84 migrations protegidas permanecem inalteradas. Sem fixtures/Auth remotos,
+reset, produção, transportes ou backups redundantes do banco descartável.
+
+Advisors:64 INFO de RLS sem política, extensão1 WARN, definer anon3 WARN,
+definer authenticated212 WARN e senhas1 WARN. Os acréscimos são a tabela privada
+intencionalmente fechada e a nova reserva autenticada, com negativas verificadas.
+Não há apontamento de FK sem índice para a tabela nova; seus dois índices
+auxiliares ainda sem uso recebem INFO. As demais ocorrências permanecem sem
+aprovação genérica. Instalação limpa/evolução legada e integração completa
+continuam na CI do SHA publicado.
+[Resultados e limites](PURCHASE_ENTRY_BALANCES.md).
+
+## DOC-B_BAL_CORRECTIONS — registro histórico
 
 Local e remoto com215 versões, sem pendências. As migrations20261111202159,
 20261111203047 e20261111203626 acrescentam somente projeção de atos nativos e

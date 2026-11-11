@@ -9,7 +9,9 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 - [Complemento aprovado de fichas e PDFs](../../../documents/01_COMANDO_COMPLEMENTAR_PDFS.md):
   quatro resultados adicionais, sem reinício da missão ou dos 105 critérios.
 - [Parecer BAL, aplicação própria e saldo no exemplar](BAL_REVIEW_APPLICATION.md):
-  núcleo implementado; correções posteriores e restante DOC-B ainda pendentes.
+  parecer, aplicação e correções posteriores implementados no fluxo atual.
+- [Saldo histórico por material da COM](PURCHASE_ENTRY_BALANCES.md):
+  captura nativa, ficha e emissão V13 conferidas; remoto217 reconciliado.
 - [Consultas de estoque e revisão BAL conferidas](STOCK_READ_VALIDATION.md).
 - [Continuidade de alertas, destinatários e vínculos](ADMINISTRATIVE_PREPARATIONS.md).
 

@@ -47,6 +47,7 @@ import type { PdfFidelityFacts } from "@/lib/documents/pdf-fidelity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
 import { balanceApplicationFacts } from "@/lib/validation/balance-application";
 import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
+import { purchaseEntryBalances } from "@/lib/validation/purchase-entry-balances";
 
 type Person = {
   id?: string;
@@ -71,6 +72,7 @@ export type DocumentSnapshot = {
   materialIdentitySource?: string;
   purchaseProgress?: PurchaseProgress;
   purchaseReceipts?: PurchaseReceipt[];
+  purchaseEntryBalances?: unknown;
   deliveryCancellation?: DeliveryCancellationContext | null;
   deliveryRegularization?: DeliveryRegularizationContext | null;
   transfer?: Omit<
@@ -169,7 +171,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -199,6 +201,7 @@ export async function renderDocumentPdf(
   const sourceFacts = revision >= 6 ? emission?.sourceFacts : undefined;
   const fidelity = revision >= 7 ? emission?.fidelityFacts : undefined;
   const corrections = revision >= 12 && snapshot.type === "BAL" ? balanceCorrectionFacts.parse(snapshot.balanceReviewCorrections) : undefined;
+  const entries = revision >= 13 && snapshot.type === "COM" ? purchaseEntryBalances.parse(snapshot.purchaseEntryBalances) : undefined;
   const cancelledV6 = Boolean(sourceFacts && snapshot.status === "cancelled");
   const entState = revision >= 9 && snapshot.type === "ENT" ? entReceiptState(snapshot.status,Boolean(sourceFacts?.historical),typeof snapshot.workflow?.acceptedAt === "string" ? snapshot.workflow.acceptedAt : null,emission?.representation) : null;
   if (emission && revision >= 6 && !sourceFacts)
@@ -1389,6 +1392,25 @@ export async function renderDocumentPdf(
     }
   } else if (snapshot.type === "COM") {
     section("Aquisição e validação");
+    if (entries) {
+      section("Saldo da família após a última entrada validada");
+      text("Cada material conserva o saldo imediatamente após sua última entrada validada nesta COM. As datas podem ser diferentes. Movimentos posteriores não substituem esse saldo.", 8);
+      table(["MATERIAL E UNIDADE", "ADQUIRIDO", "ENTRADA VALIDADA", "SALDO APÓS ENTRADA"], [.34, .18, .20, .28], snapshot.lines.map(item => {
+        const fact = entries.find(entry => entry.lineId === item.id)!;
+        return [name(item) + " · " + String(item.unit_snapshot ?? "Unidade não preservada"),
+          formatQuantity(String(item.purchased_quantity ?? 0), String(item.unit_snapshot ?? "")),
+          formatQuantity(String(item.accepted_quantity ?? 0), String(item.unit_snapshot ?? "")),
+          fact.state === "known" ? formatQuantity(fact.quantity, String(item.unit_snapshot ?? "")) : fact.state === "restricted" ? "Acesso restrito" : fact.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro"];
+      }), snapshot.lines.map(item => "purchase-entry/" + item.id));
+      for (const fact of entries) if (fact.entry) {
+        const entry = fact.entry, source = snapshot.lines.find(item => item.id === fact.lineId)!;
+        const prefix = "purchase-entry/" + fact.lineId;
+        fidelityFact(prefix + "/source", "Última entrada — " + name(source), entry.receiptId + " · evento " + entry.eventId + " · versão " + entry.eventVersion + " · entrada de " + formatQuantity(entry.enteredQuantity, String(source.unit_snapshot ?? "")));
+        fidelityFact(prefix + "/submitted", "Registro da parcela", (entry.submittedName ?? "Nome histórico não preservado") + " · " + formatBrazilDate(entry.submittedAt));
+        fidelityFact(prefix + "/validated", "Validação desta entrada", (entry.validatorName ?? "Nome histórico não preservado") + " · " + (entry.validatorId ?? "Identidade não preservada") + " · " + formatBrazilDate(entry.validatedAt));
+      }
+      section("Quantidades e expectativa da aquisição");
+    }
     table(
       snapshot.purchaseProgress
         ? [
