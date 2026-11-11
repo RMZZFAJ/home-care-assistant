@@ -676,7 +676,7 @@ responsáveis e gates. Esta sequência fixa substitui a anterior.
    complemento continuam nos blocos DOC-A a DOC-D; a revisão geral permanece.
    Responsável — Codex.
 
-5. **05 — Busca, filtros e históricos.** Em execução · 85%.
+5. **05 — Busca, filtros e históricos.** Em execução · 90%.
 
    Para concluir — Todas as listas previstas alcançam os registros permitidos,
    inclusive listas grandes e pendências antigas, com ordenação e resposta
@@ -854,7 +854,11 @@ Responsável por todos os pontos — Codex.
    antiga. As parcelas têm busca e filtro por situação, sem mudar sua
    identificação ao filtrar. Falha de consulta conserva os campos e não
    repete crédito de estoque. São filtros simples, sem novo rascunho.
-4. **05.4 — Entregas e transferências.** Percorrer as duas direções e estados.
+4. **05.4 — Entregas e transferências.** Concluído localmente · 100% deste ponto.
+   Todas as páginas permitem alcançar as tarefas pessoais e o histórico
+   autorizado, incluindo devoluções. Uma consulta incompleta recebe erro
+   recuperável; trocar filtros não mostra a seleção anterior como atual.
+   Consultar não confirma recebimento nem altera estoque.
 5. **05.5 — Consumo.** Conferir relatos antigos, busca e resultados completos.
 6. **05.6 — Agenda.** Conferir períodos e listagens permitidas.
 7. **05.7 — Catálogo e contas.** Conferir também o diretório global de contas.

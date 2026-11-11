@@ -7,6 +7,7 @@ import {
   patientContext,
   rpc,
 } from "@/lib/server/api";
+import { parseDeliveryListRead } from "@/lib/validation/document-list";
 
 export async function GET(request: Request) {
   return api("deliveries.inbox", async () => {
@@ -37,14 +38,18 @@ export async function GET(request: Request) {
       (status === "tasks" && scope !== "own")
     )
       throw new ApiError("VALIDATION_ERROR", "Revise os filtros de entrega.");
-    return NextResponse.json(
-      await rpc(auth.client, "delivery_task_list", {
+    const result = await rpc(auth.client, "delivery_task_list", {
         p_patient: patient.id,
         p_scope: scope,
         p_status: status,
         p_page: page,
         p_size: pageSize,
-      }),
-    );
+      });
+    const body = {
+      ...(result as Record<string, unknown>),
+      careRecipientId: patient.id, page, pageSize, filters: { scope, status },
+    };
+    parseDeliveryListRead(body, { careRecipientId: patient.id, page, pageSize, scope, status });
+    return NextResponse.json(body);
   });
 }

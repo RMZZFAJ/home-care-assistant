@@ -1,18 +1,20 @@
 "use client";
 import { ActionButton, LoadingIndicator, SelectField } from "@/components/ui/controls";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import {
-  api,
   can,
   Notice,
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
-import { DocumentRow, type DocumentSummary } from "./document-history";
+import { DocumentRow } from "./document-history";
 import { EmptyState } from "@/components/ui/primitives";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import Link from "next/link";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import { parseDeliveryListRead } from "@/lib/validation/document-list";
+import { formatBrazilDate } from "@/lib/receipt";
 
 export function DeliveryInbox() {
   return (
@@ -30,54 +32,22 @@ export function DeliveryInbox() {
 function Inbox({ context }: { context: WorkspaceContext }) {
   const [scope, setScope] = useState("own"),
     [status, setStatus] = useState("tasks"),
-    [page, setPage] = useState(1),
-    [attempt, setAttempt] = useState(0);
-  const [result, setResult] = useState<{
-    key: string;
-    rows: DocumentSummary[];
-    total: number;
-    error: string;
-  }>({ key: "", rows: [], total: 0, error: "" });
+    [page, setPage] = useState(1);
+  const patientId = context.patient!.id;
   const revision = useLiveRevision(),
     params = new URLSearchParams({
-      careRecipientId: context.patient!.id,
+      careRecipientId: patientId,
       scope,
       status,
       page: String(page),
       pageSize: "20",
-    }).toString(),
-    requestKey = params + ":" + revision + ":" + attempt,
-    loading = result.key !== requestKey;
-  useEffect(() => {
-    const controller = new AbortController();
-    api<{ data: DocumentSummary[]; total: number }>(
-      "/api/deliveries?" + params,
-      undefined,
-      controller.signal,
-    ).then(
-      (data) => {
-        if (!controller.signal.aborted)
-          setResult({
-            key: requestKey,
-            rows: data.data,
-            total: data.total,
-            error: "",
-          });
-      },
-      (reason) => {
-        if (!controller.signal.aborted)
-          setResult((previous) => ({
-            ...previous,
-            key: requestKey,
-            error:
-              reason instanceof Error
-                ? reason.message
-                : "Não foi possível consultar as entregas.",
-          }));
-      },
-    );
-    return () => controller.abort();
-  }, [params, requestKey]);
+    }).toString();
+  const decode = useCallback((value: unknown) => parseDeliveryListRead(value, {
+    careRecipientId: patientId, scope, status, page, pageSize: 20,
+  }), [patientId, scope, status, page]);
+  const read = useScopedRead("/api/deliveries?" + params, String(revision), decode);
+  const { loading, error } = read;
+  const rows = read.data?.data ?? [], total = read.data?.total ?? 0;
   return (
     <>
       <p className="text-sm text-(--muted)">
@@ -127,54 +97,52 @@ function Inbox({ context }: { context: WorkspaceContext }) {
           <option value="team">Histórico autorizado do paciente</option>
         </SelectField>
       </div>
-      {!loading && result.error ? (
+      {error ? (
         <Notice error>
-          {result.error}
-          <ActionButton onClick={() => setAttempt((value) => value + 1)}>
+          {error}
+          <ActionButton onClick={read.refresh}>
             Tentar novamente
           </ActionButton>
         </Notice>
       ) : null}
       {loading ? <LoadingIndicator label="Consultando entregas e tarefas" /> : null}
-      {result.rows.length ? (
+      {read.queriedAt ? <p className="text-xs text-(--muted)">
+        {loading || error ? "Última consulta preservada." : "Entregas consultadas:"} {formatBrazilDate(read.queriedAt)}.
+        {loading || error ? " Atualize para conferir a situação vigente." : ""}
+      </p> : null}
+      {rows.length ? (
         <section aria-label="Entregas da consulta" aria-busy={loading}>
-          {loading || result.error ? (
-            <Notice>
-              Última consulta preservada. Atualize para conferir a situação
-              vigente.
-            </Notice>
-          ) : null}
           <div className="hca-records">
-            {result.rows.map((row) => (
+            {rows.map((row) => (
               <DocumentRow key={row.id} row={row} />
             ))}
           </div>
         </section>
-      ) : !loading && !result.error ? (
+      ) : read.data && !loading && !error ? (
         <EmptyState title="Nenhuma entrega nesta seleção">
           {status === "tasks"
             ? "Não há tarefa executável para sua identidade e suas permissões atuais. O histórico autorizado permanece disponível nos filtros."
             : "Não foram encontradas entregas para os filtros consultados."}
         </EmptyState>
       ) : null}
-      {result.total > 20 ? (
-        <div className="hca-toolbar">
+      {read.data && total > 20 ? (
+        <nav className="hca-toolbar" aria-label="Páginas das entregas">
           <ActionButton
-            disabled={page === 1 || loading}
+            disabled={page === 1 || loading || Boolean(error)}
             onClick={() => setPage((value) => value - 1)}
           >
             Anterior
           </ActionButton>
           <span>
-            Página {page} · {result.total} entregas
+            Página {page} · {total} entregas
           </span>
           <ActionButton
-            disabled={page * 20 >= result.total || loading}
+            disabled={page * 20 >= total || loading || Boolean(error)}
             onClick={() => setPage((value) => value + 1)}
           >
             Próxima
           </ActionButton>
-        </div>
+        </nav>
       ) : null}
     </>
   );

@@ -195,5 +195,99 @@
       "DOC-B10percent and DOC-A/C/D remain;old PDF regression is not new PDF approval",
       "No SQL,merge,production,external activation or security relaxation;Sonar owner-deferred"
     ]
+  },
+  "D3.72": {
+    "baseSha": "633b0b909958474b73e5207ff9465dbc10b73885",
+    "scope": "05.4 delivery/personal-task and authorized transfer history lists",
+    "implementation": [
+      "Delivery envelope adds patient,page,size,scope/status to existing data/total;shared summary schema,server and client validation",
+      "useScopedRead replaces independent unvalidated result state;only same-selection valid data retained with timestamp;another selection/patient/page cannot become current;401/403/404 clear data",
+      "Pagination is a named navigation region and is blocked during invalid reads;native filters,own tasks and scopes preserved",
+      "No authorization from recipient identity or metadata;private.delivery_task and ent.read remain native authority"
+    ],
+    "unit": {
+      "passed": 13,
+      "files": [
+        "tests/delivery-list.test.ts",
+        "tests/document-list.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T08:45:46.615Z",
+        "duration": 235262.55000000002,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "volumeFinal": {
+        "startTime": "2026-11-11T08:53:30.202Z",
+        "duration": 118547.368,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 12,
+      "executions": 15,
+      "initialFixtureFailures": 3,
+      "qualifiedBy": "Nine initial passes retained;three volume cases repeated after test-only issuer correction.Runtime unchanged after initial cohort.",
+      "reports": [
+        "delivery-list-first.json",
+        "delivery-list-volume-final.json"
+      ],
+      "failureDirectory": "delivery-list-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "fixtureCorrection": "The extra record initially used adminA as both issuer and recipient.Native contract rightly refused it.The family now issues that record to adminA,keeping distinct authors.No production rule changed;actor import is now used and lint passes.",
+    "counterproofs": [
+      "101real personal receiving tasks and102authorized historical deliveries;all pages exactly match independent SQL created_atDESC,idASC;other recipient excluded from own;tasks resets scope to own",
+      "Six corrupt200 modes rejected:incomplete,foreign patient,page,status,scope,total;prior same-scope valid row retained;wrong new scope error hides previous rows and cannot claim empty",
+      "Real old confirmed response delivered after pending selection cannot replace it;filter focus retained;native empty and recovery remain distinct",
+      "Controlled403 clears previous rows;actual ent.read revocation yields403 and reload exposes no list content",
+      "Read/navigation emit no official POST and preserve raw complete documents/events/ledger",
+      "Original return transfer passes declaration without protocol,three distinct authors,agreement without stock,designated receipt,inactive item,partial receipt and own recovery with existing assertions"
+    ],
+    "validation": {
+      "types": "PASS on unchanged runtime sources",
+      "directedLint": "PASS after test fixture uses actor;no suppression",
+      "visual": "Fresh Chromium320 delivery list inspected",
+      "axe": "New narrow scoped list and existing four-width race/empty consumer across3profiles",
+      "existingTestChange": "Replaced expectation of old-scope caption during changed-filter read with loading and zero old rows;kept response inversion,focus,error/empty and raw ledger assertions"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4"
+      ],
+      "next": "05.5"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "05.5–05.10 and full visual/joint/human/physical/provider gates remain",
+      "No native transfer/document history rewritten;no new PDF appearance or DOC approval",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred",
+      "No SQL,merge,production or external activation"
+    ]
   }
 }

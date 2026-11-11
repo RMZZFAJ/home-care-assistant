@@ -4,7 +4,23 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.71
+## Incremento atual D3.72
+
+D3.72 fechou05.4. Entregas conferem paciente, página, seleção e registros antes
+de aceitar a resposta. Falha conserva somente a consulta válida da mesma
+seleção, com instante; trocar filtros não apresenta dados anteriores como
+atuais. Recusa de acesso retira os dados. Passaram13 unitários e12 cenários
+distintos nos três perfis, qualificados por nove aprovações iniciais e três
+finais. Três falhas de preparação do teste estão preservadas; o emissor foi
+corrigido sem alterar a regra que impede indicar a si próprio como recebedor.
+Auth real,101 tarefas pessoais/102 registros autorizados, todas as páginas
+em ordem por SQL independente, transferência de devolução com três autores,
+perda real de leitura e fatos oficiais preservados. Tipos, lint e axe/inspeção
+a320px passaram. Sem SQL novo; dry-run remoto vazio em205. Próximo05.5;
+etapa05 parcial90%. Matriz56/49 e DOC-A/B/C/D preservados; CI própria necessária.
+[Implementação e limites](../audits/D/D-B/OPERATIONAL_LISTS.md).
+
+## Incremento anterior D3.71
 
 Parcelas de aquisição têm busca, filtro por situação e páginas completas,
 mantendo identidade e número de localização na ficha ao filtrar. Passaram15

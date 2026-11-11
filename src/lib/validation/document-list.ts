@@ -44,3 +44,26 @@ export function parseDocumentListRead(value: unknown, expected: DocumentListScop
   }
   return { ...result, data: result.data.map(item => ({ ...item, fulfillment: item.fulfillment ?? undefined, document_lines: item.document_lines ?? undefined })) };
 }
+
+const deliveryResponse = response.extend({
+  filters: z.object({
+    scope: z.enum(["own", "team"]),
+    status: z.enum(["", "tasks", "transfer_pending", "transfer_ready", "pending_receipt", "disputed", "cancellation_pending", "confirmed", "cancelled", "administratively_closed"]),
+  }).refine(value => value.status !== "tasks" || value.scope === "own"),
+});
+export type DeliveryListScope = { careRecipientId: string; scope: string; status: string; page: number; pageSize: number };
+export function parseDeliveryListRead(value: unknown, expected: DeliveryListScope): {
+  data: DocumentSummary[]; total: number; page: number; pageSize: number;
+} {
+  const parsed = deliveryResponse.safeParse(value);
+  if (!parsed.success) throw new Error("A resposta das entregas não pôde ser conferida. Consulte a lista novamente.");
+  const result = parsed.data;
+  const length = Math.min(result.pageSize, Math.max(0, result.total - (result.page - 1) * result.pageSize));
+  if (result.careRecipientId !== expected.careRecipientId || result.page !== expected.page || result.pageSize !== expected.pageSize
+    || result.filters.scope !== expected.scope || result.filters.status !== expected.status
+    || result.data.length !== length || new Set(result.data.map(item => item.id)).size !== result.data.length
+    || result.data.some(item => item.type !== "ENT")) {
+    throw new Error("A resposta recebida não corresponde à consulta das entregas. Consulte a lista novamente.");
+  }
+  return { ...result, data: result.data.map(item => ({ ...item, fulfillment: item.fulfillment ?? undefined, document_lines: item.document_lines ?? undefined })) };
+}

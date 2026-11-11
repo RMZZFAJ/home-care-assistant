@@ -511,7 +511,13 @@ divergência, cancelamento pessoal, conferência administrativa ou apuração fu
 Não equivale a filtrar apenas recipient_id. Histórico autorizado usa status
 específico ou vazio e scope own/team; tasks exige own. Terminal sai da fila,
 salvo uma nova obrigação administrativa explicitamente designada. Falha de
-consulta mantém a última lista identificada como anterior, sem vazio falso.
+consulta mantém somente a lista válida do mesmo paciente, seleção e página,
+identificada com seu instante, sem vazio falso. Outra seleção não reaproveita
+os registros anteriores como resultado atual;401/403/404 retiram o conteúdo.
+O envelope conserva data,total e acrescenta careRecipientId,page,pageSize e
+filters(scope,status). Servidor e consumidor conferem estrutura, identidade
+única, total e âmbito antes de adotar a resposta. A tarefa própria continua
+calculada no banco, sem derivar autorização de recipient_id no navegador.
 
 ## Relatos e consumo
 

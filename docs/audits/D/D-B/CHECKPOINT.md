@@ -1,5 +1,19 @@
 # Checkpoint D-B
 
+D3.72 fechou05.4. Entregas conferem paciente, página, seleção e registros antes
+de aceitar a resposta. Falha conserva somente a consulta válida da mesma
+seleção, com instante; trocar filtros não apresenta dados anteriores como
+atuais. Recusa de acesso retira os dados. Passaram13 unitários e12 cenários
+distintos nos três perfis, qualificados por nove aprovações iniciais e três
+finais. Três falhas de preparação do teste estão preservadas; o emissor foi
+corrigido sem alterar a regra que impede indicar a si próprio como recebedor.
+Auth real,101 tarefas pessoais/102 registros autorizados, todas as páginas
+em ordem por SQL independente, transferência de devolução com três autores,
+perda real de leitura e fatos oficiais preservados. Tipos, lint e axe/inspeção
+a320px passaram. Sem SQL novo; dry-run remoto vazio em205. Próximo05.5;
+etapa05 parcial90%. Matriz56/49 e DOC-A/B/C/D preservados; CI própria necessária.
+[Resultados](OPERATIONAL_LISTS_VALIDATION.json).
+
 D3.71 fechou05.3. Parcelas têm busca, situação, páginas de20 e ordem estável,
 sem perder identidade, autoria, quantidades ou localização ao filtrar.
 Passaram15 unitários qualificados e18 cenários de produção nos três perfis,

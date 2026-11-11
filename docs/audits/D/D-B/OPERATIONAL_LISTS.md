@@ -113,3 +113,49 @@ Sem SQL novo; dry-run remoto vazio em205. Ponto05.3 fechado localmente;
 próximo05.4, entregas e transferências. Os105 critérios mantêm56 PASS locais
 e49 PARTIAL. CI própria e demais pontos/gates continuam necessários.
 DOC-B permanece10% e DOC-A/C/D pendentes, incluindo os novos PDFs aprovados.
+
+## D3.72 — entregas e transferências, ponto05.4
+
+Base633b0b9. A lista pessoal e o histórico autorizado reutilizam o contrato
+de tarefas existente. O envelope conserva data/total e acrescenta paciente,
+página, tamanho e seleção efetiva. Servidor e cliente conferem estrutura,
+identidades únicas, tipo ENT e coerência do total antes de adotar a leitura.
+Documento ainda não expedido pode continuar sem protocolo. A autoridade
+permanece no banco, sem deduzir permissão pela identidade do destinatário.
+
+O consumidor usa useScopedRead. Falha transitória conserva somente a consulta
+válida da mesma seleção, identificada com instante; outra seleção/página não
+apresenta dados anteriores como atuais. Recusas401/403/404 retiram os dados.
+Falha não fabrica vazio. A paginação tem identificação acessível e aguarda
+resposta válida. Consultas não viram rascunhos de negócio.
+
+Passaram13 unitários, tipos e lint dirigido. São12 cenários distintos de
+produção qualificados nos três perfis: nove aprovações da coorte inicial e
+três do caso de volume após correção exclusiva da preparação do teste. Das15
+execuções, três falharam antes da interface porque o registro adicional tinha
+emissor e destinatário iguais. O contrato nativo corretamente recusou isso;
+a família passou a emitir esse registro para o administrador, com autores
+distintos. Nenhuma regra do produto foi flexibilizada. Relatório inicial,
+contextos e capturas das falhas estão preservados.
+
+Com Auth real,101 tarefas pessoais e102 registros no histórico autorizado
+foram percorridos por todas as páginas em ordem exata comparada com SQL
+independente. Registro de outro destinatário não entra na seleção pessoal;
+tarefas executáveis retomam o âmbito próprio. Seis modos de resposta200
+inconsistente foram recusados. Mudança de seleção seguida de503 não exibe
+a leitura anterior nem inventa vazio; recuperação e perda real de ent.read
+foram conferidas. Navegar não envia POST oficial, e os documentos, eventos e
+movimentos completos permanecem iguais.
+
+Os consumidores anteriores mantiveram resposta tardia, foco, quatro larguras,
+vazio e preservação do ledger. A expectativa antiga de conservar dados de
+outro filtro foi substituída por carregamento sem linhas antigas. A devolução
+bilateral manteve três autores, declaração sem protocolo, concordância sem
+estoque, material inativo, recebimento pessoal parcial e recuperação.
+Axe a320px passou e a captura Chromium foi inspecionada.
+
+Sem SQL novo; dry-run remoto vazio em205. Ponto05.4 fechado localmente;
+próximo05.5, consumo. Etapa05 parcial90%;105 critérios mantêm56 PASS locais
+e49 PARTIAL. Restam05.5–05.10, comparação visual conjunta e demais gates.
+DOC-B permanece10% e DOC-A/C/D pendentes; não há nova aprovação de PDFs,
+rascunhos simples ou cancelamentos. CI do SHA publicado continua necessária.
