@@ -27,12 +27,12 @@ button:disabled,button[aria-disabled="true"] { cursor:not-allowed; opacity:.45; 
 @media(max-width:640px) {.profile-name,.profile-menu summary>svg { display:none; }.context-tag { display:none; }.profile-menu .header-popover { right:0; }.ui-dialog>div { padding:18px; }
 }
 @media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto !important; transition-duration:0s !important; } }
-.product-choice { display:flex; flex-wrap:wrap; align-items:center; gap:16px; border:1px solid var(--line); border-radius:12px; padding:16px; }.product-choice-selected { border-color:#a3c9c9; background:#f8fbfb; }.product-choice input[type=checkbox] { width:20px; height:20px; margin-top:1px; accent-color:var(--brand); flex-shrink:0; }.product-quantity { width:190px; max-width:100%; }.scanner-panel { padding:14px; border:1px dashed #b9cdd1; background:#f9fbfc; border-radius:12px; }.scanner-video { width:100%; max-height:240px; border-radius:10px; background:#19333d; object-fit:cover; aspect-ratio:16/9; margin-bottom:10px; }
-@media(max-width:480px) { .product-quantity { width:100%; }.product-choice { align-items:flex-start; } }
-.ui-product-choice { border:1px solid var(--line); border-radius:12px; padding:16px; }
-.ui-product-choice.is-selected { border-color:#83b5af; background:#f9fcfb; }
-.ui-product-choice>label { min-height:44px; }
-.ui-product-choice input[type=checkbox],fieldset input[type=checkbox] { width:20px; height:20px; flex-shrink:0; accent-color:var(--brand); }
+.product-quantity { width:190px; max-width:100%; } .scanner-panel { padding:14px; border:1px dashed #b9cdd1; background:#f9fbfc; border-radius:12px; }.scanner-video { width:100%; max-height:240px; border-radius:10px; background:#19333d; object-fit:cover; aspect-ratio:16/9; margin-bottom:10px; }
+
+
+
+
+fieldset input[type=checkbox] { width:20px; height:20px; flex-shrink:0; accent-color:var(--brand); }
 .ui-form-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:12px; border-top:1px solid var(--line); padding-top:20px; margin-top:24px; }
 .hca-draft-panel, .hca-draft-panel>* { min-width:0; }
 .hca-draft-panel button, .hca-draft-panel a { min-width:0; max-width:100%; white-space:normal; overflow-wrap:anywhere; }

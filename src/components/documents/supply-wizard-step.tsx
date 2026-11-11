@@ -1,5 +1,8 @@
 "use client";
 import { RelatedDocument } from "./related-document";
+import { MaterialChoice } from "@/components/catalog/material-choice";
+import { MaterialReview } from "./material-review";
+import { DefinitionGrid } from "@/components/ui/controls";
 import {
   DeliveryRecipientField,
   DeliveryRecipientReference,
@@ -373,14 +376,13 @@ export function SupplyWizardStep({
               const checked =
                 type === "BAL" || Object.hasOwn(form.quantities, product.id);
               return (
-                <div
-                  className={
-                    "product-choice " +
-                    (checked ? "product-choice-selected" : "")
-                  }
+                <MaterialChoice
+                  selected={checked}
+                  quantity
+                  className="product-choice"
                   key={product.id}
                 >
-                  <label className="flex min-w-0 flex-1 items-start gap-3">
+                  <label className="hca-material-choice-heading">
                     {type !== "BAL" ? (
                       <input
                         type="checkbox"
@@ -413,15 +415,12 @@ export function SupplyWizardStep({
                         }
                       />
                     ) : null}
-                    <span
-                      className="min-w-0"
-                      style={{ overflowWrap: "anywhere" }}
-                    >
-                      <strong className="block text-sm">{product.name}</strong>
-                      <span className="mt-1 block text-xs text-(--muted)">
+                    <span className="hca-material-choice-copy">
+                      <strong>{product.name}</strong>
+                      <small>
                         {product.unit}
                         {links[product.id]?.length ? " · Vinculado à REQ" : ""}
-                      </span>
+                      </small>
                       {product.selectionPredecessors?.length ? (
                         <span className="mt-2 block text-xs">
                           Opção para novas escolhas após{" "}
@@ -496,7 +495,7 @@ export function SupplyWizardStep({
                       />
                     </div>
                   ) : null}
-                </div>
+                </MaterialChoice>
               );
             })}
           </div>
@@ -525,21 +524,15 @@ export function SupplyWizardStep({
       ) : null}
       {step === 5 ? (
         <>
-          <div className="rounded-xl bg-(--background) p-4 text-sm">
+          {type === "COM" ? <DefinitionGrid items={[
+            { label: "Pessoa assistida", value: context.patient?.display_name },
+            { label: "Responsável", value: context.fullName },
+            { label: "Forma de aquisição", value: form.origin === "donation" ? "Doação" : form.origin === "purchase" ? "Compra pela família" : "Não informada" },
+          ]} /> : <div className="rounded-xl bg-(--background) p-4 text-sm">
             <strong>{context.patient?.display_name}</strong>
             <p className="mt-1 text-xs text-(--muted)">
               Responsável: {context.fullName}
             </p>
-            {type === "COM" ? (
-              <p className="mt-2">
-                Forma de aquisição:{" "}
-                {form.origin === "donation"
-                  ? "Doação"
-                  : form.origin === "purchase"
-                    ? "Compra pela família"
-                    : "Não informada"}
-              </p>
-            ) : null}
             {type === "ENT" ? (
               <p className="mt-2">
                 {form.source === "FAMILY"
@@ -564,8 +557,11 @@ export function SupplyWizardStep({
                 ) : null}
               </div>
             ) : null}
-          </div>
-          <ul className="divide-y divide-(--line)">
+          </div>}
+          {type === "COM" ? <MaterialReview rows={selected.map(product => ({
+            id: product.id, name: product.name,
+            details: <><small>{form.quantities[product.id] ? formatQuantity(form.quantities[product.id], product.unit) : "Quantidade pendente"}</small>{form.presentationSelections?.[product.id]?.map(row => <small key={row.id}>{presentationCaption(row)}</small>)}</>,
+          }))} /> : <ul className="divide-y divide-(--line)">
             {selected.map((product) => (
               <li
                 key={product.id}
@@ -589,7 +585,7 @@ export function SupplyWizardStep({
                 </strong>
               </li>
             ))}
-          </ul>
+          </ul>}
           {form.notes ? (
             <p className="whitespace-pre-wrap text-sm">{form.notes}</p>
           ) : null}

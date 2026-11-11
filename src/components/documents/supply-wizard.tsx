@@ -1350,7 +1350,7 @@ export function PatientSupplyWizard({
       </section>
     );
   return (
-    <div className="mx-auto max-w-4xl min-w-0 space-y-5">
+    <div className="hca-document-wizard min-w-0 space-y-5">
       {privateDraft.active ? (
         <CreationDraftPanel
           draft={privateDraft}

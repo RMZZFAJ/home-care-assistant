@@ -30,6 +30,14 @@ const stock = (patient: string) =>
   sql(
     `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)};`,
   );
+async function expectOriginSummary(page: Page, value: string) {
+  const row = page.locator("dl > div").filter({
+    has: page.locator("dt").filter({ hasText: /^Forma de aquisição$/ }),
+  });
+  await expect(row.locator("dt")).toBeVisible();
+  await expect(row.locator("dd")).toBeVisible();
+  await expect(row.locator("dd")).toHaveText(value);
+}
 async function finish(page: Page, revise = false) {
   const pending = page.waitForResponse(
     (r) =>
@@ -67,9 +75,7 @@ test("COM começa sem compra presumida e emite doação explícita sem creditar 
   await next(page);
   await next(page);
   await next(page);
-  await expect(
-    page.getByText("Forma de aquisição: Doação", { exact: true }),
-  ).toBeVisible();
+  await expectOriginSummary(page, "Doação");
   expect(stock(f.patient)).toBe(before);
   const document = await finish(page);
   expect(document.payload.origin).toBe("donation");
@@ -122,9 +128,7 @@ test("COM recupera rascunho sem origem em branco e exige escolha antes de emitir
   await next(page);
   await next(page);
   await next(page);
-  await expect(
-    page.getByText("Forma de aquisição: Compra pela família", { exact: true }),
-  ).toBeVisible();
+  await expectOriginSummary(page, "Compra pela família");
   const emitted = await finish(page, true);
   expect(emitted.id).toBe(draft.id);
   expect(emitted.payload.origin).toBe("purchase");

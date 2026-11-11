@@ -15,6 +15,9 @@ import {
   formatStockObservationTime,
 } from "@/lib/stock-observation";
 import { StockObservationField } from "./stock-observation-field";
+import { MaterialChoice } from "@/components/catalog/material-choice";
+import { MaterialReview } from "@/components/documents/material-review";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import type {
   ExtraItem,
   RequisitionFormData,
@@ -182,11 +185,12 @@ export function CatalogStep({
         const line = selected(item.id);
         const info = itemContext.find((entry) => entry.productId === item.id);
         return (
-          <article
+          <MaterialChoice
             key={item.id}
-            className={"ui-product-choice " + (line ? "is-selected" : "")}
+            selected={Boolean(line)}
+            className="ui-product-choice"
           >
-            <label className="flex min-w-0 items-start gap-3 font-semibold">
+            <label className="hca-material-choice-heading">
               <input
                 type="checkbox"
                 checked={Boolean(line)}
@@ -198,14 +202,9 @@ export function CatalogStep({
                   } else updateLine(item, {});
                 }}
               />
-              <span
-                className="min-w-0 flex-1"
-                style={{ overflowWrap: "anywhere" }}
-              >
-                {item.name}
-              </span>
-              <span className="ml-auto shrink-0 text-xs font-normal text-(--muted)">
-                {item.unit}
+              <span className="hca-material-choice-copy">
+                <strong>{item.name}</strong>
+                <small>{item.unit}</small>
               </span>
             </label>
             {item.selectionPredecessors?.length ? (
@@ -249,7 +248,7 @@ export function CatalogStep({
                   </label>
                 </div>
                 {info?.pending.length ? (
-                  <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
+                  <div className="hca-material-pending">
                     <p>
                       Este produto ainda tem requisição pendente:{" "}
                       {info.pending.map((pending) => (
@@ -287,7 +286,7 @@ export function CatalogStep({
                 ) : null}
               </div>
             ) : null}
-          </article>
+          </MaterialChoice>
         );
       })}
     </div>
@@ -352,7 +351,7 @@ export function Extras({
                     ),
                   )
                 }
-                className="mt-1 min-h-12 w-full rounded-lg border border-(--line) p-3"
+                className={inputClass + " mt-1"}
               />
               {errors[item.id + ":name"] ? <span id={item.id + "-name-error"} className="ui-field-error">{errors[item.id + ":name"]}</span> : null}
             </label>
@@ -373,15 +372,15 @@ export function Extras({
               }
             />
             <div className="flex items-end">
-              <button
-                type="button"
+              <ActionButton
+                variant="danger"
                 onClick={() =>
                   setItems(items.filter((current) => current.id !== item.id))
                 }
-                className="min-h-12 w-full rounded-lg border border-red-200 px-3 text-left text-sm font-semibold text-red-700 sm:w-auto"
+                className="w-full sm:w-auto"
               >
                 Remover item {index + 1}
-              </button>
+              </ActionButton>
             </div>
             <label className="flex items-center gap-2 text-sm sm:col-span-3">
               <input
@@ -401,15 +400,14 @@ export function Extras({
               Reposição urgente
             </label>
             {normalize(item.name) && (
-              <div className="space-y-2 rounded-lg bg-slate-50 p-3 sm:col-span-3">
+              <div className="hca-material-suggestions space-y-2 sm:col-span-3">
                 <p role="status" className="text-sm font-semibold">
                   {classificationLabels[result.classification]}
                 </p>
                 {result.candidates.slice(0, 5).map((candidate) => (
-                  <button
+                  <ActionButton
                     key={candidate.product.id}
-                    type="button"
-                    className="block min-h-11 w-full rounded border border-(--brand) p-2 text-left text-sm"
+                    className="hca-material-suggestion"
                     onClick={() => adopt(candidate.product, item)}
                   >
                     Usar item do catálogo: {candidate.product.name} (
@@ -420,7 +418,7 @@ export function Extras({
                         ? `: ${candidate.matchedName}`
                         : ""}
                     </span>
-                  </button>
+                  </ActionButton>
                 ))}
                 {result.candidates.length > 5 && (
                   <p className="text-xs text-(--muted)">
@@ -433,13 +431,11 @@ export function Extras({
           </div>
         );
       })}
-      <button
-        type="button"
+      <ActionButton
         onClick={() => setItems([...items, emptyExtra()])}
-        className="min-h-12 rounded-lg border border-(--brand) px-4 py-2 text-sm font-bold text-(--brand)"
       >
         + Incluir novo item
-      </button>
+      </ActionButton>
     </div>
   );
 }
@@ -483,27 +479,25 @@ export function Observations({
                 ),
               )
             }
-            className="w-full rounded-lg border border-(--line) p-3"
+            className={inputClass}
           />
-          <button
-            type="button"
+          <ActionButton
+            variant="danger"
             onClick={() => update(rows.filter((item) => item.id !== row.id))}
-            className="self-start text-sm font-semibold text-red-700"
+            className="self-start"
           >
             Remover
-          </button>
+          </ActionButton>
           {errors["observation:" + index] ? <p id={fieldId + "-" + index} className="ui-field-error w-full">{errors["observation:" + index]}</p> : null}
         </div>
       ))}
-      <button
-        type="button"
+      <ActionButton
         onClick={() =>
           update([...rows, { id: crypto.randomUUID(), value: "" }])
         }
-        className="rounded-lg border border-(--brand) px-4 py-2 text-sm font-bold text-(--brand)"
       >
         + Incluir nova observação
-      </button>
+      </ActionButton>
     </div>
   );
 }
@@ -520,32 +514,21 @@ export function Review({
   const extras = form.extraItems.filter((item) => item.name.trim());
   return (
     <div className="space-y-6" style={{ overflowWrap: "anywhere" }}>
-      <div>
-        <p className="text-sm text-(--muted)">Solicitante</p>
-        <p className="font-semibold">{requesterName}</p>
-        <p className="mt-4 text-sm text-(--muted)">Pessoa assistida</p>
-        <p className="font-semibold">{recipientName}</p>
-      </div>
-      <Summary
-        title="Itens do catálogo"
-        details={lines.map((item) =>
-          formatStockObservationTime(item.stockObservationAt),
-        )}
-        rows={lines.map(
-          (item) =>
-            `${item.productName} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation, item.unit)}${item.urgent ? " (urgente)" : ""}${item.repeatReason ? " · Reiteração: " + item.repeatReason : ""}`,
-        )}
-      />
-      <Summary
-        title="Itens extras"
-        details={extras.map((item) =>
-          formatStockObservationTime(item.stockObservationAt),
-        )}
-        rows={extras.map(
-          (item) =>
-            `${item.name} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation)}${item.urgent ? " (urgente)" : ""}`,
-        )}
-      />
+      <DefinitionGrid items={[{ label: "Solicitante", value: requesterName }, { label: "Pessoa assistida", value: recipientName }]} />
+      <section className="hca-document-summary">
+        <h3>Itens do catálogo</h3>
+        <MaterialReview rows={lines.map(item => ({
+          id: item.productId, name: item.productName, urgent: item.urgent,
+          details: <><small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation, item.unit)}</small><small>{formatStockObservationTime(item.stockObservationAt)}</small>{item.repeatReason ? <small>Reiteração: {item.repeatReason}</small> : null}</>,
+        }))} />
+      </section>
+      <section className="hca-document-summary">
+        <h3>Itens extras</h3>
+        <MaterialReview rows={extras.map(item => ({
+          id: item.id, name: item.name, urgent: item.urgent,
+          details: <><small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation)}</small><small>{formatStockObservationTime(item.stockObservationAt)}</small></>,
+        }))} />
+      </section>
       <Summary
         title="Observações"
         rows={form.observations.filter((item) => item.trim())}
@@ -563,10 +546,10 @@ export function Summary({
   details?: string[];
 }) {
   return (
-    <div>
+    <div className="hca-document-summary">
       <h3 className="font-bold">{title}</h3>
       {rows.length ? (
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
+        <ul>
           {textRows(rows).map((row, index) => (
             <li key={row.key}>
               <span>{row.value}</span>

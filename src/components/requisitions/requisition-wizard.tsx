@@ -475,7 +475,7 @@ function PatientRequisition({
       </Notice>{selectionLibrary(true)}</div>
     );
   return (
-    <div ref={fieldsRef} className="mx-auto max-w-4xl min-w-0 space-y-5">
+    <div ref={fieldsRef} className="hca-document-wizard min-w-0 space-y-5">
       {selectionLibrary()}
       <CreationDraftPanel
         draft={privateDraft}

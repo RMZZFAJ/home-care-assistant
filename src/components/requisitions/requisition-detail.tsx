@@ -1,4 +1,5 @@
 "use client";
+import { DocumentMaterialsTable } from "@/components/documents/document-materials-table";
 import { roleLabel } from "@/components/layout/workspace-context";
 import { Pill } from "@/components/ui/controls";
 import { DocumentBreadcrumb } from "@/components/documents/document-breadcrumb";
@@ -603,24 +604,17 @@ export function RequisitionDocumentContent({
           />
         </DocumentPanel>
         <DocumentPanel value="materials">
-          <section className="ui-card">
-            <h2 className="font-semibold">Materiais requisitados</h2>
-            <p className="mt-2 text-xs text-(--muted)">
-              Uma linha é atendida após aceite positivo em ENT vinculada.
-              Compras não atendem itens da REQ.
-            </p>
-            <ul className="mt-4 space-y-3">
-              {data.requisition_items.map((item) => {
+          <section className="hca-materials-section">
+            <DocumentMaterialsTable key={data.id} label="Materiais requisitados" heading={<><h2>Materiais requisitados</h2><p>Uma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ. O estoque observado não é quantidade solicitada para compra.</p></>}
+              columns={[{ id: "material", label: "Material" }, { id: "stock", label: "Estoque observado" }, { id: "priority", label: "Prioridade" }, { id: "fulfillment", label: "Atendimento" }]}
+              rows={data.requisition_items.map((item) => {
                 const line = f.lines.find((row) => row.id === item.id);
-                return (
-                  <li
-                    className="rounded-lg border border-(--line) p-3"
-                    key={item.id}
-                  >
-                    <div className="flex flex-wrap justify-between gap-2">
-                      <strong className="text-sm">
-                        {item.product_name_snapshot ?? item.custom_name}
-                      </strong>
+                const name = item.product_name_snapshot ?? item.custom_name ?? "Nome não preservado no registro";
+                return { id: item.id, searchText: name, cells: {
+                    material: <><strong>{name}</strong><small>{item.unit_snapshot}</small></>,
+                    stock: <>{formatStockObservation(item.current_stock, item.stock_observation, item.unit_snapshot)}<small>{formatStockObservationTime(item.stock_observation_at, item.stock_observation_time_source)}</small></>,
+                    priority: item.urgent ? <span className="ui-badge ui-badge-danger">Urgente</span> : <span className="ui-badge ui-badge-neutral">Rotina</span>,
+                    fulfillment: <div className="space-y-2">
                       <span
                         className={
                           "ui-badge ui-badge-" +
@@ -635,27 +629,6 @@ export function RequisitionDocumentContent({
                               ? "Sem atendimento confirmado"
                               : "Pendente"}
                       </span>
-                      {item.urgent ? (
-                        <span className="ui-badge ui-badge-danger">
-                          Urgente
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="mt-2 text-xs text-(--muted)">
-                      Estoque da equipe informado:{" "}
-                      {formatStockObservation(
-                        item.current_stock,
-                        item.stock_observation,
-                        item.unit_snapshot,
-                      )}
-                      <span className="block text-xs text-(--muted)">
-                        {formatStockObservationTime(
-                          item.stock_observation_at,
-                          item.stock_observation_time_source,
-                        )}
-                      </span>
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-3">
                       {requisitionDeliveries(line?.deliveries ?? []).map((delivery) => (
                         <div key={delivery.id}>
                           <RelatedDocument
@@ -672,10 +645,9 @@ export function RequisitionDocumentContent({
                         </div>
                       ))}
                     </div>
-                  </li>
-                );
-              })}
-            </ul>
+                    ,
+                  } };
+              })} />
           </section>
           {can(context, "catalog.manage") &&
           can(context, "req.review") &&

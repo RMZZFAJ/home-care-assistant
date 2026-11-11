@@ -13,6 +13,7 @@ import { RelatedDocument } from "@/components/documents/related-document";
 import { Summary } from "./requisition-steps";
 import { RequisitionOpening } from "./requisition-opening";
 import { RequisitionDisplay } from "./requisition-display";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 
 export type SavedReceipt = RequisitionReceipt & {
   id?: string;
@@ -37,28 +38,12 @@ function ReceiptContent({ receipt }: { receipt: SavedReceipt }) {
   return (
     <div className="p-3 sm:p-5">
       {id ? <RequisitionDisplay key={id} id={id} /> : null}
-      <section className="mx-auto max-w-3xl rounded-2xl border border-(--line) bg-white p-5 shadow-sm sm:p-10">
-        <p className="text-sm font-bold uppercase tracking-wider text-emerald-700">
+      <section className="ui-card hca-issued-receipt">
+        <p className="eyebrow">
           Requisição registrada
         </p>
-        <h1 className="mt-2 text-3xl font-semibold">Comprovante oficial</h1>
-        <div className="mt-6 grid gap-4 rounded-xl bg-[#f1f7f7] p-5 sm:grid-cols-2">
-          <div>
-            <p className="text-sm text-(--muted)">Protocolo</p>
-            <p className="text-xl font-bold">{receipt.protocol}</p>
-          </div>
-          <div>
-            <p className="text-sm text-(--muted)">Data e hora</p>
-            <p className="font-semibold">
-              {formatBrazilDate(receipt.createdAt)}
-            </p>
-          </div>
-        </div>
-        <p className="mt-6 text-sm">
-          Solicitante: <strong>{receipt.requesterName}</strong>
-          <br />
-          Pessoa assistida: <strong>{receipt.recipientName}</strong>
-        </p>
+        <h1 className="hca-receipt-title">Comprovante oficial</h1>
+        <div className="my-6"><DefinitionGrid items={[{ label: "Protocolo", value: receipt.protocol, wide: true }, { label: "Data e hora", value: formatBrazilDate(receipt.createdAt) }, { label: "Solicitante", value: receipt.requesterName }, { label: "Pessoa assistida", value: receipt.recipientName }]} /></div>
         {receipt.sourceRequisition ? (
           <section
             className="ui-card mt-4 space-y-2"
@@ -101,13 +86,12 @@ function ReceiptContent({ receipt }: { receipt: SavedReceipt }) {
           <DocumentDeliveryStatus id={(receipt.id ?? receipt.requisitionId)!} />
         ) : null}
         <div className="mt-8 flex flex-col gap-3 border-t border-(--line) pt-5 sm:flex-row">
-          <button
-            type="button"
+          <ActionButton
+            variant="primary"
             onClick={() => window.print()}
-            className="min-h-12 rounded-lg bg-(--brand) px-4 py-2 text-sm font-bold text-white"
           >
             Imprimir / salvar como PDF
-          </button>
+          </ActionButton>
           {receipt.id || receipt.requisitionId ? (
             <DocumentActions
               id={(receipt.id ?? receipt.requisitionId)!}

@@ -4,7 +4,28 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual D3.78
+## Incremento atual D3.79
+
+D3.79 fechou06.1 no escopo visual de REQ/COM: seleção e revisão compartilham
+componentes canônicos; materiais usam tabela/cartões com busca reversível.
+Nomes, unidades, observações, instantes, urgência, motivo, apresentações,
+parcelas e saldos da expectativa permanecem distintos. O cabeçalho respeita
+Canvas/CanvasText em cores forçadas; todas as regras do axe permanecem ativas.
+Foram qualificados51 cenários distintos nos três perfis:30 resultados do
+cohort preservado,12 resumos finais e nove consumidores finais. A rodada
+inicial completa de45 passou. Falhas de fixture, aparência, contraste e
+seletores estão preservadas. Os seletores antigos agora conferem rótulo/valor
+e nome/observação/urgência, mantendo as asserções nativas de emissão e estoque.
+Tipos e lint passaram. Cinco larguras, teclado, nomes longos, movimento
+reduzido, cores forçadas e ampliação CSS200%; não equivalem a aparelho físico,
+leitor de tela ou zoom nativo400%. Capturas longas são contextuais; recortes
+canônicos e comparação computada têm escopo próprio. Sem SQL novo; dry-run
+remoto vazio em206 migrations. Matriz57/48 e18 estados de UI preservados.
+Etapa06 parcial75%, com06.1 concluído; próximo06.2, ENT e transferências.
+DOC-A/B/C/D e os gates próprios continuam pendentes; CI própria necessária.
+[Resultados e limites](../audits/D/D-B/REQ_COM_CANONICAL.md).
+
+## Incremento anterior D3.78
 
 D3.78 fechou05.10 e a etapa05: os dez pontos de listas estão concluídos
 localmente. Auditoria confere paciente, seleção e página, mantém foco e URL,

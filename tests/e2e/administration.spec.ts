@@ -665,9 +665,12 @@ test.describe("administração integrada no ambiente local", () => {
     ).toHaveCount(0);
     for (let step = 0; step < 2; step++)
       await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
-    await expect(
-      page.getByText("Gaze — estoque da equipe: 3 pacote (observado) (urgente)", { exact: true }),
-    ).toBeVisible();
+    const reviewMaterial = page.locator(".hca-material-review li").filter({
+      has: page.locator("strong").filter({ hasText: /^Gaze$/ }),
+    });
+    await expect(reviewMaterial.getByText("Gaze", { exact: true })).toBeVisible();
+    await expect(reviewMaterial.getByText("Estoque da equipe: 3 pacote (observado)", { exact: true })).toBeVisible();
+    await expect(reviewMaterial.getByText("Urgente", { exact: true })).toBeVisible();
     const pending = page.waitForResponse(
       (response) =>
         new URL(response.url()).pathname === "/api/requisitions" &&

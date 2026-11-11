@@ -69,6 +69,17 @@ rótulo de11px,texto de13px,intervalo14px (13px no celular),sem corte de valores
 Notas e referências extensas podem ocupar a linha inteira. O resumo privado
 de estoque compartilha essa composição na oferta,revisão e consulta do resultado.
 
+MaterialChoice reproduz productoption: seleção, nome e unidade permanecem
+juntos. Quantidades, apresentações e referências complementares ficam visíveis
+sem comprimir o nome. DocumentMaterialsTable compartilha a tabela/cartão de
+materiais e sua busca local, com indicação do filtro e limpeza pelo teclado.
+Cada consumidor preserva suas colunas: PurchaseMaterials mantém proposto,
+aprovado, adquirido, validado e os quatro saldos da expectativa separados.
+Consulta indisponível recebe texto explícito, sem presumir quantidade zero.
+MaterialReview apresenta nome e detalhes completos em leitura, separando
+observação, instante, urgência e motivo. Quantidades continuam com sua unidade;
+o resumo não cria outro editor nem transforma observação em pedido de compra.
+
 ## Aceite
 
 Comparar produto e modelo em cinco viewports; testar teclado, retorno de foco,
