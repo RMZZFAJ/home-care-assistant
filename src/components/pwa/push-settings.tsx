@@ -1,8 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { api } from "@/lib/client/api";
-import { pushDevice, pushDevices } from "@/lib/push/subscription";
+import { api, ApiError } from "@/lib/client/api";
+import { pushContextReference, pushDevice, pushDevices } from "@/lib/push/subscription";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { SettingsSection } from "@/components/forms/settings-section";
 import { usePwa } from "./pwa-provider";
@@ -10,6 +10,8 @@ import { usePwa } from "./pwa-provider";
 const receipt = z
   .object({
     devices: pushDevices,
+    userId: z.uuid(),
+    contextReference: pushContextReference,
     available: z.boolean(),
     deliveryEnabled: z.boolean(),
     publicKey: z.string().nullable(),
@@ -28,9 +30,12 @@ async function currentFingerprint() {
   const registration = await navigator.serviceWorker.getRegistration("/");
   const subscription = await registration?.pushManager?.getSubscription();
   if (!subscription) return null;
+  return fingerprintOf(subscription.endpoint);
+}
+async function fingerprintOf(endpoint: string) {
   const digest = await crypto.subtle.digest(
     "SHA-256",
-    new TextEncoder().encode(subscription.endpoint),
+    new TextEncoder().encode(endpoint),
   );
   return Array.from(new Uint8Array(digest), (byte) =>
     byte.toString(16).padStart(2, "0"),
@@ -38,9 +43,9 @@ async function currentFingerprint() {
 }
 export function PushSettings() {
   const userId = useWorkspaceState().data?.userId;
-  return userId ? <PersonalPushSettings key={userId} /> : null;
+  return userId ? <PersonalPushSettings key={userId} userId={userId} /> : null;
 }
-function PersonalPushSettings() {
+function PersonalPushSettings({ userId }: { userId: string }) {
   const pwa = usePwa();
   const [data, setData] = useState<z.infer<typeof receipt> | null>(null);
   const [capable, setCapable] = useState<boolean | null>(null),
@@ -57,6 +62,7 @@ function PersonalPushSettings() {
   const lifecycleRef = useRef<AbortController | null>(null);
   const load = useCallback(async (signal?: AbortSignal) => {
     const generation = ++generationRef.current;
+    setReading(true);
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -71,8 +77,12 @@ function PersonalPushSettings() {
       !!navigator.serviceWorker;
     try {
       const next = receipt.parse(
-        await api("/api/push/devices", undefined, controller.signal),
+        await api("/api/push/devices?context=consent", undefined, controller.signal),
       );
+      if (next.userId !== userId) {
+        if (generation === generationRef.current && !controller.signal.aborted) { setData(null); setFingerprint(null); }
+        throw new Error("A conta ou sessão mudou. Atualize esta página antes de confirmar os avisos.");
+      }
       const current = support ? await currentFingerprint() : null;
       if (generation !== generationRef.current || controller.signal.aborted)
         return;
@@ -83,18 +93,20 @@ function PersonalPushSettings() {
       setData(next);
       setFingerprint(current);
     } catch (reason) {
-      if (generation === generationRef.current && !controller.signal.aborted)
+      if (generation === generationRef.current && !controller.signal.aborted) {
+        if (reason instanceof ApiError && [401, 403].includes(reason.status)) { setData(null); setFingerprint(null); }
         setError(
           reason instanceof Error
             ? reason.message
             : "Não foi possível consultar seus aparelhos.",
         );
+      }
     } finally {
       lifecycle?.removeEventListener("abort", cancel);
       if (generation === generationRef.current && !controller.signal.aborted)
         setReading(false);
     }
-  }, []);
+  }, [userId]);
   useEffect(() => {
     const lifecycle = new AbortController();
     lifecycleRef.current = lifecycle;
@@ -118,103 +130,74 @@ function PersonalPushSettings() {
   const enrolled =
     current?.state === "active" && current.currentSession && current.enabled;
   async function enroll() {
-    const registration = pwa.readyRegistration();
-    if (busy || !data?.publicKey || !capable || permission === "denied" || !registration) return;
+    const registration = pwa.readyRegistration(), lifecycle = lifecycleRef.current?.signal;
+    if (busy || reading || !data?.publicKey || !capable || permission === "denied" || !registration || !lifecycle || lifecycle.aborted) return;
+    const alive = () => !lifecycle.aborted;
     // Permission request starts synchronously within the user's click gesture.
-    const permissionPromise =
-      Notification.permission === "granted"
-        ? Promise.resolve("granted" as const)
-        : Notification.requestPermission();
-    setBusy(true);
-    setError("");
-    setMessage("");
+    const permissionPromise = Notification.permission === "granted"
+      ? Promise.resolve("granted" as const) : Notification.requestPermission();
+    setBusy(true); setError(""); setMessage("");
     try {
       const granted = await permissionPromise;
+      if (!alive()) return;
       setPermission(granted);
       if (granted !== "granted") {
-        setMessage(
-          "Permissão não concedida. Suas pendências continuam na central de notificações.",
-        );
+        setMessage("Permissão não concedida. Suas pendências continuam na central de notificações.");
         return;
       }
       if (pwa.readyRegistration() !== registration) throw new Error("A preparação do aplicativo mudou. Consulte o aplicativo neste aparelho antes de tentar novamente.");
       let subscription = await registration.pushManager.getSubscription();
+      if (!alive()) return;
       const key = keyBytes(data.publicKey);
-      if (
-        subscription?.options.applicationServerKey &&
-        Array.from(
-          new Uint8Array(subscription.options.applicationServerKey),
-        ).join() !== Array.from(key).join()
-      ) {
+      if (subscription?.options.applicationServerKey && Array.from(new Uint8Array(subscription.options.applicationServerKey)).join() !== Array.from(key).join()) {
         await subscription.unsubscribe();
+        if (!alive()) return;
         subscription = null;
       }
-      subscription ??= await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: key,
-      });
+      subscription ??= await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+      if (!alive()) return;
       await api("/api/push/devices", {
-        subscription: subscription.toJSON(),
-        label: name.trim() || "Este aparelho",
-        consent: true,
-      });
-      setMessage(
-        "Avisos vinculados a esta conta neste aparelho. Isso não confirma entrega, ciência ou recebimento físico.",
-      );
+        subscription: subscription.toJSON(), label: name.trim() || "Este aparelho", consent: true,
+        contextReference: data.contextReference,
+      }, lifecycle);
+      if (!alive()) return;
+      setMessage("Avisos vinculados a esta conta neste aparelho. Isso não confirma entrega, ciência ou recebimento físico.");
       await load();
     } catch (reason) {
-      setError(
-        (reason instanceof Error
-          ? reason.message
-          : "Não foi possível confirmar a inscrição.") +
-          " Consulte os aparelhos antes de tentar novamente.",
-      );
-    } finally {
-      setBusy(false);
-    }
+      if (alive()) setError((reason instanceof Error ? reason.message : "Não foi possível confirmar a inscrição.") + " Consulte os aparelhos antes de tentar novamente.");
+    } finally { if (alive()) setBusy(false); }
   }
-  async function command(
-    device: z.infer<typeof pushDevice>,
-    action: "revoke" | "pause" | "resume",
-  ) {
-    if (busy) return;
-    setBusy(true);
-    setError("");
-    setMessage("");
+  async function command(device: z.infer<typeof pushDevice>, action: "revoke" | "pause" | "resume") {
+    const lifecycle = lifecycleRef.current?.signal;
+    if (busy || reading || !data || !lifecycle || lifecycle.aborted) return;
+    const alive = () => !lifecycle.aborted;
+    setBusy(true); setError(""); setMessage("");
     try {
-      await api(
-        "/api/push/devices",
-        { id: device.id, action },
-        undefined,
-        "PATCH",
-      );
+      await api("/api/push/devices", { id: device.id, action, contextReference: data.contextReference }, lifecycle, "PATCH");
+      if (!alive()) return;
       if (action === "revoke" && device.fingerprint === fingerprint) {
         const registration = await navigator.serviceWorker.getRegistration("/");
-        await (
-          await registration?.pushManager?.getSubscription()
-        )?.unsubscribe();
-        for (const notification of (await registration?.getNotifications()) ??
-          [])
-          notification.close();
+        if (!alive()) return;
+        const subscription = await registration?.pushManager?.getSubscription();
+        if (!alive()) return;
+        const actualFingerprint = subscription ? await fingerprintOf(subscription.endpoint) : null;
+        if (!alive()) return;
+        if (subscription && actualFingerprint === device.fingerprint) {
+          await subscription.unsubscribe();
+          if (!alive()) return;
+          const notifications = await registration?.getNotifications();
+          if (!alive()) return;
+          for (const notification of notifications ?? []) notification.close();
+        }
       }
-      setMessage(
-        action === "revoke"
-          ? "Avisos desativados para este aparelho. Mensagens já aceitas pelo serviço podem chegar; suas pendências internas permanecem."
-          : action === "pause"
-            ? "Avisos pausados por oito horas. Suas pendências internas permanecem."
-            : "Pausa removida para os próximos avisos. Suas pendências internas permanecem.",
-      );
+      setMessage(action === "revoke"
+        ? "Avisos desativados para este aparelho. Mensagens já aceitas pelo serviço podem chegar; suas pendências internas permanecem."
+        : action === "pause" ? "Avisos pausados por oito horas. Suas pendências internas permanecem."
+        : "Pausa removida para os próximos avisos. Suas pendências internas permanecem.");
       await load();
     } catch (reason) {
-      setError(
-        (reason instanceof Error
-          ? reason.message
-          : "Não foi possível confirmar a alteração.") +
-          " Consulte o estado atual antes de repetir.",
-      );
-    } finally {
-      setBusy(false);
-    }
+      if (alive()) setError((reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração.") + " Consulte o estado atual antes de repetir.");
+    } finally { if (alive()) setBusy(false); }
   }
   return (
     <SettingsSection

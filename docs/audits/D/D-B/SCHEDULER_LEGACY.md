@@ -38,7 +38,26 @@ prolongada corrigida conserva intervalo invalid_configuration. Não se aplicam
 destinatários de hoje retroativamente e não se escondem os períodos desconhecidos.
 Essas lacunas exigem revisão técnica posterior; não são nova obrigação clínica.
 
-## Provas e limites
+## Conferência vigente de alcance e retomada
+
+Os seis casos legados passaram novamente na stack local vigente: 101
+configurações, D→D+1, 22 datas, mudança de política, falha corrigida e rollback.
+O caso REQ com dois workers também passou, mantendo um lembrete e um evento.
+Sua preparação considera agora a população elegível real e um limite finito
+de rodadas; dois lotes de 25 não poderiam prometer alcançar imediatamente um
+paciente entre 219 elegíveis do histórico preservado. Caps e asserções de
+execução única foram mantidos, sem aumentar deadline ou mudar o agendador.
+
+Os testes SQL de progresso REQ e rotação BAL passaram com rollback. O caso BAL
+conserva a primeira rodada de exatamente 100 e o alcance de 101/102 regimes.
+Seus UUIDs foram agrupados ao lado de um cursor controlado dentro da transação,
+preservando recontagens formais existentes como candidatas. A preparação antiga
+pressupunha que só regimes habilitados participavam; obteve 99 obrigações da
+fixture quando uma recontagem legítima ocupou o outro lugar. Não se retirou
+a recontagem nem se reduziu a asserção. As versões históricas das migrations
+e o banco remoto permanecem intactos.
+
+## Provas e limites históricos
 
 16/16 casos passaram: seis novos de serviço/Auth, nove consumidores pessoais de
 referência e o scheduler REQ concorrente existente. Cobrem101, D→D+1, backlog de

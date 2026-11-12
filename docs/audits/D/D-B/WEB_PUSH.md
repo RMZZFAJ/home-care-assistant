@@ -1,8 +1,64 @@
 # D5.2 — Web Push e consentimento por aparelho
 
+## Contrato vigente de conta e sessão — 12/11/2026
+
+A confirmação de avisos conserva a conta, a sessão verificada e o par VAPID da
+consulta que precedeu o gesto. GET /api/push/devices?context=consent acrescenta
+userId e contextReference à consulta pessoal; o GET anterior conserva o corpo
+compatível. POST e PATCH exigem a referência atual. Ausência ou divergência é
+recusada com VERSION_CONFLICT, antes da RPC de alteração, orientando atualizar
+a página e confirmar novamente. Uma referência não autoriza nem identifica
+um bearer: Auth, perfil ativo, sessão nativa e propriedade continuam
+revalidados pelos caminhos existentes.
+
+O servidor obtém sub/session_id de getClaims com validação de assinatura e
+compara o titular ao authenticate já verificado. O SHA-256 inclui domínio,
+conta, sessão e versão/chave pública VAPID. Não usa metadata editável, papel,
+flags ou identidade escolhida pelo navegador como autorização. Renovar o JWT
+na mesma sessão conserva a referência; outra sessão, conta ou chave exige
+nova consulta. Sem VAPID configurado, consulta e revogação pessoais ainda
+funcionam. A referência é transitória; não é novo rascunho ou registro oficial.
+
+O componente encerra suas continuações após desmontagem. A recusa por perda
+de Auth ou uma resposta de outra conta retira os metadados anteriores. Limpeza nativa
+confere o fingerprint do endpoint atual antes de remover a inscrição.
+Trocar de paciente não troca o consentimento pessoal; trocar a conta não pode
+herdar a escolha anterior. Fonte primária do método:
+[getClaims](https://supabase.com/docs/reference/javascript/auth-getclaims).
+
+A reprodução local anterior à correção obteve HTTP 200 e vínculo na segunda
+conta ao resolver a permissão iniciada na primeira. A regressão usa Auth/API
+reais, duas abas e capacidade nativa controlada. Os dois percursos de sessão
+passaram em Chromium, Android emulado e WebKit/iOS. Uma troca de conta pode
+desmontar o componente antes do envio; quando o pedido chega, deve ser recusado.
+O teste também exige diretamente HTTP 409 e ausência de vínculo, depois
+comprova nova escolha válida e recusa de comando antigo sobre o aparelho.
+Não há aceite de entrega externa ou aparelho físico.
+
+No conjunto, passaram 18 percursos distintos de navegador em coortes
+compatíveis: nove controles existentes, seis de sessão e três de sessão
+revogada/offline. As falhas do novo teste foram de observação do painel
+recolhido e ficam separadas da reprodução material HTTP 200 anterior à
+correção. Quinze unitários de contexto/criptografia, tipos e lint passaram.
+Os contratos de cache privado e ausência de replay foram preservados.
+
+## Estado observado do Preview
+
+Em 12/11/2026, o inventário Vercel confirmou identidade VAPID sensível própria
+para Preview. A leitura exclusiva da configuração não secreta
+WEB_PUSH_EXTERNAL_ENABLED retornou true, com criação/atualização em
+07/11/2026 às 22:18 UTC. Esse estado preexistente não foi alterado neste lote.
+Os testes usam a stack local com envio externo desligado e transporte
+controlado. A configuração não comprova despacho, aceite do provedor ou
+recebimento físico. A homologação e a governança operacionais continuam nos
+gates externos; produção não foi alterada.
+
+## Histórico da implantação D5.2
+
 Base4bf8247. A migration20261107195440 passou por preflight revertido e
 test:db:prepare sem reset. O [recibo remoto](D5_2_REMOTE_MIGRATIONS.json)
-registra a reconciliação desse incremento. Não existe envio externo ativo.
+registra a reconciliação desse incremento. Naquele estado inicial não havia
+envio externo ativo.
 Provas locais não significam instalação física ou recebimento em aparelho fechado.
 
 ## Inscrição e privacidade

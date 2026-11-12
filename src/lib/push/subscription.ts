@@ -44,17 +44,20 @@ export const pushSubscription = z
   .strict();
 export type WebPushSubscription = z.infer<typeof pushSubscription>;
 
+export const pushContextReference = z.string().regex(/^[a-f0-9]{64}$/);
 export const pushEnrollment = z
   .object({
     subscription: pushSubscription,
     label: z.string().trim().min(1).max(80),
     consent: z.literal(true),
+    contextReference: pushContextReference.optional(),
   })
   .strict();
 export const pushDeviceCommand = z
   .object({
     id: z.string().uuid(),
     action: z.enum(["revoke", "pause", "resume"]),
+    contextReference: pushContextReference.optional(),
   })
   .strict();
 export const pushDevice = z

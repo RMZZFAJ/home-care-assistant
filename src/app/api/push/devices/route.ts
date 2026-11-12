@@ -10,25 +10,24 @@ import {
   webPushConfiguration,
 } from "@/lib/server/web-push";
 
+import { pushRequestContext, readablePushConfiguration, requirePushRequestContext } from "@/lib/server/push-request-context";
+
 export const runtime = "nodejs";
-export async function GET() {
+export async function GET(request: Request) {
   return api("push.devices", async () => {
     const auth = await authenticate();
     const devices = pushDevices.parse(
       await rpc(auth.client, "my_web_push_devices"),
     );
-    let configuration;
-    try {
-      configuration = webPushConfiguration();
-    } catch {
-      configuration = null;
-    }
+    const configuration = readablePushConfiguration();
+    const includeContext = new URL(request.url).searchParams.get("context") === "consent";
     return NextResponse.json({
       devices,
       available: !!configuration,
       deliveryEnabled:
         !!configuration && process.env.WEB_PUSH_EXTERNAL_ENABLED === "true",
       publicKey: configuration?.publicKey ?? null,
+      ...(includeContext ? { userId: auth.userId, contextReference: await pushRequestContext(auth, configuration) } : {}),
     });
   });
 }
@@ -43,6 +42,7 @@ export async function POST(request: Request) {
         "Os avisos neste aparelho ainda não foram disponibilizados. Suas pendências continuam na central.",
         503,
       );
+    await requirePushRequestContext(auth, input.contextReference, config);
     validatePushPublicKey(input.subscription);
     const data = await rpc(auth.client, "subscribe_web_push", {
       p_subscription: input.subscription,
@@ -56,6 +56,7 @@ export async function PATCH(request: Request) {
   return api("push.preference", async () => {
     const input = await readJson(request, pushDeviceCommand);
     const auth = await authenticate();
+    await requirePushRequestContext(auth, input.contextReference, readablePushConfiguration());
     const data = await rpc(auth.client, "web_push_device_command", {
       p_id: input.id,
       p_action: input.action,

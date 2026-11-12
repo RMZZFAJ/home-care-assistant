@@ -1,4 +1,4 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Page, type Response as BrowserResponse } from "@playwright/test";
 import { createECDH, createHash, randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { mkdirSync } from "node:fs";
@@ -36,17 +36,21 @@ function subscription() {
 }
 test.afterEach(async () => {
   for (const fingerprint of owned) {
-    const id = sql(
-      `select id from private.web_push_devices where fingerprint=${sqlLiteral(fingerprint)} and user_id=${sqlLiteral(fixtures.family.id)};`,
+    const row = sql(
+      `select jsonb_build_object('id',id,'userId',user_id) from private.web_push_devices where fingerprint=${sqlLiteral(fingerprint)};`,
     );
-    if (!id) continue;
+    if (!row) continue;
+    const device = JSON.parse(row) as { id: string; userId: string };
+    const account = [fixtures.family, fixtures.professional].find(value => value.id === device.userId);
+    if (!account) throw new Error("Unexpected owner of the synthetic Push endpoint");
+    const id = device.id;
     const client = createClient(env.url, env.anonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
     expect(
       (
         await client.auth.signInWithPassword({
-          email: fixtures.family.email,
+          email: account.email,
           password: fixturePassword,
         })
       ).error,
@@ -415,4 +419,60 @@ test("preparação recusada explica a falha, bloqueia permissão Push e recupera
   await expect(panel(page).getByText(/^Avisos vinculados a esta conta neste aparelho/)).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number; subscriptions: number } }).hcaPushCapability)).toMatchObject({ requests: 1, subscriptions: 1 });
   expect(sql(`select count(*) from private.web_push_devices where fingerprint=${sqlLiteral(createHash("sha256").update(value.endpoint).digest("hex"))} and user_id=${sqlLiteral(fixtures.family.id)} and state='active';`)).toBe("1");
+});
+
+
+for (const account of ["professional", "family"] as const) test("Web Push refuses a permission result from another account session while the original tab remains open: " + account, async ({ page, context }) => {
+  const f = await setup(), value = subscription();
+  await adapter(page, value, "granted");
+  await openProfile(page, f.patient);
+  await expect(panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true })).toBeEnabled();
+  await page.evaluate(() => {
+    const permission = Notification.requestPermission.bind(Notification);
+    (Notification as unknown as { requestPermission: () => Promise<NotificationPermission> }).requestPermission = () => new Promise(resolve => {
+      (window as unknown as { releasePushPermission: () => void }).releasePushPermission = () => { void permission().then(resolve); };
+    });
+  });
+  await panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => typeof (window as unknown as { releasePushPermission?: unknown }).releasePushPermission)).toBe("function");
+  const originalContext = await (await page.request.get("/api/push/devices?context=consent")).json();
+  expect(originalContext.contextReference).toMatch(/^[a-f0-9]{64}$/);
+  const peer = await context.newPage();
+  await peer.goto("/login");
+  await peer.getByLabel("E-mail", { exact: true }).fill(fixtures[account].email);
+  await peer.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await peer.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(peer.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  const automatic: BrowserResponse[] = [];
+  const observe = (response: BrowserResponse) => { if (response.url().endsWith("/api/push/devices") && response.request().method() === "POST") automatic.push(response); };
+  page.on("response", observe);
+  await page.evaluate(() => (window as unknown as { releasePushPermission: () => void }).releasePushPermission());
+  // Account refresh can unmount the old panel before its permission result.
+  // Otherwise its own request must be refused; neither path can enroll the peer.
+  const sectionToggle = panel(page).getByRole("button", { name: "Avisos neste aparelho", exact: true });
+  await expect.poll(async () => await sectionToggle.getAttribute("aria-expanded") === "false" || await panel(page).getByRole("alert").isVisible()).toBe(true);
+  page.off("response", observe);
+  for (const rejected of automatic) {
+    expect(rejected.status(), await rejected.text()).toBe(409);
+    expect(await rejected.json()).toMatchObject({ code: "VERSION_CONFLICT" });
+  }
+  const refused = await page.request.post("/api/push/devices", { data: { subscription: value, label: "Stale permission reference", consent: true, contextReference: originalContext.contextReference } });
+  expect(refused.status(), await refused.text()).toBe(409);
+  expect(await refused.json()).toMatchObject({ code: "VERSION_CONFLICT" });
+  const fingerprint = createHash("sha256").update(value.endpoint).digest("hex");
+  expect(sql("select count(*) from private.web_push_devices where fingerprint=" + sqlLiteral(fingerprint) + ";")).toBe("0");
+  if (await sectionToggle.getAttribute("aria-expanded") === "true") await expect(panel(page).getByRole("alert")).toContainText("sessão");
+  const legacy = await (await page.request.get("/api/push/devices")).json();
+  expect(legacy).not.toHaveProperty("contextReference");
+  await page.reload();
+  await page.getByRole("button", { name: "Avisos neste aparelho", exact: true }).click();
+  const activate = panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true });
+  await expect(activate).toBeEnabled(); await activate.click();
+  await expect(panel(page).getByText("Avisos vinculados a esta conta neste aparelho. Isso não confirma entrega, ciência ou recebimento físico.", { exact: true })).toBeVisible();
+  const device = JSON.parse(sql("select jsonb_build_object('id',id,'userId',user_id,'state',state) from private.web_push_devices where fingerprint=" + sqlLiteral(fingerprint) + ";"));
+  expect(device).toMatchObject({ userId: fixtures[account].id, state: "active" });
+  const staleCommand = await page.request.patch("/api/push/devices", { data: { id: device.id, action: "revoke", contextReference: originalContext.contextReference } });
+  expect(staleCommand.status()).toBe(409);
+  expect(sql("select state from private.web_push_devices where id=" + sqlLiteral(device.id) + ";")).toBe("active");
+  await peer.close();
 });

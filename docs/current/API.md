@@ -1317,9 +1317,15 @@ o download original. [Contrato V9](../audits/D/D-B/ENT_TERMINAL.md).
 ## Web Push por aparelho
 
 GET /api/push/devices retorna configuração pública e metadados próprios; não
-retorna endpoints/chaves das inscrições. POST exige consentimento explícito,
-inscrição estrita e sessão Auth atual. PATCH pausa por oito horas, retoma ou
-revoga somente um aparelho próprio. POST /api/push/session revoga somente as
+retorna endpoints/chaves das inscrições. A variante ?context=consent acrescenta
+userId e contextReference, obtida da conta/sessão verificadas e do par VAPID.
+POST exige consentimento explícito, inscrição estrita, sessão Auth atual e
+contextReference correspondente. PATCH também exige essa referência e pausa
+por oito horas, retoma ou revoga somente um aparelho próprio. Referência
+ausente ou alterada retorna VERSION_CONFLICT antes da RPC, exigindo atualizar
+a página e confirmar outra vez. A referência é precondição de concorrência;
+Auth e autorização nativos continuam obrigatórios. O GET original não muda
+sua forma. POST /api/push/session revoga somente as
 inscrições vinculadas à sessão corrente. Todos os comandos conferem origem/CSRF.
 
 GET /api/push/open?id recebe UUID opaco, exige Auth e revalida destinatário,

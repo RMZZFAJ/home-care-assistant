@@ -83,6 +83,16 @@ campos atuais, separadamente de uma falha na leitura inicial do contexto.
 Mudanças futuras incompatíveis devem evoluir marcador e contrato conjuntamente,
 com verificação de instalação limpa, evolução legada e recuperação de rascunhos.
 
+## Sessão revogada e edição aberta
+
+O percurso novo usa a sessão real de teste do navegador, identificada pelo
+adaptador SSR público. A própria sessão é encerrada pelo Auth local. Com o
+worker ativo, /api/profile recusa com 401; o campo já aberto conserva o texto.
+Na navegação offline seguinte, somente a orientação pública aparece, sem o
+texto privado. A reconexão exige login e não envia o campo preservado. O cache
+continua restrito aos mesmos quatro arquivos públicos. Não se fabrica token,
+sessão ou indisponibilidade de provedor nesse percurso.
+
 ## Evidência a distinguir
 
 O teste do convite usa sinal de navegador controlado; não comprova instalação

@@ -9,11 +9,21 @@ test("independent service workers remind an eligible REQ only once", async () =>
   const req = await issue(patient, products);
   sql(`update public.requisition_lifecycle set next_reminder_at='1900-01-01' where requisition_id=${sqlLiteral(req.id)};`);
   const workers = [0, 1].map(() => createClient(env.url, env.serviceKey, { auth: { persistSession: false, autoRefreshToken: false } }));
-  const results = await Promise.all(workers.map((worker) => worker.rpc("run_operational_schedule")));
-  for (const result of results) {
-    assert.ifError(result.error);
-    assert.ok(result.data.lifecycleCandidates <= 100);
-    assert.ok(result.data.lifecyclePatients <= 25);
+  const patients = Number(sql("select count(distinct care_recipient_id) from private.operational_scheduler_candidates;"));
+  assert.ok(Number.isSafeInteger(patients) && patients > 0);
+  // Preserved local fixtures can exceed one 25-patient batch. The actual
+  // population gives a finite progress bound; no clock/timeout is extended.
+  const rounds = Math.ceil(patients / 25);
+  for (let round = 0; round < rounds; round++) {
+    const results = await Promise.all(workers.map((worker) => worker.rpc("run_operational_schedule")));
+    for (const result of results) {
+      assert.ifError(result.error);
+      assert.ok(result.data.lifecycleCandidates <= 100);
+      assert.ok(result.data.lifecyclePatients <= 25);
+    }
+    const reminded = Number(sql(`select reminders from public.requisition_lifecycle where requisition_id=${sqlLiteral(req.id)};`));
+    assert.ok(reminded <= 1, "concurrent workers cannot duplicate the reminder");
+    if (reminded === 1) break;
   }
   const professional = await actor("professional", patient);
   const state = await professional.from("requisition_lifecycle").select("reminders,next_reminder_at").eq("requisition_id", req.id).single();

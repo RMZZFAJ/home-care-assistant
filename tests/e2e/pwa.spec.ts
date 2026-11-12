@@ -1,8 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID, createHash } from "node:crypto";
 import { mkdirSync } from "node:fs";
+import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
-import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { setup, actor, rpc, fixtures, env } from "../integration/v4-fixtures.mjs";
 import { sourceFactsFixture } from "../integration/pdf-source-facts-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
@@ -503,4 +505,34 @@ test("PWA oferece instalação somente por gesto e mantém web quando o worker n
   await expect(
     page.getByRole("textbox", { name: "Nome", exact: true }),
   ).toBeEditable();
+});
+
+
+test("PWA keeps an open edit after real session revocation but never caches it or replays it after reconnection", async ({ page, context }) => {
+  const f = await setup(), marker = "Edição privada fictícia " + randomUUID();
+  await login(page, f.patient); await profile(page, f.patient);
+  await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller?.state)).toBe("activated");
+  await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
+  const name = page.getByRole("textbox", { name: "Nome", exact: true }); await name.fill(marker);
+  // Read only this browser's real fixture session through the public SSR adapter.
+  // The bearer stays in the Node test process and is never printed or injected.
+  const inspector = createServerClient(env.url, env.anonKey, { cookies: { getAll: () => context.cookies(), setAll: () => {} } });
+  const claims = await inspector.auth.getClaims();
+  expect(claims.error).toBeNull(); expect(claims.data?.claims.sub).toBe(fixtures.family.id);
+  const session = await inspector.auth.getSession();
+  expect(session.error).toBeNull(); expect(session.data.session).not.toBeNull();
+  const service = createClient(env.url, env.serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  const revoked = await service.auth.admin.signOut(session.data.session!.access_token, "local");
+  expect(revoked.error).toBeNull();
+  expect(await page.evaluate(async () => (await fetch("/api/profile", { cache: "no-store" })).status)).toBe(401);
+  await expect(name).toHaveValue(marker);
+  expect(await cachePaths(page)).toEqual(["/offline.html", "/pwa/apple-180.png", "/pwa/icon-192.png", "/pwa/icon-512.png"]);
+  await context.setOffline(true); await page.goto("/perfil");
+  await expect(page.getByRole("heading", { name: "Sem conexão com o aplicativo", exact: true })).toBeVisible();
+  expect(await page.locator("body").innerText()).not.toContain(marker);
+  await context.setOffline(false);
+  await page.getByRole("link", { name: "Tentar abrir novamente", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Entrar", exact: true })).toBeVisible();
+  expect(sql("select full_name from public.profiles where id=" + sqlLiteral(fixtures.family.id) + ";")).not.toBe(marker);
+  expect(await cachePaths(page)).toEqual(["/offline.html", "/pwa/apple-180.png", "/pwa/icon-192.png", "/pwa/icon-512.png"]);
 });

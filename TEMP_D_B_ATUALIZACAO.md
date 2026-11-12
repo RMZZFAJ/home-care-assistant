@@ -1,6 +1,6 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, após o fechamento local do lote 3.
+Atualizado em 12 de novembro de 2026, após o fechamento local do lote 4.
 Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
@@ -8,7 +8,7 @@ liberação para produção.
 ## 1. Definições e leitura do acompanhamento
 
 - **Critérios:** são 105, sendo 75 originais e 30 complementos da Ordem Mestre.
-  Há 60 com implementação e verificações locais concluídas e 45 parciais. Nenhum
+  Há 69 com implementação e verificações locais concluídas e 36 parciais. Nenhum
   critério inteiro está sem início; algumas subtarefas estão em 0%.
 - **Etapas 01–20:** identificadores preservados para localizar os requisitos.
   A execução restante está agrupada em seis capacidades na seção 6; as etapas
@@ -69,23 +69,24 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 
 | Acompanhamento | Estado registrado |
 | --- | --- |
-| Critérios da D-B | 60 concluídos localmente; 45 parciais; total de 105 |
-| Etapas anteriores 01 a 10 | Concluídas localmente nos respectivos escopos |
+| Critérios da D-B | 69 concluídos localmente; 36 parciais; total de 105 |
+| Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
-| Próxima entrega | Aplicativo, avisos e lembretes |
-| Incremento atual | Custódia, recuperação e verificação qualificadas |
-| Resultado local | Modalidades assinadas, recuperáveis e sob permissão |
+| Próxima entrega | Aparência restante, administração e guias |
+| Incremento atual | PWA, consentimento por sessão e lembretes |
+| Resultado local | Aplicativo e avisos recuperáveis; alcance completo |
 | Banco | Local e remoto em 231, sem atualizações pendentes |
-| CI do PDF 624c97e | Linux/Windows passaram; integração pendente |
+| CI anterior 976d42c | Linux/Windows e banco passaram; navegadores pendentes |
 | CI deste incremento | Pendente no novo commit |
-| Preview anterior 624c97e | Vercel concluiu; modalidades PDF publicadas |
+| Preview anterior 976d42c | Vercel concluiu; documentos publicados |
 
-**Último lote encerrado localmente:** lote 3, custódia, recuperação e verificação
-documental. As etapas 08/09/10 fecharam no software e nos ensaios locais.
-DOC-C.1 continua adiado. CI própria, custódia operacional, avaliação humana e
+**Último lote encerrado localmente:** lote 4, aplicativo, avisos e lembretes.
+As etapas 11/12/13 fecharam no escopo executável. A escolha de avisos não pode
+passar para outra conta ou sessão após a espera da permissão. DOC-C.1 continua
+adiado; CI própria, entrega externa, custódia operacional, avaliação humana e
 aparelho físico conservam seus gates.
 
 **Resultado do lote 1:** REQ, compra, doação, entrega, devolução autônoma e BAL
@@ -101,8 +102,9 @@ arquivos. A auditoria exige competência própria e traz identificação nominat
 em todas as páginas. Foram geradas amostras reais assinadas de REQ, compra,
 doação, entrega, devolução, BAL e auditoria, com dados fictícios de teste.
 
-**Próxima entrega:** lote 4, aplicativo, atualização, avisos e lembretes.
-Os rascunhos permanecem intactos.
+**Próxima entrega:** lote 5, as demais áreas visuais, administração, entrada e
+guias, com a recuperação oficial ainda necessária. Os rascunhos permanecem
+intactos.
 A falha da CI anterior no teste de atualização entre duas sessões passou na
 reprodução local, sem alterar o limite; a causa da falha remota não foi
 comprovada. O diagnóstico do BAL em iOS também aguarda a próxima CI completa.
@@ -122,6 +124,17 @@ A custódia usada pelo aplicativo não foi alterada; o gate operacional continua
 separado. Seis situações de falha controlada da emissão e uma retomada
 concorrente com contas reais de teste também passaram. A recuperação não troca
 o exemplar já armazenado nem altera sua conferência histórica.
+
+**Resultado do lote 4:** o aceite iniciado numa conta não vincula avisos à
+conta seguinte. Nova sessão exige outra confirmação; o acesso encerrado não
+vira conteúdo privado offline. As rotinas alcançam todos os elegíveis em lotes
+finitos e retomam os períodos conforme a política aprovada. Foram qualificados
+18 percursos de navegador, 15 unitários, sete cenários com Auth/serviço reais e
+duas regressões SQL, em coortes compatíveis.
+
+**Estado externo observado:** o envio Push do Preview já estava habilitado
+desde 7/11; essa configuração preexistente não foi alterada neste lote. Isso
+não equivale a comprovar entrega em aparelho ou homologar o serviço.
 
 ## 3. Funcionalidades e critérios
 
@@ -918,13 +931,13 @@ contingência. Designações reais ficam na etapa 20.
 
 ### 3.6 Aplicativo instalado, conexão, avisos e lembretes
 
-**Critérios deste grupo: 0 concluídos localmente; 9 parciais.**
+**Critérios deste grupo: 9 concluídos localmente; 0 parciais.**
 
 **Etapas relacionadas:** 11 a 13; 20.
 
 #### 11 — Aplicativo, instalação, atualização e offline
 
-Estado: em execução · 80%. Responsável: Codex.
+Estado: concluído localmente · 100%. Responsável: Codex.
 
 **Condição para fechar:** Os cenários automatizáveis de instalação/atualização
 preservam edição e privacidade e orientam a recuperação.
@@ -937,24 +950,25 @@ Pontos de verificação:
 - 11.4 Troca de paciente e sessão revogada.
 - 11.5 Sem conexão e retorno da conexão.
 
-**O que falta:** Conferir as combinações restantes de contexto, sessão e
-atualização. Reteste físico fica na etapa 20.
+**Entregue:** instalação protegida por cookie, recuperação, atualização com
+duas abas e edição preservada, mudança de contexto, sessão realmente encerrada
+e retorno da conexão. O cache continua somente público e nenhuma operação é
+repetida automaticamente. Reteste físico fica na etapa 20.
 
 #### Instalação e uso sem conexão — critérios originais
 
-- **Indicar conexão e atualização dos dados sem enviar ações antigas** — Em
-  execução · ≈75%. Falta: Completar combinações de troca de paciente e perda de
-  sessão. Responsável: Codex.
-- **Instalar e atualizar sem perder edição confirmada** — Em execução · ≈80%.
-  Falta: Concluir conferências restantes e repetir em aparelho físico.
-  Responsável: Codex; depois você.
-- **Aplicativo instalado com atualização segura e privacidade** — Em execução ·
-  ≈80%. Falta: Concluir teste de atualização e repetir S24 Ultra no Preview
-  estável. Responsável: Codex; depois você.
+- **Indicar conexão e atualização dos dados sem enviar ações antigas** —
+  Concluído localmente · 100%. Perda de sessão, reconexão e troca de contexto
+  preservam seus limites e não enviam edições automaticamente.
+- **Instalar e atualizar sem perder edição confirmada** — Concluído localmente
+  · 100% no software. Instalação e uso físico continuam para você na etapa 20.
+- **Aplicativo instalado com atualização segura e privacidade** — Concluído
+  localmente · 100% no software. O S24 Ultra ainda precisa de reteste físico
+  por você, no endereço estável do Preview.
 
 #### 12 — Notificações internas e avisos Push
 
-Estado: em execução · 80%. Responsável: Codex.
+Estado: concluído localmente · 100%. Responsável: Codex.
 
 **Condição para fechar:** Os casos internos e de transporte controlado comprovam
 autorização, deduplicação, recuperação e manutenção da pendência interna.
@@ -968,12 +982,14 @@ Pontos de verificação:
 - 12.5 Destino correto do aviso.
 - 12.6 Falha e recuperação da entrega controlada.
 
-**O que falta:** Concluir inscrição, entrega e recuperação controladas.
+**Entregue:** inscrição, pausa, revogação, destinatário autorizado, aviso
+genérico, deduplicação e recuperação com transporte controlado. Troca de conta
+ou nova sessão exige outra escolha; uma confirmação antiga é recusada.
 Provedores e aparelhos reais ficam na etapa 20.
 
 #### 13 — Lembretes e retorno após parada
 
-Estado: em execução · 75%. Responsável: Codex.
+Estado: concluído localmente · 100%. Responsável: Codex.
 
 **Condição para fechar:** Mais de 100 configurações são alcançadas em rodadas
 finitas e o retorno após indisponibilidade identifica ou recupera a obrigação
@@ -986,29 +1002,30 @@ Pontos de verificação:
 - 13.3 Retorno após período perdido.
 - 13.4 Obrigação processada uma vez.
 
-**O que falta:** Consolidar as rotinas anteriores e todas as situações previstas
-de retorno após parada.
+**Entregue:** produtores legados, REQ e BAL mantêm alcance finito, concorrência
+e efeito único. Períodos perdidos são recuperados ou identificados como lacuna
+quando a vigência anterior é desconhecida; não inventam ciência ou contagem.
 
 #### Avisos e lembretes — critérios originais
 
-- **Alcançar todos os pacientes, inclusive listas grandes** — Em execução ·
-  ≈80%. Falta: Fechar a conferência de cobertura e atrasos em todas as
-  situações. Responsável: Codex.
-- **Recuperar períodos em que o serviço de lembretes ficou indisponível** — Em
-  execução · ≈80%. Falta: Conferir todas as combinações de atraso e retorno do
-  serviço. Responsável: Codex.
-- **Avisos por aparelho com conteúdo genérico e acesso autorizado** — Em
-  execução · ≈75%. Falta: Concluir configuração própria do Preview e prova de
-  entrega real autorizada. Responsável: Codex; você; serviço externo.
-- **Ativar e revogar avisos por usuário e aparelho** — Em execução · ≈75%.
-  Falta: Concluir configuração do Preview e testes físicos com serviço real
-  autorizado. Responsável: Codex; você; serviço externo.
-- **Não duplicar avisos e abrir o destino autorizado** — Em execução · ≈75%.
-  Falta: Fechar recuperação e observação operacional; provar entrega real
-  autorizada. Responsável: Codex; você; serviço externo.
-- **Reconciliar lembretes antigos e atrasados sem perder obrigações** — Em
-  execução · ≈80%. Falta: Concluir conferência operacional de atrasos e
-  cobertura. Responsável: Codex.
+- **Alcançar todos os pacientes, inclusive listas grandes** — Concluído
+  localmente · 100%. Conferidos os lotes limitados e a rotação de todos os
+  elegíveis, incluindo mais de 100 configurações.
+- **Recuperar períodos em que o serviço de lembretes ficou indisponível** —
+  Concluído localmente · 100%. Mantém o período original e distingue lacunas
+  desconhecidas de obrigações efetivamente recuperadas.
+- **Avisos por aparelho com conteúdo genérico e acesso autorizado** — Concluído
+  localmente · 100% no software. Preview tem configuração própria; entrega real
+  permanece para você e o serviço externo na etapa 20.
+- **Ativar e revogar avisos por usuário e aparelho** — Concluído localmente ·
+  100% no software. Confirmação fica vinculada à conta e à sessão que a iniciou.
+  Testes físicos e serviço real continuam externos.
+- **Não duplicar avisos e abrir o destino autorizado** — Concluído localmente ·
+  100% no software. Recuperação e destino foram conferidos; observação e
+  entrega operacionais permanecem na etapa 20.
+- **Reconciliar lembretes antigos e atrasados sem perder obrigações** —
+  Concluído localmente · 100%. Cobertura, atraso, retorno, falha isolada e
+  ausência de efeitos duplicados foram conferidos.
 
 ### 3.7 Backup, recuperação, suporte e monitoramento
 
@@ -1431,6 +1448,10 @@ operacional permanece externa.
 processamento abandonado, conferência dos bytes e confiança atual qualificados.
 As etapas 08/09/10 fecharam no escopo executável; a sequência passa ao lote 4.
 
+**12 de novembro — lote 4 fechado localmente:** aplicativo, recuperação,
+consentimento por conta/sessão e lembretes com rotação e retorno qualificados.
+Os testes físicos e de entrega permanecem externos; a sequência passa ao lote 5.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1492,6 +1513,9 @@ Os gates operacionais, humanos, físicos e de CI continuam explícitos.
   compatível. Fecha com recuperação e resultados corretos nos casos previstos.
 
 ### Lote 4 — Aplicativo, avisos e lembretes
+
+**Concluído localmente.** Etapas 11/12/13 qualificadas. Instalação física,
+retorno efetivo do provedor e prova operacional permanecem na etapa 20.
 
 - **Resultado:** instalação/atualização, uso protegido no Preview, notificações
   internas/Push e retorno dos lembretes após parada completos no software.
