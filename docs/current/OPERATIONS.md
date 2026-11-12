@@ -36,8 +36,30 @@ motivo. Convites continuam dependendo de aceite pessoal.
 Contagens de registros não aprovam estoque físico, presença, ciência,
 recebimento ou início do atendimento. Informações restritas são identificadas
 sem aparecer como zero. Falhas de consulta permitem atualizar a seção; uma
-recusa de acesso retira os dados antes exibidos. A regularização de
-contingência prevista permanece uma entrega própria ainda pendente.
+recusa de acesso retira os dados antes exibidos. A contingência tem declaração e conciliação próprias, descritas abaixo.
+
+## Contingência e retorno ao aplicativo
+
+Em Guias e ajuda → Regularizar contingência, selecione o processo e procure
+primeiro o registro existente. Registre somente os fatos conhecidos; mantenha
+data, horário, fuso, pessoas, materiais e custódia desconhecidos como tais.
+A autoria digital é a sua sessão, separada de quem realizou ou recebeu o
+fato físico. Confirme a declaração para anexar o registro físico pelo fluxo
+seguro de fotos/PDFs. A declaração original permanece preservada.
+
+Informações complementares e pedidos de esclarecimento formam histórico
+próprio. A conciliação exige outra pessoa com competência local. Ela compara
+a declaração, os documentos já existentes e as evidências prontas; vincular
+não repete o fato operacional, não movimenta estoque e não assina por um
+recebedor ausente. Caso ainda falte o ato digital, use o processo próprio e
+volte para vincular o resultado legítimo. Não invente dados para encerrar.
+
+Depois de perda de resposta, confira a mesma tentativa, inclusive após
+recarregar a página. O aplicativo recupera o resultado existente ou encerra
+a referência ainda não executada, impedindo chegada tardia. Guarde o
+registro físico até conferir o resultado. O formulário comum não recebe
+salvamento de rascunho neste fluxo. Piloto, responsáveis e ensaio físico
+continuam sujeitos às designações e aos gates operacionais.
 
 ## Catálogo, unidades e scanner
 

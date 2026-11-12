@@ -30,6 +30,14 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if(error?.code==="PT409" && /^(contingency revision changed|contingency material reference changed)$/.test(message))
+    throw new ApiError("VERSION_CONFLICT","A referência da contingência mudou. Compare os registros atuais antes de preparar outra confirmação.",409);
+  if(error?.code==="PT409" && message==="contingency evidence pending")
+    throw new ApiError("ATTACHMENT_PENDING","Há evidência com envio ainda não confirmado. Consulte a mesma tentativa de anexo antes de vincular o registro.",409);
+  if(error?.code==="PT409" && /^(contingency already linked|contingency evidence closed)$/.test(message))
+    throw new ApiError("INVALID_OPERATION","O dossiê já foi vinculado. Consulte o resultado e as evidências preservadas.",409);
+  if(error?.code==="42501" && message==="independent contingency reviewer required")
+    throw new ApiError("FORBIDDEN","A conferência exige outra pessoa com competência local. Quem declarou ou complementou não revisa a própria informação.",403);
   if (error?.code === "PT409" && /^(issued document reference required|stale document material)$/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "A referência da ficha mudou ou ainda não foi emitida. Consulte seu estado antes de confirmar novamente.", 409);
   if (

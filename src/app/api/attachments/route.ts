@@ -9,9 +9,9 @@ import { attachmentMaxBytes, attachmentMaxLabel } from "@/lib/documents/attachme
 type Auth = Awaited<ReturnType<typeof authenticate>>;
 type Reservation = { id: string; filename: string; object_path: string; state: string; sha256: string | null; mime_type: string; bytes: number; legacy?: boolean };
 type Attempt = Reservation & { sourceSha256: string | null; expectedSha256: string | null; tracked: boolean; pending: boolean; canAbandon: boolean };
-const parent = z.object({ careRecipientId: z.uuid(), documentId: z.uuid().optional(), movementId: z.uuid().optional() }).refine(value => Boolean(value.documentId) !== Boolean(value.movementId), { message: "Informe um documento ou uma movimentação." });
-const command = z.object({ careRecipientId: z.uuid(), documentId: z.uuid().optional(), movementId: z.uuid().optional(), id: z.uuid(), key: z.uuid(), action: z.enum(["recover", "abandon"]) }).strict().refine(value => Boolean(value.documentId) !== Boolean(value.movementId));
-function lookup(input: z.infer<typeof parent>, key: string | null = null) { return { p_patient: input.careRecipientId, p_document: input.documentId ?? null, p_movement: input.movementId ?? null, p_key: key }; }
+const parent = z.object({ careRecipientId: z.uuid(), documentId: z.uuid().optional(), movementId: z.uuid().optional(), contingencyId: z.uuid().optional() }).refine(value => [value.documentId,value.movementId,value.contingencyId].filter(Boolean).length===1, { message: "Informe uma ficha, movimentação ou dossiê de contingência." });
+const command = z.object({ careRecipientId: z.uuid(), documentId: z.uuid().optional(), movementId: z.uuid().optional(), contingencyId: z.uuid().optional(), id: z.uuid(), key: z.uuid(), action: z.enum(["recover", "abandon"]) }).strict().refine(value => [value.documentId,value.movementId,value.contingencyId].filter(Boolean).length===1);
+function lookup(input: z.infer<typeof parent>, key: string | null = null) { return input.contingencyId?{p_patient:input.careRecipientId,p_contingency:input.contingencyId,p_key:key}:{ p_patient: input.careRecipientId, p_document: input.documentId ?? null, p_movement: input.movementId ?? null, p_key: key }; }
 const digest = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 async function confirm(auth: Auth, file: Reservation, sha256: string, sourceSha256: string) {
   await rpc(createWorkerClient(), "finalize_attachment", { p_id: file.id, p_actor: auth.userId, p_hash: sha256, p_mime: file.mime_type, p_bytes: file.bytes, p_valid: true });
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
     await patientContext(auth, parsed.data.careRecipientId);
     const key = params.get("attemptKey");
     if (key && !uuid.safeParse(key).success) throw new ApiError("VALIDATION_ERROR", "Tentativa inválida.");
-    const data = await rpc(auth.client, "attachment_attempts", lookup(parsed.data, key)) as Attempt[];
+    const data = await rpc(auth.client, parsed.data.contingencyId?"contingency_attachment_attempts":"attachment_attempts", lookup(parsed.data, key)) as Attempt[];
     const files = await Promise.all(data.map(async file => {
       const signed = file.state === "ready" ? await auth.client.storage.from("patient-evidence").createSignedUrl(file.object_path, 120) : null;
       return { ...file, object_path: undefined, url: signed?.data?.signedUrl ?? null };
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     if (sanitized.bytes.length > attachmentMaxBytes) throw new ApiError("PAYLOAD_TOO_LARGE", `O arquivo convertido excede ${attachmentMaxLabel}. Envie uma cópia menor.`, 413);
     const filename = Array.from(file.name).map(character => character.charCodeAt(0) < 32 || "/\\".includes(character) ? "_" : character).join("").slice(0, 170) || "anexo";
     const sha256 = digest(sanitized.bytes), sourceSha256 = digest(bytes);
-    const reservation = await rpc(auth.client, "prepare_attachment_attempt", {
+    const reservation = await rpc(auth.client, parsed.data.contingencyId?"prepare_contingency_attachment_attempt":"prepare_attachment_attempt", {
       ...lookup(parsed.data, uploadKey), p_filename: filename, p_mime: sanitized.mime, p_bytes: sanitized.bytes.length,
       p_source_hash: sourceSha256, p_source_bytes: bytes.length, p_source_mime: file.type, p_hash: sha256,
       p_transformation: sanitized.mime === "application/pdf" ? "pdf-passive-pages-v1" : "image-normalized-v1",
@@ -99,7 +99,7 @@ export async function PATCH(request: Request) {
   return api("attachments.recover", async () => {
     const input = await readJson(request, command, 8192), auth = await authenticate();
     await patientContext(auth, input.careRecipientId, "read", true);
-    const attempts = await rpc(auth.client, "attachment_attempts", lookup(input, input.key)) as Attempt[];
+    const attempts = await rpc(auth.client, input.contingencyId?"contingency_attachment_attempts":"attachment_attempts", lookup(input, input.key)) as Attempt[];
     const file = attempts.find(entry => entry.id === input.id);
     if (!file) throw new ApiError("NOT_FOUND", "Tentativa não encontrada neste registro.");
     if (input.action === "abandon") return reply(await rpc(auth.client, "abandon_attachment_attempt", { p_id: file.id, p_key: input.key }));

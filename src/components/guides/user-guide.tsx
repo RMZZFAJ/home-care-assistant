@@ -46,6 +46,7 @@ export function UserGuide() {
   return <section aria-label="Guia do seu perfil" className="ui-card"><h2 className="font-semibold">{!data?"Guia por tarefa":data.role==="global"?"Administração global":data.role==="general"?"Orientações gerais":roleLabel(data.role)}</h2>
     <p className="mt-2 text-sm">Guia opcional para suas tarefas. Seu progresso não altera permissões, ciência ou recebimentos.</p>
     {guide.context&&mayPrepareLocally(guide.context)?<p className="my-3"><Link className={buttonClass} href={"/preparacao-local?careRecipientId="+guide.context.patient!.id}>Acompanhar preparação local</Link></p>:null}
+    {guide.context?.patient&&can(guide.context,"contingency.read")?<p className="my-3"><Link className={buttonClass} href={"/contingencias?careRecipientId="+guide.context.patient.id}>Regularizar contingência</Link></p>:null}
     {guide.error?<Notice error>{guide.error}</Notice>:!data?<p role="status">Consultando seu guia…</p>:null}
     <button type="button" className={buttonClass} aria-disabled={guide.loading} onClick={()=>{if(!guide.loading)guide.refresh();}}>Consultar guia novamente</button>
     {error?<Notice error>{error}</Notice>:null}{message?<Notice>{message}</Notice>:null}

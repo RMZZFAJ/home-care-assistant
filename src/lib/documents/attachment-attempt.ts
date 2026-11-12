@@ -11,13 +11,14 @@ export async function freezeAttachment(file: File): Promise<FrozenAttachment> {
   const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
   return Object.freeze({ file, key: crypto.randomUUID(), sourceSha256: Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("") });
 }
-export function attachmentForm(attempt: FrozenAttachment, patientId: string, documentId?: string, movementId?: string) {
+export function attachmentForm(attempt: FrozenAttachment, patientId: string, documentId?: string, movementId?: string, contingencyId?: string) {
   const form = new FormData();
   form.set("file", attempt.file);
   form.set("idempotencyKey", attempt.key);
   form.set("careRecipientId", patientId);
   if (documentId) form.set("documentId", documentId);
   if (movementId) form.set("movementId", movementId);
+  if (contingencyId) form.set("contingencyId", contingencyId);
   return form;
 }
 export function confirmedAttachment(body: unknown, sourceSha256: string, id?: string) {

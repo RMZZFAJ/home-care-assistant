@@ -5,6 +5,7 @@ import { Workspace, Notice, type WorkspaceContext } from "@/components/workspace
 import { ActionButton, DefinitionGrid, Pill } from "@/components/ui/controls";
 import { Icon, type IconName } from "@/components/ui/primitives";
 import { useScopedRead } from "@/lib/use-scoped-read";
+import { can } from "@/lib/client/capabilities";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { formatBrazilDate } from "@/lib/receipt";
 import { mayPrepareLocally, parseLocalPreparation } from "@/lib/validation/local-preparation";
@@ -59,7 +60,7 @@ function PreparationTasks({context}:{context:WorkspaceContext}){
           {data.communication?<><DefinitionGrid items={[{label:"Apresentação do guia no primeiro acesso",value:data.communication.guideEnabled?"Habilitada":"Desabilitada"},{label:"Escolha local do guia",value:data.communication.guideConfigured?"Registrada":"Padrão inicial; pode ser alterado"}]}/>{link("/configuracoes","Conferir regras e comunicação")}</>:<p>{unknown}</p>}
         </Task>
       </div>
-      <section className="ui-card" aria-label="Conferência física e continuidade"><h2>Conferência física e continuidade</h2><p>Combine com os responsáveis como guardar referências físicas, comunicar interrupções e retomar cada fato sem duplicação. Ao retornar, procure primeiro o registro existente. A pessoa que registra a regularização não se apresenta como outra pessoa que recebeu materiais.</p><p>Esta consulta mostra metadados registrados. Ela não confirma estoque físico, presença, ciência, recebimento ou início do atendimento.</p>{link("/guias","Reabrir orientação do meu papel")}</section>
+      <section className="ui-card" aria-label="Conferência física e continuidade"><h2>Conferência física e continuidade</h2><p>Combine com os responsáveis como guardar referências físicas, comunicar interrupções e retomar cada fato sem duplicação. Ao retornar, procure primeiro o registro existente. A pessoa que registra a regularização não se apresenta como outra pessoa que recebeu materiais.</p><p>Esta consulta mostra metadados registrados. Ela não confirma estoque físico, presença, ciência, recebimento ou início do atendimento.</p><div className="hca-toolbar">{link("/guias","Reabrir orientação do meu papel")}{can(context,"contingency.read")?link("/contingencias","Registrar ou regularizar contingência"):null}</div></section>
     </>:!read.loading&&!read.error?<p>Nenhuma consulta de preparação foi confirmada.</p>:null}
   </div>;
 }

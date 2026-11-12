@@ -18,11 +18,11 @@ function readList(value: unknown) {
   return result.data;
 }
 type Attachment = z.infer<typeof attachment>;
-type Props = { patientId: string; documentId?: string; movementId?: string; writable?: boolean; onChange?: () => void };
+type Props = { patientId: string; documentId?: string; movementId?: string; contingencyId?: string; writable?: boolean; onChange?: () => void };
 export function Attachments(props: Props) {
-  return <ScopedAttachments key={`${props.patientId}:${props.documentId ?? ""}:${props.movementId ?? ""}`} {...props} />;
+  return <ScopedAttachments key={`${props.patientId}:${props.documentId ?? ""}:${props.movementId ?? ""}:${props.contingencyId ?? ""}`} {...props} />;
 }
-function ScopedAttachments({ patientId, documentId, movementId, writable = false, onChange }: Props) {
+function ScopedAttachments({ patientId, documentId, movementId, contingencyId, writable = false, onChange }: Props) {
   const [files, setFiles] = useState<Attachment[]>([]), [error, setError] = useState(""), [readError, setReadError] = useState(""), [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false), [loading, setLoading] = useState(true), [attempt, setAttempt] = useState(0);
   const [fileInvalid, setFileInvalid] = useState(false), [fileValidation, setFileValidation] = useState(0);
@@ -51,7 +51,7 @@ function ScopedAttachments({ patientId, documentId, movementId, writable = false
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [frozen]);
-  const query = new URLSearchParams({ careRecipientId: patientId, ...(documentId ? { documentId } : { movementId: movementId! }) }).toString();
+  const query = new URLSearchParams({ careRecipientId: patientId, ...(contingencyId?{contingencyId}:documentId ? { documentId } : { movementId: movementId! }) }).toString();
   const unresolved = files.some(file => file.state === "quarantine" && file.tracked && file.uploadKey);
   const newPreparationBlocked = !frozen && !resumeTarget && (loading || Boolean(readError) || unresolved);
   useEffect(() => {
@@ -76,7 +76,7 @@ function ScopedAttachments({ patientId, documentId, movementId, writable = false
     clearPending(); setMessage("Anexo confirmado. O arquivo está disponível na lista."); setAttempt(value => value + 1); onChange?.();
   }
   async function commandFor(file: Attachment, action: "recover" | "abandon") {
-    return api<unknown>("/api/attachments", { careRecipientId: patientId, documentId, movementId, id: file.id, key: file.uploadKey, action }, undefined, "PATCH");
+    return api<unknown>("/api/attachments", { careRecipientId: patientId, documentId, movementId, contingencyId, id: file.id, key: file.uploadKey, action }, undefined, "PATCH");
   }
   function deniedRead(reason: unknown) {
     if (!(reason instanceof ApiError) || ![401, 403, 404].includes(reason.status)) return false;
@@ -112,7 +112,7 @@ function ScopedAttachments({ patientId, documentId, movementId, writable = false
         }
       }
       async function send(prepare: boolean) {
-        const response = await fetch(`/api/attachments${prepare ? "?prepare=1" : ""}`, { method: "POST", body: attachmentForm(pending!, patientId, documentId, movementId), signal: AbortSignal.timeout(30_000) });
+        const response = await fetch(`/api/attachments${prepare ? "?prepare=1" : ""}`, { method: "POST", body: attachmentForm(pending!, patientId, documentId, movementId, contingencyId), signal: AbortSignal.timeout(30_000) });
         const body: unknown = await response.json().catch(() => { throw new Error("A resposta do envio não pôde ser confirmada. Consulte a mesma tentativa."); });
         if (!response.ok) {
           // A complete validation refusal before any reservation is distinct

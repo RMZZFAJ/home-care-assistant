@@ -3,7 +3,39 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — preparação local
+## Estado atual — contingência
+
+Local e remoto em 237, sem pendências. Aplicado o conjunto pronto
+20261112115038, 20261112120018, 20261112120210, 20261112121722 e
+20261112121925. Duas tabelas privadas imutáveis, três competências e um
+terceiro pai de anexo preservam declarações, atos e evidências. A reserva,
+atestação, Storage, finalização e recuperação existentes são reutilizados.
+A recuperação oficial pode encerrar uma chave ainda não executada, sem
+persistir preenchimento comum. Unidade/precisão revisadas são conferidas e
+bloqueadas no banco durante o registro. Nenhuma migration anterior foi editada.
+
+20261112121722 é um registro vazio aplicado localmente após falha na
+geração do SQL; não contém DDL nem mudança de dados. Seu histórico foi
+preservado. A proteção efetiva da referência está em 20261112121925.
+
+Pré-check: 232 versões, 19 dependências compatíveis, objetos novos ausentes
+e dry-run exclusivo das cinco versões, sem seeds/roles/Vault. Captura leve
+de histórico e contratos no banco sintético, sem backup integral redundante.
+Pós-check: 237 versões; 19 dependências e 15 funções novas, configurações e
+ACL iguais ao local. Histórico anterior preservado; duas tabelas com RLS e
+sem grants/políticas de acesso direto, FK e constraint do pai de anexo
+conferidas. Seis RPCs públicas somente authenticated; helpers privados, anon
+e service_role sem execução das funções novas. Todos os search_paths vazios.
+Dry-run final sem pendências; sem reset, fixtures/Auth remoto ou alteração
+de canais. Instalação limpa, legado e integração geral exigem CI do novo SHA.
+
+Onze cenários Auth da contingência, dez regressões nativas anteriores de
+anexos, quatro testes de contrato e dez percursos de produção móveis/WebKit
+passaram em conjuntos compatíveis. A prova de anexo inclui Storage real de
+teste, proveniência, recuperação e hashes congelados na decisão. Não é
+comprovação de operação física ou aprovação global dos achados anteriores.
+
+## Histórico — preparação local
 
 Local e remoto em 232, sem pendências. A migration
 20261112111224_phase_d3_local_preparation_context acrescenta uma consulta

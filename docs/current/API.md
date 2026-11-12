@@ -1242,6 +1242,47 @@ e não confirma conferência física. O cliente valida estrutura e paciente;
 recusa de acesso elimina a consulta anterior, e falha transitória permite
 reconsulta sem comandos.
 
+## Contingência e conciliação
+
+GET /api/contingencies exige careRecipientId e process, com filtros únicos e
+sessão/vínculo local vigentes. Processos: REQ, COM, ENT, RETURN, BAL,
+CONSUMPTION_FAMILY e CONSUMPTION_TEAM. A competência contingency.read e a
+leitura do domínio são revalidadas no banco. view=cases lista páginas de25;
+id consulta a declaração e seus atos imutáveis. view=references recebe
+query/page e consulta somente referências emitidas do mesmo paciente e
+processo, separando entrega e devolução. Respostas são privadas/no-store;
+identidade global sem vínculo local não concede acesso.
+
+POST recebe expectedActorId, careRecipientId, process, idempotencyKey e
+action. A API compara a conta esperada com Auth antes da RPC. record recebe
+content; supplement também exige id e expectedRevision. Datas, fuso, pessoas,
+referência, quantidade e custódia desconhecidos são null explícito. Materiais
+selecionados levam reviewedUnit/reviewedDecimals; o banco confere e bloqueia
+a referência durante a gravação e preserva nome/unidade/precisão próprios.
+Zero não vira desconhecido. Autor, papel e instante digitais vêm do servidor,
+separados das pessoas e do instante físico declarados. Comunicações manuais
+registram estado declarado, sem enviar aviso ou produzir ciência.
+
+needs_clarification/link_existing exigem id, expectedRevision, reason e
+targetId (null no esclarecimento). A decisão exige contingency.review e
+outra identidade, que não tenha criado ou complementado a declaração.
+Vínculo só alcança registro existente do mesmo processo/paciente e congela
+referência e evidências prontas; envio em quarentena impede concluir. Não
+cria documento, débito/crédito, ciência, recebimento ou assinatura pessoal.
+Histórico não é editado ou apagado; concorrência rejeita a revisão obsoleta.
+
+view=recovery e attemptKey consultam o resultado próprio; action=resolve
+confere a mesma intenção. Se ainda não há resultado, encerra aquela chave
+atomicamente, impedindo um comando tardio; resultado confirmado é recuperado.
+Somente a referência oficial, sem conteúdo do formulário, pode ficar em
+sessionStorage por conta/paciente. Esta recuperação não cria rascunho comum.
+
+/api/attachments também aceita contingencyId como pai exclusivo, em lugar
+de documentId/movementId. Usa a mesma reserva, quarentena, sanitização,
+atestação pelo servidor, Storage, recuperação e abandono. Autoridade atual é
+conferida no envio e na finalização. Conciliação fecha novos envios e conserva
+a recuperação dos arquivos já prontos; exemplares e hashes não são trocados.
+
 ## Referências individuais de notificações
 
 GET /api/notifications/target recebe careRecipientId, ref, area e namespace.
