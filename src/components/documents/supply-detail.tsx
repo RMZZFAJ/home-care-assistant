@@ -1,4 +1,5 @@
 "use client";
+import { DocumentComplementsPanel } from "@/components/documents/document-complements";
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { roleLabel } from "@/components/layout/workspace-context";
 import { DocumentBreadcrumb } from "@/components/documents/document-breadcrumb";
@@ -953,6 +954,7 @@ export function SupplyDocumentContent({
             auditAllowed={can(context, "audit.read")}
           >
             <DocumentPanel value="overview">
+              {data.protocol ? <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={data.version} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
               {followUpStep && (loading || readFailed || operationOpen) ? (
                 <Notice>
                   {operationOpen

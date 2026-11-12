@@ -1,4 +1,5 @@
 "use client";
+import { ComplementOriginHint } from "@/components/documents/complement-origin-hint";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -449,7 +450,7 @@ function PatientRequisition({
       setSaving(false);
     }
   }
-  if (receipt) return <Receipt receipt={receipt} />;
+  if (receipt) return <div className="space-y-4"><ComplementOriginHint /><Receipt receipt={receipt} /></div>;
   if (privateDraft.readDenied)
     return (
       <Notice error>
@@ -476,6 +477,7 @@ function PatientRequisition({
     );
   return (
     <div ref={fieldsRef} className="hca-document-wizard min-w-0 space-y-5">
+      <ComplementOriginHint />
       {selectionLibrary()}
       <CreationDraftPanel
         draft={privateDraft}

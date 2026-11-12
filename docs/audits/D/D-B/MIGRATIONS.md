@@ -3,7 +3,31 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — DOC-B.4_CANCELLATION
+## Estado atual — DOC-B.4_COMPLEMENTS
+
+Local e remoto223,sem pendências. As migrations20261112005024,20261112005608 e
+20261112010620 acrescentam relação privada imutável,quatro RPCs autenticadas,
+recuperação da própria tentativa e os fatos de vínculo na cronologia existente.
+Motivo e referências preservados; materiais e efeitos operacionais inalterados.
+
+Preflight confirmou220 versões como prefixo exato e apenas três pendências.
+As dependências anteriores coincidem; a única evolução prevista nelas foi a
+lista de fatos automáticos. Dez Auth,14 contratos/API e nove percursos browser
+precederam a aplicação linked/skip-vault. Após aplicar,223 versões,11 definições
+incluindo dependências,RLS,política,sete índices,constraints,trigger e grants
+coincidem com o local,normalizando só CRLF. Dry-run vazio. Tabela/auxiliares
+fechados; quatro RPCs exclusivas de authenticated;84 históricas preservadas.
+Sem reset,fixtures/Auth remotos,produção,transporte ou backup redundante.
+
+Advisors:Auth definer215→219,demais classes de segurança inalteradas. Os quatro
+avisos novos correspondem às RPCs intencionais com autorização/negativas reais.
+Performance:124 FKs sem índice e11 initplan preservados;64→68 índices sem uso,
+incluindo os quatro índices explícitos ainda sem carga remota. Não remover
+índices de integridade/consulta para silenciar esse aviso. Alertas anteriores
+não recebem aprovação genérica. [Resultados e orientações](DOCUMENT_COMPLEMENTS.md).
+Instalação limpa,legado,integração e CI do SHA publicado continuam gates próprios.
+
+## Fechamento anterior — DOC-B.4_CANCELLATION
 
 Local e remoto220, sem pendências. As migrations20261111232545 e20261112001835
 acrescentam consulta/confirmação da ciência do cancelamento, ordem de lock

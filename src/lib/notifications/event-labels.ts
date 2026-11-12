@@ -1,4 +1,12 @@
 const labels: Record<string, string> = {
+  "req.complement_added": "Ficha complementar vinculada ao registro original",
+  "req.complement_linked": "Vínculo com a ficha de origem registrado",
+  "com.complement_added": "Ficha complementar vinculada ao registro original",
+  "com.complement_linked": "Vínculo com a ficha de origem registrado",
+  "ent.complement_added": "Ficha complementar vinculada ao registro original",
+  "ent.complement_linked": "Vínculo com a ficha de origem registrado",
+  "bal.complement_added": "Ficha complementar vinculada ao registro original",
+  "bal.complement_linked": "Vínculo com a ficha de origem registrado",
   "req.cancellation_acknowledged": "Ciência do cancelamento da requisição registrada",
   "com.cancellation_acknowledged": "Ciência do cancelamento da compra ou doação registrada",
   "ent.cancellation_acknowledged": "Ciência do cancelamento da entrega ou devolução registrada",

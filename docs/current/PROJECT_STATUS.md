@@ -4,7 +4,32 @@ Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
 **D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
 CI do SHA publicado é gate independente; pending não significa aprovação.
 
-## Incremento atual — DOC-B.4_CANCELLATION
+## Incremento atual — DOC-B.4_COMPLEMENTS
+
+Vinculação formal de novas fichas implementada e conferida no fluxo local.
+Mesmo paciente, emissão posterior, permissão nativa do emissor/administrador e
+leitura de ambas as fichas; tipos distintos permitidos. Motivo, autor, instante
+e versões próprios, sem editar material, estoque, atendimento ou ciências.
+Eventos opacos nas duas versões e relações privadas imutáveis, com restrição
+real dos dados da ficha não autorizada. Confirmação recuperável pela própria
+chave, sem replay; consulta espera as mesmas travas da gravação.
+
+Dez Auth reais,14 contratos/API e nove percursos distintos de navegador
+qualificados:seis novos e três de compatibilidade da ciência do cancelamento.
+Cinco larguras,axe,foco,capturas móveis,tipos/lint e build de produção passaram.
+As falhas iniciais foram preservadas e só os afetados repetidos.
+
+Remoto220→223 reconciliado:três migrations,quatro RPCs autenticadas,tabela
+privada fechada e sete índices. Metadados/definições/grants iguais ao local,
+dry-run vazio;84 históricas preservadas. Sem reset,Auth/fixtures remotos,
+produção,transporte externo ou backup pesado redundante. CI do SHA publicado,
+instalação limpa,legado e integração completa continuam gates próprios; Sonar
+adiado. DOC-B estimado90%,DOC-B.4 parcial;105 estados(57PASS/48PARTIAL),18 UI e
+visual85% preservados. Próximo:representação estruturada de cancelamento,
+ciências próprias e vínculos nos PDFs; depois DOC-A.
+[Implementação e limites](../audits/D/D-B/DOCUMENT_COMPLEMENTS.md).
+
+## Incremento anterior — DOC-B.4_CANCELLATION
 
 Ciência própria do cancelamento implementada e conferida localmente nas fichas,
 separada da emissão, do recebimento e das ciências anteriores. Um ato por pessoa

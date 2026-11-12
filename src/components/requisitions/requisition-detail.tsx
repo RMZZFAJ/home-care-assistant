@@ -1,4 +1,5 @@
 "use client";
+import { DocumentComplementsPanel } from "@/components/documents/document-complements";
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { DocumentMaterialsTable } from "@/components/documents/document-materials-table";
 import { roleLabel } from "@/components/layout/workspace-context";
@@ -468,6 +469,7 @@ export function RequisitionDocumentContent({
         auditAllowed={can(context, "audit.read")}
       >
         <DocumentPanel value="overview">
+              <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
           {reading || readFailed ? (
             <Notice>
               {reading ? "Atualizando o acompanhamento da requisição…" : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}

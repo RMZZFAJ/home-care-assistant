@@ -1,4 +1,5 @@
 "use client";
+import { ComplementOriginHint } from "@/components/documents/complement-origin-hint";
 import { DocumentActions } from "./document-actions";
 import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
 
@@ -1305,6 +1306,7 @@ export function PatientSupplyWizard({
   if (saved)
     return (
       <section className="ui-card mx-auto max-w-3xl">
+        <ComplementOriginHint />
         <span className="ui-badge ui-badge-success">Documento persistido</span>
         <h2 className="mt-4 text-2xl font-semibold">
           {saved.code ?? "Rascunho salvo"}
@@ -1351,6 +1353,7 @@ export function PatientSupplyWizard({
     );
   return (
     <div className="hca-document-wizard min-w-0 space-y-5">
+      <ComplementOriginHint />
       {privateDraft.active ? (
         <CreationDraftPanel
           draft={privateDraft}

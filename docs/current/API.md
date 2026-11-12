@@ -93,6 +93,23 @@ Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
 em [C](../audits/C/README.md); decisões aprovadas não equivalem a
 implementação.
 
+## Fichas complementares
+
+GET /api/documents/:id/complements consulta relações paginadas; mode=candidates
+recebe type,search e page para procurar nova ficha emitida elegível. mode=attempt
+recebe key e consulta somente a tentativa do usuário atual, após as mesmas
+travas da gravação. Consulta não registra vínculo nem ciência.
+
+POST recebe childId,sourceVersion,childVersion,reason e idempotencyKey. Mesmo
+paciente,origem emitida,nova ficha posterior não cancelada,leitura de ambas e
+permissão nativa de emissão são verificadas no banco. Só emissor/administrador
+habilitado vincula; motivo e autoria são próprios. Versões avançam com eventos
+opacos,sem editar materiais,estoque,atendimento ou ciências. Referência mudou:
+conflito; mesma chave com intenção trocada:conflito. Sem acesso à outra ficha,
+a consulta não envia código,motivo,autor ou conteúdo do documento restrito.
+A própria confirmação permanece consultável sem permissão de emissão,desde que
+as leituras continuem autorizadas. [Escopo](../audits/D/D-B/DOCUMENT_COMPLEMENTS.md).
+
 ## Ciência própria do cancelamento
 
 GET /api/documents/:id/cancellation consulta o ato cancelado preservado e as

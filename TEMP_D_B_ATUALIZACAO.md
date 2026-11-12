@@ -66,30 +66,25 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
-| Complemento documental | DOC-B ≈75%; DOC-A, DOC-C e DOC-D em 0% do acréscimo |
+| Complemento documental | DOC-B ≈90%; DOC-A, DOC-C e DOC-D em 0% do acréscimo |
 | Ponto em execução | DOC-B.4: cancelamento e complemento de fichas |
 
 **Último ponto integral encerrado:** DOC-B.3, devolução autônoma cotidiana.
-**Último avanço encerrado dentro do ponto atual:** ciência própria do
-cancelamento, parte de DOC-B.4. Esse avanço não fecha o ponto inteiro.
+**Último avanço encerrado dentro do ponto atual:** vínculos formais de novas
+fichas complementares, somados à ciência própria do cancelamento já entregue.
+DOC-B.4 continua parcial até concluir a representação estruturada nos PDFs.
 
-**Próxima entrega:** vínculos de novas fichas complementares e representação
-estruturada do cancelamento nos arquivos, preservando originais e ciências
+**Próxima entrega:** representação estruturada do cancelamento, das ciências
+próprias e dos vínculos nos arquivos, preservando originais e ciências
 anteriores. O detalhamento único está em DOC-B.4, no grupo 3.3. A nova aparência
 dos PDFs segue em DOC-A, depois do fechamento de DOC-B.
 
-**Banco e validações do último avanço registrado:** as atualizações da ciência
-própria do cancelamento foram aplicadas no remoto, totalizando 220 atualizações
-reconciliadas com o local, sem pendências desse lote. As verificações locais
-passaram nos três perfis de navegador. A validação automática do commit
-publicado e a revisão final da fase continuam separadas. Sonar permanece adiado
-por sua decisão.
-
-**Observações de validação preservadas:** a validação automática do commit
-anterior encontrou dois testes antigos de reconto incompatíveis com a aplicação
-separada do parecer. Foram corrigidos e passaram localmente; a confirmação no
-novo commit publicado continua sendo uma verificação própria. Isso não altera
-os estados dos critérios registrados neste acompanhamento.
+**Banco e validações do último avanço registrado:** as três atualizações dos
+vínculos foram aplicadas no remoto, totalizando 223 atualizações reconciliadas
+com o local, sem pendências desse lote. Passaram dez cenários de autorização,
+quatorze verificações de contrato e nove percursos distintos nos três perfis
+de navegador. A validação automática do commit publicado e a revisão final da
+fase continuam separadas. Sonar permanece adiado por sua decisão.
 
 ## 3. Funcionalidades e critérios
 
@@ -536,7 +531,7 @@ ordem de execução.
 
 ##### DOC-B — Fatos, saldos e atos específicos
 
-**Em execução · ≈75% do acréscimo. Responsável: Codex.**
+**Em execução · ≈90% do acréscimo. Responsável: Codex.**
 
 **DOC-B.1 — BAL: concluído localmente no fluxo atual.** Parecer por material e
 aplicação ao estoque são atos separados. A aplicação tem confirmação, autoria e
@@ -570,12 +565,17 @@ preservados.
   no fluxo local, separada das ciências anteriores e sem alterar estoque.
   Consulta, recuperação, autorização e uso nos três perfis de navegador passaram.
   O pedido interno continua disponível mesmo com avisos opcionais desligados.
-- **Falta:** complementar por nova ficha vinculada e concluir a representação
-  estruturada do cancelamento nos arquivos. Preservar a ficha emitida, seu
-  conteúdo e as ciências anteriores. O cancelamento mantém aviso e pedido de
-  confirmação próprios. Responsável: Codex.
+- **Parte entregue:** novas fichas emitidas pelos formulários habituais podem
+  ser vinculadas formalmente, com motivo, autor e data próprios. As duas fichas
+  preservam materiais, ciências e estoque. Consulta, permissões, tipos distintos
+  e recuperação da mesma tentativa foram conferidos nos três perfis de navegador.
+- **Falta:** concluir a representação estruturada do cancelamento, das ciências
+  próprias e dos vínculos nos PDFs, respeitando o corte da emissão e o acesso de
+  cada pessoa. Os originais e os exemplares anteriores devem permanecer
+  preservados. Responsável: Codex.
 
-A parte entregue não conclui DOC-B.4 nem altera a estimativa de DOC-B.
+As partes entregues não concluem DOC-B.4. A estimativa de DOC-B passou de
+≈75% para ≈90% por esse avanço; os critérios originais não mudaram de estado.
 
 **Condição para fechar DOC-B:** os quatro pontos funcionam no uso cotidiano,
 com seus fatos preservados na ficha e no PDF, respeitando as permissões. Não
@@ -1287,6 +1287,12 @@ anteriores. Sua situação e todas as regras estão reunidas no grupo 3.3.
 | DOC-B.2 — COM | Saldo por material na ficha e no PDF | Concluído local |
 | DOC-B.3 — devolução | Percurso autônomo cotidiano | Concluído local |
 | DOC-B.4 — parte entregue | Ciência própria do cancelamento | Concluído local |
+| DOC-B.4 — parte entregue | Novas fichas vinculadas | Concluído local |
+
+A validação automática de um incremento anterior encontrou dois testes antigos
+de reconto incompatíveis com a aplicação separada do parecer. Foram corrigidos
+e passaram localmente; a confirmação do commit publicado continua sendo uma
+verificação própria. Esse registro histórico não aprova o candidato atual.
 
 DOC-B continua parcial. Novos formulários seguem na etapa 14 e a retomada
 simples segue em DOC-C. Esses acréscimos não reabrem silenciosamente etapas
@@ -1314,7 +1320,7 @@ por causa de um acréscimo posterior.
 
 | Ordem | Etapa ou resultado | Situação | Grupo |
 | --- | --- | --- | --- |
-| 1 — agora | DOC-B — concluir DOC-B.4 | Em execução · ≈75% | 3.3 |
+| 1 — agora | DOC-B — concluir DOC-B.4 | Em execução · ≈90% | 3.3 |
 | 2 | DOC-A — aparência dos documentos | A iniciar · 0% | 3.3 |
 | 3 | DOC-C — Andamentos e consulta | A iniciar · 0% | 3.3 |
 | 4 | DOC-D — geração integrada e exemplos | A iniciar · 0% | 3.3 |

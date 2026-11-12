@@ -10,8 +10,10 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
   quatro resultados adicionais, sem reinício da missão ou dos 105 critérios.
 - [Parecer BAL, aplicação própria e saldo no exemplar](BAL_REVIEW_APPLICATION.md):
   parecer, aplicação e correções posteriores implementados no fluxo atual.
+- [Vínculos formais de fichas complementares](DOCUMENT_COMPLEMENTS.md):
+  fluxo local qualificado e remoto223; DOC-B.4 ainda depende do PDF estruturado.
 - [Ciência própria do cancelamento](CANCELLATION_AWARENESS.md): implementação
-  local conferida e remoto220 reconciliado; DOC-B.4 e vínculos ainda parciais.
+  local conferida e remoto220 reconciliado no incremento anterior.
 - [Devolução autônoma no uso cotidiano](AUTONOMOUS_RETURNS.md): entrada própria,
   pessoas distintas, documento V14 e remoto218 reconciliado; DOC-B.3 local.
 - [Saldo histórico por material da COM](PURCHASE_ENTRY_BALANCES.md):
