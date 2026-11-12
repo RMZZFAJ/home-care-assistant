@@ -592,7 +592,10 @@ export function SupplyDocumentContent({
       <button
         key={item}
         className={item === "receive" ? primaryClass : buttonClass}
-        disabled={loading || busy || uncertain}
+        // Opening an editor has no official effect. A background read must not
+        // disable a retained opener between pointerdown and pointerup. Existing
+        // version/identity checks still authorize and validate confirmation.
+        disabled={busy || uncertain}
         onClick={(event) => {
           operationOpenerRef.current = event.currentTarget;
           decisionFocusRef.current = true;

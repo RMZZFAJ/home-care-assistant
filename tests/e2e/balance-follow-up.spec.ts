@@ -7,7 +7,7 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
-import { audit } from "./accessibility-audit";
+import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(120_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
@@ -51,7 +51,7 @@ for (const policy of ["required", "optional"] as const) {
     const conclusion = page.getByRole("list", { name: "Marcos da ficha", exact: true }).getByRole("listitem").filter({ hasText: "Conclusão" });
     await expect(conclusion).toHaveAttribute("data-state", policy === "required" ? "unknown" : "done");
     await page.setViewportSize({ width: 320, height: 900 });
-    await audit(page, `bal-follow-up-${policy}-320`);
+    await auditFromTop(page, `bal-follow-up-${policy}-320`);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await panel(page).locator(".hca-banner").filter({ hasText: latest }).screenshot({ path: `output/playwright/phase-d/balance-follow-up-${policy}-${info.project.name}.png` });

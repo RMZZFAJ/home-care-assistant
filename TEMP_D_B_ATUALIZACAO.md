@@ -78,8 +78,8 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Outras áreas visuais | 12 composições e 171 relações a conferir |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Administração, guias e aparência restante |
-| Incremento atual | Meu perfil, segurança, avisos e dispositivos em abas |
-| Resultado local | Contingência com autoria, anexo e conferência independente |
+| Incremento atual | Perfil em abas e abertura de operações durante atualização |
+| Resultado local | Perfil no Preview; correção do clique conferida localmente |
 | Banco | Local e remoto em 237, sem atualizações pendentes |
 | CI de e43961f | Chromium 1 reprovado; iOS cancelado; demais grupos passaram |
 | Preview de e43961f | Concluído na Vercel; produção preservada |
@@ -1572,6 +1572,17 @@ permaneceu. Não houve ampliação de rascunhos ou alteração de banco. Restam
 Windows, banco, Chromium 2 e os dois grupos móveis passaram. Chromium 1
 reprovou e iOS foi cancelado; essa falha será tratada separadamente antes
 do fechamento conjunto. Sonar continua adiado.
+
+**12 de novembro — abertura das operações:** uma atualização automática entre
+pressionar e soltar o botão podia impedir a abertura do formulário. A condição
+foi reproduzida e corrigida, sem registrar uma operação ou mudar documento e
+estoque ao abrir. Oito percursos passaram em uma rodada de produção, incluindo
+Chromium, Chrome móvel e WebKit. As verificações de BAL, retomada de COM e
+cancelamento de ENT continuam preservadas. A conferência de acessibilidade do
+BAL parte do topo após mudar a largura, usando o procedimento existente. Os
+quatro casos da CI anterior também passaram localmente antes da correção; isso
+não determina a causa de todos os cliques perdidos naquela execução. O Preview
+de 2fea104 concluiu; a CI da correção publicada continua obrigatória.
 
 ## 6. Sequência única do trabalho restante
 

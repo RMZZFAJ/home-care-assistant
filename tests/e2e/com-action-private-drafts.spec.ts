@@ -38,6 +38,46 @@ const official = (id: string, patient: string) =>
   );
 const field = (page: Page, id: string) => page.locator(`input[name="${id}"]`);
 
+test("background revalidation between press and release still opens the retained operation without writing facts", async ({ page }) => {
+  const f = await fixture(), id = f.document.id;
+  await login(page, f.patient);
+  await page.goto(`/documentos/${id}`);
+  const open = page.getByRole("button", { name: "Aprovar itens", exact: true });
+  const refresh = page.getByRole("button", { name: "Atualizar ficha", exact: true });
+  await expect(open).toBeEnabled();
+  await expect(refresh).toHaveAttribute("aria-disabled", "false");
+  await open.scrollIntoViewIfNeeded();
+  const before = official(id, f.patient), bounds = await open.boundingBox();
+  expect(bounds).not.toBeNull();
+  const reference = await page.request.get(`/api/documents/${id}`);
+  expect(reference.ok()).toBe(true);
+  let entered!: () => void, release!: () => void;
+  const started = new Promise<void>(resolve => { entered = resolve; });
+  const held = new Promise<void>(resolve => { release = resolve; });
+  const target = `**/api/documents/${id}`;
+  await page.route(target, async route => {
+    if (route.request().method() !== "GET") return route.continue();
+    entered();
+    await held;
+    await route.fulfill({ response: reference });
+  });
+  try {
+    await page.mouse.move(bounds!.x + bounds!.width / 2, bounds!.y + bounds!.height / 2);
+    await page.mouse.down();
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    await started;
+    await expect(refresh).toHaveAttribute("aria-busy", "true");
+    await page.mouse.up();
+    await expect(page.getByRole("tab", { name: "Aquisição", exact: true })).toHaveAttribute("aria-selected", "true");
+    await expect(field(page, f.document.lines[0].id)).toBeEnabled();
+    expect(official(id, f.patient)).toBe(before);
+  } finally {
+    await page.mouse.up();
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+});
+
 test("COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato", async ({
   page,
   browser,
