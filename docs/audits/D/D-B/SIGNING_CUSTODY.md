@@ -71,8 +71,53 @@ versão. Uma cópia que carrega P12 e senhas juntas precisa de envelope cifrado,
 chave de recuperação independente, acesso mínimo e restauração ensaiada em
 destino isolado. Nunca incluir segredos em logs ou evidências de teste.
 
-O bootstrap e o carregamento dos provedores constituem base funcional.
-Restauração da custódia, rotação completa e procedimento de incidente ainda
-necessitam de ensaio próprio; este documento não os aprova. Os testes E2E usam
-PKI efêmera e a descartam ao final. Ela não substitui a custódia do produto nem
-confiança operacional, homologação humana ou leitura em dispositivo físico.
+## Ensaios técnicos do ciclo das chaves — 12/11/2026
+
+O ensaio tests/pdf-key-lifecycle.test.ts usa os provedores reais e PKIs efêmeras
+protegidas. Qualifica quatro percursos, sem alterar a custódia ativa:
+
+- Renovação dos dois certificados sob a mesma CA e rotação para outra CA,
+  mantendo os pares históricos e recusando reutilizar a versão antiga com as
+  novas chaves. Cada exemplar é assinado e verificado com seus próprios pins.
+- Incidente de assinatura, TSA e raiz: a criptografia histórica permanece
+  íntegra, a confiança atual registra revogação e a emissão comprometida é
+  recusada. Um par de outra raiz continua utilizável. Revogar a raiz é recusado
+  na conferência criptográfica anterior à liberação do arquivo; revogar a folha
+  impede carregar o provedor. Não há fallback sem assinatura ou carimbo.
+- Expiração: a validação histórica usa a época do token genuíno; o mesmo par
+  expirado não pode gerar novo exemplar.
+- Recuperação: runtime, política e CA são cifrados pelo adaptador de backup
+  existente com chave independente. Chave incorreta não cria destino de
+  restauração. A recuperação em outro diretório preserva o segredo exato,
+  permite assinar e renovar sob a CA restaurada. Sem segredo ativo, o arquivo
+  antigo continua verificável somente com a política pública.
+
+Também passaram os três consumidores antigos dos provedores e os dezesseis
+casos de assinatura/verificação pública. Tipos e lint dirigidos passaram. A
+CI deve validar o SHA publicado. O bootstrap padrão da PKI de testes conserva
+seu comportamento; os novos parâmetros servem apenas a renovação e versões.
+
+## Procedimento inicial de recuperação
+
+1. Capturar a custódia em diretório protegido fora do repositório, incluindo
+   P12/senhas, política, versões e, separadamente identificados, chave/certificado
+   da CA e sua senha. Manter a CA fora do segredo configurado no runtime.
+2. Usar scripts/backup-archive.mjs seal com source e destination separados e
+   key-file independente de 32 bytes, fora da captura e do arquivo cifrado.
+   Origem, destino e chave devem conservar ACL do operador no Windows ou
+   permissões restritas no Unix. Não colocar material privado no terminal.
+3. Executar verify com a chave de recuperação. Depois, extract para diretório
+   novo, absoluto, externo ao repositório, sob pai com acesso restrito. O
+   adaptador autentica todos os objetos antes de criar a restauração. Não
+   sobrescrever nem substituir a custódia ativa.
+4. Conferir ambiente, versão, política, pins e um exemplar histórico antes de
+   ativar qualquer segredo recuperado. Conferir assinatura/TSA com exemplar
+   sintético; uma renovação recebe versão nova e conserva a política histórica.
+5. Incidente não se resolve restaurando chave comprometida. Conservar a
+   denylist atual, provisionar par íntegro e preservar registros e bytes.
+
+O ensaio comprova o software e o procedimento com custódia efêmera. Não é
+restauração operacional da custódia do produto, backup independente mantido por
+terceiro, HSM, confiança ICP-Brasil ou aprovação humana. Destino e chave de
+recuperação operacionais, responsáveis, guarda offline e exercício real
+continuam nos gates D6; a implementação local não é transferida a esses gates.

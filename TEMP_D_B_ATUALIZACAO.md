@@ -1,6 +1,6 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, após o fechamento local do lote 2.
+Atualizado em 12 de novembro de 2026, após o fechamento local do lote 3.
 Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
@@ -8,7 +8,7 @@ liberação para produção.
 ## 1. Definições e leitura do acompanhamento
 
 - **Critérios:** são 105, sendo 75 originais e 30 complementos da Ordem Mestre.
-  Há 57 com implementação e verificações locais concluídas e 48 parciais. Nenhum
+  Há 60 com implementação e verificações locais concluídas e 45 parciais. Nenhum
   critério inteiro está sem início; algumas subtarefas estão em 0%.
 - **Etapas 01–20:** identificadores preservados para localizar os requisitos.
   A execução restante está agrupada em seis capacidades na seção 6; as etapas
@@ -69,24 +69,24 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 
 | Acompanhamento | Estado registrado |
 | --- | --- |
-| Critérios da D-B | 57 concluídos localmente; 48 parciais; total de 105 |
-| Etapas anteriores 01 a 07 | Concluídas localmente nos respectivos escopos |
+| Critérios da D-B | 60 concluídos localmente; 45 parciais; total de 105 |
+| Etapas anteriores 01 a 10 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
-| Próxima entrega | Custódia, recuperação e verificação documental |
-| Incremento deste lote | Ficha Ampliada e auditoria com conteúdo selecionado |
+| Próxima entrega | Aplicativo, avisos e lembretes |
+| Incremento atual | Custódia, recuperação e verificação qualificadas |
 | Resultado local | Modalidades assinadas, recuperáveis e sob permissão |
 | Banco | Local e remoto em 231, sem atualizações pendentes |
-| CI anterior 10b7e80 | Linux/Windows passaram; banco falhou; sem navegadores |
+| CI do PDF 624c97e | Linux/Windows passaram; integração pendente |
 | CI deste incremento | Pendente no novo commit |
-| Preview anterior 10b7e80 | Vercel concluiu; Andamentos publicados |
+| Preview anterior 624c97e | Vercel concluiu; modalidades PDF publicadas |
 
-**Último lote encerrado localmente:** lote 2, modalidades e acompanhamento
-documental. DOC-C.2–5 e DOC-D estão integrados; DOC-C.1 permanece adiado por sua
-decisão, sem aprovação fictícia. A revisão humana dos PDFs, a CI do novo commit
-e os requisitos gerais ainda parciais de 08/09/10 permanecem separados.
+**Último lote encerrado localmente:** lote 3, custódia, recuperação e verificação
+documental. As etapas 08/09/10 fecharam no software e nos ensaios locais.
+DOC-C.1 continua adiado. CI própria, custódia operacional, avaliação humana e
+aparelho físico conservam seus gates.
 
 **Resultado do lote 1:** REQ, compra, doação, entrega, devolução autônoma e BAL
 foram gerados e assinados pelos fluxos reais de teste, com a aparência aprovada.
@@ -101,18 +101,27 @@ arquivos. A auditoria exige competência própria e traz identificação nominat
 em todas as páginas. Foram geradas amostras reais assinadas de REQ, compra,
 doação, entrega, devolução, BAL e auditoria, com dados fictícios de teste.
 
-**Próxima entrega:** lote 3, completar confiança, custódia, recuperação e
-verificação nas situações restantes de 08/09/10. Os rascunhos permanecem intactos.
+**Próxima entrega:** lote 4, aplicativo, atualização, avisos e lembretes.
+Os rascunhos permanecem intactos.
 A falha da CI anterior no teste de atualização entre duas sessões passou na
 reprodução local, sem alterar o limite; a causa da falha remota não foi
 comprovada. O diagnóstico do BAL em iOS também aguarda a próxima CI completa.
 
-**Validações deste incremento:** 14 cenários com autenticação real, 16 testes de
+**Validações do lote 2:** 14 cenários com autenticação real, 16 testes de
 conteúdo/contrato e oito percursos em Chromium/iOS, em rodadas compatíveis.
 Incluem seleção, período, resposta perdida, bytes preservados e autorização.
 O teste original entre duas sessões passou na reprodução local separada.
 As migrations foram reconciliadas. CI própria, revisão humana, aparelho físico
 e os demais gates mantêm seus requisitos; Sonar permanece adiado.
+
+**Validação do ciclo das chaves:** quatro exercícios completos, os três
+consumidores anteriores dos provedores e dezesseis casos de assinatura e
+verificação pública passaram. Tipos e lint passaram. O ensaio inclui a
+recuperação da autoridade e uma nova renovação, com chaves efêmeras protegidas.
+A custódia usada pelo aplicativo não foi alterada; o gate operacional continua
+separado. Seis situações de falha controlada da emissão e uma retomada
+concorrente com contas reais de teste também passaram. A recuperação não troca
+o exemplar já armazenado nem altera sua conferência histórica.
 
 ## 3. Funcionalidades e critérios
 
@@ -307,7 +316,7 @@ concluídas; a revisão geral da fase continua pendente.
 
 ### 3.3 Fichas, Andamentos, PDFs e anexos
 
-**Critérios deste grupo: 26 concluídos localmente; 15 parciais.**
+**Critérios deste grupo: 29 concluídos localmente; 12 parciais.**
 
 **Etapas relacionadas:** 04; 07; DOC-A a DOC-D; 08 a 10.
 
@@ -422,9 +431,9 @@ permanecem separadas nos resultados DOC-A a DOC-D.
 - **Leitura acessível do PDF e alternativa com a mesma versão** — Em execução ·
   ≈70%. Falta: Concluir cobertura de leitura assistida e conferência com
   participantes. Responsável: Codex; depois participantes.
-- **Uma geração confirmada por tentativa, com recuperação segura** — Em
-  execução · ≈80%. Falta: Completar combinações de falha e capacidade de
-  armazenamento. Responsável: Codex.
+- **Uma geração confirmada por tentativa, com recuperação segura** — Concluído
+  localmente · 100%. Falhas de assinatura, envio e confirmação preservam a
+  mesma intenção e impedem uma aprovação falsa.
 - **Diferenças documentais fiéis ao histórico, exibidas para consulta** —
   Concluído · 100%.
 - **Documentos completos, legíveis e acessíveis em todos os estados** — Em
@@ -434,24 +443,23 @@ permanecem separadas nos resultados DOC-A a DOC-D.
   execução · ≈80%. Falta: Completar todas as variações e conferir conteúdo e
   acessibilidade. Responsável: Codex.
 - **Pedidos distintos gerarem emissões distintas, mantendo cópias antigas** —
-  Em execução · ≈85%. Falta: Completar situações de uso simultâneo e falhas
-  restantes. Responsável: Codex.
+  Concluído localmente · 100%. Concorrência, retomada e acervo foram conferidos.
 - **Histórico de emissões com identidade e arquivo preservado** — Concluído ·
   100%.
 - **Gerar PDF em uma ação e recuperar o mesmo pedido nas quatro fichas** —
   Concluído · 100%.
 - **Preservar PDFs antigos sem assinatura criada retroativamente** — Concluído
   · 100%.
-- **Recuperar falhas antes e depois de assinar ou guardar o PDF** — Em execução
-  · ≈80%. Falta: Completar combinações restantes de falha e concorrência.
-  Responsável: Codex.
+- **Recuperar falhas antes e depois de assinar ou guardar o PDF** — Concluído
+  localmente · 100%. Inclui respostas perdidas após envio e confirmação e
+  retomada exclusiva de processamento abandonado.
 - **Verificar dados completos e recusar PDF vazio ou incompleto** — Em execução
   · ≈80%. Falta: Completar conferência independente de documentos longos e casos
   restantes. Responsável: Codex.
 
 #### 09 — Emissão, recuperação e falhas documentais
 
-Estado: em execução · 85%. Responsável: Codex.
+Estado: concluído localmente · 100%. Responsável: Codex.
 
 **Condição para fechar:** A mesma intenção recupera o mesmo exemplar; pedidos
 distintos geram emissões distintas; as falhas previstas deixam resultado
@@ -466,39 +474,44 @@ Pontos de verificação:
 - 09.5 Concorrência e abandono.
 - 09.6 Legado e retomada da emissão.
 
-**O que falta:** Concluir os casos restantes de falha, uso simultâneo,
-documentos antigos e recuperação da emissão.
+**Entregue:** falha do carimbo, interrupção após assinatura, respostas perdidas
+no envio e na confirmação, arquivo adulterado e retomada exclusiva de tarefa
+abandonada. A mesma emissão conserva o arquivo; versões antigas e pedidos
+distintos mantêm seus comportamentos já conferidos. CI e prova operacional
+permanecem nos gates próprios.
 
 #### Assinatura e verificação — critérios originais
 
-- **Separar identidade da emissão, assinatura e confiança do certificado** — Em
-  execução · ≈80%. Falta: Completar combinações de confiança, documentos antigos
-  e falhas. Responsável: Codex.
+- **Separar identidade da emissão, assinatura e confiança do certificado** —
+  Concluído localmente · 100%. Consulta, bytes, assinatura, tempo e confiança
+  têm resultados próprios.
 - **Assinar PDFs com certificado e carimbo de tempo internos** — Concluído ·
   100%.
-- **Preparar evolução futura para certificado ICP-Brasil** — Em execução ·
-  ≈80%. Falta: Completar tratamento de confiança, revogação e recuperação;
-  contratação futura separada. Responsável: Codex; futura contratação por você.
-- **Guardar e renovar chaves e tratar comprometimento** — Em execução · ≈70%.
-  Falta: Completar exercícios de troca, recuperação e incidente; definir
-  custódia operacional. Responsável: Codex; depois você.
+- **Preparar evolução futura para certificado ICP-Brasil** — Concluído
+  localmente · 100% na arquitetura prevista. Provedores, chaves, cadeia, tempo
+  e política estão separados. A contratação e os novos adaptadores externos
+  pertencem à evolução futura; a entrega atual usa certificado e TSA internos.
+- **Guardar e renovar chaves e tratar comprometimento** — Concluído
+  tecnicamente · 100% no software e no ensaio local. Rotação, renovação,
+  incidente e recuperação foram exercitados. Custódia operacional, destino
+  independente e responsáveis continuam para você nos gates da etapa 20.
 - **Verificar por QR Code e código digitável, sem expor dados privados** —
   Concluído · 100%.
 - **Verificar PDF enviado distinguindo integridade, assinatura e tempo** —
   Concluído · 100%.
-- **Recusar adulteração, QR copiado e emissão trocada** — Em execução · ≈80%.
-  Falta: Completar as combinações negativas e de documentos antigos.
-  Responsável: Codex.
-- **Explicar certificados conhecidos, desconhecidos e adulterados** — Em
-  execução · ≈80%. Falta: Completar variações de certificados, datas e
-  confiança. Responsável: Codex.
+- **Recusar adulteração, QR copiado e emissão trocada** — Concluído localmente
+  · 100% nos casos previstos, preservando a distinção do acervo legado.
+- **Explicar certificados conhecidos, desconhecidos e adulterados** — Concluído
+  localmente · 100%. Validade histórica e confiança atual são distintas;
+  incidentes não reescrevem a conferência registrada.
 
 #### 08 — Assinatura, certificados e ciclo das chaves
 
-Estado: em execução · 80%. Responsável: Codex.
+Estado: concluído localmente · 100%. Responsável: Codex.
 
-**Condição para fechar:** Assinar e verificar com os provedores internos e
-demonstrar troca/recuperação de chaves e preservação dos exemplares anteriores.
+**Condição de fechamento atendida:** assinar e verificar com os provedores
+internos e demonstrar troca/recuperação de chaves e preservação dos exemplares
+anteriores.
 
 Pontos de verificação:
 
@@ -508,12 +521,18 @@ Pontos de verificação:
 - 08.4 Incidente e comprometimento.
 - 08.5 Recuperação de custódia e exemplares antigos.
 
-**O que falta:** Completar os exercícios de troca, renovação, recuperação e
-incidente das chaves, mantendo os exemplares antigos.
+**Entregue:** renovação sob a mesma autoridade, rotação para outra, recusa da
+versão antiga com chaves novas e tratamento de comprometimento da assinatura,
+do carimbo e da raiz. A recuperação cifrada permite assinar e renovar com a
+autoridade restaurada; exemplares anteriores continuam preservados.
+
+**Limites:** o ensaio usou custódia efêmera protegida. Guarda operacional, chave
+independente mantida pelo responsável e exercício real continuam na etapa 20.
+As etapas 09/10 também fecharam localmente; a conferência conjunta segue em 19.
 
 #### 10 — Verificação por QR, código e arquivo
 
-Estado: em execução · 85%. Responsável: Codex.
+Estado: concluído localmente · 100%. Responsável: Codex.
 
 **Condição para fechar:** Originais, adulteração, QR copiado, outra emissão,
 certificado/token desconhecido ou inválido e limites de arquivo têm resultados
@@ -528,8 +547,10 @@ Pontos de verificação:
 - 10.5 Certificado, cadeia e carimbo de tempo.
 - 10.6 Resultado público e leitura acessível.
 
-**O que falta:** Concluir os casos restantes de integridade, confiança e
-acessibilidade da conferência documental.
+**Entregue:** QR e código, upload real, distinção de outra emissão, bytes
+adulterados ou acrescentados, legado, confiança e carimbo separados, limites
+do serviço e resultados públicos mínimos. A revisão com participantes,
+leitura assistiva e câmera física permanece externa.
 
 #### Anexos e arquivos enviados — critérios originais
 
@@ -686,7 +707,8 @@ própria das confirmações incertas.
 **Concluído localmente · 100% do acréscimo. Responsável: Codex.**
 Ficha, Ficha Ampliada e auditoria usam o pipeline real de assinatura e guarda.
 As amostras foram conferidas internamente; você ainda avalia aparência, uso e
-impressão. Isso não aprova automaticamente os critérios gerais de 08/09/10.
+impressão. Os critérios de 08/09/10 têm fechamento próprio no lote 3; os
+gates operacionais e humanos continuam separados.
 
 Integrar a nova composição ao gerador e à assinatura atuais. Preservar cópias
 antigas, recuperação e novo download dos mesmos bytes; nova emissão tem
@@ -1400,6 +1422,15 @@ As amostras são fictícias e usam a infraestrutura interna de teste. CI própri
 avaliação humana e requisitos gerais de confiança/recuperação continuam nos
 seus gates, sem promoção adicional dos 105 critérios.
 
+**12 de novembro — ciclo das chaves fechado localmente:** renovação, rotação,
+incidente e restauração cifrada com assinatura e renovação após recuperação.
+A etapa 08 e o critério de custódia fecharam no escopo local; a guarda
+operacional permanece externa.
+
+**12 de novembro — lote 3 fechado localmente:** recuperação da emissão,
+processamento abandonado, conferência dos bytes e confiança atual qualificados.
+As etapas 08/09/10 fecharam no escopo executável; a sequência passa ao lote 4.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1446,6 +1477,10 @@ rascunhos ou redefinir este fechamento como aprovação global da D-B.
   recebimento, autoria ou recuperar dados sem autorização.
 
 ### Lote 3 — Confiança, custódia e recuperação documental
+
+**Concluído localmente.** As etapas 08/09/10 estão qualificadas, com recuperação
+e resultados separados de identidade, bytes, assinatura, tempo e confiança.
+Os gates operacionais, humanos, físicos e de CI continuam explícitos.
 
 - **Resultado:** completar o ciclo das chaves, recuperação da emissão e
   conferência dos arquivos nas situações ainda pendentes.

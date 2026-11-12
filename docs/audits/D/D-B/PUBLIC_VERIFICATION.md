@@ -1,5 +1,21 @@
 # Verificação pública D4
 
+## Estado vigente — fechamento local de 10
+
+Ficha V16 e modalidades V17 usam a mesma verificação por QR, código e bytes.
+O upload real V17 foi qualificado no navegador do lote documental; os dezesseis
+casos de assinatura/verificação pública passaram no fechamento de custódia.
+A conferência de confiança no download, a expiração histórica e os incidentes
+de assinatura/TSA/raiz também foram exercitados. Os limites do HTTP conservam
+sua regressão própria. As provas anteriores de anonimato, orçamento nativo,
+QR copiado, outra emissão, legado e acessibilidade continuam aplicáveis, pois
+esses contratos não foram alterados. Não são contadas como novos percursos.
+
+A etapa 10 fecha no escopo local executável, distinguindo registro, coincidência
+dos bytes, assinatura, tempo e confiança. CI integral do SHA publicado, leitura
+assistiva com participantes, câmera física, confiança externa e liberação
+operacional continuam separadas. O acompanhamento principal conserva a fila.
+
 ## Jornadas e privacidade
 
 /verificar permite código digitável e upload sem conta. O QR V5 aponta para
@@ -72,15 +88,15 @@ depende de ativar Blob, serviços externos, processo residente ou outro deploy.
 canônico. A página distingue essa referência da nova conferência dos bytes.
 O digest de um PDF antigo registrado permite reconhecer o acervo legado; PDF
 sem assinatura incorporada continua sem assinatura. Nenhum byte antigo é
-assinado retroativamente. A migração dos consumidores que ainda geram V4 por
-GET e seus demais oráculos documentais continua pendente.
+assinado retroativamente. Os consumidores cotidianos usam V16 e as modalidades
+V17; as rotas de compatibilidade preservam os bytes anteriores.
 
 As RPCs de consulta mínima, legado e orçamento são exclusivas de service_role.
 Anon/authenticated não podem contornar a fachada limitada do HTTP. O worker
 continua sem EXECUTE para finalizar uma emissão pela sessão Auth. Índices por
-SHA atendem a consulta do acervo legado. Migrations138/139 foram aplicadas
-somente localmente, sem reset; remoto permanece no último estado
-reconciliado121.
+SHA atendem a consulta do acervo legado. A aplicação inicial de migrations
+138/139 foi local. O estado vigente local/remoto é 231, reconciliado no
+contrato de migrations; este fechamento não produz alteração de banco.
 
 No desenvolvimento, npm run dev, npm test, npm run build e o runner E2E geram
 o bundle. Alteração do núcleo/verificador exige reiniciar o processo de dev para
@@ -90,7 +106,9 @@ não equivale a execução observada na plataforma ou liberação operacional.
 
 ## Evidências e limites
 
-O [manifesto D4.3](D4_3_EVIDENCE.json) registra as coortes. Produção12/12 nos
+O [manifesto D4.3](D4_3_EVIDENCE.json) registra as coortes históricas. O termo
+produção dessas coortes indica build local de produção, sem deploy operacional.
+A rodada 12/12 nos
 três
 projetos cobre referência/código sem conta, resposta200 incompleta, outra
 emissão, upload coincidente em Chromium, excesso recusado no cliente, quatro

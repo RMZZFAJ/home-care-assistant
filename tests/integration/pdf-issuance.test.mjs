@@ -317,3 +317,23 @@ test("101 issuance intentions paginate stably across a new request and keep help
     "t",
   );
 });
+
+
+test("an abandoned expired worker lease is reclaimed once and refuses the old proof without a second intention", async () => {
+  const f = await fixture(), key = randomUUID(), before = business(f), reserved = await reserve(f, key);
+  const first = await rpc(service, "claim_pdf_issuance", { p_id: reserved.id });
+  // Controlled deadline on this synthetic issuance; no five-minute wall-clock sleep.
+  sql("update private.pdf_issuances set lease_until=clock_timestamp()-interval '1 second' where id=" + sqlLiteral(reserved.id) + ";");
+  const outcomes = await Promise.all([1, 2].map(() => service.rpc("claim_pdf_issuance", { p_id: reserved.id })));
+  const successful = outcomes.filter(result => !result.error), refused = outcomes.filter(result => result.error);
+  assert.equal(successful.length, 1); assert.equal(refused.length, 1); assert.equal(refused[0].error.code, "55P03");
+  const recovered = successful[0].data;
+  assert.notEqual(recovered.workerToken, first.workerToken);
+  assert.equal((await f.owner.rpc("pdf_issuance_stage", { p_id: reserved.id, p_token: first.workerToken, p_step: "signing", p_error: null })).error?.code, "42501");
+  await rpc(f.owner, "pdf_issuance_stage", { p_id: reserved.id, p_token: recovered.workerToken, p_step: "composing", p_error: null });
+  const repeated = await reserve(f, key);
+  assert.equal(repeated.id, reserved.id); assert.deepEqual(repeated.snapshot, reserved.snapshot);
+  assert.equal(sql("select attempts from private.pdf_issuances where id=" + sqlLiteral(reserved.id) + ";"), "2");
+  assert.equal(sql("select count(*) from private.pdf_issuances where document_id=" + sqlLiteral(f.doc.id) + ";"), "1");
+  assert.equal(business(f), before);
+});

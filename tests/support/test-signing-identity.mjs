@@ -7,7 +7,9 @@ import { spawnSync } from "node:child_process";
 import { P12Signer } from "@libpdf/core";
 
 /** Real ephemeral PKI. Private material never enters tracked fixtures or logs. */
-export async function testSigningIdentity() {
+/** @param {{ keyVersion?: string, authority?: { certificateFile: string, keyFile: string, passwordFile: string } }} [options] */
+export async function testSigningIdentity({ keyVersion = "ephemeral-test-v1", authority } = {}) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$/.test(keyVersion)) throw new Error("Invalid test key version");
   const folder = await mkdtemp(join(tmpdir(), "hca-signing-test-")),
     file = (name) => join(folder, name);
   const dispose = async () => {
@@ -59,7 +61,8 @@ export async function testSigningIdentity() {
       exportPass = "file:" + file("export-password");
     await writeFile(file("password"), password, { mode: 0o600 });
     await writeFile(file("export-password"), password, { mode: 0o600 });
-    run([
+    if (authority) await writeFile(file("root.crt"), await readFile(authority.certificateFile));
+    else run([
       "req",
       "-new",
       "-x509",
@@ -111,9 +114,9 @@ export async function testSigningIdentity() {
         "-CA",
         file("root.crt"),
         "-CAkey",
-        file("root.key"),
+        authority?.keyFile ?? file("root.key"),
         "-passin",
-        pass,
+        authority ? "file:" + authority.passwordFile : pass,
         "-CAcreateserial",
         "-out",
         file(name + ".crt"),
@@ -154,7 +157,7 @@ export async function testSigningIdentity() {
       file("runtime-secret.json"),
       JSON.stringify({
         environment: "local",
-        keyVersion: "ephemeral-test-v1",
+        keyVersion,
         signerP12: (await readFile(file("signer.p12"))).toString("base64"),
         signerPassword: password,
         timestampP12: (await readFile(file("tsa.p12"))).toString("base64"),
@@ -166,12 +169,12 @@ export async function testSigningIdentity() {
       file("trust.json"),
       JSON.stringify({
         environment: "local",
-        revision: "ephemeral-test-v1",
+        revision: keyVersion,
         roots: [{ pem: root, trust: "internal" }],
         revokedFingerprints: [],
         issuers: [
           {
-            keyVersion: "ephemeral-test-v1",
+            keyVersion,
             signerFingerprint: fingerprint(signer),
             timestampFingerprint: fingerprint(tsa),
           },
@@ -188,6 +191,7 @@ export async function testSigningIdentity() {
       privateKey: Buffer.from(pushKey.getPrivateKey("hex").padStart(64, "0"), "hex").toString("base64url"),
     }), { mode: 0o600 });
     return {
+      authority: { certificateFile: file("root.crt"), keyFile: authority?.keyFile ?? file("root.key"), passwordFile: authority?.passwordFile ?? file("password") },
       signer,
       tsa,
       root,

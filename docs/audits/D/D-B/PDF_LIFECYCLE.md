@@ -45,9 +45,38 @@ na fonte e no download, e as modalidades restritas são filtradas do acervo.
 Rascunhos comuns e sua apresentação não foram alterados.
 
 O lote 2 está concluído no escopo local executável. Amostras fictícias assinadas
-foram inspecionadas; revisão humana, impressão/aparelho, CI própria e os critérios
-gerais ainda parciais de custódia, limites e recuperação mantêm seus gates.
+foram inspecionadas; revisão humana, impressão/aparelho, CI própria e custódia
+operacional mantêm seus gates. Recuperação e verificação fecharam localmente
+no lote 3, descrito abaixo e no contrato de verificação pública.
 O andamento e a fila únicos estão no acompanhamento principal da raiz.
+
+## Recuperação da emissão — fechamento local de 09
+
+A intenção única e o caminho imutável existentes foram qualificados nos novos
+percursos de falha em tests/pdf-issuance-recovery.test.ts. Renderização,
+conferência de conteúdo, PAdES-B-T e verificação são reais; RPC e Storage têm
+faltas controladas nesse ensaio, sem atribuir a eles prova de autorização.
+
+Seis casos cobrem TSA indisponível, interrupção após assinar/antes de enviar,
+envio confirmado com resposta perdida, confirmação final com resposta perdida,
+bytes adulterados durante persistência incerta e revogação na hora do download.
+A recuperação conserva identidade e bytes já armazenados; não precisa da chave
+privada quando o objeto íntegro existe. Resultado incerto não produz ready,
+fallback sem carimbo, segundo envio ou segunda confirmação. O registro
+histórico mantém sua validação original, enquanto o download usa a política
+pública atual e pode recusar a entrega.
+
+O caso novo de tests/integration/pdf-issuance.test.mjs usa Auth real e um
+prazo vencido controlado somente na emissão fictícia. Duas retomadas concorrentes
+produzem um único novo lease; o token antigo é recusado, há uma intenção e
+duas tentativas, sem efeitos na ficha ou no estoque. test:db:prepare confirmou
+a stack local e aplicou pendências sem reset antes desse caso.
+
+As provas existentes de reserva concorrente, versões antigas, resposta perdida,
+permissões e acervo continuam aplicáveis ao mesmo contrato. Os novos percursos
+complementam os testes nativos e de navegador, sem substituir suas negativas
+com Auth real. Tipos e lint dirigidos passaram. CI do SHA publicado e revisão
+operacional/humana conservam gates próprios.
 
 ## Histórico — DOC-B.4
 
