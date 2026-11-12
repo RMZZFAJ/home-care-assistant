@@ -1,5 +1,5 @@
 "use client";
-import { ActionButton, ActionLink } from "@/components/ui/controls";
+import { ActionButton } from "@/components/ui/controls";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   api,
@@ -15,6 +15,8 @@ import {
 import { PermissionMatrix } from "./permission-matrix";
 import { NotificationMatrix } from "./notification-matrix";
 import { PolicyRules } from "./policy-rules";
+import { Icon, type IconName } from "@/components/ui/primitives";
+import "./administration.css";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { roles } from "./admin-fields";
@@ -117,7 +119,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
         }
       })
       .catch((reason) => {
-        if (!controller.signal.aborted) setError(reason.message);
+        if (!controller.signal.aborted) {
+          if (reason instanceof ApiError && [401, 403, 404].includes(reason.status)) setData(null);
+          setError(reason.message);
+        }
       });
     return () => controller.abort();
   }, [patientId, readAttempt, liveRevision]);
@@ -270,7 +275,15 @@ function Policies({ context }: { context: WorkspaceContext }) {
           />
         </Notice>
       ) : null}
-      <nav aria-label="Áreas da configuração" className="hca-configuration-tabs">{[["rules", "Regras"], ["permissions", "Permissões"], ["notifications", "Notificações"], ["people", "Pessoas e propostas"]].map(([area, label]) => { const query = new URLSearchParams(params.toString()); query.set("area", area); return <ActionLink key={area}  variant="quiet" className="hca-configuration-tab" href={"/configuracoes?" + query} aria-current={tab === area ? "page" : undefined} onClick={(event) => { if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) { event.preventDefault(); setTab(area); } }}>{label}</ActionLink>; })}</nav>
+      <nav aria-label="Áreas da configuração" className="hca-configuration-tabs hca-document-tab-list">{([
+        ["rules", "Regras", "settings"], ["permissions", "Permissões", "shield"],
+        ["notifications", "Notificações", "bell"], ["people", "Pessoas e propostas", "users"],
+      ] satisfies [string, string, IconName][]).map(([area, label, icon]) => {
+        const query = new URLSearchParams(params.toString()); query.set("area", area);
+        return <a key={area} className="hca-configuration-tab hca-document-tab" href={"/configuracoes?" + query} aria-current={tab === area ? "page" : undefined} onClick={(event) => {
+          if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) { event.preventDefault(); setTab(area); }
+        }}><Icon name={icon} />{label}</a>;
+      })}</nav>
       <div hidden={tab !== "rules"}>
         <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={recovery} error={error} message={message} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
       </div>

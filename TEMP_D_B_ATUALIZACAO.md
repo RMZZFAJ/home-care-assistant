@@ -75,11 +75,11 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
-| Outras áreas visuais | 12 composições e 171 relações a conferir |
+| Outras áreas visuais | 8 composições e 171 relações a conferir |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Administração, guias e aparência restante |
-| Incremento atual | Perfil em abas e abertura de operações durante atualização |
-| Resultado local | Perfil no Preview; correção do clique conferida localmente |
+| Incremento atual | Cadastro, regras, propostas e avisos administrativos |
+| Resultado local | Quatro composições administrativas conferidas localmente |
 | Banco | Local e remoto em 237, sem atualizações pendentes |
 | CI de e43961f | Chromium 1 reprovado; iOS cancelado; demais grupos passaram |
 | Preview de e43961f | Concluído na Vercel; produção preservada |
@@ -1234,7 +1234,7 @@ conferência conjunta local.
 
 #### 15 — Aparência das demais áreas e relações restantes
 
-Estado: em execução · 50%. Responsável: Codex.
+Estado: em execução · 60%. Responsável: Codex.
 
 **Condição para fechar:** O conjunto das etapas 6 e 15 cobre as 66 composições e
 171 relações, com funções preservadas e comparação individual com o Modelo
@@ -1242,15 +1242,24 @@ Integral.
 
 Pontos de verificação:
 
-- 15.1 Administração — ADM-01 e ADM-06 concluídos localmente; faltam ADM-02–05.
+- 15.1 Administração — ADM-01–04 e ADM-06 conferidos localmente; falta ADM-05.
 - 15.2 Identidade e acesso — ID-02 concluído localmente; faltam ID-01/03/04/05.
-- 15.3 Notificações — NOT-01/02/04 concluídos; faltam NOT-03/05.
+- 15.3 Notificações — NOT-01–04 conferidos; falta NOT-05.
 - 15.4 Guias — GUI-01 e GUI-03 concluídos localmente; preparação e suporte
   conservam suas composições restantes.
 - 15.5 Relações restantes e comparação nas cinco larguras.
 
-**O que falta:** Concluir as outras 12 composições: ID-01/03/04/05, NOT-03/05,
-ADM-02–05 e GUI-02/04, com suas relações restantes.
+**O que falta:** Concluir as outras oito composições: ID-01/03/04/05, NOT-05,
+ADM-05 e GUI-02/04. As 58 composições visuais conferidas não aprovam
+automaticamente as 171 relações entre controles e contratos. Implementações e
+verificações que essa conferência identificar continuam com Codex.
+
+**Entrega administrativa:** cadastro e atalhos autorizados, regras agrupadas,
+permissões e propostas usam a composição do modelo. A comparação conserva
+configuração vigente, proposta, versão, autoria e decisão distintas. Navegar,
+filtrar e comparar não aplica mudanças. Consultas malsucedidas de regras de
+avisos têm nova tentativa na seção; recusa de acesso retira dados antes
+exibidos. Confirmações incertas continuam usando sua recuperação própria.
 
 **Entrega do perfil e aparelhos:** as abas Meu perfil, Segurança, Avisos e
 aplicativo, Dispositivos e Ajuda conservam os campos ao navegar, voltar e
@@ -1335,9 +1344,10 @@ composições diárias da etapa 06.
 - **Faixa de atenção, próxima providência e status** — 65%. Já aplicado:
   Estrutura integrada a fatos operacionais. Falta: Concluir critérios de cada
   tarefa sem avisos simulados. Responsável: Codex.
-- **Administração, cadastros, perfil e guias** — 50%. Já aplicado: Base comum e
-  diversos controles migrados. Falta: Revisar todas as telas e diálogos dessas
-  áreas. Responsável: Codex.
+- **Administração, cadastros, perfil e guias** — 60%. Já aplicado: Perfil em
+  abas, cadastro, regras, permissões, propostas e guias locais conferidos.
+  Falta: Identidade/acesso, preparação global, suporte e relações restantes.
+  Responsável: Codex.
 - **Estoque, consumo, transferências e variantes de balanço** — 85%. Já
   aplicado: Saldos, trânsito, movimentos e relatos seguem o modelo; origem,
   correção familiar, preparação, revisão, recuperação e decisões continuam
@@ -1584,6 +1594,17 @@ quatro casos da CI anterior também passaram localmente antes da correção; iss
 não determina a causa de todos os cliques perdidos naquela execução. O Preview
 de 2fea104 concluiu; a CI da correção publicada continua obrigatória.
 
+**12 de novembro — administração e regras:** ADM-02/03/04 e NOT-03 tiveram
+fechamento visual local. Nove percursos distintos passaram em rodadas de
+produção compatíveis, preservando listas grandes, leitura recusada, tipos
+desconhecidos, versões e recuperação da mesma intenção. A navegação recebeu
+conferência final em Chrome móvel e WebKit após retirar uma herança visual de
+botão. Restam oito composições; 58 das 66 têm composição visual conferida.
+As 171 relações continuam pendentes de conferência própria, sem aprovação por
+esses resultados visuais. Não houve mudança de banco, canais ou rascunhos.
+Em b528f1d, Linux, Windows e Preview passaram; banco ainda estava em execução
+na observação. A CI do novo incremento continua obrigatória; Sonar está adiado.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1666,8 +1687,10 @@ um novo lote de funções nem impede as implementações independentes.
 ### Lote 5 — Jornadas restantes e aparência do aplicativo
 
 GUI-01, preparação local com adoção/abertura e contingência estão entregues.
-Seguem as 12 composições restantes de preparação, administração, identidade,
-avisos e suporte. As 171 relações mantêm sua conferência própria.
+Seguem as oito composições restantes de preparação, identidade, acesso e
+suporte: ID-01/03/04/05, GUI-02 e NOT-05/ADM-05/GUI-04. Identidade e preparação
+vêm a seguir; as três composições de suporte acompanham a integração técnica
+do lote 6. As 171 relações mantêm sua conferência própria no lote 5.
 
 - **Resultado:** demais áreas visuais, relações, entrada, administração e guias
   completos no Modelo Integral, sem perda de funções.

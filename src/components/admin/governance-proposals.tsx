@@ -1,5 +1,5 @@
 "use client";
-import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, FormField, SelectField, TextInput } from "@/components/ui/controls";
+import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, FormField, Pill, SelectField, TextInput } from "@/components/ui/controls";
 
 import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -58,10 +58,10 @@ export function GovernanceProposals({ context, directory, version, revision, bus
       {fresh && !data.changes.length ? <p>Nenhuma proposta corresponde aos filtros consultados.</p> : null}
       {data.changes.map(change => {
         const comparison = governanceComparison(change, directory);
-        return <article key={change.id} data-proposal-id={change.id} className="rounded-lg border border-(--line) p-3 space-y-3" aria-label={"Proposta " + change.id.slice(0, 8)}>
+        return <article key={change.id} data-proposal-id={change.id} className="ui-card hca-admin-card hca-governance-proposal space-y-3" aria-label={"Proposta " + change.id.slice(0, 8)}>
           <h3 className="font-semibold">{comparison.title}</h3>
           <p>Referência: <span className="break-all">{change.id}</span></p>
-          <p>{Object.hasOwn(governanceStatusLabels, change.status) ? governanceStatusLabels[change.status] : "Situação não reconhecida"} · por {change.proposerName} · {formatBrazilDate(change.created_at)}</p>
+          <p className="hca-proposal-state"><Pill tone={change.status === "applied" ? "success" : change.status === "rejected" ? "danger" : ["pending", "awaiting_acceptance"].includes(change.status) ? "warning" : "neutral"}>{Object.hasOwn(governanceStatusLabels, change.status) ? governanceStatusLabels[change.status] : "Situação não reconhecida"}</Pill><span>por {change.proposerName}</span><time dateTime={change.created_at}>{formatBrazilDate(change.created_at)}</time></p>
           <p>Versão de origem: {change.base_version}. Configuração vigente: {version}.</p>
           {change.base_version !== version && change.status === "pending" ? <Notice error>A configuração mudou após esta proposta. Preserve a proposta original e prepare outra após revisar a configuração vigente.</Notice> : null}
           <details><summary className="cursor-pointer font-semibold">Comparar configuração vigente e proposta</summary>

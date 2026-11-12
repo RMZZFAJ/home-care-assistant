@@ -14,11 +14,13 @@ export function PatientRegistration({
   creating,
   onToggle,
   handle,
+  destinations = [],
 }: {
   patient?: PatientContext;
   globalMode: boolean;
   creating: boolean;
   onToggle: () => void;
+  destinations?: { href: string; title: string }[];
   handle: (
     event: FormEvent<HTMLFormElement>,
     payload: (form: FormData) => Row,
@@ -26,13 +28,14 @@ export function PatientRegistration({
     refresh?: boolean,
   ) => void;
 }) {
-  if(globalMode&&(creating||!patient?.id))return <section className={panelClass}><h2 className="font-semibold">Preparar nova residência</h2><p className="my-3">O roteiro mantém a mesma preparação, administração inicial e tarefas delegadas, sem liberar produção.</p><Link className={primaryClass} href="/preparar-residencia">Preparar residência</Link>{patient?.id?<button type="button" className={buttonClass} onClick={onToggle}>Voltar ao paciente atual</button>:null}</section>;
+  if(globalMode&&(creating||!patient?.id))return <section className={`${panelClass} hca-admin-card`}><h2>Preparar nova residência</h2><p className="my-3">O roteiro reúne cadastro, administração inicial e tarefas de preparação. O início do atendimento exige a conferência das pessoas responsáveis.</p><Link className={primaryClass} href="/preparar-residencia">Preparar residência</Link>{patient?.id?<button type="button" className={buttonClass} onClick={onToggle}>Voltar ao paciente atual</button>:null}</section>;
   return (
-    <section className={panelClass}>
-      <h2 className="mb-4 text-lg font-semibold">Cadastro do paciente</h2>
+    <div className="hca-administration-grid">
+    <section className={`${panelClass} hca-admin-card`} aria-label="Cadastro do paciente">
+      <h2 className="mb-4">Cadastro do paciente</h2>
       <form
         key={creating ? "new" : (patient?.id ?? "none")}
-        className="grid gap-4 sm:grid-cols-2"
+        className="grid min-w-0 gap-4 min-[501px]:grid-cols-2"
         onSubmit={(event) =>
           handle(
             event,
@@ -106,5 +109,11 @@ export function PatientRegistration({
         </div>
       </form>
     </section>
+    {destinations.length ? <section className={`${panelClass} hca-admin-card`} aria-label="Acessos diretos do paciente">
+      <h2>Acessos diretos</h2>
+      <nav aria-label="Destinos autorizados do paciente" className="hca-admin-shortcuts">{destinations.map(destination => <Link key={destination.href} className={buttonClass} href={destination.href} prefetch={false}>{destination.title}</Link>)}</nav>
+      <p className="hca-field-hint mt-4">Os acessos usam seu perfil atual. Alterar o cadastro não confirma ciência, recebimento nem movimentação de materiais.</p>
+    </section> : null}
+    </div>
   );
 }

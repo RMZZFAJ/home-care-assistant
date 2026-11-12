@@ -24,12 +24,29 @@ A troca de aba conserva os campos e as confirmações em andamento, sem salvar
 automaticamente o preenchimento comum. Instalação, permissão de avisos,
 inscrição e entrega continuam sendo estados diferentes.
 
+## Administração e regras
+
 Um administrador global cria pacientes e configura os primeiros
-administradores locais. Alterações críticas exigem proposta e aprovação de
-outra identidade administradora do mesmo paciente. A administração de acesso
-da função Administrador é preservada; revogue o vínculo para remover a função.
+administradores locais. Na atuação global, mudanças da configuração de um
+paciente geram propostas para um administrador local distinto do proponente.
+No vínculo local, alterações autorizadas seguem a confirmação própria da ação;
+elas não exigem automaticamente outra proposta. A administração de acesso da
+função Administrador é preservada; revogue o vínculo para remover a função.
 Convites são compartilhados manualmente, não contêm credenciais e exigem
 aceite pela conta correspondente com e-mail confirmado.
+
+Administração → Paciente reúne o cadastro e os atalhos autorizados para pessoas,
+catálogo e alertas. Permissões, comunicação e regras separa Regras, Permissões,
+Notificações e Pessoas e propostas. As regras de BAL, ciência, comunicação e
+arquivamento têm edição contextual; documentos existentes conservam a política
+da emissão. Consultar ou comparar uma proposta não a aprova. A comparação
+mantém a proposta registrada e a configuração vigente distintas; uma proposta
+obsoleta exige revisar a configuração antes de preparar outra intenção.
+
+Uma consulta de regras de avisos malsucedida oferece nova consulta na própria
+seção e suspende alterações até confirmar os dados. Recusa de acesso retira a
+configuração antes exibida. Uma confirmação de alteração ainda incerta usa
+Recuperar mesma alteração; consultar a lista não substitui essa recuperação.
 
 ## Preparação local
 

@@ -36,6 +36,7 @@ import { GlobalAccounts } from "./global-accounts";
 import { AuditHistory } from "./audit-history";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { OperationsConsole } from "./operations-console";
+import "./administration.css";
 
 type Section =
   | "patient"
@@ -356,6 +357,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       <fieldset disabled={busy} hidden={readDenied} className="min-w-0 space-y-5">
         {section === "patient" && (
           <PatientRegistration
+            destinations={administrationAreas(context).filter(area => ["memberships", "catalog", "alerts"].includes(area.section)).map(area => ({ href: `/admin?section=${area.section}&careRecipientId=${patientId}`, title: area.title }))}
             patient={context.patient}
             globalMode={globalMode}
             creating={Boolean(editing)}
