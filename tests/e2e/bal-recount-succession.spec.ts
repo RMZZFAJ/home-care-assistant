@@ -252,6 +252,16 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     .getByRole("button", { name: "Confirmar revisão", exact: true })
     .click();
   await expect(review).toHaveCount(0);
+  const reviewedBeforeApplication = (
+    await (await page.request.get("/api/documents/" + f.document.id)).json()
+  ).data as SupplyDocument;
+  expect(reviewedBeforeApplication.status).toBe("submitted");
+  expect(reviewedBeforeApplication.balanceReview?.application?.state).toBe("not_applied");
+  expect(JSON.parse(recountState(f)).ledger).toEqual(before.ledger);
+  await page.getByRole("button", { name: "Aplicar contagem pelo grupo familiar", exact: true }).click();
+  const application = page.getByRole("dialog", { name: "Aplicar contagem ao estoque", exact: true });
+  await application.getByRole("button", { name: "Confirmar aplicação da contagem", exact: true }).click();
+  await expect(application).toHaveCount(0);
   const document = (
     await (await page.request.get("/api/documents/" + f.document.id)).json()
   ).data as SupplyDocument;

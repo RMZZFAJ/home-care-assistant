@@ -8,7 +8,7 @@ import { entTerminalFixture,terminalLedger } from "../integration/ent-terminal-f
 import { fixtures,rpc } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql,sqlLiteral } from "../../scripts/test-environment.mjs";
-import { generatedPdf } from "./generated-pdf";
+import { generatedPdf, CURRENT_PDF_REVISION } from "./generated-pdf";
 import { selectContext } from "./auth-context";
 test.setTimeout(180000);
 const root="output/pdf/phase-d/ent-terminal";
@@ -23,7 +23,7 @@ test.afterEach(({browserName},info)=>{
 async function login(page:Page,patient:string){
  await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures.family.email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);
 }
-async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,revision=10){
+async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,revision=CURRENT_PDF_REVISION){
  expect(response.status(),response.status()===200?label:(await response.text()).slice(0,100)).toBe(200);
  const bytes=await response.body(),pdf=await PDFDocument.load(bytes,{updateMetadata:false});
  const identity=JSON.parse(pdf.catalog.lookup(PDFName.of("HCAIssuance"),PDFHexString).decodeText());expect(identity.rendererRevision).toBe(revision);

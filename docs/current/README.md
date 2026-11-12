@@ -1,10 +1,11 @@
 # Contratos e orientação atuais
 
-**Direção visual posterior:**[Modelo Integral](../ui-ux/CANONICAL_MODEL.md).
+**Aparência vigente:**[Modelo Integral](../ui-ux/CANONICAL_MODEL.md).
 Fluent UI foi descartado como aparência. Contratos AS_IS continuam como prova
 funcional; não são aprovação da nova UI, das abas ou de Andamentos.
 
-AS_IS do candidato D-A na branch `feat/phase-d-implementation`, após a base
+Contratos implementados do candidato D-B na branch
+`feat/phase-d-implementation`, após a base
 integrada PR6 `8ec979a`. Auditorias A/B preservam a origem dos desvios.
 O [estado canônico](PROJECT_STATUS.md) identifica branch/SHA e limites. Não
 confundir requisito de integridade com garantia universal já demonstrada.
@@ -19,9 +20,15 @@ procedimentos, guardas e homologações necessárias.
   [continuidade](ROADMAP.md).
 
 REQ não pede quantidade; COM distingue previsão/chegada validada; ENT separa
-expedição/trânsito/aceite; BAL conta equipe e revisa versão. Ledger,
-autorização
-por paciente e história são preservados. Os dois P1 e as exceções C1 continuam
-abertos; guias não liberam produção. PWA/push, draft durável e verificador de
-exemplar são [projeto futuro C](../audits/C/README.md), não capacidades novas
-implementadas por esta reorganização.
+expedição/trânsito/aceite; BAL separa contagem, parecer e aplicação. Ledger,
+autorização por paciente, fatos emitidos e exemplares anteriores são
+preservados.
+PWA/Push, rascunhos duráveis, emissão assinada e verificador já têm
+implementação
+na D-B. O [acompanhamento principal](../../TEMP_D_B_ATUALIZACAO.md) distingue
+capacidade entregue e pendência. Planos C e auditorias anteriores conservam seu
+contexto histórico; não são a descrição atual de funcionalidades ausentes.
+
+O [complemento executivo](../audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt)
+congela a abrangência/apresentação dos rascunhos e adia DOC-C.1/expansão, sem
+adiar recuperação oficial, autorização, aparência aprovada ou demais requisitos.

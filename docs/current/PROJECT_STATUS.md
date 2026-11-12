@@ -1,10 +1,22 @@
-# Estado verificável do projeto
+# Estado do projeto e registros históricos
 
-Referência editorial:11/11/2026, America/Sao_Paulo. **Produção NO-GO.**
-**D-B (D3–D5) em execução; D-A (D0–D2) consolidada localmente.**
-CI do SHA publicado é gate independente; pending não significa aprovação.
+O [acompanhamento principal](../../TEMP_D_B_ATUALIZACAO.md) é a fonte do
+andamento da D-B: trabalho publicado/local, sequência, pendências e responsáveis.
+Os [contratos atuais](README.md) descrevem o implementado. A
+[matriz](../audits/D/D-B/ACCEPTANCE_EXECUTION.csv) detalha os critérios.
 
-## Incremento atual — DOC-B.4_COMPLEMENTS
+Produção NO-GO; branch feat/phase-d-implementation, PR #7 Draft. A D-A encerrou
+D0–D2 localmente; a D-B implementa D3–D5 e os complementos visuais/documentais.
+A liberação estável futura será 1.0.0, sem renumerar revisões internas.
+
+## Registros históricos preservados
+
+As entradas abaixo foram registradas em incrementos anteriores. Seus estados,
+percentuais, próximos passos e CI são datados; não constituem a fila vigente.
+Não será repetida aqui a narrativa de cada novo lote. A orientação posterior é o
+[complemento executivo](../audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt).
+
+## Incremento anterior — DOC-B.4_COMPLEMENTS
 
 Vinculação formal de novas fichas implementada e conferida no fluxo local.
 Mesmo paciente, emissão posterior, permissão nativa do emissor/administrador e

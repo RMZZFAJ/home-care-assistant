@@ -1,6 +1,7 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 11 de novembro de 2026. Inclui a refatoração visual da aplicação e
+Atualizado em 11 de novembro de 2026, após o complemento executivo. Inclui a
+refatoração visual da aplicação e
 o complemento aprovado de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
 
@@ -9,8 +10,9 @@ liberação para produção.
 - **Critérios:** são 105, sendo 75 originais e 30 complementos da Ordem Mestre.
   Há 57 com implementação e verificações locais concluídas e 48 parciais. Nenhum
   critério inteiro está sem início; algumas subtarefas estão em 0%.
-- **Etapas:** são os 20 blocos de trabalho do plano. Um critério pode depender
-  de várias etapas; concluir uma etapa não conclui automaticamente o critério.
+- **Etapas 01–20:** identificadores preservados para localizar os requisitos.
+  A execução restante está agrupada em seis capacidades na seção 6; as etapas
+  não são vinte filas independentes. Um critério pode atravessar vários lotes.
 - **Complemento documental:** DOC-A, DOC-B, DOC-C e DOC-D acrescentam quatro
   resultados. Seus percentuais medem somente esse acréscimo, preservando o
   escopo e os resultados anteriores.
@@ -44,14 +46,20 @@ encerrados; a seção 6 é a única ordem de execução do restante.
 
 Os números 01 a 20 e os nomes DOC-A a DOC-D são identificadores estáveis das
 etapas e dos acréscimos. Eles permitem comparar uma atualização com a seguinte.
-A ordem atual está na seção 6; DOC-A a DOC-D entram antes da retomada da etapa
-08, sem renumerar as etapas anteriores.
+A única ordem atual está na seção 6. DOC-D acompanha os dois primeiros lotes
+e DOC-B já entregue é reutilizado, sem quatro silos sequenciais.
 
 Os 105 critérios aparecem uma vez, nos grupos funcionais. O detalhamento de
 cada etapa, concluída ou pendente, também fica apenas no grupo da função
 correspondente: estado, pontos de entrega e condição de fechamento. O histórico
 resume os marcos; a sequência final indica somente a ordem atual e onde
 acompanhar cada etapa. Esses níveis medem escopos diferentes.
+
+Este arquivo é a fonte principal do andamento. README e índice orientam a
+navegação; contratos explicam o implementado; matriz detalha critérios;
+checkpoint conserva evidências históricas. Não é obrigatório repetir o mesmo
+relato em todos esses arquivos. O complemento executivo prevalece nos conflitos
+de método e rascunhos, preservando as demais decisões.
 
 Cada lote deve atualizar o ponto correspondente, registrando o que fechou e o
 que falta. Acréscimos de escopo devem ser identificados; não entram
@@ -66,25 +74,27 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
-| Complemento documental | DOC-B ≈90%; DOC-A, DOC-C e DOC-D em 0% do acréscimo |
-| Ponto em execução | DOC-B.4: cancelamento e complemento de fichas |
+| Complemento documental | DOC-B 100% local; DOC-A, DOC-C e DOC-D em 0% |
+| Próximo resultado utilizável | PDFs reais na composição aprovada |
+| Incremento pronto neste candidato | DOC-B.4 PDF V15; migration 224 remota |
+| CI observada cc8fad0 | Linux/Windows e banco passaram; navegador reprovou |
+| Preview observado cc8fad0 | Vercel concluiu; sem o fechamento local V15 |
 
-**Último ponto integral encerrado:** DOC-B.3, devolução autônoma cotidiana.
-**Último avanço encerrado dentro do ponto atual:** vínculos formais de novas
-fichas complementares, somados à ciência própria do cancelamento já entregue.
-DOC-B.4 continua parcial até concluir a representação estruturada nos PDFs.
+**Último ponto integral encerrado:** DOC-B.4, concluindo o bloco adicional
+DOC-B no fluxo atual. Os PDFs agora preservam cancelamento, ciências próprias
+e vínculos na versão escolhida, sem substituir fatos nem exemplares anteriores.
 
-**Próxima entrega:** representação estruturada do cancelamento, das ciências
-próprias e dos vínculos nos arquivos, preservando originais e ciências
-anteriores. O detalhamento único está em DOC-B.4, no grupo 3.3. A nova aparência
-dos PDFs segue em DOC-A, depois do fechamento de DOC-B.
+**Próxima entrega:** PDFs de REQ, COM, ENT, devolução e BAL na composição
+aprovada, já emitidos e assinados pelo sistema. As modalidades e Andamentos
+documentais seguem no segundo lote; a integração DOC-D ocorre em ambos. Não
+há dependência de reformular rascunhos para começar essa composição.
 
-**Banco e validações do último avanço registrado:** as três atualizações dos
-vínculos foram aplicadas no remoto, totalizando 223 atualizações reconciliadas
-com o local, sem pendências desse lote. Passaram dez cenários de autorização,
-quatorze verificações de contrato e nove percursos distintos nos três perfis
-de navegador. A validação automática do commit publicado e a revisão final da
-fase continuam separadas. Sonar permanece adiado por sua decisão.
+**Banco e validações do último lote:** a atualização da revisão documental foi
+aplicada no remoto, totalizando 224 atualizações reconciliadas com o local.
+Passaram oito cenários de autorização, dezesseis verificações de conteúdo e
+quatro percursos de geração assinada. As páginas renderizadas foram conferidas.
+A validação automática do commit publicado e a revisão final da fase continuam
+separadas. Sonar permanece adiado por sua decisão.
 
 ## 3. Funcionalidades e critérios
 
@@ -99,14 +109,12 @@ comparar edições e recuperar a mesma confirmação. Isso inclui as fichas,
 decisões REQ/COM/ENT/BAL, transferências, movimentação familiar, relatos e
 decisões de consumo, revisões de fluxo, agenda e Andamentos.
 
-A recuperação entre aparelhos continua em 90% no sistema inteiro. Os demais
-formulários de administração, perfil e combinações de edição ainda pertencem às
-pendências de Codex.
-
-A nova retomada simples está em DOC-C: um rascunho ativo por usuário, paciente e
-tipo, com Continuar ou Descartar e começar novo. Não será criada persistência
-para todo campo. Recuperar uma confirmação ainda incerta continua sendo parte do
-próprio processo, separada de um rascunho comum.
+A recuperação entre aparelhos tinha estimativa de 90% no escopo anterior. A
+expansão ainda não implementada e a simplificação dos painéis, inclusive
+DOC-C.1, estão **adiadas por decisão sua (OWNER-DEFERRED)** no complemento
+executivo. Os mecanismos existentes são preservados; a pendência não virou
+conclusão. Correções de defeitos, autorização, privacidade e recuperação de
+confirmações oficiais incertas continuam sob responsabilidade de Codex.
 
 #### 01 — Rascunhos das fichas e atos operacionais
 
@@ -157,8 +165,9 @@ consumo, revisões de fluxo, agenda e Andamentos.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
 - **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em execução
-  · ≈90%. Falta: Concluir a retomada em outros formulários de administração,
-  perfil e as combinações restantes de edição. As contagens preservam
+  · ≈90% no escopo anterior. Expansão em administração/perfil e simplificação
+  adiadas por você (OWNER-DEFERRED), sem PASS. Defeitos e recuperação oficial
+  continuam obrigatórios para Codex. As contagens preservam
   observações após mudanças de estoque, plantão ou ficha. As preparações
   privadas da agenda estão concluídas no escopo interno deste recurso. Revisões
   de fluxo, relatos e decisões de consumo, movimentação familiar, programação do
@@ -531,7 +540,7 @@ ordem de execução.
 
 ##### DOC-B — Fatos, saldos e atos específicos
 
-**Em execução · ≈90% do acréscimo. Responsável: Codex.**
+**Concluído localmente · 100% do acréscimo. Responsável: Codex.**
 
 **DOC-B.1 — BAL: concluído localmente no fluxo atual.** Parecer por material e
 aplicação ao estoque são atos separados. A aplicação tem confirmação, autoria e
@@ -540,7 +549,8 @@ movimentos. O PDF mostra o saldo daquela aplicação, com seu momento, ou Acesso
 restrito. Movimentos posteriores não substituem esse saldo. Os atos posteriores
 do mesmo material têm vínculo, autoria, momento, resultado e aplicação próprios
 na tela e no PDF. A contagem anterior é preservada; encaminhamento não é
-confundido com correção realizada. A nova aparência documental continua em DOC-A.
+confundido com correção realizada. A nova aparência documental continua em
+DOC-A.
 
 **DOC-B.2 — COM: concluído localmente no fluxo atual.** A ficha e o PDF mostram
 o saldo de cada material imediatamente após sua última entrada validada naquela
@@ -559,23 +569,29 @@ e mantém a diferença pendente. A ficha e o PDF identificam a devolução, seus
 responsáveis e a ausência de origem vinculada. Exemplares anteriores ficam
 preservados.
 
-**DOC-B.4 — Cancelamento e complemento: em execução.**
+**DOC-B.4 — Cancelamento e complemento: concluído localmente.**
 
 - **Parte entregue:** ciência própria do cancelamento, implementada e conferida
   no fluxo local, separada das ciências anteriores e sem alterar estoque.
-  Consulta, recuperação, autorização e uso nos três perfis de navegador passaram.
+  Consulta, recuperação, autorização e uso nos três perfis de navegador
+  passaram.
   O pedido interno continua disponível mesmo com avisos opcionais desligados.
 - **Parte entregue:** novas fichas emitidas pelos formulários habituais podem
   ser vinculadas formalmente, com motivo, autor e data próprios. As duas fichas
   preservam materiais, ciências e estoque. Consulta, permissões, tipos distintos
-  e recuperação da mesma tentativa foram conferidos nos três perfis de navegador.
-- **Falta:** concluir a representação estruturada do cancelamento, das ciências
-  próprias e dos vínculos nos PDFs, respeitando o corte da emissão e o acesso de
-  cada pessoa. Os originais e os exemplares anteriores devem permanecer
-  preservados. Responsável: Codex.
+  e recuperação da mesma tentativa foram conferidos nos três perfis de
+  navegador.
+- **Parte entregue:** os quatro tipos de ficha geram PDFs assinados com o ato
+  de cancelamento, as ciências próprias e as referências dos complementos até a
+  versão escolhida. Dados da outra ficha sem autorização não entram no arquivo.
+  Recuperação, cópia anterior, mesmos bytes e leitura restrita foram conferidos.
+  Os originais, as ciências anteriores e os saldos históricos permanecem
+  preservados. A nova aparência continua em DOC-A.
 
-As partes entregues não concluem DOC-B.4. A estimativa de DOC-B passou de
-≈75% para ≈90% por esse avanço; os critérios originais não mudaram de estado.
+DOC-B.4 fecha o bloco adicional DOC-B em 100% local. Esse percentual pertence
+somente aos fatos e atos desse acréscimo; a fase D-B e os demais blocos
+continuam
+em execução, sem mudança dos estados dos critérios originais.
 
 **Condição para fechar DOC-B:** os quatro pontos funcionam no uso cotidiano,
 com seus fatos preservados na ficha e no PDF, respeitando as permissões. Não
@@ -612,13 +628,14 @@ com marca nominativa. Andamentos terão menções a pessoas, referências e
 destaques comuns à tela e ao PDF, mantendo a cronologia. Acessos repetidos serão
 agrupados em janelas iniciais de 20 minutos.
 
-Rascunhos comuns terão um ativo por usuário, paciente e tipo, com diálogo
-Continuar ou Descartar e começar novo. Não haverá rascunho para todo campo.
-Confirmações incertas continuarão recuperáveis no próprio processo.
+DOC-C.1 foi **adiado expressamente por você** no complemento executivo. Não
+serão simplificados nem ampliados os rascunhos existentes nesta D-B. O restante
+deste resultado continua obrigatório, assim como recuperar confirmações
+oficiais incertas.
 
 Pontos de entrega:
 
-- DOC-C.1 Retomada simples de rascunhos comuns.
+- DOC-C.1 Retomada simples de rascunhos comuns — OWNER-DEFERRED; sem PASS.
 - DOC-C.2 Andamentos com menções, referências e destaques.
 - DOC-C.3 Acessos repetidos agrupados em janelas de 20 minutos.
 - DOC-C.4 Ficha completa e Ficha Ampliada com período e complementos.
@@ -647,9 +664,10 @@ Pontos de entrega:
 **Condição para fechar:** o complemento está integrado ao gerador em uso, com
 exemplos conferidos e limites da avaliação humana identificados.
 
-As dependências de devolução, revisão BAL, Andamentos, acessos e retomada
-simples pertencem a esse mesmo complemento. Sua avaliação das amostras e os
-testes com pessoas continuam separados das implementações de Codex.
+As dependências de devolução, revisão BAL, Andamentos e acessos pertencem a
+esse complemento. Rascunhos ficam congelados pela decisão posterior. Sua
+avaliação das amostras e os testes com pessoas continuam separados das
+implementações de Codex.
 
 ### 3.4 Navegação, listas e mensagens
 
@@ -779,13 +797,17 @@ concluído; outras combinações de acesso e recuperação continuam pendentes.
 - **Separar administração global, paciente e perfil pessoal** — Concluído ·
   100%.
 
-#### 14 — Retomada dos formulários restantes
+#### 14 — Formulários restantes e recuperação oficial
 
-Estado: a iniciar neste escopo · 0%. Responsável: Codex.
+**Expansão e simplificação de rascunhos: OWNER-DEFERRED por sua decisão.**
+A estimativa anterior de 0% não significa aprovação ou cancelamento do
+requisito.
+Defeitos, privacidade, autorização e recuperação oficial continuam com Codex.
 
-**Condição para fechar:** Conferir os nove grupos; quando houver rascunho comum,
-manter um ativo por usuário, paciente e tipo, com diálogo Continuar/Descartar.
-Preservar a recuperação das confirmações incertas.
+**Condição do escopo executável:** os fluxos existentes dos nove grupos abaixo
+continuam íntegros e suas confirmações incertas são recuperáveis. Somente o
+fechamento mínimo de uma conexão parcial é permitido; nenhum novo subsistema
+de rascunho ou eliminação de dados existentes.
 
 Pontos de verificação:
 
@@ -799,9 +821,9 @@ Pontos de verificação:
 - 14.8 Preferência de ciência.
 - 14.9 Políticas de suporte.
 
-Conferir retomada somente onde necessária, sem rascunho para todo campo.
-Isso não desfaz os editores específicos já concluídos na administração diária;
-os campos comuns e as confirmações incertas conservam sua recuperação própria.
+Os nove grupos identificam consumidores existentes a preservar. Não são uma
+lista de locais onde acrescentar persistência. Os editores específicos já
+concluídos são preservados, com sua apresentação e recuperação atuais.
 
 #### Entrada e orientação — critérios originais
 
@@ -1087,8 +1109,8 @@ conferência conjunta local.
 
 - **06.5 — Arquivos, resumos e seções documentais.** As nove composições
   preservam versões, exemplares, anexos, consultas, recuperação e comparações. O
-  novo diálogo de abandono tem retorno seguro; as novas regras de retomada
-  simples continuam no complemento DOC-C.
+  novo diálogo de abandono tem retorno seguro; a reformulação adicional da
+  retomada foi adiada no complemento executivo.
 
 - **06.6 — Conferência conjunta local.** Incluiu larguras, textos longos,
   teclado, foco e formas de leitura. O grupo mantém suas 46 composições
@@ -1288,15 +1310,20 @@ anteriores. Sua situação e todas as regras estão reunidas no grupo 3.3.
 | DOC-B.3 — devolução | Percurso autônomo cotidiano | Concluído local |
 | DOC-B.4 — parte entregue | Ciência própria do cancelamento | Concluído local |
 | DOC-B.4 — parte entregue | Novas fichas vinculadas | Concluído local |
+| DOC-B.4 — fechamento | PDFs com corte e acesso | Concluído local |
+| DOC-B — fechamento | Quatro pontos do acréscimo | Concluído local |
 
 A validação automática de um incremento anterior encontrou dois testes antigos
 de reconto incompatíveis com a aplicação separada do parecer. Foram corrigidos
 e passaram localmente; a confirmação do commit publicado continua sendo uma
 verificação própria. Esse registro histórico não aprova o candidato atual.
 
-DOC-B continua parcial. Novos formulários seguem na etapa 14 e a retomada
-simples segue em DOC-C. Esses acréscimos não reabrem silenciosamente etapas
-anteriores. A etapa 07 continua encerrada somente em seu escopo anterior.
+DOC-B passou de ≈75% para ≈90% com os vínculos e chegou a 100% local com o
+PDF estruturado, em 11/11/2026. Os 105 estados originais foram preservados.
+O complemento executivo posterior adiou a expansão de rascunhos da etapa 14
+e a retomada simples DOC-C.1. Esse adiamento não reabre etapas anteriores
+nem dispensa os demais requisitos. A etapa 07 continua encerrada somente em seu
+escopo anterior.
 
 **Revisão deste acompanhamento em 11/11/2026:** o detalhamento das etapas
 01 a 20 e de DOC-A a DOC-D ficou reunido nos respectivos grupos funcionais ou
@@ -1306,49 +1333,105 @@ do grupo onde acompanhar cada entrega. Foram consolidadas as descrições
 repetidas e alinhadas as referências históricas aos avanços posteriores. Os
 105 critérios, seus estados, percentuais e responsabilidades foram preservados.
 
+**Reconciliação pelo complemento executivo:** uma fonte principal de andamento,
+seis lotes por capacidade e integração DOC-D em cada resultado documental.
+DOC-C.1 e expansão de rascunhos foram adiadas por decisão do responsável;
+segurança, recuperação oficial e os demais requisitos permanecem obrigatórios.
+O fechamento PDF V15 e os 14 consumidores dirigidos passaram localmente;
+publicação/CI/Preview continuam identificados pelo candidato correspondente.
+
 ## 6. Sequência única do trabalho restante
 
-A prioridade continua sendo a operação diária. O complemento documental entra
-nos blocos 07/09/10 e em suas dependências diretas. Mantêm-se as 20 etapas, os
-105 critérios, as 66 composições e as 171 relações; DOC-A a DOC-D são os
-acréscimos identificados, sem substituir os resultados anteriores.
+Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
+entrega uma capacidade utilizável e atravessa as camadas necessárias. Os IDs
+01–20 e DOC-A/B/C/D continuam nos grupos acima e na matriz dos 105 critérios;
+não foram renumerados ou aprovados em bloco. Os percentuais anteriores são
+referências de escopo, não serão recalculados para cada pequena edição.
 
-Esta tabela é a única fila de execução. O detalhamento e a condição de
-fechamento de cada etapa ficam somente no grupo indicado. As etapas 01 a 07 já
-encerradas estão no histórico e nos grupos funcionais; não voltam para a fila
-por causa de um acréscimo posterior.
+### Lote 1 — PDFs reais com a aparência aprovada
 
-| Ordem | Etapa ou resultado | Situação | Grupo |
-| --- | --- | --- | --- |
-| 1 — agora | DOC-B — concluir DOC-B.4 | Em execução · ≈90% | 3.3 |
-| 2 | DOC-A — aparência dos documentos | A iniciar · 0% | 3.3 |
-| 3 | DOC-C — Andamentos e consulta | A iniciar · 0% | 3.3 |
-| 4 | DOC-D — geração integrada e exemplos | A iniciar · 0% | 3.3 |
-| 5 | 08 — Assinatura e chaves | Em execução · 80% | 3.3 |
-| 6 | 09 — Emissão e recuperação de PDFs | Em execução · 85% | 3.3 |
-| 7 | 10 — Verificação por QR, código e arquivo | Em execução · 85% | 3.3 |
-| 8 | 11 — Aplicativo, atualização e offline | Em execução · 80% | 3.6 |
-| 9 | 12 — Notificações internas e Push | Em execução · 80% | 3.6 |
-| 10 | 13 — Lembretes e retorno após parada | Em execução · 75% | 3.6 |
-| 11 | 14 — Retomada dos formulários restantes | A iniciar · 0% | 3.5 |
-| 12 | 15 — Demais áreas visuais e relações | Em execução · 50% | 3.9 |
-| 13 | 16 — Entrada, guias e primeira residência | Em execução · 70% | 3.5 |
-| 14 | 17 — Monitoramento e suporte | Em execução · 85% | 3.7 |
-| 15 | 18 — Backup e recuperação | Em execução · 75% | 3.7 |
-| 16 | 19 — Validação final, banco e encerramento | Em execução · 50% | 3.8 |
-| Externa | 20 — Participação e gates D-C/D6 | Pendente externo · 0% | 4 |
+- **Resultado:** gerar REQ, COM, ENT, devolução e BAL na composição aprovada,
+  com seus dados reais, assinatura, guarda, consulta e recuperação atuais.
+- **Requisitos:** DOC-A.1–6 e DOC-D.1–4; conteúdo já entregue em 07/DOC-B;
+  regressões diretamente afetadas de 09/10. Critérios detalhados no grupo 3.3.
+- **Dependências:** compositor compartilhado, fontes e fatos já disponíveis.
+  Modalidades DOC-C e rascunhos não bloqueiam este lote. Uma amostra real será
+  gerada cedo para conferir a direção visual.
+- **Limites:** preservar bytes, identidades, fontes e revisões anteriores;
+  nenhum redesenho do aplicativo ou alteração de confiança criptográfica.
+- **Validação e fechamento:** conteúdo e paginação representativos, inspeção
+  dos PDFs reais e percurso integrado assinado. Fecha quando todos os cinco
+  modelos usam a composição aprovada com os fatos e permissões preservados.
 
-Os percentuais pertencem aos escopos definidos nos grupos; a ordem da tabela
-indica a prioridade atual, enquanto a identificação de cada etapa permanece
-estável. Os pontos de uma etapa parcial não são todos novos nem todos
-concluídos: só há conclusão individual quando ela está expressamente registrada.
-Não foram criados percentuais para subtarefas sem estimativa própria.
+### Lote 2 — Modalidades e acompanhamento documental
 
-A etapa 20 reúne atividades externas que podem ser preparadas quando
-independentes e autorizadas. Elas não transferem para você implementações ainda
-pendentes de Codex.
+- **Resultado:** Ficha, Ficha Ampliada e auditoria restrita nominativa, com
+  seleção/período, Andamentos estruturados, referências, menções e acessos
+  agrupados; geração e consulta reais nas modalidades autorizadas.
+- **Requisitos:** DOC-C.2–5, DOC-D distribuído e relações documentais do grupo
+  3.3. DOC-C.1 permanece OWNER-DEFERRED, sem PASS.
+- **Dependências:** composição do lote 1 e autorização atual das fontes;
+  cancelamento, complementos, BAL, COM e devolução já entregues são
+  reutilizados.
+- **Validação e fechamento:** domínio/API/Auth nos novos fatos e permissões;
+  conteúdo e navegador representativos no candidato estável. Fecha quando as
+  modalidades e o acompanhamento funcionam juntos sem substituir ciência,
+  recebimento, autoria ou recuperar dados sem autorização.
 
-A D-B somente termina quando as etapas executáveis 01 a 19 e o complemento
-documental estiverem entregues e as pendências externas da etapa 20 estiverem
-identificadas corretamente. A liberação real permanece com os responsáveis e os
-próximos gates de D-C/D6.
+### Lote 3 — Confiança, custódia e recuperação documental
+
+- **Resultado:** completar o ciclo das chaves, recuperação da emissão e
+  conferência dos arquivos nas situações ainda pendentes.
+- **Requisitos:** restante de 08/09/10, critérios do grupo 3.3.
+- **Dependências e limites:** provedores internos e exemplares atuais;
+contratação
+  ICP-Brasil e custódia operacional externa são gates separados.
+- **Validação e fechamento:** regressões criptográficas, falhas e concorrência
+  realmente pendentes; não repetir o que os lotes 1/2 já cobrirem de forma
+  compatível. Fecha com recuperação e resultados corretos nos casos previstos.
+
+### Lote 4 — Aplicativo, avisos e lembretes
+
+- **Resultado:** instalação/atualização, uso protegido no Preview, notificações
+  internas/Push e retorno dos lembretes após parada completos no software.
+- **Requisitos:** 11/12/13, grupo 3.6.
+- **Dependências e limites:** service worker pronto e inscrições autorizadas;
+  envio externo e ensaios físicos dependem dos gates expressos, sem ativação
+  nova.
+- **Validação e fechamento:** offline sem cache privado/replay, recuperação,
+  atualização e destinatários em cenários representativos. Separa conclusão do
+  software dos testes físicos e de fornecedor ainda não realizados.
+
+### Lote 5 — Jornadas restantes e aparência do aplicativo
+
+- **Resultado:** demais áreas visuais, relações, entrada, administração e guias
+  completos no Modelo Integral, sem perda de funções.
+- **Requisitos:** 15/16 e somente a parcela obrigatória de 14; grupos
+3.4/3.5/3.9.
+- **Dependências e limites:** funções e permissões já existentes; rascunhos
+  congelados. Sem ERP, outro produto ou gestão integral de escalas.
+- **Validação e fechamento:** componentes e jornadas afetados, teclado/foco,
+  acessibilidade e larguras nos candidatos estáveis. Fecha as composições e
+  relações restantes, com orientação operacional coerente.
+
+### Lote 6 — Continuidade operacional e fechamento técnico
+
+- **Resultado:** monitoramento/suporte, backup/recuperação e candidato final
+  coerentes com banco, Preview, contratos e configuração de uso.
+- **Requisitos:** 17/18/19; grupos 3.7/3.8 e regressão integrada restante.
+- **Dependências e limites:** software dos lotes anteriores e serviços internos;
+  destino/rotina externos e liberação operacional continuam separados.
+- **Validação e fechamento:** exercícios de falha/recuperação previstos, CI do
+  SHA final e migrations prontas reconciliadas. Sem reset, merge ou produção.
+
+### Gates externos e adiamentos
+
+A etapa 20 (grupo 4) conserva avaliação humana, aparelho físico e fornecedores.
+SonarCloud e a reformulação/expansão de rascunhos estão adiados expressamente
+pelo responsável. Nenhum recebe PASS por adiamento. As responsabilidades de
+implementação continuam com Codex; dependência externa não encobre código
+faltante.
+
+Concluído tecnicamente, validação pendente, avaliação humana, bloqueio externo e
+OWNER-DEFERRED são estados distintos. A D-B executável fecha somente com os
+requisitos vigentes implementados e integrados, ressalvados esses gates reais.

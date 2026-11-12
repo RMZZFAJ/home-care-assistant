@@ -1,6 +1,16 @@
-# Checkpoint D-B
+# Checkpoint histórico D-B
 
-## Incremento atual — DOC-B.4_COMPLEMENTS
+O [acompanhamento principal](../../../../TEMP_D_B_ATUALIZACAO.md) concentra o
+andamento vigente. Este arquivo conserva os registros datados de implementação
+e validação; seus próximos passos antigos não são a sequência atual. A
+[matriz](ACCEPTANCE_EXECUTION.csv) detalha critérios e as evidências técnicas
+mantêm seus resultados próprios. Não há obrigação de repetir aqui cada lote.
+
+O fechamento local DOC-B.4 PDF está em [PDF_LIFECYCLE.md](PDF_LIFECYCLE.md).
+O [complemento executivo](OWNER_EXECUTION_SUPPLEMENT.txt) prevalece nos conflitos
+de método e rascunhos, preservando os demais requisitos e o histórico abaixo.
+
+## Incremento anterior — DOC-B.4_COMPLEMENTS
 
 Vinculação formal de novas fichas implementada e conferida no fluxo local.
 Mesmo paciente, emissão posterior, permissão nativa do emissor/administrador e

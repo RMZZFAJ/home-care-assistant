@@ -24,6 +24,8 @@ import { balanceApplicationFacts } from "@/lib/validation/balance-application";
 import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
 import { requirePurchaseEntryBalances, type PurchaseEntryBalances } from "@/lib/validation/purchase-entry-balances";
 
+import { requirePdfLifecycleFacts, type PdfLifecycleFacts } from "@/lib/documents/pdf-lifecycle";
+
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
 export type PdfContentPlan = {
   bytes: Buffer;
@@ -96,6 +98,11 @@ export async function composeIssuance(
       });
     } catch { throw invalid("purchase-entry-balances-source"); }
   }
+  let lifecycle: PdfLifecycleFacts | undefined;
+  if (revision >= 15) {
+    try { lifecycle = requirePdfLifecycleFacts(snapshot.lifecycleFacts, snapshot); }
+    catch { throw invalid("lifecycle-source-or-cutoff"); }
+  }
   let bytes: Buffer;
   try {
     bytes = await renderDocumentPdf(snapshot, sourceHash, {
@@ -155,6 +162,28 @@ export async function composeIssuance(
     ]),
   ];
   const semanticFacts: Record<string, string> = {};
+  if (lifecycle) {
+    const c = lifecycle.cancellation;
+    semanticFacts["fidelity/lifecycle/cancellation/state"] = c.state === "not_cancelled" ? "Sem cancelamento nesta versão." : c.state === "unavailable" ? "Cancelamento indicado; ato original não preservado. Nenhuma ciência presumida." : "Cancelamento registrado em ato próprio.";
+    if (c.state === "recorded") {
+      semanticFacts["fidelity/lifecycle/cancellation/act"] = c.act.id + " · versão " + c.act.version;
+      semanticFacts["fidelity/lifecycle/cancellation/actor"] = (c.act.actorName ?? "Nome não preservado") + " · " + (c.act.actorId ?? "Identidade não preservada") + " · " + formatBrazilDate(c.act.recordedAt);
+      semanticFacts["fidelity/lifecycle/cancellation/reason"] = c.act.reason ?? "Motivo não preservado";
+      semanticFacts["fidelity/lifecycle/cancellation/awareness"] = c.acknowledgements.length ? c.acknowledgements.length + " ciência(s) pessoal(is) registrada(s) até esta versão." : "Nenhuma ciência deste cancelamento registrada até esta versão.";
+      for (const a of c.acknowledgements) semanticFacts["fidelity/lifecycle/cancellation/ack/" + a.id] = (a.actorName ?? "Nome não preservado") + " · " + (a.actorId ?? "Identidade não preservada") + " · " + formatBrazilDate(a.recordedAt) + " · versão " + a.version;
+    }
+    if (!lifecycle.complements.length) semanticFacts["fidelity/lifecycle/complements/empty"] = "Nenhuma ficha complementar vinculada até esta versão.";
+    for (const l of lifecycle.complements) {
+      const prefix = "fidelity/lifecycle/complement/" + l.id;
+      semanticFacts[prefix + "/role"] = (l.role === "source" ? "Esta ficha complementa outra ficha." : "Outra ficha complementa esta ficha.") + " Vínculo registrado na versão " + l.version + ".";
+      if (!l.accessible) { semanticFacts[prefix + "/restricted"] = "Acesso restrito"; continue; }
+      const d = l.document;
+      semanticFacts[prefix + "/reference"] = d.code + " · " + d.type + " · versão " + d.version + " · " + d.protocol;
+      semanticFacts[prefix + "/hash"] = d.id + " · " + d.hash;
+      semanticFacts[prefix + "/actor"] = (l.actorName ?? "Nome não preservado") + " · " + (l.actorId ?? "Identidade não preservada") + " · " + formatBrazilDate(l.recordedAt);
+      semanticFacts[prefix + "/reason"] = l.reason;
+    }
+  }
   if (revision >= 14 && snapshot.type === "ENT") {
     const direction = materialTransferDirection(String(snapshot.payload.source ?? ""), String(snapshot.payload.destination ?? ""));
     semanticFacts["fidelity/transfer/nature"] = direction === "return" ? "Devolução de materiais" : direction === "delivery" ? "Entrega de materiais" : "Movimentação de materiais · percurso não preservado";

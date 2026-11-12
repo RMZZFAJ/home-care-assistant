@@ -120,7 +120,7 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials retain 
       }
       await expect(table.getByText(names[0], { exact: true })).toBeVisible();
       await expect(table.getByText(names[1], { exact: true })).toBeVisible();
-      await expect(table.locator("tbody td")).toHaveCount(type === "REQ" ? 8 : 18);
+      await expect(table.locator("tbody td")).toHaveCount(type === "REQ" ? 8 : 20);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await auditFromTop(page, `canonical ${type} materials ${width}`);
       if (width === 320) {

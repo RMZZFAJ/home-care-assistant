@@ -3,7 +3,28 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — DOC-B.4_COMPLEMENTS
+## Estado atual — DOC-B.4_PDF
+
+Local e remoto 224, sem pendências. Migration 20261112014602: reserva V15,
+congelamento de cancelamento/ciências/vínculos no corte e guarda de leitura de
+referências conhecidas. Preserva campos BAL/COM/ENT e intenções anteriores.
+
+Preflight confirmou223 versões e quatro dependências iguais ao local. Oito
+Auth, 16 verificações unitárias/PDF, quatro percursos com assinatura e inspeção
+das páginas precederam a aplicação linked/skip-vault. Após aplicar, 224 versões,
+oito definições/configurações/grants e sete triggers coincidem normalizando
+somente CRLF. Dry-run vazio. Reserva V15 somente authenticated; auxiliares,
+anon e service fechados. Sem tabela/índice novo;84 históricas preservadas.
+Sem reset, Auth/fixtures remotos, produção, transporte ou backup redundante.
+
+Advisors: Auth definer 219→220, a RPC intencional com negativas reais. Demais
+classes preservadas: 64 INFO sem política, extensão 1 WARN, anon 3 WARN,
+senhas 1 WARN;
+performance 124 FKs sem índice, 11 initplan e 68 índices sem uso. Os alertas antigos
+não recebem aprovação genérica. [Resultados e orientação](PDF_LIFECYCLE.md).
+CI própria, instalação limpa, legado e integração completa continuam gates.
+
+## Fechamento anterior — DOC-B.4_COMPLEMENTS
 
 Local e remoto223,sem pendências. As migrations20261112005024,20261112005608 e
 20261112010620 acrescentam relação privada imutável,quatro RPCs autenticadas,

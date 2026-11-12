@@ -1,5 +1,13 @@
 # Complemento documental da D-B
 
+**Precedência posterior:** o
+[complemento executivo](../audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt) substitui
+as orientações conflitantes de método e rascunhos. DOC-C.1 e expansão ainda
+não implementada ficam OWNER-DEFERRED; demais requisitos documentais e a
+aparência aprovada permanecem. A fila atual é o
+[acompanhamento principal](../../TEMP_D_B_ATUALIZACAO.md). O comando original
+abaixo é preservado com seu contexto e demais decisões.
+
 Complemento da missão em andamento — fichas e documentos do Home Care Assistant
 
 ## 1. Natureza desta mensagem: acréscimo, não reinício

@@ -71,3 +71,15 @@ it("V14 does not infer family or team custody from a missing historical route", 
   expect(plan.semanticFacts!["fidelity/transfer/route"]).toBe("Percurso não preservado neste registro");
   expect(plan.runs.filter(run => run.text === "Custódia não preservada")).toHaveLength(2);
 }, 30000);
+
+it("V15 preserves the autonomous return route, authorship and pending receipt while adding lifecycle facts", async () => {
+ const snapshot = source();
+ snapshot.lifecycleFacts = { schemaVersion: 1, documentId: snapshot.id, version: snapshot.version, cancellation: { state: "not_cancelled", act: null, acknowledgements: [] }, complements: [] };
+ const plan = await composeIssuance(snapshot, "a".repeat(64), { ...emission, rendererRevision: 15 });
+ expect((await validateIssuanceContent(plan.bytes, plan)).passed).toBe(true);
+ expect((await PDFDocument.load(plan.bytes)).getTitle()).toContain("Devolução de materiais");
+ expect(plan.semanticFacts!["fidelity/transfer/route"]).toBe("Equipe para Família");
+ expect(plan.semanticFacts!["fidelity/transfer/origin"]).toBe("Sem entrega de origem vinculada a esta devolução.");
+ expect(plan.semanticFacts!["fidelity/ent/receipt-state"]).toContain("Nenhum aceite é presumido");
+ expect(plan.semanticFacts!["fidelity/lifecycle/cancellation/state"]).toBe("Sem cancelamento nesta versão.");
+}, 30000);

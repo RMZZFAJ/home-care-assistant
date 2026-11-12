@@ -93,6 +93,17 @@ Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
 em [C](../audits/C/README.md); decisões aprovadas não equivalem a
 implementação.
 
+## Emissão V15 — cancelamento e complementos
+
+A emissão corrente congela cancelamento, ciências próprias e vínculos até a
+versão solicitada. Referências autorizadas preservam código, protocolo,
+versão/hash, motivo, autor e instante do vínculo. Sem leitura do documento
+relacionado, a representação é restrita e não transporta esses dados. A guarda
+comum revalida essa leitura ao recuperar, concluir ou baixar uma cópia conhecida.
+As intenções antigas mantêm revisão e fonte; download não reemite o arquivo.
+Campos COM, BAL, devoluções, assinatura interna e TSA continuam no mesmo ciclo.
+[Resultados e limites](../audits/D/D-B/PDF_LIFECYCLE.md).
+
 ## Fichas complementares
 
 GET /api/documents/:id/complements consulta relações paginadas; mode=candidates

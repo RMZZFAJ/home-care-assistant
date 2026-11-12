@@ -24,8 +24,8 @@ Auth/PostgreSQL.
 O paciente é a unidade operacional. Leia README e os documentos de arquitetura,
 banco, segurança, APIs e testes antes de ampliar fluxos. Consulte
 docs/README.md,
-docs/current/PROJECT_STATUS.md, a auditoria datada
-e seu checkpoint para retomar sem recriar funções existentes. Decisões em
+TEMP_D_B_ATUALIZACAO.md (acompanhamento principal), os contratos atuais e as
+evidências necessárias para retomar sem recriar funções existentes. Decisões em
 docs/decisions e planos C descrevem futuro, não comportamento implementado.
 Autorização corrente vem da missão vigente; relatos históricos não a renovam.
 
@@ -54,8 +54,17 @@ Reutilizar o pipeline de emissão/assinatura. Não alterar exemplares prontos.
 Devolução equipe→família é processo autônomo, sem exigir entrega de origem.
 Preservar o conteúdo emitido, seus atos e a ciência no cancelamento. Menções,
 referências e acessos não substituem ciência, recebimento ou autoria.
-Rascunhos comuns têm retomada simples, sem estender persistência a todo campo;
-preservar separadamente a recuperação de uma confirmação ainda incerta.
+O complemento executivo em docs/audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt
+prevalece sobre orientações conflitantes de método e rascunhos. Preservar escopo
+e apresentação dos rascunhos existentes; não simplificar painéis nem ampliar
+persistência, autosave ou retomada entre aparelhos. DOC-C.1 e expansão não
+implementada são OWNER-DEFERRED. Corrigir defeitos e preservar separadamente
+a recuperação segura de operações oficiais incertas e a prevenção de duplicatas.
+Implementar PDFs aprovados pelo pipeline atual sem aguardar todo DOC-C.
+Manter poucos lotes por capacidade e uma frente principal. Atualizar andamento
+e matriz no fechamento ou bloqueio relevante; checkpoint é histórico, não outro
+diário obrigatório. Preservar revisões documentais e migrations; produto 1.0.0
+é a primeira liberação estável futura, sem publicação agora.
 
 ### Contratos operacionais
 

@@ -8,7 +8,7 @@ import { regularizationPdfFixture,regularizationLedger } from "../integration/pd
 import { fixtures,rpc } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql,sqlLiteral } from "../../scripts/test-environment.mjs";
-import { generatedPdf } from "./generated-pdf";
+import { generatedPdf, CURRENT_PDF_REVISION } from "./generated-pdf";
 import { selectContext } from "./auth-context";
 test.setTimeout(180000);
 type Fixture=Awaited<ReturnType<typeof regularizationPdfFixture>>;
@@ -62,13 +62,13 @@ test("ENT regularizada gera PDF técnico pela interface, recupera V7 e preserva 
   await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
   await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
   const link=await files.getByRole("link",{name:"Baixar PDF",exact:true}).getAttribute("href");expect(link).toBeTruthy();
-  const current=await inspect(page,f,"approved-current",await page.request.get(link!),10);
+  const current=await inspect(page,f,"approved-current",await page.request.get(link!),CURRENT_PDF_REVISION);
   expect(current.identity.id).not.toBe(old.id);
   const recovery=await page.request.post(`/api/documents/${f.doc.id}/issuances`,{data:{version:f.doc.version,idempotencyKey:key}});
   expect(recovery.status()).toBe(200);expect((await recovery.json()).id).toBe(old.id);
   await inspect(page,f,"old-v7-recovered",await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${old.id}`),7);
-  await inspect(page,f,"original-before-proposal",await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.original.version}`),10);
-  await inspect(page,f,"proposal-before-decision",await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.proposed.version}`),10);
+  await inspect(page,f,"original-before-proposal",await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.original.version}`),CURRENT_PDF_REVISION);
+  await inspect(page,f,"proposal-before-decision",await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.proposed.version}`),CURRENT_PDF_REVISION);
   expect(regularizationLedger(f.patient)).toBe(before);
   expect(sql(`select accepted_quantity::text from public.document_lines where id=${sqlLiteral(f.doc.lines[0].id)};`)).toMatch(/^2(?:\.0+)?$/);
   expect(sql(`select workflow_data->>'acceptedBy' from public.operational_documents where id=${sqlLiteral(f.doc.id)};`)).toBe(fixtures.professional.id);
@@ -92,7 +92,7 @@ for(const mode of ["unknown","rejected"] as const)test(`ENT ${mode} gera exempla
   const f=await regularizationPdfFixture(mode==="unknown"?{unknownOnly:true}:{state:"rejected"}),before=regularizationLedger(f.patient);
   await login(page,f.patient);await page.goto(`/historico/${f.doc.id}`);
   await selectDocumentSection(page, "files");
-  await inspect(page,f,mode,await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.doc.version}`),10);
+  await inspect(page,f,mode,await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.doc.version}`),CURRENT_PDF_REVISION);
   expect(regularizationLedger(f.patient)).toBe(before);
   expect(sql(`select count(*) from public.stock_movements where reference_type='delivery_regularization' and reference_id=${sqlLiteral(f.item.id)};`)).toBe("0");
 });

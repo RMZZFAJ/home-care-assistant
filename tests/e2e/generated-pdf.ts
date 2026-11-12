@@ -1,3 +1,6 @@
+// API default for new intentions; explicit historical revisions remain unchanged.
+export const CURRENT_PDF_REVISION = 15;
+
 import { expect, type Page, type APIRequestContext } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 const intentions = new WeakMap<

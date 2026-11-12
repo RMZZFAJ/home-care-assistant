@@ -4,21 +4,24 @@
 em 09/11/2026, substitui Fluent e a direção visual anterior. Aplicar a todos
 os recursos existentes/futuros sem reduzir funções; migração em execução.
 
-**PDFs e fichas:** o [complemento documental aprovado](documents/01_COMANDO_COMPLEMENTAR_PDFS.md)
-autoriza a [nova composição e conteúdo](documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md).
-A aplicação conserva o Modelo Integral. Implementação do acréscimo pendente.
+**Andamento da D-B:** [acompanhamento principal](../TEMP_D_B_ATUALIZACAO.md),
+com capacidades entregues, trabalho local, fila e responsabilidades. A
+[matriz](audits/D/D-B/ACCEPTANCE_EXECUTION.csv) detalha os 105 critérios.
 
-**Estado atual:** [fonte por SHA](current/PROJECT_STATUS.md). Produção NO-GO;
-A e B1–B8 concluídas como diagnóstico; C é planejamento e organização;
-**D-B em execução** na [ordem vigente](audits/D/D-B/README.md);
-**D-A consolidada localmente; CI e liberação independentes**, com
-[evidências por incremento](audits/D/D-A/CHECKPOINT.md).
-Decisão aprovada não é funcionalidade implementada.
+**Ordens vigentes:** [Ordem Mestre](audits/D/D-B/OWNER_EXECUTION_ORDER.txt),
+[complemento documental](documents/01_COMANDO_COMPLEMENTAR_PDFS.md) e
+[complemento executivo](audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt). O último
+prevalece nos conflitos de método e rascunhos. A
+[composição PDF aprovada](documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md)
+permanece obrigatória; a aplicação conserva o Modelo Integral.
 
-Entrada mais recente: [C7–C10](audits/C/C10-pr-handoff/README.md),
-[decisões vigentes](audits/C/C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
-[projeto visual](audits/C/C8-visual-blueprint/README.md) e
-[casos de aceite](audits/C/C9-acceptance-refinement/README.md).
+**Implementado:** [contratos atuais](current/README.md). Fichas, Andamentos,
+PWA/Push e emissão/verificação assinada já têm implementação, com pendências
+indicadas no acompanhamento. Rascunhos existentes ficam congelados em escopo e
+apresentação; expansão e simplificação são OWNER-DEFERRED. Produção NO-GO.
+
+**Histórico e planejamento:** A/B são diagnóstico; C é projeto histórico e D-A
+registra D0–D2. Evidências datadas não substituem o estado do candidato atual.
 
 <!-- c-table:start -->
 

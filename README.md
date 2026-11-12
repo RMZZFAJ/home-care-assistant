@@ -1,6 +1,6 @@
 # Home Care Assistant
 
-**Aparência vigente:**o [Modelo Integral](docs/ui-ux/CANONICAL_MODEL.md) substitui
+**Aparência vigente:** o [Modelo Integral](docs/ui-ux/CANONICAL_MODEL.md) substitui
 Fluent UI em todo o sistema, sem reduzir recursos. Migração visual e fichas com
 abas/Andamentos integram a D-B; ainda não estão integralmente concluídas.
 
@@ -11,41 +11,26 @@ clínica.
 
 ## Estado e documentação
 
-**Produção NO-GO.** A e B1–B8 estão encerradas como diagnóstico; C concluiu o
-planejamento documental C0–C10. **D-B em execução**, conforme a
-[ordem e checkpoint](docs/audits/D/D-B/README.md).
-**D-A consolidada localmente (D0–D2),
-com CI e gates de liberação
-independentes**, conforme
-[checkpoint](docs/audits/D/D-A/CHECKPOINT.md). Base funcional auditada:
-`37cb7f85e96e551d6419871f94dd950712e2565b`. O estado de deploy produtivo nesta
-missão é NOT_VERIFIED; preview documental não é homologação do produto.
+**D-B em execução; produção e merge não autorizados.** A branch é
+`feat/phase-d-implementation` e a PR #7 permanece Draft. A primeira versão
+estável de produto será 1.0.0; não está sendo publicada nesta missão.
 
-- [Portal por público](docs/README.md).
+- [Acompanhamento principal e sequência restante](TEMP_D_B_ATUALIZACAO.md).
+- [Portal da documentação](docs/README.md) e
+  [contratos implementados](docs/current/README.md).
+- [Ordens vigentes e matriz de aceitação](docs/audits/D/D-B/README.md).
+- [Decisões](docs/decisions/README.md) e [histórico](docs/audits/README.md).
 
-- [Estado por fonte e SHA](docs/current/PROJECT_STATUS.md).
+Fichas em abas, Andamentos, rascunhos próprios, PWA, Web Push e verificação
+documental têm implementação no candidato. Permanecem as pendências indicadas
+no acompanhamento, incluindo aparência integral, modalidades documentais e
+validações finais. PDFs usam certificado e TSA internos, sem afirmar ICP-Brasil.
+A aparência aprovada dos PDFs está em implementação. Os mecanismos de rascunho
+existentes ficam preservados; sua simplificação e expansão foram adiadas.
 
-- [Contratos implementados e desvios conhecidos](docs/current/README.md).
-
-- [Decisões humanas](docs/decisions/README.md) e
-  [projeto C](docs/audits/C/README.md).
-
-- [Auditorias preservadas](docs/audits/README.md) e
-  [plano D](docs/audits/D/README.md).
-
-PWA e Web Push têm implementação no candidato D-B; entrega externa permanece
-desligada e aparelhos físicos aguardam homologação. PDFs usam assinatura e TSA
-internas, sem afirmar ICP-Brasil. Consulte os limites e evidências no checkpoint.
-Rascunhos próprios REQ/BAL entre aparelhos e os processos D0–D2 estão
-implementados no candidato D-A. Os dois P1 herdados receberam correção e
-regressões discriminantes. Validação local e publicação na Draft PR não
-representam aprovação da CI pendente nem liberação operacional.
-
-O [fechamento definitivo C7–C10](docs/audits/C/C10-pr-handoff/README.md)
-registra P02 OWNER_APPROVED, 66 fichas e 262 controles originais revistos.
-Catálogo atual: 274 controles/424 usos; 187 aceites planejados. Draft PR 6
-foi integrado à master. A implementação D-A usa o Draft PR 7, sem merge ou
-liberação definitiva.
+A e B encerraram o diagnóstico; C registra o planejamento histórico; D-A
+consolidou D0–D2. Esses marcos não aprovam automaticamente a CI do candidato
+atual, serviços externos, aparelhos físicos ou liberação operacional.
 
 ## Desenvolvimento
 
@@ -70,7 +55,8 @@ remoto.
 Mudança funcional autorizada usa os gates de contratos, lint, Markdown, tipos,
 unitários/build e, conforme contrato, banco/Auth/E2E pelo runner local. Os
 comandos e marcos estão no guia de testes; não há afirmação de CI verde atual
-baseada em PR antigo. Nesta C, verificações são documentais e de preservação;
-não se repetem suítes funcionais por alteração editorial. Deploy, migrations
+baseada em PR antigo. Alterações exclusivamente documentais recebem conferência
+de Markdown, links e preservação; suítes funcionais seguem o risco da mudança.
+Deploy, migrations
 remotas, envio, PR e merge dependem de autorização específica, nunca de relato
 histórico.

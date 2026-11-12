@@ -1,3 +1,4 @@
+import { CURRENT_PDF_REVISION } from "./generated-pdf";
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
@@ -88,7 +89,7 @@ test("PDF atual assina fatos de rascunho e origens físicas conhecida e desconhe
     }
     expect(row).toMatchObject({
       state: "ready",
-      rendererRevision: 10,
+      rendererRevision: CURRENT_PDF_REVISION,
       validation: { accepted: true, profile: "PAdES-B-T", wholeFile: true },
     });
     await rpc(f.owner, "select_active_context", { p_patient: f.patient });
@@ -146,7 +147,7 @@ test("PDF atual assina fatos de rascunho e origens físicas conhecida e desconhe
       const oldId = randomUUID(),
         oldKey = randomUUID();
       sql(
-        `insert into private.pdf_issuances(id,document_id,version,care_recipient_id,requested_by,requested_name,requested_session,requested_at,idempotency_key,request_hash,verification_code,renderer_revision,representation,source_hash,snapshot,object_path) select ${sqlLiteral(oldId)},document_id,version,care_recipient_id,requested_by,requested_name,requested_session,requested_at,${sqlLiteral(oldKey)},encode(extensions.digest(jsonb_build_array('pdf-issuance',document_id,version)::text,'sha256'),'hex'),upper(encode(extensions.gen_random_bytes(16),'hex')),5,representation,source_hash,snapshot-'sourceFacts'-'documentFacts','issuances/'||document_id||'/'||${sqlLiteral(oldId)}||'.pdf' from private.pdf_issuances where id=${sqlLiteral(row.id)};`,
+        `insert into private.pdf_issuances(id,document_id,version,care_recipient_id,requested_by,requested_name,requested_session,requested_at,idempotency_key,request_hash,verification_code,renderer_revision,representation,source_hash,snapshot,object_path) select ${sqlLiteral(oldId)},document_id,version,care_recipient_id,requested_by,requested_name,requested_session,requested_at,${sqlLiteral(oldKey)},encode(extensions.digest(jsonb_build_array('pdf-issuance',document_id,version)::text,'sha256'),'hex'),upper(encode(extensions.gen_random_bytes(16),'hex')),5,representation,source_hash,(select e.body from public.document_events e where e.document_id=private.pdf_issuances.document_id and e.version=private.pdf_issuances.version),'issuances/'||document_id||'/'||${sqlLiteral(oldId)}||'.pdf' from private.pdf_issuances where id=${sqlLiteral(row.id)};`,
       );
       const recovered = await page.request.post(
         `/api/documents/${f.doc.id}/issuances`,
@@ -229,7 +230,7 @@ test("PDF atual recusa caractere sem representação antes de assinar ou persist
     step: "uncertain",
     lastError: "CONTENT_INVALID",
     sha256: null,
-    rendererRevision: 10,
+    rendererRevision: CURRENT_PDF_REVISION,
   });
   expect(
     sql(

@@ -48,6 +48,7 @@ import type { PdfFidelityFacts } from "@/lib/documents/pdf-fidelity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
 import { balanceApplicationFacts } from "@/lib/validation/balance-application";
 import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
+import { requirePdfLifecycleFacts } from "@/lib/documents/pdf-lifecycle";
 import { purchaseEntryBalances } from "@/lib/validation/purchase-entry-balances";
 
 type Person = {
@@ -66,6 +67,7 @@ export type DocumentSnapshot = {
   status: string;
   createdAt?: string;
   sourceFacts?: unknown;
+  lifecycleFacts?: unknown;
   documentFacts?: unknown;
   balanceApplication?: unknown;
   balanceReviewCorrections?: unknown;
@@ -172,7 +174,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;
+  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -206,6 +208,7 @@ export async function renderDocumentPdf(
   const fidelity = revision >= 7 ? emission?.fidelityFacts : undefined;
   const corrections = revision >= 12 && snapshot.type === "BAL" ? balanceCorrectionFacts.parse(snapshot.balanceReviewCorrections) : undefined;
   const entries = revision >= 13 && snapshot.type === "COM" ? purchaseEntryBalances.parse(snapshot.purchaseEntryBalances) : undefined;
+  const lifecycle = revision >= 15 ? requirePdfLifecycleFacts(snapshot.lifecycleFacts, snapshot) : undefined;
   const cancelledV6 = Boolean(sourceFacts && snapshot.status === "cancelled");
   const entState = revision >= 9 && snapshot.type === "ENT" ? entReceiptState(snapshot.status,Boolean(sourceFacts?.historical),typeof snapshot.workflow?.acceptedAt === "string" ? snapshot.workflow.acceptedAt : null,emission?.representation) : null;
   if (emission && revision >= 6 && !sourceFacts)
@@ -1682,6 +1685,35 @@ export async function renderDocumentPdf(
   }
   if (snapshot.type === "ENT" && snapshot.deliveryRegularization?.cases.length)
     ensure(115);
+  if (lifecycle) {
+    ensure(105);
+    section("Cancelamento e ciência própria");
+    const c = lifecycle.cancellation;
+    fidelityFact("lifecycle/cancellation/state", "Situação no corte desta versão", c.state === "not_cancelled" ? "Sem cancelamento nesta versão." : c.state === "unavailable" ? "Cancelamento indicado; ato original não preservado. Nenhuma ciência presumida." : "Cancelamento registrado em ato próprio.");
+    if (c.state === "recorded") {
+      fidelityFact("lifecycle/cancellation/act", "Ato de cancelamento", c.act.id + " · versão " + c.act.version);
+      fidelityFact("lifecycle/cancellation/actor", "Responsável e momento", (c.act.actorName ?? "Nome não preservado") + " · " + (c.act.actorId ?? "Identidade não preservada") + " · " + formatBrazilDate(c.act.recordedAt));
+      fidelityFact("lifecycle/cancellation/reason", "Motivo preservado", c.act.reason ?? "Motivo não preservado");
+      fidelityFact("lifecycle/cancellation/awareness", "Ciências deste cancelamento", c.acknowledgements.length ? c.acknowledgements.length + " ciência(s) pessoal(is) registrada(s) até esta versão." : "Nenhuma ciência deste cancelamento registrada até esta versão.");
+      for (const a of c.acknowledgements) fidelityFact("lifecycle/cancellation/ack/" + a.id, "Ciência própria do cancelamento", (a.actorName ?? "Nome não preservado") + " · " + (a.actorId ?? "Identidade não preservada") + " · " + formatBrazilDate(a.recordedAt) + " · versão " + a.version);
+      text("As ciências anteriores da emissão e os recebimentos permanecem preservados. Este ato não altera estoque. A leitura deste arquivo não registra ciência do cancelamento.", 8);
+    }
+    ensure(105);
+    section("Fichas complementares vinculadas");
+    if (!lifecycle.complements.length) fidelityFact("lifecycle/complements/empty", "Vínculos no corte", "Nenhuma ficha complementar vinculada até esta versão.");
+    for (const l of lifecycle.complements) {
+      const prefix = "lifecycle/complement/" + l.id;
+      fidelityFact(prefix + "/role", "Relação preservada", (l.role === "source" ? "Esta ficha complementa outra ficha." : "Outra ficha complementa esta ficha.") + " Vínculo registrado na versão " + l.version + ".");
+      if (!l.accessible) { fidelityFact(prefix + "/restricted", "Ficha relacionada", "Acesso restrito"); continue; }
+      const d = l.document;
+      fidelityFact(prefix + "/reference", "Documento referenciado na vinculação", d.code + " · " + d.type + " · versão " + d.version + " · " + d.protocol);
+      fidelityFact(prefix + "/hash", "Referência canônica preservada", d.id + " · " + d.hash);
+      fidelityFact(prefix + "/actor", "Autor e momento do vínculo", (l.actorName ?? "Nome não preservado") + " · " + (l.actorId ?? "Identidade não preservada") + " · " + formatBrazilDate(l.recordedAt));
+      fidelityFact(prefix + "/reason", "Motivo do complemento", l.reason);
+      text("Consulta atual autorizada: " + emission!.verificationOrigin + "/documentos/" + d.id, 8);
+    }
+    text("Um vínculo complementar não substitui o conteúdo emitido, ciência, atendimento ou recebimento e não movimenta estoque. As referências autorizadas preservam a versão consultada ao vincular. Abrir a ficha exige autorização vigente.", 8);
+  }
   section("Linha do tempo operacional");
   table(
     ["DATA/HORA", "RESPONSÁVEL", "EVENTO"],

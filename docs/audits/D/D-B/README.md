@@ -5,13 +5,19 @@ NO-GO.** A ordem integral preservada em [OWNER_EXECUTION_ORDER.txt](OWNER_EXECUT
 atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitoramento.
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
-- [Etapas fixas vinculadas aos critérios originais](EXECUTION_STAGES.csv).
+- [Acompanhamento principal e única fila vigente](../../../../TEMP_D_B_ATUALIZACAO.md).
+- [Complemento executivo vigente](OWNER_EXECUTION_SUPPLEMENT.txt): poucos lotes
+  por capacidade; rascunhos congelados e DOC-C.1/expansão OWNER-DEFERRED.
+- [Mapa de etapas e IDs originais](EXECUTION_STAGES.csv): rastreabilidade, não
+  outra fila ou diário de execução.
 - [Complemento aprovado de fichas e PDFs](../../../documents/01_COMANDO_COMPLEMENTAR_PDFS.md):
   quatro resultados adicionais, sem reinício da missão ou dos 105 critérios.
 - [Parecer BAL, aplicação própria e saldo no exemplar](BAL_REVIEW_APPLICATION.md):
   parecer, aplicação e correções posteriores implementados no fluxo atual.
+- [Cancelamento, ciência e vínculos no PDF V15](PDF_LIFECYCLE.md): DOC-B.4 e
+  DOC-B locais; remoto224; aparência e modalidades seguem em DOC-A/C/D.
 - [Vínculos formais de fichas complementares](DOCUMENT_COMPLEMENTS.md):
-  fluxo local qualificado e remoto223; DOC-B.4 ainda depende do PDF estruturado.
+  fluxo local qualificado e remoto223 no incremento anterior.
 - [Ciência própria do cancelamento](CANCELLATION_AWARENESS.md): implementação
   local conferida e remoto220 reconciliado no incremento anterior.
 - [Devolução autônoma no uso cotidiano](AUTONOMOUS_RETURNS.md): entrada própria,

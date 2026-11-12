@@ -1,3 +1,4 @@
+import { CURRENT_PDF_REVISION } from "./generated-pdf";
 import { selectDocumentSection } from "./document-sections";
 import { expect,test,type Page } from "@playwright/test";
 import { createHash,randomUUID } from "node:crypto";
@@ -30,7 +31,7 @@ for(const mode of ["prepared","private"] as const)test(`ENT ${mode} preserva mar
     await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(count);
     const rows=(await(await page.request.get(endpoint)).json()).data;
     expect(rows).toHaveLength(count);const row=rows.find((r:{id:string})=>r.id!==first?.id);
-    expect(row).toMatchObject({state:"ready",rendererRevision:10,validation:{accepted:true,wholeFile:true,profile:"PAdES-B-T"}});
+    expect(row).toMatchObject({state:"ready",rendererRevision:CURRENT_PDF_REVISION,validation:{accepted:true,wholeFile:true,profile:"PAdES-B-T"}});
     const frozen=await rpc(f.owner,"pdf_issuance",{p_id:row.id});
     expect(new Date(frozen.snapshot.sourceFacts.issuedAt).toISOString()).toBe(new Date(oracle.issuedAt).toISOString());
     expect(new Date(frozen.snapshot.sourceFacts.documentCreatedAt).toISOString()).toBe(new Date(oracle.createdAt).toISOString());
