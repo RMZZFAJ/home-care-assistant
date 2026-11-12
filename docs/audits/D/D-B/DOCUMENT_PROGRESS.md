@@ -1,5 +1,45 @@
 # Andamentos persistidos nas fichas
 
+## Publicação estruturada vigente
+
+Destaque e menções são escolhas da publicação oficial, separadas do conteúdo
+privado de quatro campos. O pacote pode incluir publication com relevance
+normal/milestone/attention e mentions com até oito UUIDs distintos. Chave,
+conteúdo e opções compõem a intenção; alterar qualquer um deles não recupera
+uma publicação diferente. Pacotes antigos sem opções conservam o hash e a
+recuperação anteriores. Rascunhos e sua apresentação não foram ampliados.
+
+O banco valida pessoas com perfil e vínculo ativos no paciente da ficha e
+congela nome e papel daquele momento em tabela privada imutável, sem grants
+diretos. Nome, autoria ou papel enviados pelo navegador são recusados.
+Nova publicação reconfere leitura após a trava e elegibilidade das menções;
+recuperação de registro já confirmado exige leitura atual, sem exigir que a
+pessoa mencionada continue ativa. Nome posterior não reescreve o registro.
+
+GET /api/documents/[id]/progress/people recebe search e page, devolve vinte
+pessoas por página, total e escopo explícitos. Exige Auth, leitura da ficha e
+document.progress.create; não é diretório global nem expõe e-mail. API e banco
+recusam paciente sem autorização. Todas as respostas são private, no-store.
+Commit privado e consulta de recuperação transportam as opções somente no
+pacote oficial; salvar a nota privada continua estritamente com os quatro
+campos anteriores.
+
+Origem manual/automática e relevância Registro/Marco importante/Atenção são
+dimensões independentes. O catálogo em src/lib/documents/progress-catalog.ts
+é usado pela interface; sua integração à Ficha Ampliada e à auditoria continua
+pendente. Texto e menções não são assinatura, ciência, recebimento, confirmação
+ou atendimento. Links continuam sob autorização atual. Os fatos de cancelamento,
+ciência do cancelamento e vínculos formais entram na lista explícita da
+cronologia, sem trazer logs, lembretes ou tentativas de transporte.
+
+Validação do incremento: 19 casos com Auth real (publicação legada, detalhes,
+concorrência, recusas e espera observada), 18 testes de contratos e o percurso
+com perda da resposta em Chromium/iOS, cinco larguras e inspeção visual.
+Banco local/remoto 229 reconciliados; CI do SHA e modalidades dos PDFs não são
+aprovados por esses resultados. Estado e fila atuais no acompanhamento principal.
+
+## Registro histórico D3.29
+
 Lote D3.29, base dc8f970. Implementação incremental da nova função do Modelo
 Integral, disponível em REQ/COM/ENT/BAL. A reorganização completa em abas e
 a paridade visual das demais composições continuam pendentes.

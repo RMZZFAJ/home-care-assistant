@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { api, ApiError, authenticate, parseUuid, readJson, rpc } from "@/lib/server/api";
-import { progressFilter, publishProgress } from "@/lib/validation/document-progress";
+import { progressFilter, publishProgress, progressPublicationBody } from "@/lib/validation/document-progress";
 
 type Context = { params: Promise<{ id: string }> };
 const headers = { "Cache-Control": "private, no-store" };
@@ -24,7 +24,7 @@ export async function POST(request: Request, context: Context) {
     const { id } = await context.params;
     const input = await readJson(request, publishProgress);
     const auth = await authenticate();
-    const result = await rpc(auth.client, "document_progress_publish", { p_document: parseUuid(id), p_key: input.key, p_body: input.content });
+    const result = await rpc(auth.client, "document_progress_publish", { p_document: parseUuid(id), p_key: input.key, p_body: progressPublicationBody(input) });
     return NextResponse.json(result, { headers });
   });
 }

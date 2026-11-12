@@ -145,6 +145,7 @@ export function parseProgressPreparationReceipt(value: unknown, scope: Scope) {
         nativeResult,
         {
           key: v.command.key,
+          ...(v.command.publication ? { publication: v.command.publication } : {}),
           content: {
             ...v.command.content,
             references: v.command.content.references.map((x) =>
@@ -179,7 +180,7 @@ export function progressReceiptMatchesPacket(
     receipt.idempotencyKey === packet.key &&
     JSON.stringify(receipt.command) ===
       JSON.stringify(
-        publishProgress.parse({ key: packet.key, content: packet.content }),
+        publishProgress.parse({ key: packet.key, content: packet.content, ...(packet.publication ? { publication: packet.publication } : {}) }),
       )
   );
 }
@@ -256,6 +257,7 @@ export function parseProgressRecovery(
       key: id,
       expectedRevision: revision,
       content: progressContent,
+      publication: publishProgress.shape.publication,
       current: z
         .object({
           id,
@@ -297,7 +299,8 @@ export function parseProgressRecovery(
       v.key !== packet.key ||
       v.expectedRevision !== packet.draftCommit.revision ||
       v.current.id !== packet.draftCommit.id ||
-      JSON.stringify(v.content) !== JSON.stringify(packet.content)
+      JSON.stringify(v.content) !== JSON.stringify(packet.content) ||
+      JSON.stringify(v.publication) !== JSON.stringify(packet.publication)
     )
       throw new Error(
         "A consulta não corresponde à tentativa de andamento preservada.",

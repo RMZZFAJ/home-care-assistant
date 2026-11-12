@@ -87,6 +87,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
       exact: true,
     })
     .selectOption("family_science");
+  await editor.getByRole("combobox", { name: "Destaque do andamento", exact: true }).selectOption("attention");
   await editor
     .getByRole("button", { name: "Guardar rascunho e fechar", exact: true })
     .click();
@@ -108,6 +109,8 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   await expect(
     editor.getByRole("combobox", { name: "Categoria", exact: true }),
   ).toHaveValue("contact");
+  await expect(editor.getByRole("combobox", { name: "Destaque do andamento", exact: true })).toHaveValue("normal");
+  expect(Object.keys(JSON.parse(sql(`select content::text from private.progress_preparations where document_id=${sqlLiteral(req.id)} and owner_id=${sqlLiteral(fixtures.family.id)} and state='active'`)).note).sort()).toEqual(["category", "references", "stage", "text"]);
   await editor
     .getByLabel("Código da ficha a vincular", { exact: true })
     .fill(com.code);
@@ -141,6 +144,11 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
       exact: true,
     })
     .click();
+  const mentionedName = sql(`select full_name from public.profiles where id=${sqlLiteral(fixtures.professional.id)}`);
+  await editor.getByRole("combobox", { name: "Destaque do andamento", exact: true }).selectOption("milestone");
+  await editor.getByRole("textbox", { name: "Nome da pessoa a mencionar", exact: true }).fill(mentionedName);
+  await editor.getByRole("button", { name: "Buscar pessoas para menção", exact: true }).click();
+  await editor.getByRole("button", { name: "Mencionar " + mentionedName + " · Profissional", exact: true }).click();
   const fullText = text + " #" + com.code;
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
@@ -187,6 +195,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   ).toContainText("Andamento publicado por");
   await expect(feed).toContainText("Publicação recuperada");
   expect(packets).toHaveLength(1);
+  expect(packets[0]).toMatchObject({ publication: { relevance: "milestone", mentions: [fixtures.professional.id] } });
   expect(
     await page.evaluate(
       (key) => sessionStorage.getItem(key),
@@ -199,6 +208,9 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   await expect(
     feed.getByRole("article").getByText(fullText, { exact: true }),
   ).toBeVisible();
+  await expect(feed.getByRole("article")).toContainText("Marco importante");
+  await expect(feed.getByRole("article")).toContainText("Registro manual");
+  await expect(feed.getByRole("article")).toContainText("Pessoas mencionadas: " + mentionedName + " · Profissional");
   await expect(feed.locator("img")).toHaveCount(0);
   await expect(
     feed.getByRole("button", { name: com.code, exact: true }),

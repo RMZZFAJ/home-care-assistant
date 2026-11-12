@@ -1,3 +1,4 @@
+import { progressPublicationBody } from "@/lib/validation/document-progress";
 import { NextResponse } from "next/server";
 import {
   api,
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
       p_id: v.draftCommit.id,
       p_expected: v.draftCommit.revision,
       p_key: v.key,
-      p_body: v.content,
+      p_body: progressPublicationBody(v),
     });
     return NextResponse.json(
       { data: parseProgressPreparationConfirmation(value, v, auth.userId) },

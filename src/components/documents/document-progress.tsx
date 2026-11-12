@@ -35,7 +35,8 @@ import { useClientReady } from "@/lib/use-client-ready";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
-import { documentEventLabel } from "@/lib/notifications/event-labels";
+import { progressCareRoles, progressEventPresentation, progressRelevance } from "@/lib/documents/progress-catalog";
+import { ProgressPublicationOptions } from "./progress-publication-options";
 import { formatBrazilDate } from "@/lib/receipt";
 import { Dialog, Icon } from "@/components/ui/primitives";
 import {
@@ -90,7 +91,7 @@ function loadDraft(
 ): Draft & { error: string } {
   try {
     const raw = sessionStorage.getItem(key);
-    const saved = raw
+    const saved: z.infer<typeof storedDraft> = raw
       ? storedDraft.parse(JSON.parse(raw))
       : { content: blank, pending: null };
     if (
@@ -185,6 +186,7 @@ function ProgressContent({
     Boolean(draft.error),
   );
   const [open, setOpen] = useState(false);
+  const [publication, setPublication] = useState<NonNullable<ProgressPacket["publication"]>>({ relevance: "normal", mentions: [] });
   const [error, setError] = useState(""),
     [message, setMessage] = useState(""),
     [storageError, setStorageError] = useState(draft.error);
@@ -509,6 +511,7 @@ function ProgressContent({
         const native = publishProgress.parse({
           key: crypto.randomUUID(),
           content,
+          publication,
         });
         const saved = await privateDraft.save(privateContent);
         if (!saved || !mountedRef.current) return;
@@ -542,6 +545,7 @@ function ProgressContent({
           : parseProgressOutcome(value);
       clearEnvelope(packet);
       updateDraft({ content: blank, pending: null }, false);
+      setPublication({ relevance: "normal", mentions: [] });
       setOpen(false);
       setStorageError("");
       setMessage(
@@ -708,10 +712,12 @@ function ProgressContent({
           </p>
           {feed.data.length ? (
             <ol className="hca-event-feed">
-              {feed.data.map((row) => (
+              {feed.data.map((row) => {
+                const presentation = progressEventPresentation(row);
+                return (
                 <li key={row.id} className="hca-progress-event">
                   <span className="hca-event-marker" aria-hidden="true">
-                    <Icon name={row.source === "manual" ? "edit" : "history"} />
+                    <Icon name={presentation.originIcon} />
                   </span>
                   <article
                     className={
@@ -722,24 +728,23 @@ function ProgressContent({
                     aria-label={
                       row.source === "manual"
                         ? progressCategories[row.category]
-                        : documentEventLabel(row.action)
+                        : (presentation.event ?? undefined)
                     }
                   >
                     <div className="hca-event-heading">
                       <strong>
                         {row.source === "manual"
                           ? progressCategories[row.category]
-                          : documentEventLabel(row.action)}
+                          : presentation.event}
                       </strong>
                       <time dateTime={row.recordedAt}>
                         {formatBrazilDate(row.recordedAt)}
                       </time>
                     </div>
                     <Pill tone={row.source === "manual" ? "accent" : "neutral"}>
-                      {row.source === "manual"
-                        ? "Registro manual"
-                        : "Fato automático"}
+                      {presentation.origin}
                     </Pill>
+                    <Pill tone={presentation.tone}><Icon name={presentation.icon} /> {presentation.label}</Pill>
                     <p className="hca-event-meta">
                       {row.authorId
                         ? (row.authorName ?? "Nome histórico não preservado")
@@ -754,6 +759,7 @@ function ProgressContent({
                     {row.source === "manual" ? (
                       <>
                         <p className="hca-event-text">{row.text}</p>
+                        {row.mentions?.length ? <p className="hca-event-meta">Pessoas mencionadas: {row.mentions.map(person => person.name + " · " + progressCareRoles[person.careRole]).join("; ")}. Uma menção não registra ciência ou autoria.</p> : null}
                         <div className="hca-toolbar">
                           {row.references.map((ref) => (
                             <RelatedDocument
@@ -768,7 +774,7 @@ function ProgressContent({
                     ) : null}
                   </article>
                 </li>
-              ))}
+              );})}
             </ol>
           ) : (
             <p>Nenhum andamento corresponde a este filtro e página.</p>
@@ -905,6 +911,7 @@ function ProgressContent({
             <ProgressPreparationSummary
               content={{ documentType: type, note: pending.content }}
             />
+            {pending.publication ? <p>Destaque: {progressRelevance[pending.publication.relevance].label}. Pessoas mencionadas: {pending.publication.mentions.length}.</p> : null}
             <div className="hca-toolbar">
               <ActionButton
                 disabled={command.busy}
@@ -1083,6 +1090,7 @@ function ProgressContent({
                 permissão.
               </p>
             </fieldset>
+            <ProgressPublicationOptions id={id} patientId={patientId} value={publication} onChange={setPublication} disabled={locked} />
             <div className="hca-toolbar">
               <ActionButton
                 disabled={

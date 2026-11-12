@@ -59,8 +59,12 @@ export const progressContent = z
       ),
   })
   .strict();
+export const progressPublication = z.object({
+  relevance: z.enum(["normal", "milestone", "attention"]),
+  mentions: z.array(uuid).max(8).refine(ids => new Set(ids.map(x => x.toLowerCase())).size === ids.length, "Não repita pessoas mencionadas."),
+}).strict();
 export const publishProgress = z
-  .object({ key: uuid, content: progressContent })
+  .object({ key: uuid, content: progressContent, publication: progressPublication.optional() })
   .strict();
 export type ProgressPacket = z.infer<typeof publishProgress>;
 const manual = z
@@ -74,6 +78,8 @@ const manual = z
     category: progressContent.shape.category,
     stage: progressContent.shape.stage,
     text: progressContent.shape.text,
+    relevance: progressPublication.shape.relevance.optional(),
+    mentions: z.array(z.object({ id: uuid, name: z.string().min(1), careRole: z.enum(["admin", "family", "supervisor", "professional", "reader"]) }).strict()).max(8).optional(),
     references: z
       .array(
         z
@@ -86,7 +92,9 @@ const manual = z
       )
       .max(8),
   })
-  .strict();
+  .strict()
+  .refine(value => (value.relevance === undefined) === (value.mentions === undefined), "Os detalhes da publicação estão incompletos.")
+  .refine(value => !value.mentions || new Set(value.mentions.map(x => x.id.toLowerCase())).size === value.mentions.length, "Não repita pessoas mencionadas.");
 const automatic = z
   .object({
     id: uuid,
@@ -191,10 +199,30 @@ export function progressConfirmed(
     ) &&
     parsed.data.note.category === packet.content.category &&
     parsed.data.note.stage === packet.content.stage &&
-    parsed.data.note.text === packet.content.text
+    parsed.data.note.text === packet.content.text &&
+    (packet.publication
+      ? parsed.data.note.relevance === packet.publication.relevance &&
+        JSON.stringify(parsed.data.note.mentions?.map(x => x.id.toLowerCase())) === JSON.stringify(packet.publication.mentions.map(x => x.toLowerCase()))
+      : parsed.data.note.relevance === undefined && parsed.data.note.mentions === undefined)
   );
 }
 
 export function parseProgressOutcome(value: unknown) {
   return outcome.parse(value);
 }
+
+
+/** Only the official packet carries these choices; private four-field drafts stay unchanged. */
+export function progressPublicationBody(packet: ProgressPacket) {
+  return {
+    ...packet.content,
+    ...(packet.publication ? { publication: packet.publication } : {}),
+  };
+}
+export const progressPerson = z.object({
+  id: uuid, name: z.string().min(1), careRole: z.enum(["admin", "family", "supervisor", "professional", "reader"]),
+}).strict();
+export const progressPeoplePage = z.object({
+  documentId: uuid, careRecipientId: uuid, search: z.string(), page: z.number().int().positive(),
+  size: z.literal(20), total: z.number().int().nonnegative(), data: z.array(progressPerson).max(20),
+}).strict();

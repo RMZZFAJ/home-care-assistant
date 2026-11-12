@@ -3,7 +3,34 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — DOC-C.3: acessos agrupados
+## Estado atual — publicação estruturada de Andamentos
+
+Local e remoto 229, sem pendências. Migration 20261112061700 acrescenta detalhes
+imutáveis da publicação: destaque e nomes/papéis de pessoas mencionadas. Não
+amplia conteúdo, esquema ou apresentação dos rascunhos privados. As chaves
+anteriores permanecem válidas; opções novas integram a intenção oficial e sua
+recuperação. Menções não produzem ciência, autoria ou movimentos.
+
+Pré-check: 228 versões, sete corpos nativos esperados, incluindo a evolução
+anterior da cronologia, permissões fechadas e novos objetos ausentes. Os quatro
+registros de migrations recentes coincidem; 83 digests de statements históricos
+locais/remotos diferem, sem divergência de versões. Esses registros antigos não
+foram reparados nem usados como alegação de igualdade global. Dry-run exclusivo
+de 229. Após aplicar: nove definições/configurações/permissões e nova tabela
+iguais ao local; histórico remoto anterior intacto, digest novo idêntico e
+dry-run vazio. RLS habilitado, nenhum grant direto ou política na nova tabela;
+helper fechado, consulta de pessoas somente authenticated.
+
+Testes locais: 19 casos com Auth real, 18 testes de contrato e percurso integrado
+em Chromium/iOS, incluindo resposta perdida e rascunhos sem expansão. Advisors:
+67 tabelas RLS fechadas, 224 RPCs Auth definer; demais grupos permanecem com as
+contagens anteriores (124 FKs sem índice, onze initplans, 72 índices sem uso,
+três funções anon). As adições são a tabela fechada e a consulta autenticada;
+nenhum achado antigo recebe aprovação. Sem reset, fixtures/Auth remoto ou
+backup pesado redundante. Instalação limpa, legado e integração completa
+continuam na CI do SHA publicado.
+
+## Histórico — DOC-C.3: acessos agrupados
 
 Local e remoto 228, sem pendências. Migration 20261112051000 preserva as
 aberturas existentes da REQ e suas chaves, acrescenta os relatos das outras
