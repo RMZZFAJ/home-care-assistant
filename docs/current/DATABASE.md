@@ -710,3 +710,26 @@ referências são reavaliados nas entradas de recuperação/conclusão/download;
 listas filtram as modalidades restritas. Auxiliares privados não têm execute
 para anon, authenticated ou service_role. Reserva cotidiana e suas onze entradas
 anteriores mantêm corpos/grants; a nova modalidade tem hash de intenção próprio.
+
+## Consulta técnica de tentativas de avisos
+
+operations_notification_attempts é uma projeção de leitura para administração
+global vigente, com nova verificação de autoridade antes do retorno. Mantém
+search_path vazio, referências qualificadas e execute exclusivo de
+authenticated; o modo e a autorização são conferidos no corpo. Não concede
+leitura direta das tabelas privadas nem execute a anon ou service_role.
+
+As fontes são requisition_notifications e as entregas/tentativas privadas de
+Web Push. O resultado identifica o banco compartilhado, preserva referências,
+instantes, estados e cobertura histórica real e omite pessoas, pacientes,
+destinos, conteúdo, credenciais e dados de lease. A leitura não cria tabela,
+tentativa, evento operacional ou poder de reenvio. A fila legada conserva sua
+cobertura limitada ao resultado atual; dados históricos ausentes não são
+reconstruídos. O contrato HTTP está na [referência da API](API.md).
+
+O advisor de
+[funções SECURITY DEFINER para authenticated](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable)
+também identifica essa RPC. O privilégio é intencional; as negativas de Auth,
+papel/contexto e os grants são verificados em
+tests/integration/technical-notifications.test.mjs. O aviso não foi suprimido
+nem convertido em aprovação geral dos demais advisors.

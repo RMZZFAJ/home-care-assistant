@@ -2,7 +2,8 @@
 
 **UI/UX vigente:**[Modelo Integral](ui-ux/CANONICAL_MODEL.md), aprovado
 em 09/11/2026, substitui Fluent e a direção visual anterior. Aplicar a todos
-os recursos existentes/futuros sem reduzir funções; migração em execução.
+os recursos existentes/futuros sem reduzir funções. O acompanhamento abaixo
+conserva o estado da implementação e das validações.
 
 **Andamento da D-B:** [acompanhamento principal](../TEMP_D_B_ATUALIZACAO.md),
 com capacidades entregues, trabalho local, fila e responsabilidades. A

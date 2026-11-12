@@ -1666,6 +1666,32 @@ global em páginas de 30 contas, com total e ordenação por nome e ID.
 Exige administração global ativa. A consulta sem profilePage preserva
 o contrato anterior. [Implementação](../audits/D/D-B/ADMINISTRATIVE_PREPARATIONS.md).
 
+## Consulta técnica de tentativas
+
+GET /api/operations/notifications exige sessão e modo global vigentes.
+source aceita notices ou web_push; page é inteiro de 1 a 100000. A página
+tem 20 registros. Parâmetros desconhecidos são recusados. A RPC autenticada
+operations_notification_attempts revalida a autoridade global no banco.
+Anon e service_role não recebem execute dessa consulta.
+
+O envelope identifica environment=shared_database, fonte, página, total e
+instante. Cada registro tem referência técnica, canal, estado, criação,
+última tentativa informada, contador registrado e indicadores de presença de
+referência do provedor e erro. Não contém paciente, pessoa, destino, conteúdo,
+endpoint, credencial, lease ou texto livre do provedor.
+
+Web Push acrescenta as tentativas persistidas, com identidade, ordem, início,
+conclusão, resultado e presença de erro. A fila legada informa
+historyCoverage=last_result_only e não fabrica tentativas anteriores.
+Referência ou instante ausente não comprova ausência de envio. O cliente
+confere fonte, página, cobertura e formato antes de apresentar o resultado.
+Falha de consulta não equivale a lista vazia ou entrega confirmada.
+
+A consulta não altera fila, inscrição, incidente, ciência ou estoque. Não há
+POST nessa entrada nem concessão implícita de poderes familiares ao suporte.
+As ações autorizadas da fila do paciente e os comandos de incidentes mantêm
+suas entradas e confirmações próprias.
+
 ## Âmbito das leituras de estoque e contagem
 
 GET /api/stock/balances acrescenta careRecipientId e custody aos campos

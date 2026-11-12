@@ -10,6 +10,7 @@ import { parseAuditListRead, type AuditFilters } from "@/lib/validation/audit";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { useScopedRead } from "@/lib/use-scoped-read";
+import "./operations.css";
 
 const filters = { query: "Busca", reference: "Referência", action: "Evento", entityType: "Tipo de recurso", from: "Data inicial", to: "Data final" };
 const queryNames = { query: "auditQuery", reference: "auditReference", action: "auditAction", entityType: "auditEntityType", from: "auditFrom", to: "auditTo" };
@@ -36,7 +37,7 @@ export function AuditHistory({ patientId }: { patientId: string }) {
     if (JSON.stringify({ ...values, ...nextValues }) === filterKey && Number(nextPage) === page) read.refresh();
     if (next.toString() !== params.toString()) router.push("/admin?" + next, { scroll: false });
   }
-  return <section className="ui-card hca-audit-history space-y-4" aria-label="Histórico de auditoria" aria-busy={loading}>
+  return <section className="ui-card hca-operations-card hca-audit-history space-y-4" aria-label="Histórico de auditoria" aria-busy={loading}>
     <h2 className="font-semibold">Eventos de auditoria deste contexto</h2>
     <p>Consulte o período, o recurso ou a referência de um evento. A consulta preserva os registros e as decisões.</p>
     <form ref={formRef} className="hca-form" onSubmit={event => {
@@ -60,7 +61,7 @@ export function AuditHistory({ patientId }: { patientId: string }) {
     {data ? <>
       <p role="status">{data.total} {data.total === 1 ? "evento encontrado" : "eventos encontrados"} · página {data.page} de {Math.max(1, Math.ceil(data.total / data.pageSize))}</p>
       {fresh && !data.data.length ? <p>Nenhum evento corresponde aos filtros consultados.</p> : null}
-      <ol className="hca-records">{data.data.map(event => <li key={event.id} data-audit-id={event.id} className="hca-audit-event rounded border border-(--line) p-3 space-y-2" aria-label={"Evento " + event.id.slice(0, 8)}>
+      <ol className="ui-card hca-technical-list">{data.data.map(event => <li key={event.id} data-audit-id={event.id} className="hca-technical-record hca-audit-event" aria-label={"Evento " + event.id.slice(0, 8)}>
         <h3 className="font-semibold">{auditActionLabel(event.action)}</h3>
         <p>{formatBrazilDate(event.created_at)} · {auditEntityLabel(event.entity_type)}</p>
         <p>{event.actor_id ? "Pessoa (nome do cadastro atual): " + (event.actor_name_current || "Nome não disponível") : "Sistema ou autoria histórica não identificada"}</p>

@@ -21,12 +21,13 @@ estável de produto será 1.0.0; não está sendo publicada nesta missão.
 - [Ordens vigentes e matriz de aceitação](docs/audits/D/D-B/README.md).
 - [Decisões](docs/decisions/README.md) e [histórico](docs/audits/README.md).
 
-Fichas em abas, Andamentos, rascunhos próprios, PWA, Web Push e verificação
-documental têm implementação no candidato. Permanecem as pendências indicadas
-no acompanhamento, incluindo aparência integral, modalidades documentais e
-validações finais. PDFs usam certificado e TSA internos, sem afirmar ICP-Brasil.
-A aparência aprovada dos PDFs está em implementação. Os mecanismos de rascunho
-existentes ficam preservados; sua simplificação e expansão foram adiadas.
+Fichas em abas, Andamentos, rascunhos próprios, PWA e Web Push têm implementação
+no candidato. Ficha, Ficha Ampliada e auditoria restrita usam a aparência
+documental aprovada e o pipeline real de emissão, guarda e verificação.
+Os PDFs usam certificado e TSA internos, sem afirmar ICP-Brasil. O
+acompanhamento distingue implementação, validação técnica e avaliação humana
+pendentes. Os mecanismos de rascunho existentes ficam preservados; sua
+simplificação e expansão foram adiadas.
 
 A e B encerraram o diagnóstico; C registra o planejamento histórico; D-A
 consolidou D0–D2. Esses marcos não aprovam automaticamente a CI do candidato

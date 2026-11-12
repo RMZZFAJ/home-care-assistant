@@ -12,7 +12,10 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  reporter: [["list"], ["html", { open: "never" }]],
+  // Emit the native error at test end, before a job deadline can interrupt HTML.
+  reporter: process.env.GITHUB_ACTIONS
+    ? [["list"], ["html", { open: "never" }], ["github"]]
+    : [["list"], ["html", { open: "never" }]],
   use: {
     // General HTTP fault tests need routable requests. PWA has its own real-worker suite.
     serviceWorkers: "block",

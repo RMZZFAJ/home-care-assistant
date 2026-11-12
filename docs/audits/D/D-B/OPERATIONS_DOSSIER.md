@@ -1,16 +1,21 @@
 # Base operacional D-B
 
-**Implementação parcial.** A política aprovada é diária, sete diários e quatro
-semanais, cópia antes de alterações críticas, RPO alvo24h e RTO alvo8h.
-Não há agendamento diário ou monitoramento de incidentes implementado neste
-incremento. O ensaio abaixo não aprova o gate operacional D6.
+**Registro histórico dos incrementos operacionais.** A política aprovada é
+diária, sete diários e quatro semanais, cópia antes de alterações críticas,
+RPO alvo24h e RTO alvo8h. O software de agenda/retenção, captura cifrada,
+recuperação isolada e monitoramento persistente está implementado. A operação
+permanente e o gate D6 continuam separados. Consulte o
+[contrato vigente](../../../current/OPERATIONS.md) e o
+[acompanhamento principal](../../../../TEMP_D_B_ATUALIZACAO.md) para o estado
+atual; os marcos abaixo preservam seus resultados e limites à época.
 
 Atualização OPS.2: o [pipeline](BACKUP_PIPELINE.md) agora integra captura remota,
 destino filesystem cifrado, sete slots diários/quatro semanais, críticos
 preservados e recibos de falha. CLI real e restauração/upgrade isolados foram
 exercitados. A agenda permanente continua desligada; não há backup operacional
-externo ativo. Monitoramento persistente e consumidor técnico estão em
-validação no lote [OPS.3](OBSERVABILITY.md); nenhum aceite operacional foi dado.
+externo ativo. Monitoramento persistente e consumidor técnico foram integrados
+no lote [OPS.3](OBSERVABILITY.md) e atualizados no lote 6; nenhum aceite
+operacional foi dado.
 [Evidência atual](OPS_2_EVIDENCE.json); as seções seguintes preservam os marcos
 anteriores e seus limites específicos.
 

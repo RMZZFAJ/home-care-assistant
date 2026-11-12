@@ -492,6 +492,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
               execute={execute}
               isGlobalAdmin={globalMode}
               queried={!loading && !readError && !queueRefreshing}
+              blocked={busy || loading || Boolean(readError) || queueRefreshing || readDenied}
             />
             {notificationTotal > 20 && (
               <nav

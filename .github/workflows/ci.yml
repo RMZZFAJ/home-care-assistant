@@ -95,7 +95,9 @@ jobs:
             artifact: ios-2
     name: browser (${{ matrix.artifact }})
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # WebKit reached only 162/242 cases before the old 40-minute job deadline.
+    # Keep the same shards, workers, assertions and retries; allow its full run.
+    timeout-minutes: ${{ matrix.engine == 'webkit' && 70 || 40 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Reserve the local Supabase ports
@@ -137,6 +139,7 @@ jobs:
           name: browser-test-report-${{ matrix.artifact }}
           path: |
             playwright-report/
+            test-results/
             output/playwright/harness-results/
           retention-days: 7
 

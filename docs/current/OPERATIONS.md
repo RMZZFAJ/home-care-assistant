@@ -274,6 +274,47 @@ sendo a ação explícita para guardar a preparação. Depois da criação, nome
 estado e fuso registrados aparecem em leitura. Os resumos de escalas, BAL e
 conferência distinguem configuração registrada de execução física.
 
+## Central técnica e continuidade
+
+Administração global → Monitoramento e suporte reúne Visão técnica,
+Continuidade, Residências e contas e Eventos e política. O ambiente selecionado
+identifica as observações; ausência de atividade registrada não comprova saúde.
+As abas conservam os campos da política e a confirmação em andamento.
+
+Em Visão técnica, Investigar incidente abre o contexto, os motivos de
+acompanhamento e encerramento e sua referência. Uma resposta perdida mantém
+o ambiente bloqueado para recuperar a mesma alteração. Conflito exige consultar
+a versão atual; guardar outra política depende da revisão explícita dessa
+referência. O histórico mantém os atos e as versões anteriores.
+
+Eventos e política permite consultar tentativas do banco compartilhado.
+Web Push mostra as tentativas efetivamente registradas; a fila legada apresenta
+seu resultado atual, sem inventar histórico anterior ausente. Paciente,
+destinatário, destino, chave e conteúdo do aviso ficam fora dessa consulta.
+Aceite de transporte não comprova ciência ou recebimento. A visão global não
+concede ações locais de reenvio. A fila autorizada do paciente conserva sua
+própria revisão e exige confirmação explícita de conciliação antes de repetir
+um resultado incerto. Consultar, abrir ou cancelar essa revisão não autoriza
+outra tentativa nem ativa canais postergados.
+
+Em Continuidade, confira a cópia, o ensaio e os passos de isolamento,
+reconciliação e retomada. Registros compatíveis não substituem a conferência
+dos arquivos. Um resultado posterior de falha impede apresentar sucesso
+anterior como confirmação atual. Não há restauração ou reativação automática
+pelo painel. Responsável, substituto, canal e prazos operacionais precisam ser
+definidos antes da liberação.
+
+O mecanismo de backup contempla banco, Auth, histórico, permissões e bytes do
+Storage. A política mantém sete datas diárias, quatro semanas e cópias críticas
+preservadas. A captura e o arquivo cifrado são conferidos antes da retenção;
+mudança estável da fonte ou objeto ausente impede confirmar a cópia. Chaves e
+configuração permanecem separadas, fora do Git. A recuperação usa um destino
+novo e isolado, sem substituir o banco de origem ou ativar agendamentos e
+saídas de mensagens. RPO de 24 horas e RTO de 8 horas são metas a comprovar em
+operação. A rotina externa e o monitor externo não estão ativos.
+Os procedimentos do operador estão em [backup](../audits/D/D-B/BACKUP_PIPELINE.md)
+e [custódia documental](../audits/D/D-B/SIGNING_CUSTODY.md).
+
 ## Desenvolvimento e preservação
 
 A suíte utiliza somente a stack local home-care-assistant, com API em

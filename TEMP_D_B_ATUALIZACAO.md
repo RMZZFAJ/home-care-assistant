@@ -1,7 +1,7 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, com guia por papel, preparação local,
-contingência e identidade/acesso entregues localmente no lote 5.
+Atualizado em 12 de novembro de 2026, com suporte, acompanhamento de avisos e
+recuperação conferidos localmente no lote 6. O fechamento da CI continua aberto.
 Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
@@ -9,8 +9,8 @@ liberação para produção.
 ## 1. Definições e leitura do acompanhamento
 
 - **Critérios:** são 105, sendo 75 originais e 30 complementos da Ordem Mestre.
-  Há 72 com implementação e verificações concluídas e 33 parciais. Desses 72,
-  71 têm conclusão local e um registra a aplicação remota já reconciliada da
+  Há 79 com implementação e verificações concluídas e 26 parciais. Desses 79,
+  78 têm conclusão local e um registra a aplicação remota já reconciliada da
   D-A. Nenhum critério inteiro está sem início; algumas subtarefas estão em 0%.
 - **Etapas 01–20:** identificadores preservados para localizar os requisitos.
   A execução restante está agrupada em seis capacidades na seção 6; as etapas
@@ -71,19 +71,32 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 
 | Acompanhamento | Estado registrado |
 | --- | --- |
-| Critérios da D-B | 72 verificados; 33 parciais; total de 105 |
+| Critérios da D-B | 79 verificados; 26 parciais; total de 105 |
 | Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
-| Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
+| Aparência da aplicação | 66/66 conferidas; ressalvas no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
-| Outras áreas visuais | 3 composições e quatro relações técnicas pendentes |
+| Outras áreas visuais | Três composições e quatro relações restantes fechadas |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
-| Próxima entrega | Administração, guias e aparência restante |
-| Incremento atual | Preparação global da residência |
-| Resultado local | 63 das 66 composições conferidas localmente |
-| Banco | Local e remoto em 237, sem atualizações pendentes |
-| CI de 8657a49 | Linux, Windows e banco passaram; navegadores em execução |
-| Preview de 8657a49 | Concluído na Vercel; produção preservada |
-| CI deste incremento | Pendente; conferência conjunta obrigatória |
+| Próxima entrega | Critérios finais e validação do candidato publicado |
+| Incremento atual | Suporte, continuidade e CI iOS |
+| Resultado local | 66 composições; 164 relações conferidas |
+| Banco | Local e remoto em 238, sem atualizações pendentes |
+| CI de 0dbd2ba | Linux/Windows/banco/Chromium passaram; iOS cortado |
+| Preview de 0dbd2ba | Concluído na Vercel; produção preservada |
+| CI deste incremento | Pendente; limite iOS corrigido, diagnóstico preservado |
+
+**Resultado utilizável do lote 6:** Administração global → Monitoramento e
+suporte reúne visão técnica, continuidade, residências/contas e eventos/política.
+As tentativas de avisos são reais, paginadas e sem dados privados dos pacientes.
+A conciliação continua exigindo decisão explícita; consultar não reenvia avisos.
+Falhas de consulta e confirmações incertas têm recuperação própria, com retorno
+de foco mesmo quando o botão da ação deixa de existir.
+
+Backup e recuperação fecharam no escopo de software: uma nova cópia cifrada foi
+autenticada e restaurada isoladamente, com tabelas, arquivos e emissões prontas
+conferidos. A agenda permanente e a telemetria dessa cópia continuam desligadas.
+Destino externo, custódia operacional e metas de recuperação não foram aprovados.
+Os detalhes estão no grupo 3.7; a única sequência restante está na seção 6.
 
 **Resultado utilizável do lote 5:** Guias e ajuda apresenta navegação por
 etapas para os seis papéis, preserva o paciente nos encaminhamentos e recusa
@@ -100,7 +113,7 @@ para vincular um fato já registrado, sem repetir estoque, ciência ou aceite.
 A recuperação sobrevive à recarga pela referência da operação; o formulário
 comum não recebe rascunho. A etapa 16 está concluída no escopo de software.
 
-**Último lote encerrado localmente:** lote 4, aplicativo, avisos e lembretes.
+**Lote 4 já encerrado localmente:** aplicativo, avisos e lembretes.
 As etapas 11/12/13 fecharam no escopo executável. A escolha de avisos não pode
 passar para outra conta ou sessão após a espera da permissão. DOC-C.1 continua
 adiado; CI própria, entrega externa, custódia operacional, avaliação humana e
@@ -128,11 +141,11 @@ A preparação real dos certificados de teste tem limite próprio, sem mudar
 assinatura ou timeout do aplicativo. Passaram 26 percursos móveis e 16 testes
 de PDF, tipos e lint dirigido. A CI conjunta continua pendente.
 
-**Relações do lote 5:** conferência concluída no recorte disponível. Das 171,
-160 têm comprovação local compatível; quatro acompanham suporte no lote 6;
+**Relações dos lotes 5/6:** conferência concluída no recorte executável. Das 171,
+164 têm comprovação local compatível;
 cinco pertencem à apresentação de rascunhos adiada; duas foram removidas por
 decisão aprovada. Não equivale a aprovar as 171 integralmente. A próxima entrega
-é o lote 6, com as três composições técnicas restantes.
+é a validação conjunta do candidato publicado.
 A recuperação oficial continua obrigatória. Os rascunhos permanecem intactos.
 A atualização entre duas sessões passou no banco da CI
 976d42c; o BAL em iOS integra a correção dirigida atual.
@@ -1069,13 +1082,14 @@ quando a vigência anterior é desconhecida; não inventam ciência ou contagem.
 
 ### 3.7 Backup, recuperação, suporte e monitoramento
 
-**Critérios deste grupo: 0 concluídos localmente; 7 parciais.**
+**Critérios deste grupo: 7 concluídos no escopo local executável.** Ativação,
+custódia e comprovação operacional continuam separadas na etapa 20.
 
 **Etapas relacionadas:** 17; 18; 20.
 
 #### 18 — Backup e recuperação
 
-Estado: em execução · 75%. Responsável: Codex.
+Estado: concluído localmente · 100% do software. Responsável: Codex.
 
 **Condição para fechar:** O software e seus ensaios demonstram captura coerente,
 retenção, verificação e recuperação isolada com os limites operacionais
@@ -1089,24 +1103,30 @@ Pontos de verificação:
 - 18.4 Cópia antes de alteração crítica.
 - 18.5 Restauração isolada e recuperação de chaves.
 
-**O que falta:** Concluir recuperação de chaves, armazenamento independente e
-exercícios restantes; ativação operacional depende de autorização.
+**Entregue:** captura de banco e arquivos, cópia cifrada com chave separada,
+retenção 7+4, cópia crítica e restauração isolada. O exercício mais recente
+conferiu 183 conjuntos de tabelas, 34 arquivos, 33 PDFs e duas emissões assinadas
+prontas; a cópia foi atualizada de 237 para 238 somente no banco isolado.
+As diferenças de representação do catálogo foram delimitadas, sem ocultar o
+resultado bruto. O banco do ensaio foi removido. Recuperação e renovação das
+chaves documentais também passaram no lote 3.
+
+**O que depende de você e da operação:** escolher destino externo independente,
+titular/substituto e custódia, autorizar agenda e telemetria e realizar o ensaio
+operacional com metas de prazo. Nada disso recebe aprovação pelo teste local.
 
 #### Backup e recuperação — critérios originais
 
-- **Copiar banco e arquivos de forma protegida e conferível** — Em execução ·
-  ≈75%. Falta: Completar ligação com destino independente e operação permanente.
-  Responsável: Codex; você para destino e custódia.
-- **Retenção de sete cópias diárias e quatro semanais** — Em execução · ≈75%.
-  Falta: Ativar agenda somente no momento autorizado e conferir capacidade.
-  Responsável: Codex; você para ativação.
-- **Recuperar cópia isolada e preparar teste operacional completo** — Em
-  execução · ≈75%. Falta: Completar recuperação de chaves e ensaio operacional
-  com metas de prazo. Responsável: Codex; depois você e responsáveis.
+- **Copiar banco e arquivos de forma protegida e conferível** — Concluído
+  tecnicamente · 100%. Destino externo e custódia operacional: você.
+- **Retenção de sete cópias diárias e quatro semanais** — Concluído no software
+  · 100%. Agenda permanente ainda desligada; autorização de ativação: você.
+- **Recuperar cópia isolada e preparar teste operacional completo** — Concluído
+  tecnicamente · 100%. Ensaio operacional, participantes e metas: você e equipe.
 
 #### 17 — Monitoramento e suporte
 
-Estado: em execução · 85%. Responsável: Codex.
+Estado: concluído localmente · 100% do software. Responsável: Codex.
 
 **Condição para fechar:** Falhas previstas geram observações/incidentes
 persistentes com severidade, reconhecimento, tratamento e visão autorizada.
@@ -1120,23 +1140,26 @@ Pontos de verificação:
 - 17.5 Reconhecer e tratar incidentes.
 - 17.6 Impacto pessoal e detalhe mínimo de suporte.
 
-**O que falta:** Concluir a cobertura de falhas e o exercício de acompanhamento
-e tratamento pelas pessoas autorizadas.
+**Entregue:** incidentes persistentes, severidades e limites, reconhecimento,
+tratamento, histórico completo e orientação separada para equipe e suporte.
+As três composições finais foram comparadas ao modelo em cinco larguras;
+consulta, erro, autorização, decisão explícita e recuperação passaram no Chrome
+móvel e no WebKit. A projeção global de tentativas não concede leitura de dados
+operacionais nem permite reenvio. A observação externa e a operação assistida
+com responsáveis reais permanecem na etapa 20; monitor interno não comprova
+disponibilidade total do serviço.
 
 #### Suporte e monitoramento — critérios originais
 
-- **Separar detalhe técnico do suporte da orientação para a equipe** — Em
-  execução · ≈80%. Falta: Completar integração das ocorrências e conferir a
-  operação assistida. Responsável: Codex; depois você e suporte.
-- **Registrar, reconhecer, tratar e consultar incidentes** — Em execução ·
-  ≈80%. Falta: Concluir integração e conferir o trabalho real de suporte.
-  Responsável: Codex; depois você e suporte.
+- **Separar detalhe técnico do suporte da orientação para a equipe** —
+  Concluído localmente · 100%. Operação assistida: você e suporte.
+- **Registrar, reconhecer, tratar e consultar incidentes** — Concluído
+  localmente · 100%. Exercício com responsáveis reais: você e suporte.
 - **Acompanhar banco, avisos, assinaturas, integridade, backups e recuperação**
-  — Em execução · ≈75%. Falta: Completar cobertura operacional e integração
-  externa quando autorizada. Responsável: Codex; você; serviço externo.
-- **Visão técnica global sem acesso indevido aos dados dos pacientes** — Em
-  execução · ≈80%. Falta: Concluir revisão dos estados e exercício com
-  responsáveis. Responsável: Codex; depois suporte.
+  — Concluído no software interno · 100%. Serviço externo, ativação e
+  comprovação operacional: você e fornecedor, quando autorizados.
+- **Visão técnica global sem acesso indevido aos dados dos pacientes** —
+  Concluído localmente · 100%. Exercício com responsáveis reais: suporte.
 
 ### 3.8 Banco, qualidade, piloto e encerramento
 
@@ -1186,15 +1209,17 @@ identificar as responsabilidades externas. Sonar permanece adiado.
 
 **Etapas relacionadas:** 06; 15; 20.
 
-**Estimativa global da aplicação: 85%.** Inclui telas, estados e funções; não
-significa que 85% das telas estejam individualmente aprovadas. As 46 composições
-da etapa 06 foram fechadas localmente. GUI-01 e GUI-03 também fecharam; restam
-outras 12 e a conferência completa
-das 66 composições e 171 relações.
+**Aparência: 100% das 66 composições do escopo executável conferidas localmente.**
+Isso não aprova a CI final, a avaliação humana ou a apresentação dos rascunhos
+adiada por você. As 46 composições de operação e as vinte demais fecharam no
+recorte local. Das 171 relações, 164 têm comprovação compatível, cinco conservam
+a apresentação existente de rascunhos por decisão sua e duas foram removidas
+conforme aprovado. Nenhuma relação adiada virou PASS.
 
 O alvo é uma aparência única do Modelo Integral, incluindo recursos ausentes do
 HTML de referência. A dependência Fluent foi removida e a base compartilhada e
-as fichas em abas foram implementadas. Isso não conclui toda a migração. Os PDFs
+as fichas em abas foram implementadas. A conferência local cobre as 66
+composições, com as ressalvas acima. Os PDFs
 têm sua referência própria e estão no grupo 3.3.
 
 #### 06 — Aparência completa das áreas de operação
@@ -1238,7 +1263,7 @@ conferência conjunta local.
 
 #### 15 — Aparência das demais áreas e relações restantes
 
-Estado: em execução · 75%. Responsável: Codex.
+Estado: composições executáveis concluídas localmente · 100%. Responsável: Codex.
 
 **Condição para fechar:** O conjunto das etapas 6 e 15 cobre as 66 composições e
 171 relações, com funções preservadas e comparação individual com o Modelo
@@ -1246,17 +1271,16 @@ Integral.
 
 Pontos de verificação:
 
-- 15.1 Administração — ADM-01–04 e ADM-06 conferidos localmente; falta ADM-05.
+- 15.1 Administração — ADM-01–06 conferidos localmente.
 - 15.2 Identidade e acesso — ID-01–05 concluídos localmente no escopo visual.
-- 15.3 Notificações — NOT-01–04 conferidos; falta NOT-05.
-- 15.4 Guias — GUI-01/02/03 concluídos localmente; falta a composição de suporte.
-- 15.5 Relações reconciliadas no recorte disponível; quatro relações técnicas
-  acompanham as três composições do lote 6.
+- 15.3 Notificações — NOT-01–05 conferidos localmente.
+- 15.4 Guias — GUI-01–04 concluídos localmente, incluindo continuidade/suporte.
+- 15.5 Relações reconciliadas: 164 conferidas, cinco adiadas e duas removidas.
 
-**O que falta:** Concluir as três composições: NOT-05, ADM-05 e GUI-04.
-As 63 composições visuais conferidas e a reconciliação das 171 relações não
-aprovam as quatro relações técnicas ainda pendentes. O fechamento conjunto e a
-CI própria continuam com Codex; apresentação de rascunhos permanece adiada.
+**O que falta:** fechamento conjunto e CI do candidato publicado, com Codex;
+avaliação humana e física, com os participantes. A apresentação de rascunhos
+permanece adiada. ADM-05, NOT-05 e GUI-04 fecharam no lote 6, preservando
+permissões, histórico, política e comandos reais.
 
 **Entrega das relações:** a conferência conserva os estados próprios de
 conta global, senha, cancelamento e variantes BAL. COM e BAL já podem ser
@@ -1660,6 +1684,24 @@ critérios permanecem 72 verificados e 33 parciais até o fechamento técnico.
 Na CI de c5641bf, Linux, Windows, banco e Preview passaram; os seis grupos de
 navegador ainda estavam em execução na observação. Sonar permanece adiado.
 
+**12 de novembro — suporte e continuidade:** as três composições técnicas
+restantes e suas quatro relações fecharam localmente. Visão global de tentativas,
+auditoria, política e incidentes preservam autorização e confirmação explícita.
+Os fluxos de recuperação e foco passaram em Chrome móvel e WebKit, junto da
+comparação visual e acessibilidade dirigidas. Backup crítico e restauração
+isolada conferiram o conteúdo atual; local/remoto chegaram a 238. O grupo 3.7
+ganhou sete conclusões técnicas, chegando a 79 critérios verificados e 26
+parciais. O fechamento integrado desses parciais continua com Codex.
+
+**CI iOS desse marco:** os dois grupos de 0dbd2ba foram cortados pelo limite
+de 40 minutos. Não houve cancelamento por falha de outro grupo; Linux, Windows,
+banco e os quatro grupos Chromium/móvel passaram. Perfil e estoque apresentaram
+falhas nessa execução, mas ambos passaram na reprodução local WebKit. A causa
+dessas falhas de caso ainda depende da nova CI. O limite específico de WebKit
+passou a 70 minutos, com os mesmos casos e regras; erros serão publicados ao
+terminar cada teste e seus arquivos serão preservados mesmo em cancelamento.
+Isso corrige o corte e a perda de diagnóstico, sem declarar a CI já aprovada.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1761,6 +1803,10 @@ têm comprovação local compatível.
 
 ### Lote 6 — Continuidade operacional e fechamento técnico
 
+**Software de suporte e continuidade concluído localmente.** As etapas 17/18 e
+as três composições visuais restantes fecharam. O lote permanece aberto somente
+para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passar.
+
 - **Resultado:** monitoramento/suporte, backup/recuperação e candidato final
   coerentes com banco, Preview, contratos e configuração de uso.
 - **Requisitos:** 17/18/19; grupos 3.7/3.8 e regressão integrada restante.
@@ -1768,6 +1814,16 @@ têm comprovação local compatível.
   destino/rotina externos e liberação operacional continuam separados.
 - **Validação e fechamento:** exercícios de falha/recuperação previstos, CI do
   SHA final e migrations prontas reconciliadas. Sem reset, merge ou produção.
+
+**Ordem atual do restante, sob responsabilidade de Codex:**
+
+1. Publicar o candidato integrado com a correção do corte da CI iOS; observar
+   seus resultados e o Preview, corrigindo qualquer falha efetiva.
+2. Reconciliar os 26 critérios parciais com as entregas já fechadas, preservando
+   os IDs e os adiamentos. Fechar as validações técnicas que realmente faltarem;
+   não repetir suítes compatíveis apenas para atualizar o acompanhamento.
+3. Concluir a etapa 19: conferir CI, migrations, Preview e contratos do candidato
+   final e entregar o estado técnico com os próximos gates e responsáveis.
 
 ### Gates externos e adiamentos
 
