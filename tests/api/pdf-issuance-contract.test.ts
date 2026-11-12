@@ -13,6 +13,8 @@ it("refuses browser-selected signing facts, readiness and worker proof at the HT
     { workerToken: "secret" },
     { keyVersion: "forged" },
     { requestedBy: id },
+    { documentOptions: { mode: "summary", sections: ["progress"], period: { from: null, through: null, timeZone: "America/Sao_Paulo" }, purpose: null } },
+    { documentOptions: { mode: "expanded", sections: ["progress"], period: { from: null, through: null, timeZone: "America/Sao_Paulo" }, purpose: null, snapshot: {} } },
   ]) {
     const response = await POST(
       new Request(`https://care.example/api/documents/${id}/issuances`, {

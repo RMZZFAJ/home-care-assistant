@@ -107,6 +107,8 @@ const automatic = z
     authorName: z.string().nullable(),
   })
   .strict();
+export const progressRowSchema = z.discriminatedUnion("source", [manual, automatic]);
+export const automaticProgressSchema = automatic;
 const page = z
   .object({
     documentId: uuid,
@@ -116,7 +118,7 @@ const page = z
     size: z.number().int().min(1).max(50),
     total: z.number().int().nonnegative(),
     canPublish: z.boolean(),
-    data: z.array(z.discriminatedUnion("source", [manual, automatic])).max(50),
+    data: z.array(progressRowSchema).max(50),
   })
   .strict();
 const outcome = z

@@ -1,7 +1,7 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, após o incremento de Andamentos
-estruturados. Inclui a refatoração visual da aplicação e o complemento aprovado
+Atualizado em 12 de novembro de 2026, após o fechamento local do lote 2.
+Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
 
@@ -74,39 +74,45 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
-| Complemento documental | DOC-A/B 100% locais; DOC-C ≈40% |
-| Próxima entrega | Ficha Ampliada, auditoria e Andamentos |
-| Incremento deste lote | Menções e destaques na publicação do andamento |
-| Resultado local | Publicação e recuperação integradas; PDF ainda pendente |
-| Banco | Local e remoto em 229, sem atualizações pendentes |
-| CI anterior 0db3f13 | Linux/Windows e banco passaram; navegadores pendentes |
+| Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
+| Próxima entrega | Custódia, recuperação e verificação documental |
+| Incremento deste lote | Ficha Ampliada e auditoria com conteúdo selecionado |
+| Resultado local | Modalidades assinadas, recuperáveis e sob permissão |
+| Banco | Local e remoto em 231, sem atualizações pendentes |
+| CI anterior 10b7e80 | Linux/Windows passaram; banco falhou; sem navegadores |
 | CI deste incremento | Pendente no novo commit |
-| Preview anterior 0db3f13 | Vercel concluiu; acesso agrupado publicado |
+| Preview anterior 10b7e80 | Vercel concluiu; Andamentos publicados |
 
-**Último ponto integral encerrado:** DOC-C.3, histórico de acesso das quatro
-fichas com agrupamento em vinte minutos, recuperação e competência própria.
-DOC-A e DOC-B continuam concluídos localmente. A revisão humana dos PDFs e a
-validação do novo commit permanecem separadas.
+**Último lote encerrado localmente:** lote 2, modalidades e acompanhamento
+documental. DOC-C.2–5 e DOC-D estão integrados; DOC-C.1 permanece adiado por sua
+decisão, sem aprovação fictícia. A revisão humana dos PDFs, a CI do novo commit
+e os requisitos gerais ainda parciais de 08/09/10 permanecem separados.
 
 **Resultado do lote 1:** REQ, compra, doação, entrega, devolução autônoma e BAL
 foram gerados e assinados pelos fluxos reais de teste, com a aparência aprovada.
 Páginas, conteúdo longo, autoria, contexto legado, referências autorizadas e
-quantidades foram conferidos. A revisão 16 passa a ser usada nas novas emissões
-quando este incremento estiver disponível no Preview; exemplares anteriores
-continuam preservados.
+quantidades foram conferidos. A Ficha cotidiana mantém sua
+composição aprovada nas novas emissões; exemplares anteriores são preservados.
 
-**Próxima entrega:** modalidades e Andamentos documentais do lote 2. Ficha
-Ampliada e auditoria restrita continuam sob responsabilidade de Codex. Menções
-e destaques funcionam na tela; falta levá-los aos complementos dos PDFs.
-Acessos agrupados continuam concluídos localmente. O seletor ambíguo da CI foi
-corrigido e conferido. O caso iOS
-anterior passou na reprodução local, mas sua causa não ficou comprovada; o
-diagnóstico ampliado acompanhará a próxima CI. Os rascunhos permanecem intactos.
+**Resultado do lote 2:** Ficha Ampliada preserva materiais, observações e
+exceções essenciais; acrescenta seções e período escolhidos. Menções, destaques,
+cronologia, comunicações, confirmações, vínculos e acessos estão integrados aos
+arquivos. A auditoria exige competência própria e traz identificação nominativa
+em todas as páginas. Foram geradas amostras reais assinadas de REQ, compra,
+doação, entrega, devolução, BAL e auditoria, com dados fictícios de teste.
 
-**Validações deste incremento:** 19 cenários com autenticação real, 18 testes de
-contrato e o percurso integrado em Chromium e iOS. As cinco larguras, os dados
-e a recuperação foram conferidos, com build próprio. A atualização remota foi
-reconciliada; a CI ainda precisa validar o novo commit. Sonar permanece adiado.
+**Próxima entrega:** lote 3, completar confiança, custódia, recuperação e
+verificação nas situações restantes de 08/09/10. Os rascunhos permanecem intactos.
+A falha da CI anterior no teste de atualização entre duas sessões passou na
+reprodução local, sem alterar o limite; a causa da falha remota não foi
+comprovada. O diagnóstico do BAL em iOS também aguarda a próxima CI completa.
+
+**Validações deste incremento:** 14 cenários com autenticação real, 16 testes de
+conteúdo/contrato e oito percursos em Chromium/iOS, em rodadas compatíveis.
+Incluem seleção, período, resposta perdida, bytes preservados e autorização.
+O teste original entre duas sessões passou na reprodução local separada.
+As migrations foram reconciliadas. CI própria, revisão humana, aparelho físico
+e os demais gates mantêm seus requisitos; Sonar permanece adiado.
 
 ## 3. Funcionalidades e critérios
 
@@ -313,8 +319,9 @@ seção 6 informa a ordem atual, sem repetir os pontos de trabalho.
 
 O preenchimento pode ser salvo no servidor, retomado em outra sessão ou aparelho
 e comparado com outra edição. O texto é mantido quando outra sessão conclui o
-andamento, inclusive após perda da resposta de reconhecimento. Isso não conclui
-as menções, referências e destaques novos de DOC-C.
+andamento, inclusive após perda da resposta de reconhecimento. Esse é o
+escopo anterior da preparação privada; menções, referências e destaques têm
+seu fechamento próprio em DOC-C abaixo.
 
 #### 04 — Estados, próximas providências e vínculos das fichas
 
@@ -635,38 +642,40 @@ conteúdo preservado.
 
 ##### DOC-C — Modalidades, Andamentos e consulta
 
-**Em execução · ≈40% do acréscimo. Responsável: Codex.** DOC-C.3 está concluído
-e DOC-C.2 tem a parcela da tela implementada. DOC-C.1 permanece adiado e não
-entra no cálculo dos quatro pontos executáveis. A estimativa não mede tempo
-nem inclui a fase inteira.
+**Concluído localmente · 100% dos quatro pontos executáveis. Responsável:
+Codex.** DOC-C.1 permanece adiado por decisão sua e não entra nesse cálculo.
+A estimativa não mede a fase inteira nem substitui CI ou revisão humana.
 
-Ficha completa; Ficha Ampliada com complementos e período; auditoria restrita
-com marca nominativa. Andamentos já têm menções a pessoas, referências e
-destaques na tela, mantendo a cronologia. O catálogo visual está preparado
-para o mesmo conteúdo nos PDFs, cuja integração ainda falta. Acessos repetidos
-são agrupados em janelas de 20 minutos.
+Ficha integral e Ficha Ampliada usam a composição aprovada. A seleção acrescenta
+Andamentos, comunicações, confirmações, vínculos e histórico de acesso; o
+período não retira fatos obrigatórios da ficha. A auditoria é restrita, com
+finalidade e limites próprios. Todos usam a assinatura e a recuperação atuais.
 
 DOC-C.1 foi **adiado expressamente por você** no complemento executivo. Não
-serão simplificados nem ampliados os rascunhos existentes nesta D-B. O restante
-deste resultado continua obrigatório, assim como recuperar confirmações
-oficiais incertas.
+serão simplificados nem ampliados os rascunhos existentes nesta D-B. A
+recuperação segura das confirmações oficiais continua obrigatória.
 
 Pontos de entrega:
 
 - DOC-C.1 Retomada simples de rascunhos comuns — OWNER-DEFERRED; sem PASS.
-- DOC-C.2 Andamentos com menções, referências e destaques — em execução ·
-  ≈60%. A tela permite mencionar pessoas ativas do mesmo paciente e escolher
-  Registro, Marco importante ou Atenção, sem mudar autoria, ciência ou estoque.
-  A mesma publicação pode ser recuperada sem duplicação. O rascunho mantém
-  seus campos anteriores. Falta imprimir esses registros nas novas modalidades
-  documentais; responsabilidade de Codex.
+- DOC-C.2 Andamentos com menções, referências e destaques — concluído
+  localmente · 100%. Tela e PDF usam origem, natureza e destaque coerentes,
+  mantendo autoria e cronologia. Pessoas mencionadas não se tornam autoras ou
+  signatárias. A mesma publicação pode ser recuperada sem duplicação; o rascunho
+  mantém seus campos anteriores.
 - DOC-C.3 Acessos repetidos agrupados em janelas de 20 minutos — concluído
   localmente · 100%. Novos acessos da mesma pessoa/versão compartilham um
   registro, com recuperação por chave; o passado permanece preservado. O
   histórico exige competência própria do paciente e continua paginado. Acesso
   observado não equivale a ciência, leitura integral ou recebimento.
-- DOC-C.4 Ficha completa e Ficha Ampliada com período e complementos.
-- DOC-C.5 Auditoria restrita com marca nominativa.
+- DOC-C.4 Ficha completa e Ficha Ampliada com período e complementos —
+  concluído localmente · 100%. A escolha é fixada na emissão e preservada na
+  recuperação. Sem registros no período, o arquivo informa isso e mantém a
+  ficha integral. Uma fonte incompleta é recusada, sem publicar arquivo parcial.
+- DOC-C.5 Auditoria restrita com marca nominativa — concluído localmente ·
+  100%. Exige competência de auditoria do paciente, informa finalidade, fontes,
+  período e limites e identifica o exemplar em todas as páginas. Perder a
+  permissão bloqueia fonte, download e consulta desse exemplar no acervo.
 
 **Condição para fechar:** as modalidades e os registros funcionam na ficha e nos
 arquivos correspondentes, mantendo cronologia, autoria, acesso e recuperação
@@ -674,10 +683,10 @@ própria das confirmações incertas.
 
 ##### DOC-D — Geração integrada e exemplos reais
 
-**Em execução junto aos modelos. Responsável: Codex; você avalia as amostras.**
-A Ficha operacional dos cinco modelos usa o pipeline real e preserva exemplares
-anteriores. DOC-D.1–4 estão conferidos para essa modalidade; o mesmo ciclo será
-aplicado às modalidades novas do lote 2, antes de concluir DOC-D integralmente.
+**Concluído localmente · 100% do acréscimo. Responsável: Codex.**
+Ficha, Ficha Ampliada e auditoria usam o pipeline real de assinatura e guarda.
+As amostras foram conferidas internamente; você ainda avalia aparência, uso e
+impressão. Isso não aprova automaticamente os critérios gerais de 08/09/10.
 
 Integrar a nova composição ao gerador e à assinatura atuais. Preservar cópias
 antigas, recuperação e novo download dos mesmos bytes; nova emissão tem
@@ -1384,6 +1393,13 @@ na publicação oficial e na cronologia da tela, com recuperação da tentativa.
 O ponto permanece parcial até a integração com os PDFs do lote 2; nenhum
 critério inteiro recebeu aprovação adicional.
 
+**12 de novembro — lote 2 concluído localmente:** Ficha Ampliada, período,
+complementos e auditoria restrita integrados ao gerador e à assinatura. Menções
+e destaques chegam aos PDFs; seleção e bytes são recuperados sem nova emissão.
+As amostras são fictícias e usam a infraestrutura interna de teste. CI própria,
+avaliação humana e requisitos gerais de confiança/recuperação continuam nos
+seus gates, sem promoção adicional dos 105 critérios.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1412,9 +1428,9 @@ entregues. CI própria e avaliação humana continuam separadas.
 
 ### Lote 2 — Modalidades e acompanhamento documental
 
-**Em execução.** DOC-C.3 concluído localmente; menções e destaques de DOC-C.2
-funcionam na tela. Próximos: impressão desses registros, Ficha Ampliada e
-auditoria restrita de DOC-C.4/5. Não depende de alterar os rascunhos.
+**Concluído localmente.** DOC-C.2–5 e DOC-D estão integrados e conferidos.
+DOC-C.1 permanece adiado por decisão sua. O próximo lote é o 3, sem reabrir os
+rascunhos ou redefinir este fechamento como aprovação global da D-B.
 
 - **Resultado:** Ficha, Ficha Ampliada e auditoria restrita nominativa, com
   seleção/período, Andamentos estruturados, referências, menções e acessos
@@ -1435,8 +1451,7 @@ auditoria restrita de DOC-C.4/5. Não depende de alterar os rascunhos.
   conferência dos arquivos nas situações ainda pendentes.
 - **Requisitos:** restante de 08/09/10, critérios do grupo 3.3.
 - **Dependências e limites:** provedores internos e exemplares atuais;
-contratação
-  ICP-Brasil e custódia operacional externa são gates separados.
+  contratação ICP-Brasil e custódia operacional externa são gates separados.
 - **Validação e fechamento:** regressões criptográficas, falhas e concorrência
   realmente pendentes; não repetir o que os lotes 1/2 já cobrirem de forma
   compatível. Fecha com recuperação e resultados corretos nos casos previstos.

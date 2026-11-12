@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import fontkit from "@pdf-lib/fontkit";
-import { PDFDocument, PDFName, PDFString, rgb, type PDFFont, type PDFPage, type RGB } from "pdf-lib";
+import { PDFDocument, PDFName, PDFString, rgb, degrees, type PDFFont, type PDFPage, type RGB } from "pdf-lib";
 import { PdfStructure } from "./pdf-structure";
 
 export const documentColors = {
@@ -28,7 +28,7 @@ export type DocumentCell = { text: string; key?: string; strong?: boolean; tone?
 export type DocumentRow = { cells: DocumentCell[]; category?: string; urgent?: boolean };
 export type DocumentColumn = { label: string; fraction: number; align?: "right" };
 export type DocumentHeader = {
-  modality: string; title: string; code: string; status: string; tone: DocumentTone;
+  modality: string; auditWatermark?: string; title: string; code: string; status: string; tone: DocumentTone;
   asOf: string; requestedAt: string; exporter: string; verificationCode: string;
   privateUrl: string; metric: string; metricLabel: string; urgent?: number;
   seal?: { title: string; actor: string; at: string; how: string; tone: DocumentTone; confirmed: boolean };
@@ -214,6 +214,12 @@ export class ApprovedPdfLayout {
     this.gap(4);
   }
 
+  markedParagraph(value: string, key: string, paths: readonly string[], color: RGB) {
+    this.ensure(34);
+    this.structure.artifact(this.page, () => paths.forEach((path, index) => this.page.drawSvgPath(path, { x: M + index * 16, y: H - this.top, scale: 0.55, borderColor: color, borderWidth: 1.6 })));
+    this.paragraph(value, key, { strong: true, color, inset: paths.length * 16 + 3 });
+  }
+
   fields(fields: { label: string; value: string; key?: string; detail?: string; detailKey?: string }[]) {
     const fraction = BODY / fields.length;
     const rows = fields.map(field => this.wrap(field.value, 10.8, fraction - 12, 1));
@@ -381,6 +387,20 @@ export class ApprovedPdfLayout {
     for (const [index, page] of this.pdf.getPages().entries()) {
       this.page = page;
       this.pageIndex = index;
+      if (this.header.auditWatermark) {
+        if ([...this.header.auditWatermark].some(letter => !this.characters[0].has(letter.codePointAt(0)!))) throw new ApprovedPdfTextUnsupportedError("UNREPRESENTABLE_TEXT");
+        const glyphs: { text: string; column: number; advance: number }[] = [];
+        let column = 0, advance = 0;
+        for (const text of this.header.auditWatermark) {
+          // Separate vertical baselines so extraction preserves repeated letters as distinct glyphs.
+          const width = Math.max(4.5, this.fonts[0].widthOfTextAtSize(text, 6.3));
+          if (advance + width > 700) { column++; advance = 0; }
+          if (column >= 3) throw new Error("Audit watermark does not fit the reserved margin");
+          glyphs.push({ text, column, advance });
+          advance += width;
+        }
+        this.structure.artifact(page, () => glyphs.forEach(glyph => page.drawText(glyph.text, { x: 14 + glyph.column * 8, y: 60 + glyph.advance, size: 6.3, font: this.fonts[0], color: c.muted, rotate: degrees(90), opacity: 0.5 })));
+      }
       const footer = this.wrap("PDF solicitado por " + this.header.exporter + " · " + this.header.requestedAt, 8, BODY - 130);
       const top = H - 29 - footer.length * 11 - 13;
       this.rule(top - 7);

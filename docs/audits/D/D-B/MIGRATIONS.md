@@ -3,7 +3,29 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — publicação estruturada de Andamentos
+## Estado atual — modalidades documentais V17
+
+Local e remoto 231, sem pendências. Aplicadas uma vez 20261112070000 e
+20261112070100. Opções oficiais da emissão, fontes selecionadas, destinatário
+humano, competências próprias e recuperação por intenção não alteram rascunhos
+ou exemplares anteriores. Uma coluna, uma constraint, dois triggers e uma view
+privada; nenhuma tabela/index novo. A cronologia usa a mesma lista de fatos.
+
+Pré-check: 229 versões, onze dependências esperadas, onze entradas anteriores
+de reserva idênticas ao local, coluna/view/RPC novas ausentes e dry-run exclusivo
+das duas migrations. Pós-check: 231 versões e 26 definições/permissões/configs,
+constraint, triggers, coluna e view iguais ao local; versões antigas preservadas
+e dry-run vazio. Tabela conserva RLS e grants fechados. View/helper privados
+sem grants diretos; nova reserva somente authenticated, com negativas reais.
+
+Advisors mantêm as cinco classes de segurança e três de performance. RPCs Auth
+definer passam a 225 pela nova reserva. Permanecem 67 tabelas fechadas, três
+funções anon, 124 FKs sem índice, onze initplans e 72 índices sem uso observado.
+Extensão/proteção de senhas e achados anteriores continuam sem aprovação global.
+Sem reset, fixtures/Auth remoto ou backup pesado redundante no banco sintético.
+Instalação limpa, legado e integração integral continuam na CI do SHA publicado.
+
+## Histórico — publicação estruturada de Andamentos
 
 Local e remoto 229, sem pendências. Migration 20261112061700 acrescenta detalhes
 imutáveis da publicação: destaque e nomes/papéis de pessoas mencionadas. Não

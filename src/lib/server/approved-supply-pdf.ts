@@ -1,3 +1,4 @@
+import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
 import { documentVariant } from "@/lib/documents/variant";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { PDFHexString, PDFName } from "pdf-lib";
@@ -47,7 +48,7 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
   const status = cancelled ? "Cancelada" : purchase ? documentStatuses[snapshot.purchaseProgress?.state ?? snapshot.status] ?? "Situação não preservada" : done ? "Contagem aplicada" : snapshot.status === "archived" ? "Arquivada" : documentStatuses[snapshot.status] ?? "Situação não preservada";
   const title = purchase ? donation ? "Doação de materiais" : "Compra de materiais" : Number(snapshot.workflow?.countVersion ?? 1) > 1 ? "Reconto do estoque da equipe" : "Balanço do estoque da equipe";
   const header: DocumentHeader = {
-    modality: "Ficha", title, code: snapshot.code, status, tone, asOf: documentCutLabel(snapshot), requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName, verificationCode: emission.verificationCode,
+    ...approvedPdfMode(snapshot, emission), title, code: snapshot.code, status, tone, asOf: documentCutLabel(snapshot), requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName, verificationCode: emission.verificationCode,
     privateUrl: new URL("/documentos/" + snapshot.id, origin).href,
     metric: purchase ? snapshot.lines.filter(line => quantity(String(line.accepted_quantity ?? 0)).gt(0)).length + " / " + snapshot.lines.length : String(snapshot.lines.length),
     metricLabel: purchase ? "materiais com entrada validada" : "materiais contados",
@@ -162,6 +163,7 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
   appendOriginalObservations(layout, snapshot);
   appendDocumentCancellation(layout, lifecycle, "Cancelamento da ficha");
   const verificationUrl = new URL("/verificar/emissao/" + emission.verificationCode, origin).href;
+  appendApprovedPdfExpansion(layout, snapshot, emission);
   await appendVerificationAndPrivacy(layout, emission, purchase ? "Esta ficha de aquisição" : "Esta ficha de balanço", issuer, at, verificationUrl, emission.verificationCode.match(/.{1,4}/g)?.join("-") ?? emission.verificationCode);
   layout.finish();
   return { bytes: Buffer.from(await layout.pdf.save({ useObjectStreams: false })), identity };

@@ -1,3 +1,4 @@
+import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
 import { CATEGORY_LABELS } from "@/lib/catalog";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { appendDocumentOriginContext, appendDocumentRelated, appendOriginalObservations, appendDocumentCancellation, appendVerificationAndPrivacy } from "./approved-document-sections";
@@ -39,7 +40,7 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
   const tone: DocumentTone = cancelled ? "bad" : complete || archived ? "good" : "warn";
   const attended = source.historical ? null : snapshot.fulfillmentLines?.filter(line => line.attended).length ?? null;
   const header: DocumentHeader = {
-    modality: "Ficha", title: source.historical ? "Requisição histórica de materiais" : "Requisição de materiais",
+    ...approvedPdfMode(snapshot, emission), title: source.historical ? "Requisição histórica de materiais" : "Requisição de materiais",
     code: snapshot.code, status, tone, asOf: documentCutLabel(snapshot), privateUrl,
     requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName,
     verificationCode: emission.verificationCode,
@@ -97,6 +98,7 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
     else layout.paragraph("Registro histórico: a ciência original não está comprovada. A importação não comprova a data da emissão original nem sua ciência.", "science/historical");
   }
   appendDocumentCancellation(layout, lifecycle, "Cancelamento da requisição");
+  appendApprovedPdfExpansion(layout, snapshot, emission);
   await appendVerificationAndPrivacy(layout, emission, "Esta requisição", issuer, operationalAt, verificationUrl, formattedCode);
   layout.finish();
   return { bytes: Buffer.from(await layout.pdf.save({ useObjectStreams: false })), identity };

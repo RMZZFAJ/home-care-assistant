@@ -75,6 +75,7 @@ export type DocumentSnapshot = {
   sourceFacts?: unknown;
   lifecycleFacts?: unknown;
   presentationFacts?: unknown;
+  documentExpansion?: unknown;
   documentFacts?: unknown;
   balanceApplication?: unknown;
   balanceReviewCorrections?: unknown;
@@ -181,7 +182,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16;
+  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -208,7 +209,7 @@ export async function renderDocumentPdf(
   emission?: PdfEmissionContext,
 ) {
   const revision = emission?.rendererRevision ?? 5;
-  if (revision === 16) {
+  if (revision === 16 || revision === 17) {
     if (!emission) throw new Error("Approved document emission required");
     try { return (snapshot.type === "REQ" ? await renderApprovedRequisitionPdf(snapshot, emission) : snapshot.type === "ENT" ? await renderApprovedDeliveryPdf(snapshot, emission) : await renderApprovedSupplyPdf(snapshot, emission)).bytes; }
     catch (error) {

@@ -694,3 +694,19 @@ journal do ator efetivo, sem inferir autoria pelo criador do recurso. A
 recusa posterior às esperas reverte toda a transação. Recuperação e resolução
 serializam com a chave original; histórico próprio permanece paginado mesmo
 após reconhecimento. Funções nativas e migrations anteriores não mudam.
+
+## Modalidades documentais e fontes congeladas
+
+Migrations230–231 acrescentam document_options à intenção privada de emissão.
+Uma constraint vincula a presença das opções à revisão 17; trigger impede sua
+alteração. Fontes, chave, snapshot e bytes conservam as guardas imutáveis atuais.
+Não há reescrita de exemplares nem tabela/index novo. A view privada de fatos
+reutiliza a lista explícita da cronologia, sem grants diretos, e a consulta da
+ficha consome a mesma fonte.
+
+A nova reserva autenticada normaliza seleção/período e captura os complementos
+após os congelamentos canônicos. audit.read/document.access.read e leitura das
+referências são reavaliados nas entradas de recuperação/conclusão/download;
+listas filtram as modalidades restritas. Auxiliares privados não têm execute
+para anon, authenticated ou service_role. Reserva cotidiana e suas onze entradas
+anteriores mantêm corpos/grants; a nova modalidade tem hash de intenção próprio.

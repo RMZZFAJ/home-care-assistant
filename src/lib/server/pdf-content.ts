@@ -27,6 +27,7 @@ import { requirePurchaseEntryBalances, type PurchaseEntryBalances } from "@/lib/
 import { requirePdfLifecycleFacts, type PdfLifecycleFacts } from "@/lib/documents/pdf-lifecycle";
 import { approvedRequisitionContent } from "./approved-requisition-content";
 import { approvedSupplyContent } from "./approved-supply-content";
+import { approvedPdfExpansionContent } from "./approved-pdf-expansion-content";
 import { approvedDeliveryContent } from "./approved-delivery-content";
 
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
@@ -37,6 +38,7 @@ export type PdfContentPlan = {
   facts: string[];
   semanticFacts?: Record<string, string>;
   rendererRevision?: number;
+  auditWatermark?: string;
 };
 const normalize = (value: string) =>
   value.normalize("NFKC").replaceAll(/\s+/g, "");
@@ -120,10 +122,11 @@ export async function composeIssuance(
       error instanceof PdfTextUnsupportedError ? "unrepresentable" : "render",
     );
   }
-  if (revision === 16) {
+  if (revision === 16 || revision === 17) {
     const identity = { verificationCode: emission.verificationCode, requestedAt: emission.requestedAt };
     const obligations = snapshot.type === "REQ" ? approvedRequisitionContent(snapshot, emission) : snapshot.type === "ENT" ? approvedDeliveryContent(snapshot, emission) : approvedSupplyContent(snapshot, emission);
-    const plan = { bytes, runs, identity, rendererRevision: revision, ...obligations };
+    const expansion = revision === 17 ? approvedPdfExpansionContent(snapshot, emission) : undefined;
+    const plan = { bytes, runs, identity, rendererRevision: revision, ...obligations, semanticFacts: { ...obligations.semanticFacts, ...expansion?.semanticFacts }, auditWatermark: expansion?.auditWatermark };
     await validateIssuanceContent(bytes, plan);
     return plan;
   }
@@ -398,6 +401,14 @@ export async function validateIssuanceContent(
     );
     if (!plan.facts.length || missing !== -1)
       throw invalid("source-fact:" + missing);
+    if (plan.auditWatermark) for (const page of pages) {
+      // The mark is vertical in a reserved margin. Reconstruct actual glyph
+      // painting order; reading-order heuristics interleave it with body lines.
+      const text = page.lines.flatMap(line => line.spans.flatMap(span => span.chars))
+        .filter(char => char.bbox.x >= 7 && char.bbox.x + char.bbox.width <= 32.1 && Math.abs(char.fontSize - 6.3) < 0.01 && Number.isInteger(char.sequenceIndex))
+        .sort((a, b) => a.sequenceIndex! - b.sequenceIndex!).map(char => char.char).join("");
+      if (normalize(text) !== normalize(plan.auditWatermark)) throw invalid("audit-watermark");
+    }
     const parsed = await PDFDocument.load(bytes, { updateMetadata: false });
     const revision = plan.rendererRevision ?? Number(plan.identity.rendererRevision);
     if (revision >= 10) validatePdfStructure(parsed);

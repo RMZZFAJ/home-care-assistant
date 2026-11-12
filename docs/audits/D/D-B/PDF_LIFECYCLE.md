@@ -1,4 +1,55 @@
-# DOC-B.4 — cancelamento, ciência e vínculos no PDF
+# Atos e modalidades documentais
+
+## Contrato vigente das modalidades
+
+A Ficha cotidiana usa a composição aprovada V16. A Ficha Ampliada e o relatório
+de auditoria usam V17, preservando a Ficha integral e acrescentando fontes
+selecionadas. A identificação técnica do formato não muda a versão pública do
+produto. Nenhum exemplar anterior é reescrito ou assinado retroativamente.
+
+A seleção e o período integram a intenção imutável. A reserva captura eventos,
+notas manuais, comunicações, confirmações, relações e acessos autorizados em uma
+consulta. Uma coleção selecionada incompleta, de outro escopo ou fora do recorte
+é recusada. Intervalo de dias é inclusivo no fuso declarado; ausência de registros
+fica explícita, sem retirar materiais, observações, cancelamento ou ciências da
+Ficha. Abertura do complemento declara seleção, período, referência, fontes e
+critério. Eventos manuais/automáticos mantêm ordem e autoria próprias; origem,
+natureza, etapa e destaque permanecem distintos na tela e no arquivo.
+
+Nomes/papéis de pessoas mencionadas são preservados pelo banco. Menção não torna
+alguém autor/signatário nem cria ciência, recebimento ou estoque. Referências
+manuais só recebem rótulo/link quando autorizadas; perda posterior de leitura
+bloqueia a cópia conhecida. Uma nova seleção pode congelar o mascaramento atual.
+Comunicações conservam destinatário humano e estado disponíveis na reserva,
+excluindo destino, identificadores de provedor, templates e payloads privados.
+
+Auditoria usa audit.read do paciente e explicita finalidade, fonte e limitações.
+Acesso exige document.access.read. Identidade global e leitura da ficha não
+substituem essas competências. Marca vertical na margem contém solicitante,
+momento e código do exemplar em todas as páginas; não contém CPF, IP ou paciente.
+O verificador reconstrói a ordem real dos glifos na margem e confere a identidade
+completa em cada página, além dos fatos e da geometria do corpo. Não é laudo,
+prova de veracidade física ou garantia contra remoção da marca.
+
+A reprodução de uma fonte congelada longa expôs a supressão de letras
+consecutivas pelo extrator na marca vertical. O espaçamento dos glifos foi
+corrigido, mantendo a conferência integral em cada página. A fonte original
+passou sem alterar seus dados; o teste com letras repetidas também recusa um
+código esperado truncado.
+
+A assinatura interna PAdES-B-T e a TSA existentes cobrem toda a composição.
+Seleção, recuperação, acervo, download e upload de verificação usam o mesmo
+pipeline. Referência pendente só dispara reenvio explícito do mesmo pacote;
+referência inválida não vira outra geração. Permissões são conferidas novamente
+na fonte e no download, e as modalidades restritas são filtradas do acervo.
+Rascunhos comuns e sua apresentação não foram alterados.
+
+O lote 2 está concluído no escopo local executável. Amostras fictícias assinadas
+foram inspecionadas; revisão humana, impressão/aparelho, CI própria e os critérios
+gerais ainda parciais de custódia, limites e recuperação mantêm seus gates.
+O andamento e a fila únicos estão no acompanhamento principal da raiz.
+
+## Histórico — DOC-B.4
 
 Concluído localmente em 11/11/2026 no escopo de fatos e atos de DOC-B. A revisão
 V15 integra o gerador, a assinatura PAdES-B-T e o armazenamento existentes.

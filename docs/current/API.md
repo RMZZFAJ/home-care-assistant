@@ -18,7 +18,9 @@ before/beforeId (par obrigatório). A leitura depende da sessão, contexto e
 capacidade vigente do documento. A lista não envia snapshot, caminho privado
 ou credencial de processamento. Não cria arquivo por simples consulta.
 
-POST na mesma rota recebe somente idempotencyKey e version opcional positiva.
+POST na mesma rota recebe idempotencyKey, version opcional positiva e
+documentOptions opcional para Ficha Ampliada ou auditoria. Não recebe fontes,
+bytes, estado de assinatura, revisão de renderização ou prova do worker.
 O banco congela versão, snapshot canônico, autoria nominal, instante, código
 público aleatório e identidade da emissão. A chave pessoal reapresentada
 recupera a mesma intenção; mudança de seletor documental conflita. Cada nova
@@ -110,7 +112,8 @@ relacionada, somente a indicação restrita é congelada. Perda posterior dessa
 leitura impede recuperar uma emissão que preservou a referência conhecida;
 outra emissão pode ser criada com o mascaramento vigente.
 
-O catálogo HCAIssuance do PDF V16 contém somente verificationCode e requestedAt.
+O catálogo HCAIssuance dos PDFs V16/V17 contém somente verificationCode e
+requestedAt.
 O vínculo com documento, versão, fonte, revisão e digest permanece no registro
 imutável de emissão; identificadores internos não são despejados no corpo
 operacional. Na ENT, recebimento pessoal, conciliação administrativa e quantidade
@@ -124,6 +127,37 @@ comum revalida essa leitura ao recuperar, concluir ou baixar uma cópia conhecid
 As intenções antigas mantêm revisão e fonte; download não reemite o arquivo.
 Campos COM, BAL, devoluções, assinatura interna e TSA continuam no mesmo ciclo.
 [Resultados e limites](../audits/D/D-B/PDF_LIFECYCLE.md).
+
+## Emissão V17 — modalidades e fontes selecionadas
+
+documentOptions contém mode (expanded/audit), sections, period e purpose.
+sections escolhe progress, communications, confirmations, relations e access;
+no mínimo uma seção, sem duplicatas. period informa from/through como dias ISO
+completos e inclusivos ou ambos null, com timeZone=America/Sao_Paulo. purpose
+é null para expanded e texto de 3–500 caracteres para audit. A ordem das seções
+é normalizada no cliente e no banco e participa do hash da intenção.
+
+reserve_pdf_expanded_issuance reserva V17. A entrada cotidiana sem opções
+continua V16. Novas modalidades preservam toda a Ficha e congelam o complemento
+em uma consulta nativa, sem leituras paginadas parciais. A versão canônica e o
+instante de referência do complemento são distintos e declarados. O período
+filtra registros; vínculos refletem a versão preservada. Comunicações mostram
+destinatário, canal, estado e momento disponíveis na reserva, sem destino,
+referência do provedor, template ou payload. Não são ciência pessoal.
+
+Auditoria exige audit.read do paciente; access exige document.access.read,
+além da leitura da ficha. As mesmas competências e as referências manuais
+conhecidas são reavaliadas na recuperação, conclusão e download. Listas de
+emissão/acervo filtram essas modalidades restritas e a interface oculta seus
+registros após mudança confirmada do contexto. Não há concessão por identidade
+global. Relatório inclui finalidade, fontes, período e limites, com marca
+nominativa em todas as páginas antes da assinatura, conferida nos bytes.
+
+O pacote oficial preservado no aparelho inclui a seleção e recupera a mesma
+emissão. Referência local danificada impede iniciar outra emissão por engano;
+nenhum rascunho comum foi ampliado. Os bytes anteriores não são reescritos.
+As recusas/limites e a custódia ainda parciais seguem nos critérios gerais D4;
+estas modalidades não aprovam confiança externa, homologação humana ou produção.
 
 ## Histórico de acesso às fichas
 

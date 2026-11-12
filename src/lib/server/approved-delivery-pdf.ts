@@ -1,3 +1,4 @@
+import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { PDFHexString, PDFName } from "pdf-lib";
 import { ApprovedPdfLayout, type DocumentHeader, type DocumentTone } from "./approved-pdf-layout";
@@ -36,7 +37,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   const status = documentStatuses[snapshot.status] ?? "Situação não preservada";
   const quantities = snapshot.lines.map(line => confirmedDeliveryQuantity(snapshot, line, fidelity.deliveryResolutions, source.historical));
   const header: DocumentHeader = {
-    modality: "Ficha", title, code: snapshot.code, status, tone, asOf: documentCutLabel(snapshot), requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName, verificationCode: emission.verificationCode,
+    ...approvedPdfMode(snapshot, emission), title, code: snapshot.code, status, tone, asOf: documentCutLabel(snapshot), requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName, verificationCode: emission.verificationCode,
     privateUrl: new URL("/documentos/" + snapshot.id, origin).href,
     metric: quantities.filter(value => value.state === "recorded" && quantity(value.quantity).gt(0)).length + " / " + snapshot.lines.length, metricLabel: "materiais com recebimento pessoal registrado",
     seal: personal ? { title: issue || !snapshot.lines.every(line => line.fully_checked) ? "Recebimento parcial" : "Recebimento confirmado", actor: receiptName, at: formatBrazilDate(acceptedAt), how: "Conferência pessoal preservada", tone: "good", confirmed: true }
@@ -145,6 +146,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   }
   appendOriginalObservations(layout, snapshot); appendDocumentCancellation(layout, lifecycle, "Cancelamento da ficha");
   const verificationUrl = new URL("/verificar/emissao/" + emission.verificationCode, origin).href;
+  appendApprovedPdfExpansion(layout, snapshot, emission);
   await appendVerificationAndPrivacy(layout, emission, returned ? "Esta ficha de devolução" : "Esta ficha de entrega", issuer, at, verificationUrl, emission.verificationCode.match(/.{1,4}/g)?.join("-") ?? emission.verificationCode);
   layout.finish(); return { bytes: Buffer.from(await layout.pdf.save({ useObjectStreams: false })), identity };
 }

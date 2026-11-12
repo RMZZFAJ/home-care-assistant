@@ -67,6 +67,7 @@ export async function POST(
       body.idempotencyKey,
       body.version,
       appOrigin(request),
+      body.documentOptions,
     );
     return Response.json(receipt, {
       status: receipt.state === "ready" ? 200 : 202,

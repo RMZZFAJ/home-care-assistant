@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { pdfDocumentOptionsSchema } from "./pdf-modes";
 
 const fingerprint = z.string().regex(/^[a-f0-9]{64}$/);
 export const pdfVerificationSchema = z.object({
@@ -41,6 +42,7 @@ export const pdfIssuanceSchema = z
     readyAt: z.iso.datetime({ offset: true }).nullable(),
     verificationCode: z.string().regex(/^[A-F0-9]{32}$/),
     rendererRevision: z.number().int().min(5),
+    documentOptions: pdfDocumentOptionsSchema.optional(),
     representation: z.enum(["operational", "derived"]),
     state: z.enum(["reserved", "processing", "uncertain", "ready"]),
     step: z.enum([
@@ -67,6 +69,7 @@ export const pdfIssuanceSchema = z
       .nullable(),
   })
   .superRefine((r, ctx) => {
+    if ((r.rendererRevision === 17) !== (r.documentOptions !== undefined)) ctx.addIssue({ code: "custom", message: "Incomplete documentary modality" });
     if (
       r.state === "ready" &&
       (!r.sha256 ||
@@ -88,6 +91,7 @@ export const pdfIssuancePageSchema = z.object({
 export const pdfIssuanceRequestSchema = z
   .object({
     idempotencyKey: z.uuid(),
+    documentOptions: pdfDocumentOptionsSchema.optional(),
     version: z.number().int().positive().max(2147483647).optional(),
   })
   .strict();

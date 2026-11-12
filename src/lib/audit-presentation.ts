@@ -1,6 +1,7 @@
 import { documentEventLabel } from "./notifications/event-labels";
 
 const actions: Record<string, string> = {
+  "req.issued": "Requisição emitida", "document.progress.created": "Andamento manual publicado",
   "access.applied": "Proposta de configuração aplicada", "access.changed.local": "Configuração alterada pela administração local", "access.proposed.global": "Proposta global registrada",
   "patient.initial_administrator": "Administrador inicial vinculado", "patient.created": "Paciente cadastrado", "patient.updated": "Cadastro do paciente atualizado",
   "invitation.created": "Convite criado", "invitation.renewed": "Convite reemitido", "invitation.revoked": "Convite revogado", "invitation.accepted": "Convite aceito", "invitation.declined": "Convite recusado",

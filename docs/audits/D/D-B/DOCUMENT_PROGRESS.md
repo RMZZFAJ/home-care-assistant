@@ -26,17 +26,19 @@ campos anteriores.
 
 Origem manual/automática e relevância Registro/Marco importante/Atenção são
 dimensões independentes. O catálogo em src/lib/documents/progress-catalog.ts
-é usado pela interface; sua integração à Ficha Ampliada e à auditoria continua
-pendente. Texto e menções não são assinatura, ciência, recebimento, confirmação
+é usado pela interface e pelos complementos V17 da Ficha Ampliada e da
+auditoria. Texto e menções não são assinatura, ciência, recebimento, confirmação
 ou atendimento. Links continuam sob autorização atual. Os fatos de cancelamento,
 ciência do cancelamento e vínculos formais entram na lista explícita da
 cronologia, sem trazer logs, lembretes ou tentativas de transporte.
 
-Validação do incremento: 19 casos com Auth real (publicação legada, detalhes,
-concorrência, recusas e espera observada), 18 testes de contratos e o percurso
+Validação do incremento de menções (229): 19 casos com Auth real (publicação
+legada, detalhes, concorrência, recusas e espera observada), 18 testes de
+contratos e o percurso
 com perda da resposta em Chromium/iOS, cinco larguras e inspeção visual.
-Banco local/remoto 229 reconciliados; CI do SHA e modalidades dos PDFs não são
-aprovados por esses resultados. Estado e fila atuais no acompanhamento principal.
+A atualização 229 foi reconciliada naquele incremento. As modalidades V17 têm
+conferência própria em PDF_LIFECYCLE.md; os testes anteriores não as aprovam
+automaticamente. Estado e fila atuais no acompanhamento principal.
 
 ## Registro histórico D3.29
 

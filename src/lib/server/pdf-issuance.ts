@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ApiError, rpc } from "./api";
 import { createWorkerClient } from "./service-client";
+import type { PdfDocumentOptions } from "../documents/pdf-modes";
 import { pdfIssuanceSchema, type PdfIssuance } from "../documents/pdf-issuance";
 import { composeIssuance, validateIssuanceContent } from "./pdf-content";
 import type { DocumentSnapshot } from "./operational-pdf";
@@ -81,8 +82,10 @@ export async function issuePdf(
   key: string,
   version: number | undefined,
   verificationOrigin: string,
+  documentOptions?: PdfDocumentOptions,
 ) {
-  const reserved = (await rpc(client, "reserve_pdf_issuance_v16", {
+  const reserved = (await rpc(client, documentOptions ? "reserve_pdf_expanded_issuance" : "reserve_pdf_issuance_v16", {
+    ...(documentOptions ? { p_options: documentOptions } : {}),
     p_document: documentId,
     p_key: key,
     p_version: version ?? null,
@@ -108,7 +111,7 @@ export async function issuePdf(
     const r = await readPdfIssuance(client, reserved.id),
       trust = await loadPdfTrust();
     await stage("composing");
-    if (![5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].includes(r.rendererRevision))
+    if (![5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].includes(r.rendererRevision))
       throw new ApiError(
         "CONTENT_INVALID",
         "Revisão de renderização não suportada.",
@@ -116,7 +119,7 @@ export async function issuePdf(
         false,
       );
     const plan = await composeIssuance(r.snapshot, r.sourceHash, {
-      rendererRevision: r.rendererRevision as 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16,
+      rendererRevision: r.rendererRevision as 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17,
       id: r.id,
       verificationCode: r.verificationCode,
       requestedAt: r.requestedAt,

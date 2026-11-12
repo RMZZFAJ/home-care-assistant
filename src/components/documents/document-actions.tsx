@@ -1,7 +1,10 @@
 "use client";
+import { z } from "zod";
+import { PdfDocumentOptions } from "./pdf-document-options";
+import { pdfDocumentOptionsSchema, documentModeLabel, type PdfDocumentOptions as DocumentOptions } from "@/lib/documents/pdf-modes";
 import { FileRecord } from "@/components/ui/file-record";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { buttonClass, Notice } from "@/components/workspace";
+import { buttonClass, can, Notice } from "@/components/workspace";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { DocumentActionSlot } from "./document-action-slot";
 import { Icon } from "@/components/ui/primitives";
@@ -31,7 +34,8 @@ type Props = {
   actionTarget?: HTMLElement | null;
   onAction?: () => void;
 };
-type Intention = { key: string; version?: number };
+const intentionSchema = z.object({ key: z.uuid(), version: z.number().int().positive().max(2147483647).optional(), documentOptions: pdfDocumentOptionsSchema.optional() }).strict();
+type Intention = z.infer<typeof intentionSchema>;
 const steps = {
   reserved: "Solicitação registrada",
   recovering: "Recuperando o exemplar",
@@ -42,12 +46,14 @@ const steps = {
   ready: "Arquivo pronto",
 };
 export function DocumentActions(props: Props) {
-  const { data } = useWorkspaceState();
+  const { data, value } = useWorkspaceState();
   return data ? (
     <GeneratedFiles
       key={`${data.userId}:${props.id}`}
       {...props}
       userId={data.userId}
+      canAudit={Boolean(value && value.activeContext?.mode === "patient" && data.documentContext?.id === props.id && value.patient?.id === data.documentContext.patientId && can(value, "audit.read"))}
+      canAccess={Boolean(value && value.activeContext?.mode === "patient" && data.documentContext?.id === props.id && value.patient?.id === data.documentContext.patientId && can(value, "document.access.read"))}
       entDocument={
         data.documentContext?.id === props.id &&
         data.documentContext.type === "ENT"
@@ -84,12 +90,14 @@ function GeneratedFiles({
   code,
   version,
   userId,
+  canAudit,
+  canAccess,
   archiveVersion,
   trackNotices = true,
   entDocument,
   actionTarget,
   onAction,
-}: Props & { userId: string; entDocument: boolean }) {
+}: Props & { userId: string; entDocument: boolean; canAudit: boolean; canAccess: boolean }) {
   const headingId = useId(),
     scope = `hca:pdf-intention:${userId}:${id}`,
     endpoint = `/api/documents/${id}/issuances`;
@@ -101,6 +109,7 @@ function GeneratedFiles({
     [message, setMessage] = useState(""),
     [readError, setReadError] = useState(""),
     [pending, setPending] = useState<Intention | null>(null);
+  const [optionsOpen, setOptionsOpen] = useState(false), [integrityError, setIntegrityError] = useState(false);
   const busyRef = useRef(false),
     sequenceRef = useRef(0);
   const invalidate = useCallback(() => {
@@ -169,16 +178,10 @@ function GeneratedFiles({
       if (!live) return;
       try {
         const stored = JSON.parse(sessionStorage.getItem(scope) ?? "null");
-        if (
-          stored &&
-          typeof stored.key === "string" &&
-          /^[0-9a-f-]{36}$/i.test(stored.key) &&
-          (stored.version === undefined ||
-            (Number.isInteger(stored.version) && stored.version > 0))
-        )
-          setPending(stored);
+        if (stored !== null) setPending(intentionSchema.parse(stored));
       } catch {
-        /* A damaged local hint never becomes a server command. */
+        setIntegrityError(true);
+        setError("Não foi possível conferir a referência da emissão preservada. Nenhuma nova emissão será iniciada; consulte os arquivos e recupere sua referência original.");
       }
       void load();
     });
@@ -196,8 +199,8 @@ function GeneratedFiles({
       clearTimeout(deadline);
     };
   }, [busy, pending, load]);
-  async function generate() {
-    if (busyRef.current) return;
+  async function generate(documentOptions?: DocumentOptions) {
+    if (busyRef.current || integrityError) return;
     busyRef.current = true;
     setBusy(true);
     setError("");
@@ -206,15 +209,17 @@ function GeneratedFiles({
       const intention = pending ?? {
         key: crypto.randomUUID(),
         ...(version ? { version } : {}),
+        ...(documentOptions ? { documentOptions } : {}),
       };
       sessionStorage.setItem(scope, JSON.stringify(intention));
       setPending(intention);
       const raw = await api<unknown>(endpoint, {
         idempotencyKey: intention.key,
         ...(intention.version ? { version: intention.version } : {}),
+        ...(intention.documentOptions ? { documentOptions: intention.documentOptions } : {}),
       });
       const parsed = pdfIssuanceSchema.safeParse(raw);
-      if (!parsed.success)
+      if (!parsed.success || parsed.data.documentId !== id || parsed.data.requestedBy !== userId || intention.version && parsed.data.version !== intention.version || JSON.stringify(parsed.data.documentOptions) !== JSON.stringify(intention.documentOptions))
         throw new TransportError(
           "A resposta não confirmou o exemplar. Recupere esta mesma emissão.",
           "command",
@@ -287,6 +292,11 @@ function GeneratedFiles({
         );
     }
   }
+  const visibleRows = rows.filter(entry => {
+    if (entry.kind !== "issuance") return true;
+    const options = entry.issuance.documentOptions;
+    return !options || (options.mode !== "audit" || canAudit) && (!options.sections.includes("access") || canAccess);
+  });
   return (
     <section aria-labelledby={headingId} className="space-y-3 print:hidden">
       <h3 id={headingId} className="font-semibold">
@@ -297,7 +307,7 @@ function GeneratedFiles({
           <button
             className={buttonClass}
             type="button"
-            disabled={busy}
+            disabled={busy || integrityError}
             onClick={() => {
               onAction?.();
               void generate();
@@ -320,6 +330,8 @@ function GeneratedFiles({
           Atualizar arquivos
         </button>
       </div>
+      <button className={buttonClass} type="button" disabled={busy || Boolean(pending) || integrityError} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button>
+      <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={optionsOpen} onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} onGenerate={value => { setOptionsOpen(false); onAction?.(); void generate(value); }} />
       <p className="text-xs text-(--muted)">
         Cada nova geração cria um exemplar. Visualizar e baixar recuperam o
         arquivo registrado.
@@ -329,14 +341,14 @@ function GeneratedFiles({
       {readError ? <Notice error>{readError}</Notice> : null}
       {loading ? (
         <p role="status">Consultando arquivos…</p>
-      ) : !rows.length ? (
+      ) : !visibleRows.length ? (
         <p>
           Nenhum arquivo registrado nesta consulta. Use Gerar PDF para uma nova
           emissão explícita.
         </p>
       ) : null}
       <ul className="hca-file-records" aria-label="Exemplares registrados">
-        {rows.map((entry) => {
+        {visibleRows.map((entry) => {
           if (entry.kind !== "issuance")
             return (
               <LegacyFile
@@ -349,7 +361,7 @@ function GeneratedFiles({
           const row = entry.issuance;
           return (
             <FileRecord key={row.id} identity={row.id}
-              title={<>{code} · Versão {row.version} · {steps[row.step]}</>}
+              title={<>{code}{row.documentOptions ? " · " + documentModeLabel(row.documentOptions) : ""} · Versão {row.version} · {steps[row.step]}</>}
               actions={<>              {row.state === "ready" ? (
                 <div className="mt-2 flex flex-wrap gap-3">
                   <a
