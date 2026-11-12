@@ -100,6 +100,9 @@ test("15 ID04 global identity rows share canonical appearance without local auth
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
       await compare(account, model.locator(".record").first(), ["display", "column-gap", "padding-top", "padding-left"]);
+      const avatarProperties = ["display", "width", "height", "border-radius", "background-color", "color", "font-size", "font-weight", "border-top-width"];
+      await compare(page.locator(".hca-profile-trigger > .hca-avatar"), model.locator(".topbar .avatar"), avatarProperties);
+      await compare(account.locator(".hca-avatar"), model.locator(".record .avatar").first(), avatarProperties);
       await auditFromTop(page, "identity canonical global account " + width);
     }
     expect(writes).toEqual([]);

@@ -75,7 +75,7 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
-| Outras áreas visuais | 3 composições e 171 relações a conferir |
+| Outras áreas visuais | 3 composições e quatro relações técnicas pendentes |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Administração, guias e aparência restante |
 | Incremento atual | Preparação global da residência |
@@ -128,8 +128,11 @@ A preparação real dos certificados de teste tem limite próprio, sem mudar
 assinatura ou timeout do aplicativo. Passaram 26 percursos móveis e 16 testes
 de PDF, tipos e lint dirigido. A CI conjunta continua pendente.
 
-**Próxima entrega no lote 5:** conferência das relações e correções necessárias.
-As composições técnicas restantes acompanham o suporte no lote 6.
+**Relações do lote 5:** conferência concluída no recorte disponível. Das 171,
+160 têm comprovação local compatível; quatro acompanham suporte no lote 6;
+cinco pertencem à apresentação de rascunhos adiada; duas foram removidas por
+decisão aprovada. Não equivale a aprovar as 171 integralmente. A próxima entrega
+é o lote 6, com as três composições técnicas restantes.
 A recuperação oficial continua obrigatória. Os rascunhos permanecem intactos.
 A atualização entre duas sessões passou no banco da CI
 976d42c; o BAL em iOS integra a correção dirigida atual.
@@ -421,8 +424,9 @@ O ponto 04.5, sobre consumo, está no grupo 3.2.
   execução · ≈80%. Falta: Completar variações documentais e a conferência de
   todos os fluxos. Responsável: Codex.
 - **Todas as relações entre telas terem sentido e acesso correto** — Em
-  execução · ≈60%. Falta: Conferir todas as 171 relações, incluindo variantes de
-  balanço e cancelamento. Responsável: Codex.
+  execução · ≈90%. Falta: Concluir quatro relações do suporte e a validação
+  conjunta. A conferência preserva cancelamento, variantes BAL e consultas
+  somente de leitura; rascunhos têm adiamento expresso. Responsável: Codex.
 
 #### 07 — Dados e histórico dos PDFs
 
@@ -1246,12 +1250,23 @@ Pontos de verificação:
 - 15.2 Identidade e acesso — ID-01–05 concluídos localmente no escopo visual.
 - 15.3 Notificações — NOT-01–04 conferidos; falta NOT-05.
 - 15.4 Guias — GUI-01/02/03 concluídos localmente; falta a composição de suporte.
-- 15.5 Relações restantes e comparação nas cinco larguras.
+- 15.5 Relações reconciliadas no recorte disponível; quatro relações técnicas
+  acompanham as três composições do lote 6.
 
 **O que falta:** Concluir as três composições: NOT-05, ADM-05 e GUI-04.
-As 63 composições visuais conferidas não aprovam
-automaticamente as 171 relações entre controles e contratos. Implementações e
-verificações que essa conferência identificar continuam com Codex.
+As 63 composições visuais conferidas e a reconciliação das 171 relações não
+aprovam as quatro relações técnicas ainda pendentes. O fechamento conjunto e a
+CI própria continuam com Codex; apresentação de rascunhos permanece adiada.
+
+**Entrega das relações:** a conferência conserva os estados próprios de
+conta global, senha, cancelamento e variantes BAL. COM e BAL já podem ser
+consultadas por referências reais dos Andamentos, em leitura; erro ou resposta
+de outro tipo retira o conteúdo até nova consulta, e outro paciente é recusado.
+A consulta não registra alteração operacional ou de estoque. O avatar
+compartilhado recebeu a forma e as cores exatas do modelo, também no cabeçalho.
+Passaram três percursos no build de produção: consulta COM/BAL e comparação do
+componente no Chrome móvel e no iOS. As provas anteriores compatíveis foram
+reaproveitadas; não houve uma nova repetição de todas as 171 relações.
 
 **Entrega de acesso e identidade:** Entrar, Recuperar e Aceitar convite usam
 o mesmo padrão visual, com autenticação real. Pessoas, contas globais e escolha
@@ -1637,6 +1652,14 @@ chegando a 63 de 66 composições. Formulário e resumos mantiveram criação,
 responsáveis, recuperação e limites de autorização. O detalhamento e o restante
 continuam na etapa 15; as atividades físicas permanecem separadas.
 
+**12 de novembro — relações entre telas:** as 171 relações foram vinculadas
+aos consumidores e verificações atuais, preservando as decisões e pendências.
+COM/BAL têm consulta real de referências dos Andamentos qualificada, e o avatar
+compartilhado coincide com o modelo. A sequência segue ao lote 6; os 105
+critérios permanecem 72 verificados e 33 parciais até o fechamento técnico.
+Na CI de c5641bf, Linux, Windows, banco e Preview passaram; os seis grupos de
+navegador ainda estavam em execução na observação. Sonar permanece adiado.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1721,7 +1744,10 @@ um novo lote de funções nem impede as implementações independentes.
 GUI-01/02, preparação local com adoção/abertura, contingência e identidade/acesso
 estão entregues localmente. As três composições restantes de suporte,
 NOT-05/ADM-05/GUI-04, acompanham a integração técnica
-do lote 6. As 171 relações mantêm sua conferência própria no lote 5.
+do lote 6. A conferência própria das 171 relações está encerrada no recorte
+disponível: quatro relações técnicas pendentes, cinco de apresentação de
+rascunhos adiada e duas removidas permanecem explicitadas. As demais 160
+têm comprovação local compatível.
 
 - **Resultado:** demais áreas visuais, relações, entrada, administração e guias
   completos no Modelo Integral, sem perda de funções.

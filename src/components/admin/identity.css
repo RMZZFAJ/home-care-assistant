@@ -1,7 +1,6 @@
 .hca-identity-list.ui-card { padding: 0; overflow: hidden; }
 .hca-identity-row { display: flex; align-items: center; gap: 13px; padding: 16px 19px; border-bottom: 1px solid #eaf0ec; min-width: 0; color: var(--hca-ink); }
 .hca-identity-row:last-child { border-bottom: 0; }
-.hca-identity-row .hca-avatar { border: 0; border-radius: 11px; background: #d9ede3; color: #155a4d; font-size: 12px; font-weight: 700; }
 .hca-identity-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .hca-identity-main h3 { font-size: 13px; font-weight: 670; }
 .hca-identity-main small { display: block; margin-top: 3px; color: var(--hca-muted); font-size: 11px; }

@@ -57,7 +57,7 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 .hca-profile-identity { display: grid; max-width: 160px; text-align: left; }
 .hca-profile-identity strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
 .hca-profile-identity small { color: #bfd2cc; font-size: 11px; font-weight: 400; }
-.hca-avatar { display: inline-grid; flex: none; place-items: center; width: 34px; height: 34px; overflow: hidden; border-radius: 50%; background: #e7eeed; border: 1px solid #d5e2df; color: #315f56; font-size: 11px; font-weight: 700; }
+.hca-avatar { display: grid; flex: none; place-items: center; width: 34px; height: 34px; overflow: hidden; border-radius: 11px; background: #d9ede3; border: 0; color: #155a4d; font-size: 12px; font-weight: 700; }
 .hca-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .hca-desktop-navigation { position: fixed; top: var(--app-header-height); bottom: 0; left: 0; width: var(--hca-sidebar-width); border-right: 1px solid var(--hca-line); background: var(--hca-paper); overflow-y: auto; z-index: 20; }
 .hca-side-navigation { padding: 20px 13px; }
