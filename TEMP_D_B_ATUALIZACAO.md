@@ -66,7 +66,7 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
 | Complemento documental | DOC-B ≈75%; DOC-A, DOC-C e DOC-D em 0% do acréscimo |
-| Próximo ponto | DOC-B.4: cancelamento e complemento de fichas |
+| Ponto em execução | DOC-B.4: cancelamento e complemento de fichas |
 
 **Última entrega encerrada:** DOC-B.3, devolução autônoma cotidiana. Há uma
 entrada própria para devolver materiais da equipe à família, sem exigir uma
@@ -74,13 +74,15 @@ entrega de origem. Declaração, concordância, expedição e recebimento mantê
 atos e responsáveis. O PDF identifica a devolução e preserva as divergências.
 Os resultados anteriores do BAL e da COM continuam no grupo 3.3 e no histórico.
 
-**O que falta em DOC-B:** preservar fichas emitidas e suas ciências ao cancelar
-ou complementar, com nova ficha vinculada e confirmação própria do cancelamento.
+**O que falta em DOC-B:** criar fichas complementares vinculadas e concluir a
+representação estruturada do cancelamento nos arquivos, preservando originais
+e ciências anteriores.
 O complemento permanece parcial, estimado em ≈75%; a nova aparência dos PDFs
 segue em DOC-A.
 
-**Banco e validações do último lote encerrado:** a atualização da devolução foi
-aplicada no remoto, totalizando 218 atualizações reconciliadas com o local e sem
+**Banco e validações do último lote encerrado:** as atualizações da ciência
+própria do cancelamento foram aplicadas no remoto, totalizando 220 atualizações
+reconciliadas com o local e sem
 pendências deste lote. As verificações locais passaram nos três perfis de
 navegador. A validação automática do commit publicado e a revisão final da fase
 continuam separadas. Sonar permanece adiado por sua decisão.
@@ -511,9 +513,16 @@ estoque. O recebimento credita somente o que foi aceito e mantém a diferença
 pendente. A ficha e o PDF identificam a devolução, seus responsáveis e a ausência
 de origem vinculada. Exemplares anteriores ficam preservados.
 
-**Falta em DOC-B:** preservar conteúdo emitido e ciências anteriores em
-cancelamentos e complementos vinculados. O cancelamento terá aviso e pedido de
-confirmação próprios.
+**Resultado parcial entregue em DOC-B.4:** a ciência própria do cancelamento
+está implementada e conferida no fluxo local, separada das ciências anteriores
+e sem alterar estoque. Consulta, recuperação, autorização e uso nos três perfis
+de navegador passaram. O pedido interno continua disponível mesmo com avisos
+opcionais desligados. Isso ainda não conclui DOC-B.4.
+
+**Falta em DOC-B:** concluir os vínculos de novas fichas complementares e a
+representação estruturada do cancelamento nos arquivos, preservando o conteúdo
+emitido e suas ciências. O cancelamento
+mantém aviso e pedido de confirmação próprios. Responsável: Codex.
 
 ##### DOC-C — Modalidades, Andamentos e consulta
 
@@ -996,6 +1005,7 @@ anteriores. Sua situação e todas as regras estão reunidas no grupo 3.3.
 | DOC-B.1 — vínculos | Atos posteriores na ficha e no PDF | Concluído local |
 | DOC-B.2 — COM | Saldo por material na ficha e no PDF | Concluído local |
 | DOC-B.3 — devolução | Percurso autônomo cotidiano | Concluído local |
+| DOC-B.4 — parte entregue | Ciência própria do cancelamento | Concluído local |
 
 DOC-B continua parcial. Novos formulários seguem na etapa 14 e a retomada
 simples segue em DOC-C. Esses acréscimos não reabrem silenciosamente etapas
@@ -1058,9 +1068,11 @@ complemento de fichas e PDFs.
    no grupo 3.3.
 3. **DOC-B.3 — Devolução autônoma: concluído localmente no fluxo atual.**
    Resultado completo no grupo 3.3.
-4. **DOC-B.4 — Cancelamento e complemento: próximo ponto.** Preservar a ficha
+4. **DOC-B.4 — Cancelamento e complemento: em execução.** Preservar a ficha
    emitida e as ciências anteriores; complementar por nova ficha vinculada. O
-   cancelamento terá aviso e pedido de confirmação próprios.
+   cancelamento terá aviso e pedido de confirmação próprios. A confirmação
+   própria já foi implementada e conferida no fluxo local; os vínculos e a
+   representação documental estruturada do conjunto continuam pendentes.
 
 **Condição para fechar:** os quatro pontos funcionam no uso cotidiano, com seus
 fatos preservados na ficha e no PDF, respeitando as permissões. Não basta a

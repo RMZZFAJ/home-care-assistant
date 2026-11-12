@@ -1,4 +1,5 @@
 "use client";
+import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { DocumentMaterialsTable } from "@/components/documents/document-materials-table";
 import { roleLabel } from "@/components/layout/workspace-context";
 import { Pill } from "@/components/ui/controls";
@@ -433,6 +434,7 @@ export function RequisitionDocumentContent({
           data.recipient_name_snapshot ?? context.patient?.display_name
         }
       ></DocumentHeader>
+      {data.status === "cancelled" ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} /> : null}
       <RequisitionDisplay
         key={id}
         id={id}

@@ -96,12 +96,14 @@ export async function whileRowWaits(
     stock_movements: "public.stock_movements",
     product_presentations: "public.product_presentations",
     profiles: "public.profiles",
+    operational_documents: "public.operational_documents",
     schedule_changes: "public.shift_change_requests",
   }[target];
   assert.ok(
     table &&
       [
         "create_supply_document",
+        "acknowledge_document_cancellation",
         "revise_supply_document",
         "supply_document_command",
         "decide_consumption_report",

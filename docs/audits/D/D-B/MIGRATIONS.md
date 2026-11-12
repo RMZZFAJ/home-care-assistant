@@ -3,7 +3,33 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — DOC-B_RETURN
+## Estado atual — DOC-B.4_CANCELLATION
+
+Local e remoto220, sem pendências. As migrations20261111232545 e20261112001835
+acrescentam consulta/confirmação da ciência do cancelamento, ordem de lock
+compatível com a SCI existente e pedido interno obrigatório preservado mesmo
+com avisos opcionais desligados. Sem tabela, índice, política ou reescrita de
+histórico; canais externos continuam sujeitos às regras anteriores.
+
+Preflight confirmou218 versões como prefixo exato e somente duas pendências.
+O contrato anterior da fila coincide com o local normalizando apenas CRLF.
+Preparo sem reset, nove Auth, seis contratos/API e seis casos de navegador
+precederam a aplicação linked/skip-vault. Depois,220 versões, definições e
+grants coincidem; dry-run vazio. Duas RPCs autenticadas, auxiliar privada fechada,
+search_path vazio e negação de EXECUTE para anon/service conferidos. As84
+migrations históricas permanecem inalteradas. Sem Auth/fixtures remotos, reset,
+produção, ativação externa ou backup redundante.
+
+Advisors:64 INFO sem política, extensão1 WARN, definer anon3 WARN, definer
+Auth215 WARN e senhas1 WARN. Os dois acréscimos são as RPCs autenticadas, com
+negativas/autoridade conferidas. A [orientação de funções autenticadas](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable)
+permanece registrada; alertas antigos não recebem aprovação genérica.
+Performance:124 FKs sem índice INFO,11 initplan WARN e64 índices sem uso INFO;
+sem novos objetos dessas classes. Instalação limpa/evolução legada e integração
+completa continuam na CI do SHA publicado.
+[Escopo e limites](CANCELLATION_AWARENESS.md).
+
+## Último fechamento remoto — DOC-B_RETURN
 
 Local e remoto com218 versões, sem pendências. A migration20261111222925
 acrescenta a reserva V14 e permite a nova revisão nas fontes e fatos documentais.

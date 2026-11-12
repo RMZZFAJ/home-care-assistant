@@ -93,6 +93,24 @@ Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
 em [C](../audits/C/README.md); decisões aprovadas não equivalem a
 implementação.
 
+## Ciência própria do cancelamento
+
+GET /api/documents/:id/cancellation consulta o ato cancelado preservado e as
+ciências próprias, sem gravar acesso ou confirmação. Revalida a leitura integral
+do documento. Histórico sem ato/protocolo preservado fica unavailable, sem
+ciência presumida. A retirada de uma preparação bilateral não é cancelamento
+de ficha expedida.
+
+POST recebe somente cancellationEventId e idempotencyKey. Exige habilitação
+familiar vigente e confirma a referência; segue lock do paciente antes do
+documento e revalida autoridade após espera/registro. Um ato por pessoa/evento,
+inclusive com chaves concorrentes. Chave registrada com outro alvo conflita.
+Recuperação da própria chave após perder ciência exige conservar leitura.
+O novo evento não altera material emitido, SCI anterior ou estoque. Pedido
+interno obrigatório independe de canais/preferências opcionais; não ativa
+transporte externo. A consulta ou marcação de aviso não é esta confirmação.
+[Implementação e limites](../audits/D/D-B/CANCELLATION_AWARENESS.md).
+
 ## Comparação das versões documentais
 
 GET /api/documents/:id/history recebe version obrigatória e before opcional,

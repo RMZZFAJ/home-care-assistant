@@ -1,4 +1,8 @@
 const labels: Record<string, string> = {
+  "req.cancellation_acknowledged": "Ciência do cancelamento da requisição registrada",
+  "com.cancellation_acknowledged": "Ciência do cancelamento da compra ou doação registrada",
+  "ent.cancellation_acknowledged": "Ciência do cancelamento da entrega ou devolução registrada",
+  "bal.cancellation_acknowledged": "Ciência do cancelamento do balanço registrada",
   "ent.transfer.declared": "Transferência declarada para concordância",
   "ent.transfer.agreed": "Concordância própria da contraparte registrada",
   "ent.transfer.declined": "Transferência recusada pela contraparte",

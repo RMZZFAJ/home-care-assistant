@@ -1,4 +1,5 @@
 "use client";
+import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { roleLabel } from "@/components/layout/workspace-context";
 import { DocumentBreadcrumb } from "@/components/documents/document-breadcrumb";
 import { DocumentTimeline } from "./document-timeline";
@@ -943,6 +944,7 @@ export function SupplyDocumentContent({
               </Link>
             ) : null}
           </DocumentHeader>
+          {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
           <DocumentTabs
             rootRef={tabs.rootRef}
             type={data.type}

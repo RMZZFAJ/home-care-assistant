@@ -1,5 +1,39 @@
 # Checkpoint D-B
 
+## Incremento atual — DOC-B.4_CANCELLATION
+
+Ciência própria do cancelamento implementada e conferida localmente nas fichas,
+separada da emissão, do recebimento e das ciências anteriores. Um ato por pessoa
+e cancelamento; consulta não confirma. Leitura vigente e habilitação familiar
+são verificadas no banco, antes/depois de esperas e do registro. Recuperação
+após perda da resposta não faz replay automático. A interface limpa dados após
+recusa e preserva a falha da ação até consulta explícita, sem disputa com a
+atualização do pai. Preparação retirada sem protocolo não recebe este bloco.
+
+Nove cenários Auth, seis contratos/API e seis casos de navegador em build de
+produção passaram. REQ/COM nos três perfis, cinco larguras, axe integral,
+foco/alvo de toque, recusa403, resposta perdida, recarga e PDF pelo pipeline.
+Seis páginas nativas inspecionadas e capturas móveis conferidas. As primeiras
+rodadas e suas falhas foram preservadas; corrigidos contexto de rolagem, espera
+responsiva e disputa de consulta/ação, sem aumento de prazos ou regra retirada.
+
+Migrations219/220 reconciliadas no remoto autorizado:220 versões, definições
+(normalizando somente CRLF) e grants iguais ao local; dry-run vazio. Sem tabela
+nova, reset, Auth/fixtures remotos, produção ou transporte externo. Mantida a
+ordem de lock da SCI existente; perda de autoridade durante espera provoca
+rollback. O pedido interno obrigatório persiste com preferências/canais
+opcionais desligados, sem fabricar ciência. As84 migrations protegidas intactas.
+
+DOC-B.4 continua parcial: faltam vínculos de fichas complementares e
+representação documental estruturada do conjunto. DOC-B75%,105 estados
+originais(57PASS/48PARTIAL),18 UI e visual85% preservados. CI do SHA publicado,
+instalação limpa, evolução legada, integração completa e gates humanos/físicos
+continuam próprios. Sonar adiado; d59e971 tem validações/banco aprovados e Preview
+pronto na observação anterior, sem aprovar o novo SHA.
+[Escopo e limites](CANCELLATION_AWARENESS.md).
+
+## Último incremento publicado — DOC-B_RETURN
+
 DOC-B_RETURN conclui localmente o ponto DOC-B.3: devolução autônoma cotidiana,
 com entrada própria, origem fixa equipe→família e vínculo de entrega opcional.
 A preparação bilateral existente preserva declaração, concordância, expedição e
