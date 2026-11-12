@@ -1,7 +1,8 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, existsSync, statSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { trustedExecutable } from "./trusted-executable.mjs";
 
 export const testProject = "home-care-assistant";
 export const testRoot = resolve(process.cwd());
@@ -29,7 +30,7 @@ export function assertLocalProject({ running = true } = {}) {
     try {
       labels = JSON.parse(
         execFileSync(
-          "docker",
+          trustedExecutable("docker"),
           ["inspect", testContainer, "--format", "{{json .Config.Labels}}"],
           { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
         ),
@@ -56,9 +57,14 @@ export function getTestEnvironment() {
   try {
     status = JSON.parse(
       execFileSync(
-        "supabase",
+        trustedExecutable("supabase"),
         ["status", "--workdir", testRoot, "-o", "json"],
-        { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+        {
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+          // Supabase itself locates Docker. Do not forward an inherited search path.
+          env: { ...process.env, PATH: dirname(trustedExecutable("docker")) },
+        },
       ),
     );
   } catch {
@@ -158,7 +164,7 @@ export function assertLocalReplay() {
 export function sql(statement) {
   assertLocalProject();
   const result = spawnSync(
-    "docker",
+    trustedExecutable("docker"),
     [
       "exec",
       "-i",

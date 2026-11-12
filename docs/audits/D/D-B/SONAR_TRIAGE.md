@@ -53,7 +53,9 @@ do Docker, o servidor temporário deixou de existir. O responsável o reativou
 e a autenticação foi novamente validada pela API oficial. Não foi necessário
 alterar o config.toml ou copiar credencial para o repositório.
 
-Consulta da PR7, análise de12/11/2026 às20:58:38UTC, publicada em4d5e908:
+Consulta histórica da PR7, análise de 12/11/2026 às 20:58:38 UTC.
+Código avaliado: 4d5e908, confirmado pela API do Sonar. Este registro foi
+acrescentado posteriormente, no incremento 8fc04b8; não é um SHA autorreferente.
 49 apontamentos abertos, nenhum hotspot aguardando revisão. Quality Gate ERROR:
 confiabilidade D, segurança D e duplicação nova3,2%; manutenção A e revisão de
 hotspots100%. Esses resultados não aprovam o código local posterior.
@@ -91,7 +93,8 @@ Os22 restantes exigem classificação contextual, sem supressão coletiva:
   conferência de ETag para eliminar alerta, nem apresentar MD5 como integridade
   criptográfica do backup.
 
-Nenhum status remoto desses22 itens foi alterado. D-B-AC-030 permanece parcial
+Na conferência local anterior à publicação, nenhum dos22 status remotos havia
+sido alterado. D-B-AC-030 permanece parcial
 até correções, conferência contextual e CI/análise do SHA final.
 
 A consulta das1204 folhas do projeto confirmou que os maiores blocos de
@@ -111,3 +114,122 @@ no-store. A prova agora interrompe explicitamente a rede pertencente ao worker,
 conforme a [documentação do Playwright](https://playwright.dev/docs/service-workers),
 sem servir HTML artificial nem desabilitar o worker. O fallback é o cache público
 real. As11 regressões do worker passaram após essa mudança.
+
+### Resultado publicado e revisão contextual — 8fc04b8
+
+A análise de12/11/2026 às22:58:55UTC confirmou o SHA8fc04b8066687e87efe027b8df6c9ce331456df1.
+Os27 apontamentos tratados em código desapareceram:49→22, com bugs19→0.
+Depois da conferência de fonte, CSS e finalidade,13 apontamentos receberam
+FALSE-POSITIVE pela API oficial, sem comentários, alteração de regra, exclusão
+de fonte ou mudança do Quality Gate. O provedor confirmou RESOLVED em todos.
+
+- Oito S6845: todos os seletores têm overflow auto/scroll e nome acessível.
+  Tabindex0 permite operar a rolagem pelo teclado; não foi removido para obter
+  verde. Além da fonte, foram conferidas as regras CSS correspondentes.
+- S6853: checkbox nativo dentro de label com nome/unidade dinâmicos reais.
+- S6848: delegação fecha o popover somente para link/botão nativo; a área não
+  representa uma ação autônoma e o clique do teclado nos filhos é preservado.
+- S6850: o script define textContent do título antes de mostrar o diálogo,
+  inicialmente hidden, na referência documental.
+- S4036: OpenSSL é uma constante de caminho absoluto no probe histórico.
+- S4790: somente ETag de transporte; os limites e contraprovas criptográficos
+  já estão descritos acima. O checksum foi preservado.
+
+Registros individuais da decisão:
+
+- `AaHRCaMldFLyAauEqU3s` — typescript:S6845; FALSE-POSITIVE confirmado.
+- `AaHLdMdUw8652HDo-OSu` — typescript:S6845; FALSE-POSITIVE confirmado.
+- `AaHLRss_jy8OM9RHe5-e` — typescript:S6845; FALSE-POSITIVE confirmado.
+- `AaHKwlcpCDFA_lJdfEli` — typescript:S6845; FALSE-POSITIVE confirmado.
+- `AaHKwluBCDFA_lJdfElj` — typescript:S6853; FALSE-POSITIVE confirmado.
+- `AaHI15gCXIWw0lPB4AW_` — Web:S6850; FALSE-POSITIVE confirmado.
+- `AaHDpWV1PeUobGgKqVaZ` — typescript:S6845; FALSE-POSITIVE confirmado.
+- `AaHARW6BRvlOpV2gUqrL` — typescript:S6848; FALSE-POSITIVE confirmado.
+- `AaG_Y0UFf0qErduKpOVN` — typescript:S6845; FALSE-POSITIVE confirmado.
+- `AaG_Y0Xrf0qErduKpOVO` — typescript:S6845; FALSE-POSITIVE confirmado.
+- `AaG1YeiBtqj7RNvsFyxq` — javascript:S4036; FALSE-POSITIVE confirmado.
+- `AaGz09zpnYvp-aA_EOPx` — typescript:S6845; FALSE-POSITIVE confirmado.
+- `AaGzjRNrWrHHQUT4PNIm` — javascript:S4790; FALSE-POSITIVE confirmado.
+
+Consulta posterior confirmou nove apontamentos ainda abertos: oito S8707 nos
+verificadores Python locais e um S7039 na referência HTML. O Quality Gate segue
+ERROR por segurança e duplicação3,2%. Esses nove não foram aprovados nem
+transferidos ao responsável; a análise/correção pertinente continua com Codex.
+A CI 8fc04b8 estava em execução; Ubuntu e Windows tinham passado nessa observação.
+
+### Fechamento contextual e diagnósticos do editor
+
+Os nove registros abaixo receberam ACCEPTED, confirmado pelo MCP oficial.
+Não foram classificados como falsos positivos, corrigidos por alteração de
+código ou removidos do escopo de análise. A decisão preserva o comportamento
+intencional e reconhece os limites de uso:
+
+- Oito S8707 em sete verificadores Python: são CLIs manuais de desenvolvimento,
+  sem chamada de produção, rota HTTP, upload ou execução de agente no produto.
+  A revisão percorreu argumentos, manifestos, raízes públicas, nomes de raster
+  e destinos. Há seis destinos de relatório, três com sobrescrita intencional
+  e três com criação exclusiva; restringir somente o argumento de saída não
+  cobriria os demais caminhos. A documentação usa diretórios de corpus dentro
+  e fora de output e aceita uma raiz pública explícita externa. Esses CLIs
+  **não são uma sandbox**: caminhos e manifestos precisam ser escolhidos e
+  conferidos pelo operador, inclusive quando sugeridos por uma IA. Não devem
+  receber argumentos de usuário não confiável nem ser expostos como serviço.
+  Uma futura integração com agente/serviço exige uma fronteira própria antes
+  dessa exposição. Não foi demonstrada uma injeção de caminho pelo aplicativo.
+  A execução legítima do probe de assinatura passou novamente: arquivo inteiro,
+  assinatura e TSA íntegros e confiança somente na raiz interna fornecida.
+  O resultado contextual é no_change, sem alegar bloqueio de caminhos arbitrários.
+- S7039 na referência HTML canônica: demonstração local autocontida, com scripts
+  e estilos embutidos intencionais, sem dados privados ou entrada remota.
+  connect-src, object-src, base-uri e form-action continuam none. A permissão
+  unsafe-inline permanece um limite conhecido dessa demonstração; não comprova
+  proteção contra injeção caso seu conteúdo deixe de ser confiável. A referência
+  não é publicada como rota; a CSP do aplicativo é independente e não mudou.
+
+Registros aceitos individualmente:
+
+- `AaG-Y0GkvXabDJNoZvPC` — d4-operational-proof/verify.py.
+- `AaG-DMXZJuwU4-_1H_Rj` — d4-structure-proof/verify.py.
+- `AaG9J6HTFctgTuRSUjBI` — d4-ent-terminal-proof/verify.py.
+- `AaG8w3NIkxw1cHakNg6k` — d4-regularization-proof/verify.py.
+- `AaG60gXQE7uBDFkTGbke` — d4-fidelity-proof/verify.py.
+- `AaG2fSmpyu4V9oipB_qU` — d4-source-facts-proof/verify.py.
+- `AaG1Yegitqj7RNvsFyxo` — d4-probe/verify-proof.py, raiz pública.
+- `AaG1Yegitqj7RNvsFyxp` — d4-probe/verify-proof.py, PDF de entrada.
+- `AaG_MVSxdWXCv_DkUAVe` — Home_Care_Assistant_Modelo_Integral.html.
+
+A consulta posterior mantém Quality Gate ERROR somente por duplicação nova
+3,2% acima de 3%; confiabilidade, segurança e manutenção A, hotspots revisados
+100%. Não se alterou limiar, regra, perfil ou exclusão. Essa classificação não
+aprova produção nem substitui a CI do próximo SHA.
+
+Os comentários do CodeRabbit foram lidos na extensão do VS Code: quatro
+comentários repetiam dois temas. O caminho fixo do Windows era um defeito de
+portabilidade: whoami e icacls agora derivam de SystemRoot absoluto e recusam
+valor relativo, mantendo ausência de fallback ao PATH. O comentário sobre SHA
+autorreferente não se confirmou: 4d5e908 não continha a menção a si próprio;
+ela foi adicionada em 8fc04b8. O texto acima explicita essa cronologia.
+
+Os três S4036 indicados em test-environment usam o resolvedor compartilhado.
+Docker é absoluto e Supabase vem da instalação conhecida do operador ou do
+prefixo da action fixada. A versão 2.121.0 usa o binário nativo do pacote
+@supabase/cli da plataforma; o antigo caminho npm supabase/bin não existe.
+Supabase status também procura Docker internamente: recebe PATH restrito ao
+diretório desse executável confiável. A consulta local com PATH sentinela passou
+sem exibir credenciais, mantendo projeto, container e portas verificados.
+Os testes do resolvedor e dos provedores reais passaram seis casos; após ajustar
+o caminho do pacote, os três do resolvedor passaram novamente. A revisão
+independente do patch não identificou outra regressão concreta; Linux e a action
+real continuam sob a CI do próximo commit.
+
+Os cinco TS2307 e o TS7006 do probe histórico foram resolvidos com um tsconfig
+local ao diretório: o arquivo permanecia fora do projeto TypeScript principal
+e o editor perdia os aliases e a tipagem contextual. O compilador desse projeto
+passou sem alterar o probe ou suas conclusões históricas. Os dez avisos Markdown
+listados passaram a zero no language service instalado do VS Code, com controles
+positivo/negativo e conteúdo aprovado preservado. O botão Aplicar filtros recebeu
+type submit explícito. O tabindex da preparação da residência foi preservado:
+é uma região de rolagem que precisa continuar acessível pelo teclado.
+
+Na observação atual de 8fc04b8, Ubuntu, Windows e banco passaram; os seis grupos
+de navegador continuam em execução. Nenhum teste pendente recebeu aprovação.

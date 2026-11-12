@@ -437,7 +437,7 @@ function PatientStock({
                 onChange={event => changeFilter("to", event.currentTarget.value)}
               />
             </label>
-            <button className={primaryClass}>Aplicar filtros</button>
+            <button type="submit" className={primaryClass}>Aplicar filtros</button>
           </form>
         ) : null}
         <StockMovementHistory movements={movements} products={products} canCorrect={can(context,"stock.family.manage")}

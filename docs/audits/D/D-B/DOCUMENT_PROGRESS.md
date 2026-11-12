@@ -16,7 +16,7 @@ Nova publicação reconfere leitura após a trava e elegibilidade das menções;
 recuperação de registro já confirmado exige leitura atual, sem exigir que a
 pessoa mencionada continue ativa. Nome posterior não reescreve o registro.
 
-GET /api/documents/[id]/progress/people recebe search e page, devolve vinte
+`GET /api/documents/[id]/progress/people` recebe search e page, devolve vinte
 pessoas por página, total e escopo explícitos. Exige Auth, leitura da ficha e
 document.progress.create; não é diretório global nem expõe e-mail. API e banco
 recusam paciente sem autorização. Todas as respostas são private, no-store.

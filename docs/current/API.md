@@ -1562,7 +1562,7 @@ a autorização atual. Texto usa o limite UTF-16 do banco e dos controles HTML.
 Na publicação de Andamentos, publication opcional contém relevance
 (normal/milestone/attention) e até oito mentions distintas. Essas opções
 integram a intenção oficial, o commit e a recuperação; não são campos do
-rascunho salvo. GET /api/documents/[id]/progress/people pagina pessoas ativas
+rascunho salvo. `GET /api/documents/[id]/progress/people` pagina pessoas ativas
 do mesmo paciente (search/page, vinte por página), exigindo leitura da ficha
 e document.progress.create. Nomes e papéis são conferidos e preservados pelo
 banco; menção não registra ciência ou autoria.

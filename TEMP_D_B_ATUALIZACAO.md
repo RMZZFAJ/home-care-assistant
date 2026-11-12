@@ -79,12 +79,14 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Outras áreas visuais | Três composições e quatro relações restantes fechadas |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Critérios finais e validação do candidato publicado |
-| Incremento atual | Correções de CI, PWA e avisos do Supabase/Sonar |
+| Incremento atual | Diagnósticos do editor e comentários do CodeRabbit |
 | Resultado local | 66 composições; 164 relações conferidas |
 | Banco | Local e remoto em 240, sem atualizações pendentes |
 | CI de 0dbd2ba | Linux/Windows/banco/Chromium passaram; iOS cortado |
 | Preview de 0dbd2ba | Concluído na Vercel; produção preservada |
 | CI de 4d5e908 | Linux/Windows/banco/iOS-1 passaram; browser em correção |
+| CI de 8fc04b8 | Linux/Windows/banco passaram; navegador em execução |
+| Preview de 8fc04b8 | Pronto na Vercel, no endereço estável abaixo |
 
 **Correções do fechamento:** os campos de filtro do estoque conservam a edição
 mesmo com atualização em segundo plano. A PWA mantém a aparência aprovada,
@@ -92,7 +94,12 @@ confere a origem das mensagens e evita reaproveitar HTML pela rede. Cinco
 percursos finais passaram, incluindo estoque/iOS, painel técnico/iOS, Preview
 protegido, atualização entre abas e PDF privado/offline. As duas migrations
 novas já estão no remoto; onze avisos de consultas de identidade desapareceram.
-As27 correções do Sonar aguardam sua reanálise automática, sem aprovação fictícia.
+O Sonar confirmou 27 correções e 13 falsos positivos após conferência de contexto.
+Os nove alertas restantes foram aceitos para ferramentas manuais de
+desenvolvimento e para a demonstração HTML, com os limites registrados.
+Isso preserva riscos conhecidos; não equivale a corrigir esses nove em código.
+O Quality Gate continua reprovado pela duplicação de 3,2%. A CI completa
+do commit publicado ainda precisa terminar.
 
 **Resultado utilizável do lote 6:** Administração global → Monitoramento e
 suporte reúne visão técnica, continuidade, residências/contas e eventos/política.
@@ -108,12 +115,19 @@ A autenticação da Vercel continua obrigatória. No Preview de f3f3fa8, o login
 respondeu corretamente e a aplicação informou compatibilidade pronta. Isso não
 substitui testar os fluxos autenticados nem o reteste físico do S24 Ultra.
 
-**Ajuste final local, ainda não publicado:** as cores declaradas para o navegador,
+**Já publicado em 8fc04b8:** as cores declaradas para o navegador,
 a instalação e a página pública sem conexão agora seguem o Modelo Integral.
 Foram conferidos os metadados, a página em celular, a atualização com duas abas
 e o acesso protegido por cookie. O cache continua restrito aos quatro arquivos
-públicos. A publicação será agrupada com o fechamento da CI; a instalação física
+públicos. A instalação física
 continua sendo uma tarefa sua com apoio de Codex.
+
+**Novo ajuste local, ainda não publicado:** os avisos indicados do editor foram
+tratados, preservando as provas históricas e a rolagem pelo teclado. O comentário
+pertinente do CodeRabbit sobre o Windows foi corrigido; o histórico do SHA foi
+esclarecido. O acesso ao banco de testes usa executáveis conhecidos, inclusive
+na instalação da CI. Tipos, referências Markdown, testes dirigidos e uma
+consulta real ao banco local passaram. A CI do próximo commit continua exigida.
 
 Backup e recuperação fecharam no escopo de software: uma nova cópia cifrada foi
 autenticada e restaurada isoladamente, com tabelas, arquivos e emissões prontas
@@ -1197,7 +1211,7 @@ disponibilidade total do serviço.
 - **Aplicar atualizações pendentes da fase D-A no banco remoto** — Concluído ·
   100%.
 - **Manter as atualizações D-B aplicadas no remoto** — Concluído tecnicamente ·
-  100% para o candidato publicado. Local/remoto em 238, com pós-verificação e
+  100% para o candidato publicado. Local/remoto em 240, com pós-verificação e
   nenhuma atualização pendente. CI e Preview continuam na etapa 19.
 
 #### Piloto, qualidade e encerramento — critérios originais
@@ -1208,11 +1222,11 @@ disponibilidade total do serviço.
   o piloto com a equipe. Codex apoia e corrige defeitos constatados.
 - **Concluir verificações automáticas e tratar qualidade do código** — A CI
   do candidato publicado precisa passar; acompanhamento e correções são de
-  Codex. A revisão do Sonar foi reaberta por você em12/11:27 apontamentos receberam
-  correções locais, com65 testes dirigidos aprovados. A reanálise do commit ainda
-  é necessária; os demais alertas passam por avaliação de contexto. O resultado
-  corrente
-  é consultado nas [verificações da PR](https://github.com/RMZZFAJ/home-care-assistant/pull/7/checks).
+  Codex. O Sonar confirmou 27 correções e 13 falsos positivos conferidos em
+  contexto. Nove alertas de ferramentas manuais e da demonstração foram aceitos
+  com limites explícitos. O Quality Gate segue reprovado pela duplicação de 3,2%.
+  O resultado corrente é consultado nas
+  [verificações da PR](https://github.com/RMZZFAJ/home-care-assistant/pull/7/checks).
 
 #### 19 — Validação final, migrations e encerramento D-B
 
@@ -1452,7 +1466,7 @@ não interrompem atividades independentes da fase.
 | Acessibilidade com pessoas | 0% homologado | Participantes |
 | Destino de backup e chaves | Decisão pendente | Você |
 | Agenda de backup externo | 0% ativada | Você autoriza; Codex prepara |
-| Configuração do Sonar | Adiada | Codex; seu acesso se preciso |
+| Revisão do Sonar | Retomada; duplicação ainda reprova o gate | Codex |
 | Piloto, suporte e canais | Não definidos | Você e equipe |
 | Provedores e aparelhos reais | Pendente | Codex, você, fornecedores |
 | ICP-Brasil e serviços futuros | Futuros | Você e fornecedores |
@@ -1810,8 +1824,8 @@ GUI-01/02, preparação local com adoção/abertura, contingência e identidade/
 estão entregues localmente. As três composições restantes de suporte,
 NOT-05/ADM-05/GUI-04, acompanham a integração técnica
 do lote 6. A conferência própria das 171 relações está encerrada no recorte
-disponível: quatro relações técnicas pendentes, cinco de apresentação de
-rascunhos adiada e duas removidas permanecem explicitadas. As demais 160
+disponível: cinco de apresentação de rascunhos adiada e duas removidas
+permanecem explicitadas. As demais 164
 têm comprovação local compatível.
 
 - **Resultado:** demais áreas visuais, relações, entrada, administração e guias

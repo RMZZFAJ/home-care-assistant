@@ -111,7 +111,7 @@ laboratório não é uma nova escolha aprovada.
 ### Cabeçalho da primeira página
 
 - Esquerda: identidade HCA, modalidade, título específico e **Situação em
-  [data/hora]**.
+  \[data/hora\]**.
 - Centro: selo do ato aplicável, exceto no BAL. Somente o selo aprovado de
   bandeira lateral.
 - Direita: número da ficha grande e clicável, status, urgência aplicável e
@@ -387,12 +387,12 @@ Título **Autenticidade e verificação**, bloco legível com descrição e elem
 de consulta. Modelo de redação variável, somente para exemplares efetivamente
 assinados:
 
-> Esta [requisição/ficha de entrega/ficha de devolução/ficha de aquisição/ficha
-> de balanço] foi registrada por [autor histórico], em [data/hora]. A emissão
-> deste exemplar foi solicitada por [solicitante], em [data/hora], e assinada
-> digitalmente pelo Home Care Assistant em [instante correspondente].
+> Esta \[requisição/ficha de entrega/ficha de devolução/ficha de aquisição/ficha
+> de balanço\] foi registrada por \[autor histórico\], em \[data/hora\]. A emissão
+> deste exemplar foi solicitada por \[solicitante\], em \[data/hora\], e assinada
+> digitalmente pelo Home Care Assistant em \[instante correspondente\].
 >
-> Verifique em [endereço oficial] com o código [código deste exemplar] ou pelo
+> Verifique em \[endereço oficial\] com o código \[código deste exemplar\] ou pelo
 > QR. Código e QR localizam a emissão. Para conferir o arquivo recebido e sua
 > assinatura, envie o próprio PDF nessa página. A consulta detalhada de autoria
 > e da ficha exige acesso autorizado.
