@@ -15,6 +15,20 @@ efetivas desse vínculo; administração global é independente da função loca
 O sino reúne atualizações do paciente e o perfil permite editar identidade,
 foto, registro profissional, preferências, contatos e sessões.
 
+Acesso pessoal separa Entrar, Recuperar e Aceitar convite. O link de convite
+mostra paciente, função, permissões, emissor e validade somente para a conta
+convidada com e-mail confirmado. Confira o resumo antes de aceitar ou recusar.
+Se a confirmação não chegar, a página preserva essa decisão na mesma aba.
+Consultar resultado sem reenviar apenas lê; Recuperar decisão do convite
+confere o resultado e pode reenviar a mesma escolha. Não escolha a decisão
+oposta nem crie outro cadastro para resolver uma resposta incerta.
+
+Mudar perfil apresenta apenas os vínculos autorizados e, quando disponível,
+a administração global separada. A escolha identifica o paciente e sua função;
+não altera o vínculo. Pessoas e vínculos permite pesquisar, editar, revogar,
+reativar e conferir credenciais pelas permissões existentes. Contas globais
+continua sendo uma área distinta da administração local do paciente.
+
 Meu perfil reúne as abas Meu perfil, Segurança, Avisos e aplicativo,
 Dispositivos e Ajuda. Dados pessoais, foto e vínculos ficam em Meu perfil;
 senha, autenticador, contatos e sessões ficam em Segurança. Avisos e aplicativo

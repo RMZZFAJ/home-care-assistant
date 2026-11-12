@@ -9,11 +9,13 @@ import { useClientReady } from "@/lib/use-client-ready";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { safeReturnPath } from "@/lib/safe-return-path";
 import { isAuthRetryableFetchError } from "@supabase/supabase-js";
+import { AccessFrame } from "./access-frame";
 
 export function LoginForm() {
   const router = useRouter();
   const ready = useClientReady();
   const searchParams = useSearchParams();
+  const recovery = searchParams.get("access") === "recover";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,7 +29,7 @@ export function LoginForm() {
     setNotice("");
     const supabase = createSupabaseBrowserClient();
     if (!supabase) {
-      setError("O Supabase não está configurado neste ambiente.");
+      setError("O serviço de acesso está indisponível. Tente novamente em instantes.");
       setLoading(false);
       return;
     }
@@ -84,7 +86,7 @@ export function LoginForm() {
     }
     const supabase = createSupabaseBrowserClient();
     if (!supabase) {
-      setError("O Supabase não está configurado neste ambiente.");
+      setError("O serviço de acesso está indisponível. Tente novamente em instantes.");
       return;
     }
     setLoading(true);
@@ -114,7 +116,7 @@ export function LoginForm() {
     setError("");
     const supabase = createSupabaseBrowserClient();
     if (!supabase) {
-      setError("O Supabase não está configurado neste ambiente.");
+      setError("O serviço de acesso está indisponível. Tente novamente em instantes.");
       setLoading(false);
       return;
     }
@@ -139,16 +141,20 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={submit} className="hca-auth-form">
+    <AccessFrame active={recovery ? "recovery" : "login"} title={recovery ? "Recuperar seu acesso" : "Entrar"} returnTo={searchParams.get("next")}>
+    <form onSubmit={recovery ? event => { event.preventDefault(); void recoverPassword(); } : submit} className="hca-access-form">
       {searchParams.get("error") ? <FeedbackBanner  tone="warning" role="alert">Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</FeedbackBanner> : null}
-      <FormField label={"E-mail"} htmlFor={"login-email"}><TextInput id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setEmail(controlValue); }} roomy /></FormField>
-      <FormField label={"Senha"} htmlFor={"login-password"}><TextInput id="login-password" name="password" required disabled={!ready || loading} type="password" autoComplete="current-password" value={password} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setPassword(controlValue); }} roomy /></FormField>
+      <FormField label={"E-mail"} htmlFor={"login-email"}><TextInput id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setEmail(controlValue); }} /></FormField>
+      {!recovery ? <FormField label={"Senha"} htmlFor={"login-password"}><TextInput id="login-password" name="password" required disabled={!ready || loading} type="password" autoComplete="current-password" value={password} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setPassword(controlValue); }} /></FormField> : null}
       {error ? <FeedbackBanner  tone="error" role="alert">{error}</FeedbackBanner> : null}
       {notice ? <FeedbackBanner  tone="success" role="status">{notice}</FeedbackBanner> : null}
-      <ActionButton type="submit" variant="primary" roomy disabled={loading || !ready} >{loading ? <LoadingIndicator compact /> : undefined}{loading ? "Entrando..." : "Entrar"}</ActionButton>
+      {recovery ? <ActionButton type="submit" variant="primary" disabled={loading || !ready}>{loading ? "Solicitando…" : "Solicitar link de recuperação"}</ActionButton> : <>
+      <ActionButton type="submit" variant="primary" disabled={loading || !ready} >{loading ? <LoadingIndicator compact /> : undefined}{loading ? "Entrando..." : "Entrar"}</ActionButton>
       <ActionButton variant="quiet" type="button" onClick={recoverPassword} disabled={loading || !ready}>Esqueci minha senha</ActionButton>
-      <div className="hca-auth-divider"><span />ou<span /></div>
-      <ActionButton type="button" roomy onClick={signInWithGoogle} disabled={loading || !ready}>Continuar com Google</ActionButton>
+      <div className="hca-access-divider"><span />ou<span /></div>
+      <ActionButton type="button" onClick={signInWithGoogle} disabled={loading || !ready}>Continuar com Google</ActionButton>
+      </>}
     </form>
+    </AccessFrame>
   );
 }

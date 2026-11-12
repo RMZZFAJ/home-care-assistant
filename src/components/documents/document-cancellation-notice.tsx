@@ -69,7 +69,7 @@ export function DocumentCancellationNotice({ document, userId, activeContext, on
       {data.personalAcknowledgement ? <p role="status">Sua ciência do cancelamento está registrada em {formatBrazilDate(data.personalAcknowledgement.recordedAt)}.</p>
         : data.eligible ? <>
           {!activeContext ? <Notice>Selecione o paciente desta ficha para registrar sua ciência.</Notice> : null}
-          <button className={buttonClass} type="button" disabled={busy || checking || !checked || !activeContext} onClick={() => void acknowledge()}>{busy ? "Confirmando sua ciência…" : "Estou ciente deste cancelamento"}</button>
+          <button className={buttonClass} type="button" disabled={busy || (!checked && !checking) || !activeContext} aria-disabled={checking || !checked || undefined} onClick={() => void acknowledge()}>{busy ? "Confirmando sua ciência…" : "Estou ciente deste cancelamento"}</button>
         </> : <p>A confirmação depende de uma pessoa habilitada para ciência familiar. A leitura desta ficha não registra ciência.</p>}
     </> : null}
     <button className={buttonClass} type="button" disabled={busy || checking} onClick={() => { autoReadPausedRef.current = false; void load(); }}>Consultar minha confirmação</button>

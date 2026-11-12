@@ -1047,6 +1047,18 @@ Token inválido, expirado ou revogado não revela dados do paciente. Paciente,
 função, emissor, destinatário e validade aparecem somente para a conta
 convidada, confirmada e com sessão Auth vigente; a prévia não cria vínculo.
 Aceitar/recusar revalida os fatos e não recebe paciente ou papel editáveis.
+O envelope da prévia contém `data` e `actorId`, identidade Auth consultada
+no servidor, ou `null` no acesso anônimo. `ready` e `accepted` exigem sessão
+confirmada e prévia completa; os demais estados não incluem dados do paciente.
+`POST /api/invitations/accept` admite `expectedActor` para vincular a intenção
+à conta que conferiu a prévia. Se a conta mudou, retorna `VERSION_CONFLICT`
+sem executar a decisão. O parâmetro é opcional por compatibilidade; toda
+decisão continua autorizada pelo servidor e pela RPC transacional.
+A interface confirma aceite ou recusa pela prévia atual do mesmo token,
+sem deduzir o vínculo de uma resposta HTTP bem-sucedida. Uma tentativa incerta
+conserva token, conta e decisão na aba; a recuperação consulta o resultado e
+só reenvia explicitamente a mesma intenção quando o convite ainda está pronto.
+Respostas atrasadas não substituem outro convite ou outra conta.
 Retry de aprovação já confirmada retorna recuperação explícita por reemissão;
 o administrador local pode rotacionar o link existente, sem novo convite.
 

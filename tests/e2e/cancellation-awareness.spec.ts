@@ -10,7 +10,37 @@ import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
+test("COM cancellation confirmation retains focus during a held read and never queues a premature acknowledgement", async ({ page }) => {
+  const f = await cancellationFixture("COM"), id = f.document.id;
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, f.patient); await page.goto("/fichas/" + id);
+  const notice = page.getByRole("region", { name: "Ciência do cancelamento", exact: true });
+  const confirm = notice.getByRole("button", { name: "Estou ciente deste cancelamento", exact: true });
+  await expect(confirm).toBeEnabled(); await confirm.focus();
+  const before = awarenessFacts(id); let posts = 0, release!: () => void, entered!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  const sent = new Promise<void>(resolve => { entered = resolve; });
+  await page.route("**/api/documents/" + id + "/cancellation", async route => {
+    if (route.request().method() === "POST") { posts++; await route.continue(); return; }
+    entered(); await held; await route.continue();
+  });
+  try {
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed"))); await sent;
+    await expect(confirm).toHaveAttribute("aria-disabled", "true"); await expect(confirm).toBeFocused();
+    await confirm.evaluate((button: HTMLButtonElement) => button.click());
+    expect(posts).toBe(0); expect((await awareness(f.family, id)).totalAcknowledgements).toBe(0);
+  } finally { release(); }
+  await expect(confirm).not.toHaveAttribute("aria-disabled", "true"); await expect(confirm).toBeFocused();
+  expect(posts).toBe(0); expect(awarenessFacts(id)).toBe(before);
+});
 for (const type of ["REQ", "COM"]) test(type + " preserves original facts and recovers the personal cancellation awareness after a lost response", async ({ page }, info) => {
+  // This journey includes five full-page audits and a real signed PDF. Retained
+  // local fixtures make those checks slower than on the clean CI database.
+  test.setTimeout(240_000);
   const f = await cancellationFixture(type), id = f.document.id, before = awarenessFacts(id);
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);

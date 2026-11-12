@@ -1,0 +1,21 @@
+.hca-public-access { --app-header-height: 64px; min-height: 100dvh; background: var(--hca-bg); }
+.hca-access-header { position: sticky; top: 0; z-index: 50; height: var(--app-header-height); display: flex; align-items: center; padding: 0 25px; background: #173b3a; border-bottom: 1px solid #244e4b; }
+.hca-access-main { max-width: 1380px; padding: 23px 30px 65px; margin: auto; }
+.hca-access-main .page-heading p { margin-top: 8px; max-width: 750px; color: var(--hca-muted); font-size: 14px; }
+.hca-access-card { max-width: 620px; margin-inline: auto; padding: 21px; }
+.hca-access-card > h2 { font-size: 19px; font-weight: 700; line-height: 1.35; margin-bottom: 19px; }
+.hca-access-card > p { color: var(--hca-muted); font-size: 12px; }
+.hca-access-form { display: grid; gap: 16px; min-width: 0; }
+.hca-access-form > label { font-size: 12px; font-weight: 650; }
+.hca-access-form .hca-text-input { font-weight: inherit; }
+.hca-access-divider { display: flex; gap: 12px; align-items: center; color: var(--hca-muted); font-size: 12px; }
+.hca-access-divider span { flex: 1; height: 1px; background: var(--hca-line); }
+.hca-access-tab[aria-current=page] { color: var(--hca-teal); border-bottom-color: var(--hca-teal); }
+.hca-access-card .hca-definition-grid { margin-block: 16px; }
+@media (max-width: 850px) {
+  .hca-public-access { --app-header-height: 59px; }
+  .hca-access-header { padding-inline: 13px; }
+  .hca-access-main { padding: 20px 18px 90px; }
+  .hca-access-card { padding: 17px; }
+}
+@media (max-width: 500px) { .hca-access-main { padding: 14px 12px 100px; } }

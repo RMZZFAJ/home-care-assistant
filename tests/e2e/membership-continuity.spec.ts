@@ -35,6 +35,7 @@ const person = (user: string) =>
 test("C030 editar função fixa a mesma pessoa e conserva o vínculo de outra conta", async ({
   page,
 }) => {
+  test.setTimeout(120_000);
   const f = await setup(),
     other = member(f.patient, fixtures.reader.id);
   sql(

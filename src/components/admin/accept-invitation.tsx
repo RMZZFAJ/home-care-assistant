@@ -2,14 +2,18 @@
 import {roleLabel} from "@/lib/role-labels";
 
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
-import { api, buttonClass, inputClass, Notice, panelClass, primaryClass } from "@/components/workspace";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { api, buttonClass, inputClass, Notice, primaryClass } from "@/components/workspace";
 import { NewPasswordField } from "@/components/auth/new-password-field";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatBrazilDate } from "@/lib/receipt";
+import { AccessFrame } from "@/components/auth/access-frame";
+import { DefinitionGrid } from "@/components/ui/controls";
+import { parseInvitationRead, type InvitationPreview } from "@/lib/validation/invitation";
+import { InvitationDecision } from "./invitation-decision";
 
-type Preview = { state: "ready" | "login_required" | "wrong_account" | "accepted" | "declined" | "expired" | "revoked" | "invalid"; patientName?: string; recipientEmail?: string; role?: string; inviterName?: string; expiresAt?: string; canManageStock?: boolean; canCountStock?: boolean };
+type Preview = InvitationPreview;
 const stateMessages: Partial<Record<Preview["state"], string>> = {
   login_required: "Convite encontrado. Entre com a conta convidada para consultar o paciente, a função e quem emitiu o convite antes de decidir.",
   wrong_account: "Esta conta não pode aceitar este convite. Troque para a conta do e-mail convidado e confirmado.",
@@ -29,14 +33,43 @@ export function AcceptInvitation() {
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [actorId, setActorId] = useState<string | null>(null);
+  const [previewScope, setPreviewScope] = useState(0);
+  const [reading, setReading] = useState(false), [linkIssue, setLinkIssue] = useState("");
+  const scopeRef = useRef(0), tokenRef = useRef<string | null>(null);
+  const actorRef = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    const client = createSupabaseBrowserClient();
+    if (!client) return;
+    const { data } = client.auth.onAuthStateChange((_event, session) => {
+      const next = session?.user.id ?? null;
+      // Session events invalidate presentation; the API/RPC authorize every act.
+      if (actorRef.current !== undefined && actorRef.current !== next) {
+        scopeRef.current++;
+        setPreview(null); setActorId(null); setAccepted(false); setBusy(false);
+        setAttempt(value => value + 1);
+      }
+      actorRef.current = next;
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
   useEffect(() => {
     const receive = () => {
+      scopeRef.current++;
       const received = new URLSearchParams(window.location.hash.slice(1)).get("token");
-      if (received) {
-        sessionStorage.setItem("hca:invitation", received);
-        window.history.replaceState(null, "", window.location.pathname);
+      let selected = received;
+      try {
+        if (received) {
+          sessionStorage.setItem("hca:invitation", received);
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+        selected ??= sessionStorage.getItem("hca:invitation");
+        setLinkIssue("");
+      } catch {
+        setLinkIssue("Não foi possível guardar o link para retomada neste aparelho. Preserve o link original antes de continuar.");
       }
-      setToken(received ?? sessionStorage.getItem("hca:invitation"));
+      tokenRef.current = selected;
+      setToken(selected); setActorId(null); setBusy(false);
       setPreview(null); setAccepted(false); setError(""); setNotice("");
       setAttempt(value => value + 1); setReady(true);
     };
@@ -48,24 +81,19 @@ export function AcceptInvitation() {
   useEffect(() => {
     if (!token) return;
     const controller = new AbortController();
-    api<{ data: Preview }>("/api/invitations/preview", { token }, controller.signal)
-      .then(result => { if (!controller.signal.aborted) setPreview(result.data); })
-      .catch(reason => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "Não foi possível consultar o convite."); });
+    const epoch = ++scopeRef.current;
+    queueMicrotask(() => { if (!controller.signal.aborted) setReading(true); });
+    api<unknown>("/api/invitations/preview", { token }, controller.signal)
+      .then(raw => {
+        if (controller.signal.aborted || epoch !== scopeRef.current) return;
+        const result = parseInvitationRead(raw);
+        if (["ready", "accepted"].includes(result.data.state) && actorRef.current !== undefined && actorRef.current !== result.actorId) throw new Error("A conta mudou durante a consulta. Consulte o convite novamente.");
+        setPreview(result.data); setActorId(result.actorId); setPreviewScope(epoch); setError("");
+      })
+      .catch(reason => { if (!controller.signal.aborted && epoch === scopeRef.current) { setPreview(null); setActorId(null); setError(reason instanceof Error ? reason.message : "Não foi possível consultar o convite."); } })
+      .finally(() => { if (!controller.signal.aborted && epoch === scopeRef.current) setReading(false); });
     return () => controller.abort();
   }, [token, attempt]);
-  async function decide(decision: "accept" | "decline") {
-    if (busy || preview?.state !== "ready") return;
-    setBusy(true); setError("");
-    try {
-      await api("/api/invitations/accept", { token, decision });
-      sessionStorage.removeItem("hca:invitation");
-      if (decision === "accept") setAccepted(true);
-      else setPreview({ state: "declined" });
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Não foi possível registrar a decisão.");
-      setAttempt(value => value + 1);
-    } finally { setBusy(false); }
-  }
   async function switchAccount() {
     if (busy) return;
     setBusy(true); setError("");
@@ -82,39 +110,44 @@ export function AcceptInvitation() {
     const form = new FormData(event.currentTarget), parsed = newPasswordSchema.safeParse(form.get("password"));
     if (!parsed.success) { setError(parsed.error.issues[0].message); return; }
     setBusy(true); setError("");
+    const epoch = scopeRef.current;
     try {
       const result = await api<{ notice: string }>("/api/invitations/register", { token, email: form.get("email"), password: parsed.data, fullName: form.get("fullName") });
-      setNotice(result.notice);
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "Não foi possível concluir o cadastro."); }
-    finally { setBusy(false); }
+      if (epoch === scopeRef.current) setNotice(result.notice);
+    } catch (reason) { if (epoch === scopeRef.current) setError(reason instanceof Error ? reason.message : "Não foi possível concluir o cadastro."); }
+    finally { if (epoch === scopeRef.current) setBusy(false); }
   }
   const terminal = preview && ["expired", "revoked", "invalid", "declined"].includes(preview.state);
-  return <main id="workspace-content" tabIndex={-1} className="mx-auto max-w-xl p-4 sm:py-12"><section className={`${panelClass} space-y-5`}>
-    <p className="text-xs font-bold uppercase tracking-wider text-(--brand)">Home Care Assistant</p>
-    <h1 className="text-2xl font-semibold">Convite de acesso ao paciente</h1>
+  return <AccessFrame active="invitation" title="Convite de acesso ao paciente"><div className="hca-access-form">
     {error ? <Notice error>{error}<button className={buttonClass} disabled={busy} onClick={() => { setError(""); setAttempt(value => value + 1); }}>Consultar convite novamente</button></Notice> : null}
     {notice ? <Notice>{notice}</Notice> : null}
-    {accepted ? <><Notice>Convite aceito. Seu vínculo com o paciente está disponível.</Notice><Link href="/" className={`${primaryClass} inline-block`}>Abrir Home Care Assistant</Link></> : <>
-      {!ready || token && !preview && !error ? <Notice>Validando link…</Notice> : null}
-      {ready && !token ? <Notice error>{stateMessages.invalid}</Notice> : null}
+    {linkIssue ? <Notice error>{linkIssue}</Notice> : null}
+    {accepted ? <><Notice>Convite aceito. Seu vínculo com o paciente está disponível.</Notice><Link tabIndex={0} href="/" className={`${primaryClass} inline-block`}>Abrir Home Care Assistant</Link></> : <>
+      {!ready || reading || token && !preview && !error ? <Notice>Validando link…</Notice> : null}
+      {ready && !token && !linkIssue ? <Notice error>{stateMessages.invalid}</Notice> : null}
       {preview?.state !== "ready" && preview ? <Notice error={Boolean(terminal) || preview.state === "wrong_account"}>{stateMessages[preview.state]}</Notice> : null}
-      {preview?.patientName ? <dl className="space-y-3 rounded-lg border border-(--line) p-4" aria-label="Resumo do vínculo convidado">
-        <div><dt className="text-sm text-(--muted)">Paciente</dt><dd className="font-semibold">{preview.patientName}</dd></div>
-        <div><dt className="text-sm text-(--muted)">Função neste paciente</dt><dd>{roleLabel(preview.role)}</dd></div>
-        <div><dt className="text-sm text-(--muted)">Conta convidada</dt><dd className="break-all">{preview.recipientEmail}</dd></div>
-        <div><dt className="text-sm text-(--muted)">Convite emitido por</dt><dd>{preview.inviterName || "Nome não disponível"}</dd></div>
-        <div><dt className="text-sm text-(--muted)">Válido até</dt><dd>{preview.expiresAt ? formatBrazilDate(preview.expiresAt) + " (America/Sao_Paulo)" : "Não disponível"}</dd></div>
-        <div><dt className="text-sm text-(--muted)">Permissões específicas propostas</dt><dd>{preview.canManageStock ? "Gerenciar estoque" : "Sem gestão adicional de estoque"} · {preview.canCountStock ? "Realizar contagem" : "Sem contagem adicional"}. As regras do paciente continuam aplicáveis.</dd></div>
-      </dl> : null}
-      {preview?.state === "ready" ? <><p className="text-sm">Confira este vínculo. O aceite concede somente a função e o paciente apresentados; não altera sua identidade global.</p><div className="flex flex-wrap gap-3"><button className={primaryClass} disabled={busy} onClick={() => void decide("accept")}>{busy ? "Confirmando…" : "Aceitar convite com minha conta"}</button><button className={buttonClass} disabled={busy} onClick={() => void decide("decline")}>Recusar convite</button></div></> : null}
-      {preview?.state === "accepted" ? <Link href="/" className={`${primaryClass} inline-block`}>Abrir Home Care Assistant</Link> : null}
+      {preview?.patientName && actorId && ["ready", "accepted"].includes(preview.state) ? <section aria-label="Resumo do vínculo convidado"><DefinitionGrid items={[
+        { label: "Paciente", value: preview.patientName },
+        { label: "Função neste paciente", value: roleLabel(preview.role) },
+        { label: "Conta convidada", value: preview.recipientEmail },
+        { label: "Convite emitido por", value: preview.inviterName || "Nome não disponível" },
+        { label: "Válido até", value: preview.expiresAt ? formatBrazilDate(preview.expiresAt) + " (America/Sao_Paulo)" : "Não disponível" },
+        { label: "Permissões específicas propostas", value: <>{preview.canManageStock ? "Gerenciar estoque" : "Sem gestão adicional de estoque"} · {preview.canCountStock ? "Realizar contagem" : "Sem contagem adicional"}. As regras do paciente continuam aplicáveis.</> },
+      ]} /></section> : null}
+      {token && actorId && preview && ["ready", "accepted", "declined", "expired", "revoked", "invalid"].includes(preview.state) && !reading && !error ? <InvitationDecision key={`${token}:${actorId}`} token={token} actorId={actorId} preview={preview} onRead={(result, confirmed) => {
+        if (scopeRef.current !== previewScope || tokenRef.current !== token) return;
+        if (["ready", "accepted"].includes(result.data.state) && actorRef.current !== undefined && actorRef.current !== result.actorId) return;
+        setPreview(result.data); setActorId(result.actorId);
+        if (confirmed === "accept") setAccepted(true);
+      }} /> : null}
+      {preview?.state === "accepted" ? <Link tabIndex={0} href="/" className={`${primaryClass} inline-block`}>Abrir Home Care Assistant</Link> : null}
       {preview?.state === "wrong_account" ? <button className={primaryClass} disabled={busy} onClick={() => void switchAccount()}>Trocar conta</button> : null}
-      {preview?.state === "login_required" ? <><Link className={`${buttonClass} inline-block`} href="/login?next=%2Fconvites%2Faceitar">Entrar com minha conta</Link><details><summary className="cursor-pointer font-semibold">Ainda não tenho conta</summary><form className="mt-4 space-y-4" onSubmit={register}>
+      {preview?.state === "login_required" ? <><Link tabIndex={0} className={`${buttonClass} inline-block`} href="/login?next=%2Fconvites%2Faceitar">Entrar com minha conta</Link><details><summary className="cursor-pointer font-semibold">Ainda não tenho conta</summary><form className="mt-4 space-y-4" onSubmit={register}>
         <label className="block">Nome<input className={inputClass} name="fullName" autoComplete="name" minLength={2} maxLength={160} required disabled={busy} /></label>
         <label className="block">E-mail do convite<input className={inputClass} name="email" type="email" autoComplete="email" required disabled={busy} /></label>
         <NewPasswordField label="Senha pessoal" className={inputClass} disabled={busy} />
         <button type="submit" className={primaryClass} disabled={busy}>{busy ? "Registrando…" : "Criar minha conta"}</button>
       </form></details></> : null}
     </>}
-  </section></main>;
+  </div></AccessFrame>;
 }

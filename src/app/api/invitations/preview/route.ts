@@ -10,6 +10,9 @@ export async function POST(request: Request) {
     const client = await createSupabaseServerClient();
     if (!client) throw new ApiError("NOT_CONFIGURED", "Serviço de acesso indisponível.", 503);
     const data = await rpc(client, "invitation_preview", { p_token_hash: createHash("sha256").update(token).digest("hex") });
-    return NextResponse.json({ data });
+    const { data: { user }, error } = await client.auth.getUser();
+    if (["ready", "accepted"].includes(data.state) && (error || !user))
+      throw new ApiError("SESSION_EXPIRED", "Não foi possível confirmar a conta deste convite. Entre novamente.", 401);
+    return NextResponse.json({ data, actorId: user?.id ?? null });
   });
 }

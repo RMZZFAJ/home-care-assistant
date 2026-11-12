@@ -1,7 +1,7 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, com guia por papel, preparação local e
-contingência entregues no lote 5.
+Atualizado em 12 de novembro de 2026, com guia por papel, preparação local,
+contingência e identidade/acesso entregues localmente no lote 5.
 Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
@@ -75,14 +75,14 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
-| Outras áreas visuais | 8 composições e 171 relações a conferir |
+| Outras áreas visuais | 4 composições e 171 relações a conferir |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Administração, guias e aparência restante |
-| Incremento atual | Cadastro, regras, propostas e avisos administrativos |
-| Resultado local | Quatro composições administrativas conferidas localmente |
+| Incremento atual | Acesso, convites, pessoas, contas e escolha de contexto |
+| Resultado local | 62 das 66 composições conferidas localmente |
 | Banco | Local e remoto em 237, sem atualizações pendentes |
-| CI de e43961f | Chromium 1 reprovado; iOS cancelado; demais grupos passaram |
-| Preview de e43961f | Concluído na Vercel; produção preservada |
+| CI de c45a065 | iOS 1 reprovado; iOS 2 cancelado; demais grupos passaram |
+| Preview de c45a065 | Concluído na Vercel; produção preservada |
 | CI deste incremento | Pendente; conferência conjunta obrigatória |
 
 **Resultado utilizável do lote 5:** Guias e ajuda apresenta navegação por
@@ -128,8 +128,8 @@ A preparação real dos certificados de teste tem limite próprio, sem mudar
 assinatura ou timeout do aplicativo. Passaram 26 percursos móveis e 16 testes
 de PDF, tipos e lint dirigido. A CI conjunta continua pendente.
 
-**Próxima entrega no lote 5:** composições restantes de preparação,
-administração, identidade, avisos e suporte, com suas relações.
+**Próxima entrega no lote 5:** preparação global e conferência das relações.
+As composições técnicas restantes acompanham o suporte no lote 6.
 A recuperação oficial continua obrigatória. Os rascunhos permanecem intactos.
 A atualização entre duas sessões passou no banco da CI
 976d42c; o BAL em iOS integra a correção dirigida atual.
@@ -1234,7 +1234,7 @@ conferência conjunta local.
 
 #### 15 — Aparência das demais áreas e relações restantes
 
-Estado: em execução · 60%. Responsável: Codex.
+Estado: em execução · 70%. Responsável: Codex.
 
 **Condição para fechar:** O conjunto das etapas 6 e 15 cobre as 66 composições e
 171 relações, com funções preservadas e comparação individual com o Modelo
@@ -1243,16 +1243,28 @@ Integral.
 Pontos de verificação:
 
 - 15.1 Administração — ADM-01–04 e ADM-06 conferidos localmente; falta ADM-05.
-- 15.2 Identidade e acesso — ID-02 concluído localmente; faltam ID-01/03/04/05.
+- 15.2 Identidade e acesso — ID-01–05 concluídos localmente no escopo visual.
 - 15.3 Notificações — NOT-01–04 conferidos; falta NOT-05.
 - 15.4 Guias — GUI-01 e GUI-03 concluídos localmente; preparação e suporte
   conservam suas composições restantes.
 - 15.5 Relações restantes e comparação nas cinco larguras.
 
-**O que falta:** Concluir as outras oito composições: ID-01/03/04/05, NOT-05,
-ADM-05 e GUI-02/04. As 58 composições visuais conferidas não aprovam
+**O que falta:** Concluir as quatro composições: NOT-05, ADM-05 e GUI-02/04.
+As 62 composições visuais conferidas não aprovam
 automaticamente as 171 relações entre controles e contratos. Implementações e
 verificações que essa conferência identificar continuam com Codex.
+
+**Entrega de acesso e identidade:** Entrar, Recuperar e Aceitar convite usam
+o mesmo padrão visual, com autenticação real. Pessoas, contas globais e escolha
+de contexto conservam seus processos e permissões separados. O aceite só é
+anunciado depois de conferir o vínculo registrado. Uma resposta incerta
+preserva a conta, o convite e a decisão; a retomada não troca a escolha nem
+atinge outro link. A navegação por teclado foi corrigida no iOS. A ciência de
+cancelamento conserva foco durante a consulta, sem confirmar antecipadamente.
+Passaram 25 percursos distintos em rodadas de produção compatíveis, incluindo
+as sete reprovações da primeira rodada após as correções e a separação dos
+testes longos. A consulta de contexto teve uma falha transitória e recuperou;
+isso não atesta disponibilidade contínua. CI do novo commit ainda é necessária.
 
 **Entrega administrativa:** cadastro e atalhos autorizados, regras agrupadas,
 permissões e propostas usam a composição do modelo. A comparação conserva
@@ -1344,9 +1356,10 @@ composições diárias da etapa 06.
 - **Faixa de atenção, próxima providência e status** — 65%. Já aplicado:
   Estrutura integrada a fatos operacionais. Falta: Concluir critérios de cada
   tarefa sem avisos simulados. Responsável: Codex.
-- **Administração, cadastros, perfil e guias** — 60%. Já aplicado: Perfil em
-  abas, cadastro, regras, permissões, propostas e guias locais conferidos.
-  Falta: Identidade/acesso, preparação global, suporte e relações restantes.
+- **Administração, cadastros, perfil e guias** — 75%. Já aplicado: Perfil em
+  abas, acesso, convites, pessoas, contas, contexto, cadastro, regras,
+  permissões, propostas e guias locais conferidos. Falta: Preparação global,
+  suporte e relações restantes.
   Responsável: Codex.
 - **Estoque, consumo, transferências e variantes de balanço** — 85%. Já
   aplicado: Saldos, trânsito, movimentos e relatos seguem o modelo; origem,
@@ -1605,6 +1618,12 @@ esses resultados visuais. Não houve mudança de banco, canais ou rascunhos.
 Em b528f1d, Linux, Windows e Preview passaram; banco ainda estava em execução
 na observação. A CI do novo incremento continua obrigatória; Sonar está adiado.
 
+**12 de novembro — identidade e acesso:** ID-01/03/04/05 fecharam no escopo
+visual local, chegando a 62 de 66 composições. A decisão do convite agora exige
+conferência do vínculo e conserva a mesma tentativa incerta. A seção 15 registra
+as verificações e os limites; a CI própria continua necessária. Não houve nova
+migration ou alteração de canal, produção ou rascunho comum.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1686,10 +1705,10 @@ um novo lote de funções nem impede as implementações independentes.
 
 ### Lote 5 — Jornadas restantes e aparência do aplicativo
 
-GUI-01, preparação local com adoção/abertura e contingência estão entregues.
-Seguem as oito composições restantes de preparação, identidade, acesso e
-suporte: ID-01/03/04/05, GUI-02 e NOT-05/ADM-05/GUI-04. Identidade e preparação
-vêm a seguir; as três composições de suporte acompanham a integração técnica
+GUI-01, preparação local com adoção/abertura, contingência e identidade/acesso
+estão entregues localmente. Seguem as quatro composições restantes de
+preparação e suporte: GUI-02 e NOT-05/ADM-05/GUI-04. Preparação vem a seguir;
+as três composições de suporte acompanham a integração técnica
 do lote 6. As 171 relações mantêm sua conferência própria no lote 5.
 
 - **Resultado:** demais áreas visuais, relações, entrada, administração e guias

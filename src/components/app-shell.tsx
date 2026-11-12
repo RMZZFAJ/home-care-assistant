@@ -12,6 +12,8 @@ import { useSearchParams } from "next/navigation";
 
 import { can } from "@/lib/client/capabilities";
 import type { WorkspaceContext } from "@/types/workspace";
+import { Icon } from "@/components/ui/primitives";
+import "./layout/context-selection.css";
 import {
   roleLabel,
   useWorkspaceState,
@@ -141,7 +143,7 @@ export function AppWorkspace({
           className="ui-card hca-context-selection"
           aria-label="Mudar perfil"
         >
-          <h2 className="text-lg font-semibold">Escolha como deseja atuar</h2>
+          <h2>Escolha como deseja atuar</h2>
           {data?.documentContext ? (
             <p>
               Este documento pertence a {data.documentContext.displayName}.
@@ -150,6 +152,7 @@ export function AppWorkspace({
           ) : null}
           <p>Escolha um contexto autorizado para esta sessão.</p>
           <TextInput
+            className="hca-context-search"
             aria-label="Buscar perfil autorizado"
             placeholder="Nome do paciente"
             value={profileSearch}
@@ -168,19 +171,23 @@ export function AppWorkspace({
           <div className="hca-context-options">
             {value.isGlobalAdmin ? (
               <ActionButton
+                className="hca-context-option"
+                aria-label="Administração global"
                 disabled={selecting}
                 onClick={() => void selectProfile(null)}
               >
-                Administração global
+                <Icon name="shield" /><span><strong>Administração global</strong><small>Cadastro e propostas globais. A operação local exige seu vínculo no paciente.</small></span>
               </ActionButton>
             ) : null}
             {profiles.slice(0, 50).map((patient) => (
               <ActionButton
                 key={patient.id}
+                className="hca-context-option"
+                aria-label={patient.display_name + " · " + roleLabel(patient.role)}
                 disabled={selecting}
                 onClick={() => void selectProfile(patient.id)}
               >
-                {patient.display_name} · {roleLabel(patient.role)}
+                <Icon name="home" /><span><strong>{patient.display_name}</strong><small>{roleLabel(patient.role)}{patient.is_active === false ? " · Paciente inativo" : ""}</small></span>
               </ActionButton>
             ))}
           </div>

@@ -36,7 +36,9 @@ async function styles(actual:Locator,reference:Locator,properties:readonly strin
 async function fileParity(row:Locator,reference:Page){await styles(row,reference.locator(".doc-list-row").first(),["display","gap","padding-left","padding-top","border-bottom-color"]);await styles(row.locator(".hca-file-mark"),reference.locator(".file-mark").first(),["width","height","border-radius","background-color"]);}
 async function capture(node:Locator,file:string){
   await node.evaluate(n=>n.scrollIntoView({block:"center",behavior:"instant"}));
-  expect(await node.evaluate(n=>{const r=n.getBoundingClientRect(),x=r.left+r.width/2;return [r.top+12,r.bottom-12].every(y=>y>0&&y<innerHeight&&n.contains(document.elementFromPoint(x,y)));})).toBe(true);
+  // Native WebKit can finish a viewport/scroll update after evaluate returns.
+  // Keep the same unobscured-edge requirement and await the settled geometry.
+  await expect.poll(()=>node.evaluate(n=>{const r=n.getBoundingClientRect(),x=r.left+r.width/2;return [r.top+12,r.bottom-12].every(y=>y>0&&y<innerHeight&&n.contains(document.elementFromPoint(x,y)));})).toBe(true);
   mkdirSync("output/playwright/phase-d",{recursive:true});await node.screenshot({path:"output/playwright/phase-d/"+file+".png",animations:"disabled"});
 }
 const official=(patient:string,id:string)=>sql("select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id="+q(id)+"),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id="+q(id)+"),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id="+q(patient)+"));");

@@ -9,6 +9,8 @@ import { text, type Row } from "./admin-fields";
 
 import { AdministrativePreparationEditor } from "./administrative-preparation-editor";
 import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
+import { ProfileAvatar } from "@/components/ui/avatar";
+import "./identity.css";
 
 export function MembershipManagement({
   rows,
@@ -52,7 +54,7 @@ export function MembershipManagement({
       .includes(search.toLocaleLowerCase("pt-BR")),
   );
   return (
-    <section>
+    <section className="hca-identity-management" aria-label="Pessoas e vínculos">
       <div className="hca-section-heading">
         <div>
           <h2>Pessoas e vínculos</h2>
@@ -81,16 +83,14 @@ export function MembershipManagement({
           {filtered.length} vínculos
         </span>
       </div>
-      <div className="hca-records">
+      <div className="ui-card hca-identity-list">
         {filtered.map((row) => (
           <article
             key={text(row, "id") || text(row, "user_id")}
-            className="hca-record"
+            className="hca-identity-row"
           >
-            <span className="hca-task-icon">
-              <Icon name="user" />
-            </span>
-            <div className="hca-record-main">
+            <ProfileAvatar name={name(row)} />
+            <div className="hca-identity-main">
               <h3>{name(row)}</h3>
               <small>
                 {roleLabel(text(row, "role"))}
@@ -102,7 +102,7 @@ export function MembershipManagement({
                 {row.status === "revoked" ? "Revogado" : "Ativo"}
               </Pill>
             </div>
-            <div className="hca-record-actions">
+            <div className="hca-identity-actions">
               <ActionButton
                 aria-label={"Editar vínculo de " + name(row)}
                 disabled={row.status === "revoked"}

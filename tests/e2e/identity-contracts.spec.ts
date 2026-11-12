@@ -80,14 +80,15 @@ test("convite exige a conta correta e apresenta o vínculo somente para leitura 
   await expect(page).toHaveURL(/\/login\?next=/); await enter(page, "adminB");
   const preview = page.getByRole("definition");
   await expect(preview).toContainText([sql(`select display_name from public.care_recipients where id=${sqlLiteral(f.patient)};`), "Profissional", fixtures().adminB.email, "Teste adminA", "America/Sao_Paulo", "Realizar contagem"]);
-  const summary = page.locator('dl[aria-label="Resumo do vínculo convidado"]');
+  const summary = page.getByRole("region", { name: "Resumo do vínculo convidado", exact: true });
+  await expect(summary).toBeVisible();
   await expect(summary.locator("input,select,textarea")).toHaveCount(0);
   for (const width of [1440, 390]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "D1 invitation preview " + width); }
   mkdirSync("output/playwright/phase-d", { recursive: true });
   await page.screenshot({ path: `output/playwright/phase-d/invitation-preview-${test.info().project.name}.png`, fullPage: true, animations: "disabled" });
   const sent = page.waitForRequest(request => request.method() === "POST" && new URL(request.url()).pathname === "/api/invitations/accept");
   await page.getByRole("button", { name: "Aceitar convite com minha conta", exact: true }).click();
-  expect(Object.keys((await sent).postDataJSON()).sort()).toEqual(["decision", "token"]);
+  expect(Object.keys((await sent).postDataJSON()).sort()).toEqual(["decision", "expectedActor", "token"]);
   await expect(page.getByText("Convite aceito.", { exact: false })).toBeVisible();
   expect(sql(`select role::text from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures().adminB.id)};`)).toBe("professional");
   await page.goto("/convites/aceitar#token=" + token);
@@ -120,7 +121,7 @@ test("retry de aprovação oferece reemissão explícita sem duplicar convite ne
   expect(newLink).not.toBe(issued.invitationUrl);
   const oldToken = new URLSearchParams(new URL(issued.invitationUrl).hash.slice(1)).get("token");
   const oldPreview = await page.request.post("/api/invitations/preview", { data: { token: oldToken } });
-  expect(await oldPreview.json()).toEqual({ data: { state: "invalid" } });
+  expect(await oldPreview.json()).toEqual({ data: { state: "invalid" }, actorId: fixtures().adminA.id });
   expect(sql(`select count(*) from public.care_recipient_invitations where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");
   expect(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures().adminB.id)};`)).toBe("0");
 });

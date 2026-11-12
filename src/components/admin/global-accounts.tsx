@@ -10,6 +10,8 @@ import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Dialog, Icon } from "@/components/ui/primitives";
 import { Notice } from "@/components/workspace";
 import { Field, Check, text, bool, type Row } from "./admin-fields";
+import { ProfileAvatar } from "@/components/ui/avatar";
+import "./identity.css";
 
 const accountRoles: Record<string, string> = { admin: "Administração", supervisor: "Supervisão", professional: "Profissional", reader: "Leitura" };
 const accountRoleLabel = (value: unknown) => typeof value === "string" && Object.hasOwn(accountRoles, value) ? accountRoles[value] : "Classificação não reconhecida";
@@ -33,7 +35,7 @@ export function GlobalAccounts({ save, busy, error }: {
   }
   const [editor, setEditor] = useState<{ row: Row; opener: HTMLElement } | null>(null);
   const [review, setReview] = useState<Row | null>(null);
-  return <section aria-label="Contas globais">
+  return <section aria-label="Contas globais" className="hca-identity-management">
     <div className="hca-section-heading"><div><h2>Identidades globais</h2><p>Alterações atingem a conta inteira. Vínculos e competências locais são administrados separadamente.</p></div></div>
     <form className="hca-toolbar" onSubmit={event => { event.preventDefault(); navigate(search.trim()); }}>
       <TextInput type="search" aria-label="Pesquisar contas globais" value={search} onChange={event => setSearch(event.currentTarget.value)} leading={<Icon name="search" />} placeholder="Nome da conta" />
@@ -44,7 +46,7 @@ export function GlobalAccounts({ save, busy, error }: {
     {read.error ? <Notice error>{read.error} <ActionButton onClick={read.refresh}>Consultar contas novamente</ActionButton></Notice> : null}
     {read.loading ? <Notice>Consultando contas globais…</Notice> : null}
     {read.queriedAt ? <p className="hca-muted">{read.loading || read.error ? "Última consulta preservada; alterações aguardam atualização." : "Contas consultadas:"} {formatBrazilDate(read.queriedAt)}.</p> : null}
-    <div className="hca-records">{rows.map(row => <article key={row.id} data-profile-id={row.id} className="hca-record"><div className="hca-record-main"><h3>{row.full_name}</h3><small>{row.global_scope ? "Privilégio global" : "Sem privilégio global"} · {accountRoleLabel(row.role)}</small></div><Pill tone={row.status === "active" ? "success" : "neutral"}>{row.status === "active" ? "Ativa" : "Revogada"}</Pill><ActionButton disabled={unavailable} aria-label={"Editar conta " + row.full_name} onClick={event => setEditor({ row, opener: event.currentTarget })}>Editar</ActionButton></article>)}</div>
+    <div className="ui-card hca-identity-list">{rows.map(row => <article key={row.id} data-profile-id={row.id} className="hca-identity-row"><ProfileAvatar name={row.full_name} /><div className="hca-identity-main"><h3>{row.full_name}</h3><small>{row.global_scope ? "Privilégio global" : "Sem privilégio global"} · {accountRoleLabel(row.role)}</small></div><div className="hca-identity-actions"><Pill tone={row.status === "active" ? "success" : "neutral"}>{row.status === "active" ? "Ativa" : "Revogada"}</Pill><ActionButton disabled={unavailable} aria-label={"Editar conta " + row.full_name} onClick={event => setEditor({ row, opener: event.currentTarget })}>Editar</ActionButton></div></article>)}</div>
     {read.data && !read.loading && !read.error && !rows.length ? <p>Nenhuma conta corresponde à busca.</p> : null}
     {read.data ? <nav className="hca-toolbar" aria-label="Páginas das contas globais">
       <ActionButton disabled={page <= 1 || unavailable} onClick={() => navigate(query, page - 1)}>Contas anteriores</ActionButton>
