@@ -40,8 +40,11 @@ comportamento, sem substituir a direção visual.
 REQ/COM/ENT/BAL adotam cabeçalho e progresso próprios, ações legítimas e abas:
 Visão geral, Materiais, Atendimento/Aquisição/Contagem e revisão, Comunicações,
 Arquivos gerados, Anexos e Auditoria quando autorizada. A aba adicional Versões
-e integridade conserva o histórico documental e as aberturas da REQ para quem
-pode ler a ficha; não exige capacidade de auditoria administrativa. Auditoria
+e integridade conserva o histórico documental. O histórico de acesso das quatro
+fichas exige leitura da ficha e a competência própria document.access.read;
+não exige capacidade de auditoria administrativa. Novas exibições da mesma
+pessoa e versão são agrupadas em 20 minutos, sem reescrever registros antigos.
+Auditoria
 usa sua autorização e seu escopo próprios. Conteúdo adicional deve continuar
 completo e alcançável. Revisões não herdam inputs de criação. Troca de aba
 conserva contexto, versão, edição e tentativa incerta.

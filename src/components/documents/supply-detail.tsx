@@ -3,6 +3,7 @@ import { DocumentComplementsPanel } from "@/components/documents/document-comple
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { roleLabel } from "@/components/layout/workspace-context";
 import { DocumentBreadcrumb } from "@/components/documents/document-breadcrumb";
+import { DocumentAccessObservation, DocumentAccessHistory } from "./document-access";
 import { DocumentTimeline } from "./document-timeline";
 import { DeliveryRecipientFacts } from "./delivery-recipient";
 import { DeliveryRegularization } from "./delivery-regularization";
@@ -389,6 +390,7 @@ export function SupplyDocumentContent({
       setBusy(false);
     }
   }
+  const [accessRevision, setAccessRevision] = useState("initial");
   const activeContext = data?.care_recipient_id === context.patient?.id;
   const purchaseStep = data?.type === "COM" ? purchaseFollowUp({
     status: data.status, origin: data.payload.origin, progress: data.purchaseProgress,
@@ -608,6 +610,7 @@ export function SupplyDocumentContent({
   }
   return (
     <div className="hca-record-detail space-y-5">
+      {data?.protocol && activeContext ? <DocumentAccessObservation key={`${context.userId}:${data.id}:${data.version}`} id={data.id} version={data.version} onRecorded={setAccessRevision} /> : null}
       {data ? (
         <DocumentBreadcrumb
           code={
@@ -1251,6 +1254,7 @@ export function SupplyDocumentContent({
               />
             </DocumentPanel>
             <DocumentPanel value="history">
+              <DocumentAccessHistory id={id} refreshKey={`${data.version}:${accessRevision}`} authorized={can(context, "document.access.read")} />
               <DocumentTimeline
                 id={id}
                 version={data.version}

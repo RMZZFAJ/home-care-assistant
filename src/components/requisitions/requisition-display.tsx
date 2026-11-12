@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, buttonClass, Notice } from "@/components/workspace";
-import { formatBrazilDate } from "@/lib/receipt";
+import { DocumentAccessHistory } from "@/components/documents/document-access";
 import { useRequisitionOpeningReference } from "./requisition-opening";
 
 type Reference = { version: number; materialIdentity: string };
@@ -11,19 +11,19 @@ type Opening = {
   reference_version: number;
   recorded_at: string;
 };
-type Cursor = { at: string; id: string };
-type Trail = { data: Opening[]; next: Cursor | null };
 
 /** Mount only alongside successfully rendered REQ content. GET/prefetch is inert. */
 export function RequisitionDisplay({
   id,
   reference,
   showHistory = false,
+  historyAuthorized = true,
   onRecorded,
 }: {
   id: string;
   reference?: Reference;
   showHistory?: boolean;
+  historyAuthorized?: boolean;
   onRecorded?: (id: string) => void;
 }) {
   const context = useRequisitionOpeningReference();
@@ -125,118 +125,12 @@ export function RequisitionDisplay({
         </div>
       ) : null}
       {showHistory ? (
-        <OpeningHistory id={id} refreshKey={saved?.id ?? "initial"} />
+        <OpeningHistory id={id} refreshKey={saved?.id ?? "initial"} authorized={historyAuthorized} />
       ) : null}
     </>
   );
 }
 
-export function OpeningHistory({
-  id,
-  refreshKey,
-}: {
-  id: string;
-  refreshKey: string;
-}) {
-  const [trail, setTrail] = useState<Trail | null>(null),
-    [error, setError] = useState(""),
-    [busy, setBusy] = useState(false),
-    [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    const controller = new AbortController();
-    void api<Trail>(
-      `/api/requisitions/${id}/openings`,
-      undefined,
-      controller.signal,
-    )
-      .then((result) => {
-        if (!controller.signal.aborted) {
-          setTrail(result);
-          setError("");
-        }
-      })
-      .catch((cause) => {
-        if (!controller.signal.aborted) setError(cause.message);
-      });
-    return () => controller.abort();
-  }, [id, refreshKey, attempt]);
-  async function more() {
-    if (!trail?.next || busy) return;
-    setBusy(true);
-    setError("");
-    try {
-      const query = new URLSearchParams({
-        beforeAt: trail.next.at,
-        beforeId: trail.next.id,
-      });
-      const result = await api<Trail>(
-        `/api/requisitions/${id}/openings?${query}`,
-      );
-      setTrail({ data: [...trail.data, ...result.data], next: result.next });
-    } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Não foi possível consultar outras aberturas.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-  return (
-    <details className="ui-card">
-      <summary className="cursor-pointer font-semibold">
-        Aberturas informadas pelo aplicativo
-      </summary>
-      <div className="mt-4 space-y-3">
-        <p className="text-sm text-(--muted)">
-          O aplicativo informou exibição em primeiro plano. O horário é do
-          registro no servidor; não comprova atenção ou leitura integral.
-        </p>
-        {error ? <Notice error>{error}</Notice> : null}
-        {!trail && !error ? <Notice>Consultando aberturas…</Notice> : null}
-        {trail?.data.length === 0 ? (
-          <p>Nenhuma abertura informada neste histórico.</p>
-        ) : null}
-        {trail ? (
-          <ul className="space-y-2">
-            {trail.data.map((row) => (
-              <li
-                key={row.id}
-                className="rounded-lg border border-(--line) p-3 text-sm wrap-break-word"
-              >
-                <strong>
-                  {row.actor_name ?? "Nome não preservado no registro"}
-                </strong>
-                <p>
-                  {formatBrazilDate(row.recorded_at)} · Referência documental v
-                  {row.reference_version}
-                </p>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        <div className="ui-form-actions">
-          <button
-            type="button"
-            className={buttonClass}
-            disabled={busy}
-            onClick={() => setAttempt((value) => value + 1)}
-          >
-            Atualizar aberturas
-          </button>
-          {trail?.next ? (
-            <button
-              type="button"
-              className={buttonClass}
-              disabled={busy}
-              onClick={() => void more()}
-            >
-              {busy ? "Consultando…" : "Carregar aberturas anteriores"}
-            </button>
-          ) : null}
-        </div>
-      </div>
-    </details>
-  );
+export function OpeningHistory(props: { id: string; refreshKey: string; authorized: boolean }) {
+  return <DocumentAccessHistory {...props} collapsible />;
 }

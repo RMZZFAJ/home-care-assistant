@@ -759,7 +759,7 @@ export function RequisitionDocumentContent({
           />
         </DocumentPanel>
         <DocumentPanel value="history">
-          <OpeningHistory id={id} refreshKey={openingRevision} />
+          <OpeningHistory id={id} refreshKey={openingRevision} authorized={can(context, "document.access.read")} />
           <DocumentTimeline id={id} version={p.version} events={p.events} />
         </DocumentPanel>
         {can(context, "audit.read") ? (

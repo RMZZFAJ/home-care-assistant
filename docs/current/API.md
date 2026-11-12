@@ -125,6 +125,29 @@ As intenções antigas mantêm revisão e fonte; download não reemite o arquivo
 Campos COM, BAL, devoluções, assinatura interna e TSA continuam no mesmo ciclo.
 [Resultados e limites](../audits/D/D-B/PDF_LIFECYCLE.md).
 
+## Histórico de acesso às fichas
+
+GET /api/documents/:id/access exige sessão, contexto, leitura da ficha e
+document.access.read. Retorna vinte registros por página, com beforeAt/beforeId
+completos para continuar. A competência tem padrão de administrador local do
+paciente e pode ser concedida explicitamente; identidade global ou simples
+leitura documental não a substituem. A REQ mantém sua rota anterior de consulta,
+com os campos legados e a mesma competência específica. RLS aplica a restrição
+também à leitura direta de requisition_openings.
+
+POST recebe somente referenceVersion e key. Registra exibição informada em
+primeiro plano, depois do conteúdo disponível; GET, prefetch, rascunho privado
+e emissão de PDF não criam o relato. COM, ENT e BAL usam o mesmo contrato; REQ
+conserva seu registrador anterior e suas chaves. A mesma pessoa/versão compartilha
+o registro durante vinte minutos do primeiro relato. Versão ou pessoa distintas
+têm janela própria. Novas chaves agrupadas conservam a recuperação do registro
+original após a janela, sem substituir seus nomes ou instantes.
+
+A autoridade é revalidada depois da espera, inclusive nas recuperações. As
+respostas são private/no-store. O relato não registra ciência, leitura integral,
+recebimento, notificação, versão documental ou movimento de estoque. A consulta
+do histórico mantém paginação, estado de abertura e recuperação de falha.
+
 ## Fichas complementares
 
 GET /api/documents/:id/complements consulta relações paginadas; mode=candidates

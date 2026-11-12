@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Browser, type Page, type Locator } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
@@ -34,9 +35,9 @@ async function referenceReview(model: Page) {
   await model.locator('[data-action="wizardNext"]').click(); await model.locator('[data-action="wizardNext"]').click();
   await expect(model.locator("#wizardForm .kv")).toBeVisible();
 }
-function watchWrites(page: Page) {
+function watchWrites(page: Page, allowAccess = false) {
   const writes: string[] = [];
-  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") writes.push(request.url()); });
+  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !(allowAccess && isDocumentAccessReport(request))) writes.push(request.url()); });
   return writes;
 }
 async function captureVisible(locator: Locator, path: string) {
@@ -102,7 +103,7 @@ test("06.2 dispatched ENT preserves five independent material fields and reversi
   await expect(table.locator("tbody tr")).toHaveCount(2); await expect(table.locator("tbody td")).toHaveCount(10);
   const first = table.locator("tbody tr").filter({ has: page.getByText(names[0], { exact: true }) });
   for (const [label, value] of [["Expedido", "7 unidade"], ["Aceito", "0 unidade"], ["Conciliado", "0 unidade"], ["Quantidade pendente", "7 unidade"]]) await expect(first.locator(`td[data-label="${label}"]`)).toContainText(value);
-  const before = facts(f.patient), writes = watchWrites(page), ids = await table.locator("tbody tr").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
+  const before = facts(f.patient), writes = watchWrites(page, true), ids = await table.locator("tbody tr").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
   const ref = await reference(browser, "ficha/ENT-0001/materiais");
   try {
     const model = ref.page.locator(".tablewrap.mobilecards").first(); await expect(model).toBeVisible();

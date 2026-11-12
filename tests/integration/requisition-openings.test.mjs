@@ -10,7 +10,7 @@ const count = id => Number(sql(`select count(*) from public.requisition_openings
 const recordArgs = (id, opening) => ({ p_id: id, p_material_identity: opening.materialIdentity, p_version: opening.version, p_key: randomUUID() });
 const evidence = patient => sql(`select jsonb_build_object('events',(select jsonb_agg(to_jsonb(e) order by document_id,version) from public.document_events e where care_recipient_id=${sqlLiteral(patient)}),'documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${sqlLiteral(patient)}),'science',(select jsonb_agg(to_jsonb(s) order by id) from public.requisition_science_events s where care_recipient_id=${sqlLiteral(patient)}),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)}));`);
 
-test("REQ openings distinguish inert reads, one concurrent replay, a new opening and SCI without changing document/ledger", async () => {
+test("REQ openings distinguish inert reads, concurrent replay, a grouped opening and SCI without changing document/ledger", async () => {
   const f = await setup(), req = await issue(f.patient, [f.products[0]]), reader = await actor("reader", f.patient), family = await actor("family", f.patient);
   const opening = await rpc(reader, "requisition_opening_context", { p_id: req.id });
   assert.ifError((await reader.from("requisition_items").select("id").eq("requisition_id", req.id)).error);
@@ -24,11 +24,12 @@ test("REQ openings distinguish inert reads, one concurrent replay, a new opening
   assert.equal(evidence(f.patient), before, "Opening is not SCI, physical act, notification or technical version");
   assert.ok((await reader.rpc("record_requisition_opening", { ...args, p_material_identity: "0".repeat(64) })).error);
   assert.ok((await reader.rpc("record_requisition_opening", { ...args, p_version: opening.version + 100 })).error);
-  await rpc(reader, "record_requisition_opening", { ...args, p_key: randomUUID() }); assert.equal(count(req.id), 2);
+  const grouped = await rpc(reader, "record_requisition_opening", { ...args, p_key: randomUUID() }); assert.equal(grouped.id, first.id); assert.equal(grouped.windowReused, true); assert.equal(count(req.id), 1);
   const aware = await rpc(family, "acknowledge_requisition", { p_id: req.id, p_mode: "express", p_version: opening.version, p_material_identity: opening.materialIdentity });
-  assert.equal(count(req.id), 2, "SCI alone does not fabricate an opening"); assert.ok(aware.version > opening.version);
+  assert.equal(count(req.id), 1, "SCI alone does not fabricate an opening"); assert.ok(aware.version > opening.version);
   assert.equal((await rpc(reader, "record_requisition_opening", args)).id, first.id);
   assert.equal((await reader.rpc("record_requisition_opening", { ...args, p_version: aware.version })).error?.code, "23505");
+  await rpc(reader, "record_requisition_opening", { ...args, p_version: aware.version, p_key: randomUUID() }); assert.equal(count(req.id), 2, "A distinct observed version has its own window");
   assert.ok((await reader.from("requisition_openings").update({ actor_name: "Forged" }).eq("id", first.id)).error);
   assert.throws(() => sql(`update public.requisition_openings set actor_name='Forged' where id=${sqlLiteral(first.id)};`), /immutable/);
 });

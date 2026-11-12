@@ -130,7 +130,7 @@ test("Histórico ENT separa motivo e ressalva por versão, recupera erro da seç
   let release!: () => void; const gate = new Promise<void>(resolve => { release = resolve; });
   await page.route(url, async route => { await gate; await route.continue(); }, { times: 1 });
   const selector = comparison(page).getByRole("combobox", { name: "Versão consultada", exact: true }); await selector.focus(); await selector.selectOption(String(f.versions.returned.version));
-  try { await expect(comparison(page).getByRole("status")).toContainText("Consultando"); await expect(selector).toBeFocused(); await expect(frozen(page, f.doc.version)).toHaveCount(0); }
+  try { await expect(comparison(page).getByRole("status").filter({ hasText: "Consultando" })).toContainText("Consultando"); await expect(selector).toBeFocused(); await expect(frozen(page, f.doc.version)).toHaveCount(0); }
   finally { release(); }
   await expect(frozen(page, f.versions.returned.version)).toContainText("Devolução à origem");
   await expect(frozen(page, f.versions.returned.version)).not.toContainText("Outra unidade faltante foi conciliada sem inventar devolução.");

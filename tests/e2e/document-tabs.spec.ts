@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
@@ -311,7 +312,7 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
     const before = official(id, f.patient),
       writes: string[] = [];
     const record = (r: import("@playwright/test").Request) => {
-      if (new URL(r.url()).pathname.startsWith("/api/") && r.method() !== "GET")
+      if (new URL(r.url()).pathname.startsWith("/api/") && r.method() !== "GET" && !isDocumentAccessReport(r))
         writes.push(r.method() + " " + new URL(r.url()).pathname);
     };
     page.on("request", record);

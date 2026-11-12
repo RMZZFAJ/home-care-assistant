@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
@@ -99,7 +100,7 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials retain 
   await expect(table.locator("tbody tr")).toHaveCount(2);
   const ids = await table.locator("tbody tr").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
   const before = facts(f.patient), writes: string[] = [];
-  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") writes.push(request.url()); });
+  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !isDocumentAccessReport(request)) writes.push(request.url()); });
   const reference = await browser.newContext();
   try {
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());

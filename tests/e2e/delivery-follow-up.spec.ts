@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { actor, delivery, fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
@@ -37,7 +38,7 @@ const ledger = (patient: string) => sql(`select jsonb_agg(to_jsonb(m) order by i
 function trackWrites(page: Page) {
   const writes: string[] = [];
   page.on("request", request => {
-    if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") writes.push(request.url());
+    if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !isDocumentAccessReport(request)) writes.push(request.url());
   });
   return writes;
 }

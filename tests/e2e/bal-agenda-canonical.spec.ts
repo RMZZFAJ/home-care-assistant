@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Browser, type Locator, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
@@ -24,8 +25,8 @@ async function reference(browser: Browser, route: string) {
   await page.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#" + route);
   await page.locator("#roleSelect").selectOption("family"); return { context, page };
 }
-function writes(page: Page) {
-  const sent: string[] = []; page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/") && r.method() !== "GET") sent.push(r.url()); }); return sent;
+function writes(page: Page, allowAccess = false) {
+  const sent: string[] = []; page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/") && r.method() !== "GET" && !(allowAccess && isDocumentAccessReport(r))) sent.push(r.url()); }); return sent;
 }
 async function capture(node: Locator, name: string) {
   await node.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
@@ -39,7 +40,7 @@ test("06.3 BAL canonical readonly materials preserve physical zero,original refe
   sql(`insert into public.patient_settings(care_recipient_id) values(${q(f.patient)}) on conflict do nothing; update public.patient_settings set settings=settings||'{"balReview":"optional"}'::jsonb where care_recipient_id=${q(f.patient)};`);
   const doc = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "BAL", p_key: randomUUID(), p_draft: false, p_payload: { notes: "Observação física original; o parecer permanece independente.", lines: f.products.map((productId: string, i: number) => ({ productId, quantity: String(i) })) } });
   await login(page, f.patient); await page.goto("/documentos/" + doc.id); await selectDocumentSection(page, "workflow");
-  const before = sql(`select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${q(doc.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}));`), sent = writes(page);
+  const before = sql(`select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${q(doc.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}));`), sent = writes(page, true);
   const table = page.getByRole("table", { name: "Materiais da contagem", exact: true }), row = table.locator("tbody tr").first();
   await expect(row).toContainText(names[0]); await expect(row.locator('[data-label="Quantidade física"]')).toHaveText("0 unidade");
   await expect(row.locator('[data-label="Referência"]')).toHaveText("0 unidade"); await expect(row.locator('[data-label="Diferença"]')).toHaveText("Sem diferença");

@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
@@ -28,10 +29,10 @@ async function login(page: Page, patient: string) {
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, patient);
 }
-function trackWrites(page: Page) {
+function trackWrites(page: Page, allowAccess = false) {
   const writes: string[] = [];
   page.on("request", request => {
-    if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") writes.push(request.url());
+    if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !(allowAccess && isDocumentAccessReport(request))) writes.push(request.url());
   });
   return writes;
 }
@@ -80,7 +81,7 @@ test("COM parcels keep more than100 native declarations reachable and filter wit
   expect(sql(`select sum(quantity)::text from public.stock_movements where care_recipient_id=${q(f.patient)} and reference_type='purchase_receipt';`)).toBe("1.000000");
   const before = facts(f.patient);
   await login(page, f.patient);
-  const writes = trackWrites(page);
+  const writes = trackWrites(page, true);
   await page.goto(`/documentos/${doc.id}`);
   await selectDocumentSection(page, "workflow");
   const panel = parcel(page), observed: string[] = [];

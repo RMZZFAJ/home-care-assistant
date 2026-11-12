@@ -30,6 +30,8 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (error?.code === "PT409" && /^(issued document reference required|stale document material)$/i.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A referência da ficha mudou ou ainda não foi emitida. Consulte seu estado antes de confirmar novamente.", 409);
   if (
     error?.code === "PT409" &&
     /^(stale flow reference|flow already reviewed|flow private intent mismatch)$/i.test(

@@ -3,7 +3,32 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — composição aprovada V16
+## Estado atual — DOC-C.3: acessos agrupados
+
+Local e remoto 228, sem pendências. Migration 20261112051000 preserva as
+aberturas existentes da REQ e suas chaves, acrescenta os relatos das outras
+fichas e agrupa novos acessos da mesma pessoa/versão por vinte minutos. Duas
+tabelas privadas conservam janelas e referências de recuperação; não há
+backfill nem alteração de fatos ou nomes anteriores.
+
+Pré-validação: prefixo 227 correto, oito funções anteriores compatíveis com o
+contrato preservado, corpo original do registrador REQ conferido, política e
+RLS/grants anteriores verificados; dry-run exclusivo de 228. Pós-validação:
+228 versões, onze funções/configurações/permissões, duas tabelas, índices,
+constraints, política e nova competência idênticos ao local; grants da trilha
+anterior preservados e dry-run vazio.
+
+Advisors mantêm as classes anteriores: 66 tabelas RLS fechadas sem políticas
+diretas, 223 funções Auth SECURITY DEFINER e 72 índices sem uso observado. As
+adições correspondem às duas tabelas fechadas, duas RPCs autenticadas e quatro
+índices novos sem uso registrado no remoto. FKs sem índice permanecem 124,
+initplans onze, funções anon três; extension_in_public e proteção de senhas
+continuam pendentes. Não há aprovação global desses achados.
+
+Sem reset, fixtures/Auth remotos ou backup pesado redundante no banco sintético.
+Instalação limpa/legado e integração completa seguem na CI do novo commit.
+
+## Histórico — composição aprovada V16
 
 Local e remoto 227, sem pendências. Aplicadas uma vez as migrations
 20261112030502 (reserva e recuperação por formato), 20261112034304 (corte,

@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { legacyBalance, receiveBalanceMaterials, balState } from "../integration/bal-review-fixtures.mjs";
@@ -27,7 +28,7 @@ for (const policy of ["required", "optional"] as const) {
     await login(page, f.patient);
     const writes: string[] = [];
     page.on("request", request => {
-      if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") writes.push(request.url());
+      if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !isDocumentAccessReport(request)) writes.push(request.url());
     });
     await page.goto(`/documentos/${f.document.id}`);
     const initial = policy === "required" ? "Acompanhar as revisões do balanço" : "Consultar a contagem conciliada";

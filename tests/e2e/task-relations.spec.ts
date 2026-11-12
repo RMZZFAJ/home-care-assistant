@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { remainingNeedFixture, physicalState, fixtures, rpc } from "../integration/remaining-need-fixtures.mjs";
 import { setup } from "../integration/v4-fixtures.mjs";
+import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
@@ -20,6 +21,7 @@ async function login(page: Page, patient: string) {
 test("relação REQ para ENT abre fatos de expedição em leitura, recupera consulta e recusa outro paciente", async ({ page }, info) => {
   const f = await remainingNeedFixture(), other = await setup();
   const foreign = await rpc(other.admin, "create_supply_document", { p_patient: other.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Recebedor de outro paciente fictício", lines: [{ productId: other.products[0], quantity: "1" }] } });
+  sql("insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values("+[sqlLiteral(f.patient),sqlLiteral(fixtures.professional.id),sqlLiteral("document.access.read"),"true"].join(",")+");");
   await login(page, f.patient);
   // Opening the source REQ records its own post-render event. Finish that
   // authorized action before measuring whether the related ENT is read-only.

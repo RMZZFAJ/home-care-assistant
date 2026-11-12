@@ -102,7 +102,7 @@ test("P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevi
     expect(openings(req.id), "PDF delivery must not fabricate another application opening").toBe(1);
     if (info.project.name === "chromium") { mkdirSync("output/pdf/phase-d", { recursive: true }); const path = `output/pdf/phase-d/p02-dialog-${req.id}.pdf`; writeFileSync(path, await pdf.body(), { flag: "wx" }); await info.attach("P02 dialogue PDF", { path, contentType: "application/pdf" }); }
     await page.reload(); await selectDocumentSection(page, "overview"); await expect(page.getByText("Família ciente", { exact: true })).toBeVisible();
-    await expect.poll(() => openings(req.id)).toBe(2); expect(count(req.id)).toBe(1);
+    await expect.poll(() => openings(req.id)).toBe(1); expect(count(req.id)).toBe(1);
   } finally { await prefer(family, "manual"); }
 });
 
@@ -110,6 +110,7 @@ test("P02 abertura exige conteúdo e sinal de primeiro plano; trilha pagina fato
   test.setTimeout(120_000);
   const f = await setup(), family = await actor("family", f.patient);
   await prefer(family, "manual");
+  sql("insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(" + [sqlLiteral(f.patient),sqlLiteral(fixtures.family.id),sqlLiteral("document.access.read"),"true"].join(",") + ");");
   const req = await issue(f.patient, [f.products[0]]);
   // Controlled document-visibility signal tests the guard, not a physical device.
   await page.addInitScript(() => {
@@ -132,8 +133,8 @@ test("P02 abertura exige conteúdo e sinal de primeiro plano; trilha pagina fato
   await expect(trail.getByRole("listitem")).toHaveCount(1);
   await page.evaluate(() => { document.dispatchEvent(new Event("visibilitychange")); document.dispatchEvent(new Event("visibilitychange")); });
   await page.request.get(`/api/requisitions/${req.id}/opening`); expect(openings(req.id)).toBe(1);
-  // Additional synthetic application reports exercise the actual keyset API/UI.
-  for (let index = 0; index < 21; index++) await rpc(family, "record_requisition_opening", { p_id: req.id, p_material_identity: reference.materialIdentity, p_version: reference.version, p_key: randomUUID() });
+  // Controlled historical records exercise pagination; current repeated displays coalesce.
+  sql("insert into public.requisition_openings(requisition_id,care_recipient_id,user_id,actor_name,material_identity,reference_version,opening_key,recorded_at) select "+[sqlLiteral(req.id),sqlLiteral(f.patient),sqlLiteral(fixtures.family.id),"'Nome histórico fictício '||n",sqlLiteral(reference.materialIdentity),reference.version,"gen_random_uuid()","clock_timestamp()-interval '1 day'-n*interval '21 minutes'"].join(",")+" from generate_series(1,21) n;");
   await trail.getByRole("button", { name: "Atualizar aberturas", exact: true }).click(); await expect(trail.getByRole("listitem")).toHaveCount(20);
   await trail.getByRole("button", { name: "Carregar aberturas anteriores", exact: true }).click(); await expect(trail.getByRole("listitem")).toHaveCount(22);
   await expect(trail.getByRole("button", { name: "Carregar aberturas anteriores", exact: true })).toHaveCount(0);

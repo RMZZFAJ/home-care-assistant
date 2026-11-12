@@ -1,4 +1,5 @@
 export const capabilityLabels: Record<string,string> = {
+"document.access.read":"Consultar histórico de acesso às fichas",
 "document.progress.create":"Registrar Andamentos complementares nas fichas",
 "com.close_expectation":"Encerrar expectativa não adquirida da COM",
 "schedule.read.own":"Consultar os próprios plantões","schedule.read.team":"Consultar escala da equipe","schedule.propose":"Propor programação e alterações","schedule.manage.own":"Publicar e alterar os próprios plantões","schedule.manage.team":"Administrar escala da equipe","schedule.types.manage":"Administrar tipos de plantão",

@@ -59,12 +59,23 @@ async function choose(page: Page, target: ScheduledShift) {
   await field.press("ArrowDown");
   const label = `${target.professional_name} · ${target.type_name} · ${formatZonedDate(target.starts_at, target.timezone)} → ${formatZonedDate(target.ends_at, target.timezone)}`;
   const option = page.getByRole("option", { name: label, exact: true });
-  await expect.poll(() => option.evaluate(node => {
-    const r = node.getBoundingClientRect();
-    if (r.left < 0 || r.top < 0 || r.right > innerWidth || r.bottom > innerHeight) return false;
-    const x = r.left + r.width / 2, y = r.top + r.height / 2;
-    return [[x,r.top + 1],[x,r.bottom - 1],[r.left + 1,y],[r.right - 1,y]].every(([px,py]) => node.contains(document.elementFromPoint(px,py)));
-  }), { message: "The complete option must fit and remain unobstructed;avoid IntersectionObserver floating-point ratio" }).toBe(true);
+  const optionGeometry = () => option.evaluate(node => {
+    const r = node.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const points = [[x,r.top + 1],[x,r.bottom - 1],[r.left + 1,y],[r.right - 1,y]];
+    return {
+      inside: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight,
+      edges: points.map(([px,py]) => node.contains(document.elementFromPoint(px,py))),
+      bounds: { left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:innerWidth,height:innerHeight },
+      hits: points.map(([px,py]) => { const hit = document.elementFromPoint(px,py); return { x:px,y:py,tag:hit?.tagName,role:hit?.getAttribute("role"),className:hit?.className }; }),
+      ancestors: [node, node.parentElement!, node.closest(".hca-choice-popup")!].map(element => { const style = getComputedStyle(element), rect = element.getBoundingClientRect();return { className:element.className,top:rect.top,bottom:rect.bottom,overflow:style.overflow,pointerEvents:style.pointerEvents }; }),
+    };
+  });
+  try {
+    await expect.poll(optionGeometry, { message: "The complete option must fit and remain unobstructed;avoid IntersectionObserver floating-point ratio" }).toMatchObject({ inside: true, edges: [true,true,true,true] });
+  } catch (error) {
+    await test.info().attach("recount-option-geometry", { body: JSON.stringify(await optionGeometry(), null, 2), contentType: "application/json" });
+    throw error;
+  }
   await option.click();
 }
 test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e concilia somente a nova contagem", async ({

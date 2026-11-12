@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
@@ -19,9 +20,9 @@ async function login(page: Page, patient: string, email: string) {
   await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(email); await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click(); await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
 }
-function writes(page: Page) {
+function writes(page: Page, allowAccess = false) {
   const out: string[] = [];
-  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") out.push(request.url()); });
+  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !(allowAccess && isDocumentAccessReport(request))) out.push(request.url()); });
   return out;
 }
 
@@ -31,7 +32,7 @@ test("ENT-02 canonical task preserves recorded names,exact navigation and return
   sql(`update public.profiles set full_name=${q(issuerName.trim())} where id=${q(issuer.id)}; update public.profiles set full_name=${q(recipientName.trim())} where id=${q(recipient.id)};`);
   const doc = await rpc(issuer.client, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: recipient.id, recipientReason: "Escolha pessoal fictícia para conferir cartão e navegação", lines: [{ productId: f.products[0], quantity: "1" }] } });
   sql(`update public.profiles set full_name='Nome atual diferente do snapshot' where id in (${q(issuer.id)},${q(recipient.id)});`);
-  await login(page, f.patient, recipient.email); const before = facts(f.patient), posted = writes(page);
+  await login(page, f.patient, recipient.email); const before = facts(f.patient), posted = writes(page, true);
   await page.goto("/entregas?careRecipientId=" + f.patient); const row = card(page, doc.id);
   await expect(row).toContainText(issuerName.trim()); await expect(row).toContainText(recipientName.trim());
   await expect(row).not.toContainText("Nome atual diferente do snapshot");
