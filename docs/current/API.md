@@ -1230,6 +1230,18 @@ tratar uma coleção parcial como lista completa. Alterar uma preparação não
 reconsulta esse diretório; falha de consulta tem recuperação própria e não
 apaga os campos já preenchidos.
 
+GET /api/guides/preparation exige careRecipientId único, UUID válido, sessão
+Auth, paciente selecionado e competência local de preparação. A RPC
+local_preparation_context revalida vínculo, contexto e capacidades no banco;
+uma identidade global sem vínculo não obtém a consulta. A resposta privada
+no-store informa somente metadados de pessoas, convites, catálogo, movimentos,
+escalas, regime BAL e apresentação do guia. Cada domínio exige a sua leitura;
+valor restrito é null, inclusive quando há escrita sem leitura de estoque.
+Não retorna quantidades, não concede acesso, não altera fatos ou preferências
+e não confirma conferência física. O cliente valida estrutura e paciente;
+recusa de acesso elimina a consulta anterior, e falha transitória permite
+reconsulta sem comandos.
+
 ## Referências individuais de notificações
 
 GET /api/notifications/target recebe careRecipientId, ref, area e namespace.

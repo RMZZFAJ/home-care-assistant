@@ -139,7 +139,9 @@ e diferenças, com chaves estáveis da fonte quando rótulos se repetem. A
 consulta pública separa código, exemplar, integridade, assinatura, confiança
 e tempo, sem receber aparência de detalhe privado. A comparação privada
 empilha as duas edições em telas estreitas e conserva cada texto completo.
-As regras de retomada simples do complemento documental têm escopo próprio.
+A apresentação e a abrangência dos rascunhos existentes permanecem congeladas
+pelo complemento executivo. A retomada simples de DOC-C.1 está adiada; a
+recuperação segura de confirmações oficiais incertas continua obrigatória.
 
 ## Aceite
 

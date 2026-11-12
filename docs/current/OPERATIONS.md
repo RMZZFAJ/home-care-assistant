@@ -23,6 +23,22 @@ da função Administrador é preservada; revogue o vínculo para remover a funç
 Convites são compartilhados manualmente, não contêm credenciais e exigem
 aceite pela conta correspondente com e-mail confirmado.
 
+## Preparação local
+
+Depois do cadastro global, uma pessoa com vínculo local competente pode abrir
+Guias e ajuda → Acompanhar preparação local. A tela reúne os registros
+autorizados de pessoas, materiais, estoque, escalas, BAL e comunicação, com
+encaminhamento aos fluxos próprios. Criar o paciente não concede vínculo local
+a quem fez o cadastro. Materiais são adotados por escolha explícita; a abertura
+de estoque usa a movimentação familiar existente, com origem, quantidade e
+motivo. Convites continuam dependendo de aceite pessoal.
+
+Contagens de registros não aprovam estoque físico, presença, ciência,
+recebimento ou início do atendimento. Informações restritas são identificadas
+sem aparecer como zero. Falhas de consulta permitem atualizar a seção; uma
+recusa de acesso retira os dados antes exibidos. A regularização de
+contingência prevista permanece uma entrega própria ainda pendente.
+
 ## Catálogo, unidades e scanner
 
 O sistema controla exclusivamente insumos sob responsabilidade da família.

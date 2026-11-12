@@ -1,6 +1,6 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, com o guia por papel concluído no lote 5.
+Atualizado em 12 de novembro de 2026, com o guia por papel e a preparação local entregues no lote 5.
 Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
@@ -8,8 +8,9 @@ liberação para produção.
 ## 1. Definições e leitura do acompanhamento
 
 - **Critérios:** são 105, sendo 75 originais e 30 complementos da Ordem Mestre.
-  Há 70 com implementação e verificações locais concluídas e 35 parciais. Nenhum
-  critério inteiro está sem início; algumas subtarefas estão em 0%.
+  Há 71 com implementação e verificações concluídas e 34 parciais. Desses 71,
+  70 têm conclusão local e um registra a aplicação remota já reconciliada da
+  D-A. Nenhum critério inteiro está sem início; algumas subtarefas estão em 0%.
 - **Etapas 01–20:** identificadores preservados para localizar os requisitos.
   A execução restante está agrupada em seis capacidades na seção 6; as etapas
   não são vinte filas independentes. Um critério pode atravessar vários lotes.
@@ -69,18 +70,18 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 
 | Acompanhamento | Estado registrado |
 | --- | --- |
-| Critérios da D-B | 70 concluídos localmente; 35 parciais; total de 105 |
+| Critérios da D-B | 71 verificados; 34 parciais; total de 105 |
 | Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | Guia por papel concluído; 19 composições restantes e conferência das 171 relações |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Administração, guias e aparência restante |
-| Incremento atual | Guia por papel, contexto correto e consulta completa de pessoas |
-| Resultado local | Seis papéis conferidos; guia reabrível e preparação preservada |
-| Banco | Local e remoto em 231, sem atualizações pendentes |
-| CI observada 061722f | Linux, Windows e banco passaram; navegadores em execução |
-| Preview observado 061722f | Vercel concluiu; sem alteração de produção |
+| Incremento atual | Preparação local, adoção de materiais e abertura de estoque |
+| Resultado local | Abertura real conferida em Chrome móvel e WebKit/iOS; permissões preservadas |
+| Banco | Local e remoto em 232, sem atualizações pendentes |
+| CI observada 15001d5 | Linux, Windows e banco passaram; navegadores em execução |
+| Preview observado 15001d5 | Vercel concluiu; sem alteração de produção |
 | CI deste incremento | Pendente no commit de publicação; conferência conjunta continua obrigatória |
 
 **Resultado utilizável do lote 5:** Guias e ajuda apresenta navegação por
@@ -88,8 +89,11 @@ etapas para os seis papéis, preserva o paciente nos encaminhamentos e recusa
 respostas de outro perfil. O progresso é reabrível e continua separado dos
 atos operacionais. A preparação alcança o diretório completo de pessoas e
 conserva os campos quando uma consulta falha. GUI-01 e o ponto 16.3 estão
-concluídos tecnicamente no escopo local. Preparação local, adoção de materiais
-e regularização de contingência continuam abertas nos pontos próprios.
+concluídos tecnicamente no escopo local. A preparação local agora encaminha
+pessoas autorizadas aos fluxos reais de catálogo, estoque, pessoas, agenda,
+BAL e comunicação. Adoção de material e abertura familiar foram conferidas,
+com quantidade, origem e motivo próprios. A consulta distingue zero de acesso
+restrito e não atesta conferência física. Contingência continua pendente.
 
 **Último lote encerrado localmente:** lote 4, aplicativo, avisos e lembretes.
 As etapas 11/12/13 fecharam no escopo executável. A escolha de avisos não pode
@@ -119,8 +123,8 @@ A preparação real dos certificados de teste tem limite próprio, sem mudar
 assinatura ou timeout do aplicativo. Passaram 26 percursos móveis e 16 testes
 de PDF, tipos e lint dirigido. A CI conjunta continua pendente.
 
-**Próxima entrega funcional no lote 5:** preparação local, adoção de materiais
-e contingência; depois, as demais áreas de administração, identidade e avisos.
+**Próxima entrega funcional no lote 5:** registro e conciliação de contingência;
+depois, as demais áreas de administração, identidade e avisos.
 A recuperação oficial continua obrigatória. Os rascunhos permanecem intactos. A atualização entre duas sessões passou no banco da CI
 976d42c; o BAL em iOS integra a correção dirigida atual.
 
@@ -859,7 +863,7 @@ Codex.
 
 ### 3.5 Administração, permissões, entrada e orientação
 
-**Critérios deste grupo: 10 concluídos localmente; 2 parciais.**
+**Critérios deste grupo: 11 concluídos localmente; 1 parcial.**
 
 **Etapas relacionadas:** 02; 14; 16.
 
@@ -917,19 +921,23 @@ concluídos são preservados, com sua apresentação e recuperação atuais.
 #### Entrada e orientação — critérios originais
 
 - **Distinguir preparação do paciente de liberação operacional** — Em execução
-  · ≈70%. Falta: Completar adoção de materiais e etapas físicas; revisar todos
-  os papéis. Responsável: Codex; depois você e equipe.
+  · ≈85%. Preparação local, adoção e abertura familiar conferidas. Falta:
+  Implementar a regularização de contingência. A conferência física e o piloto
+  permanecem com você e equipe, sem aprovação presumida. Responsável: Codex;
+  depois você e equipe.
 - **Guia por papel, reabrível e sem conceder permissões** — Concluído localmente
   · 100%. Os seis papéis foram conferidos, incluindo pular, reabrir, navegar,
   guardar progresso e recuperar falhas. Responsável: Codex. Avaliação humana e
   tecnologia assistiva permanecem no bloco externo.
 - **Primeiro paciente e orientação respeitarem a autoridade de cada papel** —
-  Em execução · ≈70%. Falta: Completar materiais, abertura física e convergência
-  dos guias. Responsável: Codex; depois você e equipe.
+  Concluído localmente · 100%. Criação global, vínculo inicial local, guia
+  reabrível e preparação local funcionam sem transferir autoridade ou simular
+  fatos físicos. Avaliação humana e piloto continuam externos. Responsável:
+  Codex.
 
 #### 16 — Entrada, guias e primeira residência
 
-Estado: em execução · 70%. Responsável: Codex.
+Estado: em execução · 85%. Responsável: Codex.
 
 **Condição para fechar:** Os papéis percorrem os guias previstos, recebem
 tarefas legítimas e conseguem preparar a residência com seus limites de
@@ -937,14 +945,16 @@ autoridade.
 
 Pontos de verificação:
 
-- 16.1 Criação global e administração local.
-- 16.2 Adoção e preparação de materiais.
+- 16.1 Criação global e administração local — concluído localmente.
+- 16.2 Adoção e preparação de materiais — concluído localmente.
 - 16.3 Guia reabrível por papel — concluído localmente.
 - 16.4 Preparação física e contingência.
 
-**O que falta:** Concluir adoção de materiais, delegação local legítima,
-preparação física e regularização de contingência. GUI-01 está concluído;
-os demais guias e as designações reais mantêm seus pontos próprios.
+**O que falta:** Implementar o dossiê e a conciliação de contingência de
+16.4, com evidências, autoria própria e proteção contra duplicação. A
+preparação local já encaminha tarefas legítimas e consulta seus registros.
+A conferência física, as designações reais e o exercício humano permanecem
+na etapa 20; não substituem o software de contingência ainda devido por Codex.
 
 ### 3.6 Aplicativo instalado, conexão, avisos e lembretes
 
@@ -1371,6 +1381,15 @@ Não há autorização de liberação operacional nesta missão.
 
 ## 5. Histórico consolidado das entregas
 
+**12/11/2026 — preparação local:** adoção e abertura de estoque familiar
+percorridas nos fluxos reais, consulta de tarefas por vínculo e dados restritos
+preservados. Dez percursos móveis distintos passaram em rodadas compatíveis,
+mais cinco cenários com contas reais de teste e três testes de contrato.
+O critério de primeira residência e autoridade local foi concluído; o critério
+que também exige contingência permanece parcial. Banco local e remoto em 232.
+A CI do novo commit e a conferência conjunta permanecem próprias.
+
+
 Este é um registro de marcos, sem outra fila de execução. As etapas 01 a 07
 estão em **100% do escopo local indicado**, sob responsabilidade de Codex.
 Seus pontos completos estão nos grupos funcionais indicados abaixo. A revisão
@@ -1561,6 +1580,11 @@ antes do lote 5. A CI do novo commit continua na etapa 19; esse gate não cria
 um novo lote de funções nem impede as implementações independentes.
 
 ### Lote 5 — Jornadas restantes e aparência do aplicativo
+
+GUI-01 e a preparação local com adoção/abertura estão entregues. A próxima
+capacidade é a regularização de contingência; depois seguem as demais
+composições administrativas, de identidade e de avisos. As 19 composições
+ainda abertas e as 171 relações mantêm sua conferência própria.
 
 - **Resultado:** demais áreas visuais, relações, entrada, administração e guias
   completos no Modelo Integral, sem perda de funções.

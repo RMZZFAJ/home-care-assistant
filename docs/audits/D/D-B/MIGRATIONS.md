@@ -3,7 +3,26 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — modalidades documentais V17
+## Estado atual — preparação local
+
+Local e remoto em 232, sem pendências. A migration
+20261112111224_phase_d3_local_preparation_context acrescenta uma consulta
+local autorizada de metadados, sem novas tabelas, alteração de fatos ou
+substituição de funções anteriores. Domínios restritos retornam null; escrita
+sem leitura de estoque não revela contagens nem quantidades.
+
+Pré-check: 231 versões e sete dependências coincidentes, função nova ausente
+e dry-run exclusivo da migration pronta, sem seeds, roles ou Vault. Captura
+leve de histórico e contratos adequada à adição de leitura no banco sintético;
+sem reset, fixtures, Auth remoto ou backup integral redundante. Aplicação única
+pelo CLI vinculado ao projeto autorizado. Pós-check: 232 versões, definição,
+configuração e ACL iguais ao local; histórico anterior e sete dependências
+preservados. Somente authenticated executa, com search_path vazio; anon e
+service_role sem execução. Dry-run final vazio. Cinco cenários locais com
+Auth real passaram; instalação limpa, legado e integração integral seguem
+na CI do SHA publicado. Nenhum achado antigo recebe aprovação global.
+
+## Histórico — modalidades documentais V17
 
 Local e remoto 231, sem pendências. Aplicadas uma vez 20261112070000 e
 20261112070100. Opções oficiais da emissão, fontes selecionadas, destinatário
