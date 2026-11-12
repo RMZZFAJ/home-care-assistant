@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { Workspace, can } from "@/components/workspace";
 import { Icon, type IconName } from "@/components/ui/primitives";
+import "./more-actions.css";
 
 const actions: { label: string; description: string; href: string; icon: IconName; capability?: string; capabilities?: string[] }[] = [
   { label: "Escalas e plantões", description: "Programação, substituições e propostas", href: "/escalas", icon: "calendar", capabilities: ["schedule.read.own", "schedule.read.team"] },
@@ -16,9 +17,26 @@ const actions: { label: string; description: string; href: string; icon: IconNam
   { label: "Administração do paciente", description: "Pessoas, catálogo e regras autorizadas", href: "/admin", icon: "settings", capability: "access.manage" },
   { label: "Unidades e apresentações", description: "Apresentações e medidas dos produtos", href: "/unidades", icon: "stock", capability: "catalog.manage" },
   { label: "Comprovantes do catálogo", description: "Consultar suas confirmações e tentativas pendentes", href: "/comprovantes-catalogo", icon: "history" },
+  { label: "Guias e ajuda", description: "Orientações do seu papel e continuidade do cuidado", href: "/guias", icon: "help" },
+  { label: "Verificar documento", description: "Consultar a emissão e conferir um arquivo recebido", href: "/verificar", icon: "check" },
 ];
 export function MoreActions() {
-  return <Workspace title="Mais opções">{(context) => <nav aria-label="Rotina e funções autorizadas" className="hca-records">{actions.filter((action) => (!action.capability || can(context, action.capability)) && (!action.capabilities || action.capabilities.some(capability => can(context, capability)))).map((action) => <Link className="hca-record" key={action.href} href={action.href} prefetch={false}>
-    <span className="hca-task-icon"><Icon name={action.icon} /></span><span className="hca-record-main"><strong>{action.label}</strong><small>{action.description}</small></span><Icon name="arrow" />
-  </Link>)}</nav>}</Workspace>;
+  return (
+    <Workspace title="Mais opções">
+      {(context) => (
+        <>
+          <p className="hca-more-help">Acesse as funções disponíveis para sua conta e para o paciente selecionado.</p>
+          <nav aria-label="Rotina e funções autorizadas" className="hca-more-destinations">
+            {actions.filter(action => (!action.capability || can(context, action.capability)) && (!action.capabilities || action.capabilities.some(capability => can(context, capability)))).map(action => (
+              <Link className="hca-more-destination" key={action.href} href={action.href} prefetch={false}>
+                <Icon name={action.icon} />
+                <h2>{action.label}</h2>
+                <p>{action.description}</p>
+              </Link>
+            ))}
+          </nav>
+        </>
+      )}
+    </Workspace>
+  );
 }

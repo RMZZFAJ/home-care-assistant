@@ -7,6 +7,8 @@ import { api, buttonClass, Notice, Workspace } from "../workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { deliveryLabels } from "@/lib/notifications/presentation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
+import { Icon } from "@/components/ui/primitives";
+import "./notification-center.css";
 
 import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
 import { useInbox } from "@/lib/notifications/use-inbox";
@@ -45,7 +47,7 @@ function Center({ patientId }: { patientId?: string }) {
   };
   const rows = inbox.data?.data ?? [], total = inbox.data?.total ?? 0;
   return (
-    <section className="ui-card" aria-label="Acompanhamento pessoal">
+    <section className="hca-inbox" aria-label="Acompanhamento pessoal">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold">Acompanhamento pessoal</h2>
         <button
@@ -57,6 +59,7 @@ function Center({ patientId }: { patientId?: string }) {
           Atualizar
         </button>
       </div>
+      <p className="hca-inbox-help">Abra a tarefa certa e acompanhe os avisos desta residência.</p>
       <div className="hca-toolbar"><CheckboxField
           checked={unread}
           label="Somente não vistas"
@@ -73,22 +76,24 @@ function Center({ patientId }: { patientId?: string }) {
         </p>
       ) : null}
       {rows.length > 0 && !inbox.fresh ? <p className="my-3 text-sm text-(--muted)">Última consulta confirmada{inbox.receivedAt ? " em " + formatBrazilDate(inbox.receivedAt) : ""}; aguardando atualização.</p> : null}
-      <ul className="hca-notification-list">
+      <ul className="hca-inbox-list" aria-label="Avisos consultados">
         {rows.map((row) => (
           <li
             key={row.id}
             data-notification-id={row.id}
             className={
-              "hca-notification-row " +
+              "hca-inbox-row " +
               (row.seen_at
                 ? ""
-                : "hca-notification-unread")
+                : "hca-inbox-unread")
             }
           >
-            <div className="text-sm font-semibold">
+            <span className="hca-inbox-icon"><Icon name="bell" /></span>
+            <div className="hca-inbox-content">
+            <h3>
               <span>{row.operational_documents?.code ?? "Atualização operacional"}</span>
               {!row.seen_at ? <Pill className="ml-3"  tone="neutral">Não vista</Pill> : null}
-            </div>
+            </h3>
             <p className="mt-1 text-sm">
               {documentEventLabel(row.event_key ?? row.document_events?.action)}
             </p>
@@ -100,7 +105,8 @@ function Center({ patientId }: { patientId?: string }) {
                   " · " +
                   (deliveryLabels[row.state] ?? "Aguardando atualização")}
             </p>
-            <div className="mt-3 flex flex-wrap gap-3">
+            </div>
+            <div className="hca-inbox-actions">
               {row.document_id ||
               row.requisition_id ||
               row.reminder_id ||
@@ -141,7 +147,7 @@ function Center({ patientId }: { patientId?: string }) {
         ))}
       </ul>
       {inbox.fresh && !rows.length ? (
-        <p className="my-4 text-sm text-(--muted)">
+        <p className="hca-inbox-empty">
           Nenhuma notificação neste filtro.
         </p>
       ) : null}

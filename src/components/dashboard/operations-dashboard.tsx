@@ -5,6 +5,7 @@ import type { WorkspaceContext } from "@/types/workspace";
 import { can } from "@/lib/client/capabilities";
 import { Icon } from "@/components/ui/primitives";
 import { TaskList } from "./task-list";
+import { TaskAttention } from "./task-attention";
 import { MetricCard } from "./metric-card";
 import { CriticalStockSummary, RecentDocuments, ShiftSummary } from "./dashboard-summary";
 
@@ -12,6 +13,7 @@ export function OperationsDashboard({ context, data }: { context: WorkspaceConte
   const supervisor = context.patient?.role === "supervisor";
   return <div className="hca-dashboard hca-operational-dashboard">
     <div className="hca-dashboard-intro"><div><h2>Olá, {context.fullName.split(" ")[0]}.</h2><p>{supervisor ? "Acompanhe a equipe e as situações que precisam de supervisão." : "Suas próximas tarefas no cuidado de " + context.patient?.display_name + "."}</p></div></div>
+    <TaskAttention tasks={data.pendingTasks} />
     <TaskList title={supervisor ? "Pendências da equipe" : "Precisa da sua atenção"} tasks={data.pendingTasks} />
     <ShiftSummary data={data}/>
     {supervisor ? <div className="hca-dashboard-metrics"><MetricCard label="Entregas da equipe" value={data.teamReceipts} href="/entregas" icon="truck" /><MetricCard label="Balanços para revisão" value={data.balances} href="/historico?type=BAL&status=submitted" icon="forms" /></div> : null}

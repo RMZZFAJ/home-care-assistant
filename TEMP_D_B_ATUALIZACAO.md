@@ -75,16 +75,14 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
-| Outras áreas visuais | 18 composições e 171 relações a conferir |
+| Outras áreas visuais | 15 composições e 171 relações a conferir |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Administração, guias e aparência restante |
-| Incremento atual | Atualização automática da ficha sem deslocamento |
+| Incremento atual | Próximas tarefas, avisos e Mais opções no Modelo Integral |
 | Resultado local | Contingência com autoria, anexo e conferência independente |
 | Banco | Local e remoto em 237, sem atualizações pendentes |
-| CI de 90c9b27 | Móvel 1 reprovado; iOS cancelado; demais grupos passaram |
-| Preview observado 90c9b27 | Vercel concluiu; sem alteração de produção |
-| CI de 2d7daa6 | Markdown reprovado; Windows cancelado; banco em execução |
-| Preview de 2d7daa6 | Concluído na Vercel; produção preservada |
+| CI observada de 11cb226 | Linux/Windows passaram; banco em execução |
+| Preview de 11cb226 | Concluído na Vercel; produção preservada |
 | CI deste incremento | Pendente; conferência conjunta obrigatória |
 
 **Resultado utilizável do lote 5:** Guias e ajuda apresenta navegação por
@@ -1187,7 +1185,7 @@ identificar as responsabilidades externas. Sonar permanece adiado.
 **Estimativa global da aplicação: 85%.** Inclui telas, estados e funções; não
 significa que 85% das telas estejam individualmente aprovadas. As 46 composições
 da etapa 06 foram fechadas localmente. GUI-01 e GUI-03 também fecharam; restam
-outras 18 e a conferência completa
+outras 15 e a conferência completa
 das 66 composições e 171 relações.
 
 O alvo é uma aparência única do Modelo Integral, incluindo recursos ausentes do
@@ -1244,15 +1242,23 @@ Integral.
 
 Pontos de verificação:
 
-- 15.1 Administração.
+- 15.1 Administração — ADM-01 e ADM-06 concluídos localmente; faltam ADM-02–05.
 - 15.2 Identidade e acesso.
-- 15.3 Notificações.
+- 15.3 Notificações — NOT-01 concluído localmente; faltam NOT-02–05.
 - 15.4 Guias — GUI-01 e GUI-03 concluídos localmente; preparação e suporte
   conservam suas composições restantes.
 - 15.5 Relações restantes e comparação nas cinco larguras.
 
-**O que falta:** Concluir variações de cadastro, perfil, acesso, guias, avisos e
-suporte, com suas relações restantes.
+**O que falta:** Concluir as outras 15 composições: ID-01–05, NOT-02–05,
+ADM-02–05 e GUI-02/04, com suas relações restantes.
+
+**Entrega de tarefas, avisos e destinos:** a faixa de atenção abre uma tarefa
+real do papel atual. A central conserva filtro, todas as páginas e marcação
+explícita de aviso visto. Mais opções conserva as funções autorizadas em
+cartões e oferece Ajuda e Verificação. A página não encontrada permite voltar
+por teclado, inclusive no WebKit. Consultar ou marcar aviso visto não registra
+ciência, recebimento nem movimenta estoque. As três composições foram comparadas
+ao Modelo Integral nas cinco larguras, com teclado e acessibilidade.
 
 #### Critérios originais da aparência
 
@@ -1533,6 +1539,19 @@ troca de aba durante a reconsulta. Tipos e lint dirigido passaram. As três
 linhas longas reprovadas na CI de 2d7daa6 foram formatadas, sem suprimir regras.
 O conjunto ainda depende da CI do novo commit.
 
+**12 de novembro — tarefas, avisos e destinos:** ADM-01, NOT-01 e ADM-06
+concluídos localmente. Seis percursos em build de produção passaram em Chrome
+móvel e WebKit; dez regressões anteriores de perfis, paginação e privacidade
+foram reutilizadas de rodadas compatíveis. A leitura prematura dos links foi
+corrigida no teste; o avanço por teclado na página 404 foi corrigido no produto
+e reproduzido isoladamente no WebKit. A conferência visual também corrigiu
+métricas antigas e a composição dos cartões. Restam 15 composições; banco
+permanece em 237. Na CI de 90c9b27, Linux, Windows, banco, Chromium e móvel 2
+passaram; móvel 1 reprovou e iOS foi cancelado. Em 2d7daa6, o Markdown reprovou
+e a execução foi depois cancelada pelo novo push; o Preview havia concluído.
+Em 11cb226, Linux e Windows passaram e o Preview concluiu; banco ainda estava
+em execução na observação. A CI do incremento atual continua obrigatória.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1615,7 +1634,7 @@ um novo lote de funções nem impede as implementações independentes.
 ### Lote 5 — Jornadas restantes e aparência do aplicativo
 
 GUI-01, preparação local com adoção/abertura e contingência estão entregues.
-Seguem as 18 composições restantes de preparação, administração, identidade,
+Seguem as 15 composições restantes de preparação, administração, identidade,
 avisos e suporte. As 171 relações mantêm sua conferência própria.
 
 - **Resultado:** demais áreas visuais, relações, entrada, administração e guias

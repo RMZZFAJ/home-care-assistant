@@ -6,6 +6,7 @@ import { can } from "@/lib/client/capabilities";
 import { Icon } from "@/components/ui/primitives";
 import { MetricCard } from "./metric-card";
 import { TaskList } from "./task-list";
+import { TaskAttention } from "./task-attention";
 import { CriticalStockSummary, RecentDocuments, RequestProgress, ShiftSummary } from "./dashboard-summary";
 
 export function ManagementDashboard({ context, data }: { context: WorkspaceContext; data: DashboardData }) {
@@ -15,6 +16,7 @@ export function ManagementDashboard({ context, data }: { context: WorkspaceConte
       {can(context, "ent.create") ? <Link href="/fichas/devolucao" className="ui-button ui-button-secondary" prefetch={false}>Nova devolução de materiais</Link> : null}
       {can(context, "com.create") ? <Link href="/fichas/com" className="ui-button ui-button-secondary" prefetch={false}>Organizar compra</Link> : null}
     </div></div>
+    <TaskAttention tasks={data.pendingTasks} />
     <div className="hca-dashboard-metrics">
       {can(context, "req.read") ? <MetricCard label="Requisições abertas" value={data.requests} href="/historico?type=REQ" icon="forms" /> : null}
       {can(context, "ent.read") ? <MetricCard label="Entregas a conferir" value={data.teamReceipts} href="/entregas" icon="truck" /> : null}
