@@ -1,21 +1,25 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, ApiError, buttonClass, can, Notice, primaryClass, Workspace } from "@/components/workspace";
 import { useWorkspaceState, roleLabel } from "@/components/layout/workspace-context";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { guideProgressConfirmed, guideConfigurationConfirmed, parseGuide, type GuideCommand, type GuideContext } from "@/lib/validation/guides";
 import { guideSteps } from "@/lib/guide-content";
+import "./guides.css";
 
 function useGuide() {
   const {value}=useWorkspaceState(),scopeKey=`${value?.userId??""}:${value?.activeContext?.mode}:${value?.activeContext?.care_recipient_id??""}:${value?.patient?.role??""}`;
   const [attempt,setAttempt]=useState(0),[result,setResult]=useState<{key:string;data:GuideContext}|null>(null),[failure,setFailure]=useState<{key:string;message:string}|null>(null);
   const key=JSON.stringify([scopeKey,attempt]);
+  const ready=Boolean(value), expectedRole=value?.activeContext?.mode==="global"?"global":value?.patient?.role??"general", expectedPatient=value?.activeContext?.mode==="global"?null:value?.patient?.id??null;
   useEffect(()=>{
+    if (!ready) return;
+    const expected = { role: expectedRole, patientId: expectedPatient };
     const controller=new AbortController();
-    void api<{data:unknown}>("/api/guides",undefined,controller.signal).then(r=>parseGuide(r.data)).then(data=>{if(!controller.signal.aborted){setResult({key,data});setFailure(null);}}).catch(reason=>{if(!controller.signal.aborted)setFailure({key,message:reason instanceof Error?reason.message:"Não foi possível consultar o guia."});});
+    void api<{data:unknown}>("/api/guides",undefined,controller.signal).then(r=>parseGuide(r.data,expected)).then(data=>{if(!controller.signal.aborted){setResult({key,data});setFailure(null);}}).catch(reason=>{if(!controller.signal.aborted)setFailure({key,message:reason instanceof Error?reason.message:"Não foi possível consultar o guia."});});
     return()=>controller.abort();
-  },[scopeKey,key]);
+  },[key,ready,expectedRole,expectedPatient]);
   const error=failure?.key===key?failure.message:"",loading=result?.key!==key&&failure?.key!==key;
   return {context:value,data:result?.key===key&&!error?result.data:null,error,loading,refresh:()=>setAttempt(v=>v+1),adopt:(data:GuideContext)=>{setResult({key,data});setFailure(null);}};
 }
@@ -29,21 +33,31 @@ export function GuideOnboarding() {
 export function GuidesPage(){return <Workspace title="Guias e ajuda">{()=> <UserGuide/>}</Workspace>;}
 export function UserGuide() {
   const guide=useGuide(),data=guide.data;
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const [step,setStep]=useState<{scope:string;value:number}|null>(null),[error,setError]=useState(""),[message,setMessage]=useState("");
   const command=useCommandIntent<GuideCommand,{data:GuideContext}>(guideProgressConfirmed);
   const index=step&&step.scope===data?.scope?step.value:data?.progress.step??0,steps=guideSteps(data?.role??"reader"),locked=command.busy||command.uncertain;
   async function save(status:"started"|"skipped"|"completed",next=index){
     if(!data)return;setError("");setMessage("");
-    try{const saved=await command.send("/api/guides",{action:"progress",expectedScope:data.scope,expectedRevision:data.progress.revision,step:next,status,idempotencyKey:crypto.randomUUID()});guide.adopt(parseGuide(saved.data));setStep({scope:data.scope,value:next});setMessage(status==="completed"?"Guia percorrido. Nenhum ato operacional foi confirmado.":"Seu progresso foi guardado.");}
+    try{const saved=await command.send("/api/guides",{action:"progress",expectedScope:data.scope,expectedRevision:data.progress.revision,step:next,status,idempotencyKey:crypto.randomUUID()});guide.adopt(parseGuide(saved.data, { role:data.role, patientId:data.patientId }));setStep({scope:data.scope,value:next});setMessage(status==="completed"?"Guia percorrido. Nenhum ato operacional foi confirmado.":"Seu progresso foi guardado.");headingRef.current?.focus();}
     catch(reason){setError(reason instanceof Error?reason.message:"Não foi possível guardar seu progresso.");if(reason instanceof ApiError&&reason.status===409)guide.refresh();}
   }
-  return <section aria-label="Guia do seu perfil" className="ui-card"><h2 className="font-semibold">{data?.role==="global"?"Administração global":roleLabel(data?.role)}</h2>
-    <p className="mt-2 text-sm">Guia opcional · versão 2026-11-D3 · seu progresso não altera permissões, ciência ou recebimentos.</p>
+  return <section aria-label="Guia do seu perfil" className="ui-card"><h2 className="font-semibold">{!data?"Guia por tarefa":data.role==="global"?"Administração global":data.role==="general"?"Orientações gerais":roleLabel(data.role)}</h2>
+    <p className="mt-2 text-sm">Guia opcional para suas tarefas. Seu progresso não altera permissões, ciência ou recebimentos.</p>
     {guide.error?<Notice error>{guide.error}</Notice>:!data?<p role="status">Consultando seu guia…</p>:null}
     <button type="button" className={buttonClass} aria-disabled={guide.loading} onClick={()=>{if(!guide.loading)guide.refresh();}}>Consultar guia novamente</button>
     {error?<Notice error>{error}</Notice>:null}{message?<Notice>{message}</Notice>:null}
-    {data?<><p className="mt-4 text-sm" aria-live="polite">Etapa {index+1} de {steps.length}</p><h3 className="mt-3 font-semibold">{steps[index].title}</h3><p className="mt-2 leading-7">{steps[index].text}</p>{steps[index].href?<Link className={buttonClass+" mt-3"} href={steps[index].href!}>{steps[index].action}</Link>:null}
-      <div className="hca-toolbar mt-4"><button type="button" className={buttonClass} disabled={locked||index===0} onClick={()=>void save("started",index-1)}>Etapa anterior do guia</button><button type="button" className={primaryClass} disabled={locked} onClick={()=>void save(index===steps.length-1?"completed":"started",Math.min(index+1,steps.length-1))}>{index===steps.length-1?"Concluir guia":"Próxima etapa do guia"}</button><button type="button" className={buttonClass} disabled={locked} onClick={()=>void save("skipped")}>Pular e guardar progresso</button><button type="button" className={buttonClass} disabled={locked} onClick={()=>void save("started",0)}>Recomeçar guia</button></div>
+    {data?<><div className="hca-guide-layout">
+      <nav aria-label="Etapas do guia"><ol className="hca-guide-index">{steps.map((item, position)=><li key={item.title}><button type="button" className="hca-guide-step" aria-current={index===position?"step":undefined} disabled={locked} onClick={()=>void save("started",position)}><span aria-hidden="true">{position+1}</span><span>{item.title}</span></button></li>)}</ol></nav>
+      <div className="hca-guide-body">
+        <p aria-live="polite">Etapa {index+1} de {steps.length}</p>
+        <h3 ref={headingRef} tabIndex={-1}>{steps[index].title}</h3>
+        <p>{steps[index].text}</p>
+        {steps[index].href?<div><Link className={buttonClass} href={guideTaskHref(steps[index].href!,data.patientId)}>{steps[index].action}</Link></div>:null}
+        <p className="hca-guide-status">{data.progress.status==="completed"?"Guia concluído; você pode consultar qualquer etapa novamente.":data.progress.status==="skipped"?"Apresentação pulada. A ajuda continua disponível e suas tarefas permanecem acessíveis.":"Você pode interromper e reabrir este guia no seu perfil."}</p>
+        <div className="hca-toolbar"><button type="button" className={buttonClass} disabled={locked||index===0} onClick={()=>void save("started",index-1)}>Etapa anterior do guia</button><button type="button" className={primaryClass} disabled={locked} onClick={()=>void save(index===steps.length-1?"completed":"started",Math.min(index+1,steps.length-1))}>{index===steps.length-1?"Concluir guia":"Próxima etapa do guia"}</button><button type="button" className={buttonClass} disabled={locked} onClick={()=>void save("skipped")}>Pular e guardar progresso</button><button type="button" className={buttonClass} disabled={locked} onClick={()=>void save("started",0)}>Recomeçar guia</button></div>
+      </div>
+    </div>
       {command.uncertain?<button type="button" className={primaryClass} disabled={command.busy} onClick={()=>void command.recover().then(()=>{setMessage("Progresso recuperado.");guide.refresh();}).catch(reason=>setError(reason.message))}>Recuperar progresso do guia</button>:null}
       {guide.context&&data.patientId&&can(guide.context,"access.manage")?<GuideSetting data={data} refresh={guide.refresh}/>:null}</>:null}
   </section>;
@@ -51,4 +65,12 @@ export function UserGuide() {
 function GuideSetting({data,refresh}:{data:GuideContext;refresh:()=>void}) {
   const command=useCommandIntent<GuideCommand,unknown>(guideConfigurationConfirmed),[error,setError]=useState("");
   return <section className="mt-5 border-t border-(--line) pt-4" aria-label="Apresentação do guia neste paciente"><h3 className="font-semibold">Guia no primeiro acesso</h3><p className="my-2 text-sm">Apresentação inicial {data.showOnFirstAccess?"habilitada":"desabilitada"}. Cada pessoa pode pular ou reabrir.</p><button type="button" className={buttonClass} disabled={command.busy||command.uncertain} onClick={()=>{setError("");void command.send("/api/guides",{action:"configure",careRecipientId:data.patientId!,expectedRevision:data.configurationRevision,showOnFirstAccess:!data.showOnFirstAccess,idempotencyKey:crypto.randomUUID()}).then(refresh).catch(reason=>setError(reason.message));}}>{data.showOnFirstAccess?"Desabilitar apresentação inicial":"Habilitar apresentação inicial"}</button>{error?<p role="alert">{error}</p>:null}{command.uncertain?<button type="button" className={buttonClass} disabled={command.busy} onClick={()=>void command.recover().then(refresh).catch(reason=>setError(reason.message))}>Recuperar configuração do guia</button>:null}</section>;
+}
+
+function guideTaskHref(path: string, patient: string | null) {
+  if (!patient) return path;
+  const [pathname, query = ""] = path.split("?");
+  const params = new URLSearchParams(query);
+  params.set("careRecipientId", patient);
+  return pathname + "?" + params;
 }

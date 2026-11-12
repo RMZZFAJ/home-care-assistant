@@ -1211,7 +1211,7 @@ editáveis nesse ato. A conferência mostra também as linhas integrais.
 ## Preparação de residência e guias
 
 GET /api/residence-preparations é exclusivo do modo global autorizado. Lista
-preparações próprias em páginas de50, com page/query; id consulta a preparação
+preparações próprias em páginas de20, com page/query; id consulta a preparação
 e seu resumo de metadados. POST aceita save/create/discard com revisão esperada
 e chave da mesma intenção. Salvar não cria paciente. Criar exige identidade,
 fuso explícito, administração inicial confirmada e responsáveis distintos;
@@ -1223,6 +1223,12 @@ expectedScope, revisão, etapa, escolha e chave; troca de contexto rejeita o
 comando sem gravar no paciente seguinte. Recuperação conserva a mesma intenção.
 POST configure exige administração local do paciente e revisão da configuração.
 Progresso próprio e apresentação opcional não alteram SCI ou permissões.
+O cliente confere paciente, papel e escopo da resposta antes de exibir tarefas;
+os links preservam o paciente consultado. A preparação usa o diretório global
+paginado de contas, com trinta pessoas por página e contagem conferida, sem
+tratar uma coleção parcial como lista completa. Alterar uma preparação não
+reconsulta esse diretório; falha de consulta tem recuperação própria e não
+apaga os campos já preenchidos.
 
 ## Referências individuais de notificações
 

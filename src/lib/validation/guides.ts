@@ -16,4 +16,11 @@ export function guideConfigurationConfirmed(value:unknown,intent:GuideCommand){
   const result=z.object({data:z.object({patientId:z.uuid(),revision:z.number().int().positive(),showOnFirstAccess:z.boolean()})}).safeParse(value);
   return result.success&&intent.action==="configure"&&result.data.data.patientId===intent.careRecipientId&&result.data.data.revision===intent.expectedRevision+1&&result.data.data.showOnFirstAccess===intent.showOnFirstAccess;
 }
-export function parseGuide(value:unknown):GuideContext { const result=guideRecord.safeParse(value);if(!result.success)throw new Error("Não foi possível ler o guia. Consulte novamente.");return result.data; }
+export function parseGuide(value:unknown, expected?: Pick<GuideContext,"role"|"patientId">):GuideContext {
+  const result=guideRecord.safeParse(value);
+  if(!result.success)throw new Error("Não foi possível ler o guia. Consulte novamente.");
+  const data=result.data;
+  if (expected && (data.role!==expected.role || data.patientId!==expected.patientId || data.scope!==(expected.patientId??(expected.role==="global"?"global":"personal"))))
+    throw new Error("O guia não corresponde ao perfil atual. Consulte novamente antes de continuar.");
+  return data;
+}

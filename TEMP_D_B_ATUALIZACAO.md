@@ -1,6 +1,6 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, após o lote 4 e sua correção de CI.
+Atualizado em 12 de novembro de 2026, com o guia por papel concluído no lote 5.
 Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
@@ -8,7 +8,7 @@ liberação para produção.
 ## 1. Definições e leitura do acompanhamento
 
 - **Critérios:** são 105, sendo 75 originais e 30 complementos da Ordem Mestre.
-  Há 69 com implementação e verificações locais concluídas e 36 parciais. Nenhum
+  Há 70 com implementação e verificações locais concluídas e 35 parciais. Nenhum
   critério inteiro está sem início; algumas subtarefas estão em 0%.
 - **Etapas 01–20:** identificadores preservados para localizar os requisitos.
   A execução restante está agrupada em seis capacidades na seção 6; as etapas
@@ -69,20 +69,27 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 
 | Acompanhamento | Estado registrado |
 | --- | --- |
-| Critérios da D-B | 69 concluídos localmente; 36 parciais; total de 105 |
+| Critérios da D-B | 70 concluídos localmente; 35 parciais; total de 105 |
 | Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
-| Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
+| Outras áreas visuais | Guia por papel concluído; 19 composições restantes e conferência das 171 relações |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Administração, guias e aparência restante |
-| Incremento atual | Consulta de fichas, controles móveis e testes da CI |
-| Resultado local | Correção conferida em 26 percursos móveis; 16 testes de PDF passaram |
+| Incremento atual | Guia por papel, contexto correto e consulta completa de pessoas |
+| Resultado local | Seis papéis conferidos; guia reabrível e preparação preservada |
 | Banco | Local e remoto em 231, sem atualizações pendentes |
-| CI anterior 976d42c | Linux/Windows e banco passaram; cinco grupos de navegador falharam e um foi cancelado |
-| CI observada dc44507 | Linux passou; Windows falhou na preparação dos certificados de teste; banco em execução |
-| Preview observado dc44507 | Vercel concluiu; sem alteração de produção |
-| CI da correção | Aguardando o novo commit; validação conjunta ainda pendente |
+| CI observada 061722f | Linux, Windows e banco passaram; navegadores em execução |
+| Preview observado 061722f | Vercel concluiu; sem alteração de produção |
+| CI deste incremento | Pendente no commit de publicação; conferência conjunta continua obrigatória |
+
+**Resultado utilizável do lote 5:** Guias e ajuda apresenta navegação por
+etapas para os seis papéis, preserva o paciente nos encaminhamentos e recusa
+respostas de outro perfil. O progresso é reabrível e continua separado dos
+atos operacionais. A preparação alcança o diretório completo de pessoas e
+conserva os campos quando uma consulta falha. GUI-01 e o ponto 16.3 estão
+concluídos tecnicamente no escopo local. Preparação local, adoção de materiais
+e regularização de contingência continuam abertas nos pontos próprios.
 
 **Último lote encerrado localmente:** lote 4, aplicativo, avisos e lembretes.
 As etapas 11/12/13 fecharam no escopo executável. A escolha de avisos não pode
@@ -112,9 +119,9 @@ A preparação real dos certificados de teste tem limite próprio, sem mudar
 assinatura ou timeout do aplicativo. Passaram 26 percursos móveis e 16 testes
 de PDF, tipos e lint dirigido. A CI conjunta continua pendente.
 
-**Próxima entrega funcional:** lote 5, as demais áreas visuais, administração,
-entrada e guias, com a recuperação oficial ainda necessária. Os rascunhos
-permanecem intactos. A atualização entre duas sessões passou no banco da CI
+**Próxima entrega funcional no lote 5:** preparação local, adoção de materiais
+e contingência; depois, as demais áreas de administração, identidade e avisos.
+A recuperação oficial continua obrigatória. Os rascunhos permanecem intactos. A atualização entre duas sessões passou no banco da CI
 976d42c; o BAL em iOS integra a correção dirigida atual.
 
 **Validações do lote 2:** 14 cenários com autenticação real, 16 testes de
@@ -852,7 +859,7 @@ Codex.
 
 ### 3.5 Administração, permissões, entrada e orientação
 
-**Critérios deste grupo: 9 concluídos localmente; 3 parciais.**
+**Critérios deste grupo: 10 concluídos localmente; 2 parciais.**
 
 **Etapas relacionadas:** 02; 14; 16.
 
@@ -912,9 +919,10 @@ concluídos são preservados, com sua apresentação e recuperação atuais.
 - **Distinguir preparação do paciente de liberação operacional** — Em execução
   · ≈70%. Falta: Completar adoção de materiais e etapas físicas; revisar todos
   os papéis. Responsável: Codex; depois você e equipe.
-- **Guia por papel, reabrível e sem conceder permissões** — Em execução · ≈75%.
-  Falta: Completar convergência dos guias e conferir todas as funções.
-  Responsável: Codex.
+- **Guia por papel, reabrível e sem conceder permissões** — Concluído localmente
+  · 100%. Os seis papéis foram conferidos, incluindo pular, reabrir, navegar,
+  guardar progresso e recuperar falhas. Responsável: Codex. Avaliação humana e
+  tecnologia assistiva permanecem no bloco externo.
 - **Primeiro paciente e orientação respeitarem a autoridade de cada papel** —
   Em execução · ≈70%. Falta: Completar materiais, abertura física e convergência
   dos guias. Responsável: Codex; depois você e equipe.
@@ -931,11 +939,12 @@ Pontos de verificação:
 
 - 16.1 Criação global e administração local.
 - 16.2 Adoção e preparação de materiais.
-- 16.3 Guia reabrível por papel.
+- 16.3 Guia reabrível por papel — concluído localmente.
 - 16.4 Preparação física e contingência.
 
-**O que falta:** Concluir guias, adoção de materiais, autonomia local e
-contingência. Designações reais ficam na etapa 20.
+**O que falta:** Concluir adoção de materiais, delegação local legítima,
+preparação física e regularização de contingência. GUI-01 está concluído;
+os demais guias e as designações reais mantêm seus pontos próprios.
 
 ### 3.6 Aplicativo instalado, conexão, avisos e lembretes
 
@@ -1216,7 +1225,7 @@ Pontos de verificação:
 - 15.1 Administração.
 - 15.2 Identidade e acesso.
 - 15.3 Notificações.
-- 15.4 Guias.
+- 15.4 Guias — GUI-01 concluído; preparação e contingência ainda em execução.
 - 15.5 Relações restantes e comparação nas cinco larguras.
 
 **O que falta:** Concluir variações de cadastro, perfil, acesso, guias, avisos e
@@ -1459,6 +1468,18 @@ As etapas 08/09/10 fecharam no escopo executável; a sequência passa ao lote 4.
 **12 de novembro — lote 4 fechado localmente:** aplicativo, recuperação,
 consentimento por conta/sessão e lembretes com rotação e retorno qualificados.
 Os testes físicos e de entrega permanecem externos; a sequência passa ao lote 5.
+
+Em 12/11, o incremento do lote 5 concluiu GUI-01 nos seis papéis e corrigiu a
+consulta de pessoas na preparação. Passaram nove testes pequenos e 22 percursos
+de navegador em duas rodadas do mesmo candidato (dois e vinte), com tipos, lint
+e inspeção da tela. A primeira rodada expôs consultas antes da confirmação e
+revisão acionável durante atualização de pessoas; as causas foram corrigidas.
+A inspeção também identificou e corrigiu estilos que não estavam aplicados.
+No ciclo anterior, 976d42c teve cinco grupos de navegador reprovados e um
+cancelado; dc44507 reprovou a preparação de certificados no Windows. A correção
+061722f passou depois em Linux, Windows e banco; navegadores ainda estavam em
+execução na última observação. Esses são estados por commit, sem aprovação
+conjunta presumida.
 
 ## 6. Sequência única do trabalho restante
 

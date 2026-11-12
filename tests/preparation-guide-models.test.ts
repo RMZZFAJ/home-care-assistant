@@ -33,3 +33,10 @@ it("a structurally valid preparation200 must confirm this action, revision and i
   expect(preparationConfirmed({data:row},intent)).toBe(true);
   for(const changed of [{revision:3},{step:2},{id:other},{patientId:null,state:"draft"},{content:{...intent.content,isActive:true}}])expect(preparationConfirmed({data:{...row,...changed}},intent)).toBe(false);
 });
+
+it("rejects a well-formed guide from another patient or role while preserving generic callers", () => {
+  const data={scope:id,role:"professional",patientId:id,guideVersion:"2026-11-D3",showOnFirstAccess:false,configurationRevision:1,progress:{revision:1,step:2,status:"started"}};
+  expect(parseGuide(data,{patientId:id,role:"professional"}).patientId).toBe(id);
+  for(const expected of [{patientId:other,role:"professional"},{patientId:id,role:"family"},{patientId:null,role:"global"}])
+    expect(()=>parseGuide(data,expected)).toThrow("perfil atual");
+});

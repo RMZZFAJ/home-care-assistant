@@ -175,6 +175,21 @@ worker;
 a configuração e sua versão pertencem às decisões da família. Obrigações,
 atribuições e cursor participam da mesma transação.
 
+## Guias e preparação da residência
+
+Em Guias e ajuda, consulte as seis etapas do seu papel, avance, volte, pule ou
+recomece. O progresso pode ser reaberto no perfil. Concluir o guia não registra
+ciência, recebimento ou conclusão de uma tarefa operacional. Os links mantêm
+o paciente autorizado; mudar de papel ou paciente exige consultar o guia
+correspondente.
+
+A administração global prepara o cadastro da residência e indica responsáveis.
+As tarefas de catálogo, estoque, vínculos e regras continuam nos fluxos locais
+autorizados. Os resumos mostram registros disponíveis; não atestam conferência
+física nem o início do atendimento. Se a consulta de pessoas falhar, recupere
+a consulta antes de selecionar responsáveis ou revisar a criação. O restante
+do preenchimento é preservado.
+
 ## Desenvolvimento e preservação
 
 A suíte utiliza somente a stack local home-care-assistant, com API em
