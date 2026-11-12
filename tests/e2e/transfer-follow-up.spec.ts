@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { transferFixture, declareTransfer, transferCommand, rpc } from "../integration/transfer-fixtures.mjs";
@@ -41,7 +42,7 @@ function officialWrites(page: Page) {
   const writes: string[] = [];
   page.on("request", request => {
     const path = new URL(request.url()).pathname;
-    if (request.method() !== "GET" && (/^\/api\/documents\//.test(path) || path.startsWith("/api/transfers"))) writes.push(path);
+    if (request.method() !== "GET" && !isDocumentAccessReport(request) && (/^\/api\/documents\//.test(path) || path.startsWith("/api/transfers"))) writes.push(path);
   });
   return writes;
 }

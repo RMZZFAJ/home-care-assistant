@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Browser, type Locator, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
@@ -49,7 +50,7 @@ test("06.5 native archive attachments and historical facts share canonical rows 
   await page.getByLabel("Adicionar foto ou PDF",{exact:true}).setInputFiles({name:filename,mimeType:"image/png",buffer:source});await page.getByRole("button",{name:"Enviar anexo",exact:true}).click();await expect(page.getByRole("link",{name:filename,exact:true})).toBeVisible();
   const hashes=historyHashes(f.doc.id);expect(JSON.parse(hashes).filter((e:{version:number})=>e.version<=f.doc.version)).toEqual(JSON.parse(f.hashes));
   const before=official(f.patient,f.doc.id),count=sql("select count(*) from private.pdf_issuances where document_id="+q(f.doc.id)),sent:string[]=[];
-  page.on("request",r=>{if(new URL(r.url()).pathname.startsWith("/api/")&&r.method()!=="GET")sent.push(r.url());});
+  page.on("request",r=>{if(new URL(r.url()).pathname.startsWith("/api/")&&r.method()!=="GET"&&!isDocumentAccessReport(r))sent.push(r.url());});
   const ref=await model(browser);
   try{
     const attachment=page.getByRole("list",{name:"Arquivos anexados",exact:true}).getByRole("listitem");await expect(attachment).toHaveCount(1);

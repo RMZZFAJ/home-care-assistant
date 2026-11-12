@@ -1,4 +1,5 @@
 "use client";
+import { usePwa } from "@/components/pwa/pwa-provider";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActionButton } from "@/components/ui/controls";
 import { api, ApiError, Notice } from "@/components/workspace";
@@ -8,12 +9,14 @@ import { documentAccessOutcomeSchema, parseDocumentAccessHistory, type DocumentA
 
 /** Mount beside issued, successfully displayed content, never on a GET/prefetch. */
 export function DocumentAccessObservation({ id, version, onRecorded }: { id: string; version: number; onRecorded?: (id: string) => void }) {
+  const { runtime, offline } = usePwa();
+  const available = runtime === "ready" && !offline;
   const packetRef = useRef<{ referenceVersion: number; key: string } | null>(null);
   const savedRef = useRef(false), sendingRef = useRef(false), aliveRef = useRef(true);
   const [error, setError] = useState(""), [busy, setBusy] = useState(false);
   useEffect(() => { aliveRef.current = true; return () => { aliveRef.current = false; }; }, []);
   const record = useCallback(async () => {
-    if (savedRef.current || sendingRef.current || document.visibilityState !== "visible") return;
+    if (!available || savedRef.current || sendingRef.current || document.visibilityState !== "visible") return;
     packetRef.current ??= { referenceVersion: version, key: crypto.randomUUID() };
     sendingRef.current = true; setBusy(true);
     try {
@@ -28,7 +31,7 @@ export function DocumentAccessObservation({ id, version, onRecorded }: { id: str
       sendingRef.current = false;
       if (aliveRef.current) setBusy(false);
     }
-  }, [id, version, onRecorded]);
+  }, [id, version, onRecorded, available]);
   useEffect(() => {
     let first = 0, second = 0;
     const schedule = () => {

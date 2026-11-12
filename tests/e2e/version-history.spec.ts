@@ -1,3 +1,4 @@
+import { isDocumentAccessReport } from "./display-access-report";
 import { selectDocumentSection } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
@@ -35,7 +36,7 @@ test("Histórico rejeita resposta200 inválida ou de outra versão como falha de
   let commands = 0;
   const pageErrors: string[] = [];
   page.on("pageerror", error => pageErrors.push(error.message));
-  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") commands++; });
+  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !isDocumentAccessReport(request)) commands++; });
   await page.goto(`/fichas/${f.doc.id}?historyVersion=${f.approved.version}`);
   await expect(frozen(page, f.approved.version)).toBeVisible();
   const malformed: [string, (body: typeof valid) => void][] = [

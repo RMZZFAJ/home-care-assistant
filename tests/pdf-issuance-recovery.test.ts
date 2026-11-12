@@ -26,7 +26,7 @@ const names = ["VERCEL_ENV", "HCA_PDF_TRUST_POLICY", "HCA_PDF_TRUST_POLICY_FILE"
 const previous = names.map(name => process.env[name]);
 const hash = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
 const recover = () => issuePdf(client, row.documentId, key, row.version, origin, row.documentOptions);
-beforeAll(async () => { identity = await testSigningIdentity(); policy = JSON.parse(await readFile(identity.trustFile, "utf8")); }, 30000);
+beforeAll(async () => { identity = await testSigningIdentity(); policy = JSON.parse(await readFile(identity.trustFile, "utf8")); }, 90000);
 beforeEach(async () => {
   names.forEach(name => { delete process.env[name]; });
   process.env.HCA_PDF_TRUST_POLICY = JSON.stringify(policy);

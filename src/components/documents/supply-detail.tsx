@@ -610,7 +610,6 @@ export function SupplyDocumentContent({
   }
   return (
     <div className="hca-record-detail space-y-5">
-      {data?.protocol && activeContext ? <DocumentAccessObservation key={`${context.userId}:${data.id}:${data.version}`} id={data.id} version={data.version} onRecorded={setAccessRevision} /> : null}
       {data ? (
         <DocumentBreadcrumb
           code={
@@ -1254,6 +1253,7 @@ export function SupplyDocumentContent({
               />
             </DocumentPanel>
             <DocumentPanel value="history">
+              {data?.protocol && activeContext ? <DocumentAccessObservation key={`${context.userId}:${data.id}:${data.version}`} id={data.id} version={data.version} onRecorded={setAccessRevision} /> : null}
               <DocumentAccessHistory id={id} refreshKey={`${data.version}:${accessRevision}`} authorized={can(context, "document.access.read")} />
               <DocumentTimeline
                 id={id}

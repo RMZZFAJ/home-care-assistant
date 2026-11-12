@@ -106,7 +106,10 @@ Use a lupa para abrir pesquisa e filtros de ficha, situação, período e códig
 ou protocolo. O paciente continua no cabeçalho e filtros ativos são
 removíveis.
 O documento preserva snapshots, versões e SHA-256, além de anexos privados e
-PDFs por versão. O hash compara conteúdo; não substitui uma assinatura digital
+PDFs por versão. A aba Versões e integridade reúne o histórico de acessos.
+Se o registro de uma consulta não for confirmado, a recuperação aparece nessa
+aba, preservando o conteúdo e os controles da ficha. Acesso não substitui
+ciência nem recebimento. O hash compara conteúdo; não substitui uma assinatura digital
 nem protege contra um administrador do banco que altere dados e controles.
 
 Gravação, envio ao provedor, entrega, leitura e ciência no aplicativo são

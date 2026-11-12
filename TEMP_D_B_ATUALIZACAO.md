@@ -1,6 +1,6 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, após o fechamento local do lote 4.
+Atualizado em 12 de novembro de 2026, após o lote 4 e sua correção de CI.
 Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
@@ -75,13 +75,14 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
-| Próxima entrega | Aparência restante, administração e guias |
-| Incremento atual | PWA, consentimento por sessão e lembretes |
-| Resultado local | Aplicativo e avisos recuperáveis; alcance completo |
+| Próxima entrega | Administração, guias e aparência restante |
+| Incremento atual | Consulta de fichas, controles móveis e testes da CI |
+| Resultado local | Correção conferida em 26 percursos móveis; 16 testes de PDF passaram |
 | Banco | Local e remoto em 231, sem atualizações pendentes |
-| CI anterior 976d42c | Linux/Windows e banco passaram; navegadores pendentes |
-| CI deste incremento | Pendente no novo commit |
-| Preview anterior 976d42c | Vercel concluiu; documentos publicados |
+| CI anterior 976d42c | Linux/Windows e banco passaram; cinco grupos de navegador falharam e um foi cancelado |
+| CI observada dc44507 | Linux passou; Windows falhou na preparação dos certificados de teste; banco em execução |
+| Preview observado dc44507 | Vercel concluiu; sem alteração de produção |
+| CI da correção | Aguardando o novo commit; validação conjunta ainda pendente |
 
 **Último lote encerrado localmente:** lote 4, aplicativo, avisos e lembretes.
 As etapas 11/12/13 fecharam no escopo executável. A escolha de avisos não pode
@@ -102,12 +103,19 @@ arquivos. A auditoria exige competência própria e traz identificação nominat
 em todas as páginas. Foram geradas amostras reais assinadas de REQ, compra,
 doação, entrega, devolução, BAL e auditoria, com dados fictícios de teste.
 
-**Próxima entrega:** lote 5, as demais áreas visuais, administração, entrada e
-guias, com a recuperação oficial ainda necessária. Os rascunhos permanecem
-intactos.
-A falha da CI anterior no teste de atualização entre duas sessões passou na
-reprodução local, sem alterar o limite; a causa da falha remota não foi
-comprovada. O diagnóstico do BAL em iOS também aguarda a próxima CI completa.
+**Correção delimitada antes do lote 5:** concluída localmente. O registro de
+acesso aguarda a aplicação estar compatível, e sua falha fica no histórico,
+sem deslocar os controles. A lista de seleção não sobrepõe sua opção no
+WebKit. Os testes de consulta distinguem acesso de alteração operacional; a
+conferência de acessibilidade parte de uma posição de rolagem conhecida.
+A preparação real dos certificados de teste tem limite próprio, sem mudar
+assinatura ou timeout do aplicativo. Passaram 26 percursos móveis e 16 testes
+de PDF, tipos e lint dirigido. A CI conjunta continua pendente.
+
+**Próxima entrega funcional:** lote 5, as demais áreas visuais, administração,
+entrada e guias, com a recuperação oficial ainda necessária. Os rascunhos
+permanecem intactos. A atualização entre duas sessões passou no banco da CI
+976d42c; o BAL em iOS integra a correção dirigida atual.
 
 **Validações do lote 2:** 14 cenários com autenticação real, 16 testes de
 conteúdo/contrato e oito percursos em Chromium/iOS, em rodadas compatíveis.
@@ -1526,6 +1534,10 @@ retorno efetivo do provedor e prova operacional permanecem na etapa 20.
 - **Validação e fechamento:** offline sem cache privado/replay, recuperação,
   atualização e destinatários em cenários representativos. Separa conclusão do
   software dos testes físicos e de fornecedor ainda não realizados.
+
+A correção delimitada das falhas de CI foi implementada e conferida localmente
+antes do lote 5. A CI do novo commit continua na etapa 19; esse gate não cria
+um novo lote de funções nem impede as implementações independentes.
 
 ### Lote 5 — Jornadas restantes e aparência do aplicativo
 

@@ -52,7 +52,7 @@ beforeAll(async () => {
       trust: policy(),
     })
   ).bytes;
-}, 30000);
+}, 90000);
 afterAll(async () => {
   await identity?.dispose();
 });
