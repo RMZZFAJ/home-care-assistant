@@ -86,3 +86,51 @@ test("access-report failure stays in history without moving the ficha controls a
     await page.unrouteAll({ behavior: "wait" });
   }
 });
+
+test("background ficha refresh keeps the summary stationary and tabs selectable while the retained read is pending", async ({ page }) => {
+  const f = await setup();
+  const doc = await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+    p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "1" }] },
+  });
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, f.patient);
+  await page.goto("/documentos/" + doc.id);
+  const header = page.getByRole("region", { name: "Resumo da ficha", exact: true });
+  const refresh = page.getByRole("button", { name: "Atualizar ficha", exact: true });
+  await expect(header).toBeVisible();
+  await expect(refresh).toHaveAttribute("aria-disabled", "false");
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  const before = physical(f.patient), bounds = await header.boundingBox();
+  let entered!: () => void, release!: () => void;
+  const read = new Promise<void>(resolve => { entered = resolve; });
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/api/documents/" + doc.id, async route => {
+    if (route.request().method() !== "GET") return route.continue();
+    const response = await route.fetch();
+    entered();
+    await gate;
+    await route.fulfill({ response });
+  });
+  try {
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    await read;
+    await expect(refresh).toHaveAttribute("aria-disabled", "true");
+    await expect(refresh).toHaveAttribute("aria-busy", "true");
+    await expect(page.getByRole("status").filter({ hasText: "Atualizando consulta da ficha…" })).toHaveText("Atualizando consulta da ficha…");
+    expect(await header.boundingBox()).toEqual(bounds);
+    await selectDocumentSection(page, "attachments");
+    release();
+    await expect(refresh).toHaveAttribute("aria-disabled", "false");
+    await expect(refresh).toHaveAttribute("aria-busy", "false");
+    await expect(page.getByRole("tab", { name: "Anexos", exact: true })).toHaveAttribute("aria-selected", "true");
+    expect(physical(f.patient)).toBe(before);
+  } finally {
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+});

@@ -1,6 +1,7 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, com guia por papel, preparação local e contingência entregues no lote 5.
+Atualizado em 12 de novembro de 2026, com guia por papel, preparação local e
+contingência entregues no lote 5.
 Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
@@ -74,15 +75,17 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
-| Outras áreas visuais | Guia por papel e contingência concluídos; 18 composições restantes e conferência das 171 relações |
+| Outras áreas visuais | 18 composições e 171 relações a conferir |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Administração, guias e aparência restante |
-| Incremento atual | Declaração, evidências e conciliação de contingência |
-| Resultado local | Contingência com autoria, anexo e conferência independente; operação oficial preservada |
+| Incremento atual | Atualização automática da ficha sem deslocamento |
+| Resultado local | Contingência com autoria, anexo e conferência independente |
 | Banco | Local e remoto em 237, sem atualizações pendentes |
-| CI observada 90c9b27 | Linux, Windows, banco, Chromium e móvel 2 passaram; móvel 1 falhou; iOS cancelado |
+| CI de 90c9b27 | Móvel 1 reprovado; iOS cancelado; demais grupos passaram |
 | Preview observado 90c9b27 | Vercel concluiu; sem alteração de produção |
-| CI deste incremento | Pendente no commit de publicação; conferência conjunta continua obrigatória |
+| CI de 2d7daa6 | Markdown reprovado; Windows cancelado; banco em execução |
+| Preview de 2d7daa6 | Concluído na Vercel; produção preservada |
+| CI deste incremento | Pendente; conferência conjunta obrigatória |
 
 **Resultado utilizável do lote 5:** Guias e ajuda apresenta navegação por
 etapas para os seis papéis, preserva o paciente nos encaminhamentos e recusa
@@ -129,7 +132,8 @@ de PDF, tipos e lint dirigido. A CI conjunta continua pendente.
 
 **Próxima entrega no lote 5:** composições restantes de preparação,
 administração, identidade, avisos e suporte, com suas relações.
-A recuperação oficial continua obrigatória. Os rascunhos permanecem intactos. A atualização entre duas sessões passou no banco da CI
+A recuperação oficial continua obrigatória. Os rascunhos permanecem intactos.
+A atualização entre duas sessões passou no banco da CI
 976d42c; o BAL em iOS integra a correção dirigida atual.
 
 **Validações do lote 2:** 14 cenários com autenticação real, 16 testes de
@@ -1182,7 +1186,8 @@ identificar as responsabilidades externas. Sonar permanece adiado.
 
 **Estimativa global da aplicação: 85%.** Inclui telas, estados e funções; não
 significa que 85% das telas estejam individualmente aprovadas. As 46 composições
-da etapa 06 foram fechadas localmente. Restam outras 20 e a conferência completa
+da etapa 06 foram fechadas localmente. GUI-01 e GUI-03 também fecharam; restam
+outras 18 e a conferência completa
 das 66 composições e 171 relações.
 
 O alvo é uma aparência única do Modelo Integral, incluindo recursos ausentes do
@@ -1399,7 +1404,6 @@ navegador era do seletor de campo obrigatório; o diálogo estava nomeado
 corretamente. O finalizador de anexos foi integrado ao novo pai e suas
 regressões anteriores passaram. Banco local e remoto em 237, sem pendências.
 
-
 **12/11/2026 — preparação local:** adoção e abertura de estoque familiar
 percorridas nos fluxos reais, consulta de tarefas por vínculo e dados restritos
 preservados. Dez percursos móveis distintos passaram em rodadas compatíveis,
@@ -1407,7 +1411,6 @@ mais cinco cenários com contas reais de teste e três testes de contrato.
 O critério de primeira residência e autoridade local foi concluído; o critério
 que também exige contingência permanece parcial. Banco local e remoto em 232.
 A CI do novo commit e a conferência conjunta permanecem próprias.
-
 
 Este é um registro de marcos, sem outra fila de execução. As etapas 01 a 07
 estão em **100% do escopo local indicado**, sob responsabilidade de Codex.
@@ -1518,6 +1521,17 @@ cancelado; dc44507 reprovou a preparação de certificados no Windows. A correç
 061722f passou depois em Linux, Windows e banco; navegadores ainda estavam em
 execução na última observação. Esses são estados por commit, sem aprovação
 conjunta presumida.
+
+**12 de novembro — correção da consulta automática da ficha:** a CI de
+90c9b27 expôs um deslocamento transitório do resumo e uma seleção de aba
+instável. A reprodução reteve uma reconsulta e confirmou que o aviso de
+carregamento deslocava a ficha já aberta. O aviso inicial foi preservado;
+atualizações seguintes usam o botão existente e anúncio acessível, sem
+alterar a posição dos controles. Passaram oito percursos dirigidos em Chrome
+móvel e WebKit, incluindo anexo recuperado, acesso, negativa de histórico e
+troca de aba durante a reconsulta. Tipos e lint dirigido passaram. As três
+linhas longas reprovadas na CI de 2d7daa6 foram formatadas, sem suprimir regras.
+O conjunto ainda depende da CI do novo commit.
 
 ## 6. Sequência única do trabalho restante
 

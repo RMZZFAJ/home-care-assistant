@@ -37,6 +37,7 @@ export function DocumentHeader({
   fileActionRef,
   onRefresh,
   refreshDisabled = false,
+  refreshing = false,
   refreshButtonRef,
 }: {
   id: string;
@@ -67,6 +68,7 @@ export function DocumentHeader({
   fileActionRef?: Ref<HTMLDivElement>;
   onRefresh?: () => void;
   refreshDisabled?: boolean;
+  refreshing?: boolean;
   refreshButtonRef?: Ref<HTMLButtonElement>;
 }) {
   const Heading = headingLevel === 1 ? "h1" : "h2";
@@ -134,9 +136,10 @@ export function DocumentHeader({
                 if (!refreshDisabled) onRefresh();
               }}
               aria-disabled={refreshDisabled}
+              aria-busy={refreshing}
               aria-label="Atualizar ficha"
             >
-              <Icon name="refresh" />
+              <Icon name="refresh" className={refreshing ? "motion-safe:animate-spin" : undefined} />
             </ActionButton>
           ) : null}
           <Popover.Root

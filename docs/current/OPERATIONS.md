@@ -36,7 +36,8 @@ motivo. Convites continuam dependendo de aceite pessoal.
 Contagens de registros não aprovam estoque físico, presença, ciência,
 recebimento ou início do atendimento. Informações restritas são identificadas
 sem aparecer como zero. Falhas de consulta permitem atualizar a seção; uma
-recusa de acesso retira os dados antes exibidos. A contingência tem declaração e conciliação próprias, descritas abaixo.
+recusa de acesso retira os dados antes exibidos. A contingência tem declaração
+e conciliação próprias, descritas abaixo.
 
 ## Contingência e retorno ao aplicativo
 

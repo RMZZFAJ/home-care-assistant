@@ -631,7 +631,10 @@ export function SupplyDocumentContent({
           </button>
         </div>
       )}
-      {loading ? <Notice>Consultando documento persistido…</Notice> : null}
+      {loading && !data ? <Notice>Consultando documento persistido…</Notice> : null}
+      <span role="status" className="sr-only">
+        {loading && data ? "Atualizando consulta da ficha…" : ""}
+      </span>
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {readNotice &&
@@ -772,6 +775,7 @@ export function SupplyDocumentContent({
             onRefresh={refreshDocument}
             refreshButtonRef={refreshButtonRef}
             refreshDisabled={loading || busy}
+            refreshing={loading}
             metadata={[
               {
                 label: "Registrada por",
