@@ -268,6 +268,12 @@ física nem o início do atendimento. Se a consulta de pessoas falhar, recupere
 a consulta antes de selecionar responsáveis ou revisar a criação. O restante
 do preenchimento é preservado.
 
+Na preparação global, os sete números abrem as etapas sem concluir suas
+tarefas. Navegar conserva os campos em edição; Salvar e retomar continua
+sendo a ação explícita para guardar a preparação. Depois da criação, nome,
+estado e fuso registrados aparecem em leitura. Os resumos de escalas, BAL e
+conferência distinguem configuração registrada de execução física.
+
 ## Desenvolvimento e preservação
 
 A suíte utiliza somente a stack local home-care-assistant, com API em

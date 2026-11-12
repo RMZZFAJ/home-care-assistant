@@ -1,0 +1,14 @@
+.hca-residence-preparation { display: grid; gap: 20px; }
+.hca-preparation-navigation { min-width: 0; }
+.hca-preparation-navigation > p { color: var(--hca-muted); font-size: 11px; }
+.hca-preparation-navigation .wizard-steps { gap: 9px; margin: 17px 0 23px; padding: 3px 2px 6px; }
+.hca-preparation-navigation .hca-step-control:disabled { opacity: .48; cursor: not-allowed; }
+.hca-preparation-current-title { margin-block: 19px; font-size: 19px; font-weight: 700; }
+.hca-preparation-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; min-width: 0; }
+.hca-preparation-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; font-size: 12px; font-weight: 650; }
+.hca-preparation-field > p { color: var(--hca-muted); font-size: 11px; font-weight: 400; line-height: 1.6; }
+.hca-preparation-fields > :is(p, a, .hca-check, .hca-definition-grid, .ui-notice, [data-multiple]) { grid-column: 1 / -1; }
+.hca-preparation-fields > p { color: var(--hca-muted); font-size: 12px; line-height: 1.6; }
+.hca-preparation-fields > a { justify-self: start; white-space: normal; }
+@media (max-width: 500px) { .hca-preparation-fields { grid-template-columns: minmax(0, 1fr); } }
+@media (forced-colors: active) { .hca-preparation-navigation [aria-current=step] { outline: 2px solid Highlight; } }
