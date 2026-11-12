@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -156,7 +157,7 @@ test("P02 preferência pessoal tem revisão em leitura e recupera a mesma escolh
   const f = await setup(), family = await actor("family", f.patient), before = await prefer(family, "manual");
   try {
     await login(page, f.patient); await page.goto("/perfil");
-    await page.getByRole("button", { name: "Ciência das requisições", exact: true }).click();
+    await selectProfileSection(page, "notices");
     const mode = page.getByRole("combobox", { name: "Modalidade pessoal", exact: true }); await expect(mode).toHaveValue("manual"); await mode.selectOption("tacit");
     await page.getByRole("checkbox", { name: "Confirmo expressamente esta preferência pessoal.", exact: true }).check();
     await page.getByRole("button", { name: "Revisar preferência", exact: true }).click();

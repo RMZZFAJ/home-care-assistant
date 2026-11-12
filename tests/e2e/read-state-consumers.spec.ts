@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { actor, rpc, fixtures, setup } from "../integration/v4-fixtures.mjs";
@@ -15,7 +16,7 @@ async function login(page: Page, patient: string) {
 
 test("D3 perfil termina carregamento em falha recupera a leitura e preserva edição pessoal", async ({ page }) => {
   const f = await setup(); await login(page, f.patient);
-  let release!: () => void, entered!: () => void, mode: "delay" | "error" | "invalid" | "emptyOptional" | "live" = "delay";
+  let release!: () => void, entered!: () => void, mode: "delay" | "error" | "invalid" | "emptyOptional" | "restrictedMembership" | "live" = "delay";
   const gate = new Promise<void>(resolve => { release = resolve; }), first = new Promise<void>(resolve => { entered = resolve; });
   await page.route("**/api/profile", async route => {
     if (route.request().method() !== "GET") return route.continue();
@@ -23,14 +24,15 @@ test("D3 perfil termina carregamento em falha recupera a leitura e preserva edi�
     if (mode === "error") return route.fulfill({ status: 500, json: { code: "INTERNAL_ERROR", error: "Falha controlada na leitura do perfil" } });
     if (mode === "invalid") return route.fulfill({ status: 200, json: { data: null, sessions: [], memberships: [] } });
     if (mode === "emptyOptional") { const response = await route.fetch(), body = await response.json(); return route.fulfill({ response, json: { ...body, data: { ...body.data, professional_registration: null, professional_state: null, professional_category: null, avatar: null, phone: null }, memberships: [], sessions: [] } }); }
+    if (mode === "restrictedMembership") { const response = await route.fetch(), body = await response.json(); return route.fulfill({ response, json: { ...body, memberships: body.memberships.slice(0, 1).map((membership: Record<string, unknown>) => ({ ...membership, care_recipients: null })) } }); }
     return route.continue();
   });
   try {
     await page.goto("/perfil?careRecipientId=" + f.patient); await first;
     const panel = page.getByRole("region", { name: "Perfil pessoal", exact: true });
     await expect(panel.getByText("Carregando perfil…", { exact: true })).toBeVisible();
-    mode = "error"; release(); await expect(panel.getByRole("button", { name: "Identidade pessoal", exact: true })).toBeVisible();
-    await panel.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
+    mode = "error"; release(); await expect(panel.getByRole("heading", { name: "Identidade pessoal", exact: true })).toBeVisible();
+    await selectProfileSection(page, "identity");
     const name = panel.getByLabel("Nome", { exact: true }); await name.fill("Edição pessoal ainda não salva");
     await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do perfil");
@@ -40,9 +42,13 @@ test("D3 perfil termina carregamento em falha recupera a leitura e preserva edi�
     await expect(panel.getByRole("alert")).toContainText("A resposta da consulta do perfil não pôde ser lida");
     mode = "emptyOptional"; await panel.getByRole("button", { name: "Consultar perfil novamente", exact: true }).click();
     await expect(panel.getByRole("alert")).toHaveCount(0); await expect(name).toHaveValue("Edição pessoal ainda não salva");
-    await panel.getByRole("button", { name: "Seus vínculos com pacientes", exact: true }).click();
+    await expect(panel.getByRole("heading", { name: "Seus vínculos com pacientes", exact: true })).toBeVisible();
     await expect(panel.getByText("Nenhum vínculo local disponível para consulta.", { exact: false })).toBeVisible();
-    // Empty optional collections above are a controlled HTTP response; the
+    mode = "restrictedMembership"; await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    await expect(panel.getByText("Paciente com acesso indisponível", { exact: true })).toBeVisible();
+    await expect(panel.getByText(/Situação do paciente indisponível/)).toBeVisible();
+    await expect(panel.getByText(/Paciente inativo/)).toHaveCount(0);
+    // Empty collections and restricted metadata above are controlled HTTP responses; the
     // profile itself remains the real authorized record and is never mutated.
     mode = "live"; await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await expect(panel.getByText("Nenhum vínculo local disponível para consulta.", { exact: false })).toHaveCount(0);
@@ -51,9 +57,9 @@ test("D3 perfil termina carregamento em falha recupera a leitura e preserva edi�
     mode = "error"; await page.reload();
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do perfil");
     await expect(panel.getByText("Carregando perfil…", { exact: true })).toHaveCount(0);
-    await expect(panel.getByRole("button", { name: "Identidade pessoal", exact: true })).toHaveCount(0);
+    await expect(panel.getByRole("heading", { name: "Identidade pessoal", exact: true })).toHaveCount(0);
     mode = "live"; await panel.getByRole("button", { name: "Consultar perfil novamente", exact: true }).click();
-    await expect(panel.getByRole("button", { name: "Identidade pessoal", exact: true })).toBeVisible();
+    await expect(panel.getByRole("heading", { name: "Identidade pessoal", exact: true })).toBeVisible();
     for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "D3 profile read " + width); }
   } finally { release(); }
 });

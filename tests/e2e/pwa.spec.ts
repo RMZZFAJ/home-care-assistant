@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID, createHash } from "node:crypto";
 import { mkdirSync } from "node:fs";
@@ -31,9 +32,7 @@ async function login(page: Page, patient: string) {
 }
 async function profile(page: Page, patient: string) {
   await page.goto("/perfil?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Aplicativo neste aparelho", exact: true })
-    .click();
+  await selectProfileSection(page, "notices");
   await expect(
     pwa(page).getByText(
       "Orientação pública disponível para falta de conexão.",
@@ -164,9 +163,7 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
     marker = "Edição fictícia ainda não salva " + randomUUID();
   await login(page, f.patient);
   await profile(page, f.patient);
-  await page
-    .getByRole("button", { name: "Identidade pessoal", exact: true })
-    .click();
+  await selectProfileSection(page, "identity");
   const name = page.getByRole("textbox", { name: "Nome", exact: true });
   await name.fill(marker);
   const input = page.locator('input[name="name"]');
@@ -490,18 +487,14 @@ test("PWA oferece instalação somente por gesto e mantém web quando o worker n
     Reflect.deleteProperty(Navigator.prototype, "serviceWorker");
   });
   await page.reload();
-  await page
-    .getByRole("button", { name: "Aplicativo neste aparelho", exact: true })
-    .click();
+  await selectProfileSection(page, "notices");
   await expect(
     pwa(page).getByText(
       "A instalação e a orientação offline não estão disponíveis neste navegador. As funções web continuam disponíveis.",
       { exact: true },
     ),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Identidade pessoal", exact: true })
-    .click();
+  await selectProfileSection(page, "identity");
   await expect(
     page.getByRole("textbox", { name: "Nome", exact: true }),
   ).toBeEditable();
@@ -512,7 +505,7 @@ test("PWA keeps an open edit after real session revocation but never caches it o
   const f = await setup(), marker = "Edição privada fictícia " + randomUUID();
   await login(page, f.patient); await profile(page, f.patient);
   await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller?.state)).toBe("activated");
-  await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
+  await selectProfileSection(page, "identity");
   const name = page.getByRole("textbox", { name: "Nome", exact: true }); await name.fill(marker);
   // Read only this browser's real fixture session through the public SSR adapter.
   // The bearer stays in the Node test process and is never printed or injected.

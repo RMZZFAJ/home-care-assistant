@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync, mkdirSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
@@ -44,11 +45,13 @@ test("gestão canônica troca contexto no submenu, mantém navegação e edita p
   await page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true }).click();
   await expect(page).toHaveURL(/\/perfil/);
   await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Identidade pessoal", exact: true })).toHaveAttribute("aria-expanded", "false");
-  await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
-  await expect(page.getByLabel("Nome", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
-  await expect(page.getByLabel("Nome", { exact: true })).not.toBeVisible();
+  await selectProfileSection(page, "identity");
+  const name = page.getByLabel("Nome", { exact: true }), retainedName = await name.inputValue();
+  await expect(name).toBeVisible();
+  await selectProfileSection(page, "security");
+  await expect(name).not.toBeVisible();
+  await selectProfileSection(page, "identity");
+  await expect(name).toHaveValue(retainedName);
   await capture(page, "perfil", info.project.name);
   await page.getByLabel("Menu do usuário", { exact: true }).click();
   await page.getByRole("menuitem", { name: "Mudar perfil", exact: true }).click();

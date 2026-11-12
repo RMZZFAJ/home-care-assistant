@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
@@ -124,7 +125,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     });
     await login(family, "family", patient);
     await family.goto("/perfil?careRecipientId=" + patient);
-    await family.getByRole("button", { name: "Ciência das requisições", exact: true }).click();
+    await selectProfileSection(family, "notices");
     await family.getByRole("combobox", { name: "Modalidade pessoal", exact: true }).selectOption("dialog");
     await family.getByRole("checkbox", { name: "Confirmo expressamente esta preferência pessoal.", exact: true }).check();
     await family.getByRole("button", { name: "Revisar preferência", exact: true }).click();

@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { expect,test,type Page,type Request as BrowserRequest } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { fixtures,setup } from "../integration/v4-fixtures.mjs";
@@ -104,7 +105,7 @@ test("D3 guia pode ser pulado recuperado reaberto e configurado sem ciência ou 
   let corrupted=false;const packets:unknown[]=[];
   await page.route("**/api/guides",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(!corrupted){corrupted=true;const response=await route.fetch();expect(response.ok()).toBe(true);const actual=await response.json();return route.fulfill({response,json:{data:{...actual.data,scope:randomUUID()}}});}return route.continue();});
   const banner=page.getByRole("region",{name:"Apresentação opcional",exact:true});await banner.getByRole("button",{name:"Pular apresentação",exact:true}).click();await banner.getByRole("button",{name:"Recuperar minha escolha",exact:true}).click();await expect(banner).toHaveCount(0);expect(packets[0]).toEqual(packets[1]);
-  await page.goto("/perfil?careRecipientId="+f.patient);await page.getByRole("button",{name:"Guias e ajuda",exact:true}).click();await expect(guide(page).getByRole("heading",{name:"Administrador do paciente",exact:true})).toBeVisible();
+  await page.goto("/perfil?careRecipientId="+f.patient);await selectProfileSection(page, "help");await expect(guide(page).getByRole("heading",{name:"Administrador do paciente",exact:true})).toBeVisible();
   await guide(page).getByRole("button",{name:"Próxima etapa do guia",exact:true}).click();await expect(guide(page).getByText("Etapa 2 de 6",{exact:true})).toBeVisible();
   await guide(page).getByRole("button",{name:"Desabilitar apresentação inicial",exact:true}).click();await expect(guide(page).getByRole("button",{name:"Habilitar apresentação inicial",exact:true})).toBeVisible();
   const second=await browser.newContext();try{const pro=await second.newPage();await login(pro,"professional",f.patient);const data=(await(await pro.request.get("/api/guides")).json()).data;expect(data.role).toBe("professional");expect(data.showOnFirstAccess).toBe(false);expect(data.progress.revision).toBe(0);await pro.goto("/guias");await expect(guide(pro).getByRole("heading",{name:"Profissional",exact:true})).toBeVisible();expect((await pro.request.post("/api/guides",{data:{action:"configure",careRecipientId:f.patient,expectedRevision:1,showOnFirstAccess:true,idempotencyKey:randomUUID()}})).status()).toBe(403);}finally{await second.close();}

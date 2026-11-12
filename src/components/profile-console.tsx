@@ -21,6 +21,7 @@ import { SciencePreferenceSettings } from "./profile/science-preference";
 import { parseProfileRead, type ProfileRead } from "@/lib/validation/profile";
 import { UserGuide } from "@/components/guides/user-guide";
 import { PwaSettings } from "./pwa/pwa-settings";
+import { ProfileTabs } from "./profile/profile-tabs";
 import { PushSettings } from "./pwa/push-settings";
 import { AdministrativePendingRecovery } from "./admin/administrative-pending-recovery";
 type Profile = ProfileRead["data"];
@@ -124,18 +125,18 @@ function ProfileContent() {
     }
   }
   return (
-    <section className="mx-auto max-w-3xl space-y-5" aria-label="Perfil pessoal">
+    <section className="hca-profile space-y-5" aria-label="Perfil pessoal">
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {readFailure ? <Notice error>{readFailure.message} <button type="button" className={buttonClass} onClick={() => setReadAttempt(value => value + 1)}>Consultar perfil novamente</button></Notice> : null}
       {reading ? <Notice>{profile ? "Atualizando consulta do perfil…" : "Carregando perfil…"}</Notice> : null}
-      <PwaSettings />
-      <PushSettings />
-      {profile ? (
-        <>
+      <PushSettings renderSections={push => (
+        <ProfileTabs>
+          {{
+            identity: profile ? (<>
           <SettingsSection title="Identidade pessoal" summary="Nome, identificação profissional e preferências">
             <p className="hca-field-hint">Função e registro são informados por você. Preencha o registro somente quando aplicável à sua função; sem registro aplicável, deixe-o em branco. A família registra sua própria conferência por paciente, sem validação externa automática.</p>
-            
+
             <p className="mt-2 text-sm text-(--muted)">{profile.email}</p>
             <form
               key={attempt}
@@ -144,7 +145,7 @@ function ProfileContent() {
             >
               <fieldset
                 disabled={busy}
-                className="grid min-w-0 gap-4 sm:grid-cols-2"
+                className="grid min-w-0 gap-4 min-[501px]:grid-cols-2"
               >
                 <label className="text-sm font-semibold">
                   Nome
@@ -225,13 +226,52 @@ function ProfileContent() {
               </button>
             </form>
           </SettingsSection>
-          <SciencePreferenceSettings />
           <SettingsSection title="Foto de perfil" summary="Imagem utilizada na identificação da sua conta">
             <AvatarSettings />
           </SettingsSection>
+          <SettingsSection title="Seus vínculos com pacientes" summary="Funções e situação dos seus acessos">
+
+            <ul className="mt-4 space-y-3">
+              {memberships.map((membership) => (
+                <li
+                  key={membership.care_recipient_id}
+                  className="rounded-lg border border-(--line) p-3 text-sm"
+                >
+                  <strong>
+                    {membership.care_recipients?.display_name ??
+                      "Paciente com acesso indisponível"}
+                  </strong>
+                  <p className="mt-1">
+                    {{
+                      admin: "Administrador do paciente",
+                      family: "Familiar",
+                      supervisor: "Supervisor",
+                      professional: "Profissional da equipe",
+                      reader: "Leitor",
+                    }[membership.role] ?? membership.role}{" "}
+                    ·{" "}
+                    {membership.status === "active"
+                      ? "Vínculo ativo"
+                      : "Vínculo revogado"}
+                    {membership.care_recipients === null
+                      ? " · Situação do paciente indisponível"
+                      : membership.care_recipients.is_active ? "" : " · Paciente inativo"}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            {!memberships.length ? (
+              <p className="mt-3 text-sm text-(--muted)">
+                Nenhum vínculo local disponível para consulta. A administração
+                global possui escopo independente.
+              </p>
+            ) : null}
+          </SettingsSection>
+            </>) : null,
+            security: profile ? (<>
           {profile.providers.includes("email") ? (
             <SettingsSection title="Alterar senha" summary="Proteja seu acesso com autenticação recente">
-              
+
               <form
                 className="mt-4 space-y-4"
                 onSubmit={(event) => void save(event, "password")}
@@ -264,46 +304,8 @@ function ProfileContent() {
             providers={profile.providers}
             onChange={() => setAttempt((value) => value + 1)}
           />
-          <SettingsSection title="Seus vínculos com pacientes" summary="Funções e situação dos seus acessos">
-            
-            <ul className="mt-4 space-y-3">
-              {memberships.map((membership) => (
-                <li
-                  key={membership.care_recipient_id}
-                  className="rounded-lg border border-(--line) p-3 text-sm"
-                >
-                  <strong>
-                    {membership.care_recipients?.display_name ??
-                      "Paciente com acesso indisponível"}
-                  </strong>
-                  <p className="mt-1">
-                    {{
-                      admin: "Administrador do paciente",
-                      family: "Familiar",
-                      supervisor: "Supervisor",
-                      professional: "Profissional da equipe",
-                      reader: "Leitor",
-                    }[membership.role] ?? membership.role}{" "}
-                    ·{" "}
-                    {membership.status === "active"
-                      ? "Vínculo ativo"
-                      : "Vínculo revogado"}
-                    {membership.care_recipients?.is_active
-                      ? ""
-                      : " · Paciente inativo"}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            {!memberships.length ? (
-              <p className="mt-3 text-sm text-(--muted)">
-                Nenhum vínculo local disponível para consulta. A administração
-                global possui escopo independente.
-              </p>
-            ) : null}
-          </SettingsSection>
           <SettingsSection title="Sessões autenticadas" summary="Dispositivos e acessos vinculados à sua conta">
-            
+
             <ul className="mt-4 space-y-3">
               {sessions.map((session) => (
                 <li
@@ -347,9 +349,15 @@ function ProfileContent() {
               Encerrar outras sessões
             </button>
           </SettingsSection>
+            </>) : null,
+            notices: <><PwaSettings />{push.consent}{profile ? <SciencePreferenceSettings /> : null}</>,
+            devices: push.devices,
+            help: profile ? (<>
           <SettingsSection title="Guias e ajuda" summary="Reabrir orientações e guardar seu progresso"><UserGuide/></SettingsSection>
-        </>
-      ) : null}
+            </>) : null,
+          }}
+        </ProfileTabs>
+      )} />
     </section>
   );
 }

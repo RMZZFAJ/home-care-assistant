@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import sharp from "sharp";
 import { randomUUID, createHash } from "node:crypto";
@@ -22,7 +23,7 @@ async function login(page: Page) {
 }
 async function openPhoto(page: Page) {
   await page.goto("/perfil");
-  await page.getByRole("button", { name: "Foto de perfil", exact: true }).click();
+  await selectProfileSection(page, "identity");
   const panel = page.getByRole("region", { name: "Troca da foto de perfil", exact: true });
   await expect(panel.getByLabel("Nova foto", { exact: true })).toBeVisible();
   await expect(panel.getByRole("button", { name: "Atualizar consulta da foto", exact: true })).toHaveAttribute("aria-disabled", "false");
@@ -54,7 +55,7 @@ test("foto recupera commit com resposta perdida pela chave original, sem duplica
   await login(page); const panel = await openPhoto(page), count = objects().length;
   expect((await (await page.request.get("/api/context")).json()).data.activeContext).toBeNull();
   const name = page.locator('input[name="name"]');
-  if (!(await name.isVisible())) await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
+  if (!(await name.isVisible())) await selectProfileSection(page, "identity");
   await name.fill("Nome em edição durante a troca de foto");
   let holdReads = true;
   let key = "", reference = "";

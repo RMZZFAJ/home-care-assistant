@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { credentialFixture, credentialRead, reviewPacket, credentialHistory, fixtures, rpc } from "../integration/credential-fixtures.mjs";
 import { officialState } from "../integration/private-draft-fixtures.mjs";
@@ -102,7 +103,7 @@ test("titular altera credencial no próprio perfil; família recebe409 sem rebas
   const owner = await browser.newContext();
   try {
     const own = await owner.newPage(); await login(own, f, f.subject.email);
-    await own.goto("/perfil"); await own.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
+    await own.goto("/perfil"); await selectProfileSection(own, "identity");
     await own.getByLabel("Nome", { exact: true }).fill("Cuidadora fictícia");
     await own.getByLabel("Categoria profissional", { exact: true }).fill("Cuidadora");
     await own.getByLabel("Registro profissional", { exact: true }).fill("");

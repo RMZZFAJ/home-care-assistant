@@ -1,12 +1,11 @@
 # Operação por paciente
 
-Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
-Este guia descreve percursos existentes e invariantes; B2/B3 mostram
-exceções sem conclusão adequada em COM parcial, cancelamento ENT com consumo,
-sucessão, relato textual e produto inativo. Não há aprovação de operação real.
-Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
-em [C](../audits/C/README.md); decisões aprovadas não equivalem a
-implementação.
+Este guia descreve percursos implementados e seus invariantes na D-B.
+A base AS_IS `37cb7f85e96e551d6419871f94dd950712e2565b` e os achados B2/B3
+permanecem históricos; não descrevem automaticamente as limitações atuais.
+O [acompanhamento principal](../../TEMP_D_B_ATUALIZACAO.md) distingue entregas,
+validação pendente e próximos gates. Não há liberação operacional. Planos
+em [C](../audits/C/README.md) conservam seu caráter de especificação.
 
 ## Acesso e navegação
 
@@ -15,6 +14,15 @@ Fichas, Histórico, Estoque e Administração. As ações seguem capacidades
 efetivas desse vínculo; administração global é independente da função local.
 O sino reúne atualizações do paciente e o perfil permite editar identidade,
 foto, registro profissional, preferências, contatos e sessões.
+
+Meu perfil reúne as abas Meu perfil, Segurança, Avisos e aplicativo,
+Dispositivos e Ajuda. Dados pessoais, foto e vínculos ficam em Meu perfil;
+senha, autenticador, contatos e sessões ficam em Segurança. Avisos e aplicativo
+reúne instalação, atualização, ativação de avisos e preferência de ciência;
+Dispositivos permite consultar, pausar e desativar inscrições da própria conta.
+A troca de aba conserva os campos e as confirmações em andamento, sem salvar
+automaticamente o preenchimento comum. Instalação, permissão de avisos,
+inscrição e entrega continuam sendo estados diferentes.
 
 Um administrador global cria pacientes e configura os primeiros
 administradores locais. Alterações críticas exigem proposta e aprovação de

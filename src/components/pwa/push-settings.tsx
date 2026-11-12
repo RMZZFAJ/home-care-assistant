@@ -1,10 +1,11 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";
 import { api, ApiError } from "@/lib/client/api";
 import { pushContextReference, pushDevice, pushDevices } from "@/lib/push/subscription";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { SettingsSection } from "@/components/forms/settings-section";
+import { Icon } from "@/components/ui/primitives";
 import { usePwa } from "./pwa-provider";
 
 const receipt = z
@@ -41,11 +42,12 @@ async function fingerprintOf(endpoint: string) {
     byte.toString(16).padStart(2, "0"),
   ).join("");
 }
-export function PushSettings() {
+export type PushSettingsSections = { consent: ReactNode; devices: ReactNode };
+export function PushSettings({ renderSections }: { renderSections?: (sections: PushSettingsSections) => ReactNode } = {}) {
   const userId = useWorkspaceState().data?.userId;
-  return userId ? <PersonalPushSettings key={userId} userId={userId} /> : null;
+  return userId ? <PersonalPushSettings key={userId} userId={userId} renderSections={renderSections} /> : null;
 }
-function PersonalPushSettings({ userId }: { userId: string }) {
+function PersonalPushSettings({ userId, renderSections }: { userId: string; renderSections?: (sections: PushSettingsSections) => ReactNode }) {
   const pwa = usePwa();
   const [data, setData] = useState<z.infer<typeof receipt> | null>(null);
   const [capable, setCapable] = useState<boolean | null>(null),
@@ -199,7 +201,12 @@ function PersonalPushSettings({ userId }: { userId: string }) {
       if (alive()) setError((reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração.") + " Consulte o estado atual antes de repetir.");
     } finally { if (alive()) setBusy(false); }
   }
-  return (
+  const feedback = <>
+      {error ? <p role="alert">{error}</p> : null}
+      {message ? <p role="status">{message}</p> : null}
+      {reading ? <p role="status">Consultando aparelhos…</p> : null}
+  </>;
+  const consent = (
     <SettingsSection
       title="Avisos neste aparelho"
       summary="Permissão, privacidade e aparelhos da sua conta"
@@ -214,9 +221,7 @@ function PersonalPushSettings({ userId }: { userId: string }) {
         decisões ou recebimentos. Ao sair, esta sessão deixa de receber novos
         avisos.
       </p>
-      {error ? <p role="alert">{error}</p> : null}
-      {message ? <p role="status">{message}</p> : null}
-      {reading ? <p role="status">Consultando aparelhos…</p> : null}
+      {feedback}
       {capable === false ? (
         <p>
           Este navegador não oferece avisos neste modo. Continue usando a
@@ -267,6 +272,14 @@ function PersonalPushSettings({ userId }: { userId: string }) {
           {pwa.worker !== "ready" || pwa.runtime !== "ready" ? <p role="status">Aguarde a preparação do aplicativo neste aparelho antes de ativar avisos. Consulte a seção Aplicativo neste aparelho para verificar ou recuperar essa preparação.</p> : null}
         </div>
       ) : null}
+      <button type="button" className="ui-button ui-button-secondary" disabled={reading || busy || pwa.offline} onClick={() => void load()}>
+        Consultar aparelhos novamente
+      </button>
+    </SettingsSection>
+  );
+  const devices = (
+    <SettingsSection title="Aparelhos com avisos" summary="Inscrições da sua conta, pausas e desativação">
+      {feedback}
       <button
         type="button"
         className="ui-button ui-button-secondary"
@@ -278,16 +291,18 @@ function PersonalPushSettings({ userId }: { userId: string }) {
       {data?.devices.length === 0 ? (
         <p>Nenhum aparelho vinculado a esta conta.</p>
       ) : null}
-      <ul className="space-y-3">
+      <ul className="hca-profile-devices">
         {data?.devices.map((device) => {
           const paused =
             device.mutedUntil && Date.parse(device.mutedUntil) > checkedAt;
           return (
-            <li key={device.id} className="ui-card">
-              <p>
-                <strong>{device.label}</strong>
+            <li key={device.id} className="hca-profile-device">
+              <Icon name="phone" />
+              <div>
+              <h3>
+                <span>{device.label}</span>
                 {device.fingerprint === fingerprint ? " · Este aparelho" : ""}
-              </p>
+              </h3>
               <p>
                 {device.state === "revoked"
                   ? "Desativado"
@@ -305,8 +320,9 @@ function PersonalPushSettings({ userId }: { userId: string }) {
                   atual.
                 </p>
               ) : null}
+              </div>
               {device.state === "active" ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="hca-profile-device-actions">
                   <button
                     type="button"
                     className="ui-button ui-button-secondary"
@@ -333,4 +349,5 @@ function PersonalPushSettings({ userId }: { userId: string }) {
       </ul>
     </SettingsSection>
   );
+  return renderSections ? renderSections({ consent, devices }) : <>{consent}{devices}</>;
 }

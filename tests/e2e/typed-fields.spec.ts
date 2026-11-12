@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { createHmac, randomUUID } from "node:crypto";
 import { setup, actor, fixtures } from "../integration/v4-fixtures.mjs";
@@ -100,11 +101,11 @@ test("CFinal019 login, nova senha e OTP usam contratos distintos sem persistir d
   try {
     expect((await client.auth.mfa.challengeAndVerify({ factorId: factor, code: totp(enrolled.data!.totp.secret) })).error).toBeNull();
     await login(page, "family", undefined, true); await page.goto("/perfil");
-    await page.getByRole("button", { name: "Alterar senha", exact: true }).click();
+    await selectProfileSection(page, "security");
     const current = page.getByLabel("Senha atual", { exact: true }), next = page.getByLabel("Nova senha", { exact: true });
     await expect(current).toHaveAttribute("autocomplete", "current-password"); expect(await current.getAttribute("minlength")).toBeNull();
     await expect(next).toHaveAttribute("autocomplete", "new-password"); await expect(next).toHaveAttribute("minlength", "12");
-    await page.getByRole("button", { name: "Autenticação em duas etapas", exact: true }).click();
+    await selectProfileSection(page, "security");
     const code = page.getByLabel("Código do autenticador", { exact: true });
     await expect(code).toBeVisible(); await expect(code).toHaveAttribute("inputmode", "numeric"); await expect(code).toHaveAttribute("autocomplete", "one-time-code");
     await expect(page.getByAltText("QR privado para cadastrar seu autenticador", { exact: true })).toHaveCount(0);
@@ -114,7 +115,7 @@ test("CFinal019 login, nova senha e OTP usam contratos distintos sem persistir d
     const stored = await page.evaluate(() => [...Array(localStorage.length).keys()].map(index => localStorage.key(index)!).filter(key => /draft/i.test(key)));
     expect(stored).toEqual([]);
     await code.fill("000012"); await page.reload();
-    await page.getByRole("button", { name: "Autenticação em duas etapas", exact: true }).click();
+    await selectProfileSection(page, "security");
     await expect(page.getByLabel("Código do autenticador", { exact: true })).toHaveValue("");
   } finally { expect((await client.auth.mfa.unenroll({ factorId: factor })).error).toBeNull(); }
 });

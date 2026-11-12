@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
@@ -44,7 +45,7 @@ test("CFinal021 conta alheia tem revisão global própria e não atravessa Meu p
     const restored = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin" && response.request().method() === "POST");
     await review.getByRole("button", { name: "Confirmar conta global", exact: true }).click(); expect((await restored).ok()).toBe(true);
     await expect.poll(() => profile(target)).toEqual(before);
-    await page.goto("/perfil"); await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
+    await page.goto("/perfil"); await selectProfileSection(page, "identity");
     await expect(page.getByLabel("Nome", { exact: true })).toHaveValue(ownBefore.fullName);
     await login(page, "adminA", f.patient);
     expect((await page.request.get("/api/admin?section=profiles")).status()).toBe(403);
@@ -140,7 +141,7 @@ test("perfil recebe invalidação externa e senha nova conserva limites em carac
   try {
     await rpc(f.admin, "update_my_profile", { p_name: name, p_registration: "", p_state: null, p_category: "", p_preferences: {} });
     await expect(page.getByLabel("Menu do usuário", { exact: true })).toContainText(name);
-    await page.getByRole("button", { name: "Alterar senha", exact: true }).first().click();
+    await selectProfileSection(page, "security");
     const password = page.getByLabel("Nova senha", { exact: true });
     await expect(password).toHaveAttribute("minlength", "12"); await expect(password).toHaveAttribute("maxlength", "72");
     await expect(password).toHaveAttribute("autocomplete", "new-password");
