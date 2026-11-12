@@ -74,10 +74,10 @@ export const scheduleResourceFieldsSchema = z.discriminatedUnion("form", [
       operation: z.enum(["change", "propose_change", "cancel"]),
       professionalId: selection,
       start: text(16).refine((v) =>
-        /^(?:|\d{4}-\d{2}-\d{2}T\d{2}:\d{2})$/.test(v),
+        /^(?:\d{4}-\d{2}-\d{2}T\d{2}:\d{2})?$/.test(v),
       ),
       end: text(16).refine((v) =>
-        /^(?:|\d{4}-\d{2}-\d{2}T\d{2}:\d{2})$/.test(v),
+        /^(?:\d{4}-\d{2}-\d{2}T\d{2}:\d{2})?$/.test(v),
       ),
       notes: text(2000),
       reason: text(1000),

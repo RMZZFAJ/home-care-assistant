@@ -1,6 +1,6 @@
 # Complementos posteriores à ordem D-B
 
-## SonarCloud — adiamento autorizado
+## SonarCloud — adiamento anterior e reabertura em 12/11/2026
 
 Em06/11/2026, America/Sao_Paulo, durante a execução D-B, o responsável determinou:
 
@@ -14,6 +14,12 @@ prossegue. O estado observado do provedor permanece registrado, sem atribuir
 aprovação a Quality Gate falho ou não configurado. As correções já implementadas
 e suas evidências são preservadas. CI funcional, testes, contratos e gates D-C
 mantêm os requisitos aplicáveis da ordem.
+
+Em12/11/2026 o responsável reabriu expressamente a análise dos avisos,
+erros e recomendações do Sonar e do Supabase, autorizando correções pertinentes
+na missão atual. O adiamento acima permanece histórico; o estado vigente é
+**OWNER_REOPENED_SONAR_REVIEW_2026_11_12**. A revisão não autoriza enfraquecer
+regras, presumir aprovação do provedor, alterar produção ou retirar contraprovas.
 
 ## Eficiência da execução — 07/11/2026
 

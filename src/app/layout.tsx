@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import "./globals.css";
 import "./design-system.css";
@@ -15,6 +15,11 @@ export const metadata: Metadata = {
     "Gestão segura de requisições de insumos para assistência domiciliar.",
   appleWebApp: { capable: true, title: "Home Care", statusBarStyle: "default" },
   icons: { apple: "/pwa/apple-180.png" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#173b3a",
+  colorScheme: "light",
 };
 
 export default function RootLayout({

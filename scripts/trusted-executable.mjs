@@ -5,6 +5,8 @@ export function trustedExecutable(name) {
   const windows = {
     git: ["C:\\Program Files\\Git\\cmd\\git.exe", "C:\\Program Files\\Git\\bin\\git.exe"],
     docker: ["C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe"],
+    whoami: ["C:\\Windows\\System32\\whoami.exe"],
+    icacls: ["C:\\Windows\\System32\\icacls.exe"],
   };
   const unix = { git: ["/usr/bin/git", "/bin/git"], docker: ["/usr/bin/docker", "/usr/local/bin/docker"] };
   const candidates = (process.platform === "win32" ? windows : unix)[name];

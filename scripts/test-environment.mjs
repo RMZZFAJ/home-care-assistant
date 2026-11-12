@@ -173,8 +173,10 @@ export function sql(statement) {
       "-v",
       "ON_ERROR_STOP=1",
     ],
-    { input: statement, encoding: "utf8" },
+    { input: statement, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
   );
+  if (result.error)
+    throw new Error(`Local SQL process failed: ${result.error.code ?? "UNKNOWN"}`, { cause: result.error });
   if (result.status !== 0)
     throw new Error(`Local SQL failed: ${result.stderr.trim()}`);
   return result.stdout.trim();

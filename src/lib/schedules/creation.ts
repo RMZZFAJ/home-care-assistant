@@ -15,10 +15,10 @@ export const scheduleTypeFields = z
     form: z.literal("type"),
     name: text(100),
     start: text(8).refine((v) =>
-      /^(?:|(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?)$/.test(v),
+      /^(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?)?$/.test(v),
     ),
     duration: text(32).refine((v) =>
-      /^(?:|-?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)$/.test(v),
+      /^(?:-?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)?$/.test(v),
     ),
     active: z.boolean(),
   })

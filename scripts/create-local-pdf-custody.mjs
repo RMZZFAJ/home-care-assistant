@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { randomBytes, X509Certificate, createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
+import { trustedExecutable } from "./trusted-executable.mjs";
 
 // Local provisioning only. Never uploads secrets or activates an external service.
 const [targetArg, version] = process.argv.slice(2);
@@ -27,10 +28,10 @@ if (
   throw new Error("Custody must be a new directory outside the workspace");
 await mkdir(target, { mode: 0o700 });
 if (process.platform === "win32") {
-  const user = spawnSync("whoami", [], { encoding: "utf8", windowsHide: true });
+  const user = spawnSync(trustedExecutable("whoami"), [], { encoding: "utf8", windowsHide: true });
   if (user.status !== 0) throw new Error("Cannot identify custody owner");
   const acl = spawnSync(
-    "icacls",
+    trustedExecutable("icacls"),
     [target, "/inheritance:r", "/grant:r", user.stdout.trim() + ":(OI)(CI)F"],
     { encoding: "utf8", windowsHide: true },
   );

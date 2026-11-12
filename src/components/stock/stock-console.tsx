@@ -68,6 +68,9 @@ function PatientStock({
   const [custody, setCustody] = useState(initialCustody);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({ productId: "", from: "", to: "" });
+  const [filterFields, setFilterFields] = useState(filters);
+  const changeFilter = (field: keyof typeof filters, value: string) =>
+    setFilterFields(current => ({ ...current, [field]: value }));
   const [operation, setOperation] = useState("inbound");
   const [movementEditor, setMovementEditor] = useState<HTMLElement | null>(
     null,
@@ -135,6 +138,7 @@ function PatientStock({
         onStockFilter={(productId, location) => {
           setCustody(location);
           setFilters((current) => ({ ...current, productId }));
+          setFilterFields((current) => ({ ...current, productId }));
           setPage(1);
           historyHeadingRef.current?.focus();
         }}
@@ -402,7 +406,8 @@ function PatientStock({
               <select
                 className={inputClass}
                 name="productId"
-                defaultValue={filters.productId}
+                value={filterFields.productId}
+                onChange={event => changeFilter("productId", event.currentTarget.value)}
               >
                 <option value="">Todos</option>
                 {products.map((product) => (
@@ -418,7 +423,8 @@ function PatientStock({
                 className={inputClass}
                 type="date"
                 name="from"
-                defaultValue={filters.from}
+                value={filterFields.from}
+                onChange={event => changeFilter("from", event.currentTarget.value)}
               />
             </label>
             <label className="text-sm">
@@ -427,7 +433,8 @@ function PatientStock({
                 className={inputClass}
                 type="date"
                 name="to"
-                defaultValue={filters.to}
+                value={filterFields.to}
+                onChange={event => changeFilter("to", event.currentTarget.value)}
               />
             </label>
             <button className={primaryClass}>Aplicar filtros</button>

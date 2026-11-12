@@ -10,7 +10,7 @@ export function isDocumentAccessReport(request: Request) {
     || !/^\/api\/documents\/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\/access$/i.test(url.pathname)) return false;
   try {
     const body = request.postDataJSON() as { key?: unknown; referenceVersion?: unknown };
-    return body !== null && typeof body === "object" && Object.keys(body).sort().join(",") === "key,referenceVersion"
+    return body !== null && typeof body === "object" && Object.keys(body).sort((left, right) => left < right ? -1 : left > right ? 1 : 0).join(",") === "key,referenceVersion"
       && typeof body.key === "string" && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(body.key)
       && typeof body.referenceVersion === "number" && Number.isInteger(body.referenceVersion) && body.referenceVersion > 0 && body.referenceVersion <= 2147483647;
   } catch { return false; }

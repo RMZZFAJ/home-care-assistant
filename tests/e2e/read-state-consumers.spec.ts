@@ -31,10 +31,10 @@ test("D3 perfil termina carregamento em falha recupera a leitura e preserva edi�
     await page.goto("/perfil?careRecipientId=" + f.patient); await first;
     const panel = page.getByRole("region", { name: "Perfil pessoal", exact: true });
     await expect(panel.getByText("Carregando perfil…", { exact: true })).toBeVisible();
-    mode = "error"; release(); await expect(panel.getByRole("heading", { name: "Identidade pessoal", exact: true })).toBeVisible();
+    release(); await expect(panel.getByRole("heading", { name: "Identidade pessoal", exact: true })).toBeVisible();
     await selectProfileSection(page, "identity");
     const name = panel.getByLabel("Nome", { exact: true }); await name.fill("Edição pessoal ainda não salva");
-    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    mode = "error"; await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do perfil");
     await expect(panel.getByText("Carregando perfil…", { exact: true })).toHaveCount(0);
     await expect(panel.getByText("Atualizando consulta do perfil…", { exact: true })).toHaveCount(0);

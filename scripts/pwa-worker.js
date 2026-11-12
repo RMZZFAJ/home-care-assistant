@@ -81,6 +81,8 @@ self.addEventListener("activate", (event) => {
   );
 });
 self.addEventListener("message", (event) => {
+  // A MessagePort is only a reply channel, never evidence of the sender's origin.
+  if (event.origin !== self.location.origin || event.source?.type !== "window") return;
   if (event.data?.type === "HCA_RUNTIME" && event.ports[0])
     event.ports[0].postMessage(BUILD);
 });
@@ -156,7 +158,7 @@ self.addEventListener("fetch", (event) => {
     !url.pathname.endsWith(".pdf")
   ) {
     event.respondWith(
-      fetch(request).catch(async () => {
+      fetch(request, { cache: "no-store" }).catch(async () => {
         const fallback = await (
           await caches.open(CACHE)
         ).match("/offline.html");

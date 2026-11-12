@@ -63,7 +63,7 @@ export async function pdfIssuanceReference(page: Page, documentId: string, bytes
   const pdf = await PDFDocument.load(bytes, { updateMetadata: false });
   const raw = JSON.parse(pdf.catalog.lookup(PDFName.of("HCAIssuance"), PDFHexString).decodeText());
   if (typeof raw.id === "string") { expect(raw.rendererRevision).toBeLessThan(16); return raw; }
-  expect(Object.keys(raw).sort()).toEqual(["requestedAt", "verificationCode"]);
+  expect(Object.keys(raw).sort((left, right) => left < right ? -1 : left > right ? 1 : 0)).toEqual(["requestedAt", "verificationCode"]);
   let query = "";
   const seen = new Set<string>();
   while (true) {

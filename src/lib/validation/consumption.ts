@@ -126,7 +126,12 @@ type Cursor = z.infer<typeof consumptionCursor>;
 function comparePosition(left: Cursor, right: Cursor) {
   const instant = Date.parse(left.at) - Date.parse(right.at);
   if (instant) return Math.sign(instant);
-  const fraction = (value: string) => (value.match(/\.(\d+)/)?.[1] ?? "").replace(/0+$/, "").padEnd(9, "0");
+  const fraction = (value: string) => {
+    const digits = value.match(/\.(\d+)/)?.[1] ?? "";
+    let end = digits.length;
+    while (end > 0 && digits[end - 1] === "0") end--;
+    return digits.slice(0, end).padEnd(9, "0");
+  };
   const a = fraction(left.at), b = fraction(right.at);
   if (a !== b) return a > b ? 1 : -1;
   const leftId = left.id.toLowerCase(), rightId = right.id.toLowerCase();

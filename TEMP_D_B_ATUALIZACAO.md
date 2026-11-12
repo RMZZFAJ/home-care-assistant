@@ -79,12 +79,20 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Outras áreas visuais | Três composições e quatro relações restantes fechadas |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Critérios finais e validação do candidato publicado |
-| Incremento atual | Suporte, continuidade e CI iOS |
+| Incremento atual | Correções de CI, PWA e avisos do Supabase/Sonar |
 | Resultado local | 66 composições; 164 relações conferidas |
-| Banco | Local e remoto em 238, sem atualizações pendentes |
+| Banco | Local e remoto em 240, sem atualizações pendentes |
 | CI de 0dbd2ba | Linux/Windows/banco/Chromium passaram; iOS cortado |
 | Preview de 0dbd2ba | Concluído na Vercel; produção preservada |
-| CI deste incremento | Pendente; limite iOS corrigido, diagnóstico preservado |
+| CI de 4d5e908 | Linux/Windows/banco/iOS-1 passaram; browser em correção |
+
+**Correções do fechamento:** os campos de filtro do estoque conservam a edição
+mesmo com atualização em segundo plano. A PWA mantém a aparência aprovada,
+confere a origem das mensagens e evita reaproveitar HTML pela rede. Cinco
+percursos finais passaram, incluindo estoque/iOS, painel técnico/iOS, Preview
+protegido, atualização entre abas e PDF privado/offline. As duas migrations
+novas já estão no remoto; onze avisos de consultas de identidade desapareceram.
+As27 correções do Sonar aguardam sua reanálise automática, sem aprovação fictícia.
 
 **Resultado utilizável do lote 6:** Administração global → Monitoramento e
 suporte reúne visão técnica, continuidade, residências/contas e eventos/política.
@@ -99,6 +107,13 @@ Esse endereço acompanha as atualizações; prefira-o para instalar a PWA.
 A autenticação da Vercel continua obrigatória. No Preview de f3f3fa8, o login
 respondeu corretamente e a aplicação informou compatibilidade pronta. Isso não
 substitui testar os fluxos autenticados nem o reteste físico do S24 Ultra.
+
+**Ajuste final local, ainda não publicado:** as cores declaradas para o navegador,
+a instalação e a página pública sem conexão agora seguem o Modelo Integral.
+Foram conferidos os metadados, a página em celular, a atualização com duas abas
+e o acesso protegido por cookie. O cache continua restrito aos quatro arquivos
+públicos. A publicação será agrupada com o fechamento da CI; a instalação física
+continua sendo uma tarefa sua com apoio de Codex.
 
 Backup e recuperação fecharam no escopo de software: uma nova cópia cifrada foi
 autenticada e restaurada isoladamente, com tabelas, arquivos e emissões prontas
@@ -163,7 +178,8 @@ conteúdo/contrato e oito percursos em Chromium/iOS, em rodadas compatíveis.
 Incluem seleção, período, resposta perdida, bytes preservados e autorização.
 O teste original entre duas sessões passou na reprodução local separada.
 As migrations foram reconciliadas. CI própria, revisão humana, aparelho físico
-e os demais gates mantêm seus requisitos; Sonar permanece adiado.
+e os demais gates mantêm seus requisitos. O adiamento anterior do Sonar foi
+substituído pela revisão reaberta em12/11.
 
 **Validação do ciclo das chaves:** quatro exercícios completos, os três
 consumidores anteriores dos provedores e dezesseis casos de assinatura e
@@ -1192,7 +1208,10 @@ disponibilidade total do serviço.
   o piloto com a equipe. Codex apoia e corrige defeitos constatados.
 - **Concluir verificações automáticas e tratar qualidade do código** — A CI
   do candidato publicado precisa passar; acompanhamento e correções são de
-  Codex. Sonar permanece adiado por sua decisão, sem PASS. O resultado corrente
+  Codex. A revisão do Sonar foi reaberta por você em12/11:27 apontamentos receberam
+  correções locais, com65 testes dirigidos aprovados. A reanálise do commit ainda
+  é necessária; os demais alertas passam por avaliação de contexto. O resultado
+  corrente
   é consultado nas [verificações da PR](https://github.com/RMZZFAJ/home-care-assistant/pull/7/checks).
 
 #### 19 — Validação final, migrations e encerramento D-B
@@ -1214,7 +1233,8 @@ Pontos de verificação:
 **O que falta:** a CI confirmar instalação limpa, evolução e conjunto integrado
 no candidato publicado, com correção de qualquer falha efetiva. O schema está
 reconciliado e as responsabilidades externas estão separadas no grupo 4.
-Sonar permanece adiado. O resultado vivo da CI pertence às verificações da PR;
+A revisão do Sonar foi reaberta em12/11 e integra este fechamento. O resultado
+vivo da CI pertence às verificações da PR;
 este arquivo não exige outro relato manual a cada mudança de um job.
 
 ### 3.9 Refatoração visual de todo o sistema
@@ -1833,8 +1853,9 @@ para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passa
 ### Gates externos e adiamentos
 
 A etapa 20 (grupo 4) conserva avaliação humana, aparelho físico e fornecedores.
-SonarCloud e a reformulação/expansão de rascunhos estão adiados expressamente
-pelo responsável. Nenhum recebe PASS por adiamento. As responsabilidades de
+A reformulação/expansão de rascunhos permanece adiada expressamente pelo
+responsável. A revisão do Sonar foi retomada em12/11. Nenhum adiamento recebe
+PASS. As responsabilidades de
 implementação continuam com Codex; dependência externa não encobre código
 faltante.
 

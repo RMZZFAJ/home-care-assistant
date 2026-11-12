@@ -103,7 +103,7 @@ function PersonChoice({label,field,invalid=false,people,value,change,multiple=fa
 }
 function ZoneChoice({value,change,invalid=false}:{value?:string;change:(zone:string|undefined)=>void;invalid?:boolean}) {
   const [query,setQuery]=useState<string|null>(null),zones=[...Intl.supportedValuesOf("timeZone"),"UTC"];
-  return <div className="hca-preparation-field"><label id="preparation-zone">Fuso de referência da residência</label><SearchSelect
+  return <div className="hca-preparation-field"><label id="preparation-zone" htmlFor="preparation-timeZone">Fuso de referência da residência</label><SearchSelect
     id="preparation-timeZone"
     aria-invalid={invalid}
     aria-describedby={invalid?"preparation-validation-error":undefined}

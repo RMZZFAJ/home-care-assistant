@@ -244,14 +244,14 @@ export function snapshotFacts(body: Record<string, unknown>): { facts: HistoryFa
         const obj = record(item), identity = typeof obj.id === "string" ? obj.id : typeof obj.lineId === "string" ? obj.lineId : String(index);
         const name = obj.name_snapshot ?? obj.product_name_snapshot ?? obj.custom_name ?? names.get(obj.lineId ?? obj.id);
         const itemLabel = typeof name === "string" ? `${label} · ${name}` : `${label} · registro ${index + 1}`;
-        if (Object.keys(obj).length) for (const child of Object.keys(obj).sort()) visit(obj[child], child, `${path}/${identity}/${child}`, itemLabel);
+        if (Object.keys(obj).length) for (const child of Object.keys(obj).sort((left, right) => left < right ? -1 : left > right ? 1 : 0)) visit(obj[child], child, `${path}/${identity}/${child}`, itemLabel);
         else facts.push({ key: `${path}/${identity}`, label: itemLabel, value: scalar(item, key, path) });
       });
     } else if (value !== null && typeof value === "object") {
-      for (const child of Object.keys(record(value)).sort()) visit(record(value)[child], child, `${path}/${child}`, label);
+      for (const child of Object.keys(record(value)).sort((left, right) => left < right ? -1 : left > right ? 1 : 0)) visit(record(value)[child], child, `${path}/${child}`, label);
     } else facts.push({ key: path, label, value: scalar(value, key, path) });
   };
-  for (const key of Object.keys(body).sort()) visit(body[key], key, key, "");
+  for (const key of Object.keys(body).sort((left, right) => left < right ? -1 : left > right ? 1 : 0)) visit(body[key], key, key, "");
   return { facts, additionalFields };
 }
 

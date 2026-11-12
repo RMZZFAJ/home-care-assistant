@@ -73,13 +73,18 @@ test("NOT05 global attempt consultation keeps real source, minimizes data and re
   let mode="error";
   await page.route("**/api/operations/notifications?*",async route=>{
     if(mode==="error")return route.fulfill({status:503,json:{error:"Consulta de tentativas controlada indisponível."}});
-    if(mode==="mismatch") {const result=await route.fetch();const body=await result.json();body.data.source="notices";return route.fulfill({response:result,json:body});}
+    // A wrong page remains structurally valid for empty and populated databases.
+    // Changing source alone also invalidates nonempty rows, reaching a different check.
+    if(mode==="mismatch") {const result=await route.fetch();const body=await result.json();body.data.page+=1;return route.fulfill({response:result,json:body});}
     return route.continue();
   });
-  const refresh=scope.getByRole("button",{name:"Atualizar tentativas",exact:true});await refresh.click();
+  const refresh=scope.getByRole("button",{name:"Atualizar tentativas",exact:true});
+  // WebKit does not focus a native button on pointer click on every platform.
+  // Establish keyboard focus before testing its preservation across read failure.
+  await refresh.focus();await expect(refresh).toBeFocused();await refresh.press("Enter");
   await expect(scope.getByRole("alert")).toContainText("Consulta de tentativas controlada indisponível.");await expect(refresh).toBeFocused();
   await expect(scope).toContainText("Última consulta confirmada preservada");
-  mode="mismatch";await refresh.click();await expect(scope.getByRole("alert")).toContainText("Consulta de tentativas sem confirmação reconhecível.");
+  mode="mismatch";await refresh.click();await expect(scope.getByRole("alert")).toContainText("As tentativas não correspondem à consulta atual. Consulte novamente.");
   await expect.poll(()=>scope.locator("li[data-technical-notification]").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("data-technical-notification")))).toEqual(expected.data.map((row:{id:string})=>row.id));
   mode="live";await refresh.click();await expect(scope.getByRole("alert")).toHaveCount(0);
   await scope.getByRole("combobox",{name:"Fonte das tentativas",exact:true}).selectOption("notices");

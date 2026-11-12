@@ -98,6 +98,18 @@ test("stock history visits more than100 native movements in exact order, resets 
   await history(page).getByRole("combobox", { name: "Produto", exact: true }).selectOption("");
   await history(page).getByLabel("De", { exact: true }).fill("");
   await history(page).getByLabel("Até", { exact: true }).fill("");
+  // A real-time refresh still uses the applied filters, without restoring
+  // their old defaults over the user's new, unapplied field values.
+  const revalidated = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname === "/api/stock/movements" && url.searchParams.get("from") === "2099-01-01";
+  });
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await (await revalidated).finished();
+  await expect(history(page)).toHaveAttribute("aria-busy", "false");
+  await expect(history(page).getByRole("combobox", { name: "Produto", exact: true })).toHaveValue("");
+  await expect(history(page).getByLabel("De", { exact: true })).toHaveValue("");
+  await expect(history(page).getByLabel("Até", { exact: true })).toHaveValue("");
   await history(page).getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect.poll(() => ids(page)).toEqual(order.slice(0, 20));
   expect(facts(f.patient)).toBe(before);

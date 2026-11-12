@@ -240,7 +240,7 @@ export async function runBackup({
       throw new Error("Backup verification mismatch.");
     const archivePath = join(root, "archives", sealed.backupId);
     await rename(staged, archivePath);
-    const previousDay = Object.keys(index.daily).sort().at(-1);
+    const previousDay = Object.keys(index.daily).sort((left, right) => left < right ? -1 : left > right ? 1 : 0).at(-1);
     index.entries[sealed.backupId] = {
       id: sealed.backupId,
       mode,

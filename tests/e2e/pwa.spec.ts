@@ -1,7 +1,7 @@
 import { selectProfileSection } from "./profile-sections";
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Page, type Route } from "@playwright/test";
 import { randomUUID, createHash } from "node:crypto";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
@@ -66,6 +66,11 @@ test("PWA real oferece manifesto, ícones e fallback público sem cache de API, 
   );
   const manifest = await page.request.get("/manifest.webmanifest");
   expect(manifest.status()).toBe(200);
+  const model = readFileSync("Home_Care_Assistant_Modelo_Integral.html", "utf8");
+  const theme = /<meta name="theme-color" content="([^"]+)"/.exec(model)![1];
+  const background = /--bg:([^;]+)/.exec(model)![1];
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", theme);
+  await expect(page.locator('meta[name="color-scheme"]')).toHaveAttribute("content", "light");
   expect(await manifest.json()).toMatchObject({
     id: "/",
     name: "Home Care Assistant",
@@ -73,6 +78,8 @@ test("PWA real oferece manifesto, ícones e fallback público sem cache de API, 
     start_url: "/",
     display: "standalone",
     lang: "pt-BR",
+    theme_color: theme,
+    background_color: background,
   });
   for (const size of [192, 512]) {
     const icon = await page.request.get(`/pwa/icon-${size}.png`);
@@ -119,8 +126,25 @@ test("PWA real oferece manifesto, ícones e fallback público sem cache de API, 
     await page.setViewportSize({ width, height: 950 });
     await audit(page, "PWA settings " + width);
   }
+  // Chromium may keep worker-owned fetches online while the frame is offline.
+  // Abort that real network leg; the real worker must still read its own cache.
+  const blockedWorkerNavigations: string[] = [];
+  const offlineWorkerNetwork = (route: Route) => {
+    if (route.request().serviceWorker()) {
+      blockedWorkerNavigations.push(new URL(route.request().url()).pathname);
+      return route.abort("internetdisconnected");
+    }
+    return route.continue();
+  };
+  await context.route("**/*", offlineWorkerNetwork);
   await context.setOffline(true);
-  await page.goto(`/historico/${f.doc.id}`);
+  const offlineNavigation = await page.goto(`/historico/${f.doc.id}`);
+  expect(offlineNavigation?.fromServiceWorker()).toBe(true);
+  expect(blockedWorkerNavigations).toContain(`/historico/${f.doc.id}`);
+  await info.attach("offline-navigation-delivery", { body: JSON.stringify({
+    fromServiceWorker: offlineNavigation?.fromServiceWorker(), status: offlineNavigation?.status(),
+    cacheControl: offlineNavigation?.headers()["cache-control"],
+  }), contentType: "application/json" });
   await expect(
     page.getByRole("heading", {
       name: "Sem conexão com o aplicativo",
@@ -128,6 +152,13 @@ test("PWA real oferece manifesto, ícones e fallback público sem cache de API, 
     }),
   ).toBeVisible();
   expect(await page.locator("body").innerText()).not.toContain(f.doc.code);
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", theme);
+  const referenceBackground = await page.evaluate(color => {
+    const style = document.createElement("div").style;
+    style.backgroundColor = color;
+    return style.backgroundColor;
+  }, background);
+  await expect(page.locator("body")).toHaveCSS("background-color", referenceBackground);
   expect(
     await page.evaluate(() =>
       fetch("/api/profile").then(
@@ -142,6 +173,7 @@ test("PWA real oferece manifesto, ícones e fallback público sem cache de API, 
     path: `output/playwright/phase-d/pwa-offline-${info.project.name}.png`,
     fullPage: true,
   });
+  await context.unroute("**/*", offlineWorkerNetwork);
   await context.setOffline(false);
   await page
     .getByRole("link", { name: "Tentar abrir novamente", exact: true })

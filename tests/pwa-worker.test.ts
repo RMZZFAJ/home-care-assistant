@@ -11,6 +11,7 @@ function environment(options: { requireCookie?: boolean; poison?: boolean; failP
   const handlers: Record<string, (event: Record<string, unknown>) => void> = {};
   const stores = new Map<string, Map<string, Response>>();
   const requested: Request[] = [];
+  const networkPolicies: { url: string; cache: RequestCache | undefined }[] = [];
   const shown: { title: string; options: NotificationOptions }[] = [],
     opened: string[] = [],
     messages: unknown[] = [];
@@ -70,8 +71,9 @@ function environment(options: { requireCookie?: boolean; poison?: boolean; failP
       Request,
       Response,
       crypto: webcrypto,
-      fetch: async (request: Request) => {
+      fetch: async (request: Request, init?: RequestInit) => {
         requested.push(request);
+        networkPolicies.push({ url: request.url, cache: init?.cache ?? request.cache });
         if (disconnected) throw new TypeError("Network unavailable");
         const file = files[new URL(request.url).pathname];
         if (file) {
@@ -105,6 +107,7 @@ function environment(options: { requireCookie?: boolean; poison?: boolean; failP
     handlers,
     stores,
     requested,
+    networkPolicies,
     shown,
     opened,
     messages,
@@ -144,6 +147,18 @@ it("PWA passes the same-origin access gate and caches only pinned public bytes w
     "push",
     "pushsubscriptionchange",
   ]);
+});
+it("runtime replies require a same-origin window client and never accept a foreign, opaque or port-only sender", () => {
+  const e = environment(), postMessage = vi.fn();
+  for (const sender of [
+    { origin: "https://attacker.example", source: { type: "window" } },
+    { origin: "null", source: { type: "window" } },
+    { origin: "https://care.example", source: null },
+    { origin: "https://care.example", source: { type: "worker" } },
+  ]) e.handlers.message({ ...sender, data: { type: "HCA_RUNTIME" }, ports: [{ postMessage }] });
+  expect(postMessage).not.toHaveBeenCalled();
+  e.handlers.message({ origin: "https://care.example", source: { type: "window" }, data: { type: "HCA_RUNTIME" }, ports: [{ postMessage }] });
+  expect(postMessage).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ revision: "sentinel-v1", protocol: 1 }));
 });
 it("a successful-looking authenticated/private response cannot replace even one pinned public asset", async () => {
   const e = environment({ poison: true });
@@ -263,6 +278,7 @@ it("private APIs, PDFs, framework data, query variants and commands cannot enter
   );
   expect(store.size).toBe(before);
   expect(store.has("/perfil")).toBe(false);
+  expect(e.networkPolicies.at(-1)).toEqual({ url: "https://care.example/perfil", cache: "no-store" });
 });
 it("offline navigation uses only public orientation, never a cached private page or a queued operation", async () => {
   const e = environment();

@@ -3,7 +3,87 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — contingência
+## Estado atual — revisão dos avisos do Supabase
+
+Local e remoto em240, sem migrations pendentes, após238→239→240.
+20261112214842 preserva as onze políticas, seus papéis e predicados sensíveis
+às linhas, usando initplan somente para auth.uid(). Acrescenta dois índices
+não únicos de authority_sessions e fecha o search_path de
+invitation_registration_allowed, sem mudar corpo, assinatura ou grants.
+20261112223005 preserva a view security_invoker de saldos e acrescenta uma
+condição necessária já exigida por recipient_role: algum vínculo ativo da
+pessoa real. Sem esse vínculo, evita percorrer todo o histórico para retornar
+vazio; continuam as verificações originais por paciente e custódia.
+
+A regressão com Auth real recusava a consulta sem vínculo por timeout sobre
+mais de20mil movimentos locais; após o filtro, o caso completo passou em0,96s.
+O teste positivo de retirada concorrente e aceitação ENT passou, preservando
+as duas custódias. A autoridade interna por transação também passou; sua saída
+excedia o limite padrão de1MiB do processo SQL diante de mais de5mil pacientes
+fictícios acumulados. O harness agora limita a16MiB e informa o código de erro
+do processo. Nenhum prazo, regra de acesso ou dado foi apagado para obter verde.
+
+Preflight: prefixo completo238, equivalência das políticas, corpos/configuração,
+ACL/RLS e opções das relações; dois índices novos válidos; view com somente o
+filtro adicional e aliases redundantes do segundo braço UNION. A primeira
+comparação recusou esses aliases; a diferença foi delimitada, sem alterar
+migrations já aplicadas. Snapshot de catálogo e dump nativo de esquema
+public/private de1.707.549bytes guardados fora do Git, com ACL do operador.
+O backup crítico237 e seu ensaio de evolução238 permanecem disponíveis; não
+houve nova reconstrução de dados sem mudança que a exigisse.
+
+Recheck imediatamente antes da escrita e dry-run exclusivos239/240. Pós-check:
+240versões, políticas, corpos/configuração/grants, view, relações e índices
+iguais ao local; dry-run vazio. Sem reset, fixtures/Auth remotos ou canais novos.
+Instalação limpa, evolução legada e integração completa seguem na CI do novo SHA.
+
+Advisors após a aplicação:
+
+- Performance: os11 [avisos de initplan](https://supabase.com/docs/guides/database/database-linter?lint=0003_auth_rls_initplan)
+  desapareceram; FKs sem índice124→122. Índices ainda sem uso76→78 incluem os
+  dois recém-criados. Não remover índices de unicidade/concorrência ou criar os
+  outros122 indiscriminadamente; priorizar consultas e planos demonstrados.
+- Segurança:69 tabelas RLS sem política, sendo61 privadas sem grants diretos e
+  oito públicas. Três destas têm SELECT authenticated, mas a ausência de política
+  recusa todas as linhas; não foi criada política permissiva para limpar aviso.
+  Os três RPCs anon são convites com token e verificação booleana documental
+  legada; seus limites foram inspecionados. Os233 RPCs authenticated usam a
+  arquitetura de comandos autorizados; o aviso não equivale a aprovação geral.
+- unaccent continua no schema public, com dependências legadas não qualificadas
+  e propriedade supabase_admin. Mover a extensão isoladamente quebraria essas
+  funções. Não houve relocação ou mudança de owner por conveniência do linter.
+- A proteção contra senhas vazadas está desabilitada. A [documentação do Auth](https://supabase.com/docs/guides/auth/password-security)
+  exige plano Pro ou superior; o plano não foi confirmado e não houve upgrade
+  pago ou alteração de Auth remoto. Registrar a ativação no ambiente elegível.
+- Saúde: nenhum aviso na consulta final. Os avisos mantidos continuam visíveis;
+  ausência de erro de saúde não constitui aprovação operacional.
+
+## Histórico — consulta técnica de tentativas (238)
+
+Local e remoto em 238, sem pendências. A migration
+20261112193250_phase_db_technical_notification_reads acrescenta somente a RPC
+operations_notification_attempts: consulta global autenticada, paginada e
+minimizada. Não cria tabelas, tentativa, reenvio ou acesso operacional local.
+Anon e service_role não têm execução; a autoridade global é conferida no corpo
+antes da leitura e novamente antes do retorno. Search_path vazio e referências
+qualificadas foram preservados.
+
+Preflight: prefixo completo de 237 versões, quatro dependências de autoridade,
+colunas e proteção das três fontes conferidos; função nova ausente e dry-run
+exclusivo de 238. Uma cópia crítica cifrada foi autenticada e restaurada em banco
+isolado, com evolução 237→238, sem cron/pg_net. O banco temporário foi removido.
+O ensaio preserva as diferenças delimitadas do catálogo e não aprova RPO/RTO.
+
+Pós-check: histórico 238/238, definição, configuração, grants e dependências
+iguais ao local após normalização de CRLF; proteção das fontes preservada e
+dry-run vazio. Regressão com Auth real, paginação 101+, ordem SQL independente,
+minimização e negativas está em tests/integration/technical-notifications.test.mjs;
+API e interface reais foram qualificadas em tests/e2e/operations-monitoring.spec.ts.
+Sem reset, fixtures/Auth remotos, alteração de canal ou produção. CI do SHA
+publicado continua gate próprio. O andamento corrente pertence ao
+[acompanhamento principal](../../../../TEMP_D_B_ATUALIZACAO.md).
+
+## Histórico — contingência
 
 Local e remoto em 237, sem pendências. Aplicado o conjunto pronto
 20261112115038, 20261112120018, 20261112120210, 20261112121722 e

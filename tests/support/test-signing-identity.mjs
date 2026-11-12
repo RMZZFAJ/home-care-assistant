@@ -5,6 +5,7 @@ import { join, dirname, basename } from "node:path";
 import { randomBytes, createHash, createECDH, X509Certificate } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { P12Signer } from "@libpdf/core";
+import { trustedExecutable } from "../../scripts/trusted-executable.mjs";
 
 /** Real ephemeral PKI. Private material never enters tracked fixtures or logs. */
 /** @param {{ keyVersion?: string, authority?: { certificateFile: string, keyFile: string, passwordFile: string } }} [options] */
@@ -37,14 +38,14 @@ export async function testSigningIdentity({ keyVersion = "ephemeral-test-v1", au
         throw new Error("Test PKI OpenSSL step failed: " + args[0]);
     };
     if (process.platform === "win32") {
-      const user = spawnSync("whoami", [], {
+      const user = spawnSync(trustedExecutable("whoami"), [], {
         encoding: "utf8",
         windowsHide: true,
       });
       if (user.status !== 0)
         throw new Error("Cannot identify local custody owner");
       const acl = spawnSync(
-        "icacls",
+        trustedExecutable("icacls"),
         [
           folder,
           "/inheritance:r",

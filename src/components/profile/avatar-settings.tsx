@@ -99,7 +99,7 @@ function AvatarContent() {
         <input ref={inputRef} className={inputClass} type="file" accept="image/jpeg,image/png,image/webp" disabled={busy || frozen} aria-invalid={Boolean(inputError)} aria-describedby={inputError ? "avatar-file-error" : undefined} onChange={event => { setFile(event.currentTarget.files?.[0] ?? null); setInputError(""); }} />
       </label>
       {inputError ? <p id="avatar-file-error" role="alert">{inputError}</p> : null}
-      <button className={buttonClass} aria-disabled={busy || !file || !data}>{pending || packet ? "Reenviar arquivo original" : "Salvar foto"}</button>
+      <button type="submit" className={buttonClass} aria-disabled={busy || !file || !data}>{pending || packet ? "Reenviar arquivo original" : "Salvar foto"}</button>
     </form>
     {pending || packet ? <div className="flex flex-wrap gap-3">
       <button type="button" className={buttonClass} aria-disabled={busy} onClick={() => void command("recover")}>Recuperar troca de foto</button>

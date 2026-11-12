@@ -15,5 +15,5 @@ export function selectionConfirmed(value:unknown,packet:SelectionCommand,ownerId
   const parsed=z.object({data:z.object({selection:selectionSchema,replayed:z.boolean()}).strict()}).safeParse(value);
   if(!parsed.success)return false;
   const row=parsed.data.data.selection;
-  return row.ownerId===ownerId&&row.patientId===packet.careRecipientId&&row.name===packet.name&&JSON.stringify([...row.productIds].sort())===JSON.stringify([...packet.productIds].sort());
+  return row.ownerId===ownerId&&row.patientId===packet.careRecipientId&&row.name===packet.name&&JSON.stringify([...row.productIds].sort((left, right) => left < right ? -1 : left > right ? 1 : 0))===JSON.stringify([...packet.productIds].sort((left, right) => left < right ? -1 : left > right ? 1 : 0));
 }

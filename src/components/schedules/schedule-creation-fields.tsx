@@ -191,7 +191,7 @@ export function ScheduleCreationFields({
               onChange={(e) =>
                 patch({
                   weekdays: e.currentTarget.checked
-                    ? [...value.weekdays, n].sort()
+                    ? [...value.weekdays, n].sort((left, right) => left - right)
                     : value.weekdays.filter((x) => x !== n),
                 })
               }

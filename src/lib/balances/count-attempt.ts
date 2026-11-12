@@ -24,7 +24,7 @@ const sameAttempt = (a: unknown, b: unknown) =>
     v && typeof v === "object" && !Array.isArray(v)
       ? Object.fromEntries(
           Object.keys(v)
-            .sort()
+            .sort((left, right) => left < right ? -1 : left > right ? 1 : 0)
             .map((k) => [k, v[k]]),
         )
       : v,
@@ -33,7 +33,7 @@ const sameAttempt = (a: unknown, b: unknown) =>
     v && typeof v === "object" && !Array.isArray(v)
       ? Object.fromEntries(
           Object.keys(v)
-            .sort()
+            .sort((left, right) => left < right ? -1 : left > right ? 1 : 0)
             .map((k) => [k, v[k]]),
         )
       : v,

@@ -8,7 +8,7 @@ export const modeEmission: PdfEmissionContext = { ...fidelityEmission, rendererR
 export function modeSource(type: "REQ"|"COM"|"ENT"|"BAL", mode: "expanded"|"audit" = "expanded", records = 2): DocumentSnapshot {
  const source = type === "COM" ? purchaseEntrySource().source : type === "ENT" ? regularizationSnapshot() : structuredClone(legacyFidelitySnapshots.find(row=>row.type===type)!);
  if(type==="REQ"||type==="BAL") {
-  source.id=modeId(type==="REQ"?1:2);source.version=3;source.status=type==="REQ"?"submitted":"submitted";
+  source.id=modeId(type==="REQ"?1:2);source.version=3;source.status="submitted";
   source.lines=[{id:modeId(5),product_name_snapshot:"Material essencial integral",name_snapshot:"Material essencial integral",unit_snapshot:"un",category_snapshot:"higiene",quantity:"2",urgent:false,current_stock:"2"}];
   source.payload={notes:"Observação original que nenhum filtro pode retirar."};
   source.workflow={countVersion:1};source.balanceReviews=undefined;

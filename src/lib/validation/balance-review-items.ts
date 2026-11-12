@@ -28,7 +28,7 @@ export type BalanceReviewItemOpinion = z.infer<typeof balanceReviewItemOpinion>;
 
 /** An omitted field is not examined; it must never become an inferred approval. */
 export function balanceReviewItemsFromFields(fields: Record<string, string>) {
-  return balanceReviewItems.parse(Object.keys(fields).filter(key => key.startsWith("item:")).sort().map(key => {
+  return balanceReviewItems.parse(Object.keys(fields).filter(key => key.startsWith("item:")).sort((left, right) => left < right ? -1 : left > right ? 1 : 0).map(key => {
     const value = balanceReviewItemFields.parse(JSON.parse(fields[key]));
     return { lineId: key.slice(5), result: value.result, forwarding: value.forwarding, comment: value.comment };
   }));
