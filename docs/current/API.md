@@ -11,7 +11,7 @@ O cliente conserva edições e bloqueia novos envios até recuperar compatibilid
 O contrato e os limites do worker estão em
 [PWA D5.1](../audits/D/D-B/PWA_RUNTIME.md).
 
-## Emissões documentais D4 em implementação local
+## Emissões documentais D4
 
 GET /api/documents/:id/issuances consulta20 registros por página, com cursor
 before/beforeId (par obrigatório). A leitura depende da sessão, contexto e
@@ -25,8 +25,9 @@ recupera a mesma intenção; mudança de seletor documental conflita. Cada nova
 chave explícita cria outra emissão, sem alterar documento, SCI ou estoque.
 Resposta200 exige ready;202 representa processamento ainda não concluído.
 
-A reserva atual usa reserve_pdf_issuance_v14: ENT nova recebe revisão14, COM
-recebe13, BAL12 e REQ10. Intenções anteriores mantêm revisão, fonte e identidade.
+A reserva atual usa reserve_pdf_issuance_v16 para novas emissões dos cinco
+modelos (REQ, COM, ENT, devolução e BAL). Intenções anteriores mantêm revisão,
+fonte e identidade, inclusive se recuperadas pela entrada nova.
 Além da fonte canônica preservada,
 balanceApplication congela
 o ato correspondente à contagem e ao corte de versão escolhidos. not_applied,
@@ -93,9 +94,29 @@ Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
 em [C](../audits/C/README.md); decisões aprovadas não equivalem a
 implementação.
 
-## Emissão V15 — cancelamento e complementos
+## Emissão V16 — composição aprovada e fatos preservados
 
-A emissão corrente congela cancelamento, ciências próprias e vínculos até a
+A composição usa Source Sans 3 incorporada, categorias, bandeira lateral quando
+aplicável, macroetapas, tabelas e observações completas, com continuidade entre
+páginas. A revisão identifica o contrato documental e preserva a recuperação de
+intenções antigas; não muda a versão pública do produto.
+
+presentationFacts congela o instante exato do corte, a função do autor no
+primeiro ato emitido e referências operacionais explicitamente preservadas.
+A função não é inferida do exportador nem de um importador histórico. As
+referências reversas da REQ usam eventos canônicos de COM/ENT até o corte,
+sem afirmar que o vínculo significa atendimento integral. Sem leitura da ficha
+relacionada, somente a indicação restrita é congelada. Perda posterior dessa
+leitura impede recuperar uma emissão que preservou a referência conhecida;
+outra emissão pode ser criada com o mascaramento vigente.
+
+O catálogo HCAIssuance do PDF V16 contém somente verificationCode e requestedAt.
+O vínculo com documento, versão, fonte, revisão e digest permanece no registro
+imutável de emissão; identificadores internos não são despejados no corpo
+operacional. Na ENT, recebimento pessoal, conciliação administrativa e quantidade
+ainda pendente são fatos distintos; pendente desconta aceito e conciliado.
+
+O ciclo herdado de V15 congela cancelamento, ciências próprias e vínculos até a
 versão solicitada. Referências autorizadas preservam código, protocolo,
 versão/hash, motivo, autor e instante do vínculo. Sem leitura do documento
 relacionado, a representação é restrita e não transporta esses dados. A guarda

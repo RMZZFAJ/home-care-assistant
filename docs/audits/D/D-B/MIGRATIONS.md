@@ -3,7 +3,34 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — DOC-B.4_PDF
+## Estado atual — composição aprovada V16
+
+Local e remoto 227, sem pendências. Aplicadas uma vez as migrations
+20261112030502 (reserva e recuperação por formato), 20261112034304 (corte,
+função original e referências autorizadas) e 20261112043300 (referências
+reversas da REQ por eventos canônicos anteriores ao corte). Não reescrevem
+eventos, snapshots ou exemplares prontos.
+
+Pré-validação: 224 versões, nove definições/configurações/permissões e sete
+gatilhos iguais ao baseline local preservado; dry-run exclusivo das três
+migrations. Testes com Auth real passaram no projeto local, sem reset.
+Pós-validação: 227 versões, doze funções/configurações/permissões e oito
+gatilhos idênticos ao local; helpers privados sem grants expostos, nova RPC
+somente authenticated; dry-run vazio. Nenhuma tabela ou índice novo.
+
+Advisors mantêm as cinco classes de segurança e três de performance. A contagem
+de RPCs authenticated SECURITY DEFINER passou de 220 para 221 pela reserva V16,
+cuja autorização foi testada. Permanecem 64 tabelas RLS fechadas, três funções
+pré-existentes anon, um extension_in_public, proteção de senhas pendente,
+124 FKs sem índice, onze initplans e 68 índices sem uso. Isso não aprova os
+achados anteriores nem representa uma revisão global de segurança.
+[Regra do advisor da RPC](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable).
+
+Sem reset, fixtures/Auth remotos, ativação externa ou backup pesado redundante
+do banco sintético, conforme a autorização vigente. Instalação limpa, evolução
+legada e integração completa seguem na CI do commit publicado.
+
+## Histórico — DOC-B.4_PDF
 
 Local e remoto 224, sem pendências. Migration 20261112014602: reserva V15,
 congelamento de cancelamento/ciências/vínculos no corte e guarda de leitura de

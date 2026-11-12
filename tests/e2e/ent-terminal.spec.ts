@@ -3,12 +3,11 @@ import { expect,test,type Page,type APIResponse } from "@playwright/test";
 import { createHash,randomUUID } from "node:crypto";
 import { mkdirSync,readFileSync,writeFileSync } from "node:fs";
 import { PDF } from "@libpdf/core";
-import { PDFDocument,PDFName,PDFHexString } from "pdf-lib";
 import { entTerminalFixture,terminalLedger } from "../integration/ent-terminal-fixtures.mjs";
 import { fixtures,rpc } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql,sqlLiteral } from "../../scripts/test-environment.mjs";
-import { generatedPdf, CURRENT_PDF_REVISION } from "./generated-pdf";
+import { generatedPdf, CURRENT_PDF_REVISION, pdfIssuanceReference } from "./generated-pdf";
 import { selectContext } from "./auth-context";
 test.setTimeout(180000);
 const root="output/pdf/phase-d/ent-terminal";
@@ -25,8 +24,8 @@ async function login(page:Page,patient:string){
 }
 async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,revision=CURRENT_PDF_REVISION){
  expect(response.status(),response.status()===200?label:(await response.text()).slice(0,100)).toBe(200);
- const bytes=await response.body(),pdf=await PDFDocument.load(bytes,{updateMetadata:false});
- const identity=JSON.parse(pdf.catalog.lookup(PDFName.of("HCAIssuance"),PDFHexString).decodeText());expect(identity.rendererRevision).toBe(revision);
+ const bytes=await response.body();
+ const identity=await pdfIssuanceReference(page, f.doc.id, bytes);expect(identity.rendererRevision).toBe(revision);
  const frozen=await rpc(f.owner,"pdf_issuance",{p_id:identity.id});
  expect(frozen).toMatchObject({state:"ready",sha256:digest(bytes),validation:{accepted:true,profile:"PAdES-B-T",wholeFile:true,signerTrust:"internal",timestampTrust:"internal"}});
  const text=(await PDF.load(bytes)).extractText().flatMap(p=>p.lines.map(l=>l.spans.flatMap(s=>s.chars.map(c=>c.char)).join(""))).join(" ");

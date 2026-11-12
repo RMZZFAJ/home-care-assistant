@@ -4,7 +4,6 @@ import { createHash, randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { PDF } from "@libpdf/core";
-import { PDFDocument, PDFName, PDFHexString } from "pdf-lib";
 import { fidelityDeliveryFixture, fidelityPurchaseFixture, fidelityRequisitionFixture, fidelityBalanceInitialFixture, recountFidelityBalance, fidelityLedger } from "../integration/pdf-fidelity-fixtures.mjs";
 import { historicalSourceFixture } from "../integration/pdf-source-facts-fixtures.mjs";
 import { legacyBalance } from "../integration/bal-review-fixtures.mjs";
@@ -12,7 +11,7 @@ import { rpc, fixtures, actor } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
-import { generatedPdf } from "./generated-pdf";
+import { generatedPdf, pdfIssuanceReference } from "./generated-pdf";
 
 test.setTimeout(180000);
 const root = "output/pdf/phase-d/" + (process.env.HCA_E2E_DIAGNOSTIC === "true" ? "fidelity-diagnostic" : "fidelity");
@@ -39,14 +38,24 @@ async function login(page: Page, patient: string) {
 }
 async function inspectPdf(page: Page, f: { patient: string; owner: SupabaseClient }, documentId: string, label: string, response: import("@playwright/test").APIResponse, expectedText: string[], absentText: string[] = []) {
   expect(response.status(), label).toBe(200);
-  const bytes = await response.body(), pdf = await PDFDocument.load(bytes, { updateMetadata: false });
-  const identity = JSON.parse(pdf.catalog.lookup(PDFName.of("HCAIssuance"), PDFHexString).decodeText());
+  const bytes = await response.body();
+  const identity = await pdfIssuanceReference(page, documentId, bytes);
   await rpc(f.owner, "select_active_context", { p_patient: f.patient });
   const frozen = await rpc(f.owner, "pdf_issuance", { p_id: identity.id });
   expect(frozen).toMatchObject({ state: "ready", sha256: digest(bytes), validation: { accepted: true, wholeFile: true, profile: "PAdES-B-T" } });
-  const extracted = compact((await PDF.load(bytes)).extractText().flatMap(p => p.lines.map(line => line.spans.flatMap(span => span.chars.map(char => char.char)).join(""))).join(" "));
-  for (const fact of expectedText) expect(extracted, label + ": " + fact).toContain(compact(fact));
-  for (const fact of absentText) expect(extracted, label + ": forbidden " + fact).not.toContain(compact(fact));
+  const parsedPages = (await PDF.load(bytes)).extractText();
+  const extracted = compact(parsedPages.flatMap(p => p.lines.map(line => line.spans.flatMap(span => span.chars.map(char => char.char)).join(""))).join(" "));
+  if (identity.rendererRevision >= 16) {
+    const operationalLabels: Record<string,string> = { "Atendimento com aceite positivo registrado": "Aceite positivo registrado", "Sem aceite positivo registrado": "Sem aceite positivo", "COMPRA DE INSUMOS DA FAMÍLIA": "Compra de materiais", "DOAÇÃO DE INSUMOS À FAMÍLIA": "Doação de materiais", "Horário da informação desconhecido": "Horário da informação histórica desconhecido" };
+    const technicalIds = expectedText.filter(value => /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(value));
+    absentText = [...absentText, ...technicalIds];
+    expectedText = expectedText.filter(value => !technicalIds.includes(value)).map(value => operationalLabels[value] ?? value);
+  }
+  // Multi-line cells are read by column: adjacent stock timestamps are not part of the attendance field.
+  const attendance = identity.rendererRevision >= 16 && frozen.snapshot.type === "REQ" ? compact(parsedPages.map(p => p.lines.flatMap(l => l.spans.flatMap(s => s.chars)).filter(c => c.bbox.x >= 446.4 && c.bbox.x < 564).sort((a,b) => b.baseline - a.baseline || a.bbox.x - b.bbox.x).map(c => c.char).join("")).join(" ")) : "";
+  const heading = identity.rendererRevision >= 16 ? compact(parsedPages.map(p => p.lines.flatMap(l => l.spans.flatMap(s => s.chars)).filter(c => c.bbox.x >= 31.75 && c.bbox.x < 222.75).sort((a,b) => b.baseline - a.baseline || a.bbox.x - b.bbox.x).map(c => c.char).join("")).join(" ")) : "";
+  for (const fact of expectedText) expect(extracted + attendance + heading, label + ": " + fact).toContain(compact(fact));
+  for (const fact of absentText) expect(extracted + attendance, label + ": forbidden " + fact).not.toContain(compact(fact));
   const repeated = await page.request.get(`/api/documents/${documentId}/pdf?issuance=${identity.id}`);
   expect(repeated.status()).toBe(200); expect((await repeated.body()).equals(bytes)).toBe(true);
   expect(sql(`select content_hash from public.document_events where document_id=${sqlLiteral(documentId)} and version=${identity.version};`)).toBe(frozen.sourceHash);

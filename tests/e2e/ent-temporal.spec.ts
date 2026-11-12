@@ -1,10 +1,9 @@
-import { CURRENT_PDF_REVISION } from "./generated-pdf";
+import { CURRENT_PDF_REVISION, pdfIssuanceReference } from "./generated-pdf";
 import { selectDocumentSection } from "./document-sections";
 import { expect,test,type Page } from "@playwright/test";
 import { createHash,randomUUID } from "node:crypto";
 import { mkdirSync,readFileSync,writeFileSync } from "node:fs";
 import { PDF } from "@libpdf/core";
-import { PDFDocument,PDFName,PDFHexString } from "pdf-lib";
 import { entTemporalFixture,entTemporalOracle,entTemporalLedger } from "../integration/ent-temporal-fixtures.mjs";
 import { fixtures,rpc } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -23,8 +22,7 @@ for(const mode of ["prepared","private"] as const)test(`ENT ${mode} preserva mar
   await login(page,f.patient);await page.goto(`/historico/${f.doc.id}`);
   await selectDocumentSection(page, "files");
   const files=page.getByRole("region",{name:"Arquivos gerados",exact:true}),endpoint=`/api/documents/${f.doc.id}/issuances`;
-  const expected=["Criação da ficha: "+formatBrazilDate(oracle.createdAt),"Emissão operacional registrada: "+formatBrazilDate(oracle.issuedAt)];
-  if(oracle.draftCreatedAt)expected.push("Primeiro rascunho privado salvo: "+formatBrazilDate(oracle.draftCreatedAt));
+  const expected=["Expedição registrada",formatBrazilDate(oracle.issuedAt),"Autenticidade e verificação"];
   let first:{id:string;bytes:Buffer;requestedAt:string}|null=null;
   for(let count=1;count<=2;count++){
     await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
@@ -37,11 +35,11 @@ for(const mode of ["prepared","private"] as const)test(`ENT ${mode} preserva mar
     expect(new Date(frozen.snapshot.sourceFacts.documentCreatedAt).toISOString()).toBe(new Date(oracle.createdAt).toISOString());
     const response=await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${row.id}`);expect(response.status()).toBe(200);
     const bytes=await response.body();expect(digest(bytes)).toBe(row.sha256);
-    const pdf=await PDFDocument.load(bytes,{updateMetadata:false}),identity=JSON.parse(pdf.catalog.lookup(PDFName.of("HCAIssuance"),PDFHexString).decodeText());
+    const identity=await pdfIssuanceReference(page, f.doc.id, bytes);
     expect(identity.requestedAt).toBe(row.requestedAt);expect(identity.id).toBe(row.id);
     const text=compact((await PDF.load(bytes)).extractText().flatMap(p=>p.lines.map(l=>l.spans.flatMap(s=>s.chars.map(c=>c.char)).join(""))).join(" "));
     for(const fact of expected)expect(text,fact).toContain(compact(fact));
-    if(mode==="prepared")expect(text).not.toContain(compact("Primeiro rascunho privado salvo"));
+    expect(text).not.toContain(compact("Primeiro rascunho privado salvo"));
     expect(frozen.sourceHash).toBe(sql(`select content_hash from public.document_events where document_id=${sqlLiteral(f.doc.id)} and version=${row.version};`));
     if(first){
       expect(row.id).not.toBe(first.id);expect(bytes.equals(first.bytes)).toBe(false);
@@ -51,7 +49,7 @@ for(const mode of ["prepared","private"] as const)test(`ENT ${mode} preserva mar
       mkdirSync(root,{recursive:true});const trustFile=process.env.HCA_PDF_TRUST_POLICY_FILE;if(!trustFile)throw new Error("Guarded internal trust fixture required");
       const pem=JSON.parse(readFileSync(trustFile,"utf8")).roots[0].pem,publicRoot=`root-${digest(pem).slice(0,16)}.crt`,file=`${mode}-${count}-${row.id}.pdf`;
       writeFileSync(`${root}/${publicRoot}`,pem);writeFileSync(`${root}/${file}`,bytes,{flag:"wx"});
-      corpus.push({label:`ent-${mode}-${count}`,file,publicRoot,code:f.doc.code,issuanceId:row.id,documentId:f.doc.id,version:row.version,rendererRevision:row.rendererRevision,sha256:row.sha256,sourceHash:frozen.sourceHash,sourceFacts:frozen.snapshot.sourceFacts,documentFacts:frozen.snapshot.documentFacts,expectedText:expected,absentText:mode==="prepared"?["Primeiro rascunho privado salvo"]:[],requestedAt:row.requestedAt,clockControl:"Only new local fictional creation metadata is backdated; canonical event clocks/body/hash are preserved. Not elapsed-day or physical-device evidence."});
+      corpus.push({label:`ent-${mode}-${count}`,file,publicRoot,code:f.doc.code,issuanceId:row.id,documentId:f.doc.id,version:row.version,rendererRevision:row.rendererRevision,sha256:row.sha256,sourceHash:frozen.sourceHash,sourceFacts:frozen.snapshot.sourceFacts,documentFacts:frozen.snapshot.documentFacts,expectedText:expected,absentText:["Primeiro rascunho privado salvo"],requestedAt:row.requestedAt,clockControl:"Only new local fictional creation metadata is backdated; canonical event clocks/body/hash are preserved. Not elapsed-day or physical-device evidence."});
     }
   }
   await page.clock.install({time:new Date(Date.now()+86400000)});

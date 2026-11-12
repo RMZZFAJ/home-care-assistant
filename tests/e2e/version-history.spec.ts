@@ -2,14 +2,14 @@ import { selectDocumentSection } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { PDFDocument, PDFHexString, PDFName } from "pdf-lib";
+import { PDFDocument } from "pdf-lib";
 import { versionHistoryFixture, historyHashes } from "../integration/version-history-fixtures.mjs";
 import { fidelityDeliveryFixture, fidelityRequisitionFixture, fidelityBalanceInitialFixture, fidelityLedger } from "../integration/pdf-fidelity-fixtures.mjs";
 import { actor, fixtures } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { generatedPdf } from "./generated-pdf";
+import { generatedPdf, pdfIssuanceReference } from "./generated-pdf";
 import { audit, auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
@@ -72,8 +72,8 @@ test("Histórico COM compara snapshots, não usa nome/catálogo posterior e cons
   const oldFile = await generatedPdf(page, `/api/documents/${f.doc.id}/pdf?version=${f.approved.version}`);
   expect(oldFile.status()).toBe(200); const bytes = await oldFile.body(), hash = digest(bytes), fileUrl = oldFile.url();
   const pdf = await PDFDocument.load(bytes, { updateMetadata: false });
-  const fileIdentity = JSON.parse(pdf.catalog.lookup(PDFName.of("HCAIssuance"), PDFHexString).decodeText());
-  expect(fileIdentity.version).toBe(f.approved.version); expect(pdf.getSubject()).toContain("Representação de versão histórica");
+  const fileIdentity = await pdfIssuanceReference(page, f.doc.id, bytes);
+  expect(fileIdentity.version).toBe(f.approved.version); expect(pdf.getSubject()).toBe("Ficha");
   const count = sql(`select count(*) from private.pdf_issuances where document_id=${sqlLiteral(f.doc.id)};`), ledger = fidelityLedger(f.patient);
   const deniedWriter = await f.writer.client.from("document_events").select("id").eq("document_id", f.doc.id);
   expect(deniedWriter.error).toBeNull(); expect(deniedWriter.data).toEqual([]);
@@ -87,7 +87,7 @@ test("Histórico COM compara snapshots, não usa nome/catálogo posterior e cons
   const facts = (await api.json()).data;
   const oracle = JSON.parse(sql(`select jsonb_build_object('hash',content_hash,'name',actor_name,'quantity',body#>>'{lines,0,approved_quantity}') from public.document_events where document_id=${sqlLiteral(f.doc.id)} and version=${f.approved.version};`));
   expect(facts.selected.hash).toBe(oracle.hash); expect(facts.selected.actorName).toBe(oracle.name);
-  expect(fileIdentity.sourceHash).toBe(oracle.hash);
+  expect(sql(`select source_hash from private.pdf_issuances where id=${sqlLiteral(fileIdentity.id)}`)).toBe(oracle.hash);
   writeFileSync(info.outputPath("version-binding.json"), JSON.stringify({ documentId: f.doc.id, selectedVersion: f.approved.version, beforeVersion: f.initial.version, fileVersion: fileIdentity.version, fileSubject: pdf.getSubject(), sourceHash: oracle.hash, sha256: hash, identityMatchesFrozenEvent: true }) + "\n");
   expect(oracle.quantity).toMatch(/^2(?:\.0+)?$/); expect(facts.selected.facts.find((v: { key: string }) => v.key.endsWith("/approved_quantity")).value).toBe("2");
   const delta = comparison(page).getByRole("listitem").filter({ has: page.getByRole("heading", { name: `Materiais · ${f.oldProduct} · Quantidade aprovada`, exact: true }) });

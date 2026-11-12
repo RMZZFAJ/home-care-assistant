@@ -1,3 +1,5 @@
+import { PDF } from "@libpdf/core";
+import { formatBrazilDate } from "../../src/lib/receipt";
 import { CURRENT_PDF_REVISION } from "./generated-pdf";
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
@@ -29,7 +31,7 @@ async function login(page: Page, patient: string) {
   ).toBeVisible();
   await selectContext(page, patient);
 }
-test("PDF atual assina fatos de rascunho e origens físicas conhecida e desconhecida; intenção V5 permanece recuperável", async ({
+test("PDF atual preserva a origem congelada e distingue emissão sem expor a preparação privada; intenção V5 permanece recuperável", async ({
   page,
 }, info) => {
   const privateSource = await sourceFactsFixture(),
@@ -114,6 +116,13 @@ test("PDF atual assina fatos de rascunho e origens físicas conhecida e desconhe
     expect(response.status()).toBe(200);
     const bytes = await response.body();
     expect(hash(bytes)).toBe(row.sha256);
+    const text = (await PDF.load(bytes)).extractText().flatMap(p => p.lines.map(l => l.spans.flatMap(s => s.chars.map(c => c.char)).join(""))).join(" ").normalize("NFKC").replaceAll(/\s/g, "");
+    const compact = (value: string) => value.normalize("NFKC").replaceAll(/\s/g, "");
+    expect(text).not.toContain(compact("Primeiro rascunho privado salvo"));
+    expect(text).toContain(compact(facts.issuerName ?? "Autoria nominal desconhecida"));
+    expect(text).toContain(compact(row.requestedName));
+    expect(text).toContain(compact(formatBrazilDate(row.requestedAt)));
+    if (facts.historical) { expect(text).toContain(compact("DATA DO DOCUMENTO DE ORIGEM")); expect(text).toContain(compact(formatBrazilDate(facts.sourceCreatedAt))); }
     expect(
       (
         await (

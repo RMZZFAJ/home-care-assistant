@@ -3,12 +3,11 @@ import { expect,test,type Page,type APIResponse } from "@playwright/test";
 import { createHash,randomUUID } from "node:crypto";
 import { mkdirSync,readFileSync,writeFileSync } from "node:fs";
 import { PDF } from "@libpdf/core";
-import { PDFDocument,PDFName,PDFHexString } from "pdf-lib";
 import { regularizationPdfFixture,regularizationLedger } from "../integration/pdf-regularization-fixtures.mjs";
 import { fixtures,rpc } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql,sqlLiteral } from "../../scripts/test-environment.mjs";
-import { generatedPdf, CURRENT_PDF_REVISION } from "./generated-pdf";
+import { generatedPdf, CURRENT_PDF_REVISION, pdfIssuanceReference } from "./generated-pdf";
 import { selectContext } from "./auth-context";
 test.setTimeout(180000);
 type Fixture=Awaited<ReturnType<typeof regularizationPdfFixture>>;
@@ -27,14 +26,18 @@ async function login(page:Page,patient:string){
 }
 async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,revision:number){
   expect(response.status(),response.status()===200?label:(await response.text()).slice(0,160)).toBe(200);
-  const bytes=await response.body(),parsed=await PDFDocument.load(bytes,{updateMetadata:false});
-  const identity=JSON.parse(parsed.catalog.lookup(PDFName.of("HCAIssuance"),PDFHexString).decodeText());
+  const bytes=await response.body();
+  const identity=await pdfIssuanceReference(page, f.doc.id, bytes);
   expect(identity.rendererRevision).toBe(revision);
   const frozen=await rpc(f.owner,"pdf_issuance",{p_id:identity.id});
   expect(frozen).toMatchObject({state:"ready",sha256:digest(bytes),validation:{accepted:true,profile:"PAdES-B-T",wholeFile:true,signerTrust:"internal",timestampTrust:"internal"}});
   const text=compact((await PDF.load(bytes)).extractText().flatMap(p=>p.lines.map(l=>l.spans.flatMap(s=>s.chars.map(c=>c.char)).join(""))).join(" "));
   const item=frozen.snapshot.deliveryRegularization?.cases?.[0];
-  if(revision>=8&&item){
+  if(revision>=16&&item){
+    for(const fact of [item.proposal.proposedName,item.proposal.reviewerName,item.proposal.reason,item.proposal.basis,item.before_snapshot.receiptName,"Situação anterior","Conciliação após o procedimento"].filter(Boolean)) expect(text,label+": "+fact).toContain(compact(fact!));
+    if(item.decision)expect(text).toContain(compact(item.decision.reason));
+    for(const internal of [item.id,item.proposed_by,item.reviewer_id,...(item.decision?.lines.flatMap((line:{movementIds?:string[]})=>line.movementIds??[])??[])])expect(text).not.toContain(compact(internal));
+  }else if(revision>=8&&item){
     for(const fact of [item.id,item.proposed_by,item.reviewer_id,item.before_snapshot.acceptedBy,item.proposal.reason,item.proposal.basis,"Estado anterior da ficha","Conciliação após este procedimento e trânsito restante"].filter(Boolean))expect(text,label+": "+fact).toContain(compact(fact));
     if(item.decision)for(const fact of [item.decision.actorId,item.decision.reason,...item.decision.lines.flatMap((l:{movementIds:string[]})=>l.movementIds)])expect(text,label+": "+fact).toContain(compact(fact));
   }

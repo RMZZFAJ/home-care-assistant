@@ -25,6 +25,9 @@ import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
 import { requirePurchaseEntryBalances, type PurchaseEntryBalances } from "@/lib/validation/purchase-entry-balances";
 
 import { requirePdfLifecycleFacts, type PdfLifecycleFacts } from "@/lib/documents/pdf-lifecycle";
+import { approvedRequisitionContent } from "./approved-requisition-content";
+import { approvedSupplyContent } from "./approved-supply-content";
+import { approvedDeliveryContent } from "./approved-delivery-content";
 
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
 export type PdfContentPlan = {
@@ -33,6 +36,7 @@ export type PdfContentPlan = {
   identity: Record<string, unknown>;
   facts: string[];
   semanticFacts?: Record<string, string>;
+  rendererRevision?: number;
 };
 const normalize = (value: string) =>
   value.normalize("NFKC").replaceAll(/\s+/g, "");
@@ -115,6 +119,13 @@ export async function composeIssuance(
     throw invalid(
       error instanceof PdfTextUnsupportedError ? "unrepresentable" : "render",
     );
+  }
+  if (revision === 16) {
+    const identity = { verificationCode: emission.verificationCode, requestedAt: emission.requestedAt };
+    const obligations = snapshot.type === "REQ" ? approvedRequisitionContent(snapshot, emission) : snapshot.type === "ENT" ? approvedDeliveryContent(snapshot, emission) : approvedSupplyContent(snapshot, emission);
+    const plan = { bytes, runs, identity, rendererRevision: revision, ...obligations };
+    await validateIssuanceContent(bytes, plan);
+    return plan;
   }
   const identity = {
     id: emission.id,
@@ -388,8 +399,9 @@ export async function validateIssuanceContent(
     if (!plan.facts.length || missing !== -1)
       throw invalid("source-fact:" + missing);
     const parsed = await PDFDocument.load(bytes, { updateMetadata: false });
-    if (Number(plan.identity.rendererRevision) >= 10) validatePdfStructure(parsed);
-    if (Number(plan.identity.rendererRevision) >= 7 && parsed.catalog.lookupMaybe(PDFName.of("Lang"), PDFString)?.decodeText() !== "pt-BR")
+    const revision = plan.rendererRevision ?? Number(plan.identity.rendererRevision);
+    if (revision >= 10) validatePdfStructure(parsed);
+    if (revision >= 7 && parsed.catalog.lookupMaybe(PDFName.of("Lang"), PDFString)?.decodeText() !== "pt-BR")
       throw invalid("language");
     const identity = JSON.parse(
       parsed.catalog

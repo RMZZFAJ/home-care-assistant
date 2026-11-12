@@ -1,6 +1,6 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 11 de novembro de 2026, após o complemento executivo. Inclui a
+Atualizado em 12 de novembro de 2026, após o complemento executivo. Inclui a
 refatoração visual da aplicação e
 o complemento aprovado de fichas e PDFs. A fase permanece em execução, sem
 liberação para produção.
@@ -74,27 +74,37 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Aparência da aplicação inteira | ≈85%; detalhamento por área no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | 20 composições restantes; conferir as 171 relações |
-| Complemento documental | DOC-B 100% local; DOC-A, DOC-C e DOC-D em 0% |
-| Próximo resultado utilizável | PDFs reais na composição aprovada |
-| Incremento pronto neste candidato | DOC-B.4 PDF V15; migration 224 remota |
-| CI observada cc8fad0 | Linux/Windows e banco passaram; navegador reprovou |
-| Preview observado cc8fad0 | Vercel concluiu; sem o fechamento local V15 |
+| Complemento documental | DOC-A/B 100% locais; DOC-C pendente |
+| Próxima entrega | Ficha Ampliada, auditoria e Andamentos |
+| Incremento deste lote | Cinco modelos na aparência aprovada |
+| Resultado local | Geração, assinatura e recuperação conferidas |
+| Banco | Local e remoto em 227, sem atualizações pendentes |
+| CI ca4cf48 | Linux/Windows/banco/Chromium/mobile passaram; iOS reprovou |
+| Preview observado ca4cf48 | Vercel concluiu; ainda usa a composição anterior |
 
-**Último ponto integral encerrado:** DOC-B.4, concluindo o bloco adicional
-DOC-B no fluxo atual. Os PDFs agora preservam cancelamento, ciências próprias
-e vínculos na versão escolhida, sem substituir fatos nem exemplares anteriores.
+**Último ponto integral encerrado:** DOC-A.1–6, composição aprovada dos cinco
+modelos operacionais. Reutiliza DOC-B já concluído e o ciclo real de emissão,
+assinatura, guarda e recuperação. A revisão humana das amostras continua
+separada; a nova aparência foi implementada, sem deixá-la para essa revisão.
 
-**Próxima entrega:** PDFs de REQ, COM, ENT, devolução e BAL na composição
-aprovada, já emitidos e assinados pelo sistema. As modalidades e Andamentos
-documentais seguem no segundo lote; a integração DOC-D ocorre em ambos. Não
-há dependência de reformular rascunhos para começar essa composição.
+**Resultado do lote 1:** REQ, compra, doação, entrega, devolução autônoma e BAL
+foram gerados e assinados pelos fluxos reais de teste, com a aparência aprovada.
+Páginas, conteúdo longo, autoria, contexto legado, referências autorizadas e
+quantidades foram conferidos. A revisão 16 passa a ser usada nas novas emissões
+quando este incremento estiver disponível no Preview; exemplares anteriores
+continuam preservados.
 
-**Banco e validações do último lote:** a atualização da revisão documental foi
-aplicada no remoto, totalizando 224 atualizações reconciliadas com o local.
-Passaram oito cenários de autorização, dezesseis verificações de conteúdo e
-quatro percursos de geração assinada. As páginas renderizadas foram conferidas.
-A validação automática do commit publicado e a revisão final da fase continuam
-separadas. Sonar permanece adiado por sua decisão.
+**Próxima entrega:** modalidades e Andamentos documentais do lote 2. Ficha
+Ampliada, auditoria restrita, menções, referências e acessos agrupados continuam
+sob responsabilidade de Codex. A falha de CI no iOS da versão anterior será
+tratada de forma dirigida, sem ampliar o escopo documental nem reformular
+rascunhos.
+
+**Validações deste lote:** dezenove verificações de conteúdo, cinco cenários
+com autenticação real e vinte e cinco cenários integrados em rodadas dirigidas,
+repetindo os afetados pelas correções. O banco remoto foi reconciliado. A CI
+precisa aprovar o novo commit; ensaios humanos, físicos e confiança operacional
+continuam separados. Sonar permanece adiado por sua decisão.
 
 ## 3. Funcionalidades e critérios
 
@@ -599,11 +609,13 @@ basta a preparação isolada de uma parte do percurso.
 
 ##### DOC-A — Aparência dos documentos
 
-**A iniciar · 0% do acréscimo. Responsável: Codex.**
+**Concluído localmente · 100%. Responsável: Codex.** Os seis pontos foram
+implementados e conferidos no lote 1, com arquivos reais assinados. Revisão
+humana, impressão e CI do commit publicado continuam gates próprios.
 
-REQ, entrega, devolução, compra/doação e BAL terão a composição aprovada, fonte
+REQ, entrega, devolução, compra/doação e BAL usam a composição aprovada, fonte
 Source Sans 3, cores, bandeira lateral quando aplicável, autores, macroetapas,
-tabelas, observações e avisos completos. Conteúdo longo continuará em novas
+tabelas, observações e avisos completos. Conteúdo longo continua em novas
 páginas com cabeçalhos e rodapés legíveis. A referência dos PDFs não modifica o
 Modelo Integral da aplicação.
 
@@ -647,7 +659,10 @@ própria das confirmações incertas.
 
 ##### DOC-D — Geração integrada e exemplos reais
 
-**A iniciar · 0% do acréscimo. Responsável: Codex; você avalia as amostras.**
+**Em execução junto aos modelos. Responsável: Codex; você avalia as amostras.**
+A Ficha operacional dos cinco modelos usa o pipeline real e preserva exemplares
+anteriores. DOC-D.1–4 estão conferidos para essa modalidade; o mesmo ciclo será
+aplicado às modalidades novas do lote 2, antes de concluir DOC-D integralmente.
 
 Integrar a nova composição ao gerador e à assinatura atuais. Preservar cópias
 antigas, recuperação e novo download dos mesmos bytes; nova emissão tem
@@ -1340,6 +1355,10 @@ segurança, recuperação oficial e os demais requisitos permanecem obrigatório
 O fechamento PDF V15 e os 14 consumidores dirigidos passaram localmente;
 publicação/CI/Preview continuam identificados pelo candidato correspondente.
 
+**12 de novembro — lote 1 concluído localmente:** composição aprovada dos cinco
+modelos operacionais, integrada à assinatura e à recuperação. O restante
+documental segue no lote 2; a aplicação permanece em ≈85% de refatoração visual.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1349,6 +1368,9 @@ não foram renumerados ou aprovados em bloco. Os percentuais anteriores são
 referências de escopo, não serão recalculados para cada pequena edição.
 
 ### Lote 1 — PDFs reais com a aparência aprovada
+
+**Concluído localmente.** DOC-A.1–6 e a parcela operacional de DOC-D estão
+entregues. CI própria e avaliação humana continuam separadas.
 
 - **Resultado:** gerar REQ, COM, ENT, devolução e BAL na composição aprovada,
   com seus dados reais, assinatura, guarda, consulta e recuperação atuais.
@@ -1364,6 +1386,8 @@ referências de escopo, não serão recalculados para cada pequena edição.
   modelos usam a composição aprovada com os fatos e permissões preservados.
 
 ### Lote 2 — Modalidades e acompanhamento documental
+
+**Próxima capacidade.** Não depende de alterar os rascunhos.
 
 - **Resultado:** Ficha, Ficha Ampliada e auditoria restrita nominativa, com
   seleção/período, Andamentos estruturados, referências, menções e acessos

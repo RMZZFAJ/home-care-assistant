@@ -50,6 +50,10 @@ import { balanceApplicationFacts } from "@/lib/validation/balance-application";
 import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
 import { requirePdfLifecycleFacts } from "@/lib/documents/pdf-lifecycle";
 import { purchaseEntryBalances } from "@/lib/validation/purchase-entry-balances";
+import { renderApprovedRequisitionPdf } from "./approved-requisition-pdf";
+import { ApprovedPdfTextUnsupportedError } from "./approved-pdf-layout";
+import { renderApprovedSupplyPdf } from "./approved-supply-pdf";
+import { renderApprovedDeliveryPdf } from "./approved-delivery-pdf";
 
 type Person = {
   id?: string;
@@ -65,9 +69,12 @@ export type DocumentSnapshot = {
   protocol: string;
   version: number;
   status: string;
+  action?: string;
+  actorName?: string;
   createdAt?: string;
   sourceFacts?: unknown;
   lifecycleFacts?: unknown;
+  presentationFacts?: unknown;
   documentFacts?: unknown;
   balanceApplication?: unknown;
   balanceReviewCorrections?: unknown;
@@ -174,7 +181,7 @@ function wrap(value: unknown, font: PDFFont, size: number, maxWidth: number) {
   return result;
 }
 export type PdfEmissionContext = {
-  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
+  rendererRevision?: 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16;
   sourceFacts?: PdfSourceFacts;
   fidelityFacts?: PdfFidelityFacts;
   id: string;
@@ -201,6 +208,14 @@ export async function renderDocumentPdf(
   emission?: PdfEmissionContext,
 ) {
   const revision = emission?.rendererRevision ?? 5;
+  if (revision === 16) {
+    if (!emission) throw new Error("Approved document emission required");
+    try { return (snapshot.type === "REQ" ? await renderApprovedRequisitionPdf(snapshot, emission) : snapshot.type === "ENT" ? await renderApprovedDeliveryPdf(snapshot, emission) : await renderApprovedSupplyPdf(snapshot, emission)).bytes; }
+    catch (error) {
+      if (error instanceof ApprovedPdfTextUnsupportedError) throw new PdfTextUnsupportedError("UNREPRESENTABLE_TEXT");
+      throw error;
+    }
+  }
   const direction = snapshot.type === "ENT" ? materialTransferDirection(String(snapshot.payload.source ?? ""), String(snapshot.payload.destination ?? "")) : null;
   const movementNoun = direction === "return" ? "devolução" : direction === "delivery" ? "entrega" : "movimentação";
   const variantTitle = snapshot.type === "ENT" && revision < 14 ? "Comprovante de entrega de materiais" : documentVariant(snapshot.type, snapshot.payload, snapshot.workflow);
