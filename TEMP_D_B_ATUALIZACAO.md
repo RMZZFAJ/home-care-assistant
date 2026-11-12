@@ -9,9 +9,10 @@ liberação para produção.
 ## 1. Definições e leitura do acompanhamento
 
 - **Critérios:** são 105, sendo 75 originais e 30 complementos da Ordem Mestre.
-  Há 79 com implementação e verificações concluídas e 26 parciais. Desses 79,
-  78 têm conclusão local e um registra a aplicação remota já reconciliada da
-  D-A. Nenhum critério inteiro está sem início; algumas subtarefas estão em 0%.
+  Há 96 com implementação e verificações técnicas concluídas e nove parciais.
+  Destes 96, 94 têm conclusão local e dois registram a reconciliação remota
+  D-A/D-B. Os nove parciais conservam parcelas humanas, adiadas ou de CI; seus
+  estados não equivalem a nove funcionalidades sem implementação.
 - **Etapas 01–20:** identificadores preservados para localizar os requisitos.
   A execução restante está agrupada em seis capacidades na seção 6; as etapas
   não são vinte filas independentes. Um critério pode atravessar vários lotes.
@@ -71,7 +72,7 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 
 | Acompanhamento | Estado registrado |
 | --- | --- |
-| Critérios da D-B | 79 verificados; 26 parciais; total de 105 |
+| Critérios da D-B | 96 verificados tecnicamente; 9 parciais; total de 105 |
 | Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
 | Aparência da aplicação | 66/66 conferidas; ressalvas no grupo 3.9 |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
@@ -91,6 +92,13 @@ As tentativas de avisos são reais, paginadas e sem dados privados dos pacientes
 A conciliação continua exigindo decisão explícita; consultar não reenvia avisos.
 Falhas de consulta e confirmações incertas têm recuperação própria, com retorno
 de foco mesmo quando o botão da ação deixa de existir.
+
+**Onde avaliar:** use o
+[Preview estável da branch](https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app).
+Esse endereço acompanha as atualizações; prefira-o para instalar a PWA.
+A autenticação da Vercel continua obrigatória. No Preview de f3f3fa8, o login
+respondeu corretamente e a aplicação informou compatibilidade pronta. Isso não
+substitui testar os fluxos autenticados nem o reteste físico do S24 Ultra.
 
 Backup e recuperação fecharam no escopo de software: uma nova cópia cifrada foi
 autenticada e restaurada isoladamente, com tabelas, arquivos e emissões prontas
@@ -181,7 +189,7 @@ não equivale a comprovar entrega em aparelho ou homologar o serviço.
 
 ### 3.1 Formulários, rascunhos e recuperação
 
-**Critérios deste grupo: 9 concluídos localmente; 6 parciais.**
+**Critérios deste grupo: 14 concluídos localmente; 1 parcial por adiamento.**
 
 **Etapas relacionadas:** 01 abaixo; DOC-C no grupo 3.3; 14 no grupo 3.5.
 
@@ -216,12 +224,10 @@ consumo, revisões de fluxo, agenda e Andamentos.
 
 #### Critérios — Formulários, rascunhos e recuperação
 
-- **Orientar corretamente cada falha de consulta ou confirmação** — Em execução
-  · ≈75%. Falta: Revisar os fluxos ainda parciais e suas mensagens de
-  recuperação. Responsável: Codex.
-- **Tratar alterações concorrentes sem reaplicar uma decisão sozinha** — Em
-  execução · ≈75%. Falta: Completar os fluxos restantes de comparação e retorno
-  ao ponto certo. Responsável: Codex.
+- **Orientar corretamente cada falha de consulta ou confirmação** — Concluído
+  localmente · 100%. Consulta e confirmação têm recuperação distinta.
+- **Tratar alterações concorrentes sem reaplicar uma decisão sozinha** —
+  Concluído localmente · 100%. A referência vigente exige revisão explícita.
 - **Erros de preenchimento claros, no campo certo e sem apagar valores** —
   Concluído · 100%.
 - **Guardar rascunho próprio de ficha sem emissão automática** — Concluído ·
@@ -235,18 +241,18 @@ consumo, revisões de fluxo, agenda e Andamentos.
   100%.
 - **Rascunhos documentais separados por criação, alvo e intenção** — Concluído
   · 100%.
-- **Explicar se nada ocorreu ou se um resultado foi recuperado** — Em execução
-  · ≈80%. Falta: Concluir aplicação das mensagens em todos os fluxos parciais.
-  Responsável: Codex.
+- **Explicar se nada ocorreu ou se um resultado foi recuperado** — Concluído
+  localmente · 100%. Resultado desconhecido não é anunciado como não registrado.
 - **Campos corretos para quantidades, turnos, códigos, senhas e unidades** —
   Concluído · 100%.
 - **Consulta repetir consulta; resultado confirmado não voltar a pendente** —
-  Em execução · ≈80%. Falta: Completar mensagens e recuperação dos consumidores
-  ainda parciais. Responsável: Codex.
+  Concluído localmente · 100%. A confirmação preservada não é desfeita por erro
+  posterior de consulta.
 - **Falha ao consultar pedir atualização, sem mandar editar fato histórico** —
   Concluído · 100%.
-- **Recuperar todos os preenchimentos entre sessões e aparelhos** — Em execução
-  · ≈90% no escopo anterior. Expansão em administração/perfil e simplificação
+- **Recuperar todos os preenchimentos entre sessões e aparelhos** — Parcial
+  por decisão sua; ≈90% era a estimativa do escopo anterior. Expansão em
+  administração/perfil e simplificação
   adiadas por você (OWNER-DEFERRED), sem PASS. Defeitos e recuperação oficial
   continuam obrigatórios para Codex. As contagens preservam
   observações após mudanças de estoque, plantão ou ficha. As preparações
@@ -254,9 +260,9 @@ consumo, revisões de fluxo, agenda e Andamentos.
   de fluxo, relatos e decisões de consumo, movimentação familiar, programação do
   balanço, atribuição, adiamentos, pareceres, reconto, decisões de requisição e
   Andamentos privados estão implementados. Responsável: Codex.
-- **Preservar edição durante falha, conflito e perda de contexto** — Em
-  execução · ≈85%. Falta: Conferir em conjunto as combinações restantes de falha
-  e mudança de contexto. Responsável: Codex.
+- **Preservar edição durante falha, conflito e perda de contexto** — Concluído
+  localmente · 100% no escopo existente. A expansão de rascunhos continua adiada;
+  as confirmações oficiais incertas mantêm sua recuperação obrigatória.
 
 ### 3.2 Estoque, catálogo, consumo e agenda
 
@@ -370,7 +376,8 @@ concluídas; a revisão geral da fase continua pendente.
 
 ### 3.3 Fichas, Andamentos, PDFs e anexos
 
-**Critérios deste grupo: 29 concluídos localmente; 12 parciais.**
+**Critérios deste grupo: 38 concluídos localmente; 3 parciais por avaliação
+humana ou adiamento.**
 
 **Etapas relacionadas:** 04; 07; DOC-A a DOC-D; 08 a 10.
 
@@ -433,13 +440,13 @@ O ponto 04.5, sobre consumo, está no grupo 3.2.
 
 - **Abrir vínculo documental exato ou explicar a restrição de acesso** —
   Concluído · 100%.
-- **Histórico em consulta, com resultado de integridade calculado** — Em
-  execução · ≈80%. Falta: Completar variações documentais e a conferência de
-  todos os fluxos. Responsável: Codex.
-- **Todas as relações entre telas terem sentido e acesso correto** — Em
-  execução · ≈90%. Falta: Concluir quatro relações do suporte e a validação
-  conjunta. A conferência preserva cancelamento, variantes BAL e consultas
-  somente de leitura; rascunhos têm adiamento expresso. Responsável: Codex.
+- **Histórico em consulta, com resultado de integridade calculado** —
+  Concluído localmente · 100%. Fatos permanecem em leitura; os resultados de
+  bytes, assinatura e confiança são calculados separadamente.
+- **Todas as relações entre telas terem sentido e acesso correto** — Parcial
+  somente pela apresentação dos rascunhos adiada por você, sem PASS integral.
+  As 164 relações executáveis foram conferidas e duas foram removidas conforme
+  aprovado. Cancelamento, variantes BAL e consultas em leitura são preservados.
 
 #### 07 — Dados e histórico dos PDFs
 
@@ -483,20 +490,22 @@ permanecem separadas nos resultados DOC-A a DOC-D.
   Concluído · 100%.
 - **Histórico oferecer versão exata, motivo e diferenças disponíveis** —
   Concluído · 100%.
-- **Leitura acessível do PDF e alternativa com a mesma versão** — Em execução ·
-  ≈70%. Falta: Concluir cobertura de leitura assistida e conferência com
-  participantes. Responsável: Codex; depois participantes.
+- **Leitura acessível do PDF e alternativa com a mesma versão** — Software e
+  estrutura conferidos localmente; avaliação humana pendente, sem PASS integral.
+  Falta: leitura assistida com participantes. Responsável: participantes, com
+  apoio de Codex para corrigir defeitos encontrados.
 - **Uma geração confirmada por tentativa, com recuperação segura** — Concluído
   localmente · 100%. Falhas de assinatura, envio e confirmação preservam a
   mesma intenção e impedem uma aprovação falsa.
 - **Diferenças documentais fiéis ao histórico, exibidas para consulta** —
   Concluído · 100%.
-- **Documentos completos, legíveis e acessíveis em todos os estados** — Em
-  execução · ≈75%. Falta: Completar cenários restantes e leitura assistida; nova
-  aparência no complemento documental. Responsável: Codex; depois participantes.
-- **PDF de regularização com autores, motivos, efeitos e assinatura** — Em
-  execução · ≈80%. Falta: Completar todas as variações e conferir conteúdo e
-  acessibilidade. Responsável: Codex.
+- **Documentos completos, legíveis e acessíveis em todos os estados** — Conteúdo,
+  estados previstos e aparência conferidos localmente; avaliação humana
+  pendente, sem PASS integral. Falta: leitura assistida e impressão com
+  participantes; estados futuros não recebem aprovação antecipada.
+- **PDF de regularização com autores, motivos, efeitos e assinatura** —
+  Concluído localmente · 100%. Conteúdo e assinatura conferidos; avaliação
+  humana e comunicação operacional permanecem nos gates próprios.
 - **Pedidos distintos gerarem emissões distintas, mantendo cópias antigas** —
   Concluído localmente · 100%. Concorrência, retomada e acervo foram conferidos.
 - **Histórico de emissões com identidade e arquivo preservado** — Concluído ·
@@ -508,9 +517,9 @@ permanecem separadas nos resultados DOC-A a DOC-D.
 - **Recuperar falhas antes e depois de assinar ou guardar o PDF** — Concluído
   localmente · 100%. Inclui respostas perdidas após envio e confirmação e
   retomada exclusiva de processamento abandonado.
-- **Verificar dados completos e recusar PDF vazio ou incompleto** — Em execução
-  · ≈80%. Falta: Completar conferência independente de documentos longos e casos
-  restantes. Responsável: Codex.
+- **Verificar dados completos e recusar PDF vazio ou incompleto** — Concluído
+  localmente · 100%. Conteúdo, páginas longas e recusas foram conferidos por
+  fontes e verificadores independentes no corpus definido.
 
 #### 09 — Emissão, recuperação e falhas documentais
 
@@ -619,9 +628,9 @@ leitura assistiva e câmera física permanece externa.
 - **Preservar anotações visíveis ou recusar explicitamente a conversão** —
   Concluído · 100%.
 - **Detectar arquivo alterado sem entregá-lo como íntegro** — Concluído · 100%.
-- **Limites e recusas de envio coerentes antes e depois de enviar** — Em
-  execução · ≈80%. Falta: Completar casos de limites extremos e combinações
-  documentais restantes. Responsável: Codex.
+- **Limites e recusas de envio coerentes antes e depois de enviar** — Concluído
+  localmente · 100%. O limite de 4 MB é informado antes do envio e imposto na
+  API; arquivos com conteúdo não preservável recebem recusa explícita.
 - **Distinguir original de cópia e preservar ressalva ou recusar** — Concluído
   · 100%.
 
@@ -787,7 +796,7 @@ implementações de Codex.
 
 ### 3.4 Navegação, listas e mensagens
 
-**Critérios deste grupo: 10 concluídos localmente; 1 parcial.**
+**Critérios deste grupo: 11 concluídos localmente; 0 parciais.**
 
 **Etapas relacionadas:** 05; 19.
 
@@ -877,9 +886,9 @@ Codex.
   Concluído · 100%.
 - **Atualizar consumo e filas entre sessões sem perder edição** — Concluído ·
   100%.
-- **Busca e listas alcançarem todos os registros permitidos** — Em execução ·
-  ≈90%. Falta: Conferência conjunta entre sessões na etapa 19. Responsável:
-  Codex.
+- **Busca e listas alcançarem todos os registros permitidos** — Concluído
+  localmente · 100%. Os dez grupos de listas, auditoria e tentativas técnicas
+  têm percurso completo qualificado; a CI conjunta continua na etapa 19.
 - **Buscar, ordenar e filtrar listas grandes sem resultados trocados** —
   Concluído · 100%. Os dez grupos de listas foram conferidos, inclusive
   registros antigos e mais de 100 resultados. Responsável: Codex.
@@ -1163,7 +1172,7 @@ disponibilidade total do serviço.
 
 ### 3.8 Banco, qualidade, piloto e encerramento
 
-**Critérios deste grupo: 1 concluído localmente; 3 parciais.**
+**Critérios deste grupo: 2 concluídos tecnicamente; 2 parciais.**
 
 **Etapas relacionadas:** 19; 20.
 
@@ -1171,23 +1180,25 @@ disponibilidade total do serviço.
 
 - **Aplicar atualizações pendentes da fase D-A no banco remoto** — Concluído ·
   100%.
-- **Manter as atualizações D-B aplicadas no remoto** — Em execução · ≈90%.
-  Falta: Aplicar as atualizações que surgirem nos próximos lotes e fechar a
-  conferência final. Responsável: Codex.
+- **Manter as atualizações D-B aplicadas no remoto** — Concluído tecnicamente ·
+  100% para o candidato publicado. Local/remoto em 238, com pós-verificação e
+  nenhuma atualização pendente. CI e Preview continuam na etapa 19.
 
 #### Piloto, qualidade e encerramento — critérios originais
 
-- **Contingência, piloto e responsáveis definidos antes da liberação** — Em
-  execução · ≈50%. Falta: Completar preparação técnica; você define
-  participantes, canais e responsáveis. Responsável: Codex; você e equipe.
-- **Concluir verificações automáticas e tratar qualidade do código** — Em
-  execução · ≈65%. Falta: Fechar verificações do candidato final; Sonar aguarda
-  configuração por sua decisão. Responsável: Codex; você para liberar acesso ao
-  Sonar, se necessário.
+- **Contingência, piloto e responsáveis definidos antes da liberação** —
+  Preparação técnica concluída; parcela operacional pendente, sem PASS integral.
+  Você define residência, participantes, canais, titular e substituto e realiza
+  o piloto com a equipe. Codex apoia e corrige defeitos constatados.
+- **Concluir verificações automáticas e tratar qualidade do código** — A CI
+  do candidato publicado precisa passar; acompanhamento e correções são de
+  Codex. Sonar permanece adiado por sua decisão, sem PASS. O resultado corrente
+  é consultado nas [verificações da PR](https://github.com/RMZZFAJ/home-care-assistant/pull/7/checks).
 
 #### 19 — Validação final, migrations e encerramento D-B
 
-Estado: em execução · 50%. Responsável: Codex.
+Estado: software reconciliado; validação automática do candidato em andamento.
+Responsável: Codex.
 
 **Condição para fechar:** As etapas executáveis estão fechadas, o candidato
 final tem seus resultados verificados e o remoto corresponde à branch; os gates
@@ -1200,12 +1211,15 @@ Pontos de verificação:
 - 19.3 CI do candidato final e estado real do Sonar.
 - 19.4 Remoto, Preview, relatório e próximos gates.
 
-**O que falta:** Concluir o conjunto final, aplicar atualizações pendentes e
-identificar as responsabilidades externas. Sonar permanece adiado.
+**O que falta:** a CI confirmar instalação limpa, evolução e conjunto integrado
+no candidato publicado, com correção de qualquer falha efetiva. O schema está
+reconciliado e as responsabilidades externas estão separadas no grupo 4.
+Sonar permanece adiado. O resultado vivo da CI pertence às verificações da PR;
+este arquivo não exige outro relato manual a cada mudança de um job.
 
 ### 3.9 Refatoração visual de todo o sistema
 
-**Critérios deste grupo: 0 concluídos localmente; 4 parciais.**
+**Critérios deste grupo: 1 concluído localmente; 3 parciais de avaliação humana.**
 
 **Etapas relacionadas:** 06; 15; 20.
 
@@ -1338,93 +1352,73 @@ ao Modelo Integral nas cinco larguras, com teclado e acessibilidade.
 
 #### Critérios originais da aparência
 
-- **Aplicar integralmente o Modelo Integral em todos os recursos** — Em
-  execução · ≈85%. Falta: Concluir telas, variações, diálogos e conferência
-  visual global. Responsável: Codex.
-- **Fechar, voltar, confirmar e descartar mantendo o foco correto** — Em
-  execução · ≈75%. Falta: Concluir diálogos e variações restantes; depois testar
-  com pessoas. Responsável: Codex; depois você e participantes.
-- **Textos longos e ampliação sem cortar conteúdo ou botões** — Em execução ·
-  ≈65%. Falta: Conferir textos extremos, ampliação de 400% e todas as telas.
-  Responsável: Codex; depois participantes.
-- **Concluir cada composição de tela preservando suas funções** — Em execução ·
-  ≈85%. Falta: Concluir e conferir individualmente as 66 composições e suas
-  variações. Responsável: Codex.
+- **Aplicar integralmente o Modelo Integral em todos os recursos** — As 66
+  composições executáveis estão implementadas e conferidas localmente.
+  Avaliação humana de contraste, ampliação e uso permanece pendente, sem PASS
+  integral. A apresentação de rascunhos é a exceção expressamente adiada.
+- **Fechar, voltar, confirmar e descartar mantendo o foco correto** —
+  Implementação e percursos de teclado/foco conferidos localmente. Falta:
+  avaliação com pessoas e tecnologia assistiva. Responsável: participantes;
+  Codex corrige os defeitos constatados. O critério permanece parcial.
+- **Textos longos e ampliação sem cortar conteúdo ou botões** — Textos extensos,
+  larguras e contraste forçado foram conferidos nos cenários definidos. Falta:
+  ampliação nativa de 400% e leitura assistida com participantes. O critério
+  permanece parcial; redimensionar a janela não foi apresentado como zoom real.
+- **Concluir cada composição de tela preservando suas funções** — Concluído
+  localmente · 100% das 66 composições. Confirmação da CI e avaliação humana
+  continuam nos gates próprios.
 
 #### Estado por área visual
 
-Estes percentuais abrangem o sistema inteiro. A conferência ainda indicada aqui
-é a global e das variações restantes; ela não desfaz o fechamento local das 46
-composições diárias da etapa 06.
+O percentual abaixo mede a implementação e conferência local do escopo
+executável. A avaliação humana, física e a CI final não recebem aprovação por
+esse percentual. Os painéis existentes de rascunhos foram preservados conforme
+sua decisão; sua reformulação e expansão não entram no escopo executável atual.
 
-- **Regra visual única e retirada do Fluent** — 100%. Já aplicado: Nova regra
-  adotada; biblioteca antiga retirada. Falta: Manter a regra nos próximos
-  incrementos. Responsável: Codex.
-- **Cores, tipografia, espaçamentos e ícones** — 80%. Já aplicado: Base
-  compartilhada aplicada. Falta: Ajustar diferenças em todos os consumidores.
-  Responsável: Codex.
-- **Botões, campos, seletores, menus e diálogos reutilizáveis** — 75%. Já
-  aplicado: Componentes comuns e principais fluxos migrados. Falta: Conferir
-  todas as variações e estados. Responsável: Codex.
-- **Cabeçalho, menu lateral, paciente e navegação móvel** — 80%. Já aplicado:
-  Estrutura e navegação do modelo. Falta: Fechar comparação de todos os estados
-  e larguras. Responsável: Codex.
-- **Formulários, apoio, avisos e recuperação** — 90%. Já aplicado: Criação,
-  atos de compra, entrega e transferência, decisões de requisição, pareceres,
-  reconto, programação, atribuição e adiamentos do balanço, movimentação
-  familiar, relatos, complementos e decisões de consumo, revisões de fluxo e
-  preparação privada de Andamentos e agenda, incluindo alterações, cancelamentos
-  e decisões sobre recursos existentes, e os editores de itens, unidades,
-  precisão, apresentações, situações e sucessores do catálogo. Falta: Conferir
-  demais variações, lacunas de continuidade e apresentação conjunta.
-  Responsável: Codex.
-- **Listas, tabelas, cartões, busca e filtros** — 80%. Já aplicado: Saldos,
-  movimentos, catálogo, unidades, embalagens, relatos, arquivos e materiais das
-  quatro fichas usam as composições comuns. Nomes, precisão e valores continuam
-  visíveis. Falta: Demais listas e conferência conjunta de todas as variações.
-  Responsável: Codex.
-- **Fichas de requisição, compra, entrega e balanço em abas** — 95%. Já
-  aplicado: Abas, cabeçalho, ações e painéis reais; seleção, revisão e materiais
-  de requisição e compra conferidos. Entregas agora separam declaração,
-  expedição, aceite, conciliação e pendência; recebimento, cancelamento e
-  apuração mantêm seus fatos. A caixa mostra autoria, percurso e tarefa com
-  filtros recuperáveis. Balanços agora apresentam contagem, referência,
-  diferenças e pareceres em composições próprias. Versões, anexos e novos
-  arquivos têm composição comum. Falta: Conferência conjunta, variações
-  restantes e novas regras do complemento. Responsável: Codex.
-- **Andamentos nas quatro fichas** — 80%. Já aplicado: Registro salvo, autoria,
-  data, categoria, etapa, preenchimento privado entre aparelhos, comparação e
-  recuperação, com resumos próprios para cada situação. Falta: Fechar aparência
-  de todos os estados e vínculos. Responsável: Codex.
-- **Cronologia, fatos automáticos e referências** — 80%. Já aplicado: Eventos,
-  fatos por versão, comparações e vínculos autorizados seguem a composição
-  comum. Falta: Conferência conjunta, combinações restantes e referências novas
-  do complemento. Responsável: Codex.
-- **Faixa de atenção, próxima providência e status** — 65%. Já aplicado:
-  Estrutura integrada a fatos operacionais. Falta: Concluir critérios de cada
-  tarefa sem avisos simulados. Responsável: Codex.
-- **Administração, cadastros, perfil e guias** — 75%. Já aplicado: Perfil em
-  abas, acesso, convites, pessoas, contas, contexto, cadastro, regras,
-  permissões, propostas, preparação global e guias locais conferidos. Falta:
-  suporte e relações restantes.
-  Responsável: Codex.
-- **Estoque, consumo, transferências e variantes de balanço** — 85%. Já
-  aplicado: Saldos, trânsito, movimentos e relatos seguem o modelo; origem,
-  correção familiar, preparação, revisão, recuperação e decisões continuam
-  funcionando. Quantidades e nomes preservados ficam distintos do cadastro
-  atual. Falta: Conferência conjunta, estados restantes e integração das novas
-  regras documentais. A separação do parecer BAL e da aplicação ao estoque já
-  está concluída no fluxo atual. Responsável: Codex.
-- **Central de avisos, aplicativo e suporte** — 50%. Já aplicado: Recursos
-  existentes usam a base compartilhada. Falta: Completar composição e
-  conferência das superfícies restantes. Responsável: Codex.
-- **Preservação de todas as funções e relações** — 60%. Já aplicado: Principais
-  consumidores e fichas preservados. Falta: Conferir individualmente as 66
-  composições e 171 relações. Responsável: Codex.
-- **Teclado, foco, ampliação, contraste e celular** — 50%. Já aplicado:
-  Verificações dirigidas em diferentes larguras e navegadores. Falta: Cobertura
-  restante, ampliação real e tarefas com pessoas. Responsável: Codex; depois
-  você e participantes.
+- **Regra visual única e retirada do Fluent — 100% local.** Modelo Integral,
+  componentes próprios e retirada da biblioteca anterior concluídos.
+- **Cores, tipografia, espaçamentos e ícones — 100% local.** Base compartilhada
+  e consumidores conferidos, incluindo avatar, cabeçalho e suporte.
+- **Botões, campos, seletores, menus e diálogos — 100% local.** Controles
+  reutilizáveis, ajuda, estados, navegação, decisões e foco conferidos; as
+  tarefas humanas permanecem separadas.
+- **Cabeçalho, menu lateral, paciente e navegação móvel — 100% local.**
+  Estrutura, contexto e larguras conferidos com as permissões próprias.
+- **Formulários, apoio, avisos e recuperação — 100% local no escopo vigente.**
+  Fichas, decisões, consumo, estoque familiar, agenda, BAL, catálogo,
+  administração, perfil e Andamentos preservam campos e recuperação própria.
+  Rascunhos conservam a abrangência e apresentação existentes por sua decisão.
+- **Listas, tabelas, cartões, busca e filtros — 100% local.** Saldos, movimentos,
+  catálogo, unidades, embalagens, relatos, agenda, fichas, arquivos, avisos,
+  propostas e auditoria conferidos, incluindo listas extensas e leitura falha.
+- **Fichas de requisição, compra, entrega e balanço em abas — 100% local.**
+  Cabeçalho, ações, materiais, ciência, aquisição, expedição, recebimento,
+  conciliação, contagem/revisão, versões, anexos e arquivos gerados preservados.
+  Devolução autônoma e parecer BAL separado do estoque estão integrados.
+- **Andamentos nas quatro fichas — 100% local.** Autoria, instante, origem,
+  natureza, etapa, menções, destaques e recuperação conferidos.
+- **Cronologia, fatos automáticos e referências — 100% local.** Ordem, versões,
+  vínculos autorizados, restrições e acessos agrupados preservados. Acesso ou
+  menção não substitui ciência ou recebimento.
+- **Faixa de atenção, próxima providência e status — 100% local.** Orientações
+  ligadas aos fatos e tarefas reais de cada papel, sem concluir atos pela leitura.
+- **Administração, cadastros, perfil e guias — 100% local.** Acesso, recuperação,
+  convites, pessoas, vínculos, contas, regras, propostas, contexto, preparação
+  global/local, perfil em abas e guias por papel conferidos.
+- **Estoque, consumo, transferências e variantes de balanço — 100% local.**
+  Origem, saldos, trânsito, declarações, relatos, correções, revisão e decisão
+  mantêm quantidades, autoria e fatos antigos separados do cadastro atual.
+- **Central de avisos, aplicativo e suporte — 100% local.** Central pessoal,
+  instalação/atualização, aparelhos, preferências, tentativas, incidentes,
+  política, auditoria e roteiro de continuidade conferidos.
+- **Preservação de funções e relações — concluída no escopo executável.**
+  As 66 composições e 164 relações têm comprovação local compatível; cinco
+  relações de apresentação de rascunhos estão adiadas e duas foram removidas
+  por decisão aprovada. Não equivale a aprovar as 171 integralmente.
+- **Teclado, foco, ampliação, contraste e celular — conferência local concluída;
+  avaliação humana pendente.** Falta ampliação nativa, tecnologia assistiva e
+  tarefas em aparelhos reais. Não há percentual de homologação humana inferido
+  das capturas ou dos testes automatizados.
 
 ## 4. Sua participação e dependências externas
 
@@ -1702,6 +1696,15 @@ passou a 70 minutos, com os mesmos casos e regras; erros serão publicados ao
 terminar cada teste e seus arquivos serão preservados mesmo em cancelamento.
 Isso corrige o corte e a perda de diagnóstico, sem declarar a CI já aprovada.
 
+**12 de novembro — reconciliação final dos critérios:** os fechamentos de
+formulários, listas, emissão, recuperação, verificação e anexos foram associados
+aos critérios que ainda conservavam pendências anteriores. Foram preservadas
+as provas e os IDs; não houve nova implementação ou repetição de suíte por essa
+atualização. São 96 critérios verificados tecnicamente e nove parciais. Os nove
+conservam avaliação humana/assistiva, piloto real, apresentação/expansão de
+rascunhos adiada ou CI/Sonar. A validação da CI permanece com Codex; o adiamento
+do Sonar não aprova a qualidade nem dispensa corrigir falhas efetivas da CI.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1817,11 +1820,13 @@ para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passa
 
 **Ordem atual do restante, sob responsabilidade de Codex:**
 
-1. Publicar o candidato integrado com a correção do corte da CI iOS; observar
-   seus resultados e o Preview, corrigindo qualquer falha efetiva.
-2. Reconciliar os 26 critérios parciais com as entregas já fechadas, preservando
-   os IDs e os adiamentos. Fechar as validações técnicas que realmente faltarem;
-   não repetir suítes compatíveis apenas para atualizar o acompanhamento.
+1. **Publicado:** candidato integrado com a correção do corte da CI iOS.
+   Acompanhar o resultado do SHA atual e do Preview e corrigir falhas efetivas;
+   os dois casos iOS anteriores não recebem aprovação pela reprodução local.
+2. **Reconciliação concluída:** os 26 parciais anteriores passaram a 17
+   conclusões técnicas e nove critérios com parcelas pendentes explícitas.
+   Nenhum adiamento ou teste humano virou PASS. Preservar a associação durante
+   as correções da CI, sem repetir verificações compatíveis por rotina.
 3. Concluir a etapa 19: conferir CI, migrations, Preview e contratos do candidato
    final e entregar o estado técnico com os próximos gates e responsáveis.
 
