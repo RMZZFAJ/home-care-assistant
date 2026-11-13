@@ -5,7 +5,7 @@ import { setup, actor, fixtures, rpc } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(120_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
@@ -148,7 +148,7 @@ test("document list reaches more than100 REQ and old pending records with stable
   await expect(search).toHaveValue(code);
   await expect(links(page)).toHaveCount(1);
   await page.setViewportSize({ width: 320, height: 900 });
-  await audit(page, "document list old request 320");
+  await auditFromTop(page, "document list old request 320");
   mkdirSync("output/playwright/phase-d", { recursive: true });
   await page.getByRole("main").screenshot({ path: `output/playwright/phase-d/document-list-old-request-${info.project.name}.png` });
   expect(facts(f.patient)).toBe(before);

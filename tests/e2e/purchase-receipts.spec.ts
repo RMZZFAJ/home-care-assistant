@@ -160,6 +160,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   expect(Number((await rpc(f.admin, "operational_document", { p_id: document.id })).lines[0].waived_quantity)).toBe(0);
   await expect(form.getByRole("textbox", { name: "Motivo / justificativa", exact: true })).toHaveValue("Encerramento fictício: os 8 restantes não serão adquiridos.");
   await form.getByRole("button", { name: "Revisar operação", exact: true }).click();
+  await expect(review).toBeVisible();
   for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "COM closure review " + width); expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true); }
   mkdirSync("output/playwright/phase-d", { recursive: true }); await page.screenshot({ path: `output/playwright/phase-d/purchase-close-review-${info.project.name}.png`, animations: "disabled" });
   let attempts = 0;

@@ -1,5 +1,12 @@
 # Complementos posteriores à ordem D-B
 
+## Duplicação do Sonar adiada — 13/11/2026
+
+O responsável decidiu não alterar a configuração proposta e registrar a
+duplicação como pendência para analisar depois. O tema fica OWNER-DEFERRED,
+sem exclusões de migrations, alteração de limiar ou refatoração para esse fim.
+O gate ERROR permanece registrado, sem aprovação presumida.
+
 ## Ícone Android, saúde Realtime e duplicação — 12/11/2026
 
 Após confirmar atualização e recebimento do teste, o responsável relatou um

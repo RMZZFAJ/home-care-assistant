@@ -1,6 +1,6 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-Atualizado em 12 de novembro de 2026, com suporte, acompanhamento de avisos e
+Atualizado em 13 de novembro de 2026, com suporte, acompanhamento de avisos e
 recuperação conferidos localmente no lote 6. O fechamento da CI continua aberto.
 Inclui a refatoração visual da aplicação e o complemento aprovado
 de fichas e PDFs. A fase permanece em execução, sem
@@ -80,7 +80,7 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Outras áreas visuais | Três composições e quatro relações restantes fechadas |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Critérios finais e validação do candidato publicado |
-| Incremento atual | Ícone do aviso Android e análise de Realtime/duplicação |
+| Incremento atual | Correções da CI e consolidação das atualizações pendentes |
 | Resultado local | 66 composições; 164 relações conferidas |
 | Banco | Local e remoto em 242; sem atualizações pendentes |
 | CI de 0dbd2ba | Linux/Windows/banco/Chromium passaram; iOS cortado |
@@ -90,6 +90,8 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Preview de 8fc04b8 | Pronto na Vercel, no endereço estável abaixo |
 | CI de 7e27795 | Dois casos Chromium falharam; ambos iOS/Mobile passaram |
 | Preview de 7e27795 | Pronto; atualização e teste recebidos no S24 |
+| CI de f2491be | Mobile-1 falhou; demais passaram, três com retry |
+| Preview de f2491be | Pronto; símbolo HC confirmado por você no S24 |
 
 **Correções do fechamento:** os campos de filtro do estoque conservam a edição
 mesmo com atualização em segundo plano. A PWA mantém a aparência aprovada,
@@ -123,12 +125,14 @@ background e homologação operacional continuam separados.
 
 **Acréscimo posterior — ícone e análise técnica:** o quadrado branco do aviso
 Android foi corrigido localmente com o símbolo HC transparente para a barra,
-preservando o logo colorido no aviso. Testes dirigidos passaram; publicação
-aguarda a CI atual terminar e a aparência física será conferida depois.
+preservando o logo colorido no aviso. Testes dirigidos passaram; o incremento
+foi publicado em f2491be e você confirmou o símbolo HC no S24 após atualizar.
+Esse defeito está encerrado nesse aparelho. A CI do incremento continua própria.
 Realtime verdadeiro já está configurado. A lentidão de autorização informada
 por você está em investigação, sob minha responsabilidade, sem causa isolada
-nem correção declarada. A duplicação do Sonar foi explicada; mudanças nessa
-configuração aguardam sua decisão. Nenhuma dessas consultas alterou o remoto.
+nem correção declarada. A análise/configuração da duplicação do Sonar foi
+adiada por você em13/11, mantendo o gate reprovado. Nenhuma dessas consultas
+alterou o remoto.
 
 **Correções encontradas pela CI:** dois casos de Chromium falharam. O primeiro
 precisava iniciar a conferência visual em posição estável após redimensionar.
@@ -136,7 +140,8 @@ O segundo revelou o botão de atualização encoberto pelo menu lateral no
 desktop. Ambos foram corrigidos localmente; a recuperação da foto e seis
 percursos de atualização/falha nos três navegadores passaram. Os grupos Mobile
 e ambos iOS da CI anterior passaram, sem cancelamento. A execução terminou;
-o novo commit pode ser publicado e precisará de sua própria CI.
+as correções foram publicadas em f2491be. Sua CI terminou com falha de Mobile-1,
+detalhada no histórico abaixo.
 Cada grupo iOS precisou de uma repetição. Os dois pontos do teste foram
 corrigidos e os três casos afetados passaram na conferência dirigida do WebKit.
 
@@ -1291,7 +1296,8 @@ Pontos de verificação:
 **O que falta:** a CI confirmar instalação limpa, evolução e conjunto integrado
 no candidato publicado, com correção de qualquer falha efetiva. O schema está
 reconciliado e as responsabilidades externas estão separadas no grupo 4.
-A revisão do Sonar foi reaberta em12/11 e integra este fechamento. O resultado
+A revisão do Sonar foi reaberta em12/11. Em13/11, você adiou a análise da
+duplicação e manteve a configuração, sem aprovar o gate. O resultado
 vivo da CI pertence às verificações da PR;
 este arquivo não exige outro relato manual a cada mudança de um job.
 
@@ -1513,7 +1519,7 @@ não interrompem atividades independentes da fase.
 | Acessibilidade com pessoas | 0% homologado | Participantes |
 | Destino de backup e chaves | Decisão pendente | Você |
 | Agenda de backup externo | 0% ativada | Você autoriza; Codex prepara |
-| Revisão do Sonar | Retomada; duplicação ainda reprova o gate | Codex |
+| Duplicação do Sonar | Adiada por você; gate continua reprovado | Você/Codex |
 | Piloto, suporte e canais | Não definidos | Você e equipe |
 | Provedores e aparelhos reais | Pendente | Codex, você, fornecedores |
 | ICP-Brasil e serviços futuros | Futuros | Você e fornecedores |
@@ -1786,6 +1792,33 @@ conservam avaliação humana/assistiva, piloto real, apresentação/expansão de
 rascunhos adiada ou CI/Sonar. A validação da CI permanece com Codex; o adiamento
 do Sonar não aprova a qualidade nem dispensa corrigir falhas efetivas da CI.
 
+**13 de novembro — CI do ícone e correções dirigidas:** a execução de f2491be
+terminou com uma falha em Mobile-1 e três casos que passaram somente na
+repetição: consumo/Chromium-1, agenda/Mobile-2 e compra/iOS-2. Windows, Ubuntu,
+banco e os cinco demais grupos de navegador passaram. Não houve cancelamento.
+Na lista, a conferência após reduzir a tela conservou rolagem anterior e
+encontrou um controle parcialmente sob o cabeçalho. No consumo, a espera
+aceitou uma resposta anterior de sucesso em vez da falha provocada pelo teste.
+Na compra, a conferência de foco começou antes de a revisão reabrir.
+
+As correções usam a origem visual estável já existente, identificam a resposta
+de falha e aguardam a revisão aparecer. O teste de agenda também passa a
+confirmar cada salvamento entre sessões antes de avançar; a intermitência não
+foi atribuída a um defeito de produto sem comprovação. Regras de acessibilidade,
+autorização real, conflito de versões e ausência de efeitos indevidos permanecem.
+A coorte local de produção aprovou 11 dos 12 casos. A compra no WebKit falhou
+antes do trecho alterado: a consulta de contexto ficou indisponível, com dois
+timeouts SQL locais no período, e o formulário permaneceu bloqueado. Os
+artefatos foram preservados e somente esse caso foi repetido: passou no novo
+build de produção. São 12 cenários distintos qualificados entre as duas
+execuções, sem apagar a falha inicial. Lint dos quatro testes e Markdown dos
+cinco documentos passaram; a estrutura dos 105 critérios foi preservada.
+Não houve alteração dos limites ou desbloqueio artificial do formulário.
+A CI do próximo commit tem resultado próprio; não recebe aprovação por uma
+execução anterior. As atualizações documentais pendentes seguem no mesmo envio
+das correções. Depois desse envio, Codex aguarda seu aviso para retomar a
+leitura da CI, conforme solicitado.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1902,10 +1935,11 @@ para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passa
 
 **Ordem atual do restante, sob responsabilidade de Codex:**
 
-1. Conferir a CI e o Preview do incremento com o ícone e as correções de
-   layout/teste. A CI7e27795 terminou, incluindo ambos iOS, sem cancelamento.
-   As migrations prontas estão reconciliadas. Prosseguir no diagnóstico da
-   lentidão de autorização Realtime, sem mudanças de configuração especulativas.
+1. Conferir a nova CI e o Preview das correções de f2491be depois do seu aviso,
+   sem acompanhamento contínuo nesse intervalo. A validação dirigida e a
+   documentação pendente acompanham as correções no mesmo envio. As migrations
+   prontas estão reconciliadas. Retomar também o diagnóstico da lentidão de
+   autorização Realtime, sem mudanças de configuração especulativas.
 2. Concluir a etapa 19 com a CI do SHA novo, estado real do Sonar, banco e
    Preview. Entregar o estado técnico e os próximos gates, sem merge/produção.
 
@@ -1913,7 +1947,7 @@ para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passa
 
 A etapa 20 (grupo 4) conserva avaliação humana, aparelho físico e fornecedores.
 A reformulação/expansão de rascunhos permanece adiada expressamente pelo
-responsável. A revisão do Sonar foi retomada em12/11. Nenhum adiamento recebe
+responsável. A duplicação do Sonar foi adiada em13/11. Nenhum adiamento recebe
 PASS. As responsabilidades de
 implementação continuam com Codex; dependência externa não encobre código
 faltante.

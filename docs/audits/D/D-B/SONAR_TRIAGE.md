@@ -1,6 +1,15 @@
 # Triagem SonarCloud D-B
 
-## Duplicação consultada em7e27795 — decisão pendente
+## Decisão vigente — duplicação adiada em13/11/2026
+
+O responsável decidiu não alterar a configuração e deixar a análise da
+duplicação para depois: OWNER-DEFERRED. Nenhuma exclusão, limiar ou refatoração
+será aplicada para esse tema nesta etapa. O gate não recebe aprovação por isso.
+Em f2491be, o check terminou ERROR somente por duplicação de3,2274% no código
+novo; segurança, confiabilidade e manutenção A, hotspots revisados100% e zero
+apontamentos abertos na consulta. As correções efetivas anteriores permanecem.
+
+## Consulta em7e27795 — proposta não adotada
 
 A PR7 registra2,6% no conjunto e3,2288% no código novo:5028 linhas duplicadas
 em155722 linhas novas. O gate ERROR continua somente pelo limite de3% para
@@ -21,8 +30,8 @@ o limite de3% e os testes/fontes de aplicação na medição. A opção específ
 [Duplication Exclusions](https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/project-analysis/setting-analysis-scope/exclude-from-coverage-duplication)
 não é exclusão geral de análise. Reutilização nas APIs deve ter benefício de
 manutenção demonstrável e regressões pertinentes; não iniciar uma refatoração
-geral por meta numérica. Configuração/refatoração desse tema aguardam decisão
-do responsável. Nenhum limiar, exclusão ou código foi alterado nessa análise.
+geral por meta numérica. A decisão posterior acima adia esse tema. Nenhum
+limiar, exclusão ou código foi alterado nessa análise.
 
 ## Análise publicada4315eb9
 

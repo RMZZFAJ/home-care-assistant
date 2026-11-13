@@ -52,9 +52,14 @@ os quatro arquivos do CacheStorage. Conteúdo privado e replay continuam vedados
 Chrome móvel emulado decodificou as duas imagens do worker realmente gerado
 depois de expirar o acesso, sem novas requisições HTTP. Rodou pelo runner local
 verificado em modo diagnóstico, sem substituir o build de produção da CI ou
-a inspeção física do novo ícone. Publicação aguarda o término da CI7e27795,
-conforme a condição do responsável; a aparência corrigida no S24 ainda precisa
-ser confirmada depois da atualização publicada.
+a inspeção física do novo ícone. A publicação ocorreu em f2491be depois do
+término da CI7e27795. No Preview estável desse SHA, o responsável atualizou a
+PWA e confirmou no S24: Agora aparece o símbolo HC. Esse relato físico encerra
+o defeito do quadrado branco nesse aparelho; não aprova outros aparelhos,
+cenários de background ou a homologação operacional completa. A CI de f2491be
+terminou com falha na conferência da lista em Mobile-1; seu resultado e as
+correções dirigidas estão no acompanhamento principal. O reteste físico do
+ícone não substitui a CI do próximo SHA.
 
 ## Contrato vigente de conta e sessão — 12/11/2026
 

@@ -73,6 +73,13 @@ contratação nem atribui a lentidão ao plano. O acesso alternativo ao computad
 também retornou native pipe unavailable; não foi possível consultar o painel
 nesta sessão. Os logs estruturados não expõem duração dessas autorizações.
 
+Após o reteste físico do ícone, outra consulta encontrou994 autorizações,
+mesmo reset e mesmo máximo acumulado. As quatro chamadas adicionais somaram
+aproximadamente51ms de execução SQL, considerando o arredondamento da leitura
+anterior. Isso mostra consultas recentes rápidas, sem identificar o usuário
+ou aparelho de cada chamada. Não mede espera por conexão/rede nem substitui
+o p90 de24h; o alerta não recebeu conclusão de correção.
+
 ## Histórico da revisão dos avisos — 239/240
 
 20261112214842 preserva as onze políticas, seus papéis e predicados sensíveis

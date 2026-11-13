@@ -378,6 +378,11 @@ test("resource private CAS preserves local fields and requires explicit adoption
   await open(page, "shift_type_edit");
   await fill(page, "shift_type_edit");
   await button(page, "Guardar preenchimento privado").click();
+  const panel = page.getByRole("region", {
+    name: "Rascunho privado",
+    exact: true,
+  });
+  await expect(panel).toContainText("Revisão 1");
   const context = await peerContext(browser),
     peer = await context.newPage();
   try {
@@ -388,14 +393,13 @@ test("resource private CAS preserves local fields and requires explicit adoption
       .getByLabel("Nome do plantão", { exact: true })
       .fill("Edição da segunda sessão");
     await button(peer, "Guardar preenchimento privado").click();
+    await expect(
+      peer.getByRole("region", { name: "Rascunho privado", exact: true }),
+    ).toContainText("Revisão 2");
     await drawer(page, editorTitle("shift_type_edit"))
       .getByLabel("Nome do plantão", { exact: true })
       .fill("Minha edição depois da disputa");
     await button(page, "Guardar preenchimento privado").click();
-    const panel = page.getByRole("region", {
-      name: "Rascunho privado",
-      exact: true,
-    });
     await expect(
       panel.getByRole("region", { name: "Minha edição", exact: true }),
     ).toContainText("Minha edição depois da disputa");
@@ -407,6 +411,7 @@ test("resource private CAS preserves local fields and requires explicit adoption
     ).toContainText("Edição da segunda sessão");
     await button(page, "Manter minha edição para salvar nova revisão").click();
     await button(page, "Guardar preenchimento privado").click();
+    await expect(panel).toContainText("Revisão 3");
     const version = JSON.parse(
       sql(
         `select to_jsonb(t) from public.shift_types t where id=${q(f.target)}`,

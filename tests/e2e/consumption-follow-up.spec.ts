@@ -37,8 +37,8 @@ function officialWrites(page: Page) {
   });
   return writes;
 }
-async function refresh(page: Page, id: string) {
-  const response = page.waitForResponse(r => new URL(r.url()).pathname === `/api/consumption/${id}` && r.request().method() === "GET");
+async function refresh(page: Page, id: string, expectedStatus?: number) {
+  const response = page.waitForResponse(r => new URL(r.url()).pathname === `/api/consumption/${id}` && r.request().method() === "GET" && (expectedStatus === undefined || r.status() === expectedStatus));
   await detail(page).getByRole("button", { name: "Atualizar relato", exact: true }).click();
   return response;
 }
@@ -114,7 +114,9 @@ test("Consumption follow-up suspends operations during refresh, retains identifi
     await held;
     await route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Consulta fictícia do relato temporariamente indisponível", retryable: true } });
   });
-  const pending = refresh(page, id);
+  // An earlier real read can still finish after the fault route is installed.
+  // Observe the injected failure, rather than accepting that preceding 200.
+  const pending = refresh(page, id, 503);
   try {
     await expect(detail(page)).toContainText("Atualizando o acompanhamento do relato");
     await expect(detail(page).getByRole("button", { name: "Conferir consumo", exact: true })).toHaveCount(0);
@@ -136,8 +138,12 @@ test("Consumption follow-up suspends operations during refresh, retains identifi
   await page.unroute(`**/api/consumption/${id}`);
   await refresh(page, id);
   await expect(detail(page).getByRole("button", { name: "Conferir consumo", exact: true })).toBeEnabled();
+  const denied = page.waitForResponse(r => new URL(r.url()).pathname === `/api/consumption/${id}` && r.request().method() === "GET" && r.status() === 403);
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.adminA.id)},'stock.family.read',false);`);
-  expect((await refresh(page, id)).status()).toBe(403);
+  // Realtime may already remove the control after revocation. Drive its normal
+  // read invalidation; the HTTP request and the Auth/RLS denial remain real.
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  expect((await denied).status()).toBe(403);
   await expect(detail(page).getByRole("heading", { name: "Relato original · versão 1", exact: true })).toHaveCount(0);
   await expect(detail(page).getByRole("button", { name: "Conferir consumo", exact: true })).toHaveCount(0);
   expect(facts(f.patient)).toBe(before);
