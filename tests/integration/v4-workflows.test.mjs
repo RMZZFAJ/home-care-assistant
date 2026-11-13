@@ -73,7 +73,7 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
     source: "FAMILY",
     destination: "CARE_TEAM",
     recipientId: fixtures.professional.id,
-    lines: products.map((productId, i) => ({
+    lines: products.map((productId, i) => ({ requestFulfillment: "complete",
       productId,
       quantity: i ? "2" : "10",
       requisitionItemIds: [

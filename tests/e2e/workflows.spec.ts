@@ -397,7 +397,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
       recipientId: fixtures().professional.id,
       lines: detail.requisition_items
         .slice(0, 5)
-        .map((line: { id: string; product_id: string }) => ({
+        .map((line: { id: string; product_id: string }) => ({ requestFulfillment: "complete",
           productId: line.product_id,
           quantity: "10",
           requisitionItemIds: [line.id],

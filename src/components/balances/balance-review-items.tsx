@@ -28,9 +28,9 @@ export function BalanceReviewItemFields({ lines, fields, onChange, disabled, ref
   };
   return <fieldset ref={ref} disabled={disabled} className="hca-form-stack">
     <legend>Materiais efetivamente examinados</legend>
-    <p>Deixe Não examinado nos materiais que não conferiu. Um parecer geral não confirma cada material. Indicar reconto ou ajuste não executa esse ato.</p>
+    <p>Deixe Não examinado nos materiais que não conferiu. Uma revisão geral não confirma cada material. Indicar reconto ou ajuste não executa esse ato.</p>
     {previous.length ? <Notice>Há referências de materiais da preparação anterior que não constam nesta contagem. Remova-as explicitamente antes de confirmar.
-      {previous.map((key, index) => <ActionButton key={key} onClick={() => change(key, null)}>Remover referência anterior {index + 1} deste parecer</ActionButton>)}
+      {previous.map((key, index) => <ActionButton key={key} onClick={() => change(key, null)}>Remover referência anterior {index + 1} desta revisão</ActionButton>)}
     </Notice> : null}
     {lines.map(line => {
       const key = "item:" + line.id;
@@ -42,7 +42,7 @@ export function BalanceReviewItemFields({ lines, fields, onChange, disabled, ref
       return <fieldset className="hca-form-stack" key={line.id}>
         <legend>{line.name} · {line.unit}</legend>
         {raw !== undefined && !value ? <Notice error>O preenchimento deste material não pôde ser conferido. Ele foi mantido; escolha novamente o resultado para corrigi-lo.</Notice> : null}
-        <FormField label={"Resultado do parecer — " + line.name} error={raw !== undefined && (!value || staleLabel) ? "A referência do material mudou ou não pôde ser conferida. Escolha novamente seu resultado." : undefined}>
+        <FormField label={"Resultado da revisão — " + line.name} error={raw !== undefined && (!value || staleLabel) ? "A referência do material mudou ou não pôde ser conferida. Escolha novamente seu resultado." : undefined}>
           <SelectField value={value?.result ?? "not_examined"} onChange={event => {
             const result = event.currentTarget.value;
             if (result === "not_examined") change(key, null);
@@ -68,29 +68,29 @@ export function BalanceReviewItemFields({ lines, fields, onChange, disabled, ref
   </fieldset>;
 }
 
-export function BalanceReviewPreparedFacts({ lines, fields }: { lines: BalancePreparation["lines"]; fields: Record<string, string> }) {
-    let items: ReturnType<typeof balanceReviewItemsFromFields> | null = null;
-    try { items = balanceReviewItemsFromFields(fields); } catch { /* Malformed saved values remain editable. */ }
-    if (!items) return <Notice error>Confira os resultados por material antes de confirmar.</Notice>;
-    if (!items.length) return <p>Parecer geral; nenhum material foi declarado como examinado individualmente.</p>;
-    return <section className="hca-form-stack" aria-label="Materiais incluídos no parecer">
-      <h3>Materiais incluídos no parecer</h3>
-      {items.map(item => <article key={item.lineId} className="hca-form-stack">
-        <strong>{lines.find(line => line.id === item.lineId)?.name ?? "Referência anterior não disponível"}</strong>
-        <p>{item.result === "confirmed" ? "Confirmado" : "Diferença apontada"} · {item.forwarding === "none" ? "Sem encaminhamento adicional" : item.forwarding === "recount" ? "Solicitar reconto" : "Ajuste autorizado em ato próprio"}.</p>
-        {item.comment ? <p className="whitespace-pre-wrap wrap-anywhere">{item.comment}</p> : null}
-      </article>)}
-      <p>Os demais materiais não foram declarados como examinados. O parecer não altera o estoque.</p>
-    </section>;
+export function BalanceReviewPreparedFacts({ lines, fields }: { lines: BalancePreparation["lines"]; fields: Record<string, string>; }) {
+  let items: ReturnType<typeof balanceReviewItemsFromFields> | null = null;
+  try { items = balanceReviewItemsFromFields(fields); } catch { /* Malformed saved values remain editable. */ }
+  if (!items) return <Notice error>Confira os resultados por material antes de confirmar.</Notice>;
+  if (!items.length) return <p>Revisão geral; nenhum material foi declarado como examinado individualmente.</p>;
+  return <section className="hca-form-stack" aria-label="Materiais incluídos na revisão">
+    <h3>Materiais incluídos na revisão</h3>
+    {items.map(item => <article key={item.lineId} className="hca-form-stack">
+      <strong>{lines.find(line => line.id === item.lineId)?.name ?? "Referência anterior não disponível"}</strong>
+      <p>{item.result === "confirmed" ? "Confirmado" : "Diferença apontada"} · {item.forwarding === "none" ? "Sem encaminhamento adicional" : item.forwarding === "recount" ? "Solicitar reconto" : "Ajuste autorizado em ato próprio"}.</p>
+      {item.comment ? <p className="whitespace-pre-wrap wrap-anywhere">{item.comment}</p> : null}
+    </article>)}
+    <p>Os demais materiais não foram declarados como examinados. A revisão não altera o estoque.</p>
+  </section>;
 }
 
-export function BalanceReviewItemFacts({ review, corrections, documentId, documentVersion }: { review: BalanceReviewRecord; corrections?: unknown; documentId: string; documentVersion: number }) {
+export function BalanceReviewItemFacts({ review, corrections, documentId, documentVersion }: { review: BalanceReviewRecord; corrections?: unknown; documentId: string; documentVersion: number; }) {
   const linked = balanceCorrectionFacts.safeParse(corrections);
   const parsed = balanceReviewItems.safeParse(review.item_results ?? []);
-  if (!parsed.success) return <Notice error>Não foi possível conferir o detalhamento por material deste parecer.</Notice>;
-  if (!parsed.data.length) return <p>Parecer geral; nenhum resultado por material foi declarado neste ato.</p>;
-  return <section className="hca-form-stack" aria-label="Resultados por material deste parecer">
-    <h4>Materiais com parecer individual</h4>
+  if (!parsed.success) return <Notice error>Não foi possível conferir o detalhamento por material desta revisão.</Notice>;
+  if (!parsed.data.length) return <p>Revisão geral; nenhum resultado por material foi declarado neste ato.</p>;
+  return <section className="hca-form-stack" aria-label="Resultados por material desta revisão">
+    <h4>Materiais com revisão individual</h4>
     {parsed.data.map(item => {
       const line = review.reviewed_snapshot.lines.find(row => row.id === item.lineId);
       return <article key={item.lineId} className="hca-form-stack">
@@ -98,31 +98,31 @@ export function BalanceReviewItemFacts({ review, corrections, documentId, docume
         <p>{item.result === "confirmed" ? "Confirmado" : "Diferença apontada"} · {item.forwarding === "none" ? "Sem encaminhamento adicional" : item.forwarding === "recount" ? "Solicitação de reconto indicada" : "Ajuste autorizado em ato próprio indicado"}.</p>
         {item.comment ? <p className="whitespace-pre-wrap wrap-anywhere">{item.comment}</p> : null}
         {item.result === "difference" ? <>
-          <p>O parecer não corrige o estoque. O encaminhamento, sozinho, não comprova sua execução.</p>
+          <p>A revisão não corrige o estoque. O encaminhamento, sozinho, não comprova sua execução.</p>
           {!linked.success ? <Notice error>Não foi possível conferir os atos posteriores vinculados. Consulte novamente esta ficha.</Notice> : (() => {
-            const entry=linked.data.find(row=>row.reviewId===review.id && row.sourceLineId===item.lineId);
-            if(!entry || entry.acts.some(act=>act.documentId!==documentId || act.version>documentVersion || act.version<=review.reviewed_document_version || act.countVersion<=review.count_version || (act.application.state==='applied' && act.application.documentVersion>documentVersion)))return <Notice error>Os atos posteriores não correspondem à ficha, contagem ou versão consultada. Consulte novamente esta ficha.</Notice>;
-            if(entry.sourceState==='unavailable')return <Notice>Identidade histórica deste material indisponível; nenhum vínculo foi presumido por nome ou quantidade.</Notice>;
-            if(!entry.acts.length)return <p>Nenhum reconto posterior vinculado a este material nesta ficha.</p>;
+            const entry = linked.data.find(row => row.reviewId === review.id && row.sourceLineId === item.lineId);
+            if (!entry || entry.acts.some(act => act.documentId !== documentId || act.version > documentVersion || act.version <= review.reviewed_document_version || act.countVersion <= review.count_version || (act.application.state === 'applied' && act.application.documentVersion > documentVersion))) return <Notice error>Os atos posteriores não correspondem à ficha, contagem ou versão consultada. Consulte novamente esta ficha.</Notice>;
+            if (entry.sourceState === 'unavailable') return <Notice>Identidade histórica deste material indisponível; nenhum vínculo foi presumido por nome ou quantidade.</Notice>;
+            if (!entry.acts.length) return <p>Nenhum reconto posterior vinculado a este material nesta ficha.</p>;
             return <section className="hca-form-stack" aria-label="Atos posteriores vinculados a este material">
               <h5>Atos posteriores vinculados</h5>
-              {entry.acts.map(act=><article className="hca-form-stack" key={act.eventId}>
+              {entry.acts.map(act => <article className="hca-form-stack" key={act.eventId}>
                 <strong>Reconto {act.countVersion} · versão {act.version}</strong>
                 <p>{act.actorName ?? "Nome histórico não preservado"} · {formatBrazilDate(act.recordedAt)}.</p>
-                <p>{act.line.name} · contado neste reconto: {formatQuantity(act.line.quantity,act.line.unit)}.</p>
-                <Link className="ui-button ui-button-secondary" href={"/documentos/"+act.documentId+"/arquivos?version="+act.version}>Consultar versão {act.version} do reconto</Link>
-                {act.application.state==='applied'?<>
+                <p>{act.line.name} · contado neste reconto: {formatQuantity(act.line.quantity, act.line.unit)}.</p>
+                <Link className="ui-button ui-button-secondary" href={"/documentos/" + act.documentId + "/arquivos?version=" + act.version}>Consultar versão {act.version} do reconto</Link>
+                {act.application.state === 'applied' ? <>
                   <p>Aplicado por {act.application.actorName} · {formatBrazilDate(act.application.appliedAt)} · versão {act.application.documentVersion}.</p>
-                  <p>Saldo após a aplicação deste reconto: {act.application.lines[0].state==='restricted'?'Acesso restrito':formatQuantity(act.application.lines[0].quantity,act.line.unit)}.</p>
-                  <Link className="ui-button ui-button-secondary" href={"/documentos/"+act.documentId+"/arquivos?version="+act.application.documentVersion}>Consultar aplicação na versão {act.application.documentVersion}</Link>
-                </>:<p>{act.application.state==='not_applied'?'Reconto registrado; contagem não aplicada ao estoque.':'Saldo após a aplicação: Não disponível no registro.'}</p>}
+                  <p>Saldo após a aplicação deste reconto: {act.application.lines[0].state === 'restricted' ? 'Acesso restrito' : formatQuantity(act.application.lines[0].quantity, act.line.unit)}.</p>
+                  <Link className="ui-button ui-button-secondary" href={"/documentos/" + act.documentId + "/arquivos?version=" + act.application.documentVersion}>Consultar aplicação na versão {act.application.documentVersion}</Link>
+                </> : <p>{act.application.state === 'not_applied' ? 'Reconto registrado; contagem não aplicada ao estoque.' : 'Saldo após a aplicação: Não disponível no registro.'}</p>}
               </article>)}
-              <p>Esses atos têm autoria e resultado próprios. Não substituem o Contado nem o saldo da contagem anterior e não declaram este parecer como confirmação das contagens seguintes.</p>
+              <p>Esses atos têm autoria e resultado próprios. Não substituem o Contado nem o saldo da contagem anterior e não declaram esta revisão como confirmação das contagens seguintes.</p>
             </section>;
           })()}
         </> : null}
       </article>;
     })}
-    <p>Os demais materiais não têm resultado individual declarado neste parecer.</p>
+    <p>Os demais materiais não têm resultado individual declarado neste revisão.</p>
   </section>;
 }

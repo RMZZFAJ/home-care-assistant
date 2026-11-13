@@ -254,10 +254,10 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     exact: true,
   });
   await review
-    .getByRole("textbox", { name: /^Seu parecer sobre a contagem/ })
+    .getByRole("textbox", { name: /^Sua revisão sobre a contagem/ })
     .fill("Parecer da família sobre a contagem dois por Sheila fictícia.");
   await review
-    .getByRole("button", { name: "Revisar parecer", exact: true })
+    .getByRole("button", { name: "Conferir revisão", exact: true })
     .click();
   await review
     .getByRole("button", { name: "Confirmar revisão", exact: true })

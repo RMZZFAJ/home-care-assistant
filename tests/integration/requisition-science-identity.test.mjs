@@ -7,7 +7,7 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { whileAdvisoryWaits } from "./lock-barrier.mjs";
 
 const progress = (client, id) => rpc(client, "requisition_progress", { p_id: id });
-const payload = (f, req, quantity = "2") => ({ recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, lines: [{ productId: f.products[0], quantity, requisitionItemIds: [req.lines[0].id] }] });
+const payload = (f, req, quantity = "2") => ({ recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, lines: [{ requestFulfillment: "complete", productId: f.products[0], quantity, requisitionItemIds: [req.lines[0].id] }] });
 const scienceCount = id => Number(sql(`select count(*) from public.requisition_science_events where requisition_id=${sqlLiteral(id)};`));
 
 test("P02 one shared expedition records a separate SCI for each linked material without duplicating custody or accepted credit", async () => {
@@ -16,7 +16,7 @@ test("P02 one shared expedition records a separate SCI for each linked material 
   const second = (await rpc(pro, "submit_requisition", args))[0].requisition_id;
   const secondLine = sql(`select id from public.requisition_items where requisition_id=${sqlLiteral(second)};`);
   const ids = [first.id, second], views = await Promise.all(ids.map(id => progress(family, id)));
-  const command = { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: { recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, lines: [{ productId: f.products[0], quantity: "2", requisitionItemIds: [first.lines[0].id, secondLine], metadata: { sharedNeedReason: "Uma única entrega fictícia atende ambas as necessidades" } }] } };
+  const command = { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: { recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, lines: [{ requestFulfillment: "complete", productId: f.products[0], quantity: "2", requisitionItemIds: [first.lines[0].id, secondLine], metadata: { sharedNeedReason: "Uma única entrega fictícia atende ambas as necessidades" } }] } };
   const ent = await rpc(family, "create_supply_document", command); await rpc(family, "create_supply_document", command);
   for (const [index, id] of ids.entries()) {
     const view = await progress(family, id); assert.equal(view.science.length, 1); assert.equal(view.science[0].mode, "dispatch");
@@ -36,7 +36,7 @@ test("P02 a read-only historical REQ cannot become a new COM/ENT need or bypass 
   const line = sql(`select id from public.requisition_items where requisition_id=${sqlLiteral(id)};`);
   const before = sql(`select jsonb_build_object('request',(select to_jsonb(r) from public.requisitions r where id=${sqlLiteral(id)}),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id=${sqlLiteral(id)}),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)}));`);
   for (const p_type of ["COM", "ENT"]) for (const p_draft of [false, true]) {
-    const key = randomUUID(), lines = [{ productId: f.products[0], quantity: "2", requisitionItemIds: [line] }];
+    const key = randomUUID(), lines = [{ requestFulfillment: "complete", productId: f.products[0], quantity: "2", requisitionItemIds: [line] }];
     const p_payload = p_type === "COM" ? { origin: "purchase", lines } : { recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, lines };
     const result = await family.rpc("create_supply_document", { p_patient: f.patient, p_type, p_payload, p_draft, p_key: key });
     assert.equal(result.error?.code, "23514");

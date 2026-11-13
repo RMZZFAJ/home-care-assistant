@@ -1,3 +1,4 @@
+import { fulfillmentLabel } from "@/lib/documents/fulfillment-label";
 import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
 import { CATEGORY_LABELS } from "@/lib/catalog";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
@@ -45,7 +46,7 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
     requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName,
     verificationCode: emission.verificationCode,
     metric: attended === null ? String(snapshot.lines.length) : attended + " / " + snapshot.lines.length,
-    metricLabel: attended === null ? "materiais no registro · atendimento não apurado" : "materiais com aceite positivo",
+    metricLabel: attended === null ? "materiais no registro · atendimento não apurado" : "materiais atendidos",
     urgent: snapshot.lines.filter(line => line.urgent === true).length,
     seal: satisfying ? { title: "Família ciente", actor: satisfying.actor_name, at: formatBrazilDate(satisfying.created_at), how: scienceLabels[satisfying.mode] ?? satisfying.mode, tone: "good", confirmed: true }
       : { title: source.historical ? "Ciência não comprovada" : "Ciência pendente", actor: source.historical ? "Origem histórica" : "Sem ato que satisfaça a regra familiar", at: "", how: "Ausência de ciência não é recusa.", tone: "warn", confirmed: false },
@@ -71,7 +72,7 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
     { label: cancelled ? "Cancelamento" : archived ? "Arquivamento" : "Conclusão", symbol: cancelled ? "cross" : "check", detail: cancelled ? "Não presume atendimento" : complete ? formatBrazilDate(snapshot.sciencePolicy?.completed_at ?? null) : "Em acompanhamento", done: complete || archived || cancelled, tone: cancelled ? "bad" : complete || archived ? "good" : undefined },
   ]);
   layout.heading("Relação de materiais", "Estoque observado na solicitação. Não representa quantidade pedida nem saldo atual.");
-  const grouped = new Map<string, { line: Record<string, unknown>; index: number }[]>();
+  const grouped = new Map<string, { line: Record<string, unknown>; index: number; }[]>();
   snapshot.lines.forEach((line, index) => { const key = String(line.category_snapshot ?? ""); const category = Object.hasOwn(CATEGORY_LABELS, key) ? CATEGORY_LABELS[key as keyof typeof CATEGORY_LABELS] : key || "Materiais sem categoria preservada"; const group = grouped.get(category) ?? []; group.push({ line, index }); grouped.set(category, group); });
   const rows = [...grouped.entries()].flatMap(([category, lines]) => lines.map(({ line, index }) => {
     const key = "material/" + index;
@@ -85,12 +86,12 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
       { text: nameOf(line) + (presentation.length ? "\n" + presentation.join("\n") : ""), badge: line.urgent ? "URGENTE" : undefined, key: key + "/name", strong: true },
       { text: String(line.unit_snapshot ?? "Unidade não preservada"), key: key + "/unit" },
       { text: formatStockObservation(stock, stockKind, typeof line.unit_snapshot === "string" ? line.unit_snapshot : undefined) + "\n" + formatStockObservationTime(typeof line.stock_observation_at === "string" ? line.stock_observation_at : null, timeSource), key: key + "/stock" },
-      { text: source.historical ? "Atendimento não apurado na origem histórica" : state ? state.attended ? "Aceite positivo registrado" : "Sem aceite positivo" : "Situação não preservada", key: key + "/fulfillment", tone: state?.attended ? "good" : undefined },
+      { text: source.historical ? "Atendimento não apurado na origem histórica" : fulfillmentLabel(state), key: key + "/fulfillment", tone: state?.attended ? "good" : undefined },
     ];
     return { cells, category, urgent: line.urgent === true };
   }));
   layout.table([{ label: "Nº", fraction: 0.045 }, { label: "Material / apresentação", fraction: 0.355 }, { label: "Unidade", fraction: 0.12 }, { label: "Estoque informado", fraction: 0.25 }, { label: "Atendimento", fraction: 0.23 }], rows);
-  layout.paragraph("Atendimento indica algum aceite positivo na entrega vinculada; não comprova satisfação integral da necessidade. A requisição não define quantidade solicitada.", "materials/scope", { size: 9 });
+  layout.paragraph("O atendimento depende da avaliação familiar e dos fatos de recebimento. Atendimento parcial mantém a necessidade aberta; recebimento menor exige nova avaliação familiar. A requisição não define quantidade solicitada.", "materials/scope", { size: 9 });
   appendOriginalObservations(layout, snapshot);
   if (awareness.length || source.historical) {
     layout.heading("Ciência familiar preservada");

@@ -355,7 +355,7 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 }
 @media (max-width: 500px) { .hca-document-milestones { gap: 7px; } .hca-milestone-title { display: block; font-size: 10px; } .hca-milestone-index { margin-bottom: 5px; } .hca-document-milestones li > p { font-size: 9px; line-height: 1.4; margin: 4px 0 0; } .hca-document-tab-list { gap: 0; } .hca-document-tab { padding: 12px 10px; font-size: 11px; gap: 5px; } .hca-document-tab > svg { width: 14px; } .hca-milestone-track { height: 4px; } }
 .hca-progress-feed > .hca-section-heading > div { flex: 1 1 240px; }
-.hca-event-feed { position: relative; list-style: none; margin: 18px 0; padding: 4px 0; }
+.hca-event-feed { position: relative; list-style: none; margin: 18px 0; padding: 4px 0; max-height: 620px; overflow-y: auto; overflow-x: hidden; overscroll-behavior-y: auto; scrollbar-width: thin; }
 .hca-event-feed::before { content: ""; position: absolute; inset: 18px auto 35px 17px; width: 1px; background: #d7e3da; }
 .hca-progress-event { position: relative; display: grid; grid-template-columns: 36px minmax(0,1fr); gap: 13px; padding: 14px 0; min-width: 0; }
 .hca-event-marker { position: relative; z-index: 1; display: grid; place-items: center; width: 35px; height: 35px; color: var(--hca-teal); background: #e3f0e7; border: 6px solid white; border-radius: 50%; }

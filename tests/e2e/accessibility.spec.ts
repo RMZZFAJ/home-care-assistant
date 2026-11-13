@@ -83,7 +83,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await expect(page.getByRole("menu",{name:"Ações do usuário",exact:true})).toBeVisible();
   await expect(page.getByRole("menuitem",{name:"Meu perfil e segurança",exact:true})).toBeFocused();
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("menuitem",{name:"Mudar perfil",exact:true})).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true })).toBeFocused();
   await audit(page, "profile menu");
   await page.keyboard.press("Escape");
   await expect(page.getByLabel("Menu do usuário",{exact:true})).toBeFocused();

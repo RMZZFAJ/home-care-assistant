@@ -8,6 +8,7 @@ import { documentColors, type ApprovedPdfLayout } from "./approved-pdf-layout";
 import type { DocumentSnapshot, PdfEmissionContext } from "./operational-pdf";
 
 export function approvedPdfMode(snapshot: DocumentSnapshot, emission: PdfEmissionContext) {
+  if (emission.example) return { modality: "Exemplo fictício · sem emissão", auditWatermark: "DEMONSTRAÇÃO · SEM VALOR DOCUMENTAL" };
   if (emission.rendererRevision !== 17) return { modality: "Ficha" };
   const source = requirePdfDocumentExpansion(snapshot.documentExpansion, { ...snapshot, requestedAt: emission.requestedAt });
   return {

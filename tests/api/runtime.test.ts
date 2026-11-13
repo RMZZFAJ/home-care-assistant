@@ -16,7 +16,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 it("runtime publishes only the compatible public protocol marker without a cacheable response", async () => {
   mocks.marker.mockResolvedValue({
-    data: { protocol: 1, schema: 1 },
+    data: { protocol: 1, schema: 2 },
     error: null,
   });
   const response = await GET();
@@ -26,7 +26,7 @@ it("runtime publishes only the compatible public protocol marker without a cache
   expect(await response.json()).toEqual({
     state: "ready",
     protocol: 1,
-    schema: 1,
+    schema: 2,
   });
 });
 it("missing or incompatible schema is an explicit unavailable compatibility gate", async () => {
@@ -34,7 +34,7 @@ it("missing or incompatible schema is an explicit unavailable compatibility gate
     { data: null, error: { code: "PGRST202", message: "private diagnostic" } },
     { data: null, error: { code: "42883" } },
     { data: { protocol: 2, schema: 1 }, error: null },
-    { data: { protocol: 1, schema: 2 }, error: null },
+    { data: { protocol: 1, schema: 1 }, error: null },
   ]) {
     mocks.marker.mockResolvedValue(result);
     const response = await GET();

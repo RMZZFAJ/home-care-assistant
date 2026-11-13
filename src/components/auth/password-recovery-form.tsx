@@ -27,7 +27,7 @@ export function PasswordRecoveryForm() {
       return;
     }
     if (password !== confirmation) {
-      setError("Use pelo menos 12 caracteres e confirme a mesma senha.");
+      setError("As senhas precisam ser iguais. Confira a confirmação.");
       return;
     }
     setBusy(true);

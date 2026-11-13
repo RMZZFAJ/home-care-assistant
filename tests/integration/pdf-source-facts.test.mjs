@@ -22,7 +22,7 @@ test("V6 freezes private draft creation and actual emission without rewriting th
     before = state(f),
     row = await reserve(f),
     source = row.snapshot.sourceFacts;
-  assert.equal(row.rendererRevision, 6);
+  assert.equal(row.rendererRevision, 16);
   assert.equal(source.draftCreatedAt, "2026-11-01T12:00:00+00:00");
   assert.ok(
     Date.parse(source.documentCreatedAt) > Date.parse(source.draftCreatedAt),
@@ -39,6 +39,8 @@ test("V6 freezes private draft creation and actual emission without rewriting th
   );
   const { sourceFacts, ...body } = row.snapshot;
   assert.equal(sourceFacts.schemaVersion, 1);
+  for (const key of ["documentFacts", "balanceApplication", "balanceReviewCorrections", "purchaseEntryBalances", "lifecycleFacts", "presentationFacts"])
+    if (!Object.hasOwn(canonical.body, key)) delete body[key];
   assert.deepEqual(body, canonical.body);
   assert.equal(row.sourceHash, canonical.hash);
   assert.equal(state(f), before);

@@ -25,7 +25,7 @@ test("structured publication freezes real patient names, preserves base facts an
 });
 
 test("private four-field drafts stay unchanged while committed details and uncertain recovery bind the same attempt", async () => {
- const f=await fixture("COM"),saved=await command(f,f.family),publication=options(fixtures.professional.id),body={...f.content.note,publication},p=commit(f,saved,randomUUID(),body),before=progressFacts(f);
+ const f=await fixture("COM"),saved=await command(f,f.family),publication=options(fixtures.family.id),body={...f.content.note,publication},p=commit(f,saved,randomUUID(),body),before=progressFacts(f);
  assert.deepEqual((await rpc(f.family,"progress_preparation_context",f.scope)).content,f.content);
  await assert.rejects(command(f,f.family,"save",saved,{...f.content,note:body}),/invalid progress fields/);
  const unknown=await rpc(f.family,"progress_preparation_recovery",p);assert.equal(unknown.status,"unknown");assert.deepEqual(unknown.content,f.content.note);assert.deepEqual(unknown.publication,publication);

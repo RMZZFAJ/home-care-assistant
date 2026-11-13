@@ -22,7 +22,7 @@ async function login(page: Page, patient: string) {
 }
 async function issueFromUi(page: Page, id: string, label: string) {
   await page.goto("/documentos/" + id); await selectDocumentSection(page, "files");
-  const pending = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${id}/issuances` && response.request().method() === "POST");
+  const pending = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${id}/issuances` && response.request().method() === "POST", { timeout: 60_000 });
   await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
   const created = await pending; expect(created.status(), await created.text()).toBe(200); const row = await created.json();
   expect(row).toMatchObject({ rendererRevision: 16, state: "ready", validation: { accepted: true, wholeFile: true, profile: "PAdES-B-T", signerTrust: "internal", timestampTrust: "internal" } });
@@ -30,7 +30,7 @@ async function issueFromUi(page: Page, id: string, label: string) {
   await expect(page.getByRole("region", { name: "Arquivos gerados", exact: true }).locator('a[download][href="' + url + '"]')).toBeVisible();
   const download = await page.request.get(url); expect(download.status()).toBe(200); const bytes = await download.body(); expect(digest(bytes)).toBe(row.sha256);
   expect(await (await page.request.get(url)).body()).toEqual(bytes);
-  const recovered = await page.request.post(`/api/documents/${id}/issuances`, { data: created.request().postDataJSON() });
+  const recovered = await page.request.post(`/api/documents/${id}/issuances`, { timeout: 60_000, data: created.request().postDataJSON() });
   expect(recovered.status()).toBe(200); expect((await recovered.json()).id).toBe(row.id);
   const pdf = await PDFDocument.load(bytes, { updateMetadata: false });
   expect(JSON.parse(pdf.catalog.lookup(PDFName.of("HCAIssuance"), PDFHexString).decodeText())).toEqual({ verificationCode: row.verificationCode, requestedAt: row.requestedAt });

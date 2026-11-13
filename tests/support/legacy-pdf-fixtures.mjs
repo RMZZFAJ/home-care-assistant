@@ -1,11 +1,9 @@
 import { createHash } from "node:crypto";
-import { createRequire } from "node:module";
-import path from "node:path";
-import { existsSync } from "node:fs";
+import { PDFDocument } from "pdf-lib";
 import { createClient } from "@supabase/supabase-js";
 import { getTestEnvironment } from "../../scripts/test-environment.mjs";
 
-/** Real V4 rendering of a frozen fictional Auth snapshot, only for legacy tests. */
+/** An obsolete synthetic artifact proves retired entries stay outside the current contract. */
 export async function legacyPdfFixture(client, documentId, version = 1) {
   const env = getTestEnvironment(),
     service = createClient(env.url, env.serviceKey, {
@@ -16,22 +14,15 @@ export async function legacyPdfFixture(client, documentId, version = 1) {
     { p_id: documentId },
   );
   if (docError) throw new Error("Cannot read fictional legacy source");
-  const { data: event, error } = await client
+  const { error } = await client
     .from("document_events")
-    .select("body,content_hash")
+    .select("document_id")
     .eq("document_id", documentId)
     .eq("version", version)
     .single();
   if (error || !doc) throw new Error("Missing fictional frozen legacy source");
-  if (!existsSync(".generated/legacy-test-renderer.cjs"))
-    await import("../../scripts/build-legacy-test-renderer.mjs");
-  const { renderDocumentPdf } = createRequire(path.resolve("package.json"))(
-    path.resolve(".generated/legacy-test-renderer.cjs"),
-  );
-  const bytes = Buffer.from(
-      await renderDocumentPdf(event.body, event.content_hash),
-    ),
-    hash = createHash("sha256").update(bytes).digest("hex");
+  const pdf=await PDFDocument.create();pdf.addPage().drawText("Obsolete fictional artifact; no official issuance.");
+  const bytes=Buffer.from(await pdf.save()),hash=createHash("sha256").update(bytes).digest("hex");
   for (const [objectPath, rpc, args] of [
     [
       `${documentId}/${version}.pdf`,

@@ -1,4 +1,5 @@
 import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
+import { familyFulfillmentDescription, familyReviewDescription } from "@/lib/documents/family-fulfillment";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { PDFHexString, PDFName } from "pdf-lib";
 import { ApprovedPdfLayout, type DocumentHeader, type DocumentTone } from "./approved-pdf-layout";
@@ -31,10 +32,10 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   const at = source.historical ? source.sourceCreatedAt : source.issuedAt, acceptedAt = typeof snapshot.workflow?.acceptedAt === "string" ? snapshot.workflow.acceptedAt : null;
   const receiptName = recordedDeliveryRecipient(snapshot, source) ?? "Nome não preservado";
   const personal = !source.historical && Boolean(acceptedAt), cancelled = snapshot.status === "cancelled", administrative = snapshot.status === "administratively_closed";
-  const complete = snapshot.status === "confirmed" || snapshot.status === "received", issue = snapshot.lines.some(line => (line.metadata as { issueOpen?: boolean } | undefined)?.issueOpen);
+  const complete = snapshot.status === "confirmed" || snapshot.status === "received", issue = snapshot.lines.some(line => (line.metadata as { issueOpen?: boolean; } | undefined)?.issueOpen);
   const tone: DocumentTone = cancelled || administrative ? "bad" : complete ? "good" : "warn";
   const title = returned ? "Devolução de materiais" : direction === "delivery" ? "Entrega de materiais" : "Movimentação de materiais · percurso não preservado";
-  const status = documentStatuses[snapshot.status] ?? "Situação não preservada";
+  const status = Object.hasOwn(documentStatuses, snapshot.status) ? documentStatuses[snapshot.status] : "Situação não reconhecida nesta versão";
   const quantities = snapshot.lines.map(line => confirmedDeliveryQuantity(snapshot, line, fidelity.deliveryResolutions, source.historical));
   const header: DocumentHeader = {
     ...approvedPdfMode(snapshot, emission), title, code: snapshot.code, status, tone, asOf: documentCutLabel(snapshot), requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName, verificationCode: emission.verificationCode,
@@ -58,7 +59,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
     { label: cancelled ? "Cancelamento" : administrative ? "Encerramento administrativo" : "Conclusão", symbol: cancelled || administrative ? "cross" : "check", detail: cancelled || administrative ? "Não presume recebimento pessoal" : complete ? "Concluída" : "Em acompanhamento", done: complete || cancelled || administrative, tone: complete ? "good" : cancelled || administrative ? "bad" : undefined },
   ]);
   layout.heading("Relação de materiais", "Expedido, recebido pessoalmente e diferença ainda em aberto são fatos distintos. Devolução, falta e conciliação administrativa aparecem em seções próprias.");
-  const groups = new Map<string, { line: Record<string, unknown>; index: number }[]>();
+  const groups = new Map<string, { line: Record<string, unknown>; index: number; }[]>();
   snapshot.lines.forEach((line, index) => { const key = String(line.category_snapshot ?? ""), label = Object.hasOwn(CATEGORY_LABELS, key) ? CATEGORY_LABELS[key as keyof typeof CATEGORY_LABELS] : key || "Materiais sem categoria preservada"; const group = groups.get(label) ?? []; group.push({ line, index }); groups.set(label, group); });
   layout.table([{ label: "Nº", fraction: 0.045 }, { label: "Material", fraction: 0.335 }, { label: "Unidade", fraction: 0.12 }, { label: "Expedido", fraction: 0.15 }, { label: "Recebido confirmado", fraction: 0.18 }, { label: "Em aberto", fraction: 0.17 }], [...groups.entries()].flatMap(([category, rows]) => rows.map(({ line, index }) => {
     const receipt = quantities[index], open = (typeof line.reconciled_quantity === "string" || typeof line.reconciled_quantity === "number") && (typeof line.accepted_quantity === "string" || typeof line.accepted_quantity === "number") ? quantity(String(line.quantity)).minus(line.accepted_quantity).minus(line.reconciled_quantity).toFixed() : null;
@@ -86,7 +87,9 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
     layout.paragraph(transfer.dispatchedAt ? "Expedição própria: " + formatBrazilDate(transfer.dispatchedAt) : "Declaração e concordância não equivalem a expedição ou recebimento físico.", "transfer/dispatch", { size: 9.5 });
   }
   for (const [index, line] of snapshot.lines.entries()) {
-    const receipt = (line.metadata as { receipt?: { problem?: string; notes?: string; acceptedQuantity?: string | number } } | undefined)?.receipt;
+    const familyDecision = familyFulfillmentDescription(line);
+    if (familyDecision) { layout.heading("Avaliação familiar · " + name(line)); layout.paragraph(familyDecision, "familyFulfillment/" + index, { size: 9.5 }); }
+    const receipt = (line.metadata as { receipt?: { problem?: string; notes?: string; acceptedQuantity?: string | number; }; } | undefined)?.receipt;
     if (!receipt) continue;
     layout.heading("Divergência original · " + name(line));
     const problem = { shortage: "Quantidade menor", damaged: "Material avariado", wrong: "Produto divergente", other: "Outra diferença" };
@@ -94,6 +97,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
     layout.paragraph(receipt.notes || "Nota não preservada", "issue/" + index + "/notes");
     layout.paragraph("Aceito na declaração original: " + amount(receipt.acceptedQuantity, unit(line)), "issue/" + index + "/accepted", { size: 9.5 });
   }
+  for (const review of snapshot.fulfillmentReviews ?? []) { layout.heading("Nova avaliação familiar"); layout.paragraph(familyReviewDescription(review), "familyReview/" + review.id, { size: 9.5 }); }
   for (const [index, event] of fidelity.deliveryResolutions.entries()) {
     const line = snapshot.lines.find(value => value.id === event.lineId), prefix = "resolution/" + index;
     layout.heading("Resolução de divergência · " + (line ? name(line) : "Material não identificado"));

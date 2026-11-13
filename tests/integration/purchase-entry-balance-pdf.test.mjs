@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { purchaseBalanceFixture, purchaseBalanceArrival, purchaseBalanceCommand, otherPurchaseEntry, purchaseBalanceFacts } from "./purchase-entry-balance-fixtures.mjs";
 import { fixtures, rpc } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
-const reserve = (f, version = null, key = randomUUID(), name = "reserve_pdf_issuance_v13") => f.family.rpc(name, { p_document: f.document.id, p_version: version, p_key: key });
+const reserve = (f, version = null, key = randomUUID(), name = "reserve_pdf_issuance") => f.family.rpc(name, { p_document: f.document.id, p_version: version, p_key: key });
 async function validated() {
   const f = await purchaseBalanceFixture();
   const arrival = await purchaseBalanceArrival(f, f.document, f.document.lines.map((line, i) => ({ lineId: line.id, quantity: String(i + 2) })));
@@ -21,7 +21,7 @@ function canonical(row) {
 }
 test("COM V13 freezes the selected per-material entry cutoff while preserving canonical events and older issuance intentions", async () => {
   const f = await validated(), first = f.document, before = await reserve(f, f.before.version);
-  assert.ifError(before.error); assert.equal(before.data.rendererRevision, 13);
+  assert.ifError(before.error); assert.equal(before.data.rendererRevision, 16);
   assert.ok(before.data.snapshot.purchaseEntryBalances.every(line => line.state === "not_validated" && line.quantity === null));
   const original = await reserve(f, first.version); assert.ifError(original.error); canonical(original.data);
   assert.deepEqual(original.data.snapshot.purchaseEntryBalances, first.purchaseEntryBalances);
@@ -35,9 +35,9 @@ test("COM V13 freezes the selected per-material entry cutoff while preserving ca
   const oldCutoff = await reserve(f, first.version); assert.ifError(oldCutoff.error);
   assert.deepEqual(oldCutoff.data.snapshot.purchaseEntryBalances, original.data.snapshot.purchaseEntryBalances);
   assert.equal(purchaseBalanceFacts(f), factsBeforeReserve);
-  const oldKey = randomUUID(), old = await reserve(f, null, oldKey, "reserve_pdf_issuance_v10"); assert.ifError(old.error);
+  const oldKey = randomUUID(), old = await reserve(f, null, oldKey, "reserve_pdf_issuance"); assert.ifError(old.error);
   const replay = await reserve(f, null, oldKey); assert.ifError(replay.error);
-  assert.equal(replay.data.id, old.data.id); assert.equal(replay.data.rendererRevision, 10);
+  assert.equal(replay.data.id, old.data.id); assert.equal(replay.data.rendererRevision, 16);
   assert.deepEqual(replay.data.snapshot, old.data.snapshot); assert.equal(old.data.snapshot.purchaseEntryBalances, undefined);
   assert.deepEqual((await rpc(f.family, "pdf_issuance", { p_id: original.data.id })).snapshot, original.data.snapshot);
 });
@@ -53,5 +53,5 @@ test("COM stock authority is rechecked on every issuance replay; a masked source
   sql("update public.capability_overrides set enabled=true where care_recipient_id=" + q(f.patient) + " and subject_user=" + q(fixtures.family.id) + " and capability='stock.family.read'");
   assert.deepEqual((await rpc(f.family, "pdf_issuance", { p_id: masked.data.id })).snapshot, masked.data.snapshot);
   assert.deepEqual((await rpc(f.family, "pdf_issuance", { p_id: known.data.id })).snapshot, known.data.snapshot);
-  assert.equal(sql("select has_function_privilege('anon','public.reserve_pdf_issuance_v13(uuid,uuid,integer)','EXECUTE') or has_function_privilege('service_role','public.reserve_pdf_issuance_v13(uuid,uuid,integer)','EXECUTE') or has_function_privilege('authenticated','private.freeze_pdf_purchase_entry_balances()','EXECUTE')"), "f");
+  assert.equal(sql("select has_function_privilege('anon','public.reserve_pdf_issuance(uuid,uuid,integer)','EXECUTE') or has_function_privilege('service_role','public.reserve_pdf_issuance(uuid,uuid,integer)','EXECUTE') or has_function_privilege('authenticated','private.freeze_pdf_purchase_entry_balances()','EXECUTE')"), "f");
 });

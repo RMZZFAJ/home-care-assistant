@@ -278,14 +278,14 @@ function DraftFieldsSummary({
                       : "Não escolhido"
                   : key === "weekday" && /^[0-6]$/.test(value ?? "")
                     ? ([
-                        "Domingo",
-                        "Segunda-feira",
-                        "Terça-feira",
-                        "Quarta-feira",
-                        "Quinta-feira",
-                        "Sexta-feira",
-                        "Sábado",
-                      ][Number(value)] ?? "Não escolhido")
+                      "Domingo",
+                      "Segunda-feira",
+                      "Terça-feira",
+                      "Quarta-feira",
+                      "Quinta-feira",
+                      "Sexta-feira",
+                      "Sábado",
+                    ][Number(value)] ?? "Não escolhido")
                     : value || "Não preenchido"}
               </dd>
             </div>
@@ -314,7 +314,7 @@ function DraftFieldsSummary({
                 {line.stockObservation === "unknown"
                   ? "Estoque desconhecido"
                   : line.stockObservation === "unfilled" ||
-                      line.currentStock === null
+                    line.currentStock === null
                     ? "Estoque não informado"
                     : `Estoque observado: ${line.currentStock}`}
               </p>
@@ -322,9 +322,9 @@ function DraftFieldsSummary({
                 Observação:{" "}
                 {line.stockObservationAt
                   ? formatZonedDate(
-                      line.stockObservationAt,
-                      "America/Sao_Paulo",
-                    )
+                    line.stockObservationAt,
+                    "America/Sao_Paulo",
+                  )
                   : "Data não informada"}
               </small>
               {"repeatReason" in line && line.repeatReason ? (
@@ -485,7 +485,7 @@ function DraftFieldsSummary({
           ? "quantidade em conciliação"
           : "recebido";
     const labels: Record<string, string> = {
-      comment: "Seu parecer",
+      comment: "Sua revisão",
       targetShiftId: "Plantão escolhido",
       targetLabel: "Pessoa e período preservados",
       query: "Texto da busca de plantão",
@@ -512,7 +512,7 @@ function DraftFieldsSummary({
       if (kind === "BAL" && key.startsWith("item:")) {
         let opinion: ReturnType<typeof balanceReviewItemFields.safeParse> | null = null;
         try { opinion = balanceReviewItemFields.safeParse(JSON.parse(value)); } catch { /* The private value remains available for explicit correction. */ }
-        if (!opinion?.success) return "Parecer individual preservado; confira o preenchimento ao continuar.";
+        if (!opinion?.success) return "Revisão individual preservado; confira o preenchimento ao continuar.";
         const item = opinion.data;
         return `${item.materialName ?? "Material com nome não preservado na preparação"}${item.unit ? " · " + item.unit : ""} · ${item.result === "confirmed" ? "Confirmado" : "Diferença apontada"} · ${item.forwarding === "none" ? item.result === "difference" ? "Encaminhamento ainda não escolhido" : "Sem encaminhamento adicional" : item.forwarding === "recount" ? "Reconto indicado" : "Ajuste autorizado indicado"}${item.comment ? " · " + item.comment : ""}`;
       }
@@ -607,17 +607,17 @@ function DraftFieldsSummary({
               <div key={key}>
                 <dt>
                   {labels[key] ??
-                    (kind === "BAL" && key.startsWith("item:") ? "Parecer individual do material" : key.endsWith(":receivedQuantity")
+                    (kind === "BAL" && key.startsWith("item:") ? "Revisão individual do material" : key.endsWith(":receivedQuantity")
                       ? name(key.slice(0, -17)) +
-                        " · recebimento físico apurado"
+                      " · recebimento físico apurado"
                       : key.endsWith(":returnedQuantity")
                         ? name(key.slice(0, -17)) +
-                          " · devolução física apurada"
+                        " · devolução física apurada"
                         : key.endsWith(":missingQuantity")
                           ? name(key.slice(0, -16)) + " · falta apurada"
                           : key.endsWith(":return")
                             ? name(key.slice(0, -7)) +
-                              " · devolução física em preparação"
+                            " · devolução física em preparação"
                             : key.endsWith(":problem")
                               ? name(key.slice(0, -8)) + " · diferença"
                               : name(key) + " · " + quantityLabel)}
@@ -652,9 +652,9 @@ function DraftFieldsSummary({
                 Observação:{" "}
                 {content.observationTimes[material.id]
                   ? formatZonedDate(
-                      content.observationTimes[material.id],
-                      "America/Sao_Paulo",
-                    )
+                    content.observationTimes[material.id],
+                    "America/Sao_Paulo",
+                  )
                   : "Data não informada"}
               </small>
             </div>
@@ -721,6 +721,7 @@ export function CreationDraftPanel({
         ) : null}
       </section>
     );
+  if (draft.kind === "PROGRESS" && !draft.consumed) return <SimpleProgressDraft draft={draft} current={current} disabled={disabled} canResume={canResume} />;
   return (
     <section
       className="ui-card hca-form-stack hca-draft-panel min-w-0"
@@ -740,9 +741,9 @@ export function CreationDraftPanel({
           {draft.kind === "SCHEDULE" && isScheduleResourcePurpose(draft.purpose)
             ? "Guardar preenchimento privado"
             : draft.kind === "PROGRESS" ||
-                draft.kind === "SCHEDULE" ||
-                draft.kind === "CONSUMPTION" ||
-                draft.kind === "FLOW"
+              draft.kind === "SCHEDULE" ||
+              draft.kind === "CONSUMPTION" ||
+              draft.kind === "FLOW"
               ? "Salvar preenchimento privado"
               : "Salvar rascunho"}
           . O preenchimento ainda não salvo pode ficar apenas nesta aba.
@@ -804,7 +805,7 @@ export function CreationDraftPanel({
             onClick={() => void draft.recover()}
           >
             {(draft.kind === "PROGRESS" || draft.kind === "SCHEDULE") &&
-            draft.pending.action === "acknowledge"
+              draft.pending.action === "acknowledge"
               ? "Recuperar reconhecimento do resultado"
               : "Recuperar salvamento ou descarte"}
           </ActionButton>
@@ -824,8 +825,8 @@ export function CreationDraftPanel({
                     : "Este rascunho já foi usado em uma ficha. Consulte o resultado antes de iniciar outro preenchimento."}
           </Notice>
           {draft.kind === "CONSUMPTION" &&
-          draft.consumed.consumedResult &&
-          "preparedConsumption" in draft.consumed.consumedResult ? (
+            draft.consumed.consumedResult &&
+            "preparedConsumption" in draft.consumed.consumedResult ? (
             <div className="hca-form-stack">
               <p>
                 Registrado em{" "}
@@ -960,7 +961,7 @@ export function CreationDraftPanel({
               </p>
               <p>
                 {draft.consumed.consumedResult.nativeResult.status ===
-                "confirmed"
+                  "confirmed"
                   ? "Relato encaminhado à conferência autorizada. O estoque não foi descontado por esta revisão."
                   : "Sugestão descartada pelo próprio autor. Nenhum relato ou desconto foi criado."}
               </p>
@@ -1126,10 +1127,10 @@ export function CreationDraftPanel({
         </>
       ) : null}
       {current &&
-      draft.base?.state === "active" &&
-      !draft.blocked &&
-      (hasUnsavedChanges ??
-        JSON.stringify(current) !== JSON.stringify(draft.base.content)) ? (
+        draft.base?.state === "active" &&
+        !draft.blocked &&
+        (hasUnsavedChanges ??
+          JSON.stringify(current) !== JSON.stringify(draft.base.content)) ? (
         <p>Sua edição atual ainda não foi salva no servidor.</p>
       ) : null}
       {saved?.state === "active" && !draft.pending && !draft.conflict ? (
@@ -1210,6 +1211,31 @@ export function CreationDraftPanel({
   );
 }
 
+function SimpleProgressDraft({ draft, current, disabled, canResume }: { draft: CreationDraftController; current: CreationDraftContent | null; disabled: boolean; canResume: boolean ;}) {
+  const [discard, setDiscard] = useState(false);
+  const saved = draft.offered ?? draft.base;
+  if (draft.loading && !saved) return <p role="status">Consultando seu rascunho…</p>;
+  if (!saved && !draft.pending && !draft.conflict && !draft.error && !draft.loadError) return null;
+  return <section className="hca-simple-draft hca-form-stack" aria-label="Rascunho privado"><h3>{draft.pending ? "Verificar salvamento do rascunho" : draft.conflict ? "Existe um rascunho mais recente" : "Continuar o rascunho?"}</h3>
+    {draft.error || draft.loadError ? <Notice error>{draft.error || draft.loadError}</Notice> : null}
+    {draft.message ? <p role="status">{draft.message}</p> : null}
+    {draft.pending ? <><p>A resposta do {draft.pending.action === "discard" ? "descarte" : "salvamento"} ainda não foi confirmada. Seu conteúdo e esta tentativa estão preservados.</p><ActionButton disabled={draft.busy || disabled} onClick={() => void draft.recover()}>Verificar salvamento</ActionButton></> : draft.conflict ? <>
+      <p>Outra sessão alterou o rascunho. Seu texto continua preservado aqui. Consulte o conteúdo salvo antes de escolher qual continuar.</p>
+      {!draft.compared ? <ActionButton disabled={draft.busy} onClick={() => void draft.compare()}>Ver rascunho mais recente</ActionButton> : <>
+        {draft.comparison?.state === "active" ? <><p>Salvo em {formatZonedDate(draft.comparison.savedAt, "America/Sao_Paulo")}</p><DraftContentSummary content={draft.comparison.content} kind="PROGRESS" /></> : <p>O outro rascunho já não está ativo.</p>}
+        <details><summary>Consultar meu texto preservado</summary><DraftContentSummary content={current} kind="PROGRESS" /></details>
+        <p>Ao continuar sua edição, o próximo salvamento substituirá o rascunho consultado. Uma nova alteração concorrente será conferida novamente.</p>
+        <div className="hca-toolbar"><ActionButton disabled={draft.busy || disabled} onClick={draft.keepLocal}>Continuar minha edição</ActionButton>{draft.comparison?.state === "active" ? <ActionButton disabled={draft.busy || disabled || !canResume} onClick={() => draft.resume(draft.comparison)}>Continuar rascunho mais recente</ActionButton> : null}</div>
+      </>}
+    </> : saved?.state === "active" ? <>
+      <p>Salvo em {formatZonedDate(saved.savedAt, "America/Sao_Paulo")}. Este preenchimento pertence somente à sua conta e a esta ficha.</p>
+      {draft.offered ? <DraftContentSummary content={saved.content} kind="PROGRESS" /> : <details><summary>Consultar conteúdo salvo</summary><DraftContentSummary content={saved.content} kind="PROGRESS" /></details>}
+      <p>Destaque, menções e visibilidade serão conferidos novamente antes de publicar.</p>
+      {discard ? <><Notice>Descartar apaga somente este preenchimento privado. Registros publicados e operações oficiais permanecem preservados.</Notice><div className="hca-toolbar"><ActionButton disabled={draft.busy || disabled} onClick={() => setDiscard(false)}>Manter rascunho</ActionButton><ActionButton disabled={draft.busy || disabled} onClick={() => void draft.discard().then(() => setDiscard(false))}>Confirmar descarte e começar novo</ActionButton></div></> : <div className="hca-toolbar">{draft.offered ? <ActionButton variant="primary" disabled={draft.busy || disabled || !canResume} onClick={() => draft.resume()}>Continuar o rascunho</ActionButton> : null}<ActionButton disabled={draft.busy || disabled} onClick={() => setDiscard(true)}>Descartar e começar novo</ActionButton></div>}
+    </> : <ActionButton disabled={draft.busy} onClick={draft.reload}>Consultar rascunho novamente</ActionButton>}
+  </section>;
+}
+
 export function BalanceObservationTimes({
   content,
 }: {
@@ -1232,9 +1258,9 @@ export function BalanceObservationTimes({
             {material.name}:{" "}
             {content.observationTimes[material.id]
               ? formatZonedDate(
-                  content.observationTimes[material.id],
-                  "America/Sao_Paulo",
-                )
+                content.observationTimes[material.id],
+                "America/Sao_Paulo",
+              )
               : "Data não informada"}
           </p>
         ))}

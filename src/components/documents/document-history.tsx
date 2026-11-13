@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState, type FormEvent } from "react";
 import {
   buttonClass,
@@ -14,7 +14,7 @@ import {
 } from "@/components/workspace";
 import { EmptyState, Icon, StatusBadge } from "@/components/ui/primitives";
 import { documentLabels } from "@/types/documents";
-import {historyFilterPresentation,historyStatusLabels} from "@/lib/documents/presentation";
+import { historyFilterPresentation, historyStatusLabels } from "@/lib/documents/presentation";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { useScopedRead } from "@/lib/use-scoped-read";
@@ -31,20 +31,22 @@ type Filters = {
 };
 const empty: Filters = { search: "", type: "", status: "", from: "", to: "" };
 const historyFilters = historyStatusLabels;
-export function DocumentRow({ row }: { row: DocumentSummary }) {
+export function DocumentRow({ row }: { row: DocumentSummary; }) {
+  const pathname = usePathname(), params = useSearchParams();
+  const returnTo = pathname === "/historico" ? "?returnTo=" + encodeURIComponent(pathname + (params.size ? "?" + params.toString() : "")) : "";
   return (
     <Link
       className="document-row hca-document-record"
-      href={"/documentos/" + row.id}
+      href={"/documentos/" + row.id + returnTo}
       prefetch={false}
     >
-      <span className="document-type hca-document-kind">{row.type}</span>
+      <span className="document-type hca-document-kind">{row.kind ?? row.type}</span>
       <span className="hca-document-record-main">
         <strong>{row.code ?? (row.status === "draft" ? "Rascunho" : "Registro sem expedição")}</strong>
         <span className="block text-xs text-(--muted)">
-          {documentLabels[row.type]} · {formatBrazilDate(row.created_at)}
+          {row.kind === "DEV" ? "Devolução de materiais" : documentLabels[row.type]} · {formatBrazilDate(row.created_at)}
         </span>
-        {row.task?<span className="mt-1 block text-sm font-semibold">{row.task.label}</span>:null}
+        {row.task ? <span className="mt-1 block text-sm font-semibold">{row.task.label}</span> : null}
       </span>
       <span className="hca-document-record-end">
         <StatusBadge status={row.status} />
@@ -112,7 +114,6 @@ function HistoryContent({
     // Back/forward restores the query without replacing the focused form.
     setPreviousQuery(queryKey);
     setDraft(initial);
-    if (Object.values(initial).some(Boolean)) setShowFilters(true);
   }
   const page = initialPage;
   const liveRevision = useLiveRevision();
@@ -125,6 +126,7 @@ function HistoryContent({
     careRecipientId: patientId, page: String(page), pageSize: "20", ...filters,
   }), String(liveRevision), decode);
   const { loading, error } = read;
+  const [previousVisible, setPreviousVisible] = useState(false);
   const rows = read.data?.data ?? [], total = read.data?.total ?? 0;
   const navigate = (next: Filters, nextPage = 1) => {
     if (JSON.stringify(next) === JSON.stringify(filters) && nextPage === page) {
@@ -138,9 +140,11 @@ function HistoryContent({
   };
   const setPage = (value: number) => navigate(filters, value);
   const setFilters = (value: Filters) => navigate(value);
-  const active = Object.entries(filters).filter(([, value]) => value).map(([key,value])=>({key,...historyFilterPresentation(key,value)}));
+  const active = Object.entries(filters).filter(([, value]) => value).map(([key, value]) => ({ key, ...historyFilterPresentation(key, value) }));
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setShowFilters(false);
+    setPreviousVisible(false);
     setFilters({ ...draft });
   }
   return (
@@ -195,11 +199,12 @@ function HistoryContent({
                 }
               >
                 <option value="">Todas autorizadas</option>
+                {context.patient?.capabilities?.["ent.read"] ? <option value="DEV">DEV · Devolução de materiais</option> : null}
                 {Object.entries(documentLabels)
                   .filter(
                     ([type]) =>
                       context.patient?.capabilities?.[
-                        type.toLowerCase() + ".read"
+                      type.toLowerCase() + ".read"
                       ],
                   )
                   .map(([type, label]) => (
@@ -267,14 +272,14 @@ function HistoryContent({
             </div>
           </form>
         ) : null}
-        <p className="sr-only" role="status">{active.length?`Filtros ativos: ${active.map(item=>item.text).join(". ")}.`:"Nenhum filtro ativo."}</p>
+        <p className="sr-only" role="status">{active.length ? `Filtros ativos: ${active.map(item => item.text).join(". ")}.` : "Nenhum filtro ativo."}</p>
         {active.length ? (
           <div
             className="mt-4 flex flex-wrap gap-2"
             aria-label="Filtros ativos"
             role="group"
           >
-            {active.map(({key,text,removeLabel}) => (
+            {active.map(({ key, text, removeLabel }) => (
               <button
                 key={key}
                 className="ui-badge ui-badge-neutral min-h-9"
@@ -293,6 +298,7 @@ function HistoryContent({
       {error ? (
         <Notice error>
           {error}
+          {read.data && !previousVisible ? <button className={buttonClass} type="button" onClick={() => setPreviousVisible(true)}>Mostrar lista da última consulta</button> : null}
           <button
             className={buttonClass}
             type="button"
@@ -309,13 +315,14 @@ function HistoryContent({
         {loading || error ? "Última consulta válida" : "Lista consultada"}: {formatBrazilDate(read.queriedAt)}.
         {loading || error ? " Os registros preservados podem estar desatualizados." : ""}
       </p> : null}
-      {read.data ? (
+      {read.data && !loading && (!error || previousVisible) ? (
         <section className={panelClass}>
+          {error ? <p role="status">Lista anterior, consultada em {formatBrazilDate(read.queriedAt)}. A atualização não foi confirmada.</p> : null}
           {rows.length ? (
             rows.map((row) => <DocumentRow key={row.id} row={row} />)
           ) : !loading && !error ? (
-            <EmptyState title="Nenhuma ficha encontrada">
-              Ajuste os filtros ou registre uma nova ficha autorizada.
+            <EmptyState title={active.length ? "Nenhuma ficha encontrada" : "Ainda não há fichas neste paciente"}>
+              {active.length ? "Ajuste ou limpe os filtros para consultar novamente." : "As fichas emitidas neste contexto aparecerão aqui."}
             </EmptyState>
           ) : null}
         </section>

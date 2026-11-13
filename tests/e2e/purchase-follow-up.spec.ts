@@ -65,7 +65,7 @@ test("COM follow-up never completes draft or pending approval and does not depen
   const next = panel(page).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true });
   await next.focus();
   await next.press("Enter");
-  await expect(page.getByRole("tab", { name: "Aquisição", exact: true })).toBeFocused();
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
   expect(facts(f.patient)).toBe(before);
 
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
@@ -86,7 +86,7 @@ test("COM follow-up never completes draft or pending approval and does not depen
   await open(page, doc.id, "Consultar o encerramento da aquisição");
   await expect(conclusion(page)).toHaveAttribute("data-state", "closed");
   await panel(page).getByRole("button", { name: "Abrir Versões e integridade", exact: true }).click();
-  await expect(page.getByRole("tab", { name: "Versões e integridade", exact: true })).toBeFocused();
+  await expect(page.getByRole("tab", {name:"Identificação e registros preservados",exact:true})).toBeFocused();
   expect(facts(f.patient)).toBe(before);
   expect(writes).toEqual([]);
 });
@@ -102,7 +102,7 @@ test("COM follow-up preserves arrival rejection and P14 closure until a real par
   await open(page, doc.id, "Informar a chegada da aquisição");
   let before = facts(f.patient);
   await panel(page).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();
-  await expect(page.getByRole("tab", { name: "Aquisição", exact: true })).toBeFocused();
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
   expect(facts(f.patient)).toBe(before);
 
   doc = await send(family, doc, "receive", { lines: [{ lineId, quantity: "2" }] });

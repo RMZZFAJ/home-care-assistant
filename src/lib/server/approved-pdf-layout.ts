@@ -349,7 +349,7 @@ export class ApprovedPdfLayout {
         if (row.urgent) { this.box(M, this.top, BODY, height, c.badPale); this.box(M, this.top, 2, height, c.bad); }
         let x = M;
         row.cells.forEach((cell, i) => {
-          if (i === 0 && offset > 0) this.paint(cell.text, x + 6, this.top + 7, 9, 0, c.muted, undefined, true);
+          if (i === 0 && offset > 0 && offset >= cellLines[i].length) this.paint(cellLines[i][0] ?? "", x + 6, this.top + 7, 9, 0, c.muted, undefined, true);
           this.structure.within(cellNodes[i], () => cellLines[i].slice(offset, offset + count).forEach((line, n) => {
             const badge = Boolean(cell.badge && offset + n === cellLines[i].length - 1);
             const size = badge ? 7 : i === 0 ? 9 : 10.75, weight = badge ? 2 : cell.strong ? 1 : 0;

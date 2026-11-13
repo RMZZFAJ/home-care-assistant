@@ -37,7 +37,7 @@ const reserve = (f) =>
     p_version: 1,
   });
 
-test("mixed archive preserves legacy files and paginates 103 records across insertion without private paths or worker proof", async () => {
+test("consolidated archive excludes experimental files and paginates 101 records across insertion without private paths or worker proof", async () => {
   const f = await fixture(),
     legacy = await legacyPdfFixture(f.owner, f.doc.id),
     ids = [];
@@ -50,10 +50,10 @@ test("mixed archive preserves legacy files and paginates 103 records across inse
     entries.push(...page.data);
   }
   assert.equal(page.next, null);
-  assert.equal(entries.length, 103);
+  assert.equal(entries.length, 101);
   assert.equal(
     new Set(entries.map((r) => r.kind + ":" + r.reference)).size,
-    103,
+    101,
   );
   assert.deepEqual(
     entries
@@ -63,11 +63,7 @@ test("mixed archive preserves legacy files and paginates 103 records across inse
     ids.sort(),
   );
   assert.ok(!entries.some((r) => r.reference === newer.id));
-  assert.equal(
-    entries.find((r) => r.kind === "legacy_original").sha256,
-    legacy.hash,
-  );
-  assert.equal(entries.find((r) => r.kind === "legacy_render").renderer, 4);
+  assert.equal(entries.some(r=>r.kind!=="issuance"),false);
   assert.ok(
     !/objectPath|object_path|lease|snapshot|sourceHash|idempotency/i.test(
       JSON.stringify(entries),

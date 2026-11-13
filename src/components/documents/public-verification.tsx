@@ -17,6 +17,7 @@ import {
   type PublicPdfResult,
 } from "@/lib/documents/public-verification";
 import { formatBrazilDate } from "@/lib/receipt";
+import { PrivateVerificationDetails } from "./private-verification-details";
 const trustLabels = {
   internal: "Cadeia interna reconhecida",
   external: "Cadeia externa reconhecida pela política configurada",
@@ -74,6 +75,11 @@ export function PublicVerification({
       if (sequence !== sequenceRef.current) return;
       focusResultRef.current = focus ? sequence : null;
       setResult(parsed.data);
+      if (parsed.data.reference.found) {
+        const url = new URL(window.location.href);
+        url.pathname = "/verificar"; url.search = "?code=" + parsed.data.reference.verificationCode;
+        window.history.replaceState(null, "", url.pathname + url.search);
+      }
     },
     [],
   );
@@ -216,77 +222,77 @@ export function PublicVerification({
         são exibidos.
       </p>
       <div className="hca-public-methods">
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          void query(code);
-        }}
-        className="ui-card hca-form-stack"
-        aria-label="Consultar código"
-      >
-        <h2>Consultar pelo código</h2>
-        <label className="hca-field" htmlFor={codeId}>Código de verificação</label>
-        <TextInput
-          ref={codeInputRef}
-          id={codeId}
-          value={code}
-          disabled={busy}
-          onChange={(event) => {
-            setCode(event.target.value);
-            setError("");
-            setResult(null);
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            void query(code);
           }}
-          maxLength={64}
-          spellCheck={false}
-          autoComplete="off"
-          aria-describedby={`${helpId}${error && errorField === "code" ? " " + errorId : ""}`}
-          aria-invalid={Boolean(error) && errorField === "code"}
-        />
-        <ActionButton
-          variant="primary"
-          disabled={busy}
-          type="submit"
+          className="ui-card hca-form-stack"
+          aria-label="Consultar código"
         >
-          Consultar código
-        </ActionButton>
-      </form>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          void upload();
-        }}
-        className="ui-card hca-form-stack"
-        aria-label="Conferir arquivo PDF"
-      >
-        <h2>Conferir o exemplar</h2>
-        <label className="hca-field" htmlFor={fileId}>Arquivo PDF para conferir</label>
-        <TextInput
-          ref={fileInputRef}
-          id={fileId}
-          type="file"
-          disabled={busy}
-          accept="application/pdf,.pdf"
-          onChange={(event) => {
-            setFile(event.target.files?.[0] ?? null);
-            setError("");
-            setResult(null);
+          <h2>Consultar pelo código</h2>
+          <label className="hca-field" htmlFor={codeId}>Código de verificação</label>
+          <TextInput
+            ref={codeInputRef}
+            id={codeId}
+            value={code}
+            disabled={busy}
+            onChange={(event) => {
+              setCode(event.target.value);
+              setError("");
+              setResult(null);
+            }}
+            maxLength={64}
+            spellCheck={false}
+            autoComplete="off"
+            aria-describedby={`${helpId}${error && errorField === "code" ? " " + errorId : ""}`}
+            aria-invalid={Boolean(error) && errorField === "code"}
+          />
+          <ActionButton
+            variant="primary"
+            disabled={busy}
+            type="submit"
+          >
+            Consultar código
+          </ActionButton>
+        </form>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            void upload();
           }}
-          aria-describedby={`${helpId}${error && errorField === "file" ? " " + errorId : ""}`}
-          aria-invalid={Boolean(error) && errorField === "file"}
-        />
-        {file ? <p className="hca-selected-file">Arquivo selecionado: {file.name}</p> : null}
-        <p className="text-sm">
-          Até 4 MB. O arquivo é analisado em memória e não é guardado no acervo.
-          Limites temporários protegem o serviço contra abuso.
-        </p>
-        <ActionButton
-          variant="primary"
-          disabled={busy}
-          type="submit"
+          className="ui-card hca-form-stack"
+          aria-label="Conferir arquivo PDF"
         >
-          Conferir PDF
-        </ActionButton>
-      </form>
+          <h2>Conferir o exemplar</h2>
+          <label className="hca-field" htmlFor={fileId}>Arquivo PDF para conferir</label>
+          <TextInput
+            ref={fileInputRef}
+            id={fileId}
+            type="file"
+            disabled={busy}
+            accept="application/pdf,.pdf"
+            onChange={(event) => {
+              setFile(event.target.files?.[0] ?? null);
+              setError("");
+              setResult(null);
+            }}
+            aria-describedby={`${helpId}${error && errorField === "file" ? " " + errorId : ""}`}
+            aria-invalid={Boolean(error) && errorField === "file"}
+          />
+          {file ? <p className="hca-selected-file">Arquivo selecionado: {file.name}</p> : null}
+          <p className="text-sm">
+            Até 4 MB. O arquivo é analisado em memória e não é guardado no acervo.
+            Limites temporários protegem o serviço contra abuso.
+          </p>
+          <ActionButton
+            variant="primary"
+            disabled={busy}
+            type="submit"
+          >
+            Conferir PDF
+          </ActionButton>
+        </form>
       </div>
       {busy ? (
         <p role="status">
@@ -301,14 +307,12 @@ export function PublicVerification({
       {result ? (
         <VerificationResult result={result} headingRef={headingRef} />
       ) : null}
+      {result?.reference.found ? <PrivateVerificationDetails key={result.reference.verificationCode} code={result.reference.verificationCode} /> : null}
       <p className="text-sm">
         Assinatura técnica do Home Care Assistant e TSA internos não representam
         assinatura pessoal, ICP-Brasil ou independência temporal de terceiro.
         Revogação externa por OCSP/CRL não é consultada nesta etapa.
       </p>
-      <a className="ui-button ui-button-secondary" href="/login">
-        Acessar documento com autorização
-      </a>
     </main>
   );
 }
@@ -377,13 +381,11 @@ function VerificationResult({
               ? ref.bytesMatch
                 ? "Os bytes coincidem com o exemplar registrado."
                 : "Os bytes divergem da emissão consultada."
-              : result.legacy?.found
-                ? "Arquivo localizado no acervo legado."
-                : "Nenhum exemplar registrado corresponde a estes bytes."}
+              : "Nenhum exemplar registrado corresponde a estes bytes."}
           </p>
           {result.fileReference?.found &&
-          ref.found &&
-          result.fileReference.issuanceId !== ref.issuanceId ? (
+            ref.found &&
+            result.fileReference.issuanceId !== ref.issuanceId ? (
             <p>
               O PDF corresponde a outra emissão registrada. O código consultado
               pertence a outro exemplar.
@@ -394,12 +396,6 @@ function VerificationResult({
           ) : null}
           {analysis?.documentSignature === "valid" ? (
             <p>Assinatura do documento: criptograficamente íntegra.</p>
-          ) : null}
-          {analysis?.status === "unsigned" && result.legacy?.found ? (
-            <p>
-              Exemplar legado sem assinatura incorporada; o registro de seus
-              bytes não cria assinatura retroativa.
-            </p>
           ) : null}
           {analysis?.status === "processing_limit" ? (
             <p>

@@ -76,13 +76,6 @@ export const publicPdfResultSchema = z.object({
   fileReference: z
     .union([z.object({ found: z.literal(false) }), reference])
     .nullable(),
-  legacy: z
-    .object({
-      found: z.boolean(),
-      registeredAt: z.iso.datetime({ offset: true }).optional(),
-      sha256: z.string().optional(),
-    })
-    .nullable(),
   analysis: publicPdfAnalysisSchema.nullable(),
   fileSha256: z.string().nullable(),
   policyStatus: z

@@ -139,7 +139,7 @@ test("REQ completed fulfillment keeps personal science separate and archived fol
     await expect(overview(page)).toContainText("Conferir minha ciência e a conclusão");
     await expect(overview(page)).toContainText("atendimento dos itens está completo");
     await overview(page).getByRole("button", { name: "Abrir Ciência e responsáveis", exact: true }).click();
-    await expect(page.getByRole("tab", { name: "Atendimento", exact: true })).toBeFocused();
+    await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
     await expect(overview(page)).toContainText("Minha ciência: pendente");
     await page.route(`**/api/requisitions/${req.id}/science`, route => route.fulfill({
       status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Registro de ciência fictício recusado", retryable: true },
@@ -168,7 +168,7 @@ test("REQ completed fulfillment keeps personal science separate and archived fol
     await open(page, req.id);
     await expect(overview(page)).toContainText("Consultar o arquivamento");
     await overview(page).getByRole("button", { name: "Abrir Versões e integridade", exact: true }).click();
-    await expect(page.getByRole("tab", { name: "Versões e integridade", exact: true })).toBeFocused();
+    await expect(page.getByRole("tab", {name:"Identificação e registros preservados",exact:true})).toBeFocused();
     await expect(overview(page)).toContainText("Linha do tempo");
     expect(facts(f.patient)).toBe(archived);
     expect(ledger(f.patient)).toBe(physical);
@@ -219,7 +219,7 @@ test("REQ cancelled and real historical import show consultation instead of curr
     await expect(reader.getByRole("link", { name: "Expedir ENT vinculada", exact: true })).toHaveCount(0);
     await expect(reader.getByRole("button", { name: "Li a requisição e confirmo minha ciência", exact: true })).toHaveCount(0);
     await overview(reader).getByRole("button", { name: "Abrir Versões e integridade", exact: true }).click();
-    await expect(reader.getByRole("tab", { name: "Versões e integridade", exact: true })).toBeFocused();
+    await expect(reader.getByRole("tab", {name:"Identificação e registros preservados",exact:true})).toBeFocused();
     await expect(overview(reader)).toContainText("Linha do tempo");
     expect(facts(historical.patient)).toBe(preserved);
   } finally {

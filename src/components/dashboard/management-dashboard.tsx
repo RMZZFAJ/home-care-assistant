@@ -7,16 +7,20 @@ import { Icon } from "@/components/ui/primitives";
 import { MetricCard } from "./metric-card";
 import { TaskList } from "./task-list";
 import { TaskAttention } from "./task-attention";
-import { CriticalStockSummary, RecentDocuments, RequestProgress, ShiftSummary } from "./dashboard-summary";
+import { DashboardNotices } from "./dashboard-notices";
+import { OpenRequests } from "./open-requests";
+import { usePresentationMode } from "@/lib/ui/presentation-mode";
+import { CriticalStockSummary, RecentDocuments, ShiftSummary } from "./dashboard-summary";
 
-export function ManagementDashboard({ context, data }: { context: WorkspaceContext; data: DashboardData }) {
+export function ManagementDashboard({ context, data }: { context: WorkspaceContext; data: DashboardData; }) {
+  const { mode } = usePresentationMode(context.userId);
   return <div className="hca-dashboard">
     <div className="hca-dashboard-intro"><div><h2>O que precisa da sua atenção</h2><p>Decisões e acompanhamento de {context.patient?.display_name}.</p></div><div className="hca-toolbar">
       {can(context, "ent.create") ? <Link href="/fichas/ent" className="ui-button ui-button-primary" prefetch={false}><Icon name="plus" />Nova entrega</Link> : null}
       {can(context, "ent.create") ? <Link href="/fichas/devolucao" className="ui-button ui-button-secondary" prefetch={false}>Nova devolução de materiais</Link> : null}
       {can(context, "com.create") ? <Link href="/fichas/com" className="ui-button ui-button-secondary" prefetch={false}>Organizar compra</Link> : null}
     </div></div>
-    <TaskAttention tasks={data.pendingTasks} />
+    <TaskAttention tasks={data.pendingTasks} context={context} />
     <div className="hca-dashboard-metrics">
       {can(context, "req.read") ? <MetricCard label="Requisições abertas" value={data.requests} href="/historico?type=REQ" icon="forms" /> : null}
       {can(context, "ent.read") ? <MetricCard label="Entregas a conferir" value={data.teamReceipts} href="/entregas" icon="truck" /> : null}
@@ -25,8 +29,8 @@ export function ManagementDashboard({ context, data }: { context: WorkspaceConte
       {can(context, "com.approve") ? <MetricCard label="Compras a aprovar" value={data.purchases} href="/historico?type=COM&status=pending_approval" icon="stock" /> : null}
       {data.criticalStock.length ? <MetricCard label="Saldos abaixo do mínimo" value={data.criticalStock.length} href="/estoque" icon="stock" /> : null}
     </div>
-    <div className="hca-dashboard-columns"><TaskList title="Ações que precisam de você" tasks={data.pendingTasks} /><div className="hca-dashboard-stack"><RequestProgress data={data} /><CriticalStockSummary data={data} /></div></div>
-    <RecentDocuments data={data} />
-    <ShiftSummary data={data}/>
+    <div className="hca-l1-home-grid"><div className="hca-home-tasks"><TaskList title="Suas pendências" tasks={data.pendingTasks} /></div><DashboardNotices patientId={context.patient!.id} /><OpenRequests patientId={context.patient!.id} /></div>
+    <CriticalStockSummary data={data} />
+    <details className="hca-home-complementary" open={mode === "complete"}><summary>Movimentações recentes e programação</summary><RecentDocuments data={data} /><ShiftSummary data={data} /></details>
   </div>;
 }

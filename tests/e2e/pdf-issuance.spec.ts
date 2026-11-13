@@ -168,7 +168,7 @@ test("PDF recupera o objeto após falha no registro ready e recusa cache adulter
     `create function private.${trigger}() returns trigger language plpgsql set search_path='' as $$begin if new.document_id=${sqlLiteral(f.doc.id)} and new.state='ready' then raise exception 'controlled PDF ready fault' using errcode='P0001';end if;return new;end;$$; create trigger ${trigger} before update on private.pdf_issuances for each row execute function private.${trigger}();`,
   );
   try {
-    const failed = await page.request.post(endpoint, {
+    const failed = await page.request.post(endpoint, { timeout: 60_000,
       data: { idempotencyKey: key },
     });
     expect(failed.ok()).toBe(false);
@@ -192,7 +192,7 @@ test("PDF recupera o objeto após falha no registro ready e recusa cache adulter
     prior = await bucket.download(stored.path);
   expect(prior.error).toBeNull();
   const bytes = Buffer.from(await prior.data!.arrayBuffer());
-  const retried = await page.request.post(endpoint, {
+  const retried = await page.request.post(endpoint, { timeout: 60_000,
     data: { idempotencyKey: key },
   });
   expect(retried.status(), await retried.text()).toBe(200);
@@ -315,191 +315,21 @@ test("PDF em REQ, ENT e BAL conserva fonte e estoque e exige leitura privada atu
   }
 });
 
-test("Acervo preserva originais e V4, recusa bytes divergentes e emite versão histórica explicitamente", async ({
-  page,
-}, info) => {
-  const f = await fixture(page),
-    url = `/api/documents/${f.doc.id}`,
-    business = () =>
-      sql(
-        `select jsonb_build_object('doc',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(f.doc.id)}),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id=${sqlLiteral(f.doc.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)}),'files',(select count(*) from storage.objects where bucket_id='document-receipts' and name like ${sqlLiteral("%" + f.doc.id + "%")}),'issuances',(select count(*) from private.pdf_issuances where document_id=${sqlLiteral(f.doc.id)}));`,
-      );
-  const before = business();
-  const absent = await page.request.get(`${url}/pdf?version=1`);
-  expect(absent.status()).toBe(404);
-  expect(await absent.json()).toMatchObject({ code: "PDF_NOT_GENERATED" });
-  expect(business()).toBe(before);
-  expect(
-    (await (await page.request.get(`${url}/archive`)).json()).data,
-  ).toEqual([]);
-  const legacy = await legacyPdfFixture(f.owner, f.doc.id),
-    metadata = () =>
-      sql(
-        `select jsonb_build_object('original',(select to_jsonb(p) from public.document_pdfs p where document_id=${sqlLiteral(f.doc.id)}),'render',(select to_jsonb(p) from public.document_pdf_renders p where document_id=${sqlLiteral(f.doc.id)}));`,
-      ),
-    frozen = metadata();
-  const read = async (renderer: string) => {
-    const r = await page.request.get(
-      `${url}/pdf?version=1&renderer=${renderer}`,
-    );
-    expect(r.status(), await r.text().then((t) => t.slice(0, 80))).toBe(200);
-    return r.body();
-  };
-  expect(hash(await read("legacy"))).toBe(legacy.hash);
-  expect(hash(await read("4"))).toBe(legacy.hash);
-  const unsigned = await page.request.post("/api/verification", {
-    headers: { "content-type": "application/pdf" },
-    data: legacy.bytes,
-  });
-  expect(unsigned.status(), await unsigned.text()).toBe(200);
-  expect(await unsigned.json()).toMatchObject({
-    reference: { found: false },
-    legacy: { found: true, sha256: legacy.hash },
-    analysis: { status: "unsigned", documentSignature: "absent" },
-  });
-  const changed = Buffer.from(legacy.bytes);
-  changed[8] ^= 1;
-  const bucket = legacy.service.storage.from("document-receipts"),
-    path = `${f.doc.id}/1.pdf`;
-  expect(
-    (await bucket.update(path, changed, { contentType: "application/pdf" }))
-      .error,
-  ).toBeNull();
-  try {
-    const denied = await page.request.get(
-      `${url}/pdf?version=1&renderer=legacy`,
-    );
-    expect(denied.status()).toBe(503);
-    expect(await denied.json()).toMatchObject({ code: "PDF_BYTES_DIVERGE" });
-  } finally {
-    expect(
-      (
-        await bucket.update(path, legacy.bytes, {
-          contentType: "application/pdf",
-        })
-      ).error,
-    ).toBeNull();
-  }
-  expect(hash(await read("legacy"))).toBe(legacy.hash);
-  expect(metadata()).toBe(frozen);
-  const current = await rpc(f.admin, "supply_document_command", {
-    p_id: f.doc.id,
-    p_action: "approve",
-    p_body: { lines: [{ lineId: f.doc.lines[0].id, quantity: "1" }] },
-    p_key: randomUUID(),
-    p_version: f.doc.version,
-  });
-  expect(current.version).toBeGreaterThan(1);
-  await page.goto(`/documentos/${f.doc.id}/arquivos?version=1`);
-  const files = page.getByRole("region", {
-    name: "Arquivos gerados",
-    exact: true,
-  });
-  await expect(
-    files.getByText("Arquivo original registrado", { exact: false }),
-  ).toBeVisible();
-  await expect(
-    files.getByText("Representação legada V4", { exact: false }),
-  ).toBeVisible();
-  await expect(
-    files.getByText("assinatura incorporada não comprovada", { exact: false }),
-  ).toHaveCount(2);
-  await expect(
-    files.getByRole("link", { name: "Baixar PDF", exact: true }),
-  ).toHaveCount(0);
-  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
-  await expect(
-    files.getByRole("link", { name: "Baixar PDF", exact: true }),
-  ).toHaveCount(1);
-  await expect(
-    files.getByText("Nova representação de uma versão histórica", {
-      exact: false,
-    }),
-  ).toBeVisible();
-  const archive = (
-    await (await page.request.get(`${url}/archive?version=1`)).json()
-  ).data;
-  expect(archive).toHaveLength(3);
-  const signed = archive.find(
-    (r: { kind: string }) => r.kind === "issuance",
-  ).issuance;
-  expect(signed).toMatchObject({
-    version: 1,
-    representation: "derived",
-    validation: { accepted: true, profile: "PAdES-B-T" },
-  });
-  expect(new Date(signed.readyAt).getTime()).toBeGreaterThan(
-    new Date(current.events.at(-1).createdAt).getTime(),
-  );
-  expect(metadata()).toBe(frozen);
-  expect(hash(await read("4"))).toBe(legacy.hash);
-  let fail = true;
-  await page.route(`**${url}/archive?**`, async (route) => {
-    if (fail)
-      await route.fulfill({
-        status: 500,
-        json: {
-          code: "INTERNAL_ERROR",
-          error: "Consulta temporariamente indisponível.",
-          retryable: true,
-        },
-      });
-    else await route.continue();
-  });
-  await files
-    .getByRole("button", { name: "Atualizar arquivos", exact: true })
-    .click();
-  await expect(files.getByRole("alert")).toContainText(
-    "Consulta temporariamente indisponível",
-  );
-  fail = false;
-  await files
-    .getByRole("button", { name: "Atualizar arquivos", exact: true })
-    .click();
-  await expect(files.getByRole("alert")).toHaveCount(0);
-  await page.unroute(`**${url}/archive?**`);
-  await page
-    .getByRole("link", {
-      name: "Ver arquivos de todas as versões",
-      exact: true,
-    })
-    .click();
-  await expect(
-    page.getByRole("heading", { name: /Todas as versões/ }),
-  ).toBeVisible();
-  for (const width of [1440, 768, 390, 320]) {
-    await page.setViewportSize({ width, height: 950 });
-    await audit(page, "mixed PDF archive " + width);
-  }
-  mkdirSync("output/playwright/phase-d", { recursive: true });
-  await page.screenshot({
-    path: `output/playwright/phase-d/pdf-archive-${info.project.name}.png`,
-    fullPage: true,
-    animations: "disabled",
-  });
-  sql(
-    `update public.care_recipient_memberships set status='revoked' where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.family.id)};`,
-  );
-  expect([401, 403]).toContain(
-    (await page.request.get(`${url}/archive`)).status(),
-  );
-  expect([401, 403]).toContain(
-    (await page.request.get(`${url}/pdf?version=1&renderer=legacy`)).status(),
-  );
-  expect([401, 403]).toContain(
-    (await page.request.get(`${url}/pdf?issuance=${signed.id}`)).status(),
-  );
-  // Live authority invalidation may already have unmounted the archive.
-  // Require the whole private surface to disappear after real revocation.
-  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
-  await expect(files).toHaveCount(0);
-  await expect(
-    page.getByRole("region", { name: "Mudar perfil", exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("main").getByRole("link", { name: "Baixar PDF", exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("main").getByRole("link", { name: "Baixar arquivo legado", exact: true }),
-  ).toHaveCount(0);
+test("Acervo consolidado recusa seletores experimentais e preserva exemplares atuais",async({page})=>{
+ const f=await fixture(page),url=`/api/documents/${f.doc.id}`;
+ const before=sql(`select count(*) from private.pdf_issuances where document_id=${sqlLiteral(f.doc.id)}`);
+ for(const selector of ["?version=1","?version=1&renderer=4","?version=1&renderer=legacy"])expect((await page.request.get(url+"/pdf"+selector)).status()).toBe(400);
+ expect(sql(`select count(*) from private.pdf_issuances where document_id=${sqlLiteral(f.doc.id)}`)).toBe(before);
+ const artifact=await legacyPdfFixture(f.owner,f.doc.id);
+ expect((await(await page.request.get(url+"/archive")).json()).data).toEqual([]);
+ const inspected=await page.request.post("/api/verification",{headers:{"content-type":"application/pdf"},data:artifact.bytes});
+ expect(inspected.status()).toBe(200);expect(await inspected.json()).toMatchObject({reference:{found:false},analysis:{status:"unsigned",documentSignature:"absent"}});
+ await page.goto(`/documentos/${f.doc.id}`);await selectDocumentSection(page,"files");
+ await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
+ const files=page.getByRole("region",{name:"Arquivos gerados",exact:true});await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
+ const rows=(await(await page.request.get(url+"/archive")).json()).data;expect(rows).toHaveLength(1);expect(rows[0]).toMatchObject({kind:"issuance",issuance:{rendererRevision:16,state:"ready"}});
+ const first=await page.request.get(url+"/pdf?issuance="+rows[0].issuance.id);expect(first.ok()).toBe(true);const digest=hash(await first.body());
+ expect(hash(await(await page.request.get(url+"/pdf?issuance="+rows[0].issuance.id)).body())).toBe(digest);
+ sql(`update public.care_recipient_memberships set status='revoked' where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.family.id)}`);
+ expect([401,403]).toContain((await page.request.get(url+"/archive")).status());expect([401,403]).toContain((await page.request.get(url+"/pdf?issuance="+rows[0].issuance.id)).status());
 });

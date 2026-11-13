@@ -18,7 +18,7 @@ function readList(value: unknown) {
   return result.data;
 }
 type Attachment = z.infer<typeof attachment>;
-type Props = { patientId: string; documentId?: string; movementId?: string; contingencyId?: string; writable?: boolean; onChange?: () => void };
+type Props = { patientId: string; documentId?: string; movementId?: string; contingencyId?: string; writable?: boolean; onChange?: () => void; };
 export function Attachments(props: Props) {
   return <ScopedAttachments key={`${props.patientId}:${props.documentId ?? ""}:${props.movementId ?? ""}:${props.contingencyId ?? ""}`} {...props} />;
 }
@@ -51,7 +51,7 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [frozen]);
-  const query = new URLSearchParams({ careRecipientId: patientId, ...(contingencyId?{contingencyId}:documentId ? { documentId } : { movementId: movementId! }) }).toString();
+  const query = new URLSearchParams({ careRecipientId: patientId, ...(contingencyId ? { contingencyId } : documentId ? { documentId } : { movementId: movementId! }) }).toString();
   const unresolved = files.some(file => file.state === "quarantine" && file.tracked && file.uploadKey);
   const newPreparationBlocked = !frozen && !resumeTarget && (loading || Boolean(readError) || unresolved);
   useEffect(() => {
@@ -82,8 +82,8 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     if (!(reason instanceof ApiError) || ![401, 403, 404].includes(reason.status)) return false;
     setFiles([]); setAbandonTarget(null); setReadError(reason.message); return true;
   }
-  async function upload(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); if (busy || newPreparationBlocked) return;
+  async function upload(event?: FormEvent<HTMLFormElement>, resuming = resumeTarget, selectedFile?: File) {
+    event?.preventDefault(); if (busy || newPreparationBlocked && !resuming) return;
     setBusy(true); setError(""); setMessage(""); setFileInvalid(false);
     let phase: "local" | "prepare" | "upload" = "local";
     const wasUncertain = uncertain;
@@ -91,17 +91,17 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
       requireRuntimeCommandsAvailable();
       let pending = pendingRef.current;
       if (!pending) {
-        const file = fileInputRef.current?.files?.[0];
+        const file = selectedFile ?? fileInputRef.current?.files?.[0];
         if (!file) return;
         if (file.size > attachmentMaxBytes) { focusFileRef.current = true; setFileInvalid(true); setFileValidation(value => value + 1); throw new Error(`Selecione um arquivo de até ${attachmentMaxLabel}.`); }
         pending = await freezeAttachment(file);
-        if (resumeTarget) {
-          if (pending.sourceSha256 !== resumeTarget.sourceSha256) { focusFileRef.current = true; setFileInvalid(true); setFileValidation(value => value + 1); throw new Error("Este arquivo não corresponde ao original da tentativa. Selecione o mesmo arquivo para retomar."); }
-          pending = Object.freeze({ ...pending, file: new File([pending.file], resumeTarget.filename, { type: resumeTarget.sourceMime ?? pending.file.type }), key: resumeTarget.uploadKey! }); preparedIdRef.current = resumeTarget.id;
+        if (resuming) {
+          if (pending.sourceSha256 !== resuming.sourceSha256) { focusFileRef.current = true; setFileInvalid(true); setFileValidation(value => value + 1); throw new Error("Este arquivo não corresponde ao original da tentativa. Selecione o mesmo arquivo para retomar."); }
+          pending = Object.freeze({ ...pending, file: new File([pending.file], resuming.filename, { type: resuming.sourceMime ?? pending.file.type }), key: resuming.uploadKey! }); preparedIdRef.current = resuming.id;
         }
         pendingRef.current = pending; setFrozen(pending);
       }
-      if (wasUncertain || resumeTarget) {
+      if (wasUncertain || resuming) {
         const result = readList(await api<unknown>(`/api/attachments?${query}&attemptKey=${pending.key}`));
         const current = result.data[0];
         if (current) {
@@ -150,6 +150,7 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
         setMessage("O envio ainda não está confirmado. Consulte novamente ou retome com o mesmo arquivo. Resultado pendente impede o abandono.");
       } else {
         if (pendingRef.current?.key === file.uploadKey) clearPending();
+        setResumeTarget(current => current?.id === file.id ? null : current);
         setMessage("Anexo recuperado e confirmado."); if (mountedRef.current) onChange?.();
       }
       setAttempt(value => value + 1);
@@ -177,32 +178,36 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     {readError ? <Notice error>Não foi possível consultar a lista de anexos. {readError} Atualize esta seção.</Notice> : null}
     {message ? <Notice>{message}</Notice> : null}
     {loading ? <p className="mt-3 text-sm" role="status">Consultando anexos…</p> : null}
-    <ul className="hca-file-records" aria-label="Arquivos anexados">{files.map(file => <FileRecord key={file.id} identity={file.id}
+    <ul className="hca-file-records" aria-label="Arquivos anexados">{files.map(file => <FileRecord key={file.id} identity={file.id} mime={file.mime_type} filename={file.filename}
       title={file.url ? <a href={file.url} target="_blank" rel="noopener">{file.filename}</a> : file.filename}>
-      <DefinitionGrid items={[{ label: "Tamanho disponível", value: Math.ceil(file.bytes / 1024) + " KB" },{ label: "Estado", value: file.state === "ready" ? "Validado" : file.state === "rejected" ? "Rejeitado" : file.pending ? "Resultado do envio pendente" : "Preparado; envio não confirmado" }]} />
+      <DefinitionGrid items={[{ label: "Tamanho disponível", value: Math.ceil(file.bytes / 1024) + " KB" }, { label: "Estado", value: file.state === "ready" ? "Validado" : file.state === "rejected" ? "Rejeitado" : file.pending ? "Resultado do envio pendente" : "Preparado; envio não confirmado" }]} />
       <details className="mt-2"><summary className="cursor-pointer text-xs">Origem e conversão do arquivo</summary>
         {file.sourceSha256 ? <><p>Original selecionado: {file.sourceMime} · {Math.ceil((file.sourceBytes ?? 0) / 1024)} KB. O original não é armazenado.</p><p className="break-all">SHA-256 do original: <code>{file.sourceSha256}</code></p><p>{file.transformation === "image-normalized-v1" ? "Imagem orientada, redimensionada e convertida para JPEG sem metadados." : "PDF com páginas passivas, sem anotações ou campos interativos."}</p></> : <p>A origem e a transformação deste envio histórico não foram registradas. O hash disponível corresponde ao arquivo armazenado.</p>}
         {file.sha256 ? <p className="break-all">SHA-256 do arquivo disponível: <code>{file.sha256}</code></p> : null}
       </details>
       {writable && file.state === "quarantine" && file.uploadKey && file.tracked ? <div className="mt-2 flex flex-wrap gap-2">
         <button type="button" className={buttonClass} disabled={busy} onClick={() => void recover(file)}>Consultar e recuperar tentativa</button>
-        {!frozen && file.sourceSha256 ? <button type="button" className={buttonClass} disabled={busy} onClick={() => { setResumeTarget(file); setMessage("Selecione o mesmo arquivo original. A impressão será conferida antes de retomar."); fileInputRef.current?.focus(); }}>Retomar com arquivo original</button> : null}
+        {(!frozen || frozen.key === file.uploadKey) && file.sourceSha256 ? <button type="button" className={buttonClass} disabled={busy} onClick={() => { setResumeTarget(file); if (pendingRef.current?.key === file.uploadKey) void upload(undefined, file); else void recover(file); }}>Retomar envio</button> : null}
         {file.canAbandon ? <button type="button" className={buttonClass} disabled={busy} onClick={event => { abandonFocusRef.current = event.currentTarget; setAbandonTarget(file); }}>Abandonar tentativa incompleta</button> : <p className="text-xs">O resultado ainda pode estar pendente. O abandono permanece indisponível.</p>}
+      </div> : null}
+      {resumeTarget?.id === file.id ? <div className="hca-attachment-resume" aria-live="polite">
+        {busy ? <p role="status">Verificando e retomando esta tentativa…</p> : frozen ? <><p>Arquivo preservado nesta tentativa: {frozen.file.name}.</p><button className={primaryClass} type="button" onClick={() => void upload(undefined, file)}>Verificar e continuar este envio</button></> : <><p>O navegador não mantém os bytes deste arquivo. Selecione o mesmo original para continuar aqui. A tentativa e o destino serão preservados.</p><label className="block text-sm font-semibold">Arquivo original para retomar<input ref={fileInputRef} className={inputClass} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-invalid={fileInvalid} aria-describedby={fileInvalid ? fileErrorId : undefined} onChange={event => { const selected = event.currentTarget.files?.[0]; if (selected) void upload(undefined, file, selected); }} /></label><button type="button" className={buttonClass} onClick={() => setResumeTarget(null)}>Fechar por enquanto</button></>}
+        {error ? <p role="alert">{error}</p> : null}
       </div> : null}
     </FileRecord>)}</ul>
     <Dialog open={Boolean(abandonTarget && files.some(file => file.id === abandonTarget.id))} title="Abandonar tentativa incompleta" closeDisabled={busy} finalFocus={resolveAbandonFocus} onClose={() => setAbandonTarget(null)}>
       {abandonTarget ? <>
-      <div role="group" aria-label="Confirmar abandono da tentativa" className="hca-form-stack">
-        {error ? <Notice error>{error}</Notice> : null}
-        <p>Abandonar esta reserva incompleta libera a vaga. Arquivos confirmados e histórico serão preservados.</p>
-        <DefinitionGrid items={[{ label: "Arquivo", value: abandonTarget.filename, wide: true },{ label: "Tentativa", value: abandonTarget.id, wide: true }]} />
-        <button type="button" className={buttonClass} disabled={busy} onClick={() => setAbandonTarget(null)}>Voltar sem abandonar</button>
-        <button type="button" className={buttonClass} disabled={busy} onClick={() => void abandon(abandonTarget)}>Confirmar abandono desta tentativa</button>
-      </div>
+        <div role="group" aria-label="Confirmar abandono da tentativa" className="hca-form-stack">
+          {error ? <Notice error>{error}</Notice> : null}
+          <p>Abandonar esta reserva incompleta libera a vaga. Arquivos confirmados e histórico serão preservados.</p>
+          <DefinitionGrid items={[{ label: "Arquivo", value: abandonTarget.filename, wide: true }, { label: "Tentativa", value: abandonTarget.id, wide: true }]} />
+          <button type="button" className={buttonClass} disabled={busy} onClick={() => setAbandonTarget(null)}>Voltar sem abandonar</button>
+          <button type="button" className={buttonClass} disabled={busy} onClick={() => void abandon(abandonTarget)}>Confirmar abandono desta tentativa</button>
+        </div>
       </> : null}
     </Dialog>
     {!loading && !files.length && !readError ? <p className="mt-4 text-sm text-(--muted)">Nenhum anexo registrado.</p> : null}
-    {writable ? <form className="mt-4 space-y-3" onSubmit={upload}>
+    {writable && !resumeTarget ? <form className="mt-4 space-y-3" onSubmit={upload}>
       {unresolved && !frozen && !resumeTarget ? <p role="status">Consulte ou retome a tentativa em andamento antes de preparar outro anexo.</p> : null}
       <label className="block text-sm font-semibold">{resumeTarget ? "Arquivo original para retomar" : "Adicionar foto ou PDF"}<input ref={fileInputRef} className={inputClass} type="file" name="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-invalid={fileInvalid} aria-describedby={fileInvalid ? fileErrorId : undefined} onChange={() => { setFileInvalid(false); setError(""); }} disabled={busy || Boolean(frozen) || newPreparationBlocked} required={!frozen} /></label>
       {frozen ? <p role="status">Arquivo desta tentativa: {frozen.file.name}. A escolha fica bloqueada até confirmar ou abandonar uma reserva sem envio pendente.</p> : null}

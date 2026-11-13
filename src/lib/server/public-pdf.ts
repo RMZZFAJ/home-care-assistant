@@ -100,7 +100,6 @@ export async function publicPdfReference(request: Request, code: string) {
   return publicPdfResultSchema.parse({
     reference,
     fileReference: null,
-    legacy: null,
     analysis: null,
     fileSha256: null,
     policyStatus: await policyStatus(reference),
@@ -183,9 +182,6 @@ export async function publicPdfUpload(request: Request, code: string | null) {
     hash = createHash("sha256").update(bytes).digest("hex");
   const reference = await lookup(server, code, hash),
     fileReference = code ? await lookup(server, null, hash) : reference;
-  const legacy = !fileReference.found
-    ? await rpc(server, "legacy_pdf_public", { p_hash: hash })
-    : { found: false };
   let trust;
   try {
     trust = await loadPdfTrust();
@@ -204,7 +200,6 @@ export async function publicPdfUpload(request: Request, code: string | null) {
   return publicPdfResultSchema.parse({
     reference,
     fileReference,
-    legacy,
     analysis,
     fileSha256: hash,
     policyStatus: await policyStatus(reference),

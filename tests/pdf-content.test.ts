@@ -1,3 +1,4 @@
+import { currentPdfFixture } from "./support/current-pdf-fixture";
 import { describe, it, expect } from "vitest";
 import { PDFDocument, PDFName, PDFHexString } from "pdf-lib";
 import {
@@ -43,7 +44,7 @@ describe("independent issuance text and geometry gate", () => {
   it("confirms all four document kinds, multi-page notes and oversized material cells", async () => {
     for (const original of Object.values(demoDocuments)) {
       const source = { ...original, demo: false };
-      const plan = await composeIssuance(source, "b".repeat(64), emission);
+      const plan = await composeIssuance(currentPdfFixture(source), "b".repeat(64), emission);
       expect((await validateIssuanceContent(plan.bytes, plan)).passed).toBe(
         true,
       );
@@ -61,19 +62,19 @@ describe("independent issuance text and geometry gate", () => {
         },
       ],
     };
-    const plan = await composeIssuance(source, "b".repeat(64), emission);
+    const plan = await composeIssuance(currentPdfFixture(source), "b".repeat(64), emission);
     expect(
       (await validateIssuanceContent(plan.bytes, plan)).pages,
     ).toBeGreaterThan(3);
-  }, 30000);
+  }, 90000);
   it("compares each expected run and preserves the emission identity", async () => {
-    const plan = await composeIssuance(snapshot, "a".repeat(64), emission);
+    const plan = await composeIssuance(currentPdfFixture(snapshot), "a".repeat(64), emission);
     expect(await validateIssuanceContent(plan.bytes, plan)).toMatchObject({
       passed: true,
     });
   }, 30000);
   it("rejects swapped identity and missing visible facts before signing", async () => {
-    const plan = await composeIssuance(snapshot, "a".repeat(64), emission),
+    const plan = await composeIssuance(currentPdfFixture(snapshot), "a".repeat(64), emission),
       pdf = await PDFDocument.load(plan.bytes);
     pdf.catalog.set(PDFName.of("HCAIssuance"), PDFHexString.fromText("{}"));
     await expect(

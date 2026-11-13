@@ -45,7 +45,7 @@ function trackWrites(page: Page) {
 async function workflow(page: Page) {
   const next = panel(page).getByRole("button", { name: "Abrir Atendimento e decisões", exact: true });
   await next.focus(); await next.press("Enter");
-  await expect(page.getByRole("tab", { name: "Atendimento", exact: true })).toBeFocused();
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
 }
 
 test("ENT follow-up distinguishes returned quantities from full receipt and preserves linked REQ fulfillment", async ({ page }, info) => {

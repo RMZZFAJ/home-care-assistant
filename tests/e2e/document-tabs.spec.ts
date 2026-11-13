@@ -19,222 +19,47 @@ import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 
-test("Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras", async ({
-  page,
-  browser,
-}, info) => {
-  const f = await setup(),
-    req = await issue(f.patient, f.products);
+test("Abas comparam os tokens L1 na mesma área de leitura em cinco larguras", async ({ page, browser }, info) => {
+  const f = await setup(), req = await issue(f.patient, f.products);
   await login(page, f.patient);
   await page.goto(`/documentos/${req.id}`);
   await selectDocumentSection(page, "materials");
   const reference = await browser.newContext({ serviceWorkers: "block" });
   try {
     const model = await reference.newPage();
-    await model.route(/^https?:/, (route) => route.abort());
-    await model.goto(
-      pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href +
-        "#ficha/REQ-0003",
-    );
-    await model.getByRole("tab", { name: /^Materiais/ }).click();
-    const properties = (element: HTMLElement) => {
-      const style = getComputedStyle(element);
-      return Object.fromEntries(
-        [
-          "display",
-          "gap",
-          "font-family",
-          "font-size",
-          "font-weight",
-          "line-height",
-          "color",
-          "background-color",
-          "padding",
-          "min-height",
-          "border-bottom",
-          "position",
-          "top",
-          "margin-top",
-          "margin-bottom",
-          "overflow-x",
-        ].map((name) => [name, style.getPropertyValue(name)]),
-      );
-    };
+    await model.route(/^https?:/, route => route.abort());
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/ficha/REQ-0003");
+    await model.locator("#product-app").getByRole("tab", { name: /^Materiais/ }).click();
+    const pairs: [string,string,string[]][] = [
+      [".hca-document-header", ".doc-hero", ["background-color","border","border-radius","box-shadow","overflow"]],
+      [".hca-document-identity", ".doc-hero-top", ["display","gap","align-items","justify-content","padding","flex-direction"]],
+      [".hca-document-name", ".doc-hero-name", ["display","gap","align-items","min-width"]],
+      ["[data-document-heading]", ".doc-hero-name h1", ["font-size","font-weight","line-height","letter-spacing","color"]],
+      [".hca-document-type", ".doc-kind", ["display","width","height","border-radius","background-color","color","font-size","font-weight"]],
+      [".hca-document-meta dt", ".doc-meta dt", ["font-size","text-transform","letter-spacing","color"]],
+      [".hca-document-meta dd", ".doc-meta dd", ["font-size","font-weight","line-height","margin"]],
+      [".hca-document-tab[aria-selected=true]", ".doc-tab[aria-selected=true]", ["font-size","font-weight","line-height","padding","min-height","border-bottom","color"]],
+    ];
+    const styles = (element: Element, keys: string[]) => Object.fromEntries(keys.map(key=>[key,getComputedStyle(element).getPropertyValue(key)]));
     for (const width of [320, 390, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await model.setViewportSize({ width, height: 900 });
-      await page.evaluate(() =>
-        window.scrollTo({ top: 0, left: 0, behavior: "instant" }),
-      );
-      await model.evaluate(() =>
-        window.scrollTo({ top: 0, left: 0, behavior: "instant" }),
-      );
-      expect(
-        await page
-          .getByRole("tab", { name: "Materiais", exact: true })
-          .evaluate(properties),
-      ).toEqual(
-        await model
-          .getByRole("tab", { name: /^Materiais/ })
-          .evaluate(properties),
-      );
-      const styleProperties = (element: Element, keys: string[]) =>
-        Object.fromEntries(
-          keys.map((key) => [
-            key,
-            getComputedStyle(element).getPropertyValue(key),
-          ]),
-        );
-      const pairs: [string, string, string[]][] = [
-        [
-          ".hca-document-header",
-          ".doc-hero",
-          [
-            "background-color",
-            "border",
-            "border-radius",
-            "box-shadow",
-            "overflow",
-            "font-size",
-            "line-height",
-          ],
-        ],
-        [
-          ".hca-document-identity",
-          ".hero-id",
-          ["display", "gap", "align-items", "justify-content", "padding"],
-        ],
-        [
-          ".hca-document-name",
-          ".hero-name",
-          ["display", "gap", "align-items", "min-width"],
-        ],
-        [
-          "[data-document-heading]",
-          ".hero-name h1",
-          [
-            "font-family",
-            "font-size",
-            "font-weight",
-            "line-height",
-            "letter-spacing",
-            "color",
-          ],
-        ],
-        [
-          ".hca-document-type",
-          ".doctype",
-          [
-            "display",
-            "width",
-            "height",
-            "border-radius",
-            "background-color",
-            "color",
-            "font-size",
-            "font-weight",
-          ],
-        ],
-        [
-          ".hca-document-meta",
-          ".hero-meta",
-          ["display", "gap", "padding", "margin", "grid-template-columns"],
-        ],
-        [
-          ".hca-document-meta dt",
-          ".hero-meta dt",
-          [
-            "font-size",
-            "text-transform",
-            "letter-spacing",
-            "color",
-            "margin-bottom",
-          ],
-        ],
-        [
-          ".hca-document-meta dd",
-          ".hero-meta dd",
-          ["font-size", "font-weight", "line-height", "margin"],
-        ],
-        [
-          ".hca-document-macro",
-          ".macro",
-          ["background-color", "border-top", "padding"],
-        ],
-        [
-          ".hca-document-macro-heading",
-          ".macro-top",
-          [
-            "display",
-            "justify-content",
-            "align-items",
-            "gap",
-            "font-size",
-            "margin-bottom",
-          ],
-        ],
-        [
-          ".hca-milestone-track",
-          ".step-track",
-          ["height", "border-radius", "background-color", "margin-bottom"],
-        ],
-        [
-          ".hca-milestone-title",
-          ".step-title",
-          ["display", "font-size", "font-weight", "gap"],
-        ],
-        [
-          ".hca-document-milestones li > p",
-          ".step-sub",
-          ["font-size", "line-height", "color", "margin-top", "margin-left"],
-        ],
-        [
-          ".hca-document-action-bar",
-          ".doc-actions",
-          [
-            "display",
-            "gap",
-            "align-items",
-            "justify-content",
-            "flex-wrap",
-            "margin-top",
-          ],
-        ],
-      ];
-      for (const [actualSelector, modelSelector, keys] of pairs)
-        expect(
-          await page
-            .locator(actualSelector)
-            .first()
-            .evaluate(styleProperties, keys),
-          actualSelector + " " + width,
-        ).toEqual(
-          await model
-            .locator(modelSelector)
-            .first()
-            .evaluate(styleProperties, keys),
-        );
-      const expected = await model.getByRole("tablist").evaluate(properties);
-      // The real mobile patient selector is an approved additional 51px row.
-      if (width <= 850)
-        expected.top = `${Number.parseFloat(expected.top) + 51}px`;
-      expect(await page.getByRole("tablist").evaluate(properties)).toEqual(
-        expected,
-      );
-      await info.attach("abas-modelo-" + width, {
-        body: await model.screenshot(),
-        contentType: "image/png",
-      });
-      await info.attach("abas-reais-" + width, {
-        body: await page.screenshot(),
-        contentType: "image/png",
-      });
+      const readingWidth=await page.locator(".hca-record-detail").evaluate(el=>el.getBoundingClientRect().width);
+      // Laboratory controls take canvas space; compare the product at the same
+      // reading width without changing any design token or reference markup.
+      await model.locator("#product-app .doc-page").evaluate((el,w)=>{(el as HTMLElement).style.width=w+"px";(el as HTMLElement).style.maxWidth="none";},readingWidth);
+      for (const [actual, expected, keys] of pairs)
+        expect(await page.locator(actual).first().evaluate(styles,keys), actual+" "+width).toEqual(await model.locator("#product-app "+expected).first().evaluate(styles,keys));
+      // Later owner comments supersede the reference's separate workflow tab.
+      await expect(page.getByRole("tab", {name:"Atendimento",exact:true})).toHaveCount(0);
+      await expect(page.getByRole("tab", {name:"Histórico",exact:true})).toHaveCount(0);
+      await expect(page.locator("details.hca-document-macro")).not.toHaveAttribute("open", "");
+      expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+      await info.attach("L1-modelo-"+width,{body:await model.screenshot(),contentType:"image/png"});
+      await info.attach("L1-real-"+width,{body:await page.screenshot(),contentType:"image/png"});
     }
-  } finally {
-    await reference.close();
-  }
+  } finally { await reference.close(); }
 });
-
 async function login(page: Page, patient: string, role = "family") {
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures[role].email);
@@ -364,17 +189,9 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
     await selectDocumentSection(page, "workflow");
     await expect(page.getByRole("tabpanel")).not.toBeEmpty();
     await selectDocumentSection(page, "communications");
-    if (type === "REQ")
-      await expect(page.getByRole("tabpanel")).toContainText(
-        "Avisos e acompanhamento",
-      );
-    else
-      await expect(
-        page.getByRole("region", {
-          name: "Notificações da ficha",
-          exact: true,
-        }),
-      ).toBeVisible();
+    const communications = page.getByRole("region", {name:"Comunicações da ficha",exact:true});
+    await expect(communications).toBeVisible();
+    await expect(communications).toContainText("Aplicativo");
     await selectDocumentSection(page, "files");
     await expect(
       page.getByRole("region", { name: "Arquivos gerados", exact: true }),
@@ -485,7 +302,7 @@ test("Abas conservam conferência ENT não salva e recuperam seleção por URL e
     `/documentos/${ent.id}?historyVersion=1&careRecipientId=${f.patient}`,
   );
   await expect(
-    page.getByRole("tab", { name: "Versões e integridade", exact: true }),
+    page.getByRole("tab", {name:"Identificação e registros preservados",exact:true}),
   ).toHaveAttribute("aria-selected", "true");
   await expect(
     page.getByRole("article", {

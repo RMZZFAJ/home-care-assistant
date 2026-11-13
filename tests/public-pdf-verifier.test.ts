@@ -1,3 +1,4 @@
+import { currentPdfFixture } from "./support/current-pdf-fixture";
 import { beforeAll, afterAll, it, expect } from "vitest";
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
@@ -36,7 +37,7 @@ beforeAll(async () => {
     demo: false,
   };
   unsigned = (
-    await composeIssuance(source, "a".repeat(64), {
+    await composeIssuance(currentPdfFixture(source), "a".repeat(64), {
       id: "10000000-0000-4000-8000-000000000001",
       verificationCode: "A".repeat(32),
       requestedAt: new Date().toISOString(),
@@ -130,13 +131,13 @@ it("retains the valid document signature when the embedded time token is missing
     );
   cms.signerInfos[0].unsignedAttrs = undefined;
   const der = Buffer.from(
-      new pki.ContentInfo({
-        contentType: "1.2.840.113549.1.7.2",
-        content: cms.toSchema(true),
-      })
-        .toSchema()
-        .toBER(false),
-    ).toString("hex"),
+    new pki.ContentInfo({
+      contentType: "1.2.840.113549.1.7.2",
+      content: cms.toSchema(true),
+    })
+      .toSchema()
+      .toBER(false),
+  ).toString("hex"),
     bytes = Buffer.from(signed);
   bytes.set(Buffer.from("<" + der.padEnd(end - start - 2, "0") + ">"), start);
   expect(

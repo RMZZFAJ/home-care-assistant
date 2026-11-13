@@ -168,6 +168,7 @@ async function delivery(
         requisitionItemIds: [
           req.lines.find((row) => row.product_id === productId).id,
         ],
+        requestFulfillment: "complete",
         ...extras,
       })),
     },

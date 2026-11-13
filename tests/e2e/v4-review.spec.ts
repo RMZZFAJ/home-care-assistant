@@ -422,7 +422,7 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
           destination: "CARE_TEAM",
           recipientId: fixtures().professional.id,
           lines: [
-            { productId: product, quantity: "10", requisitionItemIds: [item] },
+            { requestFulfillment: "complete", productId: product, quantity: "10", requisitionItemIds: [item] },
           ],
         },
         idempotencyKey: randomUUID(),

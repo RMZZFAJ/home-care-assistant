@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import type { ComponentProps, ReactNode } from "react";
+import { useId, type ComponentProps, type ReactNode } from "react";
 import { Icon } from "./icon";
 
 type OverlayProps = {
@@ -17,6 +17,7 @@ type OverlayProps = {
 };
 
 function Overlay({ open, title, children, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false }: OverlayProps & { side?: "start" | "end" }) {
+  const titleId = useId();
   return <BaseDialog.Root open={open} disablePointerDismissal={closeDisabled} onOpenChange={(next, details) => {
     if (next) return;
     if (closeDisabled) details.cancel(); else onClose();
@@ -25,9 +26,9 @@ function Overlay({ open, title, children, onClose, closeDisabled = false, closeL
       <div className="hca-overlay">
         <BaseDialog.Backdrop className="hca-modal-backdrop" />
         <BaseDialog.Viewport className={side ? "hca-drawer-viewport" : "hca-modal-viewport"} data-side={side}>
-          <BaseDialog.Popup id={id} className={side ? "hca-modal hca-drawer" : "hca-modal"} finalFocus={finalFocus}>
+          <BaseDialog.Popup id={id} aria-labelledby={titleId} className={side ? "hca-modal hca-drawer" : "hca-modal"} finalFocus={finalFocus}>
             <header className="hca-modal-head">
-              <BaseDialog.Title>{title}</BaseDialog.Title>
+              <BaseDialog.Title id={titleId}>{title}</BaseDialog.Title>
               <button type="button" className="hca-control hca-control-icon" aria-label={closeLabel} disabled={closeDisabled} onClick={onClose}><Icon name="close" /></button>
             </header>
             <div className={keyboardScrollable ? "hca-modal-content hca-scroll-content" : "hca-modal-content"} tabIndex={keyboardScrollable ? 0 : undefined} role={keyboardScrollable ? "region" : undefined} aria-label={keyboardScrollable ? `Conteúdo de ${title}` : undefined}>{children}</div>

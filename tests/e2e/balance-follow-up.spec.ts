@@ -37,7 +37,7 @@ for (const policy of ["required", "optional"] as const) {
     const next = panel(page).getByRole("button", { name: "Abrir Contagem e revisão", exact: true });
     await next.focus();
     await next.press("Enter");
-    await expect(page.getByRole("tab", { name: "Contagem e revisão", exact: true })).toBeFocused();
+    await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
     await expect(page.getByRole("heading", { name: "Contagem e revisão", exact: true })).toBeVisible();
     expect(balState(f.document.id)).toBe(before);
 

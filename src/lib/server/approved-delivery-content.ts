@@ -4,6 +4,7 @@ import { pdfFidelitySchema } from "@/lib/documents/pdf-fidelity";
 import { confirmedDeliveryQuantity } from "@/lib/documents/delivery-confirmed-quantity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
 import { formatBrazilDate } from "@/lib/receipt";
+import { familyFulfillmentDescription, familyReviewDescription } from "@/lib/documents/family-fulfillment";
 import { formatQuantity, quantity } from "@/lib/quantity";
 
 const amount = (value: unknown, unit?: string) => typeof value === "number" || typeof value === "string" ? formatQuantity(value, unit) : "Não disponível no registro";
@@ -16,17 +17,20 @@ export function approvedDeliveryContent(snapshot: DocumentSnapshot, emission: Pd
   semanticFacts["receipt/state"] = entReceiptState(snapshot.status, source.historical, acceptedAt, emission.representation).declaration;
   if (snapshot.status === "administratively_closed") semanticFacts["receipt/administrative"] = "Encerramento administrativo não substitui aceite pessoal. Os efeitos apurados e a situação física ainda desconhecida permanecem nas seções próprias.";
   snapshot.lines.forEach((line, index) => {
+    const familyDecision = familyFulfillmentDescription(line);
+    if (familyDecision) semanticFacts["familyFulfillment/" + index] = familyDecision;
     const key = "material/" + index, received = confirmedDeliveryQuantity(snapshot, line, fidelity.deliveryResolutions, source.historical);
     semanticFacts[key + "/name"] = name(line); semanticFacts[key + "/unit"] = unit(line);
     semanticFacts[key + "/expedited"] = amount(line.quantity, unit(line));
     semanticFacts[key + "/received"] = received.state === "recorded" ? amount(received.quantity, unit(line)) : received.state === "unavailable" ? "Quantidade não preservada" : "Não confirmado";
     semanticFacts[key + "/open"] = amount((typeof line.reconciled_quantity === "string" || typeof line.reconciled_quantity === "number") && (typeof line.accepted_quantity === "string" || typeof line.accepted_quantity === "number") ? quantity(String(line.quantity)).minus(line.accepted_quantity).minus(line.reconciled_quantity).toFixed() : null, unit(line));
-    const receipt = (line.metadata as { receipt?: { notes?: string; acceptedQuantity?: unknown } } | undefined)?.receipt;
+    const receipt = (line.metadata as { receipt?: { notes?: string; acceptedQuantity?: unknown; }; } | undefined)?.receipt;
     if (receipt) {
       semanticFacts["issue/" + index + "/notes"] = receipt.notes || "Nota não preservada";
       semanticFacts["issue/" + index + "/accepted"] = "Aceito na declaração original: " + amount(receipt.acceptedQuantity, unit(line));
     }
   });
+  for (const review of snapshot.fulfillmentReviews ?? []) semanticFacts["familyReview/" + review.id] = familyReviewDescription(review);
   fidelity.deliveryResolutions.forEach((event, index) => {
     const line = snapshot.lines.find(value => value.id === event.lineId), key = "resolution/" + index;
     semanticFacts[key + "/outcome"] = event.resolution ? { received: "Recebimento complementar", returned: "Devolução à origem", missing: "Falta ou perda conciliada" }[event.resolution] : "Resolução não preservada";

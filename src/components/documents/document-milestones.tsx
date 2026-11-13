@@ -3,14 +3,15 @@
 import { Icon } from "@/components/ui/primitives";
 import type { DocumentMilestone } from "@/lib/documents/milestones";
 
-export function DocumentMilestones({ items }: { items: DocumentMilestone[] }) {
+export function DocumentMilestones({ items }: { items: DocumentMilestone[]; }) {
   return (
-    <div className="hca-document-macro">
-      <div className="hca-document-macro-heading">
+    <details className="hca-document-macro">
+      <summary className="hca-document-macro-heading">
         <strong>Progresso da ficha</strong>
-        <span>Marcos independentes da ordem dos Andamentos</span>
-      </div>
-      <ol className="hca-document-milestones" aria-label="Marcos da ficha">
+        <span className="hca-macro-mini" aria-hidden="true">{items.map(item => <i key={item.label} data-state={item.state} />)}</span>
+        <span>{items.filter(item => item.state === "done").length} de {items.length} marcos</span>
+      </summary>
+      <div className="hca-milestone-scroll" role="region" aria-label="Etapas da ficha; rolagem horizontal" tabIndex={0}><ol className="hca-document-milestones" aria-label="Marcos da ficha">
         {items.map((item, index) => (
           <li key={item.label} data-state={item.state}>
             <div className="hca-milestone-track" aria-hidden="true">
@@ -35,7 +36,7 @@ export function DocumentMilestones({ items }: { items: DocumentMilestone[] }) {
             <p>{item.detail}</p>
           </li>
         ))}
-      </ol>
-    </div>
+      </ol></div>
+    </details>
   );
 }

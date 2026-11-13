@@ -117,11 +117,11 @@ function Mode({
           setRecoverable(
             Boolean(
               cache?.pending ||
-                cache?.content ||
-                cache?.notes ||
-                Object.values(cache?.counts ?? {}).some(
-                  (value) => value !== "",
-                ),
+              cache?.content ||
+              cache?.notes ||
+              Object.values(cache?.counts ?? {}).some(
+                (value) => value !== "",
+              ),
             ),
           );
       } catch {
@@ -327,12 +327,12 @@ function ScheduledCount({
     const controller = new AbortController();
     const load = async () => {
       const [catalog, state] = await Promise.all([
-        api<{ data: CatalogProduct[] }>(
+        api<{ data: CatalogProduct[]; }>(
           "/api/catalog?careRecipientId=" + context.patient!.id,
           undefined,
           controller.signal,
         ),
-        api<{ data: BalanceWorkspace }>(
+        api<{ data: BalanceWorkspace; }>(
           "/api/balances?careRecipientId=" + context.patient!.id,
           undefined,
           controller.signal,
@@ -357,12 +357,12 @@ function ScheduledCount({
         documentId ?? cachedTarget ?? state.data.eligibility.documentId;
       const doc = id
         ? (
-            await api<{ data: SupplyDocument }>(
-              "/api/documents/" + id,
-              undefined,
-              controller.signal,
-            )
-          ).data
+          await api<{ data: SupplyDocument; }>(
+            "/api/documents/" + id,
+            undefined,
+            controller.signal,
+          )
+        ).data
         : null;
       if (
         doc &&
@@ -628,22 +628,22 @@ function ScheduledCount({
             : "/api/documents",
           body: editing
             ? {
-                ...commit,
-                payload,
-                idempotencyKey: crypto.randomUUID(),
-                submissionKey: crypto.randomUUID(),
-                expectedVersion: editing.version,
-                recount: assignment.kind === "recount",
-                submit: !draft,
-              }
+              ...commit,
+              payload,
+              idempotencyKey: crypto.randomUUID(),
+              submissionKey: crypto.randomUUID(),
+              expectedVersion: editing.version,
+              recount: assignment.kind === "recount",
+              submit: !draft,
+            }
             : {
-                ...commit,
-                careRecipientId: context.patient!.id,
-                type: "BAL",
-                payload,
-                idempotencyKey: crypto.randomUUID(),
-                draft,
-              },
+              ...commit,
+              careRecipientId: context.patient!.id,
+              type: "BAL",
+              payload,
+              idempotencyKey: crypto.randomUUID(),
+              draft,
+            },
           draft,
         },
         {
@@ -712,14 +712,14 @@ function ScheduledCount({
     setError("");
     try {
       const [catalog, state, documentRead] = await Promise.all([
-        api<{ data: CatalogProduct[] }>(
+        api<{ data: CatalogProduct[]; }>(
           "/api/catalog?careRecipientId=" + context.patient!.id,
         ),
-        api<{ data: BalanceWorkspace }>(
+        api<{ data: BalanceWorkspace; }>(
           "/api/balances?careRecipientId=" + context.patient!.id,
         ),
         editing
-          ? api<{ data: SupplyDocument }>("/api/documents/" + editing.id)
+          ? api<{ data: SupplyDocument; }>("/api/documents/" + editing.id)
           : Promise.resolve(null),
       ]);
       if (
@@ -803,12 +803,12 @@ function ScheduledCount({
   }
   async function scan(code: string) {
     const result = await api<{
-      data: { product_id: string; name: string; base_quantity: string }[];
+      data: { product_id: string; name: string; base_quantity: string; }[];
     }>(
       "/api/catalog/presentations?careRecipientId=" +
-        context.patient!.id +
-        "&barcode=" +
-        encodeURIComponent(code),
+      context.patient!.id +
+      "&barcode=" +
+      encodeURIComponent(code),
     );
     const presentation = result.data[0];
     if (
@@ -1070,12 +1070,12 @@ function ScheduledCount({
             <h2>Revisão da contagem</h2>
             <p>Confira as quantidades físicas e as diferenças.</p>
             {editing?.workflow_data.reviewPolicy &&
-            typeof editing.workflow_data.reviewPolicy === "object" &&
-            "balReview" in editing.workflow_data.reviewPolicy ? (
+              typeof editing.workflow_data.reviewPolicy === "object" &&
+              "balReview" in editing.workflow_data.reviewPolicy ? (
               <Notice>
                 {editing.workflow_data.reviewPolicy.balReview === "optional"
                   ? "Ao confirmar, as diferenças desta nova contagem serão conciliadas no estoque da equipe. A revisão é facultativa; a diferença não será registrada como consumo."
-                  : "Esta contagem usa a revisão exigida na política preservada do balanço. A conciliação aguarda os novos pareceres; revisões anteriores não aprovam esta contagem."}
+                  : "Esta contagem usa a revisão exigida na política preservada do balanço. A conciliação aguarda os novas revisões; revisões anteriores não aprovam esta contagem."}
               </Notice>
             ) : (
               <p>

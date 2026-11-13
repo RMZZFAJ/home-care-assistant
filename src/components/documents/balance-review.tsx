@@ -22,14 +22,14 @@ import { BalanceApplication } from "@/components/balances/balance-application";
 const groupLabel = { family: "Família", supervisor: "Supervisão" };
 function referenceLabel(context: BalanceReviewContext) {
   if (context.referenceState === "unavailable")
-    return "Referência do efeito anterior não preservada. O parecer histórico não reaplica estoque.";
+    return "Referência do efeito anterior não preservada. A revisão histórica não reaplica estoque.";
   if (context.referenceState === "historical")
-    return "O estoque recebeu movimentos posteriores. O parecer sobre esta contagem não valida o saldo atual nem reaplica ajustes.";
+    return "O estoque recebeu movimentos posteriores. A revisão sobre esta contagem não valida o saldo atual nem reaplica ajustes.";
   return context.reconciliationApplied
-    ? "Contagem já conciliada. Nenhum parecer repete a movimentação."
-    : "O parecer confirma ou aponta diferenças na contagem. Aplicar a contagem ao estoque exige um ato separado, com referência válida e as revisões previstas.";
+    ? "Contagem já conciliada. Nenhuma revisão repete a movimentação."
+    : "A revisão confirma ou aponta diferenças na contagem. Aplicar a contagem ao estoque exige um ato separado, com referência válida e as revisões previstas.";
 }
-function CountFacts({ data }: { data: SupplyDocument }) {
+function CountFacts({ data }: { data: SupplyDocument; }) {
   const context = data.balanceReview!;
   return (
     <div className="hca-form-stack hca-balance-facts">
@@ -133,18 +133,18 @@ export function BalanceReview({
         {countEvents.map((event) => {
           const captured = Array.isArray(data.canonical_snapshot.history)
             ? data.canonical_snapshot.history.find(
-                (row: unknown) =>
-                  row &&
-                  typeof row === "object" &&
-                  "version" in row &&
-                  row.version === event.version,
-              )
+              (row: unknown) =>
+                row &&
+                typeof row === "object" &&
+                "version" in row &&
+                row.version === event.version,
+            )
             : null;
           const name =
             captured &&
-            typeof captured === "object" &&
-            "actorName" in captured &&
-            typeof captured.actorName === "string"
+              typeof captured === "object" &&
+              "actorName" in captured &&
+              typeof captured.actorName === "string"
               ? captured.actorName
               : "Nome não preservado neste histórico";
           return (
@@ -172,11 +172,11 @@ export function BalanceReview({
       </section>
       <Notice>
         {["cancelled", "rejected"].includes(data.status)
-          ? "Balanço encerrado: pareceres e observações permanecem em leitura."
+          ? "Balanço encerrado: revisões e observações permanecem em leitura."
           : context.reviewRequired
-            ? "As revisões previstas ainda precisam ser registradas. Cada pessoa revisa uma vez, em grupo autorizado e distinto de quem contou. O parecer não altera estoque."
+            ? "As revisões previstas ainda precisam ser registradas. Cada pessoa revisa uma vez, em grupo autorizado e distinto de quem contou. A revisão não altera estoque."
             : context.policyReviewRequired
-              ? "As revisões previstas foram registradas. O parecer não substitui a confirmação da aplicação ao estoque."
+              ? "As revisões previstas foram registradas. A revisão não substitui a confirmação da aplicação ao estoque."
               : "Revisão facultativa. A contagem válida não entra em uma fila universal de aprovação."}
       </Notice>
       <details className="ui-card">
@@ -229,8 +229,8 @@ export function BalanceReview({
           contador não revisa o próprio ato.
         </p>
       )}
-      <section className="space-y-3" aria-label="Pareceres do balanço">
-        <h3 className="font-semibold">Pareceres com autoria própria</h3>
+      <section className="space-y-3" aria-label="Revisões do balanço">
+        <h3 className="font-semibold">Revisões com autoria própria</h3>
         {context.reviews.map((row) => (
           <article
             className="ui-card hca-form-stack"
@@ -250,15 +250,15 @@ export function BalanceReview({
                 : ""}
             </p>
             <p className="whitespace-pre-wrap wrap-break-word">
-              {row.comment || "Parecer sem comentário adicional."}
+              {row.comment || "Revisão sem comentário adicional."}
             </p>
             <BalanceReviewItemFacts review={row} corrections={context.corrections} documentId={data.id} documentVersion={data.version} />
             <p>
               {row.reviewed_snapshot.opinionOnly
-                ? "Parecer registrado sem aplicar a contagem ao estoque."
+                ? "Revisão registrada sem aplicar a contagem ao estoque."
                 : row.reviewed_snapshot.appliedBeforeReview
-                ? "Revisão posterior sem reaplicar o estoque."
-                : "Registro histórico de revisão; consulte a aplicação preservada da contagem."}
+                  ? "Revisão posterior sem reaplicar o estoque."
+                  : "Registro histórico de revisão; consulte a aplicação preservada da contagem."}
             </p>
             <details>
               <summary>Contagem e observações revisadas</summary>
@@ -278,7 +278,7 @@ export function BalanceReview({
           </article>
         ))}
         {!context.reviews.length ? (
-          <p className="text-sm">Nenhum parecer independente registrado.</p>
+          <p className="text-sm">Nenhuma revisão independente registrada.</p>
         ) : null}
         {context.legacyApprovals.length ? (
           <details>
@@ -320,7 +320,7 @@ export function BalanceReview({
           onClose={close}
           onCommitted={() => {
             setMessage(
-              "Parecer registrado com autoria própria. As observações da contagem foram preservadas.",
+              "Revisão registrada com autoria própria. As observações da contagem foram preservadas.",
             );
             focusAfterSuccessRef.current = true;
             close();

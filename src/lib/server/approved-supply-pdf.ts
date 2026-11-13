@@ -60,7 +60,7 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
   layout.pdf.setCreationDate(new Date(emission.requestedAt)); layout.pdf.setModificationDate(new Date(emission.requestedAt));
   layout.firstHeader();
   const authorDetail = originalAuthorDetail(snapshot);
-  const context = snapshot.payload.balanceContext as { startsAt?: string; endsAt?: string; countedAt?: string; professionalName?: string; shiftType?: string; timezone?: string } | undefined;
+  const context = snapshot.payload.balanceContext as { startsAt?: string; endsAt?: string; countedAt?: string; professionalName?: string; shiftType?: string; timezone?: string; } | undefined;
   const countAt = snapshot.balanceReviews?.counter.recordedAt ?? context?.countedAt ?? at;
   layout.fields([
     { label: "Paciente", value: patient, key: "identity/patient" },
@@ -82,11 +82,13 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
     layout.table([{ label: "Nº", fraction: 0.045 }, { label: "Material / unidade", fraction: 0.355 }, { label: donation ? "Declarado" : "Adquirido", fraction: 0.17 }, { label: "Entrada validada", fraction: 0.18 }, { label: "Saldo após entrada", fraction: 0.25 }], grouped(snapshot.lines.map((line, index) => {
       const entry = entries!.find(value => value.lineId === line.id)!;
       const balance = entry.state === "known" ? amount(entry.quantity, unit(line)) : entry.state === "restricted" ? "Acesso restrito" : entry.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro";
-      return { category: category(line), cells: [
-        { text: String(index + 1).padStart(2, "0") }, { text: name(line) + "\n" + unit(line), key: "material/" + index + "/name", strong: true },
-        { text: amount(line.purchased_quantity, unit(line)), key: "material/" + index + "/acquired" }, { text: amount(line.accepted_quantity, unit(line)), key: "material/" + index + "/validated" },
-        { text: balance + (entry.entry ? "\n" + formatBrazilDate(entry.entry.validatedAt) : ""), key: "material/" + index + "/balance" },
-      ] };
+      return {
+        category: category(line), cells: [
+          { text: String(index + 1).padStart(2, "0") }, { text: name(line) + "\n" + unit(line), key: "material/" + index + "/name", strong: true },
+          { text: amount(line.purchased_quantity, unit(line)), key: "material/" + index + "/acquired" }, { text: amount(line.accepted_quantity, unit(line)), key: "material/" + index + "/validated" },
+          { text: balance + (entry.entry ? "\n" + formatBrazilDate(entry.entry.validatedAt) : ""), key: "material/" + index + "/balance" },
+        ]
+      };
     })));
     layout.heading("Previsão e aquisição");
     layout.table([{ label: "Material", fraction: 0.4 }, { label: "Previsto", fraction: 0.2 }, { label: "Aprovado", fraction: 0.2 }, { label: donation ? "Declarado" : "Adquirido", fraction: 0.2 }], snapshot.lines.map((line, index) => ({ cells: [{ text: name(line) }, { text: amount(line.quantity, unit(line)), key: "purchase/" + index + "/planned" }, { text: amount(line.approved_quantity, unit(line)), key: "purchase/" + index + "/approved" }, { text: amount(line.purchased_quantity, unit(line)), key: "purchase/" + index + "/acquired" }] })));
@@ -106,21 +108,21 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
     layout.paragraph("Somente a parcela validada acrescenta materiais ao estoque familiar. Aquisição e encerramento da expectativa não movimentam estoque. A entrega à equipe é um ato separado.", "purchase/scope", { size: 9.5 });
   } else {
     const reviews = snapshot.balanceReviews?.reviews ?? [];
-    const policy = snapshot.workflow?.reviewPolicy as { balReview?: string; balApprovers?: string[]; balRequirement?: string } | undefined;
+    const policy = snapshot.workflow?.reviewPolicy as { balReview?: string; balApprovers?: string[]; balRequirement?: string; } | undefined;
     const reviewRequired = policy?.balReview === "required";
-    const eligible = reviews.filter(review => review.count_version === snapshot.balanceReviews?.countVersion && review.reference_state === "current" && review.reviewer_id !== snapshot.balanceReviews?.counter.id && policy?.balApprovers?.includes(review.review_group));
-    const reviewSatisfied = policy?.balRequirement === "all" ? Boolean(policy.balApprovers?.length && policy.balApprovers.every(group => eligible.some(review => review.review_group === group))) : eligible.length > 0;
+    const eligible = reviews.filter(review => review.count_version === snapshot.balanceReviews?.countVersion && review.reference_state === "current" && review.reviewer_id !== snapshot.balanceReviews?.counter.id && (Array.isArray(policy?.balApprovers) && policy.balApprovers.includes(review.review_group)));
+    const reviewSatisfied = policy?.balRequirement === "all" ? Boolean(Array.isArray(policy.balApprovers) && policy.balApprovers.length && policy.balApprovers.every(group => eligible.some(review => review.review_group === group))) : eligible.length > 0;
     layout.milestones([
       { label: "Contagem registrada", symbol: "document", detail: formatBrazilDate(countAt), done: Boolean(countAt), tone: "blue" },
-      ...(reviews.length || reviewRequired ? [{ label: "Revisão", symbol: "people" as const, detail: reviews.length ? "Pareceres abaixo" : "Aguardando parecer", done: reviewSatisfied, current: !reviewSatisfied && !cancelled, tone: reviewSatisfied ? "blue" as const : "warn" as const }] : []),
+      ...(reviews.length || reviewRequired ? [{ label: "Revisão", symbol: "people" as const, detail: reviews.length ? "Revisões abaixo" : "Aguardando revisão", done: reviewSatisfied, current: !reviewSatisfied && !cancelled, tone: reviewSatisfied ? "blue" as const : "warn" as const }] : []),
       { label: cancelled ? "Cancelamento" : "Conclusão", symbol: cancelled ? "cross" : "check", detail: cancelled ? "Contagem preservada" : application?.state === "applied" ? "Contagem aplicada" : "Não aplicado ao estoque", done: application?.state === "applied" || cancelled, tone: cancelled ? "bad" : application?.state === "applied" ? "good" : undefined },
     ]);
-    layout.heading("Relação de materiais", "Saldo do estoque da equipe imediatamente após aplicar esta contagem; não é o saldo atual. O parecer não altera o estoque.");
+    layout.heading("Relação de materiais", "Saldo do estoque da equipe imediatamente após aplicar esta contagem; não é o saldo atual. A revisão não altera o estoque.");
     layout.paragraph(Number(snapshot.workflow?.countVersion) > 1 ? "Reconto registrado em ato próprio, mantendo a contagem anterior." : documentVariant("BAL", snapshot.payload, snapshot.workflow).includes("contexto de plantão não preservado") ? "Contexto de plantão não preservado neste registro." : "Primeira contagem desta ficha, sem afirmar primeira contagem da residência.", "balance/countNature", { size: 9.5 });
     layout.table([{ label: "Nº", fraction: 0.045 }, { label: "Material / unidade", fraction: 0.355 }, { label: "Referência", fraction: 0.18 }, { label: "Contado", fraction: 0.17 }, { label: "Saldo após balanço", fraction: 0.25 }], grouped(snapshot.lines.map((line, index) => {
       const applied = application?.state === "applied" ? application.lines.find(item => item.lineId === line.id) : null;
       const after = application?.state === "not_applied" ? "Não aplicado" : application?.state === "unavailable" ? "Não disponível no registro" : applied?.state === "restricted" ? "Acesso restrito" : applied?.state === "known" ? amount(applied.quantity, unit(line)) : "Não disponível no registro";
-      const reference = (line.metadata as { expectedQuantity?: unknown } | undefined)?.expectedQuantity;
+      const reference = (line.metadata as { expectedQuantity?: unknown; } | undefined)?.expectedQuantity;
       return { category: category(line), cells: [{ text: String(index + 1).padStart(2, "0") }, { text: name(line) + "\n" + unit(line), key: "material/" + index + "/name", strong: true }, { text: amount(reference, unit(line)), key: "material/" + index + "/reference" }, { text: amount(line.quantity, unit(line)), key: "material/" + index + "/counted" }, { text: after + (application?.state === "applied" ? "\n" + formatBrazilDate(application.appliedAt) : ""), key: "material/" + index + "/balance" }] };
     })));
     if (snapshot.balanceReviews?.counter) layout.paragraph("Contagem registrada por " + (snapshot.balanceReviews.counter.name ?? "Nome não preservado") + " · " + formatBrazilDate(countAt), "balance/counter", { size: 9.5 });
@@ -133,9 +135,9 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
     if (!reviews.length) layout.paragraph(reviewRequired ? "Revisão exigida, ainda não registrada." : "Revisão facultativa não realizada. A conclusão segue a política preservada na ficha.", "balance/reviewState");
     for (const [index, review] of reviews.entries()) {
       const prefix = "review/" + index;
-      layout.heading("Parecer " + (index + 1) + " · " + (review.review_group === "family" ? "Família" : "Supervisão"));
+      layout.heading("Revisão " + (index + 1) + " · " + (review.review_group === "family" ? "Família" : "Supervisão"));
       layout.paragraph(review.reviewer_name + " · " + formatBrazilDate(review.recorded_at), prefix + "/actor", { size: 9.5 });
-      layout.paragraph(review.count_version !== snapshot.balanceReviews?.countVersion ? "Registro de contagem anterior; não é parecer vigente da contagem atual." : eligible.includes(review) ? "Parecer da contagem atual. Não aplica nem corrige estoque." : "Parecer preservado; elegibilidade para a contagem atual não comprovada por este contexto.", prefix + "/scope", { size: 9.5 });
+      layout.paragraph(review.count_version !== snapshot.balanceReviews?.countVersion ? "Registro de contagem anterior; não é revisão vigente da contagem atual." : eligible.includes(review) ? "Revisão da contagem atual. Não aplica nem corrige estoque." : "Revisão preservada; elegibilidade para a contagem atual não comprovada por este contexto.", prefix + "/scope", { size: 9.5 });
       layout.paragraph(review.comment || "Sem comentário adicional.", prefix + "/comment");
       for (const [itemIndex, item] of (review.item_results ?? []).entries()) {
         const line = review.reviewed_snapshot.lines.find(value => value.id === item.lineId);
@@ -146,7 +148,7 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
     for (const [index, approval] of (snapshot.balanceReviews?.legacyApprovals ?? []).entries()) {
       layout.heading("Aprovação anterior preservada");
       layout.paragraph((approval.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(approval.created_at), "balance/legacy/" + index);
-      layout.paragraph(approval.count_version === snapshot.balanceReviews?.countVersion ? "Aprovação preservada desta contagem; não substitui o parecer por material nem presume aplicação ao estoque." : "Aprovação de contagem anterior; não é aprovação vigente da contagem atual.", "balance/legacyScope/" + index, { size: 9.5 });
+      layout.paragraph(approval.count_version === snapshot.balanceReviews?.countVersion ? "Aprovação preservada desta contagem; não substitui a revisão por material nem presume aplicação ao estoque." : "Aprovação de contagem anterior; não é aprovação vigente da contagem atual.", "balance/legacyScope/" + index, { size: 9.5 });
     }
     for (const [index, correction] of (corrections ?? []).entries()) {
       if (!correction.acts.length) continue;

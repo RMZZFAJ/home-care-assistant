@@ -266,7 +266,7 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
     if (failure === "unavailable") {
       await page.getByLabel("Menu do usuário", { exact: true }).click();
       await page
-        .getByRole("menuitem", { name: "Mudar perfil", exact: true })
+        .getByRole("menuitem", { name: "Mudar paciente ou função", exact: true })
         .click();
     }
     const previousInjections = await page.evaluate((failure) => {

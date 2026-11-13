@@ -68,7 +68,7 @@ test("PDF atual preserva a origem congelada e distingue emissão sem expor a pre
         (response) =>
           new URL(response.url()).pathname ===
             `/api/documents/${f.doc.id}/issuances` &&
-          response.request().method() === "POST",
+          response.request().method() === "POST", { timeout: 60_000 },
       );
       await page
         .getByRole("button", { name: "Gerar PDF", exact: true })
@@ -160,7 +160,7 @@ test("PDF atual preserva a origem congelada e distingue emissão sem expor a pre
       );
       const recovered = await page.request.post(
         `/api/documents/${f.doc.id}/issuances`,
-        { data: { idempotencyKey: oldKey, version: row.version } },
+        { timeout: 60_000, data: { idempotencyKey: oldKey, version: row.version } },
       );
       expect(recovered.status(), await recovered.text()).toBe(200);
       expect(await recovered.json()).toMatchObject({

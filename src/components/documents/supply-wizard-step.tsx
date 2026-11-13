@@ -41,6 +41,7 @@ export type WizardState = {
   recipientId: string;
   recipientReason?: string;
   sharedNeedReasons?: Record<string, string>;
+  requestFulfillments?: Record<string, "" | "partial" | "complete">;
   presentationSelections?: Record<string, PresentationSelection[]>;
   manualQuantities?: Record<string, string>;
 };
@@ -226,15 +227,15 @@ export function SupplyWizardStep({
             </Notice>
           ) : null}
           {type !== "BAL" &&
-          requestOptions.some((option) => option.pending.length) ? (
+            requestOptions.some((option) => option.pending.length) ? (
             <details className="rounded-xl border border-(--line) p-4">
               <summary className="min-h-11 cursor-pointer text-sm font-semibold">
                 Vincular requisições pendentes
               </summary>
               <p className="my-3 text-xs text-(--muted)">
                 Marque explicitamente as linhas atendidas por esta operação. A
-                compra não atende a REQ; somente o aceite positivo da ENT
-                vinculada.
+                compra não atende a REQ. Na entrega, a família avalia a suficiência;
+                o recebedor confirma separadamente as quantidades físicas.
               </p>
               <div className="space-y-3">
                 {requestOptions
@@ -268,12 +269,12 @@ export function SupplyWizardStep({
                                 ...current,
                                 [option.productId]: event.target.checked
                                   ? [
-                                      ...(current[option.productId] ?? []),
-                                      request.lineId,
-                                    ]
+                                    ...(current[option.productId] ?? []),
+                                    request.lineId,
+                                  ]
                                   : (current[option.productId] ?? []).filter(
-                                      (id) => id !== request.lineId,
-                                    ),
+                                    (id) => id !== request.lineId,
+                                  ),
                               }));
                               if (event.target.checked)
                                 setForm((current) => ({
@@ -294,6 +295,7 @@ export function SupplyWizardStep({
                           />
                         </label>
                       ))}
+                      {type === "ENT" && form.source === "FAMILY" && links[option.productId]?.length ? <label className="mt-3 block text-sm font-semibold">Esta entrega pretende atender a necessidade<select className={inputClass} required value={form.requestFulfillments?.[option.productId] ?? ""} aria-invalid={Boolean(fieldErrors[option.productId + ":fulfillment"])} onChange={event => { const choice = event.currentTarget.value as "" | "partial" | "complete"; setForm(current => ({ ...current, requestFulfillments: { ...current.requestFulfillments, [option.productId]: choice } })); }}><option value="">Escolha a avaliação familiar</option><option value="partial">Parcialmente · continua em aberto</option><option value="complete">Por completo · necessidade atendida após recebimento</option></select><span className="hca-field-help">O destinatário verá sua decisão em leitura. Ela não confirma expedição, recebimento ou estoque.</span>{fieldErrors[option.productId + ":fulfillment"] ? <span className="ui-field-error">{fieldErrors[option.productId + ":fulfillment"]}</span> : null}</label> : null}
                       {(links[option.productId]?.length ?? 0) > 1 ? (
                         <label className="mt-3 block text-sm font-semibold">
                           Justificativa da necessidade compartilhada
@@ -434,7 +436,7 @@ export function SupplyWizardStep({
                     </span>
                   </label>
                   {checked &&
-                  !form.presentationSelections?.[product.id]?.length ? (
+                    !form.presentationSelections?.[product.id]?.length ? (
                     <label className="product-quantity text-xs font-semibold">
                       {type === "BAL"
                         ? "Contagem física"
@@ -535,9 +537,9 @@ export function SupplyWizardStep({
               { label: "Percurso", value: form.source === "FAMILY" ? "Família → Equipe" : "Equipe → Família" },
               { label: "Recebedor", value: recipientContext?.people.find(person => person.id === form.recipientId)?.name ?? people.find(person => person.id === form.recipientId)?.name ?? "Pessoa não disponível na referência atual" },
             ]} /> : <><strong>{context.patient?.display_name}</strong>
-            <p className="mt-1 text-xs text-(--muted)">
-              Responsável: {context.fullName}
-            </p></>}
+              <p className="mt-1 text-xs text-(--muted)">
+                Responsável: {context.fullName}
+              </p></>}
             {type === "ENT" && recipientContext ? (
               <div className="mt-3 space-y-2">
                 <DeliveryRecipientReference data={recipientContext} />

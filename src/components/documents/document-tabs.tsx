@@ -16,14 +16,12 @@ export type DocumentTab =
   | "attachments"
   | "history"
   | "audit";
-const baseTabs: { id: DocumentTab; label: string; icon: IconName }[] = [
+const baseTabs: { id: DocumentTab; label: string; icon: IconName; }[] = [
   { id: "overview", label: "Visão geral", icon: "home" },
   { id: "materials", label: "Materiais", icon: "stock" },
-  { id: "workflow", label: "Atendimento", icon: "check" },
   { id: "communications", label: "Comunicações", icon: "bell" },
   { id: "files", label: "Arquivos gerados", icon: "forms" },
   { id: "attachments", label: "Anexos", icon: "link" },
-  { id: "history", label: "Versões e integridade", icon: "history" },
 ];
 
 export function useDocumentTabs(auditAllowed: boolean) {
@@ -33,15 +31,16 @@ export function useDocumentTabs(auditAllowed: boolean) {
   const requested = params.get("documentTab");
   const valid = [
     ...baseTabs.map((tab) => tab.id),
+    "history",
     ...(auditAllowed ? ["audit"] : []),
   ];
-  const value: DocumentTab = valid.includes(requested ?? "")
+  const value: DocumentTab = requested === "workflow" ? "materials" : valid.includes(requested ?? "")
     ? (requested as DocumentTab)
     : params.has("historyVersion")
       ? "history"
       : "overview";
   useEffect(() => {
-    if (!focusSelectionRef.current) return;
+    if (!focusSelectionRef.current && value !== "history") return;
     const target = rootRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
     if (target) {
       focusSelectionRef.current = false;
@@ -49,6 +48,7 @@ export function useDocumentTabs(auditAllowed: boolean) {
     }
   }, [value]);
   function select(next: DocumentTab, focus = false) {
+    if (next === "workflow") next = "materials";
     if (!valid.includes(next)) return;
     focusSelectionRef.current = focus;
     const url = new URL(window.location.href);
@@ -106,6 +106,7 @@ export function DocumentTabs({
           </Tabs.Tab>
         ))}
       </Tabs.List>
+      <div hidden={value !== "history"} className="hca-document-technical-nav"><Tabs.List aria-label="Consulta técnica da ficha"><Tabs.Tab value="history" className="hca-document-tab">Identificação e registros preservados</Tabs.Tab></Tabs.List><button type="button" className="ui-button" onClick={() => onSelect("overview")}>Voltar à ficha</button></div>
       {children}
     </Tabs.Root>
   );
@@ -126,12 +127,12 @@ export function DocumentPanel({
   );
 }
 
-export function DocumentAuditAccess({ patientId }: { patientId: string }) {
+export function DocumentAuditAccess({ patientId }: { patientId: string; }) {
   return (
     <section className="ui-card">
       <h2>Auditoria autorizada</h2>
       <p className="hca-field-help">
-        Versões da ficha permanecem na aba Versões e integridade. A consulta de
+        A identificação técnica e os registros estão disponíveis em Mais. A consulta de
         auditoria usa as permissões e filtros do paciente; não representa
         conclusão de uma tarefa.
       </p>

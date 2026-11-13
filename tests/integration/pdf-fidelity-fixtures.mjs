@@ -62,7 +62,7 @@ export async function fidelityRequisitionFixture() {
   if (items.error) throw items.error;
   const selected = items.data.find(item => item.product_id === f.products[0]);
   let delivery = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false,
-    p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Atendimento parcial fictício explicitamente vinculado", lines: [{ productId: f.products[0], quantity: "1", requisitionItemIds: [selected.id] }] } });
+    p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Atendimento parcial fictício explicitamente vinculado", lines: [{ requestFulfillment: "complete", productId: f.products[0], quantity: "1", requisitionItemIds: [selected.id] }] } });
   delivery = await command(pro, delivery, "receive", { divergences: [] });
   const doc = await rpc(pro, "operational_document", { p_id: created.requisition_id });
   return { ...f, pro, owner, doc, initial, items: items.data, at, delivery };

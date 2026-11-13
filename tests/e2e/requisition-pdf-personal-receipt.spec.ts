@@ -188,7 +188,7 @@ test("M1 mantém material e ciência após resolução de extra, atendimento e d
       recipientId: fixtures.professional.id,
       recipientReason: "Recebedor real indicado para este atendimento",
       lines: [
-        {
+        { requestFulfillment: "complete",
           productId: f.products[0],
           quantity: "3",
           requisitionItemIds: [item.id],
@@ -311,12 +311,12 @@ test("ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe
       recipientId: sheila.id,
       recipientReason: "Sheila conferirá pessoalmente os materiais expedidos",
       lines: [
-        {
+        { requestFulfillment: "complete",
           productId: f.products[0],
           quantity: "3",
           requisitionItemIds: [req1.lines[0].id],
         },
-        {
+        { requestFulfillment: "complete",
           productId: f.products[1],
           quantity: "1",
           requisitionItemIds: [req2.lines[0].id],

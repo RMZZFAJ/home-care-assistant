@@ -20,7 +20,7 @@ export async function selectContext(page: Page, patient: string | null) {
       await chooser.getByRole("button", { name: label, exact: !patient }).click();
     } else {
       await page.getByLabel("Menu do usuário", { exact: true }).click();
-      await page.getByRole("menuitem", { name: "Mudar perfil", exact: true }).click();
+      await page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true }).click();
       await page.getByRole("menuitemradio", { name: label, exact: !patient }).click();
     }
     await expect.poll(async () => (await (await page.request.get("/api/context")).json()).data.activeContext?.care_recipient_id).toBe(patient);

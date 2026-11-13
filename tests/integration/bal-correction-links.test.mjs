@@ -5,7 +5,7 @@ import { correctionFixture,applyCorrection,designatedCorrection } from "./bal-co
 import { rpc,receiveBalanceMaterials } from "./bal-review-fixtures.mjs";
 import { fixtures } from "./v4-fixtures.mjs";
 import { sql,sqlLiteral as q } from "../../scripts/test-environment.mjs";
-const reserve=(f,version=null,key=randomUUID(),entry="reserve_pdf_issuance_v12")=>f.family.rpc(entry,{p_document:f.document.id,p_version:version,p_key:key});
+const reserve=(f,version=null,key=randomUUID(),entry="reserve_pdf_issuance")=>f.family.rpc(entry,{p_document:f.document.id,p_version:version,p_key:key});
 const facts=f=>sql("select jsonb_build_object('events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id="+q(f.document.id)+"),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id="+q(f.patient)+"))");
 test("BAL correction links identify exact native recount, material and separate application without rewriting earlier facts",async()=>{
  const f=await correctionFixture(),entry=f.recount.balanceReview.corrections[0];
@@ -20,10 +20,10 @@ test("BAL correction links identify exact native recount, material and separate 
  assert.deepEqual(applied.balanceReview.reviews[0],f.reviewed.balanceReview.reviews[0]);assert.equal(Number(applied.balanceReview.reviews[0].reviewed_snapshot.lines.find(l=>l.id===f.line.id).quantity),1);
  await receiveBalanceMaterials(f);
  const latest=await rpc(f.family,"operational_document",{p_id:f.document.id});assert.deepEqual(latest.balanceReview.corrections[0].acts[0].application,effect);
- const frozen=await reserve(f);assert.ifError(frozen.error);assert.equal(frozen.data.rendererRevision,12);assert.deepEqual(frozen.data.snapshot.balanceReviewCorrections,latest.balanceReview.corrections);
+ const frozen=await reserve(f);assert.ifError(frozen.error);assert.equal(frozen.data.rendererRevision,16);assert.deepEqual(frozen.data.snapshot.balanceReviewCorrections,latest.balanceReview.corrections);
  assert.deepEqual((await reserve(f,f.recount.version)).data.snapshot.balanceReviewCorrections,pending.data.snapshot.balanceReviewCorrections);
  assert.equal(Object.hasOwn(frozen.data.snapshot,"corrections"),false);assert.equal(Object.hasOwn(latest.canonical_snapshot,"corrections"),false);
- const key=randomUUID(),v11=await reserve(f,null,key,"reserve_pdf_issuance_v11");assert.ifError(v11.error);const replay=await reserve(f,null,key);assert.ifError(replay.error);assert.equal(replay.data.rendererRevision,11);assert.deepEqual(replay.data.snapshot,v11.data.snapshot);
+ const key=randomUUID(),v11=await reserve(f,null,key,"reserve_pdf_issuance");assert.ifError(v11.error);const replay=await reserve(f,null,key);assert.ifError(replay.error);assert.equal(replay.data.rendererRevision,16);assert.deepEqual(replay.data.snapshot,v11.data.snapshot);
 });
 test("correction projection excludes unrelated documents and preserves every later recount without claiming each one applied",async()=>{
  const f=await correctionFixture();const source=f.recount.balanceReview.corrections;
@@ -31,7 +31,7 @@ test("correction projection excludes unrelated documents and preserves every lat
  const d=await rpc(f.family,"operational_document",{p_id:f.document.id});assert.deepEqual(d.balanceReview.corrections,source);
  const next=await rpc(f.admin,"revise_supply_document",{p_id:d.id,p_version:d.version,p_key:randomUUID(),p_recount:true,p_payload:{lines:f.products.map(productId=>({productId,quantity:"4"})),notes:"Terceira contagem da mesma ficha."}});
  assert.deepEqual(next.balanceReview.corrections[0].acts.map(a=>a.countVersion),[2,3]);assert.ok(next.balanceReview.corrections[0].acts.every(a=>a.application.state==="not_applied"));
- assert.equal(sql("select has_function_privilege('authenticated','private.bal_correction_facts(uuid,integer)','EXECUTE') or has_function_privilege('anon','public.reserve_pdf_issuance_v12(uuid,uuid,integer)','EXECUTE')"),"f");
+ assert.equal(sql("select has_function_privilege('authenticated','private.bal_correction_facts(uuid,integer)','EXECUTE') or has_function_privilege('anon','public.reserve_pdf_issuance(uuid,uuid,integer)','EXECUTE')"),"f");
 });
 test("stock masking and revocation protect a prior correction even while the current count is not applied",async()=>{
  const f=await correctionFixture();await applyCorrection(f);

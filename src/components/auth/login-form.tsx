@@ -10,6 +10,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { safeReturnPath } from "@/lib/safe-return-path";
 import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { AccessFrame } from "./access-frame";
+import { completeEntry } from "@/lib/auth/complete-entry";
 
 export function LoginForm() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export function LoginForm() {
     }
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: signedIn, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -59,15 +60,15 @@ export function LoginForm() {
       ) {
         router.replace(
           "/perfil?mfa=required&next=" +
-            encodeURIComponent(
-              safeReturnPath(searchParams.get("next"), window.location.origin),
-            ),
+          encodeURIComponent(
+            safeReturnPath(searchParams.get("next"), window.location.origin),
+          ),
         );
         router.refresh();
         return;
       }
       router.replace(
-        safeReturnPath(searchParams.get("next"), window.location.origin),
+        await completeEntry(searchParams.get("next"), signedIn.user!.id),
       );
       router.refresh();
     } catch {
@@ -124,7 +125,7 @@ export function LoginForm() {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeReturnPath(searchParams.get("next"), window.location.origin))}`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/acesso/continuar?next=" + encodeURIComponent(safeReturnPath(searchParams.get("next"), window.location.origin)))}`,
         },
       });
       if (oauthError) {
@@ -142,19 +143,19 @@ export function LoginForm() {
 
   return (
     <AccessFrame active={recovery ? "recovery" : "login"} title={recovery ? "Recuperar seu acesso" : "Entrar"} returnTo={searchParams.get("next")}>
-    <form onSubmit={recovery ? event => { event.preventDefault(); void recoverPassword(); } : submit} className="hca-access-form">
-      {searchParams.get("error") ? <FeedbackBanner  tone="warning" role="alert">Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</FeedbackBanner> : null}
-      <FormField label={"E-mail"} htmlFor={"login-email"}><TextInput id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setEmail(controlValue); }} /></FormField>
-      {!recovery ? <FormField label={"Senha"} htmlFor={"login-password"}><TextInput id="login-password" name="password" required disabled={!ready || loading} type="password" autoComplete="current-password" value={password} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setPassword(controlValue); }} /></FormField> : null}
-      {error ? <FeedbackBanner  tone="error" role="alert">{error}</FeedbackBanner> : null}
-      {notice ? <FeedbackBanner  tone="success" role="status">{notice}</FeedbackBanner> : null}
-      {recovery ? <ActionButton type="submit" variant="primary" disabled={loading || !ready}>{loading ? "Solicitando…" : "Solicitar link de recuperação"}</ActionButton> : <>
-      <ActionButton type="submit" variant="primary" disabled={loading || !ready} >{loading ? <LoadingIndicator compact /> : undefined}{loading ? "Entrando..." : "Entrar"}</ActionButton>
-      <ActionButton variant="quiet" type="button" onClick={recoverPassword} disabled={loading || !ready}>Esqueci minha senha</ActionButton>
-      <div className="hca-access-divider"><span />ou<span /></div>
-      <ActionButton type="button" onClick={signInWithGoogle} disabled={loading || !ready}>Continuar com Google</ActionButton>
-      </>}
-    </form>
+      <form onSubmit={recovery ? event => { event.preventDefault(); void recoverPassword(); } : submit} className="hca-access-form">
+        {searchParams.get("error") ? <FeedbackBanner tone="warning" role="alert">Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</FeedbackBanner> : null}
+        <FormField label={"E-mail"} htmlFor={"login-email"}><TextInput id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setEmail(controlValue); }} /></FormField>
+        {!recovery ? <FormField label={"Senha"} htmlFor={"login-password"}><TextInput id="login-password" name="password" required disabled={!ready || loading} type="password" autoComplete="current-password" value={password} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setPassword(controlValue); }} /></FormField> : null}
+        {error ? <FeedbackBanner tone="error" role="alert">{error}</FeedbackBanner> : null}
+        {notice ? <FeedbackBanner tone="success" role="status">{notice}</FeedbackBanner> : null}
+        {recovery ? <ActionButton type="submit" variant="primary" disabled={loading || !ready}>{loading ? "Solicitando…" : "Solicitar link de recuperação"}</ActionButton> : <>
+          <ActionButton type="submit" variant="primary" disabled={loading || !ready} >{loading ? <LoadingIndicator compact /> : undefined}{loading ? "Entrando..." : "Entrar"}</ActionButton>
+          <ActionButton variant="quiet" type="button" onClick={recoverPassword} disabled={loading || !ready}>Esqueci minha senha</ActionButton>
+          <div className="hca-access-divider"><span />ou<span /></div>
+          <ActionButton type="button" onClick={signInWithGoogle} disabled={loading || !ready}>Continuar com Google</ActionButton>
+        </>}
+      </form>
     </AccessFrame>
   );
 }

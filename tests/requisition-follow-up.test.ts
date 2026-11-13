@@ -11,8 +11,8 @@ it("routes pending and partial fulfillment to the materials, independently of sc
   for (const scienceSatisfied of [true, false]) {
     const result = requisitionFollowUp({ ...active, scienceSatisfied, fulfilled: 1 });
     expect(result).toMatchObject({ pending: true, section: "materials" });
-    expect(result.description).toContain("1 de 2 itens ainda sem atendimento confirmado");
-    expect(result.description).toContain("expedição e compra não comprovam recebimento");
+    expect(result.description).toContain("1 de 2 itens permanecem em aberto");
+    expect(result.description).toContain("compra e expedição não comprovam recebimento");
   }
 });
 it("keeps full fulfillment distinct from required science and manual archiving", () => {

@@ -12,11 +12,11 @@ export type DocumentSection =
 const labels = {
   overview: "Visão geral",
   materials: "Materiais",
-  workflow: /^(Atendimento|Aquisição|Contagem e revisão)$/,
+  workflow: "Materiais",
   communications: "Comunicações",
   files: "Arquivos gerados",
   attachments: "Anexos",
-  history: "Versões e integridade",
+  history: "Identificação e registros preservados",
   audit: "Auditoria",
 };
 /** Follow the real navigation; hidden panels must never be forced open by tests. */
@@ -24,6 +24,7 @@ export async function selectDocumentSection(
   page: Page,
   section: DocumentSection,
 ) {
+  if (section === "history") { await openDocumentMore(page); await page.getByRole("button", {name:"Identificação e registros preservados",exact:true}).click(); }
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
   await tab.click();
   try {

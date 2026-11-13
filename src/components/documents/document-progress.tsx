@@ -35,6 +35,9 @@ import { useClientReady } from "@/lib/use-client-ready";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
+import { useSearchParams } from "next/navigation";
+import { ProgressReference } from "./progress-reference";
+import { ProgressTextArea } from "./progress-text-area";
 import { progressCareRoles, progressEventPresentation, progressRelevance } from "@/lib/documents/progress-catalog";
 import { ProgressPublicationOptions } from "./progress-publication-options";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -44,10 +47,8 @@ import {
   FormField,
   Pill,
   SelectField,
-  TextAreaField,
   TextInput,
 } from "@/components/ui/controls";
-import { RelatedDocument } from "./related-document";
 import { DocumentActionSlot } from "./document-action-slot";
 import {
   parseProgressPage,
@@ -61,6 +62,7 @@ import {
   type ProgressPage,
   progressReferencePage,
   progressReferenceRow,
+  mentionsEveryone,
 } from "@/lib/validation/document-progress";
 import type { CreationDraft } from "@/types/creation-drafts";
 import type { DocumentType } from "@/types/documents";
@@ -88,7 +90,7 @@ function loadDraft(
   key: string,
   patientId: string,
   documentId: string,
-): Draft & { error: string } {
+): Draft & { error: string; } {
   try {
     const raw = sessionStorage.getItem(key);
     const saved: z.infer<typeof storedDraft> = raw
@@ -170,6 +172,18 @@ function ProgressContent({
     carryFrom: draft.carryFrom,
   });
   const { content, pending } = draft;
+  const anchor = useSearchParams().get("progressRecord");
+  const [anchorError, setAnchorError] = useState("");
+  useEffect(() => {
+    if (!anchor) return;
+    const controller = new AbortController();
+    void api<unknown>(`/api/documents/${id}/progress/location?record=${encodeURIComponent(anchor)}`, undefined, controller.signal).then(raw => {
+      const result = z.object({ data: z.object({ documentId: z.uuid(), recordId: z.uuid(), page: z.number().int().positive() }) }).parse(raw).data;
+      if (result.documentId !== id || result.recordId !== anchor) throw new Error("Referência indisponível.");
+      if (!controller.signal.aborted) { setFilter("all"); setPage(result.page); setAnchorError(""); }
+    }).catch(() => { if (!controller.signal.aborted) setAnchorError("Este andamento não está disponível no seu contexto autorizado."); });
+    return () => controller.abort();
+  }, [id, anchor]);
   const publishingRef = useRef(false),
     mountedRef = useRef(false);
   useEffect(() => {
@@ -179,8 +193,8 @@ function ProgressContent({
     };
   }, []);
   const [recoveryCheck, setRecoveryCheck] = useState<ProgressRecovery | null>(
-      null,
-    ),
+    null,
+  ),
     [checkingRecovery, setCheckingRecovery] = useState(false);
   const [localIntegrityError, setLocalIntegrityError] = useState(
     Boolean(draft.error),
@@ -214,6 +228,11 @@ function ProgressContent({
     decode,
   );
   const feed = !read.loading && !read.error ? read.data : null;
+  useEffect(() => {
+    if (!anchor || !feed?.data.some(row => row.id === anchor)) return;
+    const frame = requestAnimationFrame(() => { const element = document.getElementById("andamento-" + anchor); element?.scrollIntoView({ block: "center" }); element?.focus({ preventScroll: true }); });
+    return () => cancelAnimationFrame(frame);
+  }, [anchor, feed]);
   const openerRef = useRef<HTMLButtonElement>(null);
   const command = useCommandIntent<StoredProgressPacket, unknown>(
     (value, packet) =>
@@ -223,9 +242,9 @@ function ProgressContent({
   );
   const writable = Boolean(
     feed?.canPublish &&
-      context.patient?.id === patientId &&
-      context.activeContext?.mode === "patient" &&
-      can(context, "document.progress.create"),
+    context.patient?.id === patientId &&
+    context.activeContext?.mode === "patient" &&
+    can(context, "document.progress.create"),
   );
   const privateDraft = useCreationDraft({
     userId: context.userId,
@@ -409,10 +428,10 @@ function ProgressContent({
     setCheckingRecovery(true);
     setError("");
     try {
-      const value = await api<{ data: unknown }>(
-          "/api/documents/progress-preparations/recovery",
-          packet,
-        ),
+      const value = await api<{ data: unknown; }>(
+        "/api/documents/progress-preparations/recovery",
+        packet,
+      ),
         proof = parseProgressRecovery(value.data, packet, context.userId);
       if (!mountedRef.current) return;
       if (proof.status === "applied" || proof.status === "applied_native") {
@@ -511,7 +530,7 @@ function ProgressContent({
         const native = publishProgress.parse({
           key: crypto.randomUUID(),
           content,
-          publication,
+          publication: { ...publication, visibility: mentionsEveryone(content.text) ? "public" : publication.visibility ?? "public", mentionAll: mentionsEveryone(content.text) },
         });
         const saved = await privateDraft.save(privateContent);
         if (!saved || !mountedRef.current) return;
@@ -529,19 +548,19 @@ function ProgressContent({
       const value = await (command.uncertain
         ? command.recover()
         : command.send(
-            "draftCommit" in packet
-              ? "/api/documents/progress-preparations/commit"
-              : `/api/documents/${id}/progress`,
-            packet,
-          ));
+          "draftCommit" in packet
+            ? "/api/documents/progress-preparations/commit"
+            : `/api/documents/${id}/progress`,
+          packet,
+        ));
       if (!mountedRef.current) return;
       const result =
         "draftCommit" in packet
           ? parseProgressPreparationConfirmation(
-              z.object({ data: z.unknown() }).parse(value).data,
-              packet,
-              context.userId,
-            ).receipt.nativeResult
+            z.object({ data: z.unknown() }).parse(value).data,
+            packet,
+            context.userId,
+          ).receipt.nativeResult
           : parseProgressOutcome(value);
       clearEnvelope(packet);
       updateDraft({ content: blank, pending: null }, false);
@@ -583,16 +602,15 @@ function ProgressContent({
       publishingRef.current = false;
     }
   }
-  function addReference(row: Reference) {
+  function addReference(row: Reference, replacement?: string) {
     const current = draftRef.current.content;
     if (
       locked ||
-      current.references.includes(row.id) ||
-      current.references.length >= 8
+      !current.references.includes(row.id) && current.references.length >= 8
     )
       return;
     const text =
-      current.text + (current.text ? " " : "") + "#" + (row.code ?? row.id);
+      replacement ?? current.text.replace(/(?:^|\s)#[^\s]*$/, "") + (current.text ? " " : "") + "#" + (row.code ?? row.id) + (row.kind === "progress" ? " (andamento)" : "");
     if (text.length > 2000) {
       setError(
         "A referência ultrapassaria 2000 caracteres. Seu texto foi preservado; ajuste-o antes de inserir o vínculo.",
@@ -602,7 +620,7 @@ function ProgressContent({
     setError("");
     setContent({
       ...current,
-      references: [...current.references, row.id],
+      references: current.references.includes(row.id) ? current.references : [...current.references, row.id],
       text,
     });
   }
@@ -646,12 +664,12 @@ function ProgressContent({
         </DocumentActionSlot>
       </div>
       {!open &&
-      (privateDraft.offered ||
-        privateDraft.base ||
-        privateDraft.consumed ||
-        privateDraft.pending ||
-        privateDraft.loadError ||
-        privateDraft.readDenied) ? (
+        (privateDraft.offered ||
+          privateDraft.base ||
+          privateDraft.consumed ||
+          privateDraft.pending ||
+          privateDraft.loadError ||
+          privateDraft.readDenied) ? (
         <CreationDraftPanel
           draft={privateDraft}
           current={privateContent}
@@ -704,6 +722,7 @@ function ProgressContent({
           edição foi preservado.
         </Notice>
       ) : null}
+      {anchorError ? <Notice error>{anchorError}</Notice> : null}
       {feed ? (
         <>
           <p className="hca-field-help">
@@ -715,66 +734,63 @@ function ProgressContent({
               {feed.data.map((row) => {
                 const presentation = progressEventPresentation(row);
                 return (
-                <li key={row.id} className="hca-progress-event">
-                  <span className="hca-event-marker" aria-hidden="true">
-                    <Icon name={presentation.originIcon} />
-                  </span>
-                  <article
-                    className={
-                      row.source === "manual"
-                        ? "hca-manual-note"
-                        : "hca-event-body"
-                    }
-                    aria-label={
-                      row.source === "manual"
-                        ? progressCategories[row.category]
-                        : (presentation.event ?? undefined)
-                    }
-                  >
-                    <div className="hca-event-heading">
-                      <strong>
-                        {row.source === "manual"
+                  <li key={row.id} id={"andamento-" + row.id} tabIndex={-1} className="hca-progress-event" data-tone={presentation.tone} data-selected={row.id === anchor || undefined}>
+                    <span className="hca-event-marker" aria-hidden="true">
+                      <Icon name={presentation.originIcon} />
+                    </span>
+                    <article
+                      className={
+                        row.source === "manual"
+                          ? "hca-manual-note"
+                          : "hca-event-body"
+                      }
+                      aria-label={
+                        row.source === "manual"
                           ? progressCategories[row.category]
-                          : presentation.event}
-                      </strong>
-                      <time dateTime={row.recordedAt}>
-                        {formatBrazilDate(row.recordedAt)}
-                      </time>
-                    </div>
-                    <Pill tone={row.source === "manual" ? "accent" : "neutral"}>
-                      {presentation.origin}
-                    </Pill>
-                    <Pill tone={presentation.tone}><Icon name={presentation.icon} /> {presentation.label}</Pill>
-                    <p className="hca-event-meta">
-                      {row.authorId
-                        ? (row.authorName ?? "Nome histórico não preservado")
-                        : "Sistema, sem autoria pessoal"}
-                      {row.source === "manual" && row.stage
-                        ? ` · Etapa relacionada: ${progressStages[row.stage]}`
-                        : ""}
-                      {row.source === "automatic"
-                        ? ` · Versão ${row.version}`
-                        : ""}
-                    </p>
-                    {row.source === "manual" ? (
-                      <>
-                        <p className="hca-event-text">{row.text}</p>
-                        {row.mentions?.length ? <p className="hca-event-meta">Pessoas mencionadas: {row.mentions.map(person => person.name + " · " + progressCareRoles[person.careRole]).join("; ")}. Uma menção não registra ciência ou autoria.</p> : null}
-                        <div className="hca-toolbar">
-                          {row.references.map((ref) => (
-                            <RelatedDocument
-                              key={ref.id}
-                              id={ref.id}
-                              type={ref.type}
-                              label={ref.code ?? "Ficha vinculada"}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    ) : null}
-                  </article>
-                </li>
-              );})}
+                          : (presentation.event ?? undefined)
+                      }
+                    >
+                      <div className="hca-event-heading">
+                        <strong>
+                          {row.source === "manual"
+                            ? progressCategories[row.category]
+                            : presentation.event}
+                        </strong>
+                        <time dateTime={row.recordedAt}>
+                          {formatBrazilDate(row.recordedAt)}
+                        </time>
+                      </div>
+                      <Pill tone={row.source === "manual" ? "accent" : "neutral"}>
+                        {presentation.origin}
+                      </Pill>
+                      <Pill tone={presentation.tone}><Icon name={presentation.icon} /> {presentation.label}</Pill>
+                      {row.source === "manual" && row.visibility === "family" ? <Pill>Privado · família e pessoas mencionadas</Pill> : null}
+                      <p className="hca-event-meta">
+                        {row.authorId
+                          ? (row.authorName ?? "Nome histórico não preservado")
+                          : "Sistema, sem autoria pessoal"}
+                        {row.source === "manual" && row.stage
+                          ? ` · Etapa relacionada: ${progressStages[row.stage]}`
+                          : ""}
+                        {row.source === "automatic"
+                          ? ` · Versão ${row.version}`
+                          : ""}
+                      </p>
+                      {row.source === "manual" ? (
+                        <>
+                          <p className="hca-event-text">{row.text}</p>
+                          {row.mentions?.length ? <p className="hca-event-meta">Pessoas mencionadas: {row.mentions.map(person => person.name + " · " + progressCareRoles[person.careRole]).join("; ")}. Uma menção não registra ciência ou autoria.</p> : null}
+                          <div className="hca-toolbar">
+                            {row.references.map((ref) => (
+                              <ProgressReference key={ref.id} reference={ref} />
+                            ))}
+                          </div>
+                        </>
+                      ) : null}
+                    </article>
+                  </li>
+                );
+})}
             </ol>
           ) : (
             <p>Nenhum andamento corresponde a este filtro e página.</p>
@@ -839,12 +855,12 @@ function ProgressContent({
           onRevalidateRead={() => void privateDraft.revalidateRead()}
         />
         {!pending &&
-        privateDraft.consumed?.consumedResult &&
-        "documentType" in privateDraft.consumed.consumedResult &&
-        !privateDraft.readDenied &&
-        !privateDraft.protectedReadPending &&
-        (content.text || content.references.length) &&
-        JSON.stringify(content) !==
+          privateDraft.consumed?.consumedResult &&
+          "documentType" in privateDraft.consumed.consumedResult &&
+          !privateDraft.readDenied &&
+          !privateDraft.protectedReadPending &&
+          (content.text || content.references.length) &&
+          JSON.stringify(content) !==
           JSON.stringify(
             privateDraft.consumed.consumedResult.command.content,
           ) ? (
@@ -875,9 +891,9 @@ function ProgressContent({
           </section>
         ) : null}
         {pending &&
-        "draftCommit" in pending &&
-        !privateDraft.readDenied &&
-        !privateDraft.protectedReadPending ? (
+          "draftCommit" in pending &&
+          !privateDraft.readDenied &&
+          !privateDraft.protectedReadPending ? (
           <div className="hca-form-stack">
             <ActionButton
               disabled={command.busy || checkingRecovery}
@@ -905,8 +921,8 @@ function ProgressContent({
           </div>
         ) : null}
         {pending &&
-        !privateDraft.readDenied &&
-        !privateDraft.protectedReadPending ? (
+          !privateDraft.readDenied &&
+          !privateDraft.protectedReadPending ? (
           <div className="hca-form-stack">
             <ProgressPreparationSummary
               content={{ documentType: type, note: pending.content }}
@@ -988,13 +1004,12 @@ function ProgressContent({
                 required
                 helpText={`${content.text.length}/2000 caracteres. O texto é exibido como escrito, sem executar HTML.`}
               >
-                <TextAreaField
-                  maxLength={2000}
+                <ProgressTextArea
+                  documentId={id}
                   value={content.text}
-                  onChange={(event) => {
-                    const text = event.currentTarget.value;
-                    setContent((value) => ({ ...value, text }));
-                  }}
+                  onText={text => setContent(value => ({ ...value, text }))}
+                  onMention={person => { if (!publication.mentions.includes(person.id) && publication.mentions.length >= 8) { setError("Até oito pessoas podem ser mencionadas. Remova uma menção antes de escolher outra."); return false; } setPublication(value => value.mentions.includes(person.id) ? value : ({ ...value, mentions: [...value.mentions, person.id] })); return true; }}
+                  onReference={addReference}
                 />
               </FormField>
             </fieldset>
@@ -1014,7 +1029,7 @@ function ProgressContent({
                     setReferenceNumber(1);
                   }}
                 >
-                  Buscar fichas para referência
+                  Buscar fichas e andamentos
                 </ActionButton>
               </div>
               {references.loading ? (
@@ -1034,7 +1049,7 @@ function ProgressContent({
                           }
                           onClick={() => addReference(row)}
                         >
-                          Inserir referência {row.code ?? row.type}
+                          Inserir {row.kind === "progress" ? "andamento" : "ficha"} {row.code ?? row.type}{row.excerpt ? " · " + row.excerpt : ""}
                         </ActionButton>
                       </li>
                     ))}
@@ -1090,7 +1105,7 @@ function ProgressContent({
                 permissão.
               </p>
             </fieldset>
-            <ProgressPublicationOptions id={id} patientId={patientId} value={publication} onChange={setPublication} disabled={locked} />
+            <ProgressPublicationOptions id={id} patientId={patientId} value={publication} onChange={setPublication} disabled={locked} canPrivate={["family", "admin"].includes(context.patient?.role ?? "")} collective={mentionsEveryone(content.text)} />
             <div className="hca-toolbar">
               <ActionButton
                 disabled={

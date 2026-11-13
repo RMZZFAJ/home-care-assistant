@@ -23,9 +23,9 @@ test("BAL separates a private item opinion from stock application and recovers i
  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();await selectContext(page, f.patient);
  await page.goto("/fichas/"+f.document.id);
  let dialog = await openReview(page);
- const first = f.document.lines[0], resultLabel = "Resultado do parecer — "+first.name_snapshot;
+ const first = f.document.lines[0], resultLabel = "Resultado da revisão — "+first.name_snapshot;
  await expect(dialog.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toBeEnabled();
- await dialog.getByRole("textbox", { name: /^Seu parecer sobre a contagem/ }).fill("Parecer independente; somente um material examinado.");
+ await dialog.getByRole("textbox", { name: /^Sua revisão sobre a contagem/ }).fill("Parecer independente; somente um material examinado.");
  await dialog.getByRole("combobox", { name: resultLabel, exact: true }).selectOption("confirmed");
  await dialog.getByRole("textbox", { name: "Comentário do material — "+first.name_snapshot, exact: true }).fill("Conferido individualmente.");
  const saved = page.waitForResponse(r => new URL(r.url()).pathname==="/api/drafts" && r.request().method()==="POST");
@@ -36,9 +36,9 @@ test("BAL separates a private item opinion from stock application and recovers i
  await expect(dialog.getByRole("combobox", { name: resultLabel, exact: true })).toHaveValue("confirmed");
  await expect(dialog.getByRole("textbox", { name: "Comentário do material — "+first.name_snapshot, exact: true })).toHaveValue("Conferido individualmente.");
  await dialog.getByRole("button", { name: "Consultar referência atual", exact: true }).click();
- await dialog.getByRole("button", { name: "Adotar referência atual e manter meu parecer", exact: true }).click();
- await dialog.getByRole("button", { name: "Revisar parecer", exact: true }).click();
- await expect(dialog.getByRole("region", { name: "Materiais incluídos no parecer", exact: true })).toContainText("Os demais materiais não foram declarados como examinados");
+ await dialog.getByRole("button", { name: "Adotar referência atual e manter minha revisão", exact: true }).click();
+ await dialog.getByRole("button", { name: "Conferir revisão", exact: true }).click();
+ await expect(dialog.getByRole("region", { name: "Materiais incluídos na revisão", exact: true })).toContainText("Os demais materiais não foram declarados como examinados");
  await dialog.getByRole("button", { name: "Confirmar revisão", exact: true }).click();await expect(dialog).toHaveCount(0);
  expect(stock(f.patient)).toBe(before);
  const reviewed = (await (await page.request.get("/api/documents/"+f.document.id)).json()).data;

@@ -54,7 +54,7 @@ test("gestão canônica troca contexto no submenu, mantém navegação e edita p
   await expect(name).toHaveValue(retainedName);
   await capture(page, "perfil", info.project.name);
   await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("menuitem", { name: "Mudar perfil", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true }).click();
   await expect(page.getByRole("menu", { name: "Contextos autorizados", exact: true })).toBeVisible();
   await page.getByRole("menuitem", { name: "← Voltar ao menu", exact: true }).click();
   await expect(page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true })).toBeFocused();
@@ -99,7 +99,7 @@ test("documentos comuns, histórico com URL e estoque têm apresentação real e
   await post("/api/invitations/accept", { token: new URLSearchParams(new URL(invitation.invitationUrl).hash.slice(1)).get("token") });
   await logout();
   await login(page, "adminA", patient);
-  let ent = (await post("/api/documents", { careRecipientId: patient, type: "ENT", payload: { recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixture.professional.id, lines: [{ productId: "fralda", quantity: "2", requisitionItemIds: [reqData.requisition_items[0].id] }] }, idempotencyKey: crypto.randomUUID() })).data;
+  let ent = (await post("/api/documents", { careRecipientId: patient, type: "ENT", payload: { recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixture.professional.id, lines: [{ requestFulfillment: "complete", productId: "fralda", quantity: "2", requisitionItemIds: [reqData.requisition_items[0].id] }] }, idempotencyKey: crypto.randomUUID() })).data;
   await logout();
   await login(page, "professional", patient);
   ent = (await post("/api/documents/" + ent.id, { action: "receive", expectedVersion: ent.version, body: { divergences: [] }, idempotencyKey: crypto.randomUUID() })).data;

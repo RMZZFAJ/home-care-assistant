@@ -84,34 +84,46 @@ export async function issuePdf(
   verificationOrigin: string,
   documentOptions?: PdfDocumentOptions,
 ) {
-  const reserved = (await rpc(client, documentOptions ? "reserve_pdf_expanded_issuance" : "reserve_pdf_issuance_v16", {
+  const reserved = (await rpc(client, documentOptions ? "reserve_pdf_expanded_issuance" : "reserve_pdf_issuance", {
     ...(documentOptions ? { p_options: documentOptions } : {}),
     p_document: documentId,
     p_key: key,
     p_version: version ?? null,
   })) as StoredIntention;
+  return processPdf(reserved, verificationOrigin, {
+    read: id => readPdfIssuance(client, id),
+    stage: args => rpc(client, "pdf_issuance_stage", args),
+    complete: args => rpc(client, "complete_pdf_issuance", args),
+  });
+}
+type PdfAccess = {
+  read: (id: string) => Promise<StoredIntention>;
+  stage: (args: Record<string, unknown>) => Promise<unknown>;
+  complete: (args: Record<string, unknown>) => Promise<unknown>;
+};
+async function processPdf(reserved: StoredIntention, verificationOrigin: string, access: PdfAccess) {
   if (reserved.state === "ready") return pdfIssuanceSchema.parse(reserved);
   const server = createWorkerClient();
   const { data: claim, error } = await server.rpc("claim_pdf_issuance", {
     p_id: reserved.id,
   });
   if (error?.code === "55P03")
-    return pdfIssuanceSchema.parse(await readPdfIssuance(client, reserved.id));
+    return pdfIssuanceSchema.parse(await access.read(reserved.id));
   if (error) throw persistence();
   if (claim.ready)
-    return pdfIssuanceSchema.parse(await readPdfIssuance(client, reserved.id));
+    return pdfIssuanceSchema.parse(await access.read(reserved.id));
   const stage = (step: string, lastError?: string) =>
-    rpc(client, "pdf_issuance_stage", {
+    access.stage({
       p_id: reserved.id,
       p_token: claim.workerToken,
       p_step: step,
       p_error: lastError ?? null,
     });
   try {
-    const r = await readPdfIssuance(client, reserved.id),
+    const r = await access.read(reserved.id),
       trust = await loadPdfTrust();
     await stage("composing");
-    if (![5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].includes(r.rendererRevision))
+    if (![16, 17].includes(r.rendererRevision))
       throw new ApiError(
         "CONTENT_INVALID",
         "Revisão de renderização não suportada.",
@@ -119,7 +131,7 @@ export async function issuePdf(
         false,
       );
     const plan = await composeIssuance(r.snapshot, r.sourceHash, {
-      rendererRevision: r.rendererRevision as 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17,
+      rendererRevision: r.rendererRevision,
       id: r.id,
       verificationCode: r.verificationCode,
       requestedAt: r.requestedAt,
@@ -157,7 +169,7 @@ export async function issuePdf(
     await validateIssuanceContent(bytes, plan);
     const checked = await verified(bytes, trust);
     // Auth and the server-only lease are both rechecked by the final transaction.
-    const receipt = await rpc(client, "complete_pdf_issuance", {
+    const receipt = await access.complete({
       p_id: r.id,
       p_token: claim.workerToken,
       p_hash: hash(bytes),
@@ -170,9 +182,9 @@ export async function issuePdf(
   } catch (error) {
     const code =
       error instanceof ApiError &&
-      ["CONTENT_INVALID", "SIGNATURE_INVALID", "SIGNING_UNAVAILABLE"].includes(
-        error.code,
-      )
+        ["CONTENT_INVALID", "SIGNATURE_INVALID", "SIGNING_UNAVAILABLE"].includes(
+          error.code,
+        )
         ? error.code
         : "PERSISTENCE_UNCONFIRMED";
     try {
@@ -221,7 +233,7 @@ export async function downloadPdfIssuance(
     !current.accepted ||
     current.certificateFingerprint !== r.validation.certificateFingerprint ||
     current.timestampCertificateFingerprint !==
-      r.validation.timestampCertificateFingerprint
+    r.validation.timestampCertificateFingerprint
   )
     throw signature();
   await readPdfIssuance(client, id);
@@ -229,4 +241,18 @@ export async function downloadPdfIssuance(
     bytes,
     filename: `${r.snapshot.code}-v${r.version}-${r.id.slice(0, 8)}.pdf`,
   };
+}
+
+/** A leased, revalidated notification is the system principal; no human session is fabricated. */
+export async function notificationPdf(client: SupabaseClient, notificationId: string, workerId: string, verificationOrigin: string) {
+  const command = (action: string, args: Record<string, unknown> = {}) => rpc(client, "notification_pdf", { p_notification: notificationId, p_worker: workerId, p_action: action, p_args: args });
+  const reserved = await command("reserve") as StoredIntention;
+  const read = async (id: string) => await command("read", { p_id: id }) as StoredIntention;
+  const receipt = await processPdf(reserved, verificationOrigin, { read, stage: args => command("stage", args), complete: args => command("complete", args) });
+  if (receipt.state !== "ready") throw persistence();
+  const record = await read(receipt.id), bytes = await storedBytes(client, record.objectPath);
+  if (!bytes || hash(bytes) !== record.sha256) throw persistence();
+  await verified(bytes, await loadPdfTrust());
+  await read(record.id);
+  return { bytes, filename: record.snapshot.code + "-" + record.id + ".pdf" };
 }

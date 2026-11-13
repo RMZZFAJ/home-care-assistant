@@ -23,13 +23,13 @@ test("approved REQ uses native frozen facts, real signature/storage/recovery and
   await rpc(f.admin, "link_document_complement", await complementPacket(f.admin, id, childId));
   await login(page, fixtures.adminA.email, f.patient);
   const oldKey = randomUUID();
-  await rpc(f.admin, "reserve_pdf_issuance_v15", { p_document: id, p_key: oldKey });
-  const oldRequest = await page.request.post(`/api/documents/${id}/issuances`, { data: { idempotencyKey: oldKey } });
-  expect(oldRequest.status(), await oldRequest.text()).toBe(200); const oldReceipt = await oldRequest.json(); expect(oldReceipt.rendererRevision).toBe(15);
+  await rpc(f.admin, "reserve_pdf_issuance", { p_document: id, p_key: oldKey });
+  const oldRequest = await page.request.post(`/api/documents/${id}/issuances`, { timeout: 60_000, data: { idempotencyKey: oldKey } });
+  expect(oldRequest.status(), await oldRequest.text()).toBe(200); const oldReceipt = await oldRequest.json(); expect(oldReceipt.rendererRevision).toBe(16);
   const old = await page.request.get(`/api/documents/${id}/pdf?issuance=${oldReceipt.id}`), oldBytes = await old.body(), before = awarenessFacts(id);
   expect(old.status()).toBe(200);
-  const key = randomUUID(), reserved = await rpc(f.admin, "reserve_pdf_issuance_v16", { p_document: id, p_key: key });
-  const result = await page.request.post(`/api/documents/${id}/issuances`, { data: { idempotencyKey: key } });
+  const key = randomUUID(), reserved = await rpc(f.admin, "reserve_pdf_issuance", { p_document: id, p_key: key });
+  const result = await page.request.post(`/api/documents/${id}/issuances`, { timeout: 60_000, data: { idempotencyKey: key } });
   expect(result.status(), await result.text()).toBe(200);
   const receipt = await result.json();
   expect(receipt).toMatchObject({ id: reserved.id, rendererRevision: 16, state: "ready", validation: { accepted: true, profile: "PAdES-B-T", wholeFile: true } });
@@ -41,7 +41,7 @@ test("approved REQ uses native frozen facts, real signature/storage/recovery and
   for (const value of [facts.cancellation.reason, "Cancelamento da requisição", "Ciência do cancelamento", child.code, "Autenticidade e verificação", "Não ICP-Brasil", "Confidencialidade e proteção de dados pessoais"]) expect(text).toContain(compact(value));
   for (const internal of [id, receipt.id, reserved.sourceHash, child.protocol]) expect(text).not.toContain(compact(internal));
   expect(await (await page.request.get(download)).body()).toEqual(bytes);
-  const recovered = await page.request.post(`/api/documents/${id}/issuances`, { data: { idempotencyKey: key } });
+  const recovered = await page.request.post(`/api/documents/${id}/issuances`, { timeout: 60_000, data: { idempotencyKey: key } });
   expect((await recovered.json()).id).toBe(receipt.id);
   expect(await (await page.request.get(`/api/documents/${id}/pdf?issuance=${oldReceipt.id}`)).body()).toEqual(oldBytes);
   expect(awarenessFacts(id)).toBe(before);

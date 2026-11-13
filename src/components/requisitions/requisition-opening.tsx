@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useHistoryReturn } from "@/lib/documents/use-history-return";
 import { createContext, use, useEffect, useState, type ReactNode } from "react";
 import { api, buttonClass, Notice, primaryClass } from "@/components/workspace";
 import { Dialog } from "@/components/ui/primitives";
@@ -29,6 +30,7 @@ export function RequisitionOpening({
   children: ReactNode;
 }) {
   const [opening, setOpening] = useState<Opening | null>(null);
+  const history = useHistoryReturn();
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
   const [confirmed, setConfirmed] = useState(false);
@@ -78,7 +80,7 @@ export function RequisitionOpening({
       <div className="space-y-3">
         {standalone ? <h1>Requisição e acompanhamento</h1> : null}
         <Notice>Consulta cancelada. Voltar não registra nova ciência.</Notice>
-        <Link className={buttonClass} href="/historico">
+        <Link className={buttonClass} href={history}>
           Voltar ao histórico
         </Link>
         <button

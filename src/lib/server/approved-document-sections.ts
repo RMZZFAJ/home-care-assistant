@@ -20,7 +20,7 @@ export function appendDocumentOriginContext(layout: ApprovedPdfLayout, snapshot:
 }
 
 export function appendDocumentRelated(layout: ApprovedPdfLayout, snapshot: DocumentSnapshot, lifecycle: PdfLifecycleFacts, origin: URL) {
-  const previous = snapshot.payload.sourceRequisition as { id?: string; code?: string; reason?: string } | undefined;
+  const previous = snapshot.payload.sourceRequisition as { id?: string; code?: string; reason?: string; } | undefined;
   const presentation = readPdfPresentation(snapshot);
   if (previous || lifecycle.complements.length || presentation?.references.length) {
     layout.heading("Documentos relacionados");
@@ -45,7 +45,7 @@ export function appendDocumentRelated(layout: ApprovedPdfLayout, snapshot: Docum
 }
 
 export function appendOriginalObservations(layout: ApprovedPdfLayout, snapshot: DocumentSnapshot) {
-  const intent = snapshot.payload.intent as { observations?: string[] } | undefined;
+  const intent = snapshot.payload.intent as { observations?: string[]; } | undefined;
   const observations = typeof snapshot.payload.notes === "string" && snapshot.payload.notes ? [snapshot.payload.notes] : intent?.observations ?? [];
   layout.heading("Observações originais", "Registradas pelo autor no ato da ficha.");
   if (!observations.length) layout.paragraph("Nenhuma observação original registrada.", "observations/empty");
@@ -68,6 +68,11 @@ export function appendDocumentCancellation(layout: ApprovedPdfLayout, lifecycle:
 }
 
 export async function appendVerificationAndPrivacy(layout: ApprovedPdfLayout, emission: PdfEmissionContext, subject: string, issuer: string, operationalAt: string | null, verificationUrl: string, formattedCode: string) {
+  if (emission.example) {
+    layout.heading("Exemplo fictício · sem valor documental");
+    layout.paragraph("Demonstração do formato. Não corresponde a uma emissão registrada, não contém assinatura digital e não comprova atos, ciência ou movimentações reais.", "example/scope");
+    return;
+  }
   if (emission.representation === "derived") layout.paragraph("Este exemplar retrata uma versão preservada. Um arquivo autêntico pode estar desatualizado; consulte a ficha para conhecer sua situação atual.", "representation/scope", { size: 9.5 });
   const description = subject + " foi registrada por " + issuer + ", em " + formatBrazilDate(operationalAt) + ". A emissão deste exemplar foi solicitada por " + emission.requestedName + ", em " + formatBrazilDate(emission.requestedAt) + ", para assinatura digital pelo Home Care Assistant. A assinatura identifica a origem e a integridade deste exemplar; não comprova a veracidade física dos relatos nem que a ficha permanece ativa.";
   await layout.authenticity(description, verificationUrl, formattedCode, await QRCode.toBuffer(verificationUrl, { type: "png", width: 220, margin: 1 }));

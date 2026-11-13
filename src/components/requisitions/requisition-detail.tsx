@@ -1,12 +1,15 @@
 "use client";
 import { DocumentComplementsPanel } from "@/components/documents/document-complements";
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
+import { RequisitionScienceAction } from "./requisition-science-action";
+import { DocumentCommunications } from "@/components/notifications/document-communications";
 import { DocumentMaterialsTable } from "@/components/documents/document-materials-table";
+import { DocumentFreshness } from "@/components/documents/document-freshness";
+import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import { roleLabel } from "@/components/layout/workspace-context";
 import { Pill } from "@/components/ui/controls";
 import { DocumentBreadcrumb } from "@/components/documents/document-breadcrumb";
 import Link from "next/link";
-import { SettingsSection } from "@/components/forms/settings-section";
 import { useEffect, useRef, useState } from "react";
 import {
   api,
@@ -58,7 +61,6 @@ import {
 import { ResolveExtraItem } from "./resolve-extra-item";
 import { RequisitionDisplay, OpeningHistory } from "./requisition-display";
 import {
-  deliveryLabels,
   type DeliveryStatus,
 } from "@/lib/notifications/presentation";
 
@@ -74,7 +76,7 @@ type Progress = {
   manualArchiveRequired: boolean;
   archivedAt: string | null;
   archiveReason: string | null;
-  policy: { scienceRequired?: boolean } | null;
+  policy: { scienceRequired?: boolean; } | null;
   preferences: Record<string, boolean>;
   events: TimelineEvent[];
   science: {
@@ -115,16 +117,19 @@ type Detail = {
     stock_observation_at?: string | null;
     stock_observation_time_source?: StockObservationTimeSource;
     urgent: boolean;
-    resolution?: { product_id: string } | null;
+    resolution?: { product_id: string; } | null;
   }[];
-  requisition_observations: { body: string }[];
+  requisition_observations: { body: string; }[];
   requisition_notifications: DeliveryStatus[];
   fulfillment: {
     total: number;
     fulfilled: number;
+    partial?: number;
+    reviewRequired?: number;
     lines: {
       id: string;
       attended: boolean;
+      serviceStatus?: "pending" | "partial" | "fulfilled" | "review_required";
       deliveries: RequisitionDelivery[];
     }[];
   };
@@ -140,6 +145,7 @@ const modes: Record<string, string> = {
   dispatch: "Por expedição autorizada",
 };
 
+const requisitionCopyIdentity = (value: Detail) => JSON.stringify([value.status, value.progress, value.fulfillment, value.requisition_items]);
 export function RequisitionDocumentContent({
   id,
   context,
@@ -154,12 +160,12 @@ export function RequisitionDocumentContent({
   const [fileActionTarget, setFileActionTarget] =
     useState<HTMLDivElement | null>(null);
   const [openingRevision, setOpeningRevision] = useState("initial");
-  const [data, setData] = useState<Detail | null>(null);
+  const { data, setData, acceptRead, stale } = useDocumentCopy<Detail>(requisitionCopyIdentity);
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
   const [readFailed, setReadFailed] = useState(false);
   const [message, setMessage] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busy] = useState(false);
   const [reading, setReading] = useState(true);
   const refreshButtonRef = useRef<HTMLButtonElement>(null);
   const restoreRefreshFocusRef = useRef(false);
@@ -199,14 +205,14 @@ export function RequisitionDocumentContent({
     queueMicrotask(() => {
       if (!controller.signal.aborted) setReading(true);
     });
-    void api<{ data: Detail }>(
+    void api<{ data: Detail; }>(
       `/api/requisitions/${id}`,
       undefined,
       controller.signal,
     )
       .then((result) => {
         if (!controller.signal.aborted) {
-          setData(result.data);
+          acceptRead(result.data, id + ":" + attempt);
           setReadFailed(false);
           setError("");
         }
@@ -226,27 +232,7 @@ export function RequisitionDocumentContent({
         if (!controller.signal.aborted) setReading(false);
       });
     return () => controller.abort();
-  }, [id, attempt, revision]);
-  async function recordScience() {
-    if (!data) return;
-    setBusy(true);
-    setError("");
-    try {
-      await api(`/api/requisitions/${id}/science`, {
-        mode: "express",
-        expectedVersion: data.progress.version,
-        materialIdentity: data.progress.materialIdentity,
-      });
-      setMessage("Ciência expressa registrada com sua identidade.");
-      setAttempt((value) => value + 1);
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Não foi possível concluir.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
+  }, [id, attempt, revision, acceptRead, setData]);
   if (!data)
     return (
       <div className="space-y-3">
@@ -275,6 +261,7 @@ export function RequisitionDocumentContent({
     completedAt: p.completedAt,
     scienceSatisfied: p.scienceSatisfied,
     fulfilled: f.fulfilled,
+    partial: f.partial,
   });
   const followUp = requisitionFollowUp({
     historical: Boolean(data.is_historical), status: data.status,
@@ -339,8 +326,8 @@ export function RequisitionDocumentContent({
         actions={
           <>
             {!data.is_historical &&
-            !p.archivedAt &&
-            data.status !== "cancelled" ? (
+              !p.archivedAt &&
+              data.status !== "cancelled" ? (
               <>
                 {can(context, "ent.create") ? (
                   <Link
@@ -352,29 +339,14 @@ export function RequisitionDocumentContent({
                 ) : null}
               </>
             ) : null}
-            {!data.is_historical &&
-            p.eligible &&
-            !p.archivedAt &&
-            data.status !== "cancelled" &&
-            !p.science.some(
-              (row) => row.user_id === context.userId && row.mode === "express",
-            ) ? (
-              <button
-                type="button"
-                className={primaryClass}
-                disabled={busy}
-                onClick={() => void recordScience()}
-              >
-                Li a requisição e confirmo minha ciência
-              </button>
-            ) : null}
+            {!data.is_historical ? <RequisitionScienceAction id={id} userId={context.userId} version={p.version} materialIdentity={p.materialIdentity} mayRecord={Boolean(p.eligible && !p.archivedAt && data.status !== "cancelled" && !p.science.some(row => row.user_id === context.userId && row.mode === "express"))} disabled={busy || reading} onRecorded={() => setAttempt(value => value + 1)} /> : null}
           </>
         }
         secondaryActions={
           <>
             {!data.is_historical &&
-            !p.archivedAt &&
-            data.status !== "cancelled" ? (
+              !p.archivedAt &&
+              data.status !== "cancelled" ? (
               <>
                 {can(context, "com.create") ? (
                   <Link
@@ -396,10 +368,10 @@ export function RequisitionDocumentContent({
               </button>
             ) : null}
             {!data.is_historical &&
-            !p.archivedAt &&
-            data.status !== "cancelled" &&
-            can(context, "req.review") &&
-            can(context, "req.create") ? (
+              !p.archivedAt &&
+              data.status !== "cancelled" &&
+              can(context, "req.review") &&
+              can(context, "req.create") ? (
               <button
                 className={buttonClass}
                 disabled={busy}
@@ -435,6 +407,7 @@ export function RequisitionDocumentContent({
           data.recipient_name_snapshot ?? context.patient?.display_name
         }
       ></DocumentHeader>
+      <DocumentFreshness stale={stale} loading={reading || busy} onRefresh={refreshDocument} />
       {data.status === "cancelled" ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} /> : null}
       <RequisitionDisplay
         key={id}
@@ -469,7 +442,7 @@ export function RequisitionDocumentContent({
         auditAllowed={can(context, "audit.read")}
       >
         <DocumentPanel value="overview">
-              <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
+          <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
           {reading || readFailed ? (
             <Notice>
               {reading ? "Atualizando o acompanhamento da requisição…" : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
@@ -590,8 +563,8 @@ export function RequisitionDocumentContent({
               textRows(
                 data.requisition_observations.map((row) => row.body),
               ).map((row) => (
-                <p key={row.key} className="mt-2 text-sm">
-                  {row.value}
+                <p key={row.key} className="mt-2 text-sm hca-origin-observation">
+                  <span className="hca-origin-observation-number" aria-hidden="true" />{row.value}
                 </p>
               ))
             ) : (
@@ -609,15 +582,16 @@ export function RequisitionDocumentContent({
         </DocumentPanel>
         <DocumentPanel value="materials">
           <section className="hca-materials-section">
-            <DocumentMaterialsTable key={data.id} label="Materiais requisitados" heading={<><h2>Materiais requisitados</h2><p>Uma linha é atendida após aceite positivo em ENT vinculada. Compras não atendem itens da REQ. O estoque observado não é quantidade solicitada para compra.</p></>}
-              columns={[{ id: "material", label: "Material" }, { id: "stock", label: "Estoque observado" }, { id: "priority", label: "Prioridade" }, { id: "fulfillment", label: "Atendimento" }]}
+            <DocumentMaterialsTable key={data.id} label="Materiais requisitados" heading={<><h2>Materiais e atendimento</h2><p>Estoque observado e avaliação de atendimento são fatos distintos. A requisição não tem quantidade solicitada.</p></>}
+              filters={[{ id: "all", label: "Todos" }, { id: "urgent", label: "Urgentes" }, { id: "pending", label: "Pendentes" }, { id: "fulfilled", label: "Atendidos" }, { id: "routine", label: "Rotina" }]}
+              columns={[{ id: "material", label: "Material" }, { id: "stock", label: "Estoque observado" }, { id: "fulfillment", label: "Status de atendimento do item" }]}
               rows={data.requisition_items.map((item) => {
                 const line = f.lines.find((row) => row.id === item.id);
                 const name = item.product_name_snapshot ?? item.custom_name ?? "Nome não preservado no registro";
-                return { id: item.id, searchText: name, cells: {
-                    material: <><strong>{name}</strong><small>{item.unit_snapshot}</small></>,
+                return {
+                  id: item.id, searchText: name, urgent: item.urgent, filters: [item.urgent ? "urgent" : "routine", line?.attended ? "fulfilled" : "pending"], cells: {
+                    material: <><strong>{name}</strong>{item.urgent ? <span className="sr-only">Urgente</span> : null}<small>{item.unit_snapshot}</small></>,
                     stock: <>{formatStockObservation(item.current_stock, item.stock_observation, item.unit_snapshot)}<small>{formatStockObservationTime(item.stock_observation_at, item.stock_observation_time_source)}</small></>,
-                    priority: item.urgent ? <span className="ui-badge ui-badge-danger">Urgente</span> : <span className="ui-badge ui-badge-neutral">Rotina</span>,
                     fulfillment: <div className="space-y-2">
                       <span
                         className={
@@ -629,9 +603,13 @@ export function RequisitionDocumentContent({
                           ? "Não apurado no original"
                           : line?.attended
                             ? "Atendido"
-                            : ["cancelled", "archived"].includes(documentState)
-                              ? "Sem atendimento confirmado"
-                              : "Pendente"}
+                            : line?.serviceStatus === "partial"
+                              ? "Parcialmente atendido"
+                              : line?.serviceStatus === "review_required"
+                                ? "Recebimento divergente · aguardando nova avaliação familiar"
+                                : ["cancelled", "archived"].includes(documentState)
+                                  ? "Sem atendimento confirmado"
+                                  : "Pendente"}
                       </span>
                       {requisitionDeliveries(line?.deliveries ?? []).map((delivery) => (
                         <div key={delivery.id}>
@@ -650,18 +628,18 @@ export function RequisitionDocumentContent({
                       ))}
                     </div>
                     ,
-                  } };
+                  }
+                };
               })} />
           </section>
           {can(context, "catalog.manage") &&
-          can(context, "req.review") &&
-          data.requisition_items.some(
-            (item) => !item.product_id && !item.resolution,
-          ) ? (
+            can(context, "req.review") &&
+            data.requisition_items.some(
+              (item) => !item.product_id && !item.resolution,
+            ) ? (
             <ResolveExtraItem onOpen={() => openDecision("resolve_extra")} />
           ) : null}
-        </DocumentPanel>
-        <DocumentPanel value="workflow">
+
           <section className="ui-card">
             <h2 className="font-semibold">Ciência e responsáveis</h2>
             <p className="mt-2 text-sm">
@@ -715,35 +693,10 @@ export function RequisitionDocumentContent({
             ) : null}
           </section>
         </DocumentPanel>
-        <DocumentPanel value="communications">
-          <SettingsSection
-            title="Avisos e acompanhamento"
-            summary={
-              data.requisition_notifications.length +
-              " aviso(s) · estados do aplicativo e do provedor são independentes"
-            }
-          >
-            <p className="mt-2 text-xs text-(--muted)">
-              Enviado, entregue, lido e ciência são fatos independentes.
-            </p>
-            <ul className="mt-3 space-y-2">
-              {data.requisition_notifications.map((row) => (
-                <li
-                  key={row.id}
-                  className="rounded-lg border border-(--line) p-3 text-sm"
-                >
-                  {row.recipient_label} · {row.channel} ·{" "}
-                  {deliveryLabels[row.state] ?? row.state}
-                </li>
-              ))}
-            </ul>
-            {!data.requisition_notifications.length ? (
-              <p className="mt-3 text-sm">Nenhum aviso disponível.</p>
-            ) : null}
-          </SettingsSection>
-        </DocumentPanel>
+        <DocumentPanel value="communications"><DocumentCommunications id={id} version={p.version} /></DocumentPanel>
         <DocumentPanel value="files">
           <DocumentActions
+            generationBlocked={stale}
             actionTarget={fileActionTarget}
             onAction={() => tabs.select("files")}
             id={id}

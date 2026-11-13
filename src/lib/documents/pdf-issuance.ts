@@ -36,7 +36,7 @@ export const pdfIssuanceSchema = z
     documentId: z.uuid(),
     careRecipientId: z.uuid(),
     version: z.number().int().positive(),
-    requestedBy: z.uuid(),
+    requestedBy: z.uuid().nullable(),
     requestedName: z.string(),
     requestedAt: z.iso.datetime({ offset: true }),
     readyAt: z.iso.datetime({ offset: true }).nullable(),

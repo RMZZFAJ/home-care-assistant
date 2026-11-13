@@ -68,7 +68,7 @@ test("background revalidation between press and release still opens the retained
     await started;
     await expect(refresh).toHaveAttribute("aria-busy", "true");
     await page.mouse.up();
-    await expect(page.getByRole("tab", { name: "Aquisição", exact: true })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
     await expect(field(page, f.document.lines[0].id)).toBeEnabled();
     expect(official(id, f.patient)).toBe(before);
   } finally {

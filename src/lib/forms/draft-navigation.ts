@@ -32,12 +32,12 @@ export const draftFlowStages = {
   ],
 
   BAL_REVIEW_FAMILY: [
-    { id: "bal_review_family", label: "Parecer familiar sobre a contagem" },
+    { id: "bal_review_family", label: "Revisão familiar sobre a contagem" },
   ],
   BAL_REVIEW_SUPERVISOR: [
     {
       id: "bal_review_supervisor",
-      label: "Parecer da supervisão sobre a contagem",
+      label: "Revisão da supervisão sobre a contagem",
     },
   ],
   BAL_ASSIGN_RECOUNT: [
@@ -313,18 +313,18 @@ export function stepForNavigation(
 ) {
   return navigation
     ? Math.max(
-        0,
-        draftFlowStages[flow].findIndex(
-          (entry) => entry.id === navigation.stage,
-        ),
-      )
+      0,
+      draftFlowStages[flow].findIndex(
+        (entry) => entry.id === navigation.stage,
+      ),
+    )
     : 0;
 }
 export function navigationLabel(navigation?: DraftNavigation | null) {
   return navigation
     ? (Object.values(draftFlowStages)
-        .flat()
-        .find((entry) => entry.id === navigation.stage)?.label ??
-        "Etapa indisponível")
+      .flat()
+      .find((entry) => entry.id === navigation.stage)?.label ??
+      "Etapa indisponível")
     : "Etapa não preservada neste rascunho";
 }

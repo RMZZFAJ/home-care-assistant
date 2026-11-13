@@ -5,6 +5,7 @@ import "./design-system.css";
 import { LiveSession } from "@/components/live-session";
 import "@/theme/tokens.css";
 import "./canonical-ui.css";
+import "./l1-ui.css";
 import { WorkspaceProvider } from "@/components/layout/workspace-context";
 import { PwaProvider } from "@/components/pwa/pwa-provider";
 import { stablePreviewOrigin } from "@/lib/pwa/preview-origin";
@@ -24,7 +25,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{ children: React.ReactNode; }>) {
   return (
     <html lang="pt-BR">
       <body>

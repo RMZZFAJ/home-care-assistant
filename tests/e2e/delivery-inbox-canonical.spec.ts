@@ -63,7 +63,7 @@ test("ENT-02 canonical task preserves recorded names,exact navigation and return
     await expect(state).toHaveValue("tasks"); const cta = row.getByRole("link", { name: "Conferir", exact: true });
     await expect(cta).not.toHaveAttribute("aria-disabled", "true"); await cta.focus(); await cta.press("Enter");
     await expect(page).toHaveURL(new RegExp(`/documentos/${doc.id}\\?documentTab=workflow$`));
-    await expect(page.getByRole("tab", { name: "Atendimento", exact: true })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
     await expect(page.getByRole("heading", { name: "Expedição preservada", exact: true })).toBeVisible();
     await page.goBack(); await expect(state).toHaveValue("tasks"); await page.setViewportSize({ width: 320, height: 900 });
     await row.evaluate(node => node.scrollIntoView({ block: "center", behavior: "instant" }));

@@ -1,3 +1,4 @@
+import { currentPdfFixture } from "./support/current-pdf-fixture";
 import { expect, it } from "vitest";
 import { PDF } from "@libpdf/core";
 import { readPdfPresentation, originalAuthorDetail, type PdfPresentationFacts } from "@/lib/documents/pdf-presentation";
@@ -38,7 +39,7 @@ it("approved REQ does not leak the raw source-requisition code when current nati
   const snapshot = source(), facts = snapshot.presentationFacts as PdfPresentationFacts;
   snapshot.payload = { sourceRequisition: { requisitionId: id(2), code: "REQ-SEGREDO-PRIVADO", reason: "Motivo próprio da nova requisição preservado." } };
   facts.references = [{ kind: "source_requisition", accessible: false }];
-  const plan = await composeIssuance(snapshot, "a".repeat(64), { ...fidelityEmission, rendererRevision: 16 });
+  const plan = await composeIssuance(currentPdfFixture(snapshot), "a".repeat(64), { ...fidelityEmission, rendererRevision: 16 });
   const text = (await PDF.load(plan.bytes)).extractText().flatMap(page => page.lines.map(line => line.spans.flatMap(span => span.chars.map(char => char.char)).join(""))).join(" ");
   expect(text).toContain("Acesso restrito"); expect(text).toContain("Motivo próprio"); expect(text).not.toContain("REQ-SEGREDO-PRIVADO");
   expect(plan.semanticFacts?.["identity/issuerRole"]).toBe("Familiar");

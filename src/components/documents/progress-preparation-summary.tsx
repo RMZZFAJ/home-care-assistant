@@ -1,6 +1,7 @@
 "use client";
 import { DefinitionGrid } from "@/components/ui/controls";
-import Link from "next/link";
+import { useParams } from "next/navigation";
+import { SavedProgressReference } from "./progress-reference";
 import {
   progressCategories,
   progressStages,
@@ -11,6 +12,8 @@ export function ProgressPreparationSummary({
 }: {
   content: ProgressPreparationContent;
 }) {
+  const params = useParams();
+  const documentId = typeof params.id === "string" ? params.id : undefined;
   return (
     <div className="hca-form-stack">
       <DefinitionGrid
@@ -42,13 +45,7 @@ export function ProgressPreparationSummary({
           <ul>
             {content.note.references.map((id, index) => (
               <li key={id}>
-                <Link
-                  className="ui-button"
-                  prefetch={false}
-                  href={"/fichas/" + id}
-                >
-                  Abrir referência {index + 1}
-                </Link>
+                {documentId ? <SavedProgressReference documentId={documentId} id={id} /> : <span>Referência {index + 1} preservada; abra a ficha para consultá-la.</span>}
               </li>
             ))}
           </ul>

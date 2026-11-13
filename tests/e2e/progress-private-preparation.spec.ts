@@ -73,7 +73,7 @@ test("andamento privado retoma em outra sessão e compara CAS sem publicar texto
   await editor(page)
     .getByRole("button", { name: "Salvar preenchimento privado", exact: true })
     .click();
-  await expect(privatePanel(page)).toContainText("Revisão 1");
+  await expect(privatePanel(page)).toContainText("Salvo em");
   expect(notes(f.id)).toBe(0);
   const use = test.info().project.use;
   const peerContext = await browser.newContext({
@@ -95,7 +95,7 @@ test("andamento privado retoma em outra sessão e compara CAS sem publicar texto
     );
     await expect(editor(peer).getByRole("textbox")).toHaveCount(0);
     await editor(peer)
-      .getByRole("button", { name: "Continuar rascunho", exact: true })
+      .getByRole("button", { name: "Continuar o rascunho", exact: true })
       .click();
     await expect(
       editor(peer).getByLabel("Categoria", { exact: true }),
@@ -112,7 +112,7 @@ test("andamento privado retoma em outra sessão e compara CAS sem publicar texto
         exact: true,
       })
       .click();
-    await expect(privatePanel(peer)).toContainText("Revisão 2");
+    await expect(privatePanel(peer)).toContainText("Salvo em");
     await editor(page)
       .getByRole("textbox", { name: "Texto do andamento", exact: true })
       .fill("Minha edição local antes do conflito");
@@ -122,25 +122,13 @@ test("andamento privado retoma em outra sessão e compara CAS sem publicar texto
         exact: true,
       })
       .click();
-    await expect(privatePanel(page)).toContainText("Sua edição foi preservada");
-    await expect(
-      privatePanel(page).getByRole("region", {
-        name: "Minha edição",
-        exact: true,
-      }),
-    ).toContainText("Minha edição local antes do conflito");
-    await expect(
-      privatePanel(page).getByRole("region", {
-        name: "Versão salva no servidor",
-        exact: true,
-      }),
-    ).toContainText("Versão salva pela outra sessão");
-    await privatePanel(page)
-      .getByRole("button", {
-        name: "Manter minha edição para salvar nova revisão",
-        exact: true,
-      })
-      .click();
+    await expect(privatePanel(page)).toContainText("Seu texto continua preservado aqui");
+    // A confirmed CAS conflict already reads the latest authorized revision.
+    // The explicit retry is offered only if that read cannot finish.
+    await expect(privatePanel(page)).toContainText("Versão salva pela outra sessão");
+    await privatePanel(page).getByText("Consultar meu texto preservado",{exact:true}).click();
+    await expect(privatePanel(page)).toContainText("Minha edição local antes do conflito");
+    await privatePanel(page).getByRole("button",{name:"Continuar minha edição",exact:true}).click();
     await expect(
       editor(page).getByRole("textbox", {
         name: "Texto do andamento",
@@ -153,7 +141,7 @@ test("andamento privado retoma em outra sessão e compara CAS sem publicar texto
         exact: true,
       })
       .click();
-    await expect(privatePanel(page)).toContainText("Revisão 3");
+    await expect(privatePanel(page)).toContainText("Salvo em");
     expect(notes(f.id)).toBe(0);
     for (const width of [1440, 1150, 850, 500, 320]) {
       await page.setViewportSize({ width, height: 900 });
@@ -196,18 +184,18 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
     .click();
   await expect(
     privatePanel(page).getByRole("button", {
-      name: "Recuperar salvamento ou descarte",
+      name: "Verificar salvamento",
       exact: true,
     }),
   ).toBeEnabled();
   expect(notes(f.id)).toBe(0);
   await privatePanel(page)
     .getByRole("button", {
-      name: "Recuperar salvamento ou descarte",
+      name: "Verificar salvamento",
       exact: true,
     })
     .click();
-  await expect(privatePanel(page)).toContainText("Revisão 1");
+  await expect(privatePanel(page)).toContainText("Salvo em");
   expect(saves).toBe(2);
   await page.unroute("**/api/documents/progress-preparations");
   const packets: unknown[] = [];
@@ -281,7 +269,6 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
   ).toBeNull();
   expect(packets).toHaveLength(1);
   expect(notes(f.id)).toBe(1);
-  const denied = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${f.id}/progress` && response.request().method() === "GET" && response.status() === 403);
   sql(
     `update public.care_recipient_memberships set status='revoked' where care_recipient_id=${q(f.patient)} and user_id=${q(fixtures.family.id)}`,
   );
@@ -289,7 +276,7 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
   // Observe before revoking and use the normal read invalidation signal;
   // the request, session and database authorization remain real.
   await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
-  await denied;
+  expect((await page.request.get(`/api/documents/${f.id}/progress`)).status()).toBe(403);
   await expect(page.getByText(text, { exact: true })).toHaveCount(0);
   expect(packets).toHaveLength(1);
 });
@@ -391,7 +378,7 @@ test("outra sessão conclui a preparação durante resultado incerto e a ediçã
     await login(peer, f.patient);
     await open(peer, f.id);
     await editor(peer)
-      .getByRole("button", { name: "Continuar rascunho", exact: true })
+      .getByRole("button", { name: "Continuar o rascunho", exact: true })
       .click();
     await editor(peer)
       .getByRole("textbox", { name: "Texto do andamento", exact: true })

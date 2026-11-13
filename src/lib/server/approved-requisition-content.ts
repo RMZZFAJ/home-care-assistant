@@ -1,3 +1,4 @@
+import { fulfillmentLabel } from "@/lib/documents/fulfillment-label";
 import { approvedDocumentContent } from "./approved-document-content";
 import type { DocumentSnapshot, PdfEmissionContext } from "./operational-pdf";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -17,7 +18,7 @@ export function approvedRequisitionContent(snapshot: DocumentSnapshot, emission:
     semanticFacts[key + "/unit"] = String(line.unit_snapshot ?? "Unidade não preservada");
     semanticFacts[key + "/stock"] = formatStockObservation(stock, line.stock_observation as StockObservation, typeof line.unit_snapshot === "string" ? line.unit_snapshot : undefined) + " " + formatStockObservationTime(typeof line.stock_observation_at === "string" ? line.stock_observation_at : null, stockTime);
     const attended = snapshot.fulfillmentLines?.find(value => value.id === line.id);
-    semanticFacts[key + "/fulfillment"] = source.historical ? "Atendimento não apurado na origem histórica" : attended ? attended.attended ? "Aceite positivo registrado" : "Sem aceite positivo" : "Situação não preservada";
+    semanticFacts[key + "/fulfillment"] = source.historical ? "Atendimento não apurado na origem histórica" : fulfillmentLabel(attended);
     if (line.urgent) facts.push("URGENTE");
   }
   for (const event of snapshot.scienceEvents ?? []) facts.push(event.actor_name, formatBrazilDate(event.created_at));

@@ -1,6 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { PDFDocument } from "pdf-lib";
+import { mkdirSync } from "node:fs";
+import { selectDocumentSection } from "./document-sections";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -31,7 +33,7 @@ async function prepare(page: Page) {
   const emit = async () => {
     const response = await page.request.post(
       `/api/documents/${doc.id}/issuances`,
-      { data: { idempotencyKey: randomUUID() } },
+      { timeout: 60_000, data: { idempotencyKey: randomUUID() } },
     );
     expect(response.status(), await response.text()).toBe(200);
     const row = await response.json(),
@@ -47,6 +49,48 @@ async function prepare(page: Page) {
   expect((await page.request.get("/api/context")).status()).toBe(401);
   return { ...f, doc, a, b };
 }
+
+test("L1 verification keeps login in context, separates private authorship and removes details on real revocation", async({page})=>{
+  const f=await prepare(page), code=f.a.row.verificationCode, destination="/verificar?code="+code;
+  expect((await page.request.get("/api/verification/details?code="+code)).status()).toBe(401);
+  await page.goto(destination);
+  const details=page.getByRole("region",{name:"Detalhes autorizados da emissão",exact:true});
+  await expect(details).toBeVisible();
+  await expect(details.getByText("Quem registrou a ficha",{exact:true})).toHaveCount(0);
+  await details.getByRole("link",{name:"Entrar e continuar esta verificação",exact:true}).click();
+  await page.getByLabel("E-mail",{exact:true}).fill(fixtures.family.email);
+  await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
+  await page.getByRole("button",{name:"Entrar",exact:true}).click();
+  await expect(page).toHaveURL(new RegExp("/verificar\\?code="+code+"$"));
+  const useContext=details.getByRole("button",{name:"Usar o contexto autorizado desta emissão",exact:true});
+  await expect.poll(async()=>await useContext.count()+await details.getByText("Quem registrou a ficha",{exact:true}).count()).toBeGreaterThan(0);
+  if(await useContext.isVisible())await useContext.click();
+  await expect(details.getByText("Quem registrou a ficha",{exact:true})).toBeVisible();
+  await expect(details.getByText("Quem gerou este exemplar",{exact:true})).toBeVisible();
+  await expect(details.getByText("Chave da assinatura técnica",{exact:true})).toBeVisible();
+  mkdirSync("output/playwright/l1",{recursive:true});
+  for(const width of [1440,360,412]){
+    await page.setViewportSize({width,height:940});await audit(page,"L1 verification private "+width);
+    await page.screenshot({path:`output/playwright/l1/verificacao-${width}.png`,fullPage:true});
+  }
+  await details.getByRole("link",{name:"Consultar ficha autorizada",exact:true}).click();
+  // Public authorized reading does not silently choose an operational role.
+  // Enter the document through the existing explicit context gate.
+  await selectContext(page,f.patient);
+  for(const section of ["materials","communications","files","attachments"] as const){
+    await selectDocumentSection(page,section);
+    await page.screenshot({path:`output/playwright/l1/com-${section}-412.png`,fullPage:true});
+  }
+  await page.goto("/historico?careRecipientId="+f.patient);
+  await expect(page.getByText(f.doc.code,{exact:true}).first()).toBeVisible();
+  await page.screenshot({path:"output/playwright/l1/historico-412.png",fullPage:true});
+  await page.goto(destination);await expect(details.getByText("Quem registrou a ficha",{exact:true})).toBeVisible();
+  sql(`update public.care_recipient_memberships set status='revoked' where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.family.id)}`);
+  await page.evaluate(()=>window.dispatchEvent(new Event("hca:profile-updated")));
+  expect((await page.request.get("/api/verification/details?code="+code)).status()).toBe(403);
+  await expect(details.getByText("Quem registrou a ficha",{exact:true})).toHaveCount(0);
+  await expect(page.getByRole("region",{name:"Resultado da verificação",exact:true})).toBeVisible();
+});
 test("C-FINAL023 verificação separa falha do serviço de código digitado inválido sem produzir emissão", async ({ page }) => {
   await page.goto("/verificar");
   const code = page.getByRole("textbox", { name: "Código de verificação", exact: true });

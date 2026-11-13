@@ -24,7 +24,7 @@ test("Perfil conserva o destino de teclado quando callbacks de foco chegam depoi
     await expect(page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true })).toBeFocused();
     await page.keyboard.press("ArrowDown");
     await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-    await expect(page.getByRole("menuitem", { name: "Mudar perfil", exact: true })).toBeFocused();
+    await expect(page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true })).toBeFocused();
     await page.keyboard.press("ArrowUp");
     await expect(page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true })).toBeFocused();
     await page.keyboard.press("Escape");

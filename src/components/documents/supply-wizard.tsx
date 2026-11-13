@@ -77,10 +77,10 @@ type SourceRequest = {
   requisition_items: {
     id: string;
     product_id: string | null;
-    resolution?: { product_id: string } | null;
+    resolution?: { product_id: string; } | null;
   }[];
 };
-export function SupplyWizard({ type }: { type: SupplyType }) {
+export function SupplyWizard({ type }: { type: SupplyType; }) {
   const params = useSearchParams();
   return (
     <Workspace title={documentLabels[type]} compact>
@@ -163,7 +163,7 @@ export function PatientSupplyWizard({
     draft: boolean;
     submissionKey: string;
     expectedVersion?: number;
-    draftCommit?: { id: string; revision: number };
+    draftCommit?: { id: string; revision: number; };
   } | null>(null);
   const storageKey =
     "hca:v2:draft:" +
@@ -309,14 +309,14 @@ export function PatientSupplyWizard({
         ),
         ...(type !== "BAL"
           ? {
-              origin: "" as const,
-              source: "FAMILY" as const,
-              recipientId: "",
-              recipientReason: "",
-              sharedNeedReasons: {},
-              presentationSelections: {},
-              manualQuantities: {},
-            }
+            origin: "" as const,
+            source: "FAMILY" as const,
+            recipientId: "",
+            recipientReason: "",
+            sharedNeedReasons: {},
+            presentationSelections: {},
+            manualQuantities: {},
+          }
           : {}),
         observationTimes: {},
         notes: "",
@@ -340,6 +340,7 @@ export function PatientSupplyWizard({
       recipientId: form.recipientId,
       recipientReason: form.recipientReason,
       sharedNeedReasons: form.sharedNeedReasons,
+      requestFulfillments: form.requestFulfillments,
       presentationSelections: form.presentationSelections,
       manualQuantities: form.manualQuantities,
     },
@@ -360,8 +361,8 @@ export function PatientSupplyWizard({
       : null;
   const resumeHref =
     originalSource !== requisitionId &&
-    offeredContent &&
-    "form" in offeredContent
+      offeredContent &&
+      "form" in offeredContent
       ? `/fichas/${type.toLowerCase()}?careRecipientId=${patientId}${originalSource ? "&requisitionId=" + originalSource : ""}`
       : undefined;
   const missingBalanceMaterials = Object.keys(form.quantities).filter(
@@ -381,29 +382,29 @@ export function PatientSupplyWizard({
   useEffect(() => {
     const controller = new AbortController();
     Promise.all([
-      api<{ data: CatalogProduct[] }>(
+      api<{ data: CatalogProduct[]; }>(
         "/api/catalog?careRecipientId=" + patientId,
         undefined,
         controller.signal,
       ),
-      api<{ directory: PatientPerson[] }>(
+      api<{ directory: PatientPerson[]; }>(
         "/api/patient-settings?careRecipientId=" + patientId,
         undefined,
         controller.signal,
       ),
       requisitionId
-        ? api<{ data: SourceRequest }>(
-            "/api/requisitions/" + requisitionId,
-            undefined,
-            controller.signal,
-          )
+        ? api<{ data: SourceRequest; }>(
+          "/api/requisitions/" + requisitionId,
+          undefined,
+          controller.signal,
+        )
         : Promise.resolve(null),
       type === "BAL"
         ? api<unknown>(
-            `/api/balances?careRecipientId=${patientId}&reference=true`,
-            undefined,
-            controller.signal,
-          ).then(value => parseBalanceCountReference(value, patientId))
+          `/api/balances?careRecipientId=${patientId}&reference=true`,
+          undefined,
+          controller.signal,
+        ).then(value => parseBalanceCountReference(value, patientId))
         : Promise.resolve(null),
     ])
       .then(async ([products, settings, source, stockReference]) => {
@@ -417,13 +418,13 @@ export function PatientSupplyWizard({
         setStaleLegacyReference(false);
         setPeople(settings.directory);
         if (type !== "BAL" && canReadRequests) {
-          const options = await api<{ data: ItemContext[] }>(
+          const options = await api<{ data: ItemContext[]; }>(
             "/api/requisitions/item-context?careRecipientId=" +
-              patientId +
-              "&productIds=" +
-              products.data
-                .map((product) => encodeURIComponent(product.id))
-                .join(","),
+            patientId +
+            "&productIds=" +
+            products.data
+              .map((product) => encodeURIComponent(product.id))
+              .join(","),
             undefined,
             controller.signal,
           );
@@ -486,7 +487,7 @@ export function PatientSupplyWizard({
         }
         if (documentId || recoveredId) {
           const existing = (
-            await api<{ data: SupplyDocument }>(
+            await api<{ data: SupplyDocument; }>(
               "/api/documents/" + (documentId ?? recoveredId),
               undefined,
               controller.signal,
@@ -525,6 +526,7 @@ export function PatientSupplyWizard({
             ),
           );
           setForm({
+            requestFulfillments: Object.fromEntries(existing.lines.map(line => [line.product_id, line.family_fulfillment ?? ""])),
             quantities: Object.fromEntries(
               existing.lines.map((line) => [
                 line.product_id,
@@ -623,11 +625,11 @@ export function PatientSupplyWizard({
   useEffect(() => {
     if (type !== "ENT" || loading || loadError || uncertain || saved) return;
     const controller = new AbortController();
-    api<{ data: DeliveryPreparation }>(
+    api<{ data: DeliveryPreparation; }>(
       "/api/documents/delivery-preparation?careRecipientId=" +
-        patientId +
-        "&source=" +
-        form.source,
+      patientId +
+      "&source=" +
+      form.source,
       undefined,
       controller.signal,
     )
@@ -770,6 +772,7 @@ export function PatientSupplyWizard({
       errors.lines = "Selecione ao menos um produto.";
     if (all || step === 0)
       for (const [productId, ids] of Object.entries(links)) {
+        if (type === "ENT" && form.source === "FAMILY" && ids.length && !form.requestFulfillments?.[productId]) errors[productId + ":fulfillment"] = "Escolha se esta entrega atende parcialmente ou por completo à necessidade.";
         if (
           ids.length > 1 &&
           (form.sharedNeedReasons?.[productId]?.trim().length ?? 0) < 3
@@ -940,25 +943,26 @@ export function PatientSupplyWizard({
           quantity: quantity(form.quantities[product.id]).toFixed(),
           ...(form.presentationSelections?.[product.id]?.length
             ? {
-                manualQuantity: quantity(
-                  form.manualQuantities?.[product.id] ?? "0",
-                ).toFixed(),
-                presentations: form.presentationSelections[product.id].map(
-                  (row) => ({
-                    id: row.id,
-                    version: row.version,
-                    packages: row.packages,
-                  }),
-                ),
-              }
+              manualQuantity: quantity(
+                form.manualQuantities?.[product.id] ?? "0",
+              ).toFixed(),
+              presentations: form.presentationSelections[product.id].map(
+                (row) => ({
+                  id: row.id,
+                  version: row.version,
+                  packages: row.packages,
+                }),
+              ),
+            }
             : {}),
           ...(links[product.id]?.length
             ? {
-                requisitionItemIds: links[product.id],
-                metadata: {
-                  sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "",
-                },
-              }
+              requisitionItemIds: links[product.id],
+              ...(type === "ENT" && form.source === "FAMILY" && form.requestFulfillments?.[product.id] ? { requestFulfillment: form.requestFulfillments[product.id] as "partial" | "complete" } : {}),
+              metadata: {
+                sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "",
+              },
+            }
             : {}),
         }));
       const payload: SupplyPayload = {
@@ -973,12 +977,12 @@ export function PatientSupplyWizard({
             : {}
           : type === "ENT"
             ? {
-                source: form.source,
-                destination: form.source === "FAMILY" ? "CARE_TEAM" : "FAMILY",
-                recipientId: form.recipientId,
-                recipientReason: form.recipientReason?.trim() || undefined,
-                recipientReference: activeRecipientContext!.referenceHash,
-              }
+              source: form.source,
+              destination: form.source === "FAMILY" ? "CARE_TEAM" : "FAMILY",
+              recipientId: form.recipientId,
+              recipientReason: form.recipientReason?.trim() || undefined,
+              recipientReference: activeRecipientContext!.referenceHash,
+            }
             : {}),
       };
       const privateCommit =
@@ -994,10 +998,10 @@ export function PatientSupplyWizard({
         expectedVersion: editing?.version,
         ...(privateCommit || privateDraft.draftCommit
           ? {
-              draftCommit: privateCommit
-                ? { id: privateCommit.id, revision: privateCommit.revision }
-                : privateDraft.draftCommit,
-            }
+            draftCommit: privateCommit
+              ? { id: privateCommit.id, revision: privateCommit.revision }
+              : privateDraft.draftCommit,
+          }
           : {}),
       };
     }
@@ -1019,33 +1023,33 @@ export function PatientSupplyWizard({
       /* Attempt retained in memory. */
     }
     try {
-      const result = await api<{ data: SupplyDocument }>(
+      const result = await api<{ data: SupplyDocument; }>(
         editing ? "/api/documents/" + editing.id + "/revise" : "/api/documents",
         editing
           ? {
-              payload: frozenRef.current.payload,
-              idempotencyKey: frozenRef.current.key,
-              submissionKey: frozenRef.current.submissionKey,
-              expectedVersion: frozenRef.current.expectedVersion,
-              recount,
-              ...(frozenRef.current.draftCommit
-                ? {
-                    draftCommit: frozenRef.current.draftCommit,
-                    ...(type !== "BAL" ? { draftKind: type } : {}),
-                  }
-                : {}),
-              submit: !frozenRef.current.draft,
-            }
+            payload: frozenRef.current.payload,
+            idempotencyKey: frozenRef.current.key,
+            submissionKey: frozenRef.current.submissionKey,
+            expectedVersion: frozenRef.current.expectedVersion,
+            recount,
+            ...(frozenRef.current.draftCommit
+              ? {
+                draftCommit: frozenRef.current.draftCommit,
+                ...(type !== "BAL" ? { draftKind: type } : {}),
+              }
+              : {}),
+            submit: !frozenRef.current.draft,
+          }
           : {
-              careRecipientId: context.patient!.id,
-              type,
-              payload: frozenRef.current.payload,
-              idempotencyKey: frozenRef.current.key,
-              draft: frozenRef.current.draft,
-              ...(frozenRef.current.draftCommit
-                ? { draftCommit: frozenRef.current.draftCommit }
-                : {}),
-            },
+            careRecipientId: context.patient!.id,
+            type,
+            payload: frozenRef.current.payload,
+            idempotencyKey: frozenRef.current.key,
+            draft: frozenRef.current.draft,
+            ...(frozenRef.current.draftCommit
+              ? { draftCommit: frozenRef.current.draftCommit }
+              : {}),
+          },
       );
       setSaved(
         requireSupplyConfirmation(result, {
@@ -1118,11 +1122,11 @@ export function PatientSupplyWizard({
         api<unknown>(
           `/api/balances?careRecipientId=${patientId}&reference=true`,
         ).then(value => parseBalanceCountReference(value, patientId)),
-        api<{ data: CatalogProduct[] }>(
+        api<{ data: CatalogProduct[]; }>(
           `/api/catalog?careRecipientId=${patientId}`,
         ),
         editing
-          ? api<{ data: SupplyDocument }>("/api/documents/" + editing.id)
+          ? api<{ data: SupplyDocument; }>("/api/documents/" + editing.id)
           : Promise.resolve(null),
       ]);
       if (
@@ -1198,9 +1202,9 @@ export function PatientSupplyWizard({
     setMessage("");
     const result = await api<PresentationsRead>(
       "/api/catalog/presentations?careRecipientId=" +
-        context.patient!.id +
-        "&barcode=" +
-        encodeURIComponent(code),
+      context.patient!.id +
+      "&barcode=" +
+      encodeURIComponent(code),
     );
     const presentation = result.data[0];
     if (!presentation) {
@@ -1267,8 +1271,8 @@ export function PatientSupplyWizard({
     });
     setMessage(
       presentation.name +
-        ": adicionados " +
-        formatQuantity(presentation.base_quantity, product?.unit),
+      ": adicionados " +
+      formatQuantity(presentation.base_quantity, product?.unit),
     );
     if (product)
       setStep(

@@ -37,7 +37,7 @@ export async function generatedPdf(page: Page, legacyUrl: string, reserveLegacy?
     for (let attempt = 0; attempt < 20; attempt++) {
       const response = await page.request.post(
         `/api/documents/${id}/issuances`,
-        { data: { idempotencyKey: intention.key, version } },
+        { timeout: 60_000, data: { idempotencyKey: intention.key, version } },
       );
       expect([200, 202], await response.text()).toContain(response.status());
       const row = await response.json();

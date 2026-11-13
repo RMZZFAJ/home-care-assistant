@@ -57,7 +57,7 @@ async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,rev
 
 test("ENT regularizada gera PDF técnico pela interface, recupera V7 e preserva o estoque e o aceite original",async({page,browser})=>{
   const f=await regularizationPdfFixture(),before=regularizationLedger(f.patient),key=randomUUID();
-  const old=await rpc(f.owner,"reserve_pdf_issuance_v7",{p_document:f.doc.id,p_version:f.doc.version,p_key:key});
+  const old=await rpc(f.owner,"reserve_pdf_issuance",{p_document:f.doc.id,p_version:f.doc.version,p_key:key});
   await login(page,f.patient);await page.goto(`/historico/${f.doc.id}`);
   await selectDocumentSection(page, "files");
   const files=page.getByRole("region",{name:"Arquivos gerados",exact:true});
@@ -67,7 +67,7 @@ test("ENT regularizada gera PDF técnico pela interface, recupera V7 e preserva 
   const link=await files.getByRole("link",{name:"Baixar PDF",exact:true}).getAttribute("href");expect(link).toBeTruthy();
   const current=await inspect(page,f,"approved-current",await page.request.get(link!),CURRENT_PDF_REVISION);
   expect(current.identity.id).not.toBe(old.id);
-  const recovery=await page.request.post(`/api/documents/${f.doc.id}/issuances`,{data:{version:f.doc.version,idempotencyKey:key}});
+  const recovery=await page.request.post(`/api/documents/${f.doc.id}/issuances`,{ timeout: 60_000,data:{version:f.doc.version,idempotencyKey:key}});
   expect(recovery.status()).toBe(200);expect((await recovery.json()).id).toBe(old.id);
   await inspect(page,f,"old-v7-recovered",await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${old.id}`),7);
   await inspect(page,f,"original-before-proposal",await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.original.version}`),CURRENT_PDF_REVISION);

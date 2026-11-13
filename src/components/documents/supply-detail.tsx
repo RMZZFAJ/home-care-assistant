@@ -50,6 +50,9 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { DocumentHeader } from "./document-header";
+import { FamilyFulfillmentReview } from "./family-fulfillment-review";
+import { DocumentFreshness } from "./document-freshness";
+import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import {
   DocumentTabs,
   DocumentPanel,
@@ -84,6 +87,7 @@ const secondaryDocumentActions = new Set<DocumentAction>([
   "reassign",
 ]);
 
+const supplyCopyIdentity = (value: SupplyDocument) => JSON.stringify([value.version, value.status, value.workflow_data, value.lines, value.receipts]);
 export function SupplyDocumentContent({
   id,
   context,
@@ -98,7 +102,7 @@ export function SupplyDocumentContent({
   const [fileActionTarget, setFileActionTarget] =
     useState<HTMLDivElement | null>(null);
   const editingRef = useRef(false);
-  const [data, setData] = useState<SupplyDocument | null>(null);
+  const { data, setData, acceptRead, stale } = useDocumentCopy<SupplyDocument>(supplyCopyIdentity);
   const [people, setPeople] = useState<PatientPerson[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -114,7 +118,7 @@ export function SupplyDocumentContent({
     body: unknown;
     summary: string;
     expectedVersion: number;
-    draftCommit?: { id: string; revision: number };
+    draftCommit?: { id: string; revision: number; };
   } | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [purchaseConflict, setPurchaseConflict] = useState(false);
@@ -166,11 +170,11 @@ export function SupplyDocumentContent({
   useEffect(() => {
     editingRef.current = Boolean(
       action ||
-        review ||
-        uncertain ||
-        regularizationEditing ||
-        balanceReviewEditing ||
-        transferEditing,
+      review ||
+      uncertain ||
+      regularizationEditing ||
+      balanceReviewEditing ||
+      transferEditing,
     );
   }, [
     action,
@@ -185,7 +189,7 @@ export function SupplyDocumentContent({
     body: unknown;
     expectedVersion: number;
     idempotencyKey: string;
-    draftCommit?: { id: string; revision: number };
+    draftCommit?: { id: string; revision: number; };
   } | null>(null);
   const patientId = context.patient?.id;
   useEffect(() => {
@@ -195,7 +199,7 @@ export function SupplyDocumentContent({
     queueMicrotask(() => {
       if (!controller.signal.aborted) setLoading(true);
     });
-    api<{ data: SupplyDocument }>(
+    api<{ data: SupplyDocument; }>(
       "/api/documents/" + id,
       undefined,
       controller.signal,
@@ -204,18 +208,16 @@ export function SupplyDocumentContent({
         if (controller.signal.aborted) return;
         setReadDenied(false);
         setReadFailed(false);
-        setData((current) =>
-          !editingRef.current || current === null ? result.data : current,
-        );
+        acceptRead(result.data, id + ":" + attempt, editingRef.current);
         if (editingRef.current)
           setReadNotice(
             "O acompanhamento foi atualizado. Sua operação permanece preservada e será validada contra a versão original ao confirmar.",
           );
         setError("");
         if (result.data.type !== "COM" && result.data.care_recipient_id === patientId) {
-          const directory = await api<{ directory: PatientPerson[] }>(
+          const directory = await api<{ directory: PatientPerson[]; }>(
             "/api/patient-settings?careRecipientId=" +
-              result.data.care_recipient_id,
+            result.data.care_recipient_id,
             undefined,
             controller.signal,
           );
@@ -243,7 +245,7 @@ export function SupplyDocumentContent({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [id, patientId, attempt, liveRevision]);
+  }, [id, patientId, attempt, liveRevision, acceptRead, setData]);
   async function execute() {
     if (!data) return;
     if (!pendingRef.current && review)
@@ -259,7 +261,7 @@ export function SupplyDocumentContent({
     setError("");
     const intention = pendingRef.current;
     try {
-      const result = await api<{ data: SupplyDocument }>(
+      const result = await api<{ data: SupplyDocument; }>(
         "/api/documents/" + id,
         intention,
       );
@@ -324,12 +326,12 @@ export function SupplyDocumentContent({
       setMessage(
         result.data.type === "COM"
           ? (purchaseMessages[intention.action] ??
-              "Decisão registrada na ficha.")
+            "Decisão registrada na ficha.")
           : result.data.type === "ENT" &&
-              result.data.commandOutcome?.state === "recovered"
+            result.data.commandOutcome?.state === "recovered"
             ? "Resultado anterior recuperado. Consulte o pedido correspondente no histórico da ficha."
             : result.data.type === "ENT" &&
-                cancellationMessages[intention.action]
+              cancellationMessages[intention.action]
               ? cancellationMessages[intention.action]
               : "Operação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.",
       );
@@ -376,7 +378,7 @@ export function SupplyDocumentContent({
     setBusy(true);
     setError("");
     try {
-      const result = await api<{ data: SupplyDocument }>(
+      const result = await api<{ data: SupplyDocument; }>(
         "/api/documents/" + id,
       );
       setComparison(result.data);
@@ -502,20 +504,49 @@ export function SupplyDocumentContent({
       ) &&
       (data.type === "ENT"
         ? allowed("ent.cancel") ||
-          (data.created_by === context.userId &&
-            !data.lines.some((line) => quantity(line.accepted_quantity).gt(0)))
+        (data.created_by === context.userId &&
+          !data.lines.some((line) => quantity(line.accepted_quantity).gt(0)))
         : data.type === "COM"
           ? allowed("com.approve") &&
-            !data.lines.some((line) =>
-              quantity(line.purchased_quantity).gt(0),
-            ) &&
-            !data.receipts.length &&
-            !data.purchaseProgress?.expectationClosed
+          !data.lines.some((line) =>
+            quantity(line.purchased_quantity).gt(0),
+          ) &&
+          !data.receipts.length &&
+          !data.purchaseProgress?.expectationClosed
           : data.status !== "approved" &&
-            !data.payload.balanceContext &&
-            allowed("access.manage"))
+          !data.payload.balanceContext &&
+          allowed("access.manage"))
     )
       actions.push("cancel");
+  }
+  function adoptDeliveryComparison() {
+    if (!comparison) return;
+    const pending = comparison.status === "cancellation_pending";
+    if (
+      pending &&
+      action === "consent_cancel" &&
+      !referenceAdoptionRef.current?.adoptCancellationReference(
+        comparison,
+      )
+    ) {
+      setError(
+        "Não foi possível atualizar a referência privada da conciliação. Consulte novamente.",
+      );
+      return;
+    }
+    decisionFocusRef.current = pending;
+    resultFocusRef.current = !pending;
+    setData(comparison);
+    setComparison(null);
+    setDeliveryConflict(false);
+    setReview(null);
+    if (!pending) setAction(null);
+    setFocusRevision((value) => value + 1);
+    setMessage(
+      pending
+        ? "Referência atual carregada. Confira os valores preservados e prepare uma nova revisão antes de decidir."
+        : "Resultado atual carregado. O primeiro ato e sua autoria permanecem preservados.",
+    );
   }
   function renderDeliveryComparison(ready: boolean) {
     if (!data || !comparison) return null;
@@ -525,14 +556,14 @@ export function SupplyDocumentContent({
           <DeliveryCancellationComparison
             original={
               comparison.deliveryCancellation?.sourceAccess === false &&
-              data.deliveryCancellation
+                data.deliveryCancellation
                 ? {
-                    ...data,
-                    deliveryCancellation: {
-                      ...data.deliveryCancellation,
-                      lines: [],
-                    },
-                  }
+                  ...data,
+                  deliveryCancellation: {
+                    ...data.deliveryCancellation,
+                    lines: [],
+                  },
+                }
                 : data
             }
             current={comparison}
@@ -542,34 +573,7 @@ export function SupplyDocumentContent({
           type="button"
           className={primaryClass}
           disabled={busy || !ready}
-          onClick={() => {
-            const pending = comparison.status === "cancellation_pending";
-            if (
-              pending &&
-              action === "consent_cancel" &&
-              !referenceAdoptionRef.current?.adoptCancellationReference(
-                comparison,
-              )
-            ) {
-              setError(
-                "Não foi possível atualizar a referência privada da conciliação. Consulte novamente.",
-              );
-              return;
-            }
-            decisionFocusRef.current = pending;
-            resultFocusRef.current = !pending;
-            setData(comparison);
-            setComparison(null);
-            setDeliveryConflict(false);
-            setReview(null);
-            if (!pending) setAction(null);
-            setFocusRevision((value) => value + 1);
-            setMessage(
-              pending
-                ? "Referência atual carregada. Confira os valores preservados e prepare uma nova revisão antes de decidir."
-                : "Resultado atual carregado. O primeiro ato e sua autoria permanecem preservados.",
-            );
-          }}
+          onClick={adoptDeliveryComparison}
         >
           {comparison.status === "cancellation_pending"
             ? "Usar referência atual e revisar novamente"
@@ -641,12 +645,12 @@ export function SupplyDocumentContent({
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {readNotice &&
-      (action ||
-        review ||
-        uncertain ||
-        regularizationEditing ||
-        balanceReviewEditing ||
-        transferEditing) ? (
+        (action ||
+          review ||
+          uncertain ||
+          regularizationEditing ||
+          balanceReviewEditing ||
+          transferEditing) ? (
         <Notice>{readNotice}</Notice>
       ) : null}
       {purchaseConflict && data?.type === "COM" ? (
@@ -719,7 +723,7 @@ export function SupplyDocumentContent({
           </Notice>
           {comparison ? (
             action === "consent_cancel" &&
-            comparison.status === "cancellation_pending" ? (
+              comparison.status === "cancellation_pending" ? (
               <ConsentReferenceComparison
                 expected={{
                   id: data.id,
@@ -738,9 +742,9 @@ export function SupplyDocumentContent({
               renderDeliveryComparison(
                 Boolean(
                   comparison.id === data.id &&
-                    comparison.care_recipient_id === data.care_recipient_id &&
-                    comparison.type === "ENT" &&
-                    comparison.version,
+                  comparison.care_recipient_id === data.care_recipient_id &&
+                  comparison.type === "ENT" &&
+                  comparison.version,
                 ),
               )
             )
@@ -791,12 +795,12 @@ export function SupplyDocumentContent({
             actions={
               <>
                 {activeContext &&
-                data.status === "draft" &&
-                allowed(
-                  data.type === "BAL"
-                    ? "bal.count"
-                    : data.type.toLowerCase() + ".create",
-                ) ? (
+                  data.status === "draft" &&
+                  allowed(
+                    data.type === "BAL"
+                      ? "bal.count"
+                      : data.type.toLowerCase() + ".create",
+                  ) ? (
                   <Link
                     className={primaryClass}
                     href={
@@ -810,11 +814,11 @@ export function SupplyDocumentContent({
                   </Link>
                 ) : null}
                 {activeContext &&
-                data.type === "BAL" &&
-                data.status === "submitted" &&
-                allowed("bal.count") &&
-                !data.payload.balanceContext &&
-                !data.balanceRecount?.hasRecountCycle ? (
+                  data.type === "BAL" &&
+                  data.status === "submitted" &&
+                  allowed("bal.count") &&
+                  !data.payload.balanceContext &&
+                  !data.balanceRecount?.hasRecountCycle ? (
                   <Link
                     className={buttonClass}
                     href={"/fichas/bal?documentId=" + data.id + "&recount=true"}
@@ -839,7 +843,7 @@ export function SupplyDocumentContent({
                   </Link>
                 ) : null}
                 {activeContext &&
-                (data.type === "COM" || data.type === "ENT") ? (
+                  (data.type === "COM" || data.type === "ENT") ? (
                   <PrivateOperationRecoveryActions
                     kind={data.type}
                     onSelect={(purpose) => {
@@ -873,11 +877,11 @@ export function SupplyDocumentContent({
                     : "Compra ou doação de insumos"
                 : data.transfer
                   ? materialTransferLabel(data.transfer.declaration.source, data.transfer.declaration.destination)
-                : data.type === "ENT"
-                  ? documentVariant(data.type, data.payload, data.workflow_data)
-                : data.type === "BAL"
-                  ? documentVariant(data.type, data.payload, data.workflow_data)
-                  : undefined
+                  : data.type === "ENT"
+                    ? documentVariant(data.type, data.payload, data.workflow_data)
+                    : data.type === "BAL"
+                      ? documentVariant(data.type, data.payload, data.workflow_data)
+                      : undefined
             }
             code={
               data.code ??
@@ -900,7 +904,7 @@ export function SupplyDocumentContent({
             patientName={documentPatientName(
               data.canonical_snapshot,
               context.patient?.display_name ??
-                "Paciente identificado no documento",
+              "Paciente identificado no documento",
             )}
           >
             {data.type === "COM" ? (
@@ -933,12 +937,12 @@ export function SupplyDocumentContent({
                   {data.transfer && data.transfer.state !== "dispatched"
                     ? "Esta preparação ainda não expediu materiais. Concordância, expedição e recebimento são atos separados; não há entrada no destino nesta preparação."
                     : data.status === "cancelled"
-                    ? "Os fatos anteriores permanecem preservados. Consulte as devoluções e o consumo efetivamente conciliados, quando existentes."
-                    : data.status === "administratively_closed"
-                      ? "O aceite pessoal, quando existente, permanece preservado. O dossiê distingue os efeitos administrativos comprovados da parcela física ainda desconhecida."
-                      : data.status === "confirmed"
-                        ? "Conferência encerrada. Consulte as quantidades aceitas e os atos próprios de conciliação; devolução e falta não são recebimento."
-                      : "Quantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal."}
+                      ? "Os fatos anteriores permanecem preservados. Consulte as devoluções e o consumo efetivamente conciliados, quando existentes."
+                      : data.status === "administratively_closed"
+                        ? "O aceite pessoal, quando existente, permanece preservado. O dossiê distingue os efeitos administrativos comprovados da parcela física ainda desconhecida."
+                        : data.status === "confirmed"
+                          ? "Conferência encerrada. Consulte as quantidades aceitas e os atos próprios de conciliação; devolução e falta não são recebimento."
+                          : "Quantidades aceitas já integram o saldo confirmado do destino. Divergências seguem pendentes até conciliação formal."}
                 </p>
               </div>
             ) : null}
@@ -954,6 +958,7 @@ export function SupplyDocumentContent({
               </Link>
             ) : null}
           </DocumentHeader>
+          <DocumentFreshness stale={stale} loading={loading || busy} onRefresh={refreshDocument} />
           {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
           <DocumentTabs
             rootRef={tabs.rootRef}
@@ -990,16 +995,16 @@ export function SupplyDocumentContent({
                   data.status === "cancellation_pending" ||
                   Boolean(
                     data.purchaseProgress?.expectationPending ||
-                      data.purchaseProgress?.physicalPending ||
-                      data.purchaseProgress?.validationPending,
+                    data.purchaseProgress?.physicalPending ||
+                    data.purchaseProgress?.validationPending,
                   ) ||
                   Boolean(
                     data.balanceReview?.reviewRequired &&
-                      data.status !== "approved",
+                    data.status !== "approved",
                   ) ||
                   Boolean(
                     data.balanceRecount?.activeAssignment ||
-                      data.balanceRecount?.requiresDesignation,
+                    data.balanceRecount?.requiresDesignation,
                   )
                 )}
                 onOpen={() => tabs.select(followUpStep?.section ?? "workflow", Boolean(followUpStep))}
@@ -1014,25 +1019,26 @@ export function SupplyDocumentContent({
               />
             </DocumentPanel>
             <DocumentPanel value="materials">
+              {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} onReviewed={() => setAttempt(value => value + 1)} /> : null}
               <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>
                 {data.type === "COM" ? <PurchaseMaterials data={data} /> : data.type === "ENT" ? <DeliveryMaterials data={data} /> : <>
-                <h2 className="font-semibold">Produtos e quantidades</h2>
-                <div className="mt-4 space-y-3">
-                  {data.lines.map((line) => (
-                    <SupplyLineSummary
-                      key={line.id}
-                      line={line}
-                      type={data.type}
-                      status={data.status}
-                      declarationOnly={Boolean(
-                        data.transfer && data.transfer.state !== "dispatched",
-                      )}
-                      purchaseLine={data.purchaseProgress?.lines.find(
-                        (item) => item.lineId === line.id,
-                      )}
-                    />
-                  ))}{" "}
-                </div>
+                  <h2 className="font-semibold">Produtos e quantidades</h2>
+                  <div className="mt-4 space-y-3">
+                    {data.lines.map((line) => (
+                      <SupplyLineSummary
+                        key={line.id}
+                        line={line}
+                        type={data.type}
+                        status={data.status}
+                        declarationOnly={Boolean(
+                          data.transfer && data.transfer.state !== "dispatched",
+                        )}
+                        purchaseLine={data.purchaseProgress?.lines.find(
+                          (item) => item.lineId === line.id,
+                        )}
+                      />
+                    ))}{" "}
+                  </div>
                 </>}
                 {data.payload.notes ? (
                   <p className="mt-4 whitespace-pre-wrap text-sm">
@@ -1040,8 +1046,7 @@ export function SupplyDocumentContent({
                   </p>
                 ) : null}
               </section>
-            </DocumentPanel>
-            <DocumentPanel value="workflow">
+
               {data.type === "ENT" && data.protocol ? (
                 <section className="ui-card">
                   <DeliveryDispatchFacts data={data} />
@@ -1097,14 +1102,14 @@ export function SupplyDocumentContent({
                   }
                   context={
                     action === "consent_cancel" &&
-                    (deliveryConflict || busy || uncertain)
+                      (deliveryConflict || busy || uncertain)
                       ? {
-                          ...data.deliveryCancellation,
-                          lines: [],
-                          sourceReady: false,
-                          sourceAccess: undefined,
-                          referenceHash: null,
-                        }
+                        ...data.deliveryCancellation,
+                        lines: [],
+                        sourceReady: false,
+                        sourceAccess: undefined,
+                        referenceHash: null,
+                      }
                       : data.deliveryCancellation
                   }
                   onRefresh={() => {
@@ -1233,6 +1238,7 @@ export function SupplyDocumentContent({
             <DocumentPanel value="files">
               {data.protocol ? (
                 <DocumentActions
+                  generationBlocked={stale}
                   actionTarget={fileActionTarget}
                   onAction={() => tabs.select("files")}
                   id={id}

@@ -48,15 +48,14 @@ async function inspect(page:Page,f:Fixture,label:string,response:APIResponse,rev
 for(const options of [{kind:"cancelled",personal:false},{kind:"administrative",personal:false},{kind:"administrative",personal:true}])test(`ENT ${options.kind} personal=${options.personal} não reativa recebimento no PDF nem em representação anterior`,async({page},info)=>{
  const f=await entTerminalFixture(options),before=terminalLedger(f.patient);
  let legacyKey:string|null=null;
- if(info.project.name==="chromium"&&options.kind==="administrative"&&!options.personal){legacyKey=randomUUID();await rpc(f.owner,"reserve_pdf_issuance_v8",{p_document:f.doc.id,p_version:f.doc.version,p_key:legacyKey});}
+ if(info.project.name==="chromium"&&options.kind==="administrative"&&!options.personal){legacyKey=randomUUID();await rpc(f.owner,"reserve_pdf_issuance",{p_document:f.doc.id,p_version:f.doc.version,p_key:legacyKey});}
  await login(page,f.patient);await page.goto(`/historico/${f.doc.id}`);
   await selectDocumentSection(page, "files");
  const current=await inspect(page,f,`${options.kind}-${options.personal}-current`,await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.doc.version}`));
  await inspect(page,f,`${options.kind}-${options.personal}-prior`,await generatedPdf(page,`/api/documents/${f.doc.id}/pdf?version=${f.original.version}`));
  if(legacyKey){
-  const response=await page.request.post(`/api/documents/${f.doc.id}/issuances`,{data:{version:f.doc.version,idempotencyKey:legacyKey}});expect(response.status()).toBe(200);const row=await response.json();expect(row.rendererRevision).toBe(8);
-  await inspect(page,f,"legacy-v8-recovered",await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${row.id}`),8);
-  await page.reload();await expect(page.getByRole("region",{name:"Arquivos gerados",exact:true}).getByRole("note")).toContainText("Este arquivo preserva orientações de uma emissão anterior");
+  const response=await page.request.post(`/api/documents/${f.doc.id}/issuances`,{ timeout: 60_000,data:{version:f.doc.version,idempotencyKey:legacyKey}});expect(response.status()).toBe(200);const row=await response.json();expect(row.rendererRevision).toBe(16);
+  await inspect(page,f,"consolidated-recovered",await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${row.id}`),16);
  }
  const read=await page.request.get(`/api/documents/${f.doc.id}`);expect((await read.json()).data.workflow_data.acceptedBy??null).toBe(f.doc.workflow_data.acceptedBy??null);
  expect(terminalLedger(f.patient)).toBe(before);

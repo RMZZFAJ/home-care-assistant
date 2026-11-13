@@ -82,12 +82,12 @@ export function BalancePreparationFacts({
             {["cancelled", "rejected"].includes(source.status)
               ? "Consulta histórica de balanço encerrado. A revisão não inicia uma nova conciliação."
               : source.review.referenceState === "unavailable"
-                  ? "Referência do efeito anterior não preservada. O parecer histórico não reaplica estoque."
-                  : source.review.referenceState === "historical"
-                    ? "O estoque recebeu movimentos posteriores. O parecer sobre esta contagem não valida o saldo atual nem reaplica ajustes."
-                    : source.review.reconciliationApplied
-                      ? "Contagem já conciliada. A revisão facultativa não repete a movimentação."
-                      : "O parecer não aplica a contagem ao estoque. A aplicação é um ato separado, após as revisões previstas e com referência válida."}
+                ? "Referência do efeito anterior não preservada. A revisão histórica não reaplica estoque."
+                : source.review.referenceState === "historical"
+                  ? "O estoque recebeu movimentos posteriores. A revisão sobre esta contagem não valida o saldo atual nem reaplica ajustes."
+                  : source.review.reconciliationApplied
+                    ? "Contagem já conciliada. A revisão facultativa não repete a movimentação."
+                    : "A revisão não aplica a contagem ao estoque. A aplicação é um ato separado, após as revisões previstas e com referência válida."}
           </p>
           <BalanceMaterials rows={source.lines.map(row => ({ id: row.id, name: row.name, unit: row.unit, counted: row.quantity, reference: row.expectedQuantity }))} />
         </>
@@ -187,13 +187,13 @@ export function BalanceDocumentPreparation({
   const roleAllows =
     purpose === "assign_recount"
       ? can(context, "bal.approve.family") ||
-        can(context, "bal.approve.supervisor")
+      can(context, "bal.approve.supervisor")
       : can(
-          context,
-          purpose === "review_family"
-            ? "bal.approve.family"
-            : "bal.approve.supervisor",
-        );
+        context,
+        purpose === "review_family"
+          ? "bal.approve.family"
+          : "bal.approve.supervisor",
+      );
   const privateDraft = useCreationDraft({
     userId: context.userId,
     patientId,
@@ -234,11 +234,11 @@ export function BalanceDocumentPreparation({
       parseBalancePreparation(
         await api<unknown>(
           "/api/balances/document-preparation?" +
-            new URLSearchParams({
-              careRecipientId: patientId,
-              documentId,
-              purpose,
-            }),
+          new URLSearchParams({
+            careRecipientId: patientId,
+            documentId,
+            purpose,
+          }),
           undefined,
           signal,
         ),
@@ -388,7 +388,7 @@ export function BalanceDocumentPreparation({
     if (!content || !allowed || busy || uncertain) return;
     try {
       if (purpose !== "assign_recount" && source && balanceReviewItemsFromFields(fields).some(item => !source.lines.some(line => line.id === item.lineId)))
-        throw new Error("Há um material de outra referência neste parecer. Remova a referência anterior explicitamente.");
+        throw new Error("Há um material de outra referência neste revisão. Remova a referência anterior explicitamente.");
       if (purpose !== "assign_recount" && source) for (const [key, raw] of Object.entries(fields).filter(([key]) => key.startsWith("item:"))) {
         const item = balanceReviewItemFields.parse(JSON.parse(raw)), line = source.lines.find(row => row.id === key.slice(5));
         if (!line || (item.materialName !== undefined && item.materialName !== line.name) || (item.unit !== undefined && item.unit !== line.unit))
@@ -612,12 +612,12 @@ export function BalanceDocumentPreparation({
           <>
             <h3 tabIndex={-1}>Seu preenchimento em consulta</h3>
             <Notice>
-              Consulta pessoal. Nenhum parecer, designação ou efeito no estoque
+              Consulta pessoal. Nenhuma revisão, designação ou efeito no estoque
               é confirmado nesta consulta.
             </Notice>
             {canSeePrivate &&
-            privateDraft.base?.state === "active" &&
-            !privateDraft.offered ? (
+              privateDraft.base?.state === "active" &&
+              !privateDraft.offered ? (
               <DraftContentSummary
                 content={privateDraft.base.content}
                 kind="BAL"
@@ -625,10 +625,10 @@ export function BalanceDocumentPreparation({
               />
             ) : null}
             {!privateDraft.loading &&
-            !privateDraft.loadError &&
-            !privateDraft.base &&
-            !privateDraft.offered &&
-            !privateDraft.consumed ? (
+              !privateDraft.loadError &&
+              !privateDraft.base &&
+              !privateDraft.offered &&
+              !privateDraft.consumed ? (
               <p>
                 Nenhum preenchimento ou resultado privado pendente para esta
                 decisão neste perfil.
@@ -639,7 +639,7 @@ export function BalanceDocumentPreparation({
         {!confirmed && !readOnly && !reviewing && canSeePrivate ? (
           <>
             <Notice>
-              Salvar guarda apenas o seu preenchimento. Parecer e designação
+              Salvar guarda apenas o seu preenchimento. Revisão e designação
               exigem confirmação própria; as observações originais de quem
               contou permanecem separadas.
             </Notice>
@@ -694,10 +694,10 @@ export function BalanceDocumentPreparation({
                         (row) => row.id === fields.targetShiftId,
                       )
                         ? balanceTargetLabel(
-                            comparison.recount.targets.find(
-                              (row) => row.id === fields.targetShiftId,
-                            )!,
-                          )
+                          comparison.recount.targets.find(
+                            (row) => row.id === fields.targetShiftId,
+                          )!,
+                        )
                         : "Indisponível para esta designação"}
                       .
                     </p>
@@ -732,7 +732,7 @@ export function BalanceDocumentPreparation({
                 >
                   {purpose === "assign_recount"
                     ? "Adotar referência atual"
-                    : "Adotar referência atual e manter meu parecer"}
+                    : "Adotar referência atual e manter minha revisão"}
                 </ActionButton>
                 {!balanceDocumentAvailable(comparison, purpose) ? (
                   <Notice>
@@ -812,7 +812,7 @@ export function BalanceDocumentPreparation({
                     {target
                       ? balanceTargetLabel(target)
                       : (fields.targetLabel || "Identidade preservada") +
-                        " · indisponível nesta consulta; selecione outro destino explicitamente."}
+                      " · indisponível nesta consulta; selecione outro destino explicitamente."}
                   </p>
                 ) : null}
                 {!unavailable && !source?.recount?.targets.length ? (
@@ -823,7 +823,7 @@ export function BalanceDocumentPreparation({
                 ) : null}
                 <p>
                   O reconto gera uma nova contagem com autoria própria.
-                  Pareceres anteriores permanecem históricos e não aprovam
+                  Revisões anteriores permanecem históricos e não aprovam
                   automaticamente a nova contagem.
                 </p>
               </>
@@ -833,24 +833,24 @@ export function BalanceDocumentPreparation({
                 <strong>
                   {purpose === "review_family" ? "Família" : "Supervisão"}
                 </strong>
-                . Seu parecer não substitui as observações da contagem.
+                . Sua revisão não substitui as observações da contagem.
               </p>
             )}
             {purpose !== "assign_recount" && source ? <BalanceReviewItemFields
               ref={itemsRef}
               lines={source.lines} fields={fields}
               disabled={busy || privateDraft.busy || privateDraft.loading || !!privateDraft.offered || !!privateDraft.pending || uncertain || needsReference || unavailable}
-              onChange={next => { setFields(next);setDirty(true);setFieldError(""); }}
+              onChange={next => { setFields(next); setDirty(true); setFieldError(""); }}
             /> : null}
             <FormField
               label={
                 purpose === "assign_recount"
                   ? "Sua justificativa para o reconto"
-                  : "Seu parecer sobre a contagem"
+                  : "Sua revisão sobre a contagem"
               }
               required={purpose === "assign_recount"}
               error={fieldError || undefined}
-              helpText={`${(fields[purpose === "assign_recount" ? "reason" : "comment"] ?? "").length}/${purpose === "assign_recount" ? 1000 : 2000} caracteres. ${purpose === "assign_recount" ? "A designação não registra a contagem física." : "Parecer opcional, com autoria própria."}`}
+              helpText={`${(fields[purpose === "assign_recount" ? "reason" : "comment"] ?? "").length}/${purpose === "assign_recount" ? 1000 : 2000} caracteres. ${purpose === "assign_recount" ? "A designação não registra a contagem física." : "Revisão opcional, com autoria própria."}`}
             >
               <TextAreaField
                 ref={textRef}
@@ -884,7 +884,7 @@ export function BalanceDocumentPreparation({
             >
               {purpose === "assign_recount"
                 ? "Revisar designação"
-                : "Revisar parecer"}
+                : "Conferir revisão"}
             </ActionButton>
           </>
         ) : null}
@@ -894,13 +894,13 @@ export function BalanceDocumentPreparation({
             aria-label={
               purpose === "assign_recount"
                 ? "Conferência da designação"
-                : "Conferência do parecer"
+                : "Conferência da revisão"
             }
           >
             <h3 ref={reviewRef} tabIndex={-1}>
               {purpose === "assign_recount"
                 ? "Confira a designação"
-                : "Confira seu parecer"}
+                : "Confira sua revisão"}
             </h3>
             {source && !unavailable ? (
               <BalancePreparationFacts source={source} />
@@ -915,7 +915,7 @@ export function BalanceDocumentPreparation({
               <p>
                 Grupo autorizado:{" "}
                 {purpose === "review_family" ? "Família" : "Supervisão"}. A
-                confirmação registra seu parecer independente e segue a política
+                confirmação registra sua revisão independente e segue a política
                 vigente da contagem.
               </p>
             )}
@@ -924,7 +924,7 @@ export function BalanceDocumentPreparation({
               <h3>
                 {purpose === "assign_recount"
                   ? "Sua justificativa"
-                  : "Seu parecer"}
+                  : "Sua revisão"}
               </h3>
               <p className="whitespace-pre-wrap wrap-anywhere">
                 {fields[purpose === "assign_recount" ? "reason" : "comment"] ||
@@ -940,7 +940,7 @@ export function BalanceDocumentPreparation({
                   returnFocusRef.current = true;
                 }}
               >
-                {purpose === "assign_recount" ? "Voltar" : "Voltar ao parecer"}
+                {purpose === "assign_recount" ? "Voltar" : "Voltar à revisão"}
               </ActionButton>
               {!uncertain ? (
                 <ActionButton

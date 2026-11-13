@@ -9,8 +9,9 @@ import { progressPeoplePage, type ProgressPacket } from "@/lib/validation/docume
 
 type Publication = NonNullable<ProgressPacket["publication"]>;
 type Person = z.infer<typeof progressPeoplePage>["data"][number];
-export function ProgressPublicationOptions({ id, patientId, value, onChange, disabled }: {
+export function ProgressPublicationOptions({ id, patientId, value, onChange, disabled, canPrivate = false, collective = false }: {
   id: string; patientId: string; value: Publication; onChange: (value: Publication) => void; disabled: boolean;
+  canPrivate?: boolean; collective?: boolean;
 }) {
   const [search, setSearch] = useState(""), [query, setQuery] = useState<string | null>(null), [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Person[]>([]);
@@ -29,6 +30,8 @@ export function ProgressPublicationOptions({ id, patientId, value, onChange, dis
         {Object.entries(progressRelevance).map(([key, item]) => <option key={key} value={key}>{item.label}</option>)}
       </SelectField>
     </FormField>
+    {canPrivate ? <FormField label="Visibilidade do andamento"><SelectField value={collective ? "public" : value.visibility ?? "public"} disabled={disabled || collective} onChange={event => onChange({ ...value, visibility: event.currentTarget.value as "public" | "family" })}><option value="public">Todos com acesso à ficha</option><option value="family">Privado · família e pessoas mencionadas</option></SelectField></FormField> : null}
+    {collective ? <Notice>Você mencionou @todos. Este andamento será visível a todos com acesso à ficha; a opção de privado está indisponível.</Notice> : <p className="hca-field-help">{value.visibility === "family" ? "Privado: somente a família autorizada e as pessoas mencionadas que já podem ler esta ficha." : "Visível somente às pessoas que já têm acesso à ficha."}</p>}
     <p className="hca-field-help">Escolha ao publicar. Uma menção identifica a pessoa citada; não registra ciência, autoria, assinatura ou recebimento.</p>
     <div className="hca-toolbar">
       <TextInput aria-label="Nome da pessoa a mencionar" value={search} maxLength={100} onChange={event => setSearch(event.currentTarget.value)} />

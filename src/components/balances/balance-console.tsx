@@ -52,15 +52,15 @@ export function BalanceConsole() {
     </Workspace>
   );
 }
-function FollowUp({ context }: { context: WorkspaceContext }) {
+function FollowUp({ context }: { context: WorkspaceContext; }) {
   const router = useRouter(),
     params = useSearchParams(),
     recountDocumentId = params.get("recountDocumentId");
   const patient = context.patient!,
     { data, error: loadError, reload } = useBalanceWorkspace(patient.id);
   const [editor, setEditor] = useState<BalancePreparationSelection | null>(
-      null,
-    ),
+    null,
+  ),
     [opener, setOpener] = useState<HTMLElement | null>(null);
   const [error, setError] = useState(""),
     [message, setMessage] = useState(""),
@@ -76,16 +76,32 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
   const family = ["family", "admin"].includes(patient.role),
     approve = family && can(context, "bal.defer.approve"),
     configure = family && can(context, "bal.schedule.manage");
+  const requestedDeferral = params.get("purpose") === "request_deferral";
+  useEffect(() => {
+    if (!requestedDeferral || !data) return;
+    let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      const assignment = data.eligibility.assignment;
+      if (assignment && can(context, "bal.defer.request") && (assignment.professional_id === context.userId || patient.role === "supervisor")) {
+        setEditor({ purpose: "request_deferral", targetResourceId: assignment.id });
+        setOpener(resultRef.current);
+      } else setError("Não há uma atribuição elegível para solicitar adiamento neste contexto. Consulte a programação atual.");
+      const url = new URL(window.location.href); url.searchParams.delete("purpose");
+      window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+    });
+    return () => { active = false; };
+  }, [requestedDeferral, data, context, patient.role]);
   useEffect(() => {
     const controller = new AbortController();
-    api<{ data: DocumentSummary[] }>(
+    api<{ data: DocumentSummary[]; }>(
       "/api/documents?" +
-        new URLSearchParams({
-          careRecipientId: patient.id,
-          type: "BAL",
-          status: "submitted",
-          pageSize: "20",
-        }),
+      new URLSearchParams({
+        careRecipientId: patient.id,
+        type: "BAL",
+        status: "submitted",
+        pageSize: "20",
+      }),
       undefined,
       controller.signal,
     )
@@ -171,8 +187,8 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
             </ActionButton>
           ) : null}
           {!data.regime?.activated_at &&
-          !data.eligibility.assignment &&
-          can(context, "bal.count") ? (
+            !data.eligibility.assignment &&
+            can(context, "bal.count") ? (
             <Link
               href="/fichas/bal"
               className="ui-button ui-button-primary"
@@ -182,7 +198,7 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
             </Link>
           ) : null}
           {can(context, "schedule.read.own") ||
-          can(context, "schedule.read.team") ? (
+            can(context, "schedule.read.team") ? (
             <Link
               href="/escalas"
               className="ui-button ui-button-secondary"
@@ -228,8 +244,8 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
                     "/fichas/bal" +
                     (data.eligibility.documentId
                       ? "?documentId=" +
-                        data.eligibility.documentId +
-                        (a.kind === "recount" ? "&recount=true" : "")
+                      data.eligibility.documentId +
+                      (a.kind === "recount" ? "&recount=true" : "")
                       : "")
                   }
                   className="ui-button ui-button-primary"
@@ -458,9 +474,9 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
                 (o) =>
                   o.count_document_id === d.id || o.regularized_by === d.id,
               ) &&
-              !a &&
-              (can(context, "bal.approve.family") ||
-                can(context, "bal.approve.supervisor")) ? (
+                !a &&
+                (can(context, "bal.approve.family") ||
+                  can(context, "bal.approve.supervisor")) ? (
                 <Link
                   href={recountHref(patient.id, d.id)}
                   className="ui-button ui-button-secondary"
@@ -511,7 +527,7 @@ function FollowUp({ context }: { context: WorkspaceContext }) {
           onClose={() =>
             router.replace(
               "/balancos?" +
-                new URLSearchParams({ careRecipientId: patient.id }),
+              new URLSearchParams({ careRecipientId: patient.id }),
               { scroll: false },
             )
           }

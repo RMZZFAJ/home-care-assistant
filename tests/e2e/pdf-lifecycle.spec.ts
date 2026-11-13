@@ -21,7 +21,7 @@ test.setTimeout(180_000);
 for (const type of ["REQ", "COM", "ENT", "BAL"]) test(type + " V15 generates signed lifecycle facts through the existing pipeline and preserves the chosen cutoff", async ({ page, browser }, info) => {
  const f = await cancellationFixture(type), id = f.document.id, childId = await createComplementCandidate(f, "COM"), child = await loadComplementDocument(f.admin, childId);
  const before = awarenessFacts(id), source = await awareness(f.family, id);
- const legacyPdf = (target: Page, url: string, client = f.admin) => generatedPdf(target, url, (key, version) => rpc(client, "reserve_pdf_issuance_v15", { p_document: id, p_key: key, p_version: version }));
+ const legacyPdf = (target: Page, url: string, client = f.admin) => generatedPdf(target, url, (key, version) => rpc(client, "reserve_pdf_issuance", { p_document: id, p_key: key, p_version: version }));
  await login(page, fixtures.adminA.email, f.patient);
  let historical: Buffer | null = null;
  const historicUrl = "/api/documents/" + id + "/pdf?version=" + f.beforeCancel.version;
@@ -37,7 +37,7 @@ for (const type of ["REQ", "COM", "ENT", "BAL"]) test(type + " V15 generates sig
  for (const value of [source.cancellation.reason, "Ciência própria do cancelamento", child.protocol, "Complemento formal preservando o documento original.", "As ciências anteriores da emissão"])
   expect(text).toContain(compact(value));
  const metadata = await rpc(f.admin, "pdf_issuances", { p_document: id }), current = (metadata.data as PdfIssuance[]).find(row => row.version !== f.beforeCancel.version)!;
- expect(current.rendererRevision).toBe(15); expect(current.state).toBe("ready");
+ expect(current.rendererRevision).toBe(16); expect(current.state).toBe("ready");
  expect(current.validation?.profile).toBe("PAdES-B-T"); expect(current.validation?.accepted).toBe(true);
  expect(createHash("sha256").update(bytes).digest("hex")).toBe(current.sha256);
  expect(await (await legacyPdf(page, url)).body()).toEqual(bytes);

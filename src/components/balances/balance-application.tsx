@@ -52,7 +52,7 @@ export function BalanceApplication({ data, userId, patientActive, onRefresh, onE
   useEffect(() => { onEditingChange(Boolean(group) || busy); }, [group, busy, onEditingChange]);
   useEffect(() => {
     if (recoveryFocusRef.current && !pending && !busy) {
-      recoveryFocusRef.current = false;headingRef.current?.focus();
+      recoveryFocusRef.current = false; headingRef.current?.focus();
     }
   }, [pending, busy]);
   function retain(packet: BalanceApplicationPacket | null) {
@@ -76,7 +76,7 @@ export function BalanceApplication({ data, userId, patientActive, onRefresh, onE
       action: "apply_balance", idempotencyKey: crypto.randomUUID(), expectedVersion: data.version,
       body: { group: selected, reviewReference: data.balanceReview!.referenceHash },
     };
-    inFlightRef.current = true;setSending(true);setError("");setAbsent(false);setObsolete(false);
+    inFlightRef.current = true; setSending(true); setError(""); setAbsent(false); setObsolete(false);
     try {
       retain(packet);
       const result = await api<unknown>("/api/documents/" + data.id, packet);
@@ -85,29 +85,31 @@ export function BalanceApplication({ data, userId, patientActive, onRefresh, onE
       const saved = localStorage.getItem(key);
       if (saved && parseBalanceApplicationIntent(saved, scope).idempotencyKey === packet.idempotencyKey) localStorage.removeItem(key);
       confirmedFocusRef.current = true;
-      setPending(null);setGroup(null);setMessage("Aplicação da contagem registrada com autoria própria. O parecer permanece separado.");onRefresh();
+      setPending(null); setGroup(null); setMessage("Aplicação da contagem registrada com autoria própria. A revisão permanece separado."); onRefresh();
     } catch (reason) {
-      setGroup(null);setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a aplicação. Consulte a mesma tentativa.");
-    } finally { setSending(false);inFlightRef.current = false; }
+      setGroup(null); setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a aplicação. Consulte a mesma tentativa.");
+    } finally { setSending(false); inFlightRef.current = false; }
   }
   async function recover() {
     if (!pending || inFlightRef.current || !patientActive) return;
-    inFlightRef.current = true;setReading(true);setError("");setAbsent(false);setObsolete(false);
+    inFlightRef.current = true; setReading(true); setError(""); setAbsent(false); setObsolete(false);
     try {
-      const query = new URLSearchParams({ careRecipientId: scope.patientId, documentId: data.id,
-        idempotencyKey: pending.idempotencyKey, expectedVersion: String(pending.expectedVersion), ...pending.body });
-      const response = await api<{ data: unknown }>("/api/balances/application?" + query);
+      const query = new URLSearchParams({
+        careRecipientId: scope.patientId, documentId: data.id,
+        idempotencyKey: pending.idempotencyKey, expectedVersion: String(pending.expectedVersion), ...pending.body
+      });
+      const response = await api<{ data: unknown; }>("/api/balances/application?" + query);
       const result = balanceApplicationResult.parse(response.data);
       if (result.documentId !== data.id || result.idempotencyKey !== pending.idempotencyKey)
         throw new Error("A consulta não corresponde à tentativa preservada.");
       if (result.state === "found") {
         if (result.version !== pending.expectedVersion + 1 || result.application.actorId !== userId)
           throw new Error("A consulta não confirmou a autoria e a versão da aplicação preservada.");
-        retain(null);recoveryFocusRef.current = true;setMessage("Aplicação original recuperada por consulta. Nenhum movimento foi repetido.");onRefresh();
+        retain(null); recoveryFocusRef.current = true; setMessage("Aplicação original recuperada por consulta. Nenhum movimento foi repetido."); onRefresh();
       } else if (result.state === "obsolete") setObsolete(true);
       else setAbsent(true);
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Não foi possível consultar a tentativa. Sua referência foi mantida."); }
-    finally { setReading(false);inFlightRef.current = false; }
+    finally { setReading(false); inFlightRef.current = false; }
   }
   return <section className="hca-form-stack" aria-label="Aplicação da contagem ao estoque">
     <h3 ref={headingRef} tabIndex={-1}>Aplicação da contagem ao estoque</h3>
@@ -129,13 +131,13 @@ export function BalanceApplication({ data, userId, patientActive, onRefresh, onE
     {pending ? <Notice>A referência desta tentativa foi preservada. Consulte o resultado antes de outra aplicação.
       <ActionButton disabled={busy || !patientActive} onClick={() => void recover()}>Consultar aplicação desta tentativa</ActionButton>
       {absent ? <><p>Nenhum ato desta tentativa foi encontrado na consulta. Reenviar usa a mesma chave e os mesmos dados.</p><ActionButton disabled={busy || !patientActive} onClick={() => void send(true)}>Reenviar a mesma confirmação</ActionButton></> : null}
-      {obsolete ? <><p>A tentativa não foi encontrada e sua versão foi superada. Essa versão antiga não pode mais aplicar a contagem.</p><ActionButton disabled={busy} onClick={() => { try { retain(null);setObsolete(false);onRefresh(); } catch (reason) { setError(reason instanceof Error ? reason.message : "A referência foi mantida."); } }}>Voltar à ficha atual</ActionButton></> : null}
+      {obsolete ? <><p>A tentativa não foi encontrada e sua versão foi superada. Essa versão antiga não pode mais aplicar a contagem.</p><ActionButton disabled={busy} onClick={() => { try { retain(null); setObsolete(false); onRefresh(); } catch (reason) { setError(reason instanceof Error ? reason.message : "A referência foi mantida."); } }}>Voltar à ficha atual</ActionButton></> : null}
     </Notice> : null}
-    {!pending && ready && patientActive && facts.success ? <div className="hca-toolbar">{(data.balanceReview?.applicationGroups ?? []).map(value => <ActionButton key={value} disabled={busy} onClick={event => { openerRef.current = event.currentTarget;confirmedFocusRef.current = false;setGroup(value); }}>
+    {!pending && ready && patientActive && facts.success ? <div className="hca-toolbar">{(data.balanceReview?.applicationGroups ?? []).map(value => <ActionButton key={value} disabled={busy} onClick={event => { openerRef.current = event.currentTarget; confirmedFocusRef.current = false; setGroup(value); }}>
       Aplicar contagem pelo grupo {value === "family" ? "familiar" : "de supervisão"}
     </ActionButton>)}</div> : null}
     <Dialog open={group !== null} title="Aplicar contagem ao estoque" closeDisabled={busy} onClose={() => setGroup(null)} finalFocus={finalFocus}>
-      <div className="hca-form-stack"><p>Esta confirmação é o ato que aplica a contagem. Registrar um parecer não altera o estoque.</p>
+      <div className="hca-form-stack"><p>Esta confirmação é o ato que aplica a contagem. Registrar uma revisão não altera o estoque.</p>
         <DefinitionGrid items={[{ label: "Ficha", value: data.code ?? "BAL" }, { label: "Contagem", value: data.balanceReview?.countVersion ?? "Não identificada" }, { label: "Versão consultada", value: data.version }, { label: "Grupo", value: group === "family" ? "Família" : "Supervisão" }]} />
         <div className="hca-toolbar"><ActionButton disabled={busy} onClick={() => setGroup(null)}>Voltar sem aplicar</ActionButton><ActionButton variant="primary" disabled={busy || !patientActive} onClick={() => void send()}>Confirmar aplicação da contagem</ActionButton></div>
       </div>

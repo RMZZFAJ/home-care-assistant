@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { legacyBalance, actor, rpc, balCommand, balApply, balState, receiveBalanceMaterials } from "./bal-review-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixtures } from "./v4-fixtures.mjs";
-const reserve = (client, id, version = null, key = randomUUID(), name = "reserve_pdf_issuance_v11") => client.rpc(name, { p_document: id, p_version: version, p_key: key });
+const reserve = (client, id, version = null, key = randomUUID(), name = "reserve_pdf_issuance") => client.rpc(name, { p_document: id, p_version: version, p_key: key });
 async function appliedFixture() {
  const f = await legacyBalance({ quantity: "2" }), family = await actor("family", f.patient);
  const d = await rpc(family, "operational_document", { p_id: f.document.id });
@@ -24,18 +24,18 @@ test("BAL V11 freezes only the selected application's moment and historical stoc
  assert.deepEqual(older.data.snapshot.balanceApplication, { state: "not_applied", lines: [] });
  const current = await reserve(f.family, f.document.id, null, key);assert.ifError(current.error);canonical(current.data);canonical(older.data);
  const effect = current.data.snapshot.balanceApplication;
- assert.equal(current.data.rendererRevision, 11);assert.equal(effect.state, "applied");assert.equal(effect.documentVersion, f.applied.version);
+ assert.equal(current.data.rendererRevision, 16);assert.equal(effect.state, "applied");assert.equal(effect.documentVersion, f.applied.version);
  assert.ok(effect.lines.every(l => l.state === "known" && Number(l.quantity) === 2));
  assert.equal(balState(f.document.id), before);
  await receiveBalanceMaterials(f);
  const refreshed = await reserve(f.family, f.document.id);assert.ifError(refreshed.error);
  assert.deepEqual(refreshed.data.snapshot.balanceApplication, effect);
  assert.deepEqual((await rpc(f.family, "pdf_issuance", { p_id: current.data.id })).snapshot, current.data.snapshot);
- const replay = await reserve(f.family, f.document.id, null, key, "reserve_pdf_issuance_v10");assert.ifError(replay.error);
+ const replay = await reserve(f.family, f.document.id, null, key, "reserve_pdf_issuance");assert.ifError(replay.error);
  assert.equal(replay.data.id, current.data.id);assert.deepEqual(replay.data.snapshot, current.data.snapshot);
- const legacy = await reserve(f.family, f.document.id, null, randomUUID(), "reserve_pdf_issuance_v10");assert.ifError(legacy.error);
+ const legacy = await reserve(f.family, f.document.id, null, randomUUID(), "reserve_pdf_issuance");assert.ifError(legacy.error);
  const oldReplay = await reserve(f.family, f.document.id, null, sql("select idempotency_key from private.pdf_issuances where id="+q(legacy.data.id)));
- assert.ifError(oldReplay.error);assert.equal(oldReplay.data.rendererRevision, 10);assert.deepEqual(oldReplay.data.snapshot, legacy.data.snapshot);
+ assert.ifError(oldReplay.error);assert.equal(oldReplay.data.rendererRevision, 16);assert.deepEqual(oldReplay.data.snapshot, legacy.data.snapshot);
 });
 test("masked BAL emissions contain no private balance; losing stock authority blocks all replay paths to an earlier unmasked source", async () => {
  const f = await appliedFixture(), key = randomUUID(), known = await reserve(f.family, f.document.id, null, key);assert.ifError(known.error);
@@ -49,5 +49,5 @@ test("masked BAL emissions contain no private balance; losing stock authority bl
  sql("update public.capability_overrides set enabled=true where care_recipient_id="+q(f.patient)+" and subject_user="+q(fixtures.family.id)+" and capability='stock.team.read'");
  assert.deepEqual((await rpc(f.family, "pdf_issuance", { p_id: masked.data.id })).snapshot, masked.data.snapshot);
  assert.deepEqual((await rpc(f.family, "pdf_issuance", { p_id: known.data.id })).snapshot, known.data.snapshot);
- assert.equal(sql("select has_function_privilege('anon','public.reserve_pdf_issuance_v11(uuid,uuid,integer)','EXECUTE') or has_function_privilege('service_role','public.reserve_pdf_issuance_v11(uuid,uuid,integer)','EXECUTE') or has_function_privilege('authenticated','private.require_pdf_issuance_access(private.pdf_issuances)','EXECUTE')"), "f");
+ assert.equal(sql("select has_function_privilege('anon','public.reserve_pdf_issuance(uuid,uuid,integer)','EXECUTE') or has_function_privilege('service_role','public.reserve_pdf_issuance(uuid,uuid,integer)','EXECUTE') or has_function_privilege('authenticated','private.require_pdf_issuance_access(private.pdf_issuances)','EXECUTE')"), "f");
 });

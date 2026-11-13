@@ -33,6 +33,7 @@ import {
 import { formatBrazilDate } from "@/lib/receipt";
 import { PurchaseReceiptContent } from "./purchase-details";
 import { DeliveryConsumptionReferences } from "./delivery-cancellation";
+import { familyFulfillmentDescription } from "@/lib/documents/family-fulfillment";
 
 export type DocumentAction =
   | "submit"
@@ -51,7 +52,7 @@ export type DocumentAction =
   | "consent_cancel"
   | "refuse_cancellation"
   | "withdraw_cancellation";
-export type ReceiptDraftHandle = { snapshot: () => ReceiptDraftContent };
+export type ReceiptDraftHandle = { snapshot: () => ReceiptDraftContent; };
 export type CommandEditorProps = {
   action: DocumentAction;
   data: SupplyDocument;
@@ -62,7 +63,7 @@ export type CommandEditorProps = {
     action: string,
     body: unknown,
     summary: string,
-    draftCommit?: { id: string; revision: number },
+    draftCommit?: { id: string; revision: number; },
     expectedVersion?: number,
   ) => void;
   formRef?: Ref<HTMLFormElement>;
@@ -100,8 +101,8 @@ export function CommandEditorFields({
   );
   const [receiptId, setReceiptId] = useState(
     initialDraft?.fields.receiptId ??
-      data.receipts.find((receipt) => receipt.state === "pending")?.id ??
-      "",
+    data.receipts.find((receipt) => receipt.state === "pending")?.id ??
+    "",
   );
   const selectedReceipt = data.receipts.find(
     (receipt) => receipt.id === receiptId && receipt.state === "pending",
@@ -114,7 +115,7 @@ export function CommandEditorFields({
   );
   const [resolutionSelection, setResolutionSelection] = useState(
     initialDraft?.fields.resolution ??
-      (data.recipient_id === context.userId ? "received" : "returned"),
+    (data.recipient_id === context.userId ? "received" : "returned"),
   );
   const [frozenRequest] = useState(() => ({
     ...(action === "consent_cancel"
@@ -217,8 +218,8 @@ export function CommandEditorFields({
   }, [onDraftChange, captureSnapshot, fieldRevision]);
   const [selectedLine, setSelectedLine] = useState(
     initialDraft?.fields.lineId ??
-      data.lines.find((line) => line.metadata.issueOpen)?.id ??
-      "",
+    data.lines.find((line) => line.metadata.issueOpen)?.id ??
+    "",
   );
   const lines = data.lines.filter((line) =>
     action === "purchase"
@@ -262,7 +263,7 @@ export function CommandEditorFields({
             if (quantity(value).gt(limit))
               throw new Error(
                 "A quantidade supera o limite deste ato para " +
-                  line.name_snapshot,
+                line.name_snapshot,
               );
             return [{ lineId: line.id, quantity: quantity(value).toFixed() }];
           })
@@ -326,7 +327,7 @@ export function CommandEditorFields({
           action === "validate_receipt"
             ? "Validar este recebimento e incorporar suas quantidades ao estoque familiar."
             : "Rejeitar o recebimento indicado, sem entrada no estoque. Motivo: " +
-              reason;
+            reason;
         summary +=
           "\nParcela informada por " +
           (selectedReceipt.submitted_name ?? "autor histórico não preservado") +
@@ -443,8 +444,8 @@ export function CommandEditorFields({
           );
         const returned = data.lines.map((line) => {
           const source = reference.lines.find(
-              (item) => item.lineId === line.id,
-            ),
+            (item) => item.lineId === line.id,
+          ),
             raw = quantity(line.accepted_quantity).isZero()
               ? "0"
               : (returns[line.id] ?? "");
@@ -506,6 +507,7 @@ export function CommandEditorFields({
       onSubmit={submit}
       onChange={() => setFieldRevision((value) => value + 1)}
     >
+      {data.type === "ENT" && ["receive", "divergence"].includes(action) ? <section className="ui-card hca-form-stack" aria-label="Avaliação familiar de atendimento"><h3>Informação da família para este recebimento</h3>{data.lines.map(line => { const description = familyFulfillmentDescription(line); return description ? <p key={line.id}><strong>{line.name_snapshot}.</strong> {description}</p> : null; })}<p>Você confirma as quantidades físicas. A avaliação familiar permanece em leitura.</p></section> : null}
       {action === "receive" && data.type === "ENT" ? (
         <Notice>
           Confirmar tudo aceita integralmente todos os produtos expedidos. Use
@@ -513,106 +515,106 @@ export function CommandEditorFields({
         </Notice>
       ) : null}
       {["approve", "purchase"].includes(action) ||
-      (action === "receive" && data.type === "COM")
+        (action === "receive" && data.type === "COM")
         ? lines.map((line) => {
-            const remaining =
-              action === "approve"
-                ? line.quantity
-                : action === "purchase"
-                  ? acquisitionRemaining(line).toFixed()
-                  : arrivalRemaining(line, data).toFixed();
-            return (
-              <div key={line.id} className="space-y-1">
-                <label
-                  htmlFor={instanceId + line.id}
-                  className="block text-sm font-semibold"
-                >
-                  {line.name_snapshot} · {line.unit_snapshot}
-                </label>
-                <input
-                  id={instanceId + line.id}
-                  className={inputClass}
-                  name={line.id}
-                  type="text"
-                  inputMode="decimal"
-                  maxLength={64}
-                  defaultValue={
-                    initialDraft?.fields[line.id] ??
-                    (action === "approve" ? remaining : "")
-                  }
-                  required={action === "approve"}
-                  aria-describedby={instanceId + line.id + "-help"}
-                />
-                <p
-                  id={instanceId + line.id + "-help"}
-                  className="text-xs text-(--muted)"
-                >
-                  Limite deste ato:{" "}
-                  {formatQuantity(remaining, line.unit_snapshot)}.{" "}
-                  {action === "receive"
-                    ? "Informe somente o que chegou nesta parcela. Deixe vazio se não chegou."
-                    : action === "purchase"
-                      ? "Informe somente o adquirido agora. Deixe vazio para as outras linhas."
-                      : "Aprovar não registra aquisição ou entrada no estoque."}
-                </p>
-              </div>
-            );
-          })
+          const remaining =
+            action === "approve"
+              ? line.quantity
+              : action === "purchase"
+                ? acquisitionRemaining(line).toFixed()
+                : arrivalRemaining(line, data).toFixed();
+          return (
+            <div key={line.id} className="space-y-1">
+              <label
+                htmlFor={instanceId + line.id}
+                className="block text-sm font-semibold"
+              >
+                {line.name_snapshot} · {line.unit_snapshot}
+              </label>
+              <input
+                id={instanceId + line.id}
+                className={inputClass}
+                name={line.id}
+                type="text"
+                inputMode="decimal"
+                maxLength={64}
+                defaultValue={
+                  initialDraft?.fields[line.id] ??
+                  (action === "approve" ? remaining : "")
+                }
+                required={action === "approve"}
+                aria-describedby={instanceId + line.id + "-help"}
+              />
+              <p
+                id={instanceId + line.id + "-help"}
+                className="text-xs text-(--muted)"
+              >
+                Limite deste ato:{" "}
+                {formatQuantity(remaining, line.unit_snapshot)}.{" "}
+                {action === "receive"
+                  ? "Informe somente o que chegou nesta parcela. Deixe vazio se não chegou."
+                  : action === "purchase"
+                    ? "Informe somente o adquirido agora. Deixe vazio para as outras linhas."
+                    : "Aprovar não registra aquisição ou entrada no estoque."}
+              </p>
+            </div>
+          );
+        })
         : null}
       {action === "divergence"
         ? data.lines.map((line) => (
-            <div
-              key={line.id}
-              className="rounded-lg border border-(--line) p-3"
-            >
-              <label className="flex items-center gap-3 text-sm font-semibold">
-                <input
-                  type="checkbox"
-                  checked={divergent.includes(line.id)}
-                  onChange={(event) =>
-                    setDivergent((current) =>
-                      event.target.checked
-                        ? [...current, line.id]
-                        : current.filter((id) => id !== line.id),
-                    )
-                  }
-                />
-                {line.name_snapshot} · expedido{" "}
-                {formatQuantity(line.quantity, line.unit_snapshot)}
-              </label>
-              {divergent.includes(line.id) ? (
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  <label className="text-sm">
-                    Efetivamente recebido
-                    <input
-                      className={inputClass}
-                      name={line.id}
-                      defaultValue={initialDraft?.fields[line.id] ?? ""}
-                      type="text"
-                      inputMode="decimal"
-                      maxLength={64}
-                      required
-                    />
-                  </label>
-                  <label className="text-sm">
-                    Diferença encontrada
-                    <select
-                      className={inputClass}
-                      name={line.id + ":problem"}
-                      defaultValue={
-                        initialDraft?.fields[line.id + ":problem"] ?? "shortage"
-                      }
-                    >
-                      <option value="shortage">Quantidade menor</option>
-                      <option value="damaged">Material avariado</option>
-                      <option value="wrong">Produto divergente</option>
-                      <option value="other">Outra diferença</option>
-                    </select>
-                  </label>
-                </div>
-              ) : null}
-            </div>
-          ))
+          <div
+            key={line.id}
+            className="rounded-lg border border-(--line) p-3"
+          >
+            <label className="flex items-center gap-3 text-sm font-semibold">
+              <input
+                type="checkbox"
+                checked={divergent.includes(line.id)}
+                onChange={(event) =>
+                  setDivergent((current) =>
+                    event.target.checked
+                      ? [...current, line.id]
+                      : current.filter((id) => id !== line.id),
+                  )
+                }
+              />
+              {line.name_snapshot} · expedido{" "}
+              {formatQuantity(line.quantity, line.unit_snapshot)}
+            </label>
+            {divergent.includes(line.id) ? (
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <label className="text-sm">
+                  Efetivamente recebido
+                  <input
+                    className={inputClass}
+                    name={line.id}
+                    defaultValue={initialDraft?.fields[line.id] ?? ""}
+                    type="text"
+                    inputMode="decimal"
+                    maxLength={64}
+                    required
+                  />
+                </label>
+                <label className="text-sm">
+                  Diferença encontrada
+                  <select
+                    className={inputClass}
+                    name={line.id + ":problem"}
+                    defaultValue={
+                      initialDraft?.fields[line.id + ":problem"] ?? "shortage"
+                    }
+                  >
+                    <option value="shortage">Quantidade menor</option>
+                    <option value="damaged">Material avariado</option>
+                    <option value="wrong">Produto divergente</option>
+                    <option value="other">Outra diferença</option>
+                  </select>
+                </label>
+              </div>
+            ) : null}
+          </div>
+        ))
         : null}
       {["validate_receipt", "reject_receipt"].includes(action) ? (
         <div className="space-y-3">
@@ -749,9 +751,9 @@ export function CommandEditorFields({
             >
               <option value="">Selecione</option>
               {selectedLine &&
-              !data.lines.some(
-                (line) => line.id === selectedLine && line.metadata.issueOpen,
-              ) ? (
+                !data.lines.some(
+                  (line) => line.id === selectedLine && line.metadata.issueOpen,
+                ) ? (
                 <option value={selectedLine}>
                   Linha preservada indisponível para esta conciliação
                 </option>
@@ -774,10 +776,10 @@ export function CommandEditorFields({
               onChange={(event) => setResolutionSelection(event.target.value)}
             >
               {!["returned", "missing"].includes(resolutionSelection) &&
-              !(
-                resolutionSelection === "received" &&
-                data.recipient_id === context.userId
-              ) ? (
+                !(
+                  resolutionSelection === "received" &&
+                  data.recipient_id === context.userId
+                ) ? (
                 <option value={resolutionSelection}>
                   Solução preservada indisponível para sua atuação
                 </option>
@@ -842,7 +844,7 @@ export function CommandEditorFields({
               </legend>
               <div>
                 {reviewDisabled ||
-                data.deliveryCancellation?.sourceAccess === false ? (
+                  data.deliveryCancellation?.sourceAccess === false ? (
                   <p>
                     As fontes estão em conferência ou indisponíveis. Consulte as
                     referências autorizadas atuais antes de decidir.
@@ -914,14 +916,14 @@ export function CommandEditorFields({
                 {quantity(line.accepted_quantity).isZero()
                   ? formatQuantity("0", line.unit_snapshot)
                   : returns[line.id] !== undefined &&
-                      validQuantity(returns[line.id], 6, true) &&
-                      quantity(returns[line.id]).lte(line.accepted_quantity)
+                    validQuantity(returns[line.id], 6, true) &&
+                    quantity(returns[line.id]).lte(line.accepted_quantity)
                     ? formatQuantity(
-                        quantity(line.accepted_quantity)
-                          .minus(quantity(returns[line.id]))
-                          .toFixed(),
-                        line.unit_snapshot,
-                      )
+                      quantity(line.accepted_quantity)
+                        .minus(quantity(returns[line.id]))
+                        .toFixed(),
+                      line.unit_snapshot,
+                    )
                     : "Aguardando declaração da devolução real"}
               </p>
             </fieldset>

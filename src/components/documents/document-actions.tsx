@@ -33,6 +33,7 @@ type Props = {
   trackNotices?: boolean;
   actionTarget?: HTMLElement | null;
   onAction?: () => void;
+  generationBlocked?: boolean;
 };
 const intentionSchema = z.object({ key: z.uuid(), version: z.number().int().positive().max(2147483647).optional(), documentOptions: pdfDocumentOptionsSchema.optional() }).strict();
 type Intention = z.infer<typeof intentionSchema>;
@@ -54,16 +55,12 @@ export function DocumentActions(props: Props) {
       userId={data.userId}
       canAudit={Boolean(value && value.activeContext?.mode === "patient" && data.documentContext?.id === props.id && value.patient?.id === data.documentContext.patientId && can(value, "audit.read"))}
       canAccess={Boolean(value && value.activeContext?.mode === "patient" && data.documentContext?.id === props.id && value.patient?.id === data.documentContext.patientId && can(value, "document.access.read"))}
-      entDocument={
-        data.documentContext?.id === props.id &&
-        data.documentContext.type === "ENT"
-      }
     />
   ) : (
     <p role="status">Validando acesso aos arquivos…</p>
   );
 }
-function InitialNoticeTracking({ id }: { id: string }) {
+function InitialNoticeTracking({ id }: { id: string; }) {
   const [state, setState] = useState<InitialNoticeState>({ kind: "checking" });
   useEffect(
     () =>
@@ -94,10 +91,10 @@ function GeneratedFiles({
   canAccess,
   archiveVersion,
   trackNotices = true,
-  entDocument,
   actionTarget,
   onAction,
-}: Props & { userId: string; entDocument: boolean; canAudit: boolean; canAccess: boolean }) {
+  generationBlocked = false,
+}: Props & { userId: string; canAudit: boolean; canAccess: boolean; }) {
   const headingId = useId(),
     scope = `hca:pdf-intention:${userId}:${id}`,
     endpoint = `/api/documents/${id}/issuances`;
@@ -139,14 +136,14 @@ function GeneratedFiles({
         setRows((current) =>
           cursor
             ? [
-                ...current,
-                ...page.data.data.filter(
-                  (r) =>
-                    !current.some(
-                      (c) => c.kind === r.kind && c.reference === r.reference,
-                    ),
-                ),
-              ]
+              ...current,
+              ...page.data.data.filter(
+                (r) =>
+                  !current.some(
+                    (c) => c.kind === r.kind && c.reference === r.reference,
+                  ),
+              ),
+            ]
             : page.data.data,
         );
         setNext(page.data.next);
@@ -200,7 +197,7 @@ function GeneratedFiles({
     };
   }, [busy, pending, load]);
   async function generate(documentOptions?: DocumentOptions) {
-    if (busyRef.current || integrityError) return;
+    if (busyRef.current || integrityError || generationBlocked && !pending) return;
     busyRef.current = true;
     setBusy(true);
     setError("");
@@ -307,7 +304,7 @@ function GeneratedFiles({
           <button
             className={buttonClass}
             type="button"
-            disabled={busy || integrityError}
+            disabled={busy || integrityError || generationBlocked && !pending}
             onClick={() => {
               onAction?.();
               void generate();
@@ -330,7 +327,8 @@ function GeneratedFiles({
           Atualizar arquivos
         </button>
       </div>
-      <button className={buttonClass} type="button" disabled={busy || Boolean(pending) || integrityError} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button>
+      {generationBlocked ? <p role="status">Atualize a ficha para gerar um novo PDF. Os exemplares já emitidos continuam disponíveis.</p> : null}
+      <button className={buttonClass} type="button" disabled={busy || Boolean(pending) || integrityError || generationBlocked} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button>
       <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={optionsOpen} onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} onGenerate={value => { setOptionsOpen(false); onAction?.(); void generate(value); }} />
       <p className="text-xs text-(--muted)">
         Cada nova geração cria um exemplar. Visualizar e baixar recuperam o
@@ -349,18 +347,9 @@ function GeneratedFiles({
       ) : null}
       <ul className="hca-file-records" aria-label="Exemplares registrados">
         {visibleRows.map((entry) => {
-          if (entry.kind !== "issuance")
-            return (
-              <LegacyFile
-                key={`${entry.kind}:${entry.reference}`}
-                entry={entry}
-                id={id}
-                code={code}
-              />
-            );
           const row = entry.issuance;
           return (
-            <FileRecord key={row.id} identity={row.id}
+            <FileRecord key={row.id} identity={row.id} mime="application/pdf"
               title={<>{code}{row.documentOptions ? " · " + documentModeLabel(row.documentOptions) : ""} · Versão {row.version} · {steps[row.step]}</>}
               actions={<>              {row.state === "ready" ? (
                 <div className="mt-2 flex flex-wrap gap-3">
@@ -394,7 +383,7 @@ function GeneratedFiles({
                     : "O arquivo ficará disponível após assinatura, validação e confirmação do armazenamento."}
                 </p>
               )}
-</>}
+              </>}
             >
               <p className="text-sm">
                 Solicitado por {row.requestedName} ·{" "}
@@ -404,14 +393,6 @@ function GeneratedFiles({
                 <p className="text-sm">
                   Emissão concluída em {formatBrazilDate(row.readyAt)} ·
                   Assinatura técnica e carimbo internos
-                </p>
-              ) : null}
-              {entDocument && row.rendererRevision < 9 ? (
-                <p className="ui-notice text-sm" role="note">
-                  Este arquivo preserva orientações de uma emissão anterior.
-                  Consulte a ficha no aplicativo para saber se há tarefa atual.
-                  Você pode gerar um novo PDF para obter a representação
-                  atualizada; o arquivo original permanece preservado.
                 </p>
               ) : null}
               {row.representation === "derived" ? (
@@ -443,36 +424,5 @@ function GeneratedFiles({
       ) : null}
       {trackNotices ? <InitialNoticeTracking id={id} /> : null}
     </section>
-  );
-}
-
-function LegacyFile({
-  entry,
-  id,
-  code,
-}: {
-  entry: Exclude<PdfArchiveEntry, { kind: "issuance" }>;
-  id: string;
-  code: string;
-}) {
-  const url = `/api/documents/${id}/pdf?version=${entry.version}&renderer=${entry.kind === "legacy_original" ? "legacy" : entry.renderer}`;
-  return (
-    <FileRecord identity={entry.reference}
-      title={<>{code} · Versão {entry.version} · {entry.kind === "legacy_original" ? "Arquivo original registrado" : `Representação legada V${entry.renderer}`}</>}
-      actions={<><a className={buttonClass} href={url} target="_blank" rel="noopener">Visualizar arquivo legado</a><a className={buttonClass} href={url} download>Baixar arquivo legado</a></>}
-    >
-      <p className="text-sm">
-        Registrado no acervo em {formatBrazilDate(entry.at)}. A data de emissão
-        e o solicitante do arquivo não foram preservados neste registro.
-      </p>
-      <p className="text-sm">
-        Legado: assinatura incorporada não comprovada neste registro. O download
-        confere os bytes e não gera outra representação.
-      </p>
-      <details className="text-sm">
-        <summary>Identificação do arquivo legado</summary>
-        <p className="break-all">SHA-256: {entry.sha256}</p>
-      </details>
-    </FileRecord>
   );
 }

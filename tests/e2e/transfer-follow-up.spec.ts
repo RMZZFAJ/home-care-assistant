@@ -96,7 +96,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) test(`Transfer follow-up 
   await expect(milestone(page, "Expedição")).toHaveAttribute("data-state", "pending");
   const next = panel(page).getByRole("button", { name: "Abrir Declaração e expedição", exact: true });
   await next.focus(); await next.press("Enter");
-  await expect(page.getByRole("tab", { name: "Atendimento", exact: true })).toBeFocused();
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
   await expect(panel(page)).toContainText(returned ? "Esta devolução pode ser registrada de forma autônoma" : "esse vínculo é opcional");
   expect(facts(f.patient)).toBe(before);
   doc = await command(counterparty, doc, "agree");

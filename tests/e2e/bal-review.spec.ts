@@ -36,7 +36,7 @@ const drawer = (page: Page) =>
     exact: true,
   });
 const commentField = (page: Page) =>
-  drawer(page).getByRole("textbox", { name: /^Seu parecer sobre a contagem/ });
+  drawer(page).getByRole("textbox", { name: /^Sua revisão sobre a contagem/ });
 const button = (page: Page, name: string) =>
   drawer(page).getByRole("button", { name, exact: true });
 
@@ -105,11 +105,11 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
         } else await route.continue();
       },
     );
-    await button(reviewer, "Revisar parecer").click();
+    await button(reviewer, "Conferir revisão").click();
     await button(reviewer, "Confirmar revisão").click();
     await expect(button(reviewer, "Recuperar revisão")).toBeVisible();
     await expect(button(reviewer, "Fechar edição")).toBeDisabled();
-    await expect(button(reviewer, "Voltar ao parecer")).toBeDisabled();
+    await expect(button(reviewer, "Voltar à revisão")).toBeDisabled();
     await button(reviewer, "Recuperar revisão").click();
     await expect(drawer(reviewer)).toHaveCount(0);
     expect(attempts).toHaveLength(2);
@@ -204,7 +204,7 @@ test("BAL com referência alterada conserva o parecer e adota explicitamente o n
     releaseInitial();
   }
   expect((await initialReference).status()).toBe(200);
-  await expect(button(page, "Revisar parecer")).toBeEnabled();
+  await expect(button(page, "Conferir revisão")).toBeEnabled();
   await expect(commentField(page)).toHaveValue(ownComment);
   let officialPosts = 0;
   page.on("request", (request) => {
@@ -216,7 +216,7 @@ test("BAL com referência alterada conserva o parecer e adota explicitamente o n
       officialPosts++;
   });
   await receiveBalanceMaterials(f);
-  await button(page, "Revisar parecer").click();
+  await button(page, "Conferir revisão").click();
   // The fresh pre-review read now catches this conflict before any official POST.
   await expect(button(page, "Confirmar revisão")).toHaveCount(0);
   expect(officialPosts).toBe(0);
@@ -228,9 +228,9 @@ test("BAL com referência alterada conserva o parecer e adota explicitamente o n
   });
   await expect(comparison).toBeVisible();
   await expect(
-    button(page, "Adotar referência atual e manter meu parecer"),
+    button(page, "Adotar referência atual e manter minha revisão"),
   ).toBeEnabled(); // A historical opinion is allowed; application remains separate.
-  await expect(button(page, "Revisar parecer")).toBeDisabled();
+  await expect(button(page, "Conferir revisão")).toBeDisabled();
   const old = await rpc(f.admin, "operational_document", {
     p_id: f.document.id,
   });
@@ -258,16 +258,16 @@ test("BAL com referência alterada conserva o parecer e adota explicitamente o n
   await expect(button(page, "Consultar referência atual")).toBeFocused();
   await expect(commentField(page)).toHaveValue(ownComment);
   await expect(
-    button(page, "Adotar referência atual e manter meu parecer"),
+    button(page, "Adotar referência atual e manter minha revisão"),
   ).toBeEnabled();
-  await button(page, "Adotar referência atual e manter meu parecer").click();
+  await button(page, "Adotar referência atual e manter minha revisão").click();
   await expect(comparison).toHaveCount(0);
   await expect(commentField(page)).toHaveValue(ownComment);
   await expect(
     drawer(page).getByText(recounted.payload.notes, { exact: true }),
   ).toBeVisible();
   const before = ledger(f.patient);
-  await button(page, "Revisar parecer").click();
+  await button(page, "Conferir revisão").click();
   await button(page, "Confirmar revisão").click();
   await expect(drawer(page)).toHaveCount(0);
   const document = (

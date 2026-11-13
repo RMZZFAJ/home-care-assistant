@@ -27,13 +27,13 @@ test("expanded sources cover all four types, freeze all 25 notes and preserve se
   await publish(f,"Andamento posterior ao instante congelado");
   assert.deepEqual((await rpc(f.admin,"reserve_pdf_expanded_issuance",p)).snapshot,a.snapshot);
   assert.equal(progressFacts(f),before);
-  assert.equal((await f.admin.rpc("reserve_pdf_issuance_v16",{p_document:f.id,p_key:p.p_key})).error?.code,"23505");
+  assert.equal((await f.admin.rpc("reserve_pdf_issuance",{p_document:f.id,p_key:p.p_key})).error?.code,"23505");
   assert.throws(()=>sql("update private.pdf_issuances set document_options='{}' where id="+q(a.id)),/immutable issuance options/);
  }
 });
 
 test("audit and access complements need their own patient competence on reservation, replay, download-source and both archives",async()=>{
- const f=await fixture(),basic=await rpc(f.family,"reserve_pdf_issuance_v16",{p_document:f.id,p_key:randomUUID()}),audit=packet(f,options("audit",["progress"]));
+ const f=await fixture(),basic=await rpc(f.family,"reserve_pdf_issuance",{p_document:f.id,p_key:randomUUID()}),audit=packet(f,options("audit",["progress"]));
  assert.equal((await f.family.rpc("reserve_pdf_expanded_issuance",audit)).error?.code,"42501");
  authorize(f,fixtures.family.id,"audit.read",true);
  const row=await rpc(f.family,"reserve_pdf_expanded_issuance",audit);assert.ok(row.snapshot.documentExpansion.auditTrail.length);assert.equal(row.snapshot.documentExpansion.access,null);

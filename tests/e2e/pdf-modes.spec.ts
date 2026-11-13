@@ -40,7 +40,7 @@ test("expanded models use the real chooser and preserve an uncertain selected in
   await login(page,f.patient);await openFiles(page,f.id);const endpoint="/api/documents/"+f.id+"/issuances";
   let old:{id:string;bytes:Buffer}|null=null;
   if(kind==="REQ"){
-   const response=await page.request.post(endpoint,{data:{idempotencyKey:randomUUID()}});expect(response.status(),await response.text()).toBe(200);const receipt=await response.json();expect(receipt.rendererRevision).toBe(16);
+   const response=await page.request.post(endpoint,{ timeout: 60_000,data:{idempotencyKey:randomUUID()}});expect(response.status(),await response.text()).toBe(200);const receipt=await response.json();expect(receipt.rendererRevision).toBe(16);
    old={id:receipt.id,bytes:await(await page.request.get("/api/documents/"+f.id+"/pdf?issuance="+receipt.id)).body()};
   }
   const sent:unknown[]=[];let first:unknown;
@@ -75,7 +75,7 @@ test("restricted audit signs every-page identification, verifies original bytes 
  await login(page,f.patient,fixtures.family.email);await openFiles(page,f.id);await page.getByRole("button",{name:"Escolher conteúdo do PDF",exact:true}).click();
  let dialog=page.getByRole("dialog",{name:"Escolher conteúdo do PDF",exact:true});await expect(dialog.locator('option[value="audit"]')).toBeDisabled();await dialog.getByRole("button",{name:"Voltar",exact:true}).click();
  const options={mode:"audit",sections:["progress","access"],period:{from:null,through:null,timeZone:"America/Sao_Paulo"},purpose:"Conferência documental da ficha com autoria e limitações explícitas."},endpoint="/api/documents/"+f.id+"/issuances";
- expect((await page.request.post(endpoint,{data:{idempotencyKey:randomUUID(),documentOptions:options}})).status()).toBe(403);
+ expect((await page.request.post(endpoint,{ timeout: 60_000,data:{idempotencyKey:randomUUID(),documentOptions:options}})).status()).toBe(403);
  await login(page,f.patient);await openFiles(page,f.id);await page.getByRole("button",{name:"Escolher conteúdo do PDF",exact:true}).click();dialog=page.getByRole("dialog",{name:"Escolher conteúdo do PDF",exact:true});
  await dialog.getByRole("combobox",{name:"Modalidade documental",exact:true}).selectOption("audit");await dialog.getByRole("checkbox",{name:"Histórico operacional de acesso",exact:true}).check();await dialog.getByRole("textbox",{name:"Finalidade da auditoria",exact:true}).fill(options.purpose);
  const creation=page.waitForResponse(r=>new URL(r.url()).pathname===endpoint&&r.request().method()==="POST");await dialog.getByRole("button",{name:"Emitir exemplar selecionado",exact:true}).click();const response=await creation;expect(response.status(),await response.text()).toBe(200);

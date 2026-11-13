@@ -11,17 +11,17 @@ import type { DocumentType } from "@/types/documents";
 import { RelatedDocument } from "./related-document";
 
 const names: Record<DocumentType, string> = { REQ: "Requisição", COM: "Compra ou doação", ENT: "Entrega ou devolução", BAL: "Balanço" };
-type Props = { documentId: string; version: number; userId: string; activeContext: boolean; onRecorded: () => void };
+type Props = { documentId: string; version: number; userId: string; activeContext: boolean; onRecorded: () => void; };
 export function DocumentComplementsPanel({ documentId, version, userId, activeContext, onRecorded }: Props) {
   const [page, setPage] = useState(1), [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const decode = useCallback((raw: unknown) => parseDocumentComplements((raw as { data: unknown }).data, documentId, page), [documentId, page]);
+  const decode = useCallback((raw: unknown) => parseDocumentComplements((raw as { data: unknown; }).data, documentId, page), [documentId, page]);
   const read = useScopedRead(`/api/documents/${documentId}/complements?page=${page}`, String(version), decode);
   const data = !read.error ? read.data : null;
   const refreshed = () => { read.refresh(); onRecorded(); };
   return <section className="ui-card space-y-4" aria-label="Fichas complementares" aria-busy={read.loading}>
     <h2>Fichas complementares</h2>
-    <p>O conteúdo emitido permanece preservado. Um complemento usa uma nova ficha e um vínculo próprio; não substitui ciência, recebimento ou atendimento e não altera estoque por si só.</p>
+    <p>Uma ficha complementar tem identidade e emissão próprias. O vínculo registra motivo, autoria e momento, preservando o conteúdo da origem. Use quando outro ato precisar de uma ficha própria relacionada à anterior. O vínculo não registra ciência ou recebimento e não altera estoque por si só.</p>
     {read.loading ? <p role="status">Consultando vínculos autorizados…</p> : null}
     {read.error ? <Notice error>{read.error}</Notice> : null}
     {data && !read.loading ? <>
@@ -74,7 +74,7 @@ function ComplementEditor({ source, userId, activeContext, onRecorded, onClose, 
     });
     return () => { live = false; };
   }, [storageKey]);
-  const decode = useCallback((raw: unknown) => parseComplementCandidates((raw as { data: unknown }).data, sourceId, type, query, page), [sourceId, type, query, page]);
+  const decode = useCallback((raw: unknown) => parseComplementCandidates((raw as { data: unknown; }).data, sourceId, type, query, page), [sourceId, type, query, page]);
   const read = useScopedRead(ready && !attempt && !confirmed && !denied ? endpoint + `?mode=candidates&type=${type}&search=${encodeURIComponent(query)}&page=${page}` : null, "", decode);
   const data = !read.loading && !read.error ? read.data : null;
   const selected = data?.documents.find(d => d.id === selectedId);
@@ -88,7 +88,7 @@ function ComplementEditor({ source, userId, activeContext, onRecorded, onClose, 
     if (sendingRef.current || !activeContext) return;
     sendingRef.current = true; setBusy(true); setError(""); setNotFound(false); setAttempt(input); setReview(null);
     try { sessionStorage.setItem(storageKey, JSON.stringify(input)); } catch { /* Keep this same intention in memory. */ }
-    try { const raw = await api<{ data: unknown }>(endpoint, input); requireComplementConfirmation(raw.data, input); done(); }
+    try { const raw = await api<{ data: unknown; }>(endpoint, input); requireComplementConfirmation(raw.data, input); done(); }
     catch (cause) { failed(cause); }
     finally { sendingRef.current = false; setBusy(false); }
   }
@@ -96,7 +96,7 @@ function ComplementEditor({ source, userId, activeContext, onRecorded, onClose, 
     if (sendingRef.current || !attempt) return;
     sendingRef.current = true; setBusy(true); setError("");
     try {
-      const raw = await api<{ data: unknown }>(endpoint + "?mode=attempt&key=" + attempt.idempotencyKey);
+      const raw = await api<{ data: unknown; }>(endpoint + "?mode=attempt&key=" + attempt.idempotencyKey);
       const result = parseComplementAttempt(raw.data, sourceId, attempt);
       if (result.state === "confirmed") done(); else { setNotFound(true); setDenied(false); }
     } catch (cause) { failed(cause); setNotFound(false); }

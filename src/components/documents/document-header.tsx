@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, type ReactNode, type Ref } from "react";
+import { useEffect, useRef, useState, type ReactNode, type Ref } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { StatusBadge, Icon } from "@/components/ui/primitives";
 import { ActionButton, Pill } from "@/components/ui/controls";
@@ -59,7 +59,7 @@ export function DocumentHeader({
   actions?: ReactNode;
   secondaryActions?: ReactNode;
   moreTriggerRef?: Ref<HTMLButtonElement>;
-  metadata?: { label: string; value: ReactNode }[];
+  metadata?: { label: string; value: ReactNode; }[];
   milestones?: ReactNode;
   badges?: ReactNode;
   headingLevel?: 1 | 2;
@@ -74,6 +74,15 @@ export function DocumentHeader({
   const Heading = headingLevel === 1 ? "h1" : "h2";
   const [copyMessage, setCopyMessage] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
+  const [compact, setCompact] = useState(false);
+  const markerRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const marker = markerRef.current;
+    if (!marker) return;
+    const observer = new IntersectionObserver(([entry]) => setCompact(!entry.isIntersecting && entry.boundingClientRect.top < 115), { rootMargin: "-115px 0px 0px", threshold: 0 });
+    observer.observe(marker);
+    return () => observer.disconnect();
+  }, [id]);
   const actionClosedRef = useRef(false);
   const facts = [
     ...metadata.slice(0, 1),
@@ -85,12 +94,13 @@ export function DocumentHeader({
     <>
       <section
         className="hca-document-header"
+        data-type={code.startsWith("DEV-") ? "DEV" : type}
         ref={observedRef}
         aria-label="Resumo da ficha"
       >
         <div className="hca-document-identity">
           <div className="hca-document-name">
-            <span className="hca-document-type">{type}</span>
+            <span className="hca-document-type">{code.startsWith("DEV-") ? "DEV" : type}</span>
             <div>
               <Heading tabIndex={-1} data-document-heading>
                 {code}
@@ -101,7 +111,6 @@ export function DocumentHeader({
           <div className="hca-document-tags">
             <StatusBadge status={status} label={statusLabel} />
             {badges}
-            <Pill>Versão {version}</Pill>
             {contextLabel ? <Pill>Perfil: {contextLabel}</Pill> : null}
           </div>
         </div>
@@ -117,7 +126,9 @@ export function DocumentHeader({
           <div className="hca-document-context">{children}</div>
         ) : null}
         {milestones}
+        <span ref={markerRef} className="hca-compact-marker" aria-hidden="true" />
       </section>
+      {compact ? <div className="hca-document-compact" aria-label="Identificação da ficha durante rolagem"><span className="hca-document-type">{code.startsWith("DEV-") ? "DEV" : type}</span><strong>{code}</strong><StatusBadge status={status} label={statusLabel} />{badges}</div> : null}
       <div
         className="hca-document-action-bar"
         role="group"
@@ -163,6 +174,8 @@ export function DocumentHeader({
               finalFocus={() => (actionClosedRef.current ? false : true)}
             >
               {secondaryActions ? (
+                // Delegated native button/link clicks also cover keyboard
+                // activation. This container is not an additional widget.
                 <div
                   className="hca-document-more-actions"
                   onClick={(event) => {
@@ -194,7 +207,9 @@ export function DocumentHeader({
                   <dt>Identificador</dt>
                   <dd>{id}</dd>
                 </div>
+                <div><dt>Revisão técnica</dt><dd>{version}</dd></div>
               </dl>
+              <ActionButton onClick={() => { const url = new URL(window.location.href); url.searchParams.set("documentTab", "history"); window.history.replaceState(null, "", url.pathname + url.search + url.hash); actionClosedRef.current = true; setMoreOpen(false); }}>Identificação e registros preservados</ActionButton>
               <ActionButton
                 onClick={() => {
                   if (!navigator.clipboard?.writeText) {

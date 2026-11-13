@@ -1,5 +1,5 @@
 "use client";
-import {roleLabel} from "@/lib/role-labels";
+import { roleLabel } from "@/lib/role-labels";
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -112,10 +112,21 @@ export function AcceptInvitation() {
     setBusy(true); setError("");
     const epoch = scopeRef.current;
     try {
-      const result = await api<{ notice: string }>("/api/invitations/register", { token, email: form.get("email"), password: parsed.data, fullName: form.get("fullName") });
+      const result = await api<{ notice: string; }>("/api/invitations/register", { token, email: form.get("email"), password: parsed.data, fullName: form.get("fullName") });
       if (epoch === scopeRef.current) setNotice(result.notice);
     } catch (reason) { if (epoch === scopeRef.current) setError(reason instanceof Error ? reason.message : "Não foi possível concluir o cadastro."); }
     finally { if (epoch === scopeRef.current) setBusy(false); }
+  }
+  async function google() {
+    if (busy) return;
+    setBusy(true); setError("");
+    try {
+      const client = createSupabaseBrowserClient();
+      if (!client) throw new Error("Serviço de acesso indisponível.");
+      const result = await client.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + "/auth/callback?next=" + encodeURIComponent("/acesso/continuar?next=" + encodeURIComponent("/convites/aceitar")) } });
+      if (result.error) throw new Error("Não foi possível iniciar o acesso com Google. Use e-mail e senha ou tente novamente.");
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "Não foi possível iniciar o acesso."); }
+    finally { setBusy(false); }
   }
   const terminal = preview && ["expired", "revoked", "invalid", "declined"].includes(preview.state);
   return <AccessFrame active="invitation" title="Convite de acesso ao paciente"><div className="hca-access-form">
@@ -147,6 +158,7 @@ export function AcceptInvitation() {
         <label className="block">E-mail do convite<input className={inputClass} name="email" type="email" autoComplete="email" required disabled={busy} /></label>
         <NewPasswordField label="Senha pessoal" className={inputClass} disabled={busy} />
         <button type="submit" className={primaryClass} disabled={busy}>{busy ? "Registrando…" : "Criar minha conta"}</button>
+        <div className="hca-access-divider"><span />ou<span /></div><button type="button" className={buttonClass} disabled={busy} onClick={() => void google()}>Continuar com Google</button>
       </form></details></> : null}
     </>}
   </div></AccessFrame>;

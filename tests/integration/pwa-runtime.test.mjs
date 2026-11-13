@@ -12,7 +12,7 @@ test("public runtime marker exposes no identity or authority and retains closed 
   });
   const { data, error } = await anonymous.rpc("client_schema_contract");
   assert.ifError(error);
-  assert.deepEqual(data, { protocol: 1, schema: 1 });
+  assert.deepEqual(data, { protocol: 1, schema: 2 });
   const authenticated = createClient(env.url, env.anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });

@@ -55,7 +55,7 @@ const text = (page: Page, purpose: BalanceDocumentPurpose) =>
     name:
       purpose === "assign_recount"
         ? /^Sua justificativa para o reconto/
-        : /^Seu parecer sobre a contagem/,
+        : /^Sua revisão sobre a contagem/,
   });
 async function login(page: Page, f: Fixture) {
   await page.goto("/login");
@@ -203,11 +203,11 @@ for (const purpose of [
         adopt =
           purpose === "assign_recount"
             ? "Adotar referência atual"
-            : "Adotar referência atual e manter meu parecer",
+            : "Adotar referência atual e manter minha revisão",
         review =
           purpose === "assign_recount"
             ? "Revisar designação"
-            : "Revisar parecer",
+            : "Conferir revisão",
         confirm =
           purpose === "assign_recount"
             ? "Confirmar designação"
