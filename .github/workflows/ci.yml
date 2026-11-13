@@ -134,7 +134,8 @@ jobs:
       - run: npm run test:harness -- --project=${{ matrix.project }}
       - run: npm run e2e -- --project=${{ matrix.project }} --shard=${{ matrix.shard }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: failure() || cancelled()
+        # A recovered retry is a successful job but still needs failure artifacts.
+        if: always()
         with:
           name: browser-test-report-${{ matrix.artifact }}
           path: |
