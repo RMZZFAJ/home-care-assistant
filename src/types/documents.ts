@@ -2,6 +2,7 @@ import type { BalanceReviewItem } from "@/lib/validation/balance-review-items";
 import type { BalanceApplicationFacts } from "@/lib/validation/balance-application";
 
 export type DocumentType = "REQ" | "COM" | "ENT" | "BAL";
+export type DocumentKind = DocumentType | "DEV";
 export type SupplyType = Exclude<DocumentType, "REQ">;
 export type Custody = "FAMILY" | "CARE_TEAM";
 export type Capabilities = Record<string, boolean>;
@@ -21,14 +22,19 @@ export type SupplyLine = {
   metadata: Record<string, unknown>;
   presentation_conversions?: unknown;
   requisitionItemIds: string[];
+  family_fulfillment?: "partial" | "complete" | null;
+  fulfillment_decided_by?: string | null;
+  fulfillment_decided_name?: string | null;
+  fulfillment_decided_at?: string | null;
 };
 export type DraftLine = {
   productId: string;
   quantity: string;
   requisitionItemIds?: string[];
+  requestFulfillment?: "partial" | "complete";
   metadata?: Record<string, string>;
   manualQuantity?: string;
-  presentations?: { id: string; version: number; packages: string }[];
+  presentations?: { id: string; version: number; packages: string; }[];
 };
 export type SupplyPayload = {
   lines: DraftLine[];
@@ -63,7 +69,7 @@ export type SupplyPayload = {
 export type DeliveryPreparation = {
   source: Custody;
   destination: Custody;
-  people: { id: string; name: string; role: string }[];
+  people: { id: string; name: string; role: string; }[];
   shifts: {
     id: string;
     professionalId: string;
@@ -168,7 +174,7 @@ export type PurchaseReceipt = {
   id: string;
   state: "pending" | "approved" | "rejected";
   submitted_by: string;
-  lines: { lineId: string; quantity: string }[];
+  lines: { lineId: string; quantity: string; }[];
   created_at: string;
   submission_key?: string | null;
   submitted_name?: string | null;
@@ -345,6 +351,8 @@ export type SupplyDocument = {
   id: string;
   care_recipient_id: string;
   type: DocumentType;
+  kind?: DocumentKind;
+  fulfillmentReviews?: { id: string; lineId: string; decision: "partial" | "complete"; reason: string; actorId: string; actorName: string; recordedAt: string; expectedVersion: number; expeditedQuantity: string; acceptedQuantity: string ;}[];
   number: number | null;
   code: string | null;
   protocol: string | null;
@@ -393,7 +401,7 @@ export type SupplyDocument = {
   fullyCheckedLines: number;
   totalLines: number;
 };
-export type PatientPerson = { id: string; name: string; role: string };
+export type PatientPerson = { id: string; name: string; role: string; };
 export type ItemContext = {
   productId: string;
   familyStock: string | null;
@@ -419,7 +427,7 @@ export type CatalogProduct = {
     unit: string;
     active: boolean;
   } | null;
-  selectionPredecessors?: { id: string; name: string; unit: string }[];
+  selectionPredecessors?: { id: string; name: string; unit: string; }[];
 };
 export const documentLabels: Record<DocumentType, string> = {
   REQ: "Requisição",
@@ -467,13 +475,14 @@ export type DocumentSummary = {
   id: string;
   version: number;
   type: DocumentType;
-  fulfillment?: { fulfilled: number; total: number };
+  kind?: DocumentKind;
+  fulfillment?: { fulfilled: number; total: number; };
   code: string | null;
   protocol: string | null;
   status: string;
   created_at: string;
   recipient_id: string | null;
-  task?: { code: string; label: string } | null;
+  task?: { code: string; label: string; } | null;
   document_lines?: {
     id: string;
     fully_checked: boolean;

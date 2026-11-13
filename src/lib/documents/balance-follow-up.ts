@@ -2,7 +2,7 @@ import type { SupplyDocument } from "@/types/documents";
 import type { BalanceRecountContext } from "@/types/balances";
 
 type Facts = Pick<SupplyDocument, "status" | "protocol" | "balanceReview" | "balanceRecount">;
-type Step = { heading: string; description: string; pending: boolean; label: string; section: "workflow" | "history"; statusLabel?: string };
+type Step = { heading: string; description: string; pending: boolean; label: string; section: "workflow" | "history"; statusLabel?: string; };
 
 type Recount = Pick<BalanceRecountContext, "activeAssignment" | "requiresDesignation"> & Partial<Pick<BalanceRecountContext, "lastAssignment">>;
 export function currentBalanceRecount(context?: Recount) {
@@ -37,12 +37,12 @@ export function balanceFollowUp(data: Facts): Step {
   };
   if (review.hasItemDifferences) return {
     ...workflow, heading: "Acompanhar as diferenças apontadas no balanço", pending: true,
-    description: "Há materiais com diferença declarada em parecer. O parecer não corrige o estoque; consulte o encaminhamento e o ato autorizado de reconto ou ajuste, preservando a contagem original.",
+    description: "Há materiais com diferença declarada em revisão. A revisão não corrige o estoque; consulte o encaminhamento e o ato autorizado de reconto ou ajuste, preservando a contagem original.",
   };
   if (data.status === "submitted" && !review.reconciliationApplied && review.referenceState !== "current") return {
     ...workflow, heading: "Conferir a referência do balanço", pending: true,
     description: review.referenceState === "historical"
-      ? "O estoque recebeu movimentos posteriores à referência desta contagem. Essa referência não permite concluir a conciliação atual; consulte o reconto autorizado, preservando a contagem e os pareceres anteriores."
+      ? "O estoque recebeu movimentos posteriores à referência desta contagem. Essa referência não permite concluir a conciliação atual; consulte o reconto autorizado, preservando a contagem e as revisões anteriores."
       : "A referência necessária para apurar o efeito desta contagem não está disponível. Consulte o reconto autorizado; não foi presumido saldo zero, aprovação ou conciliação.",
   };
   if (data.status === "approved" && review.reconciliationApplied) return {
@@ -51,14 +51,14 @@ export function balanceFollowUp(data: Facts): Step {
   };
   if (data.status === "submitted" && review.reviewSatisfied) return {
     ...workflow, heading: "Confirmar a aplicação da contagem ao estoque", pending: true,
-    description: "As revisões previstas foram registradas. A aplicação ainda depende de uma confirmação própria por pessoa habilitada e da referência válida. Os pareceres, sozinhos, não alteraram o estoque.",
+    description: "As revisões previstas foram registradas. A aplicação ainda depende de uma confirmação própria por pessoa habilitada e da referência válida. As revisões, sozinhos, não alteraram o estoque.",
   };
   if (data.status === "submitted" && review.reviewRequired) return {
     ...workflow, heading: "Acompanhar as revisões do balanço", pending: true,
-    description: "A contagem foi registrada e aguarda as revisões previstas na política atual. Cada parecer tem autoria própria, distinta de quem contou. Consulte separadamente os pareceres, a referência e o efeito de conciliação, sem presumir conclusão.",
+    description: "A contagem foi registrada e aguarda as revisões previstas na política atual. Cada revisão tem autoria própria, distinta de quem contou. Consulte separadamente as revisões, a referência e o efeito de conciliação, sem presumir conclusão.",
   };
   return {
     ...workflow, heading: "Consultar o efeito da contagem", pending: !review.reconciliationApplied,
-    description: "Consulte a contagem, os pareceres e o efeito efetivamente registrado. O estado documental, sozinho, não comprova ajuste de estoque; não repita uma operação para tentar atualizar esta consulta.",
+    description: "Consulte a contagem, as revisões e o efeito efetivamente registrado. O estado documental, sozinho, não comprova ajuste de estoque; não repita uma operação para tentar atualizar esta consulta.",
   };
 }

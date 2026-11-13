@@ -6,10 +6,11 @@ const amount = z.string().regex(/^\d+(?:\.\d+)?$/);
 const row = z.object({
   id: z.uuid(), version: z.number().int().positive(),
   type: z.enum(["REQ", "COM", "ENT", "BAL"]),
+  kind: z.enum(["REQ", "COM", "ENT", "DEV", "BAL"]).optional(),
   code: z.string().min(1).nullable(), protocol: z.string().min(1).nullable(),
   status: z.string().min(1).max(80), created_at: z.string().datetime({ offset: true }),
   recipient_id: z.uuid().nullable(),
-  fulfillment: z.object({ fulfilled: count, total: count })
+  fulfillment: z.object({ fulfilled: count, total: count, partial: count.optional() })
     .refine(value => value.fulfilled <= value.total).nullable().optional(),
   task: z.object({ code: z.string(), label: z.string() }).nullable().optional(),
   document_lines: z.array(z.object({
@@ -39,7 +40,7 @@ export function parseDocumentListRead(value: unknown, expected: DocumentListScop
   if (result.careRecipientId !== expected.careRecipientId || result.page !== expected.page || result.pageSize !== expected.pageSize
     || Object.entries(result.filters).some(([key, field]) => field !== (expected[key as keyof DocumentListScope].toString().trim() || null))
     || result.data.length !== length || new Set(result.data.map(item => item.id)).size !== result.data.length
-    || (expected.type !== "" && result.data.some(item => item.type !== expected.type))) {
+    || (expected.type !== "" && result.data.some(item => (item.kind ?? item.type) !== expected.type))) {
     throw new Error("A resposta recebida não corresponde à consulta das fichas. Consulte a lista novamente.");
   }
   return { ...result, data: result.data.map(item => ({ ...item, fulfillment: item.fulfillment ?? undefined, document_lines: item.document_lines ?? undefined })) };
@@ -62,7 +63,7 @@ const deliveryResponse = response.extend({
     status: z.enum(["", "tasks", "transfer_pending", "transfer_ready", "pending_receipt", "disputed", "cancellation_pending", "confirmed", "cancelled", "administratively_closed"]),
   }).refine(value => value.status !== "tasks" || value.scope === "own"),
 });
-export type DeliveryListScope = { careRecipientId: string; scope: string; status: string; page: number; pageSize: number };
+export type DeliveryListScope = { careRecipientId: string; scope: string; status: string; page: number; pageSize: number; };
 export function parseDeliveryListRead(value: unknown, expected: DeliveryListScope): {
   data: DeliveryListItem[]; total: number; page: number; pageSize: number;
 } {

@@ -21,7 +21,7 @@ const reviewBody = z
       .string()
       .refine(
         (value) => value.length <= 2000,
-        "Seu parecer permite até 2.000 caracteres.",
+        "Sua revisão permite até 2.000 caracteres.",
       ),
     reviewReference: hash,
     items: balanceReviewItems.optional(),

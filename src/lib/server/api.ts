@@ -27,19 +27,27 @@ export class ApiError extends Error {
 }
 
 export function databaseError(
-  error: { code?: string; message?: string } | null,
+  error: { code?: string; message?: string; } | null,
 ): never {
   const message = error?.message ?? "";
+  if (error?.code === "PT409" && /^family evaluation (reference changed|no longer applicable)$/.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A referência do recebimento mudou. Atualize a ficha e confira as quantidades antes de preparar a avaliação familiar.", 409);
+  if (error?.code === "22023" && message === "reference audience is narrower than publication")
+    throw new ApiError("VALIDATION_ERROR", "Uma referência tem acesso mais restrito que este andamento. Ajuste a visibilidade ou remova a referência antes de publicar.", 400);
+  if (error?.code === "22023" && /^collective mention/.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Com @todos, escolha Todos com acesso à ficha antes de publicar.", 400);
+  if (error?.code === "PT409" && message === "a reminder is already pending for this communication and channel")
+    throw new ApiError("VERSION_CONFLICT", "Já existe um pedido em andamento para esta comunicação e canal. Consulte as tentativas antes de enviar outro.", 409);
   if (error?.code === "PT429" && message === "push test rate limited")
     throw new ApiError("RATE_LIMITED", "Aguarde um minuto entre testes neste aparelho.", 429);
-  if(error?.code==="PT409" && /^(contingency revision changed|contingency material reference changed)$/.test(message))
-    throw new ApiError("VERSION_CONFLICT","A referência da contingência mudou. Compare os registros atuais antes de preparar outra confirmação.",409);
-  if(error?.code==="PT409" && message==="contingency evidence pending")
-    throw new ApiError("ATTACHMENT_PENDING","Há evidência com envio ainda não confirmado. Consulte a mesma tentativa de anexo antes de vincular o registro.",409);
-  if(error?.code==="PT409" && /^(contingency already linked|contingency evidence closed)$/.test(message))
-    throw new ApiError("INVALID_OPERATION","O dossiê já foi vinculado. Consulte o resultado e as evidências preservadas.",409);
-  if(error?.code==="42501" && message==="independent contingency reviewer required")
-    throw new ApiError("FORBIDDEN","A conferência exige outra pessoa com competência local. Quem declarou ou complementou não revisa a própria informação.",403);
+  if (error?.code === "PT409" && /^(contingency revision changed|contingency material reference changed)$/.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A referência da contingência mudou. Compare os registros atuais antes de preparar outra confirmação.", 409);
+  if (error?.code === "PT409" && message === "contingency evidence pending")
+    throw new ApiError("ATTACHMENT_PENDING", "Há evidência com envio ainda não confirmado. Consulte a mesma tentativa de anexo antes de vincular o registro.", 409);
+  if (error?.code === "PT409" && /^(contingency already linked|contingency evidence closed)$/.test(message))
+    throw new ApiError("INVALID_OPERATION", "O dossiê já foi vinculado. Consulte o resultado e as evidências preservadas.", 409);
+  if (error?.code === "42501" && message === "independent contingency reviewer required")
+    throw new ApiError("FORBIDDEN", "A conferência exige outra pessoa com competência local. Quem declarou ou complementou não revisa a própria informação.", 403);
   if (error?.code === "PT409" && /^(issued document reference required|stale document material)$/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "A referência da ficha mudou ou ainda não foi emitida. Consulte seu estado antes de confirmar novamente.", 409);
   if (
@@ -201,7 +209,7 @@ export function databaseError(
   if (/stale balance review|balance review group unavailable/i.test(message))
     throw new ApiError(
       "VERSION_CONFLICT",
-      "A contagem, a revisão ou sua referência mudou. Compare o estado atual; seu parecer foi preservado.",
+      "A contagem, a revisão ou sua referência mudou. Compare o estado atual; sua revisão foi preservado.",
       409,
     );
   if (/balance count attribution unavailable/i.test(message))
@@ -491,11 +499,11 @@ export async function api(
       error instanceof ApiError
         ? error
         : new ApiError(
-            "INTERNAL_ERROR",
-            "Não foi possível concluir a operação.",
-            500,
-            true,
-          );
+          "INTERNAL_ERROR",
+          "Não foi possível concluir a operação.",
+          500,
+          true,
+        );
     // Deliberately exclude payloads, identities, credentials and raw database errors.
     console.error(
       JSON.stringify({
@@ -616,7 +624,7 @@ export async function readJson<T>(
   try {
     json = JSON.parse(body, (_key, value, ...details: unknown[]) => {
       if (typeof value === "number") {
-        const source = (details[0] as { source?: string } | undefined)?.source;
+        const source = (details[0] as { source?: string; } | undefined)?.source;
         // Node is pinned to 24. Compare the wire token before a rounded Number
         // can pass a schema or become an authoritative decimal quantity.
         if (

@@ -12,6 +12,7 @@ const line = z
     productId: z.string().min(1).max(120),
     quantity: exactQuantity,
     requisitionItemIds: z.array(identifier).max(100).optional(),
+    requestFulfillment: z.enum(["partial", "complete"]).optional(),
     metadata: z.record(z.string(), z.string().max(500)).optional(),
     manualQuantity: exactQuantity.optional(),
     presentations: z
@@ -37,7 +38,7 @@ const line = z
     (value) =>
       !value.presentations ||
       new Set(value.presentations.map((row) => row.id)).size ===
-        value.presentations.length,
+      value.presentations.length,
     "Selecione cada apresentação uma única vez.",
   );
 export const supplyPayload = z
@@ -243,7 +244,7 @@ export const supplyCommandSchema = z
               .string()
               .refine(
                 (value) => value.length <= 2000,
-                "O parecer permite até 2.000 caracteres.",
+                "A revisão permite até 2.000 caracteres.",
               )
               .optional(),
             reviewReference: z

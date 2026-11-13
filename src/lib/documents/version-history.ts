@@ -3,7 +3,7 @@ import { formatBrazilDate } from "../receipt";
 import { documentEventLabel } from "../notifications/event-labels";
 import { formatQuantity } from "../quantity";
 
-export type HistoryFact = { key: string; label: string; value: string };
+export type HistoryFact = { key: string; label: string; value: string; };
 export type DocumentVersion = {
   id: string; version: number; action: string; recordedAt: string; hash: string;
   actorId: string | null; actorName: string | null; actorSource: "event_snapshot" | "unknown" | "system";
@@ -11,12 +11,12 @@ export type DocumentVersion = {
 };
 export type VersionComparison = {
   documentId: string; selected: DocumentVersion; before: DocumentVersion | null;
-  versions: { version: number; action: string; createdAt: string; hash: string }[];
+  versions: { version: number; action: string; createdAt: string; hash: string; }[];
 };
 
 /** Node24 preserves the original numeric token so historical decimals never round. */
 export function parseHistorySnapshot(text: string): Record<string, unknown> {
-  const parsed: unknown = JSON.parse(text, (_key: string, value: unknown, context?: { source?: string }) => {
+  const parsed: unknown = JSON.parse(text, (_key: string, value: unknown, context?: { source?: string; }) => {
     if (typeof value !== "number") return value;
     if (typeof context?.source !== "string") throw new Error("Exact numeric source unavailable");
     return context.source;
@@ -32,13 +32,13 @@ const labels: Record<string, string> = {
   unit_snapshot: "Unidade preservada", category_snapshot: "Categoria preservada", urgent: "Urgente", current_stock: "Estoque observado da equipe",
   stock_observation: "Forma da observação", stock_observation_at: "Instante da observação", stock_observation_time_source: "Origem do instante",
   quantity: "Quantidade declarada", approved_quantity: "Quantidade aprovada", purchased_quantity: "Quantidade adquirida", accepted_quantity: "Quantidade aceita", reconciled_quantity: "Quantidade conciliada", waived_quantity: "Expectativa dispensada", fully_checked: "Conferência integral",
-  origin: "Origem", source: "Custódia de origem", destination: "Custódia de destino", notes: "Observações", reason: "Motivo", comment: "Parecer", body: "Relato", text: "Texto registrado",
+  origin: "Origem", source: "Custódia de origem", destination: "Custódia de destino", notes: "Observações", reason: "Motivo", comment: "Revisão", body: "Relato", text: "Texto registrado",
   metadata: "Informações do material", receipt: "Conferência declarada", problem: "Classificação da diferença", acceptedQuantity: "Quantidade aceita na declaração", observation: "Observação", observations: "Observações", intent: "Contexto declarado",
   resolution: "Destino da diferença", returnQuantity: "Quantidade devolvida", consumedQuantity: "Consumo declarado", unknownQuantity: "Quantidade desconhecida", receivedQuantity: "Quantidade recebida", pendingQuantity: "Quantidade pendente", outcome: "Resultado", accepted: "Aceito", decision: "Decisão",
   countVersion: "Contagem", count_version: "Contagem", reviewPolicy: "Política de revisão preservada", balApprovers: "Grupos de revisão habilitados", balRule: "Condição de revisão", balanceContext: "Contexto da contagem", kind: "Tipo da contagem", countedAt: "Instante da contagem", professionalName: "Profissional no registro", shiftType: "Tipo do plantão", startsAt: "Início do plantão", endsAt: "Fim do plantão", timezone: "Fuso", weeks: "Semanas de referência",
   recipientSelection: "Escolha do recebedor", recipientSelectionHistory: "Histórico da escolha", recipientName: "Nome do recebedor", selectedName: "Nome de quem escolheu", recipientRole: "Papel do recebedor", manual: "Escolha manual", official: "Escolha oficial", recordedAt: "Instante do registro", createdAt: "Instante registrado", created_at: "Instante registrado", validated_at: "Instante da validação", importedAt: "Instante da importação", sourceCreatedAt: "Data declarada da origem",
   purchaseReceipts: "Parcelas de chegada", state: "Estado", submitted_name: "Autor da informação", validated_name: "Responsável pela conferência", submittedName: "Autor da informação", validatedName: "Responsável pela conferência",
-  balanceReviews: "Pareceres da contagem", counter: "Contador", reviews: "Pareceres", legacyApprovals: "Aprovações antigas", reviewer_name: "Nome do revisor no registro", review_group: "Grupo revisor", reference_state: "Situação da referência", reviewed_snapshot: "Contagem examinada", reviewed_document_version: "Versão examinada", recorded_at: "Instante do parecer", appliedBeforeReview: "Reconciliação anterior ao parecer",
+  balanceReviews: "Revisões da contagem", counter: "Contador", reviews: "Revisões", legacyApprovals: "Aprovações antigas", reviewer_name: "Nome do revisor no registro", review_group: "Grupo revisor", reference_state: "Situação da referência", reviewed_snapshot: "Contagem examinada", reviewed_document_version: "Versão examinada", recorded_at: "Instante da revisão", appliedBeforeReview: "Reconciliação anterior ao revisão",
   deliveryCancellation: "Cancelamento da entrega", deliveryRegularization: "Regularização da entrega", transfer: "Transferência", request: "Solicitação", history: "Histórico preservado", proposal: "Proposta", requestedName: "Nome do solicitante", requestedAt: "Instante da solicitação", proposedName: "Nome do proponente", proposedAt: "Instante da proposta", decidedName: "Nome do decisor", decidedAt: "Instante da decisão", base: "Base registrada", finding: "Apuração", findings: "Apurações", executedAt: "Instante da execução",
   sciencePolicy: "Acompanhamento da requisição", scienceEvents: "Ciências registradas", fulfillmentLines: "Atendimento por item", familyAware: "Ciência familiar exigida", policy: "Política preservada", mode: "Modo de registro", actor_name: "Nome no evento", attended: "Algum aceite positivo registrado", completed_at: "Instante da conclusão", archived_at: "Instante do arquivamento", archive_reason: "Motivo do arquivamento", manual_archive_required: "Arquivamento manual exigido", science_satisfied_at: "Instante da ciência exigida", isHistorical: "Registro importado", historical: "Registro histórico", source_created_at: "Data declarada da origem", historical_source: "Fonte histórica",
   counterName: "Nome do contador", reviewerName: "Nome do revisor", receiptId: "Parcela vinculada", actorName: "Nome preservado no evento", count: "Contagem", requirement: "Exigência", regularization: "Regularização", cancellation: "Cancelamento", previousStatus: "Situação anterior", previousCountVersion: "Contagem anterior",
@@ -226,7 +226,7 @@ const scalar = (value: unknown, key: string, path: string) => {
 };
 
 /** Project frozen values only; never consult profiles, catalogue, stock or policy now. */
-export function snapshotFacts(body: Record<string, unknown>): { facts: HistoryFact[]; additionalFields: boolean } {
+export function snapshotFacts(body: Record<string, unknown>): { facts: HistoryFact[]; additionalFields: boolean; } {
   const facts: HistoryFact[] = [];
   let additionalFields = false;
   const names = new Map((Array.isArray(body.lines) ? body.lines : []).map(item => {

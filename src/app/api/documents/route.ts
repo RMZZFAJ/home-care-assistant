@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     const from = params.get("from") || null,
       to = params.get("to") || null;
     if (
-      (type && !["REQ", "COM", "ENT", "BAL"].includes(type)) ||
+      (type && !["REQ", "COM", "ENT", "DEV", "BAL"].includes(type)) ||
       (status && !/^[a-z_]{1,40}$/.test(status)) ||
       (search && !/^[A-Za-z0-9-]{1,100}$/.test(search))
     )
@@ -72,30 +72,30 @@ export async function POST(request: Request) {
     );
     const data = input.draftCommit
       ? (
-          (await rpc(
-            auth.client,
-            input.type === "BAL"
-              ? "commit_creation_draft"
-              : "commit_supply_draft",
-            {
-              p_id: input.draftCommit.id,
-              p_expected: input.draftCommit.revision,
-              p_target: null,
-              p_key: input.idempotencyKey,
-              p_body: {
-                action: input.type === "BAL" ? "create_bal" : "create",
-                payload: input.payload,
-              },
+        (await rpc(
+          auth.client,
+          input.type === "BAL"
+            ? "commit_creation_draft"
+            : "commit_supply_draft",
+          {
+            p_id: input.draftCommit.id,
+            p_expected: input.draftCommit.revision,
+            p_target: null,
+            p_key: input.idempotencyKey,
+            p_body: {
+              action: input.type === "BAL" ? "create_bal" : "create",
+              payload: input.payload,
             },
-          )) as { result: unknown }
-        ).result
+          },
+        )) as { result: unknown; }
+      ).result
       : await rpc(auth.client, "create_supply_document", {
-          p_patient: input.careRecipientId,
-          p_type: input.type,
-          p_payload: input.payload,
-          p_key: input.idempotencyKey,
-          p_draft: input.draft,
-        });
+        p_patient: input.careRecipientId,
+        p_type: input.type,
+        p_payload: input.payload,
+        p_key: input.idempotencyKey,
+        p_draft: input.draft,
+      });
     return NextResponse.json(
       {
         data,

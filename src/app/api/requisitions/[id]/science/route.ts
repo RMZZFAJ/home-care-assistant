@@ -2,9 +2,20 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { api, authenticate, parseUuid, readJson, rpc } from "@/lib/server/api";
 
+export async function GET(request: Request, context: { params: Promise<{ id: string; }>; }) {
+  return api("requisition.science.result", async () => {
+    const id = parseUuid((await context.params).id);
+    const identity = z.string().regex(/^[0-9a-f]{64}$/).parse(new URL(request.url).searchParams.get("materialIdentity"));
+    const auth = await authenticate();
+    const progress = await rpc(auth.client, "requisition_progress", { p_id: id }) as { science: { user_id: string; mode: string; material_identity: string | null; created_at: string ;}[] ;};
+    const receipt = progress.science.find(row => row.user_id === auth.userId && row.mode === "express" && row.material_identity === identity);
+    return NextResponse.json({ documentId: id, actorId: auth.userId, materialIdentity: identity, confirmed: Boolean(receipt), recordedAt: receipt?.created_at ?? null }, { headers: { "Cache-Control": "private, no-store" } });
+  });
+}
+
 export async function POST(
   request: Request,
-  context: { params: Promise<{ id: string }> },
+  context: { params: Promise<{ id: string; }>; },
 ) {
   return api("requisition.science", async () => {
     const input = await readJson(

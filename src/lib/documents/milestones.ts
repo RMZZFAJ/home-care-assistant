@@ -114,8 +114,10 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
     const ended = ["declined", "withdrawn"].includes(transfer.state);
     return [
       { label: "Declaração", state: "done", detail: "Preparação registrada; ainda sem emissão ENT" },
-      { label: "Concordância", state: transfer.agreement?.decision === "agree" ? "done" : ended ? "closed" : "pending",
-        detail: transfer.agreement?.decision === "agree" ? "Decisão própria registrada; não é recebimento" : transfer.state === "declined" ? "Contraparte recusou a declaração" : ended ? "Encerrada sem nova decisão" : "Aguardando a contraparte designada" },
+      {
+        label: "Concordância", state: transfer.agreement?.decision === "agree" ? "done" : ended ? "closed" : "pending",
+        detail: transfer.agreement?.decision === "agree" ? "Decisão própria registrada; não é recebimento" : transfer.state === "declined" ? "Contraparte recusou a declaração" : ended ? "Encerrada sem nova decisão" : "Aguardando a contraparte designada"
+      },
       { label: "Expedição", state: ended ? "closed" : "pending", detail: ended ? "Encerrada sem expedir materiais" : "Concordância não expede materiais" },
       { label: "Recebimento", state: ended ? "closed" : "pending", detail: "Sem expedição; nenhum recebimento presumido" },
     ];
@@ -177,8 +179,8 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
           : data.status === "pending_approval"
             ? "Aguardando decisão de aprovação"
             : progress
-          ? `${acquired}/${progress.lines.length} linhas integralmente adquiridas${waived ? "; aquisição restante encerrada" : ""}`
-          : "Referência de aquisição indisponível",
+              ? `${acquired}/${progress.lines.length} linhas integralmente adquiridas${waived ? "; aquisição restante encerrada" : ""}`
+              : "Referência de aquisição indisponível",
       },
       {
         label: "Recebimento",
@@ -194,10 +196,10 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
           : closed
             ? "Encerramento preservado; sem recebimento presumido"
             : progress?.validationPending
-            ? "Conferência de chegada pendente"
-            : !hasAcquisition && progress?.expectationClosed
-              ? "Expectativa encerrada sem nova chegada"
-              : "Consulte chegadas e conferências",
+              ? "Conferência de chegada pendente"
+              : !hasAcquisition && progress?.expectationClosed
+                ? "Expectativa encerrada sem nova chegada"
+                : "Consulte chegadas e conferências",
       },
       {
         label: "Conclusão",
@@ -265,7 +267,7 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
     Boolean(data.protocol) && ["submitted", "approved"].includes(data.status);
   const recountPending = Boolean(
     currentBalanceRecount(data.balanceRecount) ||
-      data.balanceRecount?.requiresDesignation,
+    data.balanceRecount?.requiresDesignation,
   );
   // Approval and reconciliation are separate facts. A later movement does not
   // undo a recorded reconciliation, but a new recount prevents finality.
@@ -294,22 +296,22 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
           : review?.reviewSatisfied && review.policyReviewRequired
             ? "done"
             : review?.reviewRequired === false && !review.policyReviewRequired
-          ? "waived"
-          : data.status === "approved"
-            ? "done"
-            : review
-              ? "pending"
-              : "unknown",
+              ? "waived"
+              : data.status === "approved"
+                ? "done"
+                : review
+                  ? "pending"
+                  : "unknown",
       detail:
         review?.policyReviewRequired === false && review.reviews?.some(row => row.count_version === review.countVersion)
-          ? "Parecer facultativo registrado"
+          ? "Revisão facultativo registrado"
           : review?.reviewSatisfied && review.policyReviewRequired
             ? "Revisões exigidas registradas; aplicação é ato separado"
             : review?.reviewRequired === false && !review.policyReviewRequired
-          ? "Revisão facultativa nesta contagem"
-          : data.status === "approved"
-            ? "Revisões exigidas registradas"
-            : "Consulte autoria e versão das revisões",
+              ? "Revisão facultativa nesta contagem"
+              : data.status === "approved"
+                ? "Revisões exigidas registradas"
+                : "Consulte autoria e versão das revisões",
     },
     {
       label: "Conclusão",
@@ -325,13 +327,13 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
         : review?.hasItemDifferences
           ? "Diferença apontada; correção depende de ato próprio"
           : recountPending
-          ? "Reconto ou nova designação pendente"
-          : complete
-            ? "Contagem aprovada e conciliação registrada"
-            : review?.referenceState !== "current" &&
+            ? "Reconto ou nova designação pendente"
+            : complete
+              ? "Contagem aprovada e conciliação registrada"
+              : review?.referenceState !== "current" &&
                 data.status === "submitted"
-              ? "Referência anterior não permite concluir a conciliação"
-              : "Consulte o efeito e as ressalvas da contagem",
+                ? "Referência anterior não permite concluir a conciliação"
+                : "Consulte o efeito e as ressalvas da contagem",
     },
   ];
 }

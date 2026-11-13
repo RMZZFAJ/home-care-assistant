@@ -163,6 +163,7 @@ export const supplyDraftContent = z
         recipientId: z.union([z.literal(""), z.uuid()]),
         recipientReason: text(1000).optional(),
         sharedNeedReasons: entries(text(1000)).optional(),
+        requestFulfillments: entries(z.enum(["", "partial", "complete"])).optional(),
         manualQuantities: entries(text(64)).optional(),
         presentationSelections: entries(
           z
@@ -209,7 +210,7 @@ export const requisitionOperationDraftContent = receiptDraftContent.refine(
 );
 export const balanceDocumentDraftContent = receiptDraftContent.refine(
   (value) => value.materials.length === 0 && value.divergentIds.length === 0,
-  "O preparo de parecer ou designação não contém uma nova contagem física.",
+  "O preparo de revisão ou designação não contém uma nova contagem física.",
 );
 export const transferDeclarationDraftContent = receiptDraftContent
   .extend({ documentVersion: z.null() })

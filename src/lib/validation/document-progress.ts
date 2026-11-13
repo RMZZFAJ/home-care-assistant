@@ -62,6 +62,8 @@ export const progressContent = z
 export const progressPublication = z.object({
   relevance: z.enum(["normal", "milestone", "attention"]),
   mentions: z.array(uuid).max(8).refine(ids => new Set(ids.map(x => x.toLowerCase())).size === ids.length, "Não repita pessoas mencionadas."),
+  visibility: z.enum(["public", "family"]).optional(),
+  mentionAll: z.boolean().optional(),
 }).strict();
 export const publishProgress = z
   .object({ key: uuid, content: progressContent, publication: progressPublication.optional() })
@@ -79,6 +81,8 @@ const manual = z
     stage: progressContent.shape.stage,
     text: progressContent.shape.text,
     relevance: progressPublication.shape.relevance.optional(),
+    visibility: z.enum(["public", "family"]).optional(),
+    mentionAll: z.boolean().optional(),
     mentions: z.array(z.object({ id: uuid, name: z.string().min(1), careRole: z.enum(["admin", "family", "supervisor", "professional", "reader"]) }).strict()).max(8).optional(),
     references: z
       .array(
@@ -87,6 +91,10 @@ const manual = z
             id: uuid,
             code: z.string().nullable(),
             type: z.enum(["REQ", "COM", "ENT", "BAL"]),
+            kind: z.enum(["document", "progress"]).optional(),
+            documentId: uuid.optional(),
+            excerpt: z.string().optional(),
+            recordedAt: instant.optional(),
           })
           .strict(),
       )
@@ -133,6 +141,10 @@ export const progressReferenceRow = z.object({
   id: uuid,
   code: z.string().nullable(),
   type: z.enum(["REQ", "COM", "ENT", "BAL"]),
+  kind: z.enum(["document", "progress"]).optional(),
+  documentId: uuid.optional(),
+  excerpt: z.string().optional(),
+  recordedAt: instant.optional(),
 });
 export const progressReferencePage = z
   .object({
@@ -204,9 +216,15 @@ export function progressConfirmed(
     parsed.data.note.text === packet.content.text &&
     (packet.publication
       ? parsed.data.note.relevance === packet.publication.relevance &&
-        JSON.stringify(parsed.data.note.mentions?.map(x => x.id.toLowerCase())) === JSON.stringify(packet.publication.mentions.map(x => x.toLowerCase()))
+      (parsed.data.note.visibility ?? "public") === (packet.publication.visibility ?? "public") &&
+      (parsed.data.note.mentionAll ?? false) === (packet.publication.mentionAll ?? false) &&
+      JSON.stringify(parsed.data.note.mentions?.map(x => x.id.toLowerCase())) === JSON.stringify(packet.publication.mentions.map(x => x.toLowerCase()))
       : parsed.data.note.relevance === undefined && parsed.data.note.mentions === undefined)
   );
+}
+
+export function mentionsEveryone(text: string) {
+  return /(^|[^\p{L}\p{N}_])@todos(?![\p{L}\p{N}_])/iu.test(text);
 }
 
 export function parseProgressOutcome(value: unknown) {

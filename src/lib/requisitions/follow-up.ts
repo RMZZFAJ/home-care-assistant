@@ -39,7 +39,7 @@ export function requisitionFollowUp(facts: FollowUpFacts): RequisitionFollowUp {
   };
   if (facts.fulfilled < facts.total) return {
     heading: "Acompanhar as entregas vinculadas",
-    description: `${facts.total - facts.fulfilled} de ${facts.total} itens ainda sem atendimento confirmado. Somente aceite positivo em ENT válida atende um item; expedição e compra não comprovam recebimento.${!facts.scienceSatisfied ? " A ciência familiar é independente e não impede o atendimento." : ""}`,
+    description: `${facts.total - facts.fulfilled} de ${facts.total} itens permanecem em aberto. A família avalia se a entrega atende parcial ou completamente à necessidade. Uma diferença entre expedido e recebido exige nova avaliação familiar; compra e expedição não comprovam recebimento.${!facts.scienceSatisfied ? " A ciência familiar é independente e não impede o atendimento." : ""}`,
     pending: true, label: "Materiais e atendimento", section: "materials",
   };
   if (!facts.scienceSatisfied) return {

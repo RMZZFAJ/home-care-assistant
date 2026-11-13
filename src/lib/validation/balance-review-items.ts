@@ -5,7 +5,8 @@ const opinionFields = {
   forwarding: z.enum(["none", "recount", "adjustment"]),
   comment: z.string().refine(value => value.length <= 500, "O comentário do material permite até 500 caracteres."),
 };
-export const balanceReviewItemFields = z.object({ ...opinionFields,
+export const balanceReviewItemFields = z.object({
+  ...opinionFields,
   materialName: z.string().max(200).optional(), unit: z.string().max(80).optional(),
 }).strict();
 export const balanceReviewItemOpinion = z.object(opinionFields).strict().refine(value => (value.result === "confirmed") === (value.forwarding === "none"), {
@@ -21,7 +22,7 @@ export const balanceReviewItem = z.object({
 });
 export const balanceReviewItems = z.array(balanceReviewItem).max(1000).refine(
   items => new Set(items.map(item => item.lineId)).size === items.length,
-  "Não repita o mesmo material no parecer.",
+  "Não repita o mesmo material na revisão.",
 );
 export type BalanceReviewItem = z.infer<typeof balanceReviewItem>;
 export type BalanceReviewItemOpinion = z.infer<typeof balanceReviewItemOpinion>;
