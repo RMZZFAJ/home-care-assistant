@@ -29,6 +29,33 @@ confirmar sua capacidade. Local e remoto estão reconciliados em242; a CI do SHA
 publicado e o teste físico do usuário continuam próprios. Os resultados
 anteriores abaixo são históricos compatíveis, sem aprovação automática externa.
 
+Após a publicação de7e27795, o responsável confirmou o recebimento do teste no
+S24 Ultra, junto com a atualização concluída da PWA. O recebimento relatado é
+distinto do simples aceite do provedor. Não comprova todos os canais,
+destinatários, permissões do sistema ou situações de execução em background.
+
+## Ícone da notificação no Android — correção local
+
+O reteste físico também identificou um quadrado branco na barra do S24.
+O badge usava o mesmo PNG opaco do ícone colorido. O Android transforma o
+[badge em silhueta monocromática](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#badge),
+incluindo todo fundo opaco. notification-badge.svg/png conserva as letras HC
+do logo, com fundo transparente e96×96px; o ícone completo permanece colorido.
+A cor e a disposição finais continuam sob controle do sistema do aparelho.
+
+O gerador incorpora somente essas duas imagens públicas fixas ao worker.
+Assim, sua apresentação não depende de outra busca autenticada nem da validade
+do cookie de proteção do Preview. Não recebe imagens do payload e não amplia
+os quatro arquivos do CacheStorage. Conteúdo privado e replay continuam vedados.
+
+23 testes de worker/ciclo de vida, tipos e lint passaram. O caso dirigido no
+Chrome móvel emulado decodificou as duas imagens do worker realmente gerado
+depois de expirar o acesso, sem novas requisições HTTP. Rodou pelo runner local
+verificado em modo diagnóstico, sem substituir o build de produção da CI ou
+a inspeção física do novo ícone. Publicação aguarda o término da CI7e27795,
+conforme a condição do responsável; a aparência corrigida no S24 ainda precisa
+ser confirmada depois da atualização publicada.
+
 ## Contrato vigente de conta e sessão — 12/11/2026
 
 A confirmação de avisos conserva a conta, a sessão verificada e o par VAPID da

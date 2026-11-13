@@ -1,5 +1,29 @@
 # Triagem SonarCloud D-B
 
+## Duplicação consultada em7e27795 — decisão pendente
+
+A PR7 registra2,6% no conjunto e3,2288% no código novo:5028 linhas duplicadas
+em155722 linhas novas. O gate ERROR continua somente pelo limite de3% para
+código novo; os demais critérios do gate estão OK. Não é porcentagem de falhas
+operacionais ou vulnerabilidades.
+
+3271 dessas linhas estão em58 migrations que o Git confirma como arquivos novos
+da PR, cerca de65% da duplicação nova. São repetições de evolução SQL que não
+devem ser eliminadas reescrevendo migrations aplicadas. A lista também contém
+preparações/assertivas de testes e trechos reais de APIs. A comparação das APIs
+de preparação de consumo/Flows confirmou blocos semelhantes de validação,
+autorização, chamada RPC e resposta. A detecção é real, mas não comprova uma
+falha funcional nem justifica remover controles para reduzir a porcentagem.
+
+Recomendação apresentada, sem implementação: considerar apenas migrations
+imutáveis fora da conta de duplicação, mantendo sua análise de segurança,
+o limite de3% e os testes/fontes de aplicação na medição. A opção específica
+[Duplication Exclusions](https://docs.sonarsource.com/sonarqube-cloud/managing-your-projects/project-analysis/setting-analysis-scope/exclude-from-coverage-duplication)
+não é exclusão geral de análise. Reutilização nas APIs deve ter benefício de
+manutenção demonstrável e regressões pertinentes; não iniciar uma refatoração
+geral por meta numérica. Configuração/refatoração desse tema aguardam decisão
+do responsável. Nenhum limiar, exclusão ou código foi alterado nessa análise.
+
 ## Análise publicada4315eb9
 
 [PR7 no SonarCloud](https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=7).

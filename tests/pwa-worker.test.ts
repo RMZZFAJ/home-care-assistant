@@ -2,6 +2,12 @@ import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
 import { createHash, webcrypto } from "node:crypto";
 import { it, expect, vi } from "vitest";
+import sharp from "sharp";
+
+const notificationImages = {
+  icon: "data:image/png;base64," + readFileSync("public/pwa/icon-192.png").toString("base64"),
+  badge: "data:image/png;base64," + readFileSync("public/pwa/notification-badge.png").toString("base64"),
+};
 
 function environment(options: { requireCookie?: boolean; poison?: boolean; failPut?: boolean } = {}) {
   const files = Object.fromEntries(["/offline.html", "/pwa/icon-192.png", "/pwa/icon-512.png", "/pwa/apple-180.png"].map(path => {
@@ -63,7 +69,7 @@ function environment(options: { requireCookie?: boolean; poison?: boolean; failP
       JSON.stringify(
         JSON.stringify({ protocol: 1, schema: 1, revision: "sentinel-v1", assets: Object.fromEntries(Object.entries(files).map(([path, file]) => [path, { bytes: file.bytes.length, sha256: file.sha256, contentType: file.contentType }])) }),
       ),
-    ),
+    ).replace('"__HCA_NOTIFICATION_IMAGES__"', JSON.stringify(JSON.stringify(notificationImages))),
     {
       self: scope,
       caches: cacheStorage,
@@ -212,6 +218,8 @@ it("push lock-screen content is fixed, generic and independent of payload text o
       title: "Private patient",
       body: "Secret quantity",
       url: "https://evil.test/",
+      icon: "https://evil.test/private.png",
+      badge: "https://evil.test/private.png",
     },
     { v: 1, id: "//evil.test/" },
   ]) {
@@ -230,10 +238,27 @@ it("push lock-screen content is fixed, generic and independent of payload text o
       /Private patient|Secret quantity|evil/,
     );
     expect(Object.keys(shown.options.data)).toEqual(["id"]);
+    expect(shown.options.icon).toBe(notificationImages.icon);
+    expect(shown.options.badge).toBe(notificationImages.badge);
   }
   expect(e.shown[0].options.data.id).toBe(id);
   expect(e.shown[1].options.data.id).toBeNull();
   expect(e.requested).toHaveLength(0);
+});
+it("Android status-bar branding is the app mark on a transparent 96px mask, separate from the full-color icon", async () => {
+  const bytes = readFileSync("public/pwa/notification-badge.png");
+  const { data, info } = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  expect(data).toEqual(await sharp("public/pwa/notification-badge.svg").ensureAlpha().raw().toBuffer());
+  expect([info.width, info.height, info.channels]).toEqual([96, 96, 4]);
+  const alpha = Array.from(data).filter((_, index) => index % 4 === 3);
+  expect(alpha.filter(value => value === 0).length).toBeGreaterThan(alpha.length / 2);
+  expect(alpha.some(value => value === 255)).toBe(true);
+  // All four edges stay transparent, so Android cannot silhouette a rectangular background.
+  for (let y = 0; y < info.height; y++) for (let x = 0; x < info.width; x++) {
+    if (x === 0 || y === 0 || x === info.width - 1 || y === info.height - 1)
+      expect(data[(y * info.width + x) * 4 + 3]).toBe(0);
+  }
+  expect(notificationImages.badge).not.toBe(notificationImages.icon);
 });
 it("notification click opens only an authenticated same-origin destination and preserves existing edit tabs", async () => {
   const e = environment(),

@@ -80,7 +80,7 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Outras áreas visuais | Três composições e quatro relações restantes fechadas |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Critérios finais e validação do candidato publicado |
-| Incremento atual | Editor, revisão, atualização explícita e teste de Push |
+| Incremento atual | Ícone do aviso Android e análise de Realtime/duplicação |
 | Resultado local | 66 composições; 164 relações conferidas |
 | Banco | Local e remoto em 242; sem atualizações pendentes |
 | CI de 0dbd2ba | Linux/Windows/banco/Chromium passaram; iOS cortado |
@@ -88,6 +88,8 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | CI de 4d5e908 | Linux/Windows/banco/iOS-1 passaram; browser em correção |
 | CI de 8fc04b8 | Uma falha em iOS-2; demais grupos passaram |
 | Preview de 8fc04b8 | Pronto na Vercel, no endereço estável abaixo |
+| CI de 7e27795 | Linux/Windows/banco passaram; navegadores em andamento |
+| Preview de 7e27795 | Pronto; atualização e teste recebidos no S24 |
 
 **Correções do fechamento:** os campos de filtro do estoque conservam a edição
 mesmo com atualização em segundo plano. A PWA mantém a aparência aprovada,
@@ -110,9 +112,23 @@ de atualização com confirmação, resultado visível e preservação das outra
 abas; confirmação clara da inscrição e teste pessoal de Push. A implementação,
 os testes pequenos, a autorização real e a conferência integrada de navegador
 passaram, incluindo compatibilidade com a orientação offline antiga. As duas
-atualizações estão reconciliadas no remoto. A CI do novo commit e o recebimento
-real do Push continuam pendentes. Responsável técnico: Codex. O teste físico
-posterior é seu, com meu apoio.
+atualizações estão reconciliadas no remoto. A CI do novo commit continua aberta;
+o resultado físico informado por você está abaixo. Responsável técnico: Codex.
+Os demais ensaios de aparelho seguem com você e participantes, com meu apoio.
+
+**Reteste físico informado por você após a publicação de7e27795:** o S24
+atualizou e recebeu o aviso de teste. Esses dois resultados estão confirmados
+pelo seu relato. A CI ainda está em andamento; outros aparelhos, cenários de
+background e homologação operacional continuam separados.
+
+**Acréscimo posterior — ícone e análise técnica:** o quadrado branco do aviso
+Android foi corrigido localmente com o símbolo HC transparente para a barra,
+preservando o logo colorido no aviso. Testes dirigidos passaram; publicação
+aguarda a CI atual terminar e a aparência física será conferida depois.
+Realtime verdadeiro já está configurado. A lentidão de autorização informada
+por você está em investigação, sob minha responsabilidade, sem causa isolada
+nem correção declarada. A duplicação do Sonar foi explicada; mudanças nessa
+configuração aguardam sua decisão. Nenhuma dessas consultas alterou o remoto.
 
 **Resultado utilizável do lote 6:** Administração global → Monitoramento e
 suporte reúne visão técnica, continuidade, residências/contas e eventos/política.
@@ -124,9 +140,10 @@ de foco mesmo quando o botão da ação deixa de existir.
 **Onde avaliar:** use o
 [Preview estável da branch](https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app).
 Esse endereço acompanha as atualizações; prefira-o para instalar a PWA.
-A autenticação da Vercel continua obrigatória. No Preview de f3f3fa8, o login
-respondeu corretamente e a aplicação informou compatibilidade pronta. Isso não
-substitui testar os fluxos autenticados nem o reteste físico do S24 Ultra.
+A autenticação da Vercel continua obrigatória. Historicamente, no Preview de
+f3f3fa8, o login respondeu corretamente e informou compatibilidade pronta.
+O Preview de7e27795 está READY e recebeu seu reteste de atualização e Push no
+S24. Isso não substitui as demais jornadas autenticadas e avaliações previstas.
 
 **Já publicado em 8fc04b8:** as cores declaradas para o navegador,
 a instalação e a página pública sem conexão agora seguem o Modelo Integral.
@@ -1070,8 +1087,8 @@ repetida automaticamente. Reteste físico fica na etapa 20.
 - **Instalar e atualizar sem perder edição confirmada** — Concluído localmente
   · 100% no software. Instalação e uso físico continuam para você na etapa 20.
 - **Aplicativo instalado com atualização segura e privacidade** — Concluído
-  localmente · 100% no software. O S24 Ultra ainda precisa de reteste físico
-  por você, no endereço estável do Preview.
+  localmente · 100% no software. No S24, você relatou atualização e recebimento
+  do teste Push; os demais ensaios físicos permanecem na etapa 20.
 
 #### 12 — Notificações internas e avisos Push
 
@@ -1482,7 +1499,7 @@ não interrompem atividades independentes da fase.
 | Atividade | Estado | Responsável |
 | --- | --- | --- |
 | Aceite das tarefas no Preview | 0% final | Você e equipe |
-| Reteste do S24 Ultra | 0% desta rodada | Você, apoio de Codex |
+| Reteste S24 | Atualização e teste Push recebidos | Você; relato físico |
 | Acessibilidade com pessoas | 0% homologado | Participantes |
 | Destino de backup e chaves | Decisão pendente | Você |
 | Agenda de backup externo | 0% ativada | Você autoriza; Codex prepara |
@@ -1494,9 +1511,9 @@ não interrompem atividades independentes da fase.
 | Liberação de piloto/produção | 0%; fora do escopo | Você e responsáveis |
 
 Você organiza os participantes das avaliações. Codex prepara os testes, orienta
-e corrige o que for identificado. O uso anterior no S24 Ultra já aconteceu e
-revelou a falha; o 0% acima se refere ao reteste da versão corrigida pelo
-endereço estável, incluindo instalação, atualização e avisos.
+e corrige o que for identificado. O uso anterior no S24 revelou a falha; após
+7e27795, você confirmou atualização e recebimento do teste no endereço estável.
+Isso não aprova automaticamente outros aparelhos ou todos os cenários de avisos.
 
 Codex prepara e configura o destino e a agenda de backup após sua escolha e
 autorização. O ensaio operacional completo depende também dos responsáveis
@@ -1875,9 +1892,10 @@ para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passa
 
 **Ordem atual do restante, sob responsabilidade de Codex:**
 
-1. Publicar o incremento S24 e a correção delimitada de iOS. O software está
-   conferido localmente, inclusive com versões antigas. As migrations já estão
-   reconciliadas após o término da CI anterior, conforme sua condição.
+1. Aguardar a CI7e27795, que já recebeu o incremento S24 e a correção delimitada
+   de iOS, sem cancelá-la. Publicar a correção local do ícone após esse término.
+   As migrations prontas estão reconciliadas. Prosseguir no diagnóstico da
+   lentidão de autorização Realtime, sem mudanças de configuração especulativas.
 2. Concluir a etapa 19 com a CI do SHA novo, estado real do Sonar, banco e
    Preview. Entregar o estado técnico e os próximos gates, sem merge/produção.
 

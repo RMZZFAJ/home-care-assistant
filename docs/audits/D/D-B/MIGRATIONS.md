@@ -25,6 +25,44 @@ após a introdução local, sem reescrever a migration já aplicada; seu caso
 dirigido passou. As verificações de catálogo do contrato de serviço passaram;
 o restante dependente das fixtures continua na suíte completa da CI.
 
+## Alerta de autorização Realtime — consulta de 12/11/2026
+
+O responsável informou o alerta Realtime authorization checks are slow:
+p90 de6000ms nas últimas24h, acima de1000ms. O retorno health do conector veio
+sem lints; isso não invalida o indicador temporal informado nem demonstra cura.
+Não foi feita nova migration ou alteração de configuração para esse alerta.
+
+No remoto, a política hca_private_user_channel existe em realtime.messages,
+somente SELECT para authenticated: tópico próprio derivado de auth.uid(),
+sessão Auth real válida e perfil ativo. As consultas de sessão e perfil têm
+índices de chave primária. O envio usa realtime.send privado, consolidado por
+transação e visível após commit; o navegador assina esse canal via WebSocket.
+A consulta
+periódica de30s e a reconexão são recuperação, não substituição desse transporte.
+
+Os logs remotos das últimas24h mostram inicialização da replicação de Broadcast
+e encerramento por ausência de usuários, não falta de configuração. Nenhum
+erro apareceu nos36 registros de realtime_logs consultados. O inspetor sem um
+canal selecionado não comprova ausência do serviço. O teste de integração
+existente exige recepção de revisões por duas sessões Auth reais e recusa do
+tópico alheio; passou na suíte de banco da CI7e27795. Essa execução local na CI
+não é prova de entrega ponta a ponta no remoto durante a ocorrência do alerta.
+
+pg_stat_statements registra990 chamadas de realtime.authorize: média78,282ms,
+mínimo0,264ms e máximo7147,965ms, desde o reset de20/10. Esse período é diferente
+das últimas24h; a média não substitui o p90 relatado. No instante da consulta
+não havia conexões aguardando lock. Uma criação interna de partição levou5477ms,
+mas não há correlação temporal suficiente para atribuir-lhe a autorização lenta.
+
+**Pendente, responsabilidade técnica de Codex:** isolar a causa com a série
+temporal de autorização/conexões e eventual espera de banco. O conector não
+forneceu essa série e o acesso visual estava indisponível nesta sessão. Não
+declarar resolvido, aumentar prazos, abrir políticas, recriar o Realtime ou
+criar índices sem consulta/plano que justifiquem. A arquitetura permanece
+inalterada; novas decisões de configuração aguardam o responsável, conforme
+seu pedido. [Relatórios oficiais](https://supabase.com/docs/guides/realtime/reports)
+e [autorização](https://supabase.com/docs/guides/realtime/authorization).
+
 ## Histórico da revisão dos avisos — 239/240
 
 20261112214842 preserva as onze políticas, seus papéis e predicados sensíveis

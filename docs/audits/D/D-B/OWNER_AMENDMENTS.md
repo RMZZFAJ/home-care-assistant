@@ -1,5 +1,15 @@
 # Complementos posteriores à ordem D-B
 
+## Ícone Android, saúde Realtime e duplicação — 12/11/2026
+
+Após confirmar atualização e recebimento do teste, o responsável relatou um
+quadrado branco na barra do S24. Autorizou corrigir o ícone e investigar/corrigir
+o alerta Realtime authorization checks are slow, p90 de6000ms nas últimas24h.
+Pediu explicação do funcionamento real de Realtime e da duplicação do Sonar
+antes de decidir novas configurações/refatorações. Não ampliar funcionalidades,
+abrir permissões ou executar automaticamente o assistente de configuração.
+O push e alterações remotas continuam condicionados ao término da CI corrente.
+
 ## Reteste físico, atualização explícita e teste de Push — 12/11/2026
 
 O responsável relatou no S24 a faixa persistente de atualização e a falta de
@@ -19,6 +29,12 @@ workspace e revisão contextual dos avisos do Supabase, sem limpar o painel por
 mudanças cegas. Aplicação remota e push aguardam a conclusão da CI em curso;
 o trabalho do lote permanece local durante essa espera. Commits locais foram
 preservados, sem necessidade de reset ou reescrita.
+
+Depois da publicação de7e27795 e de o Preview estável ficar READY, o responsável
+respondeu ao reteste solicitado no S24: “Atualizou e recebi o aviso de teste”.
+É prova física relatada pelo responsável para esses dois resultados, não uma
+observação independente de Codex nem homologação de todos os aparelhos,
+navegadores, cenários de background ou canais operacionais.
 
 ## SonarCloud — adiamento anterior e reabertura em 12/11/2026
 

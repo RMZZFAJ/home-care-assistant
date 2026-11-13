@@ -1,6 +1,7 @@
 /* global self, caches */
-// Build replaces this one marker; the generated public file contains no secrets.
+// Build embeds only public metadata and fixed branding, never credentials or payload images.
 const BUILD = JSON.parse("__HCA_PWA_BUILD__");
+const NOTIFICATION_IMAGES = JSON.parse("__HCA_NOTIFICATION_IMAGES__");
 const CACHE = "hca-public-pwa-" + BUILD.revision;
 const PUBLIC_FILES = [
   "/offline.html",
@@ -108,8 +109,9 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification("Home Care Assistant", {
       body: test ? "Teste de avisos recebido neste aparelho. O recebimento deste teste não confirma ciência ou recebimento de materiais." : "Há uma atualização no aplicativo. Entre para consultar suas notificações.",
-      icon: "/pwa/icon-192.png",
-      badge: "/pwa/icon-192.png",
+      icon: NOTIFICATION_IMAGES.icon,
+      // Android masks this small image to one color; an opaque background becomes a square.
+      badge: NOTIFICATION_IMAGES.badge,
       ...(id ? { tag: "hca-push-" + id } : {}),
       data: { id, ...(test ? { kind: "test" } : {}) },
     }),

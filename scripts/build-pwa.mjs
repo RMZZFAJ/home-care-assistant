@@ -46,8 +46,17 @@ for (const [path, contentType] of [
 hash.update(JSON.stringify(assets));
 const build = { ...contract, revision: hash.digest("hex").slice(0, 24), assets };
 const template = await readFile("scripts/pwa-worker.js", "utf8");
+// Fixed public branding travels with the worker, including behind Preview access
+// protection. Notification rendering must not depend on a fresh authenticated fetch.
+const notificationImages = {};
+for (const [name, path] of [
+  ["icon", "public/pwa/icon-192.png"],
+  ["badge", "public/pwa/notification-badge.png"],
+]) notificationImages[name] = "data:image/png;base64," + (await readFile(path)).toString("base64");
 await writeFile(
   "public/service-worker.js",
-  template.replace('"__HCA_PWA_BUILD__"', JSON.stringify(JSON.stringify(build))),
+  template
+    .replace('"__HCA_PWA_BUILD__"', JSON.stringify(JSON.stringify(build)))
+    .replace('"__HCA_NOTIFICATION_IMAGES__"', JSON.stringify(JSON.stringify(notificationImages))),
 );
 console.log("Public PWA worker built: " + build.revision);

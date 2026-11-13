@@ -112,6 +112,11 @@ sessão ou indisponibilidade de provedor nesse percurso.
 
 ## Evidência a distinguir
 
+No Preview estável de7e27795, o responsável relatou no Samsung Galaxy S24 Ultra
+que a atualização foi concluída e o aviso de teste chegou. Esse relato físico
+comprova esses resultados no aparelho informado; não generaliza para outros
+navegadores, versões de sistema ou todos os cenários de uso em background.
+
 O teste do convite usa sinal de navegador controlado; não comprova instalação
 no sistema operacional. O ensaio de atualização usa dois clientes e registro
 real de outro URL do mesmo script, sem fabricar estados do worker. Essa variação

@@ -102,6 +102,21 @@ test("Preview protegido por cookie prepara o worker real e mantém somente os qu
   expect(await cachePaths(page)).toEqual(publicPaths);
   expect(await page.evaluate(async () => { for (const name of await caches.keys()) for (const request of await (await caches.open(name)).keys()) { const response = (await (await caches.open(name)).match(request))!; if (response.headers.has("Vary") || response.headers.has("Set-Cookie") || !response.headers.get("Cache-Control")?.includes("public")) return false; } return true; })).toBe(true);
   expect(requests.filter(request => assets.has(request.path)).every(request => request.authorized && request.status === 200)).toBe(true);
+  if (info.project.name !== "ios") {
+    // Chromium exposes worker evaluation. Decode the actual generated branding
+    // after access expires: no network or private response can supply these images.
+    const images = await context.serviceWorkers()[0].evaluate<Record<string, string>>("NOTIFICATION_IMAGES");
+    cookie = randomUUID();
+    const before = requests.length;
+    const dimensions = await page.evaluate(async (branding) => Promise.all(
+      [branding.icon, branding.badge].map(async (url) => {
+        const image = await createImageBitmap(await (await fetch(url)).blob());
+        const size = [image.width, image.height]; image.close(); return size;
+      }),
+    ), images);
+    expect(dimensions).toEqual([[192, 192], [96, 96]]);
+    expect(requests).toHaveLength(before);
+  }
 });
 for (const mode of ["expired_access", "access_redirect", "private_same_size_response"] as const) test("Preview recupera instalação recusada sem reinstalar nem guardar resposta privada: " + mode, async ({ page, context }) => {
   await authorize(context); await page.goto(origin);
