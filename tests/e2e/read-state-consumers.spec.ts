@@ -79,7 +79,10 @@ test("D3 consumo distingue demora vazio dados falha e repetição sem inventar m
     const panel = page.getByRole("region", { name: "Relatos registrados", exact: true });
     await expect(panel.getByText("Carregando relatos…", { exact: true })).toBeVisible();
     await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toHaveCount(0);
-    mode = "error"; release(); await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible();
+    release(); await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible();
+    // Keep concurrent background reads in the empty phase until it is observed.
+    // Only the following explicit refresh should encounter the injected error.
+    mode = "error";
     await page.getByRole("button", { name: "Atualizar lista", exact: true }).click();
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do consumo");
     await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toHaveCount(0); await expect(panel.getByText("Carregando relatos…", { exact: true })).toHaveCount(0);

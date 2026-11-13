@@ -84,6 +84,11 @@ test("REQ salva sem TTL retoma entre sessões sem misturar paciente ou outro tit
   await selectContext(page, f.patient);
   await open(page);
   await expect(panel(page)).toContainText(note);
+  // A retiring editor can still persist while the logout navigation is pending.
+  // Recreate that late write deterministically, without changing server drafts.
+  await page.evaluate(() => window.addEventListener("beforeunload", () => {
+    sessionStorage.setItem("hca:logout-late-write", "synthetic private editor");
+  }, { once: true }));
   await page.getByLabel("Menu do usuário", { exact: true }).click();
   await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
   await expect(page.getByLabel("E-mail", { exact: true })).toBeVisible();

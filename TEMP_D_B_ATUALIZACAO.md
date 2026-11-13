@@ -92,6 +92,7 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Preview de 7e27795 | Pronto; atualização e teste recebidos no S24 |
 | CI de f2491be | Mobile-1 falhou; demais passaram, três com retry |
 | Preview de f2491be | Pronto; símbolo HC confirmado por você no S24 |
+| CI de 77acdfc | iOS-2 falhou; demais grupos passaram; sem cancelamentos |
 
 **Correções do fechamento:** os campos de filtro do estoque conservam a edição
 mesmo com atualização em segundo plano. A PWA mantém a aparência aprovada,
@@ -1819,6 +1820,33 @@ execução anterior. As atualizações documentais pendentes seguem no mesmo env
 das correções. Depois desse envio, Codex aguarda seu aviso para retomar a
 leitura da CI, conforme solicitado.
 
+**13 de novembro — correção da CI de 77acdfc:** a falha de iOS-2 ocorreu no
+teste de recuperação de Andamentos: o Realtime retirou o botão de atualização
+após a revogação, antes do clique do teste. A conferência prepara a espera pela
+resposta de acesso negado antes de revogar e aciona a releitura normal,
+preservando autorização real, publicação única e ausência de nova escrita.
+
+Nos casos que passaram na repetição, o teste de consumo mudava para erro antes
+de observar a resposta vazia; as duas fases agora são separadas. O logout
+também revelou uma falha real: a página antiga podia gravar novamente a cópia
+local durante a navegação. Uma contraprova controlada reproduziu essa sobra.
+A limpeza imediata foi mantida e agora se repete na saída da página após o
+logout confirmado. Rascunhos do servidor e recuperação de sessão revogada
+continuam preservados. Não houve mudança de aparência, escopo dos rascunhos,
+banco, limites ou regras da CI.
+
+Os casos de PWA e retomada da agenda que tiveram repetição também integram a
+validação dirigida; a causa original dessas duas intermitências não foi
+declarada corrigida sem comprovação. A coorte final de produção aprovou os
+15 testes nos três projetos, sem repetição: logout, recuperação de Andamentos,
+sessão revogada/PWA, estados de consumo e retomada da agenda. A contraprova
+anterior do logout permanece preservada. Lint dos quatro arquivos de código e
+Markdown do acompanhamento passaram; os 105 critérios conservaram seus estados.
+Banco, Linux, Windows e os outros cinco grupos de navegador passaram, sem
+cancelamentos. A duplicação do Sonar continua adiada por você. A CI do novo
+commit permanece um gate próprio. Correções e acompanhamento seguem juntos
+no mesmo envio; depois dele, Codex encerra e aguarda seu aviso.
+
 ## 6. Sequência única do trabalho restante
 
 Esta é a única fila vigente, reconciliada pelo complemento executivo. Cada lote
@@ -1935,7 +1963,7 @@ para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passa
 
 **Ordem atual do restante, sob responsabilidade de Codex:**
 
-1. Conferir a nova CI e o Preview das correções de f2491be depois do seu aviso,
+1. Conferir a nova CI e o Preview das correções de 77acdfc depois do seu aviso,
    sem acompanhamento contínuo nesse intervalo. A validação dirigida e a
    documentação pendente acompanham as correções no mesmo envio. As migrations
    prontas estão reconciliadas. Retomar também o diagnóstico da lentidão de

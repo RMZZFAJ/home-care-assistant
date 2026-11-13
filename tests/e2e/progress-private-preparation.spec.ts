@@ -281,12 +281,15 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
   ).toBeNull();
   expect(packets).toHaveLength(1);
   expect(notes(f.id)).toBe(1);
+  const denied = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${f.id}/progress` && response.request().method() === "GET" && response.status() === 403);
   sql(
     `update public.care_recipient_memberships set status='revoked' where care_recipient_id=${q(f.patient)} and user_id=${q(fixtures.family.id)}`,
   );
-  await page
-    .getByRole("button", { name: "Atualizar Andamentos", exact: true })
-    .click();
+  // Realtime may remove the refresh control as soon as membership is revoked.
+  // Observe before revoking and use the normal read invalidation signal;
+  // the request, session and database authorization remain real.
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await denied;
   await expect(page.getByText(text, { exact: true })).toHaveCount(0);
   expect(packets).toHaveLength(1);
 });
