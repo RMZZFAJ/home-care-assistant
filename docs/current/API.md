@@ -27,9 +27,10 @@ recupera a mesma intenção; mudança de seletor documental conflita. Cada nova
 chave explícita cria outra emissão, sem alterar documento, SCI ou estoque.
 Resposta200 exige ready;202 representa processamento ainda não concluído.
 
-A reserva atual usa reserve_pdf_issuance_v16 para novas emissões dos cinco
-modelos (REQ, COM, ENT, devolução e BAL). Intenções anteriores mantêm revisão,
-fonte e identidade, inclusive se recuperadas pela entrada nova.
+A reserva atual usa reserve_pdf_issuance para novas emissões dos cinco
+modelos (REQ, COM, ENT, DEV e BAL). As entradas versionadas de experimentação
+perderam execute. A composição aprovada é única; os modos ampliado/auditoria
+preservam finalidade e autorização próprias. Arquivos prontos não são reescritos.
 Além da fonte canônica preservada,
 balanceApplication congela
 o ato correspondente à contagem e ao corte de versão escolhidos. not_applied,
@@ -39,7 +40,7 @@ retornar snapshot ou baixar emissão anterior com saldo known, inclusive por
 entradas antigas que recuperam a mesma intenção. Pode ser emitido outro exemplar
 mascarado. Ganho de acesso não altera o mascaramento já congelado.
 
-Na COM V13, purchaseEntryBalances congela por material o saldo FAMILY após a
+Na COM, purchaseEntryBalances congela por material o saldo FAMILY após a
 última entrada validada naquela COM até o corte escolhido. Cada linha contém
 lineId, state, quantity e entry. Os estados são known, restricted,
 not_validated e unavailable; somente known contém quantidade. entry identifica
@@ -542,11 +543,11 @@ confirmed/difference,forwarding none/recount/adjustment e comment até500 UTF-16
 Não examinado é omissão; diferença exige encaminhamento próprio. Não aceita
 quantidade, autoria escolhida ou alteração de notas da contagem. A opinião
 nova é marcada opinionOnly e nunca aplica estoque. Registros antigos mantêm
-sua proveniência. Parecer sobre referência histórica não valida saldo atual.
+sua proveniência. Revisão sobre referência histórica não valida saldo atual.
 Hash/versão obsoletos exigem consulta e adoção explícita da referência.
 O contrato antigo com somente group continua aceito; a UI envia a referência
 e expectedVersion. balanceReview distingue reviewSatisfied,hasItemDifferences,
-applicationGroups e application, além de contador, contagem e pareceres.
+applicationGroups e application, além de contador, contagem e revisões.
 corrections acrescenta referências de atos posteriores por reviewId/sourceLineId.
 Cada referência distingue origem known/unavailable e uma cronologia de atos.
 Somente reconto da mesma ficha, identidade textual exata do produto e contagem
@@ -1342,48 +1343,43 @@ processamento. Anon/authenticated não executam diretamente as RPCs de consulta
 mínima ou orçamento. Nenhum upload público é persistido no acervo.
 Detalhes, limites e coortes de validação na [verificação D4](../audits/D/D-B/PUBLIC_VERIFICATION.md).
 
-## Acervo privado e compatibilidade de PDFs
+## Acervo privado de PDFs consolidados
 
-GET /api/documents/:id/archive reúne emissões independentes, originais e
-representações legadas. Aceita version opcional e cursor completo
-before/kind/reference; máximo20 por página. Revalida contexto e leitura, sem
-expor caminhos, snapshots ou provas do worker. A página
-/documentos/:id/arquivos oferece os mesmos arquivos e geração explícita.
+GET /api/documents/:id/archive lista somente emissões do desenho aprovado e
+suas modalidades. Aceita version opcional e cursor completo
+before/kind/reference, com kind=issuance; máximo20 por página. Revalida contexto
+e leitura, sem caminhos, snapshots ou provas do worker. A página
+/documentos/:id/arquivos oferece os mesmos exemplares e geração explícita.
+Arquivos experimentais anteriores permanecem armazenados, fora deste acervo.
 
-GET /api/documents/:id/pdf com issuance recupera a emissão assinada exata.
-Com version e renderer=legacy recupera o original; renderer numérico seleciona
-uma representação legada registrada, com padrão4. Ausência retorna
-PDF_NOT_GENERATED404; GET nunca gera ou substitui arquivo. SHA divergente
-retorna PDF_BYTES_DIVERGE503. Autorização é conferida antes e após Storage;
-o stream começa somente depois da verificação integral. Uma nova emissão
-histórica usa POST e não recebe o instante do ato antigo como data de emissão.
-[Contrato do acervo](../audits/D/D-B/DOCUMENT_ARCHIVE.md).
+GET /api/documents/:id/pdf exige issuance e recupera os bytes assinados exatos.
+Seletores version/renderer são recusados com400. Arquivo ausente ou revisão
+experimental retorna PDF_NOT_GENERATED404. GET nunca gera ou substitui arquivo.
+SHA divergente retorna PDF_BYTES_DIVERGE503. Autorização é conferida antes e
+após Storage; o stream começa somente após a verificação integral.
+Uma nova representação de versão canônica preservada usa POST, com data própria.
 
-## Proveniência de novas emissões V6–V9
+## Proveniência da emissão consolidada
 
-POST de emissões recebe somente chave idempotente e versão opcional. O servidor
-usa reserve_pdf_issuance_v9: o banco escolhe V9 para ENT e V7 para os demais
-tipos, congelando fatos documentais suplementares. Antes, V8 era escolhida
-para evento ENT com regularizações. O navegador
-não define autoria, datas, revisão ou snapshot. Contexto suplementar não altera
-o hash do evento canônico. Histórico físico separa data de origem/importação;
-rascunho, ficha, emissão operacional e solicitação do exemplar são distintos.
-Nomes/IDs históricos são preservados e nome atual recebe rótulo específico.
-Intenções V5/V6/V7/V8 existentes continuam recuperáveis pela revisão original.
-CONTENT_INVALID pode informar caracteres não suportados, sem assinatura ou
-arquivo persistido. [Contrato e provas](../audits/D/D-B/PDF_SOURCE_FACTS.md).
+POST recebe chave idempotente, versão canônica opcional e modalidade autorizada.
+A entrada corrente é reserve_pdf_issuance; o desenho aprovado é único. As
+revisões internas16/17 distinguem Ficha e modalidades documentais, sem oferecer
+pintores experimentais. As entradas antigas versionadas estão sem execute.
+O navegador não escolhe autoria, instantes, revisão do gerador ou snapshot.
+A projeção suplementar não altera o hash do evento canônico. História física,
+importação, rascunho, emissão da ficha e geração do exemplar são fatos distintos.
+Nomes e IDs preservados não são reconstruídos a partir do cadastro atual.
 
-V7 conserva conferências e resoluções com suas autorias. V8 explicita o estado
-anterior, resultado do procedimento, identidades e instantes de proposta/decisão/
-execução e conciliação/trânsito antes/depois. Proposta sem aprovação não executa
-estoque; desconhecido permanece em trânsito e o aceite original é preservado.
-Os entrypoints antigos permanecem; a mesma chave recupera o exemplar anterior.
-[Contrato V8](../audits/D/D-B/REGULARIZATION_PDF.md).
+A fonte congela conferências, resoluções, regularizações, cancelamento,
+ciências próprias, vínculos e saldos permitidos. Estoque desconhecido ou
+restrito permanece explícito. A avaliação familiar e a reavaliação R3 não
+substituem recebimento pessoal, conciliação física ou aplicação de estoque.
+A modalidade ampliada revalida a audiência das notas e referências incluídas.
+CONTENT_INVALID pode informar caracteres não suportados; o arquivo não é
+oferecido como pronto. Recuperação usa a mesma intenção da versão consolidada.
 
-V9 conserva esses fatos e distingue estado encerrado, aceite pessoal e versão
-preservada. Só a representação operacional pendente sem aceite solicita nova
-conferência. Acervo ENT mostra aviso para revisões anteriores, sem alterar
-o download original. [Contrato V9](../audits/D/D-B/ENT_TERMINAL.md).
+Os dossiês D4 de revisões experimentais permanecem como evidência histórica.
+O contrato vigente e as contraprovas estão no [L1](../audits/D/D-B/L1_IMPLEMENTATION.md).
 
 ## Web Push por aparelho
 
@@ -1713,3 +1709,42 @@ chamando balance_count_reference com sua autorização nativa bal.read.
 As revisões de contagem conferem paciente, revisão e quantidades antes de
 adotar o resultado. A contagem agendada compara ainda o estado atual da
 atribuição e do catálogo. [Consumidores](../audits/D/D-B/STOCK_READ_VALIDATION.md).
+
+## Revisão L1 de E01–E03
+
+O marcador corrente é protocol=1, schema=2. Clientes com o contrato anterior
+precisam atualizar antes de enviar operações. A política de nova senha é mínimo
+8, A-Z, a-z, número e símbolo, até 72 bytes UTF-8; cliente, servidor e Auth local
+usam os mesmos grupos. Configuração remota permanece pendente de reconciliação.
+
+- POST /api/documents aceita requestFulfillment=partial|complete em cada linha
+  ENT vinculada à REQ. A escolha é obrigatória e consciente; autor/instante vêm
+  do banco. Confirmação física não altera essa avaliação.
+- POST /api/documents/:id/fulfillment-review recebe key, lineId, decision,
+  reason e version. Nova avaliação familiar refere as quantidades físicas
+  preservadas, sem novo estoque. Repetir a chave recupera o mesmo ato;
+  concorrência/versão e autoridade são revalidadas no banco.
+- GET /api/documents/:id/communications pagina avisos, estados reais e tentativas
+  registradas. POST recebe key, originalId e channel e cria um reforço deliberado.
+  Recuperar a chave não cria outro envio. Canal não configurado fica indisponível;
+  leitura de aviso, ciência e recebimento permanecem independentes.
+- Publicação de Andamento aceita visibility=public|family e mentionAll. Com
+  @todos, somente public. Pesquisa de pessoas/referências, localização por UUID,
+  paginação, contagens, auditoria e PDF respeitam a mesma audiência. Uma referência
+  não pode ampliar a audiência do registro reservado.
+- GET /api/requisitions/:id/science?materialIdentity=... verifica somente a ciência
+  expressa da identidade atual para aquele conteúdo. Não registra outro ato.
+- GET /api/verification/details?code=... exige Auth e leitura/contexto da emissão.
+  POST com code seleciona explicitamente seu contexto autorizado. O resultado
+  público permanece na mesma página; login preserva /verificar?code=....
+- GET /api/documents/:id/pdf aceita somente issuance. Arquivo experimental por
+  versão/renderizador não é contrato operacional. O acervo corrente lista
+  exemplares consolidados, com cursores estáveis; os bytes anteriores ficam intactos.
+- O worker de comunicação usa notification_pdf apenas com service_role e lease
+  válido do aviso. O principal é Sistema, sem sessão humana inventada. O mesmo
+  pipeline compõe, confere, assina e guarda um exemplar imutável; leitura de
+  saldos privados continua mascarada sem a competência independente.
+
+DEV usa kind e série próprios no banco/projeções e código/protocolo DEV. O motor
+transacional de transferência continua ENT internamente, preservando custódias,
+permissões e recebimento. Não exige uma ENT documental de origem.

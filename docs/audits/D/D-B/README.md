@@ -6,8 +6,11 @@ atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitorame
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
 - [Acompanhamento principal e única fila vigente](../../../../TEMP_D_B_ATUALIZACAO.md).
+- [Revisão L1 posterior](L1_IMPLEMENTATION.md): E01–E03, comentários v3,
+  decisões R1/R3 e revisão CodeRabbit; treze migrations somente locais.
 - [Complemento executivo vigente](OWNER_EXECUTION_SUPPLEMENT.txt): poucos lotes
-  por capacidade; rascunhos congelados e DOC-C.1/expansão OWNER-DEFERRED.
+  por capacidade; rascunhos congelados, com a exceção L1 dos quatro campos de
+  Andamentos; DOC-C.1/expansão não implementada continuam OWNER-DEFERRED.
 - [Mapa de etapas e IDs originais](EXECUTION_STAGES.csv): rastreabilidade, não
   outra fila ou diário de execução.
 - [Complemento aprovado de fichas e PDFs](../../../documents/01_COMANDO_COMPLEMENTAR_PDFS.md):

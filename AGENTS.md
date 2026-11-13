@@ -37,6 +37,9 @@ O responsável descartou Fluent UI como aparência em 09/11/2026.
 Home_Care_Assistant_Modelo_Integral.html é a referência canônica de UI/UX para
 todo o sistema, incluindo recursos existentes e futuros. Ler
 docs/ui-ux/CANONICAL_MODEL.md e docs/ui-ux/DESIGN_SYSTEM.md antes de alterar UI.
+E01–E03 e padrões compartilhados seguem a revisão posterior L1: laboratório v3
+mais comentários v3, conforme HCA_L1_LOTE_CODEX_E01_E03.md. O HTML antecede os
+comentários. Materiais reúne o acompanhamento; identificação técnica fica em Mais.
 Não misturar estilos, usar tema pronto ou apenas recobrir componentes Fluent.
 Usar componentes reutilizáveis coerentes com o modelo; criar os ausentes sem
 remover, resumir, ocultar ou reduzir funções. Migrar fichas para abas e
@@ -55,9 +58,11 @@ Devolução equipe→família é processo autônomo, sem exigir entrega de orige
 Preservar o conteúdo emitido, seus atos e a ciência no cancelamento. Menções,
 referências e acessos não substituem ciência, recebimento ou autoria.
 O complemento executivo em docs/audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt
-prevalece sobre orientações conflitantes de método e rascunhos. Preservar escopo
-e apresentação dos rascunhos existentes; não simplificar painéis nem ampliar
-persistência, autosave ou retomada entre aparelhos. DOC-C.1 e expansão não
+prevalece sobre orientações conflitantes de método e rascunhos. O L1 posterior
+autoriza simplificar a apresentação do rascunho de Andamentos, preservando os
+quatro campos e os controles de concorrência. Os demais rascunhos conservam
+escopo e apresentação; não ampliar persistência, autosave ou retomada entre
+aparelhos. DOC-C.1 e expansão não
 implementada são OWNER-DEFERRED. Corrigir defeitos e preservar separadamente
 a recuperação segura de operações oficiais incertas e a prevenção de duplicatas.
 Implementar PDFs aprovados pelo pipeline atual sem aguardar todo DOC-C.

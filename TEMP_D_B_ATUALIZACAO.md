@@ -1,5 +1,16 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+L1 implementado e verificado localmente na branch `feat/l1-e01-e03`, sobre `56babc7`.
+A referência vigente para E01–E03 é o laboratório v3 mais os comentários v3,
+com as decisões R1 (Revisão) e R3 (nova avaliação familiar) desta conversa.
+O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md) concentra escopo,
+contratos, validações e limites; os números D-B abaixo preservam seu recorte
+anterior e não representam aprovação do L1. Inclui o tratamento dos 20 comentários
+CodeRabbit: 14 sobre produto/testes corrigidos e seis do simulador conferidos
+contra o produto, preservando a referência recebida. Treze migrations somente
+locais, total 255; remoto/Auth remoto, CI/Preview próprios e aceite humano
+permanecem pendentes. Sem push, publicação ou produção.
+
 Atualizado em 13 de novembro de 2026, com suporte, acompanhamento de avisos e
 recuperação conferidos localmente no lote 6. O fechamento da CI continua aberto.
 Inclui a refatoração visual da aplicação e o complemento aprovado

@@ -1,5 +1,18 @@
 # Banco de dados
 
+Incremento L1 local sobre D-B `56babc7`: treze migrations novas, de
+20261113190159 a 20261113231000, total local 255, sem modificar as 84 migrations
+protegidas pelo manifesto. Audiência de Andamentos/referências e contagens,
+atendimento familiar e reavaliação R3, série DEV, reenvios idempotentes e PDF
+de comunicação com principal Sistema possuem contratos transacionais próprios.
+A reserva operacional é `reserve_pdf_issuance`; entradas experimentais
+versionadas estão sem grants de execução. Bytes/eventos antigos foram
+preservados. Este incremento ainda não foi aplicado ao remoto.
+Veja [escopo e evidências L1](../audits/D/D-B/L1_IMPLEMENTATION.md).
+
+O recorte AS_IS a seguir registra a base histórica da auditoria; não substitui
+o incremento acima nem constitui aprovação da implementação atual.
+
 Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
 B3 registra exceções em precisão, NULL/NaN, revisão BAL legado, sessão
 direta e revogação em espera. O guard e os contratos corretos devem ser

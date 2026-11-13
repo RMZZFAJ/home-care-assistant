@@ -5,7 +5,8 @@ Fluent UI foi descartado como aparência. Contratos AS_IS continuam como prova
 funcional; não são aprovação da nova UI, das abas ou de Andamentos.
 
 Contratos implementados do candidato D-B na branch
-`feat/phase-d-implementation`, após a base
+`feat/l1-e01-e03`, derivada de `feat/phase-d-implementation` em `56babc7`,
+após a base
 integrada PR6 `8ec979a`. Auditorias A/B preservam a origem dos desvios.
 O [estado canônico](PROJECT_STATUS.md) identifica branch/SHA e limites. Não
 confundir requisito de integridade com garantia universal já demonstrada.
@@ -20,7 +21,9 @@ procedimentos, guardas e homologações necessárias.
   [continuidade](ROADMAP.md).
 
 REQ não pede quantidade; COM distingue previsão/chegada validada; ENT separa
-expedição/trânsito/aceite; BAL separa contagem, parecer e aplicação. Ledger,
+expedição/trânsito/aceite; DEV tem série própria; BAL separa contagem, revisão e
+aplicação. A família distingue atendimento parcial/completo; recebimento menor
+que o expedido exige nova avaliação familiar antes de concluir. Ledger,
 autorização por paciente, fatos emitidos e exemplares anteriores são
 preservados.
 PWA/Push, rascunhos duráveis, emissão assinada e verificador já têm
@@ -32,3 +35,5 @@ contexto histórico; não são a descrição atual de funcionalidades ausentes.
 O [complemento executivo](../audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt)
 congela a abrangência/apresentação dos rascunhos e adia DOC-C.1/expansão, sem
 adiar recuperação oficial, autorização, aparência aprovada ou demais requisitos.
+O L1 posterior autoriza a simplificação visual do rascunho de Andamentos,
+preservando seus quatro campos e os controles de concorrência/recuperação.

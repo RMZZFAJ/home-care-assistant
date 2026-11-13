@@ -5,6 +5,11 @@ em 09/11/2026, substitui Fluent e a direção visual anterior. Aplicar a todos
 os recursos existentes/futuros sem reduzir funções. O acompanhamento abaixo
 conserva o estado da implementação e das validações.
 
+**Revisão posterior E01–E03:** [Lote L1](../HCA_L1_LOTE_CODEX_E01_E03.md),
+[laboratório v3](../hca-laboratorio-01-v3-final.html) mais
+[comentários posteriores](../hca-l01-v3-comentarios.json).
+[Implementação e verificações locais](audits/D/D-B/L1_IMPLEMENTATION.md).
+
 **Andamento da D-B:** [acompanhamento principal](../TEMP_D_B_ATUALIZACAO.md),
 com capacidades entregues, trabalho local, fila e responsabilidades. A
 [matriz](audits/D/D-B/ACCEPTANCE_EXECUTION.csv) detalha os 105 critérios.
@@ -19,7 +24,8 @@ permanece obrigatória; a aplicação conserva o Modelo Integral.
 **Implementado:** [contratos atuais](current/README.md). Fichas, Andamentos,
 PWA/Push e emissão/verificação assinada já têm implementação, com pendências
 indicadas no acompanhamento. Rascunhos existentes ficam congelados em escopo e
-apresentação; expansão e simplificação são OWNER-DEFERRED. Produção NO-GO.
+apresentação fora da simplificação de Andamentos aprovada no L1; expansão
+não autorizada permanece OWNER-DEFERRED. Produção NO-GO.
 
 **Histórico e planejamento:** A/B são diagnóstico; C é projeto histórico e D-A
 registra D0–D2. Evidências datadas não substituem o estado do candidato atual.

@@ -57,3 +57,6 @@ next-env.d.ts
 # Python tooling for read-only audit utilities
 /.venv/
 **/__pycache__/
+
+/.playwright-mcp/
+/output/l1-*

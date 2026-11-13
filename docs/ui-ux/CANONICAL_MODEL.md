@@ -6,6 +6,13 @@ UI como referência obrigatória de aparência, composição e experiência de t
 o sistema, incluindo recursos existentes e futuros. Não reduzir, resumir,
 retirar ou ocultar funcionalidades para caber no protótipo.
 
+Para E01–E03 e seus padrões compartilhados, a revisão posterior de 13/11/2026
+é o [Lote L1](../../HCA_L1_LOTE_CODEX_E01_E03.md):
+[laboratório v3](../../hca-laboratorio-01-v3-final.html) **mais**
+[comentários v3](../../hca-l01-v3-comentarios.json). O HTML antecede os
+comentários; as decisões posteriores prevalecem. A aparência impressa permanece
+na especificação documental aprovada, sem copiar o PDF simulado do laboratório.
+
 ## Precedência
 
 Esta ordem posterior substitui as orientações visuais conflitantes. Auditorias,
@@ -37,10 +44,11 @@ comportamento, sem substituir a direção visual.
 
 ## Fichas e Andamentos
 
-REQ/COM/ENT/BAL adotam cabeçalho e progresso próprios, ações legítimas e abas:
-Visão geral, Materiais, Atendimento/Aquisição/Contagem e revisão, Comunicações,
-Arquivos gerados, Anexos e Auditoria quando autorizada. A aba adicional Versões
-e integridade conserva o histórico documental. O histórico de acesso das quatro
+REQ/COM/ENT/DEV/BAL adotam cabeçalho e progresso próprios, ações legítimas e abas:
+Visão geral, Materiais, Comunicações, Arquivos gerados, Anexos e Auditoria quando
+autorizada. Materiais reúne o acompanhamento operacional de cada domínio.
+Identificação técnica e registros preservados ficam em Mais. O histórico de
+acesso das
 fichas exige leitura da ficha e a competência própria document.access.read;
 não exige capacidade de auditoria administrativa. Novas exibições da mesma
 pessoa e versão são agrupadas em 20 minutos, sem reescrever registros antigos.

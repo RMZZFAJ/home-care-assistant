@@ -1,5 +1,19 @@
 # Segurança e autorização
 
+L1 adiciona audiência familiar e menções a Andamentos, verificada em listagem,
+contagem, pesquisa, referência, localização, auditoria e expansão PDF.
+`@todos` exige público; uma referência nunca amplia a audiência de origem.
+O retorno recente é preferência de navegação de 30 minutos, com conta, vínculo,
+paciente e capacidade conferidos novamente pelo servidor. Não concede acesso.
+Comunicação com PDF usa principal Sistema limitado ao aviso e lease vigentes,
+sem fabricar sessão humana. A verificação pública continua mínima; seus
+detalhes privados exigem leitura viva do documento e revalidam revogação.
+Configuração forte de senha foi aplicada ao Auth local; o remoto está pendente.
+Veja [implementação L1](../audits/D/D-B/L1_IMPLEMENTATION.md).
+
+As ressalvas AS_IS abaixo pertencem ao recorte histórico indicado, com os
+tratamentos posteriores registrados no acompanhamento vigente.
+
 Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
 Garantias exigidas abaixo têm desvios delimitados em B3/B4: JWT encerrado
 ainda alcança perfil/avatar diretos, há janela após lock e URL já emitida

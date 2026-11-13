@@ -1,8 +1,8 @@
 # Home Care Assistant
 
 **Aparência vigente:** o [Modelo Integral](docs/ui-ux/CANONICAL_MODEL.md) substitui
-Fluent UI em todo o sistema, sem reduzir recursos. Migração visual e fichas com
-abas/Andamentos integram a D-B; ainda não estão integralmente concluídas.
+Fluent UI. Em E01–E03, a referência posterior é o laboratório L1 com os
+comentários v3, conforme o [lote vigente](HCA_L1_LOTE_CODEX_E01_E03.md).
 
 Gestão operacional por paciente com Next.js, React, TypeScript e Supabase.
 REQ, COM, ENT e BAL distinguem necessidade, aquisição, entrega, contagem,
@@ -12,7 +12,9 @@ clínica.
 ## Estado e documentação
 
 **D-B em execução; produção e merge não autorizados.** A branch é
-`feat/phase-d-implementation` e a PR #7 permanece Draft. A primeira versão
+`feat/l1-e01-e03`, derivada da D-B em `56babc7`; a PR #7 da base permanece Draft.
+O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md) identifica o trabalho local.
+A primeira versão
 estável de produto será 1.0.0; não está sendo publicada nesta missão.
 
 - [Acompanhamento principal e sequência restante](TEMP_D_B_ATUALIZACAO.md).
@@ -27,7 +29,8 @@ documental aprovada e o pipeline real de emissão, guarda e verificação.
 Os PDFs usam certificado e TSA internos, sem afirmar ICP-Brasil. O
 acompanhamento distingue implementação, validação técnica e avaliação humana
 pendentes. Os mecanismos de rascunho existentes ficam preservados; sua
-simplificação e expansão foram adiadas.
+simplificação dos quatro campos de Andamentos foi autorizada no L1. A expansão
+de persistência e os outros adiamentos continuam separados.
 
 A e B encerraram o diagnóstico; C registra o planejamento histórico; D-A
 consolidou D0–D2. Esses marcos não aprovam automaticamente a CI do candidato
