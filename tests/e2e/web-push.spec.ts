@@ -179,6 +179,15 @@ test("Web Push liga consentimento real de API, evento interno, worker controlado
       { exact: true },
     ),
   ).toBeVisible();
+  await expect(panel(page).getByText("Avisos ativados nesta conta e sessão, neste aparelho.", { exact: true })).toBeVisible();
+  await expect(panel(page).getByRole("button", { name: "Enviar aviso de teste neste aparelho", exact: true })).toBeDisabled();
+  // The guarded local runner keeps external delivery off; enrollment is not delivery proof.
+  const consent = await (await page.request.get("/api/push/devices?context=consent")).json();
+  const thisDevice = consent.devices.find((device: { fingerprint: string }) => device.fingerprint === createHash("sha256").update(first.endpoint).digest("hex"));
+  expect(consent.deliveryEnabled).toBe(false);
+  const disabledTest = await page.request.post("/api/push/test", { data: { deviceId: thisDevice.id, idempotencyKey: randomUUID(), contextReference: consent.contextReference } });
+  expect(disabledTest.status()).toBe(503);
+  expect((await disabledTest.json()).code).toBe("PUSH_NOT_CONFIGURED");
   expect(
     await page.evaluate(
       () =>

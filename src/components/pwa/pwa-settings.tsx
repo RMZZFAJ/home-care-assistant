@@ -62,16 +62,17 @@ export function PwaSettings() {
               : "Não foi possível preparar a orientação offline. As funções web continuam disponíveis."}
       </p>
       {pwa.workerIssue && issues[pwa.workerIssue] ? <p role="alert">{issues[pwa.workerIssue]}</p> : null}
+      {pwa.worker === "ready" && !pwa.pushTestReady ? <p role="status">A orientação offline deste aparelho é anterior ao teste de avisos. Consulte as atualizações antes de testar.</p> : null}
       {pwa.worker === "error" || pwa.workerPhase === "pending" ? <button type="button" className="ui-button ui-button-secondary" disabled={pwa.offline} onClick={() => void pwa.retryWorker()}>Tentar preparar orientação offline novamente</button> : null}
       <p>Instalar na tela inicial e preparar avisos são etapas diferentes. A instalação, sozinha, não confirma que os avisos estão prontos.</p>
       {pwa.previewInstallUrl ? <div className="ui-notice" role="status"><p>Para receber atualizações deste Preview, instale pelo endereço estável. Salve seus rascunhos antes de mudar de endereço; o acesso poderá ser solicitado novamente.</p><a href={pwa.previewInstallUrl} target="_blank" rel="noopener noreferrer" className="break-all">Abrir endereço estável do Preview</a><p>Uma instalação feita por outro endereço continua ligada àquele endereço.</p></div> : null}
       {pwa.waiting ? (
         <div className="ui-notice" role="status">
           <p>
-            Atualização pronta. Salve seus rascunhos no sistema e encerre todas
-            as abas do Home Care Assistant. A nova versão ficará disponível ao
-            reabrir o aplicativo. Esta aba não será recarregada automaticamente.
+            Atualização pronta neste aparelho. Salve seus preenchimentos antes
+            de atualizar. Somente a aba que confirmar será recarregada.
           </p>
+          <button type="button" className="ui-button ui-button-primary" disabled={pwa.updating || pwa.offline} onClick={pwa.requestUpdate}>Atualizar este aparelho</button>
         </div>
       ) : null}
       {pwa.message ? <p role="status">{pwa.message}</p> : null}

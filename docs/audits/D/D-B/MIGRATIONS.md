@@ -5,7 +5,28 @@ de dados remotos. As 84 migrations históricas permanecem protegidas.
 
 ## Estado atual — revisão dos avisos do Supabase
 
-Local e remoto em240, sem migrations pendentes, após238→239→240.
+Local e remoto em242, após240→241→242. O acréscimo de teste pessoal de Push
+usa20261113001837 e20261113002720, aplicadas depois do término da CI anterior
+e da qualificação local. Histórico completo240 preservado; dependências,
+grants e relações do Push anterior idênticos ao local. Três RPCs novas têm
+search_path vazio: uma Auth e duas somente serviço. A tabela privada tem RLS,
+nenhum grant direto e quatro índices válidos, cobrindo suas FKs.
+
+Preflight e recheck precederam a escrita; dump nativo de esquema de1.708.233
+bytes protegido fora do Git, sem nova reconstrução de dados. Pós-check confirmou
+histórico242, funções/configurações/grants, tabela, constraints e índices iguais
+ao local; dry-run sem pendências. Não houve reset, fixtures/Auth remotos, envio
+de Push ou ativação externa. A CI do novo SHA continua exigida.
+
+Os três casos novos de Auth real passaram, incluindo propriedade/sessão,
+concorrência, frequência, pausa/revogação/chave, sessão encerrada e resultado
+incerto sem replay. A guarda de chave nula foi acrescentada incrementalmente
+após a introdução local, sem reescrever a migration já aplicada; seu caso
+dirigido passou. As verificações de catálogo do contrato de serviço passaram;
+o restante dependente das fixtures continua na suíte completa da CI.
+
+## Histórico da revisão dos avisos — 239/240
+
 20261112214842 preserva as onze políticas, seus papéis e predicados sensíveis
 às linhas, usando initplan somente para auth.uid(). Acrescenta dois índices
 não únicos de authority_sessions e fecha o search_path de
@@ -37,7 +58,7 @@ Recheck imediatamente antes da escrita e dry-run exclusivos239/240. Pós-check:
 iguais ao local; dry-run vazio. Sem reset, fixtures/Auth remotos ou canais novos.
 Instalação limpa, evolução legada e integração completa seguem na CI do novo SHA.
 
-Advisors após a aplicação:
+Advisors após239/240:
 
 - Performance: os11 [avisos de initplan](https://supabase.com/docs/guides/database/database-linter?lint=0003_auth_rls_initplan)
   desapareceram; FKs sem índice124→122. Índices ainda sem uso76→78 incluem os
@@ -57,6 +78,20 @@ Advisors após a aplicação:
   pago ou alteração de Auth remoto. Registrar a ativação no ambiente elegível.
 - Saúde: nenhum aviso na consulta final. Os avisos mantidos continuam visíveis;
   ausência de erro de saúde não constitui aprovação operacional.
+
+A nova consulta de12/11 à noite confirmou os mesmos238 avisos e69 sugestões de
+segurança. Performance tem122 FKs sem índice e76 índices sem uso, total198;
+os dois índices acrescentados já registraram uso. A queda200→198 não resulta
+de remoção de índice ou de regra. Nenhuma alteração remota foi feita nessa
+reconsulta. Os contratos e limites de correção acima continuam aplicáveis.
+
+Após242, o consultor registra239 avisos e70 sugestões de segurança: a diferença
+é a RPC Auth restrita do teste e sua tabela privada fechada, ambos conferidos
+no pós-check. Não foi aberta política permissiva para remover a sugestão.
+Performance registra122 FKs anteriores sem índice e78 índices sem uso, total200;
+os dois índices adicionais cobrem FKs do recurso novo e ainda não tiveram uso
+remoto. Saúde continua sem avisos. Isso preserva a distinção entre sugestões,
+riscos conhecidos e defeitos efetivos, sem alegar aprovação geral dos achados.
 
 ## Histórico — consulta técnica de tentativas (238)
 

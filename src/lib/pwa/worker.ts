@@ -35,11 +35,44 @@ export function workerFailure(reason: unknown, fallback: string) {
 }
 
 export function workerContract(worker: ServiceWorker) {
-  return new Promise<{ protocol: number; schema: number; revision: string }>((resolve, reject) => {
+  return new Promise<{ protocol: number; schema: number; revision: string; capabilities?: unknown }>((resolve, reject) => {
     const channel = new MessageChannel();
     const close = () => { channel.port1.close(); channel.port2.close(); };
     const timer = setTimeout(() => { close(); reject(new Error("contract_unconfirmed")); }, 5000);
     channel.port1.onmessage = event => { clearTimeout(timer); close(); resolve(event.data); };
     worker.postMessage({ type: "HCA_RUNTIME" }, [channel.port2]);
+  });
+}
+
+export function workerSupports(value: unknown, capability: "explicit-update" | "push-test") {
+  return value !== null && typeof value === "object" && "capabilities" in value &&
+    Array.isArray(value.capabilities) && value.capabilities.includes(capability);
+}
+
+/** Only an explicit UI confirmation activates this exact, already installed candidate. */
+export function activateWorkerUpdate(registration: ServiceWorkerRegistration, revision: string, signal: AbortSignal) {
+  const candidate = registration.waiting;
+  if (!candidate || candidate.state !== "installed") return Promise.reject(new Error("update_candidate_changed"));
+  return new Promise<ServiceWorker>((resolve, reject) => {
+    const timer = setTimeout(() => finish(new Error("update_activation_unconfirmed")), 15000);
+    function cleanup() {
+      clearTimeout(timer);
+      candidate!.removeEventListener("statechange", changed);
+      signal.removeEventListener("abort", aborted);
+    }
+    function finish(error?: Error) {
+      cleanup();
+      if (error) reject(error); else resolve(candidate!);
+    }
+    function changed() {
+      if (candidate!.state === "redundant") finish(new Error("update_activation_failed"));
+      else if (candidate!.state === "activated" && registration.active === candidate) finish();
+    }
+    function aborted() { finish(new DOMException("Update cancelled", "AbortError")); }
+    candidate.addEventListener("statechange", changed);
+    signal.addEventListener("abort", aborted, { once: true });
+    if (signal.aborted) { aborted(); return; }
+    try { candidate.postMessage({ type: "HCA_ACTIVATE_UPDATE", revision, confirmed: true }); changed(); }
+    catch { finish(new Error("update_activation_failed")); }
   });
 }

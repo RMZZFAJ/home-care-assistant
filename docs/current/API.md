@@ -1399,6 +1399,14 @@ Auth e autorização nativos continuam obrigatórios. O GET original não muda
 sua forma. POST /api/push/session revoga somente as
 inscrições vinculadas à sessão corrente. Todos os comandos conferem origem/CSRF.
 
+`POST /api/push/test` recebe deviceId, idempotencyKey e contextReference. Exige
+conta/sessão atuais, inscrição do próprio aparelho e envio habilitado. O banco
+limita um novo teste por minuto/aparelho; repetição da mesma chave consulta o
+recibo sem duplicar transporte. Apenas RPCs de serviço obtêm a inscrição e
+concluem o resultado, após revalidar sessão, conta, pausa, revogação e chave.
+O teste é genérico e separado dos avisos operacionais. Aceite do serviço não
+comprova exibição no celular. Resultado incerto não causa reenvio automático.
+
 GET /api/push/open?id recebe UUID opaco, exige Auth e revalida destinatário,
 vínculo e recurso antes de construir um caminho interno. Não marca visto ou
 ciência. O worker operacional existente processa a fila derivada do aviso

@@ -38,18 +38,35 @@ limite de custódia e não são anunciados como revogáveis pelo worker.
 
 ## Atualização e preservação
 
-Não existe skipWaiting ou reload automático. Uma versão instalada aguarda que
-todas as abas controladas pela anterior sejam encerradas. A interface avisa
-para salvar rascunhos no servidor antes de fechar. Uma aba ainda aberta conserva
-seus campos; fechar outra aba não força a troca. A ativação limpa somente caches
-públicos próprios antigos. É o ciclo de
+Sem confirmação, a versão instalada aguarda o ciclo natural: encerrar as abas
+controladas pela anterior. Não há reload automático. A decisão posterior do
+responsável em12/11/2026 acrescenta Atualizar aplicativo: a pessoa pode salvar
+seus preenchimentos e confirmar a recarga desta aba, sem fechar as outras.
+Antes da ativação, a versão candidata é conferida com o marcador real do
+servidor. Somente uma janela da mesma origem, com confirmação explícita e a
+revisão exata, pode solicitar skipWaiting. A ativação limpa somente caches
+públicos próprios antigos. Sem confirmação, conserva o ciclo natural de
 [atualização do Service Worker](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers).
+
+A confirmação explica a recarga e permite voltar para salvar. Não salva campos
+automaticamente, não amplia rascunhos e não reenvia operações. As outras abas
+mantêm seus campos e podem confirmar sua própria recarga depois, mesmo quando
+o worker novo já está ativo. O controle é por origem e navegador; sessões em
+outro aparelho não impedem a atualização. Um recibo temporário sem dados
+privados permite mostrar sucesso após reabrir esta aba e conferir a revisão
+ativa. Falha ou resultado não confirmado é informado, sem ciclo de reload.
 
 Instalação recusada é identificada pelo estado real redundant; ativação e
 confirmação de versão são fases distintas. O prazo de observação produz
 pendência, não uma confirmação de falha. O aparelho pode tentar preparar
 novamente sem limpar Auth, rascunhos ou armazenamento de outras aplicações.
 Uma atualização recusada conserva o cache público da versão já ativa.
+
+O worker anuncia as capacidades explicit-update e push-test sem mudar o
+protocolo/schema anterior. A versão antiga continua utilizável para os fluxos
+existentes, mas não habilita um teste que ainda não sabe apresentar. O botão
+aguarda a capacidade confirmada; uma candidata sem ativação explícita é recusada
+antes de receber a mensagem. A aplicação orienta consultar a atualização.
 
 Ativar avisos exige registro ativo e versão confirmada antes de solicitar
 permissão. Uma troca de controlador invalida essa prontidão até nova consulta.

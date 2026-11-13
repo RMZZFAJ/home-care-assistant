@@ -1,8 +1,9 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { activeWorker, workerFailure, type WorkerPhase } from "@/lib/pwa/worker";
+import { activeWorker, activateWorkerUpdate, workerFailure, workerSupports, type WorkerPhase } from "@/lib/pwa/worker";
 import { stablePreviewOrigin } from "@/lib/pwa/preview-origin";
 
 class WorkerFixture extends EventTarget {
+  postMessage = vi.fn();
   constructor(public state: ServiceWorkerState) { super(); }
   transition(state: ServiceWorkerState) { this.state = state; this.dispatchEvent(new Event("statechange")); }
 }
@@ -13,11 +14,43 @@ class RegistrationFixture extends EventTarget {
   asRegistration() { return this as unknown as ServiceWorkerRegistration; }
 }
 afterEach(() => vi.useRealTimers());
+it("legacy workers remain usable but cannot promise a new Push test or explicit activation", () => {
+  for (const value of [null, {}, { protocol: 1 }, { capabilities: "push-test" }, { capabilities: ["unrelated"] }]) {
+    expect(workerSupports(value, "push-test")).toBe(false);
+    expect(workerSupports(value, "explicit-update")).toBe(false);
+  }
+  expect(workerSupports({ capabilities: ["push-test", "explicit-update"] }, "push-test")).toBe(true);
+  expect(workerSupports({ capabilities: ["push-test", "explicit-update"] }, "explicit-update")).toBe(true);
+});
 it("a redundant install rejects immediately without waiting for the global ready promise", async () => {
   const r = new RegistrationFixture(), incoming = r.installing!, phases: WorkerPhase[] = [];
   const result = activeWorker(r.asRegistration(), new AbortController().signal, p => phases.push(p)).catch(e => e);
   r.installing = null; incoming.transition("redundant");
   expect((await result).message).toBe("installation_failed"); expect(phases).toEqual(["installing"]);
+});
+it("explicit activation waits for that exact candidate, and refuses a missing or failed candidate", async () => {
+  const r = new RegistrationFixture(), candidate = new WorkerFixture("installed");
+  r.waiting = candidate;
+  const result = activateWorkerUpdate(r.asRegistration(), "requested-revision", new AbortController().signal);
+  expect(candidate.postMessage).toHaveBeenCalledExactlyOnceWith({ type: "HCA_ACTIVATE_UPDATE", revision: "requested-revision", confirmed: true });
+  r.waiting = null; r.active = candidate; candidate.transition("activated");
+  expect(await result).toBe(candidate);
+  await expect(activateWorkerUpdate(r.asRegistration(), "missing", new AbortController().signal)).rejects.toThrow("candidate_changed");
+  const failed = new WorkerFixture("installed"); r.waiting = failed;
+  const failure = activateWorkerUpdate(r.asRegistration(), "requested-revision", new AbortController().signal);
+  failed.transition("redundant");
+  await expect(failure).rejects.toThrow("activation_failed");
+});
+it("explicit update cancellation and deadline reject without reload or sending twice", async () => {
+  vi.useFakeTimers();
+  const r = new RegistrationFixture(), candidate = new WorkerFixture("installed"), abort = new AbortController();
+  r.waiting = candidate;
+  const first = activateWorkerUpdate(r.asRegistration(), "requested", abort.signal).catch(error => error);
+  abort.abort(); expect((await first).name).toBe("AbortError");
+  const second = activateWorkerUpdate(r.asRegistration(), "requested", new AbortController().signal).catch(error => error);
+  await vi.advanceTimersByTimeAsync(15000);
+  expect((await second).message).toBe("update_activation_unconfirmed");
+  expect(candidate.postMessage).toHaveBeenCalledTimes(2); expect(vi.getTimerCount()).toBe(0);
 });
 it("an observation deadline is pending and actual late activation remains recoverable", async () => {
   vi.useFakeTimers();

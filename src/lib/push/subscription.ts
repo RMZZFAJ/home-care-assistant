@@ -75,6 +75,17 @@ export const pushDevice = z
   })
   .strict();
 export const pushDevices = z.array(pushDevice).max(40);
+export const pushTestRequest = z.object({
+  deviceId: z.uuid(),
+  idempotencyKey: z.uuid(),
+  contextReference: pushContextReference,
+}).strict();
+export const pushTestReceipt = z.object({
+  id: z.uuid(),
+  state: z.enum(["pending", "processing", "accepted", "expired", "failed", "uncertain"]),
+  requestedAt: z.iso.datetime({ offset: true }),
+  code: z.string().nullable(),
+}).strict();
 
 export function pushDestination(value: unknown): string {
   const id = z.string().uuid().safeParse(value);

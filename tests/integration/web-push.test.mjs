@@ -483,3 +483,62 @@ test("concurrent workers claim disjoint deliveries, pause keeps the internal not
     "42501",
   );
 });
+
+test("personal Push test binds Auth and session, reserves once, rate limits and fences concurrent dispatch", async () => {
+  const owner = await login(), otherSession = await login(), stranger = await login("professional");
+  const device = await enroll(owner), key = randomUUID();
+  const args = { p_device: device.id, p_key: key, p_key_version: "test-v1" };
+  const anonymous = createClient(env.url, env.anonKey, { auth: { persistSession: false } });
+  for (const denied of [anonymous, service, stranger, otherSession])
+    assert.equal((await denied.rpc("request_my_web_push_test", args)).error?.code, "42501");
+  const before = sql("select count(*) from public.requisition_notifications;");
+  const [a, b] = await Promise.all([rpc(owner, "request_my_web_push_test", args), rpc(owner, "request_my_web_push_test", args)]);
+  assert.equal(a.id, b.id); assert.equal(a.state, "pending");
+  assert.deepEqual(Object.keys(a).sort(), ["code", "id", "requestedAt", "state"]);
+  assert.equal((await owner.rpc("request_my_web_push_test", { ...args, p_key: randomUUID() })).error?.code, "PT429");
+  const token = randomUUID(), prepare = { p_id: a.id, p_user: fixtures.family.id, p_token: token, p_key_version: "test-v1" };
+  for (const version of [null, "", "bad version"])
+    assert.equal((await service.rpc("prepare_web_push_test", { ...prepare, p_key_version: version })).error?.code, "P0001");
+  assert.equal((await owner.rpc("prepare_web_push_test", prepare)).error?.code, "42501");
+  assert.equal(await rpc(service, "prepare_web_push_test", { ...prepare, p_user: fixtures.professional.id }), null);
+  const prepared = await Promise.all([rpc(service, "prepare_web_push_test", prepare), rpc(service, "prepare_web_push_test", { ...prepare, p_token: randomUUID() })]);
+  assert.equal(prepared.filter(Boolean).length, 1);
+  assert.equal(prepared[0]?.subscription.endpoint ?? prepared[1]?.subscription.endpoint, device.sub.endpoint);
+  const actualToken = sql(`select lease_token from private.web_push_tests where id=${sqlLiteral(a.id)};`);
+  assert.equal(await rpc(service, "complete_web_push_test", { p_id: a.id, p_token: randomUUID(), p_result: "accepted" }), "processing");
+  assert.equal(await rpc(service, "complete_web_push_test", { p_id: a.id, p_token: actualToken, p_result: "accepted" }), "accepted");
+  assert.equal((await rpc(owner, "request_my_web_push_test", args)).state, "accepted");
+  assert.equal(await rpc(service, "prepare_web_push_test", prepare), null);
+  assert.equal(sql("select count(*) from public.requisition_notifications;"), before);
+  assert.equal(sql(`select count(*) from private.web_push_tests where user_id=${sqlLiteral(fixtures.family.id)} and request_key=${sqlLiteral(key)};`), "1");
+});
+
+test("personal Push test rechecks pause, revocation, key and actual Auth session before transport", async () => {
+  const owner = await login();
+  for (const condition of ["pause", "revoke", "key", "session"]) {
+    const device = await enroll(owner), key = randomUUID();
+    const result = await rpc(owner, "request_my_web_push_test", { p_device: device.id, p_key: key, p_key_version: "test-v1" });
+    if (condition === "pause" || condition === "revoke") await rpc(owner, "web_push_device_command", { p_id: device.id, p_action: condition });
+    if (condition === "session") {
+      const session = (await owner.auth.getClaims()).data.claims.session_id;
+      sql(`update auth.sessions set not_after=clock_timestamp()-interval '1 second' where id=${sqlLiteral(session)};`);
+    }
+    const payload = await rpc(service, "prepare_web_push_test", { p_id: result.id, p_user: fixtures.family.id, p_token: randomUUID(), p_key_version: condition === "key" ? "other-version" : "test-v1" });
+    assert.equal(payload, null);
+    assert.equal(sql(`select state from private.web_push_tests where id=${sqlLiteral(result.id)};`), "expired");
+  }
+});
+
+test("personal Push test preserves an uncertain transport result and never replays it", async () => {
+  const owner = await login(), device = await enroll(owner), key = randomUUID();
+  const args = { p_device: device.id, p_key: key, p_key_version: "test-v1" };
+  const result = await rpc(owner, "request_my_web_push_test", args), token = randomUUID();
+  const prepare = { p_id: result.id, p_user: fixtures.family.id, p_token: token, p_key_version: "test-v1" };
+  assert.ok(await rpc(service, "prepare_web_push_test", prepare));
+  sql(`update private.web_push_tests set dispatch_started_at=clock_timestamp()-interval '31 seconds' where id=${sqlLiteral(result.id)};`);
+  assert.equal((await rpc(owner, "request_my_web_push_test", args)).state, "uncertain");
+  assert.equal(await rpc(service, "prepare_web_push_test", prepare), null);
+  assert.equal(await rpc(service, "complete_web_push_test", { p_id: result.id, p_token: token, p_result: "accepted" }), "uncertain");
+  const another = await enroll(owner);
+  assert.equal((await owner.rpc("request_my_web_push_test", { ...args, p_device: another.id })).error?.code, "PT409");
+});

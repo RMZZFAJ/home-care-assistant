@@ -13,7 +13,8 @@ import {
 import { usePathname } from "next/navigation";
 import contract from "@/lib/pwa/contract.json";
 import { setRuntimeCommandsAvailable } from "@/lib/client/api";
-import { activeWorker, workerContract, workerFailure, type WorkerPhase } from "@/lib/pwa/worker";
+import { activeWorker, activateWorkerUpdate, workerContract, workerFailure, workerSupports, type WorkerPhase } from "@/lib/pwa/worker";
+import { Dialog } from "@/components/ui/overlays";
 
 type Runtime = "checking" | "ready" | "unavailable" | "incompatible";
 type WorkerState = "checking" | "ready" | "unavailable" | "error";
@@ -31,11 +32,14 @@ type State = {
   installed: boolean;
   canInstall: boolean;
   installing: boolean;
+  updating: boolean;
+  pushTestReady: boolean;
   message: string;
   error: string;
   revision: string;
   install: () => Promise<void>;
   checkUpdates: () => Promise<void>;
+  requestUpdate: () => void;
   refresh: () => Promise<void>;
   retryWorker: () => Promise<void>;
   readyRegistration: () => ServiceWorkerRegistration | null;
@@ -73,6 +77,14 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
   const [message, setMessage] = useState(""),
     [error, setError] = useState(""),
     [revision, setRevision] = useState("");
+  const [confirmUpdate, setConfirmUpdate] = useState(false),
+    [updating, setUpdating] = useState(false);
+  const [tabNeedsReload, setTabNeedsReload] = useState(false);
+  const [pushTestReady, setPushTestReady] = useState(false);
+  const tabRevisionRef = useRef<string | null>(null);
+  const [updateFeedback, setUpdateFeedback] = useState<{ text: string; failed: boolean } | null>(null);
+  const updateReceiptRef = useRef<{ revision: string; at: number } | null>(null);
+  const updateBusyRef = useRef(false);
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null),
     promptRef = useRef<InstallPrompt | null>(null);
   const readyRegistrationRef = useRef<ServiceWorkerRegistration | null>(null);
@@ -127,6 +139,7 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
     const disconnected = () => setOffline(true);
     const controllerChanged = () => {
       readyRegistrationRef.current = null; readyWorkerRef.current = null;
+      setPushTestReady(false);
       setPreparationAttempt(value => value + 1);
     };
     const installPrompt = (event: Event) => {
@@ -144,6 +157,15 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
       if (!live) return;
       setOffline(!navigator.onLine);
       setOrigin(location.origin);
+      try {
+        const raw = sessionStorage.getItem("hca:pwa-update");
+        if (raw) {
+          const receipt = JSON.parse(raw);
+          if (/^[a-f0-9]{24}$/.test(receipt.revision) && Number.isFinite(receipt.at) && receipt.at <= Date.now() && Date.now() - receipt.at < 600000)
+            updateReceiptRef.current = receipt;
+          sessionStorage.removeItem("hca:pwa-update");
+        }
+      } catch { /* Update receipts contain no private fields and never authorize an operation. */ }
       setInstalled(
         window.matchMedia("(display-mode: standalone)").matches ||
           Boolean(
@@ -237,6 +259,19 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
           return;
         }
         setRevision(version.revision);
+        setPushTestReady(workerSupports(version, "push-test"));
+        tabRevisionRef.current ??= version.revision;
+        if (!updateBusyRef.current) setTabNeedsReload(version.revision !== tabRevisionRef.current);
+        if (updateReceiptRef.current) {
+          if (updateReceiptRef.current.revision === version.revision) {
+            setMessage("Aplicativo atualizado com sucesso neste aparelho.");
+            setUpdateFeedback({ text: "Aplicativo atualizado com sucesso neste aparelho.", failed: false });
+          } else {
+            setError("A nova versão ainda não foi confirmada. Consulte as atualizações novamente.");
+            setUpdateFeedback({ text: "A nova versão ainda não foi confirmada. Consulte as atualizações novamente.", failed: true });
+          }
+          updateReceiptRef.current = null;
+        }
         readyRegistrationRef.current = current;
         readyWorkerRef.current = active;
         setWorkerPhase("ready");
@@ -297,12 +332,39 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
       await registrationRef.current.update();
       setWaiting(Boolean(registrationRef.current.waiting));
       setMessage(
-        registrationRef.current.installing ? "Preparando uma atualização. A versão atual continua disponível enquanto o navegador verifica os arquivos públicos." : "Verificação concluída. Uma versão nova aguardará o encerramento das abas antigas.",
+        registrationRef.current.installing ? "Preparando uma atualização. A versão atual continua disponível enquanto o navegador verifica os arquivos públicos." : registrationRef.current.waiting || tabNeedsReload ? "Atualização pronta. Você pode atualizar este aparelho após salvar seus preenchimentos." : "Verificação concluída. O aplicativo está atualizado neste aparelho.",
       );
     } catch {
       setError(
         "Não foi possível consultar atualizações. Verifique a conexão e tente novamente.",
       );
+    }
+  }
+  async function applyUpdate() {
+    const registration = registrationRef.current;
+    const needsActivation = Boolean(registration?.waiting);
+    const candidate = registration?.waiting ?? (tabNeedsReload ? registration?.active : null);
+    if (updateBusyRef.current || offline || !registration || !candidate) return;
+    updateBusyRef.current = true;
+    setUpdating(true); setError(""); setMessage("");
+    try {
+      const target = await workerContract(candidate);
+      const response = await fetch("/api/runtime", { cache: "no-store", signal: AbortSignal.timeout(8000) });
+      const available = await response.json();
+      if (!response.ok || available.state !== "ready" || target.protocol !== available.protocol || target.schema !== available.schema || !workerSupports(target, "explicit-update") || !/^[a-f0-9]{24}$/.test(target.revision) || (needsActivation ? registration.waiting : registration.active) !== candidate)
+        throw new Error("update_not_compatible");
+      sessionStorage.setItem("hca:pwa-update", JSON.stringify({ revision: target.revision, at: Date.now() }));
+      const activated = needsActivation ? await activateWorkerUpdate(registration, target.revision, new AbortController().signal) : candidate;
+      const actual = await workerContract(activated);
+      if (actual.revision !== target.revision || actual.protocol !== target.protocol || actual.schema !== target.schema)
+        throw new Error("update_not_confirmed");
+      // Only this confirming tab reloads. Other tabs retain their fields and pending intentions.
+      window.location.reload();
+    } catch {
+      try { sessionStorage.removeItem("hca:pwa-update"); } catch { /* No retry or reload loop. */ }
+      setError("Não foi possível confirmar a atualização. Esta aba não foi recarregada; seus preenchimentos foram preservados. Consulte as atualizações e tente novamente.");
+      setUpdateFeedback({ text: "Não foi possível confirmar a atualização. Esta aba não foi recarregada. Consulte as atualizações e tente novamente.", failed: true });
+      setConfirmUpdate(false); setUpdating(false); updateBusyRef.current = false;
     }
   }
   const blocked = !publicPage && (offline || runtime !== "ready");
@@ -321,15 +383,18 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
         worker,
         workerPhase,
         workerIssue,
-        waiting,
+        waiting: waiting || tabNeedsReload,
         installed,
         canInstall,
         installing,
+        updating,
+        pushTestReady,
         message,
         error,
         revision,
         install,
         checkUpdates,
+        requestUpdate: () => setConfirmUpdate(true),
         refresh,
         retryWorker,
         readyRegistration,
@@ -354,13 +419,20 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
           ) : null}
         </section>
       ) : null}
-      {waiting && runtime === "ready" && !offline ? (
-        <aside className="ui-notice m-3" role="status">
-          Atualização pronta. Salve seus rascunhos e encerre todas as abas do
-          aplicativo para usar a nova versão. Esta aba não será recarregada
-          automaticamente.
+      {(waiting || tabNeedsReload) && !offline ? (
+        <aside className="ui-notice m-3" role="status" aria-label="Atualização do aplicativo">
+          <p>Atualização pronta neste aparelho. Salve seus preenchimentos antes de atualizar. As outras abas não serão recarregadas.</p>
+          <button type="button" className="ui-button ui-button-primary" disabled={updating} onClick={() => setConfirmUpdate(true)}>Atualizar aplicativo</button>
         </aside>
       ) : null}
+      {updateFeedback ? <aside className="ui-notice m-3" role={updateFeedback.failed ? "alert" : "status"} aria-label="Resultado da atualização"><p>{updateFeedback.text}</p><button type="button" className="ui-button ui-button-secondary" onClick={() => setUpdateFeedback(null)}>Fechar aviso de atualização</button></aside> : null}
+      {confirmUpdate ? <Dialog open title="Atualizar aplicativo neste aparelho" closeDisabled={updating} onClose={() => { if (!updateBusyRef.current) setConfirmUpdate(false); }}>
+        <p>Esta aba será recarregada. Salve seus preenchimentos e aguarde a conclusão de qualquer envio antes de continuar. As outras abas permanecem abertas com seus campos; nenhuma operação será reenviada automaticamente.</p>
+        <div className="hca-toolbar">
+          <button type="button" className="ui-button ui-button-secondary" disabled={updating} onClick={() => setConfirmUpdate(false)}>Voltar para salvar</button>
+          <button type="button" className="ui-button ui-button-primary" disabled={updating || offline || !(waiting || tabNeedsReload)} onClick={() => void applyUpdate()}>{updating ? "Atualizando…" : "Atualizar agora"}</button>
+        </div>
+      </Dialog> : null}
       <div inert={blocked}>{children}</div>
     </Context>
   );

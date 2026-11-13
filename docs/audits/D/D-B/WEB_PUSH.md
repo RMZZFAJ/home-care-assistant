@@ -1,5 +1,34 @@
 # D5.2 — Web Push e consentimento por aparelho
 
+## Teste pessoal e confirmação visível — acréscimo de 12/11/2026
+
+O cartão informa explicitamente quando a inscrição da conta e sessão foi
+confirmada neste aparelho, distinguindo pausa e permissão do navegador.
+Enviar aviso de teste neste aparelho exige inscrição atual, worker pronto,
+permissão concedida e envio habilitado no ambiente. Não ativa um canal desligado.
+
+`POST /api/push/test` recebe deviceId, idempotencyKey e contextReference.
+Autenticação e referência atual são verificadas antes da reserva por RPC.
+O banco confere proprietário e sessão reais, limita a um novo teste por minuto
+por aparelho e devolve somente recibo seguro. Apenas o servidor obtém a inscrição
+privada, com nova conferência de conta ativa, sessão, pausa, revogação e chave.
+Uma reserva só pode iniciar transporte uma vez, mesmo com concorrência.
+
+As tentativas ficam separadas dos avisos operacionais em private.web_push_tests,
+com RLS e sem grants diretos. O conteúdo é genérico, criptografado pelo transporte
+existente, com marcador de teste; tocar abre o perfil autorizado, sem criar
+ciência, recebimento ou evento em uma ficha. Falha de rede ou confirmação incerta
+não causa reenvio automático. Consultar a mesma tentativa reaproveita sua chave.
+Aceite pelo provedor é informado como aceite, sem alegar que o sistema do celular
+exibiu o aviso. A exibição real permanece prova do aparelho/fornecedor.
+
+O acréscimo foi qualificado localmente com Auth real, transporte controlado,
+criptografia real e navegador nos dois motores, sem envio externo. Workers
+anteriores continuam nos fluxos existentes, mas não habilitam o teste novo até
+confirmar sua capacidade. Local e remoto estão reconciliados em242; a CI do SHA
+publicado e o teste físico do usuário continuam próprios. Os resultados
+anteriores abaixo são históricos compatíveis, sem aprovação automática externa.
+
 ## Contrato vigente de conta e sessão — 12/11/2026
 
 A confirmação de avisos conserva a conta, a sessão verificada e o par VAPID da

@@ -30,6 +30,8 @@ export function databaseError(
   error: { code?: string; message?: string } | null,
 ): never {
   const message = error?.message ?? "";
+  if (error?.code === "PT429" && message === "push test rate limited")
+    throw new ApiError("RATE_LIMITED", "Aguarde um minuto entre testes neste aparelho.", 429);
   if(error?.code==="PT409" && /^(contingency revision changed|contingency material reference changed)$/.test(message))
     throw new ApiError("VERSION_CONFLICT","A referência da contingência mudou. Compare os registros atuais antes de preparar outra confirmação.",409);
   if(error?.code==="PT409" && message==="contingency evidence pending")

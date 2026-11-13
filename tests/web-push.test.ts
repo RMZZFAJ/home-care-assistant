@@ -167,6 +167,16 @@ describe("Web Push protected configuration and provider protocol", () => {
       ),
     ).toBe(true);
   });
+  it("encrypts a dedicated generic test marker without changing normal notification payloads", async () => {
+    const f = fixture(), id = randomUUID();
+    let body: Uint8Array | undefined;
+    const send = vi.fn<typeof fetch>(async (_url, init) => {
+      body = init?.body as Uint8Array;
+      return new Response(null, { status: 201 });
+    });
+    expect(await webPushTransport(f.config, send).send(f.subscription, id, "test")).toEqual({ state: "accepted" });
+    expect(decrypt(Buffer.from(body!), f.recipient, f.auth)).toEqual({ v: 1, id, kind: "test" });
+  });
   it.each([
     [410, "expired"],
     [404, "expired"],

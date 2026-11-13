@@ -10,9 +10,10 @@ liberação para produção.
 
 - **Critérios:** são 105, sendo 75 originais e 30 complementos da Ordem Mestre.
   Há 96 com implementação e verificações técnicas concluídas e nove parciais.
-  Destes 96, 94 têm conclusão local e dois registram a reconciliação remota
-  D-A/D-B. Os nove parciais conservam parcelas humanas, adiadas ou de CI; seus
-  estados não equivalem a nove funcionalidades sem implementação.
+  Destes 96, 94 têm conclusão local e dois registram reconciliação remota D-A/D-B.
+  Os três critérios reabertos pelo acréscimo do S24 fecharam novamente no
+  escopo técnico. Os nove parciais conservam parcelas humanas, adiadas ou de CI;
+  seus estados não equivalem a nove funcionalidades sem implementação.
 - **Etapas 01–20:** identificadores preservados para localizar os requisitos.
   A execução restante está agrupada em seis capacidades na seção 6; as etapas
   não são vinte filas independentes. Um critério pode atravessar vários lotes.
@@ -73,19 +74,19 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | Acompanhamento | Estado registrado |
 | --- | --- |
 | Critérios da D-B | 96 verificados tecnicamente; 9 parciais; total de 105 |
-| Etapas anteriores 01 a 13 | Concluídas localmente nos respectivos escopos |
-| Aparência da aplicação | 66/66 conferidas; ressalvas no grupo 3.9 |
+| Etapas 01 a 13 | Escopos anteriores e acréscimo S24 conferidos localmente |
+| Aparência | 66 composições; acréscimo S24 conferido localmente |
 | Operação diária — etapa 06 | 46 composições; conferência conjunta concluída |
 | Outras áreas visuais | Três composições e quatro relações restantes fechadas |
 | Complemento documental | DOC-A/B/C/D concluídos no escopo local executável |
 | Próxima entrega | Critérios finais e validação do candidato publicado |
-| Incremento atual | Diagnósticos do editor e comentários do CodeRabbit |
+| Incremento atual | Editor, revisão, atualização explícita e teste de Push |
 | Resultado local | 66 composições; 164 relações conferidas |
-| Banco | Local e remoto em 240, sem atualizações pendentes |
+| Banco | Local e remoto em 242; sem atualizações pendentes |
 | CI de 0dbd2ba | Linux/Windows/banco/Chromium passaram; iOS cortado |
 | Preview de 0dbd2ba | Concluído na Vercel; produção preservada |
 | CI de 4d5e908 | Linux/Windows/banco/iOS-1 passaram; browser em correção |
-| CI de 8fc04b8 | Linux/Windows/banco passaram; navegador em execução |
+| CI de 8fc04b8 | Uma falha em iOS-2; demais grupos passaram |
 | Preview de 8fc04b8 | Pronto na Vercel, no endereço estável abaixo |
 
 **Correções do fechamento:** os campos de filtro do estoque conservam a edição
@@ -98,8 +99,20 @@ O Sonar confirmou 27 correções e 13 falsos positivos após conferência de con
 Os nove alertas restantes foram aceitos para ferramentas manuais de
 desenvolvimento e para a demonstração HTML, com os limites registrados.
 Isso preserva riscos conhecidos; não equivale a corrigir esses nove em código.
-O Quality Gate continua reprovado pela duplicação de 3,2%. A CI completa
-do commit publicado ainda precisa terminar.
+O Quality Gate continua reprovado pela duplicação de 3,2%. A CI de 8fc04b8
+terminou: cinco grupos de navegador passaram, dois com retry; iOS-2 teve uma
+falha em uma asserção específica do instrumento. O fallback offline real
+funcionou, mas o teste exigia uma interceptação disponível apenas no Chromium.
+A correção local mantém cache privado, API, conteúdo e reconexão como controles.
+
+**Acréscimo solicitado no reteste do S24 — concluído localmente, 100%:** botão
+de atualização com confirmação, resultado visível e preservação das outras
+abas; confirmação clara da inscrição e teste pessoal de Push. A implementação,
+os testes pequenos, a autorização real e a conferência integrada de navegador
+passaram, incluindo compatibilidade com a orientação offline antiga. As duas
+atualizações estão reconciliadas no remoto. A CI do novo commit e o recebimento
+real do Push continuam pendentes. Responsável técnico: Codex. O teste físico
+posterior é seu, com meu apoio.
 
 **Resultado utilizável do lote 6:** Administração global → Monitoramento e
 suporte reúne visão técnica, continuidade, residências/contas e eventos/política.
@@ -122,7 +135,7 @@ e o acesso protegido por cookie. O cache continua restrito aos quatro arquivos
 públicos. A instalação física
 continua sendo uma tarefa sua com apoio de Codex.
 
-**Novo ajuste local, ainda não publicado:** os avisos indicados do editor foram
+**Incremento de editor e revisão:** os avisos indicados do editor foram
 tratados, preservando as provas históricas e a rolagem pelo teclado. O comentário
 pertinente do CodeRabbit sobre o Windows foi corrigido; o histórico do SHA foi
 esclarecido. O acesso ao banco de testes usa executáveis conhecidos, inclusive
@@ -1023,13 +1036,15 @@ estão na etapa 19.
 
 ### 3.6 Aplicativo instalado, conexão, avisos e lembretes
 
-**Critérios deste grupo: 9 concluídos localmente; 0 parciais.**
+**Critérios deste grupo: 9 concluídos localmente; 0 parciais técnicos.**
 
 **Etapas relacionadas:** 11 a 13; 20.
 
 #### 11 — Aplicativo, instalação, atualização e offline
 
-Estado: concluído localmente · 100%. Responsável: Codex.
+Estado: escopo anterior e atualização explícita concluídos localmente · 100%.
+Responsável: Codex. A pessoa pode atualizar esta aba sem fechar
+as outras, após salvar e confirmar. Falha e sucesso têm avisos próprios.
 
 **Condição para fechar:** Os cenários automatizáveis de instalação/atualização
 preservam edição e privacidade e orientam a recuperação.
@@ -1060,7 +1075,9 @@ repetida automaticamente. Reteste físico fica na etapa 20.
 
 #### 12 — Notificações internas e avisos Push
 
-Estado: concluído localmente · 100%. Responsável: Codex.
+Estado: escopo anterior, confirmação visível e teste pessoal concluídos
+localmente · 100%. Responsável: Codex. Inscrição, aceite do serviço
+e exibição no aparelho permanecem resultados separados.
 
 **Condição para fechar:** Os casos internos e de transporte controlado comprovam
 autorização, deduplicação, recuperação e manutenção da pendência interna.
@@ -1211,8 +1228,8 @@ disponibilidade total do serviço.
 - **Aplicar atualizações pendentes da fase D-A no banco remoto** — Concluído ·
   100%.
 - **Manter as atualizações D-B aplicadas no remoto** — Concluído tecnicamente ·
-  100% para o candidato publicado. Local/remoto em 240, com pós-verificação e
-  nenhuma atualização pendente. CI e Preview continuam na etapa 19.
+  100%. As duas atualizações do teste pessoal de Push foram reconciliadas;
+  local/remoto em242, sem pendências. A CI do novo SHA continua na etapa 19.
 
 #### Piloto, qualidade e encerramento — critérios originais
 
@@ -1258,6 +1275,9 @@ este arquivo não exige outro relato manual a cada mudança de um job.
 **Etapas relacionadas:** 06; 15; 20.
 
 **Aparência: 100% das 66 composições do escopo executável conferidas localmente.**
+O novo diálogo de atualização e o cartão de teste do S24 também passaram na
+conferência local própria. O acréscimo não recebeu conclusão pela aprovação
+anterior. Avaliação humana e aparelho real continuam separados.
 Isso não aprova a CI final, a avaliação humana ou a apresentação dos rascunhos
 adiada por você. As 46 composições de operação e as vinte demais fecharam no
 recorte local. Das 171 relações, 164 têm comprovação compatível, cinco conservam
@@ -1801,7 +1821,8 @@ Os gates operacionais, humanos, físicos e de CI continuam explícitos.
 
 ### Lote 4 — Aplicativo, avisos e lembretes
 
-**Concluído localmente.** Etapas 11/12/13 qualificadas. Instalação física,
+**Concluído localmente, incluindo o acréscimo S24.** Atualização explícita e
+teste pessoal de Push fecharam no software, conforme o grupo 3.6. Instalação física,
 retorno efetivo do provedor e prova operacional permanecem na etapa 20.
 
 - **Resultado:** instalação/atualização, uso protegido no Preview, notificações
@@ -1854,15 +1875,11 @@ para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passa
 
 **Ordem atual do restante, sob responsabilidade de Codex:**
 
-1. **Publicado:** candidato integrado com a correção do corte da CI iOS.
-   Acompanhar o resultado do SHA atual e do Preview e corrigir falhas efetivas;
-   os dois casos iOS anteriores não recebem aprovação pela reprodução local.
-2. **Reconciliação concluída:** os 26 parciais anteriores passaram a 17
-   conclusões técnicas e nove critérios com parcelas pendentes explícitas.
-   Nenhum adiamento ou teste humano virou PASS. Preservar a associação durante
-   as correções da CI, sem repetir verificações compatíveis por rotina.
-3. Concluir a etapa 19: conferir CI, migrations, Preview e contratos do candidato
-   final e entregar o estado técnico com os próximos gates e responsáveis.
+1. Publicar o incremento S24 e a correção delimitada de iOS. O software está
+   conferido localmente, inclusive com versões antigas. As migrations já estão
+   reconciliadas após o término da CI anterior, conforme sua condição.
+2. Concluir a etapa 19 com a CI do SHA novo, estado real do Sonar, banco e
+   Preview. Entregar o estado técnico e os próximos gates, sem merge/produção.
 
 ### Gates externos e adiamentos
 

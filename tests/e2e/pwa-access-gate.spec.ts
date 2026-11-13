@@ -3,11 +3,16 @@ import { createServer, type Server } from "node:http";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { transformSync } from "esbuild";
+import { setup, fixtures } from "../integration/v4-fixtures.mjs";
+import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { selectContext } from "./auth-context";
+import { selectProfileSection } from "./profile-sections";
 
 test.use({ serviceWorkers: "allow" });
 const origin = "http://127.0.0.1:3000";
 let cookie = randomUUID();
 let expireAfterScript = false, redirectOnDeny = false, spoof = false, holdActivation = false, revision: string | null = null;
+let application = false, legacyWorker = false;
 let releaseActivation: (() => void) | null = null;
 const requests: { path: string; authorized: boolean; status: number }[] = [];
 let server: Server;
@@ -27,6 +32,21 @@ test.beforeAll(async () => {
     const status = authorized ? 200 : redirectOnDeny ? 307 : 401;
     requests.push({ path, authorized, status });
     if (!authorized) { response.writeHead(status, { "Content-Type": "text/html", "Cache-Control": "private, no-store", ...(redirectOnDeny ? { Location: "/gateway-login" } : {}) }); response.end("Preview authentication required"); return; }
+    if (application && !assets.has(path)) {
+      if (request.method !== "GET" && request.method !== "HEAD") { response.writeHead(405); response.end(); return; }
+      const route = new URL(request.url ?? "/", origin);
+      void fetch("http://127.0.0.1:3100" + route.pathname + route.search, {
+        method: request.method, redirect: "manual",
+        headers: { cookie: request.headers.cookie ?? "", accept: request.headers.accept ?? "*/*" },
+      }).then(async upstream => {
+        const headers = Object.fromEntries(upstream.headers);
+        delete headers["content-encoding"]; delete headers["content-length"]; delete headers["transfer-encoding"];
+        const cookies = upstream.headers.getSetCookie();
+        response.writeHead(upstream.status, { ...headers, ...(cookies.length ? { "set-cookie": cookies } : {}) });
+        response.end(Buffer.from(await upstream.arrayBuffer()));
+      }).catch(() => { if (!response.headersSent) response.writeHead(502); response.end(); });
+      return;
+    }
     if (path === "/") { response.writeHead(200, { "Content-Type": "text/html", "Cache-Control": "no-store" }); response.end("<!doctype html><html lang=pt-BR><title>Protected Preview fixture</title><p>Public worker lifecycle fixture</p><label>Rascunho de teste<input></label></html>"); return; }
     if (path === "/worker-fixture-helper.js") { response.writeHead(200, { "Content-Type": "text/javascript", "Cache-Control": "no-store" }); response.end(transformSync(readFileSync("src/lib/pwa/worker.ts", "utf8"), { loader: "ts", format: "esm" }).code); return; }
     if (path === "/fixture-activation-gate") { releaseActivation = () => { response.writeHead(200, { "Content-Type": "text/plain", "Cache-Control": "no-store" }); response.end("Activation may complete"); }; return; }
@@ -34,6 +54,7 @@ test.beforeAll(async () => {
     if (!asset) { response.writeHead(404); response.end(); return; }
     let body: Buffer | string = readFileSync(asset[0]);
     if (path === "/service-worker.js") {
+      if (legacyWorker) body = body.toString().replace('event.ports[0].postMessage({ ...BUILD, capabilities: ["explicit-update", "push-test"] });', "event.ports[0].postMessage(BUILD);");
       if (revision) {
         const source = body.toString(), match = /const BUILD = JSON\.parse\((.+)\);/m.exec(source)!;
         const build = JSON.parse(JSON.parse(match[1]));
@@ -48,7 +69,7 @@ test.beforeAll(async () => {
   await new Promise<void>((resolve, reject) => { server.once("error", reject); server.listen(3000, "127.0.0.1", resolve); });
 });
 test.afterAll(async () => { server.closeAllConnections(); await new Promise<void>(resolve => server.close(() => resolve())); });
-test.beforeEach(() => { requests.length = 0; cookie = randomUUID(); expireAfterScript = false; redirectOnDeny = false; spoof = false; holdActivation = false; revision = null; releaseActivation = null; });
+test.beforeEach(() => { requests.length = 0; cookie = randomUUID(); expireAfterScript = false; redirectOnDeny = false; spoof = false; holdActivation = false; revision = null; releaseActivation = null; application = false; legacyWorker = false; });
 test.afterEach(() => { releaseActivation?.(); releaseActivation = null; });
 async function authorize(context: BrowserContext) { await context.addCookies([{ name: "preview_access", value: cookie, url: origin, httpOnly: true, sameSite: "Lax" }]); }
 async function register(page: Page) {
@@ -130,4 +151,59 @@ test("ativação real pendente permanece sem prontidão após o prazo e confirma
   expect(await page.evaluate(async () => (await navigator.serviceWorker.getRegistration("/"))!.active!.state)).toBe("activating");
   expect(releaseActivation).not.toBeNull(); releaseActivation!(); releaseActivation = null;
   await expect.poll(async () => (await state()).status).toBe("ready"); expect(await cachePaths(page)).toEqual(publicPaths);
+});
+
+test("Preview estável atualiza por confirmação explícita e conserva a outra aba aberta", async ({ page, context }) => {
+  test.setTimeout(180000);
+  const f = await setup();
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, f.patient);
+  application = true; legacyWorker = true; await authorize(context);
+  await page.goto(origin + "/perfil?careRecipientId=" + f.patient);
+  await selectProfileSection(page, "notices");
+  await expect(page.getByText("Orientação pública disponível para falta de conexão.", { exact: true })).toBeVisible();
+  await expect(page.getByText("A orientação offline deste aparelho é anterior ao teste de avisos. Consulte as atualizações antes de testar.", { exact: true })).toBeVisible();
+  await selectProfileSection(page, "identity");
+  const first = page.getByRole("textbox", { name: "Nome", exact: true });
+  const originalName = await first.inputValue();
+  await first.fill("Edição que será preservada ao cancelar");
+  const peer = await context.newPage();
+  try {
+    await peer.goto(origin + "/perfil?careRecipientId=" + f.patient);
+    await selectProfileSection(peer, "notices");
+    await expect(peer.getByText("Orientação pública disponível para falta de conexão.", { exact: true })).toBeVisible();
+    await selectProfileSection(peer, "identity");
+    const other = peer.getByRole("textbox", { name: "Nome", exact: true });
+    await other.fill("Edição intacta na outra aba");
+    const firstClock = await page.evaluate(() => performance.timeOrigin), peerClock = await peer.evaluate(() => performance.timeOrigin);
+    await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistration("/"))?.active?.state)).toBe("activated");
+    legacyWorker = false; revision = randomUUID().replaceAll("-", "").slice(0, 24);
+    await page.evaluate(async () => (await navigator.serviceWorker.getRegistration("/"))!.update());
+    const banner = page.getByRole("status", { name: "Atualização do aplicativo", exact: true });
+    await banner.getByRole("button", { name: "Atualizar aplicativo", exact: true }).click();
+    const confirmation = page.getByRole("dialog", { name: "Atualizar aplicativo neste aparelho", exact: true });
+    await confirmation.getByRole("button", { name: "Voltar para salvar", exact: true }).click();
+    await expect(first).toHaveValue("Edição que será preservada ao cancelar");
+    expect(await page.evaluate(() => performance.timeOrigin)).toBe(firstClock);
+    await first.fill(originalName);
+    await banner.getByRole("button", { name: "Atualizar aplicativo", exact: true }).click();
+    await Promise.all([page.waitForEvent("domcontentloaded"), confirmation.getByRole("button", { name: "Atualizar agora", exact: true }).click()]);
+    await expect(page.getByRole("status", { name: "Resultado da atualização", exact: true })).toContainText("Aplicativo atualizado com sucesso");
+    expect(await page.evaluate(() => performance.timeOrigin)).toBeGreaterThan(firstClock);
+    await expect.poll(() => page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration("/"))?.waiting))).toBe(false);
+    await expect(other).toHaveValue("Edição intacta na outra aba");
+    expect(await peer.evaluate(() => performance.timeOrigin)).toBe(peerClock);
+    const peerBanner = peer.getByRole("status", { name: "Atualização do aplicativo", exact: true });
+    await expect(peerBanner).toBeVisible();
+    await other.fill(originalName);
+    await peerBanner.getByRole("button", { name: "Atualizar aplicativo", exact: true }).click();
+    await Promise.all([peer.waitForEvent("domcontentloaded"), peer.getByRole("dialog", { name: "Atualizar aplicativo neste aparelho", exact: true }).getByRole("button", { name: "Atualizar agora", exact: true }).click()]);
+    await expect(peer.getByRole("status", { name: "Resultado da atualização", exact: true })).toContainText("Aplicativo atualizado com sucesso");
+    expect(await page.evaluate(() => performance.timeOrigin)).toBeGreaterThan(firstClock);
+    expect(await cachePaths(peer)).toEqual(publicPaths);
+  } finally { await peer.close(); }
 });

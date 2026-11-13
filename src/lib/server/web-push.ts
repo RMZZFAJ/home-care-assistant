@@ -93,6 +93,7 @@ export type PushTransport = {
   send: (
     subscription: WebPushSubscription,
     deliveryId: string,
+    kind?: "test",
   ) => Promise<PushResult>;
 };
 
@@ -103,7 +104,7 @@ export function webPushTransport(
 ): PushTransport {
   return {
     keyVersion: config.keyVersion,
-    async send(subscription, deliveryId) {
+    async send(subscription, deliveryId, kind) {
       let details;
       try {
         const parsed = pushSubscription.parse(subscription);
@@ -115,7 +116,7 @@ export function webPushTransport(
           throw new Error("Invalid target");
         details = generateRequestDetails(
           parsed,
-          JSON.stringify({ v: 1, id: deliveryId }),
+          JSON.stringify({ v: 1, id: deliveryId, ...(kind === "test" ? { kind } : {}) }),
           {
             vapidDetails: {
               subject: config.subject,

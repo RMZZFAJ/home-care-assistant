@@ -1,5 +1,25 @@
 # Complementos posteriores à ordem D-B
 
+## Reteste físico, atualização explícita e teste de Push — 12/11/2026
+
+O responsável relatou no S24 a faixa persistente de atualização e a falta de
+confirmação clara da inscrição. Autorizou atualizar pelo botão, com resultado
+de sucesso/falha, sem depender de fechar outras sessões, e um teste de Push no
+próprio aparelho. Isso substitui a orientação anterior de oferecer somente
+ativação natural após fechar as abas. Não autoriza recarga sem confirmação,
+perda silenciosa de preenchimento, ampliação de rascunhos ou replay offline.
+
+O teste é explícito, genérico e destinado somente ao aparelho da sessão atual.
+Não cria pendência operacional, ciência ou recebimento. Aceite do provedor não
+é prova de exibição pelo sistema operacional. Permissões e canais desabilitados
+continuam respeitados; não há nova ativação de integração externa por Codex.
+
+Na solicitação seguinte, o responsável pediu exclusões adequadas do Pylance no
+workspace e revisão contextual dos avisos do Supabase, sem limpar o painel por
+mudanças cegas. Aplicação remota e push aguardam a conclusão da CI em curso;
+o trabalho do lote permanece local durante essa espera. Commits locais foram
+preservados, sem necessidade de reset ou reescrita.
+
 ## SonarCloud — adiamento anterior e reabertura em 12/11/2026
 
 Em06/11/2026, America/Sao_Paulo, durante a execução D-B, o responsável determinou:

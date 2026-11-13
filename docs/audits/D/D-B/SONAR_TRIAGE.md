@@ -231,5 +231,16 @@ positivo/negativo e conteúdo aprovado preservado. O botão Aplicar filtros rece
 type submit explícito. O tabindex da preparação da residência foi preservado:
 é uma região de rolagem que precisa continuar acessível pelo teclado.
 
-Na observação atual de 8fc04b8, Ubuntu, Windows e banco passaram; os seis grupos
-de navegador continuam em execução. Nenhum teste pendente recebeu aprovação.
+A CI 8fc04b8 terminou: Ubuntu, Windows, banco e cinco grupos de navegador
+passaram. iOS-2 teve241 casos aprovados e uma falha, repetida no retry: o teste
+de offline exigia uma interceptação de requisição do worker disponível apenas
+no Chromium. O artefato nativo mostra o fallback público real no WebKit.
+A correção local condiciona somente esse detalhe do instrumento; conserva
+fromServiceWorker, ausência de dados privados/API, cache público e reconexão.
+O caso passou em mobile e iOS na coorte integrada local de oito percursos.
+
+Dois grupos aprovados precisaram de retry: abertura do formulário da agenda em
+mobile e título de revisão da declaração em Chromium. As causas não foram
+comprovadas. A configuração anterior descartava seus artefatos após recuperação;
+o próximo commit conserva relatórios e capturas também em jobs aprovados.
+Não há supressão, timeout novo ou alteração de produto para ocultar esses casos.

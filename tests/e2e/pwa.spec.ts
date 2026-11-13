@@ -140,7 +140,11 @@ test("PWA real oferece manifesto, ícones e fallback público sem cache de API, 
   await context.setOffline(true);
   const offlineNavigation = await page.goto(`/historico/${f.doc.id}`);
   expect(offlineNavigation?.fromServiceWorker()).toBe(true);
-  expect(blockedWorkerNavigations).toContain(`/historico/${f.doc.id}`);
+  // Only Chromium exposes worker-owned requests to Playwright routing.
+  // WebKit's native offline transition is proved below by the real fallback,
+  // absent private content/API access, and successful online reconnection.
+  if (info.project.name !== "ios")
+    expect(blockedWorkerNavigations).toContain(`/historico/${f.doc.id}`);
   await info.attach("offline-navigation-delivery", { body: JSON.stringify({
     fromServiceWorker: offlineNavigation?.fromServiceWorker(), status: offlineNavigation?.status(),
     cacheControl: offlineNavigation?.headers()["cache-control"],
@@ -337,7 +341,7 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
   ).not.toBe(marker);
 });
 
-test("PWA aguarda todas as abas, não recarrega edição e recupera o mesmo rascunho confirmado após reabrir", async ({
+test("PWA sem confirmação de atualização aguarda abas, preserva edição e recupera rascunho após reabrir", async ({
   page,
   context,
 }, info) => {
@@ -417,7 +421,7 @@ test("PWA aguarda todas as abas, não recarrega edição e recupera o mesmo rasc
       .toBe(true);
     await expect(
       peer.getByText(
-        /^Atualização pronta\. Salve seus rascunhos e encerre todas as abas/,
+        /^Atualização pronta neste aparelho\./,
       ),
     ).toBeVisible();
     await expect(other).toHaveValue("2,");

@@ -68,7 +68,7 @@ self.addEventListener("install", (event) => {
       }
     })(),
   );
-  // Never skipWaiting: other tabs may contain unconfirmed private edits.
+  // Activation is conservative unless a same-origin window explicitly confirms an update.
 });
 self.addEventListener("activate", (event) => {
   event.waitUntil(
@@ -84,11 +84,14 @@ self.addEventListener("message", (event) => {
   // A MessagePort is only a reply channel, never evidence of the sender's origin.
   if (event.origin !== self.location.origin || event.source?.type !== "window") return;
   if (event.data?.type === "HCA_RUNTIME" && event.ports[0])
-    event.ports[0].postMessage(BUILD);
+    event.ports[0].postMessage({ ...BUILD, capabilities: ["explicit-update", "push-test"] });
+  if (event.data?.type === "HCA_ACTIVATE_UPDATE" && event.data.confirmed === true && event.data.revision === BUILD.revision)
+    event.waitUntil(self.skipWaiting());
 });
 self.addEventListener("push", (event) => {
   // Lock-screen text is always local and generic, even for hostile payloads.
   let id = null;
+  let test = false;
   try {
     const data = event.data?.json();
     if (
@@ -98,24 +101,24 @@ self.addEventListener("push", (event) => {
         data.id,
       )
     )
-      id = data.id;
+      { id = data.id; test = data.kind === "test"; }
   } catch {
     /* Malformed payload still gets only the public, generic notice. */
   }
   event.waitUntil(
     self.registration.showNotification("Home Care Assistant", {
-      body: "Há uma atualização no aplicativo. Entre para consultar suas notificações.",
+      body: test ? "Teste de avisos recebido neste aparelho. O recebimento deste teste não confirma ciência ou recebimento de materiais." : "Há uma atualização no aplicativo. Entre para consultar suas notificações.",
       icon: "/pwa/icon-192.png",
       badge: "/pwa/icon-192.png",
       ...(id ? { tag: "hca-push-" + id } : {}),
-      data: { id },
+      data: { id, ...(test ? { kind: "test" } : {}) },
     }),
   );
 });
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const id = event.notification.data?.id;
-  const path =
+  const path = event.notification.data?.kind === "test" ? "/perfil" :
     typeof id === "string" &&
     /^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(
       id,

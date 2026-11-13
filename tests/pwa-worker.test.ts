@@ -34,7 +34,7 @@ function environment(options: { requireCookie?: boolean; poison?: boolean; failP
         claimed = true;
       },
     },
-    skipWaiting: () => {
+    skipWaiting: async () => {
       skipped = true;
     },
     registration: {
@@ -158,7 +158,24 @@ it("runtime replies require a same-origin window client and never accept a forei
   ]) e.handlers.message({ ...sender, data: { type: "HCA_RUNTIME" }, ports: [{ postMessage }] });
   expect(postMessage).not.toHaveBeenCalled();
   e.handlers.message({ origin: "https://care.example", source: { type: "window" }, data: { type: "HCA_RUNTIME" }, ports: [{ postMessage }] });
-  expect(postMessage).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ revision: "sentinel-v1", protocol: 1 }));
+  expect(postMessage).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ revision: "sentinel-v1", protocol: 1, capabilities: ["explicit-update", "push-test"] }));
+});
+it("only explicit confirmation from a same-origin window activates the exact update revision", async () => {
+  const e = environment();
+  let work: Promise<unknown> | undefined;
+  const base = { origin: "https://care.example", source: { type: "window" }, ports: [], waitUntil: (promise: Promise<unknown>) => { work = promise; } };
+  const data = { type: "HCA_ACTIVATE_UPDATE", revision: "sentinel-v1", confirmed: true };
+  for (const event of [
+    { ...base, origin: "https://attacker.example", data },
+    { ...base, origin: "null", data },
+    { ...base, source: { type: "worker" }, data },
+    { ...base, source: null, data },
+    { ...base, data: { ...data, confirmed: false } },
+    { ...base, data: { ...data, revision: "other-version" } },
+  ]) e.handlers.message(event);
+  expect(e.skipped()).toBe(false);
+  e.handlers.message({ ...base, data }); await work;
+  expect(e.skipped()).toBe(true);
 });
 it("a successful-looking authenticated/private response cannot replace even one pinned public asset", async () => {
   const e = environment({ poison: true });
@@ -239,6 +256,18 @@ it("notification click opens only an authenticated same-origin destination and p
   ]);
   expect(close).toHaveBeenCalledTimes(3);
   expect(e.skipped()).toBe(false);
+  expect(e.requested).toHaveLength(0);
+});
+it("a test Push is explicit and generic, and opens the account instead of an operational notice", async () => {
+  const e = environment(), id = "11111111-1111-4111-8111-111111111111";
+  let work: Promise<unknown> | undefined;
+  e.handlers.push({ data: { json: () => ({ v: 1, id, kind: "test", body: "Private patient name" }) }, waitUntil: (value: Promise<unknown>) => { work = value; } });
+  await work;
+  expect(e.shown[0].options.body).toContain("Teste de avisos recebido");
+  expect(e.shown[0].options.body).not.toContain("Private patient");
+  e.handlers.notificationclick({ notification: { close: vi.fn(), data: e.shown[0].options.data }, waitUntil: (value: Promise<unknown>) => { work = value; } });
+  await work;
+  expect(e.opened).toEqual(["https://care.example/perfil"]);
   expect(e.requested).toHaveLength(0);
 });
 it("subscription renewal requests a fresh app consultation without inheriting account consent or transmitting keys", async () => {

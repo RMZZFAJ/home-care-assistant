@@ -1,6 +1,19 @@
 {
     "markdown.validate.enabled": true,
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+    "python.analysis.exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        ".git",
+        ".venv",
+        ".next",
+        ".next-e2e",
+        ".generated",
+        "output",
+        "test-results",
+        "playwright-report",
+        "coverage"
+    ],
     "tailwindCSS.includeLanguages": {
         "markdown": "plaintext"
     },
