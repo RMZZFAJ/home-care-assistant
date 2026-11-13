@@ -288,6 +288,8 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
     expect(
       await input.evaluate((element) => Boolean(element.closest("[inert]"))),
     ).toBe(true);
+    expect(await page.locator(".app-header").evaluate(element => element.hasAttribute("inert"))).toBe(true);
+    expect(await banner.evaluate(element => Boolean(element.closest("[inert]")))).toBe(false);
     expect(
       await page.evaluate(
         () =>

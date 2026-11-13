@@ -31,6 +31,9 @@ O responsável informou o alerta Realtime authorization checks are slow:
 p90 de6000ms nas últimas24h, acima de1000ms. O retorno health do conector veio
 sem lints; isso não invalida o indicador temporal informado nem demonstra cura.
 Não foi feita nova migration ou alteração de configuração para esse alerta.
+O responsável confirmou depois que o alerta permanece em Errors do Health
+Advisor. A permanência de uma janela de24h não distingue, sozinha, pico anterior
+de novas autorizações lentas.
 
 No remoto, a política hca_private_user_channel existe em realtime.messages,
 somente SELECT para authenticated: tópico próprio derivado de auth.uid(),
@@ -62,6 +65,13 @@ criar índices sem consulta/plano que justifiquem. A arquitetura permanece
 inalterada; novas decisões de configuração aguardam o responsável, conforme
 seu pedido. [Relatórios oficiais](https://supabase.com/docs/guides/realtime/reports)
 e [autorização](https://supabase.com/docs/guides/realtime/authorization).
+
+A documentação dos relatórios limita os gráficos detalhados de execução RLS
+de canais privados aos planos Pro/Team/Enterprise. O projeto aparece como Free
+no painel fornecido. Isso explica uma limitação de diagnóstico, não autoriza
+contratação nem atribui a lentidão ao plano. O acesso alternativo ao computador
+também retornou native pipe unavailable; não foi possível consultar o painel
+nesta sessão. Os logs estruturados não expõem duração dessas autorizações.
 
 ## Histórico da revisão dos avisos — 239/240
 

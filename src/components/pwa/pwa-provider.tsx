@@ -23,6 +23,8 @@ type InstallPrompt = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 type State = {
+  blocked: boolean;
+  notices: ReactNode;
   runtime: Runtime;
   offline: boolean;
   worker: WorkerState;
@@ -375,9 +377,28 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
       : runtime === "unavailable"
         ? "Não foi possível confirmar a conexão com o sistema. Suas edições abertas foram preservadas. Consulte novamente antes de continuar."
         : "Conferindo conexão e versão do aplicativo…";
+  // The shell places notices in its content column, outside the inert command
+  // regions. A notice before the shell is covered by its fixed desktop sidebar.
+  const notices = <>
+    {offline || runtime !== "ready" ? (
+      <section className="ui-notice m-3" aria-label="Conexão e versão do aplicativo" role={runtime === "checking" && !offline ? "status" : "alert"}>
+        <p>{status}</p>
+        {runtime !== "checking" ? <button className="ui-button ui-button-secondary" type="button" onClick={() => void refresh()}>Consultar conexão e versão novamente</button> : null}
+      </section>
+    ) : null}
+    {(waiting || tabNeedsReload) && !offline ? (
+      <aside className="ui-notice m-3" role="status" aria-label="Atualização do aplicativo">
+        <p>Atualização pronta neste aparelho. Salve seus preenchimentos antes de atualizar. As outras abas não serão recarregadas.</p>
+        <button type="button" className="ui-button ui-button-primary" disabled={updating} onClick={() => setConfirmUpdate(true)}>Atualizar aplicativo</button>
+      </aside>
+    ) : null}
+    {updateFeedback ? <aside className="ui-notice m-3" role={updateFeedback.failed ? "alert" : "status"} aria-label="Resultado da atualização"><p>{updateFeedback.text}</p><button type="button" className="ui-button ui-button-secondary" onClick={() => setUpdateFeedback(null)}>Fechar aviso de atualização</button></aside> : null}
+  </>;
   return (
     <Context
       value={{
+        blocked,
+        notices,
         runtime,
         offline,
         worker,
@@ -401,31 +422,6 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
         previewInstallUrl: previewOrigin && origin && origin !== previewOrigin ? previewOrigin : null,
       }}
     >
-      {offline || runtime !== "ready" ? (
-        <section
-          className="ui-notice m-3"
-          aria-label="Conexão e versão do aplicativo"
-          role={runtime === "checking" && !offline ? "status" : "alert"}
-        >
-          <p>{status}</p>
-          {runtime !== "checking" ? (
-            <button
-              className="ui-button ui-button-secondary"
-              type="button"
-              onClick={() => void refresh()}
-            >
-              Consultar conexão e versão novamente
-            </button>
-          ) : null}
-        </section>
-      ) : null}
-      {(waiting || tabNeedsReload) && !offline ? (
-        <aside className="ui-notice m-3" role="status" aria-label="Atualização do aplicativo">
-          <p>Atualização pronta neste aparelho. Salve seus preenchimentos antes de atualizar. As outras abas não serão recarregadas.</p>
-          <button type="button" className="ui-button ui-button-primary" disabled={updating} onClick={() => setConfirmUpdate(true)}>Atualizar aplicativo</button>
-        </aside>
-      ) : null}
-      {updateFeedback ? <aside className="ui-notice m-3" role={updateFeedback.failed ? "alert" : "status"} aria-label="Resultado da atualização"><p>{updateFeedback.text}</p><button type="button" className="ui-button ui-button-secondary" onClick={() => setUpdateFeedback(null)}>Fechar aviso de atualização</button></aside> : null}
       {confirmUpdate ? <Dialog open title="Atualizar aplicativo neste aparelho" closeDisabled={updating} onClose={() => { if (!updateBusyRef.current) setConfirmUpdate(false); }}>
         <p>Esta aba será recarregada. Salve seus preenchimentos e aguarde a conclusão de qualquer envio antes de continuar. As outras abas permanecem abertas com seus campos; nenhuma operação será reenviada automaticamente.</p>
         <div className="hca-toolbar">
@@ -433,7 +429,7 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
           <button type="button" className="ui-button ui-button-primary" disabled={updating || offline || !(waiting || tabNeedsReload)} onClick={() => void applyUpdate()}>{updating ? "Atualizando…" : "Atualizar agora"}</button>
         </div>
       </Dialog> : null}
-      <div inert={blocked}>{children}</div>
+      {children}
     </Context>
   );
 }

@@ -8,7 +8,7 @@ o alerta Realtime authorization checks are slow, p90 de6000ms nas últimas24h.
 Pediu explicação do funcionamento real de Realtime e da duplicação do Sonar
 antes de decidir novas configurações/refatorações. Não ampliar funcionalidades,
 abrir permissões ou executar automaticamente o assistente de configuração.
-O push e alterações remotas continuam condicionados ao término da CI corrente.
+A publicação de commits e alterações remotas aguarda o término da CI corrente.
 
 ## Reteste físico, atualização explícita e teste de Push — 12/11/2026
 

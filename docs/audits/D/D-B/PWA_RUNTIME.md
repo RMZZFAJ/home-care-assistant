@@ -38,6 +38,13 @@ limite de custódia e não são anunciados como revogáveis pelo worker.
 
 ## Atualização e preservação
 
+Os avisos de conexão, atualização e resultado ocupam a coluna de conteúdo do
+shell. Não antecedem o cabeçalho nem ficam sob a navegação lateral fixa.
+Em páginas públicas aparecem antes do conteúdo, sem bloqueá-lo. O provider
+conserva estado e ações; o shell aplica inert ao cabeçalho, navegação e conteúdo
+privado quando necessário, mantendo a consulta de recuperação fora dessas
+regiões. Menus em portal continuam sujeitos à guarda de comandos já existente.
+
 Sem confirmação, a versão instalada aguarda o ciclo natural: encerrar as abas
 controladas pela anterior. Não há reload automático. A decisão posterior do
 responsável em12/11/2026 acrescenta Atualizar aplicativo: a pessoa pode salvar
@@ -137,9 +144,34 @@ as falhas e as respectivas coortes, sem transformar diagnóstico em aceite.
 
 ## Execução da CI
 
-Somente iOS usa duas partes. Workers continuam seriais dentro de cada stack
+Chromium, Mobile e iOS usam duas partes cada. Workers continuam seriais na stack
 isolada, sem dividir uma base mutável entre jobs. O gate final exige todos.
-Artefatos ios-1/ios-2 são distintos; os demais nomes são preservados.
+Os seis artefatos usam o nome do navegador e a parte, sem sobrescrever os demais.
 Coleta dirigida deve demonstrar união completa, sem interseção ou caso removido.
 Observações por SHA, duração e contraprovas pertencem ao manifesto de execução
 e ao checkpoint, separados deste contrato.
+
+### Correções dirigidas da CI7e27795
+
+Chromium-1 encontrou target-size no formulário do perfil após recuperar a foto
+e redimensionar com rolagem anterior: um checkbox ficava sob o cabeçalho fixo.
+O controle já tem rótulo com alvo mínimo44px. Os dois casos passam a usar
+auditFromTop, rotina existente para a origem estável das verificações completas.
+Conservam as quatro larguras, teclado, foco, todas as regras Axe, Auth, revogação,
+retomada e ausência de objetos duplicados. Ambos passaram em produção local.
+
+Chromium-2 encontrou o botão Atualizar aplicativo realmente coberto pela barra
+lateral fixa. O posicionamento passou para a coluna do shell, preservando as
+regiões inert e a guarda de comandos inclusive nos portais. A regressão exige
+geometria abaixo do cabeçalho e à direita da navegação, clique real, cancelamento,
+atualização explícita, outra aba intacta e resultado após recarregar. O caso de
+falha/incompatibilidade exige edição preservada, cabeçalho e conteúdo inertes,
+consulta de recuperação acessível e nenhuma escrita. Os seis casos passaram
+em Chromium, Mobile e iOS, build ees5lpee9fhLBv-zRoMAb, worker725c47a1e6faeb1c07f3c570.
+Tipos e lint afetados passaram. A captura nativa acrescentada ao caso conserva
+a inspeção visual na próxima CI; não altera o contrato da jornada.
+
+Logs locais: output/phase-d-work/avatar-viewport-e2e.log e
+output/phase-d-work/pwa-notice-layout-e2e.log. Os artefatos nativos das duas
+falhas foram preservados. Não houve force click, exclusão de regra ou aumento
+de prazo; a CI do próximo SHA continua necessária.

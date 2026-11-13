@@ -14,6 +14,7 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { GuideOnboarding } from "@/components/guides/user-guide";
 import { BottomNavigation, WorkspaceNavigation } from "@/components/navigation/workspace-navigation";
 import { roleLabel, useWorkspaceState } from "./workspace-context";
+import { usePwa } from "@/components/pwa/pwa-provider";
 
 const subscribe = (callback: () => void) => {
   const media = window.matchMedia("(min-width: 851px)");
@@ -81,6 +82,7 @@ function ProfileMenu() {
 }
 
 export function WorkspaceShell({ children,showOnboarding=false }: { children: ReactNode;showOnboarding?:boolean }) {
+  const { blocked, notices } = usePwa();
   const { value, data, selecting, selectPatient } = useWorkspaceState();
   const desktop = useSyncExternalStore(subscribe, desktopSnapshot, serverSnapshot);
   const [collapsed, setCollapsed] = useState(false);
@@ -90,8 +92,8 @@ export function WorkspaceShell({ children,showOnboarding=false }: { children: Re
   const expanded = desktop ? !collapsed : mobileOpen;
   const navigation = <Suspense fallback={null}><WorkspaceNavigation context={value} operational={operational} onNavigate={() => setMobileOpen(false)} /></Suspense>;
   return <div data-context-mode={value?.activeContext?.mode ?? ""} data-context-patient={value?.activeContext?.care_recipient_id ?? ""} className={`app-shell hca-workspace ${operational ? "hca-operations-shell" : "hca-management-shell"} ${desktop && !collapsed ? "hca-navigation-expanded" : ""}`}>
-    <a href="#workspace-content" className="skip-link">Ir para o conteúdo</a>
-    <header className="app-header print:hidden">
+    <a href="#workspace-content" className="skip-link" inert={blocked}>Ir para o conteúdo</a>
+    <header className="app-header print:hidden" inert={blocked}>
       <ActionButton ref={navigationTriggerRef} className="hca-navigation-toggle" variant="quiet"  aria-label={expanded ? "Recolher navegação" : "Abrir navegação"} aria-expanded={expanded} aria-controls="workspace-navigation" onClick={(event) => { event.currentTarget.focus(); if (desktop) setCollapsed((current) => !current); else setMobileOpen((current) => !current); }} >{<Icon name="menu" />}</ActionButton>
       <Link href="/" prefetch={false} className="app-brand" aria-label="Home Care Assistant — início"><span><Icon name="home" /></span><strong>Home Care Assistant<small>Insumos, família e equipe</small></strong></Link>
       <div className="patient-picker">{data?.patients.length ? <SelectField aria-label="Pessoa assistida" value={value?.patient?.id ?? ""} disabled={selecting} onChange={(event) => void selectPatient(event.target.value)}>
@@ -101,11 +103,11 @@ export function WorkspaceShell({ children,showOnboarding=false }: { children: Re
       {value ? <NotificationBell key={`${value.activeContext?.mode}:${value.patient?.id ?? "none"}`} patientId={value.activeContext?.mode === "patient" ? value.patient?.id : undefined} disabled={selecting} /> : null}
       <ProfileMenu />
     </header>
-    {desktop && !collapsed ? <aside id="workspace-navigation" className="hca-desktop-navigation print:hidden">{navigation}</aside> : null}
+    {desktop && !collapsed ? <aside id="workspace-navigation" className="hca-desktop-navigation print:hidden" inert={blocked}>{navigation}</aside> : null}
     <Drawer title="Home Care Assistant" open={!desktop && mobileOpen} onClose={() => setMobileOpen(false)} closeLabel="Fechar menu" side="start" finalFocus={navigationTriggerRef} id={!desktop ? "workspace-navigation" : undefined}>
-      {navigation}
+      <div inert={blocked}>{navigation}</div>
     </Drawer>
-    <div className="hca-workspace-body">{showOnboarding&&value?.activeContext?<GuideOnboarding key={`${value.activeContext.mode}:${value.activeContext.care_recipient_id??""}`}/>:null}{children}</div>
-    {operational && value ? <BottomNavigation context={value} /> : null}
+    <div className="hca-workspace-body">{notices}<div inert={blocked}>{showOnboarding&&value?.activeContext?<GuideOnboarding key={`${value.activeContext.mode}:${value.activeContext.care_recipient_id??""}`}/>:null}{children}</div></div>
+    {operational && value ? <div inert={blocked}><BottomNavigation context={value} /></div> : null}
   </div>;
 }

@@ -168,7 +168,7 @@ test("ativação real pendente permanece sem prontidão após o prazo e confirma
   await expect.poll(async () => (await state()).status).toBe("ready"); expect(await cachePaths(page)).toEqual(publicPaths);
 });
 
-test("Preview estável atualiza por confirmação explícita e conserva a outra aba aberta", async ({ page, context }) => {
+test("Preview estável atualiza por confirmação explícita e conserva a outra aba aberta", async ({ page, context }, info) => {
   test.setTimeout(180000);
   const f = await setup();
   await page.goto("/login");
@@ -199,6 +199,13 @@ test("Preview estável atualiza por confirmação explícita e conserva a outra 
     legacyWorker = false; revision = randomUUID().replaceAll("-", "").slice(0, 24);
     await page.evaluate(async () => (await navigator.serviceWorker.getRegistration("/"))!.update());
     const banner = page.getByRole("status", { name: "Atualização do aplicativo", exact: true });
+    await expect(banner).toBeVisible();
+    if (info.project.name === "chromium") {
+      const noticeBox = (await banner.boundingBox())!, headerBox = (await page.locator(".app-header").boundingBox())!, navigationBox = (await page.locator(".hca-desktop-navigation").boundingBox())!;
+      expect(noticeBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
+      expect(noticeBox.x).toBeGreaterThanOrEqual(navigationBox.x + navigationBox.width);
+    }
+    await info.attach("pwa-update-placement", { body: await page.screenshot(), contentType: "image/png" });
     await banner.getByRole("button", { name: "Atualizar aplicativo", exact: true }).click();
     const confirmation = page.getByRole("dialog", { name: "Atualizar aplicativo neste aparelho", exact: true });
     await confirmation.getByRole("button", { name: "Voltar para salvar", exact: true }).click();

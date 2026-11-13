@@ -6,6 +6,7 @@ import { api, ApiError } from "@/lib/client/api";
 import type { PatientContext, WorkspaceContext } from "@/types/workspace";
 import { demoDocuments } from "@/lib/demo-documents";
 import { WorkspaceShell } from "./workspace-shell";
+import { usePwa } from "@/components/pwa/pwa-provider";
 
 export type ContextData = {
   documentContext?: { id: string; patientId: string; displayName: string; type: string } | null;
@@ -39,6 +40,7 @@ export function useWorkspaceState() { return use(Context); }
 
 /** One authority read model survives navigation; browser selection never authorizes. */
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
+  const { blocked, notices } = usePwa();
   const pathname = usePathname();
   const requestedPatientId = useSearchParams().get("careRecipientId");
   const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})(?:\/arquivos)?$/.exec(pathname)?.[1];
@@ -130,5 +132,5 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const patient = data?.patients.find((row) => row.id === patientId);
   const value: WorkspaceContext | null = data ? { ...data, patient, refresh: load } : null;
   const state = { value, data, loading, selecting, error, selectionError, requestedPatientId, load, selectProfile, selectPatient };
-  return <Context value={state}>{publicPage ? children : <WorkspaceShell showOnboarding={pathname==="/"}>{children}</WorkspaceShell>}</Context>;
+  return <Context value={state}>{publicPage ? <>{notices}<div inert={blocked}>{children}</div></> : <WorkspaceShell showOnboarding={pathname==="/"}>{children}</WorkspaceShell>}</Context>;
 }

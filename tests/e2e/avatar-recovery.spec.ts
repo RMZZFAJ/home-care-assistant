@@ -7,7 +7,7 @@ import { fixtures, env, rpc, actor } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword, patientA } from "../../scripts/test-constants.mjs";
 import { whileRowWaits } from "../integration/lock-barrier.mjs";
-import { audit } from "./accessibility-audit";
+import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 const owner = fixtures.family.id;
@@ -98,7 +98,7 @@ test("foto recupera commit com resposta perdida pela chave original, sem duplica
   const writes: string[] = []; page.on("request", request => { if (new URL(request.url()).pathname === "/api/profile/avatar" && request.method() !== "GET") writes.push(request.method()); });
   await openPhoto(page); await expect(panel.getByAltText("Sua foto de perfil", { exact: true })).toBeVisible();
   expect(writes).toEqual([]); expect(objects().length).toBe(count + 1); expect(pointer()).toBe(appliedPath);
-  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "avatar recovered " + width); }
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await auditFromTop(page, "avatar recovered " + width); }
 }));
 
 test("foto preserva avatar válido após revogação no commit e retoma o upload real em outra sessão sem novo objeto", async ({ page }) => fixture(async f => {
@@ -124,5 +124,5 @@ test("foto preserva avatar válido após revogação no commit e retoma o upload
   await expect(panel.getByText("Foto atualizada e associação confirmada.", { exact: true })).toBeVisible();
   expect(pointer()).toBe(a.objectPath); expect(objects().length).toBe(count);
   expect((await f.service.storage.from("profile-avatars").download(f.valid)).error).toBeNull();
-  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "avatar new session " + width); }
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await auditFromTop(page, "avatar new session " + width); }
 }));

@@ -88,7 +88,7 @@ silenciosamente no primeiro item nem alteram uma conclusão anterior.
 | CI de 4d5e908 | Linux/Windows/banco/iOS-1 passaram; browser em correção |
 | CI de 8fc04b8 | Uma falha em iOS-2; demais grupos passaram |
 | Preview de 8fc04b8 | Pronto na Vercel, no endereço estável abaixo |
-| CI de 7e27795 | Linux/Windows/banco passaram; navegadores em andamento |
+| CI de 7e27795 | Dois casos Chromium falharam; ambos iOS/Mobile passaram |
 | Preview de 7e27795 | Pronto; atualização e teste recebidos no S24 |
 
 **Correções do fechamento:** os campos de filtro do estoque conservam a edição
@@ -129,6 +129,14 @@ Realtime verdadeiro já está configurado. A lentidão de autorização informad
 por você está em investigação, sob minha responsabilidade, sem causa isolada
 nem correção declarada. A duplicação do Sonar foi explicada; mudanças nessa
 configuração aguardam sua decisão. Nenhuma dessas consultas alterou o remoto.
+
+**Correções encontradas pela CI:** dois casos de Chromium falharam. O primeiro
+precisava iniciar a conferência visual em posição estável após redimensionar.
+O segundo revelou o botão de atualização encoberto pelo menu lateral no
+desktop. Ambos foram corrigidos localmente; a recuperação da foto e seis
+percursos de atualização/falha nos três navegadores passaram. Os grupos Mobile
+e ambos iOS da CI anterior passaram, sem cancelamento. A execução terminou;
+o novo commit pode ser publicado e precisará de sua própria CI.
 
 **Resultado utilizável do lote 6:** Administração global → Monitoramento e
 suporte reúne visão técnica, continuidade, residências/contas e eventos/política.
@@ -1892,8 +1900,8 @@ para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passa
 
 **Ordem atual do restante, sob responsabilidade de Codex:**
 
-1. Aguardar a CI7e27795, que já recebeu o incremento S24 e a correção delimitada
-   de iOS, sem cancelá-la. Publicar a correção local do ícone após esse término.
+1. Publicar o ícone e as correções de layout/teste. A CI7e27795 já terminou,
+   incluindo os dois grupos iOS, sem cancelamento.
    As migrations prontas estão reconciliadas. Prosseguir no diagnóstico da
    lentidão de autorização Realtime, sem mudanças de configuração especulativas.
 2. Concluir a etapa 19 com a CI do SHA novo, estado real do Sonar, banco e
