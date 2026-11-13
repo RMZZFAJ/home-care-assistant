@@ -77,9 +77,12 @@ for (const policy of ["required", "optional"] as const) {
     await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
     await expect(panel(page).getByText(latest, { exact: true })).toBeVisible();
 
-    sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.family.id)},'bal.read',false);`);
     const denied = page.waitForResponse(response => target(new URL(response.url())) && response.status() === 403);
-    await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
+    sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.family.id)},'bal.read',false);`);
+    // A genuine Realtime invalidation may already remove the refresh button.
+    // Observe before revoking and drive the read consumer's normal invalidation
+    // signal; the HTTP request and its Auth/RLS denial remain real.
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await denied;
     await expect(page.locator(".hca-document-header")).toHaveCount(0);
     await expect(page.getByText(latest, { exact: true })).toHaveCount(0);

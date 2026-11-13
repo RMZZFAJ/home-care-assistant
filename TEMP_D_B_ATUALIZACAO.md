@@ -137,6 +137,8 @@ desktop. Ambos foram corrigidos localmente; a recuperação da foto e seis
 percursos de atualização/falha nos três navegadores passaram. Os grupos Mobile
 e ambos iOS da CI anterior passaram, sem cancelamento. A execução terminou;
 o novo commit pode ser publicado e precisará de sua própria CI.
+Cada grupo iOS precisou de uma repetição. Os dois pontos do teste foram
+corrigidos e os três casos afetados passaram na conferência dirigida do WebKit.
 
 **Resultado utilizável do lote 6:** Administração global → Monitoramento e
 suporte reúne visão técnica, continuidade, residências/contas e eventos/política.
@@ -1900,8 +1902,8 @@ para a etapa 19, na sequência finita abaixo; a CI publicada ainda precisa passa
 
 **Ordem atual do restante, sob responsabilidade de Codex:**
 
-1. Publicar o ícone e as correções de layout/teste. A CI7e27795 já terminou,
-   incluindo os dois grupos iOS, sem cancelamento.
+1. Conferir a CI e o Preview do incremento com o ícone e as correções de
+   layout/teste. A CI7e27795 terminou, incluindo ambos iOS, sem cancelamento.
    As migrations prontas estão reconciliadas. Prosseguir no diagnóstico da
    lentidão de autorização Realtime, sem mudanças de configuração especulativas.
 2. Concluir a etapa 19 com a CI do SHA novo, estado real do Sonar, banco e

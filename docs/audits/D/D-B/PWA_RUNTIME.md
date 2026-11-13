@@ -175,3 +175,19 @@ Logs locais: output/phase-d-work/avatar-viewport-e2e.log e
 output/phase-d-work/pwa-notice-layout-e2e.log. Os artefatos nativos das duas
 falhas foram preservados. Não houve force click, exclusão de regra ou aumento
 de prazo; a CI do próximo SHA continua necessária.
+
+Os grupos iOS terminaram sem cancelamento, mas cada um teve um retry aprovado.
+No BAL, a observação de403 era instalada depois da revogação e o teste ainda
+tentava clicar no botão que a atualização automática já podia retirar. A
+observação agora antecede a mudança e o teste aciona o sinal normal de releitura
+do consumidor. HTTP, Auth/RLS, retirada do conteúdo, estoque preservado e
+ausência de escritas continuam reais. Essa etapa controla a invalidação no
+teste; a prova do transporte Realtime permanece na integração própria.
+
+No Push indisponível, Axe registrou o alvo parcialmente encoberto pelo cabeçalho
+após os cliques anteriores. Somente essa conferência completa passa a usar
+auditFromTop; as verificações de seção dos outros casos permanecem iguais.
+Os três casos afetados passaram no WebKit, build SK2XznL0GF6SPpK9xxG-8, sem retry
+local, aumento de prazo ou exclusão de regra. Log:
+output/phase-d-work/webkit-retry-regressions.log. Isso qualifica as correções
+dirigidas, não promete ausência de flakiness na próxima execução completa.

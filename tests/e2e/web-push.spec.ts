@@ -13,7 +13,7 @@ import {
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 import { processWebPush } from "../../src/lib/server/web-push";
 
 test.setTimeout(180000);
@@ -378,7 +378,7 @@ test("Web Push negado não repete pedido, não inscreve e mantém a central e o 
       exact: true,
     }),
   ).toHaveCount(0);
-  await audit(page, "push-unavailable");
+  await auditFromTop(page, "push-unavailable");
   await page.goto("/notificacoes");
   await expect(
     page.getByRole("heading", { name: "Central de notificações", exact: true }),
