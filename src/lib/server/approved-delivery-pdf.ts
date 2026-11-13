@@ -97,7 +97,12 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
     layout.paragraph(receipt.notes || "Nota não preservada", "issue/" + index + "/notes");
     layout.paragraph("Aceito na declaração original: " + amount(receipt.acceptedQuantity, unit(line)), "issue/" + index + "/accepted", { size: 9.5 });
   }
-  for (const review of snapshot.fulfillmentReviews ?? []) { layout.heading("Nova avaliação familiar"); layout.paragraph(familyReviewDescription(review), "familyReview/" + review.id, { size: 9.5 }); }
+  for (const review of snapshot.fulfillmentReviews ?? []) {
+    const line = snapshot.lines.find(value => value.id === review.lineId);
+    layout.heading("Nova avaliação familiar");
+    layout.paragraph(line ? name(line) : "Material não identificado", "familyReview/" + review.id + "/material", { size: 9.5 });
+    layout.paragraph(familyReviewDescription(review), "familyReview/" + review.id, { size: 9.5 });
+  }
   for (const [index, event] of fidelity.deliveryResolutions.entries()) {
     const line = snapshot.lines.find(value => value.id === event.lineId), prefix = "resolution/" + index;
     layout.heading("Resolução de divergência · " + (line ? name(line) : "Material não identificado"));

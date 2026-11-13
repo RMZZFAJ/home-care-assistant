@@ -12,14 +12,20 @@ export function RequisitionScienceAction({ id, userId, version, materialIdentity
   const [pending, setPending] = useState<Attempt | null>(() => { try { const parsed = attemptSchema.safeParse(JSON.parse(sessionStorage.getItem(storageKey) ?? "null")); return parsed.success ? parsed.data : null; } catch { return null; } });
   const [open, setOpen] = useState(false), [busy, setBusy] = useState(false), [progress, setProgress] = useState(""), [error, setError] = useState(""), [done, setDone] = useState(false);
   const busyRef = useRef(false);
-  function confirmed() { setPending(null); setOpen(false); setDone(true); setError(""); try { sessionStorage.removeItem(storageKey); } catch {/* Confirmed receipt remains known. */ } onRecorded(); }
-  async function verify(attempt: Attempt) {
+  function retire() { setPending(null); try { sessionStorage.removeItem(storageKey); } catch {/* The page retains the settled outcome. */ } }
+  function confirmed(attempt: Attempt) { retire(); setOpen(false); setDone(attempt.materialIdentity === materialIdentity); setError(""); onRecorded(); }
+  async function verify(attempt: Attempt, rejected = false) {
     for (let number = 1; number <= 2; number++) {
       setProgress(`Verificando se esta ciência foi registrada (${number}/2)…`);
       try {
 const result = z.object({ documentId: z.uuid(), actorId: z.uuid(), materialIdentity: z.string(), confirmed: z.boolean(), recordedAt: z.string().nullable() }).parse(await api(`/api/requisitions/${id}/science?materialIdentity=${attempt.materialIdentity}`));
         if (result.documentId !== id || result.actorId !== userId || result.materialIdentity !== attempt.materialIdentity) throw new Error("A consulta não corresponde a esta tentativa.");
-        if (result.confirmed && result.recordedAt) { confirmed(); return true; }
+        if (result.confirmed && result.recordedAt) { confirmed(attempt); return true; }
+        if (!result.confirmed && (attempt.materialIdentity !== materialIdentity || rejected)) {
+          retire(); setProgress(""); setDone(false);
+          setError("A tentativa anterior não foi registrada e sua referência já não pode ser usada. Confira o conteúdo atual antes de dar ciência novamente.");
+          return false;
+        }
       } catch (cause) { if (cause instanceof ApiError && [401, 403, 404].includes(cause.status)) break; }
     }
     setProgress(""); setError("Ainda não foi possível confirmar o resultado. Esta tentativa continua preservada. Verifique novamente antes de iniciar outra ciência."); return false;
@@ -33,7 +39,8 @@ const result = z.object({ documentId: z.uuid(), actorId: z.uuid(), materialIdent
       if (recovering && !retry) { await verify(attempt); return; }
       setProgress("Registrando sua ciência para este conteúdo…");
       try { await api(`/api/requisitions/${id}/science`, attempt); } catch (cause) {
-        if (!recovering && cause instanceof ApiError && cause.status >= 400 && cause.status < 500) { setPending(null); try { sessionStorage.removeItem(storageKey); } catch {/* Proven rejection has no new receipt. */ } setProgress(""); setError(cause.message); return; }
+        if (cause instanceof ApiError && [400, 409].includes(cause.status)) { await verify(attempt, true); return; }
+        if (!recovering && cause instanceof ApiError && cause.status >= 400 && cause.status < 500) { retire(); setProgress(""); setError(cause.message); return; }
       }
       await verify(attempt);
     } finally { busyRef.current = false; setBusy(false); }

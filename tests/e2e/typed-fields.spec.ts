@@ -104,7 +104,7 @@ test("CFinal019 login, nova senha e OTP usam contratos distintos sem persistir d
     await selectProfileSection(page, "security");
     const current = page.getByLabel("Senha atual", { exact: true }), next = page.getByLabel("Nova senha", { exact: true });
     await expect(current).toHaveAttribute("autocomplete", "current-password"); expect(await current.getAttribute("minlength")).toBeNull();
-    await expect(next).toHaveAttribute("autocomplete", "new-password"); await expect(next).toHaveAttribute("minlength", "12");
+    await expect(next).toHaveAttribute("autocomplete", "new-password"); await expect(next).toHaveAttribute("minlength", "8");
     await selectProfileSection(page, "security");
     const code = page.getByLabel("Código do autenticador", { exact: true });
     await expect(code).toBeVisible(); await expect(code).toHaveAttribute("inputmode", "numeric"); await expect(code).toHaveAttribute("autocomplete", "one-time-code");

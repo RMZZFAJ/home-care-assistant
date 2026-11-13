@@ -30,7 +30,11 @@ export function approvedDeliveryContent(snapshot: DocumentSnapshot, emission: Pd
       semanticFacts["issue/" + index + "/accepted"] = "Aceito na declaração original: " + amount(receipt.acceptedQuantity, unit(line));
     }
   });
-  for (const review of snapshot.fulfillmentReviews ?? []) semanticFacts["familyReview/" + review.id] = familyReviewDescription(review);
+  for (const review of snapshot.fulfillmentReviews ?? []) {
+    const line = snapshot.lines.find(value => value.id === review.lineId);
+    semanticFacts["familyReview/" + review.id + "/material"] = line ? name(line) : "Material não identificado";
+    semanticFacts["familyReview/" + review.id] = familyReviewDescription(review);
+  }
   fidelity.deliveryResolutions.forEach((event, index) => {
     const line = snapshot.lines.find(value => value.id === event.lineId), key = "resolution/" + index;
     semanticFacts[key + "/outcome"] = event.resolution ? { received: "Recebimento complementar", returned: "Devolução à origem", missing: "Falta ou perda conciliada" }[event.resolution] : "Resolução não preservada";

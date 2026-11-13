@@ -5,7 +5,7 @@ import { api, ApiError, TransportError } from "./api";
 
 // Holds one immutable command while its outcome is unknown. A read failure
 // after a successful command is handled by the caller, outside this boundary.
-export function useCommandIntent<Packet extends object, Result>(confirmed: (value: unknown, packet: Packet) => boolean) {
+export function useCommandIntent<Packet extends object, Result>(confirmed: (value: unknown, packet: Packet) => boolean, definitiveRejection?: (reason: unknown) => boolean) {
   const currentRef = useRef<{ url: string; packet: Packet } | null>(null);
   const sendingRef = useRef(false);
   const unresolvedRef = useRef(false);
@@ -24,12 +24,15 @@ export function useCommandIntent<Packet extends object, Result>(confirmed: (valu
       setUncertain(false);
       return result;
     } catch (reason) {
-      const unknown = unresolvedRef.current || !(reason instanceof ApiError) || reason.status === 0 || reason.status >= 500;
+      // Only a contract that checks its receipt before rejecting can settle an
+      // earlier uncertain command. Loss of access alone cannot prove absence.
+      const rejected = definitiveRejection?.(reason) === true;
+      const unknown = !rejected && (unresolvedRef.current || !(reason instanceof ApiError) || reason.status === 0 || reason.status >= 500);
       setUncertain(unknown);
       const recovering = unresolvedRef.current;
       unresolvedRef.current = unknown;
       if (!unknown) currentRef.current = null;
-      if (recovering) {
+      if (recovering && !rejected) {
         const unavailable = new ApiError("Não foi possível recuperar a confirmação. O resultado da primeira tentativa continua incerto. Preserve a referência e consulte novamente quando o acesso estiver disponível.", 0, "RECOVERY_UNAVAILABLE");
         unavailable.cause = reason;
         throw unavailable;

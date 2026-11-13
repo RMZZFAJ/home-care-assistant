@@ -18,9 +18,22 @@ it("the approved ENT keeps original sufficiency, smaller physical receipt and th
  const review=plan.semanticFacts?.["familyReview/"+source.fulfillmentReviews[0].id];
  expect(review).toContain("Familiar da nova avaliação");expect(review).toContain("2 recebido de 4 expedido");
  expect(review).toContain("não altera o recebimento ou o estoque");
+ expect(plan.semanticFacts?.["familyReview/"+source.fulfillmentReviews[0].id+"/material"]).toBe(source.lines[0].name_snapshot);
  expect(plan.semanticFacts?.["material/0/expedited"]).toContain("4");
  expect(plan.semanticFacts?.["material/0/received"]).toContain("2");
  expect(plan.semanticFacts?.["material/0/open"]).toContain("2");
  expect((await validateIssuanceContent(plan.bytes,plan)).passed).toBe(true);
  await mkdir("output/pdf/l1-review",{recursive:true});await writeFile("output/pdf/l1-review/family-reevaluation.pdf",plan.bytes);
+},30000);
+
+it("two equal-quantity reviews identify their own material independently of decision order",async()=>{
+ const source=currentPdfFixture(structuredClone(Object.values(demoDocuments).find(row=>row.type==="ENT")!));
+ source.lines=source.lines.slice(0,2).map((line,index)=>({...line,id:`10000000-0000-4000-8000-00000000000${index+1}`,quantity:"4",accepted_quantity:"2"}));
+ source.fulfillmentReviews=[1,0].map(index=>({id:`20000000-0000-4000-8000-00000000000${index+1}`,lineId:String(source.lines[index].id),decision:index===0?"complete":"partial",reason:"Avaliação fictícia",actorId:"30000000-0000-4000-8000-000000000001",actorName:"Familiar fictício",recordedAt:"2026-11-13T13:00:00Z",expectedVersion:1,expeditedQuantity:"4",acceptedQuantity:"2"}));
+ const plan=await composeIssuance(source,"c".repeat(64),{...fidelityEmission,rendererRevision:16});
+ expect(plan.semanticFacts?.["familyReview/20000000-0000-4000-8000-000000000002/material"]).toBe("Lenço umedecido");
+ expect(plan.semanticFacts?.["familyReview/20000000-0000-4000-8000-000000000001/material"]).toBe("Fralda geriátrica G");
+ await expect(validateIssuanceContent(plan.bytes,plan)).resolves.toMatchObject({passed:true});
+ const wrong={...plan,semanticFacts:{...plan.semanticFacts,"familyReview/20000000-0000-4000-8000-000000000002/material":"Fralda geriátrica G"}};
+ await expect(validateIssuanceContent(plan.bytes,wrong)).rejects.toMatchObject({code:"CONTENT_INVALID"});
 },30000);

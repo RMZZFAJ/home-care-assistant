@@ -15,6 +15,10 @@ function canonical(row) {
   const { sourceFacts, documentFacts, purchaseEntryBalances, ...body } = row.snapshot;
   assert.equal(sourceFacts.schemaVersion, 1); assert.equal(documentFacts.schemaVersion, 1); assert.ok(purchaseEntryBalances);
   const event = JSON.parse(sql("select jsonb_build_object('body',body,'hash',content_hash) from public.document_events where document_id=" + q(row.documentId) + " and version=" + row.version));
+  for (const key of ["lifecycleFacts", "presentationFacts"]) {
+    if (Object.hasOwn(row.snapshot, key)) assert.equal(row.snapshot[key].schemaVersion, 1);
+    if (!Object.hasOwn(event.body, key)) delete body[key];
+  }
   assert.deepEqual(body, event.body); assert.equal(row.sourceHash, event.hash);
   assert.equal(JSON.stringify(event.body).includes('"quantityAfter"'), false);
   assert.equal(JSON.stringify(event.body).includes('"purchaseEntryBalances"'), false);
@@ -38,7 +42,7 @@ test("COM V13 freezes the selected per-material entry cutoff while preserving ca
   const oldKey = randomUUID(), old = await reserve(f, null, oldKey, "reserve_pdf_issuance"); assert.ifError(old.error);
   const replay = await reserve(f, null, oldKey); assert.ifError(replay.error);
   assert.equal(replay.data.id, old.data.id); assert.equal(replay.data.rendererRevision, 16);
-  assert.deepEqual(replay.data.snapshot, old.data.snapshot); assert.equal(old.data.snapshot.purchaseEntryBalances, undefined);
+  assert.deepEqual(replay.data.snapshot, old.data.snapshot); assert.deepEqual(old.data.snapshot.purchaseEntryBalances, latest);
   assert.deepEqual((await rpc(f.family, "pdf_issuance", { p_id: original.data.id })).snapshot, original.data.snapshot);
 });
 test("COM stock authority is rechecked on every issuance replay; a masked source never acquires private quantities later", async () => {

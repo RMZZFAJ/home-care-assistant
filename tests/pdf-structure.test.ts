@@ -12,13 +12,18 @@ import { InternalTimestampAuthority } from "@/lib/server/pdf-signing/internal-ts
 const snapshots = legacyFidelitySnapshots.map(original => ({ ...structuredClone(original), documentFacts: { schemaVersion: 1 as const, deliveryResolutions: [], purchaseReceiptEvents: [] } }));
 const plan = (index = 0, revision = 16) => composeIssuance(currentPdfFixture(snapshots[index]), "c".repeat(64), { ...fidelityEmission, rendererRevision: revision });
 const key = PDFName.of;
+// Reviewed content from the synthetic fixture, independent of the renderer.
+// Keep these literals when layout code changes: a missing row must fail here.
+const materialBaseline = ["Fralda geriátrica G", "Lenço umedecido", "Memantina 10 mg", "Gaze estéril", "Equipo para dieta", "Soro fisiológico 0,9%"];
+const materialUnits = ["unidade", "pacote", "comprimido", "pacote", "unidade", "frasco"];
 for (const [index, source] of snapshots.entries()) {
-  it(`preserves final content and logical structure for ${source.type}-${index} V10`, async () => {
-    const previous = await plan(index);
-    await mkdir("output/pdf/structure-v10/baseline", { recursive: true });
-    await writeFile(`output/pdf/structure-v10/baseline/${source.type}-${index}.pdf`, previous.bytes);
+  it(`preserves the independent material baseline and logical structure for ${source.type}-${index}`, async () => {
     const current = await plan(index);
-    expect(current.runs).toEqual(previous.runs);
+    const materialNames = Object.entries(current.semanticFacts ?? {}).filter(([key]) => /^material\/\d+\/name$/.test(key)).map(([,value]) => value);
+    expect(materialNames).toEqual(materialBaseline.map((name,index) => ["COM","BAL"].includes(source.type) ? name + " " + materialUnits[index] : name));
+    const painted = current.runs.map(run => run.text).join(" ").replaceAll(/\s+/g, " ");
+    for (const material of materialBaseline) expect(painted).toContain(material);
+    await expect(validateIssuanceContent(current.bytes, current)).resolves.toMatchObject({ passed: true });
     const pdf = await PDFDocument.load(current.bytes, { updateMetadata: false });
     const facts = validatePdfStructure(pdf);
     expect(facts.roles).toMatchObject({ H1: 1, Figure: 1, Document: 1 });
@@ -27,6 +32,15 @@ for (const [index, source] of snapshots.entries()) {
     await writeFile(`output/pdf/structure-v10/current/${source.type}-${index}.pdf`, current.bytes);
   }, 30_000);
 }
+
+it("the content baseline detects a deleted material even when the new renderer is internally consistent", async () => {
+  const source = currentPdfFixture(snapshots[0]);
+  source.lines = source.lines.slice(1);
+  const current = await composeIssuance(source, "c".repeat(64), { ...fidelityEmission, rendererRevision: 16 });
+  const materialNames = Object.entries(current.semanticFacts ?? {}).filter(([key]) => /^material\/\d+\/name$/.test(key)).map(([,value]) => value);
+  expect(materialNames).not.toEqual(materialBaseline);
+  expect(materialNames).not.toContain(materialBaseline[0]);
+});
 
 it("rejects missing tags, broken parents, absent scopes, unmatched content and untagged painted content", async () => {
   const current = await plan();

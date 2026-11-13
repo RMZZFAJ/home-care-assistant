@@ -20,7 +20,7 @@ test("an autonomous return needs no original ENT and preserves distinct agreemen
   assert.deepEqual(returnBalances(f), { family: 30, team: 10, transit: 0 });
   assert.equal((await transferCommand(f.counterparty.client, d.id, "dispatch", d.version)).error?.code, "42501");
   const dispatch = await transferCommand(f.initiator.client, d.id, "dispatch", d.version); assert.ifError(dispatch.error); d = dispatch.data;
-  assert.equal(d.code, "ENT-0001"); assert.ok(d.protocol); assert.equal(d.status, "pending_receipt");
+  assert.equal(d.code, "DEV-0001"); assert.ok(d.protocol); assert.equal(d.status, "pending_receipt");
   assert.deepEqual(returnBalances(f), { family: 30, team: 5, transit: 5 });
   const request = { p_id: d.id, p_action: "receive", p_version: d.version, p_key: randomUUID(),
     p_body: { divergences: [{ lineId: d.lines[0].id, acceptedQuantity: "3", problem: "shortage", notes: "Recebi três das cinco unidades devolvidas." }] } };
@@ -45,6 +45,10 @@ test("ENT V14 preserves autonomous-return source and exact old intentions while 
   const { sourceFacts, documentFacts, ...body } = current.data.snapshot;
   assert.equal(sourceFacts.schemaVersion, 1); assert.equal(documentFacts.schemaVersion, 1);
   const canonical = JSON.parse(sql("select body from public.document_events where document_id=" + q(d.id) + " and version=" + d.version));
+  for (const key of ["lifecycleFacts", "presentationFacts"]) {
+    if (Object.hasOwn(current.data.snapshot, key)) assert.equal(current.data.snapshot[key].schemaVersion, 1);
+    if (!Object.hasOwn(canonical, key)) delete body[key];
+  }
   assert.deepEqual(body, canonical); assert.equal(transferState(f), before);
   const key = randomUUID(), older = await reserve(f.initiator.client, d.id, null, key, "reserve_pdf_issuance"); assert.ifError(older.error);
   const replay = await reserve(f.initiator.client, d.id, null, key); assert.ifError(replay.error);

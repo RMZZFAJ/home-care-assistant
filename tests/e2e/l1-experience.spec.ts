@@ -30,6 +30,12 @@ test("L1 acesso e início mantêm a composição em desktop, 360 e 412 pixels",a
     await audit(page,"L1 login "+width);await capture(page,"login-"+width);
   }
   const f=await setup();const req=await issue(f.patient,f.products);await login(page,f.patient);
+  const attention=page.locator(".hca-task-attention-banner"),dismiss=attention.getByRole("button",{name:"Ocultar este aviso por 24 horas",exact:true});
+  if(await dismiss.count()){
+    const previous=await attention.getByRole("heading").innerText();
+    await dismiss.click();
+    await expect(attention.getByRole("heading",{name:previous,exact:true})).toHaveCount(0);
+  }
   for(const width of [1440,360,412]){
     await page.setViewportSize({width,height:940});
     await expect(page.locator(".hca-home-requests")).toContainText(sql("select code from public.operational_documents where id="+q(req.id)));

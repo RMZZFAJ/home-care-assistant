@@ -29,7 +29,7 @@ export function TaskAttention({ tasks, context }: { tasks: DashboardTask[]; cont
           <p>{task.description}</p>
         </div>
         <Icon name={task.kind === "delivery" ? "truck" : task.kind === "science" ? "check" : "file"} />
-        {!professionalBalance ? <ActionButton variant="quiet" aria-label="Ocultar este aviso por 24 horas" onClick={() => { const next = { ...hidden, [task.id]: Date.now() + 86_400_000 }; setHidden(next); try { localStorage.setItem(key, JSON.stringify(next)); } catch { /* Current page still honors dismissal. */ } }}><Icon name="close" /></ActionButton> : null}
+        {!professionalBalance ? <ActionButton variant="quiet" aria-label="Ocultar este aviso por 24 horas" onClick={() => { const clickedAt = Date.now(); const next = { ...hidden, [task.id]: clickedAt + 86_400_000 }; setNow(clickedAt); setHidden(next); try { localStorage.setItem(key, JSON.stringify(next)); } catch { /* Current page still honors dismissal. */ } }}><Icon name="close" /></ActionButton> : null}
       </div>
       <Link href={task.href} className="ui-button ui-button-primary" prefetch={false}>
         {professionalBalance ? "Fazer balanço" : "Abrir próxima providência"} <Icon name="arrow" />

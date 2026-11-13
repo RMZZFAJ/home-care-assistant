@@ -1,12 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { POST as preference } from "@/app/api/profile/science/route";
-import { POST as science } from "@/app/api/requisitions/[id]/science/route";
+import { GET as scienceResult, POST as science } from "@/app/api/requisitions/[id]/science/route";
 import { GET as openings, POST as display } from "@/app/api/requisitions/[id]/openings/route";
 import { ApiError, databaseError } from "@/lib/server/api";
 
 const id = "20000000-0000-4000-8000-000000000001";
 const request = (body: unknown) => new Request("https://care.example/api/profile/science", { method: "POST", headers: { "content-type": "application/json", origin: "https://care.example" }, body: JSON.stringify(body) });
 describe("P02 boundaries", () => {
+  it("rejects missing and malformed science-result identities as query validation errors", async () => {
+    for (const query of ["", "?materialIdentity=bad", "?materialIdentity=" + "a".repeat(63)]) {
+      const response = await scienceResult(new Request("https://care.example/api/requisitions/" + id + "/science" + query), { params: Promise.resolve({ id }) });
+      expect(response.status).toBe(400);
+      expect(await response.json()).toMatchObject({ code: "VALIDATION_ERROR", retryable: false });
+    }
+  });
   it("refuses a forged opening actor, invalid references and unsafe pagination before authentication", async () => {
     const base = { materialIdentity: "a".repeat(64), referenceVersion: 1, openingKey: id };
     for (const body of [{ ...base, userId: id }, { ...base, origin: "human_read" }, { ...base, referenceVersion: 0 }, { ...base, materialIdentity: "" }]) {

@@ -144,12 +144,12 @@ test("perfil recebe invalidação externa e senha nova conserva limites em carac
     await expect(page.getByLabel("Menu do usuário", { exact: true })).toContainText(name);
     await selectProfileSection(page, "security");
     const password = page.getByLabel("Nova senha", { exact: true });
-    await expect(password).toHaveAttribute("minlength", "12"); await expect(password).toHaveAttribute("maxlength", "72");
+    await expect(password).toHaveAttribute("minlength", "8"); await expect(password).toHaveAttribute("maxlength", "72");
     await expect(password).toHaveAttribute("autocomplete", "new-password");
-    await password.fill("a".repeat(72)); expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
+    await password.fill("Aa1!" + "a".repeat(68)); expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
     await password.fill("á".repeat(37)); expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);
     expect(await password.evaluate((input: HTMLInputElement) => input.validationMessage)).toContain("72 bytes");
-    await expect(page.getByText("Letras acentuadas podem ocupar mais de um byte.", { exact: false })).toBeVisible();
+    await expect(page.getByText("Limite de 72 bytes UTF-8.", { exact: false })).toBeVisible();
     await password.fill("a".repeat(12)); await page.getByRole("button", { name: "Mostrar nova senha", exact: true }).click(); await expect(password).toHaveAttribute("type", "text");
     await page.getByRole("button", { name: "Ocultar nova senha", exact: true }).click(); await expect(password).toHaveAttribute("type", "password");
     await password.fill("");

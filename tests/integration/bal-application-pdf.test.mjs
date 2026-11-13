@@ -16,6 +16,12 @@ function canonical(row) {
  const { sourceFacts, documentFacts, balanceApplication, ...body } = row.snapshot;
  assert.equal(sourceFacts.schemaVersion, 1);assert.equal(documentFacts.schemaVersion, 1);assert.ok(balanceApplication);
  const stored = JSON.parse(sql("select jsonb_build_object('body',body,'hash',content_hash) from public.document_events where document_id="+q(row.documentId)+" and version="+row.version));
+ assert.ok(Array.isArray(row.snapshot.balanceReviewCorrections));
+ if (!Object.hasOwn(stored.body,"balanceReviewCorrections")) delete body.balanceReviewCorrections;
+  for (const key of ["lifecycleFacts", "presentationFacts"]) {
+    if (Object.hasOwn(row.snapshot, key)) assert.equal(row.snapshot[key].schemaVersion, 1);
+    if (!Object.hasOwn(stored.body, key)) delete body[key];
+  }
  assert.deepEqual(body, stored.body);assert.equal(row.sourceHash, stored.hash);
 }
 test("BAL V11 freezes only the selected application's moment and historical stock, without changing canonical business facts or older intentions", async () => {

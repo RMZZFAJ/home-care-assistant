@@ -316,6 +316,7 @@ export function PatientSupplyWizard({
             sharedNeedReasons: {},
             presentationSelections: {},
             manualQuantities: {},
+            requestFulfillments: {},
           }
           : {}),
         observationTimes: {},
@@ -417,6 +418,7 @@ export function PatientSupplyWizard({
         setLegacyReference(stockReference?.data ?? null);
         setStaleLegacyReference(false);
         setPeople(settings.directory);
+        let openRequestLines = new Set<string>();
         if (type !== "BAL" && canReadRequests) {
           const options = await api<{ data: ItemContext[]; }>(
             "/api/requisitions/item-context?careRecipientId=" +
@@ -430,6 +432,7 @@ export function PatientSupplyWizard({
           );
           if (controller.signal.aborted) return;
           setRequestOptions(options.data);
+          openRequestLines = new Set(options.data.flatMap(option => option.pending.map(item => item.lineId)));
         }
         if (source && source.data.care_recipient_id !== patientId)
           throw new Error(
@@ -438,7 +441,7 @@ export function PatientSupplyWizard({
         const sourceLinks: Record<string, string[]> = {};
         for (const item of source?.data.requisition_items ?? []) {
           const productId = item.product_id ?? item.resolution?.product_id;
-          if (productId) (sourceLinks[productId] ??= []).push(item.id);
+          if (productId && openRequestLines.has(item.id)) (sourceLinks[productId] ??= []).push(item.id);
         }
         setLinks(sourceLinks);
         let restored: WizardState | undefined;

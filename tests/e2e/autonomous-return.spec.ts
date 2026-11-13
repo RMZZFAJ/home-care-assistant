@@ -89,7 +89,7 @@ test("autonomous return has its own daily entry, recovers its preparation and pr
     await expect(receiver.getByText("Operação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.", { exact: true })).toBeVisible();
     const final = (await (await receiver.request.get("/api/documents/" + id)).json()).data;
     expect(final.workflow_data.acceptedBy).toBe(f.recipient.id); expect(final.transfer.agreement.actor.id).toBe(f.counterparty.id);
-    expect(final.created_by).toBe(f.initiator.id); expect(final.transfer.originDocumentId).toBeNull(); expect(final.code).toBe("ENT-0001");
+    expect(final.created_by).toBe(f.initiator.id); expect(final.transfer.originDocumentId).toBeNull(); expect(final.code).toBe("DEV-0001");
     expect(returnBalances(f)).toEqual({ family: 33, team: 5, transit: 2 });
     const after = transferState(f), pdf = await generatedPdf(receiver, "/api/documents/" + id + "/pdf"); expect(pdf.status()).toBe(200);
     mkdirSync("output/pdf/phase-d", { recursive: true }); writeFileSync("output/pdf/phase-d/autonomous-return-" + info.project.name + ".pdf", await pdf.body());

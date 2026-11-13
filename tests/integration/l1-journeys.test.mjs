@@ -89,6 +89,8 @@ test("L1 smaller receipt cannot complete even a single-item REQ before the new f
  ent=await rpc(f.admin,"supply_document_command",{p_id:ent.id,p_action:"resolve",p_body:{lineId:ent.lines[0].id,quantity:"2",resolution:"missing",reason:"Falta física conciliada na fixture"},p_key:randomUUID(),p_version:ent.version});
  assert.equal((await progress()).completedAt,null);
  assert.equal((await rpc(family,"requisition_fulfillment",{p_requisition:req.id})).lines[0].serviceStatus,"review_required");
+ const listed=(await rpc(family,"operational_document_list",{p_patient:f.patient,p_type:"REQ"})).data.find(row=>row.id===req.id);
+ assert.equal(listed.fulfillment.partial,1);assert.equal(listed.fulfillment.fulfilled,0);
  const stock=sql("select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id="+q(f.patient));
  await rpc(family,"review_request_fulfillment",{p_document:ent.id,p_line:ent.lines[0].id,p_decision:"complete",p_reason:"O recebido é suficiente para esta solicitação fictícia",p_key:randomUUID(),p_version:ent.version});
  assert.ok((await progress()).completedAt);
