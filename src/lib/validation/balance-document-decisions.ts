@@ -43,6 +43,12 @@ const recountBody = z
       ),
   })
   .strict();
+export const balanceDocumentActionSchema = z.discriminatedUnion("purpose", [
+  z.object({ careRecipientId: id, documentId: id, expectedVersion: version, purpose: z.literal("review_family"), body: reviewBody.extend({ group: z.literal("family") }) }).strict(),
+  z.object({ careRecipientId: id, documentId: id, expectedVersion: version, purpose: z.literal("review_supervisor"), body: reviewBody.extend({ group: z.literal("supervisor") }) }).strict(),
+  z.object({ careRecipientId: id, documentId: id, expectedVersion: version, purpose: z.literal("assign_recount"), body: recountBody }).strict(),
+]);
+export type BalanceDocumentAction = z.infer<typeof balanceDocumentActionSchema>;
 export const balanceDocumentDecisionSchema = z
   .discriminatedUnion("purpose", [
     z

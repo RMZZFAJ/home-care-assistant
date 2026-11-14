@@ -98,18 +98,19 @@ export function RequisitionOpening({
         </button>
       </div>
     );
+  if (!opening && !error) return null;
   if (!opening)
     return (
       <div className="space-y-3">
         {standalone ? <h1>Requisição e acompanhamento</h1> : null}
         <Notice error={Boolean(error)}>
-          {error || "Consultando referência e preferência de abertura…"}
+          {error}
         </Notice>
         {error ? (
           <button
             type="button"
             className={buttonClass}
-            onClick={() => setAttempt((value) => value + 1)}
+            onClick={() => { setError(""); setAttempt((value) => value + 1); }}
           >
             Tentar novamente
           </button>

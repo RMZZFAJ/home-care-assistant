@@ -60,6 +60,8 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
       lines: [{ productId: f.products[0], quantity: "1" }],
     },
   });
+  // The individually mentioned reader must also be allowed to read the referenced COM.
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.professional.id)},'com.read',true)`);
   await login(page, f.patient);
   await open(page, req.id);
   const feed = page.getByRole("region", {
@@ -111,45 +113,23 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   ).toHaveValue("contact");
   await expect(editor.getByRole("combobox", { name: "Destaque do andamento", exact: true })).toHaveValue("normal");
   expect(Object.keys(JSON.parse(sql(`select content::text from private.progress_preparations where document_id=${sqlLiteral(req.id)} and owner_id=${sqlLiteral(fixtures.family.id)} and state='active'`)).note).sort()).toEqual(["category", "references", "stage", "text"]);
-  await editor
-    .getByLabel("Código da ficha a vincular", { exact: true })
-    .fill(com.code);
-  await editor
-    .getByRole("button", { name: "Buscar fichas e andamentos", exact: true })
-    .click();
-  await editor
-    .getByRole("textbox", { name: "Texto do andamento", exact: true })
-    .fill("x".repeat(2000));
-  await editor
-    .getByRole("button", {
-      name: "Inserir ficha " + com.code,
-      exact: true,
-    })
-    .click();
-  await expect(editor).toContainText(
-    "A referência ultrapassaria 2000 caracteres",
-  );
-  await expect(
-    editor.getByRole("textbox", { name: "Texto do andamento", exact: true }),
-  ).toHaveValue("x".repeat(2000));
-  await expect(
-    editor.getByRole("button", { name: "Remover referência 1", exact: true }),
-  ).toHaveCount(0);
-  await editor
-    .getByRole("textbox", { name: "Texto do andamento", exact: true })
-    .fill(text);
-  await editor
-    .getByRole("button", {
-      name: "Inserir ficha " + com.code,
-      exact: true,
-    })
-    .click();
+  const textInput = editor.getByRole("textbox", { name: "Texto do andamento", exact: true });
+  // The completed token fills the limit; adding the selected reference's space
+  // would exceed it and must preserve the original text and empty selection.
+  const limitText = "x".repeat(1998 - com.code.length) + " #" + com.code;
+  await textInput.fill(limitText);
+  await editor.getByRole("button", { name: "Ficha · " + com.code, exact: true }).click();
+  await expect(editor).toContainText("A referência ultrapassaria 2000 caracteres");
+  await expect(textInput).toHaveValue(limitText);
+  await expect(editor.getByRole("button", { name: "Remover referência 1", exact: true })).toHaveCount(0);
+  await textInput.fill(text + " #" + com.code);
+  await editor.getByRole("button", { name: "Ficha · " + com.code, exact: true }).click();
   const mentionedName = sql(`select full_name from public.profiles where id=${sqlLiteral(fixtures.professional.id)}`);
   await editor.getByRole("combobox", { name: "Destaque do andamento", exact: true }).selectOption("milestone");
-  await editor.getByRole("textbox", { name: "Nome da pessoa a mencionar", exact: true }).fill(mentionedName);
-  await editor.getByRole("button", { name: "Buscar pessoas para menção", exact: true }).click();
-  await editor.getByRole("button", { name: "Mencionar " + mentionedName + " · Profissional", exact: true }).click();
-  const fullText = text + " #" + com.code;
+  await textInput.press("End"); await textInput.pressSequentially(" @Teste");
+  await editor.getByRole("button", { name: "@" + mentionedName, exact: true }).click();
+  const fullText = await textInput.inputValue();
+  expect(fullText).toContain(text); expect(fullText).toContain("#" + com.code); expect(fullText).toContain("@" + mentionedName);
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await audit(page, "Andamento editor " + width);

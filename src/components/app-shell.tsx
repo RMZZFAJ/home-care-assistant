@@ -1,9 +1,7 @@
 "use client";
-import { useOperationActivity } from "@/components/ui/operation-activity";
 import { FeedbackBanner } from "@/components/ui/feedback";
 import {
   ActionButton,
-  LoadingIndicator,
   TextInput,
 } from "@/components/ui/controls";
 
@@ -50,7 +48,6 @@ export function AppWorkspace({
     selectProfile,
   } = useWorkspaceState();
   const [profileSearch, setProfileSearch] = useState("");
-  useOperationActivity(loading && !value, { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." });
   const normalize = (text: string) =>
     text.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("pt-BR");
   const profiles =
@@ -79,6 +76,9 @@ export function AppWorkspace({
     administrationReadRecovery &&
     value?.activeContext?.mode === "patient" &&
     value.patient?.hasMembership;
+  // Intermediate authority reads must never mount a chooser or consumers with
+  // the previous patient's context. The shared overlay owns loading feedback.
+  if (loading || selecting) return <main id="workspace-content" className="workspace-content" tabIndex={-1} aria-busy="true" />;
   return (
     <main
       id="workspace-content"
@@ -106,12 +106,6 @@ export function AppWorkspace({
                 : roleLabel(value.patient?.role)}
             </span>
           ) : null}
-        </div>
-      ) : null}
-      {loading && !value ? (
-        <div className="hca-loading" role="status">
-          <LoadingIndicator />
-          Validando sessão e pacientes autorizados…
         </div>
       ) : null}
       {error ? (

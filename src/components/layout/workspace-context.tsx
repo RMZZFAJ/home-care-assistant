@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { api, ApiError } from "@/lib/client/api";
 import type { PatientContext, WorkspaceContext } from "@/types/workspace";
 import { demoDocuments } from "@/lib/demo-documents";
@@ -43,6 +44,7 @@ export function useWorkspaceState() { return use(Context); }
 export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   const { blocked, notices } = usePwa();
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const requestedPatientId = searchParams.get("careRecipientId");
   const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})(?:\/arquivos)?$/.exec(pathname)?.[1];
@@ -52,11 +54,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     || pathname === "/verificar" || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);
   const [data, setData] = useState<ContextData | null>(null);
   const [patientId, setPatientId] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loadingRead, setLoadingRead] = useState(true);
+  const scope = JSON.stringify([pathname, requestedPatientId]);
+  const [resolvedScope, setResolvedScope] = useState<string | null>(null);
+  const loading = !publicPage && (loadingRead || resolvedScope !== scope);
   const [selecting, setSelecting] = useState(false);
   const [error, setError] = useState("");
   const [selectionError, setSelectionError] = useState("");
   const sequenceRef = useRef(0);
+  const navigationScopeRef = useRef<string | null>(null);
   const load = useCallback((signal?: AbortSignal) => {
     const sequence = ++sequenceRef.current;
     const requested = requestedPatientId;
@@ -80,14 +86,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
       if (reason instanceof ApiError && [401, 403].includes(reason.status)) setData(null);
       setError(reason instanceof Error ? reason.message : "Não foi possível validar seu acesso.");
     }).finally(() => {
-      if (!signal?.aborted && sequence === sequenceRef.current) setLoading(false);
+      if (!signal?.aborted && sequence === sequenceRef.current) {
+        setResolvedScope(scope); setLoadingRead(false);
+        if (navigationScopeRef.current === scope) { navigationScopeRef.current = null; setSelecting(false); }
+      }
     });
-  }, [documentId, requestedPatientId]);
+  }, [documentId, requestedPatientId, scope, setData, setPatientId, setError, setResolvedScope, setLoadingRead]);
   useEffect(() => {
     if (publicPage) {
       sequenceRef.current++;
       let active = true;
-      void Promise.resolve().then(() => { if (active) { setData(null); setPatientId(""); setLoading(true); } });
+      void Promise.resolve().then(() => { if (active) { setData(null); setPatientId(""); setLoadingRead(true); } });
       return () => { active = false; };
     }
     const controller = new AbortController();
@@ -109,13 +118,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     setSelectionError("");
     try {
       await api("/api/context", { careRecipientId: id });
+      await load();
+      if (id) { try { sessionStorage.setItem("hca:patient", id); } catch { /* Optional UI preference. */ } }
       if (!documentId) {
         const url = new URL(window.location.href);
         if (id) url.searchParams.set("careRecipientId", id);
         else if (!pathname.startsWith("/admin") && pathname !== "/configuracoes") url.searchParams.delete("careRecipientId");
         window.history.replaceState(null, "", url);
+      } else if (id !== data?.documentContext?.patientId) {
+        navigationScopeRef.current = JSON.stringify(["/", id]);
+        router.replace(id ? "/?careRecipientId=" + encodeURIComponent(id) : "/");
       }
-      await load();
       // All patient read models consume this confirmed client context. A
       // concurrent RSC refresh can restore an earlier query during a second
       // switch; the server session gate depends on identity, not this selection.
@@ -124,10 +137,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     } catch (reason) {
       setSelectionError(reason instanceof Error ? reason.message : "Não foi possível selecionar o perfil.");
       return false;
-    } finally { setSelecting(false); }
+    } finally { if (!navigationScopeRef.current) setSelecting(false); }
   };
   const selectPatient = async (id: string) => {
-    if (data?.activeContext?.mode === "patient" && !await selectProfile(id)) return;
+    if (data?.activeContext?.mode === "patient") { await selectProfile(id); return; }
     setPatientId(id);
     try { sessionStorage.setItem("hca:patient", id); } catch { /* No authority in storage. */ }
     const url = new URL(window.location.href);
@@ -146,5 +159,6 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     return () => window.removeEventListener("pagehide", remember);
   }, [publicPage, error, loading, selecting, data, patient, pathname, searchParams]);
   const state = { value, data, loading, selecting, error, selectionError, requestedPatientId, load, selectProfile, selectPatient };
+  useOperationActivity(!publicPage && (loading || selecting), { title: selecting ? "Mudando de paciente" : "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." });
   return <Context value={state}>{publicPage ? <>{notices}<div inert={blocked}>{children}</div></> : <WorkspaceShell showOnboarding={pathname === "/"}>{children}</WorkspaceShell>}</Context>;
 }

@@ -7,7 +7,7 @@ import { unavailableDelivery } from "../integration/delivery-regularization-fixt
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectDocumentSection } from "./document-sections";
+import { expandDocumentMilestones, selectDocumentSection } from "./document-sections";
 import { auditFromTop } from "./accessibility-audit";
 import type { SupplyDocument } from "../../src/types/documents";
 
@@ -26,7 +26,8 @@ const milestone = (page: Page, label: string) => page.getByRole("list", { name: 
   .getByRole("listitem").filter({ has: page.getByText(label, { exact: true }) });
 async function open(page: Page, id: string, heading: string) {
   await page.goto(`/documentos/${id}`);
-  await expect(panel(page)).toContainText(heading);
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText(heading);
+  await expandDocumentMilestones(page);
 }
 const facts = (patient: string) => sql(`select jsonb_build_object(
   'documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${q(patient)}),
@@ -43,7 +44,7 @@ function trackWrites(page: Page) {
   return writes;
 }
 async function workflow(page: Page) {
-  const next = panel(page).getByRole("button", { name: "Abrir Atendimento e decisões", exact: true });
+  const next = page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Atendimento e decisões", exact: true });
   await next.focus(); await next.press("Enter");
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
 }
@@ -107,12 +108,12 @@ test("ENT follow-up preserves pending cancellation and transit; read recovery ca
   await page.route(`**/api/documents/${doc.id}`, route => route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "A consulta fictícia da entrega não está disponível", retryable: true } }));
   await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
   await expect(page.getByRole("alert").filter({ hasText: "A consulta fictícia da entrega não está disponível" })).toBeVisible();
-  await expect(panel(page)).toContainText("O acompanhamento atual não foi confirmado");
-  await expect(panel(page).getByRole("button", { name: "Abrir Atendimento e decisões", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("status").filter({ hasText: "O acompanhamento atual não foi confirmado" })).toContainText("O acompanhamento atual não foi confirmado");
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Atendimento e decisões", exact: true })).toHaveCount(0);
   expect(ledger(f.patient)).toBe(physical);
   await page.unroute(`**/api/documents/${doc.id}`);
   await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
-  await expect(panel(page)).toContainText("Conciliar o material ainda em trânsito");
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Conciliar o material ainda em trânsito");
   expect(facts(f.patient)).toBe(before);
 
   for (const line of doc.lines) doc = await entSend(f.admin, doc, "resolve", { lineId: line.id, quantity: "2", resolution: "returned", reason: "Parcela em trânsito retornou à origem" });

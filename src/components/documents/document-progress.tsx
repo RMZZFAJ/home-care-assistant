@@ -18,7 +18,8 @@ import {
 } from "@/components/workspace";
 import { ProgressPreparationSummary } from "./progress-preparation-summary";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
-import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
+import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
+import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import {
   progressPreparationContentSchema,
   progressDraftNoteSchema,
@@ -61,7 +62,6 @@ import {
   stagesByDocument,
   type ProgressPacket,
   type ProgressPage,
-  progressReferencePage,
   progressReferenceRow,
   mentionsEveryone,
 } from "@/lib/validation/document-progress";
@@ -204,14 +204,13 @@ function ProgressContent({
   const [localIntegrityError, setLocalIntegrityError] = useState(
     Boolean(draft.error),
   );
-  const [open, setOpen] = useState(false);
-  const [publication, setPublication] = useState<NonNullable<ProgressPacket["publication"]>>({ relevance: "normal", mentions: [] });
+  const [open, setOpen] = useState(false), [confirmClose, setConfirmClose] = useState(false);
+  const familyOnlyPrivate = context.patient?.role === "family";
+  const [mentionNames, setMentionNames] = useState<Record<string, string>>({});
+  const [publication, setPublication] = useState<NonNullable<ProgressPacket["publication"]>>({ relevance: "normal", mentions: [], visibility: familyOnlyPrivate ? "family" : "public" });
   const [error, setError] = useState(""),
     [message, setMessage] = useState(""),
     [storageError, setStorageError] = useState(draft.error);
-  const [search, setSearch] = useState(""),
-    [referenceQuery, setReferenceQuery] = useState<string | null>(null),
-    [referenceNumber, setReferenceNumber] = useState(1);
   const revision = useLiveRevision();
   const decode = useCallback(
     (value: unknown) => {
@@ -286,6 +285,7 @@ function ProgressContent({
     },
   });
   const privateContent = { documentType: type, note: content };
+  useLongDraftAutosave(privateDraft, privateContent, open && Boolean(content.text || content.references.length || privateDraft.base?.state === "active") && !pending && !command.busy && !localIntegrityError);
   const locked =
     command.busy ||
     pending !== null ||
@@ -396,32 +396,6 @@ function ProgressContent({
       content: typeof change === "function" ? change(previous.content) : change,
     });
   }
-  const decodeReferences = useCallback(
-    (value: unknown) => {
-      const parsed = progressReferencePage.safeParse(value);
-      if (
-        !parsed.success ||
-        parsed.data.documentId !== id ||
-        parsed.data.careRecipientId !== patientId ||
-        parsed.data.search !== referenceQuery ||
-        parsed.data.page !== referenceNumber
-      )
-        throw new Error(
-          "A consulta de referências não pôde ser conferida para esta ficha. Atualize a busca.",
-        );
-      return parsed.data;
-    },
-    [id, patientId, referenceQuery, referenceNumber],
-  );
-  const references = useScopedRead(
-    open && referenceQuery !== null
-      ? `/api/documents/${id}/progress/references?search=${encodeURIComponent(referenceQuery)}&page=${referenceNumber}`
-      : null,
-    String(revision),
-    decodeReferences,
-  );
-  const choices =
-    !references.loading && !references.error ? references.data : null;
   async function checkUncertainPublication() {
     if (
       !mountedRef.current ||
@@ -513,14 +487,18 @@ function ProgressContent({
       command.busy ||
       pending ||
       !writable ||
-      privateDraft.blocked ||
+      privateDraft.blocked || privateDraft.backgroundBusy ||
       localIntegrityError
     )
       return;
     const saved = await privateDraft.save(privateContent);
-    if (saved && close) setOpen(false);
+    if (saved && close) { setConfirmClose(false); setOpen(false); privateDraft.reload(); }
   }
   async function publish() {
+    if (!pending && familyOnlyPrivate && mentionsEveryone(content.text)) {
+      setError("Os Andamentos da família são privados. Mencione cada pessoa pelo nome em vez de usar @todos.");
+      return;
+    }
     if (
       publishingRef.current ||
       command.busy ||
@@ -537,7 +515,7 @@ function ProgressContent({
         const native = publishProgress.parse({
           key: crypto.randomUUID(),
           content,
-          publication: { ...publication, visibility: mentionsEveryone(content.text) ? "public" : publication.visibility ?? "public", mentionAll: mentionsEveryone(content.text) },
+          publication: { ...publication, visibility: familyOnlyPrivate ? "family" : mentionsEveryone(content.text) ? "public" : publication.visibility ?? "public", mentionAll: mentionsEveryone(content.text) },
         });
         const saved = await privateDraft.save(privateContent);
         if (!saved || !mountedRef.current) return;
@@ -664,25 +642,6 @@ function ProgressContent({
         </DocumentActionSlot>
       </header>
       <div className="doc-card-body" id={"progress-content-" + id} hidden={collapsed}>
-      {!open &&
-        (privateDraft.offered ||
-          privateDraft.base ||
-          privateDraft.consumed ||
-          privateDraft.pending ||
-          privateDraft.loadError ||
-          privateDraft.readDenied) ? (
-        <CreationDraftPanel
-          draft={privateDraft}
-          current={privateContent}
-          patientName={context.patient?.display_name ?? "Paciente"}
-          disabled={Boolean(pending) || localIntegrityError}
-          acknowledgeLabel={
-            draft.carryFrom === privateDraft.consumed?.id
-              ? "Reconhecer resultado e continuar minha edição"
-              : "Reconhecer resultado e iniciar outro andamento"
-          }
-        />
-      ) : null}
       {message ? <Notice>{message}</Notice> : null}
       {storageError ? <Notice error>{storageError}</Notice> : null}
       {pending && !open ? (
@@ -751,10 +710,12 @@ function ProgressContent({
         title={
           pending ? "Recuperar publicação de andamento" : "Registrar andamento"
         }
-        closeDisabled={command.busy || privateDraft.busy}
+        closeDisabled={command.busy || privateDraft.busy || privateDraft.backgroundBusy}
         finalFocus={openerRef}
         onClose={() => {
-          if (!command.busy && !privateDraft.busy) setOpen(false);
+          if (command.busy || privateDraft.busy || privateDraft.backgroundBusy) return;
+          if (pending || !writable || (!content.text && !content.references.length && !privateDraft.base) || privateDraft.offered || privateDraft.consumed) setOpen(false);
+          else setConfirmClose(true);
         }}
       >
         <p className="hca-field-help">
@@ -768,7 +729,7 @@ function ProgressContent({
             verifica ou publica o mesmo conteúdo, sem criar outro andamento.
           </Notice>
         ) : null}
-        <CreationDraftPanel
+        <SimpleDraftPanel
           draft={privateDraft}
           current={privateContent}
           patientName={context.patient?.display_name ?? "Paciente"}
@@ -932,77 +893,14 @@ function ProgressContent({
               >
                 <ProgressTextArea
                   documentId={id}
+                  allowCollective={!familyOnlyPrivate}
                   value={content.text}
                   onText={text => setContent(value => ({ ...value, text }))}
-                  onMention={person => { if (!publication.mentions.includes(person.id) && publication.mentions.length >= 8) { setError("Até oito pessoas podem ser mencionadas. Remova uma menção antes de escolher outra."); return false; } setPublication(value => value.mentions.includes(person.id) ? value : ({ ...value, mentions: [...value.mentions, person.id] })); return true; }}
+                  onMention={person => { if (!publication.mentions.includes(person.id) && publication.mentions.length >= 8) { setError("Até oito pessoas podem ser mencionadas. Remova uma menção antes de escolher outra."); return false; } setMentionNames(value => ({ ...value, [person.id]: person.name })); setPublication(value => value.mentions.includes(person.id) ? value : ({ ...value, mentions: [...value.mentions, person.id] })); return true; }}
                   onReference={addReference}
                 />
               </FormField>
             </fieldset>
-            <fieldset disabled={locked} className="hca-reference-picker">
-              <legend>Referências autorizadas (opcional)</legend>
-              <div className="hca-toolbar">
-                <TextInput
-                  aria-label="Código da ficha a vincular"
-                  maxLength={100}
-                  value={search}
-                  onChange={(event) => setSearch(event.currentTarget.value)}
-                  placeholder="Ex.: ENT-0001"
-                />
-                <ActionButton
-                  onClick={() => {
-                    setReferenceQuery(search.trim());
-                    setReferenceNumber(1);
-                  }}
-                >
-                  Buscar fichas e andamentos
-                </ActionButton>
-              </div>
-              {references.loading ? (
-                <p role="status">Consultando fichas autorizadas…</p>
-              ) : references.error ? (
-                <Notice error>{references.error}</Notice>
-              ) : null}
-              {choices ? (
-                <>
-                  <ul className="hca-reference-options">
-                    {choices.data.map((row) => (
-                      <li key={row.id}>
-                        <ActionButton
-                          disabled={
-                            content.references.length >= 8 ||
-                            content.references.includes(row.id)
-                          }
-                          onClick={() => addReference(row)}
-                        >
-                          Inserir {row.kind === "progress" ? "andamento" : "ficha"} {row.code ?? row.type}{row.excerpt ? " · " + row.excerpt : ""}
-                        </ActionButton>
-                      </li>
-                    ))}
-                  </ul>
-                  {!choices.data.length ? (
-                    <p>Nenhuma ficha autorizada nesta página.</p>
-                  ) : null}
-                  <div className="hca-toolbar">
-                    <ActionButton
-                      disabled={referenceNumber === 1}
-                      onClick={() => setReferenceNumber((value) => value - 1)}
-                    >
-                      Referências anteriores
-                    </ActionButton>
-                    <span>
-                      {referenceNumber} /{" "}
-                      {Math.max(1, Math.ceil(choices.total / 20))}
-                    </span>
-                    <ActionButton
-                      disabled={referenceNumber * 20 >= choices.total}
-                      onClick={() => setReferenceNumber((value) => value + 1)}
-                    >
-                      Próximas referências
-                    </ActionButton>
-                  </div>
-                </>
-              ) : null}
               {content.references.length ? (
                 <ul>
                   {content.references.map((ref, index) => (
@@ -1025,17 +923,11 @@ function ProgressContent({
                   ))}
                 </ul>
               ) : null}
-              <p className="hca-field-help">
-                Até oito fichas deste paciente. O link só aparece enquanto a
-                pessoa consultando tiver acesso; texto digitado não concede
-                permissão.
-              </p>
-            </fieldset>
-            <ProgressPublicationOptions id={id} patientId={patientId} value={publication} onChange={setPublication} disabled={locked} canPrivate={["family", "admin"].includes(context.patient?.role ?? "")} collective={mentionsEveryone(content.text)} />
+            <ProgressPublicationOptions mentionNames={mentionNames} privateOnly={familyOnlyPrivate} value={publication} onChange={setPublication} disabled={locked} canPrivate={["family", "admin"].includes(context.patient?.role ?? "")} collective={mentionsEveryone(content.text)} />
             <div className="hca-toolbar">
               <ActionButton
                 disabled={
-                  command.busy ||
+                  command.busy || privateDraft.backgroundBusy ||
                   Boolean(pending) ||
                   !writable ||
                   privateDraft.blocked ||
@@ -1047,7 +939,7 @@ function ProgressContent({
               </ActionButton>
               <ActionButton
                 disabled={
-                  command.busy ||
+                  command.busy || privateDraft.backgroundBusy ||
                   (!pending && (!writable || privateDraft.blocked))
                 }
                 onClick={() =>
@@ -1062,8 +954,9 @@ function ProgressContent({
                 type="submit"
                 variant="primary"
                 disabled={
-                  command.busy ||
+                  command.busy || privateDraft.backgroundBusy ||
                   localIntegrityError ||
+                  (!pending && familyOnlyPrivate && mentionsEveryone(content.text)) ||
                   (!pending && (!writable || privateDraft.blocked))
                 }
               >
@@ -1076,6 +969,10 @@ function ProgressContent({
             </div>
           </form>
         ) : null}
+      </Dialog>
+      <Dialog open={confirmClose} title="Sair sem publicar o andamento?" closeDisabled={privateDraft.busy || privateDraft.backgroundBusy} onClose={() => setConfirmClose(false)}>
+        <p>O último preenchimento será guardado como rascunho. Nenhum andamento será publicado.</p>
+        <div className="hca-toolbar"><ActionButton disabled={privateDraft.busy || privateDraft.backgroundBusy} onClick={() => setConfirmClose(false)}>Voltar ao preenchimento</ActionButton><ActionButton disabled={privateDraft.busy || privateDraft.backgroundBusy || privateDraft.blocked} onClick={() => void savePersonal(true)}>Guardar e sair</ActionButton></div>
       </Dialog>
     </section>
   );

@@ -12,12 +12,11 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
-import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { useDocumentDecision, DocumentDecisionFailure } from "./use-document-decision";
+import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import {
-  CreationDraftPanel,
   DraftContentSummary,
 } from "@/components/forms/creation-draft-panel";
-import { draftFlow, navigationForStep } from "@/lib/forms/draft-navigation";
 import {
   adoptTransferDecisionReference,
   transferActionLabels,
@@ -72,32 +71,7 @@ export function TransferDecisionEditor({
   const returnFocusRef = useRef(false);
   const purpose = transferPurpose(action),
     recoveryOnly = consulting || !transferActAvailable(original, action);
-  const privateDraft = useCreationDraft({
-    userId: context.userId,
-    patientId: original.care_recipient_id,
-    kind: "ENT",
-    purpose,
-    targetDocumentId: original.id,
-    navigation: navigationForStep(draftFlow("ENT", purpose)!, 0),
-    onResume(saved) {
-      if (!saved.content || !("fields" in saved.content) || saved.content.documentVersion === null) return false;
-      restore(saved.content);
-      setBlocked(true);
-      setUnavailable(true);
-      setComparison(null);
-      return true;
-    },
-    onDiscard() {
-      restore(transferDecisionReference(reference));
-    },
-  });
-  function restore(content: ReceiptDraftContent) {
-    setBaseline(content);
-    setReason(content.fields.reason ?? "");
-    setReviewing(false);
-    pendingRef.current = null;
-    setError("");
-  }
+  const decision = useDocumentDecision({ userId: context.userId, documentId: original.id, domain: "transfer", action });
   useEffect(() => {
     if (reviewing) headingRef.current?.focus();
   }, [reviewing]);
@@ -111,28 +85,11 @@ export function TransferDecisionEditor({
     ...baseline,
     fields: { ...baseline.fields, reason },
   };
-  const panel = (
-    <CreationDraftPanel
-      draft={privateDraft}
-      current={content}
-      patientName={context.patient?.display_name ?? "Paciente selecionado"}
-      disabled={busy || uncertain || reviewing}
-      resumeLabel={recoveryOnly ? "Consultar preenchimento salvo" : undefined}
-      discardLabel={
-        recoveryOnly ? "Descartar preenchimento privado" : undefined
-      }
-      acknowledgeLabel="Reconhecer resultado aplicado"
-    />
-  );
-  const readOnly =
-    recoveryOnly ||
-    privateDraft.readDenied ||
-    privateDraft.protectedReadPending;
+  const readOnly = recoveryOnly;
   const allowed =
     !readOnly &&
     !blocked &&
     !unavailable &&
-    !privateDraft.blocked &&
     transferActAvailable(reference, action);
   async function compare() {
     setBusy(true);
@@ -157,8 +114,6 @@ export function TransferDecisionEditor({
           ? cause.message
           : "Não foi possível consultar a transferência.",
       );
-      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-        privateDraft.reload();
     } finally {
       setBusy(false);
     }
@@ -207,131 +162,62 @@ export function TransferDecisionEditor({
           ? cause.message
           : "Não foi possível conferir a transferência atual.",
       );
-      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-        privateDraft.reload();
       return;
     } finally {
       setBusy(false);
     }
-    const saved = await privateDraft.save(content);
-    if (!saved) {
-      setBlocked(true);
-      setUnavailable(true);
-      requestAnimationFrame(() => reasonControlRef.current?.focus());
-      return;
-    }
-    pendingRef.current = {
-      ...parsed.data,
-      draftCommit: { id: saved.id, revision: saved.revision },
-    };
+    pendingRef.current = parsed.data;
     setError("");
     setReviewing(true);
   }
+  function verified(row: Record<string, unknown>, intention: DocumentDecisionIntention) {
+    const value = requireSupplyConfirmation({ data: row, persistence: "confirmed" }, { id: original.id, patientId: original.care_recipient_id, type: "ENT", minimumVersion: intention.expectedVersion });
+    parseTransferReference({ data: value }, { id: original.id, patientId: original.care_recipient_id, minimumVersion: intention.expectedVersion });
+  }
   async function confirm() {
-    if (!pendingRef.current || busy) return;
-    setBusy(true);
-    setError("");
+    if (busy || !pendingRef.current && !uncertain) return;
+    setBusy(true); setError("");
     try {
-      const response = await api<unknown>(
-        "/api/documents/" + original.id + "/transfer",
-        pendingRef.current,
-      );
-      const confirmed = requireSupplyConfirmation(response, {
-        id: original.id,
-        patientId: original.care_recipient_id,
-        type: "ENT",
-        minimumVersion: pendingRef.current.expectedVersion,
-      });
-      parseTransferReference(
-        { data: confirmed },
-        {
-          id: original.id,
-          patientId: original.care_recipient_id,
-          minimumVersion: pendingRef.current.expectedVersion,
-        },
-      );
-      pendingRef.current = null;
-      setUncertain(false);
-      onSaved(confirmed);
+      const packet = pendingRef.current;
+      const result = uncertain ? await decision.checkPrevious(verified) : await decision.execute({
+        domain: "transfer", action, body: packet!.body, expectedVersion: packet!.expectedVersion,
+      }, verified);
+      if (!result) return;
+      pendingRef.current = null; setUncertain(false);
+      if (result.state === "applied") onSaved(requireSupplyConfirmation({ data: result.result, persistence: "confirmed" }, { id: original.id, patientId: original.care_recipient_id, type: "ENT", minimumVersion: result.intention.expectedVersion }));
+      else { setReviewing(false); setError("A conferência confirmou que nada foi alterado. Seus campos continuam nesta tela para tentar novamente. Se persistir, procure a supervisão."); }
     } catch (cause) {
-      const rejected =
-        cause instanceof ApiError &&
-        [400, 401, 403, 404, 409, 422].includes(cause.status);
-      setUncertain(!rejected);
-      if (rejected) {
-        pendingRef.current = null;
-        setReviewing(false);
-        setBlocked(true);
-        setUnavailable(true);
-        if (cause.status === 409) void privateDraft.reportConflict();
-        else if ([401, 403, 404].includes(cause.status)) privateDraft.reload();
-      }
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Resultado não confirmado. Recupere o mesmo ato.",
-      );
-    } finally {
-      setBusy(false);
-    }
+      const failure = cause instanceof DocumentDecisionFailure ? cause : null;
+      const originalCause = failure?.cause ?? cause;
+      const rejected = failure?.outcome === "not_applied" || originalCause instanceof ApiError && [400,401,403,404,409,422].includes(originalCause.status);
+      setUncertain(failure ? failure.outcome === "uncertain" : !rejected);
+      if (rejected) { pendingRef.current = null; setReviewing(false); if (originalCause instanceof ApiError && [403,404,409].includes(originalCause.status)) { setBlocked(true); setUnavailable(true); } }
+      setError(cause instanceof Error ? cause.message : "Não foi possível concluir. Procure a supervisão se persistir.");
+    } finally { setBusy(false); }
   }
   return (
     <RecordDrawer
+      exitDialog
       title={
         reviewing
           ? "Revisar ato da transferência"
           : transferActionLabels[action]
       }
-      busy={busy || privateDraft.busy}
-      preventClose={uncertain || !!privateDraft.pending}
+      busy={busy}
+      uncertainOutcome={uncertain || decision.uncertain}
       restoreFocusTo={restoreFocusTo}
       onClose={onClose}
     >
       <div className="hca-form-stack">
-        {panel}
+        {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
         {error ? <Notice error>{error}</Notice> : null}
-        {readOnly ? (
+        {readOnly ? <Notice>Este ato não está disponível neste estado ou perfil. Feche para consultar a ficha.</Notice> : (
           <>
-            <Notice>
-              Consulta pessoal do preenchimento. Esta tela não confirma nem
-              repete um ato oficial.
-            </Notice>
-            {privateDraft.base?.state === "active" &&
-            !privateDraft.offered &&
-            !privateDraft.readDenied &&
-            !privateDraft.protectedReadPending ? (
-              <DraftContentSummary
-                content={privateDraft.base.content}
-                kind="ENT"
-                purpose={purpose}
-              />
-            ) : null}
-            {!privateDraft.loading &&
-            !privateDraft.loadError &&
-            !privateDraft.base &&
-            !privateDraft.offered &&
-            !privateDraft.consumed ? (
-              <p>
-                Nenhum preenchimento ou resultado privado pendente para este ato
-                neste perfil.
-              </p>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <Notice>
-              Salvar preserva apenas sua preparação. Concordância, expedição e
-              recebimento têm confirmações próprias.
-            </Notice>
-            <ActionButton
-              disabled={busy || uncertain || reviewing || privateDraft.blocked}
-              onClick={() => void privateDraft.save(content)}
-            >
-              Salvar preenchimento privado
-            </ActionButton>
+
+
             {!reviewing ? (
               <ActionButton
-                disabled={busy || uncertain || privateDraft.blocked}
+                disabled={busy || uncertain}
                 onClick={() => void compare()}
               >
                 Consultar e comparar transferência atual
@@ -363,7 +249,6 @@ export function TransferDecisionEditor({
                 <ActionButton
                   disabled={
                     busy ||
-                    privateDraft.blocked ||
                     !transferActAvailable(comparison, action)
                   }
                   onClick={() => {
@@ -385,7 +270,7 @@ export function TransferDecisionEditor({
                 {!transferActAvailable(comparison, action) ? (
                   <Notice>
                     Este ato não está disponível no estado atual. Seu
-                    preenchimento continua privado para consulta ou descarte.
+                    preenchimento permanece nesta tela; fechar o descarta.
                   </Notice>
                 ) : null}
               </section>
@@ -475,8 +360,7 @@ export function TransferDecisionEditor({
                       disabled={
                         busy ||
                         uncertain ||
-                        privateDraft.readDenied ||
-                        privateDraft.protectedReadPending
+                        readOnly
                       }
                       onChange={(event) => setReason(event.currentTarget.value)}
                     />

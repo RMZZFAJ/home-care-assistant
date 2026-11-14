@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { Icon, type IconName } from "./icon";
 
 /** Section composition shared with the approved L1 laboratory. */
@@ -7,5 +7,6 @@ export function ModelSectionHead({ title, icon, action }: { title: string; icon:
 }
 
 export function DocumentSection({ title, icon, children, action, className = "" }: { title: string; icon: IconName; children: ReactNode; action?: ReactNode; className?: string }) {
-  return <section className={`doc-card ${className}`}><header className="doc-card-head"><h2><Icon name={icon} width={18} height={18} />{title}</h2>{action}</header><div className="doc-card-body">{children}</div></section>;
+  const titleId = useId();
+  return <section aria-labelledby={titleId} className={`doc-card ${className}`}><header className="doc-card-head"><h2 id={titleId}><Icon name={icon} width={18} height={18} />{title}</h2>{action}</header><div className="doc-card-body">{children}</div></section>;
 }

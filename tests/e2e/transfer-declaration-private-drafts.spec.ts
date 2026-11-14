@@ -19,8 +19,6 @@ import type { TransferPreparation } from "../../src/types/transfers";
 test.setTimeout(180_000);
 type Fixture = Awaited<ReturnType<typeof declarationDraftFixture>>;
 const dialog = (page: Page) => page.getByRole("dialog");
-const direction = (source: Custody) =>
-  source === "FAMILY" ? "Família → Equipe" : "Equipe → Família";
 async function login(page: Page, f: Fixture) {
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
@@ -39,11 +37,7 @@ async function open(page: Page, source: Custody) {
   await page
     .getByRole("button", { name: "Preparar declaração", exact: true })
     .click();
-  await expect(
-    dialog(page).getByRole("combobox", {
-      name: /^Contraparte para concordância/,
-    }),
-  ).toBeVisible();
+  await expect(page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true}).or(page.getByRole("combobox",{name:/^Contraparte para concordância/})).first()).toBeVisible();
 }
 async function fill(page: Page, f: Fixture, amount = "0,") {
   await dialog(page)
@@ -95,20 +89,13 @@ async function peerContext(browser: Browser, page: Page, info: TestInfo) {
   });
 }
 async function resume(page: Page) {
-  await dialog(page)
+  await page
     .getByRole("button", { name: "Continuar rascunho", exact: true })
     .click();
 }
 async function recover(page: Page, source: Custody) {
-  await page
-    .getByText("Minhas declarações em preparação", { exact: true })
-    .click();
-  await page
-    .getByRole("button", {
-      name: "Consultar preenchimento: " + direction(source),
-      exact: true,
-    })
-    .click();
+ await page.goto("/transferencias"); await page.getByRole("combobox",{name:/^Custódia de origem/}).selectOption(source);
+ await page.getByRole("button",{name:"Consultar último rascunho",exact:true}).click();
 }
 for (const source of ["FAMILY", "CARE_TEAM"] as const) {
   test(
@@ -360,7 +347,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       await recover(page, source);
       await expect(
         dialog(page).getByRole("button", {
-          name: "Reconhecer declaração registrada",
+          name: "Começar novo preenchimento",
           exact: true,
         }),
       ).toBeEnabled();
@@ -383,7 +370,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       expect(row.data.targetDocumentId).toBeNull();
       await dialog(page)
         .getByRole("button", {
-          name: "Reconhecer declaração registrada",
+          name: "Começar novo preenchimento",
           exact: true,
         })
         .click();

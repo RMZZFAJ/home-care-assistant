@@ -85,13 +85,11 @@ export const balancePreparationCommandSchema = z
         message: "A programação pertence ao paciente selecionado.",
       });
   });
-export const balancePreparationCommitSchema = z
+export const balancePreparationDecisionSchema = z
   .object({
     careRecipientId: id,
     purpose: balancePreparationPurposeSchema,
     targetResourceId: id,
-    draftCommit: z.object({ id, revision: version }).strict(),
-    idempotencyKey: id,
     referenceHash: hash,
     expectedVersion: version.nullable(),
     command: balanceCommandSchema.shape.command,
@@ -121,6 +119,8 @@ export const balancePreparationCommitSchema = z
           "A confirmação precisa corresponder à decisão e ao registro preservados.",
       });
   });
+export const balancePreparationCommitSchema = balancePreparationDecisionSchema.safeExtend({ draftCommit: z.object({ id, revision: version }).strict(), idempotencyKey: id });
+export type BalancePreparationDecision = z.infer<typeof balancePreparationDecisionSchema>;
 export const balancePreparationReceiptSchema = z
   .object({
     patientId: id,
@@ -434,7 +434,7 @@ export function parseBalancePreparationReceipt(
     targetResourceId: string;
     userId: string;
   },
-  intent?: BalancePreparationCommit,
+  intent?: BalancePreparationDecision,
 ): BalancePreparationReceipt {
   const parsed = balancePreparationReceiptSchema.safeParse(value);
   if (!parsed.success)

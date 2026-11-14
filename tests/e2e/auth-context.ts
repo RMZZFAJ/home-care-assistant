@@ -13,8 +13,7 @@ export async function selectContext(page: Page, patient: string | null) {
     if (await chooser.isVisible()) {
       if (patient) {
         const search = chooser.getByRole("textbox", { name: "Buscar perfil autorizado", exact: true });
-        await search.press("ControlOrMeta+A");
-        await search.pressSequentially(person.display_name);
+        await search.fill(person.display_name);
         await expect(search).toHaveValue(person.display_name);
       }
       await chooser.getByRole("button", { name: label, exact: !patient }).click();

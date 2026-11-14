@@ -23,6 +23,8 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
+import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
+import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import {
   draftFlowStages,
@@ -30,7 +32,6 @@ import {
   stepForNavigation,
 } from "@/lib/forms/draft-navigation";
 import {
-  CreationDraftPanel,
   BalanceObservationTimes,
 } from "@/components/forms/creation-draft-panel";
 import type { BalanceCountReference } from "@/types/balances";
@@ -302,6 +303,7 @@ export function PatientSupplyWizard({
       return true;
     },
     onDiscard: () => {
+      setDraftTouched(false);
       setForm((current) => ({
         ...current,
         quantities: Object.fromEntries(
@@ -355,6 +357,9 @@ export function PatientSupplyWizard({
     },
   };
   const privateContent = type === "BAL" ? balanceContent : supplyContent;
+
+  const [draftTouched, setDraftTouched] = useState(false);
+  useLongDraftAutosave(privateDraft, privateContent, draftTouched && !(busy || uncertain));
   const offeredContent = privateDraft.offered?.content;
   const originalSource =
     offeredContent && "form" in offeredContent
@@ -989,10 +994,8 @@ export function PatientSupplyWizard({
             : {}),
       };
       const privateCommit =
-        type !== "BAL"
-          ? await privateDraft.save(structuredClone(privateContent))
-          : undefined;
-      if (type !== "BAL" && !privateCommit) return;
+        await privateDraft.save(structuredClone(privateContent));
+      if (!privateCommit) return;
       frozenRef.current = {
         payload,
         key: crypto.randomUUID(),
@@ -1359,10 +1362,10 @@ export function PatientSupplyWizard({
       </section>
     );
   return (
-    <div className="hca-document-wizard min-w-0 space-y-5">
+    <div onChangeCapture={() => setDraftTouched(true)} className="hca-document-wizard min-w-0 space-y-5">
       <ComplementOriginHint />
       {privateDraft.active ? (
-        <CreationDraftPanel
+        <SimpleDraftPanel
           draft={privateDraft}
           current={privateContent}
           resumeHref={resumeHref}
@@ -1554,7 +1557,7 @@ export function PatientSupplyWizard({
                 total={6}
                 saving={
                   busy ||
-                  privateDraft.busy ||
+                  privateDraft.busy || privateDraft.backgroundBusy ||
                   (privateDraft.blocked && !uncertain) ||
                   (!allowed && !uncertain)
                 }

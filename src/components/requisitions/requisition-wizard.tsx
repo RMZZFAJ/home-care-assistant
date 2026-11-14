@@ -20,11 +20,12 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
+import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { RecurringSelection } from "./recurring-selection";
 import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
 import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
-import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
+import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { StepNavigator } from "@/components/ui/primitives";
 
@@ -143,12 +144,16 @@ function PatientRequisition({
       return true;
     },
     onDiscard: () => {
+      setDraftTouched(false);
       setForm({ lines: [], extraItems: [], observations: [] });
       setStep(0);
       setFieldErrors({});
       sessionStorage.removeItem(storageKey);
     },
   });
+
+  const [draftTouched, setDraftTouched] = useState(false);
+  useLongDraftAutosave(privateDraft, draftContent, draftTouched && !(saving || uncertain));
   const offeredSource =
     privateDraft.offered?.content && "lines" in privateDraft.offered.content
       ? (privateDraft.offered.content.remainingNeed?.requisitionId ?? null)
@@ -371,12 +376,14 @@ function PatientRequisition({
     return true;
   }
   async function submit() {
-    if (!frozenRef.current && (privateDraft.blocked || !validate(true))) return;
+    if (!frozenRef.current && (privateDraft.blocked || privateDraft.backgroundBusy || !validate(true))) return;
+    const savedDraft = !frozenRef.current ? await privateDraft.save(structuredClone(draftContent)) : null;
+    if (!frozenRef.current && !savedDraft) return;
     if (!frozenRef.current)
       frozenRef.current = {
         ...form,
-        ...(privateDraft.draftCommit
-          ? { draftCommit: privateDraft.draftCommit }
+        ...(savedDraft
+          ? { draftCommit: { id: savedDraft.id, revision: savedDraft.revision } }
           : {}),
         careRecipientId: context.patient!.id,
         idempotencyKey: crypto.randomUUID(),
@@ -476,10 +483,10 @@ function PatientRequisition({
       </Notice>{selectionLibrary(true)}</div>
     );
   return (
-    <div ref={fieldsRef} className="hca-document-wizard min-w-0 space-y-5">
+    <div ref={fieldsRef} onChangeCapture={() => setDraftTouched(true)} className="hca-document-wizard min-w-0 space-y-5">
       <ComplementOriginHint />
       {selectionLibrary()}
-      <CreationDraftPanel
+      <SimpleDraftPanel
         draft={privateDraft}
         current={draftContent}
         patientName={context.patient!.display_name}
@@ -634,7 +641,7 @@ function PatientRequisition({
             total={7}
             saving={
               saving ||
-              privateDraft.busy ||
+              privateDraft.busy || privateDraft.backgroundBusy ||
               (privateDraft.blocked && !uncertain) ||
               (!may(context, "request") && !uncertain)
             }

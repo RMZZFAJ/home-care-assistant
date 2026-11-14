@@ -31,7 +31,7 @@ async function login(page: Page, patient: string) {
   ).toBeVisible();
   await selectContext(page, patient);
 }
-test("PDF atual preserva a origem congelada e distingue emissão sem expor a preparação privada; intenção V5 permanece recuperável", async ({
+test("PDF atual preserva a origem congelada e distingue emissão sem expor a preparação privada; reserva experimental V5 preserva sua identidade e não produz outro desenho", async ({
   page,
 }, info) => {
   const privateSource = await sourceFactsFixture(),
@@ -162,18 +162,14 @@ test("PDF atual preserva a origem congelada e distingue emissão sem expor a pre
         `/api/documents/${f.doc.id}/issuances`,
         { timeout: 60_000, data: { idempotencyKey: oldKey, version: row.version } },
       );
-      expect(recovered.status(), await recovered.text()).toBe(200);
-      expect(await recovered.json()).toMatchObject({
-        id: oldId,
-        rendererRevision: 5,
-        state: "ready",
-        validation: { accepted: true },
-      });
-      const original = await page.request.get(
-        `/api/documents/${f.doc.id}/pdf?issuance=${oldId}`,
-      );
-      expect(original.status()).toBe(200);
-      expect(hash(await original.body())).toBe((await recovered.json()).sha256);
+      expect(recovered.status(), await recovered.text()).toBe(503);
+      expect((await recovered.json()).code).toBe("CONTENT_INVALID");
+      const preserved = await rpc(f.owner, "pdf_issuance", { p_id: oldId });
+      expect(preserved).toMatchObject({ id: oldId, rendererRevision: 5 });
+      expect(preserved.state).not.toBe("ready");
+      expect((await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${oldId}`)).status()).toBe(404);
+      // The approved, already-issued exemplar remains byte-for-byte available.
+      expect(hash(await (await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${row.id}`)).body())).toBe(row.sha256);
     }
     for (const width of [1440, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 950 });

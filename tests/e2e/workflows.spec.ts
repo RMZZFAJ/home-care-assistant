@@ -1,4 +1,4 @@
-import { selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
+import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { selectContext } from "./auth-context";
 import { selectDeliveryRecipient } from "./delivery-recipient";
@@ -281,6 +281,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
     .check();
   await page.getByLabel("Efetivamente recebido").fill("6");
   await confirm(page);
+  await expandDocumentMilestones(page);
   await expect(
     page.getByRole("list", { name: "Marcos da ficha", exact: true }).getByText("0/1 linhas integralmente conferidas", { exact: true }),
   ).toBeVisible();
@@ -445,6 +446,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
   await editor.getByLabel("Efetivamente recebido").nth(0).fill("0");
   await editor.getByLabel("Efetivamente recebido").nth(1).fill("0");
   await confirm(page);
+  await expandDocumentMilestones(page);
   await expect(
     page.getByRole("list", { name: "Marcos da ficha", exact: true }).getByText("8/10 linhas integralmente conferidas", { exact: true }),
   ).toBeVisible();
@@ -740,7 +742,7 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
   try {
     // The pending read may expose no header yet; all matching reads stay held.
     await expect(
-      page.getByRole("button", {
+      page.getByRole("menuitem", {
         name: "Solicitar cancelamento",
         exact: true,
         disabled: false,
@@ -752,7 +754,7 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
   }
   await openDocumentMore(page);
   await page
-    .getByRole("button", { name: "Solicitar cancelamento", exact: true })
+    .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
     .click();
   await page
     .getByLabel("Motivo / justificativa")
@@ -1022,7 +1024,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
   await openDocumentMore(page);
   await page
-    .getByRole("button", { name: "Alterar destinatário", exact: true })
+    .getByRole("menuitem", { name: "Alterar destinatário", exact: true })
     .click();
   await page.getByLabel("Novo destinatário").selectOption(fixtures().adminA.id);
   await page
@@ -1049,7 +1051,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await confirm(page);
   await openDocumentMore(page);
   await page
-    .getByRole("button", { name: "Alterar destinatário", exact: true })
+    .getByRole("menuitem", { name: "Alterar destinatário", exact: true })
     .count()
     .then((count) => expect(count).toBe(0));
   await closeDocumentMore(page);
@@ -1058,7 +1060,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
   await openDocumentMore(page);
   await page
-    .getByRole("button", { name: "Solicitar cancelamento", exact: true })
+    .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
     .click();
   await page
     .getByLabel("Motivo / justificativa")

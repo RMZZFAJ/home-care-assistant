@@ -104,9 +104,9 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials retain 
   const reference = await browser.newContext();
   try {
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
-    await model.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#ficha/" + (type === "REQ" ? "REQ-0003" : "COM-0001") + "/materiais");
-    await model.locator("#roleSelect").selectOption("family");
-    const modelTable = model.locator(".tablewrap.mobilecards").first();
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href);
+    await model.locator("#product-app").getByRole("tab", { name: /^Materiais/ }).click();
+    const modelTable = model.locator("#product-app .doc-table-wrap").first();
     await expect(modelTable).toBeVisible();
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 });
@@ -114,6 +114,7 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials retain 
         const expected = await modelTable.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property);
         await expect(table.locator("..")).toHaveCSS(property, expected);
       }
+      if (type === "REQ") await expect(table.locator("thead th")).toHaveText(["Material", "Estoque observado", "Status de atendimento do item"]);
       const row = table.locator("tbody tr").first(), modelRow = modelTable.locator("tbody tr").first();
       for (const property of ["display", "padding-left", "padding-top", "gap"] as const) {
         const expected = await modelRow.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property);
@@ -121,7 +122,7 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials retain 
       }
       await expect(table.getByText(names[0], { exact: true })).toBeVisible();
       await expect(table.getByText(names[1], { exact: true })).toBeVisible();
-      await expect(table.locator("tbody td")).toHaveCount(type === "REQ" ? 8 : 20);
+      await expect(table.locator("tbody td")).toHaveCount(type === "REQ" ? 6 : 20);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await auditFromTop(page, `canonical ${type} materials ${width}`);
       if (width === 320) {

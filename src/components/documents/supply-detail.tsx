@@ -1,4 +1,6 @@
 "use client";
+import { useDocumentDecision, DocumentDecisionFailure } from "./use-document-decision";
+import { ActionButton } from "@/components/ui/controls";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { DocumentSection } from "@/components/ui/model-section";
 import { DocumentComplementsPanel } from "@/components/documents/document-complements";
@@ -45,13 +47,12 @@ import {
 } from "./supply-command-editor";
 import { DraftReferenceComparison } from "./draft-reference-comparison";
 import { ConsentReferenceComparison } from "./consent-reference-comparison";
-import { PrivateOperationRecoveryActions } from "./private-operation-recovery-actions";
 import { type PatientPerson, type SupplyDocument } from "@/types/documents";
 import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
-import { DocumentHeader } from "./document-header";
+import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document-header";
 import { FamilyFulfillmentReview } from "./family-fulfillment-review";
 import { DocumentFreshness } from "./document-freshness";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
@@ -124,6 +125,8 @@ export function SupplyDocumentContent({
     draftCommit?: { id: string; revision: number; };
   } | null>(null);
   const [uncertain, setUncertain] = useState(false);
+  const [closeUncertain, setCloseUncertain] = useState(false);
+  const decision = useDocumentDecision({ userId: context.userId, documentId: id, domain: "supply", action: review?.action ?? action ?? "none" });
   const [purchaseConflict, setPurchaseConflict] = useState(false);
   const [deliveryConflict, setDeliveryConflict] = useState(false);
   const [regularizationEditing, setRegularizationEditing] = useState(false);
@@ -262,22 +265,27 @@ export function SupplyDocumentContent({
     if (!pendingRef.current) return;
     setBusy(true);
     setError("");
-    const intention = pendingRef.current;
+    let intention = pendingRef.current;
     try {
-      const result = await api<{ data: SupplyDocument; }>(
-        "/api/documents/" + id,
-        intention,
-      );
-      result.data = requireSupplyConfirmation(result, {
-        patientId: data.care_recipient_id,
-        type: data.type,
-        id,
-        minimumVersion: intention.expectedVersion,
-      });
+      const verify = (row: Record<string, unknown>, accepted: { expectedVersion: number }) => { requireSupplyConfirmation({ data: row, persistence: "confirmed" }, {
+        patientId: data.care_recipient_id, type: data.type, id, minimumVersion: accepted.expectedVersion,
+      }); };
+      const outcome = uncertain ? await decision.checkPrevious(verify) : await decision.execute({
+        domain: "supply", action: intention.action, body: intention.body as Record<string, unknown>, expectedVersion: intention.expectedVersion,
+      }, verify);
+      if (!outcome) return;
+      if (outcome.state === "not_applied") {
+        pendingRef.current = null; setUncertain(false); setReview(null);
+        setError("A conferência confirmou que nada foi alterado. Seus campos continuam nesta tela para tentar novamente. Se persistir, procure a supervisão."); return;
+      }
+      intention = { ...intention, action: outcome.intention.action, body: outcome.intention.body, expectedVersion: outcome.intention.expectedVersion };
+      const result = { data: requireSupplyConfirmation({ data: outcome.result, persistence: "confirmed" }, {
+        patientId: data.care_recipient_id, type: data.type, id, minimumVersion: intention.expectedVersion,
+      }) };
       resultFocusRef.current = true;
       setFocusRevision((value) => value + 1);
-      setData(result.data);
-      setReadFailed(false);
+      if (result.data.version >= data.version) { setData(result.data); setReadFailed(false); }
+      setAttempt(value => value + 1);
       pendingRef.current = null;
       setUncertain(false);
       setReview(null);
@@ -339,33 +347,33 @@ export function SupplyDocumentContent({
               : "Operação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.",
       );
     } catch (reason) {
-      const rejected =
-        reason instanceof ApiError &&
-        [400, 403, 404, 409, 422].includes(reason.status);
-      if (rejected && !uncertain) {
+      const failure = reason instanceof DocumentDecisionFailure ? reason : null;
+      const cause = failure?.cause ?? reason;
+      const rejected = failure?.outcome === "not_applied" || cause instanceof ApiError && [400, 401, 403, 404, 409, 422].includes(cause.status);
+      if (rejected) {
         if (
           data.type === "COM" &&
-          reason instanceof ApiError &&
-          reason.code === "VERSION_CONFLICT"
+          cause instanceof ApiError &&
+          cause.code === "VERSION_CONFLICT"
         )
           setPurchaseConflict(true);
         if (
           data.type === "ENT" &&
-          reason instanceof ApiError &&
-          reason.code === "VERSION_CONFLICT"
+          cause instanceof ApiError &&
+          cause.code === "VERSION_CONFLICT"
         )
           setDeliveryConflict(true);
         if (
           data.type === "ENT" &&
           intention.action === "consent_cancel" &&
-          reason instanceof ApiError &&
-          reason.status === 403
+          cause instanceof ApiError &&
+          cause.status === 403
         )
           setDeliveryConflict(true);
         pendingRef.current = null;
         setReview(null);
       }
-      setUncertain(uncertain || !rejected);
+      setUncertain(failure ? failure.outcome === "uncertain" : uncertain || !rejected);
       setError(
         reason instanceof Error
           ? reason.message
@@ -595,9 +603,11 @@ export function SupplyDocumentContent({
   }
   function renderAction(item: DocumentAction) {
     if (!data) return null;
+    const Action = secondaryDocumentActions.has(item) ? DocumentMoreButton : "button";
     return (
-      <button
+      <Action
         key={item}
+        {...(secondaryDocumentActions.has(item) ? { icon: item === "cancel" ? "close" as const : item === "reassign" ? "user" as const : "check" as const, danger: item === "cancel" } : {})}
         className={item === "receive" ? primaryClass : buttonClass}
         // Opening an editor has no official effect. A background read must not
         // disable a retained opener between pointerdown and pointerup. Existing
@@ -615,9 +625,10 @@ export function SupplyDocumentContent({
         {data.type === "COM" && item === "receive"
           ? "Informar nova chegada"
           : actionLabels[item]}
-      </button>
+      </Action>
     );
   }
+  if (!data && loading) return null;
   return (
     <div className="hca-record-detail doc-page">
       {data ? (
@@ -641,11 +652,11 @@ export function SupplyDocumentContent({
           </button>
         </div>
       )}
-      {loading && !data ? <Notice>Consultando documento persistido…</Notice> : null}
       <span role="status" className="sr-only">
         {loading && data ? "Atualizando consulta da ficha…" : ""}
       </span>
-      {error ? <Notice error>{error}</Notice> : null}
+      {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
+        {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {readNotice &&
         (action ||
@@ -837,31 +848,15 @@ export function SupplyDocumentContent({
             secondaryActions={
               <>
                 {data.type === "BAL" && data.payload.balanceContext ? (
-                  <Link
-                    href="/balancos"
+                  <DocumentMoreLink
+                    icon="calendar" href="/balancos"
                     className={buttonClass}
                     prefetch={false}
                   >
                     Acompanhar plantão, revisão e reconto
-                  </Link>
+                  </DocumentMoreLink>
                 ) : null}
-                {activeContext &&
-                  (data.type === "COM" || data.type === "ENT") ? (
-                  <PrivateOperationRecoveryActions
-                    kind={data.type}
-                    onSelect={(purpose) => {
-                      operationOpenerRef.current = moreTriggerRef.current;
-                      decisionFocusRef.current = true;
-                      setFocusRevision((value) => value + 1);
-                      tabs.select("workflow");
-                      setAction(purpose);
-                      setReview(null);
-                      setPurchaseConflict(false);
-                      setDeliveryConflict(false);
-                      setComparison(null);
-                    }}
-                  />
-                ) : null}
+
                 {actions
                   .filter((item) => secondaryDocumentActions.has(item))
                   .map(renderAction)}
@@ -1294,9 +1289,9 @@ export function SupplyDocumentContent({
             ? "Revisar encerramento da expectativa"
             : "Revisar operação definitiva"
         }
-        closeDisabled={busy || uncertain}
+        closeDisabled={busy}
         onClose={() => {
-          if (!busy && !uncertain) setReview(null);
+          if (!busy) { if (uncertain) setCloseUncertain(true); else setReview(null); }
         }}
       >
         {error ? <Notice error>{error}</Notice> : null}
@@ -1334,12 +1329,16 @@ export function SupplyDocumentContent({
             {busy
               ? "Confirmando…"
               : uncertain
-                ? "Recuperar tentativa"
+                ? "Conferir resultado"
                 : review?.action === "close_expectation"
                   ? "Confirmar encerramento da expectativa"
                   : "Confirmar operação"}
           </button>
         </div>
+      </Dialog>
+      <Dialog open={closeUncertain} title="Fechar sem resultado confirmado?" onClose={() => setCloseUncertain(false)}>
+        <p>O resultado continua sem confirmação. Fechar descarta os campos desta tela. Procure a supervisão e confira o resultado antes de repetir a ação.</p>
+        <div className="hca-toolbar"><ActionButton onClick={() => setCloseUncertain(false)}>Voltar à conferência</ActionButton><ActionButton onClick={() => { setCloseUncertain(false); setReview(null); setAction(null); pendingRef.current = null; setUncertain(false); }}>Fechar e procurar supervisão</ActionButton></div>
       </Dialog>
     </div>
   );

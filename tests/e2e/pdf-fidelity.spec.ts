@@ -121,7 +121,7 @@ test("COM distingue as três situações de parcela, proveniência, compra/doaç
   sql(`insert into private.pdf_issuances(id,document_id,version,care_recipient_id,requested_by,requested_name,requested_session,requested_at,idempotency_key,request_hash,verification_code,renderer_revision,representation,source_hash,snapshot,object_path) select ${sqlLiteral(oldId)},document_id,version,care_recipient_id,requested_by,requested_name,requested_session,requested_at,${sqlLiteral(oldKey)},encode(extensions.digest(jsonb_build_array('pdf-issuance',document_id,version)::text,'sha256'),'hex'),upper(encode(extensions.gen_random_bytes(16),'hex')),6,representation,source_hash,(select e.body from public.document_events e where e.document_id=private.pdf_issuances.document_id and e.version=private.pdf_issuances.version),'issuances/'||document_id||'/'||${sqlLiteral(oldId)}||'.pdf' from private.pdf_issuances where id=${sqlLiteral(current.identity.id)};`);
   const recovered = await page.request.post(`/api/documents/${f.doc.id}/issuances`, { timeout: 60_000, data: { idempotencyKey: oldKey, version: f.doc.version } });
   expect(recovered.status(), await recovered.text()).toBe(503);
-  expect((await recovered.json()).error.code).toBe("CONTENT_INVALID");
+  expect((await recovered.json()).code).toBe("CONTENT_INVALID");
   expect((await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${oldId}`)).status()).toBe(404);
   expect(sql(`select state from private.pdf_issuances where id=${sqlLiteral(oldId)}`)).not.toBe("ready");
   const donation = await rpc(f.owner, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false, p_payload: { origin: "donation", lines: [{ productId: f.products[0], quantity: "1" }] } });

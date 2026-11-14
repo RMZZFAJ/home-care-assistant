@@ -48,7 +48,7 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
     before = ledger(f.patient);
   await login(page, fixtures.adminA.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
-  await expect(page.getByRole("tabpanel")).toContainText("Consultar a contagem conciliada");
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Consultar a contagem conciliada");
   await selectDocumentSection(page, "workflow");
   await expect(
     page.getByRole("heading", { name: "Contagem e revisão", exact: true }),
@@ -175,7 +175,7 @@ test("BAL com referência alterada conserva o parecer e adota explicitamente o n
     ownComment = "Meu parecer permanece durante a comparação e o reconto.";
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
-  await expect(page.getByRole("tabpanel")).toContainText("Acompanhar as revisões do balanço");
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar as revisões do balanço");
   await selectDocumentSection(page, "workflow");
   let releaseInitial!: () => void;
   const initialHeld = new Promise<void>((resolve) => {

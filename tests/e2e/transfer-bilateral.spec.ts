@@ -224,7 +224,7 @@ test("transferência separa três autores, recupera declaração incerta com per
     );
     await openDocumentMore(page);
     await expect(
-      page.getByRole("button", { name: "Alterar destinatário", exact: true }),
+      page.getByRole("menuitem", { name: "Alterar destinatário", exact: true }),
     ).toHaveCount(0);
     await closeDocumentMore(page);
     const bruno = await brunoContext.newPage();

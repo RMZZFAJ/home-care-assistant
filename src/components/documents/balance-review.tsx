@@ -6,11 +6,8 @@ import { recountHref } from "@/components/balances/balance-recount-assignment";
 
 import { Notice, type WorkspaceContext } from "@/components/workspace";
 import { BalanceDocumentPreparation } from "@/components/balances/balance-document-preparation";
-import { balanceDocumentLabels } from "@/lib/forms/balance-document-draft";
-import {
-  balanceDocumentPurposes,
-  type BalanceDocumentPurpose,
-} from "@/lib/validation/supply-drafts";
+
+import { type BalanceDocumentPurpose } from "@/lib/validation/supply-drafts";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import type { BalanceReviewContext, SupplyDocument } from "@/types/documents";
@@ -179,30 +176,7 @@ export function BalanceReview({
               ? "As revisões previstas foram registradas. A revisão não substitui a confirmação da aplicação ao estoque."
               : "Revisão facultativa. A contagem válida não entra em uma fila universal de aprovação."}
       </Notice>
-      <details className="ui-card">
-        <summary>Minhas decisões em preparação</summary>
-        <p>
-          Consulte o próprio preenchimento ou resultado, inclusive após perder
-          permissão para uma nova decisão.
-        </p>
-        <div className="hca-toolbar">
-          {balanceDocumentPurposes.map((purpose) => (
-            <ActionButton
-              key={purpose}
-              onClick={(event) => {
-                setEditor({
-                  purpose,
-                  consulting: true,
-                  opener: event.currentTarget,
-                });
-                onEditingChange(true);
-              }}
-            >
-              Consultar preparação: {balanceDocumentLabels[purpose]}
-            </ActionButton>
-          ))}
-        </div>
-      </details>
+
       {context.eligibleGroups.length ? (
         <div className="hca-toolbar">
           {context.eligibleGroups.map((group) => (

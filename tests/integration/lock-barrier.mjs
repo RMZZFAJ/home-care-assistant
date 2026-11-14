@@ -103,6 +103,8 @@ export async function whileRowWaits(
     table &&
       [
         "create_supply_document",
+        "document_progress_publish",
+        "execute_document_decision",
         "acknowledge_document_cancellation",
         "revise_supply_document",
         "supply_document_command",

@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import {
   useCallback,
   useEffect,
@@ -15,18 +16,14 @@ import {
 } from "@/components/ui/controls";
 import {
   api,
-  ApiError,
   can,
   Notice,
   type WorkspaceContext,
 } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
-import { useCreationDraft } from "@/components/forms/use-creation-draft";
-import {
-  CreationDraftPanel,
-  DraftContentSummary,
-} from "@/components/forms/creation-draft-panel";
-import { draftFlow, navigationForStep } from "@/lib/forms/draft-navigation";
+import { DraftContentSummary } from "@/components/forms/creation-draft-panel";
+import { useDocumentDecision, DocumentDecisionFailure } from "@/components/documents/use-document-decision";
+import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import {
   adoptRequisitionDecisionReference,
   emptyRequisitionDecisionDraft,
@@ -37,7 +34,7 @@ import {
 import {
   parseRequisitionDecisionReference,
   requisitionDecisionPacketSchema,
-  requireRequisitionDecisionConfirmation,
+  requireRequisitionDecisionResult,
   type RequisitionDecisionReference,
   type RequisitionDecisionPacket,
 } from "@/lib/validation/requisition-decisions";
@@ -94,7 +91,6 @@ export function RequisitionDecisionEditor({
     [unavailable, setUnavailable] = useState(true);
   const [busy, setBusy] = useState(false),
     [reviewing, setReviewing] = useState(false),
-    [uncertain, setUncertain] = useState(false),
     [dirty, setDirty] = useState(false),
     [error, setError] = useState("");
   const [fieldError, setFieldError] = useState<{
@@ -118,44 +114,9 @@ export function RequisitionDecisionEditor({
       : can(context, "req.review") &&
         (purpose !== "cancel" || can(context, "req.create")) &&
         (purpose !== "resolve_extra" || can(context, "catalog.manage"));
-  const privateDraft = useCreationDraft({
-    userId: context.userId,
-    patientId,
-    kind: "REQ",
-    purpose,
-    targetDocumentId: id,
-    enabled: scopeMatches,
-    navigation: navigationForStep(draftFlow("REQ", purpose)!, 0),
-    onResume(saved) {
-      if (
-        !saved.content ||
-        !("fields" in saved.content) ||
-        saved.content.documentVersion === null
-      )
-        return false;
-      setBaseline(saved.content);
-      setFields(saved.content.fields);
-      restoredRef.current = true;
-      setNeedsReference(true);
-      setUnavailable(true);
-      setComparison(null);
-      setReviewing(false);
-      setDirty(false);
-      setError("");
-      setFieldError(null);
-      return true;
-    },
-    onDiscard() {
-      const next = reference
-        ? emptyRequisitionDecisionDraft(reference.document, purpose)
-        : null;
-      setBaseline(next);
-      setFields(next?.fields ?? {});
-      setNeedsReference(!next);
-      setDirty(false);
-      setError("");
-    },
-  });
+  const decision = useDocumentDecision({ userId: context.userId, documentId: id, domain: "requisition", action: purpose });
+  const uncertain = decision.uncertain;
+  useOperationActivity(!reference && !error && !consulting && scopeMatches, { title: "Consultando a requisição", detail: "Estamos conferindo a referência autorizada para este preenchimento." });
   const readReference = useCallback(
     async (
       signal?: AbortSignal,
@@ -205,7 +166,7 @@ export function RequisitionDecisionEditor({
         if (!restoredRef.current) {
           const content = emptyRequisitionDecisionDraft(next.document, purpose);
           setBaseline(content);
-          setFields(content.fields);
+          setFields(previous => ({ ...content.fields, ...previous }));
           setNeedsReference(false);
           setUnavailable(false);
         }
@@ -224,25 +185,17 @@ export function RequisitionDecisionEditor({
     if (reviewing) headingRef.current?.focus();
   }, [reviewing]);
   useEffect(() => {
-    if (!busy && !privateDraft.busy && !reviewing && returnFocusRef.current) {
+    if (!busy && !reviewing && returnFocusRef.current) {
       returnFocusRef.current = false;
       (reasonRef.current ?? readRecoveryRef.current ?? readOnlyHeadingRef.current ?? headingRef.current)?.focus();
     }
-  }, [busy, privateDraft.busy, reviewing]);
+  }, [busy, reviewing]);
   const content = baseline ? { ...baseline, fields } : null;
-  const readOnly =
-    !reviewing &&
-    (consulting ||
-      !scopeMatches ||
-      !roleAllows ||
-      privateDraft.readDenied ||
-      privateDraft.protectedReadPending ||
-      !!privateDraft.consumed);
+  const readOnly = !reviewing && (consulting || !scopeMatches || !roleAllows || !can(context, "req.read"));
   const available =
     !!reference && requisitionDecisionAvailable(reference.document, purpose);
   const allowed =
     !readOnly &&
-    !privateDraft.blocked &&
     !needsReference &&
     !unavailable &&
     available;
@@ -267,16 +220,9 @@ export function RequisitionDecisionEditor({
     } catch (cause) {
       setError(errorText(cause));
       returnFocusRef.current = true;
-      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-        await privateDraft.revalidateRead();
     } finally {
       setBusy(false);
     }
-  }
-  async function save() {
-    if (!content || busy || uncertain || reviewing) return;
-    const saved = await privateDraft.save(content);
-    if (saved) setDirty(false);
   }
   async function review() {
     if (!content || !allowed || busy || uncertain) return;
@@ -349,99 +295,41 @@ export function RequisitionDecisionEditor({
           "A escolha precisa de nova conferência. Substitua explicitamente o item ou o produto indisponível.",
         );
       }
-      const saved = await privateDraft.save(content);
-      if (!saved) return;
-      setDirty(false);
       setReference(current);
       setNeedsReference(false);
       setUnavailable(false);
-      pendingRef.current = {
-        ...packet.data,
-        draftCommit: { id: saved.id, revision: saved.revision },
-      };
+      pendingRef.current = packet.data;
       setReviewing(true);
     } catch (cause) {
       setError(errorText(cause));
       returnFocusRef.current = true;
-      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-        await privateDraft.revalidateRead();
     } finally {
       setBusy(false);
     }
+  }
+  function verifyDecision(row: Record<string, unknown>, intention: DocumentDecisionIntention) {
+    requireRequisitionDecisionResult(row, { action: purpose, body: requisitionDecisionPacketSchema.shape.body.parse(intention.body) }, { id, patientId });
   }
   async function confirm() {
+    if (busy || !scopeMatches) return;
     const packet = pendingRef.current;
-    if (!packet || busy || !scopeMatches) return;
-    const wasUncertain = uncertain;
-    setBusy(true);
-    setError("");
+    if (!packet && !uncertain) return;
+    setBusy(true); setError("");
     try {
-      const operation =
-        purpose === "cancel"
-          ? "status"
-          : purpose === "archive"
-            ? "archive"
-            : "resolve";
-      const response = await api<unknown>(
-        `/api/requisitions/${id}/${operation}`,
-        {
-          ...packet.body,
-          ...(purpose === "cancel" ? { status: "cancelled" } : {}),
-          expectedVersion: packet.expectedVersion,
-          idempotencyKey: packet.idempotencyKey,
-          draftCommit: packet.draftCommit,
-        },
-        undefined,
-        purpose === "cancel" ? "PATCH" : "POST",
-      );
-      requireRequisitionDecisionConfirmation(response, packet, {
-        id,
-        patientId,
-      });
-      pendingRef.current = null;
-      setUncertain(false);
-      setReviewing(false);
-      setDirty(false);
-      privateDraft.reload();
-      onSaved();
+      const outcome = uncertain ? await decision.checkPrevious(verifyDecision) : await decision.execute({
+        domain: "requisition", action: purpose, body: packet!.body,
+        expectedVersion: packet!.expectedVersion, referenceHash: fields.referenceHash,
+      }, verifyDecision);
+      if (!outcome) return;
+      pendingRef.current = null; setReviewing(false);
+      if (outcome.state === "applied") { setDirty(false); onSaved(); }
+      else setError("A conferência confirmou que nada foi alterado. Seus campos continuam nesta tela. Se o erro persistir, procure a supervisão.");
     } catch (cause) {
-      const rejected =
-        !wasUncertain &&
-        cause instanceof ApiError &&
-        [400, 401, 403, 404, 409, 422].includes(cause.status);
-      setUncertain(!rejected);
       setError(errorText(cause));
-      if (rejected) {
-        pendingRef.current = null;
-        setReviewing(false);
-        setNeedsReference(true);
-        setUnavailable(true);
-        setComparison(null);
-        returnFocusRef.current = true;
-        if (cause.code === "DRAFT_VERSION_CONFLICT")
-          void privateDraft.reportConflict();
-      }
-    } finally {
-      setBusy(false);
+      if (cause instanceof DocumentDecisionFailure && cause.outcome === "not_applied") { pendingRef.current = null; setReviewing(false); returnFocusRef.current = true; }
     }
+    finally { setBusy(false); }
   }
-  const panel = (
-    <CreationDraftPanel
-      draft={privateDraft}
-      current={content}
-      patientName={context.patient?.display_name ?? "Paciente selecionado"}
-      disabled={busy || uncertain || reviewing}
-      resumeLabel={readOnly ? "Consultar preenchimento salvo" : undefined}
-      discardLabel={readOnly ? "Descartar preenchimento privado" : undefined}
-      acknowledgeLabel="Reconhecer resultado aplicado"
-      onRevalidateRead={() => { returnFocusRef.current = true; void privateDraft.revalidateRead(); }}
-      revalidationRef={readRecoveryRef}
-    />
-  );
-  const canSeePrivate =
-    scopeMatches &&
-    !privateDraft.readDenied &&
-    !privateDraft.protectedReadPending;
   const selectedItem =
       !unavailable &&
       reference?.document.items.find(
@@ -455,84 +343,43 @@ export function RequisitionDecisionEditor({
       !initialFocusRef.current &&
       baseline &&
       !readOnly &&
-      !privateDraft.blocked
+      !busy
     ) {
       initialFocusRef.current = true;
       reasonRef.current?.focus();
     }
-  }, [baseline, readOnly, privateDraft.blocked]);
+  }, [baseline, readOnly, busy]);
   return (
     <RecordDrawer
+      exitDialog
       title={
         reviewing
           ? "Revisar decisão da requisição"
           : requisitionDecisionLabels[purpose]
       }
-      busy={busy || privateDraft.busy}
-      preventClose={uncertain || !!privateDraft.pending}
+      busy={busy}
       hasUnsavedChanges={dirty}
+      uncertainOutcome={uncertain || decision.uncertain}
       restoreFocusTo={restoreFocusTo}
       restoreFocusFallbackRef={restoreFocusFallbackRef}
       onClose={onClose}
     >
       <div className="hca-form-stack">
-        {panel}
-        {error ? <Notice error>{error}</Notice> : null}
+        {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
+        {error || decision.error ? <Notice error>{error || decision.error}</Notice> : null}
         {!scopeMatches ? (
           <Notice>
             O paciente selecionado mudou. Feche esta consulta para continuar no
             contexto atual.
           </Notice>
-        ) : readOnly ? (
+        ) : readOnly ? <Notice>Esta ação não está disponível neste estado ou perfil. Feche para continuar a consulta da ficha.</Notice> : (
           <>
-            <h3 ref={readOnlyHeadingRef} tabIndex={-1}>Seu preenchimento em consulta</h3>
-            <Notice>
-              Consulta pessoal do preenchimento. Nenhuma decisão oficial é
-              executada nesta consulta.
-            </Notice>
-            {canSeePrivate &&
-            privateDraft.base?.state === "active" &&
-            !privateDraft.offered ? (
-              <DraftContentSummary
-                content={privateDraft.base.content}
-                kind="REQ"
-                purpose={purpose}
-              />
-            ) : null}
-            {!privateDraft.loading &&
-            !privateDraft.loadError &&
-            !privateDraft.base &&
-            !privateDraft.offered &&
-            !privateDraft.consumed ? (
-              <p>
-                Nenhum preenchimento ou resultado privado pendente para esta
-                decisão neste perfil.
-              </p>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <Notice>
-              Salvar guarda apenas seu preenchimento. Arquivar, cancelar ou
-              associar um item exige a confirmação própria. Estoque e ciências
-              não são alterados ao salvar.
-            </Notice>
+
             <div className="hca-toolbar">
-              <ActionButton
-                disabled={
-                  !content ||
-                  busy ||
-                  uncertain ||
-                  reviewing ||
-                  privateDraft.blocked
-                }
-                onClick={() => void save()}
-              >
-                Salvar preenchimento privado
-              </ActionButton>
+
               {!reviewing ? (
                 <ActionButton
-                  disabled={busy || uncertain || privateDraft.blocked}
+                  disabled={busy || uncertain}
                   onClick={() => void compare()}
                 >
                   Comparar referência atual
@@ -570,7 +417,6 @@ export function RequisitionDecisionEditor({
                 <ActionButton
                   disabled={
                     busy ||
-                    privateDraft.blocked ||
                     !requisitionDecisionAvailable(comparison.document, purpose)
                   }
                   onClick={() => {
@@ -600,7 +446,7 @@ export function RequisitionDecisionEditor({
                 {!requisitionDecisionAvailable(comparison.document, purpose) ? (
                   <Notice>
                     Esta decisão não está disponível no estado atual. Seu
-                    preenchimento permanece privado para consulta ou descarte.
+                    preenchimento permanece nesta tela; sair o descarta.
                   </Notice>
                 ) : null}
               </section>
@@ -608,7 +454,7 @@ export function RequisitionDecisionEditor({
             <h3 ref={headingRef} tabIndex={-1}>
               {reviewing
                 ? "Conferir decisão antes de confirmar"
-                : "Seu preenchimento pessoal"}
+                : "Preencher decisão"}
             </h3>
             {!unavailable && reference ? (
               <p>
@@ -629,7 +475,7 @@ export function RequisitionDecisionEditor({
                 <p>
                   <strong>{requisitionDecisionLabels[purpose]}</strong>
                 </p>
-                {canSeePrivate ? (
+                {scopeMatches ? (
                   <>
                     <p className="whitespace-pre-wrap wrap-break-word">
                       Sua justificativa: {fields.reason}
@@ -643,7 +489,7 @@ export function RequisitionDecisionEditor({
                   </>
                 ) : (
                   <Notice>
-                    O conteúdo privado não está disponível para consulta nesta
+                    O preenchimento não está disponível para consulta nesta
                     sessão.
                   </Notice>
                 )}
@@ -811,6 +657,7 @@ export function RequisitionDecisionEditor({
                 >
                   <TextAreaField
                     ref={reasonRef}
+                    disabled={!baseline || busy || uncertain}
                     value={fields.reason ?? ""}
                     required
                     minLength={3}
@@ -822,7 +669,7 @@ export function RequisitionDecisionEditor({
                 <ActionButton
                   variant="primary"
                   type="submit"
-                  disabled={!allowed || busy || privateDraft.busy}
+                  disabled={!allowed || busy}
                 >
                   {purpose === "resolve_extra"
                     ? "Revisar associação"

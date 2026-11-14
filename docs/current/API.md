@@ -1713,11 +1713,35 @@ atribuição e do catálogo. [Consumidores](../audits/D/D-B/STOCK_READ_VALIDATIO
 
 ## Revisão L1 de E01–E03
 
+A revisão posterior de rascunhos está em
+[L1_DRAFT_POLICY.md](../audits/D/D-B/L1_DRAFT_POLICY.md). Os contratos privados
+históricos abaixo continuam compatíveis para consulta e recuperação. A interface
+L1 não os usa para criar novas preparações de decisões curtas.
+
 O marcador corrente é protocol=1, schema=2. Clientes com o contrato anterior
 precisam atualizar antes de enviar operações. A política de nova senha é mínimo
 6, A-Z, a-z, número e símbolo, até 72 bytes UTF-8, conforme decisão expressa
 posterior do responsável. Cliente, servidor e Auth local usam os mesmos grupos;
 o mínimo remoto conferido permanece em seis caracteres.
+
+- POST /api/documents/:id/decisions confirma key e intention: domain, action,
+  body, expectedVersion e, para REQ/revisão BAL, referenceHash. Usa a mesma
+  transação do comando nativo e do recibo oficial, sem salvar formulário.
+- POST /api/documents/:id/decisions/reconcile recebe somente key. Devolve
+  applied com intenção/resultado oficiais ou not_applied com intenção/resultado
+  nulos. A ausência fecha a chave para impedir a aplicação tardia do pedido.
+  Repetir uma tentativa ausente exige nova confirmação e nova chave.
+- POST /api/balances/decisions/:target?careRecipientId=:patient e a variante
+  /reconcile aplicam a mesma regra à programação, atribuição e adiamento.
+  O domínio é balance_workspace; expectedVersion=0 representa somente uma
+  versão de referência inicialmente ausente. O banco confere paciente, alvo,
+  propósito, comando, autoridade e hash de referência. Recuperar resultado
+  depende de leitura viva, não de restaurar um formulário pessoal.
+- Rascunhos de criação/edição extensa mantêm somente o preenchimento ativo
+  daquela pessoa e contexto, com CAS existente. A apresentação de retomada é
+  Continuar ou Descartar; uma falha de gravação conserva a referência exata.
+  O último Andamento também é guardado ao fechar voluntariamente, conforme
+  esclarecimento posterior do responsável. Nenhum desses saves publica atos.
 
 - POST /api/documents aceita requestFulfillment=partial|complete em cada linha
   ENT vinculada à REQ. A escolha é obrigatória e consciente; autor/instante vêm
@@ -1738,6 +1762,11 @@ o mínimo remoto conferido permanece em seis caracteres.
   @todos, somente public. Pesquisa de pessoas/referências, localização por UUID,
   paginação, contagens, auditoria e PDF respeitam a mesma audiência. Uma referência
   não pode ampliar a audiência do registro reservado.
+  Para novos registros do papel family, a ausência de visibility assume family;
+  public e @todos são recusados no banco. A UI oferece somente publicação privada.
+  Uma menção individual admite a pessoa ao registro reservado enquanto conservar
+  leitura viva da ficha, sem liberar outros registros privados. Recibos confirmados
+  de publicações anteriores conservam a audiência e o hash originais na recuperação.
 - GET /api/documents/:id/progress aceita from e through opcionais, no formato
   YYYY-MM-DD, com limites inclusivos do dia civil em America/Sao_Paulo. O banco
   aplica a faixa antes de totalizar e paginar; audience, tipo manual/automático,

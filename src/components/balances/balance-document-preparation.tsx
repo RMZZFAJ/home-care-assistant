@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 
 import {
   useCallback,
@@ -24,23 +25,19 @@ import {
 } from "@/components/ui/controls";
 import { SearchSelect } from "@/components/ui/search-select";
 import { RecordDrawer } from "@/components/forms/record-drawer";
-import {
-  CreationDraftPanel,
-  DraftContentSummary,
-} from "@/components/forms/creation-draft-panel";
-import { useCreationDraft } from "@/components/forms/use-creation-draft";
-import { draftFlow, navigationForStep } from "@/lib/forms/draft-navigation";
+import { useDocumentDecision, DocumentDecisionFailure } from "@/components/documents/use-document-decision";
+import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import {
   adoptBalanceDocumentDraft,
   balanceDocumentAvailable,
-  balanceDocumentPacket,
+  balanceDocumentAction,
   balanceTargetLabel,
   emptyBalanceDocumentDraft,
-  parseBalanceDocumentConfirmation,
+  requireBalanceDocumentResult,
   parseBalancePreparation,
 } from "@/lib/forms/balance-document-draft";
 import type {
-  BalanceDocumentDecision,
+  BalanceDocumentAction,
   BalancePreparation,
 } from "@/lib/validation/balance-document-decisions";
 import type {
@@ -169,10 +166,9 @@ export function BalanceDocumentPreparation({
   const [error, setError] = useState(""),
     [fieldError, setFieldError] = useState("");
   const [confirmed, setConfirmed] = useState<ReturnType<
-    typeof parseBalanceDocumentConfirmation
+    typeof requireBalanceDocumentResult
   > | null>(null);
-  const restoredRef = useRef(false),
-    packetRef = useRef<BalanceDocumentDecision | null>(null),
+  const packetRef = useRef<BalanceDocumentAction | null>(null),
     returnFocusRef = useRef(false),
     initialFocusRef = useRef(false),
     focusQueryRef = useRef(false);
@@ -180,7 +176,6 @@ export function BalanceDocumentPreparation({
     itemsRef = useRef<HTMLFieldSetElement>(null),
     resultRef = useRef<HTMLHeadingElement>(null),
     reviewRef = useRef<HTMLHeadingElement>(null),
-    readRecoveryRef = useRef<HTMLButtonElement>(null),
     recoveryRef = useRef<HTMLButtonElement>(null),
     queryRef = useRef<HTMLButtonElement>(null);
   const scopeMatches = context.patient?.id === patientId;
@@ -194,41 +189,8 @@ export function BalanceDocumentPreparation({
           ? "bal.approve.family"
           : "bal.approve.supervisor",
       );
-  const privateDraft = useCreationDraft({
-    userId: context.userId,
-    patientId,
-    kind: "BAL",
-    purpose,
-    targetDocumentId: documentId,
-    enabled: scopeMatches,
-    navigation: navigationForStep(draftFlow("BAL", purpose)!, 0),
-    onResume(saved) {
-      if (
-        !saved.content ||
-        !("fields" in saved.content) ||
-        saved.content.documentVersion === null
-      )
-        return false;
-      setBaseline(saved.content);
-      setFields(saved.content.fields);
-      restoredRef.current = true;
-      setNeedsReference(true);
-      setUnavailable(true);
-      setComparison(null);
-      setReviewing(false);
-      setDirty(false);
-      setError("");
-      return true;
-    },
-    onDiscard() {
-      const next = source ? emptyBalanceDocumentDraft(source, purpose) : null;
-      setBaseline(next);
-      setFields(next?.fields ?? {});
-      setNeedsReference(!next);
-      setDirty(false);
-      setError("");
-    },
-  });
+  const decision = useDocumentDecision({ userId: context.userId, documentId, domain: "balance", action: purpose });
+  useOperationActivity(!source && !error && !consulting && scopeMatches, { title: "Consultando a contagem", detail: "Estamos conferindo a referência autorizada para este preenchimento." });
   const readReference = useCallback(
     async (signal?: AbortSignal, minimumVersion?: number) =>
       parseBalancePreparation(
@@ -253,7 +215,7 @@ export function BalanceDocumentPreparation({
       .then((current) => {
         if (controller.signal.aborted) return;
         setSource(current);
-        if (!restoredRef.current) {
+        if (!packetRef.current) {
           const content = emptyBalanceDocumentDraft(current, purpose);
           setBaseline(content);
           setFields((previous) => ({ ...content.fields, ...previous }));
@@ -276,73 +238,17 @@ export function BalanceDocumentPreparation({
   useEffect(() => {
     if (reviewing) reviewRef.current?.focus();
   }, [reviewing]);
+  useEffect(() => { if (confirmed?.recount) resultRef.current?.focus(); }, [confirmed]);
+  useEffect(() => { if (uncertain && !busy) recoveryRef.current?.focus(); }, [uncertain, busy]);
   useEffect(() => {
-    if (
-      confirmed?.recount &&
-      !privateDraft.busy &&
-      !privateDraft.readDenied &&
-      !privateDraft.protectedReadPending
-    )
-      resultRef.current?.focus();
-  }, [
-    confirmed,
-    privateDraft.busy,
-    privateDraft.readDenied,
-    privateDraft.protectedReadPending,
-  ]);
-  useEffect(() => {
-    if (uncertain && !busy) recoveryRef.current?.focus();
-  }, [uncertain, busy]);
-  useEffect(() => {
-    if (!busy && !privateDraft.busy && focusQueryRef.current) {
-      focusQueryRef.current = false;
-      queryRef.current?.focus();
-    }
-    if (!busy && !privateDraft.busy && !reviewing && returnFocusRef.current) {
-      returnFocusRef.current = false;
-      (textRef.current ?? readRecoveryRef.current ?? queryRef.current)?.focus();
-    }
-  }, [busy, privateDraft.busy, reviewing]);
-  const canSeePrivate =
-    scopeMatches &&
-    !privateDraft.readDenied &&
-    !privateDraft.protectedReadPending;
-  const readOnly =
-    !reviewing &&
-    (consulting ||
-      !scopeMatches ||
-      !roleAllows ||
-      !canSeePrivate ||
-      !!privateDraft.consumed);
-  useEffect(() => {
-    if (
-      !initialFocusRef.current &&
-      baseline &&
-      !readOnly &&
-      !privateDraft.blocked
-    ) {
-      initialFocusRef.current = true;
-      textRef.current?.focus();
-    }
-  }, [baseline, readOnly, privateDraft.blocked]);
+    if (!busy && focusQueryRef.current) { focusQueryRef.current = false; queryRef.current?.focus(); }
+    if (!busy && !reviewing && returnFocusRef.current) { returnFocusRef.current = false; (textRef.current ?? queryRef.current)?.focus(); }
+  }, [busy, reviewing]);
+  const canSeePrivate = scopeMatches;
+  const readOnly = !reviewing && (consulting || !scopeMatches || !roleAllows);
+  useEffect(() => { if (!initialFocusRef.current && baseline && !readOnly) { initialFocusRef.current = true; textRef.current?.focus(); } }, [baseline, readOnly]);
   const content = baseline ? { ...baseline, fields } : null;
-  const savedContent = privateDraft.base?.content;
-  const matchesSaved = !!(
-    privateDraft.base?.state === "active" &&
-    content &&
-    savedContent &&
-    "fields" in savedContent &&
-    savedContent.documentVersion === content.documentVersion &&
-    Object.keys(savedContent.fields).length === Object.keys(fields).length &&
-    Object.keys(fields).every((key) => savedContent.fields[key] === fields[key])
-  );
-  const allowed =
-    !readOnly &&
-    !needsReference &&
-    !unavailable &&
-    !!source &&
-    balanceDocumentAvailable(source, purpose) &&
-    !privateDraft.blocked;
+  const allowed = !readOnly && !needsReference && !unavailable && !!source && balanceDocumentAvailable(source, purpose);
   const target = !unavailable
     ? source?.recount?.targets.find((row) => row.id === fields.targetShiftId)
     : null;
@@ -366,22 +272,9 @@ export function BalanceDocumentPreparation({
         cause instanceof Error ? cause.message : "Não foi possível comparar.",
       );
       returnFocusRef.current = true;
-      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-        await privateDraft.revalidateRead();
+
     } finally {
       setBusy(false);
-    }
-  }
-  async function savePrivate() {
-    if (
-      content &&
-      !busy &&
-      !uncertain &&
-      !reviewing &&
-      (await privateDraft.save(content))
-    ) {
-      setDirty(false);
-      returnFocusRef.current = true;
     }
   }
   async function prepare() {
@@ -394,13 +287,11 @@ export function BalanceDocumentPreparation({
         if (!line || (item.materialName !== undefined && item.materialName !== line.name) || (item.unit !== undefined && item.unit !== line.unit))
           throw new Error("O material da referência mudou. Confira e escolha novamente seu resultado antes de confirmar.");
       }
-      balanceDocumentPacket(
+      balanceDocumentAction(
         {
           patientId,
           documentId,
           purpose,
-          draftCommit: { id: crypto.randomUUID(), revision: 1 },
-          key: crypto.randomUUID(),
         },
         content,
       );
@@ -439,22 +330,7 @@ export function BalanceDocumentPreparation({
         );
         return;
       }
-      const saved = await privateDraft.save(content);
-      if (!saved) {
-        returnFocusRef.current = true;
-        return;
-      }
-      packetRef.current = balanceDocumentPacket(
-        {
-          patientId,
-          documentId,
-          purpose,
-          draftCommit: { id: saved.id, revision: saved.revision },
-          key: crypto.randomUUID(),
-        },
-        content,
-      );
-      setDirty(false);
+      packetRef.current = balanceDocumentAction({ patientId, documentId, purpose }, content);
       setReviewing(true);
     } catch (cause) {
       setError(
@@ -465,8 +341,7 @@ export function BalanceDocumentPreparation({
       setNeedsReference(true);
       setUnavailable(true);
       returnFocusRef.current = true;
-      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-        await privateDraft.revalidateRead();
+
     } finally {
       setBusy(false);
     }
@@ -474,49 +349,26 @@ export function BalanceDocumentPreparation({
   async function send() {
     const packet = packetRef.current;
     if (!packet || busy) return;
-    const recovering = uncertain;
-    setBusy(true);
-    setError("");
+    setBusy(true); setError("");
+    const verify = (result: Record<string, unknown>, intention: DocumentDecisionIntention) => {
+      requireBalanceDocumentResult(result, { ...packet, purpose: intention.action, expectedVersion: intention.expectedVersion, body: intention.body } as BalanceDocumentAction, context.userId);
+    };
     try {
-      const result = parseBalanceDocumentConfirmation(
-        await api<unknown>("/api/balances/document-preparation", packet),
-        packet,
-        context.userId,
-      );
-      setConfirmed(result);
-      packetRef.current = null;
-      setUncertain(false);
-      setReviewing(false);
-      setDirty(false);
-      privateDraft.reload();
-      onCommitted();
+      const result = uncertain ? await decision.checkPrevious(verify) : await decision.execute({ domain: "balance", action: purpose, body: packet.body, expectedVersion: packet.expectedVersion, referenceHash: fields.referenceHash }, verify);
+      if (!result || result.state !== "applied") { setUncertain(false); setReviewing(false); setError("A conferência confirmou que nada foi alterado. Confira os campos e tente novamente; se persistir, procure a supervisão."); return; }
+      const accepted = { ...packet, purpose: result.intention.action, expectedVersion: result.intention.expectedVersion, body: result.intention.body } as BalanceDocumentAction;
+      setConfirmed(requireBalanceDocumentResult(result.result, accepted, context.userId));
+      packetRef.current = null; setUncertain(false); setReviewing(false); setDirty(false); onCommitted();
     } catch (cause) {
-      const rejected =
-        cause instanceof ApiError &&
-        [400, 401, 403, 404, 409, 422].includes(cause.status);
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Resultado não confirmado. Preserve a tentativa.",
-      );
-      setUncertain(!rejected || recovering);
-      if (rejected && !recovering) {
-        packetRef.current = null;
-        setReviewing(false);
-        setNeedsReference(true);
-        setUnavailable(true);
-        returnFocusRef.current = true;
-        if (cause.code === "DRAFT_VERSION_CONFLICT")
-          await privateDraft.reportConflict();
-      }
-      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-        await privateDraft.revalidateRead();
-    } finally {
-      setBusy(false);
-    }
+      setError(cause instanceof Error ? cause.message : "Não foi possível conferir o resultado. Procure a supervisão.");
+      const unknown = !(cause instanceof DocumentDecisionFailure) || cause.outcome === "uncertain";
+      setUncertain(unknown);
+      if (!unknown) { setReviewing(false); returnFocusRef.current = true; if (cause.cause instanceof ApiError && [401,403,404,409].includes(cause.cause.status)) { setNeedsReference(true); setUnavailable(true); } }
+    } finally { setBusy(false); }
   }
   return (
     <RecordDrawer
+      exitDialog
       title={
         purpose !== "assign_recount"
           ? "Revisar contagem do balanço"
@@ -527,26 +379,14 @@ export function BalanceDocumentPreparation({
               : "Designar reconto"
       }
       onClose={onClose}
-      busy={busy || privateDraft.busy}
-      preventClose={uncertain || !!privateDraft.pending}
-      hasUnsavedChanges={dirty && !matchesSaved}
+      busy={busy || decision.busy}
+      uncertainOutcome={uncertain || decision.uncertain}
+      hasUnsavedChanges={dirty}
       restoreFocusTo={restoreFocusTo}
       restoreFocusFallbackRef={restoreFocusFallbackRef}
     >
       <div className="hca-form-stack">
-        <CreationDraftPanel
-          draft={privateDraft}
-          current={content}
-          patientName={context.patient?.display_name ?? "Paciente selecionado"}
-          disabled={busy || uncertain || reviewing}
-          resumeLabel={readOnly ? "Consultar preenchimento salvo" : undefined}
-          acknowledgeLabel="Reconhecer resultado aplicado"
-          onRevalidateRead={() => {
-            returnFocusRef.current = true;
-            void privateDraft.revalidateRead();
-          }}
-          revalidationRef={readRecoveryRef}
-        />
+        {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
         {error ? <Notice error>{error}</Notice> : null}
         {uncertain ? (
           <ActionButton
@@ -608,51 +448,13 @@ export function BalanceDocumentPreparation({
             </ActionButton>
           </section>
         ) : null}
-        {!confirmed && readOnly ? (
-          <>
-            <h3 tabIndex={-1}>Seu preenchimento em consulta</h3>
-            <Notice>
-              Consulta pessoal. Nenhuma revisão, designação ou efeito no estoque
-              é confirmado nesta consulta.
-            </Notice>
-            {canSeePrivate &&
-              privateDraft.base?.state === "active" &&
-              !privateDraft.offered ? (
-              <DraftContentSummary
-                content={privateDraft.base.content}
-                kind="BAL"
-                purpose={purpose}
-              />
-            ) : null}
-            {!privateDraft.loading &&
-              !privateDraft.loadError &&
-              !privateDraft.base &&
-              !privateDraft.offered &&
-              !privateDraft.consumed ? (
-              <p>
-                Nenhum preenchimento ou resultado privado pendente para esta
-                decisão neste perfil.
-              </p>
-            ) : null}
-          </>
-        ) : null}
+        {!confirmed && readOnly ? <Notice>Esta decisão não está disponível no vínculo atual. Fechar descarta este preenchimento.</Notice> : null}
         {!confirmed && !readOnly && !reviewing && canSeePrivate ? (
           <>
-            <Notice>
-              Salvar guarda apenas o seu preenchimento. Revisão e designação
-              exigem confirmação própria; as observações originais de quem
-              contou permanecem separadas.
-            </Notice>
             <div className="hca-toolbar">
               <ActionButton
-                disabled={busy || uncertain || privateDraft.blocked || !content}
-                onClick={() => void savePrivate()}
-              >
-                Salvar preenchimento privado
-              </ActionButton>
-              <ActionButton
                 ref={queryRef}
-                disabled={busy || uncertain || privateDraft.blocked}
+                disabled={busy || uncertain}
                 onClick={() => void compare()}
               >
                 {purpose === "assign_recount"
@@ -710,7 +512,7 @@ export function BalanceDocumentPreparation({
                 <ActionButton
                   disabled={
                     busy ||
-                    privateDraft.blocked ||
+
                     !balanceDocumentAvailable(comparison, purpose)
                   }
                   onClick={() => {
@@ -755,10 +557,10 @@ export function BalanceDocumentPreparation({
                     selectedIds={target ? [target.id] : []}
                     disabled={
                       busy ||
-                      privateDraft.busy ||
-                      privateDraft.loading ||
-                      !!privateDraft.offered ||
-                      !!privateDraft.pending ||
+
+
+
+
                       uncertain ||
                       needsReference ||
                       unavailable
@@ -839,7 +641,7 @@ export function BalanceDocumentPreparation({
             {purpose !== "assign_recount" && source ? <BalanceReviewItemFields
               ref={itemsRef}
               lines={source.lines} fields={fields}
-              disabled={busy || privateDraft.busy || privateDraft.loading || !!privateDraft.offered || !!privateDraft.pending || uncertain || needsReference || unavailable}
+              disabled={busy ||     uncertain || needsReference || unavailable}
               onChange={next => { setFields(next); setDirty(true); setFieldError(""); }}
             /> : null}
             <FormField
@@ -867,10 +669,10 @@ export function BalanceDocumentPreparation({
                 maxLength={purpose === "assign_recount" ? 1000 : 2000}
                 disabled={
                   busy ||
-                  privateDraft.busy ||
-                  privateDraft.loading ||
-                  !!privateDraft.offered ||
-                  !!privateDraft.pending ||
+
+
+
+
                   uncertain
                 }
               />

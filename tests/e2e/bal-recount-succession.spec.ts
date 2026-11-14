@@ -89,7 +89,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   const before = JSON.parse(recountState(f));
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
-  await expect(page.getByRole("tabpanel")).toContainText("Acompanhar as revisões do balanço");
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar as revisões do balanço");
   await selectDocumentSection(page, "workflow");
   await page
     .getByRole("link", { name: "Designar reconto", exact: true })
@@ -174,7 +174,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     const counter = await context.newPage();
     await login(counter, second.email, f.patient);
     await counter.goto("/documentos/" + f.document.id);
-    await expect(counter.getByRole("tabpanel")).toContainText("Acompanhar o reconto designado");
+    await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar o reconto designado");
     await counter.goto("/balancos");
     await counter
       .getByRole("main")
@@ -348,7 +348,7 @@ test("BAL reconto sem contador mostra recuperação, preserva motivo no conflito
   );
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/documentos/" + f.document.id);
-  await expect(page.getByRole("tabpanel")).toContainText("Designar o reconto do balanço");
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Designar o reconto do balanço");
   await page.goto("/balancos");
   const recovery = page.getByRole("region", {
     name: "Recontos aguardando designação",

@@ -18,6 +18,8 @@ const paths = {
   "chevron": "m9 5 7 7-7 7",
   "down": "m6 9 6 6 6-6",
   "more": "M5 12h.01 M12 12h.01 M19 12h.01",
+  "copy": "M8 8h13v13H8z M16 8V3H3v13h5",
+  "external": "M14 3h7v7 M10 14 21 3 M10 3H3v18h18v-7",
   "settings": "M9 3h6l1 3 3 1 2 5-2 5-3 1-1 3H9l-1-3-3-1-2-5 2-5 3-1z M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0",
   "shield": "m12 3 8 3v6c0 5-4 8-8 10-4-2-8-5-8-10V6z M8 12l3 3 5-6",
   "note": "M5 4h14v16H5z M9 8h6 M9 12h6 M9 16h3",

@@ -68,6 +68,7 @@ export function useCreationDraft({
   const [loading, setLoading] = useState(true);
   const [readyScope, setReadyScope] = useState("");
   const [busy, setBusy] = useState(false);
+  const [backgroundBusy, setBackgroundBusy] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [readDenied, setReadDenied] = useState(false);
   const [protectedReadPending, setProtectedReadPending] = useState(false);
@@ -136,6 +137,7 @@ export function useCreationDraft({
     void Promise.resolve().then(async () => {
       if (controller.signal.aborted) return;
       setBusy(false);
+      setBackgroundBusy(false);
       setReadyScope("");
       setBase(null);
       setOffered(null);
@@ -302,14 +304,14 @@ export function useCreationDraft({
     }
   }
 
-  async function send(packet: Packet) {
+  async function send(packet: Packet, background = false) {
     if (inFlightRef.current || !active) return;
     inFlightRef.current = true;
     const current = generationRef.current;
-    setBusy(true);
+    if (background) setBackgroundBusy(true); else setBusy(true);
     setError("");
     setMessage("");
-    setPending(packet);
+    if (!background) setPending(packet);
     try {
       sessionStorage.setItem(storageKey, JSON.stringify(packet));
     } catch {
@@ -419,6 +421,7 @@ export function useCreationDraft({
         reason instanceof ApiError &&
         [400, 401, 403, 404, 409, 413, 422].includes(reason.status);
       const recovering = unresolvedRef.current;
+      if (background && (!known || recovering)) setPending(packet);
       if (known && !recovering) {
         forgetPending();
         setPending(null);
@@ -454,7 +457,7 @@ export function useCreationDraft({
       );
     } finally {
       inFlightRef.current = false;
-      if (current === generationRef.current) setBusy(false);
+      if (current === generationRef.current) { setBusy(false); setBackgroundBusy(false); }
     }
   }
 
@@ -516,6 +519,7 @@ export function useCreationDraft({
     compared,
     loading: active && (loading || readyScope !== readScope),
     busy,
+    backgroundBusy,
     pending,
     error,
     loadError,
@@ -555,9 +559,9 @@ export function useCreationDraft({
         "Sua edição foi mantida. Salve-a para registrar uma nova revisão no servidor.",
       );
     },
-    save: (content: CreationDraftContent) =>
+    save: (content: CreationDraftContent, options?: { background?: boolean }) =>
       !blocked
-        ? send(packet("save", base, content))
+        ? send(packet("save", base, content), options?.background)
         : Promise.resolve(undefined),
     discard: () => {
       const draft = offered ?? base;

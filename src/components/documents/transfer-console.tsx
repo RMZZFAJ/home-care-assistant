@@ -24,9 +24,10 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
+import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
+import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import {
-  CreationDraftPanel,
   DraftContentSummary,
 } from "@/components/forms/creation-draft-panel";
 import {
@@ -92,7 +93,7 @@ function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext;
         <p>
           Consumo, descarte e correção de estoque têm seus próprios registros.
         </p>
-        {canPrepare ? (
+        {can(context, "ent.read") ? (
           <>
             {fixedSource ? <p><strong>Percurso:</strong> {custodyName(fixedSource)} → {custodyName(fixedSource === "CARE_TEAM" ? "FAMILY" : "CARE_TEAM")}</p> : <FormField label="Custódia de origem" required>
               <SelectField
@@ -103,10 +104,10 @@ function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext;
                 }}
               >
                 <option value="">Escolha a origem</option>
-                {can(context, "stock.family.read") ? (
+                {can(context, "ent.read") ? (
                   <option value="FAMILY">Entrega de materiais · Família → Equipe</option>
                 ) : null}
-                {can(context, "stock.team.read") ? (
+                {can(context, "ent.read") ? (
                   <option value="CARE_TEAM">Devolução de materiais · Equipe → Família</option>
                 ) : null}
               </SelectField>
@@ -115,11 +116,11 @@ function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext;
               variant="primary"
               disabled={!source}
               onClick={() => {
-                setConsulting(false);
+                setConsulting(!canPrepare);
                 setEditing(true);
               }}
             >
-              {returnOnly ? "Preparar devolução" : "Preparar declaração"}
+              {canPrepare ? returnOnly ? "Preparar devolução" : "Preparar declaração" : "Consultar último rascunho"}
             </ActionButton>
           </>
         ) : (
@@ -128,28 +129,6 @@ function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext;
             recebimentos designados continuam no acompanhamento.
           </Notice>
         )}
-        <details className="hca-form-stack">
-          <summary>Minhas declarações em preparação</summary>
-          <p>
-            Consulte somente seus preenchimentos e resultados, inclusive após
-            perder acesso à origem.
-          </p>
-          <div className="hca-form-stack">
-            {(fixedSource ? [fixedSource] : ["FAMILY", "CARE_TEAM"] as const).map((item) => (
-              <ActionButton
-                key={item}
-                onClick={() => {
-                  setSource(item);
-                  setConsulting(true);
-                  setEditing(true);
-                }}
-              >
-                Consultar preenchimento:{" "}
-                {item === "FAMILY" ? "Família → Equipe" : "Equipe → Família"}
-              </ActionButton>
-            ))}
-          </div>
-        </details>
         <Link className="ui-button ui-button-secondary" href="/entregas">
           Acompanhar entregas e devoluções
         </Link>
@@ -248,6 +227,7 @@ function TransferDeclarationEditor({
       return true;
     },
     onDiscard() {
+      setDraftTouched(false);
       const empty = emptyTransferDeclarationDraft(source);
       setBaseline(
         reference && !referenceUnavailable
@@ -281,6 +261,9 @@ function TransferDeclarationEditor({
     query,
     lines,
   });
+
+  const [draftTouched, setDraftTouched] = useState(false);
+  useLongDraftAutosave(privateDraft, currentContent, draftTouched && !(busy || uncertain || !!packet));
   useEffect(() => {
     if (recoveryOnly) return;
     const controller = new AbortController();
@@ -511,7 +494,7 @@ function TransferDeclarationEditor({
     setAttempt((value) => value + 1);
   };
   const privatePanel = (
-    <CreationDraftPanel
+    <SimpleDraftPanel
       draft={privateDraft}
       current={currentContent}
       patientName={context.patient?.display_name ?? "Paciente selecionado"}
@@ -646,6 +629,7 @@ function TransferDeclarationEditor({
       restoreFocusFallbackRef={headingRef}
       trackChanges={false}
     >
+      <div onChangeCapture={() => setDraftTouched(true)}>
       {privatePanel}
       {error ? <Notice error>{error}</Notice> : null}
       {!packet && !result ? (
@@ -812,7 +796,7 @@ function TransferDeclarationEditor({
                   exige contraparte e recebedor elegíveis.
                 </Notice>
               ) : null}
-              <form className="grid gap-4" onSubmit={prepare}>
+              <form className="grid gap-4" onChangeCapture={() => setDraftTouched(true)} onSubmit={prepare}>
                 <p>
                   Declarante: <strong>{context.fullName}</strong>. Contraparte e
                   recebedor são escolhas separadas. A mesma pessoa pode exercer
@@ -1138,6 +1122,7 @@ function TransferDeclarationEditor({
           )}
         </div>
       )}
+      </div>
     </RecordDrawer>
   );
 }

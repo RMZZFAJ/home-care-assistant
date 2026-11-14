@@ -160,7 +160,11 @@ export function requireRequisitionDecisionConfirmation(
     throw new Error(
       "A resposta não confirmou esta decisão. Recupere a mesma tentativa antes de preparar outra.",
     );
-  const row = result.data.data.result;
+  requireRequisitionDecisionResult(result.data.data.result, packet, scope);
+  return result.data.data;
+}
+
+export function requireRequisitionDecisionResult(row: Record<string, unknown>, packet: Pick<RequisitionDecisionPacket, "action" | "body">, scope: { id: string; patientId: string }) {
   const matches =
     packet.action === "cancel"
       ? row.id === scope.id &&
@@ -177,5 +181,5 @@ export function requireRequisitionDecisionConfirmation(
     throw new Error(
       "O resultado não corresponde à decisão enviada. Recupere a mesma tentativa.",
     );
-  return result.data.data;
+  return row;
 }

@@ -1,3 +1,4 @@
+import { lastDraftPanel } from "./l1-long-draft-panel";
 import { expect,test,type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { setup,actor,rpc,fixtures } from "../integration/v4-fixtures.mjs";
@@ -7,14 +8,14 @@ import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 test.setTimeout(210_000);
 test.afterEach(async({page})=>{await page.unrouteAll({behavior:"wait"});});
-const panel=(page:Page)=>page.getByRole("region",{name:"Rascunho privado",exact:true});
+const panel=lastDraftPanel;
 const save=(page:Page)=>page.getByRole("button",{name:"Salvar rascunho",exact:true});
 const next=(page:Page)=>page.getByRole("button",{name:/^Avançar$|^Revisar$/}).click();
 async function login(page:Page,patient:string,role="family"){
  await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures[role].email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);await page.bringToFront();
 }
 async function open(page:Page,patient:string,kind:"COM"|"ENT"){
- await page.goto(`/fichas/${kind.toLowerCase()}?careRecipientId=${patient}`);await expect(panel(page)).toBeVisible();await expect(panel(page).getByText("Consultando seu rascunho no servidor…",{exact:true})).toHaveCount(0);
+ await page.goto(`/fichas/${kind.toLowerCase()}?careRecipientId=${patient}`);await expect(save(page).or(page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true})).first()).toBeVisible();
 }
 async function resume(page:Page){await panel(page).getByRole("button",{name:"Continuar rascunho",exact:true}).click();await expect(save(page)).toBeEnabled();}
 async function widths(page:Page,label:string){for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});await page.evaluate(()=>window.scrollTo({top:0,left:0,behavior:"instant"}));await audit(page,label+" "+width);}}
@@ -26,10 +27,10 @@ test("COM entre duas sessões conserva decimal incompleto e resolve CAS sem emit
  try{
   const peer=await second.newPage();await login(page,f.patient);await open(page,f.patient,"COM");await resume(page);await next(page);await next(page);const quantity=page.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(quantity).toHaveValue("1,");
   await login(peer,f.patient);await open(peer,f.patient,"COM");await resume(peer);await next(peer);await next(peer);const other=peer.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(other).toHaveValue("1,");
-  await quantity.fill("2,");await save(page).click();await expect(panel(page).getByText("Salvo no servidor. Este preenchimento ainda não foi emitido.",{exact:true})).toBeVisible();
+  await quantity.fill("2,");await save(page).click();await expect(page.getByText("Último rascunho salvo.",{exact:true})).toBeVisible();
   await other.fill("3,");await save(peer).click();await expect(panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true})).toBeEnabled();await expect(other).toHaveValue("3,");await expect(panel(peer).getByText("Quantidade: 2, unidade",{exact:true})).toBeVisible();await panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true}).click();await save(peer).click();await expect(save(peer)).toBeEnabled();
   const row=JSON.parse(sql(`select jsonb_build_object('id',id,'revision',revision,'content',content,'navigation',navigation) from private.creation_drafts where id=${sqlLiteral(saved.id)};`));expect(row.revision).toBe(3);expect(row.content.form.quantities[f.products[0]]).toBe("3,");expect(row.navigation).toEqual({version:1,stage:"higiene"});
-  await peer.reload();await expect(panel(peer)).toContainText("Etapa do preenchimentoHigiene");await expect(panel(peer).getByRole("textbox")).toHaveCount(0);await resume(peer);await expect(peer.locator('[aria-current="step"]')).toContainText("Higiene");await expect(other).toHaveValue("3,");expect(official(f.patient)).toBe(before);await widths(peer,"D3 COM private incomplete form");
+  await peer.reload();await expect(panel(peer)).toBeVisible();await expect(panel(peer).getByRole("textbox")).toHaveCount(0);await resume(peer);await expect(peer.locator('[aria-current="step"]')).toContainText("Higiene");await expect(other).toHaveValue("3,");expect(official(f.patient)).toBe(before);await widths(peer,"D3 COM private incomplete form");
  }finally{await second.close();}
 });
 
@@ -37,7 +38,7 @@ test("ENT emite com rascunho privado e conserva a mesma confirmação após200 i
  const f=await setup(),owner=await actor("family",f.patient),body=draftContent(f,fixtures.professional.id);body.form.quantities[f.products[0]]="2";
  const saved=await rpc(owner,"supply_draft_command",{p_patient:f.patient,p_kind:"ENT",p_purpose:"create",p_target:null,p_id:null,p_expected:null,p_body:{action:"save",content:body},p_key:randomUUID()});
  await login(page,f.patient);await open(page,f.patient,"ENT");await resume(page);for(let i=0;i<5;i++)await next(page);
- await save(page).click();await expect(save(page)).toBeEnabled();await page.reload();await expect(panel(page)).toContainText("Etapa do preenchimentoRevisão");await resume(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
+ await save(page).click();await expect(save(page)).toBeEnabled();await page.reload();await expect(panel(page)).toBeVisible();await resume(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
  const packets:Record<string,unknown>[]=[];let documentId="";
  await page.route("**/api/documents",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(packets.length===1){const response=await route.fetch();expect(response.ok()).toBe(true);documentId=(await response.json()).data.id;return route.fulfill({response,json:{data:{id:documentId},persistence:"confirmed"}});}if(packets.length===2)return route.fulfill({status:403,json:{code:"FORBIDDEN",error:"Recuperação indisponível neste ensaio de transporte"}});return route.continue();});
  await page.getByRole("button",{name:"Confirmar e concluir",exact:true}).click();const recover=page.getByRole("button",{name:"Recuperar esta tentativa",exact:true});await expect(recover).toBeEnabled();expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");expect(packets[0].draftCommit).toMatchObject({id:saved.id});
@@ -45,21 +46,14 @@ test("ENT emite com rascunho privado e conserva a mesma confirmação após200 i
  expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");expect(sql(`select consumed_document_id from private.creation_drafts where id=${sqlLiteral(saved.id)};`)).toBe(documentId);expect(sql(`select state from private.creation_drafts where id=${sqlLiteral(saved.id)};`)).toBe("consumed");
 });
 
-test("dois alvos de divergência ENT retomam isoladamente e descarte privado não aceita a entrega",async({page,browser})=>{
- const f=await setup(),make=()=>rpc(f.admin,"create_supply_document",{p_patient:f.patient,p_type:"ENT",p_payload:{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício",lines:f.products.map(productId=>({productId,quantity:"2"}))},p_key:randomUUID(),p_draft:false}),first=await make(),second=await make(),before=official(f.patient),other=await browser.newContext();
- const edit=async(target:Page,id:string)=>{await target.goto(`/documentos/${id}?careRecipientId=${f.patient}`);await target.getByRole("button",{name:"Informar divergência",exact:true}).click();await expect(panel(target)).toBeVisible();await expect(panel(target).getByText("Consultando seu rascunho no servidor…",{exact:true})).toHaveCount(0);};
- const region=(target:Page)=>target.getByRole("region",{name:"Conferência pessoal em preparação",exact:true});
- const fill=async(target:Page,value:string,note:string)=>{await region(target).getByRole("checkbox",{name:/Material fictício V4 0/}).check();await region(target).getByRole("textbox",{name:"Efetivamente recebido",exact:true}).fill(value);await region(target).getByRole("textbox",{name:"Observações da divergência",exact:true}).fill(note);};
- try{
-  await login(page,f.patient,"professional");await edit(page,first.id);await fill(page,"1,","Conferência privada da primeira entrega");await region(page).getByRole("button",{name:"Salvar conferência privada",exact:true}).click();await expect(panel(page).getByText("Salvo no servidor. Este preenchimento ainda não foi emitido.",{exact:true})).toBeVisible();
-  await edit(page,second.id);await fill(page,"0","Conferência privada da segunda entrega");await region(page).getByRole("button",{name:"Salvar conferência privada",exact:true}).click();await expect(panel(page).getByText("Salvo no servidor. Este preenchimento ainda não foi emitido.",{exact:true})).toBeVisible();expect(official(f.patient)).toBe(before);
-  await edit(page,first.id);await panel(page).getByRole("button",{name:"Continuar rascunho",exact:true}).click();await expect(region(page).getByRole("textbox",{name:"Efetivamente recebido",exact:true})).toHaveValue("1,");
-  const peer=await other.newPage();await login(peer,f.patient,"professional");await edit(peer,first.id);await panel(peer).getByRole("button",{name:"Continuar rascunho",exact:true}).click();await fill(peer,"1","Conferência da outra sessão");await region(peer).getByRole("button",{name:"Salvar conferência privada",exact:true}).click();await expect(panel(peer).getByText("Salvo no servidor. Este preenchimento ainda não foi emitido.",{exact:true})).toBeVisible();
-  await fill(page,"0","Minha conferência preservada no conflito");await region(page).getByRole("button",{name:"Salvar conferência privada",exact:true}).click();await panel(page).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true}).click();await expect(region(page).getByRole("textbox",{name:"Efetivamente recebido",exact:true})).toHaveValue("0");await region(page).getByRole("button",{name:"Salvar conferência privada",exact:true}).click();await expect(region(page).getByRole("button",{name:"Revisar operação",exact:true})).toBeEnabled();expect(official(f.patient)).toBe(before);
-  let lost=true;const packets:unknown[]=[];await page.route(`**/api/documents/${first.id}`,async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(lost){lost=false;const response=await route.fetch();expect(response.ok()).toBe(true);return route.abort("failed");}return route.continue();});
-  await region(page).getByRole("button",{name:"Revisar operação",exact:true}).click();await page.getByRole("button",{name:"Confirmar operação",exact:true}).click();await page.getByRole("button",{name:"Recuperar tentativa",exact:true}).click();await expect(page.getByRole("button",{name:"Recuperar tentativa",exact:true})).toHaveCount(0);expect(packets).toHaveLength(2);expect(packets[0]).toEqual(packets[1]);
-  const afterFirst=official(f.patient);await edit(page,second.id);await panel(page).getByRole("button",{name:"Descartar e começar nova",exact:true}).click();await page.getByRole("button",{name:"Confirmar descarte do rascunho",exact:true}).click();await expect(page.getByRole("dialog",{name:"Descartar rascunho privado",exact:true})).toHaveCount(0);expect(official(f.patient)).toBe(afterFirst);expect(sql(`select status from public.operational_documents where id=${sqlLiteral(second.id)};`)).toBe("pending_receipt");await widths(page,"D3 ENT contextual private form");
- }finally{await other.close();}
+test("duas fichas ENT não herdam campos de conferência descartada e nenhuma navegação aceita recebimento",async({page})=>{
+ const f=await setup(),make=()=>rpc(f.admin,"create_supply_document",{p_patient:f.patient,p_type:"ENT",p_payload:{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício",lines:f.products.map(productId=>({productId,quantity:"2"}))},p_key:randomUUID(),p_draft:false}),first=await make(),second=await make(),before=official(f.patient);
+ await login(page,f.patient,"professional");
+ for(const doc of [first,second]){ await page.goto(`/fichas/${doc.id}`);await page.getByRole("button",{name:"Informar divergência",exact:true}).click();
+  const field=page.getByRole("textbox",{name:"Motivo / justificativa",exact:true}); await expect(field).toHaveValue(""); await field.fill("Conferência que será descartada sem aceitar entrega.");
+  await page.getByRole("button",{name:"Voltar",exact:true}).click(); const guard=page.getByRole("dialog",{name:"Sair sem concluir?",exact:true});await guard.getByRole("button",{name:"Sair e descartar",exact:true}).click();
+ }
+ expect(official(f.patient)).toBe(before);expect(sql(`select count(*) from private.creation_drafts where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("0");
 });
 
 test("recuperação de save incerto conserva a chave após revogação real e não revela o cache ao reabrir",async({page})=>{
@@ -73,7 +67,7 @@ test("recuperação de save incerto conserva a chave após revogação real e n�
   await panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true}).click();await expect(page.getByText(marker,{exact:true})).toHaveCount(0);expect(packets).toHaveLength(2);expect(packets[0]).toEqual(packets[1]);
   hold=false;release();await page.reload();await expect(page.getByText(marker,{exact:true})).toHaveCount(0);expect(await page.evaluate(()=>Object.keys(sessionStorage).some(key=>key.startsWith("hca:private-draft-command:")&&sessionStorage.getItem(key)?.includes("Observação privada fictícia")))).toBe(true);
  }finally{hold=false;release?.();sql(`update public.care_recipient_memberships set role='family' where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.family.id)};`);}
- await page.reload();await expect(panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true})).toBeEnabled();await panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true}).click();await expect(panel(page).getByText("Salvo no servidor. Este preenchimento ainda não foi emitido.",{exact:true})).toBeVisible();expect(packets).toHaveLength(3);expect(packets[2]).toEqual(packets[0]);expect(official(f.patient)).toBe(before);
+ await page.reload();await expect(panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true})).toBeEnabled();await panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true}).click();await expect(page.getByText("Último rascunho salvo.",{exact:true})).toBeVisible();expect(packets).toHaveLength(3);expect(packets[2]).toEqual(packets[0]);expect(official(f.patient)).toBe(before);
 });
 
 test("revisão legada HTTP prova a primeira etapa salva de COM ENT BAL e recupera somente a submissão pendente",async({page,browser})=>{

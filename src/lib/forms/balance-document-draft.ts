@@ -1,6 +1,8 @@
 import { z } from "zod";
 import {
   balanceDocumentDecisionSchema,
+  balanceDocumentActionSchema,
+  type BalanceDocumentAction,
   balancePreparationSchema,
   type BalanceDocumentDecision,
   type BalancePreparation,
@@ -117,16 +119,7 @@ export function adoptBalanceDocumentDraft(
     },
   };
 }
-export function balanceDocumentPacket(
-  scope: {
-    patientId: string;
-    documentId: string;
-    purpose: BalanceDocumentPurpose;
-    draftCommit: { id: string; revision: number };
-    key: string;
-  },
-  content: ReceiptDraftContent,
-): BalanceDocumentDecision {
+export function balanceDocumentAction(scope: { patientId: string; documentId: string; purpose: BalanceDocumentPurpose }, content: ReceiptDraftContent): BalanceDocumentAction {
   const body =
     scope.purpose === "assign_recount"
       ? {
@@ -142,6 +135,19 @@ export function balanceDocumentPacket(
           reviewReference: content.fields.referenceHash,
           items: balanceReviewItemsFromFields(content.fields),
         };
+  return balanceDocumentActionSchema.parse({ careRecipientId: scope.patientId, documentId: scope.documentId, purpose: scope.purpose, expectedVersion: content.documentVersion, body });
+}
+export function balanceDocumentPacket(
+  scope: {
+    patientId: string;
+    documentId: string;
+    purpose: BalanceDocumentPurpose;
+    draftCommit: { id: string; revision: number };
+    key: string;
+  },
+  content: ReceiptDraftContent,
+): BalanceDocumentDecision {
+  const { body } = balanceDocumentAction(scope, content);
   return balanceDocumentDecisionSchema.parse({
     careRecipientId: scope.patientId,
     documentId: scope.documentId,
@@ -217,8 +223,12 @@ export function parseBalanceDocumentConfirmation(
     row.consumedDocumentId !== packet.documentId
   )
     return fail();
+  return { ...row, ...requireBalanceDocumentResult(row.result, packet, userId) };
+}
+export function requireBalanceDocumentResult(value: unknown, packet: BalanceDocumentAction, userId: string) {
+  const fail = () => { throw new Error("A resposta não confirmou esta decisão. Confira o resultado antes de repetir."); };
   if (packet.purpose === "assign_recount") {
-    const result = recountResult.safeParse(row.result);
+    const result = recountResult.safeParse(value);
     if (
       !result.success ||
       result.data.documentId !== packet.documentId ||
@@ -229,9 +239,9 @@ export function parseBalanceDocumentConfirmation(
       result.data.designerId !== userId
     )
       return fail();
-    return { ...row, recount: result.data };
+    return { recount: result.data };
   }
-  const result = reviewResult.safeParse(row.result);
+  const result = reviewResult.safeParse(value);
   if (
     !result.success ||
     result.data.id !== packet.documentId ||
@@ -247,5 +257,5 @@ export function parseBalanceDocumentConfirmation(
     )
   )
     return fail();
-  return { ...row, recount: null };
+  return { recount: null };
 }

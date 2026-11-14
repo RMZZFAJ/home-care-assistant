@@ -130,7 +130,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
   await selectDocumentSection(page, "workflow");
   await openDocumentMore(page);
   await page
-    .getByRole("button", { name: "Solicitar cancelamento", exact: true })
+    .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
     .click();
   await editor(page)
     .getByRole("textbox", { name: "Motivo / justificativa", exact: true })
@@ -417,7 +417,7 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
     expect(ledger(f.patient)).toBe(before);
     await openDocumentMore(page);
     await page
-      .getByRole("button", { name: "Solicitar cancelamento", exact: true })
+      .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
       .click();
     await editor(page)
       .getByRole("textbox", { name: "Motivo / justificativa", exact: true })

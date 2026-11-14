@@ -144,41 +144,21 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     const more = page.getByRole("button", { name: "Mais opções da ficha", exact: true });
     await more.click();
-    const identifiers = page.locator(".hca-document-identifiers");
+    await page.evaluate(() => Object.defineProperty(navigator, "clipboard", {
+      configurable: true, value: { writeText: async (value: string) => {
+        (window as unknown as { copiedReference: string }).copiedReference = value;
+      } },
+    }));
+    await page.getByRole("menuitem", { name: "Copiar referência", exact: true }).click();
+    await expect(page.getByRole("status").filter({hasText: "Referência copiada."})).toHaveText("Referência copiada.");
+    expect(await page.evaluate(() => (window as unknown as { copiedReference: string }).copiedReference)).toBe(
+      sql(`select code from public.operational_documents where id=${sqlLiteral(id)};`),
+    );
+    await openDocumentMore(page);
+    await page.getByRole("menuitem", { name: "Protocolo e identificação", exact: true }).click();
+    const identifiers = page.getByRole("dialog", { name: "Protocolo e identificação", exact: true });
     await expect(identifiers).toContainText(id);
-    await expect(
-      identifiers.getByRole("heading", {
-        name: "Protocolo e identificação",
-        exact: true,
-      }),
-    ).toBeVisible();
-    await page.evaluate(() =>
-      Object.defineProperty(navigator, "clipboard", {
-        configurable: true,
-        value: {
-          writeText: async (value: string) => {
-            (window as unknown as { copiedReference: string }).copiedReference =
-              value;
-          },
-        },
-      }),
-    );
-    await identifiers
-      .getByRole("button", { name: "Copiar referência", exact: true })
-      .click();
-    await expect(identifiers.getByRole("status")).toHaveText(
-      "Referência copiada.",
-    );
-    expect(
-      await page.evaluate(
-        () =>
-          (window as unknown as { copiedReference: string }).copiedReference,
-      ),
-    ).toBe(
-      sql(
-        `select code from public.operational_documents where id=${sqlLiteral(id)};`,
-      ),
-    );
+    await expect(identifiers.getByRole("heading", { name: "Protocolo e identificação", exact: true })).toBeVisible();
     await identifiers.press("Escape");
     await expect(identifiers).toHaveCount(0);
     await expect(more).toBeFocused();
@@ -197,9 +177,10 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
       page.getByRole("region", { name: "Arquivos gerados", exact: true }),
     ).toBeVisible();
     await selectDocumentSection(page, "attachments");
-    await expect(
-      page.getByRole("button", { name: "Adicionar anexo", exact: true }),
-    ).toBeVisible();
+    const addAttachment = page.getByRole("button", { name: "Adicionar anexo", exact: true });
+    if (type === "COM" || type === "ENT") await expect(addAttachment).toBeVisible();
+    else await expect(addAttachment).toHaveCount(0);
+    await expect(page.getByRole("list", { name: "Arquivos anexados", exact: true })).toHaveCount(1);
     await selectDocumentSection(page, "history");
     await expect(
       page.getByRole("button", {
@@ -381,7 +362,8 @@ test("REQ retira conteúdo recusado e conserva foco de recuperação sem alterar
     try {
       await retry.press("Enter");
       await expect.poll(() => recovering).toBe(true);
-      await expect(retry).toBeDisabled();
+      if (status === 403) await expect(page.locator(".hca-activity-overlay")).toBeVisible();
+      else await expect(retry).toBeDisabled();
       // A 503 retains the header while recovery is pending. Its presence alone
       // cannot prove that recovery completed before the next refusal is tested.
       await expect(page.locator(".hca-document-header")).toHaveCount(
@@ -423,7 +405,7 @@ test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação
   await login(page, f.patient);
   await page.goto(`/documentos/${req.id}`);
   await openDocumentMore(page);
-  await expect(page.getByRole("button", { name: "Cancelar requisição", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("menuitem", { name: "Cancelar requisição", exact: true })).toHaveCount(0);
   await closeDocumentMore(page);
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.family.id)},'req.create',true);`);
   await page.reload();
@@ -432,8 +414,8 @@ test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação
   await more.focus();
   await more.press("Enter");
   await page
-    .locator(".hca-document-more-actions")
-    .getByRole("button", { name: "Cancelar requisição", exact: true })
+    .getByRole("menu", { name: "Ações da ficha", exact: true })
+    .getByRole("menuitem", { name: "Cancelar requisição", exact: true })
     .click();
   const dialog = page.getByRole("dialog", {
     name: "Cancelar requisição",
@@ -448,8 +430,9 @@ test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação
     .getByRole("textbox", { name: "Justificativa", exact: true })
     .fill("Motivo fictício ainda não confirmado");
   await dialog.press("Escape");
-  await expect(dialog.getByRole("alert").filter({ hasText: "Há alterações ainda não salvas." })).toBeVisible();
-  await dialog.getByRole("button", { name: "Descartar alterações", exact: true }).click();
+  const discard = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });
+  await expect(discard).toBeVisible();
+  await discard.getByRole("button", { name: "Sair e descartar", exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(more).toBeFocused();
   expect(official(req.id, f.patient)).toBe(before);
@@ -459,7 +442,7 @@ test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação
   await page.reload();
   await openDocumentMore(page);
   await expect(
-    page.getByRole("button", { name: "Cancelar requisição", exact: true }),
+    page.getByRole("menuitem", { name: "Cancelar requisição", exact: true }),
   ).toHaveCount(0);
   const denied = await page.request.patch(
     `/api/requisitions/${req.id}/status`,

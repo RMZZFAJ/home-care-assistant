@@ -38,11 +38,14 @@ async function open(page: Page, id: string) {
   await page.goto("/documentos/" + id);
   await selectDocumentSection(page, "overview");
   await expect(
-    page.getByRole("button", { name: "Registrar andamento", exact: true }),
+    page.getByRole("button", { name: /^(Registrar andamento|Recuperar preenchimento de andamento)$/ }),
   ).toBeEnabled();
   await page
-    .getByRole("button", { name: "Registrar andamento", exact: true })
+    .getByRole("button", { name: /^(Registrar andamento|Recuperar preenchimento de andamento)$/ })
     .click();
+}
+async function showEditor(page: Page) {
+ if (await page.getByRole("dialog", { name: /Registrar andamento|Recuperar publicação de andamento/ }).count() === 0) await page.getByRole("button", { name: /^(Registrar andamento|Recuperar publicação|Recuperar preenchimento de andamento)$/ }).click();
 }
 const editor = (page: Page) =>
   page.getByRole("dialog", { name: "Registrar andamento", exact: true });
@@ -54,109 +57,37 @@ const notes = (id: string) =>
       `select count(*) from private.document_progress_notes where document_id=${q(id)}`,
     ),
   );
-test("andamento privado retoma em outra sessão e compara CAS sem publicar texto ou perder a edição própria", async ({
-  page,
-  browser,
-}, info) => {
-  const f = await fixture();
-  await login(page, f.patient);
-  await open(page, f.id);
-  await editor(page)
-    .getByRole("textbox", { name: "Texto do andamento", exact: true })
-    .fill("Texto inicial privado entre aparelhos");
-  await editor(page)
-    .getByLabel("Categoria", { exact: true })
-    .selectOption("contact");
-  await editor(page)
-    .getByLabel("Etapa relacionada (opcional)", { exact: true })
-    .selectOption("family_science");
-  await editor(page)
-    .getByRole("button", { name: "Salvar preenchimento privado", exact: true })
-    .click();
-  await expect(privatePanel(page)).toContainText("Salvo em");
-  expect(notes(f.id)).toBe(0);
-  const use = test.info().project.use;
-  const peerContext = await browser.newContext({
-    baseURL: use.baseURL,
-    viewport: use.viewport,
-    deviceScaleFactor: use.deviceScaleFactor,
-    isMobile: use.isMobile,
-    hasTouch: use.hasTouch,
-    userAgent: use.userAgent,
-    extraHTTPHeaders: use.extraHTTPHeaders,
-    serviceWorkers: "block",
-  });
-  const peer = await peerContext.newPage();
-  try {
-    await login(peer, f.patient);
-    await open(peer, f.id);
-    await expect(privatePanel(peer)).toContainText(
-      "Texto inicial privado entre aparelhos",
-    );
-    await expect(editor(peer).getByRole("textbox")).toHaveCount(0);
-    await editor(peer)
-      .getByRole("button", { name: "Continuar o rascunho", exact: true })
-      .click();
-    await expect(
-      editor(peer).getByLabel("Categoria", { exact: true }),
-    ).toHaveValue("contact");
-    await expect(
-      editor(peer).getByLabel("Etapa relacionada (opcional)", { exact: true }),
-    ).toHaveValue("family_science");
-    await editor(peer)
-      .getByRole("textbox", { name: "Texto do andamento", exact: true })
-      .fill("Versão salva pela outra sessão");
-    await editor(peer)
-      .getByRole("button", {
-        name: "Salvar preenchimento privado",
-        exact: true,
-      })
-      .click();
-    await expect(privatePanel(peer)).toContainText("Salvo em");
-    await editor(page)
-      .getByRole("textbox", { name: "Texto do andamento", exact: true })
-      .fill("Minha edição local antes do conflito");
-    await editor(page)
-      .getByRole("button", {
-        name: "Salvar preenchimento privado",
-        exact: true,
-      })
-      .click();
-    await expect(privatePanel(page)).toContainText("Seu texto continua preservado aqui");
-    // A confirmed CAS conflict already reads the latest authorized revision.
-    // The explicit retry is offered only if that read cannot finish.
-    await expect(privatePanel(page)).toContainText("Versão salva pela outra sessão");
-    await privatePanel(page).getByText("Consultar meu texto preservado",{exact:true}).click();
-    await expect(privatePanel(page)).toContainText("Minha edição local antes do conflito");
-    await privatePanel(page).getByRole("button",{name:"Continuar minha edição",exact:true}).click();
-    await expect(
-      editor(page).getByRole("textbox", {
-        name: "Texto do andamento",
-        exact: true,
-      }),
-    ).toHaveValue("Minha edição local antes do conflito");
-    await editor(page)
-      .getByRole("button", {
-        name: "Salvar preenchimento privado",
-        exact: true,
-      })
-      .click();
-    await expect(privatePanel(page)).toContainText("Salvo em");
-    expect(notes(f.id)).toBe(0);
-    for (const width of [1440, 1150, 850, 500, 320]) {
-      await page.setViewportSize({ width, height: 900 });
-      expect(
-        await editor(page).evaluate((el) => el.scrollWidth <= el.clientWidth),
-      ).toBe(true);
-      await audit(page, "private progress editor " + width);
-    }
-    await info.attach("andamento privado 320", {
-      body: await editor(page).screenshot(),
-      contentType: "image/png",
-    });
-  } finally {
-    await peerContext.close();
-  }
+test("último Andamento também fica guardado ao fechar voluntariamente, retoma quatro campos e resolve CAS sem publicar", async ({ page, browser }) => {
+ const f = await fixture(); await login(page, f.patient); await open(page, f.id);
+ const text = editor(page).getByRole("textbox", { name: "Texto do andamento", exact: true });
+ await text.fill("Último preenchimento guardado ao sair.");
+ await editor(page).getByLabel("Categoria", { exact: true }).selectOption("contact");
+ await editor(page).getByLabel("Etapa relacionada (opcional)", { exact: true }).selectOption("family_science");
+ await expect(editor(page).getByRole("button", { name: "Guardar rascunho e fechar", exact: true })).toBeEnabled();
+ await text.press("Escape");
+ const close = page.getByRole("dialog", { name: "Sair sem publicar o andamento?", exact: true }); await expect(close).toBeVisible();
+ await close.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click(); await expect(text).toHaveValue("Último preenchimento guardado ao sair.");
+ await text.press("Escape"); await close.getByRole("button", { name: "Guardar e sair", exact: true }).click(); await expect(editor(page)).toHaveCount(0);
+ expect(notes(f.id)).toBe(0);
+ const device = await peerContext(browser), peer = await device.newPage();
+ try {
+  await login(peer, f.patient); await open(peer, f.id); const choice = peer.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true }); await expect(choice).toBeVisible();
+  await choice.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(editor(peer).getByLabel("Categoria", { exact: true })).toHaveValue("contact");
+  await expect(editor(peer).getByLabel("Etapa relacionada (opcional)", { exact: true })).toHaveValue("family_science");
+  await expect(editor(peer).getByRole("textbox", { name: "Texto do andamento", exact: true })).toHaveValue("Último preenchimento guardado ao sair.");
+  await open(page, f.id); await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await editor(peer).getByRole("textbox", { name: "Texto do andamento", exact: true }).fill("Texto salvo pela outra sessão.");
+  await editor(peer).getByRole("button", { name: "Salvar preenchimento privado", exact: true }).click(); await expect(peer.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  await editor(page).getByRole("textbox", { name: "Texto do andamento", exact: true }).fill("Minha edição diante do conflito.");
+  await editor(page).getByRole("button", { name: "Salvar preenchimento privado", exact: true }).click();
+  await expect(privatePanel(page)).toContainText("Seu texto continua preservado aqui"); await expect(privatePanel(page)).toContainText("Texto salvo pela outra sessão.");
+  await privatePanel(page).getByText("Consultar meu texto preservado", { exact: true }).click(); await expect(privatePanel(page)).toContainText("Minha edição diante do conflito.");
+  await privatePanel(page).getByRole("button", { name: "Continuar minha edição", exact: true }).click(); await editor(page).getByRole("button", { name: "Salvar preenchimento privado", exact: true }).click();
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible(); expect(notes(f.id)).toBe(0); await audit(page, "L1 retomada simples de Andamento");
+  await editor(page).getByRole("button", { name: "Guardar rascunho e fechar", exact: true }).click(); await expect(editor(page)).toHaveCount(0); await open(page, f.id); await page.getByRole("button", { name: "Descartar e começar novamente", exact: true }).click();
+  await expect(editor(page).getByRole("textbox", { name: "Texto do andamento", exact: true })).toHaveValue(""); expect(notes(f.id)).toBe(0);
+ } finally { await device.close(); }
 });
 test("save privado e publicação perdidos preservam pacotes distintos,envelope divergente e recuperação sem escrita", async ({
   page,
@@ -195,7 +126,7 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
       exact: true,
     })
     .click();
-  await expect(privatePanel(page)).toContainText("Salvo em");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   expect(saves).toBe(2);
   await page.unroute("**/api/documents/progress-preparations");
   const packets: unknown[] = [];
@@ -240,6 +171,7 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
   );
   await page.reload();
   await selectDocumentSection(page, "overview");
+  await showEditor(page);
   await expect(privatePanel(page)).toContainText("Andamento publicado por");
   await expect(
     privatePanel(page).getByRole("button", {
@@ -257,6 +189,7 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
   });
   await page.reload();
   await selectDocumentSection(page, "overview");
+  await showEditor(page);
   await expect(privatePanel(page)).toContainText(text);
   await expect(
     privatePanel(page).getByRole("button", {
@@ -377,21 +310,22 @@ test("outra sessão conclui a preparação durante resultado incerto e a ediçã
   try {
     await login(peer, f.patient);
     await open(peer, f.id);
-    await editor(peer)
-      .getByRole("button", { name: "Continuar o rascunho", exact: true })
+    await peer
+      .getByRole("button", { name: "Continuar rascunho", exact: true })
       .click();
     await editor(peer)
       .getByRole("textbox", { name: "Texto do andamento", exact: true })
       .fill(other);
+    const peerPublication = peer.waitForResponse(response => new URL(response.url()).pathname === "/api/documents/progress-preparations/commit" && response.request().method() === "POST");
     await editor(peer)
       .getByRole("button", { name: "Publicar andamento", exact: true })
       .click();
+    const confirmed = await peerPublication; expect(confirmed.status(), await confirmed.text()).toBe(200);
+    await expect(peer.locator(".hca-activity-overlay")).toHaveCount(0);
     await expect(editor(peer)).toHaveCount(0);
-    await expect(
-      peer
-        .getByRole("tabpanel", { name: "Visão geral", exact: true })
-        .getByRole("region", { name: "Rascunho privado", exact: true }),
-    ).toContainText("Andamento publicado por");
+    const published = peer.getByRole("region", { name: "Andamentos da ficha", exact: true }).getByRole("article").filter({ hasText: other });
+    await expect(published).toContainText("Teste family");
+    await expect(published.locator("time")).toHaveAttribute("datetime", /.+/);
     expect(notes(f.id)).toBe(1);
     await frozen
       .getByRole("button", {
@@ -429,25 +363,20 @@ test("outra sessão conclui a preparação durante resultado incerto e a ediçã
       .click();
     await expect(
       privatePanel(page).getByRole("button", {
-        name: "Recuperar reconhecimento do resultado",
-        exact: true,
+        name: /^(Recuperar reconhecimento do resultado|Verificar salvamento)$/,
       }),
     ).toBeEnabled();
     await page.reload();
     await selectDocumentSection(page, "overview");
     await page.unroute("**/api/documents/progress-preparations");
+    await showEditor(page);
     await privatePanel(page)
       .getByRole("button", {
-        name: "Recuperar reconhecimento do resultado",
+        name: /^(Recuperar reconhecimento do resultado|Verificar salvamento)$/,
         exact: true,
       })
       .click();
-    await expect(
-      page.getByRole("button", { name: "Registrar andamento", exact: true }),
-    ).toBeEnabled();
-    await page
-      .getByRole("button", { name: "Registrar andamento", exact: true })
-      .click();
+    await showEditor(page);
     await expect(
       editor(page).getByRole("textbox", {
         name: "Texto do andamento",

@@ -10,6 +10,13 @@ export async function completeEntry(requested: string | null, userId: string): P
   let recent = null;
   try { recent = recentDestination(sessionStorage.getItem(recentDestinationKey), userId, window.location.origin); } catch { /* Optional preference. */ }
   const memberships = data.patients.filter(patient => patient.hasMembership && patient.is_active !== false);
+  // A single operational choice needs no chooser or previous-task detour.
+  // Explicit protected destinations still retain their own live authorization.
+  if (!data.isGlobalAdmin && memberships.length === 1) {
+    if (data.activeContext?.mode !== "patient" || data.activeContext.care_recipient_id !== memberships[0].id)
+      await api("/api/context", { careRecipientId: memberships[0].id });
+    return destination;
+  }
   const target = destination === "/" && recent && memberships.some(patient => patient.id === recent.patientId) ? recent : null;
   if (target) {
     await api("/api/context", { careRecipientId: target.patientId });
@@ -18,9 +25,6 @@ export async function completeEntry(requested: string | null, userId: string): P
       const confirmed = await api<{ data: ContextData }>("/api/context" + (document ? "?documentId=" + document[1] : ""));
       return recentDestinationAllowed(target, confirmed.data) ? target.path : "/";
     } catch { return "/"; }
-  }
-  if (!data.activeContext && !data.isGlobalAdmin && memberships.length === 1) {
-    await api("/api/context", { careRecipientId: memberships[0].id });
   }
   return destination;
 }

@@ -21,9 +21,9 @@ test("L1 private notes have no unauthorized count, reference, location, audit or
   assert.equal((await reader.rpc("document_progress_location", { p_document: req.id, p_note: saved.note.id })).error?.code, "42501");
   assert.equal(sql("select count(*) from public.audit_events where entity_id=" + q(saved.note.id)), "0");
   assert.equal((await family.rpc("document_progress_publish", publish(req.id, note("@todos não pode permanecer privado", { relevance: "normal", mentions: [], visibility: "family", mentionAll: true })))).error?.code, "22023");
-  assert.equal((await family.rpc("document_progress_publish", publish(req.id, note("Referência pública incompatível", { relevance: "normal", mentions: [], visibility: "public", mentionAll: false }, [saved.note.id])))).error?.code, "22023");
+  assert.equal((await family.rpc("document_progress_publish", publish(req.id, note("Referência pública incompatível", { relevance: "normal", mentions: [], visibility: "public", mentionAll: false }, [saved.note.id])))).error?.code, "42501");
   assert.equal((await professional.rpc("document_progress_publish", publish(req.id, note("Equipe não cria privado familiar", { relevance: "normal", mentions: [], visibility: "family", mentionAll: false })))).error?.code, "42501");
-  const publicNote = await rpc(family, "document_progress_publish", publish(req.id, note("@todos podem consultar esta nota", { relevance: "milestone", mentions: [], visibility: "public", mentionAll: true })));
+  const publicNote = await rpc(await actor("adminA", f.patient), "document_progress_publish", publish(req.id, note("@todos podem consultar esta nota", { relevance: "milestone", mentions: [], visibility: "public", mentionAll: true })));
   assert.equal((await view(reader)).total, 1);
   assert.equal((await view(reader)).data[0].id, publicNote.note.id);
   const reference = await rpc(family, "document_progress_references", { p_document: req.id, p_search: saved.note.id });

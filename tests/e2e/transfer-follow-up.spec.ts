@@ -1,3 +1,4 @@
+import { expandDocumentMilestones } from "./document-sections";
 import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
@@ -36,7 +37,8 @@ async function login(page: Page, email: string, patient: string) {
 }
 async function open(page: Page, id: string, heading: string) {
   await page.goto(`/documentos/${id}`);
-  await expect(panel(page)).toContainText(heading);
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText(heading);
+  await expandDocumentMilestones(page);
 }
 function officialWrites(page: Page) {
   const writes: string[] = [];
@@ -94,7 +96,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) test(`Transfer follow-up 
   await expect(page.locator(".hca-document-name p")).toHaveText(returned ? "Devolução de materiais" : "Entrega de materiais");
   await expect(milestone(page, "Declaração")).toHaveAttribute("data-state", "done");
   await expect(milestone(page, "Expedição")).toHaveAttribute("data-state", "pending");
-  const next = panel(page).getByRole("button", { name: "Abrir Declaração e expedição", exact: true });
+  const next = page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Declaração e expedição", exact: true });
   await next.focus(); await next.press("Enter");
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
   await expect(panel(page)).toContainText(returned ? "Esta devolução pode ser registrada de forma autônoma" : "esse vínculo é opcional");

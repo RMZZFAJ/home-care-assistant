@@ -79,7 +79,7 @@ test("relação REQ para ENT abre fatos de expedição em leitura, recupera cons
   await page.goto(`/historico/${f.source.id}`);
   await selectDocumentSection(page, "materials");
   expect((await sourceOpening).status()).toBe(200);
-  await expect(page.locator(".hca-document-milestones > li").filter({has:page.getByText("Atendimento",{exact:true})}).locator(".hca-milestone-track > span")).toHaveAttribute("style", "width: 50%;");
+  await expect(page.locator(".doc-macro-segment[title^=Atendimento] > i")).toHaveAttribute("style", "width: 50%;");
   const open = page.getByRole("button", { name: f.ent.code, exact: true });
   await expect(open).toBeVisible();
   await expect(page.getByRole("cell").filter({ has: open })).toContainText("Quantidade aceita para este item: 2 unidade");

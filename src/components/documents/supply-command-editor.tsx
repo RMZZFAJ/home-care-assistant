@@ -2,12 +2,7 @@
 import { useImperativeHandle, useRef, useState, type RefObject } from "react";
 import type { SupplyDocument } from "@/types/documents";
 import { Notice, buttonClass } from "@/components/workspace";
-import {
-  CreationDraftPanel,
-  DraftContentSummary,
-} from "@/components/forms/creation-draft-panel";
-import { useCreationDraft } from "@/components/forms/use-creation-draft";
-import { navigationForStep, draftFlow } from "@/lib/forms/draft-navigation";
+import { Dialog } from "@/components/ui/overlays";
 import {
   isComOperationPurpose,
   isEntOperationPurpose,
@@ -45,7 +40,7 @@ export function CommandEditor(props: OperationEditorProps) {
     (props.data.type === "COM" && isComOperationPurpose(purpose))
   )
     return (
-      <PrivateOperationEditor
+      <OperationEditor
         key={props.data.id + ":" + purpose}
         {...props}
         kind={props.data.type}
@@ -54,7 +49,7 @@ export function CommandEditor(props: OperationEditorProps) {
     );
   return <CommandEditorFields {...props} />;
 }
-function PrivateOperationEditor(
+function OperationEditor(
   props: OperationEditorProps & {
     kind: "COM" | "ENT";
     purpose: OperationPurpose;
@@ -84,7 +79,8 @@ function PrivateOperationEditor(
   const [baseline, setBaseline] = useState(empty),
     [comparison, setComparison] = useState(false),
     [current, setCurrent] = useState(empty);
-  const flow = draftFlow(props.kind, props.purpose)!;
+  const [confirmExit, setConfirmExit] = useState(false);
+  const initialCaptureRef = useRef<string | null>(null);
   const [confirmationReset, setConfirmationReset] = useState(false);
   function restore(content: ReceiptDraftContent) {
     setInitial(content);
@@ -93,24 +89,6 @@ function PrivateOperationEditor(
     setFormRevision((v) => v + 1);
     setError("");
   }
-  const draft = useCreationDraft({
-    userId: props.context.userId,
-    patientId: props.data.care_recipient_id,
-    kind: props.kind,
-    purpose: props.purpose,
-    targetDocumentId: props.data.id,
-    navigation: navigationForStep(flow, 0),
-    onResume: (saved) => {
-      if (!saved.content || !("fields" in saved.content) || saved.content.documentVersion === null) return false;
-      restore(saved.content);
-      setConfirmationReset(false);
-      return true;
-    },
-    onDiscard: () => {
-      restore(empty);
-      setConfirmationReset(false);
-    },
-  });
   const snapshot = () => {
     const captured = captureRef.current!.snapshot();
     return {
@@ -132,8 +110,7 @@ function PrivateOperationEditor(
         official.type !== "COM" ||
         official.id !== props.data.id ||
         official.care_recipient_id !== props.data.care_recipient_id ||
-        official.version <= baseline.documentVersion ||
-        draft.blocked
+        official.version <= baseline.documentVersion
       )
         return false;
       // Called only by the explicit adoption of authorized, frozen comparison facts.
@@ -167,8 +144,7 @@ function PrivateOperationEditor(
         official.id !== props.data.id ||
         official.care_recipient_id !== props.data.care_recipient_id ||
         official.version < baseline.documentVersion ||
-        !consentReferenceReady(official) ||
-        draft.blocked
+        !consentReferenceReady(official)
       )
         return false;
       const content = snapshot();
@@ -204,123 +180,34 @@ function PrivateOperationEditor(
           !currentIds.has(material.id) && !!baseline.fields[material.id],
       )
     : [];
-  async function review(action: string, body: unknown, summary: string) {
-    if (stale || draft.blocked || props.reviewDisabled) return;
-    setError("");
-    try {
-      const saved = await draft.save(snapshot());
-      if (saved)
-        props.onReview(
-          action,
-          structuredClone(body),
-          summary,
-          { id: saved.id, revision: saved.revision },
-          baseline.documentVersion,
-        );
-    } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "Não foi possível salvar o preenchimento.",
-      );
-    }
+  function requestClose() {
+    const fields = captureRef.current?.snapshot().fields ?? current.fields;
+    if (JSON.stringify(fields) !== (initialCaptureRef.current ?? JSON.stringify(empty.fields))) setConfirmExit(true);
+    else props.onCancel();
   }
-  if (draft.readDenied || draft.protectedReadPending)
-    return (
-      <section tabIndex={-1} data-private-operation-recovery>
-        <CreationDraftPanel
-          draft={draft}
-          current={baseline}
-          patientName={
-            props.context.patient?.display_name ?? "Paciente selecionado"
-          }
-          disabled={props.reviewDisabled}
-        />
-      </section>
-    );
-  if (props.recoveryOnly)
-    return (
-      <section
-        className="hca-form-stack"
-        tabIndex={-1}
-        data-private-operation-recovery
-      >
-        <Notice>
-          A operação oficial não está disponível neste estado ou perfil. Você
-          pode consultar seu preenchimento, descartá-lo ou reconhecer um
-          resultado já aplicado, sem repetir o ato.
-        </Notice>
-        <CreationDraftPanel
-          draft={draft}
-          current={baseline}
-          patientName={
-            props.context.patient?.display_name ?? "Paciente selecionado"
-          }
-          resumeLabel="Consultar preenchimento salvo"
-          discardLabel="Descartar preenchimento privado"
-          acknowledgeLabel="Reconhecer resultado aplicado"
-        />
-        {draft.base?.state === "active" && !draft.offered ? (
-          <DraftContentSummary
-            content={draft.base.content}
-            kind={props.kind}
-            purpose={props.purpose}
-            navigation={draft.base.navigation}
-          />
-        ) : null}
-        {!draft.loading &&
-        !draft.loadError &&
-        !draft.offered &&
-        !draft.base &&
-        !draft.consumed &&
-        !draft.pending ? (
-          <p>
-            Nenhum preenchimento ou resultado privado pendente para esta
-            operação neste perfil.
-          </p>
-        ) : null}
-        <button type="button" className={buttonClass} onClick={props.onCancel}>
-          Fechar consulta do preenchimento
-        </button>
-      </section>
-    );
+  async function review(action: string, body: unknown, summary: string) {
+    if (stale || props.reviewDisabled || props.recoveryOnly) return;
+    setError(""); props.onReview(action, structuredClone(body), summary, undefined, baseline.documentVersion);
+  }
   return (
     <section
       className="mt-4 space-y-4"
       tabIndex={-1}
-      data-private-operation-recovery
+      data-operation-editor
       aria-label={
         personalReceipt
-          ? "Conferência pessoal em preparação"
-          : `Operação ${props.kind} em preparação`
+          ? "Conferência pessoal"
+          : `Operação ${props.kind}`
       }
     >
-      <CreationDraftPanel
-        draft={draft}
-        current={{
-          ...current,
-          fields: fullReference
-            ? { ...baseline.fields, ...current.fields }
-            : current.fields,
-          documentVersion: baseline.documentVersion,
-          materials: baseline.materials,
-        }}
-        patientName={
-          props.context.patient?.display_name ?? "Paciente selecionado"
-        }
-        disabled={props.reviewDisabled}
-      />
-      <p>
-        {personalReceipt
-          ? "Este preenchimento pertence somente a você e a esta entrega. Recebimento exige confirmação própria."
-          : `Este preenchimento pertence somente a você, a esta ${props.kind} e a este tipo de operação. Salvar não confirma decisões, recebimento ou movimentação de estoque; a confirmação é uma etapa própria.`}
-      </p>
+
+      <p>Confira os dados antes de confirmar. Ao sair, os campos desta ação serão descartados.</p>
       {error ? <Notice error>{error}</Notice> : null}
       {consent && !stale && props.onCompareCancellationReference ? (
         <button
           type="button"
           className={buttonClass}
-          disabled={draft.blocked || props.reviewDisabled}
+          disabled={props.reviewDisabled}
           onClick={props.onCompareCancellationReference}
         >
           Conferir fontes atuais da conciliação
@@ -417,7 +304,7 @@ function PrivateOperationEditor(
               <button
                 type="button"
                 className={buttonClass}
-                disabled={draft.blocked || props.reviewDisabled}
+                disabled={props.reviewDisabled}
                 onClick={() => {
                   const content = snapshot();
                   for (const material of removedValues)
@@ -425,7 +312,7 @@ function PrivateOperationEditor(
                   restore(content);
                 }}
               >
-                Retirar estes valores do preenchimento privado
+                Retirar estes valores do preenchimento
               </button>
             </Notice>
           ) : null}
@@ -441,7 +328,6 @@ function PrivateOperationEditor(
                   className={buttonClass}
                   disabled={
                     !ready ||
-                    draft.blocked ||
                     props.reviewDisabled ||
                     !!removedValues.length
                   }
@@ -478,7 +364,7 @@ function PrivateOperationEditor(
               type="button"
               className={buttonClass}
               disabled={
-                draft.blocked || props.reviewDisabled || !!removedValues.length
+                props.reviewDisabled || !!removedValues.length
               }
               onClick={() => {
                 setBaseline({
@@ -494,33 +380,30 @@ function PrivateOperationEditor(
           )}
         </section>
       ) : null}
-      {!draft.readDenied ? (
+      {props.recoveryOnly ? <Notice>Esta ação não está disponível na situação atual. Fechar descarta os campos desta tela.</Notice> : (
         <fieldset
           className="min-w-0"
-          disabled={draft.blocked || props.reviewDisabled}
+          disabled={props.reviewDisabled}
         >
-          <button
-            type="button"
-            className={buttonClass}
-            onClick={() => void draft.save(snapshot())}
-          >
-            {personalReceipt
-              ? "Salvar conferência privada"
-              : "Salvar preenchimento privado"}
-          </button>
+
           <CommandEditorFields
             key={formRevision}
             {...props}
             initialDraft={initial}
             snapshotRef={captureRef}
-            onDraftChange={setCurrent}
-            reviewDisabled={props.reviewDisabled || stale || draft.blocked}
+            onDraftChange={value => { initialCaptureRef.current ??= JSON.stringify(value.fields); setCurrent(value); }}
+            onCancel={requestClose}
+            reviewDisabled={props.reviewDisabled || stale}
             onReview={(action, body, summary) =>
               void review(action, body, summary)
             }
           />
         </fieldset>
-      ) : null}
+      )}
+      <Dialog open={confirmExit} title="Sair sem concluir?" onClose={() => setConfirmExit(false)}>
+        <p>Os campos desta ação serão descartados. Sair não confirma nenhuma alteração.</p>
+        <div className="hca-toolbar"><button type="button" className={buttonClass} onClick={() => setConfirmExit(false)}>Voltar ao preenchimento</button><button type="button" className={buttonClass} onClick={props.onCancel}>Sair e descartar</button></div>
+      </Dialog>
     </section>
   );
 }

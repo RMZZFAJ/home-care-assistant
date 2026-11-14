@@ -1,5 +1,32 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**Revisão posterior de 14/11 — rascunhos L1.** A decisão do responsável em
+[L1_DRAFT_POLICY.md](docs/audits/D/D-B/L1_DRAFT_POLICY.md) substitui a conservação
+de preparações de decisões curtas e a explicação inicial do cartão abaixo.
+Cancelamento, arquivamento, revisão, regularização, atos de transferência e
+decisões de programação BAL não criam novos rascunhos. Fichas extensas e
+Andamentos guardam somente o último preenchimento, com escolha sobreposta de
+retomar ou descartar. Andamentos também o guardam ao fechar voluntariamente.
+Os quatro campos, CAS e recuperação de atos oficiais permanecem preservados.
+As 22 regressões nativas dirigidas passaram com Auth real. Migration incremental
+aplicada no remoto em 260, após backup crítico cifrado verificado e pré-validação
+revertida; quatro hashes de preservação e seis corpos de função canônicos
+conferidos. Jornadas dirigidas em Chromium, mobile e iOS passaram, com
+repetição dos casos afetados e contraprovas preservadas. A CI do SHA final
+continua como gate até o início correto dos seis jobs de navegador.
+
+**Continuação de 14/11 — acesso, Andamentos e diagnósticos.** Correções na mesma
+branch: transições cobertas sem telas intermediárias, recuperação de senha em
+segunda tela, vínculo único direto ao início, menções/referências no texto,
+publicação privada obrigatória da família e Mais no formato do laboratório.
+O [registro de continuação](docs/audits/D/D-B/L1_FOLLOWUP_20261114.md) explica
+também Minhas decisões em preparação, as superfícies complementares e os alertas
+contextuais mantidos para preservar teclado. Dezessete integrações Auth reais e
+os testes dos guardas JavaScript/Python passaram. A nova migration incremental
+está aplicada no remoto em 259, após backup cifrado verificado e pré-validação
+revertida; eventos, estoque, exemplares e Storage preservados. A CI do novo SHA
+continua como gate até o início correto dos navegadores; não há aceite global.
+
 **14/11/2026 — revisão visual reaberta pelo responsável.** A entrega publicada
 não foi aceita como reprodução do laboratório. A correção está em execução
 local na mesma branch, usando HTML v3 e comentários posteriores. As evidências

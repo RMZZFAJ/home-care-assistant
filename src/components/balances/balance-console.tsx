@@ -19,7 +19,6 @@ import {
   BalanceWorkspacePreparation,
   type BalancePreparationSelection,
 } from "./balance-workspace-preparation";
-import { BalancePreparationsList } from "./balance-preparations-list";
 import { formatZonedDate } from "@/lib/schedules/time";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { weekDays, type BalanceEditor } from "./balance-forms";
@@ -64,8 +63,7 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
     [opener, setOpener] = useState<HTMLElement | null>(null);
   const [error, setError] = useState(""),
     [message, setMessage] = useState(""),
-    [documents, setDocuments] = useState<DocumentSummary[]>([]),
-    [listRevision, setListRevision] = useState(0);
+    [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [settledDeferralId, setSettledDeferralId] = useState<string | null>(
     null,
   );
@@ -533,15 +531,6 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
           }
         />
       ) : null}
-      <BalancePreparationsList
-        patientId={patient.id}
-        revision={listRevision}
-        onOpen={(selection, target) => {
-          setEditor(selection);
-          setOpener(target);
-          setError("");
-        }}
-      />
       {editor ? (
         <BalanceWorkspacePreparation
           key={
@@ -555,7 +544,6 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
           restoreFocusFallbackRef={resultRef}
           onClose={() => {
             setEditor(null);
-            setListRevision((v) => v + 1);
           }}
           onCommitted={() => {
             setEditor(null);
@@ -569,7 +557,6 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
                 ? "Solicitação registrada. O prazo atual continua válido até uma decisão familiar."
                 : "Decisão registrada. Consulte a atribuição e o histórico atualizados.",
             );
-            setListRevision((v) => v + 1);
             reload();
           }}
         />

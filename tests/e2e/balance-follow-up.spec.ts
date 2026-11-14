@@ -6,12 +6,11 @@ import { fixtures } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectDocumentSection } from "./document-sections";
+import { expandDocumentMilestones, selectDocumentSection } from "./document-sections";
 import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(120_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
-const panel = (page: Page) => page.getByRole("tabpanel");
 const stock = (patient: string) => sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)};`);
 async function login(page: Page, patient: string) {
   await page.goto("/login");
@@ -32,9 +31,9 @@ for (const policy of ["required", "optional"] as const) {
     });
     await page.goto(`/documentos/${f.document.id}`);
     const initial = policy === "required" ? "Acompanhar as revisões do balanço" : "Consultar a contagem conciliada";
-    await expect(panel(page).getByText(initial, { exact: true })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByText(initial, { exact: true })).toBeVisible();
     const before = balState(f.document.id);
-    const next = panel(page).getByRole("button", { name: "Abrir Contagem e revisão", exact: true });
+    const next = page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Contagem e revisão", exact: true });
     await next.focus();
     await next.press("Enter");
     await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
@@ -47,14 +46,15 @@ for (const policy of ["required", "optional"] as const) {
     const latest = policy === "required" ? "Conferir a referência do balanço" : "Consultar a contagem conciliada";
     // Reload the real reference; subsequent movements cannot undo prior reconciliation.
     await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
-    await expect(panel(page).getByText(latest, { exact: true })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByText(latest, { exact: true })).toBeVisible();
+    await expandDocumentMilestones(page);
     const conclusion = page.getByRole("list", { name: "Marcos da ficha", exact: true }).getByRole("listitem").filter({ hasText: "Conclusão" });
     await expect(conclusion).toHaveAttribute("data-state", policy === "required" ? "unknown" : "done");
     await page.setViewportSize({ width: 320, height: 900 });
     await auditFromTop(page, `bal-follow-up-${policy}-320`);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     mkdirSync("output/playwright/phase-d", { recursive: true });
-    await panel(page).locator(".hca-banner").filter({ hasText: latest }).screenshot({ path: `output/playwright/phase-d/balance-follow-up-${policy}-${info.project.name}.png` });
+    await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).screenshot({ path: `output/playwright/phase-d/balance-follow-up-${policy}-${info.project.name}.png` });
 
     const target = (url: URL) => url.pathname === `/api/documents/${f.document.id}`;
     let release!: () => void;
@@ -66,16 +66,16 @@ for (const policy of ["required", "optional"] as const) {
     const failed = page.waitForResponse(response => target(new URL(response.url())) && response.status() === 503);
     try {
       await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
-      await expect(panel(page)).toContainText("Atualizando o acompanhamento da ficha");
-      await expect(panel(page).getByRole("button", { name: "Abrir Contagem e revisão", exact: true })).toHaveCount(0);
+      await expect(page.getByRole("status").filter({ hasText: "Atualizando o acompanhamento da ficha" })).toContainText("Atualizando o acompanhamento da ficha");
+      await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Contagem e revisão", exact: true })).toHaveCount(0);
     } finally { release(); }
     await failed;
-    await expect(panel(page)).toContainText("O acompanhamento atual não foi confirmado");
+    await expect(page.getByRole("status").filter({ hasText: "O acompanhamento atual não foi confirmado" })).toContainText("O acompanhamento atual não foi confirmado");
     expect(balState(f.document.id)).toBe(preserved);
     expect(stock(f.patient)).toBe(ledger);
     await page.unroute(target);
     await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
-    await expect(panel(page).getByText(latest, { exact: true })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByText(latest, { exact: true })).toBeVisible();
 
     const denied = page.waitForResponse(response => target(new URL(response.url())) && response.status() === 403);
     sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.family.id)},'bal.read',false);`);

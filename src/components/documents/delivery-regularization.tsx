@@ -16,25 +16,13 @@ import {
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
 import { supplyCommandSchema } from "@/lib/validation/documents";
-import {
-  CreationDraftPanel,
-  DraftContentSummary,
-} from "@/components/forms/creation-draft-panel";
-import { useCreationDraft } from "@/components/forms/use-creation-draft";
-import { draftFlow, navigationForStep } from "@/lib/forms/draft-navigation";
-import {
-  regularizationPurposes,
-  regularizationAvailable,
-  regularizationDraftReference,
-  regularizationDraftContent,
-  regularizationDraftValues,
-  regularizationDraftStale,
-  adoptRegularizationDraftReference,
-  type RegularizationMode,
-} from "@/lib/forms/regularization-draft";
+
+import { useDocumentDecision, DocumentDecisionFailure } from "./use-document-decision";
+import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
+import { regularizationAvailable, regularizationDraftReference, regularizationDraftContent, regularizationDraftStale, adoptRegularizationDraftReference, type RegularizationMode } from "@/lib/forms/regularization-draft";
 import { parseRegularizationReference } from "@/lib/validation/regularization-reference";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
-import type { ReceiptDraftContent } from "@/lib/validation/supply-drafts";
+
 import { DraftReferenceComparison } from "./draft-reference-comparison";
 import type {
   DeliveryRegularizationCase,
@@ -63,7 +51,7 @@ type Packet = {
   body: unknown;
   expectedVersion: number;
   idempotencyKey: string;
-  draftCommit: { id: string; revision: number };
+  draftCommit?: { id: string; revision: number };
 };
 type Amounts = {
   receivedQuantity: string;
@@ -381,25 +369,7 @@ export function DeliveryRegularization({
           </ActionButton>
         ) : null}
       </div>
-      {active ? (
-        <details className="hca-form-stack">
-          <summary>Meus preenchimentos de regularização</summary>
-          <p>
-            Consulte somente seus preenchimentos e resultados, inclusive quando
-            o ato não estiver mais disponível.
-          </p>
-          <div className="hca-form-stack">
-            {(Object.keys(titles) as Mode[]).map((item) => (
-              <ActionButton
-                key={item}
-                onClick={(event) => open(item, event.currentTarget, true)}
-              >
-                Consultar preenchimento: {titles[item]}
-              </ActionButton>
-            ))}
-          </div>
-        </details>
-      ) : null}
+
       {write &&
       !details.recipientAvailable &&
       !details.reviewers.length &&
@@ -494,36 +464,8 @@ function RegularizationEditor({
   const formId = useId(),
     details = reference.deliveryRegularization!;
   const current = details.cases.find((c) => c.id === details.currentId);
-  const purpose = regularizationPurposes[mode];
-  const privateDraft = useCreationDraft({
-    userId: context.userId,
-    patientId: original.care_recipient_id,
-    kind: "ENT",
-    purpose,
-    targetDocumentId: original.id,
-    navigation: navigationForStep(draftFlow("ENT", purpose)!, 0),
-    onResume(saved) {
-      if (!saved.content || !("fields" in saved.content) || saved.content.documentVersion === null) return false;
-      restore(saved.content);
-      return true;
-    },
-    onDiscard() {
-      restore(regularizationDraftReference(reference));
-    },
-  });
-  function restore(content: ReceiptDraftContent) {
-    const values = regularizationDraftValues(content);
-    setBaseline(content);
-    setReason(values.reason);
-    setBasis(values.basis);
-    setReviewer(values.reviewer);
-    setOwner(values.owner);
-    setEntries(values.entries);
-    setReview(false);
-    intentRef.current = null;
-    setError("");
-    setErrors({});
-  }
+  const nativeAction = mode === "propose" ? "propose_regularization" : mode === "finding" ? "record_regularization_finding" : mode === "withdraw" ? "withdraw_regularization" : "review_regularization";
+  const decision = useDocumentDecision({ userId: context.userId, documentId: original.id, domain: "supply", action: nativeAction });
   const privateContent = regularizationDraftContent(baseline, reference, {
     reason,
     basis,
@@ -537,7 +479,6 @@ function RegularizationEditor({
     blocked ||
     uncertain ||
     stale ||
-    privateDraft.blocked ||
     recoveryOnly ||
     referenceUnavailable;
   useEffect(() => {
@@ -656,55 +597,31 @@ function RegularizationEditor({
       setError("Confira os campos e os limites informados antes de revisar.");
       return;
     }
-    const saved = await privateDraft.save(privateContent);
-    if (!saved) return;
-    intentRef.current = {
-      ...parsed.data,
-      draftCommit: { id: saved.id, revision: saved.revision },
-    };
+    intentRef.current = parsed.data;
     setError("");
     setReview(true);
   }
+  function verified(row: Record<string, unknown>, intention: DocumentDecisionIntention) {
+    requireSupplyConfirmation({ data: row, persistence: "confirmed" }, { id: original.id, patientId: original.care_recipient_id, type: "ENT", minimumVersion: intention.expectedVersion });
+  }
   async function send() {
-    if (!intentRef.current) return;
-    setBusy(true);
-    setError("");
+    if (busy || !intentRef.current && !uncertain) return;
+    setBusy(true); setError("");
     try {
-      const result = await api<{ data: SupplyDocument }>(
-        "/api/documents/" + reference.id,
-        intentRef.current,
-      );
-      result.data = requireSupplyConfirmation(result, {
-        id: original.id,
-        patientId: original.care_recipient_id,
-        type: "ENT",
-        minimumVersion: intentRef.current.expectedVersion,
-      });
-      setUncertain(false);
-      intentRef.current = null;
-      onSaved(result.data);
+      const packet = intentRef.current;
+      const result = uncertain ? await decision.checkPrevious(verified) : await decision.execute({ domain: "supply", action: nativeAction, body: packet!.body as Record<string, unknown>, expectedVersion: packet!.expectedVersion }, verified);
+      if (!result) return;
+      intentRef.current = null; setUncertain(false);
+      if (result.state === "applied") onSaved(requireSupplyConfirmation({ data: result.result, persistence: "confirmed" }, { id: original.id, patientId: original.care_recipient_id, type: "ENT", minimumVersion: result.intention.expectedVersion }));
+      else { setReview(false); setError("A conferência confirmou que nada foi alterado. Seus campos continuam nesta tela para tentar novamente. Se persistir, procure a supervisão."); }
     } catch (cause) {
-      const refused =
-        cause instanceof ApiError &&
-        [400, 401, 403, 404, 409, 422].includes(cause.status);
-      setUncertain(!refused);
-      if (refused) {
-        intentRef.current = null;
-        setBlocked(cause.status === 403 || cause.status === 409);
-        setReview(false);
-        if ([401, 403, 404].includes(cause.status)) {
-          setReferenceUnavailable(true);
-          privateDraft.reload();
-        }
-      }
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Não foi possível confirmar o resultado.",
-      );
-    } finally {
-      setBusy(false);
-    }
+      const failure = cause instanceof DocumentDecisionFailure ? cause : null;
+      const originalCause = failure?.cause ?? cause;
+      const refused = failure?.outcome === "not_applied" || originalCause instanceof ApiError && [400,401,403,404,409,422].includes(originalCause.status);
+      setUncertain(failure ? failure.outcome === "uncertain" : !refused);
+      if (refused) { intentRef.current = null; setReview(false); if (originalCause instanceof ApiError && [403,404,409].includes(originalCause.status)) { setBlocked(true); setReferenceUnavailable(true); } }
+      setError(cause instanceof Error ? cause.message : "Não foi possível concluir. Procure a supervisão se persistir.");
+    } finally { setBusy(false); }
   }
   async function compare() {
     setBusy(true);
@@ -731,8 +648,6 @@ function RegularizationEditor({
           ? cause.message
           : "Não foi possível consultar a ficha atual.",
       );
-      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-        privateDraft.reload();
     } finally {
       setBusy(false);
     }
@@ -741,7 +656,7 @@ function RegularizationEditor({
   const canAdopt =
     comparison &&
     regularizationAvailable(comparison, mode) &&
-    !privateDraft.blocked;
+    !recoveryOnly;
   const comparedIds = new Set(
     (comparison ?? reference).lines.map((line) => line.id),
   );
@@ -750,59 +665,7 @@ function RegularizationEditor({
       !comparedIds.has(line.id) &&
       amounts.some(([key]) => !!entries[line.id]?.[key]),
   );
-  const privatePanel = (
-    <CreationDraftPanel
-      draft={privateDraft}
-      current={privateContent}
-      patientName={context.patient?.display_name ?? "Paciente selecionado"}
-      disabled={busy || uncertain || review}
-      resumeLabel={recoveryOnly ? "Consultar preenchimento salvo" : undefined}
-      discardLabel={
-        recoveryOnly ? "Descartar preenchimento privado" : undefined
-      }
-      acknowledgeLabel="Reconhecer resultado aplicado"
-    />
-  );
-  if (
-    recoveryOnly ||
-    privateDraft.readDenied ||
-    privateDraft.protectedReadPending
-  )
-    return (
-      <RecordDrawer
-        title={titles[mode]}
-        onClose={onClose}
-        restoreFocusTo={restoreFocusTo}
-        busy={privateDraft.busy}
-        preventClose={!!privateDraft.pending}
-      >
-        <Notice>
-          Consulta pessoal do preenchimento. Esta tela não confirma nem repete
-          um ato oficial.
-        </Notice>
-        {privatePanel}
-        {privateDraft.base?.state === "active" &&
-        !privateDraft.offered &&
-        !privateDraft.readDenied &&
-        !privateDraft.protectedReadPending ? (
-          <DraftContentSummary
-            content={privateDraft.base.content}
-            kind="ENT"
-            purpose={purpose}
-          />
-        ) : null}
-        {!privateDraft.loading &&
-        !privateDraft.loadError &&
-        !privateDraft.base &&
-        !privateDraft.offered &&
-        !privateDraft.consumed ? (
-          <p>
-            Nenhum preenchimento ou resultado privado pendente para este ato
-            neste perfil.
-          </p>
-        ) : null}
-      </RecordDrawer>
-    );
+  if (recoveryOnly) return <RecordDrawer title={titles[mode]} onClose={onClose} restoreFocusTo={restoreFocusTo}><Notice>Este ato não está disponível neste estado ou perfil. Feche para consultar a ficha.</Notice></RecordDrawer>;
   function adoption(ready: boolean) {
     return (
       <ActionButton
@@ -828,24 +691,16 @@ function RegularizationEditor({
   }
   return (
     <RecordDrawer
+      exitDialog
       title={titles[mode]}
       onClose={onClose}
       busy={busy}
-      preventClose={uncertain || !!privateDraft.pending}
+      uncertainOutcome={uncertain || decision.uncertain}
       restoreFocusTo={restoreFocusTo}
     >
       <div className="space-y-4">
-        {privatePanel}
-        <Notice>
-          Salvar preserva apenas sua preparação. Proposta, decisão e
-          movimentação exigem revisão e confirmação próprias.
-        </Notice>
-        <ActionButton
-          disabled={busy || uncertain || review || privateDraft.blocked}
-          onClick={() => void privateDraft.save(privateContent)}
-        >
-          Salvar preenchimento privado
-        </ActionButton>
+
+
         {stale ? (
           <Notice>
             O preenchimento preserva outra versão ou proposta. Compare a
@@ -869,7 +724,7 @@ function RegularizationEditor({
               </p>
             ))}
             <ActionButton
-              disabled={busy || uncertain || privateDraft.blocked}
+              disabled={busy || uncertain}
               onClick={() => {
                 const next = { ...entries },
                   fields = { ...baseline.fields };
@@ -889,7 +744,7 @@ function RegularizationEditor({
                 });
               }}
             >
-              Retirar estes valores do preenchimento privado
+              Retirar estes valores do preenchimento desta tela
             </ActionButton>
           </Notice>
         ) : null}
@@ -908,6 +763,7 @@ function RegularizationEditor({
         {!referenceUnavailable && mode !== "propose" && current ? (
           <RegularizationCaseFacts item={current} />
         ) : null}
+        {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
         {error ? <Notice error>{error}</Notice> : null}
         {uncertain ? (
           <Notice>

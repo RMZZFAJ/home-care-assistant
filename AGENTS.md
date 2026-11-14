@@ -11,9 +11,9 @@ monorepos the `next` package may not be visible from the repo root) before
 writing any code. Heed deprecation notices.
 
 This block is written and re-added by `next dev` — verify at
-`node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a
-diff only re-creates the uncommitted change; committing it with your work keeps
-the tree clean.
+`node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from
+a diff only re-creates the uncommitted change; committing it with your work
+keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
 
@@ -58,11 +58,15 @@ Devolução equipe→família é processo autônomo, sem exigir entrega de orige
 Preservar o conteúdo emitido, seus atos e a ciência no cancelamento. Menções,
 referências e acessos não substituem ciência, recebimento ou autoria.
 O complemento executivo em docs/audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt
-prevalece sobre orientações conflitantes de método e rascunhos. O L1 posterior
-autoriza simplificar a apresentação do rascunho de Andamentos, preservando os
-quatro campos e os controles de concorrência. Os demais rascunhos conservam
-escopo e apresentação; não ampliar persistência, autosave ou retomada entre
-aparelhos. DOC-C.1 e expansão não
+prevalece sobre orientações conflitantes de método e rascunhos. A revisão L1
+de 14/11/2026, em docs/audits/D/D-B/L1_DRAFT_POLICY.md, substitui a persistência
+de decisões curtas: cancelar, arquivar, revisar e decidir não geram rascunho.
+Fichas com preenchimento extenso e Andamentos guardam somente o último
+preenchimento; a retomada oferece diálogo Continuar ou Descartar. Andamentos
+também guardam o último ao fechar voluntariamente, preservando seus quatro
+campos e os controles de concorrência. Recuperação de resultado oficial incerto
+e prevenção de duplicatas permanecem separadas desses rascunhos. Não ampliar
+essa revisão para os outros domínios D-B/L2. DOC-C.1 e expansão não
 implementada são OWNER-DEFERRED. Corrigir defeitos e preservar separadamente
 a recuperação segura de operações oficiais incertas e a prevenção de duplicatas.
 Implementar PDFs aprovados pelo pipeline atual sem aguardar todo DOC-C.

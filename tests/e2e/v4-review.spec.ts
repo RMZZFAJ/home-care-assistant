@@ -460,7 +460,7 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     ).toBeVisible();
     await openDocumentMore(page);
     await expect(
-      page.getByRole("button", {
+      page.getByRole("menuitem", {
         name: "Revisar arquivamento manual",
         exact: true,
       }),

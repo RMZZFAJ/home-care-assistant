@@ -24,7 +24,7 @@ export async function selectDocumentSection(
   page: Page,
   section: DocumentSection,
 ) {
-  if (section === "history") { await openDocumentMore(page); await page.getByRole("button", {name:"Identificação e registros preservados",exact:true}).click(); }
+  if (section === "history") { await openDocumentMore(page); await page.getByRole("menuitem", {name:"Identificação e registros preservados",exact:true}).click(); }
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
   await tab.click();
   try {
@@ -51,13 +51,21 @@ export async function selectDocumentSection(
 }
 
 export async function openDocumentMore(page: Page) {
-  const popup = page.locator(".hca-document-identifiers");
+  const popup = page.getByRole("menu", { name: "Ações da ficha", exact: true });
   if (!(await popup.isVisible()))
     await page.getByRole("button", { name: "Mais opções da ficha", exact: true }).click();
   await expect(popup).toBeVisible();
 }
 export async function closeDocumentMore(page: Page) {
-  const popup = page.locator(".hca-document-identifiers");
+  const popup = page.getByRole("menu", { name: "Ações da ficha", exact: true });
   if (await popup.isVisible()) await popup.press("Escape");
   await expect(popup).toHaveCount(0);
+}
+
+/** Open the collapsed, user-facing macro progress before inspecting its steps. */
+export async function expandDocumentMilestones(page: Page) {
+  const summary = page.locator("details.hca-document-macro > summary");
+  const details = page.locator("details.hca-document-macro");
+  if (await details.getAttribute("open") === null) { await summary.focus(); await summary.press("Enter"); }
+  await expect(page.getByRole("list", { name: "Marcos da ficha", exact: true })).toBeVisible();
 }

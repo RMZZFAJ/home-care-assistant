@@ -223,10 +223,12 @@ export function progressConfirmed(
     parsed.data.note.text === packet.content.text &&
     (packet.publication
       ? parsed.data.note.relevance === packet.publication.relevance &&
-      (parsed.data.note.visibility ?? "public") === (packet.publication.visibility ?? "public") &&
+      (packet.publication.visibility === undefined || (parsed.data.note.visibility ?? "public") === packet.publication.visibility) &&
       (parsed.data.note.mentionAll ?? false) === (packet.publication.mentionAll ?? false) &&
       JSON.stringify(parsed.data.note.mentions?.map(x => x.id.toLowerCase())) === JSON.stringify(packet.publication.mentions.map(x => x.toLowerCase()))
-      : parsed.data.note.relevance === undefined && parsed.data.note.mentions === undefined)
+      : (parsed.data.note.relevance === undefined && parsed.data.note.mentions === undefined)
+        || (parsed.data.note.visibility === "family" && parsed.data.note.relevance === "normal"
+          && parsed.data.note.mentions?.length === 0 && !parsed.data.note.mentionAll))
   );
 }
 

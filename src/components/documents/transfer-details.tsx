@@ -90,29 +90,7 @@ export function TransferDetails({
             </ActionButton>
           ))}
       </div>
-      <details className="hca-form-stack">
-        <summary>Meus preenchimentos da transferência</summary>
-        <p>
-          Consulte somente seus preenchimentos e resultados, inclusive quando o
-          ato não estiver mais disponível.
-        </p>
-        <div className="hca-form-stack">
-          {(Object.keys(actionLabels) as TransferAction[]).map((action) => (
-            <ActionButton
-              key={action}
-              onClick={(event) =>
-                setSelected({
-                  action,
-                  consulting: true,
-                  trigger: event.currentTarget,
-                })
-              }
-            >
-              Consultar preenchimento: {actionLabels[action]}
-            </ActionButton>
-          ))}
-        </div>
-      </details>
+
       {selected ? (
         <TransferDecisionEditor
           key={selected.action + ":" + selected.consulting}
@@ -123,7 +101,7 @@ export function TransferDetails({
           restoreFocusTo={selected.trigger}
           onClose={() => setSelected(null)}
           onSaved={(result) => {
-            onUpdated(result);
+            if (result.version >= data.version) onUpdated(result);
             setSelected(null);
             setMessage(
               selected.action === "dispatch"

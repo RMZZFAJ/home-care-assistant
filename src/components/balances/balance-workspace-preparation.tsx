@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { ActionButton } from "@/components/ui/controls";
 import {
@@ -9,9 +10,8 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
-import { useCreationDraft } from "@/components/forms/use-creation-draft";
-import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
-import { navigationForStep } from "@/lib/forms/draft-navigation";
+import { useDocumentDecision, DocumentDecisionFailure } from "@/components/documents/use-document-decision";
+import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import {
   balancePreparationTitles,
   type BalancePreparationPurpose,
@@ -22,14 +22,12 @@ import {
   balancePreparationVersion,
 } from "@/lib/forms/balance-preparation";
 import {
-  balancePreparationContentSchema,
-  balancePreparationCommitSchema,
+  balancePreparationDecisionSchema,
   parseBalancePreparationReference,
-  balancePreparationPendingSchema,
-  parseBalancePreparationConfirmation,
+  parseBalancePreparationReceipt,
   type BalancePreparationFields as Values,
   type BalancePreparationReference,
-  type BalancePreparationCommit,
+  type BalancePreparationDecision,
   type BalancePreparationReceipt,
 } from "@/lib/validation/balance-preparations";
 import type { BalanceWorkspace } from "@/types/balances";
@@ -81,7 +79,7 @@ export function BalanceWorkspacePreparation({
   const [initialReference, setInitialReference] = useState(reference),
     [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
-    [review, setReview] = useState<BalancePreparationCommit | null>(null),
+    [review, setReview] = useState<BalancePreparationDecision | null>(null),
     [receipt, setReceipt] = useState<BalancePreparationReceipt | null>(null);
   const [error, setError] = useState(""),
     [fieldError, setFieldError] = useState(""),
@@ -89,18 +87,15 @@ export function BalanceWorkspacePreparation({
     [referenceForbidden, setReferenceForbidden] = useState(false),
     [comparing, setComparing] = useState(false),
     [needsAdoption, setNeedsAdoption] = useState(false);
-  const savedBeforeReferenceRef = useRef(false),
-    restoredRef = useRef(false),
-    initializedRef = useRef(false),
+  const initializedRef = useRef(false),
     mountedRef = useRef(true),
-    packetRef = useRef<BalancePreparationCommit | null>(null);
+    packetRef = useRef<BalancePreparationDecision | null>(null);
   const reasonRef = useRef<HTMLTextAreaElement>(null),
     reviewRef = useRef<HTMLHeadingElement>(null),
     resultRef = useRef<HTMLHeadingElement>(null),
     readRecoveryRef = useRef<HTMLButtonElement>(null),
     queryRef = useRef<HTMLButtonElement>(null);
   const restoreEditingFocusRef = useRef(false);
-  const storageKey = `hca:bal-preparation-confirmation:${context.userId}:${patientId}:${purpose}:${targetResourceId}`;
   const referenceUrl =
     "/api/balances/preparations/reference?" +
     new URLSearchParams({
@@ -108,45 +103,10 @@ export function BalanceWorkspacePreparation({
       purpose,
       targetResourceId,
     });
-  const flow = ("BAL_" + purpose.toUpperCase()) as
-    | "BAL_CONFIGURE"
-    | "BAL_ASSIGN"
-    | "BAL_REQUEST_DEFERRAL"
-    | "BAL_DEFER"
-    | "BAL_APPROVE_DEFERRAL"
-    | "BAL_REJECT_DEFERRAL";
-  const draft = useCreationDraft({
-    userId: context.userId,
-    patientId,
-    kind: "BAL",
-    purpose,
-    targetDocumentId: null,
-    targetResourceId,
-    navigation: navigationForStep(flow, 0),
-    onResume: (row) => {
-      const c = balancePreparationContentSchema.safeParse(row.content);
-      if (!c.success) return false;
-      restoredRef.current = true;
-      setValues(c.data.values);
-      setReference({
-        referenceHash: c.data.referenceHash,
-        referenceVersion: c.data.referenceVersion,
-      });
-      setReview(null);
-      setError("");
-      return true;
-    },
-    onDiscard: onClose,
-  });
-  const content = {
-    values,
-    referenceHash: reference.referenceHash,
-    referenceVersion: reference.referenceVersion,
-  };
-  const saved =
-    draft.base?.content && "values" in draft.base.content
-      ? draft.base.content
-      : { values: initialValues, ...initialReference };
+  const decision = useDocumentDecision({ userId: context.userId, documentId: targetResourceId, patientId, domain: "balance_workspace", action: purpose });
+  useOperationActivity(!source && !referenceError, { title: "Consultando a programação", detail: "Estamos conferindo a referência autorizada para este preenchimento." });
+  const content = { values, referenceHash: reference.referenceHash, referenceVersion: reference.referenceVersion };
+  const saved = { values: initialValues, ...initialReference };
   const dirty = JSON.stringify(content) !== JSON.stringify(saved);
   const family = ["family", "admin"].includes(patient.role),
     allowDeferral = family && can(context, "bal.defer.approve");
@@ -160,7 +120,7 @@ export function BalanceWorkspacePreparation({
             patient.role === "supervisor")
         : allowDeferral;
   const protectedView =
-    referenceForbidden || draft.readDenied || draft.protectedReadPending;
+    referenceForbidden;
   const stale =
     !source ||
     source.referenceHash !== reference.referenceHash ||
@@ -174,44 +134,7 @@ export function BalanceWorkspacePreparation({
     };
   }, []);
   useEffect(() => {
-    let active = true;
-    void Promise.resolve().then(() => {
-      if (!active) return;
-      try {
-        const raw = sessionStorage.getItem(storageKey),
-          parsed = raw
-            ? balancePreparationPendingSchema.safeParse(JSON.parse(raw))
-            : null;
-        if (
-          parsed?.success &&
-          parsed.data.packet.careRecipientId === patientId &&
-          parsed.data.packet.purpose === purpose &&
-          parsed.data.packet.targetResourceId === targetResourceId
-        ) {
-          restoredRef.current = true;
-          setValues(parsed.data.content.values);
-          setReference({
-            referenceHash: parsed.data.content.referenceHash,
-            referenceVersion: parsed.data.content.referenceVersion,
-          });
-          packetRef.current = parsed.data.packet;
-          setReview(parsed.data.packet);
-          setUncertain(true);
-        }
-      } catch {
-        /* An optional damaged copy never authorizes a command. */
-      }
-    });
-    return () => {
-      active = false;
-    };
-  }, [storageKey, patientId, purpose, targetResourceId]);
-  useEffect(() => {
     if (
-      draft.loading ||
-      draft.offered ||
-      draft.consumed ||
-      draft.pending ||
       uncertain ||
       initializedRef.current
     )
@@ -237,7 +160,7 @@ export function BalanceWorkspacePreparation({
         setSource(current);
         setReferenceError("");
         setReferenceForbidden(false);
-        if (!restoredRef.current && !savedBeforeReferenceRef.current) {
+        if (!packetRef.current) {
           const ref = {
             referenceHash: current.referenceHash,
             referenceVersion: balancePreparationVersion(current),
@@ -260,10 +183,6 @@ export function BalanceWorkspacePreparation({
       });
     return () => controller.abort();
   }, [
-    draft.loading,
-    draft.offered,
-    draft.consumed,
-    draft.pending,
     uncertain,
     referenceUrl,
     patientId,
@@ -278,7 +197,7 @@ export function BalanceWorkspacePreparation({
     if (protectedView) readRecoveryRef.current?.focus();
   }, [protectedView]);
   useEffect(() => {
-    if (!restoreEditingFocusRef.current || busy || draft.busy || review) return;
+    if (!restoreEditingFocusRef.current || busy || review) return;
     const frame = requestAnimationFrame(() => {
       restoreEditingFocusRef.current = false;
       if (protectedView) {
@@ -290,7 +209,7 @@ export function BalanceWorkspacePreparation({
       else queryRef.current?.focus();
     });
     return () => cancelAnimationFrame(frame);
-  }, [busy, draft.busy, draft.blocked, review, protectedView]);
+  }, [busy, review, protectedView]);
   async function queryReference() {
     try {
       const current = parseBalancePreparationReference(
@@ -339,7 +258,6 @@ export function BalanceWorkspacePreparation({
         );
         if (e instanceof ApiError && [401, 403, 404].includes(e.status)) {
           setReferenceForbidden(true);
-          await draft.revalidateRead();
         }
       }
     } finally {
@@ -381,7 +299,7 @@ export function BalanceWorkspacePreparation({
     reasonRef.current?.focus();
   }
   async function prepare() {
-    if (busy || draft.blocked || !canWrite) return;
+    if (busy || !canWrite) return;
     const reason = (values.reason ?? "").trim();
     if (Array.from(reason).length < 3 || reason.length > 1000) {
       setFieldError(
@@ -411,18 +329,7 @@ export function BalanceWorkspacePreparation({
         );
         return;
       }
-      const saved = await draft.save(content);
-      if (!saved || !mountedRef.current) return;
-      const intent = balancePreparationCommitSchema.parse({
-        careRecipientId: patientId,
-        purpose,
-        targetResourceId,
-        draftCommit: { id: saved.id, revision: saved.revision },
-        idempotencyKey: crypto.randomUUID(),
-        referenceHash: reference.referenceHash,
-        expectedVersion: reference.referenceVersion,
-        command,
-      });
+      const intent = balancePreparationDecisionSchema.parse({ careRecipientId: patientId, purpose, targetResourceId, referenceHash: reference.referenceHash, expectedVersion: reference.referenceVersion, command });
       packetRef.current = intent;
       setReview(intent);
       setComparing(false);
@@ -436,7 +343,6 @@ export function BalanceWorkspacePreparation({
         reasonRef.current?.focus();
         if (e instanceof ApiError && [401, 403, 404].includes(e.status)) {
           setReferenceForbidden(true);
-          await draft.revalidateRead();
         }
       }
     } finally {
@@ -446,86 +352,42 @@ export function BalanceWorkspacePreparation({
   async function send() {
     const intent = packetRef.current;
     if (!intent || busy) return;
-    const recovering = uncertain;
-    setBusy(true);
-    setError("");
+    setBusy(true); setError("");
+    const verify = (result: Record<string, unknown>, accepted: DocumentDecisionIntention) => {
+      parseBalancePreparationReceipt(result, { patientId, purpose: accepted.action, targetResourceId, userId: context.userId }, { ...intent, purpose: accepted.action, command: accepted.body.command, referenceHash: accepted.referenceHash, expectedVersion: accepted.expectedVersion || null } as BalancePreparationDecision);
+    };
     try {
-      try {
-        sessionStorage.setItem(
-          storageKey,
-          JSON.stringify({ packet: intent, content }),
-        );
-      } catch {
-        /* Retain the exact packet in memory. */
-      }
-      const raw = await api<{ data: unknown }>(
-        "/api/balances/preparations/commit",
-        intent,
-      );
-      const confirmed = parseBalancePreparationConfirmation(
-        raw.data,
-        intent,
-        context.userId,
-      );
-      try {
-        sessionStorage.removeItem(storageKey);
-      } catch {
-        /* The confirmed server result remains authoritative. */
-      }
-      if (!mountedRef.current) return;
+      const result = uncertain ? await decision.checkPrevious(verify) : await decision.execute({ domain: "balance_workspace", action: purpose, expectedVersion: intent.expectedVersion ?? 0, referenceHash: intent.referenceHash, body: { command: intent.command } }, verify);
+      if (!mountedRef.current || !result) return;
+      if (result.state === "not_applied") { setUncertain(false); setReview(null); setError("A conferência confirmou que nada foi alterado. Confira seus campos e tente novamente; se persistir, procure a supervisão."); return; }
       packetRef.current = null;
-      setReceipt(confirmed);
-      setReview(null);
-      setUncertain(false);
-      draft.reload();
-      onCommitted();
+      setReceipt(parseBalancePreparationReceipt(result.result, { patientId, purpose, targetResourceId, userId: context.userId }));
+      setReview(null); setUncertain(false); onCommitted();
     } catch (e) {
       if (!mountedRef.current) return;
-      const rejected =
-        e instanceof ApiError &&
-        [400, 401, 403, 404, 409, 422].includes(e.status);
-      setError(
-        e instanceof Error
-          ? e.message
-          : "A confirmação ainda não foi recuperada.",
-      );
-      setUncertain(!rejected || recovering);
-      if (rejected && !recovering) {
-        packetRef.current = null;
-        setReview(null);
-        try {
-          sessionStorage.removeItem(storageKey);
-        } catch {
-          /* No committed result was claimed. */
-        }
-        setNeedsAdoption(true);
-        setComparing(true);
-        restoreEditingFocusRef.current = true;
-        if (e.code === "DRAFT_VERSION_CONFLICT") await draft.reportConflict();
-      }
-      if (e instanceof ApiError && [401, 403, 404].includes(e.status)) {
-        setReferenceForbidden(true);
-        await draft.revalidateRead();
-      }
-    } finally {
-      if (mountedRef.current) setBusy(false);
-    }
+      setError(e instanceof Error ? e.message : "Não foi possível conferir a decisão. Procure a supervisão.");
+      const unknown = !(e instanceof DocumentDecisionFailure) || e.outcome === "uncertain";
+      setUncertain(unknown);
+      if (!unknown) { setReview(null); restoreEditingFocusRef.current = true; if (e.cause instanceof ApiError && [401,403,404,409].includes(e.cause.status)) { setNeedsAdoption(true); setComparing(true); } }
+    } finally { if (mountedRef.current) setBusy(false); }
   }
   return (
     <RecordDrawer
+      exitDialog
       title={
         review
           ? "Revisar decisão do balanço"
           : balancePreparationTitles[purpose]
       }
       onClose={onClose}
-      busy={busy || draft.busy}
-      preventClose={uncertain || Boolean(review) || Boolean(draft.pending)}
-      hasUnsavedChanges={!receipt && !draft.consumed && dirty}
+      busy={busy}
+      uncertainOutcome={uncertain || decision.uncertain}
+      hasUnsavedChanges={!receipt && dirty}
       restoreFocusTo={restoreFocusTo}
       restoreFocusFallbackRef={restoreFocusFallbackRef}
     >
-      {error ? <Notice error>{error}</Notice> : null}
+      {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
+        {error ? <Notice error>{error}</Notice> : null}
       {uncertain ? (
         <Notice>
           A resposta ainda não foi confirmada. A tentativa original está
@@ -533,37 +395,17 @@ export function BalanceWorkspacePreparation({
         </Notice>
       ) : null}
       {uncertain ? (
-        <ActionButton disabled={busy || draft.busy} onClick={() => void send()}>
+        <ActionButton disabled={busy} onClick={() => void send()}>
           Recuperar a mesma tentativa
         </ActionButton>
       ) : null}
-      <CreationDraftPanel
-        draft={draft}
-        current={content}
-        patientName={patient.display_name}
-        disabled={busy || uncertain || Boolean(review)}
-        revalidationRef={readRecoveryRef}
-        onRevalidateRead={() => {
-          void draft.revalidateRead().then((ok) => {
-            if (ok) {
-              setReferenceForbidden(false);
-              if (!draft.consumed) void consult();
-            }
-          });
-        }}
-      />
       {protectedView ? (
         <Notice error>
           O acesso precisa ser revalidado antes de exibir este preenchimento.
           <ActionButton
-            disabled={busy || draft.busy}
+            disabled={busy}
             onClick={() => {
-              void draft.revalidateRead().then((ok) => {
-                if (ok) {
-                  setReferenceForbidden(false);
-                  void consult();
-                }
-              });
+              setReferenceForbidden(false); void consult();
             }}
           >
             Revalidar acesso ao preenchimento
@@ -587,7 +429,7 @@ export function BalanceWorkspacePreparation({
             Voltar ao acompanhamento
           </ActionButton>
         </section>
-      ) : draft.consumed ? null : review ? (
+      ) : review ? (
         <section className="hca-form-stack" aria-label="Conferência da decisão">
           <h3 ref={reviewRef} tabIndex={-1}>
             Confira a decisão do balanço
@@ -660,22 +502,7 @@ export function BalanceWorkspacePreparation({
           ) : null}
           <div className="hca-toolbar">
             <ActionButton
-              disabled={
-                busy ||
-                draft.loading ||
-                Boolean(draft.pending) ||
-                !canWrite ||
-                draft.blocked
-              }
-              onClick={() => {
-                savedBeforeReferenceRef.current = true;
-                void draft.save(content);
-              }}
-            >
-              Salvar preenchimento privado
-            </ActionButton>
-            <ActionButton
-              disabled={busy || draft.loading || Boolean(draft.pending)}
+              disabled={busy}
               ref={queryRef}
               onClick={() => void consult()}
             >
@@ -695,8 +522,7 @@ export function BalanceWorkspacePreparation({
                 disabled={
                   busy ||
                   Boolean(referenceError) ||
-                  Boolean(draft.pending) ||
-                  draft.blocked
+                  uncertain
                 }
                 onClick={adopt}
               >
@@ -711,7 +537,7 @@ export function BalanceWorkspacePreparation({
             </Notice>
           ) : null}
           <fieldset
-            disabled={busy || draft.blocked || !canWrite}
+            disabled={busy || !canWrite}
             className="min-w-0"
           >
             <BalancePreparationFields
@@ -723,7 +549,7 @@ export function BalanceWorkspacePreparation({
                 setValues((current) => ({ ...current, ...patch }))
               }
               onReview={() => void prepare()}
-              canReview={!stale && !draft.blocked && canWrite}
+              canReview={!stale && canWrite}
               allowDeferral={allowDeferral}
               reasonRef={reasonRef}
               error={fieldError || undefined}

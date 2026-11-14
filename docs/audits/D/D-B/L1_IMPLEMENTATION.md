@@ -1,5 +1,9 @@
 # L1 — implementação E01–E03
 
+As correções posteriores solicitadas em 14/11, a explicação das preparações,
+o exame dos diagnósticos e a validação incremental estão no
+[registro de continuação L1](L1_FOLLOWUP_20261114.md).
+
 **Situação corrente: revisão visual reaberta em 14/11/2026.** O responsável
 rejeitou a correspondência visual da entrega publicada e determinou reprodução
 do laboratório, incorporando os comentários posteriores. A revisão ocorre na

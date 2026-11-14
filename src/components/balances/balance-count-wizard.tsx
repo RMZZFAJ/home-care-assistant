@@ -15,6 +15,8 @@ import {
 } from "@/components/workspace";
 import { StepNavigator } from "@/components/ui/primitives";
 import { PatientSupplyWizard } from "@/components/documents/supply-wizard";
+import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
+import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import {
   draftFlowStages,
@@ -22,7 +24,6 @@ import {
   stepForNavigation,
 } from "@/lib/forms/draft-navigation";
 import {
-  CreationDraftPanel,
   BalanceObservationTimes,
 } from "@/components/forms/creation-draft-panel";
 import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
@@ -296,6 +297,7 @@ function ScheduledCount({
       return true;
     },
     onDiscard: () => {
+      setDraftTouched(false);
       try {
         clearIdleCountCache(sessionStorage, storageKey, {
           userId: context.userId,
@@ -320,6 +322,9 @@ function ScheduledCount({
       setFieldErrors({});
     },
   });
+
+  const [draftTouched, setDraftTouched] = useState(false);
+  useLongDraftAutosave(privateDraft, balanceContent, draftTouched && !(busy || uncertain));
   const missingMaterials = Object.keys(counts).filter(
     (id) => !products.some((product) => product.id === id),
   );
@@ -618,9 +623,9 @@ function ScheduledCount({
           referenceRevision,
         },
       };
-      const commit = privateDraft.draftCommit
-        ? { draftCommit: privateDraft.draftCommit }
-        : {};
+      const savedDraft = await privateDraft.save(structuredClone(balanceContent));
+      if (!savedDraft) return;
+      const commit = { draftCommit: { id: savedDraft.id, revision: savedDraft.revision } };
       pendingRef.current = checkCountAttempt(
         {
           url: editing
@@ -918,7 +923,7 @@ function ScheduledCount({
     <BalancePreviousObservations content={balanceContent} />
   );
   const draftPanel = (
-    <CreationDraftPanel
+    <SimpleDraftPanel
       draft={privateDraft}
       current={balanceContent}
       patientName={context.patient!.display_name}
@@ -959,7 +964,7 @@ function ScheduledCount({
     validQuantity(counts[p.id] ?? "", p.quantity_decimals ?? 0, true),
   ).length;
   return (
-    <div className="hca-form-stack">
+    <div className="hca-form-stack" onChangeCapture={() => setDraftTouched(true)}>
       {draftPanel}
       {referencePanel}
       {previousPanel}

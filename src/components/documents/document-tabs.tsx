@@ -1,8 +1,8 @@
 "use client";
 
 import { Tabs } from "@base-ui/react/tabs";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, type ReactNode, type Ref } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState, type ReactNode, type Ref } from "react";
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/primitives";
 import type { DocumentType } from "@/types/documents";
@@ -24,21 +24,34 @@ const baseTabs: { id: DocumentTab; label: string; icon: IconName; }[] = [
   { id: "attachments", label: "Anexos", icon: "link" },
 ];
 
+function tabFromUrl(params: Pick<URLSearchParams, "get" | "has">, auditAllowed: boolean): DocumentTab {
+  const requested = params.get("documentTab");
+  const valid = [...baseTabs.map(tab => tab.id), "history", ...(auditAllowed ? ["audit"] : [])];
+  return requested === "workflow" ? "materials" : valid.includes(requested ?? "")
+    ? requested as DocumentTab : params.has("historyVersion") ? "history" : "overview";
+}
+
 export function useDocumentTabs(auditAllowed: boolean) {
   const rootRef = useRef<HTMLDivElement>(null);
   const focusSelectionRef = useRef(false);
   const params = useSearchParams();
-  const requested = params.get("documentTab");
+  const pathname = usePathname();
+  const source = JSON.stringify([pathname, params.toString(), auditAllowed]);
+  const [selection, setSelection] = useState<{ source: string; value: DocumentTab } | null>(null);
   const valid = [
     ...baseTabs.map((tab) => tab.id),
     "history",
     ...(auditAllowed ? ["audit"] : []),
   ];
-  const value: DocumentTab = requested === "workflow" ? "materials" : valid.includes(requested ?? "")
-    ? (requested as DocumentTab)
-    : params.has("historyVersion")
-      ? "history"
-      : "overview";
+  // A menu command and the native URL update can share a React batch. Keep the
+  // visible panel controlled immediately, until the router snapshot catches up.
+  // Scope the optimistic choice to that exact URL snapshot and permission set.
+  const value = selection?.source === source ? selection.value : tabFromUrl(params, auditAllowed);
+  useEffect(() => {
+    const navigate = () => setSelection({ source, value: tabFromUrl(new URLSearchParams(window.location.search), auditAllowed) });
+    window.addEventListener("popstate", navigate);
+    return () => window.removeEventListener("popstate", navigate);
+  }, [source, auditAllowed]);
   useEffect(() => {
     if (!focusSelectionRef.current && value !== "history") return;
     const target = rootRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
@@ -50,6 +63,7 @@ export function useDocumentTabs(auditAllowed: boolean) {
   function select(next: DocumentTab, focus = false) {
     if (next === "workflow") next = "materials";
     if (!valid.includes(next)) return;
+    setSelection({ source, value: next });
     focusSelectionRef.current = focus;
     const url = new URL(window.location.href);
     url.searchParams.set("documentTab", next);

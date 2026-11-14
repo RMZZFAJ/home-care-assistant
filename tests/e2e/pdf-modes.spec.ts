@@ -24,7 +24,7 @@ async function publishedFixture(kind:"REQ"|"COM"|"ENT"|"BAL"|"RETURN"){
  expect(agreement.error).toBeNull();const dispatched=await transferCommand(f.initiator.client,agreement.data.id,"dispatch",agreement.data.version);expect(dispatched.error).toBeNull();
  return {...f,id:dispatched.data.id};
 }
-async function note(f:{patient:string;id:string},text:string){const client=await actor("adminA",f.patient);await rpc(client,"document_progress_publish",{p_document:f.id,p_key:randomUUID(),p_body:{category:"record",stage:"issuance",text,references:[],publication:{relevance:"milestone",mentions:[fixtures.professional.id]}}});}
+async function note(f:{patient:string;id:string},text:string){const client=await actor("adminA",f.patient);await rpc(client,"document_progress_publish",{p_document:f.id,p_key:randomUUID(),p_body:{category:"record",stage:"issuance",text,references:[],publication:{relevance:"milestone",mentions:[fixtures.adminA.id]}}});}
 async function signed(page:Page,id:string,value:unknown,label:string){
  const receipt=pdfIssuanceSchema.parse(value);expect(receipt).toMatchObject({rendererRevision:17,state:"ready",validation:{accepted:true,wholeFile:true,profile:"PAdES-B-T",signerTrust:"internal",timestampTrust:"internal"}});
  const path="/api/documents/"+id+"/pdf?issuance="+receipt.id,response=await page.request.get(path);expect(response.status(),await response.text()).toBe(200);

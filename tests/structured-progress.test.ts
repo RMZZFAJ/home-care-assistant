@@ -34,3 +34,12 @@ it("keeps origin separate from milestone and attention in one shared presentatio
  expect(progressEventPresentation({source:"automatic",action:"com.reject_receipt"})).toMatchObject({origin:"Fato automático",relevance:"attention",label:"Atenção"});
  expect(progressEventPresentation({source:"manual"}).relevance).toBe("normal");
 });
+it("accepts the server's private default for an old unspecified audience while preserving explicit audience and mention checks", () => {
+ const original=publishProgress.parse({key:id,content});
+ const privateDefault={...outcome,note:{...outcome.note,relevance:"normal",mentions:[],visibility:"family",mentionAll:false}};
+ expect(progressConfirmed(privateDefault,original,id,user)).toBe(true);
+ expect(progressConfirmed({...privateDefault,note:{...privateDefault.note,visibility:"public"}},original,id,user)).toBe(false);
+ expect(progressConfirmed({...privateDefault,note:{...privateDefault.note,mentions:outcome.note.mentions}},original,id,user)).toBe(false);
+ const explicit=publishProgress.parse({...original,publication:{relevance:"normal",mentions:[],visibility:"public"}});
+ expect(progressConfirmed(privateDefault,explicit,id,user)).toBe(false);
+});

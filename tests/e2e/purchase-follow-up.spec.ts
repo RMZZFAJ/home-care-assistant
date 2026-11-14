@@ -6,7 +6,7 @@ import { send } from "../integration/com-decision-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectDocumentSection } from "./document-sections";
+import { expandDocumentMilestones, selectDocumentSection } from "./document-sections";
 import { audit } from "./accessibility-audit";
 import type { SupplyDocument } from "../../src/types/documents";
 
@@ -22,7 +22,8 @@ async function login(page: Page, patient: string) {
 }
 async function open(page: Page, id: string, heading: string) {
   await page.goto(`/documentos/${id}`);
-  await expect(page.getByRole("tabpanel")).toContainText(heading);
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText(heading);
+  await expandDocumentMilestones(page);
 }
 const panel = (page: Page) => page.getByRole("tabpanel");
 const conclusion = (page: Page) => page.getByRole("list", { name: "Marcos da ficha", exact: true })
@@ -62,7 +63,7 @@ test("COM follow-up never completes draft or pending approval and does not depen
   let before = facts(f.patient);
   await open(page, doc.id, "Conferir a preparação antes de emitir");
   await expect(conclusion(page)).toHaveAttribute("data-state", "pending");
-  const next = panel(page).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true });
+  const next = page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true });
   await next.focus();
   await next.press("Enter");
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
@@ -85,7 +86,7 @@ test("COM follow-up never completes draft or pending approval and does not depen
   before = facts(f.patient);
   await open(page, doc.id, "Consultar o encerramento da aquisição");
   await expect(conclusion(page)).toHaveAttribute("data-state", "closed");
-  await panel(page).getByRole("button", { name: "Abrir Versões e integridade", exact: true }).click();
+  await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Versões e integridade", exact: true }).click();
   await expect(page.getByRole("tab", {name:"Identificação e registros preservados",exact:true})).toBeFocused();
   expect(facts(f.patient)).toBe(before);
   expect(writes).toEqual([]);
@@ -101,7 +102,7 @@ test("COM follow-up preserves arrival rejection and P14 closure until a real par
   const writes = trackWrites(page);
   await open(page, doc.id, "Informar a chegada da aquisição");
   let before = facts(f.patient);
-  await panel(page).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();
+  await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
   expect(facts(f.patient)).toBe(before);
 
@@ -115,7 +116,7 @@ test("COM follow-up preserves arrival rejection and P14 closure until a real par
   await open(page, doc.id, "Conferir as parcelas de chegada");
   await expect(panel(page)).toContainText("aquisição restante foi encerrada");
   await expect(conclusion(page)).toHaveAttribute("data-state", "pending");
-  await panel(page).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();
+  await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();
   await expect(panel(page).getByRole("heading", { name: "Parcela 1 · Aguardando conferência", exact: true })).toBeVisible();
   expect(facts(f.patient)).toBe(before);
   expect(ledger(f.patient)).toBe(physical);
@@ -125,7 +126,7 @@ test("COM follow-up preserves arrival rejection and P14 closure until a real par
   before = facts(f.patient);
   await open(page, doc.id, "Informar a chegada da aquisição");
   await expect(conclusion(page)).toHaveAttribute("data-state", "pending");
-  await panel(page).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();
+  await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();
   await expect(panel(page).getByRole("heading", { name: "Parcela 1 · Rejeitada", exact: true })).toBeVisible();
   expect(facts(f.patient)).toBe(before);
   expect(ledger(f.patient)).toBe(physical);
@@ -139,7 +140,7 @@ test("COM follow-up preserves arrival rejection and P14 closure until a real par
   before = facts(f.patient);
   await open(page, doc.id, "Consultar a aquisição restante encerrada");
   await expect(conclusion(page)).toHaveAttribute("data-state", "done");
-  await panel(page).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();
+  await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();
   await expect(panel(page)).toContainText("Parcela 1 · Rejeitada");
   await expect(panel(page)).toContainText("Parcela 2 · Validada");
   expect(facts(f.patient)).toBe(before);
@@ -165,11 +166,11 @@ test("COM donation follow-up keeps its origin and freshness; revoked read access
   }));
   await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
   await expect(page.getByRole("alert").filter({ hasText: "Consulta atual da doação fictícia indisponível" })).toBeVisible();
-  await expect(panel(page)).toContainText("O acompanhamento atual não foi confirmado");
-  await expect(panel(page).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("status").filter({ hasText: "O acompanhamento atual não foi confirmado" })).toContainText("O acompanhamento atual não foi confirmado");
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true })).toHaveCount(0);
   await page.unroute(`**/api/documents/${doc.id}`);
   await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
-  await expect(panel(page)).toContainText("Informar a chegada da doação");
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Informar a chegada da doação");
   await selectDocumentSection(page, "materials");
   await expect(panel(page)).toContainText("Adquirido");
   await expect(panel(page).getByRole("textbox")).toHaveCount(0);

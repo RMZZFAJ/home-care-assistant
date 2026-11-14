@@ -1,5 +1,4 @@
 "use client";
-import { useOperationActivity } from "@/components/ui/operation-activity";
 import { ActionButton, SelectField } from "@/components/ui/controls";
 
 import { Suspense, useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
@@ -85,8 +84,7 @@ function ProfileMenu() {
 
 export function WorkspaceShell({ children, showOnboarding = false }: { children: ReactNode; showOnboarding?: boolean; }) {
   const { blocked, notices } = usePwa();
-  const { value, data, selecting, selectPatient } = useWorkspaceState();
-  useOperationActivity(selecting, { title: "Mudando de paciente", detail: "Estamos conferindo seu acesso antes de apresentar o paciente selecionado." });
+  const { value, data, loading, selecting, selectPatient } = useWorkspaceState();
   const desktop = useSyncExternalStore(subscribe, desktopSnapshot, serverSnapshot);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -110,7 +108,7 @@ export function WorkspaceShell({ children, showOnboarding = false }: { children:
     <Drawer title="Home Care Assistant" open={!desktop && mobileOpen} onClose={() => setMobileOpen(false)} closeLabel="Fechar menu" side="start" finalFocus={navigationTriggerRef} id={!desktop ? "workspace-navigation" : undefined}>
       <div inert={blocked}>{navigation}</div>
     </Drawer>
-    <div className="hca-workspace-body">{notices}<div inert={blocked}>{showOnboarding && value?.activeContext ? <GuideOnboarding key={`${value.activeContext.mode}:${value.activeContext.care_recipient_id ?? ""}`} /> : null}{children}</div></div>
+    <div className="hca-workspace-body">{notices}<div hidden={loading || selecting} inert={blocked || loading || selecting}>{showOnboarding && !loading && !selecting && value?.activeContext ? <GuideOnboarding key={`${value.activeContext.mode}:${value.activeContext.care_recipient_id ?? ""}`} /> : null}{children}</div></div>
     {value?.activeContext?.mode === "patient" ? <div inert={blocked}><BottomNavigation context={value} /></div> : null}
   </div>;
 }

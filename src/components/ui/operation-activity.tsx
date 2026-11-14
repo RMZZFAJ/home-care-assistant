@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
-import { useEffect, useId, useSyncExternalStore } from "react";
+import { useLayoutEffect, useId, useSyncExternalStore } from "react";
 import { Icon, type IconName } from "./icon";
 
 type ActivityStep = { label: string; icon: IconName };
@@ -21,11 +21,11 @@ const serverSnapshot = () => undefined;
 export function useOperationActivity(active: boolean, activity: Activity) {
   const id = useId();
   const serialized = JSON.stringify(activity);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (active) entries.set(id, JSON.parse(serialized) as Activity); else entries.delete(id);
     refresh();
   }, [active, id, serialized]);
-  useEffect(() => () => { entries.delete(id); refresh(); }, [id]);
+  useLayoutEffect(() => () => { entries.delete(id); refresh(); }, [id]);
 }
 export function PageLoadingActivity({ title = "Carregando a página", detail = "Aguarde enquanto consultamos as informações disponíveis." }: { title?: string; detail?: string }) {
   useOperationActivity(true, { title, detail });
@@ -39,7 +39,7 @@ export function OperationActivityHost() {
   return <Dialog.Root open={Boolean(activity)} disablePointerDismissal onOpenChange={(open, details) => { if (!open) details.cancel(); }}>
     {activity ? <Dialog.Portal><div className="hca-activity-overlay hca-l1"><Dialog.Backdrop className="activity-backdrop" /><Dialog.Viewport className="hca-activity-viewport"><Dialog.Popup className={`activity-card${activity.steps ? " activity-dynamic" : ""}`}>
       {activity?.steps ? <><div className="connection-animation" aria-hidden="true"><span><Icon name="user" width={25} height={25} /></span><i /><span key={current}><Icon name={activity.steps[current].icon} width={28} height={28} /></span></div><span className="activity-kicker">{activity.title}</span></> : <div className="activity-spinner" aria-hidden="true"><span /><Icon name="home" width={23} height={23} /></div>}
-      <Dialog.Title render={<h2 />} aria-live="polite">{activity?.steps?.[current].label ?? activity?.title}</Dialog.Title><Dialog.Description render={<p />}>{activity?.detail ?? "Aguarde um momento."}</Dialog.Description>
+      <Dialog.Title aria-live="polite">{activity?.steps?.[current].label ?? activity?.title}</Dialog.Title><Dialog.Description>{activity?.detail ?? "Aguarde um momento."}</Dialog.Description>
       {activity?.steps ? <ol className="activity-steps">{activity.steps.map((step, index) => <li key={step.label} className={index < current ? "done" : index === current ? "current" : ""} aria-current={index === current ? "step" : undefined}><span>{index < current ? <Icon name="check" width={14} height={14} /> : index === current ? <i className="spinner" /> : index + 1}</span>{step.label}</li>)}</ol> : null}
     </Dialog.Popup></Dialog.Viewport></div></Dialog.Portal> : null}
   </Dialog.Root>;

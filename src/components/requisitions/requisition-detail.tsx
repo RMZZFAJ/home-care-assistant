@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { DocumentSection } from "@/components/ui/model-section";
 import { Icon } from "@/components/ui/icon";
 import { DocumentComplementsPanel } from "@/components/documents/document-complements";
@@ -37,7 +38,7 @@ import { requisitionDocumentState, documentStatusLabel } from "@/lib/documents/p
 import { requisitionDeliveries, requisitionFollowUp, type RequisitionDelivery } from "@/lib/requisitions/follow-up";
 import { formatQuantity } from "@/lib/quantity";
 import { Attachments } from "@/components/documents/attachments";
-import { DocumentHeader } from "@/components/documents/document-header";
+import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "@/components/documents/document-header";
 import {
   DocumentTabs,
   DocumentPanel,
@@ -55,9 +56,7 @@ import {
 } from "@/components/documents/document-timeline";
 import { RelatedDocument } from "@/components/documents/related-document";
 import { RequisitionDecisionEditor } from "./requisition-decision-editor";
-import { requisitionDecisionLabels } from "@/lib/forms/requisition-decision-draft";
 import {
-  requisitionOperationPurposes,
   type RequisitionOperationPurpose,
 } from "@/lib/validation/supply-drafts";
 import { ResolveExtraItem } from "./resolve-extra-item";
@@ -169,6 +168,7 @@ export function RequisitionDocumentContent({
   const [message, setMessage] = useState("");
   const [busy] = useState(false);
   const [reading, setReading] = useState(true);
+  useOperationActivity(reading && !data, { title: "Consultando a ficha", detail: "Estamos identificando a requisição e conferindo seu acesso." });
   const refreshButtonRef = useRef<HTMLButtonElement>(null);
   const restoreRefreshFocusRef = useRef(false);
   function refreshDocument() {
@@ -235,12 +235,13 @@ export function RequisitionDocumentContent({
       });
     return () => controller.abort();
   }, [id, attempt, revision, acceptRead, setData]);
+  if (!data && reading) return null;
   if (!data)
     return (
       <div className="space-y-3">
         <h1>Requisição e acompanhamento</h1>
         <Notice error={Boolean(error)}>
-          {error || "Carregando requisição…"}
+          {error || "Não foi possível consultar a requisição."}
         </Notice>
         {error ? (
           <button
@@ -353,46 +354,46 @@ export function RequisitionDocumentContent({
               !p.archivedAt &&
               data.status !== "cancelled" ? (
               <>
-                {offerScience && can(context, "ent.create") ? <Link className={buttonClass} href={`/fichas/ent?requisitionId=${id}`}><Icon name="truck" />Expedir ENT vinculada</Link> : null}
+                {offerScience && can(context, "ent.create") ? <DocumentMoreLink icon="truck" className={buttonClass} href={`/fichas/ent?requisitionId=${id}`}>Expedir ENT vinculada</DocumentMoreLink> : null}
                 {can(context, "com.create") ? (
-                  <Link
-                    className={buttonClass}
+                  <DocumentMoreLink
+                    icon="box" className={buttonClass}
                     href={`/fichas/com?requisitionId=${id}`}
                   >
                     Abrir COM vinculada
-                  </Link>
+                  </DocumentMoreLink>
                 ) : null}
               </>
             ) : null}
             {p.completedAt && !p.archivedAt && can(context, "req.archive") ? (
-              <button
+              <DocumentMoreButton
                 className={buttonClass}
                 disabled={busy}
-                onClick={() => openDecision("archive")}
+                icon="archive" onClick={() => openDecision("archive")}
               >
                 Revisar arquivamento manual
-              </button>
+              </DocumentMoreButton>
             ) : null}
             {!data.is_historical &&
               !p.archivedAt &&
               data.status !== "cancelled" &&
               can(context, "req.review") &&
               can(context, "req.create") ? (
-              <button
+              <DocumentMoreButton
                 className={buttonClass}
                 disabled={busy}
-                onClick={() => openDecision("cancel")}
+                danger icon="close" onClick={() => openDecision("cancel")}
               >
                 Cancelar requisição
-              </button>
+              </DocumentMoreButton>
             ) : null}
             {!data.is_historical && can(context, "req.create") ? (
-              <Link
+              <DocumentMoreLink
                 className={buttonClass}
                 href={`/fichas/req?careRecipientId=${data.care_recipient_id}&sourceRequisitionId=${id}`}
               >
                 Declarar nova necessidade remanescente
-              </Link>
+              </DocumentMoreLink>
             ) : null}
           </>
         }
@@ -517,25 +518,7 @@ export function RequisitionDocumentContent({
           </DocumentSection>
 
           <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
-      <details className="doc-help-details">
-        <summary>Minhas decisões em preparação</summary>
-        <p>
-          Consulte ou descarte seus próprios preenchimentos e reconheça
-          resultados anteriores. Esta consulta não repete decisões oficiais.
-        </p>
-        <div className="hca-toolbar">
-          {requisitionOperationPurposes.map((purpose) => (
-            <button
-              key={purpose}
-              type="button"
-              className={buttonClass}
-              onClick={() => openDecision(purpose, true)}
-            >
-              Consultar preparação: {requisitionDecisionLabels[purpose]}
-            </button>
-          ))}
-        </div>
-      </details>
+
 </aside></div></DocumentPanel>
         <DocumentPanel value="materials">
           <section

@@ -155,7 +155,13 @@ export function LoginForm() {
         <FormField label={"E-mail"} htmlFor={"login-email"}><TextInput id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={event => setEmail(event.currentTarget.value)} /></FormField>
         {!recovery ? <FormField label={"Senha"} htmlFor={"login-password"}><PasswordInput id="login-password" name="password" required disabled={!ready || loading} autoComplete="current-password" value={password} onChange={event => setPassword(event.currentTarget.value)} /></FormField> : null}
         {recovery ? <ActionButton type="submit" variant="primary" disabled={loading || !ready}>{loading ? "Solicitando…" : "Solicitar link de recuperação"}</ActionButton> : <>
-          <div className="auth-form-links"><ActionButton variant="quiet" type="button" onClick={recoverPassword} disabled={loading || !ready}>Esqueci minha senha</ActionButton></div>
+          <div className="auth-form-links"><ActionButton variant="quiet" type="button" onClick={() => {
+            setPassword(""); setError(""); setNotice("");
+            const query = new URLSearchParams({ access: "recover" });
+            const next = searchParams.get("next");
+            if (next) query.set("next", next);
+            router.push("/login?" + query);
+          }} disabled={loading || !ready}>Esqueci minha senha</ActionButton></div>
           <ActionButton type="submit" variant="primary" disabled={loading || !ready} >{loading ? <LoadingIndicator compact /> : undefined}{loading ? "Entrando..." : "Entrar"}</ActionButton>
           <div className="auth-or"><span>ou</span></div>
           <div className="google-row"><button className="google-button" type="button" aria-label="Continuar com Google" title="Continuar com Google" onClick={signInWithGoogle} disabled={loading || !ready}><svg width="21" height="21" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.2H24v8h11a9.4 9.4 0 0 1-4.1 6.2v5.2h6.7c3.9-3.6 6-8.8 6-15.2Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.7-5.2c-1.8 1.2-4.1 1.9-6.8 1.9-5.3 0-9.8-3.6-11.4-8.4H5.7v5.4A20.4 20.4 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.6 27.4a12.2 12.2 0 0 1 0-7.8v-5.4H5.7a20.3 20.3 0 0 0 0 18.6l6.9-5.4Z"/><path fill="#EA4335" d="M24 11.2c3 0 5.7 1 7.8 3l5.8-5.8A19.5 19.5 0 0 0 24 3a20.4 20.4 0 0 0-18.3 11.2l6.9 5.4c1.6-4.8 6.1-8.4 11.4-8.4Z"/></svg></button></div>
