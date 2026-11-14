@@ -79,7 +79,8 @@ for (const scenario of ["integral", "partial", "prior-consumption-inactive"]) {
       }
       assert.equal(sent.created_by, f.initiator.id);
       assert.equal(sent.recipient_id, f.recipient.id);
-      assert.equal(sent.code, "ENT-0002");
+      assert.equal(sent.code, "DEV-0001");
+      assert.equal(sent.kind, "DEV");
       assert.ok(sent.protocol);
       assert.equal(sent.status, "pending_receipt");
       if (scenario === "prior-consumption-inactive") {

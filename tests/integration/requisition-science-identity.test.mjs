@@ -29,14 +29,25 @@ test("P02 one shared expedition records a separate SCI for each linked material 
 });
 
 test("P02 a read-only historical REQ cannot become a new COM/ENT need or bypass mandatory SCI", async () => {
-  const f = await setup(), family = await actor("family", f.patient);
-  const physicalProtocol = Number(sql("select coalesce(max(physical_protocol),0)+1 from public.historical_requisition_imports;"));
-  await rpc(f.admin, "import_historical_requisitions", { p_source_hash: randomBytes(32).toString("hex"), p_rows: [{ physicalProtocol, careRecipientId: f.patient, status: "submitted", lines: [{ productId: f.products[0], currentStock: null, urgent: false }], extraItems: [], observations: ["Registro físico fictício somente para consulta."] }] });
-  const id = sql(`select id from public.requisitions where care_recipient_id=${sqlLiteral(f.patient)} and is_historical;`);
+  const f = await setup();
+  const physicalProtocol = Number(sql("select s from generate_series(1,11) s where not exists(select 1 from public.historical_requisition_imports h where h.physical_protocol=s) and not exists(select 1 from public.requisitions r where r.protocol='HC-'||lpad(s::text,6,'0')) order by s limit 1"));
+  if (physicalProtocol) {
+    const imported = await rpc(f.admin, "import_historical_requisitions", { p_source_hash: randomBytes(32).toString("hex"), p_rows: [{ physicalProtocol, careRecipientId: f.patient, status: "submitted", lines: [{ productId: f.products[0], currentStock: null, urgent: false }], extraItems: [], observations: ["Registro físico fictício somente para consulta."] }] });
+    assert.equal(imported.imported, 1);
+  } else {
+    // The approved physical range is 1–11. Repeated local runs preserve history;
+    // reuse only an active synthetic import created by this exact Auth fixture.
+    const prior = JSON.parse(sql(`select coalesce((select jsonb_build_object('patient',r.care_recipient_id,'product',(select i.product_id from public.requisition_items i where i.requisition_id=r.id and i.product_id is not null order by i.id limit 1)) from public.requisitions r join public.care_recipients c on c.id=r.care_recipient_id join public.historical_requisition_imports h on h.requisition_id=r.id join public.requisition_import_batches b on b.id=h.batch_id where r.is_historical and c.is_development and c.is_active and b.imported_by=${sqlLiteral(fixtures.adminA.id)} and exists(select 1 from public.requisition_observations o where o.requisition_id=r.id and o.body='Registro físico fictício somente para consulta.') order by r.created_at nulls last,r.id limit 1),'null'::jsonb)`));
+    assert.ok(prior, "A preserved synthetic historical fixture is required when protocols 1–11 are occupied");
+    f.patient = prior.patient;
+    f.products = [prior.product];
+  }
+  const family = await actor("family", f.patient);
+  const id = sql(`select id from public.requisitions where care_recipient_id=${sqlLiteral(f.patient)} and is_historical order by id limit 1;`);
   const line = sql(`select id from public.requisition_items where requisition_id=${sqlLiteral(id)};`);
   const before = sql(`select jsonb_build_object('request',(select to_jsonb(r) from public.requisitions r where id=${sqlLiteral(id)}),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id=${sqlLiteral(id)}),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)}));`);
   for (const p_type of ["COM", "ENT"]) for (const p_draft of [false, true]) {
-    const key = randomUUID(), lines = [{ requestFulfillment: "complete", productId: f.products[0], quantity: "2", requisitionItemIds: [line] }];
+    const key = randomUUID(), lines = [{ ...(p_type === "ENT" ? { requestFulfillment: "complete" } : {}), productId: f.products[0], quantity: "2", requisitionItemIds: [line] }];
     const p_payload = p_type === "COM" ? { origin: "purchase", lines } : { recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, lines };
     const result = await family.rpc("create_supply_document", { p_patient: f.patient, p_type, p_payload, p_draft, p_key: key });
     assert.equal(result.error?.code, "23514");

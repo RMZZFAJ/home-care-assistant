@@ -30,6 +30,15 @@ foram alinhados a R3 e passaram com Auth real: diferença física exige nova
 avaliação e não muda estoque por si só. Sem alteração de produto ou migrations.
 Publicação corretiva e acompanhamento até os navegadores continuam autorizados.
 
+A integração de `774ac04` executou 731 casos e revelou dez falhas: expectativas
+anteriores de DEV/menções e um acoplamento real da avaliação familiar à permissão
+de SCI. A correção separa a autoridade familiar (família/admin e ent.create)
+da autorização de ciência. Dez casos afetados e três negativas/concorrências
+novas passaram com Auth real. A migration incremental 20261114073734 foi
+aplicada após novo backup cifrado e pré-validação revertida; remoto em 258,
+eventos, estoque e guard de ciência preservados. O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md)
+contém os detalhes e o inventário de superfícies criadas.
+
 Registro histórico da publicação anterior de 14/11/2026: SHA `27e2f3e`
 na PR7 Draft. Treze migrations aplicadas no Supabase home-care-assistant após
 reconciliação, backup cifrado verificado e pré-validação revertida; total 255.

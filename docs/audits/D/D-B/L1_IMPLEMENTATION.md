@@ -204,6 +204,35 @@ Nenhuma regra de produto, migration, assertion de privacidade ou gate foi
 retirado. A nova publicação deve alcançar os testes de navegador antes do
 encerramento autorizado; o resultado anterior não valida seu novo SHA.
 
+Na rodada `774ac04`, a instalação limpa/evolução, SQLs, Windows e Ubuntu
+passaram. A integração executou 731 casos e revelou dez falhas. A investigação
+separou expectativas antigas de um defeito real: a avaliação familiar usava
+o helper de autorização de ciência, acoplando a permissão de atendimento à
+capacidade req.science e às designações de SCI.
+
+`20261114073734_l1_fulfillment_independent_authority.sql` corrige esse acoplamento.
+A avaliação exige vínculo ativo de família/admin, perfil/paciente ativos e
+ent.create, com sessão e contexto conferidos pelos comandos. Ciência continua
+com sua autorização e designação próprias. A reavaliação após diferença física
+usa a mesma autoridade independente; seus guards após espera continuam ativos.
+Não há concessão de ciência a outra pessoa nem movimento de estoque automático.
+
+As expectativas DEV agora conferem a série própria. A expansão de COM menciona
+uma pessoa que pode ler COM e mantém a negativa ao profissional sem leitura.
+O caso histórico usa payload válido de COM e preserva o limite físico de 1–11;
+em execuções locais repetidas, reutiliza somente a fixture sintética importada,
+sem apagar histórico. Os dez casos afetados e três contraprovas novas passaram
+com Auth real, incluindo revogação durante espera, falsificação por profissional
+e reavaliação familiar sem SCI, sem duplicata nem alteração de estoque.
+
+A migration foi aplicada no remoto após novo backup cifrado verificado:
+`94ca1747-7c9c-473d-b991-91334dbdd276`, 81 membros/16.241.830 bytes, manifesto
+`658f01c4ebc02fe367b84724b4b671c64c332d183e2b485dad1fd8fdae7f6a80`.
+Pré-validação revertida confirmou histórico 257 e ausência do helper após
+rollback. Histórico final 258; hashes de eventos, movimentos e do guard de
+ciência coincidem antes/depois, com 35 objetos Storage. Helper privado sem
+EXECUTE de cliente/worker. Sem reset, fixtures ou configuração Auth no remoto.
+
 Roteiro de avaliação: início → histórico/busca/filtros → REQ/Visão geral →
 Materiais/ciência → Arquivos/exemplar/anexo → validação pública e retorno.
 Conferir carregamento inicial simples e, em uma emissão ou ciência, as fases

@@ -67,7 +67,8 @@ test("a bilateral transfer separates Juliana's declaration, Ana's agreement and 
   assert.ifError(dispatched.error);
   assert.equal(dispatched.data.status, "pending_receipt");
   assert.equal(dispatched.data.recipient_id, f.recipient.id);
-  assert.match(dispatched.data.code, /^ENT-/);
+  assert.match(dispatched.data.code, /^DEV-/);
+  assert.equal(dispatched.data.kind, "DEV");
   const afterDispatch = JSON.parse(transferState(f));
   assert.equal(afterDispatch.ledger.length, before.ledger.length + 1);
   const accept = {

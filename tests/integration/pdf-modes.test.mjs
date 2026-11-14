@@ -5,12 +5,14 @@ import { progressPreparationFixture as fixture, progressFacts, actor, rpc, fixtu
 import { whileAdvisoryWaits } from "./lock-barrier.mjs";
 const options = (mode="expanded",sections=["progress","communications","confirmations","relations","access"]) => ({mode,sections,period:{from:null,through:null,timeZone:"America/Sao_Paulo"},purpose:mode==="audit"?"Conferência documental interna fictícia":null});
 const packet = (f,p_options=options(),p_key=randomUUID())=>({p_document:f.id,p_key,p_options});
-const publish = (f,text)=>rpc(f.family,"document_progress_publish",{p_document:f.id,p_key:randomUUID(),p_body:{...f.content.note,text,publication:{relevance:"milestone",mentions:[fixtures.professional.id]}}});
+const mentionedUser = f => f.type === "COM" ? fixtures.adminA.id : fixtures.professional.id;
+const publish = (f,text)=>rpc(f.family,"document_progress_publish",{p_document:f.id,p_key:randomUUID(),p_body:{...f.content.note,text,publication:{relevance:"milestone",mentions:[mentionedUser(f)]}}});
 const authorize = (f,user,cap,enabled) => sql("insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values("+[q(f.patient),q(user),q(cap),String(enabled)].join(",")+") on conflict (care_recipient_id,capability,subject_user) where subject_user is not null do update set enabled=excluded.enabled");
 
 test("expanded sources cover all four types, freeze all 25 notes and preserve selected data and historical intent",async()=>{
  for(const type of ["REQ","COM","ENT","BAL"]){
   const f=await fixture(type);await actor("adminA",f.patient);
+  if(type==="COM")assert.equal((await f.family.rpc("document_progress_publish",{p_document:f.id,p_key:randomUUID(),p_body:{...f.content.note,text:"Menção fictícia sem acesso COM",publication:{relevance:"normal",mentions:[fixtures.professional.id]}}})).error?.code,"42501");
   const count=type==="REQ"?25:1;for(let i=0;i<count;i++)await publish(f,"Andamento fictício de complemento "+i);
   const doc=await rpc(f.admin,"operational_document",{p_id:f.id});
   await rpc(f.admin,"record_document_access",{p_document:f.id,p_version:doc.version,p_key:randomUUID()});
@@ -18,7 +20,7 @@ test("expanded sources cover all four types, freeze all 25 notes and preserve se
   const before=progressFacts(f),p=packet(f),[a,b]=await Promise.all([rpc(f.admin,"reserve_pdf_expanded_issuance",p),rpc(f.admin,"reserve_pdf_expanded_issuance",p)]);
   assert.equal(a.id,b.id);assert.equal(a.rendererRevision,17);assert.equal(a.documentOptions.mode,"expanded");
   const expansion=a.snapshot.documentExpansion;assert.equal(expansion.progress.filter(x=>x.source==="manual").length,count);assert.equal(expansion.access.length,1);assert.equal(expansion.communications.length>=1,true);
-  assert.equal(expansion.progress.find(x=>x.source==="manual").mentions[0].id,fixtures.professional.id);
+  assert.equal(expansion.progress.find(x=>x.source==="manual").mentions[0].id,mentionedUser(f));
   assert.deepEqual(expansion.relations.references,a.snapshot.presentationFacts.references);
   for(const secret of ["destino-privado-nao-exportar","provedor-privado-nao-exportar"])assert.equal(JSON.stringify(expansion).includes(secret),false);
   assert.ok(expansion.communications.some(x=>x.recipientLabel==="Pessoa destinatária fictícia"));

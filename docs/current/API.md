@@ -1726,6 +1726,10 @@ o mínimo remoto conferido permanece em seis caracteres.
   reason e version. Nova avaliação familiar refere as quantidades físicas
   preservadas, sem novo estoque. Repetir a chave recupera o mesmo ato;
   concorrência/versão e autoridade são revalidadas no banco.
+  A decisão familiar exige vínculo ativo de família/admin e ent.create;
+  independe da permissão req.science e da designação para ciência. Dispensa
+  ou recusa de SCI não bloqueia uma avaliação familiar autorizada. Profissionais
+  não podem atribuir essa avaliação apenas por receberem ent.create.
 - GET /api/documents/:id/communications pagina avisos, estados reais e tentativas
   registradas. POST recebe key, originalId e channel e cria um reforço deliberado.
   Recuperar a chave não cria outro envio. Canal não configurado fica indisponível;
