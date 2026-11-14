@@ -1715,8 +1715,9 @@ atribuição e do catálogo. [Consumidores](../audits/D/D-B/STOCK_READ_VALIDATIO
 
 O marcador corrente é protocol=1, schema=2. Clientes com o contrato anterior
 precisam atualizar antes de enviar operações. A política de nova senha é mínimo
-8, A-Z, a-z, número e símbolo, até 72 bytes UTF-8; cliente, servidor e Auth local
-usam os mesmos grupos. Configuração remota permanece pendente de reconciliação.
+6, A-Z, a-z, número e símbolo, até 72 bytes UTF-8, conforme decisão expressa
+posterior do responsável. Cliente, servidor e Auth local usam os mesmos grupos;
+o mínimo remoto conferido permanece em seis caracteres.
 
 - POST /api/documents aceita requestFulfillment=partial|complete em cada linha
   ENT vinculada à REQ. A escolha é obrigatória e consciente; autor/instante vêm
@@ -1733,6 +1734,15 @@ usam os mesmos grupos. Configuração remota permanece pendente de reconciliaç�
   @todos, somente public. Pesquisa de pessoas/referências, localização por UUID,
   paginação, contagens, auditoria e PDF respeitam a mesma audiência. Uma referência
   não pode ampliar a audiência do registro reservado.
+- GET /api/documents/:id/progress aceita from e through opcionais, no formato
+  YYYY-MM-DD, com limites inclusivos do dia civil em America/Sao_Paulo. O banco
+  aplica a faixa antes de totalizar e paginar; audience, tipo manual/automático,
+  autorização e acesso a notas privadas continuam independentes. A resposta
+  com faixa inclui from, through e timeZone; sem faixa, conserva
+  o contrato anterior. Faixa invertida ou data inválida recebe erro de validação.
+- GET /api/documents conserva filtros, ordenação e paginação; REQs acrescentam
+  requisitionState com serviceStatus e scienceState. A interface pode mostrar
+  ciência pendente/registrada/histórica/dispensada sem inferi-la do atendimento.
 - GET /api/requisitions/:id/science?materialIdentity=... verifica somente a ciência
   expressa da identidade atual para aquele conteúdo. Não registra outro ato.
 - GET /api/verification/details?code=... exige Auth e leitura/contexto da emissão.

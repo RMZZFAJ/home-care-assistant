@@ -1,5 +1,205 @@
 # L1 — implementação E01–E03
 
+**Situação corrente: revisão visual reaberta em 14/11/2026.** O responsável
+rejeitou a correspondência visual da entrega publicada e determinou reprodução
+do laboratório, incorporando os comentários posteriores. A revisão ocorre na
+branch `feat/phase-d-implementation`. Os resultados anteriores abaixo preservam
+sua data e escopo, sem valer como aceite desta nova composição. Inclui-se a
+orientação adicional sobre carregamento sobreposto simples e carregamento com
+ícones e etapas nas operações demoradas. Nenhuma fase de carregamento pode
+anunciar um registro que ainda não tenha sido confirmado.
+
+## Refação visual de 14/11/2026
+
+Esta seção substitui a conclusão visual anterior. A fonte continua sendo o HTML
+v3 com as observações posteriores, sem alterar o laboratório nem criar outro
+protótipo. A base local preservada é `a017d9e`; a cabeça publicada anterior é
+`27e2f3e`, cuja CI falhou e cuja aparência foi rejeitada pelo responsável.
+
+### Composição reproduzida
+
+- Estrutura da aplicação: cabeçalho, contexto do paciente, navegação lateral e
+  inferior, largura da área de leitura, tipografia, espaços, ícones e controles.
+  Os estilos de produto do HTML foram portados para `src/app/lab-model.css`,
+  sem o painel de simulação. Os componentes foram reestruturados para consumi-los.
+- Início: atenção, atalhos, métricas com rodapé de acesso, lista de tarefas,
+  requisições e progresso, avisos e semana. Cada item usa o dado autorizado real;
+  não há alertas fictícios para preencher o desenho nem plantões simulados.
+- Histórico: busca permanente, filtros expansíveis em duas colunas, filtros
+  aplicados, contagem, linhas de ficha e paginação. URL, voltar/avançar,
+  erro/última consulta e proteção contra resposta antiga permanecem ativos.
+- Fichas: identificação, metadados, progresso recolhido, sugestão compacta e abas.
+  Visão geral usa Andamentos e cartões laterais. Materiais reúne acompanhamento,
+  busca/filtros, linha urgente e ciência. Comunicações, Arquivos e complementos
+  usam os mesmos cabeçalhos e cartões, com os respectivos comandos reais.
+- Arquivos: cartões compactos, ícone por tipo, visualizar/baixar/compartilhar e
+  identificação técnica expansível. Não há marcador triangular nativo preto.
+  Anexos ficam visíveis e a inclusão abre o diálogo; uma tentativa incerta
+  continua sendo recuperada dentro do próprio cartão.
+- Acesso e verificação: cartão de acesso, mostrar senha, cabeçalho público e
+  consulta em duas abas. Um PDF realmente emitido passa pelo verificador atual;
+  o resultado, seus detalhes e a consulta privada conservam a separação de fatos.
+
+As observações v3 continuam incorporadas: Materiais/Atendimento unidos,
+urgência na linha, cores e audiência de Andamentos, menções/referências,
+rascunho de quatro campos com CAS, retomada de anexo no cartão, tipos de arquivo,
+semântica de ciência/recebimento, DEV autônoma e R1/R3. A refação não reverte
+essas decisões para imitar os estados anteriores do HTML.
+
+### Carregamentos
+
+`OperationActivityHost` apresenta uma única sobreposição acessível, mesmo com
+leituras concorrentes. A versão simples usa o cartão central com ícone da casa
+e círculo. A versão por etapas usa a ligação entre ícones, mensagem da fase e
+lista de etapas, como no cenário próprio do laboratório. O movimento reduzido
+é respeitado; foco, teclado e bloqueio de cliques são controlados pelo diálogo.
+
+As fases vêm do estado da operação, sem cronômetro que simule conclusão:
+ciência distingue registro e conferência; emissão distingue preparação,
+pedido ao pipeline e confirmação do exemplar; decisão de convite distingue
+comando e leitura de confirmação. Durante uma operação pendente, Escape e
+clique fora não liberam a tela. Quando o estado termina, a sobreposição e sua
+captura de eventos são removidas. Consultas locais de Andamentos conservam
+o esqueleto do feed previsto no laboratório. Suspense e carregamento de rota
+também usam a sobreposição simples.
+
+### Superfícies criadas para fatos ausentes no laboratório
+
+São complementos do sistema real no mesmo padrão de cartões, ícones,
+disclosures e diálogos. Não representam alterações arbitrárias do desenho
+dos cenários que já existem.
+
+- **Ciência familiar em Materiais:** Cartão próprio distingue ciência atual,
+  pessoal, histórica e dispensada. Não transforma recebimento ou atendimento
+  em ciência.
+- **Dimensões independentes da REQ:** Atendimento, ciência e situação
+  documental continuam separados; não há quantidade solicitada inventada.
+- **Identificação do exemplar:** Disclosure compacto conserva emissão,
+  revisão, renderizador, instantes e hash; modos Ficha/Expandido/Auditoria
+  usam o pipeline existente e os bytes prontos não mudam.
+- **Comunicações completas:** Os cartões incluem tentativas, canal,
+  indisponibilidade, leitura, reforço e recuperação reais que o cenário
+  simplificado não enumera.
+- **Nova avaliação R3:** Cartão familiar apresenta a diferença física
+  preservada e exige nova avaliação antes da conclusão, sem conciliar estoque
+  automaticamente.
+- **Recuperação e concorrência:** Diálogos/ajudas apresentam CAS, rejeição,
+  preparação privada e resultado oficial incerto; preservam cada identidade de
+  tentativa e não ampliam autosave ou persistência entre aparelhos.
+- **Resumos adicionais do início:** Próximo plantão, estoque crítico e acervo
+  mantêm seus dados e acessos reais, usando os mesmos cartões e linhas.
+- **Orientação inicial existente:** Introdução ao guia usa o cartão verde
+  compacto do padrão, preservando progresso e continuidade reais.
+- **Verificação contextual:** Resultado técnico completo, confiança interna,
+  revogação de acesso e retorno seguro à ficha complementam a consulta pública
+  sem ampliar sua audiência.
+- **Identificação do contexto:** O rótulo Paciente atual acompanha o nome
+  real, pois não existe um nome de residência independente no contrato; o
+  seletor nativo e a troca autorizada permanecem.
+
+O calendário semanal e o filtro de período de Andamentos **existem no HTML**;
+foram conectados a dados e consultas reais, e não são classificados como criação.
+Os textos secundários que falharam na análise de contraste receberam ajuste
+pontual de cor, preservando composição, hierarquia e paleta.
+
+### Contratos e correções verificáveis
+
+Duas migrations incrementais acrescentam o necessário para apresentar fatos
+reais, sem editar migrations históricas:
+
+- `20261114053000_l1_progress_period.sql`: período civil inclusivo em
+  America/Sao_Paulo, aplicado antes de contar/paginar Andamentos. A mesma
+  autorização e audiência privada continuam valendo para a consulta inteira.
+- `20261114053800_l1_list_science_facts.sql`: listagem expõe serviço e ciência
+  como dimensões independentes da REQ. O estado de atendimento não substitui
+  o fato de ciência. Paginação, ordenação e escopo autorizado são preservados.
+
+As regressões nativas com Auth real conferem limites de dia, paginação,
+notas privadas, outro paciente, revogação e ciência independente do atendimento.
+A stack local existente foi conferida e atualizada sem reset ou substituição
+de dados. O mínimo de senha continua em seis caracteres por decisão expressa.
+
+As falhas conhecidas da CI publicada receberam correções dirigidas: o consumidor
+de preparação aceita `useParams()` ausente fora do App Router; a expectativa
+de grants inclui o worker autorizado `notification_pdf`; o teste documental usa
+o renderizador atual com emissão completa. Comparações entre duas renderizações
+independentes conferem conteúdo extraído por página, quantidades e paginação;
+identificadores internos de fontes/objetos PDF não são um oráculo de conteúdo.
+A recuperação de um exemplar pronto continua exigindo os mesmos bytes armazenados.
+
+Uma diferença da build de produção foi corrigida na origem: o chunk global
+da página de ausência carregava as correções antes do CSS do laboratório.
+`l1-ui.css` importa sua referência diretamente antes das correções; layout e
+página global passam a conservar a mesma ordem. A próxima rodada usa build
+otimizada para conferir essa ordem, em vez de extrapolar o modo diagnóstico.
+O diálogo de novo anexo conserva o input no DOM oculto quando fechado, para
+manter a seleção local durante uma consulta da lista; a seleção não é enviada
+ou persistida. Tentativas existentes são retomadas no cartão, sem abrir um
+formulário novo bloqueado. Consumidores de testes seguem esses controles reais.
+
+### Aplicação incremental remota desta refação
+
+Autorização do responsável para migrations preservada nesta conversa.
+Projeto `qwfrqychokvhdzakibid`, home-care-assistant, saudável; identidade do
+wrapper RMZZFAJ e CLI 2.121.0 conferidas. Foi usado o wrapper para preservar
+exatamente os números dos arquivos já aplicados localmente. O conector confirmou
+projeto, histórico e grants; a API de aplicação não recebe versão explícita.
+
+- Backup crítico `94f53318-bf7b-4330-aeb3-eaccd67f25c7`: 81 membros,
+  16.217.388 bytes, cifrado com chave separada e integridade verificada.
+  Manifesto SHA-256
+  `4acdcfdcf00b31c5cd6ceb9b862940472858e48eb6484e5cd1c54a54ad2605d3`.
+  Reconciliadas 255 migrations antes da alteração; sem restore ou prova D6.
+- As duas migrations foram pré-validadas em transação revertida, incluindo
+  grants authenticated e negativas anon/service_role. Após rollback, função
+  nova ausente e histórico ainda em 255. Aplicação sem seed, roles ou Vault.
+- Histórico final 257; dry-run sem pendências. Função de período presente,
+  authenticated autorizado, anon e service_role negados. Os 213 eventos e
+  11 movimentos conservam seus hashes anteriores; Storage mantém 35 objetos.
+  Nenhum reset, fixture, configuração Auth ou comunicação externa no remoto.
+
+A autorização posterior também determina push na mesma branch e acompanhamento
+da CI até os testes de navegador/mobile/iOS começarem corretamente. Qualquer
+falha anterior será corrigida antes de encerrar. Não exige aguardar a conclusão
+dos navegadores e não autoriza merge, release ou promoção de produção.
+
+### Conferência desta refação
+
+Os resultados anteriores deste documento são históricos. A nova conferência
+usa `tests/e2e/l1-laboratory-rework.spec.ts`, consumidores existentes e capturas
+em `output/playwright/l1-rework/` (artefatos locais ignorados pelo Git).
+Desktop de 1440 px e celular de 390 px são comparados com o produto do HTML
+na mesma largura, sem o painel do laboratório consumir parte da tela.
+
+Verificações locais: 25 casos unitários, duas regressões nativas com Auth real
+e a regressão SQL de service_role passaram. Foram conferidas 33 jornadas
+Chromium em produção local, repetindo apenas os casos afetados por correções.
+Incluem emissão real, conferência dos bytes, revogação, recuperação sem
+duplicatas, CAS, conteúdo histórico, filtros e sobreposições simples/por etapas.
+Tipos, ESLint dos fontes afetados, Markdown e check:contracts passaram;
+as 84 migrations históricas protegidas continuam intactas. A build otimizada
+passou. Os três cenários principais também passaram no diagnóstico anterior,
+que permanece distinguido da produção local. A rodada dirigida mobile/iOS
+acompanhará a publicação, sem substituir prova em aparelho físico.
+
+Fontes finais: `09a8f17` corrige a CI; `d55465b` concentra a refação visual,
+as duas projeções de banco e seus consumidores/testes. Os commits anteriores
+`37e9e24` e `a017d9e` permanecem, inclusive o mínimo de senha aprovado.
+Este registro e as matrizes constituem o fechamento documental do conjunto.
+O push autorizado usa
+`git push origin HEAD:refs/heads/feat/phase-d-implementation`
+e mantém a PR7 Draft. O SHA efetivamente publicado e o estado observado da CI
+serão informados ao responsável. Não há aceite visual ou aprovação geral
+presumida a partir desses resultados locais.
+
+Roteiro de avaliação: início → histórico/busca/filtros → REQ/Visão geral →
+Materiais/ciência → Arquivos/exemplar/anexo → validação pública e retorno.
+Conferir carregamento inicial simples e, em uma emissão ou ciência, as fases
+da sobreposição refinada. Conferir também recuperação de resposta perdida e
+troca de paciente, sem duplicação de atos.
+
+## Registro da publicação anterior
+
 Conjunto publicado com autorização de 14/11/2026. Push de `27e2f3e` para
 feat/phase-d-implementation, PR7 Draft; sem merge, release ou promoção de produção.
 Base preservada:

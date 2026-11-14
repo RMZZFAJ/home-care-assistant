@@ -1,14 +1,39 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-L1 publicado em 14/11/2026 com autorização do responsável: SHA `27e2f3e`
+**14/11/2026 — revisão visual reaberta pelo responsável.** A entrega publicada
+não foi aceita como reprodução do laboratório. A correção está em execução
+local na mesma branch, usando HTML v3 e comentários posteriores. As evidências
+anteriores continuam históricas; verificações de tokens, CI ou preview READY
+não representam aceite visual. A nova conferência inclui as sobreposições de
+carregamento simples e por etapas, conforme a orientação adicional do responsável.
+
+A refação reproduz a composição real de início, histórico, fichas, arquivos,
+acesso/verificação e navegação compartilhada. O registro L1 abaixo documenta
+também cada superfície criada para fatos que o laboratório não prevê.
+As duas migrations incrementais de período de Andamentos e ciência independente
+na listagem já estão no remoto: 257 migrations, backup cifrado verificado,
+pré-validação revertida e preservação dos eventos, estoque e objetos conferidos.
+Por instrução posterior do responsável, o conjunto será publicado na mesma
+branch e a execução será acompanhada até os testes de navegador/mobile/iOS
+começarem corretamente. Erro anterior a essa etapa exige correção e nova
+conferência; início de testes não equivale a CI concluída ou aceite visual.
+
+Código da refação em `d55465b`, correções da CI em `09a8f17`: 33 jornadas
+Chromium dirigidas passaram em produção local, com repetição dos casos afetados;
+25 unitários, duas integrações Auth, SQL de grants, tipos/lint/Markdown e
+check:contracts passaram. As 84 migrations históricas permanecem inalteradas.
+O próximo resultado da CI deve ser lido pelo SHA efetivamente publicado.
+
+Registro histórico da publicação anterior de 14/11/2026: SHA `27e2f3e`
 na PR7 Draft. Treze migrations aplicadas no Supabase home-care-assistant após
 reconciliação, backup cifrado verificado e pré-validação revertida; total 255.
 Eventos, estoque e exemplares anteriores preservados. Preview do SHA READY.
 A CI própria 43550944609 já havia terminado com falhas em testes unitários e
 na asserção de grants do replay. Não houve espera, merge ou promoção de produção.
 A decisão posterior de 14/11 mantém o mínimo de senha em 6 caracteres e o trabalho
-na branch feat/phase-d-implementation. O mínimo remoto já é 6; o ajuste local
-de validação, textos e configuração ainda não foi publicado.
+na branch feat/phase-d-implementation. O mínimo remoto já era 6; naquela
+observação, o ajuste local de validação, textos e configuração ainda não tinha
+sido publicado. O conjunto corrigido acima inclui essa decisão.
 O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md)
 concentra implementação, revisão CodeRabbit, publicação e provas/limites.
 Os números D-B abaixo mantêm o recorte histórico e não aprovam o L1.
