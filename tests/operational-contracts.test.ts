@@ -19,6 +19,9 @@ import { familyStockMovementSchema } from "@/lib/validation/stock";
 import { MetaWhatsAppProvider } from "@/lib/notifications/provider";
 import { renderDocumentPdf } from "@/lib/server/document-pdf";
 import { PDFDocument } from "pdf-lib";
+import { PDF } from "@libpdf/core";
+import { fidelityEmission } from "./support/pdf-fidelity-fixtures";
+import { currentPdfFixture } from "./support/current-pdf-fixture";
 const id = "20000000-0000-4000-8000-000000000001";
 describe("contratos operacionais exatos", () => {
   it("aplica a mesma precisão a números e texto sem arredondamento implícito", () => {
@@ -261,10 +264,17 @@ it("renderiza comprovante Unicode longo com paginação e versão estável", asy
       fully_checked: false,
     })),
   };
-  const first = await renderDocumentPdf(snapshot, "a".repeat(64));
-  const second = await renderDocumentPdf(snapshot, "a".repeat(64));
-  expect(first).toEqual(second);
+  const first = await renderDocumentPdf(currentPdfFixture(snapshot), "a".repeat(64), { ...fidelityEmission, rendererRevision: 16 });
+  const second = await renderDocumentPdf(currentPdfFixture(snapshot), "a".repeat(64), { ...fidelityEmission, rendererRevision: 16 });
+  // Independent renderings may assign different object/font IDs. The official
+  // issuance pipeline reuses stored bytes; this probe checks stable content.
+  const text = async (bytes: Uint8Array) => (await PDF.load(bytes)).extractText().map(page => page.lines.map(line => line.spans.map(span => span.chars.map(char => char.char).join("")).join(" ")).join(" "));
+  const firstText = await text(first), secondText = await text(second);
+  expect(firstText).toEqual(secondText);
+  expect(firstText.join(" ").match(/Produto com nome extenso e/g)).toHaveLength(45);
+  for (let index = 0; index < 45; index++) expect(firstText.join(" ")).toMatch(new RegExp("acentuação " + index + "\\b"));
   const pdf = await PDFDocument.load(first);
   expect(pdf.getPageCount()).toBeGreaterThan(1);
+  expect((await PDFDocument.load(second)).getPageCount()).toBe(pdf.getPageCount());
   expect(pdf.getTitle()).toContain("ENT-0001");
 });

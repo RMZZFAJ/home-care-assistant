@@ -13,7 +13,7 @@ export function ProgressPreparationSummary({
   content: ProgressPreparationContent;
 }) {
   const params = useParams();
-  const documentId = typeof params.id === "string" ? params.id : undefined;
+  const documentId = typeof params?.id === "string" ? params.id : undefined;
   return (
     <div className="hca-form-stack">
       <DefinitionGrid
