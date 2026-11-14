@@ -32,7 +32,7 @@ test("L1 acesso e início mantêm a composição em desktop, 360 e 412 pixels",a
   const f=await setup();const req=await issue(f.patient,f.products);await login(page,f.patient);
   const attention=page.locator(".hca-task-attention-banner"),dismiss=attention.getByRole("button",{name:"Ocultar este aviso por 24 horas",exact:true});
   if(await dismiss.count()){
-    const previous=await attention.getByRole("heading").innerText();
+    const previous=await attention.getByRole("heading").first().innerText();
     await dismiss.click();
     await expect(attention.getByRole("heading",{name:previous,exact:true})).toHaveCount(0);
   }
@@ -57,7 +57,7 @@ test("L1 ciência perdida recupera o mesmo conteúdo; @todos impede privado e Ma
     if(route.request().method()!=="POST")return route.continue();posts++;
     const response=await route.fetch();expect(response.ok()).toBe(true);await route.abort("failed");
   });
-  await page.getByRole("button",{name:"Dar ciência",exact:true}).click();
+  await page.getByRole("button",{name:"Dar ciência",exact:true}).click();await page.getByRole("button",{name:"Confirmar minha ciência",exact:true}).click();
   await expect(page.getByText("Ciência registrada para o conteúdo confirmado.",{exact:true})).toBeVisible();
   expect(posts).toBe(1);expect(sql(`select count(*) from public.requisition_science_events where requisition_id=${q(req.id)} and user_id=${q(fixtures.family.id)} and mode='express'`)).toBe("1");
   await page.unroute(`**/api/requisitions/${req.id}/science`);

@@ -26,7 +26,7 @@ async function fixture(page: Page) {
   await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email); await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, f.patient);
   await page.goto(`/historico/${doc.id}`);
-  await selectDocumentSection(page, "attachments"); await page.getByRole("button", { name: "Anexos e ficha física", exact: true }).click(); await expect(page.getByText("Nenhum anexo registrado.", { exact: true })).toBeVisible();
+  await selectDocumentSection(page, "attachments"); await page.getByRole("button", { name: "Adicionar anexo", exact: true }).click(); await expect(page.getByText("Nenhum anexo registrado.", { exact: true })).toBeVisible();
   const source = await sharp({ create: { width: 8, height: 4, channels: 3, background: "#123456" } }).png().toBuffer();
   return { ...f, owner, doc, source, file: { name: "ficha-fisica.png", mimeType: "image/png", buffer: source } };
 }
@@ -60,9 +60,9 @@ test("C-FINAL023 anexos ocultam lista recusada e recuperam leitura sem perder ar
   const f = await fixture(page);
   await picker(page).setInputFiles(f.file); await submit(page).click();
   const link = page.getByRole("link", { name: f.file.name, exact: true });
-  await expect(link).toBeVisible(); await expect(picker(page)).toBeEnabled();
+  await expect(link).toBeVisible(); await page.getByRole("button",{name:"Adicionar anexo",exact:true}).click(); await expect(picker(page)).toBeEnabled();
   const pending = { ...f.file, name: "nova-foto-ainda-nao-enviada.png" };
-  await picker(page).setInputFiles(pending);
+  await picker(page).setInputFiles(pending); await page.getByRole("button",{name:"Fechar diálogo",exact:true}).click();
   const original = rows(f.doc.id), official = facts(f.doc.id);
   let writes = 0;
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/attachments" && request.method() !== "GET") writes++; });
@@ -87,7 +87,8 @@ test("anexo confirmado com resposta perdida congela escolha e GET recupera o mes
   await loseConfirmedResponse(page, "upload");
   await picker(page).setInputFiles(f.file); await submit(page).click(); await expect(picker(page)).toBeDisabled();
   await expect(page.getByRole("button", { name: "Recuperar envio do anexo", exact: true })).toBeEnabled();
-  await expect(page.getByRole("link", { name: f.file.name, exact: true })).toBeVisible();
+  await page.getByRole("button",{name:"Fechar diálogo",exact:true}).click(); await expect(page.getByRole("link", { name: f.file.name, exact: true })).toBeVisible();
+  await page.getByRole("button",{name:"Recuperar envio do anexo",exact:true}).click();
   expect(await page.evaluate(() => document.documentElement.dataset.attachmentFaultUpstream)).toBe("201:confirmed");
   const [stored] = rows(f.doc.id); expect(stored.state).toBe("ready"); expect(rows(f.doc.id)).toHaveLength(1);
   const different = await sharp({ create: { width: 8, height: 4, channels: 3, background: "#abcdef" } }).png().toBuffer();
@@ -125,7 +126,7 @@ test("perda antes da reserva conserva arquivo e chave e permite concluir a mesma
 test("reserva preparada permite abandono explícito recuperável sem apagar história ou criar ato operacional", async ({ page }, info) => {
   const f = await fixture(page), before = facts(f.doc.id), version = sql(`select version from public.operational_documents where id=${q(f.doc.id)}`);
   await loseConfirmedResponse(page, "prepareAndAbandon");
-  await picker(page).setInputFiles(f.file); await submit(page).click(); const abandonButton = page.getByRole("button", { name: "Abandonar tentativa incompleta", exact: true }); await expect(abandonButton).toBeVisible();
+  await picker(page).setInputFiles(f.file); await submit(page).click(); await page.getByRole("button",{name:"Fechar diálogo",exact:true}).click(); const abandonButton = page.getByRole("button", { name: "Abandonar tentativa incompleta", exact: true }); await expect(abandonButton).toBeVisible();
   await abandonButton.click(); const dialog=page.getByRole("dialog",{name:"Abandonar tentativa incompleta",exact:true});
   for(const width of [320,390,768,1024,1440]){await page.setViewportSize({width,height:1100});await auditFromTop(page,"abandon reservation modal "+width);expect(await dialog.evaluate(n=>{const r=n.getBoundingClientRect();return r.top>=0&&r.left>=0&&r.bottom<=innerHeight&&r.right<=innerWidth;})).toBe(true);if(width===320)await dialog.screenshot({path:info.outputPath("abandon-modal-320.png"),animations:"disabled"});}
   await page.keyboard.press("Escape");await expect(dialog).toHaveCount(0);await expect(abandonButton).toBeFocused();await abandonButton.press("Enter");
@@ -135,16 +136,16 @@ test("reserva preparada permite abandono explícito recuperável sem apagar hist
   await page.getByRole("button", { name: "Confirmar abandono desta tentativa", exact: true }).click(); await expect(picker(page)).toBeEnabled();
   await expect(page.getByRole("button",{name:"Atualizar anexos",exact:true})).toBeFocused();
   const [abandoned] = rows(f.doc.id); expect(sql(`select count(*) from public.audit_events where action='attachment.abandoned' and entity_id=${q(abandoned.id)}`)).toBe("1"); expect(sql(`select version from public.operational_documents where id=${q(f.doc.id)}`)).toBe(version); expect(facts(f.doc.id)).toBe(before);
-  await picker(page).setInputFiles({ ...f.file, name: "nova-ficha.png" }); await submit(page).click(); await expect(page.getByRole("link", { name: "nova-ficha.png", exact: true })).toBeVisible(); expect(rows(f.doc.id)).toHaveLength(2); expect(rows(f.doc.id).filter((row: { state: string }) => row.state === "ready")).toHaveLength(1);
+  await page.getByRole("button",{name:"Adicionar anexo",exact:true}).click(); await picker(page).setInputFiles({ ...f.file, name: "nova-ficha.png" }); await submit(page).click(); await expect(page.getByRole("link", { name: "nova-ficha.png", exact: true })).toBeVisible(); expect(rows(f.doc.id)).toHaveLength(2); expect(rows(f.doc.id).filter((row: { state: string }) => row.state === "ready")).toHaveLength(1);
 });
 
 test("abandon dialog clears server metadata after native membership denial without abandoning the reservation", async ({page})=>{
   const f=await fixture(page),before=facts(f.doc.id);await loseConfirmedResponse(page,"prepareAndAbandon");
-  await picker(page).setInputFiles(f.file);await submit(page).click();await page.getByRole("button",{name:"Abandonar tentativa incompleta",exact:true}).click();
+  await picker(page).setInputFiles(f.file);await submit(page).click();await page.getByRole("button",{name:"Fechar diálogo",exact:true}).click();await page.getByRole("button",{name:"Abandonar tentativa incompleta",exact:true}).click();
   const dialog=page.getByRole("dialog",{name:"Abandonar tentativa incompleta",exact:true});await expect(dialog).toContainText(f.file.name);
   await page.route("**/api/attachments",async route=>{if(route.request().method()==="PATCH")sql("update public.care_recipient_memberships set status='revoked' where care_recipient_id="+q(f.patient)+" and user_id="+q(fixtures.family.id));await route.continue();});
   const denied=page.waitForResponse(r=>new URL(r.url()).pathname==="/api/attachments"&&r.request().method()==="PATCH");await dialog.getByRole("button",{name:"Confirmar abandono desta tentativa",exact:true}).click();expect([403,404]).toContain((await denied).status());
-  await expect(dialog).toHaveCount(0);await expect(page.locator(".hca-file-title")).toHaveCount(0);expect(rows(f.doc.id)).toHaveLength(1);expect(rows(f.doc.id)[0].state).toBe("quarantine");expect(facts(f.doc.id)).toBe(before);
+  await expect(dialog).toHaveCount(0);await expect(page.locator(".doc-file-title")).toHaveCount(0);expect(rows(f.doc.id)).toHaveLength(1);expect(rows(f.doc.id)[0].state).toBe("quarantine");expect(facts(f.doc.id)).toBe(before);
   expect(sql("select count(*) from public.audit_events where action='attachment.abandoned' and entity_id="+q(rows(f.doc.id)[0].id))).toBe("0");
 });
 
@@ -164,8 +165,8 @@ test("upload concluído no Storage é recuperado após recarga sem arquivo local
   const a = await rpc(f.owner, "prepare_attachment_attempt", { p_patient: f.patient, p_document: f.doc.id, p_movement: null, p_filename: f.file.name, p_mime: "image/jpeg", p_bytes: bytes.length, p_key: key, p_source_hash: digest(f.source), p_source_bytes: f.source.length, p_source_mime: "image/png", p_hash: hash, p_transformation: "image-normalized-v1" });
   await rpc(worker, "attest_attachment_source", { p_id: a.id, p_actor: fixtures.family.id, p_source_hash: digest(f.source), p_source_bytes: f.source.length, p_source_mime: "image/png", p_hash: hash, p_transformation: "image-normalized-v1" });
   await rpc(f.owner, "begin_attachment_upload", { p_id: a.id, p_source_hash: digest(f.source), p_hash: hash, p_token: token }); const result = await f.owner.storage.from("patient-evidence").upload(a.object_path, bytes, { contentType: "image/jpeg", upsert: false }); expect(result.error).toBeNull();
-  await page.reload(); await page.getByRole("button", { name: "Anexos e ficha física", exact: true }).click(); await expect(page.getByText("Resultado do envio pendente", { exact: false })).toBeVisible();
-  await expect(picker(page)).toBeDisabled(); await expect(submit(page)).toBeDisabled();
+  await page.reload(); await expect(page.getByText("Resultado do envio pendente", { exact: false })).toBeVisible();
+  await expect(picker(page)).toBeDisabled(); await expect(page.getByRole("button",{name:"Adicionar anexo",exact:true})).toBeDisabled();
   await expect(page.getByRole("button", { name: "Abandonar tentativa incompleta", exact: true })).toHaveCount(0); await page.getByRole("button", { name: "Consultar e recuperar tentativa", exact: true }).click(); await expect(page.getByRole("link", { name: f.file.name, exact: true })).toBeVisible();
   await expect(picker(page)).toBeEnabled();
   expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].sha256).toBe(hash); expect(sql(`select count(*) from public.document_events where document_id=${q(f.doc.id)} and action='attachment.bound' and body->'event'->>'attachmentId'=${q(a.id)}`)).toBe("1"); expect(facts(f.doc.id)).toBe(before);
@@ -179,10 +180,10 @@ test("retomada após recarga confere o original e a recuperação recusa bytes d
     await rpc(worker, "attest_attachment_source", { p_id: a.id, p_actor: fixtures.family.id, p_source_hash: digest(f.source), p_source_bytes: f.source.length, p_source_mime: "image/png", p_hash: hash, p_transformation: "image-normalized-v1" }); return a;
   }
   const key = randomUUID(), a = await prepare(key, f.file.name);
-  await page.reload(); await page.getByRole("button", { name: "Anexos e ficha física", exact: true }).click(); await expect(picker(page)).toBeDisabled();
-  await page.getByRole("button", { name: "Retomar com arquivo original", exact: true }).click(); const originalPicker = page.getByLabel("Arquivo original para retomar", { exact: true });
-  await originalPicker.setInputFiles({ ...f.file, buffer: Buffer.from("outros bytes") }); await submit(page).click(); await expect(page.getByText(/Este arquivo não corresponde ao original/)).toBeVisible(); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].state).toBe("quarantine");
-  await originalPicker.setInputFiles({ ...f.file, name: "copia-renomeada.dat", mimeType: "application/octet-stream" }); await submit(page).click(); await expect(page.getByRole("link", { name: f.file.name, exact: true })).toBeVisible(); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].id).toBe(a.id); expect(rows(f.doc.id)[0].upload_key).toBe(key);
+  await page.reload(); await expect(picker(page)).toBeDisabled();
+  await page.getByRole("button", { name: "Retomar envio", exact: true }).click(); const originalPicker = page.getByLabel("Arquivo original para retomar", { exact: true });
+  await originalPicker.setInputFiles({ ...f.file, buffer: Buffer.from("outros bytes") }); await expect(page.getByText(/Este arquivo não corresponde ao original/)).toBeVisible(); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].state).toBe("quarantine");
+  await originalPicker.setInputFiles({ ...f.file, name: "copia-renomeada.dat", mimeType: "application/octet-stream" }); await expect(page.getByRole("link", { name: f.file.name, exact: true })).toBeVisible(); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].id).toBe(a.id); expect(rows(f.doc.id)[0].upload_key).toBe(key);
   const corrupted = await prepare(randomUUID(), "divergencia-ficticia.png");
   await rpc(f.owner, "begin_attachment_upload", { p_id: corrupted.id, p_source_hash: digest(f.source), p_hash: hash, p_token: randomUUID() }); const inserted = await f.owner.storage.from("patient-evidence").upload(corrupted.object_path, Buffer.from("bytes divergentes controlados"), { contentType: "image/jpeg", upsert: false }); expect(inserted.error).toBeNull();
   await page.getByRole("button", { name: "Atualizar anexos", exact: true }).click(); await page.getByRole("button", { name: "Consultar e recuperar tentativa", exact: true }).click(); await expect(page.getByText(/O arquivo encontrado diverge desta tentativa/)).toBeVisible();

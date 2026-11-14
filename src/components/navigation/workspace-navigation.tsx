@@ -77,7 +77,9 @@ export function WorkspaceNavigation({ context, operational = false, onNavigate }
 }
 export function BottomNavigation({ context }: { context: WorkspaceContext }) {
   const pathname = usePathname();
-  return <nav className="hca-bottom-navigation print:hidden" aria-label="Navegação do plantão">{operationalDestinations.filter((item) => !item.capability || can(context, item.capability)).map((item) => <Link key={item.href} href={item.href} prefetch={false} aria-current={pathname === item.href.split("?")[0] ? "page" : undefined}>
+  const operational = ["professional", "supervisor"].includes(context.patient?.role ?? "");
+  const destinations = operational ? operationalDestinations : operationalDestinations.map(item => item.label === "Estoque" ? { ...item, href: "/estoque?custody=FAMILY", capability: "stock.family.read" } : item);
+  return <nav className="hca-bottom-navigation print:hidden" aria-label={operational ? "Navegação do plantão" : "Navegação principal no celular"}>{destinations.filter((item) => !item.capability || can(context, item.capability)).map((item) => <Link key={item.href} href={item.href} prefetch={false} aria-current={pathname === item.href.split("?")[0] ? "page" : undefined}>
     <Icon name={item.icon!} /><span>{item.label}</span>
   </Link>)}</nav>;
 }

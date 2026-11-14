@@ -14,16 +14,17 @@ type OverlayProps = {
   finalFocus?: ComponentProps<typeof BaseDialog.Popup>["finalFocus"];
   id?: string;
   keyboardScrollable?: boolean;
+  keepMounted?: boolean;
 };
 
-function Overlay({ open, title, children, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false }: OverlayProps & { side?: "start" | "end" }) {
+function Overlay({ open, title, children, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false, keepMounted = false }: OverlayProps & { side?: "start" | "end" }) {
   const titleId = useId();
   return <BaseDialog.Root open={open} disablePointerDismissal={closeDisabled} onOpenChange={(next, details) => {
     if (next) return;
     if (closeDisabled) details.cancel(); else onClose();
   }}>
-    <BaseDialog.Portal>
-      <div className="hca-overlay">
+    <BaseDialog.Portal keepMounted={keepMounted}>
+      <div className="hca-overlay hca-l1" hidden={keepMounted && !open}>
         <BaseDialog.Backdrop className="hca-modal-backdrop" />
         <BaseDialog.Viewport className={side ? "hca-drawer-viewport" : "hca-modal-viewport"} data-side={side}>
           <BaseDialog.Popup id={id} aria-labelledby={titleId} className={side ? "hca-modal hca-drawer" : "hca-modal"} finalFocus={finalFocus}>

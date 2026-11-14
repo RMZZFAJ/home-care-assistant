@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
@@ -15,6 +16,7 @@ export function PasswordRecoveryForm() {
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
+  useOperationActivity(busy, { title: "Atualizando sua senha", detail: "Aguarde a confirmação da solicitação." });
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   async function submit(event: FormEvent) {

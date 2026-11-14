@@ -1,8 +1,10 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { z } from "zod";
 import { PdfDocumentOptions } from "./pdf-document-options";
 import { pdfDocumentOptionsSchema, documentModeLabel, type PdfDocumentOptions as DocumentOptions } from "@/lib/documents/pdf-modes";
 import { FileRecord } from "@/components/ui/file-record";
+import Link from "next/link";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { buttonClass, can, Notice } from "@/components/workspace";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
@@ -107,6 +109,8 @@ function GeneratedFiles({
     [readError, setReadError] = useState(""),
     [pending, setPending] = useState<Intention | null>(null);
   const [optionsOpen, setOptionsOpen] = useState(false), [integrityError, setIntegrityError] = useState(false);
+  const [activityStage, setActivityStage] = useState(0);
+  useOperationActivity(busy, { title: "Emissão de PDF", detail: "Estamos conferindo a mesma solicitação. Aguarde a confirmação do exemplar.", stage: activityStage, steps: [{ label: "Preparando a emissão", icon: "file" }, { label: "Gerando e assinando o exemplar", icon: "shield" }, { label: "Conferindo o arquivo registrado", icon: "check" }] });
   const busyRef = useRef(false),
     sequenceRef = useRef(0);
   const invalidate = useCallback(() => {
@@ -200,6 +204,7 @@ function GeneratedFiles({
     if (busyRef.current || integrityError || generationBlocked && !pending) return;
     busyRef.current = true;
     setBusy(true);
+    setActivityStage(0);
     setError("");
     setMessage("Consultando a mesma intenção de emissão…");
     try {
@@ -210,12 +215,14 @@ function GeneratedFiles({
       };
       sessionStorage.setItem(scope, JSON.stringify(intention));
       setPending(intention);
+      setActivityStage(1);
       const raw = await api<unknown>(endpoint, {
         idempotencyKey: intention.key,
         ...(intention.version ? { version: intention.version } : {}),
         ...(intention.documentOptions ? { documentOptions: intention.documentOptions } : {}),
       });
       const parsed = pdfIssuanceSchema.safeParse(raw);
+      setActivityStage(2);
       if (!parsed.success || parsed.data.documentId !== id || parsed.data.requestedBy !== userId || intention.version && parsed.data.version !== intention.version || JSON.stringify(parsed.data.documentOptions) !== JSON.stringify(intention.documentOptions))
         throw new TransportError(
           "A resposta não confirmou o exemplar. Recupere esta mesma emissão.",
@@ -294,12 +301,10 @@ function GeneratedFiles({
     const options = entry.issuance.documentOptions;
     return !options || (options.mode !== "audit" || canAudit) && (!options.sections.includes("access") || canAccess);
   });
+  const verification = visibleRows.find(entry => entry.issuance.state === "ready")?.issuance;
   return (
-    <section aria-labelledby={headingId} className="space-y-3 print:hidden">
-      <h3 id={headingId} className="font-semibold">
-        Arquivos gerados
-      </h3>
-      <div className="flex flex-wrap gap-3">
+    <section aria-labelledby={headingId} className="doc-area print:hidden">
+      <header className="doc-section-heading"><div><h2 id={headingId}>Arquivos gerados</h2><p>Exemplares emitidos a partir desta ficha.</p></div><div className="doc-heading-actions">
         <DocumentActionSlot target={actionTarget}>
           <button
             className={buttonClass}
@@ -326,14 +331,10 @@ function GeneratedFiles({
         >
           Atualizar arquivos
         </button>
-      </div>
+        <button className={buttonClass} type="button" disabled={busy || Boolean(pending) || integrityError || generationBlocked} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button>
+      </div></header>
       {generationBlocked ? <p role="status">Atualize a ficha para gerar um novo PDF. Os exemplares já emitidos continuam disponíveis.</p> : null}
-      <button className={buttonClass} type="button" disabled={busy || Boolean(pending) || integrityError || generationBlocked} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button>
       <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={optionsOpen} onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} onGenerate={value => { setOptionsOpen(false); onAction?.(); void generate(value); }} />
-      <p className="text-xs text-(--muted)">
-        Cada nova geração cria um exemplar. Visualizar e baixar recuperam o
-        arquivo registrado.
-      </p>
       {message ? <p role="status">{message}</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {readError ? <Notice error>{readError}</Notice> : null}
@@ -345,37 +346,41 @@ function GeneratedFiles({
           emissão explícita.
         </p>
       ) : null}
-      <ul className="hca-file-records" aria-label="Exemplares registrados">
+      <div className="doc-card doc-file-acervo"><ul className="doc-file-list doc-file-list-compact" aria-label="Exemplares registrados">
         {visibleRows.map((entry) => {
           const row = entry.issuance;
           return (
             <FileRecord key={row.id} identity={row.id} mime="application/pdf"
-              title={<>{code}{row.documentOptions ? " · " + documentModeLabel(row.documentOptions) : ""} · Versão {row.version} · {steps[row.step]}</>}
+              title={<>{code} · {row.documentOptions ? documentModeLabel(row.documentOptions) : "Ficha"}{row.version < (version ?? row.version) ? <span className="doc-chip">Conteúdo anterior</span> : null}</>}
               actions={<>              {row.state === "ready" ? (
-                <div className="mt-2 flex flex-wrap gap-3">
+                <>
                   <a
                     className={buttonClass}
                     href={`/api/documents/${id}/pdf?issuance=${row.id}`}
                     target="_blank"
                     rel="noopener"
                   >
-                    Visualizar PDF
+                    <Icon name="eye" />Visualizar
                   </a>
-                  <a
-                    className={buttonClass}
+                  <span className="doc-file-icon-actions"><a
+                    className="btn btn-icon"
+                    aria-label="Baixar PDF"
+                    title="Baixar PDF"
                     href={`/api/documents/${id}/pdf?issuance=${row.id}`}
                     download
                   >
-                    Baixar PDF
+                    <Icon name="download" />
                   </a>
                   <button
-                    className={buttonClass}
+                    className="btn btn-icon"
+                    aria-label="Compartilhar PDF"
+                    title="Compartilhar PDF"
                     type="button"
                     onClick={() => void share(row)}
                   >
-                    Compartilhar PDF
-                  </button>
-                </div>
+                    <Icon name="upload" />
+                  </button></span>
+                </>
               ) : (
                 <p className="text-sm">
                   {row.state === "uncertain"
@@ -385,25 +390,18 @@ function GeneratedFiles({
               )}
               </>}
             >
-              <p className="text-sm">
-                Solicitado por {row.requestedName} ·{" "}
-                {formatBrazilDate(row.requestedAt)}
-              </p>
-              {row.readyAt ? (
-                <p className="text-sm">
-                  Emissão concluída em {formatBrazilDate(row.readyAt)} ·
-                  Assinatura técnica e carimbo internos
-                </p>
-              ) : null}
+              <p className="doc-file-edition">{row.id}</p>
+              <div className="doc-file-meta"><span><Icon name="user" width={13} height={13} />{row.requestedName}</span><span><Icon name="clock" width={13} height={13} /><time dateTime={row.readyAt ?? row.requestedAt}>{formatBrazilDate(row.readyAt ?? row.requestedAt)}</time></span>{row.state !== "ready" ? <span>{steps[row.step]}</span> : null}</div>
               {row.representation === "derived" ? (
                 <p className="text-sm">
                   Nova representação de uma versão histórica, gerada no momento
                   indicado.
                 </p>
               ) : null}
-              <details className="mt-2 text-sm">
+              <details className="doc-help-details hca-file-identification">
                 <summary>Identificação do exemplar</summary>
-                <p className="break-all">{row.id}</p>
+                <p>Conteúdo da revisão {row.version}. {steps[row.step]}.</p>
+                <p>Solicitado em {formatBrazilDate(row.requestedAt)}.{row.readyAt ? ` Emissão concluída em ${formatBrazilDate(row.readyAt)}. Assinatura técnica e carimbo internos.` : ""}</p>
                 <p className="break-all">
                   Código: HCA-{row.verificationCode.match(/.{4}/g)?.join("-")}
                 </p>
@@ -411,7 +409,9 @@ function GeneratedFiles({
             </FileRecord>
           );
         })}
-      </ul>
+      </ul></div>
+      <p className="doc-footnote"><Icon name="info" width={14} height={14} />Visualizar ou baixar reutiliza o mesmo exemplar. Cada nova geração cria um exemplar.</p>
+      {verification ? <Link className="btn btn-ghost" href={`/verificar/emissao/${verification.verificationCode}?returnTo=${encodeURIComponent(`/documentos/${id}?documentTab=files`)}`}><Icon name="shield" />Abrir validação pública</Link> : null}
       {next ? (
         <button
           className={buttonClass}

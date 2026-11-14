@@ -1,6 +1,7 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Dialog } from "@/components/ui/primitives";
+import { Dialog, Icon } from "@/components/ui/primitives";
 import { api, Notice } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
@@ -32,10 +33,11 @@ export function RelatedDocument({
       <button
         ref={triggerRef}
         type="button"
-        className="min-h-11 text-left font-semibold underline"
+        aria-label={label}
+        className="doc-linked-row"
         onClick={(event) => { event.currentTarget.focus(); setOpen(true); }}
       >
-        {label}
+        <span className="doc-linked-kind" data-type={type}>{type}</span><span className="doc-linked-main"><strong>{label}</strong><small>Consultar ficha</small></span><Icon name="chevron" width={16} height={16} />
       </button>
       {open ? <Dialog open title={label} onClose={close}>
         {type === "REQ" ? <RequisitionOpening id={id} withinDialog onCancel={close}><RelatedContent id={id} type={type} /></RequisitionOpening> : <RelatedSupplyContent key={id + type} id={id} type={type} />}
@@ -46,6 +48,7 @@ export function RelatedDocument({
 function RelatedSupplyContent({ id, type }: { id: string; type: SupplyType }) {
   const decode = useCallback((value: unknown) => parseRelatedSupplyRead(value, id, type), [id, type]);
   const read = useScopedRead(`/api/documents/${id}`, "", decode);
+  useOperationActivity(read.loading, { title: "Consultando a ficha relacionada", detail: "A ficha de origem permanece disponível após esta consulta." });
   const data = !read.loading && !read.error ? read.data?.data : null;
   return <div className="space-y-4" aria-busy={read.loading}>
     <button type="button" className="min-h-11 font-semibold underline" aria-disabled={read.loading} onClick={() => { if (!read.loading) read.refresh(); }}>Atualizar consulta</button>

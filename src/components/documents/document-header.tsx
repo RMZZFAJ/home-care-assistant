@@ -86,7 +86,7 @@ export function DocumentHeader({
   const actionClosedRef = useRef(false);
   const facts = [
     ...metadata.slice(0, 1),
-    { label: dateHeading, value: dateLabel ?? formatBrazilDate(createdAt) },
+    { label: dateHeading, value: dateLabel ?? (createdAt ? new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short" }).format(new Date(createdAt)) : formatBrazilDate(createdAt)) },
     ...metadata.slice(1),
     ...(patientName ? [{ label: "Paciente", value: patientName }] : []),
   ];
@@ -111,13 +111,12 @@ export function DocumentHeader({
           <div className="hca-document-tags">
             <StatusBadge status={status} label={statusLabel} />
             {badges}
-            {contextLabel ? <Pill>Perfil: {contextLabel}</Pill> : null}
           </div>
         </div>
         <dl className="hca-document-meta">
           {facts.map((fact) => (
             <div key={fact.label}>
-              <dt>{fact.label}</dt>
+              <dt><Icon name={fact.label === "Materiais" ? "box" : fact.label === "Paciente" ? "home" : /Emissão|Registro|Data/.test(fact.label) ? "calendar" : "user"} width={13} height={13} />{fact.label}</dt>
               <dd>{fact.value}</dd>
             </div>
           ))}
@@ -162,9 +161,8 @@ export function DocumentHeader({
           >
             <Popover.Trigger
               render={
-                <ActionButton ref={moreTriggerRef}>
+                <ActionButton ref={moreTriggerRef} className="btn-icon" aria-label="Mais opções da ficha" title="Mais opções da ficha">
                   <Icon name="more" />
-                  Mais
                 </ActionButton>
               }
             />
@@ -192,6 +190,7 @@ export function DocumentHeader({
                 </div>
               ) : null}
               <h2>Protocolo e identificação</h2>
+              {contextLabel ? <Pill>Perfil: {contextLabel}</Pill> : null}
               <dl>
                 <div>
                   <dt>Código</dt>
@@ -208,6 +207,7 @@ export function DocumentHeader({
                   <dd>{id}</dd>
                 </div>
                 <div><dt>Revisão técnica</dt><dd>{version}</dd></div>
+                <div><dt>Instante do registro</dt><dd>{formatBrazilDate(createdAt)}</dd></div>
               </dl>
               <ActionButton onClick={() => { const url = new URL(window.location.href); url.searchParams.set("documentTab", "history"); window.history.replaceState(null, "", url.pathname + url.search + url.hash); actionClosedRef.current = true; setMoreOpen(false); }}>Identificação e registros preservados</ActionButton>
               <ActionButton

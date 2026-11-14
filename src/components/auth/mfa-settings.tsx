@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { SettingsSection } from "@/components/forms/settings-section";
 import Image from "next/image";
 import { useEffect, useState, type FormEvent } from "react";
@@ -22,6 +23,7 @@ export function MfaSettings() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  useOperationActivity(busy, { title: "Confirmando a verificação de segurança", detail: "Aguarde a confirmação da solicitação." });
   const [attempt, setAttempt] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);

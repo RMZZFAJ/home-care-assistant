@@ -51,8 +51,8 @@ export function DocumentFileView({
     <Workspace title="Arquivos do documento">
       {() =>
         doc ? (
-          <section className="ui-card space-y-4">
-            <h2>
+          <section className="hca-record-detail doc-page">
+            <header className="doc-section-heading"><div><h2>
               {currentRecord?.code ?? "Documento autorizado"}
               {version
                 ? ` · Versão de origem ${version}`
@@ -62,7 +62,7 @@ export function DocumentFileView({
               Baixe um exemplar registrado ou solicite explicitamente outra
               emissão. Uma nova representação histórica usa o momento e a
               assinatura técnica atuais.
-            </p>
+            </p></div></header>
             {error ? (
               <Notice error>{error}</Notice>
             ) : currentRecord ? (

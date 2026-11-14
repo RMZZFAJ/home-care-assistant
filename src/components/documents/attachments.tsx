@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { ApiError, requireRuntimeCommandsAvailable } from "@/lib/client/api";
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { z } from "zod";
@@ -6,7 +7,7 @@ import { api, buttonClass, errorMessage, inputClass, Notice, primaryClass } from
 import { FileRecord } from "@/components/ui/file-record";
 import { DefinitionGrid } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
-import { SettingsSection } from "@/components/forms/settings-section";
+import { Icon } from "@/components/ui/icon";
 import { attachmentForm, attachmentMaxBytes, attachmentMaxLabel, attachmentPrepared, confirmedAttachment, freezeAttachment, type FrozenAttachment } from "@/lib/documents/attachment-attempt";
 
 const hash = z.string().regex(/^[a-f0-9]{64}$/);
@@ -23,8 +24,10 @@ export function Attachments(props: Props) {
   return <ScopedAttachments key={`${props.patientId}:${props.documentId ?? ""}:${props.movementId ?? ""}:${props.contingencyId ?? ""}`} {...props} />;
 }
 function ScopedAttachments({ patientId, documentId, movementId, contingencyId, writable = false, onChange }: Props) {
+  const [adding, setAdding] = useState(false);
   const [files, setFiles] = useState<Attachment[]>([]), [error, setError] = useState(""), [readError, setReadError] = useState(""), [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false), [loading, setLoading] = useState(true), [attempt, setAttempt] = useState(0);
+  useOperationActivity(busy, { title: "Processando o anexo", detail: "Estamos conferindo a mesma solicitação. Aguarde a confirmação do arquivo." });
   const [fileInvalid, setFileInvalid] = useState(false), [fileValidation, setFileValidation] = useState(0);
   const fileErrorId = useId(), focusFileRef = useRef(false);
   const [frozen, setFrozen] = useState<FrozenAttachment | null>(null), [uncertain, setUncertain] = useState(false);
@@ -73,7 +76,7 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     const receipt = confirmedAttachment(body, pending.sourceSha256, preparedIdRef.current);
     if (!receipt) throw new Error("A resposta não confirma esta tentativa. Consulte o envio antes de iniciar outro.");
     if (!mountedRef.current) return;
-    clearPending(); setMessage("Anexo confirmado. O arquivo está disponível na lista."); setAttempt(value => value + 1); onChange?.();
+    clearPending(); setAdding(false); setMessage("Anexo confirmado. O arquivo está disponível na lista."); setAttempt(value => value + 1); onChange?.();
   }
   async function commandFor(file: Attachment, action: "recover" | "abandon") {
     return api<unknown>("/api/attachments", { careRecipientId: patientId, documentId, movementId, contingencyId, id: file.id, key: file.uploadKey, action }, undefined, "PATCH");
@@ -171,14 +174,14 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     } catch (reason) { if (!deniedRead(reason)) setError(reason instanceof Error ? reason.message : "Não foi possível confirmar o abandono."); }
     finally { setBusy(false); }
   }
-  return <SettingsSection title="Anexos e ficha física" summary={`${files.length} arquivo(s) · foto e PDF vinculados à operação`}>
-    <button ref={refreshRef} className={buttonClass} disabled={busy} onClick={() => { setLoading(true); setAttempt(value => value + 1); }}>Atualizar anexos</button>
+  return <section className="doc-area" aria-label="Anexos e ficha física"><header className="doc-section-heading"><div><h2>Anexos</h2><p>Arquivos vinculados à ficha, separados dos exemplares emitidos.</p></div><div className="doc-heading-actions"><button ref={refreshRef} className={buttonClass} disabled={busy} onClick={() => { setLoading(true); setAttempt(value => value + 1); }}><Icon name="refresh" />Atualizar anexos</button>{writable ? <button className={primaryClass} type="button" disabled={busy || newPreparationBlocked} onClick={() => setAdding(true)}><Icon name="plus" />{frozen ? "Recuperar envio do anexo" : "Adicionar anexo"}</button> : null}</div></header>
+    {unresolved && !frozen ? <p role="status">Há uma tentativa em andamento. Consulte ou retome no cartão do arquivo antes de adicionar outro anexo.</p> : null}
     <p className="mt-2 text-xs text-(--muted)">Até dez arquivos ou reservas em andamento. Novos envios de até {attachmentMaxLabel}. Fotos e PDFs são convertidos para leitura segura; confira o arquivo disponível. A foto da ficha física continua como alternativa ao formulário.</p>
-    {error && !abandonTarget ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
+    {error && !abandonTarget && !adding && !resumeTarget ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
     {readError ? <Notice error>Não foi possível consultar a lista de anexos. {readError} Atualize esta seção.</Notice> : null}
     {message ? <Notice>{message}</Notice> : null}
     {loading ? <p className="mt-3 text-sm" role="status">Consultando anexos…</p> : null}
-    <ul className="hca-file-records" aria-label="Arquivos anexados">{files.map(file => <FileRecord key={file.id} identity={file.id} mime={file.mime_type} filename={file.filename}
+    <ul className="doc-card doc-file-list doc-file-list-compact" aria-label="Arquivos anexados">{files.map(file => <FileRecord key={file.id} identity={file.id} mime={file.mime_type} filename={file.filename}
       title={file.url ? <a href={file.url} target="_blank" rel="noopener">{file.filename}</a> : file.filename}>
       <DefinitionGrid items={[{ label: "Tamanho disponível", value: Math.ceil(file.bytes / 1024) + " KB" }, { label: "Estado", value: file.state === "ready" ? "Validado" : file.state === "rejected" ? "Rejeitado" : file.pending ? "Resultado do envio pendente" : "Preparado; envio não confirmado" }]} />
       <details className="mt-2"><summary className="cursor-pointer text-xs">Origem e conversão do arquivo</summary>
@@ -207,12 +210,14 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
       </> : null}
     </Dialog>
     {!loading && !files.length && !readError ? <p className="mt-4 text-sm text-(--muted)">Nenhum anexo registrado.</p> : null}
-    {writable && !resumeTarget ? <form className="mt-4 space-y-3" onSubmit={upload}>
+    {writable && !resumeTarget ? <Dialog keepMounted open={adding} title="Adicionar anexo" closeDisabled={busy} onClose={() => setAdding(false)}><form className="hca-form-stack" onSubmit={upload}>
+      {adding && error ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
+      {adding && readError ? <Notice error>{readError}</Notice> : null}
       {unresolved && !frozen && !resumeTarget ? <p role="status">Consulte ou retome a tentativa em andamento antes de preparar outro anexo.</p> : null}
       <label className="block text-sm font-semibold">{resumeTarget ? "Arquivo original para retomar" : "Adicionar foto ou PDF"}<input ref={fileInputRef} className={inputClass} type="file" name="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-invalid={fileInvalid} aria-describedby={fileInvalid ? fileErrorId : undefined} onChange={() => { setFileInvalid(false); setError(""); }} disabled={busy || Boolean(frozen) || newPreparationBlocked} required={!frozen} /></label>
       {frozen ? <p role="status">Arquivo desta tentativa: {frozen.file.name}. A escolha fica bloqueada até confirmar ou abandonar uma reserva sem envio pendente.</p> : null}
       <button type="submit" className={primaryClass} aria-disabled={busy || newPreparationBlocked}>{busy ? "Validando e enviando…" : uncertain ? "Recuperar envio do anexo" : "Enviar anexo"}</button>
       {resumeTarget && !frozen ? <button type="button" className={buttonClass} disabled={busy} onClick={() => setResumeTarget(null)}>Voltar à preparação de novo arquivo</button> : null}
-    </form> : null}
-  </SettingsSection>;
+    </form></Dialog> : null}
+  </section>;
 }

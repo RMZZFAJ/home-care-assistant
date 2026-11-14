@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { roleLabel } from "@/lib/role-labels";
 
 import Link from "next/link";
@@ -36,6 +37,7 @@ export function AcceptInvitation() {
   const [actorId, setActorId] = useState<string | null>(null);
   const [previewScope, setPreviewScope] = useState(0);
   const [reading, setReading] = useState(false), [linkIssue, setLinkIssue] = useState("");
+  useOperationActivity(!ready || reading || busy, { title: reading ? "Consultando o convite" : busy ? "Confirmando sua solicitação" : "Preparando seu acesso", detail: "Aguarde enquanto conferimos as informações deste convite." });
   const scopeRef = useRef(0), tokenRef = useRef<string | null>(null);
   const actorRef = useRef<string | null | undefined>(undefined);
   useEffect(() => {

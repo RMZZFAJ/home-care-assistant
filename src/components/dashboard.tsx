@@ -9,6 +9,7 @@ import type { DashboardData } from "@/types/dashboard";
 import { ManagementDashboard } from "./dashboard/management-dashboard";
 import { OperationsDashboard } from "./dashboard/operations-dashboard";
 import { GlobalDashboard } from "./dashboard/global-dashboard";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 
 export function Dashboard() {
   return <Workspace title="Visão geral">{(context) => context.activeContext?.mode === "global" ? <GlobalDashboard context={context} /> : context.patient ? <PatientDashboard key={context.userId + ":" + context.patient.id} context={context} /> : <EmptyState title="Seu espaço de cuidado começa aqui">Selecione um contexto autorizado para acompanhar suas próximas tarefas.</EmptyState>}</Workspace>;
@@ -18,6 +19,7 @@ function PatientDashboard({ context }: { context: WorkspaceContext; }) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  useOperationActivity(!data && !error, { title: "Carregando o início", detail: "Estamos consultando suas tarefas e os dados deste paciente." });
   useEffect(() => {
     const controller = new AbortController();
     void api<{ data: DashboardData; }>("/api/dashboard?careRecipientId=" + context.patient!.id, undefined, controller.signal).then((result) => {

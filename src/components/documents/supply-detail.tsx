@@ -1,4 +1,6 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { DocumentSection } from "@/components/ui/model-section";
 import { DocumentComplementsPanel } from "@/components/documents/document-complements";
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { roleLabel } from "@/components/layout/workspace-context";
@@ -106,6 +108,7 @@ export function SupplyDocumentContent({
   const [people, setPeople] = useState<PatientPerson[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  useOperationActivity(loading && !data || busy, { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
   const [readDenied, setReadDenied] = useState(false);
@@ -616,7 +619,7 @@ export function SupplyDocumentContent({
     );
   }
   return (
-    <div className="hca-record-detail space-y-5">
+    <div className="hca-record-detail doc-page">
       {data ? (
         <DocumentBreadcrumb
           code={
@@ -960,15 +963,6 @@ export function SupplyDocumentContent({
           </DocumentHeader>
           <DocumentFreshness stale={stale} loading={loading || busy} onRefresh={refreshDocument} />
           {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
-          <DocumentTabs
-            rootRef={tabs.rootRef}
-            type={data.type}
-            value={tabs.value}
-            onSelect={tabs.select}
-            auditAllowed={can(context, "audit.read")}
-          >
-            <DocumentPanel value="overview">
-              {data.protocol ? <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={data.version} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
               {followUpStep && (loading || readFailed || operationOpen) ? (
                 <Notice>
                   {operationOpen
@@ -1009,6 +1003,14 @@ export function SupplyDocumentContent({
                 )}
                 onOpen={() => tabs.select(followUpStep?.section ?? "workflow", Boolean(followUpStep))}
               />}
+          <DocumentTabs
+            rootRef={tabs.rootRef}
+            type={data.type}
+            value={tabs.value}
+            onSelect={tabs.select}
+            auditAllowed={can(context, "audit.read")}
+          >
+            <DocumentPanel value="overview"><div className="doc-overview-grid"><div className="doc-main-column">
               <DocumentProgress
                 actionTarget={progressActionTarget}
                 onAction={() => tabs.select("overview")}
@@ -1017,7 +1019,9 @@ export function SupplyDocumentContent({
                 patientId={data.care_recipient_id}
                 context={context}
               />
-            </DocumentPanel>
+</div><aside className="doc-side-column"><DocumentSection title="Observações da emissão" icon="file">{data.payload.notes ? <ol className="doc-original-notes"><li>{data.payload.notes}</li></ol> : <p className="doc-subtle">Sem observações.</p>}<div className="doc-author-line"><span className="doc-avatar" aria-hidden="true">{documentIssuerName(data.canonical_snapshot).split(" ").slice(0,2).map(part => part[0]).join("")}</span><span><strong>{documentIssuerName(data.canonical_snapshot)}</strong><small>{formatBrazilDate(data.created_at)}</small></span></div></DocumentSection>
+              {data.protocol ? <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={data.version} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
+</aside></div></DocumentPanel>
             <DocumentPanel value="materials">
               {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} onReviewed={() => setAttempt(value => value + 1)} /> : null}
               <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>

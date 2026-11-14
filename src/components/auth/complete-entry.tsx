@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { completeEntry } from "@/lib/auth/complete-entry";
@@ -11,6 +12,7 @@ export function CompleteEntry() {
   const router = useRouter(), params = useSearchParams();
   const [error, setError] = useState(""), [retry, setRetry] = useState(0);
   const next = params.get("next");
+  useOperationActivity(!error, { title: "Confirmando seu acesso", detail: "Estamos validando sua conta e o destino autorizado." });
   useEffect(() => {
     let active = true;
     async function enter() {

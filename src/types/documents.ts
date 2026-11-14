@@ -472,6 +472,7 @@ export const documentStatuses: Record<string, string> = {
 };
 
 export type DocumentSummary = {
+  requisitionState?: { serviceStatus: "historical" | "cancelled" | "archived" | "completed" | "fulfillment_partial" | "awaiting_fulfillment"; scienceState: "recorded" | "pending" | "waived" | "unavailable" };
   id: string;
   version: number;
   type: DocumentType;

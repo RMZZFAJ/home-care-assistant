@@ -4,9 +4,11 @@ import {
   createContext,
   use,
   useId,
+  useState,
   type ComponentProps,
   type ReactNode,
 } from "react";
+import { Icon } from "./icon";
 
 type Variant = "primary" | "secondary" | "quiet" | "danger";
 type ButtonStyle = { variant?: Variant; compact?: boolean; roomy?: boolean };
@@ -18,6 +20,8 @@ function buttonClasses(
 ) {
   return classes(
     "hca-control",
+    "btn",
+    variant === "primary" ? "btn-primary" : variant === "quiet" ? "btn-ghost" : variant === "danger" ? "btn-danger" : undefined,
     `hca-control--${variant}`,
     compact && "hca-control--compact",
     roomy && "hca-control--roomy",
@@ -105,8 +109,8 @@ export function FormField({
     errorId = error ? `${id}-error` : undefined;
   return (
     <FieldContext value={{ id, helpId, errorId, required }}>
-      <div className="hca-field">
-        <label htmlFor={id}>
+      <div className="hca-field field">
+        <label className="field-label" htmlFor={id}>
           {label}
           {required ? <span aria-hidden="true"> *</span> : null}
         </label>
@@ -168,7 +172,7 @@ export function TextInput({
       {...props}
       {...field}
       className={classes(
-        "hca-text-input",
+        "hca-text-input input",
         roomy && "hca-text-input--roomy",
         className,
       )}
@@ -189,9 +193,15 @@ export function SelectField({ className, ...props }: ComponentProps<"select">) {
     <select
       {...props}
       {...field}
-      className={classes("hca-text-input", className)}
+      className={classes("hca-text-input input", className)}
     />
   );
+}
+
+export function PasswordInput({ revealLabel = "senha", ...props }: Omit<TextInputProps, "type" | "leading"> & { revealLabel?: string }) {
+  const [visible, setVisible] = useState(false);
+  const field = useFieldAttributes(props);
+  return <span className="password-control"><TextInput {...props} {...field} type={visible ? "text" : "password"} /><button className="password-eye" type="button" aria-label={(visible ? "Ocultar " : "Mostrar ") + revealLabel} aria-pressed={visible} disabled={props.disabled} onClick={() => setVisible(current => !current)}><Icon name="eye" width={17} height={17} /></button></span>;
 }
 export function TextAreaField({
   className,

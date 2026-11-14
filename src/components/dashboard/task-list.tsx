@@ -1,5 +1,5 @@
 "use client";
-import { Pill } from "@/components/ui/controls";
+import { ModelSectionHead } from "@/components/ui/model-section";
 import Link from "next/link";
 
 import { EmptyState, Icon, type IconName } from "@/components/ui/primitives";
@@ -7,11 +7,11 @@ import type { DashboardTask } from "@/types/dashboard";
 
 const icons: Record<DashboardTask["kind"], IconName> = { science: "check", delivery: "truck", purchase: "stock", balance: "forms", archive: "history", occurrence: "forms" };
 export function TaskList({ tasks, title }: { tasks: DashboardTask[]; title: string }) {
-  return <section className="hca-records" aria-label={title}>
-    <div className="hca-dashboard-section-heading"><h2>{title}</h2><Pill tone={tasks.length ? "warning" : "neutral"}>{tasks.length ? "Prioridades" : "Sem itens nesta consulta"}</Pill></div>
-    {tasks.length ? tasks.map((task) => <Link className="hca-record" key={task.id} href={task.href} prefetch={false}>
-      <span className={`hca-task-icon ${task.priority === "attention" ? "hca-task-attention" : ""}`}><Icon name={icons[task.kind]} /></span>
-      <span className="hca-record-main"><strong>{task.title}</strong><small>{task.description}</small></span><Icon name="arrow" />
-    </Link>) : <EmptyState title="Nenhuma tarefa nesta seleção">Novas pendências autorizadas aparecerão aqui.</EmptyState>}
+  return <section className="card tasks-card" aria-label={title}>
+    <ModelSectionHead title={title} icon="note" action={tasks.length ? <span className="badge badge-neutral">{tasks.length}</span> : undefined} />
+    <div className="av-task-list">{tasks.length ? tasks.map((task) => <Link className="av-task" key={task.id} href={task.href} prefetch={false}>
+      <span className="task-icon"><Icon name={icons[task.kind]} width={18} height={18} /></span>
+      <span><strong>{task.title}</strong><small>{task.description}</small></span><Icon name="chevron" width={17} height={17} />
+    </Link>) : <EmptyState title="Nenhuma pendência por aqui">Novas tarefas para você aparecerão nesta lista.</EmptyState>}</div>
   </section>;
 }

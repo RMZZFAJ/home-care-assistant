@@ -7,8 +7,8 @@ export { api, ApiError, errorMessage } from "@/lib/client/api";
 export { can, may } from "@/lib/client/capabilities";
 
 export const inputClass = "hca-text-input";
-export const buttonClass = "hca-control hca-control--secondary";
-export const primaryClass = "hca-control hca-control--primary";
+export const buttonClass = "hca-control hca-control--secondary btn";
+export const primaryClass = "hca-control hca-control--primary btn btn-primary";
 export const panelClass = "ui-card";
 
 export function Notice({

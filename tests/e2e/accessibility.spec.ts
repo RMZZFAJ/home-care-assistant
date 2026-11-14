@@ -62,7 +62,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
     await audit(page, path);
   }
   await page.goto("/historico?careRecipientId=" + patientA);
-  await page.getByRole("button", { name: /Pesquisar e filtrar/ }).click();
+  await page.getByRole("button", { name: /Filtros/ }).click();
   await audit(page, "history expanded");
   const opened = await openNavigation(page);
   await expect(

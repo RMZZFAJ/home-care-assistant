@@ -10,6 +10,7 @@ const row = z.object({
   code: z.string().min(1).nullable(), protocol: z.string().min(1).nullable(),
   status: z.string().min(1).max(80), created_at: z.string().datetime({ offset: true }),
   recipient_id: z.uuid().nullable(),
+  requisitionState: z.object({ serviceStatus: z.enum(["historical", "cancelled", "archived", "completed", "fulfillment_partial", "awaiting_fulfillment"]), scienceState: z.enum(["recorded", "pending", "waived", "unavailable"]) }).optional(),
   fulfillment: z.object({ fulfilled: count, total: count, partial: count.optional() })
     .refine(value => value.fulfilled <= value.total).nullable().optional(),
   task: z.object({ code: z.string(), label: z.string() }).nullable().optional(),

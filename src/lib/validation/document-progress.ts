@@ -126,6 +126,9 @@ const page = z
     size: z.number().int().min(1).max(50),
     total: z.number().int().nonnegative(),
     canPublish: z.boolean(),
+    from: z.iso.date().nullable().optional(),
+    through: z.iso.date().nullable().optional(),
+    timeZone: z.literal("America/Sao_Paulo").optional(),
     data: z.array(progressRowSchema).max(50),
   })
   .strict();
@@ -165,6 +168,7 @@ export function parseProgressPage(
   id: string,
   filter: string,
   selectedPage: number,
+  period?: { from: string | null; through: string | null },
 ) {
   const result = page.safeParse(value);
   if (!result.success)
@@ -177,6 +181,7 @@ export function parseProgressPage(
     parsed.filter !== filter ||
     parsed.page !== selectedPage ||
     parsed.size !== 20 ||
+    (period && (parsed.from !== period.from || parsed.through !== period.through || parsed.timeZone !== "America/Sao_Paulo")) ||
     parsed.data.some(
       (row) =>
         row.documentId !== id || (filter !== "all" && row.source !== filter),
@@ -187,6 +192,8 @@ export function parseProgressPage(
     throw new Error(
       "A consulta de Andamentos não corresponde à ficha e à página selecionadas.",
     );
+  if (period && parsed.data.some(row => { const day = new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(new Date(row.recordedAt)); return period.from && day < period.from || period.through && day > period.through; }))
+    throw new Error("A consulta de Andamentos não corresponde ao período selecionado.");
   for (let index = 1; index < parsed.data.length; index++) {
     const before = parsed.data[index - 1],
       current = parsed.data[index];

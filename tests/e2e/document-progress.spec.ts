@@ -101,7 +101,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
     exact: true,
   });
   await editor
-    .getByRole("button", { name: "Continuar rascunho", exact: true })
+    .getByRole("button", { name: "Continuar o rascunho", exact: true })
     .click();
   await expect(
     editor.getByRole("textbox", { name: "Texto do andamento", exact: true }),
@@ -115,14 +115,14 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
     .getByLabel("Código da ficha a vincular", { exact: true })
     .fill(com.code);
   await editor
-    .getByRole("button", { name: "Buscar fichas para referência", exact: true })
+    .getByRole("button", { name: "Buscar fichas e andamentos", exact: true })
     .click();
   await editor
     .getByRole("textbox", { name: "Texto do andamento", exact: true })
     .fill("x".repeat(2000));
   await editor
     .getByRole("button", {
-      name: "Inserir referência " + com.code,
+      name: "Inserir ficha " + com.code,
       exact: true,
     })
     .click();
@@ -140,7 +140,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
     .fill(text);
   await editor
     .getByRole("button", {
-      name: "Inserir referência " + com.code,
+      name: "Inserir ficha " + com.code,
       exact: true,
     })
     .click();
@@ -203,8 +203,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
     ),
   ).toBeNull();
   await feed
-    .getByRole("combobox", { name: "Mostrar Andamentos", exact: true })
-    .selectOption("manual");
+    .getByRole("group", { name: "Mostrar Andamentos", exact: true }).getByRole("button", { name: "Manuais", exact: true }).click();
   await expect(
     feed.getByRole("article").getByText(fullText, { exact: true }),
   ).toBeVisible();
@@ -213,7 +212,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   await expect(feed.getByRole("article")).toContainText("Pessoas mencionadas: " + mentionedName + " · Profissional");
   await expect(feed.locator("img")).toHaveCount(0);
   await expect(
-    feed.getByRole("button", { name: com.code, exact: true }),
+    feed.getByRole("region", { name: "Cronologia de andamentos", exact: true }).getByRole("button", { name: com.code, exact: true }),
   ).toBeVisible();
   expect(
     sql(
@@ -261,8 +260,7 @@ test("Andamentos alcançam todos os registros, separam fatos e ocultam consulta 
     exact: true,
   });
   await feed
-    .getByRole("combobox", { name: "Mostrar Andamentos", exact: true })
-    .selectOption("manual");
+    .getByRole("group", { name: "Mostrar Andamentos", exact: true }).getByRole("button", { name: "Manuais", exact: true }).click();
   for (const [pageNumber, count, first] of [
     [1, 20, 0],
     [2, 20, 20],
@@ -277,8 +275,7 @@ test("Andamentos alcançam todos os registros, separam fatos e ocultam consulta 
       await feed.getByRole("button", { name: "Próximos", exact: true }).click();
   }
   await feed
-    .getByRole("combobox", { name: "Mostrar Andamentos", exact: true })
-    .selectOption("automatic");
+    .getByRole("group", { name: "Mostrar Andamentos", exact: true }).getByRole("button", { name: "Automáticos", exact: true }).click();
   await expect(
     feed.getByText("Registro fictício 0", { exact: true }),
   ).toHaveCount(0);

@@ -142,7 +142,7 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
     };
     page.on("request", record);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-    const more = page.getByRole("button", { name: "Mais", exact: true });
+    const more = page.getByRole("button", { name: "Mais opções da ficha", exact: true });
     await more.click();
     const identifiers = page.locator(".hca-document-identifiers");
     await expect(identifiers).toContainText(id);
@@ -198,7 +198,7 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
     ).toBeVisible();
     await selectDocumentSection(page, "attachments");
     await expect(
-      page.getByRole("button", { name: "Anexos e ficha física", exact: true }),
+      page.getByRole("button", { name: "Adicionar anexo", exact: true }),
     ).toBeVisible();
     await selectDocumentSection(page, "history");
     await expect(
@@ -427,7 +427,7 @@ test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação
   await closeDocumentMore(page);
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.family.id)},'req.create',true);`);
   await page.reload();
-  const more = page.getByRole("button", { name: "Mais", exact: true }),
+  const more = page.getByRole("button", { name: "Mais opções da ficha", exact: true }),
     before = official(req.id, f.patient);
   await more.focus();
   await more.press("Enter");

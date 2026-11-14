@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 
 import {
   useCallback,
@@ -160,6 +161,10 @@ function ProgressContent({
   actionTarget,
   onAction,
 }: ProgressProps) {
+  const [collapsed, setCollapsed] = useState(false);
+  const [period, setPeriod] = useState("all"), [from, setFrom] = useState(""), [through, setThrough] = useState("");
+  const [range, setRange] = useState<{ from: string | null; through: string | null }>({ from: null, through: null });
+  const [periodError, setPeriodError] = useState("");
   const [filter, setFilter] = useState<ProgressPage["filter"]>("all"),
     [page, setPage] = useState(1);
   const storageKey = `hca:progress:${context.userId}:${id}`;
@@ -180,7 +185,7 @@ function ProgressContent({
     void api<unknown>(`/api/documents/${id}/progress/location?record=${encodeURIComponent(anchor)}`, undefined, controller.signal).then(raw => {
       const result = z.object({ data: z.object({ documentId: z.uuid(), recordId: z.uuid(), page: z.number().int().positive() }) }).parse(raw).data;
       if (result.documentId !== id || result.recordId !== anchor) throw new Error("Referência indisponível.");
-      if (!controller.signal.aborted) { setFilter("all"); setPage(result.page); setAnchorError(""); }
+      if (!controller.signal.aborted) { setFilter("all"); setPeriod("all"); setRange({ from: null, through: null }); setPage(result.page); setAnchorError(""); }
     }).catch(() => { if (!controller.signal.aborted) setAnchorError("Este andamento não está disponível no seu contexto autorizado."); });
     return () => controller.abort();
   }, [id, anchor]);
@@ -215,15 +220,16 @@ function ProgressContent({
         id,
         filter,
         page,
+        range.from || range.through ? range : undefined,
       );
       if (result.documentType !== type)
         throw new Error("Os Andamentos não correspondem ao tipo desta ficha.");
       return result;
     },
-    [id, filter, page, type],
+    [id, filter, page, type, range],
   );
   const read = useScopedRead(
-    `/api/documents/${id}/progress?filter=${filter}&page=${page}`,
+    `/api/documents/${id}/progress?` + new URLSearchParams({ filter, page: String(page), ...(range.from ? { from: range.from } : {}), ...(range.through ? { through: range.through } : {}) }),
     String(revision),
     decode,
   );
@@ -246,6 +252,7 @@ function ProgressContent({
     context.activeContext?.mode === "patient" &&
     can(context, "document.progress.create"),
   );
+  useOperationActivity(command.busy, { title: "Registrando o andamento", detail: "Estamos conferindo o registro. O preenchimento permanece preservado." });
   const privateDraft = useCreationDraft({
     userId: context.userId,
     patientId,
@@ -626,18 +633,11 @@ function ProgressContent({
   }
   return (
     <section
-      className="ui-card hca-progress-feed"
+      className="doc-card doc-feed-card hca-progress-feed"
       aria-label="Andamentos da ficha"
       aria-busy={read.loading}
     >
-      <div className="hca-section-heading">
-        <div>
-          <h2>Andamentos</h2>
-          <p>
-            Fatos documentais e registros complementares, do primeiro ao mais
-            recente. Etapa relacionada não muda a ordem.
-          </p>
-        </div>
+      <header className="doc-card-head"><div><h2><Icon name="history" width={19} height={19} />Andamentos</h2><p>{feed ? feed.total + " registros · ordem cronológica" : "Ordem cronológica"}</p></div><div className="doc-feed-head-actions"><ActionButton className="btn-icon" aria-label="Atualizar Andamentos" aria-disabled={read.loading} onClick={() => { if (!read.loading) read.refresh(); }}><Icon name="refresh" /></ActionButton><ActionButton className="btn-icon" aria-label={collapsed ? "Expandir Andamentos" : "Recolher Andamentos"} aria-expanded={!collapsed} aria-controls={"progress-content-" + id} onClick={() => setCollapsed(value => !value)}><Icon name="down" style={{transform: collapsed ? undefined : "rotate(180deg)"}} /></ActionButton></div>
         <DocumentActionSlot target={actionTarget}>
           <ActionButton
             ref={openerRef}
@@ -662,7 +662,8 @@ function ProgressContent({
                 : "Registrar andamento"}
           </ActionButton>
         </DocumentActionSlot>
-      </div>
+      </header>
+      <div className="doc-card-body" id={"progress-content-" + id} hidden={collapsed}>
       {!open &&
         (privateDraft.offered ||
           privateDraft.base ||
@@ -691,31 +692,10 @@ function ProgressContent({
           outra.
         </Notice>
       ) : null}
-      <div className="hca-toolbar">
-        <FormField label="Mostrar Andamentos">
-          <SelectField
-            value={filter}
-            onChange={(event) => {
-              setFilter(event.currentTarget.value as ProgressPage["filter"]);
-              setPage(1);
-            }}
-          >
-            <option value="all">Todos</option>
-            <option value="automatic">Fatos automáticos</option>
-            <option value="manual">Registros manuais</option>
-          </SelectField>
-        </FormField>
-        <ActionButton
-          aria-disabled={read.loading}
-          onClick={() => {
-            if (!read.loading) read.refresh();
-          }}
-        >
-          Atualizar Andamentos
-        </ActionButton>
-      </div>
+      <div className="doc-feed-toolbar"><div className="doc-segment" role="group" aria-label="Mostrar Andamentos">{([["all", "Todos"], ["automatic", "Automáticos"], ["manual", "Manuais"]] as const).map(([value, label]) => <button type="button" key={value} aria-pressed={filter === value} onClick={() => { setFilter(value); setPage(1); }}>{label}</button>)}</div><label className="doc-period-filter"><span className="sr-only">Período dos andamentos</span><Icon name="calendar" width={15} height={15} /><select aria-label="Período dos andamentos" value={period} onChange={event => { const value = event.currentTarget.value; setPeriod(value); setPeriodError(""); if (value !== "custom") { const day = new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(new Date()); setRange(value === "today" ? { from: day, through: day } : { from: null, through: null }); setPage(1); } }}><option value="all">Todo o período</option><option value="today">Hoje</option><option value="custom">Escolher período</option></select></label></div>
+      {period === "custom" ? <div className="doc-date-range"><FormField label="De"><TextInput type="date" value={from} onChange={event => setFrom(event.currentTarget.value)} /></FormField><FormField label="Até"><TextInput type="date" value={through} min={from} onChange={event => setThrough(event.currentTarget.value)} /></FormField><ActionButton onClick={() => { const parsed = z.object({ from: z.iso.date().nullable(), through: z.iso.date().nullable() }).refine(value => Boolean(value.from || value.through) && (!value.from || !value.through || value.from <= value.through)).safeParse({ from: from || null, through: through || null }); if (!parsed.success) { setPeriodError("Informe um período válido, com a data final igual ou posterior à inicial."); return; } setRange(parsed.data); setPeriodError(""); setPage(1); }}>Aplicar período</ActionButton>{periodError ? <p role="alert" className="hca-field-error">{periodError}</p> : null}</div> : null}
       {read.loading ? (
-        <Notice>Consultando Andamentos autorizados…</Notice>
+        <div className="doc-feed-skeleton" role="status"><span className="sr-only">Consultando Andamentos autorizados…</span><i /><i /></div>
       ) : read.error ? (
         <Notice error>
           Não foi possível consultar os Andamentos. {read.error} O texto em
@@ -730,68 +710,13 @@ function ProgressContent({
             ciência, recebimento ou conclusão.
           </p>
           {feed.data.length ? (
-            <ol className="hca-event-feed">
-              {feed.data.map((row) => {
-                const presentation = progressEventPresentation(row);
-                return (
-                  <li key={row.id} id={"andamento-" + row.id} tabIndex={-1} className="hca-progress-event" data-tone={presentation.tone} data-selected={row.id === anchor || undefined}>
-                    <span className="hca-event-marker" aria-hidden="true">
-                      <Icon name={presentation.originIcon} />
-                    </span>
-                    <article
-                      className={
-                        row.source === "manual"
-                          ? "hca-manual-note"
-                          : "hca-event-body"
-                      }
-                      aria-label={
-                        row.source === "manual"
-                          ? progressCategories[row.category]
-                          : (presentation.event ?? undefined)
-                      }
-                    >
-                      <div className="hca-event-heading">
-                        <strong>
-                          {row.source === "manual"
-                            ? progressCategories[row.category]
-                            : presentation.event}
-                        </strong>
-                        <time dateTime={row.recordedAt}>
-                          {formatBrazilDate(row.recordedAt)}
-                        </time>
-                      </div>
-                      <Pill tone={row.source === "manual" ? "accent" : "neutral"}>
-                        {presentation.origin}
-                      </Pill>
-                      <Pill tone={presentation.tone}><Icon name={presentation.icon} /> {presentation.label}</Pill>
-                      {row.source === "manual" && row.visibility === "family" ? <Pill>Privado · família e pessoas mencionadas</Pill> : null}
-                      <p className="hca-event-meta">
-                        {row.authorId
-                          ? (row.authorName ?? "Nome histórico não preservado")
-                          : "Sistema, sem autoria pessoal"}
-                        {row.source === "manual" && row.stage
-                          ? ` · Etapa relacionada: ${progressStages[row.stage]}`
-                          : ""}
-                        {row.source === "automatic"
-                          ? ` · Versão ${row.version}`
-                          : ""}
-                      </p>
-                      {row.source === "manual" ? (
-                        <>
-                          <p className="hca-event-text">{row.text}</p>
-                          {row.mentions?.length ? <p className="hca-event-meta">Pessoas mencionadas: {row.mentions.map(person => person.name + " · " + progressCareRoles[person.careRole]).join("; ")}. Uma menção não registra ciência ou autoria.</p> : null}
-                          <div className="hca-toolbar">
-                            {row.references.map((ref) => (
-                              <ProgressReference key={ref.id} reference={ref} />
-                            ))}
-                          </div>
-                        </>
-                      ) : null}
-                    </article>
-                  </li>
-                );
-})}
-            </ol>
+            <div className="doc-feed-scroll" tabIndex={0} role="region" aria-label="Cronologia de andamentos"><ol className="doc-feed">{feed.data.map(row => {
+              const presentation = progressEventPresentation(row);
+              return <li key={row.id} id={"andamento-" + row.id} tabIndex={-1} className={"doc-event hca-progress-event " + (row.source === "manual" ? "is-manual" : "is-automatic")} data-tone={presentation.tone} data-selected={row.id === anchor || undefined}>
+                <span className="doc-event-mark" aria-hidden="true"><Icon name={row.source === "manual" && row.visibility === "family" ? "lock" : presentation.originIcon} width={15} height={15} /></span>
+                <article className="doc-event-body">{row.source === "automatic" ? <details className="doc-event-details"><summary><span><strong>{presentation.event}</strong><time dateTime={row.recordedAt}>{formatBrazilDate(row.recordedAt)}</time></span><Icon name="down" width={15} height={15} /></summary><div className="doc-event-expanded"><p className="doc-event-meta">{row.authorId ? row.authorName ?? "Nome histórico não preservado" : "Sistema, sem autoria pessoal"} · Revisão {row.version}</p><Pill tone={presentation.tone}><Icon name={presentation.icon} />{presentation.label}</Pill></div></details> : <><div className="doc-event-top"><h3>{progressCategories[row.category]}</h3><time className="doc-time" dateTime={row.recordedAt}>{formatBrazilDate(row.recordedAt)}</time></div><div className="doc-event-meta"><span><Icon name="user" width={13} height={13} />{row.authorName ?? "Nome histórico não preservado"}</span><span>{presentation.origin}</span>{row.stage ? <span>Etapa relacionada: {progressStages[row.stage]}</span> : null}</div><p className="doc-event-text">{row.text}</p><Pill tone={presentation.tone}><Icon name={presentation.icon} />{presentation.label}</Pill>{row.visibility === "family" ? <Pill><Icon name="lock" />Privado · família e pessoas mencionadas</Pill> : null}{row.mentions?.length ? <p className="doc-event-meta">Pessoas mencionadas: {row.mentions.map(person => person.name + " · " + progressCareRoles[person.careRole]).join("; ")}. Uma menção não registra ciência ou autoria.</p> : null}<div className="doc-event-refs">{row.references.map(ref => <ProgressReference key={ref.id} reference={ref} />)}</div></>}</article>
+              </li>;
+            })}</ol></div>
           ) : (
             <p>Nenhum andamento corresponde a este filtro e página.</p>
           )}
@@ -820,6 +745,7 @@ function ProgressContent({
           </nav>
         </>
       ) : null}
+      </div>
       <Dialog
         open={open}
         title={

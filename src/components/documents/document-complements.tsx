@@ -9,6 +9,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { complementType, linkComplementInput, parseComplementAttempt, parseComplementCandidates, parseDocumentComplements, requireComplementConfirmation, type DocumentComplements, type LinkComplementInput } from "@/lib/documents/document-complements";
 import type { DocumentType } from "@/types/documents";
 import { RelatedDocument } from "./related-document";
+import { DocumentSection } from "@/components/ui/model-section";
 
 const names: Record<DocumentType, string> = { REQ: "Requisição", COM: "Compra ou doação", ENT: "Entrega ou devolução", BAL: "Balanço" };
 type Props = { documentId: string; version: number; userId: string; activeContext: boolean; onRecorded: () => void; };
@@ -19,9 +20,8 @@ export function DocumentComplementsPanel({ documentId, version, userId, activeCo
   const read = useScopedRead(`/api/documents/${documentId}/complements?page=${page}`, String(version), decode);
   const data = !read.error ? read.data : null;
   const refreshed = () => { read.refresh(); onRecorded(); };
-  return <section className="ui-card space-y-4" aria-label="Fichas complementares" aria-busy={read.loading}>
-    <h2>Fichas complementares</h2>
-    <p>Uma ficha complementar tem identidade e emissão próprias. O vínculo registra motivo, autoria e momento, preservando o conteúdo da origem. Use quando outro ato precisar de uma ficha própria relacionada à anterior. O vínculo não registra ciência ou recebimento e não altera estoque por si só.</p>
+  return <DocumentSection title="Fichas complementares" icon="layers"><div className="hca-complements-body" aria-label="Fichas complementares" aria-busy={read.loading}>
+    <details className="doc-help-details"><summary>Quando usar uma ficha complementar</summary><p>Uma ficha complementar tem identidade e emissão próprias. O vínculo registra motivo, autoria e momento, preservando o conteúdo da origem. Use quando outro ato precisar de uma ficha própria relacionada à anterior. O vínculo não registra ciência ou recebimento e não altera estoque por si só.</p></details>
     {read.loading ? <p role="status">Consultando vínculos autorizados…</p> : null}
     {read.error ? <Notice error>{read.error}</Notice> : null}
     {data && !read.loading ? <>
@@ -50,7 +50,7 @@ export function DocumentComplementsPanel({ documentId, version, userId, activeCo
     </> : null}
     <button className={buttonClass} type="button" disabled={read.loading} onClick={read.refresh}>Atualizar vínculos</button>
     {open && data ? <ComplementEditor source={data} userId={userId} activeContext={activeContext} onRecorded={refreshed} onClose={() => setOpen(false)} finalFocus={triggerRef} /> : null}
-  </section>;
+  </div></DocumentSection>;
 }
 function ComplementEditor({ source, userId, activeContext, onRecorded, onClose, finalFocus }: {
   source: DocumentComplements; userId: string; activeContext: boolean; onRecorded: () => void; onClose: () => void; finalFocus: RefObject<HTMLButtonElement | null>;

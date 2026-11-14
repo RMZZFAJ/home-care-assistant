@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError, Notice } from "@/components/workspace";
 import { ActionButton } from "@/components/ui/controls";
@@ -20,6 +21,8 @@ export function InvitationDecision({ token, actorId, preview, onRead }: {
     } catch { return { intent: null, error: "Não foi possível ler a referência desta decisão neste aparelho. Preserve o link e procure apoio antes de decidir." }; }
   });
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const [activityStage, setActivityStage] = useState(0);
+  useOperationActivity(busy, { title: "Seu acesso está sendo preparado", detail: "Você continuará assim que a decisão e o vínculo forem confirmados.", stage: activityStage, steps: [{ label: "Confirmando seu convite", icon: "file" }, { label: "Registrando sua decisão", icon: "users" }, { label: "Conferindo o acesso ao paciente", icon: "home" }] });
   const aliveRef = useRef(true), sendingRef = useRef(false), settledRef = useRef(false);
   const intentRef = useRef(saved.intent);
   useEffect(() => { aliveRef.current = true; return () => { aliveRef.current = false; }; }, []);
@@ -60,6 +63,7 @@ export function InvitationDecision({ token, actorId, preview, onRead }: {
   async function send(decision?: "accept" | "decline", readOnly = false) {
     if (sendingRef.current || saved.error) return;
     sendingRef.current = true; setBusy(true); setError("");
+    setActivityStage(0);
     let phase: "read" | "post" = "read";
     const recovering = Boolean(intentRef.current);
     try {
@@ -78,9 +82,11 @@ export function InvitationDecision({ token, actorId, preview, onRead }: {
       }
       if (!intent || !aliveRef.current) return;
       phase = "post";
+      setActivityStage(1);
       await api<unknown>("/api/invitations/accept", intent);
       if (!aliveRef.current) return;
       phase = "read";
+      setActivityStage(2);
       const read = await consult();
       if (!aliveRef.current || apply(read)) return;
       setError("O resultado da decisão ainda não foi confirmado. Recupere a mesma tentativa antes de decidir novamente.");

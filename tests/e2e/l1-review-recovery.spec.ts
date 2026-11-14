@@ -52,7 +52,7 @@ test("L1 resultado de autenticação antigo não redireciona após sair da conti
   await page.route("**/auth/v1/user",async route=>{if(!first)return route.continue();first=false;seen();await gate;await route.fulfill({status:401,json:{message:"Sessão fictícia encerrada"}});});
   await page.goto("/acesso/continuar?next=/historico");
  }
- await requested;await page.getByRole("link",{name:"Abrir convite",exact:true}).click();
+ await requested;await page.goto("/convites/aceitar");
  await expect(page).toHaveURL(/\/convites\/aceitar/);release();
  await expect(page.getByRole("heading",{name:/convite/i})).toBeVisible();
  await expect(page).toHaveURL(/\/convites\/aceitar/);
@@ -89,7 +89,7 @@ test("L1 ciência antiga preserva a referência sem acesso e libera nova ciênci
  await expect(page.getByRole("dialog")).toContainText("não foi registrada");
  expect(await page.evaluate(key=>sessionStorage.getItem(key),key)).toBeNull();
  await page.getByRole("button",{name:"Fechar por enquanto",exact:true}).click();
- await page.getByRole("button",{name:"Dar ciência",exact:true}).click();
+ await page.getByRole("button",{name:"Dar ciência",exact:true}).click();await page.getByRole("button",{name:"Confirmar minha ciência",exact:true}).click();
  await expect(page.getByText("Ciência registrada para o conteúdo confirmado.",{exact:true})).toBeVisible();
  expect(sql(`select count(*) from public.requisition_science_events where requisition_id=${q(req.id)} and user_id=${q(fixtures.family.id)} and mode='express'`)).toBe("1");
 });

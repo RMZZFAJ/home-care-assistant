@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import Link from "next/link";
 import { useHistoryReturn } from "@/lib/documents/use-history-return";
 import { createContext, use, useEffect, useState, type ReactNode } from "react";
@@ -36,6 +37,7 @@ export function RequisitionOpening({
   const [confirmed, setConfirmed] = useState(false);
   const [cancelled, setCancelled] = useState(false);
   const [busy, setBusy] = useState(false);
+  useOperationActivity(!opening && !error && !cancelled || busy, { title: "Consultando a requisição", detail: "Estamos conferindo a consulta autorizada desta ficha." });
   useEffect(() => {
     const controller = new AbortController();
     void api<{ data: Opening }>(

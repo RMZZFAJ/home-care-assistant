@@ -7,25 +7,19 @@ import { Icon } from "@/components/ui/primitives";
 import { TaskList } from "./task-list";
 import { TaskAttention } from "./task-attention";
 import { DashboardNotices } from "./dashboard-notices";
-import { usePresentationMode } from "@/lib/ui/presentation-mode";
 import { MetricCard } from "./metric-card";
 import { CriticalStockSummary, RecentDocuments, ShiftSummary } from "./dashboard-summary";
 
 export function OperationsDashboard({ context, data }: { context: WorkspaceContext; data: DashboardData; }) {
-  const { mode } = usePresentationMode(context.userId);
   const supervisor = context.patient?.role === "supervisor";
-  return <div className="hca-dashboard hca-operational-dashboard">
-    <div className="hca-dashboard-intro"><div><h2>Olá, {context.fullName.split(" ")[0]}.</h2><p>{supervisor ? "Acompanhe a equipe e as situações que precisam de supervisão." : "Suas próximas tarefas no cuidado de " + context.patient?.display_name + "."}</p></div></div>
+  return <div className="dashboard-v2 operational-dashboard">
     <TaskAttention tasks={data.pendingTasks} context={context} />
-    <TaskList title={supervisor ? "Pendências da equipe" : "Precisa da sua atenção"} tasks={data.pendingTasks} />
-    <DashboardNotices patientId={context.patient!.id} />
-    <ShiftSummary data={data} />
-    {supervisor ? <div className="hca-dashboard-metrics"><MetricCard label="Entregas da equipe" value={data.teamReceipts} href="/entregas" icon="truck" /><MetricCard label="Balanços para revisão" value={data.balances} href="/historico?type=BAL&status=submitted" icon="forms" /></div> : null}
-    <section><div className="hca-section-heading"><h2>Ações rápidas</h2></div><div className="hca-quick-actions">
-      {supervisor && can(context, "bal.read") ? <Link href="/historico?type=BAL&status=submitted" className="hca-quick-action hca-quick-action-primary" prefetch={false}><Icon name="forms" /><strong>Acompanhar balanços</strong></Link> : can(context, "req.create") ? <Link href="/fichas/req" className="hca-quick-action hca-quick-action-primary" prefetch={false}><Icon name="plus" /><strong>Nova requisição</strong></Link> : null}
-      {can(context, "consumption.report") ? <Link href="/consumo" className="hca-quick-action" prefetch={false}><Icon name="forms" /><strong>Registrar consumo</strong></Link> : null}
-    </div></section>
+    <div className="home-quick-actions">
+      {supervisor && can(context, "bal.read") ? <Link href="/historico?type=BAL&status=submitted" className="btn btn-primary" prefetch={false}><Icon name="forms" />Acompanhar balanços</Link> : can(context, "req.create") ? <Link href="/fichas/req" className="btn btn-primary" prefetch={false}><Icon name="plus" />Nova requisição</Link> : null}
+      {can(context, "consumption.report") ? <Link href="/consumo" className="btn" prefetch={false}><Icon name="forms" />Registrar consumo</Link> : null}
+    </div>
+    <div className="dashboard-grid"><TaskList title={supervisor ? "Pendências da equipe" : "Suas pendências"} tasks={data.pendingTasks} /><aside className="dashboard-aside"><DashboardNotices patientId={context.patient!.id} />{supervisor ? <div className="metrics-grid"><MetricCard label="Balanços para revisar" value={data.balances} href="/historico?type=BAL&status=submitted" icon="forms" action="Ver balanços" /><MetricCard label="Entregas a conferir" value={data.teamReceipts} href="/entregas" icon="truck" action="Ver entregas" /></div> : null}<ShiftSummary data={data} /></aside></div>
     {supervisor ? <CriticalStockSummary data={data} /> : null}
-    <details className="hca-home-complementary" open={mode === "complete"}><summary>Movimentações recentes</summary><RecentDocuments data={data} /></details>
+    <RecentDocuments data={data} />
   </div>;
 }

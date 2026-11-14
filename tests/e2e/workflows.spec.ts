@@ -303,7 +303,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
     .toBuffer();
   await selectDocumentSection(page, "attachments");
   await page
-    .getByRole("button", { name: "Anexos e ficha física", exact: true })
+    .getByRole("button", { name: "Adicionar anexo", exact: true })
     .click();
   await page.getByLabel("Adicionar foto ou PDF").setInputFiles({
     name: "ficha-fisica.png",
@@ -347,8 +347,8 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   ).json();
   expect(Number(stock.overview[0].team.confirmed)).toBe(5);
   await page.goto("/historico?careRecipientId=" + patient);
-  await page.getByRole("button", { name: /Pesquisar e filtrar/ }).click();
-  await page.getByLabel("Ficha", { exact: true }).selectOption("ENT");
+  await page.getByRole("button", { name: /Filtros/ }).click();
+  await page.getByLabel("Tipo de ficha", { exact: true }).selectOption("ENT");
   await page
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();
@@ -555,8 +555,8 @@ test("histórico filtra código e período e conserva o documento de paciente re
     isDevelopment: true,
   });
   await page.goto("/historico?careRecipientId=" + patient);
-  await page.getByRole("button", { name: /Pesquisar e filtrar/ }).click();
-  await page.getByLabel("Código ou protocolo").fill("REQ-0001");
+  await page.getByRole("button", { name: /Filtros/ }).click();
+  await page.getByLabel("Buscar por código ou protocolo").fill("REQ-0001");
   await page
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();

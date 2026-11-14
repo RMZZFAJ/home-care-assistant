@@ -9,28 +9,27 @@ import { TaskList } from "./task-list";
 import { TaskAttention } from "./task-attention";
 import { DashboardNotices } from "./dashboard-notices";
 import { OpenRequests } from "./open-requests";
-import { usePresentationMode } from "@/lib/ui/presentation-mode";
 import { CriticalStockSummary, RecentDocuments, ShiftSummary } from "./dashboard-summary";
+import { WeekSchedule } from "./week-schedule";
 
 export function ManagementDashboard({ context, data }: { context: WorkspaceContext; data: DashboardData; }) {
-  const { mode } = usePresentationMode(context.userId);
-  return <div className="hca-dashboard">
-    <div className="hca-dashboard-intro"><div><h2>O que precisa da sua atenção</h2><p>Decisões e acompanhamento de {context.patient?.display_name}.</p></div><div className="hca-toolbar">
-      {can(context, "ent.create") ? <Link href="/fichas/ent" className="ui-button ui-button-primary" prefetch={false}><Icon name="plus" />Nova entrega</Link> : null}
-      {can(context, "ent.create") ? <Link href="/fichas/devolucao" className="ui-button ui-button-secondary" prefetch={false}>Nova devolução de materiais</Link> : null}
-      {can(context, "com.create") ? <Link href="/fichas/com" className="ui-button ui-button-secondary" prefetch={false}>Organizar compra</Link> : null}
-    </div></div>
+  return <div className="dashboard-v2 family-dashboard">
     <TaskAttention tasks={data.pendingTasks} context={context} />
-    <div className="hca-dashboard-metrics">
-      {can(context, "req.read") ? <MetricCard label="Requisições abertas" value={data.requests} href="/historico?type=REQ" icon="forms" /> : null}
-      {can(context, "ent.read") ? <MetricCard label="Entregas a conferir" value={data.teamReceipts} href="/entregas" icon="truck" /> : null}
-      {data.sciencePending > 0 ? <MetricCard label="Ciências pendentes" value={data.sciencePending} href="/historico?type=REQ&status=science_required" icon="check" /> : null}
-      {data.archivePending > 0 ? <MetricCard label="Conclusões para revisar e arquivar" value={data.archivePending} href="/historico?type=REQ&status=archive_pending" icon="history" /> : null}
-      {can(context, "com.approve") ? <MetricCard label="Compras a aprovar" value={data.purchases} href="/historico?type=COM&status=pending_approval" icon="stock" /> : null}
-      {data.criticalStock.length ? <MetricCard label="Saldos abaixo do mínimo" value={data.criticalStock.length} href="/estoque" icon="stock" /> : null}
+    <div className="home-quick-actions">
+      {can(context, "ent.create") ? <Link href="/fichas/ent" className="btn btn-primary" prefetch={false}><Icon name="truck" width={16} height={16} />Nova entrega</Link> : null}
+      {can(context, "ent.create") ? <Link href="/fichas/devolucao" className="btn" prefetch={false}><Icon name="truck" width={16} height={16} />Nova devolução</Link> : null}
+      {can(context, "com.create") ? <Link href="/fichas/com" className="btn" prefetch={false}><Icon name="plus" width={16} height={16} />Nova compra</Link> : null}
     </div>
-    <div className="hca-l1-home-grid"><div className="hca-home-tasks"><TaskList title="Suas pendências" tasks={data.pendingTasks} /></div><DashboardNotices patientId={context.patient!.id} /><OpenRequests patientId={context.patient!.id} /></div>
+    <div className="metrics-grid">
+      {can(context, "req.read") ? <MetricCard label="Requisições em aberto" value={data.requests} href="/historico?type=REQ&status=open" icon="forms" action="Ver requisições" /> : null}
+      {can(context, "ent.read") ? <MetricCard label="Entregas a conferir" value={data.teamReceipts} href="/entregas" icon="truck" action="Ver entregas" /> : null}
+      {can(context, "req.science") ? <MetricCard label="Ciências pendentes" value={data.sciencePending} href="/historico?type=REQ&status=science_required" icon="check" action="Ver requisições" /> : null}
+      {can(context, "com.approve") ? <MetricCard label="Compras a aprovar" value={data.purchases} href="/historico?type=COM&status=pending_approval" icon="stock" action="Ver compras" /> : null}
+      {data.archivePending > 0 ? <MetricCard label="Conclusões para revisar e arquivar" value={data.archivePending} href="/historico?type=REQ&status=archive_pending" icon="history" action="Revisar conclusões" /> : null}
+      {data.criticalStock.length ? <MetricCard label="Saldos abaixo do mínimo" value={data.criticalStock.length} href="/estoque" icon="stock" action="Consultar estoque" /> : null}
+    </div>
+    <div className="dashboard-grid"><div className="dashboard-main"><div className="hca-home-tasks"><TaskList title="Suas pendências" tasks={data.pendingTasks} /></div><OpenRequests patientId={context.patient!.id} /></div><aside className="dashboard-aside"><DashboardNotices patientId={context.patient!.id} /><WeekSchedule context={context} /><ShiftSummary data={data} /></aside></div>
     <CriticalStockSummary data={data} />
-    <details className="hca-home-complementary" open={mode === "complete"}><summary>Movimentações recentes e programação</summary><RecentDocuments data={data} /><ShiftSummary data={data} /></details>
+    <RecentDocuments data={data} />
   </div>;
 }

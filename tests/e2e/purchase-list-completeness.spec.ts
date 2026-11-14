@@ -48,7 +48,7 @@ test("COM list reaches more than100 acquisitions and the oldest purchase through
   await login(page, f.patient);
   const writes = trackWrites(page);
   await page.goto(`/historico?careRecipientId=${f.patient}&type=COM`);
-  const links = page.locator("a.document-row"), observed: string[] = [];
+  const links = page.locator("a.av-record"), observed: string[] = [];
   const ids = () => links.evaluateAll(nodes => nodes.map(node => node.getAttribute("href")!.split("/").at(-1)));
   for (let offset = 0; offset < order.length; offset += 20) {
     await expect.poll(ids).toEqual(order.slice(offset, offset + 20));
@@ -57,7 +57,7 @@ test("COM list reaches more than100 acquisitions and the oldest purchase through
     if (offset + 20 < order.length) await next.click(); else await expect(next).toBeDisabled();
   }
   expect(observed).toEqual(order); expect(new Set(observed).size).toBe(101);
-  await page.getByRole("textbox", { name: "Código ou protocolo", exact: true }).fill(code);
+  await page.getByRole("searchbox", { name: "Buscar por código ou protocolo", exact: true }).fill(code);
   await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect.poll(() => new URL(page.url()).searchParams.get("search")).toBe(code);
   await expect(links).toHaveCount(1);

@@ -244,7 +244,7 @@ function Agenda({
       reference,
       params.get("refKind") ?? "auto",
     );
-  const [fallbackDay] = useState(today),
+  const [fallbackDay] = useState(() => { const requested = params.get("day"); return requested && /^\d{4}-\d{2}-\d{2}$/.test(requested) && !Number.isNaN(Date.parse(requested)) && new Date(requested).toISOString().slice(0, 10) === requested ? requested : today(); }),
     [chosenDay, setChosenDay] = useState<{
       reference: string | null;
       day: string;

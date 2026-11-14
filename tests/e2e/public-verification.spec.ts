@@ -107,6 +107,7 @@ test("C-FINAL023 verificação separa falha do serviço de código digitado inv�
   await submit.click();
   await expect(page.getByRole("heading", { name: "Emissão não localizada", exact: true })).toBeFocused();
   await expect(code).toHaveValue(value); await expect(code).toHaveAttribute("aria-invalid", "false"); expect(reads).toBe(2);
+  await page.getByRole("tab", { name: "Conferir PDF", exact: true }).click();
   const file = page.getByLabel("Arquivo PDF para conferir", { exact: true }), check = page.getByRole("button", { name: "Conferir PDF", exact: true });
   const issued = sql("select count(*) from private.pdf_issuances;");
   await file.setInputFiles({ name: "pequeno.pdf", mimeType: "application/pdf", buffer: Buffer.alloc(99) }); await check.click();
@@ -188,6 +189,7 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
   await expect(
     result.getByRole("heading", { name: "Emissão localizada", exact: true }),
   ).toBeVisible();
+  await page.getByRole("tab", { name: "Conferir PDF", exact: true }).click();
   const file = page.getByLabel("Arquivo PDF para conferir", { exact: true });
   await file.setInputFiles({
     name: "outro-exemplar.pdf",
@@ -272,18 +274,12 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
     `select content_hash from public.document_events where document_id=${sqlLiteral(f.doc.id)} and version=1;`,
   );
   await page.goto(`/verificar/${f.doc.id}?version=1&hash=${hash}`);
-  await expect(page.getByRole("main").getByRole("status")).toContainText(
-    "Hash e versão correspondem ao conteúdo registrado",
-  );
-  await page
-    .getByRole("link", {
-      name: "Conferir um arquivo PDF ou código de emissão",
-      exact: true,
-    })
-    .click();
+  // L1 closes legacy hash-only public RPCs; this historical URL leads to
+  // the current verifier without inventing a check of an unsubmitted file.
+  await expect(page).toHaveURL(/\/verificar$/);
   await expect(
     page.getByRole("heading", {
-      name: "Verificação de documentos",
+      name: "Verificar documento",
       exact: true,
     }),
   ).toBeVisible();

@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { ActionButton, SelectField } from "@/components/ui/controls";
 
 import { Suspense, useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
@@ -85,6 +86,7 @@ function ProfileMenu() {
 export function WorkspaceShell({ children, showOnboarding = false }: { children: ReactNode; showOnboarding?: boolean; }) {
   const { blocked, notices } = usePwa();
   const { value, data, selecting, selectPatient } = useWorkspaceState();
+  useOperationActivity(selecting, { title: "Mudando de paciente", detail: "Estamos conferindo seu acesso antes de apresentar o paciente selecionado." });
   const desktop = useSyncExternalStore(subscribe, desktopSnapshot, serverSnapshot);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -95,20 +97,20 @@ export function WorkspaceShell({ children, showOnboarding = false }: { children:
   return <div data-context-mode={value?.activeContext?.mode ?? ""} data-context-patient={value?.activeContext?.care_recipient_id ?? ""} className={`app-shell hca-workspace ${operational ? "hca-operations-shell" : "hca-management-shell"} ${desktop && !collapsed ? "hca-navigation-expanded" : ""}`}>
     <a href="#workspace-content" className="skip-link" inert={blocked}>Ir para o conteúdo</a>
     <header className="app-header print:hidden" inert={blocked}>
-      <ActionButton ref={navigationTriggerRef} className="hca-navigation-toggle" variant="quiet" aria-label={expanded ? "Recolher navegação" : "Abrir navegação"} aria-expanded={expanded} aria-controls="workspace-navigation" onClick={(event) => { event.currentTarget.focus(); if (desktop) setCollapsed((current) => !current); else setMobileOpen((current) => !current); }} >{<Icon name="menu" />}</ActionButton>
-      <Link href="/" prefetch={false} className="app-brand" aria-label="Home Care Assistant — início"><span><Icon name="home" /></span><strong>Home Care Assistant<small>Insumos, família e equipe</small></strong></Link>
-      <div className="patient-picker">{data?.patients.length ? <SelectField aria-label="Pessoa assistida" value={value?.patient?.id ?? ""} disabled={selecting || Boolean(value?.patient?.id) && data.patients.filter(patient => data.activeContext?.mode !== "patient" || patient.hasMembership).length < 2} onChange={(event) => void selectPatient(event.target.value)}>
+      <ActionButton ref={navigationTriggerRef} className="hca-navigation-toggle" variant="quiet" aria-label={expanded ? "Recolher navegação" : "Abrir navegação"} aria-expanded={expanded} aria-controls="workspace-navigation" onClick={(event) => { event.currentTarget.focus(); if (desktop) setCollapsed((current) => !current); else setMobileOpen((current) => !current); }} >{<Icon name={desktop ? "home" : "menu"} />}</ActionButton>
+      <Link href="/" prefetch={false} className="app-brand" aria-label="Home Care Assistant — início"><span className="hca-mobile-brand-symbol"><Icon name="home" /></span><strong>Home Care Assistant<small>Organização do cuidado em casa</small></strong></Link>
+      <div className="patient-picker">{data?.patients.length ? <label className="header-context hca-patient-selector"><span className="context-icon"><Icon name="home" /></span><span><small>Paciente atual</small><strong>{value?.patient?.display_name ?? "Selecione um paciente"}</strong></span><Icon name="down" width={15} height={15} /><SelectField aria-label="Pessoa assistida" value={value?.patient?.id ?? ""} disabled={selecting || Boolean(value?.patient?.id) && data.patients.filter(patient => data.activeContext?.mode !== "patient" || patient.hasMembership).length < 2} onChange={(event) => void selectPatient(event.target.value)}>
         <option value="" disabled>Selecione um paciente</option>
         {data.patients.filter((patient) => data.activeContext?.mode !== "patient" || patient.hasMembership).map((patient) => <option key={patient.id} value={patient.id}>{patient.display_name}{patient.is_active === false ? " (inativo)" : ""}</option>)}
-      </SelectField> : <span className="text-sm text-(--muted)">Home Care Assistant</span>}</div>
+      </SelectField></label> : <span className="text-sm text-(--muted)">Home Care Assistant</span>}</div>
       {value ? <NotificationBell key={`${value.activeContext?.mode}:${value.patient?.id ?? "none"}`} patientId={value.activeContext?.mode === "patient" ? value.patient?.id : undefined} disabled={selecting} /> : null}
       <ProfileMenu />
     </header>
-    {desktop && !collapsed ? <aside id="workspace-navigation" className="hca-desktop-navigation print:hidden" inert={blocked}>{navigation}</aside> : null}
+    {desktop && !collapsed ? <aside id="workspace-navigation" className="hca-desktop-navigation print:hidden" inert={blocked}>{value?.patient ? <div className="side-context"><span><Icon name="home" width={17} height={17} /></span><div><small>PACIENTE ATUAL</small><strong>{value.patient.display_name}</strong></div></div> : null}{navigation}</aside> : null}
     <Drawer title="Home Care Assistant" open={!desktop && mobileOpen} onClose={() => setMobileOpen(false)} closeLabel="Fechar menu" side="start" finalFocus={navigationTriggerRef} id={!desktop ? "workspace-navigation" : undefined}>
       <div inert={blocked}>{navigation}</div>
     </Drawer>
     <div className="hca-workspace-body">{notices}<div inert={blocked}>{showOnboarding && value?.activeContext ? <GuideOnboarding key={`${value.activeContext.mode}:${value.activeContext.care_recipient_id ?? ""}`} /> : null}{children}</div></div>
-    {operational && value ? <div inert={blocked}><BottomNavigation context={value} /></div> : null}
+    {value?.activeContext?.mode === "patient" ? <div inert={blocked}><BottomNavigation context={value} /></div> : null}
   </div>;
 }

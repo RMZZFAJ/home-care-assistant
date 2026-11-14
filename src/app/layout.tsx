@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import "./design-system.css";
 import { LiveSession } from "@/components/live-session";
+import { OperationActivityHost, PageLoadingActivity } from "@/components/ui/operation-activity";
 import "@/theme/tokens.css";
 import "./canonical-ui.css";
 import "./l1-ui.css";
@@ -29,11 +30,12 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        <div className="hca-app-root hca-theme">
-          <Suspense fallback={<main className="p-6" role="status">Carregando seu espaço de cuidado…</main>}>
+        <div className="hca-app-root hca-theme hca-l1">
+          <Suspense fallback={<PageLoadingActivity title="Preparando seu espaço de cuidado" />}>
             <PwaProvider previewOrigin={stablePreviewOrigin(process.env.VERCEL_ENV, process.env.VERCEL_BRANCH_URL)}><WorkspaceProvider>{children}</WorkspaceProvider></PwaProvider>
           </Suspense>
           <LiveSession />
+          <OperationActivityHost />
         </div>
       </body>
     </html>

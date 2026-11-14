@@ -117,9 +117,9 @@ test("documentos comuns, histórico com URL e estoque têm apresentação real e
   }
   await page.goto("/historico?careRecipientId=" + patient + "&type=ENT&search=" + ent.code);
   await expect(page.getByRole("combobox", { name: "Ficha", exact: true })).toHaveValue("ENT");
-  await expect(page.getByLabel("Código ou protocolo", { exact: true })).toHaveValue(ent.code);
+  await expect(page.getByLabel("Buscar por código ou protocolo", { exact: true })).toHaveValue(ent.code);
   await page.reload();
-  await expect(page.getByLabel("Código ou protocolo", { exact: true })).toHaveValue(ent.code);
+  await expect(page.getByLabel("Buscar por código ou protocolo", { exact: true })).toHaveValue(ent.code);
   await expect(page.getByRole("link").filter({ hasText: ent.code })).toHaveAttribute("href", "/documentos/" + ent.id);
   await capture(page, "historico-filtros-mobile", info.project.name);
   await page.goto("/estoque?careRecipientId=" + patient + "&custody=FAMILY");

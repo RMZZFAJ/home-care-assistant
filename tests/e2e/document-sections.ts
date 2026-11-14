@@ -53,7 +53,7 @@ export async function selectDocumentSection(
 export async function openDocumentMore(page: Page) {
   const popup = page.locator(".hca-document-identifiers");
   if (!(await popup.isVisible()))
-    await page.getByRole("button", { name: "Mais", exact: true }).click();
+    await page.getByRole("button", { name: "Mais opções da ficha", exact: true }).click();
   await expect(popup).toBeVisible();
 }
 export async function closeDocumentMore(page: Page) {

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function GlobalNotFound() {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className="hca-l1">
         <main className="mx-auto flex min-h-screen max-w-xl items-center px-5 py-10">
           <section className="ui-card hca-form-stack w-full min-w-0" aria-labelledby="not-found-title">
             <span className="hca-error-symbol"><Icon name="close" width={30} /></span>

@@ -1,4 +1,6 @@
 "use client";
+import { DocumentSection } from "@/components/ui/model-section";
+import { Icon } from "@/components/ui/icon";
 import { DocumentComplementsPanel } from "@/components/documents/document-complements";
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { RequisitionScienceAction } from "./requisition-science-action";
@@ -254,6 +256,7 @@ export function RequisitionDocumentContent({
       </div>
     );
   const { fulfillment: f, progress: p } = data;
+  const offerScience = !data.is_historical && p.eligible && !p.archivedAt && data.status !== "cancelled" && !p.science.some(row => row.user_id === context.userId && row.mode === "express");
   const documentState = requisitionDocumentState({
     historical: data.is_historical,
     status: data.status,
@@ -263,6 +266,7 @@ export function RequisitionDocumentContent({
     fulfilled: f.fulfilled,
     partial: f.partial,
   });
+  const serviceLabel = data.is_historical ? "Registro histórico" : p.archivedAt ? "Arquivada" : data.status === "cancelled" ? "Cancelada" : p.completedAt ? "Atendimento concluído" : f.fulfilled || f.partial ? "Atendimento parcial" : "Aguardando atendimento";
   const followUp = requisitionFollowUp({
     historical: Boolean(data.is_historical), status: data.status,
     archivedAt: p.archivedAt, completedAt: p.completedAt,
@@ -271,7 +275,7 @@ export function RequisitionDocumentContent({
     fulfilled: f.fulfilled, total: f.total,
   });
   return (
-    <div className="hca-record-detail space-y-5">
+    <div className="hca-record-detail doc-page">
       <DocumentBreadcrumb code={data.code ?? data.protocol} />
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
@@ -301,6 +305,7 @@ export function RequisitionDocumentContent({
         ]}
         milestones={
           <DocumentMilestones
+            summary={serviceLabel}
             items={requisitionMilestones({
               historical: Boolean(data.is_historical),
               issued: Boolean(data.protocol && data.created_at),
@@ -313,14 +318,14 @@ export function RequisitionDocumentContent({
           />
         }
         badges={
-          data.requisition_items.some((item) => item.urgent) ? (
+          <>{data.requisition_items.some((item) => item.urgent) ? (
             <Pill tone="danger">
               {data.requisition_items.filter((item) => item.urgent).length}{" "}
               {data.requisition_items.filter((item) => item.urgent).length === 1
                 ? "item urgente"
                 : "itens urgentes"}
             </Pill>
-          ) : null
+          ) : null}<Pill tone={p.familyAware ? "success" : "warning"}><Icon name="users" width={13} height={13} />{data.is_historical ? "Ciência não comprovada" : p.familyAware ? "Ciência registrada" : p.policy?.scienceRequired === false ? "Exigência dispensada" : "Ciência pendente"}</Pill></>
         }
         showFiles={false}
         actions={
@@ -329,7 +334,7 @@ export function RequisitionDocumentContent({
               !p.archivedAt &&
               data.status !== "cancelled" ? (
               <>
-                {can(context, "ent.create") ? (
+                {can(context, "ent.create") && !offerScience ? (
                   <Link
                     className={primaryClass}
                     href={`/fichas/ent?requisitionId=${id}`}
@@ -339,7 +344,7 @@ export function RequisitionDocumentContent({
                 ) : null}
               </>
             ) : null}
-            {!data.is_historical ? <RequisitionScienceAction id={id} userId={context.userId} version={p.version} materialIdentity={p.materialIdentity} mayRecord={Boolean(p.eligible && !p.archivedAt && data.status !== "cancelled" && !p.science.some(row => row.user_id === context.userId && row.mode === "express"))} disabled={busy || reading} onRecorded={() => setAttempt(value => value + 1)} /> : null}
+            {!data.is_historical ? <RequisitionScienceAction id={id} userId={context.userId} version={p.version} materialIdentity={p.materialIdentity} mayRecord={Boolean(offerScience)} disabled={busy || reading} onRecorded={() => setAttempt(value => value + 1)} /> : null}
           </>
         }
         secondaryActions={
@@ -348,6 +353,7 @@ export function RequisitionDocumentContent({
               !p.archivedAt &&
               data.status !== "cancelled" ? (
               <>
+                {offerScience && can(context, "ent.create") ? <Link className={buttonClass} href={`/fichas/ent?requisitionId=${id}`}><Icon name="truck" />Expedir ENT vinculada</Link> : null}
                 {can(context, "com.create") ? (
                   <Link
                     className={buttonClass}
@@ -396,6 +402,7 @@ export function RequisitionDocumentContent({
         code={data.code ?? data.protocol}
         protocol={data.protocol}
         status={documentState}
+        statusLabel={serviceLabel}
         version={p.version}
         createdAt={data.created_at}
         dateLabel={
@@ -415,7 +422,102 @@ export function RequisitionDocumentContent({
         reference={p}
         onRecorded={setOpeningRevision}
       />
-      <details className="ui-card">
+
+          {reading || readFailed ? (
+            <Notice>
+              {reading ? "Atualizando o acompanhamento da requisição…" : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
+              {" "}Os dados preservados são da última consulta válida.
+            </Notice>
+          ) : (
+            <DocumentNextStep
+              label={followUp.label}
+              pending={followUp.pending}
+              heading={followUp.heading}
+              description={followUp.description}
+              onOpen={() => tabs.select(followUp.section, true)}
+            />
+          )}
+      <DocumentTabs
+        rootRef={tabs.rootRef}
+        type="REQ"
+        value={tabs.value}
+        onSelect={tabs.select}
+        auditAllowed={can(context, "audit.read")}
+      >
+        <DocumentPanel value="overview"><div className="doc-overview-grid"><div className="doc-main-column">
+          <DocumentProgress
+            actionTarget={progressActionTarget}
+            onAction={() => tabs.select("overview")}
+            id={id}
+            type="REQ"
+            patientId={data.care_recipient_id}
+            context={context}
+          />
+</div><aside className="doc-side-column">
+          {data.sourceRequisition ? (
+            <section
+              className="ui-card space-y-3"
+              aria-label="Origem da necessidade remanescente"
+            >
+              <h2>Origem da necessidade remanescente</h2>
+              <RelatedDocument
+                type="REQ"
+                id={data.sourceRequisition.id}
+                label={
+                  data.sourceRequisition.code ?? data.sourceRequisition.protocol
+                }
+              />
+              <p>
+                Referência na emissão: versão {data.sourceRequisition.version}.
+              </p>
+              <p className="whitespace-pre-wrap">
+                Motivo próprio: {data.sourceRequisition.reason}
+              </p>
+              <p>
+                Esta requisição tem ciência e atendimento próprios; os aceites
+                anteriores pertencem à origem.
+              </p>
+            </section>
+          ) : null}
+          {data.remainingNeedTotal > 0 ? (
+            <section
+              className="ui-card space-y-3"
+              aria-label="Necessidades seguintes"
+            >
+              <h2>Necessidades seguintes</h2>
+              <p>
+                {data.remainingNeeds.length} de {data.remainingNeedTotal}{" "}
+                registros, mais recentes primeiro.
+              </p>
+              {data.remainingNeeds.map((row) => (
+                <article key={row.id}>
+                  <RelatedDocument
+                    type="REQ"
+                    id={row.id}
+                    label={row.code ?? row.protocol}
+                  />
+                  <p>{row.remaining_need_reason}</p>
+                </article>
+              ))}
+            </section>
+          ) : null}
+          <DocumentSection title="Observações da emissão" icon="file">
+            {data.requisition_observations.length ? (
+              textRows(
+                data.requisition_observations.map((row) => row.body),
+              ).map((row) => (
+                <p key={row.key} className="mt-2 text-sm hca-origin-observation">
+                  <span className="hca-origin-observation-number" aria-hidden="true" />{row.value}
+                </p>
+              ))
+            ) : (
+              <p className="mt-2 text-sm text-(--muted)">Sem observações.</p>
+            )}
+            <div className="doc-author-line"><span className="doc-avatar" aria-hidden="true">{(data.requester_name_snapshot ?? "?").split(" ").slice(0,2).map(part => part[0]).join("")}</span><span><strong>{data.requester_name_snapshot ?? "Solicitante não identificado"}</strong><small>{formatBrazilDate(data.created_at)}</small></span></div>
+          </DocumentSection>
+
+          <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
+      <details className="doc-help-details">
         <summary>Minhas decisões em preparação</summary>
         <p>
           Consulte ou descarte seus próprios preenchimentos e reconheça
@@ -434,31 +536,10 @@ export function RequisitionDocumentContent({
           ))}
         </div>
       </details>
-      <DocumentTabs
-        rootRef={tabs.rootRef}
-        type="REQ"
-        value={tabs.value}
-        onSelect={tabs.select}
-        auditAllowed={can(context, "audit.read")}
-      >
-        <DocumentPanel value="overview">
-          <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
-          {reading || readFailed ? (
-            <Notice>
-              {reading ? "Atualizando o acompanhamento da requisição…" : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
-              {" "}Os dados preservados são da última consulta válida.
-            </Notice>
-          ) : (
-            <DocumentNextStep
-              label={followUp.label}
-              pending={followUp.pending}
-              heading={followUp.heading}
-              description={followUp.description}
-              onOpen={() => tabs.select(followUp.section, true)}
-            />
-          )}
+</aside></div></DocumentPanel>
+        <DocumentPanel value="materials">
           <section
-            className="ui-card"
+            className="doc-card hca-requisition-facts"
             aria-label="Dimensões independentes da requisição"
           >
             <div className="my-4 grid gap-3 sm:grid-cols-3">
@@ -510,77 +591,7 @@ export function RequisitionDocumentContent({
               </div>
             </div>
           </section>
-          {data.sourceRequisition ? (
-            <section
-              className="ui-card space-y-3"
-              aria-label="Origem da necessidade remanescente"
-            >
-              <h2>Origem da necessidade remanescente</h2>
-              <RelatedDocument
-                type="REQ"
-                id={data.sourceRequisition.id}
-                label={
-                  data.sourceRequisition.code ?? data.sourceRequisition.protocol
-                }
-              />
-              <p>
-                Referência na emissão: versão {data.sourceRequisition.version}.
-              </p>
-              <p className="whitespace-pre-wrap">
-                Motivo próprio: {data.sourceRequisition.reason}
-              </p>
-              <p>
-                Esta requisição tem ciência e atendimento próprios; os aceites
-                anteriores pertencem à origem.
-              </p>
-            </section>
-          ) : null}
-          {data.remainingNeedTotal > 0 ? (
-            <section
-              className="ui-card space-y-3"
-              aria-label="Necessidades seguintes"
-            >
-              <h2>Necessidades seguintes</h2>
-              <p>
-                {data.remainingNeeds.length} de {data.remainingNeedTotal}{" "}
-                registros, mais recentes primeiro.
-              </p>
-              {data.remainingNeeds.map((row) => (
-                <article key={row.id}>
-                  <RelatedDocument
-                    type="REQ"
-                    id={row.id}
-                    label={row.code ?? row.protocol}
-                  />
-                  <p>{row.remaining_need_reason}</p>
-                </article>
-              ))}
-            </section>
-          ) : null}
-          <section className="ui-card">
-            <h2 className="font-semibold">Observações</h2>
-            {data.requisition_observations.length ? (
-              textRows(
-                data.requisition_observations.map((row) => row.body),
-              ).map((row) => (
-                <p key={row.key} className="mt-2 text-sm hca-origin-observation">
-                  <span className="hca-origin-observation-number" aria-hidden="true" />{row.value}
-                </p>
-              ))
-            ) : (
-              <p className="mt-2 text-sm text-(--muted)">Sem observações.</p>
-            )}
-          </section>
-          <DocumentProgress
-            actionTarget={progressActionTarget}
-            onAction={() => tabs.select("overview")}
-            id={id}
-            type="REQ"
-            patientId={data.care_recipient_id}
-            context={context}
-          />
-        </DocumentPanel>
-        <DocumentPanel value="materials">
+
           <section className="hca-materials-section">
             <DocumentMaterialsTable key={data.id} label="Materiais requisitados" heading={<><h2>Materiais e atendimento</h2><p>Estoque observado e avaliação de atendimento são fatos distintos. A requisição não tem quantidade solicitada.</p></>}
               filters={[{ id: "all", label: "Todos" }, { id: "urgent", label: "Urgentes" }, { id: "pending", label: "Pendentes" }, { id: "fulfilled", label: "Atendidos" }, { id: "routine", label: "Rotina" }]}
@@ -640,8 +651,8 @@ export function RequisitionDocumentContent({
             <ResolveExtraItem onOpen={() => openDecision("resolve_extra")} />
           ) : null}
 
-          <section className="ui-card">
-            <h2 className="font-semibold">Ciência e responsáveis</h2>
+          <DocumentSection title="Ciência familiar" icon="users">
+            <div className="doc-science-record"><span className="doc-avatar"><Icon name={p.familyAware ? "check" : "clock"} width={18} height={18} /></span><div><strong>{data.is_historical ? "Não comprovada no original" : p.familyAware ? "Ciência registrada" : p.policy?.scienceRequired === false ? "Exigência dispensada" : "Ciência pendente"}</strong><p>Ciência, recebimento e atendimento têm registros próprios.</p></div></div>
             <p className="mt-2 text-sm">
               {data.is_historical
                 ? "A ciência original não foi comprovada. Nenhuma confirmação foi inferida na importação."
@@ -665,7 +676,7 @@ export function RequisitionDocumentContent({
             <ul className="mt-3 space-y-2">
               {p.science.map((row) => (
                 <li
-                  className="rounded-lg border border-(--line) p-3 text-sm"
+                  className="doc-person-block hca-science-person"
                   key={row.id}
                 >
                   <strong>{row.actor_name}</strong>
@@ -691,7 +702,7 @@ export function RequisitionDocumentContent({
                 {p.archiveReason}
               </p>
             ) : null}
-          </section>
+          </DocumentSection>
         </DocumentPanel>
         <DocumentPanel value="communications"><DocumentCommunications id={id} version={p.version} /></DocumentPanel>
         <DocumentPanel value="files">

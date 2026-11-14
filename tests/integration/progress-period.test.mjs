@@ -1,0 +1,30 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { randomUUID } from "node:crypto";
+import { setup, issue, actor, rpc, fixtures } from "./v4-fixtures.mjs";
+import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
+import { shiftWorker } from "./shift-fixtures.mjs";
+
+test("L1 chronology period keeps civil-day boundaries, pagination, privacy and live Auth", async () => {
+  const f = await setup(), req = await issue(f.patient, f.products);
+  const family = await actor("family", f.patient), professional = await actor("professional", f.patient);
+  const saved = await rpc(family, "document_progress_publish", { p_document: req.id, p_key: randomUUID(), p_body: { category: "record", stage: null, text: "Nota privada fictícia do período", references: [], publication: { relevance: "normal", mentions: [], visibility: "family", mentionAll: false } } });
+  const day = new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(new Date());
+  const input = { p_document: req.id, p_filter: "all", p_page: 1, p_size: 20, p_from: day, p_through: day };
+  const original = await rpc(family, "document_progress", { p_document: req.id });
+  const current = await rpc(family, "document_progress_period", input);
+  assert.equal(current.from, day); assert.equal(current.through, day); assert.equal(current.timeZone, "America/Sao_Paulo");
+  assert.deepEqual(current.data, original.data); assert.equal(current.total, original.total);
+  assert(current.data.some(row => row.id === saved.note.id));
+  assert(!(await rpc(professional, "document_progress_period", input)).data.some(row => row.id === saved.note.id));
+  const one = await rpc(family, "document_progress_period", { ...input, p_size: 1 });
+  const two = await rpc(family, "document_progress_period", { ...input, p_size: 1, p_page: 2 });
+  assert.equal(one.total, current.total); assert.equal(two.total, current.total); assert.notEqual(one.data[0].id, two.data[0].id);
+  assert.equal((await rpc(family, "document_progress_period", { ...input, p_from: "1900-01-01", p_through: "1900-01-01" })).total, 0);
+  assert.equal((await family.rpc("document_progress_period", { ...input, p_from: "2100-01-01", p_through: "2000-01-01" })).error?.code, "22023");
+  const stranger = await setup();
+  const outsider = await shiftWorker(stranger.patient, "family");
+  assert.equal((await outsider.client.rpc("document_progress_period", input)).error?.code, "42501");
+  sql(`update public.care_recipient_memberships set status='revoked' where care_recipient_id=${q(f.patient)} and user_id=${q(fixtures.family.id)};`);
+  assert.equal((await family.rpc("document_progress_period", input)).error?.code, "42501");
+});

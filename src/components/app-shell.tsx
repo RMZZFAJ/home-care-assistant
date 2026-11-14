@@ -1,4 +1,5 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { FeedbackBanner } from "@/components/ui/feedback";
 import {
   ActionButton,
@@ -49,6 +50,7 @@ export function AppWorkspace({
     selectProfile,
   } = useWorkspaceState();
   const [profileSearch, setProfileSearch] = useState("");
+  useOperationActivity(loading && !value, { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." });
   const normalize = (text: string) =>
     text.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("pt-BR");
   const profiles =

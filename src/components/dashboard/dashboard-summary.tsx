@@ -6,17 +6,18 @@ import { Icon } from "@/components/ui/primitives";
 import { DocumentRow } from "@/components/documents/document-history";
 import type { DashboardData } from "@/types/dashboard";
 import { formatQuantity } from "@/lib/quantity";
+import { ModelSectionHead } from "@/components/ui/model-section";
 
 export function ShiftSummary({data}:{data:DashboardData}) {
   const s=data.nextShift;
   if(!s)return null;
   const stamp=(value:string)=>new Intl.DateTimeFormat("pt-BR",{timeZone:s.timezone,dateStyle:"short",timeStyle:"short"}).format(new Date(value));
-  return <section className="ui-card"><div className="hca-section-heading"><h2>{s.active?"Plantão previsto para agora":"Próximo plantão previsto"}</h2><Icon name="calendar"/></div><strong>{s.shift_types?.name} · {s.professionalName}</strong><p>{stamp(s.starts_at)} → {stamp(s.ends_at)}</p><Link href="/escalas" prefetch={false}>Consultar escala e alterações</Link></section>;
+  return <section className="card week-card"><ModelSectionHead title={s.active?"Plantão previsto para agora":"Próximo plantão previsto"} icon="calendar" action={<Link className="btn btn-ghost" href="/escalas" prefetch={false}>Ver escala<Icon name="arrow" /></Link>} /><div className="card-body"><strong>{s.shift_types?.name} · {s.professionalName}</strong><p>{stamp(s.starts_at)} → {stamp(s.ends_at)}</p></div></section>;
 }
 
 export function RecentDocuments({ data }: { data: DashboardData }) {
-  return <section className="hca-records"><div className="hca-dashboard-section-heading"><h2>Movimentações recentes</h2><Link href="/historico" prefetch={false}>Ver histórico</Link></div>
-    {data.recent.length ? data.recent.map((row) => <DocumentRow key={row.id} row={row} />) : <p className="p-5 text-sm text-(--muted)">As fichas emitidas aparecerão aqui.</p>}
+  return <section className="card recent-card"><ModelSectionHead title="Movimentações recentes" icon="history" action={<Link className="btn btn-ghost" href="/historico" prefetch={false}>Ver histórico<Icon name="arrow" /></Link>} />
+    <div className="av-record-list">{data.recent.length ? data.recent.map((row) => <DocumentRow key={row.id} row={row} />) : <p className="card-body">As fichas emitidas aparecerão aqui.</p>}</div>
   </section>;
 }
 export function RequestProgress({ data }: { data: DashboardData }) {
@@ -31,9 +32,9 @@ export function RequestProgress({ data }: { data: DashboardData }) {
 }
 export function CriticalStockSummary({ data }: { data: DashboardData }) {
   if (!data.criticalStock.length) return null;
-  return <section className="hca-records"><div className="hca-dashboard-section-heading"><h2>Estoque que precisa de atenção</h2><Icon name="stock" /></div>
-    {data.criticalStock.slice(0, 4).map((item) => <Link className="hca-record" key={item.productId + item.custody} href={"/estoque?custody=" + item.custody} prefetch={false}>
-      <span className="hca-record-main"><strong>{item.name}</strong><small>{item.custody === "FAMILY" ? "Família" : "Equipe"} · Confirmado: {formatQuantity(item.confirmed)} {item.unit} · Mínimo: {formatQuantity(item.minimum)}</small></span><Icon name="arrow" />
+  return <section className="card"><ModelSectionHead title="Estoque que precisa de atenção" icon="stock" />
+    {data.criticalStock.slice(0, 4).map((item) => <Link className="av-task" key={item.productId + item.custody} href={"/estoque?custody=" + item.custody} prefetch={false}>
+      <span className="task-icon"><Icon name="box" width={18} height={18} /></span><span><strong>{item.name}</strong><small>{item.custody === "FAMILY" ? "Família" : "Equipe"} · Confirmado: {formatQuantity(item.confirmed)} {item.unit} · Mínimo: {formatQuantity(item.minimum)}</small></span><Icon name="chevron" />
     </Link>)}
   </section>;
 }

@@ -9,7 +9,8 @@ import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(120_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
-const links = (page: Page) => page.locator("a.document-row");
+async function openFilters(page: Page) { const trigger = page.getByRole("button", { name: /^Filtros/ }); if (await trigger.getAttribute("aria-expanded") !== "true") await trigger.click(); }
+const links = (page: Page) => page.locator("a.av-record");
 const facts = (patient: string) => sql(`select jsonb_build_object('documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${q(patient)}),'events',(select jsonb_agg(to_jsonb(e) order by id) from public.document_events e where care_recipient_id=${q(patient)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)}),'science',(select jsonb_agg(to_jsonb(s) order by id) from public.requisition_science_events s where care_recipient_id=${q(patient)}),'openings',(select jsonb_agg(to_jsonb(o) order by id) from public.requisition_openings o where care_recipient_id=${q(patient)}));`);
 async function login(page: Page, patient: string) {
   await page.goto("/login");
@@ -40,10 +41,12 @@ test("document list rejects malformed totals without presenting an empty or losi
   await expect(links(page).first()).toContainText(doc.code);
   for (const invalid of ["incomplete", "patient", "page", "filter", "total", "duplicate"]) {
     mode = invalid;
-    await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+    await openFilters(page); await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
     await expect(page.getByRole("alert").filter({ hasText: "resposta" })).toBeVisible();
     await expect(page.getByText("Nenhuma ficha encontrada", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Última consulta válida", { exact: false })).toBeVisible();
+    await expect(links(page)).toHaveCount(0);
+    await page.getByRole("button", { name: "Mostrar lista da última consulta", exact: true }).click();
     await expect(links(page)).toHaveCount(1);
     await expect(links(page).first()).toContainText(doc.code);
     mode = "live";
@@ -51,7 +54,7 @@ test("document list rejects malformed totals without presenting an empty or losi
     await expect(page.getByRole("alert").filter({ hasText: "resposta" })).toHaveCount(0);
   }
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.adminA.id)},'com.read',false);`);
-  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await openFilters(page); await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect(page.getByText("Nenhuma ficha encontrada", { exact: true })).toBeVisible();
   await expect(links(page)).toHaveCount(0);
   expect(facts(f.patient)).toBe(before);
@@ -59,7 +62,7 @@ test("document list rejects malformed totals without presenting an empty or losi
 
 async function traverse(page: Page, order: string[]) {
   const collected: string[] = [];
-  const observed = () => links(page).evaluateAll(nodes => nodes.map(node => node.getAttribute("href")!.split("/").at(-1)));
+  const observed = () => links(page).evaluateAll(nodes => nodes.map(node => new URL((node as HTMLAnchorElement).href).pathname.split("/").at(-1)));
   const navigation = page.getByRole("navigation", { name: "Páginas do histórico", exact: true });
   for (let offset = 0; offset < order.length; offset += 20) {
     await expect.poll(observed).toEqual(order.slice(offset, offset + 20));
@@ -100,14 +103,14 @@ test("document list reaches more than100 REQ and old pending records with stable
   });
   await page.goto(`/historico?careRecipientId=${f.patient}`);
   await traverse(page, order);
-  await page.getByRole("button", { name: "Pesquisar e filtrar", exact: true }).click();
-  await page.getByRole("combobox", { name: "Ficha", exact: true }).selectOption("REQ");
-  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await page.getByRole("button", { name: "Filtros", exact: true }).click();
+  await page.getByRole("combobox", { name: "Tipo de ficha", exact: true }).selectOption("REQ");
+  await openFilters(page); await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await traverse(page, requisitions);
   expect(new URL(page.url()).searchParams.get("page")).toBe("6");
   await page.reload();
-  await expect.poll(() => links(page).first().getAttribute("href")).toBe(`/documentos/${oldest}`);
-  await expect(page.getByRole("combobox", { name: "Ficha", exact: true })).toHaveValue("REQ");
+  await expect.poll(async () => new URL((await links(page).first().getAttribute("href"))!, page.url()).pathname).toBe(`/documentos/${oldest}`);
+  await expect(page.getByRole("combobox", { name: "Tipo de ficha", exact: true })).toHaveValue("REQ");
 
   let release!: () => void, entered!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; }), ready = new Promise<void>(resolve => { entered = resolve; });
@@ -117,12 +120,14 @@ test("document list reaches more than100 REQ and old pending records with stable
     }
     return route.continue();
   });
-  const search = page.getByRole("textbox", { name: "Código ou protocolo", exact: true });
+  const search = page.getByRole("searchbox", { name: "Buscar por código ou protocolo", exact: true });
   const oldResponse = page.waitForResponse(response => new URL(response.url()).pathname === "/api/documents" && new URL(response.url()).searchParams.get("search") === "SEMRESULTADO999");
   try {
     await search.fill("SEMRESULTADO999"); await search.press("Enter"); await ready;
     await expect(page.getByText("Consultando documentos…", { exact: true })).toBeVisible();
     await expect(page.getByText("Nenhuma ficha encontrada", { exact: true })).toHaveCount(0);
+    await page.goBack();
+    await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
     await search.fill(code); await search.press("Enter");
     await expect.poll(() => new URL(page.url()).searchParams.get("search")).toBe(code);
     await expect(links(page)).toHaveCount(1);
@@ -132,15 +137,15 @@ test("document list reaches more than100 REQ and old pending records with stable
   await (await oldResponse).finished();
   await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
   await expect(links(page)).toHaveCount(1);
-  await expect(links(page).first()).toHaveAttribute("href", `/documentos/${oldest}`);
+  await expect(links(page).first()).toHaveAttribute("href", new RegExp("^/documentos/" + oldest + "(?:\\?|$)"));
   await expect(search).toBeFocused();
   await page.unroute("**/api/documents?*");
   const day = sql(`select (created_at at time zone 'America/Sao_Paulo')::date::text from public.operational_documents where id=${q(oldest)};`);
-  await page.getByLabel("De", { exact: true }).fill(day);
+  await openFilters(page); await page.getByLabel("De", { exact: true }).fill(day);
   await page.getByLabel("Até", { exact: true }).fill(day);
-  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await openFilters(page); await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect.poll(() => new URL(page.url()).searchParams.get("from")).toBe(day);
-  await expect(page.getByLabel("De", { exact: true })).toHaveValue(day);
+  await openFilters(page); await expect(page.getByLabel("De", { exact: true })).toHaveValue(day);
   await expect(links(page)).toHaveCount(1);
   await page.goBack();
   await expect.poll(() => new URL(page.url()).searchParams.get("from")).toBeNull();
@@ -190,7 +195,7 @@ test("document list distinguishes initial delay and error from zero and clears a
   expect((await bounded.json()).pageSize).toBe(100);
   expect((await page.request.get(`/api/documents?careRecipientId=${f.patient}&from=2026-11-12&to=2026-11-11`)).status()).toBe(400);
   mode = "denied";
-  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await openFilters(page); await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect(page.getByRole("alert").filter({ hasText: "Consulta de fichas recusada" })).toBeVisible();
   await expect(links(page)).toHaveCount(0);
   await expect(page.getByText("Última consulta válida", { exact: false })).toHaveCount(0);
