@@ -121,3 +121,16 @@ Estas verificações não são a suíte completa nem aceite humano ou em disposi
 físico. A publicação permanece na branch existente; o gate solicitado é a CI do
 SHA publicado iniciar corretamente os seis jobs de navegador, sem falha anterior.
 Replay limpo, evolução legada e integração completa são verificados nessa CI.
+
+## Correção anterior ao início dos navegadores
+
+Na CI de `6ebcf0f1`, Ubuntu passou. O Windows executou 1.089 testes e encontrou
+um único timeout: o comprovante Unicode longo, com duas renderizações e extração
+independente de texto, levou 5.199 ms contra o padrão Vitest de 5.000 ms.
+O caso agora usa os mesmos 30 segundos limitados dos probes de estrutura PDF.
+Os 45 itens, conteúdo estável, paginação e título continuam obrigatórios;
+nenhuma asserção, fixture ou renderização foi removida. Os nove testes desse
+arquivo passaram na repetição dirigida no Windows local. Não houve alteração
+de produto ou banco. A CI do commit corretivo precisa validar o conjunto e
+iniciar corretamente os navegadores; o verde de Ubuntu do SHA anterior não é
+aprovação do novo SHA.

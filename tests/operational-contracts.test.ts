@@ -277,4 +277,6 @@ it("renderiza comprovante Unicode longo com paginação e versão estável", asy
   expect(pdf.getPageCount()).toBeGreaterThan(1);
   expect((await PDFDocument.load(second)).getPageCount()).toBe(pdf.getPageCount());
   expect(pdf.getTitle()).toContain("ENT-0001");
-});
+  // Two Unicode renderings plus independent text extraction exceeded Vitest's
+  // default 5s on Windows CI. Match the bounded PDF structure probes' budget.
+}, 30_000);

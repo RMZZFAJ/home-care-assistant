@@ -14,6 +14,10 @@ revertida; quatro hashes de preservação e seis corpos de função canônicos
 conferidos. Jornadas dirigidas em Chromium, mobile e iOS passaram, com
 repetição dos casos afetados e contraprovas preservadas. A CI do SHA final
 continua como gate até o início correto dos seis jobs de navegador.
+A primeira publicação desta revisão passou no Ubuntu, mas o Windows encontrou
+um timeout de 5 segundos na dupla renderização Unicode. O caso recebeu o mesmo
+prazo limitado de 30 segundos dos probes PDF, sem mudar asserções; nove testes
+do arquivo passaram na repetição dirigida. O commit corretivo exige nova CI.
 
 **Continuação de 14/11 — acesso, Andamentos e diagnósticos.** Correções na mesma
 branch: transições cobertas sem telas intermediárias, recuperação de senha em
