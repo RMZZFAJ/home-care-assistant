@@ -14,7 +14,7 @@ import { documentLabels, type DocumentType } from "@/types/documents";
 const descriptions: Record<DocumentType, string> = {
   REQ: "Informe necessidades, estoque observado e urgência. Acompanhe o atendimento por item.",
   COM: "Organize a aquisição da família, aprove itens e valide a entrada no estoque.",
-  ENT: "Transfira materiais entre família e equipe com confirmação do destinatário.",
+  ENT: "Entrega segue da família para a equipe. Devolução de materiais segue da equipe para a família e não exige uma entrega de origem.",
   BAL: "Conte o estoque da equipe e reconcilie diferenças conforme as regras do paciente.",
 };
 export function FormsHub() {
@@ -28,7 +28,7 @@ export function FormsHub() {
               .map((type) => (
                 <section key={type} className="ui-card flex flex-col gap-4">
                   <div className="flex items-center justify-between">
-                    <span className="document-type">{type}</span>
+                    <span className="document-type hca-document-kind">{type}</span>
                     <Icon name="forms" />
                   </div>
                   <div>
@@ -51,6 +51,7 @@ export function FormsHub() {
                         Nova ficha <Icon name="plus" width="16" />
                       </Link>
                     ) : null}
+                    {type === "ENT" && can(context, "ent.create") ? <Link className={buttonClass} href="/fichas/devolucao">Nova devolução de materiais</Link> : null}
                     <Link
                       className={buttonClass}
                       href={"/historico?type=" + type}

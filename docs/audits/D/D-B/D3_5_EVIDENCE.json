@@ -1,0 +1,185 @@
+{
+  "sourceBaseSha": "dfdc7ded467a0b4e2bbb648984c0761a30cbd345",
+  "sourceTreeDirty": true,
+  "files": [
+    {
+      "file": "src/app/api/admin/route.ts",
+      "sha256LfUtf8": "5903b449bede762579f8cba08ec0365e1589a6f32400b9ac2035088c67cd52e8"
+    },
+    {
+      "file": "src/app/api/guides/route.ts",
+      "sha256LfUtf8": "80495ca79a00beeb1827d96701f62cf1a904c942585dddc6825f41a4b87bcf1d"
+    },
+    {
+      "file": "src/app/api/residence-preparations/route.ts",
+      "sha256LfUtf8": "dc6ff82305dc1a98c89fe46c021ba0c0b5da61010031f3d56ca16a027a54db65"
+    },
+    {
+      "file": "src/app/api/whatsapp/flows/submissions/route.ts",
+      "sha256LfUtf8": "73dfb16d592ce453e8edb93c8c5d38d6bd4dea0bc94c263d9fcc3075db676210"
+    },
+    {
+      "file": "src/app/guias/page.tsx",
+      "sha256LfUtf8": "633fb4c039276c4f519b94ce35dcc54c4a767df02e34c362538dc45abef7f959"
+    },
+    {
+      "file": "src/app/preparar-residencia/page.tsx",
+      "sha256LfUtf8": "4390b229357ad1c21bf9d77659feb6cd5cbf4c1c3ffb72aa85c871b8c0d05c61"
+    },
+    {
+      "file": "src/components/admin/admin-console.tsx",
+      "sha256LfUtf8": "61734ac4b4663322e73fcaa5763f5f3d1f3d401629833d8623820a9994b8e471"
+    },
+    {
+      "file": "src/components/admin/notification-settings.tsx",
+      "sha256LfUtf8": "7e960293a9679169046539ec347cb64e64c3e33e639f0def3fc0be8a9cca29f0"
+    },
+    {
+      "file": "src/components/admin/patient-registration.tsx",
+      "sha256LfUtf8": "e544752aad79b91f6cf4c9de22ccf651cad8df73327c3812c89961286cd9f784"
+    },
+    {
+      "file": "src/components/forms/record-drawer.tsx",
+      "sha256LfUtf8": "36eff23130422348c976f74ccc74fcd3787012dcd544ecff9bcd742db6c4db00"
+    },
+    {
+      "file": "src/components/guides/residence-preparation.tsx",
+      "sha256LfUtf8": "ffde465f580c3916295dc459191bcf532ea39da0ef9c7fb880fcddd6bdd9ff80"
+    },
+    {
+      "file": "src/components/guides/user-guide.tsx",
+      "sha256LfUtf8": "ca9d01771aaf4434636636550dc6c21d80db5aee2b71a92d20a14528c78ba824"
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "sha256LfUtf8": "c974ee2b67211cd6b666d90d74c71e2d3a8504d171100c9c5820eb0f3b2b9e22"
+    },
+    {
+      "file": "src/components/navigation/workspace-navigation.tsx",
+      "sha256LfUtf8": "42e74106338cc2dcf81fd9bb0561c2a313de24ad3608669d52c429da520a5727"
+    },
+    {
+      "file": "src/components/profile-console.tsx",
+      "sha256LfUtf8": "27d706a95d30818fa365e77d50e59366e68fd5d6b46bc970bb6f44ef22d1606f"
+    },
+    {
+      "file": "src/components/stock/flow-reviews.tsx",
+      "sha256LfUtf8": "365d9dc3c54a09c59dd3bfc387741f2fd767259e0ba2da63aeadf408850f9dd7"
+    },
+    {
+      "file": "src/lib/client/use-command-intent.ts",
+      "sha256LfUtf8": "1caeaba894934e66b62aafa01a7fd01eb1412d9d3cf2338cad5750ce6815292d"
+    },
+    {
+      "file": "src/lib/guide-content.ts",
+      "sha256LfUtf8": "458d602bdc4a57d90ee2d8512bbe5c7d6529f46c2fc600fe4ed649eaf9e239a1"
+    },
+    {
+      "file": "src/lib/validation/flow-reviews.ts",
+      "sha256LfUtf8": "2045cff1a0c5d68d1baa9fdf769e2ecd2738b6fc27465efab357ddaebef9cb48"
+    },
+    {
+      "file": "src/lib/validation/guides.ts",
+      "sha256LfUtf8": "99156a31f781b8dfef1cb33dfc3591ece43ae92e9440ded21f09c6ee7c9fe56c"
+    },
+    {
+      "file": "src/lib/validation/residence-preparation.ts",
+      "sha256LfUtf8": "49a2f436e2f46b266d37d783d256d61acf4a0f55fb337c620de5e33cd0301104"
+    },
+    {
+      "file": "supabase/migrations/20261107035508_phase_d3_residence_preparation_and_guides.sql",
+      "sha256LfUtf8": "09439e691682dd64e623a27c95327cf7c39275de79778b872c5a6e488ca69481"
+    },
+    {
+      "file": "supabase/migrations/20261107040539_phase_d3_preparation_read_models.sql",
+      "sha256LfUtf8": "e7f96dc3a54477890dc6d14b18b9ca3f3ad8be7b8d9a2f1300b2c5fedc7781c9"
+    },
+    {
+      "file": "supabase/migrations/20261107044658_phase_d3_guide_context_intent.sql",
+      "sha256LfUtf8": "de78b790d01914b3a3b12298a31b55cb6fa6ecda4daef28985c9551747154631"
+    },
+    {
+      "file": "tests/e2e/preparation-continuity.spec.ts",
+      "sha256LfUtf8": "f875e391179d4e752471e2054fa80a78dc7f627add82fa447e5dd0bf18982c31"
+    },
+    {
+      "file": "tests/integration/lock-barrier.mjs",
+      "sha256LfUtf8": "310360be78b8fcb025f63ae4487773b83c80e0413a28b729a7c0f240deeb30ed"
+    },
+    {
+      "file": "tests/integration/preparation-guides.test.mjs",
+      "sha256LfUtf8": "522583cf8abf26c6cf9b6d6a35af8ffed5440353df345fd7b2a083f43e472b80"
+    },
+    {
+      "file": "tests/preparation-guide-models.test.ts",
+      "sha256LfUtf8": "15537d8724532186b331afcf9dbc63a09e7130e6fab14842997f57562cffe97f"
+    }
+  ],
+  "localMigrations": 130,
+  "remoteMigrations": 121,
+  "remoteDBApplied": false,
+  "unitCasesPassed": 5,
+  "authBackendCasesPassed": 7,
+  "productionBrowserDistinctCasesPassed": 18,
+  "finalAffectedProductionCasesPassed": 3,
+  "projects": [
+    "chromium",
+    "mobile",
+    "ios"
+  ],
+  "viewportsForPreparationAndGuide": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "diagnosticModeIsAcceptance": false,
+  "humanPhysicalProviderApproval": false,
+  "basePublishedCI": {
+    "sha": "dfdc7ded467a0b4e2bbb648984c0761a30cbd345",
+    "run": 42335739149,
+    "allJobs": "SUCCESS",
+    "validatesCandidate": false
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "logs": [
+    "output/phase-d-work/d3-preparation-guides-auth-final.log",
+    "output/phase-d-work/d3-preparation-models-final.log",
+    "output/phase-d-work/d3-preparation-types-final.log",
+    "output/phase-d-work/d3-preparation-lint-final.log",
+    "output/phase-d-work/d3-preparation-lint-affected-final.log",
+    "output/phase-d-work/d3-preparation-joint-acceptance.log",
+    "output/phase-d-work/d3-preparation-final-affected-acceptance.log",
+    "output/phase-d-work/d3-preparation-continuity-diagnostic.log",
+    "output/phase-d-work/d3-preparation-continuity-diagnostic-recheck.log",
+    "output/phase-d-work/d3-preparation-continuity-diagnostic-final.log",
+    "output/phase-d-work/d3-consumption-accessibility-diagnostic.log",
+    "output/phase-d-work/d3-consumption-dom-diagnostic.log",
+    "output/phase-d-work/d3-preparation-joint-diagnostic.log",
+    "output/phase-d-work/d3-consumption-focus-recheck.log"
+  ],
+  "counterproofs": [
+    "Private preparation saves before patient creation; two sessions resume and explicitly resolve a CAS conflict without losing local values",
+    "Inactive creation and lost-response recovery produce one patient, one initial administrator, no creator membership and no document or stock movement",
+    "Local/professional/cross-owner calls and private helpers are denied;101 preparations remain reachable in stable pages",
+    "Observed profile lock followed by lost global context rolls back patient, membership, revision and journal; same intent succeeds after legitimate return",
+    "Guide malformed or valid-but-wrong-scope confirmation stays uncertain; exact intent replay recovers; configuration and progress do not alter SCI or membership",
+    "An old guide scope is rejected before affecting a newly selected patient; old public command entrypoint is closed",
+    "Consumption, Flow and administrative queue each use two Auth browser sessions, preserve edits or open reconciliation, and reject a fully delivered late old-scope response",
+    "Flow ingress and external uncertain notification state are controlled local SQL fixtures, not external provider proof; no external sends were enabled",
+    "101 Flow suggestions match independent SQL ordering across50/50/1 HTTP pages; UI reaches and opens the oldest suggestion; page size remains bounded100",
+    "Drawer was visible but aria-hidden in diagnostic Strict Mode: stale cleanup restored its trigger while still open; cancelling the replaced effect frame fixed the directed case",
+    "Instrument failures for labels, a closed combobox and unsupported fixture event key were corrected without bypassing notification guards or reducing accessibility assertions",
+    "Joint production run:15 passed and3 failed. Inactive operations correctly returned PATIENT_INACTIVE409 rather than the assumed403; assert status and code, no document",
+    "Mobile/WebKit768 resize retained a scroll position partially behind the sticky header; viewport audits now begin at scroll origin with all axe rules unchanged. This does not approve every scrolled/focus state",
+    "First acceptance screenshots and contexts preserved in output/phase-d-work/d3-preparation-first-acceptance-counterproofs; confirmed preparation recovery now clears its obsolete command error",
+    "Final static drawer cleanup names its frame ref and captures only the connected fallback from the closing effect; current consumption callers do not provide that fallback; broader consumers remain a candidate CI gate"
+  ],
+  "remaining": [
+    "Complete GUI-02 material adoption and physical opening controls with legitimate local task delegation",
+    "Complete GUI-01/GUI-03 convergence and review every role",
+    "Remaining D3 and all D4/D5/operational requirements",
+    "Candidate CI and final authorized remote reconciliation",
+    "Human, physical-device and provider gates in D-C/D6"
+  ]
+}

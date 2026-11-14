@@ -1,0 +1,26 @@
+{
+  "at": "2026-11-08T02:17:02.272927+00:00",
+  "project": "qwfrqychokvhdzakibid",
+  "before": {
+    "rls_enabled_no_policy": 39,
+    "extension_in_public": 1,
+    "anon_security_definer_function_executable": 3,
+    "authenticated_security_definer_function_executable": 149,
+    "auth_leaked_password_protection": 1
+  },
+  "after": {
+    "rls_enabled_no_policy": 41,
+    "extension_in_public": 1,
+    "anon_security_definer_function_executable": 3,
+    "authenticated_security_definer_function_executable": 153,
+    "auth_leaked_password_protection": 1
+  },
+  "expectedDelta": {
+    "rls_enabled_no_policy": 2,
+    "authenticated_security_definer_function_executable": 4
+  },
+  "interpretation": "Two private RLS tables intentionally have no direct policies/grants; four Auth RPCs revalidate current ownership/context. Two worker-only RPCs attest source and settle transport. New helpers are not anonymously executable. Existing unaccent, anonymous-function and leaked-password warnings retained, not approved away.",
+  "remediation": "https://supabase.com/docs/guides/database/database-linter",
+  "rawLfSha256": "8db5ce09ad4d0b57f02281305cec61b98818baf1004b55404195c6688bfb1a2a",
+  "operationalGo": false
+}

@@ -1,0 +1,33 @@
+{
+  "at": "2026-11-08T23:49:44.977Z",
+  "sha": "ccebfcb9e8c6ec9eafb1591aae3ea4f868a2d3f7",
+  "runId": 42536119182,
+  "jobs": [
+    {
+      "id": 128900682749,
+      "name": "database",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 128900682891,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128900682958,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "preview": {
+    "id": "dpl_42uz6PYyYXi8hYk6RN4aaQhyNHjz",
+    "state": "READY",
+    "sha": "ccebfcb9e8c6ec9eafb1591aae3ea4f868a2d3f7",
+    "stableOrigin": "https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app"
+  },
+  "approval": false,
+  "newShaNeedsOwnCi": true
+}

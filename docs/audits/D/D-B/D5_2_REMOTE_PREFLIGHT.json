@@ -1,0 +1,113 @@
+{
+  "status": "PREFLIGHT_ACCEPTED_FOR_PENDING_ONLY_APPLICATION",
+  "at": "2026-11-07T21:21:53.282Z",
+  "project": "qwfrqychokvhdzakibid",
+  "sourceHead": "4bf8247f9e2debc71c92ba4e555090957e084698",
+  "sourceDirty": true,
+  "ownerAmendment": "OWNER_AMENDMENTS.md#reconciliação-remota-antecipada--fechamento-de-d51",
+  "before": 143,
+  "target": 144,
+  "pending": [
+    {
+      "file": "20261107195440_phase_d5_web_push_transport.sql",
+      "sha256": "8c83fc6ebb9d67a57248d3a3b53c79e602bc6373356b8c48d6d91d8322a8c57b"
+    }
+  ],
+  "remoteHistorySqlMatched": 143,
+  "remoteStructuralDrift": [],
+  "backup": {
+    "id": "b065691e-d9af-43ea-88f8-7d6c8111c0a3",
+    "manifestSha256": "d55dec16160c02c94a810ecbe5e492eaf255f49926f32952bc515905fcb7b33c",
+    "files": 77,
+    "bytes": 10094070,
+    "authenticated": true,
+    "restoredTables": 135,
+    "stableTableDigestsMatched": true,
+    "foreignKeysChecked": true,
+    "storageObjects": 32,
+    "pdfDigests": 31,
+    "signedIssuanceDigests": 0,
+    "probeUpgradeMigrations": 1,
+    "seconds": 57.486,
+    "destination": "Operator computer outside Git; owner-only ACL; separate encryption key",
+    "operationalExternalBackupActive": false
+  },
+  "catalogueComparison": {
+    "views": false,
+    "columns": true,
+    "indexes": true,
+    "defaults": true,
+    "policies": true,
+    "triggers": true,
+    "functions": true,
+    "relations": true,
+    "constraints": false,
+    "table_grants": true,
+    "function_grants": true
+  },
+  "compatibility": {
+    "status": "ADDITIVE_COMPATIBLE_WITH_REMOTE_143",
+    "before": 143,
+    "after": 144,
+    "existingFunctionDefinitionsPreserved": 372,
+    "existingPublicFunctionDefinitionsPreserved": 221,
+    "existingFunctionGrantsPreserved": 548,
+    "existingTableGrantsPreserved": 762,
+    "oldNoticeProducerPreserved": true,
+    "newTrigger": "Fanout only existing internal non-silent notifications with explicit current-session device consent; no historical backfill",
+    "existingRemoteDevices": 0,
+    "probeQualifications": {
+      "views": "pg_dump/reparse AS aliases; live remote143 catalogue matched prior post-validation",
+      "constraints": "Only presentation_finite_factor validation flag differs for retained local legacy NaN fixture; exact predicate"
+    },
+    "productionHead": "8ec979aac340bbc19ec64288bf0acf3abea4711a",
+    "previewHead": "4bf8247f9e2debc71c92ba4e555090957e084698",
+    "noExistingPublicFunctionChanged": true
+  },
+  "localValidation": {
+    "directedProductionBrowsers": "18 distinct across two production cohorts: 12 unchanged cases retained from 14-pass/4-fail cohort; final 6/6 corrected cases Chromium/mobile/WebKit",
+    "runtimeSourcesUnchangedAcrossCohorts": true,
+    "realAuth": "7 distinct cases; first 6 pass/1 fixture fail, corrected case pass",
+    "unit": "22/22; independent RFC8291 decryption and VAPID signature verification",
+    "serviceRoleSql": "PASS directed official runner, no reset",
+    "typesLint": "PASS affected sources",
+    "ciBase": "4bf8247 terminal failure; database and both validate jobs PASS; public status selector and history test adapter corrected locally",
+    "currentCi": "NOT_PUBLISHED_YET"
+  },
+  "sourcePreservation": {
+    "stableTablesMatchedImmediatelyBeforeApply": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.scheduler_health"
+    ]
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0,
+    "originalCronStates": [
+      {
+        "active": true,
+        "name": "hca-notification-worker",
+        "schedule": "* * * * *"
+      },
+      {
+        "active": true,
+        "name": "hca-operational-lifecycle",
+        "schedule": "* * * * *"
+      }
+    ]
+  },
+  "dryRun": {
+    "pending": 1,
+    "seeds": [],
+    "roles": [],
+    "skipVault": true
+  },
+  "limits": [
+    "No operational GO",
+    "No reset, remote fixtures, Auth configuration or external transport activation",
+    "Probe restore is not a D6 operational recovery test",
+    "Current source CI remains separate"
+  ]
+}

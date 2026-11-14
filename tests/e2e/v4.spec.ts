@@ -1,3 +1,5 @@
+import { selectProfileSection } from "./profile-sections";
+import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -66,7 +68,7 @@ async function setup(page: Page) {
   return { patient, product };
 }
 
-test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e compartilhamento do arquivo", async ({
+test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e compartilhamento do arquivo", async ({
   page,
   browser,
 }) => {
@@ -79,7 +81,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
   await post(page, "/api/patient-settings", {
     careRecipientId: patient,
     kind: "settings",
-    change: { scienceAutomatic: true, scienceByDispatch: false },
+    change: { scienceDialog: true },
     idempotencyKey: randomUUID(),
     expectedVersion: settings.version,
   });
@@ -123,15 +125,13 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
     });
     await login(family, "family", patient);
     await family.goto("/perfil?careRecipientId=" + patient);
-    await family.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
-    await family
-      .getByRole("checkbox", { name: /Automática por eventos autorizados/ })
-      .check();
-    await family
-      .getByRole("button", { name: "Salvar perfil", exact: true })
-      .click();
+    await selectProfileSection(family, "notices");
+    await family.getByRole("combobox", { name: "Modalidade pessoal", exact: true }).selectOption("dialog");
+    await family.getByRole("checkbox", { name: "Confirmo expressamente esta preferência pessoal.", exact: true }).check();
+    await family.getByRole("button", { name: "Revisar preferência", exact: true }).click();
+    await family.getByRole("dialog", { name: "Revisar preferência de ciência", exact: true }).getByRole("button", { name: "Confirmar preferência", exact: true }).click();
     await expect(
-      family.getByText("Perfil atualizado.", { exact: true }),
+      family.getByText("Preferência salva.", { exact: false }),
     ).toBeVisible();
     await family.goto("/historico?careRecipientId=" + patient);
     await login(pro, "professional", patient);
@@ -174,8 +174,10 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
     );
     await justification.fill("Necessidade revisada após consulta contextual");
     await family.getByRole("link").filter({ hasText: receipt.code }).click();
+    await family.getByRole("dialog", { name: "Ciência antes de abrir a requisição", exact: true }).getByRole("button", { name: "Confirmar ciência e abrir", exact: true }).click();
+    await selectDocumentSection(family, "workflow");
     await expect(
-      family.getByText("Automática · conteúdo exibido", { exact: false }),
+      family.getByText("Confirmação em diálogo antes de abrir", { exact: false }),
     ).toBeVisible({ timeout: 15000 });
     await expect(justification).toHaveValue(
       "Necessidade revisada após consulta contextual",
@@ -187,12 +189,16 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
       pro.getByRole("checkbox", { name: /Material V4 visual/ }),
     ).toBeChecked();
     await pro.goto("/historico/" + receipt.requisitionId);
+    await selectDocumentSection(pro, "workflow");
     await expect(
-      pro.getByText("Automática · conteúdo exibido", { exact: false }),
+      pro.getByText("Confirmação em diálogo antes de abrir", { exact: false }),
     ).toBeVisible();
+    await selectDocumentSection(pro, "materials");
     await expect(
-      pro.getByRole("listitem").filter({ hasText: "Material V4 visual" }),
+      pro.getByRole("table", { name: "Materiais requisitados", exact: true }).getByRole("row").filter({ hasText: "Material V4 visual" }),
     ).toHaveCount(1);
+    await selectDocumentSection(family, "files");
+    await family.getByRole("button", { name: "Gerar PDF", exact: true }).click();
     await expect(
       family.getByRole("button", { name: "Compartilhar PDF", exact: true }),
     ).toBeEnabled({ timeout: 15000 });
@@ -230,7 +236,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
       async (route) => {
         trackingRequests += 1;
         await route.fulfill({
-          json: { data: [{ state: "pending", channel: "internal" }] },
+          json: { data: [{ state: "pending", channel: "internal" }], waitSeconds: 10 },
         });
       },
     );
@@ -243,7 +249,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência automática e
     await family.clock.runFor(11_000);
     await expect(
       family.getByText(
-        "Documento salvo. Os avisos continuam sendo processados; consulte o acompanhamento.",
+        "Documento salvo. Acompanhamento inicial encerrado; consulte os estados atuais dos avisos.",
         { exact: true },
       ),
     ).toBeVisible();

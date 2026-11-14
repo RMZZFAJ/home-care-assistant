@@ -1,4 +1,21 @@
 const labels: Record<string, string> = {
+  "ent.fulfillment_reviewed": "Suficiência reavaliada pela família após diferença no recebimento",
+  "req.complement_added": "Ficha complementar vinculada ao registro original",
+  "req.complement_linked": "Vínculo com a ficha de origem registrado",
+  "com.complement_added": "Ficha complementar vinculada ao registro original",
+  "com.complement_linked": "Vínculo com a ficha de origem registrado",
+  "ent.complement_added": "Ficha complementar vinculada ao registro original",
+  "ent.complement_linked": "Vínculo com a ficha de origem registrado",
+  "bal.complement_added": "Ficha complementar vinculada ao registro original",
+  "bal.complement_linked": "Vínculo com a ficha de origem registrado",
+  "req.cancellation_acknowledged": "Ciência do cancelamento da requisição registrada",
+  "com.cancellation_acknowledged": "Ciência do cancelamento da compra ou doação registrada",
+  "ent.cancellation_acknowledged": "Ciência do cancelamento da entrega ou devolução registrada",
+  "bal.cancellation_acknowledged": "Ciência do cancelamento do balanço registrada",
+  "ent.transfer.declared": "Transferência declarada para concordância",
+  "ent.transfer.agreed": "Concordância própria da contraparte registrada",
+  "ent.transfer.declined": "Transferência recusada pela contraparte",
+  "ent.transfer.withdrawn": "Declaração encerrada sem expedição",
   "bal.cycle.configured": "Programação do balanço atualizada",
   "bal.cycle.opened": "Obrigação semanal disponibilizada",
   "bal.cycle.assigned": "Balanço atribuído ao plantão",
@@ -11,6 +28,9 @@ const labels: Record<string, string> = {
   "bal.cycle.deferral_rejected": "Adiamento rejeitado pela família",
   "bal.cycle.deferred": "Adiamento autorizado pela família",
   "bal.cycle.recount_assigned": "Reconto formalmente designado",
+  "bal.cycle.recount_transferred": "Responsabilidade do reconto transferida no mesmo plantão",
+  "bal.cycle.recount_unassigned": "Reconto aguardando nova designação autorizada",
+  "bal.cycle.recount_recorded": "Nova contagem física do reconto registrada",
   "bal.cycle.counted": "Contagem atual registrada e pendências regularizadas",
   "bal.cycle.assignment_resolved": "Responsabilidade do balanço definida",
   "schedule.type": "Tipo de plantão atualizado",
@@ -27,10 +47,12 @@ const labels: Record<string, string> = {
   "occurrence.received": "Ocorrência recebida para revisão",
   "bal.reminder": "Lembrete de balanço da equipe",
   "shift.reminder": "Comunicação de materiais do período",
+  "req.remaining_need_declared": "Nova necessidade vinculada declarada",
   "req.issued": "Requisição emitida",
   "req.registered_author": "Requisição encaminhada para ciência familiar",
   "req.science_recorded": "Ciência individual registrada",
   "req.science_satisfied": "Ciência familiar exigida satisfeita",
+  "req.science_requirement_changed": "Critério familiar atualizado para uma pessoa habilitada",
   "req.completed": "Requisição atendida operacionalmente",
   "req.fulfillment_updated": "Atendimento atualizado pelas entregas vinculadas",
   "req.reopened": "Atendimento reaberto por pendência",
@@ -40,29 +62,44 @@ const labels: Record<string, string> = {
   "ent.reminder": "Lembrete de conferência",
   "req.status": "Etapa da requisição atualizada",
   "req.item_resolved": "Item extra identificado",
-  "com.issued": "Compra registrada",
-  "com.approve": "Itens da compra aprovados",
+  "com.issued": "Ficha de compra ou doação emitida",
+  "com.approve": "Itens de compra ou doação aprovados",
   "com.purchase": "Aquisição registrada",
   "com.receive": "Recebimento informado",
   "com.validate_receipt": "Recebimento validado",
   "com.reject_receipt": "Recebimento rejeitado",
-  "com.cancel": "Compra cancelada",
+  "com.close_expectation": "Expectativa não adquirida encerrada",
+  "com.cancel": "Ficha de compra ou doação cancelada",
   "ent.issued": "Materiais expedidos",
   "ent.receive": "Recebimento conferido",
   "ent.resolve": "Divergência conciliada",
   "ent.reassign": "Destinatário atualizado",
   "ent.cancel": "Cancelamento registrado",
   "ent.consent_cancel": "Cancelamento consentido",
+  "ent.refuse_cancellation": "Pedido de cancelamento recusado pelo recebedor",
+  "ent.withdraw_cancellation": "Pedido de cancelamento retirado pelo solicitante",
+  "ent.propose_regularization": "Regularização administrativa proposta",
+  "ent.review_regularization": "Conferência independente da regularização registrada",
+  "ent.withdraw_regularization": "Proposta de regularização encerrada sem movimento",
+  "ent.record_regularization_finding": "Apuração futura registrada com autoria própria",
   "bal.issued": "Balanço registrado",
   "bal.recount": "Nova contagem registrada",
   "bal.approve": "Revisão do balanço registrada",
+  "bal.apply": "Aplicação da contagem ao estoque registrada",
   "bal.cancel": "Balanço cancelado",
   "attachment.bound": "Anexo vinculado",
 };
-export function documentEventLabel(action?: string) {
+export function isKnownDocumentEvent(action: string) {
+  return Object.hasOwn(labels, action);
+}
+export function documentEventLabel(action?: string, origin?: "purchase" | "donation") {
   if (!action) return "Atualização disponível";
+  if (origin === "donation") {
+    const donation: Record<string, string> = { "com.issued": "Ficha de doação emitida", "com.approve": "Itens da doação aprovados", "com.cancel": "Ficha de doação cancelada" };
+    if (Object.hasOwn(donation, action)) return donation[action];
+  }
   return (
-    labels[action] ??
+    (isKnownDocumentEvent(action) ? labels[action] : undefined) ??
     (action.endsWith(".draft")
       ? "Rascunho salvo"
       : action.endsWith(".submit")

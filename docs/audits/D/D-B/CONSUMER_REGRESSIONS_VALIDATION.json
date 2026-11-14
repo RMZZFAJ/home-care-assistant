@@ -1,0 +1,1261 @@
+{
+  "assembledAt": "2026-11-09T15:03:23.048305+00:00",
+  "baseSha": "27d2a06844f87ee685d1aa3801ccb6c6c290737b",
+  "sourceLfSha256": {
+    "src/components/documents/delivery-regularization.tsx": "554182a5c802052c42e446a7740a4a95b3ff7a5fae343d040e4d3667a1a97fba",
+    "src/components/documents/supply-command-editor.tsx": "ff9d92626d894033ab2002b41a54100020ece013b92434f9b3beb39734322b42",
+    "src/components/documents/supply-detail.tsx": "592c0167d55c8148bb655550b4599e51d2d8340eba93e8a0ffbb7064e34a80c8",
+    "src/components/schedules/schedule-console.tsx": "c4346dac9d780de39dede2b2b02b7db6afcb6c0bff5f2cb1b0a5a90bcf386016",
+    "src/components/stock/movement-origin.tsx": "41c8be9073f25fff99a25b4e4a5767da866e0cf6a181999bdc31e65d4d605b34",
+    "src/lib/forms/dialog-focus.ts": "2b23c649900dcbff14a5907acf434f3c36e46a4300618b9e74af4862c7c6c9de",
+    "tests/e2e/delivery-regularization.spec.ts": "799a75de489378027fd48220be5e85f00b3a96de23ef7197914ade18d8f389dd",
+    "tests/e2e/focus-diagnostics.ts": "981e259f88f1290b6b13d6ad78bfd30995937b2adea2d11927a86fc8e79a9dc2",
+    "tests/e2e/pdf-fidelity.spec.ts": "a3b442a86b1c4c12fd162dcdb0987baf923c3aa1e29044375ffa4a370ec146b4",
+    "tests/e2e/pdf-source-facts.spec.ts": "828faa2ce38e7dd76394f399c2fce90e2ee4d06fbec549eada35bd03fe49592b",
+    "tests/e2e/purchase-receipts.spec.ts": "a1a86a1c0289ee5ccd41fed0ad6219796a195e6e2a8a269140d1388e85d02b48",
+    "tests/e2e/selected-dates-new-window.spec.ts": "ed4bafa5d83b278036e7ba9d79937a97138e31b6dc7f807c79f61f599290fe52",
+    "tests/e2e/stock-origins.spec.ts": "9d0cb807f206ac5bc2a76ad76f2c45f3ae1d41ec7e285156f0df1c0fc9ded66f",
+    "tests/e2e/web-push.spec.ts": "f7e90eff5f6c48af7dec1a5940864b30a09978e66a1ee657c08a68e2476e2831",
+    "tests/e2e/workflows.spec.ts": "e5204932a32e44610e19ff7db27b8bb2df9dbbdb11e574ee96c4ea447fa4b0ac"
+  },
+  "browser": {
+    "distinctApprovedCases": 20,
+    "mobileChromium": 16,
+    "iosWebKit": 4,
+    "identity": "file+path+title+project;latest outcome;mutable line number excluded",
+    "rounds": {
+      "ci-compatibility-initial": {
+        "stats": {
+          "total": 14,
+          "expected": 6,
+          "unexpected": 8,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "reportSha256": "e4004a27ac7c6bedca2e0818abd24a1a474315a2c5222d39f609103c7e9fbce2",
+        "cases": [
+          {
+            "title": "P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 444,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeFocused\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel('Sua justificativa', { exact: true })\nExpected: focused\nReceived: inactive\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeFocused\" getByLabel('Sua justificativa', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Sua justificativa', { exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <textarea rows=\"3\" id=\"_r_r_reason\" maxlength=\"1000\" aria-invalid=\"false\" class=\"hca-text-input\" aria-describedby=\"_r_r_reason-help\">Minha apuração administrativa preserva o recebime…</textarea>\u001b[22m\n\u001b[2m       - unexpected"
+            ]
+          },
+          {
+            "title": "REQ leva observação zero/decimal/desconhecida, tempo e atendimento por item ao PDF atual e conserva a versão anterior e a origem legada",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "pdf-fidelity.spec.ts",
+              "line": 69,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('region', { name: 'Mudar perfil', exact: true })\nExpected: not visible\nReceived: visible\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"not toBeVisible\" getByRole('region', { name: 'Mudar perfil', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: 'Mudar perfil', exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <section aria-label=\"Mudar perfil\" class=\"ui-card hca-context-selection\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"visible\"\u001b[22m\n\n\n\u001b[90m   at \u001b[39mauth-context.ts:30\n\n  28 |   "
+            ]
+          },
+          {
+            "title": "BAL identifica primeira contagem e reconto, conserva parecer e aprovação antiga sem apresentá-los como vigentes e mantém o exemplar anterior",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "pdf-fidelity.spec.ts",
+              "line": 121,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('region', { name: 'Mudar perfil', exact: true })\nExpected: not visible\nReceived: visible\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"not toBeVisible\" getByRole('region', { name: 'Mudar perfil', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: 'Mudar perfil', exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <section aria-label=\"Mudar perfil\" class=\"ui-card hca-context-selection\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"visible\"\u001b[22m\n\n\n\u001b[90m   at \u001b[39mauth-context.ts:30\n\n  28 |   "
+            ]
+          },
+          {
+            "title": "PDF atual assina fatos de rascunho e origens físicas conhecida e desconhecida; intenção V5 permanece recuperável",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "pdf-source-facts.spec.ts",
+              "line": 31,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).not.\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('region', { name: 'Mudar perfil', exact: true })\nExpected: not visible\nReceived: visible\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"not toBeVisible\" getByRole('region', { name: 'Mudar perfil', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: 'Mudar perfil', exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <section aria-label=\"Mudar perfil\" class=\"ui-card hca-context-selection\">…</section>\u001b[22m\n\u001b[2m       - unexpected value \"visible\"\u001b[22m\n\n\n\u001b[90m   at \u001b[39mauth-context.ts:30\n\n  28 |   "
+            ]
+          },
+          {
+            "title": "COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 81,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('form').filter({ has: getByRole('button', { name: 'Revisar operação', exact: true }) }).getByRole('button', { name: 'Revisar operação', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <button disabled type=\"submit\" class=\"hca-control hca-control--primary\">Revisar operação</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not enabled\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled "
+            ]
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 119,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "selected-dates-new-window.spec.ts",
+              "line": 113,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeFocused\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true })\nExpected: focused\nReceived: inactive\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeFocused\" getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true })\u001b[22m\n\u001b"
+            ]
+          },
+          {
+            "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "stock-origins.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "Web Push liga consentimento real de API, evento interno, worker controlado e destino Auth sem ciência ou cruzamento de aparelhos",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "web-push.spec.ts",
+              "line": 149,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 196,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('region', { name: 'Resumo da ficha', exact: true }).getByText('0/1 linhas integralmente conferidas', { exact: true })\nExpected: visible\nError: strict mode violation: getByRole('region', { name: 'Resumo da ficha', exact: true }).getByText('0/1 linhas integralmente conferidas', { exact: true }) resolved to 2 elements:\n    1) <p class=\"font-semibold\">0/1 linhas integralmente conferidas</p> aka getByText('0/1 linhas integralmente').first()\n    2) <p>0/1 linhas integralmente conferidas</p> aka getByRole('list', { name: 'Marcos da ficha' })"
+            ]
+          },
+          {
+            "title": "dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 360,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('region', { name: 'Resumo da ficha', exact: true }).getByText('8/10 linhas integralmente conferidas', { exact: true })\nExpected: visible\nError: strict mode violation: getByRole('region', { name: 'Resumo da ficha', exact: true }).getByText('8/10 linhas integralmente conferidas', { exact: true }) resolved to 2 elements:\n    1) <p class=\"font-semibold\">8/10 linhas integralmente conferidas</p> aka getByText('8/10 linhas integralmente').first()\n    2) <p>8/10 linhas integralmente conferidas</p> aka getByRole('list', { name: 'Marcos da fich"
+            ]
+          },
+          {
+            "title": "histórico filtra código e período e conserva o documento de paciente renomeado e inativo",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 535,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 692,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "item extra identificado, múltiplas REQ, scanner e trânsito até o aceite",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 772,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      },
+      "ci-compatibility-middle": {
+        "stats": {
+          "total": 16,
+          "expected": 13,
+          "unexpected": 3,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "reportSha256": "7a37fb912f21c1f6eafca1870816b5d121c8a77da8145f4cb1b798c509ed302f",
+        "cases": [
+          {
+            "title": "COM só adota referência oficial conferida e exige nova confirmação de expectativa após mudança de versão",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 204,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM conserva desmarcação de confirmação salva ao retomar o rascunho",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 380,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 444,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeFocused\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel('Sua justificativa', { exact: true })\nExpected: focused\nReceived: inactive\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeFocused\" getByLabel('Sua justificativa', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Sua justificativa', { exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <textarea rows=\"3\" id=\"_r_r_reason\" maxlength=\"1000\" aria-invalid=\"false\" class=\"hca-text-input\" aria-describedby=\"_r_r_reason-help\">Minha apuração administrativa preserva o recebime…</textarea>\u001b[22m\n\u001b[2m       - unexpected"
+            ]
+          },
+          {
+            "title": "REQ leva observação zero/decimal/desconhecida, tempo e atendimento por item ao PDF atual e conserva a versão anterior e a origem legada",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "pdf-fidelity.spec.ts",
+              "line": 69,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "BAL identifica primeira contagem e reconto, conserva parecer e aprovação antiga sem apresentá-los como vigentes e mantém o exemplar anterior",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "pdf-fidelity.spec.ts",
+              "line": 123,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "PDF atual assina fatos de rascunho e origens físicas conhecida e desconhecida; intenção V5 permanece recuperável",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "pdf-source-facts.spec.ts",
+              "line": 31,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 81,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('form').filter({ has: getByRole('button', { name: 'Revisar operação', exact: true }) }).getByRole('textbox', { name: 'Motivo / justificativa', exact: true })\nExpected: \u001b[32m\"Motivo fictício preservado depois da mudança de versão.\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" locator('form').filter({ has: getByRole('button', { name: 'Revisar operação', exact: true }) }).getByRole('textbox', { name: 'Motivo / justificativa', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waitin"
+            ]
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 138,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "selected-dates-new-window.spec.ts",
+              "line": 113,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeFocused\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true })\nExpected: focused\nReceived: inactive\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeFocused\" getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true })\u001b[22m\n\u001b"
+            ]
+          },
+          {
+            "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "stock-origins.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "Web Push liga consentimento real de API, evento interno, worker controlado e destino Auth sem ciência ou cruzamento de aparelhos",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "web-push.spec.ts",
+              "line": 149,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 196,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 360,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "histórico filtra código e período e conserva o documento de paciente renomeado e inativo",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 535,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 692,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "item extra identificado, múltiplas REQ, scanner e trânsito até o aceite",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "workflows.spec.ts",
+              "line": 772,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      },
+      "ci-compatibility-probe": {
+        "stats": {
+          "total": 4,
+          "expected": 2,
+          "unexpected": 2,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "reportSha256": "defc816866503d8489fc760f0fb54fffe056e37b6c33a4355485f41cd4afe30d",
+        "cases": [
+          {
+            "title": "P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 445,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeFocused\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel('Sua justificativa', { exact: true })\nExpected: focused\nReceived: inactive\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeFocused\" getByLabel('Sua justificativa', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Sua justificativa', { exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <textarea rows=\"3\" id=\"_r_r_reason\" maxlength=\"1000\" aria-invalid=\"false\" class=\"hca-text-input\" aria-describedby=\"_r_r_reason-help\">Minha apuração administrativa preserva o recebime…</textarea>\u001b[22m\n\u001b[2m       - unexpected"
+            ]
+          },
+          {
+            "title": "COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 81,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "selected-dates-new-window.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeFocused\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true })\nExpected: focused\nReceived: inactive\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeFocused\" getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true })\u001b[22m\n\u001b"
+            ]
+          },
+          {
+            "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "stock-origins.spec.ts",
+              "line": 37,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      },
+      "ci-compatibility-final": {
+        "stats": {
+          "total": 8,
+          "expected": 8,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "reportSha256": "453be60711b9c823a688d1105f1677c9001952568114e12b9c3e0a72bb752ad4",
+        "cases": [
+          {
+            "title": "P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 445,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 445,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 81,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 81,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "selected-dates-new-window.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "selected-dates-new-window.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "stock-origins.spec.ts",
+              "line": 37,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "stock-origins.spec.ts",
+              "line": 37,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      }
+    }
+  },
+  "focus": {
+    "counterproof": "Application correctly focused reason/review button, then Base UI restoration focused popup in same frame; effect-only change did not fix it",
+    "resolution": "Stable dialog owns focus before focused control disappears; intended target receives focus after commit;no timeout,forced click or focus-trap disabling",
+    "finalTransitions": [
+      {
+        "title": "P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual",
+        "project": "mobile",
+        "active": {
+          "tag": "TEXTAREA",
+          "id": "_r_r_reason"
+        },
+        "lastCalls": [
+          {
+            "kind": "call",
+            "at": 2046.2000000029802,
+            "target": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": true,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "BODY",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 2323.2000000029802,
+            "target": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": true,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "BODY",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 2410,
+            "target": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 2421.7000000029802,
+            "target": {
+              "tag": "TEXTAREA",
+              "id": "_r_r_reason",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          }
+        ]
+      },
+      {
+        "title": "P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual",
+        "project": "ios",
+        "active": {
+          "tag": "TEXTAREA",
+          "id": "_r_r_reason"
+        },
+        "lastCalls": [
+          {
+            "kind": "call",
+            "at": 1859,
+            "target": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": "Fechar edição",
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "DIV",
+              "id": "base-ui-_r_h_",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": true,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 2726,
+            "target": {
+              "tag": "H3",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "FIELDSET",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 3797,
+            "target": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "FIELDSET",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 3811,
+            "target": {
+              "tag": "TEXTAREA",
+              "id": "_r_r_reason",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          }
+        ]
+      },
+      {
+        "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+        "project": "mobile",
+        "active": {
+          "tag": "BUTTON",
+          "id": "schedule-review-button"
+        },
+        "lastCalls": [
+          {
+            "kind": "call",
+            "at": 4527.5999999940395,
+            "target": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "H3",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 4584.399999991059,
+            "target": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": true,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "BODY",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 4859.399999991059,
+            "target": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 4874.20000000298,
+            "target": {
+              "tag": "BUTTON",
+              "id": "schedule-review-button",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          }
+        ]
+      },
+      {
+        "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+        "project": "ios",
+        "active": {
+          "tag": "BUTTON",
+          "id": "schedule-review-button"
+        },
+        "lastCalls": [
+          {
+            "kind": "call",
+            "at": 1583,
+            "target": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": "Fechar edição",
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "MAIN",
+              "id": "workspace-content",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": true,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 7650,
+            "target": {
+              "tag": "H3",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "FIELDSET",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 8234,
+            "target": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "FIELDSET",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 8249,
+            "target": {
+              "tag": "BUTTON",
+              "id": "schedule-review-button",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          }
+        ]
+      },
+      {
+        "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+        "project": "mobile",
+        "active": {
+          "tag": "H3",
+          "id": ""
+        },
+        "lastCalls": [
+          {
+            "kind": "call",
+            "at": 1658.1000000089407,
+            "target": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": "Fechar edição",
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": true,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 1710,
+            "target": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 1825.1000000089407,
+            "target": {
+              "tag": "H3",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          }
+        ]
+      },
+      {
+        "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+        "project": "ios",
+        "active": {
+          "tag": "H3",
+          "id": ""
+        },
+        "lastCalls": [
+          {
+            "kind": "call",
+            "at": 1981,
+            "target": {
+              "tag": "BUTTON",
+              "id": "",
+              "name": null,
+              "label": "Fechar edição",
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "MAIN",
+              "id": "workspace-content",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": true,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 2229,
+            "target": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "FIELDSET",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          },
+          {
+            "kind": "call",
+            "at": 2483,
+            "target": {
+              "tag": "H3",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            },
+            "active": {
+              "tag": "DIV",
+              "id": "",
+              "name": null,
+              "label": null,
+              "disabled": false,
+              "hidden": false,
+              "visible": true
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "comReference": {
+    "explicitAdoption": "same COM/patient/close_expectation only,through authorized frozen-version reader",
+    "failures": [
+      "Private baseline stayed old after parent adoption;new review disabled",
+      "FormData omitted disabled reason on adoption;last live capture now preserved"
+    ],
+    "counterproofs": [
+      "403 and invalid200 forbid adoption and suppress facts while preserving reason",
+      "New reference clears saved acknowledgement",
+      "Two rejected/successful intentions bind exact distinct versions and keys;one official event;stock unchanged",
+      "Existing private adoption/unchecked state cases pass without automatic adoption"
+    ]
+  },
+  "logLfSha256": {
+    "ci-compatibility-initial.log": "da2f2b84ec568b9807a142ed3a2cf813418e745fee777d55568834fc618d8e09",
+    "ci-compatibility-final.log": "95540dafea2c91a7ec224fd9c90d98e72bced65bf2c06debc95613b537ae9da1",
+    "ci-compatibility-focus-probe.log": "bcb0a88546b725e888fb5e1dda9e7aa40650d74e8ead347a608eb2af9a4443a6",
+    "ci-compatibility-focus-final.log": "b78370bd2c9ec656bfe53b4d7c19ddd184f031f58d11ce27baaa1f977a1d9d22",
+    "ci-compatibility-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ci-compatibility-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ci-compatibility-markdown.log": "ebb946acce51e8831faab7dc32870cc6678bb0327a5ce5c577540cc3b95f1df8"
+  },
+  "qualifiedReuse": [
+    "API,authorization and SQL unchanged;169-migration clean/legacy/full integration passed on27d2a06;not own-SHA CI approval",
+    "Thirteen mobile cases from middle retained unless one of four final consumers;source changes confined to targeted forms and diagnostic metadata",
+    "Final eight cases cover all three focus consumers and COM adoption in both engines",
+    "Auth-local official runner;synthetic data;external sending disabled;source freeze;no mutable DB suite in parallel"
+  ],
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30ColumnsUnchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "historicalMigrationsUnchanged": 84,
+    "newMigrations": 0,
+    "localRemoteVersions": 169
+  },
+  "providerObservation": "CI_27D2A06_OBSERVATION.json",
+  "limits": [
+    "Own SHA complete CI remains",
+    "Remaining contextual forms,full canonical parity and66/171 remain",
+    "No new PDF visual design,signature/provider,backup,monitoring,physical/human/AT approval",
+    "Sonar deferred;PR7 Draft;production NO-GO"
+  ],
+  "documentation": {
+    "markdownFiles": 4,
+    "issues": 0,
+    "localLinksChecked": 302
+  },
+  "remoteLedger": {
+    "projectId": "qwfrqychokvhdzakibid",
+    "count": 169,
+    "last": "20261109135205",
+    "digest": "694f6e8a1796476d6f4b342f30e6984ffc95b1e3b6b2e26b326e0061a924f0bc",
+    "pending": 0,
+    "scope": "read-only precommit ledger reconciliation;no DDL or repeated backup"
+  }
+}

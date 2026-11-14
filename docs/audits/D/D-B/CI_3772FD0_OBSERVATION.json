@@ -1,0 +1,58 @@
+{
+  "at": "2026-11-09T03:13:12.342Z",
+  "sha": "3772fd049691814f30ff0813d145e52b2536557f",
+  "runId": 42548692266,
+  "jobs": [
+    {
+      "id": 128939309264,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128939309349,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128939309683,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128943525982,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128943526116,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128943526118,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128943526220,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128953579696,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "scope": "Previous published PDF V10 SHA only; does not approve pending avatar changes",
+  "preview": "READY dpl_9SUSznAKgTVTdGaAdB8UymLWP9sK",
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION"
+}

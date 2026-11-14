@@ -1,0 +1,92 @@
+{
+  "at": "2026-11-09T03:18:05.710042+00:00",
+  "baseSha": "3772fd049691814f30ff0813d145e52b2536557f",
+  "sourceLfSha256": {
+    "src/app/api/profile/route.ts": "8d25b8a0004a2e75a729cc31448916a0f1d48a305a4e539a77efdb89cbe887b0",
+    "src/app/api/profile/avatar/route.ts": "700cab1027465a6b0844807731a9486104b9174ab6f1fe4a607bdbe9d676d13b",
+    "src/components/app-shell.tsx": "67e3322ae73d2866db30c7b532e4eea3b3afef0ef0be6346d96f17cf293c3203",
+    "src/components/profile-console.tsx": "0b7119f81ae1dfdb2328b1f47758aeca0d3efdad293f2cfe0920cf6709a7c147",
+    "src/components/profile/avatar-settings.tsx": "2a17b193f790d387ec8eca89ee94947dcc9eae76e445dab7ee13d84bfb986a40",
+    "src/lib/server/api.ts": "bbf00ddf79ef17a5e87cd6ad4ba528521d184676b3f1d0d9da5862b1fedac728",
+    "src/lib/server/avatar.ts": "158ae2f138b1b3de914dbb2ca611afeabe79bfd2a437437207ff117111ad4bd7",
+    "src/lib/validation/avatar.ts": "86411033a6c1472d986d8837e320886c4cf1df544eb895f8856f2ec267135fab",
+    "tests/integration/lock-barrier.mjs": "9c15f1bdc5df75e481a9cce8d681d89f4b8ba7dbd5233047d567e9895e36cc64",
+    "tests/integration/avatar-recovery.test.mjs": "e1b0211c9b22caa4d8e834ccd63388bab20955137de8a0dc74660d0b0e17d5c9",
+    "tests/e2e/avatar-recovery.spec.ts": "2ac65805f1b349a269ff91cd14954c4c3561b5f8114c36cd4961daa151e54f67",
+    "tests/avatar-contract.test.ts": "b79c4103cbe095a06d1dbe76d8e284983d77eac162825617d45c39249769dd84",
+    "supabase/migrations/20261109022429_phase_d3_avatar_recovery.sql": "66c1dc9e03ba6aa623fa0e58f68caed9dad02d1dd048426091f319b465b4e24f",
+    "supabase/migrations/20261109024515_phase_d3_avatar_business_conflicts.sql": "e97a4e0a2640122d9af455ac4400f9fdab47ad1cb78a3eed0fff0b06baf9f4f2"
+  },
+  "unchangedConsumerLfSha256": {
+    "tests/integration/quantity-authority.test.mjs": "b1a857fcadc10ee8793c6f9e9741f05471d39a21af5c36177324aced28ed04ad",
+    "tests/e2e/profile-focus.spec.ts": "14c75f83c74f41e326a60f6a43e6ff2df688f7241551ffa9a7b5f3f54376af2f",
+    "tests/e2e/read-state-consumers.spec.ts": "752491b8d2f7c7f44c36ac6db17071a28c2ccf2700a346b54b5c701a4170f3b2",
+    "tests/read-state-models.test.ts": "2b3a29d938711547211a204efb665ac522cd43697627427a8b642361493d33dd",
+    "tests/api/science-contract.test.ts": "4ba86d50b54464e88ddc0a4413843b23fe4eaa16f61e4fb33bcee5cd2df21ff5",
+    "tests/api/purchase-contract.test.ts": "9ea153ab40eadee6757b7792a99502fbc2ce1edb08a88ab328084073b7630925",
+    "tests/api/transfer-contract.test.ts": "18ab681f1d5e0cec026886d3dcb864ddb1421d2cb2f20741e62ac4f4829e736e"
+  },
+  "logLfSha256": {
+    "avatar-baseline.log": "e6a2f3d17f45c3ae6197b540e1abfb5d5098cf07759d58ed9a551b34bac7467d",
+    "avatar-db-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "avatar-auth.log": "5bf9e335509be0a2ef5a5c455b729ab5ab9d3bb730367b5eece72db356a6338f",
+    "avatar-auth-final.log": "70fea15b33628b78e350575efb75e1b7948ed206d8ca97ac0e9ac3e761636e81",
+    "avatar-db-conflict-fix.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "avatar-unit-regression.log": "3285909fe3c597c39dab91c3f6f7edee0ad6c17df5d54cdb2a0cb89350598950",
+    "avatar-production.log": "e00073a23f623c1e5132aad0aa27edca6c96afafb116310d4a481406f15b21fc",
+    "avatar-production-current.log": "741c6423d1af4b13b81d4e60195cc82a8ba5c123353e6095146a12f25c7ba5e5",
+    "avatar-production-ios.log": "8c1cfedc906bf018ecc46f18660096834fb14bd3de48dd559cd22d00437a24ee",
+    "avatar-production-native-before-poll.log": "cedacdf293c725c0a10eef35323e97660507f80ba6c51745d675f6ccf10af515",
+    "avatar-production-native.log": "943e39e63bb135997a89a5a12061fb0bbe4e77e440c5556346a4fdd1eae4e628",
+    "avatar-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "avatar-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "avatar-remote-dry-run.log": "8323ceaba8e107f3e141fd0be48745bdc5959f142e5f42320f49eb0e49711c03",
+    "avatar-remote-apply.log": "1c65eeabf508a1b56d0824defb18e028c5de579de79c835cf64faf97daabce25"
+  },
+  "validation": {
+    "unitPassed": 26,
+    "newAuthRealStoragePassed": 3,
+    "priorAuthPassed": 7,
+    "productionDistinctQualified": 15,
+    "avatarBrowserCases": 6,
+    "preservedBrowserCases": 9,
+    "nativeMultipartRechecks": 2,
+    "avatarWidthAxeScans": 24,
+    "types": true,
+    "affectedLint": true,
+    "mutableDbParallelWithE2e": false,
+    "globalLocalSuitesRepeated": false
+  },
+  "cohortQualification": "Runtime source unchanged between final browser cohorts. Current log has10 Chromium/mobile passes then WebKit replay-instrument FAIL;ios log5 passes after native upload fix;native log2 passes. Final test-only change replaces immediate commit-marker read with expect.poll;WebKit earlier success already observed same actual200 marker. Existing7 Auth cases passed in mixed initial log;164 changes only five new avatar RPC business error codes and old test sources remain identical.",
+  "counterproofs": {
+    "baselineOrphans": 2,
+    "profileRequiresPatient": "Actual UI failure preserved;own-account route corrected without modifying clinical access",
+    "businessConflictLoop": "40001 retried by PostgREST;new immutable correction164;3 new Auth cases now pass",
+    "webkitMultipartReplay": "Native upload retained;only downstream response invalidated after actual commit",
+    "prematureCommitAssertion": "Unknown notice can precede upload completion;test waits for actual200 marker"
+  },
+  "canonicalMatrix": {
+    "rows": 105,
+    "columns": 39,
+    "first29ColumnsAndApprovedComplementsPreserved": true,
+    "counts": {
+      "PARTIAL": 53,
+      "PASS": 49,
+      "NOT_STARTED": 3
+    },
+    "correctedWrongPdfEvidenceForAvatar": true
+  },
+  "remote": {
+    "file": "AVATAR_REMOTE_MIGRATIONS.json",
+    "applied": 164,
+    "pending": 0
+  },
+  "remainingGates": [
+    "Own published SHA CI and Preview",
+    "C-FINAL-AC-021 remaining composite flows",
+    "Human AT/physical/device/provider and D-C/D6 as specified"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false,
+  "goalComplete": false
+}

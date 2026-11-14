@@ -1,5 +1,9 @@
 # Decisões humanas do produto
 
+**Ordem posterior de 09/11/2026:**o [Modelo Integral](../ui-ux/CANONICAL_MODEL.md)
+substitui Fluent e a direção visual anterior em todo o sistema, preservando
+funções, contratos e recursos. Inclui fichas em abas e Andamentos reais.
+
 **Precedência atual:**
 [adendo C7](../audits/C/C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md).
 As respostas de 04/11/2026 substituem recomendações anteriores conflitantes.

@@ -1,11 +1,14 @@
 "use client";
+import { ComplementOriginHint } from "@/components/documents/complement-origin-hint";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { validQuantity } from "@/lib/quantity";
-import type {
-  RequisitionFormData,
-  RequisitionLine,
-} from "@/types/requisition";
+import { useSearchParams } from "next/navigation";
+import { RemainingNeedReference } from "./remaining-need-reference";
+import {
+  restoreStockObservation,
+  validStockObservation,
+} from "@/lib/stock-observation";
+import type { RequisitionFormData, RequisitionLine } from "@/types/requisition";
 import type { ItemContext } from "@/types/documents";
 import {
   api,
@@ -13,9 +16,15 @@ import {
   buttonClass,
   Notice,
   may,
+  can,
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
+import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { RecurringSelection } from "./recurring-selection";
+import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
+import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
+import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { StepNavigator } from "@/components/ui/primitives";
 
@@ -29,21 +38,24 @@ import {
 } from "./requisition-steps";
 import { Receipt, type SavedReceipt } from "./requisition-receipt";
 
-const steps = [
-  "Identificação",
-  "Medicamentos",
-  "Higiene",
-  "Dieta",
-  "Itens extras",
-  "Observações",
-  "Revisão",
-];
+const steps = draftFlowStages.REQ.map(stage => stage.label);
 export function RequisitionWizard() {
+  const sourceId = useSearchParams().get("sourceRequisitionId");
   return (
     <Workspace title="Requisição de insumos" compact>
       {(context) =>
         context.patient ? (
-          <PatientRequisition context={context} />
+          <PatientRequisition
+            key={
+              context.userId +
+              ":" +
+              context.patient.id +
+              ":" +
+              (sourceId ?? "new")
+            }
+            context={context}
+            sourceId={sourceId}
+          />
         ) : (
           <Notice>Selecione um paciente para iniciar.</Notice>
         )
@@ -51,7 +63,15 @@ export function RequisitionWizard() {
     </Workspace>
   );
 }
-function PatientRequisition({ context }: { context: WorkspaceContext }) {
+function PatientRequisition({
+  context,
+  sourceId,
+}: {
+  context: WorkspaceContext;
+  sourceId: string | null;
+}) {
+  const [sourceReady, setSourceReady] = useState(!sourceId);
+  const [sourceAttempt, setSourceAttempt] = useState(0);
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<RequisitionFormData>({
     lines: [],
@@ -63,6 +83,17 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const fieldsRef = useRef<HTMLDivElement>(null), focusErrorRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!focusErrorRef.current) return;
+    const target = [...(fieldsRef.current?.querySelectorAll<HTMLElement>('[data-field-error]') ?? [])].find(element => element.dataset.fieldError === focusErrorRef.current) ?? fieldsRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+    if (target) {
+      // Keep the invalid field clear of the fixed header and sticky steps.
+      target.focus({ preventScroll: true });
+      target.scrollIntoView({ block: "center", inline: "nearest" });
+      focusErrorRef.current = null;
+    }
+  }, [step, fieldErrors]);
   const frozenRef = useRef<Record<string, unknown> | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -71,7 +102,64 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
   const [catalogError, setCatalogError] = useState("");
   const [catalogAttempt, setCatalogAttempt] = useState(0);
   const storageKey =
-    "hca:v2:requisition:" + context.userId + ":" + context.patient!.id;
+    "hca:v2:requisition:" +
+    context.userId +
+    ":" +
+    context.patient!.id +
+    (sourceId ? ":remaining:" + sourceId : "");
+  const draftContent: RequisitionFormData = {
+    lines: form.lines,
+    extraItems: form.extraItems,
+    observations: form.observations,
+    ...(form.remainingNeed ? { remainingNeed: form.remainingNeed } : {}),
+  };
+  const privateDraft = useCreationDraft({
+    userId: context.userId,
+    patientId: context.patient!.id,
+    kind: "REQ",
+    navigation: navigationForStep("REQ", step),
+    enabled: can(context, "req.read"),
+    onResume: (draft) => {
+      if (!draft.content || !("lines" in draft.content)) return false;
+      if ((draft.content.remainingNeed?.requisitionId ?? null) !== sourceId)
+        return false;
+      setForm({
+        ...draft.content,
+        lines: draft.content.lines.map((line) => {
+          const product = products.find((item) => item.id === line.productId);
+          return product
+            ? {
+                ...line,
+                productName: product.name,
+                unit: product.unit,
+                category: product.category,
+              }
+            : line;
+        }),
+      });
+      setStep(stepForNavigation("REQ", draft.navigation));
+      setError("");
+      setFieldErrors({});
+      return true;
+    },
+    onDiscard: () => {
+      setForm({ lines: [], extraItems: [], observations: [] });
+      setStep(0);
+      setFieldErrors({});
+      sessionStorage.removeItem(storageKey);
+    },
+  });
+  const offeredSource =
+    privateDraft.offered?.content && "lines" in privateDraft.offered.content
+      ? (privateDraft.offered.content.remainingNeed?.requisitionId ?? null)
+      : null;
+  const resumeHref =
+    privateDraft.offered && offeredSource !== sourceId
+      ? `/fichas/req?careRecipientId=${context.patient!.id}${offeredSource ? "&sourceRequisitionId=" + offeredSource : ""}`
+      : undefined;
+  const missingProducts = form.lines.filter(
+    (line) => !products.some((item) => item.id === line.productId),
+  );
   useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
@@ -79,7 +167,6 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
         if (!raw) return;
         const saved = JSON.parse(raw);
         if (
-          Date.now() - saved.savedAt > 86_400_000 ||
           (saved.form?.careRecipientId &&
             saved.form.careRecipientId !== context.patient!.id)
         ) {
@@ -92,8 +179,14 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
           Array.isArray(saved.form.extraItems) &&
           Array.isArray(saved.form.observations)
         ) {
-          setForm(saved.form);
-          setMessage("Rascunho deste dispositivo recuperado.");
+          setForm({
+            ...saved.form,
+            lines: saved.form.lines.map(restoreStockObservation),
+            extraItems: saved.form.extraItems.map(restoreStockObservation),
+          });
+          setMessage(saved.intent
+            ? "Tentativa desta aba recuperada. Consulte a mesma tentativa antes de iniciar outra requisição."
+            : "Preenchimento desta aba recuperado. Salve um rascunho na conta para retomar em outra sessão ou aparelho.");
           if (saved.intent) {
             frozenRef.current = saved.intent;
             setStep(6);
@@ -169,6 +262,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
   const selected = (id: string) =>
     form.lines.find((line) => line.productId === id);
   function updateLine(item: Product, patch: Partial<RequisitionLine>) {
+    const declarationTime = new Date().toISOString();
     setForm((current) => {
       const existing = current.lines.find((line) => line.productId === item.id);
       return {
@@ -184,7 +278,9 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
                 productName: item.name,
                 category: item.category,
                 unit: item.unit,
-                currentStock: 0,
+                currentStock: null,
+                stockObservation: "unfilled",
+                stockObservationAt: declarationTime,
                 urgent: false,
                 ...patch,
               },
@@ -200,38 +296,50 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
   }
   function validate(all = false) {
     const errors: Record<string, string> = {};
+    if (missingProducts.length)
+      errors.catalog =
+        "Há materiais fora do catálogo ativo. Confira e remova-os antes de emitir.";
+    if (sourceId && (all || step === 0)) {
+      if (!sourceReady || form.remainingNeed?.requisitionId !== sourceId)
+        errors.remainingSource =
+          "Consulte e escolha a referência da requisição de origem.";
+      else if (
+        [...form.remainingNeed.reason.trim()].length < 3 ||
+        form.remainingNeed.reason.trim().length > 1000
+      )
+        errors.remainingNeed =
+          "Informe o motivo da necessidade remanescente, entre3 e1000 caracteres.";
+    }
     for (const line of form.lines.filter(
       (line) => all || line.category === currentCategory,
     )) {
       if (
-        !validQuantity(
-          String(line.currentStock),
+        !validStockObservation(
+          line,
           products.find((item) => item.id === line.productId)
             ?.quantity_decimals ?? 0,
-          true,
         )
       )
-        errors[line.productId] = "Revise a quantidade e a precisão da unidade.";
+        errors[line.productId] =
+          line.stockObservation === "legacy_unclassified"
+            ? "Confirme como informar a observação recuperada do rascunho antigo."
+            : "Revise a informação do estoque e a precisão da unidade.";
       if (
         itemContext.find((item) => item.productId === line.productId)?.pending
           .length &&
-        (line.repeatReason?.trim().length ?? 0) < 3
+        ((line.repeatReason?.trim().length ?? 0) < 3 || (line.repeatReason?.trim().length ?? 0) > 1000)
       )
         errors[line.productId + ":repeat"] =
-          "Justifique a nova requisição deste produto ainda pendente.";
+          "Justifique a nova requisição deste produto, entre três e 1.000 caracteres.";
     }
-    if (
-      (all || step === 4) &&
-      form.extraItems.some(
-        (item) =>
-          !item.name.trim() ||
-          !Number.isFinite(item.currentStock) ||
-          item.currentStock < 0,
-      )
-    )
-      errors.extras = "Preencha ou remova os itens extras incompletos.";
-    if ((all || step === 5) && form.observations.some((item) => !item.trim()))
-      errors.observations = "Preencha ou remova as observações vazias.";
+    if (all || step === 4) for (const item of form.extraItems) {
+      if (!item.name.trim()) errors[item.id + ":name"] = "Informe o nome do item extra ou remova-o.";
+      if (!validStockObservation(item)) errors[item.id + ":stock"] = "Revise a informação de estoque deste item extra.";
+    }
+    if (all || step === 5) form.observations.forEach((item, index) => {
+      if (!item.trim()) errors["observation:" + index] = "Preencha a observação ou remova-a.";
+      else if (item.trim().length > 1000) errors["observation:" + index] = "A observação deve ter até 1.000 caracteres.";
+    });
     if (all && !form.lines.length && !form.extraItems.length)
       errors.lines = "Selecione ao menos um item.";
     setFieldErrors(errors);
@@ -245,28 +353,31 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
         Object.values(errors)[0] ?? "Aguarde o catálogo e confira seu acesso.",
       );
       if (all && Object.keys(errors).length) {
-        const id = Object.keys(errors)[0].split(":")[0];
-        const product = products.find((item) => item.id === id);
+        const key = Object.keys(errors)[0];
+        const product = products.find((item) => key === item.id || key === item.id + ":repeat");
         if (product)
           setStep(
             ["medicamentos", "higiene", "dieta"].indexOf(product.category) + 1,
           );
+        else if (form.extraItems.some(item => key === item.id + ":name" || key === item.id + ":stock")) setStep(4);
+        else if (key.startsWith("observation:")) setStep(5);
+        else if (key.startsWith("remaining")) setStep(0);
+        else if (key === "lines" || key === "catalog") setStep(1);
       }
-      window.setTimeout(
-        () =>
-          document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
-        50,
-      );
+      focusErrorRef.current = Object.keys(errors)[0] ?? null;
       return false;
     }
     setError("");
     return true;
   }
   async function submit() {
-    if (!frozenRef.current && !validate(true)) return;
+    if (!frozenRef.current && (privateDraft.blocked || !validate(true))) return;
     if (!frozenRef.current)
       frozenRef.current = {
         ...form,
+        ...(privateDraft.draftCommit
+          ? { draftCommit: privateDraft.draftCommit }
+          : {}),
         careRecipientId: context.patient!.id,
         idempotencyKey: crypto.randomUUID(),
       };
@@ -300,8 +411,25 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
       const rejected =
         reason instanceof ApiError &&
         ([400, 403, 404, 413, 422].includes(reason.status) ||
+          reason.code === "DRAFT_VERSION_CONFLICT" ||
+          reason.code === "VERSION_CONFLICT" ||
           reason.code === "DUPLICATE_REVIEW_REQUIRED");
       if (rejected) {
+        if (
+          reason instanceof ApiError &&
+          reason.code === "DRAFT_VERSION_CONFLICT"
+        ) {
+          await privateDraft.reportConflict();
+          setStep(0);
+        }
+        if (
+          reason instanceof ApiError &&
+          reason.code === "VERSION_CONFLICT" &&
+          sourceId
+        ) {
+          setSourceAttempt((value) => value + 1);
+          setStep(0);
+        }
         frozenRef.current = null;
         sessionStorage.removeItem(storageKey);
         if (
@@ -322,20 +450,89 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
       setSaving(false);
     }
   }
-  if (receipt) return <Receipt receipt={receipt} />;
-  if (!may(context, "request"))
+  if (receipt) return <div className="space-y-4"><ComplementOriginHint /><Receipt receipt={receipt} /></div>;
+  if (privateDraft.readDenied)
     return (
-      <Notice>
-        Seu vínculo permite consultar as fichas autorizadas no histórico.
+      <Notice error>
+        Seu acesso ao rascunho foi encerrado. Selecione um vínculo autorizado.
       </Notice>
     );
+  if (!can(context, "req.read"))
+    return <Notice>Seu acesso à requisição foi encerrado.</Notice>;
+  const selectionLibrary = (readonly = false) => <RecurringSelection key={context.userId+":"+context.patient!.id} userId={context.userId} patientId={context.patient!.id} catalogue={products} lines={form.lines}
+    disabled={readonly||saving||uncertain||loadingCatalog||Boolean(catalogError)||privateDraft.blocked||!may(context,"request")} canSave={may(context,"request")}
+    cataloguePending={loadingCatalog} catalogueError={catalogError} onRefresh={()=>{setLoadingCatalog(true);setCatalogAttempt(value=>value+1);}}
+    onApply={ids=>setForm(current=>({...current,lines:applyMaterialSelection(current.lines,ids,products).lines}))}/>;
+  if (
+    !may(context, "request") &&
+    !uncertain &&
+    !privateDraft.pending &&
+    !privateDraft.offered &&
+    !privateDraft.base
+  )
+    return (
+      <div className="hca-form-stack"><Notice>
+        Seu vínculo permite consultar as fichas autorizadas no histórico.
+      </Notice>{selectionLibrary(true)}</div>
+    );
   return (
-    <div className="mx-auto max-w-4xl">
+    <div ref={fieldsRef} className="hca-document-wizard min-w-0 space-y-5">
+      <ComplementOriginHint />
+      {selectionLibrary()}
+      <CreationDraftPanel
+        draft={privateDraft}
+        current={draftContent}
+        patientName={context.patient!.display_name}
+        resumeHref={resumeHref}
+        disabled={saving || uncertain || loadingCatalog}
+      />
+      {missingProducts.length ? (
+        <Notice error>
+          Materiais do preenchimento que não estão no catálogo ativo:{" "}
+          {missingProducts.map((line) => (
+            <div key={line.productId}>
+              {line.productName}
+              <button
+                className={buttonClass}
+                disabled={
+                  saving ||
+                  uncertain ||
+                  privateDraft.blocked ||
+                  !may(context, "request")
+                }
+                onClick={() => removeLine(line.productId)}
+              >
+                Remover material indisponível
+              </button>
+            </div>
+          ))}
+        </Notice>
+      ) : null}
+      {sourceId ? (
+        <RemainingNeedReference
+          sourceId={sourceId}
+          patientId={context.patient!.id}
+          value={form.remainingNeed}
+          onChange={(remainingNeed) =>
+            setForm((current) => ({ ...current, remainingNeed }))
+          }
+          readonly={
+            step !== 0 ||
+            uncertain ||
+            saving ||
+            privateDraft.blocked ||
+            !may(context, "request")
+          }
+          attempt={sourceAttempt}
+          onReady={setSourceReady}
+          reasonError={fieldErrors.remainingNeed}
+        />
+      ) : null}
       <StepNavigator
         steps={steps}
         active={step}
         onChange={setStep}
-        disabled={uncertain || saving || loadingCatalog}
+        disabled={uncertain || saving || loadingCatalog || privateDraft.blocked}
         label="Etapas da requisição"
       />
       {message ? <Notice>{message}</Notice> : null}
@@ -360,7 +557,13 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
           <p className="eyebrow">REQ · {context.patient!.display_name}</p>
           <h2 className="my-4 text-xl font-semibold">{steps[step]}</h2>
           <fieldset
-            disabled={saving || uncertain || Boolean(catalogError)}
+            disabled={
+              saving ||
+              uncertain ||
+              privateDraft.blocked ||
+              !may(context, "request") ||
+              Boolean(catalogError)
+            }
             className="min-w-0"
           >
             {step === 0 ? (
@@ -377,16 +580,20 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
                 updateLine={updateLine}
                 removeLine={removeLine}
                 errors={fieldErrors}
+                selectedCount={form.lines.length}
               />
             ) : null}
             {step === 4 ? (
               <Extras
+                errors={fieldErrors}
                 items={form.extraItems}
                 setItems={(extraItems) => setForm({ ...form, extraItems })}
                 products={products}
                 adopt={(product, extra) => {
                   updateLine(product, {
                     currentStock: extra.currentStock,
+                    stockObservation: extra.stockObservation,
+                    stockObservationAt: extra.stockObservationAt,
                     urgent: extra.urgent,
                   });
                   setForm((current) => ({
@@ -400,6 +607,7 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
             ) : null}
             {step === 5 ? (
               <Observations
+                errors={fieldErrors}
                 observations={form.observations}
                 setObservations={(observations) =>
                   setForm({ ...form, observations })
@@ -421,7 +629,25 @@ function PatientRequisition({ context }: { context: WorkspaceContext }) {
               Nenhum dado será reenviado com uma chave nova.
             </Notice>
           ) : null}
-          <WizardActions step={step} total={7} saving={saving} uncertain={uncertain} blocked={Boolean(catalogError)} finishLabel="Concluir requisição" onBack={() => setStep((value) => value - 1)} onDraft={() => { try { sessionStorage.setItem(storageKey, JSON.stringify({ savedAt: Date.now(), form })); setMessage("Rascunho salvo neste dispositivo."); } catch { setError("O armazenamento deste dispositivo está indisponível."); } }} onNext={() => { if (validate()) setStep((value) => value + 1); }} onFinish={() => void submit()} />
+          <WizardActions
+            step={step}
+            total={7}
+            saving={
+              saving ||
+              privateDraft.busy ||
+              (privateDraft.blocked && !uncertain) ||
+              (!may(context, "request") && !uncertain)
+            }
+            uncertain={uncertain}
+            blocked={Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
+            finishLabel="Concluir requisição"
+            onBack={() => setStep((value) => value - 1)}
+            onDraft={() => void privateDraft.save(draftContent)}
+            onNext={() => {
+              if (validate()) setStep((value) => value + 1);
+            }}
+            onFinish={() => void submit()}
+          />
         </section>
       )}
     </div>

@@ -1,0 +1,631 @@
+{
+  "assembledAt": "2026-11-09T16:27:02.165606+00:00",
+  "baseSha": "adc4353677f3c58e162b3ae8ad9cbf5eda6679db",
+  "sourceLfSha256": {
+    "src/components/documents/consent-reference-comparison.tsx": "96acd5bd41b8ba261e40ea7b564e8aa3ae0ac64d19578f0a72a93df0e73a1f25",
+    "src/components/documents/delivery-cancellation.tsx": "150f6030528357b954a4705d0225846b2864d6c5106c21999f2d9df78ec7838f",
+    "src/components/documents/private-operation-recovery-actions.tsx": "eb8ec59779a5ea68377ef7d8fcc343ab5cbb7393e0e15823e594314121848bad",
+    "src/components/documents/supply-command-editor.tsx": "9184e6e15e0b36a7109f6b5a6dfafbf3cf37ee64da9ea6496dd08d4363c27528",
+    "src/components/documents/supply-command-fields.tsx": "fecc4b11ca7aa91cf09e9b2f9bb0abd62717d82eb6b00f34d2ff2206bdc85f3e",
+    "src/components/documents/supply-detail.tsx": "d445fbe5fcde7c97286f689a3ccfe769ce6dd58c2e897024024e73aa1dd57661",
+    "src/components/forms/creation-draft-panel.tsx": "5ddf2632d57be71f668e4a1499f4c9d3e03f83041300f1dba602f29c3b1fc48c",
+    "src/lib/forms/delivery-draft-reference.ts": "b95a3cb2b8d503621d865b8e8b0a52713d9883a342668804df489e818c255af2",
+    "src/lib/forms/draft-navigation.ts": "46e0f5ec90dfd3e2a7f4e0fd0055361c8275a8bce4c7d89f5b41b9b5fdf62172",
+    "src/lib/validation/consent-reference.ts": "2959e826f6879acb04d27584030f2c542a7ce4d4626b11d117b55fbb392a4109",
+    "src/lib/validation/supply-drafts.ts": "9274f2758ee1a8ec755c98ccc444572fb44c91b9b1ddc7da30e2e8d531e0b257",
+    "supabase/migrations/20261109151449_phase_d3_ent_consent_private_draft.sql": "d2dcd0fba734eef5ad37350f39de737a0a78877206a592874e6f50062cf79a18",
+    "tests/consent-reference.test.ts": "730f5a6c5033d0140eef18b02484f56a903cab1572fe1c2da58813e2bd79dd60",
+    "tests/e2e/delivery-cancellation.spec.ts": "962c7f1bbd02b625420cd0f0fecf18bf1580907bc03296c1fb470b3a64619db2",
+    "tests/e2e/document-tabs.spec.ts": "df75ac11f4d7adc18fa79d78b73c95d56968d6ba26aadb605b8a6c12eb8857ef",
+    "tests/e2e/ent-consent-private-drafts.spec.ts": "fac3a9d119c0e538baeb118c20fb798ef50d15e27865d48d0d2b79a4cfafc623",
+    "tests/e2e/notification-read-states.spec.ts": "ffa365124ff153c7941414a7eeca4ac9e810f455a72a218564cbf494ead1dfab",
+    "tests/e2e/requisition-observation.spec.ts": "9ab9f92d1b0874d62925f5b759003d2cadfa2f8407e17b1857a96408bd615394",
+    "tests/e2e/version-history.spec.ts": "8cab308117d1cc7e4f19a43798a5c54dc8d2db59d1feec70ea4530293025910f",
+    "tests/ent-operation-drafts.test.ts": "098bf1e45fd7fc218dd6a10c75b50f54ca23899c8ed4fb24ab79e6ca1ee0a792",
+    "tests/integration/ent-consent-fixtures.mjs": "0a169b452bbc5c34c79acb8bd48eb3b3cc81f616f013f57bebdd107dba322b3e",
+    "tests/integration/ent-consent-private-drafts.test.mjs": "011ecf3ec59c079ed286967e38f02a0210a26436dded47ca52644a2025f0e09c"
+  },
+  "unitApi": {
+    "distinctApproved": 35,
+    "files": 6,
+    "command": "vitest run tests/consent-reference.test.ts tests/ent-operation-drafts.test.ts tests/com-action-drafts.test.ts tests/supply-draft-models.test.ts tests/draft-navigation.test.ts tests/api/private-drafts-contract.test.ts"
+  },
+  "realAuth": {
+    "distinctApproved": 23,
+    "initial": {
+      "total": 22,
+      "pass": 20,
+      "fail": 2
+    },
+    "directedRepeat": {
+      "total": 2,
+      "pass": 2,
+      "productChanged": false,
+      "cause": "Existing business stale-source error is P0001 with exact message,not PT409;API already maps VERSION_CONFLICT"
+    },
+    "additional": {
+      "total": 1,
+      "pass": 1,
+      "scope": "Consumed replay and acknowledgement after write loss;read revocation;private helper ACL"
+    },
+    "newConsentCases": 8,
+    "otherEntCases": 10,
+    "postEventGuardCases": 2,
+    "navigationCases": 3,
+    "slotWaitAndPostEventRollback": true,
+    "testTriggerRemovedInFinally": true,
+    "localIncrementalPrepareNoReset": true
+  },
+  "browser": {
+    "distinctApprovedCases": 20,
+    "byProject": {
+      "mobile": 7,
+      "ios": 9,
+      "chromium": 4
+    },
+    "identity": "file+path+title+project;latest outcome;mutable line excluded",
+    "rounds": {
+      "ent-consent-initial": {
+        "stats": {
+          "total": 12,
+          "expected": 8,
+          "unexpected": 4,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 121,
+              "column": 5
+            },
+            "duration": 21740,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT compara nova fonte de consumo na mesma versão, preserva a devolução e exige outra revisão",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 467,
+              "column": 5
+            },
+            "duration": 22170,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Consumo disponível revisado: 1 unidade · Atual: 2 unidade', { exact: true })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText('Consumo disponível revisado: 1 unidade · Atual: 2 unidade', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Consumo disponível revisado: 1 unidade · Atual: 2 unidade', { exact: true })\u001b[22m\n\n\n  511 |       { exact: true },\n  512 |     ),\n> 513 |   ).toBeVisible();\n      |     ^\n  514 |   await page\n  515 |     .getByRole(\"button\", {\n  516 |       name: \"Usar referência atual e revisar novamente\",\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\delivery-cancellation.spec.ts:513:5\u001b[22m",
+                "codeframe": "  413 |       .click();\n  414 |     await expect(\n  415 |       cancellation(page).getByText(\"Recusado pelo recebedor\", { exact: true }),\n  416 |     ).toBeVisible();\n  417 |     expect(ledger(f.patient)).toBe(before);\n  418 |     await openDocumentMore(page);\n  419 |     await page\n  420 |       .getByRole(\"button\", { name: \"Solicitar cancelamento\", exact: true })\n  421 |       .click();\n  422 |     await editor(page)\n  423 |       .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n  424 |       .fill(\"Novo pedido fictício separado da decisão anterior\");\n  425 |     const next = await review(page);\n  426 |     await next\n  427 |       .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  428 |       .click();\n  429 |     await expect(next).toHaveCount(0);\n  430 |     await page\n  431 |       .getByRole(\"button\", {\n  432 |         name: \"Retirar meu pedido de cancelamento\",\n  433 |         exact: true,\n  434 |       })\n  435 |       .click();\n  436 |     await editor(page)\n  437 |       .getByRole(\"textbox\", { name: \"Motivo da retirada\", exact: true })\n  438 |       .fill(\"Solicitante retirou somente o pedido novo\");\n  439 |     const current = await review(page);\n  440 |     await current\n  441 |       .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  442 |       .click();\n  443 |     await expect(current).toHaveCount(0);\n  444 |     await expect(\n  445 |       cancellation(page).getByText(\"Retirado pelo solicitante\", {\n  446 |         exact: true,\n  447 |       }),\n  448 |     ).toBeVisible();\n  449 |     const result = (await rpc(f.admin, \"operational_document\", {\n  450 |       p_id: f.document.id,\n  451 |     })) as SupplyDocument;\n  452 |     expect(result.status).toBe(\"confirmed\");\n  453 |     expect(result.deliveryCancellation?.request.id).not.toBe(requestId);\n  454 |     expect(result.deliveryCancellation?.history[0].status).toBe(\"refused\");\n  455 |     expect(result.deliveryCancellation?.history[0].outcome?.actorId).toBe(\n  456 |       fixtures.professional.id,\n  457 |     );\n  458 |     expect(result.deliveryCancellation?.request.outcome?.actorId).toBe(\n  459 |       fixtures.adminA.id,\n  460 |     );\n  461 |     expect(ledger(f.patient)).toBe(before);\n  462 |   } finally {\n  463 |     await recipientContext.close();\n  464 |   }\n  465 | });\n  466 |\n  467 | test(\"ENT compara nova fonte de consumo na mesma versão, preserva a devolução e exige outra revisão\", async ({\n  468 |   page,\n  469 | }) => {\n  470 |   const f = await prepared({ request: true });\n  471 |   await login(page, f.patient, \"professional\");\n  472 |   await page.goto(\"/fichas/\" + f.document.id);\n  473 |   await selectDocumentSection(page, \"workflow\");\n  474 |   await page\n  475 |     .getByRole(\"button\", {\n  476 |       name: \"Consentir e reconciliar cancelamento\",\n  477 |       exact: true,\n  478 |     })\n  479 |     .click();\n  480 |   await returnField(page).fill(\"1\");\n  481 |   await editor(page)\n  482 |     .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n  483 |     .fill(\"Conciliação própria com fonte revisada\");\n  484 |   const original = await review(page);\n  485 |   await consume(f);\n  486 |   const stock = ledger(f.patient),\n  487 |     payloads: {\n  488 |       expectedVersion: number;\n  489 |       idempotencyKey: string;\n  490 |       body: { referenceHash: string };\n  491 |     }[] = [];\n  492 |   await page.route(\"**/api/documents/\" + f.document.id, async (route) => {\n  493 |     if (route.request().method() === \"POST\")\n  494 |       payloads.push(route.request().postDataJSON());\n  495 |     await route.continue();\n  496 |   });\n  497 |   await original\n  498 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  499 |     .click();\n  500 |   await expect(original).toHaveCount(0);\n  501 |   await expect(returnField(page)).toHaveValue(\"1\");\n  502 |   await page\n  503 |     .getByRole(\"button\", {\n  504 |       name: \"Consultar pedido e referências atuais\",\n  505 |       exact: true,\n  506 |     })\n  507 |     .click();\n  508 |   await expect(\n  509 |     page.getByText(\n  510 |       \"Consumo disponível revisado: 1 unidade · Atual: 2 unidade\",\n  511 |       { exact: true },\n  512 |     ),\n> 513 |   ).toBeVisible();\n      |     ^ Error: expect(locator).toBeVisible() failed\n  514 |   await page\n  515 |     .getByRole(\"button\", {\n  516 |       name: \"Usar referência atual e revisar novamente\",\n  517 |       exact: true,\n  518 |     })\n  519 |     .click();\n  520 |   await expect(returnField(page)).toHaveValue(\"1\");\n  521 |   await expect(returnField(page)).toBeFocused();\n  522 |   await returnField(page).fill(\"0\");\n  523 |   const current = await review(page);\n  524 |   await expect(\n  525 |     current.getByText(\"consumo já confirmado referenciado 2 unidade\", {\n  526 |       exact: false,\n  527 |     }),\n  528 |   ).toBeVisible();\n  529 |   await current\n  530 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  531 |     .click();\n  532 |   await expect(current).toHaveCount(0);\n  533 |   expect(payloads).toHaveLength(2);\n  534 |   expect(payloads[0].expectedVersion).toBe(payloads[1].expectedVersion);\n  535 |   expect(payloads[0].idempotencyKey).not.toBe(payloads[1].idempotencyKey);\n  536 |   expect(payloads[0].body.referenceHash).not.toBe(\n  537 |     payloads[1].body.referenceHash,\n  538 |   );\n  539 |   expect(ledger(f.patient)).toBe(stock);\n  540 |   const result = (await rpc(f.professional, \"operational_document\", {\n  541 |     p_id: f.document.id,\n  542 |   })) as SupplyDocument;\n  543 |   expect(\n  544 |     result.deliveryCancellation?.lines[0].consumptionReferences,\n  545 |   ).toHaveLength(2);\n  546 |   expect(typeof result.deliveryCancellation?.lines[0].returnQuantity).toBe(\n  547 |     \"string\",\n  548 |   );\n  549 |   expect(Number(result.deliveryCancellation?.lines[0].returnQuantity)).toBe(0);\n  550 |   expect(Number(result.deliveryCancellation?.lines[0].consumedQuantity)).toBe(\n  551 |     2,\n  552 |   );\n  553 | });\n  554 |\n  555 | test(\"ENT mantém pedido e trânsito parcial até conciliação real, sem oferecer recebimento por administrador alheio\", async ({\n  556 |   page,\n  557 | }) => {\n  558 |   const f = await prepared({ request: true, partial: true }),\n  559 |     before = ledger(f.patient);\n  560 |   await login(page, f.patient, \"adminA\");\n  561 |   await page.goto(\"/fichas/\" + f.document.id);\n  562 |   await selectDocumentSection(page, \"workflow\");\n  563 |   await expect(\n  564 |     page.getByRole(\"button\", {\n  565 |       name: \"Consentir e reconciliar cancelamento\",\n  566 |       exact: true,\n  567 |     }),\n  568 |   ).toHaveCount(0);\n  569 |   await expect(\n  570 |     cancellation(page).getByText(\"Há material em trânsito sem conciliação.\", {\n  571 |       exact: false,\n  572 |     }),\n  573 |   ).toBeVisible();\n  574 |   await page\n  575 |     .getByRole(\"button\", { name: \"Conciliar divergência\", exact: true })\n  576 |     .click();\n  577 |   const resolution = editor(page).getByRole(\"combobox\", {\n  578 |     name: \"Resolução\",\n  579 |     exact: true,\n  580 |   });\n  581 |   await expect(resolution.locator('option[value=\"received\"]')).toHaveCount(0);\n  582 |   await resolution.selectOption(\"returned\");\n  583 |   await editor(page)\n  584 |     .getByRole(\"textbox\", {\n  585 |       name: \"Quantidade conciliada neste ato\",\n  586 |       exact: true,\n  587 |     })\n  588 |     .fill(\"1\");\n  589 |   await editor(page)\n  590 |     .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n  591 |     .fill(\"Unidade em trânsito retornou fisicamente à custódia de origem\");\n  592 |   const decision = await review(page);\n  593 |   await decision\n  594 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  595 |     .click();\n  596 |   await expect(decision).toHaveCount(0);\n  597 |   await expect(\n  598 |     cancellation(page).getByRole(\"heading\", {\n  599 |       name: \"Pedido de cancelamento vigente\",\n  600 |       exact: true,\n  601 |     }),\n  602 |   ).toBeVisible();\n  603 |   expect(ledger(f.patient)).not.toBe(before);\n  604 |   const result = (await rpc(f.admin, \"operational_document\", {\n  605 |     p_id: f.document.id,\n  606 |   })) as SupplyDocument;\n  607 |   expect(result.status).toBe(\"cancellation_pending\");\n  608 |   expect(typeof result.deliveryCancellation?.unresolvedTransit).toBe(\"string\");\n  609 |   expect(Number(result.deliveryCancellation?.unresolvedTransit)).toBe(0);\n  610 |   expect(result.deliveryCancellation?.request.id).toBe(\n  611 |     f.document.deliveryCancellation?.request.id,\n  612 |   );\n  613 |   expect(Number(result.lines[0].accepted_quantity)).toBe(2);"
+              }
+            ]
+          },
+          {
+            "title": "ENT atualiza uma fonte indisponível por consulta e comparação, preservando a justificativa própria",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 617,
+              "column": 5
+            },
+            "duration": 7073,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 121,
+              "column": 5
+            },
+            "duration": 22690,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT compara nova fonte de consumo na mesma versão, preserva a devolução e exige outra revisão",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 467,
+              "column": 5
+            },
+            "duration": 23111,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Consumo disponível revisado: 1 unidade · Atual: 2 unidade', { exact: true })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText('Consumo disponível revisado: 1 unidade · Atual: 2 unidade', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Consumo disponível revisado: 1 unidade · Atual: 2 unidade', { exact: true })\u001b[22m\n\n\n  511 |       { exact: true },\n  512 |     ),\n> 513 |   ).toBeVisible();\n      |     ^\n  514 |   await page\n  515 |     .getByRole(\"button\", {\n  516 |       name: \"Usar referência atual e revisar novamente\",\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\delivery-cancellation.spec.ts:513:5\u001b[22m",
+                "codeframe": "  413 |       .click();\n  414 |     await expect(\n  415 |       cancellation(page).getByText(\"Recusado pelo recebedor\", { exact: true }),\n  416 |     ).toBeVisible();\n  417 |     expect(ledger(f.patient)).toBe(before);\n  418 |     await openDocumentMore(page);\n  419 |     await page\n  420 |       .getByRole(\"button\", { name: \"Solicitar cancelamento\", exact: true })\n  421 |       .click();\n  422 |     await editor(page)\n  423 |       .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n  424 |       .fill(\"Novo pedido fictício separado da decisão anterior\");\n  425 |     const next = await review(page);\n  426 |     await next\n  427 |       .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  428 |       .click();\n  429 |     await expect(next).toHaveCount(0);\n  430 |     await page\n  431 |       .getByRole(\"button\", {\n  432 |         name: \"Retirar meu pedido de cancelamento\",\n  433 |         exact: true,\n  434 |       })\n  435 |       .click();\n  436 |     await editor(page)\n  437 |       .getByRole(\"textbox\", { name: \"Motivo da retirada\", exact: true })\n  438 |       .fill(\"Solicitante retirou somente o pedido novo\");\n  439 |     const current = await review(page);\n  440 |     await current\n  441 |       .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  442 |       .click();\n  443 |     await expect(current).toHaveCount(0);\n  444 |     await expect(\n  445 |       cancellation(page).getByText(\"Retirado pelo solicitante\", {\n  446 |         exact: true,\n  447 |       }),\n  448 |     ).toBeVisible();\n  449 |     const result = (await rpc(f.admin, \"operational_document\", {\n  450 |       p_id: f.document.id,\n  451 |     })) as SupplyDocument;\n  452 |     expect(result.status).toBe(\"confirmed\");\n  453 |     expect(result.deliveryCancellation?.request.id).not.toBe(requestId);\n  454 |     expect(result.deliveryCancellation?.history[0].status).toBe(\"refused\");\n  455 |     expect(result.deliveryCancellation?.history[0].outcome?.actorId).toBe(\n  456 |       fixtures.professional.id,\n  457 |     );\n  458 |     expect(result.deliveryCancellation?.request.outcome?.actorId).toBe(\n  459 |       fixtures.adminA.id,\n  460 |     );\n  461 |     expect(ledger(f.patient)).toBe(before);\n  462 |   } finally {\n  463 |     await recipientContext.close();\n  464 |   }\n  465 | });\n  466 |\n  467 | test(\"ENT compara nova fonte de consumo na mesma versão, preserva a devolução e exige outra revisão\", async ({\n  468 |   page,\n  469 | }) => {\n  470 |   const f = await prepared({ request: true });\n  471 |   await login(page, f.patient, \"professional\");\n  472 |   await page.goto(\"/fichas/\" + f.document.id);\n  473 |   await selectDocumentSection(page, \"workflow\");\n  474 |   await page\n  475 |     .getByRole(\"button\", {\n  476 |       name: \"Consentir e reconciliar cancelamento\",\n  477 |       exact: true,\n  478 |     })\n  479 |     .click();\n  480 |   await returnField(page).fill(\"1\");\n  481 |   await editor(page)\n  482 |     .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n  483 |     .fill(\"Conciliação própria com fonte revisada\");\n  484 |   const original = await review(page);\n  485 |   await consume(f);\n  486 |   const stock = ledger(f.patient),\n  487 |     payloads: {\n  488 |       expectedVersion: number;\n  489 |       idempotencyKey: string;\n  490 |       body: { referenceHash: string };\n  491 |     }[] = [];\n  492 |   await page.route(\"**/api/documents/\" + f.document.id, async (route) => {\n  493 |     if (route.request().method() === \"POST\")\n  494 |       payloads.push(route.request().postDataJSON());\n  495 |     await route.continue();\n  496 |   });\n  497 |   await original\n  498 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  499 |     .click();\n  500 |   await expect(original).toHaveCount(0);\n  501 |   await expect(returnField(page)).toHaveValue(\"1\");\n  502 |   await page\n  503 |     .getByRole(\"button\", {\n  504 |       name: \"Consultar pedido e referências atuais\",\n  505 |       exact: true,\n  506 |     })\n  507 |     .click();\n  508 |   await expect(\n  509 |     page.getByText(\n  510 |       \"Consumo disponível revisado: 1 unidade · Atual: 2 unidade\",\n  511 |       { exact: true },\n  512 |     ),\n> 513 |   ).toBeVisible();\n      |     ^ Error: expect(locator).toBeVisible() failed\n  514 |   await page\n  515 |     .getByRole(\"button\", {\n  516 |       name: \"Usar referência atual e revisar novamente\",\n  517 |       exact: true,\n  518 |     })\n  519 |     .click();\n  520 |   await expect(returnField(page)).toHaveValue(\"1\");\n  521 |   await expect(returnField(page)).toBeFocused();\n  522 |   await returnField(page).fill(\"0\");\n  523 |   const current = await review(page);\n  524 |   await expect(\n  525 |     current.getByText(\"consumo já confirmado referenciado 2 unidade\", {\n  526 |       exact: false,\n  527 |     }),\n  528 |   ).toBeVisible();\n  529 |   await current\n  530 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  531 |     .click();\n  532 |   await expect(current).toHaveCount(0);\n  533 |   expect(payloads).toHaveLength(2);\n  534 |   expect(payloads[0].expectedVersion).toBe(payloads[1].expectedVersion);\n  535 |   expect(payloads[0].idempotencyKey).not.toBe(payloads[1].idempotencyKey);\n  536 |   expect(payloads[0].body.referenceHash).not.toBe(\n  537 |     payloads[1].body.referenceHash,\n  538 |   );\n  539 |   expect(ledger(f.patient)).toBe(stock);\n  540 |   const result = (await rpc(f.professional, \"operational_document\", {\n  541 |     p_id: f.document.id,\n  542 |   })) as SupplyDocument;\n  543 |   expect(\n  544 |     result.deliveryCancellation?.lines[0].consumptionReferences,\n  545 |   ).toHaveLength(2);\n  546 |   expect(typeof result.deliveryCancellation?.lines[0].returnQuantity).toBe(\n  547 |     \"string\",\n  548 |   );\n  549 |   expect(Number(result.deliveryCancellation?.lines[0].returnQuantity)).toBe(0);\n  550 |   expect(Number(result.deliveryCancellation?.lines[0].consumedQuantity)).toBe(\n  551 |     2,\n  552 |   );\n  553 | });\n  554 |\n  555 | test(\"ENT mantém pedido e trânsito parcial até conciliação real, sem oferecer recebimento por administrador alheio\", async ({\n  556 |   page,\n  557 | }) => {\n  558 |   const f = await prepared({ request: true, partial: true }),\n  559 |     before = ledger(f.patient);\n  560 |   await login(page, f.patient, \"adminA\");\n  561 |   await page.goto(\"/fichas/\" + f.document.id);\n  562 |   await selectDocumentSection(page, \"workflow\");\n  563 |   await expect(\n  564 |     page.getByRole(\"button\", {\n  565 |       name: \"Consentir e reconciliar cancelamento\",\n  566 |       exact: true,\n  567 |     }),\n  568 |   ).toHaveCount(0);\n  569 |   await expect(\n  570 |     cancellation(page).getByText(\"Há material em trânsito sem conciliação.\", {\n  571 |       exact: false,\n  572 |     }),\n  573 |   ).toBeVisible();\n  574 |   await page\n  575 |     .getByRole(\"button\", { name: \"Conciliar divergência\", exact: true })\n  576 |     .click();\n  577 |   const resolution = editor(page).getByRole(\"combobox\", {\n  578 |     name: \"Resolução\",\n  579 |     exact: true,\n  580 |   });\n  581 |   await expect(resolution.locator('option[value=\"received\"]')).toHaveCount(0);\n  582 |   await resolution.selectOption(\"returned\");\n  583 |   await editor(page)\n  584 |     .getByRole(\"textbox\", {\n  585 |       name: \"Quantidade conciliada neste ato\",\n  586 |       exact: true,\n  587 |     })\n  588 |     .fill(\"1\");\n  589 |   await editor(page)\n  590 |     .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n  591 |     .fill(\"Unidade em trânsito retornou fisicamente à custódia de origem\");\n  592 |   const decision = await review(page);\n  593 |   await decision\n  594 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  595 |     .click();\n  596 |   await expect(decision).toHaveCount(0);\n  597 |   await expect(\n  598 |     cancellation(page).getByRole(\"heading\", {\n  599 |       name: \"Pedido de cancelamento vigente\",\n  600 |       exact: true,\n  601 |     }),\n  602 |   ).toBeVisible();\n  603 |   expect(ledger(f.patient)).not.toBe(before);\n  604 |   const result = (await rpc(f.admin, \"operational_document\", {\n  605 |     p_id: f.document.id,\n  606 |   })) as SupplyDocument;\n  607 |   expect(result.status).toBe(\"cancellation_pending\");\n  608 |   expect(typeof result.deliveryCancellation?.unresolvedTransit).toBe(\"string\");\n  609 |   expect(Number(result.deliveryCancellation?.unresolvedTransit)).toBe(0);\n  610 |   expect(result.deliveryCancellation?.request.id).toBe(\n  611 |     f.document.deliveryCancellation?.request.id,\n  612 |   );\n  613 |   expect(Number(result.lines[0].accepted_quantity)).toBe(2);"
+              }
+            ]
+          },
+          {
+            "title": "ENT atualiza uma fonte indisponível por consulta e comparação, preservando a justificativa própria",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 617,
+              "column": 5
+            },
+            "duration": 9105,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT consentimento retoma em outra sessão, compara fonte alterada sem nova versão e impede403,200 inválido e fonte restrita",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "duration": 29127,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('region', { name: 'Referências autorizadas da conciliação', exact: true }).getByRole('region', { name: /^Fonte atual de / })\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByRole('region', { name: 'Referências autorizadas da conciliação', exact: true }).getByRole('region', { name: /^Fonte atual de / }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: 'Referências autorizadas da conciliação', exact: true }).getByRole('region', { name: /^Fonte atual de / })\u001b[22m\n\u001b[2m    33 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n\n\n  197 |     await expect(\n  198 |       sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n> 199 |     ).toHaveCount(2);\n      |       ^\n  200 |     sql(\n  201 |       `insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled) values(${q(f.patient)},'stock.team.read',${q(fixtures.professional.id)},false);`,\n  202 |     );\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\ent-consent-private-drafts.spec.ts:199:7\u001b[22m",
+                "codeframe": "   99 |   await openDocumentMore(page);\n  100 |   await page\n  101 |     .getByText(\"Meus preenchimentos nesta ficha\", { exact: true })\n  102 |     .click();\n  103 |   await page\n  104 |     .getByRole(\"button\", {\n  105 |       name: `Consultar preenchimento: ${label}`,\n  106 |       exact: true,\n  107 |     })\n  108 |     .click();\n  109 |   await expect(\n  110 |     page.getByRole(\"region\", { name: \"Rascunho privado\", exact: true }),\n  111 |   ).toBeVisible();\n  112 | }\n  113 |\n  114 | test(\"ENT consentimento retoma em outra sessão, compara fonte alterada sem nova versão e impede403,200 inválido e fonte restrita\", async ({\n  115 |   page,\n  116 |   browser,\n  117 | }, info) => {\n  118 |   const f = await consentFixture();\n  119 |   await login(page, f.patient);\n  120 |   await openConsent(page, f.document.id);\n  121 |   await returned(page, f.document.lines[0]).fill(\"1,\");\n  122 |   await returned(page, f.document.lines[1]).fill(\"2\");\n  123 |   await reason(page).fill(entReason);\n  124 |   const beforeSave = entFacts(f);\n  125 |   await save(page);\n  126 |   expect(entFacts(f)).toBe(beforeSave);\n  127 |   const peerContext = await session(browser, page, info),\n  128 |     peer = await peerContext.newPage();\n  129 |   try {\n  130 |     await login(peer, f.patient);\n  131 |     await openConsent(peer, f.document.id);\n  132 |     await resume(peer);\n  133 |     await expect(returned(peer, f.document.lines[0])).toHaveValue(\"1,\");\n  134 |     await expect(returned(peer, f.document.lines[1])).toHaveValue(\"2\");\n  135 |     await expect(reason(peer)).toHaveValue(entReason);\n  136 |     const current = await addConsentConsumption(f);\n  137 |     expect(current.version).toBe(f.document.version);\n  138 |     expect(current.deliveryCancellation.referenceHash).not.toBe(\n  139 |       f.document.deliveryCancellation.referenceHash,\n  140 |     );\n  141 |     await openConsent(peer, f.document.id);\n  142 |     await resume(peer);\n  143 |     await expect(\n  144 |       peer.getByRole(\"button\", { name: \"Revisar operação\", exact: true }),\n  145 |     ).toBeDisabled();\n  146 |     const unchanged = entFacts(f);\n  147 |     let fault = 403;\n  148 |     await peer.route(\n  149 |       `**/api/documents/${f.document.id}?reference=consent`,\n  150 |       (route) =>\n  151 |         fault\n  152 |           ? route.fulfill({\n  153 |               status: fault,\n  154 |               contentType: \"application/json\",\n  155 |               body: JSON.stringify(\n  156 |                 fault === 200\n  157 |                   ? { data: {} }\n  158 |                   : { code: \"FORBIDDEN\", error: \"Fonte fictícia recusada\" },\n  159 |               ),\n  160 |             })\n  161 |           : route.continue(),\n  162 |     );\n  163 |     await peer\n  164 |       .getByRole(\"button\", {\n  165 |         name: \"Comparar referência da operação\",\n  166 |         exact: true,\n  167 |       })\n  168 |       .click();\n  169 |     const sources = peer.getByRole(\"region\", {\n  170 |       name: \"Referências autorizadas da conciliação\",\n  171 |       exact: true,\n  172 |     });\n  173 |     const adopt = peer.getByRole(\"button\", {\n  174 |       name: \"Usar referência atual e revisar novamente\",\n  175 |       exact: true,\n  176 |     });\n  177 |     for (const next of [200, 0]) {\n  178 |       await expect(sources.getByRole(\"alert\")).toBeVisible();\n  179 |       await expect(adopt).toBeDisabled();\n  180 |       await expect(\n  181 |         sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n  182 |       ).toHaveCount(0);\n  183 |       await expect(\n  184 |         peer.getByText(\"Consumo já confirmado disponível:\", { exact: true }),\n  185 |       ).toHaveCount(0);\n  186 |       await expect(returned(peer, f.document.lines[0])).toHaveValue(\"1,\");\n  187 |       await expect(reason(peer)).toHaveValue(entReason);\n  188 |       expect(entFacts(f)).toBe(unchanged);\n  189 |       fault = next;\n  190 |       await sources\n  191 |         .getByRole(\"button\", {\n  192 |           name: \"Conferir novamente as fontes da conciliação\",\n  193 |           exact: true,\n  194 |         })\n  195 |         .click();\n  196 |     }\n  197 |     await expect(\n  198 |       sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n> 199 |     ).toHaveCount(2);\n      |       ^ Error: expect(locator).toHaveCount(expected) failed\n  200 |     sql(\n  201 |       `insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled) values(${q(f.patient)},'stock.team.read',${q(fixtures.professional.id)},false);`,\n  202 |     );\n  203 |     try {\n  204 |       await peer\n  205 |         .getByRole(\"button\", {\n  206 |           name: \"Consultar pedido e referências atuais novamente\",\n  207 |           exact: true,\n  208 |         })\n  209 |         .click();\n  210 |       await expect(sources.getByRole(\"alert\")).toContainText(\n  211 |         \"As fontes não estão disponíveis\",\n  212 |       );\n  213 |       await expect(adopt).toBeDisabled();\n  214 |       await expect(\n  215 |         sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n  216 |       ).toHaveCount(0);\n  217 |       await expect(\n  218 |         peer.getByText(\"Consumo já confirmado disponível:\", { exact: true }),\n  219 |       ).toHaveCount(0);\n  220 |       await expect(reason(peer)).toHaveValue(entReason);\n  221 |     } finally {\n  222 |       sql(\n  223 |         `update public.capability_overrides set enabled=true where care_recipient_id=${q(f.patient)} and capability='stock.team.read' and subject_user=${q(fixtures.professional.id)};`,\n  224 |       );\n  225 |     }\n  226 |     await peer\n  227 |       .getByRole(\"button\", {\n  228 |         name: \"Consultar pedido e referências atuais novamente\",\n  229 |         exact: true,\n  230 |       })\n  231 |       .click();\n  232 |     await expect(\n  233 |       sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n  234 |     ).toHaveCount(2);\n  235 |     await expect(adopt).toBeEnabled();\n  236 |     for (const width of [320, 390, 768, 1440]) {\n  237 |       await peer.setViewportSize({ width, height: 900 });\n  238 |       await peer.evaluate(() => window.scrollTo(0, 0));\n  239 |       await audit(peer, `consent-source-${width}`);\n  240 |     }\n  241 |     await peer.setViewportSize({ width: 390, height: 844 });\n  242 |     await sources.scrollIntoViewIfNeeded();\n  243 |     await info.attach(\"referencias-consentimento\", {\n  244 |       body: await peer.screenshot(),\n  245 |       contentType: \"image/png\",\n  246 |     });\n  247 |     await adopt.click();\n  248 |     await expect(returned(peer, f.document.lines[0])).toHaveValue(\"1,\");\n  249 |     await expect(returned(peer, f.document.lines[1])).toHaveValue(\"2\");\n  250 |     await expect(reason(peer)).toHaveValue(entReason);\n  251 |     await peer\n  252 |       .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  253 |       .click();\n  254 |     await expect(dialog(peer)).toHaveCount(0);\n  255 |     expect(entFacts(f)).toBe(unchanged);\n  256 |     for (const line of f.document.lines) await returned(peer, line).fill(\"1\");\n  257 |     let body: { referenceHash: string; requestId: string } | undefined;\n  258 |     peer.on(\"request\", (request) => {\n  259 |       if (\n  260 |         request.method() === \"POST\" &&\n  261 |         new URL(request.url()).pathname === `/api/documents/${f.document.id}`\n  262 |       )\n  263 |         body = request.postDataJSON().body;\n  264 |     });\n  265 |     await prepare(peer);\n  266 |     expect(entFacts(f)).toBe(unchanged);\n  267 |     await dialog(peer)\n  268 |       .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  269 |       .click();\n  270 |     await expect(dialog(peer)).toHaveCount(0);\n  271 |     expect(body).toMatchObject({\n  272 |       referenceHash: current.deliveryCancellation.referenceHash,\n  273 |       requestId: current.deliveryCancellation.request.id,\n  274 |     });\n  275 |     expect(\n  276 |       (await rpc(f.pro, \"operational_document\", { p_id: f.document.id }))\n  277 |         .status,\n  278 |     ).toBe(\"cancelled\");\n  279 |     expect(\n  280 |       sql(\n  281 |         `select count(*) from public.document_events where document_id=${q(f.document.id)} and action='ent.consent_cancel';`,\n  282 |       ),\n  283 |     ).toBe(\"1\");\n  284 |   } finally {\n  285 |     await peerContext.close();\n  286 |   }\n  287 | });\n  288 |\n  289 | test(\"ENT consentimento com resposta perdida recupera o resultado após reload em ficha encerrada sem repetirPOST\", async ({\n  290 |   page,\n  291 | }) => {\n  292 |   const f = await consentFixture();\n  293 |   await login(page, f.patient);\n  294 |   await openConsent(page, f.document.id);\n  295 |   for (const line of f.document.lines) await returned(page, line).fill(\"2\");\n  296 |   await reason(page).fill(entReason);\n  297 |   let posts = 0;\n  298 |   await page.route(`**/api/documents/${f.document.id}`, async (route) => {\n  299 |     if (route.request().method() !== \"POST\") return route.continue();"
+              }
+            ]
+          },
+          {
+            "title": "ENT consentimento com resposta perdida recupera o resultado após reload em ficha encerrada sem repetirPOST",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 289,
+              "column": 5
+            },
+            "duration": 8903,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerrada oferece consulta do resultado privado ao autor e não mostra esse resultado a outro perfil",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 337,
+              "column": 5
+            },
+            "duration": 12342,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT consentimento retoma em outra sessão, compara fonte alterada sem nova versão e impede403,200 inválido e fonte restrita",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "duration": 32475,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('region', { name: 'Referências autorizadas da conciliação', exact: true }).getByRole('region', { name: /^Fonte atual de / })\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByRole('region', { name: 'Referências autorizadas da conciliação', exact: true }).getByRole('region', { name: /^Fonte atual de / }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('region', { name: 'Referências autorizadas da conciliação', exact: true }).getByRole('region', { name: /^Fonte atual de / })\u001b[22m\n\u001b[2m    33 × locator resolved to 0 elements\u001b[22m\n\u001b[2m       - unexpected value \"0\"\u001b[22m\n\n\n  197 |     await expect(\n  198 |       sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n> 199 |     ).toHaveCount(2);\n      |       ^\n  200 |     sql(\n  201 |       `insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled) values(${q(f.patient)},'stock.team.read',${q(fixtures.professional.id)},false);`,\n  202 |     );\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\ent-consent-private-drafts.spec.ts:199:7\u001b[22m",
+                "codeframe": "   99 |   await openDocumentMore(page);\n  100 |   await page\n  101 |     .getByText(\"Meus preenchimentos nesta ficha\", { exact: true })\n  102 |     .click();\n  103 |   await page\n  104 |     .getByRole(\"button\", {\n  105 |       name: `Consultar preenchimento: ${label}`,\n  106 |       exact: true,\n  107 |     })\n  108 |     .click();\n  109 |   await expect(\n  110 |     page.getByRole(\"region\", { name: \"Rascunho privado\", exact: true }),\n  111 |   ).toBeVisible();\n  112 | }\n  113 |\n  114 | test(\"ENT consentimento retoma em outra sessão, compara fonte alterada sem nova versão e impede403,200 inválido e fonte restrita\", async ({\n  115 |   page,\n  116 |   browser,\n  117 | }, info) => {\n  118 |   const f = await consentFixture();\n  119 |   await login(page, f.patient);\n  120 |   await openConsent(page, f.document.id);\n  121 |   await returned(page, f.document.lines[0]).fill(\"1,\");\n  122 |   await returned(page, f.document.lines[1]).fill(\"2\");\n  123 |   await reason(page).fill(entReason);\n  124 |   const beforeSave = entFacts(f);\n  125 |   await save(page);\n  126 |   expect(entFacts(f)).toBe(beforeSave);\n  127 |   const peerContext = await session(browser, page, info),\n  128 |     peer = await peerContext.newPage();\n  129 |   try {\n  130 |     await login(peer, f.patient);\n  131 |     await openConsent(peer, f.document.id);\n  132 |     await resume(peer);\n  133 |     await expect(returned(peer, f.document.lines[0])).toHaveValue(\"1,\");\n  134 |     await expect(returned(peer, f.document.lines[1])).toHaveValue(\"2\");\n  135 |     await expect(reason(peer)).toHaveValue(entReason);\n  136 |     const current = await addConsentConsumption(f);\n  137 |     expect(current.version).toBe(f.document.version);\n  138 |     expect(current.deliveryCancellation.referenceHash).not.toBe(\n  139 |       f.document.deliveryCancellation.referenceHash,\n  140 |     );\n  141 |     await openConsent(peer, f.document.id);\n  142 |     await resume(peer);\n  143 |     await expect(\n  144 |       peer.getByRole(\"button\", { name: \"Revisar operação\", exact: true }),\n  145 |     ).toBeDisabled();\n  146 |     const unchanged = entFacts(f);\n  147 |     let fault = 403;\n  148 |     await peer.route(\n  149 |       `**/api/documents/${f.document.id}?reference=consent`,\n  150 |       (route) =>\n  151 |         fault\n  152 |           ? route.fulfill({\n  153 |               status: fault,\n  154 |               contentType: \"application/json\",\n  155 |               body: JSON.stringify(\n  156 |                 fault === 200\n  157 |                   ? { data: {} }\n  158 |                   : { code: \"FORBIDDEN\", error: \"Fonte fictícia recusada\" },\n  159 |               ),\n  160 |             })\n  161 |           : route.continue(),\n  162 |     );\n  163 |     await peer\n  164 |       .getByRole(\"button\", {\n  165 |         name: \"Comparar referência da operação\",\n  166 |         exact: true,\n  167 |       })\n  168 |       .click();\n  169 |     const sources = peer.getByRole(\"region\", {\n  170 |       name: \"Referências autorizadas da conciliação\",\n  171 |       exact: true,\n  172 |     });\n  173 |     const adopt = peer.getByRole(\"button\", {\n  174 |       name: \"Usar referência atual e revisar novamente\",\n  175 |       exact: true,\n  176 |     });\n  177 |     for (const next of [200, 0]) {\n  178 |       await expect(sources.getByRole(\"alert\")).toBeVisible();\n  179 |       await expect(adopt).toBeDisabled();\n  180 |       await expect(\n  181 |         sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n  182 |       ).toHaveCount(0);\n  183 |       await expect(\n  184 |         peer.getByText(\"Consumo já confirmado disponível:\", { exact: true }),\n  185 |       ).toHaveCount(0);\n  186 |       await expect(returned(peer, f.document.lines[0])).toHaveValue(\"1,\");\n  187 |       await expect(reason(peer)).toHaveValue(entReason);\n  188 |       expect(entFacts(f)).toBe(unchanged);\n  189 |       fault = next;\n  190 |       await sources\n  191 |         .getByRole(\"button\", {\n  192 |           name: \"Conferir novamente as fontes da conciliação\",\n  193 |           exact: true,\n  194 |         })\n  195 |         .click();\n  196 |     }\n  197 |     await expect(\n  198 |       sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n> 199 |     ).toHaveCount(2);\n      |       ^ Error: expect(locator).toHaveCount(expected) failed\n  200 |     sql(\n  201 |       `insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled) values(${q(f.patient)},'stock.team.read',${q(fixtures.professional.id)},false);`,\n  202 |     );\n  203 |     try {\n  204 |       await peer\n  205 |         .getByRole(\"button\", {\n  206 |           name: \"Consultar pedido e referências atuais novamente\",\n  207 |           exact: true,\n  208 |         })\n  209 |         .click();\n  210 |       await expect(sources.getByRole(\"alert\")).toContainText(\n  211 |         \"As fontes não estão disponíveis\",\n  212 |       );\n  213 |       await expect(adopt).toBeDisabled();\n  214 |       await expect(\n  215 |         sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n  216 |       ).toHaveCount(0);\n  217 |       await expect(\n  218 |         peer.getByText(\"Consumo já confirmado disponível:\", { exact: true }),\n  219 |       ).toHaveCount(0);\n  220 |       await expect(reason(peer)).toHaveValue(entReason);\n  221 |     } finally {\n  222 |       sql(\n  223 |         `update public.capability_overrides set enabled=true where care_recipient_id=${q(f.patient)} and capability='stock.team.read' and subject_user=${q(fixtures.professional.id)};`,\n  224 |       );\n  225 |     }\n  226 |     await peer\n  227 |       .getByRole(\"button\", {\n  228 |         name: \"Consultar pedido e referências atuais novamente\",\n  229 |         exact: true,\n  230 |       })\n  231 |       .click();\n  232 |     await expect(\n  233 |       sources.getByRole(\"region\", { name: /^Fonte atual de / }),\n  234 |     ).toHaveCount(2);\n  235 |     await expect(adopt).toBeEnabled();\n  236 |     for (const width of [320, 390, 768, 1440]) {\n  237 |       await peer.setViewportSize({ width, height: 900 });\n  238 |       await peer.evaluate(() => window.scrollTo(0, 0));\n  239 |       await audit(peer, `consent-source-${width}`);\n  240 |     }\n  241 |     await peer.setViewportSize({ width: 390, height: 844 });\n  242 |     await sources.scrollIntoViewIfNeeded();\n  243 |     await info.attach(\"referencias-consentimento\", {\n  244 |       body: await peer.screenshot(),\n  245 |       contentType: \"image/png\",\n  246 |     });\n  247 |     await adopt.click();\n  248 |     await expect(returned(peer, f.document.lines[0])).toHaveValue(\"1,\");\n  249 |     await expect(returned(peer, f.document.lines[1])).toHaveValue(\"2\");\n  250 |     await expect(reason(peer)).toHaveValue(entReason);\n  251 |     await peer\n  252 |       .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  253 |       .click();\n  254 |     await expect(dialog(peer)).toHaveCount(0);\n  255 |     expect(entFacts(f)).toBe(unchanged);\n  256 |     for (const line of f.document.lines) await returned(peer, line).fill(\"1\");\n  257 |     let body: { referenceHash: string; requestId: string } | undefined;\n  258 |     peer.on(\"request\", (request) => {\n  259 |       if (\n  260 |         request.method() === \"POST\" &&\n  261 |         new URL(request.url()).pathname === `/api/documents/${f.document.id}`\n  262 |       )\n  263 |         body = request.postDataJSON().body;\n  264 |     });\n  265 |     await prepare(peer);\n  266 |     expect(entFacts(f)).toBe(unchanged);\n  267 |     await dialog(peer)\n  268 |       .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  269 |       .click();\n  270 |     await expect(dialog(peer)).toHaveCount(0);\n  271 |     expect(body).toMatchObject({\n  272 |       referenceHash: current.deliveryCancellation.referenceHash,\n  273 |       requestId: current.deliveryCancellation.request.id,\n  274 |     });\n  275 |     expect(\n  276 |       (await rpc(f.pro, \"operational_document\", { p_id: f.document.id }))\n  277 |         .status,\n  278 |     ).toBe(\"cancelled\");\n  279 |     expect(\n  280 |       sql(\n  281 |         `select count(*) from public.document_events where document_id=${q(f.document.id)} and action='ent.consent_cancel';`,\n  282 |       ),\n  283 |     ).toBe(\"1\");\n  284 |   } finally {\n  285 |     await peerContext.close();\n  286 |   }\n  287 | });\n  288 |\n  289 | test(\"ENT consentimento com resposta perdida recupera o resultado após reload em ficha encerrada sem repetirPOST\", async ({\n  290 |   page,\n  291 | }) => {\n  292 |   const f = await consentFixture();\n  293 |   await login(page, f.patient);\n  294 |   await openConsent(page, f.document.id);\n  295 |   for (const line of f.document.lines) await returned(page, line).fill(\"2\");\n  296 |   await reason(page).fill(entReason);\n  297 |   let posts = 0;\n  298 |   await page.route(`**/api/documents/${f.document.id}`, async (route) => {\n  299 |     if (route.request().method() !== \"POST\") return route.continue();"
+              }
+            ]
+          },
+          {
+            "title": "ENT consentimento com resposta perdida recupera o resultado após reload em ficha encerrada sem repetirPOST",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 289,
+              "column": 5
+            },
+            "duration": 11030,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerrada oferece consulta do resultado privado ao autor e não mostra esse resultado a outro perfil",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 337,
+              "column": 5
+            },
+            "duration": 15721,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "cca6e3ec47af13ffab79908f4f3862577bee828633d979e9dde9ca0a6f4b58b4"
+      },
+      "ent-consent-final": {
+        "stats": {
+          "total": 4,
+          "expected": 4,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "ENT compara nova fonte de consumo na mesma versão, preserva a devolução e exige outra revisão",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 467,
+              "column": 5
+            },
+            "duration": 10262,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT compara nova fonte de consumo na mesma versão, preserva a devolução e exige outra revisão",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 467,
+              "column": 5
+            },
+            "duration": 10075,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT consentimento retoma em outra sessão, compara fonte alterada sem nova versão e impede403,200 inválido e fonte restrita",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "duration": 22644,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT consentimento retoma em outra sessão, compara fonte alterada sem nova versão e impede403,200 inválido e fonte restrita",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "duration": 27656,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "aaf68cd6664974f9cdb8022b395aca39e58c7895ee01d1471bcfee3d1a285cab"
+      },
+      "ent-consent-withdrawal": {
+        "stats": {
+          "total": 2,
+          "expected": 2,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pode ser retirado preservando os fatos",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 342,
+              "column": 5
+            },
+            "duration": 26127,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pode ser retirado preservando os fatos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 342,
+              "column": 5
+            },
+            "duration": 27055,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "1fe51bb385c7916f6e9d88c185ac5427d293e8cfce25514885deefb96d2420b5"
+      },
+      "ent-consent-ci-initial": {
+        "stats": {
+          "total": 8,
+          "expected": 5,
+          "unexpected": 3,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pode ser retirado preservando os fatos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 342,
+              "column": 5
+            },
+            "duration": 85281,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "AssertionError: ifError got unwanted exception: canceling statement due to statement timeout\n\n\u001b[90m   at \u001b[39m..\\integration\\v4-fixtures.mjs:44\n\n  42 | async function rpc(client, name, args) {\n  43 |   const result = await client.rpc(name, args);\n> 44 |   assert.ifError(result.error);\n     |          ^\n  45 |   return result.data;\n  46 | }\n  47 | async function claimExternalFixtureJob(service, worker, predicate) {\n\u001b[2m    at rpc (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\integration\\v4-fixtures.mjs:44:10)\u001b[22m\n\u001b[2m    at prepared (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\delivery-cancellation.spec.ts:35:19)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\delivery-cancellation.spec.ts:347:13\u001b[22m",
+                "codeframe": "   1 | import assert from \"node:assert/strict\";\n   2 | import { randomUUID } from \"node:crypto\";\n   3 | import { readFileSync } from \"node:fs\";\n   4 | import { createClient } from \"@supabase/supabase-js\";\n   5 | import {\n   6 |   getTestEnvironment,\n   7 |   fixtureFile,\n   8 |   sql,\n   9 |   sqlLiteral,\n   10 | } from \"../../scripts/test-environment.mjs\";\n   11 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   12 | const env = getTestEnvironment(),\n   13 |   fixtures = JSON.parse(readFileSync(fixtureFile, \"utf8\"));\n   14 | const clients = new Map();\n   15 | async function actor(name, patient) {\n   16 |   if (\n   17 |     clients.has(name) &&\n   18 |     (await clients.get(name).rpc(\"my_session_valid\")).data !== true\n   19 |   )\n   20 |     clients.delete(name);\n   21 |   if (!clients.has(name)) {\n   22 |     const client = createClient(env.url, env.anonKey, {\n   23 |       auth: { persistSession: false, autoRefreshToken: false },\n   24 |     });\n   25 |     assert.ifError(\n   26 |       (\n   27 |         await client.auth.signInWithPassword({\n   28 |           email: fixtures[name].email,\n   29 |           password: fixturePassword,\n   30 |         })\n   31 |       ).error,\n   32 |     );\n   33 |     clients.set(name, client);\n   34 |   }\n   35 |   const client = clients.get(name);\n   36 |   assert.ifError(\n   37 |     (await client.rpc(\"select_active_context\", { p_patient: patient ?? null }))\n   38 |       .error,\n   39 |   );\n   40 |   return client;\n   41 | }\n   42 | async function rpc(client, name, args) {\n   43 |   const result = await client.rpc(name, args);\n>  44 |   assert.ifError(result.error);\n      |          ^ AssertionError: ifError got unwanted exception: canceling statement due to statement timeout\n   45 |   return result.data;\n   46 | }\n   47 | async function claimExternalFixtureJob(service, worker, predicate) {\n   48 |   // Retained local data can put the fixture beyond the first bounded batch.\n   49 |   // Exercise the worker queue without deleting notices or enlarging its limit.\n   50 |   const queueSize = Number(\n   51 |     sql(\"select count(*) from public.requisition_notifications\"),\n   52 |   );\n   53 |   for (let batch = 0; batch <= queueSize; batch++) {\n   54 |     const jobs = await rpc(service, \"claim_notification_jobs\", {\n   55 |       p_limit: 100,\n   56 |       p_worker_id: worker,\n   57 |       p_external_enabled: true,\n   58 |     });\n   59 |     const fixtureJob = jobs.find(predicate);\n   60 |     if (fixtureJob) return fixtureJob;\n   61 |     if (!jobs.length) break;\n   62 |   }\n   63 |   assert.fail(\n   64 |     \"The fixture notification was not claimable within the existing queue\",\n   65 |   );\n   66 | }\n   67 | const request = (patient, products) => ({\n   68 |   p_care_recipient_id: patient,\n   69 |   p_idempotency_key: randomUUID(),\n   70 |   p_payload_hash: \"ignored\",\n   71 |   p_lines: products.map((productId) => ({\n   72 |     productId,\n   73 |     currentStock: \"0\",\n   74 |     urgent: true,\n   75 |   })),\n   76 |   p_extra_items: [],\n   77 |   p_observations: [],\n   78 | });\n   79 | /** @param {{catalogue?: {name:string,category:string,unit:string,aliases:string[]}[]|null}} [options] */\n   80 | async function setup({ catalogue = null } = {}) {\n   81 |   const global = await actor(\"global\");\n   82 |   const patient = (\n   83 |     await rpc(global, \"admin_upsert_recipient\", {\n   84 |       p_id: null,\n   85 |       p_display_name: \"Homologação fictícia V4 \" + randomUUID().slice(0, 8),\n   86 |       p_is_active: true,\n   87 |       p_is_development: true,\n   88 |     })\n   89 |   ).id;\n   90 |   // Controlled fixture setup only. All identities were issued by the official Auth API.\n   91 |   for (const name of [\"global\", \"adminA\", \"family\", \"professional\", \"reader\"])\n   92 |     sql(\n   93 |       `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values(${sqlLiteral(patient)},${sqlLiteral(fixtures[name].id)},${sqlLiteral([\"global\", \"adminA\"].includes(name) ? \"admin\" : name)});`,\n   94 |     );\n   95 |   const admin = await actor(\"adminA\", patient);\n   96 |   const products = [];\n   97 |   const definitions =\n   98 |     catalogue ??\n   99 |     Array.from({ length: 2 }, (_, i) => ({\n  100 |       name: \"Material fictício V4 \" + i,\n  101 |       category: \"higiene\",\n  102 |       unit: \"unidade\",\n  103 |       aliases: [],\n  104 |     }));\n  105 |   assert.ok(\n  106 |     Array.isArray(definitions) &&\n  107 |       definitions.length >= 1 &&\n  108 |       definitions.length <= 100,\n  109 |     \"Controlled fixture catalogue must contain 1 to 100 items\",\n  110 |   );\n  111 |   for (const definition of definitions)\n  112 |     products.push(\n  113 |       (\n  114 |         await rpc(admin, \"admin_upsert_recipient_product\", {\n  115 |           p_care_recipient_id: patient,\n  116 |           p_product_id: null,\n  117 |           p_name: definition.name,\n  118 |           p_category: definition.category,\n  119 |           p_unit: definition.unit,\n  120 |           p_aliases: definition.aliases,\n  121 |           p_is_active: true,\n  122 |         })\n  123 |       ).product_id,\n  124 |     );\n  125 |   for (const product of products)\n  126 |     await rpc(admin, \"family_stock_movement\", {\n  127 |       p_patient: patient,\n  128 |       p_product: product,\n  129 |       p_quantity: \"30\",\n  130 |       p_action: \"inbound\",\n  131 |       p_reason: \"Saldo fictício controlado de homologação V4\",\n  132 |       p_key: randomUUID(),\n  133 |     });\n  134 |   return { patient, admin, products };\n  135 | }\n  136 | async function issue(patient, products) {\n  137 |   const pro = await actor(\"professional\", patient);\n  138 |   const row = (\n  139 |     await rpc(pro, \"submit_requisition\", request(patient, products))\n  140 |   )[0];\n  141 |   const lines = await pro\n  142 |     .from(\"requisition_items\")\n  143 |     .select(\"id,product_id\")\n  144 |     .eq(\"requisition_id\", row.requisition_id);"
+              }
+            ]
+          },
+          {
+            "title": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 497,
+              "column": 5
+            },
+            "duration": 30956,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar no dia seguinte e recuperar resposta perdida",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "requisition-observation.spec.ts",
+              "line": 159,
+              "column": 5
+            },
+            "duration": 26209,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "Histórico rejeita resposta200 inválida ou de outra versão como falha de leitura recuperável",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "version-history.spec.ts",
+              "line": 26,
+              "column": 5
+            },
+            "duration": 24108,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT consentimento retoma em outra sessão, compara fonte alterada sem nova versão e impede403,200 inválido e fonte restrita",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "duration": 55937,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT consentimento retoma em outra sessão, compara fonte alterada sem nova versão e impede403,200 inválido e fonte restrita",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "duration": 47523,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeEnabled\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel('Menu do usuário', { exact: true })\nExpected: enabled\nReceived: disabled\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeEnabled\" getByLabel('Menu do usuário', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Menu do usuário', { exact: true })\u001b[22m\n\u001b[2m    32 × locator resolved to <button disabled tabindex=\"0\" type=\"button\" id=\"base-ui-_r_6_\" aria-haspopup=\"menu\" aria-expanded=\"false\" aria-label=\"Menu do usuário\" class=\"hca-control hca-control--quiet hca-profile-trigger\">…</button>\u001b[22m\n\u001b[2m       - unexpected value \"disabled\"\u001b[22m\n\n\n\u001b[90m   at \u001b[39mauth-context.ts:4\n\n  2 |\n  3 | export async function selectContext(page: Page, patient: string | null) {\n> 4 |   await expect(page.getByLabel(\"Menu do usuário\", { exact: true })).toBeEnabled();\n    |                                                                     ^\n  5 |   const response = await page.request.get(\"/api/context\");\n  6 |   expect(response.ok()).toBeTruthy();\n  7 |   const data = (await response.json()).data;\n\u001b[2m    at selectContext (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\auth-context.ts:4:69)\u001b[22m\n\u001b[2m    at login (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\ent-consent-private-drafts.spec.ts:50:22)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\ent-consent-private-drafts.spec.ts:119:3\u001b[22m",
+                "codeframe": "   1 | import { expect, type Page } from \"@playwright/test\";\n   2 |\n   3 | export async function selectContext(page: Page, patient: string | null) {\n>  4 |   await expect(page.getByLabel(\"Menu do usuário\", { exact: true })).toBeEnabled();\n     |                                                                     ^ Error: expect(locator).toBeEnabled() failed\n   5 |   const response = await page.request.get(\"/api/context\");\n   6 |   expect(response.ok()).toBeTruthy();\n   7 |   const data = (await response.json()).data;\n   8 |   const shell = page.locator(\".hca-workspace\");\n   9 |   if (!data.activeContext || data.activeContext.care_recipient_id !== patient) {\n  10 |     const chooser = page.getByRole(\"region\", { name: \"Mudar perfil\", exact: true });\n  11 |     const person = data.patients.find((row: { id: string }) => row.id === patient);\n  12 |     const label = patient ? new RegExp(\"^\" + String(person?.display_name).replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\") + \" · \") : \"Administração global\";\n  13 |     if (await chooser.isVisible()) {\n  14 |       if (patient) {\n  15 |         const search = chooser.getByRole(\"textbox\", { name: \"Buscar perfil autorizado\", exact: true });\n  16 |         await search.press(\"ControlOrMeta+A\");\n  17 |         await search.pressSequentially(person.display_name);\n  18 |         await expect(search).toHaveValue(person.display_name);\n  19 |       }\n  20 |       await chooser.getByRole(\"button\", { name: label, exact: !patient }).click();\n  21 |     } else {\n  22 |       await page.getByLabel(\"Menu do usuário\", { exact: true }).click();\n  23 |       await page.getByRole(\"menuitem\", { name: \"Mudar perfil\", exact: true }).click();\n  24 |       await page.getByRole(\"menuitemradio\", { name: label, exact: !patient }).click();\n  25 |     }\n  26 |     await expect.poll(async () => (await (await page.request.get(\"/api/context\")).json()).data.activeContext?.care_recipient_id).toBe(patient);\n  27 |   }\n  28 |   await expect(shell).toHaveAttribute(\"data-context-mode\", patient ? \"patient\" : \"global\");\n  29 |   await expect(shell).toHaveAttribute(\"data-context-patient\", patient ?? \"\");\n  30 |   await expect(page.getByRole(\"region\", { name: \"Mudar perfil\", exact: true })).not.toBeVisible();\n  31 | }\n  32 |\n  33 | //"
+              }
+            ]
+          },
+          {
+            "title": "sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera a mesma intenção após perda de escrita",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "catalogue-identities.spec.ts",
+              "line": 99,
+              "column": 5
+            },
+            "duration": 92288,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "TimeoutError: apiRequestContext.post: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - → POST http://127.0.0.1:3100/api/documents/e0db603b-31a2-493f-aa2e-42d4b355fec0/issuances\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - content-type: application/json\u001b[22m\n\u001b[2m    - content-length: 69\u001b[22m\n[local synthetic authorization redacted]\n\n\n\u001b[90m   at \u001b[39mgenerated-pdf.ts:31\n\n  29 |   if (!intention.issuance) {\n  30 |     for (let attempt = 0; attempt < 20; attempt++) {\n> 31 |       const response = await page.request.post(\n     |                                           ^\n  32 |         `/api/documents/${id}/issuances`,\n  33 |         { data: { idempotencyKey: intention.key, version } },\n  34 |       );\n\u001b[2m    at generatedPdf (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\generated-pdf.ts:31:43)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\catalogue-identities.spec.ts:105:15\u001b[22m",
+                "codeframe": "   1 | import { expect, type Page, type APIRequestContext } from \"@playwright/test\";\n   2 | import { randomUUID } from \"node:crypto\";\n   3 | const intentions = new WeakMap<\n   4 |   APIRequestContext,\n   5 |   Map<string, { key: string; issuance?: string }>\n   6 | >();\n   7 | /** A test's explicit PDF-generation action. Subsequent reads recover its exact issuance. */\n   8 | export async function generatedPdf(page: Page, legacyUrl: string) {\n   9 |   const url = new URL(legacyUrl, \"http://local.test\"),\n  10 |     match = /^\\/api\\/documents\\/([0-9a-f-]{36})\\/pdf$/.exec(url.pathname);\n  11 |   if (!match) throw new Error(\"Expected a known document PDF path\");\n  12 |   const id = match[1];\n  13 |   const detail = await page.request.get(`/api/documents/${id}`);\n  14 |   expect(detail.ok(), await detail.text()).toBe(true);\n  15 |   const version = Number(\n  16 |       url.searchParams.get(\"version\") ?? (await detail.json()).data.version,\n  17 |     ),\n  18 |     scope = `${id}:${version}`;\n  19 |   let stored = intentions.get(page.request);\n  20 |   if (!stored) {\n  21 |     stored = new Map();\n  22 |     intentions.set(page.request, stored);\n  23 |   }\n  24 |   let intention = stored.get(scope);\n  25 |   if (!intention) {\n  26 |     intention = { key: randomUUID() };\n  27 |     stored.set(scope, intention);\n  28 |   }\n  29 |   if (!intention.issuance) {\n  30 |     for (let attempt = 0; attempt < 20; attempt++) {\n> 31 |       const response = await page.request.post(\n     |                                           ^ TimeoutError: apiRequestContext.post: Timeout 15000ms exceeded.\n  32 |         `/api/documents/${id}/issuances`,\n  33 |         { data: { idempotencyKey: intention.key, version } },\n  34 |       );\n  35 |       expect([200, 202], await response.text()).toContain(response.status());\n  36 |       const row = await response.json();\n  37 |       if (row.state === \"ready\") {\n  38 |         intention.issuance = row.id;\n  39 |         break;\n  40 |       }\n  41 |       await page.waitForTimeout(500);\n  42 |     }\n  43 |     expect(\n  44 |       intention.issuance,\n  45 |       \"The explicit generation must actually reach ready\",\n  46 |     ).toBeTruthy();\n  47 |   }\n  48 |   return page.request.get(\n  49 |     `/api/documents/${id}/pdf?issuance=${intention.issuance}`,\n  50 |   );\n  51 | }\n  52 |\n  53 | //"
+              }
+            ]
+          },
+          {
+            "title": "D3 sino distingue demora falha e conteúdo e recupera por consulta sem registrar ciência",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "notification-read-states.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 27721,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "f54354cc5a55e40f21547805675e461b9f3d13172e356968fcc4126e5eb70d98"
+      },
+      "ent-consent-ci-retry": {
+        "stats": {
+          "total": 3,
+          "expected": 3,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pode ser retirado preservando os fatos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 342,
+              "column": 5
+            },
+            "duration": 33747,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera a mesma intenção após perda de escrita",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "catalogue-identities.spec.ts",
+              "line": 99,
+              "column": 5
+            },
+            "duration": 58749,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT consentimento retoma em outra sessão, compara fonte alterada sem nova versão e impede403,200 inválido e fonte restrita",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-consent-private-drafts.spec.ts",
+              "line": 114,
+              "column": 5
+            },
+            "duration": 71708,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "ff383e71d864d9de223a22771a34b3c88efb239b3e2fbd1e1f2822fa94621c5b"
+      }
+    },
+    "qualifiedReuse": "Eight unaffected initial successes reused after correcting textual product decoder;four affected repeated. Latest reference decoder was tightened and case1 repeated in both engines. Five unaffected CI round successes reused after three local availability failures;only affected three repeated. No source edits during runners;no mutable database suite in parallel.",
+    "infraFailures": "Three local failures:57014 during create_supply_document;PDF issuance post timeout after context DATABASE_UNAVAILABLE;context my_workspace timeout. Containers healthy,no waiting locks observed,no reset/timeout increase/retry suppression. Full intermediate reports retained.",
+    "viewportImagesInspected": [
+      "ent-consent-final/de5b85a17672a6b7c6410cb3943010bb560f2104.png",
+      "ent-consent-final/bced663b004457ecaf4b8c20ee88076c24f0cdc5.png"
+    ],
+    "axeRulesRetained": true,
+    "physicalDeviceProof": false
+  },
+  "directedChecks": {
+    "types": "PASS",
+    "lint": "PASS",
+    "generalChecks": "Own-SHA CI required;no duplicate local general suite"
+  },
+  "logSha256": {
+    "ent-consent-db-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "ent-consent-db-tests.log": "9d1237b976f5620a01beb24ffb2c25d024be450d5ede7c54ce2d3a61ee40f793",
+    "ent-consent-db-final.log": "0eef761b0399bb75faa6e73389c7ab473f7205f8ffa6f03e9a84ccce2c77faf9",
+    "ent-consent-ack-auth.log": "7049f9dadbb5a68b3045c9218792559294b562611d993a91644d65bd41eac99a",
+    "ent-consent-unit-complete.log": "5ece0ebcb5e209276400211b3b99af0c66a7dcf177660b020ab2b9d1a9c7cc8d",
+    "ent-consent-lint-complete.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-consent-types-complete.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-consent-e2e-initial.log": "a3dca9ca0abdaa0660237eca574d607759f8c15610872967261bfcb3592fff83",
+    "ent-consent-e2e-final.log": "9904289e316de0d25f71da3cf267dcb19bf12623f330624e74bf5dd58397edd7",
+    "ent-consent-withdrawal-e2e.log": "6f31684b333a6cf26d45ee1b5fd3ef7d8978000d15a1c9d42b84d71d4b830574",
+    "ent-consent-ci-e2e.log": "fe9eadc55e32e287c402a04f8c39c4207a4e9a7af5566415a7b72d19b723d95f",
+    "ent-consent-ci-retry.log": "a88c4f58555b1bc40e6104ff3fd4d05e78286a4d68a6630fb00016121fc3ef60",
+    "ent-consent-remote-dry-run.log": "893685e69e1b265bf715800a089eb3527dd2df11d113f455a3e726a2c5ede876",
+    "ent-consent-remote-apply.log": "6d9141ba93cd056e82c08b6eb1a31af718dbdf4784679e71c5caf548010e5f12"
+  },
+  "remote": "ENT_CONSENT_DRAFTS_REMOTE.json",
+  "ci": "CI_ADC4353_OBSERVATION.json",
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30Unchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "uiRequirements": 18,
+    "historicalMigrationsUnchanged": 84,
+    "localRemoteMigrations": 170,
+    "newMigrationEofNormalizationOnly": true
+  },
+  "limits": [
+    "D-B-AC-001 remains partial:regularization,transfer,BAL/REQ contextual forms",
+    "Full canonical66/171 parity,own SHA complete CI and D-C/D6/human/AT/physical/provider gates remain",
+    "Sonar owner-deferred;PR7 Draft;no merge or production",
+    "No new signature,backup,monitoring or external transport approval"
+  ],
+  "documentation": {
+    "markdownFiles": 5,
+    "localLinksChecked": 358,
+    "markdownIssues": 0,
+    "sourceLfHashesVerified": true,
+    "syntheticAuthorizationRedactedFromRecordedErrors": true
+  }
+}

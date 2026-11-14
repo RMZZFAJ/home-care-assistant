@@ -1,0 +1,61 @@
+{
+  "at": "2026-11-08T23:32:43.580Z",
+  "sha": "c8c34f4af40b15caac4a212b5b0dc816c44b6bc6",
+  "runId": 42531058506,
+  "jobs": [
+    {
+      "id": 128885213541,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128885213673,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128885213818,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128888236627,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128888236641,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128888236653,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 128888236688,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128896198774,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "approval": false,
+  "chromiumFindings": [
+    "C026 REQ target partially obscured after invalid-field focus and responsive resize; locally reproduced",
+    "family accessibility cached hidden main ambiguity; discriminating synthetic baseline failed"
+  ],
+  "newShaNeedsOwnCi": true
+}

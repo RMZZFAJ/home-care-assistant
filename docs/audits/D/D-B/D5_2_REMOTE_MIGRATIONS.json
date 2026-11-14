@@ -1,0 +1,179 @@
+{
+  "status": "APPLIED_AND_POST_VALIDATED",
+  "at": "2026-11-07T21:22:36.014Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": 143,
+  "after": 144,
+  "applied": 1,
+  "pending": 0,
+  "historySqlMatched": 144,
+  "catalogueComparison": {
+    "views": true,
+    "columns": true,
+    "indexes": true,
+    "defaults": true,
+    "policies": true,
+    "triggers": true,
+    "functions": true,
+    "relations": true,
+    "constraints": false,
+    "table_grants": true,
+    "function_grants": true
+  },
+  "constraintQualification": "Only presentation_finite_factor validation flag differs from local retained NaN fixture; exact predicate preserved",
+  "preservation": {
+    "originalTableProjections": 135,
+    "originalRowsMatched": true,
+    "unexpectedChanges": [],
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.scheduler_health"
+    ],
+    "authUsers": 9,
+    "profiles": 7,
+    "storageObjects": 32,
+    "cronDigestUnchanged": true,
+    "vaultDigestUnchanged": true
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0
+  },
+  "runtimeMarker": {
+    "database": true,
+    "anonymousRestHttp": 200,
+    "protocol": 1,
+    "schema": 1,
+    "invoker": true,
+    "stable": true,
+    "anon": true,
+    "authenticated": true,
+    "serviceRole": false,
+    "directPrivateTableGrants": 0
+  },
+  "noReset": true,
+  "noFixtures": true,
+  "noAuthConfigurationChanges": true,
+  "noExternalTransportActivation": true,
+  "operationalGo": false,
+  "currentSourceCi": "NOT_PUBLISHED_YET",
+  "pushSecurity": {
+    "attempts": 0,
+    "deliveries": 0,
+    "device_events": 0,
+    "devices": 0,
+    "functions": [
+      {
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "claim_web_push_deliveries",
+        "service": true
+      },
+      {
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "complete_web_push_delivery",
+        "service": true
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "my_web_push_devices",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "prepare_web_push_delivery",
+        "service": true
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "resolve_web_push",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "revoke_web_push_session",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "subscribe_web_push",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "web_push_device_command",
+        "service": false
+      }
+    ],
+    "tables": [
+      {
+        "anon": false,
+        "authenticated": false,
+        "name": "web_push_attempts",
+        "rls": true,
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": false,
+        "name": "web_push_deliveries",
+        "rls": true,
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": false,
+        "name": "web_push_device_events",
+        "rls": true,
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": false,
+        "name": "web_push_devices",
+        "rls": true,
+        "service": false
+      }
+    ]
+  }
+}

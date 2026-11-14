@@ -1,0 +1,37 @@
+{
+  "sha": "f233be91e93c974d3aff7a829e31db82f0850325",
+  "runId": 42675155797,
+  "jobs": {
+    "windows": "success",
+    "ubuntu": "success",
+    "database": "success",
+    "mobile": "success",
+    "ios2": "success",
+    "chromium": "success",
+    "ios1": "failure",
+    "aggregate": "failure"
+  },
+  "failure": {
+    "file": "tests/e2e/document-tabs.spec.ts",
+    "line": 497,
+    "title": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+    "assertion": "403 header count expected0 received1",
+    "repeatedOnRetry": true
+  },
+  "flaky": {
+    "file": "tests/e2e/attachment-attempts.spec.ts",
+    "line": 84,
+    "assertion": "Anexos aria-selected expectedtrue receivedfalse",
+    "passedRetry": true
+  },
+  "artifact": {
+    "id": 13703396893,
+    "sha256": "02ada4901015da710daaf8cbb5c910c9830b1c4a9c7fbe3cd6b42aa4848d2ce7"
+  },
+  "preview": {
+    "state": "READY",
+    "deployment": "dpl_BqRVw2Lp4n7V6AaCcXTfgfM9m9Cn"
+  },
+  "sonar": "Owner deferred until configuration; no approval inferred",
+  "limits": "No global CI approval. Directed cause investigation and own-SHA pipeline required."
+}

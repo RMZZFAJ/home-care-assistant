@@ -1,0 +1,426 @@
+{
+  "at": "2026-11-11T13:12:55.673683+00:00",
+  "increment": "D3.79",
+  "checkpoint": "06.1",
+  "status": "PASS_LOCAL_SCOPED",
+  "baseSha": "4376e76d9619827167a21e384a5269d6e3a3b003",
+  "scope": [
+    "REQ-01",
+    "REQ-02",
+    "REQ-03",
+    "REQ-04",
+    "REQ-05",
+    "COM-01",
+    "COM-02",
+    "COM-03",
+    "COM-04"
+  ],
+  "distinctQualifiedCases": 51,
+  "qualification": {
+    "unchangedCohortCases": 30,
+    "finalReviewCases": 12,
+    "finalConsumers": 9
+  },
+  "rounds": {
+    "req-com-fixture-first.json": {
+      "startTime": "2026-11-11T12:15:33.584Z",
+      "duration": 59210.916,
+      "expected": 0,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "req-com-visual-baseline.json": {
+      "startTime": "2026-11-11T12:18:16.188Z",
+      "duration": 80760.116,
+      "expected": 0,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "req-com-canonical-first.json": {
+      "startTime": "2026-11-11T12:34:11.004Z",
+      "duration": 349530.028,
+      "expected": 4,
+      "skipped": 0,
+      "unexpected": 8,
+      "flaky": 0
+    },
+    "req-com-cohort.json": {
+      "startTime": "2026-11-11T12:41:58.481Z",
+      "duration": 881770.4269999999,
+      "expected": 45,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "req-com-review-first.json": {
+      "startTime": "2026-11-11T12:59:35.132Z",
+      "duration": 429944.81,
+      "expected": 12,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "req-com-consumer-final.json": {
+      "startTime": "2026-11-11T13:08:47.098Z",
+      "duration": 145475.718,
+      "expected": 9,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "qualifiedCases": [
+    {
+      "file": "balance-count-recovery.spec.ts",
+      "title": "BAL review keeps physical fields after an invalid read and uses its own authorized stock reference",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "balance-count-recovery.spec.ts",
+      "title": "BAL review keeps physical fields after an invalid read and uses its own authorized stock reference",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "balance-count-recovery.spec.ts",
+      "title": "BAL review keeps physical fields after an invalid read and uses its own authorized stock reference",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em REQ mantém alias, teclado, categoria e entrada manual",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em COM mantém alias, teclado, categoria e entrada manual",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em REQ mantém alias, teclado, categoria e entrada manual",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em COM mantém alias, teclado, categoria e entrada manual",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em REQ mantém alias, teclado, categoria e entrada manual",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em COM mantém alias, teclado, categoria e entrada manual",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "purchase-follow-up.spec.ts",
+      "title": "COM follow-up preserves arrival rejection and P14 closure until a real parcel is validated",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "purchase-follow-up.spec.ts",
+      "title": "COM follow-up preserves arrival rejection and P14 closure until a real parcel is validated",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "purchase-follow-up.spec.ts",
+      "title": "COM follow-up preserves arrival rejection and P14 closure until a real parcel is validated",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "purchase-receipts.spec.ts",
+      "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "purchase-receipts.spec.ts",
+      "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "purchase-receipts.spec.ts",
+      "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "purchase-receipts.spec.ts",
+      "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "purchase-receipts.spec.ts",
+      "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "purchase-receipts.spec.ts",
+      "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 REQ materials retain every fact with canonical responsive table and reversible search",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 COM materials retain every fact with canonical responsive table and reversible search",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 REQ materials retain every fact with canonical responsive table and reversible search",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 COM materials retain every fact with canonical responsive table and reversible search",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 REQ materials retain every fact with canonical responsive table and reversible search",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 COM materials retain every fact with canonical responsive table and reversible search",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "requisition-science.spec.ts",
+      "title": "P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevive à falha de abertura sem duplicar",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "requisition-science.spec.ts",
+      "title": "P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevive à falha de abertura sem duplicar",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "requisition-science.spec.ts",
+      "title": "P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevive à falha de abertura sem duplicar",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "recurring-selection.spec.ts",
+      "title": "lista frequente cruza sessões, copia só materiais e nunca estoque7, urgência ou justificativa antiga",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "recurring-selection.spec.ts",
+      "title": "lista frequente cruza sessões, copia só materiais e nunca estoque7, urgência ou justificativa antiga",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "recurring-selection.spec.ts",
+      "title": "lista frequente cruza sessões, copia só materiais e nunca estoque7, urgência ou justificativa antiga",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 REQ selection and review follow the canonical model in five widths without operational writes",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 COM selection and review follow the canonical model in five widths without operational writes",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 REQ selection and review follow the canonical model in five widths without operational writes",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 COM selection and review follow the canonical model in five widths without operational writes",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 REQ selection and review follow the canonical model in five widths without operational writes",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "req-com-canonical.spec.ts",
+      "title": "06.1 COM selection and review follow the canonical model in five widths without operational writes",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "requisition-observation.spec.ts",
+      "title": "observação REQ mantém texto decimal exato, recusa arredondamento e retoma vírgula decimal sem convertê-la em zero",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "requisition-observation.spec.ts",
+      "title": "observação REQ mantém texto decimal exato, recusa arredondamento e retoma vírgula decimal sem convertê-la em zero",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "requisition-observation.spec.ts",
+      "title": "observação REQ mantém texto decimal exato, recusa arredondamento e retoma vírgula decimal sem convertê-la em zero",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "administration.spec.ts",
+      "title": "sugestões por alias e grafia ambígua só associam o produto após escolha explícita",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "administration.spec.ts",
+      "title": "sugestões por alias e grafia ambígua só associam o produto após escolha explícita",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "administration.spec.ts",
+      "title": "sugestões por alias e grafia ambígua só associam o produto após escolha explícita",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "purchase-origin.spec.ts",
+      "title": "COM começa sem compra presumida e emite doação explícita sem creditar estoque",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "purchase-origin.spec.ts",
+      "title": "COM recupera rascunho sem origem em branco e exige escolha antes de emitir sem alterar o evento anterior",
+      "project": "chromium",
+      "ok": true
+    },
+    {
+      "file": "purchase-origin.spec.ts",
+      "title": "COM começa sem compra presumida e emite doação explícita sem creditar estoque",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "purchase-origin.spec.ts",
+      "title": "COM recupera rascunho sem origem em branco e exige escolha antes de emitir sem alterar o evento anterior",
+      "project": "mobile",
+      "ok": true
+    },
+    {
+      "file": "purchase-origin.spec.ts",
+      "title": "COM começa sem compra presumida e emite doação explícita sem creditar estoque",
+      "project": "ios",
+      "ok": true
+    },
+    {
+      "file": "purchase-origin.spec.ts",
+      "title": "COM recupera rascunho sem origem em branco e exige escolha antes de emitir sem alterar o evento anterior",
+      "project": "ios",
+      "ok": true
+    }
+  ],
+  "reuseBoundary": "Only pure review templates changed after the45-case cohort. Twelve review/creation/recurring/decimal cases passed afterwards; the three obsolete origin text assertions were replaced by explicit label/value checks. Final nine cases cover both acquisition-origin paths and explicit catalogue adoption with observation and urgency. Other30 runtime paths and all native handlers,APIs,SQL,auth and ledger contracts remained identical.",
+  "checks": {
+    "types": "PASS",
+    "affectedSourceLint": "PASS",
+    "markdown": "PASS",
+    "fiveWidths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "reference": "offline canonical HTML computed styles;existing unchanged modal/header/tab foundation",
+    "forcedColors": "Canvas/CanvasText header correction;all axe rules enabled;media assertions active",
+    "motion": "reduced motion emulated",
+    "zoom": "controlled CSS200%;not native400%",
+    "sqlOracle": "native snapshots of requisitions,documents and ledger;existing decimal,origin,science,parcel and closure assertions preserved"
+  },
+  "counterproofs": [
+    "Initial fixture tried to change precision after stock history;fixture corrected without weakening native immutability.",
+    "Selected product background differed from canonical HTML before implementation.",
+    "Two new test selectors did not match existing accessible names.",
+    "Forced colors exposed three header contrast failures;system colors corrected them.",
+    "Canonical definition grid separated acquisition label/value;old combined-text selectors updated without changing ledger/origin assertions."
+  ],
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "migrations": 206,
+    "pending": [],
+    "newSql": false,
+    "dryRun": "Remote database is up to date.",
+    "vaultSync": false,
+    "reset": false,
+    "remoteFixtures": false
+  },
+  "limits": [
+    "Only06.1 closes;other46-composition group points remain.",
+    "No new approval of the105 original acceptance statuses or18 UI requirement states.",
+    "DOC-A/B/C/D unchanged;no PDF appearance,autonomous return,20-minute access policy,cancellation science or simplified draft completion claimed.",
+    "Whole-page review captures are contextual:fixed navigation may appear inside the stitched image;card/table crops and computed-style comparisons are the scoped visual evidence.",
+    "Human,screen reader,native400%,physical Android/PWA andprovider gates remain.",
+    "Own published SHA CI and protected Preview observation required.",
+    "Sonar:OWNER_DEFERRED_SONAR_CONFIGURATION;no Quality Gate approval."
+  ]
+}

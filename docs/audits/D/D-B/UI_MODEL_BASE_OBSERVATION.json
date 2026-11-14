@@ -1,0 +1,61 @@
+{
+  "at": "2026-11-09 07:17:14 UTC",
+  "sha": "25d1b708dd54262a77d8d97cd994b5d26ab3203c",
+  "run": 42574396005,
+  "jobs": [
+    {
+      "id": 129018743291,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129018743643,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129018743674,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129024045365,
+      "name": "browser (chromium)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129024045412,
+      "name": "browser (mobile)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129024045435,
+      "name": "browser (ios-1)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129024045495,
+      "name": "browser (ios-2)",
+      "status": "in_progress",
+      "conclusion": null
+    }
+  ],
+  "remoteProject": "qwfrqychokvhdzakibid",
+  "remoteMigrations": [
+    {
+      "count": 164,
+      "last": "20261109024515",
+      "versions_sha256": "178b8f89324a10bc2de1b146640897a30ee243452a2f5a68c50f396ea0bae6bc"
+    }
+  ],
+  "newMigrations": 0,
+  "pending": 0,
+  "operation": "Read-only remote reconciliation; no remote test fixture, reset or redundant backup.",
+  "currentPatchApproved": false
+}

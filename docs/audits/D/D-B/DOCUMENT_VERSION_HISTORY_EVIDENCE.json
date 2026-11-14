@@ -1,0 +1,368 @@
+{
+  "at": "2026-11-08T12:01:24.230431+00:00",
+  "sourceBase": "df498810cf43a353c8c6c894333807fbb6956e38",
+  "stage": "D4.7 frozen version comparison; PDF appearance deferred by owner",
+  "sourceLfSha256": {
+    "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+    "src/app/documentos/[id]/arquivos/page.tsx": "e05d959b2f9d106c8d60b4b5e885c81c7c35693257e86f24a6a62a648ce37944",
+    "src/components/documents/document-file-view.tsx": "d80e573dbea44ea92d9e1339742ac9ed8d234c627562db459a40d2b64366a01e",
+    "src/components/documents/document-timeline.tsx": "fe6fb5fee642f3321107bf08c9a1fe11ca8d6435f6eabb469ff83f4ef9087121",
+    "src/components/documents/supply-detail.tsx": "7c8bf02c5f69af091c00abedbc17bea7a1aa5e34c9aab762921d484b8170eced",
+    "src/components/requisitions/requisition-detail.tsx": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+    "src/lib/documents/version-history.ts": "90157378011ede3a5c45853954f908c09bc84545da123bc22324189555a01fe0",
+    "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+    "tests/version-history.test.ts": "6c2954301bc0969952b9eb3bbb246ce01bf6ed0e4509941a59dcc4a9df8e7679",
+    "tests/e2e/version-history.spec.ts": "43c9491c54eae5f24b9939e6f97aaf9f920ebc4b51fa2f67cf901b7b25a4a397",
+    "tests/integration/version-history-fixtures.mjs": "819660c6b176f409f67de19afcfe283644ec52500c59330934a3d7f695be2bae",
+    "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+    "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+  },
+  "implementation": [
+    "Auth/RLS exact version with final authority recheck; no service-role source reads or new SQL",
+    "Frozen names and line identities; no current profile/catalogue reconstruction",
+    "Exact jsonb text numeric tokens and Decimal formatting; labelled before/after, reason and caveat",
+    "Read-only facts, independent section retry, keyboard focus retained and URL selection restored from version archive",
+    "Unknown future fields explicit rather than silently claiming exhaustive coverage; private authority/session/transport omitted"
+  ],
+  "validation": {
+    "unit": {
+      "distinctPassingCases": 10,
+      "completedExecutions": 25,
+      "passed": 25,
+      "failed": 0,
+      "qualification": "8 initial;4 directed;4 expanded;5 final;1 source-date label;2 numeric/status/provenance reading cases. Unchanged server guard cases reused; CI runs the complete published suite. Final inherited-property role guard has a directed unit; valid-role browser paths unchanged."
+    },
+    "authFixtureProbe": {
+      "completedExecutions": 3,
+      "passed": 1,
+      "failed": 2,
+      "qualification": "First identity lacked com.approve; second had admin permission but attempted approval of an already auto-approved admin-created document. Final fixture uses a family creation pending approval, separate local admin and required partial-approval reason. No product authority relaxed. Cast text, real Auth, frozen name, revoked writer and exact bodies/hashes verified."
+    },
+    "production": {
+      "distinctPassingCases": 18,
+      "newDistinctCases": 12,
+      "existingConsumers": 6,
+      "completedExecutions": 42,
+      "passed": 24,
+      "failed": 18,
+      "cohorts": [
+        {
+          "log": "version-history-production.log",
+          "passed": 9,
+          "failed": 6,
+          "sources": {
+            "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+            "src/app/documentos/[id]/arquivos/page.tsx": "e05d959b2f9d106c8d60b4b5e885c81c7c35693257e86f24a6a62a648ce37944",
+            "src/components/documents/document-file-view.tsx": "d80e573dbea44ea92d9e1339742ac9ed8d234c627562db459a40d2b64366a01e",
+            "src/components/documents/document-timeline.tsx": "49663e7bbdb1ea1965050f34663bd7bcac7b2985a560482a77060a081e88fabc",
+            "src/components/documents/supply-detail.tsx": "7c8bf02c5f69af091c00abedbc17bea7a1aa5e34c9aab762921d484b8170eced",
+            "src/components/requisitions/requisition-detail.tsx": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+            "src/lib/documents/version-history.ts": "e7f2570e48cebb9c399c3cce6dfcf944ecff6ffac0e22bafdf30d9fb8687b3cf",
+            "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+            "tests/version-history.test.ts": "8b69eef3ec7872cbcebdfc41dc370d70105a4c124ac34b75ee58430fcb869753",
+            "tests/e2e/version-history.spec.ts": "e313f2f81d9a706cc696360260f5e5ff6f569a970120f1e186ae1e3bb95de676",
+            "tests/integration/version-history-fixtures.mjs": "345238ec55f6e9d6462947070d2d280d748e22247588ce3619026848a4786feb",
+            "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+            "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+          }
+        },
+        {
+          "log": "version-history-production-recheck.log",
+          "passed": 3,
+          "failed": 6,
+          "sources": {
+            "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+            "src/app/documentos/[id]/arquivos/page.tsx": "e05d959b2f9d106c8d60b4b5e885c81c7c35693257e86f24a6a62a648ce37944",
+            "src/components/documents/document-file-view.tsx": "d80e573dbea44ea92d9e1339742ac9ed8d234c627562db459a40d2b64366a01e",
+            "src/components/documents/document-timeline.tsx": "7d3a7f39fb79efff29d2c2937dd54e48bffdebfd7b9a020e7462e6cd72cfd5b9",
+            "src/components/documents/supply-detail.tsx": "7c8bf02c5f69af091c00abedbc17bea7a1aa5e34c9aab762921d484b8170eced",
+            "src/components/requisitions/requisition-detail.tsx": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+            "src/lib/documents/version-history.ts": "8b492684d4226c13ef1c7955db84ff7d7852e36e6adcfd1866819d03ae0c24dd",
+            "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+            "tests/version-history.test.ts": "0734c7d3d1d75b5abf6e88e03c1412d40e9b686351bf77608a671a769a70e1e5",
+            "tests/e2e/version-history.spec.ts": "34d35c8cb003bca05ebe3f29540f22f53241eedd0f521d641eb7892e04f15f8d",
+            "tests/integration/version-history-fixtures.mjs": "819660c6b176f409f67de19afcfe283644ec52500c59330934a3d7f695be2bae",
+            "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+            "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+          }
+        },
+        {
+          "log": "version-history-production-final.log",
+          "passed": 3,
+          "failed": 3,
+          "sources": {
+            "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+            "src/app/documentos/[id]/arquivos/page.tsx": "e05d959b2f9d106c8d60b4b5e885c81c7c35693257e86f24a6a62a648ce37944",
+            "src/components/documents/document-file-view.tsx": "d80e573dbea44ea92d9e1339742ac9ed8d234c627562db459a40d2b64366a01e",
+            "src/components/documents/document-timeline.tsx": "7d3a7f39fb79efff29d2c2937dd54e48bffdebfd7b9a020e7462e6cd72cfd5b9",
+            "src/components/documents/supply-detail.tsx": "7c8bf02c5f69af091c00abedbc17bea7a1aa5e34c9aab762921d484b8170eced",
+            "src/components/requisitions/requisition-detail.tsx": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+            "src/lib/documents/version-history.ts": "e667a132ffc08fbfc360f5d69eea3c72a29e22906919b5ee0a40763bb9ab2515",
+            "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+            "tests/version-history.test.ts": "34a3b5874077eaad5534562b533dce70f9cfc82f97432c3581dab3ded257d375",
+            "tests/e2e/version-history.spec.ts": "7f836831842f166e68244a350b70ede89d8a375c00624cd6de7426db1ab150ae",
+            "tests/integration/version-history-fixtures.mjs": "819660c6b176f409f67de19afcfe283644ec52500c59330934a3d7f695be2bae",
+            "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+            "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+          }
+        },
+        {
+          "log": "version-history-production-metadata-recheck.log",
+          "passed": 3,
+          "failed": 0,
+          "sources": {
+            "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+            "src/app/documentos/[id]/arquivos/page.tsx": "e05d959b2f9d106c8d60b4b5e885c81c7c35693257e86f24a6a62a648ce37944",
+            "src/components/documents/document-file-view.tsx": "d80e573dbea44ea92d9e1339742ac9ed8d234c627562db459a40d2b64366a01e",
+            "src/components/documents/document-timeline.tsx": "7d3a7f39fb79efff29d2c2937dd54e48bffdebfd7b9a020e7462e6cd72cfd5b9",
+            "src/components/documents/supply-detail.tsx": "7c8bf02c5f69af091c00abedbc17bea7a1aa5e34c9aab762921d484b8170eced",
+            "src/components/requisitions/requisition-detail.tsx": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+            "src/lib/documents/version-history.ts": "e667a132ffc08fbfc360f5d69eea3c72a29e22906919b5ee0a40763bb9ab2515",
+            "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+            "tests/version-history.test.ts": "34a3b5874077eaad5534562b533dce70f9cfc82f97432c3581dab3ded257d375",
+            "tests/e2e/version-history.spec.ts": "58236d82ee592ad17348c0a24491c6319788b8cead80d9e7df9ce6fc40ae71fd",
+            "tests/integration/version-history-fixtures.mjs": "819660c6b176f409f67de19afcfe283644ec52500c59330934a3d7f695be2bae",
+            "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+            "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+          }
+        },
+        {
+          "log": "version-history-production-reading.log",
+          "passed": 3,
+          "failed": 0,
+          "sources": {
+            "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+            "src/app/documentos/[id]/arquivos/page.tsx": "e05d959b2f9d106c8d60b4b5e885c81c7c35693257e86f24a6a62a648ce37944",
+            "src/components/documents/document-file-view.tsx": "d80e573dbea44ea92d9e1339742ac9ed8d234c627562db459a40d2b64366a01e",
+            "src/components/documents/document-timeline.tsx": "fe6fb5fee642f3321107bf08c9a1fe11ca8d6435f6eabb469ff83f4ef9087121",
+            "src/components/documents/supply-detail.tsx": "7c8bf02c5f69af091c00abedbc17bea7a1aa5e34c9aab762921d484b8170eced",
+            "src/components/requisitions/requisition-detail.tsx": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+            "src/lib/documents/version-history.ts": "f2716684efa4100af862f9d7160f59f3562f130f6bc78d27bb44b81a74bc6425",
+            "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+            "tests/version-history.test.ts": "cd8648d28f5a041339f1e46ca67ccefeac5a1f656e1defadea49f961b9f993f6",
+            "tests/e2e/version-history.spec.ts": "58236d82ee592ad17348c0a24491c6319788b8cead80d9e7df9ce6fc40ae71fd",
+            "tests/integration/version-history-fixtures.mjs": "819660c6b176f409f67de19afcfe283644ec52500c59330934a3d7f695be2bae",
+            "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+            "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+          }
+        },
+        {
+          "log": "version-history-production-reader.log",
+          "passed": 0,
+          "failed": 3,
+          "sources": {
+            "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+            "src/app/documentos/[id]/arquivos/page.tsx": "e05d959b2f9d106c8d60b4b5e885c81c7c35693257e86f24a6a62a648ce37944",
+            "src/components/documents/document-file-view.tsx": "d80e573dbea44ea92d9e1339742ac9ed8d234c627562db459a40d2b64366a01e",
+            "src/components/documents/document-timeline.tsx": "fe6fb5fee642f3321107bf08c9a1fe11ca8d6435f6eabb469ff83f4ef9087121",
+            "src/components/documents/supply-detail.tsx": "7c8bf02c5f69af091c00abedbc17bea7a1aa5e34c9aab762921d484b8170eced",
+            "src/components/requisitions/requisition-detail.tsx": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+            "src/lib/documents/version-history.ts": "90157378011ede3a5c45853954f908c09bc84545da123bc22324189555a01fe0",
+            "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+            "tests/version-history.test.ts": "6c2954301bc0969952b9eb3bbb246ce01bf6ed0e4509941a59dcc4a9df8e7679",
+            "tests/e2e/version-history.spec.ts": "ff2e3f5bbcc5caea31a1876cde86404966a0021307963941038ed376971e9267",
+            "tests/integration/version-history-fixtures.mjs": "819660c6b176f409f67de19afcfe283644ec52500c59330934a3d7f695be2bae",
+            "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+            "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+          }
+        },
+        {
+          "log": "version-history-production-reader-recheck.log",
+          "passed": 3,
+          "failed": 0,
+          "sources": {
+            "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+            "src/app/documentos/[id]/arquivos/page.tsx": "e05d959b2f9d106c8d60b4b5e885c81c7c35693257e86f24a6a62a648ce37944",
+            "src/components/documents/document-file-view.tsx": "d80e573dbea44ea92d9e1339742ac9ed8d234c627562db459a40d2b64366a01e",
+            "src/components/documents/document-timeline.tsx": "fe6fb5fee642f3321107bf08c9a1fe11ca8d6435f6eabb469ff83f4ef9087121",
+            "src/components/documents/supply-detail.tsx": "7c8bf02c5f69af091c00abedbc17bea7a1aa5e34c9aab762921d484b8170eced",
+            "src/components/requisitions/requisition-detail.tsx": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+            "src/lib/documents/version-history.ts": "90157378011ede3a5c45853954f908c09bc84545da123bc22324189555a01fe0",
+            "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+            "tests/version-history.test.ts": "6c2954301bc0969952b9eb3bbb246ce01bf6ed0e4509941a59dcc4a9df8e7679",
+            "tests/e2e/version-history.spec.ts": "43c9491c54eae5f24b9939e6f97aaf9f920ebc4b51fa2f67cf901b7b25a4a397",
+            "tests/integration/version-history-fixtures.mjs": "819660c6b176f409f67de19afcfe283644ec52500c59330934a3d7f695be2bae",
+            "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+            "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+          }
+        }
+      ],
+      "qualification": "Not a single15/15 run. REQ/BAL and existing PDF-source consumers retain qualified prior cohorts. Latest COM validates shared reading after final locale/status/UF labels; ENT focus/error/version paths were unchanged by those display-only corrections. Source-date label is unit checked. Final complete published SHA needs its own CI. Restricted-reader3/3 uses a family identity with COM mutation capabilities disabled. The attempted clinical override was correctly refused by the preexisting financial-role barrier; no permission was widened.",
+      "failures": [
+        "3 first COM fixtures denied missing permission;3 ENT retries lost keyboard focus when disabled. Product now uses guarded aria-disabled without removing focus",
+        "3 COM tests compared 2 with raw DB2.000000;3 ENT tests used exact getByLabel on a nested select. Numeric oracle and accessible-role selector corrected",
+        "3 COM tests assumed representation in HCAIssuance, which intentionally contains version/hash but no such field. Compare actual PDF Subject and embedded version/sourceHash; original failures retained",
+        "3 additional restricted-reader fixtures assumed a clinical COM override could grant access. Existing role privacy correctly blocked it. Final case uses a financial-scope family reader without purchase/create/approve, tests200 read/403 command and adds real clinical RPC42501/RLS-empty counterproof."
+      ]
+    },
+    "diagnostic": {
+      "productionApproval": false,
+      "completedExecutions": 3,
+      "passed": 2,
+      "failed": 1,
+      "qualification": "Chromium Next dev: first ENT passed, COM selector matched two different quantity headings; exact material-context heading corrected and COM passed. Diagnostic is not production-build evidence."
+    },
+    "projectionCoverage": {
+      "localReadOnly": true,
+      "representativeSnapshots": 48,
+      "types": [
+        "BAL",
+        "COM",
+        "ENT",
+        "REQ"
+      ],
+      "unmappedBusinessPathsInInspectedSet": 0,
+      "futureSchemaCompletenessClaim": false,
+      "qualification": "Retained synthetic latest(type,action) snapshots, field mapping inspection only; not48 executed user flows or all-state completion."
+    },
+    "bindings": "DOCUMENT_VERSION_HISTORY_BINDINGS.json",
+    "browserAccessibility": "COM axe/width checks at320/390/768/1440 across three engines; ENT keyboard retry/select during delayed response. Physical AT and hardware remain separate.",
+    "typesAndAffectedLint": {
+      "typecheckExit": 0,
+      "lintExit": 0,
+      "generalSuitesDelegatedToPublishedCi": true
+    },
+    "localCron": {
+      "localOnly": true,
+      "initiallyActiveBeforeThisStage": true,
+      "before": [
+        {
+          "active": true,
+          "jobname": "hca-notification-worker"
+        },
+        {
+          "active": true,
+          "jobname": "hca-operational-lifecycle"
+        }
+      ],
+      "after": [
+        {
+          "active": true,
+          "jobname": "hca-notification-worker"
+        },
+        {
+          "active": true,
+          "jobname": "hca-operational-lifecycle"
+        }
+      ],
+      "restored": true,
+      "externalTransportActivated": false
+    },
+    "finalSourceQualification": "Current sources match the last restricted-reader production cohort. Prior COM/ENT/REQ/BAL and PDF-source consumer cohorts retain unchanged executed paths as recorded. The pure own-property role guard is additionally unit checked; no authority rule changed. Published SHA requires full CI.",
+    "restrictedRead": {
+      "engines": 3,
+      "familyReadWithoutPurchase": true,
+      "forbiddenCommandNoEventChange": true,
+      "clinicalOverrideCannotGrantCom": true,
+      "realAuthRpcAndRls": true
+    }
+  },
+  "reuse": {
+    "fidelitySourcesUnchanged": {
+      "src/lib/server/operational-pdf.ts": "323d0eb70e1f65c3704255b4531a7e2310d5b8704ff7928bf709663baf129728",
+      "src/lib/server/pdf-content.ts": "ff5122a704d141a11d69b637c6c544ff9f1c827fb8ab213fd92525dec0e2e406",
+      "src/lib/server/pdf-issuance.ts": "36af3ec98ea7b78636fc365a5d9502ccfab34e859a3a909499ab0af2c0bc5bdf",
+      "src/lib/documents/pdf-fidelity.ts": "f10da4136054f5a062a4083d56e876ccb28917abe27910b6548c3efea90a1165",
+      "src/lib/documents/variant.ts": "d7fa4c41e924c842a810a5a8f0bb056d06c21fb9ac5f91915c484411d906ee2b",
+      "supabase/migrations/20261108093000_phase_d4_pdf_fidelity_revision.sql": "8b82e78b27041af7d89f5358c11b23f9c227ad0713a6ca214ff4651da6744e2f",
+      "tests/pdf-fidelity.test.ts": "6039761e6d859c1a2fc88932e2244ba2353029a3a7fe73ce5cd05305b5d22180",
+      "tests/support/pdf-fidelity-fixtures.ts": "24a111fbedf90b3746b4fd9777f074bc458e9109dfd85e81fc0a799a5fe1ed63",
+      "tests/support/pdf-renderer-legacy-digests.json": "3f27d31bcbdfefb8d1c758029c40527e2b456eb3faa1f834b9bcf94616114069",
+      "tests/integration/pdf-fidelity-fixtures.mjs": "09910b73dc02af82cee9c70ad2484fab50ce1f6cf073a336f74ff980a307376f",
+      "tests/integration/pdf-fidelity.test.mjs": "d4431c094aa14ae5ebd2e68fb469d22ce13194d471304a5fbf19c74b518acebd",
+      "tests/e2e/pdf-fidelity.spec.ts": "3b9e202b19b880ed883ee6030c5aa539f95de76408d1c62551df931309fdcc24",
+      "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+      "tests/e2e/pdf-issuance.spec.ts": "1b8b8589ad5193aedf0c6590f965eaa6fb95ccd851a9445ede2f5a0ac9474ce9",
+      "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+    },
+    "receipt": "PDF_FIDELITY_EVIDENCE.json",
+    "qualification": "15 core/test sources unchanged; supply-detail UI is explicitly excluded. No new pyHanko/external-trust claim."
+  },
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "migrations": 152,
+    "latest": "20261108093000",
+    "newSql": 0,
+    "remoteDdlOrFixtureOrAuthCreated": false,
+    "priorPostValidation": "PDF_FIDELITY_REMOTE_MIGRATIONS.json"
+  },
+  "publishedBaseline": {
+    "ci": "CI_DF49881_OBSERVATION.json",
+    "preview": "PDF_FIDELITY_PREVIEW_OBSERVATION.json",
+    "newHistoryNotYetPublished": true
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "physicalSamsungRetest": false,
+  "goalComplete": false,
+  "operationalGo": false,
+  "logLfSha256": {
+    "version-history-cron-reconcile.log": "70e91daa1dba16106b567ba0c031ca0f18d68f4dea935bc95215719fcc540c74",
+    "version-history-diagnostic-recheck.log": "2ee7985370234643faed3095193f8759b760675ed50c9c02c2faeeb99b9ff2d7",
+    "version-history-diagnostic.log": "06e742a58b768d864db78ef12ce31988a9edbb33e823765369fc98d5183c965c",
+    "version-history-fixture-probe-final.log": "e8b537cbcfabc34598451f95260cc656e4a77efe21b1ff60f2d79e2994ed8735",
+    "version-history-fixture-probe-recheck.log": "54a18827d18bf2c1bf5ffc3030efb445286619646281fb2c3cfe6905f5fd11a8",
+    "version-history-fixture-probe.log": "aa095a6c020011885f490a62dcd52a6d6034ab6014d652842d1ace8aff2ecf84",
+    "version-history-lint-candidate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-lint-expanded.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-lint-first.log": "c123f0840b12f0733e9685340732fa9d41de167ba65dfbde014fa70a04aecec8",
+    "version-history-lint-metadata-test.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-lint-reading.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-production-final.log": "956eb361dab5bce66e0dcffbca8637a783676da3a398b1d2da8cef5417bf7fe6",
+    "version-history-production-metadata-recheck.log": "7e8b2f6027f451cb710c9739f3c4ca625c31c63a5bebebc065abdaeba983b081",
+    "version-history-production-reading.log": "5d4d3031541be7ce5fd3ac780aaaadc75c08c0b92c6451e3f7f3e4a051c05480",
+    "version-history-production-recheck.log": "b8afb47c18582d7b9bff272446bce450245674dcb28bdf950dbe749b56f0705e",
+    "version-history-production.log": "e346b46dc0bb46ed33b82b1d11a95b6651855633412da22a138fc86a957aefd4",
+    "version-history-test-lint-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-types-candidate.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-types-expanded.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-types-first.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-types-reading.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-types-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-types.log": "aba612c744560107c658d08f17c7f38b6e162780a445007c9356f7d666251bf9",
+    "version-history-unit-date-label.log": "6671768344860d6bc2e046ec6f0d95e1c1a0be6dba83d8256cee4cd8b32c9274",
+    "version-history-unit-directed.log": "eb17a4043a9eda238ff1bae8b25ee1f6300db5e76bc61f5ef11e86f93ad43cb7",
+    "version-history-unit-expanded.log": "510c7543e7e19ec41dcc2208f360911a22b4940f448186c0e6fe1f95ec098c28",
+    "version-history-unit-final.log": "edd01cf4fe92b9f8ff4a0c749d8214d42e921651a75be9e8071f1bb14703dda6",
+    "version-history-unit-reading.log": "886305a08c657dfd3c9ad4cdb3d3b0dac4a43c715eea3092d3e58ebaf964d6f7",
+    "version-history-unit.log": "8804cee568f1ed1c86bf5f0d0636d069aee923fb5e8c6d151ea3514faa55c102",
+    "version-history-cron-final.log": "70e91daa1dba16106b567ba0c031ca0f18d68f4dea935bc95215719fcc540c74",
+    "version-history-unit-role-guard.log": "97579e748ccbe7480872e70844d2c6e16d287435a751bb00d36b0076563e24b0",
+    "version-history-types-role-guard.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-lint-role-guard.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-lint-reader-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-lint-reader.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version-history-production-reader-recheck.log": "378b18ba3dd952e44cb79727d51cbbd759503104c3b6dd69598f1cacb88b89a3",
+    "version-history-production-reader.log": "80ef0eafb813b70b2b7c7008d347963e1ff4f3ae9053ea1079131ea045af8641",
+    "version-history-types-reader-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "counterproofLfSha256": {
+    "version-history-first-com-chromium.md": "0d8661d3c59758111543be1f159c616187fceb85363dee3c01bceb33c4fb4430",
+    "version-history-first-com-ios.md": "0d8661d3c59758111543be1f159c616187fceb85363dee3c01bceb33c4fb4430",
+    "version-history-first-com-mobile.md": "0d8661d3c59758111543be1f159c616187fceb85363dee3c01bceb33c4fb4430",
+    "version-history-first-ent-chromium.md": "10229ea9027972c61ad82efbc490fb358dfd824dae7442cf9e80f5ca4cd22755",
+    "version-history-first-ent-ios.md": "10229ea9027972c61ad82efbc490fb358dfd824dae7442cf9e80f5ca4cd22755",
+    "version-history-first-ent-mobile.md": "10229ea9027972c61ad82efbc490fb358dfd824dae7442cf9e80f5ca4cd22755",
+    "version-history-second-com-chromium.md": "fa5c63229536d537f007a62cf62f209f4fddca72f72c514ba4333a0212dca335",
+    "version-history-second-com-ios.md": "86579fe1bb2d42fbd5a0e7c829a1af1b527c3c4bc1c226a7feaa801e15e89b81",
+    "version-history-second-com-mobile.md": "ed3b92dd7b22d26f56ffe6d8494b86c517886ccbf58b469a7d2b3f37b7014e64",
+    "version-history-second-ent-chromium.md": "7f338270f9ce4ec49b1632e90c2dba4b4ff805aa60813a719e27e6450ae99160",
+    "version-history-second-ent-ios.md": "250cb34acaa9d0060777e9c6fbeab74d7da9980ae1b1f4041921b17da59ed320",
+    "version-history-second-ent-mobile.md": "91aa78e72b8f473df92cd74749e617dd57ec7c02a1b6dca0ccb2cb57877bee37",
+    "version-history-third-com-chromium.md": "a1e248f47fedf476b200661f6e6abdce2f29a062352c42b2e079f530cc1d5b79",
+    "version-history-third-com-ios.md": "4a22c05b26bb8986b7b7d9dd361d306af1350ad87ac4224db27009293506a955",
+    "version-history-third-com-mobile.md": "ee8cf82263dcf50a267de232e594c4782cc9b04257dbe714c7e29f1314e1d1ad",
+    "version-history-diagnostic-first-com.md": "e9eaf96a8805edbc81e39b55d90c9382e8b0c9d3304508b1d4d5cc64627c634f",
+    "version-history-reader-first-chromium.md": "6de8f3b6d2ae477c3eaefe3925d68e48eef42b55e7f51265893cc648933fd8bb",
+    "version-history-reader-first-ios.md": "87fb0c326aa6f1fc0c3c0914a6a1fe9e565f5387dbe998636ddfe3889fc06894",
+    "version-history-reader-first-mobile.md": "9192db6af6954c1bf1ef0bfa02f7da61097aa5dc8d8b20e54a4aab9ab3d3c787"
+  },
+  "remaining": [
+    "CI and Preview of new published SHA",
+    "Other executable D-B criteria and complete C105/C106 states",
+    "Tagged PDF/physical AT/device/print and D-C/D6 gates",
+    "Operational recovery/RPO/RTO/provider and independent external trust gates; PDF redesign by owner later"
+  ]
+}

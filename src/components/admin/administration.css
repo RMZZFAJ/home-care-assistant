@@ -1,0 +1,19 @@
+.hca-administration-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.hca-admin-card { padding: 21px; }
+.hca-admin-card > h2, .hca-admin-card > .hca-section-heading h2 { font-size: 19px; font-weight: 700; line-height: 1.35; }
+.hca-admin-card .hca-field > label { font-size: 12px; font-weight: 650; }
+.hca-admin-shortcuts { display: grid; gap: 16px; margin-top: 18px; }
+.hca-configuration-tab[aria-current=page] { color: var(--hca-teal); border-bottom-color: var(--hca-teal); }
+.hca-policy-card .hca-section-heading { margin-bottom: 0; }
+.hca-policy-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 16px 0; border-bottom: 1px solid var(--hca-line); }
+.hca-policy-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.hca-policy-row h3 { font-size: 14px; font-weight: 700; }
+.hca-policy-row p { margin-top: 4px; color: var(--hca-muted); font-size: 12px; }
+.hca-governance-proposal { margin-top: 16px; }
+.hca-governance-proposal h3 { font-size: 16px; font-weight: 700; }
+.hca-governance-proposal > p { overflow-wrap: anywhere; }
+.hca-governance-proposal > .hca-proposal-state { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; color: var(--hca-muted); font-size: 12px; }
+@media (max-width: 850px) {
+  .hca-administration-grid { grid-template-columns: minmax(0, 1fr); }
+  .hca-admin-card { padding: 17px; }
+}

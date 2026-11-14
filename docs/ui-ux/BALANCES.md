@@ -1,9 +1,19 @@
 # BAL por plantão
 
+**Regra visual vigente:**[Modelo Integral](CANONICAL_MODEL.md). Fluent UI foi
+descartado como aparência; o conteúdo AS_IS abaixo é histórico quando divergir
+da nova direção. Preservar funções e contratos durante a migração integral.
+
 Guia da base funcional auditada e de seus contratos requeridos. Os desvios
 A/B e as mudanças futuras C não foram corrigidos por este documento.
 Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
 [projeto C3](../audits/C/C3-functional-specification/README.md).
+
+O incremento D2 de revisão já implementa autoria efetiva no legado e no
+regime por plantão, parecer próprio separado das notas, comparação de referência
+e recuperação do ato confirmado. As evidências e os limites vigentes estão no
+[checkpoint D-A](../audits/D/D-A/CHECKPOINT.md); sucessão/reconto facultativo
+e demais critérios ainda dependem dos respectivos incrementos.
 
 ## Ativação e autoridade
 
@@ -34,6 +44,15 @@ como atraso. Troca de horário ou cancelamento de plantão com BAL vigente exige
 a decisão familiar antes da alteração. Uma substituição no mesmo período pode
 transferir a atribuição sem deslocar a janela. Versões antigas ficam auditáveis.
 
+Na decisão de um adiamento, destino, prazo e versão propostos permanecem em
+leitura nas duas etapas. Situação atual do plantão é uma comparação separada;
+um alvo obsoleto não pode ser aprovado, mas a recusa do pedido pendente permanece
+disponível com justificativa própria. A recusa não muda prazo, atribuição ou
+estoque. Conflito preserva a justificativa, e nova consulta não troca o destino.
+Resultado incerto mantém corpo/chave congelados. Após confirmação ou fechamento,
+o foco retorna a um controle válido ou ao título estável quando o acionador
+desapareceu/perdeu elegibilidade. A consulta conserva nome e motivo do decisor.
+
 Uma contagem física atual pode regularizar semanas anteriores. Elas registram
 o documento e a data real de regularização, sem receber uma contagem retroativa
 fictícia. Atrasos anteriores não são apagados. Um reconto é uma atribuição formal
@@ -57,6 +76,43 @@ O banco produz o contexto documental: ciclo, semanas, janela, responsável real
 e data da contagem. Autor original do rascunho é preservado em substituições.
 PDF e visualizador exibem esse contexto. Política de revisão continua distinta
 do registro da contagem e da efetivação dos ajustes no ledger.
+
+Na ficha, a revisão facultativa continua disponível a outra pessoa elegível
+após a conciliação. O formulário abre com parecer vazio e notas originais em
+leitura. Consultar referência atual preserva o texto; adotar é uma ação separada
+e não envia a revisão. Referência pendente obsoleta exige reconto autorizado.
+Perda de resposta mantém conteúdo/chave congelados até recuperar o próprio ato.
+Pareceres anteriores identificam autor, grupo, contagem e versão revisada;
+consulta histórica não reaplica estoque. O PDF conserva essas distinções.
+
+No BAL emitido em revisão ou já conciliado, família ou supervisão habilitada abre
+Designar reconto pelo detalhe ou pelo acompanhamento. Contador efetivo e
+observações anteriores ficam em leitura. A pessoa escolhe explicitamente um
+plantão real pela busca e registra justificativa própria. A conferência mostra
+pessoa, período e motivo antes da confirmação; a designação não conta material.
+Resposta incerta congela a intenção e permite recuperar o mesmo ato.
+Conflito conserva motivo e escolha. A consulta compara a contagem e o mesmo
+plantão antes/depois, e a adoção explícita exige nova conferência antes de enviar.
+O comprovante conserva quem designou e a responsabilidade naquele ato;
+Consultar acompanhamento atual distingue eventuais mudanças posteriores.
+
+Substituição no mesmo intervalo conserva uma única atribuição executável de
+reconto. A nova profissional começa com quantidades e observações vazias e
+registra sua própria contagem. Sem profissional elegível, o acompanhamento
+mostra a pendência de designação, em vez de um vazio falso. A lista informa
+total e recorte das 100 mais antigas; outros BAL continuam acessíveis pelo
+histórico paginado e pelo detalhe. Reconto não altera o cumprimento ou o atraso
+original das semanas, nem torna parecer antigo uma revisão da contagem nova.
+
+O legado recebe uma janela real de reconto sem ativar obrigações semanais.
+Por isso a entrada se chama Balanço de estoque, sem presumir periodicidade para
+toda contagem. Revisão do reconto explicita aplicação facultativa da diferença
+ou necessidade dos novos pareceres conforme a política preservada. Designar
+não altera o efeito já aplicado. A nova contagem pode gerar somente a diferença
+atual, identificada como BAL, e não consumo inferido. As versões das contagens
+físicas têm links próprios para os PDFs congelados, inclusive quando nunca houve
+revisor. Observações/quantidades anteriores são consultáveis naquela versão,
+sem reaproveitá-las no formulário vazio da nova profissional.
 
 ## Processamento e validação
 

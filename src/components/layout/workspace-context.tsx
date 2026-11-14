@@ -6,9 +6,11 @@ import { api, ApiError } from "@/lib/client/api";
 import type { PatientContext, WorkspaceContext } from "@/types/workspace";
 import { demoDocuments } from "@/lib/demo-documents";
 import { WorkspaceShell } from "./workspace-shell";
+import { usePwa } from "@/components/pwa/pwa-provider";
+import { recentDestinationKey } from "@/lib/auth/recent-destination";
 
 export type ContextData = {
-  documentContext?: { id: string; patientId: string; displayName: string; type: string } | null;
+  documentContext?: { id: string; patientId: string; displayName: string; type: string; } | null;
   avatarUrl?: string | null;
   userId: string;
   fullName: string;
@@ -23,45 +25,49 @@ type State = {
   loading: boolean;
   selecting: boolean;
   error: string;
+  selectionError: string;
   requestedPatientId: string | null;
   load: () => Promise<void>;
   selectProfile: (id: string | null) => Promise<boolean>;
   selectPatient: (id: string) => Promise<void>;
 };
 const empty: State = {
-  value: null, data: null, loading: true, selecting: false, error: "", requestedPatientId: null,
-  load: async () => {}, selectProfile: async () => false, selectPatient: async () => {},
+  value: null, data: null, loading: true, selecting: false, error: "", selectionError: "", requestedPatientId: null,
+  load: async () => { }, selectProfile: async () => false, selectPatient: async () => { },
 };
 const Context = createContext<State>(empty);
-export const roleLabels: Record<string, string> = {
-  admin: "Administrador do paciente", family: "Familiar", supervisor: "Supervisor",
-  professional: "Profissional", reader: "Leitor",
-};
+export { roleLabels, roleLabel } from "@/lib/role-labels";
 export function useWorkspaceState() { return use(Context); }
 
 /** One authority read model survives navigation; browser selection never authorizes. */
-export function WorkspaceProvider({ children }: { children: ReactNode }) {
+export function WorkspaceProvider({ children }: { children: ReactNode; }) {
+  const { blocked, notices } = usePwa();
   const pathname = usePathname();
-  const requestedPatientId = useSearchParams().get("careRecipientId");
-  const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})$/.exec(pathname)?.[1];
+  const searchParams = useSearchParams();
+  const requestedPatientId = searchParams.get("careRecipientId");
+  const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})(?:\/arquivos)?$/.exec(pathname)?.[1];
   const segment = pathname.split("/")[2];
   const publicPage = ["/login", "/recuperar-senha", "/convites/aceitar"].includes(pathname)
-    || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);
+    || pathname === "/acesso/continuar"
+    || pathname === "/verificar" || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);
   const [data, setData] = useState<ContextData | null>(null);
   const [patientId, setPatientId] = useState("");
   const [loading, setLoading] = useState(true);
   const [selecting, setSelecting] = useState(false);
   const [error, setError] = useState("");
+  const [selectionError, setSelectionError] = useState("");
   const sequenceRef = useRef(0);
   const load = useCallback((signal?: AbortSignal) => {
     const sequence = ++sequenceRef.current;
     const requested = requestedPatientId;
-    return api<{ data: ContextData }>("/api/context" + (documentId ? "?documentId=" + documentId : ""), undefined, signal).then((result) => {
+    return api<{ data: ContextData; }>("/api/context" + (documentId ? "?documentId=" + documentId : ""), undefined, signal).then((result) => {
       if (signal?.aborted || sequence !== sequenceRef.current) return;
-      setData((current) => ({ ...result.data, patients: result.data.patients.map((row) => {
-        const previous = current?.patients.find((item) => item.id === row.id);
-        return previous && JSON.stringify(previous) === JSON.stringify(row) ? previous : row;
-      }) }));
+      setData((current) => ({
+        ...result.data, patients: result.data.patients.map((row) => {
+          const previous = current?.patients.find((item) => item.id === row.id);
+          return previous && JSON.stringify(previous) === JSON.stringify(row) ? previous : row;
+        })
+      }));
       setPatientId((current) => {
         if (result.data.activeContext?.mode === "patient") return result.data.activeContext.care_recipient_id ?? "";
         let remembered = "";
@@ -100,7 +106,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [load, publicPage]);
   const selectProfile = async (id: string | null) => {
     setSelecting(true);
-    setError("");
+    setSelectionError("");
     try {
       await api("/api/context", { careRecipientId: id });
       if (!documentId) {
@@ -116,7 +122,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       window.dispatchEvent(new Event("hca:context-changed"));
       return true;
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Não foi possível selecionar o perfil.");
+      setSelectionError(reason instanceof Error ? reason.message : "Não foi possível selecionar o perfil.");
       return false;
     } finally { setSelecting(false); }
   };
@@ -130,6 +136,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   };
   const patient = data?.patients.find((row) => row.id === patientId);
   const value: WorkspaceContext | null = data ? { ...data, patient, refresh: load } : null;
-  const state = { value, data, loading, selecting, error, requestedPatientId, load, selectProfile, selectPatient };
-  return <Context value={state}>{publicPage ? children : <WorkspaceShell>{children}</WorkspaceShell>}</Context>;
+  useEffect(() => {
+    if (publicPage || error || loading || selecting || !data || !patient?.hasMembership || data.activeContext?.mode !== "patient" || data.activeContext.care_recipient_id !== patient.id) return;
+    const remember = () => {
+      try { sessionStorage.setItem(recentDestinationKey, JSON.stringify({ userId: data.userId, patientId: patient.id, path: window.location.pathname + window.location.search + window.location.hash, at: Date.now() })); } catch { /* Optional preference. */ }
+    };
+    remember();
+    window.addEventListener("pagehide", remember);
+    return () => window.removeEventListener("pagehide", remember);
+  }, [publicPage, error, loading, selecting, data, patient, pathname, searchParams]);
+  const state = { value, data, loading, selecting, error, selectionError, requestedPatientId, load, selectProfile, selectPatient };
+  return <Context value={state}>{publicPage ? <>{notices}<div inert={blocked}>{children}</div></> : <WorkspaceShell showOnboarding={pathname === "/"}>{children}</WorkspaceShell>}</Context>;
 }

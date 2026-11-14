@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Dialog } from "@/components/ui/primitives";
 import { RelatedDocument } from "@/components/documents/related-document";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -10,6 +10,14 @@ import {
 } from "@/lib/catalog-match";
 import { textRows } from "@/lib/text-rows";
 import { formatQuantity } from "@/lib/quantity";
+import {
+  formatStockObservation,
+  formatStockObservationTime,
+} from "@/lib/stock-observation";
+import { StockObservationField } from "./stock-observation-field";
+import { MaterialChoice } from "@/components/catalog/material-choice";
+import { MaterialReview } from "@/components/documents/material-review";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import type {
   ExtraItem,
   RequisitionFormData,
@@ -20,7 +28,9 @@ import type { ItemContext } from "@/types/documents";
 const emptyExtra = (): ExtraItem => ({
   id: "extra-" + crypto.randomUUID(),
   name: "",
-  currentStock: 0,
+  currentStock: null,
+  stockObservation: "unfilled",
+  stockObservationAt: new Date().toISOString(),
   urgent: false,
 });
 export type Product = {
@@ -32,6 +42,7 @@ export type Product = {
   aliases?: string[];
   active?: boolean;
   is_active?: boolean;
+  selectionPredecessors?: { id: string; name: string; unit: string }[];
 };
 
 export function Identity({
@@ -64,6 +75,7 @@ export function CatalogStep({
   updateLine,
   removeLine,
   errors,
+  selectedCount,
 }: {
   items: Product[];
   itemContext: ItemContext[];
@@ -71,14 +83,17 @@ export function CatalogStep({
   updateLine: (item: Product, patch: Partial<RequisitionLine>) => void;
   removeLine: (id: string) => void;
   errors: Record<string, string>;
+  selectedCount: number;
 }) {
   const [search, setSearch] = useState("");
   const [duplicate, setDuplicate] = useState<Product | null>(null);
   const [repeatReason, setRepeatReason] = useState("");
   const visible = items.filter((item) =>
-    [item.name, ...(item.aliases ?? [])].some((name) =>
-      normalize(name).includes(normalize(search)),
-    ),
+    [
+      item.name,
+      ...(item.aliases ?? []),
+      ...(item.selectionPredecessors ?? []).map((row) => row.name),
+    ].some((name) => normalize(name).includes(normalize(search))),
   );
   return (
     <div className="space-y-4">
@@ -150,6 +165,19 @@ export function CatalogStep({
           placeholder="Nome ou nome alternativo"
         />
       </label>
+      <p
+        role="status"
+        aria-label="Resultado da busca e seleção de materiais"
+        className="text-sm"
+      >
+        {visible.length}{" "}
+        {visible.length === 1 ? "material encontrado" : "materiais encontrados"}
+        . {selectedCount}{" "}
+        {selectedCount === 1
+          ? "material selecionado"
+          : "materiais selecionados"}
+        .
+      </p>
       {!visible.length ? (
         <Notice>Nenhum produto encontrado nesta categoria.</Notice>
       ) : null}
@@ -157,11 +185,12 @@ export function CatalogStep({
         const line = selected(item.id);
         const info = itemContext.find((entry) => entry.productId === item.id);
         return (
-          <article
+          <MaterialChoice
             key={item.id}
-            className={"ui-product-choice " + (line ? "is-selected" : "")}
+            selected={Boolean(line)}
+            className="ui-product-choice"
           >
-            <label className="flex items-center gap-3 font-semibold">
+            <label className="hca-material-choice-heading">
               <input
                 type="checkbox"
                 checked={Boolean(line)}
@@ -173,11 +202,21 @@ export function CatalogStep({
                   } else updateLine(item, {});
                 }}
               />
-              {item.name}
-              <span className="ml-auto text-xs font-normal text-(--muted)">
-                {item.unit}
+              <span className="hca-material-choice-copy">
+                <strong>{item.name}</strong>
+                <small>{item.unit}</small>
               </span>
             </label>
+            {item.selectionPredecessors?.length ? (
+              <p className="mt-2 text-sm">
+                Opção cadastrada para novas escolhas após{" "}
+                {item.selectionPredecessors
+                  .map((row) => `${row.name} (${row.unit})`)
+                  .join(", ")}
+                . Confira a unidade {item.unit}; a seleção é sua e não converte
+                o estoque anterior.
+              </p>
+            ) : null}
             {line ? (
               <div className="mt-4 space-y-3">
                 <p className="text-xs text-(--muted)">
@@ -187,38 +226,16 @@ export function CatalogStep({
                     : formatQuantity(info.familyStock, item.unit)}
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="text-sm font-semibold">
-                    Estoque observado com a equipe
-                    <input
-                      className={inputClass}
-                      type="number"
-                      inputMode={
-                        (item.quantity_decimals ?? 0) ? "decimal" : "numeric"
-                      }
-                      min="0"
-                      max="100000"
-                      step={
-                        (item.quantity_decimals ?? 0)
-                          ? 10 ** -(item.quantity_decimals ?? 0)
-                          : 1
-                      }
-                      value={
-                        Number.isNaN(line.currentStock) ? "" : line.currentStock
-                      }
-                      aria-invalid={Boolean(errors[item.id])}
-                      onChange={(event) =>
-                        updateLine(item, {
-                          currentStock:
-                            event.target.value === ""
-                              ? NaN
-                              : Number(event.target.value),
-                        })
-                      }
-                    />
-                    {errors[item.id] ? (
-                      <span className="ui-field-error">{errors[item.id]}</span>
-                    ) : null}
-                  </label>
+                  <StockObservationField
+                    value={line.currentStock}
+                    mode={line.stockObservation}
+                    at={line.stockObservationAt}
+                    unit={item.unit}
+                    decimals={item.quantity_decimals ?? 0}
+                    error={errors[item.id]}
+                    errorKey={item.id}
+                    onChange={(change) => updateLine(item, change)}
+                  />
                   <label className="flex min-h-11 items-center gap-3 text-sm">
                     <input
                       type="checkbox"
@@ -231,7 +248,7 @@ export function CatalogStep({
                   </label>
                 </div>
                 {info?.pending.length ? (
-                  <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
+                  <div className="hca-material-pending">
                     <p>
                       Este produto ainda tem requisição pendente:{" "}
                       {info.pending.map((pending) => (
@@ -243,8 +260,11 @@ export function CatalogStep({
                       ))}
                     </p>
                     <label className="mt-3 block font-semibold">
-                      Motivo da nova requisição
+                      <span id={item.id + "-repeat-label"}>Motivo da nova requisição</span>
                       <textarea
+                        aria-labelledby={item.id + "-repeat-label"}
+                        data-field-error={item.id + ":repeat"}
+                        aria-describedby={errors[item.id + ":repeat"] ? item.id + "-repeat-error" : undefined}
                         className={inputClass}
                         value={line.repeatReason ?? ""}
                         minLength={3}
@@ -257,7 +277,7 @@ export function CatalogStep({
                         }
                       />
                       {errors[item.id + ":repeat"] ? (
-                        <span className="ui-field-error">
+                        <span id={item.id + "-repeat-error"} className="ui-field-error">
                           {errors[item.id + ":repeat"]}
                         </span>
                       ) : null}
@@ -266,18 +286,20 @@ export function CatalogStep({
                 ) : null}
               </div>
             ) : null}
-          </article>
+          </MaterialChoice>
         );
       })}
     </div>
   );
 }
 export function Extras({
+  errors = {},
   items,
   setItems,
   products,
   adopt,
 }: {
+  errors?: Record<string, string>;
   items: ExtraItem[];
   setItems: (items: ExtraItem[]) => void;
   products: Product[];
@@ -312,9 +334,13 @@ export function Extras({
             className="grid gap-3 rounded-xl border border-(--line) p-4 sm:grid-cols-[1fr_auto_auto]"
           >
             <label className="text-sm font-semibold">
-              Nome
+              <span id={item.id + "-name-label"}>Nome</span>
               <input
+                aria-labelledby={item.id + "-name-label"}
                 value={item.name}
+                data-field-error={item.id + ":name"}
+                aria-invalid={Boolean(errors[item.id + ":name"])}
+                aria-describedby={errors[item.id + ":name"] ? item.id + "-name-error" : undefined}
                 maxLength={200}
                 onChange={(event) =>
                   setItems(
@@ -325,41 +351,36 @@ export function Extras({
                     ),
                   )
                 }
-                className="mt-1 min-h-12 w-full rounded-lg border border-(--line) p-3"
+                className={inputClass + " mt-1"}
               />
+              {errors[item.id + ":name"] ? <span id={item.id + "-name-error"} className="ui-field-error">{errors[item.id + ":name"]}</span> : null}
             </label>
-            <label className="text-sm font-semibold">
-              Estoque atual
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={item.currentStock}
-                onChange={(event) =>
-                  setItems(
-                    items.map((current) =>
-                      current.id === item.id
-                        ? {
-                            ...current,
-                            currentStock: Number(event.target.value),
-                          }
-                        : current,
-                    ),
-                  )
-                }
-                className="mt-1 min-h-12 w-full rounded-lg border border-(--line) p-3"
-              />
-            </label>
+            <StockObservationField
+              error={errors[item.id + ":stock"]}
+              errorKey={item.id + ":stock"}
+              value={item.currentStock}
+              mode={item.stockObservation}
+              at={item.stockObservationAt}
+              onChange={(change) =>
+                setItems(
+                  items.map((current) =>
+                    current.id === item.id
+                      ? { ...current, ...change }
+                      : current,
+                  ),
+                )
+              }
+            />
             <div className="flex items-end">
-              <button
-                type="button"
+              <ActionButton
+                variant="danger"
                 onClick={() =>
                   setItems(items.filter((current) => current.id !== item.id))
                 }
-                className="min-h-12 w-full rounded-lg border border-red-200 px-3 text-left text-sm font-semibold text-red-700 sm:w-auto"
+                className="w-full sm:w-auto"
               >
                 Remover item {index + 1}
-              </button>
+              </ActionButton>
             </div>
             <label className="flex items-center gap-2 text-sm sm:col-span-3">
               <input
@@ -379,15 +400,14 @@ export function Extras({
               Reposição urgente
             </label>
             {normalize(item.name) && (
-              <div className="space-y-2 rounded-lg bg-slate-50 p-3 sm:col-span-3">
+              <div className="hca-material-suggestions space-y-2 sm:col-span-3">
                 <p role="status" className="text-sm font-semibold">
                   {classificationLabels[result.classification]}
                 </p>
                 {result.candidates.slice(0, 5).map((candidate) => (
-                  <button
+                  <ActionButton
                     key={candidate.product.id}
-                    type="button"
-                    className="block min-h-11 w-full rounded border border-(--brand) p-2 text-left text-sm"
+                    className="hca-material-suggestion"
                     onClick={() => adopt(candidate.product, item)}
                   >
                     Usar item do catálogo: {candidate.product.name} (
@@ -398,7 +418,7 @@ export function Extras({
                         ? `: ${candidate.matchedName}`
                         : ""}
                     </span>
-                  </button>
+                  </ActionButton>
                 ))}
                 {result.candidates.length > 5 && (
                   <p className="text-xs text-(--muted)">
@@ -411,23 +431,24 @@ export function Extras({
           </div>
         );
       })}
-      <button
-        type="button"
+      <ActionButton
         onClick={() => setItems([...items, emptyExtra()])}
-        className="min-h-12 rounded-lg border border-(--brand) px-4 py-2 text-sm font-bold text-(--brand)"
       >
         + Incluir novo item
-      </button>
+      </ActionButton>
     </div>
   );
 }
 export function Observations({
+  errors = {},
   observations,
   setObservations,
 }: {
+  errors?: Record<string, string>;
   observations: string[];
   setObservations: (observations: string[]) => void;
 }) {
+  const fieldId = useId();
   const [rows, setRows] = useState(() =>
     observations.map((value) => ({ id: crypto.randomUUID(), value })),
   );
@@ -441,9 +462,12 @@ export function Observations({
         Registre apenas informações operacionais necessárias.
       </p>
       {rows.map((row, index) => (
-        <div key={row.id} className="flex gap-2">
+        <div key={row.id} className="flex flex-wrap gap-2">
           <textarea
             aria-label={`Observação ${index + 1}`}
+            data-field-error={"observation:" + index}
+            aria-invalid={Boolean(errors["observation:" + index])}
+            aria-describedby={errors["observation:" + index] ? fieldId + "-" + index : undefined}
             rows={3}
             value={row.value}
             onChange={(event) =>
@@ -455,26 +479,25 @@ export function Observations({
                 ),
               )
             }
-            className="w-full rounded-lg border border-(--line) p-3"
+            className={inputClass}
           />
-          <button
-            type="button"
+          <ActionButton
+            variant="danger"
             onClick={() => update(rows.filter((item) => item.id !== row.id))}
-            className="self-start text-sm font-semibold text-red-700"
+            className="self-start"
           >
             Remover
-          </button>
+          </ActionButton>
+          {errors["observation:" + index] ? <p id={fieldId + "-" + index} className="ui-field-error w-full">{errors["observation:" + index]}</p> : null}
         </div>
       ))}
-      <button
-        type="button"
+      <ActionButton
         onClick={() =>
           update([...rows, { id: crypto.randomUUID(), value: "" }])
         }
-        className="rounded-lg border border-(--brand) px-4 py-2 text-sm font-bold text-(--brand)"
       >
         + Incluir nova observação
-      </button>
+      </ActionButton>
     </div>
   );
 }
@@ -490,27 +513,22 @@ export function Review({
   const lines = form.lines;
   const extras = form.extraItems.filter((item) => item.name.trim());
   return (
-    <div className="space-y-6">
-      <div>
-        <p className="text-sm text-(--muted)">Solicitante</p>
-        <p className="font-semibold">{requesterName}</p>
-        <p className="mt-4 text-sm text-(--muted)">Pessoa assistida</p>
-        <p className="font-semibold">{recipientName}</p>
-      </div>
-      <Summary
-        title="Itens do catálogo"
-        rows={lines.map(
-          (item) =>
-            `${item.productName} — estoque atual: ${item.currentStock ?? "desconhecido"}${item.urgent ? " (urgente)" : ""}${item.repeatReason ? " · Reiteração: " + item.repeatReason : ""}`,
-        )}
-      />
-      <Summary
-        title="Itens extras"
-        rows={extras.map(
-          (item) =>
-            `${item.name} — estoque atual: ${item.currentStock ?? "desconhecido"}${item.urgent ? " (urgente)" : ""}`,
-        )}
-      />
+    <div className="space-y-6" style={{ overflowWrap: "anywhere" }}>
+      <DefinitionGrid items={[{ label: "Solicitante", value: requesterName }, { label: "Pessoa assistida", value: recipientName }]} />
+      <section className="hca-document-summary">
+        <h3>Itens do catálogo</h3>
+        <MaterialReview rows={lines.map(item => ({
+          id: item.productId, name: item.productName, urgent: item.urgent,
+          details: <><small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation, item.unit)}</small><small>{formatStockObservationTime(item.stockObservationAt)}</small>{item.repeatReason ? <small>Reiteração: {item.repeatReason}</small> : null}</>,
+        }))} />
+      </section>
+      <section className="hca-document-summary">
+        <h3>Itens extras</h3>
+        <MaterialReview rows={extras.map(item => ({
+          id: item.id, name: item.name, urgent: item.urgent,
+          details: <><small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation)}</small><small>{formatStockObservationTime(item.stockObservationAt)}</small></>,
+        }))} />
+      </section>
       <Summary
         title="Observações"
         rows={form.observations.filter((item) => item.trim())}
@@ -518,14 +536,29 @@ export function Review({
     </div>
   );
 }
-export function Summary({ title, rows }: { title: string; rows: string[] }) {
+export function Summary({
+  title,
+  rows,
+  details,
+}: {
+  title: string;
+  rows: string[];
+  details?: string[];
+}) {
   return (
-    <div>
+    <div className="hca-document-summary">
       <h3 className="font-bold">{title}</h3>
       {rows.length ? (
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
-          {textRows(rows).map((row) => (
-            <li key={row.key}>{row.value}</li>
+        <ul>
+          {textRows(rows).map((row, index) => (
+            <li key={row.key}>
+              <span>{row.value}</span>
+              {details?.[index] ? (
+                <span className="block text-xs text-(--muted)">
+                  {details[index]}
+                </span>
+              ) : null}
+            </li>
           ))}
         </ul>
       ) : (

@@ -23,14 +23,14 @@ const body = {
   observations: [],
   idempotencyKey: "30000000-0000-4000-8000-000000000001",
 };
-function request() {
+function request(payload: unknown = body) {
   return new Request("https://care.example/api/requisitions", {
     method: "POST",
     headers: {
       "content-type": "application/json",
       origin: "https://care.example",
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
   });
 }
 function fixture(
@@ -39,6 +39,8 @@ function fixture(
     absentPatient?: boolean;
     receiptFailure?: boolean;
     conflict?: boolean;
+    inactivePatient?: boolean;
+    existingOwnKey?: boolean;
   } = {},
 ) {
   const receipt = {
@@ -91,7 +93,11 @@ function fixture(
       table === "profiles"
         ? { full_name: "Current requester", status: "active" }
         : table === "care_recipients"
-          ? { id: patientId, display_name: "Current patient", is_active: true }
+          ? {
+              id: patientId,
+              display_name: "Current patient",
+              is_active: !options.inactivePatient,
+            }
           : table === "care_recipient_memberships"
             ? { role: "professional", status: "active", can_count_stock: true }
             : receipt;
@@ -100,13 +106,22 @@ function fixture(
       (table === "care_recipients" && options.absentPatient)
         ? null
         : result;
+    let selected = "";
     const query = {
-      select: () => query,
+      select: (columns: string) => {
+        selected = columns;
+        return query;
+      },
       eq: () => query,
       maybeSingle: async () =>
-        table === "requisitions" && options.receiptFailure
-          ? { data: null, error: { message: "temporary outage" } }
-          : { data, error: null },
+        table === "requisitions" && selected === "id"
+          ? {
+              data: options.existingOwnKey ? { id: requisitionId } : null,
+              error: null,
+            }
+          : table === "requisitions" && options.receiptFailure
+            ? { data: null, error: { message: "temporary outage" } }
+            : { data, error: null },
     };
     return query;
   });
@@ -127,6 +142,60 @@ beforeEach(() => {
   fixture();
 });
 describe("requisition persistence response", () => {
+  it("preserves inactive patient conflict for a new key without invoking issuance", async () => {
+    const { rpc } = fixture({ inactivePatient: true });
+    const response = await POST(request());
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: "PATIENT_INACTIVE" });
+    expect(rpc.mock.calls.some(([name]) => name === "submit_requisition")).toBe(
+      false,
+    );
+  });
+  it("allows an inactive patient's own existing key to reach canonical recovery", async () => {
+    const { rpc } = fixture({ inactivePatient: true, existingOwnKey: true });
+    const response = await POST(request());
+    expect(response.status).toBe(201);
+    expect((await response.json()).receipt.requisitionId).toBe(requisitionId);
+    expect(rpc.mock.calls.some(([name]) => name === "submit_requisition")).toBe(
+      true,
+    );
+  });
+  it("sends an explicit reviewed source and own reason without trusting catalogue labels or source snapshots", async () => {
+    const { rpc } = fixture();
+    const source = {
+      requisitionId: "50000000-0000-4000-8000-000000000001",
+      version: 3,
+      reason: "O material entregue não encerrou a necessidade",
+    };
+    const response = await POST(request({ ...body, remainingNeed: source }));
+    expect(response.status).toBe(201);
+    const args = rpc.mock.calls.find(
+      ([name]) => name === "submit_remaining_requisition",
+    )?.[1] as Record<string, unknown>;
+    expect(args).toMatchObject({
+      p_source: source.requisitionId,
+      p_source_version: 3,
+      p_reason: source.reason,
+      p_idempotency_key: body.idempotencyKey,
+    });
+    expect(args.p_lines).toEqual([
+      { productId: "product", currentStock: 4, urgent: false },
+    ]);
+    expect(rpc.mock.calls.some(([name]) => name === "submit_requisition")).toBe(
+      false,
+    );
+    for (const remainingNeed of [
+      { ...source, version: null },
+      { ...source, reason: "😀😀" },
+      { ...source, reason: "😀".repeat(501) },
+      { ...source, actorId: "forged" },
+      { ...source, protocol: "forged" },
+      { ...source, requestedQuantity: 3 },
+    ]) {
+      const invalid = await POST(request({ ...body, remainingNeed }));
+      expect(invalid.status).toBe(400);
+    }
+  });
   it("uses persisted original snapshots and excludes client catalogue labels from the transaction", async () => {
     const { rpc } = fixture();
     const response = await POST(request());

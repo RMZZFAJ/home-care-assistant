@@ -1,0 +1,66 @@
+{
+  "at": "2026-11-09T00:26:01.350Z",
+  "sha": "3a6bdc95351f4155c901e2464d0969643157b793",
+  "runId": 42537271451,
+  "databaseJobId": 128904328704,
+  "jobs": [
+    {
+      "id": 128904328469,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128904328704,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128904328785,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128908277272,
+      "name": "browser (ios-1)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 128908277277,
+      "name": "browser (ios-2)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 128908277285,
+      "name": "browser (mobile)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 128908277318,
+      "name": "browser (chromium)",
+      "status": "in_progress",
+      "conclusion": null
+    }
+  ],
+  "databaseIntegration": {
+    "tests": 395,
+    "passed": 395,
+    "failed": 0,
+    "focusedPreparationGuidePassed": [
+      "2026-11-09T00:03:40.6262396Z ✔ residence preparation saves privately, creates inactive atomically and recovers one intention without granting its global creator clinical membership (682.407727ms)",
+      "2026-11-09T00:03:41.3456676Z ✔ preparation CAS keeps one concurrent revision and denies local creation, cross-owner reads and altered saved identity after creation (719.712465ms)",
+      "2026-11-09T00:03:42.7514495Z ✔ guide defaults and personal progress are scoped to live role, replay-safe, independent of science and locally configurable (1333.460774ms)",
+      "2026-11-09T00:03:42.7521020Z ✔ preparation and guide entrypoints do not grant anonymous, service or direct table access (71.983854ms)",
+      "2026-11-09T00:03:42.9761937Z ✔ 101 private preparations are reachable in stable pages and readiness reports recorded metadata without claiming physical or operational approval (224.80937ms)",
+      "2026-11-09T00:03:43.1407023Z ✔ a saved responsibility must remain a real active distinct identity and failed validation preserves the prior draft and command journal (164.27332ms)",
+      "2026-11-09T00:03:45.0063369Z ✔ creation rechecks global authority after an observed identity lock and rolls back patient, membership, preparation revision and intent (1866.220534ms)"
+    ]
+  },
+  "newShaNeedsOwnCi": true,
+  "approval": false
+}

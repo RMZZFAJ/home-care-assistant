@@ -1,0 +1,1683 @@
+{
+  "at": "2026-11-09T09:08:29.802737+00:00",
+  "baseSha": "47be43577a452d60420a0a52fe807180136ea9c9",
+  "distinctApprovedCases": 36,
+  "rounds": {
+    "initial": {
+      "stats": {
+        "total": 12,
+        "expected": 10,
+        "unexpected": 2,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": false
+      },
+      "cases": [
+        {
+          "title": "D3 preparação global salva antes do cadastro e recupera criação inativa sem duplicar ou conceder vínculo ao criador",
+          "projectName": "chromium",
+          "location": {
+            "file": "preparation-continuity.spec.ts",
+            "line": 33,
+            "column": 5
+          },
+          "duration": 24828,
+          "outcome": "unexpected",
+          "ok": false
+        },
+        {
+          "title": "D3 preparação global salva antes do cadastro e recupera criação inativa sem duplicar ou conceder vínculo ao criador",
+          "projectName": "ios",
+          "location": {
+            "file": "preparation-continuity.spec.ts",
+            "line": 33,
+            "column": 5
+          },
+          "duration": 30781,
+          "outcome": "unexpected",
+          "ok": false
+        },
+        {
+          "title": "UIR fundação compara modal ao HTML em cinco larguras e conserva foco e leitura",
+          "projectName": "chromium",
+          "location": {
+            "file": "canonical-foundation.spec.ts",
+            "line": 11,
+            "column": 5
+          },
+          "duration": 16020,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "UIR fundação compara modal ao HTML em cinco larguras e conserva foco e leitura",
+          "projectName": "ios",
+          "location": {
+            "file": "canonical-foundation.spec.ts",
+            "line": 11,
+            "column": 5
+          },
+          "duration": 21811,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "apresentação fracionária pode ser configurada na interface existente por delegado legítimo",
+          "projectName": "chromium",
+          "location": {
+            "file": "catalogue-contracts.spec.ts",
+            "line": 118,
+            "column": 5
+          },
+          "duration": 6544,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "apresentação fracionária pode ser configurada na interface existente por delegado legítimo",
+          "projectName": "ios",
+          "location": {
+            "file": "catalogue-contracts.spec.ts",
+            "line": 118,
+            "column": 5
+          },
+          "duration": 7747,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "estilos do streaming permanecem no head sem cópias no corpo",
+          "projectName": "chromium",
+          "location": {
+            "file": "fluent-experience.spec.ts",
+            "line": 28,
+            "column": 7
+          },
+          "duration": 118,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "gestão canônica troca contexto no submenu, mantém navegação e edita perfil sob demanda",
+          "projectName": "chromium",
+          "location": {
+            "file": "fluent-experience.spec.ts",
+            "line": 39,
+            "column": 5
+          },
+          "duration": 2182,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "estilos do streaming permanecem no head sem cópias no corpo",
+          "projectName": "ios",
+          "location": {
+            "file": "fluent-experience.spec.ts",
+            "line": 28,
+            "column": 7
+          },
+          "duration": 231,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "gestão canônica troca contexto no submenu, mantém navegação e edita perfil sob demanda",
+          "projectName": "ios",
+          "location": {
+            "file": "fluent-experience.spec.ts",
+            "line": 39,
+            "column": 5
+          },
+          "duration": 4699,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "Perfil conserva o destino de teclado quando callbacks de foco chegam depois da navegação",
+          "projectName": "chromium",
+          "location": {
+            "file": "profile-focus.spec.ts",
+            "line": 6,
+            "column": 5
+          },
+          "duration": 4871,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "Perfil conserva o destino de teclado quando callbacks de foco chegam depois da navegação",
+          "projectName": "ios",
+          "location": {
+            "file": "profile-focus.spec.ts",
+            "line": 6,
+            "column": 5
+          },
+          "duration": 6832,
+          "outcome": "expected",
+          "ok": true
+        }
+      ],
+      "reportSha256": "75b468e9fe43cda5d25cdc457fc0ff587b5e89a2fe66bb1173db66db5d9f08ce"
+    },
+    "regression": {
+      "stats": {
+        "total": 22,
+        "expected": 20,
+        "unexpected": 2,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": false
+      },
+      "cases": [
+        {
+          "title": "login, navegação, menus, filtros e quatro wizards são acessíveis e responsivos",
+          "projectName": "chromium",
+          "location": {
+            "file": "accessibility.spec.ts",
+            "line": 13,
+            "column": 5
+          },
+          "duration": 52492,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "login, navegação, menus, filtros e quatro wizards são acessíveis e responsivos",
+          "projectName": "ios",
+          "location": {
+            "file": "accessibility.spec.ts",
+            "line": 13,
+            "column": 5
+          },
+          "duration": 56804,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e concilia somente a nova contagem",
+          "projectName": "chromium",
+          "location": {
+            "file": "bal-recount-succession.spec.ts",
+            "line": 58,
+            "column": 5
+          },
+          "duration": 15571,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e concilia somente a nova contagem",
+          "projectName": "ios",
+          "location": {
+            "file": "bal-recount-succession.spec.ts",
+            "line": 58,
+            "column": 5
+          },
+          "duration": 18363,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "UIR cabeçalho e navegação seguem o HTML e mantêm contexto utilizável em cinco larguras",
+          "projectName": "chromium",
+          "location": {
+            "file": "canonical-shell.spec.ts",
+            "line": 9,
+            "column": 5
+          },
+          "duration": 9420,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "UIR cabeçalho e navegação seguem o HTML e mantêm contexto utilizável em cinco larguras",
+          "projectName": "ios",
+          "location": {
+            "file": "canonical-shell.spec.ts",
+            "line": 9,
+            "column": 5
+          },
+          "duration": 13278,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "consumo textual recebe complemento próprio, revisão em leitura e confirmação recuperável com débito único e outra sessão atualizada",
+          "projectName": "chromium",
+          "location": {
+            "file": "consumption.spec.ts",
+            "line": 204,
+            "column": 5
+          },
+          "duration": 19958,
+          "outcome": "unexpected",
+          "ok": false
+        },
+        {
+          "title": "consumo textual recebe complemento próprio, revisão em leitura e confirmação recuperável com débito único e outra sessão atualizada",
+          "projectName": "ios",
+          "location": {
+            "file": "consumption.spec.ts",
+            "line": 204,
+            "column": 5
+          },
+          "duration": 21348,
+          "outcome": "unexpected",
+          "ok": false
+        },
+        {
+          "title": "P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto",
+          "projectName": "chromium",
+          "location": {
+            "file": "delivery-preparation.spec.ts",
+            "line": 95,
+            "column": 5
+          },
+          "duration": 13409,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto",
+          "projectName": "ios",
+          "location": {
+            "file": "delivery-preparation.spec.ts",
+            "line": 95,
+            "column": 5
+          },
+          "duration": 15849,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "P05 proposta e conferência independentes preservam autoria, recuperam o mesmo ato e produzem dossiê PDF",
+          "projectName": "chromium",
+          "location": {
+            "file": "delivery-regularization.spec.ts",
+            "line": 131,
+            "column": 5
+          },
+          "duration": 17160,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "P05 proposta e conferência independentes preservam autoria, recuperam o mesmo ato e produzem dossiê PDF",
+          "projectName": "ios",
+          "location": {
+            "file": "delivery-regularization.spec.ts",
+            "line": 131,
+            "column": 5
+          },
+          "duration": 22362,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "D3 lista encontra proposta antiga e compara cinco tipos sem decidir por leitura ou vazar outro paciente",
+          "projectName": "chromium",
+          "location": {
+            "file": "governance-recovery.spec.ts",
+            "line": 120,
+            "column": 5
+          },
+          "duration": 38722,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "D3 lista encontra proposta antiga e compara cinco tipos sem decidir por leitura ou vazar outro paciente",
+          "projectName": "ios",
+          "location": {
+            "file": "governance-recovery.spec.ts",
+            "line": 120,
+            "column": 5
+          },
+          "duration": 44015,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "D3 preparação global salva antes do cadastro e recupera criação inativa sem duplicar ou conceder vínculo ao criador",
+          "projectName": "chromium",
+          "location": {
+            "file": "preparation-continuity.spec.ts",
+            "line": 33,
+            "column": 5
+          },
+          "duration": 19945,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "D3 preparação global salva antes do cadastro e recupera criação inativa sem duplicar ou conceder vínculo ao criador",
+          "projectName": "ios",
+          "location": {
+            "file": "preparation-continuity.spec.ts",
+            "line": 33,
+            "column": 5
+          },
+          "duration": 26982,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "conversão emitida mantém dois pacotes de dez após fator doze e recupera a mesma intenção sem crédito duplicado",
+          "projectName": "chromium",
+          "location": {
+            "file": "presentation-provenance.spec.ts",
+            "line": 333,
+            "column": 5
+          },
+          "duration": 12579,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "conversão emitida mantém dois pacotes de dez após fator doze e recupera a mesma intenção sem crédito duplicado",
+          "projectName": "ios",
+          "location": {
+            "file": "presentation-provenance.spec.ts",
+            "line": 333,
+            "column": 5
+          },
+          "duration": 15274,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "lista frequente cruza sessões, copia só materiais e nunca estoque7, urgência ou justificativa antiga",
+          "projectName": "chromium",
+          "location": {
+            "file": "recurring-selection.spec.ts",
+            "line": 19,
+            "column": 5
+          },
+          "duration": 12745,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "lista frequente cruza sessões, copia só materiais e nunca estoque7, urgência ou justificativa antiga",
+          "projectName": "ios",
+          "location": {
+            "file": "recurring-selection.spec.ts",
+            "line": 19,
+            "column": 5
+          },
+          "duration": 18329,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+          "projectName": "chromium",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 70,
+            "column": 5
+          },
+          "duration": 13132,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 70,
+            "column": 5
+          },
+          "duration": 22443,
+          "outcome": "expected",
+          "ok": true
+        }
+      ],
+      "artifacts": [
+        {
+          "name": "keyboard-entry-login",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\78b4aa00431c41bd9605e316fd3251679f0d7d3dc8c622a1cda09507b9ff6830.json",
+          "sha256": "78b4aa00431c41bd9605e316fd3251679f0d7d3dc8c622a1cda09507b9ff6830"
+        },
+        {
+          "name": "axe-login",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\ea8039a2354b970b46c42dc6310493c1ec945ae46032650fcf63b2b14c9621cb.json",
+          "sha256": "ea8039a2354b970b46c42dc6310493c1ec945ae46032650fcf63b2b14c9621cb"
+        },
+        {
+          "name": "keyboard-entry--",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\718b2b868355c204e6c8900514c4227fc76ad9e21dde85fef31a3d39c5bdf32e.json",
+          "sha256": "718b2b868355c204e6c8900514c4227fc76ad9e21dde85fef31a3d39c5bdf32e"
+        },
+        {
+          "name": "keyboard-entry--fichas",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\11d0789c2e1e188f21fb10c94ade96d8ea314a5e66f78f85580a1cdd0a0d7fbf.json",
+          "sha256": "11d0789c2e1e188f21fb10c94ade96d8ea314a5e66f78f85580a1cdd0a0d7fbf"
+        },
+        {
+          "name": "keyboard-entry--fichas-req",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas-req",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\f4a8b44c80c52bbb4a20f987115787167a57994a3b3cb8a76592d60dc1ce2cf3.json",
+          "sha256": "f4a8b44c80c52bbb4a20f987115787167a57994a3b3cb8a76592d60dc1ce2cf3"
+        },
+        {
+          "name": "keyboard-entry--fichas-com",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas-com",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\35b7302f5dba3bf8560ad4a09cf3bcaf2df11b6f5bcdfaa46681fc457fda6904.json",
+          "sha256": "35b7302f5dba3bf8560ad4a09cf3bcaf2df11b6f5bcdfaa46681fc457fda6904"
+        },
+        {
+          "name": "keyboard-entry--fichas-ent",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas-ent",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\d4b2d4f8155021964968daac2e9d8a44cd2e832a63f5b121842a00b008bee5e2.json",
+          "sha256": "d4b2d4f8155021964968daac2e9d8a44cd2e832a63f5b121842a00b008bee5e2"
+        },
+        {
+          "name": "keyboard-entry--fichas-bal",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas-bal",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\9bdf1f9a3e3f1e77e2f5f1ce20f14dab4aa720acc7d974a31ace798ab5111061.json",
+          "sha256": "9bdf1f9a3e3f1e77e2f5f1ce20f14dab4aa720acc7d974a31ace798ab5111061"
+        },
+        {
+          "name": "keyboard-entry--escalas",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--escalas",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\3e4c8e7f31726f2c1392fd4253837e967ab850203ada928ceffa8d3e2b42364b.json",
+          "sha256": "3e4c8e7f31726f2c1392fd4253837e967ab850203ada928ceffa8d3e2b42364b"
+        },
+        {
+          "name": "keyboard-entry--balancos",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--balancos",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\8118338f43b55a7f7ec7e23b6fcfbd622b852c0df6706f75eba5094ebce12a22.json",
+          "sha256": "8118338f43b55a7f7ec7e23b6fcfbd622b852c0df6706f75eba5094ebce12a22"
+        },
+        {
+          "name": "keyboard-entry--historico",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--historico",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\36191e33e8b4f237e09d60e0a6947efa3f648d9bef6b999bb41bb7f212c3db5d.json",
+          "sha256": "36191e33e8b4f237e09d60e0a6947efa3f648d9bef6b999bb41bb7f212c3db5d"
+        },
+        {
+          "name": "keyboard-entry--estoque",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--estoque",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\574782cd2f0bac633c2389950dc1c7e1ff70301b67d07a6d01423e69c777f495.json",
+          "sha256": "574782cd2f0bac633c2389950dc1c7e1ff70301b67d07a6d01423e69c777f495"
+        },
+        {
+          "name": "keyboard-entry--admin",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--admin",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\8a865db3b258c26eb73b2b27598c4004c8272b2cd6548e5adf1a2eab7b8808c3.json",
+          "sha256": "8a865db3b258c26eb73b2b27598c4004c8272b2cd6548e5adf1a2eab7b8808c3"
+        },
+        {
+          "name": "keyboard-entry--configuracoes",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--configuracoes",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\d24044f98eaf4882738ee89914cb376521989dc6f258f2095507354a6ca84381.json",
+          "sha256": "d24044f98eaf4882738ee89914cb376521989dc6f258f2095507354a6ca84381"
+        },
+        {
+          "name": "keyboard-entry--perfil",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--perfil",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\e928ce6cea3f7be9f433a17756522b3551f826ba238085fa74cff37fc0273311.json",
+          "sha256": "e928ce6cea3f7be9f433a17756522b3551f826ba238085fa74cff37fc0273311"
+        },
+        {
+          "name": "keyboard-entry--notificacoes",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--notificacoes",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\094cee00bc7cfef79bc7122b7b418ef964397189136e9e89230ba08b5e199bee.json",
+          "sha256": "094cee00bc7cfef79bc7122b7b418ef964397189136e9e89230ba08b5e199bee"
+        },
+        {
+          "name": "keyboard-entry--consumo",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--consumo",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\81db3276407beeafebe1120b4ae7a5984e962d04de7cfe9a0a6eca0a111bc0a0.json",
+          "sha256": "81db3276407beeafebe1120b4ae7a5984e962d04de7cfe9a0a6eca0a111bc0a0"
+        },
+        {
+          "name": "keyboard-entry--unidades",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--unidades",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\4eb1e0772d101c4a67fc7aeecb2d3a573230af5b90b16ace9574a94ee232077f.json",
+          "sha256": "4eb1e0772d101c4a67fc7aeecb2d3a573230af5b90b16ace9574a94ee232077f"
+        },
+        {
+          "name": "axe-history-expanded",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\8e6315f4494b3165e59defe3cddfbb538502eb6ab7a7e59a272ee475df080f9b.json",
+          "sha256": "8e6315f4494b3165e59defe3cddfbb538502eb6ab7a7e59a272ee475df080f9b"
+        },
+        {
+          "name": "axe-drawer",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\b19573202438145729ee0f971ff2cd65527d425e2394a711ca09d86ef93302a2.json",
+          "sha256": "b19573202438145729ee0f971ff2cd65527d425e2394a711ca09d86ef93302a2"
+        },
+        {
+          "name": "axe-notifications",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\8bcb234bdcc43238ac12ffe532266b2a45ee7e35cf63c673f7e901d83248a35c.json",
+          "sha256": "8bcb234bdcc43238ac12ffe532266b2a45ee7e35cf63c673f7e901d83248a35c"
+        },
+        {
+          "name": "axe-profile-menu",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\6f86dfd9847b0cc5bee2da24947256d79ab2e4b78e77fc08971023dd9d8d4875.json",
+          "sha256": "6f86dfd9847b0cc5bee2da24947256d79ab2e4b78e77fc08971023dd9d8d4875"
+        },
+        {
+          "name": "axe-profile-context-return",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fd92f205e0f838685bd7b2a1c02b2d8ecb089eba1086d3817cf27f09401958cc.json",
+          "sha256": "fd92f205e0f838685bd7b2a1c02b2d8ecb089eba1086d3817cf27f09401958cc"
+        },
+        {
+          "name": "keyboard-entry-login",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\78b4aa00431c41bd9605e316fd3251679f0d7d3dc8c622a1cda09507b9ff6830.json",
+          "sha256": "78b4aa00431c41bd9605e316fd3251679f0d7d3dc8c622a1cda09507b9ff6830"
+        },
+        {
+          "name": "axe-login",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\ea8039a2354b970b46c42dc6310493c1ec945ae46032650fcf63b2b14c9621cb.json",
+          "sha256": "ea8039a2354b970b46c42dc6310493c1ec945ae46032650fcf63b2b14c9621cb"
+        },
+        {
+          "name": "keyboard-entry--",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\718b2b868355c204e6c8900514c4227fc76ad9e21dde85fef31a3d39c5bdf32e.json",
+          "sha256": "718b2b868355c204e6c8900514c4227fc76ad9e21dde85fef31a3d39c5bdf32e"
+        },
+        {
+          "name": "keyboard-entry--fichas",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\11d0789c2e1e188f21fb10c94ade96d8ea314a5e66f78f85580a1cdd0a0d7fbf.json",
+          "sha256": "11d0789c2e1e188f21fb10c94ade96d8ea314a5e66f78f85580a1cdd0a0d7fbf"
+        },
+        {
+          "name": "keyboard-entry--fichas-req",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas-req",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\f4a8b44c80c52bbb4a20f987115787167a57994a3b3cb8a76592d60dc1ce2cf3.json",
+          "sha256": "f4a8b44c80c52bbb4a20f987115787167a57994a3b3cb8a76592d60dc1ce2cf3"
+        },
+        {
+          "name": "keyboard-entry--fichas-com",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas-com",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\35b7302f5dba3bf8560ad4a09cf3bcaf2df11b6f5bcdfaa46681fc457fda6904.json",
+          "sha256": "35b7302f5dba3bf8560ad4a09cf3bcaf2df11b6f5bcdfaa46681fc457fda6904"
+        },
+        {
+          "name": "keyboard-entry--fichas-ent",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas-ent",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\d4b2d4f8155021964968daac2e9d8a44cd2e832a63f5b121842a00b008bee5e2.json",
+          "sha256": "d4b2d4f8155021964968daac2e9d8a44cd2e832a63f5b121842a00b008bee5e2"
+        },
+        {
+          "name": "keyboard-entry--fichas-bal",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--fichas-bal",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\9bdf1f9a3e3f1e77e2f5f1ce20f14dab4aa720acc7d974a31ace798ab5111061.json",
+          "sha256": "9bdf1f9a3e3f1e77e2f5f1ce20f14dab4aa720acc7d974a31ace798ab5111061"
+        },
+        {
+          "name": "keyboard-entry--escalas",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--escalas",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\3e4c8e7f31726f2c1392fd4253837e967ab850203ada928ceffa8d3e2b42364b.json",
+          "sha256": "3e4c8e7f31726f2c1392fd4253837e967ab850203ada928ceffa8d3e2b42364b"
+        },
+        {
+          "name": "keyboard-entry--balancos",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--balancos",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\8118338f43b55a7f7ec7e23b6fcfbd622b852c0df6706f75eba5094ebce12a22.json",
+          "sha256": "8118338f43b55a7f7ec7e23b6fcfbd622b852c0df6706f75eba5094ebce12a22"
+        },
+        {
+          "name": "keyboard-entry--historico",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--historico",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\36191e33e8b4f237e09d60e0a6947efa3f648d9bef6b999bb41bb7f212c3db5d.json",
+          "sha256": "36191e33e8b4f237e09d60e0a6947efa3f648d9bef6b999bb41bb7f212c3db5d"
+        },
+        {
+          "name": "keyboard-entry--estoque",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--estoque",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\574782cd2f0bac633c2389950dc1c7e1ff70301b67d07a6d01423e69c777f495.json",
+          "sha256": "574782cd2f0bac633c2389950dc1c7e1ff70301b67d07a6d01423e69c777f495"
+        },
+        {
+          "name": "keyboard-entry--admin",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--admin",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\8a865db3b258c26eb73b2b27598c4004c8272b2cd6548e5adf1a2eab7b8808c3.json",
+          "sha256": "8a865db3b258c26eb73b2b27598c4004c8272b2cd6548e5adf1a2eab7b8808c3"
+        },
+        {
+          "name": "keyboard-entry--configuracoes",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--configuracoes",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\d24044f98eaf4882738ee89914cb376521989dc6f258f2095507354a6ca84381.json",
+          "sha256": "d24044f98eaf4882738ee89914cb376521989dc6f258f2095507354a6ca84381"
+        },
+        {
+          "name": "keyboard-entry--perfil",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--perfil",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\e928ce6cea3f7be9f433a17756522b3551f826ba238085fa74cff37fc0273311.json",
+          "sha256": "e928ce6cea3f7be9f433a17756522b3551f826ba238085fa74cff37fc0273311"
+        },
+        {
+          "name": "keyboard-entry--notificacoes",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--notificacoes",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\094cee00bc7cfef79bc7122b7b418ef964397189136e9e89230ba08b5e199bee.json",
+          "sha256": "094cee00bc7cfef79bc7122b7b418ef964397189136e9e89230ba08b5e199bee"
+        },
+        {
+          "name": "keyboard-entry--consumo",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--consumo",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\81db3276407beeafebe1120b4ae7a5984e962d04de7cfe9a0a6eca0a111bc0a0.json",
+          "sha256": "81db3276407beeafebe1120b4ae7a5984e962d04de7cfe9a0a6eca0a111bc0a0"
+        },
+        {
+          "name": "keyboard-entry--unidades",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe--unidades",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\4eb1e0772d101c4a67fc7aeecb2d3a573230af5b90b16ace9574a94ee232077f.json",
+          "sha256": "4eb1e0772d101c4a67fc7aeecb2d3a573230af5b90b16ace9574a94ee232077f"
+        },
+        {
+          "name": "axe-history-expanded",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\8e6315f4494b3165e59defe3cddfbb538502eb6ab7a7e59a272ee475df080f9b.json",
+          "sha256": "8e6315f4494b3165e59defe3cddfbb538502eb6ab7a7e59a272ee475df080f9b"
+        },
+        {
+          "name": "axe-drawer",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\2aeb8f368cc78e8689d00f54e5b994e1feb40a920d90d6dc54b1b5790ca36bf8.json",
+          "sha256": "2aeb8f368cc78e8689d00f54e5b994e1feb40a920d90d6dc54b1b5790ca36bf8"
+        },
+        {
+          "name": "axe-notifications",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\85cf95bc4db280819680b45b20b6cefd0c2ebbec9d9d8b2f0a385543480fee7d.json",
+          "sha256": "85cf95bc4db280819680b45b20b6cefd0c2ebbec9d9d8b2f0a385543480fee7d"
+        },
+        {
+          "name": "axe-profile-menu",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\6f86dfd9847b0cc5bee2da24947256d79ab2e4b78e77fc08971023dd9d8d4875.json",
+          "sha256": "6f86dfd9847b0cc5bee2da24947256d79ab2e4b78e77fc08971023dd9d8d4875"
+        },
+        {
+          "name": "axe-profile-context-return",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\44a8118faf777713e0e6de0a5d8e0338d3d7bcaa30e9a902d80f0d4ee5123ff7.json",
+          "sha256": "44a8118faf777713e0e6de0a5d8e0338d3d7bcaa30e9a902d80f0d4ee5123ff7"
+        },
+        {
+          "name": "axe-bal-recount-designation-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\2513ef74c472372def8869a701d1262c9e981e3b58cb9cf3522c096833639816.json",
+          "sha256": "2513ef74c472372def8869a701d1262c9e981e3b58cb9cf3522c096833639816"
+        },
+        {
+          "name": "axe-bal-recount-designation-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\885532279f71109107d8870ff98ac4b4476653b89825077c1d136ed35f5a3ec5.json",
+          "sha256": "885532279f71109107d8870ff98ac4b4476653b89825077c1d136ed35f5a3ec5"
+        },
+        {
+          "name": "axe-bal-recount-designation-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\cb3dee2d8d46c81025dc902db557d3472f5aa901c4d80f7c810c4b43fb17fee7.json",
+          "sha256": "cb3dee2d8d46c81025dc902db557d3472f5aa901c4d80f7c810c4b43fb17fee7"
+        },
+        {
+          "name": "axe-bal-recount-designation-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\b7c9cefa005e078bbd4656bc68b422b54524ca637fce9859ac18a66509b3ce27.json",
+          "sha256": "b7c9cefa005e078bbd4656bc68b422b54524ca637fce9859ac18a66509b3ce27"
+        },
+        {
+          "name": "axe-bal-recount-designation-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\cb3dee2d8d46c81025dc902db557d3472f5aa901c4d80f7c810c4b43fb17fee7.json",
+          "sha256": "cb3dee2d8d46c81025dc902db557d3472f5aa901c4d80f7c810c4b43fb17fee7"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\3d1fbcf473c5c49ac4a1c401866810c814a3ab122afc701ca776c82f0ab707fe.json",
+          "sha256": "3d1fbcf473c5c49ac4a1c401866810c814a3ab122afc701ca776c82f0ab707fe"
+        },
+        {
+          "name": "canonical-shell-reference-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\1b9fa115548531d64cc1c91bc32d8b2f6d5aadc7.png",
+          "sha256": "cf906563dcf6dbe3a550b3edb124cb1eca3bcd5b91e2f579ad622a4791f9d907"
+        },
+        {
+          "name": "current-shell-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\5f60632cb98822d96be92e0e5d3b53a49a5b70cf.png",
+          "sha256": "34d882c5fee19036fbe12bc98e78ee09466ff821ddebe8bc460acc42b8dcfd97"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\092a0fa1c5827166fae985dd3e3a5d05f6b9b9610cb7fa22879b6884e6774f70.json",
+          "sha256": "092a0fa1c5827166fae985dd3e3a5d05f6b9b9610cb7fa22879b6884e6774f70"
+        },
+        {
+          "name": "canonical-shell-reference-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\e8a7cb6791f06b6357aa00af7cde77d0d328c444.png",
+          "sha256": "4967526accf7b9b670f1ef6955a57dbbafad26ca140d368134946c2e8a3d1279"
+        },
+        {
+          "name": "current-shell-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fd1f51c98b077f4061d3207db971f1eaeff4b112.png",
+          "sha256": "3e124b726e96a2b762d98b4201f8b924c1d39b6c0db8573cc22a5f7f6cba7622"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\2b46a0e362170d366498f3df8894c7cf8718530fa286b7d9ac74931270f06feb.json",
+          "sha256": "2b46a0e362170d366498f3df8894c7cf8718530fa286b7d9ac74931270f06feb"
+        },
+        {
+          "name": "canonical-shell-reference-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\73a7442033348cdcbb596458bb998dbc76645fd8.png",
+          "sha256": "133c38e85d5e865268a2031901850547f68ed351925f0b52ad6fcd105a3e3ddd"
+        },
+        {
+          "name": "current-shell-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\af35a9552fc84808edb967f9707b47cc1109cf6b.png",
+          "sha256": "1350a01a2da9c5548d509089cbb0349e8d1abeb1512423d8144b2ac3fb9c5e9b"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-1024",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\11dfbc99093a626b18812b9045c663c9b2beaccb327737b9f96c109aed45d038.json",
+          "sha256": "11dfbc99093a626b18812b9045c663c9b2beaccb327737b9f96c109aed45d038"
+        },
+        {
+          "name": "canonical-shell-reference-1024",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\b6f0d36623b48fae6f549b62d0c8e0402bdd3543.png",
+          "sha256": "e2a18d880c6739be9192588b26afbc7063a21ef05156a2127804d840c002e261"
+        },
+        {
+          "name": "current-shell-1024",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\a43b3e6f1d4a7ec8dd8b15e9eedb7067b1a20c0b.png",
+          "sha256": "df6801242234c4680abd2675ffd6cda0fd11d0591a69f9bd91dcbc7300dc9566"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\417ccd9fcb47456b782d6c51a3a7fa6c95a72dfa948b9a7c1fd567adb815caa6.json",
+          "sha256": "417ccd9fcb47456b782d6c51a3a7fa6c95a72dfa948b9a7c1fd567adb815caa6"
+        },
+        {
+          "name": "canonical-shell-reference-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\48eb0a79fb154706273bdbbfb56055a5b4b0a4ab.png",
+          "sha256": "a6562692f05294d5aae792e8f6cf50a03ffda85aa44b81b64f588e82d6113130"
+        },
+        {
+          "name": "current-shell-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\8a68c5f15e4e2c8440506469a5291a6ab91890c2.png",
+          "sha256": "65a2906e9bd7c8ca7d2d2bba99bab863579ce4058b747f5844cc1828d832852c"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\3d1fbcf473c5c49ac4a1c401866810c814a3ab122afc701ca776c82f0ab707fe.json",
+          "sha256": "3d1fbcf473c5c49ac4a1c401866810c814a3ab122afc701ca776c82f0ab707fe"
+        },
+        {
+          "name": "canonical-shell-reference-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\ae581d6ff78f30bf32d2c5badf296ac60b72781b.png",
+          "sha256": "b1edacf0190c0d6d3c54efb48a20200dd26d42d18c98da6aece2e46236fc04a5"
+        },
+        {
+          "name": "current-shell-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\0740de1ea9bacb77f4f0a927b4ea111677e63b28.png",
+          "sha256": "508eafc00b7aeb58177c7f37cb497f30aa5c49cf46f5f3c9fc9e5675dfa898fc"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\092a0fa1c5827166fae985dd3e3a5d05f6b9b9610cb7fa22879b6884e6774f70.json",
+          "sha256": "092a0fa1c5827166fae985dd3e3a5d05f6b9b9610cb7fa22879b6884e6774f70"
+        },
+        {
+          "name": "canonical-shell-reference-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\44839387c6a1a7ee734e1ddf914a71bb3f93df9c.png",
+          "sha256": "cf91c76dfd1e6c90071c814c2b2c581d0425502f4b7fa860e0438fcbfb5410b9"
+        },
+        {
+          "name": "current-shell-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\c6040875fdd436f37945f2a09978dac9a93dc5d7.png",
+          "sha256": "8d0599cf4f3e8771ebdcba3fb18dbafe2849d9252b13151c4cafe9d0bf5a45ba"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\2b46a0e362170d366498f3df8894c7cf8718530fa286b7d9ac74931270f06feb.json",
+          "sha256": "2b46a0e362170d366498f3df8894c7cf8718530fa286b7d9ac74931270f06feb"
+        },
+        {
+          "name": "canonical-shell-reference-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\05e70be23950c9120be242938ee741fd8688245f.png",
+          "sha256": "b1bcbbdd1a590bc0e1306022685ee6be416d707c67143f0a801aec3b09456973"
+        },
+        {
+          "name": "current-shell-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\01944a1381db729e82f7ebcaae81707774de1dc4.png",
+          "sha256": "2b4a3b9e22e541324ca12aa9a336bb16fa231a76ac8f652065accb5eb0385468"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-1024",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\11dfbc99093a626b18812b9045c663c9b2beaccb327737b9f96c109aed45d038.json",
+          "sha256": "11dfbc99093a626b18812b9045c663c9b2beaccb327737b9f96c109aed45d038"
+        },
+        {
+          "name": "canonical-shell-reference-1024",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\ed3bf39bed1529f19ffc18e4e269ff15dbb82873.png",
+          "sha256": "7ca5c15d64cab5bebfe48db3840bba7aad4624a46f2901347a6dda43d6b424ce"
+        },
+        {
+          "name": "current-shell-1024",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\045435b446335d0babb3b6eff392852561b471f3.png",
+          "sha256": "c3d1a720fc07b2f30934c756ce6799e420e4863c5d0297bb66e173fe47ba6be9"
+        },
+        {
+          "name": "axe-UIR-canonical-shell-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\417ccd9fcb47456b782d6c51a3a7fa6c95a72dfa948b9a7c1fd567adb815caa6.json",
+          "sha256": "417ccd9fcb47456b782d6c51a3a7fa6c95a72dfa948b9a7c1fd567adb815caa6"
+        },
+        {
+          "name": "canonical-shell-reference-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\939bbbf13344cdfc9df31c7d451e7bc52108975c.png",
+          "sha256": "811a3211c316e41a8cbb706c948dfbd108c408cffb24d78963f62cae334890f4"
+        },
+        {
+          "name": "current-shell-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\37ded4f6fdf9c3cccfe2479aab225b35310e128f.png",
+          "sha256": "826a68fe2f1a10d85810f0874eef25a28fcc1f46f8ab15ab152d187022d40856"
+        },
+        {
+          "name": "screenshot",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\702e65ac76fd8e58e6da52f3f1532e2051007cf0.png",
+          "sha256": "ca3392d83979844d6c7f1cf64c7c0691f2913b34048739eaf1aa6cd75cfcfafc"
+        },
+        {
+          "name": "screenshot",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\34510adc26765eb3a908af47c356b42e4ac6df25.png",
+          "sha256": "b6734f42579ef995ecb5871657c09abfb9e0398607f42473597bc3b3e2f81e3c"
+        },
+        {
+          "name": "keyboard-entry-P06-selected-recipient-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-P06-selected-recipient-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\c3ab63e39ea0f38750618d8928d2e7201d91ca30bf498b4db433dedb85a990ec.json",
+          "sha256": "c3ab63e39ea0f38750618d8928d2e7201d91ca30bf498b4db433dedb85a990ec"
+        },
+        {
+          "name": "axe-P06-selected-recipient-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\dfad0121a59365d00c5ab66a703e963ab91d544e3bbe966a389ec939f62046f6.json",
+          "sha256": "dfad0121a59365d00c5ab66a703e963ab91d544e3bbe966a389ec939f62046f6"
+        },
+        {
+          "name": "axe-P06-selected-recipient-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\a7a654078537de10e05e9bd35d79929306bb7e608e71797eb0d08c8e114e58e5.json",
+          "sha256": "a7a654078537de10e05e9bd35d79929306bb7e608e71797eb0d08c8e114e58e5"
+        },
+        {
+          "name": "axe-P06-selected-recipient-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\6ff50af7ba0454ec2f72e4e6daadc23dc1b458d133a6f4dd0d4131a728bbbcd4.json",
+          "sha256": "6ff50af7ba0454ec2f72e4e6daadc23dc1b458d133a6f4dd0d4131a728bbbcd4"
+        },
+        {
+          "name": "keyboard-entry-P06-selected-recipient-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-P06-selected-recipient-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\c3ab63e39ea0f38750618d8928d2e7201d91ca30bf498b4db433dedb85a990ec.json",
+          "sha256": "c3ab63e39ea0f38750618d8928d2e7201d91ca30bf498b4db433dedb85a990ec"
+        },
+        {
+          "name": "axe-P06-selected-recipient-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\dfad0121a59365d00c5ab66a703e963ab91d544e3bbe966a389ec939f62046f6.json",
+          "sha256": "dfad0121a59365d00c5ab66a703e963ab91d544e3bbe966a389ec939f62046f6"
+        },
+        {
+          "name": "axe-P06-selected-recipient-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\a7a654078537de10e05e9bd35d79929306bb7e608e71797eb0d08c8e114e58e5.json",
+          "sha256": "a7a654078537de10e05e9bd35d79929306bb7e608e71797eb0d08c8e114e58e5"
+        },
+        {
+          "name": "axe-P06-selected-recipient-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\6ff50af7ba0454ec2f72e4e6daadc23dc1b458d133a6f4dd0d4131a728bbbcd4.json",
+          "sha256": "6ff50af7ba0454ec2f72e4e6daadc23dc1b458d133a6f4dd0d4131a728bbbcd4"
+        },
+        {
+          "name": "P05-visible-choice-Conferente independente",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\d112b08535c32421cf697b9da44a7979074e2c154220c6c16f47e77f384287de.json",
+          "sha256": "d112b08535c32421cf697b9da44a7979074e2c154220c6c16f47e77f384287de"
+        },
+        {
+          "name": "axe-regularizacao-resultado-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\cf427c6a06852437c52cec2d0759a611169fd30a015ce54eb902d47e5b1aa70b.json",
+          "sha256": "cf427c6a06852437c52cec2d0759a611169fd30a015ce54eb902d47e5b1aa70b"
+        },
+        {
+          "name": "axe-regularizacao-resultado-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\773f73ff6a2ac6c2762cb758882026ac9a4a66eb8f861ad2fbaab42ab8369be6.json",
+          "sha256": "773f73ff6a2ac6c2762cb758882026ac9a4a66eb8f861ad2fbaab42ab8369be6"
+        },
+        {
+          "name": "axe-regularizacao-resultado-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\80dca640bac33cc7a16ef7bbd319b6a07a67e47f70ab91c641cbf9306bafb1db.json",
+          "sha256": "80dca640bac33cc7a16ef7bbd319b6a07a67e47f70ab91c641cbf9306bafb1db"
+        },
+        {
+          "name": "axe-regularizacao-resultado-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\414edc3109c4bf153c0d2aa2f22b6fd9d29a6d0074537eb11d2e21602c13ee32.json",
+          "sha256": "414edc3109c4bf153c0d2aa2f22b6fd9d29a6d0074537eb11d2e21602c13ee32"
+        },
+        {
+          "name": "P05-visible-choice-Conferente independente",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\af589c183189835b9e982e2039aafb7f33bea9f01b5f6a17574d3b48013c2424.json",
+          "sha256": "af589c183189835b9e982e2039aafb7f33bea9f01b5f6a17574d3b48013c2424"
+        },
+        {
+          "name": "axe-regularizacao-resultado-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\cf427c6a06852437c52cec2d0759a611169fd30a015ce54eb902d47e5b1aa70b.json",
+          "sha256": "cf427c6a06852437c52cec2d0759a611169fd30a015ce54eb902d47e5b1aa70b"
+        },
+        {
+          "name": "axe-regularizacao-resultado-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\773f73ff6a2ac6c2762cb758882026ac9a4a66eb8f861ad2fbaab42ab8369be6.json",
+          "sha256": "773f73ff6a2ac6c2762cb758882026ac9a4a66eb8f861ad2fbaab42ab8369be6"
+        },
+        {
+          "name": "axe-regularizacao-resultado-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\80dca640bac33cc7a16ef7bbd319b6a07a67e47f70ab91c641cbf9306bafb1db.json",
+          "sha256": "80dca640bac33cc7a16ef7bbd319b6a07a67e47f70ab91c641cbf9306bafb1db"
+        },
+        {
+          "name": "axe-regularizacao-resultado-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\414edc3109c4bf153c0d2aa2f22b6fd9d29a6d0074537eb11d2e21602c13ee32.json",
+          "sha256": "414edc3109c4bf153c0d2aa2f22b6fd9d29a6d0074537eb11d2e21602c13ee32"
+        },
+        {
+          "name": "axe-D3-five-proposal-comparisons-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\ef5c17d6fc8850a44cd983f55c85ab11cf3716cfa123be07a3c4ad871607689c.json",
+          "sha256": "ef5c17d6fc8850a44cd983f55c85ab11cf3716cfa123be07a3c4ad871607689c"
+        },
+        {
+          "name": "axe-D3-five-proposal-comparisons-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\1fd8215715ee30f522b7ff2b8104578ce74b57cb0ad0b49ec909c82228ebcf54.json",
+          "sha256": "1fd8215715ee30f522b7ff2b8104578ce74b57cb0ad0b49ec909c82228ebcf54"
+        },
+        {
+          "name": "axe-D3-five-proposal-comparisons-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\a9c9d9f9ea2e546578b1afaded494e24ca8e93bb7691bd51d48523119c2c8e41.json",
+          "sha256": "a9c9d9f9ea2e546578b1afaded494e24ca8e93bb7691bd51d48523119c2c8e41"
+        },
+        {
+          "name": "axe-D3-five-proposal-comparisons-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\4e6413c72cd35a516d00011771595d3abaf5229976cd53b8295419c6e72c3f84.json",
+          "sha256": "4e6413c72cd35a516d00011771595d3abaf5229976cd53b8295419c6e72c3f84"
+        },
+        {
+          "name": "axe-D3-five-proposal-comparisons-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\ef5c17d6fc8850a44cd983f55c85ab11cf3716cfa123be07a3c4ad871607689c.json",
+          "sha256": "ef5c17d6fc8850a44cd983f55c85ab11cf3716cfa123be07a3c4ad871607689c"
+        },
+        {
+          "name": "axe-D3-five-proposal-comparisons-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\1fd8215715ee30f522b7ff2b8104578ce74b57cb0ad0b49ec909c82228ebcf54.json",
+          "sha256": "1fd8215715ee30f522b7ff2b8104578ce74b57cb0ad0b49ec909c82228ebcf54"
+        },
+        {
+          "name": "axe-D3-five-proposal-comparisons-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\a9c9d9f9ea2e546578b1afaded494e24ca8e93bb7691bd51d48523119c2c8e41.json",
+          "sha256": "a9c9d9f9ea2e546578b1afaded494e24ca8e93bb7691bd51d48523119c2c8e41"
+        },
+        {
+          "name": "axe-D3-five-proposal-comparisons-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\4e6413c72cd35a516d00011771595d3abaf5229976cd53b8295419c6e72c3f84.json",
+          "sha256": "4e6413c72cd35a516d00011771595d3abaf5229976cd53b8295419c6e72c3f84"
+        },
+        {
+          "name": "axe-D3-residence-preparation-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\7eaabaecbd995dce0325eb6806bdf22bb2b00f03ed5a1637648f59871e22d499.json",
+          "sha256": "7eaabaecbd995dce0325eb6806bdf22bb2b00f03ed5a1637648f59871e22d499"
+        },
+        {
+          "name": "axe-D3-residence-preparation-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\6dc036111174574b87d27f4171d6335759882da100b8d6917c790c1805f29a29.json",
+          "sha256": "6dc036111174574b87d27f4171d6335759882da100b8d6917c790c1805f29a29"
+        },
+        {
+          "name": "axe-D3-residence-preparation-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\9813d55ee3286740e9d935681f824d12f7bfe8091b034caeed3fc12b70830acc.json",
+          "sha256": "9813d55ee3286740e9d935681f824d12f7bfe8091b034caeed3fc12b70830acc"
+        },
+        {
+          "name": "axe-D3-residence-preparation-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\55b6a0820723976efadafdebb3fb65a51690e5b3462f9fb67d98690819ad9bf7.json",
+          "sha256": "55b6a0820723976efadafdebb3fb65a51690e5b3462f9fb67d98690819ad9bf7"
+        },
+        {
+          "name": "axe-D3-residence-preparation-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\7eaabaecbd995dce0325eb6806bdf22bb2b00f03ed5a1637648f59871e22d499.json",
+          "sha256": "7eaabaecbd995dce0325eb6806bdf22bb2b00f03ed5a1637648f59871e22d499"
+        },
+        {
+          "name": "axe-D3-residence-preparation-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\6dc036111174574b87d27f4171d6335759882da100b8d6917c790c1805f29a29.json",
+          "sha256": "6dc036111174574b87d27f4171d6335759882da100b8d6917c790c1805f29a29"
+        },
+        {
+          "name": "axe-D3-residence-preparation-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\9813d55ee3286740e9d935681f824d12f7bfe8091b034caeed3fc12b70830acc.json",
+          "sha256": "9813d55ee3286740e9d935681f824d12f7bfe8091b034caeed3fc12b70830acc"
+        },
+        {
+          "name": "axe-D3-residence-preparation-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\55b6a0820723976efadafdebb3fb65a51690e5b3462f9fb67d98690819ad9bf7.json",
+          "sha256": "55b6a0820723976efadafdebb3fb65a51690e5b3462f9fb67d98690819ad9bf7"
+        },
+        {
+          "name": "keyboard-entry-presentation-issued-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-presentation-issued-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\f375cc3e272f8d64d5b53bf464183cbd55a68d7eb68ca62bca1e93931b571980.json",
+          "sha256": "f375cc3e272f8d64d5b53bf464183cbd55a68d7eb68ca62bca1e93931b571980"
+        },
+        {
+          "name": "keyboard-entry-presentation-issued-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-presentation-issued-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\c3544539f1851bfafbb42bee8b7aa4233bf2d333338449f8ff63af2b1150c159.json",
+          "sha256": "c3544539f1851bfafbb42bee8b7aa4233bf2d333338449f8ff63af2b1150c159"
+        },
+        {
+          "name": "keyboard-entry-presentation-issued-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-presentation-issued-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\617a75fc832fd62cf9de5490ef04d526caeaeb7b1ba8999d9b940045e36978a6.json",
+          "sha256": "617a75fc832fd62cf9de5490ef04d526caeaeb7b1ba8999d9b940045e36978a6"
+        },
+        {
+          "name": "keyboard-entry-presentation-issued-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-presentation-issued-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\0e76604f184704ae11a170cac92ca4549198c9c87e75becfffd8c9ef73ab6b0d.json",
+          "sha256": "0e76604f184704ae11a170cac92ca4549198c9c87e75becfffd8c9ef73ab6b0d"
+        },
+        {
+          "name": "keyboard-entry-presentation-issued-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-presentation-issued-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\f375cc3e272f8d64d5b53bf464183cbd55a68d7eb68ca62bca1e93931b571980.json",
+          "sha256": "f375cc3e272f8d64d5b53bf464183cbd55a68d7eb68ca62bca1e93931b571980"
+        },
+        {
+          "name": "keyboard-entry-presentation-issued-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-presentation-issued-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\c3544539f1851bfafbb42bee8b7aa4233bf2d333338449f8ff63af2b1150c159.json",
+          "sha256": "c3544539f1851bfafbb42bee8b7aa4233bf2d333338449f8ff63af2b1150c159"
+        },
+        {
+          "name": "keyboard-entry-presentation-issued-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-presentation-issued-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\617a75fc832fd62cf9de5490ef04d526caeaeb7b1ba8999d9b940045e36978a6.json",
+          "sha256": "617a75fc832fd62cf9de5490ef04d526caeaeb7b1ba8999d9b940045e36978a6"
+        },
+        {
+          "name": "keyboard-entry-presentation-issued-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+          "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+        },
+        {
+          "name": "axe-presentation-issued-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\0e76604f184704ae11a170cac92ca4549198c9c87e75becfffd8c9ef73ab6b0d.json",
+          "sha256": "0e76604f184704ae11a170cac92ca4549198c9c87e75becfffd8c9ef73ab6b0d"
+        },
+        {
+          "name": "axe-REQ-frequent-selection-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\19b17f8a8c6a0b4a6b3450ad07d78d7e4d60104920c7f2cfc7dedb0c414e9d19.json",
+          "sha256": "19b17f8a8c6a0b4a6b3450ad07d78d7e4d60104920c7f2cfc7dedb0c414e9d19"
+        },
+        {
+          "name": "axe-REQ-frequent-selection-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\b13b5daa993883d627dad2d2a45d09493f551162993f0febd633ac194f72dbc8.json",
+          "sha256": "b13b5daa993883d627dad2d2a45d09493f551162993f0febd633ac194f72dbc8"
+        },
+        {
+          "name": "axe-REQ-frequent-selection-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\d47a38f2042071ae40c7aea42a43825280870d67a5568aa6e46b534e4e328e5a.json",
+          "sha256": "d47a38f2042071ae40c7aea42a43825280870d67a5568aa6e46b534e4e328e5a"
+        },
+        {
+          "name": "axe-REQ-frequent-selection-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\09aa6253344951e13b02a3e620373bff742bdbfefbc1827a06cb3ba3d1483fe6.json",
+          "sha256": "09aa6253344951e13b02a3e620373bff742bdbfefbc1827a06cb3ba3d1483fe6"
+        },
+        {
+          "name": "axe-REQ-frequent-selection-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\19b17f8a8c6a0b4a6b3450ad07d78d7e4d60104920c7f2cfc7dedb0c414e9d19.json",
+          "sha256": "19b17f8a8c6a0b4a6b3450ad07d78d7e4d60104920c7f2cfc7dedb0c414e9d19"
+        },
+        {
+          "name": "axe-REQ-frequent-selection-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\b13b5daa993883d627dad2d2a45d09493f551162993f0febd633ac194f72dbc8.json",
+          "sha256": "b13b5daa993883d627dad2d2a45d09493f551162993f0febd633ac194f72dbc8"
+        },
+        {
+          "name": "axe-REQ-frequent-selection-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\d47a38f2042071ae40c7aea42a43825280870d67a5568aa6e46b534e4e328e5a.json",
+          "sha256": "d47a38f2042071ae40c7aea42a43825280870d67a5568aa6e46b534e4e328e5a"
+        },
+        {
+          "name": "axe-REQ-frequent-selection-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\09aa6253344951e13b02a3e620373bff742bdbfefbc1827a06cb3ba3d1483fe6.json",
+          "sha256": "09aa6253344951e13b02a3e620373bff742bdbfefbc1827a06cb3ba3d1483fe6"
+        },
+        {
+          "name": "axe-transfer-three-actors-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\510772840a4e4feff7d93f78c1ba75600f652fbf032b32dc4619f5f0ac2f32e7.json",
+          "sha256": "510772840a4e4feff7d93f78c1ba75600f652fbf032b32dc4619f5f0ac2f32e7"
+        },
+        {
+          "name": "axe-transfer-three-actors-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\2245ea6c773586f03bce3ef745bf3b04f871cf939d2cd1fba64182332e6fc2cb.json",
+          "sha256": "2245ea6c773586f03bce3ef745bf3b04f871cf939d2cd1fba64182332e6fc2cb"
+        },
+        {
+          "name": "axe-transfer-three-actors-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\0914b992cf2cfb7eecc1bce524ce7b5f48128e70214e4879694a74251e290183.json",
+          "sha256": "0914b992cf2cfb7eecc1bce524ce7b5f48128e70214e4879694a74251e290183"
+        },
+        {
+          "name": "axe-transfer-three-actors-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\423b0dc3c433766e4ac91619adde9f9445d02b8d5b51c6b0fb368acc41897ffa.json",
+          "sha256": "423b0dc3c433766e4ac91619adde9f9445d02b8d5b51c6b0fb368acc41897ffa"
+        },
+        {
+          "name": "axe-transfer-three-actors-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\510772840a4e4feff7d93f78c1ba75600f652fbf032b32dc4619f5f0ac2f32e7.json",
+          "sha256": "510772840a4e4feff7d93f78c1ba75600f652fbf032b32dc4619f5f0ac2f32e7"
+        },
+        {
+          "name": "axe-transfer-three-actors-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\2245ea6c773586f03bce3ef745bf3b04f871cf939d2cd1fba64182332e6fc2cb.json",
+          "sha256": "2245ea6c773586f03bce3ef745bf3b04f871cf939d2cd1fba64182332e6fc2cb"
+        },
+        {
+          "name": "axe-transfer-three-actors-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\0914b992cf2cfb7eecc1bce524ce7b5f48128e70214e4879694a74251e290183.json",
+          "sha256": "0914b992cf2cfb7eecc1bce524ce7b5f48128e70214e4879694a74251e290183"
+        },
+        {
+          "name": "axe-transfer-three-actors-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-regression-proof\\423b0dc3c433766e4ac91619adde9f9445d02b8d5b51c6b0fb368acc41897ffa.json",
+          "sha256": "423b0dc3c433766e4ac91619adde9f9445d02b8d5b51c6b0fb368acc41897ffa"
+        }
+      ],
+      "reportSha256": "18c6af56b96a9d4117e866a7d4b09c4f53fcaee9df6734f154d48c752cbd7141"
+    },
+    "final": {
+      "stats": {
+        "total": 6,
+        "expected": 6,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "cases": [
+        {
+          "title": "consumo textual recebe complemento próprio, revisão em leitura e confirmação recuperável com débito único e outra sessão atualizada",
+          "projectName": "chromium",
+          "location": {
+            "file": "consumption.spec.ts",
+            "line": 204,
+            "column": 5
+          },
+          "duration": 15945,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "consumo textual recebe complemento próprio, revisão em leitura e confirmação recuperável com débito único e outra sessão atualizada",
+          "projectName": "ios",
+          "location": {
+            "file": "consumption.spec.ts",
+            "line": 204,
+            "column": 5
+          },
+          "duration": 21247,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "apresentações recuperam criação própria, preservam versões e estoque, e recusam código duplicado sem apagar o formulário",
+          "projectName": "chromium",
+          "location": {
+            "file": "presentation-provenance.spec.ts",
+            "line": 133,
+            "column": 5
+          },
+          "duration": 8604,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "apresentações recuperam criação própria, preservam versões e estoque, e recusam código duplicado sem apagar o formulário",
+          "projectName": "ios",
+          "location": {
+            "file": "presentation-provenance.spec.ts",
+            "line": 133,
+            "column": 5
+          },
+          "duration": 12423,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe2 de3 e mantém1 pendente",
+          "projectName": "chromium",
+          "location": {
+            "file": "requisition-pdf-personal-receipt.spec.ts",
+            "line": 287,
+            "column": 5
+          },
+          "duration": 14399,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "title": "ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe2 de3 e mantém1 pendente",
+          "projectName": "ios",
+          "location": {
+            "file": "requisition-pdf-personal-receipt.spec.ts",
+            "line": 287,
+            "column": 5
+          },
+          "duration": 20023,
+          "outcome": "expected",
+          "ok": true
+        }
+      ],
+      "artifacts": [
+        {
+          "name": "consumption-material-pointer",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\8f280e12e1f6bb90eca18c3ff0c5f0bedadeb9efeddbca76a876c4344328570f.json",
+          "sha256": "8f280e12e1f6bb90eca18c3ff0c5f0bedadeb9efeddbca76a876c4344328570f"
+        },
+        {
+          "name": "axe-consumption-supplement-review-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\b5a740dbdda81b976e402e07d3707c49bbb668baa09e5858160d1c5c3b5f1fda.json",
+          "sha256": "b5a740dbdda81b976e402e07d3707c49bbb668baa09e5858160d1c5c3b5f1fda"
+        },
+        {
+          "name": "axe-consumption-supplement-review-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\0b3f8c0356cafc8d12a01231c971a68287cf07fffcdc13b2c2f62d80b7bfa431.json",
+          "sha256": "0b3f8c0356cafc8d12a01231c971a68287cf07fffcdc13b2c2f62d80b7bfa431"
+        },
+        {
+          "name": "axe-consumption-supplement-review-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\c2a179a6fd4e183c7eb953d40574eefd837b2b1fb1d1d7120b958d1c48865e58.json",
+          "sha256": "c2a179a6fd4e183c7eb953d40574eefd837b2b1fb1d1d7120b958d1c48865e58"
+        },
+        {
+          "name": "axe-consumption-supplement-review-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\27b6da2f900657fc0ead2c6e694505c5b66bb1210d7bc031710df052079c8f50.json",
+          "sha256": "27b6da2f900657fc0ead2c6e694505c5b66bb1210d7bc031710df052079c8f50"
+        },
+        {
+          "name": "keyboard-entry-consumption-confirmed-detail-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\c7705a7be4497f017240627623fa3ce1cea4148667d22d5bada0a934d67a9ba3.json",
+          "sha256": "c7705a7be4497f017240627623fa3ce1cea4148667d22d5bada0a934d67a9ba3"
+        },
+        {
+          "name": "axe-consumption-confirmed-detail-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\5658adbcce83fdacd4905c33b4abc96a215fcf5cc77c33d0db9f6fa6f83ab25f.json",
+          "sha256": "5658adbcce83fdacd4905c33b4abc96a215fcf5cc77c33d0db9f6fa6f83ab25f"
+        },
+        {
+          "name": "consumption-material-pointer",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\c648ae0f2034c595bf5932a4f98fd32d6a0b8e4f4b4471628009ccd07b60ad53.json",
+          "sha256": "c648ae0f2034c595bf5932a4f98fd32d6a0b8e4f4b4471628009ccd07b60ad53"
+        },
+        {
+          "name": "axe-consumption-supplement-review-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\b5a740dbdda81b976e402e07d3707c49bbb668baa09e5858160d1c5c3b5f1fda.json",
+          "sha256": "b5a740dbdda81b976e402e07d3707c49bbb668baa09e5858160d1c5c3b5f1fda"
+        },
+        {
+          "name": "axe-consumption-supplement-review-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\0b3f8c0356cafc8d12a01231c971a68287cf07fffcdc13b2c2f62d80b7bfa431.json",
+          "sha256": "0b3f8c0356cafc8d12a01231c971a68287cf07fffcdc13b2c2f62d80b7bfa431"
+        },
+        {
+          "name": "axe-consumption-supplement-review-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\518cdd400c5017fac33c31c69c64a67369dafe8cadceb4c36dd7f53f4c094496.json",
+          "sha256": "518cdd400c5017fac33c31c69c64a67369dafe8cadceb4c36dd7f53f4c094496"
+        },
+        {
+          "name": "axe-consumption-supplement-review-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\f2bddcafd456339e7fdc5a351ee94d5b804f56e12cd5c5eb5431887df24cb435.json",
+          "sha256": "f2bddcafd456339e7fdc5a351ee94d5b804f56e12cd5c5eb5431887df24cb435"
+        },
+        {
+          "name": "keyboard-entry-consumption-confirmed-detail-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\b790c2b70915590fb7e5d3f842e69c71cf581020923a1580c71a244496ccd78b.json",
+          "sha256": "b790c2b70915590fb7e5d3f842e69c71cf581020923a1580c71a244496ccd78b"
+        },
+        {
+          "name": "axe-consumption-confirmed-detail-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\5658adbcce83fdacd4905c33b4abc96a215fcf5cc77c33d0db9f6fa6f83ab25f.json",
+          "sha256": "5658adbcce83fdacd4905c33b4abc96a215fcf5cc77c33d0db9f6fa6f83ab25f"
+        },
+        {
+          "name": "presentation-product-pointer-Material fictício V4 0",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\c33d6ec39b2a536144cc772e37f606f102ce4fa16bda8f853b68fbca05f0b23a.json",
+          "sha256": "c33d6ec39b2a536144cc772e37f606f102ce4fa16bda8f853b68fbca05f0b23a"
+        },
+        {
+          "name": "presentation-product-pointer-Material fictício V4 1",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\c33d6ec39b2a536144cc772e37f606f102ce4fa16bda8f853b68fbca05f0b23a.json",
+          "sha256": "c33d6ec39b2a536144cc772e37f606f102ce4fa16bda8f853b68fbca05f0b23a"
+        },
+        {
+          "name": "axe-presentation-editor-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\76a68ad061876ea0eda3f1fe08b6a4796102c2d7ccaff2a97918d35eac49f35c.json",
+          "sha256": "76a68ad061876ea0eda3f1fe08b6a4796102c2d7ccaff2a97918d35eac49f35c"
+        },
+        {
+          "name": "axe-presentation-editor-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\e2f58b1ec7183e6f30f94041a54357809dbe960783d84f3fd4914be74c1bf233.json",
+          "sha256": "e2f58b1ec7183e6f30f94041a54357809dbe960783d84f3fd4914be74c1bf233"
+        },
+        {
+          "name": "axe-presentation-editor-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\9f3389d5f952877819110cec955963a12aea43d2a19e95c0bf842191bf40eb3e.json",
+          "sha256": "9f3389d5f952877819110cec955963a12aea43d2a19e95c0bf842191bf40eb3e"
+        },
+        {
+          "name": "axe-presentation-editor-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\99e23d53110555207a26f98dd44119f8923cf5d39baee639699884b1888eeb25.json",
+          "sha256": "99e23d53110555207a26f98dd44119f8923cf5d39baee639699884b1888eeb25"
+        },
+        {
+          "name": "presentation-product-pointer-Material fictício V4 0",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\089d928f0322e0f4478d2fcb9df977bf9ab8509812cdb04251c5d335e1a4000a.json",
+          "sha256": "089d928f0322e0f4478d2fcb9df977bf9ab8509812cdb04251c5d335e1a4000a"
+        },
+        {
+          "name": "presentation-product-pointer-Material fictício V4 1",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\089d928f0322e0f4478d2fcb9df977bf9ab8509812cdb04251c5d335e1a4000a.json",
+          "sha256": "089d928f0322e0f4478d2fcb9df977bf9ab8509812cdb04251c5d335e1a4000a"
+        },
+        {
+          "name": "axe-presentation-editor-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\c5a442e5a1bf3dad0f15178792d8265c97ddf6574c128d26b099a6a88f75c602.json",
+          "sha256": "c5a442e5a1bf3dad0f15178792d8265c97ddf6574c128d26b099a6a88f75c602"
+        },
+        {
+          "name": "axe-presentation-editor-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\e2f58b1ec7183e6f30f94041a54357809dbe960783d84f3fd4914be74c1bf233.json",
+          "sha256": "e2f58b1ec7183e6f30f94041a54357809dbe960783d84f3fd4914be74c1bf233"
+        },
+        {
+          "name": "axe-presentation-editor-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\9f3389d5f952877819110cec955963a12aea43d2a19e95c0bf842191bf40eb3e.json",
+          "sha256": "9f3389d5f952877819110cec955963a12aea43d2a19e95c0bf842191bf40eb3e"
+        },
+        {
+          "name": "axe-presentation-editor-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\f99132048d542058c802a432f44c60e41b9a3927e00a84612a00d2e4dc0da476.json",
+          "sha256": "f99132048d542058c802a432f44c60e41b9a3927e00a84612a00d2e4dc0da476"
+        },
+        {
+          "name": "axe-ENT-personal-full-line-review-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\baaed07b1937039915b0b23d31f98cf1b13a087dc5b2d99d72f1e6726b39ff62.json",
+          "sha256": "baaed07b1937039915b0b23d31f98cf1b13a087dc5b2d99d72f1e6726b39ff62"
+        },
+        {
+          "name": "axe-ENT-personal-full-line-review-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\c4470138295f275afec8d35589b36cf782d5afee40854678665b5ee68d845e69.json",
+          "sha256": "c4470138295f275afec8d35589b36cf782d5afee40854678665b5ee68d845e69"
+        },
+        {
+          "name": "axe-ENT-personal-full-line-review-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\91fd4ffa828cb5b24e5d8acdfc383b300aa83cfcced567b8258d5a0088135dca.json",
+          "sha256": "91fd4ffa828cb5b24e5d8acdfc383b300aa83cfcced567b8258d5a0088135dca"
+        },
+        {
+          "name": "axe-ENT-personal-full-line-review-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\db17480288b6d026b15447c86578cfdc2059e4dc24df19afd3a172e543f64914.json",
+          "sha256": "db17480288b6d026b15447c86578cfdc2059e4dc24df19afd3a172e543f64914"
+        },
+        {
+          "name": "axe-ENT-personal-full-line-review-1440",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\6b2aa7d0d3ac86c03bbd96c4e799dd7770203f56efb116522bef30025bbeea35.json",
+          "sha256": "6b2aa7d0d3ac86c03bbd96c4e799dd7770203f56efb116522bef30025bbeea35"
+        },
+        {
+          "name": "axe-ENT-personal-full-line-review-768",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\c7f097e61536c89039d9e3c9d2822770d17cc22e066e36231ec5b7a4e199774c.json",
+          "sha256": "c7f097e61536c89039d9e3c9d2822770d17cc22e066e36231ec5b7a4e199774c"
+        },
+        {
+          "name": "axe-ENT-personal-full-line-review-390",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\dee8c810929dfbebfd85f022e4c3cc5953ddd6d0872b5228f0f5d9e94b9725ed.json",
+          "sha256": "dee8c810929dfbebfd85f022e4c3cc5953ddd6d0872b5228f0f5d9e94b9725ed"
+        },
+        {
+          "name": "axe-ENT-personal-full-line-review-320",
+          "path": "output\\phase-d-work\\ui-canonical\\composed-final-proof\\a56b9612fc71417b43fff343547eaa200fbe8e0b51c73f8ccf39a1567e7cbcae.json",
+          "sha256": "a56b9612fc71417b43fff343547eaa200fbe8e0b51c73f8ccf39a1567e7cbcae"
+        }
+      ],
+      "reportSha256": "48f41da854ca7d3a3321ecc9be350a4dbb6462ae3cebf23203c555c0908e8519"
+    }
+  },
+  "reuseBoundary": "Initial ten passed before internal input-clear correction. All remaining selector consumers exercised in later rounds;presentation management also revalidated by creation/recovery/duplicate test.Only whitespace formatting after principal product round;final source build passed. Initial modal screenshots not retained;computed-style assertions and report retained. Principal shell images retained.",
+  "baseCi": {
+    "sha": "47be43577a452d60420a0a52fe807180136ea9c9",
+    "run": 42584608882,
+    "jobs": [
+      {
+        "id": 129051456224,
+        "name": "validate (windows-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129051456317,
+        "name": "validate (ubuntu-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129051456637,
+        "name": "database",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129057349835,
+        "name": "browser (ios-1)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 129057349880,
+        "name": "browser (mobile)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 129057349960,
+        "name": "browser (chromium)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 129057350075,
+        "name": "browser (ios-2)",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  "baseCiFailure": {
+    "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42584608882/job/129057350075",
+    "cases": [
+      "presentation-editor-1440:20px Fluent trigger",
+      "REQ frequent selection320:20px Fluent trigger",
+      "ENT personal review1440:modal oracle required aria-modal attribute"
+    ],
+    "directedRecheck": "presentation creation and ENT personal case:final6/6;frequent selection:principal both engines PASS",
+    "excerptLfSha256": "05b5dd56ec52b112c99b4f575f4ae8a9d6bc9399c4bf7a535f5e7a1816fa4528"
+  },
+  "newShaCi": "REQUIRED_AFTER_PUSH",
+  "review": "Computed colors/borders/height/sidebar width;five widths;Axe and no-overflow;visual review current390/1440 screenshots.Whole product appearance not approved.",
+  "limits": [
+    "Controlled Chromium/WebKit only",
+    "No physical Android/Chrome/PWA or assistive/human/provider approval",
+    "Fichas tabs and persisted Andamentos pending",
+    "Full source SHA CI pending",
+    "Production NO-GO;PR7 Draft;Sonar owner-deferred"
+  ]
+}

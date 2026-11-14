@@ -105,8 +105,9 @@ as ações efetivamente concluídas. Autorização não é evidência de execuç
 
 ## Ativação gradual do BAL
 
-A cadeia Fluent inclui escalas persistentes e BAL por plantão. Aplicar as
-migrations não habilita nenhum paciente. Após backup, validação e deploy,
+A cadeia histórica de migrations inclui escalas persistentes e BAL por plantão.
+Os nomes SQL históricos são preservados; não definem a aparência vigente.
+Aplicar as migrations não habilita nenhum paciente. Após backup, validação e deploy,
 ative pela interface autenticada somente o paciente de homologação autorizado.
 Confirme agenda, atribuição, elegibilidade e avisos no aplicativo antes de
 habilitar outro paciente. Preserve os regimes existentes; não use fixtures

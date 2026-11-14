@@ -18,8 +18,8 @@ set local role authenticated;
 do $$declare p uuid:='ad000000-0000-4000-8000-000000000001';d jsonb;e jsonb;begin
  perform pg_temp.wa_login('professional');perform public.register_verified_phone();
  perform pg_temp.wa_login('adminA');perform public.family_stock_movement(p,'fralda',20,'inbound','Estoque para aceite com telefone confirmado',gen_random_uuid());
- d:=public.create_supply_document(p,'ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from wa_actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','2'))),gen_random_uuid(),false);
- e:=public.create_supply_document(p,'ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from wa_actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','2'))),gen_random_uuid(),false);
+ d:=public.create_supply_document(p,'ENT',jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',(select id from wa_actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','2'))),gen_random_uuid(),false);
+ e:=public.create_supply_document(p,'ENT',jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',(select id from wa_actors where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','2'))),gen_random_uuid(),false);
  insert into wa_state values('first',d->>'id'),('second',e->>'id'),('worker',gen_random_uuid()::text);
 end;$$;
 reset role;

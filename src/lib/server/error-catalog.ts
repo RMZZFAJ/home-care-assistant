@@ -47,6 +47,31 @@ const reconciliation = {
 
 /** Stable public contracts. Messages may add context without exposing private data. */
 export const errorCatalog = {
+  PDF_ANNOTATIONS_UNSUPPORTED: { ...validation, recommendedAction: "Exporte uma cópia com as anotações e campos incorporados às páginas; confira o conteúdo e envie a cópia." },
+  ATTACHMENT_PENDING: { ...conflict, recommendedAction: "Recupere a mesma tentativa. Resultado pendente impede abandonar o envio." },
+  PUSH_NOT_CONFIGURED: configuration,
+  PUSH_RESULT_UNCONFIRMED: reconciliation,
+  PDF_BYTES_DIVERGE: {
+    ...dependency,
+    recommendedAction:
+      "Solicite a recuperação do exemplar registrado e depois tente baixar novamente.",
+  },
+  PDF_NOT_GENERATED: {
+    ...validation,
+    status: 404,
+    recommendedAction:
+      "Abra Arquivos gerados e solicite explicitamente uma nova emissão desta versão.",
+  },
+  VERIFICATION_UNAVAILABLE: dependency,
+  VERIFICATION_BUSY: dependency,
+  RATE_LIMITED: {
+    ...dependency,
+    status: 429,
+    recommendedAction: "Aguarde um minuto antes de consultar novamente.",
+  },
+  SIGNING_UNAVAILABLE: configuration,
+  CONTENT_INVALID: { ...dependency, retryable: false },
+  SIGNATURE_INVALID: { ...dependency, retryable: false },
   VALIDATION_ERROR: validation,
   INVALID_JSON: validation,
   INVALID_DATE: validation,
@@ -128,6 +153,11 @@ export const errorCatalog = {
     recommendedAction:
       "Atualize a tela e revise o estado e as aprovações atuais.",
   },
+  DRAFT_VERSION_CONFLICT: {
+    ...conflict,
+    recommendedAction:
+      "Compare o preenchimento salvo com o seu e escolha explicitamente a revisão para continuar.",
+  },
   PATIENT_INACTIVE: {
     ...conflict,
     recommendedAction:
@@ -141,6 +171,7 @@ export const errorCatalog = {
   DATABASE_UNAVAILABLE: dependency,
   AUTH_UNAVAILABLE: dependency,
   PERSISTENCE_UNCONFIRMED: reconciliation,
+  REVISION_SAVED_SUBMISSION_PENDING: reconciliation,
   RECEIPT_PENDING: reconciliation,
   NOTIFICATION_RESULT_UNCONFIRMED: {
     ...reconciliation,

@@ -1,0 +1,14 @@
+.hca-identity-list.ui-card { padding: 0; overflow: hidden; }
+.hca-identity-row { display: flex; align-items: center; gap: 13px; padding: 16px 19px; border-bottom: 1px solid #eaf0ec; min-width: 0; color: var(--hca-ink); }
+.hca-identity-row:last-child { border-bottom: 0; }
+.hca-identity-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.hca-identity-main h3 { font-size: 13px; font-weight: 670; }
+.hca-identity-main small { display: block; margin-top: 3px; color: var(--hca-muted); font-size: 11px; }
+.hca-identity-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.hca-identity-management .hca-section-heading h2 { font-size: 19px; font-weight: 700; }
+@media (max-width: 850px) {
+  .hca-identity-row { flex-wrap: wrap; }
+  .hca-identity-main { flex-basis: calc(100% - 47px); }
+  .hca-identity-actions { flex-basis: 100%; }
+}
+@media (max-width: 500px) { .hca-identity-row { padding: 14px; } }

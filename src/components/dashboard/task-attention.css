@@ -1,0 +1,18 @@
+.hca-task-attention-banner {
+  background: linear-gradient(115deg, #e5f1e8, #f4f7f1);
+  border: 1px solid #d7e5d8;
+  padding: 25px;
+  border-radius: var(--hca-radius);
+  min-width: 0;
+}
+.hca-task-attention-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.hca-task-attention-heading > div { min-width: 0; }
+.hca-task-attention-heading > .hca-icon { flex: none; color: var(--hca-teal); width: 28px; height: 28px; }
+.hca-task-attention-banner .hca-task-attention-overline { font-size: 11px; letter-spacing: 1.1px; text-transform: uppercase; color: var(--hca-teal); font-weight: 700; margin: 0 0 7px; }
+.hca-task-attention-banner h2 { font-size: 24px; font-weight: 700; line-height: 1.35; letter-spacing: -.35px; overflow-wrap: anywhere; }
+.hca-task-attention-heading p { margin-top: 9px; color: #54705e; max-width: 660px; overflow-wrap: anywhere; }
+.hca-task-attention-banner > a { margin-top: 18px; }
+@media (max-width: 500px) {
+  .hca-task-attention-banner { padding: 20px; }
+  .hca-task-attention-banner h2 { font-size: 21px; }
+}

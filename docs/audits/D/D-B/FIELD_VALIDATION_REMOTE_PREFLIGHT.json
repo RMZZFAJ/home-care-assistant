@@ -1,0 +1,174 @@
+{
+  "status": "PREFLIGHT_ACCEPTED_FOR_PENDING_ONLY_APPLICATION",
+  "at": "2026-11-08T07:59:20.912Z",
+  "project": "qwfrqychokvhdzakibid",
+  "sourceBase": "f05754d581beaa6da410610d35982ca003e53a65",
+  "before": 150,
+  "target": 151,
+  "pending": 1,
+  "remoteHistorySqlMatched": 150,
+  "compatibility": {
+    "existingIdentitiesPreserved": 407,
+    "existingPublicIdentitiesPreserved": 242,
+    "authoritiesAndGrantsPreserved": true,
+    "changedDefinitions": [
+      "public.configure_patient_access",
+      "public.v4_configure_patient_access",
+      "public.v4_review_patient_access"
+    ],
+    "behavior": "All signatures, authority, CAS and replay retained; omission keeps name, explicit JSON null clears it; new commands reject blank, padded and non-string names; existing proposals/history not rewritten",
+    "newTechnicalData": "No new tables, functions, policies or grants; exactly three existing function bodies extended for explicit removal"
+  },
+  "backup": {
+    "backupId": "e5c5148c-98aa-4b96-92ca-40c1e253048e",
+    "files": 79,
+    "bytes": 11059964,
+    "manifestSha256": "6c10c4cbe977a5f7d20f7ee3c8cfea94a111af196326b5f2cbf7e687bb178618",
+    "verified": true,
+    "restoredTables": 151,
+    "stableTableDigestsMatched": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "foreignKeysChecked": true,
+    "storageObjectsVerified": 33,
+    "pdfDigestsVerified": 32,
+    "signedIssuanceDigestsVerified": 1,
+    "migrationsAppliedToProbe": [
+      "20261108023830_phase_d3_explicit_short_name_removal.sql"
+    ],
+    "catalogueComparison": {
+      "views": false,
+      "columns": true,
+      "indexes": true,
+      "defaults": true,
+      "policies": true,
+      "triggers": true,
+      "functions": true,
+      "relations": true,
+      "constraints": false,
+      "table_grants": true,
+      "function_grants": true
+    },
+    "cronEnabled": false,
+    "networkExtensionEnabled": false,
+    "seconds": 2.911,
+    "operationalRecoveryGate": "D6_NOT_SATISFIED_BY_THIS_PROBE"
+  },
+  "originalTableProjections": 151,
+  "sourcePreservation": {
+    "baseline": "Fresh immediate pre-migration snapshot, not the older backup point",
+    "activitySinceBackup": [
+      {
+        "table": "private.operations_history",
+        "backupRows": 16,
+        "currentRows": 17,
+        "backupSha256": "e73645995ccaf7ecaafe0e70746e3e2c9eb15f28fedd267923c927aef3a6f47d",
+        "currentSha256": "59ca22f123ab156c04a61bfa28ae829e130f7aa64a9640125d21fba7af780c33"
+      },
+      {
+        "table": "private.operations_incidents",
+        "backupRows": 5,
+        "currentRows": 6,
+        "backupSha256": "a6ff36cacc9d70fbd38ec15c94744bef3643dd5bbc463bc3dfc77b2fe02b2e46",
+        "currentSha256": "637d98b1d977ed3540be7e754296621c6117cf9cf595439e6f956856e3fa268d"
+      },
+      {
+        "table": "private.requisition_scheduler_progress",
+        "backupRows": 1,
+        "currentRows": 1,
+        "backupSha256": "6a51112104270af4d6b225f09a55ab4effe987a31c0d69e58a5bf029937133c3",
+        "currentSha256": "6f042cdd02e48d6748741dc616455741f7d2372c0bbbf32d70b803c195e0e228"
+      },
+      {
+        "table": "private.workspace_revisions",
+        "backupRows": 7,
+        "currentRows": 7,
+        "backupSha256": "e2bd3f0249a78cd65f0d306eacd4e8df80146c89a22a8141e2a06f861a9e6b8c",
+        "currentSha256": "4f5e3ff37a48579e11db4a64ca87ca76bfcd29b47ee85524fc71fef93662d1bb"
+      },
+      {
+        "table": "public.audit_events",
+        "backupRows": 646,
+        "currentRows": 652,
+        "backupSha256": "bc663a0100af3d6ef7ed9937d4dac078fc36ae7baedebb05ceafc5ede5a41ea1",
+        "currentSha256": "7a74d552972e569fb9d29cb9b1d387e126a708251b42e813fef18cf7ccb62d58"
+      },
+      {
+        "table": "public.document_events",
+        "backupRows": 156,
+        "currentRows": 162,
+        "backupSha256": "90fe9a15bde34e4af4d97547585b9034d57ef0062248ab9c6472af4d38c5bf68",
+        "currentSha256": "22f3203f1667d185393fb5c6f0d507587de5651f17451a979bf0e3da55d5e22d"
+      },
+      {
+        "table": "public.operational_documents",
+        "backupRows": 13,
+        "currentRows": 13,
+        "backupSha256": "03dd175d1feeaf5faed7c56b543893fbd2a9f0effa05a30847917c3e86115bb3",
+        "currentSha256": "1152c8cef6938224c8cde10b5182ff063358dfe916b3bcdb328b8bad071d5bb4"
+      },
+      {
+        "table": "public.requisition_lifecycle",
+        "backupRows": 9,
+        "currentRows": 9,
+        "backupSha256": "8bee8cfb6fcdab9239b7afa004bc5af00a517e7494b601e830eb4085727fb4b6",
+        "currentSha256": "54fb5dfad61d34cd5ca7a194b9fba1739bb4e3373971a767e17837f676222dd7"
+      },
+      {
+        "table": "public.requisition_notifications",
+        "backupRows": 370,
+        "currentRows": 380,
+        "backupSha256": "25dffd5939f77cc51b4d106f8cbdf90daf963a426eb58a9d83f32445acad4a48",
+        "currentSha256": "70d7f98126054c75d0c849e2507d9ea651a2a3605fe1238f377e4b180541def1"
+      }
+    ],
+    "storageAndHistoryExactSinceBackup": true,
+    "currentSchemaExactSinceBackup": true,
+    "unexpectedMigrationChanges": [],
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_history",
+      "private.operations_incidents",
+      "private.requisition_scheduler_progress",
+      "private.scheduler_health",
+      "private.workspace_revisions",
+      "public.audit_events",
+      "public.document_events",
+      "public.operational_documents",
+      "public.requisition_lifecycle",
+      "public.requisition_notifications"
+    ]
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0,
+    "originalCronStates": [
+      {
+        "active": true,
+        "name": "hca-notification-worker",
+        "schedule": "* * * * *"
+      },
+      {
+        "active": true,
+        "name": "hca-operational-lifecycle",
+        "schedule": "* * * * *"
+      }
+    ]
+  },
+  "dryRun": {
+    "pending": 1,
+    "seeds": [],
+    "roles": [],
+    "skipVault": true
+  },
+  "operationalExternalBackupActive": false,
+  "operationalGo": false
+}

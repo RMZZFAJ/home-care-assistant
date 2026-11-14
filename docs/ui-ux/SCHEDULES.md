@@ -1,5 +1,9 @@
 # Escalas de plantão
 
+**Regra visual vigente:**[Modelo Integral](CANONICAL_MODEL.md). Fluent UI foi
+descartado como aparência; o conteúdo AS_IS abaixo é histórico quando divergir
+da nova direção. Preservar funções e contratos durante a migração integral.
+
 Guia da base funcional auditada e de seus contratos requeridos. Os desvios
 A/B e as mudanças futuras C não foram corrigidos por este documento.
 Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:

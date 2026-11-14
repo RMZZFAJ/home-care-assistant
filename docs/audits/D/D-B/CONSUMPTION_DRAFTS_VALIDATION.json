@@ -1,0 +1,798 @@
+{
+  "increment": "D3.47",
+  "baseSha": "14fdd284f9962104063e83616725cff02d9c96d0",
+  "status": "DIRECTED_LOCAL_IMPLEMENTATION_VALIDATED_OWN_SHA_CI_REQUIRED",
+  "sourceLfSha256": {
+    "src/app/api/consumption/preparations/commit/route.ts": "13ed00fb517aecb5aac79a98ef58844005203982a029090b7f05060b19953ab0",
+    "src/app/api/consumption/preparations/reference/route.ts": "7596326acefb93d42463a8cf381fbe5a9a27e679f54f0cd9d70875720004a6ea",
+    "src/app/api/consumption/preparations/route.ts": "a92e2884624ced2b5ec53c643c29ac4d93ce3172b10c8cb1c65bb93fe8195800",
+    "src/app/canonical-ui.css": "e8a4735c4f8bcd417a68a8cf5a96cd70bda2ca3dac37e1d400e1e70af86a15cb",
+    "src/components/forms/creation-draft-panel.tsx": "eb5519d05949e9a7a0149e54ec23999780c63016e3473fe24b23ee7fb219c2c5",
+    "src/components/forms/record-drawer.tsx": "936d7e5a2bb1c409aa6479284933ddab0696a5edc30fbc1dd5dac4d78e8691d7",
+    "src/components/forms/use-creation-draft.ts": "4810dcad7b7d69a8b081ec12657e708ead645d750c4dc5148ecb64d3437bf778",
+    "src/components/stock/consumption-console.tsx": "e8d8aceba4e887d96eea00950365561f465506d2b0384ceb248a9b8fb4add92e",
+    "src/components/stock/consumption-decision.tsx": "46d3c3cd24e07ef3f5447a0e0c8e1700ec1b32cb0734d6e0e6f349d263c526d2",
+    "src/components/stock/consumption-detail.tsx": "fb59b30de0a05ccab759a0a729eae74959980688c92a116fe5db116f2354d6b0",
+    "src/components/stock/consumption-editor.tsx": "593326782d5537e8ddb8e7f31e7c3d711dce0d028fe8e2e7ae5e468b166d6021",
+    "src/components/stock/consumption-preparation.tsx": "7707ce62b175124df704aedd9320c78e8d25d6653554c39d543956f656991821",
+    "src/components/stock/consumption-private-results.tsx": "884ccb872ee1b63934ef07b8b89080a5c3c4ebaf246dfca915e63bebabc0335b",
+    "src/components/ui/controls.tsx": "5349cf4a23f43f4887c8c9ac85b8442b10475ef69934a8645146f4bbe1752959",
+    "src/components/ui/search-select.tsx": "03cbac416a4c248139f120f04f173cf537d10786b452798c43ad315ee3ae57ea",
+    "src/lib/forms/consumption-preparation-purposes.ts": "051e3a667e804c18adcc6c2d0264b877249fe13bea5e5793302c8e6a91cb21ef",
+    "src/lib/forms/draft-navigation.ts": "dee4167a2cd4f9509196279d89bd7602fa968f4f37394c4ac110ecf03f426a67",
+    "src/lib/validation/consumption-preparations.ts": "992782ecca0ff256feefa8fab1aa5bee77ecf1e9dc7b49c250d294222b5e84de",
+    "src/lib/validation/consumption.ts": "8c226f1c30a2dc13851b71ba5cd987c86f6de131db98b36a695d742c8f139f8d",
+    "src/lib/validation/creation-drafts.ts": "59bb94fdccdf2b3223a4facfe502876a697577ddb57dcacc13c1b7ec2eb6a6f6",
+    "src/lib/validation/private-draft-results.ts": "9aadef5dcc1e2ff0e8d0ced6e8dd6705a3d98d310d1e56b288a34be293dfbbea",
+    "src/lib/validation/supply-drafts.ts": "6407dd74dc1401229c15319f3e7ca4eb338e13867104285a8b6b3e72ee8171fb",
+    "src/types/creation-drafts.ts": "a3b0784c9b08c34ffb02ccbaa66629586fa42535b6c5f71c52eed71d1f3a4df0",
+    "supabase/migrations/20261110064238_phase_d3_consumption_private_preparations.sql": "64d4e0ea87b0dc8bceacd0588fa2f791109e380db42ec4984f62b62e9ebd1c1d",
+    "supabase/migrations/20261110070130_phase_d3_consumption_preparation_alias.sql": "64096983e8ef9264b581260808041e5a2fb95ad6b258c1dc3852d5db6410597f",
+    "supabase/migrations/20261110070459_phase_d3_consumption_preparation_read_recovery.sql": "26d9c8f9e91b5fddd58d5c1aada22240364b4bc7939f4ea4d8819680e570d253",
+    "supabase/migrations/20261110075731_phase_d3_consumption_preparation_catalogue_locks.sql": "d29cc6db2436fce368bfabef00e2fa9a25cdd18c5db94c00b884507cc03de041",
+    "supabase/migrations/20261110080730_phase_d3_consumption_preparation_text_normalization.sql": "9127b20d92c91b62891209dd3b0cd73c0942f75aab9fd170ec9a8fd917b5c6b6",
+    "supabase/migrations/20261110084108_phase_d3_consumption_preparation_reference_scope.sql": "361f73066920ad333237e9cc96e9d01db1df6d06c5b52955a8595e447ad95d13",
+    "tests/api/consumption-preparations-contract.test.ts": "d534220b247e5e208af3e9319528b4c59b05f4ac446346f7c708ce78b513584b",
+    "tests/consumption-preparations.test.ts": "8360d872015a9b4c98a17432404bd48d1e33650d6ddb947a3ccb5ff95a6babe6",
+    "tests/e2e/accessibility-audit.ts": "e82a77d6a873e1922d3a8ef68c100350b607fda9d3fa1f339eb5653872ea3cbc",
+    "tests/e2e/consumption-private-preparation.spec.ts": "7793ddd2cef3d863eab900f2d975b2f6da7b198be45d1b7c0a85d7ea017c81e8",
+    "tests/e2e/consumption.spec.ts": "93ceec8fef578b72acc0d07930a94bdaa45c744692bd67dbc0feaa3f037d6314",
+    "tests/e2e/notification-targets.spec.ts": "12ae081ad722a6f82c9de6acb781d03eedab5c86e0d87d7cb573be2bff7629d7",
+    "tests/e2e/workflows.spec.ts": "6453c032d0b49d85629f7a16cb8243a3ab450d52fcba417be5474484f56c3024",
+    "tests/integration/consumption-preparation-fixtures.mjs": "ef816710eabdd31b72e9fdb4415632c09a42020b2208506a8e316855b6b9c47b",
+    "tests/integration/consumption-preparations.test.mjs": "473af6d0abe73095a8c28f43e0e687c5bbbf80154e1be9a3a0086ace6ba60008",
+    "tests/integration/lock-barrier.mjs": "81744aa6010fbdd8169202b18c740459846c79a27b4ed93c56dae00e4746b669"
+  },
+  "unitApi": {
+    "qualifiedDistinct": 53,
+    "reusedUnchangedConsumers": 41,
+    "latestRepeated": 12,
+    "latestExitCode": 0,
+    "qualification": "Initial51 cases49passed/2failed;retain41 unaffected native/stock/BAL/draft consumers;replace model/API cohorts with final12/12 including raw-reference and exact-read reconciliation cases. Wrong tsx invocation did not execute cases;official Vitest12/12 passed."
+  },
+  "realAuth": {
+    "qualifiedDistinct": 20,
+    "qualifiedCohorts": {
+      "consumption-auth-final.log": {
+        "pass": 16,
+        "fail": 0,
+        "detail": "11 new +5 existing native recovery"
+      },
+      "consumption-auth-origin-precision.log": {
+        "pass": 2,
+        "fail": 0,
+        "addedDistinct": 1
+      },
+      "consumption-auth-catalogue-lock.log": {
+        "pass": 4,
+        "fail": 0,
+        "addedDistinct": 2
+      },
+      "consumption-unicode-auth-final.log": {
+        "pass": 4,
+        "fail": 0,
+        "addedDistinct": 1
+      },
+      "consumption-reference-scope-auth.log": {
+        "pass": 7,
+        "fail": 0,
+        "addedDistinct": 0,
+        "detail": "Five purposes,isolation and strengthened inactive-reference negative after187"
+      }
+    },
+    "stack": "home-care-assistant;API127.0.0.1:54321;DB127.0.0.1:54322",
+    "temporaryProbesRemoved": true,
+    "coverage": [
+      "five native purposes;partial save and no official side effects",
+      "own custody/patient/owner isolation;CAS",
+      "native key collisions and terminal decision",
+      "stale report/reference;quantity precision and Unicode trim",
+      "private journal late revocation rolls back native/private/audit/journal",
+      "reminder origin acknowledged only atomically",
+      "same-balance changed ledger",
+      "real catalogue wait plus authority revocation",
+      "inactive own history/replay/cleanup;new write/current operational reference denied"
+    ]
+  },
+  "typecheck": 0,
+  "directedLint": 0,
+  "browser": {
+    "qualifiedDistinct": 22,
+    "buildMode": "production",
+    "retainedUnchangedFromInitial": 12,
+    "latestRechecked": 10,
+    "qualifiedCases": [
+      {
+        "title": "consumo textual recebe complemento próprio, revisão em leitura e confirmação recuperável com débito único e outra sessão atualizada",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 222,
+          "column": 5
+        },
+        "duration": 21578,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "consumo compara complemento concorrente e só decide após nova revisão da versão atual",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 514,
+          "column": 5
+        },
+        "duration": 12878,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "falta conferida e rejeição motivada têm revisões próprias e nenhuma baixa de estoque",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 703,
+          "column": 5
+        },
+        "duration": 10917,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "relato anterior ao centésimo é acessível por referência e por todas as páginas, sem vazio falso em falha de leitura",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 782,
+          "column": 5
+        },
+        "duration": 9142,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "consumo textual recebe complemento próprio, revisão em leitura e confirmação recuperável com débito único e outra sessão atualizada",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 222,
+          "column": 5
+        },
+        "duration": 39664,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "consumo compara complemento concorrente e só decide após nova revisão da versão atual",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 514,
+          "column": 5
+        },
+        "duration": 17283,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "falta conferida e rejeição motivada têm revisões próprias e nenhuma baixa de estoque",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 703,
+          "column": 5
+        },
+        "duration": 14009,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "relato anterior ao centésimo é acessível por referência e por todas as páginas, sem vazio falso em falha de leitura",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 782,
+          "column": 5
+        },
+        "duration": 11555,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "ocorrência mantém origem e equipe congeladas, recupera resposta perdida e abre o relato vinculado",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "notification-targets.spec.ts",
+          "line": 42,
+          "column": 5
+        },
+        "duration": 17812,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "ocorrência mantém origem e equipe congeladas, recupera resposta perdida e abre o relato vinculado",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "notification-targets.spec.ts",
+          "line": 42,
+          "column": 5
+        },
+        "duration": 23075,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "workflows.spec.ts",
+          "line": 1111,
+          "column": 5
+        },
+        "duration": 25796,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "workflows.spec.ts",
+          "line": 1111,
+          "column": 5
+        },
+        "duration": 36096,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-production-first",
+        "qualification": "Active-patient cases unchanged by187/read-scope freshness guards;test files unchanged"
+      },
+      {
+        "title": "preenchimento de consumo retoma em outra sessão com quantidade incompleta,erro no campo e resultado pessoal exato",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption-private-preparation.spec.ts",
+          "line": 74,
+          "column": 5
+        },
+        "duration": 62624,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      },
+      {
+        "title": "salvar consumo antes da referência conservaNULL até adoção explícita sem sobrescrever a declaração",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption-private-preparation.spec.ts",
+          "line": 217,
+          "column": 5
+        },
+        "duration": 10411,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      },
+      {
+        "title": "decisão privada recupera após perda de escrita e inativação e mantém acesso pessoal separado da leitura operacional",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption-private-preparation.spec.ts",
+          "line": 337,
+          "column": 5
+        },
+        "duration": 64349,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      },
+      {
+        "title": "preenchimento de consumo retoma em outra sessão com quantidade incompleta,erro no campo e resultado pessoal exato",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption-private-preparation.spec.ts",
+          "line": 74,
+          "column": 5
+        },
+        "duration": 32724,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      },
+      {
+        "title": "salvar consumo antes da referência conservaNULL até adoção explícita sem sobrescrever a declaração",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption-private-preparation.spec.ts",
+          "line": 217,
+          "column": 5
+        },
+        "duration": 12169,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      },
+      {
+        "title": "decisão privada recupera após perda de escrita e inativação e mantém acesso pessoal separado da leitura operacional",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption-private-preparation.spec.ts",
+          "line": 337,
+          "column": 5
+        },
+        "duration": 22985,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      },
+      {
+        "title": "consumo recupera a própria confirmação após perder escrita, mas nova decisão e perda de leitura continuam bloqueadas",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 46,
+          "column": 5
+        },
+        "duration": 28669,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      },
+      {
+        "title": "consumo recupera complemento próprio já conferido por outra pessoa sem reabrir o relato ou repetir movimentos",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 137,
+          "column": 5
+        },
+        "duration": 18895,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      },
+      {
+        "title": "consumo recupera a própria confirmação após perder escrita, mas nova decisão e perda de leitura continuam bloqueadas",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 46,
+          "column": 5
+        },
+        "duration": 15835,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      },
+      {
+        "title": "consumo recupera complemento próprio já conferido por outra pessoa sem reabrir o relato ou repetir movimentos",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 137,
+          "column": 5
+        },
+        "duration": 12551,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "consumption-scope-production",
+        "qualification": "Final production recheck"
+      }
+    ],
+    "cohorts": {
+      "consumption-diagnostic-after-gateway": {
+        "stats": {
+          "total": 3,
+          "expected": 2,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "manifestSha256": "6bffde613ce235aceeaf1637e4baed85182683749fcd0563e236653ed579ad13",
+        "reportSha256": "8b70b3b88d4fa3ecbe9b2a673fddf65970a279f4f2c97de125440c65b6ab609e"
+      },
+      "consumption-diagnostic-broad": {
+        "stats": {
+          "total": 7,
+          "expected": 0,
+          "unexpected": 2,
+          "flaky": 0,
+          "skipped": 5,
+          "ok": false
+        },
+        "manifestSha256": "448d7ea72d743cc69a0fa54eb9ffdae8e5d8440891b9e1c250fde09f9fb8a307",
+        "reportSha256": "6a4e0394deb1185b988d3e6d8ac658733d04822a9ef03d3e0e9b837688d6f0bd"
+      },
+      "consumption-diagnostic-first": {
+        "stats": {
+          "total": 3,
+          "expected": 0,
+          "unexpected": 3,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "manifestSha256": "77e2bc2cbca3e178dceea9429f44349ec8a15ba0f12afbaa752d1f54459e15f8",
+        "reportSha256": "1b677be54f274ac989c380198c2b5327a946866cb94acb702f70f4aee025ebe7"
+      },
+      "consumption-diagnostic-recovery": {
+        "stats": {
+          "total": 8,
+          "expected": 7,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "manifestSha256": "a91c2a8df564d76eb3309f8bfb7ca0fc5a66c04949d1a6b2183c84955844b010",
+        "reportSha256": "c6a4e73ad8f284982d2ef659ad49482807d4598567cccda7f29dd7e988d5c826"
+      },
+      "consumption-production-first": {
+        "stats": {
+          "total": 22,
+          "expected": 21,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "manifestSha256": "55639dfdb76b1b6e1240715909148f7fccc452b92e0ebbc7c4af8ad10abeed31",
+        "reportSha256": "f89efbcf6c160e8e81d0ce50a3a5d7708efd1eb1726ae8620766152e4b461815"
+      },
+      "consumption-scope-production": {
+        "stats": {
+          "total": 10,
+          "expected": 10,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "manifestSha256": "c4184ea3a36e94760dc7e16a0e62acc87e7969a6ff03424e05309dbcc6ee4ae0",
+        "reportSha256": "2be4427baa35519a60654328b6aa8fd183f8b20b5ea0fde8e5569b31ee09a039"
+      }
+    },
+    "fiveViewports": [
+      1440,
+      1150,
+      850,
+      500,
+      320
+    ],
+    "reviewOnlyReadAndAxeGeometry": true,
+    "physicalDeviceOrHumanApproval": false,
+    "noSourceMutationDuringRunners": true,
+    "noMutableDbSuiteParallelToRunners": true,
+    "inspectedScreenshots": [
+      "consumption-production-first/6abb6f980a3c88ae3f67b42cfda63cf71027179b.png",
+      "consumption-production-first/bccc6252aabd294bd29ad99b8f3bb006283bd5cf.png",
+      "consumption-scope-production/e255a241067c99d15c0648d6d843ef24b77c12f4.png"
+    ]
+  },
+  "counterproofs": [
+    "PLpgsql42702 before private write;183 alias",
+    "inactive personal read wrongly used active native guard;184 separate live read scope",
+    "Unicode trim command mismatch;186",
+    "raw numeric source spelling/historical fields must remain hash-bound",
+    "inactive current reference leaked operational read;real Auth before187 failed;7/7 after187",
+    "old concurrent case now prevented stale confirmation before HTTP;fixture retains actually reviewed source until attempted stale command then requires explicit fresh adoption",
+    "initial production22 had21pass/1iOS picker outside viewport;real click+viewport+hit-test yields10/10 affected final cases;no force/timeout increase",
+    "late-reference,NULL persistence;private save/commit response loss;cross-session recovery;read loss without reload;wrong-key envelope not cleared"
+  ],
+  "logSha256": {
+    "consumption-auth-catalogue-lock.log": "572b3c0c5837f3c5410cfbe00bd665b8cb5fe03038bbfe94ff30ca7593e8221d",
+    "consumption-auth-final.log": "dcad150a09207a043c58c7f2f7704c119fba65591f95dd697c1af58540e3f164",
+    "consumption-auth-first.log": "d708571cb09f7e015847e6f0bd80efa5b89d17ad181112cddb29d3bc51026c25",
+    "consumption-auth-origin-precision.log": "cbbf8f8e7347e143850ad394dda6c8a5d064a856e0162f556732cca808179768",
+    "consumption-auth-second.log": "dfffa588a1618bb3e89234f7e7493a43b370406c1957f7cfd503c054ea953d61",
+    "consumption-db-alias-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "consumption-db-catalogue-lock-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "consumption-db-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "consumption-db-recovery-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "consumption-db-text-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "consumption-diagnostic-after-gateway.log": "27764ba9288cbab33dabb39c83b0916fef64b68d05050e3165c5c36f76a43edf",
+    "consumption-diagnostic-broad.log": "616d29c608b17ddc39ff93621815f7dba57d933c4fdbe352730c07d906c03f1e",
+    "consumption-diagnostic-recovery.log": "c1a3d31e2d9cc34691de3f227d2756520dc9f66ba8041670d6413a247a2edf33",
+    "consumption-diagnostic-smoke.log": "794981ef3a6ecee003a02e40cb7465f904540fc965e45db1bc14b7d7e2fd286a",
+    "consumption-exact-recovery-format.log": "6c80da8aecbcf196fe0382bcc15b272761ec20d34fa9b628e3269f2e60f08eb2",
+    "consumption-exact-recovery-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "consumption-exact-recovery-types-final.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "consumption-exact-recovery-types.log": "1f4d97fc2792a6ceb4eafac11db6e448ae8abb3642e49ffd6f16135b931eb412",
+    "consumption-final-format.log": "1db8f9e914e8614f631e9bb13184e76e897254b66ab99027ac02bc5aaaba13ff",
+    "consumption-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "consumption-final-source-format.log": "326a3e350f0a78af84bd1804630ba565afdb67eaf21a16924df60ca4ab1ce80e",
+    "consumption-final-source-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "consumption-final-source-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "consumption-final-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "consumption-format.log": "0299fd867fc7bac30ff0d54980f921310d2d6645df5e9c3f7af010a0384091e8",
+    "consumption-inactive-reference-before.log": "f91ae906e73b9c7a239b41a368473971a745db0eeac3198932c1c38f9c869634",
+    "consumption-lint-first.log": "a903d496f4a095a8e93cc61fd1041affdb61f2375c6116a9e2f6113d4ab2efa8",
+    "consumption-lint-second.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "consumption-preproduction-format.log": "2e87da6c04fb82f4e2a3f9569b7affc7e9f77c6d7dd4f60112baa2db6bd436b5",
+    "consumption-preproduction-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "consumption-preproduction-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "consumption-private-read-format.log": "664e0cd15ae6bb7c16aa373fb3827abc8f977747f30a3c35ef9e0cc7239646b9",
+    "consumption-production-first.log": "b10b56839f8da44f75adc3c97da3a4e2065e0a2b78ff254f40251e1f56c4427b",
+    "consumption-query-recovery-format.log": "e6587de15f3775991b726f8bdf8ab90cead1b491501ca4d4b09780e46941338e",
+    "consumption-read-format.log": "aca0d898e163117c470e4157f917b48fcbb9dc7857cb329662690cd06bf433cb",
+    "consumption-read-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "consumption-read-recovery-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "consumption-reference-before.log": "3d9aa6638a6591578dd3b709130632a2fbb305475ab44a8d20d7dd9870dd48a9",
+    "consumption-reference-scope-auth.log": "da0586a25465d41894c6ee0ba419b84cd39ae411fd295211ec2c126bbc82bcbe",
+    "consumption-reference-scope-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "consumption-reference-unit-final.log": "b8f4f2b0bae8a1e8e6cc8c2e784b5c164903fb3a62a26651d0ff19f6be9be889",
+    "consumption-remote-apply.log": "7cedff12406e62a2315ee71e454403013c15d684874eaba52f773b1539cfe449",
+    "consumption-remote-dry-after.log": "d77102c47dbe17725adfd88b5aed2ce8316cf1842517c1af4897c58aa8b70caf",
+    "consumption-remote-dry-before.log": "5f68fd66eb9e8fdb3af4d0f592d3e38e5156654eb9d64af664001d5e5d0545ef",
+    "consumption-scope-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "consumption-scope-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "consumption-scope-production.log": "ca1fd1262a408de1deaa529b2a8b605dae7218a447a37362ffca4961a6a89cb6",
+    "consumption-scope-selection.log": "285a34f645f5597b307038a5bde82c7b45841d104cfa7cd666838b637794a9d5",
+    "consumption-scope-types-final.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "consumption-scope-types.log": "07c0fa5dc4df597be6a5e611803586babe498b505d9b2e452b74c0cd096dba33",
+    "consumption-scope-unit-api-final.log": "a3d7caac134aaa462c097cc440e43fd7989df47df8071f531e1116e9f792f4c7",
+    "consumption-scope-unit-api.log": "662916c0762d25596bc8d89a513d5453329c28d15bb5e515d7bb00496756800d",
+    "consumption-types-first.log": "81ac263fb02377113d51888ca6587ebe6a2bbf9a46d353a8829fe2f4efb67b4e",
+    "consumption-types-second.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "consumption-types-third.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "consumption-unicode-auth-final.log": "20f0b6895d5217bc5d0848a8bf0c4fe80f7f437b568598dddece3180babb0b91",
+    "consumption-unicode-before.log": "b79e05b01fe2caf591982da42f185de5db028f2012a117dd02512bdbbea67614",
+    "consumption-unit-first.log": "7797e2570abd1c00aea1236971057ade5d8862850721cba582a2f24c57974966",
+    "consumption-unit-read-recovery.log": "7525e73c620980e4fd64757232b341b1f20a6bab8ed8c5ec42941fc77d3e9cc0",
+    "consumption-unit-recheck.log": "7a9dc49e26ba43150c452834acc2be0855a0c4a240116c0a027559ffb2ebcb32"
+  },
+  "limits": [
+    "Local controlled synthetic stack;not provider,production,physical device or human proof",
+    "CI of published SHA must validate clean install,legacy evolution and full integration/consumers",
+    "No PWA private cache,no offline replay,no external notification activation",
+    "Flow private reviews,EST-01,stock200 decoder,66/171 and other D-B gates remain"
+  ],
+  "documentaryChecks": {
+    "markdownFiles": 10,
+    "markdownIssues": 0,
+    "newLocalLinksValid": true,
+    "jsonValid": true,
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30ColumnsAndStatesUnchanged": true,
+    "uiStatesUnchanged": 18,
+    "plainOwnerReportCriteria": 105,
+    "historicalMigrationHashesUnchanged": 84,
+    "activeBreakWordsOccurrences": 0,
+    "diffCheckPassed": true,
+    "ownedChangedFiles": 49
+  },
+  "browserFrozenSourceLfSha256": {
+    "src/app/api/consumption/preparations/commit/route.ts": "13ed00fb517aecb5aac79a98ef58844005203982a029090b7f05060b19953ab0",
+    "src/app/api/consumption/preparations/reference/route.ts": "7596326acefb93d42463a8cf381fbe5a9a27e679f54f0cd9d70875720004a6ea",
+    "src/app/api/consumption/preparations/route.ts": "a92e2884624ced2b5ec53c643c29ac4d93ce3172b10c8cb1c65bb93fe8195800",
+    "src/app/canonical-ui.css": "e8a4735c4f8bcd417a68a8cf5a96cd70bda2ca3dac37e1d400e1e70af86a15cb",
+    "src/components/forms/creation-draft-panel.tsx": "eb5519d05949e9a7a0149e54ec23999780c63016e3473fe24b23ee7fb219c2c5",
+    "src/components/forms/record-drawer.tsx": "936d7e5a2bb1c409aa6479284933ddab0696a5edc30fbc1dd5dac4d78e8691d7",
+    "src/components/forms/use-creation-draft.ts": "4810dcad7b7d69a8b081ec12657e708ead645d750c4dc5148ecb64d3437bf778",
+    "src/components/stock/consumption-console.tsx": "e8d8aceba4e887d96eea00950365561f465506d2b0384ceb248a9b8fb4add92e",
+    "src/components/stock/consumption-decision.tsx": "46d3c3cd24e07ef3f5447a0e0c8e1700ec1b32cb0734d6e0e6f349d263c526d2",
+    "src/components/stock/consumption-detail.tsx": "fb59b30de0a05ccab759a0a729eae74959980688c92a116fe5db116f2354d6b0",
+    "src/components/stock/consumption-editor.tsx": "593326782d5537e8ddb8e7f31e7c3d711dce0d028fe8e2e7ae5e468b166d6021",
+    "src/components/stock/consumption-preparation.tsx": "7707ce62b175124df704aedd9320c78e8d25d6653554c39d543956f656991821",
+    "src/components/stock/consumption-private-results.tsx": "884ccb872ee1b63934ef07b8b89080a5c3c4ebaf246dfca915e63bebabc0335b",
+    "src/components/ui/controls.tsx": "5349cf4a23f43f4887c8c9ac85b8442b10475ef69934a8645146f4bbe1752959",
+    "src/components/ui/search-select.tsx": "03cbac416a4c248139f120f04f173cf537d10786b452798c43ad315ee3ae57ea",
+    "src/lib/forms/consumption-preparation-purposes.ts": "051e3a667e804c18adcc6c2d0264b877249fe13bea5e5793302c8e6a91cb21ef",
+    "src/lib/forms/draft-navigation.ts": "dee4167a2cd4f9509196279d89bd7602fa968f4f37394c4ac110ecf03f426a67",
+    "src/lib/validation/consumption-preparations.ts": "992782ecca0ff256feefa8fab1aa5bee77ecf1e9dc7b49c250d294222b5e84de",
+    "src/lib/validation/consumption.ts": "8c226f1c30a2dc13851b71ba5cd987c86f6de131db98b36a695d742c8f139f8d",
+    "src/lib/validation/creation-drafts.ts": "59bb94fdccdf2b3223a4facfe502876a697577ddb57dcacc13c1b7ec2eb6a6f6",
+    "src/lib/validation/private-draft-results.ts": "9aadef5dcc1e2ff0e8d0ced6e8dd6705a3d98d310d1e56b288a34be293dfbbea",
+    "src/lib/validation/supply-drafts.ts": "6407dd74dc1401229c15319f3e7ca4eb338e13867104285a8b6b3e72ee8171fb",
+    "src/types/creation-drafts.ts": "a3b0784c9b08c34ffb02ccbaa66629586fa42535b6c5f71c52eed71d1f3a4df0",
+    "supabase/migrations/20261110064238_phase_d3_consumption_private_preparations.sql": "64d4e0ea87b0dc8bceacd0588fa2f791109e380db42ec4984f62b62e9ebd1c1d",
+    "supabase/migrations/20261110070130_phase_d3_consumption_preparation_alias.sql": "0d16c1c2f26a27b194f8516671b7c467f2bf2d8f43db653e27cadca98c5cf230",
+    "supabase/migrations/20261110070459_phase_d3_consumption_preparation_read_recovery.sql": "26d9c8f9e91b5fddd58d5c1aada22240364b4bc7939f4ea4d8819680e570d253",
+    "supabase/migrations/20261110075731_phase_d3_consumption_preparation_catalogue_locks.sql": "980ef151d50e1955a84628d1b3893455c76d33e60d12dd097d74fe8b2c9d04a8",
+    "supabase/migrations/20261110080730_phase_d3_consumption_preparation_text_normalization.sql": "8d8e1bc9fe5c718b14e3c8237f84f79c32e3169ba573d183477837950b4d8e00",
+    "supabase/migrations/20261110084108_phase_d3_consumption_preparation_reference_scope.sql": "361f73066920ad333237e9cc96e9d01db1df6d06c5b52955a8595e447ad95d13",
+    "tests/api/consumption-preparations-contract.test.ts": "d534220b247e5e208af3e9319528b4c59b05f4ac446346f7c708ce78b513584b",
+    "tests/consumption-preparations.test.ts": "8360d872015a9b4c98a17432404bd48d1e33650d6ddb947a3ccb5ff95a6babe6",
+    "tests/e2e/accessibility-audit.ts": "e82a77d6a873e1922d3a8ef68c100350b607fda9d3fa1f339eb5653872ea3cbc",
+    "tests/e2e/consumption-private-preparation.spec.ts": "7793ddd2cef3d863eab900f2d975b2f6da7b198be45d1b7c0a85d7ea017c81e8",
+    "tests/e2e/consumption.spec.ts": "93ceec8fef578b72acc0d07930a94bdaa45c744692bd67dbc0feaa3f037d6314",
+    "tests/e2e/notification-targets.spec.ts": "12ae081ad722a6f82c9de6acb781d03eedab5c86e0d87d7cb573be2bff7629d7",
+    "tests/e2e/workflows.spec.ts": "6453c032d0b49d85629f7a16cb8243a3ab450d52fcba417be5474484f56c3024",
+    "tests/integration/consumption-preparation-fixtures.mjs": "ef816710eabdd31b72e9fdb4415632c09a42020b2208506a8e316855b6b9c47b",
+    "tests/integration/consumption-preparations.test.mjs": "473af6d0abe73095a8c28f43e0e687c5bbbf80154e1be9a3a0086ace6ba60008",
+    "tests/integration/lock-barrier.mjs": "81744aa6010fbdd8169202b18c740459846c79a27b4ed93c56dae00e4746b669"
+  },
+  "postRunnerFormatting": {
+    "reason": "Staged diff --check sees new files and found extra empty EOF lines in three authoring migrations;working diff before staging did not include untracked files",
+    "changes": [
+      {
+        "file": "supabase/migrations/20261110070130_phase_d3_consumption_preparation_alias.sql",
+        "browserFrozenLfSha256": "0d16c1c2f26a27b194f8516671b7c467f2bf2d8f43db653e27cadca98c5cf230",
+        "finalLfSha256": "64096983e8ef9264b581260808041e5a2fb95ad6b258c1dc3852d5db6410597f"
+      },
+      {
+        "file": "supabase/migrations/20261110075731_phase_d3_consumption_preparation_catalogue_locks.sql",
+        "browserFrozenLfSha256": "980ef151d50e1955a84628d1b3893455c76d33e60d12dd097d74fe8b2c9d04a8",
+        "finalLfSha256": "d29cc6db2436fce368bfabef00e2fa9a25cdd18c5db94c00b884507cc03de041"
+      },
+      {
+        "file": "supabase/migrations/20261110080730_phase_d3_consumption_preparation_text_normalization.sql",
+        "browserFrozenLfSha256": "8d8e1bc9fe5c718b14e3c8237f84f79c32e3169ba573d183477837950b4d8e00",
+        "finalLfSha256": "9127b20d92c91b62891209dd3b0cd73c0942f75aab9fd170ec9a8fd917b5c6b6"
+      }
+    ],
+    "onlyTrailingEmptyLineRemoved": true,
+    "sqlTokensIdentical": true,
+    "noRuntimeSourceChange": true,
+    "databaseDefinitionsAndAppliedStatementsUnchanged": true,
+    "functionalRetestRequired": false
+  },
+  "D3.67": {
+    "baseSha": "5350fd5d9d702493104623046e8e8be48607736b",
+    "scope": "Fixed04.5:consumption report,supplement,custody decision,shortage/rejection and movement origin;read ordering and readiness",
+    "unitApi": {
+      "distinctPassed": 13,
+      "files": [
+        "tests/consumption-follow-up.test.ts",
+        "tests/api/consumption-contract.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "cohort": {
+        "startTime": "2026-11-11T06:29:18.124Z",
+        "duration": 277484.11100000003,
+        "expected": 27,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "readDenialFinal": {
+        "startTime": "2026-11-11T07:01:24.542Z",
+        "duration": 55005.443,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 27,
+      "executions": 30,
+      "failures": 0,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "reports": [
+        "output/phase-d-work/ui-canonical/consumption-follow-up-qualified.json",
+        "output/phase-d-work/ui-canonical/consumption-follow-up-read-denial-final.json"
+      ]
+    },
+    "qualification": "Initial27cases pass with frozen sources.Final source change only clears the prior success message with denied operational read;repeated own-response-recovery case with new real403 assertions and canonical explicit reference in all3profiles.Then formatting only of that existing test.No behavioral assertions removed;old automatic-reference consumers remain in the cohort.",
+    "proofs": [
+      "Real Auth in both FAMILY and CARE_TEAM;native textual report→supplementv2→confirmedv2;decision closes the same version",
+      "Independent SQL:original body,lines,author and time unchanged;one exact2.000000 movement from correct custody to NULL;no effect from supplement or GETs",
+      "Native older GET snapshots:v1 cannot erase v2 complement;pendingv2 cannot reopen confirmedv2 or discard its decision",
+      "Delayed read and503 identify last confirmed data,suspend next-operation controls and recover without official POST",
+      "HTTP200 for another report refused before presentation;actual stock.family.read revocation produces403 and hides operational data",
+      "After lost-response recovery,real read denial also removes prior success text;no new decision or stock effect",
+      "Original response-loss,concurrent complement,explicit newer review,second-session,shortage/rejection and inactive private-recovery consumers pass",
+      "Unknown custody not inferred as CARE_TEAM;confirmed report without movement data not described as zero debit"
+    ],
+    "validation": {
+      "typecheck": "PASS",
+      "directedEslint": "PASS",
+      "axeOverflow": "320px both custodians across3profiles",
+      "visual": "FAMILY Chromium320 follow-up screenshot inspected;not whole-system or physical-device approval",
+      "reactReview": "shared FeedbackBanner;derived guidance;scoped functional read merge;no new dependency,request or authority",
+      "postBrowserChange": "formatting only of added assertions in existing consumption.spec.ts"
+    },
+    "remote": {
+      "project": "qwfrqychokvhdzakibid",
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "completedCheckpoints": [
+        "04.1",
+        "04.2",
+        "04.3",
+        "04.4",
+        "04.5"
+      ],
+      "nextCheckpoint": "04.6"
+    },
+    "limits": [
+      "Own published SHA CI required;earlier SHA not approval",
+      "04.6 BAL and joint validation remain",
+      "DOC-B stays10percent;DOC-A/C/D unimplemented;new PDF appearance and document rules not qualified here",
+      "No new migration,external delivery,merge,production release or security relaxation",
+      "Human,physical-device,provider and operational gates distinct",
+      "Sonar deferred by owner"
+    ]
+  }
+}

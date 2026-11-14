@@ -1,5 +1,11 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
+// Token presence must never authorize provider submissions. The combined
+// uploader stays disabled until D7 separates inspection from submission.
+function requireD7Authorization() {
+  throw new Error("META_TOOL_DISABLED_UNTIL_D7: inspect/submit separation and explicit provider authorization are required.");
+}
+requireD7Authorization();
 const graph = "https://graph.facebook.com/v25.0";
 const names = JSON.parse(
   readFileSync("docs/meta/templates-v4-submission.json", "utf8"),

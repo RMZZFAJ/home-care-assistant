@@ -1,0 +1,915 @@
+{
+  "D3.70": {
+    "baseSha": "81fa08a5e3297de19c7495e5a5a4a1313cce737a",
+    "scope": "05.2 canonical unified document/REQ history;old RequisitionHistory has no consumer and was not refactored",
+    "implementation": [
+      "HTTP list retains native fields and adds exact patient/filter envelope;server and client validate native shape,identity,page,size,total,uniqueness and explicit type",
+      "Shared useScopedRead retains only same-scope valid data and timestamp,clears401/403/404,no false initial zero or empty",
+      "Patient-keyed form preserves focus during query navigation;conditional query reset restores draft filters on Back/Forward;no private business draft or new storage",
+      "Native ordering/date/authorization/protocol/stock/signature contracts retained;inverted document date range rejected400"
+    ],
+    "unitApi": {
+      "passed": 30,
+      "files": [
+        "tests/document-list.test.ts",
+        "tests/language-navigation.test.ts",
+        "tests/api/purchase-origin-contract.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "baselineDefect": {
+        "startTime": "2026-11-11T07:41:29.586Z",
+        "duration": 78410.105,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "initialCohort": {
+        "startTime": "2026-11-11T07:52:36.943Z",
+        "duration": 353599.043,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "affectedFinal": {
+        "startTime": "2026-11-11T08:00:12.182Z",
+        "duration": 134015.098,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 15,
+      "qualification": "Nine initial passes retained;repeat only six failures after test-only readiness/bounds corrections.Runtime sources unchanged after initial cohort.First six failures preserved,not hidden.",
+      "incrementExecutions": 21,
+      "incrementPasses": 15,
+      "initialExpectationFailures": 6,
+      "baselineProductFailureSeparate": 1,
+      "reports": [
+        "document-list-baseline.json",
+        "document-list-first.json",
+        "document-list-affected-final.json"
+      ],
+      "failureDirectories": [
+        "document-list-baseline-81fa08a",
+        "document-list-first-failed"
+      ],
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "counterproofs": [
+      "Baseline HTTP200 without total renders false empty despite real COM;archived screenshot inspected",
+      "Six malformed200 modes cannot replace prior valid read:missing envelope/total,other patient,page,filter,impossible total,duplicate ID",
+      "101REQ plus real COMdraft and ENT;all103 rows and101REQ traversed by pages in independent SQL created_atDESC,idASC order;no losses or duplicate identities;oldest REQ reached by page and code",
+      "Real older no-result response delivered after latest query cannot replace current result;focus preserved,URL/reload and Back/Forward verified",
+      "Initial held503 never claims zero/empty;retry recovers;controlled403 clears prior data;real com.read revocation returns authorized empty;real foreign patient404",
+      "HTTP pageSize101 clamps100 as established contract;invalid date range400",
+      "Complete raw documents,events,movements,science and openings unchanged by list reads/navigation;no UI operational POST",
+      "Existing translated chips/unknown status fallback and dashboard archive-task exact list consumers retain original assertions"
+    ],
+    "testCorrections": [
+      "Date-filter navigation initially was not awaited before Back;added exact URL assertions without relaxing field/result assertions",
+      "Existing pageParameters clamps101 to100;replaced incorrect400 expectation with200 and exact effective100 assertion;no runtime bounds change"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS",
+      "visual": "Fresh initial-error desktop and oldest-REQ320 screenshots inspected;full app parity remains step06",
+      "axe": "New oldestREQ320 and existing translated-chip/status four widths across3profiles",
+      "postInitialProductionChanges": 0
+    },
+    "remote": {
+      "project": "qwfrqychokvhdzakibid",
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2"
+      ],
+      "next": "05.3"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "Other eight list checkpoints and joint validation remain",
+      "Full visual composition/171relations and physical/human/provider gates remain separate",
+      "DOC-B10percent and DOC-A/C/D pending;new PDF/signature/cancellation/draft rules not approved here",
+      "No SQL,merge,production,external activation or security relaxation;Sonar owner-deferred"
+    ]
+  },
+  "D3.71": {
+    "baseSha": "f4b0045fbabc90c4a8a35e07ad9a80c3a796d83f",
+    "scope": "05.3 purchases and receipt collection;query controls only,no new business draft",
+    "implementation": [
+      "Receipt view sorts by instant and ID without mutating the native collection;ordinals precede filters and remain tied to full-view chronology",
+      "Local query by ordinal/material/recorded author/decision and state;20rows per page,all rows reachable;genuine empty versus empty selection",
+      "Read refresh preserves query;new document key resets it;clamps effective page after collection change without effects",
+      "Shared canonical controls;no new dependency,API,RPC,permission,storage,replay or signed-document change"
+    ],
+    "unit": {
+      "qualifiedDistinct": 15,
+      "initialPassed": 14,
+      "initialFailed": 1,
+      "finalRepeated": 6,
+      "retainedUnchanged": 9,
+      "qualification": "The new helper test initially expected Aprovada;existing receipt label is Validada.Corrected only that expectation;all6helper tests pass,retained9purchase-follow-up cases unchanged.",
+      "files": [
+        "tests/purchase-receipt-list.test.ts",
+        "tests/purchase-follow-up.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "cohort": {
+        "startTime": "2026-11-11T08:26:19.508Z",
+        "duration": 217719.513,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctPassed": 18,
+      "executions": 18,
+      "failures": 0,
+      "report": "output/phase-d-work/ui-canonical/purchase-list-qualified.json",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "frozenSources": true
+    },
+    "counterproofs": [
+      "101native COM records,including donation/purchase,all pages exactly match raw SQL created_atDESC,idASC;oldest COM found by code with type retained and page reset",
+      "101native receipts;99pending/1approved/1rejected;exactly1.000000 stock credit before UI read;all receipt pages match raw SQL created_atASC,idASC",
+      "Search101 reaches last receipt;state+text empty is not absence of arrivals;approved receipt retains ordinal3 instead of1;clear restores first20",
+      "Readonly GET503 preserves local query101 and previous receipt;recovery works without extra official POST",
+      "Independent checksum of complete raw documents,lines,events,receipts and ledger unchanged during read/search/pagination;positive counts/states/stock checked separately",
+      "All4existing arrival,decision recovery,rejection,conflict/explicit adoption,expectation closure and distinct-PDF cases pass with their original assertions"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS after setter naming repair,no rule suppression",
+      "reactReview": "Shared canonical controls;derived filter/page;immutable array;per-document key;no new effect/network;serializable client props",
+      "axeOverflow": "320px receipt101 and existing consumer width checks retained",
+      "visual": "Fresh Chromium320 receipt101 inspected;complete heading,author,quantity,unit and controls;not whole-system appearance approval"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3"
+      ],
+      "next": "05.4"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "05.4–05.10 and joint/visual/human/physical/provider gates remain",
+      "Receipt ordinal is a locator in the current view,not an official protocol",
+      "DOC-B10percent and DOC-A/C/D remain;old PDF regression is not new PDF approval",
+      "No SQL,merge,production,external activation or security relaxation;Sonar owner-deferred"
+    ]
+  },
+  "D3.72": {
+    "baseSha": "633b0b909958474b73e5207ff9465dbc10b73885",
+    "scope": "05.4 delivery/personal-task and authorized transfer history lists",
+    "implementation": [
+      "Delivery envelope adds patient,page,size,scope/status to existing data/total;shared summary schema,server and client validation",
+      "useScopedRead replaces independent unvalidated result state;only same-selection valid data retained with timestamp;another selection/patient/page cannot become current;401/403/404 clear data",
+      "Pagination is a named navigation region and is blocked during invalid reads;native filters,own tasks and scopes preserved",
+      "No authorization from recipient identity or metadata;private.delivery_task and ent.read remain native authority"
+    ],
+    "unit": {
+      "passed": 13,
+      "files": [
+        "tests/delivery-list.test.ts",
+        "tests/document-list.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T08:45:46.615Z",
+        "duration": 235262.55000000002,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "volumeFinal": {
+        "startTime": "2026-11-11T08:53:30.202Z",
+        "duration": 118547.368,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 12,
+      "executions": 15,
+      "initialFixtureFailures": 3,
+      "qualifiedBy": "Nine initial passes retained;three volume cases repeated after test-only issuer correction.Runtime unchanged after initial cohort.",
+      "reports": [
+        "delivery-list-first.json",
+        "delivery-list-volume-final.json"
+      ],
+      "failureDirectory": "delivery-list-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "fixtureCorrection": "The extra record initially used adminA as both issuer and recipient.Native contract rightly refused it.The family now issues that record to adminA,keeping distinct authors.No production rule changed;actor import is now used and lint passes.",
+    "counterproofs": [
+      "101real personal receiving tasks and102authorized historical deliveries;all pages exactly match independent SQL created_atDESC,idASC;other recipient excluded from own;tasks resets scope to own",
+      "Six corrupt200 modes rejected:incomplete,foreign patient,page,status,scope,total;prior same-scope valid row retained;wrong new scope error hides previous rows and cannot claim empty",
+      "Real old confirmed response delivered after pending selection cannot replace it;filter focus retained;native empty and recovery remain distinct",
+      "Controlled403 clears previous rows;actual ent.read revocation yields403 and reload exposes no list content",
+      "Read/navigation emit no official POST and preserve raw complete documents/events/ledger",
+      "Original return transfer passes declaration without protocol,three distinct authors,agreement without stock,designated receipt,inactive item,partial receipt and own recovery with existing assertions"
+    ],
+    "validation": {
+      "types": "PASS on unchanged runtime sources",
+      "directedLint": "PASS after test fixture uses actor;no suppression",
+      "visual": "Fresh Chromium320 delivery list inspected",
+      "axe": "New narrow scoped list and existing four-width race/empty consumer across3profiles",
+      "existingTestChange": "Replaced expectation of old-scope caption during changed-filter read with loading and zero old rows;kept response inversion,focus,error/empty and raw ledger assertions"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4"
+      ],
+      "next": "05.5"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "05.5–05.10 and full visual/joint/human/physical/provider gates remain",
+      "No native transfer/document history rewritten;no new PDF appearance or DOC approval",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred",
+      "No SQL,merge,production or external activation"
+    ]
+  },
+  "D3.73": {
+    "baseSha": "e422bb2003ab543ef18c67a2503d4c3f62f2c640",
+    "scope": "05.5 consumption original-text search,filters and complete cursor pages",
+    "implementation": [
+      "Native rows/next preserved;server/client check patient,effective filters,size and requested cursor",
+      "Strict native timestampDESC,UUIDDESC order with PostgreSQL microseconds;unique IDs,last-row cursor,strict advancement and no silent Map deduplication",
+      "Continuation rejects stale generation and repeated request;403/401/404/409 clear accumulated rows;transient read retains only same selection with timestamp and stops further paging until refresh",
+      "URL is the applied query;Back/Forward/reload restore controlled filter fields without replacing focused form;query controls have no business draft"
+    ],
+    "baseline": {
+      "tests": 2,
+      "failed": 2,
+      "report": "consumption-list-baseline.json",
+      "causes": [
+        "Duplicate IDs accepted",
+        "Cursor incorrectly pointing to first row accepted"
+      ]
+    },
+    "unit": {
+      "passed": 21,
+      "files": [
+        "tests/consumption-list.test.ts",
+        "tests/read-state-models.test.ts",
+        "tests/api/consumption-contract.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T09:15:17.676Z",
+        "duration": 245588.64500000002,
+        "expected": 8,
+        "skipped": 0,
+        "unexpected": 4,
+        "flaky": 0
+      },
+      "errorsFinal": {
+        "startTime": "2026-11-11T09:20:11.437Z",
+        "duration": 127722.398,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 12,
+      "executions": 18,
+      "initialTestExpectationFailures": 4,
+      "qualifiedBy": "Six old-consumer initial passes retained;all six new list cases pass after test-only alert scoping and keyboard activation.Four initial failures preserved;two already-passing navigation cases repeated to verify the revised keyboard method.Runtime unchanged.",
+      "reports": [
+        "consumption-list-first.json",
+        "consumption-list-errors-final.json"
+      ],
+      "failureDirectory": "consumption-list-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "counterproofs": [
+      "102reports traversed completely by UI and API in independent SQL created_atDESC,idDESC order;oldest reference and original-body search,date and kind/status filters,reload,real empty and400 inverted period",
+      "Seven corrupt successful initial reads refused:incomplete,foreign patient,filters,size,duplicate IDs,order,next;invalid continuation cursor and503 retain same-selection20rows;403 continuation removes all rows without false empty",
+      "An actual delayed continuation delivered after a new kind/search selection cannot append;focus,Back/Forward and reload preserve applied filters",
+      "Actual RLS revocation of FAMILY read leaves exactly the one CARE_TEAM report;revoking TEAM then produces an authorized empty list,without exposing either custody",
+      "Raw complete original reports,revisions,decisions and ledger preserved by reading/navigation;no operational POST from the query",
+      "Existing lost-confirmation recovery,write denial,read denial,unique debit and oldest-report detail assertions preserved"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS without suppression",
+      "visual": "Fresh Chromium320 consumption list inspected",
+      "axe": "New scoped list320 across3profiles",
+      "existingConsumerChange": "Expanded prior102record case from20to40 UI rows to all102;independent SQL order,old original-body search and dates added;old detail/error/API assertions retained"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5"
+      ],
+      "next": "05.6"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "05.6–05.10 and full visual/joint/human/physical/provider gates remain",
+      "No PDF appearance/signing,stock/decision,permissions or migration contract changed",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred",
+      "No SQL,merge,production or external activation"
+    ]
+  },
+  "D3.74": {
+    "baseSha": "24376c606553e7a6b5213ba3f3fe7c982f31e10e",
+    "scope": "05.6 authorized schedule periods,complete shift collections and calendar filters",
+    "baseline": {
+      "stats": {
+        "startTime": "2026-11-11T09:32:00.394Z",
+        "duration": 83664.241,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "report": "schedule-list-baseline.json",
+      "failureDirectory": "schedule-list-baseline-failed",
+      "cause": "API returned all122 native shifts in exact independent SQL order;UI omitted the overnight shift beginning before the month."
+    },
+    "implementation": [
+      "Reuse existing complete scheduleResourceWorkspaceSchema;GET preserves native data and adds patient/period;server/client check required collections,unique identities,native patient fields,requested period and compatible time zones/windows",
+      "Period validation follows native42-day difference inclusive and returns400 for bad/reversed/oversized ranges",
+      "A carry-in shift appears once on first day with original timestamps and prior-period label;other shifts retain start-day placement;memoized filtered/day grouping avoids formatting every occurrence for every day",
+      "useScopedRead retains only valid same-period data with timestamp and disabled actions during refresh/error;new period never adopts old rows;401/403/404 clear content;native authority unchanged",
+      "Filters remain query-only;hidden team-person filter cannot narrow remaining personal view"
+    ],
+    "unit": {
+      "passed": 28,
+      "files": [
+        "tests/schedule-list.test.ts",
+        "tests/schedule-decisions.test.ts",
+        "tests/schedule-resource-preparations.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T09:41:37.866Z",
+        "duration": 240060.874,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "volumeFinal": {
+        "startTime": "2026-11-11T09:46:35.352Z",
+        "duration": 92930.994,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 15,
+      "executionsAfterFix": 18,
+      "initialAxeOriginFailures": 3,
+      "qualifiedBy": "Twelve initial passes retained;three volume cases repeated using existing auditFromTop after pointer/viewport/scroll changes.Runtime unchanged after initial cohort.All axe rules and assertions retained.",
+      "reports": [
+        "schedule-list-first.json",
+        "schedule-list-volume-final.json"
+      ],
+      "failureDirectory": "schedule-list-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "counterproofs": [
+      "122 native occurrences in month exactly match independent SQL and API order/identities;carry-in appears once;next-month occurrence excluded then reachable;person/status filters and return to month preserve complete collection",
+      "Seven corrupt successful reads rejected:incomplete,patient,period,native nested patient,duplicate,window,zone;prior valid same-period rows remain identified and all edition controls disabled",
+      "Real retained old-month response delivered after current month cannot replace it;new-period503 shows neither old rows nor false empty;valid empty is separate",
+      "Controlled403 clears content;actual schedule.read.team/own revocation returns403 and reload hides agenda;real own Auth returns only own occurrences;foreign patient404;invalid ranges400",
+      "Read/navigation preserve full native shifts,series,types,change requests,events andBAL assignments;no operational schedule POST in query case",
+      "Existing original creation,overnight duration,overlap409,mobile context,503 recovery,keyboard focus,immutable before/after review and four widths retain assertions"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS without suppression",
+      "visual": "Fresh Chromium320 carry-in card inspected;original date range and label legible",
+      "axe": "Fresh month from known top origin320 and unchanged old four-width review checks",
+      "testOnlyAdjustment": "After card screenshot and viewport/filter interaction,the initial axe scan saw a partially clipped month button beneath sticky header.Existing auditFromTop restores known scroll/focus origin;no rule,selector assertion or product source removed."
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6"
+      ],
+      "next": "05.7"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "05.7–05.10 and full visual/joint/human/physical/provider gates remain",
+      "Native workspace events remain limited100;complete event history belongs to05.10 and is not approved here",
+      "No new SQL,authorization engine,PDF/signing,stock or decision change",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred",
+      "No merge,production or external activation"
+    ]
+  },
+  "D3.75": {
+    "baseSha": "0d4b7b108cb26827bff775d97fca25d20925c42e",
+    "scope": "05.7 complete patient catalogue and global identity directories",
+    "implementation": [
+      "New stable SECURITY INVOKER catalogue_workspace aggregates full catalogue and successor guidance in one snapshot under original grants/RLS and selected real Auth membership;no table-result1000 cap",
+      "GET catalog/admin catalogue preserve existing row fields,identities,aliases,inactive guidance and successor semantics;server and UI validate patient,total,selection and uniqueness",
+      "Catalogue queries use useScopedRead with same-scope timestamp and suspended list actions on failure;denial clears;query fields do not acquire drafts;last page clamps after changed collection",
+      "GlobalAccounts uses existing30-row native paginated RPC endpoint with exact count/search/query scope;URL,Back and reload preserve query;incomplete or wrong page/query/count refused;four approved global classifications retained and unknown stored value cannot adopt first option implicitly",
+      "Global membership picker shares response validation;parent no longer downloads unpaged global profiles/catalogue for these directory screens",
+      "Explicit acknowledge/discard clears transient fields/hash until fresh private snapshot;prevents a user choice being overwritten by the asynchronous fresh read"
+    ],
+    "unit": {
+      "passed": 31,
+      "files": [
+        "tests/catalogue-list.test.ts",
+        "tests/catalog-match.test.ts",
+        "tests/administrative-preparations.test.ts"
+      ]
+    },
+    "database": {
+      "localPrepare": "PASS without reset;home-care-assistant,54321/54322",
+      "nativeAuthTests": 1,
+      "file": "tests/integration/catalogue-completeness.test.mjs",
+      "proofs": [
+        "More than1000 native items exactly match independent SQL order/count;old tabular result is1000 with larger exact count",
+        "Late inactive/source/successor guidance intact;real reader positive;foreign patient,other context,global mode,revoked membership and anonymous denied",
+        "Invoker,STABLE,authenticated-only execute;items,guidance and ledger unchanged"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuthViewers": true,
+      "syntheticDirectoryAuthRows": "Bulk local target identities;not logged-in users or remote fixtures",
+      "initial": {
+        "startTime": "2026-11-11T10:21:59.575Z",
+        "duration": 542098.745,
+        "expected": 24,
+        "skipped": 0,
+        "unexpected": 3,
+        "flaky": 0
+      },
+      "ackFinal": {
+        "startTime": "2026-11-11T10:32:58.132Z",
+        "duration": 167403.68600000002,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 30,
+      "executions": 33,
+      "initialRealFailures": 3,
+      "qualifiedBy": "Twenty-four initial passes retained;three legacy catalogue cases and three additional recipient cases pass final.Both shared hook consumers cover explicit acknowledgement;unaffected branch proofs retained.",
+      "reports": [
+        "catalogue-directory-first.json",
+        "catalogue-directory-ack-final.json"
+      ],
+      "failureDirectory": "catalogue-directory-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "regression": "Legacy reactivation accepted fields after acknowledging previous result while fresh private GET was pending;later read reset choice/reason.Three failures retained.Product clears stale local fields/hash after explicit acknowledgement/discard.Held real GET now proves no editable choice before fresh result;original reactivation/recovery assertions retained.",
+    "counterproofs": [
+      "Catalogue API returns all1005+items in independent SQL order;all101 late search matches traverse7 UI pages;old inactive alias and active successor predecessor labels remain available",
+      "Global directory has1005 filler Auth rows before101 late targets;all101 search identities traverse4 UI pages in SQL order;Back/reload and wrong/incomplete reads,503 and403 handled without identity edits",
+      "Real catalogue manage revocation403 clears rows;real local administrator cannot read global profile pages",
+      "Raw catalogue,successors,stock,documents and target profiles remain unchanged by directory reads",
+      "Original100-item REQ/COM/ENT selection preserves aliases,keyboard,categories,manual entry;old successor preserves stock/PDF bytes,lost-result recovery and personal selection;global proposal rejects changed/rebased attempts;global identity review preserves own and local isolation"
+    ],
+    "validation": {
+      "types": "PASS after race correction",
+      "directedLint": "PASS",
+      "axe": "New catalogue/profile320 and old directed consumers across3profiles",
+      "visual": "Fresh profile page320 inspected and legible.Catalogue late-item capture inspected;existing narrow table wraps status/clips initially offscreen actions,retained for06.4 full appearance review.No broad visual approval."
+    },
+    "remote": {
+      "versions": 206,
+      "migration": "20261111095717_phase_d3_complete_catalogue_read.sql",
+      "receipt": "CATALOGUE_LIST_REMOTE.json",
+      "pending": 0,
+      "localRemoteFunctionAndHistoryMatch": true,
+      "advisorsSameClassesAndCounts": true,
+      "localAdvisorLimitation": "CLI TCP connection timeout;remote MCP before/after completed;existing findings not approved"
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6",
+        "05.7"
+      ],
+      "next": "05.8"
+    },
+    "limits": [
+      "Own SHA CI,clean install/legacy evolution/full integration required",
+      "05.8–05.10 and other phase gates remain;legacy unpaged compatibility response is not the global screen data source",
+      "Catalogue320 table composition remains06.4;global editor ordinary fields/lifetime remain14",
+      "DOC-B10percent;DOC-A/C/D pending;new PDF appearance not approved",
+      "No merge,production,remote fixtures/Auth/Vault/reset or external activation"
+    ]
+  },
+  "D3.76": {
+    "baseSha": "aacc89dfcf0d29c091dbe5ea5123a33360da9d69",
+    "scope": "05.8 complete personal notification history and filters",
+    "baseline": {
+      "unitPassed": 12,
+      "unitFailed": 1,
+      "counterproof": "One row accepted with total21,page1,pageSize20 before parser correction",
+      "report": "notification-list-baseline.json"
+    },
+    "unit": {
+      "passed": 19,
+      "file": "tests/notification-inbox.test.ts"
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T10:57:34.968Z",
+        "duration": 348325.853,
+        "expected": 15,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "final": {
+        "startTime": "2026-11-11T11:04:36.001Z",
+        "duration": 180585.629,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 21,
+      "executions": 27,
+      "initialRealFailures": 6,
+      "qualifiedBy": "15 unchanged old cases initially pass;6 new cases pass after immediate controlled checkbox correction;no test weakened",
+      "reports": [
+        "notification-list-first.json",
+        "notification-list-final.json"
+      ],
+      "failureDirectory": "notification-list-first-failed",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "implementation": [
+      "Bind successful response to requested patient/page/pageSize/unread/surface;expected row count,unique identities and compatible row filters",
+      "Immediate controlled query synchronized with URL,Back and reload without remount or business draft",
+      "Keep only valid same-selection retained read with timestamp;403 clears;page and mark-seen actions await fresh read;original auth/session/RLS unchanged"
+    ],
+    "counterproofs": [
+      "102 native notices across6 UI pages exactly match independent SQL identities/order;oldest retained",
+      "Unread selection,Back,reload and bell excluding silent notices preserve distinct counts",
+      "Wrong page,size,filter,surface,patient,short page,duplicate and503 rejected without false empty or stale actions",
+      "Retained real old response cannot replace new filter;new-filter503 clears prior selection;403 clears content",
+      "Read/navigation leave full notifications,documents,events and ledger unchanged with no POST;explicit mark seen changes only selected notice and no official facts",
+      "Original bell focus/guide/isolation,close-without-science,silent filtering,context and controlled provider distinctions remain"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS",
+      "axe": "All rules retained;new oldest-page320 plus old directed consumer widths",
+      "visual": "Fresh oldest notification page320 inspected;not global appearance approval"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 206,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6",
+        "05.7",
+        "05.8"
+      ],
+      "next": "05.9"
+    },
+    "limits": [
+      "Own published SHA CI required;remaining05.9/05.10 and full phase gates",
+      "No new SQL,authorization,notification provider,SCI,stock,PDF/signing,cache or offline replay",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred;physical/human/provider gates separate",
+      "No merge,production,external activation or remote fixtures/Auth/Vault/reset"
+    ]
+  },
+  "D3.77": {
+    "baseSha": "caee35c61d793cbd583d3ce684cfdcafce287b04",
+    "scope": "05.9 complete old governance proposals and scoped recovery",
+    "unit": {
+      "passed": 50,
+      "files": [
+        "tests/governance-list.test.ts",
+        "tests/governance-presentation.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "initial": {
+        "startTime": "2026-11-11T11:15:25.115Z",
+        "duration": 275470.75299999997,
+        "expected": 9,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "volumeFinal": {
+        "startTime": "2026-11-11T11:21:28.769Z",
+        "duration": 99226.987,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 9,
+      "executions": 12,
+      "qualifiedBy": "Six unaffected initial cases retained;three volume cases final include same-filter refresh when normalizing URL;all12 executions pass",
+      "reports": [
+        "governance-list-first.json",
+        "governance-list-volume-final.json"
+      ],
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "implementation": [
+      "Native RPC and approval semantics preserved;server/client validate complete scoped page and native patient IDs",
+      "Reuse useScopedRead;retain only valid same-selection result with timestamp,disable stale decisions;denial clears;no false empty",
+      "Controlled query form remains mounted;URL/Back/reload and focused Enter;no business draft or persistence"
+    ],
+    "counterproofs": [
+      "101pending and202all proposals traverse6/11pages exactly matching independent SQL order,including oldest pending",
+      "Incomplete,patient,native patient,page,status,query,short andduplicate200 rejected;503 same-scope retained;other-search503 not empty;held old response ignored;403 clears",
+      "New reads send no POST and preserve full proposals,settings,memberships,overrides,ledger",
+      "Original five-type comparison,unknown future kind/status/fields,global readonly,foreign patient denial,explicit local approval and unchanged ledger retain assertions"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedLint": "PASS",
+      "axe": "All rules;new320 plus original four widths",
+      "visual": "Fresh oldest proposal page320 inspected;full visual gate remains",
+      "lastServerGuardReview": {
+        "change": "Preserve native RPC page/pageSize before shared validation;only trusted scope/filter metadata added",
+        "unchanged": "RPC,query and valid successful response unchanged",
+        "checks": "Shared parser16 unit cases repeated;final types and directed API lint",
+        "browserReuse": "Qualified successful-path cohorts retained;no claim of native RPC fault injection"
+      }
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 206,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6",
+        "05.7",
+        "05.8",
+        "05.9"
+      ],
+      "next": "05.10"
+    },
+    "limits": [
+      "Own SHA CI and full phase gates required",
+      "05.10 native audit/history completeness remains;no new DB grants,authorization,approval engine,PDF or offline replay",
+      "DOC-B10percent;DOC-A/C/D pending;Sonar deferred;human/physical/provider gates separate",
+      "No merge,production,remote mutation or external activation"
+    ]
+  },
+  "D3.78": {
+    "baseSha": "926a26d2313f7b68a4ed42b1e884db8014453334",
+    "scope": "05.10 audit and schedule history;fixed stage05 locally closed",
+    "unit": {
+      "passed": 40,
+      "files": [
+        "tests/operational-history.test.ts",
+        "tests/read-history.test.ts"
+      ]
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuthReaders": true,
+      "syntheticHistoryRows": "Native local SQL records;not actual shift/attendance/invitation proof",
+      "initial": {
+        "startTime": "2026-11-11T11:45:26.022Z",
+        "duration": 339796.402,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "captureFinal": {
+        "startTime": "2026-11-11T11:51:59.847Z",
+        "duration": 129471.772,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 18,
+      "executions": 21,
+      "qualifiedBy": "15 initial unaffected cases retained;3 history volume cases final correct screenshot framing only;product unchanged",
+      "reports": [
+        "operational-history-first.json",
+        "operational-history-capture-final.json"
+      ],
+      "initialCaptures": "operational-history-first-captures",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "implementation": [
+      "Audit server/client verify native page,patient,filters,unique IDs and exact window;controlled mounted query retains focus and URL/Back",
+      "Schedule GET events uses existing authenticated SELECT/RLS;own predicate and actual selected capabilities,post-read scope recheck;no schema/grant changes",
+      "Complete paged history separate from legacy100-event compatibility snapshot;preserved authors/reasons/instants and all native identities;no business draft/cache/replay"
+    ],
+    "counterproofs": [
+      "201audit events and202team/101own schedule events compared with independent SQL;all relevant pages and oldest reachable beyond old100 snapshot",
+      "Wrong context,reader,page,filters,short page,duplicate andforeign own row refused;503 retains only valid same selection;403 clears;old response ignored",
+      "Native audit.read and schedule.read.own revocations;anonymous401,denied403,foreign patient404;literal LIKE percent/underscore and SaoPaulo day filters;bad dates/ranges/page/reference400",
+      "Read/navigation preserve full audit/events/shifts/series/ledger with no operational POST;negative authorization fixtures deliberate",
+      "Original audit201,reference/date,unabortable late response and native schedule creation/overlap assertions retained"
+    ],
+    "validation": {
+      "localPrepare": "home-care-assistant54321/54322;206 migrations without reset",
+      "types": "PASS",
+      "directedLint": "PASS without suppression;query builders complete before stable decoder",
+      "axe": "All rules retained;new320 plus original four widths",
+      "visual": "Fresh320 complete-page clipped region inspected;initial auto-scrolled element capture preserved;full visual gate remains"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 206,
+      "project": "qwfrqychokvhdzakibid",
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 57,
+      "partial": 48,
+      "fixedStages": 20,
+      "completedListCheckpoints": [
+        "05.1",
+        "05.2",
+        "05.3",
+        "05.4",
+        "05.5",
+        "05.6",
+        "05.7",
+        "05.8",
+        "05.9",
+        "05.10"
+      ],
+      "stage05": "CONCLUIDO_LOCAL",
+      "promoted": [
+        "D-B-AC-002"
+      ],
+      "retainedPartial": "C-NEW-AC-016;cross-session joint check remains19",
+      "next": "06.1"
+    },
+    "limits": [
+      "Own SHA CI,stage19 joint cross-session and full phase gates remain",
+      "Legacy schedule_workspace100 snapshot retained for compatibility;active UI uses complete independently authorized paginated read",
+      "DOC-B10percent;DOC-A/C/D pending;full model appearance remains06 and15;Sonar deferred",
+      "No new SQL,remote data/Auth/Vault/reset,merge,production or external activation"
+    ]
+  }
+}

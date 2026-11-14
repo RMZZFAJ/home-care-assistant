@@ -1,7 +1,8 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, existsSync, statSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { trustedExecutable } from "./trusted-executable.mjs";
 
 export const testProject = "home-care-assistant";
 export const testRoot = resolve(process.cwd());
@@ -29,7 +30,7 @@ export function assertLocalProject({ running = true } = {}) {
     try {
       labels = JSON.parse(
         execFileSync(
-          "docker",
+          trustedExecutable("docker"),
           ["inspect", testContainer, "--format", "{{json .Config.Labels}}"],
           { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
         ),
@@ -56,9 +57,14 @@ export function getTestEnvironment() {
   try {
     status = JSON.parse(
       execFileSync(
-        "supabase",
+        trustedExecutable("supabase"),
         ["status", "--workdir", testRoot, "-o", "json"],
-        { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+        {
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+          // Supabase itself locates Docker. Do not forward an inherited search path.
+          env: { ...process.env, PATH: dirname(trustedExecutable("docker")) },
+        },
       ),
     );
   } catch {
@@ -86,7 +92,17 @@ export function getTestEnvironment() {
   };
 }
 
-export async function waitForLocalDataApi() {
+export async function dataApiIsReady(response, requiredPaths = ["/rpc/run_operational_schedule"]) {
+  if (!response.ok) return false;
+  try {
+    const schema = await response.json();
+    return schema.swagger === "2.0" && requiredPaths.length > 0 && requiredPaths.every((path) => Object.hasOwn(schema.paths ?? {}, path));
+  } catch {
+    return false;
+  }
+}
+
+export async function waitForLocalDataApi({ legacy = false } = {}) {
   const env = getTestEnvironment();
   for (let attempt = 0; attempt < 45; attempt++) {
     try {
@@ -97,7 +113,9 @@ export async function waitForLocalDataApi() {
         },
         signal: AbortSignal.timeout(2000),
       });
-      if (response.ok) return;
+      // The service role intentionally has no table grants in the current
+      // schema. OpenAPI must expose its allowlisted RPC, not user-only tables.
+      if (await dataApiIsReady(response, legacy ? ["/products", "/profiles"] : ["/rpc/run_operational_schedule"])) return;
     } catch {
       /* Reset restarts the local REST schema cache. */
     }
@@ -109,7 +127,6 @@ export async function waitForLocalDataApi() {
 }
 
 export function assertLocalReplay() {
-  getTestEnvironment();
   const backupIndex = process.argv.indexOf("--backup");
   const backup = backupIndex >= 0 ? process.argv[backupIndex + 1] : undefined;
   if (!process.argv.includes("--replay-local") || !backup) {
@@ -117,6 +134,7 @@ export function assertLocalReplay() {
       "Local reset/replay requires explicit --replay-local --backup <verified backup file>. Ordinary prepare never resets data.",
     );
   }
+  getTestEnvironment();
   const file = resolve(backup);
   if (
     !existsSync(file) ||
@@ -146,7 +164,7 @@ export function assertLocalReplay() {
 export function sql(statement) {
   assertLocalProject();
   const result = spawnSync(
-    "docker",
+    trustedExecutable("docker"),
     [
       "exec",
       "-i",
@@ -161,8 +179,10 @@ export function sql(statement) {
       "-v",
       "ON_ERROR_STOP=1",
     ],
-    { input: statement, encoding: "utf8" },
+    { input: statement, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
   );
+  if (result.error)
+    throw new Error(`Local SQL process failed: ${result.error.code ?? "UNKNOWN"}`, { cause: result.error });
   if (result.status !== 0)
     throw new Error(`Local SQL failed: ${result.stderr.trim()}`);
   return result.stdout.trim();
@@ -170,4 +190,16 @@ export function sql(statement) {
 
 export function sqlLiteral(value) {
   return `'${String(value).replaceAll("'", "''")}'`;
+}
+
+export function pauseLocalAutomationForTests() {
+  // SQL verifies the local container. Use pg_cron's supported API rather than
+  // editing its extension-owned table. Legacy replay may predate pg_cron.
+  sql(`do $$declare job record;begin
+    if to_regclass('cron.job') is not null then
+      for job in select jobid from cron.job where active and jobname in ('hca-operational-lifecycle','hca-notification-worker') loop
+        perform cron.alter_job(job.jobid,active=>false);
+      end loop;
+    end if;
+  end;$$;`);
 }

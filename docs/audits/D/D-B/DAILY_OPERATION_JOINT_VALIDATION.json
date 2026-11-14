@@ -1,0 +1,450 @@
+{
+  "at": "2026-11-11T18:31:15.667141+00:00",
+  "increment": "D3.85",
+  "checkpoint": "06.6",
+  "status": "COMPLETE_LOCAL_SCOPED_46_DAILY_COMPOSITIONS",
+  "baseSha": "e8a6adba1fc922ecd44950190c8cad17c40fe538",
+  "distinctQualifiedCases": 47,
+  "rounds": [
+    {
+      "report": "daily-joint-first.json",
+      "stats": {
+        "startTime": "2026-11-11T17:53:52.855Z",
+        "duration": 969494.073,
+        "expected": 34,
+        "skipped": 0,
+        "unexpected": 4,
+        "flaky": 0
+      }
+    },
+    {
+      "report": "daily-joint-final.json",
+      "stats": {
+        "startTime": "2026-11-11T18:12:36.080Z",
+        "duration": 657762.98,
+        "expected": 17,
+        "skipped": 0,
+        "unexpected": 5,
+        "flaky": 0
+      }
+    },
+    {
+      "report": "daily-joint-focus-final.json",
+      "stats": {
+        "startTime": "2026-11-11T18:24:46.613Z",
+        "duration": 379812.446,
+        "expected": 8,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "6f6ee950b354ed29a21a-3340cfebd83b6248563a",
+      "project": "chromium",
+      "file": "bal-recount-succession.spec.ts",
+      "title": "BAL reconto sem contador mostra recuperação, preserva motivo no conflito e exige adoção explícita do plantão atual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "6f6ee950b354ed29a21a-bd0c91bbc863f2953d53",
+      "project": "mobile",
+      "file": "bal-recount-succession.spec.ts",
+      "title": "BAL reconto sem contador mostra recuperação, preserva motivo no conflito e exige adoção explícita do plantão atual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "6f6ee950b354ed29a21a-bdfa7a569693a3d58bc8",
+      "project": "ios",
+      "file": "bal-recount-succession.spec.ts",
+      "title": "BAL reconto sem contador mostra recuperação, preserva motivo no conflito e exige adoção explícita do plantão atual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "cdd9280e3362432045cd-c8ca8aed1d5a31952140",
+      "project": "chromium",
+      "file": "canonical-foundation.spec.ts",
+      "title": "UIR fundação compara modal ao HTML em cinco larguras e conserva foco e leitura",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "cdd9280e3362432045cd-bdcde525915cd61b35b4",
+      "project": "mobile",
+      "file": "canonical-foundation.spec.ts",
+      "title": "UIR fundação compara modal ao HTML em cinco larguras e conserva foco e leitura",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "cdd9280e3362432045cd-d92984db9311a57a90eb",
+      "project": "ios",
+      "file": "canonical-foundation.spec.ts",
+      "title": "UIR fundação compara modal ao HTML em cinco larguras e conserva foco e leitura",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "056684ca5dd92ad3418d-b014e6b91be23fb01bd2",
+      "project": "chromium",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "056684ca5dd92ad3418d-9083aa04835883a83b6d",
+      "project": "mobile",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "056684ca5dd92ad3418d-5ed81db3a51c9cbb0ebf",
+      "project": "ios",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 3
+    },
+    {
+      "id": "596a783f5e7a837cad9d-1832841a267c79ffd2e2",
+      "project": "chromium",
+      "file": "com-decision-private-drafts.spec.ts",
+      "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "596a783f5e7a837cad9d-f696c7749bb9d0c460c5",
+      "project": "chromium",
+      "file": "com-decision-private-drafts.spec.ts",
+      "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "596a783f5e7a837cad9d-802d83f3d4b8d2620617",
+      "project": "mobile",
+      "file": "com-decision-private-drafts.spec.ts",
+      "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "596a783f5e7a837cad9d-04585e60291823ae1969",
+      "project": "mobile",
+      "file": "com-decision-private-drafts.spec.ts",
+      "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "596a783f5e7a837cad9d-7c698d484c2020b72b47",
+      "project": "ios",
+      "file": "com-decision-private-drafts.spec.ts",
+      "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "596a783f5e7a837cad9d-0707ae51bedb525e5d68",
+      "project": "ios",
+      "file": "com-decision-private-drafts.spec.ts",
+      "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "ff66ac1feeeae606697b-3c68a8362cae547ce474",
+      "project": "chromium",
+      "file": "document-tabs.spec.ts",
+      "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "ff66ac1feeeae606697b-1792e94672aea3a69586",
+      "project": "mobile",
+      "file": "document-tabs.spec.ts",
+      "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "ff66ac1feeeae606697b-815696c4a9f0ae09523c",
+      "project": "ios",
+      "file": "document-tabs.spec.ts",
+      "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "4e26a61823a7993f0ffa-0104064235804821a62c",
+      "project": "chromium",
+      "file": "read-state-consumers.spec.ts",
+      "title": "D3 consumo distingue demora vazio dados falha e repetição sem inventar movimentação",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "4e26a61823a7993f0ffa-469213ad28d2bd85374b",
+      "project": "mobile",
+      "file": "read-state-consumers.spec.ts",
+      "title": "D3 consumo distingue demora vazio dados falha e repetição sem inventar movimentação",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "4e26a61823a7993f0ffa-7bf6eef9be32a253c850",
+      "project": "ios",
+      "file": "read-state-consumers.spec.ts",
+      "title": "D3 consumo distingue demora vazio dados falha e repetição sem inventar movimentação",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "91db00790c2d4297df8d-9adbf214c5c258a445b5",
+      "project": "chromium",
+      "file": "record-drawer-focus.spec.ts",
+      "title": "RecordDrawer 390: continuar, descartar, Escape e salvar conservam foco e intenção",
+      "status": "expected",
+      "round": 3
+    },
+    {
+      "id": "91db00790c2d4297df8d-49c9c23f07a99d45c164",
+      "project": "chromium",
+      "file": "record-drawer-focus.spec.ts",
+      "title": "RecordDrawer 1440: continuar, descartar, Escape e salvar conservam foco e intenção",
+      "status": "expected",
+      "round": 3
+    },
+    {
+      "id": "91db00790c2d4297df8d-78c374728fe11d93654b",
+      "project": "mobile",
+      "file": "record-drawer-focus.spec.ts",
+      "title": "RecordDrawer 390: continuar, descartar, Escape e salvar conservam foco e intenção",
+      "status": "expected",
+      "round": 3
+    },
+    {
+      "id": "91db00790c2d4297df8d-c2892f74511538e705bc",
+      "project": "ios",
+      "file": "record-drawer-focus.spec.ts",
+      "title": "RecordDrawer 390: continuar, descartar, Escape e salvar conservam foco e intenção",
+      "status": "expected",
+      "round": 3
+    },
+    {
+      "id": "069821ae7bbb7ee2657b-182a3f93db6163aa87cf",
+      "project": "chromium",
+      "file": "requisition-follow-up.spec.ts",
+      "title": "REQ follow-up reaches pending ENT and partial fulfillment; stale reads and denied related access never create acts",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "069821ae7bbb7ee2657b-e8babde0f131a8a841ee",
+      "project": "mobile",
+      "file": "requisition-follow-up.spec.ts",
+      "title": "REQ follow-up reaches pending ENT and partial fulfillment; stale reads and denied related access never create acts",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "069821ae7bbb7ee2657b-09e65ac612832178cee2",
+      "project": "ios",
+      "file": "requisition-follow-up.spec.ts",
+      "title": "REQ follow-up reaches pending ENT and partial fulfillment; stale reads and denied related access never create acts",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "f5b9c68cf9c401e616ff-73802716f5529329a28b",
+      "project": "chromium",
+      "file": "transfer-bilateral.spec.ts",
+      "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "f5b9c68cf9c401e616ff-6af9b4c0c1e437bff0f4",
+      "project": "mobile",
+      "file": "transfer-bilateral.spec.ts",
+      "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "f5b9c68cf9c401e616ff-ba003d1700bb396331b6",
+      "project": "ios",
+      "file": "transfer-bilateral.spec.ts",
+      "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "615b3cb6f149483fcf92-7cc2acc1789fcf357c1f",
+      "project": "chromium",
+      "file": "v4.spec.ts",
+      "title": "V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e compartilhamento do arquivo",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "615b3cb6f149483fcf92-22c0d2147dfff6326157",
+      "project": "mobile",
+      "file": "v4.spec.ts",
+      "title": "V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e compartilhamento do arquivo",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "615b3cb6f149483fcf92-7168407ad6533a66f88a",
+      "project": "ios",
+      "file": "v4.spec.ts",
+      "title": "V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e compartilhamento do arquivo",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "26aa48cee8983222f549-2028f7d391a415e3ef6e",
+      "project": "chromium",
+      "file": "workflows.spec.ts",
+      "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "26aa48cee8983222f549-c976431d023539de85fc",
+      "project": "mobile",
+      "file": "workflows.spec.ts",
+      "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "26aa48cee8983222f549-9c68b7356f86dc8d1d60",
+      "project": "ios",
+      "file": "workflows.spec.ts",
+      "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "3bd218053094d49a694f-462be32356c305aa6c34",
+      "project": "mobile",
+      "file": "attachment-attempts.spec.ts",
+      "title": "timeout nativo30s depois do commit conserva a intenção e recupera ready sem novo upload",
+      "status": "expected",
+      "round": 1
+    },
+    {
+      "id": "056684ca5dd92ad3418d-6246857e5c6f4e492af0",
+      "project": "chromium",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "056684ca5dd92ad3418d-d232b13607fab0c5fdb5",
+      "project": "mobile",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "056684ca5dd92ad3418d-11ce41b8ae5101615534",
+      "project": "ios",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 3
+    },
+    {
+      "id": "056684ca5dd92ad3418d-65a3406d7bfcdfdd96fd",
+      "project": "chromium",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "056684ca5dd92ad3418d-82721c848117ea8ac24f",
+      "project": "mobile",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "056684ca5dd92ad3418d-7618a8f98307237a4c1e",
+      "project": "ios",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 3
+    },
+    {
+      "id": "056684ca5dd92ad3418d-764cda085638d6c4cee6",
+      "project": "chromium",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "056684ca5dd92ad3418d-50e794bd944629e5f326",
+      "project": "mobile",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 2
+    },
+    {
+      "id": "056684ca5dd92ad3418d-5f03202fa835fe8b8ac6",
+      "project": "ios",
+      "file": "catalogue-scale.spec.ts",
+      "title": "seleção em ENT mantém alias, teclado, categoria e entrada manual",
+      "status": "expected",
+      "round": 3
+    }
+  ],
+  "reusedScopedEvidence": [
+    "REQ_COM_CANONICAL_VALIDATION.json",
+    "ENT_TRANSFER_CANONICAL_VALIDATION.json",
+    "DELIVERY_INBOX_CANONICAL_VALIDATION.json",
+    "BAL_AGENDA_CANONICAL_VALIDATION.json",
+    "STOCK_CATALOGUE_CONSUMPTION_CANONICAL_VALIDATION.json",
+    "DOCUMENT_SECTIONS_CANONICAL_VALIDATION.json"
+  ],
+  "counterproofs": [
+    "First round:three obsolete receipt links and WebKit input bottom664.484375 beyond viewport 664. Original ratio1 retained;actual centered scrolling plus fullbounds and useful edge hit-tests.",
+    "CI baseline:catalogue keyboard focus lost during background disabled transition. Controlled authorized GET invalidation now holds focus;Enter/native click cannot open editor while pending.",
+    "BAL whole-page resize audit uses real scroll reset;full axe rules retained.",
+    "Original 3-author transfer,quantity3of5,ledger,science,Auth/RLS,recovery,bytes and no-replay assertions retained.",
+    "Second round:four fixture route cleanup races (route already handled) after focus guards passed. Await unrouteAll(wait) after release;four original keyboard cases rechecked. WebKit incomplete bound after focusing requires real centered scroll after popup opens;all four catalogue sizes rechecked with original ratio1.",
+    "No tab retries/force/timeout increase;failure-only navigation diagnostic."
+  ],
+  "checks": {
+    "types": "PASS",
+    "affectedLint": "PASS_ZERO_WARNINGS",
+    "remote": "207_UP_TO_DATE_DRY_RUN_NO_SQL",
+    "ciOwnSha": "REQUIRED_AFTER_PUSH",
+    "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION"
+  },
+  "limits": [
+    "Original105 states57PASS/48PARTIAL and18UI statuses preserved.",
+    "This closes original local daily appearance stage06;20other compositions,stage19 and human/native400percent/device/provider gates remain.",
+    "DOC-A/C/D0percent;DOC-B10percent. New PDF layout,BAL no-stock opinion,draft modal,mentions,20minute access grouping,cancel/complement policy remain pending.",
+    "No SQL,remote Auth/fixtures/reset,merge,production or external activation."
+  ]
+}

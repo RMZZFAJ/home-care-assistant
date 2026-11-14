@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { selectContext } from "./auth-context";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
@@ -111,10 +112,11 @@ test.describe("administração integrada no ambiente local", () => {
       .getByLabel("Nomes alternativos, separados por vírgula", { exact: true })
       .fill("Material auxiliar, Apoio operacional");
     const created = await submit(page, "Salvar item", "product");
-    const productId = created.data.product_id as string;
+    expect(created).toMatchObject({ action: "commit", state: "consumed", purpose: "create" });
+    const productId = created.outcome.productId as string;
     expect(productId).toBeTruthy();
     await expect(
-      page.getByRole("cell", { name: originalName, exact: true }),
+      page.getByRole("cell").filter({ has: page.getByText(originalName, { exact: true }) }),
     ).toBeVisible();
     await page
       .getByRole("button", { name: `Editar ${originalName}`, exact: true })
@@ -133,7 +135,7 @@ test.describe("administração integrada no ambiente local", () => {
       .uncheck();
     await submit(page, "Salvar item", "product");
     await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
-    const article = page.getByRole("row").filter({ has: page.getByRole("cell", { name: finalName, exact: true }) });
+    const article = page.getByRole("row").filter({ has: page.getByRole("cell").filter({ has: page.getByText(finalName, { exact: true }) }) });
     await expect(article.getByText("Inativo", { exact: true })).toBeVisible();
     await expect(article).toContainText("higiene");
     await expect(article.getByText("pacote", { exact: true })).toBeVisible();
@@ -213,7 +215,7 @@ test.describe("administração integrada no ambiente local", () => {
         response.request().postDataJSON().action === "membershipStatus",
     );
     await member.getByRole("button", { name: "Revogar", exact: true }).click();
-    await page.getByRole("button", { name: "Confirmar alteração", exact: true }).click();
+    await page.getByRole("button", { name: "Revogar agora", exact: true }).click();
     expect((await revoked).ok()).toBeTruthy();
     await expect(
       page.getByText("Estado do vínculo atualizado.", { exact: true }),
@@ -523,10 +525,10 @@ test.describe("administração integrada no ambiente local", () => {
       await page.request.get(`/api/requisitions/${after.data[0].id}`)
     ).json();
     expect(detail.receipt.lines).toMatchObject([
-      { productId: "fralda", currentStock: null },
+      { productId: "fralda", currentStock: null, stockObservation: "legacy_unclassified" },
     ]);
     expect(detail.receipt.extraItems).toMatchObject([
-      { name: customName, currentStock: null, urgent: true },
+      { name: customName, currentStock: null, urgent: true, stockObservation: "legacy_unclassified" },
     ]);
     expect(
       detail.data.requisition_items.find(
@@ -543,20 +545,30 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("heading", { name: protocol, exact: true }),
     ).toBeVisible();
+    const metadata = page.locator(".hca-document-meta > div");
     await expect(
-      page.locator(".hca-document-date"),
-    ).toHaveText(/^Data original desconhecida · Versão \d+$/);
+      metadata
+        .filter({ has: page.locator("dt", { hasText: /^Registro original$/ }) })
+        .locator("dd"),
+    ).toHaveText("Data original desconhecida");
     await expect(
-      page.getByText("Solicitante: Solicitante desconhecido", { exact: true }),
+      page.locator(".hca-document-tags").getByText(/^Versão \d+$/),
     ).toBeVisible();
+    await expect(
+      metadata
+        .filter({ has: page.locator("dt", { hasText: /^Solicitante$/ }) })
+        .locator("dd"),
+    ).toHaveText("Solicitante desconhecido");
+    await selectDocumentSection(page, "materials");
     await expect(
       page
         .locator("strong")
         .filter({ hasText: new RegExp("^" + customName + "$") }),
     ).toBeVisible();
     await expect(
-      page.getByText("Estoque desconhecido", { exact: false }),
+      page.getByText("Não informado no registro legado", { exact: false }),
     ).toHaveCount(2);
+    await selectDocumentSection(page, "communications");
     await page.getByRole("button", { name: /^Avisos e acompanhamento/ }).click();
     await expect(page.getByText("Nenhum aviso disponível.", { exact: true })).toBeVisible();
     const retry = await page.request.post("/api/admin", {
@@ -638,7 +650,7 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("button", { name: /^Usar item do catálogo:/ }),
     ).toHaveCount(2);
-    await page.getByLabel("Estoque atual", { exact: true }).fill("3");
+    await page.getByLabel("Estoque observado com a equipe", { exact: false }).fill("3");
     await page
       .getByRole("checkbox", { name: "Reposição urgente", exact: true })
       .check();
@@ -653,9 +665,12 @@ test.describe("administração integrada no ambiente local", () => {
     ).toHaveCount(0);
     for (let step = 0; step < 2; step++)
       await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
-    await expect(
-      page.getByText("Gaze — estoque atual: 3 (urgente)", { exact: true }),
-    ).toBeVisible();
+    const reviewMaterial = page.locator(".hca-material-review li").filter({
+      has: page.locator("strong").filter({ hasText: /^Gaze$/ }),
+    });
+    await expect(reviewMaterial.getByText("Gaze", { exact: true })).toBeVisible();
+    await expect(reviewMaterial.getByText("Estoque da equipe: 3 pacote (observado)", { exact: true })).toBeVisible();
+    await expect(reviewMaterial.getByText("Urgente", { exact: true })).toBeVisible();
     const pending = page.waitForResponse(
       (response) =>
         new URL(response.url()).pathname === "/api/requisitions" &&

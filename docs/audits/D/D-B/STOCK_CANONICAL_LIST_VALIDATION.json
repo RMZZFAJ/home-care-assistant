@@ -1,0 +1,374 @@
+{
+  "increment": "D3.45",
+  "baseSha": "46a3d3cfb8042d73e492702820f52c585914b666",
+  "status": "PASS_SCOPED_LOCAL_VALIDATION_OWN_SHA_CI_REQUIRED",
+  "unit": {
+    "passed": 7,
+    "file": "tests/stock-presentation.test.ts",
+    "reuse": "Model/test unchanged after initial pass;table composition does not alter exact-decimal filtering."
+  },
+  "typecheck": "PASS",
+  "directedLint": "PASS",
+  "sourceRawSha256": {
+    "src/app/canonical-ui.css": "9c80f0d5f9c93c7d1f0eaac46301f1e7e1bac4a6060ae5cc313a4abd9dff4c02",
+    "src/components/forms/use-creation-draft.ts": "776393e54efd2cc5ebadc5d1e4c1520af1810c03225c882138a358b86705de85",
+    "src/components/stock/stock-console.tsx": "a8f4dc229ca46edd895adf8f996a7ddf21e7e906c7851460333a4811fe3db9e6",
+    "src/components/stock/stock-overview.tsx": "fa7cc49e3aa2331cc1d69b9401a4d5ee80d8814ef861a58fb11ddb9c0982f772",
+    "src/lib/stock-presentation.ts": "e2713de46f6130f93ef1487dacba5ff40db286691e42bd063299c147be3689df",
+    "src/theme/tokens.css": "02eb50895aa5b1a18091be245254737514d537e81189d08fca06b289b5581d19",
+    "tests/e2e/accessibility-audit.ts": "e82a77d6a873e1922d3a8ef68c100350b607fda9d3fa1f339eb5653872ea3cbc",
+    "tests/e2e/delivery-preparation.spec.ts": "65c814b65dd15d29cac3fa9a45eb33382df645e536a73127e4b4b20faa1c7b85",
+    "tests/e2e/document-tabs.spec.ts": "f96bdc269b5455ec6d342baf242897e0533d4d4221eea3a6aef30538055b1a2d",
+    "tests/e2e/pdf-fidelity.spec.ts": "a3b442a86b1c4c12fd162dcdb0987baf923c3aa1e29044375ffa4a370ec146b4",
+    "tests/e2e/record-drawer-focus.spec.ts": "cf3675c524e4f0af1751ce1bb72430772b3bb28f799c1c86ed5f34de3df68d4d",
+    "tests/e2e/requisition-pdf-personal-receipt.spec.ts": "80f1519845a8464a7af7ba5091b4d29f65d40139b834c93bcc6f6fa88d979b0e",
+    "tests/e2e/stock-availability.spec.ts": "aaf32a886b374ad48f1e1e9dbf7a0ff694498f2ac26b620a1286efe65094ea81",
+    "tests/e2e/stock-canonical-layout.spec.ts": "4863d114d9e00227f051f4d507a6e2937ddd0cf2030e2721729d939bb575d162",
+    "tests/e2e/workflows.spec.ts": "5632b35661fe4bfe0e2ef5ccdf70276a108b13a981c3661dabe7fbbb9700e925",
+    "tests/stock-presentation.test.ts": "787c85180cad74ed6bb2609a1ab28a5becc6cb26d3b961bd06bc5f451335d26f"
+  },
+  "sourceLfSha256": {
+    "src/app/canonical-ui.css": "328e2daa4b6755057ea2dcbc74f9d63865ba7f2ca42668d8cc85e4ae02ba9856",
+    "src/components/forms/use-creation-draft.ts": "776393e54efd2cc5ebadc5d1e4c1520af1810c03225c882138a358b86705de85",
+    "src/components/stock/stock-console.tsx": "b2518fa7f7fc9a04b763458d9ec13a5538942fc2d97a1b13f0f496ce111a3434",
+    "src/components/stock/stock-overview.tsx": "fa7cc49e3aa2331cc1d69b9401a4d5ee80d8814ef861a58fb11ddb9c0982f772",
+    "src/lib/stock-presentation.ts": "e2713de46f6130f93ef1487dacba5ff40db286691e42bd063299c147be3689df",
+    "src/theme/tokens.css": "c8aa59bfe2bb77abd8eea54e0b4702056ffc414687864a224612289432379254",
+    "tests/e2e/accessibility-audit.ts": "e82a77d6a873e1922d3a8ef68c100350b607fda9d3fa1f339eb5653872ea3cbc",
+    "tests/e2e/delivery-preparation.spec.ts": "65c814b65dd15d29cac3fa9a45eb33382df645e536a73127e4b4b20faa1c7b85",
+    "tests/e2e/document-tabs.spec.ts": "bb879d916900d9d55211a3774b0659078720568841ef23d824fe364f35f53848",
+    "tests/e2e/pdf-fidelity.spec.ts": "a3b442a86b1c4c12fd162dcdb0987baf923c3aa1e29044375ffa4a370ec146b4",
+    "tests/e2e/record-drawer-focus.spec.ts": "cf3675c524e4f0af1751ce1bb72430772b3bb28f799c1c86ed5f34de3df68d4d",
+    "tests/e2e/requisition-pdf-personal-receipt.spec.ts": "80f1519845a8464a7af7ba5091b4d29f65d40139b834c93bcc6f6fa88d979b0e",
+    "tests/e2e/stock-availability.spec.ts": "aaf32a886b374ad48f1e1e9dbf7a0ff694498f2ac26b620a1286efe65094ea81",
+    "tests/e2e/stock-canonical-layout.spec.ts": "4863d114d9e00227f051f4d507a6e2937ddd0cf2030e2721729d939bb575d162",
+    "tests/e2e/workflows.spec.ts": "3ddc6e6564beb7c47f084dd6a6193a5710bb22c7c8e34676e8124369b6704355",
+    "tests/stock-presentation.test.ts": "787c85180cad74ed6bb2609a1ab28a5becc6cb26d3b961bd06bc5f451335d26f"
+  },
+  "browser": {
+    "uniqueQualifiedCases": 16,
+    "latestProductionStock": {
+      "stats": {
+        "total": 8,
+        "expected": 8,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "reportSha256": "015434869f0dde60e0ff032229eac2e6e25994586e3c522e8058f8bfff41c924",
+      "cases": [
+        {
+          "title": "estoque isola saldos válidos da falha inicial do histórico e recupera sem alterar o ledger",
+          "projectName": "mobile",
+          "location": {
+            "file": "stock-availability.spec.ts",
+            "line": 22,
+            "column": 5
+          },
+          "outcome": "expected",
+          "duration": 19063
+        },
+        {
+          "title": "estoque distingue indisponibilidade de vazio e conserva somente consultas anteriores do mesmo filtro",
+          "projectName": "mobile",
+          "location": {
+            "file": "stock-availability.spec.ts",
+            "line": 116,
+            "column": 5
+          },
+          "outcome": "expected",
+          "duration": 8417
+        },
+        {
+          "title": "estoque isola saldos válidos da falha inicial do histórico e recupera sem alterar o ledger",
+          "projectName": "ios",
+          "location": {
+            "file": "stock-availability.spec.ts",
+            "line": 22,
+            "column": 5
+          },
+          "outcome": "expected",
+          "duration": 21433
+        },
+        {
+          "title": "estoque distingue indisponibilidade de vazio e conserva somente consultas anteriores do mesmo filtro",
+          "projectName": "ios",
+          "location": {
+            "file": "stock-availability.spec.ts",
+            "line": 116,
+            "column": 5
+          },
+          "outcome": "expected",
+          "duration": 13571
+        },
+        {
+          "title": "estoque canônico conserva101 materiais,filtra saldo exato e mantém mínimo,situação e detalhes nas cinco larguras",
+          "projectName": "mobile",
+          "location": {
+            "file": "stock-canonical-layout.spec.ts",
+            "line": 70,
+            "column": 5
+          },
+          "outcome": "expected",
+          "duration": 23051
+        },
+        {
+          "title": "filtro de estoque conserva autorização real da equipe e não revela saldo familiar",
+          "projectName": "mobile",
+          "location": {
+            "file": "stock-canonical-layout.spec.ts",
+            "line": 201,
+            "column": 5
+          },
+          "outcome": "expected",
+          "duration": 33795
+        },
+        {
+          "title": "estoque canônico conserva101 materiais,filtra saldo exato e mantém mínimo,situação e detalhes nas cinco larguras",
+          "projectName": "ios",
+          "location": {
+            "file": "stock-canonical-layout.spec.ts",
+            "line": 70,
+            "column": 5
+          },
+          "outcome": "expected",
+          "duration": 20718
+        },
+        {
+          "title": "filtro de estoque conserva autorização real da equipe e não revela saldo familiar",
+          "projectName": "ios",
+          "location": {
+            "file": "stock-canonical-layout.spec.ts",
+            "line": 201,
+            "column": 5
+          },
+          "outcome": "expected",
+          "duration": 7604
+        }
+      ]
+    },
+    "retainedProductionCiConsumers": [
+      {
+        "cohort": "stock-ci-contrast-partial",
+        "title": "P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto",
+        "projectName": "mobile",
+        "location": {
+          "file": "delivery-preparation.spec.ts",
+          "line": 97,
+          "column": 5
+        },
+        "outcome": "expected",
+        "duration": 25391
+      },
+      {
+        "cohort": "stock-ci-contrast-partial",
+        "title": "Abas conservam conferência ENT não salva e recuperam seleção por URL e histórico sem conceder auditoria",
+        "projectName": "mobile",
+        "location": {
+          "file": "document-tabs.spec.ts",
+          "line": 434,
+          "column": 5
+        },
+        "outcome": "expected",
+        "duration": 17519
+      },
+      {
+        "cohort": "stock-ci-contrast-partial",
+        "title": "RecordDrawer 1440: continuar, descartar, Escape e salvar conservam foco e intenção",
+        "projectName": "mobile",
+        "location": {
+          "file": "record-drawer-focus.spec.ts",
+          "line": 16,
+          "column": 38
+        },
+        "outcome": "expected",
+        "duration": 16574
+      },
+      {
+        "cohort": "stock-ci-contrast-partial",
+        "title": "confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em leitura, com efeitos distintos",
+        "projectName": "mobile",
+        "location": {
+          "file": "requisition-pdf-personal-receipt.spec.ts",
+          "line": 448,
+          "column": 5
+        },
+        "outcome": "expected",
+        "duration": 20026
+      },
+      {
+        "cohort": "stock-ci-final-pass",
+        "title": "P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto",
+        "projectName": "ios",
+        "location": {
+          "file": "delivery-preparation.spec.ts",
+          "line": 97,
+          "column": 5
+        },
+        "outcome": "expected",
+        "duration": 63146
+      },
+      {
+        "cohort": "stock-ci-final-pass",
+        "title": "BAL identifica primeira contagem e reconto, conserva parecer e aprovação antiga sem apresentá-los como vigentes e mantém o exemplar anterior",
+        "projectName": "ios",
+        "location": {
+          "file": "pdf-fidelity.spec.ts",
+          "line": 123,
+          "column": 5
+        },
+        "outcome": "expected",
+        "duration": 28924
+      },
+      {
+        "cohort": "stock-ci-final-pass",
+        "title": "confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em leitura, com efeitos distintos",
+        "projectName": "ios",
+        "location": {
+          "file": "requisition-pdf-personal-receipt.spec.ts",
+          "line": 448,
+          "column": 5
+        },
+        "outcome": "expected",
+        "duration": 17289
+      },
+      {
+        "cohort": "stock-ci-final-pass",
+        "title": "REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real",
+        "projectName": "ios",
+        "location": {
+          "file": "workflows.spec.ts",
+          "line": 196,
+          "column": 5
+        },
+        "outcome": "expected",
+        "duration": 169100
+      }
+    ],
+    "retentionReason": "Only stock table/scoped CSS and success screenshot target materially changed. Retained eight CI/PDF/focus cases do not render stock table;global modal/breadcrumb rules and their tests unchanged. Four other raw hash differences match prior source after CRLF normalization. All affected stock identities repeated.",
+    "lineEndingOnlyDifferences": [
+      "src/components/stock/stock-console.tsx",
+      "src/theme/tokens.css",
+      "tests/e2e/document-tabs.spec.ts",
+      "tests/e2e/workflows.spec.ts"
+    ],
+    "priorCohorts": {
+      "stock-ci-contrast-partial": {
+        "stats": {
+          "total": 16,
+          "expected": 6,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 9,
+          "ok": false
+        },
+        "reportSha256": "55e4c5d6326617b5921fcdacc32f9af01e4ea9df01e3bd2514e586152bae45ec"
+      },
+      "stock-ci-final-pass": {
+        "stats": {
+          "total": 10,
+          "expected": 10,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "reportSha256": "4e856ad1a6ab086d6eb2d781e67d52092d1a28ea9044a3e0c5ff2b6674f92055"
+      }
+    },
+    "viewports": [
+      1440,
+      1150,
+      850,
+      500,
+      320
+    ],
+    "engines": [
+      "Chromium/mobile",
+      "WebKit/iOS emulation"
+    ],
+    "oracles": [
+      "101 unique identities across7 pages",
+      "Inactive material preserved;absent minimum differs zero/equality/below",
+      "Real Auth professional sees family:null;FAMILY movement403",
+      "Ledger digest/documents unchanged;no stock/doc POST in readonly flow",
+      "All detail values retained;Escape returns opener focus;axe five widths and320px detail"
+    ],
+    "limits": "Other identified stock consumers in workflows,fluent-experience,accessibility,catalogue-identities,language-navigation-filters,notification-targets,requisition-pdf-personal-receipt and stock-origins remain in full own-SHA CI. No full local consumer/66/171 approval. Four flaky definitions rechecked locally;global intermitttency not proved eliminated."
+  },
+  "visualReview": {
+    "observed": "Final desktop table and complete320px single-card captures inspected;readable units/status/forecasts/actions. Long unbroken material remains complete.",
+    "screenshots": {
+      "620863c8b87e105be8f305fc165b41b2a5f59aac.png": "e37548471238dc81bffd28633f46b2e51c92366fa4bf7197983b4edc4c3d00df",
+      "6227c3ba3ad7146ffea88915870b39b9843f28a7.png": "6a410a09ea5a238da79b227a0e0b10991c40e8ffb6202b4f233db7d8d3daeaec",
+      "8e95a06defd180dcdbb41cfce04d5788ddf3f563.png": "9e822e9c12a149bf334ad362f2e12e25a444ae238ea3d9985209a96f1fabe76a",
+      "a13eeb5c2c5aa0a19e255c0fb41246f4f784849b.png": "5d83cad3fc531c5de1390f09cac5c87e0dfd108603713cefc139b3b6dbc5a9e9"
+    }
+  },
+  "counterproofs": [
+    "Initial CSS-generated cell-label selector and dt accessible-name assumptions corrected to actual text/sibling value;all value/header assertions retained.",
+    "Focused filter resize retained page scroll. Whole-page audit starts at top with blur/two animation frames,as existing stock audit;no axe rule disabled.",
+    "500px page scroll691 was caused by long history text glyphs escaping fitting boxes. Header probes/containment were nondiscriminant;variants removed. Isolated history markup+CSS reproduces691 then500/320 in both motors;final integrated Auth tests pass five widths.",
+    "Initial failure diagnostic empty addStyleTag failed before capture;temporary style probes removed. Permanent failure geometry excludes raw text.",
+    "Detail label contrast4.3 failed4.5 on tinted background;canonical ink fixes actual style,final audit passes.",
+    "Passing screenshots exposed compressed auto-sized columns;fixed six-column composition preserves every value. Eight affected stock identities repeated after correction.",
+    "CI46 old BAL title updated to canonical title/native fields;read-only and native-effect oracles retained. Breadcrumb18px increased24px;resize audit origin separates occlusion from intrinsic sizing."
+  ],
+  "failedOrDiagnosticArchives": [
+    "stock-layout-first-failed",
+    "stock-layout-scroll-failed",
+    "stock-layout-overflow-failed",
+    "stock-layout-bounded-failed",
+    "stock-layout-diagnostic-failed",
+    "stock-layout-actual-probe-failed",
+    "stock-layout-viewport-probe-failed",
+    "stock-layout-table-probe-failed",
+    "stock-layout-text-corrected-partial",
+    "stock-ci-first-failed",
+    "stock-ci-contrast-partial"
+  ],
+  "artifactRawSha256": {
+    "stock-layout-unit.log": "165f73cbcc275bf03de823d77dda8241a07fbae42ccb4a4605b4b7f54d23e086",
+    "stock-layout-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stock-layout-final-lint.log": "334e799ff491a85a91b700af914edb2601029cbc22d3474c99c215399f884fa9",
+    "stock-remote-dry-run.log": "d77102c47dbe17725adfd88b5aed2ce8316cf1842517c1af4897c58aa8b70caf",
+    "stock-history-text-probe.json": "22e655907d5e5c0a6a5ef13c08fe262210a90228efa14ba27cd210b9f0682428"
+  },
+  "remote": {
+    "projectId": "qwfrqychokvhdzakibid",
+    "localCount": 177,
+    "remoteCount": 177,
+    "latest": "20261110001316",
+    "versionLinesSha256": "8561230e7f4a618a9de5c4e1c874d10d9f2e75189b54c3a80ac93e2dc6ad8ee8",
+    "dryRun": "PASS_NO_PENDING",
+    "newMigrations": [],
+    "remoteMutations": false
+  },
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "first30": "PRESERVED",
+    "statuses": "56PASS/49PARTIAL_UNCHANGED",
+    "uiRows": 18
+  },
+  "remaining": [
+    "Private cross-session family stock movement,consumption and flow review preparation",
+    "Stock200 malformed decoder;full EST-01 composition;remaining extremes/zoom",
+    "Full66 compositions/171 relations;other D-B criteria;human/device/provider gates",
+    "Own SHA CI;no approval from failed46a3d3c",
+    "Sonar owner-deferred"
+  ],
+  "boundaries": {
+    "newSql": false,
+    "remoteMutation": false,
+    "reset": false,
+    "authChanges": false,
+    "pdfChanges": false,
+    "pwaCacheReplayChanges": false,
+    "productionChanges": false,
+    "externalDeliveryActivated": false,
+    "pr7": "DRAFT_NO_MERGE",
+    "goal": "ACTIVE"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "recordedAt": "2026-11-08T22:31:58.356Z",
+  "project": "qwfrqychokvhdzakibid",
+  "operation": "Read-only migration count and last version",
+  "database": "postgres",
+  "migrations": 157,
+  "last_version": "20261108212500",
+  "newMigrationsInThisBatch": 0,
+  "remoteMutation": false,
+  "previousTargetedSqlFunctionGrantPostflight": "ENT_TERMINAL_REMOTE_MIGRATIONS.json",
+  "qualification": "Migration files unchanged; no reset, remote Auth/fixtures, backup/restore or full historical SQL/data comparison repeated."
+}

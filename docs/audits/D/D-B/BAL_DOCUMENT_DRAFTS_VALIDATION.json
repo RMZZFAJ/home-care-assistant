@@ -1,0 +1,427 @@
+{
+  "baseSha": "6ce4d35e25daa1dfbc9fbc330d0d3e603ffa8510",
+  "sourceLfSha256": {
+    "src/app/api/balances/document-preparation/route.ts": "85ee24417faea28ebf58fbf44ef73236e2a193322a93fffc21c1be1175591516",
+    "src/components/balances/balance-console.tsx": "eceb0877ce223374d71b8d1597fb12821a111186e6bb817998602c2ed274dbe9",
+    "src/components/balances/balance-document-preparation.tsx": "8df5cf3397f69b81a645ac1e47b54763012316699d256cbbbf25acf6567ca82c",
+    "src/components/balances/balance-recount-assignment.tsx": "e497b9aa342bdaf78d84b4024e7834170f037ad34861fe509ce9045c7cf541a2",
+    "src/components/documents/balance-review.tsx": "44386aa0e46bbf71beec467cde04f968b9e13db734244952388841a0fefb38ab",
+    "src/components/documents/supply-detail.tsx": "fefbbc5e025aef486b0cf9eb30fd63c8a871cf8c5a8bb34bb822a752c32b47df",
+    "src/components/forms/creation-draft-panel.tsx": "47dcce06fef9b8ba6f18582fc5ee8c3e0670fc7b6fdbd9d21d1b30052810f86b",
+    "src/lib/forms/balance-document-draft.ts": "6df9bbb8748bfe3105614702705d4f75fce7ef654721436659568c6f8fc61cb3",
+    "src/lib/forms/draft-navigation.ts": "b257a2826edd9c62a01b8e9cb24b6ebb57e97c89354f5d9534a1184848af6a87",
+    "src/lib/validation/balance-document-decisions.ts": "3e814af352d471a24ae372b02992f8d89566a9b8c9e0d9853783deb7d6eaa20b",
+    "src/lib/validation/creation-drafts.ts": "2b3a9a6a0fde69edd4ff1e2b73435cbfd36de36552579efd3dbdf29100aa0b84",
+    "src/lib/validation/private-draft-results.ts": "ab3a4f1b7948f8881f7bda6e32ca1c904e190f337c4a9d0ba14904c015c6e4ab",
+    "src/lib/validation/supply-drafts.ts": "400f3797d920b07e95395dd8103b49cd98decb599a2301907b2a22c226cc9966",
+    "supabase/migrations/20261109222649_phase_d3_balance_document_private_drafts.sql": "bb8efd76f71d7bf817df31da744395f2d58c01cca42d04b9524e29513bb4ed95",
+    "tests/balance-document-drafts.test.ts": "4235b2f08fae5d1373f0b3c8d7c6728f4affc4882313a64e69210290f33e26b3",
+    "tests/e2e/bal-document-private-drafts.spec.ts": "efbe515c01913840f491bad2fa5377a259966121487de9070b83a6586092ccd4",
+    "tests/e2e/bal-recount-succession.spec.ts": "42c4d69cafff84dbe98347ed9db3787f92c7870e8d363fc8d6132405fe20728e",
+    "tests/e2e/bal-review.spec.ts": "999821133e21947d559d830091c29a0449a6eb3b7445765b18c40b125e0606f1",
+    "tests/integration/bal-document-draft-fixtures.mjs": "c09d2fb3320794022c13af8dfbe1defed914f519db99761c6eea641ea3bc79b1",
+    "tests/integration/bal-document-private-drafts.test.mjs": "c198faf6f39477ad2116554982ffc820bbf43afdccd48b642632ba418f1c40a7"
+  },
+  "frozenRawSha256": {
+    "src/app/api/balances/document-preparation/route.ts": "85ee24417faea28ebf58fbf44ef73236e2a193322a93fffc21c1be1175591516",
+    "src/components/balances/balance-console.tsx": "6e0d05c620fb3ca770a05519eff8a3654845c0f8eef900c01c07e484bec95f2b",
+    "src/components/balances/balance-document-preparation.tsx": "8df5cf3397f69b81a645ac1e47b54763012316699d256cbbbf25acf6567ca82c",
+    "src/components/balances/balance-recount-assignment.tsx": "e497b9aa342bdaf78d84b4024e7834170f037ad34861fe509ce9045c7cf541a2",
+    "src/components/documents/balance-review.tsx": "44386aa0e46bbf71beec467cde04f968b9e13db734244952388841a0fefb38ab",
+    "src/components/documents/supply-detail.tsx": "462a4b3b33bd75d15e58b1fa58f35620838c76e10604a15cf4c321a2fc3e9629",
+    "src/components/forms/creation-draft-panel.tsx": "ea300c39025458effa04da8435303dd4fef762ed497ab772590c76bd2639a17f",
+    "src/lib/forms/balance-document-draft.ts": "6df9bbb8748bfe3105614702705d4f75fce7ef654721436659568c6f8fc61cb3",
+    "src/lib/forms/draft-navigation.ts": "c737fefdc6dab0d0229f1af6b344bd8db762125dedc8da907bdecc7cf08428df",
+    "src/lib/validation/balance-document-decisions.ts": "3e814af352d471a24ae372b02992f8d89566a9b8c9e0d9853783deb7d6eaa20b",
+    "src/lib/validation/creation-drafts.ts": "f44ee91cf0b4b6231aed98bde5ef4a80ab170ec6bc3fd69d22f5c0014726423f",
+    "src/lib/validation/private-draft-results.ts": "4b77b9ffd207b747cead0359aacbddfe7da9b8408356e00027e8d1aca7f68a8a",
+    "src/lib/validation/supply-drafts.ts": "8c033aac841c5f894ca24750c6eb52ee8d991137c008706dd8f03f65f514a96e",
+    "supabase/migrations/20261109222649_phase_d3_balance_document_private_drafts.sql": "bb8efd76f71d7bf817df31da744395f2d58c01cca42d04b9524e29513bb4ed95",
+    "tests/balance-document-drafts.test.ts": "4235b2f08fae5d1373f0b3c8d7c6728f4affc4882313a64e69210290f33e26b3",
+    "tests/e2e/bal-document-private-drafts.spec.ts": "efbe515c01913840f491bad2fa5377a259966121487de9070b83a6586092ccd4",
+    "tests/e2e/bal-recount-succession.spec.ts": "42c4d69cafff84dbe98347ed9db3787f92c7870e8d363fc8d6132405fe20728e",
+    "tests/e2e/bal-review.spec.ts": "999821133e21947d559d830091c29a0449a6eb3b7445765b18c40b125e0606f1",
+    "tests/integration/bal-document-draft-fixtures.mjs": "c09d2fb3320794022c13af8dfbe1defed914f519db99761c6eea641ea3bc79b1",
+    "tests/integration/bal-document-private-drafts.test.mjs": "c198faf6f39477ad2116554982ffc820bbf43afdccd48b642632ba418f1c40a7"
+  },
+  "unitApi": {
+    "distinct": 34,
+    "qualifiedReuse": "24 existing successes in initial34 plus10 corrected/repeated new BAL tests;not34 in one final run",
+    "newFinal": 10,
+    "unicodeCounterproof": "Zod4 max uses code points;explicit UTF16 refinements match native comment/reason limits"
+  },
+  "realAuth": {
+    "distinct": 10,
+    "completeFinalRun": "bal-document-auth-complete.log",
+    "allPass": true,
+    "coverage": "3 native purposes;two real sessions;CAS;owner and selected-patient binding;material-copy rejection;intent binding;private save has no official effects;exact replay/ack after write loss;read-loss denial;three post-journal capability rollback cases;late official-version rollback",
+    "limits": "Synthetic local Auth identities;not remote/provider/human proof"
+  },
+  "browser": {
+    "distinct": 18,
+    "byProject": {
+      "mobile": 9,
+      "ios": 9
+    },
+    "latestCases": [
+      {
+        "title": "BAL review_family retoma entre sessões,compara conflito e referências recusadas,e recupera confirmação exata após perda de escrita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "bal-document-private-drafts.spec.ts",
+          "line": 116,
+          "column": 7
+        },
+        "duration": 35519,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL review_supervisor retoma entre sessões,compara conflito e referências recusadas,e recupera confirmação exata após perda de escrita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "bal-document-private-drafts.spec.ts",
+          "line": 116,
+          "column": 7
+        },
+        "duration": 16463,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL assign_recount retoma entre sessões,compara conflito e referências recusadas,e recupera confirmação exata após perda de escrita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "bal-document-private-drafts.spec.ts",
+          "line": 116,
+          "column": 7
+        },
+        "duration": 27128,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL confirmação exige que a ficha pertença ao paciente selecionado mesmo quando a mesma pessoa tem acesso aos dois",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "bal-document-private-drafts.spec.ts",
+          "line": 332,
+          "column": 5
+        },
+        "duration": 10216,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL review_family retoma entre sessões,compara conflito e referências recusadas,e recupera confirmação exata após perda de escrita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "bal-document-private-drafts.spec.ts",
+          "line": 116,
+          "column": 7
+        },
+        "duration": 65714,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL review_supervisor retoma entre sessões,compara conflito e referências recusadas,e recupera confirmação exata após perda de escrita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "bal-document-private-drafts.spec.ts",
+          "line": 116,
+          "column": 7
+        },
+        "duration": 48763,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL assign_recount retoma entre sessões,compara conflito e referências recusadas,e recupera confirmação exata após perda de escrita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "bal-document-private-drafts.spec.ts",
+          "line": 116,
+          "column": 7
+        },
+        "duration": 62983,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL confirmação exige que a ficha pertença ao paciente selecionado mesmo quando a mesma pessoa tem acesso aos dois",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "bal-document-private-drafts.spec.ts",
+          "line": 347,
+          "column": 5
+        },
+        "duration": 9591,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL legado facultativo permite designar Sheila, preservar o efeito anterior e recuperar a nova contagem sem criar semanas",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "bal-optional-recount.spec.ts",
+          "line": 25,
+          "column": 5
+        },
+        "duration": 41363,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL legado facultativo permite designar Sheila, preservar o efeito anterior e recuperar a nova contagem sem criar semanas",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "bal-optional-recount.spec.ts",
+          "line": 25,
+          "column": 5
+        },
+        "duration": 51642,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e concilia somente a nova contagem",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "bal-recount-succession.spec.ts",
+          "line": 59,
+          "column": 5
+        },
+        "duration": 34543,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL reconto sem contador mostra recuperação, preserva motivo no conflito e exige adoção explícita do plantão atual",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "bal-recount-succession.spec.ts",
+          "line": 287,
+          "column": 5
+        },
+        "duration": 27319,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e concilia somente a nova contagem",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "bal-recount-succession.spec.ts",
+          "line": 59,
+          "column": 5
+        },
+        "duration": 34175,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL reconto sem contador mostra recuperação, preserva motivo no conflito e exige adoção explícita do plantão atual",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "bal-recount-succession.spec.ts",
+          "line": 287,
+          "column": 5
+        },
+        "duration": 24303,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL facultativo preserva autoria e observações, recupera parecer próprio após revogação e não reaplica estoque",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "bal-review.spec.ts",
+          "line": 43,
+          "column": 5
+        },
+        "duration": 33229,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL com referência alterada conserva o parecer e exige reconto, consulta e adoção explícita antes de revisar",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "bal-review.spec.ts",
+          "line": 170,
+          "column": 5
+        },
+        "duration": 11424,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL facultativo preserva autoria e observações, recupera parecer próprio após revogação e não reaplica estoque",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "bal-review.spec.ts",
+          "line": 43,
+          "column": 5
+        },
+        "duration": 39241,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "BAL com referência alterada conserva o parecer e exige reconto, consulta e adoção explícita antes de revisar",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "bal-review.spec.ts",
+          "line": 170,
+          "column": 5
+        },
+        "duration": 13707,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      }
+    ],
+    "cohorts": [
+      {
+        "name": "bal-document-final-first",
+        "stats": {
+          "total": 18,
+          "expected": 8,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 9,
+          "ok": false
+        },
+        "manifestSha256": "97950b2282073e80e1cc501928f6fadb93fbe0be660542ab575bbec1526a01fb"
+      },
+      {
+        "name": "bal-document-ios-final",
+        "stats": {
+          "total": 9,
+          "expected": 9,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "manifestSha256": "7c71812b77b2b471ebeb187d4b698d8b3e58fa1cdde5cff739bb6c24b0a6066b"
+      },
+      {
+        "name": "bal-document-mobile-final",
+        "stats": {
+          "total": 2,
+          "expected": 2,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "manifestSha256": "2dacb22cbb7ab88961efc6d12137f92857f2985dacebdcfd918fc639a4c14538"
+      },
+      {
+        "name": "bal-document-private-recovery-final",
+        "stats": {
+          "total": 2,
+          "expected": 2,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "manifestSha256": "491fc8bc0555e07d033d15a3e9e135f57dd9092bf538f46a503e31f14a86957e"
+      }
+    ],
+    "qualifiedReuse": "Latest identity keyed by file,title,project. Initial18 round:8 successes,1 failure,9 skipped;not globally green. Final iOS9,mobile2,family recovery2 replace affected cases.21 raw successes,18 unique latest identities.",
+    "mode": "Official guarded runner;HCA_E2E_DIAGNOSTIC=true;Next dev;no mutable DB suite in parallel;not production-build acceptance",
+    "coverage": "Private save/resume;raw and incomplete fields;two browser Auth sessions;CAS;403/invalid200 no false success;explicit live-reference adoption;lost native confirmation and write loss exact replay;own read/ack after reload;family private-save uncertainty exact recovery with readonly lock;no false unsaved warning;initial read cannot erase typing;legacy stock/material/history/PDF/count-author oracles;legacy nullable code explicit",
+    "limits": "Pending private read in an earlier recount attempt has no proven product cause;later directed test passed without timeout changes. Controlled replay sets only legacy code=null;all native bindings/effects preserved.18 current identities do not cover whole app."
+  },
+  "visual": {
+    "widths": [320, 390, 768, 1440],
+    "axe": "Directed automated checks in the new scenarios;not complete accessibility conformance",
+    "inspected": [
+      {
+        "file": "bal-document-private-recovery-final/a310451bfce13c6febbcb7e0cf33a289215a524e.png",
+        "sha256": "c26434de96f0f617ad5ca493fc897661a6a753e722094fdcb0535b01d0f91045"
+      },
+      {
+        "file": "bal-document-ios-final/503e5b42e459057bcbb8ef10142ac71406af7e6e.png",
+        "sha256": "cf84b6e469c821f1c0a0f697e620902235b2d39c2b6b205037d97f4f93fc802e"
+      }
+    ],
+    "observed": "Canonical controls and support text;own comments preserved;authorship separate;long selected target also spelled below selector. Screens are scrolled editor states,not complete whole-page proof."
+  },
+  "counterproofs": [
+    "Initial SQL authoring referenced nonexistent trim helper;fixed only unpublished176 source and that local helper;no replay or local migration-history rewrite.",
+    "Two invalid Auth fixtures/oracles corrected:actual supervisor member and fully_checked change distinct from unchanged physical line facts.",
+    "Initial Unicode boundary failure retained;new10 repeated with UTF16 checks.",
+    "One attempt failed504 at local GoTrue before app;no reset/timeouts raised.",
+    "Cross-patient probe before explicit API lookup already denied403 and changed neither document. Existing auth-session scope protected database;new lookup produces404. No bypass or vulnerability remediation claimed.",
+    "Legacy initial-reference fetch erased typed comment;merge preserves own fields and held-response regression now passes in both engines.",
+    "Private save response uncertainty recovered exact private packet;fields locked while uncertain and unchanged recovered copy closes/reopens safely.",
+    "Remote candidate LF normalization removed accidentalCRCRLF;all7 source/local/remote function bodies match."
+  ],
+  "logsSha256": {
+    "bal-document-db-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "bal-document-auth-complete.log": "6a285659810c1438cee8a38435ed03507c1f9e4fa632dfa5e88da8d475fef4fa",
+    "bal-document-unit-initial.log": "74ebc5bb51e8efa877d3e64a4e180ad248b28eb1c3026a65146a49a281e81b36",
+    "bal-document-unit-retention.log": "bfc507740ceb863678975f8057eb262fca0233d491326aa57a630ea498d2ae85",
+    "bal-document-types-private-recovery.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bal-document-lint-private-recovery.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bal-document-final-e2e.log": "0c888ef34c4e3075d1b571e825ecb89102ad7d0dcff15422c351627e4e1a5d30",
+    "bal-document-ios-final-e2e.log": "1f233e053247c38f35443765e1b1a669d6284fafc1ffa13fb8958c5ea697a511",
+    "bal-document-mobile-final-e2e.log": "63050cac85a0d59287ba1c47ffbf28df1c31a56e5223efcf3c43d5f6cf798a9d",
+    "bal-document-private-recovery-e2e.log": "c8347730901429c3009bdc054781094117f29a5dc5ef9a192710463b3f6f7a14",
+    "bal-document-smoke-e2e.log": "533e4631fead4be854c9cf35d2ab0bd21c487114d371dda2b734f149c0ef1c5f",
+    "bal-document-smoke-retry-e2e.log": "4ada9dbf7bb954f90799e3a164118362eb2f0689efabc6679a9403aad4b3eb34",
+    "bal-document-scope-probe-e2e.log": "f08b374346100049afb278de539567981b61504572093578f3f3ddd9ac92bdff"
+  },
+  "ciObservation": "CI_6CE4D35_OBSERVATION.json",
+  "remaining": "BAL workspace configure/assign/deferrals private preparations;full66/171 visual/functional parity;own-SHA production CI;human/AT/physical/provider gates;no new approval of signing/backup/monitoring;Sonar owner-deferred",
+  "documentary": {
+    "markdown": "6 touched Markdown files;0 issues",
+    "relativeLinks": "Touched Markdown references resolve",
+    "acceptanceMatrix": "105x39;first30 columns and all statuses preserved;56PASS/49PARTIAL",
+    "visualMatrix": "18 rows;all statuses preserved",
+    "historicalMigrations": "84 protected LF hashes unchanged",
+    "ciYaml": "Parsed with existing Python PyYAML;two mobile shards;timeout40;fail-fast=false;aggregate needs database+all browser",
+    "activeOldTextUtilityMatches": 0,
+    "scope": "No full functional-suite rerun after docs/CI-only changes;runtime20 frozen hashes remain intact"
+  }
+}

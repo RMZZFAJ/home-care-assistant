@@ -1,0 +1,111 @@
+{
+  "at": "2026-11-08T23:51:50.256948+00:00",
+  "baseSha": "ccebfcb9e8c6ec9eafb1591aae3ea4f868a2d3f7",
+  "sourceLfSha256": {
+    "src/components/documents/document-timeline.tsx": "4c46ef4a53fa25702a152fe243a3db2cd4cd0b15c9a8d4961be3c09fae4b9a64",
+    "src/lib/use-scoped-read.ts": "ce28917d3c9c4c8a6983c3ed0f92899594cd8321108442bbfbca001c089e72f0",
+    "src/lib/validation/document-history.ts": "2f005c2d9beaf1acb23790608a9982fe094d8385e0071d46340bac035112b89a",
+    "tests/document-history-read.test.ts": "fe83d9e5096bcc30846121b3301d53375871a787f2aa2ea3234db1585daec1c8",
+    "tests/e2e/version-history.spec.ts": "6ef8106ab18c51f69cf17edfecb3ca96ae01acbd85209dd9cb10fe30ab574cfc",
+    "src/lib/documents/version-history.ts": "90157378011ede3a5c45853954f908c09bc84545da123bc22324189555a01fe0",
+    "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+    "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+    "tests/version-history.test.ts": "6c2954301bc0969952b9eb3bbb246ce01bf6ed0e4509941a59dcc4a9df8e7679"
+  },
+  "validation": {
+    "unitDistinctPassedInQualifiedCohorts": 17,
+    "newUnitPassedAfterReductionRecheck": 7,
+    "productionPassed": 15,
+    "newBrowserCases": 3,
+    "existingBrowserCases": 12,
+    "totalBrowserExecutions": 16,
+    "preservedBaselineFailures": 1,
+    "malformedResponsesPerEngine": 7,
+    "newAxeScans": 12,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "types": true,
+    "affectedLint": true,
+    "generalSuitesRepeatedLocally": false,
+    "mutableDbSuiteParallelWithE2e": false
+  },
+  "proofs": {
+    "entirePageFailedBeforeDecoder": true,
+    "invalidProjectionNeverRendered": true,
+    "documentAndVersionMatchRequired": true,
+    "priorVersionAndIndexMatchRequired": true,
+    "attributionConsistencyRequired": true,
+    "retryEnterKeepsFocus": true,
+    "invalidAttributeOnImmutableFacts": false,
+    "newCasePageErrors": 0,
+    "newCaseApiCommands": 0,
+    "historyLedgerIssuancesUnchanged": true,
+    "oldFourDocumentTypesAndRealAuthNegativesPassed": true,
+    "notACryptographicIntegrityOracle": true
+  },
+  "logsLfSha256": {
+    "history-read-baseline.log": "0d0594c91bda44f07b65285933acd547455e8cecbbfb6393d3d3c4bc65a232f8",
+    "history-read-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "history-read-production.log": "847f3020e88e306779747c30563520cb6a9614af0ee4edb52a7d08c09681dac0",
+    "history-read-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "history-read-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "history-read-unit-recheck.log": "8ee83c481caeeeb16e6efa8aaf79a007901d7d2e13bbe82e77c6d301531eb3e7",
+    "history-read-unit.log": "b0a4670b20bb1984f5164beb563160211cff5466d346e7693c2e362193b3a67a",
+    "history-read-markdown.log": "76bb728352e6c805740a0b36a5736a5ed9717f76e68f0cb5e188e1d54ef9b6b8"
+  },
+  "baselineBinarySha256": "f05c436a8663f23bfcc3092f1818efcb8bf608f2b92b700bf56ba52db6f0b185",
+  "baselineContextLfSha256": "ef790c8280d3c2a2f1215499b793fd37b4412c89e6333b8f8d14b95b0fddce65",
+  "noDecoderConsumerQualification": "Optional branch absent for existing consumers; their data/state/error path remains unchanged. Only DocumentTimeline passes a stable decoder. General consumers still require published CI.",
+  "remote": {
+    "localCount": 161,
+    "noMigrationChangesAgainstBase": true,
+    "noRemoteMutation": true,
+    "remoteAppliedReceipt": "CREDENTIAL_REMOTE_MIGRATIONS.json",
+    "remoteLastProvenCount": 161,
+    "noRepeatedBackupRestore": true
+  },
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "canonicalColumnsPreserved": 29,
+    "approvedComplementsUnchanged": true,
+    "counts": {
+      "PARTIAL": 51,
+      "PASS": 48,
+      "NOT_STARTED": 6
+    },
+    "changedCriteria": [
+      "C-AC-034",
+      "C-FINAL-AC-023"
+    ]
+  },
+  "remainingGate": [
+    "Other C-FINAL-AC-023 surfaces ENT-03 ESC-03 DOC-05 ARQ-02 GUI-04",
+    "Published SHA CI",
+    "Human/AT/physical device and actual zoom where applicable",
+    "Other D-B criteria and D-C/D6"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "goalComplete": false,
+  "operationalGo": false,
+  "supportLfSha256": {
+    "HISTORY_READ_BOUNDARY.md": "dc9b2aa02cbdc5654c3655c7d4aaf07f272f7d22431e6c7fe3a00cc862f74e9b",
+    "CI_CCEBFCB_OBSERVATION.json": "6437802ff8e1ea6f59c4cb03715a4f0c3f55d8945b2fb1a8a097e040d8559552",
+    "CREDENTIAL_REMOTE_MIGRATIONS.json": "2d60339836d30bf89bcfb6a930318924ce2b78057ce86708e63837bceb3463f9",
+    "OWNER_EXECUTION_ORDER.txt": "b06ff5581d6a9bcbe32107787e2f34a7096daca4079d7b3574f5a8bd1e804730"
+  },
+  "documentationValidation": {
+    "markdownFiles": 5,
+    "markdownIssues": 0,
+    "localLinks": 208,
+    "canonicalColumnsPreservedAgainstBase": 29,
+    "approvedComplementsUnchanged": true,
+    "changedCriteria": [
+      "C-AC-034",
+      "C-FINAL-AC-023"
+    ]
+  }
+}

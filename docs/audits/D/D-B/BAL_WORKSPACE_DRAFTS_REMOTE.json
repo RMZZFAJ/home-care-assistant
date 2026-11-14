@@ -1,0 +1,353 @@
+{
+  "projectId": "qwfrqychokvhdzakibid",
+  "migration": "20261110001316_phase_d3_balance_workspace_preparations.sql",
+  "candidateLfSha256": "237338a2169277838fe74493e270c8d6cd4443e70db0816bef571a24a6da0135",
+  "preflight": {
+    "native": [
+      {
+        "anon": false,
+        "name": "balance_command",
+        "serviceRole": false,
+        "authenticated": true,
+        "lfSourceSha256": "541f6e206dbfc95f81ecf9d902c6029e3ffa655ee8cbf69fbc32018bce041605"
+      },
+      {
+        "anon": false,
+        "name": "resolve_balance_assignment",
+        "serviceRole": false,
+        "authenticated": true,
+        "lfSourceSha256": "9739c4b4a245c790e44f8937f335021755338be1eac427935033b6b6c9c997e8"
+      }
+    ],
+    "versions": {
+      "last": "20261109222649",
+      "count": 176,
+      "sha256": "ccaec0cb1545611d3cbcfe37ed87456ef8cdfef40bfe5de358785106e3a78be4"
+    },
+    "newTables": 0,
+    "newFunctions": 0,
+    "invalidConstraints": 0,
+    "waitingTransactions": 0
+  },
+  "postflight": {
+    "functions": [
+      {
+        "schema": "private",
+        "name": "balance_preparation_hash",
+        "lfSourceSha256": "5f89f22cd4234a710b246218f5b20b5c3e9bf7175dce9bdf0cef7e83ba112b9e",
+        "securityDefiner": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": false,
+        "serviceRole": false
+      },
+      {
+        "schema": "private",
+        "name": "balance_preparation_view",
+        "lfSourceSha256": "a97e3c25fc9e4a832b1fc3521284b50c50b5f1617567cadc1175eacd2da17ec9",
+        "securityDefiner": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": false,
+        "serviceRole": false
+      },
+      {
+        "schema": "private",
+        "name": "balance_preparation_workspace",
+        "lfSourceSha256": "b5c48720e89ba00605751f5c3df357c71485d67e108641aa6619c217f6dc9962",
+        "securityDefiner": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": false,
+        "serviceRole": false
+      },
+      {
+        "schema": "private",
+        "name": "require_balance_preparation_scope",
+        "lfSourceSha256": "439dd637b4e00461afe4b4c047cc14cb2f443f991424bb67e68ecd3d5ccb27c0",
+        "securityDefiner": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": false,
+        "serviceRole": false
+      },
+      {
+        "schema": "private",
+        "name": "validate_balance_preparation",
+        "lfSourceSha256": "ea9b18c841a548f88b5b2f7b3a4fb866839fde7358e688f8d475271d5912aff7",
+        "securityDefiner": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": false,
+        "serviceRole": false
+      },
+      {
+        "schema": "public",
+        "name": "balance_preparation_command",
+        "lfSourceSha256": "126aada4b8a331892f745b6e14bddf34a021b335e870d9f15ed68245ba674aee",
+        "securityDefiner": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": true,
+        "serviceRole": false
+      },
+      {
+        "schema": "public",
+        "name": "balance_preparation_context",
+        "lfSourceSha256": "70dd257f157d059f054e6e98041fc7859d0b39584c984052c5b45f040f68a590",
+        "securityDefiner": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": true,
+        "serviceRole": false
+      },
+      {
+        "schema": "public",
+        "name": "balance_preparation_list",
+        "lfSourceSha256": "5b541cf27ed5342a5209ef50ca272a6972ceb210b5cde7346ef3f1f2d87629f6",
+        "securityDefiner": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": true,
+        "serviceRole": false
+      },
+      {
+        "schema": "public",
+        "name": "balance_preparation_reference",
+        "lfSourceSha256": "2e486dfe90dc636e1b039df596ab439b8c15337b36d8c7d1c697ad5c9d592fa6",
+        "securityDefiner": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": true,
+        "serviceRole": false
+      },
+      {
+        "schema": "public",
+        "name": "commit_balance_preparation",
+        "lfSourceSha256": "eff19c0de5dbaaa8c453ba80d22f4493145b98906b2eccf9a0a83ef4d8e1f025",
+        "securityDefiner": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "anon": false,
+        "authenticated": true,
+        "serviceRole": false
+      }
+    ],
+    "versions": {
+      "count": 177,
+      "last": "20261110001316",
+      "sha256": "b1eb373742bfeeba81c773410a627e1cfda860ce8d620053e5201d712d08cb40"
+    },
+    "tables": [
+      {
+        "schema": "private",
+        "name": "balance_preparation_commands",
+        "rls": true,
+        "anonSelect": false,
+        "authSelect": false,
+        "authUpdate": false,
+        "serviceSelect": false
+      },
+      {
+        "schema": "private",
+        "name": "balance_preparations",
+        "rls": true,
+        "anonSelect": false,
+        "authSelect": false,
+        "authUpdate": false,
+        "serviceSelect": false
+      }
+    ],
+    "probeTriggers": 0,
+    "probeFunctions": 0
+  },
+  "nativePostflight": {
+    "native": [
+      {
+        "anon": false,
+        "name": "balance_command",
+        "serviceRole": false,
+        "authenticated": true,
+        "lfSourceSha256": "541f6e206dbfc95f81ecf9d902c6029e3ffa655ee8cbf69fbc32018bce041605"
+      },
+      {
+        "anon": false,
+        "name": "resolve_balance_assignment",
+        "serviceRole": false,
+        "authenticated": true,
+        "lfSourceSha256": "9739c4b4a245c790e44f8937f335021755338be1eac427935033b6b6c9c997e8"
+      }
+    ],
+    "versions": {
+      "last": "20261110001316",
+      "count": 177,
+      "sha256": "b1eb373742bfeeba81c773410a627e1cfda860ce8d620053e5201d712d08cb40"
+    },
+    "newTables": 2,
+    "newFunctions": 10,
+    "invalidConstraints": 0,
+    "waitingTransactions": 0
+  },
+  "localMatch": {
+    "functions": 10,
+    "privateTables": 2,
+    "bodiesLfAndPermissionsAndVersionsEqual": true,
+    "nativeContractsUnchanged": true
+  },
+  "advisors": {
+    "comparison": "Exact previous findings preserved excluding observed_at only;expected additive objects checked by name",
+    "deltas": [
+      {
+        "name": "rls_enabled_no_policy",
+        "before": 44,
+        "after": 46,
+        "retainedPriorFindings": true,
+        "added": [
+          {
+            "detail": "Table \\`private.balance_preparation_commands\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "balance_preparation_commands",
+              "schema": "private",
+              "type": "table"
+            }
+          },
+          {
+            "detail": "Table \\`private.balance_preparations\\` has RLS enabled, but no policies exist",
+            "metadata": {
+              "name": "balance_preparations",
+              "schema": "private",
+              "type": "table"
+            }
+          }
+        ],
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+      },
+      {
+        "name": "extension_in_public",
+        "before": 1,
+        "after": 1,
+        "retainedPriorFindings": true,
+        "added": [],
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public"
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "before": 3,
+        "after": 3,
+        "retainedPriorFindings": true,
+        "added": [],
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable"
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "before": 168,
+        "after": 173,
+        "retainedPriorFindings": true,
+        "added": [
+          {
+            "detail": "Function `public.balance_preparation_command(p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/balance_preparation_command`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "arguments": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+              "language": "plpgsql",
+              "name": "balance_preparation_command",
+              "schema": "public",
+              "security_definer": true
+            }
+          },
+          {
+            "detail": "Function `public.balance_preparation_context(p_patient uuid, p_purpose text, p_target uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/balance_preparation_context`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "arguments": "p_patient uuid, p_purpose text, p_target uuid",
+              "language": "plpgsql",
+              "name": "balance_preparation_context",
+              "schema": "public",
+              "security_definer": true
+            }
+          },
+          {
+            "detail": "Function `public.balance_preparation_list(p_patient uuid, p_before timestamp with time zone, p_before_id uuid, p_limit integer)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/balance_preparation_list`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "arguments": "p_patient uuid, p_before timestamp with time zone, p_before_id uuid, p_limit integer",
+              "language": "plpgsql",
+              "name": "balance_preparation_list",
+              "schema": "public",
+              "security_definer": true
+            }
+          },
+          {
+            "detail": "Function `public.balance_preparation_reference(p_patient uuid, p_purpose text, p_target uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/balance_preparation_reference`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "arguments": "p_patient uuid, p_purpose text, p_target uuid",
+              "language": "plpgsql",
+              "name": "balance_preparation_reference",
+              "schema": "public",
+              "security_definer": true
+            }
+          },
+          {
+            "detail": "Function `public.commit_balance_preparation(p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/commit_balance_preparation`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional.",
+            "metadata": {
+              "arguments": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+              "language": "plpgsql",
+              "name": "commit_balance_preparation",
+              "schema": "public",
+              "security_definer": true
+            }
+          }
+        ],
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "before": 1,
+        "after": 1,
+        "retainedPriorFindings": true,
+        "added": [],
+        "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+      }
+    ]
+  },
+  "application": {
+    "officialLinkedCli": true,
+    "appliedOnce": true,
+    "seeds": [],
+    "roles": [],
+    "remoteReset": false,
+    "remoteFixturesOrAuthMutation": false,
+    "externalIntegrationsActivated": false,
+    "redundantHeavyBackup": false,
+    "finalDryRunEmpty": true,
+    "applyLogLfSha256": "19ec33c6b8a429d05530d19fbba2c9a15a16b91dbf556d28f9f2e23df3dc0fae",
+    "finalDryRunLfSha256": "61694dbe27d758db19357f3815840fd60a8a56e0523cc0c289267b8196a2bbcc"
+  },
+  "localAuthoring": {
+    "intermediateStatementsPreserved": true,
+    "migrationReplayed": false,
+    "historyRewritten": false,
+    "onlyNeededLocalFunctionBodiesReplacedBeforeFinalAuthAndBrowserValidation": true,
+    "note": "Earlier ignored authoring records used a raw CRLF digest in a field labelled LF. This artifact and final validation source hashes normalize LF explicitly."
+  },
+  "limits": [
+    "Disposable synthetic remote per owner amendment;no operational restore or RPO/RTO approval.",
+    "Own SHA CI still required for clean installation,legacy evolution and full integration."
+  ]
+}

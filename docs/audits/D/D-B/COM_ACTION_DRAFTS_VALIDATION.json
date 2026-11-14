@@ -1,0 +1,525 @@
+{
+  "assembledAt": "2026-11-09T12:46:54.896129+00:00",
+  "baseSha": "d52490d3d3267224f88474a27a456466198b330a",
+  "sourceLfSha256": {
+    "src/app/api/drafts/route.ts": "41c057a1103c72fd2e13d125a400064ef6739f4d4a133d7dc5f6b2f0ba133692",
+    "src/components/documents/supply-command-editor.tsx": "131508ac7955efb46469119a3611c120fb06ef1139f04bdf919a6538f62aa3be",
+    "src/components/documents/supply-command-fields.tsx": "2dd3da25de4e92ada3b75002c3a52af729aedde131c314b86658e70a8fe02c7a",
+    "src/lib/forms/draft-navigation.ts": "d341fd68655319c8f315d401c50df2f7f3ee68085c2125d505ff0867f39c6e0c",
+    "src/lib/validation/creation-drafts.ts": "24da7a80309b6e9b422300d965bae748ab7acc61c2e5b4a4f4f43e35ab147606",
+    "src/lib/validation/private-draft-results.ts": "a752e2c7a7be4cdd3806e2b9c04da098d008c615d6c86977746e5f5a27d11de9",
+    "src/lib/validation/supply-drafts.ts": "0c7dcf8673e138c002c598b7ff2217b923e8b1af353ea93fb9d8d11757d4cb04",
+    "tests/api/private-drafts-contract.test.ts": "e7e02284ea635ea4ea7a3c62bda8eebfaaea9e39968a8be841a602cb8c188485",
+    "supabase/migrations/20261109122657_phase_d3_com_action_private_drafts.sql": "c9f7def3505f79b7fc156c6b88be5d5efdb61f7e839999b0b809b50b9e818e30",
+    "tests/com-action-drafts.test.ts": "f967c950fdbe52d5ddfb1e472cfeb4e4972b32d3ddf1da18f211845bcf08556e",
+    "tests/e2e/com-action-private-drafts.spec.ts": "2f7a581d362ca78641cfe3786e95ebfbac282da7cfd61fc852d8fed63d3cd44c",
+    "tests/integration/com-action-private-drafts.test.mjs": "8f7655fd8861d1b67b525a5c204cb6ba51a20cfa837d3e568bbe30feea5157f7"
+  },
+  "unitApi": {
+    "cases": 19,
+    "passed": 19
+  },
+  "realAuthDatabase": {
+    "distinctCases": 23,
+    "passed": 23,
+    "rounds": [
+      {
+        "file": "com-action-db-tests.log",
+        "cases": 23,
+        "passed": 22,
+        "failed": 1,
+        "failure": "numeric text formatting oracle2 versus2.000000; corrected to exact PostgreSQL decimal comparison"
+      },
+      {
+        "file": "com-action-db-final.log",
+        "cases": 3,
+        "passed": 3,
+        "failed": 0
+      }
+    ],
+    "qualifiedReuse": "20 unchanged prior kernel/navigation cases plus3 final COM cases; repeats do not inflate totals"
+  },
+  "browser": {
+    "distinctApprovedCases": 10,
+    "identity": "file + path + title + project; latest directed outcome",
+    "rounds": {
+      "com-action-initial": {
+        "stats": {
+          "total": 10,
+          "expected": 8,
+          "unexpected": 2,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 41,
+              "column": 5
+            },
+            "duration": 38042,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('dialog', { name: 'Revisar operação definitiva', exact: true }).getByRole('button', { name: 'Recuperar tentativa', exact: true })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Revisar operação definitiva', exact: true }).getByRole('button', { name: 'Recuperar tentativa', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Revisar operação definitiva', exact: true }).getByRole('button', { name: 'Recuperar tentativa', exact: true })\u001b[22m\n\n\n  117 |             exact: true,\n  118 |           }),\n> 119 |         ).toBeVisible();\n      |           ^\n  120 |         const committed = official(id, f.patient);\n  121 |         await review\n  122 |           .getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-action-private-drafts.spec.ts:119:11\u001b[22m",
+                "codeframe": "   19 |     },\n   20 |     p_key: randomUUID(),\n   21 |     p_draft: false,\n   22 |   });\n   23 |   return { ...f, document };\n   24 | }\n   25 | async function login(page: Page, patient: string) {\n   26 |   await page.goto(\"/login\");\n   27 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   28 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   29 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   30 |   await expect(\n   31 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   32 |   ).toBeVisible();\n   33 |   await selectContext(page, patient);\n   34 | }\n   35 | const official = (id: string, patient: string) =>\n   36 |   sql(\n   37 |     `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(id)}),'lines',(select jsonb_agg(to_jsonb(l) order by id) from public.document_lines l where document_id=${sqlLiteral(id)}),'events',(select jsonb_agg(to_jsonb(e) order by id) from public.document_events e where document_id=${sqlLiteral(id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)}),'pdf',(select count(*) from private.pdf_issuances where document_id=${sqlLiteral(id)}));`,\n   38 |   );\n   39 | const field = (page: Page, id: string) => page.locator(`input[name=\"${id}\"]`);\n   40 |\n   41 | test(\"COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato\", async ({\n   42 |   page,\n   43 |   browser,\n   44 | }, info) => {\n   45 |   const f = await fixture(),\n   46 |     id = f.document.id,\n   47 |     line = f.document.lines[0].id;\n   48 |   await login(page, f.patient);\n   49 |   for (const label of [\n   50 |     \"Aprovar itens\",\n   51 |     \"Registrar aquisição\",\n   52 |     \"Informar nova chegada\",\n   53 |   ]) {\n   54 |     await page.goto(`/documentos/${id}`);\n   55 |     await page.getByRole(\"button\", { name: label, exact: true }).click();\n   56 |     await expect(field(page, line)).toBeEnabled();\n   57 |     await field(page, line).fill(\"1,\");\n   58 |     const before = official(id, f.patient),\n   59 |       saved = page.waitForResponse(\n   60 |         (r) =>\n   61 |           new URL(r.url()).pathname === \"/api/drafts\" &&\n   62 |           r.request().method() === \"POST\",\n   63 |       );\n   64 |     await page\n   65 |       .getByRole(\"button\", {\n   66 |         name: \"Salvar preenchimento privado\",\n   67 |         exact: true,\n   68 |       })\n   69 |       .click();\n   70 |     expect((await saved).ok()).toBe(true);\n   71 |     expect(official(id, f.patient)).toBe(before);\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await peer.goto(`/documentos/${id}`);\n   80 |       await peer.getByRole(\"button\", { name: label, exact: true }).click();\n   81 |       await peer\n   82 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   83 |         .click();\n   84 |       await expect(field(peer, line)).toHaveValue(\"1,\");\n   85 |       expect(official(id, f.patient)).toBe(before);\n   86 |       await field(peer, line).fill(\"2\");\n   87 |       await audit(peer, \"COM private \" + label);\n   88 |       await peer\n   89 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n   90 |         .click();\n   91 |       const review = peer.getByRole(\"dialog\", {\n   92 |         name: \"Revisar operação definitiva\",\n   93 |         exact: true,\n   94 |       });\n   95 |       await expect(review).toBeVisible();\n   96 |       let dropped = false;\n   97 |       const payloads: unknown[] = [];\n   98 |       if (label === \"Registrar aquisição\")\n   99 |         await peer.route(`**/api/documents/${id}`, async (route) => {\n  100 |           if (route.request().method() !== \"PATCH\") return route.continue();\n  101 |           payloads.push(route.request().postDataJSON());\n  102 |           if (!dropped) {\n  103 |             dropped = true;\n  104 |             const response = await route.fetch();\n  105 |             expect(response.ok()).toBe(true);\n  106 |             return route.abort(\"failed\");\n  107 |           }\n  108 |           return route.continue();\n  109 |         });\n  110 |       await review\n  111 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  112 |         .click();\n  113 |       if (label === \"Registrar aquisição\") {\n  114 |         await expect(\n  115 |           review.getByRole(\"button\", {\n  116 |             name: \"Recuperar tentativa\",\n  117 |             exact: true,\n  118 |           }),\n> 119 |         ).toBeVisible();\n      |           ^ Error: expect(locator).toBeVisible() failed\n  120 |         const committed = official(id, f.patient);\n  121 |         await review\n  122 |           .getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })\n  123 |           .click();\n  124 |         await expect(review).toHaveCount(0);\n  125 |         expect(payloads).toHaveLength(2);\n  126 |         expect(payloads[1]).toEqual(payloads[0]);\n  127 |         expect(official(id, f.patient)).toBe(committed);\n  128 |       } else await expect(review).toHaveCount(0);\n  129 |     } finally {\n  130 |       await peerContext.close();\n  131 |     }\n  132 |   }\n  133 |   expect(\n  134 |     sql(\n  135 |       `select coalesce(sum(quantity),0)=2 from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`,\n  136 |     ),\n  137 |   ).toBe(\"t\");\n  138 | });\n  139 |\n  140 | test(\"COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente\", async ({\n  141 |   page,\n  142 | }) => {\n  143 |   const f = await fixture();\n  144 |   let document = await rpc(f.admin, \"supply_document_command\", {\n  145 |     p_id: f.document.id,\n  146 |     p_action: \"approve\",\n  147 |     p_body: { lines: [{ lineId: f.document.lines[0].id, quantity: \"2\" }] },\n  148 |     p_key: randomUUID(),\n  149 |     p_version: f.document.version,\n  150 |   });\n  151 |   const line = document.lines[0],\n  152 |     removed = randomUUID();\n  153 |   await rpc(f.admin, \"supply_draft_command\", {\n  154 |     p_patient: f.patient,\n  155 |     p_kind: \"COM\",\n  156 |     p_purpose: \"purchase\",\n  157 |     p_target: document.id,\n  158 |     p_id: null,\n  159 |     p_expected: null,\n  160 |     p_key: randomUUID(),\n  161 |     p_body: {\n  162 |       action: \"save\",\n  163 |       content: {\n  164 |         documentVersion: document.version,\n  165 |         fields: { [line.id]: \"1,\", [removed]: \"0,5\" },\n  166 |         divergentIds: [],\n  167 |         materials: [\n  168 |           {\n  169 |             id: line.id,\n  170 |             name: line.name_snapshot,\n  171 |             unit: line.unit_snapshot,\n  172 |             quantityDecimals: 0,\n  173 |           },\n  174 |           {\n  175 |             id: removed,\n  176 |             name: \"Referência ausente fictícia\",\n  177 |             unit: \"unidade\",\n  178 |             quantityDecimals: 1,\n  179 |           },\n  180 |         ],\n  181 |       },\n  182 |       navigation: { version: 1, stage: \"acquisition\" },\n  183 |     },\n  184 |   });\n  185 |   document = await rpc(f.admin, \"supply_document_command\", {\n  186 |     p_id: document.id,\n  187 |     p_action: \"purchase\",\n  188 |     p_body: { lines: [{ lineId: line.id, quantity: \"1\" }] },\n  189 |     p_key: randomUUID(),\n  190 |     p_version: document.version,\n  191 |   });\n  192 |   const before = official(document.id, f.patient);\n  193 |   await login(page, f.patient);\n  194 |   await page.goto(`/documentos/${document.id}`);\n  195 |   await page\n  196 |     .getByRole(\"button\", { name: \"Registrar aquisição\", exact: true })\n  197 |     .click();\n  198 |   await page\n  199 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  200 |     .click();\n  201 |   await expect(field(page, line.id)).toHaveValue(\"1,\");\n  202 |   await expect(\n  203 |     page.getByRole(\"button\", { name: \"Revisar operação\", exact: true }),\n  204 |   ).toBeDisabled();\n  205 |   await page\n  206 |     .getByRole(\"button\", {\n  207 |       name: \"Comparar referência da operação\",\n  208 |       exact: true,\n  209 |     })\n  210 |     .click();\n  211 |   const comparison = page.getByRole(\"region\", {\n  212 |     name: \"Comparação da referência da operação\",\n  213 |     exact: true,\n  214 |   });\n  215 |   await expect(\n  216 |     comparison.getByText(\"Referência ausente fictícia: 0,5 unidade\", {\n  217 |       exact: true,\n  218 |     }),\n  219 |   ).toBeVisible();"
+              }
+            ]
+          },
+          {
+            "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 140,
+              "column": 5
+            },
+            "duration": 6987,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 41,
+              "column": 5
+            },
+            "duration": 40757,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('dialog', { name: 'Revisar operação definitiva', exact: true }).getByRole('button', { name: 'Recuperar tentativa', exact: true })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByRole('dialog', { name: 'Revisar operação definitiva', exact: true }).getByRole('button', { name: 'Recuperar tentativa', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Revisar operação definitiva', exact: true }).getByRole('button', { name: 'Recuperar tentativa', exact: true })\u001b[22m\n\n\n  117 |             exact: true,\n  118 |           }),\n> 119 |         ).toBeVisible();\n      |           ^\n  120 |         const committed = official(id, f.patient);\n  121 |         await review\n  122 |           .getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-action-private-drafts.spec.ts:119:11\u001b[22m",
+                "codeframe": "   19 |     },\n   20 |     p_key: randomUUID(),\n   21 |     p_draft: false,\n   22 |   });\n   23 |   return { ...f, document };\n   24 | }\n   25 | async function login(page: Page, patient: string) {\n   26 |   await page.goto(\"/login\");\n   27 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   28 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   29 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   30 |   await expect(\n   31 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   32 |   ).toBeVisible();\n   33 |   await selectContext(page, patient);\n   34 | }\n   35 | const official = (id: string, patient: string) =>\n   36 |   sql(\n   37 |     `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(id)}),'lines',(select jsonb_agg(to_jsonb(l) order by id) from public.document_lines l where document_id=${sqlLiteral(id)}),'events',(select jsonb_agg(to_jsonb(e) order by id) from public.document_events e where document_id=${sqlLiteral(id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)}),'pdf',(select count(*) from private.pdf_issuances where document_id=${sqlLiteral(id)}));`,\n   38 |   );\n   39 | const field = (page: Page, id: string) => page.locator(`input[name=\"${id}\"]`);\n   40 |\n   41 | test(\"COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato\", async ({\n   42 |   page,\n   43 |   browser,\n   44 | }, info) => {\n   45 |   const f = await fixture(),\n   46 |     id = f.document.id,\n   47 |     line = f.document.lines[0].id;\n   48 |   await login(page, f.patient);\n   49 |   for (const label of [\n   50 |     \"Aprovar itens\",\n   51 |     \"Registrar aquisição\",\n   52 |     \"Informar nova chegada\",\n   53 |   ]) {\n   54 |     await page.goto(`/documentos/${id}`);\n   55 |     await page.getByRole(\"button\", { name: label, exact: true }).click();\n   56 |     await expect(field(page, line)).toBeEnabled();\n   57 |     await field(page, line).fill(\"1,\");\n   58 |     const before = official(id, f.patient),\n   59 |       saved = page.waitForResponse(\n   60 |         (r) =>\n   61 |           new URL(r.url()).pathname === \"/api/drafts\" &&\n   62 |           r.request().method() === \"POST\",\n   63 |       );\n   64 |     await page\n   65 |       .getByRole(\"button\", {\n   66 |         name: \"Salvar preenchimento privado\",\n   67 |         exact: true,\n   68 |       })\n   69 |       .click();\n   70 |     expect((await saved).ok()).toBe(true);\n   71 |     expect(official(id, f.patient)).toBe(before);\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await peer.goto(`/documentos/${id}`);\n   80 |       await peer.getByRole(\"button\", { name: label, exact: true }).click();\n   81 |       await peer\n   82 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   83 |         .click();\n   84 |       await expect(field(peer, line)).toHaveValue(\"1,\");\n   85 |       expect(official(id, f.patient)).toBe(before);\n   86 |       await field(peer, line).fill(\"2\");\n   87 |       await audit(peer, \"COM private \" + label);\n   88 |       await peer\n   89 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n   90 |         .click();\n   91 |       const review = peer.getByRole(\"dialog\", {\n   92 |         name: \"Revisar operação definitiva\",\n   93 |         exact: true,\n   94 |       });\n   95 |       await expect(review).toBeVisible();\n   96 |       let dropped = false;\n   97 |       const payloads: unknown[] = [];\n   98 |       if (label === \"Registrar aquisição\")\n   99 |         await peer.route(`**/api/documents/${id}`, async (route) => {\n  100 |           if (route.request().method() !== \"PATCH\") return route.continue();\n  101 |           payloads.push(route.request().postDataJSON());\n  102 |           if (!dropped) {\n  103 |             dropped = true;\n  104 |             const response = await route.fetch();\n  105 |             expect(response.ok()).toBe(true);\n  106 |             return route.abort(\"failed\");\n  107 |           }\n  108 |           return route.continue();\n  109 |         });\n  110 |       await review\n  111 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  112 |         .click();\n  113 |       if (label === \"Registrar aquisição\") {\n  114 |         await expect(\n  115 |           review.getByRole(\"button\", {\n  116 |             name: \"Recuperar tentativa\",\n  117 |             exact: true,\n  118 |           }),\n> 119 |         ).toBeVisible();\n      |           ^ Error: expect(locator).toBeVisible() failed\n  120 |         const committed = official(id, f.patient);\n  121 |         await review\n  122 |           .getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })\n  123 |           .click();\n  124 |         await expect(review).toHaveCount(0);\n  125 |         expect(payloads).toHaveLength(2);\n  126 |         expect(payloads[1]).toEqual(payloads[0]);\n  127 |         expect(official(id, f.patient)).toBe(committed);\n  128 |       } else await expect(review).toHaveCount(0);\n  129 |     } finally {\n  130 |       await peerContext.close();\n  131 |     }\n  132 |   }\n  133 |   expect(\n  134 |     sql(\n  135 |       `select coalesce(sum(quantity),0)=2 from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`,\n  136 |     ),\n  137 |   ).toBe(\"t\");\n  138 | });\n  139 |\n  140 | test(\"COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente\", async ({\n  141 |   page,\n  142 | }) => {\n  143 |   const f = await fixture();\n  144 |   let document = await rpc(f.admin, \"supply_document_command\", {\n  145 |     p_id: f.document.id,\n  146 |     p_action: \"approve\",\n  147 |     p_body: { lines: [{ lineId: f.document.lines[0].id, quantity: \"2\" }] },\n  148 |     p_key: randomUUID(),\n  149 |     p_version: f.document.version,\n  150 |   });\n  151 |   const line = document.lines[0],\n  152 |     removed = randomUUID();\n  153 |   await rpc(f.admin, \"supply_draft_command\", {\n  154 |     p_patient: f.patient,\n  155 |     p_kind: \"COM\",\n  156 |     p_purpose: \"purchase\",\n  157 |     p_target: document.id,\n  158 |     p_id: null,\n  159 |     p_expected: null,\n  160 |     p_key: randomUUID(),\n  161 |     p_body: {\n  162 |       action: \"save\",\n  163 |       content: {\n  164 |         documentVersion: document.version,\n  165 |         fields: { [line.id]: \"1,\", [removed]: \"0,5\" },\n  166 |         divergentIds: [],\n  167 |         materials: [\n  168 |           {\n  169 |             id: line.id,\n  170 |             name: line.name_snapshot,\n  171 |             unit: line.unit_snapshot,\n  172 |             quantityDecimals: 0,\n  173 |           },\n  174 |           {\n  175 |             id: removed,\n  176 |             name: \"Referência ausente fictícia\",\n  177 |             unit: \"unidade\",\n  178 |             quantityDecimals: 1,\n  179 |           },\n  180 |         ],\n  181 |       },\n  182 |       navigation: { version: 1, stage: \"acquisition\" },\n  183 |     },\n  184 |   });\n  185 |   document = await rpc(f.admin, \"supply_document_command\", {\n  186 |     p_id: document.id,\n  187 |     p_action: \"purchase\",\n  188 |     p_body: { lines: [{ lineId: line.id, quantity: \"1\" }] },\n  189 |     p_key: randomUUID(),\n  190 |     p_version: document.version,\n  191 |   });\n  192 |   const before = official(document.id, f.patient);\n  193 |   await login(page, f.patient);\n  194 |   await page.goto(`/documentos/${document.id}`);\n  195 |   await page\n  196 |     .getByRole(\"button\", { name: \"Registrar aquisição\", exact: true })\n  197 |     .click();\n  198 |   await page\n  199 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  200 |     .click();\n  201 |   await expect(field(page, line.id)).toHaveValue(\"1,\");\n  202 |   await expect(\n  203 |     page.getByRole(\"button\", { name: \"Revisar operação\", exact: true }),\n  204 |   ).toBeDisabled();\n  205 |   await page\n  206 |     .getByRole(\"button\", {\n  207 |       name: \"Comparar referência da operação\",\n  208 |       exact: true,\n  209 |     })\n  210 |     .click();\n  211 |   const comparison = page.getByRole(\"region\", {\n  212 |     name: \"Comparação da referência da operação\",\n  213 |     exact: true,\n  214 |   });\n  215 |   await expect(\n  216 |     comparison.getByText(\"Referência ausente fictícia: 0,5 unidade\", {\n  217 |       exact: true,\n  218 |     }),\n  219 |   ).toBeVisible();"
+              }
+            ]
+          },
+          {
+            "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 140,
+              "column": 5
+            },
+            "duration": 8668,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 11206,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 119,
+              "column": 5
+            },
+            "duration": 11839,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 14260,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 119,
+              "column": 5
+            },
+            "duration": 15176,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "supply-private-drafts.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "duration": 8457,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "supply-private-drafts.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "duration": 9920,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "6c014ca1baceeef12a624162d58df2462335cdda205234ad048317b9d05c7375"
+      },
+      "com-action-final": {
+        "stats": {
+          "total": 2,
+          "expected": 2,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 41,
+              "column": 5
+            },
+            "duration": 34076,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 41,
+              "column": 5
+            },
+            "duration": 39343,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "27730e9f713a25549438cb67e2a958bd486a53e64a1563d71cdcf755df28b789"
+      },
+      "com-action-visual": {
+        "stats": {
+          "total": 2,
+          "expected": 2,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 146,
+              "column": 5
+            },
+            "duration": 10031,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 146,
+              "column": 5
+            },
+            "duration": 10628,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "4ff557a67e60943c12f272fdb997d64c9fdd6cac739d61e1c69622ad05d26302"
+      }
+    },
+    "latest": [
+      {
+        "round": "com-action-final",
+        "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "com-action-private-drafts.spec.ts",
+          "line": 41,
+          "column": 5
+        },
+        "duration": 34076,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-action-visual",
+        "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "com-action-private-drafts.spec.ts",
+          "line": 146,
+          "column": 5
+        },
+        "duration": 10031,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-action-final",
+        "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "com-action-private-drafts.spec.ts",
+          "line": 41,
+          "column": 5
+        },
+        "duration": 39343,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-action-visual",
+        "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "com-action-private-drafts.spec.ts",
+          "line": 146,
+          "column": 5
+        },
+        "duration": 10628,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-action-initial",
+        "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 19,
+          "column": 5
+        },
+        "duration": 11206,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-action-initial",
+        "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 119,
+          "column": 5
+        },
+        "duration": 11839,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-action-initial",
+        "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 19,
+          "column": 5
+        },
+        "duration": 14260,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-action-initial",
+        "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 119,
+          "column": 5
+        },
+        "duration": 15176,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-action-initial",
+        "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "supply-private-drafts.spec.ts",
+          "line": 36,
+          "column": 5
+        },
+        "duration": 8457,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-action-initial",
+        "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "supply-private-drafts.spec.ts",
+          "line": 36,
+          "column": 5
+        },
+        "duration": 9920,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      }
+    ]
+  },
+  "visual": {
+    "captures": [
+      {
+        "file": "8c7cd9ee5acb5d414338631c7a16582a9aa6f5a2.png",
+        "sha256": "2c1e40af4c8951399b20d13b4b4eeb296aee1f19c2033889450b7ff62cf22663"
+      },
+      {
+        "file": "e92da4c1dda9fbf10e15e043e3e39f62c8bf8493.png",
+        "sha256": "c7350eba5b24f853c0968c89a3a824c18572bb2d6149279c8f8206dcc761c72d"
+      }
+    ],
+    "scope": "Comparison with stale/private missing material reference; desktop Chromium and mobile-width WebKit; inspected actual captures; Axe on forms and comparison",
+    "limits": "Existing shared canonical components; no claim of full record/screen parity, physical device or human/AT approval"
+  },
+  "logsLfSha256": {
+    "com-action-db-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "com-action-db-tests.log": "ab27a9d5bc82c5ed44b04ca16ce44c340287206de014eae6fa56edb583ca6bff",
+    "com-action-db-final.log": "2cf9a7a58a18c07a439711cea89ab581b5219bda7b8fdb132e5c868687534dda",
+    "com-action-unit.log": "a6c8cdd300e8141a321cf333b5d0abe3f7a2ea7b866b0c3aabcdd24330d1a3fc",
+    "com-action-unit-final.log": "866510accac307a882564f336f714d225f6f1986a846656fc9e8fa12be48024c",
+    "com-action-types.log": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+    "com-action-types-final.log": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+    "com-action-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "com-action-contracts.log": "fa4deead48764fff4ad5a30b4b612da8dc310070ec685493d8c95105b59ff39f",
+    "com-action-e2e-initial.log": "a70f439163bfe4b28faa9a18c1289e9fe3639e3453a874960fb5ff3de8a7ea0c",
+    "com-action-e2e-final.log": "d1c010c3fd8c06d7a6c2cf33d4cb7359442885aba6df12641689f9d3c59db2f7",
+    "com-action-e2e-visual.log": "a58d33601e336cb1236e7d949e06d14861dc12e402eb16bedc6bcb4dd57fbd3f"
+  },
+  "validation": {
+    "typesAndBuild": "PASS direct typecheck and official E2E production build",
+    "lint": "PASS directed affected consumers; final screenshot-only test addition checked separately",
+    "contracts": "PASS84 historical migrations unchanged"
+  },
+  "remoteEvidence": "COM_ACTION_DRAFTS_REMOTE.json",
+  "observation": {
+    "sha": "d52490d3d3267224f88474a27a456466198b330a",
+    "ciRunId": 42616651026,
+    "ci": {
+      "validate (windows-latest)": "success",
+      "validate (ubuntu-latest)": "success",
+      "database": "success",
+      "browser (chromium)": "in_progress",
+      "browser (mobile)": "in_progress",
+      "browser (ios-1)": "in_progress",
+      "browser (ios-2)": "in_progress"
+    },
+    "preview": "READY",
+    "scope": "prior SHA only; never approval of unpublished sources"
+  },
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30ColumnsUnchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "baselineMigrationsUnchanged": 84
+  },
+  "counterproofs": [
+    "Former API negative COM/receive is now supported; replace with COM/divergence and ENT/approve negatives",
+    "Decimal text oracle corrected to exact numeric PostgreSQL equality; no business code changed for it",
+    "Lost-response simulation originally matched PATCH; corrected to actual POST and proved same payload/key twice with one effect",
+    "Read-only preflight parenthesis error corrected before DDL; remote evidence preserves it"
+  ],
+  "qualifiedReuse": [
+    "Product sources stayed frozen during each browser run; no mutable database suite ran alongside E2E",
+    "Initial eight approved cases retained; corrected cross-session recovery case repeated in both engines",
+    "Two stale-reference cases repeated for additional Axe and actual image inspection; count stays10"
+  ],
+  "limits": [
+    "D-B-AC-001 remains partial: other contextual approval/correction/request forms remain",
+    "Clean install/legacy/full integration of new SHA require its CI",
+    "No new signature, provider, backup or monitoring approval",
+    "Full UI parity and66/171 remain pending; PR7 Draft; production NO-GO"
+  ],
+  "documentation": {
+    "markdownFiles": 5,
+    "localLinksChecked": 329,
+    "markdownLogLfSha256": "c655002b9712c6df380f830deaf1b682912778d0a8b3e95e14cb7ed7c806b1b9",
+    "finalTestLintLogLfSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

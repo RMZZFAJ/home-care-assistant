@@ -1,5 +1,9 @@
 # Arquitetura
 
+**Fundação visual vigente:**[Modelo Integral](../ui-ux/CANONICAL_MODEL.md).
+A migração retira Fluent/Griffel, usa componentes reutilizáveis e comportamento
+sem aparência, preservando fronteiras, autorização e funcionalidades reais.
+
 Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
 Riscos conhecidos incluem progresso REQ, autoridade após espera, frescor e
 semântica de ciência. Descrição de invariante não elimina os desvios A/B.
@@ -78,6 +82,26 @@ exigem versão esperada. Uma confirmação externa ou leitura de comprovante
 que falha não desfaz o documento já persistido; o cliente recupera a mesma
 intenção. O ledger não admite saldo negativo por exceção pública.
 
+Transferência entre custódias usa a ENT como registro operacional. A página
+/transferencias prepara declaração explícita com contraparte e recebedor
+separados. Uma única gaveta alterna edição e conferência, preserva campos nos
+conflitos e exige adoção explícita da referência atual. Resposta incerta conserva
+o pacote e sua chave até recuperação; perda posterior da capacidade de criar não
+impede recuperar a declaração confirmada com leitura ainda autorizada.
+
+O detalhe mostra os três atos com nomes preservados. A contraparte decide a
+concordância; o declarante expede; o recebedor confirma pessoalmente. Antes da
+expedição, a quantidade aparece como Declarado e não como Expedido. Encerramento
+administrativo registra o ato do administrador. As tarefas de concordância e
+expedição integram o acompanhamento de entregas antes da paginação. Foco e
+justificativa são conservados no conflito; adotar uma declaração encerrada não
+reabilita sua confirmação. O fluxo ENT anterior permanece acessível até concluir
+a equivalência necessária à substituição.
+
+Na recuperação de recontos, a identificação e as ações podem ocupar linhas
+separadas em telas estreitas. O código e o nome de quem contou mantêm espaço
+visível, mesmo quando a soma dos botões excede a largura da linha.
+
 Eventos confirmados incluem atores, conteúdo, evidências, vínculos e hash
 anterior. SHA-256 verifica conteúdo canônico, com versão documental imutável
 para clientes. Assinatura Ed25519 e gestão de chaves ficam para o roadmap.
@@ -85,9 +109,11 @@ para clientes. Assinatura Ed25519 e gestão de chaves ficam para o roadmap.
 REQ concluída com ciência obrigatória pendente conserva a exceção que exige
 arquivamento manual justificado, inclusive após ciência tardia. O contrato
 exige trabalho elegível e não trata importações históricas como
-pendências atuais; A DB-002/B3-001 demonstra que candidaturas terminais ainda
-podem bloquear o lote REQ. Isso permanece defeito aberto, separado do cursor
-BAL. Realtime privado transmite somente revisões por usuário;
+pendências atuais. A DB-002/B3-001 documenta o bloqueio histórico por terminais;
+D-A o corrigiu com filtro antes dos limites, rotação e isolamento de
+candidato inválido, separados do cursor BAL. Provas locais no
+[checkpoint D-A](../audits/D/D-A/CHECKPOINT.md). Realtime privado transmite
+somente revisões por usuário;
 reconexão e consulta periódica recuperam eventos perdidos, sem apagar
 rascunhos.
 
@@ -121,3 +147,94 @@ autorização.
 Não inferir configuração ou release do relato datado em
 [Execução histórica](../archive/evolution/EXECUTION.md). Estado corrente em
 [PROJECT_STATUS](PROJECT_STATUS.md).
+
+## Preenchimentos documentais e decisões por recurso
+
+O controlador de preenchimento compartilha apresentação,conflito,retomada
+e recuperação explícita. Programação e plantões BAL usam recursos reais e
+tabelas privadas próprias,sem representar ciclo,atribuição ou pedido como
+documento. A confirmação compõe os motores existentes com intenção e
+referência seladas no banco. Valores próprios e fatos oficiais têm ciclos
+separados;consulta não substitui escolhas e adoção exige ação explícita.
+
+Resultado preservado descreve o ato original,não o estado atual. Lista pessoal
+conserva linhas durante atualização do mesmo escopo,com indicação de consulta;
+recusa de leitura remove registros protegidos. Paciente/titular não
+compartilham estado. Retorno de foco mantém o iniciador conectado durante
+atualização ou usa fallback acessível quando ele deixa de estar disponível.
+
+Preparação STOCK usa o paciente como recurso e family_movement como propósito,
+sem documento artificial. Um slot pessoal compõe os quatro movimentos nativos
+da família com CAS,referência do ledger e intenção selada. Confirmação física e
+consumo privado são atômicos. Salvar antes da referência exige adoção posterior
+explícita. O snapshot interno usa saldo autoritativo;representação pública e
+privada exibida respeitam a leitura independente da autorização de movimentar.
+Recuperar ato próprio já vinculado não exige reativar o paciente nem concede
+escrita nova. A variante de leitura revalida a superfície sem mudar a intenção.
+
+Preparação CONSUMPTION separa relato family/team,complemento,aceite e recusa
+em recursos reais. O editor compartilhado compõe o núcleo privado com os
+motores nativos,sem duplicar fatos ou inventar documentos. Referência atual
+não substitui declaração preservada;comando selado e consumo privado são
+atômicos. Recuperação pessoal histórica tem escopo distinto da consulta
+operacional ativa. Envelope incerto só é reapresentado por ação explícita;
+a leitura autoritativa pode reconciliar apenas o pacote exato já confirmado.
+
+Revisão FLOW usa a sugestão real como alvo e mantém o documento resultante
+separado. O componente próprio compõe o mesmo controlador privado com
+review_flow_submission:salvar não registra revisão,cria relato ou debita
+estoque. Lista pessoal mantém recuperação mesmo após sair da fila pendente,
+sem depender da consulta do catálogo. Origem preservada,declaração própria,
+referência atual e resultado confirmado têm representações distintas.
+
+A agenda preserva a tentativa nativa por conta/paciente antes de transmitir.
+Consulta pessoal ao diário comprova a mesma decisão;ausência permite somente
+reenvio explícito da mesma chave. Esse ciclo é distinto do save de edição
+incompleta entre aparelhos. Inventário49/51 inicial
+separa rascunhos privados,contagens compartilhadas,arquivos,consultas e Auth.
+
+Andamentos agora compõem o controlador privado com alvo na ficha real e
+resultado no andamento nativo. Edição incompleta,CAS e retomada entre sessões
+ficam separados da publicação atômica. O callback onRead recebe apenas leitura
+tipada do escopo vigente e permite reconciliar o pacote exato sem novo POST.
+Resumos de oferta,comparação,resultado e tentativa incerta são somente leitura;
+o editor aparece apenas após a escolha correspondente. Consulta sob a trava
+original distingue conclusão própria,outra conclusão e resultado desconhecido.
+Reconhecer o resultado de outra sessão conserva a edição local somente por
+escolha explícita,inclusive após perda da resposta desse reconhecimento.
+
+Novos tipos e novas séries agora compõem ScheduleCreationPreparation com o
+mesmo controlador privado e ScheduleForm/controles canônicos compartilhados.
+Conteúdo próprio,referências atuais e recibo nativo são distintos. Quatro
+regimes preservam escolhas latentes;adotar nova versão não limpa o restante.
+Resumos são somente leitura. Edição própria de outra conclusão requer escolha
+explícita antes do reconhecimento e pode sobreviver à perda desse resultado.
+Envelope local congela a tentativa;leitura autorizada reconcilia apenas a
+confirmação exata. Alterar/decidir sobre recursos existentes usa agora a
+preparação privada
+D3.54 e continua delegando o ato ao motor nativo. Inventário de formulários
+não é prova de paridade das66 composições/171 relações.
+
+A leitura do contexto agrega o diretório completo após calcular capacidades
+somente dos candidatos de autoridade da sessão e do backend/transação. As
+guardas nativas permanecem a fonte de decisão;nenhuma autoridade é mantida
+entre requisições. Esse cálculo preserva os consumidores de administração,
+operação e processos internos. Recusa conhecida da criação de escala mantém
+revisão somente leitura até Voltar,com foco no controle de revisão ao retornar.
+Recuperação incerta continua distinta da revisão recusada e do preenchimento.
+
+## Preparações de recursos existentes da agenda
+
+ScheduleResourcePreparation reúne oito finalidades em quatro conjuntos de
+campos reutilizáveis. A referência operacional é lida para o alvo concreto,
+separada dos campos próprios. Guardar preserva inclusive preenchimento parcial
+ou uma referência que ficou antiga; uma referência não conferida nunca autoriza
+confirmar. Revisar relê a preparação salva e exige referência selada pelo banco.
+Adotar a referência atual é escolha explícita e não limpa os campos próprios.
+
+Uma única transação vincula a preparação, sua revisão e o pacote exato ao
+comando nativo e ao recibo. O estado desconhecido permanece distinto da recusa
+conhecida. Encerrar explicitamente uma tentativa incerta avança somente sua
+revisão privada, sob as mesmas travas, impedindo aplicação tardia do pacote.
+Não existe replay automático. Inventário local de referências oferece acesso
+à recuperação sem exibir campos privados antes da leitura autorizada.

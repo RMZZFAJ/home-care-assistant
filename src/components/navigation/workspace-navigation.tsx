@@ -19,12 +19,14 @@ const groups: { label: string; items: Item[] }[] = [
     { label: "Visão geral", href: "/", icon: "home" },
     { label: "Histórico de fichas", href: "/historico", icon: "history" },
     { label: "Notificações", href: "/notificacoes", icon: "bell" },
+    { label: "Guias e ajuda", href: "/guias", icon: "forms" },
     { label: "Escalas e plantões", href: "/escalas", icon: "calendar", capabilities: ["schedule.read.own", "schedule.read.team"] },
   ] },
   { label: "Fichas", items: [
     { label: "REQ · Requisição", href: "/fichas/req", icon: "forms", capability: "req.create" },
     { label: "COM · Compra da família", href: "/fichas/com", icon: "stock", capability: "com.create" },
-    { label: "ENT · Entrega / Entrada", href: "/fichas/ent", icon: "truck", capability: "ent.create" },
+    { label: "ENT · Entrega de materiais", href: "/fichas/ent", icon: "truck", capability: "ent.create" },
+    { label: "Devolução de materiais", href: "/fichas/devolucao", icon: "truck", capability: "ent.create" },
     { label: "BAL · Balanços e plantões", href: "/balancos", icon: "forms", capability: "bal.read" },
     { label: "Entregas e recebimentos", href: "/entregas", icon: "truck", capability: "ent.read" },
   ] },
@@ -40,6 +42,7 @@ const groups: { label: string; items: Item[] }[] = [
     { label: "Permissões e regras", href: "/configuracoes", icon: "settings", capability: "access.manage" },
     { label: "Catálogo", href: "/admin?section=catalog", icon: "stock", capability: "catalog.manage" },
     { label: "Unidades e apresentações", href: "/unidades", icon: "stock", capability: "catalog.manage" },
+    { label: "Comprovantes do catálogo", href: "/comprovantes-catalogo", icon: "history" },
     { label: "Auditoria", href: "/admin?section=audit", icon: "history", capability: "audit.read" },
   ] },
 ];
@@ -57,15 +60,16 @@ export function WorkspaceNavigation({ context, operational = false, onNavigate }
   };
   const filtered = (items: Item[]) => items.filter((item) => (!item.capability || context && can(context, item.capability)) && (!item.capabilities || context && item.capabilities.some(capability => can(context, capability))));
   const sections = operational ? [{ label: "Seu plantão", items: filtered(operationalDestinations) },
-    { label: "Ações rápidas", items: filtered(groups.flatMap((group) => group.items).filter((item) => ["/fichas/req", "/balancos", "/consumo", "/escalas"].includes(item.href))) },
+    { label: "Ações rápidas", items: filtered(groups.flatMap((group) => group.items).filter((item) => ["/fichas/req", "/fichas/devolucao", "/balancos", "/consumo", "/escalas"].includes(item.href))) },
     { label: "Gestão autorizada", items: filtered(groups.find((group) => group.label === "Gestão do paciente")!.items) }] : groups.map((group) => ({ ...group, items: filtered(group.items) }));
   if (context?.activeContext?.mode === "global" && context.globalAdministrationAllowed) sections.push({ label: "Administração global", items: [
     { label: "Pacientes", href: "/admin?section=patient", icon: "team" },
+    { label: "Preparar residência", href: "/preparar-residencia", icon: "team" },
     { label: "Contas globais", href: "/admin?section=profiles", icon: "user" },
     { label: "Unidades globais", href: "/unidades", icon: "stock" },
   ] });
-  return <nav aria-label="Navegação principal" className="hca-side-navigation">{sections.filter((group) => group.items.length).map((group) => <details key={group.label} open={group.label === "Área de trabalho" || group.label === "Seu plantão" || group.items.some(selected)}>
-    <summary><h2>{group.label}</h2><Icon name="chevron" width={14} /></summary>
+  return <nav aria-label="Navegação principal" className="hca-side-navigation">{sections.filter((group) => group.items.length).map((group) => <details key={group.label} open>
+    <summary><h2>{group.label}</h2><Icon name="down" width={14} /></summary>
     {group.items.map((item) => <Link key={item.href} href={item.href} prefetch={false} onClick={onNavigate} aria-current={selected(item) ? "page" : undefined}>
       {item.icon ? <Icon name={item.icon} /> : null}<span>{item.label}</span>
     </Link>)}
@@ -73,7 +77,9 @@ export function WorkspaceNavigation({ context, operational = false, onNavigate }
 }
 export function BottomNavigation({ context }: { context: WorkspaceContext }) {
   const pathname = usePathname();
-  return <nav className="hca-bottom-navigation print:hidden" aria-label="Navegação do plantão">{operationalDestinations.filter((item) => !item.capability || can(context, item.capability)).map((item) => <Link key={item.href} href={item.href} prefetch={false} aria-current={pathname === item.href.split("?")[0] ? "page" : undefined}>
+  const operational = ["professional", "supervisor"].includes(context.patient?.role ?? "");
+  const destinations = operational ? operationalDestinations : operationalDestinations.map(item => item.label === "Estoque" ? { ...item, href: "/estoque?custody=FAMILY", capability: "stock.family.read" } : item);
+  return <nav className="hca-bottom-navigation print:hidden" aria-label={operational ? "Navegação do plantão" : "Navegação principal no celular"}>{destinations.filter((item) => !item.capability || can(context, item.capability)).map((item) => <Link key={item.href} href={item.href} prefetch={false} aria-current={pathname === item.href.split("?")[0] ? "page" : undefined}>
     <Icon name={item.icon!} /><span>{item.label}</span>
   </Link>)}</nav>;
 }

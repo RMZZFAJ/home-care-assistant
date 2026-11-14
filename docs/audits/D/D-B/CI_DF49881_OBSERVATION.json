@@ -1,0 +1,61 @@
+{
+  "at": "2026-11-08 11:53:36 UTC",
+  "sha": "df498810cf43a353c8c6c894333807fbb6956e38",
+  "run": 42473738962,
+  "jobs": [
+    {
+      "id": 128710331185,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128710331311,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128710331354,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128713936487,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128713936499,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128713936538,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128713936678,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128721231815,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42473738962",
+  "approvalAppliesOnlyToSha": "df498810cf43a353c8c6c894333807fbb6956e38",
+  "newHistorySourceNotYetPublished": true,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION"
+}

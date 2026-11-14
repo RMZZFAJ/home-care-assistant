@@ -1,0 +1,158 @@
+COMPLEMENTO EXECUTIVO À D-B — RECONCILIAR E CONCLUIR NA CONVERSA ATUAL
+META
+Concluir a parte executável da D-B do Home Care Assistant nesta mesma conversa, com entregas funcionais integradas, aparência aprovada, verificações proporcionais ao risco, documentação vigente coerente e Preview utilizável para avaliação. Preservar integridade, segurança, rastreabilidade e os avanços existentes, reduzindo fragmentação, retrabalho e burocracia da execução.
+
+Este complemento altera o método de trabalho e as decisões expressamente indicadas abaixo. Não reinicia a missão nem acrescenta uma auditoria geral. Prevalece sobre instruções anteriores conflitantes nesses pontos; os demais requisitos de produto e limites de autorização permanecem.
+1. Incorporar a orientação sem perder o trabalho atual
+Continue na branch feat/phase-d-implementation, com a PR #7 em Draft, sem merge ou liberação operacional. Não trocar de conversa, branch ou objetivo por automatismo.
+
+No próximo ponto seguro, após terminar a operação indivisível em curso, incorpore este complemento. Não é necessário concluir todo o pacote antigo antes de reorganizar a sequência. Preserve alterações locais, migrations, testes em andamento e resultados válidos. Não executar reset, clean, descarte ou sobrescrita para deixar a árvore aparentemente limpa.
+
+Confira uma vez o HEAD efetivo, o diff local, as migrations pendentes e o estado relevante de CI/Preview. Não regresse ao commit citado em mensagens antigas. O trabalho local pode estar mais avançado que o publicado. Não exponha segredos na conferência.
+2. Decisões novas e limites mantidos
+Rascunhos: congelamento da abrangência e da apresentação
+Preserve os mecanismos de rascunho já implementados. Não simplifique agora os painéis e fluxos existentes e não acrescente rascunhos aos locais que ainda não os possuem. Não ampliar persistência, retomada, autosave ou edição entre aparelhos por iniciativa própria.
+
+A simplificação anteriormente solicitada, inclusive DOC-C.1, e a expansão de rascunhos ainda não implementada ficam adiadas por decisão do responsável. Nos blocos mistos, adie somente essa parcela; os demais requisitos continuam obrigatórios.
+
+Onde houver trabalho parcial, faça apenas o fechamento mínimo necessário para não deixar o fluxo quebrado ou conectado pela metade. Não use essa exceção para completar um novo subsistema de rascunhos. Não elimine dados existentes.
+
+Continuam obrigatórios: corrigir defeitos relevantes, preservar autorização e privacidade, impedir efeitos duplicados e recuperar resultados oficiais incertos. Rascunho de preenchimento não é a mesma coisa que intenção recuperável de uma operação oficial. Não reduzir essas proteções. A interface não pode prometer salvamento onde ele não existe.
+
+Registre o adiamento com referência a esta decisão, sem converter a pendência em PASS. Não existe autorização equivalente para adiar outros requisitos.
+Aparência e revisão humana
+Continue a implementação visual já aprovada, tanto da aplicação quanto dos PDFs. Não suspenda, remova ou descaracterize recursos. Também não abra uma nova rodada autônoma de redesenho de todo o produto.
+
+Depois da D-B, o responsável avaliará jornadas reais e encaminhará ajustes delimitados. Isso não dispensa entregar agora a referência aprovada, os controles funcionais, a acessibilidade necessária e as composições previstas. Refinamento humano posterior não é justificativa para manter deliberadamente um comportamento contrário ao modelo.
+
+O produto é o Home Care Assistant, voltado à operação de insumos entre família e equipe, inicialmente em uma residência. Não ampliar para Conecta Care, ERP ou gestão integral de escalas.
+Ambientes, versões e autorizações
+Mantenha o adiamento do SonarCloud, sem declará-lo aprovado. Preserve configurações externas já autorizadas; não habilite nem desabilite canais, crons ou credenciais por interpretação deste comando. Não há autorização nova para produção, merge, reset remoto, seed remoto ou testes mutáveis no remoto.
+
+A primeira liberação estável será a versão de produto 1.0.0. Não a publique agora. Não renumerar migrations aplicadas, revisões de fichas, formatos documentais ou chaves criptográficas para fazer todos parecerem V1. Essas identidades internas conservam sua finalidade e compatibilidade.
+3. Reconciliação inicial com resultado definido
+Faça uma única passagem de reconciliação usando as ordens vigentes, o estado efetivo e os documentos necessários. Não releia integralmente todas as auditorias e a conversa histórica por padrão.
+
+Conclua nessa passagem:
+- A precedência das decisões, incorporando este complemento às orientações que poderiam contradizê-lo.
+- Um acompanhamento principal, com sequência finita do restante e identificação do trabalho local ainda não publicado.
+- A correção dos pontos de entrada documentais desatualizados: README, índice de documentação, AGENTS e referências atuais relevantes.
+- A separação entre documentação vigente, planejamento, decisões substituídas, evidências históricas e artefatos temporários.
+- O vínculo dos critérios restantes a entregas observáveis, preservando IDs e resultados anteriores.
+Reaproveite os arquivos e a organização existentes. Escolha um documento principal para andamento; os demais devem apontar para ele ou manter função distinta. A matriz de aceitação continua sendo o detalhamento dos critérios, não outro diário narrativo. Elimine a obrigação de repetir manualmente o mesmo status em vários relatórios.
+
+Pode consolidar ou arquivar documentação comprovadamente duplicada ou superada, ajustando referências. Não apagar decisões úteis, testes, migrations, fontes de verificação ou código de compatibilidade sob o rótulo de “legado”. Não reescrever o histórico Git.
+
+Esta etapa termina quando as orientações permitem continuar sem contradição, o restante tem sequência e cada informação possui uma fonte principal. Não depende de reorganizar todas as pastas, dividir todos os arquivos grandes ou reescrever todos os CSS. Não criar uma reforma estrutural geral como pré-requisito para voltar a implementar.
+
+Mostre o plano reconciliado em uma atualização objetiva e prossiga. Não encerre a execução apenas por ter produzido o planejamento ou reorganizado um Markdown.
+4. Planejamento por resultados utilizáveis, não por microalterações
+Reorganize o restante em poucos lotes coesos, orientados a capacidades completas. Cada lote precisa indicar: resultado utilizável, requisitos atendidos, dependências reais, limites, validação adequada e condição de fechamento. Não precisa de um novo arquivo para cada lote.
+
+Preserve a rastreabilidade dos 105 critérios e complementos vigentes. Os identificadores DOC-A/B/C/D representam resultados a entregar; não obrigam a executar quatro silos totalmente sequenciais. Redistribua o trabalho quando isso reduzir repetição e antecipar uso real.
+
+Um lote deve atravessar as camadas necessárias — dados, API, interface, documento e recuperação — sem virar todo o sistema. Commits podem continuar incrementais; a aceitação integrada ocorre no fechamento da capacidade, não depois de cada pequena edição. Não acumule um diff gigante com assuntos independentes.
+
+Antes de alterar um contrato, identifique os consumidores e testes diretamente afetados, inclusive legados. Atualize-os no mesmo lote. Não espere a CI encontrar sucessivamente expectativas antigas de uma regra já substituída.
+
+Mantenha uma frente principal de implementação. Paralelize apenas trabalho realmente independente, sem escritores concorrentes na mesma árvore, fixtures ou banco compartilhado. Testes de aceite devem usar um candidato estável e identificável.
+5. Prioridade documental: entregar aparência e conteúdo integrados mais cedo
+Não é aceitável manter a aparência final dos PDFs indefinidamente para depois de toda descoberta periférica. Também não é aceitável produzir um PDF bonito com fatos incorretos ou permissões enfraquecidas.
+
+Replaneje o restante documental preferencialmente em dois ou três pacotes coesos, ajustados às dependências encontradas. Essa quantidade é orientação, não quota artificial nem promessa de prazo.
+Primeiro resultado: arquivos reais com a composição aprovada
+Aproveite DOC-B já implementado e o trabalho local. Conclua o que efetivamente bloquear a emissão correta e integre o compositor compartilhado e as particularidades de REQ, COM, ENT, devolução e BAL ao pipeline real.
+
+Use docs/documents/02_REFERENCIA_VISUAL_FICHAS.html e 03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md, ou seus caminhos atuais reconciliados. Reaproveite assinatura, TSA, armazenamento, recuperação e verificação existentes.
+
+Comece a composição aprovada no primeiro pacote documental após a reconciliação, salvo dependência técnica concreta que realmente a impeça. Não use como bloqueio automático toda a agenda de DOC-C ou uma busca geral por casos adicionais. Gere uma amostra real cedo dentro do pacote para conferir a direção e evitar terminar todos os conteúdos antes de perceber divergência visual. Isso não exige aprovação intermediária nem fecha o pacote sozinho.
+
+Não reexecute o trabalho concluído da COM, do BAL ou da devolução. Não crie representações provisórias extras só porque a classificação antiga separava aparência e integração.
+Segundo resultado: modalidades e acompanhamento documental completos
+Agrupe o restante aprovado de DOC-C e as dependências documentais correspondentes: Ficha, Ficha Ampliada, auditoria restrita nominativa, seleções e período, Andamentos estruturados, referências/menções, acessos agrupados e cancelamento/complemento ainda pendentes.
+
+A parcela de rascunhos está adiada. Isso não adia o restante de DOC-C. Não reinvente regras: aplique os contratos aprovados e confronte-os com a implementação efetiva.
+Fechamento integrado
+Distribua DOC-D pelos pacotes: cada resultado já deve usar emissão, assinatura, guarda e consulta reais. Ao final, faça a conferência conjunta que ainda for necessária, reutilizando verificações compatíveis, e entregue exemplares reais para avaliação.
+
+Preserve PDFs anteriores, fontes, versões, códigos e bytes. Não reemitir o acervo nem alterar documentos antigos para obter uniformidade visual. Não apresentar amostras estáticas ou dados simulados como integração pronta.
+
+A ordem interna pode mudar por dependência demonstrada. Explique o ajuste brevemente e continue; não é necessário novo aceite para decisões técnicas ordinárias dentro desse escopo.
+6. Testes: feedback rápido durante a construção, aceite integrado ao fechar
+Não implemente tudo às cegas para testar somente no final. Mude a granularidade das rodadas caras, não a exigência de correção.
+Alteração	Verificação proporcional
+Texto documental, índice ou relocação sem consumidor funcional	Links, referências, Markdown e diff; não executar manualmente toda a aplicação.
+Texto/composição de interface	Componente e fluxo afetados, renderização e acessibilidade pertinentes; ampliar quando atingir base compartilhada.
+Regra de negócio, permissão ou persistência	Testes de domínio/API/banco/Auth no ponto de mudança, com negativas e concorrência realmente afetadas.
+Composição PDF	Conteúdo e paginação representativos dos modelos alterados, inspeção dos arquivos reais e integração documental pertinente.
+Alteração em assinatura, integridade ou verificação	Regressões criptográficas e de segurança diretamente afetadas, além do percurso integrado.
+Candidato estável do lote	Seleção conjunta de jornadas e consumidores impactados; CI geral nos marcos publicados e no fechamento.
+
+
+Durante a implementação, use tipos, lint dirigido, testes pequenos e diagnóstico de navegador quando ajudarem a localizar falhas. Reserve rodadas extensas de múltiplos navegadores e tamanhos para candidatos estáveis, conforme o impacto e os gates vigentes.
+
+Não multiplicar automaticamente cada caso de banco ou conteúdo por todos os perfis, navegadores e larguras. Cubra diferenças reais de permissão e comportamento; use cenários representativos para composição e mantenha a regressão integrada exigida.
+
+Prepare fixtures e seletores antes de disparar uma rodada cara. Se houver falha clara no instrumento, corrija e repita o caso afetado antes de reproduzir a mesma falha em toda a matriz. Não interrompa uma operação indivisível nem descarte evidência necessária.
+
+Classifique a falha: produto, teste, ambiente ou contrato substituído. Corrija sua causa; não enfraqueça asserções para obter verde. Uma reprovação relevante sem correção ou explicação impede o aceite daquele resultado. Investigue acessibilidade real; não presuma que toda falha de seletor seja apenas um teste ruim.
+
+Reutilize aprovações quando código, dependências, configuração e cenário continuarem compatíveis. Não atribua um teste antigo a um candidato novo incompatível. Registre a referência testada de maneira simples. Não criar outro framework de evidências ou cache para comprovar essa reutilização.
+
+Mudanças comuns de aparência não exigem repetir toda a demonstração criptográfica, mas os exemplares novos precisam continuar válidos no pipeline. Não alterar validadores de runtime ou proteções do produto para economizar testes.
+7. Evidência suficiente, sem dossiê para cada edição
+Distinga auditoria do produto de documentação do desenvolvimento. Eventos, autoria, hashes documentais, versões e rastreabilidade do sistema permanecem intactos.
+
+Para um lote, normalmente bastam: o que foi entregue, referência do código/candidato, testes relevantes e resultados, artefatos reutilizáveis e limitações. Use os relatórios nativos e os testes existentes.
+
+Não exigir novo manifesto de hashes, relatório pericial, script de consolidação, arquivo de observação ou narrativa de contraprova para cada pequena mudança. Uma regressão reproduzível, um resultado de teste e uma referência de commit podem ser evidência suficiente. Preserve registros adicionais quando forem necessários para segurança, dados, migrations ou incidentes relevantes, não por rotina automática.
+
+Atualize o acompanhamento e a matriz ao fechar uma entrega ou mudar um bloqueio relevante. Atualize o contrato funcional quando ele realmente mudar. README e AGENTS só recebem mudanças pertinentes à sua responsabilidade. Não repetir o mesmo histórico na PR, no checkpoint, no status e no arquivo temporário.
+
+Não reorganize repetidamente o quadro para conservar percentuais subjetivos. Prefira entregas concretas concluídas, pendências e impedimentos. Não recompute percentuais com um programa novo só para esta reconciliação.
+8. Banco, builds e Preview
+Migrations são cabíveis quando o requisito exige um fato persistente, mudança real de contrato, autorização ou integridade. Não são necessárias apenas para mudar tipografia, espaçamento ou a posição de um aviso. Antes de uma migration, identifique sucintamente qual necessidade não é atendida pelas estruturas existentes.
+
+Agrupe mudanças relacionadas em unidades tecnicamente coesas, sem impor limite numérico e sem fundir, renomear ou reescrever migrations aplicadas. Preserve os procedimentos autorizados de preflight, compatibilidade, backup e pós-verificação.
+
+A aplicação remota deve conter somente o conjunto pronto e necessário ao Preview publicado. Não fazer push indiscriminado de migrations locais em elaboração. Não publicar interface que dependa de schema ausente sem um mecanismo seguro de compatibilidade. Ao final, reconcile todas as migrations deste escopo que estejam prontas e autorizadas.
+
+Reaproveite builds apenas quando corresponderem ao candidato testado. Evite rodadas locais completas duplicadas com a CI. Não enfraqueça checks obrigatórios, use skip-ci para encobrir falhas ou remova cobertura.
+
+Não interrompa o produto para reformar toda a CI ou a hospedagem. Uma otimização pontual só entra se for simples, segura e tiver benefício imediato; não pode virar outra missão. Não faça redeploys manuais apenas para atualizar percentuais documentais.
+9. Documentação útil e organização técnica
+Mantenha responsabilidades claras: README apresenta o produto; índice orienta a navegação; AGENTS regula o trabalho do agente; documentação atual explica o implementado; contratos descrevem regras; procedimentos explicam operação/configuração; histórico conserva decisões e evidências passadas.
+
+Corrija afirmações que descrevem como futuro algo já implementado ou que apresentam regras antigas como atuais. Não basta apontar para um checkpoint que contradiz o documento principal. Separe implementado, aprovado ainda pendente e histórico.
+
+Use nomes estáveis e descritivos. Evite novos arquivos com “final”, “v2-final”, “canônico novo” ou equivalentes. Preserve nomes/versionamentos que têm função real de compatibilidade. Não impor renomeação geral de código como condição de fechamento.
+
+CSS novo ou alterado deve seguir responsabilidades identificáveis, sem criar outra camada global de remendos. Reaproveite componentes. Não faça uma grande migração de estilos, divisão por contagem de linhas ou troca de stack apenas por organização. Mudança estrutural que for necessária ao lote deve ter escopo e regressão proporcionais.
+
+Feche os documentos de uso, configuração e contratos afetados junto da entrega correspondente. Não deixe toda a explicação do sistema para uma auditoria documental posterior; também não interrompa cada pequena edição para atualizar documentos que não mudaram de significado.
+10. Interface: entregar o modelo aprovado, não explicações de desenvolvimento
+Preserve estrutura estável entre perfis e estados; capacidades controlam ações e conteúdos autorizados, não uma reconstrução arbitrária da mesma tela. Mantenha macroetapas no cabeçalho, Andamentos em cronologia, arquivos gerados separados de anexos e diagnóstico centralizado.
+
+Use diálogos/gavetas para decisões e operações contextuais quando isso corresponder ao modelo; erros de campo e avisos de consulta permanecem junto ao contexto quando apropriado. Não transformar todos os avisos em modais nem empilhar toda recuperação na página por comodidade técnica. O congelamento de rascunhos é a exceção expressa à sua reformulação agora.
+
+Textos devem dizer ao usuário o que ocorreu, a consequência e a ação possível. Não levar para a interface instruções ao desenvolvedor, status da missão, detalhes de RPC/ledger ou justificativas de implementação sem necessidade operacional.
+
+Avalie as telas e PDFs renderizados, não somente os componentes no código. Não invente um novo processo universal de homologação visual: compare a jornada alterada com a referência e corrija divergências concretas. Entregue o que ainda falta do padrão aprovado; não faça passes indefinidos de aprimoramento sobre áreas já conformes.
+11. Controle de escopo e comunicação
+Uma descoberta entra imediatamente se for requisito vigente, dependência indispensável ou defeito relevante que impeça correção, segurança ou uso do escopo. Melhorias novas ficam registradas sem implementação automática. Não reclassifique como melhoria opcional algo que já é obrigatório.
+
+Se a investigação abrir uma nova cadeia de trabalho, explique o vínculo com o resultado atual e o impedimento concreto. Sem esse vínculo, não amplie o lote. Não é necessário pedir aprovação para a implementação ordinária já autorizada; alterações materiais de produto ou ações destrutivas continuam exigindo decisão.
+
+Nas atualizações, priorize: capacidade entregue, local para testar, pendência que realmente falta e próximo resultado. Quantidade de testes é informação auxiliar, não a descrição principal do progresso. Distinga implementado localmente, validado, publicado e disponível no Preview.
+
+Diante de falhas repetidas, diagnostique antes de repetir a suíte. Diante de bloqueio externo, registre-o e prossiga com trabalho independente. Não preencher a espera com novas funções, reorganizações ou provas sem necessidade.
+12. Condição de encerramento
+Após os documentos, continue os demais requisitos executáveis da D-B no plano reconciliado, sem esquecer assinatura/custódia, PWA, notificações, lembretes, administração/guia, monitoramento, backup e recuperação que efetivamente continuarem pendentes. O foco documental não autoriza abandonar o restante.
+
+A execução termina quando os requisitos executáveis vigentes estiverem implementados e integrados, o candidato final tiver as validações técnicas exigidas, o Preview e as migrations autorizadas estiverem coerentes, os contratos atuais estiverem atualizados e as pendências humanas/externas estiverem identificadas com clareza.
+
+Mantenha separados: concluído tecnicamente; validação técnica pendente; avaliação humana pendente; bloqueio externo; adiamento expresso do responsável. Não converter rascunhos adiados, Sonar adiado ou testes físicos não realizados em aprovação. Não transferir implementação faltante para a categoria “depende do usuário”.
+
+Quando restarem somente dependências externas ou humanas legitimamente separadas da entrega executável, entregue o fechamento técnico com essas ressalvas, sem continuar indefinidamente criando trabalho. Se houver bloqueador técnico não resolvido, declare a limitação; não afirme conclusão integral.
+
+Ação imediata: incorpore este complemento no próximo ponto seguro, faça a reconciliação delimitada, apresente a sequência resultante e retome a implementação nesta mesma conversa, sem esperar um novo “continue”. O objetivo é entregar capacidades completas do Home Care Assistant — com qualidade verificável e menos repetição —, não produzir uma nova auditoria da execução.

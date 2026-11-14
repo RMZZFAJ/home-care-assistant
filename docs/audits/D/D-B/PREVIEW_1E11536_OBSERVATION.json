@@ -1,0 +1,45 @@
+{
+  "at": "2026-11-08T00:19:00.353Z",
+  "startedAt": "2026-11-08T00:18:52.517Z",
+  "sha": "1e11536f4a4f25c7167bd58af211fd9580f1bf23",
+  "deployment": "https://home-care-assistant-kwa8y8tfg-rmzzfajs-projects.vercel.app",
+  "ready": true,
+  "results": [
+    {
+      "name": "runtime",
+      "status": 200,
+      "body": {
+        "state": "ready",
+        "protocol": 1,
+        "schema": 1
+      }
+    },
+    {
+      "name": "private",
+      "status": 401,
+      "code": "SESSION_EXPIRED",
+      "noApplicationSession": true
+    }
+  ],
+  "applicationAuthCreated": false,
+  "remoteBusinessFixtureCreated": false,
+  "sharedBypassLinkCreated": false,
+  "operationalGo": false,
+  "applicationHeartbeat": {
+    "environment": "preview",
+    "component": "application",
+    "observedAt": "2026-11-08 00:18:57.131+00",
+    "successAt": "2026-11-08 00:18:57.131+00",
+    "source": "Remote component read after this compatible preview runtime probe; Secret values never fetched"
+  },
+  "ciObservation": {
+    "run": 42428525557,
+    "sha": "1e11536f4a4f25c7167bd58af211fd9580f1bf23",
+    "validateLinux": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "cleanAndLegacyMigrations": "SUCCESS",
+    "integration": "IN_PROGRESS",
+    "browserJobs": "PENDING_DATABASE_DEPENDENCY",
+    "notFinalApproval": true
+  }
+}

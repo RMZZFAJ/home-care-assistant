@@ -37,8 +37,8 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
     ["/fichas", "Central de fichas"],
     ["/fichas/req", "Requisição de insumos"],
     ["/fichas/com", "Compra de insumos"],
-    ["/fichas/ent", "Entrega / Entrada"],
-    ["/fichas/bal", "Balanço semanal"],
+    ["/fichas/ent", "Entrega e devolução de materiais"],
+    ["/fichas/bal", "Balanço de estoque"],
     ["/escalas", "Escalas e plantões"],
     ["/balancos", "Balanços e plantões"],
     ["/historico", "Histórico de fichas"],
@@ -62,7 +62,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
     await audit(page, path);
   }
   await page.goto("/historico?careRecipientId=" + patientA);
-  await page.getByRole("button", { name: /Pesquisar e filtrar/ }).click();
+  await page.getByRole("button", { name: /Filtros/ }).click();
   await audit(page, "history expanded");
   const opened = await openNavigation(page);
   await expect(
@@ -80,14 +80,33 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await expect(
     page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true }),
   ).toBeVisible();
+  await expect(page.getByRole("menu",{name:"Ações do usuário",exact:true})).toBeVisible();
+  await expect(page.getByRole("menuitem",{name:"Meu perfil e segurança",exact:true})).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true })).toBeFocused();
   await audit(page, "profile menu");
   await page.keyboard.press("Escape");
+  await expect(page.getByLabel("Menu do usuário",{exact:true})).toBeFocused();
+  await page.getByLabel("Menu do usuário",{exact:true}).click();
+  await page.getByRole("menuitem",{name:"Central de notificações",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Central de notificações",exact:true})).toBeVisible();
+  await expect(page.getByRole("menu",{name:"Ações do usuário",exact:true})).toHaveCount(0);
   await page
     .getByRole("combobox", { name: "Pessoa assistida", exact: true })
     .selectOption(patientB);
   await expect(
     page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
   ).toHaveValue(patientB);
+  // The native select value changes before the context request and linked
+  // route finish. Observe the actual B workspace before starting a return to A.
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", patientB);
+  await expect(page).toHaveURL(new RegExp("careRecipientId=" + patientB));
+  await expect(page.getByRole("region", { name: "Acompanhamento pessoal", exact: true })).toBeVisible();
+  await selectContext(page,patientA);
+  await expect(page.getByRole("menu",{name:"Ações do usuário",exact:true})).toHaveCount(0);
+  await expect(page.getByLabel("Menu do usuário",{exact:true})).toBeFocused();
+  await expect(page.getByRole("main")).toBeVisible();
+  await audit(page,"profile context return");
 });
 for (const role of [
   "adminA",

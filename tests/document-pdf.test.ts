@@ -1,3 +1,5 @@
+import { currentPdfFixture } from "./support/current-pdf-fixture";
+import { fidelityEmission } from "./support/pdf-fidelity-fixtures";
 import { mkdir, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
@@ -9,14 +11,23 @@ import {
 } from "@/lib/server/operational-pdf";
 
 describe("approved document presentation", () => {
-  it("renders the current BAL shift and all linked weeks without altering the historical source",async()=>{
-    const original=Object.values(demoDocuments).find(d=>d.type==="BAL")!;
-    const serialized=JSON.stringify(original);
-    const snapshot={...original,payload:{...original.payload,balanceContext:{professionalName:"Profissional fictícia",shiftType:"Diurno",startsAt:"2026-10-25T10:00:00Z",endsAt:"2026-10-25T22:00:00Z",countedAt:"2026-10-25T15:00:00Z",timezone:"America/Sao_Paulo",weeks:["2026-10-05","2026-10-12","2026-10-19"]}}};
-    const bytes=await renderDocumentPdf(snapshot,"b".repeat(64));
+  it("renders the frozen source and own reason of a remaining need without changing the original REQ", async () => {
+    const original = Object.values(demoDocuments).find(d => d.type === "REQ")!;
+    const prior = JSON.stringify(original);
+    const snapshot = { ...original, payload: { ...original.payload, sourceRequisition: { id: original.id, code: original.code, protocol: original.protocol, version: 3, reason: "O material entregue não encerrou a necessidade fictícia" } } };
+    const bytes = await renderDocumentPdf(currentPdfFixture(snapshot), "c".repeat(64), fidelityEmission);
+    expect((await PDFDocument.load(bytes)).getPageCount()).toBeGreaterThanOrEqual(2);
+    expect(JSON.stringify(original)).toBe(prior);
+    await mkdir("output/pdf", { recursive: true }); await writeFile("output/pdf/req-remaining-need-controlled.pdf", bytes);
+  });
+  it("renders the current BAL shift and all linked weeks without altering the historical source", async () => {
+    const original = Object.values(demoDocuments).find(d => d.type === "BAL")!;
+    const serialized = JSON.stringify(original);
+    const snapshot = { ...original, payload: { ...original.payload, balanceContext: { professionalName: "Profissional fictícia", shiftType: "Diurno", startsAt: "2026-10-25T10:00:00Z", endsAt: "2026-10-25T22:00:00Z", countedAt: "2026-10-25T15:00:00Z", timezone: "America/Sao_Paulo", weeks: ["2026-10-05", "2026-10-12", "2026-10-19"] } } };
+    const bytes = await renderDocumentPdf(currentPdfFixture(snapshot), "b".repeat(64), fidelityEmission);
     expect((await PDFDocument.load(bytes)).getPageCount()).toBeGreaterThanOrEqual(2);
     expect(JSON.stringify(original)).toBe(serialized);
-    await mkdir("output/pdf",{recursive:true});await writeFile("output/pdf/bal-plantao-semanas.pdf",bytes);
+    await mkdir("output/pdf", { recursive: true }); await writeFile("output/pdf/bal-plantao-semanas.pdf", bytes);
   });
   it("directs completed and archived requests to their actual next operation", () => {
     const req = Object.values(demoDocuments)[0];
@@ -67,7 +78,7 @@ describe("approved document presentation", () => {
       const hash = createHash("sha256")
         .update(JSON.stringify(snapshot))
         .digest("hex");
-      const bytes = await renderDocumentPdf(snapshot, hash);
+      const bytes = await renderDocumentPdf(currentPdfFixture(snapshot), hash, fidelityEmission);
       const pdf = await PDFDocument.load(bytes);
       expect(pdf.getPageCount()).toBeGreaterThanOrEqual(2);
       expect(pdf.getTitle()).toContain(snapshot.code);
@@ -84,15 +95,15 @@ describe("approved document presentation", () => {
   it("paginates long material lists and unbroken hashes without dropping pages", async () => {
     const first = Object.values(demoDocuments)[0];
     const bytes = await renderDocumentPdf(
-      {
+      currentPdfFixture({
         ...first,
         lines: Array.from({ length: 80 }, (_, index) => ({
           ...first.lines[0],
           product_name_snapshot: `Produto ${index} com nome extenso para conferir quebra e legibilidade`,
           name_snapshot: `Produto ${index} com nome extenso para conferir quebra e legibilidade`,
         })),
-      },
-      "a".repeat(64),
+      }),
+      "a".repeat(64), fidelityEmission,
     );
     expect((await PDFDocument.load(bytes)).getPageCount()).toBeGreaterThan(4);
   }, 20000);

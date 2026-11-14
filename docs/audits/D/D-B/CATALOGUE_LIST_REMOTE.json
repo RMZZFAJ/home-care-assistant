@@ -1,0 +1,91 @@
+{
+  "project": "qwfrqychokvhdzakibid",
+  "beforeVersions": 205,
+  "afterVersions": 206,
+  "migration": "20261111095717_phase_d3_complete_catalogue_read.sql",
+  "pendingAfter": 0,
+  "metadata": {
+    "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+    "config": [
+      "search_path=\"\""
+    ],
+    "result": "jsonb",
+    "definer": false,
+    "version": "20261111095717",
+    "bodyHash": "d0cf34eb5aafad5393da73a5f100b799d7211ca2e79caeeb1c440eecfe4b92a8",
+    "versions": 206,
+    "volatility": "s",
+    "migrationHash": "68858dec256913435fccd93c261fad7d37648d83004fc6ce1012ccf98edcbb27"
+  },
+  "advisorsBefore": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 62,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public"
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 3,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable"
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 208,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+    }
+  ],
+  "advisorsAfter": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 62,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public"
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 3,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable"
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 208,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+    }
+  ],
+  "sameAdvisorClassesAndCounts": true,
+  "limits": [
+    "Local CLI security advisors timed out connecting to127.0.0.1;remote MCP advisors completed before/after.",
+    "Existing advisory findings remain;no global security approval.",
+    "No remote fixtures,Auth,Vault,reset,production or external activation."
+  ],
+  "localRemoteFunctionAndHistoryMatch": true
+}

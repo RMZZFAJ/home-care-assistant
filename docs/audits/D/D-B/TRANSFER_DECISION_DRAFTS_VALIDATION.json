@@ -1,0 +1,357 @@
+{
+  "assembledAt": "2026-11-09T18:31:33.472600+00:00",
+  "baseSha": "60c419b468a36b981872a70d210bddd5d13835ab",
+  "sourceLfSha256": {
+    "src/app/api/documents/[id]/transfer/route.ts": "3abf475471e92d9cc8213c0e155dbd222d61e7e85fae76bef4b469625d78ca48",
+    "src/components/documents/supply-detail.tsx": "0c152794bd4b1393ba611706c7bb86ac4395e8e766d91fb39982666ce1d9c6a1",
+    "src/components/documents/transfer-decision-editor.tsx": "b1137120419cf1390a0549587ca6469c950772c3834a6c3a4202e4c75bd9555f",
+    "src/components/documents/transfer-details.tsx": "56ccf728a987986019356209118f50cd3c4e3a7c0d71333478ba57fb7de14afd",
+    "src/components/documents/transfer-facts.tsx": "251660f3bc6ec2f3096356d3feb8ec30ed8b9db8763dabc5c6bd754c157506d3",
+    "src/components/forms/creation-draft-panel.tsx": "3f0fc5d46a66801dfe541041b39dc5e48b3eda32e8ce771a96b8fea9fd23e25d",
+    "src/lib/forms/draft-navigation.ts": "0f58dfed2f78cfb058d66e867a2fe3493f7670ca41b182a56083ca3ce50ac047",
+    "src/lib/forms/transfer-decision-draft.ts": "0853f8478889c7503f4a3c3efe06125307ba95890a9192dee1ef351db63e10fb",
+    "src/lib/validation/supply-drafts.ts": "c030b52343af33763a80635f89b07751149694a438bf60ceb40e586fc8efbb68",
+    "src/lib/validation/transfer-reference.ts": "5659263e7429cad18772a039fd8e0886fb2e46b29be9250fc2f6acafc1541c2c",
+    "src/lib/validation/transfers.ts": "05152ce82a3379962602a689d35f1e6ef89716196a402732f8c0ac1375e777bf",
+    "supabase/migrations/20261109175803_phase_d3_transfer_decision_private_drafts.sql": "d235566ba967914323ce07c17891bdaa9d31472226163fa79ab510a0ef247d55",
+    "tests/e2e/transfer-bilateral.spec.ts": "2569e1f0bdc488ce29af9ed4131d445c58b248e37a7ad1d81b03d64785d171d7",
+    "tests/e2e/transfer-decision-private-drafts.spec.ts": "423d4f786143d209de137f69c3ce51ef76a2f003a37539d917225efd3710eb5c",
+    "tests/integration/transfer-decision-administration.test.mjs": "5d51efd405c8af2adcab270851c6e83a76286b255b88539ef0b1c08c9a35a842",
+    "tests/integration/transfer-decision-draft-fixtures.mjs": "b3f0d17b5ac0092578924a86fef8a2f3c6c9bbe00a50f909653a21a22ae47dc7",
+    "tests/integration/transfer-decision-private-drafts.test.mjs": "f0b85db1184a57b4af5d765b153d5d200dd87c1a3d992e6be8d48e45efde59ff",
+    "tests/integration/transfer-decision-recovery.test.mjs": "d7c8328fca2a60d58cd5f541f77e73f7132a314022490e7ebab9363dfcfe7bf6",
+    "tests/transfer-decision-drafts.test.ts": "ff33408315acaf8ece44aec62c21f5138c94f4d7f80f3009c731e55b78e1cfaf"
+  },
+  "unitApi": {
+    "passed": 21,
+    "files": [
+      "tests/transfer-decision-drafts.test.ts",
+      "tests/api/private-drafts-contract.test.ts",
+      "tests/api/transfer-contract.test.ts",
+      "tests/draft-navigation.test.ts"
+    ]
+  },
+  "realAuth": {
+    "distinctPassed": 18,
+    "initial": {
+      "passed": 9,
+      "probeFailures": 4,
+      "cause": "42P10 in synthetic trigger ON CONFLICT: partial-index predicate absent"
+    },
+    "journalRepeatPassed": 4,
+    "additionalReplayAndSlotPassed": 4,
+    "administrationPassed": 1,
+    "limits": "Initial nine unchanged successes reused; only four affected synthetic journal probes repeated. No E2E ran concurrently with the mutable Auth suites."
+  },
+  "browser": {
+    "final": {
+      "stats": {
+        "total": 14,
+        "expected": 14,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "cases": [
+        {
+          "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 71,
+            "column": 5
+          },
+          "duration": 27561,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 338,
+            "column": 5
+          },
+          "duration": 10424,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 71,
+            "column": 5
+          },
+          "duration": 61320,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 338,
+            "column": 5
+          },
+          "duration": 23191,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência agree retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 66,
+            "column": 7
+          },
+          "duration": 13206,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência decline retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 66,
+            "column": 7
+          },
+          "duration": 11469,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência withdraw retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 66,
+            "column": 7
+          },
+          "duration": 15720,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência dispatch retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 66,
+            "column": 7
+          },
+          "duration": 17861,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência conserva consulta privada após perda de escrita sem oferecer formulário oficial",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 270,
+            "column": 5
+          },
+          "duration": 11570,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência agree retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 66,
+            "column": 7
+          },
+          "duration": 37506,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência decline retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 66,
+            "column": 7
+          },
+          "duration": 18183,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência withdraw retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 66,
+            "column": 7
+          },
+          "duration": 17368,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência dispatch retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 66,
+            "column": 7
+          },
+          "duration": 26064,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "transferência conserva consulta privada após perda de escrita sem oferecer formulário oficial",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-decision-private-drafts.spec.ts",
+            "line": 270,
+            "column": 5
+          },
+          "duration": 18768,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        }
+      ],
+      "reportSha256": "2908e218d6e9db665b83d5d2b189f5f9d31c07a1d86952046fc2bac4b7469c64"
+    },
+    "sourceFreezeCount": 18,
+    "sourceFreezeVerified": true,
+    "administrationTestAddedAfterBrowser": "Additional MJS test is not imported by E2E; all eighteen frozen sources remain identical",
+    "initialInterrupted": {
+      "completedLogLines": [
+        "  ok  1 [mobile] › tests\\e2e\\transfer-bilateral.spec.ts:71:5 › transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo (31.6s)",
+        "  x   2 [mobile] › tests\\e2e\\transfer-bilateral.spec.ts:338:5 › conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado (24.1s)",
+        "  x   3 [mobile] › tests\\e2e\\transfer-decision-private-drafts.spec.ts:72:7 › transferência agree retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos (20.4s)",
+        "  x   4 [mobile] › tests\\e2e\\transfer-decision-private-drafts.spec.ts:72:7 › transferência decline retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos (20.4s)",
+        "  x   5 [mobile] › tests\\e2e\\transfer-decision-private-drafts.spec.ts:72:7 › transferência withdraw retoma entre sessões,exige referência atual e recupera resultado sem repetir efeitos (20.4s)"
+      ],
+      "interrupted": true,
+      "scheduled": 14,
+      "reporterNotUsedForVerdict": true,
+      "files": {
+        "output\\phase-d-work\\ui-canonical\\transfer-decisions-initial-counterproofs\\transfer-bilateral-conflit-75fd1-e-não-reabrem-ato-encerrado-mobile\\error-context.md": "2ae502a73abce77553951953e26fd3fa4467113292e5c712bd7da0d7124e823b",
+        "output\\phase-d-work\\ui-canonical\\transfer-decisions-initial-counterproofs\\transfer-bilateral-conflit-75fd1-e-não-reabrem-ato-encerrado-mobile\\test-failed-1.png": "5762ab8e5388fa5bcba977be7a70e72524ec5f287560a862bd5541470418b3ac",
+        "output\\phase-d-work\\ui-canonical\\transfer-decisions-initial-counterproofs\\transfer-decision-private--8bf80-sultado-sem-repetir-efeitos-mobile\\error-context.md": "ff4ee9beed0f16fd210e149419094bd45da9f54a35b1a9b4a06a5aabb9082704",
+        "output\\phase-d-work\\ui-canonical\\transfer-decisions-initial-counterproofs\\transfer-decision-private--8bf80-sultado-sem-repetir-efeitos-mobile\\test-failed-1.png": "a237af028fdf10c8f88019f56ed9a3c5ea57937dff7952d77def524eefa6d94e",
+        "output\\phase-d-work\\ui-canonical\\transfer-decisions-initial-counterproofs\\transfer-decision-private--b9da1-sultado-sem-repetir-efeitos-mobile\\error-context.md": "12a1d76f6c205e3d3ce338fea2bac4ab47037c39a4e9e70930cf9612408997b4",
+        "output\\phase-d-work\\ui-canonical\\transfer-decisions-initial-counterproofs\\transfer-decision-private--b9da1-sultado-sem-repetir-efeitos-mobile\\test-failed-1.png": "ca1382ff8814c1fc5940368fa7661b5749da85b2a43622dd8062501f555938ec",
+        "output\\phase-d-work\\ui-canonical\\transfer-decisions-initial-counterproofs\\transfer-decision-private--bc224-sultado-sem-repetir-efeitos-mobile\\error-context.md": "62f60b020d21c849c9ffad30d0d5c5fc94698fff7f1c12e95d4aa18639728e6e",
+        "output\\phase-d-work\\ui-canonical\\transfer-decisions-initial-counterproofs\\transfer-decision-private--bc224-sultado-sem-repetir-efeitos-mobile\\test-failed-1.png": "80d2d3dfaafae42018217dade58dc26e189f7d376dffa7bb504263fa94402d9c"
+      }
+    },
+    "counterproofs": "One real post-refresh focus regression; role-vs-label test selectors. Initial HTML skipped report not used as a verdict. Initial five completed cases:one passed,four failed;remaining cases interrupted. Final14 all passed.",
+    "preflight": "PowerShell npm consumed flags; interrupted before browser cases. Final runner invoked directly,with list14 first.",
+    "screenshotsInspected": [
+      {
+        "path": "output\\phase-d-work\\ui-canonical\\transfer-decisions-final\\5e060ebb5c4f99f98ca3c0ea20dd5ac7f2bf91e0.png",
+        "sha256": "b440e923416ceb88763d0d08c50f453c36f88cf5bc2d201b80d0062fd12c67c2"
+      },
+      {
+        "path": "output\\phase-d-work\\ui-canonical\\transfer-decisions-final\\ef0e0ff2e49570d0e1a6c134265ae8fbcb9393ff.png",
+        "sha256": "e0da9e9e13ab278572d2a49bcd209535a343feaa1900c1c49b7050e5f26e5a6b"
+      }
+    ]
+  },
+  "checks": {
+    "typecheck": "PASS",
+    "lintAffectedSources": "PASS after ref naming repair;no suppression",
+    "reactChecklist": "Native shared controls;hooks before returns;fresh Auth facts;no new dependencies or styles;explicit uncertain result recovery",
+    "localDbPrepare": "173 migrations applied without reset",
+    "migrationBodies": {
+      "matchedLfBodies": true,
+      "crlfNormalized": true,
+      "expectedAndLocal": {
+        "private.require_transfer_draft_authority": "87eda171f40ffa9be9e2f4ec252d118d239ebfc2d2e5937431b46cd4c700e699",
+        "private.require_supply_draft_scope": "316f03c5f4834982016ed9e447223ec9b887c2df4c7aa741e8bded4a8f04d0ec",
+        "private.creation_draft_navigation_valid": "7ac37ed6a9023b668ef3261a11860c65220afdf8577246692160e7d111f58084",
+        "public.commit_supply_draft": "add978d70282abfbfd2c16484080a96896be7b62fc164566ba05e0613a19e6f2"
+      },
+      "migrationLfSha256": "d235566ba967914323ce07c17891bdaa9d31472226163fa79ab510a0ef247d55"
+    }
+  },
+  "logSha256": {
+    "transfer-decisions-db-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "transfer-decisions-unit-final.log": "b01b4e8a2448b84971c6a3958e50527dc3a096f5dfeb9f3c79e31d89bae29ac4",
+    "transfer-decisions-types-focus.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "transfer-decisions-lint.log": "5f462ee3e77618042f6a83445673da3caea37db11a4b0689fedba730fd046245",
+    "transfer-decisions-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer-decisions-lint-focus2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer-decisions-lint-admin.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer-decisions-auth.log": "1f6c8c06425daa6d7f0b9667dcb94997c437fc92119a5056b2bbb0fb2f9111bd",
+    "transfer-decisions-auth-journal.log": "bfaf22e6b702677745cd8c34d38945960bae635a0236ff0eb73bb7a3d6862893",
+    "transfer-decisions-auth-recovery.log": "0d71aa3c8ed7da48f3ab00c544d6b320075ee420ec764eb352c0a856f88a80f4",
+    "transfer-decisions-auth-admin.log": "29eb735fa9da10420b63e3b51c52c0fa7b0818dc76d3a0d5bbc93ba2f41adad9",
+    "transfer-decisions-e2e.log": "b0943d27423318ea62251f879a0342eb437af7f305df3250cb3ba6815e7ee3cf",
+    "transfer-decisions-e2e-final.log": "0002beb5e3e0a1d1189a37ca64de3cff2b79969039578cb2f7f4ec57ca218ad6",
+    "transfer-decisions-e2e-final-list.log": "73e875428a198b01755c31e15029a11e8c0c7aad13dce187cdefc8824bfed867",
+    "transfer-decisions-e2e-list.log": "d9dba323f35761dc63ec2113d0031306d986b19024fa72edb039d7a3278aa809",
+    "transfer-decisions-remote-dry-run.log": "87462af50355cbbe375a47a854dd0072498430eab53e2f9806156c68dd2e99f2",
+    "transfer-decisions-remote-push.log": "e800856033b38607190e54a80a13af280855cbde8be8e769568f419e47bd8747",
+    "transfer-decisions-remote-reconciled.log": "d77102c47dbe17725adfd88b5aed2ce8316cf1842517c1af4897c58aa8b70caf",
+    "transfer-decisions-markdown.log": "3947cac462c9285e924e0a36bf22436f91181cb03f64c0b454386bc597cf1031"
+  },
+  "remote": "TRANSFER_DECISION_DRAFTS_REMOTE.json",
+  "ci": "CI_60C419B_OBSERVATION.json",
+  "preservation": {
+    "historicalMigrations": 84,
+    "acceptanceRows": 105,
+    "acceptanceColumns": 39,
+    "first30Columns": "unchanged",
+    "pass": 56,
+    "partial": 49,
+    "uiRows": 18
+  },
+  "limits": [
+    "Draft declaration creation itself remains a separate pending increment",
+    "No blanket canonical parity,physical Android/iOS,AT,provider or production approval",
+    "No new signature,TSA,backup,restore or monitoring approval",
+    "Sonar deferred by owner;own published SHA CI remains required"
+  ],
+  "documentation": {
+    "markdownFiles": 4,
+    "localLinksChecked": 325,
+    "sourceLfHashesVerified": true,
+    "acceptanceFirst30ColumnsVerified": true,
+    "pass56Partial49Verified": true,
+    "markdownIssues": 0
+  }
+}

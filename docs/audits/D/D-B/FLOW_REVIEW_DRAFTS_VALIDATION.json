@@ -1,0 +1,616 @@
+{
+  "increment": "D3.48",
+  "baseSha": "e2e99d2ee0fa6f4de22910adb097087de12588b2",
+  "status": "DIRECTED_LOCAL_IMPLEMENTATION_VALIDATED_OWN_SHA_CI_REQUIRED",
+  "sourceLfSha256": {
+    "src/app/api/whatsapp/flows/preparations/commit/route.ts": "03ecbee9dce9501a3df968022e97a5f04f60dff42b5639acc6b5544871bcaa60",
+    "src/app/api/whatsapp/flows/preparations/list/route.ts": "14108af184c057502bc619b7a6ef0e49b0f180703a78b51a592a3cb6856cc52f",
+    "src/app/api/whatsapp/flows/preparations/reference/route.ts": "dd2b108c5542bca06d50549807572d6e3183fb62106301932ded74e9f32e1ced",
+    "src/app/api/whatsapp/flows/preparations/route.ts": "ec1b01c37dd525dbee61aa4a148eb4c6f4f14743a9e4ad6f6c29c156f28c8552",
+    "src/app/canonical-ui.css": "e8a4735c4f8bcd417a68a8cf5a96cd70bda2ca3dac37e1d400e1e70af86a15cb",
+    "src/components/forms/creation-draft-panel.tsx": "5eabe2ddf583e0e15e2b7bdd4f33b91b1336750d227372f285cf08edfcf80b44",
+    "src/components/forms/record-drawer.tsx": "936d7e5a2bb1c409aa6479284933ddab0696a5edc30fbc1dd5dac4d78e8691d7",
+    "src/components/forms/use-creation-draft.ts": "7d7a915e053d8c2f826f4da2d6e6f54842aaa21775204a11be4eb1cd60564393",
+    "src/components/stock/consumption-console.tsx": "ab2006ac8b8384b08afc23838abf876f0f2bf9a25daba405a863095453c40198",
+    "src/components/stock/flow-preparation-summary.tsx": "3e11245848a5baf4d8cd30e77ffa3fd89a9d1e56e610f47cc2b9b8674afd3ccb",
+    "src/components/stock/flow-review-preparation.tsx": "3d0f7ba548edc0891b9e776a866bebd0fdcde795b6097bc86d09b33ec5f60862",
+    "src/components/stock/flow-reviews.tsx": "6aa3a8241b1b848d9637a2e835b1563cf0c98e934d99d9fdf4222af72cdca6cf",
+    "src/components/ui/controls.tsx": "5349cf4a23f43f4887c8c9ac85b8442b10475ef69934a8645146f4bbe1752959",
+    "src/lib/forms/draft-navigation.ts": "a5269d685927b8e1256ba7a707d399c16ded9c4720aae60d92a495eeedade714",
+    "src/lib/server/api.ts": "a264264506618cc6a9800d96e99c7a60698de0d80b8898699b7954989365edf8",
+    "src/lib/validation/consumption-preparations.ts": "992782ecca0ff256feefa8fab1aa5bee77ecf1e9dc7b49c250d294222b5e84de",
+    "src/lib/validation/creation-drafts.ts": "89293ac2fb3ccbe46e2e3cba51d6c279cf830375112b7bee97ba6fe6c72f2573",
+    "src/lib/validation/flow-preparations.ts": "b2a8a9b976f84c382d7d7d8a53a0247d3f5e8bba94be03875ffb19bda88407bd",
+    "src/lib/validation/private-draft-results.ts": "0ca5955d549ef7d0e92b0175bd77185bf90eb001fbcbd051ca5cf3f9ccae743a",
+    "src/lib/validation/supply-drafts.ts": "7dd5ceb6a3476e009d16a581dfd0a42f15fcd0483e23058274b6e93c6ac6373d",
+    "src/types/creation-drafts.ts": "46d766250ba44f23db05ada52fec33fb250ed4d0e570e4b08ead59a34538115e",
+    "supabase/migrations/20261110090251_phase_d3_private_flow_review_preparation.sql": "9ba8406b0fb096d871d1ab1142a565ff7a0bf7a4916aa998971700007af8b795",
+    "supabase/migrations/20261110091038_phase_d3_flow_preparation_receipt_and_catalogue_scope.sql": "2922959499460d5f899ab6dabd3472ca082de58b55d2d75c019a1a3e93b10ecc",
+    "tests/api/flow-preparations-contract.test.ts": "678eedd8279edf375fe78b91a98598f10baa0e6934fb78e73a24017ebef4d49e",
+    "tests/e2e/balance-workspace-private-drafts.spec.ts": "39e1d8554bf2af725f951e4bb8e92c6fd56d8f3e316a99d92e30edee86579d35",
+    "tests/e2e/consumption.spec.ts": "93ceec8fef578b72acc0d07930a94bdaa45c744692bd67dbc0feaa3f037d6314",
+    "tests/e2e/flow-private-preparation.spec.ts": "f2075cccb46839e6fea42d39df4c4fd385f2d22cfa5669179a31d37e536fa826",
+    "tests/e2e/fluent-experience.spec.ts": "f8cafef83e62de4e5577322fd4257a3a0fd1cb86d0a5267849b02be49a176fef",
+    "tests/e2e/preparation-continuity.spec.ts": "32d7036a2d47ea33abe32ae0d04679a4cd1040a8dd14a870af3ffd0a2fab8bb9",
+    "tests/e2e/schedules.spec.ts": "af9cfd40f0e6eed4097951bc8720f0434e08635ef3c62208db2ee375204811e5",
+    "tests/e2e/workflows.spec.ts": "6453c032d0b49d85629f7a16cb8243a3ab450d52fcba417be5474484f56c3024",
+    "tests/flow-preparations.test.ts": "446652a3ce417f7f7a0a8deb5350310e97e3c5022e7d657bd5c764cbe7ecb230",
+    "tests/integration/flow-preparation-fixtures.mjs": "6347d94d97caacd7ea82bac51b0428d85e846bb72cff8366f4f784cc1d695a5a",
+    "tests/integration/flow-preparations.test.mjs": "c39a6645a0c1c7a5e2684432ea875ca936c465536e2580692a04d54e33610b3c",
+    ".github/workflows/ci.yml": "06d2454e7c544fb5da1e2e9c65adf8a6a3fd0de222413d4ef1548c7bdf2341c1"
+  },
+  "browserFrozenSourceLfSha256": {
+    "src/app/api/whatsapp/flows/preparations/commit/route.ts": "03ecbee9dce9501a3df968022e97a5f04f60dff42b5639acc6b5544871bcaa60",
+    "src/app/api/whatsapp/flows/preparations/list/route.ts": "14108af184c057502bc619b7a6ef0e49b0f180703a78b51a592a3cb6856cc52f",
+    "src/app/api/whatsapp/flows/preparations/reference/route.ts": "dd2b108c5542bca06d50549807572d6e3183fb62106301932ded74e9f32e1ced",
+    "src/app/api/whatsapp/flows/preparations/route.ts": "ec1b01c37dd525dbee61aa4a148eb4c6f4f14743a9e4ad6f6c29c156f28c8552",
+    "src/app/canonical-ui.css": "e8a4735c4f8bcd417a68a8cf5a96cd70bda2ca3dac37e1d400e1e70af86a15cb",
+    "src/components/forms/creation-draft-panel.tsx": "5eabe2ddf583e0e15e2b7bdd4f33b91b1336750d227372f285cf08edfcf80b44",
+    "src/components/forms/record-drawer.tsx": "936d7e5a2bb1c409aa6479284933ddab0696a5edc30fbc1dd5dac4d78e8691d7",
+    "src/components/forms/use-creation-draft.ts": "7d7a915e053d8c2f826f4da2d6e6f54842aaa21775204a11be4eb1cd60564393",
+    "src/components/stock/consumption-console.tsx": "ab2006ac8b8384b08afc23838abf876f0f2bf9a25daba405a863095453c40198",
+    "src/components/stock/flow-preparation-summary.tsx": "3e11245848a5baf4d8cd30e77ffa3fd89a9d1e56e610f47cc2b9b8674afd3ccb",
+    "src/components/stock/flow-review-preparation.tsx": "3d0f7ba548edc0891b9e776a866bebd0fdcde795b6097bc86d09b33ec5f60862",
+    "src/components/stock/flow-reviews.tsx": "6aa3a8241b1b848d9637a2e835b1563cf0c98e934d99d9fdf4222af72cdca6cf",
+    "src/components/ui/controls.tsx": "5349cf4a23f43f4887c8c9ac85b8442b10475ef69934a8645146f4bbe1752959",
+    "src/lib/forms/draft-navigation.ts": "a5269d685927b8e1256ba7a707d399c16ded9c4720aae60d92a495eeedade714",
+    "src/lib/server/api.ts": "a264264506618cc6a9800d96e99c7a60698de0d80b8898699b7954989365edf8",
+    "src/lib/validation/consumption-preparations.ts": "992782ecca0ff256feefa8fab1aa5bee77ecf1e9dc7b49c250d294222b5e84de",
+    "src/lib/validation/creation-drafts.ts": "89293ac2fb3ccbe46e2e3cba51d6c279cf830375112b7bee97ba6fe6c72f2573",
+    "src/lib/validation/flow-preparations.ts": "b2a8a9b976f84c382d7d7d8a53a0247d3f5e8bba94be03875ffb19bda88407bd",
+    "src/lib/validation/private-draft-results.ts": "0ca5955d549ef7d0e92b0175bd77185bf90eb001fbcbd051ca5cf3f9ccae743a",
+    "src/lib/validation/supply-drafts.ts": "7dd5ceb6a3476e009d16a581dfd0a42f15fcd0483e23058274b6e93c6ac6373d",
+    "src/types/creation-drafts.ts": "46d766250ba44f23db05ada52fec33fb250ed4d0e570e4b08ead59a34538115e",
+    "supabase/migrations/20261110090251_phase_d3_private_flow_review_preparation.sql": "9ba8406b0fb096d871d1ab1142a565ff7a0bf7a4916aa998971700007af8b795",
+    "supabase/migrations/20261110091038_phase_d3_flow_preparation_receipt_and_catalogue_scope.sql": "2922959499460d5f899ab6dabd3472ca082de58b55d2d75c019a1a3e93b10ecc",
+    "tests/api/flow-preparations-contract.test.ts": "678eedd8279edf375fe78b91a98598f10baa0e6934fb78e73a24017ebef4d49e",
+    "tests/e2e/balance-workspace-private-drafts.spec.ts": "39e1d8554bf2af725f951e4bb8e92c6fd56d8f3e316a99d92e30edee86579d35",
+    "tests/e2e/consumption.spec.ts": "93ceec8fef578b72acc0d07930a94bdaa45c744692bd67dbc0feaa3f037d6314",
+    "tests/e2e/flow-private-preparation.spec.ts": "f2075cccb46839e6fea42d39df4c4fd385f2d22cfa5669179a31d37e536fa826",
+    "tests/e2e/fluent-experience.spec.ts": "f8cafef83e62de4e5577322fd4257a3a0fd1cb86d0a5267849b02be49a176fef",
+    "tests/e2e/preparation-continuity.spec.ts": "32d7036a2d47ea33abe32ae0d04679a4cd1040a8dd14a870af3ffd0a2fab8bb9",
+    "tests/e2e/schedules.spec.ts": "af9cfd40f0e6eed4097951bc8720f0434e08635ef3c62208db2ee375204811e5",
+    "tests/e2e/workflows.spec.ts": "6453c032d0b49d85629f7a16cb8243a3ab450d52fcba417be5474484f56c3024",
+    "tests/flow-preparations.test.ts": "446652a3ce417f7f7a0a8deb5350310e97e3c5022e7d657bd5c764cbe7ecb230",
+    "tests/integration/flow-preparation-fixtures.mjs": "6347d94d97caacd7ea82bac51b0428d85e846bb72cff8366f4f784cc1d695a5a",
+    "tests/integration/flow-preparations.test.mjs": "c39a6645a0c1c7a5e2684432ea875ca936c465536e2580692a04d54e33610b3c"
+  },
+  "unitApi": {
+    "qualifiedDistinct": 67,
+    "retainedUnchangedConsumers": 24,
+    "retainedBalanceModel": 10,
+    "latestRepeated": 33,
+    "latestExitCode": 0,
+    "qualification": "24 unaffected consumption/stock/navigation successes from first36;10 unchanged BAL model successes from intermediate29;latest33 includes Flow model9/API6,BAL API6,native consumption3,private draft6,transfer3. No repeated identity added.",
+    "latestReportSha256": "e803486b581a53d6bf807d0fccbf7ba73cca852ccd587853bde33fb3f3ae1ef9"
+  },
+  "realAuth": {
+    "qualifiedDistinct": 8,
+    "pass": 8,
+    "fail": 0,
+    "stack": "home-care-assistant;API127.0.0.1:54321;DB127.0.0.1:54322",
+    "coverage": [
+      "Partial save/accept/reject,exact own/native replay,no debit",
+      "Owner/patient isolation,CAS,discard,cursor errors and three-target limit1 pagination",
+      "Changed source/terminal native permissive replay/old report key collision",
+      "Consumed own read/replay/list/ack after inactive/write loss;new writes/reference denied",
+      "Reject without team read,current catalog empty,accept denied",
+      "Membership revocation denies own reads/list",
+      "Late journal revocation rolls back source/report/private/journal/audit;probe removed"
+    ],
+    "reportLog": "flow-auth-receipt.log",
+    "temporaryProbesRemoved": true
+  },
+  "typecheck": 0,
+  "directedLint": 0,
+  "browser": {
+    "qualifiedDistinct": 22,
+    "buildMode": "production",
+    "qualification": "6 unchanged baseline +2 repaired conflict +10 later successful consumers +4 final continuity/native =22 distinct title/project identities.",
+    "qualifiedCases": [
+      {
+        "title": "BAL por plantão configure:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "balance-workspace-private-drafts.spec.ts",
+          "line": 62,
+          "column": 7
+        },
+        "duration": 36721,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-production-first",
+        "qualification": "Six unchanged BAL/consumption/Flow historical-recovery successes;no affected native or private recovery path changed afterward."
+      },
+      {
+        "title": "BAL por plantão configure:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "balance-workspace-private-drafts.spec.ts",
+          "line": 62,
+          "column": 7
+        },
+        "duration": 37395,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-production-first",
+        "qualification": "Six unchanged BAL/consumption/Flow historical-recovery successes;no affected native or private recovery path changed afterward."
+      },
+      {
+        "title": "consumo recupera a própria confirmação após perder escrita, mas nova decisão e perda de leitura continuam bloqueadas",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 46,
+          "column": 5
+        },
+        "duration": 11364,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-production-first",
+        "qualification": "Six unchanged BAL/consumption/Flow historical-recovery successes;no affected native or private recovery path changed afterward."
+      },
+      {
+        "title": "consumo recupera a própria confirmação após perder escrita, mas nova decisão e perda de leitura continuam bloqueadas",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "consumption.spec.ts",
+          "line": 46,
+          "column": 5
+        },
+        "duration": 14732,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-production-first",
+        "qualification": "Six unchanged BAL/consumption/Flow historical-recovery successes;no affected native or private recovery path changed afterward."
+      },
+      {
+        "title": "Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativo e não apaga envelope divergente",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "flow-private-preparation.spec.ts",
+          "line": 295,
+          "column": 5
+        },
+        "duration": 11556,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-production-first",
+        "qualification": "Unchanged inactive own recovery/wrong-envelope/revocation branch;later changes only conflict form and completed source focus."
+      },
+      {
+        "title": "Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativo e não apaga envelope divergente",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "flow-private-preparation.spec.ts",
+          "line": 295,
+          "column": 5
+        },
+        "duration": 14939,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-production-first",
+        "qualification": "Unchanged inactive own recovery/wrong-envelope/revocation branch;later changes only conflict form and completed source focus."
+      },
+      {
+        "title": "Flow salvo antes da referência mantémNULL e uma alteração de origem exige comparação explícita sem trocar a declaração",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "flow-private-preparation.spec.ts",
+          "line": 207,
+          "column": 5
+        },
+        "duration": 9600,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-conflict-production",
+        "qualification": "Both explicit NULL/reference-comparison conflict cases passed after exact Flow409 mapping and in-place revalidation."
+      },
+      {
+        "title": "Flow salvo antes da referência mantémNULL e uma alteração de origem exige comparação explícita sem trocar a declaração",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "flow-private-preparation.spec.ts",
+          "line": 207,
+          "column": 5
+        },
+        "duration": 11937,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-conflict-production",
+        "qualification": "Both explicit NULL/reference-comparison conflict cases passed after exact Flow409 mapping and in-place revalidation."
+      },
+      {
+        "title": "Flow privado retoma em outra sessão,preserva quantidade incompleta e recupera o mesmo ato sem descontar estoque",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "flow-private-preparation.spec.ts",
+          "line": 50,
+          "column": 5
+        },
+        "duration": 25673,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "Flow privado retoma em outra sessão,preserva quantidade incompleta e recupera o mesmo ato sem descontar estoque",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "flow-private-preparation.spec.ts",
+          "line": 50,
+          "column": 5
+        },
+        "duration": 31045,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "ocorrências e notificações preservam saldos e distinguem estados no aplicativo",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "fluent-experience.spec.ts",
+          "line": 225,
+          "column": 5
+        },
+        "duration": 8619,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "ocorrências e notificações preservam saldos e distinguem estados no aplicativo",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "fluent-experience.spec.ts",
+          "line": 225,
+          "column": 5
+        },
+        "duration": 11161,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "D3 duas sessões atualizam consumo sem apagar edição e resposta antiga não atravessa a troca de paciente",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "preparation-continuity.spec.ts",
+          "line": 114,
+          "column": 5
+        },
+        "duration": 15995,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "D3 Flow permite alcançar a sugestão mais antiga entre101 pendências sem truncar a lista",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "preparation-continuity.spec.ts",
+          "line": 160,
+          "column": 5
+        },
+        "duration": 9586,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "D3 duas sessões atualizam consumo sem apagar edição e resposta antiga não atravessa a troca de paciente",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "preparation-continuity.spec.ts",
+          "line": 114,
+          "column": 5
+        },
+        "duration": 20702,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "D3 Flow permite alcançar a sugestão mais antiga entre101 pendências sem truncar a lista",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "preparation-continuity.spec.ts",
+          "line": 160,
+          "column": 5
+        },
+        "duration": 10710,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "schedules.spec.ts",
+          "line": 9,
+          "column": 5
+        },
+        "duration": 10481,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "schedules.spec.ts",
+          "line": 9,
+          "column": 5
+        },
+        "duration": 14343,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-consumer-production",
+        "qualification": "Ten successful current consumers,including repeated first Flow case and unchanged schedules;two inaccessible-background locator failures excluded and replaced below."
+      },
+      {
+        "title": "D3 Flow acompanha ingresso controlado e revisão em outra sessão preservando edição e limpando contexto",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "preparation-continuity.spec.ts",
+          "line": 128,
+          "column": 5
+        },
+        "duration": 18869,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-continuity-production",
+        "qualification": "Latest four successful continuity/native workflow cases replace earlier identities after inert-background locator correction."
+      },
+      {
+        "title": "D3 Flow acompanha ingresso controlado e revisão em outra sessão preservando edição e limpando contexto",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "preparation-continuity.spec.ts",
+          "line": 128,
+          "column": 5
+        },
+        "duration": 18530,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-continuity-production",
+        "qualification": "Latest four successful continuity/native workflow cases replace earlier identities after inert-background locator correction."
+      },
+      {
+        "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "workflows.spec.ts",
+          "line": 1111,
+          "column": 5
+        },
+        "duration": 27113,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-continuity-production",
+        "qualification": "Latest four successful continuity/native workflow cases replace earlier identities after inert-background locator correction."
+      },
+      {
+        "title": "Flow exige revisão do autor e confirmação autorizada antes de debitar estoque",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "workflows.spec.ts",
+          "line": 1111,
+          "column": 5
+        },
+        "duration": 31979,
+        "outcome": "expected",
+        "ok": true,
+        "errors": [],
+        "archive": "flow-continuity-production",
+        "qualification": "Latest four successful continuity/native workflow cases replace earlier identities after inert-background locator correction."
+      }
+    ],
+    "runs": {
+      "flow-production-first": {
+        "total": 12,
+        "expected": 10,
+        "unexpected": 2,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": false,
+        "reportSha256": "f17cee52fea5d6613f94b7c8b3f57cc999247aadff7e08e42018bac6a5cdfd7b"
+      },
+      "flow-conflict-production": {
+        "total": 4,
+        "expected": 3,
+        "unexpected": 1,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": false,
+        "reportSha256": "d5c1e2274245373c3d1e6dfe035474c174a3086160b564eed5700b8092ecfa78"
+      },
+      "flow-consumer-production": {
+        "total": 12,
+        "expected": 10,
+        "unexpected": 2,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": false,
+        "reportSha256": "211fade4fd75ddade2658cf03bd5bc4dcf83f21a3deb837cc9ced20224936764"
+      },
+      "flow-continuity-production": {
+        "total": 4,
+        "expected": 4,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true,
+        "reportSha256": "08dc880519544fcf6c4ad30a435a830dadd5ffcaee0fb9b6a237da5c3ec5b87d"
+      }
+    },
+    "sourceStableDuringEachRun": true,
+    "mutableDatabaseTestsInParallel": false,
+    "viewports": [
+      1440,
+      1150,
+      850,
+      500,
+      320
+    ],
+    "axeGeometryFocus": true,
+    "screenshotsInspected": {
+      "a922975868722340fe955a3044604becb05fb3a4.png": "1594db4f84a92399daea43121e46e9f67f615ff9cad019cbf4764e7a334b03b4",
+      "13df7dc44ca845a3ca8c19b62e37d1d2b151d0e9.png": "80cb978307bc6f43956ac36278cf7af37ebded7f2bfc509eb0292ff62b194610"
+    }
+  },
+  "counterproofs": [
+    "Initial unit fixture lacked owner/patient/purpose/target in real command ack;fixed fixture,guard retained.",
+    "Initial Auth fixtures expected native quantity1.000000 instead of1 and nonexistent audit care_recipient_id;oracles corrected,raw private1,000000 retained.",
+    "Initial browser conflict used stock generic message and reload offered same private copy;exact Flow mapping and revalidateRead preserve text and expose comparison.",
+    "Intermediate iOS320 background shell overflow483 observed;drawer itself fits. No CSS/assert/timeout suppression. Later same-runtime first Flow case passed both engines/all five widths;intermittent geometry remains qualified.",
+    "Background source list under real modal is inert/aria-hidden;locator now includeHidden plus explicit inert assertion. No click-through,force,retry or timeout increase.",
+    "Lost native response and divergent valid envelope must retain attempt and block ack;exact authoritative read alone reconciles. Source and private save do not debit stock.",
+    "Prior full CI e2e99 failed custody fixtures and schedules click;fixtures corrected,unchanged schedule passed both directed engines. No global intermittence approval."
+  ],
+  "ci": {
+    "previousSha": "e2e99d2ee0fa6f4de22910adb097087de12588b2",
+    "runId": 42786674329,
+    "conclusion": "FAILURE",
+    "evidence": "CI_E2E99D2_OBSERVATION.json",
+    "ownSha": "REQUIRED_AFTER_PUSH",
+    "chromiumSharding": {
+      "project": "chromium",
+      "all": 321,
+      "shard1of2": 161,
+      "shard2of2": 160,
+      "disjoint": true,
+      "exactUnion": true,
+      "timeoutMinutesUnchanged": 40,
+      "failFastUnchanged": false,
+      "allProjectAggregateRetained": true
+    }
+  },
+  "logSha256": {
+    "flow-api-format.log": "689f59f56930b0b6c50130ff3206373420be75b5f4f82eb0b71b71241369d28e",
+    "flow-auth-first.log": "3eb282d617fa2a5365636520975bc90006cd9b6b137b3bde6603a115900d26ce",
+    "flow-auth-receipt.log": "4877a331bb80f8f9453f8c101f3142d4c64cd38c5c354717972498fc2bff2148",
+    "flow-ci-consumer-selection.log": "b2218ee41b1531ec9f2a11079ff18d722e16d36fe8a516532ca2f9ed75fb35d1",
+    "flow-conflict-format.log": "08728a78999f8e791d3de584b425d778e2663b28933d11978a16c31e248458f6",
+    "flow-conflict-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flow-conflict-production.log": "1b78682433313e46655e55621f578f6c0c3fd49285f3970cad8fb744c7799d6e",
+    "flow-conflict-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "flow-conflict-unit.log": "f0bd075a1e161cb0d30554ea10d582906bddfa4024eade424b576814a5d8dbe6",
+    "flow-consumer-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flow-consumer-production.log": "dbb4d074d9fccb17381e5f3d3c8a2581876210593f36e7175254814882e6ab46",
+    "flow-continuity-production.log": "1cce343f2c6ffb0903dd25f8cbf8f4a9ac4dc5c1738e81eca8c5199cfa1bc294",
+    "flow-db-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "flow-decoder-format.log": "6a14b8882052bc1701b29de5c7a4b18cd51bcecb508ccd6d4916ab99c9a9e13a",
+    "flow-editor-format.log": "69ab9f0e8e82980550b254ad2f0b63df5c8663ef864a0d95b1efcf97bee0640e",
+    "flow-editor-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "flow-final-format.log": "078166c119a8e87c53a2ea488ba3baebf65b66a822385be561d21f16242540ff",
+    "flow-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flow-final-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "flow-first-format.log": "c11d057bc194a86d571f2707fd659c98bbe8301e67d889f3755c7486fc863bc1",
+    "flow-first-types.log": "125c8a478cd05a4e101268cbb5617a5b6ad1405d80f8e0f1cbc6aa810bf4f3b9",
+    "flow-pending-focus-format.log": "b328e81ecf6d8a30c21a4f388c75eb3c045285ce440fd9435c3fc0510c05782c",
+    "flow-pending-focus-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flow-prebrowser-format.log": "b87203654b91a5171950c513746ad6d0fa1c92c4e5a06407eb636df846618451",
+    "flow-prebrowser-lint.log": "d4fb14788e5c141ce5f001cbb2ffeb324bf851e61379965b3420dd2a529d11e1",
+    "flow-prebrowser-types-final.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "flow-prebrowser-types.log": "a52aea40cd3bd07921bb822632ccf6fde185d54670e2ac610154cd085a717e31",
+    "flow-production-first.log": "a3df824fc83c8fb341c9e38aa9b75225e7639bf11358c8710a1499056611ae84",
+    "flow-receipt-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "flow-remote-apply.log": "a4537ad404f0627e22afc45c5bea9537f76f3e06e9ba848cdd320afd92ebd44d",
+    "flow-remote-dry-after.log": "d77102c47dbe17725adfd88b5aed2ce8316cf1842517c1af4897c58aa8b70caf",
+    "flow-remote-dry-before.log": "92d70d576b6df1d918e1c5f7ed89271f78258999fec05867cb0b1cb2a6c8425f",
+    "flow-responsive-format.log": "f1352d750b2b53ca3257c5d385eec41079b05c9c0d5b8dfbea32aaf309ab5822",
+    "flow-scope-format.log": "b9be70009029a8b0ee41498f210dbbce7401bc58d0f46f13103affeb5791a70e",
+    "flow-scope-lint.log": "654ac69d15b371eaf2be7bbe0b3e3a68ace7ba8822b8f8c27e3656596842a281",
+    "flow-selection.log": "79ff5afead185cd2075402a373d2126dd2958a86175d5e5e277a0ce753b9b897",
+    "flow-tests-format.log": "67f753b50c30c3a2323fd83a17a9da72e217de03875dac2e19003387587a2271",
+    "flow-unit-final.log": "2dd817cf3fbbc9444bffffe026e0ff021fe5ce038969a27e6ebc2851f60b3455",
+    "flow-unit-first.log": "71dbe40be647e8aadb8a7057fd7287bafc59595167d2910821f47381dc65f73e",
+    "flow-unit-model-balance.log": "38ecaa66fc92abd451c2041ea40a1537b4ef0900fe96921e3987fda76a217b5c",
+    "flow-close-ci-yaml.log": "68507397d05254023988eb4a7d1c9f6188d6bfe5222d3e1ec92e56443204b7b6",
+    "flow-close-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "flow-close-markdown.log": "dd831a66faca5f232ab2a49c03dbc33de1a62021b2a3999e97434411545ce3da",
+    "flow-close-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b"
+  },
+  "limits": [
+    "Local emulation is not physical S24,provider,human/AT or production proof.",
+    "Full66 compositions/171relations,integrated form inventory and D-B partial criteria remain.",
+    "Sonar configuration/remediation owner-deferred;PR7 stays Draft;no merge/production.",
+    "Clean/legacy/full integration and all browser shards must validate this published SHA."
+  ],
+  "documentaryChecks": {
+    "markdownFiles": 11,
+    "markdownIssues": 0,
+    "newLocalLinksValid": 9,
+    "jsonValid": true,
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30ColumnsAndStatesUnchanged": true,
+    "uiStatesUnchanged": true,
+    "plainOwnerReportCriteria": 105,
+    "historicalMigrationHashesUnchanged": 84,
+    "allPreviouslyPublishedMigrationsUnchanged": true,
+    "activeBreakWordsOccurrences": 0,
+    "diffCheckPassed": true,
+    "ownedChangedFiles": 43,
+    "typecheckExit": 0,
+    "directedLintExit": 0,
+    "yamlSyntaxExit": 0,
+    "frozenSourceHashesStable": 34
+  }
+}

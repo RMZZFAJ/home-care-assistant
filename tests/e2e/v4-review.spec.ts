@@ -1,3 +1,4 @@
+import { selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -110,7 +111,11 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     await expect(archiveDays).toHaveValue("9");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
     await expect(page.getByRole("alert").filter({ hasText: "configuração mudou em outra sessão" })).toBeVisible();
+    await expect(archiveDays).toHaveValue("9");
+    await expect(archiveDays).toBeDisabled();
+    await page.getByRole("dialog").getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
     await expect(archiveDays).toHaveValue("10");
     await archiveDays.fill("11");
@@ -174,6 +179,8 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         .getByRole("alert")
         .filter({ hasText: "configuração mudou em outra sessão" }),
     ).toBeVisible();
+    await expect(end).toBeDisabled();
+    await cell.getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
     await expect(end).toBeEnabled();
     await expect(end).toHaveValue("");
     expect((await persisted()).quiet_start).toBe(20);
@@ -200,8 +207,13 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
       });
       await start.selectOption("19");
       await expect(page.getByRole("alert").first()).toBeVisible();
+      if (failure === "network") {
+        await expect(start).toBeDisabled();
+        expect((await persisted()).quiet_start).toBe(20);
+        await cell.getByRole("button", { name: "Recuperar mesma alteração", exact: true }).click();
+      }
       await expect(start).toBeEnabled();
-      await expect(start).toHaveValue("20");
+      await expect(start).toHaveValue(failure === "network" ? "19" : "20");
       expect((await persisted()).cooldown_minutes).toBe(23);
       await page.unrouteAll({ behavior: "wait" });
     }
@@ -227,7 +239,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       await post(family, "/api/documents", {
         careRecipientId: patient,
         type: "COM",
-        payload: { lines: [{ productId: product, quantity: "1" }] },
+        payload: { origin:"purchase", lines: [{ productId: product, quantity: "1" }] },
         idempotencyKey: randomUUID(),
         draft: false,
       })
@@ -250,6 +262,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
         sqlLiteral(row),
     );
     await family.goto("/fichas/" + receipt.requisitionId);
+    await selectDocumentSection(family, "communications");
     const statuses = family.getByRole("region", {
       name: "Notificações da ficha",
       exact: true,
@@ -404,11 +417,12 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
         careRecipientId: patient,
         type: "ENT",
         payload: {
+          recipientReason: "Escolha manual fictícia para este recebimento",
           source: "FAMILY",
           destination: "CARE_TEAM",
           recipientId: fixtures().professional.id,
           lines: [
-            { productId: product, quantity: "10", requisitionItemIds: [item] },
+            { requestFulfillment: "complete", productId: product, quantity: "10", requisitionItemIds: [item] },
           ],
         },
         idempotencyKey: randomUUID(),
@@ -444,12 +458,14 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     await expect(
       page.getByRole("heading", { name: req.code, exact: false }),
     ).toBeVisible();
+    await openDocumentMore(page);
     await expect(
       page.getByRole("button", {
         name: "Revisar arquivamento manual",
         exact: true,
       }),
     ).toHaveCount(0);
+    await closeDocumentMore(page);
     const forbiddenArchive = await page.request.post(
       "/api/requisitions/" + req.requisitionId + "/archive",
       { data: { reason: "Tentativa proibida por capacidade explícita" } },

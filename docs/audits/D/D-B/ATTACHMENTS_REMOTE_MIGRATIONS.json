@@ -1,0 +1,158 @@
+{
+  "status": "APPLIED_AND_POST_VALIDATED",
+  "at": "2026-11-08T02:05:10.727Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": 148,
+  "after": 150,
+  "applied": 2,
+  "pending": 0,
+  "historySqlMatched": 150,
+  "catalogueComparison": {
+    "views": true,
+    "columns": true,
+    "indexes": true,
+    "defaults": true,
+    "policies": true,
+    "triggers": true,
+    "functions": true,
+    "relations": true,
+    "constraints": false,
+    "table_grants": true,
+    "function_grants": true
+  },
+  "constraintQualification": "Only the known presentation_finite_factor validation flag differs from local retained NaN fixture; exact predicate retained",
+  "preservation": {
+    "originalTableProjections": 149,
+    "originalRowsMatched": true,
+    "unexpectedChanges": [],
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "authUsers": 9,
+    "profiles": 7,
+    "storageObjects": 33,
+    "cronDigestUnchanged": true,
+    "vaultDigestUnchanged": true
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0
+  },
+  "runtimeMarker": {
+    "anonymousRestHttp": 200,
+    "protocol": 1,
+    "schema": 1
+  },
+  "technicalPrivateGrants": 0,
+  "attachmentContracts": {
+    "direct_grants": 0,
+    "functions": [
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "attachment_upload_allowed",
+        "schema": "private",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "attachment_writer",
+        "schema": "private",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "abandon_attachment_attempt",
+        "schema": "public",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "attachment_attempts",
+        "schema": "public",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "attest_attachment_source",
+        "schema": "public",
+        "service": true
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "begin_attachment_upload",
+        "schema": "public",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "prepare_attachment_attempt",
+        "schema": "public",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "settle_attachment_upload",
+        "schema": "public",
+        "service": true
+      }
+    ],
+    "private_rls": 2
+  },
+  "sourceAttestationRequired": true,
+  "legacyProvenanceNotInvented": true,
+  "noAutomaticExpiry": true,
+  "noStorageDeletion": true,
+  "noReset": true,
+  "noFixtures": true,
+  "noAuthConfigurationChanges": true,
+  "noExternalTransportActivation": true,
+  "operationalGo": false,
+  "currentSourceCi": "NOT_PUBLISHED_YET",
+  "storagePoliciesComparedToLocalCandidate": true,
+  "onlyChangedStoragePolicy": "storage.objects.evidence_upload"
+}

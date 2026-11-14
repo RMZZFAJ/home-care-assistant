@@ -1,0 +1,184 @@
+{
+  "at": "2026-11-08T17:34:46.389475+00:00",
+  "sourceBase": "8a17202526908286c155246d13985fad5903d4e6",
+  "sourceLfSha256": {
+    "src/app/api/drafts/route.ts": "478ee4dc2c9594d1931f5b1aff4dd401a8a4c9f350479402c18dbf516124a984",
+    "src/components/balances/balance-count-wizard.tsx": "4f35b16ea9b63e80c960df7d7d7ca46ba5db3fb0779f009b87857aaa948a07b1",
+    "src/components/documents/supply-command-editor.tsx": "824f72fcf2778aa8305852671f8a3aad7849d1cf501332b08a761159ee428b86",
+    "src/components/documents/supply-wizard.tsx": "85eff6c288237091046d3a35362a5f0fcbc3293b9c8ee6f07eb1f5a7e9c4198d",
+    "src/components/forms/creation-draft-panel.tsx": "90563206abf7adda0ba0f52d25fc294f78762a31001e733e542aa1bdbca78568",
+    "src/components/forms/use-creation-draft.ts": "16f71f5dce20743f247a4424c25880e943e1fbc04327be161e9fba1d1f1766fa",
+    "src/components/requisitions/requisition-wizard.tsx": "7f7e16e34783ffe499d4b30a80c338d3cda408e5ede8880c500bd00b2e18b721",
+    "src/lib/forms/draft-navigation.ts": "59bed425b59a0b50788e4556e616a5862617d109f8d934aa1d7bc90f42faa23a",
+    "src/lib/validation/creation-drafts.ts": "b2290e1b20d410dd1936e72259deb17113e450874765bf078f040a044002d884",
+    "src/lib/validation/draft-navigation.ts": "9dff82179f14f2bea75e85af8497e0d414b5f674edfc1f4bb8fde0da74497d4f",
+    "src/lib/validation/private-draft-results.ts": "4b6fe6a69d96a1b47b173a1e20cce6208e019ae267e8cf8bbd8213936cf188cd",
+    "src/types/creation-drafts.ts": "d975322c98988de1a66ac2bad361757df5e5179e989000e4c8d5022f45c4b589",
+    "supabase/migrations/20261108124300_phase_d3_draft_navigation.sql": "493500d60534839be964e6133ad506953e4ba5d8945de51e8017787bf835d682",
+    "tests/draft-navigation.test.ts": "47264a791f889651eacf5aec667b62d63912358a0bf7f0c5687864f7920d7213",
+    "tests/e2e/private-creation-drafts.spec.ts": "e01d0abf76929b734f68210adf26b4ca9cfbdb6492eeb0d5e325a70faf5319bb",
+    "tests/e2e/supply-private-drafts.spec.ts": "6f5a4615f76cb73747a51f4fa884e2f21c3fbc06e1eab67fc375c52143768a40",
+    "tests/integration/draft-navigation.test.mjs": "80c9d540069748565cba2a5564287a40b9160138b5b759bc2af2bbaaeae6e877",
+    "tests/integration/private-draft-fixtures.mjs": "33240baddd49986800f3b009d8d3d74e4e6ef05f67508574ad309483ea5dedcd",
+    "tests/integration/private-drafts.test.mjs": "3ee817cb64c586eb9a4ec9befe37c532d99a2c984f3d8366d39025c49e67f930",
+    "tests/integration/shift-fixtures.mjs": "274aaec440694d3d1176574640200d53f8542588c9e29d01ac3bdaccfebde7a8",
+    "tests/integration/supply-private-drafts.test.mjs": "bce2d91ba83b67866e8f7161ce5ba395b9ee1bc86ff2f458dc5adda18db1579b",
+    "tests/integration/v4-fixtures.mjs": "7fd6385329df90dd99e2a712aa23599dda32ca190dba82a87f4c8c1778d94a7c"
+  },
+  "scope": "C-NEW-AC-014; private stage separated from business content; PDF appearance deferred by owner",
+  "validation": {
+    "unitDistinctPassed": 16,
+    "realAuthPassed": 30,
+    "diagnosticDev": {
+      "passed": 5,
+      "failed": 0,
+      "productionEvidence": false
+    },
+    "productionChromium": {
+      "passed": 6,
+      "failed": 0,
+      "selection": "scheduled BAL review; REQ invalid/lost response; REQ CAS5/6/7 with different stages; legacy BAL lost save/discard; COM CAS/reload; ENT review/confirmation recovery"
+    },
+    "finalTypes": true,
+    "affectedLint": true,
+    "ciForNewSha": "PENDING_PUBLICATION",
+    "physicalHumanAT": "NOT_CLAIMED",
+    "markdown": {
+      "initialIssues": 6,
+      "affectedFiles": 3,
+      "recheckIssues": 0,
+      "rulesUnchanged": true
+    },
+    "reactReview": "Closed metadata in existing hook; no new effects or authority; read-only DL; centralized stage labels; existing Fluent UI and CSS retained",
+    "advisors": {
+      "historicalComparison": "PDF_FIDELITY_REMOTE_ADVISORS.json after152; not immediate pre153",
+      "ruleCountsUnchanged": true,
+      "securityFindings": 200,
+      "performanceFindings": 162,
+      "errors": 0,
+      "noBlanketApproval": true
+    }
+  },
+  "proofs": [
+    "Typed read-only original stage and content, no payload textarea",
+    "Old-client omission readable and clears stale stage on next save",
+    "Cross-device real Auth, foreign scope denial and private helper execute denied",
+    "Forged version/role/cross-purpose and cross-BAL-mode stages rejected",
+    "Navigation participates in original intent hash and CAS; content hash stays exact",
+    "Save/replay/discard preserve official document/protocol/PDF/stock facts",
+    "Consumed draft hides stage/content; new official confirmation retains existing validators",
+    "Existing authorization wait and concurrency cases remain green"
+  ],
+  "coverageCorrection": "Initial .test.tsx was not collected by existing .test.ts include; renamed and five new cases executed; no filter change or false pass counted",
+  "backup": {
+    "backupId": "c9e7e422-377e-46a8-a01e-03046c66d1d3",
+    "state": "verified",
+    "files": 80,
+    "bytes": 11320337,
+    "manifestSha256": "96b16f6a884349686c0594e950b4bb4e3b028aca633d90e01c7733206f3b0dfe"
+  },
+  "restoreAndUpgrade": {
+    "backupId": "c9e7e422-377e-46a8-a01e-03046c66d1d3",
+    "files": 80,
+    "bytes": 11320337,
+    "manifestSha256": "96b16f6a884349686c0594e950b4bb4e3b028aca633d90e01c7733206f3b0dfe",
+    "verified": true,
+    "restoredTables": 151,
+    "stableTableDigestsMatched": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "foreignKeysChecked": true,
+    "storageObjectsVerified": 34,
+    "pdfDigestsVerified": 33,
+    "signedIssuanceDigestsVerified": 2,
+    "migrationsAppliedToProbe": [
+      "20261108124300_phase_d3_draft_navigation.sql"
+    ],
+    "catalogueComparison": {
+      "views": false,
+      "columns": true,
+      "indexes": true,
+      "defaults": true,
+      "policies": true,
+      "triggers": true,
+      "functions": true,
+      "relations": true,
+      "constraints": false,
+      "table_grants": true,
+      "function_grants": true
+    },
+    "cronEnabled": false,
+    "networkExtensionEnabled": false,
+    "seconds": 14.419,
+    "operationalRecoveryGate": "D6_NOT_SATISFIED_BY_THIS_PROBE"
+  },
+  "remotePost": {
+    "status": "APPLIED_AND_POST_VALIDATED",
+    "at": "2026-11-08T17:34:27.452Z",
+    "project": "qwfrqychokvhdzakibid",
+    "before": 152,
+    "after": 153,
+    "pending": 0,
+    "historySqlMatched": 153,
+    "catalogueCandidateExactExceptDocumentedRestoreAlias": true,
+    "preservation": {
+      "tables": 151,
+      "oldRowStableDigestsExact": true,
+      "onlyNewColumnProjected": true,
+      "oldDraftRowsAllNavigationNull": 4,
+      "oldMigrationRowsExact": true,
+      "volatileSnapshotDifferences": [
+        "private.bal_scheduler_progress",
+        "private.legacy_reminder_progress",
+        "private.operations_components",
+        "private.operations_incidents",
+        "private.scheduler_health"
+      ],
+      "cronUnchanged": true,
+      "vaultUnchanged": true,
+      "storagePoliciesUnchanged": true
+    },
+    "health": {
+      "waitingLocks": 0,
+      "longTransactions": 0,
+      "invalidIndexes": 0
+    },
+    "noReset": true,
+    "noRemoteFixturesOrAuthCreated": true,
+    "externalTransportActivated": false,
+    "operationalGo": false
+  },
+  "logLfSha256": {
+    "draft-navigation-auth.log": "b7a3a402036a115438a69abb32351bdd008ea699a273683de88844cf2d10ca74",
+    "draft-navigation-diagnostic.log": "1a55554537b14e2a01b478ed9312b4ff547da046c8841da26f30fbd1548e5934",
+    "draft-navigation-final-cas-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-navigation-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-navigation-local-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "draft-navigation-markdown-recheck.log": "3d42e1d28d21dc738fdddaaa9c7290ebd9f6a75d9e322f4895f7dbdb9d826d6f",
+    "draft-navigation-markdown.log": "833391e1ff6634337fb9ab014e607c992c1b51cc60964281b6472b1d3463f031",
+    "draft-navigation-production.log": "bdc489729751078579d03b90f380b699acea2b7d2163df817d8ac123bd7ffc72",
+    "draft-navigation-remote-apply-console.log": "eb9cf3ce389d27610cc6ea7837b69ab2da5d5145a6e47cb1d65979e75f7f0a91",
+    "draft-navigation-remote-apply.log": "ff300b79828fc5cdf40c1708352911bc28755fb9bb73debcf40c73262fcd0bf8",
+    "draft-navigation-remote-backup.log": "0563107266b789f5c5584349055e501d3532342c271eac02aece875312c5fdc3",
+    "draft-navigation-remote-dry-run.log": "76792699f2ef21e56a88c9ec072d6075321ec2eafae00b47605f17935386b2b5",
+    "draft-navigation-remote-post.log": "5cb7ebd60f6880f8153b8f471d024e1c240dc02bb5dda8f0b60076df1cfc35de",
+    "draft-navigation-remote-preflight-final.log": "24f367f0564cccbc829c3aa3f513ca21821c50dc0a23ba2bb254a8718aee13c0",
+    "draft-navigation-remote-preflight.log": "24f367f0564cccbc829c3aa3f513ca21821c50dc0a23ba2bb254a8718aee13c0",
+    "draft-navigation-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-navigation-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-navigation-unit-new.log": "48035ddfeb389c148811b80a22668d2328d0e7ec624942f76cb83b7afb3fd695",
+    "draft-navigation-unit.log": "a266bbddc1420959559458f33334d23b1af53e853697654523a91b2f0f343848"
+  },
+  "boundaries": [
+    "PR7 Draft; no merge or production promotion",
+    "No remote Auth/fixtures/reset/external transport activation",
+    "Backup probe does not satisfy D6, RPO or RTO",
+    "Internal signature/TSA remains separate from ICP-Brasil and external time",
+    "Sonar owner deferred"
+  ]
+}

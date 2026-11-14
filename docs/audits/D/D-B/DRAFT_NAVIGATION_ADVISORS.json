@@ -1,0 +1,65 @@
+{
+  "at": "2026-11-08T17:36:35.440Z",
+  "project": "qwfrqychokvhdzakibid",
+  "stage": "After migration153; no claim of an immediate pre153 advisor snapshot",
+  "types": {
+    "security": {
+      "total": 200,
+      "byRule": [
+        {
+          "name": "rls_enabled_no_policy",
+          "level": "INFO",
+          "count": 41,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+        },
+        {
+          "name": "anon_security_definer_function_executable",
+          "level": "WARN",
+          "count": 3,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable"
+        },
+        {
+          "name": "auth_leaked_password_protection",
+          "level": "WARN",
+          "count": 1,
+          "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+        },
+        {
+          "name": "authenticated_security_definer_function_executable",
+          "level": "WARN",
+          "count": 154,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable"
+        },
+        {
+          "name": "extension_in_public",
+          "level": "WARN",
+          "count": 1,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public"
+        }
+      ]
+    },
+    "performance": {
+      "total": 162,
+      "byRule": [
+        {
+          "name": "unindexed_foreign_keys",
+          "level": "INFO",
+          "count": 124,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys"
+        },
+        {
+          "name": "unused_index",
+          "level": "INFO",
+          "count": 27,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index"
+        },
+        {
+          "name": "auth_rls_initplan",
+          "level": "WARN",
+          "count": 11,
+          "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0003_auth_rls_initplan"
+        }
+      ]
+    }
+  }
+}

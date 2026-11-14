@@ -1,0 +1,124 @@
+{
+  "recordedAt": "2026-11-08T21:09:57.323437+00:00",
+  "baseSha": "5a7d546528918c63dbc8cd38de7784309484009b",
+  "runtimeOrMigrationChanges": false,
+  "sourceLfSha256": {
+    "tests/integration/ent-temporal-fixtures.mjs": "80b2840d745cd6e301d44652c45b6c37996b684ee633a2e78e0617b94ce59dae",
+    "tests/integration/ent-temporal.test.mjs": "f1da871b01ed7e098ee60009a90765092fbdf91748f613556250f725c9b48b9d",
+    "tests/ent-temporal-pdf.test.ts": "92cdfda59e744b9e2f672aac518d33394f15c7f3166e27063f7f7c0cc7cb9855",
+    "tests/e2e/ent-temporal.spec.ts": "d9a557f4dbaa259406be479aad1b2f5ba6cb56d85f89cf7f28e851f9156c7684",
+    "src/lib/server/operational-pdf.ts": "e9e607c046bd204dbcdc9c760ed5c4d0dc6d80efe7e1918ef61b854fdd062ef0",
+    "src/lib/server/pdf-content.ts": "330e365eb74460553caee45967c36dab7605d132282e444b2f263fdda6c9d223",
+    "src/lib/server/pdf-issuance.ts": "df3ec253a26ef14bcc017d077c02fb6cf4f570172bc1dd09bf4d0861819e3e71",
+    "src/lib/server/document-pdf.ts": "d383942847013787f49c0f61b6ec3c030e8e9c466154c842b8a8a4ef2b9f57f6",
+    "src/lib/receipt.ts": "a42301aa2cd71068772a80aac32389ca0ec087d218288f80fb0ebc910d2cc999",
+    "src/lib/documents/pdf-source-facts.ts": "78169d9248226c072599fd19fde27f355973513bf2e02b5602ab9fae0f9c9451",
+    "supabase/migrations/20261107150000_phase_d4_pdf_source_facts.sql": "30f92d2f608b8c3d5aebb6c49d0cf370a7387b6ec2dcc002c83af0268f0fb330",
+    "supabase/migrations/20261108194000_phase_d4_regularization_pdf_facts.sql": "a08c24e03d2efe7c564b69cc01d21b94301bd098525ea9d785803e0a7c18a00d",
+    "docs/audits/D/D-B/d4-fidelity-proof/verify.py": "bea8152cc37f0084c22754ce7d12992291a55d30dbbeb0fb05c6141948848121"
+  },
+  "validation": {
+    "unitPassed": 1,
+    "authPassed": 2,
+    "productionPassed": 6,
+    "variants": [
+      "retained native ENT preparation",
+      "consumed private ENT creation draft"
+    ],
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "realSignedIssuancesDuringBrowserSuite": 12,
+    "independentSignedArtifacts": 4,
+    "internalWholeFileSignatureAndTimestamp": true,
+    "negativeOracleWrongDispatchDateRejected": true,
+    "lint": true,
+    "types": true
+  },
+  "clockFidelity": {
+    "onlyNewLocalDevelopmentRowsBackdated": true,
+    "canonicalEventsBodiesClocksHashesUnchanged": true,
+    "noTriggerDisabled": true,
+    "realElapsedDayClaim": false,
+    "browserClockAdvanceDoesNotChangeServerClock": true,
+    "ordinaryAuthenticatedDateWritesDenied": true,
+    "noLedgerOrAdditionalIssuanceOnDownload": true
+  },
+  "c108Reconciliation": {
+    "previousMatrixStatus": "PARTIAL_LOCAL_ARCHIVE_AND_VERSION_LINK",
+    "newStatus": "PASS_LOCAL_VERSIONED_HISTORY_ARCHIVE",
+    "implementation": "D4.4 exact archive plus D4.7 before/after/reason and selected-version file",
+    "approvedSourceSha": "8a17202526908286c155246d13985fad5903d4e6",
+    "approvedCi": "CI_8A17202_OBSERVATION.json",
+    "sourceLfSha256ExactAtApprovedAndCurrentSha": {
+      "src/app/api/documents/[id]/history/route.ts": "5321e385002869c13ba22ba61cdf20bec903c65d7b0d48d2206a4aeed010fa4b",
+      "src/app/documentos/[id]/arquivos/page.tsx": "e05d959b2f9d106c8d60b4b5e885c81c7c35693257e86f24a6a62a648ce37944",
+      "src/components/documents/document-file-view.tsx": "d80e573dbea44ea92d9e1339742ac9ed8d234c627562db459a40d2b64366a01e",
+      "src/components/documents/document-timeline.tsx": "fe6fb5fee642f3321107bf08c9a1fe11ca8d6435f6eabb469ff83f4ef9087121",
+      "src/components/documents/supply-detail.tsx": "7c8bf02c5f69af091c00abedbc17bea7a1aa5e34c9aab762921d484b8170eced",
+      "src/components/requisitions/requisition-detail.tsx": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+      "src/lib/documents/version-history.ts": "90157378011ede3a5c45853954f908c09bc84545da123bc22324189555a01fe0",
+      "src/lib/server/document-history.ts": "63bb94a5bb6c151d802eb975ca245d90583a934093a6b01522645f49982ca0d0",
+      "tests/version-history.test.ts": "6c2954301bc0969952b9eb3bbb246ce01bf6ed0e4509941a59dcc4a9df8e7679",
+      "tests/e2e/version-history.spec.ts": "43c9491c54eae5f24b9939e6f97aaf9f920ebc4b51fa2f67cf901b7b25a4a397",
+      "tests/integration/version-history-fixtures.mjs": "819660c6b176f409f67de19afcfe283644ec52500c59330934a3d7f695be2bae",
+      "tests/e2e/pdf-source-facts.spec.ts": "3c2bf98d5135998db5343f92b32c656dfecd3fe94474d72e5a72b9c3ec29101b",
+      "tests/e2e/generated-pdf.ts": "5153a2cb612f63dce8de035bb83336eba9533ceaab5ab659b32744f5e099b562"
+    },
+    "additionalUnchangedConsumerAndDependencyLfSha256": {
+      "package.json": "7fcffa449d9ab1b915f4f2f7dbeb4c3393b51f851c0d511a48182c7dc0ddedf5",
+      "package-lock.json": "938809f38f2106c9bc39c3a4f3fba2365ff515bb26ec47b2965a1dcdd5c6c6f1",
+      "src/lib/server/document-pdf.ts": "d383942847013787f49c0f61b6ec3c030e8e9c466154c842b8a8a4ef2b9f57f6",
+      "src/lib/documents/pdf-archive.ts": "66fe3e57722792daacd5d181ce4cc4c45e88af7c13d6d4416158cbc0ee31023b",
+      "src/components/documents/document-actions.tsx": "1dc59947304a97e23ffcb88e8de9fa044c24a3bfda17c5433229a629248ec4ac"
+    },
+    "historicalDistinctPassingBrowserCases": 18,
+    "historicalDistinctPassingUnitCases": 10,
+    "historicalBindings": "DOCUMENT_VERSION_HISTORY_BINDINGS.json",
+    "newExecutionOfHistoricalSuite": false,
+    "qualification": "Only unchanged history/archive/read contracts reused. D4.8 rendering/reservation and strengthened keyboard helper have separate proofs; no retroactive approval by the old CI."
+  },
+  "remote": {
+    "recordedAt": "2026-11-08T20:21:32.518Z",
+    "project": "qwfrqychokvhdzakibid",
+    "operation": "Read-only migration count/max-version",
+    "database": "postgres",
+    "migrations": 156,
+    "lastVersion": "20261108194000",
+    "newMigrationsInThisBatch": 0,
+    "remoteMutation": false,
+    "previousFullSqlReconciliation": "REGULARIZATION_PDF_REMOTE_MIGRATIONS.json"
+  },
+  "baselineCi": "CI_5A7D546_OBSERVATION.json",
+  "logsLfSha256": {
+    "ent-temporal-auth.log": "288bf43ce12eb22dadf80fd30ee76719bace3ad2dcee732ee0cdbe8f7c4ef583",
+    "ent-temporal-diffcheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-temporal-independent-negative.log": "042f0cd48009a6015a6072f8f99e5871c7c701c9acf1b7c6dbfc53d67b06769b",
+    "ent-temporal-independent.log": "1d7fda2685ccc95e8fb4f6c1698a53f36ca852e601bf08b933fc78c42a27aaad",
+    "ent-temporal-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-temporal-markdown-ci-final.log": "9785e1790f17b18972b25952b9e8ae7c3aa812464bd8b91015e3de76de9230c7",
+    "ent-temporal-markdown-ci-update.log": "b4b62715f797978370ae3a3f729953beaf51b8e45c09f8ce57380bd8c36e8453",
+    "ent-temporal-markdown-final.log": "56ff53e43ccd46f705e36cf8a567fc033edeb7decb59f3973f1cef0bf15152fe",
+    "ent-temporal-markdown.log": "47d45b845ad5de1a0a093b606105a1e7c73eca60d0ea13c4a5d94d3cdeaa3882",
+    "ent-temporal-production.log": "33b9cbf4af4c51e453f06092a43361281d533b8b0f5d650b75524e62d39ee5be",
+    "ent-temporal-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-temporal-unit.log": "485b398e5706a6db78fcd882e16bc347b8d32c2c1ca4e8d80418f7ff5aed9878"
+  },
+  "remaining": [
+    "Own published SHA CI",
+    "Other executable D-B requirements and C105/C106 coverage",
+    "Human/AT/physical-device/tagged PDF and D-C/D6 gates",
+    "No external trust/time/revocation or operational recovery approval"
+  ],
+  "goalComplete": false,
+  "documentationValidation": {
+    "localLinks": 187,
+    "canonicalColumnsPreserved": 29,
+    "changedCriteria": [
+      "C-AC-101",
+      "C-AC-108"
+    ]
+  }
+}

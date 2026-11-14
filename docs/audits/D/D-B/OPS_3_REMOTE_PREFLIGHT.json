@@ -1,0 +1,93 @@
+{
+  "status": "PREFLIGHT_ACCEPTED_FOR_PENDING_ONLY_APPLICATION",
+  "at": "2026-11-07T23:55:02.046Z",
+  "project": "qwfrqychokvhdzakibid",
+  "sourceBase": "19a3568782f702e1c7a56edd7623719c731accd8",
+  "before": 145,
+  "target": 147,
+  "pending": 2,
+  "remoteHistorySqlMatched": 145,
+  "compatibility": {
+    "existingIdentitiesPreserved": 387,
+    "existingPublicIdentitiesPreserved": 229,
+    "authoritiesAndGrantsPreserved": true,
+    "changedDefinitions": [
+      "public.run_operational_schedule"
+    ],
+    "behavior": "Original scheduler return keys retained; best-effort monitor subtransaction adds operationsObserved, cannot roll back business effects",
+    "newTechnicalData": "Private tables, service-only ingestion/collection, real global Auth diagnostics/configuration; personal impact is separate"
+  },
+  "backup": {
+    "backupId": "d77b1cc9-70eb-474f-973c-71344a009b5f",
+    "files": 79,
+    "bytes": 10608947,
+    "manifestSha256": "a068614d2c46a729759dedf94d5c6ce478352ecdb4ba6634dc42091bdce5d798",
+    "verified": true,
+    "restoredTables": 143,
+    "stableTableDigestsMatched": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.scheduler_health"
+    ],
+    "foreignKeysChecked": true,
+    "storageObjectsVerified": 33,
+    "pdfDigestsVerified": 32,
+    "signedIssuanceDigestsVerified": 1,
+    "migrationsAppliedToProbe": [
+      "20261107223318_phase_db_operational_observability.sql",
+      "20261107233144_phase_db_operational_conflict_response.sql"
+    ],
+    "catalogueComparison": {
+      "views": false,
+      "columns": true,
+      "indexes": true,
+      "defaults": true,
+      "policies": true,
+      "triggers": true,
+      "functions": true,
+      "relations": true,
+      "constraints": false,
+      "table_grants": true,
+      "function_grants": true
+    },
+    "cronEnabled": false,
+    "networkExtensionEnabled": false,
+    "seconds": 29.483,
+    "operationalRecoveryGate": "D6_NOT_SATISFIED_BY_THIS_PROBE"
+  },
+  "originalTableProjections": 143,
+  "sourcePreservation": {
+    "unexpectedChanges": [],
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.scheduler_health"
+    ]
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0,
+    "originalCronStates": [
+      {
+        "active": true,
+        "name": "hca-notification-worker",
+        "schedule": "* * * * *"
+      },
+      {
+        "active": true,
+        "name": "hca-operational-lifecycle",
+        "schedule": "* * * * *"
+      }
+    ]
+  },
+  "dryRun": {
+    "pending": 2,
+    "seeds": [],
+    "roles": [],
+    "skipVault": true
+  },
+  "operationalExternalBackupActive": false,
+  "operationalGo": false
+}

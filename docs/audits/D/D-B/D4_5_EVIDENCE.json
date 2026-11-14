@@ -1,0 +1,190 @@
+{
+  "sourceBaseSha": "dbc7171834dba4eb6338b60a22b8d57f7b84747b",
+  "stage": "PASS_LOCAL_SOURCE_FACTS_DIRECTED; D-B incomplete",
+  "migrations": {
+    "localCount": 141,
+    "remoteLastReconciledCount": 121,
+    "pending": 20,
+    "newFile": "supabase/migrations/20261107150000_phase_d4_pdf_source_facts.sql",
+    "preflightTransactionRolledBack": true,
+    "localAppliedWithoutReset": true,
+    "remoteApplied": false
+  },
+  "implementation": [
+    "V6 supplemental provenance frozen in private snapshot by database; canonical body/hash unchanged",
+    "Native draft/ficha/operational issuance and generation times separated",
+    "Historical known/NULL source dates, import time and qualified names",
+    "Frozen actor names/IDs survive rename/revocation; requester current name is separately labeled",
+    "Independent semantic region checks; unsupported glyph rejects before signature/Storage",
+    "Existing V5 reservation recovers with original renderer; ready bytes never rerendered",
+    "Historical and cancelled V6 wording avoids current SCI/receiving demand in directed cases"
+  ],
+  "checks": {
+    "authOriginal": {
+      "passed": 3,
+      "log": "d4-facts-auth.log"
+    },
+    "authReadOnlyFixtureReuse": {
+      "passed": 1,
+      "repeatedCase": true,
+      "log": "d4-facts-auth-reuse.log"
+    },
+    "authRenameAndRevocationFinal": {
+      "passed": 1,
+      "replacesEarlierRenameCase": true,
+      "log": "d4-facts-auth-revocation.log"
+    },
+    "unitFinal": {
+      "passed": 6,
+      "log": "d4-facts-unit-export.log"
+    },
+    "apiStrictForgery": {
+      "passed": 1,
+      "log": "d4-facts-api-forgery.log"
+    },
+    "v4v5Compatibility": {
+      "passed": 8,
+      "log": "d4-facts-v5-compatibility.log",
+      "reusedScope": "V6-only subsequent changes do not enter existing V4/V5 branches"
+    },
+    "production": {
+      "distinctApprovedNewCases": 6,
+      "status": "PASS_ACROSS_DIRECTED_COHORTS",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "firstFinalCohort": {
+        "passed": 5,
+        "failed": 1,
+        "log": "d4-facts-production-final.log",
+        "failure": "Evidence filename based on reused document ID already existed; real issuance completed but artifact export failed"
+      },
+      "chromiumRecheck": {
+        "passed": 1,
+        "log": "d4-facts-production-chromium-final.log",
+        "change": "Export artifact filename uses unique issuance ID; product source unchanged"
+      },
+      "axes": [
+        1440,
+        768,
+        390,
+        320
+      ],
+      "legacyV5RealRecovery": true,
+      "byteExactRepeatedDownload": true
+    },
+    "compatibilityProduction": {
+      "passed": 12,
+      "totalCohortPassed": 16,
+      "fixtureFailures": 2,
+      "log": "d4-facts-production.log",
+      "sourceCohort": {
+        "sourceBaseSha": "dbc7171834dba4eb6338b60a22b8d57f7b84747b",
+        "sourceLfSha256": {
+          "src/lib/documents/pdf-source-facts.ts": "78169d9248226c072599fd19fde27f355973513bf2e02b5602ab9fae0f9c9451",
+          "src/lib/server/operational-pdf.ts": "78a41ea5d7de933501468a72a82126198d57b7ebb41699d9321eb57b660c1afe",
+          "src/lib/server/pdf-content.ts": "f2275ece39115b204ae0274ba21525a43ca53eb46b3204e9c93d0cd83a6c876c",
+          "src/lib/server/pdf-issuance.ts": "deb7619311131dd2d8899ec5d0789f0e8e94e65854e997d8d0c4ef87d69c8ec7",
+          "supabase/migrations/20261107150000_phase_d4_pdf_source_facts.sql": "30f92d2f608b8c3d5aebb6c49d0cf370a7387b6ec2dcc002c83af0268f0fb330",
+          "tests/api/pdf-issuance-contract.test.ts": "7cb771dab6aa7ae6ce91619148b0836add386a08915df9d6ee018f5b8fcd28c6",
+          "tests/e2e/pdf-source-facts.spec.ts": "2095f88b142eac2b290b96f2355a820dd4ae1ebc55825856408bb0fd25cf94fa",
+          "tests/integration/pdf-source-facts-fixtures.mjs": "bf289805800e1ddccf7a4a869adde093d44d2c2cb5bc3a29676cbece12203aa8",
+          "tests/integration/pdf-source-facts.test.mjs": "9bcdb55e8766895296bea4642314df03b9c756d6ee5d2e1425d6911ef25767c3",
+          "tests/pdf-source-facts.test.ts": "f1826d3a1f70b7905818c5dd40c2da25eca93c13048b4a3abab8655359109e0a"
+        }
+      },
+      "scope": "Precedes final V6 terminal/historical wording and emission grouping. Not counted as same-build final acceptance."
+    },
+    "types": "PASS d4-facts-types-final.log",
+    "lint": "PASS d4-facts-lint-final.log",
+    "independent": "d4-source-facts-proof/VERIFICATION.json",
+    "visual": "Nine pages of current three signed PDFs inspected in contact sheet; long-note final marker raster inspected; no clipping/orphaned emission heading"
+  },
+  "counterproofs": [
+    {
+      "attempt": "unit-first",
+      "failure": "Two-column values are below labels, not adjacent in linear text; geometry oracle corrected without dropping factual checks"
+    },
+    {
+      "attempt": "diagnostic",
+      "failure": "Old document pins context; navigate to new resource before context helper"
+    },
+    {
+      "attempt": "first-production",
+      "failure": "Eleven physical import protocols exhausted on retained test stack; no reset/delete/widening. Reuse exact suite-owned development historical sources read-only."
+    },
+    {
+      "attempt": "first-final-production",
+      "failure": "Exclusive output export collided on reused document ID; use issuance ID and repeat only Chromium positive case"
+    },
+    {
+      "attempt": "independent diagnostic",
+      "failure": "Crop intersected label boundary; strict within_bbox checks value beneath own label"
+    }
+  ],
+  "ciObserved": {
+    "sha": "dbc7171834dba4eb6338b60a22b8d57f7b84747b",
+    "run": 42377491003,
+    "status": "COMPLETED_FAILURE",
+    "database": "SUCCESS including clean/legacy/integration",
+    "validateWindows": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "browsers": "FAILURES in archive refresh after revocation, menu ArrowDown focus, history loading; retained for next directed correction",
+    "validatesThisIncrement": false
+  },
+  "localState": {
+    "cron": [
+      {
+        "job": "hca-notification-worker",
+        "active": true,
+        "schedule": "* * * * *"
+      },
+      {
+        "job": "hca-operational-lifecycle",
+        "active": true,
+        "schedule": "* * * * *"
+      }
+    ],
+    "faultTriggers": 0,
+    "faultFunctions": 0
+  },
+  "sourceLfSha256": {
+    "src/lib/documents/pdf-source-facts.ts": "78169d9248226c072599fd19fde27f355973513bf2e02b5602ab9fae0f9c9451",
+    "src/lib/server/operational-pdf.ts": "00ef134f7532b0ed7e06fd9421f39510f831256065329328b106caeba6cf40a8",
+    "src/lib/server/pdf-content.ts": "f2275ece39115b204ae0274ba21525a43ca53eb46b3204e9c93d0cd83a6c876c",
+    "src/lib/server/pdf-issuance.ts": "deb7619311131dd2d8899ec5d0789f0e8e94e65854e997d8d0c4ef87d69c8ec7",
+    "supabase/migrations/20261107150000_phase_d4_pdf_source_facts.sql": "30f92d2f608b8c3d5aebb6c49d0cf370a7387b6ec2dcc002c83af0268f0fb330",
+    "tests/api/pdf-issuance-contract.test.ts": "f4b4deaaab211d84ff4afbba775c6b9aedb4669cbee40d3b7e4df802eda3392c",
+    "tests/pdf-source-facts.test.ts": "e8303640619ddc7b4236d5359c44b938759d3ae9e5eaba531b2a7c70c8da2b10",
+    "tests/integration/pdf-source-facts-fixtures.mjs": "08ca8a632e61a5561b206e0452bc8b37ed72fc5abd36c761d6f1242643aedd44",
+    "tests/integration/pdf-source-facts.test.mjs": "30742e5b7748ed62f40ea888ea0ed4a0573f1711ee4fbbedbda4ff676127f8fe",
+    "tests/e2e/pdf-source-facts.spec.ts": "9f2714665c0a5e86d7fa1eafd10ff408dddc2103b754ded9f1a422cc15200e9a"
+  },
+  "logSha256": {
+    "d4-facts-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "d4-facts-auth.log": "a7d24b94fbae9f1ea0c7b2965b69b0759930941afd8d6d33c3c1d5b09c64e9d9",
+    "d4-facts-auth-reuse.log": "f118d9fe89e487d10d6e0b73a8c646f88bc421595ab68fe562d9535f1c842052",
+    "d4-facts-auth-revocation.log": "4d985f6c0a81ac79705da7323ddc9db883fbba6ef99481ce13b3815b34517f34",
+    "d4-facts-unit-export.log": "6085f1860b27a9f048da300d394deac80bbebb14e5db4d7656c0ec62c04cbb88",
+    "d4-facts-unit-first.log": "24c64e12bc3419741a369dc4e685c872a1ec4b0044a426a81ee74ae6aa164558",
+    "d4-facts-api-forgery.log": "71875963108ca91a54fa8ccd76c35e7f69f65059c294cd153ac879745c303bc9",
+    "d4-facts-v5-compatibility.log": "bee237c94d9b1fbade39e86af3e23b4f4cf7b50bb59704d695acaf1885a8a1f5",
+    "d4-facts-diagnostic.log": "93fd57c0cb4ea09018c0bc58c18a45a5b70ac80c3fd237a4e5ce1eefbffc6d44",
+    "d4-facts-diagnostic-recheck.log": "d91a789877b8304d58009eb948a07834cd08321c8d17e93131681204ae4bef0d",
+    "d4-facts-production.log": "c2f6acc2e6eb557e420b48b6af1f72d7d98d5cd952f7bc9d15c5eb34daae7450",
+    "d4-facts-production-final.log": "8b35c8db7b10725e12dc78cc202d0197ba899a0138fec782dff07580489173e6",
+    "d4-facts-production-chromium-final.log": "943b5a09d24353cc32cddc7b21d129fc6daef017dd56a8d5383c6e307b8b1cd1",
+    "d4-facts-types-final.log": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+    "d4-facts-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ci-dbc7171-failed.log": "94dbc1a7bf3778148f698bdb398e3d5838d9a0c98bc042e90f73d927b618d096"
+  },
+  "limits": [
+    "C101 ENT draft/dispatch on different days still requires dedicated proof",
+    "C105/C106 remain partial across all state/type/attachment/long-content combinations",
+    "Internal trust only; no external revocation/ICP-Brasil/physical device/AT proof",
+    "D3 remainder, D5, ops backup/monitoring, custody drills and final remote reconciliation pending",
+    "Sonar OWNER_DEFERRED_SONAR_CONFIGURATION; production NO-GO; Draft no merge/deploy"
+  ]
+}

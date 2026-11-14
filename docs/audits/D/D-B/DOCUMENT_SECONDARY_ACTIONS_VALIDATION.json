@@ -1,0 +1,677 @@
+{
+  "assembledAt": "2026-11-09T12:22:46.115112+00:00",
+  "baseSha": "9bf18cf59d8d64a2a11dd0b72ebcb2510824befa",
+  "sourceLfSha256": {
+    "src/app/canonical-ui.css": "56e2fb19cff6eef65acd4a48ba3e43946c66edfbe915ca30df8a30096cc12c77",
+    "src/components/documents/document-header.tsx": "89354775c93bb19f5acf088168c450d22d43ebb3ec72b4c20a68081f597db8c3",
+    "src/components/documents/supply-detail.tsx": "1248607cf7ae571be433e618a194210e714d9507256a12f01cf98f2ad6d2758a",
+    "src/components/requisitions/requisition-detail.tsx": "7c7717119217c5b9c4f031313aed8c8962086697aa76d909e973f9cbf30c4c9f",
+    "tests/e2e/administration.spec.ts": "99b7dc2c8cb793a7c33f031bf6fbb943ec87c10b80203d9aef2a624c514305f7",
+    "tests/e2e/delivery-cancellation.spec.ts": "f69f8aac029d93d9aa93a37aa2a0269d0906ddf5148b299f7c0aef7ef5bef836",
+    "tests/e2e/document-sections.ts": "911f8d379c981d7246cd7403d994426b77b071fd6213a564d4ec228d1f761001",
+    "tests/e2e/document-tabs.spec.ts": "22bb1f2ec50de19016c3ebe1cae8025e814ff9e1711730dd7a210c82b8cd963f",
+    "tests/e2e/pdf-source-facts.spec.ts": "d792e81cb9421edbba2af3be39bae0991ebaa14e8536f27f2fb3b16a47a70b5b",
+    "tests/e2e/purchase-origin.spec.ts": "1159fd067d677cc025d08b2a3d571947146ca63ce22d9daf8bf4ff23f012a9de",
+    "tests/e2e/purchase-receipts.spec.ts": "f4d553d9118e500c79fa841ed0e34d680814327aa15db4c1d65750d14a0e5195",
+    "tests/e2e/remaining-need.spec.ts": "8eeada205eac736603e10b7aab699e220c1ac06ba08c4c9d0a70aa3ad7619d4c",
+    "tests/e2e/transfer-bilateral.spec.ts": "822c3d73381542b0f3e67216e45140a663ea321ece0a8bd134d882d0b20af822",
+    "tests/e2e/v4-review.spec.ts": "db499c6505ec655b163f428bd620ef61b2d0505da86d91559ddf689e6f4212a2",
+    "tests/e2e/workflows.spec.ts": "8d41d1491c98e11917183d43ce396c8d4c4cefb273d42f2834fd45b1de0135fd"
+  },
+  "browser": {
+    "distinctApprovedCases": 14,
+    "unresolvedFullImportCases": 2,
+    "identity": "file + path + title + project; latest directed outcome",
+    "rounds": {
+      "secondary-initial": {
+        "stats": {
+          "total": 10,
+          "expected": 8,
+          "unexpected": 2,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 121,
+              "column": 5
+            },
+            "duration": 19260,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 121,
+              "column": 5
+            },
+            "duration": 21151,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 253,
+              "column": 5
+            },
+            "duration": 38706,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação real",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 559,
+              "column": 5
+            },
+            "duration": 7361,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 253,
+              "column": 5
+            },
+            "duration": 48964,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação real",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 559,
+              "column": 5
+            },
+            "duration": 8999,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 119,
+              "column": 5
+            },
+            "duration": 23351,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.hca-document-header .eyebrow')\nExpected: \u001b[32m\"Doação de insumos\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" locator('.hca-document-header .eyebrow') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('.hca-document-header .eyebrow')\u001b[22m\n\n\n  163 |   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);\n  164 |   await expect(page.getByText(\"Expectativa encerrada · parcelas aguardam conferência\", { exact: true })).toBeVisible();\n> 165 |   await expect(page.locator(\".hca-document-header .eyebrow\")).toHaveText(\"Doação de insumos\");\n      |                                                               ^\n  166 |   expect(await page.locator(\".hca-document-header\").getByText(\"Expectativa encerrada · parcelas aguardam conferência\", { exact: true }).evaluate(element => {\n  167 |     const range = document.createRange(); range.selectNodeContents(element);\n  168 |     const text = range.getBoundingClientRect(), badge = element.getBoundingClientRect();\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\purchase-receipts.spec.ts:165:63\u001b[22m",
+                "codeframe": "   65 |   await page.route(\"**/api/documents/\" + document.id, async route => {\n   66 |     if (route.request().method() !== \"POST\") { await route.continue(); return; }\n   67 |     validationAttempts++; validationPayloads.push(route.request().postDataJSON());\n   68 |     if (validationAttempts === 1) { await route.fetch(); await route.abort(\"failed\"); } else await route.continue();\n   69 |   });\n   70 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n   71 |   await review.getByRole(\"button\", { name: \"Confirmar operação\", exact: true }).click();\n   72 |   await expect(review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })).toBeVisible();\n   73 |   await review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n   74 |   await expect(page.getByText(\"Parcela validada.\", { exact: false })).toBeVisible(); expect(validationPayloads).toHaveLength(2); expect(validationPayloads[0]).toEqual(validationPayloads[1]);\n   75 |   const final = await rpc(f.admin, \"operational_document\", { p_id: document.id });\n   76 |   expect(final.receipts.find((receipt: { id: string }) => receipt.id === initialReceipt.id)).toEqual(initialReceipt);\n   77 |   expect(Number(final.lines[0].accepted_quantity)).toBe(3); expect(final.receipts.find((receipt: { id: string }) => receipt.id === pending.id).validated_by).toBe(fixtures.adminA.id);\n   78 |   expect(sql(`select sum(quantity)::text from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`)).toBe(\"3.000000\");\n   79 | });\n   80 |\n   81 | test(\"COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar\", async ({ page }) => {\n   82 |   test.setTimeout(150_000);\n   83 |   const f = await setup(), family = await actor(\"family\", f.patient);\n   84 |   let document = await rpc(f.admin, \"create_supply_document\", { p_patient: f.patient, p_type: \"COM\", p_payload: { origin: \"purchase\", lines: [{ productId: f.products[0], quantity: \"10\" }] }, p_key: randomUUID(), p_draft: false });\n   85 |   const lineId = document.lines[0].id;\n   86 |   for (const p_action of [\"purchase\", \"receive\"]) document = await rpc(family, \"supply_document_command\", { p_id: document.id, p_action, p_body: { lines: [{ lineId, quantity: \"2\" }] }, p_key: randomUUID(), p_version: document.version });\n   87 |   const initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);\n   88 |   await login(page, f.patient, \"adminA\"); await page.goto(\"/fichas/\" + document.id);\n   89 |   await selectDocumentSection(page, \"workflow\");\n   90 |   await openDocumentMore(page);\n   91 |   await page.getByRole(\"button\", { name: \"Encerrar expectativa restante\", exact: true }).click();\n   92 |   const form = page.locator(\"form\").filter({ has: page.getByRole(\"button\", { name: \"Revisar operação\", exact: true }) });\n   93 |   await form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true }).fill(\"Motivo fictício preservado depois da mudança de versão.\");\n   94 |   const consent = form.getByRole(\"checkbox\", { name: \"Conferi o resumo e confirmo dispensar somente a expectativa não adquirida.\", exact: true }); await consent.check();\n   95 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n   96 |   const review = page.getByRole(\"dialog\", { name: \"Revisar encerramento da expectativa\", exact: true }); await expect(review).toBeVisible();\n   97 |   const newer = await rpc(family, \"supply_document_command\", { p_id: document.id, p_action: \"purchase\", p_body: { lines: [{ lineId, quantity: \"1\" }] }, p_key: randomUUID(), p_version: document.version });\n   98 |   const payloads: { expectedVersion: number; idempotencyKey: string }[] = [];\n   99 |   await page.route(\"**/api/documents/\" + document.id, async route => { if (route.request().method() === \"POST\") payloads.push(route.request().postDataJSON()); await route.continue(); });\n  100 |   await review.getByRole(\"button\", { name: \"Confirmar encerramento da expectativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n  101 |   await expect(page.getByRole(\"button\", { name: \"Consultar versão atual da COM\", exact: true })).toBeVisible();\n  102 |   await expect(form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })).toHaveValue(\"Motivo fictício preservado depois da mudança de versão.\");\n  103 |   expect(Number((await rpc(f.admin, \"operational_document\", { p_id: document.id })).lines[0].waived_quantity)).toBe(0);\n  104 |   await page.getByRole(\"button\", { name: \"Consultar versão atual da COM\", exact: true }).click();\n  105 |   const comparison = page.getByRole(\"region\", { name: \"Comparar versões da COM\", exact: true });\n  106 |   await expect(comparison.getByText(\"8 unidade → 7 unidade\", { exact: true })).toBeVisible(); await expect(comparison.locator(\"input,textarea,select\")).toHaveCount(0);\n  107 |   await page.getByRole(\"button\", { name: \"Usar versão atual e revisar novamente\", exact: true }).click();\n  108 |   await expect(consent).not.toBeChecked(); await expect(consent).toBeFocused();\n  109 |   await expect(form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })).toHaveValue(\"Motivo fictício preservado depois da mudança de versão.\");\n  110 |   await consent.check(); await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  111 |   await review.getByRole(\"button\", { name: \"Confirmar encerramento da expectativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n  112 |   const final = await rpc(f.admin, \"operational_document\", { p_id: document.id });\n  113 |   expect(Number(final.lines[0].waived_quantity)).toBe(7); expect(Number(final.lines[0].purchased_quantity)).toBe(3); expect(final.purchaseProgress.physicalPending).toBe(true);\n  114 |   expect(final.events.filter((event: { action: string }) => event.action === \"com.close_expectation\")).toHaveLength(1);\n  115 |   expect(payloads).toHaveLength(2); expect(payloads.map(payload => payload.expectedVersion)).toEqual([document.version, newer.version]); expect(payloads[0].idempotencyKey).not.toBe(payloads[1].idempotencyKey);\n  116 |   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);\n  117 | });\n  118 |\n  119 | test(\"COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos\", async ({ page }, info) => {\n  120 |   test.setTimeout(150_000);\n  121 |   const f = await setup(), family = await actor(\"family\", f.patient);\n  122 |   let document = await rpc(f.admin, \"create_supply_document\", { p_patient: f.patient, p_type: \"COM\", p_payload: { origin: \"donation\", lines: [{ productId: f.products[0], quantity: \"10\" }] }, p_key: randomUUID(), p_draft: false });\n  123 |   const lineId = document.lines[0].id;\n  124 |   for (const p_action of [\"purchase\", \"receive\"]) document = await rpc(family, \"supply_document_command\", { p_id: document.id, p_action, p_body: { lines: [{ lineId, quantity: \"2\" }] }, p_key: randomUUID(), p_version: document.version });\n  125 |   const receipt = document.receipts[0], initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);\n  126 |   await login(page, f.patient, \"adminA\"); await page.goto(\"/fichas/\" + document.id);\n  127 |   await selectDocumentSection(page, \"workflow\");\n  128 |   await openDocumentMore(page);\n  129 |   await page.getByRole(\"button\", { name: \"Encerrar expectativa restante\", exact: true }).click();\n  130 |   const form = page.locator(\"form\").filter({ has: page.getByRole(\"button\", { name: \"Revisar operação\", exact: true }) });\n  131 |   await expect(form.getByRole(\"heading\", { name: \"Expectativa que não será adquirida\", exact: true })).toBeVisible();\n  132 |   await expect(form.locator('input:not([type=\"checkbox\"])')).toHaveCount(0);\n  133 |   await expect(form.getByText(\"8 unidade\", { exact: true })).toBeVisible();\n  134 |   await form.getByLabel(\"Motivo / justificativa\", { exact: true }).fill(\"Encerramento fictício: os 8 restantes não serão adquiridos.\");\n  135 |   const consent = form.getByRole(\"checkbox\", { name: \"Conferi o resumo e confirmo dispensar somente a expectativa não adquirida.\", exact: true });\n  136 |   await expect(consent).not.toBeChecked(); await consent.check();\n  137 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  138 |   const review = page.getByRole(\"dialog\", { name: \"Revisar encerramento da expectativa\", exact: true });\n  139 |   await expect(review).toBeVisible(); await expect(review.locator(\"input,textarea,select\")).toHaveCount(0);\n  140 |   await review.getByRole(\"button\", { name: \"Manter restante\", exact: true }).click(); await expect(review).toHaveCount(0);\n  141 |   expect(Number((await rpc(f.admin, \"operational_document\", { p_id: document.id })).lines[0].waived_quantity)).toBe(0);\n  142 |   await expect(form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })).toHaveValue(\"Encerramento fictício: os 8 restantes não serão adquiridos.\");\n  143 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  144 |   for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await audit(page, \"COM closure review \" + width); expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true); }\n  145 |   mkdirSync(\"output/playwright/phase-d\", { recursive: true }); await page.screenshot({ path: `output/playwright/phase-d/purchase-close-review-${info.project.name}.png`, animations: \"disabled\" });\n  146 |   let attempts = 0;\n  147 |   const payloads: unknown[] = [];\n  148 |   await page.route(\"**/api/documents/\" + document.id, async route => {\n  149 |     if (route.request().method() !== \"POST\") { await route.continue(); return; }\n  150 |     attempts++; payloads.push(route.request().postDataJSON());\n  151 |     if (attempts === 1) { await route.fetch(); await route.abort(\"failed\"); } else await route.continue();\n  152 |   });\n  153 |   await review.getByRole(\"button\", { name: \"Confirmar encerramento da expectativa\", exact: true }).click();\n  154 |   await expect(review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })).toBeVisible();\n  155 |   await expect(review.getByRole(\"button\", { name: \"Manter restante\", exact: true })).toBeDisabled();\n  156 |   await expect(review.getByText(\"O resultado ainda não foi confirmado.\", { exact: false })).toBeVisible();\n  157 |   await expect(review.getByRole(\"button\", { name: \"Fechar diálogo\", exact: true })).toBeDisabled();\n  158 |   await review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n  159 |   expect(payloads).toHaveLength(2); expect(payloads[0]).toEqual(payloads[1]);\n  160 |   await page.unroute(\"**/api/documents/\" + document.id);\n  161 |   document = await rpc(f.admin, \"operational_document\", { p_id: document.id });\n  162 |   expect(document.purchaseProgress.state).toBe(\"closed_pending_validation\"); expect(Number(document.lines[0].waived_quantity)).toBe(8); expect(Number(document.lines[0].accepted_quantity)).toBe(0);\n  163 |   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);\n  164 |   await expect(page.getByText(\"Expectativa encerrada · parcelas aguardam conferência\", { exact: true })).toBeVisible();\n> 165 |   await expect(page.locator(\".hca-document-header .eyebrow\")).toHaveText(\"Doação de insumos\");\n      |                                                               ^ Error: expect(locator).toHaveText(expected) failed\n  166 |   expect(await page.locator(\".hca-document-header\").getByText(\"Expectativa encerrada · parcelas aguardam conferência\", { exact: true }).evaluate(element => {\n  167 |     const range = document.createRange(); range.selectNodeContents(element);\n  168 |     const text = range.getBoundingClientRect(), badge = element.getBoundingClientRect();\n  169 |     return text.top >= badge.top - 1 && text.bottom <= badge.bottom + 1;\n  170 |   }), \"o texto do estado deve caber verticalmente na cápsula a 320 px\").toBe(true);\n  171 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);\n  172 |   await page.locator(\".hca-document-header\").screenshot({ path: `output/playwright/phase-d/purchase-pending-header-${info.project.name}.png`, animations: \"disabled\" });\n  173 |   await expect(page.getByRole(\"button\", { name: \"Informar nova chegada\", exact: true })).toHaveCount(0);\n  174 |   const pendingPdf = await generatedPdf(page, `/api/documents/${document.id}/pdf`); expect(pendingPdf.ok()).toBe(true);\n  175 |   if (info.project.name === \"chromium\") { mkdirSync(\"output/pdf/phase-d\", { recursive: true }); writeFileSync(`output/pdf/phase-d/purchase-expectation-${document.id}-v${document.version}-pending.pdf`, await pendingPdf.body(), { flag: \"wx\" }); }\n  176 |   await page.getByRole(\"button\", { name: \"Validar recebimento\", exact: true }).click();\n  177 |   await expect(form.getByText(\"2 unidade\", { exact: true })).toBeVisible(); await expect(form.locator(\"input\")).toHaveCount(0);\n  178 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  179 |   const decision = page.getByRole(\"dialog\", { name: \"Revisar operação definitiva\", exact: true }); await decision.getByRole(\"button\", { name: \"Confirmar operação\", exact: true }).click(); await expect(decision).toHaveCount(0);\n  180 |   const final = await rpc(f.admin, \"operational_document\", { p_id: document.id });\n  181 |   expect(final.purchaseProgress.state).toBe(\"closed_below_quantity\"); expect(Number(final.lines[0].accepted_quantity)).toBe(2); expect(Number(final.lines[0].waived_quantity)).toBe(8);\n  182 |   expect(final.receipts.find((row: { id: string }) => row.id === receipt.id).state).toBe(\"approved\");\n  183 |   expect(sql(`select sum(quantity)::text from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`)).toBe(\"2.000000\");\n  184 |   await expect(page.getByText(\"Encerrada com quantidade inferior\", { exact: true })).toBeVisible();\n  185 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);\n  186 |   await page.locator(\".hca-document-header\").screenshot({ path: `output/playwright/phase-d/purchase-closed-header-${info.project.name}.png`, animations: \"disabled\" });\n  187 |   const finalPdf = await generatedPdf(page, `/api/documents/${final.id}/pdf`); expect(finalPdf.ok()).toBe(true);\n  188 |   expect((await finalPdf.body()).equals(await pendingPdf.body())).toBe(false);\n  189 |   if (info.project.name === \"chromium\") writeFileSync(`output/pdf/phase-d/purchase-expectation-${final.id}-v${final.version}-closed.pdf`, await finalPdf.body(), { flag: \"wx\" });\n  190 |   await audit(page, \"COM closed below quantity 320\"); await page.screenshot({ path: `output/playwright/phase-d/purchase-closed-${info.project.name}.png`, fullPage: true, animations: \"disabled\" });\n  191 | });\n  192 |\n  193 | test(\"COM rejeita a parcela identificada em leitura, preserva declaração e recupera a decisão sem entrada de estoque\", async ({ page }) => {\n  194 |   test.setTimeout(120_000);\n  195 |   const f = await setup(), family = await actor(\"family\", f.patient);\n  196 |   let document = await rpc(f.admin, \"create_supply_document\", { p_patient: f.patient, p_type: \"COM\", p_payload: { origin: \"purchase\", lines: [{ productId: f.products[0], quantity: \"10\" }] }, p_key: randomUUID(), p_draft: false });\n  197 |   const lineId = document.lines[0].id;\n  198 |   for (const p_action of [\"purchase\", \"receive\"]) document = await rpc(family, \"supply_document_command\", { p_id: document.id, p_action, p_body: { lines: [{ lineId, quantity: \"2\" }] }, p_key: randomUUID(), p_version: document.version });\n  199 |   const original = document.receipts[0], initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);\n  200 |   await login(page, f.patient, \"adminA\"); await page.goto(\"/fichas/\" + document.id);\n  201 |   await selectDocumentSection(page, \"workflow\");\n  202 |   await page.getByRole(\"button\", { name: \"Rejeitar recebimento\", exact: true }).click();\n  203 |   const form = page.locator(\"form\").filter({ has: page.getByRole(\"button\", { name: \"Revisar operação\", exact: true }) });\n  204 |   await expect(form.getByRole(\"heading\", { name: \"Parcela selecionada\", exact: true })).toBeVisible(); await expect(form.getByText(\"2 unidade\", { exact: true })).toBeVisible(); await expect(form.locator(\"input\")).toHaveCount(0);\n  205 |   await form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true }).fill(\"Parcela fictícia rejeitada após conferir a declaração.\");\n  206 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  207 |   const review = page.getByRole(\"dialog\", { name: \"Revisar operação definitiva\", exact: true }); await expect(review.locator(\"input,textarea,select\")).toHaveCount(0);\n  208 |   let attempts = 0;\n  209 |   const payloads: unknown[] = [];\n  210 |   await page.route(\"**/api/documents/\" + document.id, async route => {\n  211 |     if (route.request().method() !== \"POST\") { await route.continue(); return; }\n  212 |     attempts++; payloads.push(route.request().postDataJSON()); if (attempts === 1) { await route.fetch(); await route.abort(\"failed\"); } else await route.continue();\n  213 |   });\n  214 |   await review.getByRole(\"button\", { name: \"Confirmar operação\", exact: true }).click(); await expect(review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })).toBeVisible();\n  215 |   await review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n  216 |   await expect(page.getByText(\"Parcela rejeitada. A declaração original foi preservada, sem entrada desta parcela no estoque.\", { exact: true })).toBeVisible();\n  217 |   await expect(page.getByRole(\"heading\", { name: \"Parcela 1 · Rejeitada\", exact: true })).toBeVisible(); expect(payloads).toHaveLength(2); expect(payloads[0]).toEqual(payloads[1]);\n  218 |   const final = await rpc(f.admin, \"operational_document\", { p_id: document.id }), receipt = final.receipts[0];\n  219 |   expect(receipt.id).toBe(original.id); expect(receipt.lines).toEqual(original.lines); expect(receipt.submitted_by).toBe(original.submitted_by); expect(receipt.submitted_name).toBe(original.submitted_name);\n  220 |   expect(receipt.state).toBe(\"rejected\"); expect(receipt.validated_by).toBe(fixtures.adminA.id); expect(Number(final.lines[0].accepted_quantity)).toBe(0);\n  221 |   expect(final.events.filter((event: { action: string }) => event.action === \"com.reject_receipt\")).toHaveLength(1);\n  222 |   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);\n  223 | });\n  224 |\n  225 | //"
+              }
+            ]
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 119,
+              "column": 5
+            },
+            "duration": 25509,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.hca-document-header .eyebrow')\nExpected: \u001b[32m\"Doação de insumos\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" locator('.hca-document-header .eyebrow') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('.hca-document-header .eyebrow')\u001b[22m\n\n\n  163 |   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);\n  164 |   await expect(page.getByText(\"Expectativa encerrada · parcelas aguardam conferência\", { exact: true })).toBeVisible();\n> 165 |   await expect(page.locator(\".hca-document-header .eyebrow\")).toHaveText(\"Doação de insumos\");\n      |                                                               ^\n  166 |   expect(await page.locator(\".hca-document-header\").getByText(\"Expectativa encerrada · parcelas aguardam conferência\", { exact: true }).evaluate(element => {\n  167 |     const range = document.createRange(); range.selectNodeContents(element);\n  168 |     const text = range.getBoundingClientRect(), badge = element.getBoundingClientRect();\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\purchase-receipts.spec.ts:165:63\u001b[22m",
+                "codeframe": "   65 |   await page.route(\"**/api/documents/\" + document.id, async route => {\n   66 |     if (route.request().method() !== \"POST\") { await route.continue(); return; }\n   67 |     validationAttempts++; validationPayloads.push(route.request().postDataJSON());\n   68 |     if (validationAttempts === 1) { await route.fetch(); await route.abort(\"failed\"); } else await route.continue();\n   69 |   });\n   70 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n   71 |   await review.getByRole(\"button\", { name: \"Confirmar operação\", exact: true }).click();\n   72 |   await expect(review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })).toBeVisible();\n   73 |   await review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n   74 |   await expect(page.getByText(\"Parcela validada.\", { exact: false })).toBeVisible(); expect(validationPayloads).toHaveLength(2); expect(validationPayloads[0]).toEqual(validationPayloads[1]);\n   75 |   const final = await rpc(f.admin, \"operational_document\", { p_id: document.id });\n   76 |   expect(final.receipts.find((receipt: { id: string }) => receipt.id === initialReceipt.id)).toEqual(initialReceipt);\n   77 |   expect(Number(final.lines[0].accepted_quantity)).toBe(3); expect(final.receipts.find((receipt: { id: string }) => receipt.id === pending.id).validated_by).toBe(fixtures.adminA.id);\n   78 |   expect(sql(`select sum(quantity)::text from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`)).toBe(\"3.000000\");\n   79 | });\n   80 |\n   81 | test(\"COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar\", async ({ page }) => {\n   82 |   test.setTimeout(150_000);\n   83 |   const f = await setup(), family = await actor(\"family\", f.patient);\n   84 |   let document = await rpc(f.admin, \"create_supply_document\", { p_patient: f.patient, p_type: \"COM\", p_payload: { origin: \"purchase\", lines: [{ productId: f.products[0], quantity: \"10\" }] }, p_key: randomUUID(), p_draft: false });\n   85 |   const lineId = document.lines[0].id;\n   86 |   for (const p_action of [\"purchase\", \"receive\"]) document = await rpc(family, \"supply_document_command\", { p_id: document.id, p_action, p_body: { lines: [{ lineId, quantity: \"2\" }] }, p_key: randomUUID(), p_version: document.version });\n   87 |   const initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);\n   88 |   await login(page, f.patient, \"adminA\"); await page.goto(\"/fichas/\" + document.id);\n   89 |   await selectDocumentSection(page, \"workflow\");\n   90 |   await openDocumentMore(page);\n   91 |   await page.getByRole(\"button\", { name: \"Encerrar expectativa restante\", exact: true }).click();\n   92 |   const form = page.locator(\"form\").filter({ has: page.getByRole(\"button\", { name: \"Revisar operação\", exact: true }) });\n   93 |   await form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true }).fill(\"Motivo fictício preservado depois da mudança de versão.\");\n   94 |   const consent = form.getByRole(\"checkbox\", { name: \"Conferi o resumo e confirmo dispensar somente a expectativa não adquirida.\", exact: true }); await consent.check();\n   95 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n   96 |   const review = page.getByRole(\"dialog\", { name: \"Revisar encerramento da expectativa\", exact: true }); await expect(review).toBeVisible();\n   97 |   const newer = await rpc(family, \"supply_document_command\", { p_id: document.id, p_action: \"purchase\", p_body: { lines: [{ lineId, quantity: \"1\" }] }, p_key: randomUUID(), p_version: document.version });\n   98 |   const payloads: { expectedVersion: number; idempotencyKey: string }[] = [];\n   99 |   await page.route(\"**/api/documents/\" + document.id, async route => { if (route.request().method() === \"POST\") payloads.push(route.request().postDataJSON()); await route.continue(); });\n  100 |   await review.getByRole(\"button\", { name: \"Confirmar encerramento da expectativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n  101 |   await expect(page.getByRole(\"button\", { name: \"Consultar versão atual da COM\", exact: true })).toBeVisible();\n  102 |   await expect(form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })).toHaveValue(\"Motivo fictício preservado depois da mudança de versão.\");\n  103 |   expect(Number((await rpc(f.admin, \"operational_document\", { p_id: document.id })).lines[0].waived_quantity)).toBe(0);\n  104 |   await page.getByRole(\"button\", { name: \"Consultar versão atual da COM\", exact: true }).click();\n  105 |   const comparison = page.getByRole(\"region\", { name: \"Comparar versões da COM\", exact: true });\n  106 |   await expect(comparison.getByText(\"8 unidade → 7 unidade\", { exact: true })).toBeVisible(); await expect(comparison.locator(\"input,textarea,select\")).toHaveCount(0);\n  107 |   await page.getByRole(\"button\", { name: \"Usar versão atual e revisar novamente\", exact: true }).click();\n  108 |   await expect(consent).not.toBeChecked(); await expect(consent).toBeFocused();\n  109 |   await expect(form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })).toHaveValue(\"Motivo fictício preservado depois da mudança de versão.\");\n  110 |   await consent.check(); await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  111 |   await review.getByRole(\"button\", { name: \"Confirmar encerramento da expectativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n  112 |   const final = await rpc(f.admin, \"operational_document\", { p_id: document.id });\n  113 |   expect(Number(final.lines[0].waived_quantity)).toBe(7); expect(Number(final.lines[0].purchased_quantity)).toBe(3); expect(final.purchaseProgress.physicalPending).toBe(true);\n  114 |   expect(final.events.filter((event: { action: string }) => event.action === \"com.close_expectation\")).toHaveLength(1);\n  115 |   expect(payloads).toHaveLength(2); expect(payloads.map(payload => payload.expectedVersion)).toEqual([document.version, newer.version]); expect(payloads[0].idempotencyKey).not.toBe(payloads[1].idempotencyKey);\n  116 |   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);\n  117 | });\n  118 |\n  119 | test(\"COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos\", async ({ page }, info) => {\n  120 |   test.setTimeout(150_000);\n  121 |   const f = await setup(), family = await actor(\"family\", f.patient);\n  122 |   let document = await rpc(f.admin, \"create_supply_document\", { p_patient: f.patient, p_type: \"COM\", p_payload: { origin: \"donation\", lines: [{ productId: f.products[0], quantity: \"10\" }] }, p_key: randomUUID(), p_draft: false });\n  123 |   const lineId = document.lines[0].id;\n  124 |   for (const p_action of [\"purchase\", \"receive\"]) document = await rpc(family, \"supply_document_command\", { p_id: document.id, p_action, p_body: { lines: [{ lineId, quantity: \"2\" }] }, p_key: randomUUID(), p_version: document.version });\n  125 |   const receipt = document.receipts[0], initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);\n  126 |   await login(page, f.patient, \"adminA\"); await page.goto(\"/fichas/\" + document.id);\n  127 |   await selectDocumentSection(page, \"workflow\");\n  128 |   await openDocumentMore(page);\n  129 |   await page.getByRole(\"button\", { name: \"Encerrar expectativa restante\", exact: true }).click();\n  130 |   const form = page.locator(\"form\").filter({ has: page.getByRole(\"button\", { name: \"Revisar operação\", exact: true }) });\n  131 |   await expect(form.getByRole(\"heading\", { name: \"Expectativa que não será adquirida\", exact: true })).toBeVisible();\n  132 |   await expect(form.locator('input:not([type=\"checkbox\"])')).toHaveCount(0);\n  133 |   await expect(form.getByText(\"8 unidade\", { exact: true })).toBeVisible();\n  134 |   await form.getByLabel(\"Motivo / justificativa\", { exact: true }).fill(\"Encerramento fictício: os 8 restantes não serão adquiridos.\");\n  135 |   const consent = form.getByRole(\"checkbox\", { name: \"Conferi o resumo e confirmo dispensar somente a expectativa não adquirida.\", exact: true });\n  136 |   await expect(consent).not.toBeChecked(); await consent.check();\n  137 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  138 |   const review = page.getByRole(\"dialog\", { name: \"Revisar encerramento da expectativa\", exact: true });\n  139 |   await expect(review).toBeVisible(); await expect(review.locator(\"input,textarea,select\")).toHaveCount(0);\n  140 |   await review.getByRole(\"button\", { name: \"Manter restante\", exact: true }).click(); await expect(review).toHaveCount(0);\n  141 |   expect(Number((await rpc(f.admin, \"operational_document\", { p_id: document.id })).lines[0].waived_quantity)).toBe(0);\n  142 |   await expect(form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })).toHaveValue(\"Encerramento fictício: os 8 restantes não serão adquiridos.\");\n  143 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  144 |   for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await audit(page, \"COM closure review \" + width); expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true); }\n  145 |   mkdirSync(\"output/playwright/phase-d\", { recursive: true }); await page.screenshot({ path: `output/playwright/phase-d/purchase-close-review-${info.project.name}.png`, animations: \"disabled\" });\n  146 |   let attempts = 0;\n  147 |   const payloads: unknown[] = [];\n  148 |   await page.route(\"**/api/documents/\" + document.id, async route => {\n  149 |     if (route.request().method() !== \"POST\") { await route.continue(); return; }\n  150 |     attempts++; payloads.push(route.request().postDataJSON());\n  151 |     if (attempts === 1) { await route.fetch(); await route.abort(\"failed\"); } else await route.continue();\n  152 |   });\n  153 |   await review.getByRole(\"button\", { name: \"Confirmar encerramento da expectativa\", exact: true }).click();\n  154 |   await expect(review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })).toBeVisible();\n  155 |   await expect(review.getByRole(\"button\", { name: \"Manter restante\", exact: true })).toBeDisabled();\n  156 |   await expect(review.getByText(\"O resultado ainda não foi confirmado.\", { exact: false })).toBeVisible();\n  157 |   await expect(review.getByRole(\"button\", { name: \"Fechar diálogo\", exact: true })).toBeDisabled();\n  158 |   await review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n  159 |   expect(payloads).toHaveLength(2); expect(payloads[0]).toEqual(payloads[1]);\n  160 |   await page.unroute(\"**/api/documents/\" + document.id);\n  161 |   document = await rpc(f.admin, \"operational_document\", { p_id: document.id });\n  162 |   expect(document.purchaseProgress.state).toBe(\"closed_pending_validation\"); expect(Number(document.lines[0].waived_quantity)).toBe(8); expect(Number(document.lines[0].accepted_quantity)).toBe(0);\n  163 |   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);\n  164 |   await expect(page.getByText(\"Expectativa encerrada · parcelas aguardam conferência\", { exact: true })).toBeVisible();\n> 165 |   await expect(page.locator(\".hca-document-header .eyebrow\")).toHaveText(\"Doação de insumos\");\n      |                                                               ^ Error: expect(locator).toHaveText(expected) failed\n  166 |   expect(await page.locator(\".hca-document-header\").getByText(\"Expectativa encerrada · parcelas aguardam conferência\", { exact: true }).evaluate(element => {\n  167 |     const range = document.createRange(); range.selectNodeContents(element);\n  168 |     const text = range.getBoundingClientRect(), badge = element.getBoundingClientRect();\n  169 |     return text.top >= badge.top - 1 && text.bottom <= badge.bottom + 1;\n  170 |   }), \"o texto do estado deve caber verticalmente na cápsula a 320 px\").toBe(true);\n  171 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);\n  172 |   await page.locator(\".hca-document-header\").screenshot({ path: `output/playwright/phase-d/purchase-pending-header-${info.project.name}.png`, animations: \"disabled\" });\n  173 |   await expect(page.getByRole(\"button\", { name: \"Informar nova chegada\", exact: true })).toHaveCount(0);\n  174 |   const pendingPdf = await generatedPdf(page, `/api/documents/${document.id}/pdf`); expect(pendingPdf.ok()).toBe(true);\n  175 |   if (info.project.name === \"chromium\") { mkdirSync(\"output/pdf/phase-d\", { recursive: true }); writeFileSync(`output/pdf/phase-d/purchase-expectation-${document.id}-v${document.version}-pending.pdf`, await pendingPdf.body(), { flag: \"wx\" }); }\n  176 |   await page.getByRole(\"button\", { name: \"Validar recebimento\", exact: true }).click();\n  177 |   await expect(form.getByText(\"2 unidade\", { exact: true })).toBeVisible(); await expect(form.locator(\"input\")).toHaveCount(0);\n  178 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  179 |   const decision = page.getByRole(\"dialog\", { name: \"Revisar operação definitiva\", exact: true }); await decision.getByRole(\"button\", { name: \"Confirmar operação\", exact: true }).click(); await expect(decision).toHaveCount(0);\n  180 |   const final = await rpc(f.admin, \"operational_document\", { p_id: document.id });\n  181 |   expect(final.purchaseProgress.state).toBe(\"closed_below_quantity\"); expect(Number(final.lines[0].accepted_quantity)).toBe(2); expect(Number(final.lines[0].waived_quantity)).toBe(8);\n  182 |   expect(final.receipts.find((row: { id: string }) => row.id === receipt.id).state).toBe(\"approved\");\n  183 |   expect(sql(`select sum(quantity)::text from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`)).toBe(\"2.000000\");\n  184 |   await expect(page.getByText(\"Encerrada com quantidade inferior\", { exact: true })).toBeVisible();\n  185 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);\n  186 |   await page.locator(\".hca-document-header\").screenshot({ path: `output/playwright/phase-d/purchase-closed-header-${info.project.name}.png`, animations: \"disabled\" });\n  187 |   const finalPdf = await generatedPdf(page, `/api/documents/${final.id}/pdf`); expect(finalPdf.ok()).toBe(true);\n  188 |   expect((await finalPdf.body()).equals(await pendingPdf.body())).toBe(false);\n  189 |   if (info.project.name === \"chromium\") writeFileSync(`output/pdf/phase-d/purchase-expectation-${final.id}-v${final.version}-closed.pdf`, await finalPdf.body(), { flag: \"wx\" });\n  190 |   await audit(page, \"COM closed below quantity 320\"); await page.screenshot({ path: `output/playwright/phase-d/purchase-closed-${info.project.name}.png`, fullPage: true, animations: \"disabled\" });\n  191 | });\n  192 |\n  193 | test(\"COM rejeita a parcela identificada em leitura, preserva declaração e recupera a decisão sem entrada de estoque\", async ({ page }) => {\n  194 |   test.setTimeout(120_000);\n  195 |   const f = await setup(), family = await actor(\"family\", f.patient);\n  196 |   let document = await rpc(f.admin, \"create_supply_document\", { p_patient: f.patient, p_type: \"COM\", p_payload: { origin: \"purchase\", lines: [{ productId: f.products[0], quantity: \"10\" }] }, p_key: randomUUID(), p_draft: false });\n  197 |   const lineId = document.lines[0].id;\n  198 |   for (const p_action of [\"purchase\", \"receive\"]) document = await rpc(family, \"supply_document_command\", { p_id: document.id, p_action, p_body: { lines: [{ lineId, quantity: \"2\" }] }, p_key: randomUUID(), p_version: document.version });\n  199 |   const original = document.receipts[0], initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);\n  200 |   await login(page, f.patient, \"adminA\"); await page.goto(\"/fichas/\" + document.id);\n  201 |   await selectDocumentSection(page, \"workflow\");\n  202 |   await page.getByRole(\"button\", { name: \"Rejeitar recebimento\", exact: true }).click();\n  203 |   const form = page.locator(\"form\").filter({ has: page.getByRole(\"button\", { name: \"Revisar operação\", exact: true }) });\n  204 |   await expect(form.getByRole(\"heading\", { name: \"Parcela selecionada\", exact: true })).toBeVisible(); await expect(form.getByText(\"2 unidade\", { exact: true })).toBeVisible(); await expect(form.locator(\"input\")).toHaveCount(0);\n  205 |   await form.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true }).fill(\"Parcela fictícia rejeitada após conferir a declaração.\");\n  206 |   await form.getByRole(\"button\", { name: \"Revisar operação\", exact: true }).click();\n  207 |   const review = page.getByRole(\"dialog\", { name: \"Revisar operação definitiva\", exact: true }); await expect(review.locator(\"input,textarea,select\")).toHaveCount(0);\n  208 |   let attempts = 0;\n  209 |   const payloads: unknown[] = [];\n  210 |   await page.route(\"**/api/documents/\" + document.id, async route => {\n  211 |     if (route.request().method() !== \"POST\") { await route.continue(); return; }\n  212 |     attempts++; payloads.push(route.request().postDataJSON()); if (attempts === 1) { await route.fetch(); await route.abort(\"failed\"); } else await route.continue();\n  213 |   });\n  214 |   await review.getByRole(\"button\", { name: \"Confirmar operação\", exact: true }).click(); await expect(review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true })).toBeVisible();\n  215 |   await review.getByRole(\"button\", { name: \"Recuperar tentativa\", exact: true }).click(); await expect(review).toHaveCount(0);\n  216 |   await expect(page.getByText(\"Parcela rejeitada. A declaração original foi preservada, sem entrada desta parcela no estoque.\", { exact: true })).toBeVisible();\n  217 |   await expect(page.getByRole(\"heading\", { name: \"Parcela 1 · Rejeitada\", exact: true })).toBeVisible(); expect(payloads).toHaveLength(2); expect(payloads[0]).toEqual(payloads[1]);\n  218 |   const final = await rpc(f.admin, \"operational_document\", { p_id: document.id }), receipt = final.receipts[0];\n  219 |   expect(receipt.id).toBe(original.id); expect(receipt.lines).toEqual(original.lines); expect(receipt.submitted_by).toBe(original.submitted_by); expect(receipt.submitted_name).toBe(original.submitted_name);\n  220 |   expect(receipt.state).toBe(\"rejected\"); expect(receipt.validated_by).toBe(fixtures.adminA.id); expect(Number(final.lines[0].accepted_quantity)).toBe(0);\n  221 |   expect(final.events.filter((event: { action: string }) => event.action === \"com.reject_receipt\")).toHaveLength(1);\n  222 |   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);\n  223 | });\n  224 |\n  225 | //"
+              }
+            ]
+          },
+          {
+            "title": "origem obsoleta exige comparação e adoção explícita após falha; seleção, zero e motivo continuam preservados",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "remaining-need.spec.ts",
+              "line": 221,
+              "column": 5
+            },
+            "duration": 13917,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "origem obsoleta exige comparação e adoção explícita após falha; seleção, zero e motivo continuam preservados",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "remaining-need.spec.ts",
+              "line": 221,
+              "column": 5
+            },
+            "duration": 16700,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "4f86c38734c629986ba476e51eed292396e9df8227a82f11c0c187101b7cc657"
+      },
+      "secondary-compatibility": {
+        "stats": {
+          "total": 6,
+          "expected": 4,
+          "unexpected": 2,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "importação histórica revisada preserva itens extras e estoque desconhecido no comprovante",
+            "path": [
+              "administração integrada no ambiente local"
+            ],
+            "projectName": "chromium",
+            "location": {
+              "file": "administration.spec.ts",
+              "line": 454,
+              "column": 7
+            },
+            "duration": 14885,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  103 |     await page.getByRole(\"button\", { name, exact: true }).click();\n  104 |     const response = await pending;\n> 105 |     expect(response.ok()).toBeTruthy();\n      |                           ^\n  106 |     return response.json();\n  107 |   }\n  108 |\n\u001b[2m    at submit (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\administration.spec.ts:105:27)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\administration.spec.ts:496:21\u001b[22m",
+                "codeframe": "   5 | import { randomUUID } from \"node:crypto\";\n   6 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   7 | import {\n   8 |   assertLocalProject,\n   9 |   sql,\n   10 |   fixtureFile,\n   11 | } from \"../../scripts/test-environment.mjs\";\n   12 |\n   13 | type Fixture = { id: string; email: string };\n   14 |\n   15 | test.describe(\"administração integrada no ambiente local\", () => {\n   16 |   test.beforeAll(() => {\n   17 |     if (process.env.HCA_E2E_LOCAL !== \"1\")\n   18 |       throw new Error(\"The verified local browser environment is required.\");\n   19 |     assertLocalProject();\n   20 |   });\n   21 |   test.setTimeout(120_000);\n   22 |\n   23 |   function fixtures(): Record<string, Fixture> {\n   24 |     assertLocalProject();\n   25 |     if (process.env.NEXT_PUBLIC_SUPABASE_URL !== \"http://127.0.0.1:54321\")\n   26 |       throw new Error(\n   27 |         \"Only the verified local development backend is authorized.\",\n   28 |       );\n   29 |     return JSON.parse(readFileSync(fixtureFile, \"utf8\"));\n   30 |   }\n   31 |\n   32 |   async function login(page: Page, name = \"global\") {\n   33 |     await page.goto(\"/login\");\n   34 |     await page\n   35 |       .getByLabel(\"E-mail\", { exact: true })\n   36 |       .fill(fixtures()[name].email);\n   37 |     await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   38 |     await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   39 |     await expect(\n   40 |       page.getByRole(\"heading\", { name: \"Visão geral\" }).first(),\n   41 |     ).toBeVisible();\n   42 |     await expect(\n   43 |       page.getByRole(\"combobox\", { name: \"Pessoa assistida\", exact: true }),\n   44 |     ).toBeVisible();\n   45 |     await selectContext(\n   46 |       page,\n   47 |       name === \"global\" ? null : \"20000000-0000-4000-8000-000000000001\",\n   48 |     );\n   49 |   }\n   50 |\n   51 |   async function createPatient(page: Page) {\n   52 |     await selectContext(page, null);\n   53 |     const response = await page.request.post(\"/api/admin\", {\n   54 |       data: {\n   55 |         action: \"recipient\",\n   56 |         id: null,\n   57 |         displayName: `Paciente administrativo ${randomUUID().slice(0, 8)}`,\n   58 |         isActive: true,\n   59 |         isDevelopment: true,\n   60 |         initialAdministratorEmail: fixtures().global.email,\n   61 |       },\n   62 |     });\n   63 |     expect(response.ok()).toBeTruthy();\n   64 |     const result = await response.json();\n   65 |     expect(result.data.id).toBeTruthy();\n   66 |     const patient = result.data.id as string;\n   67 |     for (const role of [\"adminA\", \"shared\", \"professional\"])\n   68 |       sql(\n   69 |         `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patient}','${fixtures()[role].id}','${role === \"adminA\" ? \"admin\" : role === \"shared\" ? \"reader\" : \"professional\"}') on conflict do nothing;`,\n   70 |       );\n   71 |     await page.reload();\n   72 |     await selectContext(page, patient);\n   73 |     return patient;\n   74 |   }\n   75 |\n   76 |   async function section(page: Page, patientId: string, name: string) {\n   77 |     await page.goto(`/admin?careRecipientId=${patientId}`);\n   78 |     await selectContext(page, patientId);\n   79 |     const areas: Record<string, string> = {\n   80 |       Paciente: \"patient\",\n   81 |       Catálogo: \"catalog\",\n   82 |       Vínculos: \"memberships\",\n   83 |       Convites: \"invitations\",\n   84 |       Alertas: \"alerts\",\n   85 |       Destinatários: \"notificationRecipients\",\n   86 |       \"Importação histórica\": \"import\",\n   87 |       \"Contas globais\": \"profiles\",\n   88 |     };\n   89 |     await page\n   90 |       .getByRole(\"navigation\", { name: \"Áreas administrativas\", exact: true })\n   91 |       .locator('a[href*=\"section=' + areas[name] + '\"]')\n   92 |       .click();\n   93 |     await expect(page.getByText(\"Carregando\", { exact: false })).toHaveCount(0);\n   94 |   }\n   95 |\n   96 |   async function submit(page: Page, name: string, action: string) {\n   97 |     const pending = page.waitForResponse(\n   98 |       (response) =>\n   99 |         new URL(response.url()).pathname === \"/api/admin\" &&\n  100 |         response.request().method() === \"POST\" &&\n  101 |         response.request().postDataJSON().action === action,\n  102 |     );\n  103 |     await page.getByRole(\"button\", { name, exact: true }).click();\n  104 |     const response = await pending;\n> 105 |     expect(response.ok()).toBeTruthy();\n      |                           ^ Error: expect(received).toBeTruthy()\n  106 |     return response.json();\n  107 |   }\n  108 |\n  109 |   test(\"catálogo edita nomes alternativos e inativa preservando a identidade\", async ({\n  110 |     page,\n  111 |   }) => {\n  112 |     await login(page);\n  113 |     const patientId = await createPatient(page);\n  114 |     const originalName = `Material administrativo ${randomUUID().slice(0, 8)}`;\n  115 |     const finalName = `${originalName} revisado`;\n  116 |     await section(page, patientId, \"Catálogo\");\n  117 |     await page.getByRole(\"button\", { name: \"Novo item\", exact: true }).click();\n  118 |     await page.getByLabel(\"Nome\", { exact: true }).fill(originalName);\n  119 |     await page\n  120 |       .getByRole(\"combobox\", { name: \"Categoria\", exact: true })\n  121 |       .selectOption(\"higiene\");\n  122 |     await page.getByLabel(\"Unidade\", { exact: true }).fill(\"pacote\");\n  123 |     await page\n  124 |       .getByLabel(\"Nomes alternativos, separados por vírgula\", { exact: true })\n  125 |       .fill(\"Material auxiliar, Apoio operacional\");\n  126 |     const created = await submit(page, \"Salvar item\", \"product\");\n  127 |     const productId = created.data.product_id as string;\n  128 |     expect(productId).toBeTruthy();\n  129 |     await expect(\n  130 |       page.getByRole(\"cell\", { name: originalName, exact: true }),\n  131 |     ).toBeVisible();\n  132 |     await page\n  133 |       .getByRole(\"button\", { name: `Editar ${originalName}`, exact: true })\n  134 |       .click();\n  135 |     await expect(\n  136 |       page.getByLabel(\"Nomes alternativos, separados por vírgula\", {\n  137 |         exact: true,\n  138 |       }),\n  139 |     ).toHaveValue(\"Material auxiliar, Apoio operacional\");\n  140 |     await page.getByLabel(\"Nome\", { exact: true }).fill(finalName);\n  141 |     await page\n  142 |       .getByLabel(\"Nomes alternativos, separados por vírgula\", { exact: true })\n  143 |       .fill(\"Material auxiliar revisado, Apoio operacional\");\n  144 |     await page\n  145 |       .getByRole(\"checkbox\", { name: \"Item ativo\", exact: true })\n  146 |       .uncheck();\n  147 |     await submit(page, \"Salvar item\", \"product\");\n  148 |     await page\n  149 |       .getByRole(\"combobox\", { name: \"Situação dos produtos\", exact: true })\n  150 |       .selectOption(\"inactive\");\n  151 |     const article = page\n  152 |       .getByRole(\"row\")\n  153 |       .filter({\n  154 |         has: page.getByRole(\"cell\", { name: finalName, exact: true }),\n  155 |       });\n  156 |     await expect(article.getByText(\"Inativo\", { exact: true })).toBeVisible();\n  157 |     await expect(article).toContainText(\"higiene\");\n  158 |     await expect(article.getByText(\"pacote\", { exact: true })).toBeVisible();\n  159 |     const all = await (\n  160 |       await page.request.get(\n  161 |         `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,\n  162 |       )\n  163 |     ).json();\n  164 |     expect(all.data).toHaveLength(1);\n  165 |     expect(all.data[0]).toMatchObject({\n  166 |       id: productId,\n  167 |       name: finalName,\n  168 |       is_active: false,\n  169 |       unit: \"pacote\",\n  170 |       aliases: [\"Material auxiliar revisado\", \"Apoio operacional\"],\n  171 |     });\n  172 |     const available = await (\n  173 |       await page.request.get(`/api/catalog?careRecipientId=${patientId}`)\n  174 |     ).json();\n  175 |     expect(available.data).toHaveLength(0);\n  176 |   });\n  177 |\n  178 |   test(\"administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente\", async ({\n  179 |     page,\n  180 |   }) => {\n  181 |     await login(page);\n  182 |     const firstPatient = await createPatient(page);\n  183 |     const secondPatient = await createPatient(page);\n  184 |     const shared = fixtures().shared;\n  185 |     for (const [patientId, role] of [\n  186 |       [firstPatient, \"professional\"],\n  187 |       [secondPatient, \"reader\"],\n  188 |     ]) {\n  189 |       await section(page, patientId, \"Vínculos\");\n  190 |       await page\n  191 |         .getByRole(\"button\", { name: \"Vincular conta\", exact: true })\n  192 |         .click();\n  193 |       await page\n  194 |         .getByRole(\"combobox\", { name: \"Conta vinculada\", exact: true })\n  195 |         .selectOption(shared.id);\n  196 |       await page\n  197 |         .getByRole(\"combobox\", { name: \"Função neste paciente\", exact: true })\n  198 |         .selectOption(role);\n  199 |       await submit(page, \"Salvar vínculo\", \"membership\");\n  200 |       await expect(\n  201 |         page\n  202 |           .getByRole(\"article\")\n  203 |           .filter({ has: page.getByText(\"Teste shared\", { exact: true }) }),\n  204 |       ).toBeVisible();\n  205 |     }"
+              }
+            ]
+          },
+          {
+            "title": "importação histórica revisada preserva itens extras e estoque desconhecido no comprovante",
+            "path": [
+              "administração integrada no ambiente local"
+            ],
+            "projectName": "ios",
+            "location": {
+              "file": "administration.spec.ts",
+              "line": 454,
+              "column": 7
+            },
+            "duration": 13732,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  103 |     await page.getByRole(\"button\", { name, exact: true }).click();\n  104 |     const response = await pending;\n> 105 |     expect(response.ok()).toBeTruthy();\n      |                           ^\n  106 |     return response.json();\n  107 |   }\n  108 |\n\u001b[2m    at submit (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\administration.spec.ts:105:27)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\administration.spec.ts:496:21\u001b[22m",
+                "codeframe": "   5 | import { randomUUID } from \"node:crypto\";\n   6 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   7 | import {\n   8 |   assertLocalProject,\n   9 |   sql,\n   10 |   fixtureFile,\n   11 | } from \"../../scripts/test-environment.mjs\";\n   12 |\n   13 | type Fixture = { id: string; email: string };\n   14 |\n   15 | test.describe(\"administração integrada no ambiente local\", () => {\n   16 |   test.beforeAll(() => {\n   17 |     if (process.env.HCA_E2E_LOCAL !== \"1\")\n   18 |       throw new Error(\"The verified local browser environment is required.\");\n   19 |     assertLocalProject();\n   20 |   });\n   21 |   test.setTimeout(120_000);\n   22 |\n   23 |   function fixtures(): Record<string, Fixture> {\n   24 |     assertLocalProject();\n   25 |     if (process.env.NEXT_PUBLIC_SUPABASE_URL !== \"http://127.0.0.1:54321\")\n   26 |       throw new Error(\n   27 |         \"Only the verified local development backend is authorized.\",\n   28 |       );\n   29 |     return JSON.parse(readFileSync(fixtureFile, \"utf8\"));\n   30 |   }\n   31 |\n   32 |   async function login(page: Page, name = \"global\") {\n   33 |     await page.goto(\"/login\");\n   34 |     await page\n   35 |       .getByLabel(\"E-mail\", { exact: true })\n   36 |       .fill(fixtures()[name].email);\n   37 |     await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   38 |     await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   39 |     await expect(\n   40 |       page.getByRole(\"heading\", { name: \"Visão geral\" }).first(),\n   41 |     ).toBeVisible();\n   42 |     await expect(\n   43 |       page.getByRole(\"combobox\", { name: \"Pessoa assistida\", exact: true }),\n   44 |     ).toBeVisible();\n   45 |     await selectContext(\n   46 |       page,\n   47 |       name === \"global\" ? null : \"20000000-0000-4000-8000-000000000001\",\n   48 |     );\n   49 |   }\n   50 |\n   51 |   async function createPatient(page: Page) {\n   52 |     await selectContext(page, null);\n   53 |     const response = await page.request.post(\"/api/admin\", {\n   54 |       data: {\n   55 |         action: \"recipient\",\n   56 |         id: null,\n   57 |         displayName: `Paciente administrativo ${randomUUID().slice(0, 8)}`,\n   58 |         isActive: true,\n   59 |         isDevelopment: true,\n   60 |         initialAdministratorEmail: fixtures().global.email,\n   61 |       },\n   62 |     });\n   63 |     expect(response.ok()).toBeTruthy();\n   64 |     const result = await response.json();\n   65 |     expect(result.data.id).toBeTruthy();\n   66 |     const patient = result.data.id as string;\n   67 |     for (const role of [\"adminA\", \"shared\", \"professional\"])\n   68 |       sql(\n   69 |         `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patient}','${fixtures()[role].id}','${role === \"adminA\" ? \"admin\" : role === \"shared\" ? \"reader\" : \"professional\"}') on conflict do nothing;`,\n   70 |       );\n   71 |     await page.reload();\n   72 |     await selectContext(page, patient);\n   73 |     return patient;\n   74 |   }\n   75 |\n   76 |   async function section(page: Page, patientId: string, name: string) {\n   77 |     await page.goto(`/admin?careRecipientId=${patientId}`);\n   78 |     await selectContext(page, patientId);\n   79 |     const areas: Record<string, string> = {\n   80 |       Paciente: \"patient\",\n   81 |       Catálogo: \"catalog\",\n   82 |       Vínculos: \"memberships\",\n   83 |       Convites: \"invitations\",\n   84 |       Alertas: \"alerts\",\n   85 |       Destinatários: \"notificationRecipients\",\n   86 |       \"Importação histórica\": \"import\",\n   87 |       \"Contas globais\": \"profiles\",\n   88 |     };\n   89 |     await page\n   90 |       .getByRole(\"navigation\", { name: \"Áreas administrativas\", exact: true })\n   91 |       .locator('a[href*=\"section=' + areas[name] + '\"]')\n   92 |       .click();\n   93 |     await expect(page.getByText(\"Carregando\", { exact: false })).toHaveCount(0);\n   94 |   }\n   95 |\n   96 |   async function submit(page: Page, name: string, action: string) {\n   97 |     const pending = page.waitForResponse(\n   98 |       (response) =>\n   99 |         new URL(response.url()).pathname === \"/api/admin\" &&\n  100 |         response.request().method() === \"POST\" &&\n  101 |         response.request().postDataJSON().action === action,\n  102 |     );\n  103 |     await page.getByRole(\"button\", { name, exact: true }).click();\n  104 |     const response = await pending;\n> 105 |     expect(response.ok()).toBeTruthy();\n      |                           ^ Error: expect(received).toBeTruthy()\n  106 |     return response.json();\n  107 |   }\n  108 |\n  109 |   test(\"catálogo edita nomes alternativos e inativa preservando a identidade\", async ({\n  110 |     page,\n  111 |   }) => {\n  112 |     await login(page);\n  113 |     const patientId = await createPatient(page);\n  114 |     const originalName = `Material administrativo ${randomUUID().slice(0, 8)}`;\n  115 |     const finalName = `${originalName} revisado`;\n  116 |     await section(page, patientId, \"Catálogo\");\n  117 |     await page.getByRole(\"button\", { name: \"Novo item\", exact: true }).click();\n  118 |     await page.getByLabel(\"Nome\", { exact: true }).fill(originalName);\n  119 |     await page\n  120 |       .getByRole(\"combobox\", { name: \"Categoria\", exact: true })\n  121 |       .selectOption(\"higiene\");\n  122 |     await page.getByLabel(\"Unidade\", { exact: true }).fill(\"pacote\");\n  123 |     await page\n  124 |       .getByLabel(\"Nomes alternativos, separados por vírgula\", { exact: true })\n  125 |       .fill(\"Material auxiliar, Apoio operacional\");\n  126 |     const created = await submit(page, \"Salvar item\", \"product\");\n  127 |     const productId = created.data.product_id as string;\n  128 |     expect(productId).toBeTruthy();\n  129 |     await expect(\n  130 |       page.getByRole(\"cell\", { name: originalName, exact: true }),\n  131 |     ).toBeVisible();\n  132 |     await page\n  133 |       .getByRole(\"button\", { name: `Editar ${originalName}`, exact: true })\n  134 |       .click();\n  135 |     await expect(\n  136 |       page.getByLabel(\"Nomes alternativos, separados por vírgula\", {\n  137 |         exact: true,\n  138 |       }),\n  139 |     ).toHaveValue(\"Material auxiliar, Apoio operacional\");\n  140 |     await page.getByLabel(\"Nome\", { exact: true }).fill(finalName);\n  141 |     await page\n  142 |       .getByLabel(\"Nomes alternativos, separados por vírgula\", { exact: true })\n  143 |       .fill(\"Material auxiliar revisado, Apoio operacional\");\n  144 |     await page\n  145 |       .getByRole(\"checkbox\", { name: \"Item ativo\", exact: true })\n  146 |       .uncheck();\n  147 |     await submit(page, \"Salvar item\", \"product\");\n  148 |     await page\n  149 |       .getByRole(\"combobox\", { name: \"Situação dos produtos\", exact: true })\n  150 |       .selectOption(\"inactive\");\n  151 |     const article = page\n  152 |       .getByRole(\"row\")\n  153 |       .filter({\n  154 |         has: page.getByRole(\"cell\", { name: finalName, exact: true }),\n  155 |       });\n  156 |     await expect(article.getByText(\"Inativo\", { exact: true })).toBeVisible();\n  157 |     await expect(article).toContainText(\"higiene\");\n  158 |     await expect(article.getByText(\"pacote\", { exact: true })).toBeVisible();\n  159 |     const all = await (\n  160 |       await page.request.get(\n  161 |         `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,\n  162 |       )\n  163 |     ).json();\n  164 |     expect(all.data).toHaveLength(1);\n  165 |     expect(all.data[0]).toMatchObject({\n  166 |       id: productId,\n  167 |       name: finalName,\n  168 |       is_active: false,\n  169 |       unit: \"pacote\",\n  170 |       aliases: [\"Material auxiliar revisado\", \"Apoio operacional\"],\n  171 |     });\n  172 |     const available = await (\n  173 |       await page.request.get(`/api/catalog?careRecipientId=${patientId}`)\n  174 |     ).json();\n  175 |     expect(available.data).toHaveLength(0);\n  176 |   });\n  177 |\n  178 |   test(\"administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente\", async ({\n  179 |     page,\n  180 |   }) => {\n  181 |     await login(page);\n  182 |     const firstPatient = await createPatient(page);\n  183 |     const secondPatient = await createPatient(page);\n  184 |     const shared = fixtures().shared;\n  185 |     for (const [patientId, role] of [\n  186 |       [firstPatient, \"professional\"],\n  187 |       [secondPatient, \"reader\"],\n  188 |     ]) {\n  189 |       await section(page, patientId, \"Vínculos\");\n  190 |       await page\n  191 |         .getByRole(\"button\", { name: \"Vincular conta\", exact: true })\n  192 |         .click();\n  193 |       await page\n  194 |         .getByRole(\"combobox\", { name: \"Conta vinculada\", exact: true })\n  195 |         .selectOption(shared.id);\n  196 |       await page\n  197 |         .getByRole(\"combobox\", { name: \"Função neste paciente\", exact: true })\n  198 |         .selectOption(role);\n  199 |       await submit(page, \"Salvar vínculo\", \"membership\");\n  200 |       await expect(\n  201 |         page\n  202 |           .getByRole(\"article\")\n  203 |           .filter({ has: page.getByText(\"Teste shared\", { exact: true }) }),\n  204 |       ).toBeVisible();\n  205 |     }"
+              }
+            ]
+          },
+          {
+            "title": "COM começa sem compra presumida e emite doação explícita sem creditar estoque",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-origin.spec.ts",
+              "line": 48,
+              "column": 5
+            },
+            "duration": 13283,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM começa sem compra presumida e emite doação explícita sem creditar estoque",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-origin.spec.ts",
+              "line": 48,
+              "column": 5
+            },
+            "duration": 15834,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 361,
+              "column": 5
+            },
+            "duration": 11916,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 361,
+              "column": 5
+            },
+            "duration": 15499,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "f3cc9bb5657d75335aa5ca7b34de02a83cf1580dfc97b2c395df1eb269893f43"
+      },
+      "secondary-historical": {
+        "stats": {
+          "total": 2,
+          "expected": 2,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "REQ histórica apresenta origem desconhecida nas novas abas sem reimportar ou mudar fatos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "pdf-source-facts.spec.ts",
+              "line": 245,
+              "column": 5
+            },
+            "duration": 7211,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "REQ histórica apresenta origem desconhecida nas novas abas sem reimportar ou mudar fatos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "pdf-source-facts.spec.ts",
+              "line": 245,
+              "column": 5
+            },
+            "duration": 6854,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "69d28583b5cbc1ec276cf592dc9c2a042fa51054d8fd4743dc17753bbc9a282a"
+      }
+    },
+    "approvedCases": [
+      {
+        "round": "secondary-initial",
+        "title": "ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "delivery-cancellation.spec.ts",
+          "line": 121,
+          "column": 5
+        },
+        "duration": 19260,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-initial",
+        "title": "ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "delivery-cancellation.spec.ts",
+          "line": 121,
+          "column": 5
+        },
+        "duration": 21151,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-initial",
+        "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "document-tabs.spec.ts",
+          "line": 253,
+          "column": 5
+        },
+        "duration": 38706,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-initial",
+        "title": "Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação real",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "document-tabs.spec.ts",
+          "line": 559,
+          "column": 5
+        },
+        "duration": 7361,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-initial",
+        "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "document-tabs.spec.ts",
+          "line": 253,
+          "column": 5
+        },
+        "duration": 48964,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-initial",
+        "title": "Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação real",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "document-tabs.spec.ts",
+          "line": 559,
+          "column": 5
+        },
+        "duration": 8999,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-compatibility",
+        "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 361,
+          "column": 5
+        },
+        "duration": 11916,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-compatibility",
+        "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 361,
+          "column": 5
+        },
+        "duration": 15499,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-initial",
+        "title": "origem obsoleta exige comparação e adoção explícita após falha; seleção, zero e motivo continuam preservados",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "remaining-need.spec.ts",
+          "line": 221,
+          "column": 5
+        },
+        "duration": 13917,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-initial",
+        "title": "origem obsoleta exige comparação e adoção explícita após falha; seleção, zero e motivo continuam preservados",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "remaining-need.spec.ts",
+          "line": 221,
+          "column": 5
+        },
+        "duration": 16700,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-compatibility",
+        "title": "COM começa sem compra presumida e emite doação explícita sem creditar estoque",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "purchase-origin.spec.ts",
+          "line": 48,
+          "column": 5
+        },
+        "duration": 13283,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-compatibility",
+        "title": "COM começa sem compra presumida e emite doação explícita sem creditar estoque",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "purchase-origin.spec.ts",
+          "line": 48,
+          "column": 5
+        },
+        "duration": 15834,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-historical",
+        "title": "REQ histórica apresenta origem desconhecida nas novas abas sem reimportar ou mudar fatos",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "pdf-source-facts.spec.ts",
+          "line": 245,
+          "column": 5
+        },
+        "duration": 7211,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "secondary-historical",
+        "title": "REQ histórica apresenta origem desconhecida nas novas abas sem reimportar ou mudar fatos",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "pdf-source-facts.spec.ts",
+          "line": 245,
+          "column": 5
+        },
+        "duration": 6854,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      }
+    ],
+    "unresolvedCases": [
+      {
+        "round": "secondary-compatibility",
+        "title": "importação histórica revisada preserva itens extras e estoque desconhecido no comprovante",
+        "path": [
+          "administração integrada no ambiente local"
+        ],
+        "projectName": "chromium",
+        "location": {
+          "file": "administration.spec.ts",
+          "line": 454,
+          "column": 7
+        },
+        "duration": 14885,
+        "outcome": "unexpected",
+        "ok": false,
+        "errors": [
+          {
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  103 |     await page.getByRole(\"button\", { name, exact: true }).click();\n  104 |     const response = await pending;\n> 105 |     expect(response.ok()).toBeTruthy();\n      |                           ^\n  106 |     return response.json();\n  107 |   }\n  108 |\n\u001b[2m    at submit (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\administration.spec.ts:105:27)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\administration.spec.ts:496:21\u001b[22m",
+            "codeframe": "   5 | import { randomUUID } from \"node:crypto\";\n   6 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   7 | import {\n   8 |   assertLocalProject,\n   9 |   sql,\n   10 |   fixtureFile,\n   11 | } from \"../../scripts/test-environment.mjs\";\n   12 |\n   13 | type Fixture = { id: string; email: string };\n   14 |\n   15 | test.describe(\"administração integrada no ambiente local\", () => {\n   16 |   test.beforeAll(() => {\n   17 |     if (process.env.HCA_E2E_LOCAL !== \"1\")\n   18 |       throw new Error(\"The verified local browser environment is required.\");\n   19 |     assertLocalProject();\n   20 |   });\n   21 |   test.setTimeout(120_000);\n   22 |\n   23 |   function fixtures(): Record<string, Fixture> {\n   24 |     assertLocalProject();\n   25 |     if (process.env.NEXT_PUBLIC_SUPABASE_URL !== \"http://127.0.0.1:54321\")\n   26 |       throw new Error(\n   27 |         \"Only the verified local development backend is authorized.\",\n   28 |       );\n   29 |     return JSON.parse(readFileSync(fixtureFile, \"utf8\"));\n   30 |   }\n   31 |\n   32 |   async function login(page: Page, name = \"global\") {\n   33 |     await page.goto(\"/login\");\n   34 |     await page\n   35 |       .getByLabel(\"E-mail\", { exact: true })\n   36 |       .fill(fixtures()[name].email);\n   37 |     await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   38 |     await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   39 |     await expect(\n   40 |       page.getByRole(\"heading\", { name: \"Visão geral\" }).first(),\n   41 |     ).toBeVisible();\n   42 |     await expect(\n   43 |       page.getByRole(\"combobox\", { name: \"Pessoa assistida\", exact: true }),\n   44 |     ).toBeVisible();\n   45 |     await selectContext(\n   46 |       page,\n   47 |       name === \"global\" ? null : \"20000000-0000-4000-8000-000000000001\",\n   48 |     );\n   49 |   }\n   50 |\n   51 |   async function createPatient(page: Page) {\n   52 |     await selectContext(page, null);\n   53 |     const response = await page.request.post(\"/api/admin\", {\n   54 |       data: {\n   55 |         action: \"recipient\",\n   56 |         id: null,\n   57 |         displayName: `Paciente administrativo ${randomUUID().slice(0, 8)}`,\n   58 |         isActive: true,\n   59 |         isDevelopment: true,\n   60 |         initialAdministratorEmail: fixtures().global.email,\n   61 |       },\n   62 |     });\n   63 |     expect(response.ok()).toBeTruthy();\n   64 |     const result = await response.json();\n   65 |     expect(result.data.id).toBeTruthy();\n   66 |     const patient = result.data.id as string;\n   67 |     for (const role of [\"adminA\", \"shared\", \"professional\"])\n   68 |       sql(\n   69 |         `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patient}','${fixtures()[role].id}','${role === \"adminA\" ? \"admin\" : role === \"shared\" ? \"reader\" : \"professional\"}') on conflict do nothing;`,\n   70 |       );\n   71 |     await page.reload();\n   72 |     await selectContext(page, patient);\n   73 |     return patient;\n   74 |   }\n   75 |\n   76 |   async function section(page: Page, patientId: string, name: string) {\n   77 |     await page.goto(`/admin?careRecipientId=${patientId}`);\n   78 |     await selectContext(page, patientId);\n   79 |     const areas: Record<string, string> = {\n   80 |       Paciente: \"patient\",\n   81 |       Catálogo: \"catalog\",\n   82 |       Vínculos: \"memberships\",\n   83 |       Convites: \"invitations\",\n   84 |       Alertas: \"alerts\",\n   85 |       Destinatários: \"notificationRecipients\",\n   86 |       \"Importação histórica\": \"import\",\n   87 |       \"Contas globais\": \"profiles\",\n   88 |     };\n   89 |     await page\n   90 |       .getByRole(\"navigation\", { name: \"Áreas administrativas\", exact: true })\n   91 |       .locator('a[href*=\"section=' + areas[name] + '\"]')\n   92 |       .click();\n   93 |     await expect(page.getByText(\"Carregando\", { exact: false })).toHaveCount(0);\n   94 |   }\n   95 |\n   96 |   async function submit(page: Page, name: string, action: string) {\n   97 |     const pending = page.waitForResponse(\n   98 |       (response) =>\n   99 |         new URL(response.url()).pathname === \"/api/admin\" &&\n  100 |         response.request().method() === \"POST\" &&\n  101 |         response.request().postDataJSON().action === action,\n  102 |     );\n  103 |     await page.getByRole(\"button\", { name, exact: true }).click();\n  104 |     const response = await pending;\n> 105 |     expect(response.ok()).toBeTruthy();\n      |                           ^ Error: expect(received).toBeTruthy()\n  106 |     return response.json();\n  107 |   }\n  108 |\n  109 |   test(\"catálogo edita nomes alternativos e inativa preservando a identidade\", async ({\n  110 |     page,\n  111 |   }) => {\n  112 |     await login(page);\n  113 |     const patientId = await createPatient(page);\n  114 |     const originalName = `Material administrativo ${randomUUID().slice(0, 8)}`;\n  115 |     const finalName = `${originalName} revisado`;\n  116 |     await section(page, patientId, \"Catálogo\");\n  117 |     await page.getByRole(\"button\", { name: \"Novo item\", exact: true }).click();\n  118 |     await page.getByLabel(\"Nome\", { exact: true }).fill(originalName);\n  119 |     await page\n  120 |       .getByRole(\"combobox\", { name: \"Categoria\", exact: true })\n  121 |       .selectOption(\"higiene\");\n  122 |     await page.getByLabel(\"Unidade\", { exact: true }).fill(\"pacote\");\n  123 |     await page\n  124 |       .getByLabel(\"Nomes alternativos, separados por vírgula\", { exact: true })\n  125 |       .fill(\"Material auxiliar, Apoio operacional\");\n  126 |     const created = await submit(page, \"Salvar item\", \"product\");\n  127 |     const productId = created.data.product_id as string;\n  128 |     expect(productId).toBeTruthy();\n  129 |     await expect(\n  130 |       page.getByRole(\"cell\", { name: originalName, exact: true }),\n  131 |     ).toBeVisible();\n  132 |     await page\n  133 |       .getByRole(\"button\", { name: `Editar ${originalName}`, exact: true })\n  134 |       .click();\n  135 |     await expect(\n  136 |       page.getByLabel(\"Nomes alternativos, separados por vírgula\", {\n  137 |         exact: true,\n  138 |       }),\n  139 |     ).toHaveValue(\"Material auxiliar, Apoio operacional\");\n  140 |     await page.getByLabel(\"Nome\", { exact: true }).fill(finalName);\n  141 |     await page\n  142 |       .getByLabel(\"Nomes alternativos, separados por vírgula\", { exact: true })\n  143 |       .fill(\"Material auxiliar revisado, Apoio operacional\");\n  144 |     await page\n  145 |       .getByRole(\"checkbox\", { name: \"Item ativo\", exact: true })\n  146 |       .uncheck();\n  147 |     await submit(page, \"Salvar item\", \"product\");\n  148 |     await page\n  149 |       .getByRole(\"combobox\", { name: \"Situação dos produtos\", exact: true })\n  150 |       .selectOption(\"inactive\");\n  151 |     const article = page\n  152 |       .getByRole(\"row\")\n  153 |       .filter({\n  154 |         has: page.getByRole(\"cell\", { name: finalName, exact: true }),\n  155 |       });\n  156 |     await expect(article.getByText(\"Inativo\", { exact: true })).toBeVisible();\n  157 |     await expect(article).toContainText(\"higiene\");\n  158 |     await expect(article.getByText(\"pacote\", { exact: true })).toBeVisible();\n  159 |     const all = await (\n  160 |       await page.request.get(\n  161 |         `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,\n  162 |       )\n  163 |     ).json();\n  164 |     expect(all.data).toHaveLength(1);\n  165 |     expect(all.data[0]).toMatchObject({\n  166 |       id: productId,\n  167 |       name: finalName,\n  168 |       is_active: false,\n  169 |       unit: \"pacote\",\n  170 |       aliases: [\"Material auxiliar revisado\", \"Apoio operacional\"],\n  171 |     });\n  172 |     const available = await (\n  173 |       await page.request.get(`/api/catalog?careRecipientId=${patientId}`)\n  174 |     ).json();\n  175 |     expect(available.data).toHaveLength(0);\n  176 |   });\n  177 |\n  178 |   test(\"administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente\", async ({\n  179 |     page,\n  180 |   }) => {\n  181 |     await login(page);\n  182 |     const firstPatient = await createPatient(page);\n  183 |     const secondPatient = await createPatient(page);\n  184 |     const shared = fixtures().shared;\n  185 |     for (const [patientId, role] of [\n  186 |       [firstPatient, \"professional\"],\n  187 |       [secondPatient, \"reader\"],\n  188 |     ]) {\n  189 |       await section(page, patientId, \"Vínculos\");\n  190 |       await page\n  191 |         .getByRole(\"button\", { name: \"Vincular conta\", exact: true })\n  192 |         .click();\n  193 |       await page\n  194 |         .getByRole(\"combobox\", { name: \"Conta vinculada\", exact: true })\n  195 |         .selectOption(shared.id);\n  196 |       await page\n  197 |         .getByRole(\"combobox\", { name: \"Função neste paciente\", exact: true })\n  198 |         .selectOption(role);\n  199 |       await submit(page, \"Salvar vínculo\", \"membership\");\n  200 |       await expect(\n  201 |         page\n  202 |           .getByRole(\"article\")\n  203 |           .filter({ has: page.getByText(\"Teste shared\", { exact: true }) }),\n  204 |       ).toBeVisible();\n  205 |     }"
+          }
+        ]
+      },
+      {
+        "round": "secondary-compatibility",
+        "title": "importação histórica revisada preserva itens extras e estoque desconhecido no comprovante",
+        "path": [
+          "administração integrada no ambiente local"
+        ],
+        "projectName": "ios",
+        "location": {
+          "file": "administration.spec.ts",
+          "line": 454,
+          "column": 7
+        },
+        "duration": 13732,
+        "outcome": "unexpected",
+        "ok": false,
+        "errors": [
+          {
+            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  103 |     await page.getByRole(\"button\", { name, exact: true }).click();\n  104 |     const response = await pending;\n> 105 |     expect(response.ok()).toBeTruthy();\n      |                           ^\n  106 |     return response.json();\n  107 |   }\n  108 |\n\u001b[2m    at submit (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\administration.spec.ts:105:27)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\administration.spec.ts:496:21\u001b[22m",
+            "codeframe": "   5 | import { randomUUID } from \"node:crypto\";\n   6 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   7 | import {\n   8 |   assertLocalProject,\n   9 |   sql,\n   10 |   fixtureFile,\n   11 | } from \"../../scripts/test-environment.mjs\";\n   12 |\n   13 | type Fixture = { id: string; email: string };\n   14 |\n   15 | test.describe(\"administração integrada no ambiente local\", () => {\n   16 |   test.beforeAll(() => {\n   17 |     if (process.env.HCA_E2E_LOCAL !== \"1\")\n   18 |       throw new Error(\"The verified local browser environment is required.\");\n   19 |     assertLocalProject();\n   20 |   });\n   21 |   test.setTimeout(120_000);\n   22 |\n   23 |   function fixtures(): Record<string, Fixture> {\n   24 |     assertLocalProject();\n   25 |     if (process.env.NEXT_PUBLIC_SUPABASE_URL !== \"http://127.0.0.1:54321\")\n   26 |       throw new Error(\n   27 |         \"Only the verified local development backend is authorized.\",\n   28 |       );\n   29 |     return JSON.parse(readFileSync(fixtureFile, \"utf8\"));\n   30 |   }\n   31 |\n   32 |   async function login(page: Page, name = \"global\") {\n   33 |     await page.goto(\"/login\");\n   34 |     await page\n   35 |       .getByLabel(\"E-mail\", { exact: true })\n   36 |       .fill(fixtures()[name].email);\n   37 |     await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   38 |     await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   39 |     await expect(\n   40 |       page.getByRole(\"heading\", { name: \"Visão geral\" }).first(),\n   41 |     ).toBeVisible();\n   42 |     await expect(\n   43 |       page.getByRole(\"combobox\", { name: \"Pessoa assistida\", exact: true }),\n   44 |     ).toBeVisible();\n   45 |     await selectContext(\n   46 |       page,\n   47 |       name === \"global\" ? null : \"20000000-0000-4000-8000-000000000001\",\n   48 |     );\n   49 |   }\n   50 |\n   51 |   async function createPatient(page: Page) {\n   52 |     await selectContext(page, null);\n   53 |     const response = await page.request.post(\"/api/admin\", {\n   54 |       data: {\n   55 |         action: \"recipient\",\n   56 |         id: null,\n   57 |         displayName: `Paciente administrativo ${randomUUID().slice(0, 8)}`,\n   58 |         isActive: true,\n   59 |         isDevelopment: true,\n   60 |         initialAdministratorEmail: fixtures().global.email,\n   61 |       },\n   62 |     });\n   63 |     expect(response.ok()).toBeTruthy();\n   64 |     const result = await response.json();\n   65 |     expect(result.data.id).toBeTruthy();\n   66 |     const patient = result.data.id as string;\n   67 |     for (const role of [\"adminA\", \"shared\", \"professional\"])\n   68 |       sql(\n   69 |         `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patient}','${fixtures()[role].id}','${role === \"adminA\" ? \"admin\" : role === \"shared\" ? \"reader\" : \"professional\"}') on conflict do nothing;`,\n   70 |       );\n   71 |     await page.reload();\n   72 |     await selectContext(page, patient);\n   73 |     return patient;\n   74 |   }\n   75 |\n   76 |   async function section(page: Page, patientId: string, name: string) {\n   77 |     await page.goto(`/admin?careRecipientId=${patientId}`);\n   78 |     await selectContext(page, patientId);\n   79 |     const areas: Record<string, string> = {\n   80 |       Paciente: \"patient\",\n   81 |       Catálogo: \"catalog\",\n   82 |       Vínculos: \"memberships\",\n   83 |       Convites: \"invitations\",\n   84 |       Alertas: \"alerts\",\n   85 |       Destinatários: \"notificationRecipients\",\n   86 |       \"Importação histórica\": \"import\",\n   87 |       \"Contas globais\": \"profiles\",\n   88 |     };\n   89 |     await page\n   90 |       .getByRole(\"navigation\", { name: \"Áreas administrativas\", exact: true })\n   91 |       .locator('a[href*=\"section=' + areas[name] + '\"]')\n   92 |       .click();\n   93 |     await expect(page.getByText(\"Carregando\", { exact: false })).toHaveCount(0);\n   94 |   }\n   95 |\n   96 |   async function submit(page: Page, name: string, action: string) {\n   97 |     const pending = page.waitForResponse(\n   98 |       (response) =>\n   99 |         new URL(response.url()).pathname === \"/api/admin\" &&\n  100 |         response.request().method() === \"POST\" &&\n  101 |         response.request().postDataJSON().action === action,\n  102 |     );\n  103 |     await page.getByRole(\"button\", { name, exact: true }).click();\n  104 |     const response = await pending;\n> 105 |     expect(response.ok()).toBeTruthy();\n      |                           ^ Error: expect(received).toBeTruthy()\n  106 |     return response.json();\n  107 |   }\n  108 |\n  109 |   test(\"catálogo edita nomes alternativos e inativa preservando a identidade\", async ({\n  110 |     page,\n  111 |   }) => {\n  112 |     await login(page);\n  113 |     const patientId = await createPatient(page);\n  114 |     const originalName = `Material administrativo ${randomUUID().slice(0, 8)}`;\n  115 |     const finalName = `${originalName} revisado`;\n  116 |     await section(page, patientId, \"Catálogo\");\n  117 |     await page.getByRole(\"button\", { name: \"Novo item\", exact: true }).click();\n  118 |     await page.getByLabel(\"Nome\", { exact: true }).fill(originalName);\n  119 |     await page\n  120 |       .getByRole(\"combobox\", { name: \"Categoria\", exact: true })\n  121 |       .selectOption(\"higiene\");\n  122 |     await page.getByLabel(\"Unidade\", { exact: true }).fill(\"pacote\");\n  123 |     await page\n  124 |       .getByLabel(\"Nomes alternativos, separados por vírgula\", { exact: true })\n  125 |       .fill(\"Material auxiliar, Apoio operacional\");\n  126 |     const created = await submit(page, \"Salvar item\", \"product\");\n  127 |     const productId = created.data.product_id as string;\n  128 |     expect(productId).toBeTruthy();\n  129 |     await expect(\n  130 |       page.getByRole(\"cell\", { name: originalName, exact: true }),\n  131 |     ).toBeVisible();\n  132 |     await page\n  133 |       .getByRole(\"button\", { name: `Editar ${originalName}`, exact: true })\n  134 |       .click();\n  135 |     await expect(\n  136 |       page.getByLabel(\"Nomes alternativos, separados por vírgula\", {\n  137 |         exact: true,\n  138 |       }),\n  139 |     ).toHaveValue(\"Material auxiliar, Apoio operacional\");\n  140 |     await page.getByLabel(\"Nome\", { exact: true }).fill(finalName);\n  141 |     await page\n  142 |       .getByLabel(\"Nomes alternativos, separados por vírgula\", { exact: true })\n  143 |       .fill(\"Material auxiliar revisado, Apoio operacional\");\n  144 |     await page\n  145 |       .getByRole(\"checkbox\", { name: \"Item ativo\", exact: true })\n  146 |       .uncheck();\n  147 |     await submit(page, \"Salvar item\", \"product\");\n  148 |     await page\n  149 |       .getByRole(\"combobox\", { name: \"Situação dos produtos\", exact: true })\n  150 |       .selectOption(\"inactive\");\n  151 |     const article = page\n  152 |       .getByRole(\"row\")\n  153 |       .filter({\n  154 |         has: page.getByRole(\"cell\", { name: finalName, exact: true }),\n  155 |       });\n  156 |     await expect(article.getByText(\"Inativo\", { exact: true })).toBeVisible();\n  157 |     await expect(article).toContainText(\"higiene\");\n  158 |     await expect(article.getByText(\"pacote\", { exact: true })).toBeVisible();\n  159 |     const all = await (\n  160 |       await page.request.get(\n  161 |         `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,\n  162 |       )\n  163 |     ).json();\n  164 |     expect(all.data).toHaveLength(1);\n  165 |     expect(all.data[0]).toMatchObject({\n  166 |       id: productId,\n  167 |       name: finalName,\n  168 |       is_active: false,\n  169 |       unit: \"pacote\",\n  170 |       aliases: [\"Material auxiliar revisado\", \"Apoio operacional\"],\n  171 |     });\n  172 |     const available = await (\n  173 |       await page.request.get(`/api/catalog?careRecipientId=${patientId}`)\n  174 |     ).json();\n  175 |     expect(available.data).toHaveLength(0);\n  176 |   });\n  177 |\n  178 |   test(\"administrador local revoga um vínculo sem alterar acesso da mesma conta a outro paciente\", async ({\n  179 |     page,\n  180 |   }) => {\n  181 |     await login(page);\n  182 |     const firstPatient = await createPatient(page);\n  183 |     const secondPatient = await createPatient(page);\n  184 |     const shared = fixtures().shared;\n  185 |     for (const [patientId, role] of [\n  186 |       [firstPatient, \"professional\"],\n  187 |       [secondPatient, \"reader\"],\n  188 |     ]) {\n  189 |       await section(page, patientId, \"Vínculos\");\n  190 |       await page\n  191 |         .getByRole(\"button\", { name: \"Vincular conta\", exact: true })\n  192 |         .click();\n  193 |       await page\n  194 |         .getByRole(\"combobox\", { name: \"Conta vinculada\", exact: true })\n  195 |         .selectOption(shared.id);\n  196 |       await page\n  197 |         .getByRole(\"combobox\", { name: \"Função neste paciente\", exact: true })\n  198 |         .selectOption(role);\n  199 |       await submit(page, \"Salvar vínculo\", \"membership\");\n  200 |       await expect(\n  201 |         page\n  202 |           .getByRole(\"article\")\n  203 |           .filter({ has: page.getByText(\"Teste shared\", { exact: true }) }),\n  204 |       ).toBeVisible();\n  205 |     }"
+          }
+        ]
+      }
+    ]
+  },
+  "validation": {
+    "lint": "PASS directed14 TS/TSX consumers",
+    "typesAndBuild": "PASS official E2E production build",
+    "semanticFormatting": [
+      {
+        "file": "tests/e2e/administration.spec.ts",
+        "tokensIdenticalIgnoringTriviaAndTrailingCommas": true,
+        "tokenSha256": "201c18ff8d00a7250d9efe790479917df1870a1cfd4df3a7f64c6d101df458fc"
+      },
+      {
+        "file": "tests/e2e/purchase-receipts.spec.ts",
+        "tokensIdenticalIgnoringTriviaAndTrailingCommas": true,
+        "tokenSha256": "febb230513b3c2f4a0ea2f05e506c9863186e49764498a9c02713fb29d247ac8"
+      }
+    ],
+    "formatNormalization": "AST leaf tokens; trivia, optional trailing commas, arrow parameter parentheses and equivalent property-name quoting normalized"
+  },
+  "logsLfSha256": {
+    "secondary-e2e.log": "6af99de7d46ab1e1d2ce188d9ec45ab4eb02169861d94df770224b0caa7d0c24",
+    "secondary-compatibility-e2e.log": "18481bafbcba09bafcc18a3bb72acc43a3a879e01f5f6e6ba0d5794b4628b500",
+    "secondary-historical-e2e.log": "079c04acc257416f3ca9c2098b0887fb25013898d87c6eee19a35ae8b83a9119",
+    "secondary-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "secondary-types.log": "2798dff2631505db8d0fbfcdd59dc322215bdb5953888232abbbab4fe30f4f9b",
+    "secondary-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "observation": {
+    "sha": "9bf18cf59d8d64a2a11dd0b72ebcb2510824befa",
+    "ciRunId": 42612859949,
+    "ci": {
+      "validate (windows-latest)": "success",
+      "validate (ubuntu-latest)": "success",
+      "database": "success",
+      "browser (chromium)": "in_progress",
+      "browser (mobile)": "in_progress",
+      "browser (ios-1)": "in_progress",
+      "browser (ios-2)": "in_progress"
+    },
+    "preview": "READY",
+    "scope": "Prior SHA observed during this increment; never approval of unpublished sources"
+  },
+  "remote": {
+    "projectId": "qwfrqychokvhdzakibid",
+    "localApplied": 165,
+    "remoteApplied": 165,
+    "pending": 0,
+    "lastVersion": "20261109091550",
+    "orderedVersionSha256": "8d7a2e0d48bd9705fa90ca5d48415162f0fbb111326425ce6dc7657d59f6a5a2",
+    "operation": "read-only reconciliation; no SQL changes"
+  },
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30ColumnsUnchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "apiRpcSqlChanges": 0,
+    "originalHtmlSha256": "2f66791f0a9f8fc19ef1a021bdcce8a1bcca25264641fecddb4d4391a0ace9ff"
+  },
+  "qualifiedReuse": [
+    "Eight initial approved cases reused with unchanged product paths; four COM cases and two read-only historical cases executed separately",
+    "Only incidental test-source formatting reverted after browser execution; syntax equivalence recorded",
+    "No mutable database suite ran alongside browser tests; no stack reset or historical record deletion"
+  ],
+  "limits": [
+    "Two complete historical import cases blocked before document UI by retained stack exhausting all11 allowed physical protocols; pending clean CI and never counted as passed",
+    "Read-only historical regression reuses recognized fictional source; proves presentation and absence of effects, not fresh import",
+    "Remaining record/screen parity and66/171 reconciliation pending",
+    "Emulation does not approve physical Android, human or assistive tasks",
+    "No new PDF signature/provider/backup/monitoring approval",
+    "Published SHA requires its own CI; PR7 stays Draft; production NO-GO"
+  ],
+  "documentation": {
+    "markdownFiles": 4,
+    "localLinksChecked": 280,
+    "markdownLogSha256": "17c25b0186e3f702a3ee002ff5f63f42477c791f8792c0d7f39abb43a753f02b"
+  }
+}

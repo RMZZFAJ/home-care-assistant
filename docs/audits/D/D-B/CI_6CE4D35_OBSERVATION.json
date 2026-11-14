@@ -1,0 +1,77 @@
+{
+  "observedAt": "2026-11-09",
+  "sha": "6ce4d35e25daa1dfbc9fbc330d0d3e603ffa8510",
+  "runId": 42710916964,
+  "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42710916964",
+  "jobs": [
+    {
+      "id": 129479903961,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129479904107,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129479904266,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129490592510,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "cancelled"
+    },
+    {
+      "id": 129490592517,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129490592568,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129490592616,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129510280315,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "outcome": "FAIL; no global approval",
+  "failure": {
+    "project": "mobile",
+    "jobId": 129490592510,
+    "conclusion": "cancelled",
+    "startedAt": "2026-11-09T22:40:39Z",
+    "completedAt": "2026-11-09T23:20:57Z",
+    "annotation": "The job has exceeded the maximum execution time of 40m0s"
+  },
+  "remediation": {
+    "file": ".github/workflows/ci.yml",
+    "change": "Mobile split into two disjoint shards, as iOS already uses; no case, retry, rule, or timeout removed or increased",
+    "collectionOnly": {
+      "whole": 302,
+      "first": 155,
+      "second": 147,
+      "unionEqualsWhole": true,
+      "overlap": 0
+    }
+  },
+  "limits": "Collection is not test execution. Full own-SHA production CI remains mandatory. Other six prerequisite jobs succeeded. Sonar owner-deferred;PR7 Draft;no merge/production."
+}

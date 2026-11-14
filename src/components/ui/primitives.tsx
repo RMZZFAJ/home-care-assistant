@@ -1,60 +1,22 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode, type SVGProps } from "react";
-import {
-  Badge,
-  Button,
-  Dialog as FluentDialog,
-  DialogSurface,
-  DialogBody,
-  DialogTitle,
-  DialogContent,
-} from "@fluentui/react-components";
-import { Navigation20Regular, Dismiss20Regular, Home20Regular, DocumentBulletList20Regular, History20Regular, Box20Regular, Settings20Regular, Alert20Regular, Person20Regular, Search20Regular, ChevronDown20Regular, ArrowRight20Regular, Checkmark20Regular, Camera20Regular, ArrowUpload20Regular, Add20Regular, Calendar20Regular, People20Regular, VehicleTruck20Regular, MoreHorizontal20Regular } from "@fluentui/react-icons";
+import {documentStatusLabel} from "@/lib/documents/presentation";
 import { documentStatuses } from "@/types/documents";
 
-export type IconName =
-  | "menu"
-  | "close"
-  | "home"
-  | "forms"
-  | "history"
-  | "stock"
-  | "settings"
-  | "bell"
-  | "user"
-  | "search"
-  | "chevron"
-  | "arrow"
-  | "check"
-  | "camera"
-  | "upload"
-  | "plus"
-  | "calendar"
-  | "team"
-  | "truck"
-  | "more";
-const icons = {
-  menu: Navigation20Regular, close: Dismiss20Regular, home: Home20Regular,
-  forms: DocumentBulletList20Regular, history: History20Regular, stock: Box20Regular,
-  settings: Settings20Regular, bell: Alert20Regular, user: Person20Regular,
-  search: Search20Regular, chevron: ChevronDown20Regular, arrow: ArrowRight20Regular,
-  check: Checkmark20Regular, camera: Camera20Regular, upload: ArrowUpload20Regular,
-  plus: Add20Regular, calendar: Calendar20Regular, team: People20Regular,
-  truck: VehicleTruck20Regular, more: MoreHorizontal20Regular,
-};
-export function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconName }) {
-  const Component = icons[name];
-  return <Component width={20} height={20} aria-hidden="true" {...props} />;
-}
-export function StatusBadge({ status }: { status: string }) {
-  const tone = [
+import { useEffect, useRef, type ReactNode } from "react";
+export { Dialog } from "./overlays";
+import { Icon } from "./icon";
+export { Icon, type IconName } from "./icon";
+
+export function StatusBadge({ status, label }: { status: string; label?: string }) {
+  const tone = !Object.hasOwn(documentStatuses,status)?"neutral":[
     "approved",
     "confirmed",
     "received",
     "delivered",
     "read",
     "completed",
+    "closed_below_quantity",
   ].includes(status)
     ? "success"
     : ["disputed", "rejected", "failed", "cancelled"].includes(status)
@@ -63,9 +25,9 @@ export function StatusBadge({ status }: { status: string }) {
         ? "neutral"
         : "pending";
   return (
-    <Badge appearance="tint" color={tone === "success" ? "success" : tone === "danger" ? "danger" : tone === "pending" ? "warning" : "informative"}>
-      {documentStatuses[status] ?? status}
-    </Badge>
+    <span className={`hca-status hca-status--${tone}`}>
+      {label ?? documentStatusLabel(status)}
+    </span>
   );
 }
 export function EmptyState({
@@ -134,8 +96,9 @@ export function StepNavigator({
       >
         {steps.map((step, index) => (
           <li key={step}>
-            <Button
+            <button
               type="button"
+              className="hca-step-control"
               aria-current={index === active ? "step" : undefined}
               disabled={disabled || index > active}
               onClick={() => onChange(index)}
@@ -148,34 +111,10 @@ export function StepNavigator({
                 )}
               </span>
               {step}
-            </Button>
+            </button>
           </li>
         ))}
       </ol>
     </nav>
-  );
-}
-export function Dialog({
-  open,
-  title,
-  children,
-  onClose,
-}: {
-  open: boolean;
-  title: string;
-  children: ReactNode;
-  onClose: () => void;
-}) {
-  return (
-    <FluentDialog open={open} onOpenChange={(_, data) => { if (!data.open) onClose(); }}>
-      <DialogSurface className="hca-dialog-surface">
-        <DialogBody>
-          <DialogTitle action={<Button appearance="subtle" aria-label="Fechar diálogo" icon={<Icon name="close" />} onClick={onClose} />}>
-            {title}
-          </DialogTitle>
-          <DialogContent className="hca-dialog-content">{children}</DialogContent>
-        </DialogBody>
-      </DialogSurface>
-    </FluentDialog>
   );
 }

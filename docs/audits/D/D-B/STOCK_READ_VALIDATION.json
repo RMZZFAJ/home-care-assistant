@@ -1,0 +1,212 @@
+{
+  "increment": "D3.62",
+  "base": "23fce86438558df5cf5a0634254bb871869fc8ce",
+  "recordedAt": "2026-11-11T03:09:42.570932+00:00",
+  "scope": [
+    "stock balances and transit",
+    "stock movement history",
+    "BAL native reference",
+    "stable column keys",
+    "finite closure plan"
+  ],
+  "validation": {
+    "unitAndApi": 47,
+    "unitFiles": [
+      "tests/stock-reads.test.ts",
+      "tests/balance-read-validation.test.ts",
+      "tests/api/stock-reads-contract.test.ts",
+      "tests/stock-presentation.test.ts"
+    ],
+    "types": "pass",
+    "targetedLint": "pass",
+    "requestedNoArrayIndexKeyWarning": "fixed with semantic column identities;targeted ESLint passed",
+    "browser": {
+      "stock": {
+        "startTime": "2026-11-11T02:23:28.596Z",
+        "duration": 291115.577,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "balance": {
+        "startTime": "2026-11-11T02:43:53.259Z",
+        "duration": 132218.247,
+        "expected": 12,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "catalogueCommitBarrier": {
+        "startTime": "2026-11-11T03:02:12.993Z",
+        "duration": 399721.3,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 36,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "engines": [
+        "Chromium",
+        "WebKit"
+      ],
+      "stockAxeWidths": [
+        320,
+        390,
+        768,
+        1150,
+        1440
+      ],
+      "maxStockProducts": 101
+    },
+    "counterproofs": [
+      "Malformed successful responses cannot replace the latest valid scoped stock read or confirm an empty list.",
+      "Wrong patient, custody, history page and filters are rejected; invalid totals and quantities are rejected.",
+      "Signed balances, restricted custody nulls, optional minimum and long average precision remain valid.",
+      "BAL review uses its native authorized reference after a real general stock403;malformed and foreign reference preserve two physical values and notes.",
+      "Read-only browser actions create no operational POST and leave official document and movement snapshots unchanged.",
+      "Catalogue CI recovery case now waits for committed response loss before permission revocation;exact same packet and forbidden new key assertions retained."
+    ]
+  },
+  "remote": {
+    "from": 205,
+    "to": 205,
+    "newMigrations": [],
+    "finalDryRunEmpty": true,
+    "dryRunResult": "Remote database is up to date.",
+    "priorReconciliation": "ADMINISTRATIVE_PREPARATIONS_VALIDATION.json",
+    "newSqlOrRemoteAuthChanges": false
+  },
+  "criteria": {
+    "canonical": 75,
+    "approvedComplements": 30,
+    "localPass": 56,
+    "partial": 49,
+    "originalContractColumnsPreserved": 30,
+    "statusesPreserved": true,
+    "fixedStages": 20,
+    "closedLocalStages": [
+      "01",
+      "02",
+      "03",
+      "07"
+    ],
+    "nextStage": "04",
+    "nextStageCheckpoints": 6,
+    "remainingAdministrativeFormGroups": 9,
+    "stageRegistryLfSha256": "b47df8d47272f3533b56e5adf50ae9d5e8794b068f30a18e1061e66bc1d2acb8",
+    "visualEstimate": 60
+  },
+  "baselineCi": {
+    "sha": "23fce86438558df5cf5a0634254bb871869fc8ce",
+    "run": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42943743818",
+    "linuxWindowsDatabase": "pass",
+    "mobile1": "failed catalogue recovery case;revocation raced initial native commit;barrier corrected and qualified locally",
+    "otherObservedShards": "chromium1/2,mobile2,ios2 pass;ios1 running at observation",
+    "intermittentSuccessorCase": "first attempt dialog closure timeout;CI retry passed;local directed case retained",
+    "failureLogLfSha256": "af39b6138fe772e4184c833e064da690e648a2994787ca0bddbc52da4b20cbd5"
+  },
+  "remaining": [
+    "own SHA full CI and Preview",
+    "stage04 six document checkpoints",
+    "stage14 nine remaining form groups",
+    "66 compositions and171 relations full parity",
+    "physical/human/provider/operational gates",
+    "Sonar deferred by owner"
+  ],
+  "sourceLfSha256": {
+    "src/app/api/balances/route.ts": "4471e3a2e9c512bb0c2e6fbe638f6aafb88ae7e46bfc78b3f7f29d84fe41cb36",
+    "src/app/api/stock/balances/route.ts": "29e9ea72e2ccda497a86190a0550572007164a0b957b81dd754cee18bd89a322",
+    "src/app/api/stock/movements/route.ts": "93944ab36a8e9d9b711839f6f29f813a17b25bab119aec485d5e46d2c57a1ae2",
+    "src/components/balances/balance-count-wizard.tsx": "4296dde01dec40a274e4549e79c98662a8df381bc4b4e5ccf29a9b7de022a7a4",
+    "src/components/documents/supply-wizard.tsx": "b12b4c71a68069c012961312cb9c5d40bb84801a7a7342af14b4983abe21daa8",
+    "src/components/stock/stock-console.tsx": "0a04341eac7633b2d5fbd4c0a11b6d191d533cdd7f861653f4fd90d079fd37b6",
+    "src/components/stock/stock-overview.tsx": "5cc22414c11aec6e347d645fa338b44dcdfdac9f0a96e4ec51ecf1a366c9536a",
+    "src/components/stock/transit-stock.tsx": "b80c5ec212cdc8d686544df6d5ea31141cf47d9e6d9b5bfb672f090a84707e10",
+    "src/lib/validation/balances.ts": "56d5afb9e3226053a6a665a01f7eb7728aa7fed89405bb76c426a0cdc2b08e41",
+    "src/lib/validation/stock-reads.ts": "55fe3245f6799a4a6a8628afdc130c5fefda6b956689802b1b756ea488203bda",
+    "src/types/stock.ts": "b51e50a38cfd026c6152145b964db5bf3ee7129bdf42ccb11d01d2942439a509",
+    "tests/api/stock-reads-contract.test.ts": "c0c7678cfaa248649345bd91e88a8d8934db616bafe1249746cd29e2eac5949a",
+    "tests/balance-read-validation.test.ts": "9d2ca5244b0a1d56e24cb9eb5d02cf0fdba57a74b56eb874ac2d3315afaeda85",
+    "tests/e2e/balance-count-recovery.spec.ts": "1224066ba01d6781652c8676abbedc71ec56416dc84d896f949ca193797768eb",
+    "tests/e2e/catalogue-identities.spec.ts": "df2afcb597d806441fc27e99f871ccc92ee7957310ba2197e4aeaf680e64ab42",
+    "tests/e2e/stock-read-validation.spec.ts": "335ff9b3b7d74ca91084b17e75042cc77d8562dcc3e25c0b3c86567018236ae0",
+    "tests/stock-reads.test.ts": "5bfc2afb34ea589b14ac9f8611f6eded531f534d7fea6d96b573c08a9b18c172"
+  },
+  "D3.69": {
+    "baseSha": "4de848c4cc55d5ab5132bca5f8423678cc2e1dd1",
+    "scope": "05.1 stock balances,transit and history completeness;no product change",
+    "reuse": {
+      "sourcePackageCommit": "90f832df3b61b77bd0fbfcdb56f9bfed930ddee7",
+      "priorStockBrowserPassed": 18,
+      "rerun": false,
+      "compatibility": "All17 pre-existing LF source fingerprints match;consumer/API/parser/shared scoped reader/auth/quantity/migrations/package and4old browser files have no git diff since source package.Uses existing checks only,no new manifest.",
+      "priorReport": "output/phase-d-work/ui-canonical/stock-read-validation.json",
+      "limits": "Prior results are reused,not fresh executions;no additional BAL/catalogue cases counted."
+    },
+    "browser": {
+      "productionBuild": true,
+      "guardedLocalStack": true,
+      "realAuth": true,
+      "newCohort": {
+        "startTime": "2026-11-11T07:29:05.771Z",
+        "duration": 102715.83700000001,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "freshPassed": 3,
+      "priorReused": 18,
+      "qualifiedStockCases": 21,
+      "report": "output/phase-d-work/ui-canonical/stock-history-completeness.json",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "frozenSources": true
+    },
+    "proofs": [
+      "101native family inbound operations plus setup create more than100 real movements;UI traverses all pages in exact independent SQL order created_atDESC,idDESC without losses or duplicates",
+      "Product filter with at least50rows and SaoPaulo same-day boundaries resets pagination;all its pages match raw SQL",
+      "Real old product response held until after another product and page are current;test disables only client abort for stock history to prove stale delivery is ignored;production unchanged",
+      "Future date filter produces genuine empty;clearing filters returns first20 original rows",
+      "Read/navigation/filtering emit no operational POST and preserve complete raw ledger/document snapshots",
+      "Prior18 retain101products,5widths/axe,team privacy,late custody,error/empty,malformed200 and foreign history scope/total/page checks"
+    ],
+    "validation": {
+      "types": "PASS",
+      "directedEslint": "PASS",
+      "freshUnitTests": 0,
+      "reason": "Only discriminating browser coverage added;no runtime contract change or duplicate unit suite"
+    },
+    "remote": {
+      "newMigrations": 0,
+      "knownReconciledVersions": 205,
+      "dryRun": "Remote database is up to date."
+    },
+    "criteria": {
+      "original": 105,
+      "localPass": 56,
+      "partial": 49,
+      "fixedStages": 20,
+      "stage05": "EM_EXECUCAO",
+      "completedCheckpoints": [
+        "05.1"
+      ],
+      "nextCheckpoint": "05.2"
+    },
+    "limits": [
+      "Own published SHA CI required",
+      "Other9list checkpoints and full phase gates remain",
+      "No new PDF acceptance,merge,production or external activation",
+      "DOC-A/B/C/D remain as before;Sonar owner-deferred"
+    ]
+  }
+}

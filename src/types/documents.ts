@@ -1,4 +1,8 @@
+import type { BalanceReviewItem } from "@/lib/validation/balance-review-items";
+import type { BalanceApplicationFacts } from "@/lib/validation/balance-application";
+
 export type DocumentType = "REQ" | "COM" | "ENT" | "BAL";
+export type DocumentKind = DocumentType | "DEV";
 export type SupplyType = Exclude<DocumentType, "REQ">;
 export type Custody = "FAMILY" | "CARE_TEAM";
 export type Capabilities = Record<string, boolean>;
@@ -13,15 +17,24 @@ export type SupplyLine = {
   purchased_quantity: string;
   accepted_quantity: string;
   reconciled_quantity: string;
+  waived_quantity?: string;
   fully_checked: boolean;
   metadata: Record<string, unknown>;
+  presentation_conversions?: unknown;
   requisitionItemIds: string[];
+  family_fulfillment?: "partial" | "complete" | null;
+  fulfillment_decided_by?: string | null;
+  fulfillment_decided_name?: string | null;
+  fulfillment_decided_at?: string | null;
 };
 export type DraftLine = {
   productId: string;
   quantity: string;
   requisitionItemIds?: string[];
+  requestFulfillment?: "partial" | "complete";
   metadata?: Record<string, string>;
+  manualQuantity?: string;
+  presentations?: { id: string; version: number; packages: string; }[];
 };
 export type SupplyPayload = {
   lines: DraftLine[];
@@ -30,8 +43,61 @@ export type SupplyPayload = {
   source?: Custody;
   destination?: Custody;
   recipientId?: string;
-  balanceAssignment?: { id: string; version: number; referenceRevision: string };
-  balanceContext?: { cycleId: string; assignmentId: string; professionalId: string; professionalName: string; shiftId: string; shiftType: string; startsAt: string; endsAt: string; timezone: string; countedAt: string; weeks: string[]; kind: string };
+  recipientReason?: string;
+  recipientReference?: string;
+  balanceReferenceRevision?: string;
+  balanceAssignment?: {
+    id: string;
+    version: number;
+    referenceRevision: string;
+  };
+  balanceContext?: {
+    cycleId: string;
+    assignmentId: string;
+    professionalId: string;
+    professionalName: string;
+    shiftId: string;
+    shiftType: string;
+    startsAt: string;
+    endsAt: string;
+    timezone: string;
+    countedAt: string;
+    weeks: string[];
+    kind: string;
+  };
+};
+export type DeliveryPreparation = {
+  source: Custody;
+  destination: Custody;
+  people: { id: string; name: string; role: string; }[];
+  shifts: {
+    id: string;
+    professionalId: string;
+    professionalName: string;
+    version: number;
+    startsAt: string;
+    endsAt: string;
+  }[];
+  suggestedId: string | null;
+  state: "suggested" | "ambiguous" | "no_schedule" | "no_eligible_recipient";
+  referenceHash: string;
+  checkedAt: string;
+};
+export type DeliveryRecipientSelection = {
+  recipientId: string;
+  recipientName: string;
+  recipientRole: string;
+  suggestedId: string | null;
+  suggestionState: DeliveryPreparation["state"];
+  shifts: DeliveryPreparation["shifts"];
+  referenceHash: string;
+  manual: boolean;
+  reason: string | null;
+  previousRecipientId: string | null;
+  selectedBy: string;
+  selectedName: string;
+  recordedAt: string;
+  official: boolean;
 };
 export type DocumentEvent = {
   id: string;
@@ -41,17 +107,252 @@ export type DocumentEvent = {
   createdAt: string;
   hash: string;
 };
+export type BalanceCounter = {
+  id: string | null;
+  eventId?: string | null;
+  name: string | null;
+  source: string;
+  version?: number;
+  recordedAt?: string;
+};
+export type BalanceReviewRecord = {
+  id: string;
+  count_version: number;
+  counter_id: string;
+  reviewer_id: string;
+  reviewer_name: string;
+  review_group: "family" | "supervisor";
+  comment: string;
+  item_results?: BalanceReviewItem[];
+  reference_state: "current" | "historical" | "unavailable";
+  recorded_at: string;
+  reviewed_document_version: number;
+  reviewed_snapshot: {
+    counter: BalanceCounter;
+    notes: string | null;
+    countVersion: number;
+    lines: Pick<
+      SupplyLine,
+      "id" | "name_snapshot" | "quantity" | "unit_snapshot"
+    >[];
+    referenceRevision: string | null;
+    currentRevision: string;
+    appliedBeforeReview: boolean;
+    opinionOnly?: boolean;
+  };
+};
+export type BalanceReviewFacts = {
+  counter: BalanceCounter;
+  countVersion: number | null;
+  notes: string;
+  reviews: BalanceReviewRecord[];
+  legacyApprovals: {
+    actor_id: string;
+    actorName?: string | null;
+    nameSource?: string;
+    review_group: string;
+    count_version: number;
+    created_at: string;
+  }[];
+};
+export type BalanceReviewContext = BalanceReviewFacts & {
+  eligibleGroups: ("family" | "supervisor")[];
+  referenceRevision: string | null;
+  currentRevision: string;
+  referenceState: "current" | "historical" | "unavailable";
+  referenceHash: string;
+  reconciliationApplied: boolean;
+  reviewRequired: boolean;
+  policyReviewRequired?: boolean;
+  reviewSatisfied?: boolean;
+  hasItemDifferences?: boolean;
+  applicationGroups?: ("family" | "supervisor")[];
+  application?: BalanceApplicationFacts;
+  corrections?: import("@/lib/validation/balance-corrections").BalanceCorrectionFacts;
+};
 export type PurchaseReceipt = {
   id: string;
   state: "pending" | "approved" | "rejected";
   submitted_by: string;
-  lines: { lineId: string; quantity: string }[];
+  lines: { lineId: string; quantity: string; }[];
   created_at: string;
+  submission_key?: string | null;
+  submitted_name?: string | null;
+  validated_name?: string | null;
+  validated_by?: string | null;
+  validated_at?: string | null;
+  reason?: string | null;
+};
+export type PurchaseProgressLine = {
+  lineId: string;
+  name: string;
+  unit: string;
+  plannedQuantity: string | number;
+  approvedQuantity: string | number;
+  purchasedQuantity: string | number;
+  validatedQuantity: string | number;
+  pendingValidationQuantity: string | number;
+  unarrivedQuantity: string | number;
+  waivedQuantity: string | number;
+  waivableQuantity: string | number;
+  remainingExpectation: string | number;
+};
+export type PurchaseProgress = {
+  state: string;
+  expectationClosed: boolean;
+  expectationPending: boolean;
+  physicalPending: boolean;
+  validationPending: boolean;
+  lines: PurchaseProgressLine[];
+  closure: {
+    actorId: string;
+    actorName: string | null;
+    recordedAt: string;
+    reason: string;
+    referenceVersion: number;
+  } | null;
+};
+export type DeliveryConsumptionReference = {
+  movementId: string;
+  reportId: string;
+  recordedAt: string;
+  quantity: string;
+};
+export type DeliveryCancellationLine = {
+  lineId: string;
+  productId: string;
+  name: string;
+  unit: string;
+  acceptedQuantity: string;
+  availableConsumedQuantity?: string;
+  minimumReturnQuantity?: string;
+  quantityDecimals?: number;
+  unresolvedTransit?: string;
+  sourceReady?: boolean;
+  returnQuantity?: string;
+  consumedQuantity?: string;
+  consumptionReferences: DeliveryConsumptionReference[];
+  returnMovementIds?: string[];
+};
+export type DeliveryCancellationRequest = {
+  id: string;
+  source: "server_record" | "legacy_event";
+  sourceEventId?: string;
+  requestedBy: string | null;
+  requestedName: string | null;
+  requestedAt: string;
+  requestedVersion: number;
+  previousStatus: string | null;
+  reason: string;
+  status: "pending" | "consented" | "refused" | "withdrawn";
+  outcome?: {
+    action: string;
+    actorId: string;
+    actorName: string | null;
+    recordedAt: string;
+    reason: string;
+    version: number;
+    lines: DeliveryCancellationLine[];
+  };
+};
+export type DeliveryCancellationContext = {
+  historical?: boolean;
+  request: DeliveryCancellationRequest;
+  history: DeliveryCancellationRequest[];
+  lines: DeliveryCancellationLine[];
+  sourceReady: boolean;
+  sourceAccess?: boolean;
+  unresolvedTransit?: string;
+  referenceHash: string | null;
+  referenceVersion?: number;
+};
+export type DeliveryRegularizationLine = {
+  lineId: string;
+  productId: string;
+  name: string;
+  unit: string;
+  quantityDecimals: number;
+  expeditedQuantity: string;
+  acceptedQuantity: string;
+  priorReconciledQuantity: string;
+  pendingQuantity: string;
+  receivedQuantity: string;
+  returnedQuantity: string;
+  missingQuantity: string;
+  unknownQuantity: string;
+  movementIds?: string[];
+};
+export type DeliveryRegularizationCase = {
+  id: string;
+  document_id: string;
+  care_recipient_id: string;
+  proposed_by: string;
+  reviewer_id: string;
+  follow_up_owner_id: string | null;
+  proposed_at: string;
+  reference_version: number;
+  state: "pending" | "approved" | "rejected" | "withdrawn" | "obsolete";
+  before_snapshot: {
+    version: number;
+    status: string;
+    recipientId: string | null;
+    acceptedBy: string | null;
+    acceptedAt: string | null;
+    receiptName: string | null;
+    lines: SupplyLine[];
+  };
+  proposal: {
+    reason: string;
+    basis: string;
+    lines: DeliveryRegularizationLine[];
+    unknownQuantity: string;
+    proposedName: string;
+    reviewerName: string;
+    followUpOwnerName: string | null;
+    personalReceipt: false;
+  };
+  decision: null | {
+    action: string;
+    actorId: string;
+    actorName: string;
+    recordedAt: string;
+    reason: string;
+    version: number;
+    lines: DeliveryRegularizationLine[];
+  };
+  findings: {
+    id: string;
+    actor_id: string;
+    actor_name: string;
+    recorded_at: string;
+    body: string;
+  }[];
+};
+export type DeliveryRegularizationContext = {
+  recipientAvailable: boolean;
+  pendingTransit: string;
+  sourceReady: boolean;
+  sourceLines: {
+    lineId: string;
+    quantityDecimals: number | null;
+    sourceReady: boolean;
+  }[];
+  cases: DeliveryRegularizationCase[];
+  currentId: string | null;
+  canPropose: boolean;
+  canReview: boolean;
+  canApprove: boolean;
+  canRecordFinding: boolean;
+  canClose: boolean;
+  reviewers: PatientPerson[];
+  followUpPeople: PatientPerson[];
 };
 export type SupplyDocument = {
   id: string;
   care_recipient_id: string;
   type: DocumentType;
+  kind?: DocumentKind;
+  fulfillmentReviews?: { id: string; lineId: string; decision: "partial" | "complete"; reason: string; actorId: string; actorName: string; recordedAt: string; expectedVersion: number; expeditedQuantity: string; acceptedQuantity: string ;}[];
   number: number | null;
   code: string | null;
   protocol: string | null;
@@ -63,11 +364,35 @@ export type SupplyDocument = {
   updated_at: string;
   content_hash: string;
   payload: SupplyPayload;
-  workflow_data: Record<string, unknown>;
+  workflow_data: Record<string, unknown> & {
+    recipientSelection?: DeliveryRecipientSelection;
+    recipientSelectionHistory?: DeliveryRecipientSelection[];
+  };
   canonical_snapshot: Record<string, unknown>;
   lines: SupplyLine[];
+  linkedRequisitions?: {
+    id: string;
+    code: string;
+    protocol: string;
+    itemIds: string[];
+  }[];
+  unavailableRequisitionItems?: number;
   events: DocumentEvent[];
   receipts: PurchaseReceipt[];
+  purchaseProgress?: PurchaseProgress;
+  purchaseEntryBalances?: import("@/lib/validation/purchase-entry-balances").PurchaseEntryBalances;
+  balanceReview?: BalanceReviewContext;
+  balanceRecount?: import("./balances").BalanceRecountContext;
+  deliveryCancellation?: DeliveryCancellationContext | null;
+  deliveryRegularization?: DeliveryRegularizationContext | null;
+  transfer?: import("./transfers").TransferFacts;
+  commandOutcome?: {
+    state: "committed" | "recovered";
+    action: string;
+    eventId?: string;
+    version: number;
+    requestId: string | null;
+  };
   approvals: {
     review_group: string;
     actor_id: string;
@@ -76,7 +401,7 @@ export type SupplyDocument = {
   fullyCheckedLines: number;
   totalLines: number;
 };
-export type PatientPerson = { id: string; name: string; role: string };
+export type PatientPerson = { id: string; name: string; role: string; };
 export type ItemContext = {
   productId: string;
   familyStock: string | null;
@@ -95,12 +420,20 @@ export type CatalogProduct = {
   unit: string;
   aliases?: string[];
   quantity_decimals?: number;
+  active?: boolean;
+  successor?: {
+    id: string;
+    name: string;
+    unit: string;
+    active: boolean;
+  } | null;
+  selectionPredecessors?: { id: string; name: string; unit: string; }[];
 };
 export const documentLabels: Record<DocumentType, string> = {
   REQ: "Requisição",
   COM: "Compra de insumos",
-  ENT: "Entrega / Entrada",
-  BAL: "Balanço semanal",
+  ENT: "Entrega e devolução de materiais",
+  BAL: "Balanço de estoque",
 };
 export const documentStatuses: Record<string, string> = {
   historical: "Registro histórico",
@@ -111,6 +444,8 @@ export const documentStatuses: Record<string, string> = {
   completed_science_pending: "Concluída · ciência pendente",
   archived: "Arquivada",
   draft: "Rascunho",
+  transfer_pending: "Transferência aguardando concordância",
+  transfer_ready: "Transferência pronta para expedição",
   submitted: "Aguardando revisão",
   pending_approval: "Aguardando aprovação",
   approved: "Aprovado",
@@ -119,30 +454,53 @@ export const documentStatuses: Record<string, string> = {
   purchasing: "Compra em andamento",
   purchased: "Compra efetivada",
   partially_received: "Recebimento parcial",
+  closed_below_quantity: "Encerrada com quantidade inferior",
+  closed_pending_validation:
+    "Expectativa encerrada · parcelas aguardam conferência",
+  closed_pending_arrival:
+    "Expectativa encerrada · aquisição aguarda chegada válida",
+  pending_validation: "Parcela aguardando conferência",
   received: "Recebido",
   pending_receipt: "Aguardando recebimento",
   disputed: "Divergência pendente",
   confirmed: "Confirmado",
   cancellation_pending: "Cancelamento aguardando consentimento",
   cancelled: "Cancelado",
+  administratively_closed: "Encerrada administrativamente",
   under_review: "Em revisão",
   separated: "Separado",
 };
 
 export type DocumentSummary = {
+  requisitionState?: { serviceStatus: "historical" | "cancelled" | "archived" | "completed" | "fulfillment_partial" | "awaiting_fulfillment"; scienceState: "recorded" | "pending" | "waived" | "unavailable" };
   id: string;
   version: number;
   type: DocumentType;
-  fulfillment?: { fulfilled: number; total: number };
+  kind?: DocumentKind;
+  fulfillment?: { fulfilled: number; total: number; };
   code: string | null;
   protocol: string | null;
   status: string;
   created_at: string;
   recipient_id: string | null;
+  task?: { code: string; label: string; } | null;
   document_lines?: {
     id: string;
     fully_checked: boolean;
     accepted_quantity: string;
     quantity: string;
   }[];
+};
+export type DeliveryListFacts = {
+  source: "FAMILY" | "CARE_TEAM" | null;
+  destination: "FAMILY" | "CARE_TEAM" | null;
+  recordedByName: string | null;
+  recipientName: string | null;
+  counterpartyName: string | null;
+  receivedByName: string | null;
+};
+export type DeliveryListItem = DocumentSummary & {
+  type: "ENT";
+  deliverySummary: DeliveryListFacts;
+  document_lines: NonNullable<DocumentSummary["document_lines"]>;
 };

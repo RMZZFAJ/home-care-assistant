@@ -1,0 +1,231 @@
+{
+  "sourceBaseSha": "10e611132e91b26745412d350e7209179efed2d6",
+  "candidateIdentifiedByLfSourceHashes": true,
+  "files": [
+    {
+      "file": "src/app/api/documents/[id]/revise/route.ts",
+      "sha256LfUtf8": "8f857109474e3f09334a348a26b80c44b40917ab89750f2b990eacf4a1f495a5"
+    },
+    {
+      "file": "src/components/balances/balance-count-wizard.tsx",
+      "sha256LfUtf8": "d6320b54e3e507abed84978fa2f5b2c0116aaa8acad57e217aaf61173b97bad1"
+    },
+    {
+      "file": "src/components/documents/supply-wizard.tsx",
+      "sha256LfUtf8": "5aab98a7427a20924fa4f6a580e5ce87d14b6f9c0c10adae2433378f33d25831"
+    },
+    {
+      "file": "src/lib/server/api.ts",
+      "sha256LfUtf8": "d86bda53deeb332611d1e143b19533f9342b3327a0abe8dbab5f1bd6821f52cf"
+    },
+    {
+      "file": "src/lib/server/error-catalog.ts",
+      "sha256LfUtf8": "f723840d634970279107c8039095adddc39d82aaf1afcb712e0f9bfc45bd1179"
+    },
+    {
+      "file": "supabase/migrations/20261107070558_phase_d3_legacy_revision_recovery.sql",
+      "sha256LfUtf8": "92b2fc6417a5819440a7d97760c909c04f4be98e5662fb4cd2b87fab58769e21"
+    },
+    {
+      "file": "supabase/migrations/20261107072253_phase_d3_legacy_submission_version.sql",
+      "sha256LfUtf8": "f9446cdcc3965c75efab672599dff27c0b57e9ba2fcc2af866e06b93f1394ddf"
+    },
+    {
+      "file": "tests/api/guards.test.ts",
+      "sha256LfUtf8": "a04f2eda78cedc5dd35eaca1b24e86200e16b385060123f29e4bdac4e18f0875"
+    },
+    {
+      "file": "tests/e2e/supply-private-drafts.spec.ts",
+      "sha256LfUtf8": "a7a2be7548b7a36c996bb16f60e9e5724d0548d83e256d470a01795e1b657a2d"
+    },
+    {
+      "file": "tests/integration/supply-private-drafts.test.mjs",
+      "sha256LfUtf8": "bce2d91ba83b67866e8f7161ce5ba395b9ee1bc86ff2f458dc5adda18db1579b"
+    }
+  ],
+  "first15CaseSources": [
+    {
+      "file": "src/app/api/documents/[id]/revise/route.ts",
+      "sha256LfUtf8": "eb93c4965422637aaadae36e2ca50163e429be4a43ecf28a31c8e8401df0656f"
+    },
+    {
+      "file": "src/components/balances/balance-count-wizard.tsx",
+      "sha256LfUtf8": "d6320b54e3e507abed84978fa2f5b2c0116aaa8acad57e217aaf61173b97bad1"
+    },
+    {
+      "file": "src/lib/server/api.ts",
+      "sha256LfUtf8": "d86bda53deeb332611d1e143b19533f9342b3327a0abe8dbab5f1bd6821f52cf"
+    },
+    {
+      "file": "src/lib/server/error-catalog.ts",
+      "sha256LfUtf8": "f723840d634970279107c8039095adddc39d82aaf1afcb712e0f9bfc45bd1179"
+    },
+    {
+      "file": "supabase/migrations/20261107070558_phase_d3_legacy_revision_recovery.sql",
+      "sha256LfUtf8": "92b2fc6417a5819440a7d97760c909c04f4be98e5662fb4cd2b87fab58769e21"
+    },
+    {
+      "file": "tests/e2e/supply-private-drafts.spec.ts",
+      "sha256LfUtf8": "84553212d0901ca296326b66b469017bb62c97bd2f00526a02370a461bc33029"
+    },
+    {
+      "file": "tests/integration/supply-private-drafts.test.mjs",
+      "sha256LfUtf8": "d407695c8286f6ccc4c9d5a94dae34785930447df8b9c6c3206686182683819d"
+    }
+  ],
+  "second9CaseSources": [
+    {
+      "file": "src/app/api/documents/[id]/revise/route.ts",
+      "sha256LfUtf8": "eb93c4965422637aaadae36e2ca50163e429be4a43ecf28a31c8e8401df0656f"
+    },
+    {
+      "file": "src/components/balances/balance-count-wizard.tsx",
+      "sha256LfUtf8": "d6320b54e3e507abed84978fa2f5b2c0116aaa8acad57e217aaf61173b97bad1"
+    },
+    {
+      "file": "src/components/documents/supply-wizard.tsx",
+      "sha256LfUtf8": "3cd419041880559c2ce610d14903d8497a8ea76479368077fa7737948da03e95"
+    },
+    {
+      "file": "src/lib/server/api.ts",
+      "sha256LfUtf8": "d86bda53deeb332611d1e143b19533f9342b3327a0abe8dbab5f1bd6821f52cf"
+    },
+    {
+      "file": "src/lib/server/error-catalog.ts",
+      "sha256LfUtf8": "f723840d634970279107c8039095adddc39d82aaf1afcb712e0f9bfc45bd1179"
+    },
+    {
+      "file": "supabase/migrations/20261107070558_phase_d3_legacy_revision_recovery.sql",
+      "sha256LfUtf8": "92b2fc6417a5819440a7d97760c909c04f4be98e5662fb4cd2b87fab58769e21"
+    },
+    {
+      "file": "tests/api/guards.test.ts",
+      "sha256LfUtf8": "a04f2eda78cedc5dd35eaca1b24e86200e16b385060123f29e4bdac4e18f0875"
+    },
+    {
+      "file": "tests/e2e/supply-private-drafts.spec.ts",
+      "sha256LfUtf8": "eac67daf81d019ea97d911234380f4aed4ae22f4d8e37d0c136929c6b6dc4775"
+    },
+    {
+      "file": "tests/integration/supply-private-drafts.test.mjs",
+      "sha256LfUtf8": "d407695c8286f6ccc4c9d5a94dae34785930447df8b9c6c3206686182683819d"
+    }
+  ],
+  "migrations": [
+    "20261107070558",
+    "20261107072253"
+  ],
+  "localMigrations": 133,
+  "remoteMigrations": 121,
+  "remoteDBApplied": false,
+  "historicalProtectedMigrations": 84,
+  "localVerification": {
+    "cron": [
+      {
+        "name": "hca-notification-worker",
+        "active": true,
+        "schedule": "* * * * *"
+      },
+      {
+        "name": "hca-operational-lifecycle",
+        "active": true,
+        "schedule": "* * * * *"
+      }
+    ],
+    "faultHelpers": 0,
+    "faultTriggers": 0,
+    "localMigrations": 133
+  },
+  "authFinalCasesPassed": 17,
+  "apiGuardCasesPassed": 15,
+  "productionRuns": [
+    {
+      "passed": 9,
+      "failed": 6,
+      "log": "d3-legacy-browser-acceptance.log"
+    },
+    {
+      "passed": 9,
+      "failed": 0,
+      "log": "d3-legacy-browser-affected-recheck.log"
+    },
+    {
+      "passed": 12,
+      "failed": 0,
+      "log": "d3-legacy-browser-version-final.log"
+    }
+  ],
+  "productionCasesDistinctPassed": 24,
+  "projects": [
+    "chromium",
+    "mobile",
+    "ios"
+  ],
+  "formViewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "reuseBoundary": "Final SQL pins the original expected revision for submission. Final17 Auth cases rerun the affected database file, including fresh and legacy stages. Final12 browser cases exercise revised source: ENT/BAL pending recovery, HTTP intervening and completed stages for all3 kinds, and completed COM recovery. Earlier unchanged branches retain separate source hashes; no earlier CI is attributed to this candidate.",
+  "counterproofs": [
+    "First-stage legacy commit survives a real second-stage failure; no false no-save response or extra revision",
+    "Original expected revision is retained: an intervening revision remains draft and is not silently submitted",
+    "A legacy second stage already committed replays its original second key; changing the second key after journal binding remains409 IDEMPOTENCY_CONFLICT",
+    "Real ENT stock30 versus quantity31 blocks dispatch without erasing revision; new authorized stock facts allow the identical intention to complete once",
+    "Different actor, payload, key, version, action and selected patient cannot obtain another matching revision receipt",
+    "Reload and a controlled409 during recovery preserve both keys, original payload and the recovery control",
+    "Confirmed stage is typed in the response with correlation/no-store; logs exclude document identity, keys and payload",
+    "Fresh intentions still roll back both stages on the scoped fault trigger; temporary fault helpers/triggers are absent after all runs"
+  ],
+  "failuresAndCorrections": [
+    "Initial Auth2/4: fixture adminB had no membership; use the distinct authorized global member. Affected2/2 passed; final17/17 passed.",
+    "Initial anchored diagnostic selector selected no full Playwright title. An unanchored selector listed the exact case before execution. Root cause clarified during D3.8; the raw log is preserved.",
+    "Diagnostic form asserted cache removal while UI was still Registrando. It now waits for Documento persistido; no assertion was removed.",
+    "First production15:9 passed/6 failed. ENT409 wrongly moved the frozen recovery to step0; fixed only that uncertain branch. BAL test used monitoring URL instead of /fichas/bal. Affected9/9 and final12/12 passed."
+  ],
+  "publishedBaseCIObservedBeforeNewPush": {
+    "sha": "10e611132e91b26745412d350e7209179efed2d6",
+    "run": 42349487904,
+    "database": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "browsers": "IN_PROGRESS",
+    "validatesCandidate": false
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "humanPhysicalProviderApproval": false,
+  "diagnosticIsAcceptance": false,
+  "logs": [
+    "output/phase-d-work/d3-legacy-db-prepare.log",
+    "output/phase-d-work/d3-legacy-version-db-prepare.log",
+    "output/phase-d-work/d3-legacy-auth.log",
+    "output/phase-d-work/d3-legacy-auth-recheck.log",
+    "output/phase-d-work/d3-legacy-auth-final.log",
+    "output/phase-d-work/d3-legacy-api-guards.log",
+    "output/phase-d-work/d3-legacy-browser-diagnostic.log",
+    "output/phase-d-work/d3-legacy-browser-diagnostic-selected.log",
+    "output/phase-d-work/d3-legacy-browser-acceptance.log",
+    "output/phase-d-work/d3-legacy-browser-affected-recheck.log",
+    "output/phase-d-work/d3-legacy-browser-version-final.log",
+    "output/phase-d-work/d3-legacy-types-version-final.log",
+    "output/phase-d-work/d3-legacy-lint-version-final.log"
+  ],
+  "remaining": [
+    "CI of the newly published SHA including clean installation and legacy evolution",
+    "Other D3 criteria including24h/session/user continuity, contextual decision drafts, guides and navigation",
+    "D4,D5,backup automation,monitoring and final remote reconciliation",
+    "D-C/D6 human,AT,physical device,provider and operational release gates"
+  ],
+  "documentationValidation": {
+    "markdownFiles": 4,
+    "markdownIssues": 0,
+    "localLinks": "PASS",
+    "canonicalRows": 105,
+    "canonicalColumnsUnchanged": 29,
+    "sourceFingerprintChecks": 10,
+    "trackedMigrationFilesChanged": 0,
+    "newMigrationFiles": 2,
+    "historicalProtectedMigrations": 84
+  }
+}

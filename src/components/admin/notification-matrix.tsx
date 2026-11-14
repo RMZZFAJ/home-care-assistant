@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { api, inputClass, Notice } from "@/components/workspace";
+import { ActionButton, CheckboxField, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, SelectField, TextInput } from "@/components/ui/controls";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { api, ApiError, inputClass, Notice } from "@/components/workspace";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { roles } from "./admin-fields";
-import { Button, Checkbox, Input, Select, Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow, Tooltip } from "@fluentui/react-components";
+import { HelpTooltip } from "@/components/ui/floating";
 import { Icon } from "@/components/ui/primitives";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 type Rule = {
@@ -28,6 +29,7 @@ export function NotificationMatrix({
   busy,
   configure,
   configurationError = "",
+  recovery,
 }: {
   patientId: string;
   version: number;
@@ -37,17 +39,21 @@ export function NotificationMatrix({
     change: Record<string, unknown>,
   ) => Promise<boolean>;
   configurationError?: string;
+  recovery?: ReactNode;
 }) {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [editor, setEditor] = useState<{ event: string; role: string; opener: HTMLElement } | null>(null);
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState("");
+  const [readAttempt, setReadAttempt] = useState(0);
+  const [reading, setReading] = useState(true);
   const savingRef = useRef(false);
   const [pending, setPending] = useState(false);
   useEffect(() => {
     if (savingRef.current) return;
     const controller = new AbortController();
+    queueMicrotask(() => { if (!controller.signal.aborted) setReading(true); });
     void api<Data>(
       "/api/notification-rules?careRecipientId=" + patientId,
       undefined,
@@ -60,14 +66,21 @@ export function NotificationMatrix({
         }
       })
       .catch((reason) => {
-        if (!controller.signal.aborted) setError(reason.message);
+        if (!controller.signal.aborted) {
+          if (reason instanceof ApiError && [401, 403, 404].includes(reason.status)) setData(null);
+          setError(reason.message);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setReading(false);
       });
     return () => controller.abort();
-  }, [patientId, version]);
+  }, [patientId, version, readAttempt]);
   if (!data)
     return (
       <Notice error={Boolean(error)}>
         {error || "Carregando matriz de notificações…"}
+        {error ? <ActionButton disabled={reading} onClick={() => setReadAttempt(value => value + 1)}>Consultar regras de avisos novamente</ActionButton> : null}
       </Notice>
     );
   const update = async (
@@ -78,7 +91,7 @@ export function NotificationMatrix({
     const current = data.rules.find(
       (row) => row.event === event && row.subject_role === role,
     );
-    if (busy || savingRef.current) return;
+    if (busy || reading || error || savingRef.current) return;
     savingRef.current = true;
     setPending(true);
     setError("");
@@ -143,19 +156,20 @@ export function NotificationMatrix({
   };
   const columns = Object.entries(roles).filter(([role]) => !roleFilter || role === roleFilter);
   const available = (event: string) => data.channels.filter((channel) => !data.eventChannels || data.eventChannels[event]?.includes(channel.code));
-  return <section aria-label="Matriz de notificações">
-    {error ? <Notice error>{error}</Notice> : null}
+  return <section aria-label="Matriz de notificações" className="ui-card hca-admin-card">
+    {error ? <Notice error>{error} <ActionButton disabled={reading} onClick={() => setReadAttempt(value => value + 1)}>Consultar regras de avisos novamente</ActionButton></Notice> : null}
+    {reading ? <p role="status">Consultando regras de avisos…</p> : null}
     <div className="hca-section-heading"><div><h2>Eventos × funções · múltiplos canais</h2><p>Canais disponíveis conforme o provedor; destino verificado, consentimento e autorização continuam obrigatórios.</p></div></div>
-    <div className="hca-toolbar"><Input type="search" aria-label="Pesquisar eventos de notificação" placeholder="Buscar evento" contentBefore={<Icon name="search" />} value={search} onChange={(_, value) => setSearch(value.value)} /><Select aria-label="Função nas notificações" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="">Todas as funções</option>{Object.entries(roles).map(([role, label]) => <option key={role} value={role}>{label}</option>)}</Select></div>
-    <div className="hca-records hca-matrix-scroll" tabIndex={0} role="region" aria-label="Tabela de notificações; rolagem horizontal por função"><Table className="hca-table hca-matrix" aria-label="Canais por evento e função"><TableHeader><TableRow><TableHeaderCell>Evento</TableHeaderCell>{columns.map(([role, label]) => <TableHeaderCell key={role}>{label}</TableHeaderCell>)}</TableRow></TableHeader><TableBody>{data.events.filter((event) => documentEventLabel(event).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((event) => <TableRow key={event}><TableCell className="hca-matrix-name"><h3>{documentEventLabel(event)}</h3></TableCell>{columns.map(([role, label]) => {
+    <div className="hca-toolbar"><TextInput type="search" aria-label="Pesquisar eventos de notificação" placeholder="Buscar evento" leading={<Icon name="search" />} value={search} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSearch(controlValue); }} /><SelectField aria-label="Função nas notificações" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="">Todas as funções</option>{Object.entries(roles).map(([role, label]) => <option key={role} value={role}>{label}</option>)}</SelectField></div>
+    <div className="hca-records hca-matrix-scroll" tabIndex={0} role="region" aria-label="Tabela de notificações; rolagem horizontal por função"><DataTable className="hca-table hca-matrix" aria-label="Canais por evento e função"><DataTableHead><DataTableRow><DataTableHeading>Evento</DataTableHeading>{columns.map(([role, label]) => <DataTableHeading key={role}>{label}</DataTableHeading>)}</DataTableRow></DataTableHead><DataTableBody>{data.events.filter((event) => documentEventLabel(event).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((event) => <DataTableRow key={event}><DataTableCell className="hca-matrix-name"><h3>{documentEventLabel(event)}</h3></DataTableCell>{columns.map(([role, label]) => {
       const rule = data.rules.find((row) => row.event === event && row.subject_role === role), selected = rule?.channels ?? ["internal"];
-      return <TableCell key={role}><div className="hca-channel-cell">{available(event).map((channel) => <Tooltip key={channel.code} content={channel.label} relationship="label"><Checkbox className="hca-channel-checkbox" label={<Icon name={channel.code === "internal" ? "bell" : channel.code === "email" ? "forms" : "team"} />} aria-label={documentEventLabel(event) + " · " + label + " · " + channel.label} disabled={busy || pending} checked={selected.includes(channel.code)} onChange={(_, value) => void update(event, role, { channels: value.checked ? [...selected, channel.code] : selected.filter((code) => code !== channel.code) })} /></Tooltip>)}<Button appearance="subtle" icon={<Icon name="more" />} aria-label={"Opções de " + documentEventLabel(event) + " · " + label} disabled={busy || pending} onClick={(value) => setEditor({ event, role, opener: value.currentTarget })} /></div>
-      {editor?.event === event && editor.role === role ? <RecordDrawer title={documentEventLabel(event) + " · " + label} onClose={() => setEditor(null)} busy={busy || pending} restoreFocusTo={editor.opener} trackChanges={false}>{error || configurationError ? <Notice error>{error || configurationError}</Notice> : null}<div className="hca-form"><p className="hca-field-hint">Cada alteração é salva e confirmada pelo servidor.</p>
+      return <DataTableCell key={role}><div className="hca-channel-cell">{available(event).map((channel) => <HelpTooltip key={channel.code} content={channel.label}><CheckboxField className="hca-channel-checkbox" label={<Icon name={channel.code === "internal" ? "bell" : channel.code === "email" ? "forms" : "team"} />} aria-label={documentEventLabel(event) + " · " + label + " · " + channel.label} disabled={busy || pending || reading || Boolean(error)} checked={selected.includes(channel.code)} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.checked; return void update(event, role, { channels: controlValue ? [...selected, channel.code] : selected.filter((code) => code !== channel.code) }); }} /></HelpTooltip>)}<ActionButton variant="quiet"  aria-label={"Opções de " + documentEventLabel(event) + " · " + label} disabled={busy || pending || reading || Boolean(error)} onClick={(value) => setEditor({ event, role, opener: value.currentTarget })} >{<Icon name="more" />}</ActionButton></div>
+      {editor?.event === event && editor.role === role ? <RecordDrawer title={documentEventLabel(event) + " · " + label} onClose={() => setEditor(null)} busy={busy || pending} recovery={recovery} restoreFocusTo={editor.opener} trackChanges={false}>{error || configurationError ? <Notice error>{error || configurationError}</Notice> : null}<div className="hca-form"><p className="hca-field-hint">Cada alteração é salva e confirmada pelo servidor.</p>
                       <label className="block text-xs">
                         Comportamento
                         <select
                           className={inputClass}
-                          disabled={busy || pending}
+                          disabled={busy || pending || reading || Boolean(error)}
                           value={rule?.mode ?? "optional"}
                           onChange={(change) =>
                             update(event, role, { mode: change.target.value })
@@ -197,7 +211,7 @@ export function NotificationMatrix({
                           className={inputClass}
                           min={0}
                           max={10080}
-                          disabled={busy || pending}
+                          disabled={busy || pending || reading || Boolean(error)}
                           key={rule?.cooldown_minutes ?? 0}
                           defaultValue={rule?.cooldown_minutes ?? 0}
                           onBlur={(change) => {
@@ -221,7 +235,7 @@ export function NotificationMatrix({
                           {index ? "Fim" : "Início"}
                           <select
                             className={inputClass}
-                            disabled={busy || pending}
+                            disabled={busy || pending || reading || Boolean(error)}
                             aria-label={index ? "Fim" : "Início"}
                             value={
                               rule?.[field as "quiet_start" | "quiet_end"] ?? ""
@@ -245,7 +259,7 @@ export function NotificationMatrix({
                         </label>
                       ))}
 
-      </div></RecordDrawer> : null}</TableCell>;
-    })}</TableRow>)}</TableBody></Table></div>
+      </div></RecordDrawer> : null}</DataTableCell>;
+    })}</DataTableRow>)}</DataTableBody></DataTable></div>
   </section>;
 }

@@ -1,0 +1,138 @@
+{
+  "recordedAt": "2026-11-08T21:50:19.960107+00:00",
+  "baseSha": "9987804a11d198a114d8ede3c8f0bee703ce55a6",
+  "sourceLfSha256": {
+    "src/components/documents/document-actions.tsx": "2ef07a476e913d60271b7a6bd15f7289f003dc2f1f9e0c03f463e1f8d31f9cf4",
+    "src/lib/documents/ent-receipt-state.ts": "7daf05600c07876d4dec0294cdaa40a442cba6a8a2c70cb1e9943d94c3153ac9",
+    "src/lib/server/operational-pdf.ts": "b8800d323c0222a5de179caef864ff2aa2c10a815fb56395e729fb693e00dacd",
+    "src/lib/server/pdf-content.ts": "2ca3a188e8f63133823d7ad89ef4736efba48d2432851973fc05cb6ddb2ce9f6",
+    "src/lib/server/pdf-issuance.ts": "82ac6bbc85647710647fc750c78c8e55d9738697411c35f4d253328479f5ec31",
+    "supabase/migrations/20261108212500_phase_d4_ent_state_pdf_revision.sql": "ca51786cbea9ac97d999eeb96c4aba107f7012582164d8998e52405918edd973",
+    "tests/e2e/ent-temporal.spec.ts": "2b5986a1c4e8ebd436d74e94d7c23464c5ddf8da485145c9c9c591530ae78e1c",
+    "tests/e2e/ent-terminal.spec.ts": "3a91e3d7c369a3412891955c0a8818e53878f9fb01efdab501f721a33fa5ccfd",
+    "tests/e2e/pdf-regularization.spec.ts": "08c6fa54e7df1b50072a89995f773e5819b43a684402c4eb584543363bbeb035",
+    "tests/integration/ent-terminal-fixtures.mjs": "f3381505ba0c228f77d81bb0a43f75c3e65ff5283a13e6cefbe808225cfa3916",
+    "tests/integration/ent-terminal.test.mjs": "b420148d198679a6c80090441ad9f5735d1bb25894a7da3045ee609a1344d133",
+    "tests/pdf-ent-terminal.test.ts": "05defe43bd1baa867d2766676378a1af086150e752e5fee2b9f4d6fbfb9ba5d7"
+  },
+  "validation": {
+    "unitDistinctPassing": 37,
+    "unitFinalNewFilePassing": 22,
+    "unitExistingPassing": 15,
+    "unitPassingExecutionCohorts": [
+      34,
+      21,
+      22
+    ],
+    "authPassing": 2,
+    "productionDistinctPassing": 12,
+    "productionExecutions": 14,
+    "productionPassed": 13,
+    "productionFailed": 1,
+    "newStateEngineCasesPassed": 9,
+    "existingConsumerDistinctCasesPassed": 3,
+    "warningExtensionPassed": 1,
+    "initialStateCohortSignedPdfs": 19,
+    "independentArtifacts": 7,
+    "independentV9": 6,
+    "independentLegacyV8": 1,
+    "types": true,
+    "affectedLint": true,
+    "mutableDbParallelWithE2e": false
+  },
+  "failure": {
+    "firstCompatibilityCohort": {
+      "passed": 2,
+      "failed": 1
+    },
+    "unchangedDirectedRecheckPassed": 1,
+    "endpoint": "/api/context",
+    "code": "DATABASE_UNAVAILABLE",
+    "correlation": "2df689b8-4da6-4a2f-a8a0-237e9e87e2e1",
+    "postgresAt": "2026-11-08T21:33:27.617Z",
+    "postgresCause": "canceling statement due to statement timeout",
+    "rawLocalContext": "output/phase-d-work/ent-terminal-first-compatibility-error",
+    "pdfMismatch": false
+  },
+  "legacyControlledSha256": {
+    "cancelledV7": "8419425bd089a488079ca5cbd7e360986b5a7207d6eb5ed7e980667189edb721",
+    "administrativelyClosedV8": "17a8fcdae9e20be3714bc68563f649c9951977d361db4642613f51097896f20d"
+  },
+  "preservation": {
+    "oldBytesIncludingKnownWrongInstructionPreserved": true,
+    "sameKeyOldRevisionReplayed": true,
+    "personalClockAndActorPreserved": true,
+    "derivedVersionCreatesCurrentTask": false,
+    "ledgerChangedByIssuance": false,
+    "privateHelpersExposed": false,
+    "aestheticRedesign": false
+  },
+  "c108ReuseQualification": "Core history/archive/authorization sources unchanged. DocumentActions gained a passive legacy warning covered by the new Chromium extension; this consumer is no longer claimed identical to D4.9.",
+  "remote": "ENT_TERMINAL_REMOTE_MIGRATIONS.json",
+  "advisors": "ENT_TERMINAL_ADVISORS.json",
+  "baselineCi": "CI_9987804_OBSERVATION.json",
+  "independentProof": "d4-ent-terminal-proof/VERIFICATION.json",
+  "proofLfSha256": {
+    "CORPUS.json": "f72dae2c55bde6730602c65f179406ae38daa04c2f0553b8ef21276157ce86b1",
+    "root-5dbfb0612434136e.crt": "5dbfb0612434136e6d25aa21369759d15e59cae87b0aa953702b47737d4bb9e3",
+    "VERIFICATION.json": "c86577a16362cdf0b7e5680a1469ad844499efd78156324eeeb6063ff9cff3f1",
+    "verify.py": "5189273b38d189f75bcdfbb8a9a4be5bb1aeab99c5fe619e58c98fea78806e94"
+  },
+  "logsLfSha256": {
+    "ent-terminal-auth.log": "c457b86cec3729605d110437ed95557f70183cfdfc6d1467d1e1df90b0b60fa2",
+    "ent-terminal-before.log": "2d62f2a523f2938ca7df14eabfce7879748f22f69822ff00edfb50bf563f5bae",
+    "ent-terminal-compatibility-production.log": "c3f3bd0e4b180b6c7874b7e20f3f6f8cbea0fc47cddad27e4d27febe2616ffc3",
+    "ent-terminal-compatibility-recheck.log": "365dc37ba8573319fce51f22de40c448f5b087881916284c032de5d9fcf64f7d",
+    "ent-terminal-diffcheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-terminal-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-terminal-independent.log": "c1b31c52c3abcc9774bbf6f097e2c3f36eb723021ae50a3ef77e4434bfc9c4e7",
+    "ent-terminal-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-terminal-local-prepare.log": "837b0adb0c945e1aca7fb3df31bf2a6e1098030938dbbe37aef8a34181a3f2ac",
+    "ent-terminal-markdown.log": "28238132765d7cf79260e19ab6bc23ffc9a8df9746476a6fb84ceb33ef6f154d",
+    "ent-terminal-production.log": "cca02489e47118cbc8beb5c4db67b10735144e260e66f57127210f98e97bc67a",
+    "ent-terminal-remote-apply.log": "9811858332f07f91a9a968b283909007f1e56410268f1c669c201843e7ed9bc6",
+    "ent-terminal-remote-post.log": "1178da618564a3fe1b0c59421d4ad534a62c0fa56e639933f4ca815ff3be3a3f",
+    "ent-terminal-remote-preflight.log": "ddeae2a7d195ac61b4146fcda4347965608f3d82483a4d24cecd9a7466c0ba67",
+    "ent-terminal-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-terminal-unit-derived.log": "949fa6db95ca19e57dc2530e580596040b8e2c99709ddc5ace1e4aa12c5fd884",
+    "ent-terminal-unit-final.log": "65c1c10b7f2e8d15114726c11c2d21b0a32958202d5003766905cc1ea7f513a2",
+    "ent-terminal-unit.log": "8ab58869325f5200143467c09b64c58daeee9ed11a9680f4984da4ea3fc88d12",
+    "ent-terminal-warning-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-terminal-warning-production.log": "960e63d6b1d6f9bf715ae41f0a12951ab889ca1b0878bac1b54e3f9ad3e4437f",
+    "ent-terminal-warning-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "remaining": [
+    "Own published SHA CI",
+    "Other document types/states and attachments C105/C106",
+    "Tagged PDF, human/AT/physical device",
+    "D-C/D6 and external trust/time gates",
+    "Other executable D-B criteria"
+  ],
+  "goalComplete": false,
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "canonicalColumnsPreserved": 29,
+    "counts": {
+      "PASS": 45,
+      "PARTIAL": 50,
+      "NOT_STARTED": 10
+    },
+    "changedCriteria": [
+      "C-AC-105"
+    ]
+  },
+  "documentationValidation": {
+    "localLinks": 196,
+    "canonicalColumnsPreserved": 29,
+    "approvedComplementPreserved": true,
+    "changedCriteria": [
+      "C-AC-105"
+    ],
+    "reusedUnchangedHistoryArchiveSources": 17
+  },
+  "preservedFailureArtifactSha256": {
+    "error-context.md": "1ebdeff2c25ae50a0b707c9e8d05e6bedce70e11fd48fb414fd3f5a1a802c028",
+    "test-failed-1.png": "36f88420b4cf21fbff729cc9644be2df5d94fd6ec2774383928252ec65d19697"
+  }
+}

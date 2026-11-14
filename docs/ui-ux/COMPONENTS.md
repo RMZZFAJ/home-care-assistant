@@ -1,5 +1,9 @@
 # Componentes e responsabilidade
 
+**Regra visual vigente:**[Modelo Integral](CANONICAL_MODEL.md). Fluent UI foi
+descartado como aparência; o conteúdo AS_IS abaixo é histórico quando divergir
+da nova direção. Preservar funções e contratos durante a migração integral.
+
 Guia da base funcional auditada e de seus contratos requeridos. Os desvios
 A/B e as mudanças futuras C não foram corrigidos por este documento.
 Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
@@ -7,7 +11,8 @@ Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
 
 ## Contexto e navegação
 
-- ThemeProvider: tema Fluent e registro Griffel no SSR/streaming.
+- ThemeProvider: integração legada Fluent/Griffel ainda em retirada; não é a
+  fundação visual de destino. Novos componentes seguem CANONICAL_MODEL.md.
 - WorkspaceProvider: contexto confirmado pela API, troca explícita de vínculo
   e descarte de respostas antigas.
 - WorkspaceShell: cabeçalho, perfil, navegação lateral e navegação operacional.

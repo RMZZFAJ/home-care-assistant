@@ -1,0 +1,25 @@
+{
+  "at": "2026-11-08T00:51:28.946535+00:00",
+  "project": "qwfrqychokvhdzakibid",
+  "before": {
+    "rls_enabled_no_policy": 39,
+    "extension_in_public": 1,
+    "anon_security_definer_function_executable": 3,
+    "authenticated_security_definer_function_executable": 148,
+    "auth_leaked_password_protection": 1
+  },
+  "after": {
+    "rls_enabled_no_policy": 39,
+    "extension_in_public": 1,
+    "anon_security_definer_function_executable": 3,
+    "authenticated_security_definer_function_executable": 149,
+    "auth_leaked_password_protection": 1
+  },
+  "expectedDelta": {
+    "authenticated_security_definer_function_executable": 1
+  },
+  "interpretation": "One current-document-read policy RPC; authenticated only, no anonymous/service execute. No table, private grant or old function definition changed. Existing warnings retained.",
+  "remediation": "https://supabase.com/docs/guides/database/database-linter",
+  "rawLfSha256": "6435d19b2c139c659f333bf96931a30171dcf55124624ee13fcd0577c251e6df",
+  "operationalGo": false
+}

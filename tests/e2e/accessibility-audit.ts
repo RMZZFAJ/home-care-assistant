@@ -1,32 +1,120 @@
-import {expect} from "@playwright/test";
+import {expect, test} from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-export async function audit(page: import("@playwright/test").Page, label: string) {
-  await expect(page).toHaveTitle("Home Care Assistant");
+import { accessibilityEvidence } from "../support/accessibility-results";
+import { assertKeyboardEntry } from "./keyboard-entry";
+/** Whole-page composition checks start at a known scroll/focus origin after resize. */
+export async function auditFromTop(page: import("@playwright/test").Page, label: string, expectedTitle = "Home Care Assistant") {
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    window.scrollTo({ top: 0, behavior: "instant" });
+    return new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+  });
+  await audit(page, label, expectedTitle);
+}
+export async function audit(page: import("@playwright/test").Page, label: string, expectedTitle = "Home Care Assistant") {
+  await expect(page).toHaveTitle(expectedTitle);
   if (label === "login") await expect(page.getByLabel("E-mail", { exact: true })).toBeEnabled();
-  // Enter the application as a keyboard user. Tabster's document-edge
-  // sentinels redirect focus immediately and become untabbable inside the app.
-  // Keep every axe rule enabled and verify the redirect, rather than excluding
-  // hidden-focus findings (microsoft/tabster#288).
+  // Establish a known sequential origin before testing keyboard movement.
+  // BODY alone does not identify that origin after pointer/viewport changes.
+  // Keep all axe rules and the hidden/sentinel focus assertions enabled.
   if (await page.evaluate(() => !document.activeElement || [document.body, document.documentElement].includes(document.activeElement as HTMLElement))) {
-    await page.keyboard.press("Tab");
-    const skip = page.getByRole("link", { name: "Ir para o conteúdo", exact: true });
-    if (await skip.evaluateAll((items) => items.some((item) => item === document.activeElement))) {
-      await page.keyboard.press("Enter");
-      await expect(page.getByRole("main")).toBeFocused();
+    await page.evaluate(() => {
+      const state: { events: unknown[]; cleanup?: () => void } = { events: [] };
+      const target = (element: EventTarget | null) => element instanceof HTMLElement ? { tag: element.tagName, role: element.getAttribute("role"), tabIndex: element.tabIndex, dummy: element.hasAttribute("data-tabster-dummy"), hidden: Boolean(element.closest('[aria-hidden="true"]')) } : null;
+      const record = (event: Event) => { if (!(event instanceof KeyboardEvent) || ["Tab", "Enter"].includes(event.key)) state.events.push({ type: event.type, target: target(event.target), active: target(document.activeElement), documentFocused: document.hasFocus() }); };
+      for (const name of ["focusin", "focusout", "keydown"]) document.addEventListener(name, record, true);
+      state.cleanup = () => { for (const name of ["focusin", "focusout", "keydown"]) document.removeEventListener(name, record, true); };
+      (window as unknown as { hcaFocusEvidence: typeof state }).hcaFocusEvidence = state;
+    });
+    try {
+      await assertKeyboardEntry(page, label);
+    } finally {
+      const focus = await page.evaluate(() => {
+        const state = (window as unknown as { hcaFocusEvidence: { events: unknown[]; cleanup: () => void } }).hcaFocusEvidence;
+        state.cleanup();
+        return { events: state.events, activeTag: document.activeElement?.tagName, documentFocused: document.hasFocus() };
+      });
+      await test.info().attach("keyboard-entry-" + label.replaceAll(/[^a-z0-9-]/gi, "-"), { body: JSON.stringify(focus, null, 2), contentType: "application/json" });
     }
-    await expect.poll(() => page.evaluate(() => {
-      const active = document.activeElement;
-      return Boolean(active && active !== document.body && active !== document.documentElement && !active.hasAttribute("data-tabster-dummy") && !active.closest('[aria-hidden="true"]'));
-    }), { message: label + " keyboard entry must reach accessible content" }).toBe(true);
   }
   await page.waitForFunction(() => document.getAnimations().every((animation) => animation.playState !== "running" || animation.effect?.getComputedTiming().iterations === Infinity));
   const result = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
+  const evidence = accessibilityEvidence(label, result);
+  if (result.violations.some(item => item.id === "target-size")) {
+    const header = await page.locator(".app-header").evaluateAll(elements => elements.map(header => ({
+      bounds: header.getBoundingClientRect().toJSON(),
+      controls: Array.from(header.querySelectorAll<HTMLElement>("button,select,a")).map(element => {
+        const bounds = element.getBoundingClientRect(), style = getComputedStyle(element);
+        return { tag: element.tagName, className: element.className, bounds: bounds.toJSON(), padding: style.padding, lineHeight: style.lineHeight, display: style.display,
+          hit: [0.1, 0.5, 0.9].map(fraction => document.elementsFromPoint(bounds.left + bounds.width * fraction, bounds.top + bounds.height / 2).slice(0, 4).map(hit => ({ tag: hit.tagName, className: hit.getAttribute("class") }))) };
+      }),
+    })));
+    await test.info().attach("header-target-geometry", { body: JSON.stringify(header, null, 2), contentType: "application/json" });
+  }
+  await test.info().attach("axe-" + label.replaceAll(/[^a-z0-9-]/gi, "-"), {
+    body: JSON.stringify(evidence, null, 2), contentType: "application/json",
+  });
+  if (evidence.reviewRequired.length) test.info().annotations.push({
+    type: "accessibility-review-required",
+    description: label + ": " + evidence.reviewRequired.map((item) => item.rule).join(", "),
+  });
   expect(result.violations, label).toEqual([]);
   const size = await page.evaluate(() => ({
     width: document.documentElement.clientWidth,
     content: document.documentElement.scrollWidth,
   }));
+  if (size.content > size.width) {
+    const overflow = await page.evaluate(() =>
+      Array.from(document.querySelectorAll<HTMLElement>("body *"))
+        .filter((element) => {
+          const box = element.getBoundingClientRect();
+          return (
+            box.width > 0 &&
+            (box.left < 0 || box.right > document.documentElement.clientWidth)
+          );
+        })
+        .map((element) => ({
+          tag: element.tagName,
+          class: element.className,
+          label: element.getAttribute("aria-label"),
+          width: element.getBoundingClientRect().width,
+          left: element.getBoundingClientRect().left,
+          right: element.getBoundingClientRect().right,
+          overflow: getComputedStyle(element).overflowX,
+        })),
+    );
+    // Text can overflow while its parent's box still fits. Capture geometry,
+    // never the text itself, so a clipped header cannot mask the actual cause.
+    const overflowingText = await page.evaluate(() => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const results: { tag: string; class: string; textLength: number; left: number; right: number; width: number; clippedBy: string | null }[] = [];
+      let node: Node | null;
+      while ((node = walker.nextNode()) && results.length < 40) {
+        const parent = node.parentElement;
+        if (!parent || !node.textContent?.trim() || parent.closest('script,style,textarea,option,[hidden],[aria-hidden="true"],[inert]') || !parent.getClientRects().length) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        const box = range.getBoundingClientRect();
+        if (box.left >= 0 && box.right <= document.documentElement.clientWidth) continue;
+        let clippedBy: string | null = null;
+        for (let ancestor: HTMLElement | null = parent; ancestor; ancestor = ancestor.parentElement) {
+          if (["auto", "scroll", "hidden", "clip"].includes(getComputedStyle(ancestor).overflowX)) {
+            clippedBy = ancestor.tagName + "." + ancestor.className;
+            break;
+          }
+        }
+        results.push({ tag: parent.tagName, class: parent.className, textLength: node.textContent.length, left: box.left, right: box.right, width: box.width, clippedBy });
+      }
+      return results;
+    });
+    await test
+      .info()
+      .attach("horizontal-overflow-" + label.replaceAll(/[^a-z0-9-]/gi, "-"), {
+        body: JSON.stringify({ ...size, elements: overflow, overflowingText }, null, 2),
+        contentType: "application/json",
+      });
+  }
   expect(size.content, label + " overflow").toBeLessThanOrEqual(size.width);
 }

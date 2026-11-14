@@ -1,0 +1,50 @@
+[
+  {
+    "label": "req-current",
+    "code": "REQ-0001",
+    "issuanceId": "57f8f750-14ea-48ed-854a-5ef1a9464a88",
+    "documentId": "63750e8e-c9cd-4670-b267-d7c408fb5b82",
+    "version": 4,
+    "rendererRevision": 10,
+    "sha256": "8d13587e8f31552464f039a1306066aaeab8ad1596bc030670b3091ca7a6a178",
+    "sourceHash": "4f5f936062f2eea0d8e8ca7176770dc2bdc071b4f36d48940ffebcbeff3da87c",
+    "file": "req-current.pdf",
+    "publicRoot": "test-root-public.crt"
+  },
+  {
+    "label": "ent-missing",
+    "code": "ENT-0001",
+    "issuanceId": "46cd6857-2586-4f50-9b05-65abbaa48a6e",
+    "documentId": "7b58aa95-a080-4de1-a4d3-f5ef6efaac3a",
+    "version": 4,
+    "rendererRevision": 10,
+    "sha256": "8eff58508f1e29e30ed3ed9c47034d9ef8e12c5d272df25b2947fded2d1e3a37",
+    "sourceHash": "3be00783d89ce2e9d27496c33f9e28e61813adff68b63109658a6284f4d1e9cc",
+    "file": "ent-missing.pdf",
+    "publicRoot": "test-root-public.crt"
+  },
+  {
+    "label": "com-receipts",
+    "code": "COM-0001",
+    "issuanceId": "bcc7718e-065c-438a-a57c-0451ec6f4882",
+    "documentId": "5a0221f9-f693-48a1-a582-7bdf1de04265",
+    "version": 7,
+    "rendererRevision": 10,
+    "sha256": "08d7a5f1371006b4d4cdce548cf97d574e70edb9017e4442463ca20ff9277d76",
+    "sourceHash": "98bb094f6673a8998d1583eb890d44e55f7af454d300003b0c10abeb3334f7a2",
+    "file": "com-receipts.pdf",
+    "publicRoot": "test-root-public.crt"
+  },
+  {
+    "label": "bal-recount",
+    "code": "BAL-0001",
+    "issuanceId": "8242f3b7-3db6-4349-ad59-aa4ac0c3663a",
+    "documentId": "de03e56a-d82d-4ee4-8a40-a9480df59f92",
+    "version": 3,
+    "rendererRevision": 10,
+    "sha256": "b4710958694939231dba676d91527b17fcba8b5ecdf0fc820b05ba614c2e0d8b",
+    "sourceHash": "e6e5d4a1cfb6a8d11b29797234e751587ca7a14395e236162aa7d4afaab1241a",
+    "file": "bal-recount.pdf",
+    "publicRoot": "test-root-public.crt"
+  }
+]

@@ -1,0 +1,105 @@
+{
+  "at": "2026-11-08 07:28:54 UTC",
+  "sha": "f05754d581beaa6da410610d35982ca003e53a65",
+  "runId": 42438250256,
+  "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42438250256",
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "id": 128601670589,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "validatedSteps": [
+        "Run npm run check:contracts",
+        "Run npm run lint",
+        "Run npm run lint:markdown",
+        "Run npm run typecheck",
+        "Run npm run build"
+      ]
+    },
+    {
+      "id": 128601670701,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "validatedSteps": [
+        "Run npm run check:contracts",
+        "Run npm run lint",
+        "Run npm run lint:markdown",
+        "Run npm run typecheck",
+        "Run npm run build"
+      ]
+    },
+    {
+      "id": 128601670833,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success",
+      "validatedSteps": [
+        "Run npm run test:db:prepare",
+        "Run npm run test:migrations -- --replay-local --backup \"$HCA_LOCAL_BACKUP\"",
+        "Run npm run test:integration"
+      ]
+    },
+    {
+      "id": 128604683667,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success",
+      "validatedSteps": [
+        "Run npm run test:db:prepare",
+        "Run npm run test:db:seed",
+        "Run npm run test:harness -- --project=ios",
+        "Run npm run e2e -- --project=ios --shard=1/2"
+      ]
+    },
+    {
+      "id": 128604683702,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "success",
+      "validatedSteps": [
+        "Run npm run test:db:prepare",
+        "Run npm run test:db:seed",
+        "Run npm run test:harness -- --project=chromium",
+        "Run npm run e2e -- --project=chromium --shard=1/1"
+      ]
+    },
+    {
+      "id": 128604683709,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "success",
+      "validatedSteps": [
+        "Run npm run test:db:prepare",
+        "Run npm run test:db:seed",
+        "Run npm run test:harness -- --project=mobile",
+        "Run npm run e2e -- --project=mobile --shard=1/1"
+      ]
+    },
+    {
+      "id": 128604683720,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success",
+      "validatedSteps": [
+        "Run npm run test:db:prepare",
+        "Run npm run test:db:seed",
+        "Run npm run test:harness -- --project=ios",
+        "Run npm run e2e -- --project=ios --shard=2/2"
+      ]
+    },
+    {
+      "id": 128610754949,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "success",
+      "validatedSteps": []
+    }
+  ],
+  "validatesUnpublishedFieldIncrement": false,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false
+}

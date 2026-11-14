@@ -1,3 +1,5 @@
+import { requisitionDraftFields, requireRequisitionDraftFields } from "@/lib/validation/requisition-decisions";
+import { commitRequisitionDraft } from "@/lib/server/requisition-draft";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
@@ -13,10 +15,11 @@ import {
 
 const schema = z
   .object({
+    ...requisitionDraftFields,
     status: z.literal("cancelled"),
     reason: z.string().trim().min(3).max(1000),
   })
-  .strict();
+  .strict().superRefine(requireRequisitionDraftFields);
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -35,6 +38,10 @@ export async function PATCH(
     if (error) databaseError(error);
     if (!row)
       throw new ApiError("NOT_FOUND", "Requisição não encontrada.", 404);
+    if (input.draftCommit) {
+      await patientContext(auth, row.care_recipient_id);
+      return NextResponse.json({ data: await commitRequisitionDraft(auth.client, id, "cancel", input, { reason: input.reason }) });
+    }
     await patientContext(auth, row.care_recipient_id, "request", true);
     const data = await rpc(auth.client, "transition_requisition_status", {
       p_requisition_id: id,

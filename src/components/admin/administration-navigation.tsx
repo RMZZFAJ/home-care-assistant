@@ -1,6 +1,8 @@
 "use client";
+import { ActionButton } from "@/components/ui/controls";
 import Link from "next/link";
-import { Menu, MenuItemLink, MenuList, MenuPopover, MenuTrigger, Button } from "@fluentui/react-components";
+import { Menu } from "@base-ui/react/menu";
+import { MenuPopup } from "@/components/ui/floating";
 import { can } from "@/lib/client/capabilities";
 import type { WorkspaceContext } from "@/types/workspace";
 import { Icon, type IconName } from "@/components/ui/primitives";
@@ -16,6 +18,7 @@ const areas: { section: string; title: string; description: string; group: strin
   { section: "audit", title: "Auditoria", description: "Eventos e responsáveis preservados no histórico.", group: "Comunicação e controle", capability: "audit.read", icon: "history" },
   { section: "import", title: "Importação histórica", description: "Pré-validar e incorporar fontes físicas revisadas.", group: "Comunicação e controle", capability: "access.manage", icon: "upload" },
   { section: "profiles", title: "Contas globais", description: "Identidades e privilégios globais, separados dos vínculos locais.", group: "Administração global", capability: "access.manage", icon: "settings", globalOnly: true },
+  { section: "operations", title: "Monitoramento e suporte", description: "Incidentes técnicos, observações e políticas por ambiente.", group: "Administração global", capability: "access.manage", icon: "history", globalOnly: true },
 ];
 export function administrationAreas(context: WorkspaceContext) {
   const global = context.activeContext?.mode === "global" && context.globalAdministrationAllowed;
@@ -24,6 +27,6 @@ export function administrationAreas(context: WorkspaceContext) {
 export function AdministrationNavigation({ context, section }: { context: WorkspaceContext; section?: string | null }) {
   const allowed = administrationAreas(context);
   const query = context.patient ? "&careRecipientId=" + context.patient.id : "";
-  if (section) return <div className="hca-toolbar hca-administration-toolbar"><Link href={context.patient ? "/admin?careRecipientId=" + context.patient.id : "/admin"} prefetch={false}>Administração</Link><span aria-hidden="true">/</span><strong>{allowed.find((area) => area.section === section)?.title ?? "Área indisponível"}</strong><Menu><MenuTrigger disableButtonEnhancement><Button appearance="subtle" icon={<Icon name="more" />}>Outras áreas</Button></MenuTrigger><MenuPopover><MenuList>{allowed.map((area) => <MenuItemLink key={area.section} href={"/admin?section=" + area.section + query} icon={<Icon name={area.icon} />}>{area.title}</MenuItemLink>)}</MenuList></MenuPopover></Menu></div>;
+  if (section) return <div className="hca-toolbar hca-administration-toolbar"><Link href={context.patient ? "/admin?careRecipientId=" + context.patient.id : "/admin"} prefetch={false}>Administração</Link><span aria-hidden="true">/</span><strong>{allowed.find((area) => area.section === section)?.title ?? "Área indisponível"}</strong><Menu.Root><Menu.Trigger render={<ActionButton variant="quiet" />}>{<Icon name="more" />}Outras áreas</Menu.Trigger><MenuPopup>{allowed.map((area) => <Menu.LinkItem className="hca-menu-item" key={area.section} href={"/admin?section=" + area.section + query} >{<Icon name={area.icon} />}{area.title}</Menu.LinkItem>)}</MenuPopup></Menu.Root></div>;
   return <nav aria-label="Áreas administrativas" className="hca-administration-center">{[...new Set(allowed.map((area) => area.group))].map((group) => <section key={group}><div className="hca-section-heading"><h2>{group}</h2></div><div className="hca-compact-grid">{allowed.filter((area) => area.group === group).map((area) => <Link className="ui-card hca-admin-destination" key={area.section} href={"/admin?section=" + area.section + query} prefetch={false}><Icon name={area.icon} /><h3>{area.title}</h3><p>{area.description}</p></Link>)}</div></section>)}</nav>;
 }

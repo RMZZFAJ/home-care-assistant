@@ -90,8 +90,10 @@ do $$declare r jsonb;r2 jsonb;v_id uuid;v_rows jsonb;begin
   perform pg_temp.assert_ok((r->>'rejected')::integer=1,'historical counts reject coercion from text');
   r:=public.import_historical_requisitions('x','[{"physicalProtocol":11,"careRecipientId":"20000000-0000-4000-8000-000000000001","extraItems":[{"customName":"Fonte","productId":"fralda"}]}]');
   perform pg_temp.assert_ok((r->>'rejected')::integer=1,'historical extras cannot smuggle canonical product identities');
-  perform pg_temp.must_fail($q$select public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[{"productId":"fralda","currentStock":null,"urgent":false}]','[]','[]')$q$,'operational canonical lines still require known stock');
-  perform pg_temp.must_fail($q$select public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[]','[{"customName":"Fonte operacional","currentStock":null,"urgent":false}]','[]')$q$,'operational extra lines still require known stock');
+  perform pg_temp.must_fail($q$select public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[{"productId":"fralda","stockObservation":"observed","currentStock":null,"urgent":false}]','[]','[]')$q$,'an observed canonical count requires its value');
+  perform pg_temp.must_fail($q$select public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[]','[{"customName":"Fonte operacional","stockObservation":"observed","currentStock":null,"urgent":false}]','[]')$q$,'an observed extra count requires its value');
+  perform pg_temp.must_fail($q$select public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[{"productId":"fralda","stockObservation":"unknown","currentStock":0,"urgent":false}]','[]','[]')$q$,'unknown cannot smuggle a zero observation');
+  perform pg_temp.must_fail($q$select public.submit_requisition('20000000-0000-4000-8000-000000000001',gen_random_uuid(),'x','[]','[{"customName":"Fonte operacional","stockObservation":"unfilled","currentStock":7,"urgent":false}]','[]')$q$,'unfilled cannot smuggle an observed quantity');
 end;$$;
 
 reset role;

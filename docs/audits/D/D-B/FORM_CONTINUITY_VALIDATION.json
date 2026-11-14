@@ -1,0 +1,405 @@
+{
+  "increment": "D3.49",
+  "baseSha": "fde4e6112dfd6421034fde08c1a7bf23b4036666",
+  "status": "DIRECTED_LOCAL_IMPLEMENTATION_VALIDATED_OWN_SHA_CI_REQUIRED",
+  "sourceLfSha256": {
+    "src/components/schedules/schedule-console.tsx": "f8d3790064772c39ea782f105ebaa00a992fa6cba9ff52dfc25507ff6b7c1eaa",
+    "src/components/schedules/schedule-confirmation-panel.tsx": "d7ce4cafca583cd3001d96a96ab81f0f3f2accceb9f5ac88ad0bc5aba9c5eb25",
+    "src/components/schedules/use-schedule-confirmation.ts": "68c2c439e28b3624d4af2bef7d0f5d5d8dfc5de0ab237c8b95887ccdf37f8426",
+    "src/lib/schedules/confirmation.ts": "05fb22ad8a248ead1ca094b319d059978093450c57459ca9bd6f86a9bcfc7801",
+    "src/lib/validation/schedules.ts": "01d1fb7c939c3fabad18eaeace5e635ca9b95a7ecda2e0b14645f606b125e12d",
+    "src/components/schedules/schedule-forms.tsx": "902a35081846168158e3ad66ae33bf8e5ddfff331ee7dfb9e9f62683baea7f48",
+    "src/components/schedules/schedule-review.tsx": "9dc6a977dff1b79101417e4949a6b74de1f575e89d8d6cf14141ea3eb501b944",
+    "src/app/api/schedules/route.ts": "751ab142c6947884433e4065364e9d3121353e1b42562ea90a254cb1ceba9cb9",
+    "src/app/api/schedules/confirmation/route.ts": "fa22e695abc64787b825c4632b935644dacbd511ce6af4b1dc65e3bc5709f68b",
+    "src/app/canonical-ui.css": "e8a4735c4f8bcd417a68a8cf5a96cd70bda2ca3dac37e1d400e1e70af86a15cb",
+    "supabase/migrations/20261110105845_phase_d3_schedule_confirmation_read.sql": "b61e34ea7feb93ff177b6b1b14c04482a975d88a83cfe05154bc933cf8c98d65",
+    "tests/e2e/schedule-confirmation-recovery.spec.ts": "48ac68be49bb6ebfc78d4f5b28892f23d84c44be0a2d57f97b8d4419ffe516e7",
+    "tests/e2e/schedules.spec.ts": "af9cfd40f0e6eed4097951bc8720f0434e08635ef3c62208db2ee375204811e5",
+    "tests/integration/schedule-confirmation.test.mjs": "c7553ec895b82af294fd9841ccb94ef9f981f5e4b6e9e89089d7608e65ec7ee5"
+  },
+  "inventory": {
+    "consumers": 49,
+    "formTags": 51,
+    "classification": "initial source/contract review,not66/171 approval",
+    "sourceHashesMatch": true
+  },
+  "unitApi": {
+    "qualifiedDistinct": 15,
+    "pass": 15,
+    "fail": 0
+  },
+  "realAuth": {
+    "qualifiedDistinct": 7,
+    "nativeUnchangedPassed": 5,
+    "latestOwnRecoveryPassed": 2,
+    "stack": "home-care-assistant;API127.0.0.1:54321;DB127.0.0.1:54322",
+    "coverage": [
+      "own read/no mutation/other actor notfound",
+      "missing or revoked membership denied",
+      "lost write and inactive own history;new native writes denied",
+      "Auth-only execute,empty search_path",
+      "existing native decisions:ended series,concurrency,obsolete,disconnected worker,cancel"
+    ]
+  },
+  "browser": {
+    "qualifiedDistinct": 9,
+    "buildMode": "production",
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "cases": [
+      {
+        "title": "agenda só reenvia explicitamente a tentativa não encontrada e preserva envelope divergente",
+        "project": "chromium",
+        "archive": "schedule-recovery-envelope-production"
+      },
+      {
+        "title": "agenda só reenvia explicitamente a tentativa não encontrada e preserva envelope divergente",
+        "project": "mobile",
+        "archive": "schedule-recovery-envelope-production"
+      },
+      {
+        "title": "agenda só reenvia explicitamente a tentativa não encontrada e preserva envelope divergente",
+        "project": "ios",
+        "archive": "schedule-recovery-envelope-production"
+      },
+      {
+        "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+        "project": "chromium",
+        "archive": "schedule-recovery-production-first"
+      },
+      {
+        "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+        "project": "mobile",
+        "archive": "schedule-recovery-production-first"
+      },
+      {
+        "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+        "project": "ios",
+        "archive": "schedule-recovery-production-first"
+      },
+      {
+        "title": "agenda recupera a confirmação após recarregar sem reenviar a programação e recusa recibo de outra intenção",
+        "project": "chromium",
+        "archive": "schedule-recovery-context-production"
+      },
+      {
+        "title": "agenda recupera a confirmação após recarregar sem reenviar a programação e recusa recibo de outra intenção",
+        "project": "mobile",
+        "archive": "schedule-recovery-context-production"
+      },
+      {
+        "title": "agenda recupera a confirmação após recarregar sem reenviar a programação e recusa recibo de outra intenção",
+        "project": "ios",
+        "archive": "schedule-recovery-context-production"
+      }
+    ],
+    "runs": {
+      "schedule-recovery-production-first": {
+        "total": 9,
+        "expected": 6,
+        "unexpected": 3,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": false,
+        "reportSha256": "b6681db202e1d76a6cfc6a967f028a247d1561dc477ccd195cfb56ac71dbd92a"
+      },
+      "schedule-recovery-envelope-production": {
+        "total": 6,
+        "expected": 5,
+        "unexpected": 1,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": false,
+        "reportSha256": "922fcdd92127740240868d355fe0bb0c383a7f7510d24147e8e30a9adfa777f8"
+      },
+      "schedule-recovery-context-production": {
+        "total": 3,
+        "expected": 3,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true,
+        "reportSha256": "9518833c2d1b3947a7b4b870871723f34d77c4944bf2856c26cf5bc110f332e1"
+      }
+    },
+    "qualification": "Three unchanged native browser successes from first run;three successful explicit-retry cases from second run;three latest lost-response cases including controlled context503/manual retry and inactive own lookup. No repeated identity added.",
+    "viewports": [
+      1440,
+      1150,
+      850,
+      500,
+      320
+    ],
+    "axeAndKeyboard": true,
+    "sourceStableDuringEachRun": true,
+    "mutableDbSuiteInParallel": false
+  },
+  "remote": {
+    "projectId": "qwfrqychokvhdzakibid",
+    "project": "home-care-assistant",
+    "state": "ACTIVE_HEALTHY",
+    "status": "APPLIED_ONCE_189_TO_190",
+    "before": {
+      "versions": {
+        "count": 189,
+        "latest": "20261110091038",
+        "linesSha256": "127c8d22eea22a591e15ebe9d5d0b4922784b05e88198e73fd3e48b04cc33414"
+      },
+      "functions": [
+        {
+          "anon": false,
+          "auth": false,
+          "name": "require_schedule_management",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "bodyLfSha256": "800867e6a8f754c3a37f27fad473434bc3c9501f9b4fcfe9dd8a6887c23010cc",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "can_access_recipient",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "bodyLfSha256": "3ceeb5d4aaff863cbeb45158a633a52e71c694e6b204d1b8d700d3efe2699992",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_command",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "bodyLfSha256": "2b17a3303c9ac0bf12604665d954a85722202bfa32c0129e6a157adefd797804",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_workspace",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "bodyLfSha256": "26c09895c0ccfa3de9bfc8b7a3a6377523fc56d94f0bdca93cce899ddc8969b2",
+          "securityDefiner": true
+        }
+      ],
+      "temporaryProbes": 0
+    },
+    "after": {
+      "versions": {
+        "count": 190,
+        "latest": "20261110105845",
+        "linesSha256": "ad20288c5f1cd015b9b349de256f726e6e0c44a2fb22a8171aa8036d24102eb7"
+      },
+      "functions": [
+        {
+          "anon": false,
+          "auth": false,
+          "name": "require_schedule_management",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "bodyLfSha256": "800867e6a8f754c3a37f27fad473434bc3c9501f9b4fcfe9dd8a6887c23010cc",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "can_access_recipient",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "bodyLfSha256": "3ceeb5d4aaff863cbeb45158a633a52e71c694e6b204d1b8d700d3efe2699992",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_command",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "bodyLfSha256": "2b17a3303c9ac0bf12604665d954a85722202bfa32c0129e6a157adefd797804",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_confirmation",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "bodyLfSha256": "75fd77da62ee94b72e2a0db2989a7b0452a1e744309de768fc1147fac32d2c7a",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_workspace",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "bodyLfSha256": "26c09895c0ccfa3de9bfc8b7a3a6377523fc56d94f0bdca93cce899ddc8969b2",
+          "securityDefiner": true
+        }
+      ],
+      "temporaryProbes": 0
+    },
+    "nativeLegacyFourUnchanged": true,
+    "localRemoteEqual": true,
+    "dryRunEmpty": true,
+    "resetFixturesAuthMutation": false,
+    "newTables": 0,
+    "newReadOnlyRpc": 1,
+    "migration": "20261110105845_phase_d3_schedule_confirmation_read.sql",
+    "migrationLfSha256": "b61e34ea7feb93ff177b6b1b14c04482a975d88a83cfe05154bc933cf8c98d65",
+    "backupProcedure": "lightweight checks for owner-authorized synthetic disposable database;no redundant heavy backup",
+    "advisors": "Not repeated for this single read-only additive RPC;own ACL/config verified. Previous provider/platform findings remain."
+  },
+  "typecheck": 0,
+  "directedLint": 0,
+  "counterproofs": [
+    "First Auth fixture used adminB without membership;replaced with actual member reader. Second used invalid membership state inactive;corrected to native revoked. Guards retained.",
+    "First browser9:6pass/3fail;readonly recheck reserialized envelope property order. Same existing packet now returns without rewriting bytes;original exact-byte assertion retained.",
+    "Second browser6:5pass/1fail;real context/workspace DATABASE_UNAVAILABLE on iOS reload. UI offered Tentar novamente and packet remained. Latest test forces context503,asserts original packet/noPOST,then uses the actual retry control. No timeout/force/assert suppression.",
+    "npm on Windows consumed requested --project flags in first invocation;actual9 cases across all3 engines recorded. Later invocations call the official guarded runner directly with confirmed selection."
+  ],
+  "logSha256": {
+    "schedule-recovery-auth-final.log": "3e9e9c541aa2f28567ed6bec8b658294c4f65262f8e5e3c558d8915600989d4a",
+    "schedule-recovery-auth-scope.log": "d75db312109877f457a239f68c945a64a4c20b15b9f8b4fc2d273080f13e4299",
+    "schedule-recovery-auth.log": "0139a3dcc77fb92ec243ebdff8d58028145870a55d6b4abd16be93869123b8c8",
+    "schedule-recovery-context-format.log": "8e8f50c3597b3b14759a8859a40a0132fa0f05df2beb553c87ca190858e7cdab",
+    "schedule-recovery-context-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "schedule-recovery-context-production.log": "6253fd3182c14d6e3255d7d491f7c4b140d562ee08f08443e0fc37f54512325f",
+    "schedule-recovery-envelope-format.log": "735b1a5d8eb1fc3035b4df92c588119dca68b2693322fbbdefaf7d5295771626",
+    "schedule-recovery-envelope-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "schedule-recovery-envelope-production.log": "e743f8668c6e3e7f8fd3cc3dada7fd7acec501f0cab6bd81218fd37dfc73fe16",
+    "schedule-recovery-envelope-unit.log": "dbb79ba60a7f3c094805497fe2db835d2b4fdf98b574e19e9c2b4e0c927d60d7",
+    "schedule-recovery-format-final.log": "87c25d7b06a8b9777b772fbc13bf9256c13c4c733849fc6325138a0d19412ec1",
+    "schedule-recovery-format.log": "bcdce798920d427cf16702ade35fb9834ba09352311882ac952df5c4111e962f",
+    "schedule-recovery-lint-final.log": "646d08ac7a9b96eea0998ba88dff5a3fdf4a144cdc7e33dc17985e8794f1a34f",
+    "schedule-recovery-lint.log": "646d08ac7a9b96eea0998ba88dff5a3fdf4a144cdc7e33dc17985e8794f1a34f",
+    "schedule-recovery-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "schedule-recovery-production.log": "5841182cf71d3e72932a280c549dc35befdafad0ee0944e66b3af5b83bcd0d18",
+    "schedule-recovery-remote-apply.log": "26ee6aa5d2cbfe3eb40beae20aed05e18f024e4dd6fbfa54a2a1c91d1f52e76c",
+    "schedule-recovery-remote-dry-after.log": "d77102c47dbe17725adfd88b5aed2ce8316cf1842517c1af4897c58aa8b70caf",
+    "schedule-recovery-remote-dry-before.log": "473e6c47c4e7fda8d7c635be177789503bb8f80d78fbabe141661f70056f14c1",
+    "schedule-recovery-types-final.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "schedule-recovery-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "schedule-recovery-unit-final.log": "fc8d61c772b1ca5c811994c86ecad746106f81b9f0406edea7e16e8d0c376828",
+    "schedule-recovery-unit.log": "23f9b4e4eaed80da26f50b508d4727d07acd73fa49b3c09da70056d28b608f42",
+    "schedule-recovery-close-markdown.log": "87201b372c149d30aae54887cdea92c8fb9357aa8a647dcb12c9aa179ea2984a",
+    "schedule-recovery-close-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b"
+  },
+  "limits": [
+    "Private incomplete schedule and progress-note editors across devices remain to implement.",
+    "Inventory is initial,not exhaustive of every onclick/modal/variant.13 ordinary consumers and mixed/native/file/Auth boundaries still require review.",
+    "Human,AT,physical S24,provider and production are not proved by emulation.",
+    "Own SHA clean/legacy/full integration and all browser shards required;Sonar deferred;PR7 Draft."
+  ],
+  "documentaryChecks": {
+    "matrix105x39First30AndStatesPreserved": true,
+    "ui18StatesPreserved": true,
+    "ownerReport105Criteria": true,
+    "historicalMigrations84Unchanged": true,
+    "allPublishedMigrationsUnchanged": true,
+    "newLinksValid": 7,
+    "activeBreakWords": 0,
+    "diffCheck": true,
+    "markdownFiles": 10,
+    "ownedFiles": 24,
+    "markdownIssues": 0,
+    "finalTypecheckExit": 0,
+    "directedLintExit": 0,
+    "sourceStableAfterBrowser": true,
+    "newFileDiffCheck": true
+  },
+  "previousPublishedCiObservation": {
+    "sha": "fde4e6112dfd6421034fde08c1a7bf23b4036666",
+    "runId": 42802933301,
+    "qualification": "Point-in-time during D3.49;not own candidate approval",
+    "jobs": [
+      {
+        "id": 129784775462,
+        "name": "database",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129784775986,
+        "name": "validate (ubuntu-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129784776022,
+        "name": "validate (windows-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129791931750,
+        "name": "browser (mobile-2)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 129791931787,
+        "name": "browser (mobile-1)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 129791931790,
+        "name": "browser (ios-1)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 129791931817,
+        "name": "browser (chromium-2)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 129791931832,
+        "name": "browser (chromium-1)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 129791931835,
+        "name": "browser (ios-2)",
+        "status": "in_progress",
+        "conclusion": null
+      }
+    ],
+    "preview": "READY"
+  }
+}

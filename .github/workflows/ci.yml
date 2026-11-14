@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+# Superseded PR heads do not need to keep running. Push runs have unique groups.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   validate:
     strategy:
@@ -21,8 +26,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm install --global npm@11.21.1
-      - run: npm ci
+      - run: npm install --global --ignore-scripts npm@11.21.1
+      - run: npm ci --ignore-scripts
+      # The locked esbuild postinstall prepares its platform executable only.
+      - run: npm rebuild --offline --strict-allow-scripts esbuild
       - run: npm run check:contracts
       - run: npm run lint
       - run: npm run lint:markdown
@@ -46,8 +53,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm install --global npm@11.21.1
-      - run: npm ci
+      - run: npm install --global --ignore-scripts npm@11.21.1
+      - run: npm ci --ignore-scripts
+      # The locked esbuild postinstall prepares its platform executable only.
+      - run: npm rebuild --offline --strict-allow-scripts esbuild
       - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         with:
           version: 2.121.0
@@ -66,12 +75,33 @@ jobs:
         include:
           - project: chromium
             engine: chromium
+            shard: 1/2
+            artifact: chromium-1
+          - project: chromium
+            engine: chromium
+            shard: 2/2
+            artifact: chromium-2
           - project: mobile
             engine: chromium
+            shard: 1/2
+            artifact: mobile-1
+          - project: mobile
+            engine: chromium
+            shard: 2/2
+            artifact: mobile-2
           - project: ios
             engine: webkit
+            shard: 1/2
+            artifact: ios-1
+          - project: ios
+            engine: webkit
+            shard: 2/2
+            artifact: ios-2
+    name: browser (${{ matrix.artifact }})
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # WebKit reached only 162/242 cases before the old 40-minute job deadline.
+    # Keep the same shards, workers, assertions and retries; allow its full run.
+    timeout-minutes: ${{ matrix.engine == 'webkit' && 70 || 40 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Reserve the local Supabase ports
@@ -83,8 +113,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm install --global npm@11.21.1
-      - run: npm ci
+      - run: npm install --global --ignore-scripts npm@11.21.1
+      - run: npm ci --ignore-scripts
+      # The locked esbuild postinstall prepares its platform executable only.
+      - run: npm rebuild --offline --strict-allow-scripts esbuild
       - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         with:
           version: 2.121.0
@@ -100,17 +132,22 @@ jobs:
             if [ -f "$apt_source_file" ]; then
               sudo sed -i -E \
                 -e 's#https?://azure\.archive\.ubuntu\.com/ubuntu/?#https://archive.ubuntu.com/ubuntu/#g' \
-                -e 's#http://security\.ubuntu\.com/ubuntu/?#https://security.ubuntu.com/ubuntu/#g' \
+                -e 's#https?://security\.ubuntu\.com/ubuntu/?#https://security.ubuntu.com/ubuntu/#g' \
                 "$apt_source_file"
             fi
           done
       - run: npx playwright install --with-deps ${{ matrix.engine }}
-      - run: npm run e2e -- --project=${{ matrix.project }}
+      - run: npm run test:harness -- --project=${{ matrix.project }}
+      - run: npm run e2e -- --project=${{ matrix.project }} --shard=${{ matrix.shard }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: failure() || cancelled()
+        # A recovered retry is a successful job but still needs failure artifacts.
+        if: always()
         with:
-          name: browser-test-report-${{ matrix.project }}
-          path: playwright-report/
+          name: browser-test-report-${{ matrix.artifact }}
+          path: |
+            playwright-report/
+            test-results/
+            output/playwright/harness-results/
           retention-days: 7
 
   database-and-browser:

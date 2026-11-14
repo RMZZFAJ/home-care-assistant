@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { selectContext } from "./auth-context";
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
@@ -38,7 +39,7 @@ test("perfil pessoal salva registro e foto privada e notificações distinguem c
   expect(issued.ok()).toBeTruthy();
   const receipt = (await issued.json()).receipt;
   await page.goto("/perfil?careRecipientId=" + patientA);
-  await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
+  await selectProfileSection(page, "identity");
   await page
     .getByLabel("Categoria profissional", { exact: true })
     .fill("Profissional de homologação");
@@ -57,7 +58,7 @@ test("perfil pessoal salva registro e foto privada e notificações distinguem c
   })
     .png()
     .toBuffer();
-  await page.getByRole("button", { name: "Foto de perfil", exact: true }).click();
+  await selectProfileSection(page, "identity");
   await page.getByLabel("Nova foto", { exact: false }).setInputFiles({
     name: "perfil-ficticio.png",
     mimeType: "image/png",

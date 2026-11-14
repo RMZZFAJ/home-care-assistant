@@ -1,0 +1,180 @@
+{
+  "at": "2026-11-11T13:49:22.720711+00:00",
+  "increment": "D3.80",
+  "checkpoint": "06.2",
+  "status": "PARTIAL_POINT_LOCAL_BODY_6_OF_7",
+  "baseSha": "d36a2acebfc370f8e4a9d405fdc8e6a9a94900e4",
+  "implementedCompositions": [
+    "ENT-01",
+    "ENT-03",
+    "ENT-04",
+    "ENT-05",
+    "ENT-06",
+    "EST-04"
+  ],
+  "pendingComposition": "ENT-02:canonical task cards still need appearance and authorized recipient/direction summaries absent from the current minimal delivery_task_list output. This was already one of the seven compositions,not a new checkpoint.",
+  "distinctQualifiedCases": 30,
+  "qualification": {
+    "unchangedPassingCases": 27,
+    "finalRelatedReadCases": 3
+  },
+  "rounds": {
+    "first": {
+      "startTime": "2026-11-11T13:33:30.741Z",
+      "duration": 585839.379,
+      "expected": 27,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "relationsFinal": {
+      "startTime": "2026-11-11T13:46:05.985Z",
+      "duration": 69870.054,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "cases": [
+    {
+      "file": "delivery-cancellation.spec.ts",
+      "title": "ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "delivery-preparation.spec.ts",
+      "title": "P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "delivery-preparation.spec.ts",
+      "title": "P06 escala sugere, a família pode escolher outra pessoa e o profissional escalado não aceita em seu lugar",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "delivery-regularization.spec.ts",
+      "title": "P05 proposta e conferência independentes preservam autoria, recuperam o mesmo ato e produzem dossiê PDF",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "ent-canonical.spec.ts",
+      "title": "06.2 ENT selection and complete readonly review follow the model without shipment",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "ent-canonical.spec.ts",
+      "title": "06.2 dispatched ENT preserves five independent material fields and reversible canonical search",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "ent-canonical.spec.ts",
+      "title": "06.2 autonomous return declaration never presents declared quantities as shipped or received",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "purchase-origin.spec.ts",
+      "title": "COM começa sem compra presumida e emite doação explícita sem creditar estoque",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "transfer-follow-up.spec.ts",
+      "title": "Transfer follow-up CARE_TEAM creates without an origin link and separates agreement shipment and personal receipt",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "task-relations.spec.ts",
+      "title": "relação REQ para ENT abre fatos de expedição em leitura, recupera consulta e recusa outro paciente",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    }
+  ],
+  "positive": [
+    "Five independent ENT fields retain declared/dispatched,accepted,reconciled and pending quantities with native units.",
+    "Before dispatch,a transfer declaration shows only declared quantities;no shipped or received facts are fabricated.",
+    "Native no-origin CARE_TEAM to FAMILY return preserves distinct agreement,shipment and personal receipt;only designated recipient can accept.",
+    "Readonly review preserves chosen recipient,direction,selection justification and every material.",
+    "Cancellation displays confirmed consumption without another debit;real return and consumption reconciliation preserve native effects.",
+    "Administrative regularization retains proposal,personal acceptance,prior reconciliation,unknown physical situation and independent review.",
+    "Related reads recover503,reject wrong type and foreign patient and preserve ledger and original opening history."
+  ],
+  "visual": {
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "reference": "Canonical offline HTML computed properties and unchanged shared DefinitionGrid/MaterialReview/dialog foundation",
+    "capturing": "Real centered scrolling;hit-test top/bottom of captured node against fixed navigation;no hidden overlays or altered screenshot CSS",
+    "inspection": "Native320px first/last material captures inspected;all five fields and long names visible",
+    "allAxeRules": "Enabled",
+    "physicalDevice": "Not proved"
+  },
+  "counterproof": {
+    "failure": "Three old related-read selectors expected a combined code/accepted label.",
+    "baselineEvidence": "The4376e76 source already had code-only RelatedDocument labels and the accepted quantity in an adjacent paragraph.",
+    "correction": "Select the current exact code and independently assert accepted2 units in the same fulfillment cell;all original read-only,recovery and permission assertions retained.",
+    "preserved": "ent-transfer-first.json and ent-transfer-first-artifacts"
+  },
+  "checks": {
+    "types": "PASS",
+    "affectedLint": "PASS",
+    "markdown": "PASS"
+  },
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "newSql": false,
+    "expectedMigrations": 206,
+    "reconciliation": "Remote database is up to date;dry-run empty;206 versions;no Vault sync/reset/remote fixtures",
+    "migrations": 206
+  },
+  "limits": [
+    "06.2 remains85%:ENT-02 is not implemented or approved by these body changes.",
+    "Original105 acceptance statuses and18 UI statuses remain unchanged.",
+    "DOC-A/B/C/D unchanged;PDF appearance,mentions,20-minute views,cancellation science and simplified drafts remain separate.",
+    "Own published SHA CI required;no merge or production.",
+    "Human,screen-reader,native400%,physical Android/PWA andprovider gates remain.",
+    "Sonar:OWNER_DEFERRED_SONAR_CONFIGURATION;no Quality Gate approval."
+  ]
+}

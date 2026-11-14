@@ -1,3 +1,4 @@
+import { selectProfileSection } from "./profile-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync, mkdirSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
@@ -17,23 +18,26 @@ async function noOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 }
 async function capture(page: Page, name: string, project: string) {
-  mkdirSync("output/playwright/fluent", { recursive: true });
+  mkdirSync("output/playwright/canonical", { recursive: true });
   await page.waitForFunction(() => document.getAnimations().every((animation) => animation.playState !== "running" || animation.effect?.getComputedTiming().iterations === Infinity));
   await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-  await page.screenshot({ path: `output/playwright/fluent/${name}-${project}.png`, fullPage: await page.getByRole("dialog").count() === 0, animations: "disabled" });
+  await page.screenshot({ path: `output/playwright/canonical/${name}-${project}.png`, fullPage: await page.getByRole("dialog").count() === 0, animations: "disabled" });
 }
 
-test.describe("registro SSR Fluent", () => {
+test.describe("estilo canônico SSR", () => {
   test.use({ javaScriptEnabled: false });
   test("estilos do streaming permanecem no head sem cópias no corpo", async ({ page }) => {
     const response = await page.goto("/login?error=AUTHENTICATION_FAILED");
     expect(response?.ok()).toBe(true);
-    await expect(page.locator("head style[data-make-styles-rehydration]")).not.toHaveCount(0);
+    await expect(page.locator("head link[rel=stylesheet]")).not.toHaveCount(0);
+    await expect(page.locator(".hca-app-root")).toHaveCSS("background-color", "rgb(244, 246, 245)");
+    await expect(page.locator("[class*=fui-]")).toHaveCount(0);
+    await expect(page.locator("head style[data-make-styles-rehydration]")).toHaveCount(0);
     await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
   });
 });
 
-test("gestão Fluent troca contexto no submenu, mantém navegação e edita perfil sob demanda", async ({ page }, info) => {
+test("gestão canônica troca contexto no submenu, mantém navegação e edita perfil sob demanda", async ({ page }, info) => {
   const failures: string[] = [];
   page.on("pageerror", (error) => failures.push(error.message));
   await login(page, "shared");
@@ -41,14 +45,16 @@ test("gestão Fluent troca contexto no submenu, mantém navegação e edita perf
   await page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true }).click();
   await expect(page).toHaveURL(/\/perfil/);
   await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Identidade pessoal", exact: true })).toHaveAttribute("aria-expanded", "false");
-  await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
-  await expect(page.getByLabel("Nome", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Identidade pessoal", exact: true }).click();
-  await expect(page.getByLabel("Nome", { exact: true })).not.toBeVisible();
+  await selectProfileSection(page, "identity");
+  const name = page.getByLabel("Nome", { exact: true }), retainedName = await name.inputValue();
+  await expect(name).toBeVisible();
+  await selectProfileSection(page, "security");
+  await expect(name).not.toBeVisible();
+  await selectProfileSection(page, "identity");
+  await expect(name).toHaveValue(retainedName);
   await capture(page, "perfil", info.project.name);
   await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("menuitem", { name: "Mudar perfil", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true }).click();
   await expect(page.getByRole("menu", { name: "Contextos autorizados", exact: true })).toBeVisible();
   await page.getByRole("menuitem", { name: "← Voltar ao menu", exact: true }).click();
   await expect(page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true })).toBeFocused();
@@ -93,7 +99,7 @@ test("documentos comuns, histórico com URL e estoque têm apresentação real e
   await post("/api/invitations/accept", { token: new URLSearchParams(new URL(invitation.invitationUrl).hash.slice(1)).get("token") });
   await logout();
   await login(page, "adminA", patient);
-  let ent = (await post("/api/documents", { careRecipientId: patient, type: "ENT", payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixture.professional.id, lines: [{ productId: "fralda", quantity: "2", requisitionItemIds: [reqData.requisition_items[0].id] }] }, idempotencyKey: crypto.randomUUID() })).data;
+  let ent = (await post("/api/documents", { careRecipientId: patient, type: "ENT", payload: { recipientReason: "Escolha manual fictícia para este recebimento",  source: "FAMILY", destination: "CARE_TEAM", recipientId: fixture.professional.id, lines: [{ requestFulfillment: "complete", productId: "fralda", quantity: "2", requisitionItemIds: [reqData.requisition_items[0].id] }] }, idempotencyKey: crypto.randomUUID() })).data;
   await logout();
   await login(page, "professional", patient);
   ent = (await post("/api/documents/" + ent.id, { action: "receive", expectedVersion: ent.version, body: { divergences: [] }, idempotencyKey: crypto.randomUUID() })).data;
@@ -111,9 +117,9 @@ test("documentos comuns, histórico com URL e estoque têm apresentação real e
   }
   await page.goto("/historico?careRecipientId=" + patient + "&type=ENT&search=" + ent.code);
   await expect(page.getByRole("combobox", { name: "Ficha", exact: true })).toHaveValue("ENT");
-  await expect(page.getByLabel("Código ou protocolo", { exact: true })).toHaveValue(ent.code);
+  await expect(page.getByLabel("Buscar por código ou protocolo", { exact: true })).toHaveValue(ent.code);
   await page.reload();
-  await expect(page.getByLabel("Código ou protocolo", { exact: true })).toHaveValue(ent.code);
+  await expect(page.getByLabel("Buscar por código ou protocolo", { exact: true })).toHaveValue(ent.code);
   await expect(page.getByRole("link").filter({ hasText: ent.code })).toHaveAttribute("href", "/documentos/" + ent.id);
   await capture(page, "historico-filtros-mobile", info.project.name);
   await page.goto("/estoque?careRecipientId=" + patient + "&custody=FAMILY");
@@ -134,10 +140,10 @@ test("operação móvel oferece cinco destinos e caixa de entregas autorizada", 
   for (const label of ["Início", "Histórico", "Entregas", "Estoque", "Mais"]) await expect(navigation.getByRole("link", { name: label, exact: true })).toBeVisible();
   await capture(page, "inicio-equipe-mobile", info.project.name);
   await navigation.getByRole("link", { name: "Entregas", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Entregas e recebimentos", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entregas, devoluções e recebimentos", exact: true })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Responsável pelas entregas", exact: true })).toHaveValue("own");
   await noOverflow(page);
-  const response = await page.request.get(`/api/deliveries?careRecipientId=${patientA}&scope=own`);
+  const response = await page.request.get(`/api/deliveries?careRecipientId=${patientA}&scope=own&status=pending_receipt`);
   expect(response.ok()).toBeTruthy();
   const context = (await (await page.request.get("/api/context")).json()).data;
   for (const row of (await response.json()).data) expect(row.recipient_id).toBe(context.userId);
@@ -227,6 +233,7 @@ test("ocorrências e notificações preservam saldos e distinguem estados no apl
   await expect(page.getByRole("heading", { name: "Relatos registrados", exact: true })).toBeVisible();
   await capture(page, "ocorrencias-lista", info.project.name);
   await page.getByRole("button", { name: "Registrar ocorrência", exact: true }).click();
+  await page.getByRole("dialog",{name:"Registrar relato",exact:true}).getByLabel("Custódia",{exact:true}).selectOption("CARE_TEAM");
   await page.getByLabel("O que aconteceu?", { exact: true }).fill("Rascunho visual de ocorrência sem movimentação");
   await noOverflow(page);
   await capture(page, "ocorrencia-edicao", info.project.name);

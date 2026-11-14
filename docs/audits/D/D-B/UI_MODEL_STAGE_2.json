@@ -1,0 +1,820 @@
+{
+  "at": "2026-11-09T08:11:54.063663+00:00",
+  "baseSha": "94f36eb7b6742b0c9736c8027ac9a6d55440d593",
+  "sourceLfSha256": {
+    "src/app/canonical-ui.css": "979bf6df60965c9db0d1ac8c2d886a55c54f2887c62f9c896c8a013ed1385327",
+    "src/components/admin/admin-fields.tsx": "243955c1d40d8b32448e76c1657b174f044c1a1ee535a7138a6a58aa4ac096b9",
+    "src/components/admin/administration-navigation.tsx": "634d285daa8a3a4e6529ba9f70ed8e3ffc3039688aa0e958eaf5b5b4c5f9c38e",
+    "src/components/admin/audit-history.tsx": "f8b297a72cbec5c42fd16271f06fcd939fd9cc00f1047c550ff2de3f44247866",
+    "src/components/admin/catalogue-management.tsx": "b7895dd786b462c80d35c939eb0b827ae8db5701d49efa7f8da7b61c0b6a7b9e",
+    "src/components/admin/credential-review.tsx": "a0ca424463c0ea2221fdc01cee687e1622a8f8b617f881deb6e64719dcd88401",
+    "src/components/admin/global-accounts.tsx": "d9c336b87005a9d6c4cdae7edca05035a4c560196d689e23f451320ecf544c11",
+    "src/components/admin/governance-proposals.tsx": "99ac27d4cfdd9fa5ddfa994a543d1d79c03b5e6633c7a2bb866d45f8d00529c6",
+    "src/components/admin/membership-impact.tsx": "c8fa2d29047f9bb5de4f8a0cb021a4196ff37a43afe5d560924a44b48d15c747",
+    "src/components/admin/membership-management.tsx": "689b2b3628c42c08712a7ee7c9b4444398457e07281a2649a7553035ce250de2",
+    "src/components/admin/notification-matrix.tsx": "cb8eb50a82a30ae97d7ccdc3ce87cf0325656c9f13501c316a78685aa7d6545f",
+    "src/components/admin/permission-matrix.tsx": "0898718d1cd9e3d8cdd1371d4e4a17bf681902374af368f7a9ebb9aaa43660c6",
+    "src/components/admin/policy-console.tsx": "622645fb4f8a21a0559397258e05df33773f9a7853c8803f7830dda52d7ae09c",
+    "src/components/admin/policy-rules.tsx": "f14e7c9abda965afe1ecc90ff3279927b7f545ecaf2cb0fe9aa45de1d85a8c5d",
+    "src/components/app-shell.tsx": "c493b70bfa2ba24ae79bd6957165742c139aa08401d89169bef4974c1960794e",
+    "src/components/auth/login-form.tsx": "a96e07e692e3b8222bf8a6823d69248d2f13f6290714cad0f628e8af03c80569",
+    "src/components/balances/balance-console.tsx": "7b8b227b6562525b6594e076d0b83b4870d794f741abe91a9913b06a87474830",
+    "src/components/balances/balance-count-fields.tsx": "7c34d66a5e5ccd1086229f56dc7d0411a27a73ab148cc1f5352608fe0a889f23",
+    "src/components/balances/balance-count-wizard.tsx": "b8d483b55f3f63281751f46fda203ab75beb3511aae3d89bcaf060c88a46596a",
+    "src/components/balances/balance-forms.tsx": "ef41872a4576715750f20cf93c51e100c8259d998a502210e52473111c6a1424",
+    "src/components/balances/balance-recount-assignment.tsx": "a595dc297073d4cc6dc8b473469f74aceab51dbe8794747fe4b8bf9ac2d7cb77",
+    "src/components/catalog/catalogue-identity-management.tsx": "cb47da5f7549003b6472e75840ed345aed541bc81af66ae5fc6b8008fe11beff",
+    "src/components/catalog/presentation-management.tsx": "3a88d3e59b118c85bb333fe14cb8421d2817b9bff9527e18e0fb7a82ed33b7f2",
+    "src/components/catalog/unit-console.tsx": "8b4ef4e4caa4afcc92eeb0ff38f40b1d2fb4fb29b3ea450b7f3e6293c7b4d96e",
+    "src/components/dashboard.tsx": "b62e7a707e5a792783cef908ddeae3d3a178fe0a96fde4cf75510e8d7c39e228",
+    "src/components/dashboard/dashboard-summary.tsx": "ea3e1de711d5ecd666add3de47e986fa4cb52c0bddb06958d35910adfd21ceba",
+    "src/components/dashboard/task-list.tsx": "6e250f1475f97f9f0033505ea059f9884d5f3515b8bb8c25b9f15974ef16da92",
+    "src/components/documents/balance-review.tsx": "7f38f912b361b3baf6eb43df9ac38f0cf8a8acbab57bb257ba420f904dbf978d",
+    "src/components/documents/delivery-inbox.tsx": "cbf8af9cb1196880fcf742851396aaa08af962ee1d0558ae92b72f0daa5a033f",
+    "src/components/documents/delivery-regularization.tsx": "06e595f87ae2b46dc3d02448604714c6ed175984556429d3a0ba1049250ed40b",
+    "src/components/documents/presentation-quantity.tsx": "1180e52948468c0ebd894d67eefe0819e84bc16a04441199c3fbadf4a2aa64ce",
+    "src/components/documents/transfer-console.tsx": "50af6e91969a79825d22d8ee7ae345f282c8d0bbd1acf6b35fd82942cac1ab97",
+    "src/components/documents/transfer-details.tsx": "23318170bced8d73f247a060ca12eaf049a2bf16206f14c7fe52961128da5644",
+    "src/components/forms/creation-draft-panel.tsx": "7f38761312869507a92e1cef1b947e47d3f10e0c909136c1baa038e2250501bb",
+    "src/components/forms/settings-section.tsx": "fa30e747b8275ab36021ee9810fabb974659e78e23ad3264c9043321a6e737a0",
+    "src/components/forms/wizard-actions.tsx": "cadaba4a6ce0cfea367d226db81ae6523487a9a7a95909bebe60c0dc9c452c85",
+    "src/components/layout/workspace-shell.tsx": "770548af9a5d26be689ea16a8ef90cae0721e748e5b7baf4354b660938472f35",
+    "src/components/notifications/notification-center.tsx": "4dbee36cdb3e558ffe2a9d97a050e1936055e652b6271a4f0828b77854f35de8",
+    "src/components/notifications/notification-reference.tsx": "2d4713833ddc84d73aec1dcae21a39a6bc9870f847f91cbd8bb4edeb1b74226b",
+    "src/components/requisitions/recurring-selection.tsx": "92352e7691018a1c41880971ed8e9a369ced711cfc19fc0b68c5f50ce87e1ebd",
+    "src/components/requisitions/remaining-need-reference.tsx": "a391cfa5e996de7f9b01c0871fe660c9906f85db746d637cc64ef20cb497e234",
+    "src/components/schedules/schedule-console.tsx": "03feba44199f9998b001432f844e0a098f5ea7a1c4b56c1c8fbb45219026cca3",
+    "src/components/schedules/schedule-forms.tsx": "902a35081846168158e3ad66ae33bf8e5ddfff331ee7dfb9e9f62683baea7f48",
+    "src/components/schedules/selected-shift-dates.tsx": "523a53d8852d6b5ad56ffa643820ee65135ae4e9375f1dcfa677cab213cebe21",
+    "src/components/stock/consumption-console.tsx": "21ca16f54999d48fa38b8a59cd5296cb52cc80bf4f6286c618afc63cf6efbb2a",
+    "src/components/stock/consumption-decision.tsx": "350e50f692700690af2326d8939ce28225f20037faed6c32b2570abc36e78b78",
+    "src/components/stock/consumption-detail.tsx": "47da24adf294e42e16286ab2e5834a0a21d6cfabd3fb0ca2a19126da9abbee2d",
+    "src/components/stock/consumption-editor.tsx": "9b0de403883455576373ed9933da525f9c91c3bd900b79bebe131577948be774",
+    "src/components/stock/movement-origin.tsx": "109d64df8baa7b112eeecbf0c7933b1c5b9018b629b6bfbce845ae62a6e1f832",
+    "src/components/stock/stock-console.tsx": "6c514d3d39681a862011d7eeba47e01c81e3816fe65a16d5e0f53dfd8fae348e",
+    "src/components/stock/stock-overview.tsx": "8db2e5f191ced6fb1adb63ac745f88464f552f724026ef164ddf15fa35e27e7c",
+    "src/components/ui/controls.tsx": "8c3550faad2b86468b8986af55c9fbe6fe989cf62554b16c10e495f605526c77",
+    "src/components/ui/feedback.tsx": "562eff9788db030593f4a3331ec48a2f08ddad6360b5a270e804c2c370e467a7",
+    "src/components/workspace.tsx": "6a2b357290da40003487461870aa7a10ea6db9fd72eca1761b400f8ea04e2dcd",
+    "src/theme/tokens.css": "befd84602785864485116daa29dd4113d792df49ea8356192421e921f11813c0",
+    "tests/e2e/accessibility-audit.ts": "c9e3722aed468c9456fbbe96b0edf12b3a6cd970607e98630bce939cfc56de09",
+    "tests/e2e/governance-recovery.spec.ts": "fa36c9a6b5f21c98ed1f986503803045bee513f65186d9b3c0b2b1d2fe87d6f0"
+  },
+  "nativeMigration": [
+    {
+      "file": "src/components/admin/admin-fields.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Checkbox",
+        "Field",
+        "Input",
+        "Select",
+        "InputProps"
+      ]
+    },
+    {
+      "file": "src/components/admin/administration-navigation.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/admin/audit-history.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Field",
+        "Input",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/admin/catalogue-management.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Badge",
+        "Button",
+        "Field",
+        "Input",
+        "Select",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/components/admin/credential-review.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Checkbox",
+        "Field",
+        "Select",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/admin/global-accounts.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Badge",
+        "Button",
+        "Field",
+        "Input",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/admin/governance-proposals.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Field",
+        "Input",
+        "Select",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/components/admin/membership-impact.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/admin/membership-management.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Badge",
+        "Button",
+        "Field",
+        "Input",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/admin/notification-matrix.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Checkbox",
+        "Input",
+        "Select",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/components/admin/permission-matrix.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Badge",
+        "Button",
+        "Input",
+        "Select",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/components/admin/policy-console.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/admin/policy-rules.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Checkbox",
+        "Field",
+        "Input",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/app-shell.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Input",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/auth/login-form.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Field",
+        "Input",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-console.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Badge",
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-count-fields.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Field",
+        "Input",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-count-wizard.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-forms.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Checkbox",
+        "Field",
+        "Input",
+        "Select",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-recount-assignment.tsx",
+      "fieldsMigrated": false,
+      "migrated": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/catalog/catalogue-identity-management.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/catalog/presentation-management.tsx",
+      "fieldsMigrated": false,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/catalog/unit-console.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Input",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/components/dashboard/task-list.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Badge"
+      ]
+    },
+    {
+      "file": "src/components/dashboard.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/documents/balance-review.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/documents/delivery-inbox.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Select",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/documents/delivery-regularization.tsx",
+      "fieldsMigrated": false,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/documents/presentation-quantity.tsx",
+      "fieldsMigrated": false,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/documents/transfer-console.tsx",
+      "fieldsMigrated": false,
+      "migrated": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/documents/transfer-details.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Field",
+        "Spinner",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/forms/creation-draft-panel.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/forms/settings-section.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/forms/wizard-actions.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/notifications/notification-center.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Badge",
+        "Checkbox"
+      ]
+    },
+    {
+      "file": "src/components/notifications/notification-reference.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/requisitions/recurring-selection.tsx",
+      "fieldsMigrated": false,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/requisitions/remaining-need-reference.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/schedules/schedule-console.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Badge",
+        "Button",
+        "Field",
+        "Input",
+        "Select",
+        "Spinner",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/schedules/schedule-forms.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Checkbox",
+        "Field",
+        "Input",
+        "Select",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/schedules/selected-shift-dates.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/consumption-console.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/consumption-decision.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/consumption-detail.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/consumption-editor.tsx",
+      "fieldsMigrated": false,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/movement-origin.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/stock/stock-console.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/stock-overview.tsx",
+      "fieldsMigrated": true,
+      "migrated": [
+        "Badge",
+        "Button",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    }
+  ],
+  "validation": {
+    "distinctProductionBrowserPassed": 20,
+    "cohorts": {
+      "initialUnchangedProductPassed": 3,
+      "remainingPassed": 17
+    },
+    "cases": [
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\administration.spec.ts:325:7 › administração integrada no ambiente local › seletores administrativos salvam destinatário e limites por produto e custódia"
+      },
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\balance-shifts.spec.ts:42:5 › BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real"
+      },
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\field-validation.spec.ts:43:5 › C026 REQ anuncia erro no campo e conserva extra e observação de 1001 caracteres até corrigir e emitir 1000"
+      },
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\governance-recovery.spec.ts:120:5 › D3 lista encontra proposta antiga e compara cinco tipos sem decidir por leitura ou vazar outro paciente"
+      },
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\notification-read-states.spec.ts:58:5 › D3 central distingue demora falha resposta inválida e vazio confirmado e limita leitura à sessão"
+      },
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\purchase-receipts.spec.ts:114:5 › COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos"
+      },
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\record-drawer-focus.spec.ts:16:38 › RecordDrawer 390: continuar, descartar, Escape e salvar conservam foco e intenção"
+      },
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\schedule-decisions.spec.ts:87:5 › C-FINAL023 escala recupera leitura e preserva foco sem validar fuso proposto como input"
+      },
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\typed-fields.spec.ts:24:5 › CFinal019 catálogo e unidade preservam inteiros, código textual e escopo com persistência real"
+      },
+      {
+        "project": "chromium",
+        "case": "tests\\e2e\\typed-fields.spec.ts:91:5 › CFinal019 login, nova senha e OTP usam contratos distintos sem persistir desafio no navegador"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\administration.spec.ts:325:7 › administração integrada no ambiente local › seletores administrativos salvam destinatário e limites por produto e custódia"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\balance-shifts.spec.ts:42:5 › BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\field-validation.spec.ts:43:5 › C026 REQ anuncia erro no campo e conserva extra e observação de 1001 caracteres até corrigir e emitir 1000"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\governance-recovery.spec.ts:120:5 › D3 lista encontra proposta antiga e compara cinco tipos sem decidir por leitura ou vazar outro paciente"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\notification-read-states.spec.ts:58:5 › D3 central distingue demora falha resposta inválida e vazio confirmado e limita leitura à sessão"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\purchase-receipts.spec.ts:114:5 › COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\record-drawer-focus.spec.ts:16:38 › RecordDrawer 390: continuar, descartar, Escape e salvar conservam foco e intenção"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\schedule-decisions.spec.ts:87:5 › C-FINAL023 escala recupera leitura e preserva foco sem validar fuso proposto como input"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\typed-fields.spec.ts:24:5 › CFinal019 catálogo e unidade preservam inteiros, código textual e escopo com persistência real"
+      },
+      {
+        "project": "ios",
+        "case": "tests\\e2e\\typed-fields.spec.ts:91:5 › CFinal019 login, nova senha e OTP usam contratos distintos sem persistir desafio no navegador"
+      }
+    ],
+    "typecheck": "PASS",
+    "directedLint": "PASS",
+    "fullSuiteDelegatedToOwnShaCi": true,
+    "authenticationTraceAndScreenshotProtectionPreserved": true
+  },
+  "logLfSha256": {
+    "native-e2e.log": "880e0253c7c453ceed5ecf515aa66439d4dd34afa0e8e646a2cff197eff1b567",
+    "native-header-probe.log": "32456b8086036438baaa55448895614a0854e09163dcd6b0bfa7f263031df6ae",
+    "native-remainder-e2e.log": "5e74c64dd71f474b0966e3241f98ecabc7bf510e3b21ff89ca5ec0c16b6a6f9c",
+    "native-list.log": "f9aa4a9ba46704b8a9f0f49d2e7df2fcb8c031a8efd97d148796ae8502ab9f3e",
+    "native-remainder-list.log": "4a12c5e6231bb9260a9ed5c5c60a0b050f8a6418624fa360f3c2aa2033107181",
+    "native-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-lint-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-test-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "counterproofs": {
+    "failure": "Axe target-size on body Clear filters control partly beneath sticky header after comparison expansion and viewport change",
+    "diagnosis": "Header controls did not overlap;actual failing target identified from complete Axe node and geometry",
+    "correction": "Known task origin for governance viewport snapshots;all Axe/width/business assertions unchanged",
+    "geometryAndFailureArtifacts": {
+      "output\\phase-d-work\\ui-canonical\\native-header-failure\\error-context.md": "9423e6df174897ca701270f4cea54b59b0bcb3faf2a0ef047c0f5befc9854125",
+      "output\\phase-d-work\\ui-canonical\\native-header-failure\\geometry.json": "4ee2d01ae69e2a4bf02e2603ff88f990b8ca82ba8240bdac94b7ab1b1741d5e0",
+      "output\\phase-d-work\\ui-canonical\\native-header-failure\\test-failed-1.png": "ba48897104b53bcc2a668e494c4fdcb03c2bbe357f1fb3020d30e25ebc610f48"
+    }
+  },
+  "localMigrations": {
+    "count": 164,
+    "last": "20261109024515",
+    "versions_sha256": "178b8f89324a10bc2de1b146640897a30ee243452a2f5a68c50f396ea0bae6bc"
+  },
+  "remoteAndBaseCi": "UI_MODEL_NATIVE_OBSERVATION.json",
+  "remainingFluentImports": [
+    {
+      "file": "src/components/admin/administration-navigation.tsx",
+      "imports": [
+        "Menu",
+        "MenuItemLink",
+        "MenuList",
+        "MenuPopover",
+        "MenuTrigger"
+      ]
+    },
+    {
+      "file": "src/components/admin/notification-matrix.tsx",
+      "imports": [
+        "Tooltip"
+      ]
+    },
+    {
+      "file": "src/components/admin/permission-matrix.tsx",
+      "imports": [
+        "Menu",
+        "MenuItemRadio",
+        "MenuList",
+        "MenuPopover",
+        "MenuTrigger"
+      ]
+    },
+    {
+      "file": "src/components/auth/logout-button.tsx",
+      "imports": [
+        "MenuItem"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-recount-assignment.tsx",
+      "imports": [
+        "Combobox",
+        "Field",
+        "Option",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/catalog/presentation-management.tsx",
+      "imports": [
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/documents/delivery-recipient.tsx",
+      "imports": [
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/documents/delivery-regularization.tsx",
+      "imports": [
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/documents/presentation-quantity.tsx",
+      "imports": [
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/documents/supply-command-fields.tsx",
+      "imports": [
+        "useMergedRefs"
+      ]
+    },
+    {
+      "file": "src/components/documents/transfer-console.tsx",
+      "imports": [
+        "Combobox",
+        "Field",
+        "Input",
+        "Option",
+        "Select",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/guides/residence-preparation.tsx",
+      "imports": [
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "imports": [
+        "Avatar",
+        "MenuDivider",
+        "MenuItem",
+        "MenuItemRadio",
+        "MenuList",
+        "Popover",
+        "PopoverSurface",
+        "PopoverTrigger"
+      ]
+    },
+    {
+      "file": "src/components/notifications/notification-bell.tsx",
+      "imports": [
+        "Popover",
+        "PopoverSurface",
+        "PopoverTrigger"
+      ]
+    },
+    {
+      "file": "src/components/requisitions/recurring-selection.tsx",
+      "imports": [
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/stock/consumption-editor.tsx",
+      "imports": [
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/theme/providers.tsx",
+      "imports": [
+        "createDOMRenderer",
+        "FluentProvider",
+        "RendererProvider",
+        "renderToStyleElements",
+        "SSRProvider",
+        "webLightTheme"
+      ]
+    }
+  ],
+  "reactReview": {
+    "nativeComponentProps": true,
+    "nativeCallbackPayloads": true,
+    "capturedValuesForDeferredState": true,
+    "stableFieldsAndIds": true,
+    "noNewClientEffects": true,
+    "scopeAndCommandIntentUnchanged": true,
+    "legacyTableRulesRemoved": 6
+  },
+  "matrix": {
+    "legacyRows": 105,
+    "columns": 39,
+    "first30Preserved": true,
+    "PASS": 56,
+    "PARTIAL": 49,
+    "additionalUiRequirements": 18
+  },
+  "remainingGate": [
+    "17 Fluent files,including composed controls/menus/provider",
+    "Full shell/styles and whole-product visual comparison",
+    "REQ/COM/ENT/BAL tabs and real persisted Andamentos",
+    "Complete feature parity and66 tasks/171 relations",
+    "Own SHA CI",
+    "Human/AT/device/provider D-C/D6"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false,
+  "goalComplete": false,
+  "documentationValidation": {
+    "markdown": "PASS;5 files;0 issues",
+    "links": "PASS;new relative targets exist",
+    "json": "PASS",
+    "canonicalMatrix": "105x39;first30 preserved",
+    "backendBoundary": "API/server/RPC/migrations/intent/PWA worker unchanged",
+    "markdownLogLfSha256": "556154733e522c67cbb90fe8727368d7320a1513f849aea0302c85b6041eba4a",
+    "diffCheck": "PASS after whitespace-only cleanup of generated attribute gaps"
+  }
+}

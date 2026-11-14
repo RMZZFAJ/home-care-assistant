@@ -7,9 +7,8 @@ import {
   databaseError,
   readJson,
   rpc,
-  validateMutationRequest,
 } from "@/lib/server/api";
-import { boundedUpload, sanitizeFile } from "@/lib/server/files";
+import { uploadMyAvatar } from "@/lib/server/avatar";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { appOrigin } from "@/lib/server/app-origin";
 
@@ -117,25 +116,7 @@ export async function POST(request: Request) {
     if (
       request.headers.get("content-type")?.startsWith("multipart/form-data")
     ) {
-      validateMutationRequest(request, false);
-      const { file, bytes } = await boundedUpload(request, 5_242_880);
-      const safe = await sanitizeFile(bytes, file.type, true);
-      const objectPath = auth.userId + "/" + crypto.randomUUID() + ".jpg";
-      const { error } = await auth.client.storage
-        .from("profile-avatars")
-        .upload(objectPath, safe.bytes, {
-          contentType: safe.mime,
-          upsert: false,
-        });
-      if (error)
-        throw new ApiError(
-          "PERSISTENCE_UNCONFIRMED",
-          "Não foi possível confirmar a foto.",
-          503,
-          true,
-        );
-      await rpc(auth.client, "set_my_avatar", { p_path: objectPath });
-      return NextResponse.json({ saved: true });
+      return uploadMyAvatar(request, auth);
     }
     const input = await readJson(request, schema);
     if (input.action === "update")

@@ -1,0 +1,150 @@
+{
+  "sourceBaseSha": "9958b9620aa831272d0d0539281f570f01a5ab22",
+  "stage": "PASS_LOCAL_FRESH_DOCUMENT_LOGOUT; D-B incomplete",
+  "failedCiSha": "d0179ca17ae8487140a22e387da4cd805c303334",
+  "failedCiRun": 42372182501,
+  "ciObserved": {
+    "database": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "chromium": "FAILURE one onboarding case;173 passed",
+    "mobile": "FAILURE one onboarding case;173 passed",
+    "ios": "CANCELLED",
+    "aggregate": "FAILURE"
+  },
+  "baseline": {
+    "diagnostic": "FAIL output/phase-d-work/d4-logout-baseline-diagnostic.log; awaiting login URL did not resolve missing accessible controls",
+    "attributes": [
+      {
+        "text": "Entrar",
+        "ariaLabel": null,
+        "labelledBy": null,
+        "ancestors": [
+          {
+            "tag": "DIV",
+            "ariaHidden": "true",
+            "inert": false
+          }
+        ]
+      },
+      {
+        "text": "Esqueci minha senha",
+        "ariaLabel": null,
+        "labelledBy": null,
+        "ancestors": [
+          {
+            "tag": "DIV",
+            "ariaHidden": "true",
+            "inert": false
+          }
+        ]
+      },
+      {
+        "text": "Continuar com Google",
+        "ariaLabel": null,
+        "labelledBy": null,
+        "ancestors": [
+          {
+            "tag": "DIV",
+            "ariaHidden": "true",
+            "inert": false
+          }
+        ]
+      }
+    ],
+    "artifact": "output/phase-d-work/ci-d0179ca-chromium-artifacts/playwright-report",
+    "scope": "Visible recovery button remained under aria-hidden=true ancestor after logout; role replacement rejected as unproven"
+  },
+  "implementation": [
+    "After successful Auth signOut and local private hint cleanup, window.location.replace(/login) creates a fresh document",
+    "Fresh authentication boundary releases modal accessibility state and private client memory across all engines",
+    "Auth errors retain the existing visible retry feedback; no manual removal of aria-hidden/inert and no role selector bypass",
+    "Original registration/confirmation/acceptance/recovery/new-login assertions retained; login URL and accessible heading asserted",
+    "Local pending Auth logout is delayed, Escape closes profile menu, then actual Auth request resumes; no fake success response"
+  ],
+  "checks": {
+    "types": "PASS output/phase-d-work/d4-logout-navigation-types.log",
+    "lint": "PASS output/phase-d-work/d4-logout-navigation-lint-final.log",
+    "diagnosticOnly": {
+      "passed": 1,
+      "production": false,
+      "project": "ios",
+      "log": "output/phase-d-work/d4-logout-navigation-ios-diagnostic.log"
+    },
+    "productionBrowser": {
+      "status": "PASS",
+      "planned": 3,
+      "log": "output/phase-d-work/d4-logout-navigation-production.log",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "sourceLfSha256": {
+        "src/components/auth/logout-button.tsx": "8a024f67ff6ef321a74e50366cebaea92585df42c98c80049a1ef513db8c7082",
+        "src/components/layout/workspace-shell.tsx": "fb47bc799af44ac51ca5987a8e3dac132e8e82841c95d1434ee89b38a826295d",
+        "tests/e2e/onboarding.spec.ts": "9b0e3ca92c28e1b88cbbec3e536b80889f3b34bb8e225d1e795b7aa6656f0484"
+      },
+      "passed": 3,
+      "production": true
+    },
+    "partialProduction": {
+      "status": "FAIL",
+      "planned": 3,
+      "log": "output/phase-d-work/d4-logout-production.log",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "sourceLfSha256": {
+        "src/components/auth/logout-button.tsx": "0fa40e3e36ede0b2be7b7bb5433eb8551a84178ecab97cc513dd1a1e0a786ca8",
+        "src/components/layout/workspace-shell.tsx": "74b22435ae383f548d3c0841a09c47a70fbd47d19e4b79b936955c499058517a",
+        "tests/e2e/onboarding.spec.ts": "9b0e3ca92c28e1b88cbbec3e536b80889f3b34bb8e225d1e795b7aa6656f0484"
+      },
+      "passed": 2,
+      "failed": 1,
+      "reason": "Effect-based close still left login inaccessible after third logout on WebKit; not accepted as final correction"
+    }
+  },
+  "rejectedAlternative": [
+    {
+      "log": "output/phase-d-work/d4-logout-lint.log",
+      "reason": "flushSync triggered protected lint rule; final implementation uses ordinary committed effect; rule unchanged",
+      "priorDiagnostics": [
+        "output/phase-d-work/d4-logout-fixed-diagnostic.log",
+        "output/phase-d-work/d4-logout-effect-diagnostic.log"
+      ]
+    },
+    {
+      "log": "output/phase-d-work/d4-logout-production.log",
+      "reason": "Commit-observed modal close was insufficient on WebKit; two passed, one failed; callback/ref/effect implementation removed"
+    }
+  ],
+  "migrations": {
+    "local": 140,
+    "remoteLastReconciled": 121,
+    "pending": 19,
+    "new": [],
+    "remoteChanged": false
+  },
+  "limits": [
+    "Provider transport is local Auth and Mailpit; no real external email delivery proof",
+    "iOS/mobile are emulations, not physical devices or AT approval",
+    "CI of final published SHA required; base CI is not accepted",
+    "D-B incomplete; no merge/deployment/operational GO; Sonar configuration owner-deferred"
+  ],
+  "nextFactualProbes": {
+    "criteria": [
+      "C-AC-100",
+      "C-AC-101",
+      "C-AC-102"
+    ],
+    "observedSources": [
+      "private.record_document_event in20261105162705 freezes createdAt=d.created_at",
+      "operational-pdf.ts labels ENT Emissão using snapshot.createdAt",
+      "science_snapshot includes materialEmittedAt; renderer currently does not read that field"
+    ],
+    "next": "Probe delayed draft issuance and historical NULL dates/names against real frozen events; preserve existing canonical hashes and legacy bytes"
+  }
+}

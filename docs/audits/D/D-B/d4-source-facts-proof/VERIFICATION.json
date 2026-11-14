@@ -1,0 +1,79 @@
+{
+  "passed": true,
+  "publicRootSha256": "d7cea9025eb5e64d6404dd601e2c977e85cdbcef5cc1ba2580f66862a249f0ef",
+  "dependencies": {
+    "pdfplumber": "0.11.10",
+    "pypdf": "6.21.4",
+    "pyHanko": "0.38.1",
+    "pyhanko-certvalidator": "0.33.0",
+    "pypdfium2": "5.14.0"
+  },
+  "artifacts": [
+    {
+      "label": "private-draft",
+      "file": "private-draft.pdf",
+      "sha256": "0a5661d9860f313804076e98e863730550c087d36709d1644bb91c4975f8ffdd",
+      "pages": 3,
+      "sourceFacts": "PASS",
+      "fieldPositions": "PASS",
+      "textBounds": "PASS",
+      "footerExclusion": "PASS",
+      "emissionGroupKeptTogether": "PASS",
+      "rendererRevision": 6,
+      "pyHanko": {
+        "accepted": true,
+        "coverage": "ENTIRE_FILE",
+        "timestampTrustedToProvidedInternalRoot": true,
+        "externalTrustOrRevocationProof": false
+      }
+    },
+    {
+      "label": "historical-null",
+      "file": "historical-null.pdf",
+      "sha256": "c9c7d8929489e78ff51e7c65ad74825c27764892b19c801d51209e530113f9d3",
+      "pages": 3,
+      "sourceFacts": "PASS",
+      "fieldPositions": "PASS",
+      "textBounds": "PASS",
+      "footerExclusion": "PASS",
+      "emissionGroupKeptTogether": "PASS",
+      "rendererRevision": 6,
+      "pyHanko": {
+        "accepted": true,
+        "coverage": "ENTIRE_FILE",
+        "timestampTrustedToProvidedInternalRoot": true,
+        "externalTrustOrRevocationProof": false
+      }
+    },
+    {
+      "label": "historical-known",
+      "file": "historical-known.pdf",
+      "sha256": "33bc53adbab33fc5c69e22157c7cbf02bc874fb3f82fb2615ed423ff76dd5fd8",
+      "pages": 3,
+      "sourceFacts": "PASS",
+      "fieldPositions": "PASS",
+      "textBounds": "PASS",
+      "footerExclusion": "PASS",
+      "emissionGroupKeptTogether": "PASS",
+      "rendererRevision": 6,
+      "pyHanko": {
+        "accepted": true,
+        "coverage": "ENTIRE_FILE",
+        "timestampTrustedToProvidedInternalRoot": true,
+        "externalTrustOrRevocationProof": false
+      }
+    }
+  ],
+  "unsignedTextProbe": {
+    "file": "long-note.UNSIGNED.pdf",
+    "sha256": "fc9f57ccb67e977048681239b385ed6990c3502ff07a5eac34c78d2ca447ff8b",
+    "marker": "MARCADOR_FINAL_D4_FATOS_62026",
+    "source": "Controlled COM renderer probe with 1600 repetitions; not an issued or signed document",
+    "pages": 12,
+    "finalMarkerPage": 10,
+    "textBounds": "PASS",
+    "footerExclusion": "PASS",
+    "signatureProof": false
+  },
+  "physicalDeviceOrATProof": false
+}

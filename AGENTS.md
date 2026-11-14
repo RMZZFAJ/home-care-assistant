@@ -19,16 +19,62 @@ the tree clean.
 
 ## Projeto e fontes de verdade
 
-Home Care Assistant usa App Router, React, TypeScript e Supabase Auth/PostgreSQL.
+Home Care Assistant usa App Router, React, TypeScript e Supabase
+Auth/PostgreSQL.
 O paciente é a unidade operacional. Leia README e os documentos de arquitetura,
-banco, segurança, APIs e testes antes de ampliar fluxos. Consulte docs/README.md,
-docs/current/PROJECT_STATUS.md, a auditoria datada
-e seu checkpoint para retomar sem recriar funções existentes. Decisões em
+banco, segurança, APIs e testes antes de ampliar fluxos. Consulte
+docs/README.md,
+TEMP_D_B_ATUALIZACAO.md (acompanhamento principal), os contratos atuais e as
+evidências necessárias para retomar sem recriar funções existentes. Decisões em
 docs/decisions e planos C descrevem futuro, não comportamento implementado.
 Autorização corrente vem da missão vigente; relatos históricos não a renovam.
 
 ## Convenções verificáveis
 
+### Aparência canônica e paridade funcional
+
+O responsável descartou Fluent UI como aparência em 09/11/2026.
+Home_Care_Assistant_Modelo_Integral.html é a referência canônica de UI/UX para
+todo o sistema, incluindo recursos existentes e futuros. Ler
+docs/ui-ux/CANONICAL_MODEL.md e docs/ui-ux/DESIGN_SYSTEM.md antes de alterar UI.
+E01–E03 e padrões compartilhados seguem a revisão posterior L1: laboratório v3
+mais comentários v3, conforme HCA_L1_LOTE_CODEX_E01_E03.md. O HTML antecede os
+comentários. Materiais reúne o acompanhamento; identificação técnica fica em Mais.
+Não misturar estilos, usar tema pronto ou apenas recobrir componentes Fluent.
+Usar componentes reutilizáveis coerentes com o modelo; criar os ausentes sem
+remover, resumir, ocultar ou reduzir funções. Migrar fichas para abas e
+implementar Andamentos reais, com autoria/instante, cronologia e referência
+de etapa separados do progresso operacional. Preservar contratos, autorização,
+histórico, rascunhos, recuperação, acessibilidade e todas as contraprovas.
+As auditorias e capturas anteriores são históricas, não aprovação da nova UI.
+
+### Documentos e complemento vigente
+
+Os PDFs seguem docs/documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md e a
+referência HTML no mesmo diretório. A aparência documental antes adiada foi
+autorizada em 11/11/2026; o Modelo Integral da aplicação permanece vigente.
+Reutilizar o pipeline de emissão/assinatura. Não alterar exemplares prontos.
+Devolução equipe→família é processo autônomo, sem exigir entrega de origem.
+Preservar o conteúdo emitido, seus atos e a ciência no cancelamento. Menções,
+referências e acessos não substituem ciência, recebimento ou autoria.
+O complemento executivo em docs/audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt
+prevalece sobre orientações conflitantes de método e rascunhos. O L1 posterior
+autoriza simplificar a apresentação do rascunho de Andamentos, preservando os
+quatro campos e os controles de concorrência. Os demais rascunhos conservam
+escopo e apresentação; não ampliar persistência, autosave ou retomada entre
+aparelhos. DOC-C.1 e expansão não
+implementada são OWNER-DEFERRED. Corrigir defeitos e preservar separadamente
+a recuperação segura de operações oficiais incertas e a prevenção de duplicatas.
+Implementar PDFs aprovados pelo pipeline atual sem aguardar todo DOC-C.
+Manter poucos lotes por capacidade e uma frente principal. Atualizar andamento
+e matriz no fechamento ou bloqueio relevante; checkpoint é histórico, não outro
+diário obrigatório. Preservar revisões documentais e migrations; produto 1.0.0
+é a primeira liberação estável futura, sem publicação agora.
+
+### Contratos operacionais
+
+- Novas senhas: mínimo de 6 caracteres, conforme decisão de 14/11/2026;
+  preservar maiúscula, minúscula, número, símbolo e teto de 72 bytes UTF-8.
 - Identidade global e papel por paciente são conceitos distintos.
 - Nunca derivar autorização de IDs, metadata, nomes ou flags do navegador.
 - Administradores locais só alteram recursos e vínculos do próprio paciente.
@@ -37,9 +83,12 @@ Autorização corrente vem da missão vigente; relatos históricos não a renova
 - Estoque oficial vem de movimentações, não de edição direta de saldo.
 - Quantidade solicitada não pertence ao contrato de requisição.
 - Funções críticas usam RPC transacional com autorização no banco e na API.
-- RLS, grants explícitos/defaults e SECURITY DEFINER precisam ser revisados juntos.
-- Erros externos usam código seguro e correlação; logs não recebem payload privado.
-- Componentes devem ter carregamento, erro, vazio, feedback e controles acessíveis.
+- RLS, grants explícitos/defaults e SECURITY DEFINER precisam ser revisados
+juntos.
+- Erros externos usam código seguro e correlação; logs não recebem payload
+privado.
+- Componentes devem ter carregamento, erro, vazio, feedback e controles
+acessíveis.
 - Evitar abstrações sem consumidor e dependências sem uso demonstrável.
 
 ## Preservação e ambientes
@@ -66,14 +115,31 @@ segredos de .env.local para documentação, CI, logs, traces ou navegador.
 ## Validação e conclusão
 
 Quando autorizado a implementar, usar Node e npm dos arquivos de versão.
-Rodar check:contracts, lint,
-lint:markdown, typecheck, test e build. Para mudanças de banco/autorização,
-rodar test:db:prepare, test:migrations e test:integration. Para fluxos visuais,
-rodar e2e pelo runner que verifica a stack local, nunca contra uma sessão
-ou origem desconhecida. O runner usa dados fictícios e desabilita envio externo.
+Escolher verificações locais pelo impacto do conjunto: regressão discriminante,
+contrato/API, tipos/lint dos fontes afetados e tarefa visual quando aplicável.
+Localizar os consumidores alterados, inclusive fixtures e seletores existentes,
+antes de escolher os casos; a suíte nova não substitui a compatibilidade deles.
+Após correção, repetir somente as verificações afetadas. Não duplicar a cada
+ajuste as suítes gerais já programadas na CI da PR: check:contracts, lint,
+lint:markdown, typecheck, test e build. A CI precisa validar o SHA publicado;
+resultado de um SHA anterior ou check pendente não vale como aprovação atual.
+
+Mudanças de banco/autorização exigem test:db:prepare e regressões locais com
+Auth real, incluindo negativas/concorrência pertinentes. Instalação limpa,
+evolução legada e integração completa continuam obrigatórias; aproveitar
+test:migrations e test:integration da CI quando já programados. Repetir a suíte
+completa localmente quando uma falha, mudança transversal ou hipótese concreta
+justificar, ou quando a CI necessária estiver indisponível. Registrar o motivo,
+sem reset adicional apenas para repetir evidência inalterada.
+
+Para fluxos visuais, rodar e2e dirigido pelo runner que verifica a stack local,
+nunca contra sessão ou origem desconhecida. O runner usa dados fictícios e
+desabilita envio externo. Manter fontes estáveis durante a execução; não rodar
+suítes mutáveis de banco em paralelo com E2E.
 
 Corrigir falhas e repetir verificações afetadas. Não excluir testes ou reduzir
-regras para obter verde. RLS precisa de identidades Auth reais; mocks não bastam.
+regras para obter verde. RLS precisa de identidades Auth reais; mocks não
+bastam.
 Registrar evidências, limitações e estado final na matriz. Interface, API, banco
 e permissões precisam funcionar conjuntamente antes de concluir uma feature.
 Manter instruções permanentes separadas de incidentes e estados transitórios.

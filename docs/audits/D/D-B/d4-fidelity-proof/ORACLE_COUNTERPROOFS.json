@@ -1,0 +1,18 @@
+[
+  {
+    "probe": "old-omission",
+    "rejected": true,
+    "reason": "missing receipt provenance event",
+    "artifactBytesChanged": false,
+    "expectedSourceDeliberatelyAltered": true,
+    "qualification": "Oracle counterproof, not a claim that the product emitted a corrupted or mislabelled signed file. Original bytes passed the positive independent signature check."
+  },
+  {
+    "probe": "swapped-resolution-expectations",
+    "rejected": true,
+    "reason": "resolution outcome belongs to wrong event",
+    "artifactBytesChanged": false,
+    "expectedSourceDeliberatelyAltered": true,
+    "qualification": "Oracle counterproof, not a claim that the product emitted a corrupted or mislabelled signed file. Original bytes passed the positive independent signature check."
+  }
+]

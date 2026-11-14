@@ -1,26 +1,142 @@
 "use client";
+import { ActionButton, Pill, TextInput } from "@/components/ui/controls";
+import {roleLabel} from "@/lib/role-labels";
 import { useState } from "react";
-import { Badge, Button, Field as FluentField, Input, Select } from "@fluentui/react-components";
-import { RecordDrawer } from "@/components/forms/record-drawer";
-import { Dialog, EmptyState, Icon } from "@/components/ui/primitives";
-import { Notice } from "@/components/workspace";
-import { RoleSelect, roles, text, type Row } from "./admin-fields";
 
-export function MembershipManagement({ rows, directory, save, busy, error }: {
-  rows: Row[]; directory: Row[]; save: (payload: Row, message: string, refresh?: boolean) => Promise<unknown>; busy: boolean; error: string;
+import { CredentialReview } from "./credential-review";
+import { EmptyState, Icon } from "@/components/ui/primitives";
+import { text, type Row } from "./admin-fields";
+
+import { AdministrativePreparationEditor } from "./administrative-preparation-editor";
+import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
+import { ProfileAvatar } from "@/components/ui/avatar";
+import "./identity.css";
+
+export function MembershipManagement({
+  rows,
+  directory,
+  userId, globalMode, onConfirmed,
+  confirmationRevision = 0,
+  patientId,
+  credentialReviewAllowed = false,
+}: {
+  rows: Row[];
+  directory: Row[];
+  userId: string; globalMode: boolean;
+  onConfirmed: (outcome: AdministrativeOutcome) => void;
+  confirmationRevision?: number;
+  patientId: string;
+  credentialReviewAllowed?: boolean;
 }) {
   const [search, setSearch] = useState("");
-  const [editor, setEditor] = useState<{ row: Row | null; opener: HTMLElement } | null>(null);
-  const [change, setChange] = useState<Row | null>(null);
-  const name = (row: Row) => (row.profiles as { full_name?: string } | null)?.full_name || text(row, "full_name") || text(row, "user_id");
-  const filtered = rows.filter((row) => (name(row) + " " + (roles[text(row, "role") as keyof typeof roles] ?? text(row, "role"))).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR")));
-  return <section>
-    <div className="hca-section-heading"><div><h2>Pessoas e vínculos</h2><p>A função e as permissões se aplicam somente a este paciente.</p></div><Button appearance="primary" icon={<Icon name="plus" />} onClick={(event) => setEditor({ row: null, opener: event.currentTarget })}>Vincular conta</Button></div>
-    <div className="hca-toolbar"><Input type="search" aria-label="Pesquisar pessoas" placeholder="Nome ou função" contentBefore={<Icon name="search" />} value={search} onChange={(_, data) => setSearch(data.value)} /><span role="status" className="hca-result-count">{filtered.length} vínculos</span></div>
-    <div className="hca-records">{filtered.map((row) => <article key={text(row, "id") || text(row, "user_id")} className="hca-record"><span className="hca-task-icon"><Icon name="user" /></span><div className="hca-record-main"><h3>{name(row)}</h3><small>{roles[text(row, "role") as keyof typeof roles] ?? text(row, "role")}</small><Badge appearance="tint" color={row.status === "revoked" ? "informative" : "success"}>{row.status === "revoked" ? "Revogado" : "Ativo"}</Badge></div><div className="hca-record-actions"><Button aria-label={"Editar vínculo de " + name(row)} onClick={(event) => setEditor({ row, opener: event.currentTarget })}>Editar</Button><Button appearance="subtle" onClick={() => setChange(row)}>{row.status === "revoked" ? "Reativar" : "Revogar"}</Button></div></article>)}{!filtered.length ? <EmptyState title="Nenhum vínculo nesta seleção">Busque outra pessoa ou crie um convite.</EmptyState> : null}</div>
-    {editor ? <RecordDrawer title={editor.row ? "Editar vínculo" : "Vincular conta existente"} busy={busy} restoreFocusTo={editor.opener} onClose={() => setEditor(null)}>{error ? <Notice error>{error}</Notice> : null}<form className="hca-form" onSubmit={async (event) => { event.preventDefault(); const form = new FormData(event.currentTarget); const role = form.get("role"); const result = await save({ action: "membership", userId: form.get("userId"), role, canManageStock: role === "admin", canCountStock: false }, "Vínculo salvo e auditado.", true); if (result) setEditor(null); }}>
-      <FluentField label="Conta vinculada"><Select name="userId" defaultValue={editor.row ? text(editor.row, "user_id") : ""} required><option value="">Selecione uma conta</option>{directory.map((person) => <option key={text(person, "user_id") || text(person, "id")} value={text(person, "user_id") || text(person, "id")}>{text(person, "full_name")}</option>)}</Select></FluentField><RoleSelect value={editor.row ? text(editor.row, "role") : "professional"} /><p className="hca-field-hint">Permissões específicas ficam na matriz. Uma conta nova deve ser convidada pelo e-mail e aceitar o convite.</p><Button appearance="primary" disabled={busy} type="submit">Salvar vínculo</Button>
-    </form></RecordDrawer> : null}
-    <Dialog open={Boolean(change)} title={change?.status === "revoked" ? "Reativar vínculo" : "Revogar vínculo"} onClose={() => { if (!busy) setChange(null); }}><p>Confirmar a alteração do vínculo de <strong>{change ? name(change) : ""}</strong> neste paciente?</p><p className="hca-field-hint">A mudança será auditada e as permissões serão reavaliadas nas próximas operações.</p>{error ? <Notice error>{error}</Notice> : null}<div className="hca-toolbar"><Button disabled={busy} onClick={() => setChange(null)}>Voltar</Button><Button appearance="primary" disabled={busy} onClick={async () => { if (!change) return; const result = await save({ action: "membershipStatus", userId: change.user_id, status: change.status === "revoked" ? "active" : "revoked" }, "Estado do vínculo atualizado.", true); if (result) setChange(null); }}>Confirmar alteração</Button></div></Dialog>
-  </section>;
+  const [credential, setCredential] = useState<{ subjectId: string; opener: HTMLElement } | null>(null);
+  type Editor = {
+    row: Row | null;
+    opener: HTMLElement;
+  };
+  const [editorState, setEditorState] = useState<(Editor & { revision: number }) | null>(null);
+  const editor = editorState?.revision === confirmationRevision ? editorState : null;
+  const setEditor = (value: Editor | null) => setEditorState(value ? { ...value, revision: confirmationRevision } : null);
+  const [changeState, setChangeState] = useState<{ row: Row; revision: number } | null>(null);
+  const change = changeState?.revision === confirmationRevision ? changeState.row : null;
+  const setChange = (row: Row | null) => setChangeState(row ? { row, revision: confirmationRevision } : null);
+  const name = (row: Row) =>
+    (row.profiles as { full_name?: string } | null)?.full_name ||
+    text(row, "full_name") ||
+    text(row, "user_id");
+  const filtered = rows.filter((row) =>
+    (
+      name(row) +
+      " " +
+      (roleLabel(text(row, "role")))
+    )
+      .toLocaleLowerCase("pt-BR")
+      .includes(search.toLocaleLowerCase("pt-BR")),
+  );
+  return (
+    <section className="hca-identity-management" aria-label="Pessoas e vínculos">
+      <div className="hca-section-heading">
+        <div>
+          <h2>Pessoas e vínculos</h2>
+          <p>A função e as permissões se aplicam somente a este paciente.</p>
+        </div>
+        <ActionButton
+          variant="primary"
+
+          onClick={(event) =>
+            setEditor({ row: null, opener: event.currentTarget })
+          }
+        >{<Icon name="plus" />}
+          Vincular conta
+        </ActionButton>
+      </div>
+      <div className="hca-toolbar">
+        <TextInput
+          type="search"
+          aria-label="Pesquisar pessoas"
+          placeholder="Nome ou função"
+          leading={<Icon name="search" />}
+          value={search}
+          onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSearch(controlValue); }}
+        />
+        <span role="status" className="hca-result-count">
+          {filtered.length} vínculos
+        </span>
+      </div>
+      <div className="ui-card hca-identity-list">
+        {filtered.map((row) => (
+          <article
+            key={text(row, "id") || text(row, "user_id")}
+            className="hca-identity-row"
+          >
+            <ProfileAvatar name={name(row)} />
+            <div className="hca-identity-main">
+              <h3>{name(row)}</h3>
+              <small>
+                {roleLabel(text(row, "role"))}
+              </small>
+              <Pill
+
+                tone={row.status === "revoked" ? "neutral" : "success"}
+              >
+                {row.status === "revoked" ? "Revogado" : "Ativo"}
+              </Pill>
+            </div>
+            <div className="hca-identity-actions">
+              <ActionButton
+                aria-label={"Editar vínculo de " + name(row)}
+                disabled={row.status === "revoked"}
+                onClick={(event) =>
+                  setEditor({ row, opener: event.currentTarget })
+                }
+              >
+                Editar
+              </ActionButton>
+              <ActionButton variant="quiet" onClick={() => setChange(row)}>
+                {row.status === "revoked" ? "Reativar" : "Revogar"}
+              </ActionButton>
+              {patientId ? <ActionButton disabled={!credentialReviewAllowed} title={!credentialReviewAllowed ? "Selecione seu vínculo local para conferir uma credencial." : undefined} onClick={event => setCredential({ subjectId: text(row, "user_id"), opener: event.currentTarget })}>Conferir credencial</ActionButton> : null}
+            </div>
+          </article>
+        ))}
+        {!filtered.length ? (
+          <EmptyState title="Nenhum vínculo nesta seleção">
+            Busque outra pessoa ou crie um convite.
+          </EmptyState>
+        ) : null}
+      </div>
+      {credential && patientId ? <CredentialReview patientId={patientId} subjectId={credential.subjectId} opener={credential.opener} onClose={() => setCredential(null)}/> : null}
+      {editor ? <AdministrativePreparationEditor
+        key={text(editor.row ?? {}, "user_id") || "new"}
+        scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"membership",targetId:editor.row ? text(editor.row,"user_id") : null}}
+        userId={userId} people={directory} opener={editor.opener}
+        onClose={() => setEditor(null)} onConfirmed={onConfirmed}
+      /> : null}
+      {change ? <AdministrativePreparationEditor
+        key={text(change,"user_id")}
+        scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"membershipStatus",targetId:text(change,"user_id")}}
+        userId={userId} people={rows} onClose={() => setChange(null)} onConfirmed={onConfirmed}
+      /> : null}
+    </section>
+  );
 }

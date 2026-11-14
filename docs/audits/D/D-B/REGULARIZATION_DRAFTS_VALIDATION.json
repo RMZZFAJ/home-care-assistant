@@ -1,0 +1,357 @@
+{
+  "assembledAt": "2026-11-09T17:14:41.322698+00:00",
+  "baseSha": "5c4c4701f87172edbe6515d3f0f3117380e4229f",
+  "sourceLfSha256": {
+    "src/app/api/drafts/route.ts": "0bb8d2b9f08b86883c23d449276e2a49c3463d1e00d1023c8eea3212277e7dec",
+    "src/components/documents/delivery-regularization.tsx": "8e2b6a2019139e4b48ee97e920d2448b0ee73818554df9f80bf2a9cd102e9cb5",
+    "src/components/forms/creation-draft-panel.tsx": "3c3dd39dd8fba959337985058c4f932166bd15446c23ac51b93704da882cde5f",
+    "src/lib/forms/draft-navigation.ts": "02451cded225a2490fed574c8067cdbd76f6d40d6da7966967eaf88cc6bbd473",
+    "src/lib/forms/regularization-draft.ts": "0c3f287a0135e83f366ec3e54243eb4e85ae77c4b18e7613b8892b6e743a7946",
+    "src/lib/validation/creation-drafts.ts": "f665b451c337dda2f3f086548138e609fbc6dfb9627c9954b27a8de1d594e658",
+    "src/lib/validation/regularization-reference.ts": "f2312b6a6398c8b805af2556227bda038755fc2224e40fee72f1c64640873130",
+    "src/lib/validation/supply-drafts.ts": "873b9fd5e051868f3e60fa82270352a21a67c2fb43e5dc64c24be7719ed0467c",
+    "supabase/migrations/20261109163324_phase_d3_regularization_private_drafts.sql": "1bc007871a8717801fece56cf9fc87f5b114fcdfecdff4d66c66e566750b9519",
+    "supabase/migrations/20261109170235_phase_d3_regularization_text_normalization.sql": "4260ce4a43d17a294c95cf86e290d650d3d7357e839283425eb73d97f017bb59",
+    "tests/e2e/regularization-private-drafts.spec.ts": "c94a608374b8a066f4fb6e9f909974b13af18fd4858bb1bfaf9244ddb03b111a",
+    "tests/integration/regularization-draft-fixtures.mjs": "8b268755b728fab165b082072f04c7298666f847d59f5aa1783ac731b6e0f8c5",
+    "tests/integration/regularization-private-drafts.test.mjs": "a79a651d1d342debb00df846559878a751790278fdefdca3a3d3047c015bd677",
+    "tests/regularization-drafts.test.ts": "86959943b791df57b637c7542f51b9f86640b799eaae6e2652ca866d53970405"
+  },
+  "unitApi": {
+    "files": 5,
+    "distinctApproved": 33
+  },
+  "realAuth": {
+    "distinctApproved": 21,
+    "initial": 15,
+    "postPrivateJournal": 1,
+    "unicodeCanonicalText": 5,
+    "realAuthNoMocks": true,
+    "observedSlotWait": true,
+    "eventAndPrivateJournalRoleRollback": true,
+    "testProbesRemovedInFinally": true,
+    "qualifiedReuse": "Sixteen passing cases use unchanged scopes/atomic wrapper;172 only extends text trim. Five additional modes exercise raw Unicode/canonical binding. globalThis qualification uses the same native structuredClone."
+  },
+  "browser": {
+    "distinctApprovedCases": 14,
+    "byProject": {
+      "mobile": 7,
+      "ios": 7
+    },
+    "identity": "file+path+title+project;latest outcome;mutable lines excluded",
+    "rounds": {
+      "regularization-initial": {
+        "stats": {
+          "total": 14,
+          "expected": 13,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "P05 proposta e conferência independentes preservam autoria, recuperam o mesmo ato e produzem dossiê PDF",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 133,
+              "column": 5
+            },
+            "duration": 56647,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 445,
+              "column": 5
+            },
+            "duration": 14512,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "P05 proposta e conferência independentes preservam autoria, recuperam o mesmo ato e produzem dossiê PDF",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 133,
+              "column": 5
+            },
+            "duration": 46438,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 445,
+              "column": 5
+            },
+            "duration": 18666,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT proposta privada retoma entre sessões,conserva seleção indisponível e adota versão autorizada após403 e200 inválido",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 91,
+              "column": 5
+            },
+            "duration": 37357,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog', { name: /regularização|apuração própria/i }).getByRole('button', { name: 'Registrar proposta sem movimentar', exact: true })\u001b[22m\n\n\n  254 |         exact: true,\n  255 |       })\n> 256 |       .click();\n      |        ^\n  257 |     await expect(dialog(peer)).toHaveCount(0);\n  258 |     expect(\n  259 |       sql(\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\regularization-private-drafts.spec.ts:256:8\u001b[22m",
+                "codeframe": "  156 |           : route.fulfill({\n  157 |               status: fault === \"forbidden\" ? 403 : 200,\n  158 |               json:\n  159 |                 fault === \"forbidden\"\n  160 |                   ? {\n  161 |                       error: \"Regularização recusada fictícia\",\n  162 |                       code: \"FORBIDDEN\",\n  163 |                     }\n  164 |                   : { data: { id: f.document.id } },\n  165 |             }),\n  166 |     );\n  167 |     for (const mode of [\"forbidden\", \"invalid\"] as const) {\n  168 |       fault = mode;\n  169 |       await dialog(peer)\n  170 |         .getByRole(\"button\", {\n  171 |           name: \"Consultar ficha e elegibilidade atuais\",\n  172 |           exact: true,\n  173 |         })\n  174 |         .click();\n  175 |       await expect(\n  176 |         dialog(peer)\n  177 |           .getByRole(\"alert\")\n  178 |           .filter({\n  179 |             hasText:\n  180 |               mode === \"forbidden\"\n  181 |                 ? \"Regularização recusada fictícia\"\n  182 |                 : \"não pôde ser conferida\",\n  183 |           }),\n  184 |       ).toBeVisible();\n  185 |       await expect(\n  186 |         dialog(peer).getByRole(\"button\", {\n  187 |           name: \"Usar referência atual\",\n  188 |           exact: true,\n  189 |         }),\n  190 |       ).toHaveCount(0);\n  191 |       await expect(\n  192 |         dialog(peer).getByText(\"Aceite pessoal preservado:\", { exact: false }),\n  193 |       ).toHaveCount(0);\n  194 |       if (mode === \"forbidden\") await resume(peer);\n  195 |     }\n  196 |     sql(\n  197 |       `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.family.id)},'ent.regularize',false);`,\n  198 |     );\n  199 |     fault = \"live\";\n  200 |     await dialog(peer)\n  201 |       .getByRole(\"button\", {\n  202 |         name: \"Consultar ficha e elegibilidade atuais\",\n  203 |         exact: true,\n  204 |       })\n  205 |       .click();\n  206 |     await dialog(peer)\n  207 |       .getByRole(\"button\", { name: \"Usar referência atual\", exact: true })\n  208 |       .click();\n  209 |     await expect(\n  210 |       dialog(peer).getByText(\"Seleção preservada:\", { exact: false }),\n  211 |     ).toContainText(name(\"family\"));\n  212 |     await expect(\n  213 |       dialog(peer).getByLabel(\"Recebimento físico apurado · \" + label, {\n  214 |         exact: true,\n  215 |       }),\n  216 |     ).toHaveValue(\"0,\");\n  217 |     await expect(\n  218 |       dialog(peer).getByLabel(\"Sua justificativa\", { exact: true }),\n  219 |     ).toHaveValue(privateReason);\n  220 |     expect(regularizationFacts(f)).toBe(currentFacts);\n  221 |     for (const width of [320, 390, 768, 1440]) {\n  222 |       await peer.setViewportSize({ width, height: 900 });\n  223 |       await dialog(peer).evaluate((element) => (element.scrollTop = 0));\n  224 |       await audit(peer, \"regularization private reference \" + width);\n  225 |     }\n  226 |     await info.attach(\"regularizacao-preenchimento\", {\n  227 |       body: await peer.screenshot({ animations: \"disabled\" }),\n  228 |       contentType: \"image/png\",\n  229 |     });\n  230 |     sql(\n  231 |       `delete from public.capability_overrides where care_recipient_id=${q(f.patient)} and subject_user=${q(fixtures.family.id)} and capability='ent.regularize';`,\n  232 |     );\n  233 |     await dialog(peer)\n  234 |       .getByRole(\"button\", {\n  235 |         name: \"Consultar ficha e elegibilidade atuais\",\n  236 |         exact: true,\n  237 |       })\n  238 |       .click();\n  239 |     await dialog(peer)\n  240 |       .getByRole(\"button\", { name: \"Usar referência atual\", exact: true })\n  241 |       .click();\n  242 |     await dialog(peer)\n  243 |       .getByLabel(\"Recebimento físico apurado · \" + label, { exact: true })\n  244 |       .fill(\"0\");\n  245 |     await dialog(peer)\n  246 |       .getByLabel(\"Devolução física apurada · \" + label, { exact: true })\n  247 |       .fill(\"0\");\n  248 |     await dialog(peer)\n  249 |       .getByRole(\"button\", { name: \"Revisar ato administrativo\", exact: true })\n  250 |       .click();\n  251 |     await dialog(peer)\n  252 |       .getByRole(\"button\", {\n  253 |         name: \"Registrar proposta sem movimentar\",\n  254 |         exact: true,\n  255 |       })\n> 256 |       .click();\n      |        ^ TimeoutError: locator.click: Timeout 15000ms exceeded.\n  257 |     await expect(dialog(peer)).toHaveCount(0);\n  258 |     expect(\n  259 |       sql(\n  260 |         `select count(*) from public.delivery_regularizations where document_id=${q(f.document.id)};`,\n  261 |       ),\n  262 |     ).toBe(\"1\");\n  263 |     const appliedFacts = regularizationFacts(f);\n  264 |     let writes = 0;\n  265 |     peer.on(\"request\", (request) => {\n  266 |       if (\n  267 |         new URL(request.url()).pathname === \"/api/documents/\" + f.document.id &&\n  268 |         request.method() === \"POST\"\n  269 |       )\n  270 |         writes++;\n  271 |     });\n  272 |     await recovery(peer, \"Preparar regularização administrativa\");\n  273 |     await expect(\n  274 |       dialog(peer).getByRole(\"button\", {\n  275 |         name: \"Revisar ato administrativo\",\n  276 |         exact: true,\n  277 |       }),\n  278 |     ).toHaveCount(0);\n  279 |     await dialog(peer)\n  280 |       .getByRole(\"button\", {\n  281 |         name: \"Reconhecer resultado aplicado\",\n  282 |         exact: true,\n  283 |       })\n  284 |       .click();\n  285 |     expect(regularizationFacts(f)).toBe(appliedFacts);\n  286 |     expect(writes).toBe(0);\n  287 |   } finally {\n  288 |     await other.close();\n  289 |     sql(\n  290 |       `delete from public.capability_overrides where care_recipient_id=${q(f.patient)} and subject_user=${q(fixtures.family.id)} and capability='ent.regularize';`,\n  291 |     );\n  292 |   }\n  293 | });\n  294 |\n  295 | for (const scenario of [\n  296 |   {\n  297 |     purpose: \"approve_regularization\",\n  298 |     action: \"Conferir proposta\",\n  299 |     title: \"Conferir regularização administrativa\",\n  300 |     confirm: \"Aprovar encerramento administrativo\",\n  301 |     state: \"approved\",\n  302 |   },\n  303 |   {\n  304 |     purpose: \"reject_regularization\",\n  305 |     action: \"Rejeitar proposta\",\n  306 |     title: \"Rejeitar regularização administrativa\",\n  307 |     confirm: \"Registrar decisão sem movimentar\",\n  308 |     state: \"rejected\",\n  309 |   },\n  310 |   {\n  311 |     purpose: \"withdraw_regularization\",\n  312 |     action: \"Retirar minha proposta\",\n  313 |     title: \"Encerrar proposta de regularização\",\n  314 |     confirm: \"Registrar decisão sem movimentar\",\n  315 |     state: \"withdrawn\",\n  316 |   },\n  317 |   {\n  318 |     purpose: \"record_regularization_finding\",\n  319 |     action: \"Registrar apuração própria\",\n  320 |     title: \"Registrar apuração própria\",\n  321 |     confirm: \"Registrar minha apuração\",\n  322 |     state: \"approved\",\n  323 |   },\n  324 | ])\n  325 |   test(`ENT ${scenario.purpose} retoma sua justificativa e recupera o resultado perdido após reload sem repetir ato`, async ({\n  326 |     page,\n  327 |   }) => {\n  328 |     const f = await regularizationFixture(scenario.purpose);\n  329 |     await login(page, f.patient, f.role);\n  330 |     await open(page, f.document.id, scenario.action);\n  331 |     const fieldLabel =\n  332 |       scenario.purpose === \"record_regularization_finding\"\n  333 |         ? \"Relato da sua apuração\"\n  334 |         : \"Sua justificativa\";\n  335 |     await dialog(page)\n  336 |       .getByLabel(fieldLabel, { exact: true })\n  337 |       .fill(privateReason);\n  338 |     const before = regularizationFacts(f);\n  339 |     await save(page);\n  340 |     expect(regularizationFacts(f)).toBe(before);\n  341 |     await page.reload();\n  342 |     await selectDocumentSection(page, \"workflow\");\n  343 |     await page\n  344 |       .getByRole(\"button\", { name: scenario.action, exact: true })\n  345 |       .click();\n  346 |     await resume(page);\n  347 |     await expect(\n  348 |       dialog(page).getByLabel(fieldLabel, { exact: true }),\n  349 |     ).toHaveValue(privateReason);\n  350 |     await dialog(page)\n  351 |       .getByRole(\"button\", { name: \"Revisar ato administrativo\", exact: true })\n  352 |       .click();\n  353 |     let delivered!: () => void;\n  354 |     const committed = new Promise<void>((resolve) => (delivered = resolve));\n  355 |     await page.route(`**/api/documents/${f.document.id}`, async (route) => {\n  356 |       if (route.request().method() !== \"POST\") return route.continue();"
+              }
+            ]
+          },
+          {
+            "title": "ENT approve_regularization retoma sua justificativa e recupera o resultado perdido após reload sem repetir ato",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 325,
+              "column": 7
+            },
+            "duration": 13640,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT reject_regularization retoma sua justificativa e recupera o resultado perdido após reload sem repetir ato",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 325,
+              "column": 7
+            },
+            "duration": 12031,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT withdraw_regularization retoma sua justificativa e recupera o resultado perdido após reload sem repetir ato",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 325,
+              "column": 7
+            },
+            "duration": 12454,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT record_regularization_finding retoma sua justificativa e recupera o resultado perdido após reload sem repetir ato",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 325,
+              "column": 7
+            },
+            "duration": 17410,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT proposta privada retoma entre sessões,conserva seleção indisponível e adota versão autorizada após403 e200 inválido",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 91,
+              "column": 5
+            },
+            "duration": 31505,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT approve_regularization retoma sua justificativa e recupera o resultado perdido após reload sem repetir ato",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 325,
+              "column": 7
+            },
+            "duration": 14915,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT reject_regularization retoma sua justificativa e recupera o resultado perdido após reload sem repetir ato",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 325,
+              "column": 7
+            },
+            "duration": 16179,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT withdraw_regularization retoma sua justificativa e recupera o resultado perdido após reload sem repetir ato",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 325,
+              "column": 7
+            },
+            "duration": 15187,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT record_regularization_finding retoma sua justificativa e recupera o resultado perdido após reload sem repetir ato",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 325,
+              "column": 7
+            },
+            "duration": 15644,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "42f0431d5de6301e63fd9733abf473be608f1181bfe9150afe03043f13885b37"
+      },
+      "regularization-final": {
+        "stats": {
+          "total": 2,
+          "expected": 2,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "ENT proposta privada retoma entre sessões,conserva seleção indisponível e adota versão autorizada após403 e200 inválido",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 91,
+              "column": 5
+            },
+            "duration": 42752,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT proposta privada retoma entre sessões,conserva seleção indisponível e adota versão autorizada após403 e200 inválido",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "regularization-private-drafts.spec.ts",
+              "line": 91,
+              "column": 5
+            },
+            "duration": 55458,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "30351e55e327077703374caad8a5c72557d11b801b230e7a173f0553f3f5ca68"
+      }
+    },
+    "qualifiedReuse": "Twelve unaffected initial cases retained;only proposal repeated in both engines after172 with Unicode and peer diagnostics. Sources frozen per runner;no mutable DB suite in parallel.",
+    "initialFailureLimit": "One mobile review-not-reached failure was not reproduced;no broad instability fix claimed.",
+    "axeAndFourWidths": true,
+    "viewportImagesInspected": [
+      "regularization-initial/67a901f42efab4f4e112570307f3473f42838068.png",
+      "regularization-initial/15556676d25f0f79fa36288129544813476b70c8.png"
+    ]
+  },
+  "checks": {
+    "types": "PASS",
+    "lint": "PASS",
+    "payloadAndFieldBoundsUnchanged": true,
+    "generalSuite": "Own SHA CI required;no duplicate local general suite",
+    "sourceInventoryComparedToHead": true
+  },
+  "logSha256": {
+    "regularization-db-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "regularization-db-initial.log": "28a754014437a177bac55dfe0bb7e2d4ae09f3146fc06f16637300d262e27fa3",
+    "regularization-post-journal.log": "f1d972a1e20dfa5835da57e34ebfcd3762799beac4b96450dc3bb335da1b7ac2",
+    "regularization-unicode-auth.log": "0bbd4bb05768b8c1b0ef6d50f0d0231da38e3a5c68648cf02bfc1563b066c4c6",
+    "regularization-trim-db-prepare.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "regularization-whitespace-counterproof.log": "9011a09e7a30a2e0aee8a6a7b52bee4158ef2d76f7e430081086f21c0e6e746e",
+    "regularization-whitespace-fixed.log": "a974a40284dd06067175157e59ded3d36f839eceb9ba79ae5b8394c1b6acccb1",
+    "regularization-unit-final.log": "a09bc5da3aa90384fc71820c491baf0efb2ab4d123d34c8b29edbe4518e60353",
+    "regularization-types-publication.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regularization-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regularization-lint-publication.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regularization-e2e-initial.log": "c1e1cbb7a7d0cc20020f0acebb5e59b877dccbca4fa43b6228f729806b35ede5",
+    "regularization-e2e-final.log": "0f0dd8b0b9a63ca9a74387cc3c839149f07708e5ed67e34c2016422064005aa4",
+    "regularization-remote-dry-run.log": "493efb3788956a5928154dc382f8290cb6fca307e4cf47b097100503e5aed498",
+    "regularization-remote-apply.log": "f2c8081340b66411ce8ce5899f03d1b60d69092cb5f0f95a6a8380f27face3a6"
+  },
+  "remote": "REGULARIZATION_DRAFTS_REMOTE.json",
+  "ci": "CI_5C4C470_OBSERVATION.json",
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30Unchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "uiRequirements": 18,
+    "historicalMigrations": 84,
+    "localRemoteVersions": 172
+  },
+  "limits": [
+    "D-B-AC-001 partial:transfers,BAL/REQ contextual decisions",
+    "Full canonical66/171 parity,own SHA CI and D-C/D6/human/AT/physical/provider gates remain",
+    "Prior CI notification/onboarding overlap remains",
+    "Sonar deferred;PR7 Draft;no production",
+    "No new signing,backup,monitoring or external transport approval"
+  ],
+  "documentation": {
+    "markdownFiles": 5,
+    "localLinksChecked": 366,
+    "markdownIssues": 0,
+    "sourceLfHashesVerified": true,
+    "syntheticAuthorizationRedactedFromRecordedErrors": true
+  }
+}
