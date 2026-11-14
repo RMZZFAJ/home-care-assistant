@@ -138,12 +138,12 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
     currentSnapshot.canonical_snapshot.fulfillmentLines.filter(
       (line) => line.attended,
     ).length,
-    2,
+    1,
   );
   assert.equal(
     (await rpc(pro, "requisition_fulfillment", { p_requisition: req.id }))
       .fulfilled,
-    2,
+    1,
   );
   assert.equal(
     (
@@ -151,7 +151,7 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
         p_requisition: second.requisition_id,
       })
     ).fulfilled,
-    1,
+    0,
   );
   assert.equal(
     (await rpc(pro, "requisition_progress", { p_id: req.id })).completedAt,
@@ -171,6 +171,16 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
   });
   assert.equal(fixed.status, "confirmed");
   assert.equal(fixed.fullyCheckedLines, 1);
+  assert.equal((await rpc(admin, "requisition_progress", { p_id: req.id })).completedAt, null);
+  const stockBeforeReview = sql(`select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(patient)}`);
+  await rpc(family, "review_request_fulfillment", {
+    p_document: ent.id, p_line: first.id, p_decision: "complete",
+    p_reason: "As seis unidades recebidas atendem a necessidade compartilhada",
+    p_key: randomUUID(), p_version: fixed.version,
+  });
+  assert.equal(sql(`select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(patient)}`), stockBeforeReview);
+  assert.equal((await rpc(pro, "requisition_fulfillment", { p_requisition: req.id })).fulfilled, 2);
+  assert.equal((await rpc(pro, "requisition_fulfillment", { p_requisition: second.requisition_id })).fulfilled, 1);
   const finished = await rpc(admin, "requisition_progress", { p_id: req.id });
   assert.ok(finished.completedAt);
   assert.equal(finished.manualArchiveRequired, false);

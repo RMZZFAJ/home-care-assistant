@@ -192,6 +192,18 @@ e mantém a PR7 Draft. O SHA efetivamente publicado e o estado observado da CI
 serão informados ao responsável. Não há aceite visual ou aprovação geral
 presumida a partir desses resultados locais.
 
+Na CI publicada de `67a9041`, Windows e Ubuntu passaram integralmente e o
+Preview ficou READY. O replay ultrapassou a falha de grants anterior e encontrou
+três fixtures SQL antigas de ENT vinculada sem avaliação familiar explícita.
+Elas agora declaram a decisão inicial e conferem R3: recebimento menor fica
+pendente de reavaliação; conciliar a falta física não conclui a necessidade;
+somente a nova avaliação familiar pode concluí-la, sem novo movimento de estoque.
+As três regressões SQL passaram com Auth real e rollback, sem reset. O consumidor
+nativo V4 da necessidade compartilhada recebeu a mesma correção e passou.
+Nenhuma regra de produto, migration, assertion de privacidade ou gate foi
+retirado. A nova publicação deve alcançar os testes de navegador antes do
+encerramento autorizado; o resultado anterior não valida seu novo SHA.
+
 Roteiro de avaliação: início → histórico/busca/filtros → REQ/Visão geral →
 Materiais/ciência → Arquivos/exemplar/anexo → validação pública e retorno.
 Conferir carregamento inicial simples e, em uma emissão ou ciência, as fases

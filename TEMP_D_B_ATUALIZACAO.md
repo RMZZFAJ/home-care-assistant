@@ -24,6 +24,12 @@ Chromium dirigidas passaram em produção local, com repetição dos casos afeta
 check:contracts passaram. As 84 migrations históricas permanecem inalteradas.
 O próximo resultado da CI deve ser lido pelo SHA efetivamente publicado.
 
+A CI de `67a9041` passou Windows/Ubuntu, mas o replay encontrou fixtures antigas
+de ENT sem a avaliação explícita agora obrigatória. Três SQLs e o consumidor V4
+foram alinhados a R3 e passaram com Auth real: diferença física exige nova
+avaliação e não muda estoque por si só. Sem alteração de produto ou migrations.
+Publicação corretiva e acompanhamento até os navegadores continuam autorizados.
+
 Registro histórico da publicação anterior de 14/11/2026: SHA `27e2f3e`
 na PR7 Draft. Treze migrations aplicadas no Supabase home-care-assistant após
 reconciliação, backup cifrado verificado e pré-validação revertida; total 255.

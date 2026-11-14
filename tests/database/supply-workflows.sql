@@ -40,7 +40,7 @@ begin
  perform public.supply_document_command((c->>'id')::uuid,'validate_receipt',b,k,1);
  perform pg_temp.assert_quantity((select balance from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='FAMILY'),6,'receipt credit/idempotency');
  perform pg_temp.assume_context('family',p);
- d:=public.create_supply_document(p,'ENT',jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',t,'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','5','requisitionItemIds',jsonb_build_array(line_id)))),gen_random_uuid());
+ d:=public.create_supply_document(p,'ENT',jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',t,'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','5','requestFulfillment','complete','requisitionItemIds',jsonb_build_array(line_id)))),gen_random_uuid());
  if (d->>'status') is distinct from 'pending_receipt' or (select balance from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='FAMILY') is distinct from 1 or (select balance from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='TRANSIT') is distinct from 5 then raise exception 'dispatch custody incorrect';end if;
  begin perform public.supply_document_command((d->>'id')::uuid,'receive','{"divergences":[]}',gen_random_uuid(),(d->>'version')::integer);raise exception 'issuer accepted delivery';exception when insufficient_privilege then null;end;
  perform pg_temp.assume_context('professional',p);
@@ -48,10 +48,18 @@ begin
  if exists(select 1 from public.current_stock_balances where care_recipient_id=p and location='FAMILY') then raise exception 'family balance leaked';end if;
  d:=public.supply_document_command((d->>'id')::uuid,'receive',jsonb_build_object('divergences',jsonb_build_array(jsonb_build_object('lineId',d->'lines'->0->>'id','acceptedQuantity','3','problem','Faltaram duas unidades'))),gen_random_uuid(),(d->>'version')::integer);
  if (d->>'status') is distinct from 'disputed' or (d->>'fullyCheckedLines')::integer is distinct from 0 or (select balance from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='CARE_TEAM') is distinct from 3 then raise exception 'partial receipt incorrect';end if;
- if (public.requisition_fulfillment(req.requisition_id)->>'fulfilled')::integer<>1 then raise exception 'positive acceptance did not fulfill REQ';end if;
+ if (public.requisition_fulfillment(req.requisition_id)->>'fulfilled')::integer<>0 or (public.requisition_fulfillment(req.requisition_id)->>'reviewRequired')::integer<>1 then raise exception 'smaller receipt bypassed family reevaluation';end if;
  perform pg_temp.assume_context('global',p);
  d:=public.supply_document_command((d->>'id')::uuid,'resolve',jsonb_build_object('lineId',d->'lines'->0->>'id','quantity','2','resolution','missing','reason','Falta reconhecida definitivamente'),gen_random_uuid(),(d->>'version')::integer);
  if (d->>'status') is distinct from 'confirmed' or (d->>'fullyCheckedLines')::integer is distinct from 0 then raise exception 'resolution overwrote partial acceptance';end if;
+ if (public.requisition_fulfillment(req.requisition_id)->>'fulfilled')::integer<>0 then raise exception 'physical resolution replaced family reevaluation';end if;
+ perform pg_temp.assume_context('family',p);
+ k:=gen_random_uuid();
+ b:=public.review_request_fulfillment((d->>'id')::uuid,(d->'lines'->0->>'id')::uuid,'complete','As três unidades recebidas atendem esta necessidade',k,(d->>'version')::integer);
+ perform public.review_request_fulfillment((d->>'id')::uuid,(d->'lines'->0->>'id')::uuid,'complete','As três unidades recebidas atendem esta necessidade',k,(d->>'version')::integer);
+ if (public.requisition_fulfillment(req.requisition_id)->>'fulfilled')::integer<>1 then raise exception 'explicit family reevaluation did not fulfill REQ';end if;
+ perform pg_temp.assert_quantity((select balance from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='CARE_TEAM'),3,'family reevaluation is stock-free');
+ perform pg_temp.assume_context('global',p);
  c:=public.create_supply_document(p,'BAL','{"lines":[{"productId":"fralda","quantity":"2"}]}',gen_random_uuid());
  if (c->>'status') is distinct from 'approved' or (select balance from public.current_stock_balances where care_recipient_id=p and product_id='fralda' and location='CARE_TEAM') is distinct from 2 then raise exception 'optional BAL not applied';end if;
  begin perform public.family_stock_movement(p,'fralda',2,'outbound','Teste saldo insuficiente',gen_random_uuid());raise exception 'family overdraft allowed';exception when check_violation then null;end;
