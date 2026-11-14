@@ -73,6 +73,8 @@ diário obrigatório. Preservar revisões documentais e migrations; produto 1.0.
 
 ### Contratos operacionais
 
+- Novas senhas: mínimo de 6 caracteres, conforme decisão de 14/11/2026;
+  preservar maiúscula, minúscula, número, símbolo e teto de 72 bytes UTF-8.
 - Identidade global e papel por paciente são conceitos distintos.
 - Nunca derivar autorização de IDs, metadata, nomes ou flags do navegador.
 - Administradores locais só alteram recursos e vínculos do próprio paciente.

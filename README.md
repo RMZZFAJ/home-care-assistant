@@ -12,7 +12,7 @@ clínica.
 ## Estado e documentação
 
 **D-B em execução; produção e merge não autorizados.** A branch é
-`feat/l1-e01-e03`, derivada da D-B em `56babc7`; a PR #7 da base permanece Draft.
+`feat/phase-d-implementation`; a PR #7 permanece Draft. O L1 partiu de `56babc7`.
 O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md) identifica o trabalho local.
 A primeira versão
 estável de produto será 1.0.0; não está sendo publicada nesta missão.

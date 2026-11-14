@@ -8,7 +8,9 @@ paciente e capacidade conferidos novamente pelo servidor. Não concede acesso.
 Comunicação com PDF usa principal Sistema limitado ao aviso e lease vigentes,
 sem fabricar sessão humana. A verificação pública continua mínima; seus
 detalhes privados exigem leitura viva do documento e revalidam revogação.
-Configuração forte de senha foi aplicada ao Auth local; o remoto está pendente.
+Mínimo de senha: 6 caracteres, decidido em 14/11/2026. Cliente, servidor e
+configuração local acompanham esse limite. Os grupos de caracteres e o teto
+de 72 bytes UTF-8 permanecem. O mínimo remoto já era 6 e foi mantido.
 Veja [implementação L1](../audits/D/D-B/L1_IMPLEMENTATION.md).
 
 As ressalvas AS_IS abaixo pertencem ao recorte histórico indicado, com os

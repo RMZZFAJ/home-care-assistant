@@ -6,8 +6,10 @@ reconciliação, backup cifrado verificado e pré-validação revertida; total 2
 Eventos, estoque e exemplares anteriores preservados. Preview do SHA READY.
 A CI própria 43550944609 já havia terminado com falhas em testes unitários e
 na asserção de grants do replay. Não houve espera, merge ou promoção de produção.
-A política Auth remota de senha permanece em 6 caracteres; alinhamento ao L1 aguarda
-a autorização específica solicitada. O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md)
+A decisão posterior de 14/11 mantém o mínimo de senha em 6 caracteres e o trabalho
+na branch feat/phase-d-implementation. O mínimo remoto já é 6; o ajuste local
+de validação, textos e configuração ainda não foi publicado.
+O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md)
 concentra implementação, revisão CodeRabbit, publicação e provas/limites.
 Os números D-B abaixo mantêm o recorte histórico e não aprovam o L1.
 

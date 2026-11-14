@@ -1063,8 +1063,9 @@ Respostas atrasadas não substituem outro convite ou outra conta.
 Retry de aprovação já confirmada retorna recuperação explícita por reemissão;
 o administrador local pode rotacionar o link existente, sem novo convite.
 
-Nova senha usa mínimo de 12 caracteres e máximo de 72 bytes UTF-8 em cadastro,
-recuperação e perfil. Perfil/avatar e policies do bucket privado verificam
+Nova senha usa mínimo de 6 caracteres e máximo de 72 bytes UTF-8 em cadastro,
+recuperação e perfil, com maiúscula, minúscula, número e símbolo. A decisão de
+14/11/2026 substitui o mínimo anterior. Perfil/avatar e policies verificam
 sessão ainda existente. URLs/bytes anteriormente entregues conservam seus
 limites próprios de transporte, tratados separadamente em D4.
 

@@ -3,7 +3,9 @@
 Conjunto publicado com autorização de 14/11/2026. Push de `27e2f3e` para
 feat/phase-d-implementation, PR7 Draft; sem merge, release ou promoção de produção.
 Base preservada:
-`56babc7b4800fcb324cc3cac28b496a2e1226f44`; branch `feat/l1-e01-e03`.
+`56babc7b4800fcb324cc3cac28b496a2e1226f44`; branch atual
+`feat/phase-d-implementation`. Em 14/11, a branch local adicional foi removida
+após avanço direto da original até 37e9e24, preservando todos os commits.
 PR7 permanece Draft. Commits funcionais: `80e69be` (contratos), `e7afeeb`
 (experiência/PDF) e `1addf86` (revisão CodeRabbit). O quarto commit
 concentra documentação e instalação da CI. Nenhum trabalho anterior foi descartado.
@@ -30,7 +32,7 @@ espaços nos três separadores de tabela; texto conferido contra a entrada.
 
 ## Resultado no sistema
 
-Acesso com senha de 8/grupos/72 bytes, Google no convite, retorno seguro de 30 minutos
+Acesso com senha de 6/grupos/72 bytes, Google no convite, retorno seguro de 30 minutos
 com consulta nova de conta/vínculo/paciente/capacidade e contexto único sem troca
 redundante. As capacidades reais de escalas/consumo e a custódia do estoque são
 conferidas no retorno. Preferência simples/completa, avisos próprios por 24 h,
@@ -127,9 +129,19 @@ Backup local protegido de 13/11, cerca de 52 MB, manifesto e pg_restore --list
 conferidos. Sem reset, replay ou substituição de fixtures. A aplicação remota
 posterior foi autorizada separadamente e está registrada a seguir.
 
-O schema L1 remoto foi reconciliado e aplicado em 14/11/2026. A configuração
-Auth remota ainda não foi alterada: sua política mínima de 6 caracteres difere
-do L1. O alinhamento foi solicitado separadamente ao responsável.
+O schema L1 remoto foi reconciliado e aplicado em 14/11/2026. Na decisão
+posterior sobre senha, o responsável determinou mínimo de 6 caracteres. Essa
+decisão substitui o mínimo de 8 do anexo original, que fica preservado como
+entrada histórica. Validação compartilhada, ajuda, campo nativo, testes e
+configuração local foram alinhados; grupos e teto de 72 bytes permanecem.
+O mínimo remoto já era 6: não foi necessária escrita no Auth remoto.
+Verificação do ajuste: três casos unitários, um caso com Auth local real e
+uma jornada Chromium passaram. Cinco caracteres foram rejeitados, seis aceitos;
+grupos e limites UTF-8 continuam conferidos. A recarga da stack local manteve
+os contadores de usuários, documentos, eventos, estoque e migrations. Os
+cadastros sintéticos do teste ficam no local, com e-mail capturado no Inbucket.
+Build com tipos, ESLint afetado e Markdown passaram. O ajuste ainda não foi
+publicado e não resolve nem aprova as falhas da CI anterior.
 Instalação limpa/evolução completa e integração geral permanecem nos jobs da
 CI do SHA a publicar. Preview/CI próprios, aceite visual do responsável, AT,
 zoom nativo, impressão/dispositivo físico e provas de provedores são gates

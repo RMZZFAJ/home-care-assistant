@@ -5,11 +5,12 @@ andamento da D-B: trabalho publicado/local, sequência, pendências e responsáv
 Os [contratos atuais](README.md) descrevem o implementado. A
 [matriz](../audits/D/D-B/ACCEPTANCE_EXECUTION.csv) detalha os critérios.
 
-Produção NO-GO; branch local feat/l1-e01-e03, derivada da D-B em 56babc7.
+Produção NO-GO; branch local feat/phase-d-implementation, com L1 sobre 56babc7.
 A PR #7 da base continua Draft. O [L1](../audits/D/D-B/L1_IMPLEMENTATION.md)
 registra implementação e publicação autorizada de 27e2f3e em 14/11/2026,
-schema remoto 255 e CI própria com falhas. Auth remoto e aceite humano
-continuam separados. A D-A encerrou
+schema remoto 255 e CI própria com falhas. A decisão posterior mantém o mínimo
+de senha em 6; ajuste local ainda não publicado. O aceite humano continua
+separado. A D-A encerrou
 D0–D2 localmente; a D-B implementa D3–D5 e os complementos visuais/documentais.
 A liberação estável futura será 1.0.0, sem renumerar revisões internas.
 

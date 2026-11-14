@@ -144,8 +144,10 @@ test("perfil recebe invalidação externa e senha nova conserva limites em carac
     await expect(page.getByLabel("Menu do usuário", { exact: true })).toContainText(name);
     await selectProfileSection(page, "security");
     const password = page.getByLabel("Nova senha", { exact: true });
-    await expect(password).toHaveAttribute("minlength", "8"); await expect(password).toHaveAttribute("maxlength", "72");
+    await expect(password).toHaveAttribute("minlength", "6"); await expect(password).toHaveAttribute("maxlength", "72");
     await expect(password).toHaveAttribute("autocomplete", "new-password");
+    await password.fill("Aa1!x"); expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);
+    await password.fill("Aa1!xx"); expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
     await password.fill("Aa1!" + "a".repeat(68)); expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
     await password.fill("á".repeat(37)); expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);
     expect(await password.evaluate((input: HTMLInputElement) => input.validationMessage)).toContain("72 bytes");

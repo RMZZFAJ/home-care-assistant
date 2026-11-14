@@ -2,7 +2,7 @@ import { z } from "zod";
 // Keep these groups identical to Supabase Auth's configured requirements.
 export function passwordRequirements(value: string) {
   return [
-    { label: "Pelo menos 8 caracteres", valid: value.length >= 8 },
+    { label: "Pelo menos 6 caracteres", valid: value.length >= 6 },
     { label: "Uma letra maiúscula (A–Z)", valid: /[A-Z]/.test(value) },
     { label: "Uma letra minúscula (a–z)", valid: /[a-z]/.test(value) },
     { label: "Um número", valid: /[0-9]/.test(value) },
@@ -12,11 +12,11 @@ export function passwordRequirements(value: string) {
 }
 export const newPasswordSchema = z
   .string()
-  .min(8, "Use pelo menos 8 caracteres.")
+  .min(6, "Use pelo menos 6 caracteres.")
   .max(72, "Use até 72 caracteres; letras acentuadas podem ocupar mais espaço.")
   .refine(
     (value) => new TextEncoder().encode(value).byteLength <= 72,
     "A senha excede o limite de 72 bytes. Reduza o comprimento.",
   )
   .refine(value => passwordRequirements(value).every(rule => rule.valid),
-    "Use maiúscula, minúscula, número e símbolo, com pelo menos 8 caracteres.");
+    "Use maiúscula, minúscula, número e símbolo, com pelo menos 6 caracteres.");
