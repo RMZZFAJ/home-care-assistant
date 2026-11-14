@@ -1,7 +1,8 @@
 # L1 — implementação E01–E03
 
-Conjunto implementado e verificado localmente, pronto para revisão do responsável.
-Sem push, merge, release ou produção. Base preservada:
+Conjunto publicado com autorização de 14/11/2026. Push de `27e2f3e` para
+feat/phase-d-implementation, PR7 Draft; sem merge, release ou promoção de produção.
+Base preservada:
 `56babc7b4800fcb324cc3cac28b496a2e1226f44`; branch `feat/l1-e01-e03`.
 PR7 permanece Draft. Commits funcionais: `80e69be` (contratos), `e7afeeb`
 (experiência/PDF) e `1addf86` (revisão CodeRabbit). O quarto commit
@@ -117,16 +118,18 @@ no mesmo caso de recuperação/revogação de Andamento. Ele exigia um GET autom
 quando a invalidação podia retirar o leitor. A contraprova agora exige 403 do
 endpoint real e ocultação do conteúdo; esse caso passou localmente. Os outros
 jobs passaram na observação da base. Sonar permanece adiado pelo responsável.
-Nenhum resultado da base aprova o novo SHA ainda não publicado.
+Nenhum resultado da base aprova o SHA publicado. O resultado próprio está abaixo.
 
 Node 24.22.0/npm 11.21.1. Projeto local home-care-assistant, API 127.0.0.1:54321,
-banco 127.0.0.1:54322. Treze migrations incrementais aplicadas apenas no local,
+banco 127.0.0.1:54322. Treze migrations incrementais aplicadas localmente,
 20261113190159–20261113231000, total 255. Auth local alinhado à senha forte.
 Backup local protegido de 13/11, cerca de 52 MB, manifesto e pg_restore --list
-conferidos. Sem reset, replay, substituição de fixtures ou escrita remota.
+conferidos. Sem reset, replay ou substituição de fixtures. A aplicação remota
+posterior foi autorizada separadamente e está registrada a seguir.
 
-Remoto L1 e configuração Auth remota continuam pendentes de reconciliação,
-pré-validação e backup do alvo correto antes da homologação nesse ambiente.
+O schema L1 remoto foi reconciliado e aplicado em 14/11/2026. A configuração
+Auth remota ainda não foi alterada: sua política mínima de 6 caracteres difere
+do L1. O alinhamento foi solicitado separadamente ao responsável.
 Instalação limpa/evolução completa e integração geral permanecem nos jobs da
 CI do SHA a publicar. Preview/CI próprios, aceite visual do responsável, AT,
 zoom nativo, impressão/dispositivo físico e provas de provedores são gates
@@ -142,16 +145,55 @@ separados. Emulação, PKI efêmera e testes locais não os substituem.
 5. Gerar um PDF atual; consultar verificação, entrar no mesmo contexto e conferir
    os detalhes autorizados. Revisar arquivos/anexos e a central de comunicações.
 
-O push do conjunto só ocorrerá após autorização explícita, como exige o L1.
-Destino proposto: atualizar a branch da PR7 Draft por avanço direto, mantendo
-o checkout isolado em feat/l1-e01-e03:
+## Publicação e aplicação remota autorizadas
+
+Em 14/11/2026, o responsável autorizou o push e as migrations, sem aguardar
+o término da CI. O envio aprovado foi executado uma vez:
 
 ```sh
 git push origin HEAD:refs/heads/feat/phase-d-implementation
 ```
 
-O destino remoto foi consultado e ainda estava em 56babc7. Antes do envio
-autorizado, essa condição será conferida novamente. Sem merge ou release.
+- GitHub/PR7: cabeça `27e2f3e7c0a6192fa55316190498b5e356c51198`, Draft.
+- Supabase: home-care-assistant, projeto qwfrqychokvhdzakibid.
+  Identidade RMZZFAJ e perfil nomeado conferidos pelo wrapper do projeto.
+- Backup antes da alteração: 242 migrations reconciliadas, 184 tabelas,
+  34 objetos Storage/953.678 bytes. Captura estável conferida, com apenas
+  relógios/cursors conhecidos variando. Schema, dados, roles, ACL e bytes
+  Storage foram capturados fora do Git e cifrados com a chave separada existente.
+  O arquivo cifrado contém 82 membros/15.765.997 bytes; integridade verificada.
+  Manifesto SHA-256:
+  `9fce6fd965297aa05f37a0b87cefe28ba3ce1c397743538f302811b457cd33a5`.
+  Não foi realizado restore, nem alegada recuperação operacional D6.
+- Pré-validação da cadeia de 13 migrations em transação revertida: PASS.
+  Confirmados schema 1/242 e ausência da tabela nova após o rollback.
+  Sem locks em espera, transações antigas ou números DEV conflitantes.
+- Aplicação pelo wrapper: `db push --linked --skip-vault --yes`.
+  Exatamente as 13 migrations aprovadas, sem seeds, roles adicionais ou Vault.
+  Histórico final 255 comparado por tokens com todos os arquivos locais: PASS.
+  Dry-run final sem pendências; REST público retornou 200/protocol 1/schema 2.
+- Preservação: 212 eventos canônicos, 11 movimentos de estoque e 34 metadados
+  Storage com os mesmos hashes. Nas quatro tabelas acrescidas de colunas, todas
+  as linhas e colunas antigas coincidem, incluindo as quatro emissões anteriores.
+- Guards remotos: RLS da reavaliação ligado e sem leitura direta; entradas de
+  renderizadores antigos sem grants; listagem R3 e leitura viva da verificação
+  presentes. Sem fixtures, Auth remoto, envio externo ou alteração de exemplares.
+- Preview do mesmo SHA: READY,
+  [Vercel](https://home-care-assistant-ank5bv6on-rmzzfajs-projects.vercel.app).
+  Estado de build não substitui homologação funcional/humana do ambiente remoto.
+- A [CI própria](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/43550944609)
+  já havia concluído com falha na consulta pontual: testes operational-contracts
+  e progress-preparations; replay com asserção de grants service_role. Windows
+  foi cancelado e browsers não executaram. Instalação/npm rebuild passaram.
+  Não houve espera pelo término, reexecução, novo push de correção ou merge.
+
+Os advisors mantêm alertas de classificação: tabelas privadas RPC-only sem
+política direta, extensão pública, funções SECURITY DEFINER e proteção de senhas
+vazadas. Os grants e guards novos foram conferidos; não foram relaxados para
+eliminar alertas. [Referência do linter](https://supabase.com/docs/guides/database/database-linter).
+
+Este registro posterior de execução foi atualizado localmente. O único push
+autorizado acima continua em 27e2f3e; qualquer novo envio segue o gate do L1.
 
 ## Revisão CodeRabbit recebida
 

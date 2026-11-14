@@ -7,7 +7,9 @@ atendimento familiar e reavaliação R3, série DEV, reenvios idempotentes e PDF
 de comunicação com principal Sistema possuem contratos transacionais próprios.
 A reserva operacional é `reserve_pdf_issuance`; entradas experimentais
 versionadas estão sem grants de execução. Bytes/eventos antigos foram
-preservados. Este incremento ainda não foi aplicado ao remoto.
+preservados. As treze migrations foram aplicadas ao remoto autorizado em
+14/11/2026: total 255 reconciliado, backup verificado e REST schema 2 confirmado.
+Auth remoto permanece separado; CI própria concluiu com falhas ainda abertas.
 Veja [escopo e evidências L1](../audits/D/D-B/L1_IMPLEMENTATION.md).
 
 O recorte AS_IS a seguir registra a base histórica da auditoria; não substitui

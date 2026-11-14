@@ -7,7 +7,9 @@ Os [contratos atuais](README.md) descrevem o implementado. A
 
 Produção NO-GO; branch local feat/l1-e01-e03, derivada da D-B em 56babc7.
 A PR #7 da base continua Draft. O [L1](../audits/D/D-B/L1_IMPLEMENTATION.md)
-registra implementação, verificação e publicação pendente. A D-A encerrou
+registra implementação e publicação autorizada de 27e2f3e em 14/11/2026,
+schema remoto 255 e CI própria com falhas. Auth remoto e aceite humano
+continuam separados. A D-A encerrou
 D0–D2 localmente; a D-B implementa D3–D5 e os complementos visuais/documentais.
 A liberação estável futura será 1.0.0, sem renumerar revisões internas.
 

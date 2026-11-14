@@ -1,15 +1,15 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-L1 implementado e verificado localmente na branch `feat/l1-e01-e03`, sobre `56babc7`.
-A referência vigente para E01–E03 é o laboratório v3 mais os comentários v3,
-com as decisões R1 (Revisão) e R3 (nova avaliação familiar) desta conversa.
-O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md) concentra escopo,
-contratos, validações e limites; os números D-B abaixo preservam seu recorte
-anterior e não representam aprovação do L1. Inclui o tratamento dos 20 comentários
-CodeRabbit: 14 sobre produto/testes corrigidos e seis do simulador conferidos
-contra o produto, preservando a referência recebida. Treze migrations somente
-locais, total 255; remoto/Auth remoto, CI/Preview próprios e aceite humano
-permanecem pendentes. Sem push, publicação ou produção.
+L1 publicado em 14/11/2026 com autorização do responsável: SHA `27e2f3e`
+na PR7 Draft. Treze migrations aplicadas no Supabase home-care-assistant após
+reconciliação, backup cifrado verificado e pré-validação revertida; total 255.
+Eventos, estoque e exemplares anteriores preservados. Preview do SHA READY.
+A CI própria 43550944609 já havia terminado com falhas em testes unitários e
+na asserção de grants do replay. Não houve espera, merge ou promoção de produção.
+A política Auth remota de senha permanece em 6 caracteres; alinhamento ao L1 aguarda
+a autorização específica solicitada. O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md)
+concentra implementação, revisão CodeRabbit, publicação e provas/limites.
+Os números D-B abaixo mantêm o recorte histórico e não aprovam o L1.
 
 Atualizado em 13 de novembro de 2026, com suporte, acompanhamento de avisos e
 recuperação conferidos localmente no lote 6. O fechamento da CI continua aberto.
