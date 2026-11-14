@@ -134,3 +134,14 @@ arquivo passaram na repetição dirigida no Windows local. Não houve alteraçã
 de produto ou banco. A CI do commit corretivo precisa validar o conjunto e
 iniciar corretamente os navegadores; o verde de Ubuntu do SHA anterior não é
 aprovação do novo SHA.
+
+A conferência dos consumidores encontrou ainda um teste nativo anterior que
+esperava expor ao leitor uma nota da família publicada sem audiência explícita.
+A falha foi reproduzida com Auth real: pela regra aprovada, essa nota é privada
+e não aparece para aquele leitor. O teste passou a exigir essa ausência e a
+conservar a contraprova de referências em uma nota pública distinta, publicada
+pelo administrador autorizado: o leitor vê a nota, mas não sua referência a COM
+sem permissão. Nenhuma regra de produto foi relaxada. As seis suítes relacionadas
+de publicação, privacidade, período, rascunhos, CAS e recuperação passaram em
+24 testes nativos, sem falhas ou pulados. Essa correção de consumidor segue na
+mesma branch e exige a CI do novo SHA antes do início dos navegadores.

@@ -17,7 +17,10 @@ continua como gate até o início correto dos seis jobs de navegador.
 A primeira publicação desta revisão passou no Ubuntu, mas o Windows encontrou
 um timeout de 5 segundos na dupla renderização Unicode. O caso recebeu o mesmo
 prazo limitado de 30 segundos dos probes PDF, sem mudar asserções; nove testes
-do arquivo passaram na repetição dirigida. O commit corretivo exige nova CI.
+do arquivo passaram na repetição dirigida. Um consumidor nativo antigo de
+Andamentos foi alinhado à privacidade familiar, preservando a contraprova de
+referências públicas restritas; 24 testes Auth relacionados passaram.
+O commit corretivo exige nova CI.
 
 **Continuação de 14/11 — acesso, Andamentos e diagnósticos.** Correções na mesma
 branch: transições cobertas sem telas intermediárias, recuperação de senha em

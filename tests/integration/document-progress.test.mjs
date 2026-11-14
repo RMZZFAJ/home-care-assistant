@@ -52,7 +52,17 @@ test("Andamentos reject forged payload and other-patient references; current per
   assert.equal((await family.rpc("document_progress_publish", packet(f.id, { ...content(), references: [other.id] }))).error?.code, "42501");
   const reader = await actor("reader", f.patient);
   assert.equal((await reader.rpc("document_progress_publish", packet(f.id))).error?.code, "42501");
-  assert.equal((await reader.rpc("document_progress", { p_document: f.id, p_filter: "manual" })).data.data[0].references.length, 0);
+  assert.equal(saved.note.visibility, "family");
+  assert.deepEqual((await rpc(reader, "document_progress", { p_document: f.id, p_filter: "manual" })).data, []);
+  // Reference redaction is independent of family-note privacy. Keep that
+  // counterproof on a public note authored by an authorized patient admin.
+  const publicNote = await rpc(f.admin, "document_progress_publish", packet(f.id, {
+    ...content("Referência pública fictícia com destino restrito ao leitor"),
+    references: [com.id], publication: { relevance: "normal", mentions: [], visibility: "public" },
+  }));
+  const readerNotes = (await rpc(reader, "document_progress", { p_document: f.id, p_filter: "manual" })).data;
+  assert.deepEqual(readerNotes.map(note => note.id), [publicNote.note.id]);
+  assert.equal(readerNotes[0].references.length, 0);
   sql(`insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled)
    values(${sqlLiteral(f.patient)},'document.progress.create',${sqlLiteral(fixtures.family.id)},false);`);
   assert.equal((await family.rpc("document_progress_publish", packet(f.id))).error?.code, "42501");
