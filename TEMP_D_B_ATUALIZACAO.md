@@ -19,7 +19,8 @@ Isso não constitui aprovação da suíte completa ou aceite visual.
 Os logs fechados confirmaram também a importação histórica em Chromium/mobile/iOS
 no SHA 9af2cbcd e revelaram sete casos adicionais, tratados no registro acima.
 Cinco jornadas Chromium e três WebKit/iOS passaram; a inspeção final BAL por
-teclado também passou nas cinco larguras. A análise de 4ebe385b encontrou S4036 no PATH do
+teclado também passou nas cinco larguras. A análise de 4ebe385b encontrou S4036
+no PATH do
 preparador; o resolvedor confiável foi aplicado a todos os seus subprocessos,
 com 16 testes e inicialização local real aprovados, inclusive com PATH sentinela.
 O novo complemento requer análise Sonar e CI próprias; não herda o gate anterior.
