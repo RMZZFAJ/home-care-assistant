@@ -177,7 +177,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   document = await rpc(f.admin, "operational_document", { p_id: document.id });
   expect(document.purchaseProgress.state).toBe("closed_pending_validation"); expect(Number(document.lines[0].waived_quantity)).toBe(8); expect(Number(document.lines[0].accepted_quantity)).toBe(0);
   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);
-  await expect(page.getByText("Expectativa encerrada · parcelas aguardam conferência", { exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Resumo da ficha", exact: true }).getByText("Expectativa encerrada · parcelas aguardam conferência", { exact: true })).toBeVisible();
   await expect(page.locator(".hca-document-name p")).toHaveText("Doação de insumos");
   expect(await page.locator(".hca-document-header").getByText("Expectativa encerrada · parcelas aguardam conferência", { exact: true }).evaluate(element => {
     const range = document.createRange(); range.selectNodeContents(element);

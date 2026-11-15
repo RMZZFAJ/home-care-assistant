@@ -14,8 +14,9 @@ export async function pendingRecount({
   firstReview = true,
   referenceQuantity = "5",
   countQuantity = "2",
+  stableCurrentWindow = false,
 } = {}) {
-  const f = await balanceSetup();
+  const f = await balanceSetup({ stableCurrentWindow });
   sql(`update public.profiles set full_name='Juliana fictícia, contadora original' where id=${sqlLiteral(f.pro.id)};
     insert into public.patient_settings(care_recipient_id) values(${sqlLiteral(f.patient)}) on conflict do nothing;
     update public.patient_settings set settings=settings||jsonb_build_object('balReview',${sqlLiteral(reviewPolicy)},'balRequirement','all','balApprovers',jsonb_build_array('family','supervisor')) where care_recipient_id=${sqlLiteral(f.patient)};`);

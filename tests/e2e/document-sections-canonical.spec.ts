@@ -39,7 +39,8 @@ async function laboratoryModel(browser: Browser, scenario = "E03-27") {
   await page.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/cenario/" + scenario);
   const close = page.locator("#lab-bar [data-action='lab-toggle']");
   if (scenario === "E03-71") {
-    if (!await page.getByRole("button", { name: "Inspecionar", exact: true }).isVisible()) await page.getByRole("button", { name: "Cenários e controles", exact: true }).click();
+    await expect(close).toBeVisible();
+    if (await close.getAttribute("aria-expanded") !== "true") await close.click();
     await page.getByRole("button", { name: "Inspecionar", exact: true }).click();
     await page.getByRole("button", { name: "Preparar PDF fictício para conferência", exact: true }).click();
   }

@@ -494,7 +494,7 @@ function TransferDeclarationEditor({
     setRefreshing(true);
     setAttempt((value) => value + 1);
   };
-  const privatePanel = (
+  const privatePanel = !result && !uncertain ? (
     <SimpleDraftPanel
       draft={privateDraft}
       current={currentContent}
@@ -506,7 +506,7 @@ function TransferDeclarationEditor({
       }
       acknowledgeLabel="Reconhecer declaração registrada"
     />
-  );
+  ) : null;
   const referenceComparison = comparison ? (
     <section
       className="ui-card hca-form-stack"

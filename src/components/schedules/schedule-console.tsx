@@ -34,6 +34,7 @@ import {
   type ScheduleRecovery,
 } from "./use-schedule-confirmation";
 import { ScheduleConfirmationPanel } from "./schedule-confirmation-panel";
+import { useScrollableRegion } from "@/components/ui/use-scrollable-region";
 
 const today = () =>
   new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(
@@ -233,6 +234,7 @@ function Agenda({
     opener: HTMLElement,
   ) => void;
 }) {
+  const scrollRegion = useScrollableRegion<HTMLDivElement>();
   const patient = context.patient!,
     team = can(context, "schedule.manage.team"),
     publishOwn = can(context, "schedule.manage.own");
@@ -465,7 +467,7 @@ function Agenda({
             Programação prevista, sem registro de presença. O mesmo período
             aparece em computador e celular.
           </p>
-          <div className="hca-agenda-desktop" tabIndex={0} role="region" aria-label="Calendário de plantões; rolagem horizontal quando necessária">
+          <div className="hca-agenda-desktop" {...scrollRegion} role="region" aria-label="Calendário de plantões; rolagem horizontal quando necessária">
             {period.dates.map(renderDay)}
           </div>
           <div className="hca-agenda-mobile">{period.dates.map(renderDay)}</div>

@@ -237,3 +237,109 @@ a 9af2cbcd e não é transferido automaticamente. Windows e Ubuntu passaram
 na CI de 4ebe385b. A publicação complementar exige CI própria até o início
 correto das seis frentes de navegador. Não houve novas migrations, mudança
 remota ou aceite global.
+
+## Resultado completo de ec2c257c e continuação de 15/11
+
+A CI 43667038344 terminou com falha após o ponto de partida dos navegadores.
+Windows, Ubuntu, instalação limpa, evolução legada e 760 integrações passaram.
+Chromium-2 e mobile-2 passaram, com uma tentativa instável cada. Chromium-1,
+mobile-1, ios-1 e ios-2 falharam em casos de navegador. A conferência dos seis
+logs identificou 15 casos de origem entre falhas persistentes e recuperações
+na repetição. Esses resultados não modificam o registro histórico de partida
+dos seis jobs nem constituem aprovação da interface.
+
+As causas examinadas nesta continuação são:
+
+- medidas antigas de cabeçalho em complementos REQ/COM e um seletor textual
+  instável no painel do laboratório;
+- estado COM repetido legitimamente no resumo e cabeçalho, exigindo consulta
+  contextual no teste;
+- foco de regiões roláveis após mudanças de largura, fonte, abas e isolamento
+  modal: a atualização agora acompanha o layout e a visibilidade reais;
+- controles parcialmente encobertos pelo cabeçalho fixo no celular: a rolagem
+  reserva sua altura, conservando dimensões e aparência canônicas;
+- leitura de resultado BAL e abertura da próxima programação enquanto o modal
+  estava encoberto pela atividade, antes da confirmação: as provas aguardam o
+  recibo aplicado ou a mensagem de registro, o fim da atividade e dos diálogos;
+- espera de resposta tardia iniciada antes de uma retenção deliberada: o
+  observador passa a ser armado antes de liberar a resposta, mantendo o teste
+  da ordem invertida, foco, erro, vazio e ausência de mutação;
+- uma jornada de reconto atravessou meia-noite e o plantão fictício expirou:
+  somente esse cenário usa janela corrente estável, criada pelas mesmas RPCs;
+  o comportamento e as fixtures que exercitam a fronteira de calendário ficam
+  preservados;
+- origem de foco e ativação de permissão Push precisam aguardar o isolamento
+  de foco e a preparação efetiva; a negativa de troca de conta permanece;
+- confirmação de transferência podia ser encoberta por aviso do rascunho
+  consumido, após a consulta assíncrona desse mesmo preenchimento.
+
+A repetição dirigida terminou, com os limites registrados abaixo. Nenhum teste,
+regra axe, verificação
+de largura, histórico, quantidade, autoria ou contraprova foi excluído. As
+fixtures continuam no projeto local verificado, sem reset. Não há alteração
+de migrations, autorização ou dados remotos nesta continuação.
+
+A auditoria de composição P02 e a de Andamentos publicados usam a origem de
+rolagem definida em auditFromTop. Centralizar uma região longa antes de auditar
+a página inteira deixava outro controle parcialmente sob o cabeçalho fixo.
+Todas as larguras, regras axe, capturas da região e provas operacionais ficam.
+A reserva de altura do cabeçalho continua protegendo a rolagem por foco real.
+
+## Diagnósticos adicionais de 15/11
+
+Os seis diagnósticos TS2307/TS7006 citam
+`private-operation-recovery-actions.tsx`, removido em 6ebcf0f1 pela política L1
+de decisões curtas. Não existe fonte ou consumidor desse componente na árvore.
+O resolvedor do TypeScript, com o tsconfig atual e a mesma origem de import,
+resolve os quatro aliases para supply-drafts, workspace, floating e icon.
+Os parâmetros sem tipo são consequência da análise da aba antiga fora do projeto.
+Não foi recriado o componente nem alterada a configuração para ocultar erros.
+A aba obsoleta precisa ser fechada no editor para retirar esses diagnósticos.
+
+O calendário conserva região nomeada e rolagem horizontal por teclado. Seu foco
+passa pelo mesmo observador de overflow e visibilidade das outras regiões:
+somente uma região rolável entra na sequência de Tab; a versão desktop oculta
+no celular sai dessa sequência. A jornada existente verifica foco, deslocamento
+real por ArrowRight, versão mobile, publicação e recusa do conflito.
+
+Os 14 avisos de segurança do print foram reavaliados individualmente na fonte
+atual, mantendo as quatro ocorrências de ui_finalize. A triagem estática não
+encontrou caminho acionável: bloqueio incondicional de Meta, contenção canônica
+de PNG e de destinos documentais, seleção fixa PV, vetor de argumentos sem shell
+e destinos literais ou escolhidos explicitamente pelo operador. Não houve
+alteração desses utilitários, regeneração de evidências históricas, supressão
+de regra ou encerramento de issue remota. O print não informa revisão ou fluxo
+completo; a conclusão se limita aos fontes atuais, sem prova dinâmica de segurança.
+O artefato gerenciado l1-sonar-editor-recheck-20261115.json tem SHA-256
+604ac0e28618a873c8cd64e3e92d41aaca7341883a2e3b4a2d641a61610ea4b2.
+A política resolvida e a explicação por ocorrência estão na mesma coleção.
+
+## Provas dirigidas da continuação
+
+Os 15 casos de origem têm prova positiva nas repetições dirigidas. A primeira
+rodada WebKit aprovou 13 jornadas; as duas contraprovas de consulta de declaração
+consumida após reabertura também passaram. A nova regressão retém a resposta
+do rascunho consumido até depois da confirmação: conserva o acesso à ficha,
+um único POST oficial e o estoque, e passou nos três projetos.
+
+A rodada nos três projetos aprovou 22 de 24 execuções. As duas falhas foram
+de Andamentos em Chromium/mobile, pela posição de rolagem descrita acima;
+a repetição após o ajuste aprovou Andamentos em Chromium, mobile e WebKit/iOS.
+P02 completo, saldo COM, estoque com resposta invertida, transferência bilateral
+e as negativas de Push de dois perfis passaram nos três projetos. A emissão
+P02 havia atingido o limite de tempo em uma tentativa local; o exemplar chegou
+a ready em uma tentativa, sem erro, em 4,646 segundos. A repetição integral
+aprovou os três projetos em 45,8/40,2/44,3 segundos, sem aumentar timeouts.
+Uma rodada com duas falhas de conexão ao Auth local foi igualmente substituída
+pelas repetições integrais positivas, sem alteração de Auth.
+
+A agenda já passou em mobile e WebKit/iOS com foco, ArrowRight e versão oculta
+fora do Tab, incluindo confirmação positiva antes da próxima programação.
+Chromium alcançou a auditoria axe final, mas esgotou o orçamento local padrão
+de 30 segundos. O banco local conserva 6.810 pacientes; o seletor no contexto
+capturado contém milhares de opções. Esse único caso passou em 30,7 segundos
+com prazo local de 60 segundos, sem alterar o prazo da CI ou qualquer asserção.
+A confirmação positiva passou nos três projetos; Chromium usou o prazo local
+explicitado acima. ESLint dos fontes alterados, Markdown e os builds
+de produção com TypeScript passaram. As matrizes preservam gates humanos,
+aparelhos e provedores; a CI do próximo SHA continua necessária.

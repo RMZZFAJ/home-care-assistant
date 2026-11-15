@@ -83,10 +83,11 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   page,
   browser,
 }, info) => {
-  const f = await pendingRecount(),
+  const f = await pendingRecount({ stableCurrentWindow: true }),
     target = f.initial.targets.find(
       (row: ScheduledShift) => row.id === f.assignment.shift_id,
     );
+  expect(Date.parse(target.ends_at) - Date.now()).toBeGreaterThan(12 * 60 * 60 * 1000);
   const before = JSON.parse(recountState(f));
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);

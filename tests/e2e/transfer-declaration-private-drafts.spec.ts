@@ -17,6 +17,45 @@ import { audit } from "./accessibility-audit";
 import type { Custody, SupplyDocument } from "../../src/types/documents";
 import type { TransferPreparation } from "../../src/types/transfers";
 test.setTimeout(180_000);
+
+test("resultado confirmado permanece acessível quando a consulta do rascunho consumido chega depois", async ({ page }) => {
+  const f = await declarationDraftFixture("CARE_TEAM");
+  await login(page, f);await open(page, "CARE_TEAM");await fill(page, f, "2");
+  const before = JSON.parse(declarationFacts(f));
+  let release!: () => void, consumedReads = 0, posts = 0;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  page.on("request", request => {
+    if (request.method() === "POST" && new URL(request.url()).pathname === "/api/transfers") posts++;
+  });
+  await page.route("**/api/drafts?*", async route => {
+    if (route.request().method() !== "GET" || new URL(route.request().url()).searchParams.get("careRecipientId") !== f.patient)
+      return route.continue();
+    const response = await route.fetch(), body = await response.json();
+    if (body.data?.state === "consumed") { consumedReads++;await gate; }
+    return route.fulfill({ response, json: body });
+  });
+  try {
+    await dialog(page).getByRole("button", { name: "Revisar declaração", exact: true }).click();
+    await dialog(page).getByRole("button", { name: "Registrar declaração sem expedir", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Declaração confirmada", exact: true })).toBeVisible();
+    await expect.poll(() => consumedReads).toBeGreaterThan(0);
+    const consumed = page.waitForResponse(async response => {
+      const url = new URL(response.url());
+      return url.pathname === "/api/drafts" && url.searchParams.get("careRecipientId") === f.patient
+        && response.request().method() === "GET" && (await response.json()).data?.state === "consumed";
+    });
+    release();await (await consumed).finished();
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+    await expect(page.getByRole("dialog", { name: "Resultado anterior confirmado", exact: true })).toHaveCount(0);
+    const result = page.getByRole("dialog", { name: "Declaração registrada", exact: true });
+    await expect(result).toHaveCount(1);
+    const link = result.getByRole("link", { name: "Consultar a transferência registrada", exact: true });
+    const href = await link.getAttribute("href");expect(href).toMatch(/^\/documentos\/[0-9a-f-]{36}$/);
+    const after = declarationFacts(f);expect(JSON.parse(after).ledger).toEqual(before.ledger);expect(posts).toBe(1);
+    await link.click();await expect(page).toHaveURL(new RegExp(href! + "(?:[?#]|$)"));
+    expect(declarationFacts(f)).toBe(after);expect(posts).toBe(1);
+  } finally { release();await page.unrouteAll({ behavior: "wait" }); }
+});
 type Fixture = Awaited<ReturnType<typeof declarationDraftFixture>>;
 const dialog = (page: Page) => page.getByRole("dialog");
 async function login(page: Page, f: Fixture) {

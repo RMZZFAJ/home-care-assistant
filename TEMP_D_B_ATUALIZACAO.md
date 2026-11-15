@@ -1,5 +1,20 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**15/11 — continuação após resultado completo da CI ec2c257c.** Windows,
+Ubuntu, instalação limpa, evolução legada e 760 integrações passaram. Quatro
+jobs de navegador falharam; dois passaram, mas também tiveram tentativas
+instáveis. A revisão dos seis logs identificou 15 casos de origem. A correção
+mantém a mesma branch, trata as causas compartilhadas de foco/rolagem e
+preserva os oráculos oficiais. A repetição dirigida terminou; o próximo SHA
+precisa de CI própria. O início anterior dos jobs não aprovou a suíte completa.
+Os 15 casos de origem já têm prova positiva dirigida; P02, transferência,
+saldo COM, estoque e Push passaram nos três projetos. Andamentos passou nos
+três após normalizar a origem da auditoria. O foco da agenda agora depende
+de rolagem real e passou nos três projetos. Os seis erros TS citam
+um componente já excluído, e o compilador resolve os quatro aliases atuais.
+Os 14 avisos de segurança foram reavaliados sem caminho acionável na fonte
+atual, preservando guardas e evidências. Detalhes no registro de estabilização.
+
 **14/11 — estabilização reaberta após falhas dos navegadores e Sonar.** A CI
 43646730287 de `302d6c56` passou nas validações e 760 integrações, mas os seis
 jobs de navegador acumularam falhas. O responsável determinou a continuação na

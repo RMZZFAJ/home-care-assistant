@@ -31,7 +31,11 @@ test("BAL keeps an unsaved item review separate from stock application and recov
  expect(stock(f.patient)).toBe(before); expect(privateFormCount(f.patient)).toBe(drafts);
  await dialog.getByRole("button", { name: "Conferir revisão", exact: true }).click();
  await expect(dialog.getByRole("region", { name: "Materiais incluídos na revisão", exact: true })).toContainText("Os demais materiais não foram declarados como examinados");
- await dialog.getByRole("button", { name: "Confirmar revisão", exact: true }).click();await expect(dialog).toHaveCount(0);
+ const reviewResponse = page.waitForResponse(response => new URL(response.url()).pathname === "/api/documents/"+f.document.id+"/decisions" && response.request().method() === "POST");
+ await dialog.getByRole("button", { name: "Confirmar revisão", exact: true }).click();
+ const reviewReceipt = await reviewResponse; expect(reviewReceipt.ok(), await reviewReceipt.text()).toBe(true);
+ expect((await reviewReceipt.json()).data.state).toBe("applied");
+ await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);await expect(dialog).toHaveCount(0);
  expect(stock(f.patient)).toBe(before);
  const reviewed = (await (await page.request.get("/api/documents/"+f.document.id)).json()).data;
  expect(writes).toEqual([]); expect(privateFormCount(f.patient)).toBe(drafts);

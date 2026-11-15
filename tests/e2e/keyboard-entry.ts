@@ -22,8 +22,11 @@ export async function assertKeyboardEntry(page: Page, label: string) {
   const origin = !hasModal && await skip.count() ? skip : await scope.evaluate(element => element.hasAttribute("tabindex")) ? scope : scope
     .locator('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([data-tabster-dummy])')
     .filter({ visible: true }).first();
-  await origin.focus();
-  await expect(origin).toBeFocused();
+  await expect.poll(() => origin.evaluate(element => {
+    if (element.closest('[inert],[hidden],[aria-hidden="true"]')) return false;
+    element.focus();
+    return document.activeElement === element;
+  }), { message: label + " keyboard origin must be interactive after focus isolation settles" }).toBe(true);
   const element = await origin.elementHandle();
   await page.keyboard.press("Tab");
   await expect.poll(() => page.evaluate(start => {

@@ -441,7 +441,10 @@ for (const account of ["professional", "family"] as const) test("Web Push refuse
       (window as unknown as { releasePushPermission: () => void }).releasePushPermission = () => { void permission().then(resolve); };
     });
   });
-  await panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true }).click();
+  await page.bringToFront();
+  const enroll = panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true });
+  await enroll.focus();await expect(enroll).toBeFocused();await expect(enroll).toBeEnabled();
+  await enroll.press("Enter");
   await expect.poll(() => page.evaluate(() => typeof (window as unknown as { releasePushPermission?: unknown }).releasePushPermission)).toBe("function");
   const originalContext = await (await page.request.get("/api/push/devices?context=consent")).json();
   expect(originalContext.contextReference).toMatch(/^[a-f0-9]{64}$/);

@@ -11,7 +11,7 @@ import {
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 import { selectDocumentSection } from "./document-sections";
 
 test.setTimeout(150_000);
@@ -203,8 +203,9 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   expect(state(req.id, f.patient)).toBe(before);
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    await feed.scrollIntoViewIfNeeded();
-    await audit(page, "Andamento publicado " + width);
+    // Audit the whole composition from its origin. Centering a long feed can
+    // leave an unrelated control partly underneath the sticky app header.
+    await auditFromTop(page, "Andamento publicado " + width);
     await info.attach("Andamento publicado " + width, {
       body: await feed.screenshot(),
       contentType: "image/png",
