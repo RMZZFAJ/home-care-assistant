@@ -3,6 +3,7 @@ import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { FeedbackBanner } from "@/components/ui/feedback";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useWorkspaceState } from "@/components/layout/workspace-context";
 
 import {
   api,
@@ -54,6 +55,19 @@ export function ConsumptionDetail({
   const live = useLiveRevision(),
     headingRef = useRef<HTMLHeadingElement>(null),
     firstFocusRef = useRef(false);
+  const { loading, selecting } = useWorkspaceState();
+  useEffect(() => {
+    if (!data || reading || loading || selecting || firstFocusRef.current) return;
+    // URL/context reads keep this detail mounted but inert under the loading
+    // overlay. Transfer focus only after that transition has released it.
+    const frame = requestAnimationFrame(() => {
+      const heading = headingRef.current;
+      if (!heading || heading.closest('[inert],[hidden],[aria-hidden="true"]')) return;
+      heading.focus();
+      firstFocusRef.current = document.activeElement === heading;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [data, reading, loading, selecting]);
   useEffect(() => {
     const controller = new AbortController();
     queueMicrotask(() => {
@@ -72,10 +86,6 @@ export function ConsumptionDetail({
           );
         setData(current => mergeConsumptionRead(current, result.data));
         setError("");
-        if (!firstFocusRef.current) {
-          firstFocusRef.current = true;
-          requestAnimationFrame(() => headingRef.current?.focus());
-        }
       })
       .catch((reason) => {
         if (!controller.signal.aborted) {

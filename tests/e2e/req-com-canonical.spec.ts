@@ -139,8 +139,14 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials retain 
     const clear = page.getByRole("button", { name: "Limpar busca de materiais", exact: true });
     await clear.focus(); await clear.press("Enter"); await expect(table.locator("tbody tr")).toHaveCount(2);
     expect(await table.locator("tbody tr").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")))).toEqual(ids);
-    await page.getByRole("region", { name: /rolagem horizontal quando necessária/ }).focus();
-    await expect(page.getByRole("region", { name: /rolagem horizontal quando necessária/ })).toBeFocused();
+    const scroll = page.getByRole("region", { name: /rolagem horizontal quando necessária/ });
+    if (await scroll.evaluate(node => node.scrollWidth > node.clientWidth)) {
+      await expect(scroll).toHaveAttribute("tabindex", "0");
+      await scroll.focus();
+      await expect(scroll).toBeFocused();
+      await scroll.press("ArrowRight");
+      await expect.poll(() => scroll.evaluate(node => node.scrollLeft)).toBeGreaterThan(0);
+    } else await expect(scroll).not.toHaveAttribute("tabindex", "0");
     await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
     expect(await page.evaluate(() => matchMedia("(forced-colors: active)").matches && matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(true);
     await auditFromTop(page, `canonical ${type} forced colors and reduced motion`);

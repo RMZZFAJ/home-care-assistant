@@ -25,7 +25,17 @@ test("BAL shows actual later corrections, exact version links and masked stock w
  const link=region.getByRole("link",{name:"Consultar versão "+f.recount.version+" do reconto",exact:true});
  await expect(link).toHaveAttribute("href","/documentos/"+f.document.id+"/arquivos?version="+f.recount.version);
  const before=stock(f.patient);for(const width of [1440,1024,768,390,320]){
-  await page.setViewportSize({width,height:940});await link.focus();await audit(page,"bal-correction-links-"+width);
+  await page.setViewportSize({width,height:940});
+  const scroll=page.getByRole("region",{name:"Materiais da contagem; rolagem horizontal quando necessária",exact:true});
+  // ResizeObserver updates the tab stop after layout; inspect the settled
+  // keyboard contract before axe freezes its own geometry snapshot.
+  await expect.poll(()=>scroll.evaluate(node=>(node.scrollWidth>node.clientWidth||node.scrollHeight>node.clientHeight) ? node.tabIndex===0 : !node.hasAttribute("tabindex"))).toBe(true);
+  if(await scroll.evaluate(node=>node.scrollWidth>node.clientWidth)){
+   await scroll.focus();await expect(scroll).toBeFocused();await scroll.press("ArrowRight");
+   await expect.poll(()=>scroll.evaluate(node=>node.scrollLeft)).toBeGreaterThan(0);
+   await scroll.evaluate(node=>{node.scrollLeft=0;});
+  }
+  await link.focus();await audit(page,"bal-correction-links-"+width);
  }
  mkdirSync("output/playwright/phase-d",{recursive:true});await region.screenshot({path:"output/playwright/phase-d/bal-correction-pending-"+info.project.name+".png",animations:"disabled"});
  expect(stock(f.patient)).toBe(before);expect(writes).toEqual([]);

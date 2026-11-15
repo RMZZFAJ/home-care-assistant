@@ -73,7 +73,7 @@ for (const type of ["REQ", "COM"]) test(type + " preserves original facts and re
   await expect(confirm).toBeEnabled();
   for (const width of [1440, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 940 });
-    await expect(page.locator(".app-header")).toHaveCSS("height", width <= 850 ? "110px" : "64px");
+    await expect(page.locator(".app-header")).toHaveCSS("height", width <= 850 ? "104px" : "65px");
     await expect(page.locator(".app-header .hca-profile-identity")).toHaveCSS("display", width <= 850 ? "none" : "grid");
     await page.evaluate(() => document.fonts.ready);
     await auditFromTop(page, "cancellation-awareness-" + type + "-" + width);

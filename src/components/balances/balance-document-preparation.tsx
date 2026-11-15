@@ -369,6 +369,7 @@ export function BalanceDocumentPreparation({
   return (
     <RecordDrawer
       exitDialog
+      keyboardScrollable
       title={
         purpose !== "assign_recount"
           ? "Revisar contagem do balanço"

@@ -283,6 +283,7 @@
 @media (max-width: 500px) { .hca-compact-badges { display: none; } }
 
 .hca-modal-content, .hca-document-panel { min-width: 0; overflow-wrap: anywhere; }
+.hca-l1 .hca-form-stack { min-width: 0; grid-template-columns: minmax(0,1fr); }
 .hca-l1 fieldset { min-inline-size: 0; }
 .hca-modal-content :is(input,select,textarea) { min-width: 0; max-width: 100%; }
 .hca-modal-content :is(pre,code) { white-space: pre-wrap; overflow-wrap: anywhere; }

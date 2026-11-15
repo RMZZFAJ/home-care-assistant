@@ -190,3 +190,50 @@ aprovada nas rodadas corretivas; inclui a conferência ENT renomeada para o
 comportamento em abas vigente. O caso restante é a importação histórica nova
 limitada pela capacidade local descrita acima. Esse levantamento não substitui
 a CI completa do SHA final nem o aceite visual do responsável.
+
+## Continuação após disponibilização dos logs de 9af2cbcd
+
+A importação histórica nova passou na CI desse SHA em Chromium, mobile e iOS.
+Isso fecha a contraprova que a capacidade local não permitiu repetir; o limite
+local e a preservação dos dados continuam registrados acima. Os 101 casos de
+origem têm agora prova positiva em rodadas dirigidas ou nessa CI, sem equivaler
+a aprovação integral de uma execução única no SHA final.
+
+Os logs fechados também revelaram sete casos adicionais: ciência de cancelamento
+REQ/COM com dimensões antigas do cabeçalho, foco do consumo após transição de
+URL, foco incondicional na tabela REQ, revisão BAL extensa sem região navegável,
+largura mínima intrínseca no grupo de aplicação e inspeção de tabela BAL antes
+da atualização assíncrona de foco após resize. Foram conservadas todas as
+asserções de autoria, resposta perdida, estoque, URL e bytes de PDF.
+
+O detalhe de consumo agora espera a consulta e a transição de contexto liberarem
+o conteúdo antes de transferir foco. O editor BAL usa a região de conteúdo
+navegável já existente no componente compartilhado. A grade de formulários
+usa coluna minmax(0,1fr), impedindo expansão intrínseca no Safari em 320px.
+Os consumidores usam 65px/104px do laboratório e exigem foco somente quando
+existe rolagem real. A inspeção BAL aguarda o contrato de foco após resize e
+acrescenta prova de deslocamento real por ArrowRight; não desliga regras axe.
+
+Cinco jornadas Chromium passaram após essas correções, incluindo o consumo
+com débito único e atualização em outra sessão, ciência pessoal de cancelamento
+REQ/COM e tabelas canônicas REQ/COM. Três jornadas WebKit/iOS passaram: atos
+posteriores BAL, revisão familiar e aplicação independente com recuperação
+por GET após revogação, incluindo 320px. A repetição final da inspeção BAL
+com foco e ArrowRight explícitos passou nas cinco larguras em WebKit/iOS.
+
+A análise Sonar de 4ebe385b encontrou S4036 no preparador que já chamava
+Supabase por PATH. O reparo usa o resolvedor confiável existente tanto no stop
+opcional quanto no start e migration; o PATH descendente contém somente o
+diretório confiável do Docker. O retry continua restrito ao start. Dezesseis
+testes inertes passaram; investigação e revisão independentes não encontraram
+bypass ou regressão concreta. A inicialização real da mesma stack passou,
+inclusive com PATH herdado substituído por um caminho sentinela inexistente.
+Não foi executado restart, reset ou carregamento de fixtures nessa validação.
+
+O relatório gerenciado é l1-prepare-cli-path-fix-review.md, SHA-256
+80b4a43f488260f974e2798c073a90f892aeb343b940755eb4701346a42fda70.
+A análise do próximo SHA deve reconhecer esse reparo; o gate A anterior pertence
+a 9af2cbcd e não é transferido automaticamente. Windows e Ubuntu passaram
+na CI de 4ebe385b. A publicação complementar exige CI própria até o início
+correto das seis frentes de navegador. Não houve novas migrations, mudança
+remota ou aceite global.

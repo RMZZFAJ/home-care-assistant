@@ -1,5 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { dirname } from "node:path";
+import { trustedExecutable } from "./trusted-executable.mjs";
 import { startLocalWithPortRetry } from "./local-start-retry.mjs";
 import {
   testRoot,
@@ -10,11 +12,14 @@ import {
 } from "./test-environment.mjs";
 
 assertLocalProject({ running: false });
+const supabase = trustedExecutable("supabase");
+const commandEnvironment = { ...process.env, PATH: dirname(trustedExecutable("docker")) };
 mkdirSync(testDataRoot, { recursive: true });
 if (process.argv.includes("--restart")) {
   assertLocalProject();
-  const stopped = spawnSync("supabase", ["stop", "--workdir", testRoot], {
+  const stopped = spawnSync(supabase, ["stop", "--workdir", testRoot], {
     encoding: "utf8",
+    env: commandEnvironment,
   });
   if (stopped.status !== 0) {
     process.stderr.write(stopped.stderr);
@@ -34,7 +39,7 @@ for (const args of [
 ]) {
   // Validate the running container and localhost endpoints before the first database mutation.
   if (args[0] === "migration") getTestEnvironment();
-  const run = () => spawnSync("supabase", args, { encoding: "utf8" });
+  const run = () => spawnSync(supabase, args, { encoding: "utf8", env: commandEnvironment });
   const result = args[0] === "start"
     ? await startLocalWithPortRetry(run, {
         onRetry: (attempt, delay) => console.error(
