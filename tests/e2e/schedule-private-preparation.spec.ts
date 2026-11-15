@@ -12,6 +12,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { openSchedulePrivateArea } from "./schedule-private-area";
 test.setTimeout(150_000);
 async function peerContext(browser: Browser) {
   const use = test.info().project.use;
@@ -48,9 +49,7 @@ const button = (page: Page, name: string) =>
   page.getByRole("button", { name, exact: true });
 async function open(page: Page, series = false, own = false) {
   if (own) {
-    await page
-      .getByText("Meus preenchimentos privados da agenda", { exact: true })
-      .click();
+    await openSchedulePrivateArea(page);
     await button(
       page,
       series ? "Retomar minha programação" : "Retomar meu tipo de plantão",

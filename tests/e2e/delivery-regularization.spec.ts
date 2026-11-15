@@ -14,7 +14,7 @@ import {
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 import type { SupplyDocument } from "../../src/types/documents";
 test.setTimeout(180_000);
 type Fixture = Awaited<ReturnType<typeof unavailableDelivery>>;
@@ -135,6 +135,9 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
   page,
   browser,
 }, info) => {
+  // Retained local fixture histories make the global selectors much larger.
+  // Keep CI's existing three-minute budget and every operational/a11y oracle.
+  if (!process.env.CI) test.setTimeout(240_000);
   const f = await unavailableDelivery({ cancellation: true }),
     before = ledger(f);
   await login(page, f.patient, "adminA");
@@ -263,8 +266,15 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
       await family.setViewportSize({ width, height: 900 });
       // Start each responsive inspection at the document's reading origin;
       // focus restoration may have left earlier controls at the sticky edge.
-      await family.evaluate(() => window.scrollTo(0, 0));
-      await audit(family, "regularizacao-resultado-" + width);
+      await test.step("Auditar composição P05 " + width, () => auditFromTop(family, "regularizacao-resultado-" + width));
+      const materials = family.getByRole("region", { name: "Materiais da entrega ou transferência; rolagem horizontal quando necessária", exact: true });
+      if (await materials.evaluate(element => element.scrollWidth > element.clientWidth)) {
+        await expect(materials).toHaveAttribute("tabindex", "0");
+        await materials.focus();await expect(materials).toBeFocused();
+        const scrollBefore = await materials.evaluate(element => element.scrollLeft);
+        await materials.press(scrollBefore > 0 ? "ArrowLeft" : "ArrowRight");
+        await expect.poll(() => materials.evaluate(element => element.scrollLeft)).not.toBe(scrollBefore);
+      }
     }
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await family.screenshot({

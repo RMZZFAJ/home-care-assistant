@@ -6,6 +6,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 /** Whole-page composition checks start at a known scroll/focus origin after resize. */
 export async function auditFromTop(page: import("@playwright/test").Page, label: string, expectedTitle = "Home Care Assistant") {
+  await page.bringToFront();
   await page.evaluate(() => {
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -14,6 +15,7 @@ export async function auditFromTop(page: import("@playwright/test").Page, label:
   await audit(page, label, expectedTitle);
 }
 export async function audit(page: import("@playwright/test").Page, label: string, expectedTitle = "Home Care Assistant") {
+  await page.bringToFront();
   await expect(page).toHaveTitle(expectedTitle);
   if (label === "login") await expect(page.getByLabel("E-mail", { exact: true })).toBeEnabled();
   // Establish a known sequential origin before testing keyboard movement.
@@ -40,16 +42,19 @@ export async function audit(page: import("@playwright/test").Page, label: string
     }
   }
   await page.waitForFunction(() => document.getAnimations().every((animation) => animation.playState !== "running" || animation.effect?.getComputedTiming().iterations === Infinity));
+  // Focus/scroll can trigger responsive and sticky layout observers after the
+  // keyboard step. Measure the resulting frame, rather than that transition.
+  await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
   const result = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
   const evidence = accessibilityEvidence(label, result);
-  if (result.violations.some(item => item.id === "target-size")) {
+  if (result.violations.some(item => ["target-size", "color-contrast"].includes(item.id))) {
     const header = await page.locator(".app-header").evaluateAll(elements => elements.map(header => ({
-      bounds: header.getBoundingClientRect().toJSON(),
-      controls: Array.from(header.querySelectorAll<HTMLElement>("button,select,a")).map(element => {
+      bounds: header.getBoundingClientRect().toJSON(), background: getComputedStyle(header).backgroundColor,
+      controls: Array.from(header.querySelectorAll<HTMLElement>("button,select,a,.header-context")).map(element => {
         const bounds = element.getBoundingClientRect(), style = getComputedStyle(element);
-        return { tag: element.tagName, className: element.className, bounds: bounds.toJSON(), padding: style.padding, lineHeight: style.lineHeight, display: style.display,
+        return { tag: element.tagName, className: element.className, bounds: bounds.toJSON(), padding: style.padding, lineHeight: style.lineHeight, display: style.display, color: style.color, background: style.backgroundColor,
           hit: [0.1, 0.5, 0.9].map(fraction => document.elementsFromPoint(bounds.left + bounds.width * fraction, bounds.top + bounds.height / 2).slice(0, 4).map(hit => ({ tag: hit.tagName, className: hit.getAttribute("class") }))) };
       }),
     })));

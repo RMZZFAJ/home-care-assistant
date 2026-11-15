@@ -44,10 +44,15 @@ test("Abas comparam os tokens L1 na mesma área de leitura em cinco larguras", a
     for (const width of [320, 390, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await model.setViewportSize({ width, height: 900 });
+      await page.bringToFront();
+      await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
       const readingWidth=await page.locator(".hca-record-detail").evaluate(el=>el.getBoundingClientRect().width);
       // Laboratory controls take canvas space; compare the product at the same
       // reading width without changing any design token or reference markup.
       await model.locator("#product-app .doc-page").evaluate((el,w)=>{(el as HTMLElement).style.width=w+"px";(el as HTMLElement).style.maxWidth="none";},readingWidth);
+      await model.bringToFront();
+      await model.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
+      expect(await model.locator("#product-app .doc-page").evaluate(el => el.getBoundingClientRect().width)).toBeCloseTo(readingWidth, 1);
       for (const [actual, expected, keys] of pairs)
         expect(await page.locator(actual).first().evaluate(styles,keys), actual+" "+width).toEqual(await model.locator("#product-app "+expected).first().evaluate(styles,keys));
       // Later owner comments supersede the reference's separate workflow tab.

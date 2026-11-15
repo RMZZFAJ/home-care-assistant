@@ -104,8 +104,24 @@ test("Mais usa menu e identificação separada; família menciona por @ e refere
   await expect(editor.getByRole("textbox", { name: "Nome da pessoa a mencionar", exact: true })).toHaveCount(0);
   await text.fill("Registro privado @Teste");
   const name = sql("select full_name from public.profiles where id=" + q(fixtures.professional.id));
-  await editor.getByRole("button", { name: "@" + name, exact: true }).click();
-  await text.press("End"); await text.pressSequentially(" #" + otherCode);
+  const mention = editor.getByRole("button", { name: "@" + name, exact: true });
+  await mention.focus();await expect(mention).toBeFocused();
+  // A busy rendering frame must not move the caret back into text typed later.
+  const releaseFrames = await page.evaluateHandle(() => {
+    const request = window.requestAnimationFrame.bind(window), cancel = window.cancelAnimationFrame.bind(window);
+    const queued = new Map<number, FrameRequestCallback>();let sequence = 0;
+    window.requestAnimationFrame = callback => { const id = --sequence;queued.set(id, callback);return id; };
+    window.cancelAnimationFrame = id => { if (!queued.delete(id)) cancel(id); };
+    return () => { window.requestAnimationFrame = request;window.cancelAnimationFrame = cancel;for (const callback of queued.values()) request(callback);queued.clear(); };
+  });
+  try {
+    await mention.press("Enter");
+    await text.press("End");await text.pressSequentially(" #" + otherCode);
+  } finally { await releaseFrames.evaluate(release => release());await releaseFrames.dispose(); }
+  await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
+  const expectedText = "Registro privado @" + name + "  #" + otherCode;
+  await expect(text).toHaveValue(expectedText);
+  expect(await text.evaluate((element: HTMLTextAreaElement) => element.selectionStart)).toBe(expectedText.length);
   await editor.getByRole("button", { name: new RegExp("^Ficha · " + otherCode + "(?: ·|$)") }).click();
   const committed = page.waitForResponse(response => new URL(response.url()).pathname === "/api/documents/progress-preparations/commit" && response.request().method() === "POST");
   await editor.getByRole("button", { name: "Publicar andamento", exact: true }).click();

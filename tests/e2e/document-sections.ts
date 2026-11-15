@@ -24,6 +24,7 @@ export async function selectDocumentSection(
   page: Page,
   section: DocumentSection,
 ) {
+  await page.bringToFront();
   if (section === "history") { await openDocumentMore(page); await page.getByRole("menuitem", {name:"Identificação e registros preservados",exact:true}).click(); await expect(page.getByRole("tab", { name: "Identificação e registros preservados", exact: true })).toHaveAttribute("aria-selected", "true"); return; }
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
   await tab.click();

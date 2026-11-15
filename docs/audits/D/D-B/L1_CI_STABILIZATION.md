@@ -343,3 +343,56 @@ A confirmação positiva passou nos três projetos; Chromium usou o prazo local
 explicitado acima. ESLint dos fontes alterados, Markdown e os builds
 de produção com TypeScript passaram. As matrizes preservam gates humanos,
 aparelhos e provedores; a CI do próximo SHA continua necessária.
+
+## Resultado completo de c612fe61 e nova continuação
+
+A CI 43752683272 confirmou Windows, Ubuntu, instalação limpa, evolução legada
+e 760 integrações. Chromium-2 passou 249 casos; mobile-2 passou 248 e teve um
+caso recuperado na repetição; iOS-2 passou 247 e recuperou dois na repetição.
+Chromium-1 e mobile-1 falharam somente no filtro de entregas. iOS-1 também
+falhou na região rolável P05, na comparação de tokens em 1024px e na seleção
+de referência por # após uma menção. São quatro casos persistentes e três
+casos de agenda instáveis entre os seis logs.
+
+A lista de entregas ainda usava somente um indicador inline; a consulta passa
+a registrar sua atividade no overlay compartilhado. O cursor da seleção de
+menção era restaurado por requestAnimationFrame e podia alcançar a digitação
+posterior. A regressão retém quadros do navegador e verifica texto e seleção
+após sua liberação. As inspeções WebKit de composição aguardam o layout real
+e a mesma largura do laboratório, conservando tokens e regras axe.
+Os testes de retomada da agenda passam a abrir o details somente quando
+fechado, respeitando a restauração nativa. A revisão CAS também verifica a
+validade nativa do formulário antes da ação.
+
+A regressão do cursor falhou no código anterior: a seleção voltava de 47 para
+37 após liberar os quadros retidos, mesmo com o texto completo. A correção usa
+o commit de layout do texto controlado para restaurar a seleção; elimina a
+restauração tardia de menções e referências. A mesma regressão passou em
+WebKit/iOS e Chromium, junto da prova preexistente de limite de 2000 caracteres,
+retomada, publicação única, privacidade familiar e leitura individual por menção.
+
+As medições a11y ativam a página e aguardam os observadores do layout após o
+passo de teclado. A comparação com o laboratório também aguarda ambos os
+layouts e exige a mesma largura de leitura; todos os tokens continuam exatos.
+Diagnósticos de geometria são anexados somente quando ocorre violação de
+dimensão ou contraste. As ações entre sessões ativam a página correta antes
+de usar o controle nativo; não forçam cliques ou painéis ocultos.
+
+Oito jornadas WebKit/iOS e as oito equivalentes Chromium passaram. P05 passou
+separadamente em WebKit/iOS, incluindo quatro larguras, axe, rolagem real por
+seta, autores independentes, estoque, consulta de tarefas e PDF. A repetição
+local anterior completou 1440/768/390px e esgotou 180 segundos durante o axe
+de 320px, com milhares de opções no seletor do banco local preservado. Somente
+P05 recebe 240 segundos fora de CI; seu prazo de 180 segundos na CI permanece.
+A repetição completa terminou em cerca de 150 segundos. Houve uma medição
+local de contraste durante a mudança de layout do cabeçalho; a espera do quadro
+após o teclado conserva a regra e a aparência e passou na repetição completa.
+
+A confirmação mobile aprovou os oito casos. O fechamento tem 25 execuções
+dirigidas positivas: nove WebKit/iOS e oito em cada projeto Chromium/mobile.
+ESLint dos fontes afetados, builds de produção com TypeScript e Markdown
+passaram. A nova CI precisa validar seu próprio SHA; a aprovação de c612fe61
+em Windows/Ubuntu/banco/Sonar não é transferida automaticamente.
+Nenhum teste, regra, limite de campos, oráculo de quantidade, autoria, estoque
+ou recuperação oficial foi retirado. Não há alteração de banco, permissões,
+migrations ou dados remotos. Gates humanos, aparelhos e provedores permanecem.

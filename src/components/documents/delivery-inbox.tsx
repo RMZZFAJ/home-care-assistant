@@ -1,5 +1,6 @@
 "use client";
-import { ActionButton, FormField, LoadingIndicator, SelectField } from "@/components/ui/controls";
+import { ActionButton, FormField, SelectField } from "@/components/ui/controls";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -51,6 +52,7 @@ function Inbox({ context }: { context: WorkspaceContext }) {
   }), [patientId, scope, status, page]);
   const read = useScopedRead("/api/deliveries?" + params, String(revision), decode);
   const { loading, error } = read;
+  useOperationActivity(loading, { title: "Consultando entregas e tarefas", detail: "Estamos conferindo as entregas autorizadas desta seleção." });
   const rows = read.data?.data ?? [], total = read.data?.total ?? 0;
   const fresh = Boolean(read.data && !loading && !error);
   const navigate = (values: DeliveryInboxSelection) => {
@@ -130,7 +132,6 @@ function Inbox({ context }: { context: WorkspaceContext }) {
           </ActionButton>
         </Notice>
       ) : null}
-      {loading ? <LoadingIndicator label="Consultando entregas e tarefas" /> : null}
       {read.queriedAt ? <p className="text-xs text-(--muted)">
         {loading || error ? "Última consulta preservada." : "Entregas consultadas:"} {formatBrazilDate(read.queriedAt)}.
         {loading || error ? " Atualize para conferir a situação vigente." : ""}

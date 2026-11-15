@@ -12,6 +12,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { openSchedulePrivateArea } from "./schedule-private-area";
 import {
   scheduleResourcePurposes,
   scheduleResourceLabels,
@@ -65,9 +66,7 @@ async function open(
   recovering = false,
 ) {
   if (own) {
-    await page
-      .getByText("Meus preenchimentos privados da agenda", { exact: true })
-      .click();
+    await openSchedulePrivateArea(page);
     await button(page, "Consultar ou retomar este preenchimento").click();
   } else {
     await page
@@ -121,6 +120,8 @@ async function fill(page: Page, purpose: ScheduleResourcePurpose) {
   }
 }
 async function review(page: Page) {
+  await page.bringToFront();
+  expect(await button(page, "Revisar alteração").evaluate((element: HTMLButtonElement) => element.form?.checkValidity())).toBe(true);
   await button(page, "Revisar alteração").click();
   const d = drawer(page, "Revisar escala");
   await expect(d).toBeVisible();

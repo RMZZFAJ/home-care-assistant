@@ -1,5 +1,14 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**15/11 — continuação após resultado completo de c612fe61.** A CI 43752683272
+passou Windows, Ubuntu, instalação limpa, evolução legada e 760 integrações.
+Chromium-2, mobile-2 e iOS-2 passaram; os três shards 1 falharam em quatro
+casos de origem. Os logs completos também registram três casos de agenda
+aprovados somente na repetição. As correções tiveram 25 execuções dirigidas
+aprovadas: nove WebKit/iOS e oito em cada projeto Chromium/mobile. A mesma
+branch recebe o novo commit e CI própria até a partida das seis etapas E2E.
+O registro de estabilização conserva os resultados por SHA e os limites locais.
+
 **15/11 — continuação após resultado completo da CI ec2c257c.** Windows,
 Ubuntu, instalação limpa, evolução legada e 760 integrações passaram. Quatro
 jobs de navegador falharam; dois passaram, mas também tiveram tentativas
