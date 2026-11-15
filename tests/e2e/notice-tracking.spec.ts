@@ -58,7 +58,7 @@ test("prazo5 encerra só o acompanhamento e preserva PDF lento com bytes confirm
     await page.getByRole("button", { name: "Gerar PDF", exact: true }).click(); await first;
     await page.clock.fastForward(5000); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "elapsed");
     await expect(page.locator(".hca-activity-overlay")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Gerar PDF", exact: true, includeHidden: true })).toBeDisabled(); expect(failed).toEqual([]);
+    await expect(page.locator("button").filter({ hasText: /^Gerando PDF…$/ })).toBeDisabled(); expect(failed).toEqual([]);
     release(); await expect(files.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveCount(1); expect(issuance).toBeTruthy();
     const response = await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${issuance!.id}`); expect(response.status()).toBe(200);
     expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(issuance!.sha256);

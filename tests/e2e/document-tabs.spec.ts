@@ -230,7 +230,7 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
   }
 });
 
-test("Conferência ENT sobreposta protege campos, descarta ao sair e conserva seleção por URL sem conceder auditoria", async ({
+test("Conferência ENT conserva campos entre abas, descarta ao sair e mantém URL sem conceder auditoria", async ({
   page,
 }) => {
   const f = await setup(),
@@ -246,20 +246,23 @@ test("Conferência ENT sobreposta protege campos, descarta ao sair e conserva se
   await page
     .getByRole("button", { name: "Informar divergência", exact: true })
     .click();
-  const editor = page.getByRole("dialog", { name: "Informar divergência", exact: true });
+  const editor = page.getByRole("region", { name: "Conferência pessoal", exact: true });
   await editor.getByRole("checkbox", { name: /Material fictício V4 0/ }).check();
   await editor.getByRole("textbox", { name: "Efetivamente recebido", exact: true }).fill("1,");
   const ownText = "Edição fictícia protegida durante a conferência";
   await editor.getByRole("textbox", { name: "Observações da divergência", exact: true }).fill(ownText);
   const before = official(ent.id, f.patient);
-  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).not.toBeVisible();
-  await editor.getByRole("button", { name: "Voltar", exact: true }).click();
+  await selectDocumentSection(page, "overview");
+  await selectDocumentSection(page, "materials");
+  await expect(editor.getByRole("textbox", { name: "Efetivamente recebido", exact: true })).toHaveValue("1,");
+  await expect(editor.getByRole("textbox", { name: "Observações da divergência", exact: true })).toHaveValue(ownText);
+  await editor.getByRole("button", { name: "Fechar ação", exact: true }).click();
   const leave = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });
   await leave.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
   await expect(editor.getByRole("textbox", { name: "Efetivamente recebido", exact: true })).toHaveValue("1,");
   await expect(editor.getByRole("textbox", { name: "Observações da divergência", exact: true })).toHaveValue(ownText);
   expect(official(ent.id, f.patient)).toBe(before);
-  await editor.getByRole("button", { name: "Voltar", exact: true }).click();
+  await editor.getByRole("button", { name: "Fechar ação", exact: true }).click();
   await leave.getByRole("button", { name: "Sair e descartar", exact: true }).click();
   await expect(editor).toHaveCount(0);
   await selectDocumentSection(page, "overview");

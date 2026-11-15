@@ -6,6 +6,16 @@ jobs de navegador acumularam falhas. O responsável determinou a continuação n
 mesma branch. O [registro de estabilização](docs/audits/D/D-B/L1_CI_STABILIZATION.md)
 distingue defeitos reais, consumidores anteriores ao L1 e provas ainda pendentes.
 A execução está aberta; o início anterior dos navegadores não encerra esta revisão.
+O conjunto corretivo foi publicado em 9af2cbcd na mesma branch. Windows e
+Ubuntu passaram; o gate Sonar passou com notas A e zero issues abertas.
+Banco também passou: instalação limpa, evolução legada e 760 integrações.
+Cinco frentes chegaram aos testes de navegador; ios-2 falhou antes deles por
+colisão da porta local 54324. A preparação recebe repetição restrita a esse
+erro, sem reset, e precisa de nova CI. Oito jornadas WebKit/iOS passaram;
+100 dos 101 casos de origem inventariados têm aprovação dirigida nas rodadas
+corretivas. A importação histórica nova permanece para o banco limpo da CI,
+pois os onze protocolos locais estão ocupados; não se apagaram dados ou testes.
+Isso não constitui aprovação da suíte completa ou aceite visual.
 
 **Revisão posterior de 14/11 — rascunhos L1.** A decisão do responsável em
 [L1_DRAFT_POLICY.md](docs/audits/D/D-B/L1_DRAFT_POLICY.md) substitui a conservação

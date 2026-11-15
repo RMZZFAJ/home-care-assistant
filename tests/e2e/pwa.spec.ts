@@ -447,7 +447,7 @@ test("PWA sem confirmação de atualização aguarda abas, preserva edição e r
       .click();
     await expect(
       peer.getByText(
-        "Salvo no servidor. Este preenchimento ainda não foi emitido.",
+        "Último rascunho salvo.",
         { exact: true },
       ),
     ).toBeVisible();

@@ -59,6 +59,7 @@
 .hca-l1 .doc-card-body[hidden] { display: none; }
 .hca-l1 .hca-access-main { padding: 24px 29px 55px; }
 .hca-l1 { --hca-sidebar-width: 219px; --app-header-height: 65px; }
+.hca-l1 :is(.dashboard-v2,.history-v2,.more-v2) .card { border-radius: 12px; box-shadow: 0 3px 14px #19333205; }
 .hca-l1 .app-header { color: #f6fffc; gap: 10px; padding-inline: 24px; }
 .hca-l1 .hca-navigation-toggle { width: 34px; min-height: 34px; padding: 0; border-radius: 9px; border: 1px solid #91c4b74d; background: #ffffff09; color: #c5e1d5; }
 .hca-l1 .patient-picker { flex: 0 1 auto; margin-left: 20px; justify-content: flex-start; }

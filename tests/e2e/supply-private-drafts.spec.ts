@@ -51,7 +51,7 @@ test("duas fichas ENT não herdam campos de conferência descartada e nenhuma na
  await login(page,f.patient,"professional");
  for(const doc of [first,second]){ await page.goto(`/fichas/${doc.id}`);await page.getByRole("button",{name:"Informar divergência",exact:true}).click();
   const field=page.getByRole("textbox",{name:"Observações da divergência",exact:true}); await expect(field).toHaveValue(""); await field.fill("Conferência que será descartada sem aceitar entrega.");
-  await page.getByRole("button",{name:"Voltar",exact:true}).click(); const guard=page.getByRole("dialog",{name:"Sair sem concluir?",exact:true});await guard.getByRole("button",{name:"Sair e descartar",exact:true}).click();
+  await page.getByRole("button",{name:"Fechar ação",exact:true}).click(); const guard=page.getByRole("dialog",{name:"Sair sem concluir?",exact:true});await guard.getByRole("button",{name:"Sair e descartar",exact:true}).click();
  }
  expect(official(f.patient)).toBe(before);expect(sql(`select count(*) from private.creation_drafts where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("0");
 });

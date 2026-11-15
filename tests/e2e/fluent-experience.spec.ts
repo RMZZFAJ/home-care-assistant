@@ -116,7 +116,7 @@ test("documentos comuns, histórico com URL e estoque têm apresentação real e
     await capture(page, "documento-" + kind + "-mobile", info.project.name);
   }
   await page.goto("/historico?careRecipientId=" + patient + "&type=ENT&search=" + ent.code);
-  await page.getByRole("button", { name: /^Filtros/ }).click();
+  if (await page.getByRole("button", { name: /^Filtros/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /^Filtros/ }).click();
   await expect(page.getByRole("combobox", { name: "Tipo de ficha", exact: true })).toHaveValue("ENT");
   await expect(page.getByLabel("Buscar por código ou protocolo", { exact: true })).toHaveValue(ent.code);
   await page.reload();

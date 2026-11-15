@@ -69,9 +69,8 @@ test("L1 ciência perdida recupera o mesmo conteúdo; @todos impede privado e Ma
   await page.goto(`/documentos/${req.id}`);await page.getByRole("button",{name:"Registrar andamento",exact:true}).click();
   const editor=page.getByRole("dialog",{name:"Registrar andamento",exact:true});
   await editor.getByRole("textbox",{name:"Texto do andamento",exact:true}).fill("Registro fictício para @todos");
-  await expect(editor.getByLabel("Visibilidade do andamento",{exact:true})).toHaveValue("public");
-  await expect(editor.getByLabel("Visibilidade do andamento",{exact:true})).toBeDisabled();
-  await expect(editor).toContainText("a opção de privado está indisponível");
+  await expect(editor.getByLabel("Visibilidade do andamento",{exact:true})).toHaveCount(0);
+  await expect(editor.getByRole("status").filter({hasText:"Você mencionou @todos."})).toContainText("visível a todos com acesso à ficha");
   await audit(page,"L1 andamento coletivo");await capture(page,"andamento-todos");
 });
 test("L1 alteração real da ENT mantém a cópia antiga até atualizar e preserva a decisão familiar",async({page})=>{

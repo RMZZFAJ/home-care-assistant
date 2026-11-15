@@ -44,7 +44,7 @@ async function prepare(
   ).toBeVisible();
   await openDocumentMore(page);
   await page
-    .getByRole("link", {
+    .getByRole("menuitem", {
       name: "Declarar nova necessidade remanescente",
       exact: true,
     })
@@ -66,7 +66,14 @@ async function prepare(
     exact: true,
   });
   await expect(choice).not.toBeChecked();
-  await choice.check();
+  // This fixture deliberately keeps the source item partially fulfilled.
+  // Selecting it therefore requires the real repetition acknowledgement.
+  await choice.click();
+  const repeat = page.getByRole("dialog", { name: "Este produto já está em uma requisição pendente", exact: true });
+  await expect(repeat).toBeVisible();
+  await repeat.getByRole("textbox", { name: "Justificativa da nova requisição", exact: true }).fill(text);
+  await repeat.getByRole("button", { name: "Manter nova requisição", exact: true }).click();
+  await expect(choice).toBeChecked();
   const observation = page.getByLabel("Estoque observado com a equipe", {
     exact: false,
   });
@@ -208,7 +215,7 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
     ),
   );
   await page.goto(`/historico/${f.source.id}`);
-  await selectDocumentSection(page, "materials");
+  await selectDocumentSection(page, "overview");
   await expect(
     page.getByRole("region", { name: "Necessidades seguintes", exact: true }),
   ).toContainText(ownReason);

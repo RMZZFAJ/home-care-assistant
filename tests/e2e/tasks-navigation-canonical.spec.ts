@@ -28,7 +28,7 @@ async function login(page: Page, patient: string, role = "adminA") {
 async function compare(actual: Locator, model: Locator, properties: string[]) {
   for (const property of properties) {
     const expected = await model.evaluate((node, key) => getComputedStyle(node).getPropertyValue(key), property);
-    await expect(actual).toHaveCSS(property, expected);
+    await expect(actual, "Canonical property: " + property).toHaveCSS(property, expected);
   }
 }
 
@@ -53,7 +53,7 @@ test("15 ADM-01 next task follows the model and actual role without completing r
   try {
     const model = await reference.newPage();
     await model.route(/^https?:/, route => route.abort());
-    await model.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/inicio");
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/cenario/E02-01");
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
       await model.setViewportSize({ width, height: 900 });

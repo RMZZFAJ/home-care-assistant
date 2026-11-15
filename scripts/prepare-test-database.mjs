@@ -1,5 +1,6 @@
 import { mkdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { startLocalWithPortRetry } from "./local-start-retry.mjs";
 import {
   testRoot,
   testDataRoot,
@@ -33,7 +34,14 @@ for (const args of [
 ]) {
   // Validate the running container and localhost endpoints before the first database mutation.
   if (args[0] === "migration") getTestEnvironment();
-  const result = spawnSync("supabase", args, { encoding: "utf8" });
+  const run = () => spawnSync("supabase", args, { encoding: "utf8" });
+  const result = args[0] === "start"
+    ? await startLocalWithPortRetry(run, {
+        onRetry: (attempt, delay) => console.error(
+          `Local Supabase port collision; retrying start (${attempt}/3) in ${delay / 1000}s.`,
+        ),
+      })
+    : run();
   // start/status may print local credentials: report success only, never their output.
   if (result.status !== 0) {
     process.stderr.write(result.stderr);

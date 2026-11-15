@@ -96,12 +96,38 @@ C, segurança C e duplicação acima de 3%. As cinco ocorrências reais corrigid
 localmente precisam da nova análise do SHA publicado. O encerramento das duas
 ocorrências falsas, sozinho, não constitui gate aprovado.
 
+## Análise Sonar do conjunto publicado
+
+A análise 65788d2d-8852-477a-abb9-2753dc869a9f do SHA
+9af2cbcd6576d5f0f74b2e7090c74ce75741e4b0 passou no gate: segurança,
+confiabilidade e manutenção A, duplicação dentro do limite e zero issues
+abertas na consulta da PR7. A restrição de scripts e as correções de
+acessibilidade foram reconhecidas.
+
+O único aviso restante tratava de estilos inline do laboratório isolado.
+A triagem estática encontrou somente estilos de templates próprios e geometria
+numérica; os campos de comentários importados ou persistidos passam por escape
+antes da renderização. O HTML da raiz não é servido pelas rotas da aplicação.
+A ocorrência foi classificada como falso positivo, separadamente da correção
+anterior de scripts. Não se alterou perfil, exclusão ou limite do gate.
+
+O artefato gerenciado é
+l1-remaining-style-csp-triage-9af2cbcd.md, SHA-256
+13cbab4349417383345ac0d8c5da0aa928546d8db859cad02d7b51c2499dfc55.
+Esta triagem não afirma segurança de hospedagens arbitrárias ou de um HTML
+alterado pelo operador. Os testes de scripts anteriores permanecem evidência
+separada; não foram apresentados como validação dinâmica dessa triagem.
+
 ## Evidência em execução
 
 A rodada ampliada de 62 jornadas terminou com 46 aprovações e 16 falhas
-identificadas. A seleção seguinte contém 65 casos: as falhas restantes, os
-consumidores ainda não repetidos e uma contraprova com autosave deliberadamente
-retido. O resultado dessa seleção continua pendente; não há aprovação global.
+identificadas. A seleção seguinte de 65 casos teve 54 aprovações e 11 falhas.
+As repetições dirigidas seguintes confirmaram as correções de navegação,
+conferência, Andamentos, PDF lento, COM e retomada PWA, conservando seus
+oráculos oficiais. A comparação do início com o cenário E02-01 revelou uma
+regra ausente: cards de início, histórico e Mais usam raio de 12px e a sombra
+do laboratório. A regra foi copiada e a comparação passou em Chromium.
+Não há aprovação global.
 
 A estabilização acrescenta nome acessível aos painéis das abas, conserva a
 referência de consumo em mudança sem nova versão e alinha a lateral intermediária
@@ -122,3 +148,45 @@ As repetições de navegador ainda estão em andamento. Resultado anterior, suí
 parcial ou CI pendente não aprovam o conjunto. Nenhuma nova migration ou alteração
 remota foi necessária nesta estabilização. A CI do próximo SHA deve confirmar
 as correções; aceite humano, aparelho físico e provedores continuam separados.
+
+## Preparação da CI e nova publicação corretiva
+
+A CI 43661980893 de 9af2cbcd passou Windows, Ubuntu, instalação limpa, evolução
+legada e 760 integrações nativas. Cinco jobs chegaram ao E2E. O job ios-2
+132658616278 falhou antes dos testes: Docker não conseguiu vincular a porta
+local 54324 do container inbucket, embora o workflow já reservasse as portas
+da stack. Não foi falha de migração, autenticação nem asserção de navegador.
+
+A preparação agora repete somente o mesmo start da stack verificada quando
+o diagnóstico identifica um container home-care-assistant e colisão nas
+portas 54320–54329. São no máximo três tentativas, com esperas de 15 e 30
+segundos. Erros diferentes e a falha final continuam sendo propagados. Nenhum
+reset, stop adicional, fixture ou novo destino foi introduzido; migrations
+continuam com execução única após verificar os endpoints locais. Nove testes
+dirigidos cobrem recuperação transitória, esgotamento, outros destinos e erros
+que não podem ser repetidos. A nova CI precisa validar essa preparação.
+
+## Repetições finais dirigidas
+
+Oito jornadas passaram em WebKit/iOS no build de produção local: cabeçalho
+e navegação em cinco larguras, tabelas ENT/BAL com teclado e busca reversível,
+consulta de referência ENT indisponível, Mais e Andamentos privados por @/#,
+edição de plantão com conferência em 320px, cards de tarefas comparados ao
+laboratório e declaração com autosave deliberadamente retido. O último caso
+confirma que a revisão aguarda a própria gravação sem conflito artificial.
+
+A importação histórica nova continua sem repetição local completa: os onze
+protocolos físicos permitidos já estão ocupados por dados anteriores. A suíte
+não foi excluída, o limite não foi ampliado e nenhum dado foi apagado. A falha
+anterior da CI nesse caso era posterior à importação, no cabeçalho antigo; a
+CI com banco novo conserva a jornada inteira como contraprova. Esse limite
+local permanece explícito e separado dos resultados positivos acima.
+
+A última repetição de necessidade remanescente passou em Chromium: emissão
+única após resposta perdida e perda de escrita, motivo próprio na visão geral,
+aceite parcial da origem e bytes do PDF anterior preservados. A reconciliação
+dos 101 casos de origem inventariados encontra 100 com execução dirigida
+aprovada nas rodadas corretivas; inclui a conferência ENT renomeada para o
+comportamento em abas vigente. O caso restante é a importação histórica nova
+limitada pela capacidade local descrita acima. Esse levantamento não substitui
+a CI completa do SHA final nem o aceite visual do responsável.
