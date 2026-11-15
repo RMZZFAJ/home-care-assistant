@@ -95,7 +95,7 @@ async function resume(page: Page) {
 }
 async function recover(page: Page, source: Custody) {
  await page.goto("/transferencias"); await page.getByRole("combobox",{name:/^Custódia de origem/}).selectOption(source);
- await page.getByRole("button",{name:"Consultar último rascunho",exact:true}).click();
+ await page.getByRole("button",{name:/^(Consultar último rascunho|Preparar declaração)$/}).click();
 }
 for (const source of ["FAMILY", "CARE_TEAM"] as const) {
   test(
@@ -122,6 +122,9 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       expect(JSON.stringify(packet.content)).not.toContain("available");
       expect(JSON.stringify(packet.content)).not.toContain("originTotal");
       expect(declarationFacts(f)).toBe(before);
+      // Retire the first editor before continuing on the other device.
+      // Intentionally concurrent editors have a separate CAS regression.
+      await page.goto("/");
       const context = await peerContext(browser, page, info),
         peer = await context.newPage();
       try {
@@ -438,3 +441,36 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
     },
   );
 }
+
+
+test("declaração aguarda autosave em andamento antes de revisar sem conflito com a própria gravação", async ({ page }) => {
+  const f = await declarationDraftFixture("FAMILY");
+  await login(page, f);
+  await open(page, "FAMILY");
+  const before = declarationFacts(f);
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  const isSave = (request: import("@playwright/test").Request) =>
+    new URL(request.url()).pathname === "/api/drafts" &&
+    request.method() === "POST" && request.postDataJSON().action === "save";
+  const started = page.waitForRequest(isSave);
+  await page.route("**/api/drafts", async route => {
+    if (!isSave(route.request())) return route.continue();
+    await gate;
+    return route.continue();
+  });
+  try {
+    await fill(page, f, "2");
+    await started;
+    const review = dialog(page).getByRole("button", { name: "Revisar declaração", exact: true });
+    await expect(review).toBeDisabled();
+    await expect(dialog(page).getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ })).toHaveValue("2");
+    expect(declarationFacts(f)).toBe(before);
+    release();
+    await expect(review).toBeEnabled();
+    await review.click();
+    await expect(dialog(page).getByRole("heading", { name: "Conferir declaração antes de registrar", exact: true })).toBeFocused();
+    await expect(dialog(page).getByRole("alert")).toHaveCount(0);
+    expect(declarationFacts(f)).toBe(before);
+  } finally { release(); }
+});

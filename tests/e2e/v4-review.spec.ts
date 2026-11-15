@@ -264,11 +264,11 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
     await family.goto("/fichas/" + receipt.requisitionId);
     await selectDocumentSection(family, "communications");
     const statuses = family.getByRole("region", {
-      name: "Notificações da ficha",
+      name: "Comunicações da ficha",
       exact: true,
     });
     await expect(
-      statuses.getByText("Disponível no aplicativo", { exact: false }).first(),
+      statuses.getByText("Aviso criado no aplicativo", { exact: false }).first(),
     ).toBeVisible();
     const response = await family.request.get(
       "/api/notifications?surface=bell&careRecipientId=" + patient,
@@ -292,6 +292,9 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       bell.getByRole("link").filter({ hasText: receipt.code }),
     ).toHaveCount(1);
     await family.keyboard.press("Escape");
+    // The 25 newer silent records occupy the first communications page.
+    await statuses.getByRole("button", { name: "Próximas", exact: true }).click();
+    await expect(statuses.getByText("2 / 2", { exact: true })).toBeVisible();
     // Controlled local provider evidence, not an external Meta delivery.
     sql(
       "update public.requisition_notifications set channel='whatsapp',destination='+15555550102',state='read',read_at=now(),provider_reference='local-contract-" +

@@ -62,6 +62,11 @@ test("L1 ciência perdida recupera o mesmo conteúdo; @todos impede privado e Ma
   expect(posts).toBe(1);expect(sql(`select count(*) from public.requisition_science_events where requisition_id=${q(req.id)} and user_id=${q(fixtures.family.id)} and mode='express'`)).toBe("1");
   await page.unroute(`**/api/requisitions/${req.id}/science`);
   await selectDocumentSection(page,"overview");await page.getByRole("button",{name:"Registrar andamento",exact:true}).click();
+  await expect(page.getByRole("dialog",{name:"Registrar andamento",exact:true}).getByLabel("Visibilidade do andamento",{exact:true})).toHaveCount(0);
+  await page.getByRole("dialog",{name:"Registrar andamento",exact:true}).getByRole("button",{name:"Fechar diálogo",exact:true}).click();
+  await page.getByLabel("Menu do usuário",{exact:true}).click();await page.getByRole("menuitem",{name:"Sair",exact:true}).click();
+  await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures.professional.email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,f.patient);
+  await page.goto(`/documentos/${req.id}`);await page.getByRole("button",{name:"Registrar andamento",exact:true}).click();
   const editor=page.getByRole("dialog",{name:"Registrar andamento",exact:true});
   await editor.getByRole("textbox",{name:"Texto do andamento",exact:true}).fill("Registro fictício para @todos");
   await expect(editor.getByLabel("Visibilidade do andamento",{exact:true})).toHaveValue("public");

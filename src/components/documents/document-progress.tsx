@@ -1,4 +1,5 @@
 "use client";
+import { useScrollableRegion } from "@/components/ui/use-scrollable-region";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 
 import {
@@ -161,6 +162,7 @@ function ProgressContent({
   actionTarget,
   onAction,
 }: ProgressProps) {
+  const scrollRegion = useScrollableRegion<HTMLDivElement>();
   const [collapsed, setCollapsed] = useState(false);
   const [period, setPeriod] = useState("all"), [from, setFrom] = useState(""), [through, setThrough] = useState("");
   const [range, setRange] = useState<{ from: string | null; through: string | null }>({ from: null, through: null });
@@ -669,7 +671,7 @@ function ProgressContent({
             ciência, recebimento ou conclusão.
           </p>
           {feed.data.length ? (
-            <div className="doc-feed-scroll" tabIndex={0} role="region" aria-label="Cronologia de andamentos"><ol className="doc-feed">{feed.data.map(row => {
+            <div className="doc-feed-scroll" {...scrollRegion} role="region" aria-label="Cronologia de andamentos"><ol className="doc-feed">{feed.data.map(row => {
               const presentation = progressEventPresentation(row);
               return <li key={row.id} id={"andamento-" + row.id} tabIndex={-1} className={"doc-event hca-progress-event " + (row.source === "manual" ? "is-manual" : "is-automatic")} data-tone={presentation.tone} data-selected={row.id === anchor || undefined}>
                 <span className="doc-event-mark" aria-hidden="true"><Icon name={row.source === "manual" && row.visibility === "family" ? "lock" : presentation.originIcon} width={15} height={15} /></span>

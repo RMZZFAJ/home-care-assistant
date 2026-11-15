@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActionButton, Pill } from "@/components/ui/controls";
 import { Dialog, Icon } from "@/components/ui/primitives";
 import "./operations.css";
@@ -50,6 +50,11 @@ function NotificationRow({row,execute,blocked}:{row:Row;execute:Execute;blocked:
   const returnToRecordRef=useRef(false);
   const disabled=blocked || sending;
   const state=String(row.state);
+  useEffect(() => {
+    if (state === "uncertain" || blocked || sending || !returnToRecordRef.current) return;
+    const frame = requestAnimationFrame(() => { recordRef.current?.focus({ preventScroll: true }); returnToRecordRef.current = false; });
+    return () => cancelAnimationFrame(frame);
+  }, [state, blocked, sending]);
   const label=({pending:"Pendente",processing:"Em processamento",sent:"Enviada",delivered:"Entregue",read:"Vista",failed:"Falha",uncertain:"Resultado incerto",cancelled:"Cancelada"} as Record<string,string>)[state] ?? state;
   async function retryUncertain() {
     if(disabled || state!=="uncertain")return;

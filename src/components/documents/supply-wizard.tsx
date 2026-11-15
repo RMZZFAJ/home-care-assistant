@@ -1364,7 +1364,7 @@ export function PatientSupplyWizard({
   return (
     <div onChangeCapture={() => setDraftTouched(true)} className="hca-document-wizard min-w-0 space-y-5">
       <ComplementOriginHint />
-      {privateDraft.active ? (
+      {privateDraft.active && !uncertain ? (
         <SimpleDraftPanel
           draft={privateDraft}
           current={privateContent}

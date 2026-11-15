@@ -486,13 +486,13 @@ function PatientRequisition({
     <div ref={fieldsRef} onChangeCapture={() => setDraftTouched(true)} className="hca-document-wizard min-w-0 space-y-5">
       <ComplementOriginHint />
       {selectionLibrary()}
-      <SimpleDraftPanel
+      {!uncertain ? <SimpleDraftPanel
         draft={privateDraft}
         current={draftContent}
         patientName={context.patient!.display_name}
         resumeHref={resumeHref}
         disabled={saving || uncertain || loadingCatalog}
-      />
+      /> : null}
       {missingProducts.length ? (
         <Notice error>
           Materiais do preenchimento que não estão no catálogo ativo:{" "}

@@ -33,9 +33,9 @@ não altera o valor escolhido. Menus, popovers e tooltips usam comportamento
 Base UI e aparência própria. [Provas e gates](../audits/D/D-B/UI_MODEL_ACCEPTANCE.csv).
 
 O shell usa o breakpoint de 850px do modelo. No celular, uma linha de contexto
-de 51px mantém o seletor real de paciente abaixo do cabeçalho de 59px. Esse
-recurso operacional, ausente da demonstração, não pode ser ocultado para copiar
-sua composição. Todas as rotas e permissões continuam disponíveis; grupos da
+de 46px mantém o seletor real de paciente abaixo da primeira linha de 58px,
+conforme o laboratório L1 posterior. O seletor operacional permanece utilizável
+nessa composição. Todas as rotas e permissões continuam disponíveis; grupos da
 navegação começam abertos e podem ser recolhidos.
 
 ## Componentes e comportamento

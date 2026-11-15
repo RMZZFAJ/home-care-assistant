@@ -167,7 +167,8 @@ test("PDF atual preserva a origem congelada e distingue emissão sem expor a pre
       const preserved = await rpc(f.owner, "pdf_issuance", { p_id: oldId });
       expect(preserved).toMatchObject({ id: oldId, rendererRevision: 5 });
       expect(preserved.state).not.toBe("ready");
-      expect((await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${oldId}`)).status()).toBe(404);
+      const refusedExemplar = await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${oldId}`);
+      expect(refusedExemplar.status()).toBe(503); expect((await refusedExemplar.json()).code).toBe("PERSISTENCE_UNCONFIRMED");
       // The approved, already-issued exemplar remains byte-for-byte available.
       expect(hash(await (await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${row.id}`)).body())).toBe(row.sha256);
     }
@@ -264,11 +265,14 @@ test("REQ histórica apresenta origem desconhecida nas novas abas sem reimportar
   const meta = page.locator(".hca-document-meta > div");
   await expect(meta.filter({ has: page.locator("dt", { hasText: /^Registro original$/ }) }).locator("dd")).toHaveText("Data original desconhecida");
   await expect(meta.filter({ has: page.locator("dt", { hasText: /^Solicitante$/ }) }).locator("dd")).toHaveText("Solicitante desconhecido");
-  await expect(page.locator(".hca-document-tags").getByText(`Versão ${f.doc.version}`, { exact: true })).toBeVisible();
+  await selectDocumentSection(page, "history");
+  await page.getByRole("button", { name: "Linha do tempo", exact: true }).click();
+  await page.getByRole("button", { name: "Comparar versões", exact: true }).click();
+  await expect(page.getByRole("article", { name: `Conteúdo preservado da versão ${f.doc.version}`, exact: true })).toBeVisible();
   await selectDocumentSection(page, "materials");
   await expect(page.getByText("Não informado no registro legado", { exact: false })).toHaveCount(detail.data.requisition_items.length);
   await selectDocumentSection(page, "communications");
-  await page.getByRole("button", { name: /^Avisos e acompanhamento/ }).click();
-  await expect(page.getByText("Nenhum aviso disponível.", { exact: true })).toBeVisible();
+
+  await expect(page.getByText("Nenhuma comunicação registrada para esta ficha.", { exact: true })).toBeVisible();
   expect(snapshot()).toBe(before);
 });

@@ -64,7 +64,7 @@ test("BAL agendado recupera a revisão em leitura com referências salvas sem no
   await login(page,f.patient,f.pro.email);await open(page,"BAL");
   for(let i=0;i<f.products.length;i++)await page.getByLabel(`Material fictício V4 ${i} · unidade`,{exact:true}).fill("0");
   await next(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
-  await save(page).click();await expect(panel(page)).toBeVisible();
+  await save(page).click();await expect(panel(page)).toContainText("Último rascunho salvo.");
   const saved=await draftContext(f,"BAL",f.pro.client);
   expect(saved.navigation).toEqual({version:1,stage:"review"});
   expect(saved.content.context.mode).toBe("scheduled");
@@ -196,7 +196,7 @@ test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7
       .fill("Texto de A salvo na revisão seis");
     await next(page);
     await save(page).click();
-    await expect(panel(page)).toBeVisible();
+    await expect.poll(async () => (await draftContext(f)).content.observations).toEqual(["Texto de A salvo na revisão seis"]);
     await second
       .getByLabel("Observação 1", { exact: true })
       .fill("Texto próprio de B que precisa sobreviver ao conflito");
@@ -253,6 +253,7 @@ test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7
     ).toHaveValue("Texto próprio de B que precisa sobreviver ao conflito");
     await save(second).click();
     await expect(panel(second)).toBeVisible();
+    await expect.poll(async () => (await draftContext(f)).content.observations).toEqual(["Texto próprio de B que precisa sobreviver ao conflito"]);
     const current = await draftContext(f);
     expect(current.navigation).toEqual({ version: 1, stage: "notes" });
     expect(current.content.observations).toEqual([
@@ -584,7 +585,7 @@ test("abertura BAL antiga com resposta desconhecida recupera a mesma ficha antes
     .getByLabel("Quantidade — Material fictício V4 0", { exact: true })
     .fill("1,");
   await save(page).click();
-  await expect(panel(page)).toBeVisible();
+  await expect(panel(page)).toContainText("Último rascunho salvo.");
   const draft = await rpc(f.pro, "creation_draft_context", {
     p_patient: f.patient,
     p_kind: "BAL",

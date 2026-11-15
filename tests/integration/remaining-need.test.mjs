@@ -12,6 +12,7 @@ import {
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { whileAdvisoryWaits, whileRowWaits } from "./lock-barrier.mjs";
 import { actor, delivery, setup, issue } from "./v4-fixtures.mjs";
+import { historicalSourceFixture } from "./pdf-source-facts-fixtures.mjs";
 
 test("a completed source stays completed when a separately justified remaining need is issued", async () => {
   const base = await setup(),
@@ -72,43 +73,28 @@ test("a real foreign source and an imported readonly source cannot authorize a r
   // its selected patient after building the other real patient.
   await actor("adminA", f.patient);
   await actor("professional", f.patient);
-  const physicalProtocol = Number(
-    sql(
-      "select coalesce(max(physical_protocol),0)+1 from public.historical_requisition_imports;",
-    ),
-  );
-  await rpc(f.admin, "import_historical_requisitions", {
-    p_source_hash:
-      randomUUID().replaceAll("-", "") + randomUUID().replaceAll("-", ""),
-    p_rows: [
-      {
-        physicalProtocol,
-        careRecipientId: f.patient,
-        status: "submitted",
-        lines: [
-          { productId: f.products[0], currentStock: null, urgent: false },
-        ],
-        extraItems: [],
-        observations: ["Original físico fictício somente para leitura"],
-      },
-    ],
-  });
-  const historical = sql(
-      `select id from public.requisitions where care_recipient_id=${sqlLiteral(f.patient)} and is_historical;`,
-    ),
-    before = requestState(f),
-    physical = physicalState(f);
+  // Reuse the suite's explicitly fictional read-only source. The product has
+  // eleven physical import slots; retained local evidence must not be deleted
+  // or the import range widened merely to run this authorization check again.
+  const importedSource = await historicalSourceFixture({ knownName: false });
+  await actor("professional", f.patient);
+  const before = requestState(f), physical = physicalState(f);
   const denied = await f.pro.rpc("submit_remaining_requisition", {
     ...packet,
     p_source: other.id,
     p_source_version: 1,
   });
   assert.equal(denied.error?.code, "42501");
-  const readonly = await f.pro.rpc("submit_remaining_requisition", {
+  const historicalReader = await actor("professional", importedSource.patient);
+  assert.equal((await rpc(historicalReader, "operational_document", { p_id: importedSource.doc.id })).id, importedSource.doc.id);
+  const readonly = await historicalReader.rpc("submit_remaining_requisition", {
     ...packet,
-    p_source: historical,
-    p_source_version: 1,
+    p_care_recipient_id: importedSource.patient,
+    p_source: importedSource.doc.id,
+    p_source_version: importedSource.doc.version,
+    p_lines: [{ ...packet.p_lines[0], productId: importedSource.products[0] }],
   });
+  await actor("professional", f.patient);
   assert.equal(readonly.error?.code, "23514");
   assert.equal(requestState(f), before);
   assert.equal(physicalState(f), physical);

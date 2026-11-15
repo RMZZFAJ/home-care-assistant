@@ -169,9 +169,11 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await page
     .getByRole("button", { name: "Esqueci minha senha", exact: true })
     .click();
-  await expect(
-    page.getByText("Se o e-mail estiver autorizado", { exact: false }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/login\?access=recover/);
+  await expect(page.getByLabel("E-mail", { exact: true })).toHaveValue(email);
+  await expect(page.getByText("Se o e-mail estiver autorizado", { exact: false })).toHaveCount(0);
+  await page.getByRole("button", { name: "Solicitar link de recuperação", exact: true }).click();
+  await expect(page.getByText("Se o e-mail estiver autorizado", { exact: false })).toBeVisible();
   await page.goto(await confirmationLink(page, email, "Reset"));
   await expect(
     page.getByRole("heading", { name: "Definir nova senha" }),

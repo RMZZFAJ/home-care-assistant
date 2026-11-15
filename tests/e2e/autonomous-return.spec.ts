@@ -45,7 +45,7 @@ test("autonomous return has its own daily entry, recovers its preparation and pr
   await editor.getByRole("button", { name: "Salvar preenchimento privado", exact: true }).click(); expect((await saved).ok()).toBe(true);
   expect(transferState(f)).toBe(before);
   await page.reload(); await page.getByRole("button", { name: "Preparar devolução", exact: true }).click();
-  await editor.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true }).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(editor.getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ })).toHaveValue("5");
   await editor.getByRole("button", { name: "Comparar referência atual", exact: true }).click();
   await editor.getByRole("button", { name: "Adotar referência atual e revisar meus campos", exact: true }).click();

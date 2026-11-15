@@ -396,7 +396,7 @@ test("ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe
   });
   const pending = page.waitForResponse(
     (response) =>
-      new URL(response.url()).pathname === "/api/documents/" + delivery.id &&
+      new URL(response.url()).pathname === "/api/documents/" + delivery.id + "/decisions" &&
       response.request().method() === "POST",
   );
   await review
@@ -404,7 +404,7 @@ test("ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe
     .click();
   const response = await pending;
   expect(response.ok(), await response.text()).toBe(true);
-  expect(response.request().postDataJSON().body).toEqual({
+  expect(response.request().postDataJSON().intention.body).toEqual({
     divergences: [
       {
         lineId: delivery.lines[0].id,
@@ -561,9 +561,11 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
     path: `output/playwright/phase-d/bal-friday-summary-${info.project.name}.png`,
     fullPage: true,
   });
-  await review
-    .getByRole("button", { name: "Confirmar decisão", exact: true })
-    .click();
+  const official = page.waitForResponse(response => new URL(response.url()).pathname === `/api/balances/decisions/${f.patient}` && response.request().method() === "POST");
+  await review.getByRole("button", { name: "Confirmar decisão", exact: true }).click();
+  const confirmed = await official; expect(confirmed.ok(), await confirmed.text()).toBe(true);
+  expect((await confirmed.json()).data.state).toBe("applied");
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(review).not.toBeVisible();
   const current = await rpc(f.admin, "balance_workspace", {
     p_patient: f.patient,

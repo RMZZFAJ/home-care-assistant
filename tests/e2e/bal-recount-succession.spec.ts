@@ -1,3 +1,4 @@
+import { confirmDecisionAndReconcile } from "./l1-decision-policy";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
@@ -116,7 +117,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     animations: "disabled",
   });
   const attempts: unknown[] = [];
-  await page.route("**/api/balances/document-preparation", async (route) => {
+  await page.route("**/api/documents/" + f.document.id + "/decisions", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
     if (attempts.length === 1) {
@@ -135,29 +136,24 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
       .getByRole("region", { name: "Conferência da designação" })
       .getByText(reason, { exact: true }),
   ).toBeVisible();
-  await action(page, "Confirmar designação").click();
-  await expect(action(page, "Recuperar a mesma tentativa")).toBeVisible();
-  await expect(action(page, "Fechar edição")).toBeDisabled();
-  await expect(action(page, "Voltar")).toBeDisabled();
-  await action(page, "Recuperar a mesma tentativa").click();
+  await confirmDecisionAndReconcile(page, f.document.id, action(page, "Confirmar designação"));
   await expect(
     editor(page).getByRole("heading", {
       name: "Designação confirmada",
       exact: true,
     }),
   ).toBeFocused();
-  expect(attempts).toHaveLength(2);
-  expect(attempts[0]).toEqual(attempts[1]);
-  expect(attempts[0]).toMatchObject({
+  expect(attempts).toHaveLength(1);
+  expect(attempts[0]).toMatchObject({ intention: {
     expectedVersion: f.document.version,
-    purpose: "assign_recount",
-    draftCommit: { id: expect.any(String), revision: expect.any(Number) },
+    domain: "balance",
+    action: "assign_recount",
     body: {
       targetShiftId: f.assignment.shift_id,
       targetShiftVersion: target.version,
       reason,
     },
-  });
+  } });
   await action(page, "Consultar acompanhamento atual").click();
   await expect(editor(page)).toHaveCount(0);
   await expect(
@@ -174,7 +170,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     const counter = await context.newPage();
     await login(counter, second.email, f.patient);
     await counter.goto("/documentos/" + f.document.id);
-    await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar o reconto designado");
+    await expect(counter.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar o reconto designado");
     await counter.goto("/balancos");
     await counter
       .getByRole("main")

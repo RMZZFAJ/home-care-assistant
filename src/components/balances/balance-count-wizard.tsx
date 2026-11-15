@@ -922,7 +922,7 @@ function ScheduledCount({
   const previousPanel = (
     <BalancePreviousObservations content={balanceContent} />
   );
-  const draftPanel = (
+  const draftPanel = uncertain ? null : (
     <SimpleDraftPanel
       draft={privateDraft}
       current={balanceContent}

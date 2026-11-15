@@ -10,7 +10,7 @@ test("exibe a tela de login", async ({ page }) => {
   await page.goto("/login");
   await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible();
   await expect(page.getByLabel("E-mail")).toBeVisible();
-  await expect(page.getByLabel("Senha")).toBeVisible();
+  await expect(page.getByLabel("Senha", { exact: true })).toBeVisible();
 });
 
 test("login apresenta falha de credencial e de rede e permite recuperar a sessão", async ({

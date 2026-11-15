@@ -13,7 +13,7 @@ export async function remainingNeedFixture() {
   const f = await setup(),
     pro = await actor("professional", f.patient);
   const source = await issue(f.patient, f.products);
-  const ent = await delivery(f.patient, source, [f.products[0]]);
+  const ent = await delivery(f.patient, source, [f.products[0]], { requestFulfillment: "partial" });
   await rpc(pro, "supply_document_command", {
     p_id: ent.id,
     p_action: "receive",

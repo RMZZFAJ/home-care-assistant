@@ -49,7 +49,7 @@ test("COM list reaches more than100 acquisitions and the oldest purchase through
   const writes = trackWrites(page);
   await page.goto(`/historico?careRecipientId=${f.patient}&type=COM`);
   const links = page.locator("a.av-record"), observed: string[] = [];
-  const ids = () => links.evaluateAll(nodes => nodes.map(node => node.getAttribute("href")!.split("/").at(-1)));
+  const ids = () => links.evaluateAll(nodes => nodes.map(node => new URL(node.getAttribute("href")!, location.origin).pathname.split("/").at(-1)));
   for (let offset = 0; offset < order.length; offset += 20) {
     await expect.poll(ids).toEqual(order.slice(offset, offset + 20));
     observed.push(...await ids() as string[]);
@@ -61,7 +61,7 @@ test("COM list reaches more than100 acquisitions and the oldest purchase through
   await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect.poll(() => new URL(page.url()).searchParams.get("search")).toBe(code);
   await expect(links).toHaveCount(1);
-  await expect(links.first()).toHaveAttribute("href", `/documentos/${oldest}`);
+  expect(new URL((await links.first().getAttribute("href"))!, page.url()).pathname).toBe(`/documentos/${oldest}`);
   expect(new URL(page.url()).searchParams.get("type")).toBe("COM");
   expect(new URL(page.url()).searchParams.get("page")).toBeNull();
   expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);

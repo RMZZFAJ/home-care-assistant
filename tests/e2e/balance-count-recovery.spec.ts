@@ -1,3 +1,4 @@
+import { lastDraftPanel } from "./l1-long-draft-panel";
 import { test, expect, type Page } from "@playwright/test";
 import { balanceSetup } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
@@ -265,8 +266,10 @@ test("BAL scheduled private discard preserves a different operational attempt on
   await fill(page, f);
   await button(page, "Salvar rascunho").click();
   await expect(
-    page.getByRole("region", { name: "Rascunho privado", exact: true }),
-  ).toContainText("Revisão 1");
+    lastDraftPanel(page),
+  ).toHaveText("Último rascunho salvo.");
+  await page.reload();
+  await expect(page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true })).toBeVisible();
   const key = ownKey(f),
     saved = JSON.parse(
       (await page.evaluate((k) => sessionStorage.getItem(k), key))!,
@@ -304,14 +307,7 @@ test("BAL scheduled private discard preserves a different operational attempt on
     if (new URL(r.url()).pathname === "/api/documents" && r.method() === "POST")
       writes++;
   });
-  await button(page, "Descartar e começar nova").click();
-  await page
-    .getByRole("dialog", { name: "Descartar rascunho privado", exact: true })
-    .getByRole("button", {
-      name: "Confirmar descarte do rascunho",
-      exact: true,
-    })
-    .click();
+  await button(page, "Descartar e começar novamente").click();
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
     "descarte privado não a apagou",
   );

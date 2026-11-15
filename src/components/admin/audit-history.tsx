@@ -54,7 +54,7 @@ export function AuditHistory({ patientId }: { patientId: string }) {
       </div>
       <div className="hca-toolbar"><ActionButton name="submitAudit" type="submit" variant="primary">Consultar histórico</ActionButton><ActionButton type="button" onClick={() => { focus("query"); navigate(Object.fromEntries(Object.keys(filters).map(name => [name, ""]))); }}>Limpar filtros do histórico</ActionButton><ActionButton type="button" disabled={loading} onClick={read.refresh}>Atualizar histórico</ActionButton></div>
     </form>
-    {Object.values(values).some(Boolean) ? <div className="hca-toolbar" role="group" aria-label="Filtros ativos do histórico">{Object.entries(values).filter(([, value]) => value).map(([name, value]) => <ActionButton key={name} compact onClick={() => { focus(name); navigate({ [name]: "" }); }}>Remover {filters[name as keyof typeof filters]}: {value}</ActionButton>)}</div> : null}
+    {Object.values(values).some(Boolean) ? <div className="hca-toolbar" role="group" aria-label="Filtros ativos do histórico">{Object.entries(values).filter(([, value]) => value).map(([name, value]) => <ActionButton key={name} compact onClick={() => { focus(name); navigate({ [name]: "" }); }}><span>Remover {filters[name as keyof typeof filters]}: {value}</span></ActionButton>)}</div> : null}
     {loading ? <Notice>Consultando histórico…</Notice> : null}
     {error ? <Notice error>Última consulta destes filtros: {error} <ActionButton onClick={() => { focus("query"); read.refresh(); }}>Consultar histórico novamente</ActionButton></Notice> : null}
     {data && !fresh ? <p className="text-sm text-(--muted)">Última consulta confirmada{read.queriedAt ? " em " + formatBrazilDate(read.queriedAt) : ""}; aguardando atualização.</p> : null}

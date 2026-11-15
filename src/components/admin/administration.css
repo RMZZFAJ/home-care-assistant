@@ -4,6 +4,9 @@
 .hca-admin-card .hca-field > label { font-size: 12px; font-weight: 650; }
 .hca-admin-shortcuts { display: grid; gap: 16px; margin-top: 18px; }
 .hca-configuration-tab[aria-current=page] { color: var(--hca-teal); border-bottom-color: var(--hca-teal); }
+.hca-configuration-tabs .hca-configuration-tab { padding: 13px 15px; border-bottom-width: 3px; font-size: 12px; font-weight: 650; line-height: 1.5; min-height: 47px; }
+@media (max-width: 850px) { .hca-configuration-tabs .hca-configuration-tab { padding: 12px; } }
+@media (max-width: 500px) { .hca-configuration-tabs .hca-configuration-tab { padding: 12px 10px; font-size: 11px; gap: 5px; } }
 .hca-policy-card .hca-section-heading { margin-bottom: 0; }
 .hca-policy-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 16px 0; border-bottom: 1px solid var(--hca-line); }
 .hca-policy-row:last-child { border-bottom: 0; padding-bottom: 0; }

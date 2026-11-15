@@ -1,3 +1,4 @@
+import { lastDraftPanel } from "./l1-long-draft-panel";
 import { selectProfileSection } from "./profile-sections";
 import { test, expect, type Page, type Route } from "@playwright/test";
 import { randomUUID, createHash } from "node:crypto";
@@ -390,8 +391,7 @@ test("PWA sem confirmação de atualização aguarda abas, preserva edição e r
   const peer = await context.newPage();
   async function resume(tab: Page) {
     await tab.goto(`/fichas/com?careRecipientId=${f.patient}`);
-    await tab
-      .getByRole("region", { name: "Rascunho privado", exact: true })
+    await lastDraftPanel(tab)
       .getByRole("button", { name: "Continuar rascunho", exact: true })
       .click();
     for (let i = 0; i < 2; i++)

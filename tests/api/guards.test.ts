@@ -322,3 +322,11 @@ describe("patient capability checks", () => {
     ).rejects.toMatchObject({ code: "CONTEXT_REQUIRED" });
   });
 });
+
+it.each(["document changed before confirmation", "requisition reference changed before confirmation", "balance reference changed before confirmation", "balance reference changed after confirmation"])("maps the official decision conflict %s without reporting an outage", message => {
+  expect(() => databaseError({ code: "PT409", message })).toThrow(ApiError);
+  try { databaseError({ code: "PT409", message }); } catch (reason) {
+    expect(reason).toMatchObject({ code: "VERSION_CONFLICT", status: 409, retryable: false });
+    expect((reason as Error).message).not.toContain(message);
+  }
+});

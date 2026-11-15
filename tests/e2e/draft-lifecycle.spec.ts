@@ -1,3 +1,4 @@
+import { lastDraftPanel } from "./l1-long-draft-panel";
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { privateDraftFixture, reqContent, savePacket, officialState, draftDevice, draftContext, fixtures, rpc } from "../integration/private-draft-fixtures.mjs";
@@ -8,7 +9,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 
 test.setTimeout(180_000);
-const panel = (page: Page) => page.getByRole("region", { name: "Rascunho privado", exact: true });
+const panel = (page: Page) => lastDraftPanel(page);
 async function login(page: Page, patient: string, role: "professional" | "family" = "professional", email = fixtures[role].email) {
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(email);
@@ -19,7 +20,7 @@ async function login(page: Page, patient: string, role: "professional" | "family
 }
 async function open(page: Page) {
   await page.goto("/fichas/req");
-  await expect(panel(page)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Salvar rascunho", exact: true }).or(panel(page)).first()).toBeVisible();
   await expect(panel(page).getByText("Consultando seu rascunho no servidor…", { exact: true })).toHaveCount(0);
 }
 
@@ -74,16 +75,20 @@ test("REQ salva sem TTL retoma entre sessões sem misturar paciente ou outro tit
   const before = officialState(f), otherBefore = officialState(other);
   await login(page, f.patient);
   await open(page);
-  await expect(panel(page)).toContainText(note);
+  await expect(panel(page).getByRole("button", { name: "Continuar rascunho", exact: true })).toBeVisible();
+  expect((await (await page.request.get(`/api/drafts?careRecipientId=${f.patient}&kind=REQ`)).json()).data.content.observations).toEqual([note]);
   await panel(page).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(page.getByLabel("Observação 1", { exact: true })).toHaveValue(note);
   await selectContext(page, other.patient);
   await open(page);
-  await expect(panel(page)).not.toContainText(note);
+  await expect(page.locator("body")).not.toContainText(note);
   await expect(panel(page).getByRole("button", { name: "Continuar rascunho", exact: true })).toHaveCount(0);
   await selectContext(page, f.patient);
   await open(page);
-  await expect(panel(page)).toContainText(note);
+  await expect(panel(page).getByRole("button", { name: "Continuar rascunho", exact: true })).toBeVisible();
+  expect((await (await page.request.get(`/api/drafts?careRecipientId=${f.patient}&kind=REQ`)).json()).data.content.observations).toEqual([note]);
+  await panel(page).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(page.getByLabel("Observação 1", { exact: true })).toHaveValue(note);
   // A retiring editor can still persist while the logout navigation is pending.
   // Recreate that late write deterministically, without changing server drafts.
   await page.evaluate(() => window.addEventListener("beforeunload", () => {
@@ -95,8 +100,11 @@ test("REQ salva sem TTL retoma entre sessões sem misturar paciente ou outro tit
   expect(await page.evaluate(() => Object.keys(sessionStorage).filter(key => key.startsWith("hca:")))).toEqual([]);
   await login(page, f.patient, "family");
   await open(page);
-  await expect(panel(page)).toContainText(familyNote);
-  await expect(panel(page)).not.toContainText(note);
+  await panel(page).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  for (let step = 0; step < 6 && !await page.getByLabel("Observação 1", { exact: true }).isVisible(); step++)
+    await page.getByRole("button", { name: /^(Avançar|Revisar)$/ }).click();
+  await expect(page.getByLabel("Observação 1", { exact: true })).toHaveValue(familyNote);
+  await expect(page.locator("body")).not.toContainText(note);
   const familyRead = await page.request.get(`/api/drafts?careRecipientId=${f.patient}&kind=REQ`);
   expect((await familyRead.json()).data.id).toBe(familySaved.id);
   const fresh = await browser.newContext();
@@ -104,8 +112,8 @@ test("REQ salva sem TTL retoma entre sessões sem misturar paciente ou outro tit
     const restored = await fresh.newPage();
     await login(restored, f.patient);
     await open(restored);
-    await expect(panel(restored)).toContainText(note);
-    await expect(panel(restored)).not.toContainText(familyNote);
+    await expect(panel(restored).getByRole("button", { name: "Continuar rascunho", exact: true })).toBeVisible();
+    await expect(restored.locator("body")).not.toContainText(familyNote);
     const read = await restored.request.get(`/api/drafts?careRecipientId=${f.patient}&kind=REQ`), row = (await read.json()).data;
     expect(row).toMatchObject({ id: saved.id, revision: saved.revision, content: { observations: [note] }, navigation: { version: 1, stage: "notes" } });
     expect(row.contentHash).toBe(frozen.contentHash);

@@ -66,7 +66,8 @@ for (const policy of ["required", "optional"] as const) {
     const failed = page.waitForResponse(response => target(new URL(response.url())) && response.status() === 503);
     try {
       await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
-      await expect(page.getByRole("status").filter({ hasText: "Atualizando o acompanhamento da ficha" })).toContainText("Atualizando o acompanhamento da ficha");
+      await expect(page.locator(".hca-activity-overlay")).toBeVisible();
+      await expect(page.getByText("Atualizando o acompanhamento da ficha…", { exact: false })).toHaveCount(0);
       await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Contagem e revisão", exact: true })).toHaveCount(0);
     } finally { release(); }
     await failed;

@@ -2,6 +2,8 @@ import {expect, test} from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { accessibilityEvidence } from "../support/accessibility-results";
 import { assertKeyboardEntry } from "./keyboard-entry";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 /** Whole-page composition checks start at a known scroll/focus origin after resize. */
 export async function auditFromTop(page: import("@playwright/test").Page, label: string, expectedTitle = "Home Care Assistant") {
   await page.evaluate(() => {
@@ -109,10 +111,13 @@ export async function audit(page: import("@playwright/test").Page, label: string
       }
       return results;
     });
+    const evidencePath = test.info().outputPath("horizontal-overflow.json");
+    mkdirSync(dirname(evidencePath), { recursive: true });
+    writeFileSync(evidencePath, JSON.stringify({ ...size, elements: overflow, overflowingText }, null, 2));
     await test
       .info()
       .attach("horizontal-overflow-" + label.replaceAll(/[^a-z0-9-]/gi, "-"), {
-        body: JSON.stringify({ ...size, elements: overflow, overflowingText }, null, 2),
+        path: evidencePath,
         contentType: "application/json",
       });
   }

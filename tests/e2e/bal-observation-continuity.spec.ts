@@ -1,3 +1,4 @@
+import { lastDraftPanel } from "./l1-long-draft-panel";
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import {
@@ -23,7 +24,7 @@ test.setTimeout(180_000);
 const button = (page: Page, name: string) =>
   page.getByRole("button", { name, exact: true });
 const panel = (page: Page) =>
-  page.getByRole("region", { name: "Rascunho privado", exact: true });
+  lastDraftPanel(page);
 const review = (page: Page) =>
   page.getByRole("region", {
     name: "Conferir mudança da contagem",
@@ -39,7 +40,7 @@ async function login(page: Page, patient: string, email: string) {
   ).toBeVisible();
   await selectContext(page, patient);
   await page.goto("/fichas/bal");
-  await expect(panel(page)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Salvar rascunho", exact: true }).or(panel(page)).first()).toBeVisible();
 }
 async function stockChange(
   f:
@@ -122,7 +123,7 @@ test("BAL local scheduled fields survive a stock change,reload and explicit fres
     page.getByLabel("Observações da contagem", { exact: true }),
   ).toHaveValue(old.notes);
   await button(page, "Salvar rascunho").click();
-  await expect(panel(page)).toContainText("Revisão 1");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const saved = await rpc(f.pro.client, "creation_draft_context", {
     p_patient: f.patient,
     p_kind: "BAL",
@@ -189,7 +190,7 @@ test("BAL private optional observations survive reference change,new entry and a
   await expect(input).toHaveValue("");
   await input.fill("2");
   await button(page, "Salvar rascunho").click();
-  await expect(panel(page)).toContainText("Revisão 2");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const saved = await draftContext(f, "BAL");
   expect(saved.content.previousObservations).toEqual([old]);
   expect(saved.content.counts[f.products[0]]).toBe("2");
@@ -317,7 +318,7 @@ test("BAL private document version and reassigned shift keep old observations wi
     page.getByLabel("Material fictício V4 0 · unidade", { exact: true }),
   ).toHaveValue("");
   await button(page, "Salvar rascunho").click();
-  await expect(panel(page)).toContainText("Revisão 2");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const own = await rpc(f.pro.client, "creation_draft_context", {
     p_patient: f.patient,
     p_kind: "BAL",

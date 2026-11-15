@@ -4,6 +4,7 @@ import { DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeadin
 import { ActionButton, TextInput } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/primitives";
 import { normalizeCatalogText } from "@/lib/catalog-match";
+import { useScrollableRegion } from "@/components/ui/use-scrollable-region";
 
 export function DocumentMaterialsTable({ label, heading, columns, rows, filters }: {
   label: string; heading: ReactNode; columns: readonly { id: string; label: string; }[];
@@ -11,6 +12,7 @@ export function DocumentMaterialsTable({ label, heading, columns, rows, filters 
   filters?: readonly { id: string; label: string; }[];
 }) {
   const [query, setQuery] = useState("");
+  const scrollRegion = useScrollableRegion<HTMLDivElement>();
   const [filter, setFilter] = useState("all");
   const visible = rows.filter(row => normalizeCatalogText(row.searchText).includes(normalizeCatalogText(query)) && (filter === "all" || row.filters?.includes(filter)));
   return <div className="doc-area hca-document-materials">
@@ -19,7 +21,7 @@ export function DocumentMaterialsTable({ label, heading, columns, rows, filters 
     {filters ? <div className="hca-material-filters" role="group" aria-label="Filtrar materiais">{filters.map(item => <ActionButton key={item.id} variant={item.id === filter ? "primary" : "quiet"} aria-pressed={item.id === filter} onClick={() => setFilter(item.id)}>{item.label}</ActionButton>)}</div> : null}
     </div>{query ? <div className="card-body"><p role="status">{visible.length} de {rows.length} materiais nesta busca.</p><ActionButton onClick={() => setQuery("")}>Limpar busca de materiais</ActionButton></div> : null}
     {/* The named scroll region needs keyboard focus when cells have no controls (WCAG 2.1.1). */}
-    {!visible.length ? <p className="card-body">Nenhum material nesta busca. Ajuste ou limpe a consulta.</p> : <div className="doc-table-wrap" tabIndex={0} role="region" aria-label={label + "; rolagem horizontal quando necessária"}>
+    {!visible.length ? <p className="card-body">Nenhum material nesta busca. Ajuste ou limpe a consulta.</p> : <div className="doc-table-wrap" {...scrollRegion} role="region" aria-label={label + "; rolagem horizontal quando necessária"}>
       <DataTable className="doc-material-table" aria-label={label}>
         <DataTableHead><DataTableRow>{columns.map(column => <DataTableHeading key={column.id} scope="col">{column.label}</DataTableHeading>)}</DataTableRow></DataTableHead>
         <DataTableBody>{visible.map(row => <DataTableRow key={row.id} data-material-line-id={row.id} data-urgent={row.urgent || undefined}>

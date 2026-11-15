@@ -551,9 +551,10 @@ test.describe("administração integrada no ambiente local", () => {
         .filter({ has: page.locator("dt", { hasText: /^Registro original$/ }) })
         .locator("dd"),
     ).toHaveText("Data original desconhecida");
-    await expect(
-      page.locator(".hca-document-tags").getByText(/^Versão \d+$/),
-    ).toBeVisible();
+    await selectDocumentSection(page, "history");
+    await page.getByRole("button", { name: "Linha do tempo", exact: true }).click();
+  await page.getByRole("button", { name: "Comparar versões", exact: true }).click();
+    await expect(page.getByRole("article", { name: /^Conteúdo preservado da versão \d+$/ })).toBeVisible();
     await expect(
       metadata
         .filter({ has: page.locator("dt", { hasText: /^Solicitante$/ }) })
@@ -569,8 +570,8 @@ test.describe("administração integrada no ambiente local", () => {
       page.getByText("Não informado no registro legado", { exact: false }),
     ).toHaveCount(2);
     await selectDocumentSection(page, "communications");
-    await page.getByRole("button", { name: /^Avisos e acompanhamento/ }).click();
-    await expect(page.getByText("Nenhum aviso disponível.", { exact: true })).toBeVisible();
+
+    await expect(page.getByText("Nenhuma comunicação registrada para esta ficha.", { exact: true })).toBeVisible();
     const retry = await page.request.post("/api/admin", {
       data: { action: "historicalImport", rows, preview: false },
     });

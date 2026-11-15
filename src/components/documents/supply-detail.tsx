@@ -90,7 +90,7 @@ const secondaryDocumentActions = new Set<DocumentAction>([
   "reassign",
 ]);
 
-const supplyCopyIdentity = (value: SupplyDocument) => JSON.stringify([value.version, value.status, value.workflow_data, value.lines, value.receipts]);
+const supplyCopyIdentity = (value: SupplyDocument) => JSON.stringify([value.version, value.status, value.workflow_data, value.lines, value.receipts, value.deliveryCancellation?.referenceHash, value.balanceReview?.referenceHash]);
 export function SupplyDocumentContent({
   id,
   context,
@@ -109,7 +109,10 @@ export function SupplyDocumentContent({
   const [people, setPeople] = useState<PatientPerson[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
-  useOperationActivity(loading && !data || busy, { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
+  const [coveredRead, setCoveredRead] = useState(true);
+  const readScopeRef = useRef("");
+  const restoreRefreshFocusRef = useRef(false);
+  useOperationActivity(loading && coveredRead || busy, { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
   const [readDenied, setReadDenied] = useState(false);
@@ -141,10 +144,10 @@ export function SupplyDocumentContent({
   const operationOpenerRef = useRef<HTMLButtonElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
   const refreshButtonRef = useRef<HTMLButtonElement>(null);
-  const restoreRefreshFocusRef = useRef(false);
   function refreshDocument() {
     if (loading || busy) return;
     restoreRefreshFocusRef.current = true;
+    setCoveredRead(true);
     setLoading(true);
     setAttempt((value) => value + 1);
   }
@@ -202,8 +205,14 @@ export function SupplyDocumentContent({
     const controller = new AbortController();
     // Cache Components can resume this route with its previous state. Reconnect
     // the loading state before exposing actions on a document being refreshed.
+    const readScope = id + ":" + patientId;
+    const changedScope = readScopeRef.current !== readScope;
+    readScopeRef.current = readScope;
     queueMicrotask(() => {
-      if (!controller.signal.aborted) setLoading(true);
+      if (!controller.signal.aborted) {
+        if (changedScope) setCoveredRead(true);
+        setLoading(true);
+      }
     });
     api<{ data: SupplyDocument; }>(
       "/api/documents/" + id,
@@ -248,7 +257,7 @@ export function SupplyDocumentContent({
         }
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
+        if (!controller.signal.aborted) { setCoveredRead(false); setLoading(false); }
       });
     return () => controller.abort();
   }, [id, patientId, attempt, liveRevision, acceptRead, setData]);
@@ -278,7 +287,7 @@ export function SupplyDocumentContent({
         pendingRef.current = null; setUncertain(false); setReview(null);
         setError("A conferência confirmou que nada foi alterado. Seus campos continuam nesta tela para tentar novamente. Se persistir, procure a supervisão."); return;
       }
-      intention = { ...intention, action: outcome.intention.action, body: outcome.intention.body, expectedVersion: outcome.intention.expectedVersion };
+      intention = { ...intention, idempotencyKey: outcome.key, action: outcome.intention.action, body: outcome.intention.body, expectedVersion: outcome.intention.expectedVersion };
       const result = { data: requireSupplyConfirmation({ data: outcome.result, persistence: "confirmed" }, {
         patientId: data.care_recipient_id, type: data.type, id, minimumVersion: intention.expectedVersion,
       }) };
@@ -354,13 +363,13 @@ export function SupplyDocumentContent({
         if (
           data.type === "COM" &&
           cause instanceof ApiError &&
-          cause.code === "VERSION_CONFLICT"
+          cause.status === 409
         )
           setPurchaseConflict(true);
         if (
           data.type === "ENT" &&
           cause instanceof ApiError &&
-          cause.code === "VERSION_CONFLICT"
+          cause.status === 409
         )
           setDeliveryConflict(true);
         if (
@@ -958,13 +967,11 @@ export function SupplyDocumentContent({
           </DocumentHeader>
           <DocumentFreshness stale={stale} loading={loading || busy} onRefresh={refreshDocument} />
           {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
-              {followUpStep && (loading || readFailed || operationOpen) ? (
+              {followUpStep && loading ? null : followUpStep && (readFailed || operationOpen) ? (
                 <Notice>
                   {operationOpen
                     ? "Sua operação está preservada na versão de trabalho. Conclua ou feche a operação para consultar a próxima providência atual."
-                    : loading
-                      ? "Atualizando o acompanhamento da ficha…"
-                      : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
+                    : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
                   {" "}Os dados preservados não representam uma nova confirmação.
                 </Notice>
               ) : <DocumentNextStep

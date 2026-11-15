@@ -46,7 +46,7 @@ async function inspectPdf(page: Page, f: { patient: string; owner: SupabaseClien
   const parsedPages = (await PDF.load(bytes)).extractText();
   const extracted = compact(parsedPages.flatMap(p => p.lines.map(line => line.spans.flatMap(span => span.chars.map(char => char.char)).join(""))).join(" "));
   if (identity.rendererRevision >= 16) {
-    const operationalLabels: Record<string,string> = { "Atendimento com aceite positivo registrado": "Aceite positivo registrado", "Sem aceite positivo registrado": "Sem aceite positivo", "COMPRA DE INSUMOS DA FAMÍLIA": "Compra de materiais", "DOAÇÃO DE INSUMOS À FAMÍLIA": "Doação de materiais", "Horário da informação desconhecido": "Horário da informação histórica desconhecido" };
+    const operationalLabels: Record<string,string> = { "Atendimento com aceite positivo registrado": "Atendido conforme avaliação familiar e recebimento", "Sem aceite positivo registrado": "Pendente de atendimento", "COMPRA DE INSUMOS DA FAMÍLIA": "Compra de materiais", "DOAÇÃO DE INSUMOS À FAMÍLIA": "Doação de materiais", "Horário da informação desconhecido": "Horário da informação histórica desconhecido" };
     const technicalIds = expectedText.filter(value => /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(value));
     absentText = [...absentText, ...technicalIds];
     expectedText = expectedText.filter(value => !technicalIds.includes(value)).map(value => operationalLabels[value] ?? value);
@@ -80,7 +80,7 @@ test("REQ leva observação zero/decimal/desconhecida, tempo e atendimento por i
   await page.goto(`/historico/${f.doc.id}`);
   await selectDocumentSection(page, "workflow");
   const before = fidelityLedger(f.patient);
-  const values = ["0 unidade (observado)", "1,234567 mL (observado)", "Não sei informar", "Não informado", "Registro no rascunho (horário do dispositivo)", "FIM DA OBSERVAÇÃO REQ"];
+  const values = ["0 unidade (observado)", "1,234567 mL (observado)", "Não sei informar", "Não informado", "Registro no rascunho", "(horário do dispositivo)", "FIM DA OBSERVAÇÃO REQ"];
   const old = await issue(page, f, f.doc.id, f.initial.version, "req-before-acceptance", [...values, "Sem aceite positivo registrado"], ["Atendimento com aceite positivo registrado"]);
   await issue(page, f, f.doc.id, f.doc.version, "req-current", [...values, "Atendimento com aceite positivo registrado", "Sem aceite positivo registrado"]);
   expect(fidelityLedger(f.patient)).toBe(before);
@@ -122,7 +122,8 @@ test("COM distingue as três situações de parcela, proveniência, compra/doaç
   const recovered = await page.request.post(`/api/documents/${f.doc.id}/issuances`, { timeout: 60_000, data: { idempotencyKey: oldKey, version: f.doc.version } });
   expect(recovered.status(), await recovered.text()).toBe(503);
   expect((await recovered.json()).code).toBe("CONTENT_INVALID");
-  expect((await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${oldId}`)).status()).toBe(404);
+  const refusedExemplar = await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${oldId}`);
+  expect(refusedExemplar.status()).toBe(503); expect((await refusedExemplar.json()).code).toBe("PERSISTENCE_UNCONFIRMED");
   expect(sql(`select state from private.pdf_issuances where id=${sqlLiteral(oldId)}`)).not.toBe("ready");
   const donation = await rpc(f.owner, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false, p_payload: { origin: "donation", lines: [{ productId: f.products[0], quantity: "1" }] } });
   await page.goto(`/fichas/${donation.id}`);
@@ -139,7 +140,7 @@ test("BAL identifica primeira contagem e reconto, conserva parecer e aprovação
   const old = await issue(page, first, first.doc.id, first.doc.version, "bal-first", ["PRIMEIRA CONTAGEM DESTA FICHA", "Primeira contagem desta ficha, sem afirmar primeira contagem da residência."]);
   const f = await recountFidelityBalance(first), before = fidelityLedger(f.patient);
   await page.reload(); await expect(page.getByText("Reconto do estoque da equipe", { exact: true })).toBeVisible();
-  await issue(page, f, f.doc.id, f.doc.version, "bal-recount", ["RECONTO DO ESTOQUE DA EQUIPE", "Parecer independente da primeira contagem preservada.", "Registro de contagem anterior; não é parecer vigente da contagem atual.", "Aprovação de contagem anterior; não é aprovação vigente da contagem atual.", "Nova contagem física com autoria e política próprias."]);
+  await issue(page, f, f.doc.id, f.doc.version, "bal-recount", ["RECONTO DO ESTOQUE DA EQUIPE", "Parecer independente da primeira contagem preservada.", "Registro de contagem anterior; não é revisão vigente da contagem atual.", "Aprovação de contagem anterior; não é aprovação vigente da contagem atual.", "Nova contagem física com autoria e política próprias."]);
   const same = await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${old.identity.id}`);
   expect(same.status()).toBe(200); expect((await same.body()).equals(old.bytes)).toBe(true); expect(fidelityLedger(f.patient)).toBe(before);
   await page.goto("/historico");

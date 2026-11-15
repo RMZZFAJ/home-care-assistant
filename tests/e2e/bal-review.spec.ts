@@ -1,3 +1,4 @@
+import { confirmDecisionAndReconcile } from "./l1-decision-policy";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -91,7 +92,7 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
     });
     const attempts: unknown[] = [];
     await reviewer.route(
-      "**/api/balances/document-preparation",
+      "**/api/documents/" + f.document.id + "/decisions",
       async (route) => {
         if (route.request().method() !== "POST") return route.continue();
         attempts.push(route.request().postDataJSON());
@@ -106,14 +107,9 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
       },
     );
     await button(reviewer, "Conferir revisão").click();
-    await button(reviewer, "Confirmar revisão").click();
-    await expect(button(reviewer, "Recuperar revisão")).toBeVisible();
-    await expect(button(reviewer, "Fechar edição")).toBeDisabled();
-    await expect(button(reviewer, "Voltar à revisão")).toBeDisabled();
-    await button(reviewer, "Recuperar revisão").click();
+    await confirmDecisionAndReconcile(reviewer, f.document.id, button(reviewer, "Confirmar revisão"));
     await expect(drawer(reviewer)).toHaveCount(0);
-    expect(attempts).toHaveLength(2);
-    expect(attempts[0]).toEqual(attempts[1]);
+    expect(attempts).toHaveLength(1);
     await expect(
       reviewer.getByRole("heading", {
         name: "Contagem e revisão",
@@ -198,19 +194,18 @@ test("BAL com referência alterada conserva o parecer e adota explicitamente o n
   await page
     .getByRole("button", { name: "Revisão da família", exact: true })
     .click();
-  try {
-    await commentField(page).fill(ownComment);
-  } finally {
-    releaseInitial();
-  }
+  await expect(page.locator(".hca-activity-overlay")).toBeVisible();
+  releaseInitial();
   expect((await initialReference).status()).toBe(200);
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+  await commentField(page).fill(ownComment);
   await expect(button(page, "Conferir revisão")).toBeEnabled();
   await expect(commentField(page)).toHaveValue(ownComment);
   let officialPosts = 0;
   page.on("request", (request) => {
     if (
       new URL(request.url()).pathname ===
-        "/api/balances/document-preparation" &&
+        "/api/documents/" + f.document.id + "/decisions" &&
       request.method() === "POST"
     )
       officialPosts++;
@@ -269,6 +264,7 @@ test("BAL com referência alterada conserva o parecer e adota explicitamente o n
   const before = ledger(f.patient);
   await button(page, "Conferir revisão").click();
   await button(page, "Confirmar revisão").click();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(drawer(page)).toHaveCount(0);
   const document = (
     await (await page.request.get("/api/documents/" + old.id)).json()

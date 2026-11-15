@@ -1,7 +1,7 @@
 import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Browser, type Locator, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { setup, rpc, fixtures } from "../integration/v4-fixtures.mjs";
@@ -22,15 +22,19 @@ async function login(page: Page, patient: string) {
 async function reference(browser: Browser, route: string) {
   const context = await browser.newContext(), page = await context.newPage();
   await page.route(/^https?:/, route => route.abort());
-  await page.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#" + route);
-  await page.locator("#roleSelect").selectOption("family"); return { context, page };
+  const l1 = route.startsWith("l1:");
+  await page.goto(pathToFileURL(resolve(l1 ? "hca-laboratorio-01-v3-final.html" : "Home_Care_Assistant_Modelo_Integral.html")).href + "#" + (l1 ? route.slice(3) : route));
+  if (l1) await page.locator("#product-app").getByRole("tab", { name: /^Materiais/ }).click();
+  else await page.locator("#roleSelect").selectOption("family"); return { context, page };
 }
 function writes(page: Page, allowAccess = false) {
   const sent: string[] = []; page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/") && r.method() !== "GET" && !(allowAccess && isDocumentAccessReport(r))) sent.push(r.url()); }); return sent;
 }
 async function capture(node: Locator, name: string) {
   await node.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
-  expect(await node.evaluate(node => { const r = node.getBoundingClientRect(), x = r.left + r.width / 2; return [r.top + 12, r.bottom - 12].every(y => y > 0 && y < innerHeight && node.contains(document.elementFromPoint(x, y))); })).toBe(true);
+  const geometry = await node.evaluate(node => { const r = node.getBoundingClientRect(), x = (Math.max(0, r.left) + Math.min(innerWidth, r.right)) / 2; return { box: { top:r.top,bottom:r.bottom,height:r.height }, viewport:innerHeight, points:[r.top + 12,r.bottom - 12].map(y=>({ y, visible:y>0&&y<innerHeight&&node.contains(document.elementFromPoint(x,y)), hit:document.elementFromPoint(x,y)?.className })) }; });
+  if (!geometry.points.every(point=>point.visible)) { const path=test.info().outputPath("row-hit-test.json"); writeFileSync(path,JSON.stringify(geometry)); await test.info().attach("row-hit-test",{path,contentType:"application/json"}); }
+  expect(geometry.points.every(point=>point.visible)).toBe(true);
   mkdirSync("output/playwright/phase-d", { recursive: true }); await node.screenshot({ path: `output/playwright/phase-d/${name}.png`, animations: "disabled" });
 }
 
@@ -45,13 +49,24 @@ test("06.3 BAL canonical readonly materials preserve physical zero,original refe
   await expect(row).toContainText(names[0]); await expect(row.locator('[data-label="Quantidade física"]')).toHaveText("0 unidade");
   await expect(row.locator('[data-label="Referência"]')).toHaveText("0 unidade"); await expect(row.locator('[data-label="Diferença"]')).toHaveText("Sem diferença");
   await expect(table.locator("tbody tr").last().locator('[data-label="Diferença"]')).toHaveText("1 unidade");
-  const ref = await reference(browser, "ficha/BAL-0001/materiais");
+  const ref = await reference(browser, "l1:/ficha/REQ-0003");
   try {
-    const model = ref.page.locator(".tablewrap.mobilecards").first(); await expect(model).toBeVisible();
+    const model = ref.page.locator("#product-app .doc-table-card").first(); await expect(model).toBeVisible();
     for (const width of widths) {
       await page.setViewportSize({ width, height: 1000 }); await ref.page.setViewportSize({ width, height: 1000 });
-      for (const property of ["border-radius", "border-color", "background-color"] as const) await expect(table.locator("..")).toHaveCSS(property, await model.evaluate((n,p) => getComputedStyle(n).getPropertyValue(p), property));
+      for (const property of ["border-radius", "border-color", "background-color"] as const) await expect(page.locator(".hca-document-materials .doc-table-card")).toHaveCSS(property, await model.evaluate((n,p) => getComputedStyle(n).getPropertyValue(p), property));
       for (const property of ["display", "padding-left", "padding-top", "gap"] as const) await expect(row).toHaveCSS(property, await model.locator("tbody tr").first().evaluate((n,p) => getComputedStyle(n).getPropertyValue(p), property));
+      const scroll = table.locator("..");
+      const overflows = await scroll.evaluate(node => node.scrollWidth > node.clientWidth);
+      if (overflows) {
+        await expect(scroll).toHaveAttribute("tabindex", "0");
+        await scroll.focus();
+        await scroll.press("Home");
+        await scroll.evaluate(node => { node.scrollLeft = 0; });
+        await scroll.press("ArrowRight");
+        await expect.poll(() => scroll.evaluate(node => node.scrollLeft)).toBeGreaterThan(0);
+        await scroll.evaluate(node => { node.scrollLeft = 0; });
+      } else await expect(scroll).not.toHaveAttribute("tabindex", "0");
       await auditFromTop(page, "BAL canonical materials " + width);
       if (width === 320) await capture(row, "bal-count-material-" + info.project.name);
     }

@@ -24,6 +24,10 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await expect(page.getByLabel("Senha", { exact: true })).toBeFocused();
   await page.keyboard.type(fixturePassword);
   await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Mostrar senha", exact: true })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Esqueci minha senha", exact: true })).toBeFocused();
+  await page.keyboard.press("Tab");
   await expect(
     page.getByRole("button", { name: "Entrar", exact: true }),
   ).toBeFocused();

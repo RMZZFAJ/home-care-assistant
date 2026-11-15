@@ -252,7 +252,11 @@ export function requireBalanceDocumentResult(value: unknown, packet: BalanceDocu
         review.reviewer_id === userId &&
         review.review_group === packet.body.group &&
         review.comment === packet.body.comment &&
-        JSON.stringify(review.item_results ?? []) === JSON.stringify(packet.body.items ?? []) &&
+        (review.item_results ?? []).length === (packet.body.items ?? []).length &&
+        (review.item_results ?? []).every((item, index) => {
+          const expected = packet.body.items?.[index];
+          return expected && item.lineId === expected.lineId && item.result === expected.result && item.forwarding === expected.forwarding && item.comment === expected.comment;
+        }) &&
         review.reviewed_document_version === packet.expectedVersion,
     )
   )

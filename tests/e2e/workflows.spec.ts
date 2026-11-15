@@ -106,7 +106,7 @@ async function confirm(
   await expect(dialog).toBeVisible();
   const pending = page.waitForResponse(
     (response) =>
-      /\/api\/documents\/[a-f0-9-]+$/.test(new URL(response.url()).pathname) &&
+      /\/api\/documents\/[a-f0-9-]+\/decisions$/.test(new URL(response.url()).pathname) &&
       response.request().method() === "POST",
   );
   await dialog
@@ -167,6 +167,10 @@ async function issueSupply(
     );
   if (type === "COM")
     await page.getByLabel("Forma de aquisição").selectOption("donation");
+  if (type === "ENT" && requestId) {
+    await page.getByText("Vincular requisições pendentes", { exact: true }).click();
+    await page.getByRole("combobox", { name: /^Esta entrega pretende atender a necessidade/ }).selectOption("complete");
+  }
   await next(page);
   await next(page);
   if (type !== "BAL" && !requestId)
@@ -294,8 +298,9 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await page.goto(
     "/historico/" + req.requisitionId + "?careRecipientId=" + patient,
   );
+  await selectDocumentSection(page, "materials");
   await expect(
-    page.getByText("1/1 itens atendidos", { exact: true }),
+    page.getByText("0/1 itens atendidos", { exact: true }),
   ).toBeVisible();
   const png = await sharp({
     create: { width: 4, height: 4, channels: 3, background: "#ffffff" },
@@ -433,6 +438,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
   await page.goto(
     "/historico/" + req.requisitionId + "?careRecipientId=" + patient,
   );
+  await selectDocumentSection(page, "materials");
   await expect(
     page.getByText("5/10 itens atendidos", { exact: true }),
   ).toBeVisible();
@@ -883,6 +889,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await page
     .getByLabel("Justificativa da necessidade compartilhada", { exact: false })
     .fill("As duas requisições reiteram a mesma necessidade física.");
+  await page.getByRole("combobox", { name: /^Esta entrega pretende atender a necessidade/ }).selectOption("complete");
   await next(page);
   await page
     .getByRole("button", { name: "Ler código de barras", exact: true })
@@ -1067,7 +1074,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
     .fill("Devolução integral acordada com o recebedor");
   await confirm(page, "Pedido de cancelamento registrado, sem estorno.");
   await expect(
-    page.getByText("Cancelamento aguardando consentimento", { exact: true }),
+    page.locator(".hca-document-header").getByText("Cancelamento aguardando consentimento", { exact: true }),
   ).toBeVisible();
   let stock = (
     await (

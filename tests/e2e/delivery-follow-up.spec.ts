@@ -65,9 +65,9 @@ test("ENT follow-up distinguishes returned quantities from full receipt and pres
   doc = await entSend(pro, doc, "receive", { divergences: [{ lineId: doc.lines[0].id, acceptedQuantity: "1", problem: "shortage", notes: "Duas unidades ainda não foram recebidas" }] });
   expect(doc.status).toBe("disputed");
   const accepted = doc.workflow_data.acceptedBy;
-  // A REQ has no requested quantity. Each positively accepted linked material
-  // already fulfills its item; returning the unreceived remainder cannot undo it.
-  expect((await rpc(family, "requisition_fulfillment", { p_requisition: req.id })).fulfilled).toBe(2);
+  // A lower physical receipt requires a fresh family assessment of sufficiency.
+  // Returning the remainder preserves that outstanding assessment and the physical facts.
+  expect((await rpc(family, "requisition_fulfillment", { p_requisition: req.id })).fulfilled).toBe(1);
   before = facts(f.patient);
   await open(page, doc.id, "Conciliar a divergência da entrega");
   await expect(milestone(page, "Recebimento")).toHaveAttribute("data-state", "pending");
@@ -77,7 +77,7 @@ test("ENT follow-up distinguishes returned quantities from full receipt and pres
   expect(doc.workflow_data.acceptedBy).toBe(accepted);
   expect(Number(doc.lines[0].accepted_quantity)).toBe(1);
   expect(Number(doc.lines[0].reconciled_quantity)).toBe(2);
-  expect((await rpc(family, "requisition_fulfillment", { p_requisition: req.id })).fulfilled).toBe(2);
+  expect((await rpc(family, "requisition_fulfillment", { p_requisition: req.id })).fulfilled).toBe(1);
   before = facts(f.patient);
   await open(page, doc.id, "Consultar a conferência com diferenças");
   await expect(page.locator(".hca-document-tags")).toContainText("Conferência concluída com diferenças");

@@ -1,3 +1,4 @@
+import { noPrivateWrites, privateFormCount } from "./l1-decision-policy";
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { legacyBalance } from "../integration/bal-review-fixtures.mjs";
@@ -16,32 +17,24 @@ async function openReview(page: Page) {
  await page.getByRole("button", { name: "Revisão da família", exact: true }).click();
  return page.getByRole("dialog", { name: "Revisar contagem do balanço", exact: true });
 }
-test("BAL separates a private item opinion from stock application and recovers its committed application by GET after reload", async ({ page }, info) => {
- const f = await legacyBalance({ quantity: "1" }), before = stock(f.patient);
+test("BAL keeps an unsaved item review separate from stock application and recovers its committed application by GET after reload", async ({ page }, info) => {
+ const f = await legacyBalance({ quantity: "1" }), before = stock(f.patient), writes = noPrivateWrites(page), drafts = privateFormCount(f.patient);
  await page.goto("/login");await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);await page.getByRole("button", { name: "Entrar", exact: true }).click();
  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();await selectContext(page, f.patient);
  await page.goto("/fichas/"+f.document.id);
- let dialog = await openReview(page);
+ const dialog = await openReview(page);
  const first = f.document.lines[0], resultLabel = "Resultado da revisão — "+first.name_snapshot;
- await expect(dialog.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toBeEnabled();
  await dialog.getByRole("textbox", { name: /^Sua revisão sobre a contagem/ }).fill("Parecer independente; somente um material examinado.");
  await dialog.getByRole("combobox", { name: resultLabel, exact: true }).selectOption("confirmed");
  await dialog.getByRole("textbox", { name: "Comentário do material — "+first.name_snapshot, exact: true }).fill("Conferido individualmente.");
- const saved = page.waitForResponse(r => new URL(r.url()).pathname==="/api/drafts" && r.request().method()==="POST");
- await dialog.getByRole("button", { name: "Salvar preenchimento privado", exact: true }).click();expect((await saved).status()).toBe(200);
- await expect(dialog.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toBeEnabled();
- expect(stock(f.patient)).toBe(before);await page.reload();dialog = await openReview(page);
- await dialog.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
- await expect(dialog.getByRole("combobox", { name: resultLabel, exact: true })).toHaveValue("confirmed");
- await expect(dialog.getByRole("textbox", { name: "Comentário do material — "+first.name_snapshot, exact: true })).toHaveValue("Conferido individualmente.");
- await dialog.getByRole("button", { name: "Consultar referência atual", exact: true }).click();
- await dialog.getByRole("button", { name: "Adotar referência atual e manter minha revisão", exact: true }).click();
+ expect(stock(f.patient)).toBe(before); expect(privateFormCount(f.patient)).toBe(drafts);
  await dialog.getByRole("button", { name: "Conferir revisão", exact: true }).click();
  await expect(dialog.getByRole("region", { name: "Materiais incluídos na revisão", exact: true })).toContainText("Os demais materiais não foram declarados como examinados");
  await dialog.getByRole("button", { name: "Confirmar revisão", exact: true }).click();await expect(dialog).toHaveCount(0);
  expect(stock(f.patient)).toBe(before);
  const reviewed = (await (await page.request.get("/api/documents/"+f.document.id)).json()).data;
+ expect(writes).toEqual([]); expect(privateFormCount(f.patient)).toBe(drafts);
  expect(reviewed.status).toBe("submitted");expect(reviewed.balanceReview.reviews[0].item_results).toHaveLength(1);
  expect(reviewed.balanceReview.application.state).toBe("not_applied");
  await page.getByRole("button", { name: "Aplicar contagem pelo grupo familiar", exact: true }).click();

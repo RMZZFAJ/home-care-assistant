@@ -1,3 +1,4 @@
+import { confirmDecisionAndReconcile, noPrivateWrites, privateFormCount } from "./l1-decision-policy";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -100,7 +101,8 @@ test("BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria p
       .locator(".hca-definition-grid > div").filter({ has: page.getByText("Versão proposta", { exact: true }) }).locator("dd"),
   ).toHaveText("1");
   const attempts: unknown[] = [];
-  await page.route("**/api/balances/preparations/commit", async (route) => {
+  const endpoint = `/api/balances/decisions/${f.proposal.id}?careRecipientId=${f.patient}`;
+  await page.route("**" + endpoint, async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
     if (attempts.length === 1) {
@@ -112,27 +114,10 @@ test("BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria p
       await route.abort("failed");
     } else await route.continue();
   });
-  await review(page)
-    .getByRole("button", { name: "Confirmar decisão", exact: true })
-    .click();
-  await expect(
-    review(page).getByRole("button", {
-      name: "Recuperar confirmação",
-      exact: true,
-    }),
-  ).toBeVisible();
-  await expect(
-    review(page).getByRole("button", { name: "Voltar", exact: true }),
-  ).toBeDisabled();
-  await page.keyboard.press("Escape");
-  await expect(review(page)).toBeVisible();
-  await review(page)
-    .getByRole("button", { name: "Recuperar confirmação", exact: true })
-    .click();
+  await confirmDecisionAndReconcile(page, f.proposal.id, review(page).getByRole("button", { name: "Confirmar decisão", exact: true }), endpoint);
   await expect(review(page)).toHaveCount(0);
   await expect(form(page)).toHaveCount(0);
-  expect(attempts).toHaveLength(2);
-  expect(attempts[0]).toEqual(attempts[1]);
+  expect(attempts).toHaveLength(1);
   await expect(
     page.getByRole("heading", { name: "Programação do balanço", exact: true }),
   ).toBeFocused();
@@ -233,35 +218,16 @@ test("mudança do alvo durante a aprovação conserva a justificativa e o destin
       includeHidden: true,
     }),
   ).toBeDisabled();
-  await form(page)
-    .getByRole("button", { name: "Fechar edição", exact: true })
-    .click();
-  await expect(
-    page.getByText("Há alterações ainda não salvas.", { exact: true }),
-  ).toHaveCount(0);
-  await page
-    .locator("summary")
-    .filter({
-      hasText: "Meus preenchimentos privados de programação e plantões",
-    })
-    .click();
-  await page
-    .getByRole("button", { name: "Retomar meu preenchimento", exact: true })
-    .click();
-  await form(page)
-    .getByRole("button", { name: "Continuar rascunho", exact: true })
-    .click();
-  await expect(
-    form(page).getByRole("textbox", { name: "Justificativa", exact: true }),
-  ).toHaveValue(ownReason);
-  await form(page)
-    .getByRole("button", { name: "Fechar edição", exact: true })
-    .click();
+  const privateBefore = privateFormCount(f.patient), privateWrites = noPrivateWrites(page);
+  await form(page).getByRole("button", { name: "Fechar edição", exact: true }).click();
+  const leave = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });
+  await leave.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+  await expect(reason).toHaveValue(ownReason);
+  await form(page).getByRole("button", { name: "Fechar edição", exact: true }).click();
+  await leave.getByRole("button", { name: "Sair e descartar", exact: true }).click();
   await expect(form(page)).toHaveCount(0);
-  await expect(
-    page.getByRole("button", {
-      name: "Retomar meu preenchimento",
-      exact: true,
-    }),
-  ).toBeFocused();
+  expect(privateFormCount(f.patient)).toBe(privateBefore);
+  expect(privateWrites).toEqual([]);
+  await expect(page.getByText("Meus preenchimentos privados de programação e plantões", { exact: true })).toHaveCount(0);
+  expect(deferralState(f.patient)).toEqual(after);
 });

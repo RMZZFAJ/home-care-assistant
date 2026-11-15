@@ -14,7 +14,7 @@ const compact=(value:string)=>value.normalize("NFKC").replaceAll(/\s/g,"");
 const hash=(bytes:Uint8Array)=>createHash("sha256").update(bytes).digest("hex");
 const plain=async(bytes:Uint8Array)=>(await PDF.load(bytes)).extractText().flatMap(page=>page.lines.map(line=>line.spans.flatMap(span=>span.chars.map(char=>char.char)).join(""))).join(" ");
 async function login(page:Page,patient:string,email=fixtures.adminA.email){
- await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
+ await page.goto("/login?next=" + encodeURIComponent("/?careRecipientId=" + patient));await page.getByLabel("E-mail",{exact:true}).fill(email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
  await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);
 }
 async function openFiles(page:Page,id:string){await page.goto("/documentos/"+id);await selectDocumentSection(page,"files");await expect(page.getByRole("button",{name:"Escolher conteúdo do PDF",exact:true})).toBeEnabled();}

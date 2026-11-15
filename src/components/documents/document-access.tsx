@@ -1,4 +1,5 @@
 "use client";
+import { useScrollableRegion } from "@/components/ui/use-scrollable-region";
 import { usePwa } from "@/components/pwa/pwa-provider";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActionButton } from "@/components/ui/controls";
@@ -54,6 +55,7 @@ export function DocumentAccessHistory({ id, refreshKey, authorized, collapsible 
   return <AccessHistoryPage key={id + ":" + authorized} id={id} refreshKey={refreshKey} authorized={authorized} collapsible={collapsible} />;
 }
 function AccessHistoryPage({ id, refreshKey, authorized, collapsible }: HistoryProps) {
+  const scrollRegion = useScrollableRegion<HTMLOListElement>();
   type History = ReturnType<typeof parseDocumentAccessHistory>;
   const [trail, setTrail] = useState<History | null>(null), [error, setError] = useState("");
   const [completedScope, setCompletedScope] = useState(""), [busy, setBusy] = useState(false), [attempt, setAttempt] = useState(0);
@@ -97,7 +99,7 @@ function AccessHistoryPage({ id, refreshKey, authorized, collapsible }: HistoryP
       {trail && error ? <p className="hca-field-help">Consulta anterior preservada; a atualização não foi confirmada.</p> : null}
       {loading ? <Notice>{trail ? "Atualizando histórico; a consulta anterior permanece identificada abaixo." : "Consultando histórico de acesso…"}</Notice> : null}
       {trail?.data.length === 0 ? <p>{collapsible ? "Nenhuma abertura informada neste histórico." : "Nenhum acesso informado neste histórico."}</p> : null}
-      {trail ? <ol className="hca-event-feed">{trail.data.map(row => <li key={row.id} className="hca-progress-event">
+      {trail ? <ol className="hca-event-feed" {...scrollRegion} aria-label={collapsible ? "Aberturas da ficha; use as setas para rolar" : "Acessos à ficha; use as setas para rolar"}>{trail.data.map(row => <li key={row.id} className="hca-progress-event">
         <span className="hca-event-marker"><Icon name="clock" /></span>
         <div className="hca-event-body"><div className="hca-event-heading">
           <strong className="min-w-0 wrap-break-word">{row.actorName?.trim() ? row.actorName : "Nome não preservado no registro"}</strong><time dateTime={row.recordedAt}>{formatBrazilDate(row.recordedAt)}</time>

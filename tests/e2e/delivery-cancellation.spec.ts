@@ -1,3 +1,4 @@
+import { confirmDecisionAndReconcile } from "./l1-decision-policy";
 import { selectDocumentSection, openDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -137,7 +138,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
     .fill("Pedido fictício: conciliar o material já recebido");
   const requestReview = await review(page),
     requestPayloads: unknown[] = [];
-  await page.route("**/api/documents/" + f.document.id, async (route) => {
+  await page.route("**/api/documents/" + f.document.id + "/decisions", async (route) => {
     if (route.request().method() !== "POST") {
       await route.continue();
       return;
@@ -148,19 +149,10 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
       await route.abort("failed");
     } else await route.continue();
   });
-  await requestReview
-    .getByRole("button", { name: "Confirmar operação", exact: true })
-    .click();
-  await expect(
-    requestReview.getByRole("button", { name: "Voltar à edição", exact: true }),
-  ).toBeDisabled();
-  await requestReview
-    .getByRole("button", { name: "Recuperar tentativa", exact: true })
-    .click();
+  await confirmDecisionAndReconcile(page, f.document.id, requestReview.getByRole("button", { name: "Confirmar operação", exact: true }));
   await expect(requestReview).toHaveCount(0);
-  await page.unroute("**/api/documents/" + f.document.id);
-  expect(requestPayloads).toHaveLength(2);
-  expect(requestPayloads[0]).toEqual(requestPayloads[1]);
+  await page.unroute("**/api/documents/" + f.document.id + "/decisions");
+  expect(requestPayloads).toHaveLength(1);
   expect(ledger(f.patient)).toBe(before);
   await expect(
     cancellation(page).getByRole("heading", {
@@ -246,7 +238,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
     });
     const payloads: unknown[] = [];
     await recipient.route(
-      "**/api/documents/" + f.document.id,
+      "**/api/documents/" + f.document.id + "/decisions",
       async (route) => {
         if (route.request().method() !== "POST") {
           await route.continue();
@@ -259,27 +251,17 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
         } else await route.continue();
       },
     );
-    await consentReview
-      .getByRole("button", { name: "Confirmar operação", exact: true })
-      .click();
-    await expect(
-      consentReview.getByRole("button", {
-        name: "Fechar diálogo",
-        exact: true,
-      }),
-    ).toBeDisabled();
-    await consentReview
-      .getByRole("button", { name: "Recuperar tentativa", exact: true })
-      .click();
+    await confirmDecisionAndReconcile(recipient, f.document.id, consentReview.getByRole("button", { name: "Confirmar operação", exact: true }));
     await expect(consentReview).toHaveCount(0);
-    expect(payloads).toHaveLength(2);
-    expect(payloads[0]).toEqual(payloads[1]);
+    expect(payloads).toHaveLength(1);
     await expect(recipient.locator(".hca-document-header [data-document-heading]")).toBeFocused();
     await expect(
       cancellation(recipient).getByText("Consentido e conciliado", {
         exact: true,
       }),
     ).toBeVisible();
+    // The other tab keeps its viewed copy until the explicit refresh.
+    await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
     await expect(
       cancellation(page).getByText("Consentido e conciliado", { exact: true }),
     ).toBeVisible();
@@ -382,6 +364,7 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
     await refusal
       .getByRole("button", { name: "Confirmar operação", exact: true })
       .click();
+    await expect(recipient.locator(".hca-activity-overlay")).toHaveCount(0);
     await expect(refusal).toHaveCount(0);
     await withdrawal
       .getByRole("button", { name: "Confirmar operação", exact: true })
@@ -426,6 +409,7 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
     await next
       .getByRole("button", { name: "Confirmar operação", exact: true })
       .click();
+    await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
     await expect(next).toHaveCount(0);
     await page
       .getByRole("button", {
@@ -433,36 +417,18 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
         exact: true,
       })
       .click();
-    // The failed first intention remains a personal draft. Reopening must not
-    // silently discard it or bind its request to the new cancellation request.
-    await expect(reason).toBeDisabled();
-    await page
-      .getByRole("button", { name: "Continuar rascunho", exact: true })
-      .click();
-    await expect(reason).toHaveValue(
-      "Justificativa própria preservada para retirar o pedido",
-    );
-    await expect(
-      editor(page).getByRole("button", { name: "Revisar operação", exact: true }),
-    ).toBeDisabled();
-    await page
-      .getByRole("button", { name: "Comparar referência da operação", exact: true })
-      .click();
-    await page
-      .getByRole("button", {
-        name: "Usar referência vigente e manter preenchimento",
-        exact: true,
-      })
-      .click();
-    await expect(reason).toHaveValue(
-      "Justificativa própria preservada para retirar o pedido",
-    );
+    // Showing the previous official result ends the short decision. Reopening
+    // starts empty for the new request and cannot inherit the failed intention.
+    await expect(reason).toBeEnabled();
+    await expect(reason).toHaveValue("");
+    await expect(page.getByRole("button", { name: "Continuar rascunho", exact: true })).toHaveCount(0);
     expect(ledger(f.patient)).toBe(before);
     await reason.fill("Solicitante retirou somente o pedido novo");
     const current = await review(page);
     await current
       .getByRole("button", { name: "Confirmar operação", exact: true })
       .click();
+    await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
     await expect(current).toHaveCount(0);
     await expect(
       cancellation(page).getByText("Retirado pelo solicitante", {
@@ -508,11 +474,10 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
   await consume(f);
   const stock = ledger(f.patient),
     payloads: {
-      expectedVersion: number;
-      idempotencyKey: string;
-      body: { referenceHash: string };
+      key: string;
+      intention: { expectedVersion: number; body: { referenceHash: string } };
     }[] = [];
-  await page.route("**/api/documents/" + f.document.id, async (route) => {
+  await page.route("**/api/documents/" + f.document.id + "/decisions", async (route) => {
     if (route.request().method() === "POST")
       payloads.push(route.request().postDataJSON());
     await route.continue();
@@ -520,7 +485,8 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
   await original
     .getByRole("button", { name: "Confirmar operação", exact: true })
     .click();
-  await expect(original).toHaveCount(0);
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+    await expect(original).toHaveCount(0);
   await expect(returnField(page)).toHaveValue("1");
   await page
     .getByRole("button", {
@@ -552,12 +518,13 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
   await current
     .getByRole("button", { name: "Confirmar operação", exact: true })
     .click();
-  await expect(current).toHaveCount(0);
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+    await expect(current).toHaveCount(0);
   expect(payloads).toHaveLength(2);
-  expect(payloads[0].expectedVersion).toBe(payloads[1].expectedVersion);
-  expect(payloads[0].idempotencyKey).not.toBe(payloads[1].idempotencyKey);
-  expect(payloads[0].body.referenceHash).not.toBe(
-    payloads[1].body.referenceHash,
+  expect(payloads[0].intention.expectedVersion).toBe(payloads[1].intention.expectedVersion);
+  expect(payloads[0].key).not.toBe(payloads[1].key);
+  expect(payloads[0].intention.body.referenceHash).not.toBe(
+    payloads[1].intention.body.referenceHash,
   );
   expect(ledger(f.patient)).toBe(stock);
   const result = (await rpc(f.professional, "operational_document", {

@@ -49,3 +49,7 @@
   .hca-technical-record-main > small { font-size: 10px; }
   .hca-technical-record > .hca-control { margin-left: 51px; }
 }
+
+.hca-operations .hca-document-tab { padding: 13px 15px; border-bottom-width: 3px; font-size: 12px; font-weight: 650; line-height: 1.5; min-height: 47px; }
+@media (max-width: 850px) { .hca-operations .hca-document-tab { padding: 12px; } }
+@media (max-width: 500px) { .hca-operations .hca-document-tab { padding: 12px 10px; font-size: 11px; gap: 5px; } }

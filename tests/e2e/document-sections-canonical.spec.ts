@@ -1,3 +1,4 @@
+import { lastDraftPanel } from "./l1-long-draft-panel";
 import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Browser, type Locator, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
@@ -38,7 +39,7 @@ async function laboratoryModel(browser: Browser, scenario = "E03-27") {
   await page.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/cenario/" + scenario);
   const close = page.locator("#lab-bar [data-action='lab-toggle']");
   if (scenario === "E03-71") {
-    if (await close.getAttribute("aria-expanded") !== "true") await page.getByRole("button", { name: "Cenários e controles", exact: true }).click();
+    if (!await page.getByRole("button", { name: "Inspecionar", exact: true }).isVisible()) await page.getByRole("button", { name: "Cenários e controles", exact: true }).click();
     await page.getByRole("button", { name: "Inspecionar", exact: true }).click();
     await page.getByRole("button", { name: "Preparar PDF fictício para conferência", exact: true }).click();
   }
@@ -102,12 +103,12 @@ test("06.5 public reference and native signed file retain distinct results in ca
   }finally{await ref.context.close();}
 });
 
-test("06.5 private resume summary and native CAS comparison retain both complete editions without official effects",async({page,browser},info)=>{
+test("06.5 private resume choice and native CAS comparison retain both complete editions without official effects",async({page,browser},info)=>{
   const f=await privateDraftFixture(),content=reqContent(f);content.observations=["Observação preservada "+"com conteúdo completo ".repeat(7)];const saved=await rpc(f.pro,"creation_draft_command",savePacket(f,"REQ",content));const before=officialState(f);
-  await login(page,f.patient,fixtures.professional.email);await page.goto("/fichas/req");const panel=page.getByRole("region",{name:"Rascunho privado",exact:true});await expect(panel).toContainText(content.observations[0]);const ref=await model(browser);
+  await login(page,f.patient,fixtures.professional.email);await page.goto("/fichas/req");const panel=lastDraftPanel(page);await expect(panel.getByRole("button",{name:"Continuar rascunho",exact:true})).toBeVisible();const ref=await model(browser);
   try{
-    for(const width of widths){await page.setViewportSize({width,height:1100});await ref.page.setViewportSize({width,height:1100});await styles(panel.locator('dl[aria-label="Referências do preenchimento preservado"]'),ref.page.locator("#canonical-style-probes .kv"),["display","gap"]);await auditFromTop(page,"canonical private summary "+width);}
-    await panel.getByRole("button",{name:"Continuar rascunho",exact:true}).click();for(let i=0;i<5;i++)await page.getByRole("button",{name:/^Avançar$|^Revisar$/}).click();const local="Minha edição própria "+"que deve permanecer completa ".repeat(6);await page.getByLabel("Observação 1",{exact:true}).fill(local);
+    for(const width of widths){await page.setViewportSize({width,height:1100});await ref.page.setViewportSize({width,height:1100});await expect(panel.getByRole("button",{name:"Descartar e começar novamente",exact:true})).toBeEnabled();await auditFromTop(page,"canonical private summary "+width);}
+    await panel.getByRole("button",{name:"Continuar rascunho",exact:true}).click();for(let i=0;i<5;i++)await page.getByRole("button",{name:/^Avançar$|^Revisar$/}).click();await expect(page.getByLabel("Observação 1",{exact:true})).toHaveValue(content.observations[0]);const local="Minha edição própria "+"que deve permanecer completa ".repeat(6);await page.getByLabel("Observação 1",{exact:true}).fill(local);
     const remote={...content,observations:["Edição do servidor "+"que permanece separada ".repeat(6)]};await rpc(f.pro,"creation_draft_command",savePacket(f,"REQ",remote,saved.id,saved.revision));await page.getByRole("button",{name:/^Avançar$|^Revisar$/}).click();await page.getByRole("button",{name:"Salvar rascunho",exact:true}).click();const comparison=panel.locator(".hca-draft-comparison");await expect(comparison).toContainText(local);await expect(comparison).toContainText(remote.observations[0]);
     for(const width of widths){await page.setViewportSize({width,height:1100});await auditFromTop(page,"canonical private CAS "+width);expect(await comparison.evaluate(n=>Array.from(n.children).every(c=>c.getBoundingClientRect().right<=innerWidth))).toBe(true);}
     await page.emulateMedia({forcedColors:"active",reducedMotion:"reduce"});await auditFromTop(page,"private CAS forced colors");await page.emulateMedia({forcedColors:"none",reducedMotion:"no-preference"});await page.setViewportSize({width:320,height:1100});await capture(comparison.getByRole("region",{name:"Minha edição",exact:true}),"draft-comparison-canonical-"+info.project.name);expect(officialState(f)).toBe(before);

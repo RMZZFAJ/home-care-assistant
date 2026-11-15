@@ -1,5 +1,12 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**14/11 — estabilização reaberta após falhas dos navegadores e Sonar.** A CI
+43646730287 de `302d6c56` passou nas validações e 760 integrações, mas os seis
+jobs de navegador acumularam falhas. O responsável determinou a continuação na
+mesma branch. O [registro de estabilização](docs/audits/D/D-B/L1_CI_STABILIZATION.md)
+distingue defeitos reais, consumidores anteriores ao L1 e provas ainda pendentes.
+A execução está aberta; o início anterior dos navegadores não encerra esta revisão.
+
 **Revisão posterior de 14/11 — rascunhos L1.** A decisão do responsável em
 [L1_DRAFT_POLICY.md](docs/audits/D/D-B/L1_DRAFT_POLICY.md) substitui a conservação
 de preparações de decisões curtas e a explicação inicial do cartão abaixo.

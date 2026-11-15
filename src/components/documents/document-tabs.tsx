@@ -135,7 +135,7 @@ export function DocumentPanel({
   children: ReactNode;
 }) {
   return (
-    <Tabs.Panel value={value} keepMounted className="hca-document-panel">
+    <Tabs.Panel value={value} keepMounted aria-label={value === "history" ? "Identificação e registros preservados" : value === "audit" ? "Auditoria" : value === "workflow" ? "Materiais" : baseTabs.find(tab => tab.id === value)?.label} className="hca-document-panel">
       {children}
     </Tabs.Panel>
   );

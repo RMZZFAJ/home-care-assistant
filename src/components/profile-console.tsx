@@ -65,7 +65,7 @@ function ProfileContent() {
       })
       .catch((reason) => {
         if (controller.signal.aborted) return;
-        if (reason instanceof ApiError && [401, 403, 404].includes(reason.status)) { setProfile(null); setMemberships([]); setSessions([]); }
+        if (reason instanceof ApiError && [401, 403, 404].includes(reason.status)) { setMemberships([]); setSessions([]); }
         setReadFailure({ key: readKey, message: reason instanceof Error ? reason.message : "Não foi possível consultar o perfil." });
       });
     return () => controller.abort();

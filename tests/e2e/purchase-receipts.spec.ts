@@ -1,3 +1,4 @@
+import { confirmDecisionAndReconcile } from "./l1-decision-policy";
 import { selectDocumentSection, openDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -36,22 +37,18 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
   await expect(review.locator("input")).toHaveCount(0);
   let arrivalAttempts = 0;
   const arrivalPayloads: unknown[] = [];
-  await page.route("**/api/documents/" + document.id, async route => {
+  await page.route("**/api/documents/" + document.id + "/decisions", async route => {
     if (route.request().method() !== "POST") { await route.continue(); return; }
     arrivalAttempts++; arrivalPayloads.push(route.request().postDataJSON());
     if (arrivalAttempts === 1) { await route.fetch(); await route.abort("failed"); } else await route.continue();
   });
-  await review.getByRole("button", { name: "Confirmar operação", exact: true }).click();
-  await expect(review.getByRole("button", { name: "Recuperar tentativa", exact: true })).toBeVisible();
-  await expect(review.getByText("O resultado ainda não foi confirmado.", { exact: false })).toBeVisible();
-  await expect(review.getByRole("button", { name: "Fechar diálogo", exact: true })).toBeDisabled();
-  await review.getByRole("button", { name: "Recuperar tentativa", exact: true }).click(); await expect(review).toHaveCount(0);
+  await confirmDecisionAndReconcile(page, document.id, review.getByRole("button", { name: "Confirmar operação", exact: true })); await expect(review).toHaveCount(0);
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: document.code, exact: true })).toBeFocused();
   await expect(page.getByText("Chegada registrada e aguardando conferência.", { exact: false })).toBeVisible();
-  expect(arrivalPayloads).toHaveLength(2); expect(arrivalPayloads[0]).toEqual(arrivalPayloads[1]);
+  expect(arrivalPayloads).toHaveLength(1);
   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);
-  await page.unroute("**/api/documents/" + document.id);
+  await page.unroute("**/api/documents/" + document.id + "/decisions");
   document = await rpc(f.admin, "operational_document", { p_id: document.id });
   expect(document.receipts).toHaveLength(2);
   const pending = document.receipts.find((receipt: { state: string }) => receipt.state === "pending"); expect(Number(pending.lines[0].quantity)).toBe(1);
@@ -63,17 +60,15 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
   await expect(form.getByText("1 unidade", { exact: true })).toBeVisible(); await expect(form.locator("input")).toHaveCount(0);
   let validationAttempts = 0;
   const validationPayloads: unknown[] = [];
-  await page.route("**/api/documents/" + document.id, async route => {
+  await page.route("**/api/documents/" + document.id + "/decisions", async route => {
     if (route.request().method() !== "POST") { await route.continue(); return; }
     validationAttempts++; validationPayloads.push(route.request().postDataJSON());
     if (validationAttempts === 1) { await route.fetch(); await route.abort("failed"); } else await route.continue();
   });
   await form.getByRole("button", { name: "Revisar operação", exact: true }).click();
-  await review.getByRole("button", { name: "Confirmar operação", exact: true }).click();
-  await expect(review.getByRole("button", { name: "Recuperar tentativa", exact: true })).toBeVisible();
-  await review.getByRole("button", { name: "Recuperar tentativa", exact: true }).click(); await expect(review).toHaveCount(0);
+  await confirmDecisionAndReconcile(page, document.id, review.getByRole("button", { name: "Confirmar operação", exact: true })); await expect(review).toHaveCount(0);
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
-  await expect(page.getByText("Parcela validada.", { exact: false })).toBeVisible(); expect(validationPayloads).toHaveLength(2); expect(validationPayloads[0]).toEqual(validationPayloads[1]);
+  await expect(page.getByText("Parcela validada.", { exact: false })).toBeVisible(); expect(validationPayloads).toHaveLength(1);
   const final = await rpc(f.admin, "operational_document", { p_id: document.id });
   expect(final.receipts.find((receipt: { id: string }) => receipt.id === initialReceipt.id)).toEqual(initialReceipt);
   expect(Number(final.lines[0].accepted_quantity)).toBe(3); expect(final.receipts.find((receipt: { id: string }) => receipt.id === pending.id).validated_by).toBe(fixtures.adminA.id);
@@ -97,8 +92,8 @@ test("COM conflito compara a expectativa atual, preserva o motivo e exige nova c
   await form.getByRole("button", { name: "Revisar operação", exact: true }).click();
   const review = page.getByRole("dialog", { name: "Revisar encerramento da expectativa", exact: true }); await expect(review).toBeVisible();
   const newer = await rpc(family, "supply_document_command", { p_id: document.id, p_action: "purchase", p_body: { lines: [{ lineId, quantity: "1" }] }, p_key: randomUUID(), p_version: document.version });
-  const payloads: { expectedVersion: number; idempotencyKey: string }[] = [];
-  await page.route("**/api/documents/" + document.id, async route => { if (route.request().method() === "POST") payloads.push(route.request().postDataJSON()); await route.continue(); });
+  const payloads: { intention: { expectedVersion: number }; key: string }[] = [];
+  await page.route("**/api/documents/" + document.id + "/decisions", async route => { if (route.request().method() === "POST") payloads.push(route.request().postDataJSON()); await route.continue(); });
   await review.getByRole("button", { name: "Confirmar encerramento da expectativa", exact: true }).click(); await expect(review).toHaveCount(0);
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Consultar versão atual da COM", exact: true })).toBeVisible();
@@ -135,7 +130,7 @@ test("COM conflito compara a expectativa atual, preserva o motivo e exige nova c
   const final = await rpc(f.admin, "operational_document", { p_id: document.id });
   expect(Number(final.lines[0].waived_quantity)).toBe(7); expect(Number(final.lines[0].purchased_quantity)).toBe(3); expect(final.purchaseProgress.physicalPending).toBe(true);
   expect(final.events.filter((event: { action: string }) => event.action === "com.close_expectation")).toHaveLength(1);
-  expect(payloads).toHaveLength(2); expect(payloads.map(payload => payload.expectedVersion)).toEqual([document.version, newer.version]); expect(payloads[0].idempotencyKey).not.toBe(payloads[1].idempotencyKey);
+  expect(payloads).toHaveLength(2); expect(payloads.map(payload => payload.intention.expectedVersion)).toEqual([document.version, newer.version]); expect(payloads[0].key).not.toBe(payloads[1].key);
   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);
 });
 
@@ -170,20 +165,15 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   mkdirSync("output/playwright/phase-d", { recursive: true }); await page.screenshot({ path: `output/playwright/phase-d/purchase-close-review-${info.project.name}.png`, animations: "disabled" });
   let attempts = 0;
   const payloads: unknown[] = [];
-  await page.route("**/api/documents/" + document.id, async route => {
+  await page.route("**/api/documents/" + document.id + "/decisions", async route => {
     if (route.request().method() !== "POST") { await route.continue(); return; }
     attempts++; payloads.push(route.request().postDataJSON());
     if (attempts === 1) { await route.fetch(); await route.abort("failed"); } else await route.continue();
   });
-  await review.getByRole("button", { name: "Confirmar encerramento da expectativa", exact: true }).click();
-  await expect(review.getByRole("button", { name: "Recuperar tentativa", exact: true })).toBeVisible();
-  await expect(review.getByRole("button", { name: "Manter restante", exact: true })).toBeDisabled();
-  await expect(review.getByText("O resultado ainda não foi confirmado.", { exact: false })).toBeVisible();
-  await expect(review.getByRole("button", { name: "Fechar diálogo", exact: true })).toBeDisabled();
-  await review.getByRole("button", { name: "Recuperar tentativa", exact: true }).click(); await expect(review).toHaveCount(0);
+  await confirmDecisionAndReconcile(page, document.id, review.getByRole("button", { name: "Confirmar encerramento da expectativa", exact: true })); await expect(review).toHaveCount(0);
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
-  expect(payloads).toHaveLength(2); expect(payloads[0]).toEqual(payloads[1]);
-  await page.unroute("**/api/documents/" + document.id);
+  expect(payloads).toHaveLength(1);
+  await page.unroute("**/api/documents/" + document.id + "/decisions");
   document = await rpc(f.admin, "operational_document", { p_id: document.id });
   expect(document.purchaseProgress.state).toBe("closed_pending_validation"); expect(Number(document.lines[0].waived_quantity)).toBe(8); expect(Number(document.lines[0].accepted_quantity)).toBe(0);
   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(initialStock);
@@ -203,7 +193,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   await expect(form.getByText("2 unidade", { exact: true })).toBeVisible(); await expect(form.locator("input")).toHaveCount(0);
   await form.getByRole("button", { name: "Revisar operação", exact: true }).click();
   const decision = page.getByRole("dialog", { name: "Revisar operação definitiva", exact: true });
-  const validation = page.waitForResponse(response => new URL(response.url()).pathname === "/api/documents/" + document.id && response.request().method() === "POST");
+  const validation = page.waitForResponse(response => new URL(response.url()).pathname === "/api/documents/" + document.id + "/decisions" && response.request().method() === "POST");
   await decision.getByRole("button", { name: "Confirmar operação", exact: true }).click();
   const validated = await validation; expect(validated.status(), await validated.text()).toBe(200);
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0); await expect(decision).toHaveCount(0);
@@ -239,15 +229,14 @@ test("COM rejeita a parcela identificada em leitura, preserva declaração e rec
   const review = page.getByRole("dialog", { name: "Revisar operação definitiva", exact: true }); await expect(review.locator("input,textarea,select")).toHaveCount(0);
   let attempts = 0;
   const payloads: unknown[] = [];
-  await page.route("**/api/documents/" + document.id, async route => {
+  await page.route("**/api/documents/" + document.id + "/decisions", async route => {
     if (route.request().method() !== "POST") { await route.continue(); return; }
     attempts++; payloads.push(route.request().postDataJSON()); if (attempts === 1) { await route.fetch(); await route.abort("failed"); } else await route.continue();
   });
-  await review.getByRole("button", { name: "Confirmar operação", exact: true }).click(); await expect(review.getByRole("button", { name: "Recuperar tentativa", exact: true })).toBeVisible();
-  await review.getByRole("button", { name: "Recuperar tentativa", exact: true }).click(); await expect(review).toHaveCount(0);
+  await confirmDecisionAndReconcile(page, document.id, review.getByRole("button", { name: "Confirmar operação", exact: true })); await expect(review).toHaveCount(0);
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(page.getByText("Parcela rejeitada. A declaração original foi preservada, sem entrada desta parcela no estoque.", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Parcela 1 · Rejeitada", exact: true })).toBeVisible(); expect(payloads).toHaveLength(2); expect(payloads[0]).toEqual(payloads[1]);
+  await expect(page.getByRole("heading", { name: "Parcela 1 · Rejeitada", exact: true })).toBeVisible(); expect(payloads).toHaveLength(1);
   const final = await rpc(f.admin, "operational_document", { p_id: document.id }), receipt = final.receipts[0];
   expect(receipt.id).toBe(original.id); expect(receipt.lines).toEqual(original.lines); expect(receipt.submitted_by).toBe(original.submitted_by); expect(receipt.submitted_name).toBe(original.submitted_name);
   expect(receipt.state).toBe("rejected"); expect(receipt.validated_by).toBe(fixtures.adminA.id); expect(Number(final.lines[0].accepted_quantity)).toBe(0);

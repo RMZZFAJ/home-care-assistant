@@ -1,5 +1,9 @@
 # L1 — política de rascunhos revisada pelo responsável
 
+**Continuação posterior:** as falhas dos navegadores e o gate Sonar reabriram a
+execução. Ver [estabilização L1](L1_CI_STABILIZATION.md). Os limites de parada
+anteriores abaixo são históricos; o conjunto corretivo ainda exige nova CI.
+
 **14/11/2026 — implementação e aplicação remota verificadas; publicação e CI
 do SHA final são o gate de fechamento.**
 Esta decisão posterior substitui a obrigação anterior de conservar rascunhos

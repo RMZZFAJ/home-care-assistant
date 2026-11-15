@@ -24,8 +24,10 @@ async function login(page: Page, patient: string) {
 async function reference(browser: Browser, route: string) {
   const context = await browser.newContext(), page = await context.newPage();
   await page.route(/^https?:/, route => route.abort());
-  await page.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#" + route);
-  await page.locator("#roleSelect").selectOption("family");
+  const l1 = route.startsWith("l1:");
+  await page.goto(pathToFileURL(resolve(l1 ? "hca-laboratorio-01-v3-final.html" : "Home_Care_Assistant_Modelo_Integral.html")).href + "#" + (l1 ? route.slice(3) : route));
+  if (l1) await page.locator("#product-app").getByRole("tab", { name: /^Materiais/ }).click();
+  else await page.locator("#roleSelect").selectOption("family");
   return { context, page };
 }
 async function referenceReview(model: Page) {
@@ -35,15 +37,15 @@ async function referenceReview(model: Page) {
   await model.locator('[data-action="wizardNext"]').click(); await model.locator('[data-action="wizardNext"]').click();
   await expect(model.locator("#wizardForm .kv")).toBeVisible();
 }
-function watchWrites(page: Page, allowAccess = false) {
+function watchWrites(page: Page, allowAccess = false, allowDrafts = false) {
   const writes: string[] = [];
-  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !(allowAccess && isDocumentAccessReport(request))) writes.push(request.url()); });
+  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !(allowDrafts && new URL(request.url()).pathname === "/api/drafts") && !(allowAccess && isDocumentAccessReport(request))) writes.push(request.url()); });
   return writes;
 }
 async function captureVisible(locator: Locator, path: string) {
   await locator.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
   expect(await locator.evaluate(node => {
-    const box = node.getBoundingClientRect(), x = box.left + box.width / 2;
+    const box = node.getBoundingClientRect(), x = (Math.max(0, box.left) + Math.min(innerWidth, box.right)) / 2;
     return [box.top + 12, box.bottom - 12].every(y => y > 0 && y < innerHeight && node.contains(document.elementFromPoint(x, y)));
   }), "The actual scrolled content must be clear of fixed navigation").toBe(true);
   await locator.screenshot({ path, animations: "disabled" });
@@ -52,7 +54,7 @@ async function captureVisible(locator: Locator, path: string) {
 test("06.2 ENT selection and complete readonly review follow the model without shipment", async ({ page, browser }, info) => {
   const name = "Material de entrega " + "com nome extenso ".repeat(6) + randomUUID().slice(0, 8);
   const f = await setup({ catalogue: [{ name, category: "medicamentos", unit: "unidade", aliases: [] }] });
-  await login(page, f.patient); const before = facts(f.patient), writes = watchWrites(page);
+  await login(page, f.patient); const before = facts(f.patient), writes = watchWrites(page, false, true);
   await page.goto("/fichas/ent");
   const response = await page.request.get(`/api/documents/delivery-preparation?careRecipientId=${f.patient}&source=FAMILY`);
   expect(response.ok()).toBe(true);
@@ -104,13 +106,24 @@ test("06.2 dispatched ENT preserves five independent material fields and reversi
   const first = table.locator("tbody tr").filter({ has: page.getByText(names[0], { exact: true }) });
   for (const [label, value] of [["Expedido", "7 unidade"], ["Aceito", "0 unidade"], ["Conciliado", "0 unidade"], ["Quantidade pendente", "7 unidade"]]) await expect(first.locator(`td[data-label="${label}"]`)).toContainText(value);
   const before = facts(f.patient), writes = watchWrites(page, true), ids = await table.locator("tbody tr").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
-  const ref = await reference(browser, "ficha/ENT-0001/materiais");
+  const ref = await reference(browser, "l1:/ficha/ENT-0001");
   try {
-    const model = ref.page.locator(".tablewrap.mobilecards").first(); await expect(model).toBeVisible();
+    const model = ref.page.locator("#product-app .doc-table-card").first(); await expect(model).toBeVisible();
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 }); await ref.page.setViewportSize({ width, height: 900 });
-      for (const property of ["border-radius", "border-color", "background-color"] as const) await expect(table.locator("..")).toHaveCSS(property, await model.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      for (const property of ["border-radius", "border-color", "background-color"] as const) await expect(page.locator(".hca-document-materials .doc-table-card")).toHaveCSS(property, await model.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
       for (const property of ["display", "padding-left", "padding-top", "gap"] as const) await expect(first).toHaveCSS(property, await model.locator("tbody tr").first().evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      const scroll = table.locator("..");
+      const overflows = await scroll.evaluate(node => node.scrollWidth > node.clientWidth);
+      if (overflows) {
+        await expect(scroll).toHaveAttribute("tabindex", "0");
+        await scroll.focus();
+        await scroll.press("Home");
+        await scroll.evaluate(node => { node.scrollLeft = 0; });
+        await scroll.press("ArrowRight");
+        await expect.poll(() => scroll.evaluate(node => node.scrollLeft)).toBeGreaterThan(0);
+        await scroll.evaluate(node => { node.scrollLeft = 0; });
+      } else await expect(scroll).not.toHaveAttribute("tabindex", "0");
       await auditFromTop(page, "canonical dispatched ENT " + width);
       if (width === 320) {
         mkdirSync("output/playwright/phase-d", { recursive: true });

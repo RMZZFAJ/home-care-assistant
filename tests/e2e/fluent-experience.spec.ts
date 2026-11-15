@@ -116,11 +116,12 @@ test("documentos comuns, histórico com URL e estoque têm apresentação real e
     await capture(page, "documento-" + kind + "-mobile", info.project.name);
   }
   await page.goto("/historico?careRecipientId=" + patient + "&type=ENT&search=" + ent.code);
-  await expect(page.getByRole("combobox", { name: "Ficha", exact: true })).toHaveValue("ENT");
+  await page.getByRole("button", { name: /^Filtros/ }).click();
+  await expect(page.getByRole("combobox", { name: "Tipo de ficha", exact: true })).toHaveValue("ENT");
   await expect(page.getByLabel("Buscar por código ou protocolo", { exact: true })).toHaveValue(ent.code);
   await page.reload();
   await expect(page.getByLabel("Buscar por código ou protocolo", { exact: true })).toHaveValue(ent.code);
-  await expect(page.getByRole("link").filter({ hasText: ent.code })).toHaveAttribute("href", "/documentos/" + ent.id);
+  await expect(page.getByRole("link").filter({ hasText: ent.code })).toHaveAttribute("href", "/documentos/" + ent.id + "?returnTo=" + encodeURIComponent("/historico?careRecipientId=" + patient + "&type=ENT&search=" + ent.code));
   await capture(page, "historico-filtros-mobile", info.project.name);
   await page.goto("/estoque?careRecipientId=" + patient + "&custody=FAMILY");
   await expect(page.getByRole("heading", { name: "Saldos e previsões", exact: true })).toBeVisible();
@@ -155,7 +156,7 @@ test("dashboards apresentam tarefas reais por perfil e preservam a custódia aut
     await test.step(role, async () => {
       await page.setViewportSize({ width: 1366, height: 900 });
       await login(page, role);
-      await expect(page.getByRole("heading", { name: role === "professional" ? "Precisa da sua atenção" : role === "supervisor" ? "Pendências da equipe" : "Ações que precisam de você", exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: role === "supervisor" ? "Pendências da equipe" : "Suas pendências", exact: true })).toBeVisible();
       const response = await page.request.get("/api/dashboard?careRecipientId=" + patientA);
       expect(response.ok()).toBeTruthy();
       const data = (await response.json()).data;

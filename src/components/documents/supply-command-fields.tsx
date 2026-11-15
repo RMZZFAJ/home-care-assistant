@@ -151,11 +151,26 @@ export function CommandEditorFields({
   const [fieldRevision, setFieldRevision] = useState(0);
   const captureSnapshot = useCallback(() => {
     const form = formElementRef.current!;
-    const fields: Record<string, string> = Object.fromEntries(
-      [...new FormData(form).entries()].filter(
-        (entry): entry is [string, string] => typeof entry[1] === "string",
-      ),
-    );
+    // This is an in-memory snapshot, not the submitted command. FormData
+    // omits controls inside the temporarily disabled confirmation fieldset,
+    // which would erase the user's values while comparing a new reference.
+    const fields: Record<string, string> = {};
+    for (const control of form.elements) {
+      if (!(
+        control instanceof HTMLInputElement ||
+        control instanceof HTMLTextAreaElement ||
+        control instanceof HTMLSelectElement
+      ) || !control.name) continue;
+      if (control instanceof HTMLInputElement) {
+        if (["file", "submit", "button", "reset"].includes(control.type)) continue;
+        if (control.type === "radio" && !control.checked) continue;
+        if (control.type === "checkbox") {
+          fields[control.name] = control.checked ? control.value : "";
+          continue;
+        }
+      }
+      fields[control.name] = control.value;
+    }
     // An unchecked checkbox is absent from FormData. Persist the explicit off
     // value so the private baseline merge cannot resurrect an earlier check.
     if (action === "close_expectation")

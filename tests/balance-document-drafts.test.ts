@@ -16,6 +16,7 @@ import {
   emptyBalanceDocumentDraft,
   parseBalanceDocumentConfirmation,
   parseBalancePreparation,
+  requireBalanceDocumentResult,
 } from "@/lib/forms/balance-document-draft";
 import { GET, POST } from "@/app/api/balances/document-preparation/route";
 
@@ -498,4 +499,20 @@ describe("BAL document preparations preserve physical authorship and own incompl
       ).status,
     ).toBe(403);
   });
+});
+
+it("accepts a JSONB-reordered review receipt but rejects any changed item fact", () => {
+  const nativeItem = { lineId: targetId, result: "confirmed" as const, comment: "Conferência individual", forwarding: "none" as const };
+  const packet = { careRecipientId: patientId, documentId, expectedVersion: 4, purpose: "review_family" as const,
+    body: { group: "family" as const, comment: "Minha revisão", reviewReference: "a".repeat(64), items: [nativeItem] } };
+  const receipt = { id: documentId, care_recipient_id: patientId, type: "BAL", version: 5,
+    balanceReview: { reviews: [{ id: draftId, reviewer_id: userId, review_group: "family", comment: "Minha revisão", reviewed_document_version: 4, item_results: [nativeItem] }] } };
+  expect(() => requireBalanceDocumentResult(receipt, packet, userId)).not.toThrow();
+  for (const change of [{ lineId: draftId }, { comment: "Outro comentário" }, { result: "difference", forwarding: "recount" }, { forwarding: "adjustment" }]) {
+    const changed = structuredClone(receipt);
+    Object.assign(changed.balanceReview.reviews[0].item_results[0], change);
+    expect(() => requireBalanceDocumentResult(changed, packet, userId)).toThrow("não confirmou esta decisão");
+  }
+  expect(() => requireBalanceDocumentResult(receipt, packet, draftId)).toThrow();
+  expect(() => requireBalanceDocumentResult({ ...receipt, version: 6 }, packet, userId)).toThrow();
 });

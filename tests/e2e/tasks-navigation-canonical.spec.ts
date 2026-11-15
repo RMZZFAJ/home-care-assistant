@@ -47,27 +47,28 @@ test("15 ADM-01 next task follows the model and actual role without completing r
   const data: DashboardData = (await response.json()).data;
   const expected = data.pendingTasks.find(task => task.priority === "attention") ?? data.pendingTasks[0];
   expect(expected).toBeTruthy();
-  const banner = page.getByRole("region", { name: "Próxima providência", exact: true });
-  await expect(banner.getByRole("heading", { level: 2 })).toHaveText(expected.title);
+  const banner = page.getByRole("region", { name: "Precisa de atenção", exact: true });
+  await expect(banner.getByRole("heading", { level: 3 }).first()).toHaveText(expected.title);
   const reference = await browser.newContext();
   try {
     const model = await reference.newPage();
     await model.route(/^https?:/, route => route.abort());
-    await model.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href);
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/inicio");
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
       await model.setViewportSize({ width, height: 900 });
-      await compare(banner, model.locator(".welcome"), ["background-image", "border-color", "border-radius", "padding-left", "padding-top"]);
-      await compare(banner.getByRole("heading"), model.locator(".welcome h2"), ["font-size", "font-weight", "letter-spacing"]);
-      const metric = page.locator(".hca-metric-card").first(), modelMetric = model.locator(".metric").first();
+      await model.locator("#product-app").evaluate((node, w) => { (node as HTMLElement).style.width=w+"px"; (node as HTMLElement).style.maxWidth="none"; }, width);
+      await compare(banner.locator(".attention-item").first(), model.locator("#product-app .attention-item").first(), ["border-color", "border-radius", "padding-left", "padding-top"]);
+      await compare(banner.getByRole("heading",{level:3}).first(), model.locator("#product-app .attention-item h3").first(), ["font-size", "font-weight", "letter-spacing"]);
+      const metric = page.locator(".av-metric").first(), modelMetric = model.locator("#product-app .av-metric").first();
       await compare(metric, modelMetric, ["background-color", "border-color", "border-radius", "padding-top", "min-height"]);
-      await compare(metric.locator("strong"), modelMetric.locator(".value"), ["font-size", "font-weight", "letter-spacing"]);
-      await compare(page.getByRole("region", { name: "Ações que precisam de você", exact: true }), model.locator(".card").first(), ["border-radius"]);
+      await compare(metric.locator("strong"), modelMetric.locator("strong"), ["font-size", "font-weight", "letter-spacing"]);
+      await compare(page.getByRole("region", { name: "Suas pendências", exact: true }), model.locator("#product-app .tasks-card").first(), ["border-radius"]);
       await auditFromTop(page, "ADM01 task " + width);
     }
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await page.screenshot({ path: `output/playwright/phase-d/tasks-${info.project.name}.png`, fullPage: true });
-    const destination = banner.getByRole("link", { name: "Abrir próxima providência", exact: true });
+    const destination = banner.locator(".attention-item").filter({has:page.getByRole("heading",{name:expected.title,exact:true})}).getByRole("link").first();
     await expect(destination).toHaveAttribute("href", expected.href);
     await destination.focus(); await page.keyboard.press("Enter");
     await expect(page).toHaveURL(new RegExp(expected.href));
@@ -79,7 +80,7 @@ test("15 ADM-01 next task follows the model and actual role without completing r
     await login(page, f.patient, "professional");
     const pro = (await (await page.request.get("/api/dashboard?careRecipientId=" + f.patient)).json()).data as DashboardData;
     const task = pro.pendingTasks.find(item => item.priority === "attention") ?? pro.pendingTasks[0];
-    await expect(banner.getByRole("heading")).toHaveText(task.title);
+    await expect(banner.getByRole("heading",{level:3}).first()).toHaveText(task.title);
     await expect(page.getByRole("link", { name: "Organizar compra", exact: true })).toHaveCount(0);
     expect(facts(f.patient)).toBe(before);
   } finally { await reference.close(); }
@@ -87,10 +88,10 @@ test("15 ADM-01 next task follows the model and actual role without completing r
 
 test("15 ADM-01 empty and failed reads never fabricate an attention task or global approval", async ({ page }) => {
   const f = await setup(); await login(page, f.patient);
-  const before = facts(f.patient), banner = page.getByRole("region", { name: "Próxima providência", exact: true });
+  const before = facts(f.patient), banner = page.getByRole("region", { name: "Precisa de atenção", exact: true });
   const result = await page.request.get("/api/dashboard?careRecipientId=" + f.patient);
   expect((await result.json()).data.pendingTasks).toEqual([]);
-  await expect(page.getByText("Sem itens nesta consulta", { exact: true })).toBeVisible();
+  await expect(page.getByText("Nenhuma pendência por aqui", { exact: true })).toBeVisible();
   await expect(banner).toHaveCount(0);
   await expect(page.getByText("Em dia", { exact: true })).toHaveCount(0);
   await page.route("**/api/dashboard?*", route => route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Consulta de tarefas indisponível no cenário controlado." } }));
@@ -99,7 +100,7 @@ test("15 ADM-01 empty and failed reads never fabricate an attention task or glob
   await expect(banner).toHaveCount(0);
   await page.unrouteAll({ behavior: "wait" });
   await page.getByRole("button", { name: "Tentar novamente", exact: true }).click();
-  await expect(page.getByText("Sem itens nesta consulta", { exact: true })).toBeVisible();
+  await expect(page.getByText("Nenhuma pendência por aqui", { exact: true })).toBeVisible();
   expect(facts(f.patient)).toBe(before);
 });
 

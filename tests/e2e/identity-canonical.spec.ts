@@ -31,21 +31,22 @@ test("15 ID01 ID03 public access, recovery and invitation preserve the canonical
   const reference = await browser.newContext();
   try {
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
-    await model.goto(referenceUrl + "#acesso/entrar"); await page.goto("/login");
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/cenario/E01-01"); await page.goto("/login");
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
-      await compare(page.locator(".hca-access-card"), model.locator(".card.pad"), ["padding-top", "padding-left", "border-radius", "border-top-color", "max-width"]);
-      await compare(page.locator(".hca-access-card > h2"), model.locator(".card.pad > h2"), ["font-size", "font-weight"]);
-      await compare(page.getByRole("navigation", { name: "Etapas do acesso", exact: true }), model.locator(".tabs"), ["flex-wrap", "column-gap"]);
-      await compare(page.locator('.hca-access-tab[aria-current="page"]'), model.locator('.tab[aria-selected="true"]'), ["color", "border-bottom-color", "background-color", "padding-top", "padding-left", "font-size"]);
+      await model.locator("#product-app").evaluate((node, w) => { (node as HTMLElement).style.width = w + "px"; (node as HTMLElement).style.maxWidth = "none"; }, width);
+      await compare(page.locator(".access-card"), model.locator("#product-app .access-card"), ["border-radius", "border-top-color", "max-width"]);
+      await compare(page.locator(".auth-intro"), model.locator("#product-app .auth-intro"), ["padding-top", "padding-left"]);
+      await compare(page.locator(".auth-intro > h1"), model.locator("#product-app .auth-intro > h1"), ["font-size", "font-weight"]);
       await auditFromTop(page, "public canonical login " + width);
     }
-    await page.getByRole("navigation", { name: "Etapas do acesso", exact: true }).getByRole("link", { name: "Recuperar", exact: true }).click();
+    await page.getByRole("button", { name: "Esqueci minha senha", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Recuperar seu acesso", exact: true })).toBeVisible();
     await expect(page.getByLabel("Senha", { exact: true })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Solicitar link de recuperação", exact: true })).toBeVisible();
     await auditFromTop(page, "public canonical recovery");
-    await page.getByRole("link", { name: "Aceitar convite", exact: true }).click();
+    await page.getByRole("link", { name: "Voltar ao login", exact: true }).click();
+    await page.getByRole("link", { name: "Abrir convite", exact: true }).click();
     await expect(page.getByText("Este link não contém um convite válido.", { exact: false })).toBeVisible();
     await expect(page.getByRole("region", { name: "Resumo do vínculo convidado", exact: true })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Aceitar convite com minha conta", exact: true })).toHaveCount(0);

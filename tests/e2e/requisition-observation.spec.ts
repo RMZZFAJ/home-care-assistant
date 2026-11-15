@@ -123,7 +123,7 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
     .click();
   await expect(
     page.getByText(
-      "Salvo no servidor. Este preenchimento ainda não foi emitido.",
+      "Último rascunho salvo.",
       { exact: true },
     ),
   ).toBeVisible();
@@ -224,7 +224,7 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
     .click();
   await expect(
     page.getByText(
-      "Salvo no servidor. Este preenchimento ainda não foi emitido.",
+      "Último rascunho salvo.",
       { exact: true },
     ),
   ).toBeVisible();

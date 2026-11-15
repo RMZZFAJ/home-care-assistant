@@ -84,7 +84,7 @@ test("P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevi
     await page.getByRole("button", { name: "Tentar carregar requisição", exact: true }).click();
     await selectDocumentSection(page, "materials");
     await expect(page.getByText("Material fictício V4 0", { exact: false }).first()).toBeVisible();
-    await selectDocumentSection(page, "overview");
+    await selectDocumentSection(page, "materials");
     await expect(page.getByText("Família ciente", { exact: true })).toBeVisible();
     await selectDocumentSection(page, "workflow");
     await expect(page.getByText("Minha ciência: registrada.", { exact: true })).toBeVisible();
@@ -102,7 +102,7 @@ test("P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevi
     expect(count(req.id)).toBe(1);
     expect(openings(req.id), "PDF delivery must not fabricate another application opening").toBe(1);
     if (info.project.name === "chromium") { mkdirSync("output/pdf/phase-d", { recursive: true }); const path = `output/pdf/phase-d/p02-dialog-${req.id}.pdf`; writeFileSync(path, await pdf.body(), { flag: "wx" }); await info.attach("P02 dialogue PDF", { path, contentType: "application/pdf" }); }
-    await page.reload(); await selectDocumentSection(page, "overview"); await expect(page.getByText("Família ciente", { exact: true })).toBeVisible();
+    await page.reload(); await selectDocumentSection(page, "materials"); await expect(page.getByText("Família ciente", { exact: true })).toBeVisible();
     await expect.poll(() => openings(req.id)).toBe(1); expect(count(req.id)).toBe(1);
   } finally { await prefer(family, "manual"); }
 });

@@ -102,9 +102,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
     name: "Registrar andamento",
     exact: true,
   });
-  await editor
-    .getByRole("button", { name: "Continuar o rascunho", exact: true })
-    .click();
+  await page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true }).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(
     editor.getByRole("textbox", { name: "Texto do andamento", exact: true }),
   ).toHaveValue(text);
@@ -170,9 +168,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   await selectDocumentSection(page, "materials");
   await page.reload();
   await selectDocumentSection(page, "overview");
-  await expect(
-    feed.getByRole("region", { name: "Rascunho privado", exact: true }),
-  ).toContainText("Andamento publicado por");
+  await expect(feed.getByRole("region", { name: "Rascunho privado", exact: true })).toHaveCount(0);
   await expect(feed).toContainText("Publicação recuperada");
   expect(packets).toHaveLength(1);
   expect(packets[0]).toMatchObject({ publication: { relevance: "milestone", mentions: [fixtures.professional.id] } });
@@ -295,6 +291,7 @@ test("Andamentos alcançam todos os registros, separam fatos e ocultam consulta 
   await page
     .getByRole("button", { name: "Registrar andamento", exact: true })
     .click();
+  await page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true }).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(
     editor.getByRole("textbox", { name: "Texto do andamento", exact: true }),
   ).toHaveValue("Texto próprio preservado durante recusa");

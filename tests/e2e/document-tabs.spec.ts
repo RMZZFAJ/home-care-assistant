@@ -35,7 +35,7 @@ test("Abas comparam os tokens L1 na mesma área de leitura em cinco larguras", a
       [".hca-document-identity", ".doc-hero-top", ["display","gap","align-items","justify-content","padding","flex-direction"]],
       [".hca-document-name", ".doc-hero-name", ["display","gap","align-items","min-width"]],
       ["[data-document-heading]", ".doc-hero-name h1", ["font-size","font-weight","line-height","letter-spacing","color"]],
-      [".hca-document-type", ".doc-kind", ["display","width","height","border-radius","background-color","color","font-size","font-weight"]],
+      [".hca-document-header .hca-document-type", ".doc-kind", ["display","width","height","border-radius","background-color","color","font-size","font-weight"]],
       [".hca-document-meta dt", ".doc-meta dt", ["font-size","text-transform","letter-spacing","color"]],
       [".hca-document-meta dd", ".doc-meta dd", ["font-size","font-weight","line-height","margin"]],
       [".hca-document-tab[aria-selected=true]", ".doc-tab[aria-selected=true]", ["font-size","font-weight","line-height","padding","min-height","border-bottom","color"]],
@@ -230,7 +230,7 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
   }
 });
 
-test("Abas conservam conferência ENT não salva e recuperam seleção por URL e histórico sem conceder auditoria", async ({
+test("Conferência ENT sobreposta protege campos, descarta ao sair e conserva seleção por URL sem conceder auditoria", async ({
   page,
 }) => {
   const f = await setup(),
@@ -246,33 +246,24 @@ test("Abas conservam conferência ENT não salva e recuperam seleção por URL e
   await page
     .getByRole("button", { name: "Informar divergência", exact: true })
     .click();
-  const editor = page.getByRole("region", {
-    name: "Conferência pessoal em preparação",
-    exact: true,
-  });
-  await editor
-    .getByRole("checkbox", { name: /Material fictício V4 0/ })
-    .check();
-  await editor
-    .getByRole("textbox", { name: "Efetivamente recebido", exact: true })
-    .fill("1,");
-  await editor
-    .getByRole("textbox", { name: "Observações da divergência", exact: true })
-    .fill("Edição fictícia entre abas");
+  const editor = page.getByRole("dialog", { name: "Informar divergência", exact: true });
+  await editor.getByRole("checkbox", { name: /Material fictício V4 0/ }).check();
+  await editor.getByRole("textbox", { name: "Efetivamente recebido", exact: true }).fill("1,");
+  const ownText = "Edição fictícia protegida durante a conferência";
+  await editor.getByRole("textbox", { name: "Observações da divergência", exact: true }).fill(ownText);
   const before = official(ent.id, f.patient);
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).not.toBeVisible();
+  await editor.getByRole("button", { name: "Voltar", exact: true }).click();
+  const leave = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });
+  await leave.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+  await expect(editor.getByRole("textbox", { name: "Efetivamente recebido", exact: true })).toHaveValue("1,");
+  await expect(editor.getByRole("textbox", { name: "Observações da divergência", exact: true })).toHaveValue(ownText);
+  expect(official(ent.id, f.patient)).toBe(before);
+  await editor.getByRole("button", { name: "Voltar", exact: true }).click();
+  await leave.getByRole("button", { name: "Sair e descartar", exact: true }).click();
+  await expect(editor).toHaveCount(0);
   await selectDocumentSection(page, "overview");
-  await expect(editor).not.toBeVisible();
   await selectDocumentSection(page, "materials");
-  await selectDocumentSection(page, "workflow");
-  await expect(
-    editor.getByRole("textbox", { name: "Efetivamente recebido", exact: true }),
-  ).toHaveValue("1,");
-  await expect(
-    editor.getByRole("textbox", {
-      name: "Observações da divergência",
-      exact: true,
-    }),
-  ).toHaveValue("Edição fictícia entre abas");
   expect(official(ent.id, f.patient)).toBe(before);
   await selectDocumentSection(page, "files");
   await page.reload();

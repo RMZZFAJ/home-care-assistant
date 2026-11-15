@@ -106,7 +106,7 @@ test("Mais usa menu e identificação separada; família menciona por @ e refere
   const name = sql("select full_name from public.profiles where id=" + q(fixtures.professional.id));
   await editor.getByRole("button", { name: "@" + name, exact: true }).click();
   await text.press("End"); await text.pressSequentially(" #" + otherCode);
-  await editor.getByRole("button", { name: "Ficha · " + otherCode, exact: true }).click();
+  await editor.getByRole("button", { name: new RegExp("^Ficha · " + otherCode + "(?: ·|$)") }).click();
   const committed = page.waitForResponse(response => new URL(response.url()).pathname === "/api/documents/progress-preparations/commit" && response.request().method() === "POST");
   await editor.getByRole("button", { name: "Publicar andamento", exact: true }).click();
   const confirmed = await committed; expect(confirmed.status(), await confirmed.text()).toBe(200);

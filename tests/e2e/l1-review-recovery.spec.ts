@@ -39,19 +39,10 @@ test("L1 continuidade exige MFA com Auth real e conserva o destino seguro",async
 test("L1 resultado de autenticação antigo não redireciona após sair da continuação",async({page})=>{
  let release!:()=>void,seen!:()=>void;
  const gate=new Promise<void>(resolve=>{release=resolve;}),requested=new Promise<void>(resolve=>{seen=resolve;});
+ const f=await setup();await login(page,f.patient);
  let first=true;
- await page.route("**/auth/v1/user",async route=>{
-  if(!first)return route.continue();first=false;seen();await gate;
-  await route.fulfill({status:401,json:{message:"Sessão fictícia encerrada"}});
- });
+ await page.route("**/auth/v1/user",async route=>{if(!first)return route.continue();first=false;seen();await gate;await route.fulfill({status:401,json:{message:"Sessão fictícia encerrada"}});});
  await page.goto("/acesso/continuar?next=/historico");
- // Without a session the SDK can settle locally, so provide a real login
- // before the continuation whose deferred response is being exercised.
- if(first){
-  await page.unroute("**/auth/v1/user");const f=await setup();await login(page,f.patient);
-  await page.route("**/auth/v1/user",async route=>{if(!first)return route.continue();first=false;seen();await gate;await route.fulfill({status:401,json:{message:"Sessão fictícia encerrada"}});});
-  await page.goto("/acesso/continuar?next=/historico");
- }
  await requested;await page.goto("/convites/aceitar");
  await expect(page).toHaveURL(/\/convites\/aceitar/);release();
  await expect(page.getByRole("heading",{name:/convite/i})).toBeVisible();
@@ -104,9 +95,10 @@ test("L1 pré-vínculo oferece só a necessidade em aberto e descarte exige nova
  await expect(links.getByRole("checkbox")).toHaveCount(1);await expect(links.getByRole("checkbox")).toBeChecked();
  const choice=links.getByRole("combobox");await expect(choice).toHaveCount(1);await choice.selectOption("complete");
  await page.getByRole("button",{name:"Salvar rascunho",exact:true}).click();
- const discard=page.getByRole("button",{name:"Descartar e começar nova",exact:true});await expect(discard).toBeEnabled();await discard.click();
- await page.getByRole("button",{name:"Confirmar descarte do rascunho",exact:true}).click();
- await expect(choice).toHaveValue("");
+ await expect(page.getByText("Último rascunho salvo.",{exact:true})).toBeVisible();
+ await page.reload();const resume=page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true});
+ await resume.getByRole("button",{name:"Descartar e começar novamente",exact:true}).click();
+ await links.locator("summary").click();await expect(links.getByRole("combobox")).toHaveValue("");
  expect(sql("select count(*) from public.operational_documents where care_recipient_id="+q(f.patient)+" and type='ENT'")).toBe("1");
 });
 

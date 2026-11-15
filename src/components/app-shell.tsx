@@ -48,6 +48,11 @@ export function AppWorkspace({
     selectProfile,
   } = useWorkspaceState();
   const [profileSearch, setProfileSearch] = useState("");
+  const [accountSnapshot, setAccountSnapshot] = useState<WorkspaceContext | null>(null);
+  if (account && value && value !== accountSnapshot) setAccountSnapshot(value);
+  // Retain only this mounted account's local edit. The fallback carries no
+  // patient or administrative authority, and cannot receive user input.
+  const personalContext = value ?? (accountSnapshot ? { ...accountSnapshot, patient: undefined, patients: [], activeContext: null, isGlobalAdmin: false, globalAdministrationAllowed: false } : null);
   const normalize = (text: string) =>
     text.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase("pt-BR");
   const profiles =
@@ -78,7 +83,9 @@ export function AppWorkspace({
     value.patient?.hasMembership;
   // Intermediate authority reads must never mount a chooser or consumers with
   // the previous patient's context. The shared overlay owns loading feedback.
-  if (loading || selecting) return <main id="workspace-content" className="workspace-content" tabIndex={-1} aria-busy="true" />;
+  const [initialized, setInitialized] = useState(false);
+  if (!loading && !selecting && value && !initialized) setInitialized(true);
+  if ((loading || selecting) && !initialized) return <main id="workspace-content" className="workspace-content" tabIndex={-1} aria-busy="true" />;
   return (
     <main
       id="workspace-content"
@@ -189,8 +196,8 @@ export function AppWorkspace({
           </div>
         </section>
       ) : null}
-      {!error && value && account ? (
-        <div key={"account:" + value.userId}>{children(value)}</div>
+      {account && personalContext ? (
+        <div key={"account:" + personalContext.userId} inert={Boolean(error)}>{children(personalContext)}</div>
       ) : !error && value?.activeContext && !mismatch ? (
         !value.patient && !value.isGlobalAdmin ? (
           <FeedbackBanner>

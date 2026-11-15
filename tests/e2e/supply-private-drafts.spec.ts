@@ -50,7 +50,7 @@ test("duas fichas ENT não herdam campos de conferência descartada e nenhuma na
  const f=await setup(),make=()=>rpc(f.admin,"create_supply_document",{p_patient:f.patient,p_type:"ENT",p_payload:{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício",lines:f.products.map(productId=>({productId,quantity:"2"}))},p_key:randomUUID(),p_draft:false}),first=await make(),second=await make(),before=official(f.patient);
  await login(page,f.patient,"professional");
  for(const doc of [first,second]){ await page.goto(`/fichas/${doc.id}`);await page.getByRole("button",{name:"Informar divergência",exact:true}).click();
-  const field=page.getByRole("textbox",{name:"Motivo / justificativa",exact:true}); await expect(field).toHaveValue(""); await field.fill("Conferência que será descartada sem aceitar entrega.");
+  const field=page.getByRole("textbox",{name:"Observações da divergência",exact:true}); await expect(field).toHaveValue(""); await field.fill("Conferência que será descartada sem aceitar entrega.");
   await page.getByRole("button",{name:"Voltar",exact:true}).click(); const guard=page.getByRole("dialog",{name:"Sair sem concluir?",exact:true});await guard.getByRole("button",{name:"Sair e descartar",exact:true}).click();
  }
  expect(official(f.patient)).toBe(before);expect(sql(`select count(*) from private.creation_drafts where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("0");

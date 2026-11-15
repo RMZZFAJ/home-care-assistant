@@ -1,3 +1,4 @@
+import { confirmDecisionAndReconcile } from "./l1-decision-policy";
 import { startFocusProbe, attachFocusProbe } from "./focus-diagnostics";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
@@ -87,13 +88,13 @@ async function proposalForm(page: Page, returned = "1") {
 async function confirm(page: Page, id: string, button: string) {
   const response = page.waitForResponse(
     (r) =>
-      new URL(r.url()).pathname === "/api/documents/" + id &&
+      new URL(r.url()).pathname === "/api/documents/" + id + "/decisions" &&
       r.request().method() === "POST",
   );
   await page.getByRole("button", { name: button, exact: true }).click();
   const result = await response;
   expect(result.ok(), await result.text()).toBe(true);
-  return (await result.json()).data as SupplyDocument;
+  return (await result.json()).data.result as SupplyDocument;
 }
 async function unknownCase(f: Fixture, owner: string) {
   let document = await rpc(f.admin, "supply_document_command", {
@@ -177,7 +178,7 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
     }),
   ).toBeFocused();
   const attempts: unknown[] = [];
-  await page.route("**/api/documents/" + f.document.id, async (route) => {
+  await page.route("**/api/documents/" + f.document.id + "/decisions", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
     if (attempts.length === 1) {
@@ -186,27 +187,12 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
       await route.abort("failed");
     } else await route.continue();
   });
-  await page
-    .getByRole("button", {
-      name: "Registrar proposta sem movimentar",
-      exact: true,
-    })
-    .click();
-  await expect(
-    page.getByRole("button", { name: "Recuperar mesmo ato", exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Fechar edição", exact: true }),
-  ).toBeDisabled();
-  await expect(
-    page.getByRole("button", { name: "Editar meus campos", exact: true }),
-  ).toHaveCount(0);
-  const proposed = await confirm(page, f.document.id, "Recuperar mesmo ato");
-  expect(attempts).toHaveLength(2);
-  expect(attempts[0]).toEqual(attempts[1]);
+  await confirmDecisionAndReconcile(page, f.document.id, page.getByRole("button", { name: "Registrar proposta sem movimentar", exact: true }));
+  const proposed = await rpc(f.admin, "operational_document", { p_id: f.document.id }) as SupplyDocument;
+  expect(attempts).toHaveLength(1);
   expect(ledger(f)).toBe(before);
   expect(proposed.deliveryRegularization!.cases).toHaveLength(1);
-  await page.unroute("**/api/documents/" + f.document.id);
+  await page.unroute("**/api/documents/" + f.document.id + "/decisions");
   const familyContext = await browser.newContext(),
     family = await familyContext.newPage();
   try {
@@ -417,7 +403,7 @@ test("C043 caixa padrão oferece decisão pessoal de cancelamento e remove a tar
     .click();
   const response = page.waitForResponse(
     (r) =>
-      new URL(r.url()).pathname === "/api/documents/" + f.document.id &&
+      new URL(r.url()).pathname === "/api/documents/" + f.document.id + "/decisions" &&
       r.request().method() === "POST",
   );
   await page
@@ -471,7 +457,7 @@ test("P05 conflito preserva campos próprios e só permite nova proposta após c
     });
   const response = page.waitForResponse(
     (r) =>
-      new URL(r.url()).pathname === "/api/documents/" + f.document.id &&
+      new URL(r.url()).pathname === "/api/documents/" + f.document.id + "/decisions" &&
       r.request().method() === "POST",
   );
   await page

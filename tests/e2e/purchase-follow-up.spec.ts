@@ -114,6 +114,7 @@ test("COM follow-up preserves arrival rejection and P14 closure until a real par
   expect(doc.purchaseProgress?.state).toBe("closed_pending_validation");
   before = facts(f.patient);
   await open(page, doc.id, "Conferir as parcelas de chegada");
+  await selectDocumentSection(page, "materials");
   await expect(panel(page)).toContainText("aquisição restante foi encerrada");
   await expect(conclusion(page)).toHaveAttribute("data-state", "pending");
   await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true }).click();

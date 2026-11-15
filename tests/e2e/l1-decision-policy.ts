@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
@@ -32,6 +32,16 @@ export async function loseDecisionResponse(page: Page, endpoint: string) {
     await route.abort("failed");
   });
   return packets;
+}
+/** A lost official reply is settled automatically; no second act is sent. */
+export async function confirmDecisionAndReconcile(page: Page, id: string, confirm: Locator, endpoint = `/api/documents/${id}/decisions`) {
+  const response = page.waitForResponse(row => new URL(row.url()).pathname === endpoint.split("?")[0] + "/reconcile" && row.request().method() === "POST");
+  await confirm.click();
+  const settled = await response;
+  expect(settled.ok(), await settled.text()).toBe(true);
+  const key = settled.request().postDataJSON().key;
+  expect((await settled.json()).data).toMatchObject({ state: "applied", documentId: id, key });
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
 }
 export async function confirmedOutcome(page: Page, id: string, confirm: string, endpoint = `/api/documents/${id}/decisions`) {
   const packets = await loseDecisionResponse(page, endpoint);

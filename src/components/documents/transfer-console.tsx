@@ -76,7 +76,7 @@ function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext;
     [consulting, setConsulting] = useState(false);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const returnOnly = fixedSource === "CARE_TEAM";
-  const canPrepare = can(context, "ent.create") && (!fixedSource || can(context, fixedSource === "CARE_TEAM" ? "stock.team.read" : "stock.family.read"));
+  const canPrepare = can(context, "ent.create") && !!source && can(context, source === "CARE_TEAM" ? "stock.team.read" : "stock.family.read");
   return (
     <div className="mx-auto max-w-4xl space-y-5">
       <section className="ui-card space-y-4">
@@ -326,6 +326,7 @@ function TransferDeclarationEditor({
       needsRefresh ||
       referenceUnavailable ||
       privateDraft.blocked ||
+      privateDraft.backgroundBusy ||
       busy ||
       uncertain ||
       recoveryOnly
@@ -596,11 +597,12 @@ function TransferDeclarationEditor({
         !privateDraft.offered &&
         !privateDraft.readDenied &&
         !privateDraft.protectedReadPending ? (
-          <DraftContentSummary
-            content={privateDraft.base.content}
-            kind="ENT"
-            purpose={purpose}
-          />
+          <>
+            <DraftContentSummary content={privateDraft.base.content} kind="ENT" purpose={purpose} />
+            <ActionButton disabled={privateDraft.busy || !!privateDraft.pending || privateDraft.conflict} onClick={() => void privateDraft.discard()}>
+              Descartar preenchimento privado
+            </ActionButton>
+          </>
         ) : null}
         {!privateDraft.loading &&
         !privateDraft.loadError &&
@@ -1042,6 +1044,7 @@ function TransferDeclarationEditor({
                     needsRefresh ||
                     referenceUnavailable ||
                     privateDraft.blocked ||
+                    privateDraft.backgroundBusy ||
                     busy ||
                     !reference!.people.length ||
                     !lines.length
