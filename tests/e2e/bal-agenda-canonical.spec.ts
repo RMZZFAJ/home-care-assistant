@@ -96,7 +96,14 @@ test("06.3 agenda canonical records retain overnight dates,timezone and native e
       for (const property of ["width", "height", "border-radius", "background-color"] as const) await expect(row.locator(".hca-shift-icon")).toHaveCSS(property, await model.locator(".record-icon").evaluate((n,p) => getComputedStyle(n).getPropertyValue(p), property));
       if (width > 850) {
         const calendar = page.getByRole("region", { name: "Calendário de plantões; rolagem horizontal quando necessária", exact: true });
-        await calendar.focus(); await calendar.press("ArrowRight");
+        // The reference owns another page, and resize updates native tab entry.
+        // Establish the live page and overflow contract before sending the key.
+        await page.bringToFront();
+        await expect(calendar).toHaveAttribute("tabindex", "0");
+        await calendar.scrollIntoViewIfNeeded();
+        await calendar.evaluate(node => { node.scrollLeft = 0; });
+        await calendar.focus(); await expect(calendar).toBeFocused();
+        await calendar.press("ArrowRight");
         await expect.poll(() => calendar.evaluate(node => node.scrollLeft)).toBeGreaterThan(0);
       }
       await auditFromTop(page, "canonical agenda " + width);

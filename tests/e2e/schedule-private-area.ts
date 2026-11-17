@@ -6,6 +6,10 @@ export async function openSchedulePrivateArea(page: Page) {
   const summary = page.getByText("Meus preenchimentos privados da agenda", { exact: true });
   const details = summary.locator("..");
   await expect(summary).toBeVisible();
-  if (!await details.evaluate(element => element.hasAttribute("open"))) await summary.click();
+  if (!await details.evaluate(element => element.hasAttribute("open"))) {
+    await summary.scrollIntoViewIfNeeded();
+    await summary.focus(); await expect(summary).toBeFocused();
+    await summary.press("Enter");
+  }
   await expect(details).toHaveAttribute("open", "");
 }

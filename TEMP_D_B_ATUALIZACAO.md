@@ -1,5 +1,20 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**17/11 — continuação após resultado completo de 521d5031.** A CI 43996790376
+passou Windows, Ubuntu, instalação limpa, evolução legada e 760 integrações.
+Chromium-2 e mobile-2 passaram sem repetição. Nos outros quatro shards,
+cinco casos falharam também na segunda tentativa; uma programação iOS passou
+somente na repetição. Três falhas são o mesmo consumidor de atualização
+automática, cuja expectativa antiga não foi alinhada ao L1. O complemento
+alinha essa expectativa, conserva o anúncio apenas para leitores de tela e
+aguarda foco/rolagem reais da agenda, término da confirmação anterior de
+Andamentos e abertura nativa da área privada. Os 15 casos dirigidos passaram,
+cinco por projeto, sem repetição automática, mantendo conteúdo, CAS,
+autorização e oráculos oficiais. Build com tipos, lint dos quatro instrumentos,
+Markdown e preservação das matrizes passaram. Não há nova alteração de
+produto, banco ou dependências. A publicação segue na mesma branch e a nova
+CI não será acompanhada, conforme a orientação vigente.
+
 **16/11 — revisão do resultado completo de 2b31ebca.** A CI 43765674848
 passou Windows, Ubuntu, instalação limpa, evolução legada, 760 integrações e
 cinco dos seis jobs de navegador. Mobile-2 teve uma falha persistente COM e

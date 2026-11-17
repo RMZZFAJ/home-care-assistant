@@ -119,9 +119,17 @@ test("background ficha refresh keeps the summary stationary and tabs selectable 
   try {
     await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await read;
-    await expect(refresh).toHaveAttribute("aria-disabled", "true");
+    // A background read keeps explicit refresh available; it can replace the
+    // older read. Busy feedback stays on the control, without a blocking layer.
+    await expect(refresh).toHaveAttribute("aria-disabled", "false");
     await expect(refresh).toHaveAttribute("aria-busy", "true");
-    await expect(page.getByRole("status").filter({ hasText: "Atualizando consulta da ficha…" })).toHaveText("Atualizando consulta da ficha…");
+    await expect(page.getByRole("dialog", { name: "Consultando a ficha", exact: true })).toHaveCount(0);
+    const announcement = page.getByRole("status").filter({ hasText: "Atualizando consulta da ficha…" });
+    await expect(announcement).toHaveText("Atualizando consulta da ficha…");
+    await expect(announcement).toHaveClass("sr-only");
+    await expect(announcement).toHaveCSS("position", "absolute");
+    await expect(announcement).toHaveCSS("width", "1px");
+    await expect(announcement).toHaveCSS("height", "1px");
     expect(await header.boundingBox()).toEqual(bounds);
     await selectDocumentSection(page, "attachments");
     release();

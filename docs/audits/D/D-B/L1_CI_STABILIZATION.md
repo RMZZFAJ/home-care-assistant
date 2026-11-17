@@ -543,3 +543,89 @@ intermediárias permanecem nesses registros; não são resultado do próximo SHA
 O responsável dispensou o acompanhamento da nova CI após o push. A CI do
 próximo SHA e os gates humanos, físicos e de provedor continuam pendentes;
 o início observado em 15/11 não aprova o resultado final.
+
+## Resultado completo de 521d5031 — correção de 17/11
+
+A [CI 43996790376](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/43996790376)
+terminou em falha, com `run_attempt=1`. A conferência anterior, enquanto iOS
+ainda executava, era parcial. O resultado completo contém seis casos com
+segunda tentativa: cinco falharam novamente e um passou como flaky.
+
+| Job | Resultado E2E | Segunda tentativa |
+| --- | --- | --- |
+| Chromium-1 | 249 aprovados e uma falha | Atualização da ficha falhou |
+| Chromium-2 | 249 aprovados | Nenhuma |
+| Mobile-1 | 249 aprovados e uma falha | Atualização da ficha falhou |
+| Mobile-2 | 249 aprovados | Nenhuma |
+| iOS-1 | 248 aprovados e duas falhas | Agenda e atualização falharam |
+| iOS-2 | 247 aprovados, 1 falha e 1 flaky | Andamento falhou; agenda passou |
+
+Os seis harnesses passaram 15 casos cada. Windows passou 1.107 testes;
+Ubuntu passou 1.106 e manteve seu único caso específico de Windows ignorado.
+Instalação limpa, evolução legada e 760 integrações passaram. O agregado
+`database-and-browser` propagou apenas a falha dos navegadores; não houve
+nova falha de banco. O check de análise Sonar de 521d5031 terminou com sucesso.
+Os avisos de migração da imagem Ubuntu são informativos. Isso não elimina a
+pendência já registrada das 12 ocorrências em ferramentas de desenvolvimento.
+
+### Ajustes dos consumidores
+
+- **Atualização automática, três projetos:** `document-access.spec.ts` ainda
+  exigia Atualizar desabilitado. Esse consumidor não foi incluído na validação
+  anterior. Agora exige `aria-disabled=false`, `aria-busy=true`, ausência do
+  overlay bloqueante e anúncio de atualização apenas para leitores de tela,
+  com texto exato, classe sr-only, posição absoluta e dimensões de 1px.
+  Mantém geometria idêntica do resumo, navegação
+  real para Anexos durante a leitura presa e documentos/eventos/ciência/estoque
+  inalterados. A prova de substituição explícita da leitura presa em COM
+  passou na própria CI 521d5031 nos três motores; seu oráculo não foi alterado.
+- **Agenda canônica iOS:** a captura de falha mostra o foco no botão do
+  cabeçalho quando a prova esperava deslocamento do calendário. O consumidor
+  agora ativa a página real, aguarda `tabindex=0` após resize, traz a região
+  à vista, estabelece origem zero e confirma foco antes de ArrowRight.
+  O deslocamento positivo continua obrigatório; não há simulação de rolagem
+  no lugar da tecla, exclusão axe ou alteração de tokens/viewports.
+- **Andamento iOS:** a segunda tecla Escape era enviada imediatamente após
+  Voltar ao preenchimento, durante a saída da confirmação anterior. A imagem
+  mostra editor e texto preservados, sem confirmação. A prova aguarda a
+  remoção do diálogo anterior e a liberação após salvamento, confirma foco
+  no texto e exige a segunda confirmação visível antes de Guardar e sair.
+  Conserva os quatro campos, outra sessão, CAS, retomada/descarte e zero notas.
+  A captura não registra a cronologia exata dos eventos de descarte da tecla;
+  a correção do instrumento explicita as precondições que antes faltavam.
+- **Área privada da agenda iOS, flaky:** o details permaneceu fechado após
+  o clique da primeira tentativa. O helper conserva a abertura condicional,
+  aguarda visibilidade, traz o summary à vista e usa foco confirmado e Enter
+  nativos. Não adiciona segundo acionamento automático nem força atributo open.
+  Além do cenário de programação, um consumidor de recursos da agenda é
+  validado porque ambos usam esse helper.
+
+### Verificação e publicação
+
+Quinze casos dirigidos distintos passaram, cinco por projeto, sem repetição
+automática. O runner guardado usa o projeto local existente, API 54321 e banco
+54322. Os containers foram conferidos antes da execução. Sem reset ou substituição
+de fixtures; fontes de execução permanecem estáveis durante o lote. Foram
+selecionados os quatro cenários acima e o consumidor de recurso
+`schedule_change_reject`, preservando Auth real e envio externo desabilitado.
+
+A primeira rodada aprovou os 12 casos de agenda/Andamentos e revelou uma
+expectativa provisória incorreta no teste da leitura: a ausência visual do
+aviso não significa remover seu anúncio acessível. Os três casos da leitura
+passaram na repetição dirigida com o anúncio mantido e sua ocultação visual
+conferida; essa rodada não teve retry automático.
+As demais provas não são repetidas porque seus fontes e consumidores não
+foram alterados depois das respectivas aprovações.
+
+O build novo de produção com TypeScript passou antes da última rodada. ESLint
+dos quatro instrumentos e Markdown dos dois registros passaram. As matrizes
+mantêm seus critérios, estados, contagem e prefixos de evidência anteriores.
+Logs locais em `output/` ignorado: `l1-20261117-ci-followup-directed.log`
+(12 aprovações e três falhas da expectativa provisória) e
+`l1-20261117-background-read-final.log` (três aprovações finais).
+
+O ajuste é restrito aos quatro instrumentos de teste; não modifica UI de
+produto, autorização, rascunhos, migrations ou dependências. A nova CI continua
+como gate do próximo SHA, sem herdar aprovação das validações de 521d5031.
+O push está autorizado na mesma branch; o responsável dispensou acompanhar
+a próxima execução. PR7 permanece Draft, sem merge ou liberação.

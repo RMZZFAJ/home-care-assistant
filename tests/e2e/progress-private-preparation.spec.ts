@@ -67,7 +67,12 @@ test("último Andamento também fica guardado ao fechar voluntariamente, retoma 
  await text.press("Escape");
  const close = page.getByRole("dialog", { name: "Sair sem publicar o andamento?", exact: true }); await expect(close).toBeVisible();
  await close.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click(); await expect(text).toHaveValue("Último preenchimento guardado ao sair.");
- await text.press("Escape"); await close.getByRole("button", { name: "Guardar e sair", exact: true }).click(); await expect(editor(page)).toHaveCount(0);
+ // Wait for the closing modal to leave the dismissal stack before a new Escape.
+ await expect(close).toHaveCount(0);
+ await expect(editor(page).getByRole("button", { name: "Guardar rascunho e fechar", exact: true })).toBeEnabled();
+ await text.focus(); await expect(text).toBeFocused();
+ await text.press("Escape"); await expect(close).toBeVisible();
+ await close.getByRole("button", { name: "Guardar e sair", exact: true }).click(); await expect(editor(page)).toHaveCount(0);
  expect(notes(f.id)).toBe(0);
  const device = await peerContext(browser), peer = await device.newPage();
  try {
