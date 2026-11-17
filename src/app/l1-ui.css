@@ -75,7 +75,8 @@ html:has(.hca-workspace) { scroll-padding-block-start: 65px; }
 .hca-l1 .hca-desktop-navigation > .side-context { margin: 18px 14px 9px; }
 @media (max-width: 850px) {
  .hca-l1 { --app-header-height: 104px; }
- .hca-l1 .app-header { grid-template-rows: 58px 46px; padding-inline: 14px; gap: 0 7px; }
+ /* Keep the painted surface tall enough for both rows during viewport changes. */
+ .hca-l1 .app-header { grid-template-rows: 58px 46px; min-height: 104px; padding-inline: 14px; gap: 0 7px; }
  .hca-l1 .patient-picker { margin-left: 0; flex: 1; }
 }
 .hca-l1 .hca-document-materials { border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }

@@ -1,5 +1,24 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**16/11 — revisão do resultado completo de 2b31ebca.** A CI 43765674848
+passou Windows, Ubuntu, instalação limpa, evolução legada, 760 integrações e
+cinco dos seis jobs de navegador. Mobile-2 teve uma falha persistente COM e
+um flaky PWA; mobile-1 teve outro flaky em Anexos. São três casos com segunda
+tentativa, sem nova tentativa da execução inteira. O agregado final falhou
+somente em consequência de mobile-2. O complemento preserva a edição pessoal,
+corrige a altura do cabeçalho móvel e permite que a atualização explícita da
+ficha substitua uma leitura automática em curso, sem duplicar comandos.
+Os instrumentos mantêm seus oráculos. Inclui o patch de segurança Next.js
+16.4.5, após aviso real no build local. Os 14 avisos Sonar do print foram
+reavaliados na fonte atual sem caminho acionável; o painel do editor não foi
+reclassificado por suposição. Foram aprovados 24 casos dirigidos distintos,
+oito por projeto, com repetição dos consumidores afetados e contraprova do
+guard anterior. Build com tipos, lint dirigido e inspeção dos cabeçalhos
+passaram. O audit de produção ficou em zero; 12 ocorrências preexistentes em
+ferramentas de desenvolvimento continuam registradas como pendência.
+O próximo push permanece na mesma branch; por ordem do responsável, não será
+acompanhada a nova CI. Detalhes e limites no registro de estabilização.
+
 **15/11 — continuação após resultado completo de c612fe61.** A CI 43752683272
 passou Windows, Ubuntu, instalação limpa, evolução legada e 760 integrações.
 Chromium-2, mobile-2 e iOS-2 passaram; os três shards 1 falharam em quatro

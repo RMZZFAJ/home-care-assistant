@@ -396,3 +396,150 @@ em Windows/Ubuntu/banco/Sonar não é transferida automaticamente.
 Nenhum teste, regra, limite de campos, oráculo de quantidade, autoria, estoque
 ou recuperação oficial foi retirado. Não há alteração de banco, permissões,
 migrations ou dados remotos. Gates humanos, aparelhos e provedores permanecem.
+
+## Resultado completo de 2b31ebca — revisão de 16/11
+
+A [CI 43765674848](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/43765674848)
+terminou com uma falha persistente e dois casos flaky. Flaky é um teste que
+falha inicialmente e passa na repetição automática; não é aprovação na
+primeira tentativa. A execução inteira teve `run_attempt=1`.
+
+| Job | Resultado E2E | Casos que precisaram da segunda tentativa |
+| --- | --- | --- |
+| Chromium-1 | 250 aprovados | Nenhum |
+| Chromium-2 | 249 aprovados | Nenhum |
+| Mobile-1 | 249 aprovados e um flaky | Anexos: segunda tentativa aprovada |
+| Mobile-2 | 247 aprovados, um flaky e uma falha | PWA passou; COM falhou |
+| iOS-1 | 250 aprovados | Nenhum |
+| iOS-2 | 249 aprovados | Nenhum |
+
+Os seis harnesses passaram seus 15 casos. Windows passou 1.107 testes;
+Ubuntu passou 1.106, com um caso específico de Windows ignorado. Banco passou
+instalação limpa, evolução legada e 760 integrações, sem falhas, cancelamentos
+ou casos ignorados. `database-and-browser` apenas propagou a falha mobile-2.
+O aviso de migração da imagem Ubuntu é informativo. Os erros HTTP deliberados
+dos cenários negativos não foram confundidos com novas falhas operacionais.
+
+### Correção dos três casos
+
+- **COM, cinco larguras:** o foco programático no filtro mantinha uma rolagem
+  que deixava Atualizar/Mais parcialmente sob o cabeçalho fixo; `target-size`
+  falhou nas duas tentativas em 1440px. A auditoria da composição agora usa
+  `auditFromTop`, como os outros consumidores, conservando regras axe,
+  teclado, cinco larguras, saldos por material, parcelas, acesso, estoque e PDF.
+  A repetição iOS encontrou também contraste em 768px. A geometria capturada
+  mostrou cabeçalho com 65px e contexto terminando em 104px, mesmo com duas
+  linhas de 58/46px: a superfície não cobria o texto naquele quadro da mudança
+  de viewport. O mínimo de 104px na mesma regra móvel conserva a medida
+  do laboratório e impede esse encolhimento. A prova exige altura 65/104 e
+  contexto inteiramente contido, além do axe; captura os cinco cabeçalhos.
+  A revisão também capturou uma leitura automática iniciada entre foco e
+  Enter: o guard de loading descartava a atualização explícita e conservava
+  a cópia anterior. Na consulta Supply, uma atualização explícita agora pode
+  substituir a leitura automática; escrita ocupada e atualização explícita
+  já em curso continuam bloqueadas. Não há fila de comandos nem novo autosave.
+  A regressão prende uma leitura automática, exige o botão disponível,
+  substitui essa leitura e confronta a versão retornada com a RPC independente.
+  A contraprova mobile com o guard antigo falhou exatamente na disponibilidade
+  do botão. A correção restaura a regra restrita a leitura automática, mantendo
+  congelamento da cópia, AbortController e negativas de acesso existentes.
+- **Anexos:** o artefato mostra Anexos focado, ainda sem seleção ou mudança de
+  URL, durante a navegação móvel da faixa horizontal. O helper aguarda os
+  quadros da rolagem e usa toque real nos projetos com `hasTouch`, mantendo
+  clique no desktop e a exigência de seleção/painel reais. Não há segundo
+  clique automático ou relaxamento de asserções. A cronologia exata do gesto
+  perdido não foi capturada; não se atribui esse detalhe a uma causa provada.
+- **PWA e sessão:** a revalidação 401 retirava o usuário vivo de PushSettings,
+  que desmontava junto as abas e o formulário pessoal passados pelo caller.
+  A nova prova com Auth real reproduziu deterministicamente a perda antes da
+  correção. O componente conserva somente o dono montado para preservar essa
+  composição; sessão viva continua obrigatória para mostrar Push e executar
+  suas ações. Perda de contexto aborta consultas, limpa aparelhos e oculta suas
+  seções. Outra conta troca a chave e não recebe o preenchimento anterior.
+  O teste exige recusa nativa, texto exato preservado, `inert` e rejeição real
+  de foco, sem depender da interpretação de inert por getByRole. Também exige
+  ausência das seções Push, de comandos automáticos, de alteração do nome
+  oficial, de cache privado e de reenvio após reconexão. A retenção não concede
+  autorização nem cria persistência de rascunho.
+
+### Dependência identificada durante a validação
+
+O primeiro build local parou antes dos navegadores com `SecurityFatalError`.
+O `npm audit --omit=dev` confirmou Next.js 16.4.2 na faixa do
+[GHSA-mfr8-8qww-v76h](https://github.com/vercel/next.js/security/advisories/GHSA-mfr8-8qww-v76h).
+Next e seu plugin ESLint passam para 16.4.5, a versão mínima corrigida indicada
+no aviso. O lock muda somente suas entradas, `@next/env` e as oito variantes
+SWC. Não se adotou a mudança adicional de compressão de respostas de 16.4.6.
+
+Não há `use cache`, `unstable_cache`, parâmetros no layout raiz ou Cache
+Components habilitados nos consumidores atuais. Dependência afetada não é
+prova de exploração do sistema. A investigação e a revisão estática
+independentes não encontraram regressão concreta; o build de produção com
+tipos passou e o audit de produção ficou em zero. O audit completo mantém
+12 ocorrências preexistentes, nove moderadas e três altas, em ferramentas de
+desenvolvimento: cadeias ESLint/typescript-eslint/minimatch e
+markdownlint/re2js. Todas têm `dev=true` no lock e estão ausentes do audit de
+produção. Essa pendência de ferramentas não foi declarada resolvida nem
+ocultada com `audit fix --force` ou alterações de regras.
+
+### Nova conferência dos 14 avisos do print
+
+Foram preservadas as 14 entradas e sua ordem, incluindo as quatro ocorrências
+de `ui_finalize.py`, em 11 arquivos. A triagem estática atual encontrou
+bloqueio incondicional em Meta, contenção canônica de PNG e destinos
+documentais, seleção fixa PV, CLI validado sem shell e destinos literais ou
+explicitamente escolhidos pelo operador. Não encontrou caminho acionável
+através desses controles. Nenhum utilitário histórico foi executado para
+regenerar evidências, nem foram desativadas regras ou encerradas issues remotas.
+
+O resultado estruturado gerenciado `l1-sonar-editor-recheck-20261116.json`
+tem SHA-256
+`da2758ad799d8bf3cdc3b739aca47ef23272bb191963b12d04d4cdf931fc0eb2`.
+O print não informa revisão ou fluxo completo; a conclusão vale para a fonte
+atual inspecionada e não prova execução segura, cobertura exaustiva ou
+atualização do painel do editor.
+
+### Validação e limite de acompanhamento
+
+Foram aprovados 24 casos dirigidos distintos, oito por projeto Chromium,
+mobile e iOS, no Supabase local guardado, sem reset ou substituição de fixtures.
+Incluem os três casos originais, as quatro fichas com 20 auditorias por projeto,
+PWA público, leitura/edição pessoal e os dois consumidores positivo/negativo de
+Push. O resultado é composto por lotes proporcionais ao impacto, não por uma
+nova execução integral da CI. A prova de sessão e os consumidores Push passaram
+nos três motores; o caso Anexos mobile foi conservado do primeiro lote, pois
+seus consumidores não foram alterados depois daquela aprovação.
+
+O primeiro lote expôs a perda determinística da edição no componente Push e
+esgotou 180 segundos na última captura BAL do percurso das quatro fichas.
+Os 6.849 pacientes locais foram preservados. Somente esse percurso recebe
+240 segundos fora de CI; a CI conserva seus 180 segundos. Uma prova
+intermediária preservou texto e inert, mas falhou na interpretação de inert
+pelo seletor de papéis; a prova final exige recusa nativa de foco e ausência
+de Push. A rodada seguinte aprovou 19 de 20 casos e identificou a geometria
+iOS. As repetições preservaram essa falha e a corrida de leitura como causas
+distintas, antes de suas correções. Não se contou uma mera repetição aprovada
+como demonstração de que a causa havia desaparecido.
+
+A última rodada COM passou nos três motores, sem repetição automática. A
+leitura automática presa exige substituição explícita e a versão da RPC;
+o guard antigo falhou nessa contraprova mobile. As cinco larguras de cada
+motor passaram axe, altura e contenção do contexto. Os cabeçalhos capturados
+iOS/768, mobile/320 e Chromium/1440 foram inspecionados: superfície escura cobre
+as duas linhas móveis e conserva a composição desktop. Os consumidores mobile
+PWA público e perfil passaram depois do ajuste de altura.
+Os acionamentos de preparação usam foco e Enter nativos, e confirmam contexto
+na API e no shell; a atualização exige uma resposta GET e término da leitura.
+Não há clique forçado, segundo acionamento automático ou alteração dos oráculos.
+
+O runner produziu build novo de produção com TypeScript antes da última rodada.
+ESLint dos sete fontes afetados e Markdown dos dois registros passaram; as
+matrizes conservam critérios, estados e evidência anterior. Logs locais de apoio:
+`l1-20261116-followup-final.log`, `l1-20261116-header-consumers.log`,
+`l1-20261116-directed-mobile.log`, `l1-20261116-background-refresh-red.log` e
+`l1-20261116-background-refresh-green.log`, em `output/` ignorado. As falhas
+intermediárias permanecem nesses registros; não são resultado do próximo SHA.
+
+O responsável dispensou o acompanhamento da nova CI após o push. A CI do
+próximo SHA e os gates humanos, físicos e de provedor continuam pendentes;
+o início observado em 15/11 não aprova o resultado final.

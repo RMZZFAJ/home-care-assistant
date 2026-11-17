@@ -84,6 +84,9 @@ const official = (id: string, patient: string) =>
 test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos", async ({
   page,
 }, info) => {
+  // The retained local history makes the four-form/20-audit journey slower;
+  // its first directed run reached the last BAL capture at the CI budget.
+  if (!process.env.CI) info.setTimeout(240_000);
   const f = await setup(),
     req = await issue(f.patient, f.products),
     ent = await delivery(f.patient, req, f.products),

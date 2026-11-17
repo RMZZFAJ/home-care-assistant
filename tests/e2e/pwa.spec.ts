@@ -541,6 +541,9 @@ test("PWA oferece instalação somente por gesto e mantém web quando o worker n
 
 test("PWA keeps an open edit after real session revocation but never caches it or replays it after reconnection", async ({ page, context }) => {
   const f = await setup(), marker = "Edição privada fictícia " + randomUUID();
+  const originalName = sql("select full_name from public.profiles where id=" + sqlLiteral(fixtures.family.id) + ";");
+  const writes: string[] = [];
+  page.on("request", request => { if (["/api/profile", "/api/push/devices", "/api/push/test"].includes(new URL(request.url()).pathname) && request.method() !== "GET") writes.push(request.method()); });
   await login(page, f.patient); await profile(page, f.patient);
   await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller?.state)).toBe("activated");
   await selectProfileSection(page, "identity");
@@ -556,7 +559,19 @@ test("PWA keeps an open edit after real session revocation but never caches it o
   const revoked = await service.auth.admin.signOut(session.data.session!.access_token, "local");
   expect(revoked.error).toBeNull();
   expect(await page.evaluate(async () => (await fetch("/api/profile", { cache: "no-store" })).status)).toBe(401);
-  await expect(name).toHaveValue(marker);
+  // Exercise live denial deterministically. The retained DOM must keep its
+  // exact value while native inert isolation refuses focus and Push vanishes.
+  const deniedContext = page.waitForResponse(response => new URL(response.url()).pathname === "/api/context" && response.status() === 401);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await deniedContext;
+  const retainedName = page.locator('.hca-profile input[name="name"]');
+  await expect.poll(() => retainedName.evaluate(element => Boolean(element.closest("[inert]")))).toBe(true);
+  await expect(retainedName).toHaveValue(marker);
+  const reentry = page.getByRole("link", { name: "Entrar novamente", exact: true });
+  await reentry.focus(); await expect(reentry).toBeFocused();
+  expect(await retainedName.evaluate(element => { element.focus(); return document.activeElement === element; })).toBe(false);
+  for (const title of ["Avisos neste aparelho", "Aparelhos com avisos"])
+    await expect(page.getByRole("region", { name: title, exact: true, includeHidden: true })).toHaveCount(0);
   expect(await cachePaths(page)).toEqual(["/offline.html", "/pwa/apple-180.png", "/pwa/icon-192.png", "/pwa/icon-512.png"]);
   await context.setOffline(true); await page.goto("/perfil");
   await expect(page.getByRole("heading", { name: "Sem conexão com o aplicativo", exact: true })).toBeVisible();
@@ -564,6 +579,7 @@ test("PWA keeps an open edit after real session revocation but never caches it o
   await context.setOffline(false);
   await page.getByRole("link", { name: "Tentar abrir novamente", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Entrar", exact: true })).toBeVisible();
-  expect(sql("select full_name from public.profiles where id=" + sqlLiteral(fixtures.family.id) + ";")).not.toBe(marker);
+  expect(sql("select full_name from public.profiles where id=" + sqlLiteral(fixtures.family.id) + ";")).toBe(originalName);
+  expect(writes).toEqual([]);
   expect(await cachePaths(page)).toEqual(["/offline.html", "/pwa/apple-180.png", "/pwa/icon-192.png", "/pwa/icon-512.png"]);
 });

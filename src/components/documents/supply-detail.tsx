@@ -110,6 +110,7 @@ export function SupplyDocumentContent({
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [coveredRead, setCoveredRead] = useState(true);
+  const refreshDisabled = busy || (loading && coveredRead);
   const readScopeRef = useRef("");
   const restoreRefreshFocusRef = useRef(false);
   useOperationActivity(loading && coveredRead || busy, { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
@@ -145,7 +146,9 @@ export function SupplyDocumentContent({
   const headerRef = useRef<HTMLElement | null>(null);
   const refreshButtonRef = useRef<HTMLButtonElement>(null);
   function refreshDocument() {
-    if (loading || busy) return;
+    // Explicit read intent may replace a live background read. Commands and
+    // an already covered explicit read still block repeated activation.
+    if (refreshDisabled) return;
     restoreRefreshFocusRef.current = true;
     setCoveredRead(true);
     setLoading(true);
@@ -653,7 +656,7 @@ export function SupplyDocumentContent({
           <button
             type="button"
             className={buttonClass}
-            disabled={loading || busy}
+            disabled={refreshDisabled}
             onClick={refreshDocument}
             ref={refreshButtonRef}
           >
@@ -804,7 +807,7 @@ export function SupplyDocumentContent({
             contextLabel={roleLabel(context.patient?.role)}
             onRefresh={refreshDocument}
             refreshButtonRef={refreshButtonRef}
-            refreshDisabled={loading || busy}
+            refreshDisabled={refreshDisabled}
             refreshing={loading}
             metadata={[
               {
@@ -965,7 +968,7 @@ export function SupplyDocumentContent({
               </Link>
             ) : null}
           </DocumentHeader>
-          <DocumentFreshness stale={stale} loading={loading || busy} onRefresh={refreshDocument} />
+          <DocumentFreshness stale={stale} loading={refreshDisabled} onRefresh={refreshDocument} />
           {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
               {followUpStep && loading ? null : followUpStep && (readFailed || operationOpen) ? (
                 <Notice>

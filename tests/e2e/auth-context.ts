@@ -16,7 +16,10 @@ export async function selectContext(page: Page, patient: string | null) {
         await search.fill(person.display_name);
         await expect(search).toHaveValue(person.display_name);
       }
-      await chooser.getByRole("button", { name: label, exact: !patient }).click();
+      const choice = chooser.getByRole("button", { name: label, exact: !patient });
+      await expect(choice).toBeEnabled();
+      await choice.focus(); await expect(choice).toBeFocused();
+      await choice.press("Enter");
     } else {
       await page.getByLabel("Menu do usuário", { exact: true }).click();
       await page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true }).click();

@@ -27,7 +27,12 @@ export async function selectDocumentSection(
   await page.bringToFront();
   if (section === "history") { await openDocumentMore(page); await page.getByRole("menuitem", {name:"Identificação e registros preservados",exact:true}).click(); await expect(page.getByRole("tab", { name: "Identificação e registros preservados", exact: true })).toHaveAttribute("aria-selected", "true"); return; }
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
-  await tab.click();
+  // Horizontal tab scrolling and sticky layout must settle before the press.
+  // Touch projects use their native gesture, rather than an emulated mouse.
+  await tab.scrollIntoViewIfNeeded();
+  await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
+  if (test.info().project.use.hasTouch) await tab.tap();
+  else await tab.click();
   try {
     await expect(tab).toHaveAttribute("aria-selected", "true");
   } catch (error) {

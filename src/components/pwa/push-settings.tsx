@@ -45,9 +45,14 @@ async function fingerprintOf(endpoint: string) {
 export type PushSettingsSections = { consent: ReactNode; devices: ReactNode };
 export function PushSettings({ renderSections }: { renderSections?: (sections: PushSettingsSections) => ReactNode } = {}) {
   const userId = useWorkspaceState().data?.userId;
-  return userId ? <PersonalPushSettings key={userId} userId={userId} renderSections={renderSections} /> : null;
+  const [ownerId, setOwnerId] = useState<string | null>(userId ?? null);
+  if (userId && ownerId !== userId) setOwnerId(userId);
+  // The caller's personal form must survive a denied context read. Remember
+  // only its mounted owner; live authority still gates every Push section.
+  const mountedUserId = userId ?? ownerId;
+  return mountedUserId ? <PersonalPushSettings key={mountedUserId} userId={mountedUserId} active={userId === mountedUserId} renderSections={renderSections} /> : null;
 }
-function PersonalPushSettings({ userId, renderSections }: { userId: string; renderSections?: (sections: PushSettingsSections) => ReactNode }) {
+function PersonalPushSettings({ userId, active, renderSections }: { userId: string; active: boolean; renderSections?: (sections: PushSettingsSections) => ReactNode }) {
   const pwa = usePwa();
   const [data, setData] = useState<z.infer<typeof receipt> | null>(null);
   const [capable, setCapable] = useState<boolean | null>(null),
@@ -66,8 +71,9 @@ function PersonalPushSettings({ userId, renderSections }: { userId: string; rend
   const testIntentRef = useRef<{ deviceId: string; idempotencyKey: string } | null>(null);
   const load = useCallback(async (signal?: AbortSignal) => {
     const generation = ++generationRef.current;
-    setReading(true);
     abortRef.current?.abort();
+    if (!active) { setData(null); setFingerprint(null); setReading(false); setBusy(false); return; }
+    setReading(true);
     const controller = new AbortController();
     abortRef.current = controller;
     const lifecycle = signal ?? lifecycleRef.current?.signal;
@@ -110,7 +116,7 @@ function PersonalPushSettings({ userId, renderSections }: { userId: string; rend
       if (generation === generationRef.current && !controller.signal.aborted)
         setReading(false);
     }
-  }, [userId]);
+  }, [userId, active]);
   useEffect(() => {
     const lifecycle = new AbortController();
     lifecycleRef.current = lifecycle;
@@ -136,7 +142,7 @@ function PersonalPushSettings({ userId, renderSections }: { userId: string; rend
   const paused = !!current?.mutedUntil && Date.parse(current.mutedUntil) > checkedAt;
   async function testPush() {
     const lifecycle = lifecycleRef.current?.signal;
-    if (busy || reading || !enrolled || !current || !data || !data.deliveryEnabled || paused || permission !== "granted" || !pwa.pushTestReady || !pwa.readyRegistration() || !lifecycle || lifecycle.aborted) return;
+    if (!active || busy || reading || !enrolled || !current || !data || !data.deliveryEnabled || paused || permission !== "granted" || !pwa.pushTestReady || !pwa.readyRegistration() || !lifecycle || lifecycle.aborted) return;
     if (testIntentRef.current?.deviceId !== current.id)
       testIntentRef.current = { deviceId: current.id, idempotencyKey: crypto.randomUUID() };
     const intent = testIntentRef.current!;
@@ -166,7 +172,7 @@ function PersonalPushSettings({ userId, renderSections }: { userId: string; rend
   }
   async function enroll() {
     const registration = pwa.readyRegistration(), lifecycle = lifecycleRef.current?.signal;
-    if (busy || reading || !data?.publicKey || !capable || permission === "denied" || !registration || !lifecycle || lifecycle.aborted) return;
+    if (!active || busy || reading || !data?.publicKey || !capable || permission === "denied" || !registration || !lifecycle || lifecycle.aborted) return;
     const alive = () => !lifecycle.aborted;
     // Permission request starts synchronously within the user's click gesture.
     const permissionPromise = Notification.permission === "granted"
@@ -204,7 +210,7 @@ function PersonalPushSettings({ userId, renderSections }: { userId: string; rend
   }
   async function command(device: z.infer<typeof pushDevice>, action: "revoke" | "pause" | "resume") {
     const lifecycle = lifecycleRef.current?.signal;
-    if (busy || reading || !data || !lifecycle || lifecycle.aborted) return;
+    if (!active || busy || reading || !data || !lifecycle || lifecycle.aborted) return;
     const alive = () => !lifecycle.aborted;
     setBusy(true); setError(""); setMessage("");
     try {
@@ -389,5 +395,6 @@ function PersonalPushSettings({ userId, renderSections }: { userId: string; rend
       </ul>
     </SettingsSection>
   );
-  return renderSections ? renderSections({ consent, devices }) : <>{consent}{devices}</>;
+  const sections = { consent: active ? consent : null, devices: active ? devices : null };
+  return renderSections ? renderSections(sections) : <>{sections.consent}{sections.devices}</>;
 }
