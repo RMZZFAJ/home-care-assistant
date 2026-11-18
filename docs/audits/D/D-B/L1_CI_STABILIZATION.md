@@ -629,3 +629,56 @@ produto, autorização, rascunhos, migrations ou dependências. A nova CI contin
 como gate do próximo SHA, sem herdar aprovação das validações de 521d5031.
 O push está autorizado na mesma branch; o responsável dispensou acompanhar
 a próxima execução. PR7 permanece Draft, sem merge ou liberação.
+
+## Resultado de a8883d15 e correções de 18/11
+
+A [CI 44010118070](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44010118070)
+passou na primeira tentativa do workflow. Nos seis relatórios Playwright,
+1.492 casos passaram de primeira, cinco passaram na segunda tentativa e
+nenhum ficou com falha. Os quatro cenários corrigidos em 17/11 passaram de
+primeira nos três projetos. Windows, Ubuntu, instalação limpa, evolução
+legada, 760 integrações e os 90 casos dos harnesses passaram. Sonar e Preview
+também passaram para a mesma cabeça da PR.
+
+Os cinco casos foram executados localmente, antes da alteração, nos três
+projetos. Todos passaram, portanto a execução local de referência não
+reproduziu as falhas da CI. A inspeção das capturas e dos chamadores orientou
+os ajustes abaixo.
+
+- **BAL parcial, mobile-2:** a captura registrou `10` e vazio depois do
+  preenchimento esperado de `1` e `0`. A etapa compartilhada de materiais
+  lia o DOM mutável dentro de atualizadores adiados. Quantidades, seleções,
+  vínculos, justificativas e busca agora capturam o valor ao receber o evento.
+  O teste confere foco e ambos os valores antes da revisão, e confere as
+  quantidades por material no banco depois da emissão.
+- **Auth, iOS-1:** a abertura do convite foi interrompida por navegação para
+  login. O teste interceptava a primeira chamada genérica de usuário após
+  recarga, quando a sessão global e a continuação podem consultar a mesma
+  rota. A prova usa o link interno do perfil e Voltar do navegador. Confere
+  o retorno ao perfil no mesmo documento e recebe explicitamente a resposta
+  atrasada antes de verificar que o destino ficou preservado.
+- **Reconto, iOS-1:** a tentativa continuou pendente depois da ativação de
+  recuperação. O teste confere foco no botão e resposta da mesma revisão
+  após Enter. Preserva a verificação do destino BAL, do mesmo pacote nas
+  duas chamadas e da conciliação sem repetição do efeito.
+- **Agenda, Chromium-2 e mobile-2:** a criação do tipo e a revisão após
+  adoção da referência não abriram na primeira tentativa. Os testes
+  estabelecem página ativa, controle habilitado e foco antes do acionamento.
+  Mantêm a validação nativa do formulário, concorrência entre sessões,
+  confronto de conteúdo e confirmações oficiais. Os logs históricos não
+  registram a sequência dos eventos de clique nesses dois casos.
+
+Passaram 27 testes dirigidos, nove por projeto, sem retry automático.
+O lote inclui os cinco casos e os consumidores de COM, ENT e agenda afetados.
+O build de produção com TypeScript, ESLint dirigido e Markdown passaram.
+O runner usou o projeto local existente com dados sintéticos. A CI do novo
+SHA precisa de resultado próprio. Logs em `output/` ignorado:
+`l1-a888-flake-baseline.log` e `l1-a888-flake-directed.log`.
+
+O audit de produção retornou zero alertas. As 12 ocorrências preexistentes
+em ferramentas de desenvolvimento continuam registradas.
+
+Os resultados axe marcados como inconclusivos continuam para revisão manual.
+O aceite visual e as provas físicas e de provedores permanecem nos gates de
+entrega correspondentes. A passagem de frente para L2 é uma decisão sobre
+o resultado do novo SHA e as pendências conhecidas.

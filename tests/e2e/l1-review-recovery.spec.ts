@@ -6,6 +6,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
+import { selectProfileSection } from "./profile-sections";
 
 test.setTimeout(150_000);
 async function login(page:Page,patient:string,email=fixtures.family.email){
@@ -36,17 +37,50 @@ test("L1 continuidade exige MFA com Auth real e conserva o destino seguro",async
  }finally{expect((await person.client.auth.mfa.unenroll({factorId:factor})).error).toBeNull();}
 });
 
-test("L1 resultado de autenticação antigo não redireciona após sair da continuação",async({page})=>{
- let release!:()=>void,seen!:()=>void;
- const gate=new Promise<void>(resolve=>{release=resolve;}),requested=new Promise<void>(resolve=>{seen=resolve;});
- const f=await setup();await login(page,f.patient);
- let first=true;
- await page.route("**/auth/v1/user",async route=>{if(!first)return route.continue();first=false;seen();await gate;await route.fulfill({status:401,json:{message:"Sessão fictícia encerrada"}});});
- await page.goto("/acesso/continuar?next=/historico");
- await requested;await page.goto("/convites/aceitar");
- await expect(page).toHaveURL(/\/convites\/aceitar/);release();
- await expect(page.getByRole("heading",{name:/convite/i})).toBeVisible();
- await expect(page).toHaveURL(/\/convites\/aceitar/);
+test("L1 resultado de autenticação antigo não redireciona após sair da continuação", async ({ page }) => {
+  const f = await setup();
+  const person = await shiftWorker(f.patient, "family");
+  await login(page, f.patient, person.email);
+  await page.goto("/perfil?next=/historico");
+  await selectProfileSection(page, "security");
+  const continuation = page.getByRole("link", { name: "Continuar sem configurar agora", exact: true });
+  await expect(continuation).toBeVisible();
+  const origin = page.url();
+  const timeOrigin = await page.evaluate(() => performance.timeOrigin);
+
+  // Keep the root session mounted, so its initial Auth read cannot compete
+  // with the continuation. Release the delayed reply in the same document.
+  let release!: () => void;
+  let entered!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  const requested = new Promise<void>(resolve => { entered = resolve; });
+  const target = "**/auth/v1/user";
+  await page.route(target, async route => {
+    if (route.request().method() !== "GET") return route.continue();
+    entered();
+    await gate;
+    await route.fulfill({ status: 401, json: { message: "Sessão fictícia encerrada" } });
+  });
+  try {
+    await continuation.click();
+    await expect(page).toHaveURL(/\/acesso\/continuar\?next=/);
+    await requested;
+    await page.goBack();
+    await expect(page).toHaveURL(origin);
+    await expect(page.getByRole("tab", { name: "Segurança", exact: true })).toBeVisible();
+    expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin);
+    const delayed = page.waitForResponse(response =>
+      new URL(response.url()).pathname === "/auth/v1/user" && response.status() === 401,
+    );
+    release();
+    await (await delayed).finished();
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+    await expect(page).toHaveURL(origin);
+    await expect(page.getByRole("tab", { name: "Segurança", exact: true })).toBeVisible();
+  } finally {
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+  }
 });
 
 test("L1 seletor permite escolher o único paciente disponível quando a seleção global está vazia",async({page})=>{

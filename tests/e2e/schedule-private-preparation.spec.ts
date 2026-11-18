@@ -54,11 +54,17 @@ async function open(page: Page, series = false, own = false) {
       page,
       series ? "Retomar minha programação" : "Retomar meu tipo de plantão",
     ).click();
-  } else
-    await button(
+  } else {
+    await page.bringToFront();
+    const create = button(
       page,
       series ? "Nova programação" : "Novo tipo de plantão",
-    ).click();
+    );
+    await expect(create).toBeEnabled();
+    await create.focus();
+    await expect(create).toBeFocused();
+    await create.press("Enter");
+  }
   await expect(panel(page)).toBeVisible();
   await expect(button(page, "Atualizar preenchimento privado")).toBeEnabled();
 }

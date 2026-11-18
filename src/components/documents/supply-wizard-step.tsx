@@ -265,9 +265,10 @@ export function SupplyWizardStep({
                               ) ?? false
                             }
                             onChange={(event) => {
+                              const checked = event.currentTarget.checked;
                               setLinks((current) => ({
                                 ...current,
-                                [option.productId]: event.target.checked
+                                [option.productId]: checked
                                   ? [
                                     ...(current[option.productId] ?? []),
                                     request.lineId,
@@ -276,7 +277,7 @@ export function SupplyWizardStep({
                                     (id) => id !== request.lineId,
                                   ),
                               }));
-                              if (event.target.checked)
+                              if (checked)
                                 setForm((current) => ({
                                   ...current,
                                   quantities: {
@@ -307,15 +308,16 @@ export function SupplyWizardStep({
                             value={
                               form.sharedNeedReasons?.[option.productId] ?? ""
                             }
-                            onChange={(event) =>
+                            onChange={(event) => {
+                              const reason = event.currentTarget.value;
                               setForm((current) => ({
                                 ...current,
                                 sharedNeedReasons: {
                                   ...current.sharedNeedReasons,
-                                  [option.productId]: event.target.value,
+                                  [option.productId]: reason,
                                 },
-                              }))
-                            }
+                              }));
+                            }}
                           />
                           <span className="block text-xs font-normal text-(--muted)">
                             As REQs representam a mesma necessidade. O estoque
@@ -344,12 +346,13 @@ export function SupplyWizardStep({
               type="search"
               className={inputClass}
               value={search}
-              onChange={(event) =>
+              onChange={(event) => {
+                const value = event.currentTarget.value;
                 setSearchByCategory((current) => ({
                   ...current,
-                  [category]: event.target.value,
-                }))
-              }
+                  [category]: value,
+                }));
+              }}
             />
           </label>
           <p
@@ -389,7 +392,8 @@ export function SupplyWizardStep({
                       <input
                         type="checkbox"
                         checked={checked}
-                        onChange={(event) =>
+                        onChange={(event) => {
+                          const selected = event.currentTarget.checked;
                           setForm((current) => {
                             const quantities = {
                               ...current.quantities,
@@ -400,7 +404,7 @@ export function SupplyWizardStep({
                             const manualQuantities = {
                               ...current.manualQuantities,
                             };
-                            if (event.target.checked)
+                            if (selected)
                               quantities[product.id] = "";
                             else {
                               delete quantities[product.id];
@@ -413,8 +417,8 @@ export function SupplyWizardStep({
                               presentationSelections,
                               manualQuantities,
                             };
-                          })
-                        }
+                          });
+                        }}
                       />
                     ) : null}
                     <span className="hca-material-choice-copy">
@@ -449,19 +453,21 @@ export function SupplyWizardStep({
                         value={form.quantities[product.id] ?? ""}
                         aria-label={"Quantidade — " + product.name}
                         aria-invalid={Boolean(fieldErrors[product.id])}
-                        onChange={(event) =>
+                        onChange={(event) => {
+                          // React can apply the update after the browser restores the input.
+                          const value = event.currentTarget.value;
                           setForm((current) => ({
                             ...current,
                             quantities: {
                               ...current.quantities,
-                              [product.id]: event.target.value,
+                              [product.id]: value,
                             },
                             manualQuantities: {
                               ...current.manualQuantities,
-                              [product.id]: event.target.value,
+                              [product.id]: value,
                             },
-                          }))
-                        }
+                          }));
+                        }}
                       />
                       {fieldErrors[product.id] ? (
                         <span className="ui-field-error">

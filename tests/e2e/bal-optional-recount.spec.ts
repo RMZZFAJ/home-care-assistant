@@ -148,15 +148,17 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
     await counter
       .getByRole("button", { name: "Confirmar reconto", exact: true })
       .click();
-    await expect(
-      counter.getByRole("button", {
-        name: "Recuperar esta tentativa",
-        exact: true,
-      }),
-    ).toBeVisible();
-    await counter
-      .getByRole("button", { name: "Recuperar esta tentativa", exact: true })
-      .click();
+    const recover = counter.getByRole("button", { name: "Recuperar esta tentativa", exact: true });
+    await counter.bringToFront();
+    await expect(recover).toBeEnabled();
+    await recover.focus();
+    await expect(recover).toBeFocused();
+    const recovered = counter.waitForResponse(response =>
+      new URL(response.url()).pathname === `/api/documents/${f.document.id}/revise` &&
+      response.request().method() === "POST",
+    );
+    await recover.press("Enter");
+    expect((await recovered).ok()).toBe(true);
     await expect(
       counter.getByRole("link", { name: "Abrir ficha BAL", exact: true }),
     ).toBeVisible();

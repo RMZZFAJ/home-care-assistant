@@ -121,8 +121,12 @@ async function fill(page: Page, purpose: ScheduleResourcePurpose) {
 }
 async function review(page: Page) {
   await page.bringToFront();
-  expect(await button(page, "Revisar alteração").evaluate((element: HTMLButtonElement) => element.form?.checkValidity())).toBe(true);
-  await button(page, "Revisar alteração").click();
+  const trigger = button(page, "Revisar alteração");
+  await expect(trigger).toBeEnabled();
+  expect(await trigger.evaluate((element: HTMLButtonElement) => element.form?.checkValidity())).toBe(true);
+  await trigger.focus();
+  await expect(trigger).toBeFocused();
+  await trigger.press("Enter");
   const d = drawer(page, "Revisar escala");
   await expect(d).toBeVisible();
   await expect(d.locator("input,select,textarea")).toHaveCount(0);

@@ -373,12 +373,16 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   await resume(page);
   await next(page);
   await next(page);
-  await page
-    .getByLabel("Quantidade — Material fictício V4 0", { exact: true })
-    .fill("1");
-  await page
-    .getByLabel("Quantidade — Material fictício V4 1", { exact: true })
-    .fill("0");
+  const firstCount = page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
+  const secondCount = page.getByLabel("Quantidade — Material fictício V4 1", { exact: true });
+  await firstCount.focus();
+  await expect(firstCount).toBeFocused();
+  await firstCount.fill("1");
+  await secondCount.focus();
+  await expect(secondCount).toBeFocused();
+  await secondCount.fill("0");
+  await expect(firstCount).toHaveValue("1");
+  await expect(secondCount).toHaveValue("0");
   for (let i = 0; i < 3; i++) await next(page);
   await expect(page.getByRole("textbox")).toHaveCount(0);
   for (const width of [320, 390, 768, 1440]) {
@@ -402,6 +406,10 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   const consumed = await draftContext(f, "BAL");
   expect(consumed.state).toBe("consumed");
   expect(consumed.consumedDocumentId).toBe(official.id);
+  const quantities = sql(
+    `select jsonb_object_agg(product_id::text, quantity) from public.document_lines where document_id=${sqlLiteral(official.id)};`,
+  );
+  expect(JSON.parse(quantities)).toEqual({ [f.products[0]]: 1, [f.products[1]]: 0 });
 });
 
 test("reconto BAL privado retoma em outro aparelho e confirma uma única versão nativa após perda de resposta e de escrita", async ({

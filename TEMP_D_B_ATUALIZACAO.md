@@ -1,5 +1,18 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**18/11 — estabilização após a primeira CI verde de a8883d15.** A execução
+44010118070 passou todos os jobs. Foram 1.492 E2E aprovados de primeira e
+cinco casos aprovados na segunda tentativa. Os cinco foram examinados.
+O formulário compartilhado agora captura a quantidade e as demais edições
+no evento. A prova do BAL confere o valor por material no banco. Os testes
+de Auth, recuperação do reconto e agenda foram ajustados para observar
+resposta atrasada, foco, resposta oficial e transições reais. O audit de
+produção retornou zero alertas. As ocorrências conhecidas nas ferramentas
+de desenvolvimento e a revisão humana de acessibilidade continuam
+registradas. Os 27 casos dirigidos passaram, nove por projeto, sem retry
+automático. Build com TypeScript, ESLint e Markdown passaram. Detalhes no
+[registro de estabilização](docs/audits/D/D-B/L1_CI_STABILIZATION.md).
+
 **17/11 — continuação após resultado completo de 521d5031.** A CI 43996790376
 passou Windows, Ubuntu, instalação limpa, evolução legada e 760 integrações.
 Chromium-2 e mobile-2 passaram sem repetição. Nos outros quatro shards,
