@@ -1,5 +1,16 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**18/11 — correções após a CI de 484d4a23.** A execução 44357106763
+teve 1.493 aprovações de primeira, três na segunda tentativa e uma
+falha persistente no seletor de paciente. Windows, Ubuntu, banco,
+SonarCloud e Preview passaram. A correção preserva o retorno de foco
+em REQ e COM enquanto a lista de vínculos é consultada. As provas do
+seletor, dos comprovantes do catálogo e do histórico de estoque
+aguardam as transições que verificam. Passaram os 18 casos dirigidos,
+seis por projeto de navegador, sem repetição automática. Build com
+TypeScript e ESLint dirigido passaram. As alterações locais precisam
+de CI no SHA publicado. [Registro de estabilização](docs/audits/D/D-B/L1_CI_STABILIZATION.md).
+
 **18/11 — estabilização após a primeira CI verde de a8883d15.** A execução
 44010118070 passou todos os jobs. Foram 1.492 E2E aprovados de primeira e
 cinco casos aprovados na segunda tentativa. Os cinco foram examinados.

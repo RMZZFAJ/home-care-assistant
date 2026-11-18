@@ -83,21 +83,48 @@ test("L1 resultado de autenticação antigo não redireciona após sair da conti
   }
 });
 
-test("L1 seletor permite escolher o único paciente disponível quando a seleção global está vazia",async({page})=>{
- const f=await setup(),person=await shiftWorker(f.patient,"family");
- sql(`update public.profiles set role='admin',global_scope=true where id=${q(person.id)};update public.care_recipient_memberships set status='revoked' where user_id=${q(person.id)};`);
- await rpc(person.client,"select_active_context",{p_patient:null});
- // Keep only one of this real administrator's authorized patients in the UI
- // read to reproduce a one-choice installation without deleting other data.
- await page.route("**/api/context",async route=>{
-  if(route.request().method()!=="GET")return route.continue();
-  const response=await route.fetch(),body=await response.json();expect(response.ok()).toBe(true);
-  body.data.patients=body.data.patients.filter((row:{id:string})=>row.id===f.patient);
-  await route.fulfill({response,json:body});
- });
- await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(person.email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();
- const picker=page.getByRole("combobox",{name:"Pessoa assistida",exact:true});
- await expect(picker).toHaveValue("");await expect(picker).toBeEnabled();await picker.selectOption(f.patient);await expect(picker).toHaveValue(f.patient);
+test("L1 seletor permite escolher o único paciente disponível quando a seleção global está vazia", async ({ page }) => {
+  const f = await setup(), person = await shiftWorker(f.patient, "family");
+  sql(`update public.profiles set role='admin',global_scope=true where id=${q(person.id)};update public.care_recipient_memberships set status='revoked' where user_id=${q(person.id)};`);
+  await rpc(person.client, "select_active_context", { p_patient: null });
+
+  // Keep only one authorized patient in the browser read without changing
+  // the permissions returned by the real server.
+  await page.route("**/api/context", async route => {
+    if (route.request().method() !== "GET") return route.continue();
+    const response = await route.fetch();
+    expect(response.ok()).toBe(true);
+    const body = await response.json();
+    body.data.patients = body.data.patients.filter((row: { id: string }) => row.id === f.patient);
+    await route.fulfill({ response, json: body });
+  });
+  try {
+    await page.goto("/login");
+    await page.getByLabel("E-mail", { exact: true }).fill(person.email);
+    await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+    await page.getByRole("button", { name: "Entrar", exact: true }).click();
+    const picker = page.getByRole("combobox", { name: "Pessoa assistida", exact: true });
+    await expect(picker.getByRole("option")).toHaveCount(2);
+    await expect(picker).toHaveValue("");
+    await expect(picker).toBeEnabled();
+    const before = await page.request.get("/api/context");
+    expect(before.ok()).toBe(true);
+    const authority = (await before.json()).data;
+    expect(authority.isGlobalAdmin).toBe(true);
+    expect(authority.activeContext?.mode).not.toBe("patient");
+    await picker.selectOption(f.patient);
+    await expect(picker).toHaveValue(f.patient);
+    await expect.poll(() => new URL(page.url()).searchParams.get("careRecipientId")).toBe(f.patient);
+    await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-mode", authority.activeContext?.mode ?? "");
+    const context = await page.request.get("/api/context");
+    expect(context.ok()).toBe(true);
+    const { data } = await context.json();
+    expect(data.activeContext).toEqual(authority.activeContext);
+    expect(data.patients).toEqual(expect.arrayContaining([expect.objectContaining({ id: f.patient })]));
+  } finally {
+    // Drain even a late context refresh before Playwright disposes its response.
+    await page.unrouteAll({ behavior: "wait" });
+  }
 });
 
 test("L1 ciência antiga preserva a referência sem acesso e libera nova ciência após ausência comprovada",async({page})=>{

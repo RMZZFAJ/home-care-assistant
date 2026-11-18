@@ -46,10 +46,22 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
     name: "Histórico auditável",
     exact: true,
   });
-  await history.getByRole("button", { name: "Filtrar", exact: true }).click();
-  await history
-    .getByRole("combobox", { name: "Produto", exact: true })
-    .selectOption(f.products[0]);
+  await page.bringToFront();
+  await expect(history.getByText(/^Histórico consultado:/)).toBeVisible();
+  const filterToggle = history.getByRole("button", {
+    name: "Filtrar",
+    exact: true,
+  });
+  await filterToggle.focus();
+  await expect(filterToggle).toBeFocused();
+  await filterToggle.press("Enter");
+  await expect(filterToggle).toHaveAttribute("aria-expanded", "true");
+  const productFilter = history.getByRole("combobox", {
+    name: "Produto",
+    exact: true,
+  });
+  await productFilter.selectOption(f.products[0]);
+  await expect(productFilter).toHaveValue(f.products[0]);
   await history
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();
@@ -134,9 +146,7 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
     .getByRole("button", { name: "Fechar edição", exact: true })
     .click();
   await expect(opener).toBeFocused();
-  await expect(
-    history.getByRole("combobox", { name: "Produto", exact: true }),
-  ).toHaveValue(f.products[0]);
+  await expect(productFilter).toHaveValue(f.products[0]);
   await page.unroute("**/api/stock/movements/*/origin?*");
   for (const [kind, id, target] of [
     ["document", f.delivery.id, f.delivery.id],
@@ -185,9 +195,7 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
       .getByRole("button", { name: "Fechar edição", exact: true })
       .click();
   }
-  await history
-    .getByRole("combobox", { name: "Produto", exact: true })
-    .selectOption(f.products[1]);
+  await productFilter.selectOption(f.products[1]);
   await history
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();

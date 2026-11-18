@@ -20,6 +20,9 @@ for (const type of ["REQ", "COM"]) test(type + " links a new issued complement a
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, f.patient);
   let failRead = true, mismatchCandidate = true, denyWrite = true, loseReply = true, writes = 0;
+  let holdLinkReads = false;
+  let releaseLinkReads!: () => void;
+  const linkReadGate = new Promise<void>(resolve => { releaseLinkReads = resolve; });
   const endpoint = "/api/documents/" + sourceId + "/complements";
   await page.route("**" + endpoint + "*", async route => {
     const request = route.request(), url = new URL(request.url());
@@ -31,6 +34,8 @@ for (const type of ["REQ", "COM"]) test(type + " links a new issued complement a
       const data = await response.json(); data.data.sourceId = "30000000-0000-4000-8000-000000000099";
       await route.fulfill({ response, json: data }); return;
     }
+    if (request.method() === "GET" && !url.searchParams.has("mode") && holdLinkReads)
+      await linkReadGate;
     if (request.method() === "POST") {
       writes++;
       if (denyWrite) { denyWrite = false; await route.fulfill({ status: 403, contentType: "application/json", body: JSON.stringify({ error: "Acesso recusado na resposta controlada.", code: "FORBIDDEN" }) }); return; }
@@ -82,10 +87,19 @@ for (const type of ["REQ", "COM"]) test(type + " links a new issued complement a
   await panel.getByRole("button", { name: "Vincular ficha emitida", exact: true }).click();
   await expect(dialog).toContainText("Há uma tentativa de vínculo para consultar.");
   expect(writes).toBe(2);
-  await dialog.getByRole("button", { name: "Consultar a mesma tentativa", exact: true }).click();
-  await expect(dialog).toContainText("Vínculo confirmado.");
-  await dialog.getByRole("button", { name: "Fechar", exact: true }).click();
-  await expect(trigger).toBeFocused();
+  holdLinkReads = true;
+  try {
+    await dialog.getByRole("button", { name: "Consultar a mesma tentativa", exact: true }).click();
+    await expect(dialog).toContainText("Vínculo confirmado.");
+    await expect(page.getByText("Consultando vínculos autorizados…", { exact: true })).toBeVisible();
+    await dialog.getByRole("button", { name: "Fechar", exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toBeDisabled();
+  } finally {
+    releaseLinkReads();
+  }
+  await expect(trigger).toBeEnabled();
   expect(writes).toBe(2); expect((await readComplementLinks(f.admin, sourceId)).total).toBe(1);
   expect(awarenessFacts(sourceId)).toBe(original); expect(awarenessFacts(childId)).toBe(material);
   await expect(panel).toContainText(candidate.code);

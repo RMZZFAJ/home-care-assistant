@@ -15,6 +15,20 @@ async function login(page: Page, patient: string | null, role: "adminA" | "globa
   await selectContext(page, patient);
 }
 
+async function openNewItem(page: Page) {
+  const trigger = page.getByRole("button", { name: "Novo item", exact: true });
+  await page.bringToFront();
+  await expect(trigger).toBeEnabled();
+  await trigger.focus();
+  await expect(trigger).toBeFocused();
+  // A retained list may revalidate while the control is receiving focus.
+  await expect(trigger).toBeEnabled();
+  await trigger.press("Enter");
+  const editor = page.getByRole("dialog", { name: "Adicionar item exclusivo deste paciente" });
+  await expect(editor).toBeVisible();
+  return editor;
+}
+
 test("catalogue receipt is discoverable after closing the editor, losing write access and opening another session", async ({ page, browser }) => {
   test.setTimeout(120_000);
   const f = await setup();
@@ -30,8 +44,7 @@ test("catalogue receipt is discoverable after closing the editor, losing write a
     expect(response.status()).toBe(200);
     await route.abort("failed");
   });
-  await page.getByRole("button", { name: "Novo item", exact: true }).click();
-  const editor = page.getByRole("dialog", { name: "Adicionar item exclusivo deste paciente" });
+  const editor = await openNewItem(page);
   await editor.getByLabel("Nome", { exact: true }).fill(item);
   await editor.getByRole("button", { name: "Salvar item", exact: true }).click();
   await editor.getByRole("button", { name: "Fechar e recuperar depois", exact: true }).click();
@@ -90,8 +103,7 @@ test("global catalogue proposal is found in its patient history, separately from
   const f = await setup();
   await login(page, null, "global");
   await page.goto(`/admin?careRecipientId=${f.patient}&section=catalog`);
-  await page.getByRole("button", { name: "Novo item", exact: true }).click();
-  const editor = page.getByRole("dialog", { name: "Adicionar item exclusivo deste paciente" });
+  const editor = await openNewItem(page);
   await editor.getByLabel("Nome", { exact: true }).fill("Proposta fictícia para histórico");
   await editor.getByRole("button", { name: "Salvar item", exact: true }).click();
   await expect(editor).toHaveCount(0);

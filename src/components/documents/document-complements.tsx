@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError, buttonClass, Notice, primaryClass } from "@/components/workspace";
 import { Dialog } from "@/components/ui/primitives";
 import { FormField, SelectField, TextInput, TextAreaField } from "@/components/ui/controls";
@@ -16,6 +16,7 @@ type Props = { documentId: string; version: number; userId: string; activeContex
 export function DocumentComplementsPanel({ documentId, version, userId, activeContext, onRecorded }: Props) {
   const [page, setPage] = useState(1), [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const refreshRef = useRef<HTMLButtonElement>(null);
   const decode = useCallback((raw: unknown) => parseDocumentComplements((raw as { data: unknown; }).data, documentId, page), [documentId, page]);
   const read = useScopedRead(`/api/documents/${documentId}/complements?page=${page}`, String(version), decode);
   const data = !read.error ? read.data : null;
@@ -46,14 +47,20 @@ export function DocumentComplementsPanel({ documentId, version, userId, activeCo
           href={`/fichas/${type.toLowerCase()}?complementOf=${documentId}&complementType=${data.document.type}`}>Emitir {type === "ENT" ? "entrega" : names[type].toLowerCase()}</Link>)}</div>
         {!activeContext ? <Notice>Selecione o paciente desta ficha para registrar um vínculo.</Notice> : null}
       </> : null}
-      <button ref={triggerRef} className={buttonClass} type="button" onClick={() => setOpen(true)}>{data.creatableTypes.length ? "Vincular ficha emitida" : "Consultar tentativa de vínculo"}</button>
     </> : null}
-    <button className={buttonClass} type="button" disabled={read.loading} onClick={read.refresh}>Atualizar vínculos</button>
-    {open && data ? <ComplementEditor source={data} userId={userId} activeContext={activeContext} onRecorded={refreshed} onClose={() => setOpen(false)} finalFocus={triggerRef} /> : null}
+    {data ? (
+      // Keep the opener focusable while the same list is being revalidated.
+      <button ref={triggerRef} className={buttonClass} type="button" aria-disabled={read.loading}
+        onClick={() => { if (!read.loading) setOpen(true); }}>
+        {data.creatableTypes.length ? "Vincular ficha emitida" : "Consultar tentativa de vínculo"}
+      </button>
+    ) : null}
+    <button ref={refreshRef} className={buttonClass} type="button" disabled={read.loading} onClick={read.refresh}>Atualizar vínculos</button>
+    {open && data ? <ComplementEditor source={data} userId={userId} activeContext={activeContext} onRecorded={refreshed} onClose={() => setOpen(false)} finalFocus={() => triggerRef.current ?? refreshRef.current} /> : null}
   </div></DocumentSection>;
 }
 function ComplementEditor({ source, userId, activeContext, onRecorded, onClose, finalFocus }: {
-  source: DocumentComplements; userId: string; activeContext: boolean; onRecorded: () => void; onClose: () => void; finalFocus: RefObject<HTMLButtonElement | null>;
+  source: DocumentComplements; userId: string; activeContext: boolean; onRecorded: () => void; onClose: () => void; finalFocus: () => HTMLElement | null;
 }) {
   const sourceId = source.document.id, endpoint = `/api/documents/${sourceId}/complements`;
   const storageKey = `hca:complement-attempt:${userId}:${source.careRecipientId}:${sourceId}`;

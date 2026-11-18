@@ -682,3 +682,49 @@ Os resultados axe marcados como inconclusivos continuam para revisão manual.
 O aceite visual e as provas físicas e de provedores permanecem nos gates de
 entrega correspondentes. A passagem de frente para L2 é uma decisão sobre
 o resultado do novo SHA e as pendências conhecidas.
+
+## Correções após a CI de 484d4a23
+
+Windows, Ubuntu e banco passaram, incluindo instalação limpa, evolução
+legada e 760 integrações. Os seis jobs de navegador executaram 1.497
+cenários. Desses, 1.493 passaram na primeira tentativa, três passaram na
+segunda e um falhou nas duas. Chromium-2, mobile-2 e iOS-1 passaram
+sem repetições. O agregado falhou pelo resultado de mobile-1. A execução
+do workflow teve uma única tentativa. Os cinco casos tratados após
+`a8883d15` passaram de primeira nos três projetos. SonarCloud e Vercel
+também passaram nesse SHA.
+[CI 44357106763](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44357106763).
+
+- **Seletor no modo de administração global:** o teste encerrava a página
+  enquanto a rota interceptada ainda lia uma resposta. Nas duas tentativas,
+  Playwright descartou a resposta antes da leitura do corpo. A prova agora
+  aguarda a conclusão das rotas no encerramento e verifica o paciente
+  escolhido na URL e no controle. A API real confirma que a escolha
+  pertence à lista autorizada e que o contexto oficial continua igual ao
+  anterior à seleção de consulta.
+- **Vínculos complementares:** a atualização após confirmar o vínculo
+  desmontava o acionador antes que o diálogo devolvesse o foco. A
+  contraprova mobile reteve a leitura e reproduziu a ausência do acionador
+  após fechar. O painel conserva o botão durante a leitura do mesmo
+  escopo, bloqueia a ação nesse intervalo e devolve o foco. Quando a
+  consulta perde seu resultado autorizado, a ação sai da tela. A prova
+  usa REQ e COM e mantém as verificações de vínculo único e fatos
+  anteriores preservados.
+- **Comprovantes do catálogo:** o artefato registrou Novo item focado,
+  sem o editor. O teste agora confirma que a consulta liberou o controle,
+  confirma foco e ativa com Enter. Os dois consumidores do arquivo
+  verificam a abertura antes de editar e preservam os invariantes de
+  proposta, recebimento de comprovante e autorização.
+- **Histórico de estoque no iOS-2:** o artefato mostrou Filtrar focado e
+  recolhido, com o seletor Produto ausente após o clique. O teste aguarda
+  a consulta do histórico, confirma foco, aciona o controle com Enter e
+  confere a expansão e o valor selecionado antes de aplicar. Mantém as
+  verificações de origem exata, retenção dos filtros e estoque.
+
+Os 18 testes dirigidos passaram de primeira, seis por projeto, com dados
+sintéticos no projeto local. Build de produção com TypeScript e ESLint
+dos arquivos alterados também passaram. O lote está na branch
+`feat/phase-d-implementation` e aguarda publicação e CI própria.
+Os logs locais em `output/` registram a contraprova de foco em
+`l1-484-focus-and-fixtures-red.log` e os resultados em
+`l1-484-focus-and-fixtures-green.log` e `l1-484-stock-filter-green.log`.
