@@ -62,6 +62,25 @@ it("renders numbered issuance observations in order and retains the recipient's 
   await expect(validateIssuanceContent(current.bytes, current)).resolves.toMatchObject({ passed: true });
 });
 
+it("lists a purchase with only pending extras in a tagged table with the reviewed details", async () => {
+  const purchase = snapshots.find(snapshot => snapshot.type === "COM")!;
+  const source = currentPdfFixture({
+    ...purchase, status: "approved", lines: [], purchaseReceipts: [], purchaseEntryBalances: [], purchaseCoverage: [],
+    payload: { origin: "purchase", pendingExtras: [{
+      id: "99000000-0000-4000-8000-000000000001", name: "Protetor fictício", category: "higiene",
+      unit: "unidade", quantity: "2", details: "Acabamento lavável.",
+    }] },
+  });
+  const plan = await composeIssuance(source, "c".repeat(64), { ...fidelityEmission, rendererRevision: 16 });
+  expect(plan.semanticFacts).toMatchObject({
+    "purchase/pending-extra/0/material": "Protetor fictício Acabamento lavável.",
+    "purchase/pending-extra/0/planned": "2 unidade",
+    "purchase/pending-extra/0/status": "Cadastro pendente",
+  });
+  const structure = validatePdfStructure(await PDFDocument.load(plan.bytes, { updateMetadata: false }));
+  expect(structure.roles).toMatchObject({ Table: 1, TH: 3, TD: 3 });
+});
+
 it("rejects missing tags, broken parents, absent scopes, unmatched content and untagged painted content", async () => {
   const current = await plan();
   const mutations = [

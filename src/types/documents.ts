@@ -1,5 +1,6 @@
 import type { BalanceReviewItem } from "@/lib/validation/balance-review-items";
 import type { BalanceApplicationFacts } from "@/lib/validation/balance-application";
+import type { PendingPurchaseExtra } from "@/lib/validation/pending-purchase-extras";
 
 export type DocumentType = "REQ" | "COM" | "ENT" | "BAL";
 export type DocumentKind = DocumentType | "DEV";
@@ -40,6 +41,7 @@ export type DraftLine = {
 };
 export type SupplyPayload = {
   lines: DraftLine[];
+  pendingExtras?: PendingPurchaseExtra[];
   sources?: import("@/lib/validation/supply-sources").SupplySourceLink[];
   notes?: string;
   observations?: string[];
@@ -243,6 +245,7 @@ export type PurchaseSchedule = {
 };
 export type PurchaseProgress = {
   state: string;
+  identificationPending?: boolean;
   expectationClosed: boolean;
   expectationPending: boolean;
   physicalPending: boolean;

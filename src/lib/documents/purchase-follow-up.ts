@@ -7,7 +7,7 @@ type PurchaseFollowUp = {
   description: string;
   pending: boolean;
   label: string;
-  section: "workflow" | "history";
+  section: "workflow" | "history" | "materials";
   statusLabel: string;
 };
 
@@ -34,6 +34,10 @@ export function purchaseFollowUp(input: {
   if (input.status === "draft") return {
     ...base, pending: true, heading: "Conferir a preparação antes de emitir",
     description: "A COM ainda é um rascunho. Sua preparação não comprova aprovação, aquisição, chegada ou entrada no estoque.",
+  };
+  if (progress?.identificationPending) return {
+    ...base, pending: true, label: "Ver materiais", section: "materials", heading: "Identificar os materiais pendentes",
+    description: "Confira os itens em Materiais e associe cada um ao produto correspondente do catálogo da residência.",
   };
   if (input.status === "pending_approval") return {
     ...base, pending: true, heading: "Conferir a aprovação da aquisição",

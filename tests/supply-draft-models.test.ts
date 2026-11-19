@@ -37,3 +37,17 @@ it("does not call an arbitrary200 an emitted supply document or a confirmation f
  expect(requireSupplyConfirmation({data,persistence:"confirmed"},{patientId:id,type:"COM",id,minimumVersion:2}).id).toBe(id);
  for(const value of [{data},{data:{...data,id:other},persistence:"confirmed"},{data:{...data,care_recipient_id:other},persistence:"confirmed"},{data:{...data,version:1},persistence:"confirmed"},{data:{...data,lines:[]},persistence:"confirmed"}])expect(()=>requireSupplyConfirmation(value,{patientId:id,type:"COM",id,minimumVersion:2})).toThrow();
 });
+
+it("confirms a COM with only pending extras against exactly the reviewed material", () => {
+  const extra = { id: other, name: "Item extra fictício", quantity: "2", unit: "unidade", category: "higiene" } as const;
+  const data = {
+    id, care_recipient_id: id, type: "COM", version: 2, status: "approved",
+    payload: { origin: "purchase", pendingExtras: [extra] }, lines: [], events: [],
+  };
+  const expected = { patientId: id, type: "COM" as const, id, minimumVersion: 2, pendingExtras: [extra] };
+  expect(requireSupplyConfirmation({ data, persistence: "confirmed" }, expected).id).toBe(id);
+  const swapped = { ...data, payload: { ...data.payload, pendingExtras: [{ ...extra, quantity: "3" }] } };
+  expect(() => requireSupplyConfirmation({ data: swapped, persistence: "confirmed" }, expected)).toThrow("não correspondem");
+  expect(() => requireSupplyConfirmation({ data: { ...data, type: "ENT" }, persistence: "confirmed" },
+    { ...expected, type: "ENT" })).toThrow("não confirmou");
+});

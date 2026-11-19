@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { issuanceObservationDraft } from "./issuance-observations";
+import { pendingPurchaseExtras } from "./pending-purchase-extras";
 import { scheduleResourcePurposes } from "../schedules/resource-preparations";
 import { consumptionPreparationPurposes } from "../forms/consumption-preparation-purposes";
 import { balancePreparationPurposes } from "../forms/balance-preparation-purposes";
@@ -160,6 +161,7 @@ export const supplyDraftContent = z
       .object({
         quantities: entries(text(64)),
         extraProductIds: z.array(text(120).min(1)).max(1000).optional(),
+        pendingExtras: pendingPurchaseExtras.optional(),
         notes: text(3000),
         observations: issuanceObservationDraft.optional(),
         origin: z.enum(["", "purchase", "donation"]),

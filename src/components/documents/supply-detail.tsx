@@ -25,6 +25,7 @@ import {
 import { documentVariant } from "@/lib/documents/variant";
 import { SupplyLineSummary } from "./supply-line-summary";
 import { PurchaseMaterials } from "./purchase-materials";
+import { PurchaseExtraResolution } from "./purchase-extra-resolution";
 import { DeliveryMaterials } from "./delivery-materials";
 import { CountedDeliveryReceipt, CountedDeliveryReceiptResult } from "./delivery-receipt";
 import { canReconcileFromFamily, DeliveryReconciliation, DeliveryReconciliationResult } from "./delivery-reconciliation";
@@ -572,8 +573,10 @@ export function SupplyDocumentContent({
   const allowed = (cap: string) => Boolean(activeContext && !archived && can(context, cap));
   const followUpState = data && supplyFollowUpState(data.status, data.workflow_data.documentFollowUp);
   const followUpTerminal = followUpState === "completed" || data?.status === "cancelled" && followUpState !== "reopened";
+  const purchaseIdentificationPending = data?.type === "COM" && data.purchaseProgress?.identificationPending === true;
   const patientAdmin = Boolean(activeContext && context.patient?.role === "admin" && can(context, "access.manage"));
   const canReviewCompletion = Boolean(activeContext && !archived && data?.protocol && data.type !== "BAL"
+    && !purchaseIdentificationPending
     && !followUpTerminal && data.status !== "rejected" && data.status !== "administratively_closed"
     && (patientAdmin || (data.type === "COM" ? allowed("com.approve")
       : data.recipient_id === context.userId && allowed("ent.receive") || data.created_by === context.userId && allowed("ent.create"))));
@@ -594,7 +597,7 @@ export function SupplyDocumentContent({
     )
       actions.push("submit");
     else if (data.type === "COM") {
-      if (data.status === "pending_approval" && allowed("com.approve"))
+      if (data.status === "pending_approval" && allowed("com.approve") && !purchaseIdentificationPending)
         actions.push("approve");
       if (
         [
@@ -603,7 +606,7 @@ export function SupplyDocumentContent({
           "purchasing",
           "partially_received",
         ].includes(data.status) &&
-        allowed("com.purchase") &&
+        allowed("com.purchase") && !purchaseIdentificationPending &&
         data.lines.some((line) => acquisitionRemaining(line).gt(0))
       )
         actions.push("purchase");
@@ -617,6 +620,7 @@ export function SupplyDocumentContent({
         actions.push("receive");
       if (
         data.purchaseProgress?.expectationPending &&
+        !purchaseIdentificationPending &&
         !data.purchaseProgress.expectationClosed &&
         allowed("com.close_expectation")
       )
@@ -1074,7 +1078,7 @@ export function SupplyDocumentContent({
                   cancelled={data.status === "cancelled" && followUpState !== "completed"}
                   disabled={busy || operationOpen} onUpdated={() => setAttempt(value => value + 1)}
                   onShowMaterials={() => tabs.select("materials")}
-                  onCompleteAndArchive={patientAdmin && !followUpTerminal ? () => setArchiveDialog("archive") : undefined}
+                  onCompleteAndArchive={patientAdmin && !followUpTerminal && !purchaseIdentificationPending ? () => setArchiveDialog("archive") : undefined}
                   preservedFacts={data.type === "ENT" ? data.lines.map(line => {
                     const returned = data.deliveryCancellation?.lines.find(result => result.lineId === line.id);
                     return <article key={line.id} className="hca-receipt-line">
@@ -1258,7 +1262,19 @@ export function SupplyDocumentContent({
               </section> : null}
               {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} readOnly={archived} onReviewed={() => setAttempt(value => value + 1)} /> : null}
               <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>
-                {data.type === "COM" ? <PurchaseMaterials data={data} active={tabs.value === "materials"} /> : data.type === "ENT" ? <DeliveryMaterials data={data} active={tabs.value === "materials"} /> : <>
+                {data.type === "COM" ? <>
+                  <PurchaseExtraResolution key={data.id} data={data}
+                    mayIdentify={Boolean(activeContext && !archived && ["pending_approval", "approved"].includes(data.status) &&
+                      allowed("com.approve") && allowed("catalog.manage"))}
+                    onUpdated={document => {
+                      const updated = requireSupplyConfirmation({ data: document, persistence: "confirmed" }, {
+                        id: data.id, patientId: data.care_recipient_id, type: "COM", minimumVersion: data.version + 1,
+                      });
+                      setData(current => current?.id === updated.id && current.version <= updated.version ? updated : current);
+                    }} />
+                  {data.lines.length || !purchaseIdentificationPending
+                    ? <PurchaseMaterials data={data} active={tabs.value === "materials"} /> : null}
+                </> : data.type === "ENT" ? <DeliveryMaterials data={data} active={tabs.value === "materials"} /> : <>
                   <h2 className="font-semibold">Produtos e quantidades</h2>
                   <div className="mt-4 space-y-3">
                     {data.lines.map((line) => (

@@ -9,6 +9,7 @@ import { supplySourceLinks } from "./supply-sources";
 import { purchaseCommandBody } from "./purchase-command";
 import { purchaseArrivalBody } from "./purchase-arrival";
 import { issuedObservations } from "./issuance-observations";
+import { pendingPurchaseExtras } from "./pending-purchase-extras";
 import { countedDeliveryReceiptBody, deliveryResolutionBody, requestDeliveryNeedBody, supplyCancellationBody } from "./delivery-receipt";
 
 const identifier = z.string().uuid();
@@ -48,7 +49,8 @@ const line = z
   );
 export const supplyPayload = z
   .object({
-    lines: z.array(line).min(1).max(1000),
+    lines: z.array(line).max(1000),
+    pendingExtras: pendingPurchaseExtras.optional(),
     notes: z.string().trim().max(2000).optional(),
     observations: issuedObservations.optional(),
     origin: z.enum(["purchase", "donation"]).optional(),
@@ -76,7 +78,10 @@ export const supplyPayload = z
     balanceReferenceRevision: z.string().regex(/^\d+$/).max(20).optional(),
     sources: supplySourceLinks.optional(),
   })
-  .strict();
+  .strict()
+  .refine(value => value.lines.length > 0 || Boolean(value.pendingExtras?.length), {
+    path: ["lines"], message: "Selecione ou informe ao menos um item.",
+  });
 export const reviseSupplySchema = z
   .object({
     payload: supplyPayload,
@@ -88,7 +93,10 @@ export const reviseSupplySchema = z
     draftCommit: draftCommitSchema.optional(),
     draftKind: z.enum(["COM", "ENT", "BAL"]).default("BAL"),
   })
-  .strict();
+  .strict()
+  .refine(value => value.draftKind === "COM" || value.payload.pendingExtras === undefined, {
+    path: ["payload", "pendingExtras"], message: "A identificação pendente pertence ao planejamento da COM.",
+  });
 export const createSupplySchema = z
   .object({
     careRecipientId: identifier,
@@ -100,6 +108,11 @@ export const createSupplySchema = z
   })
   .strict()
   .superRefine((value, ctx) => {
+    if (value.type !== "COM" && value.payload.pendingExtras !== undefined)
+      ctx.addIssue({
+        code: "custom", path: ["payload", "pendingExtras"],
+        message: "A identificação pendente pertence ao planejamento da COM.",
+      });
     if (
       value.payload.balanceReferenceRevision !== undefined &&
       (value.type !== "BAL" || value.payload.balanceAssignment)
@@ -187,6 +200,7 @@ export const supplyCommandSchema = z
       "validate_receipt",
       "reject_receipt",
       "close_expectation",
+      "resolve_purchase_extra",
       "reassign",
       "resolve",
       "request_fulfillment_review",
@@ -289,6 +303,7 @@ export const supplyCommandSchema = z
       close_expectation: z
         .object({ reason, confirmed: z.literal(true) })
         .strict(),
+      resolve_purchase_extra: z.strictObject({ extraId: identifier, productId: z.string().min(1).max(120) }),
       reassign: z.object({ recipientId: identifier, reason }).strict(),
       resolve: deliveryResolutionBody,
       request_fulfillment_review: requestDeliveryNeedBody,

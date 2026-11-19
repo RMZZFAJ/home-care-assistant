@@ -392,6 +392,7 @@ export function PatientSupplyWizard({
             manualQuantities: {},
             requestFulfillments: {},
             extraProductIds: undefined,
+            pendingExtras: undefined,
             observations: undefined,
           }
           : {}),
@@ -413,6 +414,7 @@ export function PatientSupplyWizard({
     form: {
       quantities: form.quantities,
       ...(supplyExtraIds?.length ? { extraProductIds: supplyExtraIds } : {}),
+      ...(type === "COM" && form.pendingExtras?.length ? { pendingExtras: form.pendingExtras } : {}),
       notes: form.notes,
       observations: form.observations,
       origin: form.origin,
@@ -633,6 +635,7 @@ export function PatientSupplyWizard({
             notes: existing.payload.notes ?? "",
             observations: existing.payload.observations,
             extraProductIds: existing.lines.filter(line => line.metadata.catalogueExtra === "true").map(line => line.product_id),
+            pendingExtras: existing.payload.pendingExtras,
             origin: existing.payload.origin ?? "",
             source: existing.payload.source ?? "FAMILY",
             recipientId: existing.recipient_id ?? "",
@@ -881,8 +884,8 @@ export function PatientSupplyWizard({
             ? "quantidade válida"
             : "unidades inteiras") +
           (type === "BAL" ? ", inclusive zero." : " acima de zero.");
-    if (all && !Object.keys(form.quantities).length)
-      errors.lines = "Selecione ao menos um produto.";
+    if (all && !Object.keys(form.quantities).length && !(type === "COM" && form.pendingExtras?.length))
+      errors.lines = "Selecione ou informe ao menos um material.";
     if (all || step === 0)
       for (const [productId, ids] of Object.entries(links)) {
         if (!Object.hasOwn(form.quantities, productId)) continue;
@@ -1080,6 +1083,7 @@ export function PatientSupplyWizard({
         }));
       const payload: SupplyPayload = {
         lines,
+        ...(type === "COM" && form.pendingExtras?.length ? { pendingExtras: form.pendingExtras } : {}),
         notes: form.notes,
         ...(type !== "BAL" && form.observations ? { observations: form.observations.map(note => note.trim()) } : {}),
         ...(sources.length ? { sources } : {}),
@@ -1193,6 +1197,7 @@ export function PatientSupplyWizard({
         type,
         id: editing?.id,
         observations: frozenRef.current.payload.observations,
+        ...(type === "COM" ? { pendingExtras: frozenRef.current.payload.pendingExtras ?? [] } : {}),
         minimumVersion: frozenRef.current.expectedVersion !== undefined
           ? frozenRef.current.expectedVersion + 1
           : editing
@@ -1516,7 +1521,7 @@ export function PatientSupplyWizard({
           setAttempt(current => current + 1);
         }} />;
     }
-    if (!loading && !loadError && !catalog.length && !documentId && !editing && !draftTouched && step === 0)
+    if (type !== "COM" && !loading && !loadError && !catalog.length && !documentId && !editing && !draftTouched && step === 0)
       return <DocumentCatalogueEmpty patientId={patientId} patientName={context.patient!.display_name}
         mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0} />;
   }

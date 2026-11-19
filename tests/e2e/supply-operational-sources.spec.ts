@@ -1,7 +1,7 @@
 import { selectMaterialCategory } from "./material-category";
-import { openOperationalDocumentAction } from "./document-sections";
+import { openOperationalDocumentAction, selectDocumentSection } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
-import { fixtures, issue, setup } from "../integration/v4-fixtures.mjs";
+import { fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
   purchaseBalanceArrival, purchaseBalanceCommand, purchaseBalanceFixture,
@@ -32,8 +32,8 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   await expect(page.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
   await page.getByRole("button", { name: "Item extra", exact: true }).click();
   const picker = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
-  await picker.getByRole("combobox", { name: "Material do catálogo", exact: true }).fill("curativo auxiliar");
-  await page.getByRole("option", { name: name + " · unidade", exact: true }).click();
+  await picker.getByRole("textbox", { name: "Nome do material", exact: true }).fill("curativo auxiliar");
+  await picker.getByRole("button", { name: `Usar item do catálogo: ${name} (unidade)`, exact: true }).click();
   await expect(picker).toHaveCount(0);
   await selectMaterialCategory(page);
   await expect(page.getByRole("checkbox", { name: name + " unidade", exact: true })).toHaveCount(0);
@@ -75,6 +75,81 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   expect(document.lines).toMatchObject([
     { product_id: f.products[1], quantity: expect.anything(), metadata: { catalogueExtra: "true" } },
   ]);
+});
+
+test("L2 COM emite o extra pendente e identifica o material na mesma ficha sem entrada de estoque", async ({ page }, info) => {
+  test.setTimeout(150_000);
+  const f = await setup(), admin = await shiftWorker(f.patient, "admin");
+  const name = "Protetor de tecido reforçado fictício";
+  const details = "Acabamento lavável para reposição de teste.";
+  const stock = () => sql(`select jsonb_agg(to_jsonb(m) order by m.id) from public.stock_movements m where care_recipient_id=${q(f.patient)}`);
+  const before = stock();
+  await loginDecision(page, admin.email, f.patient);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/fichas/com");
+  await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
+  await next(page);
+  await page.getByRole("button", { name: "Item extra", exact: true }).click();
+  const picker = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
+  await picker.getByRole("textbox", { name: "Nome do material", exact: true }).fill(name);
+  await picker.getByRole("textbox", { name: "Quantidade", exact: true }).fill("2");
+  await picker.getByRole("button", { name: "Adicionar material", exact: true }).click();
+  const unit = picker.getByRole("combobox", { name: "Unidade de medida", exact: true });
+  await expect(unit).toBeFocused();
+  await unit.selectOption("unidade");
+  await expect(unit).not.toHaveAttribute("aria-invalid", "true");
+  await picker.getByRole("textbox", { name: "Detalhes para identificar", exact: true }).fill(details);
+  await info.attach("E05-modal-extra-pendente", { body: await picker.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await picker.getByRole("button", { name: "Adicionar material", exact: true }).click();
+  await next(page);
+  await expect(page.getByText(name, { exact: true })).toHaveCount(1);
+  await expect(page.getByText("Cadastro pendente", { exact: true })).toBeVisible();
+  const edit = page.getByRole("button", { name: "Editar " + name, exact: true });
+  await edit.click();
+  const editDialog = page.getByRole("dialog", { name: "Editar item extra", exact: true });
+  await expect(editDialog.getByRole("textbox", { name: "Detalhes para identificar", exact: true })).toHaveValue(details);
+  await editDialog.getByRole("button", { name: "Salvar alteração", exact: true }).click();
+  await next(page);
+  await next(page);
+  const review = page.getByRole("region", { name: "Itens extras", exact: true });
+  await expect(review.getByText(name, { exact: true })).toHaveCount(1);
+  await expect(review.getByText("2 unidade · Cadastro pendente", { exact: true })).toBeVisible();
+  const request = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
+  await page.getByRole("button", { name: "Confirmar e concluir", exact: true }).click();
+  const response = await request;
+  expect(response.ok(), await response.text()).toBe(true);
+  const { data: document } = await response.json();
+  expect(document.lines).toEqual([]);
+  expect(document.payload.pendingExtras).toMatchObject([{ name, unit: "unidade", quantity: "2", details }]);
+  expect(stock()).toBe(before);
+  const issued = page.getByRole("dialog", { name: "Compra emitida", exact: true });
+  const download = issued.getByRole("link", { name: "Baixar PDF", exact: true });
+  await expect(download).toBeVisible();
+  expect((await page.request.get((await download.getAttribute("href"))!)).status()).toBe(200);
+  await issued.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
+  await selectDocumentSection(page, "materials");
+  const pending = page.getByRole("region", { name: "Materiais com cadastro pendente", exact: true });
+  await expect(pending.getByText(name, { exact: true })).toBeVisible();
+  const catalogued = await rpc(f.admin, "admin_upsert_recipient_product", {
+    p_care_recipient_id: f.patient, p_product_id: null, p_name: name,
+    p_category: "higiene", p_unit: "unidade", p_aliases: [], p_is_active: true,
+  });
+  await pending.getByRole("button", { name: "Identificar " + name, exact: true }).click();
+  const identify = page.getByRole("dialog", { name: "Identificar material extra", exact: true });
+  await identify.getByRole("combobox", { name: "Produto correspondente", exact: true }).fill(name);
+  await page.getByRole("option", { name: name + " · unidade", exact: true }).click();
+  const identified = page.waitForResponse(response => response.request().method() === "POST" &&
+    new URL(response.url()).pathname === "/api/documents/" + document.id &&
+    response.request().postDataJSON().action === "resolve_purchase_extra");
+  await identify.getByRole("button", { name: "Confirmar identificação", exact: true }).click();
+  const identifiedResponse = await identified;
+  expect(identifiedResponse.ok(), await identifiedResponse.text()).toBe(true);
+  expect((await identifiedResponse.json()).data.lines).toMatchObject([{ product_id: catalogued.product_id, name_snapshot: name }]);
+  await expect(page.getByRole("button", { name: "Detalhes de " + name, exact: true })).toBeVisible();
+  await expect(pending).toHaveCount(0);
+  const current = await page.request.get("/api/documents/" + document.id);
+  expect((await current.json()).data.lines).toMatchObject([{ product_id: catalogued.product_id, name_snapshot: name }]);
+  expect(stock()).toBe(before);
 });
 
 test("L2 COM mantém o vínculo geral após desfazer importação e conserva a quantidade editada", async ({ page }, info) => {

@@ -16,6 +16,7 @@ import { CATEGORY_LABELS } from "@/lib/catalog";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { purchaseArrivalVariance } from "@/lib/documents/purchase";
+import { pendingPurchaseItems } from "@/lib/documents/pending-purchase-items";
 
 const name = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const unit = (line: Record<string, unknown>) => String(line.unit_snapshot ?? "Unidade não preservada");
@@ -91,23 +92,43 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
       { label: "Chegadas e validação", symbol: "box", detail: arrivalsDetail, done: done && (validated.length > 0 || associatedCount > 0), current: (acquired || associatedCount > 0) && !done && !cancelled, tone: done && (validated.length || associatedCount) ? "good" : "warn" },
       { label: cancelled ? "Cancelamento" : "Conclusão", symbol: cancelled ? "cross" : "check", detail: cancelled ? "Fatos anteriores preservados" : done ? "Expectativa encerrada" : "Em acompanhamento", done: done || cancelled, tone: cancelled ? "bad" : done ? "good" : undefined },
     ]);
-    layout.heading("Relação de materiais", "Saldo do estoque familiar após a última entrada validada de cada material nesta ficha. Não é o saldo atual.");
-    layout.table([{ label: "Nº", fraction: 0.045 }, { label: "Material / unidade", fraction: 0.355 }, { label: donation ? "Declarado" : "Adquirido", fraction: 0.17 }, { label: "Entrada validada", fraction: 0.18 }, { label: "Saldo após entrada", fraction: 0.25 }], grouped(snapshot.lines.map((line, index) => {
-      const entry = entries!.find(value => value.lineId === line.id)!;
-      const progress = snapshot.purchaseProgress?.lines.find(item => item.lineId === line.id);
-      const balance = entry.state === "known" ? amount(entry.quantity, unit(line)) : entry.state === "restricted" ? "Acesso restrito"
-        : associated.some(item => item.targetLineId === line.id) ? "Entrada registrada na chegada associada"
-          : entry.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro";
-      return {
-        category: category(line), cells: [
-          { text: String(index + 1).padStart(2, "0") }, { text: name(line) + "\n" + unit(line), key: "material/" + index + "/name", strong: true },
-          { text: amount(line.purchased_quantity, unit(line)), key: "material/" + index + "/acquired" }, { text: amount(progress?.validatedQuantity ?? line.accepted_quantity, unit(line)), key: "material/" + index + "/validated" },
-          { text: balance + (entry.entry ? "\n" + formatBrazilDate(entry.entry.validatedAt) : ""), key: "material/" + index + "/balance" },
-        ]
-      };
-    })));
-    layout.heading("Previsão e aquisição");
-    layout.table([{ label: "Material", fraction: 0.4 }, { label: "Previsto", fraction: 0.2 }, { label: "Aprovado", fraction: 0.2 }, { label: donation ? "Declarado" : "Adquirido", fraction: 0.2 }], snapshot.lines.map((line, index) => ({ cells: [{ text: name(line) }, { text: amount(line.quantity, unit(line)), key: "purchase/" + index + "/planned" }, { text: amount(line.approved_quantity, unit(line)), key: "purchase/" + index + "/approved" }, { text: amount(line.purchased_quantity, unit(line)), key: "purchase/" + index + "/acquired" }] })));
+    if (snapshot.lines.length) {
+      layout.heading("Relação de materiais", "Saldo do estoque familiar após a última entrada validada de cada material nesta ficha. Não é o saldo atual.");
+      layout.table([{ label: "Nº", fraction: 0.045 }, { label: "Material / unidade", fraction: 0.355 }, { label: donation ? "Declarado" : "Adquirido", fraction: 0.17 }, { label: "Entrada validada", fraction: 0.18 }, { label: "Saldo após entrada", fraction: 0.25 }], grouped(snapshot.lines.map((line, index) => {
+        const entry = entries!.find(value => value.lineId === line.id)!;
+        const progress = snapshot.purchaseProgress?.lines.find(item => item.lineId === line.id);
+        const balance = entry.state === "known" ? amount(entry.quantity, unit(line)) : entry.state === "restricted" ? "Acesso restrito"
+          : associated.some(item => item.targetLineId === line.id) ? "Entrada registrada na chegada associada"
+            : entry.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro";
+        return {
+          category: category(line), cells: [
+            { text: String(index + 1).padStart(2, "0") }, { text: name(line) + "\n" + unit(line), key: "material/" + index + "/name", strong: true },
+            { text: amount(line.purchased_quantity, unit(line)), key: "material/" + index + "/acquired" }, { text: amount(progress?.validatedQuantity ?? line.accepted_quantity, unit(line)), key: "material/" + index + "/validated" },
+            { text: balance + (entry.entry ? "\n" + formatBrazilDate(entry.entry.validatedAt) : ""), key: "material/" + index + "/balance" },
+          ]
+        };
+      })));
+    }
+    const pendingExtras = pendingPurchaseItems(snapshot.payload, snapshot.workflow);
+    if (pendingExtras.length) {
+      layout.heading("Materiais com cadastro pendente");
+      layout.table([
+        { label: "Material / detalhes", fraction: 0.55 },
+        { label: "Quantidade proposta", fraction: 0.23 },
+        { label: "Identificação", fraction: 0.22 },
+      ], grouped(pendingExtras.map((item, index) => {
+        const key = "purchase/pending-extra/" + index;
+        return { category: CATEGORY_LABELS[item.category], cells: [
+          { text: item.name + (item.details ? "\n" + item.details : ""), key: key + "/material" },
+          { text: formatQuantity(item.quantity, item.unit), key: key + "/planned" },
+          { text: "Cadastro pendente", key: key + "/status", tone: "warn" as const },
+        ] };
+      })));
+    }
+    if (snapshot.lines.length) {
+      layout.heading("Previsão e aquisição");
+      layout.table([{ label: "Material", fraction: 0.4 }, { label: "Previsto", fraction: 0.2 }, { label: "Aprovado", fraction: 0.2 }, { label: donation ? "Declarado" : "Adquirido", fraction: 0.2 }], snapshot.lines.map((line, index) => ({ cells: [{ text: name(line) }, { text: amount(line.quantity, unit(line)), key: "purchase/" + index + "/planned" }, { text: amount(line.approved_quantity, unit(line)), key: "purchase/" + index + "/approved" }, { text: amount(line.purchased_quantity, unit(line)), key: "purchase/" + index + "/acquired" }] })));
+    }
     layout.heading("Chegadas e validação por parcela");
     if (!receipts.length) layout.paragraph(associated.length ? "A entrada consta na chegada associada." : "Nenhuma chegada registrada até o corte.", "receipts/empty");
     for (const [index, receipt] of receipts.entries()) {

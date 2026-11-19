@@ -1,5 +1,30 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — item extra da COM com cadastro pendente.** O preenchimento pode
+começar em Materiais. O mesmo extra reaparece em Itens extras e Revisão.
+A COM pode ser emitida apenas com
+itens pendentes e mantém nome, tipo, unidade, quantidade e detalhes na
+ficha. A família com acesso a aprovação e catálogo identifica o produto
+compatível na mesma ficha. A operação preserva o item apresentado na emissão,
+grava a autoria e a versão, e não registra compra, recebimento ou estoque.
+
+- A conferência de emissão reconhece uma COM com apenas extras se o banco
+  confirmar os materiais da revisão. O PDF usa uma tabela etiquetada para
+  as pendências. Passaram 12 integrações com Auth real e 18 testes de
+  validação de resposta e PDF. A rodada móvel conferiu o PDF assinado e
+  a identificação na mesma ficha, a edição existente da REQ e um extra
+  da COM já associado ao catálogo. As capturas a 390 px estão em
+  `output/playwright/l2-com-pending-extras/`.
+- Permanece a escolha de permitir a compra dos itens identificados enquanto
+  outro extra aguarda cadastro. A interface e o banco mantêm essa compra
+  aguardando identificação enquanto a decisão está em aberto. O
+  [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) acompanha a questão.
+- `20261119224330` está aplicada localmente e no Supabase de desenvolvimento
+  após o ensaio com rollback e o backup verificado
+  `826b077b-e88a-4f40-b7c9-7decc4380308`. Os dois bancos têm 307 versões.
+  A comparação rastreou um lembrete agendado de ENT ocorrido no intervalo.
+  As linhas de materiais e os movimentos de estoque permanecem iguais.
+
 **19/11 — extra da REQ associado ao catálogo.** O material escolhido em
 Materiais reaparece em Itens extras com a identificação do catálogo.
 Editar ou remover o item atualiza o último rascunho, inclusive pelas ações

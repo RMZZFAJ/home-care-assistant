@@ -116,6 +116,12 @@ confere com o comando mestre.
 - **Vínculos e COM E05.** Vínculos por ficha ou material, importação seletiva,
   planejamento e chegada, compras mistas, falta e excesso, correção pelo autor,
   revisão individual ou em lote, chegada avulsa e cobertura do planejamento.
+  Itens extras da COM podem ser inseridos em Materiais ou Itens extras.
+  Os materiais fora do catálogo exigem nome, tipo, unidade e quantidade.
+  O rascunho, a revisão, a ficha e o PDF conservam a pendência e os detalhes.
+  A família habilitada pode escolher um produto compatível em Materiais.
+  A identificação conserva a linha original proposta no histórico, cria
+  uma única linha de planejamento e não registra compra, chegada ou estoque.
   Testes dirigidos conferiram emissão, recebimento e crédito único. Pendem
   revisão visual agrupada e CI do candidato que reúne os incrementos.
 - **ENT e DEV E06.** Expedição direta, conferência pessoal, falta e excedente
@@ -202,15 +208,24 @@ conferência histórica de aplicação inicial, sem inferência sobre dados atua
   Recomendação encaminhada: expedir os materiais disponíveis e mostrar a
   pendência separadamente. A escolha está em aberto.
 
-Continuam em execução os extras fora do catálogo no planejamento COM, em
-ENT e em DEV.
+- **COM mista com extra ainda sem identificação.** O laboratório prevê a
+  pendência de catálogo. A decisão encaminhada é liberar a compra dos
+  itens identificados enquanto a família resolve o extra, ou aguardar a
+  identificação de todos. Até a resposta, a COM guarda a pendência e
+  aguarda a identificação para iniciar compras. Uma COM emitida por
+  administrador conserva a aprovação inicial do planejamento.
+
+Continuam em execução os extras fora do catálogo em ENT e DEV. A resolução
+na COM exige a mesma unidade, precisão suficiente e um produto ainda ausente
+da ficha. Uma conversão de unidades ou união com uma linha já existente
+continua sem regra de produto nesta entrega.
 
 ## Migrations por ambiente
 
 Consulta de 19/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. **306 versões em cada banco**,
-de `20261019000100` a `20261119221703`, com os mesmos IDs do checkout. O
-histórico contém 242 versões anteriores a L1, 18 de L1 e 46 de L2. Os SQL de
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. **307 versões em cada banco**,
+de `20261019000100` a `20261119224330`, com os mesmos IDs do checkout. O
+histórico contém 242 versões anteriores a L1, 18 de L1 e 47 de L2. Os SQL de
 cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 Nenhuma versão só em arquivo, só na stack local, só no desenvolvimento ou
 pendente de aplicar nesta conferência. Produção fica fora desta consulta.
@@ -236,18 +251,20 @@ pendente de aplicar nesta conferência. Produção fica fora desta consulta.
 `20261119121610`, `20261119125023`, `20261119130945`, `20261119135903`,
 `20261119141610`, `20261119154356`, `20261119175654`, `20261119184524`,
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
-`20261119220003`, `20261119221703`.
+`20261119220003`, `20261119221703`, `20261119224330`.
 
 `20261119212000` e `20261119213000` tratam as observações numeradas e a
 justificativa da designação manual na transferência. `20261119220003`
 preserva a identificação proposta de um extra da REQ. `20261119221703`
-preserva a escolha explícita de um item do catálogo em Itens extras.
-O último incremento teve ensaio com rollback e backup cifrado verificado
-`f203c258-b857-4660-811b-a28a2594a3ca`. O SQL confere com o histórico
-vinculado. Os hashes estáveis dos dados de 201 tabelas permaneceram iguais
-ao comparar as mesmas colunas, e a coluna nova continua nula nas linhas
-anteriores. A comparação bruta encontrou variações de relógio e
-acompanhamento interno. O preview ainda aguarda a publicação do código.
+preserva a escolha explícita de um item do catálogo da REQ.
+`20261119224330` registra os extras da COM, a identificação posterior e
+a conferência com o rascunho. O ensaio com rollback e o backup cifrado
+`826b077b-e88a-4f40-b7c9-7decc4380308` foram verificados. O SQL confere com
+o histórico vinculado. Entre as 201 tabelas de dados comparadas, seis tiveram
+mudança estável no intervalo, explicada por um lembrete agendado de ENT
+às 20h02, com evento, auditoria e aviso interno. Linhas de materiais e
+estoque permaneceram iguais. A fila vinculada está vazia. O preview ainda
+aguarda a publicação do código.
 
 ### L3 e L4
 

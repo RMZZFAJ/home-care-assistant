@@ -7,6 +7,7 @@ import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import { purchaseArrivalVariance } from "@/lib/documents/purchase";
+import { pendingPurchaseItems } from "@/lib/documents/pending-purchase-items";
 
 const name = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const unit = (line: Record<string, unknown>) => String(line.unit_snapshot ?? "Unidade não preservada");
@@ -16,6 +17,12 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
   if (snapshot.type !== "COM" && snapshot.type !== "BAL") throw new Error("Approved supply content unavailable");
   const { facts, semanticFacts } = approvedDocumentContent(snapshot, emission);
   if (snapshot.type === "COM") {
+    for (const [index, item] of pendingPurchaseItems(snapshot.payload, snapshot.workflow).entries()) {
+      const key = "purchase/pending-extra/" + index;
+      semanticFacts[key + "/material"] = item.name + (item.details ? " " + item.details : "");
+      semanticFacts[key + "/planned"] = formatQuantity(item.quantity, item.unit);
+      semanticFacts[key + "/status"] = "Cadastro pendente";
+    }
     const entries = purchaseEntryBalances.parse(snapshot.purchaseEntryBalances);
     const coverage = snapshot.purchaseCoverage ?? [];
     const associatedLines = new Set(coverage.filter(item => item.primaryAssociation && item.targetDocumentId === snapshot.id)

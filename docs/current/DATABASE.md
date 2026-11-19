@@ -131,6 +131,13 @@ a classificação da seleção e os detalhes opcionais, com o mesmo vínculo ao
 paciente, à unidade e ao atendimento. O campo fica nulo em linhas comuns e
 em registros anteriores.
 
+Em COM, `payload.pendingExtras` guarda os itens cuja identidade ainda não
+existe no catálogo. A identificação posterior registra um evento e relaciona o
+item original à nova linha em `workflow_data.purchaseExtraResolutions`.
+O produto pertence ao mesmo paciente, usa a mesma unidade e aceita a precisão
+da quantidade proposta. A resolução muda a identidade no planejamento, sem
+registrar aquisição, recebimento ou movimentação de estoque.
+
 requisition_items distingue stock_observation (observed, unknown, unfilled ou
 legacy_unclassified) de current_stock. Unknown/unfilled exigem NULL; observed
 exige quantidade válida na precisão da unidade. Zero legado não é reclassificado.

@@ -1,9 +1,9 @@
 "use client";
 
-import { useId, useState, type FormEvent, type ReactNode } from "react";
+import { useState, type FormEvent } from "react";
 import { ActionButton, CheckboxField, FormField, Pill, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
-import { Dialog } from "@/components/ui/overlays";
+import { ExtraMaterialDialog } from "@/components/forms/extra-material-dialog";
 import { matchCatalog, normalizeCatalogText } from "@/lib/catalog-match";
 import { extraMaterialUnits } from "@/lib/documents/extra-material-identity";
 import { formatStockObservation, validStockObservation } from "@/lib/stock-observation";
@@ -145,7 +145,7 @@ function ExtraItemEditor({ item, isNew, products, selectedIds, limitReached, onC
     onSave({ ...draft, name: draft.name.trim(), identification: identification.data });
   }
 
-  return <ExtraEditorDialog isNew={isNew} onClose={onClose} onSubmit={apply} submitDisabled={isNew && limitReached}>
+  return <ExtraMaterialDialog isNew={isNew} onClose={onClose} onSubmit={apply} submitDisabled={isNew && limitReached}>
       {isNew && limitReached ? <p className="doc-subtle">O limite de itens fora do catálogo foi atingido. Você ainda pode escolher um material do catálogo.</p> : null}
       <FormField label={fields.name} error={errors.name}>
         <TextInput required value={draft.name} maxLength={200} placeholder="Digite o nome do material" onChange={event => {
@@ -181,7 +181,7 @@ function ExtraItemEditor({ item, isNew, products, selectedIds, limitReached, onC
       <FormField label="Detalhes para identificar">
         <TextAreaField rows={2} maxLength={400} value={details} placeholder="Opcional · apresentação ou tamanho" onChange={event => setDetails(event.currentTarget.value)} />
       </FormField>
-  </ExtraEditorDialog>;
+  </ExtraMaterialDialog>;
 }
 
 function CatalogueExtraEditor({ product, line, pending, onSave, onClose }: {
@@ -206,7 +206,7 @@ function CatalogueExtraEditor({ product, line, pending, onSave, onClose }: {
     }
     onSave({ ...draft, catalogueExtra: details.trim() ? { details: details.trim() } : {} });
   }
-  return <ExtraEditorDialog isNew={false} onClose={onClose} onSubmit={apply}>
+  return <ExtraMaterialDialog isNew={false} onClose={onClose} onSubmit={apply}>
     <FormField label="Material"><TextInput value={product.name} disabled /></FormField>
     <StockObservationField value={draft.currentStock} mode={draft.stockObservation} at={draft.stockObservationAt}
       unit={product.unit} decimals={decimals} error={errors.stock} onChange={change => setDraft({ ...draft, ...change })} />
@@ -216,19 +216,5 @@ function CatalogueExtraEditor({ product, line, pending, onSave, onClose }: {
     </FormField>
     {pending.length ? <RequisitionRepeatReason productId={product.id} pending={pending} value={draft.repeatReason}
       error={errors.reason} onChange={repeatReason => setDraft({ ...draft, repeatReason })} /> : null}
-  </ExtraEditorDialog>;
-}
-
-function ExtraEditorDialog({ isNew, onClose, onSubmit, submitDisabled, children }: {
-  isNew: boolean; onClose: () => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  submitDisabled?: boolean; children: ReactNode;
-}) {
-  const formId = useId();
-  return <Dialog open onClose={onClose} kicker="Itens extras" title={isNew ? "Adicionar item extra" : "Editar item extra"}
-    popupClassName="hca-requisition-extra" subtitle="Identifique o material e confira a unidade." footer={<>
-      <ActionButton onClick={onClose}>Voltar</ActionButton>
-      <ActionButton type="submit" form={formId} variant="primary" disabled={submitDisabled}><Icon name="check" />{isNew ? "Adicionar material" : "Salvar alteração"}</ActionButton>
-    </>}>
-    <form id={formId} className="hca-form-stack" noValidate onSubmit={onSubmit}>{children}</form>
-  </Dialog>;
+  </ExtraMaterialDialog>;
 }

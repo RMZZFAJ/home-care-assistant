@@ -515,6 +515,14 @@ o mesmo `productId`, a unidade do catálogo e as regras de estoque e
 reiteração. A confirmação vinculada ao rascunho confere essa classificação
 e os detalhes por produto.
 
+COM pode conter `payload.pendingExtras`, inclusive quando ainda não há uma
+linha do catálogo. Cada item preserva `id`, nome, tipo, unidade, quantidade
+e detalhes opcionais. A emissão vinculada a um rascunho confere a mesma lista
+antes de registrar a ficha. `resolve_purchase_extra` recebe `extraId`,
+`productId`, chave e versão esperada. A identificação exige leitura da COM
+e as permissões vigentes para aprovação e catálogo. As novas tentativas da
+mesma chave recuperam a identificação já registrada.
+
 Opcionalmente, remainingNeed contém requisitionId, version e reason próprios
 para emitir nova necessidade vinculada. Não aceita ator, protocolo, snapshots
 ou quantidade solicitada nessa referência. A origem deve ser REQ operacional

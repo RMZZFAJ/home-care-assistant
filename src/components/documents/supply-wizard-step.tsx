@@ -6,6 +6,8 @@ import { MaterialConsultButton } from "./catalogue-material-panel";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { materialCategories, supplyExtrasStep, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { WizardCatalogueExtra } from "@/components/forms/wizard-catalogue-extra";
+import { PurchaseExtraItems } from "./purchase-extra-items";
+import type { PendingPurchaseExtra } from "@/lib/validation/pending-purchase-extras";
 import { IssuanceObservationsEditor, IssuanceObservationList } from "@/components/forms/issuance-observations";
 import { issuanceObservations } from "@/lib/documents/issuance-observations";
 import {
@@ -40,6 +42,7 @@ import type {
 export type WizardState = {
   quantities: Record<string, string>;
   extraProductIds?: string[];
+  pendingExtras?: PendingPurchaseExtra[];
   notes: string;
   observations?: string[];
   observationTimes?: Record<string, string | null>;
@@ -129,13 +132,20 @@ export function SupplyWizardStep({
   const selected = catalog.filter((product) =>
     Object.hasOwn(form.quantities, product.id),
   );
-  function addExtra(id: string) {
+  const pendingExtras = type === "COM" ? form.pendingExtras ?? [] : [];
+  function addExtra(id: string, amount = "", replace?: string) {
     setForm(current => Object.hasOwn(current.quantities, id) ? current : {
       ...current,
-      quantities: { ...current.quantities, [id]: "" },
+      quantities: { ...current.quantities, [id]: amount },
       extraProductIds: [...(current.extraProductIds ?? []), id],
+      ...(replace ? { pendingExtras: current.pendingExtras?.filter(item => item.id !== replace) } : {}),
     });
   }
+  const extraControl = type === "COM"
+    ? <PurchaseExtraItems items={pendingExtras} catalogue={catalog} selected={form.quantities} inExtras={isExtraStep}
+        onChange={items => setForm(current => ({ ...current, pendingExtras: items }))} onChoose={addExtra} />
+    : <WizardCatalogueExtra catalogue={catalog} selectedIds={Object.keys(form.quantities)} onAdd={addExtra}
+        label={isExtraStep ? "Adicionar item extra" : undefined} />;
   function selectProduct(id: string, include: boolean) {
     setForm(current => {
       const quantities = { ...current.quantities };
@@ -379,10 +389,10 @@ export function SupplyWizardStep({
           {category && type !== "BAL" ? <>
             <WizardMaterialCategories category={category} selected={selected.filter(item => !extras.has(item.id))} onChange={onCategoryChange} />
             <div className="hca-toolbar"><BarcodeScanner onRead={scan} />
-              <WizardCatalogueExtra catalogue={catalog} selectedIds={Object.keys(form.quantities)} onAdd={addExtra} />
+              {extraControl}
             </div>
           </> : null}
-          {isExtraStep ? <WizardCatalogueExtra catalogue={catalog} selectedIds={Object.keys(form.quantities)} onAdd={addExtra} label="Adicionar item extra" /> : null}
+          {isExtraStep ? extraControl : null}
           {category ? <label className="block text-sm font-semibold">
             Buscar materiais nesta categoria
             <input
@@ -414,7 +424,7 @@ export function SupplyWizardStep({
               : "materiais selecionados"}
             . As seleções permanecem ao filtrar ou trocar de categoria.
           </p>) : null}
-          {!visibleProducts.length ? (
+          {!visibleProducts.length && !(isExtraStep && pendingExtras.length) ? (
             <Notice>
               {isExtraStep ? "Nenhum item extra incluído." : "Nenhum material nesta busca. Ajuste ou limpe o filtro; suas seleções continuam preservadas."}
             </Notice>
@@ -590,7 +600,15 @@ export function SupplyWizardStep({
             })}
             <section aria-label="Itens extras">
               <h3>Itens extras</h3>
-              {extras.size ? <MaterialReview rows={reviewRows.filter(row => extras.has(row.id))} /> : <p className="hca-field-help">Nenhum item extra incluído.</p>}
+              {extras.size || pendingExtras.length ? <MaterialReview rows={[
+                ...reviewRows.filter(row => extras.has(row.id)),
+                ...pendingExtras.map(item => ({
+                  id: item.id, name: item.name,
+                  details: <><small>{formatQuantity(item.quantity, item.unit)} · Cadastro pendente</small>
+                    {item.details ? <small className="whitespace-pre-wrap">{item.details}</small> : null}
+                  </>,
+                })),
+              ]} /> : <p className="hca-field-help">Nenhum item extra incluído.</p>}
             </section>
           </> : <ul className="divide-y divide-(--line)">
             {selected.map((product) => (
