@@ -78,11 +78,13 @@ o login; o acesso correto já foi confirmado por consulta de migrations.
 
 ```sh
 npm run supabase:project -- doctor
-npm run supabase:project -- db push --dry-run
+node scripts/supabase-project.mjs db push --dry-run
 ```
 
-Use o mesmo wrapper para a aplicação revisada. Ele recusa troca de identidade
-ou destino. O login explícito é `npm run supabase:project -- login`.
+Use `node scripts/supabase-project.mjs db push --apply` para aplicar a fila
+revisada. A chamada direta do Node preserva a opção de execução no PowerShell.
+O wrapper exige o modo explícito e recusa troca de identidade ou destino.
+O login explícito é `npm run supabase:project -- login`.
 
 O banco local home-care-assistant é o ambiente de desenvolvimento e testes.
 Reset local requer a proteção descrita em [Testes](TESTING.md). Reset remoto,

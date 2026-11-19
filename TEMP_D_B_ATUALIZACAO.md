@@ -1,5 +1,13 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — migrations no Supabase de desenvolvimento.** A invocação via npm
+no PowerShell retirou `--dry-run` antes de chamar o wrapper. As 28 migrations
+já ensaiadas foram aplicadas. A conferência encontrou 300 versões até
+`20261119184524`, sem divergências, `ent_transfers` vazia e leitura das listas da
+residência restrita à RPC autenticada. O wrapper exige `--dry-run` ou `--apply`
+via chamada direta do Node. A PR #7 continua em
+`075b4b66`, com a publicação do código compatível pendente de autorização.
+
 **19/11 — listas frequentes da residência.** A primeira etapa de REQ, COM
 e ENT oferece seleção manual ou listas da casa. O bloco abre no próprio
 formulário. O diálogo Organizar listas permite criar e editar. Quando o

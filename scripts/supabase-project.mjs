@@ -43,6 +43,13 @@ function verifyAccess(user) {
 export function runProjectCommand(args) {
   if (args.some((argument) => /^--(?:profile|workdir|project-ref|db-url)(?:=|$)/.test(argument))) throw new Error("Target/profile overrides are not accepted by the project wrapper.");
   if (["unlink","logout"].includes(args[0]) || args[0] === "projects" && args[1] !== "list" || args[0] === "db" && args[1] === "reset" || args[0] === "migration" && args[1] === "repair") throw new Error("This operation is outside the project update workflow. Local resets use the backed-up, explicitly authorized test harness.");
+  if (args[0] === "db" && args[1] === "push") {
+    const modes = args.filter(argument => argument === "--apply" || /^--dry-run(?:=|$)/.test(argument));
+    if (modes.length !== 1 || (modes[0] !== "--dry-run" && modes[0] !== "--apply")) {
+      throw new Error("Specify exactly one migration mode. Run node scripts/supabase-project.mjs db push --dry-run to preview, or use --apply to apply.");
+    }
+    if (modes[0] === "--apply") args = args.filter(argument => argument !== "--apply");
+  }
   if (args[0] === "login") {
     mkdirSync(cliHome,{recursive:true});
     writeFileSync(profile,"name: home-care-assistant\napi_url: https://api.supabase.com\ndashboard_url: https://supabase.com/dashboard\nproject_host: supabase.co\npooler_host: supabase.com\n",{mode:0o600});

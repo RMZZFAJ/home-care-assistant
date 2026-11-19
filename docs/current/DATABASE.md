@@ -1,5 +1,13 @@
 # Banco de dados
 
+O Supabase de desenvolvimento e preview está em 300 migrations até
+`20261119184524`, sem divergência no histórico. As 28 versões seguintes a
+`20261119060719` já haviam passado pelo ensaio transacional revertido. A aplicação
+definitiva ocorreu quando a invocação do npm no PowerShell omitiu `--dry-run`.
+O wrapper agora exige modo explícito antes de conectar. Na consulta após a
+aplicação, `ent_transfers` estava vazia. O preview da PR #7 em `075b4b66`
+continua com o contrato de expedição anterior e aguarda atualização do código.
+
 Em 19/11/2026, o Supabase de desenvolvimento e preview recebeu as
 12 migrations de L2 entre `20261119023722` e `20261119060719`.
 O histórico foi reconciliado em 272 versões após backup crítico cifrado
