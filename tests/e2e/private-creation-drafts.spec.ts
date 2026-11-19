@@ -437,7 +437,7 @@ test("reconto BAL privado retoma em outro aparelho e confirma uma única versão
     .getByLabel("Observações da contagem", { exact: true })
     .fill("Reconto parcial privado da substituta");
   await save(page).click();
-  await expect(panel(page)).toBeVisible();
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   expect(
     sql(
       `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(f.document.id)}),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)}));`,

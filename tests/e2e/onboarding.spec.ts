@@ -124,8 +124,9 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await page
     .getByRole("link", { name: "Abrir Home Care Assistant", exact: true })
     .click();
+  // The header can be ready before the authorized context chooser mounts.
   await expect(
-    page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
+    page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
   await selectContext(page, patientA);
   const context = await (await page.request.get("/api/context")).json();
