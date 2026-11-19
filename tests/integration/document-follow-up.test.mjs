@@ -64,17 +64,43 @@ test("REQ concluída pode reabrir, continua aberta após refresh e exige nova co
   assert.equal(ledger(f), before);
 });
 
-test("requisição arquivada preserva o estado diante de tentativa de reversão da conclusão", async () => {
+test("requisição arquivada antes do PDF consolidado preserva o estado e a recuperação legada", async () => {
   const f = await setup(), req = await issue(f.patient, [f.products[0]]);
   const team = await actor("professional", f.patient);
   const ent = await delivery(f.patient, req, [f.products[0]]);
   await supply(team, ent, "receive", { divergences: [] });
   const complete = await read(f.admin, req.id);
   const previous = ledger(f);
-  await rpc(f.admin, "archive_requisition", { p_id: req.id, p_reason: "Arquivo fictício anterior à revisão." });
+  const reason = "Arquivo fictício anterior à revisão.";
+  const author = (await f.admin.auth.getUser()).data.user.id;
+  const earlierReview = await rpc(f.admin, "requisition_decision_context", { p_id: req.id });
+  const intent = {
+    domain: "requisition", action: "archive", expectedVersion: earlierReview.documentVersion,
+    referenceHash: earlierReview.referenceHash, body: { reason },
+  };
+  const oldKey = randomUUID();
+  // Represent a synthetic native archive and decision receipt from before L2.
+  sql(`update public.requisition_lifecycle set archived_at=now(),archived_by=${q(author)},
+    archive_reason=${q(reason)} where requisition_id=${q(req.id)}`);
   const archived = await read(f.admin, req.id);
   assert.equal(archived.canReopen, false);
   assert.equal(archived.state, "archived");
+  const archive = await rpc(f.admin, "document_archive_reference", { p_document: req.id });
+  assert.equal(archive.archive, null);
+  assert.equal(archive.canArchive, false);
+  const oldResult = await rpc(f.admin, "requisition_progress", { p_id: req.id });
+  assert.ok(oldResult.archivedAt);
+  sql(`insert into private.document_decision_results(actor_id,key,document_id,state,intention,result)
+    values(${q(author)},${q(oldKey)},${q(req.id)},'applied',${q(JSON.stringify(intent))}::jsonb,${q(JSON.stringify(oldResult))}::jsonb)`);
+  const recovered = await act(f.admin, { p_document: req.id, p_key: oldKey, p_intention: intent });
+  assert.equal(recovered.state, "applied");
+  assert.deepEqual(recovered.result, oldResult);
+  const current = await rpc(f.admin, "requisition_decision_context", { p_id: req.id });
+  assert.equal((await f.admin.rpc("execute_document_decision", { p_document: req.id, p_key: randomUUID(),
+    p_intention: { ...intent, expectedVersion: current.documentVersion, referenceHash: current.referenceHash },
+  })).error?.code, "PT409");
+  assert.equal((await rpc(f.admin, "archive_requisition", { p_id: req.id, p_reason: reason })).archivedAt, oldResult.archivedAt);
+  assert.equal((await f.admin.rpc("archive_requisition", { p_id: req.id, p_reason: "Outra intenção fictícia" })).error?.code, "PT409");
   for (const reference of [complete, archived])
     assert.equal((await f.admin.rpc("execute_document_decision", command(reference, "reopen"))).error?.code, "PT409");
   assert.equal(ledger(f), previous);

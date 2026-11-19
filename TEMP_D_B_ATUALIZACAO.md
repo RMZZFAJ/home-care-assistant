@@ -1,5 +1,23 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — unificação da entrada de arquivamento de REQ.** A rota antiga
+aceita a mesma revisão versionada da rota de ciclo de vida. Toda nova
+requisição de arquivo passa pelo PDF consolidado assinado e validado. O
+formato antigo recupera o arquivo da própria pessoa com a mesma
+justificativa. Recibos confirmados anteriormente seguem recuperáveis.
+
+- A API direta, o comando de decisão e a confirmação de rascunho não
+  iniciam arquivamentos pelo contrato antigo. A fila do painel mostra
+  somente conclusões que o administrador no vínculo atual pode arquivar.
+- Passaram nove integrações com Auth real, incluindo revogação durante
+  o bloqueio da transação, preservação de recibo anterior e assinatura.
+  Android e iOS emulados recuperaram a mesma emissão pelas duas rotas
+  e abriram a consulta da REQ arquivada. A navegação após a ciência agora
+  espera pela atualização visível da ficha no teste.
+- O banco local chegou a 292 migrations até `20261119113059`. As 20
+  pendentes passaram pela pré-validação com rollback no desenvolvimento.
+  O remoto permanece em 272 até a publicação do preview compatível.
+
 **19/11 — arquivamento pelo prazo da residência.** O sistema usa a
 configuração efetiva para REQ, COM, ENT e DEV concluídas ou canceladas.
 Para REQ concluída, permanecem os critérios existentes de ciência e

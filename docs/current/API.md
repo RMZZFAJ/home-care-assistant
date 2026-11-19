@@ -336,7 +336,8 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 - **Rota:** /api/requisitions/:id/archive
 
-  **Contrato:** Arquivamento local justificado e auditado
+  **Contrato:** Aceita o comando de arquivamento com revisão e PDF
+  consolidado. O formato anterior recupera atos já registrados.
 
 - **Rota:** /api/requisitions/:id/resolve
 
@@ -641,6 +642,11 @@ administrador do paciente e revalidação da autoridade dentro da transação.
 antecipação (`early`) e motivo próprio (`other`). O último recebe
 `reason`. A primeira confirmação cria uma solicitação de consolidação
 vinculada à decisão revisada. A mesma chave recupera essa solicitação.
+
+A rota de REQ aceita o mesmo comando. Um pedido antigo contendo apenas a
+justificativa pode recuperar o arquivo registrado pela mesma pessoa com
+esse motivo. Para iniciar um arquivo, obtenha a referência atual e envie
+o comando revisado. A recuperação de recibos anteriores continua disponível.
 
 O sistema congela a fonte e assina o PDF. A ficha só muda para arquivada
 após a confirmação do exemplar e a revalidação da fonte, incluindo os

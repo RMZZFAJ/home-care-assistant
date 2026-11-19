@@ -17,6 +17,7 @@ import {
 } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { archiveIntention, sealSignedArchive } from "./document-archive-fixtures.mjs";
 
 test("V4 review: archive rechecks revoked capability after waiting for the patient transaction lock", async () => {
   const { patient, admin, products } = await setup();
@@ -30,6 +31,9 @@ test("V4 review: archive rechecks revoked capability after waiting for the patie
     p_version: ent.version,
   });
   const archiver = await actor("global", patient);
+  const review = await rpc(archiver, "document_archive_reference", { p_document: req.id });
+  assert.equal(review.canArchive, true);
+  const intent = archiveIntention(review, "Tentativa concorrente após revogação");
   const version = (
     await rpc(admin, "patient_governance", { p_patient: patient })
   ).data.version;
@@ -78,16 +82,13 @@ test("V4 review: archive rechecks revoked capability after waiting for the patie
     );
     await until(() => output.includes("archive_lock_ready"));
     archive = archiver
-      .rpc("archive_requisition", {
-        p_id: req.id,
-        p_reason: "Tentativa concorrente após revogação",
-      })
+      .rpc("prepare_document_archive", intent)
       .abortSignal(AbortSignal.timeout(10000))
       .then((result) => result);
     await until(
       () =>
         sql(
-          "select exists(select 1 from pg_stat_activity where datname='postgres' and state='active' and wait_event='advisory' and query like '%archive_requisition%')",
+          "select exists(select 1 from pg_stat_activity where datname='postgres' and state='active' and wait_event='advisory' and query like '%prepare_document_archive%')",
         ) === "t",
     );
     // The SQL bridge uses an actual Auth session, then the same policy RPC as HTTP.
@@ -116,6 +117,7 @@ test("V4 review: archive rechecks revoked capability after waiting for the patie
       (await rpc(admin, "requisition_progress", { p_id: req.id })).archivedAt,
       null,
     );
+    assert.equal(sql(`select count(*) from private.document_archive_attempts where document_id=${sqlLiteral(req.id)}`), "0");
     assert.equal(
       sql(
         "select count(*) from public.document_events where document_id=" +
@@ -302,10 +304,11 @@ test("V4 review: collective science and dashboard archive filters match authorit
     null,
   );
   await archiveCapability(null);
-  await rpc(admin, "archive_requisition", {
-    p_id: ids[0],
-    p_reason: "Arquivamento manual de cenário fictício revisado",
-  });
+  const review = await rpc(admin, "document_archive_reference", { p_document: ids[0] });
+  const reason = "Arquivamento manual de cenário fictício revisado";
+  assert.equal((await admin.rpc("archive_requisition", { p_id: ids[0], p_reason: reason })).error?.code, "PT409");
+  const archived = await sealSignedArchive(admin, archiveIntention(review, reason));
+  assert.ok(archived.issuanceId);
   await issue(patient, [products[0]]);
   tasks = await rpc(admin, "operational_tasks", { p_patient: patient });
   list = await rpc(admin, "operational_document_list", {

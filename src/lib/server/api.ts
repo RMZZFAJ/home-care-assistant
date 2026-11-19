@@ -40,6 +40,8 @@ export function databaseError(
     throw new ApiError("VERSION_CONFLICT", "A quantidade supera as chegadas aprovadas nas compras vinculadas ao material. Confira a quantidade e as origens.", 409);
   if (error?.code === "PT409" && /^(archive review changed|archive decision reference changed)$/.test(message))
     throw new ApiError("VERSION_CONFLICT", "A situação do arquivamento mudou. Consulte a ficha para conferir as decisões disponíveis.", 409);
+  if (error?.code === "PT409" && message === "consolidated archive review required")
+    throw new ApiError("INVALID_OPERATION", "Abra a ficha e escolha Arquivar ficha para revisar os dados e gerar o PDF consolidado.", 409);
   if (error?.code === "PT409" && message === "archived document is read only")
     throw new ApiError("VERSION_CONFLICT", "A ficha arquivada está disponível para consulta e download.", 409);
   if (error?.code === "PT409" && message === "verified consolidated PDF required")

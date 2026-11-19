@@ -523,9 +523,18 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
         ).json()
       ).total,
     ).toBe(1);
-    await post(page, "/api/requisitions/" + req.requisitionId + "/archive", {
-      reason: "Conclusão fictícia revisada pelo administrador local.",
-    });
+    const legacyEndpoint = "/api/requisitions/" + req.requisitionId + "/archive";
+    const canonical = "/api/documents/" + req.requisitionId + "/lifecycle/archive";
+    const reason = "Conclusão fictícia revisada pelo administrador local.";
+    const unreviewed = await page.request.post(legacyEndpoint, { data: { reason } });
+    expect(unreviewed.status()).toBe(409);
+    expect(await unreviewed.json()).toMatchObject({ code: "INVALID_OPERATION" });
+    const reference = await (await page.request.get(canonical)).json();
+    const command = { action: "archive", key: randomUUID(), version: reference.version, referenceHash: reference.referenceHash, mode: "other", reason };
+    const result = await post(page, legacyEndpoint, command);
+    expect(result).toMatchObject({ documentId: req.requisitionId, issuanceId: expect.any(String), reason });
+    expect(await post(page, canonical, command)).toEqual(result);
+    expect((await post(page, legacyEndpoint, { reason })).data.archivedAt).toBe(result.archivedAt);
     await expect(
       page.getByRole("link").filter({ hasText: req.code }),
     ).toHaveCount(0);

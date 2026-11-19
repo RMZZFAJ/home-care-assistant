@@ -5,6 +5,7 @@ import { setInterval, clearInterval } from "node:timers";
 import { createClient } from "@supabase/supabase-js";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { archiveIntention, sealSignedArchive } from "./document-archive-fixtures.mjs";
 
 import {
   env,
@@ -211,11 +212,21 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
       })
     ).error,
   );
-  const archived = await rpc(admin, "archive_requisition", {
-    p_id: req.id,
-    p_reason: "Conferência administrativa concluída",
-  });
-  assert.ok(archived.archivedAt);
+  const reviewed = await rpc(admin, "document_archive_reference", { p_document: req.id });
+  const reason = "Conferência administrativa concluída";
+  const current = await rpc(admin, "requisition_decision_context", { p_id: req.id });
+  assert.equal((await admin.rpc("execute_document_decision", {
+    p_document: req.id, p_key: randomUUID(), p_intention: {
+      domain: "requisition", action: "archive", expectedVersion: current.documentVersion,
+      referenceHash: current.referenceHash, body: { reason },
+    },
+  })).error?.code, "PT409");
+  const intent = archiveIntention(reviewed, reason);
+  const archived = await sealSignedArchive(admin, intent);
+  assert.ok(archived.archivedAt && archived.issuanceId);
+  const recovered = await rpc(admin, "archive_requisition", { p_id: req.id, p_reason: reason });
+  assert.equal(recovered.archivedAt, archived.archivedAt);
+  assert.equal(recovered.archiveReason, reason);
 });
 
 test("V4: local changes apply immediately; global proposals need a different local person", async () => {
@@ -305,6 +316,7 @@ test("V4: completion without science permanently blocks automatic archive and pr
     auth: { persistSession: false },
   });
   await rpc(service, "run_operational_schedule");
+  await rpc(service, "claim_scheduled_document_archives", { p_limit: 2 });
   assert.equal(
     (await rpc(admin, "requisition_progress", { p_id: req.id })).archivedAt,
     null,
@@ -318,18 +330,15 @@ test("V4: completion without science permanently blocks automatic archive and pr
   assert.equal(progress.scienceSatisfied, true);
   assert.equal(progress.manualArchiveRequired, true);
   await rpc(service, "run_operational_schedule");
+  await rpc(service, "claim_scheduled_document_archives", { p_limit: 2 });
   assert.equal(
     (await rpc(admin, "requisition_progress", { p_id: req.id })).archivedAt,
     null,
   );
-  assert.ok(
-    (
-      await rpc(admin, "archive_requisition", {
-        p_id: req.id,
-        p_reason: "Arquivamento manual com evidência da exceção",
-      })
-    ).archivedAt,
-  );
+  assert.equal(sql(`select count(*) from private.document_archive_attempts where document_id=${sqlLiteral(req.id)} and prepared_by is null`), "0");
+  const review = await rpc(admin, "document_archive_reference", { p_document: req.id });
+  const attempt = await sealSignedArchive(admin, archiveIntention(review, "Arquivamento manual com evidência da exceção"));
+  assert.ok(attempt.archivedAt && attempt.issuanceId);
 });
 
 test("V4: legacy header visibility consent cannot record new SCI and the manual alternative remains available", async () => {

@@ -116,7 +116,7 @@ test("REQ follow-up reaches pending ENT and partial fulfillment; stale reads and
   expect(facts(f.patient)).toBe(partial);
 });
 
-test("REQ completed fulfillment keeps personal science separate and archived follow-up opens preserved history", async ({ page }) => {
+test("REQ completed fulfillment keeps personal science separate and archived follow-up opens preserved history", async ({ page, browser }) => {
   const f = await setup(), family = await actor("family", f.patient);
   const restore = await manualPreference(family);
   try {
@@ -163,15 +163,27 @@ test("REQ completed fulfillment keeps personal science separate and archived fol
     await uncertainScience.getByRole("button", { name: "Confirmar a mesma ciência", exact: true }).click();
     expect((await science).ok()).toBe(true);
     await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar a conclusão e o arquivamento");
     await selectDocumentSection(page, "workflow");
     await expect(overview(page)).toContainText("Minha ciência: registrada");
     await selectDocumentSection(page, "overview");
-    await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar a conclusão e o arquivamento");
     expect(await rpc(family, "requisition_fulfillment", { p_requisition: req.id })).toEqual(before);
     expect(ledger(f.patient)).toBe(physical);
     expect(sql(`select count(*) from public.requisition_science_events where requisition_id=${q(req.id)} and user_id=${q(fixtures.family.id)};`)).toBe("1");
 
-    await rpc(f.admin, "archive_requisition", { p_id: req.id, p_reason: "Arquivamento fictício após conferir os fatos independentes" });
+    const administrator = await browser.newPage();
+    try {
+      await login(administrator, f.patient, "adminA");
+      const endpoint = `/api/documents/${req.id}/lifecycle/archive`;
+      const reference = await (await administrator.request.get(endpoint)).json();
+      const response = await administrator.request.post(endpoint, { data: {
+        action: "archive", key: randomUUID(), version: reference.version, referenceHash: reference.referenceHash, mode: "policy",
+      } });
+      expect(response.status(), await response.text()).toBe(200);
+      expect(await response.json()).toMatchObject({ documentId: req.id, issuanceId: expect.any(String) });
+    } finally {
+      await administrator.close();
+    }
     const archived = facts(f.patient);
     await open(page, req.id);
     await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Consultar o arquivamento");
