@@ -35,13 +35,10 @@ async function next(page: Page) {
 }
 async function hygiene(page: Page) {
   await next(page);
-  await next(page);
-  await expect(
-    page.getByRole("heading", { name: "Higiene", exact: true }),
-  ).toBeVisible();
+  await page.getByRole("navigation", { name: "Tipos de material" }).getByRole("button", { name: /^Higiene/ }).click();
 }
 async function review(page: Page) {
-  for (let step = 0; step < 4; step++) await next(page);
+  for (let step = 0; step < 3; step++) await next(page);
   await expect(
     page.getByRole("heading", { name: "Revisão", exact: true }),
   ).toBeVisible();
@@ -89,6 +86,8 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   const ledger = ledgerState();
   await login(page, f.patient);
   await hygiene(page);
+  const steps = page.getByRole("navigation", { name: "Etapas da requisição" });
+  await expect(steps.getByRole("button")).toHaveText([/Confirmação/, /Materiais/, /Extras/, /Observações/, /Revisão/]);
   const row = card(page, "Líquido fictício da observação exata");
   await row.getByRole("checkbox").first().check();
   const input = row.getByLabel("Estoque observado com a equipe", {
@@ -97,11 +96,10 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   await expect(input).toHaveValue("1.75");
   await input.fill("1.0000000000000001");
   await expect(input).toHaveValue("1.0000000000000001");
+  await page.getByRole("button", { name: /^Dieta/ }).click();
   await next(page);
   await expect(input).toHaveAttribute("aria-invalid", "true");
-  await expect(
-    page.getByRole("heading", { name: "Higiene", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Higiene/, pressed: true })).toBeVisible();
   const raw = JSON.stringify({
     careRecipientId: f.patient,
     idempotencyKey: randomUUID(),
@@ -137,8 +135,8 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   await page
     .getByRole("button", { name: "Continuar rascunho", exact: true })
     .click();
-  await expect(page.locator('[aria-current="step"]')).toContainText("Higiene");
-  await expect(page.getByRole("heading", { name: "Higiene", exact: true })).toBeVisible();
+  await expect(steps.getByRole("button", { name: "Materiais", exact: true })).toHaveAttribute("aria-current", "step");
+  await expect(page.getByRole("button", { name: /^Higiene/, pressed: true })).toBeVisible();
   await expect(input).toHaveValue("1,25");
   await review(page);
   await expect(

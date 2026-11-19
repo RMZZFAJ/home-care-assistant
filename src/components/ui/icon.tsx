@@ -32,6 +32,7 @@ const paths = {
   "upload": "M12 17V4 M8 8l4-4 4 4 M4 18v3h16v-3",
   "calendar": "M4 5h16v16H4z M4 10h16 M8 3v4 M16 3v4 M8 14h2 M14 14h2 M8 18h2",
   "heart": "M12 21C-3 12 3 1 12 7c9-6 15 5 0 14",
+  "pill": "M5 19a5 5 0 0 1 0-7l7-7a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7 0z M8.5 8.5l7 7",
   "alert": canonicalSymbols.alert,
   "info": "M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0 M12 11v6 M12 7h.01",
   "history": canonicalSymbols.history,

@@ -56,19 +56,21 @@ export function StepNavigator({
   onChange,
   disabled = false,
   label = "Etapas da ficha",
+  compact = false,
 }: {
   steps: string[];
   active: number;
   onChange: (step: number) => void;
   disabled?: boolean;
   label?: string;
+  compact?: boolean;
 }) {
   const containerRef = useRef<HTMLOListElement>(null);
   useEffect(() => {
     const current = containerRef.current?.querySelector<HTMLButtonElement>(
       '[aria-current="step"]',
     );
-    if (current && containerRef.current)
+    if (!compact && current && containerRef.current)
       containerRef.current.scrollTo({
         left:
           current.offsetLeft -
@@ -79,20 +81,20 @@ export function StepNavigator({
           ? "instant"
           : "smooth",
       });
-  }, [active]);
+  }, [active, compact]);
   return (
-    <nav className="wizard-navigation" aria-label={label}>
-      <div className="wizard-progress-label">
+    <nav className={"wizard-navigation" + (compact ? " hca-five-stage-navigation" : "")} aria-label={label}>
+      {!compact ? <div className="wizard-progress-label">
         <span>
           Etapa {active + 1} de {steps.length}
         </span>
         <strong>{steps[active]}</strong>
-      </div>
+      </div> : null}
       <ol
         ref={containerRef}
         className="wizard-steps"
-        tabIndex={0}
-        aria-label="Barra de etapas; use as setas do teclado para rolar"
+        tabIndex={compact ? undefined : 0}
+        aria-label={compact ? undefined : "Barra de etapas; use as setas do teclado para rolar"}
       >
         {steps.map((step, index) => (
           <li key={step}>
@@ -103,7 +105,7 @@ export function StepNavigator({
               disabled={disabled || index > active}
               onClick={() => onChange(index)}
             >
-              <span>
+              <span aria-hidden={compact || undefined}>
                 {index < active ? (
                   <Icon name="check" width="14" height="14" />
                 ) : (

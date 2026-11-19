@@ -622,7 +622,7 @@ test.describe("administração integrada no ambiente local", () => {
     }
     expect(productId).toBeTruthy();
     await page.goto(`/fichas/req?careRecipientId=${patientId}`);
-    for (let step = 0; step < 4; step++)
+    for (let step = 0; step < 2; step++)
       await page.getByRole("button", { name: "Avançar", exact: true }).click();
     await page
       .getByRole("button", { name: "+ Incluir novo item", exact: true })

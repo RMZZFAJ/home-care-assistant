@@ -127,8 +127,10 @@ for (const count of [1, 5, 20, 100]) {
               );
           }
           await next(page);
+          const categories = page.getByRole("navigation", { name: "Tipos de material", exact: true });
           await expect(
-            page.getByRole("heading", { name: "Medicamentos", exact: true }),
+            type === "REQ" ? categories.getByRole("button", { name: /^Medicamentos/, pressed: true })
+              : page.getByRole("heading", { name: "Medicamentos", exact: true }),
           ).toBeVisible();
           const filter = () =>
             page.getByLabel(
@@ -164,9 +166,11 @@ for (const count of [1, 5, 20, 100]) {
           await expect(status(page)).toContainText(selectedText(1));
           await filter().fill(definitions[0].aliases[0]);
           await expect(choice(0)).toBeChecked();
-          await next(page);
+          if (type === "REQ") await categories.getByRole("button", { name: /^Higiene/ }).click();
+          else await next(page);
           await expect(
-            page.getByRole("heading", { name: "Higiene", exact: true }),
+            type === "REQ" ? categories.getByRole("button", { name: /^Higiene/, pressed: true })
+              : page.getByRole("heading", { name: "Higiene", exact: true }),
           ).toBeVisible();
           await expect(status(page)).toContainText(selectedText(1));
           if (count > 1) {
@@ -188,7 +192,7 @@ for (const count of [1, 5, 20, 100]) {
           await page
             .getByRole("navigation", {
               name:
-                type === "REQ" ? "Etapas da requisição" : "Etapas da " + type,
+                type === "REQ" ? "Tipos de material" : "Etapas da " + type,
               exact: true,
             })
             .getByRole("button", { name: /Medicamentos/ })
@@ -218,7 +222,7 @@ for (const count of [1, 5, 20, 100]) {
             path: `output/playwright/phase-d/catalogue-${count}-${type}-${info.project.name}.png`,
             fullPage: true,
           });
-          for (let step = 1; step < (type === "REQ" ? 6 : 5); step++)
+          for (let step = 0; step < (type === "REQ" ? 3 : 4); step++)
             await next(page);
           await expect(
             page.getByRole("heading", { name: "Revisão", exact: true }),

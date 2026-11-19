@@ -32,7 +32,10 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
   const writes: string[] = []; page.on("request", request => { if (["/api/requisitions", "/api/documents"].includes(new URL(request.url()).pathname) && request.method() === "POST") writes.push(request.url()); });
   await page.goto(type === "REQ" ? "/fichas/req" : "/fichas/com");
   if (type === "COM") await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
-  await next(page); await expect(page.getByRole("heading", { name: "Medicamentos", exact: true })).toBeVisible();
+  await next(page);
+  await expect(type === "REQ"
+    ? page.getByRole("button", { name: /^Medicamentos/, pressed: true })
+    : page.getByRole("heading", { name: "Medicamentos", exact: true })).toBeVisible();
   const checkbox = page.getByRole("checkbox", { name: new RegExp("^Material de cuidado") }); await checkbox.check();
   const product = page.locator(type === "REQ" ? "article" : ".product-choice").filter({ has: checkbox });
   const quantity = product.getByLabel(type === "REQ" ? "Estoque observado com a equipe" : "Quantidade — " + name, { exact: type !== "REQ" });
@@ -63,7 +66,7 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
         await page.screenshot({ path: `output/playwright/phase-d/${type.toLowerCase()}-choice-${info.project.name}.png`, fullPage: true, clip: box, animations: "disabled" });
       }
     }
-    const remainingSteps = type === "REQ" ? 5 : 4; for (let step = 0; step < remainingSteps; step++) await next(page);
+    const remainingSteps = type === "REQ" ? 3 : 4; for (let step = 0; step < remainingSteps; step++) await next(page);
     await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
     await expect(page.getByText(name, { exact: false }).first()).toBeVisible();
     await model.locator('[data-action="wizardNext"]').click();

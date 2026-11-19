@@ -120,9 +120,9 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   await page.goto("/fichas/req");
   const next = page.getByRole("button", { name: "Avançar", exact: true });
   await next.click();
-  await expect(page.getByRole("heading", { name: "Medicamentos", exact: true })).toBeVisible();
-  await next.click();
-  await expect(page.getByRole("heading", { name: "Higiene", exact: true })).toBeVisible();
+  const categories = page.getByRole("navigation", { name: "Tipos de material" });
+  await expect(categories.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
+  await categories.getByRole("button", { name: /^Higiene/ }).click();
   const search = page.getByLabel("Buscar produto", { exact: true });
   await search.fill("V4 0");
   const selection = page.getByRole("checkbox", { name: /Material fictício V4 0/ });

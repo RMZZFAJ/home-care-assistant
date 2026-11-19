@@ -1,7 +1,8 @@
-import { expect, test, type Page, type Locator } from "@playwright/test";
+import { expect, test, type Page, type Locator, type Request } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { setup, actor, fixtures, rpc } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -12,9 +13,9 @@ test.setTimeout(150_000);
 const owned = new Set<string>();
 async function fixture() { const f = await setup(); owned.add(f.patient); return f; }
 test.afterEach(() => { if (owned.size) sql(`update public.care_recipients set is_active=false where id=any(array[${[...owned].map(q).join(",")}]::uuid[])`); owned.clear(); });
-async function login(page: Page, patient: string, role: "professional" | "adminA" | "global" = "adminA") {
+async function login(page: Page, patient: string, role: "professional" | "adminA" | "global" = "adminA", email = fixtures[role].email) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
@@ -43,12 +44,13 @@ async function fieldGeometry(scope: Locator, label: string) {
 
 test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 caracteres até corrigir e emitir 1000", async ({ page }, info) => {
   const f = await fixture();
+  const writer = await shiftWorker(f.patient);
   let commands = 0;
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/requisitions" && request.method() === "POST") commands++; });
-  await login(page, f.patient, "professional");
+  await login(page, f.patient, "professional", writer.email);
   await page.goto("/fichas/req");
   await expect(page.getByText("Carregando catálogo e pendências…", { exact: true })).toHaveCount(0);
-  for (let step = 0; step < 4; step++) await next(page);
+  for (let step = 0; step < 2; step++) await next(page);
   await page.getByRole("button", { name: "+ Incluir novo item", exact: true }).click();
   const name = page.getByLabel("Nome", { exact: true });
   await next(page);
@@ -62,27 +64,40 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await observation.fill("x".repeat(1001));
   await next(page);
   await errorAt(observation, "A observação deve ter até 1.000 caracteres.");
-  const placement = await observation.evaluate(element => {
+  await expect.poll(() => observation.evaluate(element => {
     const box = element.getBoundingClientRect();
     const center = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
-    return { top: box.top, bottom: box.bottom, height: innerHeight, exposed: center === element || element.contains(center) };
-  });
-  expect(placement.top).toBeGreaterThan(150);
-  expect(placement.bottom).toBeLessThan(placement.height - 64);
-  expect(placement.exposed).toBe(true);
+    return { belowHeader: box.top > 150, aboveNavigation: box.bottom < innerHeight - 64,
+      exposed: center === element || element.contains(center) };
+  })).toEqual({ belowHeader: true, aboveNavigation: true, exposed: true });
   await expect(observation).toHaveValue("x".repeat(1001));
   await expect(page.getByRole("heading", { name: "Observações", exact: true })).toBeVisible();
   expect(commands).toBe(0);
   for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "C026-observacao-" + width); }
   await capture(page, "C026-observacao", info.project.name);
-  await observation.fill("x".repeat(1000));
-  await next(page);
-  await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
+  const validNote = "x".repeat(1000);
+  const saveBody = (request: Request) => request.method() === "POST" &&
+    new URL(request.url()).pathname === "/api/drafts" && request.postDataJSON().content?.observations?.[0] === validNote;
+  let resumeSave!: () => void;
+  const gate = new Promise<void>(resolve => { resumeSave = resolve; });
+  await page.route("**/api/drafts", async route => {
+    if (saveBody(route.request())) await gate;
+    await route.continue();
+  });
+  const pendingSave = page.waitForRequest(saveBody);
+  const confirm = page.getByRole("button", { name: "Concluir requisição", exact: true });
+  try {
+    await observation.fill(validNote);
+    await pendingSave;
+    await next(page);
+    await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
+    await expect(confirm).toBeDisabled();
+  } finally { resumeSave(); }
   await page.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(observation).toHaveValue("x".repeat(1000));
   await next(page);
   await expect(page.getByText("Item extra fictício mantido", { exact: false })).toBeVisible();
-  await page.getByRole("button", { name: "Concluir requisição", exact: true }).click();
+  await confirm.click();
   const issued = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
   await expect(issued).toBeVisible();
   await page.setViewportSize(info.project.name === "mobile" ? { width: 320, height: 720 } : { width: 390, height: 844 });

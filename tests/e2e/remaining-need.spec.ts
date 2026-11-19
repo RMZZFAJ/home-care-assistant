@@ -75,10 +75,7 @@ async function prepare(
     .click();
   await reason(page).fill(text);
   await next(page);
-  await next(page);
-  await expect(
-    page.getByRole("heading", { name: "Higiene", exact: true }),
-  ).toBeVisible();
+  await page.getByRole("navigation", { name: "Tipos de material" }).getByRole("button", { name: /^Higiene/ }).click();
   const choice = page.getByRole("checkbox", {
     name: "Material fictício V4 0 unidade",
     exact: true,
@@ -100,7 +97,7 @@ async function prepare(
     page.getByLabel("Informação do estoque da equipe", { exact: true }),
   ).toHaveValue("observed");
   await observation.fill("0");
-  for (let i = 0; i < 4; i++) await next(page);
+  for (let i = 0; i < 3; i++) await next(page);
   await expect(
     page.getByRole("heading", { name: "Revisão", exact: true }),
   ).toBeVisible();
@@ -302,7 +299,7 @@ test("origem obsoleta exige comparação e adoção explícita após falha; sele
     })
     .click();
   await expect(reason(page)).toHaveValue(ownReason);
-  for (let i = 0; i < 6; i++) await next(page);
+  for (let i = 0; i < 4; i++) await next(page);
   await expect(
     page.getByText("0 unidade (observado)", { exact: false }),
   ).toBeVisible();

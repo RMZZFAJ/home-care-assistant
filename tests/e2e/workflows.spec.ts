@@ -137,14 +137,14 @@ async function confirm(
 async function issueReq(page: Page, patient: string, productName: string) {
   await page.goto("/fichas/req?careRecipientId=" + patient);
   await next(page);
-  await next(page);
+  await page.getByRole("navigation", { name: "Tipos de material" }).getByRole("button", { name: /^Higiene/ }).click();
   await page
     .getByRole("checkbox", { name: new RegExp("^" + productName) })
     .check();
   await page
     .getByLabel("Estoque observado com a equipe", { exact: false })
     .fill("2");
-  for (let step = 0; step < 4; step++) await next(page);
+  for (let step = 0; step < 3; step++) await next(page);
   const pending = page.waitForResponse(
     (r) =>
       new URL(r.url()).pathname === "/api/requisitions" &&
@@ -514,9 +514,9 @@ async function openRequisitionReview(page: Page) {
   await login(page, "professional");
   await page.goto("/fichas/req?careRecipientId=" + patient);
   await next(page);
-  await next(page);
+  await page.getByRole("navigation", { name: "Tipos de material" }).getByRole("button", { name: /^Higiene/ }).click();
   await page.getByRole("checkbox", { name: /^Material fictício V4 0/ }).check();
-  for (let step = 0; step < 4; step++) await next(page);
+  for (let step = 0; step < 3; step++) await next(page);
   return { patient, productId: products[0] };
 }
 

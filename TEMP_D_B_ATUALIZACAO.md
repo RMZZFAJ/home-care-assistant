@@ -1,5 +1,22 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — cinco etapas da REQ.** Confirmação, Materiais, Extras, Observações
+e Revisão aparecem juntas na barra compacta da v7. Medicamentos abre primeiro.
+Higiene e Dieta ficam dentro de Materiais e o rascunho recupera a categoria exata.
+A navegação interna continua disponível durante o salvamento automático. A
+emissão aguarda a gravação necessária. Uma observação acima do limite fica no
+formulário com o erro no campo, sem acionar o salvamento automático.
+
+- A barra compacta também é usada no assistente de transferências. A etapa
+  Materiais da REQ valida as seleções das três categorias e volta ao primeiro
+  campo que precisa de correção.
+- Android e iOS passaram no cenário de erro, foco, salvamento em andamento,
+  revisão e emissão com PDF. As execuções dirigidas também confirmaram retomada
+  de decimais na categoria e revisão da transferência. A execução ampla do
+  catálogo excedeu o limite local. As repetições usaram prazos locais maiores.
+- Build e TypeScript passaram. O incremento não acrescenta migration. A
+  sequência dos formulários usuais de COM e ENT segue em implementação.
+
 **19/11 — migrations no Supabase de desenvolvimento.** A invocação via npm
 no PowerShell retirou `--dry-run` antes de chamar o wrapper. As 28 migrations
 já ensaiadas foram aplicadas. A conferência encontrou 300 versões até

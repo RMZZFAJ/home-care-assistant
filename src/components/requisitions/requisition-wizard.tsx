@@ -25,12 +25,14 @@ import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "@/components/documents/document-write-access-notice";
 import { DocumentCatalogueEmpty, DocumentOpeningFailure, DocumentOpeningPending, type OpeningFailure } from "@/components/documents/document-opening-status";
 import { CatalogueOpeningError, readWizardCatalogue } from "@/lib/client/wizard-catalogue";
+import { requisitionDraftContent } from "@/lib/validation/creation-drafts";
 import { RecurringSelection } from "./recurring-selection";
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
 import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
-import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
+import { navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
+import { materialCategories, supplyWizardStages, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { Dialog, StepNavigator } from "@/components/ui/primitives";
 import { ActionButton, ActionLink } from "@/components/ui/controls";
 import { formatQuantity, quantity } from "@/lib/quantity";
@@ -48,7 +50,8 @@ import { issuanceSteps } from "@/components/documents/document-issuance-result";
 import { useIssuanceNavigation } from "@/components/documents/document-issuance-navigation";
 import { DocumentIssuanceFailure, issuanceRecoverySteps, reconcileIssuance, useIssuanceFailure } from "@/components/documents/document-issuance-failure";
 
-const steps = draftFlowStages.REQ.map(stage => stage.label);
+// Keep the stored REQ category positions while presenting the shared five stages.
+const stageStart = [0, 1, 4, 5, 6];
 export function RequisitionWizard() {
   const sourceId = useSearchParams().get("sourceRequisitionId");
   return (
@@ -107,9 +110,9 @@ function PatientRequisition({
     if (!focusErrorRef.current) return;
     const target = [...(fieldsRef.current?.querySelectorAll<HTMLElement>('[data-field-error]') ?? [])].find(element => element.dataset.fieldError === focusErrorRef.current) ?? fieldsRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
     if (target) {
-      // Keep the invalid field clear of the fixed header and sticky steps.
+      // Keep the invalid field clear of the fixed header and mobile navigation.
       target.focus({ preventScroll: true });
-      target.scrollIntoView({ block: "center", inline: "nearest" });
+      target.scrollIntoView({ behavior: "instant", block: "center", inline: "nearest" });
       focusErrorRef.current = null;
     }
   }, [step, fieldErrors]);
@@ -185,7 +188,11 @@ function PatientRequisition({
   const canWrite = may(context, "request");
   const writeAccess = useDocumentWriteAccess(canWrite);
   const consultationRef = useRef<HTMLAnchorElement>(null);
-  useLongDraftAutosave(privateDraft, draftContent, canWrite && draftTouched && !(saving || uncertain));
+  useLongDraftAutosave(
+    privateDraft,
+    draftContent,
+    canWrite && draftTouched && !saving && !uncertain && requisitionDraftContent.safeParse(draftContent).success,
+  );
   const offeredSource =
     privateDraft.offered?.content && "lines" in privateDraft.offered.content
       ? (privateDraft.offered.content.remainingNeed?.requisitionId ?? null)
@@ -289,9 +296,8 @@ function PatientRequisition({
     }, 500);
     return () => window.clearTimeout(timer);
   }, [form, issuedDocumentId, loadingCatalog, saving, storageKey, uncertain]);
-  const currentCategory = (["medicamentos", "higiene", "dieta"] as const)[
-    step - 1
-  ];
+  const currentCategory = materialCategories[step - 1]?.id;
+  const stage = currentCategory ? 1 : stageStart.indexOf(step);
   const categoryItems = useMemo(
     () => products.filter((item) => item.category === currentCategory),
     [products, currentCategory],
@@ -373,9 +379,7 @@ function PatientRequisition({
         errors.remainingNeed =
           "Informe o motivo da necessidade remanescente, entre3 e1000 caracteres.";
     }
-    for (const line of form.lines.filter(
-      (line) => all || line.category === currentCategory,
-    )) {
+    for (const line of all || currentCategory ? form.lines : []) {
       if (
         !validStockObservation(
           line,
@@ -401,7 +405,7 @@ function PatientRequisition({
     }
     if (all || step === 5) form.observations.forEach((item, index) => {
       if (!item.trim()) errors["observation:" + index] = "Preencha a observação ou remova-a.";
-      else if (item.trim().length > 1000) errors["observation:" + index] = "A observação deve ter até 1.000 caracteres.";
+      else if (item.length > 1000) errors["observation:" + index] = "A observação deve ter até 1.000 caracteres.";
     });
     if (all && !form.lines.length && !form.extraItems.length)
       errors.lines = "Selecione ao menos um item.";
@@ -415,19 +419,17 @@ function PatientRequisition({
       setError(
         Object.values(errors)[0] ?? "Aguarde o catálogo e confira seu acesso.",
       );
-      if (all && Object.keys(errors).length) {
-        const key = Object.keys(errors)[0];
-        const product = products.find((item) => key === item.id || key === item.id + ":repeat");
-        if (product)
-          setStep(
-            ["medicamentos", "higiene", "dieta"].indexOf(product.category) + 1,
-          );
-        else if (form.extraItems.some(item => key === item.id + ":name" || key === item.id + ":stock")) setStep(4);
+      const key = Object.keys(errors)[0];
+      const product = products.find((item) => key === item.id || key === item.id + ":repeat");
+      if (product)
+        setStep(materialCategories.findIndex(category => category.id === product.category) + 1);
+      else if (all && key) {
+        if (form.extraItems.some(item => key === item.id + ":name" || key === item.id + ":stock")) setStep(4);
         else if (key.startsWith("observation:")) setStep(5);
         else if (key.startsWith("remaining")) setStep(0);
         else if (key === "lines" || key === "catalog") setStep(1);
       }
-      focusErrorRef.current = Object.keys(errors)[0] ?? null;
+      focusErrorRef.current = key ?? null;
       return false;
     }
     setError("");
@@ -701,9 +703,14 @@ function PatientRequisition({
         />
       ) : null}
       <StepNavigator
-        steps={steps}
-        active={step}
-        onChange={(nextStep) => { issuanceFailure.clear(); setStep(nextStep); }}
+        steps={supplyWizardStages}
+        active={stage}
+        compact
+        onChange={(nextStage) => {
+          if (nextStage === stage) return;
+          issuanceFailure.clear();
+          setStep(stageStart[nextStage]);
+        }}
         disabled={uncertain || saving || loadingCatalog || privateDraft.blocked}
         label="Etapas da requisição"
       />
@@ -727,7 +734,7 @@ function PatientRequisition({
       ) : (
         <section className="ui-card">
           <p className="eyebrow">REQ · {context.patient!.display_name}</p>
-          <h2 className="my-4 text-xl font-semibold">{steps[step]}</h2>
+          <h2 className="my-4 text-xl font-semibold">{step === 0 ? "Confirme os dados da ficha" : step === 4 ? "Itens extras" : supplyWizardStages[stage]}</h2>
           <fieldset
             disabled={
               saving ||
@@ -749,8 +756,14 @@ function PatientRequisition({
                 disabled={saving || uncertain || loadingCatalog || Boolean(catalogError) || privateDraft.blocked || !canWrite}
                 onApply={includeMaterials} />
             </> : null}
-            {step >= 1 && step <= 3 ? (
+            {currentCategory ? <>
+              <WizardMaterialCategories
+                category={currentCategory}
+                selected={form.lines}
+                onChange={category => setStep(materialCategories.findIndex(item => item.id === category) + 1)}
+              />
               <CatalogStep
+                key={currentCategory}
                 context={context}
                 items={categoryItems}
                 itemContext={itemContext}
@@ -760,7 +773,7 @@ function PatientRequisition({
                 errors={fieldErrors}
                 selectedCount={form.lines.length}
               />
-            ) : null}
+            </> : null}
             {step === 4 ? (
               <Extras
                 errors={fieldErrors}
@@ -809,24 +822,25 @@ function PatientRequisition({
             </Notice>
           ) : null}
           <WizardActions
-            step={step}
-            total={7}
+            step={stage}
+            total={supplyWizardStages.length}
             saving={
               saving ||
-              privateDraft.busy || privateDraft.backgroundBusy ||
+              privateDraft.busy ||
               (privateDraft.blocked && !uncertain) ||
               (!may(context, "request") && !uncertain)
             }
+            draftBusy={privateDraft.backgroundBusy}
             uncertain={uncertain}
             blocked={Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
             finishLabel="Concluir requisição"
             onBack={() => {
               issuanceFailure.clear();
-              setStep((value) => value - 1);
+              setStep(stageStart[stage - 1]);
             }}
             onDraft={() => void privateDraft.save(draftContent)}
             onNext={() => {
-              if (validate() && (step !== 0 || householdSelectionRef.current?.apply() !== false)) setStep((value) => value + 1);
+              if (validate() && (step !== 0 || householdSelectionRef.current?.apply() !== false)) setStep(stageStart[stage + 1]);
             }}
             onFinish={() => { if (!issuanceFailure.reopen()) void submit(); }}
           />

@@ -1243,16 +1243,15 @@
   min-width: 0;
 }
 
-.hca-transfer-wizard .wizard-navigation {
+.wizard-navigation.hca-five-stage-navigation {
   position: static;
   padding: 10px 6px;
   border-bottom: 1px solid #d9e5dc;
-  background: transparent;
+  background: var(--hca-paper, #fff);
 }
 
-.hca-transfer-wizard .wizard-progress-label { display: none; }
-
-.hca-transfer-wizard .wizard-steps {
+.hca-five-stage-navigation .wizard-steps,
+.hca-document-wizard .hca-five-stage-navigation .wizard-steps {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0;
@@ -1260,27 +1259,63 @@
   margin: 0;
 }
 
-.hca-transfer-wizard .hca-step-control {
+.hca-five-stage-navigation .hca-step-control {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 4px;
   white-space: normal;
-  padding: 2px;
+  padding: 2px 0;
   background: transparent;
   border: 0;
-  font-size: clamp(.6rem, 2.5vw, .75rem);
-  font-weight: 650;
+  font-size: clamp(.5625rem, 2.45vw, .75rem);
+  font-weight: 550;
   width: 100%;
 }
 
-.hca-transfer-wizard .hca-step-control span {
+.hca-five-stage-navigation .hca-step-control span {
   width: 22px;
   height: 22px;
   font-size: .72rem;
 }
 
-.hca-transfer-wizard .hca-step-control:has(svg) span { color: #fff; background: #156f66; }
+.hca-five-stage-navigation .hca-step-control:has(svg) span { color: #fff; background: #156f66; }
+.hca-five-stage-navigation .hca-step-control[aria-current="step"] > span {
+  background: #e9f3eb;
+  border: 1px solid #8fb59a;
+  color: #22633f;
+}
+
+.hca-wizard-categories {
+  display: flex;
+  gap: clamp(8px, 3vw, 24px);
+  border-bottom: 1px solid var(--hca-line);
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+.hca-wizard-categories button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 6px 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  scroll-margin-top: calc(var(--app-header-height, 65px) + 8px);
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+}
+.hca-wizard-categories button[aria-pressed="true"] { border-bottom-color: var(--primary); color: var(--primary); }
+.hca-wizard-categories button small { padding: 1px 5px; border-radius: 4px; background: #e9f3eb; font-size: 10px; }
+@media (max-width: 360px) {
+  .hca-wizard-categories { gap: 6px; }
+  .hca-wizard-categories button { gap: 3px; padding-inline: 0; font-size: 10px; }
+  .hca-wizard-categories button svg { width: 12px; height: 12px; }
+  .hca-wizard-categories button small { padding-inline: 3px; }
+}
 
 .hca-transfer-wizard-content,
 .hca-transfer-wizard-result { padding: clamp(16px, 4vw, 24px); }

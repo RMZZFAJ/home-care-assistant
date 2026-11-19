@@ -243,7 +243,7 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
     await login(team, f.patient, "professional");
     await team.goto(`/fichas/req?careRecipientId=${f.patient}`);
     await team.getByRole("button", { name: "Avançar", exact: true }).click();
-    await team.getByRole("button", { name: "Avançar", exact: true }).click();
+    await team.getByRole("navigation", { name: "Tipos de material" }).getByRole("button", { name: /^Higiene/ }).click();
     await team
       .getByLabel("Buscar produto", { exact: true })
       .fill("Material fictício V4 0");

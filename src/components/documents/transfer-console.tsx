@@ -1,6 +1,7 @@
 "use client";
 
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
+import { supplyWizardStages } from "@/components/forms/supply-wizard-stages";
 import {
   FormField,
   SelectField,
@@ -69,7 +70,6 @@ import { MaterialConsultButton } from "./catalogue-material-panel";
 
 export const custodyName = (source: Custody) =>
   source === "FAMILY" ? "Família" : "Equipe";
-const transferSteps = ["Confirmação", "Materiais", "Itens extras", "Observações", "Revisão"];
 const transferStepActions = ["Selecionar materiais", "Continuar", "Continuar", "Revisar ficha"];
 export function TransferConsole({ source }: { source?: Custody } = {}) {
   return (
@@ -745,7 +745,8 @@ function TransferDeclarationEditor({
       {error ? <Notice error>{error}</Notice> : null}
       {!result && (reference && !referenceUnavailable || packet) ? (
         <StepNavigator
-          steps={transferSteps}
+          steps={supplyWizardStages}
+          compact
           active={packet ? 4 : step}
           disabled={busy || uncertain || privateDraft.blocked}
           onChange={(next) => {
@@ -955,7 +956,7 @@ function TransferDeclarationEditor({
                 ) : null}
                 </> : null}
                 {step === 1 || step === 2 ? <>
-                <h3>{transferSteps[step]}</h3>
+                <h3>{step === 2 ? "Itens extras" : supplyWizardStages[step]}</h3>
                 <FormField label={step === 2 ? "Adicionar item extra" : "Adicionar material da origem"}>
                   <SearchSelect
                     query={query}

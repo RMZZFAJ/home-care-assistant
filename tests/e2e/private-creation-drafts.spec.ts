@@ -56,7 +56,7 @@ async function resume(page: Page) {
   await expect(save(page)).toBeEnabled();
 }
 async function observations(page: Page) {
-  for (let i = 0; i < 5; i++) await next(page);
+  for (let i = 0; i < 3; i++) await next(page);
 }
 
 test("BAL agendado recupera a revisão em leitura com referências salvas sem novo ato oficial",async({page})=>{
