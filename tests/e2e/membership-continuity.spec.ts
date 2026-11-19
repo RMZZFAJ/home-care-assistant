@@ -182,4 +182,23 @@ test("desligamento mostra ENT parcial e preserva a revogação urgente quando a 
   expect(data.workflow_data.acceptedBy).toBe(fixtures.professional.id);
   expect(Number(data.lines[0].accepted_quantity)).toBe(2);
   expect(data.deliveryRegularization.canPropose).toBe(true);
+  await page.unroute("**/api/admin/membership-impact?**");
+  await page.getByRole("button", { name: "Acompanhar pendências do vínculo", exact: true }).click();
+  const followUp = page.getByRole("dialog", { name: "Acompanhar pendências do vínculo", exact: true });
+  await expect(followUp.getByRole("heading", { name: "Pendências após o desligamento", exact: true })).toBeVisible();
+  await followUp.getByRole("link", { name: "Propor apuração · " + data.code, exact: true }).click();
+  const proposal = page.getByRole("dialog", { name: "Apurar entrega pendente", exact: true });
+  await expect(proposal).toBeVisible();
+  await expect(proposal).toContainText("Aceite pessoal preservado: 2 unidade");
+  if (info.project.use.hasTouch) {
+    await page.setViewportSize({ width: 390, height: 760 });
+    const amount = proposal.getByLabel("Recebimento físico apurado · " + data.lines[0].name_snapshot, { exact: true });
+    await expect.poll(async () => (await amount.boundingBox())?.width ?? 0).toBeGreaterThan(45);
+    await info.attach("E06-13 proposta administrativa", {
+      body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+    });
+  }
+  expect(
+    sql(`select count(*) from public.delivery_regularizations where document_id=${sqlLiteral(data.id)}`),
+  ).toBe("0");
 });

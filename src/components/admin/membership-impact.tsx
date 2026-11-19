@@ -58,9 +58,13 @@ function Impacts<T extends { id: string }>({
 export function MembershipImpact({
   patientId,
   userId,
+  afterRevocation = false,
+  mayRegularize = false,
 }: {
   patientId: string;
   userId: string;
+  afterRevocation?: boolean;
+  mayRegularize?: boolean;
 }) {
   const refreshRef = useRef<HTMLButtonElement>(null),
     focusAfterRefreshRef = useRef(false);
@@ -116,12 +120,12 @@ export function MembershipImpact({
       className="my-4 space-y-4"
       aria-label="Consequências do desligamento"
     >
-      <h3 className="font-semibold">Pendências antes do desligamento</h3>
-      <p>
+      <h3 className="font-semibold">{afterRevocation ? "Pendências após o desligamento" : "Pendências antes do desligamento"}</h3>
+      {afterRevocation ? <p>As entregas da pessoa desligada podem ser encaminhadas para apuração administrativa. O histórico de recebimentos fica disponível na ficha.</p> : <p>
         A revogação continua disponível durante esta consulta. Depois, encaminhe
         as tarefas futuras pelos processos próprios; recebimentos e autorias
         anteriores permanecem preservados.
-      </p>
+      </p>}
       {loading ? <LoadingIndicator label="Consultando pendências do vínculo" /> : null}
       {!loading && result.error ? <Notice error>{result.error}</Notice> : null}
       <ActionButton
@@ -159,6 +163,12 @@ export function MembershipImpact({
                   {item.code}
                 </Link>
                 <p>{documentStatuses[item.status] ?? item.status}</p>
+                {!loading && !result.error && mayRegularize && afterRevocation && data.member.status === "revoked" ? (
+                  <Link className="hca-control hca-control--primary" prefetch={false}
+                    href={"/fichas/" + item.id + "?documentTab=materials&regularization=prepare#regularizacao"}>
+                    Propor apuração · {item.code}
+                  </Link>
+                ) : null}
                 {item.lines.map((line) => (
                   <div key={line.id} className="mt-2">
                     <p className="wrap-break-word">{line.name}</p>

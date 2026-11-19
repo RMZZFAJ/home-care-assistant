@@ -1,5 +1,32 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — regularização após o desligamento do recebedor.** A confirmação da
+revogação oferece a consulta das pendências do vínculo. A entrega autorizada
+abre a proposta na aba Materiais. O desligamento e a abertura da proposta
+ocorrem antes de qualquer ato sobre o estoque.
+
+- A proposta apresenta as quantidades por material, o saldo ainda sem
+  localização, as evidências, o conferente independente e o responsável pela
+  busca. A revisão mostra os mesmos fatos e permite aprovar ou devolver
+  para correção com justificativa.
+- A ficha separa andamento da busca e destino apurado. Quem tem autorização
+  para propor pode encaminhar uma quantidade localizada para revisão. As
+  demais unidades mantêm a apuração aberta e o aceite pessoal anterior
+  conserva sua autoria e suas quantidades.
+- A composição em celular usa os modais E06-13 e E06-14. A revisão local dos
+  campos e a recuperação do mesmo ato seguem disponíveis. O fluxo usa o
+  contrato transacional existente e não acrescenta migration.
+- Passaram oito casos dirigidos na rodada final em Android e iOS emulados.
+  O caso de proposta, revisão independente, resposta perdida e PDF assinado
+  também passou nos dois projetos na rodada anterior. A verificação da
+  situação física usa o painel de detalhes do material.
+- Após o ajuste de largura, o fluxo de abertura da proposta passou em
+  rodada dirigida nos dois projetos móveis. A captura em 390 px confirma
+  que o número e a unidade cabem lado a lado nos três campos de quantidade.
+- No caso E06-14, o envio da proposta preservou o estoque. A aprovação
+  devolveu duas unidades à família, manteve uma em trânsito e conservou
+  as duas unidades do aceite pessoal original.
+
 **19/11 — abertura da ficha e catálogo indisponível ou vazio.** A leitura
 essencial de REQ, COM, ENT e DEV acontece antes das etapas. Os avisos do
 E04-16 distinguem falha de catálogo, falha de outra referência e recusa

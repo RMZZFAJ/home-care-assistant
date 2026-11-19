@@ -9,6 +9,7 @@ import { governanceCommandConfirmed } from "@/lib/validation/governance";
 import {
   api,
   buttonClass,
+  can,
   inputClass,
   Notice,
   panelClass,
@@ -382,6 +383,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           <MembershipManagement
             userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed}
             credentialReviewAllowed={!globalMode}
+            mayRegularize={can(context, "ent.regularize")}
             confirmationRevision={confirmationRevision}
             rows={rows}
             directory={directory}

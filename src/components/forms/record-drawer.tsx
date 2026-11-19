@@ -3,13 +3,17 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from "rea
 import { Dialog, Drawer } from "@/components/ui/overlays";
 
 /** Contextual editing keeps the list and its filters in place. */
-export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false }: {
+export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false, modal = false, subtitle, popupClassName, footer }: {
   title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
   recovery?: ReactNode;
   hasUnsavedChanges?: boolean;
   keyboardScrollable?: boolean;
   uncertainOutcome?: boolean;
   exitDialog?: boolean;
+  modal?: boolean;
+  subtitle?: string;
+  popupClassName?: string;
+  footer?: (requestClose: () => void) => ReactNode;
 }) {
   const [dirty, setDirty] = useState(false);
   const [discard, setDiscard] = useState(false);
@@ -40,12 +44,13 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
     };
     if (exitDialog) requestAnimationFrame(restoreEditing); else restoreEditing();
   };
-  return <Drawer open title={title} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false} keyboardScrollable={keyboardScrollable}>
+  const Surface = modal ? Dialog : Drawer;
+  return <Surface open title={title} subtitle={subtitle} popupClassName={popupClassName} footer={footer?.(requestClose)} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false} keyboardScrollable={keyboardScrollable}>
       {recovery}
       {exitDialog ? <Dialog open={discard} title={uncertainOutcome ? "Fechar sem resultado confirmado?" : "Sair sem concluir?"} onClose={continueEditing} finalFocus={false}>
         <p>{uncertainOutcome ? "O resultado da tentativa continua sem confirmação. Fechar descarta os campos desta tela. Procure a supervisão e confira o resultado antes de repetir a ação." : "O preenchimento desta ação será descartado. Fechar não confirma a alteração."}</p>
         <div className="hca-toolbar"><button type="button" className="hca-control" disabled={busy || preventClose} onClick={continueEditing}>Voltar ao preenchimento</button><button type="button" className="hca-control hca-control--primary" disabled={busy || preventClose} onClick={() => { if (!busy && !preventClose) onClose(); }}>{uncertainOutcome ? "Fechar e procurar supervisão" : "Sair e descartar"}</button></div>
       </Dialog> : discard ? <div className="hca-attention" role="alert"><p>Há alterações ainda não salvas.</p><div className="hca-toolbar"><button type="button" className="hca-control" disabled={busy || preventClose} onClick={continueEditing}>Continuar editando</button><button type="button" className="hca-control" disabled={busy || preventClose} onClick={() => { if (!busy && !preventClose) onClose(); }}>Descartar alterações</button></div></div> : null}
       <fieldset ref={formRef} tabIndex={-1} className="min-w-0" disabled={busy} onFocusCapture={event => { editFocusRef.current = event.target; }} onChange={() => { if (trackChanges) setDirty(true); }}>{children}</fieldset>
-  </Drawer>;
+  </Surface>;
 }

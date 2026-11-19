@@ -620,8 +620,8 @@ export function SupplyDocumentContent({
         (((data.status === "disputed" || data.status === "cancellation_pending") &&
           data.lines.some((line) => quantity(line.quantity).minus(line.accepted_quantity).minus(line.reconciled_quantity).gt(0))) ||
           (data.status === "disputed" && data.lines.some(line => line.metadata.issueOpen && !readCountedDeliveryReceipt(line.metadata)))) &&
-        ((data.deliveryRegularization?.recipientAvailable !== false &&
-          ((data.recipient_id === context.userId && allowed("ent.receive")) || allowed("access.manage"))) ||
+        data.deliveryRegularization?.recipientAvailable !== false &&
+        ((data.recipient_id === context.userId && allowed("ent.receive")) || allowed("access.manage") ||
           (hasCountedTransit && canReconcileFromFamily(data, context)))
       )
         actions.push("resolve");

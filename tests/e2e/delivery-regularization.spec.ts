@@ -60,8 +60,13 @@ async function choose(page: Page, label: string, name: string) {
   await option.click();
 }
 const drawer = (page: Page) =>
-  page.getByRole("dialog", { name: /regularização|apuração própria/i });
+  page.getByRole("dialog", { name: /regularização|Revisar apuração|Apurar entrega pendente|Acompanhar material pendente/i });
+async function disclose(page: Page, title: string) {
+  const summary = drawer(page).getByText(title, { exact: true });
+  if (!await summary.evaluate(element => element.closest("details")?.open)) await summary.click();
+}
 async function proposalForm(page: Page, returned = "1") {
+  await disclose(page, "Motivo e evidências da proposta");
   await page
     .getByLabel("Sua justificativa", { exact: true })
     .fill("Minha apuração administrativa preserva o recebimento original");
@@ -219,6 +224,7 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
     await family
       .getByRole("button", { name: "Conferir proposta", exact: true })
       .click();
+    await disclose(family, "Motivo e evidências");
     await expect(
       family.getByLabel("Sua justificativa", { exact: true }),
     ).toHaveValue("");
@@ -320,6 +326,8 @@ test("P05 profissional futuro encontra sua tarefa e relata apenas apuração pr�
   await page
     .getByRole("button", { name: "Registrar apuração própria", exact: true })
     .click();
+  await expect(drawer(page).getByRole("button", { name: "Andamento da busca", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(drawer(page).getByRole("button", { name: "Destino apurado", exact: true })).toHaveCount(0);
   await expect(
     page.getByLabel("Relato da sua apuração", { exact: true }),
   ).toHaveValue("");
@@ -340,12 +348,16 @@ test("P05 profissional futuro encontra sua tarefa e relata apenas apuração pr�
     fixtures.supervisor.id,
   );
   await selectDocumentSection(page, "materials");
+  const materialName = result.lines[0].name_snapshot;
+  await page.getByRole("button", { name: "Detalhes de " + materialName, exact: true }).click();
+  const material = page.getByRole("dialog", { name: materialName, exact: true });
   await expect(
-    page.getByText(
+    material.getByText(
       "Encerramento administrativo · situação física ainda desconhecida",
       { exact: true },
     ),
   ).toBeVisible();
+  await material.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   const pdf = await generatedPdf(
     page,
     `/api/documents/${result.id}/pdf?version=${result.version}`,
@@ -369,6 +381,68 @@ test("P05 profissional futuro encontra sua tarefa e relata apenas apuração pr�
       exact: true,
     }),
   ).toBeVisible();
+});
+
+test("E06-14 submete o destino apurado à revisão e movimenta apenas a parcela aprovada", async ({ page, browser }, info) => {
+  const f = await unavailableDelivery({ quantity: "5", counted: true });
+  await login(page, f.patient, "adminA");
+  await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "materials");
+  await expect(page.getByRole("button", { name: "Preparar regularização", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Conciliar divergência", exact: true })).toHaveCount(0);
+  const original = await unknownCase(f, fixtures.adminA.id);
+  const before = ledger(f);
+  await page.reload();
+  await selectDocumentSection(page, "materials");
+  await page.getByRole("button", { name: "Registrar apuração própria", exact: true }).click();
+  const panel = drawer(page);
+  await expect(panel.getByText("Ver quantidades já apuradas", { exact: true })).toBeVisible();
+  if (info.project.use.hasTouch) await info.attach("E06-14 material em apuração", {
+    body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
+  await panel.getByRole("button", { name: "Destino apurado", exact: true }).click();
+  await panel.getByRole("combobox", { name: "Destino apurado", exact: true }).selectOption("returnedQuantity");
+  await panel.getByLabel("Devolução física apurada · Material fictício V4 0", { exact: true }).fill("2");
+  await disclose(page, "Motivo e evidências da proposta");
+  await panel.getByLabel("Sua justificativa", { exact: true }).fill("Duas unidades localizadas no estoque da origem");
+  await panel.getByLabel("Evidências e limites da apuração", { exact: true }).fill("Contagem presencial comparou o material devolvido com a ficha.");
+  await choose(page, "Conferente independente", person("family"));
+  await disclose(page, "Responsável pela busca");
+  await choose(page, "Responsável pela apuração futura", person("adminA"));
+  await panel.getByRole("button", { name: "Revisar ato administrativo", exact: true }).click();
+  const proposed = await confirm(page, original.id, "Registrar proposta sem movimentar");
+  expect(ledger(f)).toBe(before);
+  const proposal = proposed.deliveryRegularization!.cases.find(item => item.id === proposed.deliveryRegularization!.currentId)!;
+  expect(proposal.state).toBe("pending");
+  expect(Number(proposal.proposal.lines[0].returnedQuantity)).toBe(2);
+  expect(Number(proposal.proposal.lines[0].unknownQuantity)).toBe(1);
+
+  const reviewContext = await browser.newContext();
+  try {
+    const reviewer = await reviewContext.newPage();
+    await login(reviewer, f.patient, "family");
+    await reviewer.goto("/fichas/" + proposed.id);
+    await selectDocumentSection(reviewer, "materials");
+    await reviewer.getByRole("button", { name: "Conferir proposta", exact: true }).click();
+    await expect(drawer(reviewer).getByText("Ainda sem localização", { exact: true })).toBeVisible();
+    if (info.project.use.hasTouch) await info.attach("E06-13 revisão independente", {
+      body: await reviewer.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+    });
+    await expect(drawer(reviewer).getByRole("combobox", { name: "Decisão sobre a proposta", exact: true })).toHaveValue("approve");
+    await drawer(reviewer).getByLabel("Sua justificativa", { exact: true }).fill("Conferi o retorno físico dessas duas unidades.");
+    await drawer(reviewer).getByRole("button", { name: "Revisar ato administrativo", exact: true }).click();
+    const result = await confirm(reviewer, proposed.id, "Aprovar encerramento administrativo");
+    expect(result.workflow_data.acceptedBy).toBe(fixtures.professional.id);
+    expect(Number(result.lines[0].accepted_quantity)).toBe(2);
+    expect(Number(result.deliveryRegularization!.pendingTransit)).toBe(1);
+    const movements = JSON.parse(ledger(f));
+    expect(movements).toHaveLength(JSON.parse(before).length + 1);
+    const approved = movements.find((move: { reference_id: string }) => move.reference_id === proposal.id);
+    expect(approved).toMatchObject({ source_location: "TRANSIT", destination_location: "FAMILY" });
+    expect(Number(approved.quantity)).toBe(2);
+  } finally {
+    await reviewContext.close();
+  }
 });
 
 test("C043 caixa padrão oferece decisão pessoal de cancelamento e remove a tarefa após recusa sem movimentar", async ({

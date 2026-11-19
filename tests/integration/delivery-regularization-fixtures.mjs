@@ -7,6 +7,7 @@ export async function unavailableDelivery({
   cancellation = false,
   quantity = "3",
   completeReceipt = false,
+  counted = false,
 } = {}) {
   const f = await setup(),
     professional = await actor("professional", f.patient);
@@ -26,7 +27,7 @@ export async function unavailableDelivery({
   document = await rpc(professional, "supply_document_command", {
     p_id: document.id,
     p_action: "receive",
-    p_body: {
+    p_body: counted ? { countedReceipt: { lines: [{ lineId: document.lines[0].id, receivedQuantity: "2" }] } } : {
       divergences: completeReceipt
         ? []
         : [

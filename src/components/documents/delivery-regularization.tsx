@@ -1,8 +1,10 @@
 "use client";
 import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import { SearchSelect } from "@/components/ui/search-select";
-import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
-import { useEffect, useId, useRef, useState } from "react";
+import { ActionButton, DefinitionGrid, FormField, SelectField } from "@/components/ui/controls";
+import { Icon, type IconName } from "@/components/ui/icon";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
 
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import {
@@ -24,6 +26,7 @@ import { parseRegularizationReference } from "@/lib/validation/regularization-re
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 
 import { DraftReferenceComparison } from "./draft-reference-comparison";
+import { DeliveryMaterialMenu } from "./delivery-material-menu";
 import type {
   DeliveryRegularizationCase,
   DeliveryRegularizationLine,
@@ -40,11 +43,11 @@ const states = {
 };
 type Mode = RegularizationMode;
 const titles: Record<Mode, string> = {
-  propose: "Preparar regularização administrativa",
-  approve: "Conferir regularização administrativa",
-  reject: "Rejeitar regularização administrativa",
+  propose: "Apurar entrega pendente",
+  approve: "Revisar apuração",
+  reject: "Revisar apuração",
   withdraw: "Encerrar proposta de regularização",
-  finding: "Registrar apuração própria",
+  finding: "Acompanhar material pendente",
 };
 type Packet = {
   action: string;
@@ -187,6 +190,58 @@ export function RegularizationCaseFacts({
     </article>
   );
 }
+
+function RegularizationFold({ title, icon, children }: { title: string; icon: IconName; children: ReactNode }) {
+  return <details className="hca-receipt-fold">
+    <summary><Icon name={icon} />{title}<Icon name="down" /></summary>
+    <div className="hca-form-stack">{children}</div>
+  </details>;
+}
+
+function RegularizationBalances({ line }: { line: DeliveryRegularizationLine }) {
+  return <div className="hca-regularization-balances">
+    {amounts.map(([key, label]) => <p key={key}><span>{label}</span><strong>{formatQuantity(line[key], line.unit)}</strong></p>)}
+    <p className="hca-regularization-unknown"><span>Ainda sem localização</span><strong>{formatQuantity(line.unknownQuantity, line.unit)}</strong></p>
+  </div>;
+}
+
+function RegularizationReviewFacts({ item, data, followUp, disabled }: {
+  item: DeliveryRegularizationCase;
+  data: SupplyDocument;
+  followUp: boolean;
+  disabled: boolean;
+}) {
+  const lines = item.decision?.lines.length ? item.decision.lines : item.proposal.lines;
+  return <div className="hca-form-stack">
+    {lines.filter(line => !followUp || quantity(line.unknownQuantity).gt(0)).map(line => {
+      const material = data.lines.find(candidate => candidate.id === line.lineId);
+      const quantityLabel = followUp
+        ? formatQuantity(line.unknownQuantity, line.unit) + " em apuração"
+        : formatQuantity(line.expeditedQuantity, line.unit) + " expedidos";
+      return <article key={line.lineId} className="hca-receipt-line">
+        <header>
+          <div><h3>{line.name}</h3><p>{data.code} · {quantityLabel}</p></div>
+          {material ? <DeliveryMaterialMenu data={data} line={material} disabled={disabled} /> : null}
+        </header>
+        {followUp ? <RegularizationFold title="Ver quantidades já apuradas" icon="history">
+          <RegularizationBalances line={line} />
+          <p>Responsável pela busca: {item.proposal.followUpOwnerName ?? "Nome não preservado"}.</p>
+        </RegularizationFold> : <RegularizationBalances line={line} />}
+      </article>;
+    })}
+    {!followUp ? <>
+      <RegularizationFold title="Motivo e evidências" icon="note">
+        <p>Proposta de {item.proposal.proposedName} · {formatBrazilDate(item.proposed_at)}</p>
+        <p className="whitespace-pre-wrap wrap-break-word"><strong>Motivo:</strong> {item.proposal.reason}</p>
+        <p className="whitespace-pre-wrap wrap-break-word"><strong>Como foi conferido:</strong> {item.proposal.basis}</p>
+      </RegularizationFold>
+      {item.proposal.followUpOwnerName ? <RegularizationFold title="Responsável pela busca" icon="user">
+        <p>{item.proposal.followUpOwnerName}</p>
+      </RegularizationFold> : null}
+    </> : null}
+  </div>;
+}
+
 function PersonChoice({
   id,
   label,
@@ -277,30 +332,33 @@ export function DeliveryRegularization({
   onEditingChange: (editing: boolean) => void;
   readOnly?: boolean;
 }) {
-  const [mode, setMode] = useState<Mode | null>(null),
-    [message, setMessage] = useState("");
-  const [consulting, setConsulting] = useState(false);
-  const [trigger, setTrigger] = useState<HTMLElement | null>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const params = useSearchParams();
   const details = data.deliveryRegularization;
-  if (!details || data.status === "draft") return null;
   const active = !readOnly && context.patient?.id === data.care_recipient_id;
   const write = active && can(context, "ent.regularize");
+  const administrativeEntry = params.get("regularization") === "prepare" && params.get("documentTab") === "materials";
+  const [mode, setMode] = useState<Mode | null>(() => administrativeEntry && write && details?.canPropose ? "propose" : null),
+    [message, setMessage] = useState("");
+  const [trigger, setTrigger] = useState<HTMLElement | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    onEditingChange(mode !== null);
+    return () => onEditingChange(false);
+  }, [mode, onEditingChange]);
+  if (!details || data.status === "draft") return null;
   const current = details.cases.find((c) => c.id === details.currentId);
-  function open(next: Mode, target: HTMLElement, privateOnly = false) {
+  function open(next: Mode, target: HTMLElement) {
     setTrigger(target);
     setMode(next);
-    setConsulting(privateOnly);
-    onEditingChange(true);
   }
   function close() {
     setMode(null);
-    onEditingChange(false);
   }
   return (
     <section
       className="ui-card space-y-4"
       aria-label="Regularização administrativa"
+      id="regularizacao"
     >
       <h2 ref={headingRef} tabIndex={-1}>
         Regularização administrativa
@@ -387,10 +445,11 @@ export function DeliveryRegularization({
           original={data}
           context={context}
           recoveryOnly={
-            consulting || !active || !regularizationAvailable(data, mode)
+            !active || !regularizationAvailable(data, mode)
           }
-          mode={mode}
+          startingMode={mode}
           restoreFocusTo={trigger}
+          headingRef={headingRef}
           onClose={close}
           onSaved={(result) => {
             onUpdated(result);
@@ -411,18 +470,20 @@ function RegularizationEditor({
   original,
   context,
   recoveryOnly,
-  mode,
+  startingMode,
   onClose,
   onSaved,
   restoreFocusTo,
+  headingRef,
 }: {
   original: SupplyDocument;
   context: WorkspaceContext;
   recoveryOnly: boolean;
-  mode: Mode;
+  startingMode: Mode;
   onClose: () => void;
   onSaved: (document: SupplyDocument) => void;
   restoreFocusTo: HTMLElement | null;
+  headingRef: RefObject<HTMLHeadingElement | null>;
 }) {
   const [reference, setReference] = useState(original),
     [comparison, setComparison] = useState<SupplyDocument | null>(null);
@@ -430,6 +491,13 @@ function RegularizationEditor({
     regularizationDraftReference(original),
   );
   const [referenceUnavailable, setReferenceUnavailable] = useState(false);
+  const [followUpKind, setFollowUpKind] = useState<"note" | "destination">("note");
+  const [destinations, setDestinations] = useState<Record<string, keyof Amounts>>({});
+  const [reviewDecision, setReviewDecision] = useState<"approve" | "reject">(startingMode === "reject" ? "reject" : "approve");
+  const followUp = startingMode === "finding";
+  const independentReview = startingMode === "approve" || startingMode === "reject";
+  const mode = followUp && followUpKind === "destination" ? "propose" : independentReview ? reviewDecision : startingMode;
+  const title = titles[followUp ? "finding" : mode];
   const [reason, setReason] = useState(""),
     [basis, setBasis] = useState(""),
     [reviewer, setReviewer] = useState(""),
@@ -439,9 +507,9 @@ function RegularizationEditor({
       original.lines.map((l) => [
         l.id,
         {
-          receivedQuantity: remaining(l).eq(0) ? "0" : "",
-          returnedQuantity: remaining(l).eq(0) ? "0" : "",
-          missingQuantity: remaining(l).eq(0) ? "0" : "",
+          receivedQuantity: followUp || remaining(l).eq(0) ? "0" : "",
+          returnedQuantity: followUp || remaining(l).eq(0) ? "0" : "",
+          missingQuantity: followUp || remaining(l).eq(0) ? "0" : "",
         },
       ]),
     ),
@@ -454,18 +522,22 @@ function RegularizationEditor({
     [errors, setErrors] = useState<Record<string, string>>({});
   const intentRef = useRef<Packet | null>(null),
     formRef = useRef<HTMLFormElement>(null),
+    reasonRef = useRef<HTMLTextAreaElement>(null),
     reviewRef = useRef<HTMLHeadingElement>(null);
   const [focusRevision, setFocusRevision] = useState(0);
   useEffect(() => {
     if (!focusRevision) return;
-    const frame = requestAnimationFrame(() =>
-      formRef.current?.querySelector<HTMLElement>("textarea,input")?.focus(),
-    );
+    const frame = requestAnimationFrame(() => {
+      const dialog = reasonRef.current?.closest("details");
+      if (dialog) dialog.open = true;
+      reasonRef.current?.focus();
+    });
     return () => cancelAnimationFrame(frame);
   }, [focusRevision]);
   const formId = useId(),
     details = reference.deliveryRegularization!;
   const current = details.cases.find((c) => c.id === details.currentId);
+  const destinationAllowed = can(context, "ent.regularize") && details.canPropose;
   const nativeAction = mode === "propose" ? "propose_regularization" : mode === "finding" ? "record_regularization_finding" : mode === "withdraw" ? "withdraw_regularization" : "review_regularization";
   const decision = useDocumentDecision({ userId: context.userId, documentId: original.id, domain: "supply", action: nativeAction });
   const privateContent = regularizationDraftContent(baseline, reference, {
@@ -482,6 +554,8 @@ function RegularizationEditor({
     uncertain ||
     stale ||
     recoveryOnly ||
+    !regularizationAvailable(reference, mode) ||
+    (followUp && mode === "propose" && !destinationAllowed) ||
     referenceUnavailable;
   useEffect(() => {
     if (review) reviewRef.current?.focus();
@@ -519,6 +593,18 @@ function RegularizationEditor({
     };
   });
   const hasUnknown = plans.some((l) => quantity(l.unknownQuantity).gt(0));
+  function chooseDestination(lineId: string, next: keyof Amounts) {
+    const previous = destinations[lineId] ?? "receivedQuantity";
+    if (previous === next) return;
+    setDestinations(current => ({ ...current, [lineId]: next }));
+    setEntries(current => ({
+      ...current,
+      [lineId]: {
+        receivedQuantity: "0", returnedQuantity: "0", missingQuantity: "0",
+        [next]: current[lineId]?.[previous] ?? "0",
+      },
+    }));
+  }
   async function prepare() {
     if (editorBlocked) return;
     const problems: Record<string, string> = {};
@@ -547,15 +633,18 @@ function RegularizationEditor({
           problems[l.lineId + "receivedQuantity"] =
             "A soma apurada ultrapassa a pendência em trânsito.";
       }
+      if (followUp && !plans.some(line => amounts.some(([key]) => quantity(line[key]).gt(0))))
+        problems.destination = "Informe uma quantidade localizada ou com perda confirmada.";
     }
     setErrors(problems);
     if (Object.keys(problems).length) {
       setError("Revise os campos indicados.");
-      requestAnimationFrame(() =>
-        formRef.current
-          ?.querySelector<HTMLElement>('[aria-invalid="true"]')
-          ?.focus(),
-      );
+      requestAnimationFrame(() => {
+        const target = document.getElementById(formId + Object.keys(problems)[0]);
+        const disclosure = target?.closest("details");
+        if (disclosure) disclosure.open = true;
+        (target ?? formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]'))?.focus();
+      });
       return;
     }
     const body =
@@ -659,6 +748,11 @@ function RegularizationEditor({
     comparison &&
     regularizationAvailable(comparison, mode) &&
     !recoveryOnly;
+  const pendingLines = reference.lines.filter(line => remaining(line).gt(0));
+  const singlePending = pendingLines.length === 1 ? pendingLines[0] : null;
+  const followUpSubtitle = singlePending
+    ? `O destino de ${formatQuantity(remaining(singlePending).toFixed(), singlePending.unit_snapshot)} ainda está em aberto.`
+    : "Consulte as quantidades apuradas e acompanhe o destino do restante.";
   const comparedIds = new Set(
     (comparison ?? reference).lines.map((line) => line.id),
   );
@@ -667,7 +761,7 @@ function RegularizationEditor({
       !comparedIds.has(line.id) &&
       amounts.some(([key]) => !!entries[line.id]?.[key]),
   );
-  if (recoveryOnly) return <RecordDrawer title={titles[mode]} onClose={onClose} restoreFocusTo={restoreFocusTo}><Notice>Este ato não está disponível neste estado ou perfil. Feche para consultar a ficha.</Notice></RecordDrawer>;
+  if (recoveryOnly) return <RecordDrawer modal title={title} onClose={onClose} restoreFocusTo={restoreFocusTo} restoreFocusFallbackRef={headingRef}><Notice>Este ato não está disponível neste estado ou perfil. Feche para consultar a ficha.</Notice></RecordDrawer>;
   function adoption(ready: boolean) {
     return (
       <ActionButton
@@ -691,18 +785,62 @@ function RegularizationEditor({
       </ActionButton>
     );
   }
+  const reasonField = (
+    <div>
+      <label className="block text-sm font-semibold" htmlFor={formId + "reason"}>
+        {mode === "finding" ? "Relato da sua apuração" : "Sua justificativa"}
+      </label>
+      <textarea
+        ref={reasonRef}
+        id={formId + "reason"}
+        className={inputClass}
+        rows={3}
+        maxLength={mode === "finding" ? 2000 : 1000}
+        value={reason}
+        onChange={event => setReason(event.currentTarget.value)}
+        aria-invalid={Boolean(errors.reason)}
+        aria-describedby={formId + "reason-help"}
+      />
+      <p id={formId + "reason-help"} className={errors.reason ? "ui-field-error" : "hca-field-hint"}>
+        {errors.reason ?? `${reason.length}/${mode === "finding" ? 2000 : 1000} caracteres. Autoria própria; o motivo original permanece em leitura.`}
+      </p>
+    </div>
+  );
   return (
     <RecordDrawer
       exitDialog
-      title={titles[mode]}
+      modal
+      popupClassName="hca-regularization-dialog"
+      title={title}
+      subtitle={followUp ? followUpSubtitle
+        : independentReview ? "Confira as quantidades, as evidências e o responsável antes de registrar sua decisão."
+          : mode === "propose" ? "O recebedor está indisponível. Informe o destino dos materiais que continuam em trânsito."
+            : undefined}
       onClose={onClose}
       busy={busy}
       uncertainOutcome={uncertain || decision.uncertain}
       restoreFocusTo={restoreFocusTo}
+      restoreFocusFallbackRef={headingRef}
+      footer={requestClose => <>
+        <ActionButton disabled={busy || uncertain} onClick={requestClose}>Voltar</ActionButton>
+        {review && !uncertain ? (
+          <ActionButton disabled={busy} onClick={event => {
+            holdDialogFocus(event.currentTarget);
+            setReview(false);
+            intentRef.current = null;
+            setFocusRevision(value => value + 1);
+          }}>Editar meus campos</ActionButton>
+        ) : null}
+        {review || uncertain ? (
+          <ActionButton variant="primary" disabled={busy || blocked} onClick={() => void send()}>
+            {uncertain ? "Recuperar mesmo ato" : mode === "approve" ? "Aprovar encerramento administrativo"
+              : mode === "propose" ? "Registrar proposta sem movimentar"
+                : mode === "finding" ? "Registrar minha apuração" : "Registrar decisão sem movimentar"}
+          </ActionButton>
+        ) : <ActionButton type="submit" form={formId} variant="primary" disabled={editorBlocked}>Revisar ato administrativo</ActionButton>}
+      </>}
     >
-      <div className="space-y-4">
-
-
+      <div className="hca-form-stack hca-delivery-receipt">
         {stale ? (
           <Notice>
             O preenchimento preserva outra versão ou proposta. Compare a
@@ -750,20 +888,10 @@ function RegularizationEditor({
             </ActionButton>
           </Notice>
         ) : null}
-        <p className="text-sm">
-          {reference.code} · ficha v{reference.version}
-        </p>
-        <Notice>
-          {mode === "propose"
-            ? "Propor preserva o estoque. Outra pessoa conferirá sua apuração antes de qualquer encerramento crítico."
-            : mode === "approve"
-              ? "Aprovar movimenta somente o material comprovado. O desconhecido permanece em trânsito e conserva responsável futuro. Não altera o aceite pessoal anterior."
-              : mode === "finding"
-                ? "Seu relato fica vinculado à pendência. Ele não movimenta estoque nem declara recebimento pela pessoa desligada."
-                : "Este ato preserva a proposta e os fatos anteriores, sem movimentar estoque."}
-        </Notice>
-        {!referenceUnavailable && mode !== "propose" && current ? (
-          <RegularizationCaseFacts item={current} />
+        {!referenceUnavailable && current ? (
+          followUp || independentReview
+            ? <RegularizationReviewFacts data={reference} item={current} followUp={followUp} disabled={busy || uncertain} />
+            : mode === "withdraw" ? <RegularizationCaseFacts item={current} /> : null
         ) : null}
         {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
         {error ? <Notice error>{error}</Notice> : null}
@@ -821,10 +949,8 @@ function RegularizationEditor({
             )}
           </section>
         ) : null}
-        {!uncertain ? (
-          <ActionButton disabled={busy} onClick={() => void compare()}>
-            Consultar ficha e elegibilidade atuais
-          </ActionButton>
+        {!uncertain && (stale || blocked || referenceUnavailable) ? (
+          <ActionButton disabled={busy} onClick={() => void compare()}>Consultar ficha e elegibilidade atuais</ActionButton>
         ) : null}
         {review ? (
           <section
@@ -866,6 +992,7 @@ function RegularizationEditor({
         ) : (
           <form
             ref={formRef}
+            id={formId}
             noValidate
             className="space-y-4"
             onSubmit={(e) => {
@@ -873,38 +1000,130 @@ function RegularizationEditor({
               void prepare();
             }}
           >
-            <fieldset className="min-w-0 space-y-4" disabled={editorBlocked}>
-              <div>
-                <label
-                  className="block text-sm font-semibold"
-                  htmlFor={formId + "reason"}
-                >
-                  {mode === "finding"
-                    ? "Relato da sua apuração"
-                    : "Sua justificativa"}
-                </label>
-                <textarea
-                  id={formId + "reason"}
-                  className={inputClass}
-                  rows={3}
-                  maxLength={mode === "finding" ? 2000 : 1000}
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  aria-invalid={Boolean(errors.reason)}
-                  aria-describedby={formId + "reason-help"}
-                />
-                <p
-                  id={formId + "reason-help"}
-                  className={
-                    errors.reason ? "ui-field-error" : "hca-field-hint"
-                  }
-                >
-                  {errors.reason ??
-                    `${reason.length}/${mode === "finding" ? 2000 : 1000} caracteres. Autoria própria; o motivo original permanece em leitura.`}
-                </p>
-              </div>
-              {mode === "propose" ? (
-                <>
+            <fieldset className="min-w-0 space-y-4" data-regularization-form={mode} disabled={editorBlocked}>
+              {followUp ? <fieldset className="hca-regularization-choice">
+                <legend>O que deseja registrar?</legend>
+                <ActionButton aria-pressed={followUpKind === "note"} onClick={() => setFollowUpKind("note")}>Andamento da busca</ActionButton>
+                {destinationAllowed ? <ActionButton aria-pressed={followUpKind === "destination"} onClick={() => setFollowUpKind("destination")}>Destino apurado</ActionButton> : null}
+              </fieldset> : null}
+              {independentReview ? <FormField label="Decisão sobre a proposta">
+                <SelectField value={reviewDecision} onChange={event => setReviewDecision(event.currentTarget.value === "approve" ? "approve" : "reject")}>
+                  <option value="approve" disabled={!details.canApprove}>Aprovar a apuração</option>
+                  <option value="reject">Devolver para correção</option>
+                </SelectField>
+              </FormField> : null}
+              {errors.destination ? <p className="ui-field-error">{errors.destination}</p> : null}
+              {mode === "propose" ? <>
+                  {plans.filter(line => !followUp || quantity(line.pendingQuantity).gt(0)).map(l => {
+                    const material = reference.lines.find(line => line.id === l.lineId);
+                    return (
+                    <section
+                      key={l.lineId}
+                      className="hca-receipt-line"
+                    >
+                      <header>
+                        <div><h3>{l.name}</h3><p>{reference.code} · {formatQuantity(l.expeditedQuantity, l.unit)} expedidos</p></div>
+                        {material ? <DeliveryMaterialMenu data={reference} line={material} disabled={editorBlocked} /> : null}
+                      </header>
+                      {!referenceUnavailable ? (
+                        <p className="text-sm">
+                          Aceite pessoal preservado:{" "}
+                          {formatQuantity(l.acceptedQuantity, l.unit)} ·
+                          Pendente em trânsito:{" "}
+                          {formatQuantity(l.pendingQuantity, l.unit)}
+                        </p>
+                      ) : null}
+                      {quantity(l.pendingQuantity).eq(0) &&
+                      amounts.every(
+                        ([key]) => entries[l.lineId]?.[key] === "0",
+                      ) ? (
+                        <p>Sem quantidade pendente nesta linha.</p>
+                      ) : (
+                        <>
+                          {followUp ? <FormField label="Destino apurado">
+                            <SelectField value={destinations[l.lineId] ?? "receivedQuantity"} onChange={event => {
+                              const choice = amounts.find(([key]) => key === event.currentTarget.value);
+                              if (choice) chooseDestination(l.lineId, choice[0]);
+                            }}>
+                              <option value="receivedQuantity">{reference.payload.destination === "FAMILY" ? "Com a família" : "Com a equipe"}</option>
+                              <option value="returnedQuantity">{reference.payload.source === "CARE_TEAM" ? "Devolvido à equipe" : "Devolvido à família"}</option>
+                              <option value="missingQuantity">Perda confirmada</option>
+                            </SelectField>
+                          </FormField> : null}
+                          <div className="hca-regularization-quantities">
+                            {amounts.filter(([key]) => !followUp || key === (destinations[l.lineId] ?? "receivedQuantity")).map(([key, label]) => (
+                              <div key={key}>
+                                <label
+                                  className="block text-sm font-semibold"
+                                  htmlFor={formId + l.lineId + key}
+                                >
+                                  {label}<span className="sr-only"> · {l.name}</span>
+                                </label>
+                                <div className="hca-receipt-quantity"><input
+                                  id={formId + l.lineId + key}
+                                  className={inputClass}
+                                  type="text"
+                                  inputMode="decimal"
+                                  value={entries[l.lineId]?.[key] ?? ""}
+                                  onChange={(event) => {
+                                    const value = event.currentTarget.value;
+                                    setEntries((v) => ({
+                                      ...v,
+                                      [l.lineId]: {
+                                        ...v[l.lineId],
+                                        [key]: value,
+                                      },
+                                    }));
+                                  }}
+                                  aria-invalid={Boolean(errors[l.lineId + key])}
+                                  aria-describedby={
+                                    formId + l.lineId + key + "-help"
+                                  }
+                                /><span>{l.unit}</span></div>
+                                <p
+                                  id={formId + l.lineId + key + "-help"}
+                                  className={
+                                    errors[l.lineId + key]
+                                      ? "ui-field-error"
+                                      : "sr-only"
+                                  }
+                                >
+                                  {errors[l.lineId + key] ??
+                                    `${l.unit} · até ${l.quantityDecimals} casas decimais. Informe zero quando apurado.`}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                          <ActionButton
+                            onClick={() =>
+                              setEntries((v) => ({
+                                ...v,
+                                [l.lineId]: {
+                                  receivedQuantity: "0",
+                                  returnedQuantity: "0",
+                                  missingQuantity: "0",
+                                },
+                              }))
+                            }
+                          >
+                            Manter {l.name} como desconhecido
+                          </ActionButton>
+                        </>
+                      )}
+                      {!referenceUnavailable ? (
+                        <p className="hca-regularization-unknown">
+                          <span>Ainda sem localização</span><strong>{" "}
+                          {quantity(l.unknownQuantity).lt(0)
+                            ? "A soma ultrapassa a pendência"
+                            : formatQuantity(l.unknownQuantity, l.unit)}
+                          </strong>
+                        </p>
+                      ) : null}
+                    </section>
+                    );
+                  })}
+                  <RegularizationFold title="Motivo e evidências da proposta" icon="note">
+                    {reasonField}
                   <div>
                     <label
                       htmlFor={formId + "basis"}
@@ -932,97 +1151,6 @@ function RegularizationEditor({
                         `${basis.length}/2000 caracteres. Declare o que foi comprovado e o que continua desconhecido.`}
                     </p>
                   </div>
-                  {plans.map((l) => (
-                    <section
-                      key={l.lineId}
-                      className="space-y-3 rounded-xl border border-(--line) p-3"
-                    >
-                      <h3 className="font-semibold wrap-break-word">{l.name}</h3>
-                      {!referenceUnavailable ? (
-                        <p className="text-sm">
-                          Aceite pessoal preservado:{" "}
-                          {formatQuantity(l.acceptedQuantity, l.unit)} ·
-                          Pendente em trânsito:{" "}
-                          {formatQuantity(l.pendingQuantity, l.unit)}
-                        </p>
-                      ) : null}
-                      {quantity(l.pendingQuantity).eq(0) &&
-                      amounts.every(
-                        ([key]) => entries[l.lineId]?.[key] === "0",
-                      ) ? (
-                        <p>Sem quantidade pendente nesta linha.</p>
-                      ) : (
-                        <>
-                          <div className="grid gap-3 sm:grid-cols-2">
-                            {amounts.map(([key, label]) => (
-                              <div key={key}>
-                                <label
-                                  className="block text-sm font-semibold"
-                                  htmlFor={formId + l.lineId + key}
-                                >
-                                  {label} · {l.name}
-                                </label>
-                                <input
-                                  id={formId + l.lineId + key}
-                                  className={inputClass}
-                                  type="text"
-                                  inputMode="decimal"
-                                  value={entries[l.lineId]?.[key] ?? ""}
-                                  onChange={(e) =>
-                                    setEntries((v) => ({
-                                      ...v,
-                                      [l.lineId]: {
-                                        ...v[l.lineId],
-                                        [key]: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                  aria-invalid={Boolean(errors[l.lineId + key])}
-                                  aria-describedby={
-                                    formId + l.lineId + key + "-help"
-                                  }
-                                />
-                                <p
-                                  id={formId + l.lineId + key + "-help"}
-                                  className={
-                                    errors[l.lineId + key]
-                                      ? "ui-field-error"
-                                      : "hca-field-hint"
-                                  }
-                                >
-                                  {errors[l.lineId + key] ??
-                                    `${l.unit} · até ${l.quantityDecimals} casas decimais. Informe zero quando apurado.`}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                          <ActionButton
-                            onClick={() =>
-                              setEntries((v) => ({
-                                ...v,
-                                [l.lineId]: {
-                                  receivedQuantity: "0",
-                                  returnedQuantity: "0",
-                                  missingQuantity: "0",
-                                },
-                              }))
-                            }
-                          >
-                            Manter {l.name} como desconhecido
-                          </ActionButton>
-                        </>
-                      )}
-                      {!referenceUnavailable ? (
-                        <p className="text-sm">
-                          Situação física desconhecida:{" "}
-                          {quantity(l.unknownQuantity).lt(0)
-                            ? "A soma ultrapassa a pendência"
-                            : formatQuantity(l.unknownQuantity, l.unit)}
-                          . Permanece em trânsito.
-                        </p>
-                      ) : null}
-                    </section>
-                  ))}
                   <PersonChoice
                     id={formId + "reviewer"}
                     label="Conferente independente"
@@ -1032,7 +1160,9 @@ function RegularizationEditor({
                     onChange={setReviewer}
                     error={errors.reviewer}
                   />
+                  </RegularizationFold>
                   {hasUnknown ? (
+                    <RegularizationFold title="Responsável pela busca" icon="user">
                     <PersonChoice
                       id={formId + "owner"}
                       label="Responsável pela apuração futura"
@@ -1042,50 +1172,26 @@ function RegularizationEditor({
                       onChange={setOwner}
                       error={errors.owner}
                     />
+                    </RegularizationFold>
                   ) : null}
-                </>
-              ) : null}
-              <ActionButton type="submit" variant="primary">
-                Revisar ato administrativo
-              </ActionButton>
+              </> : reasonField}
             </fieldset>
           </form>
         )}
-        <div className="hca-toolbar">
-          <ActionButton disabled={busy || uncertain} onClick={onClose}>
-            Voltar sem registrar
-          </ActionButton>
-          {review && !uncertain ? (
-            <ActionButton
-              disabled={busy}
-              onClick={(event) => {
-                holdDialogFocus(event.currentTarget);
-                setReview(false);
-                intentRef.current = null;
-                setFocusRevision((value) => value + 1);
-              }}
-            >
-              Editar meus campos
-            </ActionButton>
-          ) : null}
-          {review || uncertain ? (
-            <ActionButton
-              variant="primary"
-              disabled={busy || blocked}
-              onClick={() => void send()}
-            >
-              {uncertain
-                ? "Recuperar mesmo ato"
-                : mode === "approve"
-                  ? "Aprovar encerramento administrativo"
-                  : mode === "propose"
-                    ? "Registrar proposta sem movimentar"
-                    : mode === "finding"
-                      ? "Registrar minha apuração"
-                      : "Registrar decisão sem movimentar"}
-            </ActionButton>
-          ) : null}
-        </div>
+        <p className="hca-regularization-impact">
+          <Icon name={mode === "finding" ? "history" : "shield"} width={16} height={16} />
+          {mode === "propose"
+            ? "Uma pessoa designada revisará a proposta antes de atualizar o estoque."
+            : mode === "approve"
+              ? "A aprovação registra os destinos apurados. O restante continua em trânsito e o aceite pessoal permanece preservado."
+              : mode === "finding"
+                ? "O registro entra no histórico da busca. As quantidades em apuração continuam pendentes."
+                : "A decisão preserva a proposta e os fatos anteriores, sem movimentar estoque."}
+        </p>
+        {!uncertain && !stale && !blocked && !referenceUnavailable ? <RegularizationFold title="Referência da ficha" icon="file">
+          <p>{reference.code} · ficha v{reference.version}</p>
+          <ActionButton disabled={busy} onClick={() => void compare()}>Consultar ficha e elegibilidade atuais</ActionButton>
+        </RegularizationFold> : null}
       </div>
     </RecordDrawer>
   );

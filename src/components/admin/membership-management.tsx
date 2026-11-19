@@ -10,6 +10,8 @@ import { text, type Row } from "./admin-fields";
 import { AdministrativePreparationEditor } from "./administrative-preparation-editor";
 import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
 import { ProfileAvatar } from "@/components/ui/avatar";
+import { Dialog } from "@/components/ui/overlays";
+import { MembershipImpact } from "./membership-impact";
 import "./identity.css";
 
 export function MembershipManagement({
@@ -19,6 +21,7 @@ export function MembershipManagement({
   confirmationRevision = 0,
   patientId,
   credentialReviewAllowed = false,
+  mayRegularize = false,
 }: {
   rows: Row[];
   directory: Row[];
@@ -27,8 +30,14 @@ export function MembershipManagement({
   confirmationRevision?: number;
   patientId: string;
   credentialReviewAllowed?: boolean;
+  mayRegularize?: boolean;
 }) {
   const [search, setSearch] = useState("");
+  type MemberReference = { patientId: string; userId: string };
+  const [impact, setImpact] = useState<MemberReference | null>(null);
+  const [revocation, setRevocation] = useState<MemberReference | null>(null);
+  const impactSubject = impact?.patientId === patientId ? impact.userId : null;
+  const revokedSubject = revocation?.patientId === patientId ? revocation : null;
   const [credential, setCredential] = useState<{ subjectId: string; opener: HTMLElement } | null>(null);
   type Editor = {
     row: Row | null;
@@ -70,6 +79,10 @@ export function MembershipManagement({
           Vincular conta
         </ActionButton>
       </div>
+      {revokedSubject && !globalMode ? <div className="hca-attention">
+        <p>Consulte as entregas e outras pendências da pessoa desligada.</p>
+        <ActionButton onClick={() => setImpact(revokedSubject)}>Acompanhar pendências do vínculo</ActionButton>
+      </div> : null}
       <div className="hca-toolbar">
         <TextInput
           type="search"
@@ -115,6 +128,9 @@ export function MembershipManagement({
               <ActionButton variant="quiet" onClick={() => setChange(row)}>
                 {row.status === "revoked" ? "Reativar" : "Revogar"}
               </ActionButton>
+              {row.status === "revoked" && !globalMode ? <ActionButton onClick={() => setImpact({ patientId, userId: text(row, "user_id") })}>
+                Acompanhar pendências
+              </ActionButton> : null}
               {patientId ? <ActionButton disabled={!credentialReviewAllowed} title={!credentialReviewAllowed ? "Selecione seu vínculo local para conferir uma credencial." : undefined} onClick={event => setCredential({ subjectId: text(row, "user_id"), opener: event.currentTarget })}>Conferir credencial</ActionButton> : null}
             </div>
           </article>
@@ -135,8 +151,16 @@ export function MembershipManagement({
       {change ? <AdministrativePreparationEditor
         key={text(change,"user_id")}
         scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"membershipStatus",targetId:text(change,"user_id")}}
-        userId={userId} people={rows} onClose={() => setChange(null)} onConfirmed={onConfirmed}
+        userId={userId} people={rows} onClose={() => setChange(null)} onConfirmed={outcome => {
+          if (outcome.kind === "local" && outcome.action === "membershipStatus" && outcome.userId)
+            setRevocation(outcome.status === "revoked" ? { patientId, userId: outcome.userId } : null);
+          onConfirmed(outcome);
+        }}
       /> : null}
+      {impactSubject && !globalMode ? <Dialog open title="Acompanhar pendências do vínculo"
+        onClose={() => setImpact(null)} footer={<ActionButton onClick={() => setImpact(null)}>Voltar</ActionButton>}>
+        <MembershipImpact patientId={patientId} userId={impactSubject} afterRevocation mayRegularize={mayRegularize} />
+      </Dialog> : null}
     </section>
   );
 }
