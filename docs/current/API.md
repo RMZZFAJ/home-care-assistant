@@ -1731,6 +1731,11 @@ o mínimo remoto conferido permanece em seis caracteres.
   applied com intenção/resultado oficiais ou not_applied com intenção/resultado
   nulos. A ausência fecha a chave para impedir a aplicação tardia do pedido.
   Repetir uma tentativa ausente exige nova confirmação e nova chave.
+- Na COM, o domínio `supply` aceita `request_receipt_correction` com `receiptId`
+  e `reason` e `resubmit_receipt` com `receiptId` e as `lines` corrigidas.
+  Cada linha reenviada inclui `lineId`, `quantity`, `expectedQuantity` e a
+  escolha aplicável à falta ou ao excedente. O pedido cabe ao administrador
+  habilitado e o reenvio ao autor da chegada. Ambos preservam o ID original.
 - POST /api/balances/decisions/:target?careRecipientId=:patient e a variante
   /reconcile aplicam a mesma regra à programação, atribuição e adiamento.
   O domínio é balance_workspace; expectedVersion=0 representa somente uma

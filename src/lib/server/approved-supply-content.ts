@@ -30,7 +30,8 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
     [...(snapshot.purchaseReceipts ?? [])].sort((a, b) => a.created_at.localeCompare(b.created_at)).forEach((receipt, index) => {
       const prefix = "receipt/" + index;
       semanticFacts[prefix + "/submitted"] = "Chegada registrada por " + (receipt.submitted_name ?? "Nome não preservado") + " · " + formatBrazilDate(receipt.created_at);
-      semanticFacts[prefix + "/decision"] = receipt.state === "pending" ? "Ainda sem decisão de validação." : (receipt.state === "approved" ? "Validada por " : "Rejeitada por ") + (receipt.validated_name ?? "Nome não preservado") + " · " + formatBrazilDate(receipt.validated_at ?? null);
+      semanticFacts[prefix + "/decision"] = receipt.state === "pending" ? "Ainda sem decisão de validação." : receipt.state === "correction_requested" ? "Aguardando correção pelo autor da chegada."
+        : (receipt.state === "approved" ? "Validada por " : "Rejeitada por ") + (receipt.validated_name ?? "Nome não preservado") + " · " + formatBrazilDate(receipt.validated_at ?? null);
       if (receipt.reason) semanticFacts[prefix + "/reason"] = receipt.reason;
       receipt.lines.forEach((item, itemIndex) => {
         const line = snapshot.lines.find(value => value.id === item.lineId);
@@ -38,6 +39,18 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
         semanticFacts[prefix + "/quantity/" + itemIndex] = amount(item.quantity, unit(line));
         const variance = purchaseArrivalVariance(receipt, item, unit(line));
         if (variance) semanticFacts[prefix + "/difference/" + itemIndex] = name(line) + " · " + variance;
+      });
+      receipt.corrections?.forEach((correction, correctionIndex) => {
+        const key = prefix + "/correction/" + correctionIndex;
+        semanticFacts[key + "/requested"] = "Correção solicitada por " + (correction.requesterName ?? "Nome não preservado") + " · " + formatBrazilDate(correction.requestedAt);
+        semanticFacts[key + "/reason"] = correction.reason;
+        if (correction.resubmittedAt) semanticFacts[key + "/resubmitted"] = "Reenviada pelo autor em " + formatBrazilDate(correction.resubmittedAt);
+        const records = { Declarado: correction.previousLines, Corrigido: correction.correctedLines ?? [] };
+        for (const [label, items] of Object.entries(records)) items.forEach((item, itemIndex) => {
+          const material = snapshot.lines.find(value => value.id === item.lineId);
+          if (!material) throw new Error("Correction material missing");
+          semanticFacts[key + "/" + label + "/" + itemIndex] = label + " · " + name(material) + " · " + amount(item.quantity, unit(material));
+        });
       });
     });
     if (snapshot.purchaseProgress?.closure) {

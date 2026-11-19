@@ -149,6 +149,15 @@ integra a entrada física após a validação sem ampliar a quantidade comprada.
 O registro da parcela e o snapshot documental preservam os valores e a
 providência de cada linha.
 
+O administrador habilitado pode solicitar correção de uma parcela de outro
+autor. A parcela conserva sua referência, seu registro original e o motivo
+informado. A quantidade continua reservada enquanto aguarda o autor. Somente
+o autor com autoridade atual pode reenviar os mesmos materiais e, ao fazê-lo,
+usa a nova quantidade esperada. A revisão e a aprovação registram atos próprios
+na mesma parcela. Somente a aprovação move estoque. A linha originalmente sem
+recebimento pode ser resolvida mesmo se outra parcela completou a expectativa.
+Os atos e os snapshots preservam autoria, instantes e as duas declarações.
+
 bal_approvals identifica grupo, ator e versão de contagem. Reconto conserva
 aprovações antigas e captura nova referência; elas não aprovam o novo balanço.
 

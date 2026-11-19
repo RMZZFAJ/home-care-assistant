@@ -68,6 +68,8 @@ const labels: Record<string, string> = {
   "com.receive": "Recebimento informado",
   "com.validate_receipt": "Recebimento validado",
   "com.reject_receipt": "Recebimento rejeitado",
+  "com.request_receipt_correction": "Correção da chegada solicitada",
+  "com.resubmit_receipt": "Chegada corrigida e reenviada",
   "com.close_expectation": "Expectativa não adquirida encerrada",
   "com.cancel": "Ficha de compra ou doação cancelada",
   "ent.issued": "Materiais expedidos",

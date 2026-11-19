@@ -98,9 +98,10 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
     if (!receipts.length) layout.paragraph("Nenhuma chegada registrada até o corte.", "receipts/empty");
     for (const [index, receipt] of receipts.entries()) {
       const prefix = "receipt/" + index;
-      layout.heading("Parcela " + (index + 1) + " · " + ({ approved: "Recebimento validado", pending: "Aguardando conferência", rejected: "Recebimento rejeitado" }[receipt.state]));
+      layout.heading("Parcela " + (index + 1) + " · " + ({ approved: "Recebimento validado", pending: "Aguardando conferência", rejected: "Recebimento rejeitado", correction_requested: "Correção solicitada" }[receipt.state]));
       layout.paragraph("Chegada registrada por " + (receipt.submitted_name ?? "Nome não preservado") + " · " + formatBrazilDate(receipt.created_at), prefix + "/submitted", { size: 9.5 });
-      layout.paragraph(receipt.state === "pending" ? "Ainda sem decisão de validação." : (receipt.state === "approved" ? "Validada por " : "Rejeitada por ") + (receipt.validated_name ?? "Nome não preservado") + " · " + formatBrazilDate(receipt.validated_at ?? null), prefix + "/decision", { size: 9.5 });
+      layout.paragraph(receipt.state === "pending" ? "Ainda sem decisão de validação." : receipt.state === "correction_requested" ? "Aguardando correção pelo autor da chegada."
+        : (receipt.state === "approved" ? "Validada por " : "Rejeitada por ") + (receipt.validated_name ?? "Nome não preservado") + " · " + formatBrazilDate(receipt.validated_at ?? null), prefix + "/decision", { size: 9.5 });
       if (receipt.reason) layout.paragraph(receipt.reason, prefix + "/reason");
       if (receipt.state === "rejected") layout.paragraph("Registro de chegada rejeitado; não comprova entrada de material.", prefix + "/scope", { size: 9.5 });
       layout.table([{ label: "Material", fraction: 0.7 }, { label: "Quantidade da parcela", fraction: 0.3 }], receipt.lines.map((item, itemIndex) => { const line = snapshot.lines.find(value => value.id === item.lineId); if (!line) throw new Error("Receipt material missing"); return { cells: [{ text: name(line) }, { text: amount(item.quantity, unit(line)), key: prefix + "/quantity/" + itemIndex }] }; }));
@@ -109,6 +110,19 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
         if (!line) throw new Error("Receipt material missing");
         const variance = purchaseArrivalVariance(receipt, item, unit(line));
         if (variance) layout.paragraph(name(line) + " · " + variance, prefix + "/difference/" + itemIndex, { size: 9.5 });
+      }
+      for (const [correctionIndex, correction] of (receipt.corrections ?? []).entries()) {
+        const key = prefix + "/correction/" + correctionIndex;
+        layout.paragraph("Correção solicitada por " + (correction.requesterName ?? "Nome não preservado") + " · " + formatBrazilDate(correction.requestedAt), key + "/requested", { size: 9.5 });
+        layout.paragraph(correction.reason, key + "/reason", { size: 9.5 });
+        if (correction.resubmittedAt) layout.paragraph("Reenviada pelo autor em " + formatBrazilDate(correction.resubmittedAt), key + "/resubmitted", { size: 9.5 });
+        for (const [label, items] of [["Declarado", correction.previousLines], ["Corrigido", correction.correctedLines ?? []]] as const) {
+          for (const [itemIndex, item] of items.entries()) {
+            const line = snapshot.lines.find(value => value.id === item.lineId);
+            if (!line) throw new Error("Correction material missing");
+            layout.paragraph(label + " · " + name(line) + " · " + amount(item.quantity, unit(line)), key + "/" + label + "/" + itemIndex, { size: 9.5 });
+          }
+        }
       }
     }
     const closure = snapshot.purchaseProgress?.closure;

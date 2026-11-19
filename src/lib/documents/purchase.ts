@@ -3,8 +3,9 @@ import type { PurchaseReceipt, SupplyDocument, SupplyLine } from "@/types/docume
 import type { PurchaseSelection } from "@/lib/validation/purchase-command";
 import type { PurchaseArrivalSelection } from "@/lib/validation/purchase-arrival";
 
-export const receiptStates: Record<string, string> = {
+export const receiptStates: Record<PurchaseReceipt["state"], string> = {
   pending: "Aguardando conferência", approved: "Validada", rejected: "Rejeitada",
+  correction_requested: "Correção solicitada",
 };
 export const purchaseActivitySteps = [
   { label: "Registrando a compra e as chegadas", icon: "file" },
@@ -19,6 +20,13 @@ export function arrivalRemaining(line: SupplyLine, document: SupplyDocument) {
   if (reported) return quantity(reported.unarrivedQuantity);
   const pending = document.receipts.filter(receipt => receipt.state === "pending").flatMap(receipt => receipt.lines).filter(item => item.lineId === line.id).reduce((sum, item) => sum.plus(item.quantity), quantity(0));
   return quantity(line.purchased_quantity).minus(line.accepted_quantity).minus(pending);
+}
+
+export function arrivalCorrectionExpected(document: SupplyDocument, receipt: PurchaseReceipt, item: PurchaseReceipt["lines"][number], line: SupplyLine) {
+  const expected = quantity(receipt.l2_arrival ? item.expectedQuantity ?? item.quantity : item.quantity);
+  const reserved = receipt.l2_arrival && item.remainingAction === "short" ? expected
+    : expected.lt(item.quantity) ? expected : quantity(item.quantity);
+  return arrivalRemaining(line, document).plus(reserved);
 }
 
 export function formatPurchaseDate(date: string) {

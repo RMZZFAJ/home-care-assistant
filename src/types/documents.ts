@@ -171,16 +171,26 @@ export type BalanceReviewContext = BalanceReviewFacts & {
   application?: BalanceApplicationFacts;
   corrections?: import("@/lib/validation/balance-corrections").BalanceCorrectionFacts;
 };
+export type PurchaseReceiptLine = {
+  lineId: string;
+  quantity: string;
+  expectedQuantity?: string;
+  remainingAction?: "wait" | "short";
+  excessConfirmed?: true;
+};
 export type PurchaseReceipt = {
   id: string;
-  state: "pending" | "approved" | "rejected";
+  state: "pending" | "approved" | "rejected" | "correction_requested";
   submitted_by: string;
-  lines: {
-    lineId: string;
-    quantity: string;
-    expectedQuantity?: string;
-    remainingAction?: "wait" | "short";
-    excessConfirmed?: true;
+  lines: PurchaseReceiptLine[];
+  corrections?: {
+    requestedAt: string;
+    requesterId: string;
+    requesterName: string | null;
+    reason: string;
+    previousLines: PurchaseReceiptLine[];
+    resubmittedAt?: string;
+    correctedLines?: PurchaseReceiptLine[];
   }[];
   l2_arrival?: boolean;
   created_at: string;

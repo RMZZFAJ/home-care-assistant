@@ -46,12 +46,15 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
   }, [storageKey, reconcileEndpoint, documentId, domain, action]);
   const cancellingRequisition = domain === "requisition" && action === "cancel";
   const purchasing = domain === "supply" && action === "purchase";
+  const resendingArrival = domain === "supply" && action === "resubmit_receipt";
   useOperationActivity(busy, {
-    title: cancellingRequisition ? "Registrando cancelamento" : purchasing ? "Registrando compra" : purchaseArrival ? "Registrando chegada" : "Concluindo a ação",
+    title: cancellingRequisition ? "Registrando cancelamento" : purchasing ? "Registrando compra"
+      : resendingArrival ? "Reenviando chegada" : purchaseArrival ? "Registrando chegada" : "Concluindo a ação",
     detail: "Aguarde a conferência do resultado antes de tentar novamente.",
     stage,
     steps: purchasing ? purchaseActivitySteps : [
-      { label: cancellingRequisition ? "Conferindo os efeitos no estoque" : purchaseArrival ? "Registrando as quantidades recebidas" : "Enviando sua confirmação", icon: cancellingRequisition ? "stock" : purchaseArrival ? "truck" : "file" },
+      { label: cancellingRequisition ? "Conferindo os efeitos no estoque" : resendingArrival ? "Conferindo o lançamento"
+        : purchaseArrival ? "Registrando as quantidades recebidas" : "Enviando sua confirmação", icon: cancellingRequisition ? "stock" : purchaseArrival ? "truck" : "file" },
       { label: "Conferindo o resultado", icon: "check" },
     ],
   });

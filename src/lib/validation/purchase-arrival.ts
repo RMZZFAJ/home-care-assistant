@@ -13,3 +13,5 @@ export const purchaseArrivalBody = z.object({
 }).strict();
 
 export type PurchaseArrivalSelection = z.infer<typeof purchaseArrivalBody>["lines"];
+export const requestArrivalCorrection = z.object({ receiptId: z.uuid(), reason: z.string().trim().min(3).max(1000) }).strict();
+export const resubmitArrival = purchaseArrivalBody.extend({ receiptId: z.uuid() });

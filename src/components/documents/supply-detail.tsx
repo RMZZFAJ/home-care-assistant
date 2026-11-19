@@ -76,11 +76,11 @@ import { deliveryFollowUp } from "@/lib/documents/delivery-follow-up";
 import { materialTransferDirection, materialTransferLabel, transferFollowUp } from "@/lib/documents/transfer-follow-up";
 import { DocumentProgress } from "./document-progress";
 import {
-  PurchaseDetails,
   PurchaseExpectationComparison,
 } from "./purchase-details";
 import { confirmedPurchase, PurchaseResult, type ConfirmedPurchase } from "./purchase-register";
 import { PurchaseArrivalResult } from "./purchase-arrival";
+import { PurchaseArrivalCorrections } from "./purchase-arrival-correction";
 import {
   acquisitionRemaining,
   arrivalRemaining,
@@ -467,8 +467,11 @@ export function SupplyDocumentContent({
   }
   const [accessRevision, setAccessRevision] = useState("initial");
   const activeContext = data?.care_recipient_id === context.patient?.id;
+  const pendingCorrections = data?.type === "COM" ? data.receipts.filter(receipt => receipt.state === "correction_requested") : [];
   const purchaseStep = data?.type === "COM" ? purchaseFollowUp({
     status: data.status, origin: data.payload.origin, progress: data.purchaseProgress,
+    arrivalCorrection: pendingCorrections.length ? pendingCorrections.some(receipt =>
+      receipt.submitted_by === context.userId && activeContext && can(context, "com.receive")) ? "author" : "waiting" : undefined,
   }) : null;
   const deliveryStep = data?.type === "ENT"
     ? data.transfer ? transferFollowUp(data) : deliveryFollowUp(data,
@@ -1197,7 +1200,10 @@ export function SupplyDocumentContent({
                   }}
                 />
               ) : null}
-              {data.type === "COM" ? <PurchaseDetails key={data.id} data={data} /> : null}
+              {data.type === "COM" ? (
+                <PurchaseArrivalCorrections key={`${data.id}:${context.userId}:${context.patient?.id}`} data={data} context={context}
+                  onUpdated={updated => { setData(updated); setAttempt(value => value + 1); }} />
+              ) : null}
               {data.type === "BAL" && data.status !== "draft" ? (
                 <BalanceReview
                   data={data}

@@ -114,9 +114,22 @@ unidades registra a falta sem movimentar o estoque e mostra o saldo como
 sem entrada validada. Passaram oito integrações com Auth real, oito testes
 unitários dirigidos e dez execuções em Android e iOS emulados, sem retry
 nas rodadas finais. Os logs estão em `output/playwright/l2-com-arrival-*.log`
-e as capturas móveis em `output/playwright/l2-com-arrival/`. A devolução
-para correção pelo autor, a aprovação em lote, a chegada avulsa e a
-cobertura de outro planejamento ainda fazem parte das próximas etapas.
+e as capturas móveis em `output/playwright/l2-com-arrival/`.
+
+A devolução para correção do E05-10 preserva a parcela e a quantidade
+original. Somente o autor reenvia a chegada. O motivo, a autoria, o instante
+e cada nova quantidade ficam no histórico e no PDF. A confirmação usa a
+mesma recuperação de operação oficial. A chegada volta à conferência e
+somente um novo ato de aprovação credita o estoque. A migration
+`20261119044938_l2_com_arrival_correction.sql` foi aplicada na stack local.
+Sete integrações cobriram autoria, chave repetida, versão vencida, aprovação,
+chegada de zero unidades, estoque e preservação documental. Passaram 17
+testes unitários dirigidos e seis casos em Android e iOS emulados, incluindo
+perda de resposta e emissão do PDF durante a pendência. O painel foi
+comparado com o E05-10 em 390 px e os dois casos móveis passaram novamente
+após o ajuste visual. Logs `l2-com-correction-*.log` e capturas em
+`output/playwright/l2-com-correction/`. Restam o painel unificado de decisões,
+a aprovação em lote, a chegada avulsa e a cobertura de outro planejamento.
 
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma

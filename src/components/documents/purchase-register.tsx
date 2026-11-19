@@ -84,6 +84,7 @@ export function confirmedPurchase(document: SupplyDocument, lines: PurchaseSelec
     approved: "Os materiais já em mãos entraram no estoque familiar.",
     pending: "As chegadas dos materiais já em mãos aguardam o administrador.",
     rejected: "Uma chegada desta compra foi rejeitada.",
+    correction_requested: "Uma chegada desta compra aguarda correção pelo autor.",
   };
   const waiting = lines.some(line => !line.inHand);
   const summary = [
@@ -97,6 +98,7 @@ export function confirmedPurchase(document: SupplyDocument, lines: PurchaseSelec
     if (arrival?.state === "approved") status = "Chegada validada e incorporada ao estoque familiar";
     if (arrival?.state === "pending") status = "Chegada aguardando aprovação do administrador";
     if (arrival?.state === "rejected") status = "Chegada registrada e posteriormente rejeitada";
+    if (arrival?.state === "correction_requested") status = "Chegada aguardando correção pelo autor";
     return {
       id: line.lineId,
       name: material?.name_snapshot ?? "Material da compra",

@@ -15,6 +15,7 @@ export function purchaseFollowUp(input: {
   status: string;
   origin?: string;
   progress?: PurchaseProgress;
+  arrivalCorrection?: "author" | "waiting";
 }): PurchaseFollowUp {
   const progress = input.progress;
   const state = progress?.state ?? input.status;
@@ -42,10 +43,18 @@ export function purchaseFollowUp(input: {
     ...base, pending: false, heading: "Consultar as etapas da aquisição",
     description: "A referência das quantidades não está disponível. Atualize a ficha; a ausência desses dados não foi tratada como conclusão.",
   };
+  if (input.arrivalCorrection === "author") return {
+    ...base, pending: true, heading: "Corrigir a chegada informada",
+    description: "Confira o motivo da pendência e reenvie a quantidade corrigida para aprovação.",
+  };
   if (progress.validationPending) return {
     ...base, pending: true, heading: "Conferir as parcelas de chegada",
     description: (progress.expectationClosed ? "A aquisição restante foi encerrada, mas há parcelas aguardando validação. " : "Há parcelas aguardando validação. ")
       + "Consulte autor, instante e quantidades de cada declaração. Informar chegada ainda não credita essa parcela no estoque.",
+  };
+  if (input.arrivalCorrection === "waiting") return {
+    ...base, pending: true, heading: "Aguardar a correção da chegada",
+    description: "A parcela foi devolvida para o autor corrigir e reenviar para aprovação.",
   };
   if (progress.physicalPending) return {
     ...base, pending: true, heading: donation ? "Informar a chegada da doação" : "Informar a chegada da aquisição",

@@ -1,0 +1,64 @@
+import { expect, test } from "@playwright/test";
+import { randomUUID } from "node:crypto";
+import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
+import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
+import { purchaseBalanceCommand, purchaseBalanceFixture } from "../integration/purchase-entry-balance-fixtures.mjs";
+import { confirmDecisionAndReconcile, loginDecision, loseDecisionResponse } from "./l1-decision-policy";
+import { selectDocumentSection } from "./document-sections";
+import { generatedPdf } from "./generated-pdf";
+
+test("COM devolve a mesma chegada ao autor e credita só o que foi reenviado e aprovado", async ({ page }, info) => {
+  test.setTimeout(100_000);
+  const f = await purchaseBalanceFixture(), [line] = f.document.lines;
+  const pending = await purchaseBalanceCommand(f.family, f.document, "receive", { lines: [
+    { lineId: line.id, quantity: "4", expectedQuantity: "6", remainingAction: "wait" },
+  ] }, randomUUID());
+  const [receipt] = pending.receipts;
+  const stockEntries = () => sql(`select count(*) from public.stock_movements where reference_type='purchase_receipt' and reference_id=${sqlLiteral(receipt.id)};`);
+  const path = `/fichas/${pending.id}`;
+  const note = "Confira as unidades por embalagem.";
+  await loginDecision(page, fixtures.adminA.email, f.patient);
+  await page.goto(path);
+  await selectDocumentSection(page, "workflow");
+  await page.getByRole("button", { name: "Abrir pendência", exact: true }).click();
+  const request = page.getByRole("dialog", { name: "Abrir pendência na chegada", exact: true });
+  await request.getByRole("textbox", { name: "O que precisa ser corrigido?" }).fill(note);
+  await request.getByRole("button", { name: "Confirmar pendência", exact: true }).click();
+  await page.getByRole("dialog", { name: "Correção solicitada", exact: true }).getByRole("button", { name: "Concluir" }).click();
+  await expect(page.getByRole("button", { name: "Corrigir chegada", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Validar recebimento", exact: true })).toHaveCount(0);
+  expect(stockEntries()).toBe("0");
+  const pdf = await generatedPdf(page, `/api/documents/${pending.id}/pdf`);
+  expect(pdf.ok(), await pdf.text()).toBe(true);
+  expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
+
+  await page.context().clearCookies();
+  await loginDecision(page, fixtures.family.email, f.patient);
+  await page.goto(path);
+  await selectDocumentSection(page, "workflow");
+  await page.getByRole("button", { name: "Corrigir chegada", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "Corrigir chegada", exact: true });
+  await expect(editor.getByText(note, { exact: true })).toBeVisible();
+  const quantity = editor.getByRole("textbox", { name: /^Quantidade corrigida/ });
+  await expect(quantity).toHaveValue("4");
+  if (info.project.use.hasTouch) await info.attach("E05-10 correção da chegada", { body: await page.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png" });
+  await editor.getByRole("button", { name: "Detalhes de " + line.name_snapshot, exact: true }).click();
+  const details = page.getByRole("dialog", { name: "Detalhes do material", exact: true });
+  await expect(details).toBeVisible();
+  await details.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
+  await expect(details).toHaveCount(0);
+  await quantity.fill("5");
+  const endpoint = `/api/documents/${pending.id}/decisions`;
+  const packets = await loseDecisionResponse(page, endpoint);
+  await confirmDecisionAndReconcile(page, pending.id, editor.getByRole("button", { name: "Reenviar para aprovação", exact: true }));
+  await page.getByRole("dialog", { name: "Chegada reenviada", exact: true }).getByRole("button", { name: "Concluir" }).click();
+  expect(packets).toHaveLength(1);
+  expect(stockEntries()).toBe("0");
+  const after = await rpc(f.admin, "operational_document", { p_id: pending.id });
+  expect(after.receipts).toHaveLength(1);
+  expect(after.receipts[0]).toMatchObject({ id: receipt.id, state: "pending", lines: [{ quantity: "5" }] });
+  expect(after.receipts[0].corrections[0]).toMatchObject({ reason: note, previousLines: [{ quantity: "4" }], correctedLines: [{ quantity: "5" }] });
+  const credited = await purchaseBalanceCommand(f.admin, after, "validate_receipt", { receiptId: receipt.id });
+  expect(credited.receipts[0].state).toBe("approved");
+  expect(stockEntries()).toBe("1");
+});

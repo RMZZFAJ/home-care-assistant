@@ -1,13 +1,20 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ActionButton, FormField, SelectField, TextInput } from "@/components/ui/controls";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatPurchaseDate, receiptStates } from "@/lib/documents/purchase";
-import type { PurchaseReceipt, SupplyDocument } from "@/types/documents";
+import type { PurchaseReceipt, PurchaseReceiptLine, SupplyDocument } from "@/types/documents";
 import { purchaseReceiptRows, type ReceiptFilter } from "@/lib/documents/purchase-receipt-list";
 
 export function PurchaseReceiptContent({ receipt, lines }: { receipt: PurchaseReceipt; lines: SupplyDocument["lines"] }) {
+  const correction = receipt.corrections?.at(-1);
+  function historicQuantities(items: PurchaseReceiptLine[]) {
+    return items.map(item => {
+      const line = lines.find(candidate => candidate.id === item.lineId);
+      return <li key={item.lineId}>{line?.name_snapshot ?? "Material registrado"} · {formatQuantity(item.quantity, line?.unit_snapshot)}</li>;
+    });
+  }
   return <div className="space-y-2 text-sm">
     <p>Informada por <strong>{receipt.submitted_name ?? "Autor histórico não preservado"}</strong> · {formatBrazilDate(receipt.created_at)}</p>
     <dl className="space-y-2">{receipt.lines.map(item => {
@@ -26,9 +33,24 @@ export function PurchaseReceiptContent({ receipt, lines }: { receipt: PurchaseRe
     })}</dl>
     {receipt.validated_at ? <p>{receipt.state === "rejected" ? "Rejeitada" : "Validada"} por {receipt.validated_name ?? "Nome histórico não preservado"} · {formatBrazilDate(receipt.validated_at)}</p> : null}
     {receipt.reason ? <p className="whitespace-pre-wrap">Motivo: {receipt.reason}</p> : null}
+    {receipt.state === "correction_requested" && correction ? <div className="hca-arrival-attention rounded-lg p-3">
+      <strong>Correção solicitada a {receipt.submitted_name ?? "quem informou a chegada"}</strong>
+      <p className="whitespace-pre-wrap">{correction.reason}</p>
+    </div> : null}
+    {receipt.corrections?.length ? <details className="hca-arrival-stock">
+      <summary>Histórico das correções</summary>
+      {receipt.corrections.map(entry => <div key={entry.requestedAt} className="mt-2 space-y-1">
+        <p>{entry.requesterName ?? "Nome histórico não preservado"} · {formatBrazilDate(entry.requestedAt)}</p>
+        <p className="whitespace-pre-wrap">{entry.reason}</p>
+        <p>Informado anteriormente</p><ul>{historicQuantities(entry.previousLines)}</ul>
+        {entry.resubmittedAt && entry.correctedLines ? <><p>Reenviado em {formatBrazilDate(entry.resubmittedAt)}</p><ul>{historicQuantities(entry.correctedLines)}</ul></> : null}
+      </div>)}
+    </details> : null}
   </div>;
 }
-export function PurchaseDetails({ data }: { data: SupplyDocument }) {
+export function PurchaseDetails({ data, arrivalActions }: {
+  data: SupplyDocument; arrivalActions?: (receipt: PurchaseReceipt) => ReactNode;
+}) {
   const progress = data.purchaseProgress;
   const [filter, setFilter] = useState<ReceiptFilter>({ query: "", state: "" });
   const [selectedPage, setSelectedPage] = useState(1);
@@ -71,6 +93,7 @@ export function PurchaseDetails({ data }: { data: SupplyDocument }) {
         {visible.map(({ receipt, ordinal }) => <li key={receipt.id} value={ordinal} data-receipt-id={receipt.id} className="rounded-xl border border-(--line) p-4">
           <h3 className="mb-2 font-semibold">Parcela {ordinal} · {receiptStates[receipt.state]}</h3>
           <PurchaseReceiptContent receipt={receipt} lines={data.lines} />
+          {arrivalActions?.(receipt)}
         </li>)}
       </ol>}
       {pages > 1 ? <nav className="hca-toolbar" aria-label="Páginas das parcelas">
