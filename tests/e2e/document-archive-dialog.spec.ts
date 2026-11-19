@@ -1,0 +1,45 @@
+import { expect, test } from "@playwright/test";
+import { entOperationFixture } from "../integration/ent-operation-fixtures.mjs";
+import { terminalLedger } from "../integration/ent-terminal-fixtures.mjs";
+import { fixtures } from "../integration/v4-fixtures.mjs";
+import { loginDecision } from "./l1-decision-policy";
+
+test.setTimeout(120_000);
+
+test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT sem mudar seu PDF", async ({ page }, info) => {
+  const { document, patient } = await entOperationFixture("accepted");
+  if (info.project.name === "mobile") await page.setViewportSize({ width: 320, height: 670 });
+  await loginDecision(page, fixtures.adminA.email, patient);
+  const stock = terminalLedger(patient);
+  await page.goto(`/fichas/${document.id}`);
+  await page.getByRole("button", { name: "Revisar conclusão", exact: true }).click();
+  const conclusion = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+  await conclusion.getByRole("button", { name: "Concluir e arquivar", exact: true }).click();
+  const archive = page.getByRole("dialog", { name: "Arquivar ficha", exact: true });
+  await expect(archive.getByText("Ficha concluída ou cancelada", { exact: true })).toBeVisible();
+  const endpoint = `/api/documents/${document.id}/lifecycle/archive`;
+  expect(await (await page.request.get(endpoint)).json()).toMatchObject({ condition: "completed", archive: null });
+  await info.attach("revisao-do-arquivamento", { body: await archive.screenshot(), contentType: "image/png" });
+  await archive.getByRole("button", { name: "Arquivar e consolidar PDF", exact: true }).click();
+  await page.getByRole("dialog", { name: "Ficha arquivada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Revisar conclusão", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Registrar andamento", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Revisar encerramento", exact: true }).click();
+  const review = page.getByRole("dialog", { name: "Confirmar encerramento", exact: true });
+  const link = review.getByRole("link", { name: "Baixar PDF consolidado", exact: true });
+  const url = (await link.getAttribute("href"))!;
+  const original = await page.request.get(url);
+  expect(original.status()).toBe(200);
+  await info.attach("confirmacao-do-encerramento", { body: await review.screenshot(), contentType: "image/png" });
+  await review.getByRole("button", { name: "Reverter arquivamento", exact: true }).click();
+  const reverse = page.getByRole("dialog", { name: "Reverter arquivamento", exact: true });
+  await reverse.getByRole("textbox", { name: "Motivo da reversão" }).fill("Acompanhamento fictício restaurado após o arquivo.");
+  await reverse.getByRole("button", { name: "Reverter arquivamento", exact: true }).click();
+  await page.getByRole("dialog", { name: "Arquivamento revertido", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Registrar andamento", exact: true })).toBeEnabled();
+  expect(await (await page.request.get(endpoint)).json()).toMatchObject({ condition: "completed", archive: null });
+  const preserved = await page.request.get(url);
+  expect(preserved.status()).toBe(200);
+  expect((await preserved.body()).equals(await original.body())).toBe(true);
+  expect(terminalLedger(patient)).toBe(stock);
+});

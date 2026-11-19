@@ -1,5 +1,27 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — arquivamento nas fichas e decisão do administrador.** O menu
+Mais oferece a revisão de arquivamento nas fichas elegíveis. Concluir e
+arquivar registra a conclusão e abre a revisão do arquivo para uma
+segunda confirmação. O diálogo apresenta a política efetiva da residência,
+o motivo e a geração do PDF consolidado. A partir do cabeçalho arquivado,
+o arquivo fica disponível para baixar e o administrador pode revisar o
+encerramento. A confirmação ou reversão usa o exemplar já assinado.
+
+- Arquivar, confirmar e reverter usam o contrato transacional e o PDF
+  preservado. Falta integrar o agendador ao mesmo contrato.
+- A REQ preserva `req.archive`. Arquivos e Andamentos entram em modo de
+  consulta com o arquivo ativo. Falta migrar a entrada legada de REQ.
+- A tentativa com resposta incerta conserva a referência oficial enquanto
+  a revisão estiver aberta. A verificação no preview está pendente.
+
+Passaram seis integrações dirigidas e seis casos em Android e iOS
+emulados, incluindo permissão da REQ, recuperação de resposta perdida e
+reversão da ENT com preservação do PDF e do estoque. A stack local tem
+290 migrations até `20261119110234`. As 18 migrations pendentes passaram
+pela pré-validação com rollback no desenvolvimento remoto, que segue
+com 272 versões enquanto o preview compatível aguarda publicação.
+
 **19/11 — contrato de arquivo manual e PDF consolidado.** A API reserva o
 exemplar a partir da versão revisada. A ficha só é arquivada depois da
 assinatura, da conferência do armazenamento e da nova validação do acesso

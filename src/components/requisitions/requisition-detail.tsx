@@ -5,6 +5,8 @@ import { Icon } from "@/components/ui/icon";
 import { DocumentComplementsPanel } from "@/components/documents/document-complements";
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { DocumentFollowUpActions } from "@/components/documents/document-follow-up-actions";
+import { DocumentArchiveActions, DocumentArchiveDialog, type ArchiveDialogMode } from "@/components/documents/document-archive-dialog";
+import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
 import { RequisitionScienceAction } from "./requisition-science-action";
 import { DocumentCommunications } from "@/components/notifications/document-communications";
 import { DocumentMaterialsTable } from "@/components/documents/document-materials-table";
@@ -138,6 +140,7 @@ type Detail = {
     }[];
   };
   progress: Progress;
+  documentArchive?: unknown;
 };
 const modes: Record<string, string> = {
   express: "Expressa no aplicativo",
@@ -172,6 +175,8 @@ export function RequisitionDocumentContent({
   const [stockOutcome, setStockOutcome] = useState<RequisitionStockOutcome | null>(null);
   const [busy] = useState(false);
   const [reading, setReading] = useState(true);
+  const [archiveDialog, setArchiveDialog] = useState<ArchiveDialogMode | null>(null);
+  const archiveReviewRef = useRef<HTMLButtonElement>(null);
   useOperationActivity(reading && !data, { title: "Consultando a ficha", detail: "Estamos identificando a requisição e conferindo seu acesso." });
   const refreshButtonRef = useRef<HTMLButtonElement>(null);
   const restoreRefreshFocusRef = useRef(false);
@@ -264,6 +269,8 @@ export function RequisitionDocumentContent({
   const lifecycleVisible = !data.is_historical && !p.archivedAt && context.patient?.id === data.care_recipient_id;
   const terminalFollowUp = data.status === "cancelled" || Boolean(p.completedAt);
   const patientAdmin = context.patient?.role === "admin" && can(context, "access.manage");
+  const archive = activeDocumentArchive(data.documentArchive);
+  const archiveAllowed = patientAdmin && can(context, "req.archive") && context.patient?.id === data.care_recipient_id;
   const offerScience = !data.is_historical && p.eligible && !p.archivedAt && data.status !== "cancelled" && !p.science.some(row => row.user_id === context.userId && row.mode === "express");
   const documentState = requisitionDocumentState({
     historical: data.is_historical,
@@ -274,7 +281,7 @@ export function RequisitionDocumentContent({
     fulfilled: f.fulfilled,
     partial: f.partial,
   });
-  const serviceLabel = data.is_historical ? "Registro histórico" : p.archivedAt ? "Arquivada" : data.status === "cancelled" ? "Cancelada" : p.completedAt ? "Atendimento concluído" : f.fulfilled || f.partial ? "Atendimento parcial" : "Aguardando atendimento";
+  const serviceLabel = archive ? documentArchiveLabel(archive) : data.is_historical ? "Registro histórico" : p.archivedAt ? "Arquivada" : data.status === "cancelled" ? "Cancelada" : p.completedAt ? "Atendimento concluído" : f.fulfilled || f.partial ? "Atendimento parcial" : "Aguardando atendimento";
   const followUp = requisitionFollowUp({
     historical: Boolean(data.is_historical), status: data.status,
     archivedAt: p.archivedAt, completedAt: p.completedAt,
@@ -353,6 +360,7 @@ export function RequisitionDocumentContent({
               </>
             ) : null}
             {!data.is_historical ? <RequisitionScienceAction id={id} userId={context.userId} version={p.version} materialIdentity={p.materialIdentity} mayRecord={Boolean(offerScience)} disabled={busy || reading} onRecorded={() => setAttempt(value => value + 1)} /> : null}
+            {archive ? <DocumentArchiveActions archive={archive} reviewRef={archiveReviewRef} onReview={archiveAllowed ? () => setArchiveDialog("review") : undefined} /> : null}
             {lifecycleVisible ? <DocumentFollowUpActions
               id={id} patientId={data.care_recipient_id} kind="REQ" code={data.code ?? data.protocol}
               patientName={context.patient?.display_name ?? "Paciente identificado na ficha"}
@@ -362,6 +370,7 @@ export function RequisitionDocumentContent({
               disabled={busy || reading}
               preservedFacts={<p>A contagem da emissão e as movimentações posteriores permanecem registradas.</p>}
               onUpdated={() => setAttempt(value => value + 1)} onShowMaterials={() => tabs.select("materials")}
+              onCompleteAndArchive={archiveAllowed && !terminalFollowUp ? () => setArchiveDialog("archive") : undefined}
             /> : null}
           </>
         }
@@ -382,13 +391,13 @@ export function RequisitionDocumentContent({
                 ) : null}
               </>
             ) : null}
-            {p.completedAt && !p.archivedAt && can(context, "req.archive") ? (
+            {terminalFollowUp && lifecycleVisible && archiveAllowed ? (
               <DocumentMoreButton
                 className={buttonClass}
                 disabled={busy}
-                icon="archive" onClick={() => openDecision("archive")}
+                icon="archive" onClick={() => setArchiveDialog("archive")}
               >
-                Revisar arquivamento manual
+                Arquivar ficha
               </DocumentMoreButton>
             ) : null}
             {!data.is_historical &&
@@ -404,7 +413,7 @@ export function RequisitionDocumentContent({
                 Cancelar requisição
               </DocumentMoreButton>
             ) : null}
-            {!data.is_historical && can(context, "req.create") ? (
+            {!data.is_historical && !p.archivedAt && can(context, "req.create") ? (
               <DocumentMoreLink
                 className={buttonClass}
                 href={`/fichas/req?careRecipientId=${data.care_recipient_id}&sourceRequisitionId=${id}`}
@@ -432,8 +441,12 @@ export function RequisitionDocumentContent({
           data.recipient_name_snapshot ?? context.patient?.display_name
         }
       ></DocumentHeader>
+      {archiveDialog && archiveAllowed ? <DocumentArchiveDialog key={`${context.userId}:${id}:${archiveDialog}`} id={id} patientId={data.care_recipient_id}
+        code={data.code ?? data.protocol} patientName={data.recipient_name_snapshot ?? context.patient?.display_name ?? "Paciente identificado na ficha"}
+        actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
+        onClose={() => setArchiveDialog(null)} onUpdated={() => setAttempt(value => value + 1)} /> : null}
       <DocumentFreshness stale={stale} loading={reading || busy} onRefresh={refreshDocument} />
-      {data.status === "cancelled" ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} /> : null}
+      {data.status === "cancelled" ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={!p.archivedAt && data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} /> : null}
       <RequisitionDisplay
         key={id}
         id={id}
@@ -470,6 +483,7 @@ export function RequisitionDocumentContent({
             type="REQ"
             patientId={data.care_recipient_id}
             context={context}
+            readOnly={Boolean(p.archivedAt)}
           />
         </DocumentPanel>
         <DocumentPanel value="overview">
@@ -536,7 +550,7 @@ export function RequisitionDocumentContent({
             <div className="doc-author-line"><span className="doc-avatar" aria-hidden="true">{(data.requester_name_snapshot ?? "?").split(" ").slice(0,2).map(part => part[0]).join("")}</span><span><strong>{data.requester_name_snapshot ?? "Solicitante não identificado"}</strong><small>{formatBrazilDate(data.created_at)}</small></span></div>
           </DocumentSection>
 
-          <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
+          <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={!p.archivedAt && data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
 
           </div>
         </DocumentPanel>
@@ -646,7 +660,7 @@ export function RequisitionDocumentContent({
                 };
               })} />
           </section>
-          {can(context, "catalog.manage") &&
+          {!p.archivedAt && can(context, "catalog.manage") &&
             can(context, "req.review") &&
             data.requisition_items.some(
               (item) => !item.product_id && !item.resolution,
@@ -711,6 +725,7 @@ export function RequisitionDocumentContent({
         <DocumentPanel value="files">
           <DocumentActions
             generationBlocked={stale}
+            readOnly={Boolean(p.archivedAt)}
             actionTarget={fileActionTarget}
             onAction={() => tabs.select("files")}
             id={id}
@@ -722,7 +737,7 @@ export function RequisitionDocumentContent({
           <Attachments
             patientId={data.care_recipient_id}
             documentId={id}
-            writable={can(context, "req.create")}
+            writable={!p.archivedAt && can(context, "req.create")}
           />
         </DocumentPanel>
         <DocumentPanel value="history">

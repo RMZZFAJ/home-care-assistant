@@ -996,6 +996,9 @@
 .hca-document-follow-up .hca-cancellation-checklist li:first-child { border-top: 1px solid var(--hca-line); }
 .hca-document-follow-up .hca-cancellation-checklist li > svg { flex-basis: 26px; height: 26px; padding: 5px; border: 0; background: #edf6ef; }
 .hca-document-follow-up .hca-cancellation-checklist .hca-follow-up-blocker > svg { color: #a24656; background: #fff0f2; }
+.hca-document-archive .hca-cancellation-checklist .hca-archive-attention > svg { color: #a16911; background: #fff2d6; }
+.hca-document-archive .hca-follow-up-prior > span:last-child { max-width: 112px; text-align: center; }
+.hca-document-archive .hca-follow-up-prior > a { font-size: 11px; white-space: nowrap; }
 .hca-document-follow-up .hca-cancellation-checklist strong { display: inline-block; margin-bottom: 3px; }
 .hca-document-follow-up .hca-receipt-line { border-width: 1px 0 0; border-radius: 0; padding: 12px 0 0; }
 .hca-l1 .hca-document-follow-up textarea { min-height: 68px; }
@@ -1006,6 +1009,16 @@
 @media (max-width: 500px) {
   .hca-modal-viewport:has(.hca-document-follow-up) { inset: min(7.7dvh, 58px) 0 0; padding: 10px; }
   .hca-l1 .hca-modal:has(.hca-document-follow-up) { max-height: 100%; }
+  .hca-l1 .hca-modal:has(.hca-document-follow-up) > .hca-modal-footer:has(> button:nth-of-type(3)) {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px;
+  }
+  .hca-l1 .hca-modal:has(.hca-document-follow-up) > .hca-modal-footer:has(> button:nth-of-type(3)) > button {
+    width: 100%; max-width: none; justify-content: center;
+  }
+  .hca-l1 .hca-modal:has(.hca-document-follow-up) > .hca-modal-footer:has(> button:nth-of-type(3)) > button:first-child {
+    grid-column: 1 / -1; justify-self: start; width: auto;
+  }
+  .hca-l1 .hca-modal:has([data-archive-view="review"]) > .hca-modal-footer:has(> button:nth-of-type(3)) > button:first-child { justify-self: center; }
 }
 .hca-receipt-field { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .hca-receipt-field label { font-weight: 600; }

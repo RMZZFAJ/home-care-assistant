@@ -70,8 +70,8 @@ function ArrivalCorrectionQuantity({ document, receipt, item, line }: {
   </article>;
 }
 
-export function PurchaseArrivalCorrections({ data, context, onUpdated }: {
-  data: SupplyDocument; context: WorkspaceContext; onUpdated: (read: SupplyDocument) => void;
+export function PurchaseArrivalCorrections({ data, context, onUpdated, readOnly = false }: {
+  data: SupplyDocument; context: WorkspaceContext; onUpdated: (read: SupplyDocument) => void; readOnly?: boolean;
 }) {
   const scope = { userId: context.userId, documentId: data.id, domain: "supply" as const };
   const decision = useDocumentDecision({ ...scope, action: resubmitAction });
@@ -82,7 +82,7 @@ export function PurchaseArrivalCorrections({ data, context, onUpdated }: {
   const [exit, setExit] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const formId = useId();
-  const active = context.patient?.id === data.care_recipient_id && !["cancelled", "rejected", "administratively_closed"].includes(data.status);
+  const active = !readOnly && context.patient?.id === data.care_recipient_id && !["cancelled", "rejected", "administratively_closed"].includes(data.status);
   const mayResubmit = active && can(context, "com.receive");
   const mayResubmitReceipt = (receipt: PurchaseReceipt) => mayResubmit && receipt.state === "correction_requested" && receipt.submitted_by === context.userId;
   const selected = data.receipts.find(receipt => receipt.id === editor?.receiptId);

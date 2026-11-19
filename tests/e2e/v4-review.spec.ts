@@ -464,11 +464,18 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     await openDocumentMore(page);
     await expect(
       page.getByRole("menuitem", {
-        name: "Revisar arquivamento manual",
+        name: "Arquivar ficha",
         exact: true,
       }),
     ).toHaveCount(0);
     await closeDocumentMore(page);
+    const lifecycleArchive = "/api/documents/" + req.requisitionId + "/lifecycle/archive";
+    const withheld = await (await page.request.get(lifecycleArchive)).json();
+    expect(withheld).toMatchObject({ condition: "completed", canArchive: false });
+    const deniedNewArchive = await page.request.post(lifecycleArchive, {
+      data: { action: "archive", mode: "policy", key: randomUUID(), version: withheld.version, referenceHash: withheld.referenceHash },
+    });
+    expect(deniedNewArchive.status()).toBe(403);
     const forbiddenArchive = await page.request.post(
       "/api/requisitions/" + req.requisitionId + "/archive",
       { data: { reason: "Tentativa proibida por capacidade explícita" } },

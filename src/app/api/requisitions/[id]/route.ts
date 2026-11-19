@@ -9,6 +9,7 @@ import {
   uuid,
 } from "@/lib/server/api";
 import { loadReceipt } from "@/lib/server/receipts";
+import { documentArchiveReference } from "@/lib/documents/document-archive";
 
 export async function GET(
   _request: Request,
@@ -60,6 +61,8 @@ export async function GET(
       rpc(auth.client, "requisition_fulfillment", { p_requisition: id }),
       rpc(auth.client, "requisition_progress", { p_id: id }),
     ]);
+    const documentArchive = progress && typeof progress === "object" && "archivedAt" in progress && progress.archivedAt
+      ? documentArchiveReference.parse(await rpc(auth.client, "document_archive_reference", { p_document: id })).archive : null;
     return NextResponse.json({
       data: {
         ...data,
@@ -76,6 +79,7 @@ export async function GET(
         requisition_notifications: notifications ?? [],
         fulfillment,
         progress,
+        documentArchive,
       },
       receipt,
     });

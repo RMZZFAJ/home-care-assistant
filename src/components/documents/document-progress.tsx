@@ -128,6 +128,7 @@ type ProgressProps = {
   context: WorkspaceContext;
   actionTarget?: HTMLElement | null;
   onAction?: () => void;
+  readOnly?: boolean;
 };
 export function DocumentProgress({
   id,
@@ -136,6 +137,7 @@ export function DocumentProgress({
   context,
   actionTarget,
   onAction,
+  readOnly,
 }: ProgressProps) {
   const ready = useClientReady();
   return ready ? (
@@ -147,6 +149,7 @@ export function DocumentProgress({
       context={context}
       actionTarget={actionTarget}
       onAction={onAction}
+      readOnly={readOnly}
     />
   ) : (
     <section className="ui-card" role="status">
@@ -161,6 +164,7 @@ function ProgressContent({
   context,
   actionTarget,
   onAction,
+  readOnly,
 }: ProgressProps) {
   const scrollRegion = useScrollableRegion<HTMLDivElement>();
   const [collapsed, setCollapsed] = useState(false);
@@ -231,7 +235,7 @@ function ProgressContent({
   );
   const read = useScopedRead(
     `/api/documents/${id}/progress?` + new URLSearchParams({ filter, page: String(page), ...(range.from ? { from: range.from } : {}), ...(range.through ? { through: range.through } : {}) }),
-    String(revision),
+    `${revision}:${readOnly ? "archived" : "open"}`,
     decode,
   );
   const feed = !read.loading && !read.error ? read.data : null;
@@ -248,7 +252,7 @@ function ProgressContent({
         : progressConfirmed(value, packet, id, context.userId),
   );
   const writable = Boolean(
-    feed?.canPublish &&
+    !readOnly && feed?.canPublish &&
     context.patient?.id === patientId &&
     context.activeContext?.mode === "patient" &&
     can(context, "document.progress.create"),
@@ -265,10 +269,11 @@ function ProgressContent({
       context.activeContext?.mode,
       can(context, type.toLowerCase() + ".read"),
       can(context, "document.progress.create"),
+      Boolean(readOnly),
     ]),
     onRead: reconcilePublication,
     onResume(saved) {
-      if (pending || localIntegrityError || !saved.content) return false;
+      if (readOnly || pending || localIntegrityError || !saved.content) return false;
       const parsed = progressPreparationContentSchema.safeParse(saved.content);
       if (!parsed.success || parsed.data.documentType !== type) return false;
       updateDraft({ content: parsed.data.note, pending: null });
@@ -287,7 +292,7 @@ function ProgressContent({
     },
   });
   const privateContent = { documentType: type, note: content };
-  useLongDraftAutosave(privateDraft, privateContent, open && Boolean(content.text || content.references.length || privateDraft.base?.state === "active") && !pending && !command.busy && !localIntegrityError);
+  useLongDraftAutosave(privateDraft, privateContent, !readOnly && open && Boolean(content.text || content.references.length || privateDraft.base?.state === "active") && !pending && !command.busy && !localIntegrityError);
   const locked =
     command.busy ||
     pending !== null ||
@@ -618,7 +623,7 @@ function ProgressContent({
       aria-busy={read.loading}
     >
       <header className="doc-card-head"><div><h2><Icon name="history" width={19} height={19} />Andamentos</h2><p>{feed ? feed.total + " registros · ordem cronológica" : "Ordem cronológica"}</p></div><div className="doc-feed-head-actions"><ActionButton className="btn-icon" aria-label="Atualizar Andamentos" aria-disabled={read.loading} onClick={() => { if (!read.loading) read.refresh(); }}><Icon name="refresh" /></ActionButton><ActionButton className="btn-icon" aria-label={collapsed ? "Expandir Andamentos" : "Recolher Andamentos"} aria-expanded={!collapsed} aria-controls={"progress-content-" + id} onClick={() => setCollapsed(value => !value)}><Icon name="down" style={{transform: collapsed ? undefined : "rotate(180deg)"}} /></ActionButton></div>
-        <DocumentActionSlot target={actionTarget}>
+        {!readOnly ? <DocumentActionSlot target={actionTarget}>
           <ActionButton
             ref={openerRef}
             disabled={
@@ -641,12 +646,12 @@ function ProgressContent({
                 ? "Recuperar preenchimento de andamento"
                 : "Registrar andamento"}
           </ActionButton>
-        </DocumentActionSlot>
+        </DocumentActionSlot> : null}
       </header>
       <div className="doc-card-body" id={"progress-content-" + id} hidden={collapsed}>
       {message ? <Notice>{message}</Notice> : null}
       {storageError ? <Notice error>{storageError}</Notice> : null}
-      {pending && !open ? (
+      {!readOnly && pending && !open ? (
         <Notice>
           Há uma publicação sem confirmação. A referência e o conteúdo estão
           guardados neste aparelho; recupere a mesma tentativa antes de iniciar
@@ -708,7 +713,7 @@ function ProgressContent({
       ) : null}
       </div>
       <Dialog
-        open={open}
+        open={!readOnly && open}
         title={
           pending ? "Recuperar publicação de andamento" : "Registrar andamento"
         }
@@ -972,7 +977,7 @@ function ProgressContent({
           </form>
         ) : null}
       </Dialog>
-      <Dialog open={confirmClose} title="Sair sem publicar o andamento?" closeDisabled={privateDraft.busy || privateDraft.backgroundBusy} onClose={() => setConfirmClose(false)}>
+      <Dialog open={!readOnly && confirmClose} title="Sair sem publicar o andamento?" closeDisabled={privateDraft.busy || privateDraft.backgroundBusy} onClose={() => setConfirmClose(false)}>
         <p>O último preenchimento será guardado como rascunho. Nenhum andamento será publicado.</p>
         <div className="hca-toolbar"><ActionButton disabled={privateDraft.busy || privateDraft.backgroundBusy} onClick={() => setConfirmClose(false)}>Voltar ao preenchimento</ActionButton><ActionButton disabled={privateDraft.busy || privateDraft.backgroundBusy || privateDraft.blocked} onClick={() => void savePersonal(true)}>Guardar e sair</ActionButton></div>
       </Dialog>

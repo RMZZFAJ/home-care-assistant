@@ -13,6 +13,15 @@ export const documentArchiveAttempt = z.object({
   archivedAt: z.iso.datetime({ offset: true }).nullable(), issuanceId: z.uuid().nullable(),
   decision: decision.nullable(),
 }).refine(value => Boolean(value.archivedAt) === Boolean(value.issuanceId));
+export type DocumentArchiveAttempt = z.infer<typeof documentArchiveAttempt>;
+export function activeDocumentArchive(value: unknown) {
+  const parsed = documentArchiveAttempt.safeParse(value);
+  return parsed.success && parsed.data.archivedAt && parsed.data.decision !== "reverse" ? parsed.data : null;
+}
+
+export function documentArchiveLabel(archive: DocumentArchiveAttempt) {
+  return archive.decision === "confirm" ? "Arquivada · encerramento confirmado" : "Arquivada · aguardando confirmação";
+}
 
 export const documentArchiveReference = z.object({
   documentId: z.uuid(), patientId: z.uuid(), version: z.number().int().positive(),

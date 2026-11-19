@@ -31,8 +31,8 @@ type Packet = z.infer<typeof packetSchema>;
 // This RPC checks its official receipt before rejecting a stale reference.
 const definitiveRejection = (cause: unknown) => cause instanceof ApiError && cause.status === 409 && cause.code === "VERSION_CONFLICT";
 
-export function FamilyFulfillmentReview({ data, context, onReviewed }: {
-  data: SupplyDocument; context: WorkspaceContext; onReviewed: () => void;
+export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = false }: {
+  data: SupplyDocument; context: WorkspaceContext; onReviewed: () => void; readOnly?: boolean;
 }) {
   const storageKey = `hca:fulfillment-review:${context.userId}:${data.id}`;
   const [pending, setPending] = useState<Packet | null>(() => {
@@ -58,7 +58,7 @@ export function FamilyFulfillmentReview({ data, context, onReviewed }: {
     steps: [{ label: "Preservando o recebimento confirmado", icon: "truck" }, { label: "Conferindo a avaliação", icon: "check" }],
   });
 
-  const active = context.patient?.id === data.care_recipient_id && ["confirmed", "disputed"].includes(data.status);
+  const active = !readOnly && context.patient?.id === data.care_recipient_id && ["confirmed", "disputed"].includes(data.status);
   const eligible = active && canAssessDeliveryNeed(data, context);
   const receiver = active && data.payload.destination === "CARE_TEAM" && context.userId === data.recipient_id && can(context, "ent.receive");
   const lines = data.lines.filter(line => data.workflow_data.acceptedAt && linkedDeliveryNeed(data, line));

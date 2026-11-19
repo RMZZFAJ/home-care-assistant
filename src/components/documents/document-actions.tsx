@@ -38,6 +38,7 @@ type Props = {
   actionTarget?: HTMLElement | null;
   onAction?: () => void;
   generationBlocked?: boolean;
+  readOnly?: boolean;
 };
 const intentionSchema = z.object({ key: z.uuid(), version: z.number().int().positive().max(2147483647).optional(), documentOptions: pdfDocumentOptionsSchema.optional() }).strict();
 const parseInitialPdf = (raw: unknown) => initialPdfStatusSchema.parse(raw);
@@ -99,6 +100,7 @@ function GeneratedFiles({
   actionTarget,
   onAction,
   generationBlocked = false,
+  readOnly = false,
 }: Props & { userId: string; canAudit: boolean; canAccess: boolean; }) {
   const headingId = useId(),
     scope = `hca:pdf-intention:${userId}:${id}`,
@@ -240,7 +242,7 @@ function GeneratedFiles({
     }
   }
   async function generate(documentOptions?: DocumentOptions) {
-    if (busyRef.current || integrityError || generationBlocked && !pending) return;
+    if (busyRef.current || integrityError || readOnly || generationBlocked && !pending) return;
     busyRef.current = true;
     setBusy(true);
     setActivityStage(0);
@@ -344,7 +346,7 @@ function GeneratedFiles({
   return (
     <section aria-labelledby={headingId} className="doc-area hca-document-files print:hidden">
       <header className="doc-section-heading"><div><h2 id={headingId}>Arquivos gerados</h2><p>Exemplares emitidos a partir desta ficha.</p></div><div className="doc-heading-actions">
-        <DocumentActionSlot target={actionTarget}>
+        {!readOnly ? <DocumentActionSlot target={actionTarget}>
           <button
             className={buttonClass}
             type="button"
@@ -361,7 +363,7 @@ function GeneratedFiles({
                 ? "Recuperar emissão"
                 : "Gerar PDF"}
           </button>
-        </DocumentActionSlot>
+        </DocumentActionSlot> : null}
         <button
           className={buttonClass}
           type="button"
@@ -370,9 +372,10 @@ function GeneratedFiles({
         >
           Atualizar arquivos
         </button>
-        <button className={buttonClass} type="button" disabled={busy || initialBusy || Boolean(pending) || integrityError || generationBlocked} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button>
+        {!readOnly ? <button className={buttonClass} type="button" disabled={busy || initialBusy || Boolean(pending) || integrityError || generationBlocked} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button> : null}
       </div></header>
-      {generationBlocked ? <p role="status">Atualize a ficha para gerar um novo PDF. Os exemplares já emitidos continuam disponíveis.</p> : null}
+      {readOnly ? <p role="status">Os exemplares emitidos estão disponíveis para consulta e download.</p>
+        : generationBlocked ? <p role="status">Atualize a ficha para gerar um novo PDF. Os exemplares já emitidos continuam disponíveis.</p> : null}
       {initial.data ? <div className="doc-card hca-initial-pdf">
         <strong>PDF inicial</strong>
         {initial.data.state === "ready" && initial.data.issuanceId ? <a className={buttonClass}
@@ -382,11 +385,11 @@ function GeneratedFiles({
           {initialError ? <Notice error>{initialError}</Notice> : <p role="status">{initial.data.state === "uncertain"
             ? "O PDF inicial ainda não foi confirmado. A ficha já está registrada."
             : "A ficha está emitida. O PDF inicial ficará disponível após a assinatura e a conferência."}</p>}
-          {!generationBlocked && <button className={buttonClass} type="button" disabled={busy || initialBusy}
+          {!readOnly && !generationBlocked && <button className={buttonClass} type="button" disabled={busy || initialBusy}
             onClick={() => void retryInitial()}>Recuperar PDF inicial</button>}
         </>}
       </div> : null}
-      <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={optionsOpen} onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} onGenerate={value => { setOptionsOpen(false); onAction?.(); void generate(value); }} />
+      <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={!readOnly && optionsOpen} onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} onGenerate={value => { setOptionsOpen(false); onAction?.(); void generate(value); }} />
       {message ? <p role="status">{message}</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {readError ? <Notice error>{readError}</Notice> : null}
@@ -394,8 +397,7 @@ function GeneratedFiles({
         <p role="status">Consultando arquivos…</p>
       ) : !visibleRows.length && !initial.data ? (
         <p>
-          Nenhum arquivo registrado nesta consulta. Use Gerar PDF para uma nova
-          emissão explícita.
+          {readOnly ? "Nenhum arquivo registrado nesta consulta." : "Nenhum arquivo registrado nesta consulta. Use Gerar PDF para uma nova emissão explícita."}
         </p>
       ) : null}
       <div className="doc-card doc-file-acervo"><ul className="doc-file-list doc-file-list-compact" aria-label="Exemplares registrados">

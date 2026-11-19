@@ -269,11 +269,13 @@ export function DeliveryRegularization({
   context,
   onUpdated,
   onEditingChange,
+  readOnly = false,
 }: {
   data: SupplyDocument;
   context: WorkspaceContext;
   onUpdated: (document: SupplyDocument) => void;
   onEditingChange: (editing: boolean) => void;
+  readOnly?: boolean;
 }) {
   const [mode, setMode] = useState<Mode | null>(null),
     [message, setMessage] = useState("");
@@ -282,7 +284,7 @@ export function DeliveryRegularization({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const details = data.deliveryRegularization;
   if (!details || data.status === "draft") return null;
-  const active = context.patient?.id === data.care_recipient_id;
+  const active = !readOnly && context.patient?.id === data.care_recipient_id;
   const write = active && can(context, "ent.regularize");
   const current = details.cases.find((c) => c.id === details.currentId);
   function open(next: Mode, target: HTMLElement, privateOnly = false) {

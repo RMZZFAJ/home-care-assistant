@@ -48,13 +48,13 @@ test("L2 confere o saldo antes de cancelar uma REQ e recupera uma única revers�
     where reference_id=${q(f.req.id)} and reference_type='requisition_count_reversal'`)).toBe("1:4.000000");
 });
 
-for (const purpose of ["cancel", "archive", "resolve_extra"] as const) test(`REQ ${purpose}: saída descarta campos e resposta perdida confere um único ato sem rascunho`, async ({ page }) => {
+for (const purpose of ["cancel", "resolve_extra"] as const) test(`REQ ${purpose}: saída descarta campos e resposta perdida confere um único ato sem rascunho`, async ({ page }) => {
   const f = await reqDecisionFixture(purpose), writes = noPrivateWrites(page), count = privateFormCount(f.patient);
   await loginDecision(page, fixtures.adminA.email, f.patient);
   async function open() {
     await page.goto("/fichas/" + f.req.id);
     if (purpose === "resolve_extra") { await selectDocumentSection(page, "materials"); await page.getByRole("button", { name: "Identificar item extra", exact: true }).click(); }
-    else { await openDocumentMore(page); await page.getByRole("menuitem", { name: purpose === "cancel" ? "Cancelar requisição" : "Revisar arquivamento manual", exact: true }).click(); }
+    else { await openDocumentMore(page); await page.getByRole("menuitem", { name: "Cancelar requisição", exact: true }).click(); }
   }
   const label = purpose === "resolve_extra" ? "Justificativa da associação" : "Justificativa";
   await open(); const before = reqDecisionFacts(f);
@@ -69,8 +69,52 @@ for (const purpose of ["cancel", "archive", "resolve_extra"] as const) test(`REQ
   await page.getByRole("button", { name: purpose === "resolve_extra" ? "Revisar associação" : "Revisar decisão", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Conferir decisão antes de confirmar", exact: true })).toBeFocused();
   await audit(page, "L1 decisão REQ sem rascunho");
-  await confirmedOutcome(page, f.req.id, purpose === "resolve_extra" ? "Confirmar associação" : purpose === "cancel" ? "Confirmar cancelamento" : "Confirmar arquivamento");
+  await confirmedOutcome(page, f.req.id, purpose === "resolve_extra" ? "Confirmar associação" : "Confirmar cancelamento");
   expect(reqDecisionFacts(f)).not.toBe(before); expect(privateFormCount(f.patient)).toBe(count); expect(writes).toEqual([]);
+});
+
+test("REQ archive: saída descarta campos e resposta perdida confere um único arquivo sem rascunho", async ({ page }) => {
+  const f = await reqDecisionFixture("archive"), writes = noPrivateWrites(page), count = privateFormCount(f.patient);
+  await loginDecision(page, fixtures.adminA.email, f.patient);
+  await page.goto("/fichas/" + f.req.id);
+  const review = page.getByRole("dialog", { name: "Arquivar ficha", exact: true });
+  async function open() {
+    await openDocumentMore(page);
+    await page.getByRole("menuitem", { name: "Arquivar ficha", exact: true }).click();
+    await review.getByRole("combobox", { name: "Motivo do arquivamento" }).selectOption("other");
+  }
+  await open();
+  const before = reqDecisionFacts(f);
+  const field = review.getByRole("textbox", { name: "Descreva o motivo" });
+  await field.fill("Texto descartado sem confirmar ato.");
+  await review.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await page.getByRole("dialog", { name: "Sair sem concluir?", exact: true }).getByRole("button", { name: "Sair e descartar", exact: true }).click();
+  expect(reqDecisionFacts(f)).toBe(before);
+  await open();
+  await expect(field).toHaveValue("");
+  await field.fill("Justificativa confirmada sem rascunho.");
+  await audit(page, "L2 arquivamento de REQ sem rascunho");
+
+  const packets: unknown[] = [];
+  await page.route(`**/api/documents/${f.req.id}/lifecycle/archive`, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    packets.push(route.request().postDataJSON());
+    if (packets.length > 1) return route.continue();
+    const result = await route.fetch();
+    expect(result.status(), await result.text()).toBe(200);
+    await route.abort("failed");
+  });
+  await review.getByRole("button", { name: "Arquivar e consolidar PDF", exact: true }).click();
+  await review.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const result = page.getByRole("dialog", { name: "Ficha arquivada", exact: true });
+  await expect(result.getByRole("link", { name: "Baixar PDF consolidado" })).toBeVisible();
+  await result.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Revisar encerramento", exact: true })).toBeVisible();
+  expect(packets).toHaveLength(2);
+  expect(packets[1]).toEqual(packets[0]);
+  expect(sql(`select count(*) from public.document_events where document_id=${q(f.req.id)} and action='req.archived.manual'`)).toBe("1");
+  expect(privateFormCount(f.patient)).toBe(count);
+  expect(writes).toEqual([]);
 });
 test("REQ falha antes do ato confirma ausência, conserva texto e permite nova chave; tentativa atrasada não aplica", async ({ page }) => {
   const f = await reqDecisionFixture("cancel"); await loginDecision(page, fixtures.adminA.email, f.patient);

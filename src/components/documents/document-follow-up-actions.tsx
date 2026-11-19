@@ -32,15 +32,17 @@ const labels: Record<Blocker, [ready: string, blocked: string, instruction: stri
 };
 
 export function DocumentFollowUpActions({
-  id, patientId, kind, code, patientName, actor, userId, canComplete, canReopen, cancelled, disabled, preservedFacts, onUpdated, onShowMaterials,
+  id, patientId, kind, code, patientName, actor, userId, canComplete, canReopen, cancelled, disabled, preservedFacts, onUpdated, onShowMaterials, onCompleteAndArchive,
 }: {
   id: string; patientId: string; kind: FollowUpReference["kind"]; code: string; patientName: string; actor: string; userId: string;
   canComplete: boolean; canReopen: boolean; cancelled: boolean; disabled: boolean;
   preservedFacts?: ReactNode;
   onUpdated: () => void;
   onShowMaterials: () => void;
+  onCompleteAndArchive?: () => void;
 }) {
   const openerRef = useRef<HTMLButtonElement>(null);
+  const continueToArchiveRef = useRef(false);
   const [purpose, setPurpose] = useState<Purpose | null>(null);
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
@@ -67,6 +69,7 @@ export function DocumentFollowUpActions({
   const confirmation = reopening ? "Reabrir acompanhamento" : "Concluir";
 
   function open(next: Purpose) {
+    continueToArchiveRef.current = false;
     setReason("");
     setError("");
     setConflict(false);
@@ -83,8 +86,9 @@ export function DocumentFollowUpActions({
     if (destination === "materials") onShowMaterials();
   }
 
-  async function submit() {
+  async function submit(archiveNext = false) {
     if (!purpose || decision.busy || !decision.uncertain && (!canSend || !facts)) return;
+    if (!decision.uncertain) continueToArchiveRef.current = archiveNext;
     setError("");
     try {
       const verify = (value: unknown) => {
@@ -97,7 +101,14 @@ export function DocumentFollowUpActions({
         domain: "lifecycle", action: purpose, body: { reason: reason.trim() },
         expectedVersion: facts!.version, referenceHash: facts!.referenceHash,
       }, verify);
-      if (outcome?.state === "applied") setResult(readReference({ data: outcome.result }));
+      if (outcome?.state === "applied") {
+        const completed = readReference({ data: outcome.result });
+        if (completed.state === "completed" && continueToArchiveRef.current && onCompleteAndArchive) {
+          setPurpose(null);
+          onUpdated();
+          onCompleteAndArchive();
+        } else setResult(completed);
+      }
       if (outcome?.state === "not_applied") setError("A conferência confirmou que esta tentativa não alterou a ficha.");
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : "Não foi possível confirmar a decisão.");
@@ -120,6 +131,9 @@ export function DocumentFollowUpActions({
         facts?.blockers.length ? "Resolva as pendências antes de concluir a ficha." : "Confira as condições da ficha antes de concluir."}
       finalFocus={openerRef} closeDisabled={decision.busy} onClose={() => closeReview()} footer={<>
         <ActionButton variant="quiet" disabled={decision.busy} onClick={() => closeReview()}><Icon name="back" />Voltar à ficha</ActionButton>
+        {!reopening && onCompleteAndArchive && !decision.uncertain ? <ActionButton disabled={decision.busy || !canSend} onClick={() => void submit(true)}>
+          <Icon name="archive" />Concluir e arquivar
+        </ActionButton> : null}
         <ActionButton variant="primary" disabled={decision.busy || !decision.uncertain && !canSend} onClick={() => void submit()}>
           <Icon name={reopening ? "undo" : "check"} />{decision.uncertain ? "Conferir resultado" : confirmation}
         </ActionButton>

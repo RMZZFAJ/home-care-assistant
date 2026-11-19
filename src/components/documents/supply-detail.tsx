@@ -27,6 +27,8 @@ import { canReconcileFromFamily, DeliveryReconciliation, DeliveryReconciliationR
 import { DeliveryTransitCancellation, DeliveryTransitCancellationResult } from "./delivery-transit-cancellation";
 import { DeliveryCancellationDecision, DeliveryCancellationStatusDialog, type CancellationAction } from "./delivery-cancellation-decision";
 import { DocumentFollowUpActions } from "./document-follow-up-actions";
+import { DocumentArchiveActions, DocumentArchiveDialog, type ArchiveDialogMode } from "./document-archive-dialog";
+import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
 import { supplyFollowUpState } from "@/lib/documents/follow-up-lifecycle";
 import { cancelledTransitReturn, readCountedDeliveryReceipt, verifyCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
 import { deliveryTransit } from "@/lib/documents/family-fulfillment";
@@ -182,6 +184,8 @@ export function SupplyDocumentContent({
   const [regularizationEditing, setRegularizationEditing] = useState(false);
   const [balanceReviewEditing, setBalanceReviewEditing] = useState(false);
   const [transferEditing, setTransferEditing] = useState(false);
+  const [archiveDialog, setArchiveDialog] = useState<ArchiveDialogMode | null>(null);
+  const archiveReviewRef = useRef<HTMLButtonElement>(null);
   const [focusRevision, setFocusRevision] = useState(0);
   const [comparison, setComparison] = useState<SupplyDocument | null>(null);
   const commandFormRef = useRef<HTMLFormElement | null>(null);
@@ -546,15 +550,17 @@ export function SupplyDocumentContent({
   const balanceStep = data?.type === "BAL" ? balanceFollowUp(data) : null;
   const followUpStep = purchaseStep ?? deliveryStep ?? balanceStep;
   const operationOpen = Boolean(action || review || uncertain || regularizationEditing || balanceReviewEditing || transferEditing);
-  const allowed = (cap: string) => Boolean(activeContext && can(context, cap));
+  const archive = activeDocumentArchive(data?.workflow_data.documentArchive);
+  const archived = Boolean(archive);
+  const allowed = (cap: string) => Boolean(activeContext && !archived && can(context, cap));
   const followUpState = data && supplyFollowUpState(data.status, data.workflow_data.documentFollowUp);
   const followUpTerminal = followUpState === "completed" || data?.status === "cancelled" && followUpState !== "reopened";
-  const patientAdmin = context.patient?.role === "admin" && allowed("access.manage");
+  const patientAdmin = Boolean(activeContext && context.patient?.role === "admin" && can(context, "access.manage"));
   const actions: DocumentAction[] = [];
   if (
     data &&
     !["cancelled", "rejected"].includes(data.status) &&
-    activeContext
+    activeContext && !archived
   ) {
     if (
       data.status === "draft" &&
@@ -982,7 +988,8 @@ export function SupplyDocumentContent({
                 {actions
                   .filter((item) => !secondaryDocumentActions.has(item))
                   .map(renderAction)}
-                {activeContext && data.protocol && data.type !== "BAL" ? <DocumentFollowUpActions
+                {archive ? <DocumentArchiveActions archive={archive} reviewRef={archiveReviewRef} onReview={patientAdmin ? () => setArchiveDialog("review") : undefined} /> : null}
+                {activeContext && !archived && data.protocol && data.type !== "BAL" ? <DocumentFollowUpActions
                   id={data.id} patientId={data.care_recipient_id} kind={data.type === "COM" ? "COM" : data.kind === "DEV" ? "DEV" : "ENT"}
                   code={data.code ?? data.protocol} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado na ficha")}
                   userId={context.userId} actor={context.fullName}
@@ -993,6 +1000,7 @@ export function SupplyDocumentContent({
                   cancelled={data.status === "cancelled" && followUpState !== "completed"}
                   disabled={busy || operationOpen} onUpdated={() => setAttempt(value => value + 1)}
                   onShowMaterials={() => tabs.select("materials")}
+                  onCompleteAndArchive={patientAdmin && !followUpTerminal ? () => setArchiveDialog("archive") : undefined}
                   preservedFacts={data.type === "ENT" ? data.lines.map(line => {
                     const returned = data.deliveryCancellation?.lines.find(result => result.lineId === line.id);
                     return <article key={line.id} className="hca-receipt-line">
@@ -1004,7 +1012,7 @@ export function SupplyDocumentContent({
                       ]} />
                     </article>;
                   }) : <p>Compras e entradas físicas anteriores permanecem registradas.</p>} /> : null}
-                {activeContext && data.type === "COM" ? <PurchaseArrivalReview context={context} documentId={data.id}
+                {activeContext && !archived && data.type === "COM" ? <PurchaseArrivalReview context={context} documentId={data.id}
                   hasPending={data.receipts.some(receipt => receipt.state === "pending" && receipt.submitted_by !== context.userId)}
                   onReviewed={async () => {
                     const current = await api<{ data: SupplyDocument }>("/api/documents/" + data.id);
@@ -1034,6 +1042,8 @@ export function SupplyDocumentContent({
                 {actions
                   .filter((item) => secondaryDocumentActions.has(item))
                   .map(renderAction)}
+                {patientAdmin && !archived && followUpTerminal && data.protocol && data.type !== "BAL" ? <DocumentMoreButton
+                  icon="archive" disabled={busy || operationOpen} onClick={() => setArchiveDialog("archive")}>Arquivar ficha</DocumentMoreButton> : null}
               </>
             }
             moreTriggerRef={moreTriggerRef}
@@ -1065,11 +1075,11 @@ export function SupplyDocumentContent({
                 : undefined
             }
             status={
-              data.type === "COM"
+              archived ? "archived" : data.type === "COM"
                 ? (data.purchaseProgress?.state ?? data.status)
                 : data.status
             }
-            statusLabel={followUpState === "reopened" ? "Acompanhamento reaberto" : followUpState === "completed" ? "Acompanhamento concluído" : followUpStep?.statusLabel}
+            statusLabel={archive ? documentArchiveLabel(archive) : followUpState === "reopened" ? "Acompanhamento reaberto" : followUpState === "completed" ? "Acompanhamento concluído" : followUpStep?.statusLabel}
             protocol={data.protocol}
             version={data.version}
             createdAt={data.created_at}
@@ -1130,9 +1140,13 @@ export function SupplyDocumentContent({
               </Link>
             ) : null}
           </DocumentHeader>
+          {archiveDialog && patientAdmin ? <DocumentArchiveDialog key={`${context.userId}:${id}:${archiveDialog}`} id={id} patientId={data.care_recipient_id}
+            code={data.code ?? data.protocol ?? data.type} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado na ficha")}
+            actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
+            onClose={() => setArchiveDialog(null)} onUpdated={() => setAttempt(value => value + 1)} /> : null}
           <DocumentFreshness stale={stale} loading={refreshDisabled} onRefresh={refreshDocument} />
-          {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
-              {followUpStep && loading ? null : followUpStep && (readFailed || operationOpen) ? (
+          {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext && !archived)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
+              {archived ? <Notice>A ficha arquivada está disponível para consulta e download.</Notice> : followUpStep && loading ? null : followUpStep && (readFailed || operationOpen) ? (
                 <Notice>
                   {operationOpen
                     ? "Sua operação está preservada na versão de trabalho. Conclua ou feche a operação para consultar a próxima providência atual."
@@ -1185,12 +1199,13 @@ export function SupplyDocumentContent({
                 type={data.type}
                 patientId={data.care_recipient_id}
                 context={context}
+                readOnly={archived}
               />
             </DocumentPanel>
             <DocumentPanel value="overview">
               <div className="doc-main-column">
                 <DocumentSection title="Observações da emissão" icon="file">{data.payload.notes ? <ol className="doc-original-notes"><li>{data.payload.notes}</li></ol> : <p className="doc-subtle">Sem observações.</p>}<div className="doc-author-line"><span className="doc-avatar" aria-hidden="true">{documentIssuerName(data.canonical_snapshot).split(" ").slice(0,2).map(part => part[0]).join("")}</span><span><strong>{documentIssuerName(data.canonical_snapshot)}</strong><small>{formatBrazilDate(data.created_at)}</small></span></div></DocumentSection>
-              {data.protocol ? <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={data.version} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
+              {data.protocol ? <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={data.version} userId={context.userId} activeContext={Boolean(activeContext && !archived)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
               </div>
             </DocumentPanel>
             <DocumentPanel value="materials">
@@ -1199,7 +1214,7 @@ export function SupplyDocumentContent({
                 {data.originDocuments.map((origin) => <RelatedDocument
                   key={origin.documentId} id={origin.documentId} type={origin.type} label={origin.code} />)}
               </section> : null}
-              {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} onReviewed={() => setAttempt(value => value + 1)} /> : null}
+              {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} readOnly={archived} onReviewed={() => setAttempt(value => value + 1)} /> : null}
               <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>
                 {data.type === "COM" ? <PurchaseMaterials data={data} /> : data.type === "ENT" ? <DeliveryMaterials data={data} /> : <>
                   <h2 className="font-semibold">Produtos e quantidades</h2>
@@ -1270,6 +1285,7 @@ export function SupplyDocumentContent({
                 <DeliveryRegularization
                   data={data}
                   context={context}
+                  readOnly={archived}
                   onEditingChange={setRegularizationEditing}
                   onUpdated={setData}
                 />
@@ -1303,7 +1319,7 @@ export function SupplyDocumentContent({
                 />
               ) : null}
               {data.type === "COM" ? (
-                <PurchaseArrivalCorrections key={`${data.id}:${context.userId}:${context.patient?.id}`} data={data} context={context}
+                <PurchaseArrivalCorrections key={`${data.id}:${context.userId}:${context.patient?.id}`} data={data} context={context} readOnly={archived}
                   onUpdated={updated => { setData(updated); setAttempt(value => value + 1); }} />
               ) : null}
               {data.type === "BAL" && data.status !== "draft" ? (
@@ -1424,6 +1440,7 @@ export function SupplyDocumentContent({
               {data.protocol ? (
                 <DocumentActions
                   generationBlocked={stale}
+                  readOnly={archived}
                   actionTarget={fileActionTarget}
                   onAction={() => tabs.select("files")}
                   id={id}
@@ -1442,7 +1459,7 @@ export function SupplyDocumentContent({
                 patientId={data.care_recipient_id}
                 documentId={data.id}
                 writable={
-                  activeContext &&
+                  activeContext && !archived &&
                   (data.created_by === context.userId ||
                     data.recipient_id === context.userId ||
                     allowed("access.manage"))
