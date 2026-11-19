@@ -2,10 +2,11 @@
 
 import { Tabs } from "@base-ui/react/tabs";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode, type Ref } from "react";
+import { use, useEffect, useRef, useState, type ReactNode, type Ref } from "react";
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/primitives";
 import type { DocumentType } from "@/types/documents";
+import { MaterialVisitContext } from "./material-visit-context";
 
 export type DocumentTab =
   | "overview"
@@ -36,11 +37,12 @@ function tabFromUrl(params: Pick<URLSearchParams, "get" | "has">, auditAllowed: 
 }
 
 export function useDocumentTabs(auditAllowed: boolean) {
+  const embedded = use(MaterialVisitContext) !== null;
   const rootRef = useRef<HTMLDivElement>(null);
   const focusSelectionRef = useRef(false);
   const params = useSearchParams();
   const pathname = usePathname();
-  const source = JSON.stringify([pathname, params.toString(), auditAllowed]);
+  const source = JSON.stringify([embedded ? "consulta" : pathname, embedded ? "" : params.toString(), auditAllowed]);
   const [selection, setSelection] = useState<{ source: string; value: DocumentTab } | null>(null);
   const valid = [
     ...baseTabs.map((tab) => tab.id),
@@ -50,12 +52,13 @@ export function useDocumentTabs(auditAllowed: boolean) {
   // A menu command and the native URL update can share a React batch. Keep the
   // visible panel controlled immediately, until the router snapshot catches up.
   // Scope the optimistic choice to that exact URL snapshot and permission set.
-  const value = selection?.source === source ? selection.value : tabFromUrl(params, auditAllowed);
+  const value = selection?.source === source ? selection.value : embedded ? "materials" : tabFromUrl(params, auditAllowed);
   useEffect(() => {
+    if (embedded) return;
     const navigate = () => setSelection({ source, value: tabFromUrl(new URLSearchParams(window.location.search), auditAllowed) });
     window.addEventListener("popstate", navigate);
     return () => window.removeEventListener("popstate", navigate);
-  }, [source, auditAllowed]);
+  }, [source, auditAllowed, embedded]);
   useEffect(() => {
     if (!focusSelectionRef.current && value !== "history") return;
     const target = rootRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
@@ -69,13 +72,15 @@ export function useDocumentTabs(auditAllowed: boolean) {
     if (!valid.includes(next)) return;
     setSelection({ source, value: next });
     focusSelectionRef.current = focus;
-    const url = new URL(window.location.href);
-    url.searchParams.set("documentTab", next);
-    if (next !== "progress") {
-      url.searchParams.delete("progressRecord");
-      if (url.hash.startsWith("#andamento-")) url.hash = "";
+    if (!embedded) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("documentTab", next);
+      if (next !== "progress") {
+        url.searchParams.delete("progressRecord");
+        if (url.hash.startsWith("#andamento-")) url.hash = "";
+      }
+      window.history.replaceState(null, "", url.pathname + url.search + url.hash);
     }
-    window.history.replaceState(null, "", url.pathname + url.search + url.hash);
     if (focus && next === value) {
       focusSelectionRef.current = false;
       rootRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.focus();

@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, type ReactNode } from "react";
+import { lazy, Suspense, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Tabs } from "@base-ui/react/tabs";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import { Drawer } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
+import { PageLoadingActivity } from "@/components/ui/operation-activity";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { documentMaterialPanel, materialPanelSections, type MaterialPanelSection } from "@/lib/validation/document-material-context";
 import { documentStatusLabel } from "@/lib/documents/presentation";
@@ -15,9 +16,14 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
 import type { DocumentType } from "@/types/documents";
+import type { WorkspaceContext } from "@/types/workspace";
 import type { DocumentMaterialRow } from "./document-material-list";
 import { RelatedDocumentBody } from "./related-document";
 import { DocumentMaterialHistory } from "./document-material-history";
+import { MaterialVisitContext } from "./material-visit-context";
+import type { MaterialVisitTarget } from "./material-full-visit";
+
+const MaterialFullVisit = lazy(() => import("./material-full-visit").then(module => ({ default: module.MaterialFullVisit })));
 
 export type LinkedMaterialDocument = { id: string; code: string | null; type: DocumentType };
 export type MaterialPanelPosition = {
@@ -31,33 +37,54 @@ export type MaterialPanelPosition = {
 const labels = { stock: "Estoque", history: "Histórico", links: "Fichas" };
 
 export function DocumentMaterialPanel({
-  row, documentId, patientId, revision, position, onPosition, onNavigate, finalFocus, onClose,
+  row, documentId, patientId, revision, position, onPosition, onNavigate, finalFocus, onClose, inlineContext,
+  closeText = "Voltar à ficha", detailTitle = "Em acompanhamento nesta ficha",
 }: {
-  row: DocumentMaterialRow;
-  documentId: string;
+  row: Pick<DocumentMaterialRow, "id" | "name" | "unit" | "detail" | "related">;
+  documentId?: string;
   patientId: string;
   revision: string;
   position: MaterialPanelPosition;
   onPosition: (next: MaterialPanelPosition) => void;
-  onNavigate: (current: MaterialPanelPosition) => void;
+  onNavigate?: (current: MaterialPanelPosition) => void;
   finalFocus: () => HTMLElement | false;
   onClose: () => void;
+  inlineContext?: WorkspaceContext;
+  closeText?: string;
+  detailTitle?: string;
 }) {
   const { section, page, linked } = position;
   const router = useRouter();
+  const inheritedContext = use(MaterialVisitContext);
+  const visitContext = inlineContext ?? inheritedContext;
+  const [inlineVisit, setInlineVisit] = useState<{ target: MaterialVisitTarget; key: string | null; opener: HTMLElement | null } | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const inlineOpenerRef = useRef<HTMLElement | null>(null);
   const linkedTriggerRef = useRef<HTMLButtonElement | null>(null);
   const linkedReturnFocusRef = useRef<string | null>(null);
   const restoredScrollRef = useRef(false);
   const decode = useCallback((raw: unknown) => {
     const data = documentMaterialPanel.parse(raw);
-    if (data.documentId !== documentId || data.patientId !== patientId || data.lineId !== row.id
+    const material = documentId ? data.lineId : data.productId;
+    if (data.documentId !== (documentId ?? null) || data.patientId !== patientId || material !== row.id
       || data.section !== section || data.page !== page) throw new Error("A resposta pertence a outra consulta.");
     return data;
   }, [documentId, patientId, row.id, section, page]);
+  const query = new URLSearchParams({ section, page: String(page) });
+  if (documentId) query.set("line", row.id);
+  else { query.set("productId", row.id); query.set("careRecipientId", patientId); }
+  const endpoint = documentId ? `/api/documents/${documentId}/materials` : "/api/catalog/material";
   const { loading, data, error, refresh } = useScopedRead(
-    `/api/documents/${documentId}/materials?line=${row.id}&section=${section}&page=${page}`, revision, decode,
+    endpoint + "?" + query, revision, decode,
   );
+  useEffect(() => {
+    if (!inlineVisit) return;
+    const close = () => {
+      if (window.history.state?.hcaInlineMaterialVisit !== inlineVisit.key) setInlineVisit(null);
+    };
+    window.addEventListener("popstate", close);
+    return () => window.removeEventListener("popstate", close);
+  }, [inlineVisit]);
   useEffect(() => {
     if (loading || !data || restoredScrollRef.current) return;
     restoredScrollRef.current = true;
@@ -78,10 +105,11 @@ export function DocumentMaterialPanel({
         : contentRef.current?.querySelector<HTMLButtonElement>(`[data-material-reference="${id}"]`)
           ?? contentRef.current?.parentElement?.querySelector<HTMLButtonElement>('[data-material-section][aria-selected="true"]');
       linkedReturnFocusRef.current = null;
+      if (contentRef.current) contentRef.current.scrollTop = position.panelScroll;
       next?.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);
-  }, [linked, loading]);
+  }, [linked, loading, position.panelScroll]);
   function select(next: MaterialPanelSection, nextPage = 1) {
     if (contentRef.current) contentRef.current.scrollTop = 0;
     onPosition({ ...position, section: next, page: nextPage, panelScroll: 0 });
@@ -101,9 +129,27 @@ export function DocumentMaterialPanel({
     linkedReturnFocusRef.current = linked?.id ?? null;
     onPosition({ ...position, linked: null });
   }
-  function visit(href: string, id: string, event: { preventDefault: () => void }, focusEntry?: string) {
-    onNavigate({ ...position, focusEntry, panelScroll: contentRef.current?.scrollTop ?? position.panelScroll });
-    const token = prepareMaterialVisit(id, patientId);
+  function closeVisit() {
+    if (inlineVisit?.key && window.history.state?.hcaInlineMaterialVisit === inlineVisit.key) window.history.back();
+    else setInlineVisit(null);
+  }
+  function visit(href: string, target: MaterialVisitTarget, event: { preventDefault: () => void }, focusEntry?: string) {
+    if (visitContext) {
+      event.preventDefault();
+      const opener = inlineOpenerRef.current;
+      let key: string | null = null;
+      try {
+        const token = crypto.randomUUID();
+        window.history.pushState({ ...window.history.state, hcaInlineMaterialVisit: token }, "");
+        key = token;
+      } catch {
+        // The explicit return still closes the consultation when history is unavailable.
+      }
+      setInlineVisit({ target, opener, key });
+      return;
+    }
+    onNavigate?.({ ...position, focusEntry, panelScroll: contentRef.current?.scrollTop ?? position.panelScroll });
+    const token = prepareMaterialVisit(target.reference.id, patientId);
     if (!token) return;
     event.preventDefault();
     const url = new URL(href, window.location.origin);
@@ -111,6 +157,10 @@ export function DocumentMaterialPanel({
     router.push(url.pathname + url.search);
   }
   const displayQuantity = (value: string | null) => value === null ? "Não disponível nesta consulta" : formatQuantity(value, row.unit ?? undefined);
+  const inlineSurface = inlineVisit && visitContext ? <Suspense fallback={<PageLoadingActivity title="Abrindo ficha completa" />}>
+    <MaterialFullVisit context={visitContext} target={inlineVisit.target} onClose={closeVisit}
+      finalFocus={() => inlineVisit.opener?.isConnected ? inlineVisit.opener : false} />
+  </Suspense> : null;
   return <Tabs.Root value={section} onValueChange={value => {
     if (materialPanelSections.some(item => item === value)) select(value as MaterialPanelSection);
   }}>
@@ -119,7 +169,7 @@ export function DocumentMaterialPanel({
       navigation={<Tabs.List aria-label="Consulta do material" className="hca-material-sheet-tabs">
         {materialPanelSections.map(item => <Tabs.Tab value={item} key={item} data-material-section>{labels[item]}</Tabs.Tab>)}
       </Tabs.List>}
-      footer={<ActionButton onClick={onClose}><Icon name="back" />Voltar à ficha</ActionButton>}>
+      footer={<ActionButton onClick={onClose}><Icon name="back" />{closeText}</ActionButton>}>
       <Tabs.Panel value={section} className="hca-material-sheet-body">
         {loading ? <LoadingIndicator label="Consultando material" /> : error ? <div role="alert" className="hca-v7-material-read-error">
           <p>{error}</p><ActionButton onClick={refresh}>Tentar novamente</ActionButton>
@@ -130,7 +180,7 @@ export function DocumentMaterialPanel({
             <div><dt>Equipe · disponível</dt><dd>{displayQuantity(data.team)}</dd>
               {data.team !== null ? <dd className="hca-material-balance-note">Contagens e recebimentos confirmados</dd> : null}</div>
           </dl></section>
-          {row.detail || row.related?.length ? <section><h3>Em acompanhamento nesta ficha</h3>
+          {row.detail || row.related?.length ? <section><h3>{detailTitle}</h3>
             {row.detail}
             {row.related?.length ? <div className="hca-material-linked-list">{row.related.map(item =>
               <div key={item.document.id}>{link(item.document, item.detail)}</div>
@@ -150,7 +200,8 @@ export function DocumentMaterialPanel({
             const { id, code } = record.arrival;
             const path = `/estoque?arrival=${id}`;
             return <Link href={path} className="hca-material-history-reference" data-material-history-entry={record.id}
-              onNavigate={event => visit(path, id, event, record.id)}>
+              onClick={event => { inlineOpenerRef.current = event.currentTarget; }}
+              onNavigate={event => visit(path, { kind: "arrival", reference: { id, code } }, event, record.id)}>
               <Icon name="link" width={13} height={13} />{code}
             </Link>;
           }} /> : data?.section === "links" ? <section>
@@ -170,12 +221,15 @@ export function DocumentMaterialPanel({
         footer={<>
           <ActionButton onClick={closeLinked}><Icon name="back" />Voltar ao material</ActionButton>
           <Link href={`/fichas/${linked.id}`} className="ui-button ui-button-primary"
-            onNavigate={event => visit(`/fichas/${linked.id}`, linked.id, event)}>
+            onClick={event => { inlineOpenerRef.current = event.currentTarget; }}
+            onNavigate={event => visit(`/fichas/${linked.id}`, { kind: "document", reference: linked }, event)}>
             <Icon name="external" />Abrir {linked.code ?? "ficha"}
           </Link>
         </>}>
         <RelatedDocumentBody id={linked.id} type={linked.type} onClose={closeLinked} />
+        {inlineSurface}
       </Drawer> : null}
+      {!linked ? inlineSurface : null}
     </Drawer>
   </Tabs.Root>;
 }

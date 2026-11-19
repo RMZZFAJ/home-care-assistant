@@ -111,3 +111,40 @@ test("material decisions retain the frozen arrival quantity and actor, independe
   assert.ok(professional.rows.every(row => row.arrival === null && !row.type.startsWith("arrival.")));
   assert.equal(purchaseBalanceFacts(f), before);
 });
+
+test("catalogue consultation works before a document exists and respects patient, product and custody boundaries", async () => {
+  const f = await remainingNeedFixture();
+  const before = physicalState(f);
+  const [productId, otherProduct] = f.products;
+  const consult = (client, product, section) => rpc(client, "catalogue_material_context", {
+    p_patient: f.patient, p_product: product, p_section: section,
+  });
+  const balances = await consult(f.pro, productId, "stock");
+  assert.equal(balances.documentId, null);
+  assert.equal(balances.lineId, null);
+  assert.equal(balances.team, "2");
+  assert.ok(balances.observations.some(row => row.documentId === f.source.id));
+  const history = await consult(f.pro, productId, "history");
+  assert.ok(history.rows.some(row => row.type === "ent.receive" && row.document?.id === f.ent.id));
+  assert.deepEqual(new Set((await consult(f.pro, productId, "links")).rows.map(row => row.id)),
+    new Set([f.source.id, f.ent.id]));
+  assert.ok((await consult(f.pro, otherProduct, "links")).rows.every(row => row.id !== f.ent.id));
+  const otherPatient = await setup();
+  const wrongContext = await actor("reader", otherPatient.patient);
+  for (const [client, patient, product] of [
+    [wrongContext, f.patient, productId], [f.pro, f.patient, "material-inexistente"],
+  ]) {
+    const response = await client.rpc("catalogue_material_context", { p_patient: patient, p_product: product });
+    assert.equal(response.error?.code, "42501");
+  }
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values (${q(f.patient)},${q(fixtures.professional.id)},'stock.family.read',false),
+    (${q(f.patient)},${q(fixtures.professional.id)},'stock.team.read',false),
+    (${q(f.patient)},${q(fixtures.professional.id)},'ent.read',false)`);
+  const limited = await consult(f.pro, productId, "stock");
+  assert.equal(limited.family, null);
+  assert.equal(limited.team, null);
+  assert.ok((await consult(f.pro, productId, "history")).rows.every(row => row.kind === "decision" && row.document?.id !== f.ent.id));
+  assert.ok((await consult(f.pro, productId, "links")).rows.every(row => row.id !== f.ent.id));
+  assert.equal(physicalState(f), before);
+});

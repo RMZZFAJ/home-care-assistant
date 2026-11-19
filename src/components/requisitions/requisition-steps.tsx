@@ -17,7 +17,9 @@ import {
 import { StockObservationField } from "./stock-observation-field";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "@/components/documents/material-review";
+import { MaterialConsultButton } from "@/components/documents/catalogue-material-panel";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import type { WorkspaceContext } from "@/types/workspace";
 import type {
   ExtraItem,
   RequisitionFormData,
@@ -69,6 +71,7 @@ export function Identity({
   );
 }
 export function CatalogStep({
+  context,
   items,
   itemContext,
   selected,
@@ -77,6 +80,7 @@ export function CatalogStep({
   errors,
   selectedCount,
 }: {
+  context: WorkspaceContext;
   items: Product[];
   itemContext: ItemContext[];
   selected: (id: string) => RequisitionLine | undefined;
@@ -207,6 +211,7 @@ export function CatalogStep({
                 <small>{item.unit}</small>
               </span>
             </label>
+            <MaterialConsultButton context={context} material={item} />
             {item.selectionPredecessors?.length ? (
               <p className="mt-2 text-sm">
                 Opção cadastrada para novas escolhas após{" "}
@@ -503,10 +508,12 @@ export function Observations({
   );
 }
 export function Review({
+  context,
   form,
   recipientName,
   requesterName,
 }: {
+  context: WorkspaceContext;
   form: RequisitionFormData;
   recipientName: string;
   requesterName: string;
@@ -520,6 +527,7 @@ export function Review({
         <h3>Itens do catálogo</h3>
         <MaterialReview rows={lines.map(item => ({
           id: item.productId, name: item.productName, urgent: item.urgent,
+          consult: <MaterialConsultButton context={context} material={{ id: item.productId, name: item.productName, unit: item.unit }} />,
           details: <><small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation, item.unit)}</small><small>{formatStockObservationTime(item.stockObservationAt)}</small>{item.repeatReason ? <small>Reiteração: {item.repeatReason}</small> : null}</>,
         }))} />
       </section>

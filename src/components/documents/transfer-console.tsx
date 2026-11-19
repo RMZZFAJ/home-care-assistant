@@ -60,6 +60,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import type { Custody, SupplyDocument } from "@/types/documents";
 import type { TransferPreparation } from "@/types/transfers";
 import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
+import { MaterialConsultButton } from "./catalogue-material-panel";
 
 export const custodyName = (source: Custody) =>
   source === "FAMILY" ? "Família" : "Equipe";
@@ -704,7 +705,9 @@ function TransferDeclarationEditor({
       }
       aria-busy={busy || privateDraft.busy}
     >
-      <div onChangeCapture={() => setDraftTouched(true)}>
+      <div onChangeCapture={event => {
+        if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);
+      }}>
       {privatePanel}
       {error ? <Notice error>{error}</Notice> : null}
       {!result && (reference && !referenceUnavailable || packet) ? (
@@ -869,7 +872,7 @@ function TransferDeclarationEditor({
                   Não há pessoa habilitada na custódia de destino para confirmar o recebimento.
                 </Notice>
               ) : null}
-              <form className="grid gap-4" onChangeCapture={() => setDraftTouched(true)} onSubmit={prepare}>
+              <form className="grid gap-4" onSubmit={prepare}>
                 {step === 0 ? <>
                 <h3>Confirme os dados da {isReturn ? "devolução" : "entrega"}</h3>
                 <p><strong>Paciente</strong> · {context.patient?.display_name}</p>
@@ -976,6 +979,7 @@ function TransferDeclarationEditor({
                             : "indisponível"}
                           .
                         </p>
+                        {product ? <MaterialConsultButton context={context} material={product} /> : null}
                         <FormField
                           label={
                             "Quantidade de " +
@@ -1133,6 +1137,7 @@ function TransferDeclarationEditor({
                       {lines.find((item) => item.productId === line.productId)?.extra ? " · Item extra" : ""}
                       {product?.active === false ? " · inativo com saldo" : ""}
                     </p>
+                    {product ? <MaterialConsultButton context={context} material={product} /> : null}
                   </article>
                 );
               })}

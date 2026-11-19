@@ -258,6 +258,7 @@ function PatientStock({
         {custody !== "TRANSIT" && stock.data ? (
           <StockOverview
             key={JSON.stringify([custody, search, balanceFilter])}
+            context={context}
             products={visible}
             custody={custody}
             allowedCustodies={[

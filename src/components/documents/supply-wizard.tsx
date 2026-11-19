@@ -1457,7 +1457,9 @@ export function PatientSupplyWizard({
       </section>
     );
   return (
-    <div onChangeCapture={() => setDraftTouched(true)} className="hca-document-wizard min-w-0 space-y-5">
+    <div onChangeCapture={event => {
+      if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);
+    }} className="hca-document-wizard min-w-0 space-y-5">
       <ComplementOriginHint />
       {privateDraft.active && !uncertain ? (
         <SimpleDraftPanel

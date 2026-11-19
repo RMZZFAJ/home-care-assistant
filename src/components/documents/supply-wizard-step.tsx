@@ -1,11 +1,9 @@
 "use client";
-import { Menu } from "@base-ui/react/menu";
-import { MenuPopup } from "@/components/ui/floating";
-import { Icon } from "@/components/ui/primitives";
 import { RelatedDocument } from "./related-document";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
-import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { MaterialConsultButton } from "./catalogue-material-panel";
+import { DefinitionGrid } from "@/components/ui/controls";
 import {
   DeliveryRecipientField,
   DeliveryRecipientReference,
@@ -439,17 +437,8 @@ export function SupplyWizardStep({
                       ) : null}
                     </span>
                   </label>
-                  {checked && openMaterialSources ? (
-                    <Menu.Root>
-                      <Menu.Trigger render={<ActionButton compact variant="quiet" className="hca-material-origin-button"
-                        aria-label={`Mais ações de ${product.name}`} />}><Icon name="more" /></Menu.Trigger>
-                      <MenuPopup>
-                        <Menu.Item className="hca-menu-item" onClick={() => openMaterialSources(product)}>
-                          <Icon name="link" />Vincular a uma ficha
-                        </Menu.Item>
-                      </MenuPopup>
-                    </Menu.Root>
-                  ) : null}
+                  {type !== "BAL" ? <MaterialConsultButton context={context} material={product} menu
+                    onLink={checked && openMaterialSources ? () => openMaterialSources(product) : undefined} /> : null}
                   {checked &&
                     !form.presentationSelections?.[product.id]?.length ? (
                     <label className="product-quantity text-xs font-semibold">
@@ -570,6 +559,7 @@ export function SupplyWizardStep({
           </div>}
           {type !== "BAL" ? <MaterialReview rows={selected.map(product => ({
             id: product.id, name: product.name,
+            consult: <MaterialConsultButton context={context} material={product} />,
             details: <><small>{form.quantities[product.id] ? formatQuantity(form.quantities[product.id], product.unit) : "Quantidade pendente"}</small>{form.presentationSelections?.[product.id]?.map(row => <small key={row.id}>{presentationCaption(row)}</small>)}</>,
           }))} /> : <ul className="divide-y divide-(--line)">
             {selected.map((product) => (

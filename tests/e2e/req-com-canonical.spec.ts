@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { mkdirSync } from "node:fs";
 import { setup, fixtures, issue, rpc } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -13,8 +14,8 @@ import { selectDocumentSection } from "./document-sections";
 
 test.setTimeout(180_000);
 const widths = [320, 390, 768, 1024, 1440];
-async function login(page: Page, patient: string, role: "professional" | "family") {
-  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures[role].email);
+async function login(page: Page, patient: string, email: string) {
+  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
 }
@@ -24,7 +25,10 @@ const facts = (patient: string) => sql(`select jsonb_build_object('req',(select 
 for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and review follow the canonical model in five widths without operational writes`, async ({ page, browser }, info) => {
   const f = await setup({ catalogue: [{ name: "Material de cuidado " + "com nome extenso ".repeat(5) + randomUUID().slice(0, 8), category: "medicamentos", unit: "mL", aliases: [] }] });
   const name = sql(`select name from public.care_recipient_products where care_recipient_id=${q(f.patient)} and product_id=${q(f.products[0])};`);
-  await login(page, f.patient, type === "REQ" ? "professional" : "family"); const before = facts(f.patient);
+  // Five complete accessibility passes should measure this fixture, even
+  // when an older local stack retains thousands of residences for shared test accounts.
+  const user = await shiftWorker(f.patient, type === "REQ" ? "professional" : "family");
+  await login(page, f.patient, user.email); const before = facts(f.patient);
   const writes: string[] = []; page.on("request", request => { if (["/api/requisitions", "/api/documents"].includes(new URL(request.url()).pathname) && request.method() === "POST") writes.push(request.url()); });
   await page.goto(type === "REQ" ? "/fichas/req" : "/fichas/com");
   if (type === "COM") await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
@@ -93,7 +97,7 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials follow 
     p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
     p_payload: { origin: "purchase", lines: f.products.map(productId => ({ productId, quantity: "10" })) },
   });
-  await login(page, f.patient, "family");
+  await login(page, f.patient, fixtures.family.email);
   await page.goto(type === "REQ" ? "/historico/" + doc.id : "/documentos/" + doc.id);
   await selectDocumentSection(page, "materials");
   const list = page.getByRole("list", { name: type === "REQ" ? "Materiais requisitados" : "Materiais da compra ou doação", exact: true });

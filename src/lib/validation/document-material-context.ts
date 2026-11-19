@@ -14,7 +14,8 @@ export const documentMaterialSummary = scope.extend({
 });
 export const materialPanelSections = ["stock", "history", "links"] as const;
 const lineScope = scope.extend({
-  lineId: z.uuid(), productId: z.string().nullable(), page: z.number().int().positive(),
+  documentId: z.uuid().nullable(), lineId: z.uuid().nullable(),
+  productId: z.string().nullable(), page: z.number().int().positive(),
 });
 const observationMode = z.enum(["observed", "unknown", "unfilled", "legacy_unclassified"]);
 const historyRecord = z.object({

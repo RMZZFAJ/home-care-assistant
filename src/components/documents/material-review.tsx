@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 /** Read-only material records share the canonical review composition. */
 export function MaterialReview({ rows }: {
-  rows: readonly { id: string; name: string; details: ReactNode; urgent?: boolean }[];
+  rows: readonly { id: string; name: string; details: ReactNode; urgent?: boolean; consult?: ReactNode }[];
 }) {
   if (!rows.length) return <p className="mt-2 text-sm text-(--muted)">Nenhum registro.</p>;
   return (
@@ -14,6 +14,7 @@ export function MaterialReview({ rows }: {
             {row.details}
           </div>
           {row.urgent ? <span className="ui-badge ui-badge-danger">Urgente</span> : null}
+          {row.consult}
         </li>
       ))}
     </ul>

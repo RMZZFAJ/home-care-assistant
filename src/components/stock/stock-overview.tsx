@@ -17,9 +17,10 @@ import {
   type StockBalanceFilter,
 } from "@/lib/stock-presentation";
 
-import { RecordDrawer } from "@/components/forms/record-drawer";
+import { CatalogueMaterialPanel } from "@/components/documents/catalogue-material-panel";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import type { ProductStock, StockCustody, StockMetric } from "@/types/stock";
+import type { WorkspaceContext } from "@/types/workspace";
 
 const labels: Record<string, string> = {
   FAMILY: "Família",
@@ -38,6 +39,7 @@ function StockQuantity({ value, unit }: { value: string; unit: string }) {
   );
 }
 export function StockOverview({
+  context,
   products,
   custody,
   allowedCustodies,
@@ -45,6 +47,7 @@ export function StockOverview({
   filter = "all",
   showEmpty = true,
 }: {
+  context: WorkspaceContext;
   products: ProductStock[];
   custody: string;
   allowedCustodies: string[];
@@ -227,13 +230,16 @@ export function StockOverview({
         </nav>
       ) : null}
       {selection && selected ? (
-        <RecordDrawer
-          title={selected.product.name + " · " + labels[selected.custody]}
+        <CatalogueMaterialPanel
+          key={selected.product.productId + ":" + selected.custody}
+          context={context}
+          material={{ id: selected.product.productId, unit: selected.product.unit,
+            name: selected.product.name + " · " + labels[selected.custody] }}
           onClose={() => setSelection(null)}
-          restoreFocusTo={selection.opener}
-          restoreFocusFallbackRef={listRef}
-          trackChanges={false}
-        >
+          closeText="Voltar ao estoque"
+          detailTitle={`Saldo e previsões · ${labels[selected.custody]}`}
+          finalFocus={() => selection.opener.isConnected ? selection.opener : listRef.current ?? false}
+          detail={
           <div className="hca-stock-detail">
             <div className="hca-stock-available">
               <span>Saldo confirmado · {selected.product.unit}</span>
@@ -306,7 +312,7 @@ export function StockOverview({
               válidos. Somente a ENT aceita atende as linhas REQ.
             </p>
           </div>
-        </RecordDrawer>
+        } />
       ) : null}
     </div>
   );

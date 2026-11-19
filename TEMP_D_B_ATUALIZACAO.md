@@ -1,5 +1,32 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — consulta de material no preenchimento e no estoque.** O painel
+de Estoque, Histórico e Fichas também abre no catálogo e na revisão das
+fichas em preenchimento, ao selecionar materiais para devolução e na
+consulta de saldos e previsões do estoque.
+
+- A origem fica montada durante a abertura da ficha relacionada,
+  inclusive na tela completa. O retorno conserva etapa, digitação,
+  busca, rolagem e foco sem criar outro rascunho pela consulta.
+- A identidade de catálogo autoriza a leitura pela associação com a
+  residência selecionada. Saldos e movimentos continuam separados
+  conforme a permissão de cada custódia. As fichas relacionadas exigem
+  a leitura do próprio tipo e usam as telas, permissões e abas reais.
+- A consulta de estoque também apresenta mínimo, trânsito, projeção,
+  consumo extraordinário e divergência na custódia consultada.
+- A integração com Auth real conferiu o catálogo, o histórico, o
+  isolamento por material e residência e a revogação de leitura.
+- Os casos dirigidos em Android e iOS emulados cobriram a consulta
+  com REQ, COM e DEV em edição e os saldos de estoque. Foi verificado
+  o botão Voltar, o retorno pelo histórico do navegador e a abertura
+  de chegada avulsa pela consulta. A comparação móvel usou 390 px.
+- A verificação de acessibilidade de seleção e revisão usa uma
+  identidade dedicada à residência de teste, com as mesmas regras
+  e larguras da suíte de referência.
+- A stack local tem 297 migrations até `20261119141610`. As 25
+  pendentes foram ensaiadas no desenvolvimento com rollback. O
+  desenvolvimento segue em 272 até a publicação do preview compatível.
+
 **19/11 — decisões no Histórico de cada material.** A cronologia reúne
 as movimentações permitidas da custódia, as contagens de REQ, a compra,
 as decisões de chegada e as avaliações de necessidade. A quantidade,
@@ -21,8 +48,8 @@ A autorização para a ficha determina quais decisões entram na consulta.
 - Banco local com 296 versões até `20261119135903`. A fila de 24
   migrations passou no ensaio remoto com rollback, incluindo os grants
   do Histórico. O desenvolvimento segue em 272 até o preview compatível.
-- Falta reutilizar o painel a partir do preenchimento e da consulta
-  geral de estoque.
+- Ao fim daquele incremento, faltava reutilizar o painel no
+  preenchimento e na consulta geral de estoque.
 
 **19/11 — Materiais e fichas relacionadas.** REQ, COM, ENT e DEV usam a
 lista compacta da v7, com busca, contagens e filtro de situação. O painel

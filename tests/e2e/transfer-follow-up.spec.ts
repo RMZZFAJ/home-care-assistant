@@ -65,7 +65,19 @@ async function declareInUi(page: Page, f: Fixture, source: Custody, info: TestIn
   const material = drawer.getByRole("combobox", { name: /^Adicionar material da origem/ });
   await material.click(); await material.fill("Material fictício V4 0"); await material.press("ArrowDown");
   await page.getByRole("option", { name: /Material fictício V4 0/ }).click();
-  await drawer.getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ }).fill("2");
+  const amount = drawer.getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ });
+  await amount.fill("2");
+  if (source === "CARE_TEAM") {
+    const consult = drawer.getByRole("button", { name: "Consultar material Material fictício V4 0", exact: true });
+    await consult.click();
+    const panel = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
+    await expect(panel.getByRole("heading", { name: "Estoque atual", exact: true })).toBeVisible();
+    await panel.getByRole("tab", { name: "Histórico", exact: true }).click();
+    await expect(panel.getByRole("heading", { name: "Movimentações e decisões", exact: true })).toBeVisible();
+    await panel.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+    await expect(consult).toBeFocused();
+    await expect(amount).toHaveValue("2");
+  }
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
   await expect(drawer.getByRole("heading", { name: "Itens extras", exact: true })).toBeVisible();
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();

@@ -561,7 +561,9 @@ function PatientRequisition({
       </Notice>{selectionLibrary(true)}</div>
     );
   return (
-    <div ref={fieldsRef} onChangeCapture={() => setDraftTouched(true)} className="hca-document-wizard min-w-0 space-y-5">
+    <div ref={fieldsRef} onChangeCapture={event => {
+      if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);
+    }} className="hca-document-wizard min-w-0 space-y-5">
       <Dialog open={reviewStock} title="Confira o estoque da equipe" onClose={() => setReviewStock(false)}>
         {loadingCatalog ? <p role="status">Consultando o estoque atual…</p> : catalogError ? (
           <Notice error>{catalogError}</Notice>
@@ -713,6 +715,7 @@ function PatientRequisition({
             ) : null}
             {step >= 1 && step <= 3 ? (
               <CatalogStep
+                context={context}
                 items={categoryItems}
                 itemContext={itemContext}
                 selected={selected}
@@ -755,6 +758,7 @@ function PatientRequisition({
             ) : null}
             {step === 6 ? (
               <Review
+                context={context}
                 form={form}
                 recipientName={context.patient!.display_name}
                 requesterName={context.fullName}
