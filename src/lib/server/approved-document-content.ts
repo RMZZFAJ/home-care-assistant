@@ -4,6 +4,7 @@ import { requirePdfLifecycleFacts } from "@/lib/documents/pdf-lifecycle";
 import { formatBrazilDate } from "@/lib/receipt";
 import { readPdfPresentation, originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { frozenFollowUpFacts } from "@/lib/documents/follow-up-lifecycle";
+import { frozenArchiveFacts } from "@/lib/documents/document-archive";
 
 /** Common source obligations, independent of all layout components. */
 export function approvedDocumentContent(snapshot: DocumentSnapshot, emission: PdfEmissionContext) {
@@ -22,6 +23,7 @@ export function approvedDocumentContent(snapshot: DocumentSnapshot, emission: Pd
   for (const [index, ref] of (presentation?.references ?? []).entries()) semanticFacts["operationalReference/" + index] = referenceLabels[ref.kind] + " · " + (ref.accessible ? ref.code : "Acesso restrito");
   observations.forEach((note, index) => { semanticFacts["observation/" + index] = note; });
   for (const fact of frozenFollowUpFacts(snapshot.workflow?.documentFollowUp)) semanticFacts[fact.key] = fact.text;
+  for (const fact of frozenArchiveFacts(snapshot.archiveFacts)) semanticFacts[fact.key] = fact.text;
   const cancellation = lifecycle.cancellation;
   if (cancellation.state === "recorded") {
     semanticFacts["cancellation/actor"] = "Cancelada por " + (cancellation.act.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(cancellation.act.recordedAt);

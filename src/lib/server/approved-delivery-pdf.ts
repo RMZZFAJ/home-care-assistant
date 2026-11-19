@@ -34,9 +34,9 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   const receiptName = recordedDeliveryRecipient(snapshot, source) ?? "Nome não preservado";
   const personal = !source.historical && Boolean(acceptedAt), cancelled = snapshot.status === "cancelled", administrative = snapshot.status === "administratively_closed";
   const complete = snapshot.status === "confirmed" || snapshot.status === "received", issue = snapshot.lines.some(line => (line.metadata as { issueOpen?: boolean; } | undefined)?.issueOpen);
-  const tone: DocumentTone = cancelled || administrative ? "bad" : complete ? "good" : "warn";
+  const tone: DocumentTone = snapshot.archiveFacts ? "blue" : cancelled || administrative ? "bad" : complete ? "good" : "warn";
   const title = returned ? "Devolução de materiais" : direction === "delivery" ? "Entrega de materiais" : "Movimentação de materiais · percurso não preservado";
-  const status = Object.hasOwn(documentStatuses, snapshot.status) ? documentStatuses[snapshot.status] : "Situação não reconhecida nesta versão";
+  const status = snapshot.archiveFacts ? "Arquivada" : Object.hasOwn(documentStatuses, snapshot.status) ? documentStatuses[snapshot.status] : "Situação não reconhecida nesta versão";
   const quantities = snapshot.lines.map(line => confirmedDeliveryQuantity(snapshot, line, fidelity.deliveryResolutions, source.historical));
   const header: DocumentHeader = {
     ...approvedPdfMode(snapshot, emission), title, code: snapshot.code, status, tone, asOf: documentCutLabel(snapshot), requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName, verificationCode: emission.verificationCode,

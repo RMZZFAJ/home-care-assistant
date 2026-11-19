@@ -22,6 +22,7 @@ import { approvedRequisitionContent } from "./approved-requisition-content";
 import { approvedSupplyContent } from "./approved-supply-content";
 import { approvedPdfExpansionContent } from "./approved-pdf-expansion-content";
 import { approvedDeliveryContent } from "./approved-delivery-content";
+import { frozenDocumentArchive } from "@/lib/documents/document-archive";
 
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
 export type PdfContentPlan = {
@@ -56,6 +57,11 @@ export async function composeIssuance(
   const runs: Run[] = [];
   const revision = emission.rendererRevision ?? 16;
   if (![16, 17].includes(revision)) throw invalid("retired-renderer");
+  if (snapshot.archiveFacts !== undefined) {
+    const archive = frozenDocumentArchive.safeParse(snapshot.archiveFacts);
+    if (!archive.success || archive.data.documentId !== snapshot.id || archive.data.sourceVersion !== snapshot.version)
+      throw invalid("archive-source-or-cutoff");
+  }
   const parsed = pdfSourceFactsSchema.safeParse(snapshot.sourceFacts);
   if (!parsed.success) throw invalid("source-facts-schema");
   const sourceFacts = parsed.data;

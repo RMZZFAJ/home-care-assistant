@@ -38,6 +38,12 @@ export function databaseError(
     throw new ApiError("VERSION_CONFLICT", "A compra escolhida mudou. Confira a quantidade em aberto e revise a cobertura antes de confirmar.", 409);
   if (error?.code === "PT409" && message === "delivery exceeds approved source quantity")
     throw new ApiError("VERSION_CONFLICT", "A quantidade supera as chegadas aprovadas nas compras vinculadas ao material. Confira a quantidade e as origens.", 409);
+  if (error?.code === "PT409" && /^(archive review changed|archive decision reference changed)$/.test(message))
+    throw new ApiError("VERSION_CONFLICT", "A situação do arquivamento mudou. Consulte a ficha para conferir as decisões disponíveis.", 409);
+  if (error?.code === "PT409" && message === "archived document is read only")
+    throw new ApiError("VERSION_CONFLICT", "A ficha arquivada está disponível para consulta e download.", 409);
+  if (error?.code === "PT409" && message === "verified consolidated PDF required")
+    throw new ApiError("PERSISTENCE_UNCONFIRMED", "O PDF consolidado ainda aguarda confirmação. Consulte a mesma tentativa de arquivamento.", 409, true);
   if (error?.code === "42501" && message === "existing supply sources require read permission")
     throw new ApiError("FORBIDDEN", "O rascunho tem uma origem fora da sua permissão de leitura. Peça a conferência a alguém com acesso às origens.", 403);
   if (error?.code === "PT409" && /^(requisition cancellation stock reference changed or missing|requisition cancellation stock reversal is unavailable)$/.test(message))

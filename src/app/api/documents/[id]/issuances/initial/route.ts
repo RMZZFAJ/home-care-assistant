@@ -1,6 +1,6 @@
 import { api, ApiError, authenticate, parseUuid, rpc, validateMutationRequest } from "@/lib/server/api";
 import { configuredAppOrigin } from "@/lib/server/app-origin";
-import { issueInitialDocumentPdf } from "@/lib/server/pdf-issuance";
+import { issueSystemDocumentPdf } from "@/lib/server/pdf-issuance";
 import { createWorkerClient } from "@/lib/server/service-client";
 import { initialPdfStatusSchema } from "@/lib/documents/pdf-issuance";
 
@@ -24,7 +24,7 @@ export async function POST(request: Request, context: Context) {
     const initial = await initialPdf(context);
     if (!initial) throw new ApiError("NOT_FOUND", "Esta ficha não tem uma solicitação de PDF inicial.", 404);
     if (initial.state !== "ready") {
-      await issueInitialDocumentPdf(createWorkerClient(), initial.id, configuredAppOrigin());
+      await issueSystemDocumentPdf(createWorkerClient(), initial.id, configuredAppOrigin());
     }
     const current = await initialPdf(context);
     return Response.json(current, { status: current?.state === "ready" ? 200 : 202 });

@@ -10,11 +10,14 @@ const milestones = new Set([
   "req.issued", "req.science_satisfied", "req.completed", "com.issued", "com.validate_receipt",
   "ent.issued", "ent.receive", "ent.resolve", "ent.fulfillment_reviewed", "ent.transfer.agreed", "bal.issued", "bal.approve", "bal.apply",
   "req.follow_up_completed", "com.follow_up_completed", "ent.follow_up_completed",
+  "req.archived.manual", "req.archived.automatic", "com.archived.manual", "ent.archived.manual",
+  "req.archive_confirmed", "com.archive_confirmed", "ent.archive_confirmed",
 ]);
 const attention = new Set([
   "req.reopened", "com.reject_receipt", "com.cancel", "ent.cancel", "ent.consent_cancel",
   "ent.refuse_cancellation", "ent.propose_regularization", "ent.transfer.declined", "ent.request_fulfillment_review", "bal.cancel", "bal.recount",
   "req.follow_up_reopened", "com.follow_up_reopened", "ent.follow_up_reopened",
+  "req.archive_reverted", "com.archive_reverted", "ent.archive_reverted",
 ]);
 /** Origin and relevance are independent; a manual milestone remains a manual record. */
 export function progressEventPresentation(row: {

@@ -6,6 +6,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { readPdfPresentation } from "@/lib/documents/pdf-presentation";
 import { pdfSourceFactsSchema, sourceNameLabels } from "@/lib/documents/pdf-source-facts";
 import { frozenFollowUpFacts } from "@/lib/documents/follow-up-lifecycle";
+import { frozenArchiveFacts } from "@/lib/documents/document-archive";
 
 export const confidentialityNotice = "Este documento contém dados pessoais, inclusive informações de saúde, sujeitos a proteção especial pela Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais — LGPD), quando aplicável. O acesso, a guarda, a reprodução e o compartilhamento devem respeitar a finalidade legítima, a necessidade e a segurança das informações, limitando-se às pessoas autorizadas e aos dados necessários. A emissão não autoriza divulgação pública ou uso incompatível com essa finalidade. Confira o destinatário antes de compartilhar e utilize canal adequado. Se receber este documento por engano, não o encaminhe; comunique o responsável pelo envio e observe as orientações de guarda ou descarte aplicáveis. A identificação do exportador não afasta os deveres dos demais envolvidos, nem substitui as regras de autorização e proteção do sistema.";
 
@@ -70,9 +71,15 @@ export function appendDocumentCancellation(layout: ApprovedPdfLayout, lifecycle:
 
 export function appendDocumentFollowUp(layout: ApprovedPdfLayout, snapshot: DocumentSnapshot) {
   const facts = frozenFollowUpFacts(snapshot.workflow?.documentFollowUp);
-  if (!facts.length) return;
-  layout.heading("Decisões de acompanhamento");
-  for (const fact of facts) layout.paragraph(fact.text, fact.key, { size: 9.5 });
+  if (facts.length) {
+    layout.heading("Decisões de acompanhamento");
+    for (const fact of facts) layout.paragraph(fact.text, fact.key, { size: 9.5 });
+  }
+  const archive = frozenArchiveFacts(snapshot.archiveFacts);
+  if (archive.length) {
+    layout.heading("Arquivamento");
+    for (const fact of archive) layout.paragraph(fact.text, fact.key, { size: 9.5 });
+  }
 }
 
 export async function appendVerificationAndPrivacy(layout: ApprovedPdfLayout, emission: PdfEmissionContext, subject: string, issuer: string, operationalAt: string | null, verificationUrl: string, formattedCode: string) {

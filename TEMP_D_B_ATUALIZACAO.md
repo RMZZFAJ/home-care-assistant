@@ -1,5 +1,24 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — contrato de arquivo manual e PDF consolidado.** A API reserva o
+exemplar a partir da versão revisada. A ficha só é arquivada depois da
+assinatura, da conferência do armazenamento e da nova validação do acesso
+e da referência. O arquivo vigente bloqueia novos Andamentos, emissões
+manuais e alterações documentais. O administrador pode confirmar o
+encerramento ou reverter com justificativa, preservando o consolidado.
+
+| Caso | Evidência local | Pendência |
+| --- | --- | --- |
+| Preparação e acesso | Integração com Auth real confirma permissão, repetição da intenção e ausência de efeito oficial sem PDF | Diálogos e menu de três pontos da v7 |
+| Fonte atual | Um novo Andamento invalida a revisão anterior mesmo sem mudar a versão da ficha | Fluxo Concluir e arquivar |
+| Assinatura e decisões | Pipeline documental existente com corte, autoria e verificação do arquivo | Agendamento pelo prazo e integração do fluxo de REQ já existente |
+
+Passaram 14 testes de integração dirigidos, 16 unitários e quatro
+execuções da API com sessão aberta em Android e iOS emulados. A stack
+local tem 289 migrations até `20261119105026`. As 17 migrations
+pendentes no desenvolvimento remoto passaram pela pré-validação com
+rollback. O remoto segue com 272 versões.
+
 **19/11 — PDF inicial automático de REQ, COM, ENT, DEV e BAL.** O evento
 oficial cria uma solicitação única. Na REQ, o corte incorpora a ciência
 tácita aplicável na emissão. O processamento usa a assinatura e a

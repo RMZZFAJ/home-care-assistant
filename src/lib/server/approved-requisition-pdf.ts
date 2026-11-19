@@ -37,8 +37,8 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
   const familyAware = !source.historical && (snapshot.sciencePolicy?.familyAware === true || Boolean(snapshot.sciencePolicy?.science_satisfied_at));
   const satisfying = familyAware ? awareness.find(event => event.created_at === snapshot.sciencePolicy?.science_satisfied_at) ?? awareness[0] : undefined;
   const complete = Boolean(snapshot.sciencePolicy?.completed_at), archived = Boolean(snapshot.sciencePolicy?.archived_at), cancelled = snapshot.status === "cancelled";
-  const status = cancelled ? "Cancelada" : archived ? "Arquivada" : complete ? "Atendimento concluído" : source.historical ? "Registro histórico" : familyAware ? "Em atendimento" : "Ciência e atendimento pendentes";
-  const tone: DocumentTone = cancelled ? "bad" : complete || archived ? "good" : "warn";
+  const status = snapshot.archiveFacts ? "Arquivada" : cancelled ? "Cancelada" : archived ? "Arquivada" : complete ? "Atendimento concluído" : source.historical ? "Registro histórico" : familyAware ? "Em atendimento" : "Ciência e atendimento pendentes";
+  const tone: DocumentTone = snapshot.archiveFacts ? "blue" : cancelled ? "bad" : complete || archived ? "good" : "warn";
   const attended = source.historical ? null : snapshot.fulfillmentLines?.filter(line => line.attended).length ?? null;
   const header: DocumentHeader = {
     ...approvedPdfMode(snapshot, emission), title: source.historical ? "Requisição histórica de materiais" : "Requisição de materiais",

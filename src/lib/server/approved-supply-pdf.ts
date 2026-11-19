@@ -54,8 +54,8 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
   const entered = snapshot.lines.filter(line => quantity(String(line.accepted_quantity ?? 0)).gt(0) ||
     associated.some(item => item.targetLineId === line.id)).length;
   const done = purchase ? !snapshot.purchaseProgress?.expectationPending && !snapshot.purchaseProgress?.validationPending && !snapshot.purchaseProgress?.physicalPending && snapshot.purchaseProgress !== undefined : application?.state === "applied";
-  const tone: DocumentTone = cancelled || snapshot.status === "rejected" ? "bad" : done ? "good" : "warn";
-  const status = cancelled ? "Cancelada" : purchase ? documentStatuses[snapshot.purchaseProgress?.state ?? snapshot.status] ?? "Situação não preservada" : done ? "Contagem aplicada" : snapshot.status === "archived" ? "Arquivada" : documentStatuses[snapshot.status] ?? "Situação não preservada";
+  const tone: DocumentTone = snapshot.archiveFacts ? "blue" : cancelled || snapshot.status === "rejected" ? "bad" : done ? "good" : "warn";
+  const status = snapshot.archiveFacts ? "Arquivada" : cancelled ? "Cancelada" : purchase ? documentStatuses[snapshot.purchaseProgress?.state ?? snapshot.status] ?? "Situação não preservada" : done ? "Contagem aplicada" : snapshot.status === "archived" ? "Arquivada" : documentStatuses[snapshot.status] ?? "Situação não preservada";
   const title = purchase ? donation ? "Doação de materiais" : "Compra de materiais" : Number(snapshot.workflow?.countVersion ?? 1) > 1 ? "Reconto do estoque da equipe" : "Balanço do estoque da equipe";
   const header: DocumentHeader = {
     ...approvedPdfMode(snapshot, emission), title, code: snapshot.code, status, tone, asOf: documentCutLabel(snapshot), requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName, verificationCode: emission.verificationCode,

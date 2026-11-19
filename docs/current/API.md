@@ -629,6 +629,33 @@ processado. A recuperação preserva o identificador da emissão e os efeitos
 operacionais da ficha. A leitura por `issuance` usa o mesmo contrato dos
 demais PDFs assinados.
 
+## Arquivamento com PDF consolidado
+
+`GET /api/documents/:id/lifecycle/archive` retorna a situação da ficha, o
+prazo definido nas configurações do paciente, a versão e o `referenceHash`
+da revisão. A leitura exige acesso à ficha. Os atos de arquivo exigem
+administrador do paciente e revalidação da autoridade dentro da transação.
+
+`POST` nesse recurso recebe `action: "archive"`, `key`, `version`,
+`referenceHash` e `mode`. Os motivos são política padrão (`policy`),
+antecipação (`early`) e motivo próprio (`other`). O último recebe
+`reason`. A primeira confirmação cria uma solicitação de consolidação
+vinculada à decisão revisada. A mesma chave recupera essa solicitação.
+
+O sistema congela a fonte e assina o PDF. A ficha só muda para arquivada
+após a confirmação do exemplar e a revalidação da fonte, incluindo os
+Andamentos adicionados desde a revisão. O exemplar em preparação permanece
+fora das consultas e verificações públicas. Um resultado `202` indica
+processamento. Na falha de PDF, a situação anterior da ficha continua
+disponível e a mesma chave recupera a tentativa oficial.
+
+Depois do arquivamento, `confirm` encerra o arquivo e `reverse` restaura
+a condição anterior com justificativa. As duas ações enviam `key`,
+`version` e `referenceHash` da revisão atual. As decisões registram autoria
+e instante, preservam os bytes do consolidado e deixam o estoque como está.
+As consultas e os arquivos anteriores permanecem disponíveis. Enquanto
+o arquivo está ativo, os Andamentos e novas emissões manuais ficam bloqueados.
+
 ## ENT e DEV — cancelamento físico e decisão do recebedor
 
 Com a expedição em trânsito e sem conferência pessoal, `cancel` exige

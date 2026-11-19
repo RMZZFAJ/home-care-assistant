@@ -27,6 +27,7 @@ export type DocumentSnapshot = {
   presentationFacts?: unknown;
   documentExpansion?: unknown;
   documentFacts?: unknown;
+  archiveFacts?: unknown;
   balanceApplication?: unknown;
   balanceReviewCorrections?: unknown;
   materialIdentity?: string;

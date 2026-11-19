@@ -257,7 +257,7 @@ export async function notificationPdf(client: SupabaseClient, notificationId: st
   return { bytes, filename: record.snapshot.code + "-" + record.id + ".pdf" };
 }
 
-export async function issueInitialDocumentPdf(client: SupabaseClient, requestId: string, verificationOrigin: string) {
+export async function issueSystemDocumentPdf(client: SupabaseClient, requestId: string, verificationOrigin: string) {
   const command = (action: string, args: Record<string, unknown> = {}) =>
     rpc(client, "initial_document_pdf", { p_request: requestId, p_action: action, p_args: args });
   const reserved = await command("reserve") as StoredIntention;
@@ -270,7 +270,7 @@ export async function issueInitialDocumentPdf(client: SupabaseClient, requestId:
 
 export async function processInitialDocumentPdfs(client: SupabaseClient, verificationOrigin: string) {
   const claimed = await rpc(client, "claim_initial_document_pdfs", { p_limit: 3 }) as string[];
-  const results = await Promise.allSettled(claimed.map(id => issueInitialDocumentPdf(client, id, verificationOrigin)));
+  const results = await Promise.allSettled(claimed.map(id => issueSystemDocumentPdf(client, id, verificationOrigin)));
   const ready = results.filter(result => result.status === "fulfilled" && result.value.state === "ready").length;
   const failed = results.filter(result => result.status === "rejected").length;
   return { claimed: claimed.length, ready, failed, processing: claimed.length - ready - failed };
