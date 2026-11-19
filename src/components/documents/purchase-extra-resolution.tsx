@@ -25,6 +25,7 @@ export function PurchaseExtraResolution({ data, mayIdentify, onUpdated }: {
   return <section className="hca-form-stack" aria-label="Materiais com cadastro pendente">
     <h3>Materiais com cadastro pendente</h3>
     <p className="doc-subtle">A família precisa identificar estes materiais no catálogo da residência.</p>
+    {data.lines.length ? <p className="doc-subtle">Os itens já identificados seguem pelas etapas de aprovação, compra e chegada.</p> : null}
     <ul className="hca-form-stack">{pending.map(extra => <li key={extra.id} className="hca-requisition-extra-row">
       <div className="hca-extra-item-heading"><strong>{extra.name}</strong><Pill tone="warning">Cadastro pendente</Pill></div>
       <p>{formatQuantity(extra.quantity, extra.unit)}</p>
@@ -102,6 +103,7 @@ function IdentifyExtra({ item, data, onClose, onSuccess }: {
       </ActionButton></>}>
     <div className="hca-form-stack">
       <p><strong>{item.name}</strong> · {formatQuantity(item.quantity, item.unit)}</p>
+      {data.status !== "pending_approval" ? <p className="doc-subtle">Ao confirmar, essa quantidade também ficará disponível para registrar a compra.</p> : null}
       {item.details ? <p className="whitespace-pre-wrap">{item.details}</p> : null}
       {loadError ? <FeedbackBanner tone="error">{loadError} <ActionButton compact onClick={() => {
         setLoadError(""); setLoadAttempt(attempt => attempt + 1);

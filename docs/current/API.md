@@ -1988,3 +1988,19 @@ o mínimo remoto conferido permanece em seis caracteres.
 DEV usa kind e série próprios no banco/projeções e código/protocolo DEV. O motor
 transacional de transferência continua ENT internamente, preservando custódias,
 permissões e recebimento. Não exige uma ENT documental de origem.
+
+O rascunho privado conserva os extras ainda sem cadastro, com ID da linha,
+nome, tipo, unidade, quantidade e detalhes opcionais. Em `purpose=create` ou
+`revise` de ENT, esses dados ficam em `content.form.pendingExtras`. Em
+`transfer_declare_family` e `transfer_declare_team`, ficam em
+`content.pendingExtras`. Enquanto a regra de expedição desses itens está em
+decisão, uma confirmação de rascunho com extras pendentes recebe conflito da
+RPC. A revisão fica disponível. Ao escolher um material de catálogo, a
+expedição usa a linha identificada e aplica a validação de saldo e precisão.
+
+Uma COM mista aceita `approve`, `purchase` e atos de chegada para as linhas
+identificadas, conforme as permissões e os limites já vigentes. O extra
+continua em `purchaseProgress.identificationPending`. A identificação por
+`resolve_purchase_extra` pode ocorrer depois da compra ou chegada de outras
+linhas. Ela conserva o ID da ficha e acrescenta a linha autorizada sem criar
+compra ou lançamento de estoque.

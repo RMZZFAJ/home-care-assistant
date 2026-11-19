@@ -46,6 +46,16 @@ it("distinguishes acquisition from validated arrival for purchase and donation",
   expect(donation.heading).toBe("Informar a chegada da doação");
   expect(purchaseFollowUp({ ...input, origin: "donation", progress: { ...acquired, state: "purchasing" } }).statusLabel).toBe("Doação em andamento");
 });
+it("guides mixed purchases to the actionable lines until only identification remains", () => {
+  const mixed = { ...progress, identificationPending: true };
+  expect(purchaseFollowUp({ ...input, progress: mixed }).heading).toBe("Registrar a aquisição dos materiais");
+  expect(purchaseFollowUp({ ...input, status: "pending_approval", progress: mixed }).heading).toBe("Conferir a aprovação da aquisição");
+  const pendingOnly = { ...mixed, lines: [] };
+  expect(purchaseFollowUp({ ...input, status: "pending_approval", progress: pendingOnly }).section).toBe("materials");
+  const acquired = { ...mixed, lines: [{ ...line, purchasedQuantity: "10", remainingExpectation: "0" }] };
+  expect(purchaseFollowUp({ ...input, progress: { ...acquired, physicalPending: true } }).heading).toBe("Informar a chegada da aquisição");
+  expect(purchaseFollowUp({ ...input, progress: acquired }).heading).toBe("Identificar os materiais pendentes");
+});
 it.each(["cancelled", "rejected", "administratively_closed"])("closed %s directs to history even with old pending flags", status => {
   expect(purchaseFollowUp({ ...input, status })).toMatchObject({ pending: false, section: "history" });
   const milestones = supplyMilestones({ ...facts, status, purchaseProgress: progress });

@@ -4,19 +4,31 @@ import { useState, type FormEvent } from "react";
 import { ExtraMaterialDialog } from "@/components/forms/extra-material-dialog";
 import { ActionButton, FormField, Pill, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
-import { matchCatalog, normalizeCatalogText } from "@/lib/catalog-match";
+import { matchCatalog, normalizeCatalogText, type MatchableCatalogItem } from "@/lib/catalog-match";
 import { extraMaterialUnits } from "@/lib/documents/extra-material-identity";
 import { formatQuantity } from "@/lib/quantity";
 import { exactQuantity } from "@/lib/validation/exact-quantity";
 import { pendingPurchaseExtra, type PendingPurchaseExtra } from "@/lib/validation/pending-purchase-extras";
-import type { CatalogProduct } from "@/types/documents";
 
 type ExtraEditor = { item?: PendingPurchaseExtra };
+type CatalogueMaterial = MatchableCatalogItem & { unit: string };
 
-export function PurchaseExtraItems({ items, catalogue, selected, inExtras, onChange, onChoose }: {
+export const pendingExtraDispatchMessage = "Identifique os itens extras no catálogo ou retire-os do preenchimento para poder expedir.";
+
+export function pendingExtraReviewRow(item: PendingPurchaseExtra) {
+  return {
+    id: item.id,
+    name: item.name,
+    details: <><small>{formatQuantity(item.quantity, item.unit)} · Cadastro pendente</small>
+      {item.details ? <small className="whitespace-pre-wrap">{item.details}</small> : null}
+    </>,
+  };
+}
+
+export function SupplyExtraItems({ items, catalogue, selected, inExtras, onChange, onChoose }: {
   items: PendingPurchaseExtra[];
-  catalogue: CatalogProduct[];
-  selected: Record<string, string>;
+  catalogue: readonly CatalogueMaterial[];
+  selected: ReadonlySet<string>;
   inExtras: boolean;
   onChange: (items: PendingPurchaseExtra[]) => void;
   onChoose: (product: string, quantity: string, replace?: string) => void;
@@ -37,7 +49,7 @@ export function PurchaseExtraItems({ items, catalogue, selected, inExtras, onCha
       </li>)}
     </ul> : null}
     <ActionButton onClick={() => setEditor({})}><Icon name="plus" />{inExtras ? "Adicionar item extra" : "Item extra"}</ActionButton>
-    {editor ? <PurchaseExtraEditor item={editor.item} catalogue={catalogue} selected={selected}
+    {editor ? <SupplyExtraEditor item={editor.item} catalogue={catalogue} selected={selected}
       atLimit={items.length >= 20} onClose={() => setEditor(null)}
       onChoose={(product, quantity) => {
         onChoose(product, quantity, editor.item?.id);
@@ -50,10 +62,10 @@ export function PurchaseExtraItems({ items, catalogue, selected, inExtras, onCha
   </>;
 }
 
-function PurchaseExtraEditor({ item, catalogue, selected, atLimit, onClose, onChoose, onSave }: {
+function SupplyExtraEditor({ item, catalogue, selected, atLimit, onClose, onChoose, onSave }: {
   item?: PendingPurchaseExtra;
-  catalogue: CatalogProduct[];
-  selected: Record<string, string>;
+  catalogue: readonly CatalogueMaterial[];
+  selected: ReadonlySet<string>;
   atLimit: boolean;
   onClose: () => void;
   onChoose: (product: string, quantity: string) => void;
@@ -67,8 +79,8 @@ function PurchaseExtraEditor({ item, catalogue, selected, atLimit, onClose, onCh
   const [errors, setErrors] = useState<Record<string, string>>({});
   const query = normalizeCatalogText(draft.name);
   const { candidates } = matchCatalog(draft.name, catalogue);
-  const nearby = candidates.length ? candidates.map(match => match.product) : query.length >= 2
-    ? catalogue.filter(product => product.active !== false && [product.name, ...(product.aliases ?? [])]
+  const nearby = candidates.length ? candidates.map(match => match.product) : query
+    ? catalogue.filter(product => product.active !== false && product.is_active !== false && [product.name, ...(product.aliases ?? [])]
       .some(label => normalizeCatalogText(label).includes(query))) : [];
   const exactMatch = candidates.some(match => match.kind === "exact" || match.kind === "alias");
   const needsChoice = nearby.length > 0 && query !== ignored;
@@ -80,6 +92,7 @@ function PurchaseExtraEditor({ item, catalogue, selected, atLimit, onClose, onCh
 
   function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    event.stopPropagation();
     if (!item && atLimit) return;
     const parsed = pendingPurchaseExtra.safeParse({ ...draft, details: draft.details.trim() || undefined });
     const nextErrors: Record<string, string> = {};
@@ -105,7 +118,7 @@ function PurchaseExtraEditor({ item, catalogue, selected, atLimit, onClose, onCh
     {exactMatch || needsChoice ? <div className="hca-material-suggestions space-y-2">
       <p role="status" className="font-semibold">É um destes materiais?</p>
       {nearby.slice(0, 5).map(product => <ActionButton key={product.id} compact variant="quiet"
-        className="hca-material-suggestion" disabled={Object.hasOwn(selected, product.id)}
+        className="hca-material-suggestion" disabled={selected.has(product.id)}
         aria-label={`Usar item do catálogo: ${product.name} (${product.unit})`} onClick={() => {
           const quantity = exactQuantity.safeParse(draft.quantity);
           const sameUnit = !draft.unit || product.unit.trim().localeCompare(draft.unit, "pt-BR", { sensitivity: "base" }) === 0;

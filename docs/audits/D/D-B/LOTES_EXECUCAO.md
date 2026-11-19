@@ -122,13 +122,19 @@ confere com o comando mestre.
   A família habilitada pode escolher um produto compatível em Materiais.
   A identificação conserva a linha original proposta no histórico, cria
   uma única linha de planejamento e não registra compra, chegada ou estoque.
+  A compra e a chegada dos itens identificados podem seguir enquanto outro
+  extra aguarda cadastro. A ficha conserva a pendência até a identificação.
   Testes dirigidos conferiram emissão, recebimento e crédito único. Pendem
   revisão visual agrupada e CI do candidato que reúne os incrementos.
 - **ENT e DEV E06.** Expedição direta, conferência pessoal, falta e excedente
   em apuração, conciliação, suficiência, troca do recebedor e regularização
   com revisão independente após revogação. Recebimento físico e avaliação
-  familiar distintos, com testes em celular e Auth real. Pendem P2 e a
-  validação combinada no preview compatível.
+  familiar distintos, com testes em celular e Auth real. O item extra sem
+  cadastro começa em Materiais, reaparece em Itens extras e fica uma vez na
+  revisão. Rascunho, edição e remoção mantêm a identidade dessa linha. A
+  escolha explícita de um produto cadastrado devolve o item à regra de
+  disponibilidade e precisão da custódia de origem. Pendem P2, o efeito dos
+  extras ainda não identificados na expedição e a validação no preview.
 - **Fichas, atualização e acesso E04–E06.** Lista compacta de Materiais, painéis,
   preservação da edição em consulta, aba Andamentos, menu e botão flutuante,
   próximo passo, comparação de mudanças e retirada da ficha quando cai o acesso.
@@ -206,29 +212,35 @@ conferência histórica de aplicação inicial, sem inferência sobre dados atua
   Codex é se a ficha deve expedir os materiais disponíveis e registrar o
   extra como pendência, ou esperar pela identificação para expedir tudo.
   Recomendação encaminhada: expedir os materiais disponíveis e mostrar a
-  pendência separadamente. A escolha está em aberto.
+  pendência separadamente. A escolha está em aberto. Enquanto isso o sistema
+  aceita salvar e revisar a ficha inteira e mantém a expedição aguardando
+  identificação. O banco confirma essa mesma regra no rascunho revisado.
 
-- **COM mista com extra ainda sem identificação.** O laboratório prevê a
-  pendência de catálogo. A decisão encaminhada é liberar a compra dos
-  itens identificados enquanto a família resolve o extra, ou aguardar a
-  identificação de todos. Até a resposta, a COM guarda a pendência e
-  aguarda a identificação para iniciar compras. Uma COM emitida por
-  administrador conserva a aprovação inicial do planejamento.
+- **COM mista com extra ainda sem identificação.** Em 19/11, o responsável
+  aprovou a compra dos itens já identificados com o extra pendente na mesma
+  ficha. O laboratório mostra a pendência de catálogo. A continuidade da
+  compra dos itens conhecidos foi definida na execução. Uma COM emitida por
+  administrador conserva a aprovação inicial das linhas identificadas.
 
-Continuam em execução os extras fora do catálogo em ENT e DEV. A resolução
-na COM exige a mesma unidade, precisão suficiente e um produto ainda ausente
+Na aplicação, o extra pede a quantidade real. O laboratório apresenta uma
+unidade como exemplo inicial. A resolução na COM exige a mesma unidade,
+precisão suficiente e um produto ainda ausente
 da ficha. Uma conversão de unidades ou união com uma linha já existente
 continua sem regra de produto nesta entrega.
 
 ## Migrations por ambiente
 
 Consulta de 19/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. **307 versões em cada banco**,
-de `20261019000100` a `20261119224330`, com os mesmos IDs do checkout. O
-histórico contém 242 versões anteriores a L1, 18 de L1 e 47 de L2. Os SQL de
-cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
-Nenhuma versão só em arquivo, só na stack local, só no desenvolvimento ou
-pendente de aplicar nesta conferência. Produção fica fora desta consulta.
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **309 versões no local**
+e **307 no desenvolvimento**, com 242 versões anteriores a L1 e 18 de L1.
+Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
+Produção fica fora desta consulta.
+
+### L2 — Aplicadas apenas no local
+
+`20261119231733` guarda o extra de ENT e DEV no rascunho e protege a expedição.
+`20261119233039` libera os itens identificados da COM mista. O ensaio com
+rollback foi concluído e as duas versões estão na fila de aplicação vinculada.
 
 ### L1 — Aplicadas no local e no desenvolvimento
 

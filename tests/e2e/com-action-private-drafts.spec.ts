@@ -2,11 +2,45 @@ import { openOperationalDocumentAction } from "./document-sections";
 import { test, expect } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { loginDecision, noPrivateWrites, privateFormCount, confirmedOutcome } from "./l1-decision-policy";
 import { selectDocumentSection } from "./document-sections";
 import { audit } from "./accessibility-audit";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 test.setTimeout(150_000);
+test("COM libera a compra do item identificado enquanto o extra aguarda cadastro", async ({ page }, info) => {
+  const f = await setup();
+  const buyer = await shiftWorker(f.patient, "family");
+  const extra = { id: randomUUID(), name: "Forro térmico fictício", category: "higiene", unit: "unidade", quantity: "2" };
+  const doc = await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+    p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "2" }], pendingExtras: [extra] },
+  });
+  await loginDecision(page, buyer.email, f.patient);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/fichas/" + doc.id);
+  await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }))
+    .toContainText("Registrar a aquisição dos materiais");
+  await selectDocumentSection(page, "materials");
+  const pending = page.getByRole("region", { name: "Materiais com cadastro pendente", exact: true });
+  await expect(pending.getByText(extra.name, { exact: true })).toBeVisible();
+  await openOperationalDocumentAction(page, "Registrar compra realizada");
+  const editor = page.getByRole("dialog", { name: "Registrar compra", exact: true });
+  const line = doc.lines[0];
+  await expect(editor.getByText(extra.name, { exact: true })).toHaveCount(0);
+  await editor.getByRole("textbox", { name: line.name_snapshot + " · " + line.unit_snapshot, exact: true }).fill("2");
+  await info.attach("E05-compra-com-extra-pendente", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  const submitted = page.waitForResponse(response => response.request().method() === "POST" &&
+    new URL(response.url()).pathname === "/api/documents/" + doc.id + "/decisions");
+  await editor.getByRole("button", { name: "Confirmar compra", exact: true }).click();
+  const receipt = await submitted;
+  expect(receipt.ok(), await receipt.text()).toBe(true);
+  const saved = await rpc(f.admin, "operational_document", { p_id: doc.id });
+  expect(saved.purchaseProgress.identificationPending).toBe(true);
+  expect(saved.payload.pendingExtras).toEqual([extra]);
+  expect(Number(saved.lines[0].purchased_quantity)).toBe(2);
+});
+
 test("COM aprovação, aquisição e chegada são atos separados sem rascunhos e cada resposta perdida é conferida uma vez", async ({ page }) => {
  const f = await setup(), family = await actor("family", f.patient), writes = noPrivateWrites(page);
  let doc = await rpc(family, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "2" }] }, p_key: randomUUID(), p_draft: false });

@@ -2,7 +2,8 @@
 
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
 import { materialCategories, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
-import { WizardCatalogueExtra } from "@/components/forms/wizard-catalogue-extra";
+import { pendingExtraDispatchMessage, pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
+import { MaterialReview } from "./material-review";
 import { IssuanceObservationsEditor, IssuanceObservationList } from "@/components/forms/issuance-observations";
 import { issuanceObservationErrors } from "@/lib/documents/issuance-observations";
 import { normalizeCatalogText } from "@/lib/catalog-match";
@@ -194,6 +195,8 @@ function TransferDeclarationEditor({
   const [reason, setReason] = useState(""),
     [query, setQuery] = useState(""),
     [lines, setLines] = useState<{ productId: string; quantity: string; extra?: boolean }[]>([]);
+  const [pendingExtras, setPendingExtras] = useState<NonNullable<TransferDeclarationDraftContent["pendingExtras"]>>([]);
+  const [reviewingPending, setReviewingPending] = useState(false);
   const [observations, setObservations] = useState<string[]>([]);
   const [observationErrors, setObservationErrors] = useState<Record<string, string>>({});
   const [step, setStep] = useState(0);
@@ -259,6 +262,8 @@ function TransferDeclarationEditor({
       setOriginId(values.originId);
       setReason(values.reason);
       setObservations(values.observations ?? (values.reason ? [values.reason] : []));
+      setPendingExtras(values.pendingExtras ?? []);
+      setReviewingPending(false);
       setObservationErrors({});
       setQuery(values.query);
       setCategory(materialCategories.find(item => item.id === values.category)?.id ?? null);
@@ -290,6 +295,8 @@ function TransferDeclarationEditor({
       setQuery("");
       setCategory("medicamentos");
       setLines([]);
+      setPendingExtras([]);
+      setReviewingPending(false);
       setStep(0);
       setPacket(null);
     },
@@ -326,6 +333,7 @@ function TransferDeclarationEditor({
     originId,
     reason,
     observations,
+    pendingExtras,
     step,
     query,
     category: category ?? undefined,
@@ -336,6 +344,9 @@ function TransferDeclarationEditor({
   const productsById = new Map(products.map(product => [product.id, product]));
   const activeCategory = category ?? materialCategories.find(item => item.id === productsById.get(lines[0]?.productId)?.category)?.id ?? "medicamentos";
   const selectedIds = lines.map(line => line.productId);
+  const review = packet?.declaration ?? (reviewingPending ? {
+    recipientId, originDocumentId: originId, reason, observations, lines,
+  } : null);
   const regularSelection = lines.flatMap(line => {
     const product = productsById.get(line.productId);
     return product && !line.extra ? [product] : [];
@@ -400,14 +411,14 @@ function TransferDeclarationEditor({
     return () => controller.abort();
   }, [patientId, source, context.userId, attempt, recoveryOnly]);
   useEffect(() => {
-    if (packet || result) reviewHeadingRef.current?.focus();
-  }, [packet, result]);
+    if (packet || result || reviewingPending) reviewHeadingRef.current?.focus();
+  }, [packet, result, reviewingPending]);
   function close() {
     if (uncertain || privateDraft.pending || busy) return;
     if (
       !result &&
       !recoveryOnly &&
-      (reason || observations.length || lines.length || counterpartyId || recipientId)
+      (reason || observations.length || lines.length || pendingExtras.length || counterpartyId || recipientId)
     )
       setDiscard(true);
     else onClose();
@@ -447,7 +458,7 @@ function TransferDeclarationEditor({
       return;
     }
     if (
-      !lines.length ||
+      (!lines.length && !pendingExtras.length) ||
       !reference.people.some((person) => person.id === recipientId) ||
       lines.some(
         (line) =>
@@ -483,6 +494,11 @@ function TransferDeclarationEditor({
     if (Object.keys(invalidObservations).length) {
       setError("Confira as observações destacadas.");
       window.setTimeout(() => document.querySelector<HTMLElement>('[data-field-error][aria-invalid="true"]')?.focus(), 0);
+      return;
+    }
+    if (pendingExtras.length) {
+      setError("");
+      setReviewingPending(true);
       return;
     }
     const parsed = createTransferSchema.safeParse({
@@ -570,8 +586,10 @@ function TransferDeclarationEditor({
       setBusy(false);
     }
   }
-  function addExtra(id: string) {
-    setLines(current => current.some(line => line.productId === id) ? current : [...current, { productId: id, quantity: "", extra: true }]);
+  function addExtra(id: string, amount: string, replace?: string) {
+    if (selectedIds.includes(id)) return;
+    setLines(current => [...current, { productId: id, quantity: amount, extra: true }]);
+    if (replace) setPendingExtras(current => current.filter(item => item.id !== replace));
     setDraftTouched(true);
   }
   async function submit() {
@@ -801,11 +819,12 @@ function TransferDeclarationEditor({
         <StepNavigator
           steps={supplyWizardStages}
           compact
-          active={packet ? 4 : step}
+          active={review ? 4 : step}
           disabled={busy || uncertain || privateDraft.blocked}
           onChange={(next) => {
             if (next < 4) {
               setPacket(null);
+              setReviewingPending(false);
               setError("");
               setStep(next);
             }
@@ -931,7 +950,7 @@ function TransferDeclarationEditor({
         </div>
       ) : (
         <div className="hca-transfer-wizard-content">
-          {!packet ? <p className="hca-field-help">
+          {!review ? <p className="hca-field-help">
             <strong>
               {custodyName(source)} → {custodyName(reference!.destination)}
             </strong>{" "}
@@ -948,7 +967,7 @@ function TransferDeclarationEditor({
               referência atual antes de confirmar.
             </Notice>
           ) : null}
-          {!packet ? (
+          {!review ? (
             <>
               <ActionButton disabled={refreshing} onClick={refresh}>
                 {refreshing
@@ -1061,8 +1080,10 @@ function TransferDeclarationEditor({
                 {step === 1 || step === 2 ? <>
                 <h3>{step === 2 ? "Itens extras" : supplyWizardStages[step]}</h3>
                 {step === 1 ? <WizardMaterialCategories category={activeCategory} selected={regularSelection} onChange={next => { setCategory(next); setQuery(""); }} /> : null}
-                {step === 1 ? <>
-                <WizardCatalogueExtra catalogue={products} selectedIds={selectedIds} onAdd={addExtra} />
+                <SupplyExtraItems items={pendingExtras} inExtras={step === 2}
+                  catalogue={products.map(({ id, name, unit }) => ({ id, name, unit }))} selected={new Set(selectedIds)}
+                  onChange={items => { setPendingExtras(items); setDraftTouched(true); }} onChoose={addExtra} />
+                {step === 1 ? (
                 <FormField label="Adicionar material da origem">
                   <SearchSelect
                     query={query}
@@ -1104,9 +1125,9 @@ function TransferDeclarationEditor({
                     }
                   />
                 </FormField>
-                </> : <WizardCatalogueExtra catalogue={products} selectedIds={selectedIds} onAdd={addExtra} label="Adicionar item extra" />}
+                ) : null}
                 {visibleLines.length === 0 ? (
-                  <p>
+                  step === 2 && pendingExtras.length ? null : <p>
                     {step === 2 ? "Nenhum item extra incluído." : "Nenhum material selecionado. Informe as quantidades na unidade base."}
                   </p>
                 ) : (
@@ -1204,7 +1225,7 @@ function TransferDeclarationEditor({
                     busy ||
                     !reference!.people.length ||
                     (step === 0 && !recipientId) ||
-                    (step === 3 && !lines.length)
+                    (step === 3 && !lines.length && !pendingExtras.length)
                   }
                 >
                   {transferStepActions[step]}
@@ -1220,10 +1241,10 @@ function TransferDeclarationEditor({
                 <div><dt>Paciente</dt><dd>{context.patient?.display_name}</dd></div>
                 <div><dt>Preenchido por</dt><dd>{context.fullName}</dd></div>
                 <div><dt>Destino</dt><dd>{isReturn ? "Estoque da família" : "Estoque da equipe"}</dd></div>
-                <div><dt>Recebedor físico</dt><dd>{personName(packet.declaration.recipientId)}</dd></div>
+                <div><dt>Recebedor físico</dt><dd>{personName(review.recipientId)}</dd></div>
               </dl>
               <h4>Materiais</h4>
-              {packet.declaration.lines.map((line) => {
+              {review.lines.map((line) => {
                 const product = reference?.products.find(
                   (p) => p.id === line.productId,
                 );
@@ -1238,23 +1259,28 @@ function TransferDeclarationEditor({
                   </article>
                 );
               })}
+              {pendingExtras.length ? <section aria-label="Itens extras pendentes">
+                <h4>Itens extras pendentes</h4>
+                <MaterialReview rows={pendingExtras.map(pendingExtraReviewRow)} />
+              </section> : null}
               <p>
                 Origem documental:{" "}
                 {reference?.origins.find(
-                  (origin) => origin.id === packet.declaration.originDocumentId,
+                  (origin) => origin.id === review.originDocumentId,
                 )?.code ?? "Sem vínculo informado"}
                 .
               </p>
-              {packet.declaration.reason ? <p className="whitespace-pre-wrap">
-                {packet.declaration.observations ? "Justificativa da escolha do recebedor" : "Sua justificativa"}: {packet.declaration.reason}
+              {review.reason ? <p className="whitespace-pre-wrap">
+                {review.observations ? "Justificativa da escolha do recebedor" : "Sua justificativa"}: {review.reason}
               </p> : null}
               <section className="hca-document-summary"><h3>Observações</h3>
-                <IssuanceObservationList observations={packet.declaration.observations ?? []} />
+                <IssuanceObservationList observations={review.observations ?? []} />
               </section>
               <Notice>
                 A expedição debita o saldo da origem e coloca os materiais em trânsito.
                 O destino recebe o saldo após a conferência pessoal.
               </Notice>
+              {reviewingPending ? <Notice>{pendingExtraDispatchMessage}</Notice> : null}
               {uncertain ? (
                 <Notice>
                   O resultado ainda é incerto. Verifique esta tentativa de expedição antes de enviar outra.
@@ -1266,6 +1292,7 @@ function TransferDeclarationEditor({
                     onClick={() => {
                       issuanceFailure.clear();
                       setPacket(null);
+                      setReviewingPending(false);
                       requestAnimationFrame(() =>
                         (reasonFieldRef.current ?? observationsHeadingRef.current)?.focus(),
                       );
@@ -1274,7 +1301,7 @@ function TransferDeclarationEditor({
                     Voltar
                   </ActionButton>
                 ) : null}
-                <ActionButton variant="primary" disabled={busy} onClick={() => { if (!issuanceFailure.reopen()) void submit(); }}>
+                <ActionButton variant="primary" disabled={busy || reviewingPending} onClick={() => { if (!issuanceFailure.reopen()) void submit(); }}>
                   <Icon name="send" width="16" height="16" />
                   {uncertain
                     ? "Verificar a expedição"

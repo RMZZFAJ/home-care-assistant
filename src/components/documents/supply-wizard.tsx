@@ -45,6 +45,7 @@ import {
 import type { BalanceCountReference } from "@/types/balances";
 import { parseBalanceCountReference } from "@/lib/validation/balances";
 import { BalanceReviewRows } from "@/components/balances/balance-count-fields";
+import { pendingExtraDispatchMessage } from "./supply-extra-items";
 import {
   balanceDraftContent,
   type BalanceDraftContent,
@@ -414,7 +415,7 @@ export function PatientSupplyWizard({
     form: {
       quantities: form.quantities,
       ...(supplyExtraIds?.length ? { extraProductIds: supplyExtraIds } : {}),
-      ...(type === "COM" && form.pendingExtras?.length ? { pendingExtras: form.pendingExtras } : {}),
+      ...(type !== "BAL" && form.pendingExtras?.length ? { pendingExtras: form.pendingExtras } : {}),
       notes: form.notes,
       observations: form.observations,
       origin: form.origin,
@@ -884,7 +885,7 @@ export function PatientSupplyWizard({
             ? "quantidade válida"
             : "unidades inteiras") +
           (type === "BAL" ? ", inclusive zero." : " acima de zero.");
-    if (all && !Object.keys(form.quantities).length && !(type === "COM" && form.pendingExtras?.length))
+    if (all && !Object.keys(form.quantities).length && !form.pendingExtras?.length)
       errors.lines = "Selecione ou informe ao menos um material.";
     if (all || step === 0)
       for (const [productId, ids] of Object.entries(links)) {
@@ -1036,6 +1037,10 @@ export function PatientSupplyWizard({
     )
       return;
     if (!frozenRef.current) {
+      if (type === "ENT" && form.pendingExtras?.length) {
+        setError(pendingExtraDispatchMessage);
+        return;
+      }
       if (type === "BAL" && (needsBalanceReview || !legacyReference)) return;
       if (
         type === "BAL" &&
@@ -1781,6 +1786,8 @@ export function PatientSupplyWizard({
                   tentativa antes de iniciar outra.
                 </Notice>
               ) : null}
+              {type === "ENT" && step === supplyStageSteps[4] && form.pendingExtras?.length && !uncertain
+                ? <Notice>{pendingExtraDispatchMessage}</Notice> : null}
               <WizardActions
                 step={stage}
                 total={steps.length}
@@ -1796,7 +1803,8 @@ export function PatientSupplyWizard({
                   (!(step === 0 && legacyOpeningKey) &&
                     (needsBalanceReview ||
                       missingBalanceMaterials.length > 0)) ||
-                  (type === "ENT" && step === 0 && recipientLoading)
+                  (type === "ENT" && (step === 0 && recipientLoading ||
+                    step === supplyStageSteps[4] && !!form.pendingExtras?.length))
                 }
                 onBack={() => {
                   issuanceFailure.clear();

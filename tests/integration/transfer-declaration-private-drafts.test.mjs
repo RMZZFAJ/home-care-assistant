@@ -15,6 +15,32 @@ import {
   declarationPurposes,
 } from "./transfer-declaration-draft-fixtures.mjs";
 for (const source of ["FAMILY", "CARE_TEAM"]) {
+  test(`private ${source} declaration preserves one pending extra and blocks dispatch until the draft is revised`, async () => {
+    const f = await declarationDraftFixture(source);
+    const packet = declarationPacket(f);
+    const extra = { id: randomUUID(), name: "Proteção fictícia", category: "higiene", unit: "unidade", quantity: "2" };
+    packet.p_body.content.pendingExtras = [extra];
+    const before = declarationFacts(f);
+    const saved = await rpc(f.client, "supply_draft_command", packet);
+    assert.deepEqual((await declarationRead(await declarationPeer(f), f)).content.pendingExtras, [extra]);
+    assert.equal(await declarationRead(f.initiator.client, f), null);
+    assert.equal((await f.client.rpc("commit_supply_draft", declarationCommit(f, saved))).error?.code, "PT409");
+    const revision = { ...packet, p_id: saved.id, p_expected: saved.revision };
+    assert.equal((await f.client.rpc("supply_draft_command", {
+      ...revision, p_key: randomUUID(), p_body: {
+        ...packet.p_body, content: { ...packet.p_body.content, pendingExtras: [extra, extra] },
+      },
+    })).error?.code, "22023");
+    assert.equal(declarationFacts(f), before);
+    const { pendingExtras, ...resolvedContent } = packet.p_body.content;
+    assert.deepEqual(pendingExtras, [extra]);
+    const revised = await rpc(f.client, "supply_draft_command", {
+      ...revision, p_key: randomUUID(), p_body: { ...packet.p_body, content: resolvedContent },
+    });
+    const result = await rpc(f.client, "commit_supply_draft", declarationCommit(f, revised));
+    assert.equal(result.result.lines.length, 1);
+  });
+
   test(
     "private transfer declaration " +
       source +
@@ -236,6 +262,28 @@ for (const source of ["FAMILY", "CARE_TEAM"]) {
     },
   );
 }
+
+test("ENT through the supply wizard stores the unresolved extra without creating or dispatching an official document", async () => {
+  const f = await declarationDraftFixture("FAMILY");
+  const extra = { id: randomUUID(), name: "Cobertura fictícia", category: "higiene", unit: "unidade", quantity: "1" };
+  const before = declarationFacts(f);
+  const saved = await rpc(f.client, "supply_draft_command", {
+    p_patient: f.patient, p_kind: "ENT", p_purpose: "create", p_target: null, p_id: null, p_expected: null, p_key: randomUUID(),
+    p_body: { action: "save", content: {
+      form: { quantities: {}, pendingExtras: [extra], origin: "", source: "FAMILY", recipientId: f.recipientId, notes: "" },
+      links: {}, materials: [], context: { documentId: null, documentVersion: null, requisitionId: null, recipientName: "" },
+    } },
+  });
+  const read = await rpc(f.client, "supply_draft_context", {
+    p_patient: f.patient, p_kind: "ENT", p_purpose: "create", p_target: null,
+  });
+  assert.deepEqual(read.content.form.pendingExtras, [extra]);
+  assert.equal((await f.client.rpc("commit_supply_draft", {
+    p_id: saved.id, p_expected: saved.revision, p_target: null, p_key: randomUUID(),
+    p_body: { action: "create", payload: { lines: [] } },
+  })).error?.code, "PT409");
+  assert.equal(declarationFacts(f), before);
+});
 test("direction-specific declaration slots cannot overwrite the other custody and keep own discard after source read loss", async () => {
   const f = await declarationDraftFixture("CARE_TEAM"),
     packet = declarationPacket(f),

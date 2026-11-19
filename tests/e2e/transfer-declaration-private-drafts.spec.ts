@@ -10,9 +10,11 @@ import {
   declarationFacts,
 } from "../integration/transfer-declaration-draft-fixtures.mjs";
 import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
+import { loginDecision } from "./l1-decision-policy";
 import { audit } from "./accessibility-audit";
 import type { Custody, SupplyDocument } from "../../src/types/documents";
 import type { TransferPreparation } from "../../src/types/transfers";
@@ -139,6 +141,71 @@ async function recover(page: Page, source: Custody) {
  await page.goto("/transferencias"); await page.getByRole("combobox",{name:/^Custódia de origem/}).selectOption(source);
  await page.getByRole("button",{name:/^(Consultar último rascunho|Preparar declaração)$/}).click();
 }
+test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha do catálogo", async ({ page }, info) => {
+  const f = await declarationDraftFixture("CARE_TEAM");
+  const author = await shiftWorker(f.patient, "admin");
+  const item = "Protetor de tecido fictício";
+  const before = declarationFacts(f);
+  await loginDecision(page, author.email, f.patient);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/fichas/devolucao");
+  const start = page.getByRole("button", { name: "Preparar devolução", exact: true });
+  await start.click();
+  await recipient(page).selectOption(f.recipientId);
+  const reason = editor(page).getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
+  if (await reason.isVisible()) await reason.fill("A pessoa designada receberá esta devolução.");
+  await editor(page).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
+  await editor(page).getByRole("button", { name: "Item extra", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
+  await dialog.getByLabel("Nome do material", { exact: true }).fill(item);
+  await dialog.getByLabel("Unidade de medida", { exact: true }).selectOption("unidade");
+  await dialog.getByLabel("Quantidade", { exact: true }).fill("2");
+  await dialog.getByRole("button", { name: "Adicionar material", exact: true }).click();
+  await expect(stepButton(page, "Materiais")).toHaveAttribute("aria-current", "step");
+  await continueStep(page);
+  const name = editor(page).getByText(item, { exact: true });
+  await expect(name).toHaveCount(1);
+  const url = "/api/drafts?" + new URLSearchParams({ careRecipientId: f.patient, kind: "ENT", purpose: f.purpose });
+  await expect.poll(async () => (await (await page.request.get(url)).json()).data?.content).toMatchObject({
+    fields: { wizardStep: "2" }, pendingExtras: [{ name: item, quantity: "2", unit: "unidade" }],
+  });
+  await page.reload();
+  await start.click();
+  await resume(page);
+  await editor(page).getByRole("button", { name: "Comparar referência atual", exact: true }).click();
+  await editor(page).getByRole("button", { name: "Adotar referência atual e revisar meus campos", exact: true }).click();
+  await expect(name).toHaveCount(1);
+  await continueStep(page);
+  await editor(page).getByRole("button", { name: "Revisar ficha", exact: true }).click();
+  await expect(editor(page).getByRole("region", { name: "Itens extras pendentes", exact: true }).getByText(item, { exact: true })).toHaveCount(1);
+  const dispatch = editor(page).getByRole("button", { name: "Expedir devolução", exact: true });
+  await expect(dispatch).toBeDisabled();
+  await info.attach("E06-revisao-extra-pendente", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  expect(declarationFacts(f)).toBe(before);
+  await stepButton(page, "Extras").click();
+  await editor(page).getByRole("button", { name: "Editar " + item, exact: true }).click();
+  const edit = page.getByRole("dialog", { name: "Editar item extra", exact: true });
+  const product = f.reference.products.find((row: TransferPreparation["products"][number]) => row.id === f.products[0])!;
+  await edit.getByLabel("Nome do material", { exact: true }).fill(product.name);
+  await edit.getByRole("button", { name: `Usar item do catálogo: ${product.name} (${product.unit})`, exact: true }).click();
+  await expect(name).toHaveCount(0);
+  await amountField(page).fill("2");
+  await continueStep(page);
+  await editor(page).getByRole("button", { name: "Revisar ficha", exact: true }).click();
+  const confirmed = page.waitForResponse(response => response.request().method() === "POST" &&
+    new URL(response.url()).pathname === "/api/transfers");
+  await dispatch.click();
+  const response = await confirmed;
+  expect(response.ok(), await response.text()).toBe(true);
+  const body = await response.json();
+  expect(body).toMatchObject({ persistence: "confirmed", data: {
+    transfer: { state: "dispatched" },
+    lines: [{ product_id: product.id, metadata: { catalogueExtra: "true" } }],
+  } });
+  const after = JSON.parse(declarationFacts(f));
+  expect(after.ledger).toHaveLength(JSON.parse(before).ledger.length + 1);
+});
+
 for (const source of ["FAMILY", "CARE_TEAM"] as const) {
   test(
     "declaração " +

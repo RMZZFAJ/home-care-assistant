@@ -63,7 +63,7 @@ test("a pending extra can be the only item in a COM and confirmation protects th
   assert.equal(stock(f.patient), before);
 });
 
-test("an administrator's COM preserves approval separately from identification and keeps stock unchanged", async () => {
+test("a mixed COM purchases and receives the identified line while preserving a pending extra", async () => {
   const f = await setup();
   const extra = item();
   const before = stock(f.patient);
@@ -75,14 +75,55 @@ test("an administrator's COM preserves approval separately from identification a
   const document = await rpc(f.admin, "create_supply_document", args);
   assert.equal(document.status, "approved");
   assert.equal(Number(document.lines[0].approved_quantity), 1);
-  const blocked = await f.admin.rpc("supply_document_command", {
-    p_id: document.id, p_action: "purchase", p_body: { lines: [{ lineId: document.lines[0].id, quantity: "1" }] },
+  const command = {
+    p_id: document.id, p_action: "purchase", p_body: { lines: [{ lineId: document.lines[0].id, quantity: "1", inHand: true }] },
     p_key: randomUUID(), p_version: document.version,
+  };
+  assert.equal(stock(f.patient), before);
+  const purchased = await rpc(f.admin, "supply_document_command", command);
+  assert.equal(purchased.status, "partially_received");
+  assert.equal(purchased.purchaseProgress.identificationPending, true);
+  assert.equal(purchased.purchaseProgress.expectationPending, true);
+  assert.equal(Number(purchased.lines[0].accepted_quantity), 1);
+  assert.deepEqual(purchased.payload.pendingExtras, [extra]);
+  const afterPurchase = JSON.parse(stock(f.patient));
+  assert.equal(afterPurchase.length, JSON.parse(before).length + 1);
+  assert.equal(afterPurchase.find(move => !JSON.parse(before).some(old => old.id === move.id)).product_id, f.products[0]);
+  assert.equal((await rpc(f.admin, "supply_document_command", command)).id, document.id);
+  assert.deepEqual(JSON.parse(stock(f.patient)), afterPurchase);
+  const resolved = await purchaseBalanceCommand(f.admin, purchased, "resolve_purchase_extra", { extraId: extra.id, productId: f.products[1] });
+  assert.equal(resolved.id, document.id);
+  assert.equal(resolved.status, "partially_received");
+  assert.equal(resolved.purchaseProgress.identificationPending, false);
+  assert.equal(Number(resolved.lines.find(line => line.product_id === f.products[1]).approved_quantity), 2);
+  assert.deepEqual(JSON.parse(stock(f.patient)), afterPurchase);
+  const completion = await purchaseBalanceCommand(f.admin, resolved, "purchase", { lines: [{
+    lineId: resolved.lines.find(line => line.product_id === f.products[1]).id, quantity: "2", inHand: true,
+  }] });
+  assert.equal(completion.status, "received");
+  assert.equal(JSON.parse(stock(f.patient)).length, afterPurchase.length + 1);
+  assert.equal((await rpc(f.admin, "create_supply_document", args)).id, document.id);
+});
+
+test("a mixed COM can approve known lines without disposing of the unresolved extra", async () => {
+  const f = await setup();
+  const family = await actor("family", f.patient);
+  const extra = item();
+  const before = stock(f.patient);
+  const document = await rpc(family, "create_supply_document", {
+    p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+    p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "1" }], pendingExtras: [extra] },
   });
-  assert.equal(blocked.error?.code, "PT409");
-  const resolved = await purchaseBalanceCommand(f.admin, document, "resolve_purchase_extra", { extraId: extra.id, productId: f.products[1] });
-  assert.equal(resolved.status, "approved");
+  const approval = await purchaseBalanceCommand(f.admin, document, "approve", {
+    lines: [{ lineId: document.lines[0].id, quantity: "0" }], reason: "O material identificado já está disponível.",
+  });
+  assert.equal(approval.status, "partially_approved");
+  assert.equal(approval.purchaseProgress.identificationPending, true);
+  const resolved = await purchaseBalanceCommand(f.admin, approval, "resolve_purchase_extra", {
+    extraId: extra.id, productId: f.products[1],
+  });
+  assert.equal(resolved.id, document.id);
+  assert.equal(Number(resolved.lines.find(line => line.product_id === f.products[0]).approved_quantity), 0);
   assert.equal(Number(resolved.lines.find(line => line.product_id === f.products[1]).approved_quantity), 2);
   assert.equal(stock(f.patient), before);
-  assert.equal((await rpc(f.admin, "create_supply_document", args)).id, document.id);
 });

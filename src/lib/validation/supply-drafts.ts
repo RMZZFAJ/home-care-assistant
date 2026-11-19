@@ -227,7 +227,10 @@ export const balanceDocumentDraftContent = receiptDraftContent.refine(
   "O preparo de revisão ou designação não contém uma nova contagem física.",
 );
 export const transferDeclarationDraftContent = receiptDraftContent
-  .extend({ documentVersion: z.null(), observations: issuanceObservationDraft.optional() })
+  .extend({
+    documentVersion: z.null(), observations: issuanceObservationDraft.optional(),
+    pendingExtras: pendingPurchaseExtras.optional(),
+  })
   .refine(
     (value) =>
       new Set(value.materials.map((item) => item.id)).size ===

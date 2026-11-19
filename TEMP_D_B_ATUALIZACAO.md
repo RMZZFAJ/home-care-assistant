@@ -1,5 +1,17 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — extras da ENT, DEV e COM mista.** A entrega e a devolução preservam
+o extra fora do catálogo no último rascunho. A pessoa pode editar, remover,
+escolher um produto correspondente e conferir a linha uma vez na revisão.
+A expedição aguarda identificação enquanto a decisão sobre envio parcial
+está em aberto. O banco revalida a pendência no rascunho confirmado.
+
+Na COM mista, a decisão do responsável libera aprovação, compra e chegada
+das linhas identificadas enquanto o extra aguarda cadastro na mesma ficha.
+Identificar o extra após a compra das demais linhas abre o planejamento
+da quantidade desse extra em uma operação própria, com autoria e versão.
+O histórico da compra e da chegada anteriores fica disponível na ficha.
+
 **19/11 — item extra da COM com cadastro pendente.** O preenchimento pode
 começar em Materiais. O mesmo extra reaparece em Itens extras e Revisão.
 A COM pode ser emitida apenas com
@@ -15,10 +27,8 @@ grava a autoria e a versão, e não registra compra, recebimento ou estoque.
   a identificação na mesma ficha, a edição existente da REQ e um extra
   da COM já associado ao catálogo. As capturas a 390 px estão em
   `output/playwright/l2-com-pending-extras/`.
-- Permanece a escolha de permitir a compra dos itens identificados enquanto
-  outro extra aguarda cadastro. A interface e o banco mantêm essa compra
-  aguardando identificação enquanto a decisão está em aberto. O
-  [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) acompanha a questão.
+- A regra da COM mista foi decidida na continuação da execução. O
+  [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) acompanha a decisão.
 - `20261119224330` está aplicada localmente e no Supabase de desenvolvimento
   após o ensaio com rollback e o backup verificado
   `826b077b-e88a-4f40-b7c9-7decc4380308`. Os dois bancos têm 307 versões.

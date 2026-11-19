@@ -597,7 +597,7 @@ export function SupplyDocumentContent({
     )
       actions.push("submit");
     else if (data.type === "COM") {
-      if (data.status === "pending_approval" && allowed("com.approve") && !purchaseIdentificationPending)
+      if (data.status === "pending_approval" && allowed("com.approve") && data.lines.length)
         actions.push("approve");
       if (
         [
@@ -606,7 +606,7 @@ export function SupplyDocumentContent({
           "purchasing",
           "partially_received",
         ].includes(data.status) &&
-        allowed("com.purchase") && !purchaseIdentificationPending &&
+        allowed("com.purchase") &&
         data.lines.some((line) => acquisitionRemaining(line).gt(0))
       )
         actions.push("purchase");
@@ -1264,7 +1264,8 @@ export function SupplyDocumentContent({
               <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>
                 {data.type === "COM" ? <>
                   <PurchaseExtraResolution key={data.id} data={data}
-                    mayIdentify={Boolean(activeContext && !archived && ["pending_approval", "approved"].includes(data.status) &&
+                    mayIdentify={Boolean(activeContext && !archived &&
+                      ["pending_approval", "approved", "partially_approved", "purchasing", "purchased", "partially_received"].includes(data.status) &&
                       allowed("com.approve") && allowed("catalog.manage"))}
                     onUpdated={document => {
                       const updated = requireSupplyConfirmation({ data: document, persistence: "confirmed" }, {

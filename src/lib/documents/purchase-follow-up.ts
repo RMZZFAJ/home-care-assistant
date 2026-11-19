@@ -35,13 +35,15 @@ export function purchaseFollowUp(input: {
     ...base, pending: true, heading: "Conferir a preparação antes de emitir",
     description: "A COM ainda é um rascunho. Sua preparação não comprova aprovação, aquisição, chegada ou entrada no estoque.",
   };
-  if (progress?.identificationPending) return {
-    ...base, pending: true, label: "Ver materiais", section: "materials", heading: "Identificar os materiais pendentes",
-    description: "Confira os itens em Materiais e associe cada um ao produto correspondente do catálogo da residência.",
-  };
-  if (input.status === "pending_approval") return {
+  if (input.status === "pending_approval" && (!progress?.identificationPending || progress.lines.length)) return {
     ...base, pending: true, heading: "Conferir a aprovação da aquisição",
     description: "As quantidades propostas aguardam a decisão autorizada. Aprovar não altera o previsto original nem registra aquisição ou recebimento.",
+  };
+  const identifiedRemaining = progress?.lines.some(line => quantity(line.remainingExpectation).gt(0));
+  if (progress?.identificationPending && !identifiedRemaining && !progress.physicalPending &&
+    !progress.validationPending && !input.arrivalCorrection) return {
+    ...base, pending: true, label: "Ver materiais", section: "materials", heading: "Identificar os materiais pendentes",
+    description: "Confira os itens em Materiais e associe cada um ao produto correspondente do catálogo da residência.",
   };
   if (!progress?.lines.length) return {
     ...base, pending: false, heading: "Consultar as etapas da aquisição",

@@ -11,6 +11,7 @@ export type TransferDeclarationValues = {
   originId: string;
   reason: string;
   observations?: string[];
+  pendingExtras?: TransferDeclarationDraftContent["pendingExtras"];
   query: string;
   category?: string;
   lines: { productId: string; quantity: string; extra?: boolean }[];
@@ -46,6 +47,7 @@ export function transferDeclarationValues(
     originId: content.fields.originId ?? "",
     reason: content.fields.reason ?? "",
     observations: content.observations,
+    pendingExtras: content.pendingExtras,
     query: content.fields.query ?? "",
     ...(content.fields.category ? { category: content.fields.category } : {}),
     step: /^[0-3]$/.test(content.fields.wizardStep ?? "") ? Number(content.fields.wizardStep) : 0,
@@ -88,6 +90,7 @@ export function transferDeclarationDraftContent(
     divergentIds: [],
     materials,
     ...(values.observations ? { observations: values.observations } : {}),
+    ...(values.pendingExtras?.length ? { pendingExtras: values.pendingExtras } : {}),
     fields: {
       source: baseline.fields.source,
       referenceHash: baseline.fields.referenceHash ?? "",

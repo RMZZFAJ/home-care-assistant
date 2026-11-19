@@ -10,6 +10,8 @@ import {
 } from "@/lib/schedules/resource-preparations";
 import { SchedulePreparationSummary } from "@/components/schedules/schedule-preparation-summary";
 import { ProgressPreparationSummary } from "@/components/documents/progress-preparation-summary";
+import { MaterialReview } from "@/components/documents/material-review";
+import { pendingExtraReviewRow } from "@/components/documents/supply-extra-items";
 import { FlowPreparationSummary } from "@/components/stock/flow-preparation-summary";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 
@@ -395,6 +397,7 @@ function DraftFieldsSummary({
               </div>
             </article>
           ))}
+        {content.form.pendingExtras?.length ? <MaterialReview rows={content.form.pendingExtras.map(pendingExtraReviewRow)} /> : null}
         {content.form.notes ? (
           <p className="whitespace-pre-wrap wrap-anywhere">
             {content.form.notes}
@@ -430,6 +433,8 @@ function DraftFieldsSummary({
             {material.unit}
           </p>
         ))}
+        {"pendingExtras" in content && content.pendingExtras?.length
+          ? <MaterialReview rows={content.pendingExtras.map(pendingExtraReviewRow)} /> : null}
         {content.fields.reason ? (
           <p className="whitespace-pre-wrap wrap-anywhere">
             Sua justificativa: {content.fields.reason}
