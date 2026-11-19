@@ -6,6 +6,7 @@ import { purchaseBalanceCommand, purchaseBalanceFixture } from "../integration/p
 import { confirmDecisionAndReconcile, loginDecision, loseDecisionResponse } from "./l1-decision-policy";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
+import { arrivalCard, chooseArrivalAction, confirmArrivalReview, openArrivalReview } from "./purchase-arrival-review";
 
 test("COM devolve a mesma chegada ao autor e credita só o que foi reenviado e aprovado", async ({ page }, info) => {
   test.setTimeout(100_000);
@@ -20,13 +21,13 @@ test("COM devolve a mesma chegada ao autor e credita só o que foi reenviado e a
   await loginDecision(page, fixtures.adminA.email, f.patient);
   await page.goto(path);
   await selectDocumentSection(page, "workflow");
-  await page.getByRole("button", { name: "Abrir pendência", exact: true }).click();
-  const request = page.getByRole("dialog", { name: "Abrir pendência na chegada", exact: true });
-  await request.getByRole("textbox", { name: "O que precisa ser corrigido?" }).fill(note);
-  await request.getByRole("button", { name: "Confirmar pendência", exact: true }).click();
-  await page.getByRole("dialog", { name: "Correção solicitada", exact: true }).getByRole("button", { name: "Concluir" }).click();
+  const request = await openArrivalReview(page);
+  await chooseArrivalAction(arrivalCard(request, receipt.id), "Abrir pendência", note);
+  const { result: requested } = await confirmArrivalReview(page, request);
+  await expect(requested.getByText("Correção solicitada", { exact: true })).toBeVisible();
+  await requested.getByRole("button", { name: "Concluir" }).click();
   await expect(page.getByRole("button", { name: "Corrigir chegada", exact: true })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Validar recebimento", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Conferir chegadas", exact: true })).toHaveCount(0);
   expect(stockEntries()).toBe("0");
   const pdf = await generatedPdf(page, `/api/documents/${pending.id}/pdf`);
   expect(pdf.ok(), await pdf.text()).toBe(true);

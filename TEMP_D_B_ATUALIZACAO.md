@@ -128,8 +128,24 @@ testes unitários dirigidos e seis casos em Android e iOS emulados, incluindo
 perda de resposta e emissão do PDF durante a pendência. O painel foi
 comparado com o E05-10 em 390 px e os dois casos móveis passaram novamente
 após o ajuste visual. Logs `l2-com-correction-*.log` e capturas em
-`output/playwright/l2-com-correction/`. Restam o painel unificado de decisões,
-a aprovação em lote, a chegada avulsa e a cobertura de outro planejamento.
+`output/playwright/l2-com-correction/`.
+
+A conferência E05-10/E05-11 usa o mesmo painel na ficha, no Início e no
+estoque familiar. A ficha limita o painel a suas parcelas e os outros acessos
+agrupam os lançamentos pelas compras do paciente. O administrador pode
+aprovar, recusar, abrir pendência ao autor ou deixar a parcela para depois.
+A migration `20261119050841_l2_com_arrival_review_batch.sql` deixa cada
+decisão no histórico da respectiva COM e conserva o recibo do conjunto na
+mesma transação. A recuperação consulta a chave original e informa o
+resultado de cada parcela. Passaram nove integrações com Auth real e 22
+testes em Android e iOS emulados, incluindo a jornada de REQ até BAL. A
+consulta e o lote mantiveram a leitura protegida, o saldo após a decisão,
+o PDF e a atualização da ficha antes da próxima ação. Evidências em
+`output/playwright/l2-com-review-*.log`. O cenário E05-11 foi comparado em
+390 px, com capturas em `output/playwright/l2-com-review/`. A conferência
+e o caso instável do guia passaram novamente nos três projetos de navegador.
+Permanecem a chegada avulsa, sua inclusão no painel e a cobertura explícita
+de outro planejamento.
 
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma

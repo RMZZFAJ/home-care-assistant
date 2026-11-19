@@ -1,5 +1,6 @@
 import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
+import { confirmArrivalReview, openArrivalReview } from "./purchase-arrival-review";
 import { selectContext } from "./auth-context";
 import { selectDeliveryRecipient } from "./delivery-recipient";
 import { openNavigation } from "./navigation";
@@ -261,10 +262,9 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await logout(page);
   await login(page, "adminA");
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Validar recebimento", exact: true })
-    .click();
-  await confirm(page, "Parcela validada.");
+  const review = await openArrivalReview(page);
+  const approval = await confirmArrivalReview(page, review);
+  await approval.result.getByRole("button", { name: "Concluir", exact: true }).click();
   stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();

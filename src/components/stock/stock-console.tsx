@@ -1,4 +1,5 @@
 "use client";
+import { PurchaseArrivalReview } from "@/components/documents/purchase-arrival-review";
 import { FamilyStockPreparation } from "./family-stock-preparation";
 import {
   ActionButton,
@@ -167,6 +168,7 @@ function PatientStock({
           <h2 id="stock-balances-heading" className="font-semibold">
             Saldos e previsões
           </h2>
+          {hasFamily && custody !== "CARE_TEAM" && custody !== "TRANSIT" ? <PurchaseArrivalReview context={context} /> : null}
           <button
             className={buttonClass}
             aria-disabled={stock.loading}

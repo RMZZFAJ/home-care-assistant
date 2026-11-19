@@ -31,7 +31,6 @@ import {
   deliveryConsentDraftFields,
 } from "@/lib/forms/delivery-draft-reference";
 import { formatBrazilDate } from "@/lib/receipt";
-import { PurchaseReceiptContent } from "./purchase-details";
 import { PurchaseFormLine } from "./purchase-register";
 import { PurchaseArrivalFields } from "./purchase-arrival";
 import { Icon } from "@/components/ui/icon";
@@ -44,8 +43,6 @@ export type DocumentAction =
   | "purchase"
   | "receive"
   | "divergence"
-  | "validate_receipt"
-  | "reject_receipt"
   | "close_expectation"
   | "reassign"
   | "resolve"
@@ -107,14 +104,6 @@ export function CommandEditorFields({
         initialDraft?.fields[line.id + ":return"] ?? "",
       ]),
     ),
-  );
-  const [receiptId, setReceiptId] = useState(
-    initialDraft?.fields.receiptId ??
-    data.receipts.find((receipt) => receipt.state === "pending")?.id ??
-    "",
-  );
-  const selectedReceipt = data.receipts.find(
-    (receipt) => receipt.id === receiptId && receipt.state === "pending",
   );
   const [divergent, setDivergent] = useState<string[]>(
     initialDraft?.divergentIds ?? [],
@@ -188,11 +177,6 @@ export function CommandEditorFields({
       )?.checked
         ? "on"
         : "";
-    if (
-      (action === "validate_receipt" || action === "reject_receipt") &&
-      selectedReceipt
-    )
-      fields.receiptLabel = `Parcela ${data.receipts.indexOf(selectedReceipt) + 1} · ${selectedReceipt.submitted_name ?? "Nome histórico não preservado"} · ${formatBrazilDate(selectedReceipt.created_at)} · ${selectedReceipt.lines.length} produto(s)`;
     if (action === "reassign" && selectedRecipient)
       fields.recipientLabel = selectedRecipient.name;
     if (action === "resolve") {
@@ -228,7 +212,6 @@ export function CommandEditorFields({
     data,
     divergent,
     action,
-    selectedReceipt,
     selectedRecipient,
     frozenRequest,
     returns,
@@ -356,34 +339,6 @@ export function CommandEditorFields({
           action === "receive"
             ? "Confirmar o recebimento integral de todas as linhas e incorporar as quantidades ao estoque do destino."
             : "Aceitar integralmente as linhas não marcadas. Nas linhas selecionadas, incorporar imediatamente apenas a quantidade informada e abrir divergência para resolução.";
-      } else if (action === "validate_receipt" || action === "reject_receipt") {
-        if (!selectedReceipt)
-          throw new Error("Selecione uma parcela pendente para conferir.");
-        body = {
-          receiptId: selectedReceipt.id,
-          ...(action === "reject_receipt" ? { reason } : {}),
-        };
-        summary =
-          action === "validate_receipt"
-            ? "Validar este recebimento e incorporar suas quantidades ao estoque familiar."
-            : "Rejeitar o recebimento indicado, sem entrada no estoque. Motivo: " +
-            reason;
-        summary +=
-          "\nParcela informada por " +
-          (selectedReceipt.submitted_name ?? "autor histórico não preservado") +
-          " em " +
-          formatBrazilDate(selectedReceipt.created_at) +
-          ".\n" +
-          selectedReceipt.lines
-            .map((item) => {
-              const line = data.lines.find((line) => line.id === item.lineId);
-              return (
-                (line?.name_snapshot ?? "Material registrado") +
-                ": " +
-                formatQuantity(item.quantity, line?.unit_snapshot)
-              );
-            })
-            .join("\n");
       } else if (action === "close_expectation") {
         if (
           !data.purchaseProgress?.expectationPending ||
@@ -530,7 +485,6 @@ export function CommandEditorFields({
   const needsReason = [
     "approve",
     "divergence",
-    "reject_receipt",
     "close_expectation",
     "reassign",
     "resolve",
@@ -662,49 +616,6 @@ export function CommandEditorFields({
           </div>
         ))
         : null}
-      {["validate_receipt", "reject_receipt"].includes(action) ? (
-        <div className="space-y-3">
-          <label className="block text-sm font-semibold">
-            Recebimento pendente
-            <select
-              className={inputClass}
-              name="receiptId"
-              required
-              value={receiptId}
-              onChange={(event) => setReceiptId(event.target.value)}
-            >
-              {receiptId && !selectedReceipt ? (
-                <option value={receiptId}>
-                  Parcela preservada indisponível para esta decisão
-                </option>
-              ) : null}
-              {data.receipts
-                .filter((receipt) => receipt.state === "pending")
-                .map((receipt) => (
-                  <option key={receipt.id} value={receipt.id}>
-                    Parcela {data.receipts.indexOf(receipt) + 1} ·{" "}
-                    {receipt.lines.length} produto(s) ·{" "}
-                    {new Date(receipt.created_at).toLocaleString("pt-BR")} ·{" "}
-                    {receipt.submitted_name ?? "Nome histórico não preservado"}
-                  </option>
-                ))}
-            </select>
-          </label>
-          {selectedReceipt ? (
-            <section className="space-y-2">
-              <h3 className="font-semibold">Parcela selecionada</h3>
-              <PurchaseReceiptContent
-                receipt={selectedReceipt}
-                lines={data.lines}
-              />
-            </section>
-          ) : (
-            <Notice error>
-              Não há parcela pendente disponível para esta decisão.
-            </Notice>
-          )}
-        </div>
-      ) : null}
       {action === "close_expectation" ? (
         <section className="space-y-3">
           <h3 className="font-semibold">Expectativa que não será adquirida</h3>

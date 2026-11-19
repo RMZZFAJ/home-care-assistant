@@ -934,6 +934,9 @@
   padding: 6px 8px;
 }
 .hca-l1 .hca-arrival-attention select { min-width: 0; max-width: 60%; font-size: 12px; }
+.hca-l1 .hca-purchase-line[data-inactive="true"] { background: var(--hca-bg); }
+.hca-l1 .hca-purchase-status.hca-arrival-confirmed { color: var(--success); background: var(--hca-green-bg); }
+.hca-l1 .hca-purchase-status.hca-arrival-rejected { color: var(--danger); background: var(--hca-red-bg); }
 .hca-l1 .hca-arrival-stock { color: var(--muted); font-size: 12px; }
 .hca-l1 .hca-arrival-stock summary { cursor: pointer; min-height: 28px; color: var(--primary); }
 .hca-l1 .hca-arrival-stock .hca-icon { width: 14px; height: 14px; display: inline; margin-inline-end: 5px; }

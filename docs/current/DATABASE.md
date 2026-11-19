@@ -158,6 +158,16 @@ na mesma parcela. Somente a aprovação move estoque. A linha originalmente sem
 recebimento pode ser resolvida mesmo se outra parcela completou a expectativa.
 Os atos e os snapshots preservam autoria, instantes e as duas declarações.
 
+A conferência em lote reúne parcelas pendentes de COM do paciente ativo.
+O banco confere competência administrativa, autoria, situação e versão
+de cada parcela sob o mesmo lock do estoque. Atos sucessivos da mesma COM
+usam a versão produzida pelo ato anterior. O resultado da seleção preserva
+o resultado de cada parcela, inclusive quando a referência mudou, a chegada
+já foi decidida ou o ato está bloqueado. Apenas os atos efetivados gravam a
+decisão nativa, o evento e a movimentação aplicável. Consultar uma chave
+ausente encerra aquela tentativa. O recibo privado da seleção é gravado
+na mesma transação dos atos e fica disponível para recuperação autorizada.
+
 bal_approvals identifica grupo, ator e versão de contagem. Reconto conserva
 aprovações antigas e captura nova referência; elas não aprovam o novo balanço.
 

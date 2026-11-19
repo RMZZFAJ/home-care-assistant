@@ -81,6 +81,7 @@ import {
 import { confirmedPurchase, PurchaseResult, type ConfirmedPurchase } from "./purchase-register";
 import { PurchaseArrivalResult } from "./purchase-arrival";
 import { PurchaseArrivalCorrections } from "./purchase-arrival-correction";
+import { PurchaseArrivalReview } from "./purchase-arrival-review";
 import {
   acquisitionRemaining,
   arrivalRemaining,
@@ -347,11 +348,7 @@ export function SupplyDocumentContent({
         setPurchaseResult(confirmedPurchase(result.data, lines, requirePurchaseArrival(result.data, lines)));
         return;
       }
-      const receipt = result.data.receipts.find(
-        (receipt) => intention.action === "validate_receipt"
-          ? receipt.id === outcome.intention.body.receiptId
-          : receipt.submission_key === intention.idempotencyKey,
-      );
+      const receipt = result.data.receipts.find(receipt => receipt.submission_key === intention.idempotencyKey);
       const zeroArrival = receipt?.l2_arrival && receipt.lines.every(line => quantity(line.quantity).eq(0));
       if (result.data.type === "COM" && intention.action === "receive" && receipt &&
         (receipt.state === "approved" || receipt.state === "pending")) {
@@ -369,11 +366,6 @@ export function SupplyDocumentContent({
             : receipt?.state === "pending"
               ? "Chegada registrada e aguardando conferência. Nenhuma quantidade desta parcela foi incorporada ao estoque."
               : "Chegada registrada. Consulte a parcela e seu estado de conferência.",
-        validate_receipt:
-          zeroArrival ? "Parcela validada sem movimentação de estoque."
-            : "Parcela validada. As quantidades declaradas integram o estoque familiar.",
-        reject_receipt:
-          "Parcela rejeitada. A declaração original foi preservada, sem entrada desta parcela no estoque.",
         close_expectation:
           "Expectativa restante encerrada, sem entrada ou baixa de material." +
           (result.data.purchaseProgress?.physicalPending
@@ -515,11 +507,6 @@ export function SupplyDocumentContent({
         data.lines.some((line) => arrivalRemaining(line, data).gt(0))
       )
         actions.push("receive");
-      if (
-        data.receipts.some((receipt) => receipt.state === "pending") &&
-        allowed("com.validate")
-      )
-        actions.push("validate_receipt", "reject_receipt");
       if (
         data.purchaseProgress?.expectationPending &&
         !data.purchaseProgress.expectationClosed &&
@@ -912,6 +899,15 @@ export function SupplyDocumentContent({
                 {actions
                   .filter((item) => !secondaryDocumentActions.has(item))
                   .map(renderAction)}
+                {activeContext && data.type === "COM" ? <PurchaseArrivalReview context={context} documentId={data.id}
+                  hasPending={data.receipts.some(receipt => receipt.state === "pending" && receipt.submitted_by !== context.userId)}
+                  onReviewed={async () => {
+                    const current = await api<{ data: SupplyDocument }>("/api/documents/" + data.id);
+                    const updated = requireSupplyConfirmation({ data: current.data, persistence: "confirmed" }, {
+                      id: data.id, patientId: data.care_recipient_id, type: "COM", minimumVersion: data.version,
+                    });
+                    setData(previous => previous?.id === updated.id && previous.version <= updated.version ? updated : previous);
+                  }} /> : null}
                 {activeContext && data.type === "COM" && allowed("ent.create") &&
                   data.lines.some((line) => quantity(line.accepted_quantity).gt(0)) ? (
                   <Link className={buttonClass} href={`/fichas/ent?purchaseId=${data.id}`}>Preparar entrega</Link>
@@ -1451,8 +1447,6 @@ export const actionLabels: Record<DocumentAction, string> = {
   purchase: "Registrar compra",
   receive: "Confirmar recebimento",
   divergence: "Informar divergência",
-  validate_receipt: "Validar recebimento",
-  reject_receipt: "Rejeitar recebimento",
   close_expectation: "Encerrar expectativa restante",
   reassign: "Alterar destinatário",
   resolve: "Conciliar divergência",

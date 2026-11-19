@@ -11,6 +11,7 @@ import { DashboardNotices } from "./dashboard-notices";
 import { OpenRequests } from "./open-requests";
 import { CriticalStockSummary, RecentDocuments, ShiftSummary } from "./dashboard-summary";
 import { WeekSchedule } from "./week-schedule";
+import { PurchaseArrivalReview } from "@/components/documents/purchase-arrival-review";
 
 export function ManagementDashboard({ context, data }: { context: WorkspaceContext; data: DashboardData; }) {
   return <div className="dashboard-v2 family-dashboard">
@@ -19,6 +20,7 @@ export function ManagementDashboard({ context, data }: { context: WorkspaceConte
       {can(context, "ent.create") ? <Link href="/fichas/ent" className="btn btn-primary" prefetch={false}><Icon name="truck" width={16} height={16} />Nova entrega</Link> : null}
       {can(context, "ent.create") ? <Link href="/fichas/devolucao" className="btn" prefetch={false}><Icon name="truck" width={16} height={16} />Nova devolução</Link> : null}
       {can(context, "com.create") ? <Link href="/fichas/com" className="btn" prefetch={false}><Icon name="plus" width={16} height={16} />Nova compra</Link> : null}
+      <PurchaseArrivalReview context={context} />
     </div>
     <div className="metrics-grid">
       {can(context, "req.read") ? <MetricCard label="Requisições em aberto" value={data.requests} href="/historico?type=REQ&status=open" icon="forms" action="Ver requisições" /> : null}

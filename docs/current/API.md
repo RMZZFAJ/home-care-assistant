@@ -1736,6 +1736,14 @@ o mínimo remoto conferido permanece em seis caracteres.
   Cada linha reenviada inclui `lineId`, `quantity`, `expectedQuantity` e a
   escolha aplicável à falta ou ao excedente. O pedido cabe ao administrador
   habilitado e o reenvio ao autor da chegada. Ambos preservam o ID original.
+- `GET /api/purchases/arrivals/review` consulta chegadas a conferir no paciente.
+  Recebe `careRecipientId`, `documentId` opcional e o cursor `beforeAt` com
+  `beforeId`. Saldo familiar só aparece com autorização de leitura.
+- `POST /api/purchases/arrivals/review` confirma `careRecipientId`, `key` e
+  `entries`. Cada entrada indica `documentId`, `receiptId`, `version`, `decision`
+  e o `reason` exigido para recusa ou correção. A resposta identifica o
+  resultado efetivo de cada parcela. O `POST` em `/reconcile` recebe apenas
+  o paciente e a chave. Se não houver ato, fecha a chave com `not_applied`.
 - POST /api/balances/decisions/:target?careRecipientId=:patient e a variante
   /reconcile aplicam a mesma regra à programação, atribuição e adiamento.
   O domínio é balance_workspace; expectedVersion=0 representa somente uma
