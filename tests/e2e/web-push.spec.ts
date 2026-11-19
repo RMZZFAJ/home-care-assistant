@@ -330,9 +330,17 @@ test("Web Push negado não repete pedido, não inscreve e mantém a central e o 
     value = subscription();
   await adapter(page, value, "denied");
   await openProfile(page, f.patient);
-  await panel(page)
-    .getByRole("button", { name: "Ativar avisos neste aparelho", exact: true })
-    .click();
+  await page.bringToFront();
+  const activate = panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true });
+  await activate.scrollIntoViewIfNeeded();
+  await expect.poll(() => page.evaluate(async () =>
+    (await navigator.serviceWorker.getRegistration("/"))?.active?.state,
+  )).toBe("activated");
+  await expect(activate).toBeEnabled();
+  await activate.click();
+  await expect.poll(() => page.evaluate(() =>
+    (window as unknown as { hcaPushCapability: { requests: number } }).hcaPushCapability.requests,
+  )).toBe(1);
   await expect(
     panel(page).getByText(
       "Permissão não concedida. Suas pendências continuam na central de notificações.",

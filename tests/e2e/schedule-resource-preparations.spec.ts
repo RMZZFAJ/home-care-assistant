@@ -122,10 +122,14 @@ async function fill(page: Page, purpose: ScheduleResourcePurpose) {
 async function review(page: Page) {
   await page.bringToFront();
   const trigger = button(page, "Revisar alteração");
-  await expect(trigger).toBeEnabled();
-  expect(await trigger.evaluate((element: HTMLButtonElement) => element.form?.checkValidity())).toBe(true);
-  await trigger.focus();
-  await expect(trigger).toBeFocused();
+  // Adopting a reference can briefly disable this control again while the
+  // private copy settles. Retry only readiness and focus, before submitting.
+  await expect(async () => {
+    await expect(trigger).toBeEnabled({ timeout: 750 });
+    expect(await trigger.evaluate((element: HTMLButtonElement) => element.form?.checkValidity())).toBe(true);
+    await trigger.focus({ timeout: 750 });
+    await expect(trigger).toBeFocused({ timeout: 750 });
+  }).toPass({ timeout: 15_000 });
   await trigger.press("Enter");
   const d = drawer(page, "Revisar escala");
   await expect(d).toBeVisible();
