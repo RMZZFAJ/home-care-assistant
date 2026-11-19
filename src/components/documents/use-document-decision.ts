@@ -41,7 +41,16 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
     });
     return () => { active = false; };
   }, [storageKey, reconcileEndpoint, documentId, domain, action]);
-  useOperationActivity(busy, { title: "Concluindo a ação", detail: "Aguarde a conferência do resultado antes de tentar novamente.", stage, steps: [{ label: "Enviando sua confirmação", icon: "file" }, { label: "Conferindo o resultado", icon: "check" }] });
+  const cancellingRequisition = domain === "requisition" && action === "cancel";
+  useOperationActivity(busy, {
+    title: cancellingRequisition ? "Registrando cancelamento" : "Concluindo a ação",
+    detail: "Aguarde a conferência do resultado antes de tentar novamente.",
+    stage,
+    steps: [
+      { label: cancellingRequisition ? "Conferindo os efeitos no estoque" : "Enviando sua confirmação", icon: cancellingRequisition ? "stock" : "file" },
+      { label: "Conferindo o resultado", icon: "check" },
+    ],
+  });
   function remember(key: string) { currentRef.current = { scope: storageKey, key }; try { sessionStorage.setItem(storageKey, key); } catch { /* The open form retains its key. */ } }
   function forget() { if (currentRef.current?.scope === storageKey) currentRef.current = null; try { sessionStorage.removeItem(storageKey); } catch { /* No permission or result comes from storage. */ } }
   function previous() { if (currentRef.current?.scope === storageKey) return currentRef.current.key; try { const value = sessionStorage.getItem(storageKey); return value && /^[a-f0-9-]{36}$/.test(value) ? value : null; } catch { return null; } }

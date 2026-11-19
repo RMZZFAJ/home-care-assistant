@@ -10,7 +10,8 @@ import { DocumentMaterialsTable } from "@/components/documents/document-material
 import { DocumentFreshness } from "@/components/documents/document-freshness";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import { roleLabel } from "@/components/layout/workspace-context";
-import { Pill } from "@/components/ui/controls";
+import { ActionButton, Pill } from "@/components/ui/controls";
+import { Dialog } from "@/components/ui/overlays";
 import { DocumentBreadcrumb } from "@/components/documents/document-breadcrumb";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -56,6 +57,7 @@ import {
 } from "@/components/documents/document-timeline";
 import { RelatedDocument } from "@/components/documents/related-document";
 import { RequisitionDecisionEditor } from "./requisition-decision-editor";
+import type { RequisitionStockOutcome } from "./requisition-stock-cancellation";
 import {
   type RequisitionOperationPurpose,
 } from "@/lib/validation/supply-drafts";
@@ -166,6 +168,7 @@ export function RequisitionDocumentContent({
   const [error, setError] = useState("");
   const [readFailed, setReadFailed] = useState(false);
   const [message, setMessage] = useState("");
+  const [stockOutcome, setStockOutcome] = useState<RequisitionStockOutcome | null>(null);
   const [busy] = useState(false);
   const [reading, setReading] = useState(true);
   useOperationActivity(reading && !data, { title: "Consultando a ficha", detail: "Estamos identificando a requisição e conferindo seu acesso." });
@@ -729,14 +732,36 @@ export function RequisitionDocumentContent({
           restoreFocusTo={decision.trigger}
           restoreFocusFallbackRef={moreTriggerRef}
           onClose={() => setDecision(null)}
-          onSaved={() => {
+          onSaved={(result) => {
             setDecision(null);
             setAttempt((value) => value + 1);
-            setMessage(
-              "Decisão registrada ou recuperada. Consulte os fatos atuais desta requisição.",
-            );
+            setStockOutcome(result ?? null);
+            setMessage(result ? "" : "Decisão registrada ou recuperada. Consulte os fatos atuais desta requisição.");
           }}
         />
+      ) : null}
+      {stockOutcome && context.patient?.id === data.care_recipient_id ? (
+        <Dialog open title="Ficha cancelada"
+          kicker={data.code ?? data.protocol}
+          onClose={() => setStockOutcome(null)}
+          finalFocus={moreTriggerRef}
+          footer={<ActionButton variant="primary" onClick={() => setStockOutcome(null)}>Voltar à ficha</ActionButton>}>
+          <div className="hca-form-stack">
+            <p>{stockOutcome.choice === "reverse"
+              ? "O ajuste de estoque da emissão foi revertido. As movimentações posteriores foram preservadas."
+              : "A contagem informada na emissão da REQ foi mantida. As movimentações posteriores foram preservadas."}</p>
+            {can(context, "stock.team.read") && stockOutcome.lines.length ? (
+              <ul className="hca-form-stack">
+                {stockOutcome.lines.map((line) => (
+                  <li className="hca-record" key={line.productId}>
+                    <strong>{line.name}</strong>
+                    <span>Saldo no cancelamento {formatQuantity(line.current)} → {formatQuantity(stockOutcome.choice === "reverse" ? line.afterReversal : line.current, line.currentUnit)}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        </Dialog>
       ) : null}
     </div>
   );

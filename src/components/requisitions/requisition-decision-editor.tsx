@@ -21,6 +21,7 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { RecordDrawer } from "@/components/forms/record-drawer";
+import { RequisitionStockCancellationDialog, type RequisitionStockOutcome } from "./requisition-stock-cancellation";
 import { DraftContentSummary } from "@/components/forms/creation-draft-panel";
 import { useDocumentDecision, DocumentDecisionFailure } from "@/components/documents/use-document-decision";
 import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
@@ -37,6 +38,7 @@ import {
   requireRequisitionDecisionResult,
   type RequisitionDecisionReference,
   type RequisitionDecisionPacket,
+  type RequisitionStockChoice,
 } from "@/lib/validation/requisition-decisions";
 import type {
   ReceiptDraftContent,
@@ -81,7 +83,7 @@ export function RequisitionDecisionEditor({
   restoreFocusTo: HTMLElement | null;
   restoreFocusFallbackRef?: RefObject<HTMLElement | null>;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (stockOutcome?: RequisitionStockOutcome) => void;
 }) {
   const [baseline, setBaseline] = useState<ReceiptDraftContent | null>(null),
     [fields, setFields] = useState<Record<string, string>>({});
@@ -91,6 +93,7 @@ export function RequisitionDecisionEditor({
     [unavailable, setUnavailable] = useState(true);
   const [busy, setBusy] = useState(false),
     [reviewing, setReviewing] = useState(false),
+    [choosingStock, setChoosingStock] = useState(false),
     [dirty, setDirty] = useState(false),
     [error, setError] = useState("");
   const [fieldError, setFieldError] = useState<{
@@ -182,8 +185,8 @@ export function RequisitionDecisionEditor({
     return () => controller.abort();
   }, [purpose, consulting, scopeMatches, readReference]);
   useEffect(() => {
-    if (reviewing) headingRef.current?.focus();
-  }, [reviewing]);
+    if (reviewing && !choosingStock) headingRef.current?.focus();
+  }, [reviewing, choosingStock]);
   useEffect(() => {
     if (!busy && !reviewing && returnFocusRef.current) {
       returnFocusRef.current = false;
@@ -300,6 +303,7 @@ export function RequisitionDecisionEditor({
       setUnavailable(false);
       pendingRef.current = packet.data;
       setReviewing(true);
+      if (purpose === "cancel" && current.document.stockCancellation) setChoosingStock(true);
     } catch (cause) {
       setError(errorText(cause));
       returnFocusRef.current = true;
@@ -310,19 +314,36 @@ export function RequisitionDecisionEditor({
   function verifyDecision(row: Record<string, unknown>, intention: DocumentDecisionIntention) {
     requireRequisitionDecisionResult(row, { action: purpose, body: requisitionDecisionPacketSchema.shape.body.parse(intention.body) }, { id, patientId });
   }
-  async function confirm() {
+  const stockComparison = purpose === "cancel" ? reference?.document.stockCancellation : undefined;
+  async function confirm(stockChoice?: RequisitionStockChoice) {
     if (busy || !scopeMatches) return;
     const packet = pendingRef.current;
     if (!packet && !uncertain) return;
+    if (!uncertain && stockComparison && !stockChoice) {
+      setChoosingStock(true);
+      return;
+    }
+    setChoosingStock(false);
     setBusy(true); setError("");
     try {
       const outcome = uncertain ? await decision.checkPrevious(verifyDecision) : await decision.execute({
-        domain: "requisition", action: purpose, body: packet!.body,
+        domain: "requisition", action: purpose, body: {
+          ...packet!.body,
+          ...(stockChoice && stockComparison ? { stockChoice, stockReference: stockComparison.reference } : {}),
+        },
         expectedVersion: packet!.expectedVersion, referenceHash: fields.referenceHash,
       }, verifyDecision);
       if (!outcome) return;
       pendingRef.current = null; setReviewing(false);
-      if (outcome.state === "applied") { setDirty(false); onSaved(); }
+      if (outcome.state === "applied") {
+        setDirty(false);
+        const chosen = outcome.result.stockChoice;
+        if (chosen === "keep" || chosen === "reverse") {
+          const lines = stockComparison?.reference === outcome.intention.body.stockReference &&
+            can(context, "stock.team.read") ? stockComparison?.lines ?? [] : [];
+          onSaved({ choice: chosen, lines });
+        } else onSaved();
+      }
       else setError("A conferência confirmou que nada foi alterado. Seus campos continuam nesta tela. Se o erro persistir, procure a supervisão.");
     } catch (cause) {
       setError(errorText(cause));
@@ -349,12 +370,27 @@ export function RequisitionDecisionEditor({
       reasonRef.current?.focus();
     }
   }, [baseline, readOnly, busy]);
+  if (choosingStock && scopeMatches && stockComparison && reference) return (
+    <RequisitionStockCancellationDialog
+      code={reference.document.code}
+      comparison={stockComparison}
+      onClose={() => {
+        pendingRef.current = null;
+        returnFocusRef.current = true;
+        setReviewing(false);
+        setChoosingStock(false);
+      }}
+      onConfirm={(choice) => void confirm(choice)}
+    />
+  );
   return (
     <RecordDrawer
       exitDialog
       title={
         reviewing
           ? "Revisar decisão da requisição"
+          : stockComparison && purpose === "cancel"
+            ? "Revisar e cancelar"
           : requisitionDecisionLabels[purpose]
       }
       busy={busy}
@@ -673,7 +709,7 @@ export function RequisitionDecisionEditor({
                 >
                   {purpose === "resolve_extra"
                     ? "Revisar associação"
-                    : "Revisar decisão"}
+                    : stockComparison ? "Confirmar cancelamento" : "Revisar decisão"}
                 </ActionButton>
               </form>
             )}

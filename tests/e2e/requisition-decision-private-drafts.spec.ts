@@ -1,12 +1,53 @@
 import { test, expect } from "@playwright/test";
 import { randomUUID } from "node:crypto";
-import { reqDecisionFixture, reqDecisionFacts } from "../integration/requisition-decision-draft-fixtures.mjs";
+import { countedReqDecisionFixture, moveTeamStock, reqDecisionFixture, reqDecisionFacts } from "../integration/requisition-decision-draft-fixtures.mjs";
 import { fixtures } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectDocumentSection, openDocumentMore } from "./document-sections";
 import { loginDecision, noPrivateWrites, privateFormCount, discardDecision, confirmedOutcome } from "./l1-decision-policy";
 import { audit } from "./accessibility-audit";
 test.setTimeout(150_000);
+test("L2 confere o saldo antes de cancelar uma REQ e recupera uma única reversão", async ({ page }, info) => {
+  const f = await countedReqDecisionFixture();
+  moveTeamStock(f, 12);
+  moveTeamStock(f, -2);
+  const before = reqDecisionFacts(f);
+  await loginDecision(page, fixtures.adminA.email, f.patient);
+  await page.goto("/fichas/" + f.req.id);
+  await openDocumentMore(page);
+  await page.getByRole("menuitem", { name: "Cancelar requisição", exact: true }).click();
+  const reason = "Reverter somente o ajuste da emissão.";
+  await page.getByRole("textbox", { name: "Justificativa", exact: true }).fill(reason);
+  const start = page.getByRole("button", { name: "Confirmar cancelamento", exact: true });
+  await start.click();
+  const choice = page.getByRole("dialog", { name: "Como deve ficar o estoque?", exact: true });
+  await expect(choice).toBeVisible();
+  await expect(choice.getByRole("button", { name: "Cancelar a requisição", exact: true })).toBeDisabled();
+  await expect(choice.getByText(/de 12 para 8 unidade/)).toBeVisible();
+  await choice.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(choice).toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: "Justificativa", exact: true })).toHaveValue(reason);
+  expect(reqDecisionFacts(f)).toBe(before);
+  await start.click();
+  const keep = choice.getByRole("radio", { name: /Manter a contagem da REQ/ });
+  const reverse = choice.getByRole("radio", { name: /Reverter o ajuste da emissão/ });
+  await expect(keep).toHaveAccessibleName(/18.*18 unidade/);
+  await expect(reverse).toHaveAccessibleName(/18.*22 unidade/);
+  await reverse.check();
+  await audit(page, "L2 decisão de estoque no cancelamento da REQ");
+  await page.screenshot({ path: `output/playwright/l2-req-cancellation-${info.project.name}.png` });
+  await confirmedOutcome(page, f.req.id, "Cancelar a requisição");
+  const result = page.getByRole("dialog", { name: "Ficha cancelada", exact: true });
+  await expect(result).toContainText("18 → 22 unidade");
+  await expect(result).toContainText("As movimentações posteriores foram preservadas.");
+  await page.screenshot({ path: `output/playwright/l2-req-cancellation-result-${info.project.name}.png` });
+  await result.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(result).toHaveCount(0);
+  expect(privateFormCount(f.patient)).toBe("0");
+  expect(sql(`select count(*) || ':' || sum(quantity)::text from public.stock_movements
+    where reference_id=${q(f.req.id)} and reference_type='requisition_count_reversal'`)).toBe("1:4.000000");
+});
+
 for (const purpose of ["cancel", "archive", "resolve_extra"] as const) test(`REQ ${purpose}: saída descarta campos e resposta perdida confere um único ato sem rascunho`, async ({ page }) => {
   const f = await reqDecisionFixture(purpose), writes = noPrivateWrites(page), count = privateFormCount(f.patient);
   await loginDecision(page, fixtures.adminA.email, f.patient);

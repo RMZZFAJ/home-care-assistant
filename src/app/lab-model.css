@@ -707,3 +707,65 @@
 @container product (max-width:700px){.hca-l1 .public-validator{padding:0;max-width:540px;margin:0 auto}.hca-l1 .pv-heading{gap:13px}.hca-l1 .pv-seal{width:44px;height:44px;border-radius:12px}.hca-l1 .pv-heading h1{font-size:23px}.hca-l1 .pv-heading p{font-size:12px}.hca-l1 .pv-privacy{align-items:flex-start;font-size:11px}.hca-l1 .pv-form{padding:20px 18px}.hca-l1 .pv-methods button{font-size:12px;gap:7px;padding:12px 7px}.hca-l1 .pv-submit .btn{width:100%}.hca-l1 .pv-result-heading{padding:20px 18px;gap:11px}.hca-l1 .pv-result h2{font-size:17px}.hca-l1 .pv-result-symbol{width:37px;height:37px;border-radius:10px}.hca-l1 .pv-evidence{grid-template-columns:1fr;padding:17px 18px;gap:15px}.hca-l1 .pv-evidence>div{display:flex;justify-content:space-between;gap:16px}.hca-l1 .pv-evidence strong{text-align:right}.hca-l1 .pv-details{padding:17px 18px}.hca-l1 .pv-details dl>div{grid-template-columns:1fr;gap:4px}.hca-l1 .pv-result-actions{padding:0 18px 20px}.hca-l1 .pv-footer{align-items:flex-start;flex-direction:column;gap:10px}.hca-l1 .pv-footer p{margin:0 8px}}
 
 .hca-l1 .pv-details>summary::after{content:none;display:none}.hca-l1 .pv-details[open]>summary>svg{transform:rotate(180deg)}
+
+.hca-l1 .hca-cancellation-stock-material {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 4px 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+.hca-l1 .hca-cancellation-stock-material > svg {
+  flex: none;
+  box-sizing: content-box;
+  width: 16px;
+  height: 16px;
+  padding: 8px;
+  border-radius: 10px;
+  color: var(--primary);
+  background: #edf6ef;
+}
+.hca-l1 .hca-cancellation-stock-material p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.hca-l1 .hca-cancellation-stock-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 12px;
+}
+.hca-l1 .hca-cancellation-stock-option:has(:checked) {
+  background: #edf6ef;
+  border-color: #74a897;
+}
+.hca-l1 .hca-cancellation-stock-option input {
+  flex: none;
+  accent-color: var(--primary);
+}
+.hca-l1 .hca-cancellation-stock-option > span,
+.hca-l1 .hca-cancellation-stock-amounts {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.hca-l1 .hca-cancellation-stock-option small {
+  color: var(--muted);
+}
+.hca-l1 .hca-cancellation-stock-amounts > span {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.hca-l1 .hca-cancellation-stock-amounts svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+}

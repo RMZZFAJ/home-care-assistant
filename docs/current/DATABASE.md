@@ -195,6 +195,16 @@ preenchido. Desconhecido, vazio e chamadas legadas sem referência
 preservam o saldo. O ajuste de contagem tem origem `requisition_count`
 e é recuperável pela mesma chave de idempotência da emissão.
 
+O cancelamento de uma REQ com ajuste exige uma escolha explícita vinculada
+ao saldo e à referência atuais. Manter conserva os movimentos. Reverter
+insere um movimento compensatório `requisition_count_reversal` por
+material e preserva o ajuste original e os movimentos posteriores.
+A referência é revalidada sob o lock de estoque. A escolha, o evento
+de cancelamento e a compensação são gravados na mesma transação.
+Uma contagem absoluta posterior, mesmo sem movimento, impede reverter
+enquanto a regra P1 aguarda decisão. Só quem tem `stock.team.read`
+recebe os saldos para comparação e pode confirmar a reversão.
+
 BAL trata exclusivamente estoque da equipe. A referência usa revisão do
 ledger; mudança desde a contagem impede aprovação até reconto. Política
 opcional aplica diretamente; política obrigatória exige os grupos e as

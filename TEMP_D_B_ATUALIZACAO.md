@@ -37,10 +37,24 @@ as 84 migrations históricas protegidas. Passaram seis integrações com
 Auth real e seis verificações em Android e iOS emulados, sem retry.
 As verificações cobriram conflito de referência, concorrência, retomada
 de rascunho e recuperação da mesma emissão após perda de resposta.
-A decisão de estoque no cancelamento e a aplicação em preview
-continuam pendentes. Evidências em
+A aplicação em preview continua pendente. Evidências em
 `output/playwright/l2-req-count-integration.log` e
 `output/playwright/l2-req-count-ui-fixed.log`.
+
+O cancelamento da REQ oferece a escolha explícita de manter ou reverter
+o ajuste. A comparação mostra o saldo antes e depois em cada opção.
+A reversão compensa o efeito da emissão e preserva as entradas e saídas
+posteriores. A escolha fica no histórico oficial da mesma transação.
+Outra contagem absoluta posterior mantém a reversão indisponível
+enquanto P1 aguarda decisão. A recuperação consulta a mesma chave.
+A migration `20261119030844_l2_requisition_cancel_stock_choice.sql`
+foi aplicada no banco local. Quatro integrações com Auth real e quatro
+casos dirigidos em Android e iOS emulados passaram sem retry. A jornada
+móvel confirmou retorno à justificativa, ausência de rascunho, escolha
+do ajuste e saldo de 18 para 22 após recuperar a resposta. O cenário
+`E04-14/cancellation-with-movements` foi reaberto em 390 px para
+comparação. Capturas e logs `l2-req-cancellation-*` estão em
+`output/playwright/`.
 
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma

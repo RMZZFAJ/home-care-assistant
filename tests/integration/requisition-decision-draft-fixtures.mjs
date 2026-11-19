@@ -1,11 +1,51 @@
 import { randomUUID } from "node:crypto";
-import { actor, rpc, setup, issue, delivery, request } from "./v4-fixtures.mjs";
+import { actor, rpc, setup, issue, delivery, request, fixtures } from "./v4-fixtures.mjs";
 import { draftDevice } from "./private-draft-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 
 export const reqDecisionPurposes = ["archive", "cancel", "resolve_extra"];
 export const reqDecisionReason =
   "\uFEFF\n Motivo próprio preservado,sem decisão automática\u00A0\t";
+
+export function moveTeamStock(fixture, delta) {
+  sql(`insert into public.stock_movements (
+    care_recipient_id, product_id, quantity, movement_type, performed_by,
+    source_location, destination_location, justification
+  ) values (
+    ${q(fixture.patient)}, ${q(fixture.products[0])}, ${Math.abs(delta)}, 'adjustment',
+    ${q(fixtures.adminA.id)}, ${delta < 0 ? "'CARE_TEAM'" : "null"}, ${delta > 0 ? "'CARE_TEAM'" : "null"},
+    'Movimento relativo fictício');`);
+}
+
+export async function issueCountedRequisition(fixture, count, repeatReason) {
+  const productId = fixture.products[0];
+  const [reference] = await rpc(fixture.pro, "requisition_item_context", {
+    p_patient: fixture.patient,
+    p_products: [productId],
+  });
+  const [created] = await rpc(fixture.pro, "submit_requisition", {
+    ...request(fixture.patient, [productId]),
+    p_lines: [{
+      productId,
+      currentStock: String(count),
+      stockObservation: "observed",
+      stockReference: reference.teamStockReference,
+      urgent: false,
+      ...(repeatReason ? { repeatReason } : {}),
+    }],
+  });
+  return { id: created.requisition_id };
+}
+
+export async function countedReqDecisionFixture() {
+  const fixture = await setup();
+  const subject = {
+    ...fixture,
+    pro: await actor("professional", fixture.patient),
+  };
+  moveTeamStock(subject, 12);
+  return { ...subject, req: await issueCountedRequisition(subject, 8) };
+}
 export async function reqDecisionFixture(purpose) {
   const f = await setup();
   let req;

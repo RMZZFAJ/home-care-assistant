@@ -391,6 +391,12 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 }
 .hca-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 21px; border-bottom: 1px solid var(--hca-line); flex: none; }
 .hca-modal-head h2 { min-width: 0; overflow-wrap: anywhere; margin: 0; font-size: 19px; line-height: 1.35; letter-spacing: -.35px; }
+.hca-modal-context-head { align-items: flex-start; }
+.hca-modal-context-head h2 { font-weight: 700; }
+.hca-modal-kicker { margin: 0 0 7px; color: var(--hca-muted); font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+.hca-modal-subtitle { margin: 6px 0 0; color: var(--hca-muted); font-size: 12px; }
+.hca-modal-footer { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 17px; border-top: 1px solid var(--hca-line); }
+.hca-modal-footer > button { flex: 1; }
 .hca-modal-content { min-height: 0; padding: 22px; overflow: auto; overscroll-behavior: contain; }
 .hca-scroll-content:focus-visible { outline: 3px solid #5aa99a; outline-offset: -3px; }
 .wizard-steps .hca-step-control { display: inline-flex; align-items: center; gap: 8px; min-height: 41px; padding: 7px 9px; border: 0; background: transparent; color: var(--hca-muted); font: 12px var(--hca-font); border-radius: 8px; }

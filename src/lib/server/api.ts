@@ -32,6 +32,8 @@ export function databaseError(
   const message = error?.message ?? "";
   if (error?.code === "PT409" && message === "requisition stock reference changed")
     throw new ApiError("REQUEST_STOCK_CHANGED", "O estoque mudou durante o preenchimento. Sua contagem foi preservada para conferência.", 409);
+  if (error?.code === "PT409" && /^(requisition cancellation stock reference changed or missing|requisition cancellation stock reversal is unavailable)$/.test(message))
+    throw new ApiError("VERSION_CONFLICT", "Confira o estoque atual antes de cancelar a requisição. Sua justificativa foi preservada.", 409);
   if (error?.code === "PT409" && /^(document changed before confirmation|(?:requisition|balance) reference changed (?:before|after) confirmation)$/.test(message))
     throw new ApiError("VERSION_CONFLICT", "A referência da ficha mudou. Compare os dados atuais e revise seus campos antes de confirmar novamente.", 409);
   if (error?.code === "PT409" && /^(?:this )?command was settled without an act; confirm a new attempt$/.test(message))

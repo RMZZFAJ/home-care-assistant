@@ -28,6 +28,25 @@ export function requireRequisitionDraftFields(
     });
 }
 const digest = z.string().regex(/^[a-f0-9]{64}$/);
+const stockQuantity = z.string().regex(/^-?\d+(?:\.\d{1,6})?$/);
+export const requisitionStockCancellationSchema = z.object({
+  reference: digest,
+  canReadStock: z.boolean(),
+  canReverse: z.boolean(),
+  lines: z.array(z.object({
+    productId: z.string(),
+    name: z.string(),
+    unit: z.string(),
+    currentUnit: z.string(),
+    beforeIssuance: stockQuantity,
+    counted: stockQuantity,
+    current: stockQuantity,
+    afterReversal: stockQuantity.nullable(),
+    block: z.enum(["already_reversed", "later_count", "material_changed", "insufficient_stock", "stock_limit"]).nullable(),
+  }).strict()).max(1000),
+}).strict();
+export type RequisitionStockCancellation = z.infer<typeof requisitionStockCancellationSchema>;
+export type RequisitionStockChoice = "keep" | "reverse";
 export const requisitionDecisionReferenceSchema = z
   .object({
     id: z.uuid(),
@@ -48,6 +67,7 @@ export const requisitionDecisionReferenceSchema = z
     archivedAt: z.iso.datetime({ offset: true }).nullable(),
     catalogueHash: digest,
     referenceHash: digest,
+    stockCancellation: requisitionStockCancellationSchema.optional(),
     fulfillment: z
       .object({
         total: z.number().int().nonnegative(),
@@ -110,6 +130,8 @@ export const requisitionDecisionPacketSchema = z
           .max(1000, "A justificativa permite até 1000 caracteres."),
         itemId: z.uuid().optional(),
         productId: z.string().min(1).max(120).optional(),
+        stockChoice: z.enum(["keep", "reverse"]).optional(),
+        stockReference: digest.optional(),
       })
       .strict(),
     expectedVersion: version,
@@ -118,6 +140,9 @@ export const requisitionDecisionPacketSchema = z
   })
   .strict()
   .superRefine((value, context) => {
+    if (Boolean(value.body.stockChoice) !== Boolean(value.body.stockReference) ||
+      (value.body.stockChoice !== undefined && value.action !== "cancel"))
+      context.addIssue({ code: "custom", message: "Confira a decisão de estoque do cancelamento." });
     if (
       value.action === "resolve_extra"
         ? !value.body.itemId || !value.body.productId
@@ -169,7 +194,8 @@ export function requireRequisitionDecisionResult(row: Record<string, unknown>, p
     packet.action === "cancel"
       ? row.id === scope.id &&
         row.care_recipient_id === scope.patientId &&
-        row.status === "cancelled"
+        row.status === "cancelled" &&
+        row.stockChoice === packet.body.stockChoice
       : packet.action === "archive"
         ? z.iso.datetime({ offset: true }).safeParse(row.archivedAt).success &&
           row.archiveReason === packet.body.reason
