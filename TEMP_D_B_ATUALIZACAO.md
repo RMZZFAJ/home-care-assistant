@@ -1,5 +1,34 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — abertura da ficha e catálogo indisponível ou vazio.** A leitura
+essencial de REQ, COM, ENT e DEV acontece antes das etapas. Os avisos do
+E04-16 distinguem falha de catálogo, falha de outra referência e recusa
+de acesso. As tentativas explícitas de recuperação repetem a consulta.
+Após duas, o aviso conserva o diagnóstico copiável, com código e referência
+em formato seguro.
+
+- Uma resposta completa e autorizada confirma o catálogo vazio. Se só há
+  materiais inativos, a orientação diz isso. Quem tem a capacidade de
+  catálogo chega à área existente de cadastro. Os demais perfis recebem
+  a orientação de pedir cadastro ou revisão ao administrador.
+- A DEV consulta a referência da custódia. Materiais inativos com saldo
+  ainda podem aparecer quando a referência permite. Uma referência vazia
+  precisa da leitura completa do catálogo antes de mostrar o estado vazio.
+- A recuperação de emissão e os rascunhos permanecem no fluxo existente.
+  Este incremento usa as APIs existentes e não acrescenta migration.
+- Para conferir em celular, abra Nova requisição ou Nova compra em uma
+  residência fictícia sem materiais. Em Nova devolução, a referência
+  autorizada da custódia também é conferida antes da identificação.
+- A comparação a 390 px com E04-16 levou à remoção do título duplicado
+  na tela de catálogo vazio. O cabeçalho real conserva a seleção de paciente.
+- Dez casos distintos tiveram resultado aprovado em Android e iOS emulados.
+  Nove passaram na rodada conjunta. A REQ em Android recebeu HTTP 503
+  durante o login com a conta compartilhada. O caso passou nos dois
+  navegadores com Auth real e um único vínculo, sem retry automático.
+- O teste de emissão da ENT passou a aguardar as etapas reais de avisos
+  e assinatura. O ensaio confirmou uma única ficha e o mesmo pedido de
+  recuperação após perda de resposta. Build e ESLint dirigido passaram.
+
 **19/11 — mudança de acesso com a ficha aberta.** Quando a pessoa perde
 o vínculo, o espaço da residência dá lugar ao aviso E06-17 sobre fundo
 neutro. A ficha e seus painéis são desmontados. A resposta atrasada de

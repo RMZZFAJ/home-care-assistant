@@ -32,6 +32,8 @@ import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "./document-write-access-notice";
+import { DocumentCatalogueEmpty, DocumentOpeningFailure, DocumentOpeningPending, type OpeningFailure } from "./document-opening-status";
+import { CatalogueOpeningError, readWizardCatalogue } from "@/lib/client/wizard-catalogue";
 import {
   draftFlowStages,
   navigationForStep,
@@ -170,6 +172,8 @@ export function PatientSupplyWizard({
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [openingFailure, setOpeningFailure] = useState<OpeningFailure | null>(null);
+  const [catalogueTotal, setCatalogueTotal] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [issuing, setIssuing] = useState(false);
   const [uncertain, setUncertain] = useState(false);
@@ -458,11 +462,10 @@ export function PatientSupplyWizard({
   useEffect(() => {
     const controller = new AbortController();
     Promise.all([
-      api<{ data: CatalogProduct[]; }>(
-        "/api/catalog?careRecipientId=" + patientId,
-        undefined,
-        controller.signal,
-      ),
+      type === "BAL"
+        ? api<{ data: CatalogProduct[]; }>("/api/catalog?careRecipientId=" + patientId, undefined, controller.signal)
+          .then(result => ({ ...result, total: null }))
+        : readWizardCatalogue(patientId, controller.signal),
       api<{ directory: PatientPerson[]; }>(
         "/api/patient-settings?careRecipientId=" + patientId,
         undefined,
@@ -490,7 +493,7 @@ export function PatientSupplyWizard({
         setStaleLegacyReference(false);
         setPeople(settings.directory);
         let options: ItemContext[] = [];
-        if (type !== "BAL" && canReadRequests) {
+        if (type !== "BAL" && canReadRequests && products.data.length) {
           const response = await api<{ data: ItemContext[]; }>(
             "/api/requisitions/item-context?careRecipientId=" +
             patientId +
@@ -502,6 +505,7 @@ export function PatientSupplyWizard({
             controller.signal,
           );
           if (controller.signal.aborted) return;
+          if (!Array.isArray(response.data)) throw new Error("Não foi possível conferir a referência de materiais.");
           options = response.data;
           setRequestOptions(options);
         }
@@ -677,11 +681,17 @@ export function PatientSupplyWizard({
           setDraftMaterials(restoredBalance.materials);
         }
         setLoading(false);
+        setLoadError("");
+        setOpeningFailure(null);
+        setCatalogueTotal(products.total);
         setError("");
       })
       .catch((reason) => {
         if (!controller.signal.aborted) {
           setLoading(false);
+          setOpeningFailure(reason instanceof CatalogueOpeningError
+            ? { source: "catalogue", cause: reason.cause }
+            : { source: "reference", cause: reason });
           setLoadError(
             reason instanceof Error
               ? reason.message
@@ -1462,6 +1472,21 @@ export function PatientSupplyWizard({
         ) : null}
       </section>
     );
+  if (type !== "BAL" && !uncertain && !privateDraft.pending && !privateDraft.consumed) {
+    if (catalogueTotal === null) {
+      if (loading || !openingFailure) return <DocumentOpeningPending />;
+      const originId = documentId ?? routedSourceId;
+      return <DocumentOpeningFailure failure={openingFailure} attempts={attempt}
+        operation={type === "COM" ? "Abrir compra" : "Abrir entrega"}
+        back={originId ? "/fichas/" + originId : "/fichas"} onRetry={() => {
+          setLoading(true);
+          setAttempt(current => current + 1);
+        }} />;
+    }
+    if (!loading && !loadError && !catalog.length && !documentId && !editing && !draftTouched && step === 0)
+      return <DocumentCatalogueEmpty patientId={patientId} patientName={context.patient!.display_name}
+        mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0} />;
+  }
   return (
     <div onChangeCapture={event => {
       if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);

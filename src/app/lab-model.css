@@ -1025,6 +1025,23 @@
 .hca-revoked-content { display: grid; justify-items: center; width: min(680px, calc(100% - 30px)); margin: 56px auto 0; padding: 27px; border: 1px dashed #cfdec8; border-radius: 13px; background: #f8fbf6; text-align: center; color: #50654a; }
 .hca-revoked-content > h1 { margin: 0; font-size: 18px; line-height: 1.35; font-weight: 700; }
 .hca-revoked-content > p { margin: 10px 0 18px; font-size: 12px; line-height: 1.7; }
+.workspace-content:has(.hca-opening-placeholder, .hca-opening-catalogue) > .page-heading { display: none; }
+.hca-opening-placeholder { max-width: 680px; margin: 35px auto 0; padding: 27px; border: 1px dashed #cfdec8; border-radius: 13px; background: #f8fbf6; text-align: center; color: #50654a; }
+.hca-opening-placeholder > svg { display: block; margin-inline: auto; }
+.hca-opening-placeholder > h2 { margin: 0; font-size: 18px; font-weight: 700; }
+.hca-opening-placeholder > p { margin: 10px 0 18px; font-size: 12px; }
+.hca-overlay:has(.hca-opening-error) > .hca-modal-backdrop,
+.hca-overlay:has(.hca-opening-error) > .hca-modal-viewport { position: fixed; inset: var(--app-header-height, 65px) 0 0; }
+.hca-overlay:has(.hca-opening-error) > .hca-modal-backdrop { background: #183c3242; backdrop-filter: blur(1px); }
+.hca-l1 .hca-opening-error > .hca-modal-footer { padding: 15px 18px; background: #fafcfb; }
+.hca-opening-catalogue > nav { display: flex; align-items: center; gap: 8px; color: #456659; font-size: 11px; }
+.hca-opening-patient { display: flex; align-items: center; gap: 6px; margin-top: 16px; color: #206259; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.hca-opening-catalogue > h1 { margin: 5px 0 16px; font-size: 23px; font-weight: 750; }
+.hca-opening-empty { display: grid; justify-items: center; gap: 13px; min-height: 250px; padding: 56px 22px; border: 1px solid #d7e3dc; border-radius: 15px; background: #fff; text-align: center; }
+.hca-opening-empty-icon { display: grid; place-items: center; width: 55px; height: 55px; border-radius: 50%; background: #edf5ea; color: #56784e; }
+.hca-opening-empty h2 { margin: 0; color: #254b39; font-size: 17px; font-weight: 700; }
+.hca-opening-empty p { max-width: 270px; margin: 0; color: #50654a; font-size: 12px; line-height: 1.7; }
+.hca-l1 .hca-opening-empty > a { margin-top: 6px; min-height: 42px; }
 .hca-l1 .hca-issuance-notice-attention { display: grid; gap: 6px; margin: 0 0 14px; padding: 10px; border-radius: 9px; background: #fff4df; color: #785920; font-size: 12px; }
 .hca-l1 .hca-issuance-notice-attention p { margin: 0; }
 .hca-l1 .hca-issuance-notice-attention a { justify-self: start; }

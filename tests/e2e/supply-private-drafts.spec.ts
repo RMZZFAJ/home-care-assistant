@@ -56,7 +56,8 @@ test("ENT emite com rascunho privado e conserva a mesma confirmação após200 i
  await expect(modal.locator("pre")).toContainText("FORBIDDEN");
  await expect(modal.locator("pre")).not.toContainText("Texto privado");
  await recover.click();
- await expect(page.getByRole("dialog",{name:"Entrega expedida",exact:true})).toBeVisible();
+ // The result waits for notice preparation and signed PDF generation, each with its own transport budget.
+ await expect(page.getByRole("dialog",{name:"Entrega expedida",exact:true})).toBeVisible({timeout:65_000});
  expect(packets).toHaveLength(1);expect(lookups).toHaveLength(2);expect(lookups[0]).toEqual(lookups[1]);
  expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");expect(sql(`select consumed_document_id from private.creation_drafts where id=${sqlLiteral(saved.id)};`)).toBe(documentId);expect(sql(`select state from private.creation_drafts where id=${sqlLiteral(saved.id)};`)).toBe("consumed");
 });

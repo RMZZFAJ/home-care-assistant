@@ -23,6 +23,8 @@ import {
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "@/components/documents/document-write-access-notice";
+import { DocumentCatalogueEmpty, DocumentOpeningFailure, DocumentOpeningPending, type OpeningFailure } from "@/components/documents/document-opening-status";
+import { CatalogueOpeningError, readWizardCatalogue } from "@/lib/client/wizard-catalogue";
 import { RecurringSelection } from "./recurring-selection";
 import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
 import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
@@ -119,6 +121,8 @@ function PatientRequisition({
   const [itemContext, setItemContext] = useState<ItemContext[]>([]);
   const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [catalogError, setCatalogError] = useState("");
+  const [openingFailure, setOpeningFailure] = useState<OpeningFailure | null>(null);
+  const [catalogueTotal, setCatalogueTotal] = useState<number | null>(null);
   const [catalogAttempt, setCatalogAttempt] = useState(0);
   const [reviewStock, setReviewStock] = useState(false);
   const contextByProduct = useMemo(
@@ -232,36 +236,36 @@ function PatientRequisition({
   }, [storageKey, context.patient]);
   useEffect(() => {
     const controller = new AbortController();
-    api<{ data: Product[] }>(
-      "/api/catalog?careRecipientId=" + context.patient!.id,
-      undefined,
-      controller.signal,
-    )
-      .then(async (body) => {
-        const items = body.data.filter(
-          (item) => item.active !== false && item.is_active !== false,
-        );
-        const info = await api<{ data: ItemContext[] }>(
+    readWizardCatalogue(context.patient!.id, controller.signal)
+      .then(async ({ data: items, total }) => {
+        const info = items.length ? await api<{ data: ItemContext[] }>(
           "/api/requisitions/item-context?careRecipientId=" +
             context.patient!.id +
             "&productIds=" +
             items.map((item) => encodeURIComponent(item.id)).join(","),
           undefined,
           controller.signal,
-        );
+        ) : { data: [] };
+        if (!Array.isArray(info.data)) throw new Error("Não foi possível conferir a referência de materiais.");
         if (!controller.signal.aborted) {
           setProducts(items);
           setItemContext(info.data);
           setCatalogError("");
+          setOpeningFailure(null);
+          setCatalogueTotal(total);
         }
       })
       .catch((reason) => {
-        if (!controller.signal.aborted)
+        if (!controller.signal.aborted) {
+          setOpeningFailure(reason instanceof CatalogueOpeningError
+            ? { source: "catalogue", cause: reason.cause }
+            : { source: "reference", cause: reason });
           setCatalogError(
             reason instanceof Error
               ? reason.message
               : "Não foi possível carregar o catálogo.",
           );
+        }
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoadingCatalog(false);
@@ -565,6 +569,19 @@ function PatientRequisition({
         <DocumentWriteAccessNotice {...writeAccess} draftSaved={privateDraft.base?.state === "active"} consultationRef={consultationRef} />
       </div>
     );
+  if (!uncertain && !privateDraft.pending && !privateDraft.consumed) {
+    if (catalogueTotal === null) {
+      if (loadingCatalog || !openingFailure) return <DocumentOpeningPending />;
+      return <DocumentOpeningFailure failure={openingFailure} attempts={catalogAttempt} operation="Abrir requisição"
+        back={sourceId ? "/fichas/" + sourceId : "/fichas"} onRetry={() => {
+          setLoadingCatalog(true);
+          setCatalogAttempt(current => current + 1);
+        }} />;
+    }
+    if (!loadingCatalog && !catalogError && !products.length && !draftTouched && step === 0)
+      return <DocumentCatalogueEmpty patientId={context.patient!.id} patientName={context.patient!.display_name}
+        mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0} />;
+  }
   return (
     <div ref={fieldsRef} onChangeCapture={event => {
       if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);

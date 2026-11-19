@@ -32,9 +32,10 @@ test("falha nos dados da ficha bloqueia comandos e a retomada conserva o rascunh
   let failed = false;
   await page.route("**/api/catalog?**", async route => { if (!failed) { failed = true; await route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ code: "NOT_CONFIGURED", error: "Falha fictícia ao carregar catálogo", retryable: true }) }); } else await route.continue(); });
   await page.goto("/fichas/ent?documentId=" + draft.id);
-  await expect(page.getByText("Falha fictícia ao carregar catálogo", { exact: true })).toBeVisible();
+  const opening = page.getByRole("dialog", { name: "Catálogo indisponível", exact: true });
+  await expect(opening).toBeVisible();
   await expect(page.getByRole("button", { name: "Avançar", exact: true })).toHaveCount(0); await expect(page.getByRole("button", { name: "Salvar rascunho", exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Recarregar dados", exact: true }).click();
+  await opening.getByRole("button", { name: "Tentar novamente", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Identificação", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Avançar", exact: true }).click(); await page.getByRole("button", { name: "Avançar", exact: true }).click();
   await expect(page.getByLabel("Quantidade — Material fictício V4 0", { exact: true })).toHaveValue("7");

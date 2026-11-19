@@ -34,6 +34,8 @@ import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "./document-write-access-notice";
+import { DocumentCatalogueEmpty, DocumentOpeningFailure, DocumentOpeningPending, type OpeningFailure } from "./document-opening-status";
+import { CatalogueOpeningError, readWizardCatalogue } from "@/lib/client/wizard-catalogue";
 import {
   DraftContentSummary,
 } from "@/components/forms/creation-draft-panel";
@@ -178,6 +180,8 @@ function TransferDeclarationEditor({
   const [attempt, setAttempt] = useState(0),
     [refreshing, setRefreshing] = useState(false),
     [needsRefresh, setNeedsRefresh] = useState(false);
+  const [openingFailure, setOpeningFailure] = useState<OpeningFailure | null>(null);
+  const [emptyCatalogueTotal, setEmptyCatalogueTotal] = useState<number | null>(null);
   const [counterpartyId, setCounterpartyId] = useState(""),
     [recipientId, setRecipientId] = useState(""),
     [originId, setOriginId] = useState("");
@@ -319,24 +323,35 @@ function TransferDeclarationEditor({
       undefined,
       controller.signal,
     )
-      .then((response) => {
+      .then(async (response) => {
         if (controller.signal.aborted) return;
         const current = parseTransferPreparation(response, {
           patientId,
           userId: context.userId,
           source,
         });
+        if (!loadedRef.current && !current.products.length) {
+          const catalogue = await readWizardCatalogue(patientId, controller.signal);
+          if (controller.signal.aborted) return;
+          if (catalogue.data.length) throw new Error("A referência de materiais mudou durante a abertura.");
+          setEmptyCatalogueTotal(catalogue.total);
+        } else setEmptyCatalogueTotal(null);
         if (!loadedRef.current && !restoredRef.current) {
           setReference(current);
           setRecipientId((previous) => previous || current.suggested?.professionalId || "");
           setBaseline((old) => adoptTransferDeclarationReference(old, current));
           setReferenceUnavailable(false);
+          setNeedsRefresh(false);
         } else setComparison(current);
         loadedRef.current = true;
         setError("");
+        setOpeningFailure(null);
       })
       .catch((cause) => {
         if (controller.signal.aborted) return;
+        setOpeningFailure(cause instanceof CatalogueOpeningError
+          ? { source: "catalogue", cause: cause.cause }
+          : { source: "reference", cause });
         setReferenceUnavailable(true);
         setNeedsRefresh(true);
         setComparison(null);
@@ -699,6 +714,16 @@ function TransferDeclarationEditor({
       {!privateDraft.readDenied && !privateDraft.protectedReadPending && !privateDraft.pending && !uncertain
         ? <DocumentWriteAccessNotice {...writeAccess} draftSaved={privateDraft.base?.state === "active"} /> : null}
     </>);
+  if (!result && !packet && !uncertain && !privateDraft.pending && !privateDraft.consumed) {
+    if (!reference && !comparison && !privateDraft.base && !privateDraft.offered) {
+      if (refreshing || !openingFailure) return <DocumentOpeningPending />;
+      return <DocumentOpeningFailure failure={openingFailure} attempts={attempt}
+        operation={isReturn ? "Abrir devolução" : "Abrir entrega"} back={onClose} onRetry={refresh} />;
+    }
+    if (emptyCatalogueTotal !== null && !privateDraft.base && !privateDraft.offered)
+      return <DocumentCatalogueEmpty patientId={patientId} patientName={context.patient!.display_name}
+        mayManage={can(context, "catalog.manage")} hasInactive={emptyCatalogueTotal > 0} />;
+  }
   return (
     <section
       className="hca-transfer-wizard"
