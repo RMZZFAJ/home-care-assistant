@@ -1,4 +1,6 @@
 "use client";
+
+import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
 import {
   FormField,
   SelectField,
@@ -206,6 +208,7 @@ function TransferDeclarationEditor({
   const { navigating, openIssued } = useIssuanceNavigation(context.userId, patientId);
   const processName = materialTransferLabel(source, source === "FAMILY" ? "CARE_TEAM" : "FAMILY").toLocaleLowerCase("pt-BR");
   const isReturn = source === "CARE_TEAM";
+  const householdSelectionRef = useRef<HouseholdListSelectionHandle>(null);
   useOperationActivity((busy && Boolean(packet)) || navigating, {
     title: uncertain ? "Consultando a expedição" : isReturn ? "Expedindo devolução" : "Expedindo entrega",
     stage: navigating ? 1 : 0,
@@ -395,6 +398,7 @@ function TransferDeclarationEditor({
     )
       return;
     if (step < 3) {
+      if (step === 0 && householdSelectionRef.current?.apply() === false) return;
       const materialStep = step === 1 || step === 2;
       const stepLines = lines.filter((line) => !!line.extra === (step === 2));
       if (materialStep && (step === 1 && !stepLines.length || stepLines.some((line) => {
@@ -931,6 +935,24 @@ function TransferDeclarationEditor({
                     ))}
                   </SelectField>
                 </FormField>
+                {!isReturn ? (
+                  <HouseholdListSelection ref={householdSelectionRef}
+                    key={context.userId + ":" + patientId}
+                    userId={context.userId} patientId={patientId} kind="ENT"
+                    catalogue={reference!.products.map(product => ({
+                      ...product, selectable: quantity(product.available).gt(0),
+                    }))}
+                    selectedIds={lines.map(line => line.productId)}
+                    disabled={!write || needsRefresh || referenceUnavailable || privateDraft.blocked}
+                    onApply={ids => {
+                      setLines(current => [
+                        ...current,
+                        ...ids.filter(id => !current.some(line => line.productId === id))
+                          .map(productId => ({ productId, quantity: "" })),
+                      ]);
+                      setDraftTouched(true);
+                    }} />
+                ) : null}
                 </> : null}
                 {step === 1 || step === 2 ? <>
                 <h3>{transferSteps[step]}</h3>

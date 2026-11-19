@@ -64,6 +64,7 @@ import { StepNavigator, Icon } from "@/components/ui/primitives";
 import { ActionButton } from "@/components/ui/controls";
 import { RelatedDocument } from "./related-document";
 import { SupplyWizardStep, type WizardState } from "./supply-wizard-step";
+import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
 import { SupplySourcePicker, type SupplySourceSelection } from "./supply-source-picker";
 import { emptySupplySources, prepareSupplySources, type SupplySourcePreparation } from "@/lib/forms/supply-source-preparation";
 import { parseSupplySources } from "@/lib/validation/supply-sources";
@@ -135,6 +136,7 @@ export function PatientSupplyWizard({
 }) {
   const [step, setStep] = useState(0);
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
+  const householdSelectionRef = useRef<HouseholdListSelectionHandle>(null);
   const [people, setPeople] = useState<PatientPerson[]>([]);
   const [recipientContext, setRecipientContext] =
     useState<DeliveryPreparation | null>(null);
@@ -892,6 +894,7 @@ export function PatientSupplyWizard({
   async function next() {
     const openingKey = step === 0 && !editing ? legacyOpeningKey : null;
     if (!openingKey && (needsBalanceReview || !validate())) return;
+    if (step === 0 && householdSelectionRef.current?.apply() === false) return;
     // Retain recovery of an old, already-started documentary opening. New
     // entry never creates this key or an operational draft.
     if (openingKey) {
@@ -1688,6 +1691,22 @@ export function PatientSupplyWizard({
                     }
                   }}
                 />
+                {step === 0 && (type === "COM" || type === "ENT" && form.source === "FAMILY") ? (
+                  <HouseholdListSelection ref={householdSelectionRef} key={context.userId + ":" + patientId + ":" + type}
+                    userId={context.userId} patientId={patientId} kind={type} catalogue={catalog}
+                    selectedIds={Object.keys(form.quantities)}
+                    disabled={busy || uncertain || loading || privateDraft.blocked || !allowed}
+                    onApply={ids => {
+                      setForm(current => ({
+                        ...current,
+                        quantities: {
+                          ...Object.fromEntries(ids.map(id => [id, ""])),
+                          ...current.quantities,
+                        },
+                      }));
+                      setDraftTouched(true);
+                    }} />
+                ) : null}
                 {sourcePicker && linkedTarget ? <SupplySourcePicker
                   patientId={patientId}
                   target={linkedTarget}

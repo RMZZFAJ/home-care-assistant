@@ -1423,3 +1423,25 @@
   .hca-overlay:has(.hca-material-sheet) { --material-sheet-inset: 58px; }
   .hca-l1 .hca-drawer-viewport > .hca-material-sheet { border-width: 0; }
 }
+.hca-household-lists { display: grid; gap: 8px; margin-top: 16px; }
+.hca-household-lists h3 { font-size: 14px; font-weight: 750; margin-bottom: 3px; }
+.hca-household-method { border: 1px solid var(--hca-line); border-radius: 12px; background: #fff; overflow: hidden; }
+.hca-household-method:has([aria-pressed="true"]) { border-color: #92b9aa; }
+.hca-household-method-choice { display: grid; grid-template-columns: 18px minmax(0, 1fr) 18px; align-items: center; gap: 10px; min-height: 56px; width: 100%; padding: 9px 12px; text-align: start; }
+.hca-household-method-choice[aria-pressed="true"] { background: #eff7f3; }
+.hca-household-method-dot { width: 17px; height: 17px; border: 1px solid #9fbcaf; border-radius: 50%; background: #fff; }
+.hca-household-method-choice[aria-pressed="true"] .hca-household-method-dot { border: 5px solid var(--hca-teal); }
+.hca-household-method-choice strong, .hca-household-list-option strong, .hca-household-management strong { display: block; font-size: 13px; overflow-wrap: anywhere; }
+.hca-household-method-choice small, .hca-household-list-option small, .hca-household-management small { display: block; font-size: 11px; color: var(--hca-muted); overflow-wrap: anywhere; }
+.hca-household-list-body { padding: 4px 12px 10px; font-size: 12px; }
+.hca-household-list-option { display: flex; gap: 10px; align-items: center; min-height: 48px; padding: 8px 0; border-bottom: 1px solid var(--hca-line); }
+.hca-household-list-option input { width: 17px; height: 17px; flex: none; accent-color: var(--hca-teal); }
+.hca-household-list-edit { display: grid; }
+.hca-household-list-dialog { max-width: 490px; }
+.hca-household-list-dialog .hca-modal-kicker { text-transform: uppercase; }
+.hca-household-list-dialog .hca-modal-content { padding: 16px 18px; }
+.hca-household-management { margin: 0; padding: 0; list-style: none; }
+.hca-household-management li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--hca-line); }
+.hca-household-symbol { width: 33px; height: 33px; display: grid; place-items: center; background: #eff5f1; color: var(--hca-teal); border-radius: 9px; }
+.hca-household-personal { margin: 8px 0; font-size: 12px; }
+.hca-household-personal > summary { padding: 9px 0; cursor: pointer; color: var(--hca-muted); }

@@ -26,6 +26,7 @@ import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "@/components/
 import { DocumentCatalogueEmpty, DocumentOpeningFailure, DocumentOpeningPending, type OpeningFailure } from "@/components/documents/document-opening-status";
 import { CatalogueOpeningError, readWizardCatalogue } from "@/lib/client/wizard-catalogue";
 import { RecurringSelection } from "./recurring-selection";
+import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
 import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
 import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
@@ -82,6 +83,7 @@ function PatientRequisition({
   const [sourceReady, setSourceReady] = useState(!sourceId);
   const [sourceAttempt, setSourceAttempt] = useState(0);
   const [step, setStep] = useState(0);
+  const householdSelectionRef = useRef<HouseholdListSelectionHandle>(null);
   const [form, setForm] = useState<RequisitionFormData>({
     lines: [],
     extraItems: [],
@@ -547,15 +549,22 @@ function PatientRequisition({
     return <Notice>Seu acesso à requisição foi encerrado.</Notice>;
   if (issuedDocumentId)
     return <Notice>Requisição registrada. <ActionButton onClick={() => openIssued(issuedDocumentId)}>Abrir ficha</ActionButton></Notice>;
-  const selectionLibrary = (readonly = false) => <RecurringSelection key={context.userId+":"+context.patient!.id} userId={context.userId} patientId={context.patient!.id} catalogue={products} lines={form.lines}
-    disabled={readonly||saving||uncertain||loadingCatalog||Boolean(catalogError)||privateDraft.blocked||!may(context,"request")} canSave={may(context,"request")}
-    cataloguePending={loadingCatalog} catalogueError={catalogError} onRefresh={()=>{setLoadingCatalog(true);setCatalogAttempt(value=>value+1);}}
-    onApply={ids=>setForm(current=>{
+  function includeMaterials(ids: string[]) {
+    setForm(current => {
       const selection = applyMaterialSelection(current.lines,ids,products);
       const added = new Set(selection.added);
-      return { ...current, lines: selection.lines.map((line) =>
+      return { ...current, lines: selection.lines.map(line =>
         added.has(line.productId) ? { ...line, ...newStockObservation(line.productId) } : line) };
-    })}/>;
+    });
+    setDraftTouched(true);
+  }
+  const selectionLibrary = (readonly = false) => <details className="hca-household-personal">
+    <summary>Minhas listas pessoais</summary>
+    <RecurringSelection key={context.userId+":"+context.patient!.id} userId={context.userId} patientId={context.patient!.id} catalogue={products} lines={form.lines}
+    disabled={readonly||saving||uncertain||loadingCatalog||Boolean(catalogError)||privateDraft.blocked||!may(context,"request")} canSave={may(context,"request")}
+    cataloguePending={loadingCatalog} catalogueError={catalogError} onRefresh={()=>{setLoadingCatalog(true);setCatalogAttempt(value=>value+1);}}
+    onApply={includeMaterials}/>
+  </details>;
   if (
     !canWrite &&
     !uncertain &&
@@ -729,12 +738,17 @@ function PatientRequisition({
             }
             className="min-w-0"
           >
-            {step === 0 ? (
+            {step === 0 ? <>
               <Identity
                 name={context.patient!.display_name}
                 requesterName={context.fullName}
               />
-            ) : null}
+              <HouseholdListSelection ref={householdSelectionRef} key={context.userId + ":" + context.patient!.id}
+                userId={context.userId} patientId={context.patient!.id} kind="REQ"
+                catalogue={products} selectedIds={form.lines.map(line => line.productId)}
+                disabled={saving || uncertain || loadingCatalog || Boolean(catalogError) || privateDraft.blocked || !canWrite}
+                onApply={includeMaterials} />
+            </> : null}
             {step >= 1 && step <= 3 ? (
               <CatalogStep
                 context={context}
@@ -812,7 +826,7 @@ function PatientRequisition({
             }}
             onDraft={() => void privateDraft.save(draftContent)}
             onNext={() => {
-              if (validate()) setStep((value) => value + 1);
+              if (validate() && (step !== 0 || householdSelectionRef.current?.apply() !== false)) setStep((value) => value + 1);
             }}
             onFinish={() => { if (!issuanceFailure.reopen()) void submit(); }}
           />

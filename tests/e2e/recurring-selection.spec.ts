@@ -4,16 +4,24 @@ import {randomUUID} from "node:crypto";
 import {privateDraftFixture,reqContent,savePacket,draftContext,officialState,rpc,fixtures} from "../integration/private-draft-fixtures.mjs";
 import {fixturePassword} from "../../scripts/test-constants.mjs";
 import {sql,sqlLiteral} from "../../scripts/test-environment.mjs";
-import {selectContext} from "./auth-context";
 import {audit} from "./accessibility-audit";
 test.setTimeout(180000);
 test.afterEach(async({page})=>{await page.unrouteAll({behavior:"wait"});});
 const drawer=(page:Page)=>page.getByRole("dialog",{name:"Usar lista frequente",exact:true});
 const panel=(page:Page)=>lastDraftPanel(page);
 async function login(page:Page,patient:string){
- await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures.professional.email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);await page.goto("/fichas/req");await expect(page.getByRole("button", { name: "Salvar rascunho", exact: true }).or(panel(page)).first()).toBeVisible();await expect(panel(page).getByText("Consultando seu rascunho no servidor…",{exact:true})).toHaveCount(0);
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.professional.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  const context = await page.request.post("/api/context", { data: { careRecipientId: patient } });
+  expect(context.ok(), await context.text()).toBeTruthy();
+  await page.goto("/fichas/req");
+  await expect(page.getByRole("button", { name: "Salvar rascunho", exact: true }).or(panel(page)).first()).toBeVisible({ timeout: 30_000 });
+  await expect(panel(page).getByText("Consultando seu rascunho no servidor…", { exact: true })).toHaveCount(0);
 }
-async function open(page:Page){await page.getByRole("button",{name:"Usar lista frequente",exact:true}).click();await expect(drawer(page)).toBeVisible();await expect(drawer(page).getByText("Consultando suas listas neste paciente…",{exact:true})).toHaveCount(0);await expect(drawer(page).getByText("Atualizando disponibilidade dos materiais…",{exact:true})).toHaveCount(0);await expect(drawer(page).getByRole("combobox")).toBeVisible();}
+async function open(page:Page){const trigger=page.getByRole("button",{name:"Usar lista frequente",exact:true});if(!await trigger.isVisible())await page.getByText("Minhas listas pessoais",{exact:true}).click();await trigger.click();await expect(drawer(page)).toBeVisible();await expect(drawer(page).getByText("Consultando suas listas neste paciente…",{exact:true})).toHaveCount(0);await expect(drawer(page).getByText("Atualizando disponibilidade dos materiais…",{exact:true})).toHaveCount(0);await expect(drawer(page).getByRole("combobox")).toBeVisible();}
 async function choose(page:Page,name:string){const combo=drawer(page).getByRole("combobox");await combo.fill(name);await combo.press("ArrowDown");await expect(page.getByRole("option",{name,exact:true})).toBeVisible();await combo.press("Enter");await expect(drawer(page).getByRole("region",{name:"Materiais da lista escolhida",exact:true})).toBeVisible();}
 async function seeded(){const f=await privateDraftFixture(),content=reqContent(f);content.lines=f.products.slice(0,2).map((id:string,i:number)=>({...content.lines[0],productId:id,productName:`Material fictício V4 ${i}`,currentStock:"7",urgent:true,repeatReason:"Motivo antigo não reutilizável"}));const saved=await rpc(f.pro,"creation_draft_command",savePacket(f,"REQ",content));return {f,saved};}
 

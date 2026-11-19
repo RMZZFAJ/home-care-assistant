@@ -1,5 +1,34 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — listas frequentes da residência.** A primeira etapa de REQ, COM
+e ENT oferece seleção manual ou listas da casa. O bloco abre no próprio
+formulário. O diálogo Organizar listas permite criar e editar. Quando o
+preenchimento ainda está vazio, a criação abre a escolha dos materiais.
+
+- Na passagem para Materiais, o formulário reúne os itens elegíveis de
+  todas as listas marcadas. Materiais repetidos aparecem uma vez e os
+  campos já preenchidos mantêm seus valores. A lista guarda apenas os
+  materiais. Quantidades, estoque, urgência e justificativas vêm da
+  operação atual.
+- As listas pessoais existentes continuam acessíveis em Minhas listas
+  pessoais na REQ. Elas mantêm a visibilidade original. As listas criadas
+  no diálogo novo pertencem à residência e são compartilhadas conforme
+  as permissões de REQ, COM e ENT.
+- A revisão impede sobrescrever uma alteração concorrente. O salvamento
+  com resposta perdida recupera o mesmo comando. As seis integrações
+  com Auth real cobriram compartilhamento, isolamento, revisão,
+  recuperação e as listas pessoais.
+- A criação, edição, recuperação e aplicação passaram em Android e iOS
+  emulados, incluindo a entrada de ENT por Transferências. Também passaram
+  as duas regressões de listas pessoais em cada projeto. Na rodada
+  agrupada, o iOS encontrou um HTTP 503 no catálogo da COM. A rodada final
+  usou um perfil fictício exclusivo da residência, com o mesmo código
+  da aplicação e sem repetição automática. O bloco expandido e o diálogo
+  foram conferidos em 390 px.
+- A migration `20261119184524` foi aplicada na stack local sem reset. O
+  ensaio com rollback conferiu as 28 migrations pendentes e os grants.
+  O desenvolvimento segue em 272 versões até o preview compatível.
+
 **19/11 — troca de recebedor antes da conferência.** Em uma ENT expedida,
 o menu de ações abre a troca do E06-09. O diálogo mostra o recebedor atual,
 o horário da expedição, as pessoas elegíveis, o plantão atual e os próximos
