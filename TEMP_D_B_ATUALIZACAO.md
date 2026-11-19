@@ -1,5 +1,32 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — Materiais e fichas relacionadas.** REQ, COM, ENT e DEV usam a
+lista compacta da v7, com busca, contagens e filtro de situação. O painel
+separa estoque atual, movimentações e fichas relacionadas. Mantém os
+dados históricos das linhas, como estoque informado, saldos após
+entradas e quantidades declaradas e confirmadas.
+
+- A consulta usa a linha da ficha e confere o acesso por residência,
+  por tipo de documento e por custódia. A integração com Auth real
+  verificou o saldo atual, a observação de origem, a revogação de
+  acesso e a ausência de gravação oficial.
+- A abertura da ficha completa oferece Voltar ao painel. O retorno
+  restaura a consulta ligada, filtro, busca, aba, rolagem e foco da
+  ficha de origem.
+- A rodada final passou seis casos em Android e iOS emulados, sem
+  repetição automática. Cobriu a rolagem com abas e rodapé fixos, o
+  retorno da ficha completa, a revogação de leitura durante a consulta
+  e o modal de Andamentos. As regressões dirigidas cobriram também
+  entrada de compras, recebimento contado e saldos históricos.
+- A stack local chegou a 295 migrations até `20261119130945`. As 23
+  pendentes passaram pela pré-validação com rollback no desenvolvimento
+  remoto, que segue em 272. A aplicação deve acompanhar o preview
+  compatível. O preview em `075b4b66` ainda chama a rota legada de
+  arquivamento que o novo contrato fecha para novas gravações.
+- Permanecem pendentes o histórico das decisões sem movimentação e a
+  reutilização do painel nas consultas durante o preenchimento e no
+  estoque.
+
 **19/11 — avisos no PDF inicial de emissão.** A etapa de avisos usa o
 mesmo processamento e as permissões do worker. A consulta durante a
 emissão seleciona somente avisos próprios da ficha e da ciência tácita

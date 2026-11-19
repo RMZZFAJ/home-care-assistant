@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Locator } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { purchaseBalanceFixture, purchaseBalanceArrival, purchaseBalanceCommand, otherPurchaseEntry, purchaseBalanceFacts } from "../integration/purchase-entry-balance-fixtures.mjs";
@@ -23,9 +23,14 @@ test("COM shows each material's last validated family balance, distinct parcels 
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, f.patient); await page.goto("/fichas/" + f.document.id);
   await selectDocumentSection(page, "materials");
-  const table = page.getByRole("table", { name: "Materiais da compra ou doação", exact: true });
-  const row = (id: string) => table.locator('[data-material-line-id="' + id + '"]');
-  const balance = (id: string) => row(id).locator('[data-label="Saldo após última entrada"]');
+  const list = page.getByRole("list", { name: "Materiais da compra ou doação", exact: true });
+  const row = (id: string) => list.locator('[data-material-line-id="' + id + '"]');
+  async function withBalance(id: string, check: (balance: Locator, panel: Locator) => Promise<void>) {
+    await row(id).getByRole("button", { name: /^Detalhes de / }).click();
+    const panel = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Estoque atual", exact: true }) });
+    await check(panel.locator('[data-material-fact="Saldo após última entrada"] dd'), panel);
+    await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  }
   const refresh = page.getByRole("button", { name: "Atualizar ficha", exact: true });
   async function refreshCopy(expectedVersion?: number) {
     await expect(refresh).toBeEnabled();
@@ -39,11 +44,11 @@ test("COM shows each material's last validated family balance, distinct parcels 
     await refresh.press("Enter"); await read;
     await expect(refresh).toHaveAttribute("aria-busy", "false");
   }
-  await expect(balance(a.id)).toHaveText("Sem entrada validada");
-  await expect(balance(b.id)).toHaveText("Sem entrada validada");
+  await withBalance(a.id, balance => expect(balance).toHaveText("Sem entrada validada"));
+  await withBalance(b.id, balance => expect(balance).toHaveText("Sem entrada validada"));
   const arrival = await purchaseBalanceArrival(f, f.document, [{ lineId: a.id, quantity: "2" }, { lineId: b.id, quantity: "4" }]);
   await refreshCopy();
-  await expect(balance(a.id)).toHaveText("Sem entrada validada");
+  await withBalance(a.id, balance => expect(balance).toHaveText("Sem entrada validada"));
   const first = await purchaseBalanceCommand(f.admin, arrival.document, "validate_receipt", { receiptId: arrival.receipt.id });
   await otherPurchaseEntry(f, "5");
   const later = await purchaseBalanceArrival(f, first, [{ lineId: a.id, quantity: "1" }], f.admin);
@@ -68,17 +73,21 @@ test("COM shows each material's last validated family balance, distinct parcels 
     await backgroundRead;
     await expect(refresh).toHaveAttribute("aria-busy", "true");
     await expect(refresh).toBeEnabled();
-    await expect(balance(a.id)).toHaveText("Sem entrada validada");
+    await withBalance(a.id, balance => expect(balance).toHaveText("Sem entrada validada"));
     await refreshCopy(later.document.version);
   } finally { release(); await page.unroute(target); }
-  await expect(balance(a.id).locator("strong")).toHaveText("38 unidade");
-  await expect(balance(b.id).locator("strong")).toHaveText("34 unidade");
-  await expect(row(a.id).locator('[data-label="Validado"]')).toHaveText("3 unidade");
-  await expect(row(b.id).locator('[data-label="Validado"]')).toHaveText("4 unidade");
-  await expect(balance(a.id)).toContainText("Parcela 2 · entrada de 1 unidade");
-  await expect(balance(b.id)).toContainText("Parcela 1 · entrada de 4 unidade");
-  await expect(balance(a.id)).toContainText(formatBrazilDate(later.receipt.validated_at));
-  await expect(balance(b.id)).toContainText(formatBrazilDate(first.receipts.find((receipt: { id: string }) => receipt.id === arrival.receipt.id).validated_at));
+  await withBalance(a.id, async (balance, panel) => {
+    await expect(balance.locator("strong")).toHaveText("38 unidade");
+    await expect(panel.locator('[data-material-fact="Validado"] dd')).toHaveText("3 unidade");
+    await expect(balance).toContainText("Parcela 2 · entrada de 1 unidade");
+    await expect(balance).toContainText(formatBrazilDate(later.receipt.validated_at));
+  });
+  await withBalance(b.id, async (balance, panel) => {
+    await expect(balance.locator("strong")).toHaveText("34 unidade");
+    await expect(panel.locator('[data-material-fact="Validado"] dd')).toHaveText("4 unidade");
+    await expect(balance).toContainText("Parcela 1 · entrada de 4 unidade");
+    await expect(balance).toContainText(formatBrazilDate(first.receipts.find((receipt: { id: string }) => receipt.id === arrival.receipt.id).validated_at));
+  });
   for (const width of [1440, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 940 });
     const header = await page.locator(".app-header").evaluate(element => {
@@ -91,7 +100,7 @@ test("COM shows each material's last validated family balance, distinct parcels 
     await info.attach("com-header-" + width, { body: await page.locator(".app-header").screenshot({ animations: "disabled" }), contentType: "image/png" });
   }
   mkdirSync("output/playwright/phase-d", { recursive: true });
-  await table.screenshot({ path: "output/playwright/phase-d/com-entry-balances-" + info.project.name + ".png", animations: "disabled" });
+  await list.screenshot({ path: "output/playwright/phase-d/com-entry-balances-" + info.project.name + ".png", animations: "disabled" });
   await selectDocumentSection(page, "workflow");
   const parcels = page.getByRole("region", { name: "Parcelas de chegada", exact: true });
   await expect(parcels.getByRole("heading", { name: "Parcela 1 · Validada", exact: true })).toBeVisible();
@@ -103,7 +112,8 @@ test("COM shows each material's last validated family balance, distinct parcels 
   sql("insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(" + q(f.patient) + "," + q(fixtures.family.id) + ",'stock.family.read',false)");
   await selectDocumentSection(page, "materials");
   await refreshCopy();
-  await expect(balance(a.id)).toContainText("Acesso restrito"); await expect(balance(b.id)).toContainText("Acesso restrito");
+  await withBalance(a.id, balance => expect(balance).toContainText("Acesso restrito"));
+  await withBalance(b.id, balance => expect(balance).toContainText("Acesso restrito"));
   expect((await page.request.get(pdf.url())).status()).toBe(403);
   await page.route(target, async route => {
     if (route.request().method() !== "GET") return route.continue();
@@ -113,9 +123,9 @@ test("COM shows each material's last validated family balance, distinct parcels 
   });
   await refreshCopy();
   await expect(page.getByRole("tabpanel", { name: "Materiais", exact: true }).getByRole("alert")).toContainText("Não foi possível conferir o saldo das entradas");
-  await expect(balance(a.id)).toHaveText("Saldo não conferido");
+  await withBalance(a.id, balance => expect(balance).toHaveText("Saldo não conferido"));
   await page.unrouteAll({ behavior: "wait" });
   await refreshCopy();
-  await expect(balance(a.id)).toContainText("Acesso restrito");
+  await withBalance(a.id, balance => expect(balance).toContainText("Acesso restrito"));
   expect(purchaseBalanceFacts(f)).toBe(before); expect(writes).toEqual([]);
 });

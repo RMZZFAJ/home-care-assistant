@@ -86,7 +86,7 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
   } finally { await reference.close(); }
 });
 
-for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials retain every fact with canonical responsive table and reversible search`, async ({ page, browser }, info) => {
+for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials follow the v7 compact list with reversible search`, async ({ page }, info) => {
   const names = ["Material detalhado " + "com nome extenso ".repeat(6) + randomUUID().slice(0, 8), "Outro material " + randomUUID().slice(0, 8)];
   const f = await setup({ catalogue: names.map(name => ({ name, category: "medicamentos", unit: "unidade", aliases: [] })) });
   const doc = type === "REQ" ? await issue(f.patient, f.products) : await rpc(f.admin, "create_supply_document", {
@@ -96,33 +96,22 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials retain 
   await login(page, f.patient, "family");
   await page.goto(type === "REQ" ? "/historico/" + doc.id : "/documentos/" + doc.id);
   await selectDocumentSection(page, "materials");
-  const table = page.getByRole("table", { name: type === "REQ" ? "Materiais requisitados" : "Materiais da compra ou doação", exact: true });
-  await expect(table.locator("tbody tr")).toHaveCount(2);
-  const ids = await table.locator("tbody tr").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
+  const list = page.getByRole("list", { name: type === "REQ" ? "Materiais requisitados" : "Materiais da compra ou doação", exact: true });
+  const items = list.getByRole("listitem");
+  await expect(items).toHaveCount(2);
+  const ids = await items.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
   const before = facts(f.patient), writes: string[] = [];
   page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !isDocumentAccessReport(request)) writes.push(request.url()); });
-  const reference = await browser.newContext();
-  try {
-    const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
-    await model.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href);
-    await model.locator("#product-app").getByRole("tab", { name: /^Materiais/ }).click();
-    const modelTable = model.locator("#product-app .doc-table-wrap").first();
-    await expect(modelTable).toBeVisible();
-    for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 });
-      for (const property of ["border-radius", "background-color", "border-color"] as const) {
-        const expected = await modelTable.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property);
-        await expect(table.locator("..")).toHaveCSS(property, expected);
-      }
-      if (type === "REQ") await expect(table.locator("thead th")).toHaveText(["Material", "Estoque observado", "Status de atendimento do item"]);
-      const row = table.locator("tbody tr").first(), modelRow = modelTable.locator("tbody tr").first();
-      for (const property of ["display", "padding-left", "padding-top", "gap"] as const) {
-        const expected = await modelRow.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property);
-        await expect(row).toHaveCSS(property, expected);
-      }
-      await expect(table.getByText(names[0], { exact: true })).toBeVisible();
-      await expect(table.getByText(names[1], { exact: true })).toBeVisible();
-      await expect(table.locator("tbody td")).toHaveCount(type === "REQ" ? 6 : 20);
+  {
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      const row = items.first().getByRole("button");
+      await expect(row).toHaveCSS("display", "grid");
+      await expect(row).toHaveCSS("padding-left", "15px");
+      await expect(row).toHaveCSS("padding-top", "12px");
+      await expect(list.getByText(names[0], { exact: true })).toBeVisible();
+      await expect(list.getByText(names[1], { exact: true })).toBeVisible();
+      await expect(row.locator(".hca-v7-material-facts > span")).toHaveCount(type === "REQ" ? 2 : 4);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await auditFromTop(page, `canonical ${type} materials ${width}`);
       if (width === 320) {
@@ -133,29 +122,21 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials retain 
       }
     }
     const search = page.getByRole("searchbox", { name: "Pesquisar material", exact: true });
-    await search.fill("OUTRO--MATERIAL"); await expect(table.locator("tbody tr")).toHaveCount(1);
-    await expect(table).toContainText(names[1]);
-    await search.fill("Sem correspondência fictícia"); await expect(table).toHaveCount(0);
-    const clear = page.getByRole("button", { name: "Limpar busca de materiais", exact: true });
-    await clear.focus(); await clear.press("Enter"); await expect(table.locator("tbody tr")).toHaveCount(2);
-    expect(await table.locator("tbody tr").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")))).toEqual(ids);
-    const scroll = page.getByRole("region", { name: /rolagem horizontal quando necessária/ });
-    if (await scroll.evaluate(node => node.scrollWidth > node.clientWidth)) {
-      await expect(scroll).toHaveAttribute("tabindex", "0");
-      await scroll.focus();
-      await expect(scroll).toBeFocused();
-      await scroll.press("ArrowRight");
-      await expect.poll(() => scroll.evaluate(node => node.scrollLeft)).toBeGreaterThan(0);
-    } else await expect(scroll).not.toHaveAttribute("tabindex", "0");
+    await search.fill("OUTRO--MATERIAL"); await expect(items).toHaveCount(1);
+    await expect(list).toContainText(names[1]);
+    await search.fill("Sem correspondência fictícia"); await expect(list).toHaveCount(0);
+    const clear = page.getByRole("button", { name: "Limpar busca", exact: true });
+    await clear.focus(); await clear.press("Enter"); await expect(items).toHaveCount(2);
+    expect(await items.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")))).toEqual(ids);
     await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
     expect(await page.evaluate(() => matchMedia("(forced-colors: active)").matches && matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(true);
     await auditFromTop(page, `canonical ${type} forced colors and reduced motion`);
     await page.emulateMedia({ forcedColors: "none", reducedMotion: "no-preference" });
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.evaluate(() => { document.documentElement.style.zoom = "2"; });
-    await expect(search).toBeVisible(); await expect(table.getByText(names[0], { exact: true })).toBeVisible();
+    await expect(search).toBeVisible(); await expect(list.getByText(names[0], { exact: true })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.evaluate(() => { document.documentElement.style.zoom = ""; });
     expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
-  } finally { await reference.close(); }
+  }
 });

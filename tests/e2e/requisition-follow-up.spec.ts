@@ -66,17 +66,20 @@ test("REQ follow-up reaches pending ENT and partial fulfillment; stale reads and
   await nextStep.focus();
   await nextStep.press("Enter");
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
-  const material = overview(page).getByRole("table", { name: "Materiais requisitados", exact: true }).getByRole("row").filter({ hasText: "Material fictício V4 0" });
-  await expect(material).toContainText("Pendente");
-  await expect(material).toContainText("Aguardando recebimento");
-  await expect(material).toContainText("Quantidade aceita para este item: 0 unidade");
-  const linked = material.getByRole("button", { name: ent.code, exact: true });
+  const material = overview(page).getByRole("button", { name: /^Detalhes de Material fictício V4 0/ });
+  await expect(material).toContainText("Em aberto");
+  await material.click();
+  const drawer = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
+  await expect(drawer).toContainText("Aguardando recebimento");
+  await expect(drawer).toContainText("Quantidade aceita para este item: 0 unidade");
+  const linked = drawer.getByRole("button", { name: ent.code, exact: true });
   await linked.click();
   let dialog = page.getByRole("dialog", { name: ent.code, exact: true });
   await expect(dialog).toContainText("Material fictício V4 0");
   await dialog.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(linked).toBeFocused();
+  await drawer.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   expect(facts(f.patient)).toBe(before);
 
   await rpc(await actor("professional", f.patient), "supply_document_command", {
@@ -102,7 +105,8 @@ test("REQ follow-up reaches pending ENT and partial fulfillment; stale reads and
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("1 de 2 itens permanecem em aberto");
   await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Materiais e atendimento", exact: true }).click();
   await expect(material).toContainText("Atendido");
-  await expect(material).toContainText("Quantidade aceita para este item: 10 unidade");
+  await material.click();
+  await expect(drawer).toContainText("Quantidade aceita para este item: 10 unidade");
 
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
     values(${q(f.patient)},${q(fixtures.family.id)},'ent.read',false);`);
@@ -110,6 +114,13 @@ test("REQ follow-up reaches pending ENT and partial fulfillment; stale reads and
   dialog = page.getByRole("dialog", { name: ent.code, exact: true });
   await expect(dialog.getByRole("alert")).toBeVisible();
   await expect(dialog.getByText("Material fictício V4 0", { exact: false })).toHaveCount(0);
+  const materialRead = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname === `/api/documents/${req.id}/materials` && url.searchParams.has("line");
+  });
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  expect((await materialRead).ok()).toBe(true);
+  await expect(dialog.getByRole("alert")).toBeVisible();
   await dialog.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
   await expect(linked).toBeFocused();
   expect(writes).toEqual([]);

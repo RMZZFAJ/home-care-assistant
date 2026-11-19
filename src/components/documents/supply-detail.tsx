@@ -1222,7 +1222,7 @@ export function SupplyDocumentContent({
               </section> : null}
               {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} readOnly={archived} onReviewed={() => setAttempt(value => value + 1)} /> : null}
               <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>
-                {data.type === "COM" ? <PurchaseMaterials data={data} /> : data.type === "ENT" ? <DeliveryMaterials data={data} /> : <>
+                {data.type === "COM" ? <PurchaseMaterials data={data} active={tabs.value === "materials"} /> : data.type === "ENT" ? <DeliveryMaterials data={data} active={tabs.value === "materials"} /> : <>
                   <h2 className="font-semibold">Produtos e quantidades</h2>
                   <div className="mt-4 space-y-3">
                     {data.lines.map((line) => (

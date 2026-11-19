@@ -93,9 +93,12 @@ test("ENT confere falta e excedente na mesma ficha e recupera confirmação sem 
   const after = JSON.parse(transferState(f));
   expect(after.ledger).toHaveLength(before.ledger.length + 2);
   await selectDocumentSection(page, "materials");
-  const table = page.getByRole("table", { name: "Materiais da entrega ou transferência", exact: true });
-  await expect(table.getByRole("columnheader", { name: "Recebido declarado" })).toBeAttached();
-  await expect(table.getByRole("columnheader", { name: "Excedente em apuração" })).toBeAttached();
+  const materials = page.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
+  await materials.getByRole("button", { name: "Detalhes de Material fictício V4 1", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "Material fictício V4 1", exact: true });
+  await expect(panel.getByText("Recebido declarado", { exact: true })).toBeVisible();
+  await expect(panel.getByText("Excedente em apuração", { exact: true })).toBeVisible();
+  await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await expect(page.getByText(receiptNote, { exact: true })).toBeVisible();
   const pdf = await generatedPdf(page, "/api/documents/" + sent.id + "/pdf");
   expect(pdf.ok(), await pdf.text()).toBe(true);

@@ -267,14 +267,9 @@ test("P05 proposta e conferência independentes preservam autoria, recuperam o m
       // Start each responsive inspection at the document's reading origin;
       // focus restoration may have left earlier controls at the sticky edge.
       await test.step("Auditar composição P05 " + width, () => auditFromTop(family, "regularizacao-resultado-" + width));
-      const materials = family.getByRole("region", { name: "Materiais da entrega ou transferência; rolagem horizontal quando necessária", exact: true });
-      if (await materials.evaluate(element => element.scrollWidth > element.clientWidth)) {
-        await expect(materials).toHaveAttribute("tabindex", "0");
-        await materials.focus();await expect(materials).toBeFocused();
-        const scrollBefore = await materials.evaluate(element => element.scrollLeft);
-        await materials.press(scrollBefore > 0 ? "ArrowLeft" : "ArrowRight");
-        await expect.poll(() => materials.evaluate(element => element.scrollLeft)).not.toBe(scrollBefore);
-      }
+      const materials = family.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
+      await expect(materials.getByRole("button", { name: /^Detalhes de / }).first()).toBeEnabled();
+      expect(await materials.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
     }
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await family.screenshot({

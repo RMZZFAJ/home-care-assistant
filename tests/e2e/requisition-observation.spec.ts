@@ -391,11 +391,14 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
     "Não informado",
   ])
     await expect(page.getByText(fact, { exact: false }).first()).toBeVisible();
-  await expect(
-    page.getByText("Registro no rascunho (horário do dispositivo):", {
-      exact: false,
-    }).filter({ visible: true }),
-  ).toHaveCount(4);
+  const materials = page.getByRole("list", { name: "Materiais requisitados", exact: true }).getByRole("button", { name: /^Detalhes de / });
+  await expect(materials).toHaveCount(4);
+  for (const material of await materials.all()) {
+    await material.click();
+    const panel = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Em acompanhamento nesta ficha", exact: true }) });
+    await expect(panel.getByText("Registro no rascunho (horário do dispositivo):", { exact: false }).first()).toBeVisible();
+    await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  }
   const pdf = await generatedPdf(
     page,
     `/api/documents/${receipt.requisitionId}/pdf`,

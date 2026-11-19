@@ -44,10 +44,15 @@ export function RelatedDocument({
         )}
       </button>
       {open ? <Dialog open title={label} onClose={close}>
-        {type === "REQ" ? <RequisitionOpening id={id} withinDialog onCancel={close}><RelatedContent id={id} type={type} /></RequisitionOpening> : <RelatedSupplyContent key={id + type} id={id} type={type} />}
+        <RelatedDocumentBody id={id} type={type} onClose={close} />
       </Dialog> : null}
     </>
   );
+}
+export function RelatedDocumentBody({ id, type, onClose }: { id: string; type: DocumentType; onClose: () => void }) {
+  return type === "REQ"
+    ? <RequisitionOpening id={id} withinDialog onCancel={onClose}><RelatedContent id={id} type={type} /></RequisitionOpening>
+    : <RelatedSupplyContent key={id + type} id={id} type={type} />;
 }
 function RelatedSupplyContent({ id, type }: { id: string; type: SupplyType }) {
   const decode = useCallback((value: unknown) => parseRelatedSupplyRead(value, id, type), [id, type]);

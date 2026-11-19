@@ -9,7 +9,7 @@ import { DocumentArchiveActions, DocumentArchiveDialog, type ArchiveDialogMode }
 import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
 import { RequisitionScienceAction } from "./requisition-science-action";
 import { DocumentCommunications } from "@/components/notifications/document-communications";
-import { DocumentMaterialsTable } from "@/components/documents/document-materials-table";
+import { DocumentMaterialList } from "@/components/documents/document-material-list";
 import { DocumentFreshness } from "@/components/documents/document-freshness";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import { roleLabel } from "@/components/layout/workspace-context";
@@ -618,53 +618,33 @@ export function RequisitionDocumentContent({
           </section>
 
           <section className="hca-materials-section">
-            <DocumentMaterialsTable key={data.id} label="Materiais requisitados" heading={<><h2>Materiais e atendimento</h2><p>Estoque observado e avaliação de atendimento são fatos distintos. A requisição não tem quantidade solicitada.</p></>}
-              filters={[{ id: "all", label: "Todos" }, { id: "urgent", label: "Urgentes" }, { id: "pending", label: "Pendentes" }, { id: "fulfilled", label: "Atendidos" }, { id: "routine", label: "Rotina" }]}
-              columns={[{ id: "material", label: "Material" }, { id: "stock", label: "Estoque observado" }, { id: "fulfillment", label: "Status de atendimento do item" }]}
+            <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
+              revision={String(p.version)} active={tabs.value === "materials"} label="Materiais requisitados" settledLabel="Supridos"
+              today={{ location: "family", label: "Família hoje" }}
+              heading={<><h2>Materiais e atendimento</h2><p>Estoque observado e avaliação de atendimento têm registros próprios.</p></>}
               rows={data.requisition_items.map((item) => {
                 const line = f.lines.find((row) => row.id === item.id);
                 const name = item.product_name_snapshot ?? item.custom_name ?? "Nome não preservado no registro";
+                const status = data.is_historical ? "Não apurado no original" : line?.attended ? "Atendido"
+                  : line?.serviceStatus === "partial" ? "Parcialmente atendido"
+                    : line?.serviceStatus === "review_required" ? "Nova avaliação familiar pendente"
+                      : ["cancelled", "archived"].includes(documentState) ? "Sem atendimento confirmado" : "Em aberto";
                 return {
-                  id: item.id, searchText: name, urgent: item.urgent, filters: [item.urgent ? "urgent" : "routine", line?.attended ? "fulfilled" : "pending"], cells: {
-                    material: <><strong>{name}</strong>{item.urgent ? <span className="sr-only">Urgente</span> : null}<small>{item.unit_snapshot}</small></>,
-                    stock: <>{formatStockObservation(item.current_stock, item.stock_observation, item.unit_snapshot)}<small>{formatStockObservationTime(item.stock_observation_at, item.stock_observation_time_source)}</small></>,
-                    fulfillment: <div className="space-y-2">
-                      <span
-                        className={
-                          "ui-badge ui-badge-" +
-                          (data.is_historical ? "neutral" : line?.attended ? "success" : "pending")
-                        }
-                      >
-                        {data.is_historical
-                          ? "Não apurado no original"
-                          : line?.attended
-                            ? "Atendido"
-                            : line?.serviceStatus === "partial"
-                              ? "Parcialmente atendido"
-                              : line?.serviceStatus === "review_required"
-                                ? "Recebimento divergente · aguardando nova avaliação familiar"
-                                : ["cancelled", "archived"].includes(documentState)
-                                  ? "Sem atendimento confirmado"
-                                  : "Pendente"}
-                      </span>
-                      {requisitionDeliveries(line?.deliveries ?? []).map((delivery) => (
-                        <div key={delivery.id}>
-                          <RelatedDocument
-                            id={delivery.id}
-                            type="ENT"
-                            label={delivery.code ?? "ENT em preparação"}
-                          />
-                          <p className="text-xs text-(--muted)">
-                            {documentStatusLabel(delivery.status)} ·{" "}
-                            {delivery.acceptedQuantity === null
-                              ? "Quantidade aceita não informada"
-                              : `Quantidade aceita para este item: ${formatQuantity(delivery.acceptedQuantity, item.unit_snapshot)}`}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                    ,
-                  }
+                  id: item.id, name, unit: item.unit_snapshot ?? null, urgent: item.urgent, done: Boolean(line?.attended),
+                  status, tone: data.is_historical ? "neutral" : line?.attended ? "success" : "pending",
+                  facts: [{ label: "Informado na REQ", value: formatStockObservation(item.current_stock, item.stock_observation, item.unit_snapshot) }],
+                  detail: <div className="space-y-2">
+                      <p>{status}</p>
+                      <p>{formatStockObservationTime(item.stock_observation_at, item.stock_observation_time_source)}</p>
+                    </div>,
+                  related: requisitionDeliveries(line?.deliveries ?? []).map(delivery => ({
+                    document: { id: delivery.id, type: "ENT", code: delivery.code ?? "ENT em preparação" },
+                    detail: <>
+                      {documentStatusLabel(delivery.status)} ·{" "}
+                      {delivery.acceptedQuantity === null ? "Quantidade aceita não informada"
+                        : `Quantidade aceita para este item: ${formatQuantity(delivery.acceptedQuantity, item.unit_snapshot)}`}
+                    </>,
+                  })),
                 };
               })} />
           </section>

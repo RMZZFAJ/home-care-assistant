@@ -96,48 +96,43 @@ test("06.2 ENT selection and complete readonly review follow the model without s
   } finally { await ref.context.close(); }
 });
 
-test("06.2 dispatched ENT preserves five independent material fields and reversible canonical search", async ({ page, browser }, info) => {
+test("06.2 dispatched ENT preserves its material facts and reversible v7 search", async ({ page }, info) => {
   const names = ["Material expedido " + "com nome extenso ".repeat(6) + randomUUID().slice(0, 8), "Outro material " + randomUUID().slice(0, 8)];
   const f = await setup({ catalogue: names.map(name => ({ name, category: "medicamentos", unit: "unidade", aliases: [] })) });
   const doc = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Escolha manual fictícia para conferência da composição", lines: f.products.map(productId => ({ productId, quantity: "7" })) } });
   await login(page, f.patient); await page.goto("/documentos/" + doc.id); await selectDocumentSection(page, "materials");
-  const table = page.getByRole("table", { name: "Materiais da entrega ou transferência", exact: true });
-  await expect(table.locator("tbody tr")).toHaveCount(2); await expect(table.locator("tbody td")).toHaveCount(10);
-  const first = table.locator("tbody tr").filter({ has: page.getByText(names[0], { exact: true }) });
-  for (const [label, value] of [["Expedido", "7 unidade"], ["Aceito", "0 unidade"], ["Conciliado", "0 unidade"], ["Quantidade pendente", "7 unidade"]]) await expect(first.locator(`td[data-label="${label}"]`)).toContainText(value);
-  const before = facts(f.patient), writes = watchWrites(page, true), ids = await table.locator("tbody tr").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
-  const ref = await reference(browser, "l1:/ficha/ENT-0001");
-  try {
-    const model = ref.page.locator("#product-app .doc-table-card").first(); await expect(model).toBeVisible();
-    for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await ref.page.setViewportSize({ width, height: 900 });
-      for (const property of ["border-radius", "border-color", "background-color"] as const) await expect(page.locator(".hca-document-materials .doc-table-card")).toHaveCSS(property, await model.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
-      for (const property of ["display", "padding-left", "padding-top", "gap"] as const) await expect(first).toHaveCSS(property, await model.locator("tbody tr").first().evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
-      const scroll = table.locator("..");
-      const overflows = await scroll.evaluate(node => node.scrollWidth > node.clientWidth);
-      if (overflows) {
-        await expect(scroll).toHaveAttribute("tabindex", "0");
-        await scroll.focus();
-        await scroll.press("Home");
-        await scroll.evaluate(node => { node.scrollLeft = 0; });
-        await scroll.press("ArrowRight");
-        await expect.poll(() => scroll.evaluate(node => node.scrollLeft)).toBeGreaterThan(0);
-        await scroll.evaluate(node => { node.scrollLeft = 0; });
-      } else await expect(scroll).not.toHaveAttribute("tabindex", "0");
+  const list = page.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
+  const items = list.getByRole("listitem");
+  await expect(items).toHaveCount(2);
+  const first = list.getByRole("button", { name: "Detalhes de " + names[0], exact: true });
+  const before = facts(f.patient), writes = watchWrites(page, true), ids = await items.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
+  await first.click();
+  const panel = page.getByRole("dialog", { name: names[0], exact: true });
+  for (const [label, value] of [["Expedido", "7 unidade"], ["Recebido", "0 unidade"], ["Conciliado", "0 unidade"], ["Em trânsito", "7 unidade"]])
+    await expect(panel.locator(`[data-material-fact="${label}"] dd`)).toHaveText(value);
+  await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(first).toBeFocused();
+  {
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect(first).toHaveCSS("display", "grid");
+      await expect(first).toHaveCSS("padding-left", "15px");
+      expect(await list.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
       await auditFromTop(page, "canonical dispatched ENT " + width);
       if (width === 320) {
         mkdirSync("output/playwright/phase-d", { recursive: true });
         await captureVisible(first, `output/playwright/phase-d/ent-materials-first-${info.project.name}.png`);
-        await captureVisible(table.locator("tbody tr").last(), `output/playwright/phase-d/ent-materials-last-${info.project.name}.png`);
+        await captureVisible(items.last(), `output/playwright/phase-d/ent-materials-last-${info.project.name}.png`);
       }
     }
     const search = page.getByRole("searchbox", { name: "Pesquisar material", exact: true });
-    await search.fill("OUTRO--MATERIAL"); await expect(table.locator("tbody tr")).toHaveCount(1);
-    await search.fill("Sem correspondência fictícia"); await expect(table).toHaveCount(0);
-    const clear = page.getByRole("button", { name: "Limpar busca de materiais", exact: true }); await clear.focus(); await clear.press("Enter");
-    expect(await table.locator("tbody tr").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")))).toEqual(ids);
+    await search.fill("OUTRO--MATERIAL"); await expect(items).toHaveCount(1);
+    await search.fill("Sem correspondência fictícia"); await expect(list).toHaveCount(0);
+    const clear = page.getByRole("button", { name: "Limpar busca", exact: true }); await clear.focus(); await clear.press("Enter");
+    await expect(items).toHaveCount(2);
+    expect(await items.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")))).toEqual(ids);
     expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
-  } finally { await ref.context.close(); }
+  }
 });
 
 test("06.2 autonomous return declaration never presents declared quantities as shipped or received", async ({ page, browser }) => {
@@ -145,9 +140,9 @@ test("06.2 autonomous return declaration never presents declared quantities as s
   expect(created.response.error).toBeNull(); const doc = created.response.data;
   expect(doc.transfer.originDocumentId).toBeNull(); expect(doc.protocol).toBeNull();
   await login(page, f.patient); await page.goto("/documentos/" + doc.id); await selectDocumentSection(page, "materials");
-  const table = page.getByRole("table", { name: "Materiais da entrega ou transferência", exact: true });
-  await expect(table.locator("tbody tr")).toHaveCount(1); await expect(table.locator("tbody td")).toHaveCount(2);
-  await expect(page.getByText("Expedido", { exact: true })).toHaveCount(0); await expect(table).toContainText("5 unidade");
+  const list = page.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
+  await expect(list.getByRole("listitem")).toHaveCount(1);
+  await expect(list.getByText("Expedido", { exact: true })).toHaveCount(0); await expect(list).toContainText("5 unidade");
   const before = facts(f.patient), writes = watchWrites(page);
   await selectDocumentSection(page, "workflow");
   const region = page.getByRole("region", { name: "Expedição e histórico da transferência", exact: true }), grid = region.locator(".hca-definition-grid").first();

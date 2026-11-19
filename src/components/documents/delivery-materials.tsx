@@ -1,35 +1,50 @@
 "use client";
-import { DocumentMaterialsTable } from "./document-materials-table";
+
+import { DocumentMaterialList } from "./document-material-list";
 import { formatQuantity, quantity } from "@/lib/quantity";
+import { formatBrazilDate } from "@/lib/receipt";
 import { readPresentationConversions, presentationCaption } from "@/lib/presentation-conversion";
 import type { SupplyDocument } from "@/types/documents";
 import { readCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
 
-const declaredColumns = [{ id: "material", label: "Material" }, { id: "declared", label: "Declarado" }];
-const dispatchedColumns = [{ id: "material", label: "Material" }, { id: "declared", label: "Expedido" }, { id: "accepted", label: "Aceito" }, { id: "reconciled", label: "Conciliado" }, { id: "pending", label: "Quantidade pendente" }];
-
-export function DeliveryMaterials({ data }: { data: SupplyDocument; }) {
+export function DeliveryMaterials({ data, active }: { data: SupplyDocument; active: boolean }) {
   const declarationOnly = Boolean(data.transfer && data.transfer.state !== "dispatched");
-  const counted = data.lines.some(line => Boolean(readCountedDeliveryReceipt(line.metadata)));
-  const columns = counted ? [
-    { id: "material", label: "Material" }, { id: "declared", label: "Expedido" },
-    { id: "received", label: "Recebido declarado" }, { id: "accepted", label: "Reconhecido" },
-    { id: "reconciled", label: "Conciliado" }, { id: "pending", label: "Em trânsito" },
-    { id: "excess", label: "Excedente em apuração" },
-  ] : dispatchedColumns;
-  const notes = counted && typeof data.workflow_data.receiptNotes === "string" ? data.workflow_data.receiptNotes.trim() : "";
-  return <DocumentMaterialsTable key={data.id} label="Materiais da entrega ou transferência" heading={<><h2>Produtos e quantidades</h2><p>{declarationOnly ? "Quantidade da declaração preservada, sem expedição ou recebimento nesta transferência." : "Expedição, aceite pessoal e conciliação são fatos separados. Consulte o resultado de cada linha."}</p>{notes ? <div><strong>Observação do recebedor</strong><p className="whitespace-pre-wrap">{notes}</p></div> : null}</>} columns={declarationOnly ? declaredColumns : columns}
+  const notes = typeof data.workflow_data.receiptNotes === "string" ? data.workflow_data.receiptNotes.trim() : "";
+  const familyDestination = data.kind === "DEV" || data.payload.destination === "FAMILY";
+  return <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
+    revision={String(data.version)} active={active} label="Materiais da entrega ou transferência" settledLabel="Conferidos"
+    today={familyDestination ? { location: "family", label: "Família hoje" } : { location: "team", label: "Equipe hoje" }}
+    heading={<><h2>Produtos e quantidades</h2><p>{declarationOnly ? "Materiais declarados para expedição." : "Expedição, aceite pessoal e conciliação têm registros próprios."}</p>
+      {notes ? <><strong>Observação do recebedor</strong><p className="whitespace-pre-wrap">{notes}</p></> : null}</>}
     rows={data.lines.map(line => {
       const receipt = readCountedDeliveryReceipt(line.metadata);
-      return ({
-      id: line.id, searchText: line.name_snapshot, cells: {
-        material: <><strong>{line.name_snapshot}</strong><small>{line.unit_snapshot}</small>{readPresentationConversions(line.presentation_conversions).map(row => <small key={row.id}>{presentationCaption(row)}</small>)}{line.requisitionItemIds.length ? <small>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</small> : null}{line.family_fulfillment ? <small><strong>Avaliação familiar: {line.family_fulfillment === "partial" ? "atendimento parcial" : "atendimento completo"}</strong> · {line.fulfillment_decided_name} · {line.fulfillment_decided_at ? new Date(line.fulfillment_decided_at).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }) : "Instante não disponível"}. Confirmar recebimento conserva esta avaliação.</small> : null}</>,
-        declared: formatQuantity(line.quantity, line.unit_snapshot),
-        received: formatQuantity(receipt?.receivedQuantity, line.unit_snapshot),
-        accepted: formatQuantity(line.accepted_quantity, line.unit_snapshot),
-        excess: formatQuantity(receipt?.excessQuantity, line.unit_snapshot),
-        reconciled: formatQuantity(line.reconciled_quantity, line.unit_snapshot),
-        pending: <>{formatQuantity(quantity(line.quantity).minus(line.accepted_quantity).minus(line.reconciled_quantity).toFixed(), line.unit_snapshot)}<small>{line.fully_checked ? "Linha integralmente conferida" : data.status === "administratively_closed" ? line.metadata.issueOpen ? "Encerramento administrativo · situação física ainda desconhecida" : "Conciliação administrativa registrada · aceite pessoal preservado" : line.metadata.issueOpen ? "Divergência aberta" : data.status === "confirmed" ? "Linha conciliada com diferença" : data.status === "cancelled" ? "Expedição cancelada e compensada" : data.status === "pending_receipt" ? "Aguardando conferência" : "Quantidade pendente"}</small></>,
-      }
-    }); })} />;
+      const cancelled = data.status === "cancelled";
+      const transit = cancelled ? "0" : quantity(line.quantity).minus(line.accepted_quantity).minus(line.reconciled_quantity).toFixed();
+      const issue = Boolean(line.metadata.issueOpen);
+      const done = !cancelled && !declarationOnly && !issue && line.fully_checked;
+      const status = declarationOnly ? "Declarado" : cancelled ? "Cancelado" : issue ? "Em apuração"
+        : done ? "Conferido" : Number(line.accepted_quantity) > 0 ? "Recebido em parte" : "Em trânsito";
+      const amount = (value?: string | null) => formatQuantity(value, line.unit_snapshot);
+      const facts = declarationOnly ? [{ label: "Declarado", value: amount(line.quantity) }] : [
+        { label: "Expedido", value: amount(line.quantity) }, { label: "Em trânsito", value: amount(transit) },
+        { label: "Recebido", value: amount(line.accepted_quantity) },
+      ];
+      const detail = declarationOnly ? facts : [
+        ...facts, { label: "Conciliado", value: amount(line.reconciled_quantity) },
+        ...(receipt ? [{ label: "Recebido declarado", value: amount(receipt.receivedQuantity) },
+          { label: "Excedente em apuração", value: amount(receipt.excessQuantity) }] : []),
+      ];
+      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, status, done,
+        tone: done ? "success" : cancelled ? "danger" : declarationOnly ? "neutral" : "pending",
+        facts, detail: <>
+          {readPresentationConversions(line.presentation_conversions).map(item => <p key={item.id}>{presentationCaption(item)}</p>)}
+          {line.requisitionItemIds.length ? <p>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</p> : null}
+          {line.family_fulfillment ? <p><strong>Avaliação familiar: {line.family_fulfillment === "partial" ? "atendimento parcial" : "atendimento completo"}</strong> · {line.fulfillment_decided_name} · {line.fulfillment_decided_at ? formatBrazilDate(line.fulfillment_decided_at) : "Instante não disponível"}</p> : null}
+          {data.status === "administratively_closed" ? <p>{issue
+            ? "Encerramento administrativo · situação física ainda desconhecida"
+            : "Conciliação administrativa registrada · aceite pessoal preservado"}</p> : null}
+          <dl className="hca-material-balance-grid">{detail.map(fact => <div key={fact.label} data-material-fact={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl>
+        </>,
+      };
+    })} />;
 }

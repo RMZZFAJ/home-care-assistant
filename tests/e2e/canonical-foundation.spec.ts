@@ -19,12 +19,13 @@ test("UIR fundação compara modal ao HTML em cinco larguras e conserva foco e l
   await selectContext(page, f.patient);
   const sourceOpening = page.waitForResponse(response => new URL(response.url()).pathname === `/api/requisitions/${f.source.id}/openings` && response.request().method() === "POST");
   await page.goto(`/historico/${f.source.id}`);
-  await selectDocumentSection(page, "materials"); expect((await sourceOpening).status()).toBe(200);
+  await selectDocumentSection(page, "progress"); expect((await sourceOpening).status()).toBe(200);
   const before = physicalState(f), writes: string[] = [];
   page.on("request", request => { if (/^\/api\/(documents|requisitions|stock|balances)/.test(new URL(request.url()).pathname) && request.method() !== "GET") writes.push(new URL(request.url()).pathname); });
-  const opener = page.getByRole("table", { name: "Materiais requisitados", exact: true }).getByRole("button", { name: f.ent.code, exact: true });
+  const opener = page.getByRole("button", { name: "Registrar andamento", exact: true });
   await opener.click();
-  const dialog = page.getByRole("dialog"); await expect(dialog.getByText("Expedido", { exact: true })).toBeVisible();
+  const dialog = page.getByRole("dialog", { name: "Registrar andamento", exact: true });
+  await expect(dialog).toBeVisible();
   const reference = await browser.newContext({ serviceWorkers: "block" });
   try {
     const model = await reference.newPage();

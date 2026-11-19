@@ -1,17 +1,13 @@
 "use client";
 import { useMemo } from "react";
-import { DocumentMaterialsTable } from "./document-materials-table";
-import { formatQuantity } from "@/lib/quantity";
+import { DocumentMaterialList } from "./document-material-list";
+import { formatQuantity, quantity as decimal } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { FeedbackBanner } from "@/components/ui/feedback";
 import { requirePurchaseEntryBalances, type PurchaseEntryBalance } from "@/lib/validation/purchase-entry-balances";
 import { readPresentationConversions, presentationCaption } from "@/lib/presentation-conversion";
 import type { SupplyDocument } from "@/types/documents";
 
-const core = [{ id: "material", label: "Material" }, { id: "proposed", label: "Proposto" }, { id: "approved", label: "Aprovado" }, { id: "purchased", label: "Adquirido" }, { id: "validated", label: "Validado" }];
-const expectation = [{ id: "pending", label: "Em conferência" }, { id: "unarrived", label: "Aquisição sem chegada válida" }, { id: "waived", label: "Não será adquirido" }, { id: "remaining", label: "Por adquirir" }];
-const afterEntry = { id: "entryBalance", label: "Saldo após última entrada" };
-const variance = [{ id: "short", label: "Falta encerrada" }, { id: "excess", label: "Excedente validado" }];
 function EntryBalance({ fact, unit, receipts }: { fact?: PurchaseEntryBalance; unit: string; receipts: SupplyDocument["receipts"] }) {
   if (!fact) return <>Não disponível no registro</>;
   if (fact.state === "not_validated") return <>Sem entrada validada</>;
@@ -23,25 +19,51 @@ function EntryBalance({ fact, unit, receipts }: { fact?: PurchaseEntryBalance; u
       <small>Parcela {ordinal} · entrada de {formatQuantity(entry.enteredQuantity, unit)}</small></> : null}
   </>;
 }
-export function PurchaseMaterials({ data }: { data: SupplyDocument }) {
+export function PurchaseMaterials({ data, active }: { data: SupplyDocument; active: boolean }) {
   const progress = useMemo(() => new Map(data.purchaseProgress?.lines.map(line => [line.lineId, line])), [data.purchaseProgress]);
   const balances = useMemo(() => {
     if (data.purchaseEntryBalances === undefined) return { valid: true, facts: [] };
     try { return { valid: true, facts: requirePurchaseEntryBalances(data.purchaseEntryBalances, { version: data.version, lines: data.lines, receipts: data.receipts, events: data.events }) }; }
     catch { return { valid: false, facts: [] }; }
   }, [data.purchaseEntryBalances, data.version, data.lines, data.receipts, data.events]);
-  const hasVariance = data.purchaseProgress?.lines.some(line =>
-    Number(line.closedShortQuantity ?? 0) > 0 || Number(line.approvedExcessQuantity ?? 0) > 0);
-  return <DocumentMaterialsTable key={data.id} label="Materiais da compra ou doação" heading={<><h2>Produtos e quantidades</h2><p>Valores de cada ato são apresentados separadamente. A validação da chegada determina a entrada no estoque.</p><p>O saldo da família é o registrado após a última entrada validada de cada material nesta ficha. As datas podem ser diferentes; movimentos posteriores não substituem esse saldo.</p>{!balances.valid ? <FeedbackBanner tone="error">Não foi possível conferir o saldo das entradas. Use Atualizar ficha para consultar novamente.</FeedbackBanner> : null}</>} columns={[...(progress.size ? [...core, ...expectation] : core), ...(hasVariance ? variance : []), afterEntry]}
+  return <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
+    revision={String(data.version)} active={active} label="Materiais da compra ou doação" settledLabel="Recebidos"
+    today={{ location: "family", label: "Família hoje" }}
+    heading={<><h2>Produtos e quantidades</h2><p>A validação da chegada determina a entrada no estoque.</p>
+      {!balances.valid ? <FeedbackBanner tone="error">Não foi possível conferir o saldo das entradas. Use Atualizar ficha.</FeedbackBanner> : null}</>}
     rows={data.lines.map(line => {
       const current = progress.get(line.id);
       const quantity = (value: string | number | undefined) => value === undefined ? "Não informado neste registro" : formatQuantity(value, line.unit_snapshot);
-      return { id: line.id, searchText: line.name_snapshot, cells: {
-        material: <><strong>{line.name_snapshot}</strong><small>{line.unit_snapshot}</small>{readPresentationConversions(line.presentation_conversions).map(row => <small key={row.id}>{presentationCaption(row)}</small>)}{line.requisitionItemIds.length ? <small>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</small> : null}</>,
-        proposed: quantity(line.quantity), approved: quantity(line.approved_quantity), purchased: quantity(line.purchased_quantity), validated: quantity(current?.validatedQuantity ?? line.accepted_quantity),
-        pending: quantity(current?.pendingValidationQuantity), unarrived: quantity(current?.unarrivedQuantity), waived: quantity(current?.waivedQuantity), remaining: quantity(current?.remainingExpectation),
-        short: quantity(current?.closedShortQuantity), excess: quantity(current?.approvedExcessQuantity),
-        entryBalance: balances.valid ? <EntryBalance fact={balances.facts.find(fact => fact.lineId === line.id)} unit={line.unit_snapshot} receipts={data.receipts} /> : "Saldo não conferido",
-      } };
+      const entered = current?.validatedQuantity ?? line.accepted_quantity;
+      const hasPending = Number(current?.pendingValidationQuantity ?? 0) > 0;
+      const done = Number(entered) > 0 && Number(entered) >= Number(line.approved_quantity) && !hasPending;
+      const status = hasPending ? "Em conferência" : done ? "Entrada aprovada"
+        : Number(entered) > 0 ? "Entrada parcial" : Number(line.purchased_quantity) > 0 ? "Aguardando chegada"
+          : Number(line.approved_quantity) > 0 ? "Autorizado" : "Em avaliação";
+      const detail = [
+        { label: "Proposto", value: quantity(line.quantity) }, { label: "Aprovado", value: quantity(line.approved_quantity) },
+        { label: "Adquirido", value: quantity(line.purchased_quantity) }, { label: "Validado", value: quantity(entered) },
+        ...(current ? [
+          { label: "Em conferência", value: quantity(current.pendingValidationQuantity) },
+          { label: "Aquisição sem chegada válida", value: quantity(current.unarrivedQuantity) },
+          { label: "Não será adquirido", value: quantity(current.waivedQuantity) },
+          { label: "Por adquirir", value: quantity(current.remainingExpectation) },
+          ...(Number(current.closedShortQuantity ?? 0) > 0 ? [{ label: "Falta encerrada", value: quantity(current.closedShortQuantity) }] : []),
+          ...(Number(current.approvedExcessQuantity ?? 0) > 0 ? [{ label: "Excedente validado", value: quantity(current.approvedExcessQuantity) }] : []),
+        ] : []),
+        { label: "Saldo após última entrada", value: balances.valid
+          ? <EntryBalance fact={balances.facts.find(fact => fact.lineId === line.id)} unit={line.unit_snapshot} receipts={data.receipts} /> : "Saldo não conferido" },
+      ];
+      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, status, done,
+        tone: done ? "success" : hasPending || Number(entered) > 0 ? "pending" : "neutral",
+        facts: [{ label: "Pedido / autorizado", value: `${quantity(line.quantity)} / ${quantity(line.approved_quantity)}` },
+          { label: "Comprado", value: quantity(line.purchased_quantity) },
+          { label: "Chegou / entrou", value: `${current ? quantity(decimal(entered).plus(current.pendingValidationQuantity).toFixed()) : quantity(undefined)} / ${quantity(entered)}` }],
+        detail: <>
+          {readPresentationConversions(line.presentation_conversions).map(item => <p key={item.id}>{presentationCaption(item)}</p>)}
+          {line.requisitionItemIds.length ? <p>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</p> : null}
+          <dl className="hca-material-balance-grid">{detail.map(fact => <div key={fact.label} data-material-fact={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl>
+        </>,
+      };
     })} />;
 }
