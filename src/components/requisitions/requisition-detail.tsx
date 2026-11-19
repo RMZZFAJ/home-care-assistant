@@ -123,6 +123,7 @@ type Detail = {
     product_name_snapshot: string;
     custom_name: string | null;
     unit_snapshot: string;
+    extra_details?: string | null;
     current_stock: string | null;
     stock_observation?: StockObservation;
     stock_observation_at?: string | null;
@@ -655,7 +656,8 @@ export function RequisitionDocumentContent({
                 const status = data.is_historical ? "Não apurado no original" : line?.attended ? "Atendido"
                   : line?.serviceStatus === "partial" ? "Parcialmente atendido"
                     : line?.serviceStatus === "review_required" ? "Nova avaliação familiar pendente"
-                      : ["cancelled", "archived"].includes(documentState) ? "Sem atendimento confirmado" : "Em aberto";
+                      : ["cancelled", "archived"].includes(documentState) ? "Sem atendimento confirmado"
+                        : item.product_id || item.resolution ? "Em aberto" : "Cadastro pendente";
                 return {
                   id: item.id, name, unit: item.unit_snapshot ?? null, urgent: item.urgent, done: Boolean(line?.attended),
                   status, tone: data.is_historical ? "neutral" : line?.attended ? "success" : "pending",
@@ -663,6 +665,7 @@ export function RequisitionDocumentContent({
                   detail: <div className="space-y-2">
                       <p>{status}</p>
                       <p>{formatStockObservationTime(item.stock_observation_at, item.stock_observation_time_source)}</p>
+                      {item.extra_details ? <p className="whitespace-pre-wrap">{item.extra_details}</p> : null}
                     </div>,
                   related: requisitionDeliveries(line?.deliveries ?? []).map(delivery => ({
                     document: { id: delivery.id, type: "ENT", code: delivery.code ?? "ENT em preparação" },

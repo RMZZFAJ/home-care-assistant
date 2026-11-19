@@ -35,7 +35,7 @@ export function RequisitionReceiptCard({ receipt }: { receipt: RequisitionReceip
             ...receipt.lines.map(item =>
               `${item.productName} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation, item.unit)}${item.urgent ? " (urgente)" : ""}`),
             ...receipt.extraItems.map(item =>
-              `${item.name} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation)}${item.urgent ? " (urgente)" : ""}`),
+              `${item.name}${item.identification ? " · " + item.identification.unit : ""} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation, item.identification?.unit)}${item.urgent ? " (urgente)" : ""}${item.identification?.details ? " · " + item.identification.details : ""}`),
           ]} />
         <Summary title="Observações" rows={receipt.observations} />
         <div className="hca-toolbar print:hidden">

@@ -49,6 +49,7 @@ export type RequisitionLine = {
 export type ExtraItem = {
   id: string;
   name: string;
+  identification?: import("@/lib/documents/extra-material-identity").ExtraMaterialIdentity;
   currentStock: string | number | null;
   stockObservation?: StockObservation;
   stockObservationAt?: string | null;

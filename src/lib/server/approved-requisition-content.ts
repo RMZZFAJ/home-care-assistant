@@ -14,7 +14,8 @@ export function approvedRequisitionContent(snapshot: DocumentSnapshot, emission:
     const key = "material/" + index;
     const stock = typeof line.current_stock === "number" || typeof line.current_stock === "string" ? line.current_stock : null;
     const stockTime = ["client_draft", "server_submission", "legacy_unknown"].includes(String(line.stock_observation_time_source)) ? line.stock_observation_time_source as StockObservationTimeSource : "legacy_unknown";
-    semanticFacts[key + "/name"] = String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
+    semanticFacts[key + "/name"] = String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado")
+      + (typeof line.extra_details === "string" ? " " + line.extra_details : "");
     semanticFacts[key + "/unit"] = String(line.unit_snapshot ?? "Unidade não preservada");
     semanticFacts[key + "/stock"] = formatStockObservation(stock, line.stock_observation as StockObservation, typeof line.unit_snapshot === "string" ? line.unit_snapshot : undefined) + " " + formatStockObservationTime(typeof line.stock_observation_at === "string" ? line.stock_observation_at : null, stockTime);
     const attended = snapshot.fulfillmentLines?.find(value => value.id === line.id);

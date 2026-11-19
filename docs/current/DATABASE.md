@@ -120,6 +120,11 @@ solicitada. document_request_links associa explicitamente linhas de COM/ENT
 requisition_item_resolutions identifica item extra no catálogo sem alterar
 a linha original. A decisão e seu motivo integram uma nova versão auditável.
 
+Extras fora do catálogo com identificação informada na REQ guardam tipo e
+unidade em `category_snapshot` e `unit_snapshot`, e a descrição opcional em
+`extra_details`. A emissão preserva a identidade e os detalhes na intenção e
+no snapshot, sem associar o item ao catálogo ou gerar um movimento de estoque.
+
 requisition_items distingue stock_observation (observed, unknown, unfilled ou
 legacy_unclassified) de current_stock. Unknown/unfilled exigem NULL; observed
 exige quantidade válida na precisão da unidade. Zero legado não é reclassificado.

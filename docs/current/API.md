@@ -500,6 +500,14 @@ extraItems e observations. Não aceita quantidade solicitada. Catálogo e
 snapshots são resolvidos no banco. A resposta confirma persistence e receipt;
 RECEIPT_PENDING preserva o ID e a chave se a leitura posterior falhar.
 
+Em um item extra fora do catálogo, `extraItems[].identification` registra
+`category`, `unit` e `details` opcional, de até 400 caracteres. A unidade é
+obrigatória no formulário atual. Clientes e rascunhos antigos podem chegar
+sem o objeto. Quando a identificação foi salva, o ato de confirmação exige
+os mesmos nomes e identificações na revisão do rascunho. O comprovante devolve
+a identidade preservada, e a ficha indica a pendência de cadastro. Uma
+associação posterior ao catálogo usa a decisão de identificação existente.
+
 Opcionalmente, remainingNeed contém requisitionId, version e reason próprios
 para emitir nova necessidade vinculada. Não aceita ator, protocolo, snapshots
 ou quantidade solicitada nessa referência. A origem deve ser REQ operacional

@@ -23,6 +23,7 @@ import {
   stockPreparationMutationSchema,
 } from "./stock-preparations";
 import { z } from "zod";
+import { extraMaterialIdentity } from "./extra-material-identity";
 import {
   balancePreparationSaveSchema,
   balancePreparationMutationSchema,
@@ -101,6 +102,7 @@ export const requisitionDraftContent = z
           .object({
             id: text(120).min(1),
             name: text(200),
+            identification: extraMaterialIdentity.optional(),
             ...observation,
             urgent: z.boolean(),
           })

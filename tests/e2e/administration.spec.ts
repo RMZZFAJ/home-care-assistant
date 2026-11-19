@@ -594,7 +594,7 @@ test.describe("administração integrada no ambiente local", () => {
 
   test("sugestões por alias e grafia ambígua só associam o produto após escolha explícita", async ({
     page,
-  }) => {
+  }, info) => {
     await login(page);
     const patientId = await createPatient(page);
     let productId = "";
@@ -625,45 +625,30 @@ test.describe("administração integrada no ambiente local", () => {
     for (let step = 0; step < 2; step++)
       await page.getByRole("button", { name: "Avançar", exact: true }).click();
     await page
-      .getByRole("button", { name: "+ Incluir novo item", exact: true })
+      .getByRole("button", { name: "Adicionar item extra", exact: true })
       .click();
-    await page
-      .getByLabel("Nome", { exact: true })
-      .fill("compressa alternativa");
-    await expect(
-      page.getByText("Nome alternativo reconhecido no catálogo.", {
-        exact: true,
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Remover item 1", exact: true }),
-    ).toBeVisible();
+    const extra = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
+    const name = extra.getByRole("textbox", { name: "Nome do material", exact: true });
+    await name.fill("compressa alternativa");
+    await expect(extra.getByText("É um destes materiais?", { exact: true })).toBeVisible();
+    await info.attach("extra-req-sugestoes", { body: await extra.screenshot(), contentType: "image/png" });
     await expect(
       page.getByRole("button", { name: /^Usar item do catálogo:/ }),
     ).toHaveCount(1);
-    await page.getByLabel("Nome", { exact: true }).fill("gazi");
-    await expect(
-      page.getByText(
-        "Correspondência ambígua: há mais de um item possível. Escolha explicitamente o correto.",
-        { exact: true },
-      ),
-    ).toBeVisible();
+    await name.fill("gazi");
     await expect(
       page.getByRole("button", { name: /^Usar item do catálogo:/ }),
     ).toHaveCount(2);
-    await page.getByLabel("Estoque observado com a equipe", { exact: false }).fill("3");
+    await extra.getByRole("combobox", { name: "Informação do estoque da equipe" }).selectOption("observed");
+    await extra.getByLabel("Estoque observado com a equipe", { exact: false }).fill("3");
     await page
       .getByRole("checkbox", { name: "Reposição urgente", exact: true })
       .check();
-    await expect(
-      page.getByRole("button", { name: "Remover item 1", exact: true }),
-    ).toBeVisible();
     await page
       .getByRole("button", { name: /^Usar item do catálogo: Gaze \(pacote\)/ })
       .click();
-    await expect(
-      page.getByRole("button", { name: "Remover item 1", exact: true }),
-    ).toHaveCount(0);
+    await expect(extra).toHaveCount(0);
+    await expect(page.getByText("Nenhum item extra incluído.", { exact: true })).toBeVisible();
     for (let step = 0; step < 2; step++)
       await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
     const reviewMaterial = page.locator(".hca-material-review li").filter({

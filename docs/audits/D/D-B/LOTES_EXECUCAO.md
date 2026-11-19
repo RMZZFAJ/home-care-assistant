@@ -92,7 +92,21 @@ confere com o comando mestre.
   de equipe e emissão transacionais. Cancelamento compara o estoque antes e
   depois. Listas, etapas, foco e REQ exercitados em Android e iOS emulados.
   COM, ENT e DEV usam observações numeradas na revisão e na ficha emitida.
-  Pendem os extras fora do catálogo e P1.
+  O extra fora do catálogo da REQ pode começar em Materiais e reaparece uma
+  vez em Itens extras. A edição usa o modal de E04-05, com tipo, unidade,
+  estoque, urgência e detalhes. A emissão preserva a pendência de cadastro
+  e os dados informados na ficha, no comprovante e no PDF assinado. O item
+  fica sem produto associado e sem lançamento de estoque. O registro da
+  identidade na emissão é um complemento necessário ao produto real.
+  A composição móvel mantém o título, as sugestões sob o nome, os seletores
+  e o rodapé de ações de E04-05. O formulário usa a informação de estoque do
+  produto para distinguir observado, desconhecido e não informado, incluindo
+  a revisão de rascunhos legados. As sugestões mostram nomes e unidades
+  reais do paciente. A referência do laboratório mostra códigos de exemplo.
+  Quando o nome informado é idêntico ao nome ou alias ativo, o contrato
+  vigente exige escolher o material correspondente ou informar um nome
+  que diferencie o novo item.
+  P1 continua pendente.
 - **Vínculos e COM E05.** Vínculos por ficha ou material, importação seletiva,
   planejamento e chegada, compras mistas, falta e excesso, correção pelo autor,
   revisão individual ou em lote, chegada avulsa e cobertura do planejamento.
@@ -174,16 +188,25 @@ conferência histórica de aplicação inicial, sem inferência sobre dados atua
   A proposta registrada vincula o débito e o crédito à mesma entrega após
   confirmação da origem e disponibilidade pertinente.
 
-Nenhuma decisão adicional de produto foi identificada nesta atualização.
-A identificação do extra ainda ausente do catálogo tem regra aprovada e
-segue como implementação pendente.
+- **Extras sem identificação em ENT e DEV.** A v7 permite preencher a
+  quantidade de um extra pendente. Hoje a expedição oficial exige um produto
+  do catálogo do paciente com saldo disponível. A decisão encaminhada no
+  Codex é se a ficha deve expedir os materiais disponíveis e registrar o
+  extra como pendência, ou esperar pela identificação para expedir tudo.
+  Recomendação encaminhada: expedir os materiais disponíveis e mostrar a
+  pendência separadamente. A escolha está em aberto.
+
+Continua pendente a apresentação de um extra associado a um material do
+catálogo da REQ na própria etapa Itens extras. Hoje a escolha explícita
+preserva estoque informado e urgência na linha de catálogo. Continuam em
+execução os extras fora do catálogo no planejamento COM, em ENT e em DEV.
 
 ## Migrations por ambiente
 
 Consulta de 19/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. **304 versões em cada banco**,
-de `20261019000100` a `20261119213000`, com os mesmos IDs do checkout. O
-histórico contém 242 versões anteriores a L1, 18 de L1 e 44 de L2. Os SQL de
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. **305 versões em cada banco**,
+de `20261019000100` a `20261119220003`, com os mesmos IDs do checkout. O
+histórico contém 242 versões anteriores a L1, 18 de L1 e 45 de L2. Os SQL de
 cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 Nenhuma versão só em arquivo, só na stack local, só no desenvolvimento ou
 pendente de aplicar nesta conferência. Produção fica fora desta consulta.
@@ -208,13 +231,17 @@ pendente de aplicar nesta conferência. Produção fica fora desta consulta.
 `20261119105026`, `20261119110234`, `20261119111617`, `20261119113059`,
 `20261119121610`, `20261119125023`, `20261119130945`, `20261119135903`,
 `20261119141610`, `20261119154356`, `20261119175654`, `20261119184524`,
-`20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`.
+`20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
+`20261119220003`.
 
-As duas versões mais recentes tratam as observações numeradas e a
-justificativa da designação manual na transferência. A aplicação foi
-precedida de ensaio com rollback e backup cifrado verificado. Os dois SQL
-conferem com o histórico do Supabase e os hashes estáveis de 201 tabelas
-permaneceram iguais. A comparação bruta encontrou variações de relógio e
+`20261119212000` e `20261119213000` tratam as observações numeradas e a
+justificativa da designação manual na transferência. `20261119220003`
+preserva a identificação proposta de um extra da REQ. O último incremento
+teve ensaio com rollback e backup cifrado verificado
+`66ed4ebc-969a-49d1-9b2d-ed1a87e566e2`. O SQL confere com o histórico
+vinculado. Os hashes estáveis dos dados de 201 tabelas permaneceram iguais
+ao comparar as mesmas colunas, e a coluna nova continua nula nas linhas
+anteriores. A comparação bruta encontrou variações de relógio e
 acompanhamento interno. O preview ainda aguarda a publicação do código.
 
 ### L3 e L4

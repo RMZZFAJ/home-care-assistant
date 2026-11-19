@@ -4,10 +4,7 @@ import { Dialog } from "@/components/ui/primitives";
 import { RelatedDocument } from "@/components/documents/related-document";
 import { formatBrazilDate } from "@/lib/receipt";
 import { inputClass, Notice } from "@/components/workspace";
-import {
-  matchCatalog,
-  normalizeCatalogText as normalize,
-} from "@/lib/catalog-match";
+import { normalizeCatalogText as normalize } from "@/lib/catalog-match";
 import { textRows } from "@/lib/text-rows";
 import { formatQuantity } from "@/lib/quantity";
 import {
@@ -21,20 +18,11 @@ import { MaterialConsultButton } from "@/components/documents/catalogue-material
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import type { WorkspaceContext } from "@/types/workspace";
 import type {
-  ExtraItem,
   RequisitionFormData,
   RequisitionLine,
 } from "@/types/requisition";
 import type { ItemContext } from "@/types/documents";
 
-const emptyExtra = (): ExtraItem => ({
-  id: "extra-" + crypto.randomUUID(),
-  name: "",
-  currentStock: null,
-  stockObservation: "unfilled",
-  stockObservationAt: new Date().toISOString(),
-  urgent: false,
-});
 export type Product = {
   id: string;
   name: string;
@@ -300,153 +288,6 @@ export function CatalogStep({
     </div>
   );
 }
-export function Extras({
-  errors = {},
-  items,
-  setItems,
-  products,
-  adopt,
-}: {
-  errors?: Record<string, string>;
-  items: ExtraItem[];
-  setItems: (items: ExtraItem[]) => void;
-  products: Product[];
-  adopt: (product: Product, extra: ExtraItem) => void;
-}) {
-  const classificationLabels = {
-    exact: "Correspondência exata no catálogo.",
-    alias: "Nome alternativo reconhecido no catálogo.",
-    approximate:
-      "Correspondência aproximada. Confira nome e unidade antes de escolher.",
-    ambiguous:
-      "Correspondência ambígua: há mais de um item possível. Escolha explicitamente o correto.",
-    absent: "Nenhuma correspondência no catálogo deste paciente.",
-  };
-  const candidateLabels = {
-    exact: "Nome exato",
-    alias: "Nome alternativo",
-    approximate: "Grafia aproximada",
-  };
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-(--muted)">
-        Adicione materiais não disponíveis no catálogo e informe somente o
-        estoque atual. As sugestões exigem sua escolha antes de vincular um
-        item.
-      </p>
-      {items.map((item, index) => {
-        const result = matchCatalog(item.name, products);
-        return (
-          <div
-            key={item.id}
-            className="grid gap-3 rounded-xl border border-(--line) p-4 sm:grid-cols-[1fr_auto_auto]"
-          >
-            <label className="text-sm font-semibold">
-              <span id={item.id + "-name-label"}>Nome</span>
-              <input
-                aria-labelledby={item.id + "-name-label"}
-                value={item.name}
-                data-field-error={item.id + ":name"}
-                aria-invalid={Boolean(errors[item.id + ":name"])}
-                aria-describedby={errors[item.id + ":name"] ? item.id + "-name-error" : undefined}
-                maxLength={200}
-                onChange={(event) =>
-                  setItems(
-                    items.map((current) =>
-                      current.id === item.id
-                        ? { ...current, name: event.target.value }
-                        : current,
-                    ),
-                  )
-                }
-                className={inputClass + " mt-1"}
-              />
-              {errors[item.id + ":name"] ? <span id={item.id + "-name-error"} className="ui-field-error">{errors[item.id + ":name"]}</span> : null}
-            </label>
-            <StockObservationField
-              error={errors[item.id + ":stock"]}
-              errorKey={item.id + ":stock"}
-              value={item.currentStock}
-              mode={item.stockObservation}
-              at={item.stockObservationAt}
-              onChange={(change) =>
-                setItems(
-                  items.map((current) =>
-                    current.id === item.id
-                      ? { ...current, ...change }
-                      : current,
-                  ),
-                )
-              }
-            />
-            <div className="flex items-end">
-              <ActionButton
-                variant="danger"
-                onClick={() =>
-                  setItems(items.filter((current) => current.id !== item.id))
-                }
-                className="w-full sm:w-auto"
-              >
-                Remover item {index + 1}
-              </ActionButton>
-            </div>
-            <label className="flex items-center gap-2 text-sm sm:col-span-3">
-              <input
-                type="checkbox"
-                className="h-5 w-5"
-                checked={item.urgent}
-                onChange={(event) =>
-                  setItems(
-                    items.map((current) =>
-                      current.id === item.id
-                        ? { ...current, urgent: event.target.checked }
-                        : current,
-                    ),
-                  )
-                }
-              />
-              Reposição urgente
-            </label>
-            {normalize(item.name) && (
-              <div className="hca-material-suggestions space-y-2 sm:col-span-3">
-                <p role="status" className="text-sm font-semibold">
-                  {classificationLabels[result.classification]}
-                </p>
-                {result.candidates.slice(0, 5).map((candidate) => (
-                  <ActionButton
-                    key={candidate.product.id}
-                    className="hca-material-suggestion"
-                    onClick={() => adopt(candidate.product, item)}
-                  >
-                    Usar item do catálogo: {candidate.product.name} (
-                    {candidate.product.unit})
-                    <span className="mt-1 block text-xs text-(--muted)">
-                      {candidateLabels[candidate.kind]}
-                      {candidate.kind === "alias"
-                        ? `: ${candidate.matchedName}`
-                        : ""}
-                    </span>
-                  </ActionButton>
-                ))}
-                {result.candidates.length > 5 && (
-                  <p className="text-xs text-(--muted)">
-                    Mostrando 5 de {result.candidates.length} possibilidades.
-                    Refine o nome para localizar o item correto.
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        );
-      })}
-      <ActionButton
-        onClick={() => setItems([...items, emptyExtra()])}
-      >
-        + Incluir novo item
-      </ActionButton>
-    </div>
-  );
-}
 export function Observations({
   errors = {},
   observations,
@@ -537,7 +378,12 @@ export function Review({
         <h3>Itens extras</h3>
         <MaterialReview rows={extras.map(item => ({
           id: item.id, name: item.name, urgent: item.urgent,
-          details: <><small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation)}</small><small>{formatStockObservationTime(item.stockObservationAt)}</small></>,
+          details: <>
+            <small>Cadastro pendente{item.identification ? " · " + item.identification.unit : ""}</small>
+            <small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation, item.identification?.unit)}</small>
+            <small>{formatStockObservationTime(item.stockObservationAt)}</small>
+            {item.identification?.details ? <small className="whitespace-pre-wrap">{item.identification.details}</small> : null}
+          </>,
         }))} />
       </section>
       <Summary

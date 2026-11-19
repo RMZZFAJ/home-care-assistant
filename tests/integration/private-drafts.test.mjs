@@ -166,6 +166,33 @@ test("a private draft commits one official REQ and recovers its result after wri
   );
 });
 
+test("REQ extra identification must match the saved revision and never moves stock", async () => {
+  const f = await privateDraftFixture();
+  const identification = { category: "higiene", unit: "tubo", details: "Apresentação fictícia 15 g" };
+  const extra = { id: "extra-" + randomUUID(), name: "Material extra de teste", currentStock: null, stockObservation: "unknown", urgent: true, identification };
+  const content = { ...reqContent(f), lines: [], extraItems: [extra] };
+  const before = JSON.parse(officialState(f));
+  const invalid = savePacket(f, "REQ", { ...content, extraItems: [{ ...extra, identification: { ...identification, unit: "inventada" } }] });
+  assert.equal((await f.pro.rpc("creation_draft_command", invalid)).error?.code, "22023");
+  const saved = await rpc(f.pro, "creation_draft_command", savePacket(f, "REQ", content));
+  assert.deepEqual((await draftContext(f)).content.extraItems, [extra]);
+  const packet = confirmPacket(f, saved);
+  const confirmed = { customName: extra.name, currentStock: null, stockObservation: "unknown", urgent: true, identification };
+  packet.p_body.lines = [];
+  packet.p_body.extraItems = [confirmed];
+  const { error: mismatch } = await f.pro.rpc("commit_creation_draft", {
+    ...packet, p_body: { ...packet.p_body, extraItems: [{ ...confirmed, identification: { ...identification, unit: "frasco" } }] },
+  });
+  assert.equal(mismatch?.code, "PT409");
+  assert.deepEqual(JSON.parse(officialState(f)), before);
+  const issued = await rpc(f.pro, "commit_creation_draft", packet);
+  const { data, error } = await f.pro.from("requisition_items").select("product_id,custom_name,category_snapshot,unit_snapshot,extra_details").eq("requisition_id", issued.consumedDocumentId).single();
+  assert.ifError(error);
+  assert.deepEqual(data, { product_id: null, custom_name: extra.name, category_snapshot: "higiene", unit_snapshot: "tubo", extra_details: identification.details });
+  assert.deepEqual(JSON.parse(officialState(f)).stock, before.stock);
+  assert.equal((await rpc(f.pro, "commit_creation_draft", packet)).consumedDocumentId, issued.consumedDocumentId);
+});
+
 test("a private BAL editing draft allocates its first protocol only on confirmation of the existing target", async () => {
   const f = await privateDraftFixture();
   const original = await rpc(f.pro, "create_supply_document", {

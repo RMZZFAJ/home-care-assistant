@@ -82,6 +82,7 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
     const state = snapshot.fulfillmentLines?.find(entry => entry.id === line.id);
     const timeSource = ["client_draft", "server_submission", "legacy_unknown"].includes(String(line.stock_observation_time_source)) ? line.stock_observation_time_source as StockObservationTimeSource : "legacy_unknown";
     const presentation = readPresentationConversions(line.presentation_conversions).map(presentationCaption);
+    if (typeof line.extra_details === "string") presentation.unshift(line.extra_details);
     const cells: DocumentCell[] = [
       { text: String(index + 1).padStart(2, "0") },
       { text: nameOf(line) + (presentation.length ? "\n" + presentation.join("\n") : ""), badge: line.urgent ? "URGENTE" : undefined, key: key + "/name", strong: true },

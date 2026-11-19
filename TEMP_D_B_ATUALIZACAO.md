@@ -1,5 +1,25 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — item extra da REQ com cadastro pendente.** Em Materiais ou Itens
+extras, o modal permite escolher explicitamente uma correspondência ou
+preencher um novo material com tipo, unidade, estoque informado, urgência
+e detalhes. O item novo reaparece em Itens extras e na revisão. A REQ
+emitida preserva a identidade no comprovante e no PDF assinado. O extra fica
+disponível para a identificação autorizada no catálogo, sem lançar estoque.
+
+- Passaram 19 integrações com Auth real e 11 testes de conteúdo, estrutura
+  e assinatura de PDF. Passaram quatro casos dirigidos em Android e iOS
+  emulados, com dois casos de iOS repetidos após o ajuste final do seletor,
+  sem retries automáticos. O build de produção e o ESLint passaram.
+  As capturas de E04-05 estão em `output/playwright/l2-unlisted-extras/`.
+- `20261119220003` está aplicada no local e no desenvolvimento após ensaio
+  com rollback e backup verificado `66ed4ebc-969a-49d1-9b2d-ed1a87e566e2`.
+  O inventário tem 305 versões. A comparação conferiu os dados anteriores
+  de 201 tabelas e o SQL no histórico remoto.
+- Permanecem a classificação do extra já associado ao catálogo na REQ, o
+  extra pendente de COM, ENT e DEV e a escolha de expedição em ENT e DEV.
+  O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) detalha a diferença.
+
 **19/11 — observações de emissão em COM, ENT e DEV.** A etapa oferece campos
 numerados, inclusão e remoção, foco no erro e revisão na mesma ordem. O
 rascunho guarda o texto em edição e a emissão congela a lista confirmada. A

@@ -131,12 +131,14 @@ export async function POST(request: Request) {
     const extras = input.extraItems.map(
       ({
         name,
+        identification,
         currentStock,
         stockObservation,
         stockObservationAt,
         urgent,
       }) => ({
         customName: name,
+        ...(identification ? { identification } : {}),
         currentStock,
         ...(stockObservation ? { stockObservation } : {}),
         ...(stockObservationAt ? { stockObservationAt } : {}),

@@ -36,11 +36,11 @@ import { materialCategories, supplyWizardStages, WizardMaterialCategories } from
 import { Dialog, StepNavigator } from "@/components/ui/primitives";
 import { ActionButton, ActionLink } from "@/components/ui/controls";
 import { formatQuantity, quantity } from "@/lib/quantity";
+import { RequisitionExtras } from "./requisition-extra-items";
 
 import {
   Identity,
   CatalogStep,
-  Extras,
   Observations,
   Review,
   type Product,
@@ -401,6 +401,7 @@ function PatientRequisition({
     }
     if (all || step === 4) for (const item of form.extraItems) {
       if (!item.name.trim()) errors[item.id + ":name"] = "Informe o nome do item extra ou remova-o.";
+      if (!item.identification) errors[item.id + ":unit"] = "Confirme a unidade de medida do item extra.";
       if (!validStockObservation(item)) errors[item.id + ":stock"] = "Revise a informação de estoque deste item extra.";
     }
     if (all || step === 5) form.observations.forEach((item, index) => {
@@ -424,7 +425,7 @@ function PatientRequisition({
       if (product)
         setStep(materialCategories.findIndex(category => category.id === product.category) + 1);
       else if (all && key) {
-        if (form.extraItems.some(item => key === item.id + ":name" || key === item.id + ":stock")) setStep(4);
+        if (form.extraItems.some(item => key.startsWith(item.id + ":"))) setStep(4);
         else if (key.startsWith("observation:")) setStep(5);
         else if (key.startsWith("remaining")) setStep(0);
         else if (key === "lines" || key === "catalog") setStep(1);
@@ -774,12 +775,14 @@ function PatientRequisition({
                 selectedCount={form.lines.length}
               />
             </> : null}
-            {step === 4 ? (
-              <Extras
+            {currentCategory || step === 4 ? (
+              <RequisitionExtras
+                showItems={step === 4}
                 errors={fieldErrors}
                 items={form.extraItems}
-                setItems={(extraItems) => setForm({ ...form, extraItems })}
+                setItems={(extraItems) => setForm(current => ({ ...current, extraItems }))}
                 products={products}
+                selectedIds={form.lines.map(line => line.productId)}
                 adopt={(product, extra) => {
                   updateLine(product, {
                     currentStock: extra.currentStock,

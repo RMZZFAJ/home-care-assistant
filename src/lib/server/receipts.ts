@@ -6,6 +6,7 @@ import type {
   StockObservationTimeSource,
 } from "@/types/requisition";
 import { ApiError, databaseError } from "@/lib/server/api";
+import { extraMaterialIdentity } from "@/lib/validation/extra-material-identity";
 
 // Only snapshots from the original transaction are authoritative. Legacy rows
 // retain their identity but are explicitly marked as reconstructed.
@@ -16,7 +17,7 @@ export async function loadReceipt(
   const { data, error } = await client
     .from("requisitions")
     .select(
-      "id,code,protocol,created_at,source_requisition_id,source_requisition_version,remaining_need_reason,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,stock_observation,stock_observation_at,stock_observation_time_source,urgent,product_name_snapshot,category_snapshot,unit_snapshot,snapshot_source,products(name,category,unit)),requisition_observations(body)",
+      "id,code,protocol,created_at,source_requisition_id,source_requisition_version,remaining_need_reason,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,stock_observation,stock_observation_at,stock_observation_time_source,urgent,product_name_snapshot,category_snapshot,unit_snapshot,extra_details,snapshot_source,products(name,category,unit)),requisition_observations(body)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -88,17 +89,23 @@ export async function loadReceipt(
       }),
     extraItems: items
       .filter((item) => !item.product_id)
-      .map((item) => ({
-        id: item.id,
-        name: item.product_name_snapshot ?? item.custom_name ?? "Item extra",
-        currentStock: item.current_stock ?? null,
-        stockObservation: (item.stock_observation ??
-          "legacy_unclassified") as StockObservation,
-        stockObservationAt: item.stock_observation_at,
-        stockObservationTimeSource:
-          item.stock_observation_time_source as StockObservationTimeSource,
-        urgent: item.urgent,
-      })),
+      .map((item) => {
+        const identification = extraMaterialIdentity.safeParse({
+          category: item.category_snapshot, unit: item.unit_snapshot, details: item.extra_details ?? undefined,
+        });
+        return {
+          id: item.id,
+          name: item.product_name_snapshot ?? item.custom_name ?? "Item extra",
+          identification: identification.data,
+          currentStock: item.current_stock ?? null,
+          stockObservation: (item.stock_observation ??
+            "legacy_unclassified") as StockObservation,
+          stockObservationAt: item.stock_observation_at,
+          stockObservationTimeSource:
+            item.stock_observation_time_source as StockObservationTimeSource,
+          urgent: item.urgent,
+        };
+      }),
     observations: (data.requisition_observations ?? []).map(
       (item) => item.body,
     ),

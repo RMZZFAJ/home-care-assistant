@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { extraMaterialIdentity } from "./extra-material-identity";
 import { exactQuantity } from "./documents";
 import { draftCommitSchema, requisitionStockReferenceSchema } from "./creation-drafts";
 
@@ -51,6 +52,7 @@ export const extraItemSchema = z
   .object({
     id: z.string().trim().min(1).max(120),
     name: z.string().trim().min(1, "Informe o nome do item.").max(200, "O nome do item deve ter até 200 caracteres."),
+    identification: extraMaterialIdentity.optional(),
     ...observation,
     urgent: z.boolean(),
   })
