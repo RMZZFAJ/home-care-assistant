@@ -1,5 +1,29 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — mudança de acesso com a ficha aberta.** Quando a pessoa perde
+o vínculo, o espaço da residência dá lugar ao aviso E06-17 sobre fundo
+neutro. A ficha e seus painéis são desmontados. A resposta atrasada de
+uma leitura antes autorizada fica sem efeito, e a API recusa nova leitura.
+O quadro neutro reproduz o cabeçalho com coração e o cartão delimitado da
+v7. Depois de Entendi, Voltar ao início dá acesso à seleção disponível.
+
+- Quando resta acesso de consulta, o assistente interrompe o salvamento
+  automático e guarda a edição da página em memória. A consulta das fichas
+  autorizadas fica disponível. O aviso confirma rascunho salvo somente com
+  confirmação do servidor. Se a escrita voltar, o preenchimento aberto pode
+  ser retomado no mesmo ponto.
+- A COM foi verificada do salvamento à retomada com Auth real. A troca de
+  paciente, a recuperação de resultado incerto e a consulta privada de ENT
+  e DEV mantêm seus controles.
+- Build de produção e ESLint dirigido passaram. Dos 14 casos dirigidos em
+  Android e iOS emulados, 13 passaram na rodada conjunta. O teste de leitura
+  em segundo plano recebeu HTTP 503 do contexto durante o login e passou na
+  repetição isolada com o mesmo código, sem retry automático. Depois do
+  ajuste visual, os quatro casos afetados passaram nos dois projetos.
+- O incremento usa os contratos existentes e não acrescenta migration.
+  O desenvolvimento permanece com 272 versões. A instalação das 26
+  migrations já ensaiadas aguarda o preview compatível da PR #7.
+
 **19/11 — resposta da família e conhecimento individual.** A REQ e a
 ENT vinculada mostram qual material foi reavaliado. Após alteração, o
 modal compara as duas avaliações. Quando a família mantém a decisão,

@@ -1010,6 +1010,21 @@
 .hca-document-change-list del { color: #586e62; text-decoration-thickness: 1px; }
 .hca-document-change-list svg { flex: none; color: #62796a; }
 .hca-document-change-note { margin: 0; color: #3d534c; font-size: 13px; line-height: 1.45; }
+.hca-l1 .hca-access-notice-dialog { border-top-color: #bf6269; }
+.hca-l1 .hca-access-notice-dialog .hca-modal-heading-icon { color: #993d45; background: #faecec; }
+.hca-l1 .hca-access-notice-dialog .hca-modal-kicker { color: #993d45; }
+.hca-l1 .hca-access-notice-dialog .hca-modal-subtitle { margin-top: 8px; color: #50655f; font-size: 13px; line-height: 1.45; }
+.hca-l1 .hca-access-notice-dialog > .hca-modal-footer { background: #fafcfb; }
+.hca-overlay:has(.hca-revoked-dialog) > .hca-modal-backdrop,
+.hca-overlay:has(.hca-revoked-dialog) > .hca-modal-viewport { position: fixed; inset: 58px 0 0; }
+.hca-overlay:has(.hca-revoked-dialog) > .hca-modal-backdrop { background: #183c3242; backdrop-filter: blur(1px); }
+.hca-revoked-workspace { min-height: 100dvh; background: #f0f3f0; }
+.hca-revoked-header { display: flex; align-items: center; gap: 8px; min-height: 58px; padding: 0 16px; border-bottom: 1px solid #254c47; background: #173b3a; color: #eff9f4; }
+.hca-revoked-header > strong { max-width: 81px; font-size: 11px; line-height: 1.35; }
+.hca-revoked-brand-mark { display: grid; place-items: center; width: 29px; height: 29px; border: 1px solid #8bbdaf55; border-radius: 8px; background: #ffffff07; color: #c8e2d8; }
+.hca-revoked-content { display: grid; justify-items: center; width: min(680px, calc(100% - 30px)); margin: 56px auto 0; padding: 27px; border: 1px dashed #cfdec8; border-radius: 13px; background: #f8fbf6; text-align: center; color: #50654a; }
+.hca-revoked-content > h1 { margin: 0; font-size: 18px; line-height: 1.35; font-weight: 700; }
+.hca-revoked-content > p { margin: 10px 0 18px; font-size: 12px; line-height: 1.7; }
 .hca-l1 .hca-issuance-notice-attention { display: grid; gap: 6px; margin: 0 0 14px; padding: 10px; border-radius: 9px; background: #fff4df; color: #785920; font-size: 12px; }
 .hca-l1 .hca-issuance-notice-attention p { margin: 0; }
 .hca-l1 .hca-issuance-notice-attention a { justify-self: start; }

@@ -7,6 +7,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
 import { auditFromTop } from "./accessibility-audit";
+import { loginDecision } from "./l1-decision-policy";
 
 test.setTimeout(150_000);
 const physical = (patient: string) => sql("select jsonb_build_object('documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id="+q(patient)+"),'events',(select jsonb_agg(to_jsonb(e) order by document_id,version) from public.document_events e where care_recipient_id="+q(patient)+"),'science',(select jsonb_agg(to_jsonb(s) order by id) from public.requisition_science_events s where care_recipient_id="+q(patient)+"),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id="+q(patient)+"));");
@@ -137,6 +138,69 @@ test("background ficha refresh keeps the summary stationary and tabs selectable 
     await expect(refresh).toHaveAttribute("aria-busy", "false");
     await expect(page.getByRole("tab", { name: "Anexos", exact: true })).toHaveAttribute("aria-selected", "true");
     expect(physical(f.patient)).toBe(before);
+  } finally {
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+});
+
+test("L2 revogação deixa só o fundo neutro mesmo quando uma leitura autorizada chega atrasada", async ({ page }, info) => {
+  const f = await setup();
+  const privateNote = "Observação reservada da residência " + randomUUID();
+  const patientName = sql(`select display_name from public.care_recipients where id=${q(f.patient)}`);
+  const doc = await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+    p_payload: { origin: "purchase", notes: privateNote, lines: [{ productId: f.products[0], quantity: "2" }] },
+  });
+  await loginDecision(page, fixtures.family.email, f.patient);
+  await page.goto(`/fichas/${doc.id}`);
+  await expect(page.getByRole("heading", { name: doc.code, exact: true })).toBeVisible();
+  await expect(page.getByRole("tabpanel", { name: "Visão geral", exact: true }).getByText(privateNote, { exact: true })).toBeVisible();
+  const endpoint = "/api/documents/" + doc.id;
+  let release!: () => void, captured!: () => void, returned!: () => void;
+  const hold = new Promise<void>(resolve => { release = resolve; });
+  const first = new Promise<void>(resolve => { captured = resolve; });
+  const finished = new Promise<void>(resolve => { returned = resolve; });
+  let intercepted = false;
+  await page.route("**" + endpoint, async route => {
+    if (intercepted || route.request().method() !== "GET") return route.continue();
+    intercepted = true;
+    const oldResponse = await route.fetch();
+    expect(oldResponse.ok()).toBe(true);
+    captured();
+    await hold;
+    try { await route.fulfill({ response: oldResponse }); }
+    catch { /* Unmounting may cancel the intercepted read before delivery. */ }
+    finally { returned(); }
+  });
+  try {
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    await first;
+    sql(`update public.care_recipient_memberships set status='revoked'
+         where care_recipient_id=${q(f.patient)} and user_id=${q(fixtures.family.id)}`);
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+    const modal = page.getByRole("dialog", { name: "O acesso à residência foi revogado", exact: true });
+    await expect(modal).toBeVisible();
+    const returnLink = page.getByRole("link", { name: "Voltar ao início", exact: true });
+    await expect(returnLink).toHaveCount(0);
+    release();
+    await finished;
+    await expect(modal).toBeVisible();
+    await expect(page.getByText(patientName, { exact: true })).toHaveCount(0);
+    await expect(page.getByText(privateNote, { exact: true })).toHaveCount(0);
+    await expect(page.locator("[data-document-heading]")).toHaveCount(0);
+    await expect(page.locator(".hca-bottom-navigation")).toHaveCount(0);
+    const response = await page.request.get(endpoint);
+    expect([403, 404]).toContain(response.status());
+    expect(await response.text()).not.toContain(privateNote);
+    if (info.project.use.hasTouch) await info.attach("E06-17 acesso revogado", {
+      body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+    });
+    await modal.getByRole("button", { name: "Entendi", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Acesso encerrado", exact: true })).toBeVisible();
+    await expect(returnLink).toBeFocused();
+    await returnLink.click();
+    await expect(page.getByText(patientName, { exact: true })).toHaveCount(0);
   } finally {
     release();
     await page.unrouteAll({ behavior: "wait" });

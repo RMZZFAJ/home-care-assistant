@@ -33,6 +33,7 @@ import {
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "./document-write-access-notice";
 import {
   DraftContentSummary,
 } from "@/components/forms/creation-draft-panel";
@@ -217,6 +218,7 @@ function TransferDeclarationEditor({
   const write =
     can(context, "ent.create") &&
     can(context, source === "FAMILY" ? "stock.family.read" : "stock.team.read");
+  const writeAccess = useDocumentWriteAccess(write);
   const recoveryOnly = consulting || (!write && !uncertain);
   const purpose = transferDeclarationPurpose(source);
   const privateDraft = useCreationDraft({
@@ -307,7 +309,7 @@ function TransferDeclarationEditor({
   });
 
   const [draftTouched, setDraftTouched] = useState(false);
-  useLongDraftAutosave(privateDraft, currentContent, draftTouched && !(busy || uncertain || !!packet));
+  useLongDraftAutosave(privateDraft, currentContent, write && draftTouched && !(busy || uncertain || !!packet));
   useEffect(() => {
     if (recoveryOnly) return;
     const controller = new AbortController();
@@ -658,7 +660,7 @@ function TransferDeclarationEditor({
     privateDraft.readDenied ||
     privateDraft.protectedReadPending
   )
-    return (
+    return (<>
       <RecordDrawer
         title="Minha declaração em preparação"
         busy={privateDraft.busy}
@@ -694,7 +696,9 @@ function TransferDeclarationEditor({
           </p>
         ) : null}
       </RecordDrawer>
-    );
+      {!privateDraft.readDenied && !privateDraft.protectedReadPending && !privateDraft.pending && !uncertain
+        ? <DocumentWriteAccessNotice {...writeAccess} draftSaved={privateDraft.base?.state === "active"} /> : null}
+    </>);
   return (
     <section
       className="hca-transfer-wizard"

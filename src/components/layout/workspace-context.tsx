@@ -7,6 +7,7 @@ import { api, ApiError } from "@/lib/client/api";
 import type { PatientContext, WorkspaceContext } from "@/types/workspace";
 import { demoDocuments } from "@/lib/demo-documents";
 import { WorkspaceShell } from "./workspace-shell";
+import { WorkspaceAccessRevoked } from "./workspace-access-revoked";
 import { usePwa } from "@/components/pwa/pwa-provider";
 import { recentDestinationKey } from "@/lib/auth/recent-destination";
 
@@ -37,6 +38,8 @@ const empty: State = {
   load: async () => { }, selectProfile: async () => false, selectPatient: async () => { },
 };
 const Context = createContext<State>(empty);
+type ActiveMembership = { userId: string; patientId: string };
+type Revocation = ActiveMembership & { scope: string };
 const selectionSteps = [
   { label: "Validando o vínculo escolhido", icon: "shield" },
   { label: "Consultando o espaço do paciente", icon: "home" },
@@ -66,6 +69,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   const selecting = selectionStage !== null;
   const [error, setError] = useState("");
   const [selectionError, setSelectionError] = useState("");
+  const [revocation, setRevocation] = useState<Revocation | null>(null);
+  const activeMembershipRef = useRef<ActiveMembership | null>(null);
   const sequenceRef = useRef(0);
   const navigationScopeRef = useRef<string | null>(null);
   const load = useCallback((signal?: AbortSignal) => {
@@ -73,6 +78,25 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     const requested = requestedPatientId;
     return api<{ data: ContextData; }>("/api/context" + (documentId ? "?documentId=" + documentId : ""), undefined, signal).then((result) => {
       if (signal?.aborted || sequence !== sequenceRef.current) return;
+      const workspace = result.data;
+      const hasMembership = (id: string) => workspace.patients.some(row => row.id === id && row.hasMembership);
+      const prior = activeMembershipRef.current;
+      const lost = prior?.userId === workspace.userId && !hasMembership(prior.patientId) ? prior : null;
+      const selected = workspace.activeContext;
+      activeMembershipRef.current = selected?.mode === "patient" && selected.care_recipient_id && hasMembership(selected.care_recipient_id)
+        ? { userId: workspace.userId, patientId: selected.care_recipient_id }
+        : null;
+      setRevocation(current => {
+        if (lost) return { ...lost, scope };
+        return current?.scope === scope && current.userId === workspace.userId && !hasMembership(current.patientId) ? current : null;
+      });
+      if (lost) {
+        try {
+          const recent = JSON.parse(sessionStorage.getItem(recentDestinationKey) ?? "null");
+          if (recent?.userId === lost.userId && recent?.patientId === lost.patientId) sessionStorage.removeItem(recentDestinationKey);
+          if (sessionStorage.getItem("hca:patient") === lost.patientId) sessionStorage.removeItem("hca:patient");
+        } catch { /* Stored destinations are optional. */ }
+      }
       setData((current) => ({
         ...result.data, patients: result.data.patients.map((row) => {
           const previous = current?.patients.find((item) => item.id === row.id);
@@ -88,7 +112,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
       setError("");
     }).catch((reason) => {
       if (signal?.aborted || sequence !== sequenceRef.current) return;
-      if (reason instanceof ApiError && [401, 403].includes(reason.status)) setData(null);
+      if (reason instanceof ApiError && [401, 403].includes(reason.status)) {
+        activeMembershipRef.current = null;
+        setRevocation(null);
+        setData(null);
+      }
       setError(reason instanceof Error ? reason.message : "Não foi possível validar seu acesso.");
     }).finally(() => {
       if (!signal?.aborted && sequence === sequenceRef.current) {
@@ -96,12 +124,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
         if (navigationScopeRef.current === scope) { navigationScopeRef.current = null; setSelectionStage(null); }
       }
     });
-  }, [documentId, requestedPatientId, scope, setData, setPatientId, setError, setResolvedScope, setLoadingRead]);
+  }, [documentId, requestedPatientId, scope, setData, setPatientId, setLoadingRead]);
   useEffect(() => {
     if (publicPage) {
       sequenceRef.current++;
+      activeMembershipRef.current = null;
       let active = true;
-      void Promise.resolve().then(() => { if (active) { setData(null); setPatientId(""); setLoadingRead(true); } });
+      void Promise.resolve().then(() => { if (active) { setRevocation(null); setData(null); setPatientId(""); setLoadingRead(true); } });
       return () => { active = false; };
     }
     const controller = new AbortController();
@@ -155,18 +184,21 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   };
   const patient = data?.patients.find((row) => row.id === patientId);
   const value: WorkspaceContext | null = data ? { ...data, patient, refresh: load } : null;
+  const revoked = !publicPage && revocation?.scope === scope && revocation.userId === data?.userId;
   useEffect(() => {
-    if (publicPage || error || loading || selecting || !data || !patient?.hasMembership || data.activeContext?.mode !== "patient" || data.activeContext.care_recipient_id !== patient.id) return;
+    if (publicPage || revoked || error || loading || selecting || !data || !patient?.hasMembership || data.activeContext?.mode !== "patient" || data.activeContext.care_recipient_id !== patient.id) return;
     const remember = () => {
       try { sessionStorage.setItem(recentDestinationKey, JSON.stringify({ userId: data.userId, patientId: patient.id, path: window.location.pathname + window.location.search + window.location.hash, at: Date.now() })); } catch { /* Optional preference. */ }
     };
     remember();
     window.addEventListener("pagehide", remember);
     return () => window.removeEventListener("pagehide", remember);
-  }, [publicPage, error, loading, selecting, data, patient, pathname, searchParams]);
+  }, [publicPage, revoked, error, loading, selecting, data, patient, pathname, searchParams]);
   const state = { value, data, loading, selecting, error, selectionError, requestedPatientId, load, selectProfile, selectPatient };
-  useOperationActivity(!publicPage && (loading || selecting), selectionStage === null
+  useOperationActivity(!publicPage && !revoked && (loading || selecting), selectionStage === null
     ? { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." }
     : { title: "Mudando de paciente", stage: selectionStage, steps: selectionSteps, detail: "Aguarde a confirmação da operação." });
-  return <Context value={state}>{publicPage ? <>{notices}<div inert={blocked}>{children}</div></> : <WorkspaceShell showOnboarding={pathname === "/"}>{children}</WorkspaceShell>}</Context>;
+  return <Context value={state}>{publicPage ? <>{notices}<div inert={blocked}>{children}</div></>
+    : revoked ? <WorkspaceAccessRevoked key={scope} />
+    : <WorkspaceShell showOnboarding={pathname === "/"}>{children}</WorkspaceShell>}</Context>;
 }

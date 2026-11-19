@@ -22,13 +22,14 @@ import {
 } from "@/components/workspace";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "@/components/documents/document-write-access-notice";
 import { RecurringSelection } from "./recurring-selection";
 import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
 import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { Dialog, StepNavigator } from "@/components/ui/primitives";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, ActionLink } from "@/components/ui/controls";
 import { formatQuantity, quantity } from "@/lib/quantity";
 
 import {
@@ -175,7 +176,10 @@ function PatientRequisition({
   });
 
   const [draftTouched, setDraftTouched] = useState(false);
-  useLongDraftAutosave(privateDraft, draftContent, draftTouched && !(saving || uncertain));
+  const canWrite = may(context, "request");
+  const writeAccess = useDocumentWriteAccess(canWrite);
+  const consultationRef = useRef<HTMLAnchorElement>(null);
+  useLongDraftAutosave(privateDraft, draftContent, canWrite && draftTouched && !(saving || uncertain));
   const offeredSource =
     privateDraft.offered?.content && "lines" in privateDraft.offered.content
       ? (privateDraft.offered.content.remainingNeed?.requisitionId ?? null)
@@ -549,16 +553,17 @@ function PatientRequisition({
         added.has(line.productId) ? { ...line, ...newStockObservation(line.productId) } : line) };
     })}/>;
   if (
-    !may(context, "request") &&
+    !canWrite &&
     !uncertain &&
-    !privateDraft.pending &&
-    !privateDraft.offered &&
-    !privateDraft.base
+    !privateDraft.pending
   )
     return (
-      <div className="hca-form-stack"><Notice>
-        Seu vínculo permite consultar as fichas autorizadas no histórico.
-      </Notice>{selectionLibrary(true)}</div>
+      <div className="hca-form-stack">
+        <Notice>Seu vínculo permite consultar as fichas autorizadas no histórico.</Notice>
+        <div><ActionLink ref={consultationRef} href={sourceId ? "/fichas/" + sourceId : "/historico"}>Consultar fichas autorizadas</ActionLink></div>
+        {selectionLibrary(true)}
+        <DocumentWriteAccessNotice {...writeAccess} draftSaved={privateDraft.base?.state === "active"} consultationRef={consultationRef} />
+      </div>
     );
   return (
     <div ref={fieldsRef} onChangeCapture={event => {

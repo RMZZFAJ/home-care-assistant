@@ -31,6 +31,7 @@ import { DocumentDeliveryStatus } from "@/components/notifications/document-deli
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "./document-write-access-notice";
 import {
   draftFlowStages,
   navigationForStep,
@@ -212,6 +213,8 @@ export function PatientSupplyWizard({
     context,
     type === "BAL" ? "bal.count" : type.toLowerCase() + ".create",
   );
+  const writeAccess = useDocumentWriteAccess(allowed);
+  const consultationRef = useRef<HTMLAnchorElement>(null);
   const patientId = context.patient!.id;
   const linkedTarget = type === "BAL" ? null : type;
   const routedSourceId = linkedTarget ? requisitionId ?? purchaseId : null;
@@ -417,7 +420,7 @@ export function PatientSupplyWizard({
   const privateContent = type === "BAL" ? balanceContent : supplyContent;
 
   const [draftTouched, setDraftTouched] = useState(false);
-  useLongDraftAutosave(privateDraft, privateContent, draftTouched && !(busy || uncertain));
+  useLongDraftAutosave(privateDraft, privateContent, allowed && draftTouched && !(busy || uncertain));
   const offeredContent = privateDraft.offered?.content;
   const originalSource =
     offeredContent && "form" in offeredContent
@@ -1399,12 +1402,15 @@ export function PatientSupplyWizard({
         original continua preservada.
       </Notice>
     );
-  if (!allowed && !uncertain && !privateDraft.active)
+  if (!allowed && !uncertain && !privateDraft.pending)
     return (
-      <Notice>
-        Seu vínculo não permite emitir esta ficha. Consulte as fichas
-        autorizadas no histórico.
-      </Notice>
+      <div className="hca-form-stack">
+        <Notice>Seu vínculo permite consultar as fichas autorizadas no histórico.</Notice>
+        <div><Link className={buttonClass} ref={consultationRef} href={documentId ? "/fichas/" + documentId : "/historico"}>
+          Consultar fichas autorizadas
+        </Link></div>
+        <DocumentWriteAccessNotice {...writeAccess} draftSaved={privateDraft.base?.state === "active"} consultationRef={consultationRef} />
+      </div>
     );
   if (recoveredId)
     return <Notice>Ficha registrada. <Link href={"/fichas/" + recoveredId}>Acompanhar ficha</Link></Notice>;

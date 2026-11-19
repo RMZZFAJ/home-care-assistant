@@ -85,6 +85,51 @@ test("recuperação de save incerto conserva a chave após revogação real e n�
  await page.reload();await expect(panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true})).toBeEnabled();await panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true}).click();await expect(page.getByText("Último rascunho salvo.",{exact:true})).toBeVisible();expect(packets).toHaveLength(3);expect(packets[2]).toEqual(packets[0]);expect(official(f.patient)).toBe(before);
 });
 
+test("L2 perda de escrita conserva a edição da COM e o vínculo permite consulta", async ({ page }, info) => {
+  const f = await setup();
+  const observation = "Preenchimento preservado durante mudança de acesso";
+  await login(page, f.patient);
+  await open(page, f.patient, "COM");
+  await page.getByRole("combobox", { name: /Forma de aquisição/ }).selectOption("donation");
+  for (let step = 0; step < 4; step++) await next(page);
+  const field = page.getByRole("textbox", { name: /Observações e contexto/ });
+  await field.fill(observation);
+  await save(page).click();
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  const before = official(f.patient);
+  const draftBefore = sql(`select content::text from private.creation_drafts
+    where care_recipient_id=${sqlLiteral(f.patient)} and owner_id=${sqlLiteral(fixtures.family.id)} and kind='COM' and state='active'`);
+  expect(draftBefore).toContain(observation);
+  const inReadOnly: string[] = [];
+  page.on("request", request => {
+    if (request.method() === "POST" && ["/api/drafts", "/api/documents"].includes(new URL(request.url()).pathname)) inReadOnly.push(request.url());
+  });
+
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+       values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.family.id)},'com.create',false)`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  const notice = page.getByRole("dialog", { name: "Seu acesso agora é de consulta", exact: true });
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText("O último rascunho salvo poderá ser retomado");
+  await expect(field).toHaveCount(0);
+  await expect(save(page)).toHaveCount(0);
+  if (info.project.use.hasTouch) await info.attach("E06-17 acesso de consulta", {
+    body: await notice.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
+  await notice.getByRole("button", { name: "Consultar ficha", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Consultar fichas autorizadas", exact: true })).toBeFocused();
+  expect(inReadOnly).toEqual([]);
+  expect(official(f.patient)).toBe(before);
+
+  sql(`update public.capability_overrides set enabled=true
+       where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.family.id)}
+         and capability='com.create'`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  await expect(field).toHaveValue(observation);
+  await expect(save(page)).toBeEnabled();
+  expect(official(f.patient)).toBe(before);
+});
+
 test("revisão legada HTTP prova a primeira etapa salva de COM ENT BAL e recupera somente a submissão pendente",async({page,browser})=>{
  const f=await setup(),second=await browser.newContext(),pro=await second.newPage();await login(page,f.patient,"adminA");await login(pro,f.patient,"professional");
  try{for(const kind of ["COM","ENT","BAL"]){
