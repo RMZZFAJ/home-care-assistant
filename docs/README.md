@@ -10,6 +10,14 @@ conserva o estado da implementação e das validações.
 [comentários posteriores](../hca-l01-v3-comentarios.json).
 [Implementação e verificações locais](audits/D/D-B/L1_IMPLEMENTATION.md).
 
+**Lotes L1 a L4:** o [registro de execução](audits/D/D-B/LOTES_EXECUCAO.md)
+reúne a comparação com os laboratórios, os complementos do produto, as
+pendências por lote e o inventário de migrations por ambiente. A referência de
+L2 é o [laboratório v7](../hca-laboratorio-02-v7.html), com as regras do
+[comando mestre](../HCA_L2_COMANDO_MESTRE_CODEX_V7.md). A
+[consolidação intermediária](../HCA_L2_DECISOES_VIGENTES_E_PENDENCIAS.md)
+serve como apoio histórico.
+
 **Andamento da D-B:** [acompanhamento principal](../TEMP_D_B_ATUALIZACAO.md),
 com capacidades entregues, trabalho local, fila e responsabilidades. A
 [matriz](audits/D/D-B/ACCEPTANCE_EXECUTION.csv) detalha os 105 critérios.

@@ -1,5 +1,16 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — registro dos lotes e revisão Sonar.** O
+[registro de execução](docs/audits/D/D-B/LOTES_EXECUCAO.md) reúne L1 e L2 e
+reserva espaço para L3 e L4. Os três arquivos originais de L2 estão versionados
+na raiz, seguindo L1. A consulta conferiu as mesmas 302 migrations em arquivo,
+na stack local e no desenvolvimento. A PR #7 ainda aponta para `075b4b66`.
+As decisões P1 e P2 e a comparação móvel restante continuam em aberto.
+O commit `454eca8d` corrige os avisos pertinentes de formulário, rolagem por
+teclado, atualização da matriz de avisos e invocação do Supabase. Passaram 12
+casos de navegador em Android e iOS emulados, 17 testes dos utilitários, build,
+tipos e ESLint. A avaliação dos alertas históricos consta do registro dos lotes.
+
 **19/11 — etapas de COM e ENT e extras do catálogo.** COM e ENT usam as cinco
 etapas compactas da v7. As categorias ficam dentro de Materiais. O assistente
 de entrega e devolução também organiza os materiais por categoria. O rascunho

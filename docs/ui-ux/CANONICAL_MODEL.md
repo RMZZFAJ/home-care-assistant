@@ -13,6 +13,13 @@ Para E01–E03 e seus padrões compartilhados, a revisão posterior de 13/11/202
 comentários; as decisões posteriores prevalecem. A aparência impressa permanece
 na especificação documental aprovada, sem copiar o PDF simulado do laboratório.
 
+Em E04–E06, o [laboratório L2 v7](../../hca-laboratorio-02-v7.html) rege a
+aparência e a experiência em celular. O
+[comando mestre L2](../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md) define os impactos
+autorizados nas superfícies compartilhadas de L1. A v7 já incorpora os
+comentários aprovados. O [registro de execução](../audits/D/D-B/LOTES_EXECUCAO.md)
+acompanha as comparações feitas e as pendências de implementação.
+
 ## Precedência
 
 Esta ordem posterior substitui as orientações visuais conflitantes. Auditorias,

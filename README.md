@@ -18,6 +18,7 @@ A primeira versão
 estável de produto será 1.0.0; não está sendo publicada nesta missão.
 
 - [Acompanhamento principal e sequência restante](TEMP_D_B_ATUALIZACAO.md).
+- [Execução dos lotes L1 a L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
 - [Portal da documentação](docs/README.md) e
   [contratos implementados](docs/current/README.md).
 - [Ordens vigentes e matriz de aceitação](docs/audits/D/D-B/README.md).
