@@ -275,3 +275,19 @@ export async function processInitialDocumentPdfs(client: SupabaseClient, verific
   const failed = results.filter(result => result.status === "rejected").length;
   return { claimed: claimed.length, ready, failed, processing: claimed.length - ready - failed };
 }
+
+export async function processScheduledDocumentArchives(client: SupabaseClient, verificationOrigin: string) {
+  const claimed = await rpc(client, "claim_scheduled_document_archives", { p_limit: 2 }) as string[];
+  const results = await Promise.allSettled(claimed.map(async id => {
+    const document = await issueSystemDocumentPdf(client, id, verificationOrigin);
+    if (document.state !== "ready") return "processing";
+    const archive = await rpc(client, "commit_scheduled_document_archive", { p_request: id });
+    return archive ? "archived" : "superseded";
+  }));
+  const summary = { claimed: claimed.length, archived: 0, processing: 0, superseded: 0, failed: 0 };
+  for (const result of results) {
+    if (result.status === "rejected") summary.failed++;
+    else summary[result.value]++;
+  }
+  return summary;
+}

@@ -1,5 +1,25 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — arquivamento pelo prazo da residência.** O sistema usa a
+configuração efetiva para REQ, COM, ENT e DEV concluídas ou canceladas.
+Para REQ concluída, permanecem os critérios existentes de ciência e
+arquivamento manual obrigatório. O worker registra o arquivo após
+assinar e validar o consolidado. A decisão definitiva continua com o
+administrador. Uma reversão inicia novo prazo para o arquivo automático.
+
+- O agendador anterior deixou de arquivar REQ diretamente. O fluxo
+  programado e o manual compartilham o registro do arquivo. A rota
+  manual legada da REQ ainda precisa ser ligada ao contrato vigente.
+- Passaram nove integrações, incluindo concorrência, arquivamento
+  manual e lembretes. Em Android e iOS emulados, passaram o prazo
+  configurado de 11 dias, a assinatura PAdES-B-T, o download e a
+  confirmação sem alterar o exemplar ou o estoque. As regressões
+  dirigidas de emissão inicial e de alteração de política passaram.
+- O banco local tem 291 migrations até `20261119111617`. As 19
+  pendentes passaram pela pré-validação com rollback no desenvolvimento
+  remoto, que segue com 272 versões até `20261119060719`. A aplicação
+  definitiva aguarda o preview compatível.
+
 **19/11 — arquivamento nas fichas e decisão do administrador.** O menu
 Mais oferece a revisão de arquivamento nas fichas elegíveis. Concluir e
 arquivar registra a conclusão e abre a revisão do arquivo para uma

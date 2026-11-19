@@ -144,7 +144,7 @@ export function DocumentArchiveDialog({ id, patientId, code, patientName, actor,
         {reference.error ? <Notice error>{reference.error}<ActionButton compact onClick={reference.refresh}>Consultar novamente</ActionButton></Notice> : null}
         {view === "review" && archive && !archive.decision ? <>
           <div className="hca-follow-up-prior">
-            <Icon name="archive" /><div><h3>Arquivada</h3><p>Arquivamento manual por {archive.actorName}</p></div>
+            <Icon name="archive" /><div><h3>Arquivada</h3><p>{archive.automatic ? "Arquivamento automático pelo prazo da residência" : "Arquivamento manual por " + archive.actorName}</p></div>
             <Pill tone="warning">Aguardando sua confirmação</Pill>
           </div>
           <DefinitionGrid items={[

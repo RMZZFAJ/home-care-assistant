@@ -93,9 +93,9 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         idempotencyKey: randomUUID(),
         expectedVersion: (await governance(other)).version,
       });
-    await expect(page.getByText("Arquivamento após 7 dias da conclusão", { exact: true })).toBeVisible();
+    await expect(page.getByText("Arquivamento 7 dias após conclusão ou cancelamento", { exact: true })).toBeVisible();
     await revisePolicy({ archiveDays: 8 });
-    await expect(page.getByText("Arquivamento após 8 dias da conclusão", { exact: true })).toBeVisible({ timeout: 45000 });
+    await expect(page.getByText("Arquivamento 8 dias após conclusão ou cancelamento", { exact: true })).toBeVisible({ timeout: 45000 });
     await page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true }).click();
     await page.getByLabel("Primeiro lembrete (horas)", { exact: true }).fill("3");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
@@ -103,7 +103,7 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     expect((await governance(page)).settings.archiveDays).toBe(8);
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
-    const archiveDays = page.getByLabel("Arquivar após conclusão (dias)", { exact: true });
+    const archiveDays = page.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true });
     await expect(archiveDays).toHaveValue("8");
     await archiveDays.fill("9");
     await revisePolicy({ archiveDays: 10 });

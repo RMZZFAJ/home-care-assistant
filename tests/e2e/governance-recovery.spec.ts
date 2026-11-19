@@ -92,7 +92,7 @@ test("D3 regra preserva a tentativa incerta e distingue confirmação de falha n
   const f = await setup(); await login(page, "global", null);
   await page.goto("/configuracoes?careRecipientId=" + f.patient);
   await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
-  const drawer = page.getByRole("dialog"), field = drawer.getByLabel("Arquivar após conclusão (dias)", { exact: true });
+  const drawer = page.getByRole("dialog"), field = drawer.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true });
   await field.fill("12");
   const packets: unknown[] = []; let first = true;
   await page.route("**/api/patient-settings", async route => {

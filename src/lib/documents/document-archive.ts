@@ -11,7 +11,7 @@ const base = {
 export const documentArchiveAttempt = z.object({
   ...base, preparedAt: z.iso.datetime({ offset: true }),
   archivedAt: z.iso.datetime({ offset: true }).nullable(), issuanceId: z.uuid().nullable(),
-  decision: decision.nullable(),
+  decision: decision.nullable(), automatic: z.boolean().optional(),
 }).refine(value => Boolean(value.archivedAt) === Boolean(value.issuanceId));
 export type DocumentArchiveAttempt = z.infer<typeof documentArchiveAttempt>;
 export function activeDocumentArchive(value: unknown) {

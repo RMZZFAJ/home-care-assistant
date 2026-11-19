@@ -346,7 +346,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
     await login(global, "global", null);
     await global.goto("/configuracoes?careRecipientId=" + patient);
     await global.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
-    await global.getByLabel("Arquivar após conclusão (dias)").fill("9");
+    await global.getByLabel("Arquivar após conclusão ou cancelamento (dias)").fill("9");
     await global
       .getByRole("button", { name: "Registrar política", exact: true })
       .click();
