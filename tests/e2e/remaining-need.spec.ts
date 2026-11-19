@@ -149,9 +149,8 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
   await page
     .getByRole("button", { name: "Concluir requisição", exact: true })
     .click();
-  await expect(
-    page.getByRole("button", { name: "Recuperar esta tentativa", exact: true }),
-  ).toBeVisible();
+  const recovery = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
+  await expect(recovery).toBeVisible();
   expect(
     sql(
       `select count(*) from public.requisitions where source_requisition_id=${sqlLiteral(f.source.id)};`,
@@ -173,14 +172,11 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
     window.dispatchEvent(new Event("hca:profile-updated")),
   );
   await changed;
-  await page
-    .getByRole("button", { name: "Recuperar esta tentativa", exact: true })
-    .click();
+  await recovery.getByRole("button", { name: "Consultar resultado", exact: true }).click();
   await expect(
     page.getByRole("dialog", { name: "Requisição emitida", exact: true }),
   ).toBeVisible();
-  expect(packets).toHaveLength(2);
-  expect(packets[0]).toEqual(packets[1]);
+  expect(packets).toHaveLength(1);
   expect(packets[0].remainingNeed).toMatchObject({
     requisitionId: f.source.id,
     version: f.sourceVersion,

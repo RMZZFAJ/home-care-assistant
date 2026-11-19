@@ -317,8 +317,11 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
     animations: "disabled",
   });
   let failedResponse = false;
+  let writes = 0;
   await page.route("**/api/requisitions", async (route) => {
-    if (route.request().method() === "POST" && !failedResponse) {
+    if (route.request().method() !== "POST") return route.continue();
+    writes++;
+    if (!failedResponse) {
       failedResponse = true;
       await route.fetch();
       await route.abort("failed");
@@ -327,21 +330,23 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   await page
     .getByRole("button", { name: "Concluir requisição", exact: true })
     .click();
-  await expect(
-    page.getByRole("button", { name: "Recuperar esta tentativa", exact: true }),
-  ).toBeVisible();
+  const recovery = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
+  await expect(recovery).toBeVisible();
   expect(count(f.patient)).toBe("1");
   const response = page.waitForResponse(
     (result) =>
       result.request().method() === "POST" &&
-      new URL(result.url()).pathname === "/api/requisitions",
+      new URL(result.url()).pathname === "/api/drafts/issuance/reconcile",
   );
-  await page
-    .getByRole("button", { name: "Recuperar esta tentativa", exact: true })
-    .click();
+  await recovery.getByRole("button", { name: "Consultar resultado", exact: true }).click();
   const result = await response;
   expect(result.ok()).toBe(true);
-  const { receipt } = await result.json();
+  const { data } = await result.json();
+  expect(data.state).toBe("applied");
+  const official = await page.request.get("/api/requisitions/" + data.documentId);
+  expect(official.ok()).toBe(true);
+  const { receipt } = await official.json();
+  expect(writes).toBe(1);
   const observations = receipt.lines
     .map((line: { stockObservation: string; currentStock: number | null }) => [
       line.stockObservation,
@@ -389,7 +394,7 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   await expect(
     page.getByText("Registro no rascunho (horário do dispositivo):", {
       exact: false,
-    }),
+    }).filter({ visible: true }),
   ).toHaveCount(4);
   const pdf = await generatedPdf(
     page,

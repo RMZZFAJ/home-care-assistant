@@ -10,6 +10,7 @@ import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { issuanceSteps } from "./document-issuance-result";
 import { useIssuanceNavigation } from "./document-issuance-navigation";
+import { DocumentIssuanceFailure, issuanceRecoverySteps, reconcileIssuance, useIssuanceFailure } from "./document-issuance-failure";
 import { Icon, StepNavigator } from "@/components/ui/primitives";
 import { Dialog } from "@/components/ui/overlays";
 import Link from "next/link";
@@ -184,6 +185,8 @@ function TransferDeclarationEditor({
   const [step, setStep] = useState(0);
   const [packet, setPacket] = useState<TransferDeclaration | null>(null),
     [result, setResult] = useState<SupplyDocument | null>(null);
+  const [recoveredId, setRecoveredId] = useState<string | null>(null);
+  const issuanceFailure = useIssuanceFailure();
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
@@ -193,14 +196,16 @@ function TransferDeclarationEditor({
     reasonFieldRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef(false);
   const patientId = context.patient!.id;
+  const storageKey = "hca:transfer-issuance:" + context.userId + ":" + patientId + ":" + source;
   const { navigating, openIssued } = useIssuanceNavigation(context.userId, patientId);
   const processName = materialTransferLabel(source, source === "FAMILY" ? "CARE_TEAM" : "FAMILY").toLocaleLowerCase("pt-BR");
   const isReturn = source === "CARE_TEAM";
   useOperationActivity((busy && Boolean(packet)) || navigating, {
-    title: isReturn ? "Expedindo devolução" : "Expedindo entrega",
+    title: uncertain ? "Consultando a expedição" : isReturn ? "Expedindo devolução" : "Expedindo entrega",
     stage: navigating ? 1 : 0,
-    steps: issuanceSteps,
-    detail: navigating ? "A expedição foi registrada. Estamos abrindo a ficha." : "Conferindo o saldo da origem e registrando os materiais em trânsito.",
+    steps: uncertain ? issuanceRecoverySteps : issuanceSteps,
+    detail: navigating ? "A expedição foi registrada. Estamos abrindo a ficha."
+      : uncertain ? "Aguarde a confirmação desta tentativa." : "Conferindo o saldo da origem e registrando os materiais em trânsito.",
   });
   const restoredRef = useRef(false);
   const returnFocusRef = useRef(false);
@@ -264,6 +269,20 @@ function TransferDeclarationEditor({
       setPacket(null);
     },
   });
+  useEffect(() => {
+    if (consulting) return;
+    const timer = window.setTimeout(() => {
+      try {
+        const parsed = createTransferSchema.safeParse(JSON.parse(sessionStorage.getItem(storageKey) ?? "null"));
+        if (!parsed.success || parsed.data.careRecipientId !== patientId ||
+          parsed.data.declaration.source !== source || !parsed.data.draftCommit) return;
+        pendingRef.current = parsed.data;
+        setPacket(parsed.data);
+        setUncertain(true);
+      } catch { /* Recovery still requires the authorized server receipt. */ }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [consulting, patientId, source, storageKey]);
   const privateReadRef = useRef(privateDraft.revalidateRead);
   useEffect(() => {
     privateReadRef.current = privateDraft.base?.state === "active"
@@ -481,30 +500,53 @@ function TransferDeclarationEditor({
   }
   async function submit() {
     if (busy) return;
-    if (!pendingRef.current) pendingRef.current = packet;
-    if (!pendingRef.current) return;
+    const intent = pendingRef.current ?? packet;
+    if (!intent) return;
+    pendingRef.current = intent;
     setBusy(true);
     setError("");
+    try { sessionStorage.setItem(storageKey, JSON.stringify(intent)); } catch { /* Retained in memory. */ }
     try {
-      const response = await api<unknown>("/api/transfers", pendingRef.current);
-      const issued = requireTransferDeclarationConfirmation(response, {
-        patientId,
-        userId: context.userId,
-        declaration: pendingRef.current.declaration,
-      });
-      openIssued(issued.id);
-      setResult(issued);
+      if (uncertain && intent.draftCommit) {
+        const resolution = await reconcileIssuance(patientId, intent.draftCommit, intent.idempotencyKey);
+        if (resolution.state === "not_applied") {
+          pendingRef.current = null;
+          try { sessionStorage.removeItem(storageKey); } catch { /* The server has closed the old key. */ }
+          setUncertain(false);
+          if (resolution.draftSaved && write) {
+            setPacket({ ...intent, idempotencyKey: crypto.randomUUID() });
+          } else {
+            setPacket(null);
+            if (!resolution.draftSaved) void privateDraft.reportConflict();
+          }
+          issuanceFailure.report({ outcome: "rejected", cause: issuanceFailure.failure?.cause,
+            draftSaved: resolution.draftSaved, retryable: resolution.draftSaved && write });
+          return;
+        }
+        setRecoveredId(resolution.documentId);
+        openIssued(resolution.documentId);
+      } else {
+        const response = await api<unknown>("/api/transfers", intent);
+        const issued = requireTransferDeclarationConfirmation(response, {
+          patientId, userId: context.userId, declaration: intent.declaration,
+        });
+        setResult(issued);
+        openIssued(issued.id);
+      }
       pendingRef.current = null;
       setPacket(null);
       setUncertain(false);
+      issuanceFailure.clear();
+      try { sessionStorage.removeItem(storageKey); } catch { /* Issuance is already confirmed. */ }
       privateDraft.reload();
     } catch (cause) {
       const rejected =
-        cause instanceof ApiError &&
+        !uncertain && cause instanceof ApiError &&
         [400, 401, 403, 404, 409, 422].includes(cause.status);
       setUncertain(!rejected);
       if (rejected) {
         pendingRef.current = null;
+        try { sessionStorage.removeItem(storageKey); } catch { /* Storage may be unavailable. */ }
         setPacket(null);
         setNeedsRefresh(true);
         setReferenceUnavailable(true);
@@ -513,12 +555,11 @@ function TransferDeclarationEditor({
           void privateDraft.reportConflict();
         else if ([401, 403, 404].includes(cause.status)) await privateReadRef.current();
         returnFocusRef.current = true;
+        issuanceFailure.clear();
+        setError(cause.message);
+      } else {
+        issuanceFailure.report({ outcome: "uncertain", cause });
       }
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Resultado não confirmado. Verifique a mesma tentativa de expedição.",
-      );
     } finally {
       setBusy(false);
     }
@@ -609,8 +650,10 @@ function TransferDeclarationEditor({
       </ActionButton>
     </section>
   ) : null;
+  if (recoveredId)
+    return <Notice>Expedição registrada. <Link href={"/fichas/" + recoveredId}>Acompanhar ficha</Link></Notice>;
   if (
-    (recoveryOnly && !result) ||
+    (recoveryOnly && !result && !issuanceFailure.open) ||
     privateDraft.readDenied ||
     privateDraft.protectedReadPending
   )
@@ -1080,12 +1123,12 @@ function TransferDeclarationEditor({
               </dl>
               <h4>Materiais</h4>
               {packet.declaration.lines.map((line) => {
-                const product = reference!.products.find(
+                const product = reference?.products.find(
                   (p) => p.id === line.productId,
                 );
                 return (
                   <article className="hca-transfer-wizard-material" key={line.productId}>
-                    <strong>{product?.name}</strong>
+                    <strong>{product?.name ?? "Material selecionado"}</strong>
                     <p>{formatQuantity(line.quantity, product?.unit)}
                       {lines.find((item) => item.productId === line.productId)?.extra ? " · Item extra" : ""}
                       {product?.active === false ? " · inativo com saldo" : ""}
@@ -1095,7 +1138,7 @@ function TransferDeclarationEditor({
               })}
               <p>
                 Origem documental:{" "}
-                {reference!.origins.find(
+                {reference?.origins.find(
                   (origin) => origin.id === packet.declaration.originDocumentId,
                 )?.code ?? "Sem vínculo informado"}
                 .
@@ -1116,6 +1159,7 @@ function TransferDeclarationEditor({
                 {!uncertain ? (
                   <ActionButton
                     onClick={() => {
+                      issuanceFailure.clear();
                       setPacket(null);
                       requestAnimationFrame(() =>
                         reasonFieldRef.current?.focus(),
@@ -1125,7 +1169,7 @@ function TransferDeclarationEditor({
                     Voltar
                   </ActionButton>
                 ) : null}
-                <ActionButton variant="primary" disabled={busy} onClick={() => void submit()}>
+                <ActionButton variant="primary" disabled={busy} onClick={() => { if (!issuanceFailure.reopen()) void submit(); }}>
                   <Icon name="send" width="16" height="16" />
                   {uncertain
                     ? "Verificar a expedição"
@@ -1137,6 +1181,7 @@ function TransferDeclarationEditor({
         </div>
       )}
       </div>
+      <DocumentIssuanceFailure state={issuanceFailure} operation={isReturn ? "Expedição de devolução" : "Expedição de entrega"} onRetry={submit} />
     </section>
   );
 }

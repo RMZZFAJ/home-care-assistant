@@ -40,9 +40,24 @@ test("ENT emite com rascunho privado e conserva a mesma confirmação após200 i
  await login(page,f.patient);await open(page,f.patient,"ENT");await resume(page);for(let i=0;i<5;i++)await next(page);
  await save(page).click();await expect(save(page)).toBeEnabled();await page.reload();await expect(panel(page)).toBeVisible();await resume(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
  const packets:Record<string,unknown>[]=[];let documentId="";
- await page.route("**/api/documents",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(packets.length===1){const response=await route.fetch();expect(response.ok()).toBe(true);documentId=(await response.json()).data.id;return route.fulfill({response,json:{data:{id:documentId},persistence:"confirmed"}});}if(packets.length===2)return route.fulfill({status:403,json:{code:"FORBIDDEN",error:"Recuperação indisponível neste ensaio de transporte"}});return route.continue();});
- await page.getByRole("button",{name:"Confirmar e concluir",exact:true}).click();const recover=page.getByRole("button",{name:"Recuperar esta tentativa",exact:true});await expect(recover).toBeEnabled();expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");expect(packets[0].draftCommit).toMatchObject({id:saved.id});
- await recover.click();await expect(recover).toBeEnabled();expect(packets).toHaveLength(2);expect(packets[1]).toEqual(packets[0]);await recover.click();await expect(recover).toHaveCount(0);expect(packets).toHaveLength(3);expect(packets[2]).toEqual(packets[0]);
+ await page.route("**/api/documents",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());const response=await route.fetch();expect(response.ok()).toBe(true);documentId=(await response.json()).data.id;return route.fulfill({response,json:{data:{id:documentId},persistence:"confirmed"}});});
+ const lookups: unknown[]=[];
+ await page.route("**/api/drafts/issuance/reconcile", async route => {
+   lookups.push(route.request().postDataJSON());
+   if (lookups.length===1) return route.fulfill({status:403,json:{code:"FORBIDDEN",error:"Texto privado do ensaio"}});
+   return route.continue();
+ });
+ await page.getByRole("button",{name:"Confirmar e concluir",exact:true}).click();
+ const modal=page.getByRole("dialog",{name:"Resultado ainda não confirmado",exact:true});
+ const recover=modal.getByRole("button",{name:"Consultar resultado",exact:true});
+ await expect(recover).toBeEnabled();expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");expect(packets[0].draftCommit).toMatchObject({id:saved.id});
+ await recover.click();await expect(recover).toBeEnabled();
+ await modal.getByText("Detalhes para suporte",{exact:true}).click();
+ await expect(modal.locator("pre")).toContainText("FORBIDDEN");
+ await expect(modal.locator("pre")).not.toContainText("Texto privado");
+ await recover.click();
+ await expect(page.getByRole("dialog",{name:"Entrega expedida",exact:true})).toBeVisible();
+ expect(packets).toHaveLength(1);expect(lookups).toHaveLength(2);expect(lookups[0]).toEqual(lookups[1]);
  expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");expect(sql(`select consumed_document_id from private.creation_drafts where id=${sqlLiteral(saved.id)};`)).toBe(documentId);expect(sql(`select state from private.creation_drafts where id=${sqlLiteral(saved.id)};`)).toBe("consumed");
 });
 

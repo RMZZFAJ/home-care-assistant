@@ -1,6 +1,7 @@
 "use client";
 import { ComplementOriginHint } from "@/components/documents/complement-origin-hint";
 import { useOperationActivity } from "@/components/ui/operation-activity";
+import { DocumentIssuanceFailure, issuanceRecoverySteps, reconcileIssuance, useIssuanceFailure } from "./document-issuance-failure";
 import { issuanceSteps } from "./document-issuance-result";
 import { useIssuanceNavigation } from "./document-issuance-navigation";
 import { DocumentActions } from "./document-actions";
@@ -170,16 +171,20 @@ export function PatientSupplyWizard({
   const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
   const [issuing, setIssuing] = useState(false);
+  const [uncertain, setUncertain] = useState(false);
   const { navigating, openIssued } = useIssuanceNavigation(context.userId, context.patient!.id);
   useOperationActivity((busy && issuing) || navigating, {
-    title: "Emissão da ficha", stage: navigating ? 1 : 0, steps: issuanceSteps,
-    detail: navigating ? "A ficha foi registrada. Estamos abrindo o acompanhamento." : "Estamos conferindo os materiais e registrando a ficha.",
+    title: uncertain ? "Consultando a emissão" : "Emissão da ficha",
+    stage: navigating ? 1 : 0, steps: uncertain ? issuanceRecoverySteps : issuanceSteps,
+    detail: navigating ? "A ficha foi registrada. Estamos abrindo o acompanhamento."
+      : uncertain ? "Aguarde a confirmação desta tentativa." : "Estamos conferindo os materiais e registrando a ficha.",
   });
   const [error, setError] = useState("");
+  const [recoveredId, setRecoveredId] = useState<string | null>(null);
+  const issuanceFailure = useIssuanceFailure();
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState<SupplyDocument | null>(null);
   const [saved, setSaved] = useState<SupplyDocument | null>(null);
-  const [uncertain, setUncertain] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const frozenRef = useRef<{
     payload: SupplyPayload;
@@ -976,6 +981,7 @@ export function PatientSupplyWizard({
     }
   }
   async function persist(draft: boolean) {
+    if (busy) return;
     if (draft && !frozenRef.current) {
       await privateDraft.save(privateContent);
       return;
@@ -1089,6 +1095,26 @@ export function PatientSupplyWizard({
       /* Attempt retained in memory. */
     }
     try {
+      const intent = frozenRef.current;
+      if (isIssuance && uncertain && intent.draftCommit) {
+        const resolution = await reconcileIssuance(patientId, intent.draftCommit, intent.key);
+        if (resolution.state === "not_applied") {
+          frozenRef.current = null;
+          try { sessionStorage.removeItem(storageKey); } catch { /* The server has closed the old key. */ }
+          setUncertain(false);
+          issuanceFailure.report({ outcome: "rejected", cause: issuanceFailure.failure?.cause,
+            draftSaved: resolution.draftSaved, retryable: resolution.draftSaved && allowed });
+          return;
+        }
+        if (editing && resolution.documentId !== editing.id)
+          throw new Error("A confirmação não corresponde à ficha revisada.");
+        try { sessionStorage.removeItem(storageKey); } catch { /* Issuance is already confirmed. */ }
+        setRecoveredId(resolution.documentId);
+        openIssued(resolution.documentId);
+        setUncertain(false);
+        issuanceFailure.clear();
+        return;
+      }
       const result = await api<{ data: SupplyDocument; }>(
         editing ? "/api/documents/" + editing.id + "/revise" : "/api/documents",
         editing
@@ -1134,11 +1160,15 @@ export function PatientSupplyWizard({
         sessionStorage.removeItem(storageKey + ":start");
       } catch { /* The server has confirmed the document. */ }
       setUncertain(false);
+      issuanceFailure.clear();
     } catch (reason) {
       const known =
         reason instanceof ApiError &&
         [400, 403, 404, 409, 413, 422].includes(reason.status);
-      if (known && !uncertain) frozenRef.current = null;
+      if (known && !uncertain) {
+        frozenRef.current = null;
+        try { sessionStorage.removeItem(storageKey); } catch { /* Storage may be unavailable. */ }
+      }
       if (
         type === "BAL" &&
         reason instanceof ApiError &&
@@ -1164,11 +1194,12 @@ export function PatientSupplyWizard({
         setStep(0);
       }
       setUncertain(uncertain || !known);
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "Não foi possível confirmar a gravação.",
-      );
+      if (isIssuance && frozenRef.current?.draftCommit && (uncertain || !known)) {
+        issuanceFailure.report({ outcome: "uncertain", cause: reason });
+      } else {
+        issuanceFailure.clear();
+        setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a gravação.");
+      }
     } finally {
       setBusy(false);
       setIssuing(false);
@@ -1375,6 +1406,8 @@ export function PatientSupplyWizard({
         autorizadas no histórico.
       </Notice>
     );
+  if (recoveredId)
+    return <Notice>Ficha registrada. <Link href={"/fichas/" + recoveredId}>Acompanhar ficha</Link></Notice>;
   if (saved)
     return (
       <section className="ui-card mx-auto max-w-3xl">
@@ -1509,7 +1542,7 @@ export function PatientSupplyWizard({
           <StepNavigator
             steps={steps}
             active={step}
-            onChange={setStep}
+            onChange={(nextStep) => { issuanceFailure.clear(); setStep(nextStep); }}
             disabled={busy || uncertain || loading || privateDraft.blocked}
             label={"Etapas da " + type}
           />
@@ -1668,13 +1701,15 @@ export function PatientSupplyWizard({
                   (type === "ENT" && step === 0 && recipientLoading)
                 }
                 onBack={() => {
+                  issuanceFailure.clear();
                   setStep((value) => value - 1);
                   setError("");
                 }}
                 onDraft={() => void persist(true)}
                 onNext={next}
-                onFinish={() => void persist(false)}
+                onFinish={() => { if (!issuanceFailure.reopen()) void persist(false); }}
               />
+              <DocumentIssuanceFailure state={issuanceFailure} operation={type === "COM" ? "Emissão de ficha de compras" : "Expedição de entrega"} onRetry={() => persist(false)} />
             </section>
           )}
         </>

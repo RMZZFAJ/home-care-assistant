@@ -42,6 +42,7 @@ import {
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { issuanceSteps } from "@/components/documents/document-issuance-result";
 import { useIssuanceNavigation } from "@/components/documents/document-issuance-navigation";
+import { DocumentIssuanceFailure, issuanceRecoverySteps, reconcileIssuance, useIssuanceFailure } from "@/components/documents/document-issuance-failure";
 
 const steps = draftFlowStages.REQ.map(stage => stage.label);
 export function RequisitionWizard() {
@@ -88,9 +89,12 @@ function PatientRequisition({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uncertain, setUncertain] = useState(false);
   useOperationActivity(saving || navigating, {
-    title: "Emissão da requisição", stage: navigating ? 1 : 0, steps: issuanceSteps,
-    detail: navigating ? "A requisição foi registrada. Estamos abrindo a ficha." : "Estamos registrando a requisição e conferindo a contagem informada.",
+    title: uncertain ? "Consultando a emissão" : "Emissão da requisição",
+    stage: navigating ? 1 : 0, steps: uncertain ? issuanceRecoverySteps : issuanceSteps,
+    detail: navigating ? "A requisição foi registrada. Estamos abrindo a ficha."
+      : uncertain ? "Aguarde a confirmação desta tentativa." : "Estamos registrando a requisição e conferindo a contagem informada.",
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const fieldsRef = useRef<HTMLDivElement>(null), focusErrorRef = useRef<string | null>(null);
@@ -104,8 +108,12 @@ function PatientRequisition({
       focusErrorRef.current = null;
     }
   }, [step, fieldErrors]);
-  const frozenRef = useRef<Record<string, unknown> | null>(null);
-  const [uncertain, setUncertain] = useState(false);
+  const frozenRef = useRef<(RequisitionFormData & {
+    careRecipientId: string;
+    idempotencyKey: string;
+    draftCommit?: { id: string; revision: number };
+  }) | null>(null);
+  const issuanceFailure = useIssuanceFailure();
   const [products, setProducts] = useState<Product[]>([]);
   const [itemContext, setItemContext] = useState<ItemContext[]>([]);
   const [loadingCatalog, setLoadingCatalog] = useState(true);
@@ -416,6 +424,7 @@ function PatientRequisition({
     return true;
   }
   async function submit() {
+    if (saving) return;
     if (!frozenRef.current && (privateDraft.blocked || privateDraft.backgroundBusy || !validate(true))) return;
     if (!frozenRef.current && stockReviewLines.length) {
       openStockReview(false);
@@ -447,11 +456,23 @@ function PatientRequisition({
     setSaving(true);
     setError("");
     try {
-      const body = await api<{ receipt: RequisitionReceipt }>(
-        "/api/requisitions",
-        frozenRef.current,
-      );
-      const issuedId = body.receipt?.requisitionId;
+      const intent = frozenRef.current;
+      let issuedId: string | undefined;
+      if (uncertain && intent.draftCommit) {
+        const resolution = await reconcileIssuance(context.patient!.id, intent.draftCommit, intent.idempotencyKey);
+        if (resolution.state === "not_applied") {
+          frozenRef.current = null;
+          try { sessionStorage.removeItem(storageKey); } catch { /* The server has closed the old key. */ }
+          setUncertain(false);
+          issuanceFailure.report({ outcome: "rejected", cause: issuanceFailure.failure?.cause,
+            draftSaved: resolution.draftSaved, retryable: resolution.draftSaved && may(context, "request") });
+          return;
+        }
+        issuedId = resolution.documentId;
+      } else {
+        const body = await api<{ receipt: RequisitionReceipt }>("/api/requisitions", intent);
+        issuedId = body.receipt?.requisitionId;
+      }
       if (!issuedId)
         throw new Error(
           "Consulte o histórico ou recupere esta tentativa para confirmar o comprovante.",
@@ -459,10 +480,11 @@ function PatientRequisition({
       openIssued(issuedId);
       setIssuedDocumentId(issuedId);
       setUncertain(false);
+      issuanceFailure.clear();
       try { sessionStorage.removeItem(storageKey); } catch { /* A missing storage API does not change the confirmed receipt. */ }
     } catch (reason) {
       const rejected =
-        reason instanceof ApiError &&
+        !uncertain && reason instanceof ApiError &&
         ([400, 403, 404, 413, 422].includes(reason.status) ||
           reason.code === "DRAFT_VERSION_CONFLICT" ||
           reason.code === "VERSION_CONFLICT" ||
@@ -485,7 +507,7 @@ function PatientRequisition({
           setStep(0);
         }
         frozenRef.current = null;
-        sessionStorage.removeItem(storageKey);
+        try { sessionStorage.removeItem(storageKey); } catch { /* Storage may be unavailable. */ }
         if (reason instanceof ApiError && reason.code === "REQUEST_STOCK_CHANGED")
           openStockReview(true);
         if (
@@ -497,11 +519,12 @@ function PatientRequisition({
         }
       }
       setUncertain(!rejected);
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "Não foi possível registrar.",
-      );
+      if (rejected) {
+        issuanceFailure.clear();
+        setError(reason.message);
+      } else {
+        issuanceFailure.report({ outcome: "uncertain", cause: reason });
+      }
     } finally {
       setSaving(false);
     }
@@ -647,7 +670,7 @@ function PatientRequisition({
       <StepNavigator
         steps={steps}
         active={step}
-        onChange={setStep}
+        onChange={(nextStep) => { issuanceFailure.clear(); setStep(nextStep); }}
         disabled={uncertain || saving || loadingCatalog || privateDraft.blocked}
         label="Etapas da requisição"
       />
@@ -757,13 +780,17 @@ function PatientRequisition({
             uncertain={uncertain}
             blocked={Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
             finishLabel="Concluir requisição"
-            onBack={() => setStep((value) => value - 1)}
+            onBack={() => {
+              issuanceFailure.clear();
+              setStep((value) => value - 1);
+            }}
             onDraft={() => void privateDraft.save(draftContent)}
             onNext={() => {
               if (validate()) setStep((value) => value + 1);
             }}
-            onFinish={() => void submit()}
+            onFinish={() => { if (!issuanceFailure.reopen()) void submit(); }}
           />
+          <DocumentIssuanceFailure state={issuanceFailure} operation="Emissão de requisição" onRetry={submit} />
         </section>
       )}
     </div>

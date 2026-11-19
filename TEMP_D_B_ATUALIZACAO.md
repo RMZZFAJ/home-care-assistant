@@ -1,5 +1,33 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — falha e recuperação na emissão de fichas.** REQ, COM, ENT e DEV
+usam o modal da v7 com diagnóstico copiável e até duas tentativas explícitas
+por revisão. A consulta usa a chave da emissão e o bloqueio transacional do
+gravador. Um recibo encontrado leva à ficha original. Se a emissão não
+ocorreu, a consulta encerra a chave anterior e permite uma nova tentativa
+explícita. A confirmação de rascunho salvo depende da revisão que continua
+ativa no servidor.
+
+- O diagnóstico inclui operação, estado, código e referência segura. O
+  modal não expõe mensagens internas, conteúdo preenchido ou credenciais.
+- Integrações com Auth real verificaram o bloqueio de uma gravação
+  atrasada, a corrida com o gravador e a recuperação pelo titular após
+  revogação de escrita. A perda de leitura e a tentativa por outro
+  titular foram recusadas.
+- As verificações dirigidas em Android e iOS emulados cobriram as quatro
+  fichas, a recuperação sem duplicar efeitos, o PDF inicial e a nova
+  tentativa após confirmação de ausência. Os testes de REQ recuperada
+  foram repetidos com contagem dos horários visíveis e vínculo profissional
+  dedicado. Na primeira rodada, o WebKit ficou na visão global durante a
+  preparação de um caso no ambiente local com 7.994 cadastros.
+- Pacotes anteriores sem referência ao rascunho conservam a recuperação
+  pela chave original. O processamento de avisos no corte do exemplar
+  inicial ainda precisa de validação integrada.
+- A stack local chegou a 293 migrations até `20261119121610`. As 21
+  pendentes passaram pela pré-validação com rollback no desenvolvimento
+  remoto. O banco remoto segue em 272 enquanto o preview usa o SHA
+  `075b4b66`, anterior ao conjunto.
+
 **19/11 — confirmação de emissão sobre a ficha.** REQ, COM, ENT e DEV
 abrem a ficha em Materiais após a confirmação oficial. A interface usa
 o carregamento dinâmico para gravar, consultar e assinar o PDF inicial.
@@ -16,9 +44,7 @@ lado a lado e a ação Acompanhar ficha abaixo.
   ficha, download, compartilhamento e recuperação do PDF. A REQ
   remanescente confirmou um único ajuste de 2 para 0 e preservou os
   movimentos anteriores, o recebimento parcial e o PDF original.
-- Os diálogos de falha de gravação e diagnóstico copiável da v7 ainda
-  precisam ser ligados aos fluxos de emissão. Este incremento usa as
-  migrations já preparadas para o PDF inicial.
+- Este incremento usa as migrations preparadas para o PDF inicial.
 
 **19/11 — unificação da entrada de arquivamento de REQ.** A rota antiga
 aceita a mesma revisão versionada da rota de ciclo de vida. Toda nova
@@ -87,11 +113,12 @@ e da referência. O arquivo vigente bloqueia novos Andamentos, emissões
 manuais e alterações documentais. O administrador pode confirmar o
 encerramento ou reverter com justificativa, preservando o consolidado.
 
-| Caso | Evidência local | Pendência |
-| --- | --- | --- |
-| Preparação e acesso | Integração com Auth real confirma permissão, repetição da intenção e ausência de efeito oficial sem PDF | Diálogos e menu de três pontos da v7 |
-| Fonte atual | Um novo Andamento invalida a revisão anterior mesmo sem mudar a versão da ficha | Fluxo Concluir e arquivar |
-| Assinatura e decisões | Pipeline documental existente com corte, autoria e verificação do arquivo | Agendamento pelo prazo e integração do fluxo de REQ já existente |
+- A integração com Auth real confirmou permissão, repetição da intenção e
+  ausência de efeito oficial sem PDF. Faltavam os diálogos e o menu Mais da v7.
+- Um novo Andamento invalidou a revisão sem mudar a versão da ficha.
+  Faltava o fluxo Concluir e arquivar.
+- Corte, autoria e verificação usaram o pipeline documental existente.
+  Faltavam o agendamento pelo prazo e a integração da entrada legada da REQ.
 
 Passaram 14 testes de integração dirigidos, 16 unitários e quatro
 execuções da API com sessão aberta em Android e iOS emulados. A stack
@@ -106,11 +133,12 @@ validação existentes. A ficha conserva sua autoria e o PDF identifica
 o sistema como solicitante. A aba de arquivos mostra a situação real e
 recupera o exemplar pela mesma referência se a resposta se perder.
 
-| Caso | Evidência local | Pendência |
-| --- | --- | --- |
-| Solicitação e autoria | Três integrações dirigidas cobrem os cinco tipos, o corte da ciência, a revogação e a recuperação | Preview com a migration e o worker compatíveis |
-| Assinatura e recuperação | Pipeline PAdES-B-T, armazenamento e download em navegador móvel emulado | Modal completo de resultado da emissão da v7 |
-| Agendamento | O worker processa PDFs mesmo com falha no agendador e preserva a indicação de falha | PDF consolidado, arquivo e confirmação |
+- Três integrações cobriram os cinco tipos, o corte da ciência, a revogação e
+  a recuperação. Faltava o preview com a migration e o worker compatíveis.
+- O navegador móvel emulado verificou assinatura PAdES-B-T, armazenamento e
+  download. Faltava o modal completo de resultado da emissão da v7.
+- O worker processou PDFs durante falha do agendador e preservou a indicação
+  da falha. Faltavam o PDF consolidado, o arquivo e a confirmação.
 
 Passaram 14 regressões de integração do pipeline e da ciência e 17
 testes unitários dirigidos. A stack local tem 287 migrations até
@@ -125,11 +153,14 @@ transação. A reabertura preserva a situação física da entrega e as
 movimentações oficiais. A REQ restaurada após reversão exige uma nova
 revisão antes da conclusão.
 
-| Caso | Evidência local | Pendência |
-| --- | --- | --- |
-| Reversão e conclusão | 12 integrações com Auth real, incluindo concorrência, permissões, REQ arquivada e preservação do ledger | CI do SHA publicado |
-| Exemplar assinado | PDF PAdES-B-T de ENT com decisão anterior e motivo da reversão. O PDF original voltou com os mesmos bytes | Pipeline automático da emissão e do arquivamento |
-| Revisão e descarte | Revisões do laboratório v7 em celular e casos dirigidos em Android e iOS emulados | Arquivar, confirmar, reverter arquivo e política da residência |
+- Doze integrações com Auth real cobriram concorrência, permissões, REQ
+  arquivada e preservação do ledger. Faltava a CI do SHA publicado.
+- O PDF PAdES-B-T de ENT trouxe a decisão anterior e o motivo da reversão.
+  O PDF original voltou com os mesmos bytes. Faltava o pipeline automático
+  da emissão e do arquivamento.
+- As revisões da v7 foram verificadas em celular e nos casos dirigidos
+  em Android e iOS emulados. Faltavam arquivo, confirmação, reversão e
+  política da residência.
 
 A stack local passou a 285 migrations até `20261119100441`. O ambiente de
 desenvolvimento remoto tem 272 até `20261119060719`. O preview publicado
@@ -147,11 +178,12 @@ com a devolução física ou recusar. O solicitante pode retirar o pedido
 enquanto ele estiver em aberto. Uma nova referência de consumo preserva as
 quantidades digitadas e exige nova confirmação física.
 
-| Caso | Evidência local | Pendência |
-| --- | --- | --- |
-| Prévia antes do pedido | Auth real e cálculo compartilhado para ENT e DEV | CI do SHA publicado |
-| Consumo protegido | Prévia sem fontes quando falta acesso à custódia e sem identificadores de consumo | Conferência no preview compatível |
-| Decisão e estoque | Pedido, recusa e retirada preservam o ledger. Consentimento registra a devolução e referencia o consumo | Validar no preview compatível |
+- A prévia usou Auth real e cálculo compartilhado para ENT e DEV. Faltava
+  a CI do SHA publicado.
+- A prévia omitiu fontes e identificadores de consumo sem acesso à custódia.
+  Faltava conferir no preview compatível.
+- Pedido, recusa e retirada preservaram o ledger. O consentimento registrou
+  a devolução e referenciou o consumo. Faltava validar no preview compatível.
 
 Passaram 30 integrações, 13 testes unitários e 20 casos distintos em rodadas
 dirigidas de Mobile e iOS emulados. A última rodada dos seis casos afetados
@@ -169,11 +201,13 @@ confirmada. A decisão curta é descartada quando a pessoa sai da revisão.
 A conferência pessoal de zero unidades usa o pedido ao recebedor original
 e preserva o trânsito até que o destino físico seja esclarecido.
 
-| Caso | Evidência local | Pendência |
-| --- | --- | --- |
-| ENT e DEV em trânsito | Auth real, confirmação explícita, retorno à origem e recuperação sem duplicação | Validar o SHA publicado |
-| Conferência de zero | O pedido fica pendente e preserva o ledger e o trânsito | Revisar a jornada de decisão do recebedor conforme a v7 |
-| Vínculos e ciência anteriores | As regressões de legado, autorização e ciência passaram | Conferência no preview compatível |
+- ENT e DEV em trânsito passaram com Auth real, confirmação explícita,
+  retorno à origem e recuperação sem duplicação. Faltava validar o SHA
+  publicado.
+- Na conferência de zero, o pedido preservou o ledger e o trânsito. Faltava
+  revisar a jornada de decisão do recebedor conforme a v7.
+- As regressões de legado, autorização e ciência passaram. Faltava conferir
+  no preview compatível.
 
 Passaram 40 integrações, 33 testes unitários e quatro casos em Mobile e
 iOS emulados sem retry. O teste de navegador verificou descarte, recuperação
@@ -191,11 +225,13 @@ saldo do item. As outras linhas mantêm suas pendências. A equipe pode pedir
 nova avaliação com a quantidade já conferida. O motivo e a autoria
 aparecem na ficha, nos avisos internos e no documento emitido.
 
-| Verificação | Evidência local | Pendência |
-| --- | --- | --- |
-| Conciliação e decisão familiar | Auth real, resolução por material, negativa de papel e recuperação da mesma chave | CI do commit publicado |
-| Pedido da equipe e revisão | Quantidade conferida, motivo visível, revisão com histórico e estoque preservado | CI do commit publicado |
-| Exemplar assinado | PDF emitido com a avaliação, o destino do material e o motivo da conciliação | Conferência no preview compatível |
+- Conciliação e decisão familiar passaram com Auth real, resolução por
+  material, negativa de papel e recuperação da mesma chave. Faltava a CI
+  do commit publicado.
+- O pedido da equipe mostrou quantidade conferida e motivo. A revisão
+  preservou o histórico e o estoque. Faltava a CI do commit publicado.
+- O PDF assinado trouxe a avaliação, o destino do material e o motivo da
+  conciliação. Faltava conferir no preview compatível.
 
 Passaram 14 integrações dirigidas, 23 testes unitários e oito casos em
 Mobile e iOS emulados sem retry. A emissão assinada e a recuperação da

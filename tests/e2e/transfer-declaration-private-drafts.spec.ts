@@ -354,12 +354,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
           exact: true,
         })
         .click();
-      await expect(
-        editor(page).getByRole("button", {
-          name: "Verificar a expedição",
-          exact: true,
-        }),
-      ).toBeVisible();
+      await expect(page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true })).toBeVisible();
       expect(document?.transfer?.state).toBe("dispatched");
       expect(JSON.parse(declarationFacts(f)).ledger).toHaveLength(before.ledger.length + 1);
       const after = declarationFacts(f);

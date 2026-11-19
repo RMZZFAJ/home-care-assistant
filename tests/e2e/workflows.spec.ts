@@ -15,6 +15,7 @@ import {
   sqlLiteral,
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { setup } from "../integration/v4-fixtures.mjs";
 test.setTimeout(240_000);
 function fixtures() {
   assertLocalProject();
@@ -500,16 +501,22 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
   ).toBe(403);
 });
 
-test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async ({
-  page,
-}) => {
-  await login(page);
-  const { patient, products } = await prepare(page);
+async function openRequisitionReview(page: Page) {
+  const { patient, products } = await setup();
+  selectedPatients.set(page, patient);
+  await login(page, "professional");
   await page.goto("/fichas/req?careRecipientId=" + patient);
   await next(page);
   await next(page);
-  await page.getByRole("checkbox", { name: /^Material 01/ }).check();
+  await page.getByRole("checkbox", { name: /^Material fictício V4 0/ }).check();
   for (let step = 0; step < 4; step++) await next(page);
+  return { patient, productId: products[0] };
+}
+
+test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async ({
+  page,
+}) => {
+  const { patient, productId } = await openRequisitionReview(page);
   let savedId = "";
   await page.route("**/api/requisitions", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
@@ -520,9 +527,7 @@ test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async (
   await page
     .getByRole("button", { name: "Concluir requisição", exact: true })
     .click();
-  await expect(
-    page.getByRole("button", { name: "Recuperar esta tentativa", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true })).toBeVisible();
   await page.unroute("**/api/requisitions");
   await page.reload();
   await page
@@ -537,7 +542,43 @@ test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async (
   expect(listing.total).toBe(1);
   expect(listing.data[0].id).toBe(savedId);
   expect(listing.data[0].code).toBe("REQ-0001");
-  expect(products).toHaveLength(1);
+  const detail = await get(page, "/api/requisitions/" + savedId);
+  expect(detail.ok()).toBe(true);
+  expect((await detail.json()).receipt.lines.map((line: { productId: string }) => line.productId)).toEqual([productId]);
+});
+
+test("emissão sem registro confirma ausência, preserva o rascunho e só reenvia sob nova chave após ação explícita", async ({ page }, info) => {
+  const { patient } = await openRequisitionReview(page);
+
+  const writes: Record<string, unknown>[] = [];
+  await page.route("**/api/requisitions", async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    writes.push(route.request().postDataJSON());
+    return writes.length === 1 ? route.abort("failed") : route.continue();
+  });
+  const count = async () => (await (await get(page, "/api/documents?careRecipientId=" + patient + "&type=REQ")).json()).total;
+
+  await page.getByRole("button", { name: "Concluir requisição", exact: true }).click();
+  const warning = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
+  await expect(warning).toBeVisible();
+  await expect(warning.getByText(/Seu rascunho está salvo/)).toHaveCount(0);
+  await warning.getByRole("button", { name: "Consultar resultado", exact: true }).click();
+  const failure = page.getByRole("dialog", { name: "Não foi possível gravar a ficha", exact: true });
+  await expect(failure.getByText(/Seu rascunho está salvo/)).toBeVisible();
+  await expect(failure.locator("details")).not.toHaveAttribute("open");
+  await expect(failure.getByText("Detalhes para suporte", { exact: true })).toBeVisible();
+  expect(await failure.locator("summary").evaluate(element => getComputedStyle(element, "::after").display)).toBe("none");
+  expect(await count()).toBe(0);
+  expect(writes).toHaveLength(1);
+  await info.attach("modal-de-falha-confirmada", {
+    body: await failure.screenshot({ animations: "disabled" }),
+    contentType: "image/png",
+  });
+  await failure.getByRole("button", { name: "Tentar novamente", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Requisição emitida", exact: true })).toBeVisible();
+  expect(writes).toHaveLength(2);
+  expect(writes[1].idempotencyKey).not.toBe(writes[0].idempotencyKey);
+  expect(await count()).toBe(1);
 });
 
 test("histórico filtra código e período e conserva o documento de paciente renomeado e inativo", async ({

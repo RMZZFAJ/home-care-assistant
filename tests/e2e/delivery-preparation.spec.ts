@@ -117,14 +117,12 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   const attempts: unknown[] = [];
   let saved: SupplyDocument | undefined;
   let attemptedPdf: { id: string; issuanceId: string } | undefined;
-  const pdfSigned = Promise.withResolvers<void>();
   const releasePdfResponse = Promise.withResolvers<void>();
   await page.route("**/api/documents/*/issuances/initial", async route => {
     if (route.request().method() !== "POST") return route.continue();
     const response = await route.fetch();
     expect(response.status(), await response.text()).toBe(200);
     attemptedPdf = await response.json();
-    pdfSigned.resolve();
     await releasePdfResponse.promise;
     await route.abort("failed");
   });
@@ -141,15 +139,12 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   await page
     .getByRole("button", { name: "Confirmar e concluir", exact: true })
     .click();
-  await expect(
-    page.getByRole("button", { name: "Recuperar esta tentativa", exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Voltar", exact: true }),
-  ).toBeDisabled();
+  const uncertain = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
+  await expect(uncertain).toBeVisible();
+  await expect(uncertain.getByText(/Seu rascunho está salvo/)).toHaveCount(0);
   try {
-    await page.getByRole("button", { name: "Recuperar esta tentativa", exact: true }).click();
-    await pdfSigned.promise;
+    await uncertain.getByRole("button", { name: "Consultar resultado", exact: true }).click();
+    await expect.poll(() => Boolean(attemptedPdf), { timeout: 15_000 }).toBe(true);
     await expect(page.getByRole("heading", { name: "Gerando o PDF de emissão", exact: true })).toBeVisible();
     await expect(page.getByRole("list", { name: "Etapas da operação" }).locator('[aria-current="step"]'))
       .toContainText("Gerando o PDF de emissão");
@@ -163,8 +158,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   await expect(emitted.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveAttribute("href",
     `/api/documents/${saved!.id}/pdf?issuance=${attemptedPdf!.issuanceId}`);
   expect(sql(`select count(*) from private.pdf_issuances where initial_request_id=${sqlLiteral(attemptedPdf!.id)}`)).toBe("1");
-  expect(attempts).toHaveLength(2);
-  expect(attempts[1]).toEqual(attempts[0]);
+  expect(attempts).toHaveLength(1);
   expect(saved).toBeTruthy();
   const result = (await rpc(f.admin, "operational_document", {
     p_id: saved!.id,

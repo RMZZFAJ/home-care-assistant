@@ -122,21 +122,14 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
       exact: true,
     })
     .click();
-  await expect(
-    review.getByRole("button", {
-      name: "Verificar a expedição",
-      exact: true,
-    }),
-  ).toBeVisible();
+  const recovery = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
+  await expect(recovery).toBeVisible();
   expect(JSON.parse(transferState(f)).ledger).toHaveLength(before.ledger.length + 1);
-  await review
-    .getByRole("button", { name: "Verificar a expedição", exact: true })
-    .click();
+  await recovery.getByRole("button", { name: "Consultar resultado", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Devolução expedida", exact: true }),
   ).toBeVisible();
-  expect(packets).toHaveLength(2);
-  expect(packets[1]).toEqual(packets[0]);
+  expect(packets).toHaveLength(1);
   expect(document!.code).toMatch(/^DEV-/);
   expect(document!.status).toBe("pending_receipt");
   expect(document!.transfer?.agreement).toBeNull();

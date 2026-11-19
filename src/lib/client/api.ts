@@ -19,6 +19,7 @@ export class ApiError extends Error {
     message: string,
     public status: number,
     public code?: string,
+    public correlationId?: string,
   ) {
     super(message);
     this.name = "ApiError";
@@ -99,6 +100,9 @@ export async function api<T>(
         response.status,
         body && typeof body === "object" && "code" in body
           ? String(body.code)
+          : undefined,
+        body && typeof body === "object" && "correlationId" in body && typeof body.correlationId === "string"
+          ? body.correlationId
           : undefined,
       );
     return body as T;

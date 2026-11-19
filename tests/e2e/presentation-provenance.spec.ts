@@ -364,14 +364,12 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
   await page
     .getByRole("button", { name: "Confirmar e concluir", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Recuperar esta tentativa", exact: true })
-    .click();
+  await page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true })
+    .getByRole("button", { name: "Consultar resultado", exact: true }).click();
   await expect(
     page.getByRole("dialog", { name: "Compra emitida", exact: true }),
   ).toBeVisible();
-  expect(attempts).toHaveLength(2);
-  expect(attempts[0]).toEqual(attempts[1]);
+  expect(attempts).toHaveLength(1);
   const id = sql(
     `select id from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`,
   );
