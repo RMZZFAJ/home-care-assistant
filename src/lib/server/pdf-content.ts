@@ -23,6 +23,7 @@ import { approvedSupplyContent } from "./approved-supply-content";
 import { approvedPdfExpansionContent } from "./approved-pdf-expansion-content";
 import { approvedDeliveryContent } from "./approved-delivery-content";
 import { frozenDocumentArchive } from "@/lib/documents/document-archive";
+import { initialPdfNoticeFacts } from "./initial-pdf-notice-content";
 
 type Run = Parameters<NonNullable<PdfEmissionContext["onText"]>>[0];
 export type PdfContentPlan = {
@@ -119,7 +120,9 @@ export async function composeIssuance(
   const identity = { verificationCode: emission.verificationCode, requestedAt: emission.requestedAt };
   const obligations = snapshot.type === "REQ" ? approvedRequisitionContent(snapshot, emission) : snapshot.type === "ENT" ? approvedDeliveryContent(snapshot, emission) : approvedSupplyContent(snapshot, emission);
   const expansion = revision === 17 ? approvedPdfExpansionContent(snapshot, emission) : undefined;
-  const plan = { bytes, runs, identity, rendererRevision: revision, ...obligations, semanticFacts: { ...obligations.semanticFacts, ...expansion?.semanticFacts }, auditWatermark: expansion?.auditWatermark };
+  const plan = { bytes, runs, identity, rendererRevision: revision, ...obligations,
+    semanticFacts: { ...obligations.semanticFacts, ...initialPdfNoticeFacts(snapshot.issuanceNoticeCut), ...expansion?.semanticFacts },
+    auditWatermark: expansion?.auditWatermark };
   await validateIssuanceContent(bytes, plan);
   return plan;
 }

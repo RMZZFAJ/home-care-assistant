@@ -5,7 +5,8 @@ import { secretMatches } from "@/lib/notifications/webhook";
 import { processNotifications } from "@/lib/notifications/worker";
 import { processWebPush } from "@/lib/server/web-push";
 import { observeHeartbeat } from "@/lib/server/operations-observer";
-import { processInitialDocumentPdfs, processScheduledDocumentArchives } from "@/lib/server/pdf-issuance";
+import { processInitialDocumentPdfs } from "@/lib/server/initial-document-issuance";
+import { processScheduledDocumentArchives } from "@/lib/server/pdf-issuance";
 import { configuredAppOrigin } from "@/lib/server/app-origin";
 
 export const maxDuration = 120;

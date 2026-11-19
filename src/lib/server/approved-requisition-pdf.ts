@@ -1,5 +1,6 @@
 import { fulfillmentLabel } from "@/lib/documents/fulfillment-label";
 import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
+import { appendInitialPdfNotices } from "./initial-pdf-notice-content";
 import { CATEGORY_LABELS } from "@/lib/catalog";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { appendDocumentOriginContext, appendDocumentRelated, appendOriginalObservations, appendDocumentCancellation, appendDocumentFollowUp, appendVerificationAndPrivacy } from "./approved-document-sections";
@@ -100,6 +101,7 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
   }
   appendDocumentCancellation(layout, lifecycle, "Cancelamento da requisição");
   appendDocumentFollowUp(layout, snapshot);
+  appendInitialPdfNotices(layout, snapshot.issuanceNoticeCut);
   appendApprovedPdfExpansion(layout, snapshot, emission);
   await appendVerificationAndPrivacy(layout, emission, "Esta requisição", issuer, operationalAt, verificationUrl, formattedCode);
   layout.finish();

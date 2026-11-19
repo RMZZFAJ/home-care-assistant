@@ -1,5 +1,28 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — avisos no PDF inicial de emissão.** A etapa de avisos usa o
+mesmo processamento e as permissões do worker. A consulta durante a
+emissão seleciona somente avisos próprios da ficha e da ciência tácita
+aplicável. O PDF assinado inclui o resumo congelado por canal e estado
+com o instante do corte. O resumo mantém fila, processamento, aceitação,
+envio, entrega, leitura, falha e incerteza distintos.
+
+- O evento e seu hash permanecem no registro canônico. O resumo fica
+  ligado à solicitação automática, sem nomes, destinos, mensagens ou
+  referências privadas. A recuperação do PDF lê o mesmo corte.
+- Complemento de interface para falha parcial de aviso: o resultado mostra
+  a ficha confirmada e oferece Consultar avisos, que abre Comunicações.
+  Os detalhes do aviso e o reenvio deliberado usam os controles existentes.
+- As seis integrações com Auth real cobriram o recorte da ciência tácita,
+  o bloqueio de outras fichas, a recuperação do resumo e a preservação
+  dos eventos, do estoque e do arquivamento.
+- Passaram oito casos em Android e iOS emulados. O caso de ENT verificou
+  as etapas em ordem, a falha sintética em Comunicações e o texto
+  extraído do mesmo PDF assinado após perda da resposta.
+- A stack local está com 294 migrations até `20261119125023`. As 22
+  pendentes passaram pela pré-validação com rollback no desenvolvimento
+  remoto. A aplicação aguarda o preview compatível.
+
 **19/11 — falha e recuperação na emissão de fichas.** REQ, COM, ENT e DEV
 usam o modal da v7 com diagnóstico copiável e até duas tentativas explícitas
 por revisão. A consulta usa a chave da emissão e o bloqueio transacional do
@@ -21,8 +44,7 @@ ativa no servidor.
   dedicado. Na primeira rodada, o WebKit ficou na visão global durante a
   preparação de um caso no ambiente local com 7.994 cadastros.
 - Pacotes anteriores sem referência ao rascunho conservam a recuperação
-  pela chave original. O processamento de avisos no corte do exemplar
-  inicial ainda precisa de validação integrada.
+  pela chave original.
 - A stack local chegou a 293 migrations até `20261119121610`. As 21
   pendentes passaram pela pré-validação com rollback no desenvolvimento
   remoto. O banco remoto segue em 272 enquanto o preview usa o SHA

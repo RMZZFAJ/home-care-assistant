@@ -89,6 +89,50 @@ test("COM draft queues no initial exemplar until official issuance and retries c
   assert.equal(sql(`select count(*) from private.pdf_issuances where initial_request_id=${q(queued.id)}`), "1");
 });
 
+test("the initial notice cut uses only its own issuance jobs and preserves known outcomes on recovery", async () => {
+  const { admin, patient, products } = await setup();
+  const first = await issue(patient, [products[0]]);
+  const unrelated = await issue(patient, [products[1]]);
+  const request = await status(admin, first.id);
+  const workerId = randomUUID();
+  const claim = { p_request: request.id, p_limit: 10, p_worker_id: workerId, p_external_enabled: false };
+  assert.equal((await admin.rpc("claim_initial_pdf_notices", claim)).error?.code, "42501");
+  assert.equal((await admin.rpc("capture_initial_pdf_notices", { p_request: request.id, p_unconfirmed: false })).error?.code, "42501");
+  assert.equal(request.noticesPrepared, false);
+  const jobs = await rpc(service, "claim_initial_pdf_notices", claim);
+  assert.ok(jobs.length >= 2);
+  assert.ok(jobs.every(job => job.document_id === first.id && job.channel === "internal"));
+  assert.equal(sql(`select count(*) from public.requisition_notifications
+    where document_id=${q(unrelated.id)} and attempts>0`), "0");
+  const complete = (job, state, error = null) => rpc(service, "complete_notification_job", {
+    p_id: job.id, p_worker_id: workerId, p_state: state, p_error: error,
+  });
+  await complete(jobs[0], "failed", "synthetic controlled result");
+  await complete(jobs[1], "delivered");
+  await rpc(service, "capture_initial_pdf_notices", { p_request: request.id, p_unconfirmed: false });
+  const prepared = await status(admin, first.id);
+  assert.equal(prepared.noticesPrepared, true);
+  assert.equal(prepared.noticesNeedAttention, true);
+  assert.equal(prepared.issuanceId, null);
+  const reserved = await system(request.id, "reserve");
+  assert.ifError(reserved.error);
+  assert.equal(sql(`select (select jsonb_object_agg(field.key,r.snapshot->field.key) from jsonb_each(e.body) field)=e.body
+      and r.source_hash=e.content_hash and not(r.snapshot?'issuanceNoticeCut')
+    from private.pdf_issuances r join public.document_events e on e.document_id=r.document_id and e.version=r.version
+    where r.id=${q(reserved.data.id)}`), "t");
+  const cut = reserved.data.snapshot.issuanceNoticeCut;
+  assert.ok(cut.counts.some(row => row.channel === "internal" && row.state === "failed" && row.total === 1));
+  assert.ok(cut.counts.some(row => row.channel === "internal" && row.state === "delivered" && row.total === 1));
+  assert.doesNotMatch(JSON.stringify(cut), /synthetic controlled result|recipient|destination/);
+  for (const job of jobs.slice(2)) await complete(job, "delivered");
+  assert.deepEqual(await rpc(service, "claim_initial_pdf_notices", claim), []);
+  await rpc(service, "capture_initial_pdf_notices", { p_request: request.id, p_unconfirmed: true });
+  const repeated = await system(request.id, "reserve");
+  assert.ifError(repeated.error);
+  assert.equal(repeated.data.id, reserved.data.id);
+  assert.deepEqual(repeated.data.snapshot.issuanceNoticeCut, cut);
+});
+
 test("ENT, autonomous DEV and BAL reserve system exemplars without changing physical facts", async () => {
   const ent = await entTerminalFixture({ kind: "cancelled" });
   const f = await autonomousReturnFixture();

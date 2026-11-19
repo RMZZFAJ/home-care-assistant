@@ -14,6 +14,7 @@ import { useIssuanceResult } from "./document-issuance-navigation";
 export const issuanceSteps = [
   { label: "Registrando a ficha", icon: "file" },
   { label: "Conferindo a emissão", icon: "check" },
+  { label: "Processando os avisos da emissão", icon: "bell" },
   { label: "Gerando o PDF de emissão", icon: "shield" },
 ] as const;
 const titles = {
@@ -23,7 +24,9 @@ const titles = {
   DEV: "Devolução expedida",
 };
 type ResultProps = { id: string; userId: string; patientId: string; code: string; patientName?: string; kind: keyof typeof titles; donation?: boolean };
-type PdfResult = { state: "ready"; issuanceId: string } | { state: "pending" | "unavailable" };
+type PdfResult = ({ state: "ready"; issuanceId: string } | { state: "pending" | "unavailable" }) & {
+  noticesNeedAttention?: boolean;
+};
 
 function checkedPdf(value: unknown, documentId: string): InitialPdfStatus {
   const status = initialPdfStatusSchema.parse(value);
@@ -50,8 +53,10 @@ function IssuanceResult({ id, code, patientName, kind, donation, onClose }: Resu
   useOperationActivity(result === null, {
     title: "Emissão da ficha", stage, steps: issuanceSteps,
     detail: stage === 1
-      ? "A ficha foi registrada. Estamos consultando a solicitação do PDF inicial."
-      : "O sistema está assinando e conferindo o exemplar desta emissão.",
+      ? kind === "REQ" ? "A requisição foi registrada. Estamos consultando a emissão e a ciência aplicável."
+        : "A ficha foi registrada. Estamos consultando a emissão."
+      : stage === 2 ? "Estamos conferindo a situação dos avisos desta ficha."
+        : "O sistema está assinando e conferindo o exemplar desta emissão.",
   });
   useEffect(() => {
     const controller = new AbortController();
@@ -61,25 +66,36 @@ function IssuanceResult({ id, code, patientName, kind, donation, onClose }: Resu
       if (!signal.aborted) setCompleted({ attempt, result: pdf });
     }
     async function confirmPdf() {
+      let noticesNeedAttention = false;
       try {
         let status = checkedPdf(await api(endpoint, undefined, signal), id);
         if (signal.aborted) return;
         if (!status) { finish({ state: "unavailable" }); return; }
+        noticesNeedAttention = status.noticesNeedAttention ?? false;
         if (status.state !== "ready") {
           const requestId = status.id;
-          setStage(2);
-          status = checkedPdf(await api(endpoint, undefined, signal, "POST"), id);
-          if (!status || requestId !== status.id) throw new Error("A solicitação do PDF inicial mudou.");
+          if (status.noticesPrepared === false && !status.issuanceId) {
+            setStage(2);
+            status = checkedPdf(await api(endpoint + "?phase=notices", undefined, signal, "POST"), id);
+            if (!status || requestId !== status.id) throw new Error("A solicitação do PDF inicial mudou.");
+            noticesNeedAttention = status.noticesNeedAttention ?? false;
+          }
+          if (status.state !== "ready") {
+            setStage(3);
+            status = checkedPdf(await api(endpoint, undefined, signal, "POST"), id);
+            if (!status || requestId !== status.id) throw new Error("A solicitação do PDF inicial mudou.");
+            noticesNeedAttention = status.noticesNeedAttention ?? noticesNeedAttention;
+          }
         }
         finish(status.state === "ready" && status.issuanceId
-          ? { state: "ready", issuanceId: status.issuanceId }
-          : { state: "pending" });
+          ? { state: "ready", issuanceId: status.issuanceId, noticesNeedAttention }
+          : { state: "pending", noticesNeedAttention });
       } catch (error) {
         if (signal.aborted) return;
         if (error instanceof ApiError && [401, 403, 404].includes(error.status)) {
           onClose();
           void load();
-        } else finish({ state: "pending" });
+        } else finish({ state: "pending", noticesNeedAttention });
       }
     }
     void confirmPdf();
@@ -108,6 +124,10 @@ function IssuanceResult({ id, code, patientName, kind, donation, onClose }: Resu
         <ActionButton ref={shareRef} onClick={() => setSharing(true)}><Icon name="link" />Compartilhar link</ActionButton>
         <ActionButton variant="primary" onClick={onClose}><Icon name="arrow" />Acompanhar ficha</ActionButton>
       </div>}>
+      {result.noticesNeedAttention ? <div className="hca-issuance-notice-attention">
+        <p>Alguns avisos da emissão precisam de atenção.</p>
+        <ActionLink href={`/fichas/${id}?documentTab=communications`} onClick={onClose}>Consultar avisos</ActionLink>
+      </div> : null}
       {sharing ? <DocumentShareDialog id={id} code={code} patientName={patientName} onClose={() => setSharing(false)} finalFocus={shareRef} /> : null}
     </Dialog>
   );

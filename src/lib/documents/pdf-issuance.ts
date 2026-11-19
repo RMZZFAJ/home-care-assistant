@@ -89,6 +89,8 @@ export const initialPdfStatusSchema = z.object({
   state: pdfIssuanceSchema.shape.state,
   issuanceId: z.uuid().nullable(),
   lastError: pdfIssuanceSchema.shape.lastError,
+  noticesPrepared: z.boolean().optional(),
+  noticesNeedAttention: z.boolean().optional(),
 }).nullable();
 export type InitialPdfStatus = z.infer<typeof initialPdfStatusSchema>;
 

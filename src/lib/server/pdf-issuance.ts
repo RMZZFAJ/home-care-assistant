@@ -268,14 +268,6 @@ export async function issueSystemDocumentPdf(client: SupabaseClient, requestId: 
   });
 }
 
-export async function processInitialDocumentPdfs(client: SupabaseClient, verificationOrigin: string) {
-  const claimed = await rpc(client, "claim_initial_document_pdfs", { p_limit: 3 }) as string[];
-  const results = await Promise.allSettled(claimed.map(id => issueSystemDocumentPdf(client, id, verificationOrigin)));
-  const ready = results.filter(result => result.status === "fulfilled" && result.value.state === "ready").length;
-  const failed = results.filter(result => result.status === "rejected").length;
-  return { claimed: claimed.length, ready, failed, processing: claimed.length - ready - failed };
-}
-
 export async function processScheduledDocumentArchives(client: SupabaseClient, verificationOrigin: string) {
   const claimed = await rpc(client, "claim_scheduled_document_archives", { p_limit: 2 }) as string[];
   const results = await Promise.allSettled(claimed.map(async id => {

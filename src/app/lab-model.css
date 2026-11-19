@@ -971,6 +971,9 @@
 .hca-l1 .hca-issuance-actions > :last-child { grid-column: 1 / -1; }
 .hca-l1 .hca-issuance-actions > * { min-width: 0; white-space: normal; text-align: center; }
 .hca-l1 .hca-issuance-actions svg { flex-shrink: 0; }
+.hca-l1 .hca-issuance-notice-attention { display: grid; gap: 6px; margin: 0 0 14px; padding: 10px; border-radius: 9px; background: #fff4df; color: #785920; font-size: 12px; }
+.hca-l1 .hca-issuance-notice-attention p { margin: 0; }
+.hca-l1 .hca-issuance-notice-attention a { justify-self: start; }
 .hca-l1 .hca-issued-receipt > summary { display: flex; align-items: center; gap: 8px; font-weight: 650; list-style: none; }
 .hca-l1 .hca-issued-receipt > summary::-webkit-details-marker { display: none; }
 .hca-l1 .hca-issued-receipt > summary > :last-child { margin-inline-start: auto; }

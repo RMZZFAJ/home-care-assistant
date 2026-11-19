@@ -1,4 +1,5 @@
 import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
+import { appendInitialPdfNotices } from "./initial-pdf-notice-content";
 import { deliveryNeedRequestDescription, deliveryResolutionLabels, familyFulfillmentDescription, familyReviewDescription } from "@/lib/documents/family-fulfillment";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { PDFHexString, PDFName } from "pdf-lib";
@@ -205,6 +206,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   appendOriginalObservations(layout, snapshot); appendDocumentCancellation(layout, lifecycle, "Cancelamento da ficha");
   appendDocumentFollowUp(layout, snapshot);
   const verificationUrl = new URL("/verificar/emissao/" + emission.verificationCode, origin).href;
+  appendInitialPdfNotices(layout, snapshot.issuanceNoticeCut);
   appendApprovedPdfExpansion(layout, snapshot, emission);
   await appendVerificationAndPrivacy(layout, emission, returned ? "Esta ficha de devolução" : "Esta ficha de entrega", issuer, at, verificationUrl, emission.verificationCode.match(/.{1,4}/g)?.join("-") ?? emission.verificationCode);
   layout.finish(); return { bytes: Buffer.from(await layout.pdf.save({ useObjectStreams: false })), identity };

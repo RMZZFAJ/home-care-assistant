@@ -1,6 +1,7 @@
 import { api, ApiError, authenticate, parseUuid, rpc, validateMutationRequest } from "@/lib/server/api";
 import { configuredAppOrigin } from "@/lib/server/app-origin";
 import { issueSystemDocumentPdf } from "@/lib/server/pdf-issuance";
+import { prepareInitialDocumentNotices } from "@/lib/server/initial-document-issuance";
 import { createWorkerClient } from "@/lib/server/service-client";
 import { initialPdfStatusSchema } from "@/lib/documents/pdf-issuance";
 
@@ -23,10 +24,17 @@ export async function POST(request: Request, context: Context) {
     validateMutationRequest(request, false);
     const initial = await initialPdf(context);
     if (!initial) throw new ApiError("NOT_FOUND", "Esta ficha não tem uma solicitação de PDF inicial.", 404);
+    const phase = new URL(request.url).searchParams.get("phase");
+    if (phase !== null && phase !== "notices")
+      throw new ApiError("VALIDATION_ERROR", "Etapa de emissão inválida.");
     if (initial.state !== "ready") {
-      await issueSystemDocumentPdf(createWorkerClient(), initial.id, configuredAppOrigin());
+      const worker = createWorkerClient();
+      if (!initial.noticesPrepared && !initial.issuanceId)
+        await prepareInitialDocumentNotices(worker, initial.id);
+      if (phase === null)
+        await issueSystemDocumentPdf(worker, initial.id, configuredAppOrigin());
     }
     const current = await initialPdf(context);
-    return Response.json(current, { status: current?.state === "ready" ? 200 : 202 });
+    return Response.json(current, { status: phase === "notices" || current?.state === "ready" ? 200 : 202 });
   });
 }

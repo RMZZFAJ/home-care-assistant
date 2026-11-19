@@ -3,6 +3,7 @@ import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { historyHashes } from "../integration/version-history-fixtures.mjs";
 import { expect, test, type Page } from "@playwright/test";
+import { PDF } from "@libpdf/core";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { currentDeliveryShift } from "../integration/delivery-preparation-fixtures.mjs";
@@ -118,6 +119,15 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   let saved: SupplyDocument | undefined;
   let attemptedPdf: { id: string; issuanceId: string } | undefined;
   const releasePdfResponse = Promise.withResolvers<void>();
+  const releaseNoticeResponse = Promise.withResolvers<void>();
+  const noticeResponses: { noticesPrepared: boolean; noticesNeedAttention: boolean; issuanceId: string | null }[] = [];
+  await page.route(/\/issuances\/initial\?phase=notices$/, async route => {
+    const response = await route.fetch();
+    expect(response.ok()).toBe(true);
+    noticeResponses.push(await response.json());
+    await releaseNoticeResponse.promise;
+    await route.fulfill({ response });
+  });
   await page.route("**/api/documents/*/issuances/initial", async route => {
     if (route.request().method() !== "POST") return route.continue();
     const response = await route.fetch();
@@ -133,6 +143,11 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
       const response = await route.fetch();
       expect(response.ok()).toBe(true);
       saved = (await response.json()).data;
+      const affected = sql(`update public.requisition_notifications set state='failed',last_error='synthetic controlled result'
+        where id=(select id from public.requisition_notifications
+          where document_id=${sqlLiteral(saved!.id)} and event_key='ent.issued' and channel='internal' order by id limit 1)
+        returning id`);
+      expect(affected).not.toBe("");
       await route.abort("failed");
     } else await route.continue();
   });
@@ -144,19 +159,41 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   await expect(uncertain.getByText(/Seu rascunho está salvo/)).toHaveCount(0);
   try {
     await uncertain.getByRole("button", { name: "Consultar resultado", exact: true }).click();
+    const processingNotices = page.getByRole("dialog", { name: "Processando os avisos da emissão", exact: true });
+    await expect(processingNotices).toBeVisible();
+    await expect.poll(() => noticeResponses.length).toBe(1);
+    expect(noticeResponses[0]).toMatchObject({ noticesPrepared: true, noticesNeedAttention: true, issuanceId: null });
+    await info.attach("emissao-processando-avisos", {
+      body: await processingNotices.screenshot({ animations: "disabled" }), contentType: "image/png",
+    });
+    releaseNoticeResponse.resolve();
     await expect.poll(() => Boolean(attemptedPdf), { timeout: 15_000 }).toBe(true);
     await expect(page.getByRole("heading", { name: "Gerando o PDF de emissão", exact: true })).toBeVisible();
     await expect(page.getByRole("list", { name: "Etapas da operação" }).locator('[aria-current="step"]'))
       .toContainText("Gerando o PDF de emissão");
   } finally {
+    releaseNoticeResponse.resolve();
     releasePdfResponse.resolve();
   }
   const emitted = page.getByRole("dialog", { name: "Entrega expedida", exact: true });
   await expect(emitted).toBeVisible();
+  await expect(emitted.getByRole("link", { name: "Consultar avisos", exact: true })).toHaveAttribute("href", `/fichas/${saved!.id}?documentTab=communications`);
   await expect(emitted.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveCount(0);
   await emitted.getByRole("button", { name: "Recuperar PDF", exact: true }).click();
-  await expect(emitted.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveAttribute("href",
-    `/api/documents/${saved!.id}/pdf?issuance=${attemptedPdf!.issuanceId}`);
+  const href = `/api/documents/${saved!.id}/pdf?issuance=${attemptedPdf!.issuanceId}`;
+  await expect(emitted.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveAttribute("href", href);
+  const file = await page.request.get(href);
+  expect(file.ok()).toBe(true);
+  const text = (await PDF.load(await file.body())).extractText().flatMap(p =>
+    p.lines.map(l => l.spans.flatMap(s => s.chars.map(c => c.char)).join(""))).join(" ").replace(/\s+/g, " ");
+  expect(text).toContain("Comunicações da emissão");
+  expect(text).toContain("Aviso no aplicativo · Falhou · 1");
+  expect(text).toContain("Aviso no aplicativo · Entregue");
+  expect(text).not.toContain("synthetic controlled result");
+  expect(noticeResponses).toHaveLength(1);
+  await info.attach("emissao-confirmada-com-aviso", {
+    body: await emitted.screenshot({ animations: "disabled" }), contentType: "image/png",
+  });
   expect(sql(`select count(*) from private.pdf_issuances where initial_request_id=${sqlLiteral(attemptedPdf!.id)}`)).toBe("1");
   expect(attempts).toHaveLength(1);
   expect(saved).toBeTruthy();

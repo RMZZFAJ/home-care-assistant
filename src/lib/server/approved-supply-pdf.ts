@@ -1,4 +1,5 @@
 import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
+import { appendInitialPdfNotices } from "./initial-pdf-notice-content";
 import { documentVariant } from "@/lib/documents/variant";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { PDFHexString, PDFName } from "pdf-lib";
@@ -214,6 +215,7 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
   appendDocumentCancellation(layout, lifecycle, "Cancelamento da ficha");
   appendDocumentFollowUp(layout, snapshot);
   const verificationUrl = new URL("/verificar/emissao/" + emission.verificationCode, origin).href;
+  appendInitialPdfNotices(layout, snapshot.issuanceNoticeCut);
   appendApprovedPdfExpansion(layout, snapshot, emission);
   await appendVerificationAndPrivacy(layout, emission, purchase ? "Esta ficha de aquisição" : "Esta ficha de balanço", issuer, at, verificationUrl, emission.verificationCode.match(/.{1,4}/g)?.join("-") ?? emission.verificationCode);
   layout.finish();
