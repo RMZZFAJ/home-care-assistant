@@ -53,11 +53,13 @@ for (const mode of ["pending", "accepted"] as const) test(`ENT cancelamento ${mo
   expect(writes).toEqual([]);
   return;
  }
- await page.getByRole("textbox", { name: "Motivo / justificativa", exact: true }).fill(entReason);
- await page.getByRole("button", { name: "Revisar operação", exact: true }).click();
- await page.getByRole("dialog", { name: "Revisar operação definitiva", exact: true }).press("Escape");
- expect(entFacts(f)).toBe(before); await expect(page.getByRole("textbox", { name: "Motivo / justificativa", exact: true })).toHaveValue(entReason);
- await page.getByRole("button", { name: "Revisar operação", exact: true }).click(); await audit(page, "L1 ENT cancelamento sem rascunho");
- await confirmedOutcome(page, f.document.id, "Confirmar operação"); expect(privateFormCount(f.patient)).toBe("0"); expect(writes).toEqual([]);
+ const request = page.getByRole("dialog", { name: "Solicitar cancelamento", exact: true });
+ const reason = request.getByRole("textbox", { name: "Motivo do pedido de cancelamento", exact: true });
+ await reason.fill(entReason);
+ await request.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+ await page.getByRole("dialog", { name: "Sair sem concluir?" }).getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+ expect(entFacts(f)).toBe(before); await expect(reason).toHaveValue(entReason);
+ await audit(page, "ENT pedido de cancelamento sem rascunho");
+ await confirmedOutcome(page, f.document.id, "Enviar pedido"); expect(privateFormCount(f.patient)).toBe("0"); expect(writes).toEqual([]);
  expect((await rpc(f.admin, "operational_document", { p_id: f.document.id })).status).toBe("cancellation_pending");
 });

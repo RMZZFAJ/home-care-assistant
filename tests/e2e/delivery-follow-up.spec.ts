@@ -102,7 +102,7 @@ test("ENT follow-up preserves pending cancellation and transit; read recovery ca
   let before = facts(f.patient), physical = ledger(f.patient);
   await open(page, doc.id, "Conciliar o material ainda em trânsito");
   await workflow(page);
-  await expect(page.getByRole("button", { name: "Consentir e reconciliar cancelamento", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Analisar pedido de cancelamento", exact: true })).toHaveCount(0);
   expect(facts(f.patient)).toBe(before);
   await selectDocumentSection(page, "overview");
   await page.route(`**/api/documents/${doc.id}`, route => route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "A consulta fictícia da entrega não está disponível", retryable: true } }));

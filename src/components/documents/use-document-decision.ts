@@ -12,8 +12,9 @@ export class DocumentDecisionFailure extends Error {
 /** Only a confirmed command's key survives this form. Fields never become a draft. */
 type DecisionVerifier = (result: Record<string, unknown>, intention: DocumentDecisionIntention, key: string) => void;
 
-export function useDocumentDecision({ userId, documentId, domain, action, patientId, purchaseArrival = false }: {
-  userId: string; documentId: string; domain: DocumentDecisionIntention["domain"]; action: string; patientId?: string; purchaseArrival?: boolean;
+export function useDocumentDecision({ userId, documentId, domain, action, patientId, purchaseArrival = false, deliveryCancellationRequest = false }: {
+  userId: string; documentId: string; domain: DocumentDecisionIntention["domain"]; action: string; patientId?: string;
+  purchaseArrival?: boolean; deliveryCancellationRequest?: boolean;
 }) {
   const storageKey = `hca:official-decision:${userId}:${documentId}:${domain}:${action}`;
   const endpoint = domain === "balance_workspace" ? `/api/balances/decisions/${documentId}?careRecipientId=${patientId}` : `/api/documents/${documentId}/decisions`;
@@ -51,20 +52,24 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
   const reconcilingDelivery = domain === "supply" && action === "resolve";
   const requestingDeliveryReview = domain === "supply" && action === "request_fulfillment_review";
   const resendingArrival = domain === "supply" && action === "resubmit_receipt";
+  const consentingDelivery = domain === "supply" && action === "consent_cancel";
+  const changingCancellationRequest = domain === "supply" && ["refuse_cancellation", "withdraw_cancellation"].includes(action);
   useOperationActivity(busy, {
-    title: cancellingRequisition || cancellingSupply ? "Registrando cancelamento" : purchasing ? "Registrando compra"
+    title: deliveryCancellationRequest ? "Enviando pedido de cancelamento" : consentingDelivery ? "Registrando consentimento e devolução"
+      : changingCancellationRequest ? "Registrando a decisão" : cancellingRequisition || cancellingSupply ? "Registrando cancelamento" : purchasing ? "Registrando compra"
       : resendingArrival ? "Reenviando chegada" : purchaseArrival ? "Registrando chegada"
         : receiving ? "Confirmando recebimento" : reconcilingDelivery ? "Registrando conciliação"
           : requestingDeliveryReview ? "Enviando pedido de reavaliação" : "Concluindo a ação",
     detail: "Aguarde a conferência do resultado antes de tentar novamente.",
     stage,
     steps: purchasing ? purchaseActivitySteps : [
-      { label: cancellingRequisition || cancellingSupply ? "Conferindo os efeitos no estoque" : resendingArrival ? "Conferindo o lançamento"
+      { label: deliveryCancellationRequest ? "Conferindo o recebimento" : consentingDelivery ? "Conferindo devolução e consumo"
+        : changingCancellationRequest ? "Conferindo a autoria" : cancellingRequisition || cancellingSupply ? "Conferindo os efeitos no estoque" : resendingArrival ? "Conferindo o lançamento"
         : purchaseArrival ? "Registrando as quantidades recebidas" : receiving ? "Registrando a conferência"
           : reconcilingDelivery ? "Registrando o destino do material"
             : requestingDeliveryReview ? "Preservando o recebimento confirmado" : "Enviando sua confirmação",
-      icon: cancellingRequisition || cancellingSupply ? "stock" : purchaseArrival || receiving ? "truck" : "file" },
-      { label: receiving ? "Conferindo o estoque e as pendências" : "Conferindo o resultado", icon: "check" },
+      icon: deliveryCancellationRequest ? "truck" : consentingDelivery || cancellingRequisition || cancellingSupply ? "stock" : purchaseArrival || receiving ? "truck" : "file" },
+      { label: deliveryCancellationRequest ? "Conferindo o pedido registrado" : receiving ? "Conferindo o estoque e as pendências" : "Conferindo o resultado", icon: "check" },
     ],
   });
   function remember(key: string) { currentRef.current = { scope: storageKey, key }; try { sessionStorage.setItem(storageKey, key); } catch { /* The open form retains its key. */ } }

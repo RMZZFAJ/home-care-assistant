@@ -1064,9 +1064,10 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
     .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
     .click();
   await page
-    .getByLabel("Motivo / justificativa")
+    .getByLabel("Motivo do pedido de cancelamento")
     .fill("Devolução integral acordada com o recebedor");
-  await confirm(page, "Pedido de cancelamento registrado, sem estorno.");
+  await page.getByRole("button", { name: "Enviar pedido", exact: true }).click();
+  await page.getByRole("dialog", { name: "Aguardando decisão do recebedor" }).getByRole("button", { name: "Voltar à ficha" }).click();
   await expect(
     page.locator(".hca-document-header").getByText("Cancelamento aguardando consentimento", { exact: true }),
   ).toBeVisible();
@@ -1082,26 +1083,28 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
   await page
     .getByRole("button", {
-      name: "Consentir e reconciliar cancelamento",
+      name: "Analisar pedido de cancelamento",
       exact: true,
     })
     .click();
   await page
-    .getByLabel("Motivo / justificativa")
+    .getByLabel("Motivo da sua decisão")
     .fill("Quatro unidades efetivamente devolvidas à família");
   await expect(
-    page.getByText("Consumo já confirmado disponível: 0 unidade", {
+    page.getByRole("dialog", { name: "Analisar pedido de cancelamento" }).getByText("0 unidade", {
       exact: true,
     }),
   ).toBeVisible();
   await expect(page.locator('input[name$=":consumed"]')).toHaveCount(0);
   const actualReturn = page.getByRole("textbox", {
-    name: `Devolução física real · ${product.name} · unidade`,
+    name: `Quantidade fisicamente devolvida · ${product.name}`,
     exact: true,
   });
-  await expect(actualReturn).toHaveValue("");
+  await expect(actualReturn).toHaveValue("4");
   await actualReturn.fill("4");
-  await confirm(page, "Cancelamento consentido.");
+  await page.getByRole("switch", { name: "Conferi a devolução física e as referências de consumo" }).check();
+  await page.getByRole("button", { name: "Consentir e registrar devolução", exact: true }).click();
+  await page.getByRole("dialog", { name: "Ficha cancelada" }).getByRole("button", { name: "Voltar à ficha" }).click();
   stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)

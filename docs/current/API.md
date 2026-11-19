@@ -605,6 +605,13 @@ withdraw_cancellation pertence ao solicitante. Cada decisão envia requestId,
 motivo próprio, expectedVersion e idempotencyKey. Nenhum administrador assume
 o ato pessoal de outra identidade. Autor/motivo/instante originais são leitura.
 
+A consulta `GET /api/documents/:id?reference=cancellation-preview` oferece
+o saldo por material na versão que será revisada antes do pedido. Exige
+leitura da ficha e autoridade para solicitar. Consumo confirmado disponível
+e retorno mínimo usam o mesmo cálculo da conciliação. Quando o leitor
+carece de acesso à custódia ou faltam fontes, a interface identifica a
+indisponibilidade. A prévia omite identificadores de relatos e movimentações.
+
 consent_cancel recebe referenceHash e lines com lineId/returnQuantity. Consumo
 é calculado dos aceites e devoluções reais, com referência a débitos anteriores
 confirmados da mesma custódia; não é input editável nem um novo desconto.

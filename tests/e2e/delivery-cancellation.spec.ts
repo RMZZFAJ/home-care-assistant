@@ -97,11 +97,25 @@ const editor = (page: Page) =>
   });
 const cancellation = (page: Page) =>
   page.getByRole("region", { name: "Cancelamento da entrega", exact: true });
+const requestDialog = (page: Page) => page.getByRole("dialog", { name: "Solicitar cancelamento", exact: true });
+const decisionDialog = (page: Page) => page.getByRole("dialog", { name: "Analisar pedido de cancelamento", exact: true });
+const withdrawalDialog = (page: Page) => page.getByRole("dialog", { name: "Retirar pedido de cancelamento", exact: true });
 const returnField = (page: Page) =>
-  editor(page).getByRole("textbox", {
-    name: "Devolução física real · Material fictício V4 0 · unidade",
+  decisionDialog(page).getByRole("textbox", {
+    name: "Quantidade fisicamente devolvida · Material fictício V4 0",
     exact: true,
   });
+const physicalCheck = (page: Page) => decisionDialog(page).getByRole("switch", {
+  name: "Conferi a devolução física e as referências de consumo", exact: true,
+});
+const consentButton = (page: Page) => decisionDialog(page).getByRole("button", {
+  name: "Consentir e registrar devolução", exact: true,
+});
+async function closeStatus(page: Page, title: string) {
+  const status = page.getByRole("dialog", { name: title, exact: true });
+  await status.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(status).toHaveCount(0);
+}
 const ledger = (patient: string) =>
   sql(
     `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)};`,
@@ -133,11 +147,16 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
   await page
     .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
     .click();
-  await editor(page)
-    .getByRole("textbox", { name: "Motivo / justificativa", exact: true })
+  const requestReview = requestDialog(page);
+  await expect(requestReview.getByText("Consumo confirmado disponível", { exact: true })).toBeVisible();
+  await expect(requestReview.getByText("1 unidade", { exact: true })).toHaveCount(2);
+  if (info.project.use.hasTouch) await info.attach("Solicitação após recebimento", {
+    contentType: "image/png", body: await page.screenshot({ animations: "disabled", scale: "css" }),
+  });
+  await requestReview
+    .getByRole("textbox", { name: "Motivo do pedido de cancelamento", exact: true })
     .fill("Pedido fictício: conciliar o material já recebido");
-  const requestReview = await review(page),
-    requestPayloads: unknown[] = [];
+  const requestPayloads: unknown[] = [];
   await page.route("**/api/documents/" + f.document.id + "/decisions", async (route) => {
     if (route.request().method() !== "POST") {
       await route.continue();
@@ -149,11 +168,14 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
       await route.abort("failed");
     } else await route.continue();
   });
-  await confirmDecisionAndReconcile(page, f.document.id, requestReview.getByRole("button", { name: "Confirmar operação", exact: true }));
+  await confirmDecisionAndReconcile(page, f.document.id, requestReview.getByRole("button", { name: "Enviar pedido", exact: true }));
   await expect(requestReview).toHaveCount(0);
   await page.unroute("**/api/documents/" + f.document.id + "/decisions");
   expect(requestPayloads).toHaveLength(1);
   expect(ledger(f.patient)).toBe(before);
+  const pendingStatus = page.getByRole("dialog", { name: "Aguardando decisão do recebedor", exact: true });
+  await expect(pendingStatus).toContainText("Estoque preservado");
+  await closeStatus(page, "Aguardando decisão do recebedor");
   await expect(
     cancellation(page).getByRole("heading", {
       name: "Pedido de cancelamento vigente",
@@ -162,13 +184,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
   ).toBeVisible();
   await expect(
     page.getByRole("button", {
-      name: "Consentir e reconciliar cancelamento",
-      exact: true,
-    }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("button", {
-      name: "Recusar pedido de cancelamento",
+      name: "Analisar pedido de cancelamento",
       exact: true,
     }),
   ).toHaveCount(0);
@@ -196,33 +212,40 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
   await selectDocumentSection(recipient, "workflow");
     await recipient
       .getByRole("button", {
-        name: "Consentir e reconciliar cancelamento",
+        name: "Analisar pedido de cancelamento",
         exact: true,
       })
       .click();
-    await expect(returnField(recipient)).toHaveValue("");
+    const consentReview = decisionDialog(recipient);
+    await expect(returnField(recipient)).toHaveValue("1");
     await expect(
-      editor(recipient).locator('input[name$=":consumed"]'),
+      consentReview.locator('input[name$=":consumed"]'),
     ).toHaveCount(0);
     await expect(
-      editor(recipient).getByText(
+      consentReview.getByText(
         "Pedido fictício: conciliar o material já recebido",
         { exact: true },
       ),
     ).toBeVisible();
     await returnField(recipient).fill("1,0");
-    await editor(recipient)
-      .getByRole("textbox", { name: "Motivo / justificativa", exact: true })
+    await consentReview
+      .getByRole("textbox", { name: "Motivo da sua decisão", exact: true })
       .fill("Uma unidade foi consumida e uma foi fisicamente devolvida");
-    const consentReview = await review(recipient);
+    await expect(consentButton(recipient)).toBeDisabled();
+    await physicalCheck(recipient).check();
     await expect(
-      consentReview.getByText("consumo já confirmado referenciado 1 unidade", {
+      consentReview.getByText("Consumo a referenciar: 1 unidade", {
         exact: false,
       }),
     ).toBeVisible();
     for (const width of [1440, 768, 390, 320]) {
       await recipient.setViewportSize({ width, height: 900 });
       await audit(recipient, "ENT cancellation review " + width);
+      const back = await consentReview.getByRole("button", { name: "Voltar à ficha", exact: true }).boundingBox();
+      const confirm = await consentButton(recipient).boundingBox();
+      expect(back).not.toBeNull();
+      expect(confirm).not.toBeNull();
+      expect(Math.abs(back!.y - confirm!.y)).toBeLessThan(2);
       expect(
         await recipient.evaluate(
           () =>
@@ -251,8 +274,9 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
         } else await route.continue();
       },
     );
-    await confirmDecisionAndReconcile(recipient, f.document.id, consentReview.getByRole("button", { name: "Confirmar operação", exact: true }));
+    await confirmDecisionAndReconcile(recipient, f.document.id, consentButton(recipient));
     await expect(consentReview).toHaveCount(0);
+    await closeStatus(recipient, "Ficha cancelada");
     expect(payloads).toHaveLength(1);
     await expect(recipient.locator(".hca-document-header [data-document-heading]")).toBeFocused();
     await expect(
@@ -338,13 +362,13 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
       exact: true,
     })
     .click();
-  const reason = editor(page).getByRole("textbox", {
+  const withdrawal = withdrawalDialog(page);
+  const reason = withdrawal.getByRole("textbox", {
     name: "Motivo da retirada",
     exact: true,
   });
   await expect(reason).toHaveValue("");
   await reason.fill("Justificativa própria preservada para retirar o pedido");
-  const withdrawal = await review(page);
   const recipientContext = await browser.newContext(),
     recipient = await recipientContext.newPage();
   try {
@@ -353,29 +377,30 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
   await selectDocumentSection(recipient, "workflow");
     await recipient
       .getByRole("button", {
-        name: "Recusar pedido de cancelamento",
+        name: "Analisar pedido de cancelamento",
         exact: true,
       })
       .click();
-    await editor(recipient)
-      .getByRole("textbox", { name: "Motivo da recusa", exact: true })
-      .fill("Recebedor mantém os materiais e recusa este pedido");
-    const refusal = await review(recipient);
+    const refusal = decisionDialog(recipient);
+    await refusal.getByRole("combobox", { name: "Sua decisão" }).selectOption("refuse_cancellation");
     await refusal
-      .getByRole("button", { name: "Confirmar operação", exact: true })
+      .getByRole("textbox", { name: "Motivo da sua decisão", exact: true })
+      .fill("Recebedor mantém os materiais e recusa este pedido");
+    await refusal
+      .getByRole("button", { name: "Recusar cancelamento", exact: true })
       .click();
     await expect(recipient.locator(".hca-activity-overlay")).toHaveCount(0);
     await expect(refusal).toHaveCount(0);
+    await closeStatus(recipient, "Cancelamento não autorizado");
     await withdrawal
-      .getByRole("button", { name: "Confirmar operação", exact: true })
+      .getByRole("button", { name: "Retirar pedido", exact: true })
       .click();
-    await expect(withdrawal).toHaveCount(0);
     await expect(reason).toHaveValue(
       "Justificativa própria preservada para retirar o pedido",
     );
     await expect(
-      editor(page).getByRole("button", {
-        name: "Revisar operação",
+      withdrawal.getByRole("button", {
+        name: "Retirar pedido",
         exact: true,
       }),
     ).toBeDisabled();
@@ -394,6 +419,7 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
         exact: true,
       })
       .click();
+    await closeStatus(page, "Cancelamento não autorizado");
     await expect(
       cancellation(page).getByText("Recusado pelo recebedor", { exact: true }),
     ).toBeVisible();
@@ -402,18 +428,18 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
     await page
       .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
       .click();
-    await editor(page)
-      .getByRole("textbox", { name: "Motivo / justificativa", exact: true })
-      .fill("Novo pedido fictício separado da decisão anterior");
-    const next = await review(page);
+    const next = requestDialog(page);
     await next
-      .getByRole("button", { name: "Confirmar operação", exact: true })
+      .getByRole("textbox", { name: "Motivo do pedido de cancelamento", exact: true })
+      .fill("Novo pedido fictício separado da decisão anterior");
+    await next
+      .getByRole("button", { name: "Enviar pedido", exact: true })
       .click();
     await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
     await expect(next).toHaveCount(0);
-    await page
+    await page.getByRole("dialog", { name: "Aguardando decisão do recebedor" })
       .getByRole("button", {
-        name: "Retirar meu pedido de cancelamento",
+        name: "Retirar pedido",
         exact: true,
       })
       .click();
@@ -424,12 +450,12 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
     await expect(page.getByRole("button", { name: "Continuar rascunho", exact: true })).toHaveCount(0);
     expect(ledger(f.patient)).toBe(before);
     await reason.fill("Solicitante retirou somente o pedido novo");
-    const current = await review(page);
-    await current
-      .getByRole("button", { name: "Confirmar operação", exact: true })
+    await withdrawal
+      .getByRole("button", { name: "Retirar pedido", exact: true })
       .click();
     await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
-    await expect(current).toHaveCount(0);
+    await expect(withdrawal).toHaveCount(0);
+    await closeStatus(page, "Pedido retirado");
     await expect(
       cancellation(page).getByText("Retirado pelo solicitante", {
         exact: true,
@@ -462,15 +488,15 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
   await selectDocumentSection(page, "workflow");
   await page
     .getByRole("button", {
-      name: "Consentir e reconciliar cancelamento",
+      name: "Analisar pedido de cancelamento",
       exact: true,
     })
     .click();
   await returnField(page).fill("1");
-  await editor(page)
-    .getByRole("textbox", { name: "Motivo / justificativa", exact: true })
+  await decisionDialog(page)
+    .getByRole("textbox", { name: "Motivo da sua decisão", exact: true })
     .fill("Conciliação própria com fonte revisada");
-  const original = await review(page);
+  await physicalCheck(page).check();
   await consume(f);
   const stock = ledger(f.patient),
     payloads: {
@@ -482,12 +508,9 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
       payloads.push(route.request().postDataJSON());
     await route.continue();
   });
-  await original
-    .getByRole("button", { name: "Confirmar operação", exact: true })
-    .click();
+  await consentButton(page).click();
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
-    await expect(original).toHaveCount(0);
-  await expect(returnField(page)).toHaveValue("1");
+  await expect(consentButton(page)).toBeDisabled();
   await page
     .getByRole("button", {
       name: "Consultar pedido e referências atuais",
@@ -508,18 +531,18 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
     .click();
   await expect(returnField(page)).toHaveValue("1");
   await expect(returnField(page)).toBeFocused();
+  await expect(physicalCheck(page)).not.toBeChecked();
   await returnField(page).fill("0");
-  const current = await review(page);
   await expect(
-    current.getByText("consumo já confirmado referenciado 2 unidade", {
+    decisionDialog(page).getByText("Consumo a referenciar: 2 unidade", {
       exact: false,
     }),
   ).toBeVisible();
-  await current
-    .getByRole("button", { name: "Confirmar operação", exact: true })
-    .click();
+  await physicalCheck(page).check();
+  await consentButton(page).click();
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
-    await expect(current).toHaveCount(0);
+  await expect(decisionDialog(page)).toHaveCount(0);
+  await closeStatus(page, "Ficha cancelada");
   expect(payloads).toHaveLength(2);
   expect(payloads[0].intention.expectedVersion).toBe(payloads[1].intention.expectedVersion);
   expect(payloads[0].key).not.toBe(payloads[1].key);
@@ -552,7 +575,7 @@ test("ENT mantém pedido e trânsito parcial até conciliação real, sem oferec
   await selectDocumentSection(page, "workflow");
   await expect(
     page.getByRole("button", {
-      name: "Consentir e reconciliar cancelamento",
+      name: "Analisar pedido de cancelamento",
       exact: true,
     }),
   ).toHaveCount(0);
@@ -626,20 +649,17 @@ test("ENT atualiza uma fonte indisponível por consulta e comparação, preserva
       { exact: false },
     ),
   ).toBeVisible();
-  await expect(
-    page.getByRole("button", {
-      name: "Consentir e reconciliar cancelamento",
-      exact: true,
-    }),
-  ).toHaveCount(0);
   await page
     .getByRole("button", {
-      name: "Recusar pedido de cancelamento",
+      name: "Analisar pedido de cancelamento",
       exact: true,
     })
     .click();
-  const reason = editor(page).getByRole("textbox", {
-    name: "Motivo da recusa",
+  await expect(consentButton(page)).toBeDisabled();
+  await expect(returnField(page)).toHaveCount(0);
+  await decisionDialog(page).getByRole("combobox", { name: "Sua decisão" }).selectOption("refuse_cancellation");
+  const reason = decisionDialog(page).getByRole("textbox", {
+    name: "Motivo da sua decisão",
     exact: true,
   });
   await reason.fill(
@@ -648,7 +668,7 @@ test("ENT atualiza uma fonte indisponível por consulta e comparação, preserva
   sql(
     `update public.capability_overrides set enabled=true where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.professional.id)} and capability='stock.team.read';`,
   );
-  await cancellation(page)
+  await decisionDialog(page)
     .getByRole("button", { name: "Atualizar referências", exact: true })
     .click();
   await expect(
@@ -667,16 +687,14 @@ test("ENT atualiza uma fonte indisponível por consulta e comparação, preserva
     "Justificativa própria preservada durante atualização da fonte",
   );
   await expect(reason).toBeFocused();
-  await expect(
-    cancellation(page).getByText(
-      "As referências de consumo não estão disponíveis para o seu acesso atual.",
-      { exact: false },
-    ),
-  ).toHaveCount(0);
   await expect(page.locator('[aria-invalid="true"]')).toHaveCount(0);
-  await editor(page)
-    .getByRole("button", { name: "Fechar ação", exact: true })
+  await decisionDialog(page)
+    .getByRole("button", { name: "Voltar à ficha", exact: true })
     .click();
+  await page.getByRole("dialog", { name: "Sair sem concluir?" }).getByRole("button", { name: "Sair e descartar", exact: true }).click();
+  await expect(cancellation(page).getByText(
+    "As referências de consumo não estão disponíveis para o seu acesso atual.", { exact: false },
+  )).toHaveCount(0);
   expect(ledger(f.patient)).toBe(before);
   const current = (await rpc(f.professional, "operational_document", {
     p_id: f.document.id,

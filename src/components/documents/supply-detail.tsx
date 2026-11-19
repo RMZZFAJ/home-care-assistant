@@ -25,6 +25,7 @@ import { DeliveryMaterials } from "./delivery-materials";
 import { CountedDeliveryReceipt, CountedDeliveryReceiptResult } from "./delivery-receipt";
 import { canReconcileFromFamily, DeliveryReconciliation, DeliveryReconciliationResult } from "./delivery-reconciliation";
 import { DeliveryTransitCancellation, DeliveryTransitCancellationResult } from "./delivery-transit-cancellation";
+import { DeliveryCancellationDecision, DeliveryCancellationStatusDialog, type CancellationAction } from "./delivery-cancellation-decision";
 import { readCountedDeliveryReceipt, verifyCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
 import { deliveryTransit } from "@/lib/documents/family-fulfillment";
 import { countedDeliveryReceiptBody, deliveryResolutionBody, type CountedDeliveryReceiptBody, type DeliveryResolutionBody } from "@/lib/validation/delivery-receipt";
@@ -146,6 +147,7 @@ export function SupplyDocumentContent({
   const [arrivalResult, setArrivalResult] = useState<{ documentId: string; receipt: PurchaseReceipt } | null>(null);
   const [deliveryReceiptResult, setDeliveryReceiptResult] = useState<SupplyDocument | null>(null);
   const [transitCancellationResult, setTransitCancellationResult] = useState<SupplyDocument | null>(null);
+  const [cancellationStatus, setCancellationStatus] = useState<SupplyDocument | null>(null);
   const [reconciliationResult, setReconciliationResult] = useState<{ data: SupplyDocument; body: DeliveryResolutionBody } | null>(null);
   const [purchaseUpdating, setPurchaseUpdating] = useState(false);
   const purchaseReadAttemptRef = useRef<number | null>(null);
@@ -160,12 +162,19 @@ export function SupplyDocumentContent({
   const reconcilingDelivery = action === "resolve" && hasCountedTransit;
   const hasUnreceivedDispatch = data?.type === "ENT" && data.status === "pending_receipt" && !data.workflow_data.acceptedAt;
   const cancellingTransit = action === "cancel" && hasUnreceivedDispatch;
+  const hasPersonalReceipt = data?.type === "ENT" && (Boolean(data.workflow_data.acceptedAt) ||
+    data.lines.some(line => quantity(line.accepted_quantity).gt(0)));
+  const reviewingCancellation = data?.type === "ENT" && (action === "cancel" && hasPersonalReceipt ||
+    action === "consent_cancel" || action === "refuse_cancellation" || action === "withdraw_cancellation");
   const coveredOperation = registeringPurchase || registeringArrival;
-  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery && !cancellingTransit), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
+  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
   const [review, setReview] = useState<SupplyReview | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [closeUncertain, setCloseUncertain] = useState(false);
-  const decision = useDocumentDecision({ userId: context.userId, documentId: id, domain: "supply", action: review?.action ?? action ?? "none", purchaseArrival: registeringArrival });
+  const decision = useDocumentDecision({
+    userId: context.userId, documentId: id, domain: "supply", action: review?.action ?? action ?? "none",
+    purchaseArrival: registeringArrival, deliveryCancellationRequest: reviewingCancellation && action === "cancel",
+  });
   const [purchaseConflict, setPurchaseConflict] = useState(false);
   const [deliveryConflict, setDeliveryConflict] = useState(false);
   const [regularizationEditing, setRegularizationEditing] = useState(false);
@@ -349,6 +358,14 @@ export function SupplyDocumentContent({
             !read.lines.some(line => typeof line.metadata.cancelledTransitReturn === "string"))
             throw new Error("Não foi possível verificar o cancelamento e o retorno dos materiais.");
         }
+        if (reviewingCancellation && read.type === "ENT") {
+          const request = read.deliveryCancellation?.request;
+          const expectedStatus = { cancel: "pending", consent_cancel: "consented", refuse_cancellation: "refused", withdraw_cancellation: "withdrawn" }[accepted.action as CancellationAction];
+          const event = read.events.find(item => item.version === accepted.expectedVersion + 1 && item.actorId === context.userId && item.action === "ent." + accepted.action);
+          if (!request || request.status !== expectedStatus || !event ||
+            (accepted.action === "cancel" ? request.reason !== accepted.body.reason || request.requestedBy !== context.userId : request.id !== accepted.body.requestId || request.outcome?.reason !== accepted.body.reason))
+            throw new Error("Não foi possível verificar a decisão deste pedido.");
+        }
       };
       const outcome = checking ? await decision.checkPrevious(verify) : initialIntention && await decision.execute({
         domain: "supply", action: initialIntention.action, body: initialIntention.body as Record<string, unknown>, expectedVersion: initialIntention.expectedVersion,
@@ -387,6 +404,11 @@ export function SupplyDocumentContent({
       if (intention.action === "cancel" && intention.body.transitReturned === true) {
         setMessage("");
         setTransitCancellationResult(result.data);
+        return;
+      }
+      if (reviewingCancellation && result.data.deliveryCancellation) {
+        tabs.select("workflow");
+        setCancellationStatus(result.data);
         return;
       }
       if (intention.action === "purchase" && result.data.payload.origin !== "donation") {
@@ -591,13 +613,7 @@ export function SupplyDocumentContent({
         data.recipient_id === context.userId &&
         allowed("ent.receive")
       ) {
-        if (
-          data.deliveryCancellation?.sourceReady &&
-          data.deliveryCancellation.referenceHash &&
-          !quantity(data.deliveryCancellation.unresolvedTransit ?? "0").gt(0)
-        )
-          actions.push("consent_cancel");
-        actions.push("refuse_cancellation");
+        if (data.deliveryCancellation?.request.status === "pending") actions.push("consent_cancel");
       }
       if (
         data.status === "cancellation_pending" &&
@@ -631,28 +647,23 @@ export function SupplyDocumentContent({
   function adoptDeliveryComparison() {
     if (!comparison) return;
     const pending = comparison.status === "cancellation_pending";
-    if (
-      pending &&
-      action === "consent_cancel" &&
-      !referenceAdoptionRef.current?.adoptCancellationReference(
-        comparison,
-      )
-    ) {
-      setError(
-        "Não foi possível atualizar a referência privada da conciliação. Consulte novamente.",
-      );
-      return;
-    }
     decisionFocusRef.current = pending;
     resultFocusRef.current = !pending;
     setData(comparison);
     setComparison(null);
     setDeliveryConflict(false);
     setReview(null);
-    if (!pending) setAction(null);
+    setError("");
+    if (reviewingCancellation) {
+      const canReviewRequestAgain = action === "cancel" && hasPersonalReceipt && ["confirmed", "disputed"].includes(comparison.status);
+      if (!canReviewRequestAgain && (!pending || data?.deliveryCancellation?.request.id !== comparison.deliveryCancellation?.request.id)) {
+        setAction(null);
+        if (comparison.deliveryCancellation) setCancellationStatus(comparison);
+      }
+    } else if (!pending) setAction(null);
     setFocusRevision((value) => value + 1);
     setMessage(
-      pending
+      pending || (action === "cancel" && reviewingCancellation && ["confirmed", "disputed"].includes(comparison.status))
         ? "Referência atual carregada. Confira os valores preservados e prepare uma nova revisão antes de decidir."
         : "Resultado atual carregado. O primeiro ato e sua autoria permanecem preservados.",
     );
@@ -724,7 +735,8 @@ export function SupplyDocumentContent({
         disabled={busy || uncertain}
         onClick={(event) => {
           operationOpenerRef.current = event.currentTarget;
-          if ((item === "receive" && data.type === "ENT") || (item === "resolve" && hasCountedTransit) || (item === "cancel" && hasUnreceivedDispatch)) {
+          if ((item === "receive" && data.type === "ENT") || (item === "resolve" && hasCountedTransit) ||
+            (item === "cancel" && (hasUnreceivedDispatch || hasPersonalReceipt)) || item === "consent_cancel" || item === "withdraw_cancellation") {
             setError("");
             setReview(null);
             if (item === "cancel") operationOpenerRef.current = moreTriggerRef.current;
@@ -839,7 +851,7 @@ export function SupplyDocumentContent({
         {loading && data ? "Atualizando consulta da ficha…" : ""}
       </span>
       {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
-        {error && !countingDelivery && !reconcilingDelivery && !cancellingTransit ? <Notice error>{error}</Notice> : null}
+      {error && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {readNotice &&
         (action ||
@@ -851,7 +863,7 @@ export function SupplyDocumentContent({
         <Notice>{readNotice}</Notice>
       ) : null}
       {!coveredOperation ? purchaseConflictPanel : null}
-      {deliveryConflict && data?.type === "ENT" && !countingDelivery && !reconcilingDelivery && !cancellingTransit ? (
+      {deliveryConflict && data?.type === "ENT" && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation ? (
         <section className="ui-card space-y-3">
           <Notice error>
             O pedido, a versão ou as referências da conciliação mudaram. Seus
@@ -1237,6 +1249,7 @@ export function SupplyDocumentContent({
               ) : null}
               {data.type === "ENT" && data.deliveryCancellation ? (
                 <DeliveryCancellationDetails
+                  onInspect={() => setCancellationStatus(data)}
                   sourceChecking={
                     action === "consent_cancel" &&
                     (deliveryConflict || busy || uncertain)
@@ -1306,7 +1319,7 @@ export function SupplyDocumentContent({
                   ) : null}
                 </section>
               ) : null}
-              {!countingDelivery && !reconcilingDelivery && !cancellingTransit && (actions.length || action) ? (
+              {!countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation && (actions.length || action) ? (
                 <section className="ui-card">
                   <h2>
                     {action && !actions.includes(action)
@@ -1318,10 +1331,6 @@ export function SupplyDocumentContent({
                       key={data.id + action}
                       referenceAdoptionRef={referenceAdoptionRef}
                       recoveryOnly={!actions.includes(action)}
-                      onCompareCancellationReference={() => {
-                        setDeliveryConflict(true);
-                        void comparePurchaseVersion();
-                      }}
                       action={action}
                       purchaseFeedback={error}
                       purchaseConflictContent={purchaseConflictPanel}
@@ -1536,8 +1545,58 @@ export function SupplyDocumentContent({
           resultFocusRef.current = true;
           setFocusRevision(value => value + 1);
         }} /> : null}
+      {data && reviewingCancellation && !readDenied ? <DeliveryCancellationDecision
+        key={data.id}
+        data={data} action={action as CancellationAction}
+        patientName={context.patient?.display_name ?? "Paciente identificado na ficha"} actor={context.fullName}
+        busy={busy || decision.busy} blocked={deliveryConflict || !actions.includes(action === "refuse_cancellation" ? "consent_cancel" : action!)}
+        uncertain={uncertain || decision.uncertain} error={error || decision.recoveryMessage}
+        finalFocus={operationOpenerRef}
+        conflict={deliveryConflict ? <Notice>
+          O pedido, a versão ou as referências da conciliação mudaram. Seus campos permanecem nesta revisão.
+          {comparison ? action === "consent_cancel" && comparison.status === "cancellation_pending" ? <ConsentReferenceComparison
+            expected={{
+              id: data.id, patientId: data.care_recipient_id, version: comparison.version,
+              requestId: comparison.deliveryCancellation?.request.id, referenceHash: comparison.deliveryCancellation?.referenceHash,
+              lineIds: comparison.lines.map(line => line.id),
+            }}>
+            {renderDeliveryComparison}
+          </ConsentReferenceComparison> : renderDeliveryComparison(comparison.id === data.id && comparison.care_recipient_id === data.care_recipient_id)
+            : <ActionButton onClick={() => void comparePurchaseVersion()}>Consultar pedido e referências atuais</ActionButton>}
+        </Notice> : null}
+        focusRevision={focusRevision}
+        onAction={next => { setAction(next); setReview(null); setError(""); }}
+        onCompare={() => { setDeliveryConflict(true); void comparePurchaseVersion(); }}
+        onSubmit={body => {
+          const next = { action: action!, body, summary: "", expectedVersion: data.version };
+          setReview(next);
+          void execute(next);
+        }}
+        onRecover={() => void execute()}
+        onClose={() => {
+          setAction(null);
+          setReview(null);
+          setError("");
+          setDeliveryConflict(false);
+          setComparison(null);
+          setAttempt(value => value + 1);
+        }}
+        onCloseUncertain={() => setCloseUncertain(true)} /> : null}
+      {cancellationStatus?.id === id && !readDenied && activeContext ? <DeliveryCancellationStatusDialog
+        data={cancellationStatus}
+        patientName={context.patient?.display_name ?? "Paciente identificado na ficha"}
+        onWithdraw={actions.includes("withdraw_cancellation") && data?.deliveryCancellation?.request.id === cancellationStatus.deliveryCancellation?.request.id ? () => {
+          setCancellationStatus(null);
+          setAction("withdraw_cancellation");
+        } : undefined}
+        onClose={() => {
+          setCancellationStatus(null);
+          resultFocusRef.current = true;
+          setFocusRevision(value => value + 1);
+        }}
+        onHistory={() => { setCancellationStatus(null); tabs.select("history"); }} /> : null}
       <Dialog
-        open={Boolean(review) && !readDenied && !countingDelivery && !reconcilingDelivery && !cancellingTransit && (!coveredOperation || uncertain)}
+        open={Boolean(review) && !readDenied && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation && (!coveredOperation || uncertain)}
         title={
           review?.action === "close_expectation"
             ? "Revisar encerramento da expectativa"
@@ -1623,7 +1682,7 @@ export const actionLabels: Record<DocumentAction, string> = {
   approve_family: "Revisão da família",
   approve_supervisor: "Revisão da supervisão",
   cancel: "Solicitar cancelamento",
-  consent_cancel: "Consentir e reconciliar cancelamento",
+  consent_cancel: "Analisar pedido de cancelamento",
   refuse_cancellation: "Recusar pedido de cancelamento",
   withdraw_cancellation: "Retirar meu pedido de cancelamento",
 };

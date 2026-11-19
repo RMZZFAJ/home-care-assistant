@@ -9,9 +9,13 @@ test.setTimeout(150_000);
 test("ENT consentimento mantém devolução física e ciência separadas, sem salvar campos ou repetir estoque após resposta perdida", async ({ page }) => {
  const f = await consentFixture(), before = entFacts(f), writes = noPrivateWrites(page);
  await loginDecision(page, fixtures.professional.email, f.patient); await page.goto("/fichas/" + f.document.id); await selectDocumentSection(page, "workflow");
- await page.getByRole("button", { name: "Consentir e reconciliar cancelamento", exact: true }).click();
- for (const line of f.document.lines) await page.getByRole("textbox", { name: `Devolução física real · ${line.name_snapshot} · ${line.unit_snapshot}`, exact: true }).fill("2");
- await page.getByRole("textbox", { name: "Motivo / justificativa", exact: true }).fill(entReason);
- expect(entFacts(f)).toBe(before); await page.getByRole("button", { name: "Revisar operação", exact: true }).click(); await audit(page, "L1 consentimento sem rascunho");
- await confirmedOutcome(page, f.document.id, "Confirmar operação"); expect(privateFormCount(f.patient)).toBe("0"); expect(writes).toEqual([]); expect(entFacts(f)).not.toBe(before);
+ await page.getByRole("button", { name: "Analisar pedido de cancelamento", exact: true }).click();
+ for (const line of f.document.lines) await page.getByRole("textbox", { name: `Quantidade fisicamente devolvida · ${line.name_snapshot}`, exact: true }).fill("2");
+ await page.getByRole("textbox", { name: "Motivo da sua decisão", exact: true }).fill(entReason);
+ expect(entFacts(f)).toBe(before);
+ await page.getByRole("switch", { name: "Conferi a devolução física e as referências de consumo", exact: true }).check();
+ await audit(page, "ENT consentimento sem rascunho");
+ await confirmedOutcome(page, f.document.id, "Consentir e registrar devolução");
+ await expect(page.getByRole("dialog", { name: "Ficha cancelada", exact: true })).toBeVisible();
+ expect(privateFormCount(f.patient)).toBe("0"); expect(writes).toEqual([]); expect(entFacts(f)).not.toBe(before);
 });

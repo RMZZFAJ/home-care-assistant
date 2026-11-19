@@ -4,15 +4,21 @@ import { supplyCommandSchema } from "@/lib/validation/documents";
 import { withRequisitionLinks } from "@/lib/server/document-requisition-links";
 
 type Context = { params: Promise<{ id: string }> };
-export async function GET(_request: Request, context: Context) {
+export async function GET(request: Request, context: Context) {
   return api("documents.detail", async () => {
     const { id } = await context.params;
     const auth = await authenticate();
+    const documentId = parseUuid(id);
+    if (new URL(request.url).searchParams.get("reference") === "cancellation-preview") {
+      return NextResponse.json({
+        data: await rpc(auth.client, "delivery_cancellation_preview", { p_id: documentId }),
+      });
+    }
     return NextResponse.json({
       data: await withRequisitionLinks(
         auth.client,
         await rpc(auth.client, "operational_document", {
-          p_id: parseUuid(id),
+          p_id: documentId,
         }),
       ),
     });

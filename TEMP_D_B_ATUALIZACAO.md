@@ -1,5 +1,27 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — pedido e decisão após recebimento de ENT e DEV.** A revisão
+E06-11 mostra o recebimento, o consumo disponível e o saldo para conferir.
+O pedido registra autoria e aguarda o recebedor original. Ele pode consentir
+com a devolução física ou recusar. O solicitante pode retirar o pedido
+enquanto ele estiver em aberto. Uma nova referência de consumo preserva as
+quantidades digitadas e exige nova confirmação física.
+
+| Caso | Evidência local | Pendência |
+| --- | --- | --- |
+| Prévia antes do pedido | Auth real e cálculo compartilhado para ENT e DEV | CI do SHA publicado |
+| Consumo protegido | Prévia sem fontes quando falta acesso à custódia e sem identificadores de consumo | Conferência no preview compatível |
+| Decisão e estoque | Pedido, recusa e retirada preservam o ledger. Consentimento registra a devolução e referencia o consumo | Validar no preview compatível |
+
+Passaram 30 integrações, 13 testes unitários e 20 casos distintos em rodadas
+dirigidas de Mobile e iOS emulados. A última rodada dos seis casos afetados
+pelos ajustes passou sem retry, incluindo o rodapé a 320 px, a quantidade
+com vírgula, a comparação de consumo e a recusa pela caixa de tarefas.
+
+A migration `20261119093029` elevou o histórico local a 282 versões.
+O remoto tem 272 e o preview está em `075b4b66`. A fila das dez migrations
+aguarda a publicação da interface compatível na mesma branch.
+
 **19/11 — cancelamento físico de ENT e DEV em trânsito.** A revisão E06-10
 apresenta o saldo e o estoque de retorno por material. O cancelamento
 preserva os vínculos e gera o histórico na mesma transação que a devolução

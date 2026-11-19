@@ -59,9 +59,8 @@ export function ConsentReferenceComparison({
     >
       <h3>Pedido e consumo confirmado na consulta atual</h3>
       <p>
-        O rascunho preserva suas declarações e a identidade da referência
-        consultada. Os fatos de consumo são consultados com seu acesso atual;
-        não são reconstruídos a partir do preenchimento privado.
+        Seus valores permanecem nesta revisão. As referências de consumo
+        são consultadas com seu acesso atual.
       </p>
       {read.loading ? (
         <p role="status">Conferindo pedido e fontes de consumo…</p>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Notice } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
-import { DefinitionGrid } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import type {
   DeliveryCancellationContext,
   DeliveryCancellationLine,
@@ -86,10 +86,12 @@ function RequestFacts({
 export function DeliveryCancellationDetails({
   context,
   onRefresh,
+  onInspect,
   sourceChecking = false,
 }: {
   context: DeliveryCancellationContext;
   onRefresh: () => void;
+  onInspect: () => void;
   sourceChecking?: boolean;
 }) {
   return (
@@ -102,6 +104,7 @@ export function DeliveryCancellationDetails({
             : "Resultado do pedido de cancelamento"}
       </h2>
       <RequestFacts request={context.request} historical={context.historical} />
+      <ActionButton onClick={onInspect}>Ver pedido e decisão</ActionButton>
       {context.historical ? (
         <Notice>
           O pedido não recebeu consentimento pessoal. A regularização

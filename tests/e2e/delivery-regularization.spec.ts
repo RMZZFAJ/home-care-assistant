@@ -401,25 +401,25 @@ test("C043 caixa padrão oferece decisão pessoal de cancelamento e remove a tar
   );
   await page
     .getByRole("button", {
-      name: "Recusar pedido de cancelamento",
+      name: "Analisar pedido de cancelamento",
       exact: true,
     })
     .click();
-  await page
-    .getByLabel("Motivo da recusa", { exact: true })
+  const decision = page.getByRole("dialog", { name: "Analisar pedido de cancelamento" });
+  await decision.getByRole("combobox", { name: "Sua decisão", exact: true }).selectOption("refuse_cancellation");
+  await decision
+    .getByRole("textbox", { name: "Motivo da sua decisão", exact: true })
     .fill("Minha decisão pessoal mantém o recebimento e recusa o cancelamento");
-  await page
-    .getByRole("button", { name: "Revisar operação", exact: true })
-    .click();
   const response = page.waitForResponse(
     (r) =>
       new URL(r.url()).pathname === "/api/documents/" + f.document.id + "/decisions" &&
       r.request().method() === "POST",
   );
   await page
-    .getByRole("button", { name: "Confirmar operação", exact: true })
+    .getByRole("button", { name: "Recusar cancelamento", exact: true })
     .click();
   expect((await response).ok()).toBe(true);
+  await page.getByRole("dialog", { name: "Cancelamento não autorizado" }).getByRole("button", { name: "Voltar à ficha" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   expect(ledger(f)).toBe(before);
   await page.goto("/entregas");

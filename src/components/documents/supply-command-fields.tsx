@@ -26,16 +26,10 @@ import {
   acquisitionRemaining,
   arrivalRemaining,
 } from "@/lib/documents/purchase";
-import {
-  deliveryRequestDraftFields,
-  deliveryConsentDraftFields,
-} from "@/lib/forms/delivery-draft-reference";
-import { formatBrazilDate } from "@/lib/receipt";
 import { PurchaseFormLine } from "./purchase-register";
 import { PurchaseArrivalFields } from "./purchase-arrival";
 import { coverageFromForm } from "./purchase-coverage-fields";
 import { Icon } from "@/components/ui/icon";
-import { DeliveryConsumptionReferences } from "./delivery-cancellation";
 import { familyFulfillmentDescription } from "@/lib/documents/family-fulfillment";
 
 export type DocumentAction =
@@ -98,14 +92,6 @@ export function CommandEditorFields({
   const [reasonText, setReasonText] = useState(
     initialDraft?.fields.reason ?? "",
   );
-  const [returns, setReturns] = useState<Record<string, string>>(() =>
-    Object.fromEntries(
-      data.lines.map((line) => [
-        line.id,
-        initialDraft?.fields[line.id + ":return"] ?? "",
-      ]),
-    ),
-  );
   const [divergent, setDivergent] = useState<string[]>(
     initialDraft?.divergentIds ?? [],
   );
@@ -116,20 +102,6 @@ export function CommandEditorFields({
     initialDraft?.fields.resolution ??
     (data.recipient_id === context.userId ? "received" : "returned"),
   );
-  const [frozenRequest] = useState(() => ({
-    ...(action === "consent_cancel"
-      ? deliveryConsentDraftFields(data)
-      : deliveryRequestDraftFields(data)),
-    ...(initialDraft?.fields.referenceHash !== undefined
-      ? { referenceHash: initialDraft.fields.referenceHash }
-      : {}),
-    ...(initialDraft?.fields.requestId !== undefined
-      ? { requestId: initialDraft.fields.requestId }
-      : {}),
-    ...(initialDraft?.fields.requestLabel !== undefined
-      ? { requestLabel: initialDraft.fields.requestLabel }
-      : {}),
-  }));
   const eligibleRecipients = useMemo(() => {
     const roles =
       data.payload.destination === "FAMILY"
@@ -185,19 +157,6 @@ export function CommandEditorFields({
       if (line)
         fields.lineLabel = `${line.name_snapshot} · ${line.unit_snapshot}`;
     }
-    if (
-      [
-        "refuse_cancellation",
-        "withdraw_cancellation",
-        "consent_cancel",
-      ].includes(action)
-    )
-      Object.assign(fields, frozenRequest);
-    if (action === "consent_cancel")
-      for (const line of data.lines)
-        fields[line.id + ":return"] = quantity(line.accepted_quantity).isZero()
-          ? "0"
-          : (returns[line.id] ?? "");
     return {
       documentVersion: data.version,
       fields,
@@ -214,8 +173,6 @@ export function CommandEditorFields({
     divergent,
     action,
     selectedRecipient,
-    frozenRequest,
-    returns,
   ]);
   useImperativeHandle(snapshotRef, () => ({ snapshot: captureSnapshot }), [
     captureSnapshot,
@@ -405,82 +362,6 @@ export function CommandEditorFields({
         summary =
           "Registrar cancelamento. Caso já exista aceite na ENT, o documento aguardará o consentimento autenticado do recebedor e a conciliação dos materiais. Motivo: " +
           reason;
-      } else if (
-        action === "refuse_cancellation" ||
-        action === "withdraw_cancellation"
-      ) {
-        const request = data.deliveryCancellation?.request;
-        if (!request || request.status !== "pending")
-          throw new Error(
-            "Não existe pedido de cancelamento vigente para esta ação. Atualize a ficha.",
-          );
-        if (frozenRequest.requestId !== request.id)
-          throw new Error(
-            "O pedido deste preenchimento mudou. Compare as referências e escolha expressamente a referência vigente.",
-          );
-        body = { reason, requestId: request.id };
-        summary = `${action === "refuse_cancellation" ? "Recusar" : "Retirar meu"} pedido de cancelamento de ${request.requestedName ?? "nome não preservado"}, ${formatBrazilDate(request.requestedAt)}. Motivo original: ${request.reason}\nJustificativa desta decisão: ${reason}\nA ficha retorna à conferência vigente; esta decisão não movimenta estoque.`;
-      } else if (action === "consent_cancel") {
-        const reference = data.deliveryCancellation;
-        if (
-          !reference?.sourceReady ||
-          !reference.referenceHash ||
-          reference.request.status !== "pending"
-        )
-          throw new Error(
-            "Atualize as referências da conciliação. Os dados de origem não podem ser editados aqui.",
-          );
-        if (
-          frozenRequest.requestId !== reference.request.id ||
-          !("referenceHash" in frozenRequest) ||
-          frozenRequest.referenceHash !== reference.referenceHash
-        )
-          throw new Error(
-            "O pedido ou as referências de consumo deste preenchimento mudaram. Compare e adote a referência vigente antes de revisar.",
-          );
-        if (quantity(reference.unresolvedTransit ?? "0").gt(0))
-          throw new Error(
-            "Concilie a situação real do material em trânsito antes de consentir.",
-          );
-        const returned = data.lines.map((line) => {
-          const source = reference.lines.find(
-            (item) => item.lineId === line.id,
-          ),
-            raw = quantity(line.accepted_quantity).isZero()
-              ? "0"
-              : (returns[line.id] ?? "");
-          if (
-            !source ||
-            !validQuantity(raw, source.quantityDecimals ?? 6, true) ||
-            quantity(raw).gt(line.accepted_quantity) ||
-            quantity(raw).lt(source.minimumReturnQuantity ?? "0")
-          ) {
-            (
-              event.currentTarget.elements.namedItem(
-                line.id + ":return",
-              ) as HTMLInputElement | null
-            )?.focus();
-            throw new Error(
-              "Confira a devolução real e o consumo já confirmado disponível para a linha indicada.",
-            );
-          }
-          return { lineId: line.id, returnQuantity: quantity(raw).toFixed() };
-        });
-        body = {
-          reason,
-          requestId: reference.request.id,
-          referenceHash: reference.referenceHash,
-          lines: returned,
-        };
-        summary =
-          `Consentir com o pedido de ${reference.request.requestedName ?? "nome não preservado"}, ${formatBrazilDate(reference.request.requestedAt)}. Motivo original: ${reference.request.reason}\n` +
-          returned
-            .map((item) => {
-              const line = data.lines.find((line) => line.id === item.lineId)!;
-              return `${line.name_snapshot}: devolução real ${formatQuantity(item.returnQuantity, line.unit_snapshot)}; consumo já confirmado referenciado ${formatQuantity(quantity(line.accepted_quantity).minus(item.returnQuantity).toFixed(), line.unit_snapshot)}.`;
-            })
-            .join("\n") +
-          `\nJustificativa da conciliação: ${reason}\nSomente a devolução real movimenta estoque. O consumo anterior é referenciado uma vez, sem novo desconto.`;
       }
       onReview(command, body, summary);
     } catch (reason) {
@@ -494,9 +375,6 @@ export function CommandEditorFields({
     "reassign",
     "resolve",
     "cancel",
-    "consent_cancel",
-    "refuse_cancellation",
-    "withdraw_cancellation",
   ].includes(action);
 
   return (
@@ -771,136 +649,9 @@ export function CommandEditorFields({
           </label>
         </>
       ) : null}
-      {[
-        "consent_cancel",
-        "refuse_cancellation",
-        "withdraw_cancellation",
-      ].includes(action) && data.deliveryCancellation ? (
-        <section className="space-y-2">
-          <h3 className="font-semibold">Pedido original em leitura</h3>
-          <p>
-            {data.deliveryCancellation.request.requestedName ??
-              "Nome não preservado"}{" "}
-            · {formatBrazilDate(data.deliveryCancellation.request.requestedAt)}
-          </p>
-          <p className="whitespace-pre-wrap">
-            {data.deliveryCancellation.request.reason}
-          </p>
-        </section>
-      ) : null}
-      {action === "consent_cancel" ? (
-        <>
-          <Notice>
-            Informe somente as devoluções físicas reais. A parte do aceite que
-            não será devolvida precisa de consumo já confirmado nas referências
-            abaixo; esta conciliação não registra um novo consumo.
-          </Notice>
-          {data.lines.map((line) => (
-            <fieldset
-              key={line.id}
-              className="grid min-w-0 gap-3 rounded border border-(--line) p-3 sm:grid-cols-2"
-            >
-              <legend className="px-2 text-sm font-semibold">
-                {line.name_snapshot} · aceito{" "}
-                {formatQuantity(line.accepted_quantity)}
-              </legend>
-              <div>
-                {reviewDisabled ||
-                  data.deliveryCancellation?.sourceAccess === false ? (
-                  <p>
-                    As fontes estão em conferência ou indisponíveis. Consulte as
-                    referências autorizadas atuais antes de decidir.
-                  </p>
-                ) : (
-                  <>
-                    <p>
-                      Consumo já confirmado disponível:{" "}
-                      {formatQuantity(
-                        data.deliveryCancellation?.lines.find(
-                          (item) => item.lineId === line.id,
-                        )?.availableConsumedQuantity,
-                        line.unit_snapshot,
-                      )}
-                    </p>
-                    {data.deliveryCancellation?.lines.find(
-                      (item) => item.lineId === line.id,
-                    ) ? (
-                      <DeliveryConsumptionReferences
-                        line={
-                          data.deliveryCancellation.lines.find(
-                            (item) => item.lineId === line.id,
-                          )!
-                        }
-                      />
-                    ) : null}
-                  </>
-                )}
-              </div>
-              {quantity(line.accepted_quantity).gt(0) ? (
-                <label className="text-sm">
-                  Devolução física real · {line.name_snapshot} ·{" "}
-                  {line.unit_snapshot}
-                  <input
-                    name={line.id + ":return"}
-                    className={inputClass}
-                    type="text"
-                    inputMode="decimal"
-                    autoComplete="off"
-                    aria-describedby={instanceId + line.id + "-return-help"}
-                    value={returns[line.id] ?? ""}
-                    onChange={(event) =>
-                      setReturns((values) => ({
-                        ...values,
-                        [line.id]: event.target.value,
-                      }))
-                    }
-                    required
-                  />
-                </label>
-              ) : (
-                <p>
-                  Sem quantidade aceita nesta linha: devolução e consumo
-                  conciliados são zero.
-                </p>
-              )}
-              <p
-                id={instanceId + line.id + "-return-help"}
-                className="hca-field-hint"
-              >
-                Informe a devolução em {line.unit_snapshot}, com até{" "}
-                {data.deliveryCancellation?.lines.find(
-                  (item) => item.lineId === line.id,
-                )?.quantityDecimals ?? 6}{" "}
-                casas decimais. Aceita vírgula ou ponto.
-              </p>
-              <p className="text-sm">
-                Parcela do aceite a conciliar com consumo confirmado:{" "}
-                {quantity(line.accepted_quantity).isZero()
-                  ? formatQuantity("0", line.unit_snapshot)
-                  : returns[line.id] !== undefined &&
-                    validQuantity(returns[line.id], 6, true) &&
-                    quantity(returns[line.id]).lte(line.accepted_quantity)
-                    ? formatQuantity(
-                      quantity(line.accepted_quantity)
-                        .minus(quantity(returns[line.id]))
-                        .toFixed(),
-                      line.unit_snapshot,
-                    )
-                    : "Aguardando declaração da devolução real"}
-              </p>
-            </fieldset>
-          ))}
-        </>
-      ) : null}
       {needsReason ? (
         <label className="block text-sm font-semibold">
-          {action === "refuse_cancellation"
-            ? "Motivo da recusa"
-            : action === "withdraw_cancellation"
-              ? "Motivo da retirada"
-              : action === "divergence"
-                ? "Observações da divergência"
-                : "Motivo / justificativa"}
+          {action === "divergence" ? "Observações da divergência" : "Motivo / justificativa"}
           <textarea
             className={inputClass}
             name="reason"

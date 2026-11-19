@@ -124,6 +124,28 @@ const evidence = (f) =>
   sql(
     `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(f.document.id)}),'lines',(select jsonb_agg(to_jsonb(l) order by id) from public.document_lines l where document_id=${sqlLiteral(f.document.id)}),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id=${sqlLiteral(f.document.id)}),'allocations',(select jsonb_agg(to_jsonb(a) order by id) from public.delivery_consumption_allocations a where document_id=${sqlLiteral(f.document.id)}));`,
   );
+
+test("ENT preview uses the same live consumption and protects custody before a request", async () => {
+  const f = await accepted(await setup(), { request: false });
+  const args = { p_id: f.document.id }, before = evidence(f), stock = ledger(f);
+  const preview = await rpc(f.admin, "delivery_cancellation_preview", args);
+  assert.deepEqual([preview.documentId, preview.patientId, preview.version], [f.document.id, f.patient, f.document.version]);
+  assert.equal(preview.sourceReady, true);
+  assert.deepEqual(preview.lines.map(line => [Number(line.acceptedQuantity), Number(line.availableConsumedQuantity), Number(line.minimumReturnQuantity)]), [[2, 1, 1]]);
+  assert.equal(Object.hasOwn(preview.lines[0], "consumptionReferences"), false);
+  assert.equal((await f.professional.rpc("delivery_cancellation_preview", args)).error?.code, "42501");
+  sql(`insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled) values(${sqlLiteral(f.patient)},'stock.team.read',${sqlLiteral(fixtures.adminA.id)},false);`);
+  const restricted = await rpc(f.admin, "delivery_cancellation_preview", args);
+  assert.deepEqual([restricted.sourceReady, restricted.lines], [false, []]);
+  assert.equal(evidence(f), before);
+  assert.equal(ledger(f), stock);
+  const sent = await command(f.admin, f.document, "cancel", f.cancelBody);
+  assert.ifError(sent.error);
+  const pending = await rpc(f.professional, "operational_document", args);
+  assert.equal(pending.deliveryCancellation.lines[0].availableConsumedQuantity, preview.lines[0].availableConsumedQuantity);
+  assert.equal((await f.admin.rpc("delivery_cancellation_preview", args)).error?.code, "PT409");
+  assert.equal(ledger(f), stock);
+});
 async function sendAs(client, document, action, body, key = randomUUID()) {
   const session = (await client.auth.getSession()).data.session;
   assert.ok(session);

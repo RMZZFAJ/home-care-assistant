@@ -974,6 +974,12 @@
 .hca-cancellation-checklist p { color: var(--hca-muted); font-size: 12px; }
 .hca-l1 .hca-transit-cancellation textarea { min-height: 68px; }
 .hca-l1 .hca-modal:has(.hca-transit-cancellation) > .hca-modal-footer > button { white-space: normal; }
+.hca-cancellation-decision { gap: 12px; }
+.hca-cancellation-decision .hca-cancellation-quantities { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-top: 9px; border-top: 1px solid var(--hca-line); gap: 8px; }
+.hca-l1 .hca-cancellation-decision textarea { min-height: 68px; }
+.hca-l1 .hca-modal:has(.hca-cancellation-decision) > .hca-modal-footer { flex-wrap: nowrap; }
+.hca-l1 .hca-modal:has(.hca-cancellation-decision) > .hca-modal-footer > button { min-width: 0; white-space: normal; }
+.hca-l1 .hca-modal:has(.hca-cancellation-decision) > .hca-modal-footer > button:last-child { max-width: 68%; }
 .hca-receipt-field { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .hca-receipt-field label { font-weight: 600; }
 .hca-receipt-quantity { display: flex; align-items: center; width: 110px; max-width: 45%; background: var(--hca-bg); border: 1px solid var(--hca-line); border-radius: 10px; }

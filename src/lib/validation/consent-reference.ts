@@ -97,7 +97,7 @@ export function parseConsentReference(
         )))
   )
     throw new Error(
-      "A ficha ou as fontes mudaram. Salve seu preenchimento e consulte o pedido e as referências atuais novamente.",
+      "A ficha ou as fontes mudaram. Seus valores permanecem na revisão. Consulte o pedido e as referências atuais novamente.",
     );
   return reference;
 }

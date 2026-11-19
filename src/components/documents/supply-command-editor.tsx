@@ -11,11 +11,6 @@ import {
   type ComOperationPurpose,
   type ReceiptDraftContent,
 } from "@/lib/validation/supply-drafts";
-import {
-  deliveryRequestDraftFields,
-  deliveryConsentDraftFields,
-  consentReferenceReady,
-} from "@/lib/forms/delivery-draft-reference";
 import { DraftReferenceComparison } from "./draft-reference-comparison";
 import {
   CommandEditorFields,
@@ -27,11 +22,9 @@ export type { DocumentAction } from "./supply-command-fields";
 type OperationPurpose = EntOperationPurpose | ComOperationPurpose;
 export type OperationReferenceHandle = {
   adoptClosingReference: (official: SupplyDocument) => boolean;
-  adoptCancellationReference: (official: SupplyDocument) => boolean;
 };
 type OperationEditorProps = CommandEditorProps & {
   referenceAdoptionRef?: RefObject<OperationReferenceHandle | null>;
-  onCompareCancellationReference?: () => void;
   recoveryOnly?: boolean;
   purchaseFeedback?: string;
   purchaseConflictContent?: ReactNode;
@@ -65,7 +58,6 @@ function OperationEditor(
   const coveredEditor = purchase || arrival;
   const directCredit = props.context.patient?.role === "admin" && can(props.context, "com.validate");
   const purchaseFormId = useId();
-  const consent = props.kind === "ENT" && props.purpose === "consent_cancel";
   const personalReceipt =
     props.kind === "ENT" &&
     (props.purpose === "receive" || props.purpose === "divergence");
@@ -76,7 +68,7 @@ function OperationEditor(
     [error, setError] = useState("");
   const empty: ReceiptDraftContent = {
     documentVersion: props.data.version,
-    fields: consent ? deliveryConsentDraftFields(props.data) : {},
+    fields: {},
     divergentIds: [],
     materials: props.data.lines.map((line) => ({
       id: line.id,
@@ -145,43 +137,8 @@ function OperationEditor(
       setComparison(false);
       return true;
     },
-    adoptCancellationReference(official) {
-      if (
-        !consent ||
-        props.recoveryOnly ||
-        !captureRef.current ||
-        official.id !== props.data.id ||
-        official.care_recipient_id !== props.data.care_recipient_id ||
-        official.version < baseline.documentVersion ||
-        !consentReferenceReady(official)
-      )
-        return false;
-      const content = snapshot();
-      restore({
-        ...content,
-        documentVersion: official.version,
-        fields: {
-          ...content.fields,
-          ...current.fields,
-          ...deliveryConsentDraftFields(official),
-        },
-        materials: official.lines.map((line) => ({
-          id: line.id,
-          name: line.name_snapshot,
-          unit: line.unit_snapshot,
-          quantityDecimals: 0,
-        })),
-      });
-      setComparison(false);
-      return true;
-    },
   }));
-  const reference = deliveryConsentDraftFields(props.data);
-  const stale =
-    baseline.documentVersion !== props.data.version ||
-    (consent &&
-      (baseline.fields.referenceHash !== reference.referenceHash ||
-        baseline.fields.requestId !== reference.requestId));
+  const stale = baseline.documentVersion !== props.data.version;
   const currentIds = new Set(props.data.lines.map((line) => line.id));
   const removedValues = com
     ? baseline.materials.filter(
@@ -214,16 +171,6 @@ function OperationEditor(
       {error ? <Notice error>{error}</Notice> : null}
       {coveredEditor && props.purchaseFeedback ? <Notice error>{props.purchaseFeedback}</Notice> : null}
       {coveredEditor ? props.purchaseConflictContent : null}
-      {consent && !stale && props.onCompareCancellationReference ? (
-        <button
-          type="button"
-          className={buttonClass}
-          disabled={props.reviewDisabled}
-          onClick={props.onCompareCancellationReference}
-        >
-          Conferir fontes atuais da conciliação
-        </button>
-      ) : null}
       {confirmationReset ? (
         <Notice>
           A confirmação anterior foi desmarcada porque a referência mudou.
@@ -234,21 +181,10 @@ function OperationEditor(
         <Notice>
           Este preenchimento usa a versão {baseline.documentVersion}; a ficha
           vigente está na versão {props.data.version}.
-          {consent ? (
-            <p>
-              O pedido ou a fonte de consumo consultada mudou. A versão da ficha
-              pode continuar igual. Suas devoluções digitadas e seu motivo
-              permanecem preservados.
-            </p>
-          ) : null}
           <button
             type="button"
             className={buttonClass}
-            onClick={() => {
-              if (consent && props.onCompareCancellationReference)
-                props.onCompareCancellationReference();
-              else setComparison(true);
-            }}
+            onClick={() => setComparison(true)}
           >
             {fullReference
               ? "Comparar referência da operação"
@@ -348,16 +284,6 @@ function OperationEditor(
                       documentVersion: props.data.version,
                       materials: empty.materials,
                     };
-                    if (
-                      props.kind === "ENT" &&
-                      ["refuse_cancellation", "withdraw_cancellation"].includes(
-                        props.purpose,
-                      )
-                    )
-                      Object.assign(
-                        content.fields,
-                        deliveryRequestDraftFields(props.data),
-                      );
                     if (props.purpose === "close_expectation") {
                       delete content.fields.confirmed;
                       setConfirmationReset(true);

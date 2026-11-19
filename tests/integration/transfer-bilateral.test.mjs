@@ -428,6 +428,11 @@ test("reverse transfer cancellation references confirmed family consumption and 
     p_key: randomUUID(),
     p_version: 1,
   });
+  const preview = await rpc(f.admin, "delivery_cancellation_preview", { p_id: d.id });
+  assert.equal(preview.sourceReady, true);
+  assert.deepEqual(preview.lines.map(line => [
+    Number(line.acceptedQuantity), Number(line.availableConsumedQuantity), Number(line.minimumReturnQuantity),
+  ]), [[5, 2, 3]]);
   d = await rpc(f.admin, "supply_document_command", {
     p_id: d.id,
     p_action: "cancel",
