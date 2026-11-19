@@ -2,7 +2,8 @@ import { expect, type Page } from "@playwright/test";
 
 export async function selectContext(page: Page, patient: string | null) {
   await expect(page.getByLabel("Menu do usuário", { exact: true })).toBeEnabled();
-  const response = await page.request.get("/api/context");
+  // Retry a reset connection once on context reads while keeping HTTP errors visible.
+  const response = await page.request.get("/api/context", { maxRetries: 1 });
   expect(response.ok()).toBeTruthy();
   const data = (await response.json()).data;
   const shell = page.locator(".hca-workspace");
@@ -25,7 +26,7 @@ export async function selectContext(page: Page, patient: string | null) {
       await page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true }).click();
       await page.getByRole("menuitemradio", { name: label, exact: !patient }).click();
     }
-    await expect.poll(async () => (await (await page.request.get("/api/context")).json()).data.activeContext?.care_recipient_id).toBe(patient);
+    await expect.poll(async () => (await (await page.request.get("/api/context", { maxRetries: 1 })).json()).data.activeContext?.care_recipient_id).toBe(patient);
   }
   await expect(shell).toHaveAttribute("data-context-mode", patient ? "patient" : "global");
   await expect(shell).toHaveAttribute("data-context-patient", patient ?? "");
