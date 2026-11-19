@@ -118,6 +118,7 @@ export async function POST(request: Request) {
         stockReference,
         urgent,
         repeatReason,
+        catalogueExtra,
       }) => ({
         productId,
         currentStock,
@@ -126,6 +127,7 @@ export async function POST(request: Request) {
         ...(stockObservation === "observed" && stockReference ? { stockReference: stockReference.token } : {}),
         urgent,
         ...(repeatReason ? { repeatReason } : {}),
+        ...(catalogueExtra ? { catalogueExtra } : {}),
       }),
     );
     const extras = input.extraItems.map(

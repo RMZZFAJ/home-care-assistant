@@ -33,7 +33,7 @@ export function RequisitionReceiptCard({ receipt }: { receipt: RequisitionReceip
           formatStockObservationTime(item.stockObservationAt, item.stockObservationTimeSource))}
           rows={[
             ...receipt.lines.map(item =>
-              `${item.productName} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation, item.unit)}${item.urgent ? " (urgente)" : ""}`),
+              `${item.productName}${item.catalogueExtra ? " · material do catálogo incluído como extra" : ""} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation, item.unit)}${item.urgent ? " (urgente)" : ""}${item.catalogueExtra?.details ? " · " + item.catalogueExtra.details : ""}`),
             ...receipt.extraItems.map(item =>
               `${item.name}${item.identification ? " · " + item.identification.unit : ""} — estoque da equipe: ${formatStockObservation(item.currentStock, item.stockObservation, item.identification?.unit)}${item.urgent ? " (urgente)" : ""}${item.identification?.details ? " · " + item.identification.details : ""}`),
           ]} />

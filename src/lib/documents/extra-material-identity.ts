@@ -6,3 +6,5 @@ export type ExtraMaterialIdentity = {
   unit: (typeof extraMaterialUnits)[number];
   details?: string;
 };
+
+export type CatalogueExtra = { details?: string };

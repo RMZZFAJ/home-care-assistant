@@ -4,6 +4,7 @@ import type { DocumentSnapshot, PdfEmissionContext } from "./operational-pdf";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
+import { catalogueExtra } from "@/lib/validation/extra-material-identity";
 
 /** Content obligations from the frozen source, independent of the approved painter's run log. */
 export function approvedRequisitionContent(snapshot: DocumentSnapshot, emission: PdfEmissionContext) {
@@ -16,6 +17,8 @@ export function approvedRequisitionContent(snapshot: DocumentSnapshot, emission:
     const stockTime = ["client_draft", "server_submission", "legacy_unknown"].includes(String(line.stock_observation_time_source)) ? line.stock_observation_time_source as StockObservationTimeSource : "legacy_unknown";
     semanticFacts[key + "/name"] = String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado")
       + (typeof line.extra_details === "string" ? " " + line.extra_details : "");
+    const extra = catalogueExtra.safeParse(line.catalogue_extra).data;
+    if (extra) semanticFacts[key + "/name"] += " Material do catálogo incluído como extra" + (extra.details ? " " + extra.details : "");
     semanticFacts[key + "/unit"] = String(line.unit_snapshot ?? "Unidade não preservada");
     semanticFacts[key + "/stock"] = formatStockObservation(stock, line.stock_observation as StockObservation, typeof line.unit_snapshot === "string" ? line.unit_snapshot : undefined) + " " + formatStockObservationTime(typeof line.stock_observation_at === "string" ? line.stock_observation_at : null, stockTime);
     const attended = snapshot.fulfillmentLines?.find(value => value.id === line.id);

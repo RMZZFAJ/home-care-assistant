@@ -106,6 +106,12 @@ confere com o comando mestre.
   Quando o nome informado é idêntico ao nome ou alias ativo, o contrato
   vigente exige escolher o material correspondente ou informar um nome
   que diferencie o novo item.
+  A escolha explícita de uma sugestão reaparece em Itens extras com o
+  rótulo Material do catálogo. O mesmo produto fica disponível para editar,
+  remover e retomar com a unidade oficial. A revisão mostra a linha somente
+  em Itens extras. A ficha e o PDF preservam a classificação e os detalhes,
+  com os controles vigentes de reiteração e estoque. O laboratório usa
+  registros fictícios para essas etapas.
   P1 continua pendente.
 - **Vínculos e COM E05.** Vínculos por ficha ou material, importação seletiva,
   planejamento e chegada, compras mistas, falta e excesso, correção pelo autor,
@@ -196,17 +202,15 @@ conferência histórica de aplicação inicial, sem inferência sobre dados atua
   Recomendação encaminhada: expedir os materiais disponíveis e mostrar a
   pendência separadamente. A escolha está em aberto.
 
-Continua pendente a apresentação de um extra associado a um material do
-catálogo da REQ na própria etapa Itens extras. Hoje a escolha explícita
-preserva estoque informado e urgência na linha de catálogo. Continuam em
-execução os extras fora do catálogo no planejamento COM, em ENT e em DEV.
+Continuam em execução os extras fora do catálogo no planejamento COM, em
+ENT e em DEV.
 
 ## Migrations por ambiente
 
 Consulta de 19/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. **305 versões em cada banco**,
-de `20261019000100` a `20261119220003`, com os mesmos IDs do checkout. O
-histórico contém 242 versões anteriores a L1, 18 de L1 e 45 de L2. Os SQL de
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. **306 versões em cada banco**,
+de `20261019000100` a `20261119221703`, com os mesmos IDs do checkout. O
+histórico contém 242 versões anteriores a L1, 18 de L1 e 46 de L2. Os SQL de
 cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 Nenhuma versão só em arquivo, só na stack local, só no desenvolvimento ou
 pendente de aplicar nesta conferência. Produção fica fora desta consulta.
@@ -232,13 +236,14 @@ pendente de aplicar nesta conferência. Produção fica fora desta consulta.
 `20261119121610`, `20261119125023`, `20261119130945`, `20261119135903`,
 `20261119141610`, `20261119154356`, `20261119175654`, `20261119184524`,
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
-`20261119220003`.
+`20261119220003`, `20261119221703`.
 
 `20261119212000` e `20261119213000` tratam as observações numeradas e a
 justificativa da designação manual na transferência. `20261119220003`
-preserva a identificação proposta de um extra da REQ. O último incremento
-teve ensaio com rollback e backup cifrado verificado
-`66ed4ebc-969a-49d1-9b2d-ed1a87e566e2`. O SQL confere com o histórico
+preserva a identificação proposta de um extra da REQ. `20261119221703`
+preserva a escolha explícita de um item do catálogo em Itens extras.
+O último incremento teve ensaio com rollback e backup cifrado verificado
+`f203c258-b857-4660-811b-a28a2594a3ca`. O SQL confere com o histórico
 vinculado. Os hashes estáveis dos dados de 201 tabelas permaneceram iguais
 ao comparar as mesmas colunas, e a coluna nova continua nula nas linhas
 anteriores. A comparação bruta encontrou variações de relógio e

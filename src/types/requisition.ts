@@ -44,6 +44,7 @@ export type RequisitionLine = {
   stockReference?: RequisitionStockReference;
   urgent: boolean;
   repeatReason?: string;
+  catalogueExtra?: import("@/lib/documents/extra-material-identity").CatalogueExtra;
 };
 
 export type ExtraItem = {

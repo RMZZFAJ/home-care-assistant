@@ -6,7 +6,7 @@ import type {
   StockObservationTimeSource,
 } from "@/types/requisition";
 import { ApiError, databaseError } from "@/lib/server/api";
-import { extraMaterialIdentity } from "@/lib/validation/extra-material-identity";
+import { catalogueExtra, extraMaterialIdentity } from "@/lib/validation/extra-material-identity";
 
 // Only snapshots from the original transaction are authoritative. Legacy rows
 // retain their identity but are explicitly marked as reconstructed.
@@ -17,7 +17,7 @@ export async function loadReceipt(
   const { data, error } = await client
     .from("requisitions")
     .select(
-      "id,code,protocol,created_at,source_requisition_id,source_requisition_version,remaining_need_reason,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,stock_observation,stock_observation_at,stock_observation_time_source,urgent,product_name_snapshot,category_snapshot,unit_snapshot,extra_details,snapshot_source,products(name,category,unit)),requisition_observations(body)",
+      "id,code,protocol,created_at,source_requisition_id,source_requisition_version,remaining_need_reason,requester_name_snapshot,recipient_name_snapshot,profiles!requisitions_created_by_fkey(full_name),care_recipients(display_name),requisition_items(id,product_id,custom_name,current_stock,stock_observation,stock_observation_at,stock_observation_time_source,urgent,product_name_snapshot,category_snapshot,unit_snapshot,extra_details,catalogue_extra,snapshot_source,products(name,category,unit)),requisition_observations(body)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -72,6 +72,7 @@ export async function loadReceipt(
           : item.products;
         return {
           productId: item.product_id,
+          catalogueExtra: catalogueExtra.safeParse(item.catalogue_extra).data,
           productName:
             item.product_name_snapshot ?? product?.name ?? "Produto arquivado",
           category: (item.category_snapshot ??

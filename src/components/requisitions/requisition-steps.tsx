@@ -212,7 +212,8 @@ export function CatalogStep({
                 o estoque anterior.
               </p>
             ) : null}
-            {line ? (
+            {line?.catalogueExtra ? <p className="doc-subtle mt-3">Incluído em Itens extras.</p> : null}
+            {line && !line.catalogueExtra ? (
               <div className="mt-4 space-y-3">
                 <p className="text-xs text-(--muted)">
                   Família · saldo confirmado deste produto:{" "}
@@ -243,43 +244,13 @@ export function CatalogStep({
                     Reposição urgente
                   </label>
                 </div>
-                {info?.pending.length ? (
-                  <div className="hca-material-pending">
-                    <p>
-                      Este produto ainda tem requisição pendente:{" "}
-                      {info.pending.map((pending) => (
-                        <RelatedDocument
-                          key={pending.lineId}
-                          id={pending.requisitionId}
-                          label={pending.code}
-                        />
-                      ))}
-                    </p>
-                    <label className="mt-3 block font-semibold">
-                      <span id={item.id + "-repeat-label"}>Motivo da nova requisição</span>
-                      <textarea
-                        aria-labelledby={item.id + "-repeat-label"}
-                        data-field-error={item.id + ":repeat"}
-                        aria-describedby={errors[item.id + ":repeat"] ? item.id + "-repeat-error" : undefined}
-                        className={inputClass}
-                        value={line.repeatReason ?? ""}
-                        minLength={3}
-                        maxLength={1000}
-                        aria-invalid={Boolean(errors[item.id + ":repeat"])}
-                        onChange={(event) =>
-                          updateLine(item, {
-                            repeatReason: event.target.value || undefined,
-                          })
-                        }
-                      />
-                      {errors[item.id + ":repeat"] ? (
-                        <span id={item.id + "-repeat-error"} className="ui-field-error">
-                          {errors[item.id + ":repeat"]}
-                        </span>
-                      ) : null}
-                    </label>
-                  </div>
-                ) : null}
+                {info?.pending.length ? <RequisitionRepeatReason
+                  productId={item.id}
+                  pending={info.pending}
+                  value={line.repeatReason}
+                  error={errors[item.id + ":repeat"]}
+                  onChange={repeatReason => updateLine(item, { repeatReason })}
+                /> : null}
               </div>
             ) : null}
           </MaterialChoice>
@@ -288,6 +259,29 @@ export function CatalogStep({
     </div>
   );
 }
+export function RequisitionRepeatReason({ productId, pending, value, error, onChange }: {
+  productId: string;
+  pending: ItemContext["pending"];
+  value?: string;
+  error?: string;
+  onChange: (value: string | undefined) => void;
+}) {
+  const labelId = useId();
+  const errorId = error ? labelId + "-error" : undefined;
+  return <div className="hca-material-pending">
+    <p>Este produto ainda tem requisição pendente:{" "}
+      {pending.map(row => <RelatedDocument key={row.lineId} id={row.requisitionId} label={row.code} />)}
+    </p>
+    <label className="mt-3 block font-semibold">
+      <span id={labelId}>Motivo da nova requisição</span>
+      <textarea aria-labelledby={labelId} data-field-error={productId + ":repeat"} aria-describedby={errorId}
+        className={inputClass} value={value ?? ""} minLength={3} maxLength={1000} aria-invalid={Boolean(error)}
+        onChange={event => onChange(event.target.value || undefined)} />
+      {error ? <span id={errorId} className="ui-field-error">{error}</span> : null}
+    </label>
+  </div>;
+}
+
 export function Observations({
   errors = {},
   observations,
@@ -363,20 +357,27 @@ export function Review({
 }) {
   const lines = form.lines;
   const extras = form.extraItems.filter((item) => item.name.trim());
+  const catalogueRow = (item: RequisitionLine) => ({
+    id: item.productId, name: item.productName, urgent: item.urgent,
+    consult: <MaterialConsultButton context={context} material={{ id: item.productId, name: item.productName, unit: item.unit }} />,
+    details: <>
+      {item.catalogueExtra ? <small>Material do catálogo · {item.unit}</small> : null}
+      <small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation, item.unit)}</small>
+      <small>{formatStockObservationTime(item.stockObservationAt)}</small>
+      {item.repeatReason ? <small>Reiteração: {item.repeatReason}</small> : null}
+      {item.catalogueExtra?.details ? <small className="whitespace-pre-wrap">{item.catalogueExtra.details}</small> : null}
+    </>,
+  });
   return (
     <div className="space-y-6" style={{ overflowWrap: "anywhere" }}>
       <DefinitionGrid items={[{ label: "Solicitante", value: requesterName }, { label: "Pessoa assistida", value: recipientName }]} />
       <section className="hca-document-summary">
         <h3>Itens do catálogo</h3>
-        <MaterialReview rows={lines.map(item => ({
-          id: item.productId, name: item.productName, urgent: item.urgent,
-          consult: <MaterialConsultButton context={context} material={{ id: item.productId, name: item.productName, unit: item.unit }} />,
-          details: <><small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation, item.unit)}</small><small>{formatStockObservationTime(item.stockObservationAt)}</small>{item.repeatReason ? <small>Reiteração: {item.repeatReason}</small> : null}</>,
-        }))} />
+        <MaterialReview rows={lines.filter(item => !item.catalogueExtra).map(catalogueRow)} />
       </section>
       <section className="hca-document-summary">
         <h3>Itens extras</h3>
-        <MaterialReview rows={extras.map(item => ({
+        <MaterialReview rows={[...lines.filter(item => item.catalogueExtra).map(catalogueRow), ...extras.map(item => ({
           id: item.id, name: item.name, urgent: item.urgent,
           details: <>
             <small>Cadastro pendente{item.identification ? " · " + item.identification.unit : ""}</small>
@@ -384,7 +385,7 @@ export function Review({
             <small>{formatStockObservationTime(item.stockObservationAt)}</small>
             {item.identification?.details ? <small className="whitespace-pre-wrap">{item.identification.details}</small> : null}
           </>,
-        }))} />
+        }))]} />
       </section>
       <Summary
         title="Observações"

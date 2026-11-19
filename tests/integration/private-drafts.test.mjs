@@ -193,6 +193,30 @@ test("REQ extra identification must match the saved revision and never moves sto
   assert.equal((await rpc(f.pro, "commit_creation_draft", packet)).consumedDocumentId, issued.consumedDocumentId);
 });
 
+test("a matched REQ extra is one catalogue line with the classification and details of its saved revision", async () => {
+  const f = await privateDraftFixture();
+  const catalogueExtra = { details: "Apresentação confirmada no plantão" };
+  const initial = reqContent(f);
+  const marked = { ...initial.lines[0], catalogueExtra };
+  const before = officialState(f);
+  const invalid = savePacket(f, "REQ", { ...initial, lines: [{ ...marked, catalogueExtra: { details: false } }] });
+  assert.equal((await f.pro.rpc("creation_draft_command", invalid)).error?.code, "22023");
+  const saved = await rpc(f.pro, "creation_draft_command", savePacket(f, "REQ", { ...initial, lines: [marked] }));
+  assert.deepEqual((await draftContext(f)).content.lines[0].catalogueExtra, catalogueExtra);
+  const packet = confirmPacket(f, saved);
+  assert.equal((await f.pro.rpc("commit_creation_draft", packet)).error?.code, "PT409");
+  const line = { ...packet.p_body.lines[0], catalogueExtra };
+  const changed = { ...packet, p_body: { ...packet.p_body, lines: [{ ...line, catalogueExtra: { details: "Mudança sem revisão" } }] } };
+  assert.equal((await f.pro.rpc("commit_creation_draft", changed)).error?.code, "PT409");
+  assert.equal(officialState(f), before);
+  packet.p_body.lines = [line];
+  const issued = await rpc(f.pro, "commit_creation_draft", packet);
+  const { data, error } = await f.pro.from("requisition_items").select("product_id,custom_name,current_stock,catalogue_extra").eq("requisition_id", issued.consumedDocumentId).single();
+  assert.ifError(error);
+  assert.deepEqual(data, { product_id: f.products[0], custom_name: null, current_stock: 0, catalogue_extra: catalogueExtra });
+  assert.equal((await rpc(f.pro, "commit_creation_draft", packet)).consumedDocumentId, issued.consumedDocumentId);
+});
+
 test("a private BAL editing draft allocates its first protocol only on confirmation of the existing target", async () => {
   const f = await privateDraftFixture();
   const original = await rpc(f.pro, "create_supply_document", {

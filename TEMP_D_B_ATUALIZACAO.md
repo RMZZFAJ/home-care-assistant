@@ -1,5 +1,28 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — extra da REQ associado ao catálogo.** O material escolhido em
+Materiais reaparece em Itens extras com a identificação do catálogo.
+Editar ou remover o item atualiza o último rascunho, inclusive pelas ações
+em modal. A revisão exibe a linha uma vez, em Itens extras. A emissão e o
+PDF assinado conservam a classificação e os detalhes, com a mesma unidade
+e as regras de estoque e atendimento do item catalogado.
+
+- Os testes com Auth real verificaram uma linha por produto, idempotência
+  e recusa de uma confirmação com classificação ou detalhes divergentes.
+  O painel de edição usa a unidade de catálogo e conserva o campo de
+  justificativa quando existe uma requisição anterior pendente.
+- A primeira rodada de navegador encontrou timeouts na stack local e
+  confirmou que alterações no modal não acionavam o salvamento automático.
+  Após a correção, passaram seis casos em Android e iOS emulados, sem retry
+  automático, incluindo retomada, emissão e nova conferência após mudança de saldo.
+  Foi usado o limite de 90 segundos na execução local. Os limites da CI
+  continuam os mesmos. Também passaram 20 integrações com Auth real,
+  11 testes de PDF, build de produção, ESLint e manifesto de contratos.
+  Capturas em `output/playwright/l2-catalogue-req-extra/`.
+- `20261119221703` está aplicada no local e no desenvolvimento, após ensaio
+  com rollback e backup verificado `f203c258-b857-4660-811b-a28a2594a3ca`.
+  O inventário tem 306 versões e a fila vinculada está vazia.
+
 **19/11 — item extra da REQ com cadastro pendente.** Em Materiais ou Itens
 extras, o modal permite escolher explicitamente uma correspondência ou
 preencher um novo material com tipo, unidade, estoque informado, urgência
@@ -16,8 +39,8 @@ disponível para a identificação autorizada no catálogo, sem lançar estoque.
   com rollback e backup verificado `66ed4ebc-969a-49d1-9b2d-ed1a87e566e2`.
   O inventário tem 305 versões. A comparação conferiu os dados anteriores
   de 201 tabelas e o SQL no histórico remoto.
-- Permanecem a classificação do extra já associado ao catálogo na REQ, o
-  extra pendente de COM, ENT e DEV e a escolha de expedição em ENT e DEV.
+- Permanecem o extra pendente de COM, ENT e DEV e a escolha de expedição
+  em ENT e DEV.
   O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) detalha a diferença.
 
 **19/11 — observações de emissão em COM, ENT e DEV.** A etapa oferece campos

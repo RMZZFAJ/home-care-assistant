@@ -334,6 +334,7 @@ function PatientRequisition({
     }
   }
   function updateLine(item: Product, patch: Partial<RequisitionLine>) {
+    setDraftTouched(true);
     setForm((current) => {
       const existing = current.lines.find((line) => line.productId === item.id);
       return {
@@ -358,6 +359,7 @@ function PatientRequisition({
     });
   }
   function removeLine(id: string) {
+    setDraftTouched(true);
     setForm((current) => ({
       ...current,
       lines: current.lines.filter((line) => line.productId !== id),
@@ -379,7 +381,9 @@ function PatientRequisition({
         errors.remainingNeed =
           "Informe o motivo da necessidade remanescente, entre3 e1000 caracteres.";
     }
-    for (const line of all || currentCategory ? form.lines : []) {
+    const linesToValidate = all ? form.lines : form.lines.filter(line =>
+      currentCategory ? !line.catalogueExtra : step === 4 && line.catalogueExtra);
+    for (const line of linesToValidate) {
       if (
         !validStockObservation(
           line,
@@ -423,7 +427,7 @@ function PatientRequisition({
       const key = Object.keys(errors)[0];
       const product = products.find((item) => key === item.id || key === item.id + ":repeat");
       if (product)
-        setStep(materialCategories.findIndex(category => category.id === product.category) + 1);
+        setStep(selected(product.id)?.catalogueExtra ? 4 : materialCategories.findIndex(category => category.id === product.category) + 1);
       else if (all && key) {
         if (form.extraItems.some(item => key.startsWith(item.id + ":"))) setStep(4);
         else if (key.startsWith("observation:")) setStep(5);
@@ -780,15 +784,22 @@ function PatientRequisition({
                 showItems={step === 4}
                 errors={fieldErrors}
                 items={form.extraItems}
-                setItems={(extraItems) => setForm(current => ({ ...current, extraItems }))}
+                setItems={extraItems => {
+                  setDraftTouched(true);
+                  setForm(current => ({ ...current, extraItems }));
+                }}
                 products={products}
-                selectedIds={form.lines.map(line => line.productId)}
-                adopt={(product, extra) => {
+                lines={form.lines}
+                itemContext={itemContext}
+                updateLine={updateLine}
+                removeLine={removeLine}
+                adopt={(product, extra, details) => {
                   updateLine(product, {
                     currentStock: extra.currentStock,
                     stockObservation: extra.stockObservation,
                     stockObservationAt: extra.stockObservationAt,
                     urgent: extra.urgent,
+                    catalogueExtra: details ? { details } : {},
                   });
                   setForm((current) => ({
                     ...current,

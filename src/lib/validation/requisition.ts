@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { extraMaterialIdentity } from "./extra-material-identity";
+import { catalogueExtra, extraMaterialIdentity } from "./extra-material-identity";
 import { exactQuantity } from "./documents";
 import { draftCommitSchema, requisitionStockReferenceSchema } from "./creation-drafts";
 
@@ -43,6 +43,7 @@ export const requisitionLineSchema = z
     ...observation,
     stockReference: requisitionStockReferenceSchema.optional(),
     urgent: z.boolean(),
+    catalogueExtra: catalogueExtra.optional(),
     repeatReason: z.string().trim().min(3, "Informe um motivo com pelo menos três caracteres.").max(1000, "O motivo deve ter até 1.000 caracteres.").optional(),
   })
   .strict()

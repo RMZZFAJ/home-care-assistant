@@ -1491,6 +1491,17 @@
   justify-content: space-between;
   gap: 0.75rem;
 }
+.hca-requisition-extra-row {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #d8e5de;
+  border-radius: 11px;
+  background: #fff;
+  overflow-wrap: anywhere;
+}
+.hca-requisition-extra-row[data-urgent="true"] { border-inline-start: 3px solid #bd6878; background: #fffafb; }
+.hca-requisition-extra-row > p { font-size: 13px; margin-block: 3px 6px; }
+.hca-requisition-extra-row .hca-status { padding: 3px 8px; font-size: 10px; }
 .hca-l1 .hca-requisition-extra .hca-modal-kicker { text-transform: uppercase; }
 .hca-l1 .hca-requisition-extra .hca-modal-head > .hca-control-icon { border-color: transparent; }
 .hca-l1 .hca-requisition-extra select {

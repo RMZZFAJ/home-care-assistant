@@ -124,6 +124,7 @@ type Detail = {
     custom_name: string | null;
     unit_snapshot: string;
     extra_details?: string | null;
+    catalogue_extra?: { details?: string } | null;
     current_stock: string | null;
     stock_observation?: StockObservation;
     stock_observation_at?: string | null;
@@ -665,6 +666,8 @@ export function RequisitionDocumentContent({
                   detail: <div className="space-y-2">
                       <p>{status}</p>
                       <p>{formatStockObservationTime(item.stock_observation_at, item.stock_observation_time_source)}</p>
+                      {item.catalogue_extra ? <p>Material do catálogo incluído como extra.</p> : null}
+                      {item.catalogue_extra?.details ? <p className="whitespace-pre-wrap">{item.catalogue_extra.details}</p> : null}
                       {item.extra_details ? <p className="whitespace-pre-wrap">{item.extra_details}</p> : null}
                     </div>,
                   related: requisitionDeliveries(line?.deliveries ?? []).map(delivery => ({

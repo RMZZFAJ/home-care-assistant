@@ -4,6 +4,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
   assertLocalProject,
   sql,
@@ -595,37 +597,23 @@ test.describe("administração integrada no ambiente local", () => {
   test("sugestões por alias e grafia ambígua só associam o produto após escolha explícita", async ({
     page,
   }, info) => {
-    await login(page);
-    const patientId = await createPatient(page);
-    let productId = "";
-    for (const [name, aliases] of [
-      ["Gaze", ["Compressa alternativa"]],
-      ["Gaza", []],
-    ] as const) {
-      const response = await page.request.post("/api/admin", {
-        data: {
-          action: "product",
-          careRecipientId: patientId,
-          id: null,
-          name,
-          category: "higiene",
-          unit: "pacote",
-          aliases,
-          description: null,
-          sortOrder: 0,
-          isActive: true,
-        },
-      });
-      expect(response.ok()).toBeTruthy();
-      const saved = await response.json();
-      if (name === "Gaze") productId = saved.data.product_id;
-    }
-    expect(productId).toBeTruthy();
+    const { patient: patientId, products: [productId] } = await setup({
+      catalogue: [
+        { name: "Gaze", aliases: ["Compressa alternativa"], category: "higiene", unit: "pacote" },
+        { name: "Gaza", aliases: [], category: "higiene", unit: "pacote" },
+      ],
+    });
+    const writer = await shiftWorker(patientId);
+    await page.goto("/login");
+    await page.getByLabel("E-mail", { exact: true }).fill(writer.email);
+    await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+    await page.getByRole("button", { name: "Entrar", exact: true }).click();
+    await page.waitForURL(url => url.pathname === "/");
     await page.goto(`/fichas/req?careRecipientId=${patientId}`);
-    for (let step = 0; step < 2; step++)
-      await page.getByRole("button", { name: "Avançar", exact: true }).click();
+    const next = page.getByRole("button", { name: "Avançar", exact: true });
+    await next.click();
     await page
-      .getByRole("button", { name: "Adicionar item extra", exact: true })
+      .getByRole("button", { name: "Item extra", exact: true })
       .click();
     const extra = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
     const name = extra.getByRole("textbox", { name: "Nome do material", exact: true });
@@ -644,19 +632,48 @@ test.describe("administração integrada no ambiente local", () => {
     await page
       .getByRole("checkbox", { name: "Reposição urgente", exact: true })
       .check();
+    await extra.getByRole("textbox", { name: "Detalhes para identificar", exact: true }).fill("Usar no kit do plantão.");
     await page
       .getByRole("button", { name: /^Usar item do catálogo: Gaze \(pacote\)/ })
       .click();
     await expect(extra).toHaveCount(0);
-    await expect(page.getByText("Nenhum item extra incluído.", { exact: true })).toBeVisible();
-    for (let step = 0; step < 2; step++)
-      await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
+    await next.click();
+    const editButton = page.getByRole("button", { name: "Editar Gaze", exact: true });
+    await expect(editButton).toHaveCount(1);
+    await expect(page.getByText("Material do catálogo", { exact: true })).toBeVisible();
+    await expect(page.getByText("Estoque informado: 3 pacote", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Adicionar item extra", exact: true }).click();
+    await name.fill("Gaza");
+    await extra.getByRole("button", { name: /^Usar item do catálogo: Gaza \(pacote\)/ }).click();
+    await page.getByRole("button", { name: "Remover Gaza", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Editar Gaza", exact: true })).toHaveCount(0);
+    await editButton.click();
+    const edit = page.getByRole("dialog", { name: "Editar item extra", exact: true });
+    await expect(edit.getByRole("textbox", { name: "Material", exact: true })).toBeDisabled();
+    await expect(edit.getByRole("textbox", { name: "Detalhes para identificar", exact: true })).toHaveValue("Usar no kit do plantão.");
+    const details = "Usar no kit da noite.";
+    await edit.getByRole("textbox", { name: "Detalhes para identificar", exact: true }).fill(details);
+    await edit.getByRole("button", { name: "Salvar alteração", exact: true }).click();
+    await expect.poll(async () => {
+      const response = await page.request.get(`/api/drafts?careRecipientId=${patientId}&kind=REQ`);
+      return (await response.json()).data?.content?.lines?.[0]?.catalogueExtra?.details;
+    }).toBe(details);
+    await page.reload();
+    await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+    await expect(editButton).toHaveCount(1);
+    await expect(page.getByText(details, { exact: true })).toBeVisible();
+    await info.attach("extra-req-retomado", { body: await editButton.locator("xpath=ancestor::li[1]").screenshot(), contentType: "image/png" });
+    await next.click();
+    await page.getByRole("button", { name: "Revisar", exact: true }).click();
     const reviewMaterial = page.locator(".hca-material-review li").filter({
       has: page.locator("strong").filter({ hasText: /^Gaze$/ }),
     });
+    await expect(reviewMaterial).toHaveCount(1);
+    await expect(reviewMaterial.locator("xpath=ancestor::section[1]").getByRole("heading", { name: "Itens extras", exact: true })).toBeVisible();
     await expect(reviewMaterial.getByText("Gaze", { exact: true })).toBeVisible();
     await expect(reviewMaterial.getByText("Estoque da equipe: 3 pacote (observado)", { exact: true })).toBeVisible();
     await expect(reviewMaterial.getByText("Urgente", { exact: true })).toBeVisible();
+    await expect(reviewMaterial.getByText(details, { exact: true })).toBeVisible();
     const pending = page.waitForResponse(
       (response) =>
         new URL(response.url()).pathname === "/api/requisitions" &&
@@ -669,11 +686,13 @@ test.describe("administração integrada no ambiente local", () => {
     expect(response.ok()).toBeTruthy();
     const persisted = await response.json();
     expect(persisted.receipt.lines).toMatchObject([
-      { productId, productName: "Gaze", currentStock: 3, urgent: true },
+      { productId, productName: "Gaze", currentStock: 3, urgent: true, catalogueExtra: { details } },
     ]);
+    expect(persisted.receipt.lines).toHaveLength(1);
     expect(persisted.receipt.extraItems).toHaveLength(0);
-    await expect(
-      page.getByRole("dialog", { name: "Requisição emitida", exact: true }),
-    ).toBeVisible();
+    const issued = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
+    await expect(issued).toBeVisible();
+    const pdf = await page.request.get((await issued.getByRole("link", { name: "Baixar PDF", exact: true }).getAttribute("href"))!);
+    expect(pdf.status()).toBe(200);
   });
 });

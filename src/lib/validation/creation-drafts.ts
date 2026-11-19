@@ -23,7 +23,7 @@ import {
   stockPreparationMutationSchema,
 } from "./stock-preparations";
 import { z } from "zod";
-import { extraMaterialIdentity } from "./extra-material-identity";
+import { catalogueExtra, extraMaterialIdentity } from "./extra-material-identity";
 import {
   balancePreparationSaveSchema,
   balancePreparationMutationSchema,
@@ -92,6 +92,7 @@ export const requisitionDraftContent = z
             stockReference: requisitionStockReferenceSchema.optional(),
             urgent: z.boolean(),
             repeatReason: text(1000).optional(),
+            catalogueExtra: catalogueExtra.optional(),
           })
           .strict(),
       )

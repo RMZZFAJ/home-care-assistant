@@ -13,6 +13,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
 import { readPresentationConversions, presentationCaption } from "@/lib/presentation-conversion";
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
+import { catalogueExtra } from "@/lib/validation/extra-material-identity";
 
 const nameOf = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const scienceLabels: Record<string, string> = {
@@ -82,6 +83,8 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
     const state = snapshot.fulfillmentLines?.find(entry => entry.id === line.id);
     const timeSource = ["client_draft", "server_submission", "legacy_unknown"].includes(String(line.stock_observation_time_source)) ? line.stock_observation_time_source as StockObservationTimeSource : "legacy_unknown";
     const presentation = readPresentationConversions(line.presentation_conversions).map(presentationCaption);
+    const extra = catalogueExtra.safeParse(line.catalogue_extra).data;
+    if (extra) presentation.unshift("Material do catálogo incluído como extra", ...(extra.details ? [extra.details] : []));
     if (typeof line.extra_details === "string") presentation.unshift(line.extra_details);
     const cells: DocumentCell[] = [
       { text: String(index + 1).padStart(2, "0") },

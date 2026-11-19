@@ -508,6 +508,13 @@ os mesmos nomes e identificações na revisão do rascunho. O comprovante devolv
 a identidade preservada, e a ficha indica a pendência de cadastro. Uma
 associação posterior ao catálogo usa a decisão de identificação existente.
 
+Quando uma sugestão do catálogo foi escolhida em Itens extras, o material
+segue em `lines` e pode conter `catalogueExtra` com `details` opcional.
+O comprovante conserva a classificação em `lines`; a API continua usando
+o mesmo `productId`, a unidade do catálogo e as regras de estoque e
+reiteração. A confirmação vinculada ao rascunho confere essa classificação
+e os detalhes por produto.
+
 Opcionalmente, remainingNeed contém requisitionId, version e reason próprios
 para emitir nova necessidade vinculada. Não aceita ator, protocolo, snapshots
 ou quantidade solicitada nessa referência. A origem deve ser REQ operacional
