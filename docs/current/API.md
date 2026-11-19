@@ -588,9 +588,18 @@ Não é um estado administrativo nem a soma de quantidades requisitadas.
 fullyCheckedLines da ENT não inclui linhas parcialmente aceitas, mesmo
 quando sua diferença já foi conciliada.
 
-## ENT — pedido de cancelamento e conciliação
+## ENT e DEV — cancelamento físico e decisão do recebedor
 
-Após aceite, cancel cria pedido identificado pelo banco e não movimenta
+Com a expedição em trânsito e sem conferência pessoal, `cancel` exige
+`reason` e `transitReturned: true`, além da versão e da chave da tentativa.
+A confirmação declara que a expedição foi interrompida e que os materiais
+voltaram à origem. O banco calcula o saldo de cada linha, devolve somente
+esse saldo à custódia original e registra o retorno e o cancelamento na
+mesma transação. Um rascunho ainda sem expedição pode ser descartado sem
+movimentação. Repetir a chave recupera o resultado original.
+
+Após a conferência pessoal, inclusive com zero unidades, cancel cria pedido
+identificado pelo banco e não movimenta
 estoque. O recebedor original decide consent_cancel/refuse_cancellation;
 withdraw_cancellation pertence ao solicitante. Cada decisão envia requestId,
 motivo próprio, expectedVersion e idempotencyKey. Nenhum administrador assume

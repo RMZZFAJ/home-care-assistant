@@ -29,3 +29,4 @@ export const deliveryResolutionBody = z.object({
 
 export type DeliveryResolutionBody = z.output<typeof deliveryResolutionBody>;
 export const requestDeliveryNeedBody = z.object({ lineId: z.uuid(), reason }).strict();
+export const supplyCancellationBody = z.object({ reason, transitReturned: z.literal(true).optional() }).strict();

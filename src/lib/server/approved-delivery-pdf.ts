@@ -12,7 +12,7 @@ import { requirePdfLifecycleFacts } from "@/lib/documents/pdf-lifecycle";
 import { materialTransferDirection } from "@/lib/documents/transfer-follow-up";
 import { confirmedDeliveryQuantity, recordedDeliveryRecipient } from "@/lib/documents/delivery-confirmed-quantity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
-import { readCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
+import { cancelledTransitReturn, readCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
 import { CATEGORY_LABELS } from "@/lib/catalog";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
@@ -96,6 +96,19 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
       { label: "Reconhecido", fraction: 0.18 }, { label: "Em trânsito", fraction: 0.18 },
       { label: "Excedente", fraction: 0.18 },
     ], countedRows);
+  }
+  const transitReturns = snapshot.lines.flatMap((line, index) => {
+    const returned = cancelledTransitReturn(line.metadata);
+    return returned ? [{ cells: [
+      { text: name(line) },
+      { text: amount(returned, unit(line)), key: "material/" + index + "/cancelledTransitReturn" },
+    ] }] : [];
+  });
+  if (transitReturns.length) {
+    layout.heading("Retorno físico antes do recebimento", snapshot.payload.source === "CARE_TEAM"
+      ? "A expedição foi interrompida e os materiais voltaram ao estoque da equipe."
+      : "A expedição foi interrompida e os materiais voltaram ao estoque da família.");
+    layout.table([{ label: "Material", fraction: 0.6 }, { label: "Retornado à origem", fraction: 0.4 }], transitReturns);
   }
   const selection = snapshot.workflow?.recipientSelection as DeliveryRecipientSelection | undefined;
   if (selection) {

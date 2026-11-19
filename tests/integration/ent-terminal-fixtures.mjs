@@ -10,7 +10,7 @@ export async function entTerminalFixture({kind="administrative",personal=false}=
  const original=doc;
  if(kind==="cancelled"){
   assert.equal(personal,false);
-  doc=await rpc(owner,"supply_document_command",{p_id:doc.id,p_version:doc.version,p_action:"cancel",p_key:randomUUID(),p_body:{reason:"Cancelamento fictício anterior a qualquer aceite pessoal"}});
+  doc=await rpc(owner,"supply_document_command",{p_id:doc.id,p_version:doc.version,p_action:"cancel",p_key:randomUUID(),p_body:{reason:"Cancelamento fictício anterior a qualquer aceite pessoal",transitReturned:true}});
   if(doc.status==="cancellation_pending")doc=await rpc(recipient,"supply_document_command",{p_id:doc.id,p_version:doc.version,p_action:"consent_cancel",p_key:randomUUID(),p_body:{requestId:doc.deliveryCancellation.request.id,referenceHash:doc.deliveryCancellation.referenceHash,reason:"Consentimento próprio sem devolução de itens não recebidos",lines:doc.lines.map(l=>({lineId:l.id,returnQuantity:"0"}))}});
   assert.equal(doc.status,"cancelled");
  }else{

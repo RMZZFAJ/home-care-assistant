@@ -149,8 +149,8 @@ async function sendAs(client, document, action, body, key = randomUUID()) {
   return { ok: response.ok, body: await response.json() };
 }
 async function legacyFixtureCommand(client, document, action, body) {
-  // Controlled compatibility setup only: execute the retained, non-public legacy
-  // engine with a real fixture session. New permission/decision assertions use Auth RPC.
+  // Build the pre-reconciliation request shape under the fixture identity.
+  // The legacy consent engine then consumes it without modern allocations.
   assert.ok(["cancel", "consent_cancel"].includes(action));
   const session = (await client.auth.getSession()).data.session;
   assert.ok(session);
@@ -165,9 +165,14 @@ async function legacyFixtureCommand(client, document, action, body) {
       payload[key],
     ]),
   );
-  sql(
-    `begin;select set_config('request.jwt.claims',${sqlLiteral(JSON.stringify(claims))},true);do $fixture$begin perform public.audited_legacy_supply_command(${sqlLiteral(document.id)},${sqlLiteral(action)},${sqlLiteral(JSON.stringify(body))}::jsonb,${sqlLiteral(randomUUID())},${document.version});end;$fixture$;commit;`,
-  );
+  const id = sqlLiteral(document.id), command = sqlLiteral(JSON.stringify(body)), key = sqlLiteral(randomUUID());
+  const prepare = action === "cancel"
+    ? `update public.operational_documents set status='cancellation_pending',version=version+1,
+       workflow_data=workflow_data||jsonb_build_object('cancellationRequestedBy',auth.uid(),'cancellationReason',(${command}::jsonb)->>'reason')
+       where id=${id} and version=${document.version};
+       select private.record_document_event(${id},'ent.cancel',${command}::jsonb,${key});`
+    : `do $fixture$begin perform public.audited_legacy_supply_command(${id},'consent_cancel',${command}::jsonb,${key},${document.version});end;$fixture$;`;
+  sql(`begin;select set_config('request.jwt.claims',${sqlLiteral(JSON.stringify(claims))},true);${prepare}commit;`);
   return rpc(client, "operational_document", { p_id: document.id });
 }
 async function consent(f) {

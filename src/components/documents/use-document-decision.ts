@@ -45,24 +45,25 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
     return () => { active = false; };
   }, [storageKey, reconcileEndpoint, documentId, domain, action]);
   const cancellingRequisition = domain === "requisition" && action === "cancel";
+  const cancellingSupply = domain === "supply" && action === "cancel";
   const purchasing = domain === "supply" && action === "purchase";
   const receiving = domain === "supply" && action === "receive" && !purchaseArrival;
   const reconcilingDelivery = domain === "supply" && action === "resolve";
   const requestingDeliveryReview = domain === "supply" && action === "request_fulfillment_review";
   const resendingArrival = domain === "supply" && action === "resubmit_receipt";
   useOperationActivity(busy, {
-    title: cancellingRequisition ? "Registrando cancelamento" : purchasing ? "Registrando compra"
+    title: cancellingRequisition || cancellingSupply ? "Registrando cancelamento" : purchasing ? "Registrando compra"
       : resendingArrival ? "Reenviando chegada" : purchaseArrival ? "Registrando chegada"
         : receiving ? "Confirmando recebimento" : reconcilingDelivery ? "Registrando conciliação"
           : requestingDeliveryReview ? "Enviando pedido de reavaliação" : "Concluindo a ação",
     detail: "Aguarde a conferência do resultado antes de tentar novamente.",
     stage,
     steps: purchasing ? purchaseActivitySteps : [
-      { label: cancellingRequisition ? "Conferindo os efeitos no estoque" : resendingArrival ? "Conferindo o lançamento"
+      { label: cancellingRequisition || cancellingSupply ? "Conferindo os efeitos no estoque" : resendingArrival ? "Conferindo o lançamento"
         : purchaseArrival ? "Registrando as quantidades recebidas" : receiving ? "Registrando a conferência"
           : reconcilingDelivery ? "Registrando o destino do material"
             : requestingDeliveryReview ? "Preservando o recebimento confirmado" : "Enviando sua confirmação",
-      icon: cancellingRequisition ? "stock" : purchaseArrival || receiving ? "truck" : "file" },
+      icon: cancellingRequisition || cancellingSupply ? "stock" : purchaseArrival || receiving ? "truck" : "file" },
       { label: receiving ? "Conferindo o estoque e as pendências" : "Conferindo o resultado", icon: "check" },
     ],
   });

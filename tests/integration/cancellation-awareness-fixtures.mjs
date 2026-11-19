@@ -21,7 +21,9 @@ export async function cancellationFixture(type = "REQ") {
   }
   const beforeCancel = await rpc(family, "operational_document", { p_id: d.id });
   if (type === "REQ") await rpc(f.admin, "transition_requisition_status", { p_requisition_id: d.id, p_to_status: "cancelled", p_reason: "Cancelamento próprio, preservando as ciências anteriores." });
-  else await rpc(f.admin, "supply_document_command", { p_id: d.id, p_action: "cancel", p_body: { reason: "Cancelamento próprio desta ficha emitida." }, p_version: beforeCancel.version, p_key: randomUUID() });
+  else await rpc(f.admin, "supply_document_command", { p_id: d.id, p_action: "cancel", p_body: {
+    reason: "Cancelamento próprio desta ficha emitida.", ...(type === "ENT" ? { transitReturned: true } : {}),
+  }, p_version: beforeCancel.version, p_key: randomUUID() });
   return { ...f, family, document: await rpc(family, "operational_document", { p_id: d.id }), beforeCancel };
 }
 export { actor, rpc, fixtures };

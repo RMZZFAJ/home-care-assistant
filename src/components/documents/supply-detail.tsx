@@ -24,6 +24,7 @@ import { PurchaseMaterials } from "./purchase-materials";
 import { DeliveryMaterials } from "./delivery-materials";
 import { CountedDeliveryReceipt, CountedDeliveryReceiptResult } from "./delivery-receipt";
 import { canReconcileFromFamily, DeliveryReconciliation, DeliveryReconciliationResult } from "./delivery-reconciliation";
+import { DeliveryTransitCancellation, DeliveryTransitCancellationResult } from "./delivery-transit-cancellation";
 import { readCountedDeliveryReceipt, verifyCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
 import { deliveryTransit } from "@/lib/documents/family-fulfillment";
 import { countedDeliveryReceiptBody, deliveryResolutionBody, type CountedDeliveryReceiptBody, type DeliveryResolutionBody } from "@/lib/validation/delivery-receipt";
@@ -144,6 +145,7 @@ export function SupplyDocumentContent({
   const [purchaseResult, setPurchaseResult] = useState<ConfirmedPurchase | null>(null);
   const [arrivalResult, setArrivalResult] = useState<{ documentId: string; receipt: PurchaseReceipt } | null>(null);
   const [deliveryReceiptResult, setDeliveryReceiptResult] = useState<SupplyDocument | null>(null);
+  const [transitCancellationResult, setTransitCancellationResult] = useState<SupplyDocument | null>(null);
   const [reconciliationResult, setReconciliationResult] = useState<{ data: SupplyDocument; body: DeliveryResolutionBody } | null>(null);
   const [purchaseUpdating, setPurchaseUpdating] = useState(false);
   const purchaseReadAttemptRef = useRef<number | null>(null);
@@ -156,8 +158,10 @@ export function SupplyDocumentContent({
   const hasCountedTransit = data?.type === "ENT" && data.status === "disputed" &&
     data.lines.some(line => deliveryTransit(line).gt(0) && readCountedDeliveryReceipt(line.metadata));
   const reconcilingDelivery = action === "resolve" && hasCountedTransit;
+  const hasUnreceivedDispatch = data?.type === "ENT" && data.status === "pending_receipt" && !data.workflow_data.acceptedAt;
+  const cancellingTransit = action === "cancel" && hasUnreceivedDispatch;
   const coveredOperation = registeringPurchase || registeringArrival;
-  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
+  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery && !cancellingTransit), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
   const [review, setReview] = useState<SupplyReview | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [closeUncertain, setCloseUncertain] = useState(false);
@@ -338,6 +342,13 @@ export function SupplyDocumentContent({
             item.expectedVersion === accepted.expectedVersion && item.actorId === context.userId && item.decision === body.familyAssessment && item.reason === body.reason);
           if (!event || !assessment) throw new Error("Não foi possível verificar a conciliação deste material.");
         }
+        if (accepted.action === "cancel" && accepted.body.transitReturned === true) {
+          const event = read.events.find(item => item.version === accepted.expectedVersion + 1 && item.actorId === context.userId && item.action === "ent.cancel");
+          if (read.type !== "ENT" || read.status !== "cancelled" || !event ||
+            read.lines.some(line => deliveryTransit(line).gt(0)) ||
+            !read.lines.some(line => typeof line.metadata.cancelledTransitReturn === "string"))
+            throw new Error("Não foi possível verificar o cancelamento e o retorno dos materiais.");
+        }
       };
       const outcome = checking ? await decision.checkPrevious(verify) : initialIntention && await decision.execute({
         domain: "supply", action: initialIntention.action, body: initialIntention.body as Record<string, unknown>, expectedVersion: initialIntention.expectedVersion,
@@ -371,6 +382,11 @@ export function SupplyDocumentContent({
       if (reconcilingDelivery && intention.action === "resolve") {
         setMessage("");
         setReconciliationResult({ data: result.data, body: deliveryResolutionBody.parse(intention.body) });
+        return;
+      }
+      if (intention.action === "cancel" && intention.body.transitReturned === true) {
+        setMessage("");
+        setTransitCancellationResult(result.data);
         return;
       }
       if (intention.action === "purchase" && result.data.payload.origin !== "donation") {
@@ -597,7 +613,7 @@ export function SupplyDocumentContent({
       ) &&
       (data.type === "ENT"
         ? allowed("ent.cancel") ||
-        (data.created_by === context.userId &&
+        (data.created_by === context.userId && !data.workflow_data.acceptedAt &&
           !data.lines.some((line) => quantity(line.accepted_quantity).gt(0)))
         : data.type === "COM"
           ? allowed("com.approve") &&
@@ -708,9 +724,10 @@ export function SupplyDocumentContent({
         disabled={busy || uncertain}
         onClick={(event) => {
           operationOpenerRef.current = event.currentTarget;
-          if ((item === "receive" && data.type === "ENT") || (item === "resolve" && hasCountedTransit)) {
+          if ((item === "receive" && data.type === "ENT") || (item === "resolve" && hasCountedTransit) || (item === "cancel" && hasUnreceivedDispatch)) {
             setError("");
             setReview(null);
+            if (item === "cancel") operationOpenerRef.current = moreTriggerRef.current;
             setAction(item);
             return;
           }
@@ -728,7 +745,7 @@ export function SupplyDocumentContent({
             ? "Conferir recebimento"
           : item === "purchase" && data.payload.origin === "donation"
             ? "Registrar aquisição"
-            : actionLabels[item]}
+            : item === "cancel" && hasUnreceivedDispatch ? "Cancelar ficha" : actionLabels[item]}
       </Action>
     );
   }
@@ -822,7 +839,7 @@ export function SupplyDocumentContent({
         {loading && data ? "Atualizando consulta da ficha…" : ""}
       </span>
       {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
-        {error && !countingDelivery && !reconcilingDelivery ? <Notice error>{error}</Notice> : null}
+        {error && !countingDelivery && !reconcilingDelivery && !cancellingTransit ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {readNotice &&
         (action ||
@@ -834,7 +851,7 @@ export function SupplyDocumentContent({
         <Notice>{readNotice}</Notice>
       ) : null}
       {!coveredOperation ? purchaseConflictPanel : null}
-      {deliveryConflict && data?.type === "ENT" && !countingDelivery && !reconcilingDelivery ? (
+      {deliveryConflict && data?.type === "ENT" && !countingDelivery && !reconcilingDelivery && !cancellingTransit ? (
         <section className="ui-card space-y-3">
           <Notice error>
             O pedido, a versão ou as referências da conciliação mudaram. Seus
@@ -1289,7 +1306,7 @@ export function SupplyDocumentContent({
                   ) : null}
                 </section>
               ) : null}
-              {!countingDelivery && !reconcilingDelivery && (actions.length || action) ? (
+              {!countingDelivery && !reconcilingDelivery && !cancellingTransit && (actions.length || action) ? (
                 <section className="ui-card">
                   <h2>
                     {action && !actions.includes(action)
@@ -1480,8 +1497,47 @@ export function SupplyDocumentContent({
           resultFocusRef.current = true;
           setFocusRevision(value => value + 1);
         }} /> : null}
+      {data && cancellingTransit && !readDenied ? <DeliveryTransitCancellation
+        key={data.id}
+        data={data} patientName={context.patient?.display_name ?? "Paciente identificado na ficha"} actor={context.fullName}
+        busy={busy || decision.busy} blocked={deliveryConflict || !actions.includes("cancel")}
+        uncertain={uncertain || decision.uncertain} error={error || decision.recoveryMessage}
+        finalFocus={operationOpenerRef}
+        conflict={deliveryConflict ? <Notice>
+          A ficha mudou durante a revisão. Confira a situação atual antes de cancelar.
+          {comparison ? <ActionButton disabled={busy} onClick={() => {
+            setData(comparison);
+            setComparison(null);
+            setDeliveryConflict(false);
+            setReview(null);
+            setError("");
+            if (comparison.status !== "pending_receipt" || comparison.workflow_data.acceptedAt) setAction(null);
+          }}>Usar versão atual</ActionButton> :
+            <ActionButton disabled={busy} onClick={() => void comparePurchaseVersion()}>Consultar versão atual</ActionButton>}
+        </Notice> : null}
+        onSubmit={body => {
+          const next = { action: "cancel", body, summary: "", expectedVersion: data.version };
+          setReview(next);
+          void execute(next);
+        }}
+        onRecover={() => void execute()}
+        onClose={() => {
+          setAction(null);
+          setReview(null);
+          setError("");
+          setDeliveryConflict(false);
+          setComparison(null);
+          setAttempt(value => value + 1);
+        }}
+        onCloseUncertain={() => setCloseUncertain(true)} /> : null}
+      {transitCancellationResult?.id === id && !readDenied && activeContext ? <DeliveryTransitCancellationResult
+        data={transitCancellationResult} onClose={() => {
+          setTransitCancellationResult(null);
+          resultFocusRef.current = true;
+          setFocusRevision(value => value + 1);
+        }} /> : null}
       <Dialog
-        open={Boolean(review) && !readDenied && !countingDelivery && !reconcilingDelivery && (!coveredOperation || uncertain)}
+        open={Boolean(review) && !readDenied && !countingDelivery && !reconcilingDelivery && !cancellingTransit && (!coveredOperation || uncertain)}
         title={
           review?.action === "close_expectation"
             ? "Revisar encerramento da expectativa"

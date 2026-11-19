@@ -110,7 +110,7 @@ export const entBody = (f, purpose) =>
             requestId: f.document.deliveryCancellation.request.id,
             reason: entReason,
           }
-        : { reason: entReason };
+        : { reason: entReason, ...(purpose === "cancel" && f.document.status === "pending_receipt" ? { transitReturned: true } : {}) };
 export const entCommit = (f, purpose, saved) => ({
   p_id: saved.id,
   p_expected: saved.revision,

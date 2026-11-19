@@ -8,7 +8,7 @@ import { draftCommitSchema } from "./creation-drafts";
 import { supplySourceLinks } from "./supply-sources";
 import { purchaseCommandBody } from "./purchase-command";
 import { purchaseArrivalBody } from "./purchase-arrival";
-import { countedDeliveryReceiptBody, deliveryResolutionBody, requestDeliveryNeedBody } from "./delivery-receipt";
+import { countedDeliveryReceiptBody, deliveryResolutionBody, requestDeliveryNeedBody, supplyCancellationBody } from "./delivery-receipt";
 
 const identifier = z.string().uuid();
 const line = z
@@ -290,7 +290,7 @@ export const supplyCommandSchema = z
       reassign: z.object({ recipientId: identifier, reason }).strict(),
       resolve: deliveryResolutionBody,
       request_fulfillment_review: requestDeliveryNeedBody,
-      cancel: z.object({ reason }).strict(),
+      cancel: supplyCancellationBody,
       refuse_cancellation: z.object({ reason, requestId: identifier }).strict(),
       withdraw_cancellation: z
         .object({ reason, requestId: identifier })

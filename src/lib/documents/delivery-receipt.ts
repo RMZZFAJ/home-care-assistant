@@ -18,6 +18,12 @@ export function readCountedDeliveryReceipt(metadata: unknown) {
   return read.success ? read.data : null;
 }
 
+export function cancelledTransitReturn(metadata: unknown) {
+  const value = metadata && typeof metadata === "object" && "cancelledTransitReturn" in metadata ? metadata.cancelledTransitReturn : null;
+  const read = exactQuantity.safeParse(value);
+  return read.success && quantity(read.data).gt(0) ? read.data : null;
+}
+
 export function deliveryNeedRequest(metadata: unknown) {
   const request = metadata && typeof metadata === "object" && "fulfillmentReviewRequest" in metadata ? metadata.fulfillmentReviewRequest : null;
   if (!request || typeof request !== "object" || !("reason" in request) || typeof request.reason !== "string" ||

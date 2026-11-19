@@ -1,5 +1,27 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — cancelamento físico de ENT e DEV em trânsito.** A revisão E06-10
+apresenta o saldo e o estoque de retorno por material. O cancelamento
+preserva os vínculos e gera o histórico na mesma transação que a devolução
+confirmada. A decisão curta é descartada quando a pessoa sai da revisão.
+A conferência pessoal de zero unidades usa o pedido ao recebedor original
+e preserva o trânsito até que o destino físico seja esclarecido.
+
+| Caso | Evidência local | Pendência |
+| --- | --- | --- |
+| ENT e DEV em trânsito | Auth real, confirmação explícita, retorno à origem e recuperação sem duplicação | Validar o SHA publicado |
+| Conferência de zero | O pedido fica pendente e preserva o ledger e o trânsito | Revisar a jornada de decisão do recebedor conforme a v7 |
+| Vínculos e ciência anteriores | As regressões de legado, autorização e ciência passaram | Conferência no preview compatível |
+
+Passaram 40 integrações, 33 testes unitários e quatro casos em Mobile e
+iOS emulados sem retry. O teste de navegador verificou descarte, recuperação
+do ato após perda de resposta e retorno físico no PDF assinado.
+
+A migration `20261119091837` elevou o histórico local a 281 versões. O
+remoto tem 272 com o preview em `075b4b66`. A interface atualizada envia
+a confirmação de retorno; as nove migrations pendentes aguardam sua
+publicação na mesma branch.
+
 **19/11 — conciliação de ENT por material e suficiência.** O fluxo segue
 E06-08 e E06-18. Cada quantidade em trânsito tem destino e motivo próprios.
 A família autorizada pode registrar a suficiência ao esclarecer o último

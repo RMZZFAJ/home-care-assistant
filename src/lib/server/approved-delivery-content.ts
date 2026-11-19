@@ -3,7 +3,7 @@ import { approvedDocumentContent } from "./approved-document-content";
 import { pdfFidelitySchema } from "@/lib/documents/pdf-fidelity";
 import { confirmedDeliveryQuantity } from "@/lib/documents/delivery-confirmed-quantity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
-import { readCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
+import { cancelledTransitReturn, readCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
 import { formatBrazilDate } from "@/lib/receipt";
 import { deliveryNeedRequestDescription, deliveryResolutionLabels, familyFulfillmentDescription, familyReviewDescription } from "@/lib/documents/family-fulfillment";
 import { formatQuantity, quantity } from "@/lib/quantity";
@@ -29,6 +29,8 @@ export function approvedDeliveryContent(snapshot: DocumentSnapshot, emission: Pd
     semanticFacts[key + "/expedited"] = amount(line.quantity, unit(line));
     semanticFacts[key + "/received"] = received.state === "recorded" ? amount(received.quantity, unit(line)) : received.state === "unavailable" ? "Quantidade não preservada" : "Não confirmado";
     semanticFacts[key + "/open"] = amount((typeof line.reconciled_quantity === "string" || typeof line.reconciled_quantity === "number") && (typeof line.accepted_quantity === "string" || typeof line.accepted_quantity === "number") ? quantity(String(line.quantity)).minus(line.accepted_quantity).minus(line.reconciled_quantity).toFixed() : null, unit(line));
+    const physicalReturn = cancelledTransitReturn(line.metadata);
+    if (physicalReturn) semanticFacts[key + "/cancelledTransitReturn"] = amount(physicalReturn, unit(line));
     const counted = readCountedDeliveryReceipt(line.metadata);
     if (counted) {
       semanticFacts[key + "/countedDeclared"] = amount(counted.receivedQuantity, unit(line));
