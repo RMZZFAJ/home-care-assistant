@@ -2,6 +2,7 @@ import { z } from "zod";
 import { scheduleResourcePurposes } from "../schedules/resource-preparations";
 import { consumptionPreparationPurposes } from "../forms/consumption-preparation-purposes";
 import { balancePreparationPurposes } from "../forms/balance-preparation-purposes";
+import { supplySourceLinks } from "./supply-sources";
 const text = (max: number) =>
   z.string().max(max, `Este campo permite até ${max} caracteres.`);
 const entries = <T extends z.ZodType>(value: T, max = 1000, keyLength = 120) =>
@@ -185,12 +186,16 @@ export const supplyDraftContent = z
       })
       .strict(),
     links: entries(z.array(z.uuid()).max(1000)),
+    sources: supplySourceLinks.optional(),
+    sourceImports: entries(z.array(text(120).min(1)).max(1000), 100).optional(),
+    sourceSeeds: entries(text(64)).optional(),
     materials: draftMaterials,
     context: z
       .object({
         documentId: z.uuid().nullable(),
         documentVersion: z.number().int().positive().nullable(),
         requisitionId: z.uuid().nullable(),
+        purchaseId: z.uuid().nullable().optional(),
         recipientName: text(200),
       })
       .strict(),

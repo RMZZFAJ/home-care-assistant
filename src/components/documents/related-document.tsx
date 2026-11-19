@@ -17,10 +17,12 @@ export function RelatedDocument({
   id,
   type = "REQ",
   label,
+  compact = false,
 }: {
   id: string;
   type?: DocumentType;
   label: string;
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -34,10 +36,12 @@ export function RelatedDocument({
         ref={triggerRef}
         type="button"
         aria-label={label}
-        className="doc-linked-row"
+        className={compact ? "hca-source-link" : "doc-linked-row"}
         onClick={(event) => { event.currentTarget.focus(); setOpen(true); }}
       >
-        <span className="doc-linked-kind" data-type={type}>{type}</span><span className="doc-linked-main"><strong>{label}</strong><small>Consultar ficha</small></span><Icon name="chevron" width={16} height={16} />
+        {compact ? <>{label}<Icon name="external" width={13} height={13} /></> : (
+          <><span className="doc-linked-kind" data-type={type}>{type}</span><span className="doc-linked-main"><strong>{label}</strong><small>Consultar ficha</small></span><Icon name="chevron" width={16} height={16} /></>
+        )}
       </button>
       {open ? <Dialog open title={label} onClose={close}>
         {type === "REQ" ? <RequisitionOpening id={id} withinDialog onCancel={close}><RelatedContent id={id} type={type} /></RequisitionOpening> : <RelatedSupplyContent key={id + type} id={id} type={type} />}

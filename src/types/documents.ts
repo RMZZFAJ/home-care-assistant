@@ -38,6 +38,7 @@ export type DraftLine = {
 };
 export type SupplyPayload = {
   lines: DraftLine[];
+  sources?: import("@/lib/validation/supply-sources").SupplySourceLink[];
   notes?: string;
   origin?: "purchase" | "donation";
   source?: Custody;
@@ -376,6 +377,7 @@ export type SupplyDocument = {
     protocol: string;
     itemIds: string[];
   }[];
+  originDocuments?: import("@/lib/validation/supply-sources").SupplySourceOrigin[];
   unavailableRequisitionItems?: number;
   events: DocumentEvent[];
   receipts: PurchaseReceipt[];

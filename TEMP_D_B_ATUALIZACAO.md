@@ -56,6 +56,24 @@ do ajuste e saldo de 18 para 22 após recuperar a resposta. O cenário
 comparação. Capturas e logs `l2-req-cancellation-*` estão em
 `output/playwright/`.
 
+COM e ENT passaram a registrar vínculos operacionais gerais e por
+material. No início por outra ficha, a REQ oferece necessidades em
+aberto e a COM fornece as quantidades de chegada aprovada disponíveis
+no estoque da família. A seleção avulsa permite manter só o vínculo
+geral. Desfazer a importação preserva quantidades que já foram editadas.
+A emissão revalida a origem, os materiais e o limite aprovado da
+compra. Os vínculos passam pela leitura autorizada da ficha de origem.
+As migrations `20261119032323_l2_supply_operational_sources.sql` e
+`20261119033747_l2_supply_source_capacity_and_revision.sql` foram
+aplicadas no banco local. Vínculos da DEV e apresentação destas novas
+origens nos PDFs ainda estão em implementação.
+Passaram duas integrações com Auth real e seis verificações móveis sem
+retry, incluindo a regressão do pré-vínculo de ENT de L1. A comparação
+móvel com E05-01 e E06-01 cobriu os filtros, o vínculo por material,
+o vínculo sem importação e a retomada do rascunho. Capturas e logs
+`l2-supply-*final.log`, `l2-supply-origin-picker-*` e
+`l2-ent-from-com-*` estão em `output/playwright/`.
+
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma
 falha persistente no seletor de paciente. Windows, Ubuntu, banco,

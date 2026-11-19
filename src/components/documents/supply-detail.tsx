@@ -3,6 +3,7 @@ import { useDocumentDecision, DocumentDecisionFailure } from "./use-document-dec
 import { ActionButton } from "@/components/ui/controls";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { DocumentSection } from "@/components/ui/model-section";
+import { RelatedDocument } from "./related-document";
 import { DocumentComplementsPanel } from "@/components/documents/document-complements";
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { roleLabel } from "@/components/layout/workspace-context";
@@ -855,6 +856,10 @@ export function SupplyDocumentContent({
                 {actions
                   .filter((item) => !secondaryDocumentActions.has(item))
                   .map(renderAction)}
+                {activeContext && data.type === "COM" && allowed("ent.create") &&
+                  data.lines.some((line) => quantity(line.accepted_quantity).gt(0)) ? (
+                  <Link className={buttonClass} href={`/fichas/ent?purchaseId=${data.id}`}>Preparar entrega</Link>
+                ) : null}
               </>
             }
             secondaryActions={
@@ -1032,6 +1037,11 @@ export function SupplyDocumentContent({
               </div>
             </DocumentPanel>
             <DocumentPanel value="materials">
+              {data.originDocuments?.length ? <section className="hca-form-stack" aria-label="Fichas de origem">
+                <h3>Fichas de origem</h3>
+                {data.originDocuments.map((origin) => <RelatedDocument
+                  key={origin.documentId} id={origin.documentId} type={origin.type} label={origin.code} />)}
+              </section> : null}
               {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} onReviewed={() => setAttempt(value => value + 1)} /> : null}
               <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>
                 {data.type === "COM" ? <PurchaseMaterials data={data} /> : data.type === "ENT" ? <DeliveryMaterials data={data} /> : <>

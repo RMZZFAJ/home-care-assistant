@@ -205,6 +205,18 @@ Uma contagem absoluta posterior, mesmo sem movimento, impede reverter
 enquanto a regra P1 aguarda decisão. Só quem tem `stock.team.read`
 recebe os saldos para comparação e pode confirmar a reversão.
 
+Uma COM pode ter a REQ como origem e uma ENT de família para equipe
+pode ter REQ ou COM. O vínculo geral dispensa importação de materiais.
+O vínculo por material exige uma linha correspondente e elegível.
+Para COM, a expedição vinculada respeita o total aprovado nas origens
+daquele material e o saldo físico da família. O cálculo e a
+persistência ocorrem na transação da ficha sob o lock de estoque.
+O payload registra o digest do conjunto de origens. As identidades
+ficam em `private.supply_source_sets` e a consulta aplica a permissão
+de leitura de cada tipo. Esses vínculos são distintos do complemento
+formal e o atendimento de REQ continua dependendo da entrega e das
+avaliações pertinentes.
+
 BAL trata exclusivamente estoque da equipe. A referência usa revisão do
 ledger; mudança desde a contagem impede aprovação até reconto. Política
 opcional aplica diretamente; política obrigatória exige os grupos e as

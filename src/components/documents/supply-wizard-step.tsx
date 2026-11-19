@@ -1,13 +1,16 @@
 "use client";
+import { Menu } from "@base-ui/react/menu";
+import { MenuPopup } from "@/components/ui/floating";
+import { Icon } from "@/components/ui/primitives";
 import { RelatedDocument } from "./related-document";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
-import { DefinitionGrid } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import {
   DeliveryRecipientField,
   DeliveryRecipientReference,
 } from "./delivery-recipient";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
   inputClass,
   Notice,
@@ -58,7 +61,8 @@ export function SupplyWizardStep({
   links,
   setLinks,
   requestOptions,
-  requisitionId,
+  sourceSection,
+  openMaterialSources,
   scan,
   recipientContext,
   recipientComparison,
@@ -83,7 +87,8 @@ export function SupplyWizardStep({
   links: Record<string, string[]>;
   setLinks: Dispatch<SetStateAction<Record<string, string[]>>>;
   requestOptions: ItemContext[];
-  requisitionId: string | null;
+  sourceSection?: ReactNode;
+  openMaterialSources?: (product: CatalogProduct) => void;
   scan: (code: string) => Promise<void>;
   recipientContext: DeliveryPreparation | null;
   recipientComparison: DeliveryPreparation | null;
@@ -220,12 +225,7 @@ export function SupplyWizardStep({
               />
             </div>
           ) : null}
-          {requisitionId ? (
-            <Notice>
-              Produtos vinculados à REQ de origem. Informe as quantidades deste
-              ato; a requisição não define quantidade solicitada.
-            </Notice>
-          ) : null}
+          {sourceSection}
           {type !== "BAL" &&
             requestOptions.some((option) => option.pending.length) ? (
             <details className="rounded-xl border border-(--line) p-4">
@@ -439,6 +439,17 @@ export function SupplyWizardStep({
                       ) : null}
                     </span>
                   </label>
+                  {checked && openMaterialSources ? (
+                    <Menu.Root>
+                      <Menu.Trigger render={<ActionButton compact variant="quiet" className="hca-material-origin-button"
+                        aria-label={`Mais ações de ${product.name}`} />}><Icon name="more" /></Menu.Trigger>
+                      <MenuPopup>
+                        <Menu.Item className="hca-menu-item" onClick={() => openMaterialSources(product)}>
+                          <Icon name="link" />Vincular a uma ficha
+                        </Menu.Item>
+                      </MenuPopup>
+                    </Menu.Root>
+                  ) : null}
                   {checked &&
                     !form.presentationSelections?.[product.id]?.length ? (
                     <label className="product-quantity text-xs font-semibold">

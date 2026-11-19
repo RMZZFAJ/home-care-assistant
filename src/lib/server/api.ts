@@ -32,6 +32,12 @@ export function databaseError(
   const message = error?.message ?? "";
   if (error?.code === "PT409" && message === "requisition stock reference changed")
     throw new ApiError("REQUEST_STOCK_CHANGED", "O estoque mudou durante o preenchimento. Sua contagem foi preservada para conferência.", 409);
+  if (error?.code === "PT409" && message === "operational source material changed")
+    throw new ApiError("VERSION_CONFLICT", "Um material deixou de estar disponível na ficha de origem. Confira os vínculos antes de confirmar.", 409);
+  if (error?.code === "PT409" && message === "delivery exceeds approved source quantity")
+    throw new ApiError("VERSION_CONFLICT", "A quantidade supera as chegadas aprovadas nas compras vinculadas ao material. Confira a quantidade e as origens.", 409);
+  if (error?.code === "42501" && message === "existing supply sources require read permission")
+    throw new ApiError("FORBIDDEN", "O rascunho tem uma origem fora da sua permissão de leitura. Peça a conferência a alguém com acesso às origens.", 403);
   if (error?.code === "PT409" && /^(requisition cancellation stock reference changed or missing|requisition cancellation stock reversal is unavailable)$/.test(message))
     throw new ApiError("VERSION_CONFLICT", "Confira o estoque atual antes de cancelar a requisição. Sua justificativa foi preservada.", 409);
   if (error?.code === "PT409" && /^(document changed before confirmation|(?:requisition|balance) reference changed (?:before|after) confirmation)$/.test(message))

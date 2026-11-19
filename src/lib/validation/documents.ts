@@ -5,6 +5,7 @@ import { quantity } from "@/lib/quantity";
 import { exactQuantity } from "./exact-quantity";
 export { exactQuantity } from "./exact-quantity";
 import { draftCommitSchema } from "./creation-drafts";
+import { supplySourceLinks } from "./supply-sources";
 
 const identifier = z.string().uuid();
 const line = z
@@ -68,6 +69,7 @@ export const supplyPayload = z
       .strict()
       .optional(),
     balanceReferenceRevision: z.string().regex(/^\d+$/).max(20).optional(),
+    sources: supplySourceLinks.optional(),
   })
   .strict();
 export const reviseSupplySchema = z
