@@ -55,7 +55,6 @@ export function DocumentHeader({
   badges,
   headingLevel = 2,
   contextLabel,
-  progressActionRef,
   fileActionRef,
   onRefresh,
   refreshDisabled = false,
@@ -86,7 +85,6 @@ export function DocumentHeader({
   badges?: ReactNode;
   headingLevel?: 1 | 2;
   contextLabel?: string;
-  progressActionRef?: Ref<HTMLDivElement>;
   fileActionRef?: Ref<HTMLDivElement>;
   onRefresh?: () => void;
   refreshDisabled?: boolean;
@@ -169,7 +167,6 @@ export function DocumentHeader({
           <div ref={fileActionRef} className="hca-document-action-slot" />
         </div>
         <div className="hca-document-action-row">
-          <div ref={progressActionRef} className="hca-document-action-slot" />
           {onRefresh ? (
             <ActionButton
               ref={refreshButtonRef}

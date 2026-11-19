@@ -130,8 +130,6 @@ export function SupplyDocumentContent({
 }) {
   const liveRevision = useLiveRevision();
   const tabs = useDocumentTabs(can(context, "audit.read"));
-  const [progressActionTarget, setProgressActionTarget] =
-    useState<HTMLDivElement | null>(null);
   const [fileActionTarget, setFileActionTarget] =
     useState<HTMLDivElement | null>(null);
   const editingRef = useRef(false);
@@ -941,7 +939,6 @@ export function SupplyDocumentContent({
         <>
           <DocumentHeader
             headingLevel={1}
-            progressActionRef={setProgressActionTarget}
             fileActionRef={setFileActionTarget}
             contextLabel={roleLabel(context.patient?.role)}
             onRefresh={refreshDocument}
@@ -1199,8 +1196,7 @@ export function SupplyDocumentContent({
           >
             <DocumentPanel value="progress">
               <DocumentProgress
-                actionTarget={progressActionTarget}
-                onAction={() => tabs.select("progress")}
+                code={data.code ?? data.protocol ?? "Rascunho"}
                 id={id}
                 type={data.type}
                 patientId={data.care_recipient_id}

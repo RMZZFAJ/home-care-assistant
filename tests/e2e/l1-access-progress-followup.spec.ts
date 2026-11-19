@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
@@ -126,9 +127,10 @@ test("Mais usa menu e identificação separada; família menciona por @ e refere
   const identity = page.getByRole("dialog", { name: "Protocolo e identificação", exact: true });
   await expect(identity.getByText(req.id, { exact: true })).toBeVisible(); await expect(identity.getByText(code, { exact: true })).toBeVisible();
   await identity.getByRole("button", { name: "Fechar diálogo", exact: true }).click(); await expect(more).toBeFocused();
-  await page.getByRole("button", { name: "Registrar andamento", exact: true }).click();
-  const editor = page.getByRole("dialog", { name: "Registrar andamento", exact: true }), text = editor.getByRole("textbox", { name: "Texto do andamento", exact: true });
-  await expect(editor.getByLabel("Visibilidade do andamento", { exact: true })).toHaveCount(0);
+  await selectDocumentSection(page, "progress");
+  await page.getByRole("button", { name: "Novo andamento", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "Novo andamento", exact: true }), text = editor.getByRole("textbox", { name: "Texto do andamento", exact: true });
+  await expect(editor.getByRole("switch")).toHaveCount(0);
   await expect(editor.getByRole("textbox", { name: "Código da ficha a vincular", exact: true })).toHaveCount(0);
   await expect(editor.getByRole("textbox", { name: "Nome da pessoa a mencionar", exact: true })).toHaveCount(0);
   await text.fill("Registro privado @Teste");
@@ -153,7 +155,7 @@ test("Mais usa menu e identificação separada; família menciona por @ e refere
   expect(await text.evaluate((element: HTMLTextAreaElement) => element.selectionStart)).toBe(expectedText.length);
   await editor.getByRole("button", { name: new RegExp("^Ficha · " + otherCode + "(?: ·|$)") }).click();
   const committed = page.waitForResponse(response => new URL(response.url()).pathname === "/api/documents/progress-preparations/commit" && response.request().method() === "POST");
-  await editor.getByRole("button", { name: "Publicar andamento", exact: true }).click();
+  await editor.getByRole("button", { name: "Registrar andamento", exact: true }).click();
   const confirmed = await committed; expect(confirmed.status(), await confirmed.text()).toBe(200);
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(editor).toHaveCount(0);

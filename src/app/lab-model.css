@@ -508,7 +508,8 @@
 .hca-l1 .doc-original-notes>li{padding-left:4px;font-size:13.5px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
 .hca-l1 .doc-original-notes>li+li{margin-top:13px}
 .hca-l1 .doc-original-notes>li::marker{font-weight:700;color:var(--primary);font-size:12px}
-.hca-l1 .doc-feed-head-actions{display:flex;gap:2px;margin:-4px -5px 0 0;flex:none}
+.hca-l1 .hca-progress-feed>.doc-card-head{flex-wrap:wrap}
+.hca-l1 .doc-feed-head-actions{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:-4px -5px 0 auto}
 .hca-l1 .doc-feed-head-actions>.btn-icon{height:32px;min-height:32px;width:32px;min-width:32px;border-color:transparent;background:transparent;color:var(--muted)}
 .hca-l1 .doc-feed-toolbar{margin-bottom:15px;gap:9px}
 .hca-l1 .doc-period-filter{display:flex;align-items:center;gap:5px;min-height:33px;border:1px solid var(--line);background:#fff;border-radius:7px;padding:0 7px;color:var(--muted)}

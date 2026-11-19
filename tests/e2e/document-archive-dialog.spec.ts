@@ -1,3 +1,4 @@
+import { selectDocumentSection } from "./document-sections";
 import { expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { entOperationFixture } from "../integration/ent-operation-fixtures.mjs";
@@ -25,7 +26,8 @@ test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT s
   await archive.getByRole("button", { name: "Arquivar e consolidar PDF", exact: true }).click();
   await page.getByRole("dialog", { name: "Ficha arquivada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(page.getByRole("button", { name: "Revisar conclusão", exact: true })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Registrar andamento", exact: true })).toHaveCount(0);
+  await selectDocumentSection(page, "progress");
+  await expect(page.getByRole("button", { name: "Novo andamento", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Revisar encerramento", exact: true }).click();
   const review = page.getByRole("dialog", { name: "Confirmar encerramento", exact: true });
   const link = review.getByRole("link", { name: "Baixar PDF consolidado", exact: true });
@@ -38,7 +40,8 @@ test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT s
   await reverse.getByRole("textbox", { name: "Motivo da reversão" }).fill("Acompanhamento fictício restaurado após o arquivo.");
   await reverse.getByRole("button", { name: "Reverter arquivamento", exact: true }).click();
   await page.getByRole("dialog", { name: "Arquivamento revertido", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Registrar andamento", exact: true })).toBeEnabled();
+  await selectDocumentSection(page, "progress");
+  await expect(page.getByRole("button", { name: "Novo andamento", exact: true })).toBeEnabled();
   expect(await (await page.request.get(endpoint)).json()).toMatchObject({ condition: "completed", archive: null });
   const preserved = await page.request.get(url);
   expect(preserved.status()).toBe(200);

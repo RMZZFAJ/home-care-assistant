@@ -17,7 +17,7 @@ export function ProgressPublicationOptions({ value, onChange, disabled, canPriva
     </FormField>
     {!privateOnly && canPrivate ? (
       <label className="hca-progress-visibility">
-        <span>Andamento privado</span>
+        <span>Privado da família</span>
         <input
           type="checkbox"
           role="switch"

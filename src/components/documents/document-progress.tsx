@@ -52,7 +52,6 @@ import {
   SelectField,
   TextInput,
 } from "@/components/ui/controls";
-import { DocumentActionSlot } from "./document-action-slot";
 import {
   parseProgressPage,
   parseProgressOutcome,
@@ -126,8 +125,7 @@ type ProgressProps = {
   type: DocumentType;
   patientId: string;
   context: WorkspaceContext;
-  actionTarget?: HTMLElement | null;
-  onAction?: () => void;
+  code: string;
   readOnly?: boolean;
 };
 export function DocumentProgress({
@@ -135,8 +133,7 @@ export function DocumentProgress({
   type,
   patientId,
   context,
-  actionTarget,
-  onAction,
+  code,
   readOnly,
 }: ProgressProps) {
   const ready = useClientReady();
@@ -147,8 +144,7 @@ export function DocumentProgress({
       type={type}
       patientId={patientId}
       context={context}
-      actionTarget={actionTarget}
-      onAction={onAction}
+      code={code}
       readOnly={readOnly}
     />
   ) : (
@@ -162,8 +158,7 @@ function ProgressContent({
   type,
   patientId,
   context,
-  actionTarget,
-  onAction,
+  code,
   readOnly,
 }: ProgressProps) {
   const scrollRegion = useScrollableRegion<HTMLDivElement>();
@@ -622,31 +617,18 @@ function ProgressContent({
       aria-label="Andamentos da ficha"
       aria-busy={read.loading}
     >
-      <header className="doc-card-head"><div><h2><Icon name="history" width={19} height={19} />Andamentos</h2><p>{feed ? feed.total + " registros · ordem cronológica" : "Ordem cronológica"}</p></div><div className="doc-feed-head-actions"><ActionButton className="btn-icon" aria-label="Atualizar Andamentos" aria-disabled={read.loading} onClick={() => { if (!read.loading) read.refresh(); }}><Icon name="refresh" /></ActionButton><ActionButton className="btn-icon" aria-label={collapsed ? "Expandir Andamentos" : "Recolher Andamentos"} aria-expanded={!collapsed} aria-controls={"progress-content-" + id} onClick={() => setCollapsed(value => !value)}><Icon name="down" style={{transform: collapsed ? undefined : "rotate(180deg)"}} /></ActionButton></div>
-        {!readOnly ? <DocumentActionSlot target={actionTarget}>
-          <ActionButton
-            ref={openerRef}
-            disabled={
-              !pending &&
-              !writable &&
-              !privateDraft.offered &&
-              !privateDraft.base &&
-              !privateDraft.consumed &&
-              !privateDraft.pending
-            }
-            onClick={() => {
-              onAction?.();
-              setOpen(true);
-            }}
-          >
-            <Icon name="plus" />
-            {pending
-              ? "Recuperar publicação"
-              : privateDraft.pending
-                ? "Recuperar preenchimento de andamento"
-                : "Registrar andamento"}
-          </ActionButton>
-        </DocumentActionSlot> : null}
+      <header className="doc-card-head">
+        <div><h2><Icon name="history" width={19} height={19} />Andamentos</h2><p>Registros em ordem cronológica.</p></div>
+        <div className="doc-feed-head-actions">
+          {!readOnly && (writable || pending || privateDraft.offered || privateDraft.base || privateDraft.consumed || privateDraft.pending) ? (
+            <ActionButton compact ref={openerRef} onClick={() => setOpen(true)}>
+              <Icon name="plus" />
+              {pending ? "Recuperar publicação" : privateDraft.pending ? "Recuperar preenchimento de andamento" : "Novo andamento"}
+            </ActionButton>
+          ) : null}
+          <ActionButton className="btn-icon" aria-label="Atualizar Andamentos" aria-disabled={read.loading} onClick={() => { if (!read.loading) read.refresh(); }}><Icon name="refresh" /></ActionButton>
+          <ActionButton className="btn-icon" aria-label={collapsed ? "Expandir Andamentos" : "Recolher Andamentos"} aria-expanded={!collapsed} aria-controls={"progress-content-" + id} onClick={() => setCollapsed(value => !value)}><Icon name="down" style={{ transform: collapsed ? undefined : "rotate(180deg)" }} /></ActionButton>
+        </div>
       </header>
       <div className="doc-card-body" id={"progress-content-" + id} hidden={collapsed}>
       {message ? <Notice>{message}</Notice> : null}
@@ -715,8 +697,10 @@ function ProgressContent({
       <Dialog
         open={!readOnly && open}
         title={
-          pending ? "Recuperar publicação de andamento" : "Registrar andamento"
+          pending ? "Recuperar publicação de andamento" : "Novo andamento"
         }
+        kicker={code}
+        subtitle={pending ? undefined : "Acrescente um registro ao acompanhamento da ficha."}
         closeDisabled={command.busy || privateDraft.busy || privateDraft.backgroundBusy}
         finalFocus={openerRef}
         onClose={() => {
@@ -971,7 +955,7 @@ function ProgressContent({
                   ? "Confirmando publicação…"
                   : pending
                     ? "Recuperar a mesma publicação"
-                    : "Publicar andamento"}
+                    : "Registrar andamento"}
               </ActionButton>
             </div>
           </form>

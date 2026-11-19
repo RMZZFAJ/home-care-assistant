@@ -22,9 +22,9 @@ test("UIR fundação compara modal ao HTML em cinco larguras e conserva foco e l
   await selectDocumentSection(page, "progress"); expect((await sourceOpening).status()).toBe(200);
   const before = physicalState(f), writes: string[] = [];
   page.on("request", request => { if (/^\/api\/(documents|requisitions|stock|balances)/.test(new URL(request.url()).pathname) && request.method() !== "GET") writes.push(new URL(request.url()).pathname); });
-  const opener = page.getByRole("button", { name: "Registrar andamento", exact: true });
+  const opener = page.getByRole("button", { name: "Novo andamento", exact: true });
   await opener.click();
-  const dialog = page.getByRole("dialog", { name: "Registrar andamento", exact: true });
+  const dialog = page.getByRole("dialog", { name: "Novo andamento", exact: true });
   await expect(dialog).toBeVisible();
   const reference = await browser.newContext({ serviceWorkers: "block" });
   try {

@@ -36,19 +36,19 @@ async function login(page: Page, patient: string) {
 }
 async function open(page: Page, id: string) {
   await page.goto("/documentos/" + id);
-  await selectDocumentSection(page, "overview");
+  await selectDocumentSection(page, "progress");
   await expect(
-    page.getByRole("button", { name: /^(Registrar andamento|Recuperar preenchimento de andamento)$/ }),
+    page.getByRole("button", { name: /^(Novo andamento|Recuperar preenchimento de andamento)$/ }),
   ).toBeEnabled();
   await page
-    .getByRole("button", { name: /^(Registrar andamento|Recuperar preenchimento de andamento)$/ })
+    .getByRole("button", { name: /^(Novo andamento|Recuperar preenchimento de andamento)$/ })
     .click();
 }
 async function showEditor(page: Page) {
- if (await page.getByRole("dialog", { name: /Registrar andamento|Recuperar publicação de andamento/ }).count() === 0) await page.getByRole("button", { name: /^(Registrar andamento|Recuperar publicação|Recuperar preenchimento de andamento)$/ }).click();
+ if (await page.getByRole("dialog", { name: /Novo andamento|Recuperar publicação de andamento/ }).count() === 0) await page.getByRole("button", { name: /^(Novo andamento|Recuperar publicação|Recuperar preenchimento de andamento)$/ }).click();
 }
 const editor = (page: Page) =>
-  page.getByRole("dialog", { name: "Registrar andamento", exact: true });
+  page.getByRole("dialog", { name: "Novo andamento", exact: true });
 const privatePanel = (page: Page) =>
   page.getByRole("region", { name: "Rascunho privado", exact: true });
 const notes = (id: string) =>
@@ -143,7 +143,7 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
     },
   );
   await editor(page)
-    .getByRole("button", { name: "Publicar andamento", exact: true })
+    .getByRole("button", { name: "Registrar andamento", exact: true })
     .click();
   const frozen = page.getByRole("dialog", {
     name: "Recuperar publicação de andamento",
@@ -173,7 +173,7 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
     `insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled) values(${q(f.patient)},'document.progress.create',${q(fixtures.family.id)},false)`,
   );
   await page.reload();
-  await selectDocumentSection(page, "overview");
+  await selectDocumentSection(page, "progress");
   await showEditor(page);
   await expect(privatePanel(page)).toContainText("Andamento publicado por");
   await expect(
@@ -191,7 +191,7 @@ test("save privado e publicação perdidos preservam pacotes distintos,envelope 
     value: original,
   });
   await page.reload();
-  await selectDocumentSection(page, "overview");
+  await selectDocumentSection(page, "progress");
   await showEditor(page);
   await expect(privatePanel(page)).toContainText(text);
   await expect(
@@ -236,7 +236,7 @@ test("referência legada de publicação ainda recupera o mesmo POST nativo apó
     value: JSON.stringify({ content: packet.content, pending: packet }),
   });
   await page.reload();
-  await selectDocumentSection(page, "overview");
+  await selectDocumentSection(page, "progress");
   await page
     .getByRole("button", { name: "Recuperar publicação", exact: true })
     .click();
@@ -295,7 +295,7 @@ test("outra sessão conclui a preparação durante resultado incerto e a ediçã
     },
   );
   await editor(page)
-    .getByRole("button", { name: "Publicar andamento", exact: true })
+    .getByRole("button", { name: "Registrar andamento", exact: true })
     .click();
   const frozen = page.getByRole("dialog", {
     name: "Recuperar publicação de andamento",
@@ -321,7 +321,7 @@ test("outra sessão conclui a preparação durante resultado incerto e a ediçã
       .fill(other);
     const peerPublication = peer.waitForResponse(response => new URL(response.url()).pathname === "/api/documents/progress-preparations/commit" && response.request().method() === "POST");
     await editor(peer)
-      .getByRole("button", { name: "Publicar andamento", exact: true })
+      .getByRole("button", { name: "Registrar andamento", exact: true })
       .click();
     const confirmed = await peerPublication; expect(confirmed.status(), await confirmed.text()).toBe(200);
     await expect(peer.locator(".hca-activity-overlay")).toHaveCount(0);
@@ -370,7 +370,7 @@ test("outra sessão conclui a preparação durante resultado incerto e a ediçã
       }),
     ).toBeEnabled();
     await page.reload();
-    await selectDocumentSection(page, "overview");
+    await selectDocumentSection(page, "progress");
     await page.unroute("**/api/documents/progress-preparations");
     await showEditor(page);
     await privatePanel(page)

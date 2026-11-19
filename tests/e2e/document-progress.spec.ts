@@ -38,7 +38,7 @@ async function open(page: Page, id: string, type = "REQ") {
   if (opening) await (await opening).finished();
   await selectDocumentSection(page, "progress");
   await expect(
-    page.getByRole("button", { name: "Registrar andamento", exact: true }),
+    page.getByRole("button", { name: "Novo andamento", exact: true }),
   ).toBeEnabled();
 }
 const state = (id: string, patient: string) =>
@@ -70,10 +70,10 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
     exact: true,
   });
   await page
-    .getByRole("button", { name: "Registrar andamento", exact: true })
+    .getByRole("button", { name: "Novo andamento", exact: true })
     .click();
   let editor = page.getByRole("dialog", {
-    name: "Registrar andamento",
+    name: "Novo andamento",
     exact: true,
   });
   const text =
@@ -97,10 +97,10 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
   await expect(editor).toHaveCount(0);
   await page.reload();
   await page
-    .getByRole("button", { name: "Registrar andamento", exact: true })
+    .getByRole("button", { name: "Novo andamento", exact: true })
     .click();
   editor = page.getByRole("dialog", {
-    name: "Registrar andamento",
+    name: "Novo andamento",
     exact: true,
   });
   await page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true }).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
@@ -149,7 +149,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
     },
   );
   await editor
-    .getByRole("button", { name: "Publicar andamento", exact: true })
+    .getByRole("button", { name: "Registrar andamento", exact: true })
     .click();
   editor = page.getByRole("dialog", {
     name: "Recuperar publicação de andamento",
@@ -270,10 +270,10 @@ test("Andamentos alcançam todos os registros, separam fatos e ocultam consulta 
     feed.getByText("Requisição emitida", { exact: true }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "Registrar andamento", exact: true })
+    .getByRole("button", { name: "Novo andamento", exact: true })
     .click();
   const editor = page.getByRole("dialog", {
-    name: "Registrar andamento",
+    name: "Novo andamento",
     exact: true,
   });
   await editor
@@ -300,7 +300,7 @@ test("Andamentos alcançam todos os registros, separam fatos e ocultam consulta 
     .getByRole("button", { name: "Atualizar Andamentos", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Registrar andamento", exact: true })
+    .getByRole("button", { name: "Novo andamento", exact: true })
     .click();
   await page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true }).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(
@@ -352,17 +352,17 @@ test("Andamentos funcionam em REQ COM ENT e BAL sem modificar versões ou movime
         exact: true,
       });
     await page
-      .getByRole("button", { name: "Registrar andamento", exact: true })
+      .getByRole("button", { name: "Novo andamento", exact: true })
       .click();
     const editor = page.getByRole("dialog", {
-      name: "Registrar andamento",
+      name: "Novo andamento",
       exact: true,
     });
     await editor
       .getByRole("textbox", { name: "Texto do andamento", exact: true })
       .fill("Registro complementar fictício " + type);
     await editor
-      .getByRole("button", { name: "Publicar andamento", exact: true })
+      .getByRole("button", { name: "Registrar andamento", exact: true })
       .click();
     await expect(editor).toHaveCount(0);
     await expect(feed).toContainText("Andamento publicado");

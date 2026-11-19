@@ -1,5 +1,26 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — editor de Andamentos na aba da ficha.** A aba reúne a
+cronologia, os filtros Todos/Automáticos/Manuais e o botão Novo
+andamento. O editor abre com o código da ficha e registra pelo mesmo
+fluxo de publicação. Atualização, filtro por período e paginação foram
+mantidos.
+
+- A família publica em privado. O interruptor aparece apenas para quem
+  pode escolher a audiência. Permanecem os campos, as referências por
+  `#`, as menções individuais e as regras de `@todos`.
+- Os testes confirmaram a retomada do último preenchimento depois de
+  fechar, a recuperação de publicação sem duplicata, a autoria,
+  o bloqueio em ficha arquivada e a restauração de foco.
+- Passaram cinco casos em cada projeto móvel emulado, Android e
+  iOS/WebKit, sem repetição. O build de produção, o TypeScript e o
+  ESLint dirigido passaram. A aba e o editor da v7 foram conferidos
+  a 390 px. O menu flutuante e sua navegação seguem no próximo
+  incremento de organização das ações.
+- A mudança de interface não tem migration. O desenvolvimento
+  permanece em 272 versões até `20261119060719`. As 25 migrations
+  ensaiadas aguardam o código compatível no preview.
+
 **19/11 — consulta de material no preenchimento e no estoque.** O painel
 de Estoque, Histórico e Fichas também abre no catálogo e na revisão das
 fichas em preenchimento, ao selecionar materiais para devolução e na
