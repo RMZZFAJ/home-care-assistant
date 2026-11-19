@@ -18,6 +18,8 @@ export type SupplyLine = {
   accepted_quantity: string;
   reconciled_quantity: string;
   waived_quantity?: string;
+  covered_quantity?: string;
+  associated_quantity?: string;
   fully_checked: boolean;
   metadata: Record<string, unknown>;
   presentation_conversions?: unknown;
@@ -177,6 +179,7 @@ export type PurchaseReceiptLine = {
   expectedQuantity?: string;
   remainingAction?: "wait" | "short";
   excessConfirmed?: true;
+  coverage?: import("@/lib/validation/purchase-coverage").PurchaseCoverageChoice;
 };
 export type PurchaseReceipt = {
   id: string;
@@ -214,6 +217,8 @@ export type PurchaseProgressLine = {
   closedShortQuantity?: string | number;
   approvedExcessQuantity?: string | number;
   waivedQuantity: string | number;
+  coveredQuantity?: string | number;
+  associatedQuantity?: string | number;
   waivableQuantity: string | number;
   remainingExpectation: string | number;
 };
@@ -408,6 +413,7 @@ export type SupplyDocument = {
   events: DocumentEvent[];
   receipts: PurchaseReceipt[];
   purchaseProgress?: PurchaseProgress;
+  purchaseCoverage?: import("@/lib/validation/purchase-coverage").PurchaseCoverageFact[];
   purchaseSchedule?: PurchaseSchedule[];
   purchaseArrivalId?: string | null;
   purchaseEntryBalances?: import("@/lib/validation/purchase-entry-balances").PurchaseEntryBalances;

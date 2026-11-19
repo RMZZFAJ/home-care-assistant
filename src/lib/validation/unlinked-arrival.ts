@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { purchaseAssociation, purchaseCoverageChoice, purchaseLinkDetails } from "./purchase-coverage";
 
 export const unlinkedOrigins = ["external_purchase", "gift", "donation"] as const;
 export const unlinkedOrigin = z.enum(unlinkedOrigins);
@@ -8,7 +9,9 @@ const version = z.number().int().min(1).max(2147483647);
 const instant = z.iso.datetime({ offset: true });
 const amount = z.string().regex(/^-?\d+(?:\.\d+)?$/);
 const productId = z.string().min(1).max(120);
-const lines = z.array(z.object({ productId, quantity: z.string().regex(/^\d{1,10}(?:\.\d{1,6})?$/) }).strict()).min(1).max(100)
+const choices = { association: purchaseAssociation.optional(), coverage: purchaseCoverageChoice.optional() };
+const lines = z.array(z.object({ productId, quantity: z.string().regex(/^\d{1,10}(?:\.\d{1,6})?$/), ...choices }).strict()
+  .refine(line => !line.coverage || line.association, "Selecione a compra antes de cobrir outro planejamento.")).min(1).max(100)
   .refine(items => new Set(items.map(item => item.productId)).size === items.length, "Inclua cada material uma vez.");
 export const unlinkedArrivalIntent = z.union([
   z.object({ origin: unlinkedOrigin, lines }).strict(),
@@ -27,9 +30,9 @@ const summary = z.object({
 }).strict();
 export type UnlinkedArrival = z.infer<typeof summary>;
 const material = z.object({ lineId: z.uuid(), productId, name: z.string(), unit: z.string(), quantity: amount,
-  decimals: z.number().int().min(0).max(6) }).strict();
+  decimals: z.number().int().min(0).max(6), ...choices }).strict();
 export const unlinkedArrivalDetails = summary.extend({
-  canCorrect: z.boolean(), materials: z.array(material.extend({ familyStock: amount.nullable() })).min(1).max(100),
+  canCorrect: z.boolean(), materials: z.array(material.extend({ familyStock: amount.nullable(), ...purchaseLinkDetails })).min(1).max(100),
   history: z.array(z.object({ version, author: z.string(), at: instant, state, reason: z.string().nullable(),
     materials: z.array(material).min(1).max(100) }).strict()).min(1),
 });

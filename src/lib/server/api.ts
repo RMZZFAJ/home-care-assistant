@@ -34,6 +34,8 @@ export function databaseError(
     throw new ApiError("REQUEST_STOCK_CHANGED", "O estoque mudou durante o preenchimento. Sua contagem foi preservada para conferência.", 409);
   if (error?.code === "PT409" && message === "operational source material changed")
     throw new ApiError("VERSION_CONFLICT", "Um material deixou de estar disponível na ficha de origem. Confira os vínculos antes de confirmar.", 409);
+  if (error?.code === "PT409" && message === "purchase coverage changed")
+    throw new ApiError("VERSION_CONFLICT", "A compra escolhida mudou. Confira a quantidade em aberto e revise a cobertura antes de confirmar.", 409);
   if (error?.code === "PT409" && message === "delivery exceeds approved source quantity")
     throw new ApiError("VERSION_CONFLICT", "A quantidade supera as chegadas aprovadas nas compras vinculadas ao material. Confira a quantidade e as origens.", 409);
   if (error?.code === "42501" && message === "existing supply sources require read permission")

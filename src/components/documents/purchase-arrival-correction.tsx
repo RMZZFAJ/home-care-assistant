@@ -6,7 +6,7 @@ import { ActionButton, FormField, SelectField, TextInput } from "@/components/ui
 import { Dialog } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
 import { api } from "@/lib/client/api";
-import { arrivalCorrectionExpected } from "@/lib/documents/purchase";
+import { arrivalCorrectionExpected, sameArrivalCoverage } from "@/lib/documents/purchase";
 import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { resubmitArrival } from "@/lib/validation/purchase-arrival";
@@ -15,6 +15,7 @@ import type { PurchaseReceipt, PurchaseReceiptLine, SupplyDocument, SupplyLine }
 import { PurchaseDetails } from "./purchase-details";
 import { SupplyLineSummary } from "./supply-line-summary";
 import { useDocumentDecision } from "./use-document-decision";
+import { coverageFromForm, PurchaseCoverageFields, type ArrivalPlanningChoices } from "./purchase-coverage-fields";
 
 const resubmitAction = "resubmit_receipt";
 
@@ -26,6 +27,7 @@ function ArrivalCorrectionQuantity({ document, receipt, item, line }: {
   const [value, setValue] = useState(item.quantity);
   const [confirmedAgainst, setConfirmedAgainst] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [planning, setPlanning] = useState<ArrivalPlanningChoices>({ coverage: item.coverage });
   const optionsRef = useRef<HTMLButtonElement>(null);
   const expected = arrivalCorrectionExpected(document, receipt, item, line);
   const physical = validQuantity(value, 6, true) ? quantity(value) : null;
@@ -58,6 +60,9 @@ function ArrivalCorrectionQuantity({ document, receipt, item, line }: {
         onChange={event => setConfirmedAgainst(event.currentTarget.checked ? expected.toFixed() : null)} />
       <span>Conferi {formatQuantity(physical.minus(expected).toFixed(), line.unit_snapshot)} a mais.</span>
     </label> : null}
+    <PurchaseCoverageFields patientId={document.care_recipient_id} productId={line.product_id} material={line.name_snapshot}
+      unit={line.unit_snapshot} source={{ id: document.id, code: document.code }} received={value} value={planning} onChange={setPlanning} />
+    {planning.coverage ? <input type="hidden" name={line.id + ":coverage"} value={JSON.stringify(planning.coverage)} /> : null}
     <Dialog open={showDetails} title="Detalhes do material" onClose={() => setShowDetails(false)} finalFocus={optionsRef}>
       <SupplyLineSummary line={line} type="COM" status={document.status}
         purchaseLine={document.purchaseProgress?.lines.find(row => row.lineId === line.id)} />
@@ -103,7 +108,8 @@ export function PurchaseArrivalCorrections({ data, context, onUpdated }: {
     const { lines } = resubmitArrival.parse(intention.body);
     if (lines.length !== receipt.lines.length || !lines.every(line => receipt.lines.some(item =>
       item.lineId === line.lineId && item.quantity === line.quantity && item.expectedQuantity === line.expectedQuantity &&
-      item.remainingAction === line.remainingAction && item.excessConfirmed === line.excessConfirmed))) {
+      item.remainingAction === line.remainingAction && item.excessConfirmed === line.excessConfirmed &&
+      sameArrivalCoverage(item.coverage, line.coverage)))) {
       throw new Error("As quantidades corrigidas não foram confirmadas.");
     }
     return confirmed;
@@ -148,10 +154,13 @@ export function PurchaseArrivalCorrections({ data, context, onUpdated }: {
           if (!validQuantity(value, 6, true)) throw new Error("Confira a quantidade de " + material.name_snapshot + ".");
           const expected = arrivalCorrectionExpected(data, selected, item, material);
           const physical = quantity(value);
+          const coverage = coverageFromForm(fields, material.id);
           if (physical.gt(expected) && fields.get(material.id + ":excess") !== "on") throw new Error("Confirme o excedente de " + material.name_snapshot + ".");
+          if (coverage && (!quantity(coverage.quantity).gt(0) || quantity(coverage.quantity).gt(physical)))
+            throw new Error("Confira a cobertura declarada para " + material.name_snapshot);
           return { lineId: material.id, quantity: physical.toFixed(), expectedQuantity: expected.toFixed(),
             ...(physical.lt(expected) ? { remainingAction: fields.get(material.id + ":remainingAction") } : {}),
-            ...(physical.gt(expected) ? { excessConfirmed: true } : {}) };
+            ...(physical.gt(expected) ? { excessConfirmed: true } : {}), ...(coverage ? { coverage } : {}) };
       });
       apply(await decision.execute({ domain: "supply", action: resubmitAction, body: { receiptId: selected.id, lines }, expectedVersion: editor.version }, verifiedRead));
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível registrar a correção."); }

@@ -157,9 +157,23 @@ aplicada localmente. Passaram cinco integrações com Auth real e quatro
 execuções do conjunto dirigido no Android e iOS emulados. As duas
 execuções finais da chegada avulsa passaram após a conferência visual,
 sem repetição automática. As capturas estão em
-`output/playwright/l2-unlinked-arrivals/`. Seguem abertas a cobertura
-explícita de uma COM e a ação de abrir a conferência de um único CHE
-diretamente pelo seu cartão.
+`output/playwright/l2-unlinked-arrivals/`. A ação de abrir a conferência
+de um único CHE diretamente pelo seu cartão segue pendente.
+
+A cobertura E05-02 usa a COM aberta como origem. Em uma chegada avulsa,
+o seletor indica a compra elegível mais recente e aguarda a escolha da
+pessoa. Cada material pode cobrir uma quantidade de um planejamento
+anterior. A aprovação confere novamente a disponibilidade e registra
+um único crédito físico. O planejamento anterior guarda a referência
+e a quantidade coberta em seu histórico, separadas da entrada física.
+A [migration de cobertura](supabase/migrations/20261119060719_l2_purchase_arrival_coverage.sql)
+foi aplicada no Supabase local. Oito casos de integração com Auth real
+passaram, incluindo saída sem efeito diante de cobertura desatualizada,
+reenvio pelo autor e recuperação da tentativa original.
+Os dois caminhos foram verificados em Android e iOS emulados.
+O PDF assinado da COM usa os vínculos congelados no evento e identifica
+quando o crédito veio de uma CHE. As capturas e o exemplar de teste ficam
+em `output/playwright/l2-arrival-coverage/`.
 
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma

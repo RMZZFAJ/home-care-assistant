@@ -17,13 +17,19 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
   const { facts, semanticFacts } = approvedDocumentContent(snapshot, emission);
   if (snapshot.type === "COM") {
     const entries = purchaseEntryBalances.parse(snapshot.purchaseEntryBalances);
+    const coverage = snapshot.purchaseCoverage ?? [];
+    const associatedLines = new Set(coverage.filter(item => item.primaryAssociation && item.targetDocumentId === snapshot.id)
+      .map(item => item.targetLineId));
     snapshot.lines.forEach((line, index) => {
       const prefix = "material/" + index, entry = entries.find(value => value.lineId === line.id)!;
       semanticFacts[prefix + "/name"] = name(line) + " " + unit(line);
       semanticFacts[prefix + "/acquired"] = amount(line.purchased_quantity, unit(line));
       const progress = snapshot.purchaseProgress?.lines.find(item => item.lineId === line.id);
       semanticFacts[prefix + "/validated"] = amount(progress?.validatedQuantity ?? line.accepted_quantity, unit(line));
-      semanticFacts[prefix + "/balance"] = (entry.state === "known" ? amount(entry.quantity, unit(line)) : entry.state === "restricted" ? "Acesso restrito" : entry.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro") + (entry.entry ? " " + formatBrazilDate(entry.entry.validatedAt) : "");
+      const balance = entry.state === "known" ? amount(entry.quantity, unit(line)) : entry.state === "restricted" ? "Acesso restrito"
+        : associatedLines.has(String(line.id)) ? "Entrada registrada na chegada associada"
+          : entry.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro";
+      semanticFacts[prefix + "/balance"] = balance + (entry.entry ? " " + formatBrazilDate(entry.entry.validatedAt) : "");
       semanticFacts["purchase/" + index + "/planned"] = amount(line.quantity, unit(line));
       semanticFacts["purchase/" + index + "/approved"] = amount(line.approved_quantity, unit(line));
     });
@@ -53,6 +59,16 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
         });
       });
     });
+    for (const [index, allocation] of coverage.entries()) {
+      const incoming = allocation.targetDocumentId === snapshot.id;
+      const source = incoming ? allocation.sourceCode : allocation.targetCode;
+      const title = allocation.primaryAssociation ? "Chegada associada" : incoming ? "Planejamento coberto por" : "Planejamento coberto em";
+      const parts = [allocation.material, title + " " + source];
+      if (Number(allocation.planningQuantity) > 0) parts.push("Planejamento: " + amount(allocation.planningQuantity, allocation.unit));
+      if (Number(allocation.arrivalQuantity) > 0) parts.push("Recebidas da compra: " + amount(allocation.arrivalQuantity, allocation.unit));
+      semanticFacts["purchase/coverage/" + index] = parts.join(" · ");
+    }
+    if (coverage.length) semanticFacts["purchase/coverage/scope"] = "A entrada física consta uma vez, na chegada de origem.";
     if (snapshot.purchaseProgress?.closure) {
       const closure = snapshot.purchaseProgress.closure;
       semanticFacts["purchase/closure/actor"] = (closure.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(closure.recordedAt);

@@ -79,6 +79,10 @@ export function SupplyLineSummary({
                   <dt>Aquisição sem chegada válida</dt>
                   <dd>{formatQuantity(purchaseLine.unarrivedQuantity)}</dd>
                 </div>
+                {Number(purchaseLine.coveredQuantity ?? 0) > 0 ? <div>
+                  <dt>Planejamento coberto por chegada</dt>
+                  <dd>{formatQuantity(purchaseLine.coveredQuantity)}</dd>
+                </div> : null}
                 <div>
                   <dt>Não será adquirido</dt>
                   <dd>{formatQuantity(purchaseLine.waivedQuantity)}</dd>

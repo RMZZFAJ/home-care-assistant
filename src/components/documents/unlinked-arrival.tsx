@@ -16,11 +16,13 @@ import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { parseCatalogueCollectionRead } from "@/lib/validation/catalogue-list";
-import { unlinkedArrivalDetails, unlinkedArrivalPage, unlinkedArrivalReceipt, unlinkedOrigin,
+import { unlinkedArrivalDetails, unlinkedArrivalIntent, unlinkedArrivalPage, unlinkedArrivalReceipt, unlinkedOrigin,
   unlinkedOriginLabel, unlinkedOrigins, type UnlinkedArrival, type UnlinkedArrivalDetails,
   type UnlinkedArrivalIntent } from "@/lib/validation/unlinked-arrival";
 import type { PresentationsRead } from "@/types/catalogue";
 import type { WorkspaceContext } from "@/types/workspace";
+import { PurchaseCoverageFields, type ArrivalPlanningChoices } from "./purchase-coverage-fields";
+import { PurchaseArrivalLinks } from "./purchase-arrival-links";
 
 const endpoint = "/api/purchases/arrivals/unlinked";
 const statusLabel = { pending: "Aguardando aprovação", approved: "Entrada aprovada",
@@ -32,7 +34,7 @@ const originDescription = { external_purchase: "Compra externa recebida na resid
 const steps = [{ label: "Registrando a chegada", icon: "truck" }, { label: "Conferindo o resultado", icon: "check" }] as const;
 type Origin = typeof unlinkedOrigins[number];
 type CatalogItem = { id: string; name: string; unit: string; quantity_decimals: number; aliases: string[] };
-type Row = Pick<CatalogItem, "id" | "name" | "unit" | "quantity_decimals"> & { amount: string };
+type Row = Pick<CatalogItem, "id" | "name" | "unit" | "quantity_decimals"> & { amount: string; planning?: ArrivalPlanningChoices };
 
 function ArrivalStatus({ state }: { state: UnlinkedArrival["state"] }) {
   const icon = state === "approved" ? "check" : state === "rejected" ? "close" : "clock";
@@ -74,6 +76,7 @@ function ArrivalEditor({ context, correction, onClose, returnFocus }: {
   const [origin, setOrigin] = useState<Origin | "">(correction?.origin ?? "");
   const [lines, setLines] = useState<Row[]>(() => correction?.materials.map(item => ({
     id: item.productId, name: item.name, unit: item.unit, quantity_decimals: item.decimals, amount: item.quantity,
+    planning: { association: item.association, coverage: item.coverage },
   })) ?? []);
   const [filter, setFilter] = useState("");
   const [error, setError] = useState("");
@@ -146,14 +149,17 @@ function ArrivalEditor({ context, correction, onClose, returnFocus }: {
   }
   function validIntent(): UnlinkedArrivalIntent | null {
     if (!lines.length || lines.some(line => !validQuantity(line.amount, line.quantity_decimals))) return null;
-    const materials = lines.map(line => ({ productId: line.id, quantity: quantity(line.amount).toFixed() }));
-    if (correction) return { arrivalId: correction.id, version: correction.version, lines: materials };
-    return origin ? { origin, lines: materials } : null;
+    const materials = lines.map(line => ({ productId: line.id, quantity: quantity(line.amount).toFixed(), ...line.planning }));
+    if (materials.some(line => line.coverage && (!validQuantity(line.coverage.quantity, 6) ||
+      quantity(line.coverage.quantity).gt(line.quantity)))) return null;
+    const parsed = unlinkedArrivalIntent.safeParse(correction
+      ? { arrivalId: correction.id, version: correction.version, lines: materials } : { origin, lines: materials });
+    return parsed.success ? parsed.data : null;
   }
   async function submit(recover = false) {
     if (sendingRef.current || (recover ? !key : Boolean(key))) return;
     const intent = recover ? null : validIntent();
-    if (!recover && !intent) { setError("Selecione a origem e informe uma quantidade válida para cada material."); return; }
+    if (!recover && !intent) { setError("Confira a origem, as quantidades recebidas e os planejamentos escolhidos."); return; }
     sendingRef.current = true; setBusy(true); setStage(recover ? 1 : 0); setError("");
     const attempt = key ?? crypto.randomUUID();
     setKey(attempt);
@@ -240,6 +246,11 @@ function ArrivalEditor({ context, correction, onClose, returnFocus }: {
               <TextInput required inputMode={row.quantity_decimals ? "decimal" : "numeric"} value={row.amount}
                 onChange={event => updateAmount(row.id, event.currentTarget.value)} />
             </FormField>
+            <PurchaseCoverageFields patientId={patient.id} productId={row.id} material={row.name} unit={row.unit}
+              received={row.amount} value={row.planning ?? {}} onChange={planning => {
+                setLines(previous => previous.map(item => item.id === row.id ? { ...item, planning } : item));
+                setDirty(true);
+              }} />
           </article>)}
           <p className="hca-purchase-limit">{direct ? "Ao confirmar, as quantidades entram no estoque familiar." : "As quantidades entram no estoque familiar após aprovação."}</p>
         </>}
@@ -266,15 +277,16 @@ function scopedArrivalData(value: unknown, patientId: string) {
 }
 type Cursor = { at: string; id: string };
 
-export function UnlinkedArrivalHistory({ context, revision }: { context: WorkspaceContext; revision: string }) {
+export function UnlinkedArrivalHistory({ context, revision, arrivalId }: { context: WorkspaceContext; revision: string; arrivalId?: string | null }) {
   if (!context.patient || !ableToRead(context)) return null;
-  return <ArrivalHistory key={`${context.userId}:${context.patient.id}`} context={context} revision={revision} />;
+  return <ArrivalHistory key={`${context.userId}:${context.patient.id}:${context.patient.role}:${can(context, "com.validate")}:${arrivalId ?? ""}`}
+    context={context} revision={revision} arrivalId={arrivalId} />;
 }
 
-function ArrivalHistory({ context, revision }: { context: WorkspaceContext; revision: string }) {
+function ArrivalHistory({ context, revision, arrivalId }: { context: WorkspaceContext; revision: string; arrivalId?: string | null }) {
   const patient = context.patient!;
   const [pages, setPages] = useState<Cursor[]>([]);
-  const [selected, setSelected] = useState<UnlinkedArrival | null>(null);
+  const [selected, setSelected] = useState<{ id: string; code?: string } | null>(arrivalId ? { id: arrivalId } : null);
   const [correction, setCorrection] = useState<UnlinkedArrivalDetails | null>(null);
   const openerRef = useRef<HTMLButtonElement | null>(null);
   const headingId = useId();
@@ -291,6 +303,8 @@ function ArrivalHistory({ context, revision }: { context: WorkspaceContext; revi
   const history = useScopedRead(endpoint + "?" + query, revision, decodePage);
   const detail = useScopedRead(selected ? endpoint + "?" + new URLSearchParams({ careRecipientId: patient.id, id: selected.id }) : null,
     revision, decodeDetail);
+  const selectedCode = detail.data?.code ?? selected?.code;
+  const associated = detail.data?.materials.some(item => item.association);
 
   return <section className="ui-card space-y-3" aria-labelledby={headingId} aria-busy={history.loading}>
     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -316,7 +330,7 @@ function ArrivalHistory({ context, revision }: { context: WorkspaceContext; revi
       }}>Chegadas anteriores</ActionButton> : null}
     </div> : null}
     <Dialog open={Boolean(selected) && !correction} title="Detalhes da chegada" kicker="Chegada de materiais"
-      subtitle={selected ? `${selected.code} · chegada avulsa, sem COM vinculada.` : undefined}
+      subtitle={selectedCode && detail.data ? `${selectedCode} · ${associated ? "chegada associada a uma compra." : "chegada avulsa, sem COM vinculada."}` : selectedCode}
       onClose={() => setSelected(null)} finalFocus={openerRef} footer={<>
         <ActionButton variant={detail.data?.canCorrect ? undefined : "primary"} onClick={() => setSelected(null)}>Fechar consulta</ActionButton>
         {detail.data?.canCorrect && !detail.loading && !detail.error ? <ActionButton variant="primary" onClick={() => setCorrection(detail.data)}>Corrigir chegada</ActionButton> : null}
@@ -366,6 +380,7 @@ function ArrivalMaterial({ item, pending, code }: { item: UnlinkedArrivalDetails
         <MenuPopup><Menu.Item className="hca-menu-item" onClick={() => setOpen(true)}><Icon name="eye" />Detalhes do material</Menu.Item></MenuPopup>
       </Menu.Root>
     </div>
+    <PurchaseArrivalLinks unit={item.unit} linkedPurchase={item.linkedPurchase} priorPlanning={item.priorPlanning} />
     {item.familyStock === null ? null : <details className="hca-arrival-stock">
       <summary><Icon name="stock" />Estoque familiar<Icon name="down" /></summary>
       <p>Disponíveis hoje: {formatQuantity(item.familyStock, item.unit)}</p>

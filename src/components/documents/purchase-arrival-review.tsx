@@ -16,6 +16,7 @@ import { arrivalReviewBatchLimit, arrivalReviewQueue, requireArrivalReviewReceip
   type ArrivalReviewQueue, type ArrivalReviewReceipt, type ArrivalReviewRow } from "@/lib/validation/purchase-arrival-review";
 import type { WorkspaceContext } from "@/types/workspace";
 import { unlinkedOriginLabel } from "@/lib/validation/unlinked-arrival";
+import { PurchaseArrivalLinks } from "./purchase-arrival-links";
 
 const endpoint = "/api/purchases/arrivals/review";
 const reviewSteps = [{ label: "Conferindo as parcelas selecionadas", icon: "file" },
@@ -66,7 +67,9 @@ function ArrivalReviewCard({ row, choice, update }: {
     <p className="text-sm text-(--muted)">{row.documentCode}{row.origin ? ` · ${unlinkedOriginLabel[row.origin]}` : ""} · {row.author ?? "Autor não preservado"} · {formatBrazilDate(row.submittedAt)}</p>
     {!one ? <ul className="space-y-2">{row.materials.map(item => <li key={item.lineId}>
       <strong>{item.name} · {formatQuantity(item.quantity, item.unit)} informados</strong><MaterialStatus item={item} />
+      <PurchaseArrivalLinks unit={item.unit} linkedPurchase={item.linkedPurchase} priorPlanning={item.priorPlanning} />
     </li>)}</ul> : null}
+    {one ? <PurchaseArrivalLinks unit={one.unit} linkedPurchase={one.linkedPurchase} priorPlanning={one.priorPlanning} /> : null}
     {correction || reject ? <FormField label={correction ? "O que precisa ser corrigido?" : "Motivo da recusa"}>
       <TextAreaField rows={2} value={choice.reason ?? ""} maxLength={1000} required minLength={3}
         placeholder={correction ? `Explique a correção para ${row.author ?? "o autor"}.` : "Explique por que esta chegada será cancelada."}

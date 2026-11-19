@@ -33,6 +33,7 @@ import {
 import { formatBrazilDate } from "@/lib/receipt";
 import { PurchaseFormLine } from "./purchase-register";
 import { PurchaseArrivalFields } from "./purchase-arrival";
+import { coverageFromForm } from "./purchase-coverage-fields";
 import { Icon } from "@/components/ui/icon";
 import { DeliveryConsumptionReferences } from "./delivery-cancellation";
 import { familyFulfillmentDescription } from "@/lib/documents/family-fulfillment";
@@ -259,12 +260,16 @@ export function CommandEditorFields({
           if (!validQuantity(raw, 6, true)) throw new Error("Confira a quantidade recebida de " + line.name_snapshot);
           const physical = quantity(raw);
           const remaining = form.get(line.id + ":remainingAction");
+          const coverage = coverageFromForm(form, line.id);
           if (physical.gt(expected) && !form.has(line.id + ":excess"))
             throw new Error("Confirme o excedente de " + line.name_snapshot);
+          if (coverage && (!quantity(coverage.quantity).gt(0) || quantity(coverage.quantity).gt(physical)))
+            throw new Error("Confira a cobertura declarada para " + line.name_snapshot);
           return {
             lineId: line.id, quantity: physical.toFixed(), expectedQuantity: expected.toFixed(),
             ...(physical.lt(expected) ? { remainingAction: remaining === "short" ? "short" : "wait" } : {}),
             ...(physical.gt(expected) ? { excessConfirmed: true as const } : {}),
+            ...(coverage ? { coverage } : {}),
           };
         });
         body = { lines: entries };

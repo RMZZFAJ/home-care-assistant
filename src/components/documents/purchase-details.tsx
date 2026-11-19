@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { ActionButton, FormField, SelectField, TextInput } from "@/components/ui/controls";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -59,6 +60,22 @@ export function PurchaseDetails({ data, arrivalActions }: {
   const visible = rows.slice((page - 1) * 20, page * 20);
   function clear() { setFilter({ query: "", state: "" }); setSelectedPage(1); }
   return <section className="ui-card space-y-4" aria-label="Parcelas de chegada"><h2 className="font-semibold">Parcelas e expectativa da aquisição</h2>
+    {data.purchaseCoverage?.length ? <section className="hca-purchase-line" aria-label="Planejamentos cobertos">
+      <h3>Planejamentos cobertos</h3>
+      <ul className="hca-purchase-list">{data.purchaseCoverage.map(item => {
+        const incoming = item.targetDocumentId === data.id;
+        const href = incoming
+          ? item.sourceDocumentId ? `/fichas/${item.sourceDocumentId}` : `/estoque?arrival=${item.sourceArrivalId}`
+          : `/fichas/${item.targetDocumentId}`;
+        return <li className="hca-purchase-line" key={item.id}>
+          <strong>{item.material}</strong>
+          <p>{item.primaryAssociation ? "Chegada associada" : incoming ? "Planejamento coberto pela chegada de" : "Planejamento coberto em"}{" "}
+            <Link href={href}>{incoming ? item.sourceCode : item.targetCode}</Link></p>
+          {quantity(item.planningQuantity).gt(0) ? <p>Cobertura do planejamento: {formatQuantity(item.planningQuantity, item.unit)}</p> : null}
+          {quantity(item.arrivalQuantity).gt(0) ? <p>Recebidas da compra: {formatQuantity(item.arrivalQuantity, item.unit)}</p> : null}
+        </li>;
+      })}</ul>
+    </section> : null}
     {progress?.closure ? <div className="rounded-xl border border-(--line) p-4 text-sm"><p className="font-semibold">Expectativa restante encerrada, sem entrada ou baixa de material.</p><p>{progress.closure.actorName ?? "Responsável identificado no evento"} · {formatBrazilDate(progress.closure.recordedAt)}</p><p className="whitespace-pre-wrap">{progress.closure.reason}</p>{progress.physicalPending ? <p className="mt-2">Parcelas que aguardam conferência ou aquisição ainda sem chegada válida continuam pendentes.</p> : <p className="mt-2">As quantidades efetivamente validadas estão preservadas; a parte dispensada não foi recebida.</p>}</div> : null}
     {data.purchaseSchedule?.length ? <details className="hca-purchase-line">
       <summary>Previsões informadas pela loja</summary>

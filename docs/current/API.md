@@ -1755,6 +1755,17 @@ o mínimo remoto conferido permanece em seis caracteres.
   `arrivalId`, `version` e os mesmos materiais. Para conferir a tentativa,
   use a mesma chave com `intent: null`. A resposta `recorded` conserva a
   chegada registrada. A resposta `not_applied` fecha a chave.
+- `GET /api/purchases/arrivals/targets` recebe `careRecipientId`, `productId`
+  e `sourceDocumentId` opcional. A consulta ordena as compras elegíveis da
+  mais recente à mais antiga e distingue planejamento em aberto de compra
+  que ainda espera chegada. Com origem, retorna apenas o planejamento de
+  compras anteriores.
+- Uma linha de CHE pode informar `association` com `documentId` e `lineId`.
+  Uma linha de chegada pode informar `coverage` com esses campos e
+  `quantity` para cobrir planejamento anterior. Na CHE a cobertura depende
+  de compra associada. Na COM a ficha aberta é a origem. A conferência
+  mostra os vínculos declarados e a compra apresenta os vínculos confirmados
+  em `purchaseCoverage`.
 - POST /api/balances/decisions/:target?careRecipientId=:patient e a variante
   /reconcile aplicam a mesma regra à programação, atribuição e adiamento.
   O domínio é balance_workspace; expectedVersion=0 representa somente uma

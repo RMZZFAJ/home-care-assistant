@@ -13,7 +13,7 @@ export const purchaseActivitySteps = [
   { label: "Atualizando o acompanhamento", icon: "refresh" },
 ] as const;
 export function acquisitionRemaining(line: SupplyLine) {
-  return quantity(line.approved_quantity).minus(line.purchased_quantity).minus(line.waived_quantity ?? 0);
+  return quantity(line.approved_quantity).minus(line.purchased_quantity).minus(line.waived_quantity ?? 0).minus(line.covered_quantity ?? 0);
 }
 export function arrivalRemaining(line: SupplyLine, document: SupplyDocument) {
   const reported = document.purchaseProgress?.lines.find(item => item.lineId === line.id);
@@ -52,12 +52,18 @@ export function requirePurchaseReceipt(document: SupplyDocument, lines: Purchase
     !lines.every(line => receipt.lines.some(item =>
       item.lineId === line.lineId && quantity(item.quantity).eq(line.quantity) &&
       item.remainingAction === line.remainingAction && item.excessConfirmed === line.excessConfirmed &&
+      sameArrivalCoverage(item.coverage, line.coverage) &&
       (line.expectedQuantity === undefined ? item.expectedQuantity === undefined :
         item.expectedQuantity != null && quantity(item.expectedQuantity).eq(line.expectedQuantity)),
     ))) {
     throw new Error("A resposta não confirmou a parcela desta tentativa. Confira o resultado antes de repetir.");
   }
   return receipt;
+}
+
+export function sameArrivalCoverage(a: PurchaseReceipt["lines"][number]["coverage"], b: typeof a) {
+  if (!a || !b) return a === b;
+  return a.documentId === b.documentId && a.lineId === b.lineId && quantity(a.quantity).eq(b.quantity);
 }
 
 export function requirePurchaseArrival(document: SupplyDocument, lines: PurchaseSelection) {

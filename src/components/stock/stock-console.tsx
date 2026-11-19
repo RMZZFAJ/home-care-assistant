@@ -270,7 +270,7 @@ function PatientStock({
           />
         ) : null}
       </section>
-      {showFamilyArrivals ? <UnlinkedArrivalHistory context={context} revision={revision} /> : null}
+      {showFamilyArrivals ? <UnlinkedArrivalHistory context={context} revision={revision} arrivalId={params.get("arrival")} /> : null}
       {custody !== "TRANSIT" && can(context, "stock.family.manage") ? (
         <div className="hca-toolbar">
           <ActionButton

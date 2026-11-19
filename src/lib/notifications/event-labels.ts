@@ -70,6 +70,7 @@ const labels: Record<string, string> = {
   "com.reject_receipt": "Recebimento rejeitado",
   "com.request_receipt_correction": "Correção da chegada solicitada",
   "com.resubmit_receipt": "Chegada corrigida e reenviada",
+  "com.arrival_coverage": "Cobertura de planejamento registrada",
   "com.close_expectation": "Expectativa não adquirida encerrada",
   "com.cancel": "Ficha de compra ou doação cancelada",
   "ent.issued": "Materiais expedidos",

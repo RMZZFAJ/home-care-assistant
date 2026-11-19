@@ -44,6 +44,15 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
   const receipts = [...(snapshot.purchaseReceipts ?? [])].sort((a, b) => a.created_at.localeCompare(b.created_at));
   const validated = receipts.filter(receipt => receipt.state === "approved");
   const last = [...validated].sort((a, b) => (b.validated_at ?? "").localeCompare(a.validated_at ?? ""))[0];
+  const coverage = snapshot.purchaseCoverage ?? [];
+  const associated = coverage.filter(item => item.primaryAssociation && item.targetDocumentId === snapshot.id);
+  const latestAssociated = associated[0];
+  const associatedCount = new Set(associated.map(item => item.sourceArrivalId)).size;
+  const arrivalsDetail = associatedCount
+    ? [validated.length ? validated.length + " parcela(s) validada(s)" : "", associatedCount === 1 ? "1 chegada associada" : associatedCount + " chegadas associadas"].filter(Boolean).join(" · ")
+    : validated.length + " parcela(s) validada(s)";
+  const entered = snapshot.lines.filter(line => quantity(String(line.accepted_quantity ?? 0)).gt(0) ||
+    associated.some(item => item.targetLineId === line.id)).length;
   const done = purchase ? !snapshot.purchaseProgress?.expectationPending && !snapshot.purchaseProgress?.validationPending && !snapshot.purchaseProgress?.physicalPending && snapshot.purchaseProgress !== undefined : application?.state === "applied";
   const tone: DocumentTone = cancelled || snapshot.status === "rejected" ? "bad" : done ? "good" : "warn";
   const status = cancelled ? "Cancelada" : purchase ? documentStatuses[snapshot.purchaseProgress?.state ?? snapshot.status] ?? "Situação não preservada" : done ? "Contagem aplicada" : snapshot.status === "archived" ? "Arquivada" : documentStatuses[snapshot.status] ?? "Situação não preservada";
@@ -51,10 +60,12 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
   const header: DocumentHeader = {
     ...approvedPdfMode(snapshot, emission), title, code: snapshot.code, status, tone, asOf: documentCutLabel(snapshot), requestedAt: formatBrazilDate(emission.requestedAt), exporter: emission.requestedName, verificationCode: emission.verificationCode,
     privateUrl: new URL("/documentos/" + snapshot.id, origin).href,
-    metric: purchase ? snapshot.lines.filter(line => quantity(String(line.accepted_quantity ?? 0)).gt(0)).length + " / " + snapshot.lines.length : String(snapshot.lines.length),
+    metric: purchase ? entered + " / " + snapshot.lines.length : String(snapshot.lines.length),
     metricLabel: purchase ? "materiais com entrada validada" : "materiais contados",
     seal: purchase ? last ? { title: validated.length > 1 ? "Entradas validadas" : "Entrada validada", actor: last.validated_name ?? "Nome não preservado", at: formatBrazilDate(last.validated_at ?? null), how: validated.length > 1 ? "Última validação; parcelas detalhadas abaixo." : "Validação da chegada registrada", tone: "good", confirmed: true }
-      : { title: "Entrada pendente", actor: "Sem chegada validada", at: "", how: "Aquisição não comprova entrada em estoque.", tone: "warn", confirmed: false } : undefined,
+      : latestAssociated ? { title: "Entrada associada", actor: latestAssociated.sourceCode, at: formatBrazilDate(latestAssociated.recordedAt),
+        how: "Conferência preservada na chegada de origem.", tone: "good", confirmed: true }
+        : { title: "Entrada pendente", actor: "Sem chegada validada", at: "", how: "Aquisição não comprova entrada em estoque.", tone: "warn", confirmed: false } : undefined,
   };
   const layout = await ApprovedPdfLayout.create(header, emission.onText), identity = { verificationCode: emission.verificationCode, requestedAt: emission.requestedAt };
   layout.pdf.catalog.set(PDFName.of("HCAIssuance"), PDFHexString.fromText(JSON.stringify(identity)));
@@ -76,14 +87,16 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
     layout.milestones([
       { label: "Emissão", symbol: "document", detail: formatBrazilDate(at), done: Boolean(at), tone: "blue" },
       { label: donation ? "Doação registrada" : "Aquisição", symbol: "box", detail: acquired ? "Quantidade registrada" : "Em acompanhamento", done: acquired, current: !acquired && !cancelled, tone: acquired ? "blue" : "warn" },
-      { label: "Chegadas e validação", symbol: "box", detail: validated.length + " parcela(s) validada(s)", done: done && validated.length > 0, current: acquired && !done && !cancelled, tone: done && validated.length ? "good" : "warn" },
+      { label: "Chegadas e validação", symbol: "box", detail: arrivalsDetail, done: done && (validated.length > 0 || associatedCount > 0), current: (acquired || associatedCount > 0) && !done && !cancelled, tone: done && (validated.length || associatedCount) ? "good" : "warn" },
       { label: cancelled ? "Cancelamento" : "Conclusão", symbol: cancelled ? "cross" : "check", detail: cancelled ? "Fatos anteriores preservados" : done ? "Expectativa encerrada" : "Em acompanhamento", done: done || cancelled, tone: cancelled ? "bad" : done ? "good" : undefined },
     ]);
     layout.heading("Relação de materiais", "Saldo do estoque familiar após a última entrada validada de cada material nesta ficha. Não é o saldo atual.");
     layout.table([{ label: "Nº", fraction: 0.045 }, { label: "Material / unidade", fraction: 0.355 }, { label: donation ? "Declarado" : "Adquirido", fraction: 0.17 }, { label: "Entrada validada", fraction: 0.18 }, { label: "Saldo após entrada", fraction: 0.25 }], grouped(snapshot.lines.map((line, index) => {
       const entry = entries!.find(value => value.lineId === line.id)!;
       const progress = snapshot.purchaseProgress?.lines.find(item => item.lineId === line.id);
-      const balance = entry.state === "known" ? amount(entry.quantity, unit(line)) : entry.state === "restricted" ? "Acesso restrito" : entry.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro";
+      const balance = entry.state === "known" ? amount(entry.quantity, unit(line)) : entry.state === "restricted" ? "Acesso restrito"
+        : associated.some(item => item.targetLineId === line.id) ? "Entrada registrada na chegada associada"
+          : entry.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro";
       return {
         category: category(line), cells: [
           { text: String(index + 1).padStart(2, "0") }, { text: name(line) + "\n" + unit(line), key: "material/" + index + "/name", strong: true },
@@ -95,7 +108,7 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
     layout.heading("Previsão e aquisição");
     layout.table([{ label: "Material", fraction: 0.4 }, { label: "Previsto", fraction: 0.2 }, { label: "Aprovado", fraction: 0.2 }, { label: donation ? "Declarado" : "Adquirido", fraction: 0.2 }], snapshot.lines.map((line, index) => ({ cells: [{ text: name(line) }, { text: amount(line.quantity, unit(line)), key: "purchase/" + index + "/planned" }, { text: amount(line.approved_quantity, unit(line)), key: "purchase/" + index + "/approved" }, { text: amount(line.purchased_quantity, unit(line)), key: "purchase/" + index + "/acquired" }] })));
     layout.heading("Chegadas e validação por parcela");
-    if (!receipts.length) layout.paragraph("Nenhuma chegada registrada até o corte.", "receipts/empty");
+    if (!receipts.length) layout.paragraph(associated.length ? "A entrada consta na chegada associada." : "Nenhuma chegada registrada até o corte.", "receipts/empty");
     for (const [index, receipt] of receipts.entries()) {
       const prefix = "receipt/" + index;
       layout.heading("Parcela " + (index + 1) + " · " + ({ approved: "Recebimento validado", pending: "Aguardando conferência", rejected: "Recebimento rejeitado", correction_requested: "Correção solicitada" }[receipt.state]));
@@ -125,9 +138,22 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
         }
       }
     }
+    if (coverage.length) {
+      layout.heading("Cobertura de planejamento e chegadas associadas");
+      for (const [index, item] of coverage.entries()) {
+        const incoming = item.targetDocumentId === snapshot.id;
+        const peer = incoming ? item.sourceCode : item.targetCode;
+        const detail = item.primaryAssociation ? "Chegada associada" : incoming ? "Planejamento coberto por" : "Planejamento coberto em";
+        const covered = quantity(item.planningQuantity).gt(0) ? " · Planejamento: " + amount(item.planningQuantity, item.unit) : "";
+        const received = quantity(item.arrivalQuantity).gt(0) ? " · Recebidas da compra: " + amount(item.arrivalQuantity, item.unit) : "";
+        layout.paragraph(item.material + " · " + detail + " " + peer + covered + received, "purchase/coverage/" + index, { size: 9.5 });
+      }
+      layout.paragraph("A entrada física consta uma vez, na chegada de origem.", "purchase/coverage/scope", { size: 9.5 });
+    }
     const closure = snapshot.purchaseProgress?.closure;
     if (closure) { layout.heading("Aquisição restante encerrada"); layout.paragraph((closure.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(closure.recordedAt), "purchase/closure/actor"); layout.paragraph(closure.reason, "purchase/closure/reason"); }
-    layout.paragraph("Somente a parcela validada acrescenta materiais ao estoque familiar. Aquisição e encerramento da expectativa não movimentam estoque. A entrega à equipe é um ato separado.", "purchase/scope", { size: 9.5 });
+    layout.paragraph((associatedCount ? "A entrada validada fica no registro da chegada de origem." : "Somente a parcela validada acrescenta materiais ao estoque familiar.") +
+      " Aquisição e encerramento da expectativa não movimentam estoque. A entrega à equipe é um ato separado.", "purchase/scope", { size: 9.5 });
   } else {
     const reviews = snapshot.balanceReviews?.reviews ?? [];
     const policy = snapshot.workflow?.reviewPolicy as { balReview?: string; balApprovers?: string[]; balRequirement?: string; } | undefined;

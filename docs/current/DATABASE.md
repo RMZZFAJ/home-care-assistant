@@ -840,3 +840,22 @@ conferem sessão, papel local e capacidade no paciente. A consulta retorna as
 chegadas próprias, as disponíveis para conferência e as aprovadas para quem
 tem leitura familiar. A chave oficial por ator preserva o resultado exato e
 registra tentativas encerradas sem ato.
+
+## Cobertura de planejamento por chegada
+
+A cobertura explícita reduz a expectativa de compra por material da COM
+anterior. `covered_quantity` é independente das quantidades adquiridas,
+dispensadas e recebidas. A COM anterior ganha o evento
+`com.arrival_coverage` com origem e quantidade. A associação primária de
+uma CHE pode atender chegada já esperada e cobrir a expectativa restante.
+Somente essa COM pode usar o recebimento associado como origem de ENT.
+
+A aprovação reavalia paciente, ordem das compras, material, unidade e
+quantidades em aberto sob o lock do estoque. A tabela privada
+`purchase_arrival_allocations` liga a parcela ou CHE aos materiais das
+compras. A entrada física continua no registro de origem. Se a quantidade
+aplicável mudou, o lote marca aquele lançamento como bloqueado e o autor
+pode corrigir a associação ou a cobertura preservando a própria chegada.
+Os vínculos confirmados são congelados no evento da COM antes do hash.
+Os PDFs novos usam esse recorte para identificar a entrada associada e a
+cobertura. Os exemplares já emitidos preservam seus próprios recortes.

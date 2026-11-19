@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { unlinkedOrigin } from "./unlinked-arrival";
+import { purchaseLinkDetails } from "./purchase-coverage";
 
 const instant = z.iso.datetime({ offset: true });
 const amount = z.string().regex(/^-?\d+(?:\.\d+)?$/);
@@ -24,6 +25,7 @@ export const arrivalReviewQueueQuery = z.object({
 const material = z.object({
   lineId: z.uuid(), name: z.string(), unit: z.string(), quantity: amount,
   expectedQuantity: amount.nullable(), remainingAction: z.enum(["wait", "short"]).nullable(), familyStock: amount.nullable(),
+  ...purchaseLinkDetails,
 }).strict();
 const arrivalReviewRow = z.object({ ...target, documentCode: z.string(), author: z.string().nullable(),
   submittedAt: instant, materials: z.array(material).min(1), origin: unlinkedOrigin.optional(),

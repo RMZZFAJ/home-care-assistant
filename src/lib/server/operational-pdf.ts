@@ -33,6 +33,7 @@ export type DocumentSnapshot = {
   materialIdentitySource?: string;
   purchaseProgress?: PurchaseProgress;
   purchaseReceipts?: PurchaseReceipt[];
+  purchaseCoverage?: import("@/lib/validation/purchase-coverage").PurchaseCoverageFact[];
   purchaseEntryBalances?: unknown;
   deliveryCancellation?: DeliveryCancellationContext | null;
   deliveryRegularization?: DeliveryRegularizationContext | null;
