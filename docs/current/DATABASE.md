@@ -184,6 +184,17 @@ stock_overview separa confirmado, previsão, mínimo e divergência.
 stock_transit lista ENT abertas sem revelar o saldo geral familiar.
 Métricas de consumo usam débitos confirmados, nunca observação da REQ.
 
+O contexto de material da REQ inclui o saldo confirmado da equipe para
+preencher novas linhas. A RPC exige leitura de REQ e só devolve o valor
+de CARE_TEAM com `stock.team.read`. A capacidade `req.create` permite
+obter a referência opaca da posição do estoque. A emissão com contagem
+observada e referência válida grava a REQ e o ajuste do saldo na mesma
+transação. Uma contagem igual ao saldo registra o fato sem movimento.
+Uma referência obsoleta exige nova conferência e preserva o valor já
+preenchido. Desconhecido, vazio e chamadas legadas sem referência
+preservam o saldo. O ajuste de contagem tem origem `requisition_count`
+e é recuperável pela mesma chave de idempotência da emissão.
+
 BAL trata exclusivamente estoque da equipe. A referência usa revisão do
 ledger; mudança desde a contagem impede aprovação até reconto. Política
 opcional aplica diretamente; política obrigatória exige os grupos e as

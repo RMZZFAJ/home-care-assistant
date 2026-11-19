@@ -31,6 +31,8 @@ export type CatalogItem = {
   selectionPredecessors?: { id: string; name: string; unit: string }[];
 };
 
+export type RequisitionStockReference = { token: string; quantity: string | null };
+
 export type RequisitionLine = {
   productId: string;
   productName: string;
@@ -39,6 +41,7 @@ export type RequisitionLine = {
   currentStock: string | number | null;
   stockObservation?: StockObservation;
   stockObservationAt?: string | null;
+  stockReference?: RequisitionStockReference;
   urgent: boolean;
   repeatReason?: string;
 };

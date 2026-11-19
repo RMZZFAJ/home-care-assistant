@@ -115,6 +115,7 @@ export async function POST(request: Request) {
         currentStock,
         stockObservation,
         stockObservationAt,
+        stockReference,
         urgent,
         repeatReason,
       }) => ({
@@ -122,6 +123,7 @@ export async function POST(request: Request) {
         currentStock,
         ...(stockObservation ? { stockObservation } : {}),
         ...(stockObservationAt ? { stockObservationAt } : {}),
+        ...(stockObservation === "observed" && stockReference ? { stockReference: stockReference.token } : {}),
         urgent,
         ...(repeatReason ? { repeatReason } : {}),
       }),

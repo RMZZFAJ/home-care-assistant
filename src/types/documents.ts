@@ -405,6 +405,8 @@ export type PatientPerson = { id: string; name: string; role: string; };
 export type ItemContext = {
   productId: string;
   familyStock: string | null;
+  teamStock?: string | null;
+  teamStockReference?: string | null;
   pending: {
     requisitionId: string;
     lineId: string;

@@ -73,6 +73,10 @@ const observation = {
     .nullable()
     .optional(),
 };
+export const requisitionStockReferenceSchema = z.strictObject({
+  token: z.string().regex(/^[0-9a-f]{64}$/),
+  quantity: z.string().regex(/^-?\d{1,12}(?:\.\d{1,6})?$/).nullable(),
+});
 export const requisitionDraftContent = z
   .object({
     lines: z
@@ -84,6 +88,7 @@ export const requisitionDraftContent = z
             category: z.enum(["medicamentos", "higiene", "dieta"]),
             unit: text(80).optional(),
             ...observation,
+            stockReference: requisitionStockReferenceSchema.optional(),
             urgent: z.boolean(),
             repeatReason: text(1000).optional(),
           })

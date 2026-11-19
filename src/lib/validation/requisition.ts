@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { exactQuantity } from "./documents";
-import { draftCommitSchema } from "./creation-drafts";
+import { draftCommitSchema, requisitionStockReferenceSchema } from "./creation-drafts";
 
 const quantity = exactQuantity
   .transform(Number)
@@ -40,6 +40,7 @@ export const requisitionLineSchema = z
     category: z.enum(["medicamentos", "higiene", "dieta"]).optional(),
     unit: z.string().trim().min(1).max(80).optional(),
     ...observation,
+    stockReference: requisitionStockReferenceSchema.optional(),
     urgent: z.boolean(),
     repeatReason: z.string().trim().min(3, "Informe um motivo com pelo menos três caracteres.").max(1000, "O motivo deve ter até 1.000 caracteres.").optional(),
   })

@@ -153,6 +153,10 @@ export const errorCatalog = {
     recommendedAction:
       "Atualize a tela e revise o estado e as aprovações atuais.",
   },
+  REQUEST_STOCK_CHANGED: {
+    ...conflict,
+    recommendedAction: "Confira o saldo da equipe e revise a contagem antes de emitir.",
+  },
   DRAFT_VERSION_CONFLICT: {
     ...conflict,
     recommendedAction:

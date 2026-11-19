@@ -62,8 +62,8 @@ export function Identity({
       </p>
       <Notice>
         Marque os produtos necessários e informe o estoque observado com a
-        equipe. A requisição não contém quantidade solicitada e não movimenta o
-        estoque.
+        equipe. Ao emitir, as contagens informadas atualizam o estoque da equipe.
+        A requisição registra necessidades sem quantidade solicitada.
       </Notice>
     </div>
   );
@@ -230,6 +230,7 @@ export function CatalogStep({
                     value={line.currentStock}
                     mode={line.stockObservation}
                     at={line.stockObservationAt}
+                    suggested={info?.teamStock}
                     unit={item.unit}
                     decimals={item.quantity_decimals ?? 0}
                     error={errors[item.id]}

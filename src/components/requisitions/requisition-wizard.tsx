@@ -27,7 +27,9 @@ import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
 import { draftFlowStages, navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
-import { StepNavigator } from "@/components/ui/primitives";
+import { Dialog, StepNavigator } from "@/components/ui/primitives";
+import { ActionButton } from "@/components/ui/controls";
+import { formatQuantity, quantity } from "@/lib/quantity";
 
 import {
   Identity,
@@ -102,6 +104,11 @@ function PatientRequisition({
   const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [catalogError, setCatalogError] = useState("");
   const [catalogAttempt, setCatalogAttempt] = useState(0);
+  const [reviewStock, setReviewStock] = useState(false);
+  const contextByProduct = useMemo(
+    () => new Map(itemContext.map((item) => [item.productId, item])),
+    [itemContext],
+  );
   const storageKey =
     "hca:v2:requisition:" +
     context.userId +
@@ -266,8 +273,36 @@ function PatientRequisition({
   );
   const selected = (id: string) =>
     form.lines.find((line) => line.productId === id);
+  function stockReferenceFor(productId: string) {
+    const current = contextByProduct.get(productId);
+    if (current?.teamStockReference)
+      return { token: current.teamStockReference, quantity: current.teamStock ?? null };
+  }
+  function newStockObservation(productId: string) {
+    const stockReference = stockReferenceFor(productId);
+    const teamStock = stockReference?.quantity;
+    const prefilledStock = teamStock != null && Number(teamStock) >= 0 && Number(teamStock) <= 100000
+      ? teamStock
+      : null;
+    return {
+      currentStock: prefilledStock,
+      stockObservation: prefilledStock === null ? "unfilled" as const : "observed" as const,
+      stockObservationAt: new Date().toISOString(),
+      ...(stockReference ? { stockReference } : {}),
+    };
+  }
+  const stockReviewLines = form.lines.filter((line) =>
+    line.stockObservation === "observed" &&
+    (!line.stockReference || line.stockReference.token !== contextByProduct.get(line.productId)?.teamStockReference),
+  );
+  function openStockReview(refresh: boolean) {
+    setReviewStock(true);
+    if (refresh) {
+      setLoadingCatalog(true);
+      setCatalogAttempt((attempt) => attempt + 1);
+    }
+  }
   function updateLine(item: Product, patch: Partial<RequisitionLine>) {
-    const declarationTime = new Date().toISOString();
     setForm((current) => {
       const existing = current.lines.find((line) => line.productId === item.id);
       return {
@@ -283,9 +318,7 @@ function PatientRequisition({
                 productName: item.name,
                 category: item.category,
                 unit: item.unit,
-                currentStock: null,
-                stockObservation: "unfilled",
-                stockObservationAt: declarationTime,
+                ...newStockObservation(item.id),
                 urgent: false,
                 ...patch,
               },
@@ -377,6 +410,10 @@ function PatientRequisition({
   }
   async function submit() {
     if (!frozenRef.current && (privateDraft.blocked || privateDraft.backgroundBusy || !validate(true))) return;
+    if (!frozenRef.current && stockReviewLines.length) {
+      openStockReview(false);
+      return;
+    }
     const savedDraft = !frozenRef.current ? await privateDraft.save(structuredClone(draftContent)) : null;
     if (!frozenRef.current && !savedDraft) return;
     if (!frozenRef.current)
@@ -420,6 +457,7 @@ function PatientRequisition({
         ([400, 403, 404, 413, 422].includes(reason.status) ||
           reason.code === "DRAFT_VERSION_CONFLICT" ||
           reason.code === "VERSION_CONFLICT" ||
+          reason.code === "REQUEST_STOCK_CHANGED" ||
           reason.code === "DUPLICATE_REVIEW_REQUIRED");
       if (rejected) {
         if (
@@ -439,6 +477,8 @@ function PatientRequisition({
         }
         frozenRef.current = null;
         sessionStorage.removeItem(storageKey);
+        if (reason instanceof ApiError && reason.code === "REQUEST_STOCK_CHANGED")
+          openStockReview(true);
         if (
           reason instanceof ApiError &&
           reason.code === "DUPLICATE_REVIEW_REQUIRED"
@@ -469,7 +509,12 @@ function PatientRequisition({
   const selectionLibrary = (readonly = false) => <RecurringSelection key={context.userId+":"+context.patient!.id} userId={context.userId} patientId={context.patient!.id} catalogue={products} lines={form.lines}
     disabled={readonly||saving||uncertain||loadingCatalog||Boolean(catalogError)||privateDraft.blocked||!may(context,"request")} canSave={may(context,"request")}
     cataloguePending={loadingCatalog} catalogueError={catalogError} onRefresh={()=>{setLoadingCatalog(true);setCatalogAttempt(value=>value+1);}}
-    onApply={ids=>setForm(current=>({...current,lines:applyMaterialSelection(current.lines,ids,products).lines}))}/>;
+    onApply={ids=>setForm(current=>{
+      const selection = applyMaterialSelection(current.lines,ids,products);
+      const added = new Set(selection.added);
+      return { ...current, lines: selection.lines.map((line) =>
+        added.has(line.productId) ? { ...line, ...newStockObservation(line.productId) } : line) };
+    })}/>;
   if (
     !may(context, "request") &&
     !uncertain &&
@@ -484,6 +529,60 @@ function PatientRequisition({
     );
   return (
     <div ref={fieldsRef} onChangeCapture={() => setDraftTouched(true)} className="hca-document-wizard min-w-0 space-y-5">
+      <Dialog open={reviewStock} title="Confira o estoque da equipe" onClose={() => setReviewStock(false)}>
+        {loadingCatalog ? <p role="status">Consultando o estoque atual…</p> : catalogError ? (
+          <Notice error>{catalogError}</Notice>
+        ) : (
+          <>
+            <p>Sua contagem foi preservada. Confira os valores antes de emitir a requisição.</p>
+            <ul className="my-4 space-y-3">
+              {stockReviewLines.map((line) => {
+                const current = stockReferenceFor(line.productId);
+                const canCompare = current?.quantity != null;
+                const unit = products.find((product) => product.id === line.productId)?.unit;
+                const difference = current?.quantity != null && line.currentStock != null
+                  ? quantity(line.currentStock).minus(current.quantity)
+                  : null;
+                return <li key={line.productId} className="ui-card">
+                  <strong>{line.productName}</strong>
+                  <dl className="mt-2 grid grid-cols-2 gap-2">
+                    <dt>Saldo na referência anterior</dt>
+                    <dd>{canCompare ? <s>{formatQuantity(line.stockReference?.quantity, line.unit)}</s> : "Indisponível"}</dd>
+                    <dt>Saldo atual da equipe</dt>
+                    <dd>{canCompare ? formatQuantity(current.quantity, unit) : "Indisponível"}</dd>
+                    <dt>Sua contagem</dt>
+                    <dd>{formatQuantity(line.currentStock, line.unit)}</dd>
+                    {difference && line.unit === unit ? <>
+                      <dt>Ajuste na emissão</dt>
+                      <dd>{difference.isPositive() ? "+" : ""}{formatQuantity(difference.toFixed(), unit)}</dd>
+                    </> : null}
+                  </dl>
+                  {unit && unit !== line.unit ? <p>Confira a contagem na unidade atual, {unit}.</p> : null}
+                </li>;
+              })}
+            </ul>
+          </>
+        )}
+        <div className="flex flex-wrap gap-2">
+          <ActionButton type="button" onClick={() => setReviewStock(false)}>Voltar</ActionButton>
+          <ActionButton type="button" variant="primary"
+            disabled={loadingCatalog || Boolean(catalogError) || stockReviewLines.some((line) => !stockReferenceFor(line.productId))}
+            onClick={() => {
+              const changed = new Set(stockReviewLines.map((line) => line.productId));
+              setForm((current) => ({ ...current, lines: current.lines.map((line) =>
+                changed.has(line.productId) ? {
+                  ...line,
+                  unit: products.find((product) => product.id === line.productId)?.unit,
+                  stockReference: stockReferenceFor(line.productId),
+                } : line) }));
+              setDraftTouched(true);
+              setReviewStock(false);
+              setError("");
+            }}>
+            Usar referência atual
+          </ActionButton>
+        </div>
+      </Dialog>
       <ComplementOriginHint />
       {selectionLibrary()}
       {!uncertain ? <SimpleDraftPanel

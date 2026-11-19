@@ -2,8 +2,84 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { setup, actor, rpc, request } from "./v4-fixtures.mjs";
+import { setup, actor, rpc, request, fixtures } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
+
+test("REQ context exposes the team balance only with the independent stock capability", async () => {
+  const { patient, products } = await setup();
+  const product = products[0];
+  sql(`insert into public.stock_movements
+    (care_recipient_id, product_id, quantity, movement_type, performed_by, destination_location, justification)
+    values (${sqlLiteral(patient)}, ${sqlLiteral(product)}, 7, 'adjustment',
+      ${sqlLiteral(fixtures.adminA.id)}, 'CARE_TEAM', 'Saldo fictício para contexto REQ');`);
+  const pro = await actor("professional", patient);
+  const args = { p_patient: patient, p_products: products };
+  const visible = await rpc(pro, "requisition_item_context", args);
+  assert.equal(visible.find(row => row.productId === product).teamStock, "7");
+  assert.equal(visible.find(row => row.productId === products[1]).teamStock, "0");
+
+  sql(`insert into public.capability_overrides(care_recipient_id, subject_user, capability, enabled)
+    values (${sqlLiteral(patient)}, ${sqlLiteral(fixtures.professional.id)}, 'stock.team.read', false);`);
+  const restricted = await rpc(pro, "requisition_item_context", args);
+  assert.deepEqual(restricted, visible.map(row => ({ ...row, teamStock: null })));
+  const inaccessible = await pro.rpc("requisition_item_context", { ...args, p_patient: randomUUID() });
+  assert.equal(inaccessible.error?.code, "42501");
+  assert.equal(inaccessible.data, null);
+});
+
+test("REQ issuance applies the count once and rejects stale references after a concurrent issuance", async () => {
+  const f = await setup();
+  const [product, unchanged] = f.products;
+  const pro = await actor("professional", f.patient);
+  const context = (products = f.products) => rpc(pro, "requisition_item_context", {
+    p_patient: f.patient,
+    p_products: products,
+  });
+  const references = new Map((await context()).map(row => [row.productId, row.teamStockReference]));
+  const first = {
+    ...request(f.patient, f.products),
+    p_lines: [{
+      productId: product, currentStock: "7", stockObservation: "observed",
+      stockReference: references.get(product), urgent: false,
+    }, {
+      productId: unchanged, currentStock: null, stockObservation: "unknown", urgent: false,
+    }],
+  };
+  const conflicting = {
+    ...first,
+    p_idempotency_key: randomUUID(),
+    p_lines: [{ ...first.p_lines[0], currentStock: "4" }, first.p_lines[1]],
+  };
+  const submissions = await Promise.all([
+    pro.rpc("submit_requisition", first),
+    pro.rpc("submit_requisition", conflicting),
+  ]);
+  const winnerIndex = submissions.findIndex(result => !result.error);
+  assert.ok(winnerIndex !== -1, JSON.stringify(submissions));
+  const loser = submissions[1 - winnerIndex];
+  assert.equal(loser.error?.code, "PT409");
+  assert.equal(loser.error?.message, "requisition stock reference changed");
+  const applied = submissions[winnerIndex].data[0];
+  const count = winnerIndex === 0 ? "7" : "4";
+  const replay = await rpc(pro, "submit_requisition", [first, conflicting][winnerIndex]);
+  assert.equal(replay[0].requisition_id, applied.requisition_id);
+  assert.equal(sql(`select count(*) from public.requisitions where care_recipient_id=${sqlLiteral(f.patient)};`), "1");
+  assert.equal(sql(`select count(*) from public.stock_movements
+    where reference_type='requisition_count' and reference_id=${sqlLiteral(applied.requisition_id)};`), "1");
+
+  const latest = (await context([product]))[0];
+  const sameCount = {
+    ...request(f.patient, [product]),
+    p_lines: [{ ...first.p_lines[0], currentStock: count,
+      stockReference: latest.teamStockReference, repeatReason: "Contagem fictícia que confirma o saldo" }],
+  };
+  const confirmation = (await rpc(pro, "submit_requisition", sameCount))[0];
+  assert.equal(sql(`select count(*) || ':' || count(movement_id) from private.requisition_stock_counts
+    where requisition_id=${sqlLiteral(confirmation.requisition_id)};`), "1:0");
+  assert.notEqual((await context([product]))[0].teamStockReference, latest.teamStockReference);
+  assert.equal(sql(`select count(*) from private.requisition_stock_counts
+    where care_recipient_id=${sqlLiteral(f.patient)} and product_id=${sqlLiteral(unchanged)};`), "0");
+});
 
 test("REQ stores observed zero, explicit unknown and unfilled separately under real Auth and idempotency", async () => {
   const f = await setup(), pro = await actor("professional", f.patient);

@@ -1,12 +1,14 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-**18/11 — início de L2 na branch `feat/phase-d-implementation`.**
+**19/11 — correções da CI e avanço de L2 em `feat/phase-d-implementation`.**
 A CI 44415326665 teve uma falha persistente no aceite de convite no
-iOS-2. O cabeçalho estava pronto antes da área de escolha do vínculo.
-O commit local `837edcb9` altera somente o teste de convite para
-aguardar a Visão geral antes da seleção. O fluxo passou de primeira
-em Chromium, Android e iOS emulados. Os três testes aprovados em
-segunda tentativa ficam registrados fora desse commit.
+iOS-2 e três aprovações na segunda tentativa em reconto BAL, Andamentos
+e agenda. A correção publicada em `07e3a640` aguarda a Visão geral para
+selecionar vínculo, confirma o salvamento do rascunho BAL antes da
+leitura e observa o fechamento de Andamentos e a abertura da agenda
+pelos controles reais. As 12 verificações dirigidas passaram de
+primeira nas três configurações de navegador. O commit publicado
+contém somente os quatro testes. As mudanças de L2 seguem locais.
 
 A implementação de L2 segue o comando mestre v7 e o HTML aprovado
 `hca-laboratorio-02-v7.html`. O SHA-256 conferiu com o comando. O
@@ -21,9 +23,24 @@ projetos móveis, com retomada, concorrência, visibilidade, publicação
 recuperável e links antigos. Build com tipos, ESLint e Markdown
 passaram. Pendem as jornadas operacionais, a integração documental
 e a comparação móvel do restante de L2. P1 e o ato final de P2
-aguardam definição do responsável. O lote segue local, sem migrations
-aplicadas. Evidências em `output/playwright/l2-reference/`,
+aguardam definição do responsável. Evidências em `output/playwright/l2-reference/`,
 `l2-v7-access-activity-directed.log` e `l2-v7-progress-tab-directed.log`.
+
+A emissão da REQ passou a registrar a contagem de materiais do catálogo
+com o ajuste de estoque da equipe na mesma transação. O preenchimento
+parte do saldo atual quando o vínculo tem permissão de leitura. Se a
+referência mudar, a interface preserva a contagem e pede uma nova
+conferência. Contagem igual ao saldo registra o fato sem movimentação.
+Campos desconhecidos ou vazios preservam o saldo. As três migrations
+incrementais desta etapa foram aplicadas no banco local, preservando
+as 84 migrations históricas protegidas. Passaram seis integrações com
+Auth real e seis verificações em Android e iOS emulados, sem retry.
+As verificações cobriram conflito de referência, concorrência, retomada
+de rascunho e recuperação da mesma emissão após perda de resposta.
+A decisão de estoque no cancelamento e a aplicação em preview
+continuam pendentes. Evidências em
+`output/playwright/l2-req-count-integration.log` e
+`output/playwright/l2-req-count-ui-fixed.log`.
 
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma

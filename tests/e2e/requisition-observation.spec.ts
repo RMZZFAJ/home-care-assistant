@@ -9,7 +9,7 @@ import {
   sqlLiteral,
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
-import { setup, rpc } from "../integration/v4-fixtures.mjs";
+import { setup, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 
@@ -79,9 +79,14 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
     p_presentation: null,
     p_base_quantity: null,
   });
-  const ledger = sql(
+  sql(`insert into public.stock_movements
+    (care_recipient_id, product_id, quantity, movement_type, performed_by, destination_location, justification)
+    values (${sqlLiteral(f.patient)}, ${sqlLiteral(fluid.product_id)}, 1.75, 'adjustment',
+      ${sqlLiteral(fixtures.adminA.id)}, 'CARE_TEAM', 'Saldo fracionado fictício para revisão REQ');`);
+  const ledgerState = () => sql(
     `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`,
   );
+  const ledger = ledgerState();
   await login(page, f.patient);
   await hygiene(page);
   const row = card(page, "Líquido fictício da observação exata");
@@ -89,6 +94,7 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   const input = row.getByLabel("Estoque observado com a equipe", {
     exact: false,
   });
+  await expect(input).toHaveValue("1.75");
   await input.fill("1.0000000000000001");
   await expect(input).toHaveValue("1.0000000000000001");
   await next(page);
@@ -138,9 +144,22 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   await expect(
     page.getByText("1,25 mL (observado)", { exact: false }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Concluir requisição", exact: true })
-    .click();
+  expect(ledgerState()).toBe(ledger);
+  sql(`insert into public.stock_movements
+    (care_recipient_id, product_id, quantity, movement_type, performed_by, destination_location, justification)
+    values (${sqlLiteral(f.patient)}, ${sqlLiteral(fluid.product_id)}, 0.25, 'adjustment',
+      ${sqlLiteral(fixtures.adminA.id)}, 'CARE_TEAM', 'Movimento fictício após a revisão REQ');`);
+  const beforeEmission = ledgerState();
+  const issueButton = page.getByRole("button", { name: "Concluir requisição", exact: true });
+  await issueButton.click();
+  const stockReview = page.getByRole("dialog", { name: "Confira o estoque da equipe" });
+  await expect(stockReview.getByText("1,75 mL", { exact: true })).toBeVisible();
+  await expect(stockReview.getByText("2 mL", { exact: true })).toBeVisible();
+  await expect(stockReview.getByText("1,25 mL", { exact: true })).toBeVisible();
+  expect(count(f.patient)).toBe("0");
+  expect(ledgerState()).toBe(beforeEmission);
+  await stockReview.getByRole("button", { name: "Usar referência atual" }).click();
+  await issueButton.click();
   await expect(
     page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
   ).toBeVisible();
@@ -149,11 +168,10 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
       `select current_stock::text from public.requisition_items where care_recipient_id=${sqlLiteral(f.patient)} and product_id=${sqlLiteral(fluid.product_id)};`,
     ),
   ).toBe("1.250000");
-  expect(
-    sql(
-      `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`,
-    ),
-  ).toBe(ledger);
+  expect(sql(`select balance_before::text || ':' || counted_quantity::text
+    from private.requisition_stock_counts where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("2.000000:1.250000");
+  expect(sql(`select quantity::text || ':' || source_location
+    from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='requisition_count';`)).toBe("0.750000:CARE_TEAM");
 });
 
 test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar no dia seguinte e recuperar resposta perdida", async ({
@@ -190,10 +208,10 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
     await row.getByRole("checkbox").first().check();
     await expect(
       row.getByLabel("Estoque observado com a equipe", { exact: false }),
-    ).toHaveValue("");
+    ).toHaveValue("0");
     await expect(
       row.getByLabel("Informação do estoque da equipe", { exact: true }),
-    ).toHaveValue("unfilled");
+    ).toHaveValue("observed");
   }
   const zero = cards[0].getByLabel("Estoque observado com a equipe", {
     exact: false,
@@ -350,9 +368,14 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   expect(count(f.patient)).toBe("1");
   expect(
     sql(
-      `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`,
+      `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m
+       where care_recipient_id=${sqlLiteral(f.patient)} and reference_type is distinct from 'requisition_count';`,
     ),
   ).toBe(ledger);
+  expect(sql(`select count(*)||':'||count(movement_id) from private.requisition_stock_counts
+    where requisition_id=${sqlLiteral(receipt.requisitionId)};`)).toBe("2:1");
+  expect(sql(`select quantity::text||':'||destination_location from public.stock_movements
+    where reference_type='requisition_count' and reference_id=${sqlLiteral(receipt.requisitionId)};`)).toBe("7.000000:CARE_TEAM");
   await page.unroute("**/api/requisitions");
   await page.goto("/historico/" + receipt.requisitionId);
   await selectDocumentSection(page, "materials");
