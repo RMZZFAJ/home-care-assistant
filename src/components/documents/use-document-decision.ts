@@ -54,8 +54,10 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
   const resendingArrival = domain === "supply" && action === "resubmit_receipt";
   const consentingDelivery = domain === "supply" && action === "consent_cancel";
   const changingCancellationRequest = domain === "supply" && ["refuse_cancellation", "withdraw_cancellation"].includes(action);
+  const followUp = domain === "lifecycle";
   useOperationActivity(busy, {
-    title: deliveryCancellationRequest ? "Enviando pedido de cancelamento" : consentingDelivery ? "Registrando consentimento e devolução"
+    title: followUp ? (action === "reopen" ? "Reabrindo acompanhamento" : "Registrando conclusão")
+      : deliveryCancellationRequest ? "Enviando pedido de cancelamento" : consentingDelivery ? "Registrando consentimento e devolução"
       : changingCancellationRequest ? "Registrando a decisão" : cancellingRequisition || cancellingSupply ? "Registrando cancelamento" : purchasing ? "Registrando compra"
       : resendingArrival ? "Reenviando chegada" : purchaseArrival ? "Registrando chegada"
         : receiving ? "Confirmando recebimento" : reconcilingDelivery ? "Registrando conciliação"
@@ -63,7 +65,7 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
     detail: "Aguarde a conferência do resultado antes de tentar novamente.",
     stage,
     steps: purchasing ? purchaseActivitySteps : [
-      { label: deliveryCancellationRequest ? "Conferindo o recebimento" : consentingDelivery ? "Conferindo devolução e consumo"
+      { label: followUp ? "Conferindo a decisão e o histórico" : deliveryCancellationRequest ? "Conferindo o recebimento" : consentingDelivery ? "Conferindo devolução e consumo"
         : changingCancellationRequest ? "Conferindo a autoria" : cancellingRequisition || cancellingSupply ? "Conferindo os efeitos no estoque" : resendingArrival ? "Conferindo o lançamento"
         : purchaseArrival ? "Registrando as quantidades recebidas" : receiving ? "Registrando a conferência"
           : reconcilingDelivery ? "Registrando o destino do material"

@@ -980,6 +980,29 @@
 .hca-l1 .hca-modal:has(.hca-cancellation-decision) > .hca-modal-footer { flex-wrap: nowrap; }
 .hca-l1 .hca-modal:has(.hca-cancellation-decision) > .hca-modal-footer > button { min-width: 0; white-space: normal; }
 .hca-l1 .hca-modal:has(.hca-cancellation-decision) > .hca-modal-footer > button:last-child { max-width: 68%; }
+.hca-document-follow-up { gap: 21px; font-size: 12px; }
+.hca-document-follow-up .hca-cancellation-quantities { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.hca-document-follow-up :is(details, .hca-follow-up-prior > div) { min-width: 0; }
+.hca-follow-up-prior { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.hca-follow-up-prior h3 { margin: 0 0 3px; font-size: 13px; }
+.hca-follow-up-prior p + p { margin-top: 5px; }
+.hca-follow-up-prior p, .hca-document-follow-up .hca-cancellation-checklist p { color: var(--hca-muted); font-size: 11px; }
+.hca-follow-up-prior > svg { width: 33px; height: 33px; padding: 8px; border-radius: 10px; color: var(--hca-teal); background: var(--hca-bg); }
+.hca-document-follow-up .hca-cancellation-checklist li { padding: 16px 0; border-bottom: 1px solid var(--hca-line); border-top: 0; }
+.hca-document-follow-up .hca-cancellation-checklist li:first-child { border-top: 1px solid var(--hca-line); }
+.hca-document-follow-up .hca-cancellation-checklist li > svg { flex-basis: 26px; height: 26px; padding: 5px; border: 0; background: #edf6ef; }
+.hca-document-follow-up .hca-cancellation-checklist .hca-follow-up-blocker > svg { color: #a24656; background: #fff0f2; }
+.hca-document-follow-up .hca-cancellation-checklist strong { display: inline-block; margin-bottom: 3px; }
+.hca-document-follow-up .hca-receipt-line { border-width: 1px 0 0; border-radius: 0; padding: 12px 0 0; }
+.hca-l1 .hca-document-follow-up textarea { min-height: 68px; }
+.hca-l1 .hca-modal:has(.hca-document-follow-up) > .hca-modal-content { background: var(--hca-paper); padding: 20px 18px; }
+.hca-l1 .hca-modal:has(.hca-document-follow-up) > .hca-modal-footer { flex-wrap: nowrap; justify-content: space-between; padding: 14px 18px; }
+.hca-l1 .hca-modal:has(.hca-document-follow-up) > .hca-modal-footer > button { min-width: 0; min-height: 40px; font-size: 11px; white-space: normal; }
+.hca-l1 .hca-modal:has(.hca-document-follow-up) > .hca-modal-footer svg { width: 15px; height: 15px; }
+@media (max-width: 500px) {
+  .hca-modal-viewport:has(.hca-document-follow-up) { inset: min(7.7dvh, 58px) 0 0; padding: 10px; }
+  .hca-l1 .hca-modal:has(.hca-document-follow-up) { max-height: 100%; }
+}
 .hca-receipt-field { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .hca-receipt-field label { font-weight: 600; }
 .hca-receipt-quantity { display: flex; align-items: center; width: 110px; max-width: 45%; background: var(--hca-bg); border: 1px solid var(--hca-line); border-radius: 10px; }

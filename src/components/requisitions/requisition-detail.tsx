@@ -4,6 +4,7 @@ import { DocumentSection } from "@/components/ui/model-section";
 import { Icon } from "@/components/ui/icon";
 import { DocumentComplementsPanel } from "@/components/documents/document-complements";
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
+import { DocumentFollowUpActions } from "@/components/documents/document-follow-up-actions";
 import { RequisitionScienceAction } from "./requisition-science-action";
 import { DocumentCommunications } from "@/components/notifications/document-communications";
 import { DocumentMaterialsTable } from "@/components/documents/document-materials-table";
@@ -260,6 +261,9 @@ export function RequisitionDocumentContent({
       </div>
     );
   const { fulfillment: f, progress: p } = data;
+  const lifecycleVisible = !data.is_historical && !p.archivedAt && context.patient?.id === data.care_recipient_id;
+  const terminalFollowUp = data.status === "cancelled" || Boolean(p.completedAt);
+  const patientAdmin = context.patient?.role === "admin" && can(context, "access.manage");
   const offerScience = !data.is_historical && p.eligible && !p.archivedAt && data.status !== "cancelled" && !p.science.some(row => row.user_id === context.userId && row.mode === "express");
   const documentState = requisitionDocumentState({
     historical: data.is_historical,
@@ -349,6 +353,16 @@ export function RequisitionDocumentContent({
               </>
             ) : null}
             {!data.is_historical ? <RequisitionScienceAction id={id} userId={context.userId} version={p.version} materialIdentity={p.materialIdentity} mayRecord={Boolean(offerScience)} disabled={busy || reading} onRecorded={() => setAttempt(value => value + 1)} /> : null}
+            {lifecycleVisible ? <DocumentFollowUpActions
+              id={id} patientId={data.care_recipient_id} kind="REQ" code={data.code ?? data.protocol}
+              patientName={context.patient?.display_name ?? "Paciente identificado na ficha"}
+              userId={context.userId} actor={context.fullName}
+              canComplete={!terminalFollowUp && (patientAdmin || can(context, "req.review"))}
+              canReopen={terminalFollowUp && patientAdmin} cancelled={data.status === "cancelled"}
+              disabled={busy || reading}
+              preservedFacts={<p>A contagem da emissão e as movimentações posteriores permanecem registradas.</p>}
+              onUpdated={() => setAttempt(value => value + 1)} onShowMaterials={() => tabs.select("materials")}
+            /> : null}
           </>
         }
         secondaryActions={

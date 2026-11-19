@@ -1,4 +1,10 @@
 const labels: Record<string, string> = {
+  "req.follow_up_completed": "Acompanhamento da requisição concluído",
+  "req.follow_up_reopened": "Acompanhamento da requisição reaberto",
+  "com.follow_up_completed": "Acompanhamento da aquisição concluído",
+  "com.follow_up_reopened": "Acompanhamento da aquisição reaberto",
+  "ent.follow_up_completed": "Acompanhamento da entrega ou devolução concluído",
+  "ent.follow_up_reopened": "Acompanhamento da entrega ou devolução reaberto",
   "ent.fulfillment_reviewed": "Suficiência reavaliada pela família",
   "ent.fulfillment_review_requested": "Avaliação familiar da necessidade pendente",
   "ent.request_fulfillment_review": "Equipe pediu reavaliação da necessidade",

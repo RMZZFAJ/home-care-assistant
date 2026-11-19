@@ -588,6 +588,27 @@ Não é um estado administrativo nem a soma de quantidades requisitadas.
 fullyCheckedLines da ENT não inclui linhas parcialmente aceitas, mesmo
 quando sua diferença já foi conciliada.
 
+## Reabertura e conclusão do acompanhamento
+
+`GET /api/documents/:id?reference=follow-up` fornece a versão da ficha, o
+estado do acompanhamento e a situação física. A revisão identifica a decisão
+anterior e as pendências por tipo de ficha. A leitura exige acesso à ficha e
+o banco calcula as ações permitidas para a identidade autenticada.
+
+`POST /api/documents/:id/decisions` aceita o domínio `lifecycle` e as ações
+`reopen` e `complete` para REQ, COM, ENT e DEV. Ambas exigem a versão e o
+`referenceHash` da revisão. A reabertura exige justificativa e administrador
+do paciente com `access.manage`. A conclusão exige as pendências resolvidas
+e a autoridade de revisão, aprovação ou participação vigente no tipo de ficha.
+O banco revalida a referência, vincula o ato anterior e registra o resultado
+na mesma transação que a decisão. A mesma chave recupera o ato oficial.
+
+Reabrir uma entrega cancelada retoma o acompanhamento e conserva o
+cancelamento físico. A REQ volta à situação anterior quando essa referência
+está preservada. Contagens, recebimento, devoluções, consumo, estoque e
+exemplares anteriores permanecem registrados. A geração de um novo exemplar
+da ficha inclui os fatos de acompanhamento congelados na versão solicitada.
+
 ## ENT e DEV — cancelamento físico e decisão do recebedor
 
 Com a expedição em trânsito e sem conferência pessoal, `cancel` exige

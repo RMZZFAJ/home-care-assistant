@@ -2,7 +2,7 @@ import { fulfillmentLabel } from "@/lib/documents/fulfillment-label";
 import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
 import { CATEGORY_LABELS } from "@/lib/catalog";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
-import { appendDocumentOriginContext, appendDocumentRelated, appendOriginalObservations, appendDocumentCancellation, appendVerificationAndPrivacy } from "./approved-document-sections";
+import { appendDocumentOriginContext, appendDocumentRelated, appendOriginalObservations, appendDocumentCancellation, appendDocumentFollowUp, appendVerificationAndPrivacy } from "./approved-document-sections";
 import { PDFHexString, PDFName } from "pdf-lib";
 import { ApprovedPdfLayout, type DocumentCell, type DocumentHeader, type DocumentTone } from "./approved-pdf-layout";
 import type { DocumentSnapshot, PdfEmissionContext } from "./operational-pdf";
@@ -99,6 +99,7 @@ export async function renderApprovedRequisitionPdf(snapshot: DocumentSnapshot, e
     else layout.paragraph("Registro histórico: a ciência original não está comprovada. A importação não comprova a data da emissão original nem sua ciência.", "science/historical");
   }
   appendDocumentCancellation(layout, lifecycle, "Cancelamento da requisição");
+  appendDocumentFollowUp(layout, snapshot);
   appendApprovedPdfExpansion(layout, snapshot, emission);
   await appendVerificationAndPrivacy(layout, emission, "Esta requisição", issuer, operationalAt, verificationUrl, formattedCode);
   layout.finish();

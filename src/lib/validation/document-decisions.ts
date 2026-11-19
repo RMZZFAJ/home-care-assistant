@@ -4,12 +4,12 @@ import { countedDeliveryReceiptBody, deliveryResolutionBody, requestDeliveryNeed
 import { purchaseArrivalBody, requestArrivalCorrection, resubmitArrival } from "./purchase-arrival";
 
 export const documentDecisionIntention = z.object({
-  domain: z.enum(["requisition", "supply", "transfer", "balance", "balance_workspace"]),
+  domain: z.enum(["requisition", "supply", "transfer", "balance", "balance_workspace", "lifecycle"]),
   action: z.string().min(1).max(80),
   body: z.record(z.string(), z.unknown()),
   expectedVersion: z.number().int().nonnegative().max(2147483647),
   referenceHash: z.string().regex(/^[a-f0-9]{64}$/).optional(),
-}).strict().refine(value => !["requisition", "balance", "balance_workspace"].includes(value.domain) || Boolean(value.referenceHash), "Confira a referência da ficha.")
+}).strict().refine(value => !["requisition", "balance", "balance_workspace", "lifecycle"].includes(value.domain) || Boolean(value.referenceHash), "Confira a referência da ficha.")
   .refine(value => value.domain === "balance_workspace" || value.expectedVersion > 0, "Confira a versão da ficha.")
   .refine(value => value.domain !== "supply" || value.action !== "purchase" || purchaseCommandBody.safeParse(value.body).success, {
     path: ["body"],
@@ -25,6 +25,10 @@ export const documentDecisionIntention = z.object({
     requestDeliveryNeedBody.safeParse(value.body).success, { path: ["body"], message: "Informe o motivo do pedido da equipe." })
   .refine(value => value.domain !== "supply" || value.action !== "cancel" ||
     supplyCancellationBody.safeParse(value.body).success, { path: ["body"], message: "Confira o motivo e a confirmação do cancelamento." })
+  .refine(value => value.domain !== "lifecycle" ||
+    (value.action === "reopen" ? z.object({ reason: z.string().trim().min(3).max(1000) }).strict().safeParse(value.body).success
+      : value.action === "complete" && z.object({ reason: z.string().max(1000).optional() }).strict().safeParse(value.body).success),
+  { path: ["body"], message: "Confira a revisão e a justificativa da ficha." })
   .refine(value => value.domain !== "supply" || value.action !== "request_receipt_correction" || requestArrivalCorrection.safeParse(value.body).success,
     { path: ["body"], message: "Informe o que o autor precisa corrigir." })
   .refine(value => value.domain !== "supply" || value.action !== "resubmit_receipt" || resubmitArrival.safeParse(value.body).success,

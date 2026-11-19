@@ -9,7 +9,13 @@ export async function GET(request: Request, context: Context) {
     const { id } = await context.params;
     const auth = await authenticate();
     const documentId = parseUuid(id);
-    if (new URL(request.url).searchParams.get("reference") === "cancellation-preview") {
+    const reference = new URL(request.url).searchParams.get("reference");
+    if (reference === "follow-up") {
+      return NextResponse.json({
+        data: await rpc(auth.client, "document_follow_up_reference", { p_id: documentId }),
+      });
+    }
+    if (reference === "cancellation-preview") {
       return NextResponse.json({
         data: await rpc(auth.client, "delivery_cancellation_preview", { p_id: documentId }),
       });

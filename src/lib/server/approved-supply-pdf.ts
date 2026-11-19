@@ -3,7 +3,7 @@ import { documentVariant } from "@/lib/documents/variant";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { PDFHexString, PDFName } from "pdf-lib";
 import { ApprovedPdfLayout, type DocumentHeader, type DocumentRow, type DocumentTone } from "./approved-pdf-layout";
-import { appendDocumentOriginContext, appendDocumentRelated, appendOriginalObservations, appendDocumentCancellation, appendVerificationAndPrivacy } from "./approved-document-sections";
+import { appendDocumentOriginContext, appendDocumentRelated, appendOriginalObservations, appendDocumentCancellation, appendDocumentFollowUp, appendVerificationAndPrivacy } from "./approved-document-sections";
 import type { DocumentSnapshot, PdfEmissionContext } from "./operational-pdf";
 import { documentStatuses } from "@/types/documents";
 import { pdfSourceFactsSchema } from "@/lib/documents/pdf-source-facts";
@@ -212,6 +212,7 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
   }
   appendOriginalObservations(layout, snapshot);
   appendDocumentCancellation(layout, lifecycle, "Cancelamento da ficha");
+  appendDocumentFollowUp(layout, snapshot);
   const verificationUrl = new URL("/verificar/emissao/" + emission.verificationCode, origin).href;
   appendApprovedPdfExpansion(layout, snapshot, emission);
   await appendVerificationAndPrivacy(layout, emission, purchase ? "Esta ficha de aquisição" : "Esta ficha de balanço", issuer, at, verificationUrl, emission.verificationCode.match(/.{1,4}/g)?.join("-") ?? emission.verificationCode);

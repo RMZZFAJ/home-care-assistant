@@ -3,7 +3,7 @@ import { deliveryNeedRequestDescription, deliveryResolutionLabels, familyFulfill
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { PDFHexString, PDFName } from "pdf-lib";
 import { ApprovedPdfLayout, type DocumentHeader, type DocumentTone } from "./approved-pdf-layout";
-import { appendDocumentOriginContext, appendDocumentRelated, appendOriginalObservations, appendDocumentCancellation, appendVerificationAndPrivacy } from "./approved-document-sections";
+import { appendDocumentOriginContext, appendDocumentRelated, appendOriginalObservations, appendDocumentCancellation, appendDocumentFollowUp, appendVerificationAndPrivacy } from "./approved-document-sections";
 import type { DocumentSnapshot, PdfEmissionContext } from "./operational-pdf";
 import { documentStatuses, type DeliveryRecipientSelection } from "@/types/documents";
 import { pdfSourceFactsSchema } from "@/lib/documents/pdf-source-facts";
@@ -203,6 +203,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
     for (const [findingIndex, finding] of item.findings.entries()) { layout.paragraph("Apuração de " + finding.actor_name + " · " + formatBrazilDate(finding.recorded_at), prefix + "/findingActor/" + findingIndex, { size: 9.5 }); layout.paragraph(finding.body, prefix + "/finding/" + findingIndex); }
   }
   appendOriginalObservations(layout, snapshot); appendDocumentCancellation(layout, lifecycle, "Cancelamento da ficha");
+  appendDocumentFollowUp(layout, snapshot);
   const verificationUrl = new URL("/verificar/emissao/" + emission.verificationCode, origin).href;
   appendApprovedPdfExpansion(layout, snapshot, emission);
   await appendVerificationAndPrivacy(layout, emission, returned ? "Esta ficha de devolução" : "Esta ficha de entrega", issuer, at, verificationUrl, emission.verificationCode.match(/.{1,4}/g)?.join("-") ?? emission.verificationCode);

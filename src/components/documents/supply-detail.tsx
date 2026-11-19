@@ -1,6 +1,6 @@
 "use client";
 import { useDocumentDecision, DocumentDecisionFailure } from "./use-document-decision";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { DocumentSection } from "@/components/ui/model-section";
 import { RelatedDocument } from "./related-document";
@@ -26,7 +26,9 @@ import { CountedDeliveryReceipt, CountedDeliveryReceiptResult } from "./delivery
 import { canReconcileFromFamily, DeliveryReconciliation, DeliveryReconciliationResult } from "./delivery-reconciliation";
 import { DeliveryTransitCancellation, DeliveryTransitCancellationResult } from "./delivery-transit-cancellation";
 import { DeliveryCancellationDecision, DeliveryCancellationStatusDialog, type CancellationAction } from "./delivery-cancellation-decision";
-import { readCountedDeliveryReceipt, verifyCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
+import { DocumentFollowUpActions } from "./document-follow-up-actions";
+import { supplyFollowUpState } from "@/lib/documents/follow-up-lifecycle";
+import { cancelledTransitReturn, readCountedDeliveryReceipt, verifyCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
 import { deliveryTransit } from "@/lib/documents/family-fulfillment";
 import { countedDeliveryReceiptBody, deliveryResolutionBody, type CountedDeliveryReceiptBody, type DeliveryResolutionBody } from "@/lib/validation/delivery-receipt";
 import {
@@ -56,7 +58,7 @@ import {
 import { DraftReferenceComparison } from "./draft-reference-comparison";
 import { ConsentReferenceComparison } from "./consent-reference-comparison";
 import type { PatientPerson, PurchaseReceipt, SupplyDocument } from "@/types/documents";
-import { quantity } from "@/lib/quantity";
+import { formatQuantity, quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
@@ -545,6 +547,9 @@ export function SupplyDocumentContent({
   const followUpStep = purchaseStep ?? deliveryStep ?? balanceStep;
   const operationOpen = Boolean(action || review || uncertain || regularizationEditing || balanceReviewEditing || transferEditing);
   const allowed = (cap: string) => Boolean(activeContext && can(context, cap));
+  const followUpState = data && supplyFollowUpState(data.status, data.workflow_data.documentFollowUp);
+  const followUpTerminal = followUpState === "completed" || data?.status === "cancelled" && followUpState !== "reopened";
+  const patientAdmin = context.patient?.role === "admin" && allowed("access.manage");
   const actions: DocumentAction[] = [];
   if (
     data &&
@@ -977,6 +982,28 @@ export function SupplyDocumentContent({
                 {actions
                   .filter((item) => !secondaryDocumentActions.has(item))
                   .map(renderAction)}
+                {activeContext && data.protocol && data.type !== "BAL" ? <DocumentFollowUpActions
+                  id={data.id} patientId={data.care_recipient_id} kind={data.type === "COM" ? "COM" : data.kind === "DEV" ? "DEV" : "ENT"}
+                  code={data.code ?? data.protocol} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado na ficha")}
+                  userId={context.userId} actor={context.fullName}
+                  canReopen={followUpTerminal && patientAdmin}
+                  canComplete={!followUpTerminal && data.status !== "rejected" && data.status !== "administratively_closed" &&
+                    (patientAdmin || (data.type === "COM" ? allowed("com.approve") :
+                      data.recipient_id === context.userId && allowed("ent.receive") || data.created_by === context.userId && allowed("ent.create")))}
+                  cancelled={data.status === "cancelled" && followUpState !== "completed"}
+                  disabled={busy || operationOpen} onUpdated={() => setAttempt(value => value + 1)}
+                  onShowMaterials={() => tabs.select("materials")}
+                  preservedFacts={data.type === "ENT" ? data.lines.map(line => {
+                    const returned = data.deliveryCancellation?.lines.find(result => result.lineId === line.id);
+                    return <article key={line.id} className="hca-receipt-line">
+                      <h3>{line.name_snapshot}</h3>
+                      <DefinitionGrid className="hca-cancellation-quantities" items={[
+                        { label: "Recebimento registrado", value: data.workflow_data.acceptedAt ? formatQuantity(line.accepted_quantity, line.unit_snapshot) : "Sem conferência registrada" },
+                        { label: "Consumo confirmado", value: formatQuantity(returned?.consumedQuantity, line.unit_snapshot) },
+                        { label: "Retorno registrado", value: formatQuantity(returned?.returnQuantity ?? cancelledTransitReturn(line.metadata), line.unit_snapshot) },
+                      ]} />
+                    </article>;
+                  }) : <p>Compras e entradas físicas anteriores permanecem registradas.</p>} /> : null}
                 {activeContext && data.type === "COM" ? <PurchaseArrivalReview context={context} documentId={data.id}
                   hasPending={data.receipts.some(receipt => receipt.state === "pending" && receipt.submitted_by !== context.userId)}
                   onReviewed={async () => {
@@ -1042,7 +1069,7 @@ export function SupplyDocumentContent({
                 ? (data.purchaseProgress?.state ?? data.status)
                 : data.status
             }
-            statusLabel={followUpStep?.statusLabel}
+            statusLabel={followUpState === "reopened" ? "Acompanhamento reaberto" : followUpState === "completed" ? "Acompanhamento concluído" : followUpStep?.statusLabel}
             protocol={data.protocol}
             version={data.version}
             createdAt={data.created_at}
