@@ -1,4 +1,6 @@
 "use client";
+import { IssuanceObservationList } from "@/components/forms/issuance-observations";
+import { issuanceObservations } from "@/lib/documents/issuance-observations";
 
 import { useId, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { ActionButton, DefinitionGrid, TextAreaField, TextInput } from "@/components/ui/controls";
@@ -202,7 +204,7 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
               { label: "Expedido por", value: props.sender, wide: true },
             ]} />
             <p><strong>Observação de quem expediu</strong></p>
-            <p className="whitespace-pre-wrap">{data.payload.notes?.trim() || "Sem observação na expedição."}</p>
+            <IssuanceObservationList observations={issuanceObservations(data.payload)} empty="Sem observação na expedição." />
           </details>
           <details className="hca-receipt-fold">
             <summary><Icon name="note" />Adicionar observação ao recebimento<Icon name="down" /></summary>

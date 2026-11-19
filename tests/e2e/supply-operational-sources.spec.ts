@@ -52,15 +52,27 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   await expect(extra).toHaveValue("2");
   await info.attach("E05-extra-restaurado", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
   await next(page);
+  const observation = "A caixa será entregue em dois volumes.";
+  const addObservation = page.getByRole("button", { name: "Adicionar observação", exact: true });
+  await addObservation.click();
+  await page.getByLabel("Observação 1", { exact: true }).fill(observation);
+  await addObservation.click();
+  await next(page);
+  await expect(page.getByLabel("Observação 2", { exact: true })).toBeFocused();
+  await info.attach("E05-observacoes-numeradas", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await page.getByRole("button", { name: "Remover observação 2", exact: true }).click();
   await next(page);
   const review = page.getByRole("region", { name: "Itens extras", exact: true });
   await expect(review.getByText(name, { exact: true })).toHaveCount(1);
   await expect(review.getByText("2 unidade", { exact: true })).toBeVisible();
+  await expect(page.getByText(observation, { exact: true })).toBeVisible();
   const submission = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
   await page.getByRole("button", { name: "Confirmar e concluir", exact: true }).click();
   const response = await submission;
   expect(response.ok(), await response.text()).toBe(true);
-  expect((await response.json()).data.lines).toMatchObject([
+  const { data: document } = await response.json();
+  expect(document.payload.observations).toEqual([observation]);
+  expect(document.lines).toMatchObject([
     { product_id: f.products[1], quantity: expect.anything(), metadata: { catalogueExtra: "true" } },
   ]);
 });

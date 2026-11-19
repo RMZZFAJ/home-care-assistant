@@ -91,7 +91,8 @@ confere com o comando mestre.
   listas da casa, consulta, urgência e retomada na categoria exata. Contagem
   de equipe e emissão transacionais. Cancelamento compara o estoque antes e
   depois. Listas, etapas, foco e REQ exercitados em Android e iOS emulados.
-  Pendem extras fora do catálogo, observações numeradas em COM, ENT e DEV e P1.
+  COM, ENT e DEV usam observações numeradas na revisão e na ficha emitida.
+  Pendem os extras fora do catálogo e P1.
 - **Vínculos e COM E05.** Vínculos por ficha ou material, importação seletiva,
   planejamento e chegada, compras mistas, falta e excesso, correção pelo autor,
   revisão individual ou em lote, chegada avulsa e cobertura do planejamento.
@@ -123,6 +124,13 @@ Andamentos foram exercitadas nos percursos correspondentes. As comparações
 registradas sustentam a equivalência desses elementos e a interação testada.
 A v7 completa, incluindo variantes restantes, ainda requer revisão final.
 
+A etapa de Observações foi conferida em 390 px. As capturas mostram os campos
+numerados, a ação Remover e o foco e a mensagem na validação. A revisão móvel
+incluiu a retomada, a ordem no recebimento e a nota própria do recebedor.
+Cabeçalho, rodapé, posição do status de rascunho e composição do comparativo
+de referência continuam no ajuste visual compartilhado do lote. A REQ ainda
+usa seu editor numerado anterior.
+
 **Complementos para fatos e funções existentes no sistema.** Minhas listas
 pessoais ficam acessíveis na REQ com a visibilidade original, ao lado das
 listas compartilhadas da residência. A abertura vazia conserva o contexto
@@ -132,6 +140,14 @@ anexos e demais abas. O produto incorpora autoria, disponibilidade real,
 versão concorrente, recuperação idempotente e permissões de leitura e escrita
 nos mesmos cartões, diálogos e estados da v7. Essas integrações complementam
 o PDF demonstrativo e os estados simulados pelo HTML.
+
+Na escolha manual de recebedor em ENT e DEV, a confirmação contém um campo
+para justificar a escolha. Esse controle real do repositório estava acoplado
+à observação única da expedição. Agora a justificativa fica com a designação,
+as observações ficam na emissão e a pessoa recebedora escreve sua própria
+nota na conferência. O vínculo documental opcional também fica na Confirmação,
+onde pode ser revisto se os materiais selecionados divergirem da origem.
+Rascunhos antigos conservam o texto anterior.
 
 **Divergências e dependências.** A v7 reúne etapas que o repositório já
 expunha em entradas usuais e pelo assistente de transferências. Os fluxos
@@ -159,15 +175,15 @@ conferência histórica de aplicação inicial, sem inferência sobre dados atua
   confirmação da origem e disponibilidade pertinente.
 
 Nenhuma decisão adicional de produto foi identificada nesta atualização.
-As observações numeradas e a identificação do extra ainda ausente do catálogo
-têm regra aprovada e seguem como implementação pendente.
+A identificação do extra ainda ausente do catálogo tem regra aprovada e
+segue como implementação pendente.
 
 ## Migrations por ambiente
 
 Consulta de 19/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. **302 versões em cada banco**,
-de `20261019000100` a `20261119204118`, com os mesmos IDs do checkout. O
-histórico contém 242 versões anteriores a L1, 18 de L1 e 42 de L2. Os SQL de
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. **304 versões em cada banco**,
+de `20261019000100` a `20261119213000`, com os mesmos IDs do checkout. O
+histórico contém 242 versões anteriores a L1, 18 de L1 e 44 de L2. Os SQL de
 cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 Nenhuma versão só em arquivo, só na stack local, só no desenvolvimento ou
 pendente de aplicar nesta conferência. Produção fica fora desta consulta.
@@ -192,14 +208,14 @@ pendente de aplicar nesta conferência. Produção fica fora desta consulta.
 `20261119105026`, `20261119110234`, `20261119111617`, `20261119113059`,
 `20261119121610`, `20261119125023`, `20261119130945`, `20261119135903`,
 `20261119141610`, `20261119154356`, `20261119175654`, `20261119184524`,
-`20261119203458`, `20261119204118`.
+`20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`.
 
-Os dois últimos SQL tratam a preparação e autoridade dos extras de catálogo.
-A aplicação foi precedida de backup cifrado verificado e ensaio com rollback.
-A conferência após a aplicação encontrou apenas as diferenças previstas em
-relógio e acompanhamento interno na comparação de 201 tabelas. A publicação
-do aplicativo e a aplicação do SQL são eventos distintos. O estado de backup,
-pré-validação e compatibilidade deve ser anotado a cada próxima aplicação.
+As duas versões mais recentes tratam as observações numeradas e a
+justificativa da designação manual na transferência. A aplicação foi
+precedida de ensaio com rollback e backup cifrado verificado. Os dois SQL
+conferem com o histórico do Supabase e os hashes estáveis de 201 tabelas
+permaneceram iguais. A comparação bruta encontrou variações de relógio e
+acompanhamento interno. O preview ainda aguarda a publicação do código.
 
 ### L3 e L4
 

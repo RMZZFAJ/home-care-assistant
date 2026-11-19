@@ -8,6 +8,7 @@ import { draftCommitSchema } from "./creation-drafts";
 import { supplySourceLinks } from "./supply-sources";
 import { purchaseCommandBody } from "./purchase-command";
 import { purchaseArrivalBody } from "./purchase-arrival";
+import { issuedObservations } from "./issuance-observations";
 import { countedDeliveryReceiptBody, deliveryResolutionBody, requestDeliveryNeedBody, supplyCancellationBody } from "./delivery-receipt";
 
 const identifier = z.string().uuid();
@@ -49,6 +50,7 @@ export const supplyPayload = z
   .object({
     lines: z.array(line).min(1).max(1000),
     notes: z.string().trim().max(2000).optional(),
+    observations: issuedObservations.optional(),
     origin: z.enum(["purchase", "donation"]).optional(),
     source: z.enum(["FAMILY", "CARE_TEAM"]).optional(),
     destination: z.enum(["FAMILY", "CARE_TEAM"]).optional(),

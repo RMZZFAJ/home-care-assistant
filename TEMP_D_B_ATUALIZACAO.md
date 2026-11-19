@@ -1,5 +1,23 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — observações de emissão em COM, ENT e DEV.** A etapa oferece campos
+numerados, inclusão e remoção, foco no erro e revisão na mesma ordem. O
+rascunho guarda o texto em edição e a emissão congela a lista confirmada. A
+ficha e o PDF assinado mostram os textos originais. Na confirmação da
+transferência ficam o vínculo de origem e a justificativa da escolha manual
+do recebedor. Quem recebe pode consultar a expedição e registrar sua nota.
+
+- Passaram 12 casos dirigidos no Android e iOS emulados, 28 integrações com
+  Auth real e 17 testes de conteúdo e estrutura de PDF. A rodada móvel final
+  teve retries automáticos desabilitados. Build, tipos e ESLint passaram.
+  Capturas em `output/playwright/l2-issuance-observations/` mostram os campos,
+  a numeração e a validação em 390 px.
+- `20261119212000` e `20261119213000` estão aplicadas no local e no Supabase de
+  desenvolvimento. O ensaio com rollback e o backup cifrado
+  `287c82b8-b87d-4832-a728-81ec5328b4b5` foram verificados antes da aplicação.
+  O histórico de 304 versões confere. Os 201 hashes estáveis de dados
+  conferiram e a fila de aplicação está vazia.
+
 **19/11 — registro dos lotes e revisão Sonar.** O
 [registro de execução](docs/audits/D/D-B/LOTES_EXECUCAO.md) reúne L1 e L2 e
 reserva espaço para L3 e L4. Os três arquivos originais de L2 estão versionados

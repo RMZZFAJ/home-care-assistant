@@ -1,5 +1,6 @@
 "use client";
 import { BalancePreviousObservations } from "@/components/balances/observation-continuity";
+import { IssuanceObservationList } from "@/components/forms/issuance-observations";
 import { ScheduleResourceSummary } from "@/components/schedules/schedule-resource-summary";
 import { balanceReviewItemFields } from "@/lib/validation/balance-review-items";
 import {
@@ -399,6 +400,8 @@ function DraftFieldsSummary({
             {content.form.notes}
           </p>
         ) : null}
+        {content.form.observations?.length ? <IssuanceObservationList
+          observations={content.form.observations.map(value => value || "Observação incompleta")} /> : null}
         {content.form.recipientReason ? (
           <p className="whitespace-pre-wrap wrap-anywhere">
             Justificativa da pessoa recebedora: {content.form.recipientReason}
@@ -432,6 +435,8 @@ function DraftFieldsSummary({
             Sua justificativa: {content.fields.reason}
           </p>
         ) : null}
+        {"observations" in content && content.observations?.length ? <IssuanceObservationList
+          observations={content.observations.map(value => value || "Observação incompleta")} /> : null}
         {content.fields.query ? (
           <p className="whitespace-pre-wrap wrap-anywhere">
             Busca preservada: {content.fields.query}

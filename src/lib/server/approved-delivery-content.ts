@@ -60,7 +60,8 @@ export function approvedDeliveryContent(snapshot: DocumentSnapshot, emission: Pd
   const transfer = snapshot.transfer;
   if (transfer) {
     const direct = transfer.declaration.mode === "direct";
-    semanticFacts["transfer/declaration"] = (direct ? "Expedidor: " : "Declarante: ") + transfer.declaration.actor.name + " · " + formatBrazilDate(transfer.declaration.recordedAt); semanticFacts["transfer/reason"] = transfer.declaration.reason;
+    semanticFacts["transfer/declaration"] = (direct ? "Expedidor: " : "Declarante: ") + transfer.declaration.actor.name + " · " + formatBrazilDate(transfer.declaration.recordedAt);
+    if (transfer.declaration.reason) semanticFacts["transfer/reason"] = transfer.declaration.reason;
     const recipient = (direct ? "Recebedor indicado na expedição: " : "Recebedor físico designado: ") + transfer.declaration.recipient.name;
     semanticFacts["transfer/people"] = transfer.declaration.counterparty ? "Contraparte para concordância: " + transfer.declaration.counterparty.name + " · " + recipient : recipient;
     if (transfer.agreement) { semanticFacts["transfer/agreement"] = (transfer.agreement.decision === "agree" ? "Concordância própria: " : "Recusa própria: ") + transfer.agreement.actor.name + " · " + formatBrazilDate(transfer.agreement.recordedAt); semanticFacts["transfer/agreementReason"] = transfer.agreement.reason; }

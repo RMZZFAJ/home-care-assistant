@@ -47,6 +47,8 @@ async function fillDeclaration(
   await drawer
     .getByRole("combobox", { name: /^Recebedor físico designado/ })
     .selectOption(f.recipient.id);
+  await drawer.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true }).fill("Quem vai receber tem disponibilidade para a conferência.");
+  await drawer.getByRole("combobox", { name: /^ENT documental de origem/ }).selectOption(f.origin.id);
   await drawer.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   const material = drawer.getByRole("combobox", {
     name: /^Adicionar material da origem/,
@@ -61,11 +63,9 @@ async function fillDeclaration(
     .fill("5");
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
+  await drawer.getByRole("button", { name: "Adicionar observação", exact: true }).click();
   await drawer
-    .getByRole("combobox", { name: /^ENT documental de origem/ })
-    .selectOption(f.origin.id);
-  await drawer
-    .getByRole("textbox", { name: /^Sua justificativa para a (entrega|devolução) de materiais/ })
+    .getByLabel("Observação 1", { exact: true })
     .fill(
       "Devolução física de cinco unidades, com Bruno como recebedor pessoal.",
     );
@@ -334,9 +334,7 @@ test("conflitos preservam a expedição, exigem adoção explícita e não reabr
   expect(officialPosts).toHaveLength(0);
   expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);
   await expect(
-    editor.getByRole("textbox", {
-      name: /^Sua justificativa para a (entrega|devolução) de materiais/,
-    }),
+    editor.getByLabel("Observação 1", { exact: true }),
   ).toHaveValue(/Devolução física de cinco/);
   await expect(
     editor.getByRole("textbox", {

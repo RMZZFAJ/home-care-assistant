@@ -7,6 +7,7 @@ import { readPdfPresentation } from "@/lib/documents/pdf-presentation";
 import { pdfSourceFactsSchema, sourceNameLabels } from "@/lib/documents/pdf-source-facts";
 import { frozenFollowUpFacts } from "@/lib/documents/follow-up-lifecycle";
 import { frozenArchiveFacts } from "@/lib/documents/document-archive";
+import { issuanceObservations } from "@/lib/documents/issuance-observations";
 
 export const confidentialityNotice = "Este documento contém dados pessoais, inclusive informações de saúde, sujeitos a proteção especial pela Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais — LGPD), quando aplicável. O acesso, a guarda, a reprodução e o compartilhamento devem respeitar a finalidade legítima, a necessidade e a segurança das informações, limitando-se às pessoas autorizadas e aos dados necessários. A emissão não autoriza divulgação pública ou uso incompatível com essa finalidade. Confira o destinatário antes de compartilhar e utilize canal adequado. Se receber este documento por engano, não o encaminhe; comunique o responsável pelo envio e observe as orientações de guarda ou descarte aplicáveis. A identificação do exportador não afasta os deveres dos demais envolvidos, nem substitui as regras de autorização e proteção do sistema.";
 
@@ -47,8 +48,7 @@ export function appendDocumentRelated(layout: ApprovedPdfLayout, snapshot: Docum
 }
 
 export function appendOriginalObservations(layout: ApprovedPdfLayout, snapshot: DocumentSnapshot) {
-  const intent = snapshot.payload.intent as { observations?: string[]; } | undefined;
-  const observations = typeof snapshot.payload.notes === "string" && snapshot.payload.notes ? [snapshot.payload.notes] : intent?.observations ?? [];
+  const observations = issuanceObservations(snapshot.payload);
   layout.heading("Observações originais", "Registradas pelo autor no ato da ficha.");
   if (!observations.length) layout.paragraph("Nenhuma observação original registrada.", "observations/empty");
   observations.forEach((note, index) => layout.observation(note, index + 1, "observation/" + index));

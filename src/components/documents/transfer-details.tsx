@@ -44,7 +44,7 @@ export function TransferDetails({
       <h2 ref={headerRef} tabIndex={-1}>
         Atos da {materialTransferLabel(facts.declaration.source, facts.declaration.destination).toLocaleLowerCase("pt-BR")}
       </h2>
-      <TransferFactsDisplay facts={facts} />
+      <TransferFactsDisplay facts={facts} numberedObservations={Array.isArray(data.payload.observations)} />
       {facts.originDocumentId ? (
         <RelatedDocument
           id={facts.originDocumentId}

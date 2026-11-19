@@ -74,7 +74,7 @@ test("duas fichas ENT não herdam campos de conferência descartada e nenhuma na
 });
 
 test("recuperação de save incerto conserva a chave após revogação real e não revela o cache ao reabrir",async({page})=>{
- const f=await setup(),marker="Observação privada fictícia "+randomUUID(),before=official(f.patient);await login(page,f.patient);await open(page,f.patient,"COM");await page.getByRole("combobox",{name:/Forma de aquisição/}).selectOption("donation");for(let i=0;i<3;i++)await next(page);await page.getByRole("textbox",{name:/Observações e contexto/}).fill(marker);
+ const f=await setup(),marker="Observação privada fictícia "+randomUUID(),before=official(f.patient);await login(page,f.patient);await open(page,f.patient,"COM");await page.getByRole("combobox",{name:/Forma de aquisição/}).selectOption("donation");for(let i=0;i<3;i++)await next(page);await page.getByRole("button",{name:"Adicionar observação",exact:true}).click();await page.getByLabel("Observação 1",{exact:true}).fill(marker);
  const packets:unknown[]=[];let lose=true;await page.route("**/api/drafts",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(lose){lose=false;const response=await route.fetch();expect(response.ok()).toBe(true);return route.abort("failed");}return route.continue();});
  await save(page).click();await expect(panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true})).toBeEnabled();
  let release!:()=>void,entered!:()=>void;const gate=new Promise<void>(r=>{release=r;}),arrived=new Promise<void>(r=>{entered=r;});let hold=true;
@@ -94,7 +94,8 @@ test("L2 perda de escrita conserva a edição da COM e o vínculo permite consul
   await open(page, f.patient, "COM");
   await page.getByRole("combobox", { name: /Forma de aquisição/ }).selectOption("donation");
   for (let step = 0; step < 3; step++) await next(page);
-  const field = page.getByRole("textbox", { name: /Observações e contexto/ });
+  await page.getByRole("button", { name: "Adicionar observação", exact: true }).click();
+  const field = page.getByLabel("Observação 1", { exact: true });
   await field.fill(observation);
   await save(page).click();
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();

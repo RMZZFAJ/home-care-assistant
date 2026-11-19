@@ -61,6 +61,7 @@ import type { SupplyDraftContent } from "@/lib/validation/supply-drafts";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
+import { issuanceObservationErrors } from "@/lib/documents/issuance-observations";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
 import { ActionButton } from "@/components/ui/controls";
 import { RelatedDocument } from "./related-document";
@@ -391,6 +392,7 @@ export function PatientSupplyWizard({
             manualQuantities: {},
             requestFulfillments: {},
             extraProductIds: undefined,
+            observations: undefined,
           }
           : {}),
         observationTimes: {},
@@ -412,6 +414,7 @@ export function PatientSupplyWizard({
       quantities: form.quantities,
       ...(supplyExtraIds?.length ? { extraProductIds: supplyExtraIds } : {}),
       notes: form.notes,
+      observations: form.observations,
       origin: form.origin,
       source: form.source,
       recipientId: form.recipientId,
@@ -628,6 +631,7 @@ export function PatientSupplyWizard({
               ]),
             ),
             notes: existing.payload.notes ?? "",
+            observations: existing.payload.observations,
             extraProductIds: existing.lines.filter(line => line.metadata.catalogueExtra === "true").map(line => line.product_id),
             origin: existing.payload.origin ?? "",
             source: existing.payload.source ?? "FAMILY",
@@ -819,6 +823,8 @@ export function PatientSupplyWizard({
   ]);
   function validate(all = false) {
     const errors: Record<string, string> = {};
+    if (type !== "BAL" && (all || step === 4))
+      Object.assign(errors, issuanceObservationErrors(form.observations ?? []));
     if (
       type === "COM" &&
       (all || step === 0) &&
@@ -897,6 +903,7 @@ export function PatientSupplyWizard({
         const first = Object.keys(errors)[0];
         const product = relevant.find(item => item.id === first);
         if (product) setStep(extras.has(product.id) ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1);
+        else if (first.startsWith("observation:")) setStep(4);
         else if (all) setStep(first === "lines" ? supplyStageSteps[1] : 0);
       }
       window.setTimeout(
@@ -1074,6 +1081,7 @@ export function PatientSupplyWizard({
       const payload: SupplyPayload = {
         lines,
         notes: form.notes,
+        ...(type !== "BAL" && form.observations ? { observations: form.observations.map(note => note.trim()) } : {}),
         ...(sources.length ? { sources } : {}),
         ...(type === "BAL"
           ? { balanceReferenceRevision: legacyReference!.revision }
@@ -1184,6 +1192,7 @@ export function PatientSupplyWizard({
         patientId,
         type,
         id: editing?.id,
+        observations: frozenRef.current.payload.observations,
         minimumVersion: frozenRef.current.expectedVersion !== undefined
           ? frozenRef.current.expectedVersion + 1
           : editing

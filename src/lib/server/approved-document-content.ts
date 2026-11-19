@@ -5,11 +5,12 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { readPdfPresentation, originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { frozenFollowUpFacts } from "@/lib/documents/follow-up-lifecycle";
 import { frozenArchiveFacts } from "@/lib/documents/document-archive";
+import { issuanceObservations } from "@/lib/documents/issuance-observations";
 
 /** Common source obligations, independent of all layout components. */
 export function approvedDocumentContent(snapshot: DocumentSnapshot, emission: PdfEmissionContext) {
   const source = pdfSourceFactsSchema.parse(snapshot.sourceFacts), lifecycle = requirePdfLifecycleFacts(snapshot.lifecycleFacts, snapshot);
-  const observations = typeof snapshot.payload.notes === "string" && snapshot.payload.notes ? [snapshot.payload.notes] : (snapshot.payload.intent as { observations?: string[] } | undefined)?.observations ?? [];
+  const observations = issuanceObservations(snapshot.payload);
   const facts = [snapshot.code, source.patientName ?? "Nome do paciente não preservado", source.issuerName ?? "Autoria nominal desconhecida", emission.requestedName, emission.verificationCode.match(/.{1,4}/g)?.join("-") ?? emission.verificationCode,
     ...snapshot.lines.flatMap(line => [String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado"), String(line.unit_snapshot ?? "Unidade não preservada")]), ...observations];
   const semanticFacts: Record<string, string> = { "identity/patient": source.patientName ?? "Nome do paciente não preservado", "identity/issuer": source.issuerName ?? "Autoria nominal desconhecida" };

@@ -108,6 +108,8 @@ test("E04-04 organiza uma lista da casa e reutiliza materiais em REQ, COM e ENT"
   await page.getByRole("combobox", { name: /^Custódia de origem/ }).selectOption("FAMILY");
   await page.getByRole("button", { name: "Preparar declaração", exact: true }).click();
   await page.getByRole("combobox", { name: /^Recebedor físico designado/ }).selectOption(fixtures.professional.id);
+  const manualSelection = page.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
+  if (await manualSelection.isVisible()) await manualSelection.fill("Profissional escolhido para a conferência das listas.");
   await showLists(page);
   await page.getByRole("checkbox", { name: new RegExp(updated) }).check();
   await page.getByRole("button", { name: "Selecionar materiais", exact: true }).click();

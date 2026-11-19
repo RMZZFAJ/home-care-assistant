@@ -1,8 +1,14 @@
 # Banco de dados
 
-O Supabase de desenvolvimento e preview está em 302 migrations até
-`20261119204118`. As duas últimas acrescentam a etapa Extras aos rascunhos de
-COM e ENT e vinculam a classificação de materiais do catálogo à confirmação.
+O Supabase local e de desenvolvimento está em 304 migrations até
+`20261119213000`. As duas versões novas conferem a ordem das observações
+contra o rascunho e preservam a justificativa de escolha do recebedor como
+fato próprio. O backup cifrado, o ensaio com rollback e o histórico remoto
+foram conferidos. Os hashes estáveis de 201 tabelas permaneceram iguais.
+
+O registro anterior estava em 302 migrations até `20261119204118`.
+As duas versões anteriores acrescentaram a etapa Extras aos rascunhos de
+COM e ENT e vincularam a classificação de materiais do catálogo à confirmação.
 O backup cifrado anterior ao lote foi verificado e as duas migrations passaram
 pelo ensaio com rollback. Os hashes estáveis das 201 tabelas comparadas
 conferiram e a fila remota está vazia.

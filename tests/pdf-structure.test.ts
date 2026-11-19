@@ -42,6 +42,26 @@ it("the content baseline detects a deleted material even when the new renderer i
   expect(materialNames).not.toContain(materialBaseline[0]);
 });
 
+it("renders numbered issuance observations in order and retains the recipient's separate note", async () => {
+  const delivery = snapshots.find(snapshot => snapshot.type === "ENT")!;
+  const source = currentPdfFixture({
+    ...delivery,
+    payload: { ...delivery.payload, notes: "", observations: ["Volumes lacrados.", "Conferir etiquetas."] },
+    workflow: { ...delivery.workflow, receiptNotes: "Recebi um volume nesta conferência." },
+  });
+  const current = await composeIssuance(source, "c".repeat(64), { ...fidelityEmission, rendererRevision: 16 });
+  expect(current.semanticFacts).toMatchObject({
+    "observation/0": "Volumes lacrados.",
+    "observation/1": "Conferir etiquetas.",
+    "receipt/notes": "Recebi um volume nesta conferência.",
+  });
+  const painted = current.runs.map(run => run.text).join(" ");
+  const firstObservation = painted.indexOf("Volumes lacrados.");
+  expect(firstObservation).toBeGreaterThanOrEqual(0);
+  expect(painted.indexOf("Conferir etiquetas.")).toBeGreaterThan(firstObservation);
+  await expect(validateIssuanceContent(current.bytes, current)).resolves.toMatchObject({ passed: true });
+});
+
 it("rejects missing tags, broken parents, absent scopes, unmatched content and untagged painted content", async () => {
   const current = await plan();
   const mutations = [

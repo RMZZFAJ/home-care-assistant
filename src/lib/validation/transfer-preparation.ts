@@ -93,6 +93,7 @@ export function requireTransferDeclarationConfirmation(
   const row = requireSupplyConfirmation(value, {
     patientId: expected.patientId,
     type: "ENT",
+    observations: expected.declaration.observations,
   });
   parseTransferReference(
     { data: row },

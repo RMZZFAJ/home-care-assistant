@@ -42,6 +42,7 @@ export type SupplyPayload = {
   lines: DraftLine[];
   sources?: import("@/lib/validation/supply-sources").SupplySourceLink[];
   notes?: string;
+  observations?: string[];
   origin?: "purchase" | "donation";
   source?: Custody;
   destination?: Custody;

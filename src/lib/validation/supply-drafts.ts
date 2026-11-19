@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { issuanceObservationDraft } from "./issuance-observations";
 import { scheduleResourcePurposes } from "../schedules/resource-preparations";
 import { consumptionPreparationPurposes } from "../forms/consumption-preparation-purposes";
 import { balancePreparationPurposes } from "../forms/balance-preparation-purposes";
@@ -160,6 +161,7 @@ export const supplyDraftContent = z
         quantities: entries(text(64)),
         extraProductIds: z.array(text(120).min(1)).max(1000).optional(),
         notes: text(3000),
+        observations: issuanceObservationDraft.optional(),
         origin: z.enum(["", "purchase", "donation"]),
         source: z.enum(["FAMILY", "CARE_TEAM"]),
         recipientId: z.union([z.literal(""), z.uuid()]),
@@ -223,7 +225,7 @@ export const balanceDocumentDraftContent = receiptDraftContent.refine(
   "O preparo de revisão ou designação não contém uma nova contagem física.",
 );
 export const transferDeclarationDraftContent = receiptDraftContent
-  .extend({ documentVersion: z.null() })
+  .extend({ documentVersion: z.null(), observations: issuanceObservationDraft.optional() })
   .refine(
     (value) =>
       new Set(value.materials.map((item) => item.id)).size ===

@@ -121,7 +121,8 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   if (transfer) {
     const direct = transfer.declaration.mode === "direct";
     layout.heading(direct ? (returned ? "Expedição da devolução" : "Expedição da entrega") : (returned ? "Declaração da devolução" : "Declaração da transferência"));
-    layout.paragraph((direct ? "Expedidor: " : "Declarante: ") + transfer.declaration.actor.name + " · " + formatBrazilDate(transfer.declaration.recordedAt), "transfer/declaration"); layout.paragraph(transfer.declaration.reason, "transfer/reason");
+    layout.paragraph((direct ? "Expedidor: " : "Declarante: ") + transfer.declaration.actor.name + " · " + formatBrazilDate(transfer.declaration.recordedAt), "transfer/declaration");
+    if (transfer.declaration.reason) layout.paragraph(transfer.declaration.reason, "transfer/reason");
     const counterparty = transfer.declaration.counterparty;
     const recipient = (direct ? "Recebedor indicado na expedição: " : "Recebedor físico designado: ") + transfer.declaration.recipient.name;
     layout.paragraph(counterparty ? "Contraparte para concordância: " + counterparty.name + " · " + recipient : recipient, "transfer/people", { size: 9.5 });

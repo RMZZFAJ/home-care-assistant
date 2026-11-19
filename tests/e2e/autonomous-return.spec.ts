@@ -37,6 +37,9 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
   const editor = page.getByRole("region", { name: "Nova devolução", exact: true });
   await expect(editor.getByRole("combobox", { name: /^Contraparte para concordância/ })).toHaveCount(0);
   await editor.getByRole("combobox", { name: /^Recebedor físico designado/ }).selectOption(f.recipient.id);
+  const selectionReason = "A pessoa da família estará presente para receber a devolução.";
+  await editor.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true }).fill(selectionReason);
+  await expect(editor.getByRole("combobox", { name: /^ENT documental de origem/ })).toHaveValue("");
   await editor.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   const search = editor.getByRole("combobox", { name: /^Adicionar material da origem/ });
   await search.click(); await search.fill("Material fictício V4 0"); await search.press("ArrowDown");
@@ -44,25 +47,37 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
   await editor.getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ }).fill("5");
   await editor.getByRole("button", { name: "Continuar", exact: true }).click();
   await editor.getByRole("button", { name: "Continuar", exact: true }).click();
-  await expect(editor.getByRole("combobox", { name: /^ENT documental de origem/ })).toHaveValue("");
   const reason = "Devolução autônoma de cinco unidades à família, sem entrega de origem vinculada.";
+  const packaging = "Materiais separados em dois volumes lacrados.";
+  const receiverNote = "Recebi três das cinco unidades desta devolução autônoma.";
+  const addObservation = editor.getByRole("button", { name: "Adicionar observação", exact: true });
+  await addObservation.click();
+  await editor.getByLabel("Observação 1", { exact: true }).fill(reason);
+  await addObservation.click();
   const saved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/drafts" &&
-    response.request().method() === "POST" && response.request().postDataJSON()?.content?.fields?.reason === reason);
-  await editor.getByRole("textbox", { name: /^Sua justificativa para a devolução/ }).fill(reason);
+    response.request().method() === "POST" && response.request().postDataJSON()?.content?.observations?.[1] === packaging);
+  await editor.getByLabel("Observação 2", { exact: true }).fill(packaging);
   expect((await saved).ok()).toBe(true);
   expect(transferState(f)).toBe(before);
   await page.reload(); await page.getByRole("button", { name: "Preparar devolução", exact: true }).click();
   await page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true }).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await editor.getByRole("button", { name: "Comparar referência atual", exact: true }).click();
   await editor.getByRole("button", { name: "Adotar referência atual e revisar meus campos", exact: true }).click();
-  await expect(editor.getByRole("textbox", { name: /^Sua justificativa para a devolução/ })).toHaveValue(reason);
+  await expect(editor.getByLabel("Observação 1", { exact: true })).toHaveValue(reason);
+  await expect(editor.getByLabel("Observação 2", { exact: true })).toHaveValue(packaging);
+  await page.setViewportSize({ width: 390, height: 820 });
+  await info.attach("E06-observacoes-dev", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
   await editor.getByRole("button", { name: "Revisar ficha", exact: true }).click();
+  await expect(editor.getByRole("list").filter({ hasText: packaging }).getByRole("listitem")).toHaveText([reason, packaging]);
   const recorded = page.waitForResponse(response => new URL(response.url()).pathname === "/api/transfers" && response.request().method() === "POST");
   await editor.getByRole("button", { name: "Expedir devolução", exact: true }).click();
   const response = await recorded; expect(response.ok()).toBe(true);
   const document = (await response.json()).data, id = document.id;
   expect(document.transfer.originDocumentId).toBeNull(); expect(document.protocol).toBeTruthy();
   expect(document.transfer.agreement).toBeNull();
+  expect(document.payload.observations).toEqual([reason, packaging]);
+  expect(document.payload.recipientReason).toBe(selectionReason);
+  expect(document.payload.notes).toBe("");
   expect(returnBalances(f)).toEqual({ family: 30, team: 5, transit: 5 });
   const peerOptions = { baseURL: new URL(page.url()).origin, viewport: info.project.use.viewport,
     isMobile: info.project.use.isMobile, hasTouch: info.project.use.hasTouch,
@@ -83,10 +98,11 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
     const amount = receive.getByRole("textbox", { name: /Recebidas de Material fictício V4 0/ });
     await expect(amount).toHaveValue("5");
     await receive.getByText("Dados e observação da expedição", { exact: true }).click();
-    await expect(receive).toContainText(reason);
+    await expect(receive.getByRole("list").filter({ hasText: packaging }).getByRole("listitem")).toHaveText([reason, packaging]);
+    await expect(receive.getByRole("list").filter({ hasText: packaging })).not.toContainText(selectionReason);
     await amount.fill("3");
     await receive.getByText("Adicionar observação ao recebimento", { exact: true }).click();
-    await receive.getByRole("textbox", { name: "Sua observação no recebimento", exact: true }).fill("Recebi três das cinco unidades desta devolução autônoma.");
+    await receive.getByRole("textbox", { name: "Sua observação no recebimento", exact: true }).fill(receiverNote);
     await receive.getByRole("button", { name: "Confirmar recebimento", exact: true }).click();
     const receiptReview = receiver.getByRole("dialog", { name: "Confirmar diferença no recebimento", exact: true });
     await expect(receiptReview).toContainText("2 unidade a menos");
@@ -95,6 +111,8 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
     await expect(receiptResult).toContainText("estoque familiar");
     await receiptResult.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
     const final = (await (await receiver.request.get("/api/documents/" + id)).json()).data;
+    expect(final.payload.observations).toEqual([reason, packaging]);
+    expect(final.workflow_data.receiptNotes).toBe(receiverNote);
     expect(final.workflow_data.acceptedBy).toBe(f.recipient.id); expect(final.transfer.agreement).toBeNull();
     expect(final.created_by).toBe(f.initiator.id); expect(final.transfer.originDocumentId).toBeNull(); expect(final.code).toBe("DEV-0001");
     expect(returnBalances(f)).toEqual({ family: 33, team: 5, transit: 2 });

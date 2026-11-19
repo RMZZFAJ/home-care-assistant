@@ -28,12 +28,21 @@ test("COM and ENT partial private saves survive a second Auth device with separa
 });
 
 test("COM confirmation consumes its private slot once, replays the same result and never deletes its official result on acknowledgement",async()=>{
- const f=await setup(),owner=await actor("family",f.patient),args=packet(f),saved=await rpc(owner,"supply_draft_command",args);
- const command={p_id:saved.id,p_expected:saved.revision,p_target:null,p_key:randomUUID(),p_body:{action:"create",payload:payload(f,"COM")}},confirmed=await rpc(owner,"commit_supply_draft",command);
+ const f=await setup(),owner=await actor("family",f.patient),draft=content(f);
+ draft.form.observations=["\uFEFF Separar os dois volumes. ","Conferir as embalagens no recebimento."];
+ const observations=draft.form.observations.map(value=>value.trim());
+ const args=packet(f,"COM","create",null,draft),saved=await rpc(owner,"supply_draft_command",args);
+ const staged=official(f);
+ const command={p_id:saved.id,p_expected:saved.revision,p_target:null,p_key:randomUUID(),p_body:{action:"create",payload:{...payload(f,"COM"),observations}}};
+ const differentOrder={...command,p_body:{...command.p_body,payload:{...command.p_body.payload,observations:[...observations].reverse()}}};
+ assert.equal((await owner.rpc("commit_supply_draft",differentOrder)).error?.code,"22023");
+ assert.equal(official(f),staged);
+ const confirmed=await rpc(owner,"commit_supply_draft",command);
  const state=official(f);assert.equal(confirmed.result.type,"COM");assert.ok(confirmed.consumedDocumentId);
+ assert.deepEqual(confirmed.result.payload.observations,observations);
  assert.deepEqual((await rpc(owner,"commit_supply_draft",command)).result,confirmed.result);assert.equal(official(f),state);
  assert.equal((await owner.rpc("commit_supply_draft",{...command,p_key:randomUUID()})).error?.code,"PT409");
- assert.equal((await owner.rpc("commit_supply_draft",{...command,p_body:{...command.p_body,payload:{...payload(f,"COM"),notes:"Outra intenção"}}})).error?.code,"23505");
+ assert.equal((await owner.rpc("commit_supply_draft",{...command,p_body:{...command.p_body,payload:{...command.p_body.payload,notes:"Outra intenção"}}})).error?.code,"23505");
  const consumed=await read(owner,args);assert.equal(consumed.state,"consumed");assert.equal(consumed.content,null);
  await rpc(owner,"supply_draft_command",{...args,p_id:saved.id,p_expected:consumed.revision,p_body:{action:"acknowledge"},p_key:randomUUID()});assert.equal(await read(owner,args),null);assert.equal(official(f),state);
  const next=await rpc(owner,"supply_draft_command",{...args,p_key:randomUUID()});await rpc(owner,"supply_draft_command",{...args,p_id:next.id,p_expected:1,p_body:{action:"discard"},p_key:randomUUID()});assert.equal(official(f),state);

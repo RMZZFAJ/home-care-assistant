@@ -1,4 +1,6 @@
 "use client";
+import { IssuanceObservationList } from "@/components/forms/issuance-observations";
+import { issuanceObservations } from "@/lib/documents/issuance-observations";
 import { useDocumentDecision, DocumentDecisionFailure } from "./use-document-decision";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
@@ -1244,7 +1246,7 @@ export function SupplyDocumentContent({
             </DocumentPanel>
             <DocumentPanel value="overview">
               <div className="doc-main-column">
-                <DocumentSection title="Observações da emissão" icon="file">{data.payload.notes ? <ol className="doc-original-notes"><li>{data.payload.notes}</li></ol> : <p className="doc-subtle">Sem observações.</p>}<div className="doc-author-line"><span className="doc-avatar" aria-hidden="true">{documentIssuerName(data.canonical_snapshot).split(" ").slice(0,2).map(part => part[0]).join("")}</span><span><strong>{documentIssuerName(data.canonical_snapshot)}</strong><small>{formatBrazilDate(data.created_at)}</small></span></div></DocumentSection>
+                <DocumentSection title="Observações da emissão" icon="file"><IssuanceObservationList observations={issuanceObservations(data.payload)} /><div className="doc-author-line"><span className="doc-avatar" aria-hidden="true">{documentIssuerName(data.canonical_snapshot).split(" ").slice(0,2).map(part => part[0]).join("")}</span><span><strong>{documentIssuerName(data.canonical_snapshot)}</strong><small>{formatBrazilDate(data.created_at)}</small></span></div></DocumentSection>
               {data.protocol ? <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={data.version} userId={context.userId} activeContext={Boolean(activeContext && !archived)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
               </div>
             </DocumentPanel>

@@ -508,6 +508,11 @@
 .hca-l1 .doc-original-notes>li{padding-left:4px;font-size:13.5px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
 .hca-l1 .doc-original-notes>li+li{margin-top:13px}
 .hca-l1 .doc-original-notes>li::marker{font-weight:700;color:var(--primary);font-size:12px}
+.hca-l1 .hca-issuance-observation-list { display: grid; gap: 8px; margin: 12px 0; }
+.hca-l1 .hca-issuance-observation-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hca-l1 .hca-issuance-observation-heading label { font-weight: 620; }
+.hca-l1 .hca-issuance-observation-list textarea { width: 100%; }
+.hca-l1 .hca-issuance-observation-empty { display: flex; align-items: center; gap: 10px; margin: 14px 0 16px; padding: 14px 12px; border-radius: 10px; color: #5e7568; background: #f6f9f6; font-size: 13px; }
 .hca-l1 .hca-progress-feed>.doc-card-head{flex-wrap:wrap}
 .hca-l1 .doc-feed-head-actions{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:-4px -5px 0 auto}
 .hca-l1 .doc-feed-head-actions>.btn-icon{height:32px;min-height:32px;width:32px;min-width:32px;border-color:transparent;background:transparent;color:var(--muted)}

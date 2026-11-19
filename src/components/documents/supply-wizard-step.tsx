@@ -6,6 +6,8 @@ import { MaterialConsultButton } from "./catalogue-material-panel";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { materialCategories, supplyExtrasStep, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { WizardCatalogueExtra } from "@/components/forms/wizard-catalogue-extra";
+import { IssuanceObservationsEditor, IssuanceObservationList } from "@/components/forms/issuance-observations";
+import { issuanceObservations } from "@/lib/documents/issuance-observations";
 import {
   DeliveryRecipientField,
   DeliveryRecipientReference,
@@ -39,6 +41,7 @@ export type WizardState = {
   quantities: Record<string, string>;
   extraProductIds?: string[];
   notes: string;
+  observations?: string[];
   observationTimes?: Record<string, string | null>;
   origin: "" | "purchase" | "donation";
   source: "FAMILY" | "CARE_TEAM";
@@ -530,8 +533,9 @@ export function SupplyWizardStep({
       ) : null}
       {step === 4 ? (
         <>
+          {type === "BAL" || form.notes ? (
           <label className="block text-sm font-semibold">
-            Observações e contexto
+            {type === "BAL" ? "Observações e contexto" : "Observação do preenchimento anterior"}
             <textarea
               className={inputClass}
               rows={4}
@@ -543,10 +547,13 @@ export function SupplyWizardStep({
               placeholder="Registre apenas exceções e informações necessárias."
             />
           </label>
-          <p className="text-xs leading-5 text-(--muted)">
+          ) : null}
+          {type !== "BAL" ? <IssuanceObservationsEditor observations={form.observations ?? []}
+            onChange={observations => setForm(previous => ({ ...previous, observations }))} errors={fieldErrors} /> : null}
+          {type === "BAL" ? <p className="text-xs leading-5 text-(--muted)">
             Fotos e anexos poderão ser adicionados no detalhamento após salvar a
             ficha.
-          </p>
+          </p> : null}
         </>
       ) : null}
       {step === 5 ? (
@@ -610,7 +617,10 @@ export function SupplyWizardStep({
               </li>
             ))}
           </ul>}
-          {form.notes ? (
+          {type !== "BAL" ? <section className="hca-document-summary">
+            <h3>Observações</h3>
+            <IssuanceObservationList observations={issuanceObservations(form).map(note => note.trim()).filter(Boolean)} />
+          </section> : form.notes ? (
             <p className="whitespace-pre-wrap text-sm">{form.notes}</p>
           ) : null}
           <Notice>

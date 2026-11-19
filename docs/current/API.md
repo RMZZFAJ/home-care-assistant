@@ -1300,7 +1300,19 @@ plantão indicado. Corte conserva linhas históricas e impede republicação
 posterior. Leitura continua limitada a42 dias por consulta; a UI pagina/navega
 o calendário sem ampliar esse limite.
 
-## Conferência pessoal de ENT e DEV
+## Observações originais e conferência pessoal
+
+COM e ENT aceitam `payload.observations` na criação e na revisão. Expedições
+diretas de ENT e DEV aceitam `declaration.observations` em `POST /api/transfers`.
+A lista tem até 50 textos de 1.000 unidades UTF-16. O autosave conserva textos
+em branco ou incompletos. A emissão valida conteúdo e ordem da lista contra a
+revisão salva e congela as observações na ficha e no PDF.
+
+Na declaração direta atual, `reason` identifica a opção pelo recebedor e
+continua obrigatório quando a escolha é manual. A lista de observações é
+opcional para expedir. Clientes anteriores podem omitir `observations` e
+continuam no contrato legado de `reason` e `notes`. A nota do recebedor
+continua em `workflow_data.receiptNotes`, sob a autoria do recebimento.
 
 GET/POST /api/documents/:id acrescentam linkedRequisitions e
 unavailableRequisitionItems às ENT. Referências vêm dos itens vinculados pelo

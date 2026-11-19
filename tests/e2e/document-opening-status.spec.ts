@@ -113,6 +113,7 @@ test("L2 abertura da DEV retoma a identificação depois de recuperar a referên
   await expect(page.getByRole("region", { name: "Nova devolução", exact: true })).toBeVisible();
   expect(writes).toEqual([]);
   await page.getByRole("combobox", { name: "Recebedor físico designado", exact: true }).selectOption(fixtures.family.id);
+  await page.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true }).fill("Pessoa da família presente para a conferência.");
   await next.click();
-  await expect(page.getByRole("button", { name: "2 Materiais", exact: true })).toHaveAttribute("aria-current", "step");
+  await expect(page.getByRole("button", { name: "Materiais", exact: true })).toHaveAttribute("aria-current", "step");
 });

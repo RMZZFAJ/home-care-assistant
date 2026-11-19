@@ -61,7 +61,7 @@ const dialog = (page: Page) => page.getByRole("dialog");
 const editor = (page: Page) => page.getByRole("region", { name: /^Nova (devolução|entrega)$/ });
 const recipient = (page: Page) => editor(page).getByRole("combobox", { name: /^Recebedor físico designado/ });
 const amountField = (page: Page) => editor(page).getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ });
-const reasonField = (page: Page) => editor(page).getByRole("textbox", { name: /^Sua justificativa para a (entrega|devolução) de materiais/ });
+const observationField = (page: Page) => editor(page).getByLabel("Observação 1", { exact: true });
 const stepButton = (page: Page, name: string) =>
   editor(page).getByRole("navigation", { name: "Etapas da ficha" }).getByRole("button", { name: new RegExp(name + "$") });
 const continueStep = (page: Page) => editor(page).getByRole("button", { name: "Continuar", exact: true }).click();
@@ -88,6 +88,10 @@ async function open(page: Page, source: Custody) {
 }
 async function fill(page: Page, f: Fixture, amount = "0,") {
   await recipient(page).selectOption(f.recipientId);
+  const manualSelection = editor(page).getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
+  if (await manualSelection.isVisible()) await manualSelection.fill("Escolha confirmada com a pessoa que fará a conferência.");
+  if (f.originId)
+    await editor(page).getByRole("combobox", { name: /^ENT documental de origem/ }).selectOption(f.originId);
   await editor(page).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   const search = editor(page).getByRole("combobox", {
     name: /^Adicionar material da origem/,
@@ -99,11 +103,8 @@ async function fill(page: Page, f: Fixture, amount = "0,") {
   await amountField(page).fill("2");
   await continueStep(page);
   await continueStep(page);
-  if (f.originId)
-    await editor(page)
-      .getByRole("combobox", { name: /^ENT documental de origem/ })
-      .selectOption(f.originId);
-  await reasonField(page).fill(draftReason);
+  await editor(page).getByRole("button", { name: "Adicionar observação", exact: true }).click();
+  await observationField(page).fill(draftReason);
   if (amount !== "2") {
     await stepButton(page, "Materiais").click();
     await amountField(page).fill(amount);
@@ -114,7 +115,7 @@ async function savedDraft(page: Page, f: Fixture, query = "") {
   const read = async () => (await (await page.request.get(url)).json()).data;
   await expect.poll(read).toMatchObject({
     state: "active",
-    content: { fields: { query, reason: draftReason, [f.products[0] + ":transferQuantity"]: "0," } },
+    content: { observations: [draftReason], fields: { query, [f.products[0] + ":transferQuantity"]: "0," } },
   });
   return read();
 }
@@ -293,7 +294,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
         expect(declarationFacts(f)).toBe(before);
         await continueStep(peer);
         await continueStep(peer);
-        await expect(reasonField(peer)).toHaveValue(packet.content.fields.reason);
+        await expect(observationField(peer)).toHaveValue(packet.content.observations[0]);
         await editor(peer)
           .getByRole("button", { name: "Revisar ficha", exact: true })
           .click();
@@ -436,7 +437,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
         .click();
       await expect(
         dialog(page).getByText(
-          "Sua justificativa: " + packet.content.fields.reason,
+          packet.content.observations[0].trim(),
           { exact: false },
         ),
       ).toBeVisible();
@@ -470,7 +471,7 @@ test("declaração aguarda autosave em andamento antes de revisar sem conflito c
   const isSave = (request: import("@playwright/test").Request) =>
     new URL(request.url()).pathname === "/api/drafts" &&
     request.method() === "POST" && request.postDataJSON().action === "save" &&
-    request.postDataJSON().content?.fields?.reason === draftReason;
+    request.postDataJSON().content?.observations?.[0] === draftReason;
   const started = page.waitForRequest(isSave);
   await page.route("**/api/drafts", async route => {
     if (!isSave(route.request())) return route.continue();
@@ -482,7 +483,7 @@ test("declaração aguarda autosave em andamento antes de revisar sem conflito c
     await started;
     const review = editor(page).getByRole("button", { name: "Revisar ficha", exact: true });
     await expect(review).toBeDisabled();
-    await expect(reasonField(page)).toHaveValue(draftReason);
+    await expect(observationField(page)).toHaveValue(draftReason);
     expect(declarationFacts(f)).toBe(before);
     release();
     await expect(review).toBeEnabled();

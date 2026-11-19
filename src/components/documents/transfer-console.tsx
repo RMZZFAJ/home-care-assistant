@@ -3,6 +3,8 @@
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
 import { materialCategories, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { WizardCatalogueExtra } from "@/components/forms/wizard-catalogue-extra";
+import { IssuanceObservationsEditor, IssuanceObservationList } from "@/components/forms/issuance-observations";
+import { issuanceObservationErrors } from "@/lib/documents/issuance-observations";
 import { normalizeCatalogText } from "@/lib/catalog-match";
 import {
   FormField,
@@ -192,6 +194,8 @@ function TransferDeclarationEditor({
   const [reason, setReason] = useState(""),
     [query, setQuery] = useState(""),
     [lines, setLines] = useState<{ productId: string; quantity: string; extra?: boolean }[]>([]);
+  const [observations, setObservations] = useState<string[]>([]);
+  const [observationErrors, setObservationErrors] = useState<Record<string, string>>({});
   const [step, setStep] = useState(0);
   const [category, setCategory] = useState<WizardMaterialCategory | null>("medicamentos");
   const [packet, setPacket] = useState<TransferDeclaration | null>(null),
@@ -204,6 +208,8 @@ function TransferDeclarationEditor({
     [discard, setDiscard] = useState(false);
   const pendingRef = useRef<TransferDeclaration | null>(null),
     reviewHeadingRef = useRef<HTMLHeadingElement | null>(null),
+    observationsHeadingRef = useRef<HTMLHeadingElement | null>(null),
+    originFieldRef = useRef<HTMLSelectElement | null>(null),
     reasonFieldRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef(false);
   const patientId = context.patient!.id;
@@ -252,6 +258,8 @@ function TransferDeclarationEditor({
       setRecipientId(values.recipientId);
       setOriginId(values.originId);
       setReason(values.reason);
+      setObservations(values.observations ?? (values.reason ? [values.reason] : []));
+      setObservationErrors({});
       setQuery(values.query);
       setCategory(materialCategories.find(item => item.id === values.category)?.id ?? null);
       setLines(values.lines);
@@ -277,6 +285,8 @@ function TransferDeclarationEditor({
       setRecipientId("");
       setOriginId("");
       setReason("");
+      setObservations([]);
+      setObservationErrors({});
       setQuery("");
       setCategory("medicamentos");
       setLines([]);
@@ -307,7 +317,7 @@ function TransferDeclarationEditor({
   useEffect(() => {
     if (!busy && !privateDraft.busy && !packet && returnFocusRef.current) {
       returnFocusRef.current = false;
-      reasonFieldRef.current?.focus();
+      (reasonFieldRef.current ?? observationsHeadingRef.current)?.focus();
     }
   }, [busy, privateDraft.busy, packet, referenceUnavailable]);
   const currentContent = declarationContent(baseline, reference, {
@@ -315,12 +325,14 @@ function TransferDeclarationEditor({
     recipientId,
     originId,
     reason,
+    observations,
     step,
     query,
     category: category ?? undefined,
     lines,
   });
   const products = reference?.products ?? [];
+  const manualRecipient = Boolean(recipientId && recipientId !== reference?.suggested?.professionalId);
   const productsById = new Map(products.map(product => [product.id, product]));
   const activeCategory = category ?? materialCategories.find(item => item.id === productsById.get(lines[0]?.productId)?.category)?.id ?? "medicamentos";
   const selectedIds = lines.map(line => line.productId);
@@ -395,7 +407,7 @@ function TransferDeclarationEditor({
     if (
       !result &&
       !recoveryOnly &&
-      (reason || lines.length || counterpartyId || recipientId)
+      (reason || observations.length || lines.length || counterpartyId || recipientId)
     )
       setDiscard(true);
     else onClose();
@@ -414,6 +426,11 @@ function TransferDeclarationEditor({
     )
       return;
     if (step < 3) {
+      if (step === 0 && manualRecipient && reason.trim().length < 3) {
+        setError("Justifique a escolha do recebedor.");
+        reasonFieldRef.current?.focus();
+        return;
+      }
       if (step === 0 && householdSelectionRef.current?.apply() === false) return;
       const materialStep = step === 1 || step === 2;
       const stepLines = lines.filter((line) => !!line.extra === (step === 2));
@@ -451,6 +468,21 @@ function TransferDeclarationEditor({
       setError(
         "A ENT de origem não corresponde a todos os materiais. Revise o vínculo conhecido ou escolha sem vínculo.",
       );
+      setStep(0);
+      requestAnimationFrame(() => originFieldRef.current?.focus());
+      return;
+    }
+    if (manualRecipient && reason.trim().length < 3) {
+      setError("Justifique a escolha do recebedor.");
+      setStep(0);
+      requestAnimationFrame(() => reasonFieldRef.current?.focus());
+      return;
+    }
+    const invalidObservations = issuanceObservationErrors(observations);
+    setObservationErrors(invalidObservations);
+    if (Object.keys(invalidObservations).length) {
+      setError("Confira as observações destacadas.");
+      window.setTimeout(() => document.querySelector<HTMLElement>('[data-field-error][aria-invalid="true"]')?.focus(), 0);
       return;
     }
     const parsed = createTransferSchema.safeParse({
@@ -462,7 +494,8 @@ function TransferDeclarationEditor({
         recipientId,
         originDocumentId: originId || null,
         referenceHash: reference.referenceHash,
-        reason,
+        reason: reason.trim(),
+        observations: observations.map(note => note.trim()),
         lines: lines.map(({ productId, quantity }) => ({ productId, quantity })),
       },
     });
@@ -686,7 +719,7 @@ function TransferDeclarationEditor({
           setNeedsRefresh(false);
           setReferenceUnavailable(false);
           setError("");
-          requestAnimationFrame(() => reasonFieldRef.current?.focus());
+          requestAnimationFrame(() => (reasonFieldRef.current ?? observationsHeadingRef.current)?.focus());
         }}
       >
         Adotar referência atual e revisar meus campos
@@ -957,6 +990,55 @@ function TransferDeclarationEditor({
                     ))}
                   </SelectField>
                 </FormField>
+                {manualRecipient || reason ? <FormField label="Justificativa da escolha do recebedor" required={manualRecipient}>
+                  <TextAreaField ref={reasonFieldRef} rows={2} required={manualRecipient} minLength={3} maxLength={1000}
+                    value={reason} onChange={event => setReason(event.currentTarget.value)} />
+                </FormField> : null}
+                <FormField label="ENT documental de origem, quando conhecida">
+                  <SelectField
+                    ref={originFieldRef}
+                    value={originId}
+                    onChange={(controlEvent) => {
+                      const controlValue = controlEvent.currentTarget.value;
+                      return setOriginId(controlValue);
+                    }}
+                  >
+                    <option value="">Sem vínculo documental de origem</option>
+                    {originId &&
+                    !reference!.origins.some(
+                      (origin) =>
+                        origin.id === originId &&
+                        lines.every((line) =>
+                          origin.productIds.includes(line.productId),
+                        ),
+                    ) ? (
+                      <option value={originId} disabled>
+                        {currentContent.fields.originLabel ||
+                          "Vínculo preservado"}{" "}
+                        · indisponível para estes materiais
+                      </option>
+                    ) : null}
+                    {reference!.origins
+                      .filter(
+                        (origin) =>
+                          lines.every((line) =>
+                            origin.productIds.includes(line.productId),
+                          ),
+                      )
+                      .map((origin) => (
+                        <option key={origin.id} value={origin.id}>
+                          {origin.code} · {formatBrazilDate(origin.createdAt)}
+                        </option>
+                      ))}
+                  </SelectField>
+                </FormField>
+                <p className="text-sm">
+                  O vínculo é opcional: uma devolução não exige entrega de origem.
+                  {" "}A seleção contém até 100 ENT recentes com aceite na custódia
+                  de origem ({reference!.originTotal} no total). O vínculo
+                  documenta a origem conhecida; não identifica lotes ou presume
+                  disponibilidade dessas unidades.
+                </p>
                 {!isReturn ? (
                   <HouseholdListSelection ref={householdSelectionRef}
                     key={context.userId + ":" + patientId}
@@ -1105,68 +1187,8 @@ function TransferDeclarationEditor({
                 )}
                 </> : null}
                 {step === 3 ? <>
-                <h3>Observações</h3>
-                <FormField label="ENT documental de origem, quando conhecida">
-                  <SelectField
-                    value={originId}
-                    onChange={(controlEvent) => {
-                      const controlValue = controlEvent.currentTarget.value;
-                      return setOriginId(controlValue);
-                    }}
-                  >
-                    <option value="">Sem vínculo documental de origem</option>
-                    {originId &&
-                    !reference!.origins.some(
-                      (origin) =>
-                        origin.id === originId &&
-                        lines.every((line) =>
-                          origin.productIds.includes(line.productId),
-                        ),
-                    ) ? (
-                      <option value={originId} disabled>
-                        {currentContent.fields.originLabel ||
-                          "Vínculo preservado"}{" "}
-                        · indisponível para estes materiais
-                      </option>
-                    ) : null}
-                    {reference!.origins
-                      .filter(
-                        (origin) =>
-                          lines.length &&
-                          lines.every((line) =>
-                            origin.productIds.includes(line.productId),
-                          ),
-                      )
-                      .map((origin) => (
-                        <option key={origin.id} value={origin.id}>
-                          {origin.code} · {formatBrazilDate(origin.createdAt)}
-                        </option>
-                      ))}
-                  </SelectField>
-                </FormField>
-                <p className="text-sm">
-                  O vínculo é opcional: uma devolução não exige entrega de origem.
-                  {" "}A seleção contém até 100 ENT recentes com aceite na custódia
-                  de origem ({reference!.originTotal} no total). O vínculo
-                  documenta a origem conhecida; não identifica lotes ou presume
-                  disponibilidade dessas unidades.
-                </p>
-                <FormField
-                  label={`Sua justificativa para a ${processName}`}
-                  required
-                >
-                  <TextAreaField
-                    ref={reasonFieldRef}
-                    required
-                    minLength={3}
-                    maxLength={1000}
-                    value={reason}
-                    onChange={(controlEvent) => {
-                      const controlValue = controlEvent.currentTarget.value;
-                      return setReason(controlValue);
-                    }}
-                  />
-                </FormField>
+                <h3 ref={observationsHeadingRef} tabIndex={-1}>Observações</h3>
+                <IssuanceObservationsEditor observations={observations} onChange={setObservations} errors={observationErrors} />
                 </> : null}
                 <div className="hca-transfer-wizard-footer">
                 {step > 0 ? <ActionButton onClick={() => { setError(""); setStep(step - 1); }}>Voltar</ActionButton> : null}
@@ -1223,9 +1245,12 @@ function TransferDeclarationEditor({
                 )?.code ?? "Sem vínculo informado"}
                 .
               </p>
-              <p className="whitespace-pre-wrap">
-                Sua justificativa: {packet.declaration.reason}
-              </p>
+              {packet.declaration.reason ? <p className="whitespace-pre-wrap">
+                {packet.declaration.observations ? "Justificativa da escolha do recebedor" : "Sua justificativa"}: {packet.declaration.reason}
+              </p> : null}
+              <section className="hca-document-summary"><h3>Observações</h3>
+                <IssuanceObservationList observations={packet.declaration.observations ?? []} />
+              </section>
               <Notice>
                 A expedição debita o saldo da origem e coloca os materiais em trânsito.
                 O destino recebe o saldo após a conferência pessoal.
@@ -1242,7 +1267,7 @@ function TransferDeclarationEditor({
                       issuanceFailure.clear();
                       setPacket(null);
                       requestAnimationFrame(() =>
-                        reasonFieldRef.current?.focus(),
+                        (reasonFieldRef.current ?? observationsHeadingRef.current)?.focus(),
                       );
                     }}
                   >

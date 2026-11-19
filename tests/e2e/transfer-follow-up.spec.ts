@@ -61,6 +61,9 @@ async function declareInUi(page: Page, f: Fixture, source: Custody, info: TestIn
   const drawer = page.getByRole("region", { name: `Nova ${label}`, exact: true });
   await expect(drawer.getByRole("combobox", { name: /^Contraparte para concordância/ })).toHaveCount(0);
   await drawer.getByRole("combobox", { name: /^Recebedor físico designado/ }).selectOption(source === "CARE_TEAM" ? f.recipient.id : f.initiator.id);
+  const manualSelection = drawer.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
+  if (await manualSelection.isVisible()) await manualSelection.fill("Pessoa indicada está disponível para conferir os materiais.");
+  await expect(drawer.getByRole("combobox", { name: /^ENT documental de origem/ })).toHaveValue("");
   await drawer.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   const material = drawer.getByRole("combobox", { name: /^Adicionar material da origem/ });
   await material.click(); await material.fill("Material fictício V4 0"); await material.press("ArrowDown");
@@ -81,8 +84,8 @@ async function declareInUi(page: Page, f: Fixture, source: Custody, info: TestIn
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
   await expect(drawer.getByRole("heading", { name: "Itens extras", exact: true })).toBeVisible();
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
-  await expect(drawer.getByRole("combobox", { name: /^ENT documental de origem/ })).toHaveValue("");
-  await drawer.getByRole("textbox", { name: /^Sua justificativa para a (entrega|devolução) de materiais/ }).fill("Processo autônomo fictício sem entrega de origem vinculada");
+  await drawer.getByRole("button", { name: "Adicionar observação", exact: true }).click();
+  await drawer.getByLabel("Observação 1", { exact: true }).fill("Processo autônomo fictício sem entrega de origem vinculada");
   await drawer.getByRole("button", { name: "Revisar ficha", exact: true }).click();
   await expect(drawer.getByRole("heading", { name: /Revise antes de expedir/ })).toBeVisible();
   const ship = drawer.getByRole("button", { name: `Expedir ${label}`, exact: true });
