@@ -609,6 +609,26 @@ está preservada. Contagens, recebimento, devoluções, consumo, estoque e
 exemplares anteriores permanecem registrados. A geração de um novo exemplar
 da ficha inclui os fatos de acompanhamento congelados na versão solicitada.
 
+## PDF inicial da ficha
+
+A emissão oficial de REQ, COM, ENT, DEV ou BAL registra uma solicitação
+única de PDF inicial. A REQ usa a versão que contém a ciência tácita
+aplicável durante a emissão. Uma ciência posterior conserva seu próprio
+registro e pertence a uma versão posterior. O sistema mantém a autoria
+original da ficha e aparece como solicitante do PDF inicial.
+
+O processamento de avisos e o PDF têm resultados próprios. O worker
+processa os avisos e assina os exemplares pendentes no pipeline existente.
+Fila e processamento têm estados próprios. A disponibilidade do arquivo
+depende da assinatura, da validação e da confirmação de armazenamento.
+
+`GET /api/documents/:id/issuances/initial` consulta o estado da solicitação
+com permissão atual de leitura da ficha. `POST` recupera a mesma solicitação.
+O endpoint de recuperação pode responder `202` enquanto o exemplar é
+processado. A recuperação preserva o identificador da emissão e os efeitos
+operacionais da ficha. A leitura por `issuance` usa o mesmo contrato dos
+demais PDFs assinados.
+
 ## ENT e DEV — cancelamento físico e decisão do recebedor
 
 Com a expedição em trânsito e sem conferência pessoal, `cancel` exige

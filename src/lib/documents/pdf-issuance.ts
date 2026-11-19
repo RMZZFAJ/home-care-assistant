@@ -82,6 +82,16 @@ export const pdfIssuanceSchema = z
       ctx.addIssue({ code: "custom", message: "Incomplete ready issuance" });
   });
 export type PdfIssuance = z.infer<typeof pdfIssuanceSchema>;
+export const initialPdfStatusSchema = z.object({
+  id: z.uuid(),
+  documentId: z.uuid(),
+  version: z.number().int().positive(),
+  state: pdfIssuanceSchema.shape.state,
+  issuanceId: z.uuid().nullable(),
+  lastError: pdfIssuanceSchema.shape.lastError,
+}).nullable();
+export type InitialPdfStatus = z.infer<typeof initialPdfStatusSchema>;
+
 export const pdfIssuancePageSchema = z.object({
   data: z.array(pdfIssuanceSchema),
   next: z

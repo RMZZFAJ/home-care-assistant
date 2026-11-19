@@ -346,6 +346,8 @@
 .hca-l1 .doc-section-heading h2{margin:0;font-size:19px;line-height:1.3;font-weight:670;letter-spacing:-.4px}
 .hca-l1 .doc-section-heading p{margin:7px 0 0;font-size:13px;color:var(--muted);line-height:1.5}
 .hca-l1 .doc-heading-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.hca-l1 .hca-initial-pdf{display:flex;align-items:center;flex-wrap:wrap;gap:9px 13px;padding:14px 16px}
+.hca-l1 .hca-initial-pdf > :is(p,[role="alert"]){flex-basis:100%;margin:0}
 .hca-l1 .doc-table-card{overflow:hidden}
 .hca-l1 .doc-table-wrap{overflow-x:auto;max-width:100%;min-width:0}
 .hca-l1 .doc-material-table{border-collapse:collapse;border-spacing:0;width:100%;text-align:left}
@@ -434,6 +436,8 @@
   .hca-l1 .doc-section-heading h2{font-size:18px}
   .hca-l1 .doc-section-heading p{font-size:12.5px}
   .hca-l1 .doc-heading-actions{gap:6px}
+  .hca-l1 .hca-document-files .doc-section-heading > div:first-child{flex-basis:100%}
+  .hca-l1 .hca-document-files .doc-heading-actions{justify-content:flex-start}
   .hca-l1 .doc-material-table,.hca-l1 .doc-material-table tbody{display:block;width:100%}
   .hca-l1 .doc-material-table thead{display:none}
   .hca-l1 .doc-material-table tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 18px;padding:17px;border-bottom:1px solid #e6ece7}

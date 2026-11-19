@@ -1,5 +1,23 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — PDF inicial automático de REQ, COM, ENT, DEV e BAL.** O evento
+oficial cria uma solicitação única. Na REQ, o corte incorpora a ciência
+tácita aplicável na emissão. O processamento usa a assinatura e a
+validação existentes. A ficha conserva sua autoria e o PDF identifica
+o sistema como solicitante. A aba de arquivos mostra a situação real e
+recupera o exemplar pela mesma referência se a resposta se perder.
+
+| Caso | Evidência local | Pendência |
+| --- | --- | --- |
+| Solicitação e autoria | Três integrações dirigidas cobrem os cinco tipos, o corte da ciência, a revogação e a recuperação | Preview com a migration e o worker compatíveis |
+| Assinatura e recuperação | Pipeline PAdES-B-T, armazenamento e download em navegador móvel emulado | Modal completo de resultado da emissão da v7 |
+| Agendamento | O worker processa PDFs mesmo com falha no agendador e preserva a indicação de falha | PDF consolidado, arquivo e confirmação |
+
+Passaram 14 regressões de integração do pipeline e da ciência e 17
+testes unitários dirigidos. A stack local tem 287 migrations até
+`20261119103125`. As 15 migrations pendentes no desenvolvimento remoto
+passaram pela pré-validação com rollback. O remoto segue com 272 versões.
+
 **19/11 — revisão e reabertura do acompanhamento.** REQ, COM, ENT e DEV
 passam pela revisão das pendências da ficha. O administrador do paciente
 pode reabrir uma conclusão ou um cancelamento com justificativa vinculada à

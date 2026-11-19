@@ -5,6 +5,8 @@ import { secretMatches } from "@/lib/notifications/webhook";
 import { processNotifications } from "@/lib/notifications/worker";
 import { processWebPush } from "@/lib/server/web-push";
 import { observeHeartbeat } from "@/lib/server/operations-observer";
+import { processInitialDocumentPdfs } from "@/lib/server/pdf-issuance";
+import { configuredAppOrigin } from "@/lib/server/app-origin";
 
 export const maxDuration = 120;
 export async function POST(request: Request) {
@@ -19,14 +21,18 @@ export async function POST(request: Request) {
     )
       throw new ApiError("FORBIDDEN", "Processamento não autorizado.", 403);
     const client = createWorkerClient();
-    const schedule = await rpc(client, "run_operational_schedule");
-    const data = await processNotifications(client);
-    const webPush = await processWebPush(client);
+    const [schedule] = await Promise.allSettled([rpc(client, "run_operational_schedule")]);
+    const [notifications, push] = await Promise.allSettled([processNotifications(client), processWebPush(client)]);
+    const initialPdfs = await processInitialDocumentPdfs(client, configuredAppOrigin());
+    if (schedule.status === "rejected") throw schedule.reason;
+    if (notifications.status === "rejected") throw notifications.reason;
+    if (push.status === "rejected") throw push.reason;
     const operationsObservation = await observeHeartbeat(client, "worker");
     return NextResponse.json({
-      data,
-      webPush,
-      schedule,
+      data: notifications.value,
+      webPush: push.value,
+      initialPdfs,
+      schedule: schedule.value,
       operationsObservation,
     });
   });

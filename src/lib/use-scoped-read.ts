@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api, ApiError } from "@/lib/client/api";
 
 /** Independent reads retain only an authorized result of the same scope. */
 export function useScopedRead<T>(url: string | null, revision = "", decode?: (value: unknown) => T) {
   const [attempt, setAttempt] = useState(0);
+  const refresh = useCallback(() => setAttempt(value => value + 1), []);
   const key = JSON.stringify([url, revision, attempt]);
   const [result, setResult] = useState<{
     key: string;
@@ -53,6 +54,6 @@ export function useScopedRead<T>(url: string | null, revision = "", decode?: (va
     queriedAt: sameScope ? result.queriedAt : null,
     error: sameScope ? result.error : "",
     loading: url !== null && result?.key !== key,
-    refresh: () => setAttempt((value) => value + 1),
+    refresh,
   };
 }

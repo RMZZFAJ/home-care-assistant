@@ -12,6 +12,7 @@ import { DocumentActionSlot } from "./document-action-slot";
 import { Icon } from "@/components/ui/primitives";
 import { api, ApiError, TransportError } from "@/lib/client/api";
 import {
+  initialPdfStatusSchema,
   pdfIssuanceSchema,
   type PdfIssuance,
 } from "@/lib/documents/pdf-issuance";
@@ -21,6 +22,7 @@ import {
   type PdfArchiveCursor,
 } from "@/lib/documents/pdf-archive";
 import { formatBrazilDate } from "@/lib/receipt";
+import { useScopedRead } from "@/lib/use-scoped-read";
 import {
   initialNoticeMessage,
   startInitialNoticeTracking,
@@ -38,6 +40,7 @@ type Props = {
   generationBlocked?: boolean;
 };
 const intentionSchema = z.object({ key: z.uuid(), version: z.number().int().positive().max(2147483647).optional(), documentOptions: pdfDocumentOptionsSchema.optional() }).strict();
+const parseInitialPdf = (raw: unknown) => initialPdfStatusSchema.parse(raw);
 type Intention = z.infer<typeof intentionSchema>;
 const steps = {
   reserved: "Solicitação registrada",
@@ -100,6 +103,12 @@ function GeneratedFiles({
   const headingId = useId(),
     scope = `hca:pdf-intention:${userId}:${id}`,
     endpoint = `/api/documents/${id}/issuances`;
+  const initialEndpoint = `${endpoint}/initial`;
+  const initial = useScopedRead(archiveVersion ? null : initialEndpoint, userId, parseInitialPdf);
+  const refreshInitial = initial.refresh;
+  const initialProcessing = initial.data?.state === "reserved" || initial.data?.state === "processing";
+  const [initialBusy, setInitialBusy] = useState(false);
+  const [initialError, setInitialError] = useState("");
   const [rows, setRows] = useState<PdfArchiveEntry[]>([]),
     [next, setNext] = useState<PdfArchiveCursor | null>(null),
     [loading, setLoading] = useState(true),
@@ -110,7 +119,7 @@ function GeneratedFiles({
     [pending, setPending] = useState<Intention | null>(null);
   const [optionsOpen, setOptionsOpen] = useState(false), [integrityError, setIntegrityError] = useState(false);
   const [activityStage, setActivityStage] = useState(0);
-  useOperationActivity(busy, { title: "Emissão de PDF", detail: "Estamos conferindo a mesma solicitação. Aguarde a confirmação do exemplar.", stage: activityStage, steps: [{ label: "Preparando a emissão", icon: "file" }, { label: "Gerando e assinando o exemplar", icon: "shield" }, { label: "Conferindo o arquivo registrado", icon: "check" }] });
+  useOperationActivity(busy || initialBusy, { title: initialBusy ? "Recuperando o PDF inicial" : "Emissão de PDF", detail: "Estamos conferindo a mesma solicitação. Aguarde a confirmação do exemplar.", stage: activityStage, steps: [{ label: "Preparando a emissão", icon: "file" }, { label: "Gerando e assinando o exemplar", icon: "shield" }, { label: "Conferindo o arquivo registrado", icon: "check" }] });
   const busyRef = useRef(false),
     sequenceRef = useRef(0);
   const invalidate = useCallback(() => {
@@ -200,6 +209,36 @@ function GeneratedFiles({
       clearTimeout(deadline);
     };
   }, [busy, pending, load]);
+  useEffect(() => {
+    if (!initialProcessing) return;
+    const timer = window.setInterval(refreshInitial, 4000);
+    const deadline = window.setTimeout(() => window.clearInterval(timer), 60_000);
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(deadline);
+    };
+  }, [initialProcessing, refreshInitial]);
+
+  async function retryInitial() {
+    if (busyRef.current || !initial.data?.id) return;
+    busyRef.current = true;
+    setInitialBusy(true);
+    setActivityStage(1);
+    setInitialError("");
+    try {
+      const result = parseInitialPdf(await api<unknown>(initialEndpoint, {}));
+      if (result?.documentId !== id || result.id !== initial.data.id)
+        throw new Error("A resposta não confirmou o PDF inicial desta ficha.");
+      setActivityStage(2);
+    } catch {
+      setInitialError("A ficha foi registrada. Ainda não foi possível confirmar o PDF inicial. Tente recuperar o mesmo exemplar.");
+    } finally {
+      refreshInitial();
+      void load();
+      setInitialBusy(false);
+      busyRef.current = false;
+    }
+  }
   async function generate(documentOptions?: DocumentOptions) {
     if (busyRef.current || integrityError || generationBlocked && !pending) return;
     busyRef.current = true;
@@ -303,13 +342,13 @@ function GeneratedFiles({
   });
   const verification = visibleRows.find(entry => entry.issuance.state === "ready")?.issuance;
   return (
-    <section aria-labelledby={headingId} className="doc-area print:hidden">
+    <section aria-labelledby={headingId} className="doc-area hca-document-files print:hidden">
       <header className="doc-section-heading"><div><h2 id={headingId}>Arquivos gerados</h2><p>Exemplares emitidos a partir desta ficha.</p></div><div className="doc-heading-actions">
         <DocumentActionSlot target={actionTarget}>
           <button
             className={buttonClass}
             type="button"
-            disabled={busy || integrityError || generationBlocked && !pending}
+            disabled={busy || initialBusy || integrityError || generationBlocked && !pending}
             onClick={() => {
               onAction?.();
               void generate();
@@ -327,20 +366,33 @@ function GeneratedFiles({
           className={buttonClass}
           type="button"
           disabled={loading}
-          onClick={() => void load()}
+          onClick={() => { refreshInitial(); void load(); }}
         >
           Atualizar arquivos
         </button>
-        <button className={buttonClass} type="button" disabled={busy || Boolean(pending) || integrityError || generationBlocked} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button>
+        <button className={buttonClass} type="button" disabled={busy || initialBusy || Boolean(pending) || integrityError || generationBlocked} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button>
       </div></header>
       {generationBlocked ? <p role="status">Atualize a ficha para gerar um novo PDF. Os exemplares já emitidos continuam disponíveis.</p> : null}
+      {initial.data ? <div className="doc-card hca-initial-pdf">
+        <strong>PDF inicial</strong>
+        {initial.data.state === "ready" && initial.data.issuanceId ? <a className={buttonClass}
+          href={`/api/documents/${id}/pdf?issuance=${initial.data.issuanceId}`} download>
+          <Icon name="download" />Baixar PDF inicial
+        </a> : <>
+          {initialError ? <Notice error>{initialError}</Notice> : <p role="status">{initial.data.state === "uncertain"
+            ? "O PDF inicial ainda não foi confirmado. A ficha já está registrada."
+            : "A ficha está emitida. O PDF inicial ficará disponível após a assinatura e a conferência."}</p>}
+          {!generationBlocked && <button className={buttonClass} type="button" disabled={busy || initialBusy}
+            onClick={() => void retryInitial()}>Recuperar PDF inicial</button>}
+        </>}
+      </div> : null}
       <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={optionsOpen} onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} onGenerate={value => { setOptionsOpen(false); onAction?.(); void generate(value); }} />
       {message ? <p role="status">{message}</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {readError ? <Notice error>{readError}</Notice> : null}
       {loading ? (
         <p role="status">Consultando arquivos…</p>
-      ) : !visibleRows.length ? (
+      ) : !visibleRows.length && !initial.data ? (
         <p>
           Nenhum arquivo registrado nesta consulta. Use Gerar PDF para uma nova
           emissão explícita.
