@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useId, useState } from "react";
 import { ActionButton, FormField, TextInput } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
@@ -21,6 +21,7 @@ export function SupplySourcePicker({ patientId, target, current, product, onClos
   onClose: () => void;
   onApply: (selection: SupplySourceSelection[]) => void;
 }) {
+  const importGroupId = useId();
   const [filter, setFilter] = useState<(typeof supplySourceFilter.options)[number]>("");
   const [search, setSearch] = useState("");
   const [term, setTerm] = useState("");
@@ -71,8 +72,8 @@ export function SupplySourcePicker({ patientId, target, current, product, onClos
                   <small>{documentStatuses[option.status] ?? option.status} · {formatBrazilDate(option.createdAt)}</small>
                 </div>
               </div>
-              {chosen && !product ? <label className="hca-source-import">
-                <input type="checkbox" checked={chosen.importMaterials} disabled={!count} onChange={(event) => {
+              {chosen && !product ? <label className="hca-source-import" htmlFor={`${importGroupId}-${option.id}`}>
+                <input id={`${importGroupId}-${option.id}`} type="checkbox" checked={chosen.importMaterials} disabled={!count} onChange={(event) => {
                   const importMaterials = event.target.checked;
                   setSelected((list) => list.map((row) => row.option.id === option.id
                     ? { option, importMaterials } : row));

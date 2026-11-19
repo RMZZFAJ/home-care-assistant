@@ -9,6 +9,7 @@ import { governanceComparison, governanceFilterLabels, governanceKindLabels, gov
 import { formatBrazilDate } from "@/lib/receipt";
 import { parseGovernanceListRead } from "@/lib/validation/governance-list";
 import { useScopedRead } from "@/lib/use-scoped-read";
+import { TableFrame } from "@/components/ui/table-frame";
 
 export function GovernanceProposals({ context, directory, version, revision, busy, configure, reissue }: {
   context: WorkspaceContext; version: number; revision: number; busy: boolean;
@@ -65,9 +66,9 @@ export function GovernanceProposals({ context, directory, version, revision, bus
           <p>Versão de origem: {change.base_version}. Configuração vigente: {version}.</p>
           {change.base_version !== version && change.status === "pending" ? <Notice error>A configuração mudou após esta proposta. Preserve a proposta original e prepare outra após revisar a configuração vigente.</Notice> : null}
           <details><summary className="cursor-pointer font-semibold">Comparar configuração vigente e proposta</summary>
-            <div className="hca-matrix-scroll mt-3" role="region" tabIndex={0} aria-label={"Comparação da proposta " + change.id.slice(0, 8)}>
+            <TableFrame className="hca-matrix-scroll mt-3" label={"Comparação da proposta " + change.id.slice(0, 8)}>
               <DataTable className="hca-table" aria-label="Configuração vigente e proposta"><DataTableHead><DataTableRow><DataTableHeading>Campo</DataTableHeading><DataTableHeading>Vigente agora</DataTableHeading><DataTableHeading>Proposta registrada</DataTableHeading></DataTableRow></DataTableHead><DataTableBody>{comparison.rows.map(row => <DataTableRow key={row.key}><DataTableCell>{row.label}</DataTableCell><DataTableCell><span className="whitespace-pre-wrap wrap-break-word">{row.current}</span></DataTableCell><DataTableCell><span className="whitespace-pre-wrap wrap-break-word">{row.proposed}</span></DataTableCell></DataTableRow>)}</DataTableBody></DataTable>
-            </div>
+            </TableFrame>
           </details>
           {!comparison.supported ? <Notice error>Esta proposta contém um tipo ou campo que esta versão não reconhece. Consulte a origem antes de aprovar.</Notice> : null}
           {change.status === "awaiting_acceptance" ? <div><p>O vínculo depende do aceite do destinatário.</p>{local && change.resolution?.invitationId ? <ActionButton disabled={busy || !fresh} onClick={() => void reissue(change.resolution!.invitationId!)}>Reemitir convite e invalidar link anterior</ActionButton> : null}</div> : null}

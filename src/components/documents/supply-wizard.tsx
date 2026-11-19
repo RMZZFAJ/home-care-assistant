@@ -230,7 +230,8 @@ export function PatientSupplyWizard({
   const patientId = context.patient!.id;
   const linkedTarget = type === "BAL" ? null : type;
   const routedSourceId = linkedTarget ? requisitionId ?? purchaseId : null;
-  const sourceIds = sourceSetup.sources.map((row) => row.documentId).sort().join(",");
+  const sourceIds = sourceSetup.sources.map((row) => row.documentId)
+    .sort((first, second) => first.localeCompare(second, "en")).join(",");
   const readSources = useCallback((value: unknown) => {
     if (!linkedTarget) throw new Error("Esta ficha não admite vínculos de emissão.");
     return parseSupplySources(value, patientId, linkedTarget, 1);

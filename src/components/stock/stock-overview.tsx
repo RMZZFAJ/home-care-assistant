@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/controls";
 import { useRef, useState } from "react";
 import { EmptyState } from "@/components/ui/primitives";
+import { TableFrame } from "@/components/ui/table-frame";
 import {
   stockBalanceRows,
   stockBalanceSituation,
@@ -85,11 +86,9 @@ export function StockOverview({
           : ""}
       </p>
       {rows.length ? (
-        <div
+        <TableFrame
           className="hca-stock-table-wrap"
-          role="region"
-          aria-label="Tabela de saldos; role horizontalmente quando necessário"
-          tabIndex={0}
+          label="Tabela de saldos; role horizontalmente quando necessário"
         >
           <DataTable
             className="hca-stock-table hca-mobile-records"
@@ -203,7 +202,7 @@ export function StockOverview({
               })}
             </DataTableBody>
           </DataTable>
-        </div>
+        </TableFrame>
       ) : showEmpty ? (
         <EmptyState title="Nenhum produto encontrado">
           Ajuste a busca, a custódia ou o filtro de saldo. Quantidades em

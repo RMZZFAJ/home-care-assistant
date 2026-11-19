@@ -89,6 +89,7 @@ export function CatalogStep({
   errors: Record<string, string>;
   selectedCount: number;
 }) {
+  const materialGroupId = useId();
   const [search, setSearch] = useState("");
   const [duplicate, setDuplicate] = useState<Product | null>(null);
   const [repeatReason, setRepeatReason] = useState("");
@@ -194,8 +195,9 @@ export function CatalogStep({
             selected={Boolean(line)}
             className="ui-product-choice"
           >
-            <label className="hca-material-choice-heading">
+            <label className="hca-material-choice-heading" htmlFor={`${materialGroupId}-${item.id}`}>
               <input
+                id={`${materialGroupId}-${item.id}`}
                 type="checkbox"
                 checked={Boolean(line)}
                 onChange={() => {

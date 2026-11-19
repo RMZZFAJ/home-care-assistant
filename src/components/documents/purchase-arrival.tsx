@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
 import { ActionButton, SelectField, TextInput } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
@@ -51,6 +51,8 @@ export function PurchaseArrivalResult({ receipt, lines, onClose }: {
 export function PurchaseArrivalFields({ data, lines, fields, directCredit, mayReadStock }: {
   data: SupplyDocument; lines: SupplyLine[]; fields?: Record<string, string>; directCredit: boolean; mayReadStock: boolean;
 }) {
+  const quantityGroupId = useId();
+  const quantityLabel = "Recebidos agora";
   const [values, setValues] = useState<Record<string, ArrivalField>>(() => Object.fromEntries(lines.map(line => [line.id, {
     selected: fields ? fields[line.id + ":selected"] === "on" : lines.length === 1,
     value: fields?.[line.id] ?? "",
@@ -140,7 +142,7 @@ export function PurchaseArrivalFields({ data, lines, fields, directCredit, mayRe
       const confirmed = mayReadStock ? stock?.find(row => row.productId === line.product_id)?.family?.confirmed : undefined;
       const short = physical && physical.lt(expected);
       const excess = physical && physical.gt(expected);
-      const label = line.name_snapshot + " · " + line.unit_snapshot;
+      const quantityId = `${quantityGroupId}-${line.id}`;
       return <article key={line.id} className="hca-purchase-line">
         <div className="hca-purchase-line-heading">
           <div><h3>{line.name_snapshot}</h3><p>Aguardando {formatQuantity(expected.toFixed(), line.unit_snapshot)}</p></div>
@@ -153,13 +155,14 @@ export function PurchaseArrivalFields({ data, lines, fields, directCredit, mayRe
             onClick={() => setDetailsId(line.id)}><Icon name="more" /></ActionButton>
         </div>
         {field.selected ? <>
-          <label className="hca-purchase-field"><span>Recebidos agora</span>
+          <div className="hca-purchase-field"><label htmlFor={quantityId}>{quantityLabel}</label>
             <span className="hca-purchase-quantity">
-              <TextInput name={line.id} aria-label={label} inputMode="decimal" maxLength={64} required
+              <TextInput id={quantityId} name={line.id} inputMode="decimal" maxLength={64} required
+                aria-label={`${quantityLabel} · ${line.name_snapshot} · ${line.unit_snapshot}`}
                 value={field.value} onChange={event => update(line.id, { value: event.currentTarget.value, excess: false })} />
               <span aria-hidden="true">{line.unit_snapshot}</span>
             </span>
-          </label>
+          </div>
           {short ? <label className="hca-purchase-field hca-arrival-attention">
             <span>Restam {formatQuantity(expected.minus(physical).toFixed(), line.unit_snapshot)}</span>
             <SelectField name={line.id + ":remainingAction"} aria-label={"Destino da falta · " + line.name_snapshot}

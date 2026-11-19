@@ -76,6 +76,10 @@ test("15 ADM02 ADM03 patient resources and policy follow the model without chang
     await auditFromTop(page, "administration permissions empty320");
     await page.getByRole("searchbox", { name: "Pesquisar permissões", exact: true }).fill("");
     await expect(page.getByRole("table", { name: "Permissões efetivas", exact: true }).getByRole("row")).not.toHaveCount(1);
+    const permissionsScroll = page.getByRole("region", { name: /^Tabela de permissões/ });
+    await expect(permissionsScroll).toHaveAttribute("tabindex", "0");
+    await permissionsScroll.press("ArrowRight");
+    await expect.poll(() => permissionsScroll.evaluate(node => node.scrollLeft)).toBeGreaterThan(0);
     expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await page.screenshot({ path: `output/playwright/phase-d/administration-permissions-${info.project.name}.png` });

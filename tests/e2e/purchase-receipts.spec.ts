@@ -106,7 +106,9 @@ test("COM chegada combina código e preenchimento manual e exige confirmação d
   await reader.getByRole("button", { name: "Usar quantidade", exact: true }).click();
   await expect(arrival.locator(`input[name="${scanned.id}"]`)).toHaveValue("8");
   await arrival.getByRole("switch", { name: "Chegou · " + manual.name_snapshot, exact: true }).click();
-  await arrival.locator(`input[name="${manual.id}"]`).fill("4");
+  await arrival.getByRole("textbox", {
+    name: `Recebidos agora · ${manual.name_snapshot} · ${manual.unit_snapshot}`, exact: true,
+  }).fill("4");
   await expect(arrival.getByText("Restam 2 unidade", { exact: true })).toBeVisible();
   const scannedCard = arrival.locator("article").filter({ has: page.getByRole("heading", { name: scanned.name_snapshot, exact: true }) });
   await scannedCard.getByText("Estoque familiar", { exact: true }).click();

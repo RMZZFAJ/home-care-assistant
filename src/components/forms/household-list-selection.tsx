@@ -200,8 +200,8 @@ export function HouseholdListSelection({
         {loading ? <p role="status">Consultando listas da casa…</p> : null}
         {readError ? <Notice error>{readError}<ActionButton onClick={refresh}>Consultar listas novamente</ActionButton></Notice> : null}
         {!loading && !readError && !rows.length ? <p>A casa ainda não tem listas frequentes.</p> : null}
-        {!loading && !readError ? rows.map(list => <label key={list.id} className="hca-household-list-option">
-          <input type="checkbox" checked={checked.includes(list.id)} disabled={disabled}
+        {!loading && !readError ? rows.map(list => <label key={list.id} className="hca-household-list-option" htmlFor={`${bodyId}-list-${list.id}`}>
+          <input id={`${bodyId}-list-${list.id}`} type="checkbox" checked={checked.includes(list.id)} disabled={disabled}
             onChange={event => {
               const included = event.currentTarget.checked;
               setChecked(previous => included ? [...previous, list.id] : previous.filter(id => id !== list.id));
@@ -263,8 +263,8 @@ export function HouseholdListSelection({
           <div aria-label="Materiais da lista" role="group" className="hca-household-list-edit">
             {activeMatches.map(product => ({ id: product.id, text: product.name, unit: product.unit }))
               .concat(hiddenEditorIds.map(id => ({ id, text: catalogue.find(product => product.id === id)?.name ?? id, unit: "Indisponível" })))
-              .map(product => <label className="hca-household-list-option" key={product.id}>
-                <input type="checkbox" checked={editor.productIds.includes(product.id)} disabled={saveDisabled}
+              .map(product => <label className="hca-household-list-option" key={product.id} htmlFor={`${bodyId}-material-${product.id}`}>
+                <input id={`${bodyId}-material-${product.id}`} type="checkbox" checked={editor.productIds.includes(product.id)} disabled={saveDisabled}
                   onChange={event => {
                     const included = event.currentTarget.checked;
                     setEditor(current => current && { ...current, productIds: included

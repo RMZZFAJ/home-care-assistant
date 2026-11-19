@@ -1,8 +1,9 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, resolve } from "node:path";
+import { delimiter, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { trustedExecutable } from "./trusted-executable.mjs";
 
 export const projectRef = "qwfrqychokvhdzakibid";
 const workspace = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -19,10 +20,19 @@ function environment() {
   delete env.SUPABASE_PROFILE;
   delete env.SUPABASE_WORKDIR;
   delete env.SUPABASE_NO_KEYRING;
+  for (const name of Object.keys(env)) {
+    if (name.toUpperCase() === "PATH") delete env[name];
+  }
+  // Keep OS tools and Docker's credential helper available without the caller's search path.
+  env.PATH = (process.platform === "win32"
+    ? ["C:\\Windows\\System32", "C:\\Program Files\\Docker\\Docker\\resources\\bin"]
+    : ["/usr/bin", "/bin", "/usr/local/bin"]
+  ).join(delimiter);
   return env;
 }
 function execute(args, capture = true) {
-  const result = spawnSync("supabase", [...args,"--profile",profile,"--workdir",workspace], {env:environment(),encoding:"utf8",stdio:capture?["ignore","pipe","pipe"]:"inherit"});
+  const env = environment();
+  const result = spawnSync(trustedExecutable("supabase"), [...args,"--profile",profile,"--workdir",workspace], {env,encoding:"utf8",stdio:capture?["ignore","pipe","pipe"]:"inherit"});
   if (result.error || result.status !== 0) throw new Error(capture ? result.stderr?.trim() || "Supabase command failed." : "Supabase command failed.");
   return result.stdout;
 }

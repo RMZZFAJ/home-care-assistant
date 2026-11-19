@@ -24,6 +24,7 @@ type CorrectionEditor = { receiptId: string; version: number; };
 function ArrivalCorrectionQuantity({ document, receipt, item, line }: {
   document: SupplyDocument; receipt: PurchaseReceipt; item: PurchaseReceiptLine; line: SupplyLine;
 }) {
+  const quantityId = useId();
   const [value, setValue] = useState(item.quantity);
   const [confirmedAgainst, setConfirmedAgainst] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -41,14 +42,14 @@ function ArrivalCorrectionQuantity({ document, receipt, item, line }: {
       <p className="hca-arrival-attention hca-purchase-status"><Icon name="clock" />Correção solicitada por {latest.requesterName ?? "quem conferiu a chegada"}</p>
       <p className="whitespace-pre-wrap">{latest.reason}</p>
     </> : null}
-    <label className="hca-purchase-field"><span>Quantidade corrigida</span>
+    <div className="hca-purchase-field"><label htmlFor={quantityId}>Quantidade corrigida</label>
       <span className="hca-purchase-quantity">
-        <TextInput name={line.id} required inputMode="decimal" maxLength={64} value={value}
+        <TextInput id={quantityId} name={line.id} required inputMode="decimal" maxLength={64} value={value}
           aria-label={"Quantidade corrigida · " + line.name_snapshot}
           onChange={event => { setValue(event.currentTarget.value); setConfirmedAgainst(null); }} />
         <span aria-hidden="true">{line.unit_snapshot}</span>
       </span>
-    </label>
+    </div>
     {physical?.lt(expected) ? <FormField label={"Destino da falta · " + line.name_snapshot}
       helpText={"Restam " + formatQuantity(expected.minus(physical).toFixed(), line.unit_snapshot)}>
       <SelectField name={line.id + ":remainingAction"} defaultValue={item.remainingAction ?? "wait"}>
