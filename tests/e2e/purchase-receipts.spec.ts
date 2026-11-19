@@ -1,3 +1,5 @@
+import { expectNoOperationalDocumentAction } from "./document-sections";
+import { openOperationalDocumentAction } from "./document-sections";
 import { confirmDecisionAndReconcile } from "./l1-decision-policy";
 import { selectDocumentSection, openDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
@@ -28,7 +30,7 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
   const initialReceipt = document.receipts[0], initialStock = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   await login(page, f.patient, "family"); await page.goto("/fichas/" + document.id);
   await selectDocumentSection(page, "workflow");
-  await page.getByRole("button", { name: /^(Confirmar recebimento|Informar nova chegada)$/ }).click();
+  await openOperationalDocumentAction(page, "Registrar chegada");
   const field = page.locator(`input[name="${lineId}"]`);
   await expect(field).toHaveValue("");
   await field.fill("1");
@@ -93,7 +95,7 @@ test("COM chegada combina código e preenchimento manual e exige confirmação d
   });
   await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
   await selectDocumentSection(page, "workflow");
-  await page.getByRole("button", { name: "Informar nova chegada", exact: true }).click();
+  await openOperationalDocumentAction(page, "Registrar chegada");
   const arrival = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
   await arrival.getByRole("button", { name: "Ler código", exact: true }).click();
   const reader = page.getByRole("dialog", { name: "Ler código", exact: true });
@@ -152,7 +154,7 @@ test("COM registra a falta sem anunciar entrada quando nenhuma unidade chega", a
   await expect(approved.result.getByText("Chegada aprovada sem movimentação de estoque", { exact: true })).toBeVisible();
   await approved.result.getByRole("button", { name: "Concluir", exact: true }).click();
 
-  await page.getByRole("button", { name: "Informar nova chegada", exact: true }).click();
+  await openOperationalDocumentAction(page, "Registrar chegada");
   const arrival = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
   await arrival.locator(`input[name="${line.id}"]`).fill("0");
   await arrival.getByRole("combobox", { name: "Destino da falta · " + line.name_snapshot, exact: true }).selectOption("short");
@@ -281,7 +283,7 @@ test("COM encerra apenas expectativa não adquirida, preserva conferência da pa
   }), "o texto do estado deve caber verticalmente na cápsula a 320 px").toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.locator(".hca-document-header").screenshot({ path: `output/playwright/phase-d/purchase-pending-header-${info.project.name}.png`, animations: "disabled" });
-  await expect(page.getByRole("button", { name: "Informar nova chegada", exact: true })).toHaveCount(0);
+  await expectNoOperationalDocumentAction(page, "Registrar chegada");
   const pendingPdf = await generatedPdf(page, `/api/documents/${document.id}/pdf`); expect(pendingPdf.ok()).toBe(true);
   if (info.project.name === "chromium") { mkdirSync("output/pdf/phase-d", { recursive: true }); writeFileSync(`output/pdf/phase-d/purchase-expectation-${document.id}-v${document.version}-pending.pdf`, await pendingPdf.body(), { flag: "wx" }); }
   const arrivalReview = await openArrivalReview(page);

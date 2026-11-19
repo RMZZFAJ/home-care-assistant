@@ -1,6 +1,6 @@
 "use client";
 import { useOperationActivity } from "@/components/ui/operation-activity";
-import { useState, useRef } from "react";
+import { useImperativeHandle, useState, useRef, type Ref, type RefObject } from "react";
 import { z } from "zod";
 import { ActionButton } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
@@ -8,7 +8,8 @@ import { Notice } from "@/components/workspace";
 import { api, ApiError } from "@/lib/client/api";
 const attemptSchema = z.object({ mode: z.literal("express"), expectedVersion: z.number().int().positive(), materialIdentity: z.string().regex(/^[0-9a-f]{64}$/) }).strict();
 type Attempt = z.infer<typeof attemptSchema>;
-export function RequisitionScienceAction({ id, userId, version, materialIdentity, mayRecord, disabled, onRecorded }: { id: string; userId: string; version: number; materialIdentity: string; mayRecord: boolean; disabled: boolean; onRecorded: () => void ;}) {
+export type RequisitionScienceControl = { open: (opener: HTMLButtonElement | null) => void };
+export function RequisitionScienceAction({ id, userId, version, materialIdentity, mayRecord, disabled, onRecorded, control }: { id: string; userId: string; version: number; materialIdentity: string; mayRecord: boolean; disabled: boolean; onRecorded: () => void; control?: Ref<RequisitionScienceControl>; }) {
   const storageKey = `hca:science:${userId}:${id}`;
   const [pending, setPending] = useState<Attempt | null>(() => { try { const parsed = attemptSchema.safeParse(JSON.parse(sessionStorage.getItem(storageKey) ?? "null")); return parsed.success ? parsed.data : null; } catch { return null; } });
   const [open, setOpen] = useState(false), [busy, setBusy] = useState(false), [progress, setProgress] = useState(""), [error, setError] = useState(""), [confirmedIdentity, setConfirmedIdentity] = useState<string | null>(null);
@@ -16,6 +17,17 @@ export function RequisitionScienceAction({ id, userId, version, materialIdentity
   const [reviewing, setReviewing] = useState(false), [stage, setStage] = useState(0);
   useOperationActivity(busy, { title: "Confirmação de ciência", detail: progress || "Aguarde a confirmação do registro.", stage, steps: [{ label: "Confirmando sua leitura", icon: "user" }, { label: "Registrando sua ciência", icon: "file" }, { label: "Conferindo a resposta", icon: "check" }] });
   const busyRef = useRef(false);
+  const openerRef: RefObject<HTMLButtonElement | null> = useRef(null);
+  function openReview(opener: HTMLButtonElement | null) {
+    if (disabled || busyRef.current || !pending && !mayRecord) return;
+    openerRef.current = opener;
+    if (pending) void execute();
+    else {
+      setReviewing(true);
+      setOpen(true);
+    }
+  }
+  useImperativeHandle(control, () => ({ open: openReview }));
   function retire() { setPending(null); try { sessionStorage.removeItem(storageKey); } catch {/* The page retains the settled outcome. */ } }
   function confirmed(attempt: Attempt) { retire(); setOpen(false); setConfirmedIdentity(attempt.materialIdentity); setError(""); onRecorded(); }
   async function verify(attempt: Attempt, rejected = false) {
@@ -52,5 +64,23 @@ const result = z.object({ documentId: z.uuid(), actorId: z.uuid(), materialIdent
     } finally { busyRef.current = false; setBusy(false); }
   }
   if (!mayRecord && !pending && !error && !done) return null;
-  return <>{mayRecord || pending ? <ActionButton variant={pending ? "secondary" : "primary"} disabled={disabled || busy} onClick={() => { if (pending) void execute(); else { setReviewing(true); setOpen(true); } }}>{pending ? "Verificar ciência pendente" : "Dar ciência"}</ActionButton> : null}{done ? <span role="status" className="hca-field-help">Ciência registrada para o conteúdo confirmado.</span> : null}<Dialog open={open && !busy} title={reviewing ? "Confirmar ciência da requisição" : "Resultado da ciência"} onClose={() => setOpen(false)}><div className="hca-form-stack">{reviewing ? <><p>Li esta requisição e confirmo minha ciência.</p><Notice>Esta confirmação registra sua ciência. Não confirma recebimento de materiais nem altera o atendimento ou o estoque.</Notice><div className="hca-toolbar"><ActionButton onClick={() => setOpen(false)}>Voltar sem confirmar</ActionButton><ActionButton variant="primary" disabled={disabled || !mayRecord} onClick={() => void execute()}>Confirmar minha ciência</ActionButton></div></> : <>{progress ? <p role="status">{progress}</p> : null}{error ? <Notice error>{error}</Notice> : null}{pending ? <p>A confirmação pertence ao conteúdo que você leu. Fechar por enquanto preserva a referência desta tentativa; verificar consulta o mesmo resultado.</p> : null}<div className="hca-toolbar"><ActionButton onClick={() => setOpen(false)}>Fechar por enquanto</ActionButton>{pending ? <><ActionButton disabled={disabled} onClick={() => void execute()}>Verificar resultado</ActionButton>{mayRecord ? <ActionButton disabled={disabled} onClick={() => void execute(true)}>Confirmar a mesma ciência</ActionButton> : null}</> : null}</div></>}</div></Dialog></>;
+  return <>
+    {pending || mayRecord && !control ? <ActionButton
+      variant={pending ? "secondary" : "primary"} disabled={disabled || busy}
+      onClick={event => openReview(event.currentTarget)}
+    >{pending ? "Verificar ciência pendente" : "Dar ciência"}</ActionButton> : null}
+    {done ? <span role="status" className="hca-field-help">Ciência registrada para o conteúdo confirmado.</span> : null}
+    <Dialog open={open && !busy} title={reviewing ? "Confirmar ciência da requisição" : "Resultado da ciência"} finalFocus={openerRef} onClose={() => setOpen(false)}>
+      <div className="hca-form-stack">{reviewing ? <><p>Li esta requisição e confirmo minha ciência.</p>
+        <Notice>Esta confirmação registra sua ciência. Não confirma recebimento de materiais nem altera o atendimento ou o estoque.</Notice>
+        <div className="hca-toolbar"><ActionButton onClick={() => setOpen(false)}>Voltar sem confirmar</ActionButton><ActionButton variant="primary" disabled={disabled || !mayRecord} onClick={() => void execute()}>Confirmar minha ciência</ActionButton></div>
+      </> : <>
+        {progress ? <p role="status">{progress}</p> : null}{error ? <Notice error>{error}</Notice> : null}
+        {pending ? <p>A confirmação pertence ao conteúdo que você leu. Fechar por enquanto preserva a referência desta tentativa; verificar consulta o mesmo resultado.</p> : null}
+        <div className="hca-toolbar"><ActionButton onClick={() => setOpen(false)}>Fechar por enquanto</ActionButton>
+          {pending ? <><ActionButton disabled={disabled} onClick={() => void execute()}>Verificar resultado</ActionButton>{mayRecord ? <ActionButton disabled={disabled} onClick={() => void execute(true)}>Confirmar a mesma ciência</ActionButton> : null}</> : null}
+        </div>
+      </>}</div>
+    </Dialog>
+  </>;
 }

@@ -7,7 +7,7 @@ import { StatusBadge, Icon, type IconName } from "@/components/ui/primitives";
 import { ActionButton, Pill } from "@/components/ui/controls";
 import { MenuPopup } from "@/components/ui/floating";
 import { DocumentActions } from "./document-actions";
-import { DocumentShareDialog } from "./document-share-dialog";
+import { DocumentShareDialog, documentShareUrl } from "./document-share-dialog";
 import { formatBrazilDate } from "@/lib/receipt";
 import { documentLabels, type DocumentType } from "@/types/documents";
 
@@ -47,6 +47,7 @@ export function DocumentHeader({
   observedRef,
   unissuedLabel,
   showFiles = true,
+  nextStep,
   actions,
   secondaryActions,
   moreTriggerRef,
@@ -77,6 +78,7 @@ export function DocumentHeader({
   observedRef?: Ref<HTMLElement>;
   unissuedLabel?: string;
   showFiles?: boolean;
+  nextStep?: ReactNode;
   actions?: ReactNode;
   secondaryActions?: ReactNode;
   moreTriggerRef?: Ref<HTMLButtonElement>;
@@ -119,6 +121,30 @@ export function DocumentHeader({
     ...metadata.slice(1),
     ...(patientName ? [{ label: "Paciente", value: patientName }] : []),
   ];
+  const moreMenu = (
+    <Menu.Root open={moreOpen} onOpenChange={open => { if (open) actionClosedRef.current = false; setMoreOpen(open); }}>
+      <Menu.Trigger render={<ActionButton ref={moreButtonRef} className="btn-icon" aria-label="Mais opções da ficha" title="Mais ações"><Icon name="more" /></ActionButton>} />
+      <MenuPopup sideOffset={8} className="hca-document-more-menu" aria-label="Ações da ficha" finalFocus={() => !actionClosedRef.current}>
+        <div className="hca-document-more-title">Ações da ficha</div>
+        <Menu.Item className="hca-menu-item" onClick={() => {
+          const openShare = () => { setCopyMessage(""); setSharingOpen(true); };
+          if (!navigator.clipboard?.writeText) { actionClosedRef.current = true; openShare(); return; }
+          void navigator.clipboard.writeText(documentShareUrl(id)).then(() => setCopyMessage("Link da ficha copiado."), openShare);
+        }}><Icon name="link" width={17} height={17} />Copiar link da ficha</Menu.Item>
+        <Menu.Item className="hca-menu-item" onClick={() => {
+          actionClosedRef.current = true; setCopyMessage(""); setSharingOpen(true);
+        }}><Icon name="external" width={17} height={17} />Compartilhar link da ficha</Menu.Item>
+        <Menu.Item className="hca-menu-item" onClick={() => {
+          if (!navigator.clipboard?.writeText) { setCopyMessage("Não foi possível copiar. Selecione o código no cabeçalho."); return; }
+          void navigator.clipboard.writeText(code).then(() => setCopyMessage("Referência copiada."), () => setCopyMessage("Não foi possível copiar. Selecione o código no cabeçalho."));
+        }}><Icon name="copy" width={17} height={17} />Copiar referência</Menu.Item>
+        <Menu.Item className="hca-menu-item" onClick={() => { actionClosedRef.current = true; setIdentificationOpen(true); }}><Icon name="shield" width={17} height={17} />Protocolo e identificação</Menu.Item>
+        <Menu.Item className="hca-menu-item" render={<Link href={"/verificar?returnTo=" + encodeURIComponent("/fichas/" + id)} />}><Icon name="external" width={17} height={17} />Validação pública de documento</Menu.Item>
+        <Menu.Item className="hca-menu-item" onClick={() => { const url = new URL(window.location.href); url.searchParams.set("documentTab", "history"); window.history.replaceState(null, "", url.pathname + url.search + url.hash); actionClosedRef.current = true; }}><Icon name="history" />Identificação e registros preservados</Menu.Item>
+        {secondaryActions ? <><Menu.Separator className="hca-menu-separator" /><DocumentMoreActionContext value={() => { actionClosedRef.current = true; }}><Menu.Group>{secondaryActions}</Menu.Group></DocumentMoreActionContext></> : null}
+      </MenuPopup>
+    </Menu.Root>
+  );
   return (
     <>
       <div className="hca-document-compact-slot">{compact ? <div className="hca-document-compact" aria-label="Identificação da ficha durante rolagem"><span className="hca-document-type">{code.startsWith("DEV-") ? "DEV" : type}</span><strong>{code}</strong><StatusBadge status={status} label={statusLabel} /><span className="hca-compact-badges">{badges}</span></div> : null}</div>
@@ -128,6 +154,7 @@ export function DocumentHeader({
         ref={observedRef}
         aria-label="Resumo da ficha"
       >
+        <div className="hca-document-header-more">{moreMenu}</div>
         <div className="hca-document-identity">
           <div className="hca-document-name">
             <span className="hca-document-type">{code.startsWith("DEV-") ? "DEV" : type}</span>
@@ -157,6 +184,7 @@ export function DocumentHeader({
         {milestones}
         <span ref={markerRef} className="hca-compact-marker" aria-hidden="true" />
       </section>
+      {nextStep}
       <div
         className="hca-document-action-bar"
         role="group"
@@ -180,23 +208,6 @@ export function DocumentHeader({
               <Icon name="refresh" className={refreshing ? "motion-safe:animate-spin" : undefined} />
             </ActionButton>
           ) : null}
-          <Menu.Root open={moreOpen} onOpenChange={open => { if (open) actionClosedRef.current = false; setMoreOpen(open); }}>
-            <Menu.Trigger render={<ActionButton ref={moreButtonRef} className="btn-icon" aria-label="Mais opções da ficha" title="Mais ações"><Icon name="more" /></ActionButton>} />
-            <MenuPopup sideOffset={8} className="hca-document-more-menu" aria-label="Ações da ficha" finalFocus={() => !actionClosedRef.current}>
-              <div className="hca-document-more-title">Ações da ficha</div>
-              <Menu.Item className="hca-menu-item" onClick={() => {
-                actionClosedRef.current = true; setCopyMessage(""); setSharingOpen(true);
-              }}><Icon name="external" width={17} height={17} />Compartilhar link da ficha</Menu.Item>
-              <Menu.Item className="hca-menu-item" onClick={() => {
-                if (!navigator.clipboard?.writeText) { setCopyMessage("Não foi possível copiar. Selecione o código no cabeçalho."); return; }
-                void navigator.clipboard.writeText(code).then(() => setCopyMessage("Referência copiada."), () => setCopyMessage("Não foi possível copiar. Selecione o código no cabeçalho."));
-              }}><Icon name="copy" width={17} height={17} />Copiar referência</Menu.Item>
-              <Menu.Item className="hca-menu-item" onClick={() => { actionClosedRef.current = true; setIdentificationOpen(true); }}><Icon name="shield" width={17} height={17} />Protocolo e identificação</Menu.Item>
-              <Menu.Item className="hca-menu-item" render={<Link href={"/verificar?returnTo=" + encodeURIComponent("/fichas/" + id)} />}><Icon name="external" width={17} height={17} />Validação pública de documento</Menu.Item>
-              <Menu.Item className="hca-menu-item" onClick={() => { const url = new URL(window.location.href); url.searchParams.set("documentTab", "history"); window.history.replaceState(null, "", url.pathname + url.search + url.hash); actionClosedRef.current = true; }}><Icon name="history" />Identificação e registros preservados</Menu.Item>
-              {secondaryActions ? <><Menu.Separator className="hca-menu-separator" /><DocumentMoreActionContext value={() => { actionClosedRef.current = true; }}><Menu.Group>{secondaryActions}</Menu.Group></DocumentMoreActionContext></> : null}
-            </MenuPopup>
-          </Menu.Root>
         </div>
       </div>
       {copyMessage && !sharingOpen ? <div className="hca-copy-toast" role="status"><Icon name={copyMessage.startsWith("Não") ? "alert" : "check"} />{copyMessage}</div> : null}

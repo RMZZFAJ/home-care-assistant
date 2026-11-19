@@ -1,3 +1,4 @@
+import { openOperationalDocumentAction } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { createHmac, randomUUID } from "node:crypto";
 import { setup, issue, delivery, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
@@ -141,7 +142,7 @@ test("L1 ciência antiga preserva a referência sem acesso e libera nova ciênci
  await expect(page.getByRole("dialog")).toContainText("não foi registrada");
  expect(await page.evaluate(key=>sessionStorage.getItem(key),key)).toBeNull();
  await page.getByRole("button",{name:"Fechar por enquanto",exact:true}).click();
- await page.getByRole("button",{name:"Dar ciência",exact:true}).click();await page.getByRole("button",{name:"Confirmar minha ciência",exact:true}).click();
+ await openOperationalDocumentAction(page, "Registrar minha ciência");await page.getByRole("button",{name:"Confirmar minha ciência",exact:true}).click();
  await expect(page.getByText("Ciência registrada para o conteúdo confirmado.",{exact:true})).toBeVisible();
  expect(sql(`select count(*) from public.requisition_science_events where requisition_id=${q(req.id)} and user_id=${q(fixtures.family.id)} and mode='express'`)).toBe("1");
 });

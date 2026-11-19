@@ -1,3 +1,5 @@
+import { expectNoOperationalDocumentAction } from "./document-sections";
+import { openOperationalDocumentAction } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { actor, delivery, fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
@@ -156,7 +158,7 @@ test("REQ completed fulfillment keeps personal science separate and archived fol
     await page.route(`**/api/requisitions/${req.id}/science`, route => route.fulfill({
       status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Registro de ciência fictício recusado", retryable: true },
     }));
-    await page.getByRole("button", { name: "Dar ciência", exact: true }).click();
+    await openOperationalDocumentAction(page, "Registrar minha ciência");
     await page.getByRole("button", { name: "Confirmar minha ciência", exact: true }).click();
     const uncertainScience = page.getByRole("dialog", { name: "Resultado da ciência", exact: true });
     await expect(uncertainScience).toContainText("Esta tentativa continua preservada");
@@ -223,7 +225,7 @@ test("REQ cancelled and real historical import show consultation instead of curr
   await selectDocumentSection(page, "materials");
   await expect(overview(page)).toContainText("Sem atendimento confirmado");
   await selectDocumentSection(page, "overview");
-  await expect(page.getByRole("menuitem", { name: "Expedir ENT vinculada", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("menuitem", { name: "Preparar entrega", exact: true })).toHaveCount(0);
   await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Versões e integridade", exact: true }).click();
   await expect(overview(page)).toContainText("Linha do tempo");
   expect(facts(f.patient)).toBe(cancelled);
@@ -249,8 +251,9 @@ test("REQ cancelled and real historical import show consultation instead of curr
     await expect(overview(reader)).toContainText("Não apurado no original");
     await expect(overview(reader).getByText("Pendente", { exact: true })).toHaveCount(0);
     await selectDocumentSection(reader, "overview");
-    await expect(reader.getByRole("menuitem", { name: "Expedir ENT vinculada", exact: true })).toHaveCount(0);
-    await expect(reader.getByRole("button", { name: /^(Dar ciência|Verificar ciência pendente)$/, exact: true })).toHaveCount(0);
+    await expect(reader.getByRole("menuitem", { name: "Preparar entrega", exact: true })).toHaveCount(0);
+    await expectNoOperationalDocumentAction(reader, "Registrar minha ciência");
+    await expect(reader.getByRole("button", { name: "Verificar ciência pendente", exact: true })).toHaveCount(0);
     await reader.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Versões e integridade", exact: true }).click();
     await expect(reader.getByRole("tab", {name:"Identificação e registros preservados",exact:true})).toBeFocused();
     await expect(overview(reader)).toContainText("Linha do tempo");

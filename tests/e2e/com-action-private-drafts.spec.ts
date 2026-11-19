@@ -1,3 +1,4 @@
+import { openOperationalDocumentAction } from "./document-sections";
 import { test, expect } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
@@ -10,12 +11,13 @@ test("COM aprovação, aquisição e chegada são atos separados sem rascunhos e
  const f = await setup(), family = await actor("family", f.patient), writes = noPrivateWrites(page);
  let doc = await rpc(family, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "2" }] }, p_key: randomUUID(), p_draft: false });
  await loginDecision(page, fixtures.adminA.email, f.patient);
- for (const label of ["Aprovar itens", "Registrar compra", "Informar nova chegada"]) {
-  await page.goto("/fichas/" + doc.id); await selectDocumentSection(page, "workflow"); await page.getByRole("button", { name: label, exact: true }).click();
+ for (const label of ["Aprovar itens", "Registrar compra realizada", "Registrar chegada"]) {
+  await page.goto("/fichas/" + doc.id); await selectDocumentSection(page, "workflow"); if (label === "Aprovar itens") await page.getByRole("button", { name: label, exact: true }).click();
+  else await openOperationalDocumentAction(page, label);
   await page.locator(`input[name="${doc.lines[0].id}"]`).fill(label === "Aprovar itens" ? "2" : "1");
   await expect(page.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toHaveCount(0);
-  const isPurchase = label === "Registrar compra";
-  const isArrival = label === "Informar nova chegada";
+  const isPurchase = label === "Registrar compra realizada";
+  const isArrival = label === "Registrar chegada";
   if (!isPurchase && !isArrival) await page.getByRole("button", { name: "Revisar operação", exact: true }).click();
   await audit(page, "COM ato sem rascunho");
   await confirmedOutcome(page, doc.id, isPurchase ? "Confirmar compra" : isArrival ? "Confirmar entrada" : "Confirmar operação");
@@ -43,7 +45,7 @@ test("COM compra mista da família preserva a previsão e recupera uma chegada p
   await loginDecision(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + doc.id);
   await selectDocumentSection(page, "workflow");
-  await page.getByRole("button", { name: "Registrar compra", exact: true }).click();
+  await openOperationalDocumentAction(page, "Registrar compra realizada");
   const editor = page.getByRole("dialog", { name: "Registrar compra", exact: true });
   const qty = (line: typeof inHand) => editor.getByRole("textbox", { name: line.name_snapshot + " · " + line.unit_snapshot, exact: true });
   const timing = (line: typeof inHand) => editor.getByRole("switch", { name: "Já está em mãos · " + line.name_snapshot, exact: true });

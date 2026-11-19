@@ -1,3 +1,4 @@
+import { expectNoOperationalDocumentAction } from "./document-sections";
 import { selectDocumentSection, openDocumentAction } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -333,11 +334,7 @@ test("ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe
     await page.goto("/fichas/" + delivery.id);
     await selectDocumentSection(page, "workflow");
     await readOnlyDispatch(page, codes);
-    await expect(
-      page.getByRole("button", {
-        name: "Conferir recebimento", exact: true,
-      }),
-    ).toHaveCount(0);
+    await expectNoOperationalDocumentAction(page, "Conferir recebimento");
     const denied = await page.request.post("/api/documents/" + delivery.id, {
       data: {
         action: "receive",

@@ -1,4 +1,4 @@
-import { selectDocumentSection } from "./document-sections";
+import { openOperationalDocumentAction } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
@@ -127,8 +127,18 @@ test("Mais usa menu e identificação separada; família menciona por @ e refere
   const identity = page.getByRole("dialog", { name: "Protocolo e identificação", exact: true });
   await expect(identity.getByText(req.id, { exact: true })).toBeVisible(); await expect(identity.getByText(code, { exact: true })).toBeVisible();
   await identity.getByRole("button", { name: "Fechar diálogo", exact: true }).click(); await expect(more).toBeFocused();
-  await selectDocumentSection(page, "progress");
-  await page.getByRole("button", { name: "Novo andamento", exact: true }).click();
+  const fab = page.getByRole("button", { name: "Ações da ficha", exact: true });
+  await fab.press("Enter");
+  const operations = page.getByRole("menu", { name: "Ações operacionais", exact: true });
+  await expect(operations).toBeVisible();
+  await operations.press("Escape");
+  await expect(fab).toBeFocused();
+  await openOperationalDocumentAction(page, "Novo andamento");
+  await expect(page.getByRole("tab", { name: "Andamentos", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("dialog", { name: "Novo andamento", exact: true })).toHaveCount(0);
+  const newProgress = page.getByRole("button", { name: "Novo andamento", exact: true });
+  await expect(newProgress).toBeFocused();
+  await newProgress.click();
   const editor = page.getByRole("dialog", { name: "Novo andamento", exact: true }), text = editor.getByRole("textbox", { name: "Texto do andamento", exact: true });
   await expect(editor.getByRole("switch")).toHaveCount(0);
   await expect(editor.getByRole("textbox", { name: "Código da ficha a vincular", exact: true })).toHaveCount(0);

@@ -1,3 +1,4 @@
+import { openOperationalDocumentAction } from "./document-sections";
 import { randomUUID } from "node:crypto";
 import { PDF } from "@libpdf/core";
 import { expect, test, type Page } from "@playwright/test";
@@ -70,7 +71,7 @@ test("ENT solicita reavaliação com a quantidade conferida e mostra à família
   const [line] = ent.lines;
   const reason = "As unidades recebidas não cobrem o próximo plantão.";
   await openDelivery(page, f.patient, ent.id, fixtures.professional.email);
-  await page.getByRole("button", { name: "Conferir recebimento", exact: true }).click();
+  await openOperationalDocumentAction(page, "Conferir recebimento");
   const receipt = page.getByRole("dialog", { name: "Conferir recebimento", exact: true });
   await receipt.getByRole("switch", { name: "Necessidade suprida · " + line.name_snapshot }).uncheck();
   await receipt.getByLabel("Motivo do pedido de reavaliação").fill(reason);

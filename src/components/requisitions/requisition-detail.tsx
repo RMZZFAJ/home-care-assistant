@@ -7,7 +7,8 @@ import { DocumentCancellationNotice } from "@/components/documents/document-canc
 import { DocumentFollowUpActions } from "@/components/documents/document-follow-up-actions";
 import { DocumentArchiveActions, DocumentArchiveDialog, type ArchiveDialogMode } from "@/components/documents/document-archive-dialog";
 import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
-import { RequisitionScienceAction } from "./requisition-science-action";
+import { RequisitionScienceAction, type RequisitionScienceControl } from "./requisition-science-action";
+import { DocumentFab } from "@/components/documents/document-fab";
 import { DocumentCommunications } from "@/components/notifications/document-communications";
 import { DocumentMaterialList } from "@/components/documents/document-material-list";
 import { DocumentFreshness } from "@/components/documents/document-freshness";
@@ -16,7 +17,6 @@ import { roleLabel } from "@/components/layout/workspace-context";
 import { ActionButton, Pill } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
 import { DocumentBreadcrumb } from "@/components/documents/document-breadcrumb";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   api,
@@ -24,7 +24,6 @@ import {
   buttonClass,
   can,
   Notice,
-  primaryClass,
   type WorkspaceContext,
 } from "@/components/workspace";
 import { useLiveRevision } from "@/lib/use-live-revision";
@@ -166,6 +165,9 @@ export function RequisitionDocumentContent({
 }) {
   const revision = useLiveRevision();
   const tabs = useDocumentTabs(can(context, "audit.read"));
+  const fabRef = useRef<HTMLButtonElement>(null);
+  const scienceControlRef = useRef<RequisitionScienceControl>(null);
+  const reviewControlRef = useRef<(opener: HTMLButtonElement | null) => void>(null);
   const [fileActionTarget, setFileActionTarget] =
     useState<HTMLDivElement | null>(null);
   const [openingRevision, setOpeningRevision] = useState("initial");
@@ -271,9 +273,16 @@ export function RequisitionDocumentContent({
   const lifecycleVisible = !data.is_historical && !p.archivedAt && context.patient?.id === data.care_recipient_id;
   const terminalFollowUp = data.status === "cancelled" || Boolean(p.completedAt);
   const patientAdmin = context.patient?.role === "admin" && can(context, "access.manage");
+  const canComplete = can(context, "req.review") || patientAdmin;
   const archive = activeDocumentArchive(data.documentArchive);
   const archiveAllowed = patientAdmin && can(context, "req.archive") && context.patient?.id === data.care_recipient_id;
   const offerScience = !data.is_historical && p.eligible && !p.archivedAt && data.status !== "cancelled" && !p.science.some(row => row.user_id === context.userId && row.mode === "express");
+  const progressAllowed = !p.archivedAt && context.activeContext?.mode === "patient"
+    && context.patient?.id === data.care_recipient_id && can(context, "document.progress.create");
+  const canStartDelivery = lifecycleVisible && can(context, "ent.create");
+  const canStartPurchase = lifecycleVisible && can(context, "com.create");
+  const operationalMenu = !terminalFollowUp && lifecycleVisible
+    && (canStartDelivery || canStartPurchase || offerScience || progressAllowed);
   const documentState = requisitionDocumentState({
     historical: data.is_historical,
     status: data.status,
@@ -348,29 +357,33 @@ export function RequisitionDocumentContent({
           ) : null}<Pill tone={p.familyAware ? "success" : "warning"}><Icon name="users" width={13} height={13} />{data.is_historical ? "Ciência não comprovada" : p.familyAware ? "Ciência registrada" : p.policy?.scienceRequired === false ? "Exigência dispensada" : "Ciência pendente"}</Pill></>
         }
         showFiles={false}
+        nextStep={
+          reading || readFailed ? (
+            <Notice>
+              {reading ? "Atualizando o acompanhamento da requisição…" : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
+              {" "}Os dados preservados são da última consulta válida.
+            </Notice>
+          ) : (
+            <DocumentNextStep
+              label={followUp.label}
+              pending={followUp.pending}
+              heading={followUp.heading}
+              description={followUp.description}
+              onOpen={() => tabs.select(followUp.section, true)}
+            />
+          )
+        }
         actions={
           <>
-            {!data.is_historical &&
-              !p.archivedAt &&
-              data.status !== "cancelled" ? (
-              <>
-                {can(context, "ent.create") && !offerScience ? (
-                  <Link
-                    className={primaryClass}
-                    href={`/fichas/ent?requisitionId=${id}`}
-                  >
-                    Expedir ENT vinculada
-                  </Link>
-                ) : null}
-              </>
-            ) : null}
-            {!data.is_historical ? <RequisitionScienceAction id={id} userId={context.userId} version={p.version} materialIdentity={p.materialIdentity} mayRecord={Boolean(offerScience)} disabled={busy || reading} onRecorded={() => setAttempt(value => value + 1)} /> : null}
+            {terminalFollowUp && progressAllowed && tabs.value !== "progress" ? <ActionButton onClick={() => tabs.select("progress", true)}><Icon name="plus" />Novo andamento</ActionButton> : null}
+            {!data.is_historical ? <RequisitionScienceAction id={id} userId={context.userId} version={p.version} materialIdentity={p.materialIdentity} mayRecord={Boolean(offerScience)} disabled={busy || reading} control={operationalMenu ? scienceControlRef : undefined} onRecorded={() => setAttempt(value => value + 1)} /> : null}
             {archive ? <DocumentArchiveActions archive={archive} reviewRef={archiveReviewRef} onReview={archiveAllowed ? () => setArchiveDialog("review") : undefined} /> : null}
             {lifecycleVisible ? <DocumentFollowUpActions
               id={id} patientId={data.care_recipient_id} kind="REQ" code={data.code ?? data.protocol}
               patientName={context.patient?.display_name ?? "Paciente identificado na ficha"}
               userId={context.userId} actor={context.fullName}
-              canComplete={!terminalFollowUp && (patientAdmin || can(context, "req.review"))}
+              canComplete={!terminalFollowUp && canComplete}
+              reviewControl={reviewControlRef}
               canReopen={terminalFollowUp && patientAdmin} cancelled={data.status === "cancelled"}
               disabled={busy || reading}
               preservedFacts={<p>A contagem da emissão e as movimentações posteriores permanecem registradas.</p>}
@@ -381,21 +394,9 @@ export function RequisitionDocumentContent({
         }
         secondaryActions={
           <>
-            {!data.is_historical &&
-              !p.archivedAt &&
-              data.status !== "cancelled" ? (
-              <>
-                {offerScience && can(context, "ent.create") ? <DocumentMoreLink icon="truck" className={buttonClass} href={`/fichas/ent?requisitionId=${id}`}>Expedir ENT vinculada</DocumentMoreLink> : null}
-                {can(context, "com.create") ? (
-                  <DocumentMoreLink
-                    icon="box" className={buttonClass}
-                    href={`/fichas/com?requisitionId=${id}`}
-                  >
-                    Abrir COM vinculada
-                  </DocumentMoreLink>
-                ) : null}
-              </>
-            ) : null}
+            {lifecycleVisible && !terminalFollowUp && canComplete ? <DocumentMoreButton
+              icon="check" disabled={busy || reading} onClick={() => reviewControlRef.current?.(moreTriggerRef.current)}
+            >Revisar conclusão</DocumentMoreButton> : null}
             {terminalFollowUp && lifecycleVisible && archiveAllowed ? (
               <DocumentMoreButton
                 className={buttonClass}
@@ -446,6 +447,12 @@ export function RequisitionDocumentContent({
           data.recipient_name_snapshot ?? context.patient?.display_name
         }
       ></DocumentHeader>
+      {operationalMenu ? <DocumentFab triggerRef={fabRef}>
+        {canStartDelivery ? <DocumentMoreLink icon="truck" href={`/fichas/ent?requisitionId=${id}`}>Preparar entrega</DocumentMoreLink> : null}
+        {canStartPurchase ? <DocumentMoreLink icon="box" href={`/fichas/com?requisitionId=${id}`}>Preparar compra</DocumentMoreLink> : null}
+        {offerScience ? <DocumentMoreButton icon="check" disabled={busy || reading} onClick={() => scienceControlRef.current?.open(fabRef.current)}>Registrar minha ciência</DocumentMoreButton> : null}
+        {progressAllowed ? <DocumentMoreButton icon="plus" onClick={() => tabs.select("progress", true)}>Novo andamento</DocumentMoreButton> : null}
+      </DocumentFab> : null}
       {archiveDialog && archiveAllowed ? <DocumentArchiveDialog key={`${context.userId}:${id}:${archiveDialog}`} id={id} patientId={data.care_recipient_id}
         code={data.code ?? data.protocol} patientName={data.recipient_name_snapshot ?? context.patient?.display_name ?? "Paciente identificado na ficha"}
         actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
@@ -459,20 +466,6 @@ export function RequisitionDocumentContent({
         onRecorded={setOpeningRevision}
       />
 
-          {reading || readFailed ? (
-            <Notice>
-              {reading ? "Atualizando o acompanhamento da requisição…" : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
-              {" "}Os dados preservados são da última consulta válida.
-            </Notice>
-          ) : (
-            <DocumentNextStep
-              label={followUp.label}
-              pending={followUp.pending}
-              heading={followUp.heading}
-              description={followUp.description}
-              onOpen={() => tabs.select(followUp.section, true)}
-            />
-          )}
       <DocumentTabs
         rootRef={tabs.rootRef}
         type="REQ"

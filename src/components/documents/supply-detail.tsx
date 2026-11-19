@@ -1,6 +1,7 @@
 "use client";
 import { useDocumentDecision, DocumentDecisionFailure } from "./use-document-decision";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { DocumentSection } from "@/components/ui/model-section";
 import { RelatedDocument } from "./related-document";
@@ -27,6 +28,7 @@ import { canReconcileFromFamily, DeliveryReconciliation, DeliveryReconciliationR
 import { DeliveryTransitCancellation, DeliveryTransitCancellationResult } from "./delivery-transit-cancellation";
 import { DeliveryCancellationDecision, DeliveryCancellationStatusDialog, type CancellationAction } from "./delivery-cancellation-decision";
 import { DocumentFollowUpActions } from "./document-follow-up-actions";
+import { DocumentFab } from "./document-fab";
 import { DocumentArchiveActions, DocumentArchiveDialog, type ArchiveDialogMode } from "./document-archive-dialog";
 import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
 import { supplyFollowUpState } from "@/lib/documents/follow-up-lifecycle";
@@ -130,6 +132,8 @@ export function SupplyDocumentContent({
 }) {
   const liveRevision = useLiveRevision();
   const tabs = useDocumentTabs(can(context, "audit.read"));
+  const fabRef = useRef<HTMLButtonElement>(null);
+  const reviewControlRef = useRef<(opener: HTMLButtonElement | null) => void>(null);
   const [fileActionTarget, setFileActionTarget] =
     useState<HTMLDivElement | null>(null);
   const editingRef = useRef(false);
@@ -555,6 +559,13 @@ export function SupplyDocumentContent({
   const followUpState = data && supplyFollowUpState(data.status, data.workflow_data.documentFollowUp);
   const followUpTerminal = followUpState === "completed" || data?.status === "cancelled" && followUpState !== "reopened";
   const patientAdmin = Boolean(activeContext && context.patient?.role === "admin" && can(context, "access.manage"));
+  const canReviewCompletion = Boolean(activeContext && !archived && data?.protocol && data.type !== "BAL"
+    && !followUpTerminal && data.status !== "rejected" && data.status !== "administratively_closed"
+    && (patientAdmin || (data.type === "COM" ? allowed("com.approve")
+      : data.recipient_id === context.userId && allowed("ent.receive") || data.created_by === context.userId && allowed("ent.create"))));
+  const progressAllowed = allowed("document.progress.create");
+  const canPrepareDelivery = data?.type === "COM" && allowed("ent.create")
+    && data.lines.some(line => quantity(line.accepted_quantity).gt(0));
   const actions: DocumentAction[] = [];
   if (
     data &&
@@ -731,25 +742,32 @@ export function SupplyDocumentContent({
       </>
     );
   }
-  function renderAction(item: DocumentAction) {
+  const operationalMenu = Boolean(data?.protocol && !followUpTerminal && data.status !== "rejected" && activeContext && !archived);
+  const fabActions: DocumentAction[] = operationalMenu
+    ? actions.filter(item => item === "purchase" || item === "receive" || item === "reassign")
+    : [];
+  const prepareReturn = operationalMenu && data?.type === "ENT" && data.kind !== "DEV"
+    && allowed("ent.create") && allowed("stock.team.read");
+
+  function renderAction(item: DocumentAction, inFab = false) {
     if (!data) return null;
-    const Action = secondaryDocumentActions.has(item) ? DocumentMoreButton : "button";
+    const menuAction = inFab || secondaryDocumentActions.has(item);
+    const Action = menuAction ? DocumentMoreButton : "button";
     return (
       <Action
         key={item}
-        {...(secondaryDocumentActions.has(item) ? { icon: item === "cancel" ? "close" as const : item === "reassign" ? "user" as const : "check" as const, danger: item === "cancel" } : {})}
+        {...(menuAction ? { icon: item === "cancel" ? "close" as const : item === "reassign" ? "user" as const : item === "purchase" ? "box" as const : item === "receive" && data.type === "COM" ? "truck" as const : "check" as const, danger: item === "cancel" } : {})}
         className={item === "receive" ? primaryClass : buttonClass}
         // Opening an editor has no official effect. A background read must not
         // disable a retained opener between pointerdown and pointerup. Existing
         // version/identity checks still authorize and validate confirmation.
         disabled={busy || uncertain}
         onClick={(event) => {
-          operationOpenerRef.current = event.currentTarget;
+          operationOpenerRef.current = inFab ? fabRef.current : menuAction ? moreTriggerRef.current : event.currentTarget;
           if ((item === "receive" && data.type === "ENT") || (item === "resolve" && hasCountedTransit) ||
             (item === "cancel" && (hasUnreceivedDispatch || hasPersonalReceipt)) || item === "consent_cancel" || item === "withdraw_cancellation") {
             setError("");
             setReview(null);
-            if (item === "cancel") operationOpenerRef.current = moreTriggerRef.current;
             setAction(item);
             return;
           }
@@ -762,11 +780,11 @@ export function SupplyDocumentContent({
         }}
       >
         {data.type === "COM" && item === "receive"
-          ? "Informar nova chegada"
+          ? inFab ? "Registrar chegada" : "Informar nova chegada"
           : item === "receive"
             ? "Conferir recebimento"
-          : item === "purchase" && data.payload.origin === "donation"
-            ? "Registrar aquisição"
+          : item === "purchase"
+            ? data.payload.origin === "donation" ? "Registrar aquisição" : inFab ? "Registrar compra realizada" : actionLabels[item]
             : item === "cancel" && hasUnreceivedDispatch ? "Cancelar ficha" : actionLabels[item]}
       </Action>
     );
@@ -954,6 +972,46 @@ export function SupplyDocumentContent({
             ]}
             milestones={<DocumentMilestones items={supplyMilestones(data)} />}
             showFiles={false}
+            nextStep={
+              archived ? <Notice>A ficha arquivada está disponível para consulta e download.</Notice> : followUpStep && loading ? null : followUpStep && (readFailed || operationOpen) ? (
+                <Notice>
+                  {operationOpen
+                    ? "Sua operação está preservada na versão de trabalho. Conclua ou feche a operação para consultar a próxima providência atual."
+                    : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
+                  {" "}Os dados preservados não representam uma nova confirmação.
+                </Notice>
+              ) : <DocumentNextStep
+                label={
+                  followUpStep
+                    ? followUpStep.label
+                    : data.type === "BAL"
+                      ? "Contagem e revisão"
+                      : "Atendimento e decisões"
+                }
+                heading={followUpStep?.heading}
+                description={followUpStep?.description}
+                pending={followUpStep?.pending ?? (
+                  data.status === "draft" ||
+                  data.status === "pending_receipt" ||
+                  data.status === "disputed" ||
+                  data.status === "cancellation_pending" ||
+                  Boolean(
+                    data.purchaseProgress?.expectationPending ||
+                    data.purchaseProgress?.physicalPending ||
+                    data.purchaseProgress?.validationPending,
+                  ) ||
+                  Boolean(
+                    data.balanceReview?.reviewRequired &&
+                    data.status !== "approved",
+                  ) ||
+                  Boolean(
+                    data.balanceRecount?.activeAssignment ||
+                    data.balanceRecount?.requiresDesignation,
+                  )
+                )}
+                onOpen={() => tabs.select(followUpStep?.section ?? "workflow", Boolean(followUpStep))}
+              />
+            }
             actions={
               <>
                 {activeContext &&
@@ -989,17 +1047,16 @@ export function SupplyDocumentContent({
                   </Link>
                 ) : null}
                 {actions
-                  .filter((item) => !secondaryDocumentActions.has(item))
-                  .map(renderAction)}
+                  .filter((item) => !secondaryDocumentActions.has(item) && !fabActions.includes(item))
+                  .map(item => renderAction(item))}
+                {followUpTerminal && progressAllowed && tabs.value !== "progress" ? <ActionButton onClick={() => tabs.select("progress", true)}><Icon name="plus" />Novo andamento</ActionButton> : null}
                 {archive ? <DocumentArchiveActions archive={archive} reviewRef={archiveReviewRef} onReview={patientAdmin ? () => setArchiveDialog("review") : undefined} /> : null}
                 {activeContext && !archived && data.protocol && data.type !== "BAL" ? <DocumentFollowUpActions
                   id={data.id} patientId={data.care_recipient_id} kind={data.type === "COM" ? "COM" : data.kind === "DEV" ? "DEV" : "ENT"}
                   code={data.code ?? data.protocol} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado na ficha")}
                   userId={context.userId} actor={context.fullName}
                   canReopen={followUpTerminal && patientAdmin}
-                  canComplete={!followUpTerminal && data.status !== "rejected" && data.status !== "administratively_closed" &&
-                    (patientAdmin || (data.type === "COM" ? allowed("com.approve") :
-                      data.recipient_id === context.userId && allowed("ent.receive") || data.created_by === context.userId && allowed("ent.create")))}
+                  canComplete={canReviewCompletion} reviewControl={reviewControlRef}
                   cancelled={data.status === "cancelled" && followUpState !== "completed"}
                   disabled={busy || operationOpen} onUpdated={() => setAttempt(value => value + 1)}
                   onShowMaterials={() => tabs.select("materials")}
@@ -1024,14 +1081,16 @@ export function SupplyDocumentContent({
                     });
                     setData(previous => previous?.id === updated.id && previous.version <= updated.version ? updated : previous);
                   }} /> : null}
-                {activeContext && data.type === "COM" && allowed("ent.create") &&
-                  data.lines.some((line) => quantity(line.accepted_quantity).gt(0)) ? (
+                {canPrepareDelivery && !operationalMenu ? (
                   <Link className={buttonClass} href={`/fichas/ent?purchaseId=${data.id}`}>Preparar entrega</Link>
                 ) : null}
               </>
             }
             secondaryActions={
               <>
+                {canReviewCompletion ? <DocumentMoreButton
+                  icon="check" disabled={busy || operationOpen} onClick={() => reviewControlRef.current?.(moreTriggerRef.current)}
+                >Revisar conclusão</DocumentMoreButton> : null}
                 {data.type === "BAL" && data.payload.balanceContext ? (
                   <DocumentMoreLink
                     icon="calendar" href="/balancos"
@@ -1043,8 +1102,8 @@ export function SupplyDocumentContent({
                 ) : null}
 
                 {actions
-                  .filter((item) => secondaryDocumentActions.has(item))
-                  .map(renderAction)}
+                  .filter((item) => secondaryDocumentActions.has(item) && !fabActions.includes(item))
+                  .map(item => renderAction(item))}
                 {patientAdmin && !archived && followUpTerminal && data.protocol && data.type !== "BAL" ? <DocumentMoreButton
                   icon="archive" disabled={busy || operationOpen} onClick={() => setArchiveDialog("archive")}>Arquivar ficha</DocumentMoreButton> : null}
               </>
@@ -1143,50 +1202,18 @@ export function SupplyDocumentContent({
               </Link>
             ) : null}
           </DocumentHeader>
+          {operationalMenu && (fabActions.length > 0 || canPrepareDelivery || prepareReturn || progressAllowed) ? <DocumentFab triggerRef={fabRef}>
+            {fabActions.map(item => renderAction(item, true))}
+            {canPrepareDelivery ? <DocumentMoreLink icon="truck" href={`/fichas/ent?purchaseId=${data.id}`}>Preparar entrega</DocumentMoreLink> : null}
+            {prepareReturn ? <DocumentMoreLink icon="undo" href={`/fichas/devolucao?careRecipientId=${data.care_recipient_id}`}>Preparar devolução</DocumentMoreLink> : null}
+            {progressAllowed ? <DocumentMoreButton icon="plus" onClick={() => tabs.select("progress", true)}>Novo andamento</DocumentMoreButton> : null}
+          </DocumentFab> : null}
           {archiveDialog && patientAdmin ? <DocumentArchiveDialog key={`${context.userId}:${id}:${archiveDialog}`} id={id} patientId={data.care_recipient_id}
             code={data.code ?? data.protocol ?? data.type} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado na ficha")}
             actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
             onClose={() => setArchiveDialog(null)} onUpdated={() => setAttempt(value => value + 1)} /> : null}
           <DocumentFreshness stale={stale} loading={refreshDisabled} onRefresh={refreshDocument} />
           {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext && !archived)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
-              {archived ? <Notice>A ficha arquivada está disponível para consulta e download.</Notice> : followUpStep && loading ? null : followUpStep && (readFailed || operationOpen) ? (
-                <Notice>
-                  {operationOpen
-                    ? "Sua operação está preservada na versão de trabalho. Conclua ou feche a operação para consultar a próxima providência atual."
-                    : "O acompanhamento atual não foi confirmado. Atualize a ficha para consultar a próxima providência."}
-                  {" "}Os dados preservados não representam uma nova confirmação.
-                </Notice>
-              ) : <DocumentNextStep
-                label={
-                  followUpStep
-                    ? followUpStep.label
-                    : data.type === "BAL"
-                      ? "Contagem e revisão"
-                      : "Atendimento e decisões"
-                }
-                heading={followUpStep?.heading}
-                description={followUpStep?.description}
-                pending={followUpStep?.pending ?? (
-                  data.status === "draft" ||
-                  data.status === "pending_receipt" ||
-                  data.status === "disputed" ||
-                  data.status === "cancellation_pending" ||
-                  Boolean(
-                    data.purchaseProgress?.expectationPending ||
-                    data.purchaseProgress?.physicalPending ||
-                    data.purchaseProgress?.validationPending,
-                  ) ||
-                  Boolean(
-                    data.balanceReview?.reviewRequired &&
-                    data.status !== "approved",
-                  ) ||
-                  Boolean(
-                    data.balanceRecount?.activeAssignment ||
-                    data.balanceRecount?.requiresDesignation,
-                  )
-                )}
-                onOpen={() => tabs.select(followUpStep?.section ?? "workflow", Boolean(followUpStep))}
-              />}
           <DocumentTabs
             rootRef={tabs.rootRef}
             type={data.type}

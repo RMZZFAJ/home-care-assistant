@@ -1,3 +1,4 @@
+import { openOperationalDocumentAction } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { fixtures, issue, setup } from "../integration/v4-fixtures.mjs";
 import {
@@ -77,7 +78,7 @@ test("L2 Preparar entrega parte da COM e traz apenas a quantidade da chegada apr
   const com = await purchaseBalanceCommand(f.admin, arrival.document, "validate_receipt", { receiptId: arrival.receipt.id });
   await loginDecision(page, fixtures.adminA.email, f.patient);
   await page.goto("/documentos/" + com.id);
-  await page.getByRole("link", { name: "Preparar entrega", exact: true }).click();
+  await openOperationalDocumentAction(page, "Preparar entrega");
   const origin = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
   await expect(origin.getByRole("button", { name: com.code, exact: true })).toBeVisible();
   await page.screenshot({ path: `output/playwright/l2-ent-from-com-${info.project.name}.png`, scale: "css" });

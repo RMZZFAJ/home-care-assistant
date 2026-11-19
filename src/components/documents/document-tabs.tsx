@@ -2,7 +2,7 @@
 
 import { Tabs } from "@base-ui/react/tabs";
 import { usePathname, useSearchParams } from "next/navigation";
-import { use, useEffect, useRef, useState, type ReactNode, type Ref } from "react";
+import { use, useCallback, useEffect, useRef, useState, type ReactNode, type Ref } from "react";
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/primitives";
 import type { DocumentType } from "@/types/documents";
@@ -53,6 +53,12 @@ export function useDocumentTabs(auditAllowed: boolean) {
   // visible panel controlled immediately, until the router snapshot catches up.
   // Scope the optimistic choice to that exact URL snapshot and permission set.
   const value = selection?.source === source ? selection.value : embedded ? "materials" : tabFromUrl(params, auditAllowed);
+  const focusSelectedTab = useCallback((next: DocumentTab) => {
+    const trigger = next === "progress"
+      ? rootRef.current?.querySelector<HTMLElement>("[data-progress-editor-trigger]")
+      : null;
+    (trigger ?? rootRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]'))?.focus();
+  }, []);
   useEffect(() => {
     if (embedded) return;
     const navigate = () => setSelection({ source, value: tabFromUrl(new URLSearchParams(window.location.search), auditAllowed) });
@@ -61,12 +67,9 @@ export function useDocumentTabs(auditAllowed: boolean) {
   }, [source, auditAllowed, embedded]);
   useEffect(() => {
     if (!focusSelectionRef.current && value !== "history") return;
-    const target = rootRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
-    if (target) {
-      focusSelectionRef.current = false;
-      target.focus();
-    }
-  }, [value]);
+    focusSelectionRef.current = false;
+    focusSelectedTab(value);
+  }, [value, focusSelectedTab]);
   function select(next: DocumentTab, focus = false) {
     if (next === "workflow") next = "materials";
     if (!valid.includes(next)) return;
@@ -83,7 +86,7 @@ export function useDocumentTabs(auditAllowed: boolean) {
     }
     if (focus && next === value) {
       focusSelectionRef.current = false;
-      rootRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.focus();
+      focusSelectedTab(next);
     }
   }
   return { value, select, rootRef };

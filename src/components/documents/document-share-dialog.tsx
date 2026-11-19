@@ -5,6 +5,10 @@ import { ActionButton, FormField, TextInput } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
 
+export function documentShareUrl(id: string) {
+  return new URL("/fichas/" + id, window.location.origin).href;
+}
+
 export function DocumentShareDialog({ id, code, patientName, onClose, finalFocus }: {
   id: string;
   code: string;
@@ -12,7 +16,7 @@ export function DocumentShareDialog({ id, code, patientName, onClose, finalFocus
   onClose: () => void;
   finalFocus: RefObject<HTMLElement | null>;
 }) {
-  const url = new URL("/fichas/" + id, window.location.origin).href;
+  const url = documentShareUrl(id);
   const [message, setMessage] = useState("");
   async function copy() {
     try {

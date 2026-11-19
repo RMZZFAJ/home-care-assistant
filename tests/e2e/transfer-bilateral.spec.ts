@@ -1,4 +1,5 @@
-import { selectDocumentSection, openDocumentMore, closeDocumentMore, openDocumentAction } from "./document-sections";
+import { expectNoOperationalDocumentAction } from "./document-sections";
+import { selectDocumentSection, openDocumentAction } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
@@ -168,17 +169,11 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
     await ana.goto("/documentos/" + id);
     await selectDocumentSection(ana, "workflow");
     await expect(ana.getByRole("button", { name: "Concordar com a transferência", exact: true })).toHaveCount(0);
-    await expect(
-      ana.getByRole("button", { name: "Conferir recebimento", exact: true }),
-    ).toHaveCount(0);
+    await expectNoOperationalDocumentAction(ana, "Conferir recebimento");
     expect(JSON.parse(transferState(f)).ledger.length).toBe(
       before.ledger.length + 1,
     );
-    await openDocumentMore(page);
-    await expect(
-      page.getByRole("menuitem", { name: "Alterar destinatário", exact: true }),
-    ).toHaveCount(0);
-    await closeDocumentMore(page);
+    await expectNoOperationalDocumentAction(page, "Alterar destinatário");
     const bruno = await brunoContext.newPage();
     await login(bruno, f.recipient.email, f.patient);
     await bruno.goto("/entregas");

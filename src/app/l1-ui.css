@@ -212,6 +212,9 @@ html:has(.hca-workspace) { scroll-padding-block-start: 65px; }
 .hca-record-detail { container: document / inline-size; }
 .hca-document-header { border-radius: 16px; box-shadow: 0 3px 14px #183e2f05; }
 .hca-document-identity { align-items: flex-start; gap: 20px; padding: 22px 24px 19px; }
+.hca-document-header { position: relative; }
+.hca-document-header-more { position: absolute; inset-block-start: 16px; inset-inline-end: 16px; }
+.hca-document-header:has(.hca-document-header-more) .hca-document-identity { padding-inline-end: 66px; }
 .hca-document-name { flex: 1; }
 .hca-document-name :is(h1,h2) { margin: 0; font-size: 27px; line-height: 1.13; font-weight: 760; }
 .hca-document-name p { margin: 5px 0 0; line-height: 1.4; }

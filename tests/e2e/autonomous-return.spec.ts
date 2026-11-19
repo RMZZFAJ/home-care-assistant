@@ -1,3 +1,5 @@
+import { expectNoOperationalDocumentAction } from "./document-sections";
+import { openOperationalDocumentAction } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { autonomousReturnFixture, returnBalances, transferState } from "../integration/autonomous-return-fixtures.mjs";
@@ -70,13 +72,13 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
     const counter = await counterContext.newPage(); await login(counter, f.counterparty.email, f.patient);
     await counter.goto("/documentos/" + id); await selectDocumentSection(counter, "workflow");
     await expect(counter.getByRole("button", { name: "Concordar com a transferência", exact: true })).toHaveCount(0);
-    await expect(counter.getByRole("button", { name: "Conferir recebimento", exact: true })).toHaveCount(0);
+    await expectNoOperationalDocumentAction(counter, "Conferir recebimento");
     expect(returnBalances(f)).toEqual({ family: 30, team: 5, transit: 5 });
     const receiver = await receiverContext.newPage(); await login(receiver, f.recipient.email, f.patient);
     await receiver.goto("/entregas"); const task = receiver.locator('[data-delivery-id="' + id + '"]');
     await expect(task).toContainText("Devolução de materiais"); await task.getByRole("link", { name: "Conferir", exact: true }).click();
     await selectDocumentSection(receiver, "workflow");
-    await receiver.getByRole("button", { name: "Conferir recebimento", exact: true }).click();
+    await openOperationalDocumentAction(receiver, "Conferir recebimento");
     const receive = receiver.getByRole("dialog", { name: "Conferir recebimento", exact: true });
     const amount = receive.getByRole("textbox", { name: /Recebidas de Material fictício V4 0/ });
     await expect(amount).toHaveValue("5");

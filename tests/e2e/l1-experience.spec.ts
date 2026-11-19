@@ -1,3 +1,4 @@
+import { openOperationalDocumentAction } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -50,14 +51,18 @@ test("L1 ciência perdida recupera o mesmo conteúdo; @todos impede privado e Ma
   const f=await setup(),req=await issue(f.patient,f.products);await login(page,f.patient);
   await page.goto(`/documentos/${req.id}`);await selectDocumentSection(page,"materials");
   await expect(page.getByRole("tab",{name:"Atendimento",exact:true})).toHaveCount(0);
-  await expect(page.getByRole("button",{name:"Urgentes",exact:true})).toBeVisible();
+  const materials = page.getByRole("region", { name: "Materiais requisitados", exact: true });
+  const filter = materials.getByRole("button", { name: /^Todos \(\d+\)$/ }).and(materials.locator("button[aria-expanded]"));
+  await filter.click();
+  await expect(materials.getByRole("button", { name: /^Urgentes \(\d+\)$/ })).toBeVisible();
+  await filter.click();
   const macro=page.locator("details.hca-document-macro");await expect(macro).not.toHaveAttribute("open","");
   let posts=0;
   await page.route(`**/api/requisitions/${req.id}/science`,async route=>{
     if(route.request().method()!=="POST")return route.continue();posts++;
     const response=await route.fetch();expect(response.ok()).toBe(true);await route.abort("failed");
   });
-  await page.getByRole("button",{name:"Dar ciência",exact:true}).click();await page.getByRole("button",{name:"Confirmar minha ciência",exact:true}).click();
+  await openOperationalDocumentAction(page, "Registrar minha ciência");await page.getByRole("button",{name:"Confirmar minha ciência",exact:true}).click();
   await expect(page.getByText("Ciência registrada para o conteúdo confirmado.",{exact:true})).toBeVisible();
   expect(posts).toBe(1);expect(sql(`select count(*) from public.requisition_science_events where requisition_id=${q(req.id)} and user_id=${q(fixtures.family.id)} and mode='express'`)).toBe("1");
   await page.unroute(`**/api/requisitions/${req.id}/science`);

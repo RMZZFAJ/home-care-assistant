@@ -75,8 +75,27 @@ export async function openDocumentAction(page: Page, name: string) {
   await page.getByRole("menuitem", { name, exact: true }).click();
 }
 
+function operationalMenu(page: Page) {
+  return page.getByRole("menu", { name: "Ações operacionais", exact: true });
+}
+
+export async function openOperationalDocumentAction(page: Page, name: string) {
+  const menu = operationalMenu(page);
+  if (!(await menu.isVisible())) await page.getByRole("button", { name: "Ações da ficha", exact: true }).click();
+  await menu.getByRole("menuitem", { name, exact: true }).click();
+}
+
+export async function expectNoOperationalDocumentAction(page: Page, name: string) {
+  const menu = operationalMenu(page);
+  const trigger = page.getByRole("button", { name: "Ações da ficha", exact: true });
+  if (await trigger.isVisible()) await trigger.click();
+  await expect(page.getByRole("button", { name, exact: true })).toHaveCount(0);
+  await expect(menu.getByRole("menuitem", { name, exact: true })).toHaveCount(0);
+  if (await menu.isVisible()) await menu.press("Escape");
+}
+
 export async function confirmCompleteDeliveryReceipt(page: Page) {
-  await page.getByRole("button", { name: "Conferir recebimento", exact: true }).click();
+  await openOperationalDocumentAction(page, "Conferir recebimento");
   const editor = page.getByRole("dialog", { name: "Conferir recebimento", exact: true });
   await editor.getByRole("button", { name: "Confirmar recebimento", exact: true }).click();
   const result = page.getByRole("dialog", { name: "Recebimento confirmado", exact: true });

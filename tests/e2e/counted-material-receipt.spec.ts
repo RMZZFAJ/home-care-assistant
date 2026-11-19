@@ -1,3 +1,4 @@
+import { openOperationalDocumentAction } from "./document-sections";
 import { randomUUID } from "node:crypto";
 import { PDF } from "@libpdf/core";
 import { expect, test, type Page } from "@playwright/test";
@@ -36,7 +37,7 @@ test("ENT confere falta e excedente na mesma ficha e recupera confirmação sem 
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, f.patient);
   await page.goto("/fichas/" + sent.id);
-  await page.getByRole("button", { name: "Conferir recebimento", exact: true }).click();
+  await openOperationalDocumentAction(page, "Conferir recebimento");
   const editor = page.getByRole("dialog", { name: "Conferir recebimento", exact: true });
   const short = editor.getByRole("textbox", { name: /Recebidas de Material fictício V4 0/ });
   const excess = editor.getByRole("textbox", { name: /Recebidas de Material fictício V4 1/ });

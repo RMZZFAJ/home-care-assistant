@@ -621,7 +621,7 @@ function ProgressContent({
         <div><h2><Icon name="history" width={19} height={19} />Andamentos</h2><p>Registros em ordem cronológica.</p></div>
         <div className="doc-feed-head-actions">
           {!readOnly && (writable || pending || privateDraft.offered || privateDraft.base || privateDraft.consumed || privateDraft.pending) ? (
-            <ActionButton compact ref={openerRef} onClick={() => setOpen(true)}>
+            <ActionButton compact variant="quiet" data-progress-editor-trigger ref={openerRef} onClick={() => setOpen(true)}>
               <Icon name="plus" />
               {pending ? "Recuperar publicação" : privateDraft.pending ? "Recuperar preenchimento de andamento" : "Novo andamento"}
             </ActionButton>

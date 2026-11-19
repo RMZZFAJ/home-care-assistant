@@ -1,3 +1,5 @@
+import { openDocumentMore, closeDocumentMore } from "./document-sections";
+import { openDocumentAction } from "./document-sections";
 import { selectDocumentSection } from "./document-sections";
 import { expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
@@ -15,7 +17,7 @@ test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT s
   await loginDecision(page, fixtures.adminA.email, patient);
   const stock = terminalLedger(patient);
   await page.goto(`/fichas/${document.id}`);
-  await page.getByRole("button", { name: "Revisar conclusão", exact: true }).click();
+  await openDocumentAction(page, "Revisar conclusão");
   const conclusion = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
   await conclusion.getByRole("button", { name: "Concluir e arquivar", exact: true }).click();
   const archive = page.getByRole("dialog", { name: "Arquivar ficha", exact: true });
@@ -25,7 +27,9 @@ test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT s
   await info.attach("revisao-do-arquivamento", { body: await archive.screenshot(), contentType: "image/png" });
   await archive.getByRole("button", { name: "Arquivar e consolidar PDF", exact: true }).click();
   await page.getByRole("dialog", { name: "Ficha arquivada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Revisar conclusão", exact: true })).toHaveCount(0);
+  await openDocumentMore(page);
+  await expect(page.getByRole("menuitem", { name: "Revisar conclusão", exact: true })).toHaveCount(0);
+  await closeDocumentMore(page);
   await selectDocumentSection(page, "progress");
   await expect(page.getByRole("button", { name: "Novo andamento", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Revisar encerramento", exact: true }).click();

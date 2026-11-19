@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, type ReactNode } from "react";
+import { useCallback, useImperativeHandle, useRef, useState, type ReactNode, type Ref } from "react";
 import { ActionButton, DefinitionGrid, FormField, Pill, TextAreaField } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { useOperationActivity } from "@/components/ui/operation-activity";
@@ -32,7 +32,7 @@ const labels: Record<Blocker, [ready: string, blocked: string, instruction: stri
 };
 
 export function DocumentFollowUpActions({
-  id, patientId, kind, code, patientName, actor, userId, canComplete, canReopen, cancelled, disabled, preservedFacts, onUpdated, onShowMaterials, onCompleteAndArchive,
+  id, patientId, kind, code, patientName, actor, userId, canComplete, canReopen, cancelled, disabled, preservedFacts, onUpdated, onShowMaterials, onCompleteAndArchive, reviewControl,
 }: {
   id: string; patientId: string; kind: FollowUpReference["kind"]; code: string; patientName: string; actor: string; userId: string;
   canComplete: boolean; canReopen: boolean; cancelled: boolean; disabled: boolean;
@@ -40,6 +40,7 @@ export function DocumentFollowUpActions({
   onUpdated: () => void;
   onShowMaterials: () => void;
   onCompleteAndArchive?: () => void;
+  reviewControl?: Ref<(opener: HTMLButtonElement | null) => void>;
 }) {
   const openerRef = useRef<HTMLButtonElement>(null);
   const continueToArchiveRef = useRef(false);
@@ -68,7 +69,9 @@ export function DocumentFollowUpActions({
   const title = reopening ? "Reverter decisão e reabrir" : "Revisar e concluir";
   const confirmation = reopening ? "Reabrir acompanhamento" : "Concluir";
 
-  function open(next: Purpose) {
+  function open(next: Purpose, opener: HTMLButtonElement | null) {
+    if (disabled || (next === "complete" ? !canComplete : !canReopen)) return;
+    openerRef.current = opener;
     continueToArchiveRef.current = false;
     setReason("");
     setError("");
@@ -76,6 +79,7 @@ export function DocumentFollowUpActions({
     reference.refresh();
     setPurpose(next);
   }
+  useImperativeHandle(reviewControl, () => (opener: HTMLButtonElement | null) => open("complete", opener));
 
   function closeReview(destination: "close" | "materials" = "close") {
     if (decision.uncertain || reason.trim()) {
@@ -121,9 +125,9 @@ export function DocumentFollowUpActions({
   const priorLabel = facts?.state === "cancelled" ? "Cancelada" : "Concluída";
   const closeResult = () => { setResult(null); setPurpose(null); onUpdated(); };
   return <>
-    {canReopen ? <ActionButton ref={openerRef} disabled={disabled} onClick={() => open("reopen")}>
+    {canReopen ? <ActionButton disabled={disabled} onClick={event => open("reopen", event.currentTarget)}>
       <Icon name="refresh" />{cancelled ? "Reverter cancelamento" : "Reverter conclusão"}
-    </ActionButton> : canComplete ? <ActionButton ref={openerRef} disabled={disabled} onClick={() => open("complete")}>
+    </ActionButton> : canComplete && !reviewControl ? <ActionButton disabled={disabled} onClick={event => open("complete", event.currentTarget)}>
       <Icon name="check" />Revisar conclusão
     </ActionButton> : null}
     <Dialog open={Boolean(purpose) && !result} title={title} kicker={`${code} · ${patientName}`}

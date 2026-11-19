@@ -1,5 +1,26 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — ações das fichas e próximo passo.** A sugestão fica antes
+dos atalhos. Os três pontos no cabeçalho dão acesso a copiar e
+compartilhar o link, revisar conclusão, cancelar e arquivar, de acordo
+com o estado e a capacidade. A identificação e os registros técnicos
+continuam disponíveis no mesmo menu.
+
+- O botão flutuante abre as ações disponíveis de entrega, compra,
+  ciência, chegada, recebimento e devolução. Cada opção usa o fluxo
+  existente. Novo andamento leva à aba e ao botão do editor.
+- O botão flutuante fica acima da navegação móvel, inclusive no perfil
+  da família. As verificações cobriram Escape, retorno de foco,
+  tamanho dos alvos e a sequência até o editor.
+- Passaram 18 casos dirigidos neste incremento em Android e iOS
+  emulados, distribuídos pelas rodadas de conferência e correção.
+  Foram verificados a ciência após perda de resposta, as permissões
+  de Andamentos, a compra mista, a cobertura de chegada, o recebimento
+  com diferença e a conclusão com arquivamento.
+- Build de produção, TypeScript e ESLint dirigido passaram. O
+  incremento é de interface. A fila de 25 migrations aguarda o preview
+  compatível com o novo contrato de arquivamento.
+
 **19/11 — editor de Andamentos na aba da ficha.** A aba reúne a
 cronologia, os filtros Todos/Automáticos/Manuais e o botão Novo
 andamento. O editor abre com o código da ficha e registra pelo mesmo
@@ -15,8 +36,7 @@ mantidos.
 - Passaram cinco casos em cada projeto móvel emulado, Android e
   iOS/WebKit, sem repetição. O build de produção, o TypeScript e o
   ESLint dirigido passaram. A aba e o editor da v7 foram conferidos
-  a 390 px. O menu flutuante e sua navegação seguem no próximo
-  incremento de organização das ações.
+  a 390 px.
 - A mudança de interface não tem migration. O desenvolvimento
   permanece em 272 versões até `20261119060719`. As 25 migrations
   ensaiadas aguardam o código compatível no preview.

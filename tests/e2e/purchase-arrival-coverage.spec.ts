@@ -1,3 +1,4 @@
+import { openOperationalDocumentAction } from "./document-sections";
 import { expect, test, type Locator } from "@playwright/test";
 import { PDF } from "@libpdf/core";
 import { randomUUID } from "node:crypto";
@@ -29,7 +30,7 @@ test("E05-02 associa automaticamente a COM de origem e cobre só a quantidade es
   await loginDecision(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + purchase.id);
   await selectDocumentSection(page, "workflow");
-  await page.getByRole("button", { name: /^(Confirmar recebimento|Informar nova chegada)$/ }).click();
+  await openOperationalDocumentAction(page, "Registrar chegada");
   const dialog = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
   await expect(dialog.getByText("Compra de origem", { exact: false })).toContainText(purchase.code);
   await expect(dialog.getByRole("combobox", { name: /Qual compra recebeu/ })).toHaveCount(0);

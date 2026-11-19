@@ -1,3 +1,4 @@
+import { openDocumentAction, openDocumentMore, closeDocumentMore } from "./document-sections";
 import { expect, test } from "@playwright/test";
 import { PDF } from "@libpdf/core";
 import { entOperationFixture, entSend } from "../integration/ent-operation-fixtures.mjs";
@@ -37,7 +38,9 @@ test("administrador reabre uma ENT mantendo a devolução, o cancelamento e o ex
 
   const success = page.getByRole("dialog", { name: "Acompanhamento reaberto", exact: true });
   await success.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Revisar conclusão", exact: true })).toBeVisible();
+  await openDocumentMore(page);
+  await expect(page.getByRole("menuitem", { name: "Revisar conclusão", exact: true })).toBeVisible();
+  await closeDocumentMore(page);
   const currentDetails = await page.request.get(`/api/documents/${doc.id}`);
   expect((await currentDetails.json()).data).toMatchObject({ status: "cancelled", workflow_data: { documentFollowUp: { state: "reopened" } } });
   expect(terminalLedger(patient)).toBe(stock);
@@ -67,8 +70,7 @@ test("revisão da ENT exige conferência pessoal e descarta a nota somente após
   if (info.project.name === "mobile") await page.setViewportSize({ width: 320, height: 680 });
   await loginDecision(page, fixtures.adminA.email, patient);
   await page.goto(`/historico/${document.id}`);
-  const button = page.getByRole("button", { name: "Revisar conclusão", exact: true });
-  await button.click();
+  await openDocumentAction(page, "Revisar conclusão");
   const review = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
   await review.getByText("Conferência pessoal pendente", { exact: true }).click();
   await expect(review.getByRole("button", { name: "Concluir", exact: true })).toBeDisabled();
@@ -84,7 +86,7 @@ test("revisão da ENT exige conferência pessoal e descarta a nota somente após
 
   const received = await entSend(fixture.pro, document, "receive", { divergences: [] });
   const stock = terminalLedger(patient);
-  await button.click();
+  await openDocumentAction(page, "Revisar conclusão");
   await expect(observation).toBeEmpty();
   await expect(review.getByText("Recebimento registrado", { exact: true })).toBeVisible();
   await review.getByRole("button", { name: "Concluir", exact: true }).click();

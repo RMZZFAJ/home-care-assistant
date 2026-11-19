@@ -1,4 +1,6 @@
-import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, closeDocumentMore, openDocumentAction, confirmCompleteDeliveryReceipt } from "./document-sections";
+import { expectNoOperationalDocumentAction } from "./document-sections";
+import { openOperationalDocumentAction } from "./document-sections";
+import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, openDocumentAction, confirmCompleteDeliveryReceipt } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { confirmArrivalReview, openArrivalReview } from "./purchase-arrival-review";
 import { selectContext } from "./auth-context";
@@ -239,16 +241,12 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await logout(page);
   await login(page, "family");
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Registrar aquisição", exact: true })
-    .click();
+  await openOperationalDocumentAction(page, "Registrar aquisição");
   await page
     .getByLabel(product.name + " · unidade", { exact: true })
     .fill("10");
   await confirm(page, "Aquisição registrada.");
-  await page
-    .getByRole("button", { name: "Informar nova chegada", exact: true })
-    .click();
+  await openOperationalDocumentAction(page, "Registrar chegada");
   await page
     .getByLabel(product.name + " · unidade", { exact: true })
     .fill("10");
@@ -1067,10 +1065,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
     })
   ).data;
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
-  await openDocumentMore(page);
-  await page
-    .getByRole("menuitem", { name: "Alterar destinatário", exact: true })
-    .click();
+  await openOperationalDocumentAction(page, "Alterar destinatário");
   await page.getByLabel("Novo destinatário").selectOption(fixtures().adminA.id);
   await page
     .getByLabel("Motivo / justificativa")
@@ -1091,12 +1086,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await login(page, "adminA");
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
   await confirmCompleteDeliveryReceipt(page);
-  await openDocumentMore(page);
-  await page
-    .getByRole("menuitem", { name: "Alterar destinatário", exact: true })
-    .count()
-    .then((count) => expect(count).toBe(0));
-  await closeDocumentMore(page);
+  await expectNoOperationalDocumentAction(page, "Alterar destinatário");
   await logout(page);
   await login(page);
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);

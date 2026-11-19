@@ -1,3 +1,5 @@
+import { expectNoOperationalDocumentAction } from "./document-sections";
+import { openOperationalDocumentAction } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { setup, issue, fixtures } from "../integration/v4-fixtures.mjs";
@@ -96,7 +98,7 @@ test("L1 laboratório: ficha, ciência em etapas e exemplares preservam os atos 
     await route.fulfill({ response });
   });
   try {
-    await page.getByRole("button", { name: "Dar ciência", exact: true }).click();
+    await openOperationalDocumentAction(page, "Registrar minha ciência");
     await page.getByRole("button", { name: "Confirmar minha ciência", exact: true }).click(); await posted;
     await expect(page.getByRole("dialog", { name: "Registrando sua ciência", exact: true })).toBeVisible();
     await capture(page, "carregamento-ciencia-registro", false);
@@ -104,7 +106,7 @@ test("L1 laboratório: ficha, ciência em etapas e exemplares preservam os atos 
     await expect(page.getByRole("dialog", { name: "Conferindo a resposta", exact: true })).toBeVisible();
     await capture(page, "carregamento-ciencia-conferencia", false); readRelease();
     await expect(page.getByText("Ciência registrada para o conteúdo confirmado.", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Dar ciência", exact: true })).toHaveCount(0);
+    await expectNoOperationalDocumentAction(page, "Registrar minha ciência");
   } finally { postRelease(); readRelease(); }
   await page.unroute(`**/api/requisitions/${req.id}/science*`);
   await selectDocumentSection(page, "files");
