@@ -1,6 +1,7 @@
-import { quantity } from "@/lib/quantity";
-import type { SupplyDocument, SupplyLine } from "@/types/documents";
+import { formatQuantity, quantity } from "@/lib/quantity";
+import type { PurchaseReceipt, SupplyDocument, SupplyLine } from "@/types/documents";
 import type { PurchaseSelection } from "@/lib/validation/purchase-command";
+import type { PurchaseArrivalSelection } from "@/lib/validation/purchase-arrival";
 
 export const receiptStates: Record<string, string> = {
   pending: "Aguardando conferência", approved: "Validada", rejected: "Rejeitada",
@@ -22,6 +23,33 @@ export function arrivalRemaining(line: SupplyLine, document: SupplyDocument) {
 
 export function formatPurchaseDate(date: string) {
   return date.split("-").reverse().join("/");
+}
+
+export function purchaseArrivalVariance(
+  receipt: PurchaseReceipt, item: PurchaseReceipt["lines"][number], unit: string,
+) {
+  if (!receipt.l2_arrival || item.expectedQuantity == null) return null;
+  const difference = quantity(item.expectedQuantity).minus(item.quantity);
+  const expected = "Esperados " + formatQuantity(item.expectedQuantity, unit);
+  if (difference.gt(0)) return expected + " · Faltaram " + formatQuantity(difference.toFixed(), unit) +
+    (item.remainingAction === "short" ? " · Encerrar com falta" : " · Aguardar nova entrega");
+  if (difference.lt(0)) return expected + " · Excedente conferido de " + formatQuantity(difference.abs().toFixed(), unit);
+  return expected;
+}
+
+export function requirePurchaseReceipt(document: SupplyDocument, lines: PurchaseArrivalSelection, key: string) {
+  const receipt = Array.isArray(document.receipts) && document.receipts.find(item => item.submission_key === key);
+  if (!receipt || !["approved", "pending", "rejected"].includes(receipt.state) ||
+    !Array.isArray(receipt.lines) || receipt.lines.length !== lines.length ||
+    !lines.every(line => receipt.lines.some(item =>
+      item.lineId === line.lineId && quantity(item.quantity).eq(line.quantity) &&
+      item.remainingAction === line.remainingAction && item.excessConfirmed === line.excessConfirmed &&
+      (line.expectedQuantity === undefined ? item.expectedQuantity === undefined :
+        item.expectedQuantity != null && quantity(item.expectedQuantity).eq(line.expectedQuantity)),
+    ))) {
+    throw new Error("A resposta não confirmou a parcela desta tentativa. Confira o resultado antes de repetir.");
+  }
+  return receipt;
 }
 
 export function requirePurchaseArrival(document: SupplyDocument, lines: PurchaseSelection) {

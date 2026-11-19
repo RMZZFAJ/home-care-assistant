@@ -7,6 +7,7 @@ export { exactQuantity } from "./exact-quantity";
 import { draftCommitSchema } from "./creation-drafts";
 import { supplySourceLinks } from "./supply-sources";
 import { purchaseCommandBody } from "./purchase-command";
+import { purchaseArrivalBody } from "./purchase-arrival";
 
 const identifier = z.string().uuid();
 const line = z
@@ -260,7 +261,7 @@ export const supplyCommandSchema = z
       ]),
       purchase: purchaseCommandBody,
       receive: z.union([
-        z.object({ lines: commandLines }).strict(),
+        purchaseArrivalBody,
         z
           .object({
             divergences: z

@@ -250,7 +250,10 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await page
     .getByLabel(product.name + " · unidade", { exact: true })
     .fill("10");
-  await confirm(page, "Chegada registrada e aguardando conferência.");
+  await page.getByRole("dialog", { name: "Registrar chegada", exact: true }).getByRole("button", { name: "Enviar para aprovação", exact: true }).click();
+  const arrival = page.getByRole("dialog", { name: "Chegada enviada para aprovação", exact: true });
+  await expect(arrival).toBeVisible();
+  await arrival.getByRole("button", { name: "Concluir", exact: true }).click();
   let stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();

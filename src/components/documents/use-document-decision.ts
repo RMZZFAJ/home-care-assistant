@@ -10,8 +10,10 @@ export class DocumentDecisionFailure extends Error {
 }
 
 /** Only a confirmed command's key survives this form. Fields never become a draft. */
-export function useDocumentDecision({ userId, documentId, domain, action, patientId }: {
-  userId: string; documentId: string; domain: DocumentDecisionIntention["domain"]; action: string; patientId?: string;
+type DecisionVerifier = (result: Record<string, unknown>, intention: DocumentDecisionIntention, key: string) => void;
+
+export function useDocumentDecision({ userId, documentId, domain, action, patientId, purchaseArrival = false }: {
+  userId: string; documentId: string; domain: DocumentDecisionIntention["domain"]; action: string; patientId?: string; purchaseArrival?: boolean;
 }) {
   const storageKey = `hca:official-decision:${userId}:${documentId}:${domain}:${action}`;
   const endpoint = domain === "balance_workspace" ? `/api/balances/decisions/${documentId}?careRecipientId=${patientId}` : `/api/documents/${documentId}/decisions`;
@@ -45,32 +47,32 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
   const cancellingRequisition = domain === "requisition" && action === "cancel";
   const purchasing = domain === "supply" && action === "purchase";
   useOperationActivity(busy, {
-    title: cancellingRequisition ? "Registrando cancelamento" : purchasing ? "Registrando compra" : "Concluindo a ação",
+    title: cancellingRequisition ? "Registrando cancelamento" : purchasing ? "Registrando compra" : purchaseArrival ? "Registrando chegada" : "Concluindo a ação",
     detail: "Aguarde a conferência do resultado antes de tentar novamente.",
     stage,
     steps: purchasing ? purchaseActivitySteps : [
-      { label: cancellingRequisition ? "Conferindo os efeitos no estoque" : "Enviando sua confirmação", icon: cancellingRequisition ? "stock" : "file" },
+      { label: cancellingRequisition ? "Conferindo os efeitos no estoque" : purchaseArrival ? "Registrando as quantidades recebidas" : "Enviando sua confirmação", icon: cancellingRequisition ? "stock" : purchaseArrival ? "truck" : "file" },
       { label: "Conferindo o resultado", icon: "check" },
     ],
   });
   function remember(key: string) { currentRef.current = { scope: storageKey, key }; try { sessionStorage.setItem(storageKey, key); } catch { /* The open form retains its key. */ } }
   function forget() { if (currentRef.current?.scope === storageKey) currentRef.current = null; try { sessionStorage.removeItem(storageKey); } catch { /* No permission or result comes from storage. */ } }
   function previous() { if (currentRef.current?.scope === storageKey) return currentRef.current.key; try { const value = sessionStorage.getItem(storageKey); return value && /^[a-f0-9-]{36}$/.test(value) ? value : null; } catch { return null; } }
-  async function settle(key: string, intention?: DocumentDecisionIntention, verify?: (result: Record<string, unknown>, intention: DocumentDecisionIntention) => void) {
+  async function settle(key: string, intention?: DocumentDecisionIntention, verify?: DecisionVerifier) {
     setStage(1);
     const result = requireDocumentDecisionReceipt(await api(reconcileEndpoint, { key }), { documentId, key, domain, action }, intention);
-    if (result.state === "applied") verify?.(result.result, result.intention);
+    if (result.state === "applied") verify?.(result.result, result.intention, key);
     forget(); setUncertain(false);
     return result;
   }
-  async function checkPrevious(verify?: (result: Record<string, unknown>, intention: DocumentDecisionIntention) => void): Promise<DocumentDecisionReceipt | null> {
+  async function checkPrevious(verify?: DecisionVerifier): Promise<DocumentDecisionReceipt | null> {
     const key = previous(); if (!key || sendingRef.current) return null;
     sendingRef.current = true; setBusy(true); setError("");
     try { return await settle(key, undefined, verify); }
     catch (cause) { remember(key); setUncertain(true); const message = `Não foi possível conferir o resultado anterior. Procure a supervisão antes de repetir a ação. ${cause instanceof Error ? cause.message : "Tente consultar novamente."}`; setError(message); throw new DocumentDecisionFailure(message, "uncertain", cause); }
     finally { sendingRef.current = false; setBusy(false); }
   }
-  async function execute(input: DocumentDecisionIntention, verify?: (result: Record<string, unknown>, intention: DocumentDecisionIntention) => void): Promise<DocumentDecisionReceipt | null> {
+  async function execute(input: DocumentDecisionIntention, verify?: DecisionVerifier): Promise<DocumentDecisionReceipt | null> {
     if (sendingRef.current) return null;
     if (previous()) { const message = "Confira o resultado anterior antes de confirmar outra tentativa."; setUncertain(true); setError(message); throw new DocumentDecisionFailure(message, "uncertain"); }
     const parsed = documentDecisionIntention.safeParse(input);
@@ -80,7 +82,7 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
     try {
       const result = requireDocumentDecisionReceipt(await api(endpoint, { key, intention }), { documentId, key, domain, action }, intention);
       if (result.state !== "applied") throw new Error("A confirmação não contém um ato aplicado.");
-      verify?.(result.result, result.intention);
+      verify?.(result.result, result.intention, key);
       forget(); setUncertain(false); return result;
     } catch (cause) {
       const detail = cause instanceof Error ? cause.message : "Falha ao concluir a ação.";

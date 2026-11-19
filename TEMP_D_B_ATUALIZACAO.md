@@ -99,8 +99,24 @@ compra, nos detalhes do material, no resultado e na jornada de doação com
 saldo inicial da REQ. Duas verificações do PDF de entrada também passaram.
 As capturas estão em `output/playwright/l2-com-purchase/` e a última execução
 em `output/playwright/l2-com-purchase-directed.log`. A chegada informada
-em separado ainda precisa
-incorporar as faltas, os excedentes, a correção e a aprovação em lote da v7.
+em separado recebeu o painel E05-09 com seleção por material, leitura de
+embalagem e preenchimento manual. Quantidade física, quantidade esperada
+e destino da falta ficam na parcela. O estoque é creditado na hora por
+administrador habilitado ou após a aprovação de uma chegada da família.
+Uma falta encerrada deixa de ser esperada após aprovação. Um excedente
+conferido pode entrar no estoque e seguir por ENT com vínculo à COM.
+
+A migration `20261119041907_l2_com_arrival_variances.sql` foi aplicada na
+stack local. As regressões cobriram espera, encerramento, recusa, excesso
+sem confirmação, conflito de versão, recuperação de resposta, leitura de
+embalagem com edição manual e PDF de compra. A conferência com zero
+unidades registra a falta sem movimentar o estoque e mostra o saldo como
+sem entrada validada. Passaram oito integrações com Auth real, oito testes
+unitários dirigidos e dez execuções em Android e iOS emulados, sem retry
+nas rodadas finais. Os logs estão em `output/playwright/l2-com-arrival-*.log`
+e as capturas móveis em `output/playwright/l2-com-arrival/`. A devolução
+para correção pelo autor, a aprovação em lote, a chegada avulsa e a
+cobertura de outro planejamento ainda fazem parte das próximas etapas.
 
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma

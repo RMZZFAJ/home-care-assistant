@@ -41,7 +41,8 @@ export function requirePurchaseEntryBalances(value: unknown, source: Source): Pu
     const material = source.lines.find(item => item.id === fact.lineId)!;
     if (fact.state === "not_validated" && ((typeof material.accepted_quantity !== "string" && typeof material.accepted_quantity !== "number")
       || !quantity(material.accepted_quantity).eq(0)
-      || source.receipts.some(receipt => receipt.state === "approved" && receipt.lines.some(item => item.lineId === fact.lineId))))
+      || source.receipts.some(receipt => receipt.state === "approved" && receipt.lines.some(item =>
+        item.lineId === fact.lineId && (!receipt.l2_arrival || quantity(item.quantity).gt(0))))))
       throw new Error("A ausência de entrada não corresponde ao registro.");
     if (!fact.entry) continue;
     const act = fact.entry;

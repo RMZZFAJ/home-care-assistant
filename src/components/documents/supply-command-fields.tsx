@@ -33,6 +33,7 @@ import {
 import { formatBrazilDate } from "@/lib/receipt";
 import { PurchaseReceiptContent } from "./purchase-details";
 import { PurchaseFormLine } from "./purchase-register";
+import { PurchaseArrivalFields } from "./purchase-arrival";
 import { Icon } from "@/components/ui/icon";
 import { DeliveryConsumptionReferences } from "./delivery-cancellation";
 import { familyFulfillmentDescription } from "@/lib/documents/family-fulfillment";
@@ -93,6 +94,7 @@ export function CommandEditorFields({
   const [error, setError] = useState("");
   const instanceId = useId();
   const registeringPurchase = action === "purchase" && data.payload.origin !== "donation";
+  const registeringArrival = action === "receive" && data.type === "COM";
   const mayReceivePurchase = can(context, "com.receive");
   const directPurchaseCredit = mayReceivePurchase && context.patient?.role === "admin" && can(context, "com.validate");
   const [reasonText, setReasonText] = useState(
@@ -265,11 +267,30 @@ export function CommandEditorFields({
         body = { group: action === "approve_family" ? "family" : "supervisor" };
         summary =
           "Confirmar revisão deste balanço. A aplicação depende da política e da referência de estoque ainda válida.";
-      } else if (
-        action === "approve" ||
-        action === "purchase" ||
-        (action === "receive" && data.type === "COM")
-      ) {
+      } else if (registeringArrival) {
+        const selected = lines.filter(line => form.has(line.id + ":selected"));
+        if (!selected.length) throw new Error("Selecione ao menos um material que chegou.");
+        const entries = selected.map(line => {
+          const raw = String(form.get(line.id) ?? "").trim();
+          const expected = arrivalRemaining(line, data);
+          if (!validQuantity(raw, 6, true)) throw new Error("Confira a quantidade recebida de " + line.name_snapshot);
+          const physical = quantity(raw);
+          const remaining = form.get(line.id + ":remainingAction");
+          if (physical.gt(expected) && !form.has(line.id + ":excess"))
+            throw new Error("Confirme o excedente de " + line.name_snapshot);
+          return {
+            lineId: line.id, quantity: physical.toFixed(), expectedQuantity: expected.toFixed(),
+            ...(physical.lt(expected) ? { remainingAction: remaining === "short" ? "short" : "wait" } : {}),
+            ...(physical.gt(expected) ? { excessConfirmed: true as const } : {}),
+          };
+        });
+        body = { lines: entries };
+        summary = entries.map((row, index) => {
+          const line = selected[index];
+          return line.name_snapshot + " · " + formatQuantity(row.quantity, line.unit_snapshot) +
+            " recebidos de " + formatQuantity(row.expectedQuantity, line.unit_snapshot);
+        }).join("\n");
+      } else if (action === "approve" || action === "purchase") {
         const values = lines
           .flatMap((line) => {
             const value = String(form.get(line.id) ?? "").trim();
@@ -279,9 +300,7 @@ export function CommandEditorFields({
             const limit =
               action === "approve"
                 ? quantity(line.quantity)
-                : action === "purchase"
-                  ? acquisitionRemaining(line)
-                  : arrivalRemaining(line, data);
+                : acquisitionRemaining(line);
             if (quantity(value).gt(limit))
               throw new Error(
                 "A quantidade supera o limite deste ato para " +
@@ -312,11 +331,6 @@ export function CommandEditorFields({
             );
           })
           .join("\n");
-        if (action === "receive" && data.type === "COM")
-          summary +=
-            context.patient?.role === "admin" && can(context, "com.validate")
-              ? "\nEsta chegada será validada imediatamente pela sua permissão administrativa, com entrada das quantidades declaradas no estoque familiar."
-              : "\nRegistrar esta chegada para conferência, sem entrada no estoque até a validação autorizada.";
       } else if (action === "receive" || action === "divergence") {
         command = "receive";
         if (action === "divergence" && !divergent.length)
@@ -530,7 +544,7 @@ export function CommandEditorFields({
     <form
       id={formId}
       ref={formElementRef}
-      className={registeringPurchase ? "hca-purchase-list" : "mt-5 space-y-4 border-t border-(--line) pt-5"}
+      className={registeringPurchase || registeringArrival ? "hca-purchase-list" : "mt-5 space-y-4 border-t border-(--line) pt-5"}
       onSubmit={submit}
       onChange={() => setFieldRevision((value) => value + 1)}
     >
@@ -548,15 +562,15 @@ export function CommandEditorFields({
           progress={data.purchaseProgress?.lines.find(progress => progress.lineId === line.id)}
           fieldId={instanceId + line.id} mayReceive={mayReceivePurchase} directCredit={directPurchaseCredit} />)}
       </> : null}
-      {action === "approve" || (action === "purchase" && !registeringPurchase) ||
-        (action === "receive" && data.type === "COM")
+      {registeringArrival ? <PurchaseArrivalFields data={data} lines={lines} fields={initialDraft?.fields}
+        mayReadStock={can(context, "stock.family.read")}
+        directCredit={directPurchaseCredit} /> : null}
+      {action === "approve" || (action === "purchase" && !registeringPurchase)
         ? lines.map((line) => {
           const remaining =
             action === "approve"
               ? line.quantity
-              : action === "purchase"
-                ? acquisitionRemaining(line).toFixed()
-                : arrivalRemaining(line, data).toFixed();
+              : acquisitionRemaining(line).toFixed();
           return (
             <div key={line.id} className="space-y-1">
               <label
@@ -585,9 +599,7 @@ export function CommandEditorFields({
               >
                 Limite deste ato:{" "}
                 {formatQuantity(remaining, line.unit_snapshot)}.{" "}
-                {action === "receive"
-                  ? "Informe somente o que chegou nesta parcela. Deixe vazio se não chegou."
-                  : action === "purchase"
+                {action === "purchase"
                     ? "Informe somente o adquirido nesta parcela."
                     : "Aprovar não registra aquisição ou entrada no estoque."}
               </p>

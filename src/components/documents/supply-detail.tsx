@@ -48,12 +48,13 @@ import {
 } from "./supply-command-editor";
 import { DraftReferenceComparison } from "./draft-reference-comparison";
 import { ConsentReferenceComparison } from "./consent-reference-comparison";
-import { type PatientPerson, type SupplyDocument } from "@/types/documents";
+import type { PatientPerson, PurchaseReceipt, SupplyDocument } from "@/types/documents";
 import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { purchaseCommandBody } from "@/lib/validation/purchase-command";
+import { purchaseArrivalBody } from "@/lib/validation/purchase-arrival";
 import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document-header";
 import { FamilyFulfillmentReview } from "./family-fulfillment-review";
@@ -79,11 +80,13 @@ import {
   PurchaseExpectationComparison,
 } from "./purchase-details";
 import { confirmedPurchase, PurchaseResult, type ConfirmedPurchase } from "./purchase-register";
+import { PurchaseArrivalResult } from "./purchase-arrival";
 import {
   acquisitionRemaining,
   arrivalRemaining,
   purchaseActivitySteps,
   requirePurchaseArrival,
+  requirePurchaseReceipt,
 } from "@/lib/documents/purchase";
 import {
   DeliveryCancellationDetails,
@@ -132,17 +135,20 @@ export function SupplyDocumentContent({
   const [readFailed, setReadFailed] = useState(false);
   const [message, setMessage] = useState("");
   const [purchaseResult, setPurchaseResult] = useState<ConfirmedPurchase | null>(null);
+  const [arrivalResult, setArrivalResult] = useState<{ documentId: string; receipt: PurchaseReceipt } | null>(null);
   const [purchaseUpdating, setPurchaseUpdating] = useState(false);
   const purchaseReadAttemptRef = useRef<number | null>(null);
   useOperationActivity(purchaseUpdating, { title: "Registrando compra", stage: 2, steps: purchaseActivitySteps });
   const [readNotice, setReadNotice] = useState("");
   const [action, setAction] = useState<DocumentAction | null>(null);
   const registeringPurchase = action === "purchase" && data?.payload.origin !== "donation";
-  useOperationActivity(loading && coveredRead || (busy && !registeringPurchase), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
+  const registeringArrival = action === "receive" && data?.type === "COM";
+  const coveredOperation = registeringPurchase || registeringArrival;
+  useOperationActivity(loading && coveredRead || (busy && !coveredOperation), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
   const [review, setReview] = useState<SupplyReview | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [closeUncertain, setCloseUncertain] = useState(false);
-  const decision = useDocumentDecision({ userId: context.userId, documentId: id, domain: "supply", action: review?.action ?? action ?? "none" });
+  const decision = useDocumentDecision({ userId: context.userId, documentId: id, domain: "supply", action: review?.action ?? action ?? "none", purchaseArrival: registeringArrival });
   const [purchaseConflict, setPurchaseConflict] = useState(false);
   const [deliveryConflict, setDeliveryConflict] = useState(false);
   const [regularizationEditing, setRegularizationEditing] = useState(false);
@@ -297,13 +303,16 @@ export function SupplyDocumentContent({
     setError("");
     let intention = pendingRef.current;
     try {
-      const verify = (row: Record<string, unknown>, accepted: DocumentDecisionIntention) => {
+      const verify = (row: Record<string, unknown>, accepted: DocumentDecisionIntention, key: string) => {
         const read = requireSupplyConfirmation({ data: row, persistence: "confirmed" }, {
           patientId: data.care_recipient_id, type: data.type, id, minimumVersion: accepted.expectedVersion,
         });
         if (accepted.action === "purchase") {
           const { lines } = purchaseCommandBody.parse(accepted.body);
           requirePurchaseArrival(read, lines);
+        }
+        if (accepted.action === "receive" && read.type === "COM") {
+          requirePurchaseReceipt(read, purchaseArrivalBody.parse(accepted.body).lines, key);
         }
       };
       const outcome = uncertain ? await decision.checkPrevious(verify) : await decision.execute({
@@ -339,20 +348,30 @@ export function SupplyDocumentContent({
         return;
       }
       const receipt = result.data.receipts.find(
-        (receipt) => receipt.submission_key === intention.idempotencyKey,
+        (receipt) => intention.action === "validate_receipt"
+          ? receipt.id === outcome.intention.body.receiptId
+          : receipt.submission_key === intention.idempotencyKey,
       );
+      const zeroArrival = receipt?.l2_arrival && receipt.lines.every(line => quantity(line.quantity).eq(0));
+      if (result.data.type === "COM" && intention.action === "receive" && receipt &&
+        (receipt.state === "approved" || receipt.state === "pending")) {
+        setArrivalResult({ documentId: id, receipt });
+      }
       const purchaseMessages: Record<string, string> = {
         approve:
           "Decisão de aprovação registrada. Quantidades adquiridas e recebidas não mudaram.",
         purchase: "Aquisição registrada. A chegada terá seu próprio registro.",
         receive:
-          receipt?.state === "approved"
-            ? "Chegada registrada e validada. As quantidades desta parcela foram incorporadas ao estoque familiar."
+          receipt?.state === "approved" && zeroArrival
+            ? "Conferência registrada sem movimentação de estoque."
+            : receipt?.state === "approved"
+              ? "Chegada registrada e validada. As quantidades desta parcela foram incorporadas ao estoque familiar."
             : receipt?.state === "pending"
               ? "Chegada registrada e aguardando conferência. Nenhuma quantidade desta parcela foi incorporada ao estoque."
               : "Chegada registrada. Consulte a parcela e seu estado de conferência.",
         validate_receipt:
-          "Parcela validada. As quantidades declaradas integram o estoque familiar.",
+          zeroArrival ? "Parcela validada sem movimentação de estoque."
+            : "Parcela validada. As quantidades declaradas integram o estoque familiar.",
         reject_receipt:
           "Parcela rejeitada. A declaração original foi preservada, sem entrada desta parcela no estoque.",
         close_expectation:
@@ -663,7 +682,7 @@ export function SupplyDocumentContent({
           tabs.select("workflow");
           setAction(item);
           setReview(null);
-          if (item === "purchase") setError("");
+          if (item === "purchase" || (item === "receive" && data.type === "COM")) setError("");
         }}
       >
         {data.type === "COM" && item === "receive"
@@ -775,7 +794,7 @@ export function SupplyDocumentContent({
           transferEditing) ? (
         <Notice>{readNotice}</Notice>
       ) : null}
-      {!registeringPurchase ? purchaseConflictPanel : null}
+      {!coveredOperation ? purchaseConflictPanel : null}
       {deliveryConflict && data?.type === "ENT" ? (
         <section className="ui-card space-y-3">
           <Notice error>
@@ -1281,7 +1300,7 @@ export function SupplyDocumentContent({
                           ...(draftCommit ? { draftCommit } : {}),
                         };
                         setReview(next);
-                        if (registeringPurchase) void execute(next);
+                        if (coveredOperation) void execute(next);
                       }}
                     />
                   ) : null}
@@ -1346,12 +1365,13 @@ export function SupplyDocumentContent({
         </>
       ) : null}
       <Dialog
-        open={Boolean(review) && !readDenied && (!registeringPurchase || uncertain)}
+        open={Boolean(review) && !readDenied && (!coveredOperation || uncertain)}
         title={
           review?.action === "close_expectation"
             ? "Revisar encerramento da expectativa"
             : registeringPurchase
               ? "Conferir resultado da compra"
+              : registeringArrival ? "Conferir resultado da chegada"
               : "Revisar operação definitiva"
         }
         closeDisabled={busy}
@@ -1406,6 +1426,12 @@ export function SupplyDocumentContent({
         resultFocusRef.current = true;
         setFocusRevision(value => value + 1);
       }} /> : null}
+      {arrivalResult?.documentId === id && data && !readDenied ? <PurchaseArrivalResult receipt={arrivalResult.receipt} lines={data.lines}
+        onClose={() => {
+          setArrivalResult(null);
+          resultFocusRef.current = true;
+          setFocusRevision(value => value + 1);
+        }} /> : null}
       <Dialog open={closeUncertain} title="Fechar sem resultado confirmado?" onClose={() => setCloseUncertain(false)}>
         <p>O resultado continua sem confirmação. Fechar descarta os campos desta tela. Procure a supervisão e confira o resultado antes de repetir a ação.</p>
         <div className="hca-toolbar"><ActionButton onClick={() => setCloseUncertain(false)}>Voltar à conferência</ActionButton><ActionButton onClick={() => { setCloseUncertain(false); setReview(null); setAction(null); pendingRef.current = null; setUncertain(false); }}>Fechar e procurar supervisão</ActionButton></div>

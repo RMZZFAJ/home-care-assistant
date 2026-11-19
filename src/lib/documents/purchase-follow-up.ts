@@ -58,6 +58,10 @@ export function purchaseFollowUp(input: {
       ? "Ainda há expectativa de aquisição autorizada. Registre as quantidades da doação e depois informe a chegada."
       : "Ainda há quantidades autorizadas para comprar. No registro, marque o que já está em mãos e informe a previsão para o que ainda vai chegar.",
   };
+  if (progress.state === "closed_below_quantity" && !progress.expectationClosed) return {
+    ...base, pending: false, heading: "Consultar faltas encerradas",
+    description: "Confira as quantidades recebidas e as diferenças registradas no encerramento da chegada.",
+  };
   if (progress.expectationClosed) return {
     ...base, pending: false, heading: "Consultar a aquisição restante encerrada",
     description: "O encerramento e as parcelas estão preservados. A quantidade não adquirida não foi recebida. As entradas validadas pertencem aos seus atos próprios; a COM não atende uma REQ sem ENT aceita.",

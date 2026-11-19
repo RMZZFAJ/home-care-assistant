@@ -14,6 +14,7 @@ import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
 import { CATEGORY_LABELS } from "@/lib/catalog";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
+import { purchaseArrivalVariance } from "@/lib/documents/purchase";
 
 const name = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const unit = (line: Record<string, unknown>) => String(line.unit_snapshot ?? "Unidade não preservada");
@@ -81,11 +82,12 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
     layout.heading("Relação de materiais", "Saldo do estoque familiar após a última entrada validada de cada material nesta ficha. Não é o saldo atual.");
     layout.table([{ label: "Nº", fraction: 0.045 }, { label: "Material / unidade", fraction: 0.355 }, { label: donation ? "Declarado" : "Adquirido", fraction: 0.17 }, { label: "Entrada validada", fraction: 0.18 }, { label: "Saldo após entrada", fraction: 0.25 }], grouped(snapshot.lines.map((line, index) => {
       const entry = entries!.find(value => value.lineId === line.id)!;
+      const progress = snapshot.purchaseProgress?.lines.find(item => item.lineId === line.id);
       const balance = entry.state === "known" ? amount(entry.quantity, unit(line)) : entry.state === "restricted" ? "Acesso restrito" : entry.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro";
       return {
         category: category(line), cells: [
           { text: String(index + 1).padStart(2, "0") }, { text: name(line) + "\n" + unit(line), key: "material/" + index + "/name", strong: true },
-          { text: amount(line.purchased_quantity, unit(line)), key: "material/" + index + "/acquired" }, { text: amount(line.accepted_quantity, unit(line)), key: "material/" + index + "/validated" },
+          { text: amount(line.purchased_quantity, unit(line)), key: "material/" + index + "/acquired" }, { text: amount(progress?.validatedQuantity ?? line.accepted_quantity, unit(line)), key: "material/" + index + "/validated" },
           { text: balance + (entry.entry ? "\n" + formatBrazilDate(entry.entry.validatedAt) : ""), key: "material/" + index + "/balance" },
         ]
       };
@@ -102,6 +104,12 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
       if (receipt.reason) layout.paragraph(receipt.reason, prefix + "/reason");
       if (receipt.state === "rejected") layout.paragraph("Registro de chegada rejeitado; não comprova entrada de material.", prefix + "/scope", { size: 9.5 });
       layout.table([{ label: "Material", fraction: 0.7 }, { label: "Quantidade da parcela", fraction: 0.3 }], receipt.lines.map((item, itemIndex) => { const line = snapshot.lines.find(value => value.id === item.lineId); if (!line) throw new Error("Receipt material missing"); return { cells: [{ text: name(line) }, { text: amount(item.quantity, unit(line)), key: prefix + "/quantity/" + itemIndex }] }; }));
+      for (const [itemIndex, item] of receipt.lines.entries()) {
+        const line = snapshot.lines.find(value => value.id === item.lineId);
+        if (!line) throw new Error("Receipt material missing");
+        const variance = purchaseArrivalVariance(receipt, item, unit(line));
+        if (variance) layout.paragraph(name(line) + " · " + variance, prefix + "/difference/" + itemIndex, { size: 9.5 });
+      }
     }
     const closure = snapshot.purchaseProgress?.closure;
     if (closure) { layout.heading("Aquisição restante encerrada"); layout.paragraph((closure.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(closure.recordedAt), "purchase/closure/actor"); layout.paragraph(closure.reason, "purchase/closure/reason"); }

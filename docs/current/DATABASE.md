@@ -139,6 +139,16 @@ pela loja ficam nas linhas do evento de aquisição e são consultáveis na COM.
 Somente a chegada validada disponibiliza quantidade para uma ENT, mesmo
 quando outra linha aguarda a loja.
 
+A declaração de chegada vinculada registra a quantidade esperada e a
+quantidade física por material. O banco revalida o esperado pelo saldo
+disponível sob o lock do estoque. Quando a família informa uma falta com
+encerramento, o saldo fica reservado até a decisão. A aprovação encerra
+a falta e uma recusa libera a quantidade pendente. Uma chegada menor com
+nova entrega esperada mantém a diferença em aberto. O excedente confirmado
+integra a entrada física após a validação sem ampliar a quantidade comprada.
+O registro da parcela e o snapshot documental preservam os valores e a
+providência de cada linha.
+
 bal_approvals identifica grupo, ator e versão de contagem. Reconto conserva
 aprovações antigas e captura nova referência; elas não aprovam o novo balanço.
 

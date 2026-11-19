@@ -6,6 +6,7 @@ import { balanceApplicationFacts } from "@/lib/validation/balance-application";
 import { balanceCorrectionFacts } from "@/lib/validation/balance-corrections";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
+import { purchaseArrivalVariance } from "@/lib/documents/purchase";
 
 const name = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const unit = (line: Record<string, unknown>) => String(line.unit_snapshot ?? "Unidade não preservada");
@@ -20,7 +21,8 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
       const prefix = "material/" + index, entry = entries.find(value => value.lineId === line.id)!;
       semanticFacts[prefix + "/name"] = name(line) + " " + unit(line);
       semanticFacts[prefix + "/acquired"] = amount(line.purchased_quantity, unit(line));
-      semanticFacts[prefix + "/validated"] = amount(line.accepted_quantity, unit(line));
+      const progress = snapshot.purchaseProgress?.lines.find(item => item.lineId === line.id);
+      semanticFacts[prefix + "/validated"] = amount(progress?.validatedQuantity ?? line.accepted_quantity, unit(line));
       semanticFacts[prefix + "/balance"] = (entry.state === "known" ? amount(entry.quantity, unit(line)) : entry.state === "restricted" ? "Acesso restrito" : entry.state === "not_validated" ? "Sem entrada validada" : "Não disponível no registro") + (entry.entry ? " " + formatBrazilDate(entry.entry.validatedAt) : "");
       semanticFacts["purchase/" + index + "/planned"] = amount(line.quantity, unit(line));
       semanticFacts["purchase/" + index + "/approved"] = amount(line.approved_quantity, unit(line));
@@ -30,7 +32,13 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
       semanticFacts[prefix + "/submitted"] = "Chegada registrada por " + (receipt.submitted_name ?? "Nome não preservado") + " · " + formatBrazilDate(receipt.created_at);
       semanticFacts[prefix + "/decision"] = receipt.state === "pending" ? "Ainda sem decisão de validação." : (receipt.state === "approved" ? "Validada por " : "Rejeitada por ") + (receipt.validated_name ?? "Nome não preservado") + " · " + formatBrazilDate(receipt.validated_at ?? null);
       if (receipt.reason) semanticFacts[prefix + "/reason"] = receipt.reason;
-      receipt.lines.forEach((item, itemIndex) => { const line = snapshot.lines.find(value => value.id === item.lineId); if (!line) throw new Error("Receipt material missing"); semanticFacts[prefix + "/quantity/" + itemIndex] = amount(item.quantity, unit(line)); });
+      receipt.lines.forEach((item, itemIndex) => {
+        const line = snapshot.lines.find(value => value.id === item.lineId);
+        if (!line) throw new Error("Receipt material missing");
+        semanticFacts[prefix + "/quantity/" + itemIndex] = amount(item.quantity, unit(line));
+        const variance = purchaseArrivalVariance(receipt, item, unit(line));
+        if (variance) semanticFacts[prefix + "/difference/" + itemIndex] = name(line) + " · " + variance;
+      });
     });
     if (snapshot.purchaseProgress?.closure) {
       const closure = snapshot.purchaseProgress.closure;

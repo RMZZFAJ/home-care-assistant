@@ -927,3 +927,13 @@
   color: var(--success);
   box-shadow: 0 0 0 6px #eaf5ef, inset 0 0 0 1px #c9e6d4, 0 3px 9px #32523a20;
 }
+.hca-l1 .hca-arrival-attention {
+  color: var(--warning);
+  background: #fff4d9;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+.hca-l1 .hca-arrival-attention select { min-width: 0; max-width: 60%; font-size: 12px; }
+.hca-l1 .hca-arrival-stock { color: var(--muted); font-size: 12px; }
+.hca-l1 .hca-arrival-stock summary { cursor: pointer; min-height: 28px; color: var(--primary); }
+.hca-l1 .hca-arrival-stock .hca-icon { width: 14px; height: 14px; display: inline; margin-inline-end: 5px; }

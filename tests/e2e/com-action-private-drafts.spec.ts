@@ -15,14 +15,17 @@ test("COM aprovação, aquisição e chegada são atos separados sem rascunhos e
   await page.locator(`input[name="${doc.lines[0].id}"]`).fill(label === "Aprovar itens" ? "2" : "1");
   await expect(page.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toHaveCount(0);
   const isPurchase = label === "Registrar compra";
-  if (!isPurchase) await page.getByRole("button", { name: "Revisar operação", exact: true }).click();
+  const isArrival = label === "Informar nova chegada";
+  if (!isPurchase && !isArrival) await page.getByRole("button", { name: "Revisar operação", exact: true }).click();
   await audit(page, "COM ato sem rascunho");
-  await confirmedOutcome(page, doc.id, isPurchase ? "Confirmar compra" : "Confirmar operação");
+  await confirmedOutcome(page, doc.id, isPurchase ? "Confirmar compra" : isArrival ? "Confirmar entrada" : "Confirmar operação");
   if (isPurchase) {
    const result = page.getByRole("dialog", { name: "Compra registrada", exact: true });
    await expect(result.getByText("Aguardando entrega da loja", { exact: true })).toBeVisible();
    await result.getByRole("button", { name: "Concluir", exact: true }).click();
   }
+  if (isArrival) await page.getByRole("dialog", { name: "Entrada confirmada", exact: true })
+   .getByRole("button", { name: "Concluir", exact: true }).click();
   await page.unroute(`**/api/documents/${doc.id}/decisions`);
   doc = await rpc(f.admin, "operational_document", { p_id: doc.id });
  }

@@ -30,11 +30,11 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
   await page.getByRole("button", { name: /^(Confirmar recebimento|Informar nova chegada)$/ }).click();
   const field = page.locator(`input[name="${lineId}"]`);
   await expect(field).toHaveValue("");
-  await field.fill("1"); await page.getByRole("button", { name: "Revisar operação", exact: true }).click();
-  const review = page.getByRole("dialog", { name: "Revisar operação definitiva", exact: true }); await expect(review).toBeVisible();
-  await expect(review.getByText("Material fictício V4 0: 1 unidade", { exact: false })).toBeVisible();
-  await expect(review.getByText("Registrar esta chegada para conferência, sem entrada no estoque até a validação autorizada.", { exact: false })).toBeVisible();
-  await expect(review.locator("input")).toHaveCount(0);
+  await field.fill("1");
+  const arrival = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
+  await expect(arrival.getByText("Restam 7 unidade", { exact: true })).toBeVisible();
+  await expect(arrival.getByText("A família poderá usar essas quantidades após a aprovação do administrador.", { exact: false })).toBeVisible();
+  await arrival.getByRole("combobox", { name: "Destino da falta · Material fictício V4 0", exact: true }).selectOption("short");
   let arrivalAttempts = 0;
   const arrivalPayloads: unknown[] = [];
   await page.route("**/api/documents/" + document.id + "/decisions", async route => {
@@ -42,7 +42,11 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
     arrivalAttempts++; arrivalPayloads.push(route.request().postDataJSON());
     if (arrivalAttempts === 1) { await route.fetch(); await route.abort("failed"); } else await route.continue();
   });
-  await confirmDecisionAndReconcile(page, document.id, review.getByRole("button", { name: "Confirmar operação", exact: true })); await expect(review).toHaveCount(0);
+  await confirmDecisionAndReconcile(page, document.id, arrival.getByRole("button", { name: "Enviar para aprovação", exact: true }));
+  const result = page.getByRole("dialog", { name: "Chegada enviada para aprovação", exact: true });
+  await expect(result.getByText("Falta informada para conferência", { exact: true })).toBeVisible();
+  await result.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(arrival).toHaveCount(0);
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: document.code, exact: true })).toBeFocused();
   await expect(page.getByText("Chegada registrada e aguardando conferência.", { exact: false })).toBeVisible();
@@ -58,6 +62,7 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
   const form = page.locator("form").filter({ has: page.getByRole("button", { name: "Revisar operação", exact: true }) });
   await expect(form.getByRole("heading", { name: "Parcela selecionada", exact: true })).toBeVisible();
   await expect(form.getByText("1 unidade", { exact: true })).toBeVisible(); await expect(form.locator("input")).toHaveCount(0);
+  await expect(form.getByText("Faltaram 7 unidade · Encerrar com falta", { exact: true })).toBeVisible();
   let validationAttempts = 0;
   const validationPayloads: unknown[] = [];
   await page.route("**/api/documents/" + document.id + "/decisions", async route => {
@@ -66,13 +71,112 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
     if (validationAttempts === 1) { await route.fetch(); await route.abort("failed"); } else await route.continue();
   });
   await form.getByRole("button", { name: "Revisar operação", exact: true }).click();
+  const review = page.getByRole("dialog", { name: "Revisar operação definitiva", exact: true });
   await confirmDecisionAndReconcile(page, document.id, review.getByRole("button", { name: "Confirmar operação", exact: true })); await expect(review).toHaveCount(0);
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(page.getByText("Parcela validada.", { exact: false })).toBeVisible(); expect(validationPayloads).toHaveLength(1);
   const final = await rpc(f.admin, "operational_document", { p_id: document.id });
   expect(final.receipts.find((receipt: { id: string }) => receipt.id === initialReceipt.id)).toEqual(initialReceipt);
   expect(Number(final.lines[0].accepted_quantity)).toBe(3); expect(final.receipts.find((receipt: { id: string }) => receipt.id === pending.id).validated_by).toBe(fixtures.adminA.id);
+  expect(Number(final.purchaseProgress.lines[0].closedShortQuantity)).toBe(7);
   expect(sql(`select sum(quantity)::text from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`)).toBe("3.000000");
+});
+
+test("COM chegada combina código e preenchimento manual e exige confirmação do excedente", async ({ page }, info) => {
+  test.setTimeout(150_000);
+  const f = await setup();
+  const created = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "COM",
+    p_payload: { origin: "purchase", lines: f.products.map(productId => ({ productId, quantity: "6" })) },
+    p_key: randomUUID(), p_draft: false,
+  });
+  const [scanned, manual] = created.lines;
+  const document = await rpc(f.admin, "supply_document_command", { p_id: created.id, p_action: "purchase",
+    p_body: { lines: created.lines.map((line: { id: string }) => ({ lineId: line.id, quantity: "6" })) },
+    p_key: randomUUID(), p_version: created.version,
+  });
+  await rpc(f.admin, "catalogue_presentation_command", {
+    p_patient: f.patient, p_id: null, p_version: null, p_key: randomUUID(), p_body: {
+      productId: scanned.product_id, barcode: "1234567890128", name: "Pacote com quatro unidades", baseQuantity: "4", active: true,
+    },
+  });
+  await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
+  await selectDocumentSection(page, "workflow");
+  await page.getByRole("button", { name: "Informar nova chegada", exact: true }).click();
+  const arrival = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
+  await arrival.getByRole("button", { name: "Ler código", exact: true }).click();
+  const reader = page.getByRole("dialog", { name: "Ler código", exact: true });
+  await reader.getByLabel("Código manual").fill("1234567890128");
+  await reader.getByRole("button", { name: "Identificar", exact: true }).click();
+  await expect(reader.getByText("4 unidade por embalagem", { exact: true })).toBeVisible();
+  await reader.getByRole("textbox", { name: "Embalagens", exact: true }).fill("2");
+  await reader.getByRole("button", { name: "Usar quantidade", exact: true }).click();
+  await expect(arrival.locator(`input[name="${scanned.id}"]`)).toHaveValue("8");
+  await arrival.getByRole("switch", { name: "Chegou · " + manual.name_snapshot, exact: true }).click();
+  await arrival.locator(`input[name="${manual.id}"]`).fill("4");
+  await expect(arrival.getByText("Restam 2 unidade", { exact: true })).toBeVisible();
+  const scannedCard = arrival.locator("article").filter({ has: page.getByRole("heading", { name: scanned.name_snapshot, exact: true }) });
+  await scannedCard.getByText("Estoque familiar", { exact: true }).click();
+  await expect(scannedCard.getByText("Disponíveis hoje: 30 unidade · Com esta entrada: 38 unidade", { exact: true })).toBeVisible();
+  const confirm = arrival.getByRole("button", { name: "Confirmar entrada", exact: true });
+  await confirm.click();
+  await expect(arrival.getByText("Confirme o excedente de " + scanned.name_snapshot, { exact: true })).toBeVisible();
+  await arrival.getByRole("checkbox", { name: "Conferi 2 unidade a mais.", exact: true }).check();
+  await audit(page, "COM chegada mista scanner");
+  if (info.project.use.hasTouch) await info.attach("E05-09 chegada", { body: await page.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png" });
+  await confirm.click();
+  const result = page.getByRole("dialog", { name: "Entrada confirmada", exact: true });
+  await expect(result.getByText("Aguardando nova entrega", { exact: true })).toBeVisible();
+  await result.getByRole("button", { name: "Concluir", exact: true }).click();
+  const read = await rpc(f.admin, "operational_document", { p_id: document.id });
+  expect(read.receipts[0].lines).toEqual([
+    expect.objectContaining({ lineId: scanned.id, quantity: "8", expectedQuantity: "6", excessConfirmed: true }),
+    expect.objectContaining({ lineId: manual.id, quantity: "4", expectedQuantity: "6", remainingAction: "wait" }),
+  ]);
+  const pdf = await generatedPdf(page, "/api/documents/" + document.id + "/pdf");
+  expect(pdf.ok(), await pdf.text()).toBe(true);
+  expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
+});
+
+test("COM registra a falta sem anunciar entrada quando nenhuma unidade chega", async ({ page }) => {
+  test.setTimeout(90_000);
+  const f = await setup(), family = await actor("family", f.patient);
+  const created = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "COM",
+    p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "6" }] },
+    p_key: randomUUID(), p_draft: false,
+  });
+  const line = created.lines[0];
+  const document = await rpc(f.admin, "supply_document_command", { p_id: created.id, p_action: "purchase",
+    p_body: { lines: [{ lineId: line.id, quantity: "6" }] }, p_key: randomUUID(), p_version: created.version,
+  });
+  const pending = await rpc(family, "supply_document_command", { p_id: document.id, p_action: "receive",
+    p_body: { lines: [{ lineId: line.id, quantity: "0", expectedQuantity: "6", remainingAction: "wait" }] },
+    p_key: randomUUID(), p_version: document.version,
+  });
+  await login(page, f.patient, "adminA");
+  await page.goto("/fichas/" + document.id);
+  await selectDocumentSection(page, "workflow");
+  await page.getByRole("button", { name: "Validar recebimento", exact: true }).click();
+  await page.getByRole("button", { name: "Revisar operação", exact: true }).click();
+  const review = page.getByRole("dialog", { name: "Revisar operação definitiva", exact: true });
+  await review.getByRole("button", { name: "Confirmar operação", exact: true }).click();
+  await expect(page.getByText("Parcela validada sem movimentação de estoque.", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "Informar nova chegada", exact: true }).click();
+  const arrival = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
+  await arrival.locator(`input[name="${line.id}"]`).fill("0");
+  await arrival.getByRole("combobox", { name: "Destino da falta · " + line.name_snapshot, exact: true }).selectOption("short");
+  await arrival.getByRole("button", { name: "Confirmar entrada", exact: true }).click();
+  const result = page.getByRole("dialog", { name: "Conferência registrada", exact: true });
+  await expect(result.getByText("A conferência foi registrada sem movimentação de estoque.", { exact: true })).toBeVisible();
+  await expect(result.getByText("Falta registrada", { exact: true })).toBeVisible();
+  await result.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(page.getByText("Conferência registrada sem movimentação de estoque.", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Não foi possível conferir o saldo das entradas/)).toHaveCount(0);
+  await expect(page.getByText("Sem entrada validada", { exact: true }).first()).toHaveCount(1);
+  const read = await rpc(f.admin, "operational_document", { p_id: document.id });
+  expect(read.receipts.find((receipt: { id: string }) => receipt.id === pending.receipts[0].id).state).toBe("approved");
+  expect(Number(read.purchaseProgress.lines[0].closedShortQuantity)).toBe(6);
+  expect(sql(`select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`)).toBe("0");
 });
 
 test("COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar", async ({ page }) => {

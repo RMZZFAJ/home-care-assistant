@@ -175,7 +175,14 @@ export type PurchaseReceipt = {
   id: string;
   state: "pending" | "approved" | "rejected";
   submitted_by: string;
-  lines: { lineId: string; quantity: string; }[];
+  lines: {
+    lineId: string;
+    quantity: string;
+    expectedQuantity?: string;
+    remainingAction?: "wait" | "short";
+    excessConfirmed?: true;
+  }[];
+  l2_arrival?: boolean;
   created_at: string;
   submission_key?: string | null;
   submitted_name?: string | null;
@@ -194,6 +201,8 @@ export type PurchaseProgressLine = {
   validatedQuantity: string | number;
   pendingValidationQuantity: string | number;
   unarrivedQuantity: string | number;
+  closedShortQuantity?: string | number;
+  approvedExcessQuantity?: string | number;
   waivedQuantity: string | number;
   waivableQuantity: string | number;
   remainingExpectation: string | number;

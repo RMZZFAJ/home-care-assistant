@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { ActionButton, FormField, SelectField, TextInput } from "@/components/ui/controls";
-import { formatQuantity } from "@/lib/quantity";
+import { formatQuantity, quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatPurchaseDate, receiptStates } from "@/lib/documents/purchase";
 import type { PurchaseReceipt, SupplyDocument } from "@/types/documents";
@@ -12,7 +12,17 @@ export function PurchaseReceiptContent({ receipt, lines }: { receipt: PurchaseRe
     <p>Informada por <strong>{receipt.submitted_name ?? "Autor histórico não preservado"}</strong> · {formatBrazilDate(receipt.created_at)}</p>
     <dl className="space-y-2">{receipt.lines.map(item => {
       const line = lines.find(line => line.id === item.lineId);
-      return <div key={item.lineId} className="grid gap-1 rounded-lg border border-(--line) p-3 sm:grid-cols-2"><dt>{line?.name_snapshot ?? "Material identificado na parcela"}</dt><dd className="font-semibold">{formatQuantity(item.quantity, line?.unit_snapshot)}</dd></div>;
+      const expected = receipt.l2_arrival && item.expectedQuantity != null ? quantity(item.expectedQuantity) : null;
+      const difference = expected?.minus(item.quantity);
+      return <div key={item.lineId} className="grid gap-1 rounded-lg border border-(--line) p-3">
+        <dt>{line?.name_snapshot ?? "Material identificado na parcela"}</dt>
+        <dd><strong>{formatQuantity(item.quantity, line?.unit_snapshot)}</strong>{expected ? " recebidos" : ""}</dd>
+        {expected ? <dd>Esperados nesta parcela {formatQuantity(expected.toFixed(), line?.unit_snapshot)}</dd> : null}
+        {difference?.gt(0) ? <dd className="hca-arrival-attention">
+          Faltaram {formatQuantity(difference.toFixed(), line?.unit_snapshot)} · {item.remainingAction === "short" ? "Encerrar com falta" : "Aguardar nova entrega"}
+        </dd> : null}
+        {difference?.lt(0) ? <dd>Excedente conferido de {formatQuantity(difference.abs().toFixed(), line?.unit_snapshot)}</dd> : null}
+      </div>;
     })}</dl>
     {receipt.validated_at ? <p>{receipt.state === "rejected" ? "Rejeitada" : "Validada"} por {receipt.validated_name ?? "Nome histórico não preservado"} · {formatBrazilDate(receipt.validated_at)}</p> : null}
     {receipt.reason ? <p className="whitespace-pre-wrap">Motivo: {receipt.reason}</p> : null}

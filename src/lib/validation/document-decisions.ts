@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { purchaseCommandBody } from "./purchase-command";
+import { purchaseArrivalBody } from "./purchase-arrival";
 
 export const documentDecisionIntention = z.object({
   domain: z.enum(["requisition", "supply", "transfer", "balance", "balance_workspace"]),
@@ -12,7 +13,9 @@ export const documentDecisionIntention = z.object({
   .refine(value => value.domain !== "supply" || value.action !== "purchase" || purchaseCommandBody.safeParse(value.body).success, {
     path: ["body"],
     message: "Confira as quantidades e as previsões da compra.",
-  });
+  })
+  .refine(value => value.domain !== "supply" || value.action !== "receive" || !("lines" in value.body) ||
+    purchaseArrivalBody.safeParse(value.body).success, { path: ["body"], message: "Confira os materiais da chegada." });
 export type DocumentDecisionIntention = z.infer<typeof documentDecisionIntention>;
 const receiptBase = { documentId: z.uuid(), key: z.uuid(), recordedAt: z.iso.datetime({ offset: true }) };
 export const documentDecisionReceipt = z.discriminatedUnion("state", [

@@ -11,6 +11,7 @@ import type { SupplyDocument } from "@/types/documents";
 const core = [{ id: "material", label: "Material" }, { id: "proposed", label: "Proposto" }, { id: "approved", label: "Aprovado" }, { id: "purchased", label: "Adquirido" }, { id: "validated", label: "Validado" }];
 const expectation = [{ id: "pending", label: "Em conferência" }, { id: "unarrived", label: "Aquisição sem chegada válida" }, { id: "waived", label: "Não será adquirido" }, { id: "remaining", label: "Por adquirir" }];
 const afterEntry = { id: "entryBalance", label: "Saldo após última entrada" };
+const variance = [{ id: "short", label: "Falta encerrada" }, { id: "excess", label: "Excedente validado" }];
 function EntryBalance({ fact, unit, receipts }: { fact?: PurchaseEntryBalance; unit: string; receipts: SupplyDocument["receipts"] }) {
   if (!fact) return <>Não disponível no registro</>;
   if (fact.state === "not_validated") return <>Sem entrada validada</>;
@@ -29,14 +30,17 @@ export function PurchaseMaterials({ data }: { data: SupplyDocument }) {
     try { return { valid: true, facts: requirePurchaseEntryBalances(data.purchaseEntryBalances, { version: data.version, lines: data.lines, receipts: data.receipts, events: data.events }) }; }
     catch { return { valid: false, facts: [] }; }
   }, [data.purchaseEntryBalances, data.version, data.lines, data.receipts, data.events]);
-  return <DocumentMaterialsTable key={data.id} label="Materiais da compra ou doação" heading={<><h2>Produtos e quantidades</h2><p>Valores de cada ato são apresentados separadamente. A validação da chegada determina a entrada no estoque.</p><p>O saldo da família é o registrado após a última entrada validada de cada material nesta ficha. As datas podem ser diferentes; movimentos posteriores não substituem esse saldo.</p>{!balances.valid ? <FeedbackBanner tone="error">Não foi possível conferir o saldo das entradas. Use Atualizar ficha para consultar novamente.</FeedbackBanner> : null}</>} columns={[...(progress.size ? [...core, ...expectation] : core), afterEntry]}
+  const hasVariance = data.purchaseProgress?.lines.some(line =>
+    Number(line.closedShortQuantity ?? 0) > 0 || Number(line.approvedExcessQuantity ?? 0) > 0);
+  return <DocumentMaterialsTable key={data.id} label="Materiais da compra ou doação" heading={<><h2>Produtos e quantidades</h2><p>Valores de cada ato são apresentados separadamente. A validação da chegada determina a entrada no estoque.</p><p>O saldo da família é o registrado após a última entrada validada de cada material nesta ficha. As datas podem ser diferentes; movimentos posteriores não substituem esse saldo.</p>{!balances.valid ? <FeedbackBanner tone="error">Não foi possível conferir o saldo das entradas. Use Atualizar ficha para consultar novamente.</FeedbackBanner> : null}</>} columns={[...(progress.size ? [...core, ...expectation] : core), ...(hasVariance ? variance : []), afterEntry]}
     rows={data.lines.map(line => {
       const current = progress.get(line.id);
       const quantity = (value: string | number | undefined) => value === undefined ? "Não informado neste registro" : formatQuantity(value, line.unit_snapshot);
       return { id: line.id, searchText: line.name_snapshot, cells: {
         material: <><strong>{line.name_snapshot}</strong><small>{line.unit_snapshot}</small>{readPresentationConversions(line.presentation_conversions).map(row => <small key={row.id}>{presentationCaption(row)}</small>)}{line.requisitionItemIds.length ? <small>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</small> : null}</>,
-        proposed: quantity(line.quantity), approved: quantity(line.approved_quantity), purchased: quantity(line.purchased_quantity), validated: quantity(line.accepted_quantity),
+        proposed: quantity(line.quantity), approved: quantity(line.approved_quantity), purchased: quantity(line.purchased_quantity), validated: quantity(current?.validatedQuantity ?? line.accepted_quantity),
         pending: quantity(current?.pendingValidationQuantity), unarrived: quantity(current?.unarrivedQuantity), waived: quantity(current?.waivedQuantity), remaining: quantity(current?.remainingExpectation),
+        short: quantity(current?.closedShortQuantity), excess: quantity(current?.approvedExcessQuantity),
         entryBalance: balances.valid ? <EntryBalance fact={balances.facts.find(fact => fact.lineId === line.id)} unit={line.unit_snapshot} receipts={data.receipts} /> : "Saldo não conferido",
       } };
     })} />;
