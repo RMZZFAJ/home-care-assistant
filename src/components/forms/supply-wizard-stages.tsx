@@ -1,6 +1,9 @@
 import { Icon, type IconName } from "@/components/ui/icon";
 
 export const supplyWizardStages = ["Confirmação", "Materiais", "Extras", "Observações", "Revisão"];
+// The private navigation IDs for older categories, notes and review keep their positions.
+export const supplyExtrasStep = 6;
+export const supplyStageSteps = [0, 1, supplyExtrasStep, 4, 5];
 
 export const materialCategories = [
   { id: "medicamentos", label: "Medicamentos", icon: "pill" },
@@ -8,12 +11,12 @@ export const materialCategories = [
   { id: "dieta", label: "Dieta", icon: "box" },
 ] as const satisfies readonly { id: string; label: string; icon: IconName }[];
 
-type Category = (typeof materialCategories)[number]["id"];
+export type WizardMaterialCategory = (typeof materialCategories)[number]["id"];
 
 export function WizardMaterialCategories({ category, selected, onChange }: {
-  category: Category;
-  selected: readonly { category: Category }[];
-  onChange: (category: Category) => void;
+  category: WizardMaterialCategory;
+  selected: readonly { category: string }[];
+  onChange: (category: WizardMaterialCategory) => void;
 }) {
   return (
     <nav className="hca-wizard-categories" aria-label="Tipos de material">

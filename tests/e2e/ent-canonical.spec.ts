@@ -76,7 +76,7 @@ test("06.2 ENT selection and complete readonly review follow the model without s
       await expect(page.getByLabel("Quantidade — " + name, { exact: true })).toHaveValue("12");
       await auditFromTop(page, "canonical ENT selection " + width);
     }
-    for (let step = 0; step < 4; step++) await next();
+    for (let step = 0; step < 3; step++) await next();
     await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
     await ref.page.locator('[data-action="wizardNext"]').click(); await ref.page.locator('select[name="recipient"]').selectOption({ index: 0 });
     await ref.page.locator('[data-action="wizardNext"]').click(); await ref.page.locator('[data-action="wizardNext"]').click();

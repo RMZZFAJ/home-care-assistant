@@ -189,9 +189,9 @@ test("catalogue consultation from a purchase keeps the quantity when using brows
   await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
   const next = page.getByRole("button", { name: "Avançar", exact: true });
   await next.click();
-  await expect(page.getByRole("heading", { name: "Medicamentos", exact: true })).toBeVisible();
-  await next.click();
-  await expect(page.getByRole("heading", { name: "Higiene", exact: true })).toBeVisible();
+  const categories = page.getByRole("navigation", { name: "Tipos de material" });
+  await expect(categories.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
+  await categories.getByRole("button", { name: /^Higiene/ }).click();
   await page.getByRole("checkbox", { name: /^Material fictício V4 0/ }).check();
   const amount = page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
   await amount.fill("4");

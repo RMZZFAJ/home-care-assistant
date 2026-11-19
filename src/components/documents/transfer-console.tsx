@@ -1,7 +1,9 @@
 "use client";
 
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
-import { supplyWizardStages } from "@/components/forms/supply-wizard-stages";
+import { materialCategories, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
+import { WizardCatalogueExtra } from "@/components/forms/wizard-catalogue-extra";
+import { normalizeCatalogText } from "@/lib/catalog-match";
 import {
   FormField,
   SelectField,
@@ -191,6 +193,7 @@ function TransferDeclarationEditor({
     [query, setQuery] = useState(""),
     [lines, setLines] = useState<{ productId: string; quantity: string; extra?: boolean }[]>([]);
   const [step, setStep] = useState(0);
+  const [category, setCategory] = useState<WizardMaterialCategory | null>("medicamentos");
   const [packet, setPacket] = useState<TransferDeclaration | null>(null),
     [result, setResult] = useState<SupplyDocument | null>(null);
   const [recoveredId, setRecoveredId] = useState<string | null>(null);
@@ -250,6 +253,7 @@ function TransferDeclarationEditor({
       setOriginId(values.originId);
       setReason(values.reason);
       setQuery(values.query);
+      setCategory(materialCategories.find(item => item.id === values.category)?.id ?? null);
       setLines(values.lines);
       setStep(values.step ?? 0);
       setPacket(null);
@@ -274,6 +278,7 @@ function TransferDeclarationEditor({
       setOriginId("");
       setReason("");
       setQuery("");
+      setCategory("medicamentos");
       setLines([]);
       setStep(0);
       setPacket(null);
@@ -312,8 +317,19 @@ function TransferDeclarationEditor({
     reason,
     step,
     query,
+    category: category ?? undefined,
     lines,
   });
+  const products = reference?.products ?? [];
+  const productsById = new Map(products.map(product => [product.id, product]));
+  const activeCategory = category ?? materialCategories.find(item => item.id === productsById.get(lines[0]?.productId)?.category)?.id ?? "medicamentos";
+  const selectedIds = lines.map(line => line.productId);
+  const regularSelection = lines.flatMap(line => {
+    const product = productsById.get(line.productId);
+    return product && !line.extra ? [product] : [];
+  });
+  const visibleLines = lines.filter(line => step === 2 ? Boolean(line.extra) : !line.extra &&
+    (productsById.get(line.productId)?.category ?? "medicamentos") === activeCategory);
 
   const [draftTouched, setDraftTouched] = useState(false);
   useLongDraftAutosave(privateDraft, currentContent, write && draftTouched && !(busy || uncertain || !!packet));
@@ -401,10 +417,10 @@ function TransferDeclarationEditor({
       if (step === 0 && householdSelectionRef.current?.apply() === false) return;
       const materialStep = step === 1 || step === 2;
       const stepLines = lines.filter((line) => !!line.extra === (step === 2));
-      if (materialStep && (step === 1 && !stepLines.length || stepLines.some((line) => {
+      if (materialStep && stepLines.some((line) => {
         const product = reference.products.find((item) => item.id === line.productId);
         return !product || !validQuantity(line.quantity, product.quantityDecimals) || quantity(line.quantity).gt(product.available);
-      }))) {
+      })) {
         setError("Escolha os materiais e informe quantidades válidas dentro do saldo disponível.");
         return;
       }
@@ -414,6 +430,7 @@ function TransferDeclarationEditor({
       return;
     }
     if (
+      !lines.length ||
       !reference.people.some((person) => person.id === recipientId) ||
       lines.some(
         (line) =>
@@ -519,6 +536,10 @@ function TransferDeclarationEditor({
     } finally {
       setBusy(false);
     }
+  }
+  function addExtra(id: string) {
+    setLines(current => current.some(line => line.productId === id) ? current : [...current, { productId: id, quantity: "", extra: true }]);
+    setDraftTouched(true);
   }
   async function submit() {
     if (busy) return;
@@ -957,33 +978,35 @@ function TransferDeclarationEditor({
                 </> : null}
                 {step === 1 || step === 2 ? <>
                 <h3>{step === 2 ? "Itens extras" : supplyWizardStages[step]}</h3>
-                <FormField label={step === 2 ? "Adicionar item extra" : "Adicionar material da origem"}>
+                {step === 1 ? <WizardMaterialCategories category={activeCategory} selected={regularSelection} onChange={next => { setCategory(next); setQuery(""); }} /> : null}
+                {step === 1 ? <>
+                <WizardCatalogueExtra catalogue={products} selectedIds={selectedIds} onAdd={addExtra} />
+                <FormField label="Adicionar material da origem">
                   <SearchSelect
                     query={query}
                     selectedIds={[]}
                     placeholder="Buscar material"
                     onQueryChange={(queryValue) => setQuery(queryValue)}
                     onSelectionChange={(nextIds) => {
-                      if (
-                        nextIds[0] &&
-                        !lines.some((line) => line.productId === nextIds[0])
-                      )
+                      const product = products.find(item => item.id === nextIds[0]);
+                      if (product && !selectedIds.includes(product.id)) {
                         setLines((previous) => [
                           ...previous,
-                          { productId: nextIds[0]!, quantity: "", extra: step === 2 },
+                          { productId: product.id, quantity: "" },
                         ]);
+                        setCategory(materialCategories.find(item => item.id === product.category)?.id ?? activeCategory);
+                        setDraftTouched(true);
+                      }
                       setQuery("");
                     }}
                     options={
-                      reference!.products
+                      products
                         .filter(
                           (product) =>
-                            !lines.some(
-                              (line) => line.productId === product.id,
-                            ) &&
-                            `${product.name} ${product.category}`
-                              .toLocaleLowerCase("pt-BR")
-                              .includes(query.toLocaleLowerCase("pt-BR")),
+                            !selectedIds.includes(product.id) &&
+                            (query.trim()
+                              ? normalizeCatalogText(`${product.name} ${product.category}`).includes(normalizeCatalogText(query))
+                              : product.category === activeCategory),
                         )
                         .map((product) => ({
                           value: product.id,
@@ -995,17 +1018,17 @@ function TransferDeclarationEditor({
                               {formatQuantity(product.available)} {product.unit}
                             </>
                           ),
-                        })) ?? []
+                        }))
                     }
                   />
                 </FormField>
-                {!lines.some((line) => !!line.extra === (step === 2)) ? (
+                </> : <WizardCatalogueExtra catalogue={products} selectedIds={selectedIds} onAdd={addExtra} label="Adicionar item extra" />}
+                {visibleLines.length === 0 ? (
                   <p>
                     {step === 2 ? "Nenhum item extra incluído." : "Nenhum material selecionado. Informe as quantidades na unidade base."}
                   </p>
                 ) : (
-                  lines.map((line, index) => {
-                    if (!!line.extra !== (step === 2)) return null;
+                  visibleLines.map((line) => {
                     const product = reference!.products.find(
                       (p) => p.id === line.productId,
                     );
@@ -1051,8 +1074,8 @@ function TransferDeclarationEditor({
                               const controlValue =
                                 controlEvent.currentTarget.value;
                               return setLines((previous) =>
-                                previous.map((row, i) =>
-                                  i === index
+                                previous.map((row) =>
+                                  row.productId === line.productId
                                     ? { ...row, quantity: controlValue }
                                     : row,
                                 ),

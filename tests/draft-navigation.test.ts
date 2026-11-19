@@ -26,7 +26,10 @@ it("rejects arbitrary versions, authority fields and stages from another purpose
  expect(navigationAllowed("BAL","create",{version:1,stage:"count"},{context:{mode:"legacy"}})).toBe(false);
  expect(navigationAllowed("ENT","receive",{version:1,stage:"divergence"})).toBe(false);
  expect(navigationAllowed("ENT","divergence",{version:1,stage:"divergence"})).toBe(true);
- expect(navigationAllowed("COM","create",{version:1,stage:"extras"})).toBe(false);
+ expect(navigationAllowed("COM","create",{version:1,stage:"extras"})).toBe(true);
+ expect(navigationAllowed("ENT","revise",{version:1,stage:"extras"})).toBe(true);
+ expect(navigationAllowed("ENT","receive",{version:1,stage:"extras"})).toBe(false);
+ expect(navigationAllowed("BAL","create",{version:1,stage:"extras"},{context:{mode:"legacy"}})).toBe(false);
 });
 it("keeps navigation outside business content and permits omission only on a save",()=>{
  const packet={careRecipientId:id,kind:"REQ",targetDocumentId:null,id:null,expectedRevision:null,idempotencyKey:id,action:"save",content};

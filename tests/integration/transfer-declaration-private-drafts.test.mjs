@@ -92,12 +92,10 @@ for (const source of ["FAMILY", "CARE_TEAM"]) {
       source +
       " seals every submitted fact and consumes once into a new ENT without dispatch or receipt",
     async () => {
-      const f = await declarationDraftFixture(source),
-        saved = await rpc(
-          f.client,
-          "supply_draft_command",
-          declarationPacket(f),
-        ),
+      const f = await declarationDraftFixture(source);
+      const packet = declarationPacket(f);
+      if (source === "CARE_TEAM") packet.p_body.content.fields[f.products[0] + ":transferExtra"] = "1";
+      const saved = await rpc(f.client, "supply_draft_command", packet),
         before = declarationFacts(f),
         body = declarationBody(f);
       for (const change of [
@@ -109,6 +107,7 @@ for (const source of ["FAMILY", "CARE_TEAM"]) {
         { reason: body.reason + " alterada" },
         { lines: [{ productId: f.products[0], quantity: "3" }] },
         { lines: [{ productId: f.products[1], quantity: "2" }] },
+        { lines: [{ productId: f.products[0], quantity: "2", catalogueExtra: source === "FAMILY" }] },
       ]) {
         assert.equal(
           (
@@ -145,6 +144,8 @@ for (const source of ["FAMILY", "CARE_TEAM"]) {
       assert.equal(result.result.transfer.agreement, null);
       assert.equal(result.result.transfer.dispatchedAt, null);
       assert.equal(result.result.receipts.length, 0);
+      assert.equal(result.result.lines.length, 1);
+      assert.equal(result.result.lines[0].metadata.catalogueExtra, source === "CARE_TEAM" ? "true" : undefined);
       assert.deepEqual(
         JSON.parse(declarationFacts(f)).ledger,
         JSON.parse(before).ledger,

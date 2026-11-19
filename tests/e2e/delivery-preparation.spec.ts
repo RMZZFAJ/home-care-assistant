@@ -1,3 +1,4 @@
+import { selectMaterialCategory } from "./material-category";
 import { isDocumentAccessReport } from "./display-access-report";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
@@ -37,7 +38,7 @@ const next = (page: Page) =>
   page.getByRole("button", { name: /^(Avançar|Revisar)$/ }).click();
 async function materialsAndReview(page: Page) {
   await next(page);
-  await next(page);
+  await selectMaterialCategory(page);
   await page.getByRole("checkbox", { name: /^Material fictício V4 0/ }).check();
   await page
     .getByLabel("Quantidade — Material fictício V4 0", { exact: true })
@@ -301,7 +302,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
   await open(page, f.patient);
   await selectDeliveryRecipient(page, "Teste professional", reason);
   await materialsAndReview(page);
-  await page.getByRole("button", { name: /^Identificação/ }).click();
+  await page.getByRole("navigation", { name: "Etapas da ENT" }).getByRole("button", { name: "Confirmação", exact: true }).click();
   await page.route("**/api/documents/delivery-preparation?**", (route) =>
     route.fulfill({
       status: 503,
@@ -357,7 +358,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
       }),
     ).toHaveValue("Teste professional");
     await next(page);
-    await next(page);
+    await selectMaterialCategory(page);
     await expect(
       page.getByLabel("Quantidade — Material fictício V4 0", { exact: true }),
     ).toHaveValue("2");
@@ -385,7 +386,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
     await page
       .getByRole("button", { name: "Usar referências atuais", exact: true })
       .click();
-    for (let index = 0; index < 5; index++) await next(page);
+    for (let index = 0; index < 4; index++) await next(page);
     const document = await finish(page);
     expect(document.recipient_id).toBe(fixtures.professional.id);
     expect(document.workflow_data.recipientSelection?.reason).toBe(reason);
@@ -412,7 +413,7 @@ test("P06 sem pessoa elegível mantém preparação pendente e nenhuma leitura o
   ).toBeDisabled();
   await next(page);
   await expect(
-    page.getByRole("heading", { name: "Identificação", exact: true }),
+    page.getByRole("heading", { name: "Confirme os dados da ficha", exact: true }),
   ).toBeVisible();
   expect(ledger(f.patient)).toBe(before);
   expect(

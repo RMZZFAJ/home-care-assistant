@@ -71,3 +71,41 @@ test("COM ENT creation, revision and personal receipt retain independent private
   assert.equal(sql(`select content_hash=encode(extensions.digest(content::text,'sha256'),'hex') from private.creation_drafts where id=${sqlLiteral(saved.id)};`),"t");
  }
 });
+
+test("COM binds one catalogue extra to its saved private stage and issues the same line exactly once", async () => {
+ const f = await privateDraftFixture(), materialId = f.products[0];
+ const materials = [{ id: materialId, name: "Material fictício", unit: "unidade", quantityDecimals: 0 }];
+ const content = {
+  form: { quantities: { [materialId]: "2" }, notes: "Nota fictícia", origin: "purchase", source: "FAMILY", recipientId: "", extraProductIds: [materialId] },
+  links: {}, materials, context: { documentId: null, documentVersion: null, requisitionId: null, recipientName: "" },
+ };
+ const draft = { p_patient: f.patient, p_kind: "COM", p_purpose: "create", p_target: null, p_id: null, p_expected: null,
+  p_body: { action: "save", content, navigation: nav("extras") }, p_key: randomUUID() };
+ const before = officialState(f);
+ for (const extraProductIds of [[materialId, materialId], ["outro-material"], [12]]) {
+  const result = await f.admin.rpc("supply_draft_command", {
+   ...draft, p_key: randomUUID(), p_body: { ...draft.p_body, content: { ...content, form: { ...content.form, extraProductIds } } },
+  });
+  assert.equal(result.error?.code, "22023");
+ }
+ const saved = await rpc(f.admin, "supply_draft_command", draft);
+ const read = await rpc(f.admin, "supply_draft_context", { p_patient: f.patient, p_kind: "COM", p_purpose: "create", p_target: null });
+ assert.deepEqual(read.navigation, nav("extras"));
+ assert.deepEqual(read.content.form.extraProductIds, [materialId]);
+ const line = { productId: materialId, quantity: "2" };
+ const confirmation = { p_id: saved.id, p_expected: saved.revision, p_target: null, p_key: randomUUID(),
+  p_body: { action: "create", payload: { origin: "purchase", lines: [line] } } };
+ const missingExtra = await f.admin.rpc("commit_supply_draft", confirmation);
+ assert.equal(missingExtra.error?.code, "22023");
+ assert.equal(officialState(f), before);
+ confirmation.p_body.payload.lines[0] = { ...line, metadata: { catalogueExtra: "true" } };
+ const issued = await rpc(f.admin, "commit_supply_draft", confirmation);
+ assert.equal(issued.result.lines.length, 1);
+ assert.equal(issued.result.lines[0].product_id, materialId);
+ assert.equal(issued.result.lines[0].metadata.catalogueExtra, "true");
+ const state = officialState(f);
+ const replay = await rpc(f.admin, "commit_supply_draft", confirmation);
+ assert.equal(replay.replayed, true);
+ assert.equal(replay.consumedDocumentId, issued.consumedDocumentId);
+ assert.equal(officialState(f), state);
+});

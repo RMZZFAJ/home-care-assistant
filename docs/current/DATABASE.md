@@ -1,6 +1,13 @@
 # Banco de dados
 
-O Supabase de desenvolvimento e preview está em 300 migrations até
+O Supabase de desenvolvimento e preview está em 302 migrations até
+`20261119204118`. As duas últimas acrescentam a etapa Extras aos rascunhos de
+COM e ENT e vinculam a classificação de materiais do catálogo à confirmação.
+O backup cifrado anterior ao lote foi verificado e as duas migrations passaram
+pelo ensaio com rollback. Os hashes estáveis das 201 tabelas comparadas
+conferiram e a fila remota está vazia.
+
+O registro anterior chegou a 300 migrations até
 `20261119184524`, sem divergência no histórico. As 28 versões seguintes a
 `20261119060719` já haviam passado pelo ensaio transacional revertido. A aplicação
 definitiva ocorreu quando a invocação do npm no PowerShell omitiu `--dry-run`.

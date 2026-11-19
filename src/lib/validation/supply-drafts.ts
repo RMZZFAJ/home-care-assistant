@@ -158,6 +158,7 @@ export const supplyDraftContent = z
     form: z
       .object({
         quantities: entries(text(64)),
+        extraProductIds: z.array(text(120).min(1)).max(1000).optional(),
         notes: text(3000),
         origin: z.enum(["", "purchase", "donation"]),
         source: z.enum(["FAMILY", "CARE_TEAM"]),
@@ -184,7 +185,11 @@ export const supplyDraftContent = z
             .max(100),
         ).optional(),
       })
-      .strict(),
+      .strict()
+      .refine(form => !form.extraProductIds || (
+        new Set(form.extraProductIds).size === form.extraProductIds.length &&
+        form.extraProductIds.every(id => Object.hasOwn(form.quantities, id))
+      ), "Identifique cada extra entre os materiais selecionados, uma única vez."),
     links: entries(z.array(z.uuid()).max(1000)),
     sources: supplySourceLinks.optional(),
     sourceImports: entries(z.array(text(120).min(1)).max(1000), 100).optional(),

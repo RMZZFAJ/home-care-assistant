@@ -1,3 +1,4 @@
+import { selectMaterialCategory } from "./material-category";
 import { lastDraftPanel } from "./l1-long-draft-panel";
 import { selectProfileSection } from "./profile-sections";
 import { test, expect, type Page, type Route } from "@playwright/test";
@@ -394,8 +395,8 @@ test("PWA sem confirmação de atualização aguarda abas, preserva edição e r
     await lastDraftPanel(tab)
       .getByRole("button", { name: "Continuar rascunho", exact: true })
       .click();
-    for (let i = 0; i < 2; i++)
-      await tab.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
+    await tab.getByRole("button", { name: "Avançar", exact: true }).click();
+    await selectMaterialCategory(tab);
     return tab.getByRole("textbox", {
       name: "Quantidade — Material fictício V4 0",
       exact: true,

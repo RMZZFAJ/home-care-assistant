@@ -1,6 +1,8 @@
+import { selectMaterialCategory } from "./material-category";
 import { openOperationalDocumentAction } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { fixtures, issue, setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
   purchaseBalanceArrival, purchaseBalanceCommand, purchaseBalanceFixture,
 } from "../integration/purchase-entry-balance-fixtures.mjs";
@@ -11,6 +13,57 @@ import { audit } from "./accessibility-audit";
 const next = (page: Page) => page.getByRole("button", { name: /^(Avançar|Revisar)$/ }).click();
 const material = (page: Page) => page.getByRole("checkbox", { name: /^Material fictício V4 0/ });
 const count = (page: Page) => page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
+
+test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para ele", async ({ page }, info) => {
+  test.setTimeout(150_000);
+  const name = "Complemento fictício de higiene";
+  const f = await setup({ catalogue: [
+    { name: "Medicamento fictício da compra", category: "medicamentos", unit: "unidade", aliases: [] },
+    { name, category: "higiene", unit: "unidade", aliases: ["Curativo auxiliar"] },
+  ] });
+  const admin = await shiftWorker(f.patient, "admin");
+  await loginDecision(page, admin.email, f.patient);
+  await page.setViewportSize({ width: 390, height: 760 });
+  await page.goto("/fichas/com");
+  const stages = page.getByRole("navigation", { name: "Etapas da COM", exact: true });
+  await expect(stages.getByRole("button")).toHaveText([/Confirmação/, /Materiais/, /Extras/, /Observações/, /Revisão/]);
+  await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
+  await next(page);
+  await expect(page.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
+  await page.getByRole("button", { name: "Item extra", exact: true }).click();
+  const picker = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
+  await picker.getByRole("combobox", { name: "Material do catálogo", exact: true }).fill("curativo auxiliar");
+  await page.getByRole("option", { name: name + " · unidade", exact: true }).click();
+  await expect(picker).toHaveCount(0);
+  await selectMaterialCategory(page);
+  await expect(page.getByRole("checkbox", { name: name + " unidade", exact: true })).toHaveCount(0);
+  await next(page);
+  const extra = page.getByLabel("Quantidade — " + name, { exact: true });
+  await extra.fill("2");
+  const saved = page.waitForResponse(response => response.request().method() === "POST" &&
+    new URL(response.url()).pathname === "/api/drafts" &&
+    response.request().postDataJSON().content?.form?.quantities?.[f.products[1]] === "2");
+  await page.getByRole("button", { name: "Salvar rascunho", exact: true }).click();
+  const receipt = await saved;
+  expect(receipt.ok(), await receipt.text()).toBe(true);
+  await page.reload();
+  await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(stages.getByRole("button", { name: "Extras", exact: true })).toHaveAttribute("aria-current", "step");
+  await expect(extra).toHaveValue("2");
+  await info.attach("E05-extra-restaurado", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await next(page);
+  await next(page);
+  const review = page.getByRole("region", { name: "Itens extras", exact: true });
+  await expect(review.getByText(name, { exact: true })).toHaveCount(1);
+  await expect(review.getByText("2 unidade", { exact: true })).toBeVisible();
+  const submission = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
+  await page.getByRole("button", { name: "Confirmar e concluir", exact: true }).click();
+  const response = await submission;
+  expect(response.ok(), await response.text()).toBe(true);
+  expect((await response.json()).data.lines).toMatchObject([
+    { product_id: f.products[1], quantity: expect.anything(), metadata: { catalogueExtra: "true" } },
+  ]);
+});
 
 test("L2 COM mantém o vínculo geral após desfazer importação e conserva a quantidade editada", async ({ page }, info) => {
   const f = await setup();
@@ -23,12 +76,11 @@ test("L2 COM mantém o vínculo geral após desfazer importação e conserva a q
   await expect(origin).toContainText("Materiais elegíveis trazidos");
   await page.getByLabel("Forma de aquisição").selectOption("purchase");
   await next(page);
-  await next(page);
+  await selectMaterialCategory(page);
   await expect(material(page)).toBeChecked();
   await expect(count(page)).toHaveValue("");
   await count(page).fill("3");
-  for (let index = 0; index < 2; index++)
-    await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await page.getByRole("button", { name: "Voltar", exact: true }).click();
   await origin.getByRole("button", { name: "Alterar", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Vincular fichas", exact: true });
   await dialog.getByRole("button", { name: "BAL", exact: true }).click();
@@ -44,7 +96,7 @@ test("L2 COM mantém o vínculo geral após desfazer importação e conserva a q
   await expect(origin.getByRole("button", { name: code, exact: true })).toBeVisible();
   await expect(origin).toContainText("sem importar materiais");
   await next(page);
-  await next(page);
+  await selectMaterialCategory(page);
   await expect(material(page)).toBeChecked();
   await expect(count(page)).toHaveValue("3");
   async function openMaterialOrigin() {

@@ -1,5 +1,25 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — etapas de COM e ENT e extras do catálogo.** COM e ENT usam as cinco
+etapas compactas da v7. As categorias ficam dentro de Materiais. O assistente
+de entrega e devolução também organiza os materiais por categoria. O rascunho
+guarda a categoria e, em COM e ENT, distingue a etapa Extras da etapa
+Observações. Rascunhos antigos conservam os identificadores das etapas.
+
+- A escolha explícita de um material existente pode começar em Materiais ou
+  em Itens extras. A quantidade segue no mesmo registro do rascunho à revisão
+  e à emissão. O banco vincula a classificação ao rascunho confirmado. O
+  material conserva o contrato normal de quantidade, estoque e expedição.
+- Quatro testes no Android e no iOS, 12 integrações com Auth real e 15 testes
+  unitários passaram. Build, TypeScript, ESLint e manifesto de contratos
+  passaram. A identificação de extras ainda fora do catálogo e as observações
+  em entradas numeradas continuam em implementação.
+- As migrations `20261119203458` e `20261119204118` foram aplicadas no
+  desenvolvimento após backup cifrado verificado e ensaio com rollback.
+  O histórico subiu de 300 para 302. A comparação de 201 tabelas encontrou
+  apenas as variações previstas de relógio e acompanhamento interno.
+  A fila remota está vazia. O preview da PR #7 aguarda código compatível.
+
 **19/11 — cinco etapas da REQ.** Confirmação, Materiais, Extras, Observações
 e Revisão aparecem juntas na barra compacta da v7. Medicamentos abre primeiro.
 Higiene e Dieta ficam dentro de Materiais e o rascunho recupera a categoria exata.

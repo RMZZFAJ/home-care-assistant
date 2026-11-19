@@ -11,6 +11,7 @@ export type TransferDeclarationValues = {
   originId: string;
   reason: string;
   query: string;
+  category?: string;
   lines: { productId: string; quantity: string; extra?: boolean }[];
   step?: number;
 };
@@ -44,6 +45,7 @@ export function transferDeclarationValues(
     originId: content.fields.originId ?? "",
     reason: content.fields.reason ?? "",
     query: content.fields.query ?? "",
+    ...(content.fields.category ? { category: content.fields.category } : {}),
     step: /^[0-3]$/.test(content.fields.wizardStep ?? "") ? Number(content.fields.wizardStep) : 0,
     lines: content.materials.map((material) => ({
       productId: material.id,
@@ -100,6 +102,7 @@ export function transferDeclarationDraftContent(
             "Vínculo anterior indisponível"),
       reason: values.reason,
       query: values.query,
+      ...(values.category ? { category: values.category } : {}),
       wizardStep: String(values.step ?? 0),
       ...Object.fromEntries(
         values.lines.map((line) => [

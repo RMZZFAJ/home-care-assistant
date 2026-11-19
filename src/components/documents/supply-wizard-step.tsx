@@ -3,7 +3,9 @@ import { RelatedDocument } from "./related-document";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
-import { DefinitionGrid } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { materialCategories, supplyExtrasStep, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
+import { WizardCatalogueExtra } from "@/components/forms/wizard-catalogue-extra";
 import {
   DeliveryRecipientField,
   DeliveryRecipientReference,
@@ -35,6 +37,7 @@ import type {
 } from "@/types/documents";
 export type WizardState = {
   quantities: Record<string, string>;
+  extraProductIds?: string[];
   notes: string;
   observationTimes?: Record<string, string | null>;
   origin: "" | "purchase" | "donation";
@@ -49,6 +52,7 @@ export type WizardState = {
 
 export function SupplyWizardStep({
   step,
+  onCategoryChange,
   type,
   context,
   form,
@@ -75,6 +79,7 @@ export function SupplyWizardStep({
   refreshPresentations,
 }: {
   step: number;
+  onCategoryChange: (category: string) => void;
   type: SupplyType;
   context: WorkspaceContext;
   form: WizardState;
@@ -100,14 +105,16 @@ export function SupplyWizardStep({
   presentationLoading: boolean;
   refreshPresentations: () => void;
 }) {
-  const category = ["medicamentos", "higiene", "dieta"][step - 1] ?? "";
+  const category = materialCategories[step - 1]?.id;
+  const extras = new Set(form.extraProductIds);
+  const isExtraStep = type !== "BAL" && step === supplyExtrasStep;
   const [searchByCategory, setSearchByCategory] = useState<
     Record<string, string>
   >({});
-  const search = searchByCategory[category] ?? "";
+  const search = searchByCategory[category ?? ""] ?? "";
   const visibleProducts = catalog.filter(
     (product) =>
-      product.category === category &&
+      isExtraStep ? extras.has(product.id) : !extras.has(product.id) && product.category === category &&
       [
         product.name,
         ...(product.aliases ?? []),
@@ -119,6 +126,35 @@ export function SupplyWizardStep({
   const selected = catalog.filter((product) =>
     Object.hasOwn(form.quantities, product.id),
   );
+  function addExtra(id: string) {
+    setForm(current => Object.hasOwn(current.quantities, id) ? current : {
+      ...current,
+      quantities: { ...current.quantities, [id]: "" },
+      extraProductIds: [...(current.extraProductIds ?? []), id],
+    });
+  }
+  function selectProduct(id: string, include: boolean) {
+    setForm(current => {
+      const quantities = { ...current.quantities };
+      const presentationSelections = { ...current.presentationSelections };
+      const manualQuantities = { ...current.manualQuantities };
+      if (include) quantities[id] = "";
+      else {
+        delete quantities[id];
+        delete presentationSelections[id];
+        delete manualQuantities[id];
+      }
+      return { ...current, quantities, presentationSelections, manualQuantities,
+        extraProductIds: current.extraProductIds?.filter(extraId => extraId !== id) };
+    });
+  }
+  const reviewRows = step === 5 && type !== "BAL" ? selected.map(product => ({
+    id: product.id, name: product.name, category: product.category,
+    consult: <MaterialConsultButton context={context} material={product} />,
+    details: <><small>{form.quantities[product.id] ? formatQuantity(form.quantities[product.id], product.unit) : "Quantidade pendente"}</small>{form.presentationSelections?.[product.id]?.map(row => <small key={row.id}>{presentationCaption(row)}</small>)}
+      {links[product.id]?.length ? <small>{links[product.id].length} {links[product.id].length === 1 ? "necessidade vinculada" : "necessidades vinculadas"}</small> : null}
+    </>,
+  })) : [];
   function updatePackages(
     productId: string,
     selections: PresentationSelection[],
@@ -335,10 +371,16 @@ export function SupplyWizardStep({
           ) : null}
         </>
       ) : null}
-      {step >= 1 && step <= 3 ? (
+      {category || isExtraStep ? (
         <>
-          {type !== "BAL" ? <BarcodeScanner onRead={scan} /> : null}
-          <label className="block text-sm font-semibold">
+          {category && type !== "BAL" ? <>
+            <WizardMaterialCategories category={category} selected={selected.filter(item => !extras.has(item.id))} onChange={onCategoryChange} />
+            <div className="hca-toolbar"><BarcodeScanner onRead={scan} />
+              <WizardCatalogueExtra catalogue={catalog} selectedIds={Object.keys(form.quantities)} onAdd={addExtra} />
+            </div>
+          </> : null}
+          {isExtraStep ? <WizardCatalogueExtra catalogue={catalog} selectedIds={Object.keys(form.quantities)} onAdd={addExtra} label="Adicionar item extra" /> : null}
+          {category ? <label className="block text-sm font-semibold">
             Buscar materiais nesta categoria
             <input
               type="search"
@@ -352,7 +394,8 @@ export function SupplyWizardStep({
                 }));
               }}
             />
-          </label>
+          </label> : null}
+          {category ? (
           <p
             role="status"
             aria-label="Resultado da busca e seleção de materiais"
@@ -367,11 +410,10 @@ export function SupplyWizardStep({
               ? "material selecionado"
               : "materiais selecionados"}
             . As seleções permanecem ao filtrar ou trocar de categoria.
-          </p>
+          </p>) : null}
           {!visibleProducts.length ? (
             <Notice>
-              Nenhum material nesta busca. Ajuste ou limpe o filtro; suas
-              seleções continuam preservadas.
+              {isExtraStep ? "Nenhum item extra incluído." : "Nenhum material nesta busca. Ajuste ou limpe o filtro; suas seleções continuam preservadas."}
             </Notice>
           ) : null}
           <div className="space-y-3">
@@ -386,37 +428,11 @@ export function SupplyWizardStep({
                   key={product.id}
                 >
                   <label className="hca-material-choice-heading">
-                    {type !== "BAL" ? (
+                    {type !== "BAL" && !isExtraStep ? (
                       <input
                         type="checkbox"
                         checked={checked}
-                        onChange={(event) => {
-                          const selected = event.currentTarget.checked;
-                          setForm((current) => {
-                            const quantities = {
-                              ...current.quantities,
-                            };
-                            const presentationSelections = {
-                              ...current.presentationSelections,
-                            };
-                            const manualQuantities = {
-                              ...current.manualQuantities,
-                            };
-                            if (selected)
-                              quantities[product.id] = "";
-                            else {
-                              delete quantities[product.id];
-                              delete presentationSelections[product.id];
-                              delete manualQuantities[product.id];
-                            }
-                            return {
-                              ...current,
-                              quantities,
-                              presentationSelections,
-                              manualQuantities,
-                            };
-                          });
-                        }}
+                        onChange={(event) => selectProduct(product.id, event.currentTarget.checked)}
                       />
                     ) : null}
                     <span className="hca-material-choice-copy">
@@ -437,6 +453,9 @@ export function SupplyWizardStep({
                       ) : null}
                     </span>
                   </label>
+                  {isExtraStep ? <ActionButton type="button" onClick={() => selectProduct(product.id, false)}>
+                    Remover {product.name}
+                  </ActionButton> : null}
                   {type !== "BAL" ? <MaterialConsultButton context={context} material={product} menu
                     onLink={checked && openMaterialSources ? () => openMaterialSources(product) : undefined} /> : null}
                   {checked &&
@@ -557,11 +576,16 @@ export function SupplyWizardStep({
               </div>
             ) : null}
           </div>}
-          {type !== "BAL" ? <MaterialReview rows={selected.map(product => ({
-            id: product.id, name: product.name,
-            consult: <MaterialConsultButton context={context} material={product} />,
-            details: <><small>{form.quantities[product.id] ? formatQuantity(form.quantities[product.id], product.unit) : "Quantidade pendente"}</small>{form.presentationSelections?.[product.id]?.map(row => <small key={row.id}>{presentationCaption(row)}</small>)}</>,
-          }))} /> : <ul className="divide-y divide-(--line)">
+          {type !== "BAL" ? <>
+            {materialCategories.map(category => {
+              const rows = reviewRows.filter(row => row.category === category.id && !extras.has(row.id));
+              return rows.length ? <section key={category.id}><h3>{category.label}</h3><MaterialReview rows={rows} /></section> : null;
+            })}
+            <section aria-label="Itens extras">
+              <h3>Itens extras</h3>
+              {extras.size ? <MaterialReview rows={reviewRows.filter(row => extras.has(row.id))} /> : <p className="hca-field-help">Nenhum item extra incluído.</p>}
+            </section>
+          </> : <ul className="divide-y divide-(--line)">
             {selected.map((product) => (
               <li
                 key={product.id}

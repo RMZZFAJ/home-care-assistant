@@ -1,3 +1,4 @@
+import { selectMaterialCategory } from "./material-category";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -104,7 +105,7 @@ async function wizard(page: Page, patient: string) {
     .getByLabel("Forma de aquisição", { exact: false })
     .selectOption("purchase");
   await page.getByRole("button", { name: "Avançar", exact: true }).click();
-  await page.getByRole("button", { name: "Avançar", exact: true }).click();
+  await selectMaterialCategory(page);
   await page.getByRole("checkbox", { name: /Material fictício V4 0/ }).check();
   const combo = page.getByRole("combobox", {
     name: "Apresentação de Material fictício V4 0",

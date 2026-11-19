@@ -59,6 +59,12 @@ export const draftFlowStages = {
     { id: "notes", label: "Observações" },
     { id: "review", label: "Revisão" },
   ],
+  SUPPLY_CREATE: [
+    ...common,
+    { id: "notes", label: "Observações" },
+    { id: "review", label: "Revisão" },
+    { id: "extras", label: "Itens extras" },
+  ],
   BAL: [
     { id: "count", label: "Contagem" },
     { id: "review", label: "Revisão" },
@@ -281,7 +287,7 @@ export function draftFlow(
       ? "BAL"
       : "SUPPLY";
   }
-  return kind === "COM" || kind === "ENT" ? "SUPPLY" : null;
+  return kind === "COM" || kind === "ENT" ? "SUPPLY_CREATE" : null;
 }
 export function navigationForStep(
   flow: DraftFlow,

@@ -1,3 +1,4 @@
+import { selectMaterialCategory } from "./material-category";
 import { expectNoOperationalDocumentAction } from "./document-sections";
 import { openOperationalDocumentAction } from "./document-sections";
 import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, openDocumentAction, confirmCompleteDeliveryReceipt } from "./document-sections";
@@ -185,7 +186,8 @@ async function issueSupply(
     await page.getByRole("combobox", { name: /^Esta entrega pretende atender a necessidade/ }).selectOption("complete");
   }
   await next(page);
-  await next(page);
+  if (type === "BAL") await next(page);
+  else await selectMaterialCategory(page);
   if (type !== "BAL" && !requestId)
     await page
       .getByRole("checkbox", { name: new RegExp("^" + productName) })

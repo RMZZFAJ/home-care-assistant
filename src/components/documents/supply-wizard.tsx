@@ -60,6 +60,7 @@ import {
 import type { SupplyDraftContent } from "@/lib/validation/supply-drafts";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
+import { materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
 import { ActionButton } from "@/components/ui/controls";
 import { RelatedDocument } from "./related-document";
@@ -85,7 +86,7 @@ import {
   type DeliveryPreparation,
 } from "@/types/documents";
 
-const steps = draftFlowStages.SUPPLY.map((stage) => stage.label);
+const balanceSteps = draftFlowStages.SUPPLY.map((stage) => stage.label);
 export function SupplyWizard({ type }: { type: SupplyType; }) {
   const params = useSearchParams();
   return (
@@ -135,6 +136,11 @@ export function PatientSupplyWizard({
   recount: boolean;
 }) {
   const [step, setStep] = useState(0);
+  const isBalance = type === "BAL";
+  const draftFlow = isBalance ? "SUPPLY" : "SUPPLY_CREATE";
+  const category = materialCategories[step - 1]?.id;
+  const stage = isBalance ? step : category ? 1 : supplyStageSteps.indexOf(step);
+  const steps = isBalance ? balanceSteps : supplyWizardStages;
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
   const householdSelectionRef = useRef<HouseholdListSelectionHandle>(null);
   const [people, setPeople] = useState<PatientPerson[]>([]);
@@ -301,7 +307,7 @@ export function PatientSupplyWizard({
     userId: context.userId,
     patientId,
     kind: type,
-    navigation: navigationForStep("SUPPLY", step),
+    navigation: navigationForStep(draftFlow, step),
     purpose:
       type === "BAL"
         ? "create"
@@ -337,7 +343,7 @@ export function PatientSupplyWizard({
           setSourceSetup({ ...emptySupplySources, sources: [{ documentId: requisitionId, general: true, productIds }] });
         }
         setDraftMaterials(content.materials);
-        setStep(stepForNavigation("SUPPLY", draft.navigation));
+        setStep(stepForNavigation(draftFlow, draft.navigation));
         setError("");
         setFieldErrors({});
         return true;
@@ -356,7 +362,7 @@ export function PatientSupplyWizard({
         notes: content.notes,
       }));
       setDraftMaterials(content.materials);
-      setStep(stepForNavigation("SUPPLY", draft.navigation));
+      setStep(stepForNavigation(draftFlow, draft.navigation));
       setError("");
       setFieldErrors({});
       return true;
@@ -383,6 +389,7 @@ export function PatientSupplyWizard({
             presentationSelections: {},
             manualQuantities: {},
             requestFulfillments: {},
+            extraProductIds: undefined,
           }
           : {}),
         observationTimes: {},
@@ -398,9 +405,11 @@ export function PatientSupplyWizard({
       sessionStorage.removeItem(storageKey);
     },
   });
+  const supplyExtraIds = form.extraProductIds?.filter(id => Object.hasOwn(form.quantities, id));
   const supplyContent: SupplyDraftContent = {
     form: {
       quantities: form.quantities,
+      ...(supplyExtraIds?.length ? { extraProductIds: supplyExtraIds } : {}),
       notes: form.notes,
       origin: form.origin,
       source: form.source,
@@ -443,6 +452,7 @@ export function PatientSupplyWizard({
     (id) => !catalog.some((product) => product.id === id),
   );
   function updateForm(value: SetStateAction<WizardState>) {
+    setDraftTouched(true);
     setForm((current) => {
       const next = typeof value === "function" ? value(current) : value;
       if (type !== "BAL") return next;
@@ -617,6 +627,7 @@ export function PatientSupplyWizard({
               ]),
             ),
             notes: existing.payload.notes ?? "",
+            extraProductIds: existing.lines.filter(line => line.metadata.catalogueExtra === "true").map(line => line.product_id),
             origin: existing.payload.origin ?? "",
             source: existing.payload.source ?? "FAMILY",
             recipientId: existing.recipient_id ?? "",
@@ -813,7 +824,6 @@ export function PatientSupplyWizard({
       !["purchase", "donation"].includes(form.origin)
     )
       errors.origin = "Escolha se este ato é uma compra ou uma doação.";
-    const category = ["medicamentos", "higiene", "dieta"][step - 1];
     if (type === "ENT" && (all || step === 0) && !form.recipientId)
       errors.recipientId = "Selecione quem receberá esta entrega.";
     if (type === "ENT" && (all || step === 0)) {
@@ -844,11 +854,12 @@ export function PatientSupplyWizard({
         errors.recipientReason =
           "Explique a escolha manual ou troca do recebedor com 3 a 1000 caracteres.";
     }
-    const relevant = catalog.filter(
-      (product) =>
-        (all || product.category === category) &&
-        (type === "BAL" || Object.hasOwn(form.quantities, product.id)),
-    );
+    const extras = new Set(form.extraProductIds);
+    const relevant = catalog.filter(product => {
+      if (isBalance) return all || product.category === category;
+      if (!Object.hasOwn(form.quantities, product.id)) return false;
+      return all || (category && !extras.has(product.id)) || (step === supplyExtrasStep && extras.has(product.id));
+    });
     for (const product of relevant)
       if (
         !validQuantity(
@@ -881,6 +892,12 @@ export function PatientSupplyWizard({
     setFieldErrors(errors);
     if (Object.keys(errors).length) {
       setError("Confira os campos destacados.");
+      if (!isBalance) {
+        const first = Object.keys(errors)[0];
+        const product = relevant.find(item => item.id === first);
+        if (product) setStep(extras.has(product.id) ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1);
+        else if (all) setStep(first === "lines" ? supplyStageSteps[1] : 0);
+      }
       window.setTimeout(
         () =>
           document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
@@ -987,7 +1004,7 @@ export function PatientSupplyWizard({
         setBusy(false);
       }
     }
-    setStep((current) => Math.min(steps.length - 1, current + 1));
+    setStep(isBalance ? Math.min(steps.length - 1, step + 1) : supplyStageSteps[stage + 1]);
     if (type === "BAL" && step === 4) {
       requestAnimationFrame(() => {
         const heading = document.getElementById("supply-wizard-heading");
@@ -997,7 +1014,7 @@ export function PatientSupplyWizard({
     }
   }
   async function persist(draft: boolean) {
-    if (busy) return;
+    if (busy || privateDraft.backgroundBusy) return;
     if (draft && !frozenRef.current) {
       await privateDraft.save(privateContent);
       return;
@@ -1044,11 +1061,14 @@ export function PatientSupplyWizard({
             ? {
               requisitionItemIds: links[product.id],
               ...(type === "ENT" && form.source === "FAMILY" && form.requestFulfillments?.[product.id] ? { requestFulfillment: form.requestFulfillments[product.id] as "partial" | "complete" } : {}),
-              metadata: {
-                sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "",
-              },
             }
             : {}),
+          ...(links[product.id]?.length || form.extraProductIds?.includes(product.id) ? {
+            metadata: {
+              ...(links[product.id]?.length ? { sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "" } : {}),
+              ...(form.extraProductIds?.includes(product.id) ? { catalogueExtra: "true" } : {}),
+            },
+          } : {}),
         }));
       const payload: SupplyPayload = {
         lines,
@@ -1391,7 +1411,7 @@ export function PatientSupplyWizard({
     );
     if (product)
       setStep(
-        ["medicamentos", "higiene", "dieta"].indexOf(product.category) + 1,
+        form.extraProductIds?.includes(product.id) ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1,
       );
   }
   if (privateDraft.readDenied || privateDraft.protectedReadPending)
@@ -1577,8 +1597,13 @@ export function PatientSupplyWizard({
         <>
           <StepNavigator
             steps={steps}
-            active={step}
-            onChange={(nextStep) => { issuanceFailure.clear(); setStep(nextStep); }}
+            active={stage}
+            compact={!isBalance}
+            onChange={(nextStage) => {
+              if (nextStage === stage) return;
+              issuanceFailure.clear();
+              setStep(isBalance ? nextStage : supplyStageSteps[nextStage]);
+            }}
             disabled={busy || uncertain || loading || privateDraft.blocked}
             label={"Etapas da " + type}
           />
@@ -1613,7 +1638,11 @@ export function PatientSupplyWizard({
                   tabIndex={-1}
                   className="mt-2 text-xl font-semibold"
                 >
-                  {steps[step]}
+                  {step === supplyExtrasStep ? "Itens extras"
+                    : !isBalance && step === 0 ? "Confirme os dados da ficha"
+                      : !isBalance && category ? type === "ENT" ? "Prepare os materiais da entrega"
+                        : form.origin === "donation" ? "Selecione os materiais da doação" : "Selecione o que será comprado"
+                        : steps[stage]}
                 </h2>
               </div>
               <fieldset
@@ -1628,6 +1657,7 @@ export function PatientSupplyWizard({
               >
                 <SupplyWizardStep
                   step={step}
+                  onCategoryChange={nextCategory => setStep(materialCategories.findIndex(item => item.id === nextCategory) + 1)}
                   type={type}
                   context={context}
                   form={form}
@@ -1737,14 +1767,15 @@ export function PatientSupplyWizard({
                 </Notice>
               ) : null}
               <WizardActions
-                step={step}
-                total={6}
+                step={stage}
+                total={steps.length}
                 saving={
                   busy ||
-                  privateDraft.busy || privateDraft.backgroundBusy ||
+                  privateDraft.busy || (isBalance && privateDraft.backgroundBusy) ||
                   (privateDraft.blocked && !uncertain) ||
                   (!allowed && !uncertain)
                 }
+                draftBusy={privateDraft.backgroundBusy}
                 uncertain={uncertain}
                 blocked={
                   (!(step === 0 && legacyOpeningKey) &&
@@ -1754,7 +1785,7 @@ export function PatientSupplyWizard({
                 }
                 onBack={() => {
                   issuanceFailure.clear();
-                  setStep((value) => value - 1);
+                  setStep(isBalance ? step - 1 : supplyStageSteps[stage - 1]);
                   setError("");
                 }}
                 onDraft={() => void persist(true)}

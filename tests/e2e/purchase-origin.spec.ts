@@ -1,3 +1,4 @@
+import { selectMaterialCategory } from "./material-category";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -67,7 +68,7 @@ test("COM começa sem compra presumida e emite doação explícita sem creditar 
   expect(stock(f.patient)).toBe(before);
   await origin.selectOption("donation");
   await next(page);
-  await next(page);
+  await selectMaterialCategory(page);
   await page.getByRole("checkbox", { name: /^Material fictício V4 0/ }).check();
   await page
     .getByLabel("Quantidade — Material fictício V4 0", { exact: true })
@@ -117,7 +118,7 @@ test("COM recupera rascunho sem origem em branco e exige escolha antes de emitir
   await expect(origin).toHaveAttribute("aria-invalid", "true");
   await origin.selectOption("purchase");
   await next(page);
-  await next(page);
+  await selectMaterialCategory(page);
   await expect(
     page.getByLabel("Quantidade — Material fictício V4 0", { exact: true }),
   ).toHaveValue("2");
