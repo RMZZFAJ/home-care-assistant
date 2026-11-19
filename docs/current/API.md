@@ -1738,12 +1738,23 @@ o mínimo remoto conferido permanece em seis caracteres.
   habilitado e o reenvio ao autor da chegada. Ambos preservam o ID original.
 - `GET /api/purchases/arrivals/review` consulta chegadas a conferir no paciente.
   Recebe `careRecipientId`, `documentId` opcional e o cursor `beforeAt` com
-  `beforeId`. Saldo familiar só aparece com autorização de leitura.
+  `beforeId`. Sem ficha, inclui chegadas avulsas com `documentId: null` e
+  `origin`. Saldo familiar só aparece com autorização de leitura.
 - `POST /api/purchases/arrivals/review` confirma `careRecipientId`, `key` e
   `entries`. Cada entrada indica `documentId`, `receiptId`, `version`, `decision`
   e o `reason` exigido para recusa ou correção. A resposta identifica o
   resultado efetivo de cada parcela. O `POST` em `/reconcile` recebe apenas
   o paciente e a chave. Se não houver ato, fecha a chave com `not_applied`.
+- `GET /api/purchases/arrivals/unlinked` consulta chegadas avulsas. Recebe
+  `careRecipientId` e, na lista, aceita o par `beforeAt` e `beforeId`.
+  A consulta por `id` traz quantidades, autoria, decisões e versões. O saldo
+  familiar depende da capacidade de leitura do estoque.
+- `POST /api/purchases/arrivals/unlinked` recebe `careRecipientId`, `key` e
+  `intent`. A criação informa `origin` (`external_purchase`, `gift` ou
+  `donation`) e `lines` com `productId` e `quantity`. O autor reenvia com
+  `arrivalId`, `version` e os mesmos materiais. Para conferir a tentativa,
+  use a mesma chave com `intent: null`. A resposta `recorded` conserva a
+  chegada registrada. A resposta `not_applied` fecha a chave.
 - POST /api/balances/decisions/:target?careRecipientId=:patient e a variante
   /reconcile aplicam a mesma regra à programação, atribuição e adiamento.
   O domínio é balance_workspace; expectedVersion=0 representa somente uma

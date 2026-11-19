@@ -940,3 +940,22 @@
 .hca-l1 .hca-arrival-stock { color: var(--muted); font-size: 12px; }
 .hca-l1 .hca-arrival-stock summary { cursor: pointer; min-height: 28px; color: var(--primary); }
 .hca-l1 .hca-arrival-stock .hca-icon { width: 14px; height: 14px; display: inline; margin-inline-end: 5px; }
+.hca-l1 .hca-arrival-facts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 0;
+  border-block: 1px solid var(--line);
+  font-size: 12px;
+}
+.hca-l1 .hca-arrival-facts > div { display: grid; grid-template-columns: minmax(0, 6rem) 1fr; gap: 8px; }
+.hca-l1 .hca-arrival-facts dt { color: var(--muted); }
+.hca-l1 .hca-arrival-facts dd { margin: 0; overflow-wrap: anywhere; text-align: end; font-weight: 600; }
+.hca-l1 .hca-arrival-summary { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; margin: 0; }
+.hca-l1 .hca-arrival-summary .hca-icon { width: 15px; height: 15px; }
+.hca-l1 .hca-arrival-material { box-shadow: 0 1px 2px #163e3010; }
+.hca-l1 .hca-arrival-material .hca-arrival-stock { border-block-start: 1px solid var(--line); padding-block-start: 6px; }
+.hca-l1 .hca-arrival-material .hca-arrival-stock summary { display: flex; align-items: center; gap: 5px; }
+.hca-l1 .hca-arrival-material .hca-arrival-stock summary::after { content: none; display: none; }
+.hca-l1 .hca-arrival-material .hca-arrival-stock summary .hca-icon:last-child { margin-inline-start: auto; }
+.hca-l1 .hca-arrival-material .hca-arrival-stock[open] summary .hca-icon:last-child { rotate: 180deg; }

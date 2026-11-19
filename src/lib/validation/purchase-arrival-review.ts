@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { unlinkedOrigin } from "./unlinked-arrival";
 
 const instant = z.iso.datetime({ offset: true });
 const amount = z.string().regex(/^-?\d+(?:\.\d+)?$/);
 const target = {
-  documentId: z.uuid(), receiptId: z.uuid(), version: z.number().int().min(1).max(2147483647),
+  documentId: z.uuid().nullable(), receiptId: z.uuid(), version: z.number().int().min(1).max(2147483647),
 };
 export const arrivalReviewBatchLimit = 100;
 export const arrivalReviewDecision = z.discriminatedUnion("decision", [
@@ -25,8 +26,8 @@ const material = z.object({
   expectedQuantity: amount.nullable(), remainingAction: z.enum(["wait", "short"]).nullable(), familyStock: amount.nullable(),
 }).strict();
 const arrivalReviewRow = z.object({ ...target, documentCode: z.string(), author: z.string().nullable(),
-  submittedAt: instant, materials: z.array(material).min(1),
-}).strict();
+  submittedAt: instant, materials: z.array(material).min(1), origin: unlinkedOrigin.optional(),
+}).strict().refine(row => (row.documentId === null) === (row.origin !== undefined));
 export type ArrivalReviewRow = z.infer<typeof arrivalReviewRow>;
 export const arrivalReviewQueue = z.object({ arrivals: z.array(arrivalReviewRow).max(30),
   next: z.object({ at: instant, id: z.uuid() }).strict().nullable(),
@@ -34,7 +35,7 @@ export const arrivalReviewQueue = z.object({ arrivals: z.array(arrivalReviewRow)
 export type ArrivalReviewQueue = z.infer<typeof arrivalReviewQueue>;
 
 const outcome = z.object({
-  documentId: z.uuid(), receiptId: z.uuid(), documentCode: z.string().nullable(), submittedAt: instant.nullable(), materials: z.array(z.string()),
+  documentId: z.uuid().nullable(), receiptId: z.uuid(), documentCode: z.string().nullable(), submittedAt: instant.nullable(), materials: z.array(z.string()),
   status: z.enum(["approved", "rejected", "correction_requested", "already_decided", "changed", "blocked"]),
 }).strict();
 export const arrivalReviewReceipt = z.discriminatedUnion("state", [

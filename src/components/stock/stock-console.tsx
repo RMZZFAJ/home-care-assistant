@@ -1,5 +1,6 @@
 "use client";
 import { PurchaseArrivalReview } from "@/components/documents/purchase-arrival-review";
+import { UnlinkedArrivalAction, UnlinkedArrivalHistory } from "@/components/documents/unlinked-arrival";
 import { FamilyStockPreparation } from "./family-stock-preparation";
 import {
   ActionButton,
@@ -124,6 +125,7 @@ function PatientStock({
   const movements = history.data?.data ?? [];
   const total = history.data?.total ?? 0;
   const hasFamily = can(context, "stock.family.read");
+  const showFamilyArrivals = hasFamily && custody !== "CARE_TEAM" && custody !== "TRANSIT";
   const hasTeam = can(context, "stock.team.read");
   const visible = products.filter((product) =>
     product.name
@@ -168,7 +170,10 @@ function PatientStock({
           <h2 id="stock-balances-heading" className="font-semibold">
             Saldos e previsões
           </h2>
-          {hasFamily && custody !== "CARE_TEAM" && custody !== "TRANSIT" ? <PurchaseArrivalReview context={context} /> : null}
+          {showFamilyArrivals ? <div className="flex flex-wrap gap-2">
+            <UnlinkedArrivalAction context={context} />
+            <PurchaseArrivalReview context={context} />
+          </div> : null}
           <button
             className={buttonClass}
             aria-disabled={stock.loading}
@@ -265,6 +270,7 @@ function PatientStock({
           />
         ) : null}
       </section>
+      {showFamilyArrivals ? <UnlinkedArrivalHistory context={context} revision={revision} /> : null}
       {custody !== "TRANSIT" && can(context, "stock.family.manage") ? (
         <div className="hca-toolbar">
           <ActionButton

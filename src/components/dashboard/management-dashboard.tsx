@@ -12,6 +12,7 @@ import { OpenRequests } from "./open-requests";
 import { CriticalStockSummary, RecentDocuments, ShiftSummary } from "./dashboard-summary";
 import { WeekSchedule } from "./week-schedule";
 import { PurchaseArrivalReview } from "@/components/documents/purchase-arrival-review";
+import { UnlinkedArrivalAction } from "@/components/documents/unlinked-arrival";
 
 export function ManagementDashboard({ context, data }: { context: WorkspaceContext; data: DashboardData; }) {
   return <div className="dashboard-v2 family-dashboard">
@@ -20,6 +21,7 @@ export function ManagementDashboard({ context, data }: { context: WorkspaceConte
       {can(context, "ent.create") ? <Link href="/fichas/ent" className="btn btn-primary" prefetch={false}><Icon name="truck" width={16} height={16} />Nova entrega</Link> : null}
       {can(context, "ent.create") ? <Link href="/fichas/devolucao" className="btn" prefetch={false}><Icon name="truck" width={16} height={16} />Nova devolução</Link> : null}
       {can(context, "com.create") ? <Link href="/fichas/com" className="btn" prefetch={false}><Icon name="plus" width={16} height={16} />Nova compra</Link> : null}
+      <UnlinkedArrivalAction context={context} />
       <PurchaseArrivalReview context={context} />
     </div>
     <div className="metrics-grid">

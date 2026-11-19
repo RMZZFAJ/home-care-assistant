@@ -144,8 +144,22 @@ o PDF e a atualização da ficha antes da próxima ação. Evidências em
 `output/playwright/l2-com-review-*.log`. O cenário E05-11 foi comparado em
 390 px, com capturas em `output/playwright/l2-com-review/`. A conferência
 e o caso instável do guia passaram novamente nos três projetos de navegador.
-Permanecem a chegada avulsa, sua inclusão no painel e a cobertura explícita
-de outro planejamento.
+
+A chegada avulsa E05-17/E05-18 é registrada no Início ou no cabeçalho do
+estoque familiar. O lançamento CHE identifica compra externa, presente ou
+doação, com seleção manual de materiais e conversão de embalagens por código.
+A chegada do familiar entra no painel de conferência compartilhado. O
+administrador habilitado pode confirmar entrada no próprio lançamento.
+A recusa mantém o histórico e o pedido de correção volta ao autor. A tela
+de estoque consulta a chegada, e o histórico de movimentos aponta a origem
+do crédito. A migration `20261119054620_l2_unlinked_arrivals.sql` foi
+aplicada localmente. Passaram cinco integrações com Auth real e quatro
+execuções do conjunto dirigido no Android e iOS emulados. As duas
+execuções finais da chegada avulsa passaram após a conferência visual,
+sem repetição automática. As capturas estão em
+`output/playwright/l2-unlinked-arrivals/`. Seguem abertas a cobertura
+explícita de uma COM e a ação de abrir a conferência de um único CHE
+diretamente pelo seu cartão.
 
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma

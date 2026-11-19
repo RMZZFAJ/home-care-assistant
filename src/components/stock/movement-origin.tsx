@@ -9,6 +9,7 @@ import { RecordDrawer } from "@/components/forms/record-drawer";
 import { DocumentHeader } from "@/components/documents/document-header";
 import { PurchaseReceiptContent } from "@/components/documents/purchase-details";
 import { SupplyLineSummary } from "@/components/documents/supply-line-summary";
+import { UnlinkedArrivalFacts } from "@/components/documents/unlinked-arrival";
 import { ConsumptionLines } from "./consumption-lines";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { useLiveRevision } from "@/lib/use-live-revision";
@@ -42,6 +43,10 @@ function MovementFacts({ movement }: { movement: OriginMovement }) {
 }
 function OriginContent({ data }: { data: StockOrigin }) {
   if (data.kind === "unavailable") return <Notice>{data.message}</Notice>;
+  if (data.kind === "unlinked_arrival") return <section aria-label="Chegada de origem" className="space-y-3">
+    <h3>{data.arrival.code} · Chegada avulsa</h3>
+    <UnlinkedArrivalFacts arrival={data.arrival} />
+  </section>;
   if (data.kind === "manual")
     return (
       <section className="space-y-3" aria-label="Origem do movimento familiar">

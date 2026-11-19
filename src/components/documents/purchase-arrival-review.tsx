@@ -15,6 +15,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { arrivalReviewBatchLimit, arrivalReviewQueue, requireArrivalReviewReceipt, type ArrivalReviewDecision,
   type ArrivalReviewQueue, type ArrivalReviewReceipt, type ArrivalReviewRow } from "@/lib/validation/purchase-arrival-review";
 import type { WorkspaceContext } from "@/types/workspace";
+import { unlinkedOriginLabel } from "@/lib/validation/unlinked-arrival";
 
 const endpoint = "/api/purchases/arrivals/review";
 const reviewSteps = [{ label: "Conferindo as parcelas selecionadas", icon: "file" },
@@ -62,7 +63,7 @@ function ArrivalReviewCard({ row, choice, update }: {
         </MenuPopup>
       </Menu.Root>
     </div>
-    <p className="text-sm text-(--muted)">{row.documentCode} · {row.author ?? "Autor não preservado"} · {formatBrazilDate(row.submittedAt)}</p>
+    <p className="text-sm text-(--muted)">{row.documentCode}{row.origin ? ` · ${unlinkedOriginLabel[row.origin]}` : ""} · {row.author ?? "Autor não preservado"} · {formatBrazilDate(row.submittedAt)}</p>
     {!one ? <ul className="space-y-2">{row.materials.map(item => <li key={item.lineId}>
       <strong>{item.name} · {formatQuantity(item.quantity, item.unit)} informados</strong><MaterialStatus item={item} />
     </li>)}</ul> : null}
@@ -112,8 +113,9 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
   const groups = new Map<string, ArrivalReviewRow[]>();
   const selected: ArrivalReviewDecision[] = [];
   for (const row of queue.arrivals) {
-    const group = groups.get(row.documentId);
-    if (group) group.push(row); else groups.set(row.documentId, [row]);
+    const groupKey = row.documentId ?? "unlinked";
+    const group = groups.get(groupKey);
+    if (group) group.push(row); else groups.set(groupKey, [row]);
     const choice = choices[row.receiptId];
     if (!choice || choice.decision === "skip") continue;
     const target = { documentId: row.documentId, receiptId: row.receiptId, version: row.version };
@@ -193,7 +195,7 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
       <Icon name="truck" width={16} height={16} />{pendingKey ? "Conferir resultado das chegadas" : "Conferir chegadas"}
     </ActionButton> : null}
     <Dialog open={open} title={documentId && queue.arrivals.length <= 1 ? "Conferir entrada no estoque" : "Conferir chegadas"}
-      kicker={`COM · ${patientName}`} subtitle="Os itens marcados entram no estoque familiar. Desmarque para decidir depois ou use os três pontos para pedir correção ou recusar."
+      kicker={`${documentId ? "COM" : "Chegadas"} · ${patientName}`} subtitle="Os itens marcados entram no estoque familiar. Desmarque para decidir depois ou use os três pontos para pedir correção ou recusar."
       onClose={requestClose} closeDisabled={busy} finalFocus={triggerRef}
       footer={<><ActionButton disabled={busy} onClick={requestClose}>Voltar</ActionButton>
         {pendingKey ? <ActionButton variant="primary" disabled={busy} onClick={() => void send(true)}>Conferir mesmo resultado</ActionButton>
@@ -205,7 +207,7 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
           {!loading && !error && !queue.arrivals.length ? <p>Nenhuma chegada aguarda conferência neste momento.</p> : null}
           {!loading && error && !queue.arrivals.length ? <ActionButton onClick={() => void load()}>Consultar chegadas</ActionButton> : null}
           {selected.length > arrivalReviewBatchLimit ? <Notice error>Selecione até {arrivalReviewBatchLimit} chegadas por confirmação.</Notice> : null}
-          {[...groups].map(([id, rows]) => <section key={id} aria-label={`Chegadas de ${rows[0].documentCode}`} className="hca-purchase-list">
+          {[...groups].map(([id, rows]) => <section key={id} aria-label={id === "unlinked" ? "Chegadas avulsas" : `Chegadas de ${rows[0].documentCode}`} className="hca-purchase-list">
             {rows.map(row => <ArrivalReviewCard key={row.receiptId} row={row} choice={choices[row.receiptId] ?? { decision: "skip" }}
               update={choice => { setDirty(true); setChoices(previous => ({ ...previous, [row.receiptId]: choice })); }} />)}
           </section>)}

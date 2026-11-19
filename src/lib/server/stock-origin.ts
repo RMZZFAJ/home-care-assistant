@@ -3,6 +3,8 @@ import { ApiError, databaseError, rpc } from "./api";
 import type { StockOrigin, OriginMovement } from "@/types/stock-origin";
 import type { SupplyDocument } from "@/types/documents";
 import type { ConsumptionReport } from "@/types/consumption";
+import { unlinkedArrivalDetails } from "@/lib/validation/unlinked-arrival";
+import { quantity } from "@/lib/quantity";
 
 const movementColumns =
   "id,product_id,quantity::text,source_location,destination_location,justification,created_at,reference_type,reference_id,performed_by";
@@ -87,6 +89,16 @@ export async function stockMovementOrigin(
     return unavailable(
       "Este movimento histórico não tem uma origem documental identificada. Nenhuma ficha foi presumida.",
     );
+  if (movement.reference_type === "unlinked_arrival") {
+    const { data, error } = await client.rpc("read_unlinked_arrivals", { p_patient: patientId, p_id: movement.reference_id });
+    if (error?.code === "42501") return unavailable();
+    if (error) databaseError(error);
+    const arrival = unlinkedArrivalDetails.parse(data);
+    const material = arrival.materials.find(line => line.productId === movement.product_id);
+    if (arrival.id !== movement.reference_id || arrival.state !== "approved" || movement.source_location !== null ||
+      movement.destination_location !== "FAMILY" || !material || !quantity(material.quantity).eq(movement.quantity)) return unavailable();
+    return { ...base, kind: "unlinked_arrival", arrival, material: { name: material.name, unit: material.unit } };
+  }
   if (movement.reference_type === "consumption") {
     const { data, error } = await client
       .from("consumption_reports")

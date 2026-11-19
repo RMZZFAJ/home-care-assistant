@@ -1,6 +1,7 @@
 import type { SupplyDocument } from "./documents";
 import type { ConsumptionReport } from "./consumption";
 import type { StockMovement } from "./stock";
+import type { UnlinkedArrivalDetails } from "@/lib/validation/unlinked-arrival";
 
 export type OriginMovement = StockMovement & { performed_by: string | null };
 export type StockOrigin = {
@@ -15,6 +16,7 @@ export type StockOrigin = {
       regularizationId: string | null;
     }
   | { kind: "consumption"; report: ConsumptionReport }
+  | { kind: "unlinked_arrival"; arrival: UnlinkedArrivalDetails }
   | { kind: "manual"; compensates: OriginMovement | null }
   | {
       kind: "inventory";

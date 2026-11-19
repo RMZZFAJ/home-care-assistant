@@ -821,3 +821,22 @@ também identifica essa RPC. O privilégio é intencional; as negativas de Auth,
 papel/contexto e os grants são verificados em
 tests/integration/technical-notifications.test.mjs. O aviso não foi suprimido
 nem convertido em aprovação geral dos demais advisors.
+
+## Chegadas avulsas
+
+`private.unlinked_arrivals` numera chegadas CHE por paciente. Os materiais
+preservam nome, unidade e quantidade declarada. A revisão insere um evento
+por versão com autoria, instante e motivo. O reenvio usa a mesma chegada,
+confere a versão atual e exige o autor do registro.
+
+O lock de estoque do paciente serializa a numeração e o crédito. A aprovação
+gera um movimento de entrada por material, com `reference_type=unlinked_arrival`
+e referência à chegada. Declaração pendente, recusa e pedido de correção
+mantêm as quantidades fora do saldo confirmado. A chegada entra no painel
+comum de conferência, com ordenação conjunta antes de paginar.
+
+As tabelas privadas têm RLS e grants revogados. As RPCs autenticadas
+conferem sessão, papel local e capacidade no paciente. A consulta retorna as
+chegadas próprias, as disponíveis para conferência e as aprovadas para quem
+tem leitura familiar. A chave oficial por ator preserva o resultado exato e
+registra tentativas encerradas sem ato.
