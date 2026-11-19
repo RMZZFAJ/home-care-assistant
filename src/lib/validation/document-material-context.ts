@@ -16,23 +16,37 @@ export const materialPanelSections = ["stock", "history", "links"] as const;
 const lineScope = scope.extend({
   lineId: z.uuid(), productId: z.string().nullable(), page: z.number().int().positive(),
 });
+const observationMode = z.enum(["observed", "unknown", "unfilled", "legacy_unclassified"]);
+const historyRecord = z.object({
+  type: z.string(), createdAt: date, author: z.string().nullable(),
+  document: document.nullable(), arrival: z.object({ id: z.uuid(), code: z.string() }).nullable(),
+});
+export const materialHistoryRow = z.discriminatedUnion("kind", [
+  historyRecord.extend({
+    kind: z.literal("movement"), id: z.uuid(), quantity,
+    source: z.string().nullable(), destination: z.string().nullable(),
+    sourceAfter: quantity.nullable(), destinationAfter: quantity.nullable(),
+  }),
+  historyRecord.extend({
+    kind: z.literal("decision"), id: z.string().min(1), quantity: quantity.nullable(),
+    unit: z.string().nullable(), reason: z.string().nullable(), detail: z.string().nullable(),
+  }),
+]);
+export const materialHistoryObservation = observationMode;
+export type MaterialHistoryRow = z.infer<typeof materialHistoryRow>;
 export const documentMaterialPanel = z.discriminatedUnion("section", [
   lineScope.extend({
     section: z.literal("stock"), ...balances,
     observations: z.array(z.object({
       documentId: z.uuid(), code: z.string().nullable(), createdAt: date,
-      quantity: quantity.nullable(), observation: z.enum(["observed", "unknown", "unfilled", "legacy_unclassified"]).nullable(),
+      quantity: quantity.nullable(), observation: observationMode.nullable(),
       unit: z.string().nullable(), observedAt: date.nullable(),
       timeSource: z.enum(["client_draft", "server_submission", "legacy_unknown"]).nullable(),
     })),
   }),
   lineScope.extend({
     section: z.literal("history"), available: z.boolean(), total: z.number().int().nonnegative(),
-    rows: z.array(z.object({
-      id: z.uuid(), quantity, type: z.string(), createdAt: date, author: z.string().nullable(),
-      source: z.string().nullable(), destination: z.string().nullable(),
-      sourceAfter: quantity.nullable(), destinationAfter: quantity.nullable(), document: document.nullable(),
-    })),
+    rows: z.array(materialHistoryRow),
   }),
   lineScope.extend({
     section: z.literal("links"), total: z.number().int().nonnegative(),

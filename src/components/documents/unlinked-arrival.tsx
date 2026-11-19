@@ -1,4 +1,5 @@
 "use client";
+import { MaterialVisitReturn } from "./material-visit-return";
 
 import { useCallback, useId, useRef, useState, type RefObject } from "react";
 import { Menu } from "@base-ui/react/menu";
@@ -337,7 +338,10 @@ function ArrivalHistory({ context, revision, arrivalId }: { context: WorkspaceCo
       </>}>
       {detail.loading ? <LoadingIndicator label="Consultando a chegada" /> : null}
       {detail.error ? <><Notice error>{detail.error}</Notice><ActionButton onClick={detail.refresh}>Consultar novamente</ActionButton></> : null}
-      {detail.data ? <UnlinkedArrivalFacts arrival={detail.data} /> : null}
+      {detail.data ? <>
+        <MaterialVisitReturn targetId={detail.data.id} patientId={patient.id} />
+        <UnlinkedArrivalFacts arrival={detail.data} />
+      </> : null}
     </Dialog>
     {correction ? <ArrivalEditor context={context} correction={correction} onClose={() => {
       setCorrection(null); detail.refresh();

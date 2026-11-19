@@ -33,7 +33,7 @@ const place = z.object({
   page: z.number().int().min(1).max(1_000_000), linked: z.object({
     id: z.uuid(), code: z.string().nullable(), type: z.enum(["REQ", "COM", "ENT", "BAL"]),
   }).nullable(),
-  panelScroll: z.number(), pageScroll: z.number(),
+  panelScroll: z.number(), pageScroll: z.number(), focusEntry: z.string().optional(),
   filter: z.enum(filters), search: z.string().max(160),
 });
 

@@ -1,5 +1,29 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — decisões no Histórico de cada material.** A cronologia reúne
+as movimentações permitidas da custódia, as contagens de REQ, a compra,
+as decisões de chegada e as avaliações de necessidade. A quantidade,
+o motivo e a autoria vêm da revisão em que cada ato foi registrado.
+A autorização para a ficha determina quais decisões entram na consulta.
+
+- Uma correção mantém a quantidade informada na revisão anterior. A
+  chegada corrigida, sua validação e a entrada física têm registros
+  próprios. A avaliação de suficiência não altera o estoque.
+- As chegadas avulsas abrem pela consulta autorizada de estoque.
+  Voltar ao painel restaura a aba, a posição da rolagem e o foco na
+  referência usada para abrir a chegada.
+- A integração com Auth real cobriu os dados históricos, o isolamento
+  por linha e paciente, a remoção de leitura da ficha e da custódia e
+  as avaliações familiares sem movimentação adicional.
+- A rodada dirigida passou os seis casos em Android e iOS emulados
+  sem repetição. A comparação a 390 px conferiu linha do tempo, abas,
+  referências e botão de retorno.
+- Banco local com 296 versões até `20261119135903`. A fila de 24
+  migrations passou no ensaio remoto com rollback, incluindo os grants
+  do Histórico. O desenvolvimento segue em 272 até o preview compatível.
+- Falta reutilizar o painel a partir do preenchimento e da consulta
+  geral de estoque.
+
 **19/11 — Materiais e fichas relacionadas.** REQ, COM, ENT e DEV usam a
 lista compacta da v7, com busca, contagens e filtro de situação. O painel
 separa estoque atual, movimentações e fichas relacionadas. Mantém os
@@ -23,9 +47,8 @@ entradas e quantidades declaradas e confirmadas.
   remoto, que segue em 272. A aplicação deve acompanhar o preview
   compatível. O preview em `075b4b66` ainda chama a rota legada de
   arquivamento que o novo contrato fecha para novas gravações.
-- Permanecem pendentes o histórico das decisões sem movimentação e a
-  reutilização do painel nas consultas durante o preenchimento e no
-  estoque.
+- Ao fim daquele incremento, faltavam o histórico das decisões sem
+  movimentação e a reutilização do painel no preenchimento e no estoque.
 
 **19/11 — avisos no PDF inicial de emissão.** A etapa de avisos usa o
 mesmo processamento e as permissões do worker. A consulta durante a

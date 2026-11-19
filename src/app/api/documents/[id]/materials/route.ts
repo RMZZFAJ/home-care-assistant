@@ -19,6 +19,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     const { line, section, page } = parsed.data;
     const result = await rpc(auth.client, "document_material_context", {
       p_document: id, p_line: line, p_section: section, p_page: page,
+      ...(line && section === "history" ? { p_include_decisions: true } : {}),
     });
     return NextResponse.json((line ? documentMaterialPanel : documentMaterialSummary).parse(result),
       { headers: { "Cache-Control": "no-store" } });

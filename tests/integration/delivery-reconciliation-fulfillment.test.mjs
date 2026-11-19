@@ -52,6 +52,16 @@ test("team can ask after an exact receipt and the family can reverse its assessm
   assert.equal(sql(`select count(*) from private.document_progress_facts
     where document_id=${q(sent.id)} and action='ent.request_fulfillment_review' and actor_id=${q(fixtures.professional.id)}`),"1");
   assert.equal((await progress()).reviewRequired,1);
+  const history = await rpc(family,"document_material_context",{
+    p_document:sent.id,p_line:line.id,p_section:"history",p_include_decisions:true,
+  });
+  assert.equal(history.rows.find(item => item.type==="ent.receive").reason,firstReason);
+  assert.deepEqual(history.rows.filter(item => item.type==="ent.fulfillment_reviewed").map(item =>
+    [item.detail,Number(item.quantity),item.author]),[
+    ["partial",5,current.fulfillmentReviews[1].actorName],
+    ["complete",5,current.fulfillmentReviews[0].actorName],
+  ]);
+  assert.equal(history.rows.find(item => item.type==="ent.request_fulfillment_review").reason,intent.body.reason);
   assert.equal(stock(f.patient),applied);
 });
 

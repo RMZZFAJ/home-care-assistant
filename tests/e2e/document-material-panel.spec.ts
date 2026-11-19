@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 import { remainingNeedFixture, physicalState, fixtures } from "../integration/remaining-need-fixtures.mjs";
+import { rpc } from "../integration/v4-fixtures.mjs";
+import { purchaseBalanceCommand, purchaseBalanceFacts, purchaseBalanceFixture } from "../integration/purchase-entry-balance-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
@@ -59,4 +62,48 @@ test("material panel retains its linked consultation, search, and focus after a 
   await expect(page.getByRole("tab", { name: "Visão geral", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Voltar ao painel", exact: true })).toHaveCount(0);
   expect(physicalState(f)).toBe(before);
+});
+
+test("material history shows a correction and a separate arrival, then returns to the exact entry", async ({ page }, info) => {
+  await page.setViewportSize({ width: 390, height: 700 });
+  const f = await purchaseBalanceFixture();
+  const line = f.document.lines.find((item: { product_id: string }) => item.product_id === f.products[0]);
+  const pending = await purchaseBalanceCommand(f.family, f.document, "receive", {
+    lines: [{ lineId: line.id, quantity: "4", expectedQuantity: "6", remainingAction: "wait" }],
+  });
+  const reason = "Confira as unidades de cada embalagem.";
+  const correction = await purchaseBalanceCommand(f.admin, pending, "request_receipt_correction", {
+    receiptId: pending.receipts[0].id, reason,
+  });
+  const { result: arrival } = await rpc(f.family, "unlinked_arrival_command", {
+    p_patient: f.patient, p_key: randomUUID(), p_body: { origin: "gift", lines: [{ productId: line.product_id, quantity: "2" }] },
+  });
+  const before = purchaseBalanceFacts(f);
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await selectContext(page, f.patient);
+  await page.goto(`/fichas/${f.document.id}`);
+  await selectDocumentSection(page, "materials");
+  await page.getByRole("button", { name: "Detalhes de Material fictício V4 0", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
+  const history = panel.getByRole("tab", { name: "Histórico", exact: true });
+  await history.click();
+  const correctionEntry = panel.getByRole("listitem").filter({ hasText: reason });
+  await expect(correctionEntry).toContainText("Correção solicitada");
+  await expect(correctionEntry).toContainText("4 unidade");
+  await expect(correctionEntry).toContainText(correction.receipts[0].corrections[0].requesterName);
+  const arrivalEntry = panel.getByRole("listitem").filter({ hasText: "Chegada avulsa informada" });
+  const arrivalLink = arrivalEntry.getByRole("link", { name: arrival.code, exact: true });
+  await expect(arrivalLink).toBeVisible();
+  await info.attach("historico-do-material", { body: await panel.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await arrivalLink.click();
+  const arrivalDetails = page.getByRole("dialog", { name: "Detalhes da chegada", exact: true });
+  await expect(arrivalDetails).toContainText(arrival.code);
+  await expect(arrivalDetails).toContainText("Recebidas: 2 unidade");
+  await arrivalDetails.getByRole("button", { name: "Voltar ao painel", exact: true }).click();
+  await expect(history).toHaveAttribute("aria-selected", "true");
+  await expect(arrivalLink).toBeFocused();
+  expect(purchaseBalanceFacts(f)).toBe(before);
 });

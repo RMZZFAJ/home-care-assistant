@@ -1273,9 +1273,15 @@
 .hca-l1 .hca-material-balance-grid dt, .hca-l1 .hca-material-balance-grid .hca-material-balance-note { font-size: 10px; color: #546e62; font-weight: 400; }
 .hca-l1 .hca-material-balance-grid dd { margin: 3px 0 0; font-size: 16px; font-weight: 650; overflow-wrap: anywhere; }
 .hca-l1 .hca-material-linked-list small { display: block; font-weight: 400; color: #546e62; }
-.hca-l1 .hca-material-timeline { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
-.hca-l1 .hca-material-timeline li { display: flex; align-items: flex-start; gap: 10px; }
-.hca-l1 .hca-material-timeline-icon { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; color: #156f66; background: #edf4ee; }
+.hca-l1 .hca-material-timeline { display: grid; margin: 6px 0 0; padding: 0; list-style: none; }
+.hca-l1 .hca-material-timeline li { position: relative; display: flex; align-items: flex-start; gap: 12px; padding-bottom: 22px; }
+.hca-l1 .hca-material-timeline li:not(:last-child)::before { position: absolute; content: ""; left: 13px; top: 27px; bottom: 0; width: 1px; background: #e0eadd; }
+.hca-l1 .hca-material-timeline-icon { display: grid; place-items: center; flex: none; width: 27px; height: 27px; border-radius: 50%; color: #45764d; background: #eef5ea; }
+.hca-l1 .hca-material-timeline-main { flex: 1; min-width: 0; padding-top: 2px; overflow-wrap: anywhere; }
+.hca-l1 .hca-material-timeline-main strong { display: block; color: #355640; font-size: 12px; }
+.hca-l1 .hca-material-timeline-main p { margin: 4px 0; color: #546e62; font-size: 11px; line-height: 1.65; }
+.hca-l1 .hca-material-timeline-main small { display: block; color: #546e62; margin-top: 6px; font-size: 10px; }
+.hca-l1 .hca-material-history-reference { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 0; border: 0; background: transparent; color: #156f66; font-size: 12px; font-weight: 650; }
 .hca-l1 .hca-material-linked-list { display: grid; gap: 8px; }
 .hca-l1 .hca-material-linked-list article { padding: 9px; border: 1px solid #dde7e0; border-radius: 10px; }
 .hca-l1 .hca-material-link { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px; min-height: 42px; border: 1px solid #dde7e0; border-radius: 10px; background: #fff; color: #24473c; text-align: left; }
