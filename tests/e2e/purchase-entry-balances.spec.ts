@@ -30,10 +30,14 @@ test("COM shows each material's last validated family balance, distinct parcels 
   async function refreshCopy(expectedVersion?: number) {
     await expect(refresh).toBeEnabled();
     await refresh.focus(); await expect(refresh).toBeFocused();
-    const read = page.waitForResponse(response => new URL(response.url()).pathname === "/api/documents/" + f.document.id && response.request().method() === "GET");
-    await refresh.press("Enter"); const response = await read; await response.finished();
+    const read = page.waitForEvent("requestfinished", { predicate: async request => {
+      if (new URL(request.url()).pathname !== "/api/documents/" + f.document.id || request.method() !== "GET") return false;
+      const response = await request.response();
+      if (!response?.ok()) return false;
+      return expectedVersion === undefined || (await response.json()).data.version === expectedVersion;
+    } });
+    await refresh.press("Enter"); await read;
     await expect(refresh).toHaveAttribute("aria-busy", "false");
-    if (expectedVersion !== undefined) expect((await response.json()).data.version).toBe(expectedVersion);
   }
   await expect(balance(a.id)).toHaveText("Sem entrada validada");
   await expect(balance(b.id)).toHaveText("Sem entrada validada");

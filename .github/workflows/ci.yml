@@ -101,8 +101,9 @@ jobs:
     name: browser (${{ matrix.artifact }})
     runs-on: ubuntu-latest
     # WebKit reached only 162/242 cases before the old 40-minute job deadline.
-    # Keep the same shards, workers, assertions and retries; allow its full run.
-    timeout-minutes: ${{ matrix.engine == 'webkit' && 70 || 40 }}
+    # The mobile shard also hit 40 minutes during sustained runner slowdown.
+    # Keep the same shards, workers, assertions and retries.
+    timeout-minutes: ${{ matrix.engine == 'webkit' && 70 || (matrix.project == 'mobile' && 55 || 40) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Reserve the local Supabase ports
