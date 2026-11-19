@@ -14,11 +14,14 @@ revisão antes da conclusão.
 | Exemplar assinado | PDF PAdES-B-T de ENT com decisão anterior e motivo da reversão. O PDF original voltou com os mesmos bytes | Pipeline automático da emissão e do arquivamento |
 | Revisão e descarte | Revisões do laboratório v7 em celular e casos dirigidos em Android e iOS emulados | Arquivar, confirmar, reverter arquivo e política da residência |
 
-A stack local passou a 284 migrations até `20261119100441`. O ambiente de
+A stack local passou a 285 migrations até `20261119100441`. O ambiente de
 desenvolvimento remoto tem 272 até `20261119060719`. O preview publicado
 em `075b4b66` rejeita o novo estado de expedição pendente na sua validação e
-usa o contrato anterior de cancelamento físico. As 12 migrations locais
-aguardam a publicação coordenada do código compatível.
+usa o contrato anterior de cancelamento físico. A migration `20261119095551`
+normaliza as quebras de linha da função de decisões antes da extensão de
+acompanhamento. A pré-validação com rollback confirmou a aplicação das 13
+migrations no remoto e os grants esperados. A instalação definitiva aguarda
+a publicação coordenada do código compatível.
 
 **19/11 — pedido e decisão após recebimento de ENT e DEV.** A revisão
 E06-11 mostra o recebimento, o consumo disponível e o saldo para conferir.
