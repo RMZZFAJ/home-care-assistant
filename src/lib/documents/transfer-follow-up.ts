@@ -18,14 +18,9 @@ export function transferFollowUp(data: Facts) {
   if (facts.state === "dispatched") return deliveryFollowUp(data, direction === "return" ? "return" : "delivery");
   const noun = direction === "return" ? "devolução" : direction === "delivery" ? "entrega" : "transferência";
   const base = { section: "workflow" as const, label: "Declaração e expedição" };
-  if (facts.state === "pending") return {
-    ...base, pending: true, heading: `Conferir a concordância da ${noun}`,
-    description: "A contraparte designada registra sua própria decisão. A declaração ainda não expediu materiais; concordância não é recebimento nem altera o estoque.",
-    statusLabel: `${direction === "return" ? "Devolução" : direction === "delivery" ? "Entrega" : "Transferência"} aguardando concordância`,
-  };
-  if (facts.state === "agreed") return {
+  if (facts.state === "pending" || facts.state === "agreed") return {
     ...base, pending: true, heading: `Conferir a expedição da ${noun}`,
-    description: "A concordância foi registrada. A expedição autorizada ainda precisa ocorrer; somente ela debita a origem e cria trânsito. O destino é creditado pelo recebimento pessoal posterior.",
+    description: "A expedição debita a origem e põe os materiais em trânsito. O saldo chega ao destino após a conferência pessoal.",
     statusLabel: `${direction === "return" ? "Devolução" : direction === "delivery" ? "Entrega" : "Transferência"} pronta para expedição`,
   };
   if (["declined", "withdrawn"].includes(facts.state)) return {

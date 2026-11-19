@@ -15,6 +15,11 @@ const packet = z.object({
     destination: custody,
     referenceHash: z.string().regex(/^[a-f0-9]{64}$/),
     checkedAt: z.iso.datetime({ offset: true }),
+    suggested: z.object({
+      professionalId: z.uuid(),
+      startsAt: z.iso.datetime({ offset: true }),
+      endsAt: z.iso.datetime({ offset: true }),
+    }).nullable().optional(),
     people: z.array(
       z.object({
         id: z.uuid(),
@@ -63,6 +68,7 @@ export function parseTransferPreparation(
     row.source !== expected.source ||
     row.destination === row.source ||
     row.people.some((p) => p.id === expected.userId) ||
+    (row.suggested && (row.source !== "FAMILY" || !row.people.some((person) => person.id === row.suggested?.professionalId))) ||
     new Set(row.people.map((p) => p.id)).size !== row.people.length ||
     new Set(row.products.map((p) => p.id)).size !== row.products.length ||
     new Set(row.origins.map((p) => p.id)).size !== row.origins.length ||
@@ -95,15 +101,20 @@ export function requireTransferDeclarationConfirmation(
   const actual = row.transfer!,
     sent = expected.declaration,
     person = actual.declaration;
-  const sameId = (left: string, right: string) =>
-    left.toLowerCase() === right.toLowerCase();
+  const sameId = (left?: string, right?: string) =>
+    left?.toLowerCase() === right?.toLowerCase();
+  const codePrefix = sent.source === "CARE_TEAM" ? "DEV-" : "ENT-";
   if (
     !sameId(person.actor.id, expected.userId) ||
     person.source !== sent.source ||
     person.reason !== sent.reason ||
     person.referenceHash !== sent.referenceHash ||
-    !sameId(person.counterparty.id, sent.counterpartyId) ||
+    person.mode !== sent.mode ||
+    !sameId(person.counterparty?.id, sent.counterpartyId) ||
     !sameId(person.recipient.id, sent.recipientId) ||
+    (sent.mode === "direct" &&
+      (actual.state !== "dispatched" || row.status !== "pending_receipt" ||
+        !row.code?.startsWith(codePrefix) || !row.protocol)) ||
     (actual.originDocumentId ?? "").toLowerCase() !==
       (sent.originDocumentId ?? "").toLowerCase() ||
     row.lines.length !== sent.lines.length ||

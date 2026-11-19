@@ -24,13 +24,13 @@ test("a bilateral transfer separates Juliana's declaration, Ana's agreement and 
     before.ledger,
     "Declaration must not move the material",
   );
-  const premature = await transferCommand(
-    f.initiator.client,
+  const unauthorized = await transferCommand(
+    f.counterparty.client,
     declared.id,
     "dispatch",
     declared.version,
   );
-  assert.equal(premature.error?.code, "PT409");
+  assert.equal(unauthorized.error?.code, "42501");
   assert.equal(
     (
       await transferCommand(
@@ -614,7 +614,7 @@ test("an unavailable counterparty cannot agree and an administrator may close on
   );
 });
 
-test("dispatch rolls back its native movement when the agreed counterparty loses authority during the later actor FK wait", async () => {
+test("dispatch rolls back its native movement when the designated receiver loses authority during the later actor FK wait", async () => {
   const f = await transferFixture(),
     { response } = await declareTransfer(f);
   assert.ifError(response.error);
@@ -627,7 +627,7 @@ test("dispatch rolls back its native movement when the agreed counterparty loses
   );
   assert.ifError(agreed.error);
   sql(
-    `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(f.counterparty.id)},'ent.receive',true);`,
+    `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(f.recipient.id)},'ent.receive',true);`,
   );
   const before = transferState(f);
   const rejected = await whileRowWaits(
@@ -643,7 +643,7 @@ test("dispatch rolls back its native movement when the agreed counterparty loses
       ),
     async () => {
       sql(
-        `update public.capability_overrides set enabled=false where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(f.counterparty.id)} and capability='ent.receive';`,
+        `update public.capability_overrides set enabled=false where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(f.recipient.id)} and capability='ent.receive';`,
       );
     },
   );

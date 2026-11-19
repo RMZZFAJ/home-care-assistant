@@ -7,6 +7,9 @@ import {
 } from "@/components/ui/controls";
 import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { Icon, StepNavigator } from "@/components/ui/primitives";
+import { Dialog } from "@/components/ui/overlays";
 import Link from "next/link";
 import {
   useEffect,
@@ -43,7 +46,7 @@ import {
   requireTransferDeclarationConfirmation,
 } from "@/lib/validation/transfer-preparation";
 import type { TransferDeclarationDraftContent } from "@/lib/validation/supply-drafts";
-import { quantity } from "@/lib/quantity";
+import { quantity, validQuantity } from "@/lib/quantity";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import {
   createTransferSchema,
@@ -57,9 +60,11 @@ import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
 
 export const custodyName = (source: Custody) =>
   source === "FAMILY" ? "Família" : "Equipe";
+const transferSteps = ["Confirmação", "Materiais", "Itens extras", "Observações", "Revisão"];
+const transferStepActions = ["Selecionar materiais", "Continuar", "Continuar", "Revisar ficha"];
 export function TransferConsole({ source }: { source?: Custody } = {}) {
   return (
-    <Workspace title={source === "CARE_TEAM" ? "Devolução de materiais" : "Entregas e devoluções de materiais"}>
+    <Workspace title={source === "CARE_TEAM" ? "Nova devolução" : "Entregas e devoluções de materiais"}>
       {(context) =>
         context.patient && can(context, "ent.read") ? (
           <PatientTransfers key={context.patient.id} context={context} fixedSource={source} />
@@ -75,20 +80,23 @@ function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext;
     [editing, setEditing] = useState(false),
     [consulting, setConsulting] = useState(false);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+  function endEditing() {
+    setEditing(false);
+    requestAnimationFrame(() => headingRef.current?.focus());
+  }
   const returnOnly = fixedSource === "CARE_TEAM";
   const canPrepare = can(context, "ent.create") && !!source && can(context, source === "CARE_TEAM" ? "stock.team.read" : "stock.family.read");
   return (
     <div className="mx-auto max-w-4xl space-y-5">
-      <section className="ui-card space-y-4">
+      {!editing ? <section className="ui-card space-y-4">
         <h2 ref={headingRef} tabIndex={-1}>
-          {returnOnly ? "Declarar devolução de materiais" : "Declarar entrega ou devolução de materiais"}
+          {returnOnly ? "Nova devolução" : "Nova entrega ou devolução"}
         </h2>
         <p>
           A entrega segue da família para a equipe. A devolução de materiais
           segue da equipe para a família e pode ser autônoma, sem uma entrega
-          de origem vinculada. A contraparte concorda primeiro. A expedição coloca os
-          materiais em trânsito; somente o recebimento pessoal credita o
-          destino.
+          de origem vinculada. Ao expedir, os materiais ficam em trânsito até a
+          conferência da pessoa designada.
         </p>
         <p>
           Consumo, descarte e correção de estoque têm seus próprios registros.
@@ -133,14 +141,14 @@ function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext;
           Acompanhar entregas e devoluções
         </Link>
         {returnOnly ? <Link className="ui-button ui-button-secondary" href="/transferencias">Consultar os dois percursos de materiais</Link> : null}
-      </section>
+      </section> : null}
       {editing && source ? (
         <TransferDeclarationEditor
           key={source + ":" + consulting}
           context={context}
           source={source}
           consulting={consulting}
-          onClose={() => setEditing(false)}
+          onClose={endEditing}
           headingRef={headingRef}
         />
       ) : null}
@@ -170,7 +178,8 @@ function TransferDeclarationEditor({
     [originId, setOriginId] = useState("");
   const [reason, setReason] = useState(""),
     [query, setQuery] = useState(""),
-    [lines, setLines] = useState<{ productId: string; quantity: string }[]>([]);
+    [lines, setLines] = useState<{ productId: string; quantity: string; extra?: boolean }[]>([]);
+  const [step, setStep] = useState(0);
   const [packet, setPacket] = useState<TransferDeclaration | null>(null),
     [result, setResult] = useState<SupplyDocument | null>(null);
   const [error, setError] = useState(""),
@@ -183,6 +192,11 @@ function TransferDeclarationEditor({
   const loadedRef = useRef(false);
   const patientId = context.patient!.id;
   const processName = materialTransferLabel(source, source === "FAMILY" ? "CARE_TEAM" : "FAMILY").toLocaleLowerCase("pt-BR");
+  const isReturn = source === "CARE_TEAM";
+  useOperationActivity(busy && !!packet, {
+    title: isReturn ? "Expedindo devolução" : "Expedindo entrega",
+    detail: "Conferindo o saldo da origem e registrando os materiais em trânsito.",
+  });
   const restoredRef = useRef(false);
   const returnFocusRef = useRef(false);
   const [baseline, setBaseline] = useState<TransferDeclarationDraftContent>(
@@ -217,6 +231,7 @@ function TransferDeclarationEditor({
       setReason(values.reason);
       setQuery(values.query);
       setLines(values.lines);
+      setStep(values.step ?? 0);
       setPacket(null);
       setResult(null);
       setError("");
@@ -240,13 +255,16 @@ function TransferDeclarationEditor({
       setReason("");
       setQuery("");
       setLines([]);
+      setStep(0);
       setPacket(null);
     },
   });
-  const privateReloadRef = useRef(privateDraft.reload);
+  const privateReadRef = useRef(privateDraft.revalidateRead);
   useEffect(() => {
-    privateReloadRef.current = privateDraft.reload;
-  }, [privateDraft.reload]);
+    privateReadRef.current = privateDraft.base?.state === "active"
+      ? privateDraft.revalidateRead
+      : () => Promise.resolve(false);
+  }, [privateDraft.base, privateDraft.revalidateRead]);
   useEffect(() => {
     if (!busy && !privateDraft.busy && !packet && returnFocusRef.current) {
       returnFocusRef.current = false;
@@ -258,6 +276,7 @@ function TransferDeclarationEditor({
     recipientId,
     originId,
     reason,
+    step,
     query,
     lines,
   });
@@ -282,6 +301,7 @@ function TransferDeclarationEditor({
         });
         if (!loadedRef.current && !restoredRef.current) {
           setReference(current);
+          setRecipientId((previous) => previous || current.suggested?.professionalId || "");
           setBaseline((old) => adoptTransferDeclarationReference(old, current));
           setReferenceUnavailable(false);
         } else setComparison(current);
@@ -299,7 +319,7 @@ function TransferDeclarationEditor({
             : "Não foi possível consultar a referência.",
         );
         if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-          privateReloadRef.current();
+          void privateReadRef.current();
       })
       .finally(() => {
         if (!controller.signal.aborted) setRefreshing(false);
@@ -332,10 +352,23 @@ function TransferDeclarationEditor({
       recoveryOnly
     )
       return;
+    if (step < 3) {
+      const materialStep = step === 1 || step === 2;
+      const stepLines = lines.filter((line) => !!line.extra === (step === 2));
+      if (materialStep && (step === 1 && !stepLines.length || stepLines.some((line) => {
+        const product = reference.products.find((item) => item.id === line.productId);
+        return !product || !validQuantity(line.quantity, product.quantityDecimals) || quantity(line.quantity).gt(product.available);
+      }))) {
+        setError("Escolha os materiais e informe quantidades válidas dentro do saldo disponível.");
+        return;
+      }
+      setError("");
+      setQuery("");
+      setStep(step + 1);
+      return;
+    }
     if (
-      ![counterpartyId, recipientId].every((id) =>
-        reference.people.some((person) => person.id === id),
-      ) ||
+      !reference.people.some((person) => person.id === recipientId) ||
       lines.some(
         (line) =>
           !reference.products.some((product) => product.id === line.productId),
@@ -362,12 +395,12 @@ function TransferDeclarationEditor({
       idempotencyKey: crypto.randomUUID(),
       declaration: {
         source,
-        counterpartyId,
+        mode: "direct",
         recipientId,
         originDocumentId: originId || null,
         referenceHash: reference.referenceHash,
         reason,
-        lines,
+        lines: lines.map(({ productId, quantity }) => ({ productId, quantity })),
       },
     });
     if (!parsed.success) {
@@ -387,6 +420,13 @@ function TransferDeclarationEditor({
       setError(
         "Revise as casas decimais permitidas na unidade de cada material.",
       );
+      return;
+    }
+    if (parsed.data.declaration.lines.some((line) => {
+      const product = reference.products.find((item) => item.id === line.productId);
+      return !product || quantity(line.quantity).gt(product.available);
+    })) {
+      setError("A quantidade a expedir deve caber no saldo disponível de cada material.");
       return;
     }
     setBusy(true);
@@ -429,12 +469,13 @@ function TransferDeclarationEditor({
           : "Não foi possível conferir a referência atual.",
       );
       if (cause instanceof ApiError && [401, 403, 404].includes(cause.status))
-        privateDraft.reload();
+        await privateReadRef.current();
     } finally {
       setBusy(false);
     }
   }
   async function submit() {
+    if (busy) return;
     if (!pendingRef.current) pendingRef.current = packet;
     if (!pendingRef.current) return;
     setBusy(true);
@@ -465,13 +506,13 @@ function TransferDeclarationEditor({
         setBaseline(currentContent);
         if (cause.code === "DRAFT_VERSION_CONFLICT")
           void privateDraft.reportConflict();
-        else if ([401, 403, 404].includes(cause.status)) privateDraft.reload();
+        else if ([401, 403, 404].includes(cause.status)) await privateReadRef.current();
         returnFocusRef.current = true;
       }
       setError(
         cause instanceof Error
           ? cause.message
-          : "Resultado não confirmado. Recupere a mesma declaração.",
+          : "Resultado não confirmado. Verifique a mesma tentativa de expedição.",
       );
     } finally {
       setBusy(false);
@@ -479,11 +520,7 @@ function TransferDeclarationEditor({
   }
   const personName = (id: string, ref = reference) =>
     (referenceUnavailable && ref === reference
-      ? id === counterpartyId
-        ? currentContent.fields.counterpartyLabel
-        : id === recipientId
-          ? currentContent.fields.recipientLabel
-          : undefined
+      ? currentContent.fields.recipientLabel
       : ref?.people.find((person) => person.id === id)?.name) ??
     "Escolha anterior indisponível";
   const refresh = () => {
@@ -513,13 +550,6 @@ function TransferDeclarationEditor({
       aria-label="Comparação da referência da transferência"
     >
       <h3>Referência preservada e atual</h3>
-      <p>
-        Contraparte:{" "}
-        {currentContent.fields.counterpartyLabel || "Não escolhida"} →{" "}
-        {comparison.people.find((person) => person.id === counterpartyId)
-          ?.name ?? "Escolha indisponível"}
-        .
-      </p>
       <p>
         Recebedor: {currentContent.fields.recipientLabel || "Não escolhido"} →{" "}
         {comparison.people.find((person) => person.id === recipientId)?.name ??
@@ -617,41 +647,35 @@ function TransferDeclarationEditor({
       </RecordDrawer>
     );
   return (
-    <RecordDrawer
-      title={
+    <section
+      className="hca-transfer-wizard"
+      aria-label={
         result
-          ? "Declaração registrada"
-          : packet
-            ? `Revisar declaração da ${processName}`
-            : `Preparar ${processName}`
+          ? (isReturn ? "Devolução expedida" : "Entrega expedida")
+          : (isReturn ? "Nova devolução" : "Nova entrega")
       }
-      busy={busy || privateDraft.busy}
-      preventClose={uncertain || !!privateDraft.pending}
-      onClose={close}
-      restoreFocusFallbackRef={headingRef}
-      trackChanges={false}
+      aria-busy={busy || privateDraft.busy}
     >
       <div onChangeCapture={() => setDraftTouched(true)}>
       {privatePanel}
       {error ? <Notice error>{error}</Notice> : null}
-      {!packet && !result ? (
-        <>
-          <Notice>
-            Salvar preserva somente sua preparação. Registrar a declaração exige
-            revisão e confirmação próprias.
-          </Notice>
-          <ActionButton
-            disabled={busy || uncertain || privateDraft.blocked}
-            onClick={() => void privateDraft.save(currentContent)}
-          >
-            Salvar preenchimento privado
-          </ActionButton>
-        </>
+      {!result && (reference && !referenceUnavailable || packet) ? (
+        <StepNavigator
+          steps={transferSteps}
+          active={packet ? 4 : step}
+          disabled={busy || uncertain || privateDraft.blocked}
+          onChange={(next) => {
+            if (next < 4) {
+              setPacket(null);
+              setError("");
+              setStep(next);
+            }
+          }}
+        />
       ) : null}
       {discard ? (
-        <Notice>
-          Esta declaração ainda não foi registrada. Fechar sem salvar mantém a
-          última cópia privada confirmada e descarta as alterações atuais.
+        <Dialog open title="Sair por agora?" onClose={() => setDiscard(false)}>
+          <p>Você pode guardar o preenchimento e continuar em outro momento.</p>
           <div className="hca-toolbar">
             <ActionButton onClick={() => setDiscard(false)}>
               Continuar editando
@@ -672,28 +696,27 @@ function TransferDeclarationEditor({
               Fechar sem salvar estas alterações
             </ActionButton>
           </div>
-        </Notice>
+        </Dialog>
       ) : null}
       {result ? (
-        <div className="space-y-4">
+        <div className="hca-transfer-wizard-result">
+          <span className="hca-transfer-wizard-result-icon" aria-hidden="true"><Icon name="check" width="24" height="24" /></span>
           <h3 ref={reviewHeadingRef} tabIndex={-1}>
-            Declaração confirmada
+            {isReturn ? "Devolução expedida" : "Entrega expedida"}
           </h3>
           <p>
-            Consulte a ficha atual para acompanhar a decisão da contraparte.
-            Este registro não comprova expedição ou recebimento.
+            Os materiais estão em trânsito e aguardam a conferência de {result.transfer?.declaration.recipient.name}.
           </p>
           <p>
-            Declarante: {result.transfer?.declaration.actor.name}. Contraparte:{" "}
-            {result.transfer?.declaration.counterparty.name}. Recebedor físico:{" "}
-            {result.transfer?.declaration.recipient.name}.
+            {result.code} · Expedida por {result.transfer?.declaration.actor.name}.
           </p>
           <Link
             className="ui-button ui-button-primary"
-            href={"/documentos/" + result.id}
+            href={"/fichas/" + result.id}
           >
-            Consultar a transferência registrada
+            Acompanhar ficha
           </Link>
+          <ActionButton onClick={onClose}>Nova ficha</ActionButton>
         </div>
       ) : (!reference || referenceUnavailable) && !packet ? (
         <div className="hca-form-stack">
@@ -753,7 +776,7 @@ function TransferDeclarationEditor({
               />
             </FormField>
             <ActionButton disabled variant="primary">
-              Revisar declaração
+              Revisar ficha
             </ActionButton>
           </div>
           {refreshing ? (
@@ -765,10 +788,11 @@ function TransferDeclarationEditor({
           >
             Comparar referência atual
           </ActionButton>
+          <ActionButton disabled={busy || privateDraft.busy} onClick={close}>Sair por agora</ActionButton>
         </div>
       ) : (
-        <div className="space-y-4">
-          <p>
+        <div className="hca-transfer-wizard-content">
+          {!packet ? <p className="hca-field-help">
             <strong>
               {custodyName(source)} → {custodyName(reference!.destination)}
             </strong>{" "}
@@ -778,7 +802,7 @@ function TransferDeclarationEditor({
               : "Referência consultada em " +
                 formatBrazilDate(reference!.checkedAt) +
                 "."}
-          </p>
+          </p> : null}
           {needsRefresh ? (
             <Notice>
               Seus campos foram preservados. Consulte, compare e adote a
@@ -794,41 +818,14 @@ function TransferDeclarationEditor({
               </ActionButton>
               {!reference!.people.length ? (
                 <Notice>
-                  Não há pessoa habilitada na custódia de destino. A declaração
-                  exige contraparte e recebedor elegíveis.
+                  Não há pessoa habilitada na custódia de destino para confirmar o recebimento.
                 </Notice>
               ) : null}
               <form className="grid gap-4" onChangeCapture={() => setDraftTouched(true)} onSubmit={prepare}>
-                <p>
-                  Declarante: <strong>{context.fullName}</strong>. Contraparte e
-                  recebedor são escolhas separadas. A mesma pessoa pode exercer
-                  os dois atos, registrando cada um pessoalmente.
-                </p>
-                <FormField label="Contraparte para concordância" required>
-                  <SelectField
-                    required
-                    value={counterpartyId}
-                    onChange={(controlEvent) => {
-                      const controlValue = controlEvent.currentTarget.value;
-                      return setCounterpartyId(controlValue);
-                    }}
-                  >
-                    <option value="">Escolha quem decide a concordância</option>
-                    {counterpartyId &&
-                    !reference!.people.some((p) => p.id === counterpartyId) ? (
-                      <option value={counterpartyId} disabled>
-                        {currentContent.fields.counterpartyLabel ||
-                          "Escolha anterior indisponível"}{" "}
-                        · indisponível
-                      </option>
-                    ) : null}
-                    {reference!.people.map((person) => (
-                      <option key={person.id} value={person.id}>
-                        {person.name}
-                      </option>
-                    ))}
-                  </SelectField>
-                </FormField>
+                {step === 0 ? <>
+                <h3>Confirme os dados da {isReturn ? "devolução" : "entrega"}</h3>
+                <p><strong>Paciente</strong> · {context.patient?.display_name}</p>
+                <p><strong>Expedidor</strong> · {context.fullName}</p>
                 <FormField label="Recebedor físico designado" required>
                   <SelectField
                     required
@@ -849,12 +846,15 @@ function TransferDeclarationEditor({
                     ) : null}
                     {reference!.people.map((person) => (
                       <option key={person.id} value={person.id}>
-                        {person.name}
+                        {person.name}{person.id === reference!.suggested?.professionalId ? " · Em plantão" : ""}
                       </option>
                     ))}
                   </SelectField>
                 </FormField>
-                <FormField label="Adicionar material da origem">
+                </> : null}
+                {step === 1 || step === 2 ? <>
+                <h3>{transferSteps[step]}</h3>
+                <FormField label={step === 2 ? "Adicionar item extra" : "Adicionar material da origem"}>
                   <SearchSelect
                     query={query}
                     selectedIds={[]}
@@ -867,7 +867,7 @@ function TransferDeclarationEditor({
                       )
                         setLines((previous) => [
                           ...previous,
-                          { productId: nextIds[0]!, quantity: "" },
+                          { productId: nextIds[0]!, quantity: "", extra: step === 2 },
                         ]);
                       setQuery("");
                     }}
@@ -896,13 +896,13 @@ function TransferDeclarationEditor({
                     }
                   />
                 </FormField>
-                {!lines.length ? (
+                {!lines.some((line) => !!line.extra === (step === 2)) ? (
                   <p>
-                    Nenhum material selecionado. Informe as quantidades na
-                    unidade base.
+                    {step === 2 ? "Nenhum item extra incluído." : "Nenhum material selecionado. Informe as quantidades na unidade base."}
                   </p>
                 ) : (
                   lines.map((line, index) => {
+                    if (!!line.extra !== (step === 2)) return null;
                     const product = reference!.products.find(
                       (p) => p.id === line.productId,
                     );
@@ -976,6 +976,9 @@ function TransferDeclarationEditor({
                     );
                   })
                 )}
+                </> : null}
+                {step === 3 ? <>
+                <h3>Observações</h3>
                 <FormField label="ENT documental de origem, quando conhecida">
                   <SelectField
                     value={originId}
@@ -1037,6 +1040,10 @@ function TransferDeclarationEditor({
                     }}
                   />
                 </FormField>
+                </> : null}
+                <div className="hca-transfer-wizard-footer">
+                {step > 0 ? <ActionButton onClick={() => { setError(""); setStep(step - 1); }}>Voltar</ActionButton> : null}
+                {step === 0 ? <ActionButton disabled={busy || privateDraft.blocked} onClick={close}>Sair por agora</ActionButton> : null}
                 <ActionButton
                   type="submit"
                   variant="primary"
@@ -1047,38 +1054,38 @@ function TransferDeclarationEditor({
                     privateDraft.backgroundBusy ||
                     busy ||
                     !reference!.people.length ||
-                    !lines.length
+                    (step === 0 && !recipientId) ||
+                    (step === 3 && !lines.length)
                   }
                 >
-                  Revisar declaração
+                  {transferStepActions[step]}
                 </ActionButton>
+                </div>
               </form>
             </>
           ) : (
-            <section className="space-y-4">
-              <h3 ref={reviewHeadingRef} tabIndex={-1}>
-                Conferir declaração antes de registrar
-              </h3>
-              <p>Declarante: {context.fullName}.</p>
-              <p>
-                Contraparte:{" "}
-                <strong>{personName(packet.declaration.counterpartyId)}</strong>
-                .
-              </p>
-              <p>
-                Recebedor físico:{" "}
-                <strong>{personName(packet.declaration.recipientId)}</strong>.
-              </p>
+            <section className="hca-transfer-wizard-review">
+              <h2 ref={reviewHeadingRef} tabIndex={-1}>Revise antes de expedir</h2>
+              <p className="hca-field-help">Confira os materiais e as informações que acompanharão esta ficha.</p>
+              <dl className="hca-transfer-wizard-summary">
+                <div><dt>Paciente</dt><dd>{context.patient?.display_name}</dd></div>
+                <div><dt>Preenchido por</dt><dd>{context.fullName}</dd></div>
+                <div><dt>Destino</dt><dd>{isReturn ? "Estoque da família" : "Estoque da equipe"}</dd></div>
+                <div><dt>Recebedor físico</dt><dd>{personName(packet.declaration.recipientId)}</dd></div>
+              </dl>
+              <h4>Materiais</h4>
               {packet.declaration.lines.map((line) => {
                 const product = reference!.products.find(
                   (p) => p.id === line.productId,
                 );
                 return (
-                  <p key={line.productId}>
-                    {product?.name} · {formatQuantity(line.quantity)}{" "}
-                    {product?.unit}
-                    {product?.active === false ? " · inativo com saldo" : ""}
-                  </p>
+                  <article className="hca-transfer-wizard-material" key={line.productId}>
+                    <strong>{product?.name}</strong>
+                    <p>{formatQuantity(line.quantity, product?.unit)}
+                      {lines.find((item) => item.productId === line.productId)?.extra ? " · Item extra" : ""}
+                      {product?.active === false ? " · inativo com saldo" : ""}
+                    </p>
+                  </article>
                 );
               })}
               <p>
@@ -1092,17 +1099,15 @@ function TransferDeclarationEditor({
                 Sua justificativa: {packet.declaration.reason}
               </p>
               <Notice>
-                A declaração aguarda a concordância própria da contraparte.
-                Concordância não confirma expedição nem recebimento. Somente a
-                expedição posterior debita a origem e cria trânsito.
+                A expedição debita o saldo da origem e coloca os materiais em trânsito.
+                O destino recebe o saldo após a conferência pessoal.
               </Notice>
               {uncertain ? (
                 <Notice>
-                  O resultado não foi confirmado. Recupere esta mesma declaração
-                  antes de editar ou iniciar outra.
+                  O resultado ainda é incerto. Verifique esta tentativa de expedição antes de enviar outra.
                 </Notice>
               ) : null}
-              <div className="hca-toolbar">
+              <div className="hca-transfer-wizard-footer">
                 {!uncertain ? (
                   <ActionButton
                     onClick={() => {
@@ -1112,13 +1117,14 @@ function TransferDeclarationEditor({
                       );
                     }}
                   >
-                    Voltar aos meus campos
+                    Voltar
                   </ActionButton>
                 ) : null}
-                <ActionButton variant="primary" onClick={() => void submit()}>
+                <ActionButton variant="primary" disabled={busy} onClick={() => void submit()}>
+                  <Icon name="send" width="16" height="16" />
                   {uncertain
-                    ? "Recuperar mesma declaração"
-                    : "Registrar declaração sem expedir"}
+                    ? "Verificar a expedição"
+                    : isReturn ? "Expedir devolução" : "Expedir entrega"}
                 </ActionButton>
               </div>
             </section>
@@ -1126,6 +1132,6 @@ function TransferDeclarationEditor({
         </div>
       )}
       </div>
-    </RecordDrawer>
+    </section>
   );
 }

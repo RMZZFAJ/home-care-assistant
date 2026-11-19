@@ -1,5 +1,37 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — expedição direta de ENT e DEV.** O assistente de
+transferência confirma paciente e destinatário, seleciona materiais e itens
+extras, registra a observação e apresenta a revisão. A expedição gera o
+protocolo e coloca os materiais em trânsito na mesma transação. Na DEV, o
+vínculo opcional à ENT preserva a ficha de origem. A confirmação pertence
+à pessoa designada. Decisões bilaterais antigas continuam no histórico.
+As migrations `20261119063513` e `20261119072627` foram aplicadas na
+stack local sem reset. Os 16 casos dirigidos com Auth real conferiram
+o recebimento pessoal, a expedição de uma declaração legada pendente, o
+consumo do rascunho, a recuperação sem duplicar o movimento e as revogações
+de autoridade durante a transação.
+O rodapé da revisão permanece visível acima da navegação móvel. A retomada
+preserva a etapa, os campos parciais e a pessoa já escolhida. Uma recusa na
+consulta da origem revalida o rascunho aberto e deixa o aviso visível.
+A rodada dirigida após essa correção passou 30 casos em Chromium, Mobile
+e iOS sem retry. Outros dez casos em Mobile e iOS verificaram consulta,
+retirada e expedição de declarações legadas, além da devolução autônoma
+pela entrada de rotina com retomada e recebimento pessoal. A revisão foi
+conferida em celular ao lado de E06-16. Continuam pendentes as novas jornadas de
+conferência, conciliação e suficiência de L2.
+
+**19/11 — banco remoto de desenvolvimento e preview.** Aplicadas 12
+migrations de L2 de `20261119023722` a `20261119060719`, já presentes
+em commits locais. A pré-validação executou os arquivos do Git com finais
+de linha originais em transação revertida. O backup crítico cifrado foi
+autenticado, o histórico passou de 260 para 272 versões, os grants foram
+conferidos e os hashes de oito tabelas de negócio e Auth foram preservados.
+As duas migrations de expedição seguem locais. A interface publicada
+rejeita uma declaração pendente com expedição disponível, combinação que
+o banco passa a devolver com a primeira migration. A aplicação no preview
+precisa ser coordenada com a publicação de uma interface compatível.
+
 **19/11 — correções da CI e avanço de L2 em `feat/phase-d-implementation`.**
 A CI 44415326665 teve uma falha persistente no aceite de convite no
 iOS-2 e três aprovações na segunda tentativa em reconto BAL, Andamentos

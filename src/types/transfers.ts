@@ -8,6 +8,7 @@ export type TransferPreparation = {
   referenceHash: string;
   checkedAt: string;
   people: { id: string; name: string; role: string }[];
+  suggested?: { professionalId: string; startsAt: string; endsAt: string } | null;
   products: {
     id: string;
     name: string;
@@ -30,7 +31,8 @@ export type TransferFacts = {
   state: "pending" | "agreed" | "declined" | "withdrawn" | "dispatched";
   declaration: {
     actor: Person;
-    counterparty: Person;
+    mode?: "direct";
+    counterparty?: Person;
     recipient: Person;
     source: Custody;
     destination: Custody;

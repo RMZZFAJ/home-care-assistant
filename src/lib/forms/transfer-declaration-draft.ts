@@ -11,7 +11,8 @@ export type TransferDeclarationValues = {
   originId: string;
   reason: string;
   query: string;
-  lines: { productId: string; quantity: string }[];
+  lines: { productId: string; quantity: string; extra?: boolean }[];
+  step?: number;
 };
 export function emptyTransferDeclarationDraft(
   source: Custody,
@@ -43,9 +44,11 @@ export function transferDeclarationValues(
     originId: content.fields.originId ?? "",
     reason: content.fields.reason ?? "",
     query: content.fields.query ?? "",
+    step: /^[0-3]$/.test(content.fields.wizardStep ?? "") ? Number(content.fields.wizardStep) : 0,
     lines: content.materials.map((material) => ({
       productId: material.id,
       quantity: content.fields[material.id + ":transferQuantity"] ?? "",
+      extra: content.fields[material.id + ":transferExtra"] === "1",
     })),
   };
 }
@@ -97,12 +100,14 @@ export function transferDeclarationDraftContent(
             "Vínculo anterior indisponível"),
       reason: values.reason,
       query: values.query,
+      wizardStep: String(values.step ?? 0),
       ...Object.fromEntries(
         values.lines.map((line) => [
           line.productId + ":transferQuantity",
           line.quantity,
         ]),
       ),
+      ...Object.fromEntries(values.lines.filter((line) => line.extra).map((line) => [line.productId + ":transferExtra", "1"])),
     },
   };
 }

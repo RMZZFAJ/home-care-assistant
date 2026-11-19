@@ -57,7 +57,8 @@ function fixture(source: Custody) {
     originId: origin,
     reason: "\uFEFF\n Justificativa própria \u00A0",
     query: "Busca preservada",
-    lines: [{ productId: "material", quantity: "0002,0000000000" }],
+    step: 2,
+    lines: [{ productId: "material", quantity: "0002,0000000000", extra: true }],
   };
   const content = transferDeclarationDraftContent(
     adoptTransferDeclarationReference(
@@ -114,7 +115,7 @@ function fixture(source: Custody) {
       originDocumentId: origin,
       referenceHash: reference.referenceHash,
       reason: values.reason,
-      lines: values.lines,
+      lines: values.lines.map(({ productId, quantity }) => ({ productId, quantity })),
     },
   }).declaration;
   const document = {

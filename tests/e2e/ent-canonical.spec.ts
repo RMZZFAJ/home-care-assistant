@@ -150,7 +150,7 @@ test("06.2 autonomous return declaration never presents declared quantities as s
   await expect(page.getByText("Expedido", { exact: true })).toHaveCount(0); await expect(table).toContainText("5 unidade");
   const before = facts(f.patient), writes = watchWrites(page);
   await selectDocumentSection(page, "workflow");
-  const region = page.getByRole("region", { name: "Declaração e concordância da transferência", exact: true }), grid = region.locator(".hca-definition-grid").first();
+  const region = page.getByRole("region", { name: "Expedição e histórico da transferência", exact: true }), grid = region.locator(".hca-definition-grid").first();
   await expect(region).toContainText("Esta devolução pode ser registrada de forma autônoma");
   for (const label of ["Declarante", "Registrada em", "Contraparte designada para concordância", "Recebedor físico designado"]) await expect(grid.locator("dt").filter({ hasText: label })).toBeVisible();
   const ref = await reference(browser, "nova/ENT");

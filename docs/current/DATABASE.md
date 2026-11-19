@@ -1,5 +1,13 @@
 # Banco de dados
 
+Em 19/11/2026, o Supabase de desenvolvimento e preview recebeu as
+12 migrations de L2 entre `20261119023722` e `20261119060719`.
+O histórico foi reconciliado em 272 versões após backup crítico cifrado
+e pré-validação revertida. As mudanças abrangem contagem e cancelamento
+da REQ, origens operacionais, compras, chegadas e cobertura de planejamento.
+Grants e índices foram conferidos. Os hashes dos registros anteriores
+conferiram em oito tabelas, incluindo fichas, eventos, estoque e usuários.
+
 Incremento L1 local sobre D-B `56babc7`: treze migrations novas, de
 20261113190159 a 20261113231000, total local 255, sem modificar as 84 migrations
 protegidas pelo manifesto. Audiência de Andamentos/referências e contagens,

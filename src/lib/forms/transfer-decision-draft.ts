@@ -42,7 +42,7 @@ export function transferDecisionReference(
       transferSource: facts.declaration.source,
       transferDestination: facts.declaration.destination,
       transferInitiator: facts.declaration.actor.name,
-      transferCounterparty: facts.declaration.counterparty.name,
+      transferCounterparty: facts.declaration.counterparty?.name ?? "",
       transferRecipient: facts.declaration.recipient.name,
     },
     divergentIds: [],

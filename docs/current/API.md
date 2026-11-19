@@ -624,49 +624,46 @@ workflow_data.recipientSelection preserva pessoa escolhida/sugerida, escala,
 motivo, indicador e instante; indicações anteriores permanecem no histórico.
 Indicação não é presença, assinatura ou recebimento pessoal.
 
-## Transferência bilateral — P07
+## Expedição de entrega e devolução
 
 GET /api/transfers/preparation recebe careRecipientId/source. Exige ent.create,
 ent.read e leitura do estoque da origem. Retorna pessoas elegíveis na custódia
 oposta, materiais ativos ou inativos com saldo positivo na origem, quantidades
 disponíveis, até 100 ENT recentes com aceite nessa custódia e referenceHash.
-originTotal informa o recorte documental; nenhuma COM ou saldo geral de outra
-custódia é exposto por essa preparação.
+originTotal informa o recorte documental. Para saída da família, `suggested`
+identifica o plantão vigente quando há um único profissional elegível.
 
-POST /api/transfers recebe careRecipientId, idempotencyKey e declaration, com
-source, counterpartyId, recipientId, originDocumentId opcional, referenceHash,
-reason e lines de productId/quantity na unidade base. Reason tem 3–1000 unidades
-UTF-16, com pelo menos três caracteres; quantidades são positivas e exatas.
-Cria ENT em transfer_pending, com materiais e três papéis congelados, sem
-protocolo ou movimento. A ENT de origem é documental, deve ter aceite positivo
-dos materiais na custódia de origem e não identifica lotes individuais.
+POST /api/transfers recebe `careRecipientId`, `idempotencyKey`, `draftCommit`
+opcional e `declaration`. O fluxo de expedição envia `mode: "direct"`,
+`source`, `recipientId`, `referenceHash`, `reason`, `lines` de `productId` e
+`quantity` na unidade base e, opcionalmente, `originDocumentId`. A transação
+revalida a referência, a elegibilidade e o saldo físico, atribui o protocolo
+ENT ou DEV e coloca a quantidade em trânsito. A resposta confirmada tem
+estado `pending_receipt`. O vínculo documental exige aceite positivo dos
+materiais na custódia de origem e preserva a história da ENT vinculada.
 
 POST /api/documents/{id}/transfer recebe action, body, expectedVersion e
-idempotencyKey. Agree/decline são decisões pessoais da contraparte, com reason
-próprio. Agree produz transfer_ready; nenhum deles expede ou recebe. Dispatch
-recebe body vazio e pertence ao declarante autorizado: exige concordância e
-elegibilidade vigentes, gera protocolo ENT e usa o motor existente para origem
-→ trânsito. Withdraw encerra declaração ainda não expedida; administrador apto
-pode encerrá-la com autoria administrativa própria. Versão obsoleta, referência
-alterada e intenção incompatível são conflitos, sem efeito parcial.
+idempotencyKey para declarações anteriores. `Dispatch` recebe `body` vazio e
+permite ao declarante autorizado expedir as preparações pendentes ou com
+concordância histórica. `Withdraw` encerra declaração ainda não expedida e
+registra a autoria efetiva. Registros bilaterais anteriores conservam suas
+decisões e seus motivos. Versão obsoleta, referência alterada e intenção
+incompatível são conflitos e a transação é revertida.
 
-O recebimento posterior continua no comando ENT existente e pertence somente
-ao recebedor designado. A mesma pessoa pode ser contraparte e recebedor, mas
-registra dois atos distintos. O recebedor desta declaração fica congelado;
-substituí-lo exige encerrar/cancelar e preparar outra transferência. A troca de
-destinatário das ENT comuns mantém seu contrato. Cancelamento após consumo,
-divergências e conciliação usam o motor ENT preservado.
+O recebimento posterior continua no comando ENT existente e pertence à pessoa
+designada. A troca de destinatário das ENT comuns mantém seu contrato. A
+troca na DEV e a conferência de quantidades de L2 evoluem em incrementos
+próprios. O motor ENT continua registrando cancelamento e conciliação.
 
 Recuperação da mesma chave/intenção confirmada exige ent.read vivo, sem exigir
 novamente a capacidade da escrita concluída. Nova intenção revalida todas as
-permissões, inclusive após esperas tardias. A API não aceita autores, concordância
-ou aceite fabricados pelo cliente. Delivery task list filtra decisões da
-contraparte e expedições do declarante antes da paginação e aceita os dois novos
-estados. O escopo próprio inclui os três participantes da transferência.
+permissões, inclusive após esperas tardias. Os autores de cada ato vêm da
+sessão. As tarefas seguem a expedição, o recebimento e a resolução de
+divergências, com filtro de autoridade anterior à paginação.
 
-O PDF a partir da expedição contém declaração, concordância e recebimento
-separados. Versões anteriores à expedição ficam no histórico e não são servidas
-como comprovante ENT. Nenhum ato representa assinatura digital.
+O PDF assinado apresenta a expedição, o recebedor e os atos físicos
+preservados. Concordâncias históricas constam quando registradas. Versões
+anteriores à expedição ficam no histórico da ficha.
 
 ## Apresentações registradas em COM e ENT
 

@@ -78,11 +78,14 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   }
   const transfer = snapshot.transfer;
   if (transfer) {
-    layout.heading(returned ? "Declaração da devolução" : "Declaração da transferência");
-    layout.paragraph("Declarante: " + transfer.declaration.actor.name + " · " + formatBrazilDate(transfer.declaration.recordedAt), "transfer/declaration"); layout.paragraph(transfer.declaration.reason, "transfer/reason");
-    layout.paragraph("Contraparte para concordância: " + transfer.declaration.counterparty.name + " · Recebedor físico designado: " + transfer.declaration.recipient.name, "transfer/people", { size: 9.5 });
+    const direct = transfer.declaration.mode === "direct";
+    layout.heading(direct ? (returned ? "Expedição da devolução" : "Expedição da entrega") : (returned ? "Declaração da devolução" : "Declaração da transferência"));
+    layout.paragraph((direct ? "Expedidor: " : "Declarante: ") + transfer.declaration.actor.name + " · " + formatBrazilDate(transfer.declaration.recordedAt), "transfer/declaration"); layout.paragraph(transfer.declaration.reason, "transfer/reason");
+    const counterparty = transfer.declaration.counterparty;
+    const recipient = "Recebedor físico designado: " + transfer.declaration.recipient.name;
+    layout.paragraph(counterparty ? "Contraparte para concordância: " + counterparty.name + " · " + recipient : recipient, "transfer/people", { size: 9.5 });
     if (transfer.agreement) { layout.paragraph((transfer.agreement.decision === "agree" ? "Concordância própria: " : "Recusa própria: ") + transfer.agreement.actor.name + " · " + formatBrazilDate(transfer.agreement.recordedAt), "transfer/agreement"); layout.paragraph(transfer.agreement.reason, "transfer/agreementReason"); }
-    else layout.paragraph("Sem concordância registrada nesta versão.", "transfer/agreement");
+    else if (!direct) layout.paragraph("Sem concordância registrada nesta versão.", "transfer/agreement");
     if (transfer.withdrawal) { layout.paragraph((transfer.withdrawal.kind === "administrative_close" ? "Encerramento administrativo: " : "Retirada pelo declarante: ") + transfer.withdrawal.actor.name + " · " + formatBrazilDate(transfer.withdrawal.recordedAt), "transfer/withdrawal"); layout.paragraph(transfer.withdrawal.reason, "transfer/withdrawalReason"); }
     layout.paragraph(transfer.dispatchedAt ? "Expedição própria: " + formatBrazilDate(transfer.dispatchedAt) : "Declaração e concordância não equivalem a expedição ou recebimento físico.", "transfer/dispatch", { size: 9.5 });
   }

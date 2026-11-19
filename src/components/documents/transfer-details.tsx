@@ -39,7 +39,7 @@ export function TransferDetails({
   return (
     <section
       className="ui-card hca-form-stack"
-      aria-label="Declaração e concordância da transferência"
+      aria-label="Expedição e histórico da transferência"
     >
       <h2 ref={headerRef} tabIndex={-1}>
         Atos da {materialTransferLabel(facts.declaration.source, facts.declaration.destination).toLocaleLowerCase("pt-BR")}
@@ -57,24 +57,17 @@ export function TransferDetails({
           : "Sem vínculo documental de origem; esse vínculo é opcional."}</p>
       )}
       <p className="text-sm">
-        O vínculo documental preserva a origem conhecida. Não individualiza
-        lotes e não transforma concordância em recebimento.
+        O vínculo documental preserva a origem conhecida dos materiais.
       </p>
       {message ? <Notice>{message}</Notice> : null}
       <div className="hca-toolbar">
-        {(Object.keys(actionLabels) as TransferAction[])
-          .filter((action) =>
-            action === "dispatch"
-              ? facts.canDispatch
-              : action === "withdraw"
-                ? facts.canWithdraw
-                : facts.canAgree,
-          )
+        {(["dispatch", "withdraw"] as const)
+          .filter((action) => action === "dispatch" ? facts.canDispatch : facts.canWithdraw)
           .map((action) => (
             <ActionButton
               key={action}
               variant={
-                action === "agree" || action === "dispatch"
+                action === "dispatch"
                   ? "primary"
                   : "secondary"
               }
@@ -106,9 +99,7 @@ export function TransferDetails({
             setMessage(
               selected.action === "dispatch"
                 ? "Expedição confirmada. Os materiais estão em trânsito até o recebimento pessoal."
-                : selected.action === "agree"
-                  ? "Concordância registrada com sua autoria. Ainda não houve expedição nem recebimento."
-                  : "Decisão registrada sem movimentar materiais.",
+                : "Decisão registrada sem movimentar materiais.",
             );
             requestAnimationFrame(() => headerRef.current?.focus());
           }}

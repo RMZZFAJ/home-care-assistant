@@ -95,7 +95,7 @@ function Inbox({ context }: { context: WorkspaceContext }) {
           }}
         >
           <option value="tasks">Minhas tarefas executáveis</option>
-          <option value="transfer_pending">Aguardando concordância</option>
+          <option value="transfer_pending">Declaração aguardando expedição</option>
           <option value="transfer_ready">Prontas para expedição</option>
           <option value="pending_receipt">Aguardando recebimento</option>
           <option value="disputed">Com divergência</option>

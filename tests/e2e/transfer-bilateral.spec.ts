@@ -4,6 +4,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import {
+  declareTransfer,
   transferFixture,
   transferCommand,
   transferState,
@@ -37,16 +38,15 @@ async function fillDeclaration(
   await page
     .getByRole("button", { name: "Preparar declaração", exact: true })
     .click();
-  const drawer = page.getByRole("dialog", {
-    name: "Preparar devolução de materiais",
+  const drawer = page.getByRole("region", {
+    name: "Nova devolução",
     exact: true,
   });
-  await drawer
-    .getByRole("combobox", { name: /^Contraparte para concordância/ })
-    .selectOption(f.counterparty.id);
+  await expect(drawer.getByRole("combobox", { name: /^Contraparte para concordância/ })).toHaveCount(0);
   await drawer
     .getByRole("combobox", { name: /^Recebedor físico designado/ })
     .selectOption(f.recipient.id);
+  await drawer.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   const material = drawer.getByRole("combobox", {
     name: /^Adicionar material da origem/,
   });
@@ -58,17 +58,19 @@ async function fillDeclaration(
   await drawer
     .getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ })
     .fill("5");
+  await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
+  await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
   await drawer
     .getByRole("combobox", { name: /^ENT documental de origem/ })
     .selectOption(f.origin.id);
   await drawer
     .getByRole("textbox", { name: /^Sua justificativa para a (entrega|devolução) de materiais/ })
     .fill(
-      "Devolução física de cinco unidades, com Ana como contraparte e Bruno como recebedor pessoal.",
+      "Devolução física de cinco unidades, com Bruno como recebedor pessoal.",
     );
   return drawer;
 }
-test("transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo", async ({
+test("devolução separa expedidor e recebedor, recupera expedição incerta com perda de escrita e recebe três de cinco de material inativo", async ({
   page,
   browser,
 }, info) => {
@@ -95,14 +97,11 @@ test("transferência separa três autores, recupera declaração incerta com per
     ),
   ).toBe(true);
   const editor = await fillDeclaration(page, f);
-  await expect(editor.getByText(/Inativo com saldo preservado/)).toBeVisible();
   await editor
-    .getByRole("button", { name: "Revisar declaração", exact: true })
+    .getByRole("button", { name: "Revisar ficha", exact: true })
     .click();
-  const review = page.getByRole("dialog", {
-    name: "Revisar declaração da devolução de materiais",
-    exact: true,
-  });
+  const review = editor;
+  await expect(review.getByText(/inativo com saldo/)).toBeVisible();
   const packets: unknown[] = [];
   let document: SupplyDocument | undefined;
   await page.route("**/api/transfers", async (route) => {
@@ -119,38 +118,39 @@ test("transferência separa três autores, recupera declaração incerta com per
   });
   await review
     .getByRole("button", {
-      name: "Registrar declaração sem expedir",
+      name: "Expedir devolução",
       exact: true,
     })
     .click();
   await expect(
     review.getByRole("button", {
-      name: "Recuperar mesma declaração",
+      name: "Verificar a expedição",
       exact: true,
     }),
   ).toBeVisible();
-  expect(JSON.parse(transferState(f)).ledger).toEqual(before.ledger);
+  expect(JSON.parse(transferState(f)).ledger).toHaveLength(before.ledger.length + 1);
   await review
-    .getByRole("button", { name: "Recuperar mesma declaração", exact: true })
+    .getByRole("button", { name: "Verificar a expedição", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Declaração confirmada", exact: true }),
+    page.getByRole("heading", { name: "Devolução expedida", exact: true }),
   ).toBeVisible();
   expect(packets).toHaveLength(2);
   expect(packets[1]).toEqual(packets[0]);
-  expect(document!.code).toBeNull();
+  expect(document!.code).toMatch(/^DEV-/);
+  expect(document!.status).toBe("pending_receipt");
+  expect(document!.transfer?.agreement).toBeNull();
   expect(document!.transfer?.declaration.actor.id).toBe(f.initiator.id);
   await page.unroute("**/api/transfers");
   await page
     .getByRole("link", {
-      name: "Consultar a transferência registrada",
+      name: "Acompanhar ficha",
       exact: true,
     })
     .click();
   await selectDocumentSection(page, "materials");
   const id = document!.id;
-  await expect(page.getByText("Declarado", { exact: true })).toBeVisible();
-  await expect(page.getByText("Expedido", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Expedido", { exact: true })).toBeVisible();
   await selectDocumentSection(page, "workflow");
   await expect(
     page.getByRole("heading", {
@@ -171,54 +171,13 @@ test("transferência separa três autores, recupera declaração incerta com per
     const ana = await anaContext.newPage();
     await login(ana, f.counterparty.email, f.patient);
     await ana.goto("/entregas");
-    const task = ana.locator(`[data-delivery-id="${id}"]`);
-    await expect(task).toContainText("Decidir concordância da transferência");
-    await task.getByRole("link", { name: "Abrir tarefa", exact: true }).click();
+    await expect(ana.locator(`[data-delivery-id="${id}"]`)).toHaveCount(0);
+    await ana.goto("/documentos/" + id);
     await selectDocumentSection(ana, "workflow");
-    await ana
-      .getByRole("button", {
-        name: "Concordar com a transferência",
-        exact: true,
-      })
-      .click();
-    await ana
-      .getByRole("textbox", { name: /^Sua justificativa para este ato/ })
-      .fill(
-        "Ana concorda com a transferência; Bruno deve conferir o recebimento físico.",
-      );
-    await ana
-      .getByRole("button", { name: "Revisar meu ato", exact: true })
-      .click();
-    await ana
-      .getByRole("button", { name: "Confirmar decisão", exact: true })
-      .click();
-    await expect(
-      ana.getByText(
-        "Concordância registrada com sua autoria. Ainda não houve expedição nem recebimento.",
-        { exact: true },
-      ),
-    ).toBeVisible();
+    await expect(ana.getByRole("button", { name: "Concordar com a transferência", exact: true })).toHaveCount(0);
     await expect(
       ana.getByRole("button", { name: "Confirmar recebimento", exact: true }),
     ).toHaveCount(0);
-    expect(JSON.parse(transferState(f)).ledger).toEqual(before.ledger);
-    await page.goto("/documentos/" + id);
-  await selectDocumentSection(page, "workflow");
-    await page
-      .getByRole("button", { name: "Expedir transferência", exact: true })
-      .click();
-    await page
-      .getByRole("button", { name: "Revisar meu ato", exact: true })
-      .click();
-    await page
-      .getByRole("button", { name: "Confirmar expedição", exact: true })
-      .click();
-    await expect(
-      page.getByText(
-        "Expedição confirmada. Os materiais estão em trânsito até o recebimento pessoal.",
-        { exact: true },
-      ),
-    ).toBeVisible();
     expect(JSON.parse(transferState(f)).ledger.length).toBe(
       before.ledger.length + 1,
     );
@@ -263,7 +222,7 @@ test("transferência separa três autores, recupera declaração incerta com per
     ).data as SupplyDocument;
     expect(received.status).toBe("disputed");
     expect(received.workflow_data.acceptedBy).toBe(f.recipient.id);
-    expect(received.transfer?.agreement?.actor.id).toBe(f.counterparty.id);
+    expect(received.transfer?.agreement).toBeNull();
     expect(Number(received.lines[0].accepted_quantity)).toBe(3);
     expect(
       Number(
@@ -288,7 +247,7 @@ test("transferência separa três autores, recupera declaração incerta com per
     ).toBe(2);
     for (const width of [320, 390, 768, 1440]) {
       await bruno.setViewportSize({ width, height: 900 });
-      await audit(bruno, `transfer-three-actors-${width}`);
+      await audit(bruno, `transfer-direct-receipt-${width}`);
     }
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await bruno.setViewportSize({ width: 320, height: 900 });
@@ -333,7 +292,7 @@ test("transferência separa três autores, recupera declaração incerta com per
   }
 });
 
-test("conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado", async ({
+test("conflitos preservam a expedição, exigem adoção explícita e não reabrem o encerramento legado", async ({
   page,
 }) => {
   const f = await transferFixture();
@@ -346,7 +305,7 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
       officialPosts.push(request.postDataJSON());
   });
   await login(page, f.initiator.email, f.patient);
-  let editor = await fillDeclaration(page, f);
+  const editor = await fillDeclaration(page, f);
   const report = await rpc(
     f.initiator.client,
     "report_extraordinary_consumption",
@@ -368,12 +327,12 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
   });
   let ledger = JSON.parse(transferState(f)).ledger;
   await editor
-    .getByRole("button", { name: "Revisar declaração", exact: true })
+    .getByRole("button", { name: "Revisar ficha", exact: true })
     .click();
   // Fresh review rejects a stale source before any official declaration POST.
   await expect(
     page.getByRole("button", {
-      name: "Registrar declaração sem expedir",
+      name: "Expedir devolução",
       exact: true,
     }),
   ).toHaveCount(0);
@@ -382,10 +341,6 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
   ).toBeVisible();
   expect(officialPosts).toHaveLength(0);
   expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);
-  editor = page.getByRole("dialog", {
-    name: "Preparar devolução de materiais",
-    exact: true,
-  });
   await expect(
     editor.getByRole("textbox", {
       name: /^Sua justificativa para a (entrega|devolução) de materiais/,
@@ -397,7 +352,7 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
     }),
   ).toHaveValue("5");
   await expect(
-    editor.getByRole("button", { name: "Revisar declaração", exact: true }),
+    editor.getByRole("button", { name: "Revisar ficha", exact: true }),
   ).toBeDisabled();
   let failed = false;
   await page.route("**/api/transfers/preparation?*", async (route) => {
@@ -431,11 +386,11 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
     })
     .click();
   await editor
-    .getByRole("button", { name: "Revisar declaração", exact: true })
+    .getByRole("button", { name: "Revisar ficha", exact: true })
     .click();
   await expect(
     page.getByRole("heading", {
-      name: "Conferir declaração antes de registrar",
+      name: "Revise antes de expedir",
       exact: true,
     }),
   ).toBeFocused();
@@ -462,12 +417,12 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
   const beforeNativeConflict = transferState(f);
   await page
     .getByRole("button", {
-      name: "Registrar declaração sem expedir",
+      name: "Expedir devolução",
       exact: true,
     })
     .click();
   await expect(
-    editor.getByRole("button", { name: "Revisar declaração", exact: true }),
+    editor.getByRole("button", { name: "Revisar ficha", exact: true }),
   ).toBeDisabled();
   await expect(
     editor.getByRole("textbox", {
@@ -492,61 +447,58 @@ test("conflitos preservam campos da declaração e da contraparte, exigem adoç�
     })
     .click();
   await editor
-    .getByRole("button", { name: "Revisar declaração", exact: true })
+    .getByRole("button", { name: "Revisar ficha", exact: true })
     .click();
   await expect(
     page.getByRole("heading", {
-      name: "Conferir declaração antes de registrar",
+      name: "Revise antes de expedir",
       exact: true,
     }),
   ).toBeFocused();
 
   await page
     .getByRole("button", {
-      name: "Registrar declaração sem expedir",
+      name: "Expedir devolução",
       exact: true,
     })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Declaração confirmada", exact: true }),
+    page.getByRole("heading", { name: "Devolução expedida", exact: true }),
   ).toBeVisible();
-  expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);
+  expect(JSON.parse(transferState(f)).ledger).toHaveLength(ledger.length + 1);
+  ledger = JSON.parse(transferState(f)).ledger;
   expect(officialPosts).toHaveLength(2);
-  const d = JSON.parse(transferState(f)).documents.find(
-    (doc: SupplyDocument) => doc.status === "transfer_pending",
-  ) as SupplyDocument;
   await page.unroute("**/api/transfers/preparation?*");
-  await page.goto("/login");
-  // Use a separate Auth identity with its own selected patient context.
-  await page.context().clearCookies();
-  await login(page, f.counterparty.email, f.patient);
+  const legacy = await declareTransfer(f, { quantity: "1" });
+  expect(legacy.response.error).toBeNull();
+  const d = legacy.response.data as SupplyDocument;
   await page.goto("/documentos/" + d.id);
   await selectDocumentSection(page, "workflow");
   await page
-    .getByRole("button", { name: "Concordar com a transferência", exact: true })
+    .getByRole("button", { name: "Encerrar declaração sem expedir", exact: true })
     .click();
   const reason = page.getByRole("textbox", {
     name: /^Sua justificativa para este ato/,
   });
   await reason.fill(
-    "Parecer próprio preservado enquanto o declarante encerra sua proposta.",
+    "Motivo próprio preservado enquanto outra sessão encerra a declaração.",
   );
   const withdrawn = await transferCommand(
     f.initiator.client,
     d.id,
     "withdraw",
     d.version,
-    { reason: "Declarante encerra pessoalmente antes da concordância" },
+    { reason: "Declarante encerra pessoalmente a declaração legada" },
   );
   expect(withdrawn.error).toBeNull();
   await page
     .getByRole("button", { name: "Revisar meu ato", exact: true })
     .click();
-  // The mandatory private save now detects the closed act before an official POST.
+  // The review checks live authority before an official submission.
   await expect(
     page.getByRole("button", { name: "Confirmar decisão", exact: true }),
   ).toHaveCount(0);
-  await expect(reason).toHaveValue(/Parecer próprio preservado/);
+  await expect(reason).toHaveValue(/Motivo próprio preservado/);
   await expect(reason).toBeFocused();
   await page
     .getByRole("button", {

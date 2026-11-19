@@ -35,9 +35,9 @@ test("resultado confirmado permanece acessível quando a consulta do rascunho co
     return route.fulfill({ response, json: body });
   });
   try {
-    await dialog(page).getByRole("button", { name: "Revisar declaração", exact: true }).click();
-    await dialog(page).getByRole("button", { name: "Registrar declaração sem expedir", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Declaração confirmada", exact: true })).toBeVisible();
+    await editor(page).getByRole("button", { name: "Revisar ficha", exact: true }).click();
+    await editor(page).getByRole("button", { name: "Expedir devolução", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Devolução expedida", exact: true })).toBeVisible();
     await expect.poll(() => consumedReads).toBeGreaterThan(0);
     const consumed = page.waitForResponse(async response => {
       const url = new URL(response.url());
@@ -47,17 +47,25 @@ test("resultado confirmado permanece acessível quando a consulta do rascunho co
     release();await (await consumed).finished();
     await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
     await expect(page.getByRole("dialog", { name: "Resultado anterior confirmado", exact: true })).toHaveCount(0);
-    const result = page.getByRole("dialog", { name: "Declaração registrada", exact: true });
+    const result = page.getByRole("region", { name: "Devolução expedida", exact: true });
     await expect(result).toHaveCount(1);
-    const link = result.getByRole("link", { name: "Consultar a transferência registrada", exact: true });
-    const href = await link.getAttribute("href");expect(href).toMatch(/^\/documentos\/[0-9a-f-]{36}$/);
-    const after = declarationFacts(f);expect(JSON.parse(after).ledger).toEqual(before.ledger);expect(posts).toBe(1);
+    const link = result.getByRole("link", { name: "Acompanhar ficha", exact: true });
+    const href = await link.getAttribute("href");expect(href).toMatch(/^\/fichas\/[0-9a-f-]{36}$/);
+    const after = declarationFacts(f);expect(JSON.parse(after).ledger).toHaveLength(before.ledger.length + 1);expect(posts).toBe(1);
     await link.click();await expect(page).toHaveURL(new RegExp(href! + "(?:[?#]|$)"));
     expect(declarationFacts(f)).toBe(after);expect(posts).toBe(1);
   } finally { release();await page.unrouteAll({ behavior: "wait" }); }
 });
 type Fixture = Awaited<ReturnType<typeof declarationDraftFixture>>;
 const dialog = (page: Page) => page.getByRole("dialog");
+const editor = (page: Page) => page.getByRole("region", { name: /^Nova (devolução|entrega)$/ });
+const recipient = (page: Page) => editor(page).getByRole("combobox", { name: /^Recebedor físico designado/ });
+const amountField = (page: Page) => editor(page).getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ });
+const reasonField = (page: Page) => editor(page).getByRole("textbox", { name: /^Sua justificativa para a (entrega|devolução) de materiais/ });
+const stepButton = (page: Page, name: string) =>
+  editor(page).getByRole("navigation", { name: "Etapas da ficha" }).getByRole("button", { name: new RegExp(name + "$") });
+const continueStep = (page: Page) => editor(page).getByRole("button", { name: "Continuar", exact: true }).click();
+const draftReason = "\uFEFF\n Declaração própria preservada entre sessões\u00A0";
 async function login(page: Page, f: Fixture) {
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
@@ -76,45 +84,39 @@ async function open(page: Page, source: Custody) {
   await page
     .getByRole("button", { name: "Preparar declaração", exact: true })
     .click();
-  await expect(page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true}).or(page.getByRole("combobox",{name:/^Contraparte para concordância/})).first()).toBeVisible();
+  await expect(page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true}).or(recipient(page)).first()).toBeVisible();
 }
 async function fill(page: Page, f: Fixture, amount = "0,") {
-  await dialog(page)
-    .getByRole("combobox", { name: /^Contraparte para concordância/ })
-    .selectOption(f.counterpartyId);
-  await dialog(page)
-    .getByRole("combobox", { name: /^Recebedor físico designado/ })
-    .selectOption(f.recipientId);
-  const search = dialog(page).getByRole("combobox", {
+  await recipient(page).selectOption(f.recipientId);
+  await editor(page).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
+  const search = editor(page).getByRole("combobox", {
     name: /^Adicionar material da origem/,
   });
   await search.click();
   await search.fill("Material fictício V4 0");
   await search.press("ArrowDown");
   await page.getByRole("option", { name: /Material fictício V4 0/ }).click();
-  await dialog(page)
-    .getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ })
-    .fill(amount);
+  await amountField(page).fill("2");
+  await continueStep(page);
+  await continueStep(page);
   if (f.originId)
-    await dialog(page)
+    await editor(page)
       .getByRole("combobox", { name: /^ENT documental de origem/ })
       .selectOption(f.originId);
-  await dialog(page)
-    .getByRole("textbox", { name: /^Sua justificativa para a (entrega|devolução) de materiais/ })
-    .fill("\uFEFF\n Declaração própria preservada entre sessões\u00A0");
+  await reasonField(page).fill(draftReason);
+  if (amount !== "2") {
+    await stepButton(page, "Materiais").click();
+    await amountField(page).fill(amount);
+  }
 }
-async function save(page: Page) {
-  const request = page.waitForResponse(
-    (r) =>
-      new URL(r.url()).pathname === "/api/drafts" &&
-      r.request().method() === "POST",
-  );
-  await dialog(page)
-    .getByRole("button", { name: "Salvar preenchimento privado", exact: true })
-    .click();
-  const response = await request;
-  expect(response.ok()).toBe(true);
-  return response.request().postDataJSON();
+async function savedDraft(page: Page, f: Fixture, query = "") {
+  const url = "/api/drafts?" + new URLSearchParams({ careRecipientId: f.patient, kind: "ENT", purpose: f.purpose });
+  const read = async () => (await (await page.request.get(url)).json()).data;
+  await expect.poll(read).toMatchObject({
+    state: "active",
+    content: { fields: { query, reason: draftReason, [f.products[0] + ":transferQuantity"]: "0," } },
+  });
+  return read();
 }
 async function peerContext(browser: Browser, page: Page, info: TestInfo) {
   const use = info.project.use;
@@ -146,13 +148,13 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       await login(page, f);
       await open(page, source);
       await fill(page, f);
-      const search = dialog(page).getByRole("combobox", {
+      const search = editor(page).getByRole("combobox", {
         name: /^Adicionar material da origem/,
       });
       await search.fill("Busca própria ainda sem seleção");
       await search.press("Escape");
       const before = declarationFacts(f),
-        packet = await save(page);
+        packet = await savedDraft(page, f, "Busca própria ainda sem seleção");
       expect(packet.targetDocumentId).toBeNull();
       expect(packet.content.documentVersion).toBeNull();
       expect(packet.content.fields[f.products[0] + ":transferQuantity"]).toBe(
@@ -171,13 +173,13 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
         await open(peer, source);
         await resume(peer);
         await expect(
-          dialog(peer).getByRole("textbox", {
+          editor(peer).getByRole("textbox", {
             name: /^Quantidade de Material fictício V4 0/,
           }),
         ).toHaveValue("0,");
         await expect(
-          dialog(peer).getByRole("button", {
-            name: "Revisar declaração",
+          editor(peer).getByRole("button", {
+            name: "Revisar ficha",
             exact: true,
           }),
         ).toBeDisabled();
@@ -198,14 +200,14 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
         );
         for (const mode of ["forbidden", "invalid"] as const) {
           fault = mode;
-          await dialog(peer)
+          await editor(peer)
             .getByRole("button", {
               name: "Comparar referência atual",
               exact: true,
             })
             .click();
           await expect(
-            dialog(peer)
+            editor(peer)
               .getByRole("alert")
               .filter({
                 hasText:
@@ -215,21 +217,23 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
               }),
           ).toBeVisible();
           await expect(
-            dialog(peer).getByRole("button", {
+            editor(peer).getByRole("button", {
               name: "Adotar referência atual e revisar meus campos",
               exact: true,
             }),
           ).toHaveCount(0);
           await expect(
-            dialog(peer).getByText("Disponível na origem:", { exact: false }),
+            editor(peer).getByText("Disponível na origem:", { exact: false }),
           ).toHaveCount(0);
-          if (mode === "forbidden") await resume(peer);
+          await expect(
+            peer.getByRole("dialog", { name: "Continuar seu rascunho?" }),
+          ).toHaveCount(0);
         }
         sql(
           "insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(" +
             q(f.patient) +
             "," +
-            q(f.counterpartyId) +
+            q(f.recipientId) +
             ",'ent.receive',false);",
         );
         const latest = (await rpc(f.client, "transfer_preparation", {
@@ -237,61 +241,42 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
           p_source: source,
         })) as TransferPreparation;
         const replacement = latest.people.find(
-          (person) =>
-            person.id !== f.counterpartyId && person.id !== f.recipientId,
+          (person) => person.id !== f.recipientId,
         );
         expect(replacement).toBeTruthy();
         fault = "live";
-        await dialog(peer)
+        await editor(peer)
           .getByRole("button", {
             name: "Comparar referência atual",
             exact: true,
           })
           .click();
         await expect(
-          dialog(peer).getByRole("region", {
+          editor(peer).getByRole("region", {
             name: "Comparação da referência da transferência",
             exact: true,
           }),
         ).toContainText("Escolha indisponível");
-        await dialog(peer)
+        await editor(peer)
           .getByRole("button", {
             name: "Adotar referência atual e revisar meus campos",
             exact: true,
           })
           .click();
-        const counterparty = dialog(peer).getByRole("combobox", {
-          name: /^Contraparte para concordância/,
-        });
-        await expect(counterparty).toHaveValue(f.counterpartyId);
-        await expect(counterparty.locator("option:checked")).toContainText(
-          packet.content.fields.counterpartyLabel,
-        );
+        await expect(stepButton(peer, "Materiais")).toHaveAttribute("aria-current", "step");
+        await expect(amountField(peer)).toHaveValue("0,");
         await expect(
-          dialog(peer).getByRole("textbox", {
-            name: /^Quantidade de Material fictício V4 0/,
-          }),
-        ).toHaveValue("0,");
-        await expect(
-          dialog(peer).getByRole("textbox", {
-            name: /^Sua justificativa para a (entrega|devolução) de materiais/,
-          }),
-        ).toHaveValue(packet.content.fields.reason);
-        await expect(
-          dialog(peer).getByRole("combobox", {
+          editor(peer).getByRole("combobox", {
             name: /^Adicionar material da origem/,
           }),
         ).toHaveValue(packet.content.fields.query);
-        await counterparty.selectOption(replacement!.id);
-        if (source === "FAMILY")
-          await dialog(peer)
-            .getByRole("combobox", { name: /^Recebedor físico designado/ })
-            .selectOption(replacement!.id);
-        await dialog(peer)
-          .getByRole("textbox", {
-            name: /^Quantidade de Material fictício V4 0/,
-          })
-          .fill("2");
+        await stepButton(peer, "Confirmação").click();
+        await expect(recipient(peer)).toHaveValue(f.recipientId);
+        await expect(recipient(peer).locator("option:checked")).toContainText(packet.content.fields.recipientLabel);
+        await expect(recipient(peer).locator("option:checked")).toBeDisabled();
+        await recipient(peer).selectOption(replacement!.id);
+        await editor(peer).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
+        await amountField(peer).fill("2");
         if (source === "CARE_TEAM") {
           for (const width of [320, 390, 768, 1440]) {
             await peer.setViewportSize({ width, height: 900 });
@@ -306,31 +291,29 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
           });
         } else await audit(peer, "private transfer declaration " + source);
         expect(declarationFacts(f)).toBe(before);
-        await dialog(peer)
-          .getByRole("button", { name: "Revisar declaração", exact: true })
+        await continueStep(peer);
+        await continueStep(peer);
+        await expect(reasonField(peer)).toHaveValue(packet.content.fields.reason);
+        await editor(peer)
+          .getByRole("button", { name: "Revisar ficha", exact: true })
           .click();
         await expect(
-          dialog(peer).getByRole("heading", {
-            name: "Conferir declaração antes de registrar",
+          editor(peer).getByRole("heading", {
+            name: "Revise antes de expedir",
             exact: true,
           }),
         ).toBeFocused();
         expect(declarationFacts(f)).toBe(before);
-        await dialog(peer)
+        await editor(peer)
           .getByRole("button", {
-            name: "Registrar declaração sem expedir",
+            name: /^Expedir (entrega|devolução)$/,
             exact: true,
           })
           .click();
         await expect(
-          dialog(peer).getByRole("heading", {
-            name: "Declaração confirmada",
-            exact: true,
-          }),
+          peer.getByRole("heading", { name: /^(Entrega|Devolução) expedida$/ }),
         ).toBeVisible();
-        expect(JSON.parse(declarationFacts(f)).ledger).toEqual(
-          JSON.parse(before).ledger,
-        );
+        expect(JSON.parse(declarationFacts(f)).ledger).toHaveLength(JSON.parse(before).ledger.length + 1);
       } finally {
         await context.close();
       }
@@ -362,23 +345,23 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
         );
         await route.abort("failed");
       });
-      await dialog(page)
-        .getByRole("button", { name: "Revisar declaração", exact: true })
+      await editor(page)
+        .getByRole("button", { name: "Revisar ficha", exact: true })
         .click();
-      await dialog(page)
+      await editor(page)
         .getByRole("button", {
-          name: "Registrar declaração sem expedir",
+          name: /^Expedir (entrega|devolução)$/,
           exact: true,
         })
         .click();
       await expect(
-        dialog(page).getByRole("button", {
-          name: "Recuperar mesma declaração",
+        editor(page).getByRole("button", {
+          name: "Verificar a expedição",
           exact: true,
         }),
       ).toBeVisible();
-      expect(document?.transfer?.state).toBe("pending");
-      expect(JSON.parse(declarationFacts(f)).ledger).toEqual(before.ledger);
+      expect(document?.transfer?.state).toBe("dispatched");
+      expect(JSON.parse(declarationFacts(f)).ledger).toHaveLength(before.ledger.length + 1);
       const after = declarationFacts(f);
       await page.reload();
       let preparations = 0;
@@ -396,7 +379,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       await expect(dialog(page).getByRole("textbox")).toHaveCount(0);
       await expect(
         dialog(page).getByRole("button", {
-          name: "Registrar declaração sem expedir",
+          name: /^Expedir (entrega|devolução)$/,
           exact: true,
         }),
       ).toHaveCount(0);
@@ -431,7 +414,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       await open(page, source);
       await fill(page, f);
       const before = declarationFacts(f),
-        packet = await save(page);
+        packet = await savedDraft(page, f);
       const capability =
         source === "FAMILY" ? "stock.family.read" : "stock.team.read";
       sql(
@@ -465,7 +448,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       await expect(dialog(page).getByRole("textbox")).toHaveCount(0);
       await expect(
         dialog(page).getByRole("button", {
-          name: "Revisar declaração",
+          name: "Revisar ficha",
           exact: true,
         }),
       ).toHaveCount(0);
@@ -491,7 +474,8 @@ test("declaração aguarda autosave em andamento antes de revisar sem conflito c
   const gate = new Promise<void>(resolve => { release = resolve; });
   const isSave = (request: import("@playwright/test").Request) =>
     new URL(request.url()).pathname === "/api/drafts" &&
-    request.method() === "POST" && request.postDataJSON().action === "save";
+    request.method() === "POST" && request.postDataJSON().action === "save" &&
+    request.postDataJSON().content?.fields?.reason === draftReason;
   const started = page.waitForRequest(isSave);
   await page.route("**/api/drafts", async route => {
     if (!isSave(route.request())) return route.continue();
@@ -501,15 +485,15 @@ test("declaração aguarda autosave em andamento antes de revisar sem conflito c
   try {
     await fill(page, f, "2");
     await started;
-    const review = dialog(page).getByRole("button", { name: "Revisar declaração", exact: true });
+    const review = editor(page).getByRole("button", { name: "Revisar ficha", exact: true });
     await expect(review).toBeDisabled();
-    await expect(dialog(page).getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ })).toHaveValue("2");
+    await expect(reasonField(page)).toHaveValue(draftReason);
     expect(declarationFacts(f)).toBe(before);
     release();
     await expect(review).toBeEnabled();
     await review.click();
-    await expect(dialog(page).getByRole("heading", { name: "Conferir declaração antes de registrar", exact: true })).toBeFocused();
-    await expect(dialog(page).getByRole("alert")).toHaveCount(0);
+    await expect(editor(page).getByRole("heading", { name: "Revise antes de expedir", exact: true })).toBeFocused();
+    await expect(editor(page).getByRole("alert")).toHaveCount(0);
     expect(declarationFacts(f)).toBe(before);
   } finally { release(); }
 });

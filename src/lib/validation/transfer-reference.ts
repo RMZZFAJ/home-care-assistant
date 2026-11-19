@@ -41,7 +41,8 @@ const packet = z.object({
         ]),
         declaration: z.object({
           actor,
-          counterparty: actor,
+          mode: z.literal("direct").optional(),
+          counterparty: actor.optional(),
           recipient: actor,
           source: custody,
           destination: custody,
@@ -87,6 +88,8 @@ export function parseTransferReference(
     );
   const row = parsed.data.data,
     facts = row.transfer;
+  const direct = facts.declaration.mode === "direct";
+  const beforeDispatch = facts.state === "pending" || facts.state === "agreed";
   if (
     row.id !== expected.id ||
     row.care_recipient_id !== expected.patientId ||
@@ -94,16 +97,17 @@ export function parseTransferReference(
     new Set(row.lines.map((line) => line.id)).size !== row.lines.length ||
     facts.declaration.source === facts.declaration.destination ||
     (facts.canAgree && facts.state !== "pending") ||
-    (facts.canDispatch && facts.state !== "agreed") ||
-    (facts.canWithdraw && !["pending", "agreed"].includes(facts.state)) ||
-    (facts.state === "pending") !==
-      (facts.agreement === null && facts.withdrawal === null) ||
+    (facts.canDispatch && !beforeDispatch) ||
+    (facts.canWithdraw && !beforeDispatch) ||
+    direct === !!facts.declaration.counterparty ||
+    (direct && (facts.state !== "dispatched" || facts.agreement !== null)) ||
+    (facts.state === "pending" && (facts.agreement !== null || facts.withdrawal !== null)) ||
     (facts.agreement !== null &&
-      facts.agreement.actor.id !== facts.declaration.counterparty.id) ||
+      facts.agreement.actor.id !== facts.declaration.counterparty?.id) ||
     (facts.state === "dispatched") !== (facts.dispatchedAt !== null) ||
     (facts.state === "declined" && facts.agreement?.decision !== "decline") ||
-    (["agreed", "dispatched"].includes(facts.state) &&
-      facts.agreement?.decision !== "agree") ||
+    (facts.state === "agreed" && facts.agreement?.decision !== "agree") ||
+    (facts.state === "dispatched" && facts.agreement !== null && facts.agreement.decision !== "agree") ||
     (facts.state === "withdrawn") !== (facts.withdrawal !== null)
   )
     throw new Error(

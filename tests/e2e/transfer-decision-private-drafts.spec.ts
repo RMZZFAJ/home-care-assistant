@@ -5,7 +5,20 @@ import { selectDocumentSection } from "./document-sections";
 import { loginDecision, noPrivateWrites, privateFormCount, confirmedOutcome } from "./l1-decision-policy";
 import { audit } from "./accessibility-audit";
 test.setTimeout(150_000);
-for (const action of ["agree", "decline", "withdraw", "dispatch"] as const) test(`transferência ${action}: fatos são conferidos antes do ato, sem rascunho de decisão ou duplicação`, async ({ page }) => {
+test("declaração legada mantém a referência histórica e dispensa decisão prévia na tela", async ({ page }) => {
+  const f = await transferDecisionFixture("agree"), before = decisionFacts(f), writes = noPrivateWrites(page);
+  await loginDecision(page, f.writer.email, f.patient);
+  await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
+  await expect(page.getByRole("region", { name: "Expedição e histórico da transferência" })).toContainText("Contraparte designada para concordância");
+  for (const action of ["agree", "decline"] as const) {
+    await expect(page.getByRole("button", { name: transferActionLabels[action], exact: true })).toHaveCount(0);
+  }
+  expect(decisionFacts(f)).toBe(before);
+  expect(writes).toEqual([]);
+});
+
+for (const action of ["withdraw", "dispatch"] as const) test(`transferência ${action}: fatos são conferidos antes do ato, sem rascunho de decisão ou duplicação`, async ({ page }) => {
   const f = await transferDecisionFixture(action), before = decisionFacts(f), count = privateFormCount(f.patient), writes = noPrivateWrites(page);
   await loginDecision(page, f.writer.email, f.patient); await page.goto("/fichas/" + f.document.id); await selectDocumentSection(page, "workflow");
   await page.getByRole("button", { name: transferActionLabels[action], exact: true }).click();

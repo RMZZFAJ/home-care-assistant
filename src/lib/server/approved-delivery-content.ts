@@ -44,8 +44,9 @@ export function approvedDeliveryContent(snapshot: DocumentSnapshot, emission: Pd
   });
   const transfer = snapshot.transfer;
   if (transfer) {
-    semanticFacts["transfer/declaration"] = "Declarante: " + transfer.declaration.actor.name + " · " + formatBrazilDate(transfer.declaration.recordedAt); semanticFacts["transfer/reason"] = transfer.declaration.reason;
-    semanticFacts["transfer/people"] = "Contraparte para concordância: " + transfer.declaration.counterparty.name + " · Recebedor físico designado: " + transfer.declaration.recipient.name;
+    semanticFacts["transfer/declaration"] = (transfer.declaration.mode === "direct" ? "Expedidor: " : "Declarante: ") + transfer.declaration.actor.name + " · " + formatBrazilDate(transfer.declaration.recordedAt); semanticFacts["transfer/reason"] = transfer.declaration.reason;
+    const recipient = "Recebedor físico designado: " + transfer.declaration.recipient.name;
+    semanticFacts["transfer/people"] = transfer.declaration.counterparty ? "Contraparte para concordância: " + transfer.declaration.counterparty.name + " · " + recipient : recipient;
     if (transfer.agreement) { semanticFacts["transfer/agreement"] = (transfer.agreement.decision === "agree" ? "Concordância própria: " : "Recusa própria: ") + transfer.agreement.actor.name + " · " + formatBrazilDate(transfer.agreement.recordedAt); semanticFacts["transfer/agreementReason"] = transfer.agreement.reason; }
     if (transfer.withdrawal) { semanticFacts["transfer/withdrawal"] = (transfer.withdrawal.kind === "administrative_close" ? "Encerramento administrativo: " : "Retirada pelo declarante: ") + transfer.withdrawal.actor.name + " · " + formatBrazilDate(transfer.withdrawal.recordedAt); semanticFacts["transfer/withdrawalReason"] = transfer.withdrawal.reason; }
   }

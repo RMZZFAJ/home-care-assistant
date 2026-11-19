@@ -21,7 +21,8 @@ export const createTransferSchema = z
     declaration: z
       .object({
         source: z.enum(["FAMILY", "CARE_TEAM"]),
-        counterpartyId: identifier,
+        mode: z.literal("direct").optional(),
+        counterpartyId: identifier.optional(),
         recipientId: identifier,
         originDocumentId: identifier.nullable().optional(),
         referenceHash: z.string().regex(/^[0-9a-f]{64}$/),
@@ -42,6 +43,10 @@ export const createTransferSchema = z
           .max(1000),
       })
       .strict()
+      .refine(
+        ({ mode, counterpartyId }) => mode === "direct" ? !counterpartyId : !!counterpartyId,
+        { path: ["counterpartyId"], message: "Seleção incompatível com a modalidade da expedição." },
+      )
       .refine(
         (value) =>
           new Set(value.lines.map((line) => line.productId)).size ===

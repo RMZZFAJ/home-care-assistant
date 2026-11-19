@@ -114,11 +114,11 @@ export function supplyMilestones(data: MilestoneFacts): DocumentMilestone[] {
     const ended = ["declined", "withdrawn"].includes(transfer.state);
     return [
       { label: "Declaração", state: "done", detail: "Preparação registrada; ainda sem emissão ENT" },
-      {
-        label: "Concordância", state: transfer.agreement?.decision === "agree" ? "done" : ended ? "closed" : "pending",
-        detail: transfer.agreement?.decision === "agree" ? "Decisão própria registrada; não é recebimento" : transfer.state === "declined" ? "Contraparte recusou a declaração" : ended ? "Encerrada sem nova decisão" : "Aguardando a contraparte designada"
-      },
-      { label: "Expedição", state: ended ? "closed" : "pending", detail: ended ? "Encerrada sem expedir materiais" : "Concordância não expede materiais" },
+      ...(transfer.agreement ? [{
+        label: "Concordância", state: "done" as const,
+        detail: transfer.agreement.decision === "agree" ? "Concordância registrada" : "Contraparte recusou a declaração",
+      }] : []),
+      { label: "Expedição", state: ended ? "closed" : "pending", detail: ended ? "Encerrada sem expedir materiais" : "Aguardando expedição" },
       { label: "Recebimento", state: ended ? "closed" : "pending", detail: "Sem expedição; nenhum recebimento presumido" },
     ];
   }

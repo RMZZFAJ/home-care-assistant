@@ -138,6 +138,10 @@ describe("transfer decision private preparations", () => {
   });
   it("requires the exact document,patient,monotonic version and complete facts on a fresh Auth read", () => {
     expect(parseTransferReference(packet, expected).id).toBe(id);
+    const dispatchable = structuredClone(packet);
+    dispatchable.data.transfer.canAgree = false;
+    dispatchable.data.transfer.canDispatch = true;
+    expect(parseTransferReference(dispatchable, expected).transfer?.canDispatch).toBe(true);
     const mutations = [
       (r: typeof packet) => {
         r.data.id = patient;
@@ -153,9 +157,6 @@ describe("transfer decision private preparations", () => {
       },
       (r: typeof packet) => {
         r.data.transfer.declaration.destination = "CARE_TEAM";
-      },
-      (r: typeof packet) => {
-        r.data.transfer.canDispatch = true;
       },
     ];
     for (const mutate of mutations) {
@@ -179,6 +180,9 @@ describe("transfer decision private preparations", () => {
     expect(parseTransferReference(copy, expected).transfer?.canAgree).toBe(
       false,
     );
+    copy.data.transfer!.canDispatch = true;
+    expect(() => parseTransferReference(copy, expected)).toThrow();
+    copy.data.transfer!.canDispatch = false;
     copy.data.transfer!.agreement.actor = actor;
     expect(() => parseTransferReference(copy, expected)).toThrow();
   });

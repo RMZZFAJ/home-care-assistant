@@ -17,9 +17,9 @@ export function TransferFactsDisplay({ facts }: { facts: TransferFacts }) {
         .
       </p>
       <DefinitionGrid items={[
-        { label: "Declarante", value: declaration.actor.name },
+        { label: declaration.mode === "direct" ? "Expedidor" : "Declarante", value: declaration.actor.name },
         { label: "Registrada em", value: formatBrazilDate(declaration.recordedAt) },
-        { label: "Contraparte designada para concordância", value: declaration.counterparty.name },
+        ...(declaration.counterparty ? [{ label: "Contraparte designada para concordância", value: declaration.counterparty.name }] : []),
         { label: "Recebedor físico designado", value: declaration.recipient.name },
       ]} />
       <p className="whitespace-pre-wrap">
@@ -38,19 +38,14 @@ export function TransferFactsDisplay({ facts }: { facts: TransferFacts }) {
           </p>
           <p className="whitespace-pre-wrap">{facts.agreement.reason}</p>
         </>
-      ) : (
-        <p>A concordância ainda não foi registrada.</p>
-      )}
+      ) : null}
       {facts.dispatchedAt ? (
         <p>
           Expedição efetiva: {formatBrazilDate(facts.dispatchedAt)}. Acompanhe o
           recebimento e as divergências abaixo.
         </p>
       ) : (
-        <p>
-          Sem expedição registrada nesta declaração. Concordância não comprova
-          recebimento nem movimenta os materiais.
-        </p>
+        <p>Sem expedição registrada nesta declaração.</p>
       )}
       {facts.withdrawal ? (
         <>

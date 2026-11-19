@@ -482,7 +482,7 @@ export const documentStatuses: Record<string, string> = {
   completed_science_pending: "Concluída · ciência pendente",
   archived: "Arquivada",
   draft: "Rascunho",
-  transfer_pending: "Transferência aguardando concordância",
+  transfer_pending: "Transferência aguardando expedição",
   transfer_ready: "Transferência pronta para expedição",
   submitted: "Aguardando revisão",
   pending_approval: "Aguardando aprovação",
