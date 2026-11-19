@@ -59,12 +59,16 @@ for (const [role,label,title,action] of profiles) test("canonical guide for "+ro
 test("guide rejects a valid response from another role without exposing its tasks or sending progress", async ({page})=>{
   const f=await setup();await login(page,"professional",f.patient);
   const valid=(await(await page.request.get("/api/guides")).json()).data;
-  await page.route("**/api/guides",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({data:{...valid,role:"global"}})}),{times:1});
+  let wrongRole=true;
+  await page.route("**/api/guides",route=>wrongRole&&route.request().method()==="GET"
+    ? route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({data:{...valid,role:"global"}})})
+    : route.continue());
   let writes=0;page.on("request",r=>{if(new URL(r.url()).pathname==="/api/guides"&&r.method()==="POST")writes++;});
   await page.goto("/guias");
   const panel=page.getByRole("region",{name:"Guia do seu perfil",exact:true});
   await expect(panel.getByRole("alert")).toContainText("perfil atual");
   await expect(panel.getByRole("navigation")).toHaveCount(0);
+  wrongRole=false;
   const retry=panel.getByRole("button",{name:"Consultar guia novamente",exact:true});await retry.focus();await retry.press("Enter");
   await expect(panel.getByRole("heading",{name:"Profissional",exact:true})).toBeVisible();await expect(retry).toBeFocused();
   expect(writes).toBe(0);expect((await(await page.request.get("/api/guides")).json()).data.progress).toEqual(valid.progress);
