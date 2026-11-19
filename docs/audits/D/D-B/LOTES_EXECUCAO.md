@@ -231,16 +231,11 @@ continua sem regra de produto nesta entrega.
 ## Migrations por ambiente
 
 Consulta de 19/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **309 versões no local**
-e **307 no desenvolvimento**, com 242 versões anteriores a L1 e 18 de L1.
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **309 versões em cada banco**,
+com 242 versões anteriores a L1, 18 de L1 e 49 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
-Produção fica fora desta consulta.
-
-### L2 — Aplicadas apenas no local
-
-`20261119231733` guarda o extra de ENT e DEV no rascunho e protege a expedição.
-`20261119233039` libera os itens identificados da COM mista. O ensaio com
-rollback foi concluído e as duas versões estão na fila de aplicação vinculada.
+As versões em arquivo, na stack local e no desenvolvimento coincidem. A
+fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 
 ### L1 — Aplicadas no local e no desenvolvimento
 
@@ -263,7 +258,8 @@ rollback foi concluído e as duas versões estão na fila de aplicação vincula
 `20261119121610`, `20261119125023`, `20261119130945`, `20261119135903`,
 `20261119141610`, `20261119154356`, `20261119175654`, `20261119184524`,
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
-`20261119220003`, `20261119221703`, `20261119224330`.
+`20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
+`20261119233039`.
 
 `20261119212000` e `20261119213000` tratam as observações numeradas e a
 justificativa da designação manual na transferência. `20261119220003`
@@ -277,6 +273,14 @@ mudança estável no intervalo, explicada por um lembrete agendado de ENT
 às 20h02, com evento, auditoria e aviso interno. Linhas de materiais e
 estoque permaneceram iguais. A fila vinculada está vazia. O preview ainda
 aguarda a publicação do código.
+
+`20261119231733` guarda o extra de ENT e DEV no rascunho e protege a expedição.
+`20261119233039` libera os itens identificados da COM mista. As duas versões
+foram aplicadas após ensaio com rollback e backup cifrado verificado
+`91150014-8e4a-438d-b452-b3a83d28a475`. O SQL das duas versões confere com o
+histórico vinculado. A comparação de 201 tabelas registrou variações de
+horário e estado operacional. O único conteúdo estável alterado foi o
+histórico de migrations.
 
 ### L3 e L4
 

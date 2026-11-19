@@ -12,6 +12,13 @@ Identificar o extra após a compra das demais linhas abre o planejamento
 da quantidade desse extra em uma operação própria, com autoria e versão.
 O histórico da compra e da chegada anteriores fica disponível na ficha.
 
+Quatro casos em Android e iOS emulados a 390 px passaram na rodada final.
+As integrações com Auth real verificaram a retomada, a ausência de efeito de
+estoque na identificação e as entradas das linhas compradas. As versões
+`20261119231733` e `20261119233039` estão no local e no desenvolvimento.
+O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#migrations-por-ambiente)
+relaciona a verificação do histórico e o backup usado para a aplicação.
+
 **19/11 — item extra da COM com cadastro pendente.** O preenchimento pode
 começar em Materiais. O mesmo extra reaparece em Itens extras e Revisão.
 A COM pode ser emitida apenas com
