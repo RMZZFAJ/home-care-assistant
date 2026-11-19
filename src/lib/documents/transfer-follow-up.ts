@@ -10,7 +10,8 @@ export function materialTransferLabel(source?: string, destination?: string) {
   const direction = materialTransferDirection(source, destination);
   return direction === "return" ? "Devolução de materiais" : direction === "delivery" ? "Entrega de materiais" : "Transferência entre custódias";
 }
-type Facts = Pick<SupplyDocument, "transfer" | "status" | "protocol" | "fullyCheckedLines" | "totalLines" | "deliveryCancellation" | "deliveryRegularization">;
+type Facts = Pick<SupplyDocument, "transfer" | "status" | "protocol" | "fullyCheckedLines" | "totalLines" | "deliveryCancellation" | "deliveryRegularization">
+  & Partial<Pick<SupplyDocument, "lines">>;
 export function transferFollowUp(data: Facts) {
   const facts = data.transfer;
   if (!facts) return null;

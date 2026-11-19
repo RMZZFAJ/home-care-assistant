@@ -935,6 +935,39 @@
 }
 .hca-l1 .hca-arrival-attention select { min-width: 0; max-width: 60%; font-size: 12px; }
 .hca-l1 .hca-purchase-line[data-inactive="true"] { background: var(--hca-bg); }
+
+.hca-modal:has(.hca-delivery-receipt) > .hca-modal-content { background: var(--hca-bg); padding: 12px 14px 15px; }
+.hca-modal:has(.hca-delivery-receipt):not(.hca-modal-success) > .hca-modal-head h2 { color: #204733; font-size: 20px; font-weight: 750; line-height: 1.22; }
+.hca-modal:has(.hca-delivery-receipt):not(.hca-modal-success) > .hca-modal-head button { border-color: transparent; background: transparent; }
+.hca-modal:has(.hca-delivery-receipt) > .hca-modal-footer { justify-content: flex-end; }
+.hca-modal:has(.hca-delivery-receipt) > .hca-modal-footer > button { flex: 0 1 auto; min-width: 96px; max-width: 60%; }
+.hca-delivery-receipt { display: grid; gap: 9px; font-size: 13px; }
+.hca-delivery-receipt p { margin: 0; }
+.hca-receipt-line { display: grid; gap: 8px; min-width: 0; padding: 12px; border: 1px solid var(--hca-line); border-radius: 12px; background: var(--hca-paper, white); }
+.hca-receipt-line header { display: flex; align-items: start; justify-content: space-between; gap: 8px; }
+.hca-receipt-line h3 { margin: 0; font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.hca-receipt-line header p { font-size: 12px; color: var(--hca-muted); }
+.hca-receipt-line header > button { border-color: transparent; background: transparent; }
+.hca-receipt-field { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.hca-receipt-field label { font-weight: 600; }
+.hca-receipt-quantity { display: flex; align-items: center; width: 110px; max-width: 45%; background: var(--hca-bg); border: 1px solid var(--hca-line); border-radius: 10px; }
+.hca-l1 .hca-receipt-quantity input { flex: 1 1 2.6em; min-width: 0; width: auto; padding-inline: 8px 0; background: transparent; border: 0; border-radius: inherit; font-size: 16px; }
+.hca-receipt-quantity > span { flex: 0 1 auto; min-width: 44px; padding-inline: 4px 8px; color: var(--hca-muted); font-size: 11px; overflow-wrap: anywhere; }
+.hca-receipt-change { display: inline-block; background: #fff0d9; color: #75400c; border-radius: 5px; padding: 3px 6px; font-size: 11px; }
+.hca-receipt-difference { border-color: #ead4b1; }
+.hca-receipt-difference header > strong { flex: 0 0 auto; max-width: 45%; text-align: right; }
+.hca-receipt-quantities, .hca-receipt-impact { display: flex; align-items: center; gap: 7px; }
+.hca-receipt-impact { padding: 7px 4px; }
+.hca-receipt-impact svg { flex: none; }
+.hca-receipt-family { color: var(--hca-muted); }
+.hca-receipt-fold { border-top: 1px solid var(--hca-line); }
+.hca-receipt-fold > summary { display: flex; align-items: center; gap: 7px; min-height: 42px; cursor: pointer; list-style: none; font-weight: 600; }
+.hca-receipt-fold > summary::-webkit-details-marker { display: none; }
+.hca-l1 .hca-modal .hca-delivery-receipt .hca-receipt-fold > summary::after { content: none; display: none; }
+.hca-receipt-fold > summary > .hca-icon { flex: 0 0 15px; width: 15px; }
+.hca-receipt-fold > summary > .hca-icon:last-child { margin-inline-start: auto; }
+.hca-receipt-fold[open] > summary > .hca-icon:last-child { transform: rotate(180deg); }
+.hca-receipt-fold[open] > :not(summary) { margin-block: 3px 6px; }
 .hca-l1 .hca-purchase-status.hca-arrival-confirmed { color: var(--success); background: var(--hca-green-bg); }
 .hca-l1 .hca-purchase-status.hca-arrival-rejected { color: var(--danger); background: var(--hca-red-bg); }
 .hca-l1 .hca-arrival-stock { color: var(--muted); font-size: 12px; }

@@ -49,7 +49,7 @@ test("ENT emite com rascunho privado e conserva a mesma confirmação após200 i
 test("duas fichas ENT não herdam campos de conferência descartada e nenhuma navegação aceita recebimento",async({page})=>{
  const f=await setup(),make=()=>rpc(f.admin,"create_supply_document",{p_patient:f.patient,p_type:"ENT",p_payload:{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício",lines:f.products.map(productId=>({productId,quantity:"2"}))},p_key:randomUUID(),p_draft:false}),first=await make(),second=await make(),before=official(f.patient);
  await login(page,f.patient,"professional");
- for(const doc of [first,second]){ await page.goto(`/fichas/${doc.id}`);await page.getByRole("button",{name:"Informar divergência",exact:true}).click();
+ for(const doc of [first,second]){ await page.goto(`/fichas/${doc.id}`);await openDocumentAction(page, "Informar divergência");
   const field=page.getByRole("textbox",{name:"Observações da divergência",exact:true}); await expect(field).toHaveValue(""); await field.fill("Conferência que será descartada sem aceitar entrega.");
   await page.getByRole("button",{name:"Fechar ação",exact:true}).click(); const guard=page.getByRole("dialog",{name:"Sair sem concluir?",exact:true});await guard.getByRole("button",{name:"Sair e descartar",exact:true}).click();
  }
@@ -138,3 +138,4 @@ test("revisão HTTP de COM ENT BAL reverte as duas etapas na falha e recupera as
   const replay=await target.request.post(`/api/documents/${doc.id}/revise`,{data:body});expect(replay.ok()).toBe(true);expect(await replay.json()).toEqual(result);expect(official(f.patient)).toBe(after);
  }}finally{await second.close();}
 });
+import { openDocumentAction } from "./document-sections";

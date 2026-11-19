@@ -1,4 +1,4 @@
-import { selectDocumentSection } from "./document-sections";
+import { selectDocumentSection, openDocumentAction } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
@@ -335,7 +335,7 @@ test("ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe
     await readOnlyDispatch(page, codes);
     await expect(
       page.getByRole("button", {
-        name: /^(Confirmar recebimento|Informar divergência)$/,
+        name: "Conferir recebimento", exact: true,
       }),
     ).toHaveCount(0);
     const denied = await page.request.post("/api/documents/" + delivery.id, {
@@ -354,9 +354,7 @@ test("ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe
   await page.goto("/fichas/" + delivery.id);
   await selectDocumentSection(page, "workflow");
   await readOnlyDispatch(page, codes);
-  await page
-    .getByRole("button", { name: "Informar divergência", exact: true })
-    .click();
+  await openDocumentAction(page, "Informar divergência");
   await expect(
     page.getByRole("checkbox", { name: /Material fictício V4/ }),
   ).toHaveCount(2);

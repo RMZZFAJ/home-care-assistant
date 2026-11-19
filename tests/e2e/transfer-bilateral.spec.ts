@@ -1,4 +1,4 @@
-import { selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
+import { selectDocumentSection, openDocumentMore, closeDocumentMore, openDocumentAction } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
@@ -176,7 +176,7 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
     await selectDocumentSection(ana, "workflow");
     await expect(ana.getByRole("button", { name: "Concordar com a transferência", exact: true })).toHaveCount(0);
     await expect(
-      ana.getByRole("button", { name: "Confirmar recebimento", exact: true }),
+      ana.getByRole("button", { name: "Conferir recebimento", exact: true }),
     ).toHaveCount(0);
     expect(JSON.parse(transferState(f)).ledger.length).toBe(
       before.ledger.length + 1,
@@ -193,9 +193,7 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
     await expect(receiptTask).toContainText("Conferir meu recebimento");
     await receiptTask.getByRole("link", { name: "Conferir", exact: true }).click();
     await selectDocumentSection(bruno, "workflow");
-    await bruno
-      .getByRole("button", { name: "Informar divergência", exact: true })
-      .click();
+    await openDocumentAction(bruno, "Informar divergência");
     await bruno
       .getByRole("checkbox", { name: /Material fictício V4 0.*expedido/ })
       .check();

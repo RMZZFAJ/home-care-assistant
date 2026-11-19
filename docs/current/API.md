@@ -578,9 +578,10 @@ commit daquela intenção. Consulta não cria ou repete movimento. Reenvio exige
 ato explícito, mesma chave e corpo. A recuperação por leitura permite perda de
 escrita, nunca perda de bal.read; saldos respeitam a permissão atual.
 
-ENT receive exige divergences, mesmo vazio. Linhas não selecionadas são
-integralmente aceitas; acceptedQuantity positiva parcial credita o destino.
-Resolução registra received, returned ou missing com quantidade e motivo.
+ENT e DEV recebem a conferência pessoal pelo comando `receive`. A contagem
+informa todas as linhas em `countedReceipt`. O contrato `divergences` das
+chamadas existentes também é aceito. Resolução de trânsito registra
+`received`, `returned` ou `missing` com quantidade e motivo.
 
 Atendimento da REQ deriva exclusivamente de aceite positivo de ENT vinculada.
 Não é um estado administrativo nem a soma de quantidades requisitadas.
@@ -1209,15 +1210,26 @@ plantão indicado. Corte conserva linhas históricas e impede republicação
 posterior. Leitura continua limitada a42 dias por consulta; a UI pagina/navega
 o calendário sem ampliar esse limite.
 
-## Conferência pessoal ENT
+## Conferência pessoal de ENT e DEV
 
 GET/POST /api/documents/:id acrescentam linkedRequisitions e
 unavailableRequisitionItems às ENT. Referências vêm dos itens vinculados pelo
 banco, filtradas pelo paciente e RLS do leitor; não há consulta administrativa.
 Falta de acesso ao vínculo é informada, sem expor dados da REQ protegida.
-O comando receive continua aceitando somente divergences: quantidade recebida,
-problema e observação por linha. Origem/destino/material/vínculos/ator não são
-editáveis nesse ato. A conferência mostra também as linhas integrais.
+O comando `receive`, inclusive pelo endpoint de decisões, aceita
+`countedReceipt` com `lines` contendo `lineId` e `receivedQuantity` e
+`notes` opcional do recebedor. A pessoa designada confere cada linha uma
+vez. Origem, destino, material e vínculos vêm da ficha. A nota do recebedor
+fica em `workflow_data.receiptNotes` e a observação da expedição permanece
+no conteúdo emitido.
+
+O banco registra por linha a quantidade expedida, declarada, reconhecida,
+em trânsito no momento da conferência e o excedente. Só a quantidade
+reconhecida, limitada à expedição, sai do trânsito para a custódia de destino.
+O excedente segue em apuração. A resolução de trânsito não aumenta a
+expedição e só aparece como tarefa quando há saldo a esclarecer ou um registro
+qualitativo do contrato anterior. `divergences` continua disponível para os
+fluxos existentes, incluindo avaria e erro de identificação.
 
 ## Preparação de residência e guias
 

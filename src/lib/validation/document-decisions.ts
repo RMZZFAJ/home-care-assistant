@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { purchaseCommandBody } from "./purchase-command";
+import { countedDeliveryReceiptBody } from "./delivery-receipt";
 import { purchaseArrivalBody, requestArrivalCorrection, resubmitArrival } from "./purchase-arrival";
 
 export const documentDecisionIntention = z.object({
@@ -16,6 +17,8 @@ export const documentDecisionIntention = z.object({
   })
   .refine(value => value.domain !== "supply" || value.action !== "receive" || !("lines" in value.body) ||
     purchaseArrivalBody.safeParse(value.body).success, { path: ["body"], message: "Confira os materiais da chegada." })
+  .refine(value => value.domain !== "supply" || value.action !== "receive" || !("countedReceipt" in value.body) ||
+    countedDeliveryReceiptBody.safeParse(value.body).success, { path: ["body"], message: "Confira as quantidades recebidas." })
   .refine(value => value.domain !== "supply" || value.action !== "request_receipt_correction" || requestArrivalCorrection.safeParse(value.body).success,
     { path: ["body"], message: "Informe o que o autor precisa corrigir." })
   .refine(value => value.domain !== "supply" || value.action !== "resubmit_receipt" || resubmitArrival.safeParse(value.body).success,

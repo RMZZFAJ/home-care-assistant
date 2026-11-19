@@ -1,5 +1,23 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — conferência pessoal de ENT e DEV.** A interface preenche as
+quantidades expedidas e apresenta as diferenças antes de confirmar. O banco
+registra expedido, declarado, reconhecido, saldo inicial em trânsito e
+excedente. A nota do recebedor preserva a própria autoria e a observação
+da expedição. Os materiais e o PDF da conferência apresentam esses fatos.
+
+A revisão móvel seguiu E06-06 e E06-07. Passaram 16 casos dirigidos no Mobile
+e iOS emulados, 31 casos unitários e cinco integrações com Auth real. A
+resposta perdida foi conferida com uma escrita oficial e os movimentos
+esperados. A repetição dirigida em Mobile e iOS conferiu também as
+quantidades e as duas observações diretamente no texto do PDF assinado.
+Quando termina o trânsito e sobra apenas excedente, a ficha
+mostra a apuração e deixa de oferecer tarefa de conciliação física.
+A stack local tem 277 migrations até `20261119083628`. O preview tem 272
+até `20261119060719`. O conjunto posterior aguarda a versão compatível da
+interface publicada. Conciliação por material e suficiência seguem em
+implementação. A regularização final do excedente permanece reservada em P2.
+
 **19/11 — expedição direta de ENT e DEV.** O assistente de
 transferência confirma paciente e destinatário, seleciona materiais e itens
 extras, registra a observação e apresenta a revisão. A expedição gera o

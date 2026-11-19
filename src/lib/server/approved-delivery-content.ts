@@ -3,6 +3,7 @@ import { approvedDocumentContent } from "./approved-document-content";
 import { pdfFidelitySchema } from "@/lib/documents/pdf-fidelity";
 import { confirmedDeliveryQuantity } from "@/lib/documents/delivery-confirmed-quantity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
+import { readCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
 import { formatBrazilDate } from "@/lib/receipt";
 import { familyFulfillmentDescription, familyReviewDescription } from "@/lib/documents/family-fulfillment";
 import { formatQuantity, quantity } from "@/lib/quantity";
@@ -15,6 +16,8 @@ export function approvedDeliveryContent(snapshot: DocumentSnapshot, emission: Pd
   const { source, facts, semanticFacts } = approvedDocumentContent(snapshot, emission), fidelity = pdfFidelitySchema.parse(snapshot.documentFacts);
   const acceptedAt = typeof snapshot.workflow?.acceptedAt === "string" ? snapshot.workflow.acceptedAt : null;
   semanticFacts["receipt/state"] = entReceiptState(snapshot.status, source.historical, acceptedAt, emission.representation).declaration;
+  const receiptNotes = typeof snapshot.workflow?.receiptNotes === "string" ? snapshot.workflow.receiptNotes.trim() : "";
+  if (receiptNotes) semanticFacts["receipt/notes"] = receiptNotes;
   if (snapshot.status === "administratively_closed") semanticFacts["receipt/administrative"] = "Encerramento administrativo não substitui aceite pessoal. Os efeitos apurados e a situação física ainda desconhecida permanecem nas seções próprias.";
   snapshot.lines.forEach((line, index) => {
     const familyDecision = familyFulfillmentDescription(line);
@@ -24,6 +27,14 @@ export function approvedDeliveryContent(snapshot: DocumentSnapshot, emission: Pd
     semanticFacts[key + "/expedited"] = amount(line.quantity, unit(line));
     semanticFacts[key + "/received"] = received.state === "recorded" ? amount(received.quantity, unit(line)) : received.state === "unavailable" ? "Quantidade não preservada" : "Não confirmado";
     semanticFacts[key + "/open"] = amount((typeof line.reconciled_quantity === "string" || typeof line.reconciled_quantity === "number") && (typeof line.accepted_quantity === "string" || typeof line.accepted_quantity === "number") ? quantity(String(line.quantity)).minus(line.accepted_quantity).minus(line.reconciled_quantity).toFixed() : null, unit(line));
+    const counted = readCountedDeliveryReceipt(line.metadata);
+    if (counted) {
+      semanticFacts[key + "/countedDeclared"] = amount(counted.receivedQuantity, unit(line));
+      semanticFacts[key + "/countedRecognized"] = amount(counted.recognizedQuantity, unit(line));
+      semanticFacts[key + "/countedTransit"] = amount(counted.remainingTransitQuantity, unit(line));
+      semanticFacts[key + "/countedExcess"] = amount(counted.excessQuantity, unit(line));
+      return;
+    }
     const receipt = (line.metadata as { receipt?: { notes?: string; acceptedQuantity?: unknown; }; } | undefined)?.receipt;
     if (receipt) {
       semanticFacts["issue/" + index + "/notes"] = receipt.notes || "Nota não preservada";

@@ -22,10 +22,10 @@ it("names delivery and autonomous return only from their exact direction, withou
   }
 });
 it("a recorded declaration does not claim ENT issuance, shipment, receipt or authority", () => {
-  expect(transferFollowUp(facts)).toMatchObject({ pending: true, heading: "Conferir a concordância da devolução", section: "workflow" });
+  expect(transferFollowUp(facts)).toMatchObject({ pending: true, heading: "Conferir a expedição da devolução", section: "workflow" });
   const milestones = supplyMilestones(facts);
-  expect(milestones.map(item => item.label)).toEqual(["Declaração", "Concordância", "Expedição", "Recebimento"]);
-  expect(milestones.map(item => item.state)).toEqual(["done", "pending", "pending", "pending"]);
+  expect(milestones.map(item => item.label)).toEqual(["Declaração", "Expedição", "Recebimento"]);
+  expect(milestones.map(item => item.state)).toEqual(["done", "pending", "pending"]);
   expect(transfer.canAgree).toBe(false);
 });
 it("agreement without shipment does not complete expedition or receipt", () => {
@@ -37,7 +37,7 @@ it.each(["declined", "withdrawn"] as const)("unshipped %s closes preparation wit
   const closed = { ...facts, status: state === "declined" ? "rejected" : "cancelled", transfer: { ...transfer, state } };
   expect(transferFollowUp(closed)).toMatchObject({ pending: false, section: "workflow" });
   expect(transferFollowUp(closed)?.description).toContain("nenhum material foi movimentado");
-  expect(supplyMilestones(closed).map(item => item.state)).toEqual(["done", "closed", "closed", "closed"]);
+  expect(supplyMilestones(closed).map(item => item.state)).toEqual(["done", "closed", "closed"]);
   expect(supplyMilestones({ ...closed, transfer: { ...closed.transfer, agreement } })[1].state).toBe("done");
 });
 it("a dispatched return follows personal receipt and its divergence without being called a delivery", () => {

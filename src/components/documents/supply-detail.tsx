@@ -22,6 +22,9 @@ import { documentVariant } from "@/lib/documents/variant";
 import { SupplyLineSummary } from "./supply-line-summary";
 import { PurchaseMaterials } from "./purchase-materials";
 import { DeliveryMaterials } from "./delivery-materials";
+import { CountedDeliveryReceipt, CountedDeliveryReceiptResult } from "./delivery-receipt";
+import { readCountedDeliveryReceipt, verifyCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
+import { countedDeliveryReceiptBody, type CountedDeliveryReceiptBody } from "@/lib/validation/delivery-receipt";
 import {
   DeliveryDispatchFacts,
   DeliveryReceiptReview,
@@ -98,6 +101,7 @@ const secondaryDocumentActions = new Set<DocumentAction>([
   "cancel",
   "close_expectation",
   "reassign",
+  "divergence",
 ]);
 type SupplyReview = {
   action: string;
@@ -137,6 +141,7 @@ export function SupplyDocumentContent({
   const [message, setMessage] = useState("");
   const [purchaseResult, setPurchaseResult] = useState<ConfirmedPurchase | null>(null);
   const [arrivalResult, setArrivalResult] = useState<{ documentId: string; receipt: PurchaseReceipt } | null>(null);
+  const [deliveryReceiptResult, setDeliveryReceiptResult] = useState<SupplyDocument | null>(null);
   const [purchaseUpdating, setPurchaseUpdating] = useState(false);
   const purchaseReadAttemptRef = useRef<number | null>(null);
   useOperationActivity(purchaseUpdating, { title: "Registrando compra", stage: 2, steps: purchaseActivitySteps });
@@ -144,8 +149,9 @@ export function SupplyDocumentContent({
   const [action, setAction] = useState<DocumentAction | null>(null);
   const registeringPurchase = action === "purchase" && data?.payload.origin !== "donation";
   const registeringArrival = action === "receive" && data?.type === "COM";
+  const countingDelivery = action === "receive" && data?.type === "ENT";
   const coveredOperation = registeringPurchase || registeringArrival;
-  useOperationActivity(loading && coveredRead || (busy && !coveredOperation), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
+  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
   const [review, setReview] = useState<SupplyReview | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [closeUncertain, setCloseUncertain] = useState(false);
@@ -299,10 +305,11 @@ export function SupplyDocumentContent({
         idempotencyKey: crypto.randomUUID(),
         ...(nextReview.draftCommit ? { draftCommit: nextReview.draftCommit } : {}),
       };
-    if (!pendingRef.current) return;
+    const checking = uncertain || decision.uncertain;
+    if (!pendingRef.current && !checking) return;
     setBusy(true);
     setError("");
-    let intention = pendingRef.current;
+    const initialIntention = pendingRef.current;
     try {
       const verify = (row: Record<string, unknown>, accepted: DocumentDecisionIntention, key: string) => {
         const read = requireSupplyConfirmation({ data: row, persistence: "confirmed" }, {
@@ -315,16 +322,19 @@ export function SupplyDocumentContent({
         if (accepted.action === "receive" && read.type === "COM") {
           requirePurchaseReceipt(read, purchaseArrivalBody.parse(accepted.body).lines, key);
         }
+        if (accepted.action === "receive" && read.type === "ENT" && "countedReceipt" in accepted.body) {
+          verifyCountedDeliveryReceipt(read, countedDeliveryReceiptBody.parse(accepted.body), accepted.expectedVersion, context.userId);
+        }
       };
-      const outcome = uncertain ? await decision.checkPrevious(verify) : await decision.execute({
-        domain: "supply", action: intention.action, body: intention.body as Record<string, unknown>, expectedVersion: intention.expectedVersion,
+      const outcome = checking ? await decision.checkPrevious(verify) : initialIntention && await decision.execute({
+        domain: "supply", action: initialIntention.action, body: initialIntention.body as Record<string, unknown>, expectedVersion: initialIntention.expectedVersion,
       }, verify);
       if (!outcome) return;
       if (outcome.state === "not_applied") {
         pendingRef.current = null; setUncertain(false); setReview(null);
         setError("A conferência confirmou que nada foi alterado. Seus campos continuam nesta tela para tentar novamente. Se persistir, procure a supervisão."); return;
       }
-      intention = { ...intention, idempotencyKey: outcome.key, action: outcome.intention.action, body: outcome.intention.body, expectedVersion: outcome.intention.expectedVersion };
+      const intention = { ...outcome.intention, idempotencyKey: outcome.key };
       const result = { data: requireSupplyConfirmation({ data: outcome.result, persistence: "confirmed" }, {
         patientId: data.care_recipient_id, type: data.type, id, minimumVersion: intention.expectedVersion,
       }) };
@@ -340,6 +350,11 @@ export function SupplyDocumentContent({
       setDeliveryConflict(false);
       setComparison(null);
       setReadNotice("");
+      if (result.data.type === "ENT" && intention.action === "receive" && countedDeliveryReceiptBody.safeParse(intention.body).success) {
+        setMessage("");
+        setDeliveryReceiptResult(result.data);
+        return;
+      }
       if (intention.action === "purchase" && result.data.payload.origin !== "donation") {
         const { lines } = purchaseCommandBody.parse(intention.body);
         setMessage("");
@@ -419,7 +434,7 @@ export function SupplyDocumentContent({
           setDeliveryConflict(true);
         if (
           data.type === "ENT" &&
-          intention.action === "consent_cancel" &&
+          (initialIntention?.action ?? action) === "consent_cancel" &&
           cause instanceof ApiError &&
           cause.status === 403
         )
@@ -446,7 +461,9 @@ export function SupplyDocumentContent({
       const result = await api<{ data: SupplyDocument; }>(
         "/api/documents/" + id,
       );
-      setComparison(result.data);
+      setComparison(data ? requireSupplyConfirmation({ data: result.data, persistence: "confirmed" }, {
+        id: data.id, patientId: data.care_recipient_id, type: data.type, minimumVersion: data.version,
+      }) : null);
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -527,14 +544,9 @@ export function SupplyDocumentContent({
       )
         actions.push("reassign");
       if (
-        (data.status === "disputed" ||
-          (data.status === "cancellation_pending" &&
-            data.lines.some((line) =>
-              quantity(line.quantity)
-                .minus(line.accepted_quantity)
-                .minus(line.reconciled_quantity)
-                .gt(0),
-            ))) &&
+        (((data.status === "disputed" || data.status === "cancellation_pending") &&
+          data.lines.some((line) => quantity(line.quantity).minus(line.accepted_quantity).minus(line.reconciled_quantity).gt(0))) ||
+          (data.status === "disputed" && data.lines.some(line => line.metadata.issueOpen && !readCountedDeliveryReceipt(line.metadata)))) &&
         data.deliveryRegularization?.recipientAvailable !== false &&
         ((data.recipient_id === context.userId && allowed("ent.receive")) ||
           allowed("access.manage"))
@@ -667,6 +679,12 @@ export function SupplyDocumentContent({
         disabled={busy || uncertain}
         onClick={(event) => {
           operationOpenerRef.current = event.currentTarget;
+          if (item === "receive" && data.type === "ENT") {
+            setError("");
+            setReview(null);
+            setAction(item);
+            return;
+          }
           decisionFocusRef.current = true;
           setFocusRevision((value) => value + 1);
           tabs.select("workflow");
@@ -677,6 +695,8 @@ export function SupplyDocumentContent({
       >
         {data.type === "COM" && item === "receive"
           ? "Informar nova chegada"
+          : item === "receive"
+            ? "Conferir recebimento"
           : item === "purchase" && data.payload.origin === "donation"
             ? "Registrar aquisição"
             : actionLabels[item]}
@@ -773,7 +793,7 @@ export function SupplyDocumentContent({
         {loading && data ? "Atualizando consulta da ficha…" : ""}
       </span>
       {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
-        {error ? <Notice error>{error}</Notice> : null}
+        {error && !countingDelivery ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {readNotice &&
         (action ||
@@ -785,7 +805,7 @@ export function SupplyDocumentContent({
         <Notice>{readNotice}</Notice>
       ) : null}
       {!coveredOperation ? purchaseConflictPanel : null}
-      {deliveryConflict && data?.type === "ENT" ? (
+      {deliveryConflict && data?.type === "ENT" && !countingDelivery ? (
         <section className="ui-card space-y-3">
           <Notice error>
             O pedido, a versão ou as referências da conciliação mudaram. Seus
@@ -1240,7 +1260,7 @@ export function SupplyDocumentContent({
                   ) : null}
                 </section>
               ) : null}
-              {actions.length || action ? (
+              {!countingDelivery && (actions.length || action) ? (
                 <section className="ui-card">
                   <h2>
                     {action && !actions.includes(action)
@@ -1366,8 +1386,42 @@ export function SupplyDocumentContent({
           </DocumentTabs>
         </>
       ) : null}
+      {data && countingDelivery && !readDenied ? <CountedDeliveryReceipt
+        key={data.id}
+        data={data} context={context} sender={data.transfer?.declaration.actor.name ?? documentIssuerName(data.canonical_snapshot)}
+        review={review ? review.body as CountedDeliveryReceiptBody : null}
+        busy={busy || decision.busy} blocked={deliveryConflict || !actions.includes("receive")} uncertain={uncertain || decision.uncertain}
+        error={error || decision.recoveryMessage}
+        finalFocus={operationOpenerRef}
+        conflict={deliveryConflict ? <Notice>
+          A ficha mudou durante a conferência.
+          {comparison ? <><p>Versão atual {comparison.version} · {comparison.lines.length} materiais.</p>
+            <ActionButton disabled={busy} onClick={adoptDeliveryComparison}>Usar versão atual e revisar novamente</ActionButton></>
+            : <ActionButton disabled={busy} onClick={() => void comparePurchaseVersion()}>Consultar versão atual</ActionButton>}
+        </Notice> : !actions.includes("receive") ? <Notice>O recebimento desta ficha está indisponível para este acesso.</Notice> : null}
+        onReview={(body, different) => {
+          const next = { action: "receive", body, summary: "", expectedVersion: data.version };
+          setError("");
+          setReview(next);
+          if (!different) void execute(next);
+        }}
+        onEdit={() => setReview(null)} onConfirm={() => void execute()} onCloseUncertain={() => setCloseUncertain(true)}
+        onClose={() => {
+          setAction(null);
+          setReview(null);
+          setError("");
+          setDeliveryConflict(false);
+          setComparison(null);
+          setAttempt(value => value + 1);
+        }} /> : null}
+      {deliveryReceiptResult?.id === id && !readDenied && activeContext ? <CountedDeliveryReceiptResult
+        data={deliveryReceiptResult} onClose={() => {
+          setDeliveryReceiptResult(null);
+          resultFocusRef.current = true;
+          setFocusRevision(value => value + 1);
+        }} /> : null}
       <Dialog
-        open={Boolean(review) && !readDenied && (!coveredOperation || uncertain)}
+        open={Boolean(review) && !readDenied && !countingDelivery && (!coveredOperation || uncertain)}
         title={
           review?.action === "close_expectation"
             ? "Revisar encerramento da expectativa"

@@ -12,6 +12,7 @@ import { requirePdfLifecycleFacts } from "@/lib/documents/pdf-lifecycle";
 import { materialTransferDirection } from "@/lib/documents/transfer-follow-up";
 import { confirmedDeliveryQuantity, recordedDeliveryRecipient } from "@/lib/documents/delivery-confirmed-quantity";
 import { entReceiptState } from "@/lib/documents/ent-receipt-state";
+import { readCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
 import { CATEGORY_LABELS } from "@/lib/catalog";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
@@ -70,6 +71,32 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   layout.paragraph(entReceiptState(snapshot.status, source.historical, acceptedAt, emission.representation).declaration, "receipt/state", { size: 9.5 });
   if (administrative) layout.paragraph("Encerramento administrativo não substitui aceite pessoal. Os efeitos apurados e a situação física ainda desconhecida permanecem nas seções próprias.", "receipt/administrative", { size: 9.5 });
   if (personal) layout.paragraph("Conferência pessoal: " + receiptName + " · " + formatBrazilDate(acceptedAt), "receipt/actor");
+  const receiptNotes = typeof snapshot.workflow?.receiptNotes === "string" ? snapshot.workflow.receiptNotes.trim() : "";
+  if (receiptNotes) {
+    layout.heading("Observação do recebedor");
+    layout.paragraph(receiptNotes, "receipt/notes");
+  }
+  const countedRows = snapshot.lines.flatMap((line, index) => {
+    const counted = readCountedDeliveryReceipt(line.metadata);
+    if (!counted) return [];
+    const key = "material/" + index;
+    return [{ cells: [
+      { text: name(line), strong: true },
+      { text: amount(counted.receivedQuantity, unit(line)), key: key + "/countedDeclared" },
+      { text: amount(counted.recognizedQuantity, unit(line)), key: key + "/countedRecognized" },
+      { text: amount(counted.remainingTransitQuantity, unit(line)), key: key + "/countedTransit" },
+      { text: amount(counted.excessQuantity, unit(line)), key: key + "/countedExcess" },
+    ] }];
+  });
+  if (countedRows.length) {
+    layout.ensure(155);
+    layout.heading("Quantidades no momento da conferência", "O excedente fica em apuração até a regularização da origem.");
+    layout.table([
+      { label: "Material", fraction: 0.28 }, { label: "Recebido declarado", fraction: 0.18 },
+      { label: "Reconhecido", fraction: 0.18 }, { label: "Em trânsito", fraction: 0.18 },
+      { label: "Excedente", fraction: 0.18 },
+    ], countedRows);
+  }
   const selection = snapshot.workflow?.recipientSelection as DeliveryRecipientSelection | undefined;
   if (selection) {
     layout.heading("Recebedor designado"); layout.paragraph(selection.recipientName + " · " + (selection.manual ? "Escolha manual" : "Sugestão da escala mantida"), "recipient/person");
@@ -92,6 +119,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   for (const [index, line] of snapshot.lines.entries()) {
     const familyDecision = familyFulfillmentDescription(line);
     if (familyDecision) { layout.heading("Avaliação familiar · " + name(line)); layout.paragraph(familyDecision, "familyFulfillment/" + index, { size: 9.5 }); }
+    if (readCountedDeliveryReceipt(line.metadata)) continue;
     const receipt = (line.metadata as { receipt?: { problem?: string; notes?: string; acceptedQuantity?: string | number; }; } | undefined)?.receipt;
     if (!receipt) continue;
     layout.heading("Divergência original · " + name(line));

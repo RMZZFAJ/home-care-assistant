@@ -1,4 +1,4 @@
-import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
+import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, closeDocumentMore, openDocumentAction, confirmCompleteDeliveryReceipt } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { confirmArrivalReview, openArrivalReview } from "./purchase-arrival-review";
 import { selectContext } from "./auth-context";
@@ -284,9 +284,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await logout(page);
   await login(page, "professional");
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Informar divergência", exact: true })
-    .click();
+  await openDocumentAction(page, "Informar divergência");
   await page
     .getByRole("checkbox", { name: new RegExp("^" + product.name) })
     .check();
@@ -438,10 +436,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
   await logout(page);
   await login(page, "professional");
   await page.goto("/fichas/" + first.data.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Confirmar recebimento", exact: true })
-    .click();
-  await confirm(page);
+  await confirmCompleteDeliveryReceipt(page);
   await page.goto(
     "/historico/" + req.requisitionId + "?careRecipientId=" + patient,
   );
@@ -450,9 +445,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     page.getByText("5/10 itens atendidos", { exact: true }),
   ).toBeVisible();
   await page.goto("/fichas/" + second.data.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Informar divergência", exact: true })
-    .click();
+  await openDocumentAction(page, "Informar divergência");
   const editor = page.locator("form");
   await editor.getByRole("checkbox").nth(8).check();
   await editor.getByRole("checkbox").nth(9).check();
@@ -995,10 +988,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await logout(page);
   await login(page, "professional");
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Confirmar recebimento", exact: true })
-    .click();
-  await confirm(page);
+  await confirmCompleteDeliveryReceipt(page);
   for (const id of [extra.requisitionId, second.requisitionId]) {
     const req = (await (await get(page, "/api/requisitions/" + id)).json())
       .data;
@@ -1059,10 +1049,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   await logout(page);
   await login(page, "adminA");
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Confirmar recebimento", exact: true })
-    .click();
-  await confirm(page);
+  await confirmCompleteDeliveryReceipt(page);
   await openDocumentMore(page);
   await page
     .getByRole("menuitem", { name: "Alterar destinatário", exact: true })

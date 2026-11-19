@@ -70,6 +70,19 @@ export async function closeDocumentMore(page: Page) {
   await expect(popup).toHaveCount(0);
 }
 
+export async function openDocumentAction(page: Page, name: string) {
+  await openDocumentMore(page);
+  await page.getByRole("menuitem", { name, exact: true }).click();
+}
+
+export async function confirmCompleteDeliveryReceipt(page: Page) {
+  await page.getByRole("button", { name: "Conferir recebimento", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "Conferir recebimento", exact: true });
+  await editor.getByRole("button", { name: "Confirmar recebimento", exact: true }).click();
+  const result = page.getByRole("dialog", { name: "Recebimento confirmado", exact: true });
+  await result.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+}
+
 /** Open the collapsed, user-facing macro progress before inspecting its steps. */
 export async function expandDocumentMilestones(page: Page) {
   const summary = page.locator("details.hca-document-macro > summary");

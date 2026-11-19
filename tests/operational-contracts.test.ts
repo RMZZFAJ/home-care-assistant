@@ -49,6 +49,12 @@ describe("contratos operacionais exatos", () => {
     expect(parsed.body).toEqual({
       divergences: [{ lineId: id, acceptedQuantity: "6.25" }],
     });
+    expect(supplyCommandSchema.parse({
+      ...parsed,
+      body: { countedReceipt: { notes: "Observação do recebedor", lines: [{ lineId: id, receivedQuantity: "8,25" }] } },
+    }).body).toEqual({
+      countedReceipt: { notes: "Observação do recebedor", lines: [{ lineId: id, receivedQuantity: "8.25" }] },
+    });
     expect(quantity("0.1").plus("0.2").toFixed()).toBe("0.3");
     expect(validQuantity("1.1", 0)).toBe(false);
     expect(validQuantity("1.1234567", 6)).toBe(false);

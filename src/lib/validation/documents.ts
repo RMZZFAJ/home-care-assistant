@@ -8,6 +8,7 @@ import { draftCommitSchema } from "./creation-drafts";
 import { supplySourceLinks } from "./supply-sources";
 import { purchaseCommandBody } from "./purchase-command";
 import { purchaseArrivalBody } from "./purchase-arrival";
+import { countedDeliveryReceiptBody } from "./delivery-receipt";
 
 const identifier = z.string().uuid();
 const line = z
@@ -262,6 +263,7 @@ export const supplyCommandSchema = z
       purchase: purchaseCommandBody,
       receive: z.union([
         purchaseArrivalBody,
+        countedDeliveryReceiptBody,
         z
           .object({
             divergences: z

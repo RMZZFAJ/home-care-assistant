@@ -14,7 +14,7 @@ import {
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
+import { selectDocumentSection, openDocumentMore, closeDocumentMore, openDocumentAction } from "./document-sections";
 import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
@@ -251,9 +251,7 @@ test("Conferência ENT conserva campos entre abas, descarta ao sair e mantém UR
   await expect(
     page.getByRole("tab", { name: "Visão geral", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
-  await page
-    .getByRole("button", { name: "Informar divergência", exact: true })
-    .click();
+  await openDocumentAction(page, "Informar divergência");
   const editor = page.getByRole("region", { name: "Conferência pessoal", exact: true });
   await editor.getByRole("checkbox", { name: /Material fictício V4 0/ }).check();
   await editor.getByRole("textbox", { name: "Efetivamente recebido", exact: true }).fill("1,");

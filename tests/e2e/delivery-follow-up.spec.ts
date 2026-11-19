@@ -160,7 +160,7 @@ test("ENT follow-up keeps independent regularization and unknown physical transi
   await expect(milestone(page, "Conclusão")).toHaveAttribute("data-state", "closed");
   await workflow(page);
   await expect(panel(page)).toContainText("Parcela desconhecida permanece em trânsito");
-  await expect(page.getByRole("button", { name: "Confirmar recebimento", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Conferir recebimento", exact: true })).toHaveCount(0);
   expect(facts(f.patient)).toBe(before);
   expect(writes).toEqual([]);
 });

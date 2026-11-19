@@ -1,5 +1,6 @@
 import { quantity } from "@/lib/quantity";
 import type { SupplyDocument } from "@/types/documents";
+import { readCountedDeliveryReceipt } from "./delivery-receipt";
 
 type DeliveryFollowUp = {
   heading: string;
@@ -11,13 +12,16 @@ type DeliveryFollowUp = {
 };
 type Facts = Pick<SupplyDocument,
   "status" | "protocol" | "fullyCheckedLines" | "totalLines" |
-  "deliveryCancellation" | "deliveryRegularization">;
+  "deliveryCancellation" | "deliveryRegularization"> & Partial<Pick<SupplyDocument, "lines">>;
 
 export function deliveryFollowUp(data: Facts, operation: "delivery" | "return" = "delivery"): DeliveryFollowUp {
   const noun = operation === "return" ? "devolução" : "entrega";
   const base = { label: "Atendimento e decisões", section: "workflow" as const };
   const regularization = data.deliveryRegularization;
   const current = regularization?.cases.find(item => item.id === regularization.currentId);
+  const excessOnly = data.lines?.some(line => quantity(readCountedDeliveryReceipt(line.metadata)?.excessQuantity ?? "0").gt(0))
+    && !data.lines.some(line => quantity(line.quantity).minus(line.accepted_quantity).minus(line.reconciled_quantity).gt(0)
+      || line.metadata.issueOpen && !readCountedDeliveryReceipt(line.metadata));
   if (["cancelled", "rejected"].includes(data.status)) return {
     ...base, pending: false,
     ...(data.deliveryCancellation ? {} : { label: "Versões e integridade", section: "history" as const }),
@@ -39,6 +43,11 @@ export function deliveryFollowUp(data: Facts, operation: "delivery" | "return" =
       ? "Acompanhar o material ainda em trânsito"
       : "Consultar o encerramento administrativo",
     description: "O encerramento administrativo preserva o aceite e tem autoria própria. Consulte o dossiê e as apurações. Parcela física desconhecida continua em trânsito com seu responsável; o encerramento não presume recebimento nem resolve essa parcela.",
+  };
+  if (data.status === "disputed" && excessOnly) return {
+    ...base, pending: true, heading: "Acompanhar o excedente em apuração",
+    description: "O estoque do destino reconheceu a quantidade expedida. O excedente declarado aguarda regularização da origem.",
+    statusLabel: "Excedente em apuração",
   };
   if (["pending_receipt", "disputed", "cancellation_pending"].includes(data.status) && regularization?.recipientAvailable === false) return {
     ...base, pending: true, heading: `Consultar a regularização da ${noun}`,
