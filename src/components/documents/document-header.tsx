@@ -4,9 +4,10 @@ import { Menu } from "@base-ui/react/menu";
 import Link from "next/link";
 import { Dialog } from "@/components/ui/overlays";
 import { StatusBadge, Icon, type IconName } from "@/components/ui/primitives";
-import { ActionButton, FormField, Pill, TextInput } from "@/components/ui/controls";
+import { ActionButton, Pill } from "@/components/ui/controls";
 import { MenuPopup } from "@/components/ui/floating";
 import { DocumentActions } from "./document-actions";
+import { DocumentShareDialog } from "./document-share-dialog";
 import { formatBrazilDate } from "@/lib/receipt";
 import { documentLabels, type DocumentType } from "@/types/documents";
 
@@ -96,7 +97,7 @@ export function DocumentHeader({
   const [copyMessage, setCopyMessage] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
   const [identificationOpen, setIdentificationOpen] = useState(false);
-  const [sharingOpen, setSharingOpen] = useState(false), [shareUrl, setShareUrl] = useState("");
+  const [sharingOpen, setSharingOpen] = useState(false);
   useEffect(() => {
     if (!copyMessage || sharingOpen) return;
     const timer = setTimeout(() => setCopyMessage(""), 6000);
@@ -187,7 +188,7 @@ export function DocumentHeader({
             <MenuPopup sideOffset={8} className="hca-document-more-menu" aria-label="Ações da ficha" finalFocus={() => !actionClosedRef.current}>
               <div className="hca-document-more-title">Ações da ficha</div>
               <Menu.Item className="hca-menu-item" onClick={() => {
-                actionClosedRef.current = true; setCopyMessage(""); setShareUrl(new URL("/fichas/" + id, window.location.origin).href); setSharingOpen(true);
+                actionClosedRef.current = true; setCopyMessage(""); setSharingOpen(true);
               }}><Icon name="external" width={17} height={17} />Compartilhar link da ficha</Menu.Item>
               <Menu.Item className="hca-menu-item" onClick={() => {
                 if (!navigator.clipboard?.writeText) { setCopyMessage("Não foi possível copiar. Selecione o código no cabeçalho."); return; }
@@ -202,16 +203,7 @@ export function DocumentHeader({
         </div>
       </div>
       {copyMessage && !sharingOpen ? <div className="hca-copy-toast" role="status"><Icon name={copyMessage.startsWith("Não") ? "alert" : "check"} />{copyMessage}</div> : null}
-      <Dialog open={sharingOpen} onClose={() => setSharingOpen(false)} title="Compartilhar ficha" finalFocus={moreButtonRef}>
-        <div className="share-heading"><span className="share-icon"><Icon name="link" width={25} height={25} /></span><div><strong>{code}</strong><p>{patientName}</p></div></div>
-        <p>Quem receber o link precisa ter acesso a este paciente.</p>
-        <FormField label="Link da ficha"><TextInput value={shareUrl} readOnly /></FormField>
-        {copyMessage ? <p role="status">{copyMessage}</p> : null}
-        <div className="hca-toolbar"><ActionButton onClick={() => setSharingOpen(false)}>Fechar</ActionButton><ActionButton variant="primary" onClick={() => {
-          if (!navigator.clipboard?.writeText) { setCopyMessage("Não foi possível copiar. Selecione o link apresentado acima."); return; }
-          void navigator.clipboard.writeText(shareUrl).then(() => setCopyMessage("Link da ficha copiado."), () => setCopyMessage("Não foi possível copiar. Selecione o link apresentado acima."));
-        }}><Icon name="copy" />Copiar link</ActionButton></div>
-      </Dialog>
+      {sharingOpen ? <DocumentShareDialog id={id} code={code} patientName={patientName} onClose={() => setSharingOpen(false)} finalFocus={moreButtonRef} /> : null}
       <Dialog open={identificationOpen} onClose={() => setIdentificationOpen(false)} title="Protocolo e identificação" finalFocus={moreButtonRef}>
         {contextLabel ? <Pill>Perfil: {contextLabel}</Pill> : null}
         <dl className="hca-document-identifiers">

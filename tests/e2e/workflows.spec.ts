@@ -529,7 +529,7 @@ test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async (
     .getByRole("button", { name: "Recuperar esta tentativa", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
+    page.getByRole("dialog", { name: "Requisição emitida", exact: true }),
   ).toBeVisible();
   const listing = await (
     await get(page, "/api/documents?careRecipientId=" + patient + "&type=REQ")

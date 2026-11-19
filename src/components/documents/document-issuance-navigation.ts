@@ -1,0 +1,35 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useCallback, useSyncExternalStore, useTransition } from "react";
+import { z } from "zod";
+
+type IssuanceScope = { id: string; patientId: string; userId: string };
+let pending: IssuanceScope | null = null;
+const listeners = new Set<() => void>();
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => { listeners.delete(listener); };
+};
+function publish(value: IssuanceScope | null) {
+  pending = value;
+  listeners.forEach(listener => listener());
+}
+
+export function useIssuanceNavigation(userId: string, patientId: string) {
+  const router = useRouter();
+  const [navigating, startNavigation] = useTransition();
+  function openIssued(documentId: string) {
+    const id = z.uuid().parse(documentId);
+    publish({ id, userId, patientId });
+    startNavigation(() => router.replace(`/fichas/${id}?documentTab=materials`));
+  }
+  return { navigating, openIssued };
+}
+
+export function useIssuanceResult(scope: IssuanceScope) {
+  const result = useSyncExternalStore(subscribe, () => pending, () => null);
+  const matches = result?.id === scope.id && result.userId === scope.userId && result.patientId === scope.patientId;
+  const dismiss = useCallback(() => { if (pending === result) publish(null); }, [result]);
+  return matches ? dismiss : null;
+}

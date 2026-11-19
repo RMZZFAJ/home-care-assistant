@@ -143,7 +143,7 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
   expect(document!.transfer?.declaration.actor.id).toBe(f.initiator.id);
   await page.unroute("**/api/transfers");
   await page
-    .getByRole("link", {
+    .getByRole("button", {
       name: "Acompanhar ficha",
       exact: true,
     })

@@ -928,9 +928,30 @@
   height: 60px;
   margin-inline: auto;
   border-radius: 50%;
+  background: #fff;
   color: var(--success);
   box-shadow: 0 0 0 6px #eaf5ef, inset 0 0 0 1px #c9e6d4, 0 3px 9px #32523a20;
 }
+@media (prefers-reduced-motion: no-preference) {
+  .hca-l1 .hca-modal-success-icon { animation: hca-result-medallion .62s cubic-bezier(.23,.7,.2,1) both; }
+}
+@keyframes hca-result-medallion {
+  0% { transform: perspective(300px) rotateY(-140deg) scale(.7); opacity: .6; }
+  65% { transform: perspective(300px) rotateY(15deg) scale(1.13); opacity: 1; }
+  100% { transform: perspective(300px) rotateY(0) scale(1); opacity: 1; }
+}
+.hca-l1 .hca-modal-success:has(.hca-issuance-actions) > .hca-modal-content { padding: 20px 16px 0; }
+.hca-l1 .hca-modal-success:has(.hca-issuance-actions) > .hca-modal-head { inset: 0 0 auto auto; }
+.hca-l1 .hca-modal-success:has(.hca-issuance-actions) > .hca-modal-head button { background: transparent; border-color: transparent; color: var(--hca-muted); }
+.hca-l1 .hca-modal-success:has(.hca-issuance-actions) .hca-modal-success-copy h2 { font-size: 21px; line-height: 1.2; letter-spacing: -.6px; }
+.hca-l1 .hca-issuance-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: 7px; }
+.hca-l1 .hca-issuance-actions > :last-child { grid-column: 1 / -1; }
+.hca-l1 .hca-issuance-actions > * { min-width: 0; white-space: normal; text-align: center; }
+.hca-l1 .hca-issuance-actions svg { flex-shrink: 0; }
+.hca-l1 .hca-issued-receipt > summary { display: flex; align-items: center; gap: 8px; font-weight: 650; list-style: none; }
+.hca-l1 .hca-issued-receipt > summary::-webkit-details-marker { display: none; }
+.hca-l1 .hca-issued-receipt > summary > :last-child { margin-inline-start: auto; }
+.hca-l1 .hca-issued-receipt[open] > summary { margin-bottom: 12px; }
 .hca-l1 .hca-arrival-attention {
   color: var(--warning);
   background: #fff4d9;

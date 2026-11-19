@@ -368,7 +368,7 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
     .getByRole("button", { name: "Recuperar esta tentativa", exact: true })
     .click();
   await expect(
-    page.getByText("Documento persistido", { exact: true }),
+    page.getByRole("dialog", { name: "Compra emitida", exact: true }),
   ).toBeVisible();
   expect(attempts).toHaveLength(2);
   expect(attempts[0]).toEqual(attempts[1]);
@@ -488,7 +488,7 @@ test("nova emissão com fator obsoleto conserva a escolha e exige comparação a
     .getByRole("button", { name: "Confirmar e concluir", exact: true })
     .click();
   await expect(
-    page.getByText("Documento persistido", { exact: true }),
+    page.getByRole("dialog", { name: "Compra emitida", exact: true }),
   ).toBeVisible();
   expect(
     sql(

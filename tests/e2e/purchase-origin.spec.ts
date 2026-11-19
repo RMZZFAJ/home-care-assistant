@@ -81,13 +81,9 @@ test("COM começa sem compra presumida e emite doação explícita sem creditar 
   expect(document.payload.origin).toBe("donation");
   expect(Number(document.lines[0].quantity)).toBe(2);
   expect(stock(f.patient)).toBe(before);
-  await expect(
-    page.getByText(
-      "Doação registrada. Acompanhe as parcelas e a validação da chegada.",
-      { exact: true },
-    ),
-  ).toBeVisible();
-  await page.getByRole("link", { name: /Acompanhar ficha/ }).click();
+  const emitted = page.getByRole("dialog", { name: "Doação emitida", exact: true });
+  await expect(emitted).toBeVisible();
+  await emitted.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
   await expect(page.locator(".hca-document-name p")).toHaveText(
     "Doação de insumos",
   );

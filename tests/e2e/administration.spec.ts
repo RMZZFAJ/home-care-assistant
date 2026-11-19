@@ -688,7 +688,7 @@ test.describe("administração integrada no ambiente local", () => {
     ]);
     expect(persisted.receipt.extraItems).toHaveLength(0);
     await expect(
-      page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
+      page.getByRole("dialog", { name: "Requisição emitida", exact: true }),
     ).toBeVisible();
   });
 });

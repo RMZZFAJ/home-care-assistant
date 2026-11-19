@@ -116,6 +116,18 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   ).toBeVisible();
   const attempts: unknown[] = [];
   let saved: SupplyDocument | undefined;
+  let attemptedPdf: { id: string; issuanceId: string } | undefined;
+  const pdfSigned = Promise.withResolvers<void>();
+  const releasePdfResponse = Promise.withResolvers<void>();
+  await page.route("**/api/documents/*/issuances/initial", async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    const response = await route.fetch();
+    expect(response.status(), await response.text()).toBe(200);
+    attemptedPdf = await response.json();
+    pdfSigned.resolve();
+    await releasePdfResponse.promise;
+    await route.abort("failed");
+  });
   await page.route("**/api/documents", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
@@ -135,12 +147,22 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   await expect(
     page.getByRole("button", { name: "Voltar", exact: true }),
   ).toBeDisabled();
-  await page
-    .getByRole("button", { name: "Recuperar esta tentativa", exact: true })
-    .click();
-  await expect(
-    page.getByText("Documento persistido", { exact: true }),
-  ).toBeVisible();
+  try {
+    await page.getByRole("button", { name: "Recuperar esta tentativa", exact: true }).click();
+    await pdfSigned.promise;
+    await expect(page.getByRole("heading", { name: "Gerando o PDF de emissão", exact: true })).toBeVisible();
+    await expect(page.getByRole("list", { name: "Etapas da operação" }).locator('[aria-current="step"]'))
+      .toContainText("Gerando o PDF de emissão");
+  } finally {
+    releasePdfResponse.resolve();
+  }
+  const emitted = page.getByRole("dialog", { name: "Entrega expedida", exact: true });
+  await expect(emitted).toBeVisible();
+  await expect(emitted.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveCount(0);
+  await emitted.getByRole("button", { name: "Recuperar PDF", exact: true }).click();
+  await expect(emitted.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveAttribute("href",
+    `/api/documents/${saved!.id}/pdf?issuance=${attemptedPdf!.issuanceId}`);
+  expect(sql(`select count(*) from private.pdf_issuances where initial_request_id=${sqlLiteral(attemptedPdf!.id)}`)).toBe("1");
   expect(attempts).toHaveLength(2);
   expect(attempts[1]).toEqual(attempts[0]);
   expect(saved).toBeTruthy();
@@ -166,7 +188,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
       `select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)} and type='ENT';`,
     ),
   ).toBe("1");
-  await page.getByRole("link", { name: /Acompanhar ficha/ }).click();
+  await emitted.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
   await selectDocumentSection(page, "workflow");
   await expect(
     page.getByRole("region", { name: "Indicação do recebedor", exact: true }),

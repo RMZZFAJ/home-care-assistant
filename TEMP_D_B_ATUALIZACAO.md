@@ -1,5 +1,25 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — confirmação de emissão sobre a ficha.** REQ, COM, ENT e DEV
+abrem a ficha em Materiais após a confirmação oficial. A interface usa
+o carregamento dinâmico para gravar, consultar e assinar o PDF inicial.
+O resultado apresenta medalhão animado, download e compartilhamento
+lado a lado e a ação Acompanhar ficha abaixo.
+
+- A recuperação pertence ao exemplar inicial. Se a assinatura ainda
+  não puder ser confirmada, a emissão da ficha continua reconhecida e
+  é possível consultar o mesmo PDF no diálogo ou em Arquivos gerados.
+- A doação tem a identificação própria “Doação emitida”. O comprovante
+  imprimível da REQ fica em Arquivos gerados, com indicação para dados
+  reconstruídos. Compartilhar usa o endereço autenticado da ficha.
+- Passaram os casos dirigidos Android e iOS para emissão, abertura da
+  ficha, download, compartilhamento e recuperação do PDF. A REQ
+  remanescente confirmou um único ajuste de 2 para 0 e preservou os
+  movimentos anteriores, o recebimento parcial e o PDF original.
+- Os diálogos de falha de gravação e diagnóstico copiável da v7 ainda
+  precisam ser ligados aos fluxos de emissão. Este incremento usa as
+  migrations já preparadas para o PDF inicial.
+
 **19/11 — unificação da entrada de arquivamento de REQ.** A rota antiga
 aceita a mesma revisão versionada da rota de ciclo de vida. Toda nova
 requisição de arquivo passa pelo PDF consolidado assinado e validado. O

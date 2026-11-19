@@ -68,6 +68,7 @@ import { purchaseCommandBody } from "@/lib/validation/purchase-command";
 import { purchaseArrivalBody } from "@/lib/validation/purchase-arrival";
 import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document-header";
+import { DocumentIssuanceResult } from "./document-issuance-result";
 import { FamilyFulfillmentReview } from "./family-fulfillment-review";
 import { DocumentFreshness } from "./document-freshness";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
@@ -837,6 +838,11 @@ export function SupplyDocumentContent({
   if (!data && loading) return null;
   return (
     <div className="hca-record-detail doc-page">
+      {data?.code && context.patient?.id === data.care_recipient_id && (data.type === "COM" || data.type === "ENT") ? (
+        <DocumentIssuanceResult id={id} userId={context.userId} patientId={data.care_recipient_id} patientName={context.patient.display_name}
+          code={data.code} kind={data.kind === "DEV" || data.code.startsWith("DEV-") ? "DEV" : data.type}
+          donation={data.type === "COM" && data.payload.origin === "donation"} />
+      ) : null}
       {data ? (
         <DocumentBreadcrumb
           code={

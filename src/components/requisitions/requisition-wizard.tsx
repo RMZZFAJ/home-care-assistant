@@ -8,7 +8,7 @@ import {
   restoreStockObservation,
   validStockObservation,
 } from "@/lib/stock-observation";
-import type { RequisitionFormData, RequisitionLine } from "@/types/requisition";
+import type { RequisitionFormData, RequisitionLine, RequisitionReceipt } from "@/types/requisition";
 import type { ItemContext } from "@/types/documents";
 import {
   api,
@@ -39,7 +39,9 @@ import {
   Review,
   type Product,
 } from "./requisition-steps";
-import { Receipt, type SavedReceipt } from "./requisition-receipt";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { issuanceSteps } from "@/components/documents/document-issuance-result";
+import { useIssuanceNavigation } from "@/components/documents/document-issuance-navigation";
 
 const steps = draftFlowStages.REQ.map(stage => stage.label);
 export function RequisitionWizard() {
@@ -81,10 +83,15 @@ function PatientRequisition({
     extraItems: [],
     observations: [],
   });
-  const [receipt, setReceipt] = useState<SavedReceipt | null>(null);
+  const { navigating, openIssued } = useIssuanceNavigation(context.userId, context.patient!.id);
+  const [issuedDocumentId, setIssuedDocumentId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  useOperationActivity(saving || navigating, {
+    title: "Emissão da requisição", stage: navigating ? 1 : 0, steps: issuanceSteps,
+    detail: navigating ? "A requisição foi registrada. Estamos abrindo a ficha." : "Estamos registrando a requisição e conferindo a contagem informada.",
+  });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const fieldsRef = useRef<HTMLDivElement>(null), focusErrorRef = useRef<string | null>(null);
   useEffect(() => {
@@ -250,7 +257,7 @@ function PatientRequisition({
     return () => controller.abort();
   }, [context.patient, catalogAttempt]);
   useEffect(() => {
-    if (receipt || uncertain || saving || loadingCatalog) return;
+    if (issuedDocumentId || uncertain || saving || loadingCatalog) return;
     const timer = window.setTimeout(() => {
       if (frozenRef.current) return;
       try {
@@ -263,7 +270,7 @@ function PatientRequisition({
       }
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [form, loadingCatalog, receipt, saving, storageKey, uncertain]);
+  }, [form, issuedDocumentId, loadingCatalog, saving, storageKey, uncertain]);
   const currentCategory = (["medicamentos", "higiene", "dieta"] as const)[
     step - 1
   ];
@@ -440,17 +447,19 @@ function PatientRequisition({
     setSaving(true);
     setError("");
     try {
-      const body = await api<{ receipt: SavedReceipt }>(
+      const body = await api<{ receipt: RequisitionReceipt }>(
         "/api/requisitions",
         frozenRef.current,
       );
-      if (!body.receipt)
+      const issuedId = body.receipt?.requisitionId;
+      if (!issuedId)
         throw new Error(
           "Consulte o histórico ou recupere esta tentativa para confirmar o comprovante.",
         );
-      setReceipt(body.receipt);
+      openIssued(issuedId);
+      setIssuedDocumentId(issuedId);
       setUncertain(false);
-      sessionStorage.removeItem(storageKey);
+      try { sessionStorage.removeItem(storageKey); } catch { /* A missing storage API does not change the confirmed receipt. */ }
     } catch (reason) {
       const rejected =
         reason instanceof ApiError &&
@@ -497,7 +506,6 @@ function PatientRequisition({
       setSaving(false);
     }
   }
-  if (receipt) return <div className="space-y-4"><ComplementOriginHint /><Receipt receipt={receipt} /></div>;
   if (privateDraft.readDenied)
     return (
       <Notice error>
@@ -506,6 +514,8 @@ function PatientRequisition({
     );
   if (!can(context, "req.read"))
     return <Notice>Seu acesso à requisição foi encerrado.</Notice>;
+  if (issuedDocumentId)
+    return <Notice>Requisição registrada. <ActionButton onClick={() => openIssued(issuedDocumentId)}>Abrir ficha</ActionButton></Notice>;
   const selectionLibrary = (readonly = false) => <RecurringSelection key={context.userId+":"+context.patient!.id} userId={context.userId} patientId={context.patient!.id} catalogue={products} lines={form.lines}
     disabled={readonly||saving||uncertain||loadingCatalog||Boolean(catalogError)||privateDraft.blocked||!may(context,"request")} canSave={may(context,"request")}
     cataloguePending={loadingCatalog} catalogueError={catalogError} onRefresh={()=>{setLoadingCatalog(true);setCatalogAttempt(value=>value+1);}}

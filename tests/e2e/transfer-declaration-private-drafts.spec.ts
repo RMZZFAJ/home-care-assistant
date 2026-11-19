@@ -47,12 +47,12 @@ test("resultado confirmado permanece acessível quando a consulta do rascunho co
     release();await (await consumed).finished();
     await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
     await expect(page.getByRole("dialog", { name: "Resultado anterior confirmado", exact: true })).toHaveCount(0);
-    const result = page.getByRole("region", { name: "Devolução expedida", exact: true });
-    await expect(result).toHaveCount(1);
-    const link = result.getByRole("link", { name: "Acompanhar ficha", exact: true });
-    const href = await link.getAttribute("href");expect(href).toMatch(/^\/fichas\/[0-9a-f-]{36}$/);
+    const result = page.getByRole("dialog", { name: "Devolução expedida", exact: true });
+    await expect(result).toBeVisible();
+    const href = new URL(page.url()).pathname;expect(href).toMatch(/^\/fichas\/[0-9a-f-]{36}$/);
     const after = declarationFacts(f);expect(JSON.parse(after).ledger).toHaveLength(before.ledger.length + 1);expect(posts).toBe(1);
-    await link.click();await expect(page).toHaveURL(new RegExp(href! + "(?:[?#]|$)"));
+    await result.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(href + "(?:[?#]|$)"));
     expect(declarationFacts(f)).toBe(after);expect(posts).toBe(1);
   } finally { release();await page.unrouteAll({ behavior: "wait" }); }
 });

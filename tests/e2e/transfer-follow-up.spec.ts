@@ -88,7 +88,9 @@ async function declareInUi(page: Page, f: Fixture, source: Custody, info: TestIn
   const response = await pending;
   expect(response.ok(), await response.text()).toBe(true);
   const doc = (await response.json()).data as SupplyDocument;
-  await expect(page.getByRole("region", { name: label === "entrega" ? "Entrega expedida" : "Devolução expedida", exact: true }).getByRole("link", { name: "Acompanhar ficha" })).toBeVisible();
+  const result = page.getByRole("dialog", { name: label === "entrega" ? "Entrega expedida" : "Devolução expedida", exact: true });
+  await expect(result.getByRole("link", { name: "Baixar PDF", exact: true })).toBeVisible();
+  await result.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
   return doc;
 }
 

@@ -22,6 +22,24 @@ const reason = (page: Page) =>
   page.getByLabel("Motivo da necessidade remanescente", { exact: true });
 const source = (page: Page) =>
   page.getByRole("region", { name: "Nova necessidade vinculada", exact: true });
+function expectOnlyNewCount(f: Awaited<ReturnType<typeof remainingNeedFixture>>, before: string, issuedId: string) {
+  type Movement = { id: string; quantity: number };
+  const { ledger: oldLedger, ...oldFacts } = JSON.parse(before) as { ledger: Movement[] };
+  const after = physicalState(f);
+  const { ledger, ...facts } = JSON.parse(after) as { ledger: Movement[] };
+  const oldIds = new Set(oldLedger.map(movement => movement.id));
+  expect(facts).toEqual(oldFacts);
+  expect(ledger.filter(movement => oldIds.has(movement.id))).toEqual(oldLedger);
+  expect(ledger.filter(movement => !oldIds.has(movement.id))).toEqual([
+    expect.objectContaining({
+      quantity: 2, product_id: f.products[0], source_location: "CARE_TEAM", destination_location: null,
+      reference_type: "requisition_count", reference_id: issuedId, performed_by: fixtures.professional.id,
+    }),
+  ]);
+  expect(sql(`select balance_before::text || ':' || counted_quantity::text
+    from private.requisition_stock_counts where requisition_id=${sqlLiteral(issuedId)}`)).toBe("2.000000:0.000000");
+  return after;
+}
 async function prepare(
   page: Page,
   f: Awaited<ReturnType<typeof remainingNeedFixture>>,
@@ -77,10 +95,10 @@ async function prepare(
   const observation = page.getByLabel("Estoque observado com a equipe", {
     exact: false,
   });
-  await expect(observation).toHaveValue("");
+  await expect(observation).toHaveValue("2");
   await expect(
     page.getByLabel("Informação do estoque da equipe", { exact: true }),
-  ).toHaveValue("unfilled");
+  ).toHaveValue("observed");
   await observation.fill("0");
   for (let i = 0; i < 4; i++) await next(page);
   await expect(
@@ -159,7 +177,7 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
     .getByRole("button", { name: "Recuperar esta tentativa", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
+    page.getByRole("dialog", { name: "Requisição emitida", exact: true }),
   ).toBeVisible();
   expect(packets).toHaveLength(2);
   expect(packets[0]).toEqual(packets[1]);
@@ -168,13 +186,16 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
     version: f.sourceVersion,
     reason: ownReason,
   });
+  await page.getByRole("dialog", { name: "Requisição emitida", exact: true })
+    .getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
+  await selectDocumentSection(page, "overview");
   await expect(
     page.getByRole("region", {
       name: "Origem da necessidade remanescente",
       exact: true,
     }),
   ).toContainText(ownReason);
-  expect(physicalState(f)).toBe(before);
+  const after = expectOnlyNewCount(f, before, created);
   const oldAgain = await generatedPdf(
     page,
     `/api/documents/${f.source.id}/pdf?version=${f.sourceVersion}`,
@@ -224,7 +245,7 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
       `select count(*) from public.requisitions where source_requisition_id=${sqlLiteral(f.source.id)};`,
     ),
   ).toBe("1");
-  expect(physicalState(f)).toBe(before);
+  expect(physicalState(f)).toBe(after);
 });
 
 test("origem obsoleta exige comparação e adoção explícita após falha; seleção, zero e motivo continuam preservados", async ({
@@ -300,14 +321,15 @@ test("origem obsoleta exige comparação e adoção explícita após falha; sele
     .getByRole("button", { name: "Concluir requisição", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
+    page.getByRole("dialog", { name: "Requisição emitida", exact: true }),
   ).toBeVisible();
   expect(
     sql(
       `select count(*) from public.requisitions where source_requisition_id=${sqlLiteral(f.source.id)};`,
     ),
   ).toBe("2");
-  expect(physicalState(f)).toBe(before);
+  const issuedId = new URL(page.url()).pathname.split("/").at(-1)!;
+  expectOnlyNewCount(f, before, issuedId);
   await info.attach("independent-remaining-need-state", {
     contentType: "application/json",
     body: Buffer.from(

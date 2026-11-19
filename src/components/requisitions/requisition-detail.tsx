@@ -34,6 +34,7 @@ import {
   formatStockObservationTime,
 } from "@/lib/stock-observation";
 import type {
+  RequisitionReceipt,
   StockObservation,
   StockObservationTimeSource,
 } from "@/types/requisition";
@@ -50,6 +51,8 @@ import {
   useDocumentTabs,
 } from "@/components/documents/document-tabs";
 import { DocumentActions } from "@/components/documents/document-actions";
+import { DocumentIssuanceResult } from "@/components/documents/document-issuance-result";
+import { RequisitionReceiptCard } from "./requisition-receipt";
 import { DocumentMilestones } from "@/components/documents/document-milestones";
 import { DocumentNextStep } from "@/components/documents/document-next-step";
 import { requisitionMilestones } from "@/lib/documents/milestones";
@@ -94,6 +97,7 @@ type Progress = {
   }[];
 };
 type Detail = {
+  receipt?: RequisitionReceipt;
   id: string;
   care_recipient_id: string;
   code: string | null;
@@ -216,14 +220,14 @@ export function RequisitionDocumentContent({
     queueMicrotask(() => {
       if (!controller.signal.aborted) setReading(true);
     });
-    void api<{ data: Detail; }>(
+    void api<{ data: Detail; receipt?: RequisitionReceipt }>(
       `/api/requisitions/${id}`,
       undefined,
       controller.signal,
     )
       .then((result) => {
         if (!controller.signal.aborted) {
-          acceptRead(result.data, id + ":" + attempt);
+          acceptRead({ ...result.data, receipt: result.receipt }, id + ":" + attempt);
           setReadFailed(false);
           setError("");
         }
@@ -291,6 +295,10 @@ export function RequisitionDocumentContent({
   });
   return (
     <div className="hca-record-detail doc-page">
+      {context.patient?.id === data.care_recipient_id ? (
+        <DocumentIssuanceResult id={id} userId={context.userId} patientId={data.care_recipient_id} patientName={context.patient.display_name}
+          code={data.code ?? data.protocol} kind="REQ" />
+      ) : null}
       <DocumentBreadcrumb code={data.code ?? data.protocol} />
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
@@ -723,6 +731,7 @@ export function RequisitionDocumentContent({
         </DocumentPanel>
         <DocumentPanel value="communications"><DocumentCommunications id={id} version={p.version} /></DocumentPanel>
         <DocumentPanel value="files">
+          {data.receipt ? <RequisitionReceiptCard receipt={data.receipt} /> : null}
           <DocumentActions
             generationBlocked={stale}
             readOnly={Boolean(p.archivedAt)}

@@ -8,6 +8,8 @@ import {
 import { SearchSelect } from "@/components/ui/search-select";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import { useOperationActivity } from "@/components/ui/operation-activity";
+import { issuanceSteps } from "./document-issuance-result";
+import { useIssuanceNavigation } from "./document-issuance-navigation";
 import { Icon, StepNavigator } from "@/components/ui/primitives";
 import { Dialog } from "@/components/ui/overlays";
 import Link from "next/link";
@@ -191,11 +193,14 @@ function TransferDeclarationEditor({
     reasonFieldRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef(false);
   const patientId = context.patient!.id;
+  const { navigating, openIssued } = useIssuanceNavigation(context.userId, patientId);
   const processName = materialTransferLabel(source, source === "FAMILY" ? "CARE_TEAM" : "FAMILY").toLocaleLowerCase("pt-BR");
   const isReturn = source === "CARE_TEAM";
-  useOperationActivity(busy && !!packet, {
+  useOperationActivity((busy && Boolean(packet)) || navigating, {
     title: isReturn ? "Expedindo devolução" : "Expedindo entrega",
-    detail: "Conferindo o saldo da origem e registrando os materiais em trânsito.",
+    stage: navigating ? 1 : 0,
+    steps: issuanceSteps,
+    detail: navigating ? "A expedição foi registrada. Estamos abrindo a ficha." : "Conferindo o saldo da origem e registrando os materiais em trânsito.",
   });
   const restoredRef = useRef(false);
   const returnFocusRef = useRef(false);
@@ -482,13 +487,13 @@ function TransferDeclarationEditor({
     setError("");
     try {
       const response = await api<unknown>("/api/transfers", pendingRef.current);
-      setResult(
-        requireTransferDeclarationConfirmation(response, {
-          patientId,
-          userId: context.userId,
-          declaration: pendingRef.current.declaration,
-        }),
-      );
+      const issued = requireTransferDeclarationConfirmation(response, {
+        patientId,
+        userId: context.userId,
+        declaration: pendingRef.current.declaration,
+      });
+      openIssued(issued.id);
+      setResult(issued);
       pendingRef.current = null;
       setPacket(null);
       setUncertain(false);

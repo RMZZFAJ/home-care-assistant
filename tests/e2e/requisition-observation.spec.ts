@@ -161,7 +161,7 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   await stockReview.getByRole("button", { name: "Usar referência atual" }).click();
   await issueButton.click();
   await expect(
-    page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
+    page.getByRole("dialog", { name: "Requisição emitida", exact: true }),
   ).toBeVisible();
   expect(
     sql(

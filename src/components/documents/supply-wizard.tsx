@@ -1,5 +1,8 @@
 "use client";
 import { ComplementOriginHint } from "@/components/documents/complement-origin-hint";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { issuanceSteps } from "./document-issuance-result";
+import { useIssuanceNavigation } from "./document-issuance-navigation";
 import { DocumentActions } from "./document-actions";
 import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
 
@@ -166,6 +169,12 @@ export function PatientSupplyWizard({
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [issuing, setIssuing] = useState(false);
+  const { navigating, openIssued } = useIssuanceNavigation(context.userId, context.patient!.id);
+  useOperationActivity((busy && issuing) || navigating, {
+    title: "Emissão da ficha", stage: navigating ? 1 : 0, steps: issuanceSteps,
+    detail: navigating ? "A ficha foi registrada. Estamos abrindo o acompanhamento." : "Estamos conferindo os materiais e registrando a ficha.",
+  });
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState<SupplyDocument | null>(null);
@@ -1058,6 +1067,10 @@ export function PatientSupplyWizard({
           : {}),
       };
     }
+    const recoveringSubmission = uncertain && editing !== null && frozenRef.current.expectedVersion !== undefined
+      && editing.version > frozenRef.current.expectedVersion;
+    const isIssuance = type !== "BAL" && !frozenRef.current.draft && (!editing?.protocol || recoveringSubmission);
+    setIssuing(isIssuance);
     setBusy(true);
     setError("");
     try {
@@ -1104,21 +1117,22 @@ export function PatientSupplyWizard({
               : {}),
           },
       );
-      setSaved(
-        requireSupplyConfirmation(result, {
-          patientId,
-          type,
-          id: editing?.id,
-          minimumVersion:
-            frozenRef.current.expectedVersion !== undefined
-              ? frozenRef.current.expectedVersion + 1
-              : editing
-                ? editing.version + 1
-                : 1,
-        }),
-      );
-      sessionStorage.removeItem(storageKey);
-      sessionStorage.removeItem(storageKey + ":start");
+      const confirmed = requireSupplyConfirmation(result, {
+        patientId,
+        type,
+        id: editing?.id,
+        minimumVersion: frozenRef.current.expectedVersion !== undefined
+          ? frozenRef.current.expectedVersion + 1
+          : editing
+            ? editing.version + 1
+            : 1,
+      });
+      if (isIssuance && confirmed.protocol && confirmed.status !== "draft") openIssued(confirmed.id);
+      setSaved(confirmed);
+      try {
+        sessionStorage.removeItem(storageKey);
+        sessionStorage.removeItem(storageKey + ":start");
+      } catch { /* The server has confirmed the document. */ }
       setUncertain(false);
     } catch (reason) {
       const known =
@@ -1157,6 +1171,7 @@ export function PatientSupplyWizard({
       );
     } finally {
       setBusy(false);
+      setIssuing(false);
     }
   }
   async function adoptBalanceReference() {
