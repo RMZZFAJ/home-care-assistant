@@ -1,5 +1,31 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — conciliação de ENT por material e suficiência.** O fluxo segue
+E06-08 e E06-18. Cada quantidade em trânsito tem destino e motivo próprios.
+A família autorizada pode registrar a suficiência ao esclarecer o último
+saldo do item. As outras linhas mantêm suas pendências. A equipe pode pedir
+nova avaliação com a quantidade já conferida. O motivo e a autoria
+aparecem na ficha, nos avisos internos e no documento emitido.
+
+| Verificação | Evidência local | Pendência |
+| --- | --- | --- |
+| Conciliação e decisão familiar | Auth real, resolução por material, negativa de papel e recuperação da mesma chave | CI do commit publicado |
+| Pedido da equipe e revisão | Quantidade conferida, motivo visível, revisão com histórico e estoque preservado | CI do commit publicado |
+| Exemplar assinado | PDF emitido com a avaliação, o destino do material e o motivo da conciliação | Conferência no preview compatível |
+
+Passaram 14 integrações dirigidas, 23 testes unitários e oito casos em
+Mobile e iOS emulados sem retry. A emissão assinada e a recuperação da
+avaliação após perda de resposta foram verificadas no navegador. O guard
+confirmou que as 84 migrations históricas permanecem intactas.
+
+A stack local chegou a 280 migrations após `20261119085036`,
+`20261119085400` e `20261119090742`. O remoto de desenvolvimento
+permanece com 272 até `20261119060719`. O preview publicado em `075b4b66`
+rejeita uma declaração pendente habilitada para expedição. As oito
+migrations locais pendentes estão na sequência desse contrato e devem ser
+aplicadas com a interface compatível da mesma branch. O ato final de P2
+permanece reservado para decisão do responsável.
+
 **19/11 — conferência pessoal de ENT e DEV.** A interface preenche as
 quantidades expedidas e apresenta as diferenças antes de confirmar. O banco
 registra expedido, declarado, reconhecido, saldo inicial em trânsito e

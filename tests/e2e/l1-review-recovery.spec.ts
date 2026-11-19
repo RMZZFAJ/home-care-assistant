@@ -174,7 +174,7 @@ test("L1 avaliação restaurada rejeitada libera nova escolha; resposta perdida 
  const dialog=page.getByRole("dialog");await dialog.getByRole("button",{name:"Verificar mesma avaliação",exact:true}).click();
  await expect(dialog).toContainText("referência do recebimento mudou");
  expect(await page.evaluate(key=>sessionStorage.getItem(key),key)).toBeNull();
- await dialog.getByRole("combobox").selectOption("complete");
+ await dialog.getByRole("button",{name:"Integralmente",exact:true}).click();
  await page.route(`**/api/documents/${ent.id}/fulfillment-review`,async route=>{
   const response=await route.fetch();expect(response.ok()).toBe(true);await route.abort("failed");
  });

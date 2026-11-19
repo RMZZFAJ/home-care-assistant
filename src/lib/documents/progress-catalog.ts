@@ -8,11 +8,11 @@ export const progressRelevance = {
 export type ProgressRelevance = keyof typeof progressRelevance;
 const milestones = new Set([
   "req.issued", "req.science_satisfied", "req.completed", "com.issued", "com.validate_receipt",
-  "ent.issued", "ent.receive", "ent.resolve", "ent.transfer.agreed", "bal.issued", "bal.approve", "bal.apply",
+  "ent.issued", "ent.receive", "ent.resolve", "ent.fulfillment_reviewed", "ent.transfer.agreed", "bal.issued", "bal.approve", "bal.apply",
 ]);
 const attention = new Set([
   "req.reopened", "com.reject_receipt", "com.cancel", "ent.cancel", "ent.consent_cancel",
-  "ent.refuse_cancellation", "ent.propose_regularization", "ent.transfer.declined", "bal.cancel", "bal.recount",
+  "ent.refuse_cancellation", "ent.propose_regularization", "ent.transfer.declined", "ent.request_fulfillment_review", "bal.cancel", "bal.recount",
 ]);
 /** Origin and relevance are independent; a manual milestone remains a manual record. */
 export function progressEventPresentation(row: {

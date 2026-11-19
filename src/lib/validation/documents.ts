@@ -8,7 +8,7 @@ import { draftCommitSchema } from "./creation-drafts";
 import { supplySourceLinks } from "./supply-sources";
 import { purchaseCommandBody } from "./purchase-command";
 import { purchaseArrivalBody } from "./purchase-arrival";
-import { countedDeliveryReceiptBody } from "./delivery-receipt";
+import { countedDeliveryReceiptBody, deliveryResolutionBody, requestDeliveryNeedBody } from "./delivery-receipt";
 
 const identifier = z.string().uuid();
 const line = z
@@ -187,6 +187,7 @@ export const supplyCommandSchema = z
       "close_expectation",
       "reassign",
       "resolve",
+      "request_fulfillment_review",
       "cancel",
       "consent_cancel",
       "refuse_cancellation",
@@ -287,14 +288,8 @@ export const supplyCommandSchema = z
         .object({ reason, confirmed: z.literal(true) })
         .strict(),
       reassign: z.object({ recipientId: identifier, reason }).strict(),
-      resolve: z
-        .object({
-          lineId: identifier,
-          quantity: exactQuantity,
-          resolution: z.enum(["received", "missing", "returned"]),
-          reason,
-        })
-        .strict(),
+      resolve: deliveryResolutionBody,
+      request_fulfillment_review: requestDeliveryNeedBody,
       cancel: z.object({ reason }).strict(),
       refuse_cancellation: z.object({ reason, requestId: identifier }).strict(),
       withdraw_cancellation: z

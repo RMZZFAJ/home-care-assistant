@@ -8,7 +8,7 @@ const event = z.object({
 export const pdfFidelitySchema = z.object({
   schemaVersion: z.literal(1),
   deliveryResolutions: z.array(event.extend({
-    lineId: z.uuid().nullable(), resolution: z.enum(["received", "missing", "returned"]).nullable(),
+    lineId: z.uuid().nullable(), resolution: z.enum(["received", "missing", "returned", "not_sent"]).nullable(),
     quantity: z.string().nullable(), reason: z.string().nullable(),
   }).strict()),
   purchaseReceiptEvents: z.array(event.extend({

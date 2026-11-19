@@ -1231,6 +1231,23 @@ expedição e só aparece como tarefa quando há saldo a esclarecer ou um regist
 qualitativo do contrato anterior. `divergences` continua disponível para os
 fluxos existentes, incluindo avaria e erro de identificação.
 
+Em ENT de origem familiar e destino equipe, cada linha vinculada a uma REQ
+aceita `reviewReason` no recebimento quando a quantidade confere. O recebedor
+designado também pode pedir reavaliação depois por `request_fulfillment_review`
+com `lineId` e `reason`. O banco preserva a quantidade, registra motivo,
+autoria e instante do pedido e avisa internamente a família habilitada.
+
+A conciliação quantitativa via `resolve` aceita um `lineId`, uma `quantity`,
+`resolution` e `reason`. Os destinos são recebimento complementar
+(`received`), permanência na origem (`not_sent`), retorno (`returned`) e
+perda (`missing`). Se a família autorizada encerrar o trânsito de um
+material que aguarda avaliação, pode incluir `familyAssessment` como
+`partial` ou `complete`. A operação preserva a declaração da expedição
+e registra a avaliação na mesma transação e na mesma versão de conciliação.
+Sem essa avaliação, a pendência de necessidade permanece aberta. As
+decisões posteriores registradas por `fulfillment-review` preservam todas
+as anteriores e exigem motivo ao alterar a suficiência.
+
 ## Preparação de residência e guias
 
 GET /api/residence-preparations é exclusivo do modo global autorizado. Lista

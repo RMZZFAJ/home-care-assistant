@@ -18,6 +18,15 @@ export function readCountedDeliveryReceipt(metadata: unknown) {
   return read.success ? read.data : null;
 }
 
+export function deliveryNeedRequest(metadata: unknown) {
+  const request = metadata && typeof metadata === "object" && "fulfillmentReviewRequest" in metadata ? metadata.fulfillmentReviewRequest : null;
+  if (!request || typeof request !== "object" || !("reason" in request) || typeof request.reason !== "string" ||
+    !("actorId" in request) || typeof request.actorId !== "string" ||
+    !("actorName" in request) || typeof request.actorName !== "string" ||
+    !("recordedAt" in request) || typeof request.recordedAt !== "string" || !Number.isFinite(Date.parse(request.recordedAt))) return null;
+  return { reason: request.reason, actorId: request.actorId, actorName: request.actorName, recordedAt: request.recordedAt };
+}
+
 export function compareDeliveryQuantity(expedited: string | number, received: string | number) {
   const planned = quantity(expedited);
   const declared = quantity(received);
@@ -40,11 +49,12 @@ export function verifyCountedDeliveryReceipt(
     !data.events.some(event => event.action === "ent.receive" && event.actorId === actorId && event.version === version + 1) ||
     lines.length !== data.lines.length
   ) throw new Error("A confirmação do recebimento pessoal ainda precisa ser conferida.");
-  const amounts = new Map(lines.map(line => [line.lineId, line.receivedQuantity]));
+  const amounts = new Map(lines.map(line => [line.lineId, line]));
   for (const line of data.lines) {
     const counted = readCountedDeliveryReceipt(line.metadata);
-    const received = amounts.get(line.id);
-    if (received === undefined || !counted) throw new Error("A confirmação não contém todos os materiais conferidos.");
+    const submitted = amounts.get(line.id);
+    if (!submitted || !counted) throw new Error("A confirmação não contém todos os materiais conferidos.");
+    const received = submitted.receivedQuantity;
     const actual = compareDeliveryQuantity(line.quantity, received);
     if (!quantity(counted.expeditedQuantity).eq(line.quantity) ||
       !quantity(counted.receivedQuantity).eq(received) ||
@@ -52,5 +62,10 @@ export function verifyCountedDeliveryReceipt(
       !actual.transit.eq(counted.remainingTransitQuantity) ||
       !actual.excess.eq(counted.excessQuantity)
     ) throw new Error("As quantidades do recebimento ainda precisam ser conferidas.");
+    if (submitted.reviewReason) {
+      const request = deliveryNeedRequest(line.metadata);
+      if (request?.reason !== submitted.reviewReason || request.actorId !== actorId)
+        throw new Error("O pedido de avaliação familiar ainda precisa ser conferido.");
+    }
   }
 }

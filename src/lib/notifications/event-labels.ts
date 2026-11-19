@@ -1,5 +1,7 @@
 const labels: Record<string, string> = {
-  "ent.fulfillment_reviewed": "Suficiência reavaliada pela família após diferença no recebimento",
+  "ent.fulfillment_reviewed": "Suficiência reavaliada pela família",
+  "ent.fulfillment_review_requested": "Avaliação familiar da necessidade pendente",
+  "ent.request_fulfillment_review": "Equipe pediu reavaliação da necessidade",
   "req.complement_added": "Ficha complementar vinculada ao registro original",
   "req.complement_linked": "Vínculo com a ficha de origem registrado",
   "com.complement_added": "Ficha complementar vinculada ao registro original",

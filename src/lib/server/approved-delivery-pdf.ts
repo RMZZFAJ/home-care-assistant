@@ -1,5 +1,5 @@
 import { approvedPdfMode, appendApprovedPdfExpansion } from "./approved-pdf-expansion";
-import { familyFulfillmentDescription, familyReviewDescription } from "@/lib/documents/family-fulfillment";
+import { deliveryNeedRequestDescription, deliveryResolutionLabels, familyFulfillmentDescription, familyReviewDescription } from "@/lib/documents/family-fulfillment";
 import { originalAuthorDetail, documentCutLabel } from "@/lib/documents/pdf-presentation";
 import { PDFHexString, PDFName } from "pdf-lib";
 import { ApprovedPdfLayout, type DocumentHeader, type DocumentTone } from "./approved-pdf-layout";
@@ -119,6 +119,11 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   for (const [index, line] of snapshot.lines.entries()) {
     const familyDecision = familyFulfillmentDescription(line);
     if (familyDecision) { layout.heading("Avaliação familiar · " + name(line)); layout.paragraph(familyDecision, "familyFulfillment/" + index, { size: 9.5 }); }
+    const teamRequest = deliveryNeedRequestDescription(line.metadata);
+    if (teamRequest) {
+      layout.heading("Pedido de reavaliação · " + name(line));
+      layout.paragraph(teamRequest, "familyRequest/" + index, { size: 9.5 });
+    }
     if (readCountedDeliveryReceipt(line.metadata)) continue;
     const receipt = (line.metadata as { receipt?: { problem?: string; notes?: string; acceptedQuantity?: string | number; }; } | undefined)?.receipt;
     if (!receipt) continue;
@@ -137,7 +142,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   for (const [index, event] of fidelity.deliveryResolutions.entries()) {
     const line = snapshot.lines.find(value => value.id === event.lineId), prefix = "resolution/" + index;
     layout.heading("Resolução de divergência · " + (line ? name(line) : "Material não identificado"));
-    layout.paragraph(event.resolution ? { received: "Recebimento complementar", returned: "Devolução à origem", missing: "Falta ou perda conciliada" }[event.resolution] : "Resolução não preservada", prefix + "/outcome", { strong: true });
+    layout.paragraph(event.resolution ? deliveryResolutionLabels[event.resolution] : "Resolução não preservada", prefix + "/outcome", { strong: true });
     layout.paragraph((event.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(event.recordedAt), prefix + "/actor", { size: 9.5 }); layout.paragraph("Quantidade desta resolução: " + amount(event.quantity, line ? unit(line) : undefined), prefix + "/quantity"); layout.paragraph(event.reason || "Motivo não preservado", prefix + "/reason");
   }
   const cancellation = snapshot.deliveryCancellation;
