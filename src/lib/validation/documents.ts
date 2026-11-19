@@ -6,6 +6,7 @@ import { exactQuantity } from "./exact-quantity";
 export { exactQuantity } from "./exact-quantity";
 import { draftCommitSchema } from "./creation-drafts";
 import { supplySourceLinks } from "./supply-sources";
+import { purchaseCommandBody } from "./purchase-command";
 
 const identifier = z.string().uuid();
 const line = z
@@ -257,9 +258,7 @@ export const supplyCommandSchema = z
           })
           .strict(),
       ]),
-      purchase: z
-        .object({ lines: commandLines, notes: z.string().max(1000).optional() })
-        .strict(),
+      purchase: purchaseCommandBody,
       receive: z.union([
         z.object({ lines: commandLines }).strict(),
         z

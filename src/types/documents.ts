@@ -198,6 +198,13 @@ export type PurchaseProgressLine = {
   waivableQuantity: string | number;
   remainingExpectation: string | number;
 };
+export type PurchaseSchedule = {
+  eventId: string;
+  lineId: string;
+  quantity: string | number;
+  expectedDate: string;
+  recordedAt: string;
+};
 export type PurchaseProgress = {
   state: string;
   expectationClosed: boolean;
@@ -382,6 +389,8 @@ export type SupplyDocument = {
   events: DocumentEvent[];
   receipts: PurchaseReceipt[];
   purchaseProgress?: PurchaseProgress;
+  purchaseSchedule?: PurchaseSchedule[];
+  purchaseArrivalId?: string | null;
   purchaseEntryBalances?: import("@/lib/validation/purchase-entry-balances").PurchaseEntryBalances;
   balanceReview?: BalanceReviewContext;
   balanceRecount?: import("./balances").BalanceRecountContext;

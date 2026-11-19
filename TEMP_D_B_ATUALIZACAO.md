@@ -10,6 +10,14 @@ pelos controles reais. As 12 verificações dirigidas passaram de
 primeira nas três configurações de navegador. O commit publicado
 contém somente os quatro testes. As mudanças de L2 seguem locais.
 
+A CI 44448551950 concluiu com 760 integrações aprovadas e uma falha
+persistente no Mobile-2. O teste de agenda tentou focar o botão durante
+uma transição da referência. No iOS-2, o teste de permissão negada do
+Web Push passou na segunda tentativa. O commit `c6f8c73c` aguarda prontidão
+e foco na agenda e confirma o service worker ativo antes de acionar a
+permissão. Os dois casos passaram localmente em Android e iOS emulados,
+na primeira tentativa. Somente esses dois testes foram publicados.
+
 A implementação de L2 segue o comando mestre v7 e o HTML aprovado
 `hca-laboratorio-02-v7.html`. O SHA-256 conferiu com o comando. O
 navegador renderizou as 175 variantes e permitiu inspecionar os
@@ -73,6 +81,26 @@ móvel com E05-01 e E06-01 cobriu os filtros, o vínculo por material,
 o vínculo sem importação e a retomada do rascunho. Capturas e logs
 `l2-supply-*final.log`, `l2-supply-origin-picker-*` e
 `l2-ent-from-com-*` estão em `output/playwright/`.
+
+O registro de compra da COM passou a aceitar materiais em mãos e materiais
+aguardando a loja na mesma confirmação. Cada material tem sua própria
+quantidade, situação e opções. As previsões ficam no histórico da compra.
+Uma parcela de chegada é criada somente com os materiais em mãos. Ela
+aguarda aprovação quando informada pela família e recebe crédito imediato
+quando confirmada por administrador habilitado.
+
+A migration `20261119034942_l2_com_mixed_purchase_arrival.sql` foi verificada
+na stack local. Oito integrações com Auth real cobriram as permissões, uma
+única chegada e entrada mesmo com repetição, reversão integral quando o
+segundo ato é recusado e expedição de ENT enquanto a COM permanece aberta.
+O percurso E05-08 inclui a retomada após resposta perdida e a consulta
+da previsão após recarregar. Android e iOS emulados passaram no painel de
+compra, nos detalhes do material, no resultado e na jornada de doação com
+saldo inicial da REQ. Duas verificações do PDF de entrada também passaram.
+As capturas estão em `output/playwright/l2-com-purchase/` e a última execução
+em `output/playwright/l2-com-purchase-directed.log`. A chegada informada
+em separado ainda precisa
+incorporar as faltas, os excedentes, a correção e a aprovação em lote da v7.
 
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma

@@ -54,7 +54,9 @@ export function purchaseFollowUp(input: {
   };
   if (progress.expectationPending) return {
     ...base, pending: true, heading: donation ? "Registrar os materiais da doação" : "Registrar a aquisição dos materiais",
-    description: "Ainda há expectativa de aquisição autorizada. Registre somente as quantidades efetivamente adquiridas; esse ato não confirma chegada nem entrada no estoque.",
+    description: donation
+      ? "Ainda há expectativa de aquisição autorizada. Registre as quantidades da doação e depois informe a chegada."
+      : "Ainda há quantidades autorizadas para comprar. No registro, marque o que já está em mãos e informe a previsão para o que ainda vai chegar.",
   };
   if (progress.expectationClosed) return {
     ...base, pending: false, heading: "Consultar a aquisição restante encerrada",

@@ -207,6 +207,10 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await login(page, "professional");
   const req = await issueReq(page, patient, product.name);
   expect(req.code).toBe("REQ-0001");
+  const teamAfterRequisition = (
+    await (await get(page, "/api/stock/balances?careRecipientId=" + patient)).json()
+  ).overview[0].team.confirmed;
+  expect(Number(teamAfterRequisition)).toBe(2);
   await logout(page);
   await login(page, "family");
   const purchase = await issueSupply(
@@ -292,7 +296,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
-  expect(Number(stock.overview[0].team.confirmed)).toBe(6);
+  expect(Number(stock.overview[0].team.confirmed)).toBe(Number(teamAfterRequisition) + 6);
   expect(Number(stock.overview[0].team.incoming)).toBe(4);
   expect(stock.overview[0].family).toBeNull();
   await page.goto(

@@ -1,8 +1,9 @@
 "use client";
-import { useImperativeHandle, useRef, useState, type RefObject } from "react";
+import { useId, useImperativeHandle, useRef, useState, type ReactNode, type RefObject } from "react";
 import type { SupplyDocument } from "@/types/documents";
 import { Notice, buttonClass } from "@/components/workspace";
 import { Dialog } from "@/components/ui/overlays";
+import { ActionButton } from "@/components/ui/controls";
 import {
   isComOperationPurpose,
   isEntOperationPurpose,
@@ -32,6 +33,9 @@ type OperationEditorProps = CommandEditorProps & {
   referenceAdoptionRef?: RefObject<OperationReferenceHandle | null>;
   onCompareCancellationReference?: () => void;
   recoveryOnly?: boolean;
+  purchaseFeedback?: string;
+  purchaseConflictContent?: ReactNode;
+  confirmationPending?: boolean;
 };
 export function CommandEditor(props: OperationEditorProps) {
   const purpose = props.action;
@@ -56,6 +60,8 @@ function OperationEditor(
   },
 ) {
   const com = props.kind === "COM";
+  const purchase = props.purpose === "purchase" && props.data.payload.origin !== "donation";
+  const purchaseFormId = useId();
   const consent = props.kind === "ENT" && props.purpose === "consent_cancel";
   const personalReceipt =
     props.kind === "ENT" &&
@@ -189,9 +195,9 @@ function OperationEditor(
     if (stale || props.reviewDisabled || props.recoveryOnly) return;
     setError(""); props.onReview(action, structuredClone(body), summary, undefined, baseline.documentVersion);
   }
-  return (
+  const content = (
     <section
-      className="mt-4 space-y-4"
+      className={purchase ? "space-y-4" : "mt-4 space-y-4"}
       tabIndex={-1}
       data-operation-editor
       aria-label={
@@ -201,8 +207,10 @@ function OperationEditor(
       }
     >
 
-      <p>Confira os dados antes de confirmar. Ao sair, os campos desta ação serão descartados.</p>
+      {!purchase ? <p>Confira os dados antes de confirmar. Ao sair, os campos desta ação serão descartados.</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
+      {purchase && props.purchaseFeedback ? <Notice error>{props.purchaseFeedback}</Notice> : null}
+      {purchase ? props.purchaseConflictContent : null}
       {consent && !stale && props.onCompareCancellationReference ? (
         <button
           type="button"
@@ -389,6 +397,7 @@ function OperationEditor(
           <CommandEditorFields
             key={formRevision}
             {...props}
+            formId={purchase ? purchaseFormId : undefined}
             initialDraft={initial}
             snapshotRef={captureRef}
             onDraftChange={value => { initialCaptureRef.current ??= JSON.stringify(value.fields); setCurrent(value); }}
@@ -406,4 +415,13 @@ function OperationEditor(
       </Dialog>
     </section>
   );
+  if (!purchase) return content;
+  return <Dialog open title="Registrar compra" subtitle="Marque os materiais que já estão com você."
+    kicker={props.context.patient?.display_name ? "COM · " + props.context.patient.display_name.toLocaleUpperCase("pt-BR") : "COM"}
+    onClose={requestClose} closeDisabled={props.confirmationPending}
+    footer={<>
+      <ActionButton onClick={requestClose} disabled={props.confirmationPending}>Voltar</ActionButton>
+      <ActionButton type="submit" variant="primary" form={purchaseFormId}
+        disabled={props.reviewDisabled || stale || props.recoveryOnly}>Confirmar compra</ActionButton>
+    </>}>{content}</Dialog>;
 }

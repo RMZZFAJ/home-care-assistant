@@ -128,6 +128,17 @@ recalcula autoridade/quantidades aprovadas. Crédito exige sessão/contexto/
 capacidade vigentes e conserva autoria da decisão. Clientes não editam as
 quantidades declaradas ao validar/rejeitar uma parcela.
 
+Em compras mistas da COM, o mesmo comando registra a aquisição e uma parcela
+com os materiais marcados como em mãos. O ID do evento de compra identifica
+a chegada. As duas versões e os efeitos pertinentes confirmam juntos sob o
+lock do estoque do paciente. A identificação da parcela é devolvida no
+resultado e a mesma tentativa recupera os registros sem nova movimentação.
+O familiar habilitado abre uma parcela pendente. O administrador precisa da
+capacidade de validar para creditar no próprio ato. As previsões informadas
+pela loja ficam nas linhas do evento de aquisição e são consultáveis na COM.
+Somente a chegada validada disponibiliza quantidade para uma ENT, mesmo
+quando outra linha aguarda a loja.
+
 bal_approvals identifica grupo, ator e versão de contagem. Reconto conserva
 aprovações antigas e captura nova referência; elas não aprovam o novo balanço.
 

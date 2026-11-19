@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { purchaseCommandBody } from "./purchase-command";
 
 export const documentDecisionIntention = z.object({
   domain: z.enum(["requisition", "supply", "transfer", "balance", "balance_workspace"]),
@@ -7,7 +8,11 @@ export const documentDecisionIntention = z.object({
   expectedVersion: z.number().int().nonnegative().max(2147483647),
   referenceHash: z.string().regex(/^[a-f0-9]{64}$/).optional(),
 }).strict().refine(value => !["requisition", "balance", "balance_workspace"].includes(value.domain) || Boolean(value.referenceHash), "Confira a referência da ficha.")
-  .refine(value => value.domain === "balance_workspace" || value.expectedVersion > 0, "Confira a versão da ficha.");
+  .refine(value => value.domain === "balance_workspace" || value.expectedVersion > 0, "Confira a versão da ficha.")
+  .refine(value => value.domain !== "supply" || value.action !== "purchase" || purchaseCommandBody.safeParse(value.body).success, {
+    path: ["body"],
+    message: "Confira as quantidades e as previsões da compra.",
+  });
 export type DocumentDecisionIntention = z.infer<typeof documentDecisionIntention>;
 const receiptBase = { documentId: z.uuid(), key: z.uuid(), recordedAt: z.iso.datetime({ offset: true }) };
 export const documentDecisionReceipt = z.discriminatedUnion("state", [

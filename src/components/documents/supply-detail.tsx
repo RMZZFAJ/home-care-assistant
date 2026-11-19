@@ -53,6 +53,8 @@ import { quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
+import { purchaseCommandBody } from "@/lib/validation/purchase-command";
+import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document-header";
 import { FamilyFulfillmentReview } from "./family-fulfillment-review";
 import { DocumentFreshness } from "./document-freshness";
@@ -76,9 +78,12 @@ import {
   PurchaseDetails,
   PurchaseExpectationComparison,
 } from "./purchase-details";
+import { confirmedPurchase, PurchaseResult, type ConfirmedPurchase } from "./purchase-register";
 import {
   acquisitionRemaining,
   arrivalRemaining,
+  purchaseActivitySteps,
+  requirePurchaseArrival,
 } from "@/lib/documents/purchase";
 import {
   DeliveryCancellationDetails,
@@ -90,6 +95,13 @@ const secondaryDocumentActions = new Set<DocumentAction>([
   "close_expectation",
   "reassign",
 ]);
+type SupplyReview = {
+  action: string;
+  body: unknown;
+  summary: string;
+  expectedVersion: number;
+  draftCommit?: { id: string; revision: number; };
+};
 
 const supplyCopyIdentity = (value: SupplyDocument) => JSON.stringify([value.version, value.status, value.workflow_data, value.lines, value.receipts, value.deliveryCancellation?.referenceHash, value.balanceReview?.referenceHash]);
 export function SupplyDocumentContent({
@@ -114,21 +126,20 @@ export function SupplyDocumentContent({
   const refreshDisabled = busy || (loading && coveredRead);
   const readScopeRef = useRef("");
   const restoreRefreshFocusRef = useRef(false);
-  useOperationActivity(loading && coveredRead || busy, { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
   const [readDenied, setReadDenied] = useState(false);
   const [readFailed, setReadFailed] = useState(false);
   const [message, setMessage] = useState("");
+  const [purchaseResult, setPurchaseResult] = useState<ConfirmedPurchase | null>(null);
+  const [purchaseUpdating, setPurchaseUpdating] = useState(false);
+  const purchaseReadAttemptRef = useRef<number | null>(null);
+  useOperationActivity(purchaseUpdating, { title: "Registrando compra", stage: 2, steps: purchaseActivitySteps });
   const [readNotice, setReadNotice] = useState("");
   const [action, setAction] = useState<DocumentAction | null>(null);
-  const [review, setReview] = useState<{
-    action: string;
-    body: unknown;
-    summary: string;
-    expectedVersion: number;
-    draftCommit?: { id: string; revision: number; };
-  } | null>(null);
+  const registeringPurchase = action === "purchase" && data?.payload.origin !== "donation";
+  useOperationActivity(loading && coveredRead || (busy && !registeringPurchase), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
+  const [review, setReview] = useState<SupplyReview | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [closeUncertain, setCloseUncertain] = useState(false);
   const decision = useDocumentDecision({ userId: context.userId, documentId: id, domain: "supply", action: review?.action ?? action ?? "none" });
@@ -261,28 +272,40 @@ export function SupplyDocumentContent({
         }
       })
       .finally(() => {
-        if (!controller.signal.aborted) { setCoveredRead(false); setLoading(false); }
+        if (controller.signal.aborted) return;
+        setCoveredRead(false);
+        setLoading(false);
+        if (purchaseReadAttemptRef.current !== null && attempt >= purchaseReadAttemptRef.current) {
+          purchaseReadAttemptRef.current = null;
+          setPurchaseUpdating(false);
+        }
       });
     return () => controller.abort();
   }, [id, patientId, attempt, liveRevision, acceptRead, setData]);
-  async function execute() {
+  async function execute(nextReview = review) {
     if (!data) return;
-    if (!pendingRef.current && review)
+    if (!pendingRef.current && nextReview)
       pendingRef.current = {
-        action: review.action,
-        body: review.body,
-        expectedVersion: review.expectedVersion,
+        action: nextReview.action,
+        body: nextReview.body,
+        expectedVersion: nextReview.expectedVersion,
         idempotencyKey: crypto.randomUUID(),
-        ...(review.draftCommit ? { draftCommit: review.draftCommit } : {}),
+        ...(nextReview.draftCommit ? { draftCommit: nextReview.draftCommit } : {}),
       };
     if (!pendingRef.current) return;
     setBusy(true);
     setError("");
     let intention = pendingRef.current;
     try {
-      const verify = (row: Record<string, unknown>, accepted: { expectedVersion: number }) => { requireSupplyConfirmation({ data: row, persistence: "confirmed" }, {
-        patientId: data.care_recipient_id, type: data.type, id, minimumVersion: accepted.expectedVersion,
-      }); };
+      const verify = (row: Record<string, unknown>, accepted: DocumentDecisionIntention) => {
+        const read = requireSupplyConfirmation({ data: row, persistence: "confirmed" }, {
+          patientId: data.care_recipient_id, type: data.type, id, minimumVersion: accepted.expectedVersion,
+        });
+        if (accepted.action === "purchase") {
+          const { lines } = purchaseCommandBody.parse(accepted.body);
+          requirePurchaseArrival(read, lines);
+        }
+      };
       const outcome = uncertain ? await decision.checkPrevious(verify) : await decision.execute({
         domain: "supply", action: intention.action, body: intention.body as Record<string, unknown>, expectedVersion: intention.expectedVersion,
       }, verify);
@@ -307,14 +330,21 @@ export function SupplyDocumentContent({
       setDeliveryConflict(false);
       setComparison(null);
       setReadNotice("");
+      if (intention.action === "purchase" && result.data.payload.origin !== "donation") {
+        const { lines } = purchaseCommandBody.parse(intention.body);
+        setMessage("");
+        purchaseReadAttemptRef.current = attempt + 1;
+        setPurchaseUpdating(true);
+        setPurchaseResult(confirmedPurchase(result.data, lines, requirePurchaseArrival(result.data, lines)));
+        return;
+      }
       const receipt = result.data.receipts.find(
         (receipt) => receipt.submission_key === intention.idempotencyKey,
       );
       const purchaseMessages: Record<string, string> = {
         approve:
           "Decisão de aprovação registrada. Quantidades adquiridas e recebidas não mudaram.",
-        purchase:
-          "Aquisição registrada. Este ato não confirma chegada nem entrada no estoque.",
+        purchase: "Aquisição registrada. A chegada terá seu próprio registro.",
         receive:
           receipt?.state === "approved"
             ? "Chegada registrada e validada. As quantidades desta parcela foram incorporadas ao estoque familiar."
@@ -633,14 +663,79 @@ export function SupplyDocumentContent({
           tabs.select("workflow");
           setAction(item);
           setReview(null);
+          if (item === "purchase") setError("");
         }}
       >
         {data.type === "COM" && item === "receive"
           ? "Informar nova chegada"
-          : actionLabels[item]}
+          : item === "purchase" && data.payload.origin === "donation"
+            ? "Registrar aquisição"
+            : actionLabels[item]}
       </Action>
     );
   }
+  const purchaseConflictPanel = purchaseConflict && data?.type === "COM" ? (
+    <section className="ui-card space-y-3">
+      <Notice error>
+        A COM mudou desde o resumo que você revisou. Seus campos permanecem
+        preservados; consulte a versão atual antes de preparar outra
+        confirmação.
+      </Notice>
+      {comparison ? (
+        <>
+          <PurchaseExpectationComparison
+            original={data}
+            current={comparison}
+          />
+          <DraftReferenceComparison
+            id={data.id}
+            fromVersion={data.version}
+            toVersion={comparison.version}
+          >
+            {(ready) => (
+              <button
+                type="button"
+                className={primaryClass}
+                disabled={busy || !ready || !comparison.purchaseProgress}
+                onClick={() => {
+                  if (
+                    action === "close_expectation" &&
+                    !referenceAdoptionRef.current?.adoptClosingReference(
+                      comparison,
+                    )
+                  ) {
+                    setError(
+                      "Não foi possível atualizar a referência do preenchimento. Consulte as versões novamente.",
+                    );
+                    return;
+                  }
+                  decisionFocusRef.current = true;
+                  setData(comparison);
+                  setComparison(null);
+                  setPurchaseConflict(false);
+                  setReview(null);
+                  setMessage(
+                    "Versão atual carregada. Confira os valores preservados e prepare uma nova revisão. O encerramento exige nova concordância com o resumo.",
+                  );
+                }}
+              >
+                Usar versão atual e revisar novamente
+              </button>
+            )}
+          </DraftReferenceComparison>
+        </>
+      ) : (
+        <button
+          type="button"
+          className={buttonClass}
+          disabled={busy}
+          onClick={() => void comparePurchaseVersion()}
+        >
+          Consultar versão atual da COM
+        </button>
+      )}
+    </section>
+  ) : null;
   if (!data && loading) return null;
   return (
     <div className="hca-record-detail doc-page">
@@ -680,68 +775,7 @@ export function SupplyDocumentContent({
           transferEditing) ? (
         <Notice>{readNotice}</Notice>
       ) : null}
-      {purchaseConflict && data?.type === "COM" ? (
-        <section className="ui-card space-y-3">
-          <Notice error>
-            A COM mudou desde o resumo que você revisou. Seus campos permanecem
-            preservados; consulte a versão atual antes de preparar outra
-            confirmação.
-          </Notice>
-          {comparison ? (
-            <>
-              <PurchaseExpectationComparison
-                original={data}
-                current={comparison}
-              />
-              <DraftReferenceComparison
-                id={data.id}
-                fromVersion={data.version}
-                toVersion={comparison.version}
-              >
-                {(ready) => (
-                  <button
-                    type="button"
-                    className={primaryClass}
-                    disabled={busy || !ready || !comparison.purchaseProgress}
-                    onClick={() => {
-                      if (
-                        action === "close_expectation" &&
-                        !referenceAdoptionRef.current?.adoptClosingReference(
-                          comparison,
-                        )
-                      ) {
-                        setError(
-                          "Não foi possível atualizar a referência do preenchimento. Consulte as versões novamente.",
-                        );
-                        return;
-                      }
-                      decisionFocusRef.current = true;
-                      setData(comparison);
-                      setComparison(null);
-                      setPurchaseConflict(false);
-                      setReview(null);
-                      setMessage(
-                        "Versão atual carregada. Confira os valores preservados e prepare uma nova revisão. O encerramento exige nova concordância com o resumo.",
-                      );
-                    }}
-                  >
-                    Usar versão atual e revisar novamente
-                  </button>
-                )}
-              </DraftReferenceComparison>
-            </>
-          ) : (
-            <button
-              type="button"
-              className={buttonClass}
-              disabled={busy}
-              onClick={() => void comparePurchaseVersion()}
-            >
-              Consultar versão atual da COM
-            </button>
-          )}
-        </section>
-      ) : null}
+      {!registeringPurchase ? purchaseConflictPanel : null}
       {deliveryConflict && data?.type === "ENT" ? (
         <section className="ui-card space-y-3">
           <Notice error>
@@ -1202,6 +1236,9 @@ export function SupplyDocumentContent({
                         void comparePurchaseVersion();
                       }}
                       action={action}
+                      purchaseFeedback={error}
+                      purchaseConflictContent={purchaseConflictPanel}
+                      confirmationPending={busy || uncertain}
                       data={data}
                       people={people.filter(
                         (person) => person.id !== data.created_by,
@@ -1235,15 +1272,17 @@ export function SupplyDocumentContent({
                         summary,
                         draftCommit,
                         expectedVersion,
-                      ) =>
-                        setReview({
+                      ) => {
+                        const next = {
                           action: command,
                           body,
                           summary,
                           expectedVersion: expectedVersion ?? data.version,
                           ...(draftCommit ? { draftCommit } : {}),
-                        })
-                      }
+                        };
+                        setReview(next);
+                        if (registeringPurchase) void execute(next);
+                      }}
                     />
                   ) : null}
                   {!action ? (
@@ -1307,11 +1346,13 @@ export function SupplyDocumentContent({
         </>
       ) : null}
       <Dialog
-        open={Boolean(review) && !readDenied}
+        open={Boolean(review) && !readDenied && (!registeringPurchase || uncertain)}
         title={
           review?.action === "close_expectation"
             ? "Revisar encerramento da expectativa"
-            : "Revisar operação definitiva"
+            : registeringPurchase
+              ? "Conferir resultado da compra"
+              : "Revisar operação definitiva"
         }
         closeDisabled={busy}
         onClose={() => {
@@ -1360,6 +1401,11 @@ export function SupplyDocumentContent({
           </button>
         </div>
       </Dialog>
+      {purchaseResult?.documentId === id && !readDenied && !purchaseUpdating ? <PurchaseResult result={purchaseResult} onClose={() => {
+        setPurchaseResult(null);
+        resultFocusRef.current = true;
+        setFocusRevision(value => value + 1);
+      }} /> : null}
       <Dialog open={closeUncertain} title="Fechar sem resultado confirmado?" onClose={() => setCloseUncertain(false)}>
         <p>O resultado continua sem confirmação. Fechar descarta os campos desta tela. Procure a supervisão e confira o resultado antes de repetir a ação.</p>
         <div className="hca-toolbar"><ActionButton onClick={() => setCloseUncertain(false)}>Voltar à conferência</ActionButton><ActionButton onClick={() => { setCloseUncertain(false); setReview(null); setAction(null); pendingRef.current = null; setUncertain(false); }}>Fechar e procurar supervisão</ActionButton></div>
@@ -1370,7 +1416,7 @@ export function SupplyDocumentContent({
 export const actionLabels: Record<DocumentAction, string> = {
   submit: "Emitir rascunho",
   approve: "Aprovar itens",
-  purchase: "Registrar aquisição",
+  purchase: "Registrar compra",
   receive: "Confirmar recebimento",
   divergence: "Informar divergência",
   validate_receipt: "Validar recebimento",

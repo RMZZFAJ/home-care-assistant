@@ -32,6 +32,8 @@ import {
 } from "@/lib/forms/delivery-draft-reference";
 import { formatBrazilDate } from "@/lib/receipt";
 import { PurchaseReceiptContent } from "./purchase-details";
+import { PurchaseFormLine } from "./purchase-register";
+import { Icon } from "@/components/ui/icon";
 import { DeliveryConsumptionReferences } from "./delivery-cancellation";
 import { familyFulfillmentDescription } from "@/lib/documents/family-fulfillment";
 
@@ -67,6 +69,7 @@ export type CommandEditorProps = {
     expectedVersion?: number,
   ) => void;
   formRef?: Ref<HTMLFormElement>;
+  formId?: string;
   reviewDisabled?: boolean;
 };
 export function CommandEditorFields({
@@ -77,6 +80,7 @@ export function CommandEditorFields({
   onCancel,
   onReview,
   formRef,
+  formId,
   reviewDisabled = false,
   initialDraft,
   snapshotRef,
@@ -88,6 +92,9 @@ export function CommandEditorFields({
 }) {
   const [error, setError] = useState("");
   const instanceId = useId();
+  const registeringPurchase = action === "purchase" && data.payload.origin !== "donation";
+  const mayReceivePurchase = can(context, "com.receive");
+  const directPurchaseCredit = mayReceivePurchase && context.patient?.role === "admin" && can(context, "com.validate");
   const [reasonText, setReasonText] = useState(
     initialDraft?.fields.reason ?? "",
   );
@@ -280,7 +287,11 @@ export function CommandEditorFields({
                 "A quantidade supera o limite deste ato para " +
                 line.name_snapshot,
               );
-            return [{ lineId: line.id, quantity: quantity(value).toFixed() }];
+            const amount = { lineId: line.id, quantity: quantity(value).toFixed() };
+            if (!registeringPurchase) return [amount];
+            const inHand = form.has(line.id + ":inHand");
+            const expectedDate = String(form.get(line.id + ":expectedDate") ?? "");
+            return [{ ...amount, inHand, ...(!inHand && expectedDate ? { expectedDate } : {}) }];
           })
           .filter(
             (line) => action === "approve" || quantity(line.quantity).gt(0),
@@ -517,8 +528,9 @@ export function CommandEditorFields({
 
   return (
     <form
+      id={formId}
       ref={formElementRef}
-      className="mt-5 space-y-4 border-t border-(--line) pt-5"
+      className={registeringPurchase ? "hca-purchase-list" : "mt-5 space-y-4 border-t border-(--line) pt-5"}
       onSubmit={submit}
       onChange={() => setFieldRevision((value) => value + 1)}
     >
@@ -529,7 +541,14 @@ export function CommandEditorFields({
           “Informar divergência” quando houver diferença.
         </Notice>
       ) : null}
-      {["approve", "purchase"].includes(action) ||
+      {registeringPurchase ? <>
+        {directPurchaseCredit ? <p className="hca-purchase-administrator"><Icon name="shield" />Aprovação automática · administrador</p> : null}
+        {!mayReceivePurchase ? <Notice>O seu vínculo permite registrar a compra. A chegada será registrada por uma pessoa habilitada.</Notice> : null}
+        {lines.map(line => <PurchaseFormLine key={line.id} line={line} fields={initialDraft?.fields} status={data.status}
+          progress={data.purchaseProgress?.lines.find(progress => progress.lineId === line.id)}
+          fieldId={instanceId + line.id} mayReceive={mayReceivePurchase} directCredit={directPurchaseCredit} />)}
+      </> : null}
+      {action === "approve" || (action === "purchase" && !registeringPurchase) ||
         (action === "receive" && data.type === "COM")
         ? lines.map((line) => {
           const remaining =
@@ -569,7 +588,7 @@ export function CommandEditorFields({
                 {action === "receive"
                   ? "Informe somente o que chegou nesta parcela. Deixe vazio se não chegou."
                   : action === "purchase"
-                    ? "Informe somente o adquirido agora. Deixe vazio para as outras linhas."
+                    ? "Informe somente o adquirido nesta parcela."
                     : "Aprovar não registra aquisição ou entrada no estoque."}
               </p>
             </div>
@@ -967,7 +986,7 @@ export function CommandEditorFields({
         </label>
       ) : null}
       {error ? <Notice error>{error}</Notice> : null}
-      <div className="flex flex-wrap gap-3">
+      {!formId ? <div className="flex flex-wrap gap-3">
         <button className={buttonClass} type="button" onClick={onCancel}>
           Fechar ação
         </button>
@@ -978,7 +997,7 @@ export function CommandEditorFields({
         >
           Revisar operação
         </button>
-      </div>
+      </div> : null}
     </form>
   );
 }

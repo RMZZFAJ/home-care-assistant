@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/client/api";
 import { useOperationActivity } from "@/components/ui/operation-activity";
+import { purchaseActivitySteps } from "@/lib/documents/purchase";
 import { documentDecisionIntention, requireDocumentDecisionReceipt, type DocumentDecisionIntention, type DocumentDecisionReceipt } from "@/lib/validation/document-decisions";
 
 export class DocumentDecisionFailure extends Error {
@@ -42,11 +43,12 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
     return () => { active = false; };
   }, [storageKey, reconcileEndpoint, documentId, domain, action]);
   const cancellingRequisition = domain === "requisition" && action === "cancel";
+  const purchasing = domain === "supply" && action === "purchase";
   useOperationActivity(busy, {
-    title: cancellingRequisition ? "Registrando cancelamento" : "Concluindo a ação",
+    title: cancellingRequisition ? "Registrando cancelamento" : purchasing ? "Registrando compra" : "Concluindo a ação",
     detail: "Aguarde a conferência do resultado antes de tentar novamente.",
     stage,
-    steps: [
+    steps: purchasing ? purchaseActivitySteps : [
       { label: cancellingRequisition ? "Conferindo os efeitos no estoque" : "Enviando sua confirmação", icon: cancellingRequisition ? "stock" : "file" },
       { label: "Conferindo o resultado", icon: "check" },
     ],

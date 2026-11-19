@@ -51,7 +51,7 @@ test("COM and BAL references in a real progress note stay readonly, recover read
       const dialog = page.getByRole("dialog", { name: ref.code, exact: true });
       await expect(dialog).toContainText(name); await expect(dialog).toContainText("unidade");
       await expect(dialog.locator("input,select,textarea")).toHaveCount(0);
-      await expect(dialog.getByRole("button", { name: /Aprovar|Registrar aquisição|Registrar contagem|Revisar balanço|Confirmar/ })).toHaveCount(0);
+      await expect(dialog.getByRole("button", { name: /Aprovar|Registrar aquisição|Registrar compra|Registrar contagem|Revisar balanço|Confirmar/ })).toHaveCount(0);
       const endpoint = "**/api/documents/" + ref.id;
       await page.route(endpoint, route => route.fulfill({ status: 503, json: { error: "Consulta controlada da referência indisponível." } }), { times: 1 });
       const retry = dialog.getByRole("button", { name: "Atualizar consulta", exact: true }); await retry.click();

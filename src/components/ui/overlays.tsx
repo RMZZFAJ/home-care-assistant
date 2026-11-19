@@ -18,9 +18,10 @@ type OverlayProps = {
   id?: string;
   keyboardScrollable?: boolean;
   keepMounted?: boolean;
+  success?: boolean;
 };
 
-function Overlay({ open, title, kicker, subtitle, children, footer, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false, keepMounted = false }: OverlayProps & { side?: "start" | "end" }) {
+function Overlay({ open, title, kicker, subtitle, children, footer, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false, keepMounted = false, success = false }: OverlayProps & { side?: "start" | "end" }) {
   const titleId = useId();
   return <BaseDialog.Root open={open} disablePointerDismissal={closeDisabled} onOpenChange={(next, details) => {
     if (next) return;
@@ -30,9 +31,9 @@ function Overlay({ open, title, kicker, subtitle, children, footer, onClose, clo
       <div className="hca-overlay hca-l1" hidden={keepMounted && !open}>
         <BaseDialog.Backdrop className="hca-modal-backdrop" />
         <BaseDialog.Viewport className={side ? "hca-drawer-viewport" : "hca-modal-viewport"} data-side={side}>
-          <BaseDialog.Popup id={id} aria-labelledby={titleId} className={side ? "hca-modal hca-drawer" : "hca-modal"} finalFocus={finalFocus}>
+          <BaseDialog.Popup id={id} aria-labelledby={titleId} className={side ? "hca-modal hca-drawer" : success ? "hca-modal hca-modal-success" : "hca-modal"} finalFocus={finalFocus}>
             <header className={kicker || subtitle ? "hca-modal-head hca-modal-context-head" : "hca-modal-head"}>
-              {kicker || subtitle ? (
+              {success ? null : kicker || subtitle ? (
                 <div>
                   {kicker ? <p className="hca-modal-kicker">{kicker}</p> : null}
                   <BaseDialog.Title id={titleId}>{title}</BaseDialog.Title>
@@ -41,7 +42,14 @@ function Overlay({ open, title, kicker, subtitle, children, footer, onClose, clo
               ) : <BaseDialog.Title id={titleId}>{title}</BaseDialog.Title>}
               <button type="button" className="hca-control hca-control-icon" aria-label={closeLabel} disabled={closeDisabled} onClick={onClose}><Icon name="close" /></button>
             </header>
-            <div className={keyboardScrollable ? "hca-modal-content hca-scroll-content" : "hca-modal-content"} tabIndex={keyboardScrollable ? 0 : undefined} role={keyboardScrollable ? "region" : undefined} aria-label={keyboardScrollable ? `Conteúdo de ${title}` : undefined}>{children}</div>
+            <div className={keyboardScrollable ? "hca-modal-content hca-scroll-content" : "hca-modal-content"} tabIndex={keyboardScrollable ? 0 : undefined} role={keyboardScrollable ? "region" : undefined} aria-label={keyboardScrollable ? `Conteúdo de ${title}` : undefined}>
+              {success ? <div className="hca-modal-success-copy">
+                <span className="hca-modal-success-icon"><Icon name="check" width={30} height={30} /></span>
+                <BaseDialog.Title id={titleId}>{title}</BaseDialog.Title>
+                {subtitle ? <BaseDialog.Description>{subtitle}</BaseDialog.Description> : null}
+              </div> : null}
+              {children}
+            </div>
             {footer ? <footer className="hca-modal-footer">{footer}</footer> : null}
           </BaseDialog.Popup>
         </BaseDialog.Viewport>

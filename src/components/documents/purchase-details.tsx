@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { ActionButton, FormField, SelectField, TextInput } from "@/components/ui/controls";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
-import { receiptStates } from "@/lib/documents/purchase";
+import { formatPurchaseDate, receiptStates } from "@/lib/documents/purchase";
 import type { PurchaseReceipt, SupplyDocument } from "@/types/documents";
 import { purchaseReceiptRows, type ReceiptFilter } from "@/lib/documents/purchase-receipt-list";
 
@@ -28,6 +28,18 @@ export function PurchaseDetails({ data }: { data: SupplyDocument }) {
   function clear() { setFilter({ query: "", state: "" }); setSelectedPage(1); }
   return <section className="ui-card space-y-4" aria-label="Parcelas de chegada"><h2 className="font-semibold">Parcelas e expectativa da aquisição</h2>
     {progress?.closure ? <div className="rounded-xl border border-(--line) p-4 text-sm"><p className="font-semibold">Expectativa restante encerrada, sem entrada ou baixa de material.</p><p>{progress.closure.actorName ?? "Responsável identificado no evento"} · {formatBrazilDate(progress.closure.recordedAt)}</p><p className="whitespace-pre-wrap">{progress.closure.reason}</p>{progress.physicalPending ? <p className="mt-2">Parcelas que aguardam conferência ou aquisição ainda sem chegada válida continuam pendentes.</p> : <p className="mt-2">As quantidades efetivamente validadas estão preservadas; a parte dispensada não foi recebida.</p>}</div> : null}
+    {data.purchaseSchedule?.length ? <details className="hca-purchase-line">
+      <summary>Previsões informadas pela loja</summary>
+      <ol className="hca-purchase-list">
+        {data.purchaseSchedule.map(planned => {
+          const line = data.lines.find(item => item.id === planned.lineId);
+          return <li key={planned.eventId + planned.lineId}>
+            <strong>{line?.name_snapshot ?? "Material da compra"}</strong> · {formatQuantity(planned.quantity, line?.unit_snapshot)}
+            <p className="hca-purchase-limit">Previsão {formatPurchaseDate(planned.expectedDate)} · Registro {formatBrazilDate(planned.recordedAt)}</p>
+          </li>;
+        })}
+      </ol>
+    </details> : null}
     <p className="text-sm text-(--muted)">Cada chegada tem declaração e decisão próprias. Informar chegada não altera o estoque antes da validação; a validação administrativa imediata fica identificada na parcela.</p>
     {!data.receipts.length ? <p>Nenhuma parcela de chegada informada.</p> : <>
       <div className="grid gap-3 sm:grid-cols-2">
