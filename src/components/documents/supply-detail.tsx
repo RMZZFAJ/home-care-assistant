@@ -1015,18 +1015,22 @@ export function SupplyDocumentContent({
             onSelect={tabs.select}
             auditAllowed={can(context, "audit.read")}
           >
-            <DocumentPanel value="overview"><div className="doc-overview-grid"><div className="doc-main-column">
+            <DocumentPanel value="progress">
               <DocumentProgress
                 actionTarget={progressActionTarget}
-                onAction={() => tabs.select("overview")}
+                onAction={() => tabs.select("progress")}
                 id={id}
                 type={data.type}
                 patientId={data.care_recipient_id}
                 context={context}
               />
-</div><aside className="doc-side-column"><DocumentSection title="Observações da emissão" icon="file">{data.payload.notes ? <ol className="doc-original-notes"><li>{data.payload.notes}</li></ol> : <p className="doc-subtle">Sem observações.</p>}<div className="doc-author-line"><span className="doc-avatar" aria-hidden="true">{documentIssuerName(data.canonical_snapshot).split(" ").slice(0,2).map(part => part[0]).join("")}</span><span><strong>{documentIssuerName(data.canonical_snapshot)}</strong><small>{formatBrazilDate(data.created_at)}</small></span></div></DocumentSection>
+            </DocumentPanel>
+            <DocumentPanel value="overview">
+              <div className="doc-main-column">
+                <DocumentSection title="Observações da emissão" icon="file">{data.payload.notes ? <ol className="doc-original-notes"><li>{data.payload.notes}</li></ol> : <p className="doc-subtle">Sem observações.</p>}<div className="doc-author-line"><span className="doc-avatar" aria-hidden="true">{documentIssuerName(data.canonical_snapshot).split(" ").slice(0,2).map(part => part[0]).join("")}</span><span><strong>{documentIssuerName(data.canonical_snapshot)}</strong><small>{formatBrazilDate(data.created_at)}</small></span></div></DocumentSection>
               {data.protocol ? <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={data.version} userId={context.userId} activeContext={Boolean(activeContext)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
-</aside></div></DocumentPanel>
+              </div>
+            </DocumentPanel>
             <DocumentPanel value="materials">
               {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} onReviewed={() => setAttempt(value => value + 1)} /> : null}
               <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>

@@ -3,7 +3,7 @@ import { useOperationActivity } from "@/components/ui/operation-activity";
 import { FeedbackBanner } from '@/components/ui/feedback';
 import { ActionButton, FormField, LoadingIndicator, PasswordInput, TextInput } from "@/components/ui/controls";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useClientReady } from "@/lib/use-client-ready";
@@ -11,7 +11,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { safeReturnPath } from "@/lib/safe-return-path";
 import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { AccessFrame } from "./access-frame";
-import { completeEntry } from "@/lib/auth/complete-entry";
+import { completeEntry, entrySteps } from "@/lib/auth/complete-entry";
 
 export function LoginForm() {
   const router = useRouter();
@@ -21,21 +21,27 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [navigating, navigateToWorkspace] = useTransition();
+  const [stage, setStage] = useState<number | null>(null);
+  const loading = submitting || navigating;
   const [notice, setNotice] = useState("");
   const feedbackRef = useRef<HTMLDivElement>(null);
   useEffect(() => { if (error || notice) { feedbackRef.current?.focus({ preventScroll: true }); feedbackRef.current?.scrollIntoView({ block: "nearest" }); } }, [error, notice]);
-  useOperationActivity(loading || !ready, { title: !ready ? "Preparando seu acesso" : recovery ? "Solicitando a recuperação" : "Confirmando seu acesso", detail: "Aguarde enquanto conferimos a solicitação." });
+  useOperationActivity(loading || !ready, stage !== null && !recovery
+    ? { title: "Confirmando seu acesso", stage, steps: entrySteps, detail: "Aguarde a confirmação da operação." }
+    : { title: !ready ? "Preparando seu acesso" : recovery ? "Solicitando a recuperação" : "Confirmando seu acesso", detail: "Aguarde enquanto conferimos a solicitação." });
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setLoading(true);
+    setStage(0);
+    setSubmitting(true);
     setError("");
     setNotice("");
     const supabase = createSupabaseBrowserClient();
     if (!supabase) {
       setError("O serviço de acesso está indisponível. Tente novamente em instantes.");
-      setLoading(false);
+      setSubmitting(false);
       return;
     }
 
@@ -53,32 +59,34 @@ export function LoginForm() {
               ? "Muitas tentativas de acesso. Aguarde e tente novamente."
               : "E-mail ou senha inválidos.",
         );
-        setLoading(false);
+        setSubmitting(false);
         return;
       }
+      setStage(1);
       const { data: assurance } =
         await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
       if (
         assurance?.nextLevel === "aal2" &&
         assurance.currentLevel !== "aal2"
       ) {
-        router.replace(
-          "/perfil?mfa=required&next=" +
-          encodeURIComponent(
+        navigateToWorkspace(() => {
+          router.replace("/perfil?mfa=required&next=" + encodeURIComponent(
             safeReturnPath(searchParams.get("next"), window.location.origin),
-          ),
-        );
-        router.refresh();
+          ));
+          router.refresh();
+        });
         return;
       }
-      router.replace(
-        await completeEntry(searchParams.get("next"), signedIn.user!.id),
-      );
-      router.refresh();
+      setStage(2);
+      const destination = await completeEntry(searchParams.get("next"), signedIn.user!.id);
+      navigateToWorkspace(() => {
+        router.replace(destination);
+        router.refresh();
+      });
     } catch {
       setError("Não foi possível conectar. Tente novamente.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
@@ -94,7 +102,7 @@ export function LoginForm() {
       setError("O serviço de acesso está indisponível. Tente novamente em instantes.");
       return;
     }
-    setLoading(true);
+    setSubmitting(true);
     try {
       const { error: recoveryError } =
         await supabase.auth.resetPasswordForEmail(email, {
@@ -112,17 +120,18 @@ export function LoginForm() {
     } catch {
       setError("Não foi possível conectar. Tente novamente.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
   async function signInWithGoogle() {
-    setLoading(true);
+    setStage(null);
+    setSubmitting(true);
     setError("");
     const supabase = createSupabaseBrowserClient();
     if (!supabase) {
       setError("O serviço de acesso está indisponível. Tente novamente em instantes.");
-      setLoading(false);
+      setSubmitting(false);
       return;
     }
     try {
@@ -136,12 +145,12 @@ export function LoginForm() {
         setError(
           "Não foi possível iniciar o login com Google. Verifique se o provedor está habilitado.",
         );
-        setLoading(false);
+        setSubmitting(false);
       }
     } catch {
       setError("Não foi possível conectar ao provedor. Tente novamente.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 

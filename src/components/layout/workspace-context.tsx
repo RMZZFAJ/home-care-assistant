@@ -37,6 +37,10 @@ const empty: State = {
   load: async () => { }, selectProfile: async () => false, selectPatient: async () => { },
 };
 const Context = createContext<State>(empty);
+const selectionSteps = [
+  { label: "Validando o vínculo escolhido", icon: "shield" },
+  { label: "Consultando o espaço do paciente", icon: "home" },
+] as const;
 export { roleLabels, roleLabel } from "@/lib/role-labels";
 export function useWorkspaceState() { return use(Context); }
 
@@ -58,7 +62,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   const scope = JSON.stringify([pathname, requestedPatientId]);
   const [resolvedScope, setResolvedScope] = useState<string | null>(null);
   const loading = !publicPage && (loadingRead || resolvedScope !== scope);
-  const [selecting, setSelecting] = useState(false);
+  const [selectionStage, setSelectionStage] = useState<number | null>(null);
+  const selecting = selectionStage !== null;
   const [error, setError] = useState("");
   const [selectionError, setSelectionError] = useState("");
   const sequenceRef = useRef(0);
@@ -88,7 +93,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     }).finally(() => {
       if (!signal?.aborted && sequence === sequenceRef.current) {
         setResolvedScope(scope); setLoadingRead(false);
-        if (navigationScopeRef.current === scope) { navigationScopeRef.current = null; setSelecting(false); }
+        if (navigationScopeRef.current === scope) { navigationScopeRef.current = null; setSelectionStage(null); }
       }
     });
   }, [documentId, requestedPatientId, scope, setData, setPatientId, setError, setResolvedScope, setLoadingRead]);
@@ -114,10 +119,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     };
   }, [load, publicPage]);
   const selectProfile = async (id: string | null) => {
-    setSelecting(true);
+    setSelectionStage(0);
     setSelectionError("");
     try {
       await api("/api/context", { careRecipientId: id });
+      setSelectionStage(1);
       await load();
       if (id) { try { sessionStorage.setItem("hca:patient", id); } catch { /* Optional UI preference. */ } }
       if (!documentId) {
@@ -137,7 +143,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     } catch (reason) {
       setSelectionError(reason instanceof Error ? reason.message : "Não foi possível selecionar o perfil.");
       return false;
-    } finally { if (!navigationScopeRef.current) setSelecting(false); }
+    } finally { if (!navigationScopeRef.current) setSelectionStage(null); }
   };
   const selectPatient = async (id: string) => {
     if (data?.activeContext?.mode === "patient") { await selectProfile(id); return; }
@@ -159,6 +165,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     return () => window.removeEventListener("pagehide", remember);
   }, [publicPage, error, loading, selecting, data, patient, pathname, searchParams]);
   const state = { value, data, loading, selecting, error, selectionError, requestedPatientId, load, selectProfile, selectPatient };
-  useOperationActivity(!publicPage && (loading || selecting), { title: selecting ? "Mudando de paciente" : "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." });
+  useOperationActivity(!publicPage && (loading || selecting), selectionStage === null
+    ? { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." }
+    : { title: "Mudando de paciente", stage: selectionStage, steps: selectionSteps, detail: "Aguarde a confirmação da operação." });
   return <Context value={state}>{publicPage ? <>{notices}<div inert={blocked}>{children}</div></> : <WorkspaceShell showOnboarding={pathname === "/"}>{children}</WorkspaceShell>}</Context>;
 }

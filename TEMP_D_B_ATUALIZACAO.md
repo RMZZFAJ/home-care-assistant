@@ -1,5 +1,30 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**18/11 — início de L2 na branch `feat/phase-d-implementation`.**
+A CI 44415326665 teve uma falha persistente no aceite de convite no
+iOS-2. O cabeçalho estava pronto antes da área de escolha do vínculo.
+O commit local `837edcb9` altera somente o teste de convite para
+aguardar a Visão geral antes da seleção. O fluxo passou de primeira
+em Chromium, Android e iOS emulados. Os três testes aprovados em
+segunda tentativa ficam registrados fora desse commit.
+
+A implementação de L2 segue o comando mestre v7 e o HTML aprovado
+`hca-laboratorio-02-v7.html`. O SHA-256 conferiu com o comando. O
+navegador renderizou as 175 variantes e permitiu inspecionar os
+estados de formulário, falha, sucesso e carregamento em 412 e 360 px.
+Os dois carregamentos seguem no host compartilhado. Entrada e troca
+de paciente avançam de etapa com as respostas observadas. O lote
+dirigido de oito casos de acesso passou sem repetição automática
+em Android e iOS emulados. A aba Andamentos foi separada e está em
+verificação contínua. Dez casos dirigidos passaram de primeira nos
+projetos móveis, com retomada, concorrência, visibilidade, publicação
+recuperável e links antigos. Build com tipos, ESLint e Markdown
+passaram. Pendem as jornadas operacionais, a integração documental
+e a comparação móvel do restante de L2. P1 e o ato final de P2
+aguardam definição do responsável. O lote segue local, sem migrations
+aplicadas. Evidências em `output/playwright/l2-reference/`,
+`l2-v7-access-activity-directed.log` e `l2-v7-progress-tab-directed.log`.
+
 **18/11 — correções após a CI de 484d4a23.** A execução 44357106763
 teve 1.493 aprovações de primeira, três na segunda tentativa e uma
 falha persistente no seletor de paciente. Windows, Ubuntu, banco,

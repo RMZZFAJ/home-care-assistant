@@ -15,7 +15,18 @@ export function ProgressPublicationOptions({ value, onChange, disabled, canPriva
         {Object.entries(progressRelevance).map(([key, item]) => <option key={key} value={key}>{item.label}</option>)}
       </SelectField>
     </FormField>
-    {!privateOnly && canPrivate ? <FormField label="Visibilidade do andamento"><SelectField value={collective ? "public" : value.visibility ?? "public"} disabled={disabled || collective} onChange={event => onChange({ ...value, visibility: event.currentTarget.value as "public" | "family" })}><option value="public">Todos com acesso à ficha</option><option value="family">Privado · família e pessoas mencionadas</option></SelectField></FormField> : null}
+    {!privateOnly && canPrivate ? (
+      <label className="hca-progress-visibility">
+        <span>Andamento privado</span>
+        <input
+          type="checkbox"
+          role="switch"
+          checked={!collective && value.visibility === "family"}
+          disabled={disabled || collective}
+          onChange={event => onChange({ ...value, visibility: event.currentTarget.checked ? "family" : "public" })}
+        />
+      </label>
+    ) : null}
     {collective && privateOnly ? <Notice error>Os Andamentos da família são privados. Mencione cada pessoa pelo nome em vez de usar @todos.</Notice> : collective ? <Notice>Você mencionou @todos. Este andamento será visível a todos com acesso à ficha.</Notice> : <p className="hca-field-help">{privateOnly || value.visibility === "family" ? "Privado: a família autorizada e as pessoas mencionadas poderão ler este andamento. Cada pessoa mencionada precisa manter acesso à ficha." : "Visível às pessoas que têm acesso à ficha."}</p>}
     {value.mentions.length ? <ul className="hca-progress-selected">{value.mentions.map(id => <li key={id}>
       @{mentionNames[id] ?? "Pessoa selecionada"}{" "}

@@ -36,6 +36,7 @@ async function open(page: Page, id: string, type = "REQ") {
       : null;
   await page.goto("/documentos/" + id);
   if (opening) await (await opening).finished();
+  await selectDocumentSection(page, "progress");
   await expect(
     page.getByRole("button", { name: "Registrar andamento", exact: true }),
   ).toBeEnabled();
@@ -167,7 +168,7 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
     .click();
   await selectDocumentSection(page, "materials");
   await page.reload();
-  await selectDocumentSection(page, "overview");
+  await selectDocumentSection(page, "progress");
   await expect(feed.getByRole("region", { name: "Rascunho privado", exact: true })).toHaveCount(0);
   await expect(feed).toContainText("Publicação recuperada");
   expect(packets).toHaveLength(1);
@@ -211,6 +212,15 @@ test("Andamento conserva rascunho, recupera publicação após reload com a mesm
       contentType: "image/png",
     });
   }
+  const progressId = sql(
+    `select id from private.document_progress_notes where document_id=${sqlLiteral(req.id)};`,
+  );
+  await page.goto(`/documentos/${req.id}?documentTab=overview&progressRecord=${progressId}#andamento-${progressId}`);
+  await expect(page.getByRole("tab", { name: "Andamentos", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator(`#andamento-${progressId}`)).toBeFocused();
+  await selectDocumentSection(page, "overview");
+  await expect(feed).toHaveCount(0);
+  expect(new URL(page.url()).searchParams.has("progressRecord")).toBe(false);
 });
 
 test("Andamentos alcançam todos os registros, separam fatos e ocultam consulta recusada sem apagar edição própria", async ({

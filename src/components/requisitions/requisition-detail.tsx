@@ -445,16 +445,18 @@ export function RequisitionDocumentContent({
         onSelect={tabs.select}
         auditAllowed={can(context, "audit.read")}
       >
-        <DocumentPanel value="overview"><div className="doc-overview-grid"><div className="doc-main-column">
+        <DocumentPanel value="progress">
           <DocumentProgress
             actionTarget={progressActionTarget}
-            onAction={() => tabs.select("overview")}
+            onAction={() => tabs.select("progress")}
             id={id}
             type="REQ"
             patientId={data.care_recipient_id}
             context={context}
           />
-</div><aside className="doc-side-column">
+        </DocumentPanel>
+        <DocumentPanel value="overview">
+          <div className="doc-main-column">
           {data.sourceRequisition ? (
             <section
               className="ui-card space-y-3"
@@ -519,7 +521,8 @@ export function RequisitionDocumentContent({
 
           <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
 
-</aside></div></DocumentPanel>
+          </div>
+        </DocumentPanel>
         <DocumentPanel value="materials">
           <section
             className="doc-card hca-requisition-facts"

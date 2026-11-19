@@ -10,6 +10,7 @@ import type { DocumentType } from "@/types/documents";
 export type DocumentTab =
   | "overview"
   | "materials"
+  | "progress"
   | "workflow"
   | "communications"
   | "files"
@@ -19,6 +20,7 @@ export type DocumentTab =
 const baseTabs: { id: DocumentTab; label: string; icon: IconName; }[] = [
   { id: "overview", label: "Visão geral", icon: "home" },
   { id: "materials", label: "Materiais", icon: "stock" },
+  { id: "progress", label: "Andamentos", icon: "history" },
   { id: "communications", label: "Comunicações", icon: "bell" },
   { id: "files", label: "Arquivos gerados", icon: "forms" },
   { id: "attachments", label: "Anexos", icon: "link" },
@@ -27,6 +29,8 @@ const baseTabs: { id: DocumentTab; label: string; icon: IconName; }[] = [
 function tabFromUrl(params: Pick<URLSearchParams, "get" | "has">, auditAllowed: boolean): DocumentTab {
   const requested = params.get("documentTab");
   const valid = [...baseTabs.map(tab => tab.id), "history", ...(auditAllowed ? ["audit"] : [])];
+  // Previously emitted links opened records in Visão geral.
+  if (params.has("progressRecord") && (requested === null || requested === "overview")) return "progress";
   return requested === "workflow" ? "materials" : valid.includes(requested ?? "")
     ? requested as DocumentTab : params.has("historyVersion") ? "history" : "overview";
 }
@@ -67,6 +71,10 @@ export function useDocumentTabs(auditAllowed: boolean) {
     focusSelectionRef.current = focus;
     const url = new URL(window.location.href);
     url.searchParams.set("documentTab", next);
+    if (next !== "progress") {
+      url.searchParams.delete("progressRecord");
+      if (url.hash.startsWith("#andamento-")) url.hash = "";
+    }
     window.history.replaceState(null, "", url.pathname + url.search + url.hash);
     if (focus && next === value) {
       focusSelectionRef.current = false;

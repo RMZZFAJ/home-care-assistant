@@ -3,6 +3,12 @@ import { safeReturnPath } from "@/lib/safe-return-path";
 import type { ContextData } from "@/components/layout/workspace-context";
 import { recentDestination, recentDestinationKey, recentDestinationAllowed } from "./recent-destination";
 
+export const entrySteps = [
+  { label: "Validando sua conta", icon: "user" },
+  { label: "Conferindo a segurança da sessão", icon: "shield" },
+  { label: "Preparando o destino autorizado", icon: "home" },
+] as const;
+
 export async function completeEntry(requested: string | null, userId: string): Promise<string> {
   const destination = safeReturnPath(requested, window.location.origin);
   const { data } = await api<{ data: ContextData; }>("/api/context");

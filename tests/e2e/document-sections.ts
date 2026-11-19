@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 export type DocumentSection =
   | "overview"
   | "materials"
+  | "progress"
   | "workflow"
   | "communications"
   | "files"
@@ -12,6 +13,7 @@ export type DocumentSection =
 const labels = {
   overview: "Visão geral",
   materials: "Materiais",
+  progress: "Andamentos",
   workflow: "Materiais",
   communications: "Comunicações",
   files: "Arquivos gerados",

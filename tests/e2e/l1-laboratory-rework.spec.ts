@@ -74,6 +74,7 @@ test("L1 laboratório: início e histórico usam as composições reais em deskt
 test("L1 laboratório: ficha, ciência em etapas e exemplares preservam os atos reais", async ({ page }) => {
   const f = await setup(), req = await issue(f.patient, f.products); await login(page, f.patient);
   await page.goto(`/documentos/${req.id}`);
+  await selectDocumentSection(page, "progress");
   await expect(page.locator(".doc-feed")).toBeVisible();
   await page.getByRole("combobox", { name: "Período dos andamentos", exact: true }).selectOption("custom");
   const feed = page.locator(".hca-progress-feed");
@@ -82,7 +83,7 @@ test("L1 laboratório: ficha, ciência em etapas e exemplares preservam os atos 
   await expect(feed).toContainText("Nenhum andamento corresponde a este filtro e página.");
   await page.getByRole("combobox", { name: "Período dos andamentos", exact: true }).selectOption("all");
   await expect(page.locator(".doc-feed")).toBeVisible();
-  for (const width of [1440, 390]) { await page.setViewportSize({ width, height: 940 }); await capture(page, `req-visao-geral-${width}`); }
+  for (const width of [412, 360]) { await page.setViewportSize({ width, height: 940 }); await capture(page, `req-andamentos-${width}`); }
   await selectDocumentSection(page, "materials");
   await expect(page.getByRole("heading", { name: "Ciência familiar", exact: true })).toBeVisible();
   for (const width of [1440, 390]) { await page.setViewportSize({ width, height: 940 }); await capture(page, `req-materiais-${width}`); }

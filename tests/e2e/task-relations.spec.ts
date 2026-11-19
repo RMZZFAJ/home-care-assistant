@@ -35,6 +35,7 @@ test("COM and BAL references in a real progress note stay readonly, recover read
     category: "record", stage: "issuance", text: "Consulta de referências preservadas, sem editar as fichas emitidas.", references: references.map(ref => ref.id),
   } });
   await login(page, f.patient, "family"); await page.goto("/fichas/" + source);
+  await selectDocumentSection(page, "progress");
   const feed = page.getByRole("region", { name: "Andamentos da ficha", exact: true });
   await expect(feed.getByText("Consulta de referências preservadas, sem editar as fichas emitidas.", { exact: true })).toBeVisible();
   const snapshot = () => sql(`select jsonb_build_object(

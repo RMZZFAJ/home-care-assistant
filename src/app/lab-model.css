@@ -611,11 +611,33 @@
 .hca-l1 .doc-help-details>summary::after,
 .hca-l1 .doc-help-details[open]>summary::after{display:inline-block;width:auto;height:auto;border:0;transform:none;line-height:1;flex:none}
 
-/* Loading and staged operations, from the same laboratory. */
-.hca-l1 .activity-backdrop{position:absolute;inset:0;background:#173b3a61;backdrop-filter:blur(5px)}.hca-l1 .activity-card{position:relative;width:min(376px,100%);border:1px solid #e5ece6;border-radius:21px;padding:34px 29px;background:#fff;box-shadow:0 24px 90px #143c3835;text-align:center;outline:none}.hca-l1 .activity-card h2{font-size:20px;letter-spacing:-.5px;margin:17px 0 9px;line-height:1.3}.hca-l1 .activity-card p{font-size:13px;line-height:1.65;color:var(--muted);max-width:305px;margin:auto}.hca-l1 .activity-spinner{width:67px;height:67px;display:grid;place-items:center;margin:0 auto 20px;position:relative;color:var(--primary);background:#f3f8f4;border-radius:50%}.hca-l1 .activity-spinner>span{position:absolute;inset:-3px;border:2px solid #dbe9e0;border-top-color:var(--primary);border-radius:50%;animation:lab-spin 1s linear infinite}.hca-l1 .activity-kicker{display:block;font-size:9px;font-weight:650;letter-spacing:.9px;color:#698779;margin-top:26px}.hca-l1 .activity-dynamic{width:min(420px,100%);padding:37px 32px}.hca-l1 .connection-animation{height:64px;display:flex;justify-content:center;align-items:center;gap:15px;color:var(--primary)}.hca-l1 .connection-animation>span{height:57px;width:57px;display:grid;place-items:center;border-radius:17px;background:#ecf5ef;border:1px solid #dcebe1;animation:gentle-pulse 2.4s ease-in-out infinite}.hca-l1 .connection-animation>span:last-child{background:#dfeee5;animation-delay:.7s}.hca-l1 .connection-animation>i{width:43px;height:2px;background:linear-gradient(90deg,#d1e4d7,var(--primary),#d1e4d7);background-size:200% 100%;animation:skeleton-sweep 1.5s infinite}.hca-l1 .activity-steps{list-style:none;padding:0;margin:25px 0 0;text-align:left;display:grid;gap:14px}.hca-l1 .activity-steps li{display:flex;align-items:center;gap:11px;font-size:12px;color:#85958c}.hca-l1 .activity-steps li>span{height:24px;width:24px;display:grid;place-items:center;border-radius:50%;background:#f0f3f0;font-size:10px;flex:none}.hca-l1 .activity-steps .current{color:var(--ink);font-weight:600}.hca-l1 .activity-steps .current>span,.hca-l1 .activity-steps .done>span{background:#e4f1e8;color:var(--primary)}.hca-l1 .activity-steps .done{color:#527761}.hca-l1 .activity-steps .spinner{height:12px;width:12px;border-width:1.6px}@keyframes lab-spin{to{transform:rotate(360deg)}}@keyframes gentle-pulse{50%{transform:translateY(-4px);box-shadow:0 8px 16px #156f660b}}
+/* Shared operation activity. The mobile composition follows the approved L2 reference. */
+.hca-l1 .activity-backdrop{position:absolute;inset:0;background:#173b3a61;backdrop-filter:blur(5px)}
+.hca-l1 .activity-card{position:relative;width:min(376px,100%);border:1px solid #e5ece6;border-radius:21px;padding:34px 29px;background:#fff;box-shadow:0 24px 90px #143c3835;text-align:center;outline:none}
+.hca-l1 .activity-card h2{font-size:20px;letter-spacing:-.5px;margin:17px 0 9px;line-height:1.3}
+.hca-l1 .activity-card p{font-size:13px;line-height:1.65;color:var(--muted);max-width:305px;margin:auto}
+.hca-l1 .activity-spinner{width:67px;height:67px;display:grid;place-items:center;margin:0 auto 20px;position:relative;color:var(--primary);background:#f3f8f4;border-radius:50%}
+.hca-l1 .activity-spinner>span{position:absolute;inset:-3px;border:2px solid #dbe9e0;border-top-color:var(--primary);border-radius:50%;animation:lab-spin 1s linear infinite}
+.hca-l1 .activity-kicker{display:block;font-size:9px;font-weight:650;letter-spacing:.9px;color:#698779;margin-top:26px}
+.hca-l1 .activity-dynamic{width:min(420px,100%);padding:37px 32px}
+.hca-l1 .connection-animation{height:64px;display:flex;justify-content:center;align-items:center;gap:15px;color:var(--primary)}
+.hca-l1 .connection-animation>span{height:57px;width:57px;display:grid;place-items:center;border-radius:17px;background:#ecf5ef;border:1px solid #dcebe1;animation:activity-pulse 2.4s ease-in-out infinite}
+.hca-l1 .connection-animation>span:last-child{background:#dfeee5;animation-delay:.7s}
+.hca-l1 .connection-animation>i{width:43px;height:2px;background:linear-gradient(90deg,#d1e4d7,var(--primary),#d1e4d7);background-size:200% 100%;animation:activity-sweep 1.5s infinite}
+.hca-l1 .activity-steps{list-style:none;padding:0;margin:25px 0 0;text-align:left;display:grid;gap:14px}
+.hca-l1 .activity-steps li{display:flex;align-items:center;gap:11px;font-size:12px;color:#617471}
+.hca-l1 .activity-steps li>span{height:24px;width:24px;display:grid;place-items:center;border-radius:50%;background:#f0f3f0;font-size:10px;flex:none}
+.hca-l1 .activity-steps .current{color:var(--ink);font-weight:600}
+.hca-l1 .activity-steps .current>span,.hca-l1 .activity-steps .done>span{background:#e4f1e8;color:var(--primary)}
+.hca-l1 .activity-steps .done{color:#527761}
+.hca-l1 .activity-step-spinner{height:12px;width:12px;border:1.6px solid #b6c9bd;border-top-color:var(--primary);border-radius:50%;animation:lab-spin 1s linear infinite}
+@keyframes lab-spin{to{transform:rotate(360deg)}}
+@keyframes activity-pulse{50%{transform:translateY(-2px)}}
+@keyframes activity-sweep{to{background-position:200% 0}}
 @container product (max-width:500px){.hca-l1 .activity-card{padding:29px 23px;border-radius:18px}.hca-l1 .activity-card h2{font-size:19px}.hca-l1 .activity-card p{font-size:12px}}
-@media(prefers-reduced-motion:reduce){.hca-l1 .spinner,.hca-l1 .activity-spinner>span,.hca-l1 .connection-animation>span,.hca-l1 .connection-animation>i{animation:none}}
-@media(forced-colors:active){.hca-l1 .activity-card{background:Canvas;color:CanvasText;border-color:CanvasText}}@keyframes skeleton-sweep{to{background-position:-220% 0}}
+@media(prefers-reduced-motion:reduce){.hca-l1 .spinner,.hca-l1 .activity-spinner>span,.hca-l1 .connection-animation>span,.hca-l1 .connection-animation>i,.hca-l1 .activity-step-spinner{animation:none}}
+@media(forced-colors:active){.hca-l1 .activity-card{background:Canvas;color:CanvasText;border-color:CanvasText}}
+@keyframes skeleton-sweep{to{background-position:-220% 0}}
 @keyframes doc-shimmer{to{background-position:-200% 0}}
 
 /* Access compositions from the same reference. */

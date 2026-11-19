@@ -60,18 +60,47 @@ test("abrir ficha e trocar paciente exibem somente a sobreposição e seguem dir
     if (route.request().method() === "GET" && new URL(route.request().url()).searchParams.get("documentId") === req.id) await gate;
     await route.continue();
   });
-  await page.goto("/fichas/" + req.id);
-  await expect(page.locator(".hca-activity-overlay")).toBeVisible();
-  await expect(page.locator(".hca-workspace-body .hca-banner:visible")).toHaveCount(0);
-  release(); await expect(page.locator(".hca-document-header")).toBeVisible();
-  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0); await page.unroute("**/api/context**");
-  let change!: () => void; const changing = new Promise<void>(resolve => { change = resolve; });
-  await page.route("**/api/context", async route => { if (route.request().method() === "POST") await changing; await route.continue(); });
-  await page.getByRole("combobox", { name: "Pessoa assistida", exact: true }).selectOption(b.patient);
-  await expect(page.getByRole("heading", { name: "Mudando de paciente", exact: true })).toBeVisible();
-  await expect(page.locator(".hca-workspace-body .hca-banner:visible")).toHaveCount(0);
-  await expect(page.getByRole("region", { name: "Mudar perfil", exact: true })).toHaveCount(0);
-  change(); await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", b.patient);
+  try {
+    await page.goto("/fichas/" + req.id);
+    await expect(page.locator(".hca-activity-overlay")).toBeVisible();
+    await expect(page.getByRole("list", { name: "Etapas da operação", exact: true })).toHaveCount(0);
+    await expect(page.locator(".hca-workspace-body .hca-banner:visible")).toHaveCount(0);
+  } finally {
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+  await expect(page.locator(".hca-document-header")).toBeVisible();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+  let authorize!: () => void;
+  let loadContext!: () => void;
+  let selectionSent = false;
+  const authorizationGate = new Promise<void>(resolve => { authorize = resolve; });
+  const contextGate = new Promise<void>(resolve => { loadContext = resolve; });
+  await page.route("**/api/context", async route => {
+    if (route.request().method() === "POST") {
+      await authorizationGate;
+      selectionSent = true;
+    } else if (selectionSent) await contextGate;
+    await route.continue();
+  });
+  try {
+    await page.getByRole("combobox", { name: "Pessoa assistida", exact: true }).selectOption(b.patient);
+    const stages = page.getByRole("list", { name: "Etapas da operação", exact: true });
+    const current = stages.locator('li[aria-current="step"]');
+    await expect(current).toHaveText("Validando o vínculo escolhido");
+    await expect(page.locator(".hca-workspace-body .hca-banner:visible")).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "Mudar perfil", exact: true })).toHaveCount(0);
+
+    authorize();
+    await expect(current).toHaveText("Consultando o espaço do paciente");
+    await expect(stages.getByText("Concluída.", { exact: true })).toHaveCount(1);
+    await expect(page.locator(".hca-workspace-body .hca-banner:visible")).toHaveCount(0);
+  } finally {
+    authorize();
+    loadContext();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", b.patient);
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   expect(new URL(page.url()).pathname).toBe("/");

@@ -57,11 +57,13 @@ usa sua autorização e seu escopo próprios. Conteúdo adicional deve continuar
 completo e alcançável. Revisões não herdam inputs de criação. Troca de aba
 conserva contexto, versão, edição e tentativa incerta.
 
-Visão geral reúne Andamentos e próxima providência factual. Linha cronológica
-do primeiro ao mais recente, filtro de fatos automáticos/registros humanos e
-paginação completa. Marcos de progresso não determinam cronologia. A etapa
-relacionada é apenas atributo. Auditoria continua separada; nem todo log vira
-andamento. Autores, instantes, estados e consequências vêm dos fatos reais.
+Visão geral reúne os fatos de origem, e a próxima providência factual fica
+antes das abas. A v7 aprovada de L2 dedica uma aba a Andamentos. O atalho abre
+essa aba, e os links já emitidos continuam localizando o registro. A cronologia
+vai do primeiro ao mais recente, com filtros de fatos automáticos e registros
+humanos e paginação completa. A etapa relacionada é um atributo. A data do ato
+ordena a cronologia. Auditoria conserva sua leitura própria. Autores, instantes,
+estados e consequências vêm dos fatos reais.
 
 Registrar andamento é função real integrada às quatro fichas: texto até 2000 caracteres,
 categoria, etapa opcional, referências autorizadas, autoria/instante gerados
