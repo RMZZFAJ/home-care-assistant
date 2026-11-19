@@ -5,6 +5,21 @@ import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
 import type { DocumentChange } from "@/lib/documents/document-changes";
 
+export function DocumentChangeFacts({ changes }: {
+  changes: ReadonlyArray<{ id: string; label: string; before?: string; after: string }>;
+}) {
+  return <dl className="hca-document-change-list">
+    {changes.map(change => <div key={change.id}>
+      <dt>{change.label}</dt>
+      <dd>{change.before !== undefined ? <>
+        <del><span className="sr-only">Antes: </span>{change.before}</del>
+        <Icon name="arrow" width={15} height={15} />
+      </> : null}
+        <strong>{change.before !== undefined ? <span className="sr-only">Agora: </span> : null}{change.after}</strong></dd>
+    </div>)}
+  </dl>;
+}
+
 export function DocumentFreshness({ code, changes, loading, editing, onRefresh }: {
   code: string; changes: DocumentChange[]; loading: boolean; editing?: boolean; onRefresh: () => void;
 }) {
@@ -33,14 +48,7 @@ export function DocumentFreshness({ code, changes, loading, editing, onRefresh }
           onRefresh();
         }}>{loading ? "Atualizando…" : "Atualizar agora"}</ActionButton> : null}
       </>}>
-      {changes.length ? <dl className="hca-document-change-list">
-        {changes.map(change => <div key={change.id}>
-          <dt>{change.label}</dt>
-          <dd><del><span className="sr-only">Antes: </span>{change.before}</del>
-            <Icon name="arrow" width={15} height={15} />
-            <strong><span className="sr-only">Agora: </span>{change.after}</strong></dd>
-        </div>)}
-      </dl> : null}
+      {changes.length ? <DocumentChangeFacts changes={changes} /> : null}
       <p className="hca-document-change-note">{editing
         ? "Seu preenchimento foi preservado. A referência da operação será conferida antes da confirmação."
         : "Atualize a ficha para consultar as informações atuais e gerar um novo PDF. Os exemplares emitidos continuam disponíveis."}</p>

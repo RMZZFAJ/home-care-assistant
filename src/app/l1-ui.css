@@ -147,7 +147,9 @@ html:has(.hca-workspace) { scroll-padding-block-start: 65px; }
 .hca-macro-mini i[data-state=active] { background: #69a693; }
 .hca-next-step-kicker { display: block; margin-bottom: 5px; font-size: 9px; letter-spacing: .9px; text-transform: uppercase; }
 .hca-dismiss-suggestion { float: right; }
-.hca-document-freshness { position: sticky; top: var(--app-header-height, 65px); z-index: 21; display: flex; align-items: center; gap: 8px; padding: 5px 14px; border-bottom: 1px solid #ead6aa; background: #fff3d9; color: #7e5f24; font-size: 12px; }
+.hca-document-updates { position: sticky; top: var(--app-header-height, 65px); z-index: 21; }
+.hca-document-updates:empty { display: none; }
+.hca-document-freshness { display: flex; align-items: center; gap: 8px; padding: 5px 14px; border-bottom: 1px solid #ead6aa; background: #fff3d9; color: #7e5f24; font-size: 12px; }
 .hca-document-freshness > svg { flex: none; }
 .hca-document-freshness > span { flex: 1; min-width: 0; }
 .hca-l1 .hca-document-freshness > .btn { flex: none; min-height: 36px; padding-inline: 4px; color: inherit; text-decoration: underline; text-underline-offset: 3px; }

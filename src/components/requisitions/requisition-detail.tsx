@@ -12,6 +12,7 @@ import { DocumentFab } from "@/components/documents/document-fab";
 import { DocumentCommunications } from "@/components/notifications/document-communications";
 import { DocumentMaterialList } from "@/components/documents/document-material-list";
 import { DocumentFreshness } from "@/components/documents/document-freshness";
+import { DocumentFamilyDecisionNotice } from "@/components/documents/document-family-decision-notice";
 import { changedFact } from "@/lib/documents/document-changes";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import { roleLabel } from "@/components/layout/workspace-context";
@@ -387,8 +388,14 @@ export function RequisitionDocumentContent({
           ) : null}<Pill tone={p.familyAware ? "success" : "warning"}><Icon name="users" width={13} height={13} />{data.is_historical ? "Ciência não comprovada" : p.familyAware ? "Ciência registrada" : p.policy?.scienceRequired === false ? "Exigência dispensada" : "Ciência pendente"}</Pill></>
         }
         showFiles={false}
-        updateNotice={observedData ? <DocumentFreshness code={data.code ?? data.protocol}
-          changes={requisitionChanges(data, observedData)} loading={reading || busy} editing={Boolean(decision)} onRefresh={refreshDocument} /> : null}
+        updateNotice={<>
+          {observedData ? <DocumentFreshness code={data.code ?? data.protocol}
+            changes={requisitionChanges(data, observedData)} loading={reading || busy} editing={Boolean(decision)} onRefresh={refreshDocument} /> : null}
+          {!data.is_historical && context.activeContext?.mode === "patient" && context.patient?.id === data.care_recipient_id &&
+            can(context, "req.read") && can(context, "ent.read") ? <DocumentFamilyDecisionNotice
+              key={context.userId + ":" + id} id={id} patientId={data.care_recipient_id} userId={context.userId}
+              code={data.code ?? data.protocol} revision={revision + attempt} blocked={Boolean(decision || archiveDialog)} returnFocus={refreshButtonRef} /> : null}
+        </>}
         nextStep={
           reading || readFailed ? (
             <Notice>

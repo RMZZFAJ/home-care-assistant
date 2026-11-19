@@ -1,5 +1,27 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — resposta da família e conhecimento individual.** A REQ e a
+ENT vinculada mostram qual material foi reavaliado. Após alteração, o
+modal compara as duas avaliações. Quando a família mantém a decisão,
+o modal mostra a avaliação mantida. A primeira consulta apresenta o
+aviso pendente. Se a resposta chegar com a ficha aberta, a faixa
+permite consultar o aviso ao terminar a operação.
+
+- Entendi registra conhecimento para a pessoa autenticada. A mesma
+  confirmação vale nas duas fichas e pode ser recuperada após perda
+  de resposta. A pessoa que decidiu fica fora do aviso.
+- A leitura exige o vínculo e as capacidades do documento e da ENT.
+  A perda de leitura oculta o aviso e impede confirmação. O
+  registro de conhecimento é independente de ciência formal, estoque,
+  versão, Andamentos e recebimento.
+- Passaram três integrações com Auth real, incluindo repetição
+  concorrente, autor da decisão, outro paciente e revogação de leitura.
+  Passaram seis casos em Android e iOS emulados sobre a avaliação
+  alterada, a mantida, a recuperação e a separação de Andamentos.
+- A migration `20261119154356` foi aplicada localmente sem reset. As
+  26 migrations pendentes passaram no ensaio remoto com rollback.
+  O desenvolvimento continua em 272 versões até o preview compatível.
+
 **19/11 — comparação de alterações na ficha aberta.** A faixa sob
 o resumo oferece Ver o que mudou. O modal da v7 mostra o valor anterior
 riscado, o atual e o efeito sobre a operação. A ficha mantém sua
@@ -21,9 +43,6 @@ possível voltar ao preenchimento e conferir a referência na confirmação.
 - Build de produção, TypeScript e ESLint dirigido passaram. Este
   incremento não acrescenta migration. A fila de 25 do desenvolvimento
   segue condicionada ao preview compatível.
-- O aviso individual da decisão familiar, incluindo a decisão
-  mantida, exige registro próprio de conhecimento. A comparação
-  geral cobre a alteração observada na ficha aberta.
 
 **19/11 — ações das fichas e próximo passo.** A sugestão fica antes
 dos atalhos. Os três pontos no cabeçalho dão acesso a copiar e

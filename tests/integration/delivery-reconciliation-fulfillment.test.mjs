@@ -110,3 +110,56 @@ test("family resolves one item's transit and records its assessment once while t
   assert.equal((await progress()).partial,1);
   assert.equal(stock(f.patient),afterTransit);
 });
+
+test("family decision knowledge is per reader, shared by linked fichas and independent from science and stock", async () => {
+  const f = await setup(), [product] = f.products;
+  const req = await issue(f.patient, [product]);
+  const unrelated = await issue(f.patient, [f.products[1]]);
+  const family = await actor("family", f.patient), team = await actor("professional", f.patient);
+  const sent = await delivery(f.patient, req, [product], { quantity: "5" });
+  const [line] = sent.lines;
+  const received = await receive(team, sent, [{ lineId: line.id, receivedQuantity: "5", reviewReason: "A equipe pediu nova avaliação." }]);
+  const args = (id, review = null) => ({ p_document: id, p_acknowledge: review });
+  const notice = (client, id, review = null) => rpc(client, "document_family_decision_notice", args(id, review));
+  assert.equal((await notice(team, req.id)).notice, null);
+
+  const kept = await approve(family, received, line, "complete", "");
+  const changed = await approve(family, await rpc(family, "operational_document", { p_id: sent.id }),
+    line, "partial", "A família reconheceu a necessidade de uma entrega complementar.");
+  assert.equal((await notice(family, sent.id)).notice, null);
+  assert.equal((await notice(family, req.id)).notice, null);
+  assert.equal((await family.rpc("document_family_decision_notice", args(req.id, kept.reviewId))).error?.code, "42501");
+  assert.equal((await team.rpc("document_family_decision_notice", args(unrelated.id, kept.reviewId))).error?.code, "42501");
+  assert.deepEqual(await notice(team, req.id).then(({ notice }) => [notice.id,notice.previous,notice.decision]), [kept.reviewId,"complete","complete"]);
+  assert.equal((await notice(team, sent.id)).notice.id, kept.reviewId);
+  const snapshot = () => ({
+    stock: stock(f.patient),
+    documents: sql(`select jsonb_build_object(
+      'science',(select count(*) from public.requisition_science_events where requisition_id=${q(req.id)}),
+      'versions',(select jsonb_agg(version order by id) from public.operational_documents where id in (${q(req.id)},${q(sent.id)})),
+      'events',(select count(*) from public.document_events where document_id in (${q(req.id)},${q(sent.id)})))`),
+  });
+  const beforeAwareness = snapshot();
+  const [one, repeat] = await Promise.all([
+    notice(team, req.id, kept.reviewId), notice(team, sent.id, kept.reviewId),
+  ]);
+  assert.deepEqual(one.acknowledgement, repeat.acknowledgement);
+  assert.equal(one.acknowledgement.reviewId, kept.reviewId);
+  assert.deepEqual([one.notice.id,one.notice.previous,one.notice.decision], [changed.reviewId,"complete","partial"]);
+  assert.equal((await notice(f.admin, req.id)).notice.id, kept.reviewId);
+
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+       values(${q(f.patient)},${q(fixtures.professional.id)},'ent.read',false)`);
+  assert.equal((await notice(team, req.id)).notice, null);
+  assert.equal((await team.rpc("document_family_decision_notice", args(req.id, changed.reviewId))).error?.code, "42501");
+  assert.equal((await team.rpc("document_family_decision_notice", args(sent.id))).error?.code, "42501");
+  sql(`update public.capability_overrides set enabled=true
+       where care_recipient_id=${q(f.patient)} and subject_user=${q(fixtures.professional.id)} and capability='ent.read'`);
+  assert.equal((await notice(team, sent.id, changed.reviewId)).notice, null);
+  const outside = await setup();
+  const otherContext = await actor("professional", outside.patient);
+  assert.equal((await otherContext.rpc("document_family_decision_notice", args(req.id))).error?.code, "42501");
+  assert.equal(sql(`select count(*) from private.requisition_fulfillment_awareness where review_id in
+    (${q(kept.reviewId)},${q(changed.reviewId)})`), "2");
+  assert.deepEqual(snapshot(), beforeAwareness);
+});

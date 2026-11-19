@@ -1905,6 +1905,16 @@ o mínimo remoto conferido permanece em seis caracteres.
   independe da permissão req.science e da designação para ciência. Dispensa
   ou recusa de SCI não bloqueia uma avaliação familiar autorizada. Profissionais
   não podem atribuir essa avaliação apenas por receberem ent.create.
+- GET /api/documents/:id/fulfillment-review/awareness recebe a REQ ou ENT
+  aberta no vínculo ativo. Devolve a próxima avaliação familiar vinculada que
+  o leitor ainda pode conhecer, junto do valor anterior, da decisão, autoria,
+  quantidade considerada e motivo. A leitura da REQ exige req.read e as
+  decisões da entrega exigem ent.read. O próprio autor é excluído.
+- POST nessa rota recebe reviewId. O banco confirma a relação com a ficha,
+  a capacidade de leitura e o ator da sessão antes de guardar o instante.
+  Repetir a confirmação devolve o mesmo instante. O mesmo registro vale na
+  REQ e na ENT vinculada. Esse ato é separado da ciência formal, da entrega
+  de notificações, do recebimento físico e dos efeitos de estoque.
 - GET /api/documents/:id/communications pagina avisos, estados reais e tentativas
   registradas. POST recebe key, originalId e channel e cria um reforço deliberado.
   Recuperar a chave não cria outro envio. Canal não configurado fica indisponível;

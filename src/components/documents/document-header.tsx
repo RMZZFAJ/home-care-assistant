@@ -186,7 +186,7 @@ export function DocumentHeader({
         {milestones}
         <span ref={markerRef} className="hca-compact-marker" aria-hidden="true" />
       </section>
-      {updateNotice}
+      {updateNotice ? <div className="hca-document-updates">{updateNotice}</div> : null}
       {nextStep}
       <div
         className="hca-document-action-bar"

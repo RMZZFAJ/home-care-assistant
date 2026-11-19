@@ -73,6 +73,7 @@ import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document
 import { DocumentIssuanceResult } from "./document-issuance-result";
 import { FamilyFulfillmentReview } from "./family-fulfillment-review";
 import { DocumentFreshness } from "./document-freshness";
+import { DocumentFamilyDecisionNotice } from "./document-family-decision-notice";
 import { supplyChanges } from "@/lib/documents/document-changes";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import {
@@ -958,8 +959,13 @@ export function SupplyDocumentContent({
             ]}
             milestones={<DocumentMilestones items={supplyMilestones(data)} />}
             showFiles={false}
-            updateNotice={observedData ? <DocumentFreshness code={data.code ?? data.type}
-              changes={supplyChanges(data, observedData)} loading={refreshDisabled} editing={operationOpen} onRefresh={refreshDocument} /> : null}
+            updateNotice={<>
+              {observedData ? <DocumentFreshness code={data.code ?? data.type}
+                changes={supplyChanges(data, observedData)} loading={refreshDisabled} editing={operationOpen} onRefresh={refreshDocument} /> : null}
+              {data.kind === "ENT" && data.protocol && activeContext && context.activeContext?.mode === "patient" && can(context, "ent.read") ? <DocumentFamilyDecisionNotice
+                key={context.userId + ":" + id} id={id} patientId={data.care_recipient_id} userId={context.userId}
+                code={data.code ?? data.type} revision={liveRevision + attempt} blocked={operationOpen || Boolean(archiveDialog)} returnFocus={refreshButtonRef} /> : null}
+            </>}
             nextStep={
               archived ? <Notice>A ficha arquivada está disponível para consulta e download.</Notice> : followUpStep && loading ? null : followUpStep && (readFailed || operationOpen) ? (
                 <Notice>

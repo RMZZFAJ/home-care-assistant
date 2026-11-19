@@ -7,6 +7,7 @@ import { actor, delivery, fixtures, issue, rpc, setup } from "../integration/v4-
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
+import { audit } from "./accessibility-audit";
 import type { SupplyDocument } from "../../src/types/documents";
 
 async function openDelivery(page: Page, patient: string, document: string, email: string) {
@@ -95,7 +96,61 @@ test("ENT solicita reavaliação com a quantidade conferida e mostra à família
     await review.getByRole("button", { name: "Registrar avaliação familiar", exact: true }).click();
     await expect(review).toHaveCount(0);
     await expect(familyPage.getByText(/Nova avaliação familiar: atendimento parcial/)).toBeVisible();
+    await expect(familyPage.getByRole("button", { name: "Ver decisão familiar", exact: true })).toHaveCount(0);
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    await page.getByRole("button", { name: "Ver decisão familiar", exact: true }).click();
+    const response = page.getByRole("dialog", { name: "A família alterou o atendimento para parcial", exact: true });
+    await expect(response.locator("del")).toContainText("Integral");
+    await expect(response.locator("dd strong")).toContainText("Parcial");
+    await expect(response).toContainText("A família manterá o restante da requisição em aberto.");
+    await response.getByRole("button", { name: "Entendi", exact: true }).click();
+    await expect(response).toHaveCount(0);
   } finally {
     await familyPage.close();
   }
+});
+
+test("REQ mostra avaliação mantida e recupera a confirmação sem repetir o aviso na ENT", async ({ page }, info) => {
+  const f = await setup(), req = await issue(f.patient, [f.products[0]]);
+  const family = await actor("family", f.patient), team = await actor("professional", f.patient);
+  const ent = await delivery(f.patient, req, [f.products[0]], { quantity: "5" }) as SupplyDocument;
+  const [line] = ent.lines;
+  const received = await rpc(team, "supply_document_command", {
+    p_id: ent.id, p_action: "receive", p_key: randomUUID(), p_version: ent.version,
+    p_body: { countedReceipt: { lines: [{ lineId: line.id, receivedQuantity: "5", reviewReason: "Conferência da suficiência das cinco unidades." }] } },
+  });
+  const response = await rpc(family, "review_request_fulfillment", {
+    p_document: ent.id, p_line: line.id, p_key: randomUUID(), p_version: received.version,
+    p_decision: "complete", p_reason: "",
+  });
+  await openDelivery(page, f.patient, req.id, fixtures.professional.email);
+  const notice = page.getByRole("dialog", { name: "A família manteve o atendimento integral", exact: true });
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText(line.name_snapshot);
+  await expect(notice).toContainText("Integral mantido");
+  await expect(notice.locator("del")).toHaveCount(0);
+  await audit(page, "L2 resposta da família");
+  if (info.project.use.hasTouch) await info.attach("E04-15 avaliação mantida", {
+    body: await notice.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
+
+  const endpoint = `/api/documents/${req.id}/fulfillment-review/awareness`;
+  const bodies: unknown[] = [];
+  await page.route("**" + endpoint, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    bodies.push(route.request().postDataJSON());
+    const result = await route.fetch();
+    expect(result.ok()).toBe(true);
+    if (bodies.length === 1) return route.abort("failed");
+    await route.fulfill({ response: result });
+  });
+  await notice.getByRole("button", { name: "Entendi", exact: true }).click();
+  await expect(notice).toContainText("Ainda não foi possível confirmar seu registro");
+  await notice.getByRole("button", { name: "Confirmar novamente", exact: true }).click();
+  await expect(notice).toHaveCount(0);
+  expect(bodies).toEqual([{ reviewId: response.reviewId }, { reviewId: response.reviewId }]);
+  const loaded = page.waitForResponse(row => new URL(row.url()).pathname === `/api/documents/${ent.id}/fulfillment-review/awareness`);
+  await page.goto(`/fichas/${ent.id}`);
+  expect((await (await loaded).json()).data.notice).toBeNull();
+  await expect(page.getByRole("button", { name: "Ver decisão familiar", exact: true })).toHaveCount(0);
 });
