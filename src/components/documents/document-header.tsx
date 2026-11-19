@@ -47,6 +47,7 @@ export function DocumentHeader({
   observedRef,
   unissuedLabel,
   showFiles = true,
+  updateNotice,
   nextStep,
   actions,
   secondaryActions,
@@ -78,6 +79,7 @@ export function DocumentHeader({
   observedRef?: Ref<HTMLElement>;
   unissuedLabel?: string;
   showFiles?: boolean;
+  updateNotice?: ReactNode;
   nextStep?: ReactNode;
   actions?: ReactNode;
   secondaryActions?: ReactNode;
@@ -184,6 +186,7 @@ export function DocumentHeader({
         {milestones}
         <span ref={markerRef} className="hca-compact-marker" aria-hidden="true" />
       </section>
+      {updateNotice}
       {nextStep}
       <div
         className="hca-document-action-bar"

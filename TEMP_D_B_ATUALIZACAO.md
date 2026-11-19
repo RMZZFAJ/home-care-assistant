@@ -1,5 +1,30 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — comparação de alterações na ficha aberta.** A faixa sob
+o resumo oferece Ver o que mudou. O modal da v7 mostra o valor anterior
+riscado, o atual e o efeito sobre a operação. A ficha mantém sua
+referência de trabalho até Atualizar agora. Durante uma decisão, é
+possível voltar ao preenchimento e conferir a referência na confirmação.
+
+- A comparação vem de duas leituras autorizadas da mesma ficha. A
+  geração de novos PDFs fica bloqueada até a atualização. Os
+  exemplares emitidos continuam consultáveis.
+- A ENT mostrou a quantidade reconhecida de 0 para 10, com a decisão
+  familiar parcial preservada. Um Andamento novo apareceu na aba
+  sem abrir a faixa de alterações.
+- A COM mostrou a quantidade declarada de 4 para 5 após correção da
+  mesma chegada, ainda sem crédito em estoque.
+- Passaram seis casos dirigidos em Android e iOS emulados, incluindo
+  leitura em segundo plano, retorno de foco e auditoria de
+  acessibilidade do modal. A comparação visual a 390 px usou o
+  laboratório e o recebimento real com dados fictícios.
+- Build de produção, TypeScript e ESLint dirigido passaram. Este
+  incremento não acrescenta migration. A fila de 25 do desenvolvimento
+  segue condicionada ao preview compatível.
+- O aviso individual da decisão familiar, incluindo a decisão
+  mantida, exige registro próprio de conhecimento. A comparação
+  geral cobre a alteração observada na ficha aberta.
+
 **19/11 — ações das fichas e próximo passo.** A sugestão fica antes
 dos atalhos. Os três pontos no cabeçalho dão acesso a copiar e
 compartilhar o link, revisar conclusão, cancelar e arquivar, de acordo

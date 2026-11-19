@@ -2,13 +2,14 @@
 
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { useId, type ComponentProps, type ReactNode } from "react";
-import { Icon } from "./icon";
+import { Icon, type IconName } from "./icon";
 
 type OverlayProps = {
   open: boolean;
   title: string;
   kicker?: string;
   subtitle?: string;
+  headingIcon?: IconName;
   children: ReactNode;
   navigation?: ReactNode;
   footer?: ReactNode;
@@ -25,7 +26,7 @@ type OverlayProps = {
   contentRef?: ComponentProps<"div">["ref"];
 };
 
-function Overlay({ open, title, kicker, subtitle, children, navigation, footer, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false, keepMounted = false, success = false, failure, popupClassName, contentRef }: OverlayProps & { side?: "start" | "end" }) {
+function Overlay({ open, title, kicker, subtitle, headingIcon, children, navigation, footer, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false, keepMounted = false, success = false, failure, popupClassName, contentRef }: OverlayProps & { side?: "start" | "end" }) {
   const titleId = useId();
   const outcome = success ? "success" : failure;
   return <BaseDialog.Root open={open} disablePointerDismissal={closeDisabled} onOpenChange={(next, details) => {
@@ -37,8 +38,9 @@ function Overlay({ open, title, kicker, subtitle, children, navigation, footer, 
         <BaseDialog.Backdrop className="hca-modal-backdrop" />
         <BaseDialog.Viewport className={side ? "hca-drawer-viewport" : "hca-modal-viewport"} data-side={side}>
           <BaseDialog.Popup id={id} aria-labelledby={titleId} className={[side ? "hca-modal hca-drawer" : outcome ? "hca-modal hca-modal-success" : "hca-modal", popupClassName].filter(Boolean).join(" ")} data-outcome={outcome} finalFocus={finalFocus}>
-            <header className={kicker || subtitle ? "hca-modal-head hca-modal-context-head" : "hca-modal-head"}>
-              {outcome ? null : kicker || subtitle ? (
+            <header className={kicker || subtitle || headingIcon ? "hca-modal-head hca-modal-context-head" : "hca-modal-head"}>
+              {!outcome && headingIcon ? <span className="hca-modal-heading-icon"><Icon name={headingIcon} width={22} height={22} /></span> : null}
+              {outcome ? null : kicker || subtitle || headingIcon ? (
                 <div>
                   {kicker ? <p className="hca-modal-kicker">{kicker}</p> : null}
                   <BaseDialog.Title id={titleId}>{title}</BaseDialog.Title>

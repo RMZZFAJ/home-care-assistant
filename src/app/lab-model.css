@@ -994,6 +994,22 @@
 .hca-l1 .hca-issuance-actions > :last-child { grid-column: 1 / -1; }
 .hca-l1 .hca-issuance-actions > * { min-width: 0; white-space: normal; text-align: center; }
 .hca-l1 .hca-issuance-actions svg { flex-shrink: 0; }
+.hca-l1 .hca-document-change-dialog { width: min(365px, calc(100vw - 20px)); border: 0; border-top: 3px solid #71a899; border-radius: 18px; box-shadow: 0 18px 65px #193b3033; }
+.hca-l1 .hca-document-change-dialog > .hca-modal-head { display: grid; grid-template-columns: 36px minmax(0, 1fr) 30px; align-items: start; gap: 10px; padding: 19px 16px 9px; border: 0; }
+.hca-l1 .hca-document-change-dialog .hca-modal-heading-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; color: #236c65; background: #e3f2ed; }
+.hca-l1 .hca-document-change-dialog .hca-modal-kicker { margin: 0 0 4px; color: #236c65; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+.hca-l1 .hca-document-change-dialog .hca-modal-head h2 { font-size: 20px; line-height: 1.18; letter-spacing: -.6px; }
+.hca-l1 .hca-document-change-dialog .hca-modal-head > button { width: 30px; min-width: 30px; min-height: 30px; padding: 0; border-color: transparent; background: transparent; color: var(--hca-muted); }
+.hca-l1 .hca-document-change-dialog > .hca-modal-content { padding: 7px 17px 16px; }
+.hca-l1 .hca-document-change-dialog > .hca-modal-footer { padding: 11px 14px; background: #fafcfb; }
+.hca-l1 .hca-document-change-dialog > .hca-modal-footer .btn { min-height: 42px; white-space: normal; }
+.hca-document-change-list { display: grid; gap: 10px; margin: 0 0 10px; }
+.hca-document-change-list > div { padding: 10px 12px; border: 1px solid #dbe6df; border-radius: 10px; }
+.hca-document-change-list dt { color: #577067; font-size: 11px; }
+.hca-document-change-list dd { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin: 3px 0 0; font-size: 16px; }
+.hca-document-change-list del { color: #586e62; text-decoration-thickness: 1px; }
+.hca-document-change-list svg { flex: none; color: #62796a; }
+.hca-document-change-note { margin: 0; color: #3d534c; font-size: 13px; line-height: 1.45; }
 .hca-l1 .hca-issuance-notice-attention { display: grid; gap: 6px; margin: 0 0 14px; padding: 10px; border-radius: 9px; background: #fff4df; color: #785920; font-size: 12px; }
 .hca-l1 .hca-issuance-notice-attention p { margin: 0; }
 .hca-l1 .hca-issuance-notice-attention a { justify-self: start; }

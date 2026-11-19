@@ -63,3 +63,34 @@ test("COM devolve a mesma chegada ao autor e credita só o que foi reenviado e a
   expect(credited.receipts[0].state).toBe("approved");
   expect(stockEntries()).toBe("1");
 });
+
+test("COM aberta compara a quantidade corrigida de uma chegada antes de atualizar", async ({ page }, info) => {
+  const f = await purchaseBalanceFixture(), [line] = f.document.lines;
+  const declaration = { lineId: line.id, quantity: "4", expectedQuantity: "6", remainingAction: "wait" };
+  const pending = await purchaseBalanceCommand(f.family, f.document, "receive", { lines: [declaration] });
+  const [receipt] = pending.receipts;
+  const awaiting = await purchaseBalanceCommand(f.admin, pending, "request_receipt_correction", {
+    receiptId: receipt.id, reason: "Revise a unidade da embalagem.",
+  });
+  await loginDecision(page, fixtures.adminA.email, f.patient);
+  await page.goto(`/fichas/${awaiting.id}`);
+  await selectDocumentSection(page, "materials");
+  await expect(page.getByRole("tabpanel")).toContainText(line.name_snapshot);
+  await expect(page.locator(".hca-document-freshness")).toHaveCount(0);
+
+  await purchaseBalanceCommand(f.family, awaiting, "resubmit_receipt", {
+    receiptId: receipt.id, lines: [{ ...declaration, quantity: "5" }],
+  });
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await page.getByRole("button", { name: "Ver o que mudou", exact: true }).click();
+  const comparison = page.getByRole("dialog", { name: "Esta ficha recebeu alterações", exact: true });
+  const amount = comparison.locator("dl > div").filter({ hasText: "Quantidade informada na chegada" });
+  await expect(amount.locator("del")).toContainText("Antes: 4 ");
+  await expect(amount.locator("strong")).toContainText("Agora: 5 ");
+  await expect(comparison.getByText("Quantidade recebida no estoque familiar", { exact: false })).toHaveCount(0);
+  if (info.project.use.hasTouch) await info.attach("E05-15 chegada atualizada", { body: await comparison.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png" });
+  await comparison.getByRole("button", { name: "Atualizar agora", exact: true }).click();
+  await expect(comparison).toHaveCount(0);
+  await expect(page.locator(".hca-document-freshness")).toHaveCount(0);
+  expect(sql(`select count(*) from public.stock_movements where reference_type='purchase_receipt' and reference_id=${sqlLiteral(receipt.id)};`)).toBe("0");
+});

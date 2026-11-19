@@ -73,6 +73,7 @@ import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document
 import { DocumentIssuanceResult } from "./document-issuance-result";
 import { FamilyFulfillmentReview } from "./family-fulfillment-review";
 import { DocumentFreshness } from "./document-freshness";
+import { supplyChanges } from "@/lib/documents/document-changes";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import {
   DocumentTabs,
@@ -137,7 +138,7 @@ export function SupplyDocumentContent({
   const [fileActionTarget, setFileActionTarget] =
     useState<HTMLDivElement | null>(null);
   const editingRef = useRef(false);
-  const { data, setData, acceptRead, stale } = useDocumentCopy<SupplyDocument>(supplyCopyIdentity);
+  const { data, observedData, setData, acceptRead, stale } = useDocumentCopy<SupplyDocument>(supplyCopyIdentity);
   const [people, setPeople] = useState<PatientPerson[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -159,7 +160,6 @@ export function SupplyDocumentContent({
   const [purchaseUpdating, setPurchaseUpdating] = useState(false);
   const purchaseReadAttemptRef = useRef<number | null>(null);
   useOperationActivity(purchaseUpdating, { title: "Registrando compra", stage: 2, steps: purchaseActivitySteps });
-  const [readNotice, setReadNotice] = useState("");
   const [action, setAction] = useState<DocumentAction | null>(null);
   const registeringPurchase = action === "purchase" && data?.payload.origin !== "donation";
   const registeringArrival = action === "receive" && data?.type === "COM";
@@ -280,10 +280,6 @@ export function SupplyDocumentContent({
         setReadDenied(false);
         setReadFailed(false);
         acceptRead(result.data, id + ":" + attempt, editingRef.current);
-        if (editingRef.current)
-          setReadNotice(
-            "O acompanhamento foi atualizado. Sua operação permanece preservada e será validada contra a versão original ao confirmar.",
-          );
         setError("");
         if (result.data.type !== "COM" && result.data.care_recipient_id === patientId) {
           const directory = await api<{ directory: PatientPerson[]; }>(
@@ -399,7 +395,6 @@ export function SupplyDocumentContent({
       setPurchaseConflict(false);
       setDeliveryConflict(false);
       setComparison(null);
-      setReadNotice("");
       if (result.data.type === "ENT" && intention.action === "receive" && countedDeliveryReceiptBody.safeParse(intention.body).success) {
         setMessage("");
         setDeliveryReceiptResult(result.data);
@@ -886,15 +881,6 @@ export function SupplyDocumentContent({
       {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
       {error && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      {readNotice &&
-        (action ||
-          review ||
-          uncertain ||
-          regularizationEditing ||
-          balanceReviewEditing ||
-          transferEditing) ? (
-        <Notice>{readNotice}</Notice>
-      ) : null}
       {!coveredOperation ? purchaseConflictPanel : null}
       {deliveryConflict && data?.type === "ENT" && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation ? (
         <section className="ui-card space-y-3">
@@ -972,6 +958,8 @@ export function SupplyDocumentContent({
             ]}
             milestones={<DocumentMilestones items={supplyMilestones(data)} />}
             showFiles={false}
+            updateNotice={observedData ? <DocumentFreshness code={data.code ?? data.type}
+              changes={supplyChanges(data, observedData)} loading={refreshDisabled} editing={operationOpen} onRefresh={refreshDocument} /> : null}
             nextStep={
               archived ? <Notice>A ficha arquivada está disponível para consulta e download.</Notice> : followUpStep && loading ? null : followUpStep && (readFailed || operationOpen) ? (
                 <Notice>
@@ -1212,7 +1200,6 @@ export function SupplyDocumentContent({
             code={data.code ?? data.protocol ?? data.type} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado na ficha")}
             actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
             onClose={() => setArchiveDialog(null)} onUpdated={() => setAttempt(value => value + 1)} /> : null}
-          <DocumentFreshness stale={stale} loading={refreshDisabled} onRefresh={refreshDocument} />
           {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext && !archived)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
           <DocumentTabs
             rootRef={tabs.rootRef}

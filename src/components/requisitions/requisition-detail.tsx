@@ -12,6 +12,7 @@ import { DocumentFab } from "@/components/documents/document-fab";
 import { DocumentCommunications } from "@/components/notifications/document-communications";
 import { DocumentMaterialList } from "@/components/documents/document-material-list";
 import { DocumentFreshness } from "@/components/documents/document-freshness";
+import { changedFact } from "@/lib/documents/document-changes";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import { roleLabel } from "@/components/layout/workspace-context";
 import { ActionButton, Pill } from "@/components/ui/controls";
@@ -156,6 +157,35 @@ const modes: Record<string, string> = {
 };
 
 const requisitionCopyIdentity = (value: Detail) => JSON.stringify([value.status, value.progress, value.fulfillment, value.requisition_items]);
+
+const needLabels = {
+  pending: "Pendente",
+  partial: "Parcial",
+  fulfilled: "Integral",
+  review_required: "Aguardando nova avaliação familiar",
+};
+
+function requisitionChanges(before: Detail, after: Detail) {
+  const summary = (data: Detail) => {
+    const archive = activeDocumentArchive(data.documentArchive);
+    return archive ? documentArchiveLabel(archive) : documentStatusLabel(requisitionDocumentState({
+      historical: data.is_historical, status: data.status, archivedAt: data.progress.archivedAt, completedAt: data.progress.completedAt,
+      scienceSatisfied: data.progress.scienceSatisfied, fulfilled: data.fulfillment.fulfilled, partial: data.fulfillment.partial,
+    }));
+  };
+  const changes = changedFact("state", "Situação da ficha", summary(before), summary(after));
+  changes.push(...changedFact("science", "Ciência familiar", before.progress.familyAware ? "Registrada" : "Pendente", after.progress.familyAware ? "Registrada" : "Pendente"));
+  const previous = new Map(before.fulfillment.lines.map(line => [line.id, line]));
+  const next = new Map(after.fulfillment.lines.map(line => [line.id, line]));
+  const status = (line: Detail["fulfillment"]["lines"][number] | undefined) =>
+    line ? needLabels[line.serviceStatus ?? (line.attended ? "fulfilled" : "pending")] : "Sem avaliação";
+  for (const item of after.requisition_items) {
+    const name = item.custom_name ?? item.product_name_snapshot;
+    changes.push(...changedFact(item.id, name + " · Atendimento da necessidade", status(previous.get(item.id)), status(next.get(item.id))));
+  }
+  return changes;
+}
+
 export function RequisitionDocumentContent({
   id,
   context,
@@ -171,7 +201,7 @@ export function RequisitionDocumentContent({
   const [fileActionTarget, setFileActionTarget] =
     useState<HTMLDivElement | null>(null);
   const [openingRevision, setOpeningRevision] = useState("initial");
-  const { data, setData, acceptRead, stale } = useDocumentCopy<Detail>(requisitionCopyIdentity);
+  const { data, observedData, setData, acceptRead, stale } = useDocumentCopy<Detail>(requisitionCopyIdentity);
   const [attempt, setAttempt] = useState(0);
   const [error, setError] = useState("");
   const [readFailed, setReadFailed] = useState(false);
@@ -357,6 +387,8 @@ export function RequisitionDocumentContent({
           ) : null}<Pill tone={p.familyAware ? "success" : "warning"}><Icon name="users" width={13} height={13} />{data.is_historical ? "Ciência não comprovada" : p.familyAware ? "Ciência registrada" : p.policy?.scienceRequired === false ? "Exigência dispensada" : "Ciência pendente"}</Pill></>
         }
         showFiles={false}
+        updateNotice={observedData ? <DocumentFreshness code={data.code ?? data.protocol}
+          changes={requisitionChanges(data, observedData)} loading={reading || busy} editing={Boolean(decision)} onRefresh={refreshDocument} /> : null}
         nextStep={
           reading || readFailed ? (
             <Notice>
@@ -457,7 +489,6 @@ export function RequisitionDocumentContent({
         code={data.code ?? data.protocol} patientName={data.recipient_name_snapshot ?? context.patient?.display_name ?? "Paciente identificado na ficha"}
         actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
         onClose={() => setArchiveDialog(null)} onUpdated={() => setAttempt(value => value + 1)} /> : null}
-      <DocumentFreshness stale={stale} loading={reading || busy} onRefresh={refreshDocument} />
       {data.status === "cancelled" ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={!p.archivedAt && data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} /> : null}
       <RequisitionDisplay
         key={id}
