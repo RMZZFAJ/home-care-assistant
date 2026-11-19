@@ -36,6 +36,11 @@ test("DEV expede diretamente, preserva a ENT original e reconhece somente o rece
   assert.equal(sent.transfer.agreement, null);
   assert.equal(sent.transfer.originDocumentId, f.origin.id);
   assert.ok(sent.events.every(event => event.action !== "ent.transfer.declared"));
+  const reassignment = await f.initiator.client.rpc("supply_document_command", {
+    p_id: sent.id, p_action: "reassign", p_version: sent.version, p_key: randomUUID(),
+    p_body: { recipientId: f.counterparty.id, reason: "A devolução direta preserva o recebedor definido" },
+  });
+  assert.equal(reassignment.error?.code, "22023");
 
   const afterDispatch = JSON.parse(transferState(f));
   assert.equal(afterDispatch.ledger.length, before.ledger.length + 1);

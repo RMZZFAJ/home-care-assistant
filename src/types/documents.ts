@@ -102,6 +102,17 @@ export type DeliveryRecipientSelection = {
   recordedAt: string;
   official: boolean;
 };
+export type DeliveryReassignmentContext = {
+  documentId: string;
+  version: number;
+  currentRecipientId: string;
+  currentRecipientName: string | null;
+  dispatchedAt: string | null;
+  people: DeliveryPreparation["people"];
+  shifts: DeliveryPreparation["shifts"];
+  nextShifts: Pick<DeliveryPreparation["shifts"][number], "id" | "professionalId" | "startsAt" | "endsAt">[];
+  suggestedId: string | null;
+};
 export type DocumentEvent = {
   id: string;
   version: number;

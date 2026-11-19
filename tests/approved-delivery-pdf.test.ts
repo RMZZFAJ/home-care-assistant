@@ -58,6 +58,25 @@ it("approved autonomous return preserves direction, declaration/agreement and ab
   writeFileSync("output/pdf/approved/return-controlled.pdf", plan.bytes);
 }, 30000);
 
+it("identifies the original dispatch recipient separately from the newly designated recipient", async () => {
+  const source = structuredClone(legacyFidelitySnapshots.find(row => row.type === "ENT")!);
+  source.status = "pending_receipt";
+  source.documentFacts = { schemaVersion: 1, deliveryResolutions: [], purchaseReceiptEvents: [] };
+  const recordedAt = "2026-11-11T12:00:00Z", referenceHash = "b".repeat(64);
+  const issuer = { id: regularizationId(71), name: "Familiar expedidora" };
+  const original = { id: regularizationId(72), name: "Roberto recebedor inicial" };
+  const current = { id: regularizationId(73), name: "Ana nova recebedora" };
+  source.transfer = { state: "dispatched", originDocumentId: null, dispatchedAt: recordedAt, agreement: null, withdrawal: null,
+    declaration: { mode: "direct", actor: issuer, recipient: original, source: "FAMILY", destination: "CARE_TEAM", reason: "Expedição original", recordedAt, referenceHash } };
+  source.workflow = { recipientSelection: { recipientId: current.id, recipientName: current.name, recipientRole: "professional",
+    selectedBy: issuer.id, selectedName: issuer.name, recordedAt, referenceHash, official: true, manual: true,
+    previousRecipientId: original.id, suggestionState: "no_schedule", suggestedId: null, shifts: [], reason: "Troca para o plantão seguinte" } };
+  const plan = await composeIssuance(lifecycle(source), "a".repeat(64), emission), text = await plain(plan.bytes);
+  expect(text).toContain(compact("Recebedor indicado na expedição: " + original.name));
+  expect(text).toContain(compact("Recebedor designado " + current.name));
+  expect(text).toContain(compact("Troca para o plantão seguinte"));
+}, 30000);
+
 it("approved ENT keeps pending or rejected administrative quantities as proposals and never gives an unproved receipt a success seal", async () => {
   for (const state of ["pending", "rejected"] as const) {
     const source = lifecycle(regularizationSnapshot()), item = source.deliveryRegularization!.cases[0]; item.state = state;

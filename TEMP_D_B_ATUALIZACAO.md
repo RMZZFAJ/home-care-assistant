@@ -1,5 +1,30 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — troca de recebedor antes da conferência.** Em uma ENT expedida,
+o menu de ações abre a troca do E06-09. O diálogo mostra o recebedor atual,
+o horário da expedição, as pessoas elegíveis, o plantão atual e os próximos
+plantões publicados. O registro exige justificativa.
+
+- A troca vale para a ENT direta antes do aceite e preserva a declaração
+  original de expedição. DEV e transferências bilaterais conservam a regra
+  anterior. Somente o recebedor vigente pode conferir os materiais.
+- O ato registra autoria e motivo, enfileira o aviso pela política vigente
+  e conserva o estoque. Em caso de resposta perdida, a ficha consulta o
+  resultado da mesma tentativa. Sair descarta o preenchimento após
+  confirmação. O PDF distingue o recebedor indicado na expedição da
+  designação vigente.
+- Passaram 16 integrações com Auth real e 20 verificações dirigidas de
+  conteúdo em PDF. O cenário E06-09 passou em Android e iOS emulados, sem
+  repetição automática. A captura em 390 px mostra as duas opções de
+  plantão e a confirmação da troca.
+- A regressão da DEV também passou nos dois projetos. No iOS, a rodada
+  isolada fechou as sessões auxiliares antes da auditoria e usou o
+  limite local de 300 segundos. O limite da CI permanece em 180 segundos.
+- A migration `20261119175654` foi conferida na stack local. O ensaio com
+  rollback cobriu as 27 migrations pendentes no desenvolvimento e conferiu
+  os grants do novo contexto. O remoto segue em 272 versões e requer um
+  preview compatível antes da aplicação definitiva.
+
 **19/11 — regularização após o desligamento do recebedor.** A confirmação da
 revogação oferece a consulta das pendências do vínculo. A entrega autorizada
 abre a proposta na aba Materiais. O desligamento e a abertura da proposta

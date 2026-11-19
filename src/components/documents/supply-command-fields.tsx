@@ -4,7 +4,6 @@ import {
   useCallback,
   useEffect,
   useId,
-  useMemo,
   useImperativeHandle,
   useRef,
   useState,
@@ -21,7 +20,7 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
-import type { PatientPerson, SupplyDocument } from "@/types/documents";
+import type { SupplyDocument } from "@/types/documents";
 import {
   acquisitionRemaining,
   arrivalRemaining,
@@ -51,7 +50,6 @@ export type ReceiptDraftHandle = { snapshot: () => ReceiptDraftContent; };
 export type CommandEditorProps = {
   action: DocumentAction;
   data: SupplyDocument;
-  people: PatientPerson[];
   context: WorkspaceContext;
   onCancel: () => void;
   onReview: (
@@ -68,7 +66,6 @@ export type CommandEditorProps = {
 export function CommandEditorFields({
   action,
   data,
-  people,
   context,
   onCancel,
   onReview,
@@ -95,27 +92,9 @@ export function CommandEditorFields({
   const [divergent, setDivergent] = useState<string[]>(
     initialDraft?.divergentIds ?? [],
   );
-  const [recipientSelection, setRecipientSelection] = useState(
-    initialDraft?.fields.recipientId ?? "",
-  );
   const [resolutionSelection, setResolutionSelection] = useState(
     initialDraft?.fields.resolution ??
     (data.recipient_id === context.userId ? "received" : "returned"),
-  );
-  const eligibleRecipients = useMemo(() => {
-    const roles =
-      data.payload.destination === "FAMILY"
-        ? ["admin", "family"]
-        : ["admin", "professional", "supervisor"];
-    return people.filter(
-      (person) =>
-        roles.includes(person.role) &&
-        person.id !== data.recipient_id &&
-        person.id !== data.created_by,
-    );
-  }, [people, data.payload.destination, data.recipient_id, data.created_by]);
-  const selectedRecipient = eligibleRecipients.find(
-    (person) => person.id === recipientSelection,
   );
   const formElementRef = useRef<HTMLFormElement | null>(null);
   useImperativeHandle(formRef, () => formElementRef.current!);
@@ -150,8 +129,6 @@ export function CommandEditorFields({
       )?.checked
         ? "on"
         : "";
-    if (action === "reassign" && selectedRecipient)
-      fields.recipientLabel = selectedRecipient.name;
     if (action === "resolve") {
       const line = data.lines.find((item) => item.id === fields.lineId);
       if (line)
@@ -172,7 +149,6 @@ export function CommandEditorFields({
     data,
     divergent,
     action,
-    selectedRecipient,
   ]);
   useImperativeHandle(snapshotRef, () => ({ snapshot: captureSnapshot }), [
     captureSnapshot,
@@ -323,14 +299,6 @@ export function CommandEditorFields({
             .join("\n") +
           "\n\nDispensar somente a expectativa não adquirida, sem entrada ou baixa de material. Parcelas pendentes continuam exigindo conferência.\nMotivo: " +
           reason;
-      } else if (action === "reassign") {
-        if (!selectedRecipient)
-          throw new Error(
-            "Escolha expressamente uma pessoa elegível para receber esta entrega.",
-          );
-        body = { recipientId: recipientSelection, reason };
-        summary =
-          "Alterar o destinatário antes do primeiro aceite. Motivo: " + reason;
       } else if (action === "resolve") {
         const selected = data.lines.find(
           (line) => line.id === selectedLine && line.metadata.issueOpen,
@@ -372,7 +340,6 @@ export function CommandEditorFields({
     "approve",
     "divergence",
     "close_expectation",
-    "reassign",
     "resolve",
     "cancel",
   ].includes(action);
@@ -553,30 +520,6 @@ export function CommandEditorFields({
             adquirida.
           </label>
         </section>
-      ) : null}
-      {action === "reassign" ? (
-        <label className="block text-sm font-semibold">
-          Novo destinatário
-          <select
-            name="recipientId"
-            className={inputClass}
-            required
-            value={recipientSelection}
-            onChange={(event) => setRecipientSelection(event.target.value)}
-          >
-            <option value="">Selecione</option>
-            {recipientSelection && !selectedRecipient ? (
-              <option value={recipientSelection}>
-                Pessoa preservada indisponível para esta entrega
-              </option>
-            ) : null}
-            {eligibleRecipients.map((person) => (
-              <option key={person.id} value={person.id}>
-                {person.name}
-              </option>
-            ))}
-          </select>
-        </label>
       ) : null}
       {action === "resolve" ? (
         <>

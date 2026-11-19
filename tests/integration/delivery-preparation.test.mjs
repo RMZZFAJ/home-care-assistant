@@ -96,6 +96,72 @@ const prepare = (f) =>
     p_patient: f.patient,
     p_source: "FAMILY",
   });
+test("E06-09 reassigns direct ENT once, preserves the dispatch, and transfers personal receipt authority", async () => {
+  const f = await setup();
+  const shift = currentShift(f);
+  const recipient = await actor("professional", f.patient);
+  const former = await actor("global", f.patient);
+  const reader = await actor("reader", f.patient);
+  try {
+    const preparation = await rpc(f.admin, "transfer_preparation", { p_patient: f.patient, p_source: "FAMILY" });
+    const sent = await rpc(f.admin, "create_transfer_declaration", {
+      p_patient: f.patient,
+      p_key: randomUUID(),
+      p_body: {
+        mode: "direct", source: "FAMILY", recipientId: fixtures.global.id,
+        referenceHash: preparation.referenceHash, reason: "Expedição direta fictícia",
+        lines: [{ productId: f.products[0], quantity: "2" }],
+      },
+    });
+    const reference = { p_id: sent.id };
+    const read = await rpc(f.admin, "delivery_reassignment_context", reference);
+    assert.equal(read.version, sent.version);
+    assert.equal(read.currentRecipientId, fixtures.global.id);
+    assert.equal(read.suggestedId, fixtures.professional.id);
+    assert.equal(read.shifts[0].id, shift.id);
+    assert.ok(!read.people.some(person => [fixtures.global.id, fixtures.adminA.id, fixtures.family.id, fixtures.reader.id].includes(person.id)));
+    assert.equal((await reader.rpc("delivery_reassignment_context", reference)).error?.code, "42501");
+    const command = {
+      p_id: sent.id, p_version: sent.version, p_action: "reassign", p_key: randomUUID(),
+      p_body: { recipientId: fixtures.professional.id, reason: "Profissional assumiu o plantão fictício" },
+    };
+    const before = stock(f);
+    assert.equal((await recipient.rpc("supply_document_command", command)).error?.code, "42501");
+    assert.equal((await f.admin.rpc("supply_document_command", {
+      ...command, p_key: randomUUID(), p_body: { ...command.p_body, recipientId: fixtures.global.id },
+    })).error?.code, "22023");
+    const [first, repeated] = await Promise.all([
+      rpc(f.admin, "supply_document_command", command),
+      rpc(f.admin, "supply_document_command", command),
+    ]);
+    assert.equal(first.version, sent.version + 1);
+    assert.equal(first.version, repeated.version);
+    assert.equal(first.events.filter(event => event.action === "ent.reassign").length, 1);
+    assert.equal(first.recipient_id, fixtures.professional.id);
+    assert.equal(first.workflow_data.recipientSelection.previousRecipientId, fixtures.global.id);
+    assert.equal(first.workflow_data.recipientSelection.reason, command.p_body.reason);
+    assert.deepEqual(first.transfer.declaration, sent.transfer.declaration);
+    assert.equal(first.events.find(event => event.version === sent.version).hash,
+      sent.events.find(event => event.version === sent.version).hash);
+    assert.equal(stock(f), before);
+    assert.equal(sql(`select count(*) from public.requisition_notifications where document_id=${sqlLiteral(sent.id)}
+      and recipient_user_id=${sqlLiteral(fixtures.professional.id)} and event_key='ent.reassign' and channel='internal';`), "1");
+    const receipt = {
+      p_id: sent.id, p_version: first.version, p_action: "receive",
+      p_key: randomUUID(), p_body: { divergences: [] },
+    };
+    assert.equal((await former.rpc("supply_document_command", receipt)).error?.code, "42501");
+    const accepted = await rpc(recipient, "supply_document_command", receipt);
+    assert.equal(accepted.workflow_data.acceptedBy, fixtures.professional.id);
+    assert.equal((await f.admin.rpc("delivery_reassignment_context", reference)).error?.code, "PT409");
+    assert.equal((await f.admin.rpc("supply_document_command", {
+      ...command, p_version: accepted.version, p_key: randomUUID(),
+    })).error?.code, "PT409");
+  } finally {
+    shift.close();
+  }
+});
+
 test("P06 suggests the single current eligible worker and captures the actual chooser without fabricating a receipt", async () => {
   const f = await setup(),
     shift = currentShift(f);

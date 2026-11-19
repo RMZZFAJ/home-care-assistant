@@ -49,6 +49,7 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
   const cancellingSupply = domain === "supply" && action === "cancel";
   const purchasing = domain === "supply" && action === "purchase";
   const receiving = domain === "supply" && action === "receive" && !purchaseArrival;
+  const reassigningDelivery = domain === "supply" && action === "reassign";
   const reconcilingDelivery = domain === "supply" && action === "resolve";
   const requestingDeliveryReview = domain === "supply" && action === "request_fulfillment_review";
   const resendingArrival = domain === "supply" && action === "resubmit_receipt";
@@ -60,7 +61,7 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
       : deliveryCancellationRequest ? "Enviando pedido de cancelamento" : consentingDelivery ? "Registrando consentimento e devolução"
       : changingCancellationRequest ? "Registrando a decisão" : cancellingRequisition || cancellingSupply ? "Registrando cancelamento" : purchasing ? "Registrando compra"
       : resendingArrival ? "Reenviando chegada" : purchaseArrival ? "Registrando chegada"
-        : receiving ? "Confirmando recebimento" : reconcilingDelivery ? "Registrando conciliação"
+        : receiving ? "Confirmando recebimento" : reassigningDelivery ? "Atualizando recebedor" : reconcilingDelivery ? "Registrando conciliação"
           : requestingDeliveryReview ? "Enviando pedido de reavaliação" : "Concluindo a ação",
     detail: "Aguarde a conferência do resultado antes de tentar novamente.",
     stage,
@@ -68,10 +69,10 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
       { label: followUp ? "Conferindo a decisão e o histórico" : deliveryCancellationRequest ? "Conferindo o recebimento" : consentingDelivery ? "Conferindo devolução e consumo"
         : changingCancellationRequest ? "Conferindo a autoria" : cancellingRequisition || cancellingSupply ? "Conferindo os efeitos no estoque" : resendingArrival ? "Conferindo o lançamento"
         : purchaseArrival ? "Registrando as quantidades recebidas" : receiving ? "Registrando a conferência"
-          : reconcilingDelivery ? "Registrando o destino do material"
+          : reassigningDelivery ? "Conferindo o vínculo e registrando a troca" : reconcilingDelivery ? "Registrando o destino do material"
             : requestingDeliveryReview ? "Preservando o recebimento confirmado" : "Enviando sua confirmação",
-      icon: deliveryCancellationRequest ? "truck" : consentingDelivery || cancellingRequisition || cancellingSupply ? "stock" : purchaseArrival || receiving ? "truck" : "file" },
-      { label: deliveryCancellationRequest ? "Conferindo o pedido registrado" : receiving ? "Conferindo o estoque e as pendências" : "Conferindo o resultado", icon: "check" },
+      icon: reassigningDelivery ? "user" : deliveryCancellationRequest ? "truck" : consentingDelivery || cancellingRequisition || cancellingSupply ? "stock" : purchaseArrival || receiving ? "truck" : "file" },
+      { label: deliveryCancellationRequest ? "Conferindo o pedido registrado" : receiving ? "Conferindo o estoque e as pendências" : reassigningDelivery ? "Conferindo a alteração registrada" : "Conferindo o resultado", icon: "check" },
     ],
   });
   function remember(key: string) { currentRef.current = { scope: storageKey, key }; try { sessionStorage.setItem(storageKey, key); } catch { /* The open form retains its key. */ } }

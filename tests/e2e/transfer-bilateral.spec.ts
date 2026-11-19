@@ -75,6 +75,7 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
   page,
   browser,
 }, info) => {
+  if (!process.env.CI && info.project.name === "ios") test.setTimeout(300_000);
   const f = await transferFixture(),
     before = JSON.parse(transferState(f));
   sql(
@@ -129,7 +130,7 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
   await recovery.getByRole("button", { name: "Consultar resultado", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Devolução expedida", exact: true }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 60_000 }); // The initial PDF route also has a 60-second budget.
   expect(packets).toHaveLength(1);
   expect(document!.code).toMatch(/^DEV-/);
   expect(document!.status).toBe("pending_receipt");
@@ -155,12 +156,8 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
   sql(
     `update public.capability_overrides set enabled=true where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(f.initiator.id)} and capability='ent.create';`,
   );
-  const anaContext = await browser.newContext({
-      baseURL: new URL(page.url()).origin,
-    }),
-    brunoContext = await browser.newContext({
-      baseURL: new URL(page.url()).origin,
-    });
+  const baseURL = new URL(page.url()).origin;
+  const anaContext = await browser.newContext({ baseURL });
   try {
     const ana = await anaContext.newPage();
     await login(ana, f.counterparty.email, f.patient);
@@ -173,14 +170,23 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
     expect(JSON.parse(transferState(f)).ledger.length).toBe(
       before.ledger.length + 1,
     );
-    await expectNoOperationalDocumentAction(page, "Alterar destinatário");
+  } finally {
+    await anaContext.close();
+  }
+  await expectNoOperationalDocumentAction(page, "Trocar recebedor");
+  await page.close();
+  const brunoContext = await browser.newContext({ baseURL });
+  try {
     const bruno = await brunoContext.newPage();
+    await bruno.bringToFront();
     await login(bruno, f.recipient.email, f.patient);
     await bruno.goto("/entregas");
     const receiptTask = bruno.locator(`[data-delivery-id="${id}"]`);
     await expect(receiptTask).toContainText("Conferir meu recebimento");
     await receiptTask.getByRole("link", { name: "Conferir", exact: true }).click();
-    await selectDocumentSection(bruno, "workflow");
+    await expect(bruno.getByRole("heading", { name: document!.code!, exact: true })).toBeVisible();
+    await expect(bruno.locator(".hca-activity-overlay")).toHaveCount(0);
+    await expect(bruno.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
     await openDocumentAction(bruno, "Informar divergência");
     await bruno
       .getByRole("checkbox", { name: /Material fictício V4 0.*expedido/ })
@@ -231,6 +237,7 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
         ),
       ),
     ).toBe(2);
+    await expect(bruno.locator(".hca-activity-overlay")).toHaveCount(0);
     for (const width of [320, 390, 768, 1440]) {
       await bruno.setViewportSize({ width, height: 900 });
       await audit(bruno, `transfer-direct-receipt-${width}`);
@@ -273,7 +280,6 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
       (await bruno.request.get(`/api/documents/${id}/pdf?version=1`)).status(),
     ).toBe(400);
   } finally {
-    await anaContext.close();
     await brunoContext.close();
   }
 });

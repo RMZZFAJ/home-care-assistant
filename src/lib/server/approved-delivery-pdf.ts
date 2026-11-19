@@ -123,7 +123,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
     layout.heading(direct ? (returned ? "Expedição da devolução" : "Expedição da entrega") : (returned ? "Declaração da devolução" : "Declaração da transferência"));
     layout.paragraph((direct ? "Expedidor: " : "Declarante: ") + transfer.declaration.actor.name + " · " + formatBrazilDate(transfer.declaration.recordedAt), "transfer/declaration"); layout.paragraph(transfer.declaration.reason, "transfer/reason");
     const counterparty = transfer.declaration.counterparty;
-    const recipient = "Recebedor físico designado: " + transfer.declaration.recipient.name;
+    const recipient = (direct ? "Recebedor indicado na expedição: " : "Recebedor físico designado: ") + transfer.declaration.recipient.name;
     layout.paragraph(counterparty ? "Contraparte para concordância: " + counterparty.name + " · " + recipient : recipient, "transfer/people", { size: 9.5 });
     if (transfer.agreement) { layout.paragraph((transfer.agreement.decision === "agree" ? "Concordância própria: " : "Recusa própria: ") + transfer.agreement.actor.name + " · " + formatBrazilDate(transfer.agreement.recordedAt), "transfer/agreement"); layout.paragraph(transfer.agreement.reason, "transfer/agreementReason"); }
     else if (!direct) layout.paragraph("Sem concordância registrada nesta versão.", "transfer/agreement");

@@ -18,6 +18,8 @@ import {
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { setup } from "../integration/v4-fixtures.mjs";
+import { currentDeliveryShift } from "../integration/delivery-preparation-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 test.setTimeout(240_000);
 function fixtures() {
   assertLocalProject();
@@ -27,9 +29,9 @@ function fixtures() {
   >;
 }
 const selectedPatients = new WeakMap<Page, string>();
-async function login(page: Page, role = "global") {
+async function signIn(page: Page, email: string) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures()[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -38,6 +40,13 @@ async function login(page: Page, role = "global") {
   await expect(
     page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
   ).toBeVisible();
+}
+async function login(page: Page, role = "global", preparedPatient?: string) {
+  await signIn(page, fixtures()[role].email);
+  if (preparedPatient) {
+    await post(page, "/api/context", { careRecipientId: preparedPatient });
+    return;
+  }
   await selectContext(
     page,
     selectedPatients.get(page) ??
@@ -1035,44 +1044,75 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   }
 });
 
-test("alteração de destinatário e cancelamento bilateral preservam os saldos reais", async ({
+test("E06-09 troca de recebedor de ENT direta e cancelamento com consentimento preservam os saldos reais", async ({
   page,
-}) => {
-  await login(page);
-  const { patient, products } = await prepare(page);
-  const product = products[0];
-  await post(page, "/api/stock/movements", {
-    careRecipientId: patient,
-    productId: product.id,
-    quantity: "10",
-    action: "inbound",
-    reason: "Entrada para cancelamento bilateral",
-    idempotencyKey: randomUUID(),
-  });
+}, info) => {
+  const { patient, products } = await setup();
+  const product = { id: products[0], name: "Material fictício V4 0" };
+  const receiver = await shiftWorker(patient, "admin");
+  const nextWorker = await shiftWorker(patient);
+  sql(`update public.profiles set full_name='Conferente do plantão atual' where id=${sqlLiteral(receiver.id)};
+    update public.profiles set full_name='Conferente do próximo plantão' where id=${sqlLiteral(nextWorker.id)};
+    insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values
+      (${sqlLiteral(patient)},${sqlLiteral(fixtures().adminA.id)},'ent.receive',false),
+      (${sqlLiteral(patient)},${sqlLiteral(fixtures().global.id)},'ent.receive',false),
+      (${sqlLiteral(patient)},${sqlLiteral(fixtures().family.id)},'ent.cancel',true);`);
+  await page.setViewportSize({ width: 390, height: 760 });
+  await login(page, "family", patient);
+  currentDeliveryShift({ patient }, receiver.id);
+  currentDeliveryShift({ patient }, nextWorker.id, 60);
+  const preparation = (await (await get(page, "/api/transfers/preparation?source=FAMILY&careRecipientId=" + patient)).json()).data;
   const delivery = (
-    await post(page, "/api/documents", {
+    await post(page, "/api/transfers", {
       careRecipientId: patient,
-      type: "ENT",
-      payload: {
-        recipientReason: "Escolha manual fictícia para este recebimento",
+      declaration: {
+        mode: "direct",
+        referenceHash: preparation.referenceHash,
+        reason: "Escolha manual fictícia para este recebimento",
         source: "FAMILY",
-        destination: "CARE_TEAM",
         recipientId: fixtures().professional.id,
         lines: [{ productId: product.id, quantity: "4" }],
       },
       idempotencyKey: randomUUID(),
-      draft: false,
     })
   ).data;
+  expect(delivery.transfer.declaration.mode).toBe("direct");
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
-  await openOperationalDocumentAction(page, "Alterar destinatário");
-  await page.getByLabel("Novo destinatário").selectOption(fixtures().adminA.id);
-  await page
-    .getByLabel("Motivo / justificativa")
-    .fill("Administrador receberá os materiais nesta ocasião");
-  await confirm(page);
+  await expect(page.getByRole("heading", { name: delivery.code, exact: true })).toBeVisible();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+  await openOperationalDocumentAction(page, "Trocar recebedor");
+  const editor = page.getByRole("dialog", { name: "Trocar recebedor", exact: true });
+  const onDuty = editor.getByRole("button", { name: /Em plantão/, pressed: true });
+  await expect(onDuty).toBeVisible();
+  await expect(onDuty.locator(".hca-reassignment-choice")).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(editor.getByRole("button", { name: /Próximo plantão/, pressed: false })).toBeVisible();
+  await expect(editor.getByText("Ainda não registrada", { exact: true })).toBeVisible();
+  await info.attach("E06-09-trocar-recebedor", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  const reason = "Administrador receberá os materiais nesta ocasião";
+  await editor.getByLabel("Motivo da troca").fill(reason);
+  await editor.getByRole("button", { name: "Voltar", exact: true }).click();
+  const exit = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });
+  await exit.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+  await expect(editor.getByLabel("Motivo da troca")).toHaveValue(reason);
+  const decisionPath = "**/api/documents/" + delivery.id + "/decisions";
+  let sent = 0;
+  await page.route(decisionPath, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    sent++;
+    const response = await route.fetch();
+    expect(response.ok(), await response.text()).toBeTruthy();
+    await route.abort("failed");
+  });
+  await editor.getByRole("button", { name: "Confirmar novo recebedor", exact: true }).click();
+  const success = page.getByRole("dialog", { name: "Recebedor atualizado", exact: true });
+  await expect(success.getByText(reason, { exact: true })).toBeVisible();
+  await expect(success.getByText("Recebedor anterior", { exact: true })).toBeVisible();
+  await info.attach("E06-09-recebedor-atualizado", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await success.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await page.unroute(decisionPath);
+  expect(sent).toBe(1);
   await logout(page);
-  await login(page, "professional");
+  await login(page, "professional", patient);
   const denied = await page.request.post("/api/documents/" + delivery.id, {
     data: {
       action: "receive",
@@ -1083,13 +1123,15 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   });
   expect(denied.status()).toBe(403);
   await logout(page);
-  await login(page, "adminA");
+  await signIn(page, receiver.email);
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
   await confirmCompleteDeliveryReceipt(page);
-  await expectNoOperationalDocumentAction(page, "Alterar destinatário");
+  await expectNoOperationalDocumentAction(page, "Trocar recebedor");
   await logout(page);
-  await login(page);
+  await login(page, "family", patient);
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
+  await expect(page.getByRole("heading", { name: delivery.code, exact: true })).toBeVisible();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await openDocumentMore(page);
   await page
     .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
@@ -1108,9 +1150,9 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(4);
-  expect(Number(stock.family.confirmed)).toBe(6);
+  expect(Number(stock.family.confirmed)).toBe(26);
   await logout(page);
-  await login(page, "adminA");
+  await signIn(page, receiver.email);
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
   await page
     .getByRole("button", {
@@ -1142,7 +1184,7 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(0);
-  expect(Number(stock.family.confirmed)).toBe(10);
+  expect(Number(stock.family.confirmed)).toBe(30);
 });
 
 test("Flow exige revisão do autor e confirmação autorizada antes de debitar estoque", async ({

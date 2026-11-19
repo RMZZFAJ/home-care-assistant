@@ -20,7 +20,7 @@ export function TransferFactsDisplay({ facts }: { facts: TransferFacts }) {
         { label: declaration.mode === "direct" ? "Expedidor" : "Declarante", value: declaration.actor.name },
         { label: "Registrada em", value: formatBrazilDate(declaration.recordedAt) },
         ...(declaration.counterparty ? [{ label: "Contraparte designada para concordância", value: declaration.counterparty.name }] : []),
-        { label: "Recebedor físico designado", value: declaration.recipient.name },
+        { label: declaration.mode === "direct" ? "Recebedor indicado na expedição" : "Recebedor físico designado", value: declaration.recipient.name },
       ]} />
       <p className="whitespace-pre-wrap">
         Justificativa original: {declaration.reason}

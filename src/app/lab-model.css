@@ -1114,6 +1114,30 @@
 .hca-regularization-impact > svg { flex: 0 0 16px; }
 #regularizacao { scroll-margin-top: calc(var(--app-header-height, 65px) + 16px); }
 .hca-transit-cancellation .hca-definition-grid { gap: 12px; }
+.hca-overlay:has(.hca-reassignment-dialog) > .hca-modal-backdrop,
+.hca-overlay:has(.hca-reassignment-dialog) > .hca-modal-viewport { position: fixed; inset: var(--app-header-height, 65px) 0 0; }
+.hca-overlay:has(.hca-reassignment-dialog) > .hca-modal-backdrop { background: #183c3254; backdrop-filter: blur(1px); }
+.hca-l1 .hca-reassignment-dialog { width: min(490px, 100%); max-height: 100%; }
+.hca-l1 .hca-reassignment-dialog > .hca-modal-head { padding: 18px 16px 16px 18px; }
+.hca-l1 .hca-reassignment-dialog .hca-modal-kicker { text-transform: uppercase; letter-spacing: .09em; }
+.hca-l1 .hca-reassignment-dialog > .hca-modal-head > button { border-color: transparent; background: transparent; color: var(--hca-muted); }
+.hca-l1 .hca-reassignment-dialog > .hca-modal-content { padding: 16px 18px; }
+.hca-l1 .hca-reassignment-dialog > .hca-modal-footer { justify-content: flex-end; padding: 14px 18px; background: #fafcfb; }
+.hca-l1 .hca-reassignment-dialog > .hca-modal-footer > button { flex: 0 1 110px; min-height: 44px; padding: 8px 10px; font-size: 11px; line-height: 1.35; white-space: normal; }
+.hca-reassignment { display: grid; gap: 20px; font-size: 12px; }
+.hca-reassignment .hca-definition-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-bottom: 16px; border-bottom: 1px solid var(--hca-line); }
+.hca-reassignment-people { min-width: 0; display: grid; gap: 7px; }
+.hca-reassignment-people > legend { padding: 0 0 10px; font-size: 14px; font-weight: 750; }
+.hca-reassignment-person { display: grid; grid-template-columns: 35px minmax(0, 1fr) 19px; gap: 10px; align-items: center; width: 100%; min-height: 58px; padding: 8px 10px; text-align: start; border: 1px solid var(--hca-line); border-radius: 11px; background: #fff; }
+.hca-reassignment-person[aria-pressed="true"] { border-color: #7eac9d; background: #eff7f2; }
+.hca-reassignment-person:disabled { opacity: .6; }
+.hca-reassignment-initials, .hca-reassignment-choice { display: grid; place-items: center; border: 1px solid #c1dcd3; }
+.hca-reassignment-initials { width: 35px; height: 35px; border-radius: 10px; background: #e4f0ea; font-weight: 700; color: #265e50; }
+.hca-reassignment-choice { width: 19px; height: 19px; border-radius: 50%; }
+.hca-reassignment-person[aria-pressed="true"] .hca-reassignment-choice { border-color: var(--hca-teal); background: var(--hca-teal); color: #fff; }
+.hca-reassignment-person-copy { min-width: 0; overflow-wrap: anywhere; }
+.hca-reassignment-person-copy > span { display: flex; align-items: center; gap: 5px; margin-top: 3px; font-size: 11px; color: var(--hca-muted); }
+.hca-reassignment-person-copy svg { flex: none; }
 .hca-transit-cancellation .hca-transit-quantities { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-top: 10px; border-top: 1px solid var(--hca-line); }
 .hca-cancellation-checklist { margin: 0; padding: 0; list-style: none; }
 .hca-cancellation-checklist li { display: flex; align-items: flex-start; gap: 9px; border-top: 1px solid var(--hca-line); padding: 10px 0; }

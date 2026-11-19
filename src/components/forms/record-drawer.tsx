@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from "rea
 import { Dialog, Drawer } from "@/components/ui/overlays";
 
 /** Contextual editing keeps the list and its filters in place. */
-export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false, modal = false, subtitle, popupClassName, footer }: {
+export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false, modal = false, kicker, subtitle, popupClassName, footer }: {
   title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
   recovery?: ReactNode;
   hasUnsavedChanges?: boolean;
@@ -11,6 +11,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
   uncertainOutcome?: boolean;
   exitDialog?: boolean;
   modal?: boolean;
+  kicker?: string;
   subtitle?: string;
   popupClassName?: string;
   footer?: (requestClose: () => void) => ReactNode;
@@ -45,7 +46,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
     if (exitDialog) requestAnimationFrame(restoreEditing); else restoreEditing();
   };
   const Surface = modal ? Dialog : Drawer;
-  return <Surface open title={title} subtitle={subtitle} popupClassName={popupClassName} footer={footer?.(requestClose)} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false} keyboardScrollable={keyboardScrollable}>
+  return <Surface open title={title} kicker={kicker} subtitle={subtitle} popupClassName={popupClassName} footer={footer?.(requestClose)} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false} keyboardScrollable={keyboardScrollable}>
       {recovery}
       {exitDialog ? <Dialog open={discard} title={uncertainOutcome ? "Fechar sem resultado confirmado?" : "Sair sem concluir?"} onClose={continueEditing} finalFocus={false}>
         <p>{uncertainOutcome ? "O resultado da tentativa continua sem confirmação. Fechar descarta os campos desta tela. Procure a supervisão e confira o resultado antes de repetir a ação." : "O preenchimento desta ação será descartado. Fechar não confirma a alteração."}</p>

@@ -20,6 +20,11 @@ export async function GET(request: Request, context: Context) {
         data: await rpc(auth.client, "delivery_cancellation_preview", { p_id: documentId }),
       });
     }
+    if (reference === "recipient-reassignment") {
+      return NextResponse.json({
+        data: await rpc(auth.client, "delivery_reassignment_context", { p_id: documentId }),
+      }, { headers: { "Cache-Control": "no-store" } });
+    }
     return NextResponse.json({
       data: await withRequisitionLinks(
         auth.client,
