@@ -1248,7 +1248,8 @@ export function PatientSupplyWizard({
       }
       setUncertain(uncertain || !known);
       if (isIssuance && frozenRef.current?.draftCommit && (uncertain || !known)) {
-        issuanceFailure.report({ outcome: "uncertain", cause: reason });
+        issuanceFailure.report({ outcome: type === "COM" && uncertain ? "lookup_failed" : "uncertain",
+          cause: reason, draftSaved: type === "COM" && !uncertain });
       } else {
         issuanceFailure.clear();
         setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a gravação.");
@@ -1817,7 +1818,8 @@ export function PatientSupplyWizard({
                 onNext={next}
                 onFinish={() => { if (!issuanceFailure.reopen()) void persist(false); }}
               />
-              <DocumentIssuanceFailure state={issuanceFailure} operation={type === "COM" ? "Emissão de ficha de compras" : "Expedição de entrega"} onRetry={() => persist(false)} />
+              <DocumentIssuanceFailure state={issuanceFailure} purchase={type === "COM"}
+                operation={type === "COM" ? "Emissão de ficha de compras" : "Expedição de entrega"} onRetry={() => persist(false)} />
             </section>
           )}
         </>

@@ -25,7 +25,7 @@ export async function reconcileIssuance(
   return issuanceReconciliationReceipt.parse(response.data);
 }
 
-type Failure = { outcome: "rejected" | "uncertain"; cause: unknown; draftSaved?: boolean; retryable?: boolean };
+type Failure = { outcome: "rejected" | "uncertain" | "lookup_failed"; cause: unknown; draftSaved?: boolean; retryable?: boolean };
 
 export function useIssuanceFailure() {
   const [failure, setFailure] = useState<Failure | null>(null);
@@ -58,41 +58,48 @@ export function useIssuanceFailure() {
 }
 
 export function DocumentIssuanceFailure({
-  state, operation, onRetry,
+  state, operation, onRetry, purchase = false,
 }: {
   state: ReturnType<typeof useIssuanceFailure>;
   operation: string;
   onRetry: () => Promise<void>;
+  purchase?: boolean;
 }) {
   return state.open && state.failure
-    ? <FailureDialog {...state.failure} operation={operation} attempts={state.attempts}
+    ? <FailureDialog {...state.failure} operation={operation} attempts={state.attempts} purchase={purchase}
         onClose={state.close} onRetry={() => state.retry(onRetry)} />
     : null;
 }
 
-function FailureDialog({ outcome, draftSaved, retryable = true, cause, operation, attempts, onClose, onRetry }: Failure & {
+function FailureDialog({ outcome, draftSaved, retryable = true, cause, operation, attempts, onClose, onRetry, purchase }: Failure & {
   operation: string;
   attempts: number;
   onClose: () => void;
   onRetry: () => void;
+  purchase: boolean;
 }) {
-  const title = outcome === "rejected" ? "Não foi possível gravar a ficha" : "Resultado ainda não confirmado";
+  const lookupFailed = outcome === "lookup_failed";
+  const title = lookupFailed ? "Não foi possível consultar o envio"
+    : outcome === "rejected" ? "Não foi possível gravar a ficha"
+      : purchase ? "Envio sem confirmação" : "Resultado ainda não confirmado";
   const canRetry = retryable && attempts < 2;
   const { copy, details } = useOperationSupport({ cause, operation, result: title,
-    fallbackCode: "EMISSAO_SEM_CONFIRMACAO", attempts, attemptLabel: "Tentativas nesta revisão" });
+    fallbackCode: lookupFailed ? "CONSULTA_ENVIO_INDISPONIVEL" : "EMISSAO_SEM_CONFIRMACAO", attempts, attemptLabel: "Tentativas nesta revisão" });
 
-  return <Dialog open failure={outcome} title={title}
-    subtitle={outcome === "rejected"
-      ? "A ficha não foi registrada nesta tentativa."
-      : "Ainda não foi possível confirmar se a ficha foi registrada. Consulte esta tentativa antes de emitir outra ficha."}
+  return <Dialog open failure={lookupFailed ? "rejected" : outcome} title={title}
+    subtitle={lookupFailed ? "A consulta ficou indisponível. Verifique o resultado da mesma tentativa."
+      : outcome === "rejected" ? "A ficha não foi registrada nesta tentativa."
+        : "Ainda não foi possível confirmar se a ficha foi registrada. Consulte esta tentativa antes de emitir outra ficha."}
     onClose={onClose}
     footer={<>
       <ActionButton onClick={onClose}>Voltar à revisão</ActionButton>
       {canRetry
-        ? <ActionButton variant="primary" onClick={onRetry}><Icon name="refresh" />{outcome === "uncertain" ? "Consultar resultado" : "Tentar novamente"}</ActionButton>
+        ? <ActionButton variant="primary" onClick={onRetry}><Icon name="refresh" />{outcome === "uncertain"
+          ? purchase ? "Verificar confirmação" : "Consultar resultado" : "Tentar novamente"}</ActionButton>
         : <ActionButton variant="primary" onClick={() => void copy()}><Icon name="copy" />Copiar detalhes</ActionButton>}
     </>}>
-    {draftSaved ? <p className="hca-issuance-draft-saved"><Icon name="note" width={16} height={16} />Seu rascunho está salvo. Você poderá retomar o preenchimento.</p> : null}
+    {draftSaved ? <p className="hca-issuance-draft-saved"><Icon name="note" width={16} height={16} />
+      {outcome === "uncertain" ? "O preenchimento foi guardado antes do envio." : "Seu rascunho está salvo. Você poderá retomar o preenchimento."}</p> : null}
     {attempts >= 2 ? <p className="hca-issuance-retry-limit">O problema persiste. Copie os detalhes para o responsável e retome a operação mais tarde.</p> : null}
     {details}
   </Dialog>;

@@ -5,6 +5,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { randomUUID, createHash } from "node:crypto";
 import { setup, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -99,8 +100,8 @@ async function chooseProduct(page: Page, name: string) {
   await option.click();
   await expect(combo).toHaveValue(name);
 }
-async function wizard(page: Page, patient: string) {
-  await page.goto("/fichas/com?careRecipientId=" + patient);
+async function wizard(page: Page, patient?: string) {
+  if (patient) await page.goto("/fichas/com?careRecipientId=" + patient);
   await page.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   await selectMaterialCategory(page);
   await page.getByRole("checkbox", { name: /Material fictício V4 0/ }).check();
@@ -344,11 +345,18 @@ test("edição obsoleta compara o fator atual e só adota a referência por aç�
 test("conversão emitida mantém dois pacotes de dez após fator doze e recupera a mesma intenção sem crédito duplicado", async ({
   page,
 }, info) => {
+  test.setTimeout(170_000);
   const f = await seed();
-  await login(page, f.patient);
-  await wizard(page, f.patient);
+  const admin = await shiftWorker(f.patient, "admin");
+  await page.goto("/login?next=%2Ffichas%2Fcom");
+  await page.getByLabel("E-mail", { exact: true }).fill(admin.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page).toHaveURL(url => url.pathname === "/fichas/com");
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
+  await wizard(page);
   await review(page);
-  const attempts: unknown[] = [];
+  const attempts: { idempotencyKey: string }[] = [];
   await page.route("**/api/documents", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
@@ -359,15 +367,31 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
       await route.abort("failed");
     } else await route.continue();
   });
+  const lookups: { idempotencyKey: string }[] = [];
+  await page.route("**/api/drafts/issuance/reconcile", async route => {
+    lookups.push(route.request().postDataJSON());
+    if (lookups.length === 1) {
+      await route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Consulta indisponível" } });
+    } else await route.continue();
+  });
   await page
     .getByRole("button", { name: "Emitir compra", exact: true })
     .click();
-  await page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true })
-    .getByRole("button", { name: "Consultar resultado", exact: true }).click();
+  const uncertain = page.getByRole("dialog", { name: "Envio sem confirmação", exact: true });
+  await expect(uncertain).toContainText("O preenchimento foi guardado antes do envio.");
+  await info.attach("E05-16 envio sem confirmação", { body: await uncertain.screenshot(), contentType: "image/png" });
+  await uncertain.getByRole("button", { name: "Verificar confirmação", exact: true }).click();
+  const failed = page.getByRole("dialog", { name: "Não foi possível consultar o envio", exact: true });
+  await expect(failed).toContainText("mesma tentativa");
+  await info.attach("E05-16 consulta indisponível", { body: await failed.screenshot(), contentType: "image/png" });
+  await failed.getByRole("button", { name: "Tentar novamente", exact: true }).click();
   await expect(
     page.getByRole("dialog", { name: "Compra emitida", exact: true }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 65_000 });
   expect(attempts).toHaveLength(1);
+  expect(lookups).toHaveLength(2);
+  expect(lookups[0]).toEqual(lookups[1]);
+  expect(lookups[1].idempotencyKey).toBe(attempts[0].idempotencyKey);
   const id = sql(
     `select id from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`,
   );
@@ -405,9 +429,13 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
   ).toBe("20.000000");
   await page.goto("/fichas/" + id);
   await selectDocumentSection(page, "materials");
+  const material = document.lines[0].name_snapshot;
+  await page.getByRole("button", { name: "Detalhes de " + material, exact: true }).click();
+  const details = page.getByRole("dialog", { name: material, exact: true });
   await expect(
-    page.getByText(/código 0123456789012.*2 × 10 unidade = 20 unidade.*v1/),
+    details.getByText(/código 0123456789012.*2 × 10 unidade = 20 unidade.*v1/),
   ).toBeVisible();
+  await details.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 940 });
     await page.evaluate(() => {

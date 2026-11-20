@@ -314,6 +314,9 @@ continua com seu vínculo próprio no menu de três pontos. A avaliação
 familiar de suficiência e a justificativa para múltiplas REQs aparecem
 quando há vínculos que exigem essas informações. O seletor também reconhece
 os vínculos por linha dos rascunhos anteriores.
+Na DEV, a origem documental pertence à expedição. A opção de vínculo
+por material demonstrada pela v7 ainda requer conferência com esse
+contrato.
 
 O rodapé dos assistentes L2 mostra o estado da gravação automática e as
 ações de navegação. A confirmação de saída e os controles excepcionais de
@@ -342,6 +345,18 @@ e materiais em leitura, com as ações de descartar e continuar no rodapé.
 Mantém a nomenclatura aprovada na L1. O teste de banco com Auth real
 confirmou uma compra e uma doação na mesma COM, um único crédito da doação
 e preservação do evento original.
+
+Em E05-16, a COM apresenta Envio sem confirmação quando falta a
+resposta da emissão. Uma consulta que falha tem o seu próprio diálogo
+e mantém a mesma tentativa para a próxima verificação. O estado inicial
+informa que o preenchimento foi guardado antes do envio. Voltar à revisão
+acompanha a tela que está aberta no fluxo de emissão real. O diagnóstico
+usa código e correlação, com o limite de duas consultas pelo diálogo.
+No iOS emulado, a mesma chave recuperou a ficha, a conversão original
+apareceu no painel do material e o PDF foi gerado. A primeira rodada no
+Android também confirmou a recuperação e o crédito único. A última
+rodada no Android parou na emissão inicial. O PostgreSQL local registrou
+um timeout da instrução antes da simulação da perda de resposta.
 
 ### Decisões e dúvidas de L2
 
