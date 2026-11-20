@@ -19,6 +19,7 @@ const confirmed = z.object({
 export function requireSupplyConfirmation(value: unknown, expected: {
   patientId: string; type: SupplyDocument["type"]; id?: string; minimumVersion?: number;
   observations?: string[]; pendingExtras?: PendingPurchaseExtra[];
+  acquisitionMode?: "planned";
 }): SupplyDocument {
   const parsed = confirmed.safeParse(value);
   if (!parsed.success) throw new Error("A resposta não confirmou a ficha. Recupere a mesma tentativa antes de emitir outra.");
@@ -26,6 +27,9 @@ export function requireSupplyConfirmation(value: unknown, expected: {
   if (row.care_recipient_id !== expected.patientId || row.type !== expected.type ||
     expected.id && row.id !== expected.id || row.version < (expected.minimumVersion ?? 1))
     throw new Error("A confirmação não corresponde à ficha e à versão desta tentativa. Recupere o resultado original.");
+  if (expected.acquisitionMode === "planned" &&
+    (row.payload.acquisitionMode !== expected.acquisitionMode || "origin" in row.payload))
+    throw new Error("A confirmação não corresponde ao planejamento desta tentativa. Recupere o resultado original.");
   const extras = pendingPurchaseExtras.safeParse(row.payload.pendingExtras === undefined ? [] : row.payload.pendingExtras);
   if (!extras.success || extras.data.length && row.type !== "COM" || !row.lines.length && !extras.data.length)
     throw new Error("A resposta não confirmou os materiais da ficha. Recupere a mesma tentativa.");

@@ -41,6 +41,12 @@ describe("explicit acquisition origin", () => {
         }).success,
       ).toBe(true);
   });
+  it("records a COM plan without a purchase or donation and rejects conflicting claims", () => {
+    const payload = { ...input.payload, acquisitionMode: "planned" };
+    expect(createSupplySchema.safeParse({ ...input, payload }).success).toBe(true);
+    expect(createSupplySchema.safeParse({ ...input, payload: { ...payload, origin: "donation" } }).success).toBe(false);
+    expect(createSupplySchema.safeParse({ ...input, type: "BAL", payload }).success).toBe(false);
+  });
   it("returns a safe editable-choice error for direct RPC rejection", () => {
     expect(() =>
       databaseError({ code: "22023", message: "purchase origin required" }),

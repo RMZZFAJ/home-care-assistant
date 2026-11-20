@@ -46,6 +46,7 @@ export type SupplyPayload = {
   notes?: string;
   observations?: string[];
   origin?: "purchase" | "donation";
+  acquisitionMode?: "planned";
   source?: Custody;
   destination?: Custody;
   recipientId?: string;

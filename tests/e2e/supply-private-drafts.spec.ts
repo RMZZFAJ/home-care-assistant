@@ -6,6 +6,8 @@ import { setup,actor,rpc,fixtures } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql,sqlLiteral } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { loginDecision } from "./l1-decision-policy";
 import { audit } from "./accessibility-audit";
 test.setTimeout(210_000);
 test.afterEach(async({page})=>{await page.unrouteAll({behavior:"wait"});});
@@ -25,14 +27,18 @@ const official=(patient:string)=>sql(`select jsonb_build_object('documents',(sel
 const draftContent=(f:{products:string[]},recipient="")=>({form:{quantities:{[f.products[0]]:"1,"},notes:"Preenchimento privado fictício",origin:recipient?"":"donation",source:"FAMILY",recipientId:recipient,recipientReason:recipient?"Pessoa indicada manualmente para esta entrega":""},links:{},materials:f.products.map((id,i)=>({id,name:"Material fictício V4 "+i,unit:"unidade",quantityDecimals:0})),context:{documentId:null,documentVersion:null,requisitionId:null,recipientName:recipient?"Profissional fictício":""}});
 
 test("COM entre duas sessões conserva decimal incompleto e resolve CAS sem emitir protocolo ou ficha",async({page,browser})=>{
- const f=await setup(),owner=await actor("family",f.patient),body=draftContent(f),saved=await rpc(owner,"supply_draft_command",{p_patient:f.patient,p_kind:"COM",p_purpose:"create",p_target:null,p_id:null,p_expected:null,p_body:{action:"save",content:body},p_key:randomUUID()}),before=official(f.patient),second=await browser.newContext();
+ const f=await setup(),owner=await shiftWorker(f.patient,"family"),body=draftContent(f),saved=await rpc(owner.client,"supply_draft_command",{p_patient:f.patient,p_kind:"COM",p_purpose:"create",p_target:null,p_id:null,p_expected:null,p_body:{action:"save",content:body},p_key:randomUUID()}),before=official(f.patient),second=await browser.newContext();
  try{
-  const peer=await second.newPage();await login(page,f.patient);await open(page,f.patient,"COM");await resume(page);await next(page);await selectMaterialCategory(page);const quantity=page.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(quantity).toHaveValue("1,");
-  await login(peer,f.patient);await open(peer,f.patient,"COM");await resume(peer);await next(peer);await selectMaterialCategory(peer);const other=peer.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(other).toHaveValue("1,");
+  const peer=await second.newPage();await loginDecision(page,owner.email,f.patient);await open(page,f.patient,"COM");await resume(page);await next(page);await selectMaterialCategory(page);const quantity=page.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(quantity).toHaveValue("1,");
+  await loginDecision(peer,owner.email,f.patient);await open(peer,f.patient,"COM");await resume(peer);await next(peer);await selectMaterialCategory(peer);const other=peer.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(other).toHaveValue("1,");
   await quantity.fill("2,");await expect(savedStatus(page)).toHaveText("Último rascunho salvo.");
   await other.fill("3,");await expect(panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true})).toBeEnabled();await expect(other).toHaveValue("3,");await expect(panel(peer).getByText("Quantidade: 2, unidade",{exact:true})).toBeVisible();await panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true}).click();await expect(savedStatus(peer)).toHaveText("Último rascunho salvo.");
   const row=JSON.parse(sql(`select jsonb_build_object('id',id,'revision',revision,'content',content,'navigation',navigation) from private.creation_drafts where id=${sqlLiteral(saved.id)};`));expect(row.revision).toBe(3);expect(row.content.form.quantities[f.products[0]]).toBe("3,");expect(row.navigation).toEqual({version:1,stage:"higiene"});
-  await peer.reload();await expect(panel(peer)).toBeVisible();await expect(panel(peer).getByRole("textbox")).toHaveCount(0);await resume(peer);await expect(peer.locator('[aria-current="step"]')).toContainText("Materiais");await expect(peer.getByRole("button",{name:/^Higiene/,pressed:true})).toBeVisible();await expect(other).toHaveValue("3,");expect(official(f.patient)).toBe(before);await widths(peer,"D3 COM private incomplete form");
+  await peer.reload();await expect(panel(peer)).toBeVisible();await expect(panel(peer).getByRole("textbox")).toHaveCount(0);
+  await expect(panel(peer)).toContainText("Última gravação");
+  await expect(panel(peer)).toContainText("Etapa salva");
+  await expect(panel(peer).getByRole("listitem").filter({ hasText: "Material fictício V4 0" })).toContainText("3, unidade");
+  await resume(peer);await expect(peer.locator('[aria-current="step"]')).toContainText("Materiais");await expect(peer.getByRole("button",{name:/^Higiene/,pressed:true})).toBeVisible();await expect(other).toHaveValue("3,");expect(official(f.patient)).toBe(before);await widths(peer,"D3 COM private incomplete form");
  }finally{await second.close();}
 });
 
@@ -77,7 +83,7 @@ test("duas fichas ENT não herdam campos de conferência descartada e nenhuma na
 });
 
 test("recuperação de save incerto conserva a chave após revogação real e não revela o cache ao reabrir",async({page})=>{
- const f=await setup(),marker="Observação privada fictícia "+randomUUID(),before=official(f.patient);await login(page,f.patient);await open(page,f.patient,"COM");await page.getByRole("combobox",{name:/Forma de aquisição/}).selectOption("donation");for(let i=0;i<3;i++)await next(page);await page.getByRole("button",{name:"Adicionar observação",exact:true}).click();
+ const f=await setup(),marker="Observação privada fictícia "+randomUUID(),before=official(f.patient);await login(page,f.patient);await open(page,f.patient,"COM");for(let i=0;i<3;i++)await next(page);await page.getByRole("button",{name:"Adicionar observação",exact:true}).click();
  const packets:unknown[]=[];let lose=true;await page.route("**/api/drafts",async route=>{if(route.request().method()!=="POST")return route.continue();const body=route.request().postDataJSON();if(!body.content?.form?.observations?.includes(marker))return route.continue();packets.push(body);if(lose){lose=false;const response=await route.fetch();expect(response.ok()).toBe(true);return route.abort("failed");}return route.continue();});
  await page.getByLabel("Observação 1",{exact:true}).fill(marker);await expect(panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true})).toBeEnabled();
  let release!:()=>void,entered!:()=>void;const gate=new Promise<void>(r=>{release=r;}),arrived=new Promise<void>(r=>{entered=r;});let hold=true;
@@ -95,7 +101,6 @@ test("L2 perda de escrita conserva a edição da COM e o vínculo permite consul
   const observation = "Preenchimento preservado durante mudança de acesso";
   await login(page, f.patient);
   await open(page, f.patient, "COM");
-  await page.getByRole("combobox", { name: /Forma de aquisição/ }).selectOption("donation");
   for (let step = 0; step < 3; step++) await next(page);
   await page.getByRole("button", { name: "Adicionar observação", exact: true }).click();
   const field = page.getByLabel("Observação 1", { exact: true });

@@ -66,6 +66,47 @@ test("COM explicit purchase and donation preserve origin, exact quantities and o
     );
   }
 });
+test("COM planning preserves the issuance when actual purchase and donation are recorded", async () => {
+  const f = await setup();
+  const [boughtProduct, donatedProduct] = f.products;
+  const plan = {
+    acquisitionMode: "planned",
+    lines: [boughtProduct, donatedProduct].map(productId => ({ productId, quantity: "2" })),
+  };
+  const before = stock(f);
+  assert.equal((await create(f, { ...plan, origin: "purchase" })).error?.code, "22023");
+  const { data: document, error } = await create(f, plan);
+  assert.ifError(error);
+  assert.equal(document.payload.acquisitionMode, "planned");
+  assert.equal(document.payload.origin, undefined);
+  assert.equal(stock(f), before);
+  const bought = document.lines.find(line => line.product_id === boughtProduct);
+  const donated = document.lines.find(line => line.product_id === donatedProduct);
+  const issued = sql(`select body::text from public.document_events where document_id=${sqlLiteral(document.id)} and version=1`);
+  await rpc(f.admin, "supply_document_command", {
+    p_id: document.id,
+    p_action: "purchase",
+    p_body: { lines: [{ lineId: bought.id, quantity: "2", inHand: true }] },
+    p_key: randomUUID(),
+    p_version: document.version,
+  });
+  const { result: donation } = await rpc(f.admin, "unlinked_arrival_command", {
+    p_patient: f.patient,
+    p_key: randomUUID(),
+    p_body: { origin: "donation", lines: [{
+      productId: donatedProduct,
+      quantity: "2",
+      association: { documentId: document.id, lineId: donated.id },
+    }] },
+  });
+  assert.equal(donation.state, "approved");
+  const current = await rpc(f.admin, "operational_document", { p_id: document.id });
+  assert.equal(current.payload.acquisitionMode, "planned");
+  assert.equal(current.payload.origin, undefined);
+  assert.equal(current.purchaseProgress.lines.every(line => line.remainingExpectation === 0), true);
+  assert.equal(sql(`select body::text from public.document_events where document_id=${sqlLiteral(document.id)} and version=1`), issued);
+  assert.equal(sql(`select count(*) from public.stock_movements where reference_type='unlinked_arrival' and reference_id=${sqlLiteral(donation.id)}`), "1");
+});
 test("COM draft may retain an unknown origin but submit cannot invent a purchase or emit until explicitly revised", async () => {
   const f = await setup(),
     before = stock(f),

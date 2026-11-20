@@ -31,7 +31,6 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
   await login(page, f.patient, user.email); const before = facts(f.patient);
   const writes: string[] = []; page.on("request", request => { if (["/api/requisitions", "/api/documents"].includes(new URL(request.url()).pathname) && request.method() === "POST") writes.push(request.url()); });
   await page.goto(type === "REQ" ? "/fichas/req" : "/fichas/com");
-  if (type === "COM") await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
   await next(page);
   await expect(page.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
   const checkbox = page.getByRole("checkbox", { name: new RegExp("^Material de cuidado") }); await checkbox.check();

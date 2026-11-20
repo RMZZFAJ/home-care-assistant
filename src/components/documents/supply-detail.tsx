@@ -1203,7 +1203,7 @@ export function SupplyDocumentContent({
                   ? "Doação de insumos"
                   : data.payload.origin === "purchase"
                     ? "Compra de insumos"
-                    : "Compra ou doação de insumos"
+                    : data.payload.acquisitionMode === "planned" ? "Planejamento de aquisição" : "Compra ou doação de insumos"
                 : data.transfer
                   ? materialTransferLabel(data.transfer.declaration.source, data.transfer.declaration.destination)
                   : data.type === "ENT"
@@ -1236,7 +1236,7 @@ export function SupplyDocumentContent({
               "Paciente identificado no documento",
             )}
           >
-            {data.type === "COM" ? (
+            {data.type === "COM" && data.payload.acquisitionMode !== "planned" ? (
               <p className="mt-3 text-sm">
                 Origem:{" "}
                 {data.payload.origin === "donation"

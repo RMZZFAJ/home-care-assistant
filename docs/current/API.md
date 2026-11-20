@@ -549,9 +549,12 @@ REQ histórica é somente consulta: novos vínculos COM/ENT, inclusive rascunhos
 são recusados. Vínculos/fatos anteriores permanecem preservados. Falha ao
 carregar dados da ficha bloqueia edição e autosave até recarregar com sucesso.
 
-COM emitida exige origin purchase ou donation explícita. Rascunho pode
-conservar origem desconhecida; submit exige escolha válida. Eventos antigos
-não são preenchidos retroativamente e a leitura histórica permanece neutra.
+O assistente emite a COM com `payload.acquisitionMode = "planned"`.
+A compra realizada usa o ato de aquisição. Uma doação é registrada como
+chegada e pode cobrir o planejamento. O contrato ainda aceita `origin`
+`purchase` ou `donation` para chamadas compatíveis com a modalidade histórica.
+Os dois campos são mutuamente exclusivos. Rascunhos antigos podem conservar
+origem desconhecida, e os eventos anteriores preservam o conteúdo original.
 ENT exige source e destination
 FAMILY/CARE_TEAM distintos e recipientId autorizado. BAL registra todos os
 produtos ativos da equipe e sua referência. Campos financeiros não são

@@ -28,7 +28,6 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   await page.goto("/fichas/com");
   const stages = page.getByRole("navigation", { name: "Etapas da COM", exact: true });
   await expect(stages.getByRole("button")).toHaveText([/Confirmação/, /Materiais/, /Extras/, /Observações/, /Revisão/]);
-  await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
   await next(page);
   await expect(page.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
   await page.getByRole("button", { name: "Item extra", exact: true }).click();
@@ -87,7 +86,6 @@ test("L2 COM emite o extra pendente e identifica o material na mesma ficha sem e
   await loginDecision(page, admin.email, f.patient);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/fichas/com");
-  await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
   await next(page);
   await page.getByRole("button", { name: "Item extra", exact: true }).click();
   const picker = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
@@ -163,7 +161,6 @@ test("L2 COM mantém o vínculo geral após desfazer importação e conserva a q
   const origin = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
   await expect(origin.getByRole("button", { name: code, exact: true })).toBeVisible();
   await expect(origin).toContainText("Materiais elegíveis trazidos");
-  await page.getByLabel("Forma de aquisição").selectOption("purchase");
   await next(page);
   await selectMaterialCategory(page);
   await expect(material(page)).toBeChecked();

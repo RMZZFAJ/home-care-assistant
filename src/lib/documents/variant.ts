@@ -4,7 +4,8 @@ import { materialTransferDirection } from "./transfer-follow-up";
 /** Describe only the variant preserved by the authoritative document payload. */
 export function documentVariant(type: DocumentType, payload: Record<string, unknown>, workflow?: Record<string, unknown>) {
   if (type === "COM") return payload.origin === "donation" ? "Doação de insumos à família"
-    : payload.origin === "purchase" ? "Compra de insumos da família" : "Compra ou doação de insumos";
+    : payload.origin === "purchase" ? "Compra de insumos da família"
+      : payload.acquisitionMode === "planned" ? "Planejamento de aquisição" : "Compra ou doação de insumos";
   if (type === "BAL") {
     const context = payload.balanceContext;
     const kind = context && typeof context === "object" && "kind" in context ? context.kind : null;

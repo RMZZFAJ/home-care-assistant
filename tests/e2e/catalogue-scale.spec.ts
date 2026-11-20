@@ -68,10 +68,6 @@ for (const count of [1, 5, 20, 100]) {
           await page.goto(
             `/fichas/${type.toLowerCase()}?careRecipientId=${f.patient}`,
           );
-          if (type === "COM")
-            await page
-              .getByLabel("Forma de aquisição", { exact: false })
-              .selectOption("purchase");
           if (type === "ENT") {
             const preparation = await page.request.get(
               `/api/documents/delivery-preparation?careRecipientId=${f.patient}&source=FAMILY`,

@@ -332,10 +332,16 @@ A ENT originada na COM recuperou somente a quantidade aprovada. A ENT
 vinculada a duas REQs exigiu a justificativa e completou a expedição e o
 aceite com os fluxos de leitura do código de barras preservados.
 
-A escolha entre compra e doação passa para o ato de aquisição ou
-recebimento. O contrato atual ainda lê a origem da emissão para distinguir
-as operações. A transição precisa preservar o sentido e o histórico das
-COMs já emitidas. Essa mudança segue em aberto.
+A COM é emitida como planejamento. A família pode registrar uma compra
+realizada na ficha ou informar a doação recebida em Chegadas e associá-la ao
+planejamento. A mesma COM pode receber os dois atos. O histórico e o tipo
+dos documentos anteriores foram preservados.
+
+O diálogo de retomada dos assistentes mostra paciente, horário salvo, etapa
+e materiais em leitura, com as ações de descartar e continuar no rodapé.
+Mantém a nomenclatura aprovada na L1. O teste de banco com Auth real
+confirmou uma compra e uma doação na mesma COM, um único crédito da doação
+e preservação do evento original.
 
 ### Decisões e dúvidas de L2
 
@@ -376,9 +382,9 @@ continua sem regra de produto nesta entrega.
 
 ## Migrations por ambiente
 
-Consulta de 19/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **309 versões em cada banco**,
-com 242 versões anteriores a L1, 18 de L1 e 49 de L2.
+Consulta de 20/11/2026 à stack local `home-care-assistant` e ao Supabase de
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **310 versões em cada banco**,
+com 242 versões anteriores a L1, 18 de L1 e 50 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 As versões em arquivo, na stack local e no desenvolvimento coincidem. A
 fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
@@ -405,7 +411,7 @@ fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 `20261119141610`, `20261119154356`, `20261119175654`, `20261119184524`,
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
-`20261119233039`.
+`20261119233039`, `20261120043839`.
 
 `20261119212000` e `20261119213000` tratam as observações numeradas e a
 justificativa da designação manual na transferência. `20261119220003`
@@ -427,6 +433,13 @@ foram aplicadas após ensaio com rollback e backup cifrado verificado
 histórico vinculado. A comparação de 201 tabelas registrou variações de
 horário e estado operacional. O único conteúdo estável alterado foi o
 histórico de migrations.
+
+`20261120043839` permite emitir a COM como planejamento. O backup cifrado
+`512679d1-ea96-4cbf-86e8-39d598ff5d6b` foi verificado antes do ensaio com
+rollback. O ensaio conferiu o planejamento, as modalidades antigas, a
+recusa de payload misto e a ausência de grants públicos. A fila apontou
+somente essa migration. Após a aplicação, o histórico remoto registrou a
+versão 310 e a fila voltou a ficar vazia.
 
 ### L3 e L4
 

@@ -94,8 +94,7 @@ test("E04-04 organiza uma lista da casa e reutiliza materiais em REQ, COM e ENT"
   for (const kind of ["com", "ent"] as const) {
     await page.goto("/fichas/" + kind);
     await listMethod(page);
-    if (kind === "com") await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
-    else await selectDeliveryRecipient(page, "Teste professional", "Recebedor da entrega fictícia");
+    if (kind === "ent") await selectDeliveryRecipient(page, "Teste professional", "Recebedor da entrega fictícia");
     await showLists(page);
     await page.getByRole("checkbox", { name: new RegExp(updated) }).check();
     if (kind === "com") await page.getByRole("checkbox", { name: new RegExp(overlapping) }).check();

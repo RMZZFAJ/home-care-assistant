@@ -179,8 +179,6 @@ async function issueSupply(
       "Teste professional",
       "Pessoa indicada manualmente para receber estes materiais",
     );
-  if (type === "COM")
-    await page.getByLabel("Forma de aquisição").selectOption("donation");
   if (type === "ENT" && requestId) {
     await page.getByRole("combobox", { name: /^Esta entrega pretende atender a necessidade/ }).selectOption("complete");
   }
@@ -212,7 +210,7 @@ async function issueSupply(
   return (await response.json()).data;
 }
 
-test("REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real", async ({
+test("REQ → planejamento COM → compra → validação → estoque familiar → ENT parcial → BAL real", async ({
   page,
 }) => {
   await login(page);
@@ -237,6 +235,7 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
     req.requisitionId,
   );
   expect(purchase.code).toBe("COM-0001");
+  expect(purchase.payload.acquisitionMode).toBe("planned");
   expect(purchase.status).toBe("pending_approval");
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
   await expect(
@@ -252,11 +251,14 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await logout(page);
   await login(page, "family");
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
-  await openOperationalDocumentAction(page, "Registrar aquisição");
-  await page
+  await openOperationalDocumentAction(page, "Registrar compra realizada");
+  const acquisition = page.getByRole("dialog", { name: "Registrar compra", exact: true });
+  await acquisition
     .getByLabel(product.name + " · unidade", { exact: true })
     .fill("10");
-  await confirm(page, "Aquisição registrada.");
+  await acquisition.getByRole("button", { name: "Confirmar compra", exact: true }).click();
+  await page.getByRole("dialog", { name: "Compra registrada", exact: true })
+    .getByRole("button", { name: "Concluir", exact: true }).click();
   await openOperationalDocumentAction(page, "Registrar chegada");
   await page
     .getByLabel(product.name + " · unidade", { exact: true })

@@ -218,7 +218,6 @@ test("catalogue consultation from a purchase keeps the quantity when using brows
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await selectContext(page, f.patient);
   await page.goto("/fichas/com");
-  await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
   const next = page.getByRole("button", { name: "Selecionar materiais", exact: true });
   await next.click();
   const categories = page.getByRole("navigation", { name: "Tipos de material" });

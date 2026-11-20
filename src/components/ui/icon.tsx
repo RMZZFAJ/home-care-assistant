@@ -38,6 +38,7 @@ const paths = {
   "info": "M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0 M12 11v6 M12 7h.01",
   "history": canonicalSymbols.history,
   "archive": "M3 4h18v5H3z M5 9v12h14V9 M10 14h4",
+  "trash": "M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7",
   "lock": "M6 10h12v11H6z M8 10V7a4 4 0 0 1 8 0v3",
   "edit": canonicalSymbols.edit,
   "image": "M3 4h18v16H3z M3 17l6-6 4 4 3-3 5 5 M14 8h.01",

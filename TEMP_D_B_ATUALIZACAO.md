@@ -6,7 +6,7 @@ ao nome e a contagem usa a opção Não sei informar. A abertura
 da ficha emitida participa do carregamento em etapas. O
 [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md)
 também acompanha o estado automático do rascunho no rodapé, a entrada única
-para vínculos gerais e a transição ainda aberta da origem da aquisição.
+para vínculos gerais e a emissão da COM como planejamento da aquisição.
 
 **20/11 — recuperação da atualização de chegada da COM.** O diálogo da v7
 mostra o diagnóstico recolhido. A recuperação consulta a ficha e volta à

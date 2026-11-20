@@ -833,12 +833,6 @@ export function PatientSupplyWizard({
     const errors: Record<string, string> = {};
     if (type !== "BAL" && (all || step === 4))
       Object.assign(errors, issuanceObservationErrors(form.observations ?? []));
-    if (
-      type === "COM" &&
-      (all || step === 0) &&
-      !["purchase", "donation"].includes(form.origin)
-    )
-      errors.origin = "Escolha se este ato é uma compra ou uma doação.";
     if (type === "ENT" && (all || step === 0) && !form.recipientId)
       errors.recipientId = "Selecione quem receberá esta entrega.";
     if (type === "ENT" && (all || step === 0)) {
@@ -1100,9 +1094,7 @@ export function PatientSupplyWizard({
           ? { balanceReferenceRevision: legacyReference!.revision }
           : {}),
         ...(type === "COM"
-          ? form.origin
-            ? { origin: form.origin }
-            : {}
+          ? { acquisitionMode: "planned" as const }
           : type === "ENT"
             ? {
               source: form.source,
@@ -1206,7 +1198,8 @@ export function PatientSupplyWizard({
         type,
         id: editing?.id,
         observations: frozenRef.current.payload.observations,
-        ...(type === "COM" ? { pendingExtras: frozenRef.current.payload.pendingExtras ?? [] } : {}),
+        ...(type === "COM" ? { pendingExtras: frozenRef.current.payload.pendingExtras ?? [],
+          acquisitionMode: frozenRef.current.payload.acquisitionMode } : {}),
         minimumVersion: frozenRef.current.expectedVersion !== undefined
           ? frozenRef.current.expectedVersion + 1
           : editing
@@ -1669,7 +1662,7 @@ export function PatientSupplyWizard({
                   {step === supplyExtrasStep ? "Itens extras"
                     : !isBalance && step === 0 ? "Confirme os dados da ficha"
                       : !isBalance && category ? type === "ENT" ? "Prepare os materiais da entrega"
-                        : form.origin === "donation" ? "Selecione os materiais da doação" : "Selecione o que será comprado"
+                        : "Selecione os materiais a adquirir"
                         : steps[stage]}
                 </h2>
               </div>

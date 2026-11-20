@@ -1,6 +1,12 @@
 # Banco de dados
 
-O Supabase local e de desenvolvimento está em 304 migrations até
+Em 20/11/2026, o Supabase local e de desenvolvimento chegou a 310
+migrations com `20261120043839`. A emissão da COM passou a registrar o
+planejamento de aquisição. O ensaio remoto com rollback validou as
+modalidades aceitas e os grants do helper. Após a aplicação, a consulta
+confirmou a nova versão e a fila vinculada vazia.
+
+O registro anterior do Supabase local e de desenvolvimento estava em 304 migrations até
 `20261119213000`. As duas versões novas conferem a ordem das observações
 contra o rascunho e preservam a justificativa de escolha do recebedor como
 fato próprio. O backup cifrado, o ensaio com rollback e o histórico remoto
@@ -530,12 +536,12 @@ e o autor atuais no workflow antes do evento/hash, com histórico de preparaçõ
 e expedição distintos. Revalidação final recusa perda de elegibilidade após
 espera no movimento. Dados/eventos antigos não recebem preenchimento retroativo.
 
-Nova emissão COM valida origin purchase/donation no create e no submit. O
-helper privado valida somente o corpo, sem acesso ou execução por clientes.
-Origem ausente/inválida recusa transacionalmente emissão/protocolo/evento;
-rascunho desconhecido permanece válido para preparação e exige escolha antes
-de emitir. Não há UPDATE de origem em documento/evento histórico nem crédito
-de estoque por definir a origem ou emitir a aquisição.
+A emissão de COM registra um planejamento com `acquisitionMode: planned`.
+O helper privado valida esse marcador ou a modalidade explícita do contrato
+histórico, sem execução por clientes. Um payload misto é recusado. O campo
+permite emitir a ficha sem declarar um ato de compra ou de doação. Nenhum
+evento anterior recebe preenchimento retroativo. O crédito depende da
+chegada validada, que continua sendo um ato separado.
 
 workspace_revisions e broadcasts privados invalidam leituras autorizadas, sem
 enviar snapshots clínicos. Perfis usam profiles.id para alcançar a própria

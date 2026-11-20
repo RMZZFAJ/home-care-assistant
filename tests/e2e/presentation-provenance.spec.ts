@@ -101,9 +101,6 @@ async function chooseProduct(page: Page, name: string) {
 }
 async function wizard(page: Page, patient: string) {
   await page.goto("/fichas/com?careRecipientId=" + patient);
-  await page
-    .getByLabel("Forma de aquisição", { exact: false })
-    .selectOption("purchase");
   await page.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   await selectMaterialCategory(page);
   await page.getByRole("checkbox", { name: /Material fictício V4 0/ }).check();

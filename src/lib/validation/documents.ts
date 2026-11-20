@@ -54,6 +54,7 @@ export const supplyPayload = z
     notes: z.string().trim().max(2000).optional(),
     observations: issuedObservations.optional(),
     origin: z.enum(["purchase", "donation"]).optional(),
+    acquisitionMode: z.literal("planned").optional(),
     source: z.enum(["FAMILY", "CARE_TEAM"]).optional(),
     destination: z.enum(["FAMILY", "CARE_TEAM"]).optional(),
     recipientId: identifier.optional(),
@@ -81,6 +82,9 @@ export const supplyPayload = z
   .strict()
   .refine(value => value.lines.length > 0 || Boolean(value.pendingExtras?.length), {
     path: ["lines"], message: "Selecione ou informe ao menos um item.",
+  })
+  .refine(value => !(value.origin && value.acquisitionMode), {
+    path: ["acquisitionMode"], message: "Use o planejamento ou uma modalidade histórica de aquisição.",
   });
 export const reviseSupplySchema = z
   .object({
@@ -96,6 +100,9 @@ export const reviseSupplySchema = z
   .strict()
   .refine(value => value.draftKind === "COM" || value.payload.pendingExtras === undefined, {
     path: ["payload", "pendingExtras"], message: "A identificação pendente pertence ao planejamento da COM.",
+  })
+  .refine(value => value.draftKind === "COM" || value.payload.acquisitionMode === undefined, {
+    path: ["payload", "acquisitionMode"], message: "O planejamento da aquisição pertence à COM.",
   });
 export const createSupplySchema = z
   .object({
@@ -141,11 +148,16 @@ export const createSupplySchema = z
         path: ["payload", "lines"],
         message: "O balanço registra a contagem física na unidade base.",
       });
-    if (value.type === "COM" && !value.draft && !value.payload.origin)
+    if (value.type !== "COM" && value.payload.acquisitionMode)
+      ctx.addIssue({
+        code: "custom", path: ["payload", "acquisitionMode"],
+        message: "O planejamento da aquisição pertence à COM.",
+      });
+    if (value.type === "COM" && !value.draft && !value.payload.origin && !value.payload.acquisitionMode)
       ctx.addIssue({
         code: "custom",
-        path: ["payload", "origin"],
-        message: "Escolha compra ou doação antes de emitir a ficha.",
+        path: ["payload", "acquisitionMode"],
+        message: "Informe que esta ficha registra um planejamento de aquisição.",
       });
     if (value.type !== "BAL" && value.payload.balanceAssignment)
       ctx.addIssue({

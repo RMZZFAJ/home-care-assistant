@@ -232,48 +232,11 @@ export function SupplyWizardStep({
         <>
           <p className="text-sm leading-6 text-(--muted)">
             {type === "COM"
-              ? "Solicite os itens necessários à família. Compra ou doação entram pela mesma ficha, sem comprovante de pagamento obrigatório."
+              ? "Organize os materiais a adquirir. A família registra a compra ou a doação quando ela acontecer."
               : type === "ENT"
                 ? "Selecione as custódias e a pessoa que confirmará o recebimento. A expedição deixa os materiais em trânsito."
                 : "Conte todos os produtos sob responsabilidade familiar que estão com a equipe. Materiais de terceiros ficam fora deste controle."}
           </p>
-          {type === "COM" ? (
-            <label className="block text-sm font-semibold">
-              Forma de aquisição
-              <select
-                className={inputClass}
-                value={form.origin}
-                required
-                aria-invalid={Boolean(fieldErrors.origin)}
-                aria-describedby={
-                  fieldErrors.origin
-                    ? "purchase-origin-hint purchase-origin-error"
-                    : "purchase-origin-hint"
-                }
-                onChange={(event) =>
-                  setForm({
-                    ...form,
-                    origin: event.target.value as WizardState["origin"],
-                  })
-                }
-              >
-                <option value="">Escolha compra ou doação</option>
-                <option value="purchase">Compra pela família</option>
-                <option value="donation">
-                  Doação / incorporação sem pagamento
-                </option>
-              </select>
-              <span id="purchase-origin-hint" className="hca-field-hint">
-                Escolha a origem deste ato. Previsão e emissão ainda não
-                incorporam material ao estoque.
-              </span>
-              {fieldErrors.origin ? (
-                <span id="purchase-origin-error" className="ui-field-error">
-                  {fieldErrors.origin}
-                </span>
-              ) : null}
-            </label>
-          ) : null}
           {type === "ENT" ? (
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm font-semibold">
@@ -508,7 +471,6 @@ export function SupplyWizardStep({
           {type === "COM" ? <DefinitionGrid items={[
             { label: "Pessoa assistida", value: context.patient?.display_name },
             { label: "Responsável", value: context.fullName },
-            { label: "Forma de aquisição", value: form.origin === "donation" ? "Doação" : form.origin === "purchase" ? "Compra pela família" : "Não informada" },
           ]} /> : <div className={type === "ENT" ? "hca-form-stack" : "rounded-xl bg-(--background) p-4 text-sm"}>
             {type === "ENT" ? <DefinitionGrid items={[
               { label: "Pessoa assistida", value: context.patient?.display_name },

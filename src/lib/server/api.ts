@@ -283,7 +283,7 @@ export function databaseError(
   if (/purchase origin required/i.test(message))
     throw new ApiError(
       "VALIDATION_ERROR",
-      "Escolha compra ou doação antes de emitir esta ficha. A origem histórica não informada continua preservada.",
+      "Confira o planejamento de aquisição antes de emitir esta ficha.",
       400,
     );
   if (/stale delivery recipient reference/i.test(message))
