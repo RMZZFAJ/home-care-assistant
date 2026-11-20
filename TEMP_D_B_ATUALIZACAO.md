@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — catálogo vazio na COM.** A abertura apresenta o estado do
+catálogo e o atalho de cadastro a quem administra. A ação Planejar com
+item extra mantém a emissão com cadastro pendente e a retomada do
+rascunho. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — leitura de código na COM e na ENT.** O diálogo Ler código
 confere apresentação, fator e total antes de incluir. Os quatro casos
 dirigidos passaram em Android e iOS emulados, com registro da conversão

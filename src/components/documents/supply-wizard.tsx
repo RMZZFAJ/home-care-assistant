@@ -196,6 +196,7 @@ export function PatientSupplyWizard({
   const [loadError, setLoadError] = useState("");
   const [openingFailure, setOpeningFailure] = useState<OpeningFailure | null>(null);
   const [catalogueTotal, setCatalogueTotal] = useState<number | null>(null);
+  const [planningWithoutCatalogue, setPlanningWithoutCatalogue] = useState(false);
   const [busy, setBusy] = useState(false);
   const [issuing, setIssuing] = useState(false);
   const [uncertain, setUncertain] = useState(false);
@@ -384,6 +385,7 @@ export function PatientSupplyWizard({
     },
     onDiscard: () => {
       setDraftTouched(false);
+      setPlanningWithoutCatalogue(false);
       const defaults = sourceDefaultsRef.current;
       if (type !== "BAL") {
         setLinks(defaults?.links ?? {});
@@ -1468,9 +1470,18 @@ export function PatientSupplyWizard({
           setAttempt(current => current + 1);
         }} />;
     }
-    if (type !== "COM" && !loading && !loadError && !catalog.length && !documentId && !editing && !draftTouched && step === 0)
-      return <DocumentCatalogueEmpty patientId={patientId} patientName={context.patient!.display_name}
-        mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0} />;
+    if (!loading && !loadError && !catalog.length && !documentId && !editing && !draftTouched &&
+      step === 0 && !planningWithoutCatalogue) {
+      if (privateDraft.loading) return <DocumentOpeningPending />;
+      if (!privateDraft.blocked && privateDraft.base?.state !== "active")
+        return <DocumentCatalogueEmpty patientId={patientId} patientName={context.patient!.display_name}
+          mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0}
+          onPlanExtra={type === "COM" ? () => {
+            setPlanningWithoutCatalogue(true);
+            openStep(supplyExtrasStep);
+            requestAnimationFrame(() => document.getElementById("supply-wizard-heading")?.focus());
+          } : undefined} />;
+    }
   }
   const exitDocumentId = documentId ?? routedSourceId;
   const navigation = <StepNavigator

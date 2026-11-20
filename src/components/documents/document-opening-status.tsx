@@ -54,16 +54,18 @@ export function DocumentOpeningFailure({ failure, attempts, onRetry, back, opera
   </>;
 }
 
-export function DocumentCatalogueEmpty({ patientId, patientName, mayManage, hasInactive }: {
+export function DocumentCatalogueEmpty({ patientId, patientName, mayManage, hasInactive, onPlanExtra }: {
   patientId: string;
   patientName: string;
   mayManage: boolean;
   hasInactive: boolean;
+  onPlanExtra?: () => void;
 }) {
+  const registrationPurpose = onPlanExtra ? "para usar o catálogo nesta compra." : "para liberar o preenchimento das fichas.";
   const description = hasInactive
-    ? mayManage ? "Reative um material ou cadastre um novo para liberar o preenchimento das fichas."
+    ? mayManage ? `Reative um material ou cadastre um novo ${registrationPurpose}`
       : "Peça ao administrador do paciente para revisar os materiais inativos."
-    : mayManage ? "Cadastre o primeiro material para liberar o preenchimento das fichas."
+    : mayManage ? `Cadastre o primeiro material ${registrationPurpose}`
       : "Peça ao administrador do paciente para cadastrar os materiais da residência.";
   return <section className="hca-opening-catalogue">
     <nav aria-label="Localização"><Link href="/fichas">Fichas</Link><Icon name="arrow" width={12} height={12} /><span aria-current="page">Catálogo de materiais</span></nav>
@@ -76,6 +78,10 @@ export function DocumentCatalogueEmpty({ patientId, patientName, mayManage, hasI
       {mayManage ? <ActionLink variant="primary" href={"/admin?" + new URLSearchParams({
         section: "catalog", careRecipientId: patientId,
       })}><Icon name="plus" />{hasInactive ? "Gerenciar materiais" : "Cadastrar material"}</ActionLink> : null}
+      {onPlanExtra ? <>
+        <p>Você pode planejar a compra e identificar o item extra depois.</p>
+        <ActionButton onClick={onPlanExtra}>Planejar com item extra</ActionButton>
+      </> : null}
     </div>
   </section>;
 }

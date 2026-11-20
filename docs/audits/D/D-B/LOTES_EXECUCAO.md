@@ -378,6 +378,19 @@ teste dirigido deste incremento cobre essa correção. Os demais casos de
 abertura, fichas, rascunhos e fluxos do segundo shard seguem em triagem.
 [Execução da CI](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44691631298).
 
+Na abertura da COM, o catálogo vazio ou só com materiais inativos volta a
+ter o estado de E04-16. Quem administra pode ir direto ao cadastro ou à
+gestão. **Planejar com item extra** preserva a opção já existente de emitir
+um planejamento com cadastro pendente. A ação leva a Itens extras e só
+passa a guardar rascunho quando há preenchimento. Rascunhos existentes
+continuam disponíveis para retomada na abertura.
+
+Android e iOS emulados reproduziram o estado vazio, o atalho de cadastro,
+a edição e a retomada do extra, seguidas da emissão sem entrada de estoque.
+No mesmo teste, quem pode requisitar recebeu a orientação para pedir
+cadastro ou revisão dos inativos. Os casos dirigidos de indisponibilidade e
+recusa de acesso na REQ e recuperação da referência na DEV também passaram.
+
 Na Confirmação da COM e da ENT, Fichas vinculadas abre o seletor de
 origens e permite escolher se a ficha também traz materiais. Cada material
 continua com seu vínculo próprio no menu de três pontos. A avaliação

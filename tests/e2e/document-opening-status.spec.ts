@@ -56,32 +56,60 @@ test("L2 abertura distingue catálogo vazio e inativo e oferece cadastro somente
     p_id: null, p_display_name: "Catálogo fictício vazio " + randomUUID().slice(0, 8),
     p_is_active: true, p_is_development: true,
   });
-  sql(`insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values
-    (${q(patient)},${q(fixtures.adminA.id)},'admin'),
-    (${q(patient)},${q(fixtures.professional.id)},'professional')`);
+  const admin = await shiftWorker(patient, "admin");
+  const requester = await shiftWorker(patient);
   expect(sql(`select count(*) from public.care_recipient_products where care_recipient_id=${q(patient)}`)).toBe("0");
-  await loginDecision(page, fixtures.adminA.email, patient);
+  await loginDecision(page, admin.email, patient);
+  const writes = noPrivateWrites(page);
   await page.goto("/fichas/com");
   await expect(page.getByRole("heading", { name: "Catálogo de materiais", level: 1, exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Nenhum material cadastrado", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toHaveCount(0);
   if (info.project.use.hasTouch) await info.attach("E04-16 catálogo vazio do administrador", {
     body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
   });
   await page.getByRole("link", { name: "Cadastrar material", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Catálogo do paciente", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Novo item", exact: true })).toBeEnabled();
+  await page.goto("/fichas/com");
+  await page.getByRole("button", { name: "Planejar com item extra", exact: true }).click();
+  await expect(page.locator("#supply-wizard-heading")).toBeFocused();
+  await expect(page.getByRole("button", { name: "Extras", exact: true })).toHaveAttribute("aria-current", "step");
+  expect(writes).toEqual([]);
+  await page.getByRole("button", { name: "Adicionar item extra", exact: true }).click();
+  const item = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
+  await item.getByRole("textbox", { name: "Nome do material", exact: true }).fill("Protetor lavável fictício");
+  await item.getByRole("combobox", { name: "Unidade de medida", exact: true }).selectOption("unidade");
+  await item.getByRole("textbox", { name: "Quantidade", exact: true }).fill("2");
+  await item.getByRole("button", { name: "Adicionar material", exact: true }).click();
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  await page.reload();
+  const resume = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
+  await resume.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(page.getByText("Protetor lavável fictício", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Continuar", exact: true }).click();
+  await page.getByRole("button", { name: "Revisar ficha", exact: true }).click();
+  const request = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
+  await page.getByRole("button", { name: "Emitir compra", exact: true }).click();
+  const emitted = await request;
+  expect(emitted.ok(), await emitted.text()).toBe(true);
+  const { data: purchase } = await emitted.json();
+  expect(purchase.lines).toEqual([]);
+  expect(purchase.payload.pendingExtras).toMatchObject([{ name: "Protetor lavável fictício", quantity: "2" }]);
+  expect(sql(`select count(*) from public.stock_movements where care_recipient_id=${q(patient)}`)).toBe("0");
+  await expect(page.getByRole("dialog", { name: "Compra emitida", exact: true })).toBeVisible({ timeout: 65_000 });
 
   const context = await browser.newContext();
   try {
     const professional = await context.newPage();
-    await loginDecision(professional, fixtures.professional.email, patient);
+    await loginDecision(professional, requester.email, patient);
     await professional.goto("/fichas/req");
     await expect(professional.getByText("Peça ao administrador do paciente para cadastrar os materiais da residência.", { exact: true })).toBeVisible();
     await expect(professional.getByRole("link", { name: "Cadastrar material", exact: true })).toHaveCount(0);
     await expect(professional.getByRole("button", { name: "Selecionar materiais", exact: true })).toHaveCount(0);
+    await expect(professional.getByRole("button", { name: "Planejar com item extra", exact: true })).toHaveCount(0);
 
-    const admin = await actor("adminA", patient);
-    await rpc(admin, "admin_upsert_recipient_product", {
+    await rpc(admin.client, "admin_upsert_recipient_product", {
       p_care_recipient_id: patient, p_product_id: null, p_name: "Material fictício inativo",
       p_category: "higiene", p_unit: "unidade", p_aliases: [], p_is_active: false,
     });
