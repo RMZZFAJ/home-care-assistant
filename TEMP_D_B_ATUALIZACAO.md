@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — cabeçalhos, ajuda e ações dos assistentes de L2.** REQ, COM, ENT e
+DEV agora usam o cabeçalho do laboratório v7 no formulário e ações nomeadas
+por etapa e tipo. A saída da primeira etapa pode confirmar o último
+rascunho antes de voltar. O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md)
+detalha os complementos da aplicação e o preview de desenvolvimento.
+
 **19/11 — cartão e rodapé dos assistentes de L2.** REQ, COM, ENT e DEV
 compartilham a composição das etapas e o rodapé com o estado real do
 rascunho. O aviso de Observações da REQ fica junto do campo com erro. A

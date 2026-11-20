@@ -29,7 +29,7 @@ test("L2 abertura da REQ separa indisponibilidade, resposta incompleta e acesso 
   if (info.project.use.hasTouch) await info.attach("E04-16 falha antes da abertura", {
     body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
   });
-  await expect(page.getByRole("button", { name: "Avançar", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toHaveCount(0);
   const malformed = page.waitForResponse(response => new URL(response.url()).pathname === "/api/catalog" && response.status() === 200);
   await retry.click();
   await malformed;
@@ -78,7 +78,7 @@ test("L2 abertura distingue catálogo vazio e inativo e oferece cadastro somente
     await professional.goto("/fichas/req");
     await expect(professional.getByText("Peça ao administrador do paciente para cadastrar os materiais da residência.", { exact: true })).toBeVisible();
     await expect(professional.getByRole("link", { name: "Cadastrar material", exact: true })).toHaveCount(0);
-    await expect(professional.getByRole("button", { name: "Avançar", exact: true })).toHaveCount(0);
+    await expect(professional.getByRole("button", { name: "Selecionar materiais", exact: true })).toHaveCount(0);
 
     const admin = await actor("adminA", patient);
     await rpc(admin, "admin_upsert_recipient_product", {

@@ -10,7 +10,7 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { loginDecision } from "./l1-decision-policy";
 import { audit } from "./accessibility-audit";
 
-const next = (page: Page) => page.getByRole("button", { name: /^(Avançar|Revisar)$/ }).click();
+const next = (page: Page) => page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 const material = (page: Page) => page.getByRole("checkbox", { name: /^Material fictício V4 0/ });
 const count = (page: Page) => page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
 
@@ -67,7 +67,7 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   await expect(review.getByText("2 unidade", { exact: true })).toBeVisible();
   await expect(page.getByText(observation, { exact: true })).toBeVisible();
   const submission = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
-  await page.getByRole("button", { name: "Confirmar e concluir", exact: true }).click();
+  await page.getByRole("button", { name: "Emitir compra", exact: true }).click();
   const response = await submission;
   expect(response.ok(), await response.text()).toBe(true);
   const { data: document } = await response.json();
@@ -115,7 +115,7 @@ test("L2 COM emite o extra pendente e identifica o material na mesma ficha sem e
   await expect(review.getByText(name, { exact: true })).toHaveCount(1);
   await expect(review.getByText("2 unidade · Cadastro pendente", { exact: true })).toBeVisible();
   const request = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
-  await page.getByRole("button", { name: "Confirmar e concluir", exact: true }).click();
+  await page.getByRole("button", { name: "Emitir compra", exact: true }).click();
   const response = await request;
   expect(response.ok(), await response.text()).toBe(true);
   const { data: document } = await response.json();
@@ -202,7 +202,7 @@ test("L2 COM mantém o vínculo geral após desfazer importação e conserva a q
   await expect(material(page)).not.toHaveAccessibleName(/Vinculado à REQ/);
   for (let index = 0; index < 3; index++) await next(page);
   const pending = page.waitForResponse((response) => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
-  await page.getByRole("button", { name: "Confirmar e concluir", exact: true }).click();
+  await page.getByRole("button", { name: "Emitir compra", exact: true }).click();
   const response = await pending;
   expect(response.ok(), await response.text()).toBe(true);
   const result = (await response.json()).data;

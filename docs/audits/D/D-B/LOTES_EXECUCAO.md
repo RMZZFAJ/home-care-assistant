@@ -190,8 +190,19 @@ rascunho. A indicação distingue a gravação em curso da confirmação do
 conteúdo e da etapa pelo servidor. Retomada, conflito e recuperação continuam com
 os diálogos próprios. O erro de Observações da REQ permanece junto do campo
 focado. O produto conserva a ação explícita Salvar rascunho em REQ, COM e
-ENT no rodapé. O cabeçalho global, os textos das ações e a saída inicial desses
-assistentes ainda precisam da comparação final com a v7.
+ENT no rodapé.
+
+O cabeçalho das novas fichas REQ, COM, ENT e DEV segue a v7 com caminho
+Fichas, identificação do paciente, título, descrição e ajuda sobre a ficha.
+Os textos das ações seguem a etapa e o tipo de ficha. Em REQ, COM e ENT,
+Sair por agora volta à origem ou à central de fichas. Se houve edição,
+a opção Salvar e fechar usa a confirmação do último rascunho antes de
+navegar. A devolução usa o mesmo cabeçalho e mantém seu fluxo de abertura
+e o controle de rascunho da expedição.
+
+O menu autenticado, a escolha inicial da operação na central de entregas
+e devoluções e o botão manual de salvar rascunho são complementos do sistema
+real ao recorte da v7.
 
 A referência foi capturada em 360 e 412 px nos estados E04-01, E05-01,
 E06-01 e E06-16. A primeira rodada dos percursos integrados passou em COM
@@ -453,6 +464,10 @@ de PDF, antes das asserções corrigidas. A verificação E2E segue na CI.
 O [preview de `f3fe0f08`](https://vercel.com/rmzzfajs-projects/home-care-assistant/HGzAn29N7g9sog74TBkioz9yXQHP)
 ficou pronto com o cartão e o rodapé de L2. O SonarCloud desse candidato
 continuou com os quatro apontamentos do HTML de referência.
+
+O [preview fixo da branch](https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app)
+acompanha os commits enviados para a PR 7. A Vercel confirmou essa associação
+em `80e0f5cc`. Ele é o endereço de desenvolvimento para conferir os envios de L2.
 
 Na stack local preservada, a rodada SQL sem replay parou na regressão de
 agendamento da REQ, que passou no replay da CI. Dois casos locais de PDF

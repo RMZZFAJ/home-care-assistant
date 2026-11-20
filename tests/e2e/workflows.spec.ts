@@ -107,7 +107,7 @@ async function prepare(page: Page, count = 1) {
   return { patient, products };
 }
 async function next(page: Page) {
-  await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
+  await page.getByRole("button", { name: /^(Avançar|Revisar|Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 }
 async function confirm(
   page: Page,
@@ -152,7 +152,7 @@ async function issueReq(page: Page, patient: string, productName: string) {
       r.request().method() === "POST",
   );
   await page
-    .getByRole("button", { name: "Concluir requisição", exact: true })
+    .getByRole("button", { name: "Emitir requisição", exact: true })
     .click();
   const response = await pending;
   expect(response.ok(), await response.text()).toBeTruthy();
@@ -160,7 +160,7 @@ async function issueReq(page: Page, patient: string, productName: string) {
 }
 async function issueSupply(
   page: Page,
-  type: string,
+  type: "BAL" | "COM" | "ENT",
   patient: string,
   productName: string,
   amount: string,
@@ -204,8 +204,9 @@ async function issueSupply(
       (/\/revise$/.test(new URL(r.url()).pathname) &&
         r.request().method() === "POST"),
   );
+  const action = { BAL: "Confirmar e concluir", COM: "Emitir compra", ENT: "Expedir entrega" }[type];
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: action, exact: true })
     .click();
   const response = await pending;
   expect(response.ok(), await response.text()).toBeTruthy();
@@ -534,7 +535,7 @@ test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async (
     await route.abort("failed");
   });
   await page
-    .getByRole("button", { name: "Concluir requisição", exact: true })
+    .getByRole("button", { name: "Emitir requisição", exact: true })
     .click();
   await expect(page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true })).toBeVisible();
   await page.unroute("**/api/requisitions");
@@ -567,7 +568,7 @@ test("emissão sem registro confirma ausência, preserva o rascunho e só reenvi
   });
   const count = async () => (await (await get(page, "/api/documents?careRecipientId=" + patient + "&type=REQ")).json()).total;
 
-  await page.getByRole("button", { name: "Concluir requisição", exact: true }).click();
+  await page.getByRole("button", { name: "Emitir requisição", exact: true }).click();
   const warning = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
   await expect(warning).toBeVisible();
   await expect(warning.getByText(/Seu rascunho está salvo/)).toHaveCount(0);
@@ -1022,7 +1023,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
       response.request().method() === "POST",
   );
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: "Expedir entrega", exact: true })
     .click();
   const response = await issuing;
   expect(response.ok(), await response.text()).toBeTruthy();

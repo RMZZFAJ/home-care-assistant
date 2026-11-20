@@ -127,7 +127,7 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await selectContext(page, f.patient);
   await page.goto("/fichas/req");
-  const next = page.getByRole("button", { name: "Avançar", exact: true });
+  const next = page.getByRole("button", { name: "Selecionar materiais", exact: true });
   await next.click();
   const categories = page.getByRole("navigation", { name: "Tipos de material" });
   await expect(categories.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
@@ -204,7 +204,7 @@ test("catalogue consultation from a purchase keeps the quantity when using brows
   await selectContext(page, f.patient);
   await page.goto("/fichas/com");
   await page.getByLabel("Forma de aquisição", { exact: false }).selectOption("purchase");
-  const next = page.getByRole("button", { name: "Avançar", exact: true });
+  const next = page.getByRole("button", { name: "Selecionar materiais", exact: true });
   await next.click();
   const categories = page.getByRole("navigation", { name: "Tipos de material" });
   await expect(categories.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();

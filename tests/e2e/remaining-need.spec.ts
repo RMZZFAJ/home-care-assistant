@@ -17,7 +17,7 @@ import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 const next = (page: Page) =>
-  page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
+  page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 const reason = (page: Page) =>
   page.getByLabel("Motivo da necessidade remanescente", { exact: true });
 const source = (page: Page) =>
@@ -144,7 +144,7 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
     await route.abort("failed");
   });
   await page
-    .getByRole("button", { name: "Concluir requisição", exact: true })
+    .getByRole("button", { name: "Emitir requisição", exact: true })
     .click();
   const recovery = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
   await expect(recovery).toBeVisible();
@@ -266,7 +266,7 @@ test("origem obsoleta exige comparação e adoção explícita após falha; sele
     return route.continue();
   });
   await page
-    .getByRole("button", { name: "Concluir requisição", exact: true })
+    .getByRole("button", { name: "Emitir requisição", exact: true })
     .click();
   await expect(page.getByText(/A requisição de origem mudou/)).toBeVisible();
   await expect(reason(page)).toHaveValue(ownReason);
@@ -275,7 +275,7 @@ test("origem obsoleta exige comparação e adoção explícita após falha; sele
     source(page).getByText("Consulta fictícia indisponível", { exact: false }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Avançar", exact: true }),
+    page.getByRole("button", { name: "Selecionar materiais", exact: true }),
   ).toBeDisabled();
   expect(
     sql(
@@ -290,7 +290,7 @@ test("origem obsoleta exige comparação e adoção explícita após falha; sele
     source(page).getByText(/A origem mudou. Compare o atendimento acima/),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Avançar", exact: true }),
+    page.getByRole("button", { name: "Selecionar materiais", exact: true }),
   ).toBeDisabled();
   await source(page)
     .getByRole("button", {
@@ -311,7 +311,7 @@ test("origem obsoleta exige comparação e adoção explícita após falha; sele
     await audit(page, `remaining-need-adopted-${width}`);
   }
   await page
-    .getByRole("button", { name: "Concluir requisição", exact: true })
+    .getByRole("button", { name: "Emitir requisição", exact: true })
     .click();
   await expect(
     page.getByRole("dialog", { name: "Requisição emitida", exact: true }),

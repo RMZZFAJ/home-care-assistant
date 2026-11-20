@@ -1,7 +1,8 @@
 "use client";
 
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
-import { materialCategories, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
+import { materialCategories, supplyWizardCopy, supplyWizardNextLabels, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
+import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { pendingExtraDispatchMessage, pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
 import { MaterialReview } from "./material-review";
 import { IssuanceObservationsEditor, IssuanceObservationList } from "@/components/forms/issuance-observations";
@@ -76,10 +77,11 @@ import { MaterialConsultButton } from "./catalogue-material-panel";
 
 export const custodyName = (source: Custody) =>
   source === "FAMILY" ? "Família" : "Equipe";
-const transferStepActions = ["Selecionar materiais", "Continuar", "Continuar", "Revisar ficha"];
 export function TransferConsole({ source }: { source?: Custody } = {}) {
+  const kind = source === "CARE_TEAM" ? "DEV" : source === "FAMILY" ? "ENT" : null;
   return (
-    <Workspace title={source === "CARE_TEAM" ? "Nova devolução" : "Entregas e devoluções de materiais"}>
+    <Workspace title={kind ? supplyWizardCopy[kind].title : "Entregas e devoluções de materiais"}
+      heading={kind ? context => <SupplyWizardHeading kind={kind} patient={context.patient!.display_name} /> : undefined}>
       {(context) =>
         context.patient && can(context, "ent.read") ? (
           <PatientTransfers key={context.patient.id} context={context} fixedSource={source} />
@@ -1231,7 +1233,7 @@ function TransferDeclarationEditor({
                   }
                 >
                   <Icon name="arrow" width="14" height="14" />
-                  {transferStepActions[step]}
+                  {supplyWizardNextLabels[step]}
                 </ActionButton>
                 </SupplyWizardFooter>
               </form>
@@ -1308,7 +1310,7 @@ function TransferDeclarationEditor({
                   <Icon name="send" width="16" height="16" />
                   {uncertain
                     ? "Verificar a expedição"
-                    : isReturn ? "Expedir devolução" : "Expedir entrega"}
+                    : supplyWizardCopy[isReturn ? "DEV" : "ENT"].finish}
                 </ActionButton>
               </SupplyWizardFooter>
             </section>

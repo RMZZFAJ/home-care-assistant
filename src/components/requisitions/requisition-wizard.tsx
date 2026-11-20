@@ -32,8 +32,9 @@ import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
 import { navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
+import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { IssuanceObservationsEditor } from "@/components/forms/issuance-observations";
-import { materialCategories, supplyWizardStages, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
+import { materialCategories, supplyWizardCopy, supplyWizardStages, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { Dialog, StepNavigator } from "@/components/ui/primitives";
 import { ActionButton, ActionLink } from "@/components/ui/controls";
 import { formatQuantity, quantity } from "@/lib/quantity";
@@ -55,7 +56,8 @@ const stageStart = [0, 1, 4, 5, 6];
 export function RequisitionWizard() {
   const sourceId = useSearchParams().get("sourceRequisitionId");
   return (
-    <Workspace title="Requisição de insumos" compact>
+    <Workspace title={supplyWizardCopy.REQ.title} compact
+      heading={context => <SupplyWizardHeading kind="REQ" patient={context.patient!.display_name} />}>
       {(context) =>
         context.patient ? (
           <PatientRequisition
@@ -858,10 +860,10 @@ function PatientRequisition({
               (!may(context, "request") && !uncertain)
             }
             draftBusy={privateDraft.backgroundBusy}
-            supplyStatus={{ draft: privateDraft, current: draftContent }}
+            supply={{ kind: "REQ", draft: privateDraft, current: draftContent, hasEdits: draftTouched,
+              exitHref: sourceId ? "/fichas/" + encodeURIComponent(sourceId) : "/fichas" }}
             uncertain={uncertain}
             blocked={Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
-            finishLabel="Concluir requisição"
             onBack={() => {
               issuanceFailure.clear();
               setStep(stageStart[stage - 1]);

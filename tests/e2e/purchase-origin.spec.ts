@@ -26,7 +26,7 @@ async function open(page: Page, patient: string, path = "/fichas/com") {
   await page.goto(path);
 }
 const next = (page: Page) =>
-  page.getByRole("button", { name: /^(Avançar|Revisar)$/ }).click();
+  page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 const stock = (patient: string) =>
   sql(
     `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)};`,
@@ -48,7 +48,7 @@ async function finish(page: Page, revise = false) {
         : new URL(r.url()).pathname === "/api/documents"),
   );
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: "Emitir compra", exact: true })
     .click();
   const response = await pending;
   expect(response.ok(), await response.text()).toBe(true);

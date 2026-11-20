@@ -104,7 +104,7 @@ async function wizard(page: Page, patient: string) {
   await page
     .getByLabel("Forma de aquisição", { exact: false })
     .selectOption("purchase");
-  await page.getByRole("button", { name: "Avançar", exact: true }).click();
+  await page.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   await selectMaterialCategory(page);
   await page.getByRole("checkbox", { name: /Material fictício V4 0/ }).check();
   const combo = page.getByRole("combobox", {
@@ -131,9 +131,9 @@ async function wizard(page: Page, patient: string) {
   ).toContainText("20 unidade");
 }
 async function review(page: Page) {
-  await page.getByRole("button", { name: "Avançar", exact: true }).click();
-  await page.getByRole("button", { name: "Avançar", exact: true }).click();
-  await page.getByRole("button", { name: "Revisar", exact: true }).click();
+  await page.getByRole("button", { name: "Continuar", exact: true }).click();
+  await page.getByRole("button", { name: "Continuar", exact: true }).click();
+  await page.getByRole("button", { name: "Revisar ficha", exact: true }).click();
 }
 
 test("apresentações recuperam criação própria, preservam versões e estoque, e recusam código duplicado sem apagar o formulário", async ({
@@ -363,7 +363,7 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
     } else await route.continue();
   });
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: "Emitir compra", exact: true })
     .click();
   await page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true })
     .getByRole("button", { name: "Consultar resultado", exact: true }).click();
@@ -455,7 +455,7 @@ test("nova emissão com fator obsoleto conserva a escolha e exige comparação a
   await rpc(f.admin, "catalogue_presentation_command", edit(f, 1));
   await review(page);
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: "Emitir compra", exact: true })
     .click();
   await expect(
     page.getByText(/A apresentação mudou ou ficou indisponível/),
@@ -484,7 +484,7 @@ test("nova emissão com fator obsoleto conserva a escolha e exige comparação a
   ).toContainText("24 unidade");
   await review(page);
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: "Emitir compra", exact: true })
     .click();
   await expect(
     page.getByRole("dialog", { name: "Compra emitida", exact: true }),

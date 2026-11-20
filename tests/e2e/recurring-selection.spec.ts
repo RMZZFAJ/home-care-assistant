@@ -36,8 +36,8 @@ test("lista frequente cruza sessões, copia só materiais e nunca estoque7, urg�
   await peer.getByRole("button",{name:"Salvar rascunho",exact:true}).click();await expect(panel(peer)).toContainText("Último rascunho salvo.");const actual=await draftContext(f);expect(actual.content.lines).toHaveLength(2);for(const line of actual.content.lines){expect(line.currentStock).toBeNull();expect(line.stockObservation).toBe("unfilled");expect(line.stockObservationAt).toBeNull();expect(line.urgent).toBe(false);expect(line.repeatReason).toBeUndefined();}expect(actual.content.observations).toEqual([]);expect(officialState(f)).toBe(before);
   const countBefore=Number(sql(`select count(*) from public.requisitions where care_recipient_id=${sqlLiteral(f.patient)};`));
   const issued=peer.waitForResponse(response=>response.request().method()==="POST"&&new URL(response.url()).pathname==="/api/requisitions");
-  for(let i=0;i<4;i++)await peer.getByRole("button",{name:/^Avançar$|^Revisar$/}).click();
-  await peer.getByRole("button",{name:"Concluir requisição",exact:true}).click();
+  for(let i=0;i<4;i++)await peer.getByRole("button",{name:/^(Selecionar materiais|Continuar|Revisar ficha)$/}).click();
+  await peer.getByRole("button",{name:"Emitir requisição",exact:true}).click();
   const response=await issued;expect(response.ok(),await response.text()).toBe(true);
   const sent=response.request().postDataJSON();for(const line of sent.lines){expect(line.currentStock).toBeNull();expect(line.urgent).toBe(false);expect(line.repeatReason).toBeUndefined();}
   const receipt=(await response.json()).receipt,id=receipt.requisitionId??receipt.id;expect(typeof id).toBe("string");

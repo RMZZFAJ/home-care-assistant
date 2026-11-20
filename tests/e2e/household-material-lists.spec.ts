@@ -81,7 +81,7 @@ test("E04-04 organiza uma lista da casa e reutiliza materiais em REQ, COM e ENT"
   await expect(selectedList).toBeChecked();
   await selectedList.scrollIntoViewIfNeeded();
   await info.attach("E04-04-lista-no-acordeao", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
-  await page.getByRole("button", { name: "Avançar", exact: true }).click();
+  await page.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   for (const name of names) await expect(page.getByRole("checkbox", { name: new RegExp(name) })).toBeChecked();
   for (const urgent of await page.getByRole("checkbox", { name: "Reposição urgente", exact: true }).all())
     await expect(urgent).not.toBeChecked();
@@ -99,7 +99,7 @@ test("E04-04 organiza uma lista da casa e reutiliza materiais em REQ, COM e ENT"
     await showLists(page);
     await page.getByRole("checkbox", { name: new RegExp(updated) }).check();
     if (kind === "com") await page.getByRole("checkbox", { name: new RegExp(overlapping) }).check();
-    await page.getByRole("button", { name: "Avançar", exact: true }).click();
+    await page.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
     for (const name of names)
       await expect(page.getByRole("textbox", { name: "Quantidade — " + name, exact: true })).toHaveValue("");
   }

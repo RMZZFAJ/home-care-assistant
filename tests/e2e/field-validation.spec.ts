@@ -26,7 +26,7 @@ async function login(page: Page, patient: string, role: "professional" | "adminA
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, role === "global" ? null : patient);
 }
-const next = (page: Page) => page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
+const next = (page: Page) => page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 const state = (patient: string) => JSON.parse(sql(`select coalesce((select jsonb_build_object('version',version,'settings',settings) from public.patient_settings where care_recipient_id=${q(patient)}),'{"version":1,"settings":{}}'::jsonb)`));
 const count = (patient: string) => sql(`select count(*) from public.access_change_requests where care_recipient_id=${q(patient)}`);
 async function errorAt(field: Locator, text: string) {
@@ -54,6 +54,17 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/requisitions" && request.method() === "POST") commands++; });
   await login(page, f.patient, "professional", writer.email, "/fichas/req");
   await expect(page.getByText("Carregando catálogo e pendências…", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Nova requisição", exact: true })).toBeVisible();
+  const location = page.getByRole("navigation", { name: "Localização da ficha" });
+  await expect(location.getByRole("link", { name: "Fichas", exact: true })).toHaveAttribute("href", "/fichas");
+  const help = page.getByRole("button", { name: "Ajuda sobre esta ficha", exact: true });
+  await help.click();
+  const wizardHelp = page.getByRole("dialog", { name: "Uma ficha, com seu contexto", exact: true });
+  await expect(wizardHelp).toBeVisible();
+  await wizardHelp.getByRole("button", { name: "Entendi", exact: true }).click();
+  await expect(wizardHelp).toBeHidden();
+  await expect(help).toBeFocused();
+  await expect(page.getByRole("button", { name: "Sair por agora", exact: true })).toBeVisible();
   await next(page);
   await page.getByRole("button", { name: "Item extra", exact: true }).click();
   const extra = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
@@ -133,7 +144,7 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
     await route.continue();
   });
   const pendingSave = page.waitForRequest(saveBody);
-  const confirm = page.getByRole("button", { name: "Concluir requisição", exact: true });
+  const confirm = page.getByRole("button", { name: "Emitir requisição", exact: true });
   try {
     await observation.fill(validNote);
     await pendingSave;

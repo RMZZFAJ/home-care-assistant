@@ -31,7 +31,7 @@ async function login(page: Page, patient: string) {
   ).toHaveCount(0);
 }
 async function next(page: Page) {
-  await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
+  await page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 }
 async function hygiene(page: Page) {
   await next(page);
@@ -148,7 +148,7 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
     values (${sqlLiteral(f.patient)}, ${sqlLiteral(fluid.product_id)}, 0.25, 'adjustment',
       ${sqlLiteral(fixtures.adminA.id)}, 'CARE_TEAM', 'Movimento fictício após a revisão REQ');`);
   const beforeEmission = ledgerState();
-  const issueButton = page.getByRole("button", { name: "Concluir requisição", exact: true });
+  const issueButton = page.getByRole("button", { name: "Emitir requisição", exact: true });
   await issueButton.click();
   const stockReview = page.getByRole("dialog", { name: "Confira o estoque da equipe" });
   await expect(stockReview.getByText("1,75 mL", { exact: true })).toBeVisible();
@@ -326,7 +326,7 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
     } else await route.continue();
   });
   await page
-    .getByRole("button", { name: "Concluir requisição", exact: true })
+    .getByRole("button", { name: "Emitir requisição", exact: true })
     .click();
   const recovery = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
   await expect(recovery).toBeVisible();

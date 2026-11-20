@@ -1031,6 +1031,7 @@
 .hca-revoked-content > h1 { margin: 0; font-size: 18px; line-height: 1.35; font-weight: 700; }
 .hca-revoked-content > p { margin: 10px 0 18px; font-size: 12px; line-height: 1.7; }
 .workspace-content:has(.hca-opening-placeholder, .hca-opening-catalogue) > .page-heading { display: none; }
+.workspace-content:has(.hca-opening-placeholder, .hca-opening-catalogue) > .hca-supply-wizard-heading { display: none; }
 .hca-opening-placeholder { max-width: 680px; margin: 35px auto 0; padding: 27px; border: 1px dashed #cfdec8; border-radius: 13px; background: #f8fbf6; text-align: center; color: #50654a; }
 .hca-opening-placeholder > svg { display: block; margin-inline: auto; }
 .hca-opening-placeholder > h2 { margin: 0; font-size: 18px; font-weight: 700; }
@@ -1240,6 +1241,12 @@
 .hca-l1 .hca-arrival-material .hca-arrival-stock summary::after { content: none; display: none; }
 .hca-l1 .hca-arrival-material .hca-arrival-stock summary .hca-icon:last-child { margin-inline-start: auto; }
 .hca-l1 .hca-arrival-material .hca-arrival-stock[open] summary .hca-icon:last-child { rotate: 180deg; }
+.hca-supply-wizard-heading .hca-document-breadcrumb { margin-block-end: 16px; }
+.hca-supply-wizard-heading .eyebrow { display: flex; align-items: center; gap: 5px; font-size: 10px; overflow-wrap: anywhere; }
+.hca-supply-wizard-heading .eyebrow svg { flex: none; }
+.hca-supply-wizard-heading h1 { color: var(--hca-ink); font-size: 24px; font-weight: 730; letter-spacing: -.65px; line-height: 1.2; margin-block-start: 6px; }
+.hca-supply-wizard-heading .page-heading > .btn-icon { flex: none; color: var(--hca-muted); }
+
 .hca-transfer-wizard,
 .hca-supply-wizard-card {
   background: var(--hca-paper, #fff);
@@ -1375,8 +1382,9 @@
 .hca-supply-wizard-footer-actions,
 .hca-supply-wizard-footer-actions > div { display: flex; align-items: center; gap: 6px; }
 .hca-supply-wizard-footer-actions > div { margin-inline-start: auto; justify-content: flex-end; flex-wrap: wrap; min-width: 0; }
+.hca-supply-wizard-footer-meta { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 2px 8px; }
+.hca-supply-wizard-footer-meta:has(.hca-supply-wizard-status:not(:empty)) { margin-block-start: 9px; }
 .hca-supply-wizard-status { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 0; color: #4a6659; font-size: 11px; }
-.hca-supply-wizard-status:not(:empty) { margin-block-start: 9px; }
 
 @media (max-width: 850px) {
   .hca-supply-wizard-footer {

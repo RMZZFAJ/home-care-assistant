@@ -20,6 +20,7 @@ import {
 
 export function AppWorkspace({
   title,
+  heading,
   children,
   administration = false,
   administrationCapabilities = ["access.manage"],
@@ -29,6 +30,7 @@ export function AppWorkspace({
   documentPage = false,
 }: {
   title: string;
+  heading?: (context: WorkspaceContext) => ReactNode;
   children: (context: WorkspaceContext) => ReactNode;
   administration?: boolean;
   administrationCapabilities?: string[];
@@ -86,6 +88,7 @@ export function AppWorkspace({
   const [initialized, setInitialized] = useState(false);
   if (!loading && !selecting && value && !initialized) setInitialized(true);
   if ((loading || selecting) && !initialized) return <main id="workspace-content" className="workspace-content" tabIndex={-1} aria-busy="true" />;
+  const customHeading = heading && value?.patient && !choose && !error ? heading(value) : null;
   return (
     <main
       id="workspace-content"
@@ -94,7 +97,8 @@ export function AppWorkspace({
       }
       tabIndex={-1}
     >
-      {!documentPage || choose || !value || error ? (
+      {customHeading}
+      {!customHeading && (!documentPage || choose || !value || error) ? (
         <div className="page-heading">
           <div>
             <p className="eyebrow">

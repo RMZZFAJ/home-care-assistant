@@ -39,9 +39,9 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   for (const [path, title] of [
     ["/", "Visão geral"],
     ["/fichas", "Central de fichas"],
-    ["/fichas/req", "Requisição de insumos"],
-    ["/fichas/com", "Compra de insumos"],
-    ["/fichas/ent", "Entrega e devolução de materiais"],
+    ["/fichas/req", "Nova requisição"],
+    ["/fichas/com", "Nova compra"],
+    ["/fichas/ent", "Nova entrega"],
     ["/fichas/bal", "Balanço de estoque"],
     ["/escalas", "Escalas e plantões"],
     ["/balancos", "Balanços e plantões"],

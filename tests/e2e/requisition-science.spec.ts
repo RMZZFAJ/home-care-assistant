@@ -35,10 +35,10 @@ test("falha nos dados da ficha bloqueia comandos e a retomada conserva o rascunh
   await page.goto("/fichas/ent?documentId=" + draft.id);
   const opening = page.getByRole("dialog", { name: "Catálogo indisponível", exact: true });
   await expect(opening).toBeVisible();
-  await expect(page.getByRole("button", { name: "Avançar", exact: true })).toHaveCount(0); await expect(page.getByRole("button", { name: "Salvar rascunho", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toHaveCount(0); await expect(page.getByRole("button", { name: "Salvar rascunho", exact: true })).toHaveCount(0);
   await opening.getByRole("button", { name: "Tentar novamente", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Confirme os dados da ficha", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Avançar", exact: true }).click(); await selectMaterialCategory(page);
+  await page.getByRole("button", { name: "Selecionar materiais", exact: true }).click(); await selectMaterialCategory(page);
   await expect(page.getByLabel("Quantidade — Material fictício V4 0", { exact: true })).toHaveValue("7");
   expect(sql(`select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(draft.id)};`)).toBe(before);
   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(ledger);

@@ -35,7 +35,7 @@ async function open(page: Page, patient: string) {
   await page.goto("/fichas/ent");
 }
 const next = (page: Page) =>
-  page.getByRole("button", { name: /^(Avançar|Revisar)$/ }).click();
+  page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 async function materialsAndReview(page: Page) {
   await next(page);
   await selectMaterialCategory(page);
@@ -66,7 +66,7 @@ async function finish(page: Page) {
       response.request().method() === "POST",
   );
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: "Expedir entrega", exact: true })
     .click();
   const response = await pending;
   expect(response.ok(), await response.text()).toBe(true);
@@ -153,7 +153,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
     } else await route.continue();
   });
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: "Expedir entrega", exact: true })
     .click();
   const uncertain = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
   await expect(uncertain).toBeVisible();
@@ -372,7 +372,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
         r.request().method() === "POST",
     );
     await page
-      .getByRole("button", { name: "Confirmar e concluir", exact: true })
+      .getByRole("button", { name: "Expedir entrega", exact: true })
       .click();
     expect((await response).status()).toBe(409);
     expect(ledger(f.patient)).toBe(before);

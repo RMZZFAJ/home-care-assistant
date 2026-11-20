@@ -29,6 +29,7 @@ import {
 } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
+import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "./document-write-access-notice";
@@ -61,7 +62,7 @@ import {
 import type { SupplyDraftContent } from "@/lib/validation/supply-drafts";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
-import { materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
+import { materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardCopy, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
 import { issuanceObservationErrors } from "@/lib/documents/issuance-observations";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
 import { ActionButton } from "@/components/ui/controls";
@@ -91,8 +92,10 @@ import {
 const balanceSteps = draftFlowStages.SUPPLY.map((stage) => stage.label);
 export function SupplyWizard({ type }: { type: SupplyType; }) {
   const params = useSearchParams();
+  const kind = type === "BAL" ? null : type;
   return (
-    <Workspace title={documentLabels[type]} compact>
+    <Workspace title={kind ? supplyWizardCopy[kind].title : documentLabels[type]} compact
+      heading={kind ? context => <SupplyWizardHeading kind={kind} patient={context.patient!.display_name} /> : undefined}>
       {(context) => {
         if (!context.patient)
           return <Notice>Selecione um paciente para abrir uma ficha.</Notice>;
@@ -1530,6 +1533,7 @@ export function PatientSupplyWizard({
       return <DocumentCatalogueEmpty patientId={patientId} patientName={context.patient!.display_name}
         mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0} />;
   }
+  const exitDocumentId = documentId ?? routedSourceId;
   const navigation = <StepNavigator
     steps={steps}
     active={stage}
@@ -1559,8 +1563,7 @@ export function PatientSupplyWizard({
       ) : null}
       {legacyOpeningKey && !loading && !loadError ? (
         <Notice>
-          Na etapa Identificação, use Avançar para recuperar a abertura anterior
-          desta ficha.
+          Na primeira etapa, use {isBalance ? "Avançar" : "Selecionar materiais"} para recuperar a abertura anterior desta ficha.
         </Notice>
       ) : null}
       {needsBalanceReview && !uncertain && !loading && !loadError ? (
@@ -1803,7 +1806,8 @@ export function PatientSupplyWizard({
                   (!allowed && !uncertain)
                 }
                 draftBusy={privateDraft.backgroundBusy}
-                supplyStatus={isBalance ? undefined : { draft: privateDraft, current: privateContent }}
+                supply={type === "BAL" ? undefined : { kind: type, draft: privateDraft, current: privateContent,
+                  hasEdits: draftTouched, exitHref: exitDocumentId ? "/fichas/" + encodeURIComponent(exitDocumentId) : "/fichas" }}
                 uncertain={uncertain}
                 blocked={
                   (!(step === 0 && legacyOpeningKey) &&

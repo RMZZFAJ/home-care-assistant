@@ -24,7 +24,7 @@ async function login(
   await selectContext(page, patient);
 }
 const next = (page: Page) =>
-  page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
+  page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 const status = (page: Page) =>
   page.getByRole("status", {
     name: "Resultado da busca e seleção de materiais",

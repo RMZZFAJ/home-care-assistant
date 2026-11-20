@@ -11,7 +11,7 @@ test.setTimeout(210_000);
 test.afterEach(async({page})=>{await page.unrouteAll({behavior:"wait"});});
 const panel=lastDraftPanel;
 const save=(page:Page)=>page.getByRole("button",{name:"Salvar rascunho",exact:true});
-const next=(page:Page)=>page.getByRole("button",{name:/^Avançar$|^Revisar$/}).click();
+const next=(page:Page)=>page.getByRole("button",{name:/^(Selecionar materiais|Continuar|Revisar ficha)$/}).click();
 async function login(page:Page,patient:string,role="family"){
  await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures[role].email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);await page.bringToFront();
 }
@@ -48,7 +48,7 @@ test("ENT emite com rascunho privado e conserva a mesma confirmação após200 i
    if (lookups.length===1) return route.fulfill({status:403,json:{code:"FORBIDDEN",error:"Texto privado do ensaio"}});
    return route.continue();
  });
- await page.getByRole("button",{name:"Confirmar e concluir",exact:true}).click();
+ await page.getByRole("button",{name:"Expedir entrega",exact:true}).click();
  const modal=page.getByRole("dialog",{name:"Resultado ainda não confirmado",exact:true});
  const recover=modal.getByRole("button",{name:"Consultar resultado",exact:true});
  await expect(recover).toBeEnabled();expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");expect(packets[0].draftCommit).toMatchObject({id:saved.id});

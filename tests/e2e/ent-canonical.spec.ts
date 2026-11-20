@@ -62,7 +62,7 @@ test("06.2 ENT selection and complete readonly review follow the model without s
   if (!person) throw new Error("The native preparation must include the eligible recipient");
   const reason = "Escolha pessoal fictícia para conferir a revisão visual da entrega";
   await selectDeliveryRecipient(page, person.name, reason);
-  const next = () => page.getByRole("button", { name: /^(Avançar|Revisar)$/ }).click();
+  const next = () => page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
   await next(); const checkbox = page.getByRole("checkbox", { name: name + " unidade", exact: true });
   await checkbox.check(); await page.getByLabel("Quantidade — " + name, { exact: true }).fill("12");
   const ref = await reference(browser, "nova/ENT");

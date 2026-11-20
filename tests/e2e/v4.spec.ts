@@ -148,7 +148,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
       family.getByRole("link").filter({ hasText: receipt.code }),
     ).toBeVisible({ timeout: 20000 });
     await pro.goto("/fichas/req?careRecipientId=" + patient);
-    await pro.getByRole("button", { name: "Avançar", exact: true }).click();
+    await pro.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
     await pro.getByRole("navigation", { name: "Tipos de material" }).getByRole("button", { name: /^Higiene/ }).click();
     await pro.getByRole("checkbox", { name: /Material V4 visual/ }).click();
     const duplicate = pro.getByRole("dialog", {

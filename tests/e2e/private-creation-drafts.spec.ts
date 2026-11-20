@@ -30,7 +30,7 @@ const panel = lastDraftPanel;
 const save = (page: Page) =>
   page.getByRole("button", { name: "Salvar rascunho", exact: true });
 const next = (page: Page) =>
-  page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
+  page.getByRole("button", { name: /^(Avançar|Revisar|Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 async function login(
   page: Page,
   patient: string,

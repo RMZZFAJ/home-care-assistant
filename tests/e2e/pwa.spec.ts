@@ -395,7 +395,7 @@ test("PWA sem confirmação de atualização aguarda abas, preserva edição e r
     await lastDraftPanel(tab)
       .getByRole("button", { name: "Continuar rascunho", exact: true })
       .click();
-    await tab.getByRole("button", { name: "Avançar", exact: true }).click();
+    await tab.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
     await selectMaterialCategory(tab);
     return tab.getByRole("textbox", {
       name: "Quantidade — Material fictício V4 0",

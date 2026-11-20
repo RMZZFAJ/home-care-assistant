@@ -102,7 +102,7 @@ test("REQ salva sem TTL retoma entre sessões sem misturar paciente ou outro tit
   await open(page);
   await panel(page).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   for (let step = 0; step < 6 && !await page.getByLabel("Observação 1", { exact: true }).isVisible(); step++)
-    await page.getByRole("button", { name: /^(Avançar|Revisar)$/ }).click();
+    await page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
   await expect(page.getByLabel("Observação 1", { exact: true })).toHaveValue(familyNote);
   await expect(page.locator("body")).not.toContainText(note);
   const familyRead = await page.request.get(`/api/drafts?careRecipientId=${f.patient}&kind=REQ`);

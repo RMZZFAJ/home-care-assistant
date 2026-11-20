@@ -613,7 +613,7 @@ test.describe("administração integrada no ambiente local", () => {
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
     await page.waitForURL(url => url.pathname === "/");
     await page.goto(`/fichas/req?careRecipientId=${patientId}`);
-    const next = page.getByRole("button", { name: "Avançar", exact: true });
+    const next = page.getByRole("button", { name: /^(Selecionar materiais|Continuar)$/ });
     await next.click();
     await page
       .getByRole("button", { name: "Item extra", exact: true })
@@ -667,7 +667,7 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(page.getByText(details, { exact: true })).toBeVisible();
     await info.attach("extra-req-retomado", { body: await editButton.locator("xpath=ancestor::li[1]").screenshot(), contentType: "image/png" });
     await next.click();
-    await page.getByRole("button", { name: "Revisar", exact: true }).click();
+    await page.getByRole("button", { name: "Revisar ficha", exact: true }).click();
     const reviewMaterial = page.locator(".hca-material-review li").filter({
       has: page.locator("strong").filter({ hasText: /^Gaze$/ }),
     });
@@ -683,7 +683,7 @@ test.describe("administração integrada no ambiente local", () => {
         response.request().method() === "POST",
     );
     await page
-      .getByRole("button", { name: "Concluir requisição", exact: true })
+      .getByRole("button", { name: "Emitir requisição", exact: true })
       .click();
     const response = await pending;
     expect(response.ok()).toBeTruthy();
