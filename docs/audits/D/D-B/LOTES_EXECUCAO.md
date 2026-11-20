@@ -156,6 +156,23 @@ Andamentos foram exercitadas nos percursos correspondentes. As comparações
 registradas sustentam a equivalência desses elementos e a interação testada.
 A v7 completa, incluindo variantes restantes, ainda requer revisão final.
 
+O painel de Materiais do cenário E04-11 usa as abas Estoque, Histórico e
+Fichas. A aba Fichas reúne requisições em acompanhamento, histórico
+arquivado e aquisição e movimentação. A prévia mostra identificação,
+autoria, data, situação e os fatos do material preservados na ficha.
+É possível abrir a ficha completa e retornar à mesma consulta. O escopo
+por paciente e ficha é conferido na leitura antes de apresentar os dados.
+As capturas da referência e do produto em 390 px foram comparadas em
+Android e iOS emulados. Seis casos de navegador passaram na rodada final,
+incluindo retorno à posição exata do formulário, foco, busca e valores
+digitados, falha de consulta e recusa de acesso a outro paciente.
+
+O sistema acrescenta o grupo Outras requisições quando existe uma
+requisição encerrada ou cancelada sem arquivamento formal. A prévia mantém
+a ação Atualizar consulta para recuperar uma falha de leitura. A unidade
+vem do registro real. Códigos de catálogo exibidos apenas no exemplo da
+v7 ficam fora da consulta quando a referência real só fornece a unidade.
+
 A etapa de Observações foi conferida em 390 px. As capturas mostram os campos
 numerados, a ação Remover e o foco e a mensagem na validação. A revisão móvel
 incluiu a retomada, a ordem no recebimento e a nota própria do recebedor.
@@ -185,10 +202,10 @@ Rascunhos antigos conservam o texto anterior.
 expunha em entradas usuais e pelo assistente de transferências. Os fluxos
 foram aproximados visualmente com preservação da etapa salva em rascunhos
 antigos. O PDF inicial usa o pipeline real de emissão, assinatura e controle
-de acesso. O código publicado em `075b4b66` ainda tem um leitor anterior à
+de acesso. O SHA de referência anterior `075b4b66` tem um leitor anterior à
 combinação de declaração pendente e expedição disponível que o banco de
-desenvolvimento passou a expor. Essa diferença permanece até o preview rodar
-com o código compatível. Há registro da ausência de transferências na
+desenvolvimento passou a expor. A aplicação no preview acompanha esse banco
+quando roda com o leitor compatível. Há registro da ausência de transferências na
 conferência histórica de aplicação inicial, sem inferência sobre dados atuais.
 
 ### Decisões e dúvidas de L2
@@ -360,8 +377,8 @@ A [CI 44477574161](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/4
 concluiu com sucesso para `075b4b66` e os 15 checks exibidos na PR estão
 aprovados para esse SHA. O workflow foi executado uma vez e os logs dos seis
 jobs de navegador não contêm marcador de retry, flaky ou falha do Playwright.
-A implementação local posterior e a triagem de 19/11 ainda aguardam o ciclo
-do próprio SHA, inclusive Sonar e preview compatível.
+A implementação posterior e a triagem de 19/11 exigem a comprovação dos
+checks do próprio SHA, inclusive Sonar e preview compatível.
 
 L3 e L4 ainda não começaram. Quando tiverem ordem e referência aprovadas,
 registrar o escopo de cada lote, suas comparações comprovadas, criações fora

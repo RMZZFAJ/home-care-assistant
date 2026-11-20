@@ -32,6 +32,7 @@ const place = z.object({
   lineId: z.uuid(), section: z.enum(materialPanelSections),
   page: z.number().int().min(1).max(1_000_000), linked: z.object({
     id: z.uuid(), code: z.string().nullable(), type: z.enum(["REQ", "COM", "ENT", "BAL"]),
+    kind: z.enum(["REQ", "COM", "ENT", "DEV", "BAL"]).optional(),
   }).nullable(),
   panelScroll: z.number(), pageScroll: z.number(), focusEntry: z.string().optional(),
   filter: z.enum(filters), search: z.string().max(160),

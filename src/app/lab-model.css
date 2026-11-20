@@ -1438,6 +1438,18 @@
 .hca-l1 .hca-material-sheet-body { padding: 20px; }
 .hca-l1 .hca-material-sheet-body section + section { margin-top: 22px; }
 .hca-l1 .hca-material-sheet-body h3 { margin: 0 0 10px; color: #24473c; font-size: 13px; font-weight: 650; }
+.hca-l1 .hca-material-observation-note { margin-top: 10px; color: #637469; font-size: 11px; }
+.hca-l1 .hca-related-record { display: grid; gap: 12px; }
+.hca-l1 .hca-related-record section + section { margin-top: 4px; padding-top: 16px; }
+.hca-l1 .hca-related-refresh { justify-self: end; min-height: 36px; }
+.hca-l1 .hca-related-record-code { color: #637469; font-size: 11px; margin-block: 0 10px; }
+.hca-l1 .hca-related-record-identity { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.hca-l1 .hca-related-record-identity dt { color: #637469; font-size: 11px; }
+.hca-l1 .hca-related-record-identity dd { margin: 4px 0 0; color: #24473c; font-size: 13px; overflow-wrap: anywhere; }
+.hca-l1 .hca-related-materials { display: grid; gap: 0; padding: 0; margin: 0; list-style: none; }
+.hca-l1 .hca-related-materials > :is(li, article) { padding: 12px 0; border: 0; border-radius: 0; overflow-wrap: anywhere; }
+.hca-l1 .hca-related-materials > :is(li, article) + :is(li, article) { border-top: 1px solid #e3eae6; }
+.hca-l1 .hca-related-material-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin-bottom: 12px; }
 .hca-l1 .hca-material-balance-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 12px 0; padding: 15px 0; border-block: 1px solid #e4ece6; }
 .hca-l1 .hca-material-balance-grid dt, .hca-l1 .hca-material-balance-grid .hca-material-balance-note { font-size: 10px; color: #546e62; font-weight: 400; }
 .hca-l1 .hca-material-balance-grid dd { margin: 3px 0 0; font-size: 16px; font-weight: 650; overflow-wrap: anywhere; }
@@ -1454,7 +1466,16 @@
 .hca-l1 .hca-material-linked-list { display: grid; gap: 8px; }
 .hca-l1 .hca-material-linked-list article { padding: 9px; border: 1px solid #dde7e0; border-radius: 10px; }
 .hca-l1 .hca-material-link { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px; min-height: 42px; border: 1px solid #dde7e0; border-radius: 10px; background: #fff; color: #24473c; text-align: left; }
-.hca-l1 .hca-material-link span { flex: 1; }
+.hca-l1 .hca-material-link-icon { display: grid; flex: none; place-items: center; width: 32px; height: 32px; background: #eef5ea; border-radius: 8px; color: #527461; }
+.hca-l1 .hca-material-link-copy { flex: 1; min-width: 0; font-size: 12px; overflow-wrap: anywhere; }
+.hca-l1 .hca-material-link > .ui-badge { max-width: 40%; flex: none; white-space: normal; font-size: 10px; overflow-wrap: anywhere; }
+.hca-l1 .hca-material-link:focus-visible { outline: 2px solid #156f66; outline-offset: 2px; }
+.hca-l1 .hca-material-sheet-body .hca-material-link-group > .hca-material-linked-list { gap: 0; }
+.hca-l1 .hca-material-sheet-body .hca-material-link-group .hca-material-link {
+  min-height: 62px; padding: 12px 0; border: 0; border-radius: 0; background: transparent;
+}
+.hca-l1 .hca-material-sheet-body .hca-material-link-group .hca-material-linked-list > div + div { border-top: 1px solid #e3eae6; }
+.hca-l1 .hca-material-sheet-body .hca-material-link-group .hca-material-link-copy strong { color: #156f66; }
 .hca-l1 .hca-material-pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
 @media (max-width: 600px) {
   .hca-overlay:has(.hca-material-full) { --material-view-inset: 58px; }

@@ -1,5 +1,12 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — painel de material e fichas relacionadas.** A aba Fichas agrupa
+as referências reais conforme a v7. A prévia mostra paciente, autoria,
+data, situação e quantidades registradas. O retorno à edição restaura foco,
+busca, preenchimento e rolagem. Os seis casos dirigidos em Android e iOS
+emulados passaram na rodada final. As capturas da comparação a 390 px
+estão em `output/playwright/l2-material-links/`.
+
 **19/11 — extras da ENT, DEV e COM mista.** A entrega e a devolução preservam
 o extra fora do catálogo no último rascunho. A pessoa pode editar, remover,
 escolher um produto correspondente e conferir a linha uma vez na revisão.

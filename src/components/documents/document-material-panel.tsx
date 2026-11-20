@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { lazy, Suspense, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { lazy, Suspense, use, useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Tabs } from "@base-ui/react/tabs";
-import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
+import { ActionButton, LoadingIndicator, Pill } from "@/components/ui/controls";
 import { Drawer } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
 import { PageLoadingActivity } from "@/components/ui/operation-activity";
+import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { documentMaterialPanel, materialPanelSections, type MaterialPanelSection } from "@/lib/validation/document-material-context";
 import { documentStatusLabel } from "@/lib/documents/presentation";
@@ -15,17 +16,17 @@ import { materialVisitParam, prepareMaterialVisit } from "@/lib/documents/materi
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
-import type { DocumentType } from "@/types/documents";
+import type { DocumentKind, DocumentType } from "@/types/documents";
 import type { WorkspaceContext } from "@/types/workspace";
 import type { DocumentMaterialRow } from "./document-material-list";
-import { RelatedDocumentBody } from "./related-document";
+import { RelatedDocumentBody, relatedDocumentLabel } from "./related-document";
 import { DocumentMaterialHistory } from "./document-material-history";
 import { MaterialVisitContext } from "./material-visit-context";
 import type { MaterialVisitTarget } from "./material-full-visit";
 
 const MaterialFullVisit = lazy(() => import("./material-full-visit").then(module => ({ default: module.MaterialFullVisit })));
 
-export type LinkedMaterialDocument = { id: string; code: string | null; type: DocumentType };
+export type LinkedMaterialDocument = { id: string; code: string | null; type: DocumentType; kind?: DocumentKind };
 export type MaterialPanelPosition = {
   lineId: string;
   section: MaterialPanelSection;
@@ -35,6 +36,8 @@ export type MaterialPanelPosition = {
   linked: LinkedMaterialDocument | null;
 };
 const labels = { stock: "Estoque", history: "Histórico", links: "Fichas" };
+const linkedIcons = { REQ: "note", COM: "box", ENT: "truck", DEV: "truck", BAL: "stock" } as const;
+const closedRequisitionStatuses = new Set(["cancelled", "completed", "delivered", "historical"]);
 
 export function DocumentMaterialPanel({
   row, documentId, patientId, revision, position, onPosition, onNavigate, finalFocus, onClose, inlineContext,
@@ -57,6 +60,9 @@ export function DocumentMaterialPanel({
   const router = useRouter();
   const inheritedContext = use(MaterialVisitContext);
   const visitContext = inlineContext ?? inheritedContext;
+  const workspacePatient = useWorkspaceState().value?.patient;
+  const patient = visitContext?.patient ?? workspacePatient;
+  const linkDescriptionId = useId();
   const [inlineVisit, setInlineVisit] = useState<{ target: MaterialVisitTarget; key: string | null; opener: HTMLElement | null } | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const inlineOpenerRef = useRef<HTMLElement | null>(null);
@@ -114,15 +120,22 @@ export function DocumentMaterialPanel({
     if (contentRef.current) contentRef.current.scrollTop = 0;
     onPosition({ ...position, section: next, page: nextPage, panelScroll: 0 });
   }
-  function link(record: LinkedMaterialDocument, detail?: ReactNode, timeline = false) {
+  function link(record: LinkedMaterialDocument, detail?: ReactNode, options: { timeline?: boolean; status?: string; archived?: boolean; attention?: boolean } = {}) {
     if (record.id === documentId) return null;
+    const kind = record.kind ?? record.type;
+    const { timeline, status, archived, attention } = options;
+    const statusId = status ? `${linkDescriptionId}-${record.id}` : undefined;
+    const detailId = statusId && detail ? statusId + "-detail" : undefined;
     return <button className={timeline ? "hca-material-history-reference" : "hca-material-link"} type="button"
-      aria-label={record.code ?? record.type} data-material-reference={record.id} onClick={event => {
+      aria-label={record.code ?? kind} aria-describedby={statusId ? [detailId, statusId].filter(Boolean).join(" ") : undefined}
+      data-material-reference={record.id} onClick={event => {
       linkedTriggerRef.current = event.currentTarget;
       onPosition({ ...position, linked: record, panelScroll: contentRef.current?.scrollTop ?? 0 });
     }}>
-      {timeline ? <><Icon name="link" width={13} height={13} />{record.code ?? record.type}</>
-        : <><Icon name="file" /><span><strong>{record.code ?? record.type}</strong>{detail ? <small>{detail}</small> : null}</span><Icon name="chevron" /></>}
+      {timeline ? <><Icon name="link" width={13} height={13} />{record.code ?? kind}</>
+        : <><span className="hca-material-link-icon"><Icon name={archived ? "archive" : linkedIcons[kind]} width={16} height={16} /></span>
+          <span className="hca-material-link-copy"><strong>{record.code ?? kind}</strong>{detail ? <small id={detailId}>{detail}</small> : null}</span>
+          {status ? <Pill id={statusId} tone={attention ? "warning" : "neutral"}>{status}</Pill> : <Icon name="chevron" width={16} height={16} />}</>}
     </button>;
   }
   function closeLinked() {
@@ -157,6 +170,13 @@ export function DocumentMaterialPanel({
     router.push(url.pathname + url.search);
   }
   const displayQuantity = (value: string | null) => value === null ? "Não disponível nesta consulta" : formatQuantity(value, row.unit ?? undefined);
+  const links = data?.section === "links" ? data.rows.filter(item => item.id !== documentId) : [];
+  const linkGroups = [
+    { label: "Requisições em acompanhamento", rows: links.filter(item => item.kind === "REQ" && !item.archived && !closedRequisitionStatuses.has(item.status)) },
+    { label: "Outras requisições", rows: links.filter(item => item.kind === "REQ" && !item.archived && closedRequisitionStatuses.has(item.status)) },
+    { label: "Histórico arquivado", rows: links.filter(item => item.archived) },
+    { label: "Aquisição e movimentação", rows: links.filter(item => item.kind !== "REQ" && !item.archived) },
+  ];
   const inlineSurface = inlineVisit && visitContext ? <Suspense fallback={<PageLoadingActivity title="Abrindo ficha completa" />}>
     <MaterialFullVisit context={visitContext} target={inlineVisit.target} onClose={closeVisit}
       finalFocus={() => inlineVisit.opener?.isConnected ? inlineVisit.opener : false} />
@@ -187,15 +207,17 @@ export function DocumentMaterialPanel({
             )}</div> : null}
           </section> : null}
           <section><h3>Estoque informado nas requisições</h3>
-            {data.observations.length ? <div className="hca-material-linked-list">{data.observations.map(observation => <article key={observation.documentId}>
+            {data.observations.length ? <><div className="hca-material-linked-list">{data.observations.map(observation => <article key={observation.documentId}>
               {link({ id: observation.documentId, code: observation.code, type: "REQ" }, formatBrazilDate(observation.createdAt))}
               <strong>{formatStockObservation(observation.quantity, observation.observation ?? undefined, observation.unit ?? undefined)}</strong>
               <small>{formatStockObservationTime(observation.observedAt, observation.timeSource ?? "legacy_unknown")}</small>
-            </article>)}</div> : <p>Nenhuma contagem de requisição disponível para este material.</p>}
+            </article>)}</div><p className="hca-material-observation-note">
+              Cada quantidade foi registrada na requisição correspondente. Os valores ficam preservados separadamente do saldo atual.
+            </p></> : <p>Nenhuma contagem de requisição disponível para este material.</p>}
           </section>
         </> : data?.section === "history" ? <DocumentMaterialHistory rows={data.rows} movementsAvailable={data.available}
           unit={row.unit} reference={record => {
-            if (record.document) return link(record.document, undefined, true);
+            if (record.document) return link(record.document, undefined, { timeline: true });
             if (!record.arrival) return null;
             const { id, code } = record.arrival;
             const path = `/estoque?arrival=${id}`;
@@ -204,11 +226,15 @@ export function DocumentMaterialPanel({
               onNavigate={event => visit(path, { kind: "arrival", reference: { id, code } }, event, record.id)}>
               <Icon name="link" width={13} height={13} />{code}
             </Link>;
-          }} /> : data?.section === "links" ? <section>
-          <h3>Fichas relacionadas</h3>
-          {data.rows.length ? <div className="hca-material-linked-list">{data.rows.map(item => <div key={item.id}>
-            {link(item, `${item.kind} · ${item.archived ? "Arquivada" : documentStatusLabel(item.status)} · ${formatBrazilDate(item.createdAt)}`)}
-          </div>)}</div> : <p>Nenhuma ficha relacionada disponível neste vínculo.</p>}
+        }} /> : data?.section === "links" ? links.length ? linkGroups.map(group => group.rows.length ? <section key={group.label} aria-label={group.label} className="hca-material-link-group">
+          <h3>{group.label}</h3>
+          <div className="hca-material-linked-list">{group.rows.map(item => <div key={item.id}>
+            {link(item, `${relatedDocumentLabel(item.kind)} · ${formatBrazilDate(item.createdAt)}`,
+              { status: item.archived ? "Arquivada" : documentStatusLabel(item.status), archived: item.archived,
+                attention: !item.archived && ["fulfillment_partial", "partially_received", "disputed"].includes(item.status) })}
+          </div>)}</div>
+        </section> : null) : <section><h3>Fichas relacionadas</h3>
+          <p>Nenhuma ficha relacionada disponível neste vínculo.</p>
         </section> : null}
         {data && data.section !== "stock" && (data.total > 20 || page > 1) ? <div className="hca-material-pagination">
           <ActionButton disabled={page === 1} onClick={() => select(section, page - 1)}>Anterior</ActionButton>
@@ -216,7 +242,8 @@ export function DocumentMaterialPanel({
           <ActionButton disabled={data.total <= page * 20} onClick={() => select(section, page + 1)}>Próxima</ActionButton>
         </div> : null}
       </Tabs.Panel>
-      {linked ? <Drawer open title={linked.code ?? linked.type} kicker="Ficha relacionada" keyboardScrollable
+      {linked ? <Drawer open title={linked.code ?? linked.kind ?? linked.type} kicker="Ficha relacionada" keyboardScrollable
+        subtitle={[relatedDocumentLabel(linked.kind ?? linked.type), patient?.id === patientId ? patient.display_name : null].filter(Boolean).join(" · ")}
         popupClassName="hca-material-sheet" onClose={closeLinked}
         footer={<>
           <ActionButton onClick={closeLinked}><Icon name="back" />Voltar ao material</ActionButton>
@@ -226,7 +253,7 @@ export function DocumentMaterialPanel({
             <Icon name="external" />Abrir {linked.code ?? "ficha"}
           </Link>
         </>}>
-        <RelatedDocumentBody id={linked.id} type={linked.type} onClose={closeLinked} />
+        <RelatedDocumentBody id={linked.id} type={linked.type} patientId={patientId} title={linked.code ?? undefined} onClose={closeLinked} />
         {inlineSurface}
       </Drawer> : null}
       {!linked ? inlineSurface : null}

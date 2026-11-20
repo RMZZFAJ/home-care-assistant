@@ -39,12 +39,27 @@ export function MaterialConsultButton({ context, material, menu = false, onLink 
 }) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const sourceScrollRef = useRef<{ left: number; top: number } | null>(null);
+  function openMaterial() {
+    sourceScrollRef.current = { left: window.scrollX, top: window.scrollY };
+    setOpen(true);
+  }
+  function closeMaterial() {
+    const position = sourceScrollRef.current;
+    setOpen(false);
+    requestAnimationFrame(() => {
+      const button = buttonRef.current;
+      if (!button?.isConnected) return;
+      button.focus({ preventScroll: true });
+      if (position) window.scrollTo({ ...position, behavior: "instant" });
+    });
+  }
   return <>
     {menu ? <Menu.Root>
       <Menu.Trigger ref={buttonRef} render={<ActionButton compact variant="quiet" className="hca-material-origin-button"
         aria-label={`Mais ações de ${material.name}`} />}><Icon name="more" /></Menu.Trigger>
       <MenuPopup>
-        <Menu.Item className="hca-menu-item" onClick={() => setOpen(true)}>
+        <Menu.Item className="hca-menu-item" onClick={openMaterial}>
           <Icon name="eye" />Detalhes do material
         </Menu.Item>
         {onLink ? <Menu.Item className="hca-menu-item" onClick={onLink}>
@@ -52,10 +67,10 @@ export function MaterialConsultButton({ context, material, menu = false, onLink 
         </Menu.Item> : null}
       </MenuPopup>
     </Menu.Root> : <ActionButton ref={buttonRef} className="hca-material-consult-button" variant="quiet" compact
-      aria-label={`Consultar material ${material.name}`} onClick={() => setOpen(true)}>
+      aria-label={`Consultar material ${material.name}`} onClick={openMaterial}>
       <Icon name="eye" />Consultar material
     </ActionButton>}
     {open ? <CatalogueMaterialPanel context={context} material={material}
-      finalFocus={() => buttonRef.current ?? false} onClose={() => setOpen(false)} closeText="Voltar ao preenchimento" /> : null}
+      finalFocus={() => false} onClose={closeMaterial} closeText="Voltar ao preenchimento" /> : null}
   </>;
 }

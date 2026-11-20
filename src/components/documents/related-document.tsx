@@ -1,17 +1,28 @@
 "use client";
 import { useOperationActivity } from "@/components/ui/operation-activity";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Dialog, Icon } from "@/components/ui/primitives";
-import { api, Notice } from "@/components/workspace";
+import { useCallback, useRef, useState } from "react";
+import { ActionButton, Pill } from "@/components/ui/controls";
+import { Drawer } from "@/components/ui/overlays";
+import { Icon } from "@/components/ui/icon";
+import { Notice } from "@/components/workspace";
+import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { formatBrazilDate } from "@/lib/receipt";
 import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
 import { RequisitionDisplay } from "@/components/requisitions/requisition-display";
 import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
-import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
-import type { DocumentType, SupplyType } from "@/types/documents";
+import { documentLabels, type DocumentKind, type DocumentType, type SupplyType } from "@/types/documents";
+import { documentIssuerName, documentPatientName, documentStatusLabel } from "@/lib/documents/presentation";
+import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
+import { pendingPurchaseItems } from "@/lib/documents/pending-purchase-items";
+import { formatQuantity } from "@/lib/quantity";
 import { SupplyLineSummary } from "./supply-line-summary";
 import { useScopedRead } from "@/lib/use-scoped-read";
-import { parseRelatedSupplyRead } from "@/lib/validation/related-document";
+import { parseRelatedRequisitionRead, parseRelatedSupplyRead } from "@/lib/validation/related-document";
+
+export function relatedDocumentLabel(kind: DocumentKind) {
+  if (kind === "DEV") return "Devolução de materiais";
+  return kind === "ENT" ? "Entrega de materiais" : documentLabels[kind];
+}
 
 export function RelatedDocument({
   id,
@@ -43,82 +54,108 @@ export function RelatedDocument({
           <><span className="doc-linked-kind" data-type={type}>{type}</span><span className="doc-linked-main"><strong>{label}</strong><small>Consultar ficha</small></span><Icon name="chevron" width={16} height={16} /></>
         )}
       </button>
-      {open ? <Dialog open title={label} onClose={close}>
-        <RelatedDocumentBody id={id} type={type} onClose={close} />
-      </Dialog> : null}
+      {open ? <Drawer open title={label ?? relatedDocumentLabel(type)} kicker="Ficha relacionada"
+        popupClassName="hca-material-sheet" keyboardScrollable onClose={close}
+        footer={<ActionButton onClick={close}><Icon name="back" />Voltar à origem</ActionButton>}>
+        <RelatedDocumentBody id={id} type={type} title={label} onClose={close} />
+      </Drawer> : null}
     </>
   );
 }
-export function RelatedDocumentBody({ id, type, onClose }: { id: string; type: DocumentType; onClose: () => void }) {
+export function RelatedDocumentBody({ id, type, patientId, title, onClose }: {
+  id: string; type: DocumentType; patientId?: string; title?: string; onClose: () => void;
+}) {
+  const patient = useWorkspaceState().value?.patient;
+  const currentPatient = patientId ?? patient?.id;
+  const patientName = patient?.id === currentPatient ? patient?.display_name : undefined;
   return type === "REQ"
-    ? <RequisitionOpening id={id} withinDialog onCancel={onClose}><RelatedContent id={id} type={type} /></RequisitionOpening>
-    : <RelatedSupplyContent key={id + type} id={id} type={type} />;
+    ? <RequisitionOpening id={id} key={id + ":" + currentPatient} withinDialog onCancel={onClose}>
+      <RelatedRequisitionContent id={id} patientId={currentPatient} patientName={patientName} title={title} />
+    </RequisitionOpening>
+    : <RelatedSupplyContent key={id + type} id={id} type={type} patientId={currentPatient} patientName={patientName} title={title} />;
 }
-function RelatedSupplyContent({ id, type }: { id: string; type: SupplyType }) {
-  const decode = useCallback((value: unknown) => parseRelatedSupplyRead(value, id, type), [id, type]);
-  const read = useScopedRead(`/api/documents/${id}`, "", decode);
-  useOperationActivity(read.loading, { title: "Consultando a ficha relacionada", detail: "A ficha de origem permanece disponível após esta consulta." });
+
+function RecordIdentity({ code, title, patient, author, createdAt, status }: {
+  code: string | null; title?: string; patient?: string; author?: string | null; createdAt: string; status: string;
+}) {
+  return <section>
+    <h3>Identificação do registro</h3>
+    {code && code !== title ? <p className="hca-related-record-code">{code}</p> : null}
+    <dl className="hca-related-record-identity">
+      <div><dt>Paciente</dt><dd>{patient ?? "Identificação indisponível"}</dd></div>
+      <div><dt>Registrado por</dt><dd>{author ?? "Nome histórico não preservado"}</dd></div>
+      <div><dt>Data</dt><dd><time dateTime={createdAt}>{formatBrazilDate(createdAt)}</time></dd></div>
+      <div><dt>Situação</dt><dd>{status}</dd></div>
+    </dl>
+  </section>;
+}
+
+function RelatedSupplyContent({ id, type, patientId, patientName, title }: {
+  id: string; type: SupplyType; patientId?: string; patientName?: string; title?: string;
+}) {
+  const decode = useCallback((value: unknown) => parseRelatedSupplyRead(value, id, type, patientId), [id, type, patientId]);
+  const read = useScopedRead(`/api/documents/${id}`, patientId, decode);
+  useOperationActivity(read.loading, { title: "Consultando a ficha relacionada" });
   const data = !read.loading && !read.error ? read.data?.data : null;
-  return <div className="space-y-4" aria-busy={read.loading}>
-    <button type="button" className="min-h-11 font-semibold underline" aria-disabled={read.loading} onClick={() => { if (!read.loading) read.refresh(); }}>Atualizar consulta</button>
-    {read.loading ? <Notice>Consultando documento autorizado…</Notice> : read.error ? <Notice error>{read.error}</Notice> : data ? <>
-      <p>{data.code} · {formatBrazilDate(data.created_at)}</p>
-      {data.lines.map(line => <SupplyLineSummary key={line.id} line={line} type={type} status={data.status} declarationOnly={Boolean(data.transfer && data.transfer.state !== "dispatched")} />)}
+  const pending = type === "COM" && data?.payload ? pendingPurchaseItems(data.payload, data.workflow_data) : [];
+  const archive = activeDocumentArchive(data?.workflow_data?.documentArchive);
+  return <div className="hca-material-sheet-body hca-related-record" aria-busy={read.loading}>
+    {!read.loading && read.error ? <Notice error>{read.error}</Notice> : data ? <>
+      <RecordIdentity code={data.code ?? data.protocol ?? null} title={title} createdAt={data.created_at}
+        patient={documentPatientName(data.canonical_snapshot ?? {}, patientName ?? "Identificação indisponível")}
+        author={documentIssuerName(data.canonical_snapshot ?? {})} status={archive ? documentArchiveLabel(archive) : documentStatusLabel(data.status)} />
+      <section>
+        <h3>{type === "COM" ? "Aquisição dos materiais" : type === "ENT" ? "Quantidades da movimentação" : "Materiais do registro"}</h3>
+        <div className="hca-related-materials">
+          {data.lines.map(line => <SupplyLineSummary key={line.id} line={line} type={type} status={data.status} declarationOnly={Boolean(data.transfer && data.transfer.state !== "dispatched")} />)}
+          {!data.lines.length && !pending.length ? <p>Nenhum material neste registro.</p> : null}
+        </div>
+      </section>
+      {pending.length ? <section><h3>Materiais com cadastro pendente</h3>
+        <ul className="hca-related-materials">{pending.map(item => <li key={item.id}>
+          <div className="hca-related-material-title"><strong>{item.name}</strong><Pill tone="warning">Cadastro pendente</Pill></div>
+          <p>{formatQuantity(item.quantity, item.unit)}</p>
+          {item.details ? <p className="whitespace-pre-wrap">{item.details}</p> : null}
+        </li>)}</ul>
+      </section> : null}
     </> : null}
-    <p className="text-xs text-(--muted)">Feche esta consulta para continuar de onde parou.</p>
+    <ActionButton compact variant="quiet" className="hca-related-refresh" aria-disabled={read.loading}
+      onClick={() => { if (!read.loading) read.refresh(); }}><Icon name="refresh" />Atualizar consulta</ActionButton>
   </div>;
 }
-function RelatedContent({ id, type }: { id: string; type: "REQ" }) {
-  const [data, setData] = useState<Record<string, unknown> | null>(null);
-  const [error, setError] = useState("");
-  useEffect(() => {
-    const controller = new AbortController();
-    void api<{ data: Record<string, unknown> }>(
-      (type === "REQ" ? "/api/requisitions/" : "/api/documents/") + id,
-      undefined,
-      controller.signal,
-    )
-      .then((result) => {
-        if (!controller.signal.aborted) setData(result.data);
-      })
-      .catch((reason) => {
-        if (!controller.signal.aborted) setError(reason.message);
-      });
-    return () => controller.abort();
-  }, [id, type]);
-  if (error) return <Notice error>{error}</Notice>;
-  if (!data) return <Notice>Consultando documento autorizado…</Notice>;
-  const lines = (data.requisition_items ?? data.lines ?? []) as Record<
-    string,
-    unknown
-  >[];
+function RelatedRequisitionContent({ id, patientId, patientName, title }: {
+  id: string; patientId?: string; patientName?: string; title?: string;
+}) {
+  const decode = useCallback((value: unknown) => parseRelatedRequisitionRead(value, id, patientId), [id, patientId]);
+  const read = useScopedRead(`/api/requisitions/${id}`, patientId, decode);
+  useOperationActivity(read.loading, { title: "Consultando a ficha relacionada" });
+  const data = !read.loading && !read.error ? read.data?.data : null;
+  const archive = activeDocumentArchive(data?.documentArchive);
   return (
-    <div className="space-y-4">
-      {type === "REQ" ? <RequisitionDisplay key={id} id={id} reference={data.progress as { version: number; materialIdentity: string }} /> : null}
-      <p>
-        {String(data.code ?? data.protocol)} ·{" "}
-        {formatBrazilDate(String(data.created_at))}
-      </p>
-      <ul className="space-y-2">
-        {lines.map((line) => (
-          <li
-            className="rounded-lg border border-(--line) p-3 text-sm"
-            key={String(line.id)}
-          >
-            {String(
-              line.product_name_snapshot ??
-                line.name_snapshot ??
-                line.custom_name ??
-                "Produto",
-            )}
-            {line.urgent ? " · Urgente" : ""}
-            {type === "REQ" ? <><p>Estoque da equipe: {formatStockObservation(typeof line.current_stock === "number" || typeof line.current_stock === "string" ? line.current_stock : null, line.stock_observation as StockObservation, typeof line.unit_snapshot === "string" ? line.unit_snapshot : undefined)}</p><p className="text-xs text-(--muted)">{formatStockObservationTime(typeof line.stock_observation_at === "string" ? line.stock_observation_at : null, line.stock_observation_time_source as StockObservationTimeSource)}</p></> : null}
-          </li>
-        ))}
-      </ul>
-      <p className="text-xs text-(--muted)">
-        Feche esta consulta para continuar de onde parou.
-      </p>
+    <div className="hca-material-sheet-body hca-related-record" aria-busy={read.loading}>
+      {!read.loading && read.error ? <>
+        <Notice error>{read.error}</Notice><ActionButton onClick={read.refresh}>Tentar novamente</ActionButton>
+      </> : data ? <>
+        <RequisitionDisplay key={id} id={id} reference={data.progress ?? undefined} />
+        <RecordIdentity code={data.code ?? data.protocol} title={title} createdAt={data.created_at}
+          patient={data.recipient_name_snapshot ?? patientName} author={data.requester_name_snapshot}
+          status={archive ? documentArchiveLabel(archive) : documentStatusLabel(data.status)} />
+        <section><h3>Materiais do registro</h3>
+          <ul className="hca-related-materials">
+            {data.requisition_items.map(line => <li key={line.id}>
+              <div className="hca-related-material-title">
+                <strong>{line.product_name_snapshot ?? line.custom_name ?? "Material"}</strong>
+                {line.urgent ? <Pill tone="danger">Urgente</Pill> : null}
+              </div>
+              <dl className="hca-related-record-identity"><div><dt>Estoque da equipe informado</dt>
+                <dd>{formatStockObservation(line.current_stock, line.stock_observation ?? undefined, line.unit_snapshot ?? undefined)}</dd>
+              </div><div><dt>Referência da contagem</dt>
+                <dd>{formatStockObservationTime(line.stock_observation_at, line.stock_observation_time_source ?? "legacy_unknown")}</dd>
+              </div></dl>
+            </li>)}
+          </ul>
+        </section>
+      </> : null}
     </div>
   );
 }
