@@ -58,6 +58,14 @@ export async function selectDocumentSection(
   await expect(page.getByRole("tabpanel")).toHaveCount(1);
 }
 
+export async function openBalanceComparison(page: Page) {
+  const summary = page.locator("summary").filter({ hasText: /^Comparar contagem e referência$/ });
+  const table = page.getByRole("table", { name: "Materiais da contagem", exact: true });
+  if (await summary.locator("..").getAttribute("open") === null) await summary.click();
+  await expect(table).toBeVisible();
+  return table;
+}
+
 export async function openDocumentMore(page: Page) {
   const popup = page.getByRole("menu", { name: "Ações da ficha", exact: true });
   if (!(await popup.isVisible()))

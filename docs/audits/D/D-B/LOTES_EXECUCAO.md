@@ -606,12 +606,29 @@ reteste da escolha no catálogo passou até o download do PDF assinado.
 
 **Composição da aba Materiais.** REQ, COM, ENT, DEV e BAL usam o mesmo
 cabeçalho, filtro, lista compacta e painel do material. Cada ficha mostra
-as medidas do seu processo. O BAL distingue contagem física, saldo na
-referência e saldo familiar atual. Os dados de revisão e aplicação do
-balanço continuam em seus controles próprios na aba. REQ apresenta sob o
-nome do material os códigos de entregas já relacionados à linha. A busca,
-útil para catálogos maiores que o exemplo E04-11, e as demais abas do
-produto foram preservadas.
+as medidas do seu processo. Na linha compacta do BAL ficam a contagem
+física e o estoque familiar atual. No painel do material ficam também a
+referência histórica e a diferença. A comparação de toda a contagem fica
+em **Comparar contagem e referência**, dentro de **Contagem e revisão**.
+A revisão e a aplicação do balanço têm seus controles próprios na aba.
+REQ apresenta sob o nome do material os códigos de entregas já relacionados
+à linha. A busca para catálogos maiores que o exemplo E04-11 e as demais
+abas continuam acessíveis.
+
+A referência móvel usa a unidade na identificação sob o nome do material.
+Na aplicação, os valores de quantidade ainda podem repetir essa unidade
+nas duas colunas. Isso ocupa mais espaço nos materiais com nomes ou
+rótulos longos. A diferença apareceu na captura do BAL a 360 px e fica
+aberta na revisão da composição compacta.
+
+Na rodada final em iOS emulado, cinco casos compararam as linhas emitidas
+com E04-11 em 360 e 412 px. REQ, COM, ENT e BAL também foram exercitados em
+320 px. Os testes conferiram fundo, espaçamento, tipografia e duas colunas.
+A REQ foi comparada no estado urgente. O BAL preservou a contagem zero, a
+referência e a diferença no painel, a busca e o retorno de foco. A tabela
+expandida manteve a rolagem por teclado. A DEV foi comparada após retomar
+o extra, resolver sua identificação e expedir. A consulta preservou o
+livro de estoque. O build, a checagem de tipos e o lint passaram.
 
 **Vínculo por material em REQ e BAL.** O menu usa o seletor dos demais
 assistentes, com os mesmos filtros de tipo. O complemento implementado usa

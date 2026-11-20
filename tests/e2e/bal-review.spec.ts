@@ -54,10 +54,10 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
   const material = page.getByRole("list", { name: "Materiais do balanço", exact: true })
     .getByRole("button", { name: `Detalhes de ${f.document.lines[0].name_snapshot}`, exact: true });
   await expect(material).toContainText("Contagem da equipe");
-  await expect(material).toContainText("Saldo na referência");
-  await expect(material).toContainText("Família hoje");
+  await expect(material).toContainText("Estoque familiar");
   await material.click();
   const materialDrawer = page.getByRole("dialog", { name: f.document.lines[0].name_snapshot, exact: true });
+  await expect(materialDrawer.getByText("Saldo na referência", { exact: true })).toBeVisible();
   await expect(materialDrawer.getByText("Recebido / validado", { exact: true })).toBeVisible();
   await materialDrawer.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await expect(material).toBeFocused();

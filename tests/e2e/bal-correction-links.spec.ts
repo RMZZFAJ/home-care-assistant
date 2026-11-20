@@ -6,7 +6,7 @@ import { fixtures } from "../integration/v4-fixtures.mjs";
 import { sql,sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectDocumentSection } from "./document-sections";
+import { openBalanceComparison, selectDocumentSection } from "./document-sections";
 import { audit } from "./accessibility-audit";
 import { generatedPdf } from "./generated-pdf";
 
@@ -24,6 +24,7 @@ test("BAL shows actual later corrections, exact version links and masked stock w
  await expect(region).toContainText("Reconto registrado; contagem não aplicada ao estoque.");
  const link=region.getByRole("link",{name:"Consultar versão "+f.recount.version+" do reconto",exact:true});
  await expect(link).toHaveAttribute("href","/documentos/"+f.document.id+"/arquivos?version="+f.recount.version);
+ await openBalanceComparison(page);
  const before=stock(f.patient);for(const width of [1440,1024,768,390,320]){
   await page.setViewportSize({width,height:940});
   const scroll=page.getByRole("region",{name:"Materiais da contagem; rolagem horizontal quando necessária",exact:true});

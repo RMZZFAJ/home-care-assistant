@@ -4,13 +4,13 @@ import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { mkdirSync } from "node:fs";
-import { setup, fixtures, issue, rpc } from "../integration/v4-fixtures.mjs";
+import { setup, issue, rpc } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { auditFromTop } from "./accessibility-audit";
-import { selectDocumentSection } from "./document-sections";
+import { expectMobileMaterialRow, mobileMaterialReference, openIssuedMaterials } from "./l2-mobile-materials";
 
 test.setTimeout(180_000);
 const widths = [320, 390, 768, 1024, 1440];
@@ -120,29 +120,26 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
   } finally { await reference.close(); }
 });
 
-for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials follow the v7 compact list with reversible search`, async ({ page }, info) => {
+for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials follow the v7 compact list with reversible search`, async ({ page, browser }, info) => {
   const names = ["Material detalhado " + "com nome extenso ".repeat(6) + randomUUID().slice(0, 8), "Outro material " + randomUUID().slice(0, 8)];
   const f = await setup({ catalogue: names.map(name => ({ name, category: "medicamentos", unit: "unidade", aliases: [] })) });
   const doc = type === "REQ" ? await issue(f.patient, f.products) : await rpc(f.admin, "create_supply_document", {
     p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
     p_payload: { origin: "purchase", lines: f.products.map(productId => ({ productId, quantity: "10" })) },
   });
-  await login(page, f.patient, fixtures.family.email);
-  await page.goto(type === "REQ" ? "/historico/" + doc.id : "/documentos/" + doc.id);
-  await selectDocumentSection(page, "materials");
+  await openIssuedMaterials(page, f.patient, doc.id);
   const list = page.getByRole("list", { name: type === "REQ" ? "Materiais requisitados" : "Materiais da compra ou doação", exact: true });
   const items = list.getByRole("listitem");
   await expect(items).toHaveCount(2);
   const ids = await items.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
   const before = facts(f.patient), writes: string[] = [];
   page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !isDocumentAccessReport(request)) writes.push(request.url()); });
-  {
-    for (const width of [320, 390]) {
+  const reference = await mobileMaterialReference(browser, type === "REQ" ? "REQ-0003" : "COM-0028");
+  try {
+    for (const width of [320, 360, 412]) {
       await page.setViewportSize({ width, height: 900 });
       const row = items.first().getByRole("button");
-      await expect(row).toHaveCSS("display", "grid");
-      await expect(row).toHaveCSS("padding-left", "15px");
-      await expect(row).toHaveCSS("padding-top", "12px");
+      await expectMobileMaterialRow(row, reference.page, width);
       await expect(list.getByText(names[0], { exact: true })).toBeVisible();
       await expect(list.getByText(names[1], { exact: true })).toBeVisible();
       await expect(row.locator(".hca-v7-material-facts > span")).toHaveCount(type === "REQ" ? 2 : 4);
@@ -172,5 +169,7 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials follow 
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.evaluate(() => { document.documentElement.style.zoom = ""; });
     expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
+  } finally {
+    await reference.context.close();
   }
 });

@@ -1,5 +1,6 @@
 "use client";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { recountHref } from "@/components/balances/balance-recount-assignment";
@@ -48,7 +49,10 @@ function CountFacts({ data }: { data: SupplyDocument; }) {
           ? "Consulta histórica de balanço encerrado. A revisão não inicia uma nova conciliação."
           : referenceLabel(context)}
       </p>
-      <BalanceMaterials rows={data.lines.map(line => ({ id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, counted: line.quantity, reference: line.metadata.expectedQuantity as string | number | null | undefined }))} />
+      <details className="doc-help-details">
+        <summary className="min-h-11"><Icon name="stock" width={16} height={16} />Comparar contagem e referência</summary>
+        <BalanceMaterials rows={data.lines.map(line => ({ id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, counted: line.quantity, reference: line.metadata.expectedQuantity as string | number | null | undefined }))} />
+      </details>
     </div>
   );
 }

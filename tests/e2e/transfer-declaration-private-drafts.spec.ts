@@ -16,6 +16,7 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
 import { loginDecision } from "./l1-decision-policy";
 import { audit } from "./accessibility-audit";
+import { expectMobileMaterialRow, mobileMaterialReference, selectReadyMaterials } from "./l2-mobile-materials";
 import type { Custody, SupplyDocument } from "../../src/types/documents";
 import type { TransferPreparation } from "../../src/types/transfers";
 test.setTimeout(180_000);
@@ -151,7 +152,8 @@ async function recover(page: Page, source: Custody) {
  await page.goto("/transferencias"); await page.getByRole("combobox",{name:/^Custódia de origem/}).selectOption(source);
  await page.getByRole("button",{name:/^(Consultar último rascunho|Preparar declaração)$/}).click();
 }
-test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha do catálogo", async ({ page }, info) => {
+test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha do catálogo", async ({ page, browser }, info) => {
+  test.setTimeout(240_000);
   const f = await declarationDraftFixture("CARE_TEAM");
   const author = await shiftWorker(f.patient, "admin");
   const item = "Protetor de tecido fictício";
@@ -160,6 +162,7 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/fichas/devolucao");
   const start = page.getByRole("button", { name: "Preparar devolução", exact: true });
+  await expect(start).toBeVisible({ timeout: 45_000 });
   await start.click();
   await recipient(page).selectOption(f.recipientId);
   const reason = editor(page).getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
@@ -180,6 +183,7 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
     fields: { wizardStep: "2" }, pendingExtras: [{ name: item, quantity: "2", unit: "unidade" }],
   });
   await page.reload();
+  await expect(start).toBeVisible({ timeout: 45_000 });
   await start.click();
   await resume(page);
   await editor(page).getByRole("button", { name: "Comparar referência atual", exact: true }).click();
@@ -187,7 +191,10 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
   await expect(name).toHaveCount(1);
   await continueStep(page);
   await editor(page).getByRole("button", { name: "Revisar ficha", exact: true }).click();
-  await expect(editor(page).getByRole("region", { name: "Itens extras pendentes", exact: true }).getByText(item, { exact: true })).toHaveCount(1);
+  const pendingExtra = editor(page).getByRole("region", { name: "Itens extras", exact: true })
+    .getByRole("listitem").filter({ has: page.getByText(item, { exact: true }) });
+  await expect(pendingExtra).toHaveCount(1);
+  await expect(pendingExtra).toContainText("Cadastro pendente");
   const dispatch = editor(page).getByRole("button", { name: "Expedir devolução", exact: true });
   await expect(dispatch).toBeDisabled();
   await info.attach("E06-revisao-extra-pendente", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
@@ -214,6 +221,26 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
   } });
   const after = JSON.parse(declarationFacts(f));
   expect(after.ledger).toHaveLength(JSON.parse(before).ledger.length + 1);
+  const ref = await mobileMaterialReference(browser, "DEV-0008");
+  const documentPage = await page.context().newPage();
+  try {
+    await documentPage.goto("/fichas/" + body.data.id);
+    await selectReadyMaterials(documentPage);
+    const list = documentPage.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
+    const row = list.getByRole("button", { name: "Detalhes de " + product.name, exact: true });
+    await expect(row).toContainText("Expedido");
+    await expect(row).toContainText("Em trânsito");
+    await expect(row).toContainText("Recebido");
+    await expect(row).toContainText("Família hoje");
+    for (const width of [360, 412]) {
+      await documentPage.setViewportSize({ width, height: 900 });
+      await expectMobileMaterialRow(row, ref.page, width);
+    }
+    expect(JSON.parse(declarationFacts(f)).ledger).toEqual(after.ledger);
+  } finally {
+    await documentPage.close();
+    await ref.context.close();
+  }
 });
 
 for (const source of ["FAMILY", "CARE_TEAM"] as const) {

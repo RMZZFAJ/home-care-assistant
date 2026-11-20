@@ -10,6 +10,7 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
+import { expectMobileMaterialRow, mobileMaterialReference, openIssuedMaterials } from "./l2-mobile-materials";
 import { selectDeliveryRecipient } from "./delivery-recipient";
 import { auditFromTop } from "./accessibility-audit";
 
@@ -96,11 +97,11 @@ test("06.2 ENT selection and complete readonly review follow the model without s
   } finally { await ref.context.close(); }
 });
 
-test("06.2 dispatched ENT preserves its material facts and reversible v7 search", async ({ page }, info) => {
+test("06.2 dispatched ENT preserves its material facts and reversible v7 search", async ({ page, browser }, info) => {
   const names = ["Material expedido " + "com nome extenso ".repeat(6) + randomUUID().slice(0, 8), "Outro material " + randomUUID().slice(0, 8)];
   const f = await setup({ catalogue: names.map(name => ({ name, category: "medicamentos", unit: "unidade", aliases: [] })) });
   const doc = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Escolha manual fictícia para conferência da composição", lines: f.products.map(productId => ({ productId, quantity: "7" })) } });
-  await login(page, f.patient); await page.goto("/documentos/" + doc.id); await selectDocumentSection(page, "materials");
+  await openIssuedMaterials(page, f.patient, doc.id);
   const list = page.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
   const items = list.getByRole("listitem");
   await expect(items).toHaveCount(2);
@@ -112,11 +113,11 @@ test("06.2 dispatched ENT preserves its material facts and reversible v7 search"
     await expect(panel.locator(`[data-material-fact="${label}"] dd`)).toHaveText(value);
   await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await expect(first).toBeFocused();
-  {
-    for (const width of [320, 390]) {
+  const ref = await mobileMaterialReference(browser, "ENT-0019");
+  try {
+    for (const width of [320, 360, 412]) {
       await page.setViewportSize({ width, height: 900 });
-      await expect(first).toHaveCSS("display", "grid");
-      await expect(first).toHaveCSS("padding-left", "15px");
+      await expectMobileMaterialRow(first, ref.page, width);
       expect(await list.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
       await auditFromTop(page, "canonical dispatched ENT " + width);
       if (width === 320) {
@@ -132,6 +133,8 @@ test("06.2 dispatched ENT preserves its material facts and reversible v7 search"
     await expect(items).toHaveCount(2);
     expect(await items.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")))).toEqual(ids);
     expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
+  } finally {
+    await ref.context.close();
   }
 });
 

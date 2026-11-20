@@ -9,8 +9,9 @@ import { shiftCommand, shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectDocumentSection } from "./document-sections";
+import { openBalanceComparison } from "./document-sections";
 import { auditFromTop } from "./accessibility-audit";
+import { expectMobileMaterialRow, mobileMaterialReference, openIssuedMaterials } from "./l2-mobile-materials";
 
 test.setTimeout(180_000);
 const widths = [320, 390, 768, 1024, 1440];
@@ -22,10 +23,9 @@ async function login(page: Page, patient: string) {
 async function reference(browser: Browser, route: string) {
   const context = await browser.newContext(), page = await context.newPage();
   await page.route(/^https?:/, route => route.abort());
-  const l1 = route.startsWith("l1:");
-  await page.goto(pathToFileURL(resolve(l1 ? "hca-laboratorio-01-v3-final.html" : "Home_Care_Assistant_Modelo_Integral.html")).href + "#" + (l1 ? route.slice(3) : route));
-  if (l1) await page.locator("#product-app").getByRole("tab", { name: /^Materiais/ }).click();
-  else await page.locator("#roleSelect").selectOption("family"); return { context, page };
+  await page.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#" + route);
+  await page.locator("#roleSelect").selectOption("family");
+  return { context, page };
 }
 function writes(page: Page, allowAccess = false) {
   const sent: string[] = []; page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/") && r.method() !== "GET" && !(allowAccess && isDocumentAccessReport(r))) sent.push(r.url()); }); return sent;
@@ -43,19 +43,43 @@ test("06.3 BAL canonical readonly materials preserve physical zero,original refe
   const f = await setup({ catalogue: names.map(name => ({ name, category: "higiene", unit: "unidade", aliases: [] })) });
   sql(`insert into public.patient_settings(care_recipient_id) values(${q(f.patient)}) on conflict do nothing; update public.patient_settings set settings=settings||'{"balReview":"optional"}'::jsonb where care_recipient_id=${q(f.patient)};`);
   const doc = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "BAL", p_key: randomUUID(), p_draft: false, p_payload: { notes: "Observação física original; o parecer permanece independente.", lines: f.products.map((productId: string, i: number) => ({ productId, quantity: String(i) })) } });
-  await login(page, f.patient); await page.goto("/documentos/" + doc.id); await selectDocumentSection(page, "workflow");
+  await openIssuedMaterials(page, f.patient, doc.id, "admin");
   const before = sql(`select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${q(doc.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}));`), sent = writes(page, true);
-  const table = page.getByRole("table", { name: "Materiais da contagem", exact: true }), row = table.locator("tbody tr").first();
-  await expect(row).toContainText(names[0]); await expect(row.locator('[data-label="Quantidade física"]')).toHaveText("0 unidade");
-  await expect(row.locator('[data-label="Referência"]')).toHaveText("0 unidade"); await expect(row.locator('[data-label="Diferença"]')).toHaveText("Sem diferença");
-  await expect(table.locator("tbody tr").last().locator('[data-label="Diferença"]')).toHaveText("1 unidade");
-  const ref = await reference(browser, "l1:/ficha/REQ-0003");
+  const materials = page.getByRole("region", { name: "Materiais do balanço", exact: true });
+  const list = materials.getByRole("list", { name: "Materiais do balanço", exact: true });
+  const row = list.getByRole("button", { name: "Detalhes de " + names[0], exact: true });
+  await expect(row).toContainText("0 unidade");
+  await expect(row).toContainText("Estoque familiar");
+  await expect(page.getByRole("table", { name: "Materiais da contagem", exact: true })).toHaveCount(0);
+  const ref = await mobileMaterialReference(browser, "BAL-0012");
   try {
-    const model = ref.page.locator("#product-app .doc-table-card").first(); await expect(model).toBeVisible();
-    for (const width of widths) {
-      await page.setViewportSize({ width, height: 1000 }); await ref.page.setViewportSize({ width, height: 1000 });
-      for (const property of ["border-radius", "border-color", "background-color"] as const) await expect(page.locator(".hca-document-materials .doc-table-card")).toHaveCSS(property, await model.evaluate((n,p) => getComputedStyle(n).getPropertyValue(p), property));
-      for (const property of ["display", "padding-left", "padding-top", "gap"] as const) await expect(row).toHaveCSS(property, await model.locator("tbody tr").first().evaluate((n,p) => getComputedStyle(n).getPropertyValue(p), property));
+    for (const width of [320, 360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expectMobileMaterialRow(row, ref.page, width);
+      await auditFromTop(page, "BAL canonical materials " + width);
+      if (width === 360) await capture(row, "bal-count-material-" + info.project.name);
+    }
+    await row.click();
+    const panel = page.getByRole("dialog", { name: names[0], exact: true });
+    await expect(panel.locator('[data-material-fact="Saldo na referência"] dd')).toHaveText("0 unidade");
+    await expect(panel.locator('[data-material-fact="Diferença na contagem"] dd')).toHaveText("Sem diferença");
+    await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+    await expect(row).toBeFocused();
+    const search = materials.getByRole("searchbox", { name: "Pesquisar material", exact: true });
+    await search.fill("OUTRO--MATERIAL"); await expect(list.getByRole("listitem")).toHaveCount(1);
+    await search.fill("Ausente na contagem fictícia"); await expect(list).toHaveCount(0);
+    const clear = materials.getByRole("button", { name: "Limpar busca", exact: true });
+    await clear.focus(); await clear.press("Enter");
+    await expect(list.getByRole("listitem")).toHaveCount(2);
+
+    const table = await openBalanceComparison(page);
+    const countedRows = table.locator("tbody tr");
+    await expect(countedRows.first().locator('[data-label="Quantidade física"]')).toHaveText("0 unidade");
+    await expect(countedRows.first().locator('[data-label="Referência"]')).toHaveText("0 unidade");
+    await expect(countedRows.first().locator('[data-label="Diferença"]')).toHaveText("Sem diferença");
+    await expect(countedRows.last().locator('[data-label="Diferença"]')).toHaveText("1 unidade");
+    for (const width of [320, 412]) {
+      await page.setViewportSize({ width, height: 900 });
       const scroll = table.locator("..");
       const overflows = await scroll.evaluate(node => node.scrollWidth > node.clientWidth);
       if (overflows) {
@@ -67,12 +91,8 @@ test("06.3 BAL canonical readonly materials preserve physical zero,original refe
         await expect.poll(() => scroll.evaluate(node => node.scrollLeft)).toBeGreaterThan(0);
         await scroll.evaluate(node => { node.scrollLeft = 0; });
       } else await expect(scroll).not.toHaveAttribute("tabindex", "0");
-      await auditFromTop(page, "BAL canonical materials " + width);
-      if (width === 320) await capture(row, "bal-count-material-" + info.project.name);
+      await auditFromTop(page, "BAL comparison " + width);
     }
-    const search = page.getByRole("searchbox", { name: "Pesquisar material", exact: true }); await search.fill("OUTRO--MATERIAL"); await expect(table.locator("tbody tr")).toHaveCount(1);
-    await search.fill("Ausente na contagem fictícia"); await expect(table).toHaveCount(0);
-    const clear = page.getByRole("button", { name: "Limpar busca de materiais", exact: true }); await clear.focus(); await clear.press("Enter"); await expect(table.locator("tbody tr")).toHaveCount(2);
     await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" }); await auditFromTop(page, "BAL forced colors reduced motion");
     expect(sql(`select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${q(doc.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}));`)).toBe(before); expect(sent).toEqual([]);
   } finally { await ref.context.close(); }

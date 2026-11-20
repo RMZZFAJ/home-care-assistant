@@ -8,6 +8,11 @@ import type { SupplyDocument } from "@/types/documents";
 type Amount = string | number | null | undefined;
 export type BalanceMaterial = { id: string; name: string; unit: string; counted: Amount; reference: Amount };
 const available = (value: Amount) => value !== null && value !== undefined && value !== "";
+function formatDifference(counted: Amount, reference: Amount, unit: string) {
+  if (!available(counted) || !available(reference)) return "Diferença não disponível";
+  const difference = quantity(counted!).minus(quantity(reference!));
+  return difference.isZero() ? "Sem diferença" : formatQuantity(difference.toFixed(), unit);
+}
 
 export function IssuedBalanceMaterials({ data, active }: { data: SupplyDocument; active: boolean }) {
   const applied = Boolean(data.balanceReview?.reconciliationApplied);
@@ -17,24 +22,26 @@ export function IssuedBalanceMaterials({ data, active }: { data: SupplyDocument;
     : data.balanceReview?.reviewRequired ? "Aguardando revisão" : "Contado";
   return <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
     revision={String(data.version)} active={active} label="Materiais do balanço" settledLabel="Conferidos"
-    today={{ location: "family", label: "Família hoje" }}
-    heading={<><h2>Materiais</h2><p>Contagem da equipe, referência do balanço e estoque familiar.</p></>}
+    today={{ location: "family", label: "Estoque familiar" }}
+    heading={<><h2>Materiais</h2><p>Contagem da equipe e estoque familiar atual.</p></>}
     rows={data.lines.map(line => {
       const expected = line.metadata.expectedQuantity;
       const reference = typeof expected === "string" || typeof expected === "number" ? expected : null;
       const amount = (value: Amount) => formatQuantity(value, line.unit_snapshot);
-      const facts = [
-        { label: "Contagem da equipe", value: amount(line.quantity) },
+      const facts = [{ label: "Contagem da equipe", value: amount(line.quantity) }];
+      const detail = [
+        ...facts,
         { label: "Saldo na referência", value: available(reference) ? amount(reference) : "Referência não disponível" },
+        { label: "Diferença na contagem", value: formatDifference(line.quantity, reference, line.unit_snapshot) },
+        { label: "Recebido / validado", value: amount(line.accepted_quantity) },
       ];
-      const detail = [...facts, { label: "Recebido / validado", value: amount(line.accepted_quantity) }];
       return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, status,
         done: !closed && Boolean(reviewed), tone: closed ? "neutral" : reviewed ? "success" : "pending", facts,
         detail: <>
           {readPresentationConversions(line.presentation_conversions).map(item => <p key={item.id}>{presentationCaption(item)}</p>)}
           {line.requisitionItemIds.length ? <p>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</p> : null}
           <dl className="hca-material-balance-grid">{detail.map(fact =>
-            <div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl>
+            <div key={fact.label} data-material-fact={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl>
         </>,
       };
     })} />;
@@ -44,12 +51,11 @@ export function BalanceMaterials({ rows }: { rows: BalanceMaterial[] }) {
     columns={[{ id: "material", label: "Material" }, { id: "counted", label: "Quantidade física" }, { id: "reference", label: "Referência" }, { id: "difference", label: "Diferença" }]}
     rows={rows.map(row => {
       const hasCount = available(row.counted), hasReference = available(row.reference);
-      const difference = hasCount && hasReference ? quantity(row.counted!).minus(quantity(row.reference!)) : null;
       return { id: row.id, searchText: row.name, cells: {
         material: <div className="hca-factual-material"><strong>{row.name}</strong><small>{row.unit}</small></div>,
         counted: hasCount ? formatQuantity(row.counted, row.unit) : "Contagem não informada",
         reference: hasReference ? formatQuantity(row.reference, row.unit) : "Referência não disponível",
-        difference: difference === null ? "Diferença não disponível" : difference.isZero() ? "Sem diferença" : formatQuantity(difference.toFixed(), row.unit),
+        difference: formatDifference(row.counted, row.reference, row.unit),
       } };
     })} />;
 }
