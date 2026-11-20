@@ -89,7 +89,7 @@ async function prepare(
   await repeat.getByRole("textbox", { name: "Justificativa da nova requisição", exact: true }).fill(text);
   await repeat.getByRole("button", { name: "Manter nova requisição", exact: true }).click();
   await expect(choice).toBeChecked();
-  const observation = page.getByLabel("Estoque observado com a equipe", {
+  const observation = page.getByLabel("Estoque atual", {
     exact: false,
   });
   await expect(observation).toHaveValue("2");

@@ -83,7 +83,9 @@ for (const count of [1, 5, 20, 100]) {
               throw new Error(
                 "The controlled ENT fixture requires its authorized eligible recipient",
               );
-            const receiver = page.getByRole("combobox", {
+            await page.getByRole("button", { name: /^(Alterar|Escolher) recebedor$/ }).click();
+            const picker = page.getByRole("dialog", { name: "Escolher recebedor", exact: true });
+            const receiver = picker.getByRole("combobox", {
               name: "Destinatário designado",
               exact: true,
             });
@@ -113,6 +115,7 @@ for (const count of [1, 5, 20, 100]) {
             await receiver.press("ArrowDown");
             await page
               .getByRole("option", { name: person.name, exact: true })
+              .or(page.getByRole("option", { name: `${person.name} · Em plantão`, exact: true }))
               .click();
             await page
               .getByLabel("Justificativa da escolha do recebedor", {
@@ -121,19 +124,14 @@ for (const count of [1, 5, 20, 100]) {
               .fill(
                 "Escolha manual fictícia para percorrer a seleção de materiais",
               );
+            await picker.getByRole("button", { name: "Usar recebedor", exact: true }).click();
           }
           await next(page);
           const categories = page.getByRole("navigation", { name: "Tipos de material", exact: true });
           await expect(
             categories.getByRole("button", { name: /^Medicamentos/, pressed: true }),
           ).toBeVisible();
-          const filter = () =>
-            page.getByLabel(
-              type === "REQ"
-                ? "Buscar produto"
-                : "Buscar materiais nesta categoria",
-              { exact: true },
-            );
+          const filter = () => page.getByRole("searchbox", { name: "Buscar material", exact: true });
           const choice = (index: number) =>
             page.getByRole("checkbox", {
               name: definitions[index].name + " unidade",

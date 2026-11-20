@@ -1,9 +1,10 @@
 "use client";
 
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
-import { materialCategories, supplyWizardCopy, supplyWizardNextLabels, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
+import { adjacentMaterialCategory, materialCategories, supplyWizardCopy, supplyWizardNextLabels, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
+import { WizardMaterialSearch, WizardMaterialToolbar } from "@/components/forms/wizard-material-tools";
 import { pendingExtraDispatchMessage, pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
 import { MaterialReview } from "./material-review";
 import { IssuanceObservationsEditor, IssuanceObservationList } from "@/components/forms/issuance-observations";
@@ -386,6 +387,9 @@ function TransferDeclarationEditor({
   const activeCategory = category ?? materialCategories.find(item => item.id === productsById.get(lines[0]?.productId)?.category)?.id ?? "medicamentos";
   const linesByProduct = new Map(lines.map(line => [line.productId, line]));
   const selectedIds = [...linesByProduct.keys()];
+  const extraItemsControl = <SupplyExtraItems items={pendingExtras} inExtras={step === 2}
+    catalogue={products.map(({ id, name, unit }) => ({ id, name, unit }))} selected={new Set(selectedIds)}
+    onChange={items => { setPendingExtras(items); setDraftTouched(true); }} onChoose={addExtra} />;
   const sourceIds = sourceSetup.sources.length ? sourceSetup.sources.map(link => link.documentId).join(",") : originId;
   const sourceParams = new URLSearchParams({ careRecipientId: patientId, target: "DEV", ids: sourceIds });
   const decodeSources = useCallback((value: unknown) => parseSupplySources(value, patientId, "DEV", 1), [patientId]);
@@ -551,6 +555,15 @@ function TransferDeclarationEditor({
       setDiscard(true);
     else onClose();
   }
+  function editReviewedStep(target: 1 | 2 | 3) {
+    if (uncertain || busy) return;
+    issuanceFailure.clear();
+    setPacket(null);
+    setReviewingPending(false);
+    setStep(target);
+    if (target === 3) requestAnimationFrame(() => observationsHeadingRef.current?.focus());
+  }
+
   async function prepare(event: FormEvent) {
     event.preventDefault();
     if (
@@ -572,7 +585,8 @@ function TransferDeclarationEditor({
       }
       if (step === 0 && householdSelectionRef.current?.apply() === false) return;
       const materialStep = step === 1 || step === 2;
-      const stepLines = lines.filter((line) => !!line.extra === (step === 2));
+      const stepLines = lines.filter(line => !!line.extra === (step === 2) &&
+        (step !== 1 || !isReturn || productsById.get(line.productId)?.category === activeCategory));
       if (materialStep && stepLines.some((line) => {
         const product = reference.products.find((item) => item.id === line.productId);
         return !product || !validQuantity(line.quantity, product.quantityDecimals) || quantity(line.quantity).gt(product.available);
@@ -582,6 +596,12 @@ function TransferDeclarationEditor({
       }
       setError("");
       setQuery("");
+      const nextCategory = step === 1 && isReturn && adjacentMaterialCategory(activeCategory, reference.products, "next");
+      if (nextCategory) {
+        setCategory(nextCategory);
+        return;
+      }
+      if (step === 0 && isReturn) setCategory(adjacentMaterialCategory(undefined, reference.products, "next") ?? "medicamentos");
       setStep(step + 1);
       return;
     }
@@ -1237,20 +1257,15 @@ function TransferDeclarationEditor({
                   A devolução leva materiais do estoque da equipe de volta à família.
                 </p> : null}
                 {step === 1 ? <WizardMaterialCategories category={activeCategory} selected={regularSelection} onChange={next => { setCategory(next); setQuery(""); }} /> : null}
-                <div className={isReturn && step === 1 ? "hca-toolbar" : undefined}>
-                  {isReturn && step === 1 ? (
+                {isReturn && step === 1 ? <>
+                  <WizardMaterialToolbar count={selectedIds.length + pendingExtras.length} matches={query.trim() ? returnProducts.length : undefined}>
                     <ActionButton ref={barcodeTriggerRef} variant="quiet" compact onClick={() => setReadingBarcode(true)}>
                       <Icon name="camera" />Ler código
                     </ActionButton>
-                  ) : null}
-                  <SupplyExtraItems items={pendingExtras} inExtras={step === 2}
-                  catalogue={products.map(({ id, name, unit }) => ({ id, name, unit }))} selected={new Set(selectedIds)}
-                  onChange={items => { setPendingExtras(items); setDraftTouched(true); }} onChoose={addExtra} />
-                </div>
-                {isReturn && step === 1 ? <FormField label="Buscar material">
-                  <TextInput type="search" value={query} onChange={event => setQuery(event.currentTarget.value)}
-                    placeholder="Nome do material" />
-                </FormField> : null}
+                    {extraItemsControl}
+                  </WizardMaterialToolbar>
+                  <WizardMaterialSearch value={query} onChange={setQuery} />
+                </> : extraItemsControl}
                 {isReturn && step === 1 ? <div className="hca-wizard-material-list">
                   {returnProducts.map(product => {
                     const line = linesByProduct.get(product.id);
@@ -1415,7 +1430,13 @@ function TransferDeclarationEditor({
                 <IssuanceObservationsEditor observations={observations} onChange={setObservations} errors={observationErrors} />
                 </> : null}
                 <SupplyWizardFooter status={{ draft: privateDraft, current: currentContent, hasEdits: draftTouched }} back={step > 0
-                  ? <ActionButton variant="quiet" onClick={() => { setError(""); setStep(step - 1); }}><Icon name="back" width="14" height="14" />Voltar</ActionButton>
+                  ? <ActionButton variant="quiet" onClick={() => {
+                    setError("");
+                    setQuery("");
+                    const previous = step === 1 && isReturn && reference && adjacentMaterialCategory(activeCategory, reference.products, "previous");
+                    if (previous) setCategory(previous);
+                    else setStep(step - 1);
+                  }}><Icon name="back" width="14" height="14" />Voltar</ActionButton>
                   : <ActionButton variant="quiet" disabled={busy || privateDraft.blocked} onClick={close}><Icon name="back" width="14" height="14" />Sair por agora</ActionButton>}>
                 <ActionButton
                   type="submit"
@@ -1447,7 +1468,11 @@ function TransferDeclarationEditor({
                 <div><dt>Destino</dt><dd>{isReturn ? "Estoque da família" : "Estoque da equipe"}</dd></div>
                 <div><dt>Recebedor físico</dt><dd>{personName(review.recipientId)}</dd></div>
               </dl>
-              <h4>Materiais</h4>
+              <div className="hca-issuance-observation-heading">
+                <h3>Materiais</h3>
+                <ActionButton compact variant="quiet" aria-label="Editar materiais do catálogo" disabled={uncertain || busy}
+                  onClick={() => editReviewedStep(1)}>Editar</ActionButton>
+              </div>
               {review.lines.map((line) => {
                 const product = reference?.products.find(
                   (p) => p.id === line.productId,
@@ -1459,14 +1484,19 @@ function TransferDeclarationEditor({
                       {lines.find((item) => item.productId === line.productId)?.extra ? " · Item extra" : ""}
                       {product?.active === false ? " · inativo com saldo" : ""}
                     </p>
-                    {product ? <MaterialConsultButton context={context} material={product} /> : null}
+                    {product ? <MaterialConsultButton context={context} material={product} menu /> : null}
                   </article>
                 );
               })}
-              {pendingExtras.length ? <section aria-label="Itens extras pendentes">
-                <h4>Itens extras pendentes</h4>
-                <MaterialReview rows={pendingExtras.map(pendingExtraReviewRow)} />
-              </section> : null}
+              <section aria-label="Itens extras">
+                <div className="hca-issuance-observation-heading">
+                  <h3>Itens extras</h3>
+                  <ActionButton compact variant="quiet" aria-label="Editar itens extras" disabled={uncertain || busy}
+                    onClick={() => editReviewedStep(2)}>Editar</ActionButton>
+                </div>
+                {pendingExtras.length ? <MaterialReview rows={pendingExtras.map(pendingExtraReviewRow)} />
+                  : <p className="hca-field-help">Nenhum item extra pendente.</p>}
+              </section>
               {review.sources?.length ? <section className="hca-document-summary" aria-label="Fichas vinculadas">
                 <h3>Fichas vinculadas</h3>
                 {review.sources.map(link => {
@@ -1487,7 +1517,12 @@ function TransferDeclarationEditor({
               {review.reason ? <p className="whitespace-pre-wrap">
                 {review.observations ? "Justificativa da escolha do recebedor" : "Sua justificativa"}: {review.reason}
               </p> : null}
-              <section className="hca-document-summary"><h3>Observações</h3>
+              <section className="hca-document-summary">
+                <div className="hca-issuance-observation-heading">
+                  <h3>Observações</h3>
+                  <ActionButton compact variant="quiet" aria-label="Editar observações" disabled={uncertain || busy}
+                    onClick={() => editReviewedStep(3)}>Editar</ActionButton>
+                </div>
                 <IssuanceObservationList observations={review.observations ?? []} />
               </section>
               <Notice>

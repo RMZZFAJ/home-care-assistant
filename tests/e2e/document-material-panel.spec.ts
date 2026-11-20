@@ -135,7 +135,7 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   const categories = page.getByRole("navigation", { name: "Tipos de material" });
   await expect(categories.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
   await categories.getByRole("button", { name: /^Higiene/ }).click();
-  const search = page.getByLabel("Buscar produto", { exact: true });
+  const search = page.getByLabel("Buscar material", { exact: true });
   await search.fill("V4 0");
   const selection = page.getByRole("checkbox", { name: /Material fictício V4 0/ });
   await expect(selection).toHaveCSS("width", "32px");
@@ -144,7 +144,7 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   const duplicate = page.getByRole("dialog", { name: "Este produto já está em uma requisição pendente" });
   await duplicate.getByLabel("Justificativa da nova requisição", { exact: true }).fill("Contagem fictícia ainda necessária para esta residência.");
   await duplicate.getByRole("button", { name: "Manter nova requisição", exact: true }).click();
-  const amount = page.getByLabel("Estoque observado com a equipe · unidade", { exact: true });
+  const amount = page.getByLabel("Estoque atual · unidade", { exact: true });
   const unknown = page.getByRole("checkbox", { name: "Não sei informar", exact: true });
   await unknown.check();
   await expect(amount).toBeDisabled();

@@ -35,7 +35,7 @@ import { WizardActions } from "@/components/forms/wizard-actions";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
 import { IssuanceObservationsEditor } from "@/components/forms/issuance-observations";
-import { materialCategories, supplyWizardCopy, supplyWizardStages, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
+import { adjacentMaterialCategory, materialCategories, supplyWizardCopy, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { Dialog, StepNavigator } from "@/components/ui/primitives";
 import { ActionButton, ActionLink } from "@/components/ui/controls";
 import { formatQuantity, quantity } from "@/lib/quantity";
@@ -302,6 +302,9 @@ function PatientRequisition({
   }, [form, issuedDocumentId, loadingCatalog, saving, storageKey, uncertain]);
   const currentCategory = materialCategories[step - 1]?.id;
   const stage = currentCategory ? 1 : stageStart.indexOf(step);
+  function openCategory(category: WizardMaterialCategory) {
+    setStep(materialCategories.findIndex(entry => entry.id === category) + 1);
+  }
   const categoryItems = useMemo(
     () => products.filter((item) => item.category === currentCategory),
     [products, currentCategory],
@@ -322,7 +325,7 @@ function PatientRequisition({
     return {
       currentStock: prefilledStock,
       stockObservation: prefilledStock === null ? "unfilled" as const : "observed" as const,
-      stockObservationAt: new Date().toISOString(),
+      stockObservationAt: prefilledStock === null ? null : new Date().toISOString(),
       ...(stockReference ? { stockReference } : {}),
     };
   }
@@ -386,7 +389,7 @@ function PatientRequisition({
           "Informe o motivo da necessidade remanescente, entre3 e1000 caracteres.";
     }
     const linesToValidate = all ? form.lines : form.lines.filter(line =>
-      currentCategory ? !line.catalogueExtra : step === 4 && line.catalogueExtra);
+      currentCategory ? line.category === currentCategory && !line.catalogueExtra : step === 4 && line.catalogueExtra);
     for (const line of linesToValidate) {
       if (
         !validStockObservation(
@@ -559,7 +562,11 @@ function PatientRequisition({
   if (issuedDocumentId)
     return <Notice>Requisição registrada. <ActionButton onClick={() => openIssued(issuedDocumentId)}>Abrir ficha</ActionButton></Notice>;
   function includeMaterials(ids: string[]) {
-    setForm(current => ({ ...current, lines: applyMaterialSelection(current.lines, ids, products).lines }));
+    setForm(current => {
+      const existing = new Set(current.lines.map(line => line.productId));
+      const { lines } = applyMaterialSelection(current.lines, ids, products);
+      return { ...current, lines: lines.map(line => existing.has(line.productId) ? line : { ...line, ...newStockObservation(line.productId) }) };
+    });
     setDraftTouched(true);
   }
   const selectionLibrary = (readonly = false) => <details className="hca-household-personal">
@@ -604,13 +611,16 @@ function PatientRequisition({
     }}
     adopt={(product, extra, details) => {
       updateLine(product, {
-        currentStock: extra.currentStock,
-        stockObservation: extra.stockObservation,
-        stockObservationAt: extra.stockObservationAt,
+        ...(extra.stockObservationAt ? {
+          currentStock: extra.currentStock,
+          stockObservation: extra.stockObservation,
+          stockObservationAt: extra.stockObservationAt,
+        } : {}),
         urgent: extra.urgent,
-        catalogueExtra: details ? { details } : {},
       });
-      setForm(current => ({ ...current, extraItems: current.extraItems.filter(item => item.id !== extra.id) }));
+      setForm(current => ({ ...current, extraItems: current.extraItems.filter(item => item.id !== extra.id),
+        observations: details ? [...current.observations, details] : current.observations }));
+      openCategory(product.category);
     }} />;
   return (
     <div ref={fieldsRef} onChangeCapture={event => {
@@ -775,7 +785,7 @@ function PatientRequisition({
               <WizardMaterialCategories
                 category={currentCategory}
                 selected={form.lines}
-                onChange={category => setStep(materialCategories.findIndex(item => item.id === category) + 1)}
+                onChange={openCategory}
               />
             </> : null}
             {currentCategory ? <CatalogStep key={currentCategory} context={context} items={categoryItems}
@@ -801,6 +811,8 @@ function PatientRequisition({
                 form={form}
                 recipientName={context.patient!.display_name}
                 requesterName={context.fullName}
+                onEditCategory={openCategory}
+                onEditExtras={() => setStep(4)}
                 onEditObservations={() => {
                   setStep(5);
                   requestAnimationFrame(() => {
@@ -837,10 +849,15 @@ function PatientRequisition({
             blocked={loadingCatalog || Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
             onBack={() => {
               issuanceFailure.clear();
-              setStep(stageStart[stage - 1]);
+              const previous = currentCategory && adjacentMaterialCategory(currentCategory, products, "previous");
+              if (previous) openCategory(previous);
+              else setStep(step === 4 ? materialCategories.length : stageStart[stage - 1]);
             }}
             onNext={() => {
-              if (validate() && (step !== 0 || householdSelectionRef.current?.apply() !== false)) setStep(stageStart[stage + 1]);
+              if (!validate() || step === 0 && householdSelectionRef.current?.apply() === false) return;
+              const next = (step === 0 || currentCategory) && adjacentMaterialCategory(currentCategory, products, "next");
+              if (next) openCategory(next);
+              else setStep(stageStart[stage + 1]);
             }}
             onFinish={() => { if (!issuanceFailure.reopen()) void submit(); }}
           />

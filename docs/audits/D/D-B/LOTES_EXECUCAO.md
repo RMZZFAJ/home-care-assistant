@@ -567,6 +567,50 @@ migration neste ajuste.
 
 ### Decisões e dúvidas de L2
 
+**Revisão seguinte pedida pelo responsável.** A reabertura de um assistente
+reconhece automaticamente um resultado confirmado. A retomada de um
+preenchimento ativo usa o mesmo diálogo com paciente, data, etapa e
+materiais. Uma tentativa ainda incerta conserva sua recuperação própria.
+
+Os assistentes de REQ, COM, ENT e DEV compartilham busca, contagem e ações
+de materiais. Continuar percorre as categorias com materiais antes de
+abrir Extras. As categorias vazias seguem consultáveis pelas abas. Os
+formulários de cada ficha conservam os seus contratos de estoque, expedição,
+contagem e aprovação. A composição comum evita manter quatro versões da
+mesma busca, barra de ações e retomada.
+
+Na REQ, Estoque atual começa com a referência consultada da equipe. A
+emissão usa a contagem informada. A orientação da linha distingue zero
+de saldo desconhecido e o rodapé apresenta a gravação do rascunho. Ao
+escolher uma correspondência do catálogo em Extras, a ficha abre sua
+categoria em Materiais. Contagem e urgência digitadas são preservadas e os
+detalhes livres entram em Observações. Ciência familiar e o atalho de
+acompanhamento agora apontam para Visão geral.
+
+Novas ENT seguem Família → Equipe. A confirmação apresenta o recebedor
+e a indicação de plantão conforme a escala consultada. A escolha e a
+comparação de referências ficam no diálogo, com confirmação antes de aplicar.
+Devoluções novas usam o assistente DEV. Um preenchimento histórico de
+devolução recuperado pela rota antiga conserva sua identidade.
+
+No iOS emulado, a REQ passou da emissão assinada ao início de outra
+requisição sem o aviso de resultado anterior. A ENT mostrou a pessoa em
+plantão e permitiu designar outro recebedor com justificativa. O ator da
+escala permaneceu impedido de aceitar a entrega no lugar dele. Na REQ de
+teste do catálogo, a escolha de Gaze percorreu duas categorias, reapareceu
+no rascunho na etapa salva e registrou três pacotes tanto na ficha quanto
+no saldo da equipe. A consulta local encontrou o PDF assinado disponível
+após a janela de 15 segundos do teste. Os prazos da verificação foram
+ajustados nas operações que incluem abertura e assinatura da ficha. O
+reteste da escolha no catálogo passou até o download do PDF assinado.
+
+**Vínculo por material em REQ e BAL.** A extensão solicitada precisa de uma
+referência documental por linha, com verificação independente da leitura da
+ficha relacionada. As origens de COM, ENT e DEV continuam com as regras da
+seção 7 do comando mestre. A referência da REQ ou do BAL deve conservar
+separados o saldo, o atendimento, a aprovação e a evidência do vínculo.
+A gravação e sua verificação continuam pendentes neste recorte.
+
 - **P1 — Reversão de contagem de REQ superada por nova contagem oficial.**
   Sem decisão registrada. A reversão comum preserva
   movimentos posteriores. Outra contagem absoluta bloqueia a reversão até

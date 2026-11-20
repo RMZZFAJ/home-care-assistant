@@ -2,10 +2,9 @@
 import { useId } from "react";
 import { inputClass } from "@/components/workspace";
 import type { StockObservation } from "@/types/requisition";
-import { formatStockObservationTime } from "@/lib/stock-observation";
 
-export function StockObservationField({ value, mode, at, suggested, decimals = 6, unit, error, errorKey, onChange, compact = false }: {
-  value: string | number | null; mode?: StockObservation; at?: string | null; suggested?: string | null; decimals?: number; unit?: string; error?: string;
+export function StockObservationField({ value, mode, suggested, decimals = 6, unit, error, errorKey, onChange, compact = false }: {
+  value: string | number | null; mode?: StockObservation; suggested?: string | null; decimals?: number; unit?: string; error?: string;
   errorKey?: string; onChange: (change: { currentStock: string | number | null; stockObservation: StockObservation; stockObservationAt: string }) => void;
   compact?: boolean;
 }) {
@@ -21,7 +20,7 @@ export function StockObservationField({ value, mode, at, suggested, decimals = 6
       <option value="unfilled">Não informado</option><option value="unknown">Não sei informar</option><option value="observed">Observei e vou informar</option>
     </select>
     </> : null}
-    <label className="block text-sm font-semibold" htmlFor={id + "-quantity"}>Estoque observado com a equipe{unit ? " · " + unit : ""}</label>
+    <label className="block text-sm font-semibold" htmlFor={id + "-quantity"}>Estoque atual{unit ? " · " + unit : ""}</label>
     <div className={compact ? "hca-wizard-stock-input" : undefined}>
     <input id={id + "-quantity"} data-field-error={error && selected !== "legacy_unclassified" ? errorKey : undefined} className={inputClass} type="text" inputMode={decimals ? "decimal" : "numeric"} maxLength={64}
       value={value == null || Number.isNaN(value) ? "" : value} disabled={selected === "unknown"} aria-describedby={description} aria-invalid={error && selected !== "legacy_unclassified" ? true : undefined}
@@ -36,13 +35,9 @@ export function StockObservationField({ value, mode, at, suggested, decimals = 6
       Não sei informar
     </label> : null}
     <p id={id + "-help"} className="text-xs text-(--muted)">
-      {suggested == null
-        ? "Vazio significa não informado. Digite 0 somente se observou zero."
-        : value == null ? `Saldo de referência da equipe: ${suggested}. Informe o que você observou.`
-          : "Confira a quantidade sugerida pelo saldo da equipe e ajuste conforme a contagem."}{" "}
-      Faixa de 0 a 100000. {decimals ? `Até ${decimals} casas decimais.` : "Somente unidades inteiras."}
+      {suggested == null ? "Informe a quantidade que está com a equipe." : "Confira o saldo da equipe e ajuste conforme a contagem."}{" "}
+      A emissão atualiza o estoque com a quantidade informada. Use 0 se o material acabou ou marque “Não sei informar” para preservar o saldo.
     </p>
-    <p className="text-xs text-(--muted)">{formatStockObservationTime(at)}</p>
     {error ? <p id={id + "-error"} className="ui-field-error">{error}</p> : null}
   </div>;
 }

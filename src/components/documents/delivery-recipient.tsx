@@ -1,8 +1,12 @@
 "use client";
 import { SearchSelect } from "@/components/ui/search-select";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 
-import { inputClass, Notice, buttonClass } from "@/components/workspace";
+import { Notice } from "@/components/workspace";
+import { ActionButton, FormField, Pill, TextAreaField } from "@/components/ui/controls";
+import { Dialog } from "@/components/ui/overlays";
+import { Icon } from "@/components/ui/icon";
+import { roleLabel } from "@/lib/role-labels";
 import { formatBrazilDate } from "@/lib/receipt";
 import type {
   DeliveryPreparation,
@@ -71,162 +75,94 @@ export function DeliveryRecipientField({
   onRefresh: () => void;
   onAdopt: () => void;
 }) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState("");
+  const [reason, setReason] = useState("");
   const [search, setSearch] = useState<string | null>(null);
-  const chosen = data?.people.find((person) => person.id === form.recipientId);
-  const needsReason = Boolean(
-    form.recipientId &&
-    (form.recipientId !== data?.suggestedId ||
-      (previousRecipient && previousRecipient !== form.recipientId)),
-  );
-  return (
-    <section
-      className="space-y-4 sm:col-span-2"
-      aria-label="Escolha do recebedor"
-    >
-      {loading ? (
-        <Notice>Consultando pessoas elegíveis e sugestão da escala…</Notice>
-      ) : null}
-      {error ? <Notice error>{error}</Notice> : null}
-      {fieldErrors.recipientContext ? (
-        <Notice error>{fieldErrors.recipientContext}</Notice>
-      ) : null}
-      {data ? <DeliveryRecipientReference data={data} /> : null}
-      <button
-        type="button"
-        className={buttonClass}
-        disabled={loading}
-        onClick={onRefresh}
-      >
-        Atualizar pessoas e escala
-      </button>
-      {comparison ? (
-        <section
-          className="space-y-3 rounded-xl border border-(--line) p-4"
-          aria-label="Comparação do recebedor"
-        >
-          <h3 className="font-semibold">Referências atualizadas</h3>
-          <p>
-            Sugestão revisada:{" "}
-            {data?.people.find((person) => person.id === data.suggestedId)
-              ?.name ?? "Sem sugestão"}
-          </p>
-          <DeliveryRecipientReference data={comparison} />
-          <p>
-            Seu recebedor e motivo digitados foram preservados. Confira a
-            elegibilidade antes de continuar.
-          </p>
-          <button type="button" className={buttonClass} onClick={onAdopt}>
-            Usar referências atuais
-          </button>
-        </section>
-      ) : null}
+  const chosen = data?.people.find(person => person.id === form.recipientId);
+  const selected = data?.people.find(person => person.id === selectedId);
+  const onDuty = chosen && data?.shifts.some(shift => shift.professionalId === chosen.id);
+  const needsReason = Boolean(selectedId &&
+    (selectedId !== data?.suggestedId || (previousRecipient && previousRecipient !== selectedId)));
+  const missing = fieldErrors.recipientId || fieldErrors.recipientReason || fieldErrors.recipientContext;
+  const editLabel = chosen ? "Alterar recebedor" : "Escolher recebedor";
+
+  function edit() {
+    setSelectedId(form.recipientId);
+    setReason(form.recipientReason ?? "");
+    setSearch(null);
+    setOpen(true);
+  }
+
+  function apply() {
+    if (!selected || comparison || (needsReason && reason.trim().length < 3)) return;
+    setForm(current => ({ ...current, recipientId: selected.id, recipientReason: reason.trim() }));
+    setOpen(false);
+  }
+
+  return <section className="hca-form-stack" aria-label="Escolha do recebedor">
+    <h3>{data?.destination === "FAMILY" ? "Quem receberá na família" : "Quem receberá na equipe"}</h3>
+    <div className="hca-source-summary hca-wizard-recipient">
+      <span className="hca-source-symbol"><Icon name="user" /></span>
       <div>
-        <label
-          htmlFor="delivery-recipient"
-          className="block text-sm font-semibold"
-        >
-          Destinatário designado
-        </label>
-        <SearchSelect
-          id="delivery-recipient"
-          query={search ?? chosen?.name ?? ""}
-          selectedIds={chosen ? [chosen.id] : []}
-          disabled={
-            loading ||
-            Boolean(error) ||
-            !data?.people.length ||
-            Boolean(comparison)
-          }
-          required
-          aria-invalid={Boolean(fieldErrors.recipientId)}
-          aria-describedby={
-            fieldErrors.recipientId
-              ? "delivery-recipient-help delivery-recipient-error"
-              : "delivery-recipient-help"
-          }
-          triggerLabel={"Abrir opções de recebedor"}
-          placeholder="Busque e selecione quem receberá"
-          onQueryChange={queryValue => {
-            setSearch(queryValue);
-            setForm((current) => ({ ...current, recipientId: "" }));
-          }}
-          onSelectionChange={nextIds => {
-            if (
-              data?.people.some((person) => person.id === nextIds[0])
-            ) {
-              setForm((current) => ({
-                ...current,
-                recipientId: nextIds[0]!,
-              }));
-              setSearch(null);
-            }
-          }}
-          options={(data?.people
-            .filter(
-              (person) =>
-                !search ||
-                person.name
-                  .toLocaleLowerCase("pt-BR")
-                  .includes(search.toLocaleLowerCase("pt-BR")),
-            )
-            .map((person) => (
-              ({ value: person.id, label: person.name, content: <>
-                {person.name}
-              </> })
-            ))) ?? []}
-        />
-        <p id="delivery-recipient-help" className="hca-field-hint">
-          Somente a pessoa que receber fisicamente poderá confirmar o aceite. A
-          escolha não transfere essa autoria.
-        </p>
-        {fieldErrors.recipientId ? (
-          <p id="delivery-recipient-error" className="ui-field-error">
-            {fieldErrors.recipientId}
-          </p>
-        ) : null}
+        <strong>{chosen?.name ?? "Recebedor a definir"}</strong>
+        <small>{chosen ? roleLabel(chosen.role) : "Escolha uma pessoa habilitada para a conferência."}</small>
+        {onDuty ? <Pill tone="success"><Icon name="clock" width={12} height={12} />Em plantão</Pill> : null}
       </div>
-      {needsReason || form.recipientReason ? (
+      <ActionButton ref={triggerRef} compact variant="quiet" aria-label={editLabel} aria-invalid={Boolean(missing)}
+        disabled={loading || (!error && !data?.people.length)} onClick={edit}>
+        <Icon name="edit" />{chosen ? "Alterar" : "Escolher"}
+      </ActionButton>
+    </div>
+    {loading ? <p className="hca-field-help" role="status">Consultando escala e recebedores elegíveis…</p> : null}
+    {missing || error ? <Notice error>{missing || error}</Notice> : null}
+    {data && !chosen && data.state !== "no_eligible_recipient" ? <p className="hca-field-help">{stateLabels[data.state]}</p> : null}
+    {data?.state === "no_eligible_recipient" ? <Notice>{stateLabels.no_eligible_recipient}</Notice> : null}
+    {comparison && !open ? <Notice>Confira a referência atual da escala ao alterar o recebedor.</Notice> : null}
+    {open ? <Dialog open title="Escolher recebedor" kicker="Entrega de materiais" popupClassName="hca-wizard-dialog" finalFocus={triggerRef}
+      onClose={() => setOpen(false)} keyboardScrollable
+      footer={<>
+        <ActionButton onClick={() => setOpen(false)}>Voltar</ActionButton>
+        <ActionButton variant="primary" disabled={loading || Boolean(error) || Boolean(comparison) || !selected || needsReason && reason.trim().length < 3}
+          onClick={apply}><Icon name="check" />Usar recebedor</ActionButton>
+      </>}>
+      <div className="hca-form-stack">
+        {data ? <DeliveryRecipientReference data={data} /> : null}
+        <ActionButton compact variant="quiet" disabled={loading} onClick={onRefresh}>
+          <Icon name="refresh" />Consultar escala atual
+        </ActionButton>
+        {loading ? <p role="status">Consultando escala e recebedores elegíveis…</p> : null}
+        {error ? <Notice error>{error}</Notice> : null}
+        {comparison ? <section className="hca-form-stack" aria-label="Comparação do recebedor">
+          <h3>Referências atualizadas</h3>
+          <DeliveryRecipientReference data={comparison} />
+          <ActionButton onClick={onAdopt}>Usar referências atuais</ActionButton>
+        </section> : null}
         <div>
-          <label
-            htmlFor="delivery-recipient-reason"
-            className="block text-sm font-semibold"
-          >
-            Justificativa da escolha do recebedor
-          </label>
-          <textarea
-            id="delivery-recipient-reason"
-            className={inputClass}
-            rows={3}
-            minLength={3}
-            maxLength={1000}
-            required={needsReason}
-            value={form.recipientReason ?? ""}
-            aria-invalid={Boolean(fieldErrors.recipientReason)}
-            aria-describedby={
-              fieldErrors.recipientReason
-                ? "delivery-recipient-reason-help delivery-recipient-reason-error"
-                : "delivery-recipient-reason-help"
-            }
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                recipientReason: event.target.value,
-              }))
-            }
-          />
-          <p id="delivery-recipient-reason-help" className="hca-field-hint">
-            {form.recipientReason?.length ?? 0}/1000 caracteres. Explique a
-            escolha manual ou a troca; o motivo será preservado com sua autoria.
-          </p>
-          {fieldErrors.recipientReason ? (
-            <p id="delivery-recipient-reason-error" className="ui-field-error">
-              {fieldErrors.recipientReason}
-            </p>
-          ) : null}
+          <label htmlFor="delivery-recipient" className="field-label">Destinatário designado</label>
+          <SearchSelect id="delivery-recipient" query={search ?? selected?.name ?? ""} selectedIds={selected ? [selected.id] : []}
+            disabled={loading || Boolean(error) || Boolean(comparison) || !data?.people.length} required
+            aria-describedby="delivery-recipient-help" triggerLabel="Abrir opções de recebedor" placeholder="Busque quem receberá"
+            onQueryChange={value => { setSearch(value); setSelectedId(""); }}
+            onSelectionChange={ids => {
+              const person = data?.people.find(candidate => candidate.id === ids[0]);
+              if (!person) return;
+              setSelectedId(person.id);
+              setSearch(null);
+            }}
+            options={data?.people.filter(person => !search || person.name.toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR")))
+              .map(person => ({ value: person.id, label: person.name, content: <>
+                {person.name}{data.shifts.some(shift => shift.professionalId === person.id) ? " · Em plantão" : ""}
+              </> })) ?? []} />
+          <p id="delivery-recipient-help" className="hca-field-help">Somente a pessoa que receber fisicamente pode confirmar o recebimento.</p>
         </div>
-      ) : null}
-    </section>
-  );
+        {needsReason || reason ? <FormField label="Justificativa da escolha do recebedor" required={needsReason}>
+          <TextAreaField rows={3} minLength={3} maxLength={1000} value={reason} onChange={event => setReason(event.currentTarget.value)} />
+        </FormField> : null}
+      </div>
+    </Dialog> : null}
+  </section>;
 }
 export function DeliveryRecipientFacts({
   selection,

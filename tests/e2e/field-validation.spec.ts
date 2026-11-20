@@ -225,6 +225,10 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
     .toEqual({ product: null, category: "higiene", unit: "tubo", details });
   expect(sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${q(f.patient)}`)).toBe(before);
   expect(sql(`select o.body from public.requisition_observations o join public.requisitions r on r.id=o.requisition_id where r.care_recipient_id=${q(f.patient)}`)).toBe("x".repeat(1000));
+  await page.goto("/fichas/req");
+  await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toBeEnabled();
+  await expect(page.getByRole("dialog", { name: "Resultado anterior confirmado", exact: true })).toHaveCount(0);
+  expect(commands).toBe(1);
 });
 
 test("C026 apresentação incompleta aponta material, nome, código e fator sem perder dados nem mover estoque", async ({ page }, info) => {

@@ -245,7 +245,7 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
     await team.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
     await team.getByRole("navigation", { name: "Tipos de material" }).getByRole("button", { name: /^Higiene/ }).click();
     await team
-      .getByLabel("Buscar produto", { exact: true })
+      .getByLabel("Buscar material", { exact: true })
       .fill("Material fictício V4 0");
     const choice = team.getByRole("checkbox", {
       name: /Material fictício V4 A solução/,

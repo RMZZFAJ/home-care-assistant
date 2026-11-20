@@ -1,21 +1,34 @@
 import { expect, type Page } from "@playwright/test";
 
+export async function openDeliveryRecipient(page: Page) {
+  const picker = page.getByRole("dialog", { name: "Escolher recebedor", exact: true });
+  await page.getByRole("button", { name: /^(Alterar|Escolher) recebedor$/ }).click();
+  await expect(picker).toBeVisible();
+  return picker;
+}
+
 export async function selectDeliveryRecipient(
   page: Page,
   name: string,
   reason: string,
 ) {
-  const field = page.getByRole("combobox", {
+  const picker = await openDeliveryRecipient(page);
+  const field = picker.getByRole("combobox", {
     name: "Destinatário designado",
     exact: true,
   });
   await expect(field).toBeEnabled();
   await field.fill(name);
   await field.press("ArrowDown");
-  await page.getByRole("option", { name, exact: true }).click();
-  const explanation = page.getByRole("textbox", {
+  await page.getByRole("option", { name, exact: true }).or(page.getByRole("option", { name: `${name} · Em plantão`, exact: true })).click();
+  const explanation = picker.getByRole("textbox", {
     name: "Justificativa da escolha do recebedor",
     exact: true,
   });
-  if (await explanation.isVisible()) await explanation.fill(reason);
+  if (await explanation.isVisible()) {
+    if (!reason) return;
+    await explanation.fill(reason);
+  }
+  await picker.getByRole("button", { name: "Usar recebedor", exact: true }).click();
+  await expect(picker).toBeHidden();
 }

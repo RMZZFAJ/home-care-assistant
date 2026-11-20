@@ -37,7 +37,7 @@ export function SupplySourcePicker({ patientId, target, current, product, onClos
     : "Marque as fichas de origem. Em cada uma, escolha se deseja trazer os materiais.";
   const targetLabel = { COM: "Compra", ENT: "Entrega", DEV: "Devolução" }[target];
   return <Dialog open title={title} kicker={product?.name ?? targetLabel} subtitle={subtitle}
-    onClose={onClose} keyboardScrollable
+    onClose={onClose} keyboardScrollable popupClassName="hca-wizard-dialog"
     footer={<><ActionButton onClick={onClose}>Voltar</ActionButton>
       <ActionButton variant="primary" onClick={() => onApply(selected)}>
         <Icon name="check" />Aplicar vínculos

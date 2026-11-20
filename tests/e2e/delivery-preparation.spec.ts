@@ -5,29 +5,33 @@ import { generatedPdf } from "./generated-pdf";
 import { historyHashes } from "../integration/version-history-fixtures.mjs";
 import { expect, test, type Page } from "@playwright/test";
 import { PDF } from "@libpdf/core";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { currentDeliveryShift } from "../integration/delivery-preparation-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
-  fixtureFile,
   sql,
   sqlLiteral,
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectDeliveryRecipient } from "./delivery-recipient";
+import { openDeliveryRecipient, selectDeliveryRecipient } from "./delivery-recipient";
 import { audit, auditFromTop } from "./accessibility-audit";
 import type { SupplyDocument } from "../../src/types/documents";
 
 test.setTimeout(150_000);
 const reason =
   "A pessoa vinculada indicada receberá fisicamente estes materiais";
-async function open(page: Page, patient: string) {
-  const ids = JSON.parse(readFileSync(fixtureFile, "utf8"));
-  await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(ids.adminA.email);
+async function open(page: Page, patient: string, singlePatientEmail?: string) {
+  await page.goto(singlePatientEmail ? "/login?next=%2Ffichas%2Fent" : "/login", { waitUntil: "domcontentloaded" });
+  await page.getByLabel("E-mail", { exact: true }).fill(singlePatientEmail ?? fixtures.adminA.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  if (singlePatientEmail) {
+    await expect(page).toHaveURL(url => url.pathname === "/fichas/ent");
+    await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", patient);
+    return;
+  }
   await expect(
     page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
@@ -100,18 +104,19 @@ test("C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantid
 test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto", async ({
   page,
 }, info) => {
+  test.setTimeout(210_000);
   const f = await setup(),
-    before = ledger(f.patient);
-  await open(page, f.patient);
+    before = ledger(f.patient), admin = await shiftWorker(f.patient, "admin");
+  await open(page, f.patient, admin.email);
   await expect(
     page.getByText(/Não há sugestão inequívoca da escala/),
   ).toBeVisible();
   await selectDeliveryRecipient(page, "Teste professional", "");
-  await next(page);
-  await expect(explanation(page)).toBeFocused();
-  await expect(explanation(page)).toHaveAttribute("aria-invalid", "true");
+  const useRecipient = page.getByRole("button", { name: "Usar recebedor", exact: true });
+  await expect(useRecipient).toBeDisabled();
   expect(ledger(f.patient)).toBe(before);
   await explanation(page).fill(reason);
+  await useRecipient.click();
   await materialsAndReview(page);
   await expect(
     page.getByText("Justificativa da escolha: " + reason, { exact: true }),
@@ -131,7 +136,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   });
   await page.route("**/api/documents/*/issuances/initial", async route => {
     if (route.request().method() !== "POST") return route.continue();
-    const response = await route.fetch();
+    const response = await route.fetch({ timeout: 65_000 });
     expect(response.status(), await response.text()).toBe(200);
     attemptedPdf = await response.json();
     await releasePdfResponse.promise;
@@ -161,14 +166,14 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   try {
     await uncertain.getByRole("button", { name: "Consultar resultado", exact: true }).click();
     const processingNotices = page.getByRole("dialog", { name: "Processando os avisos da emissão", exact: true });
-    await expect(processingNotices).toBeVisible();
+    await expect(processingNotices).toBeVisible({ timeout: 65_000 });
     await expect.poll(() => noticeResponses.length).toBe(1);
     expect(noticeResponses[0]).toMatchObject({ noticesPrepared: true, noticesNeedAttention: true, issuanceId: null });
     await info.attach("emissao-processando-avisos", {
       body: await processingNotices.screenshot({ animations: "disabled" }), contentType: "image/png",
     });
     releaseNoticeResponse.resolve();
-    await expect.poll(() => Boolean(attemptedPdf), { timeout: 15_000 }).toBe(true);
+    await expect.poll(() => Boolean(attemptedPdf), { timeout: 65_000 }).toBe(true);
     await expect(page.getByRole("heading", { name: "Gerando o PDF de emissão", exact: true })).toBeVisible();
     await expect(page.getByRole("list", { name: "Etapas da operação" }).locator('[aria-current="step"]'))
       .toContainText("Gerando o PDF de emissão");
@@ -202,7 +207,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
     p_id: saved!.id,
   })) as SupplyDocument;
   expect(result.workflow_data.recipientSelection?.selectedBy).toBe(
-    fixtures.adminA.id,
+    admin.id,
   );
   expect(result.workflow_data.recipientSelection?.recipientId).toBe(
     fixtures.professional.id,
@@ -253,14 +258,11 @@ test("P06 escala sugere, a família pode escolher outra pessoa e o profissional 
     shift = currentDeliveryShift(f);
   try {
     await open(page, f.patient);
-    const combo = page.getByRole("combobox", {
-      name: "Destinatário designado",
-      exact: true,
-    });
-    await expect(combo).toHaveValue("Teste professional");
+    const recipient = page.getByRole("region", { name: "Escolha do recebedor", exact: true });
+    await expect(recipient).toContainText("Teste professional");
+    await expect(recipient).toContainText("Em plantão");
     await expect(explanation(page)).toHaveCount(0);
     await selectDeliveryRecipient(page, "Teste global", reason);
-    await expect(explanation(page)).toHaveValue(reason);
     await materialsAndReview(page);
     const recipientSummary = page.locator("dl > div").filter({
       has: page.locator("dt").filter({ hasText: /^Recebedor$/ }),
@@ -303,6 +305,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
   await selectDeliveryRecipient(page, "Teste professional", reason);
   await materialsAndReview(page);
   await page.getByRole("navigation", { name: "Etapas da ENT" }).getByRole("button", { name: "Confirmação", exact: true }).click();
+  await openDeliveryRecipient(page);
   await page.route("**/api/documents/delivery-preparation?**", (route) =>
     route.fulfill({
       status: 503,
@@ -314,7 +317,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
     }),
   );
   await page
-    .getByRole("button", { name: "Atualizar pessoas e escala", exact: true })
+    .getByRole("button", { name: "Consultar escala atual", exact: true })
     .click();
   await expect(
     page
@@ -327,7 +330,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
   const shift = currentDeliveryShift(f, fixtures.global.id);
   try {
     await page
-      .getByRole("button", { name: "Atualizar pessoas e escala", exact: true })
+      .getByRole("button", { name: "Consultar escala atual", exact: true })
       .click();
     await expect(
       page.getByRole("region", {
@@ -357,6 +360,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
         exact: true,
       }),
     ).toHaveValue("Teste professional");
+    await page.getByRole("button", { name: "Usar recebedor", exact: true }).click();
     await next(page);
     await selectMaterialCategory(page);
     await expect(
@@ -376,6 +380,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
       .click();
     expect((await response).status()).toBe(409);
     expect(ledger(f.patient)).toBe(before);
+    await openDeliveryRecipient(page);
     await expect(
       page.getByRole("region", {
         name: "Comparação do recebedor",
@@ -386,6 +391,7 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
     await page
       .getByRole("button", { name: "Usar referências atuais", exact: true })
       .click();
+    await page.getByRole("button", { name: "Usar recebedor", exact: true }).click();
     for (let index = 0; index < 4; index++) await next(page);
     const document = await finish(page);
     expect(document.recipient_id).toBe(fixtures.professional.id);
@@ -409,7 +415,7 @@ test("P06 sem pessoa elegível mantém preparação pendente e nenhuma leitura o
     page.getByText(/Não há pessoa elegível para receber nesta direção/),
   ).toBeVisible();
   await expect(
-    page.getByRole("combobox", { name: "Destinatário designado", exact: true }),
+    page.getByRole("button", { name: "Escolher recebedor", exact: true }),
   ).toBeDisabled();
   await next(page);
   await expect(

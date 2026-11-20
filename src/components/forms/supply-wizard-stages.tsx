@@ -21,6 +21,12 @@ export const materialCategories = [
 
 export type WizardMaterialCategory = (typeof materialCategories)[number]["id"];
 
+export function adjacentMaterialCategory(category: WizardMaterialCategory | undefined, products: readonly { category: string }[], direction: "next" | "previous") {
+  const current = materialCategories.findIndex(entry => entry.id === category);
+  const candidates = direction === "next" ? materialCategories.slice(current + 1) : materialCategories.slice(0, current).reverse();
+  return candidates.find(entry => products.some(product => product.category === entry.id))?.id;
+}
+
 export function WizardMaterialCategories({ category, selected, onChange }: {
   category: WizardMaterialCategory;
   selected: readonly { category: string }[];

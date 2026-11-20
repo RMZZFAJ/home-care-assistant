@@ -153,7 +153,7 @@ test("REQ completed fulfillment keeps personal science separate and archived fol
     await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Conferir minha ciência e a conclusão");
     await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("atendimento dos itens está completo");
     await page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Ciência e responsáveis", exact: true }).click();
-    await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
+    await expect(page.getByRole("tab", { name: "Visão geral", exact: true })).toBeFocused();
     await expect(overview(page)).toContainText("Minha ciência: pendente");
     await page.route(`**/api/requisitions/${req.id}/science`, route => route.fulfill({
       status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Registro de ciência fictício recusado", retryable: true },
@@ -177,9 +177,8 @@ test("REQ completed fulfillment keeps personal science separate and archived fol
     expect((await science).ok()).toBe(true);
     await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
     await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar a conclusão e o arquivamento");
-    await selectDocumentSection(page, "workflow");
-    await expect(overview(page)).toContainText("Minha ciência: registrada");
     await selectDocumentSection(page, "overview");
+    await expect(overview(page)).toContainText("Minha ciência: registrada");
     expect(await rpc(family, "requisition_fulfillment", { p_requisition: req.id })).toEqual(before);
     expect(ledger(f.patient)).toBe(physical);
     expect(sql(`select count(*) from public.requisition_science_events where requisition_id=${q(req.id)} and user_id=${q(fixtures.family.id)};`)).toBe("1");

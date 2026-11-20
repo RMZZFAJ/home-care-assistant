@@ -17,7 +17,7 @@ type RequisitionFollowUp = {
   description: string;
   pending: boolean;
   label: string;
-  section: "materials" | "workflow" | "history";
+  section: "materials" | "overview" | "history";
 };
 
 /** Orient from independent recorded facts; opening a section never performs an act. */
@@ -51,12 +51,12 @@ export function requisitionFollowUp(facts: FollowUpFacts): RequisitionFollowUp {
     description: facts.designationPending
       ? "O atendimento dos itens está completo, mas a ciência obrigatória depende de uma pessoa familiar habilitada. Consulte a designação com a administração local. Arquivar não registra ciência."
       : "O atendimento dos itens está completo e a ciência familiar obrigatória permanece pendente. Cada pessoa registra somente a própria ciência. O arquivamento manual exige autoridade e justificativa; não substitui essa ciência.",
-    pending: true, label: "Ciência e responsáveis", section: "workflow",
+    pending: true, label: "Ciência e responsáveis", section: "overview",
   };
   return {
     heading: facts.completedAt ? "Acompanhar a conclusão e o arquivamento" : "Conferir o registro de conclusão",
     description: "Os itens têm atendimento confirmado e a regra de ciência está satisfeita. Consulte os registros de conclusão e arquivamento; ciência dispensada não atribui confirmação a nenhuma pessoa.",
-    pending: false, label: "Ciência e responsáveis", section: "workflow",
+    pending: false, label: "Ciência e responsáveis", section: "overview",
   };
 }
 

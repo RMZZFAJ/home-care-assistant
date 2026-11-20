@@ -62,7 +62,7 @@ import {
 import type { SupplyDraftContent } from "@/lib/validation/supply-drafts";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
-import { materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardCopy, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
+import { adjacentMaterialCategory, materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardCopy, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
 import { issuanceObservationErrors } from "@/lib/documents/issuance-observations";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
 import { ActionButton } from "@/components/ui/controls";
@@ -902,7 +902,7 @@ export function PatientSupplyWizard({
     const relevant = catalog.filter(product => {
       if (isBalance) return all || product.category === category;
       if (!Object.hasOwn(form.quantities, product.id)) return false;
-      return all || (category && !extras.has(product.id)) || (step === supplyExtrasStep && extras.has(product.id));
+      return all || (product.category === category && !extras.has(product.id)) || (step === supplyExtrasStep && extras.has(product.id));
     });
     for (const product of relevant)
       if (
@@ -924,7 +924,7 @@ export function PatientSupplyWizard({
       for (const [productId, ids] of Object.entries(links)) {
         if (!Object.hasOwn(form.quantities, productId)) continue;
         if (!all && ((step === supplyExtrasStep && !extras.has(productId)) ||
-          (category && extras.has(productId)))) continue;
+          (category && !relevant.some(product => product.id === productId)))) continue;
         if (
           ids.length > 1 &&
           (form.sharedNeedReasons?.[productId]?.trim().length ?? 0) < 3
@@ -1051,7 +1051,9 @@ export function PatientSupplyWizard({
         setBusy(false);
       }
     }
-    openStage(Math.min(steps.length - 1, stage + 1));
+    const nextCategory = !isBalance && (step === 0 || category) && adjacentMaterialCategory(category, catalog, "next");
+    if (nextCategory) openStep(materialCategories.findIndex(item => item.id === nextCategory) + 1);
+    else openStage(Math.min(steps.length - 1, stage + 1));
     if (type === "BAL" && step === 4) {
       requestAnimationFrame(() => {
         const heading = document.getElementById("supply-wizard-heading");
@@ -1645,6 +1647,7 @@ export function PatientSupplyWizard({
                 <SupplyWizardStep
                   step={step}
                   onCategoryChange={nextCategory => openStep(materialCategories.findIndex(item => item.id === nextCategory) + 1)}
+                  onEditStage={openStage}
                   type={type}
                   context={context}
                   form={form}
@@ -1786,7 +1789,9 @@ export function PatientSupplyWizard({
                 }
                 onBack={() => {
                   issuanceFailure.clear();
-                  openStage(stage - 1);
+                  const previous = !isBalance && category && adjacentMaterialCategory(category, catalog, "previous");
+                  if (previous) openStep(materialCategories.findIndex(item => item.id === previous) + 1);
+                  else openStage(stage - 1);
                   setError("");
                 }}
                 onNext={next}

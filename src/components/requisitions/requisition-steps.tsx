@@ -17,8 +17,9 @@ import { MaterialReview } from "@/components/documents/material-review";
 import { MaterialConsultButton } from "@/components/documents/catalogue-material-panel";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
-import { materialCategories } from "@/components/forms/supply-wizard-stages";
+import { materialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { IssuanceObservationList } from "@/components/forms/issuance-observations";
+import { WizardMaterialSearch, WizardMaterialToolbar } from "@/components/forms/wizard-material-tools";
 import type { WorkspaceContext } from "@/types/workspace";
 import type {
   RequisitionFormData,
@@ -119,22 +120,8 @@ export function CatalogStep({
           />
         </label>
       </Dialog>
-      <label className="block text-sm font-semibold">
-        Buscar produto
-        <input
-          className={inputClass}
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Nome ou nome alternativo"
-        />
-      </label>
-      <div className="hca-wizard-material-toolbar">
-        <p role="status" aria-label="Resultado da busca e seleção de materiais">
-          {search.trim() ? `${visible.length} ${visible.length === 1 ? "material encontrado" : "materiais encontrados"} · ` : ""}
-          {selectedCount} {selectedCount === 1 ? "material selecionado" : "materiais selecionados"}
-        </p>
-        {extras}
-      </div>
+      <WizardMaterialToolbar count={selectedCount} matches={search.trim() ? visible.length : undefined}>{extras}</WizardMaterialToolbar>
+      <WizardMaterialSearch value={search} onChange={setSearch} />
       {!visible.length ? (
         <Notice>Nenhum produto encontrado nesta categoria.</Notice>
       ) : null}
@@ -206,7 +193,6 @@ export function CatalogStep({
                     compact
                     value={line.currentStock}
                     mode={line.stockObservation}
-                    at={line.stockObservationAt}
                     suggested={info?.teamStock}
                     unit={item.unit}
                     decimals={item.quantity_decimals ?? 0}
@@ -259,12 +245,16 @@ export function Review({
   form,
   recipientName,
   requesterName,
+  onEditCategory,
+  onEditExtras,
   onEditObservations,
 }: {
   context: WorkspaceContext;
   form: RequisitionFormData;
   recipientName: string;
   requesterName: string;
+  onEditCategory: (category: WizardMaterialCategory) => void;
+  onEditExtras: () => void;
   onEditObservations: () => void;
 }) {
   const lines = form.lines;
@@ -286,12 +276,18 @@ export function Review({
       {materialCategories.map(category => {
         const group = lines.filter(item => item.category === category.id && !item.catalogueExtra);
         return group.length ? <section key={category.id} className="hca-document-summary">
-          <h3>{category.label}</h3>
+          <div className="hca-issuance-observation-heading">
+            <h3>{category.label}</h3>
+            <ActionButton compact variant="quiet" aria-label={`Editar materiais de ${category.label}`} onClick={() => onEditCategory(category.id)}>Editar</ActionButton>
+          </div>
           <MaterialReview rows={group.map(catalogueRow)} />
         </section> : null;
       })}
       <section className="hca-document-summary">
-        <h3>Itens extras</h3>
+        <div className="hca-issuance-observation-heading">
+          <h3>Itens extras</h3>
+          <ActionButton compact variant="quiet" aria-label="Editar itens extras" onClick={onEditExtras}>Editar</ActionButton>
+        </div>
         <MaterialReview rows={[...lines.filter(item => item.catalogueExtra).map(catalogueRow), ...extras.map(item => ({
           id: item.id, name: item.name, urgent: item.urgent,
           details: <>

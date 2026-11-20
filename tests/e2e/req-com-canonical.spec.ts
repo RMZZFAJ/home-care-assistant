@@ -35,7 +35,7 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
   await expect(page.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
   const checkbox = page.getByRole("checkbox", { name: new RegExp("^Material de cuidado") }); await checkbox.check();
   const product = page.locator(type === "REQ" ? "article" : ".product-choice").filter({ has: checkbox });
-  const quantity = product.getByLabel(type === "REQ" ? "Estoque observado com a equipe" : "Quantidade — " + name, { exact: type !== "REQ" });
+  const quantity = product.getByLabel(type === "REQ" ? "Estoque atual" : "Quantidade — " + name, { exact: type !== "REQ" });
   await quantity.fill(type === "REQ" ? "99999" : "12");
   const reference = await browser.newContext();
   try {

@@ -90,7 +90,7 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   await expect(steps.getByRole("button")).toHaveText([/Confirmação/, /Materiais/, /Extras/, /Observações/, /Revisão/]);
   const row = card(page, "Líquido fictício da observação exata");
   await row.getByRole("checkbox").first().check();
-  const input = row.getByLabel("Estoque observado com a equipe", {
+  const input = row.getByLabel("Estoque atual", {
     exact: false,
   });
   await expect(input).toHaveValue("1.75");
@@ -202,13 +202,13 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   for (const row of cards) {
     await row.getByRole("checkbox").first().check();
     await expect(
-      row.getByLabel("Estoque observado com a equipe", { exact: false }),
+      row.getByLabel("Estoque atual", { exact: false }),
     ).toHaveValue("0");
     await expect(
       row.getByRole("checkbox", { name: "Não sei informar", exact: true }),
     ).not.toBeChecked();
   }
-  const zero = cards[0].getByLabel("Estoque observado com a equipe", {
+  const zero = cards[0].getByLabel("Estoque atual", {
     exact: false,
   });
   await zero.fill("7");
@@ -220,16 +220,16 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
     .getByRole("checkbox", { name: "Não sei informar", exact: true })
     .check();
   await expect(
-    cards[1].getByLabel("Estoque observado com a equipe", { exact: false }),
+    cards[1].getByLabel("Estoque atual", { exact: false }),
   ).toBeDisabled();
   await cards[2]
-    .getByLabel("Estoque observado com a equipe", { exact: false })
+    .getByLabel("Estoque atual", { exact: false })
     .fill("7");
   await cards[2]
-    .getByLabel("Estoque observado com a equipe", { exact: false })
+    .getByLabel("Estoque atual", { exact: false })
     .fill("");
   await cards[3]
-    .getByLabel("Estoque observado com a equipe", { exact: false })
+    .getByLabel("Estoque atual", { exact: false })
     .fill("7");
   await expect(
     page.getByText(
@@ -280,9 +280,9 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   await expect(
     cards[2].getByRole("checkbox", { name: "Não sei informar", exact: true }),
   ).not.toBeChecked();
-  await expect(cards[2].getByLabel("Estoque observado com a equipe", { exact: false })).toHaveValue("");
+  await expect(cards[2].getByLabel("Estoque atual", { exact: false })).toHaveValue("");
   await expect(
-    cards[3].getByLabel("Estoque observado com a equipe", { exact: false }),
+    cards[3].getByLabel("Estoque atual", { exact: false }),
   ).toHaveValue("7");
   await review(page);
   for (const fact of [
@@ -442,7 +442,7 @@ test("rascunho anterior conserva 0 e 7 para revisão sem classificá-los como ob
   for (const [index, line] of lines.entries()) {
     await expect(
       card(page, line.productName).getByLabel(
-        "Estoque observado com a equipe",
+        "Estoque atual",
         { exact: false },
       ),
     ).toHaveValue(index ? "7" : "0");

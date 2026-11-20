@@ -147,7 +147,7 @@ async function issueReq(page: Page, patient: string, productName: string) {
     .getByRole("checkbox", { name: new RegExp("^" + productName) })
     .check();
   await page
-    .getByLabel("Estoque observado com a equipe", { exact: false })
+    .getByLabel("Estoque atual", { exact: false })
     .fill("2");
   for (let step = 0; step < 3; step++) await next(page);
   const pending = page.waitForResponse(

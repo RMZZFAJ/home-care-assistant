@@ -590,6 +590,58 @@ export function RequisitionDocumentContent({
             <div className="doc-author-line"><span className="doc-avatar" aria-hidden="true">{(data.requester_name_snapshot ?? "?").split(" ").slice(0,2).map(part => part[0]).join("")}</span><span><strong>{data.requester_name_snapshot ?? "Solicitante não identificado"}</strong><small>{formatBrazilDate(data.created_at)}</small></span></div>
           </DocumentSection>
 
+          <DocumentSection title="Ciência familiar" icon="users">
+            <div className="doc-science-record"><span className="doc-avatar"><Icon name={p.familyAware ? "check" : "clock"} width={18} height={18} /></span><div><strong>{data.is_historical ? "Não comprovada no original" : p.familyAware ? "Ciência registrada" : p.policy?.scienceRequired === false ? "Exigência dispensada" : "Ciência pendente"}</strong><p>Ciência, recebimento e atendimento têm registros próprios.</p></div></div>
+            <p className="mt-2 text-sm">
+              {data.is_historical
+                ? "A ciência original não foi comprovada. Nenhuma confirmação foi inferida na importação."
+                : p.familyAware
+                  ? "Família ciente por uma pessoa habilitada. Cada pessoa mantém seu próprio registro."
+                  : p.policy?.scienceRequired === false
+                    ? "A exigência foi dispensada pela regra desta requisição. Isso não registra ciência em nome de ninguém."
+                    : "A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente."}
+            </p>
+            {!data.is_historical ? (
+              <p className="mt-2 text-sm">
+                Minha ciência:{" "}
+                {p.personalScience
+                  ? "registrada"
+                  : p.eligible
+                    ? "pendente"
+                    : "sem habilitação neste paciente"}
+                .
+              </p>
+            ) : null}
+            <ul className="mt-3 space-y-2">
+              {p.science.map((row) => (
+                <li
+                  className="doc-person-block hca-science-person"
+                  key={row.id}
+                >
+                  <strong>{row.actor_name}</strong>
+                  <p>
+                    {modes[row.mode] ?? row.mode} ·{" "}
+                    {formatBrazilDate(row.created_at)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+
+            {p.manualArchiveRequired ? (
+              <Notice>
+                Concluída com ciência obrigatória pendente. O arquivamento
+                automático está bloqueado; um responsável autorizado poderá
+                arquivar com justificativa, sem inventar ciência.
+              </Notice>
+            ) : null}
+
+            {p.archivedAt ? (
+              <p className="mt-3 text-sm">
+                Arquivado em {formatBrazilDate(p.archivedAt)} ·{" "}
+                {p.archiveReason}
+              </p>
+            ) : null}
+          </DocumentSection>
           <DocumentComplementsPanel key={`${context.userId}:${id}`} documentId={id} version={p.version} userId={context.userId} activeContext={!p.archivedAt && data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} />
 
           </div>
@@ -599,7 +651,7 @@ export function RequisitionDocumentContent({
             className="doc-card hca-requisition-facts"
             aria-label="Dimensões independentes da requisição"
           >
-            <div className="my-4 grid gap-3 sm:grid-cols-3">
+            <div className="my-4 grid gap-3 sm:grid-cols-2">
               <div className="rounded-lg bg-(--background) p-3">
                 <p className="text-xs text-(--muted)">Atendimento</p>
                 <strong>
@@ -618,19 +670,6 @@ export function RequisitionDocumentContent({
                           ? "Parcial"
                           : "Aguardando ENT aceita"}
                 </p>
-              </div>
-              <div className="rounded-lg bg-(--background) p-3">
-                <p className="text-xs text-(--muted)">Ciência familiar</p>
-                <strong>
-                  {data.is_historical
-                    ? "Não comprovada no original"
-                    : p.familyAware
-                      ? "Família ciente"
-                      : p.designationPending
-                        ? "Pendente de designação"
-                        : "Ciência não registrada"}
-                </strong>
-                <p className="text-xs">Independente do recebimento</p>
               </div>
               <div className="rounded-lg bg-(--background) p-3">
                 <p className="text-xs text-(--muted)">Documento</p>
@@ -692,58 +731,6 @@ export function RequisitionDocumentContent({
             <ResolveExtraItem onOpen={() => openDecision("resolve_extra")} />
           ) : null}
 
-          <DocumentSection title="Ciência familiar" icon="users">
-            <div className="doc-science-record"><span className="doc-avatar"><Icon name={p.familyAware ? "check" : "clock"} width={18} height={18} /></span><div><strong>{data.is_historical ? "Não comprovada no original" : p.familyAware ? "Ciência registrada" : p.policy?.scienceRequired === false ? "Exigência dispensada" : "Ciência pendente"}</strong><p>Ciência, recebimento e atendimento têm registros próprios.</p></div></div>
-            <p className="mt-2 text-sm">
-              {data.is_historical
-                ? "A ciência original não foi comprovada. Nenhuma confirmação foi inferida na importação."
-                : p.familyAware
-                  ? "Família ciente por uma pessoa habilitada. Cada pessoa mantém seu próprio registro."
-                  : p.policy?.scienceRequired === false
-                    ? "A exigência foi dispensada pela regra desta requisição. Isso não registra ciência em nome de ninguém."
-                    : "A ciência familiar está pendente. Entregas e aceites válidos podem continuar normalmente."}
-            </p>
-            {!data.is_historical ? (
-              <p className="mt-2 text-sm">
-                Minha ciência:{" "}
-                {p.personalScience
-                  ? "registrada"
-                  : p.eligible
-                    ? "pendente"
-                    : "sem habilitação neste paciente"}
-                .
-              </p>
-            ) : null}
-            <ul className="mt-3 space-y-2">
-              {p.science.map((row) => (
-                <li
-                  className="doc-person-block hca-science-person"
-                  key={row.id}
-                >
-                  <strong>{row.actor_name}</strong>
-                  <p>
-                    {modes[row.mode] ?? row.mode} ·{" "}
-                    {formatBrazilDate(row.created_at)}
-                  </p>
-                </li>
-              ))}
-            </ul>
-
-            {p.manualArchiveRequired ? (
-              <Notice>
-                Concluída com ciência obrigatória pendente. O arquivamento
-                automático está bloqueado; um responsável autorizado poderá
-                arquivar com justificativa, sem inventar ciência.
-              </Notice>
-            ) : null}
-
-            {p.archivedAt ? (
-              <p className="mt-3 text-sm">
-                Arquivado em {formatBrazilDate(p.archivedAt)} ·{" "}
-                {p.archiveReason}
-              </p>
-            ) : null}
-          </DocumentSection>
         </DocumentPanel>
         <DocumentPanel value="communications"><DocumentCommunications id={id} version={p.version} /></DocumentPanel>
         <DocumentPanel value="files">

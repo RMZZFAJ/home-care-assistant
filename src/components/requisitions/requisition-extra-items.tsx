@@ -175,7 +175,7 @@ function ExtraItemEditor({ item, isNew, products, selectedIds, limitReached, onC
           {extraMaterialUnits.map(value => <option key={value} value={value}>{value[0].toUpperCase() + value.slice(1)}</option>)}
         </SelectField>
       </FormField>
-      <StockObservationField value={draft.currentStock} mode={draft.stockObservation} at={draft.stockObservationAt}
+      <StockObservationField value={draft.currentStock} mode={draft.stockObservation}
         unit={unit || undefined} error={errors.stock} onChange={change => setDraft({ ...draft, ...change })} />
       <CheckboxField checked={draft.urgent} label="Reposição urgente" onChange={event => setDraft({ ...draft, urgent: event.currentTarget.checked })} />
       <FormField label="Detalhes para identificar">
@@ -208,7 +208,7 @@ function CatalogueExtraEditor({ product, line, pending, onSave, onClose }: {
   }
   return <ExtraMaterialDialog isNew={false} onClose={onClose} onSubmit={apply}>
     <FormField label="Material"><TextInput value={product.name} disabled /></FormField>
-    <StockObservationField value={draft.currentStock} mode={draft.stockObservation} at={draft.stockObservationAt}
+    <StockObservationField value={draft.currentStock} mode={draft.stockObservation}
       unit={product.unit} decimals={decimals} error={errors.stock} onChange={change => setDraft({ ...draft, ...change })} />
     <CheckboxField checked={draft.urgent} label="Reposição urgente" onChange={event => setDraft({ ...draft, urgent: event.currentTarget.checked })} />
     <FormField label="Detalhes para identificar">

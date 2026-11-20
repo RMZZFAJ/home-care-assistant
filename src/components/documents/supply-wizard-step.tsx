@@ -1,5 +1,6 @@
 "use client";
 import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
+import { WizardMaterialSearch, WizardMaterialToolbar } from "@/components/forms/wizard-material-tools";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
@@ -77,6 +78,7 @@ function SharedNeedReason({ type, productId, form, setForm, error }: {
 export function SupplyWizardStep({
   step,
   onCategoryChange,
+  onEditStage,
   type,
   context,
   form,
@@ -102,6 +104,7 @@ export function SupplyWizardStep({
 }: {
   step: number;
   onCategoryChange: (category: string) => void;
+  onEditStage: (stage: 2 | 3) => void;
   type: SupplyType;
   context: WorkspaceContext;
   form: WizardState;
@@ -241,26 +244,8 @@ export function SupplyWizardStep({
                 : "Conte todos os produtos sob responsabilidade familiar que estão com a equipe. Materiais de terceiros ficam fora deste controle."}
           </p>
           {type === "ENT" ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="text-sm font-semibold">
-                Origem do estoque
-                <select
-                  className={inputClass}
-                  value={form.source}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      source: event.target.value as "FAMILY" | "CARE_TEAM",
-                      recipientId: "",
-                    })
-                  }
-                >
-                  <option value="FAMILY">Entrega de materiais · Família → Equipe</option>
-                  <option value="CARE_TEAM">
-                    Devolução de materiais · Equipe → Família
-                  </option>
-                </select>
-              </label>
+            <div className="hca-form-stack">
+              {form.source === "CARE_TEAM" ? <Notice>Preenchimento anterior de devolução · Equipe → Família.</Notice> : null}
               <DeliveryRecipientField
                 key={form.source}
                 data={recipientContext}
@@ -292,32 +277,16 @@ export function SupplyWizardStep({
             <WizardMaterialCategories category={category} selected={selected.filter(item => !extras.has(item.id))} onChange={onCategoryChange} />
           </> : null}
           {isExtraStep ? extraControl : null}
-          {category ? <label className="block text-sm font-semibold">
-            Buscar materiais nesta categoria
-            <input
-              type="search"
-              className={inputClass}
-              value={search}
-              onChange={(event) => {
-                const value = event.currentTarget.value;
-                setSearchByCategory((current) => ({
-                  ...current,
-                  [category]: value,
-                }));
-              }}
-            />
-          </label> : null}
-          {category ? <div className="hca-wizard-material-toolbar">
-            <p role="status" aria-label="Resultado da busca e seleção de materiais">
-              {search.trim() ? `${visibleProducts.length} ${visibleProducts.length === 1 ? "material encontrado" : "materiais encontrados"} · ` : ""}
-              {selected.length + pendingExtras.length} {selected.length + pendingExtras.length === 1 ? "material selecionado" : "materiais selecionados"}
-            </p>
-            {type !== "BAL" ? <div className="hca-toolbar">
+          {category ? <>
+            <WizardMaterialToolbar count={selected.length + pendingExtras.length} matches={search.trim() ? visibleProducts.length : undefined}>
+            {type !== "BAL" ? <>
               <ActionButton ref={barcodeTriggerRef} compact variant="quiet"
                 onClick={() => setBarcodeOpen(true)}><Icon name="camera" />Ler código</ActionButton>
               {extraControl}
-            </div> : null}
-          </div> : null}
+            </> : null}
+            </WizardMaterialToolbar>
+            <WizardMaterialSearch value={search} onChange={value => setSearchByCategory(current => ({ ...current, [category]: value }))} />
+          </> : null}
           {!visibleProducts.length && !(isExtraStep && pendingExtras.length) ? (
             <Notice>
               {isExtraStep ? "Nenhum item extra incluído." : "Nenhum material nesta busca. Ajuste ou limpe o filtro; suas seleções continuam preservadas."}
@@ -393,12 +362,13 @@ export function SupplyWizardStep({
                       setForm={setForm} error={fieldErrors[product.id + ":shared"]} /> : null}
                   </div> : null}
                   {checked && !usesPresentations ? (
-                    <label className="product-quantity text-xs font-semibold">
-                      {type === "BAL"
+                    <label className={type === "BAL" ? "product-quantity text-xs font-semibold" : "hca-wizard-stock-field text-xs font-semibold"}>
+                      <span>{type === "BAL"
                         ? "Contagem física"
                         : type === "COM"
                           ? "Quantidade a adquirir"
-                          : "Quantidade expedida"}
+                          : "Quantidade expedida"}</span>
+                      <span className={type === "BAL" ? undefined : "hca-wizard-stock-input"}>
                       <input
                         className={inputClass}
                         inputMode="decimal"
@@ -421,6 +391,8 @@ export function SupplyWizardStep({
                           }));
                         }}
                       />
+                      {type === "BAL" ? null : <span aria-hidden="true">{product.unit}</span>}
+                      </span>
                       {fieldErrors[product.id] ? (
                         <span className="ui-field-error">
                           {fieldErrors[product.id]}
@@ -518,10 +490,19 @@ export function SupplyWizardStep({
           {type !== "BAL" ? <>
             {materialCategories.map(category => {
               const rows = reviewRows.filter(row => row.category === category.id && !extras.has(row.id));
-              return rows.length ? <section key={category.id}><h3>{category.label}</h3><MaterialReview rows={rows} /></section> : null;
+              return rows.length ? <section key={category.id}>
+                <div className="hca-issuance-observation-heading">
+                  <h3>{category.label}</h3>
+                  <ActionButton compact variant="quiet" aria-label={`Editar materiais de ${category.label}`} onClick={() => onCategoryChange(category.id)}>Editar</ActionButton>
+                </div>
+                <MaterialReview rows={rows} />
+              </section> : null;
             })}
             <section aria-label="Itens extras">
-              <h3>Itens extras</h3>
+              <div className="hca-issuance-observation-heading">
+                <h3>Itens extras</h3>
+                <ActionButton compact variant="quiet" aria-label="Editar itens extras" onClick={() => onEditStage(2)}>Editar</ActionButton>
+              </div>
               {extras.size || pendingExtras.length ? <MaterialReview rows={[
                 ...reviewRows.filter(row => extras.has(row.id)),
                 ...pendingExtras.map(pendingExtraReviewRow),
@@ -553,7 +534,10 @@ export function SupplyWizardStep({
             ))}
           </ul>}
           {type !== "BAL" ? <section className="hca-document-summary">
-            <h3>Observações</h3>
+            <div className="hca-issuance-observation-heading">
+              <h3>Observações</h3>
+              <ActionButton compact variant="quiet" aria-label="Editar observações" onClick={() => onEditStage(3)}>Editar</ActionButton>
+            </div>
             <IssuanceObservationList observations={issuanceObservations(form).map(note => note.trim()).filter(Boolean)} />
           </section> : form.notes ? (
             <p className="whitespace-pre-wrap text-sm">{form.notes}</p>

@@ -1,5 +1,5 @@
 "use client";
-import type { ComponentProps } from "react";
+import { useEffect, useRef, type ComponentProps } from "react";
 import Link from "next/link";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
@@ -45,23 +45,34 @@ function DraftMaterials({ draft }: { draft: CreationDraft }) {
 /** One resume choice; exceptional concurrency/recovery retains its real controls. */
 export function SimpleDraftPanel({ statusInFooter = false, ...props }: ComponentProps<typeof CreationDraftPanel> & { statusInFooter?: boolean }) {
   const { draft, disabled = false, canResume = true, patientName } = props;
+  const { acknowledge, consumed } = draft;
+  const wizard = draft.kind !== "PROGRESS";
+  const acknowledgedRef = useRef<string | null>(null);
+  const completed = wizard && consumed ? `${consumed.id}:${consumed.revision}` : null;
+  const canAcknowledge = draft.active && !disabled && !draft.loading && !draft.busy && !draft.backgroundBusy && !draft.pending &&
+    !draft.error && !draft.loadError && !draft.conflict && !draft.readDenied && !draft.protectedReadPending;
+  useEffect(() => {
+    if (!completed || !canAcknowledge || acknowledgedRef.current === completed) return;
+    acknowledgedRef.current = completed;
+    void acknowledge();
+  }, [acknowledge, canAcknowledge, completed]);
+
   if (!draft.active) return null;
+  if (wizard && draft.busy && draft.pending?.action === "save" && !draft.error && !draft.conflict) return null;
+  if (wizard && draft.busy && draft.pending?.action === "acknowledge" && !draft.error && !draft.conflict) return null;
   if (draft.readDenied || draft.protectedReadPending || draft.loadError || draft.error || draft.pending || draft.conflict || draft.kind === "PROGRESS" && draft.consumed)
     return <CreationDraftPanel {...props} />;
-  if (draft.consumed) return <Dialog open title="Resultado anterior confirmado" closeDisabled onClose={() => {}}>
-    <p>O preenchimento anterior já foi concluído. Nenhuma nova confirmação foi enviada.</p>
-    <div className="hca-toolbar">{draft.consumed.consumedDocumentId ? <Link className="hca-control" href={"/fichas/" + draft.consumed.consumedDocumentId}>Ver ficha</Link> : null}<ActionButton disabled={draft.busy || disabled} onClick={() => void draft.acknowledge()}>Começar novo preenchimento</ActionButton></div>
-  </Dialog>;
+  if (completed) return null;
   const offered = draft.offered;
   if (offered?.state === "active") {
     const resume = props.resumeHref ? <Link className="hca-control" href={props.resumeHref}>Continuar rascunho</Link>
       : <ActionButton variant="primary" disabled={draft.busy || disabled || !canResume} onClick={() => draft.resume()}>
-        {props.resumeLabel ?? "Continuar rascunho"}{statusInFooter ? <Icon name="arrow" /> : null}
+        {props.resumeLabel ?? "Continuar rascunho"}{wizard ? <Icon name="arrow" /> : null}
       </ActionButton>;
     const discard = <ActionButton disabled={draft.busy || disabled} onClick={() => void draft.discard()}>
-      {statusInFooter ? <Icon name="trash" /> : null}{props.discardLabel ?? "Descartar e começar novamente"}
+      {wizard ? <Icon name="trash" /> : null}{props.discardLabel ?? "Descartar e começar novamente"}
     </ActionButton>;
-    if (statusInFooter) return <Dialog open title="Continuar seu rascunho?" kicker="Rascunho da ficha"
+    if (wizard) return <Dialog open title="Continuar seu rascunho?" kicker="Rascunho da ficha" popupClassName="hca-wizard-dialog"
       subtitle="Você tem um preenchimento salvo para este paciente." closeDisabled onClose={() => {}}
       keyboardScrollable footer={<>{discard}{resume}</>}>
       <div className="hca-form-stack">

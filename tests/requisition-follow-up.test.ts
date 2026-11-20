@@ -18,13 +18,13 @@ it("routes pending and partial fulfillment to the materials, independently of sc
 it("keeps full fulfillment distinct from required science and manual archiving", () => {
   const complete = { ...active, fulfilled: 2, completedAt: "2026-11-11T03:00:00Z" };
   const family = requisitionFollowUp({ ...complete, eligible: true });
-  expect(family).toMatchObject({ pending: true, section: "workflow" });
+  expect(family).toMatchObject({ pending: true, section: "overview" });
   expect(family.heading).toContain("minha ciência");
   expect(family.description).toContain("não substitui essa ciência");
   expect(requisitionFollowUp({ ...complete, designationPending: true }).heading).toContain("designação");
   expect(requisitionFollowUp(complete).heading).toBe("Acompanhar a ciência familiar");
   const satisfied = requisitionFollowUp({ ...complete, scienceSatisfied: true });
-  expect(satisfied).toMatchObject({ pending: false, section: "workflow" });
+  expect(satisfied).toMatchObject({ pending: false, section: "overview" });
   expect(satisfied.description).toContain("ciência dispensada não atribui confirmação");
 });
 it.each([
