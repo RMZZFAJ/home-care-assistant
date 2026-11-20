@@ -33,6 +33,7 @@ import { navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigati
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
+import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
 import { IssuanceObservationsEditor } from "@/components/forms/issuance-observations";
 import { materialCategories, supplyWizardCopy, supplyWizardStages, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { Dialog, StepNavigator } from "@/components/ui/primitives";
@@ -41,7 +42,6 @@ import { formatQuantity, quantity } from "@/lib/quantity";
 import { RequisitionExtras } from "./requisition-extra-items";
 
 import {
-  Identity,
   CatalogStep,
   Review,
   type Product,
@@ -595,6 +595,23 @@ function PatientRequisition({
       return <DocumentCatalogueEmpty patientId={context.patient!.id} patientName={context.patient!.display_name}
         mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0} />;
   }
+  const extraEditor = <RequisitionExtras showItems={step === 4} errors={fieldErrors}
+    items={form.extraItems} products={products} lines={form.lines} itemContext={itemContext}
+    updateLine={updateLine} removeLine={removeLine}
+    setItems={extraItems => {
+      setDraftTouched(true);
+      setForm(current => ({ ...current, extraItems }));
+    }}
+    adopt={(product, extra, details) => {
+      updateLine(product, {
+        currentStock: extra.currentStock,
+        stockObservation: extra.stockObservation,
+        stockObservationAt: extra.stockObservationAt,
+        urgent: extra.urgent,
+        catalogueExtra: details ? { details } : {},
+      });
+      setForm(current => ({ ...current, extraItems: current.extraItems.filter(item => item.id !== extra.id) }));
+    }} />;
   return (
     <div ref={fieldsRef} onChangeCapture={event => {
       if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);
@@ -746,10 +763,8 @@ function PatientRequisition({
             className="min-w-0"
           >
             {step === 0 ? <>
-              <Identity
-                name={context.patient!.display_name}
-                requesterName={context.fullName}
-              />
+              <SupplyWizardIdentity context={context} kind="REQ" />
+              <p className="hca-wizard-intro">Ao emitir, as contagens informadas atualizam o estoque da equipe. A requisição registra as necessidades de materiais.</p>
               <HouseholdListSelection ref={householdSelectionRef} key={context.userId + ":" + context.patient!.id}
                 userId={context.userId} patientId={context.patient!.id} kind="REQ"
                 catalogue={products} selectedIds={form.lines.map(line => line.productId)}
@@ -762,49 +777,11 @@ function PatientRequisition({
                 selected={form.lines}
                 onChange={category => setStep(materialCategories.findIndex(item => item.id === category) + 1)}
               />
-              <CatalogStep
-                key={currentCategory}
-                context={context}
-                items={categoryItems}
-                itemContext={itemContext}
-                selected={selected}
-                updateLine={updateLine}
-                removeLine={removeLine}
-                errors={fieldErrors}
-                selectedCount={form.lines.length}
-              />
             </> : null}
-            {currentCategory || step === 4 ? (
-              <RequisitionExtras
-                showItems={step === 4}
-                errors={fieldErrors}
-                items={form.extraItems}
-                setItems={extraItems => {
-                  setDraftTouched(true);
-                  setForm(current => ({ ...current, extraItems }));
-                }}
-                products={products}
-                lines={form.lines}
-                itemContext={itemContext}
-                updateLine={updateLine}
-                removeLine={removeLine}
-                adopt={(product, extra, details) => {
-                  updateLine(product, {
-                    currentStock: extra.currentStock,
-                    stockObservation: extra.stockObservation,
-                    stockObservationAt: extra.stockObservationAt,
-                    urgent: extra.urgent,
-                    catalogueExtra: details ? { details } : {},
-                  });
-                  setForm((current) => ({
-                    ...current,
-                    extraItems: current.extraItems.filter(
-                      (item) => item.id !== extra.id,
-                    ),
-                  }));
-                }}
-              />
-            ) : null}
+            {currentCategory ? <CatalogStep key={currentCategory} context={context} items={categoryItems}
+              itemContext={itemContext} selected={selected} updateLine={updateLine} removeLine={removeLine}
+              errors={fieldErrors} selectedCount={form.lines.length + form.extraItems.length} extras={extraEditor} /> : null}
+            {step === 4 ? extraEditor : null}
             {step === 5 ? (
               <IssuanceObservationsEditor
                 errors={fieldErrors}

@@ -159,8 +159,10 @@ test("L2 COM mantém o vínculo geral após desfazer importação e conserva a q
   await loginDecision(page, admin.email, f.patient);
   await page.goto(`/fichas/com?requisitionId=${req.id}`);
   const origin = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
+  await expect(page.getByLabel("Forma de aquisição", { exact: false })).toHaveCount(0);
   await expect(origin.getByRole("button", { name: code, exact: true })).toBeVisible();
   await expect(origin).toContainText("Materiais elegíveis trazidos");
+  await expect(origin.getByRole("button", { name: "Alterar", exact: true })).toHaveCount(1);
   await next(page);
   await selectMaterialCategory(page);
   await expect(material(page)).toBeChecked();
@@ -185,15 +187,23 @@ test("L2 COM mantém o vínculo geral após desfazer importação e conserva a q
   await selectMaterialCategory(page);
   await expect(material(page)).toBeChecked();
   await expect(count(page)).toHaveValue("3");
+  const menuTrigger = page.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true });
   async function openMaterialOrigin() {
-    await page.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true }).click();
+    await menuTrigger.click();
     await page.getByRole("menuitem", { name: "Vincular a uma ficha", exact: true }).click();
     return page.getByRole("dialog", { name: "Vincular este material", exact: true });
   }
+  await material(page).uncheck();
+  await expect(page.getByRole("button", { name: "Vincular a uma ficha", exact: true })).toHaveCount(0);
   const itemOrigin = await openMaterialOrigin();
   await itemOrigin.getByRole("checkbox", { name: "Vincular " + code, exact: true }).check();
+  await expect(itemOrigin.getByRole("checkbox", { name: /Importar materiais/ })).toHaveCount(0);
   await itemOrigin.getByRole("button", { name: "Aplicar vínculos" }).click();
+  await expect(menuTrigger).toBeFocused();
+  await expect(material(page)).toBeChecked();
   await expect(material(page)).toHaveAccessibleName(/Vinculado à REQ/);
+  await expect(count(page)).toHaveValue("");
+  await count(page).fill("3");
   await expect(count(page)).toHaveValue("3");
   const removeItemOrigin = await openMaterialOrigin();
   await removeItemOrigin.getByRole("checkbox", { name: "Vincular " + code, exact: true }).uncheck();
@@ -205,6 +215,8 @@ test("L2 COM mantém o vínculo geral após desfazer importação e conserva a q
   const response = await pending;
   expect(response.ok(), await response.text()).toBe(true);
   const result = (await response.json()).data;
+  expect(result.payload.acquisitionMode).toBe("planned");
+  expect(result.payload.origin).toBeUndefined();
   expect(result.originDocuments).toMatchObject([{ documentId: req.id, general: true, productIds: [] }]);
   expect(result.lines[0].requisitionItemIds).toEqual([]);
 });

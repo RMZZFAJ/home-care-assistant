@@ -8,7 +8,7 @@ export function MaterialReview({ rows }: {
   return (
     <ul className="hca-material-review">
       {rows.map(row => (
-        <li key={row.id}>
+        <li key={row.id} data-urgent={row.urgent || undefined}>
           <div className="hca-material-review-main">
             <strong>{row.name}</strong>
             {row.details}

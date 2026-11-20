@@ -176,7 +176,8 @@ export function PatientSupplyWizard({
   });
   const [links, setLinks] = useState<Record<string, string[]>>({});
   const [sourceSetup, setSourceSetup] = useState<SupplySourcePreparation>(emptySupplySources);
-  const [sourcePicker, setSourcePicker] = useState<{ product?: CatalogProduct } | null>(null);
+  const [sourcePicker, setSourcePicker] = useState<{ product?: CatalogProduct; returnFocus: () => HTMLButtonElement | null } | null>(null);
+  const sourceTriggerRef = useRef<HTMLButtonElement>(null);
   const sourceDefaultsRef = useRef<ReturnType<typeof prepareSupplySources> | null>(null);
   const [requestOptions, setRequestOptions] = useState<ItemContext[]>([]);
   const effectiveSourceSetup = includeSavedRequisitionSources(sourceSetup, links, requestOptions);
@@ -256,6 +257,8 @@ export function PatientSupplyWizard({
     "",
     readSources,
   );
+  const generalSourceOptions = (currentSources.data?.data ?? []).filter(option =>
+    sources.some(row => row.documentId === option.id && row.general));
   const presentations = useScopedRead<PresentationsRead>(
     type !== "BAL"
       ? `/api/catalog/presentations?careRecipientId=${patientId}`
@@ -485,8 +488,16 @@ export function PatientSupplyWizard({
       return { ...next, observationTimes: times };
     });
   }
+  function closeSourcePicker() {
+    const returnFocus = sourcePicker?.returnFocus;
+    setSourcePicker(null);
+    if (returnFocus) requestAnimationFrame(() => returnFocus()?.focus({ preventScroll: true }));
+  }
   function applySources(selection: SupplySourceSelection[]) {
-    const result = prepareSupplySources(effectiveSourceSetup, selection, form.quantities, links, requestOptions, sourcePicker?.product?.id);
+    const productId = sourcePicker?.product?.id;
+    const quantities = productId && selection.length && !Object.hasOwn(form.quantities, productId)
+      ? { ...form.quantities, [productId]: "" } : form.quantities;
+    const result = prepareSupplySources(effectiveSourceSetup, selection, quantities, links, requestOptions, productId);
     setForm((current) => {
       const next = { ...current, quantities: result.quantities };
       if (type !== "ENT") return next;
@@ -503,7 +514,7 @@ export function PatientSupplyWizard({
     });
     setLinks(result.links);
     setSourceSetup(result.preparation);
-    setSourcePicker(null);
+    closeSourcePicker();
     setDraftTouched(true);
   }
   useEffect(() => {
@@ -1049,12 +1060,8 @@ export function PatientSupplyWizard({
       });
     }
   }
-  async function persist(draft: boolean) {
+  async function persist() {
     if (busy || privateDraft.backgroundBusy) return;
-    if (draft && !frozenRef.current) {
-      await privateDraft.save(privateContent);
-      return;
-    }
     if (
       !frozenRef.current &&
       (privateDraft.blocked || missingBalanceMaterials.length)
@@ -1140,7 +1147,7 @@ export function PatientSupplyWizard({
         payload,
         key: crypto.randomUUID(),
         submissionKey: crypto.randomUUID(),
-        draft,
+        draft: false,
         expectedVersion: editing?.version,
         ...(privateCommit || privateDraft.draftCommit
           ? {
@@ -1505,7 +1512,7 @@ export function PatientSupplyWizard({
         <SimpleDraftPanel
           draft={privateDraft}
           current={privateContent}
-          statusInFooter={!isBalance && !loadError && !loading}
+          statusInFooter={!loadError && !loading}
           resumeHref={resumeHref}
           patientName={context.patient!.display_name}
           disabled={busy || uncertain || loading}
@@ -1652,17 +1659,20 @@ export function PatientSupplyWizard({
                       <div className="hca-source-summary">
                         <span className="hca-source-symbol"><Icon name="link" /></span>
                         <div>
-                          <strong>{sources.some((row) => row.general) ? "Origens vinculadas" : sources.length ? "Vínculos por material" : "Ficha independente"}</strong>
+                          {generalSourceOptions.length ? <div className="hca-source-summary-links">
+                            {generalSourceOptions.map(option => <RelatedDocument key={option.id} id={option.id} type={option.type} label={option.code} compact />)}
+                          </div> : <strong>{sources.some(row => row.general) ? "Origens vinculadas" : sources.length ? "Vínculos por material" : "Ficha independente"}</strong>}
                           <small>{sources.some((row) => row.productIds.some((productId) => sourceSetup.sourceImports[row.documentId]?.includes(productId)))
                             ? "Materiais elegíveis trazidos das fichas de origem."
                             : sources.length ? "Vínculo registrado sem importar materiais." : "Vincule uma origem se ela fizer parte deste registro."}</small>
                         </div>
-                        <ActionButton compact variant="quiet" onClick={() => setSourcePicker({})} disabled={currentSources.loading || type === "ENT" && form.source !== "FAMILY"}>
+                        <ActionButton ref={sourceTriggerRef} compact variant="quiet"
+                          onClick={() => setSourcePicker({ returnFocus: () => sourceTriggerRef.current })}
+                          disabled={currentSources.loading || type === "ENT" && form.source !== "FAMILY"}>
+                          <Icon name={sources.some(row => row.general) ? "edit" : "link"} />
                           {sources.some((row) => row.general) ? "Alterar" : "Vincular"}
                         </ActionButton>
                       </div>
-                      {currentSources.data?.data.filter((option) => sources.some((row) => row.documentId === option.id && row.general))
-                        .map((option) => <RelatedDocument key={option.id} id={option.id} type={option.type} label={option.code} />)}
                       {sources.length > (currentSources.data?.data.length ?? 0) && !currentSources.loading
                         ? <p className="hca-field-help">Uma origem está indisponível. Confira a seleção antes de emitir.</p> : null}
                       {fieldErrors.sources ? <Notice error>{fieldErrors.sources}</Notice> : null}
@@ -1671,7 +1681,8 @@ export function PatientSupplyWizard({
                       ) : null}
                     </section>
                   ) : undefined}
-                  openMaterialSources={linkedTarget && form.source === "FAMILY" && !currentSources.loading ? (product) => setSourcePicker({ product }) : undefined}
+                  openMaterialSources={linkedTarget && form.source === "FAMILY" && !currentSources.loading
+                    ? (product, returnFocus) => setSourcePicker({ product, returnFocus }) : undefined}
                   onScannedMaterial={product => {
                     setError("");
                     setMessage("");
@@ -1729,7 +1740,7 @@ export function PatientSupplyWizard({
                     return link && (sourcePicker.product ? link.productIds.includes(sourcePicker.product.id) : link.general)
                       ? [{ option, importMaterials: Boolean(sourceSetup.sourceImports[option.id]?.length) }] : [];
                   })}
-                  onClose={() => setSourcePicker(null)}
+                  onClose={closeSourcePicker}
                   onApply={applySources}
                 /> : null}
               </fieldset>
@@ -1764,6 +1775,7 @@ export function PatientSupplyWizard({
                 draftBusy={privateDraft.backgroundBusy}
                 supply={type === "BAL" ? undefined : { kind: type, draft: privateDraft, current: privateContent,
                   hasEdits: draftTouched, exitHref: exitDocumentId ? "/fichas/" + encodeURIComponent(exitDocumentId) : "/fichas" }}
+                draftStatus={isBalance ? { draft: privateDraft, current: privateContent, hasEdits: draftTouched } : undefined}
                 uncertain={uncertain}
                 blocked={
                   (!(step === 0 && legacyOpeningKey) &&
@@ -1777,12 +1789,11 @@ export function PatientSupplyWizard({
                   openStage(stage - 1);
                   setError("");
                 }}
-                onDraft={isBalance ? () => void persist(true) : undefined}
                 onNext={next}
-                onFinish={() => { if (!issuanceFailure.reopen()) void persist(false); }}
+                onFinish={() => { if (!issuanceFailure.reopen()) void persist(); }}
               />
               <DocumentIssuanceFailure state={issuanceFailure} purchase={type === "COM"}
-                operation={type === "COM" ? "Emissão de ficha de compras" : "Expedição de entrega"} onRetry={() => persist(false)} />
+                operation={type === "COM" ? "Emissão de ficha de compras" : "Expedição de entrega"} onRetry={persist} />
             </section>
           )}
         </>

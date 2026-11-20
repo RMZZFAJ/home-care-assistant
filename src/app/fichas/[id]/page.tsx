@@ -3,10 +3,11 @@ import { AuthenticatedPage } from "@/components/authenticated-page";
 import { DocumentViewer } from "@/components/documents/document-viewer";
 import { demoDocuments } from "@/lib/demo-documents";
 import { DemoDocument } from "@/components/documents/demo-document";
+import { PageLoadingActivity } from "@/components/ui/operation-activity";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   return (
-    <Suspense fallback={<p role="status">Carregando ficha…</p>}>
+    <Suspense fallback={<PageLoadingActivity title="Consultando a ficha" />}>
       <Detail params={params} />
     </Suspense>
   );

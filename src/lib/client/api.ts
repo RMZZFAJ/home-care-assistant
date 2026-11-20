@@ -55,6 +55,7 @@ export async function api<T>(
   payload?: unknown,
   signal?: AbortSignal,
   method?: string,
+  { timeoutMs = 30_000 }: { timeoutMs?: number } = {},
 ): Promise<T> {
   const requestMethod = method?.toUpperCase() ?? (payload === undefined ? "GET" : "POST");
   const requestKind: RequestKind = ["GET", "HEAD", "OPTIONS"].includes(requestMethod) ? "read" : "command";
@@ -63,7 +64,7 @@ export async function api<T>(
   const cancel = () => controller.abort();
   if (signal?.aborted) controller.abort();
   signal?.addEventListener("abort", cancel, { once: true });
-  const timeout = setTimeout(cancel, 30_000);
+  const timeout = setTimeout(cancel, timeoutMs);
   try {
     const response = await fetch(url, {
       cache: "no-store",

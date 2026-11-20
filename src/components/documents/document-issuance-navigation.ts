@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useSyncExternalStore, useTransition } from "react";
 import { z } from "zod";
 
@@ -48,4 +48,11 @@ export function useIssuanceOpeningActivity(id: string | undefined, userId: strin
   const result = useSyncExternalStore(subscribe, () => pending, () => null);
   if (result && result.id === id && result.userId === userId && result.patientId === patientId) return openingActivity;
   return null;
+}
+
+/** Route fallbacks can appear before the workspace has authorized the destination. */
+export function useIssuanceRouteActivity() {
+  const pathname = usePathname();
+  const result = useSyncExternalStore(subscribe, () => pending, () => null);
+  return result && pathname === `/fichas/${result.id}` ? openingActivity : null;
 }

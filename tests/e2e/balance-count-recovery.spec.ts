@@ -72,9 +72,14 @@ test("BAL review keeps physical fields after an invalid read and uses its own au
     return route.fulfill({ response, json: body });
   });
   for (let index = 0; index < f.products.length; index++) {
-    await page.getByLabel(`Material fictício V4 ${index} · unidade`, { exact: true }).fill(index ? "0" : "2");
+    const count = page.getByLabel(`Material fictício V4 ${index} · unidade`, { exact: true });
+    await count.fill(index ? "0" : "2");
+    await expect(count).toHaveValue(index ? "0" : "2");
   }
   await page.getByLabel("Observações da contagem", { exact: true }).fill("Conferência física preservada durante falha de leitura");
+  const footer = page.locator(".hca-supply-wizard-footer");
+  await expect(footer.getByRole("button", { name: "Salvar rascunho", exact: true })).toHaveCount(0);
+  await expect(footer.getByRole("status")).toHaveText("Último rascunho salvo.");
   for (const invalid of ["invalid", "foreign"] as const) {
     mode = invalid;
     await button(page, "Revisar").click();

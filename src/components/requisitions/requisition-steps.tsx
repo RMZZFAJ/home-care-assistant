@@ -1,5 +1,5 @@
 "use client";
-import { useId, useState } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { Dialog } from "@/components/ui/primitives";
 import { RelatedDocument } from "@/components/documents/related-document";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -38,29 +38,6 @@ export type Product = {
   selectionPredecessors?: { id: string; name: string; unit: string }[];
 };
 
-export function Identity({
-  name,
-  requesterName,
-}: {
-  name: string;
-  requesterName: string;
-}) {
-  return (
-    <div className="space-y-4">
-      <p className="text-sm">
-        Paciente: <strong>{name}</strong>
-      </p>
-      <p className="text-sm">
-        Solicitante: <strong>{requesterName}</strong>
-      </p>
-      <Notice>
-        Marque os produtos necessários e informe o estoque observado com a
-        equipe. Ao emitir, as contagens informadas atualizam o estoque da equipe.
-        A requisição registra necessidades sem quantidade solicitada.
-      </Notice>
-    </div>
-  );
-}
 export function CatalogStep({
   context,
   items,
@@ -70,6 +47,7 @@ export function CatalogStep({
   removeLine,
   errors,
   selectedCount,
+  extras,
 }: {
   context: WorkspaceContext;
   items: Product[];
@@ -79,6 +57,7 @@ export function CatalogStep({
   removeLine: (id: string) => void;
   errors: Record<string, string>;
   selectedCount: number;
+  extras: ReactNode;
 }) {
   const materialGroupId = useId();
   const [search, setSearch] = useState("");
@@ -96,7 +75,16 @@ export function CatalogStep({
       <Dialog
         open={Boolean(duplicate)}
         title="Este produto já está em uma requisição pendente"
+        kicker="Requisição"
+        headingIcon="alert"
         onClose={() => setDuplicate(null)}
+        footer={<>
+          <ActionButton onClick={() => setDuplicate(null)}>Não incluir o item</ActionButton>
+          <ActionButton variant="primary" disabled={repeatReason.trim().length < 3} onClick={() => {
+            if (duplicate) updateLine(duplicate, { repeatReason: repeatReason.trim() });
+            setDuplicate(null);
+          }}>Manter nova requisição</ActionButton>
+        </>}
       >
         <p className="text-sm">
           Confira a necessidade anterior antes de reiterar {duplicate?.name}. A
@@ -130,27 +118,6 @@ export function CatalogStep({
             onChange={(event) => setRepeatReason(event.target.value)}
           />
         </label>
-        <div className="ui-form-actions">
-          <button
-            type="button"
-            className="ui-button ui-button-secondary"
-            onClick={() => setDuplicate(null)}
-          >
-            Não incluir o item
-          </button>
-          <button
-            type="button"
-            className="ui-button ui-button-primary"
-            disabled={repeatReason.trim().length < 3}
-            onClick={() => {
-              if (duplicate)
-                updateLine(duplicate, { repeatReason: repeatReason.trim() });
-              setDuplicate(null);
-            }}
-          >
-            Manter nova requisição
-          </button>
-        </div>
       </Dialog>
       <label className="block text-sm font-semibold">
         Buscar produto
@@ -161,22 +128,17 @@ export function CatalogStep({
           placeholder="Nome ou nome alternativo"
         />
       </label>
-      <p
-        role="status"
-        aria-label="Resultado da busca e seleção de materiais"
-        className="text-sm"
-      >
-        {visible.length}{" "}
-        {visible.length === 1 ? "material encontrado" : "materiais encontrados"}
-        . {selectedCount}{" "}
-        {selectedCount === 1
-          ? "material selecionado"
-          : "materiais selecionados"}
-        .
-      </p>
+      <div className="hca-wizard-material-toolbar">
+        <p role="status" aria-label="Resultado da busca e seleção de materiais">
+          {search.trim() ? `${visible.length} ${visible.length === 1 ? "material encontrado" : "materiais encontrados"} · ` : ""}
+          {selectedCount} {selectedCount === 1 ? "material selecionado" : "materiais selecionados"}
+        </p>
+        {extras}
+      </div>
       {!visible.length ? (
         <Notice>Nenhum produto encontrado nesta categoria.</Notice>
       ) : null}
+      <div className="hca-wizard-material-list">
       {visible.map((item) => {
         const line = selected(item.id);
         const info = itemContext.find((entry) => entry.productId === item.id);
@@ -185,6 +147,7 @@ export function CatalogStep({
           <MaterialChoice
             key={item.id}
             selected={Boolean(line)}
+            urgent={line?.urgent}
             className="ui-product-choice hca-wizard-material"
           >
             <div className="hca-wizard-material-head">
@@ -264,6 +227,7 @@ export function CatalogStep({
           </MaterialChoice>
         );
       })}
+      </div>
     </div>
   );
 }
@@ -307,7 +271,7 @@ export function Review({
   const extras = form.extraItems.filter((item) => item.name.trim());
   const catalogueRow = (item: RequisitionLine) => ({
     id: item.productId, name: item.productName, urgent: item.urgent,
-    consult: <MaterialConsultButton context={context} material={{ id: item.productId, name: item.productName, unit: item.unit }} />,
+    consult: <MaterialConsultButton context={context} material={{ id: item.productId, name: item.productName, unit: item.unit }} menu />,
     details: <>
       {item.catalogueExtra ? <small>Material do catálogo · {item.unit}</small> : null}
       <small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation, item.unit)}</small>
@@ -319,10 +283,13 @@ export function Review({
   return (
     <div className="space-y-6" style={{ overflowWrap: "anywhere" }}>
       <DefinitionGrid items={[{ label: "Solicitante", value: requesterName }, { label: "Pessoa assistida", value: recipientName }]} />
-      <section className="hca-document-summary">
-        <h3>Itens do catálogo</h3>
-        <MaterialReview rows={lines.filter(item => !item.catalogueExtra).map(catalogueRow)} />
-      </section>
+      {materialCategories.map(category => {
+        const group = lines.filter(item => item.category === category.id && !item.catalogueExtra);
+        return group.length ? <section key={category.id} className="hca-document-summary">
+          <h3>{category.label}</h3>
+          <MaterialReview rows={group.map(catalogueRow)} />
+        </section> : null;
+      })}
       <section className="hca-document-summary">
         <h3>Itens extras</h3>
         <MaterialReview rows={[...lines.filter(item => item.catalogueExtra).map(catalogueRow), ...extras.map(item => ({

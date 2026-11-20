@@ -63,11 +63,12 @@ function SupplyWizardExit({ supply, disabled }: { supply: SupplyActions; disable
   </>;
 }
 
-export function WizardActions({ step, total, saving, draftBusy = false, uncertain, blocked = false, finishLabel = "Confirmar e concluir", onBack, onDraft, onNext, onFinish, supply }: {
+export function WizardActions({ step, total, saving, draftBusy = false, uncertain, blocked = false, finishLabel = "Confirmar e concluir", onBack, onNext, onFinish, supply, draftStatus }: {
   step: number; total: number; saving: boolean; draftBusy?: boolean; uncertain: boolean; blocked?: boolean;
-  onBack: () => void; onDraft?: () => void; onNext: () => void; onFinish: () => void;
+  onBack: () => void; onNext: () => void; onFinish: () => void;
   finishLabel?: string;
   supply?: SupplyActions;
+  draftStatus?: DraftStatus;
 }) {
   const back = supply && step === 0 ? <SupplyWizardExit supply={supply} disabled={saving || uncertain} />
     : <ActionButton variant={supply ? "quiet" : undefined} disabled={step === 0 || saving || uncertain} onClick={onBack}>
@@ -86,6 +87,5 @@ export function WizardActions({ step, total, saving, draftBusy = false, uncertai
         {saving ? "Registrando…" : uncertain ? "Recuperar esta tentativa" : finish}
       </ActionButton>
     );
-  return supply ? <SupplyWizardFooter back={back} status={uncertain ? undefined : supply}>{mainAction}</SupplyWizardFooter>
-    : <div className="hca-wizard-actions">{back}<div>{onDraft && <ActionButton disabled={saving || draftBusy || uncertain} onClick={onDraft}>Salvar rascunho</ActionButton>}{mainAction}</div></div>;
+  return <SupplyWizardFooter back={back} status={uncertain ? undefined : supply ?? draftStatus}>{mainAction}</SupplyWizardFooter>;
 }

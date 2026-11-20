@@ -536,6 +536,7 @@ function ScheduledCount({
     return products.length > 0;
   }
   function changeCount(id: string, value: string) {
+    setDraftTouched(true);
     setCounts((current) => ({ ...current, [id]: value }));
     setObservationTimes((current) => ({
       ...current,
@@ -592,12 +593,8 @@ function ScheduledCount({
       setBusy(false);
     }
   }
-  async function save(draft: boolean) {
+  async function save() {
     if (cacheError || !sourceReady) return;
-    if (draft && !pendingRef.current) {
-      await privateDraft.save(balanceContent);
-      return;
-    }
     if (
       !pendingRef.current &&
       (privateDraft.blocked || missingMaterials.length)
@@ -639,7 +636,7 @@ function ScheduledCount({
               submissionKey: crypto.randomUUID(),
               expectedVersion: editing.version,
               recount: assignment.kind === "recount",
-              submit: !draft,
+              submit: true,
             }
             : {
               ...commit,
@@ -647,9 +644,9 @@ function ScheduledCount({
               type: "BAL",
               payload,
               idempotencyKey: crypto.randomUUID(),
-              draft,
+              draft: false,
             },
-          draft,
+          draft: false,
         },
         {
           userId: context.userId,
@@ -926,6 +923,7 @@ function ScheduledCount({
     <SimpleDraftPanel
       draft={privateDraft}
       current={balanceContent}
+      statusInFooter={initial.eligibility.available && !cacheError}
       patientName={context.patient!.display_name}
       disabled={busy || uncertain || Boolean(cacheError)}
     />
@@ -964,7 +962,7 @@ function ScheduledCount({
     validQuantity(counts[p.id] ?? "", p.quantity_decimals ?? 0, true),
   ).length;
   return (
-    <div className="hca-form-stack" onChangeCapture={() => setDraftTouched(true)}>
+    <div className="hca-form-stack">
       {draftPanel}
       {referencePanel}
       {previousPanel}
@@ -1067,7 +1065,7 @@ function ScheduledCount({
               errors={fieldErrors}
               notes={notes}
               onCount={changeCount}
-              onNotes={setNotes}
+              onNotes={value => { setNotes(value); setDraftTouched(true); }}
             />
           </>
         ) : (
@@ -1109,6 +1107,8 @@ function ScheduledCount({
           saving={
             busy || privateDraft.busy || (privateDraft.blocked && !uncertain)
           }
+          draftBusy={privateDraft.backgroundBusy}
+          draftStatus={{ draft: privateDraft, current: balanceContent, hasEdits: draftTouched }}
           uncertain={uncertain}
           blocked={
             !eligible ||
@@ -1119,9 +1119,8 @@ function ScheduledCount({
             Boolean(cacheError)
           }
           onBack={() => setStep(0)}
-          onDraft={() => void save(true)}
           onNext={() => void review()}
-          onFinish={() => void save(false)}
+          onFinish={() => void save()}
           finishLabel={
             assignment?.kind === "recount"
               ? "Confirmar reconto"
@@ -1133,7 +1132,7 @@ function ScheduledCount({
         <ActionButton
           disabled={busy || Boolean(cacheError)}
           variant="primary"
-          onClick={() => void save(false)}
+          onClick={() => void save()}
         >
           Recuperar a mesma tentativa
         </ActionButton>

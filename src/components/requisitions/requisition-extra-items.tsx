@@ -63,7 +63,7 @@ export function RequisitionExtras({ items, setItems, products, lines, itemContex
         })}
       </ul> : <p className="hca-issuance-observation-empty"><Icon name="stock" />Nenhum item extra incluído.</p>}
     </> : null}
-    <ActionButton onClick={() => setEditor({
+    <ActionButton variant={showItems ? "secondary" : "quiet"} compact={!showItems} onClick={() => setEditor({
       kind: "unlisted",
       item: { id: `extra-${crypto.randomUUID()}`, name: "", currentStock: null, stockObservation: "unknown", urgent: false },
       isNew: true,

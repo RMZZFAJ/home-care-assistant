@@ -66,11 +66,14 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await expect(help).toBeFocused();
   await expect(page.getByRole("button", { name: "Sair por agora", exact: true })).toBeVisible();
   const lists = page.getByRole("region", { name: "Seleção de materiais", exact: true });
+  await expect(page.getByRole("button", { name: /^Usar listas frequentes/ })).toHaveCount(1);
+  await expect(page.locator(".hca-wizard-identity")).toContainText("Preenchido pelo sistema");
   await expect(page.getByText("Minhas listas pessoais", { exact: true })).toBeHidden();
   await lists.getByRole("button", { name: /^Usar listas frequentes/ }).click();
   await expect(lists.getByText("Minhas listas pessoais", { exact: true })).toBeVisible();
   await lists.getByRole("button", { name: /^Selecionar manualmente/ }).click();
   await expect(page.getByText("Minhas listas pessoais", { exact: true })).toBeHidden();
+  await info.attach("Confirmação da REQ no celular", { body: await page.screenshot(), contentType: "image/png" });
   await next(page);
   await page.getByRole("button", { name: "Item extra", exact: true }).click();
   const extra = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
@@ -173,6 +176,15 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
     await route.continue();
   });
   const opening = page.waitForRequest(request => /\/api\/requisitions\/[^/]+\/opening$/.test(new URL(request.url()).pathname), { timeout: 65_000 });
+  await page.evaluate(() => {
+    let sawDynamic = false;
+    const observer = new MutationObserver(() => {
+      if (document.querySelector(".hca-activity-overlay .activity-dynamic")) sawDynamic = true;
+      if (sawDynamic && document.querySelector(".hca-activity-overlay .activity-card:not(.activity-dynamic)"))
+        document.documentElement.dataset.issuanceShowedSimpleActivity = "true";
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+  });
   try {
     await confirm.click();
     await opening;
@@ -183,6 +195,7 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   }
   const issued = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
   await expect(issued).toBeVisible({ timeout: 65_000 });
+  expect(await page.locator("html").getAttribute("data-issuance-showed-simple-activity")).toBeNull();
   await page.setViewportSize(info.project.name === "mobile" ? { width: 320, height: 720 } : { width: 390, height: 844 });
   const heading = page.locator("[data-document-heading]");
   await expect(heading).toBeVisible();

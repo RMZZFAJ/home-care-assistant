@@ -48,7 +48,7 @@ export function SupplyExtraItems({ items, catalogue, selected, inExtras, onChang
         </div>
       </li>)}
     </ul> : null}
-    <ActionButton onClick={() => setEditor({})}><Icon name="plus" />{inExtras ? "Adicionar item extra" : "Item extra"}</ActionButton>
+    <ActionButton variant={inExtras ? "secondary" : "quiet"} compact={!inExtras} onClick={() => setEditor({})}><Icon name="plus" />{inExtras ? "Adicionar item extra" : "Item extra"}</ActionButton>
     {editor ? <SupplyExtraEditor item={editor.item} catalogue={catalogue} selected={selected}
       atLimit={items.length >= 20} onClose={() => setEditor(null)}
       onChoose={(product, quantity) => {

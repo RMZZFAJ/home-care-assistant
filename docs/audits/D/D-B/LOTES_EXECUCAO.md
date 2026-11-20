@@ -189,8 +189,9 @@ REQ, COM, ENT e DEV usam o mesmo rodapé para navegação e estado do último
 rascunho. A indicação distingue a gravação em curso da confirmação do
 conteúdo e da etapa pelo servidor. Retomada, conflito e recuperação continuam com
 os diálogos próprios. O erro de Observações da REQ permanece junto do campo
-focado. O produto conserva a ação explícita Salvar rascunho em REQ, COM e
-ENT no rodapé.
+focado. O rodapé normal exibe o estado da gravação automática. A ação de
+salvar e fechar pertence ao diálogo de saída. Resultados incertos usam os
+controles específicos de recuperação.
 
 O cabeçalho das novas fichas REQ, COM, ENT e DEV segue a v7 com caminho
 Fichas, identificação do paciente, título, descrição e ajuda sobre a ficha.
@@ -519,6 +520,50 @@ apareceu no painel do material e o PDF foi gerado. A primeira rodada no
 Android também confirmou a recuperação e o crédito único. A última
 rodada no Android parou na emissão inicial. O PostgreSQL local registrou
 um timeout da instrução antes da simulação da perda de resposta.
+
+### Revisão dos wizards após o retorno do responsável
+
+A comparação em celular usou E04-01, E05-01, E06-01 e E06-16. A identidade
+da confirmação, a lista contínua, os controles na linha do material, o menu
+de três pontos e o estado do rascunho no rodapé seguem essa composição. A
+REQ separa a urgência da inclusão, destaca a linha urgente e agrupa a
+revisão por tipo. A avaliação da necessidade em ENT permanece junto do
+material. A consulta de detalhes fica no menu também durante a revisão.
+
+A REQ abre listas frequentes por um único controle na confirmação. As
+listas pessoais ficam nesse contexto como recurso adicional do produto.
+COM e ENT mantêm um seletor de origem geral na confirmação. O menu do
+material pode abrir o vínculo daquela linha sem importar os demais itens.
+A COM usa o planejamento neutro. Compra ou doação é registrada quando a
+família adquire ou recebe os materiais.
+
+O BAL compartilha o estado da gravação automática no rodapé. Na abertura
+da ficha emitida, os estados intermediários de sessão e rota usam o mesmo
+carregamento da emissão. O diálogo de reiteração da REQ passa a usar o
+rodapé padrão com as ações de confirmar e voltar.
+
+Em Android emulado, a REQ manteve o indicador por etapas durante a leitura
+retida da ficha. O PDF terminou de assinar cerca de 34 segundos após a
+reserva, depois do prazo geral de 30 segundos da chamada no navegador. A
+geração inicial agora aguarda o prazo próprio do endpoint. As demais
+consultas continuam usando o prazo padrão.
+
+O reteste da REQ passou em Android e iOS emulados, incluindo a emissão, o
+carregamento durante a abertura e o download do PDF assinado. O caso do BAL
+confirmou a gravação automática pelo rodapé e a revisão no iOS. No Android,
+o PostgreSQL interrompeu a preparação do BAL. A COM confirmou o vínculo
+geral e o vínculo por material no primeiro Android e no iOS do reteste.
+O reteste Android chegou à emissão e recebeu indisponibilidade do banco.
+
+Complementos do produto nesta revisão incluem busca para catálogos reais,
+descrições de saldo e vínculo, alternativas do catálogo e recuperação do
+rascunho em falha ou conflito. O bloco de identidade usa paciente, autor e
+vínculo autenticados. A referência de consulta da DEV permanece associada
+ao saldo e às pessoas verificados no servidor.
+
+Permanecem em revisão visual as variantes de modais de operação, a abertura
+da escolha de recebedor da ENT e os estados de retomada nas fichas. Nenhuma
+migration neste ajuste.
 
 ### Decisões e dúvidas de L2
 

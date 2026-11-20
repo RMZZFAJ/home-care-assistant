@@ -3,6 +3,7 @@
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
 import { materialCategories, supplyWizardCopy, supplyWizardNextLabels, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
+import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
 import { pendingExtraDispatchMessage, pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
 import { MaterialReview } from "./material-review";
 import { IssuanceObservationsEditor, IssuanceObservationList } from "@/components/forms/issuance-observations";
@@ -1113,8 +1114,7 @@ function TransferDeclarationEditor({
               <form className="grid gap-4" onSubmit={prepare}>
                 {step === 0 ? <>
                 <h3>Confirme os dados da {isReturn ? "devolução" : "entrega"}</h3>
-                <p><strong>Paciente</strong> · {context.patient?.display_name}</p>
-                <p><strong>Expedidor</strong> · {context.fullName}</p>
+                <SupplyWizardIdentity context={context} kind={isReturn ? "DEV" : "ENT"} />
                 <FormField label="Recebedor físico designado" required>
                   <SelectField
                     required
@@ -1251,7 +1251,7 @@ function TransferDeclarationEditor({
                   <TextInput type="search" value={query} onChange={event => setQuery(event.currentTarget.value)}
                     placeholder="Nome do material" />
                 </FormField> : null}
-                {isReturn && step === 1 ? <div className="space-y-3">
+                {isReturn && step === 1 ? <div className="hca-wizard-material-list">
                   {returnProducts.map(product => {
                     const line = linesByProduct.get(product.id);
                     const available = quantity(product.available).gt(0);

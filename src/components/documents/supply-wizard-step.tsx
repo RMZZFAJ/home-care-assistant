@@ -1,4 +1,5 @@
 "use client";
+import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
@@ -110,7 +111,7 @@ export function SupplyWizardStep({
   people: PatientPerson[];
   links: Record<string, string[]>;
   sourceSection?: ReactNode;
-  openMaterialSources?: (product: CatalogProduct) => void;
+  openMaterialSources?: (product: CatalogProduct, returnFocus: () => HTMLButtonElement | null) => void;
   onScannedMaterial: (product: CatalogProduct) => void;
   recipientContext: DeliveryPreparation | null;
   recipientComparison: DeliveryPreparation | null;
@@ -192,7 +193,7 @@ export function SupplyWizardStep({
   }
   const reviewRows = step === 5 && type !== "BAL" ? selected.map(product => ({
     id: product.id, name: product.name, category: product.category,
-    consult: <MaterialConsultButton context={context} material={product} />,
+    consult: <MaterialConsultButton context={context} material={product} menu />,
     details: <><small>{form.quantities[product.id] ? formatQuantity(form.quantities[product.id], product.unit) : "Quantidade pendente"}</small>{form.presentationSelections?.[product.id]?.map(row => <small key={row.id}>{presentationCaption(row)}</small>)}
       {links[product.id]?.length ? <small>{links[product.id].length} {links[product.id].length === 1 ? "necessidade vinculada" : "necessidades vinculadas"}</small> : null}
       {assessesDelivery && links[product.id]?.length ? <small>
@@ -231,7 +232,8 @@ export function SupplyWizardStep({
     <>
       {step === 0 ? (
         <>
-          <p className="text-sm leading-6 text-(--muted)">
+          {type !== "BAL" ? <SupplyWizardIdentity context={context} kind={type} /> : null}
+          <p className="hca-wizard-intro">
             {type === "COM"
               ? "Organize os materiais a adquirir. A família registra a compra ou a doação quando ela acontecer."
               : type === "ENT"
@@ -241,7 +243,7 @@ export function SupplyWizardStep({
           {type === "ENT" ? (
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm font-semibold">
-                Origem
+                Origem do estoque
                 <select
                   className={inputClass}
                   value={form.source}
@@ -288,10 +290,6 @@ export function SupplyWizardStep({
         <>
           {category && type !== "BAL" ? <>
             <WizardMaterialCategories category={category} selected={selected.filter(item => !extras.has(item.id))} onChange={onCategoryChange} />
-            <div className="hca-toolbar"><ActionButton ref={barcodeTriggerRef} compact variant="quiet"
-              onClick={() => setBarcodeOpen(true)}><Icon name="camera" />Ler código</ActionButton>
-              {extraControl}
-            </div>
           </> : null}
           {isExtraStep ? extraControl : null}
           {category ? <label className="block text-sm font-semibold">
@@ -309,28 +307,23 @@ export function SupplyWizardStep({
               }}
             />
           </label> : null}
-          {category ? (
-          <p
-            role="status"
-            aria-label="Resultado da busca e seleção de materiais"
-            className="text-sm"
-          >
-            {visibleProducts.length}{" "}
-            {visibleProducts.length === 1
-              ? "material encontrado"
-              : "materiais encontrados"}
-            . {Object.keys(form.quantities).length}{" "}
-            {Object.keys(form.quantities).length === 1
-              ? "material selecionado"
-              : "materiais selecionados"}
-            . As seleções permanecem ao filtrar ou trocar de categoria.
-          </p>) : null}
+          {category ? <div className="hca-wizard-material-toolbar">
+            <p role="status" aria-label="Resultado da busca e seleção de materiais">
+              {search.trim() ? `${visibleProducts.length} ${visibleProducts.length === 1 ? "material encontrado" : "materiais encontrados"} · ` : ""}
+              {selected.length + pendingExtras.length} {selected.length + pendingExtras.length === 1 ? "material selecionado" : "materiais selecionados"}
+            </p>
+            {type !== "BAL" ? <div className="hca-toolbar">
+              <ActionButton ref={barcodeTriggerRef} compact variant="quiet"
+                onClick={() => setBarcodeOpen(true)}><Icon name="camera" />Ler código</ActionButton>
+              {extraControl}
+            </div> : null}
+          </div> : null}
           {!visibleProducts.length && !(isExtraStep && pendingExtras.length) ? (
             <Notice>
               {isExtraStep ? "Nenhum item extra incluído." : "Nenhum material nesta busca. Ajuste ou limpe o filtro; suas seleções continuam preservadas."}
             </Notice>
           ) : null}
-          <div className="space-y-3">
+          <div className={type === "BAL" || isExtraStep ? "space-y-3" : "hca-wizard-material-list"}>
             {visibleProducts.map((product) => {
               const checked =
                 type === "BAL" || Object.hasOwn(form.quantities, product.id);
@@ -376,7 +369,7 @@ export function SupplyWizardStep({
                     </span>
                   </label>
                   {type !== "BAL" ? <MaterialConsultButton context={context} material={product} menu
-                    onLink={checked && openMaterialSources ? () => openMaterialSources(product) : undefined}
+                    onLink={openMaterialSources ? returnFocus => openMaterialSources(product, returnFocus) : undefined}
                     onEditPresentations={checked
                       ? returnFocus => setPresentationEditor({ productId: product.id, returnFocus }) : undefined}
                     presentationErrorId={presentationErrorId} /> : null}

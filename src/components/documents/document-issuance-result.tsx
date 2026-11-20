@@ -77,7 +77,8 @@ function IssuanceResult({ id, code, patientName, kind, donation, onClose }: Resu
           }
           if (status.state !== "ready") {
             setStage(3);
-            status = checkedPdf(await api(endpoint, undefined, signal, "POST"), id);
+            // The signing endpoint has a 60-second execution budget.
+            status = checkedPdf(await api(endpoint, undefined, signal, "POST", { timeoutMs: 65_000 }), id);
             if (!status || requestId !== status.id) throw new Error("A solicitação do PDF inicial mudou.");
             noticesNeedAttention = status.noticesNeedAttention ?? noticesNeedAttention;
           }

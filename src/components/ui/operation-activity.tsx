@@ -2,6 +2,7 @@
 
 import { Dialog } from "@base-ui/react/dialog";
 import { useLayoutEffect, useId, useSyncExternalStore } from "react";
+import { useIssuanceRouteActivity } from "@/components/documents/document-issuance-navigation";
 import { Icon, type IconName } from "./icon";
 
 type ActivityStep = { label: string; icon: IconName };
@@ -28,8 +29,10 @@ export function useOperationActivity(active: boolean, activity: Activity) {
   useLayoutEffect(() => () => { entries.delete(id); refresh(); }, [id]);
 }
 export function PageLoadingActivity({ title = "Carregando a página", detail = "Aguarde enquanto consultamos as informações disponíveis." }: { title?: string; detail?: string }) {
-  useOperationActivity(true, { title, detail });
-  return <p className="sr-only" role="status">{title}. {detail}</p>;
+  const issuance = useIssuanceRouteActivity();
+  const activity = issuance ?? { title, detail };
+  useOperationActivity(true, activity);
+  return <p className="sr-only" role="status">{activity.title}. {activity.detail}</p>;
 }
 
 /** One modal surface also covers concurrent reads, without stacking loading dialogs. */
