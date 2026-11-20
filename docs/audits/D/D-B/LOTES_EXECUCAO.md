@@ -408,6 +408,12 @@ contraparte. A REQ exige a revisão consolidada para um novo arquivamento.
 Cinco integrações dirigidas passaram com Auth real após atualizar essas
 regressões no commit `2da302ee`.
 
+A execução de `a89e6053` também registrou três expectativas de arquivamento
+novo pelo rascunho legado. A regressão agora exige a recusa dos dois pedidos
+concorrentes e a preservação do rascunho, do diário de operações e dos
+materiais emitidos. Seis integrações dirigidas passaram com Auth real,
+incluindo a recuperação idempotente de cancelamento e de identificação.
+
 Na stack local preservada, a rodada SQL sem replay parou na regressão de
 agendamento da REQ, que passou no replay da CI. Dois casos locais de PDF
 inicial também terminaram com `statement timeout` ao preparar as fichas.
@@ -441,6 +447,9 @@ deu confiança alta à classificação sem ação no produto. A declaração CSS
 duplicada, o seletor de arquivo oculto e a expressão usada para ajustar texto
 de demonstração também ficam no HTML de referência. Os quatro apontamentos
 continuam visíveis no SonarCloud.
+No commit `614402f6`, a análise confirmou quatro apontamentos abertos,
+todos no HTML aprovado. O preview desse commit ficou pronto.
+[Preview de desenvolvimento](https://vercel.com/rmzzfajs-projects/home-care-assistant/9E78g3V6VMvLj4zZQcmeaySYqLVQ).
 
 L3 e L4 ainda não começaram. Quando tiverem ordem e referência aprovadas,
 registrar o escopo de cada lote, suas comparações comprovadas, criações fora

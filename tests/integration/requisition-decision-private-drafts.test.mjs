@@ -80,7 +80,9 @@ for (const purpose of reqDecisionPurposes) {
   test(
     "REQ " +
       purpose +
-      " seals action,version and fields;concurrent confirmation replays one result after write loss",
+      (purpose === "archive"
+        ? " seals legacy fields and rejects both concurrent attempts to bypass consolidated review"
+        : " seals action,version and fields;concurrent confirmation replays one result after write loss"),
     async () => {
       const f = await reqDecisionFixture(purpose),
         packet = reqDecisionSave(f),
@@ -123,11 +125,25 @@ for (const purpose of reqDecisionPurposes) {
         );
         assert.equal(reqDecisionFacts(f), before);
       }
-      const peer = await reqDecisionPeer(f),
-        results = await Promise.all([
-          rpc(f.client, "commit_supply_draft", commit),
-          rpc(peer, "commit_supply_draft", commit),
-        ]);
+      const peer = await reqDecisionPeer(f);
+      if (purpose === "archive") {
+        const responses = await Promise.all(
+          [f.client, peer].map((client) => client.rpc("commit_supply_draft", commit)),
+        );
+        for (const { error } of responses) {
+          assert.equal(error?.code, "PT409");
+          assert.equal(error?.message, "consolidated archive review required");
+        }
+        const retained = await reqDecisionRead(peer, f);
+        assert.equal(retained.state, saved.state);
+        assert.equal(retained.revision, saved.revision);
+        assert.equal(reqDecisionFacts(f), before);
+        return;
+      }
+      const results = await Promise.all([
+        rpc(f.client, "commit_supply_draft", commit),
+        rpc(peer, "commit_supply_draft", commit),
+      ]);
       assert.equal(results.filter((r) => r.replayed).length, 1);
       assert.equal(results[0].consumedDocumentId, f.req.id);
       assert.deepEqual(results[0].result, results[1].result);
@@ -142,12 +158,7 @@ for (const purpose of reqDecisionPurposes) {
         "PT409",
       );
       const after = reqDecisionFacts(f),
-        cap =
-          purpose === "archive"
-            ? "req.archive"
-            : purpose === "resolve_extra"
-              ? "catalog.manage"
-              : "req.review";
+        cap = purpose === "resolve_extra" ? "catalog.manage" : "req.review";
       sql(
         `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.adminA.id)},${q(cap)},false);`,
       );
@@ -200,7 +211,9 @@ for (const purpose of reqDecisionPurposes) {
   test(
     "REQ " +
       purpose +
-      " rechecks authority after private journal and rolls back official effects,draft and journal",
+      (purpose === "archive"
+        ? " requires consolidated review and rolls back an attempted legacy draft journal"
+        : " rechecks authority after private journal and rolls back official effects,draft and journal"),
     async () => {
       const f = await reqDecisionFixture(purpose),
         saved = await rpc(f.client, "supply_draft_command", reqDecisionSave(f)),
@@ -217,10 +230,9 @@ for (const purpose of reqDecisionPurposes) {
         `create function private.${name}() returns trigger language plpgsql security definer set search_path='' as $$begin if new.draft_id=${q(saved.id)}::uuid then insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.adminA.id)},${q(cap)},false) on conflict(care_recipient_id,subject_user,capability) where subject_user is not null do update set enabled=false;end if;return new;end;$$;create trigger ${name} after insert on private.creation_draft_commands for each row execute function private.${name}();`,
       );
       try {
-        assert.equal(
-          (await f.client.rpc("commit_supply_draft", commit)).error?.code,
-          "42501",
-        );
+        const { error } = await f.client.rpc("commit_supply_draft", commit);
+        assert.equal(error?.code, purpose === "archive" ? "PT409" : "42501");
+        if (purpose === "archive") assert.equal(error?.message, "consolidated archive review required");
         assert.equal(reqDecisionFacts(f), before);
         assert.equal(
           (await reqDecisionRead(f.client, f)).revision,
@@ -376,7 +388,9 @@ for (const purpose of reqDecisionPurposes) {
   test(
     "REQ " +
       purpose +
-      " refuses relabeling issued material as historical and preserves the normal native decision",
+      (purpose === "archive"
+        ? " refuses relabeling issued material as historical and blocks a new legacy archive"
+        : " refuses relabeling issued material as historical and preserves the normal native decision"),
     async () => {
       const f = await reqDecisionFixture(purpose),
         before = reqDecisionFacts(f);
@@ -396,13 +410,20 @@ for (const purpose of reqDecisionPurposes) {
           "supply_draft_command",
           reqDecisionSave(f),
         ),
-        confirmed = await rpc(
-          f.client,
+        confirmed = await f.client.rpc(
           "commit_supply_draft",
           reqDecisionCommit(f, saved),
         );
-      assert.equal(confirmed.consumedDocumentId, f.req.id);
-      assert.equal((await reqDecisionRead(f.client, f)).state, "consumed");
+      if (purpose === "archive") {
+        assert.equal(confirmed.error?.code, "PT409");
+        assert.equal(confirmed.error?.message, "consolidated archive review required");
+        assert.equal((await reqDecisionRead(f.client, f)).state, saved.state);
+        assert.equal(reqDecisionFacts(f), before);
+      } else {
+        assert.ifError(confirmed.error);
+        assert.equal(confirmed.data.consumedDocumentId, f.req.id);
+        assert.equal((await reqDecisionRead(f.client, f)).state, "consumed");
+      }
       assert.equal(
         sql(
           `select jsonb_agg(to_jsonb(i) order by id) from public.requisition_items i where requisition_id=${q(f.req.id)};`,
