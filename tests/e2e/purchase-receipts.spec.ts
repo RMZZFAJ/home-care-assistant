@@ -1,6 +1,6 @@
 import { expectNoOperationalDocumentAction } from "./document-sections";
 import { openOperationalDocumentAction } from "./document-sections";
-import { confirmDecisionAndReconcile } from "./l1-decision-policy";
+import { confirmDecisionAndReconcile, confirmedOutcome, noPrivateWrites } from "./l1-decision-policy";
 import { selectDocumentSection, openDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -95,6 +95,74 @@ test("E05-11 reúne chegadas de duas compras e uma avulsa e aplica somente as de
   const remaining = await openArrivalReview(page);
   await expect(remaining.locator("article[data-receipt-id]")).toHaveCount(1);
   await expect(arrivalCard(remaining, complete.receipt.id).getByRole("switch")).toBeChecked();
+});
+
+test("E05-13 bloqueia COM com chegada pendente e cancela após aprovação sem estornar o estoque", async ({ page }, info) => {
+  test.setTimeout(150_000);
+  const f = await purchaseBalanceFixture();
+  const pending = await purchaseBalanceArrival(f, f.document, f.document.lines.map((line: { id: string }) => ({
+    lineId: line.id, quantity: "6", expectedQuantity: "6",
+  })));
+  const currentSettings = Number(sql(`select version from public.patient_settings where care_recipient_id=${sqlLiteral(f.patient)}`));
+  await rpc(f.admin, "configure_patient_access", {
+    p_patient: f.patient, p_kind: "settings", p_change: { archiveDays: 11 }, p_version: currentSettings, p_key: randomUUID(),
+  });
+  const reviewer = await shiftWorker(f.patient, "admin");
+  const destination = `/fichas/${f.document.id}`;
+  await page.goto("/login?" + new URLSearchParams({ next: destination }));
+  await page.getByLabel("E-mail", { exact: true }).fill(reviewer.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page).toHaveURL(url => url.pathname === destination, { timeout: 45_000 });
+  const drafts = noPrivateWrites(page);
+  const review = page.getByRole("dialog", { name: "Revisar e cancelar", exact: true });
+  const confirm = review.getByRole("button", { name: "Confirmar cancelamento", exact: true });
+  async function openReview() {
+    await openDocumentMore(page);
+    await page.getByRole("menuitem", { name: "Cancelar ficha", exact: true }).click();
+    await expect(review).toBeVisible();
+  }
+  await openReview();
+  const blocker = review.locator("details").filter({ hasText: "Chegadas e aprovações pendentes" });
+  await expect(blocker).toHaveJSProperty("open", false);
+  await blocker.locator("summary").press("Enter");
+  await expect(blocker.getByText("Revise as chegadas pendentes", { exact: false })).toBeVisible();
+  await expect(confirm).toBeDisabled();
+  await review.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(review).toHaveCount(0);
+
+  const approved = await purchaseBalanceCommand(f.admin, pending.document, "validate_receipt", { receiptId: pending.receipt.id });
+  const ledger = () => sql(`select jsonb_agg(to_jsonb(m) order by m.id) from public.stock_movements m where m.care_recipient_id=${sqlLiteral(f.patient)}`);
+  const before = ledger();
+  await page.reload();
+  await openReview();
+  await expect(review.getByText("Nenhuma chegada aguarda aprovação.", { exact: true })).toBeVisible();
+  await expect(review.getByText("Chegadas aprovadas", { exact: true })).toHaveCount(2);
+  await expect(review.getByText("Crédito no estoque", { exact: true })).toHaveCount(2);
+  await expect(review.getByText("Arquivamento em 11 dias", { exact: true })).toBeVisible();
+  expect(ledger()).toBe(before);
+  const original = page.viewportSize();
+  if (info.project.use.hasTouch) for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(review.getByRole("region", { name: "Conteúdo de Revisar e cancelar", exact: true })).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(confirm).toBeInViewport({ ratio: 1 });
+    await info.attach(`Revisão da COM · ${width} px`, {
+      body: await review.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png",
+    });
+  }
+  if (original) await page.setViewportSize(original);
+  const reason = review.getByRole("textbox", { name: "Motivo do cancelamento", exact: true });
+  await reason.fill("Encerrar o planejamento da compra com as entradas preservadas.");
+  await confirmedOutcome(page, f.document.id, "Confirmar cancelamento");
+  const result = page.getByRole("dialog", { name: "Ficha cancelada", exact: true });
+  await expect(result).toContainText("créditos no estoque foram preservados");
+  const after = await rpc(reviewer.client, "operational_document", { p_id: f.document.id });
+  expect(after.status).toBe("cancelled");
+  expect(after.receipts).toEqual(approved.receipts);
+  expect(after.lines).toEqual(approved.lines);
+  expect(after.events.filter((event: { action: string }) => event.action === "com.cancel")).toHaveLength(1);
+  expect(ledger()).toBe(before);
+  expect(drafts).toEqual([]);
 });
 
 test("COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas", async ({ page }) => {

@@ -21,6 +21,7 @@ for (const mode of ["pending", "accepted"] as const) test(`ENT cancelamento ${mo
   const submit = review.getByRole("button", { name: "Confirmar cancelamento", exact: true });
   await expect(review.getByText("Retorno à origem", { exact: true })).toHaveCount(2);
   await expect(review.getByText("0 em trânsito", { exact: true })).toHaveCount(2);
+  await expect(review.getByText("Arquivamento em 7 dias", { exact: true })).toBeVisible();
   await expect(submit).toBeDisabled();
   await expect(submit).toBeInViewport({ ratio: 1 });
   if (info.project.use.hasTouch) await info.attach("Revisão do retorno físico", {

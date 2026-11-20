@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — cancelamento da COM e prazo de arquivamento.** A revisão de
+E05-13 mostra as chegadas e os créditos de estoque preservados. A COM pode ser
+cancelada após resolver as chegadas. A revisão de conclusão e os diálogos
+de cancelamento exibem a política vigente da residência. O
+[registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) detalha os efeitos.
+
 **20/11 — conferência de chegadas em lote.** O diálogo do Início, Estoque
 e ficha COM segue a composição móvel de E05-11. A lista conserva a origem
 e as decisões por chegada e pode ser percorrida pelo teclado. A expansão

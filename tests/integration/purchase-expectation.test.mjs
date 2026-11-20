@@ -80,10 +80,22 @@ test("COM closes 10 as 2 validated plus 8 waived with one concurrent intention a
   const event = decisionEvent(document.id, "com.close_expectation"); assert.deepEqual(event.event, body); assert.equal(event.purchaseProgress.closure.actorId, fixtures.adminA.id);
   assert.equal(event.purchaseReceipts[0].id, result.receipt.id); assert.equal(Number(event.purchaseProgress.lines[0].waivedQuantity), 8);
   assert.equal(first.events.filter(event => event.action === "com.close_expectation").length, 1);
-  for (const [p_action, p_body] of [["purchase", { lines: [{ lineId: line.id, quantity: "8" }] }], ["cancel", { reason: "Não pode apagar fatos físicos nem o encerramento" }]]) {
-    assert.ok((await f.admin.rpc("supply_document_command", { p_id: first.id, p_action, p_body, p_key: randomUUID(), p_version: first.version })).error);
-  }
+  assert.ok((await f.admin.rpc("supply_document_command", { p_id: first.id, p_action: "purchase",
+    p_body: { lines: [{ lineId: line.id, quantity: "8" }] }, p_key: randomUUID(), p_version: first.version })).error);
   assert.equal((await view(f.admin, document.id)).version, first.version); assert.equal(ledger(f.patient), initial);
+
+  const cancel = { p_id: first.id, p_action: "cancel", p_body: { reason: "Encerrar o planejamento com a chegada preservada" },
+    p_key: randomUUID(), p_version: first.version };
+  assert.equal((await f.family.rpc("supply_document_command", cancel)).error?.code, "42501");
+  const [cancelled, replay] = await Promise.all([rpc(f.admin, "supply_document_command", cancel), rpc(f.admin, "supply_document_command", cancel)]);
+  assert.equal(cancelled.status, "cancelled");
+  assert.equal(cancelled.version, first.version + 1);
+  assert.equal(replay.version, cancelled.version);
+  assert.deepEqual(cancelled.lines, first.lines);
+  assert.deepEqual(cancelled.receipts, first.receipts);
+  assert.deepEqual(cancelled.purchaseProgress.closure, first.purchaseProgress.closure);
+  assert.equal(cancelled.events.filter(item => item.action === "com.cancel").length, 1);
+  assert.equal(ledger(f.patient), initial);
 });
 
 test("COM closure permits an explicitly delegated family member and refuses professional/global identities without local authority", async () => {
@@ -148,17 +160,27 @@ test("COM multiple parcels keep their individual validation duties after the una
   assert.equal(all.receipts.filter(receipt => receipt.state === "approved").length, 2);
 });
 
-test("COM cannot waive acquired/unarrived material or cancel purchase/receipt facts and rejects a changed closure summary", async () => {
+test("COM cannot waive or cancel while purchased material still awaits arrival or review", async () => {
   const f = await purchased("10"), { document } = await arrival(f, "2", f.admin), initial = evidence(f.document.id), stock = ledger(f.patient);
   for (const [p_action, p_body] of [["close_expectation", body], ["cancel", { reason: "Não apagar aquisição e chegada já registradas" }]]) {
     assert.ok((await f.admin.rpc("supply_document_command", { p_id: document.id, p_action, p_body, p_key: randomUUID(), p_version: document.version })).error);
   }
   assert.equal(evidence(document.id), initial); assert.equal(ledger(f.patient), stock);
   const partial = await purchased(), pending = await arrival(partial), baseline = evidence(partial.document.id);
+  const cancel = (document) => ({ p_id: document.id, p_action: "cancel", p_body: { reason: "Conferir a chegada antes de encerrar" },
+    p_key: randomUUID(), p_version: document.version });
+  assert.equal((await partial.admin.rpc("supply_document_command", cancel(document))).error?.code, "42501");
+  assert.equal((await partial.admin.rpc("supply_document_command", cancel(pending.document))).error?.code, "PT409");
   for (const p_body of [{ ...body, confirmed: false }, { ...body, waivedQuantity: "8" }, { ...body, reason: null }])
     assert.equal((await partial.admin.rpc("supply_document_command", { p_id: pending.document.id, p_action: "close_expectation", p_body, p_key: randomUUID(), p_version: pending.document.version })).error?.code, "22023");
   assert.ok((await partial.admin.rpc("supply_document_command", { p_id: pending.document.id, p_action: "close_expectation", p_body: body, p_key: randomUUID(), p_version: pending.document.version - 1 })).error);
   assert.equal(evidence(partial.document.id), baseline);
+  const correction = await rpc(partial.admin, "execute_com_arrival_review", { p_patient: partial.patient, p_key: randomUUID(),
+    p_entries: [{ documentId: pending.document.id, receiptId: pending.receipt.id, version: pending.document.version,
+      decision: "request_correction", reason: "Confira a quantidade declarada." }] });
+  assert.equal(correction.results[0].status, "correction_requested");
+  const awaitingCorrection = await view(partial.admin, pending.document.id);
+  assert.equal((await partial.admin.rpc("supply_document_command", cancel(awaitingCorrection))).error?.code, "PT409");
 });
 
 for (const revocation of ["session", "capability", "context"]) test(`COM closure rechecks ${revocation} after its observed stock lock without dispensing or moving material`, async () => {

@@ -17,15 +17,23 @@ for (const purpose of ["validate_receipt", "reject_receipt", "close_expectation"
    await audit(page, "Conferência COM sem rascunho");
    const { receipt } = await confirmArrivalReview(page, panel, true);
    expect(receipt.results).toMatchObject([{ receiptId: f.secondReceipt.id, status: purpose === "validate_receipt" ? "approved" : "rejected" }]);
+ } else if (purpose === "cancel") {
+   await openDocumentMore(page);
+   await page.getByRole("menuitem", { name: "Cancelar ficha", exact: true }).click();
+   const review = page.getByRole("dialog", { name: "Revisar e cancelar", exact: true });
+   await review.getByRole("textbox", { name: "Motivo do cancelamento", exact: true }).fill(decisionReason);
+   expect(decisionFacts(f)).toBe(before); expect(privateFormCount(f.patient)).toBe("0");
+   await audit(page, "Cancelamento de COM sem rascunho");
+   await confirmedOutcome(page, f.document.id, "Confirmar cancelamento");
+   await expect(page.getByRole("dialog", { name: "Ficha cancelada", exact: true })).toBeVisible();
  } else {
    await openDocumentMore(page);
-   const label = purpose === "close_expectation" ? "Encerrar expectativa restante" : "Solicitar cancelamento";
-   await page.getByRole("menuitem", { name: label, exact: true }).click();
+   await page.getByRole("menuitem", { name: "Encerrar expectativa restante", exact: true }).click();
    await page.getByRole("textbox", { name: "Motivo / justificativa", exact: true }).fill(decisionReason);
-   if (purpose === "close_expectation") await page.getByRole("checkbox", { name: /Conferi o resumo e confirmo dispensar/ }).check();
+   await page.getByRole("checkbox", { name: /Conferi o resumo e confirmo dispensar/ }).check();
    expect(decisionFacts(f)).toBe(before); expect(privateFormCount(f.patient)).toBe("0");
    await page.getByRole("button", { name: "Revisar operação", exact: true }).click(); await audit(page, "L1 decisão COM sem rascunho");
-   await confirmedOutcome(page, f.document.id, purpose === "close_expectation" ? "Confirmar encerramento da expectativa" : "Confirmar operação");
+   await confirmedOutcome(page, f.document.id, "Confirmar encerramento da expectativa");
  }
  expect(decisionFacts(f)).not.toBe(before); expect(writes).toEqual([]); expect(privateFormCount(f.patient)).toBe("0");
  if (purpose === "validate_receipt" || purpose === "reject_receipt") { const current = await rpc(f.admin, "operational_document", { p_id: f.document.id }); expect(current.receipts.find((row: { id: string }) => row.id === f.secondReceipt.id).state).toBe(purpose === "validate_receipt" ? "approved" : "rejected"); }

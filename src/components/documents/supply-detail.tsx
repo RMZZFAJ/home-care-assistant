@@ -29,7 +29,9 @@ import { PurchaseExtraResolution } from "./purchase-extra-resolution";
 import { DeliveryMaterials } from "./delivery-materials";
 import { CountedDeliveryReceipt, CountedDeliveryReceiptResult } from "./delivery-receipt";
 import { canReconcileFromFamily, DeliveryReconciliation, DeliveryReconciliationResult } from "./delivery-reconciliation";
-import { DeliveryTransitCancellation, DeliveryTransitCancellationResult } from "./delivery-transit-cancellation";
+import { DeliveryTransitCancellationFacts, DeliveryTransitCancellationResult } from "./delivery-transit-cancellation";
+import { DocumentCancellationReview } from "./document-cancellation-review";
+import { PurchaseCancellationFacts, PurchaseCancellationResult, purchaseCancellationBlockers } from "./purchase-cancellation";
 import { DeliveryCancellationDecision, DeliveryCancellationStatusDialog, type CancellationAction } from "./delivery-cancellation-decision";
 import { DocumentFollowUpActions } from "./document-follow-up-actions";
 import { DocumentFab } from "./document-fab";
@@ -168,6 +170,7 @@ export function SupplyDocumentContent({
   const [deliveryReceiptResult, setDeliveryReceiptResult] = useState<SupplyDocument | null>(null);
   const [reassignmentResult, setReassignmentResult] = useState<SupplyDocument | null>(null);
   const [transitCancellationResult, setTransitCancellationResult] = useState<SupplyDocument | null>(null);
+  const [purchaseCancellationResult, setPurchaseCancellationResult] = useState<string | null>(null);
   const [cancellationStatus, setCancellationStatus] = useState<SupplyDocument | null>(null);
   const [reconciliationResult, setReconciliationResult] = useState<{ data: SupplyDocument; body: DeliveryResolutionBody } | null>(null);
   const [purchaseUpdating, setPurchaseUpdating] = useState(false);
@@ -183,6 +186,9 @@ export function SupplyDocumentContent({
   const reconcilingDelivery = action === "resolve" && hasCountedTransit;
   const hasUnreceivedDispatch = data?.type === "ENT" && data.status === "pending_receipt" && !data.workflow_data.acceptedAt;
   const cancellingTransit = action === "cancel" && hasUnreceivedDispatch;
+  const cancellingPurchase = action === "cancel" && data?.type === "COM";
+  const reviewingDirectCancellation = cancellingTransit || cancellingPurchase;
+  const purchaseCancellation = purchaseCancellationBlockers(cancellingPurchase ? data : null);
   const hasPersonalReceipt = data?.type === "ENT" && (Boolean(data.workflow_data.acceptedAt) ||
     data.lines.some(line => quantity(line.accepted_quantity).gt(0)));
   const reviewingCancellation = data?.type === "ENT" && (action === "cancel" && hasPersonalReceipt ||
@@ -192,7 +198,7 @@ export function SupplyDocumentContent({
   const activityTitle = refreshingArrival ? "Atualizando chegada" : busy ? "Confirmando a operação" : "Consultando a ficha";
   const openingIssuance = useIssuanceOpeningActivity(id, context.userId, context.patient?.id);
   const activity = (!data && openingIssuance) || { title: activityTitle, detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." };
-  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation), activity);
+  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation), activity);
   const [review, setReview] = useState<SupplyReview | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [closeUncertain, setCloseUncertain] = useState(false);
@@ -426,6 +432,9 @@ export function SupplyDocumentContent({
             !read.lines.some(line => typeof line.metadata.cancelledTransitReturn === "string"))
             throw new Error("Não foi possível verificar o cancelamento e o retorno dos materiais.");
         }
+        if (accepted.action === "cancel" && read.type === "COM" && (read.status !== "cancelled" ||
+          !read.events.some(item => item.version === accepted.expectedVersion + 1 && item.actorId === context.userId && item.action === "com.cancel")))
+          throw new Error("Não foi possível verificar o cancelamento da compra.");
         if (reviewingCancellation && read.type === "ENT") {
           const request = read.deliveryCancellation?.request;
           const expectedStatus = { cancel: "pending", consent_cancel: "consented", refuse_cancellation: "refused", withdraw_cancellation: "withdrawn" }[accepted.action as CancellationAction];
@@ -478,6 +487,11 @@ export function SupplyDocumentContent({
         setTransitCancellationResult(result.data);
         return;
       }
+      if (intention.action === "cancel" && result.data.type === "COM") {
+        setMessage("");
+        setPurchaseCancellationResult(result.data.id);
+        return;
+      }
       if (reviewingCancellation && result.data.deliveryCancellation) {
         tabs.select("workflow");
         setCancellationStatus(result.data);
@@ -516,8 +530,6 @@ export function SupplyDocumentContent({
             : " As quantidades efetivamente validadas foram preservadas."),
         submit:
           "COM emitida. A emissão não comprova aquisição, chegada ou entrada no estoque.",
-        cancel:
-          "Ficha cancelada com histórico preservado, sem entrada ou baixa de material.",
       };
       const cancellationMessages: Record<string, string> = {
         cancel:
@@ -728,12 +740,7 @@ export function SupplyDocumentContent({
         (data.created_by === context.userId && !data.workflow_data.acceptedAt &&
           !data.lines.some((line) => quantity(line.accepted_quantity).gt(0)))
         : data.type === "COM"
-          ? allowed("com.approve") &&
-          !data.lines.some((line) =>
-            quantity(line.purchased_quantity).gt(0),
-          ) &&
-          !data.receipts.length &&
-          !data.purchaseProgress?.expectationClosed
+          ? allowed("com.approve")
           : data.status !== "approved" &&
           !data.payload.balanceContext &&
           allowed("access.manage"))
@@ -840,7 +847,7 @@ export function SupplyDocumentContent({
         onClick={(event) => {
           operationOpenerRef.current = inFab ? fabRef.current : menuAction ? moreTriggerRef.current : event.currentTarget;
           if (item === "reassign" || (item === "receive" && data.type === "ENT") || (item === "resolve" && hasCountedTransit) ||
-            (item === "cancel" && (hasUnreceivedDispatch || hasPersonalReceipt)) || item === "consent_cancel" || item === "withdraw_cancellation") {
+            (item === "cancel" && (data.type === "COM" || hasUnreceivedDispatch || hasPersonalReceipt)) || item === "consent_cancel" || item === "withdraw_cancellation") {
             setError("");
             setReview(null);
             setAction(item);
@@ -860,11 +867,11 @@ export function SupplyDocumentContent({
             ? "Conferir recebimento"
           : item === "purchase"
             ? data.payload.origin === "donation" ? "Registrar aquisição" : inFab ? "Registrar compra realizada" : actionLabels[item]
-            : item === "cancel" && hasUnreceivedDispatch ? "Cancelar ficha" : actionLabels[item]}
+            : item === "cancel" && (data.type === "COM" || hasUnreceivedDispatch) ? "Cancelar ficha" : actionLabels[item]}
       </Action>
     );
   }
-  const purchaseConflictPanel = purchaseConflict && data?.type === "COM" ? (
+  const purchaseConflictPanel = (purchaseConflict || cancellingPurchase && stale) && data?.type === "COM" ? (
     <section className="ui-card space-y-3">
       <Notice error>
         A COM mudou desde o resumo que você revisou. Seus campos permanecem
@@ -904,7 +911,7 @@ export function SupplyDocumentContent({
                   setComparison(null);
                   setPurchaseConflict(false);
                   setReview(null);
-                  setMessage(
+                  if (!cancellingPurchase) setMessage(
                     "Versão atual carregada. Confira os valores preservados e prepare uma nova revisão. O encerramento exige nova concordância com o resumo.",
                   );
                 }}
@@ -967,9 +974,9 @@ export function SupplyDocumentContent({
         {loading && data ? "Atualizando consulta da ficha…" : ""}
       </span>
       {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
-      {error && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation ? <Notice error>{error}</Notice> : null}
+      {error && !countingDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      {!coveredOperation ? purchaseConflictPanel : null}
+      {!coveredOperation && !cancellingPurchase ? purchaseConflictPanel : null}
       {deliveryConflict && data?.type === "ENT" && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation ? (
         <section className="ui-card space-y-3">
           <Notice error>
@@ -1474,7 +1481,7 @@ export function SupplyDocumentContent({
                   ) : null}
                 </section>
               ) : null}
-              {!countingDelivery && !reassigningDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation && (actions.length || action) ? (
+              {!countingDelivery && !reassigningDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation && (actions.length || action) ? (
                 <section className="ui-card">
                   <h2>
                     {action && !actions.includes(action)
@@ -1688,13 +1695,14 @@ export function SupplyDocumentContent({
           resultFocusRef.current = true;
           setFocusRevision(value => value + 1);
         }} /> : null}
-      {data && cancellingTransit && !readDenied ? <DeliveryTransitCancellation
+      {data && reviewingDirectCancellation && !readDenied && activeContext ? <DocumentCancellationReview
         key={data.id}
         data={data} patientName={context.patient?.display_name ?? "Paciente identificado na ficha"} actor={context.fullName}
-        busy={busy || decision.busy} blocked={deliveryConflict || !actions.includes("cancel")}
+        busy={busy || decision.busy} blocked={deliveryConflict || !actions.includes("cancel") || cancellingPurchase && (
+          purchaseConflict || stale || purchaseCancellation.unavailable || purchaseCancellation.awaitingArrival || purchaseCancellation.awaitingReview)}
         uncertain={uncertain || decision.uncertain} error={error || decision.recoveryMessage}
         finalFocus={operationOpenerRef}
-        conflict={deliveryConflict ? <Notice>
+        conflict={cancellingPurchase ? purchaseConflictPanel : deliveryConflict ? <Notice>
           A ficha mudou durante a revisão. Confira a situação atual antes de cancelar.
           {comparison ? <ActionButton disabled={busy} onClick={() => {
             setData(comparison);
@@ -1706,7 +1714,8 @@ export function SupplyDocumentContent({
           }}>Usar versão atual</ActionButton> :
             <ActionButton disabled={busy} onClick={() => void comparePurchaseVersion()}>Consultar versão atual</ActionButton>}
         </Notice> : null}
-        onSubmit={body => {
+        onConfirm={reason => {
+          const body = cancellingTransit ? { reason, transitReturned: true } : { reason };
           const next = { action: "cancel", body, summary: "", expectedVersion: data.version };
           setReview(next);
           void execute(next);
@@ -1717,10 +1726,13 @@ export function SupplyDocumentContent({
           setReview(null);
           setError("");
           setDeliveryConflict(false);
+          setPurchaseConflict(false);
           setComparison(null);
           setAttempt(value => value + 1);
         }}
-        onCloseUncertain={() => setCloseUncertain(true)} /> : null}
+        onCloseUncertain={() => setCloseUncertain(true)}>
+        {cancellingPurchase ? <PurchaseCancellationFacts data={data} blockers={purchaseCancellation} /> : <DeliveryTransitCancellationFacts data={data} />}
+      </DocumentCancellationReview> : null}
       {transitCancellationResult?.id === id && !readDenied && activeContext ? <DeliveryTransitCancellationResult
         data={transitCancellationResult} onClose={() => {
           setTransitCancellationResult(null);
@@ -1778,7 +1790,7 @@ export function SupplyDocumentContent({
         }}
         onHistory={() => { setCancellationStatus(null); tabs.select("history"); }} /> : null}
       <Dialog
-        open={Boolean(review) && !readDenied && !countingDelivery && !reassigningDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation && (!coveredOperation || uncertain)}
+        open={Boolean(review) && !readDenied && !countingDelivery && !reassigningDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation && (!coveredOperation || uncertain)}
         title={
           review?.action === "close_expectation"
             ? "Revisar encerramento da expectativa"
@@ -1845,6 +1857,11 @@ export function SupplyDocumentContent({
           resultFocusRef.current = true;
           setFocusRevision(value => value + 1);
         }} /> : null}
+      {purchaseCancellationResult === id && !readDenied && activeContext ? <PurchaseCancellationResult onClose={() => {
+        setPurchaseCancellationResult(null);
+        resultFocusRef.current = true;
+        setFocusRevision(value => value + 1);
+      }} /> : null}
       <Dialog open={closeUncertain} title="Fechar sem resultado confirmado?" onClose={() => setCloseUncertain(false)}>
         <p>O resultado continua sem confirmação. Fechar descarta os campos desta tela. Procure a supervisão e confira o resultado antes de repetir a ação.</p>
         <div className="hca-toolbar"><ActionButton onClick={() => setCloseUncertain(false)}>Voltar à conferência</ActionButton><ActionButton onClick={() => { setCloseUncertain(false); setReview(null); setAction(null); pendingRef.current = null; setUncertain(false); }}>Fechar e procurar supervisão</ActionButton></div>

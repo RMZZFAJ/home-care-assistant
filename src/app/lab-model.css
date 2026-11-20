@@ -1229,6 +1229,20 @@
 .hca-cancellation-checklist p { color: var(--hca-muted); font-size: 12px; }
 .hca-l1 .hca-transit-cancellation textarea { min-height: 68px; }
 .hca-l1 .hca-modal:has(.hca-transit-cancellation) > .hca-modal-footer > button { white-space: normal; }
+.hca-l1 .hca-cancellation-review > .hca-modal-content { background: var(--hca-paper); padding: 18px; }
+.hca-cancellation-review .hca-receipt-line { border-width: 1px 0 0; border-radius: 0; padding: 10px 0 0; }
+.hca-cancellation-review .hca-transit-quantities dd { font-size: 15px; font-weight: 700; }
+.hca-cancellation-review .hca-cancellation-checklist li > svg { flex-basis: 25px; height: 25px; padding: 5px; border: 0; background: #edf6ef; }
+.hca-l1 .hca-cancellation-review > .hca-modal-footer { flex-wrap: nowrap; }
+.hca-l1 .hca-cancellation-review > .hca-modal-footer > button { min-width: 0; }
+.hca-l1 .hca-cancellation-review h2 { color: #254d36; font-size: 20px; line-height: 1.3; }
+.hca-document-archive-policy {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  padding: 10px 0; border-block-start: 1px solid var(--hca-line); overflow-wrap: anywhere;
+}
+.hca-document-archive-policy strong { font-size: 12px; }
+.hca-document-archive-policy p { color: var(--hca-muted); font-size: 11px; }
+.hca-document-archive-policy > button { grid-column: 2 / -1; justify-self: start; }
 .hca-cancellation-decision { gap: 12px; }
 .hca-cancellation-decision .hca-cancellation-quantities { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-top: 9px; border-top: 1px solid var(--hca-line); gap: 8px; }
 .hca-l1 .hca-cancellation-decision textarea { min-height: 68px; }
@@ -1246,7 +1260,8 @@
 .hca-document-follow-up .hca-cancellation-checklist li { padding: 16px 0; border-bottom: 1px solid var(--hca-line); border-top: 0; }
 .hca-document-follow-up .hca-cancellation-checklist li:first-child { border-top: 1px solid var(--hca-line); }
 .hca-document-follow-up .hca-cancellation-checklist li > svg { flex-basis: 26px; height: 26px; padding: 5px; border: 0; background: #edf6ef; }
-.hca-document-follow-up .hca-cancellation-checklist .hca-follow-up-blocker > svg { color: #a24656; background: #fff0f2; }
+.hca-cancellation-checklist .hca-follow-up-blocker > svg,
+.hca-cancellation-review .hca-cancellation-checklist .hca-follow-up-blocker > svg { color: #a24656; background: #fff0f2; }
 .hca-document-archive .hca-cancellation-checklist .hca-archive-attention > svg { color: #a16911; background: #fff2d6; }
 .hca-document-archive .hca-follow-up-prior > span:last-child { max-width: 112px; text-align: center; }
 .hca-document-archive .hca-follow-up-prior > a { font-size: 11px; white-space: nowrap; }

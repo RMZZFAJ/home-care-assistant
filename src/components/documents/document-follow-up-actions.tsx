@@ -10,6 +10,7 @@ import { followUpReference, type FollowUpReference } from "@/lib/documents/follo
 import { formatBrazilDate } from "@/lib/receipt";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { DocumentDecisionFailure, useDocumentDecision } from "./use-document-decision";
+import { DocumentArchivePolicy } from "./document-archive-policy";
 
 type Purpose = "complete" | "reopen";
 type Blocker = FollowUpReference["blockers"][number];
@@ -182,6 +183,8 @@ export function DocumentFollowUpActions({
         {!decision.uncertain ? <FormField label={reopening ? "Justificativa da reversão" : "Observação da conclusão"} required={reopening}>
           <TextAreaField rows={3} maxLength={1000} readOnly={decision.busy} value={reason} onChange={event => setReason(event.currentTarget.value)} />
         </FormField> : null}
+        {facts && !reopening && !unavailable && !decision.uncertain && !decision.busy ?
+          <DocumentArchivePolicy id={id} patientId={patientId} version={facts.version} /> : null}
       </div>
     </Dialog>
     {discard ? <Dialog open title={decision.uncertain ? "Sair antes de conferir o resultado?" : "Sair sem concluir?"}

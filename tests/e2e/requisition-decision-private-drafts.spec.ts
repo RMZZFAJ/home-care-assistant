@@ -16,6 +16,7 @@ test("L2 confere o saldo antes de cancelar uma REQ e recupera uma única revers�
   await page.goto("/fichas/" + f.req.id);
   await openDocumentMore(page);
   await page.getByRole("menuitem", { name: "Cancelar requisição", exact: true }).click();
+  await expect(page.getByText("Arquivamento em 7 dias", { exact: true })).toBeVisible();
   const reason = "Reverter somente o ajuste da emissão.";
   await page.getByRole("textbox", { name: "Justificativa", exact: true }).fill(reason);
   const start = page.getByRole("button", { name: "Confirmar cancelamento", exact: true });

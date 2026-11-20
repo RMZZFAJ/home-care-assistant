@@ -24,6 +24,7 @@ import { RecordDrawer } from "@/components/forms/record-drawer";
 import { RequisitionStockCancellationDialog, type RequisitionStockOutcome } from "./requisition-stock-cancellation";
 import { DraftContentSummary } from "@/components/forms/creation-draft-panel";
 import { useDocumentDecision, DocumentDecisionFailure } from "@/components/documents/use-document-decision";
+import { DocumentArchivePolicy } from "@/components/documents/document-archive-policy";
 import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import {
   adoptRequisitionDecisionReference,
@@ -702,6 +703,8 @@ export function RequisitionDecisionEditor({
                     onChange={(event) => setField("reason", event.target.value)}
                   />
                 </FormField>
+                {purpose === "cancel" && reference && !unavailable && !uncertain ?
+                  <DocumentArchivePolicy id={id} patientId={patientId} version={reference.document.documentVersion} /> : null}
                 <ActionButton
                   variant="primary"
                   type="submit"

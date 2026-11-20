@@ -19,6 +19,7 @@ test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT s
   await page.goto(`/fichas/${document.id}`);
   await openDocumentAction(page, "Revisar conclusão");
   const conclusion = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+  await expect(conclusion.getByText("Arquivamento em 7 dias", { exact: true })).toBeVisible();
   await conclusion.getByRole("button", { name: "Concluir e arquivar", exact: true }).click();
   const archive = page.getByRole("dialog", { name: "Arquivar ficha", exact: true });
   await expect(archive.getByText("Ficha concluída ou cancelada", { exact: true })).toBeVisible();

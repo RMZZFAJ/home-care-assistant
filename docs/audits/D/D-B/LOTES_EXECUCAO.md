@@ -163,6 +163,33 @@ mostrou a compra ainda pendente. Também passaram os quatro casos de
 conferência individual e chegada avulsa nos dois navegadores. O incremento
 usa as migrations já instaladas.
 
+**Revisão de cancelamento e prazo de arquivamento.** A COM usa o diálogo
+de E05-13. A revisão lista as quantidades compradas, as chegadas aprovadas
+e o efeito sobre o estoque por material, inclusive em fichas com várias
+linhas e unidades. A v7 usa um material no exemplo. O cancelamento encerra o
+planejamento quando as chegadas estão resolvidas, preservando as aquisições,
+as parcelas, os vínculos e os créditos existentes. Material comprado que
+ainda aguarda chegada, aprovação ou correção mantém a confirmação bloqueada.
+A regra anterior impedia também o cancelamento com todas as chegadas
+resolvidas. O banco continua verificando autorização e versão na transação.
+
+ENT e DEV antes do recebimento compartilham a estrutura do diálogo de
+E06-10. A confirmação continua dependendo do retorno físico à origem.
+REQ, COM e entregas aplicáveis mostram na revisão o prazo lido da política
+da residência, também usado na revisão de conclusão. A comparação do
+laboratório usou a composição de E04-12, E04-14, E05-12, E05-13 e E06-10.
+O produto preserva os dados reais inclusive quando o prazo configurado é
+de 11 dias. O teste de conclusão e arquivo verificou a preservação do PDF
+assinado após reverter o arquivamento.
+
+As 29 integrações dirigidas usaram Auth real. A verificação conferiu
+recusa sem autoridade, manutenção de pedidos com chegadas abertas,
+repetição concorrente da mesma chave, preservação do estoque e da
+dispensa anterior e uma única ocorrência nova no histórico. Os percursos
+móveis em Android e iOS emulados conferiram o rodapé a 360 e 412 px,
+o cancelamento sem rascunho, a recuperação da resposta perdida e o
+retorno ao menu de origem com a aba Andamentos preservada.
+
 **Trechos de composição conferidos.** A barra de cinco etapas, as categorias
 dentro de Materiais, o bloco expandido e o diálogo Organizar listas em E04-04,
 o comparativo de cancelamento E04-14, o aviso de catálogo E04-16, e os modais
@@ -719,8 +746,8 @@ continua sem regra de produto nesta entrega.
 ## Migrations por ambiente
 
 Consulta de 20/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **312 versões em cada banco**,
-com 242 versões anteriores a L1, 18 de L1 e 52 de L2.
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **313 versões em cada banco**,
+com 242 versões anteriores a L1, 18 de L1 e 53 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 As versões em arquivo, na stack local e no desenvolvimento coincidem. A
 fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
@@ -747,13 +774,21 @@ fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 `20261119141610`, `20261119154356`, `20261119175654`, `20261119184524`,
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
-`20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`.
+`20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`,
+`20261120231639`.
+
+`20261120231639` permite cancelar uma COM cujas chegadas estão resolvidas.
+Os bloqueios ficam na transação existente. O ensaio remoto executou o SQL
+e verificou os grants com rollback. O backup cifrado verificado foi
+`61f6bad5-6d07-4010-baf3-f154674765fc`. A aplicação vinculada acrescentou
+somente esta versão. O desenvolvimento confirmou 313 migrations, fila
+vazia e função interna sem acesso direto pelo papel autenticado.
 
 `20261120214300` guarda os vínculos documentais por material da REQ e do
 BAL. A única versão pendente foi aplicada após confirmar o prefixo de 311
 versões, verificar o backup cifrado
 `f99cd5cb-63a3-4398-b4e4-c4fbbd16b46a` e ensaiar SQL e grants com rollback.
-Os históricos local e remoto conferem nas 312 versões. A fila vinculada
+Naquela conferência os históricos local e remoto tinham 312 versões. A fila vinculada
 ficou vazia. A leitura direta da tabela está bloqueada e o seletor exige
 uma sessão autorizada.
 
