@@ -378,6 +378,15 @@ teste dirigido deste incremento cobre essa correção. Os demais casos de
 abertura, fichas, rascunhos e fluxos do segundo shard seguem em triagem.
 [Execução da CI](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44691631298).
 
+Na REQ e na COM, o log da CI mostrou o menu flutuante interceptando a
+abertura de Arquivos gerados e de Conferir chegadas. A verificação da
+ação ausente agora espera o menu abrir, confere a ausência da ação e
+aguarda o fechamento do menu e da sobreposição antes do próximo controle.
+A reprodução local no iOS emulado encontrou a mesma falha na REQ.
+Os três percursos dirigidos passaram em Chromium, Android e iOS emulados.
+O primeiro Chromium da COM excedeu o limite do PostgreSQL local ao criar
+a ficha de teste. O reteste dirigido passou sem retry automático.
+
 Na abertura da COM, o catálogo vazio ou só com materiais inativos volta a
 ter o estado de E04-16. Quem administra pode ir direto ao cadastro ou à
 gestão. **Planejar com item extra** preserva a opção já existente de emitir

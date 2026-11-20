@@ -87,11 +87,16 @@ export async function openOperationalDocumentAction(page: Page, name: string) {
 
 export async function expectNoOperationalDocumentAction(page: Page, name: string) {
   const menu = operationalMenu(page);
-  const trigger = page.getByRole("button", { name: "Ações da ficha", exact: true });
-  if (await trigger.isVisible()) await trigger.click();
+  const trigger = page.getByRole("button", { name: /^(Ações da ficha|Fechar ações da ficha)$/ });
+  if (await trigger.isVisible()) {
+    if (await trigger.getAttribute("aria-expanded") !== "true") await trigger.click();
+    await expect(menu).toBeVisible();
+  }
   await expect(page.getByRole("button", { name, exact: true })).toHaveCount(0);
   await expect(menu.getByRole("menuitem", { name, exact: true })).toHaveCount(0);
   if (await menu.isVisible()) await menu.press("Escape");
+  await expect(menu).toBeHidden();
+  await expect(page.locator(".hca-document-fab-backdrop")).toBeHidden();
 }
 
 export async function confirmCompleteDeliveryReceipt(page: Page) {
