@@ -12,6 +12,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { setup, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import type { ReceiptLine } from "../../src/types/requisition";
 
 async function login(page: Page, patient: string) {
   const fixtures = JSON.parse(readFileSync(fixtureFile, "utf8"));
@@ -137,7 +138,7 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   await expect(input).toHaveValue("1,25");
   await review(page);
   await expect(
-    page.getByText("1,25 mL (observado)", { exact: false }),
+    page.getByText("Estoque atual da equipe: 1,25 mL", { exact: true }),
   ).toBeVisible();
   expect(ledgerState()).toBe(ledger);
   sql(`insert into public.stock_movements
@@ -286,17 +287,17 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   ).toHaveValue("7");
   await review(page);
   for (const fact of [
-    "0 unidade (observado)",
-    "7 unidade (observado)",
-    "Não sei informar",
-    "Não informado",
+    "Estoque atual da equipe: 0 unidade",
+    "Estoque atual da equipe: 7 unidade",
+    "Estoque atual da equipe: Não sei informar",
+    "Estoque atual da equipe: Não informado",
   ])
     await expect(page.getByText(fact, { exact: false })).toBeVisible();
   await expect(
     page.getByText("Registro no rascunho (horário do dispositivo):", {
       exact: false,
     }),
-  ).toHaveCount(4);
+  ).toHaveCount(0);
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -376,18 +377,17 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   await page.unroute("**/api/requisitions");
   await page.goto("/historico/" + receipt.requisitionId);
   await selectDocumentSection(page, "materials");
-  for (const fact of [
-    "0 unidade (observado)",
-    "7 unidade (observado)",
-    "Não sei informar",
-    "Não informado",
-  ])
-    await expect(page.getByText(fact, { exact: false }).first()).toBeVisible();
   const materials = page.getByRole("list", { name: "Materiais requisitados", exact: true }).getByRole("button", { name: /^Detalhes de / });
   await expect(materials).toHaveCount(4);
-  for (const material of await materials.all()) {
+  for (const line of receipt.lines as ReceiptLine[]) {
+    const material = materials.filter({ hasText: line.productName });
+    const observed = line.stockObservation === "observed";
+    const shortValue = observed ? String(line.currentStock) : line.stockObservation === "unknown" ? "Não sei informar" : "Não informado";
+    const fullValue = observed ? `${line.currentStock} ${line.unit} (observado)` : shortValue;
+    await expect(material.locator(".hca-v7-material-facts > span").filter({ hasText: "Informado na REQ" }).locator("b")).toHaveText(shortValue);
     await material.click();
     const panel = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Em acompanhamento nesta ficha", exact: true }) });
+    await expect(panel.getByText("Informado nesta REQ", { exact: true }).locator("..")).toContainText(fullValue);
     await expect(panel.getByText("Registro no rascunho (horário do dispositivo):", { exact: false }).first()).toBeVisible();
     await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   }
@@ -470,6 +470,6 @@ test("rascunho anterior conserva 0 e 7 para revisão sem classificá-los como ob
   await review(page);
   for (const amount of [0, 7])
     await expect(
-      page.getByText(amount + " unidade (observado)", { exact: false }),
+      page.getByText(`Estoque atual da equipe: ${amount} unidade`, { exact: true }),
     ).toBeVisible();
 });

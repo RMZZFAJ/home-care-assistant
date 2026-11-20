@@ -170,6 +170,7 @@ export function DocumentMaterialPanel({
     router.push(url.pathname + url.search);
   }
   const displayQuantity = (value: string | null) => value === null ? "Não disponível nesta consulta" : formatQuantity(value, row.unit ?? undefined);
+  const observations = data?.section === "stock" ? data.observations.filter(observation => observation.documentId !== documentId) : [];
   const links = data?.section === "links" ? data.rows.filter(item => item.id !== documentId) : [];
   const linkGroups = [
     { label: "Requisições em acompanhamento", rows: links.filter(item => item.kind === "REQ" && !item.archived && !closedRequisitionStatuses.has(item.status)) },
@@ -207,13 +208,13 @@ export function DocumentMaterialPanel({
             )}</div> : null}
           </section> : null}
           <section><h3>Estoque informado nas requisições</h3>
-            {data.observations.length ? <><div className="hca-material-linked-list">{data.observations.map(observation => <article key={observation.documentId}>
+            {observations.length ? <><div className="hca-material-linked-list">{observations.map(observation => <article key={observation.documentId}>
               {link({ id: observation.documentId, code: observation.code, type: "REQ" }, formatBrazilDate(observation.createdAt))}
               <strong>{formatStockObservation(observation.quantity, observation.observation ?? undefined, observation.unit ?? undefined)}</strong>
               <small>{formatStockObservationTime(observation.observedAt, observation.timeSource ?? "legacy_unknown")}</small>
             </article>)}</div><p className="hca-material-observation-note">
               Cada quantidade foi registrada na requisição correspondente. Os valores ficam preservados separadamente do saldo atual.
-            </p></> : <p>Nenhuma contagem de requisição disponível para este material.</p>}
+            </p></> : <p>{data.observations.length ? "Nenhuma contagem de outra requisição disponível para este material." : "Nenhuma contagem de requisição disponível para este material."}</p>}
           </section>
         </> : data?.section === "history" ? <DocumentMaterialHistory rows={data.rows} movementsAvailable={data.available}
           unit={row.unit} reference={record => {

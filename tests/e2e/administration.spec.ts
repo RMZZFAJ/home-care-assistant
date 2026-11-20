@@ -676,7 +676,7 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(reviewMaterial).toHaveCount(1);
     await expect(reviewMaterial.locator("xpath=ancestor::section[1]").getByRole("heading", { name: "Higiene", exact: true })).toBeVisible();
     await expect(reviewMaterial.getByText("Gaze", { exact: true })).toBeVisible();
-    await expect(reviewMaterial.getByText("Estoque da equipe: 3 pacote (observado)", { exact: true })).toBeVisible();
+    await expect(reviewMaterial.getByText("Estoque atual da equipe: 3 pacote", { exact: true })).toBeVisible();
     await expect(reviewMaterial.getByText("Urgente", { exact: true })).toBeVisible();
     await expect(page.getByText(details, { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Editar materiais de Higiene", exact: true })).toBeVisible();

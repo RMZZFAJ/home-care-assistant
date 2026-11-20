@@ -301,7 +301,7 @@ test("origem obsoleta exige comparação e adoção explícita após falha; sele
   await expect(reason(page)).toHaveValue(ownReason);
   for (let i = 0; i < 4; i++) await next(page);
   await expect(
-    page.getByText("0 unidade (observado)", { exact: false }),
+    page.getByText("Estoque atual da equipe: 0 unidade", { exact: true }),
   ).toBeVisible();
   await expect(source(page)).toContainText(
     `Minha referência para a confirmação: versão ${f.sourceVersion + 1}`,

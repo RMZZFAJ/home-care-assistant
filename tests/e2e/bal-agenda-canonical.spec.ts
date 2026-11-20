@@ -48,7 +48,9 @@ test("06.3 BAL canonical readonly materials preserve physical zero,original refe
   const materials = page.getByRole("region", { name: "Materiais do balanço", exact: true });
   const list = materials.getByRole("list", { name: "Materiais do balanço", exact: true });
   const row = list.getByRole("button", { name: "Detalhes de " + names[0], exact: true });
-  await expect(row).toContainText("0 unidade");
+  const counted = row.locator(".hca-v7-material-facts > span").filter({ hasText: "Contagem da equipe" });
+  await expect(counted.locator("b")).toHaveText("0");
+  await expect(row.locator(".hca-v7-material-unit")).toHaveText("unidade");
   await expect(row).toContainText("Estoque familiar");
   await expect(page.getByRole("table", { name: "Materiais da contagem", exact: true })).toHaveCount(0);
   const ref = await mobileMaterialReference(browser, "BAL-0012");

@@ -615,11 +615,12 @@ REQ apresenta sob o nome do material os códigos de entregas já relacionados
 à linha. A busca para catálogos maiores que o exemplo E04-11 e as demais
 abas continuam acessíveis.
 
-A referência móvel usa a unidade na identificação sob o nome do material.
-Na aplicação, os valores de quantidade ainda podem repetir essa unidade
-nas duas colunas. Isso ocupa mais espaço nos materiais com nomes ou
-rótulos longos. A diferença apareceu na captura do BAL a 360 px e fica
-aberta na revisão da composição compacta.
+A unidade aparece uma vez na identificação sob o nome do material,
+como em E04-11. As quantidades nas duas colunas preservam as casas
+decimais e o espaço para rótulos longos. O leitor de tela recebe a unidade
+junto dos valores. Os painéis de detalhe exibem as quantidades com unidade.
+Na REQ, o painel mostra a contagem original e seu horário quando informado,
+além das contagens das demais requisições relacionadas.
 
 Na rodada final em iOS emulado, cinco casos compararam as linhas emitidas
 com E04-11 em 360 e 412 px. REQ, COM, ENT e BAL também foram exercitados em
@@ -629,6 +630,12 @@ referência e a diferença no painel, a busca e o retorno de foco. A tabela
 expandida manteve a rolagem por teclado. A DEV foi comparada após retomar
 o extra, resolver sua identificação e expedir. A consulta preservou o
 livro de estoque. O build, a checagem de tipos e o lint passaram.
+
+Após ajustar as unidades, sete casos passaram no iOS emulado com build de
+produção e sem repetição. Incluíram os cinco tipos emitidos, os valores
+zero e sete, saldo desconhecido, campo vazio e a data da observação da REQ
+após recuperar uma resposta perdida. A declaração DEV ainda sem expedição
+exibiu sua quantidade declarada sob o rótulo correspondente.
 
 **Vínculo por material em REQ e BAL.** O menu usa o seletor dos demais
 assistentes, com os mesmos filtros de tipo. O complemento implementado usa

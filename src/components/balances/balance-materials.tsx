@@ -28,9 +28,10 @@ export function IssuedBalanceMaterials({ data, active }: { data: SupplyDocument;
       const expected = line.metadata.expectedQuantity;
       const reference = typeof expected === "string" || typeof expected === "number" ? expected : null;
       const amount = (value: Amount) => formatQuantity(value, line.unit_snapshot);
-      const facts = [{ label: "Contagem da equipe", value: amount(line.quantity) }];
+      const countedLabel = "Contagem da equipe";
+      const facts = [{ label: countedLabel, value: formatQuantity(line.quantity) }];
       const detail = [
-        ...facts,
+        { label: countedLabel, value: amount(line.quantity) },
         { label: "Saldo na referência", value: available(reference) ? amount(reference) : "Referência não disponível" },
         { label: "Diferença na contagem", value: formatDifference(line.quantity, reference, line.unit_snapshot) },
         { label: "Recebido / validado", value: amount(line.accepted_quantity) },

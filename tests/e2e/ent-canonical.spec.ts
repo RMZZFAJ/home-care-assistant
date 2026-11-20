@@ -145,7 +145,9 @@ test("06.2 autonomous return declaration never presents declared quantities as s
   await login(page, f.patient); await page.goto("/documentos/" + doc.id); await selectDocumentSection(page, "materials");
   const list = page.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
   await expect(list.getByRole("listitem")).toHaveCount(1);
-  await expect(list.getByText("Expedido", { exact: true })).toHaveCount(0); await expect(list).toContainText("5 unidade");
+  await expect(list.getByText("Expedido", { exact: true })).toHaveCount(0);
+  await expect(list.locator(".hca-v7-material-unit")).toHaveText("unidade");
+  await expect(list.locator(".hca-v7-material-facts > span").filter({ hasText: "Declarado" }).locator("b")).toHaveText("5");
   const before = facts(f.patient), writes = watchWrites(page);
   await selectDocumentSection(page, "workflow");
   const region = page.getByRole("region", { name: "Expedição e histórico da transferência", exact: true }), grid = region.locator(".hca-definition-grid").first();

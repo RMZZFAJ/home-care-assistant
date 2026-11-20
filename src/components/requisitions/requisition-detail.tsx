@@ -701,12 +701,16 @@ export function RequisitionDocumentContent({
                     : line?.serviceStatus === "review_required" ? "Nova avaliação familiar pendente"
                       : ["cancelled", "archived"].includes(documentState) ? "Sem atendimento confirmado"
                         : item.product_id || item.resolution ? "Em aberto" : "Cadastro pendente";
+                const reported = item.current_stock != null && item.stock_observation !== "unknown" && item.stock_observation !== "unfilled"
+                  ? formatQuantity(item.current_stock)
+                  : formatStockObservation(item.current_stock, item.stock_observation);
                 return {
                   id: item.id, name, unit: item.unit_snapshot ?? null, urgent: item.urgent, done: Boolean(line?.attended),
                   status, tone: data.is_historical ? "neutral" : line?.attended ? "success" : "pending",
-                  facts: [{ label: "Informado na REQ", value: formatStockObservation(item.current_stock, item.stock_observation, item.unit_snapshot) }],
+                  facts: [{ label: "Informado na REQ", value: reported }],
                   detail: <div className="space-y-2">
                       <p>{status}</p>
+                      <p><strong>Informado nesta REQ</strong> · {formatStockObservation(item.current_stock, item.stock_observation, item.unit_snapshot)}</p>
                       <p>{formatStockObservationTime(item.stock_observation_at, item.stock_observation_time_source)}</p>
                       {item.catalogue_extra ? <p>Material do catálogo incluído como extra.</p> : null}
                       {item.catalogue_extra?.details ? <p className="whitespace-pre-wrap">{item.catalogue_extra.details}</p> : null}

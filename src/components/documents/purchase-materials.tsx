@@ -60,9 +60,9 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
           document: { id: origin.documentId, type: origin.type, code: origin.code },
           detail: "Origem vinculada a este material",
         })),
-        facts: [{ label: "Pedido / autorizado", value: `${quantity(line.quantity)} / ${quantity(line.approved_quantity)}` },
-          { label: "Comprado", value: quantity(line.purchased_quantity) },
-          { label: "Chegou / entrou", value: `${current ? quantity(decimal(entered).plus(current.pendingValidationQuantity).toFixed()) : quantity(undefined)} / ${quantity(entered)}` }],
+        facts: [{ label: "Pedido / autorizado", value: `${formatQuantity(line.quantity)} / ${formatQuantity(line.approved_quantity)}` },
+          { label: "Comprado", value: formatQuantity(line.purchased_quantity) },
+          { label: "Chegou / entrou", value: `${current ? formatQuantity(decimal(entered).plus(current.pendingValidationQuantity).toFixed()) : "Não informado neste registro"} / ${formatQuantity(entered)}` }],
         detail: <>
           {readPresentationConversions(line.presentation_conversions).map(item => <p key={item.id}>{presentationCaption(item)}</p>)}
           {line.requisitionItemIds.length ? <p>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</p> : null}

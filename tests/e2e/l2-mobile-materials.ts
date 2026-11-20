@@ -50,4 +50,9 @@ export async function expectMobileMaterialRow(row: Locator, reference: Page, wid
     expect(await facts.locator(".hca-v7-material-facts, .v7-material-facts").evaluate(node =>
       getComputedStyle(node).gridTemplateColumns.split(" ").length)).toBe(2);
   }
+  const unit = await row.locator(".hca-v7-material-unit").innerText();
+  const values = await row.locator(".hca-v7-material-facts b").allTextContents();
+  expect(unit.trim()).not.toBe("");
+  for (const value of values) expect(value).not.toContain(" " + unit);
+  await expect(row).toHaveAttribute("aria-describedby", /^material-unit-\S+ material-facts-/);
 }

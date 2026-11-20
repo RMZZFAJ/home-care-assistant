@@ -25,15 +25,14 @@ export function DeliveryMaterials({ data, active }: { data: SupplyDocument; acti
       const done = !cancelled && !declarationOnly && !issue && line.fully_checked;
       const status = declarationOnly ? "Declarado" : cancelled ? "Cancelado" : issue ? "Em apuração"
         : done ? "Conferido" : Number(line.accepted_quantity) > 0 ? "Recebido em parte" : "Em trânsito";
-      const amount = (value?: string | null) => formatQuantity(value, line.unit_snapshot);
-      const facts = declarationOnly ? [{ label: "Declarado", value: amount(line.quantity) }] : [
-        { label: "Expedido", value: amount(line.quantity) }, { label: "Em trânsito", value: amount(transit) },
-        { label: "Recebido", value: amount(line.accepted_quantity) },
+      const amounts = declarationOnly ? [{ label: "Declarado", value: line.quantity }] : [
+        { label: "Expedido", value: line.quantity }, { label: "Em trânsito", value: transit },
+        { label: "Recebido", value: line.accepted_quantity },
       ];
-      const detail = declarationOnly ? facts : [
-        ...facts, { label: "Conciliado", value: amount(line.reconciled_quantity) },
-        ...(receipt ? [{ label: "Recebido declarado", value: amount(receipt.receivedQuantity) },
-          { label: "Excedente em apuração", value: amount(receipt.excessQuantity) }] : []),
+      const detail = declarationOnly ? amounts : [
+        ...amounts, { label: "Conciliado", value: line.reconciled_quantity },
+        ...(receipt ? [{ label: "Recebido declarado", value: receipt.receivedQuantity },
+          { label: "Excedente em apuração", value: receipt.excessQuantity }] : []),
       ];
       const origins = data.originDocuments?.filter(origin => origin.productIds.includes(line.product_id)) ?? [];
       const requests = data.linkedRequisitions?.filter(req =>
@@ -51,14 +50,15 @@ export function DeliveryMaterials({ data, active }: { data: SupplyDocument; acti
             detail: "Requisição vinculada a este material",
           })),
         ],
-        facts, detail: <>
+        facts: amounts.map(({ label, value }) => ({ label, value: formatQuantity(value) })),
+        detail: <>
           {readPresentationConversions(line.presentation_conversions).map(item => <p key={item.id}>{presentationCaption(item)}</p>)}
           {line.requisitionItemIds.length ? <p>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</p> : null}
           {line.family_fulfillment ? <p><strong>Avaliação familiar: {line.family_fulfillment === "partial" ? "atendimento parcial" : "atendimento completo"}</strong> · {line.fulfillment_decided_name} · {line.fulfillment_decided_at ? formatBrazilDate(line.fulfillment_decided_at) : "Instante não disponível"}</p> : null}
           {data.status === "administratively_closed" ? <p>{issue
             ? "Encerramento administrativo · situação física ainda desconhecida"
             : "Conciliação administrativa registrada · aceite pessoal preservado"}</p> : null}
-          <dl className="hca-material-balance-grid">{detail.map(fact => <div key={fact.label} data-material-fact={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl>
+          <dl className="hca-material-balance-grid">{detail.map(fact => <div key={fact.label} data-material-fact={fact.label}><dt>{fact.label}</dt><dd>{formatQuantity(fact.value, line.unit_snapshot)}</dd></div>)}</dl>
         </>,
       };
     })} />;
