@@ -258,6 +258,23 @@ as capturas do produto em Android e iOS emulados estão em
 e sem retry. A conferência excluiu outra chegada pendente da mesma COM,
 restaurou o foco e preservou as duas chegadas sem lançamento de estoque.
 
+A variante Falha ao atualizar abre o diálogo compartilhado quando falha
+uma atualização solicitada na COM. O diagnóstico recolhido usa a referência
+de suporte da consulta. Duas tentativas de leitura continuam disponíveis
+enquanto a consulta falha. Ao esgotá-las, o diálogo oferece copiar o
+diagnóstico e voltar à ficha. Durante a falha, a cópia anterior permanece
+disponível para consulta e a geração de novos PDFs fica bloqueada. Se a
+recuperação encontrar mudanças, a comparação abre antes de substituir a
+cópia. O fluxo usa leituras e mantém os controles de aprovação da chegada.
+O texto informa que a consulta falhou mesmo quando o serviço devolve um
+erro com a conexão ativa. O carregamento acompanha a única consulta real,
+sem simular etapas. Android e iOS emulados passaram sem retry com Auth real,
+uma falha HTTP simulada, recuperação pela API e nova falha persistente.
+Os testes conferiram o limite de duas tentativas, o retorno de foco, a
+permanência do comparativo após uma leitura em segundo plano e a ausência
+de movimentos de estoque. As capturas da v7 e do produto estão em
+`output/playwright/l2-arrival-failure/`.
+
 **Divergências e dependências.** A v7 reúne etapas que o repositório já
 expunha em entradas usuais e pelo assistente de transferências. Os fluxos
 foram aproximados visualmente com preservação da etapa salva em rascunhos

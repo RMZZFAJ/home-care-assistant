@@ -14,11 +14,12 @@ export function useDocumentCopy<T>(identity: (value: T) => string) {
   }, []);
   const acceptRead = useCallback((next: T, key: string, preserveOperation = false) => {
     const changed = currentRef.current !== null && identity(currentRef.current) !== identity(next);
-    if (changed && (acceptedReadRef.current === key || preserveOperation)) {
+    const preserveCopy = acceptedReadRef.current === key || preserveOperation;
+    acceptedReadRef.current = key;
+    if (changed && preserveCopy) {
       setObservedData(next);
       return;
     }
-    acceptedReadRef.current = key;
     setData(next);
   }, [identity, setData]);
   return { data: storedData, observedData, setData, acceptRead, stale: observedData !== null };

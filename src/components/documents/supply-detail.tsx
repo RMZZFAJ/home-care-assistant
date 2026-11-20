@@ -102,6 +102,7 @@ import { confirmedPurchase, PurchaseResult, type ConfirmedPurchase } from "./pur
 import { PurchaseArrivalResult } from "./purchase-arrival";
 import { PurchaseArrivalCorrections } from "./purchase-arrival-correction";
 import { PurchaseArrivalReview, canReviewPurchaseArrivals, type OpenChangedArrivals } from "./purchase-arrival-review";
+import { arrivalRefreshRetryLimit, PurchaseArrivalRefreshFailure } from "./purchase-arrival-refresh-failure";
 import {
   acquisitionRemaining,
   arrivalRemaining,
@@ -127,6 +128,8 @@ type SupplyReview = {
   expectedVersion: number;
   draftCommit?: { id: string; revision: number; };
 };
+type ArrivalReadIntent = { scope: string; attempt: number; retries: number; before: SupplyDocument; failed?: boolean };
+type ArrivalReadFailure = { cause: unknown; retries: number; open: boolean };
 
 const supplyCopyIdentity = (value: SupplyDocument) => JSON.stringify([value.version, value.status, value.workflow_data, value.lines, value.receipts, value.deliveryCancellation?.referenceHash, value.balanceReview?.referenceHash]);
 export function SupplyDocumentContent({
@@ -155,6 +158,9 @@ export function SupplyDocumentContent({
   const [error, setError] = useState("");
   const [readDenied, setReadDenied] = useState(false);
   const [readFailed, setReadFailed] = useState(false);
+  const arrivalReadRef = useRef<ArrivalReadIntent | null>(null);
+  const [arrivalReadFailure, setArrivalReadFailure] = useState<ArrivalReadFailure | null>(null);
+  const [openRecoveredComparison, setOpenRecoveredComparison] = useState(false);
   const [message, setMessage] = useState("");
   const [purchaseResult, setPurchaseResult] = useState<ConfirmedPurchase | null>(null);
   const [arrivalResult, setArrivalResult] = useState<{ documentId: string; receipt: PurchaseReceipt } | null>(null);
@@ -181,7 +187,9 @@ export function SupplyDocumentContent({
   const reviewingCancellation = data?.type === "ENT" && (action === "cancel" && hasPersonalReceipt ||
     action === "consent_cancel" || action === "refuse_cancellation" || action === "withdraw_cancellation");
   const coveredOperation = registeringPurchase || registeringArrival || reassigningDelivery;
-  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation), { title: busy ? "Confirmando a operação" : "Consultando a ficha", detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
+  const refreshingArrival = loading && coveredRead && data?.type === "COM";
+  const activityTitle = refreshingArrival ? "Atualizando chegada" : busy ? "Confirmando a operação" : "Consultando a ficha";
+  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation), { title: activityTitle, detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
   const [review, setReview] = useState<SupplyReview | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [closeUncertain, setCloseUncertain] = useState(false);
@@ -206,21 +214,35 @@ export function SupplyDocumentContent({
   const operationOpenerRef = useRef<HTMLButtonElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
   const refreshButtonRef = useRef<HTMLButtonElement>(null);
-  function refreshDocument() {
+  const patientId = context.patient?.id;
+  function startDocumentRead(retries = 0) {
     // Explicit read intent may replace a live background read. Commands and
     // an already covered explicit read still block repeated activation.
     if (refreshDisabled) return;
+    if (data?.type === "COM") {
+      arrivalReadRef.current = { scope: id + ":" + patientId, attempt: attempt + 1, retries, before: data };
+    }
+    setArrivalReadFailure(failure => failure ? { ...failure, open: false } : null);
+    setOpenRecoveredComparison(false);
     restoreRefreshFocusRef.current = true;
     setCoveredRead(true);
     setLoading(true);
     setAttempt((value) => value + 1);
   }
+  function refreshDocument() {
+    if (refreshDisabled) return;
+    if (arrivalReadFailure) {
+      setArrivalReadFailure({ ...arrivalReadFailure, open: true });
+    } else {
+      startDocumentRead();
+    }
+  }
   useEffect(() => {
     if (!loading && restoreRefreshFocusRef.current) {
       restoreRefreshFocusRef.current = false;
-      refreshButtonRef.current?.focus();
+      if (!arrivalReadFailure?.open && !openRecoveredComparison) refreshButtonRef.current?.focus();
     }
-  }, [loading]);
+  }, [loading, arrivalReadFailure?.open, openRecoveredComparison]);
   const resultFocusRef = useRef(false);
   useEffect(() => {
     if (decisionFocusRef.current) {
@@ -264,7 +286,6 @@ export function SupplyDocumentContent({
     idempotencyKey: string;
     draftCommit?: { id: string; revision: number; };
   } | null>(null);
-  const patientId = context.patient?.id;
   useEffect(() => {
     const controller = new AbortController();
     // Cache Components can resume this route with its previous state. Reconnect
@@ -272,9 +293,15 @@ export function SupplyDocumentContent({
     const readScope = id + ":" + patientId;
     const changedScope = readScopeRef.current !== readScope;
     readScopeRef.current = readScope;
+    const intent = arrivalReadRef.current;
+    const arrivalRead = intent?.attempt === attempt && intent.scope === readScope ? intent : null;
     queueMicrotask(() => {
       if (!controller.signal.aborted) {
-        if (changedScope) setCoveredRead(true);
+        if (changedScope) {
+          setCoveredRead(true);
+          setArrivalReadFailure(null);
+          setOpenRecoveredComparison(false);
+        }
         setLoading(true);
       }
     });
@@ -287,7 +314,15 @@ export function SupplyDocumentContent({
         if (controller.signal.aborted) return;
         setReadDenied(false);
         setReadFailed(false);
-        acceptRead(result.data, id + ":" + attempt, editingRef.current);
+        setArrivalReadFailure(null);
+        if (arrivalRead) {
+          arrivalReadRef.current = null;
+          if (arrivalRead.retries > 0 && !arrivalRead.failed && supplyChanges(arrivalRead.before, result.data).length) {
+            setOpenRecoveredComparison(true);
+          }
+        }
+        const preserveCopy = editingRef.current || Boolean(arrivalRead && (arrivalRead.retries || arrivalRead.failed));
+        acceptRead(result.data, id + ":" + attempt, preserveCopy);
         setError("");
         if (result.data.type !== "COM" && result.data.care_recipient_id === patientId) {
           const directory = await api<{ directory: PatientPerson[]; }>(
@@ -306,8 +341,17 @@ export function SupplyDocumentContent({
             reason instanceof ApiError &&
             [401, 403, 404].includes(reason.status)
           ) {
+            arrivalReadRef.current = null;
+            setArrivalReadFailure(null);
+            setOpenRecoveredComparison(false);
             setReadDenied(true);
             setData(null);
+          } else if (arrivalRead) {
+            if (!arrivalRead.failed) {
+              arrivalReadRef.current = { ...arrivalRead, failed: true };
+              setArrivalReadFailure({ cause: reason, retries: arrivalRead.retries, open: true });
+            }
+            return;
           }
           setError(
             reason instanceof Error
@@ -887,6 +931,14 @@ export function SupplyDocumentContent({
           code={data.code} kind={data.kind === "DEV" || data.code.startsWith("DEV-") ? "DEV" : data.type}
           donation={data.type === "COM" && data.payload.origin === "donation"} />
       ) : null}
+      {data?.type === "COM" && arrivalReadFailure ? (
+        <PurchaseArrivalRefreshFailure key={arrivalReadFailure.retries} cause={arrivalReadFailure.cause} retries={arrivalReadFailure.retries}
+          open={arrivalReadFailure.open} returnFocus={refreshButtonRef}
+          onClose={() => setArrivalReadFailure({ ...arrivalReadFailure, open: false })}
+          onRetry={() => {
+            if (arrivalReadFailure.retries < arrivalRefreshRetryLimit) startDocumentRead(arrivalReadFailure.retries + 1);
+          }} />
+      ) : null}
       {data ? (
         <DocumentBreadcrumb
           code={
@@ -994,6 +1046,7 @@ export function SupplyDocumentContent({
             updateNotice={<>
               {observedData ? <DocumentFreshness code={data.code ?? data.type}
                 changes={copyChanges} loading={refreshDisabled} editing={operationOpen} onRefresh={refreshDocument}
+                openedAfterRecovery={openRecoveredComparison} onCloseRecovery={() => setOpenRecoveredComparison(false)}
                 onReviewArrival={reviewableChangedArrivals.length ? opener => changedArrivalsRef.current?.(
                   reviewableChangedArrivals, () => opener?.isConnected ? opener : refreshButtonRef.current,
                 ) : undefined} /> : null}
@@ -1506,7 +1559,7 @@ export function SupplyDocumentContent({
             <DocumentPanel value="files">
               {data.protocol ? (
                 <DocumentActions
-                  generationBlocked={stale}
+                  generationBlocked={stale || Boolean(arrivalReadFailure)}
                   readOnly={archived}
                   actionTarget={fileActionTarget}
                   onAction={() => tabs.select("files")}

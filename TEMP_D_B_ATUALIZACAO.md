@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — recuperação da atualização de chegada da COM.** O diálogo da v7
+mostra o diagnóstico recolhido. A recuperação consulta a ficha e volta à
+comparação se encontrar mudanças. Após duas tentativas sem sucesso, ficam
+disponíveis o diagnóstico e a volta à ficha. O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md)
+documenta os dois testes móveis que passaram e os estados comparados.
+
 **20/11 — chegada corrigida com a COM aberta.** A faixa da v7 distingue
 a mudança na quantidade recebida. Ver o que mudou compara os valores e
 permite abrir a conferência das chegadas alteradas pela fila existente.

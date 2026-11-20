@@ -67,7 +67,7 @@ test("COM devolve a mesma chegada ao autor e credita só o que foi reenviado e a
 });
 
 test("COM aberta compara a quantidade corrigida de uma chegada antes de atualizar", async ({ page }, info) => {
-  test.setTimeout(120_000);
+  test.setTimeout(150_000);
   const f = await purchaseBalanceFixture(), [line, otherLine] = f.document.lines;
   const declaration = { lineId: line.id, quantity: "4", expectedQuantity: "6", remainingAction: "wait" };
   const pending = await purchaseBalanceCommand(f.family, f.document, "receive", { lines: [declaration] });
@@ -88,15 +88,35 @@ test("COM aberta compara a quantidade corrigida de uma chegada antes de atualiza
   await expect(page.getByRole("tabpanel")).toContainText(line.name_snapshot);
   await expect(page.locator(".hca-document-freshness")).toHaveCount(0);
 
+  let blockReads = true;
+  const correlationId = randomUUID();
+  await page.route(`**/api/documents/${awaiting.id}`, async route => {
+    if (!blockReads || route.request().method() !== "GET") return route.continue();
+    await route.fulfill({ status: 503, json: {
+      error: "Mensagem de infraestrutura sintética", code: "DATABASE_UNAVAILABLE", correlationId,
+    } });
+  });
   await purchaseBalanceCommand(f.family, other.document, "resubmit_receipt", {
     receiptId: receipt.id, lines: [{ ...declaration, quantity: "5" }],
   });
-  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  const refreshButton = page.getByRole("button", { name: "Atualizar ficha", exact: true });
+  await refreshButton.click();
+  const failure = page.getByRole("dialog", { name: "Não foi possível atualizar a chegada", exact: true });
+  await expect(failure).toBeVisible();
+  await expect(failure.getByText("Mensagem de infraestrutura sintética")).toHaveCount(0);
+  const support = failure.locator("details");
+  await expect(support).not.toHaveAttribute("open", "");
+  if (info.project.use.hasTouch) await info.attach("E05-15 falha ao atualizar", { body: await failure.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png" });
+  await support.getByText("Detalhes para suporte", { exact: true }).click();
+  await expect(support.locator("pre")).toContainText(correlationId);
+  await expect(support.locator("pre")).toContainText("Tentativas nesta revisão: 0");
+
+  blockReads = false;
+  await failure.getByRole("button", { name: "Tentar novamente", exact: true }).click();
   const banner = page.locator(".hca-document-freshness");
   const opener = banner.getByRole("button", { name: "Ver o que mudou", exact: true });
-  await expect(banner.getByRole("status")).toHaveText("A quantidade da chegada mudou.");
-  await opener.click();
   const comparison = page.getByRole("dialog", { name: "A quantidade recebida mudou", exact: true });
+  await expect(comparison).toBeVisible();
   const amount = comparison.locator("dl > div").filter({ hasText: "Quantidade informada na chegada" });
   await expect(amount.locator("del")).toContainText("Antes: 4 ");
   await expect(amount.locator("strong")).toContainText("Agora: 5 ");
@@ -105,6 +125,12 @@ test("COM aberta compara a quantidade corrigida de uma chegada antes de atualiza
   await comparison.getByRole("button", { name: "Consultar compra", exact: true }).click();
   await expect(comparison).toHaveCount(0);
   await expect(opener).toBeFocused();
+  const liveRead = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${awaiting.id}`
+    && response.request().method() === "GET");
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  expect((await liveRead).ok()).toBe(true);
+  await expect(page.locator(".hca-record-detail > span[role='status']")).toBeEmpty();
+  await expect(banner.getByRole("status")).toHaveText("A quantidade da chegada mudou.");
   await opener.click();
   await comparison.getByRole("button", { name: "Revisar chegada", exact: true }).click();
   const review = page.getByRole("dialog", { name: "Conferir entrada no estoque", exact: true });
@@ -113,8 +139,27 @@ test("COM aberta compara a quantidade corrigida de uma chegada antes de atualiza
   await expect(review.getByRole("button", { name: "Confirmar decisões", exact: true })).toBeEnabled();
   await review.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(opener).toBeFocused();
-  await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
+  await refreshButton.click();
   await expect(banner).toHaveCount(0);
+
+  blockReads = true;
+  await refreshButton.click();
+  const retry = failure.getByRole("button", { name: "Tentar novamente", exact: true });
+  for (const count of [1, 2]) {
+    await retry.click();
+    await expect(failure).toBeVisible();
+    await failure.locator("summary").click();
+    await expect(failure.locator("pre")).toContainText("Tentativas nesta revisão: " + count);
+  }
+  await expect(retry).toHaveCount(0);
+  await expect(failure.locator("footer").getByRole("button", { name: "Copiar detalhes", exact: true })).toBeVisible();
+  await failure.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(failure).toHaveCount(0);
+  await expect(refreshButton).toBeFocused();
+  await refreshButton.click();
+  await expect(failure).toBeVisible();
+  await expect(retry).toHaveCount(0);
+
   expect(sql(`select count(*) from public.stock_movements where reference_type='purchase_receipt'
     and reference_id in (${sqlLiteral(receipt.id)}, ${sqlLiteral(other.receipt.id)});`)).toBe("0");
 });
