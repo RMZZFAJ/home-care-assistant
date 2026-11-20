@@ -78,8 +78,15 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await info.attach("extra-req", { body: await edit.screenshot(), contentType: "image/png" });
   await edit.getByRole("button", { name: "Salvar alteração", exact: true }).click();
   await next(page);
-  await page.getByRole("button", { name: "+ Incluir nova observação", exact: true }).click();
+  await expect(page.getByText("Nenhuma observação adicionada.", { exact: true })).toBeVisible();
+  const addObservation = page.getByRole("button", { name: "Adicionar observação", exact: true });
+  await addObservation.click();
   const observation = page.getByRole("textbox", { name: "Observação 1", exact: true });
+  await expect(observation).toBeFocused();
+  await addObservation.click();
+  await expect(page.getByRole("textbox", { name: "Observação 2", exact: true })).toBeFocused();
+  await page.getByRole("button", { name: "Remover observação 2", exact: true }).click();
+  await expect(observation).toBeFocused();
   await observation.fill("x".repeat(1001));
   await next(page);
   await errorAt(observation, "A observação deve ter até 1.000 caracteres.");
@@ -112,7 +119,8 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
     await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
     await expect(confirm).toBeDisabled();
   } finally { resumeSave(); }
-  await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await page.getByRole("button", { name: "Editar observações", exact: true }).click();
+  await expect(observation).toBeFocused();
   await expect(observation).toHaveValue("x".repeat(1000));
   await next(page);
   await expect(extraName).toHaveCount(1);

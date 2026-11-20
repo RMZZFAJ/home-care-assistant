@@ -16,6 +16,7 @@ import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "@/components/documents/material-review";
 import { MaterialConsultButton } from "@/components/documents/catalogue-material-panel";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { IssuanceObservationList } from "@/components/forms/issuance-observations";
 import type { WorkspaceContext } from "@/types/workspace";
 import type {
   RequisitionFormData,
@@ -282,78 +283,18 @@ export function RequisitionRepeatReason({ productId, pending, value, error, onCh
   </div>;
 }
 
-export function Observations({
-  errors = {},
-  observations,
-  setObservations,
-}: {
-  errors?: Record<string, string>;
-  observations: string[];
-  setObservations: (observations: string[]) => void;
-}) {
-  const fieldId = useId();
-  const [rows, setRows] = useState(() =>
-    observations.map((value) => ({ id: crypto.randomUUID(), value })),
-  );
-  function update(next: typeof rows) {
-    setRows(next);
-    setObservations(next.map((row) => row.value));
-  }
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-(--muted)">
-        Registre apenas informações operacionais necessárias.
-      </p>
-      {rows.map((row, index) => (
-        <div key={row.id} className="flex flex-wrap gap-2">
-          <textarea
-            aria-label={`Observação ${index + 1}`}
-            data-field-error={"observation:" + index}
-            aria-invalid={Boolean(errors["observation:" + index])}
-            aria-describedby={errors["observation:" + index] ? fieldId + "-" + index : undefined}
-            rows={3}
-            value={row.value}
-            onChange={(event) =>
-              update(
-                rows.map((item) =>
-                  item.id === row.id
-                    ? { ...item, value: event.target.value }
-                    : item,
-                ),
-              )
-            }
-            className={inputClass}
-          />
-          <ActionButton
-            variant="danger"
-            onClick={() => update(rows.filter((item) => item.id !== row.id))}
-            className="self-start"
-          >
-            Remover
-          </ActionButton>
-          {errors["observation:" + index] ? <p id={fieldId + "-" + index} className="ui-field-error w-full">{errors["observation:" + index]}</p> : null}
-        </div>
-      ))}
-      <ActionButton
-        onClick={() =>
-          update([...rows, { id: crypto.randomUUID(), value: "" }])
-        }
-      >
-        + Incluir nova observação
-      </ActionButton>
-    </div>
-  );
-}
 export function Review({
   context,
   form,
   recipientName,
   requesterName,
+  onEditObservations,
 }: {
   context: WorkspaceContext;
   form: RequisitionFormData;
   recipientName: string;
   requesterName: string;
+  onEditObservations: () => void;
 }) {
   const lines = form.lines;
   const extras = form.extraItems.filter((item) => item.name.trim());
@@ -387,10 +328,13 @@ export function Review({
           </>,
         }))]} />
       </section>
-      <Summary
-        title="Observações"
-        rows={form.observations.filter((item) => item.trim())}
-      />
+      <section className="hca-document-summary">
+        <div className="hca-issuance-observation-heading">
+          <h3>Observações</h3>
+          <ActionButton compact variant="quiet" aria-label="Editar observações" onClick={onEditObservations}>Editar</ActionButton>
+        </div>
+        <IssuanceObservationList observations={form.observations.filter((item) => item.trim())} />
+      </section>
     </div>
   );
 }

@@ -173,12 +173,18 @@ a ação Atualizar consulta para recuperar uma falha de leitura. A unidade
 vem do registro real. Códigos de catálogo exibidos apenas no exemplo da
 v7 ficam fora da consulta quando a referência real só fornece a unidade.
 
-A etapa de Observações foi conferida em 390 px. As capturas mostram os campos
-numerados, a ação Remover e o foco e a mensagem na validação. A revisão móvel
-incluiu a retomada, a ordem no recebimento e a nota própria do recebedor.
-Cabeçalho, rodapé, posição do status de rascunho e composição do comparativo
-de referência continuam no ajuste visual compartilhado do lote. A REQ ainda
-usa seu editor numerado anterior.
+A etapa de Observações da REQ usa o mesmo editor de COM, ENT e DEV. O editor
+reproduz o estado vazio, o campo numerado, Adicionar observação e Remover.
+A revisão retorna ao preenchimento pela ação Editar. A REQ conserva textos
+colados acima de 1.000 caracteres para a pessoa corrigir antes de emitir.
+O laboratório limita a digitação pelo próprio campo.
+
+O cenário E04-01 foi aberto em 390 px. O produto foi exercitado no Android e
+iOS emulados. Quatro casos passaram sem retry, incluindo foco ao adicionar,
+remover e editar, bloqueio do texto longo, autosave durante a revisão, emissão
+real, PDF e retomada do extra da COM. As capturas da REQ também mostram os
+ajustes restantes de cabeçalho, rodapé, posição do status do rascunho e aviso
+duplicado na validação. Esses pontos seguem na revisão visual do assistente.
 
 **Complementos para fatos e funções existentes no sistema.** Minhas listas
 pessoais ficam acessíveis na REQ com a visibilidade original, ao lado das
@@ -379,6 +385,16 @@ aprovados para esse SHA. O workflow foi executado uma vez e os logs dos seis
 jobs de navegador não contêm marcador de retry, flaky ou falha do Playwright.
 A implementação posterior e a triagem de 19/11 exigem a comprovação dos
 checks do próprio SHA, inclusive Sonar e preview compatível.
+
+A [CI 44645167326](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44645167326)
+passou nas validações Windows e Ubuntu, na instalação limpa e na evolução
+legada. A regressão SQL parou na lista de permissões de `service_role`, que
+ainda não enumerava seis RPCs de L2 para emissão inicial, avisos e arquivo.
+O commit `97c7991a` corrige o teste com as assinaturas exatas e verifica a
+negativa para `anon` e `authenticated`. A regressão isolada passou no banco
+local. Na [nova CI](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44646528431),
+Windows, Ubuntu e a etapa de migrations também passaram. A etapa de
+integração ainda estava executando na consulta de 19/11.
 
 L3 e L4 ainda não começaram. Quando tiverem ordem e referência aprovadas,
 registrar o escopo de cada lote, suas comparações comprovadas, criações fora

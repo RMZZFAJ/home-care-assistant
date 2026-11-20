@@ -32,6 +32,7 @@ import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
 import { navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
+import { IssuanceObservationsEditor } from "@/components/forms/issuance-observations";
 import { materialCategories, supplyWizardStages, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { Dialog, StepNavigator } from "@/components/ui/primitives";
 import { ActionButton, ActionLink } from "@/components/ui/controls";
@@ -41,7 +42,6 @@ import { RequisitionExtras } from "./requisition-extra-items";
 import {
   Identity,
   CatalogStep,
-  Observations,
   Review,
   type Product,
 } from "./requisition-steps";
@@ -811,12 +811,16 @@ function PatientRequisition({
               />
             ) : null}
             {step === 5 ? (
-              <Observations
+              <IssuanceObservationsEditor
                 errors={fieldErrors}
                 observations={form.observations}
-                setObservations={(observations) =>
-                  setForm({ ...form, observations })
-                }
+                limitInput={false}
+                onChange={observations => {
+                  setDraftTouched(true);
+                  setForm(current => ({ ...current, observations }));
+                  setFieldErrors(current => Object.fromEntries(Object.entries(current).filter(([name]) => !name.startsWith("observation:"))));
+                  setError("");
+                }}
               />
             ) : null}
             {step === 6 ? (
@@ -825,6 +829,15 @@ function PatientRequisition({
                 form={form}
                 recipientName={context.patient!.display_name}
                 requesterName={context.fullName}
+                onEditObservations={() => {
+                  setStep(5);
+                  requestAnimationFrame(() => {
+                    const editor = fieldsRef.current?.querySelector(".hca-issuance-observations");
+                    const control = editor?.querySelector("textarea") ?? editor?.querySelector("button");
+                    control?.focus({ preventScroll: true });
+                    control?.scrollIntoView({ block: "center", inline: "nearest" });
+                  });
+                }}
               />
             ) : null}
           </fieldset>

@@ -1,5 +1,12 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — Observações da REQ e retomada da CI.** O editor da etapa Observações
+segue o E04-01 com notas numeradas, remoção, foco e retorno da revisão. A REQ
+preserva texto colado acima do limite até a pessoa corrigir. Os quatro
+percursos dirigidos passaram em Android e iOS emulados. Os ajustes restantes
+do assistente e a correção do teste de permissões da CI estão no
+[registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **19/11 — painel de material e fichas relacionadas.** A aba Fichas agrupa
 as referências reais conforme a v7. A prévia mostra paciente, autoria,
 data, situação e quantidades registradas. O retorno à edição restaura foco,
