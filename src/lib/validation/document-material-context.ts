@@ -11,6 +11,9 @@ const document = z.object({
 const balances = { family: quantity.nullable(), team: quantity.nullable() };
 export const documentMaterialSummary = scope.extend({
   balances: z.array(z.object({ lineId: z.uuid(), productId: z.string().nullable(), ...balances })),
+  references: z.array(z.object({
+    lineId: z.uuid(), document: document.pick({ id: true, type: true, kind: true, code: true }),
+  })).optional(),
 });
 export const materialPanelSections = ["stock", "history", "links"] as const;
 const lineScope = scope.extend({

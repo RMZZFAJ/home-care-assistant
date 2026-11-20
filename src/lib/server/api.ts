@@ -74,6 +74,8 @@ export function databaseError(
     throw new ApiError("FORBIDDEN", "A conferência exige outra pessoa com competência local. Quem declarou ou complementou não revisa a própria informação.", 403);
   if (error?.code === "PT409" && /^(issued document reference required|stale document material)$/i.test(message))
     throw new ApiError("VERSION_CONFLICT", "A referência da ficha mudou ou ainda não foi emitida. Consulte seu estado antes de confirmar novamente.", 409);
+  if (error?.code === "PT409" && message === "material reference no longer available")
+    throw new ApiError("MATERIAL_REFERENCE_CHANGED", "Uma ficha vinculada deixou de estar disponível para este material. Volte a Materiais e revise os vínculos antes de emitir.", 409);
   if (
     error?.code === "PT409" &&
     /^(stale flow reference|flow already reviewed|flow private intent mismatch)$/i.test(

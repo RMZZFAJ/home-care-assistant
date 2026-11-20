@@ -56,6 +56,10 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
       ];
       return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, status, done,
         tone: done ? "success" : hasPending || Number(entered) > 0 ? "pending" : "neutral",
+        related: data.originDocuments?.filter(origin => origin.productIds.includes(line.product_id)).map(origin => ({
+          document: { id: origin.documentId, type: origin.type, code: origin.code },
+          detail: "Origem vinculada a este material",
+        })),
         facts: [{ label: "Pedido / autorizado", value: `${quantity(line.quantity)} / ${quantity(line.approved_quantity)}` },
           { label: "Comprado", value: quantity(line.purchased_quantity) },
           { label: "Chegou / entrou", value: `${current ? quantity(decimal(entered).plus(current.pendingValidationQuantity).toFixed()) : quantity(undefined)} / ${quantity(entered)}` }],

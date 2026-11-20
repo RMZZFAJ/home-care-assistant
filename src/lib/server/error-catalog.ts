@@ -157,6 +157,10 @@ export const errorCatalog = {
     ...conflict,
     recommendedAction: "Confira o saldo da equipe e revise a contagem antes de emitir.",
   },
+  MATERIAL_REFERENCE_CHANGED: {
+    ...conflict,
+    recommendedAction: "Volte aos materiais e confira as fichas vinculadas.",
+  },
   DRAFT_VERSION_CONFLICT: {
     ...conflict,
     recommendedAction:

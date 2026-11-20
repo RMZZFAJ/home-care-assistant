@@ -613,12 +613,21 @@ nome do material os códigos de entregas já relacionados à linha. A busca,
 útil para catálogos maiores que o exemplo E04-11, e as demais abas do
 produto foram preservadas.
 
-**Vínculo por material em REQ e BAL.** A extensão solicitada precisa de uma
-referência documental por linha, com verificação independente da leitura da
-ficha relacionada. As origens de COM, ENT e DEV continuam com as regras da
-seção 7 do comando mestre. A referência da REQ ou do BAL deve conservar
-separados o saldo, o atendimento, a aprovação e a evidência do vínculo.
-A gravação e sua verificação continuam pendentes neste recorte.
+**Vínculo por material em REQ e BAL.** O menu usa o seletor dos demais
+assistentes, com os mesmos filtros de tipo. O complemento implementado usa
+como referência as fichas emitidas e visíveis do mesmo paciente que
+contêm o mesmo material. A escolha acompanha a revisão do rascunho
+e é registrada com autor, instante e versão na transação da emissão.
+As origens de COM, ENT e DEV preservam a seção 7 do comando mestre.
+Vínculos documentais da REQ e do BAL deixam estoque, atendimento,
+aprovação e exemplares assinados sob seus contratos existentes. A aba
+Materiais apresenta os vínculos da linha e permite consultar a ficha.
+
+A integração local confirmou a retomada do rascunho, a emissão de REQ e
+BAL, a repetição com a mesma chave, a rejeição de outro material sem
+efeito na emissão e a ocultação da referência após revogar a leitura
+da ficha relacionada. A migration `20261120214300` foi instalada no banco
+local sem reset.
 
 - **P1 — Reversão de contagem de REQ superada por nova contagem oficial.**
   Sem decisão registrada. A reversão comum preserva
@@ -659,8 +668,8 @@ continua sem regra de produto nesta entrega.
 ## Migrations por ambiente
 
 Consulta de 20/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **311 versões em cada banco**,
-com 242 versões anteriores a L1, 18 de L1 e 51 de L2.
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **312 versões em cada banco**,
+com 242 versões anteriores a L1, 18 de L1 e 52 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 As versões em arquivo, na stack local e no desenvolvimento coincidem. A
 fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
@@ -687,7 +696,15 @@ fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 `20261119141610`, `20261119154356`, `20261119175654`, `20261119184524`,
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
-`20261119233039`, `20261120043839`, `20261120052605`.
+`20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`.
+
+`20261120214300` guarda os vínculos documentais por material da REQ e do
+BAL. A única versão pendente foi aplicada após confirmar o prefixo de 311
+versões, verificar o backup cifrado
+`f99cd5cb-63a3-4398-b4e4-c4fbbd16b46a` e ensaiar SQL e grants com rollback.
+Os históricos local e remoto conferem nas 312 versões. A fila vinculada
+ficou vazia. A leitura direta da tabela está bloqueada e o seletor exige
+uma sessão autorizada.
 
 `20261119212000` e `20261119213000` tratam as observações numeradas e a
 justificativa da designação manual na transferência. `20261119220003`

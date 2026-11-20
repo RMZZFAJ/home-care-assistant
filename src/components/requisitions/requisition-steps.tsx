@@ -7,10 +7,7 @@ import { inputClass, Notice } from "@/components/workspace";
 import { normalizeCatalogText as normalize } from "@/lib/catalog-match";
 import { textRows } from "@/lib/text-rows";
 import { formatQuantity } from "@/lib/quantity";
-import {
-  formatStockObservation,
-  formatStockObservationTime,
-} from "@/lib/stock-observation";
+import { formatStockObservation } from "@/lib/stock-observation";
 import { StockObservationField } from "./stock-observation-field";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "@/components/documents/material-review";
@@ -46,6 +43,8 @@ export function CatalogStep({
   selected,
   updateLine,
   removeLine,
+  onLink,
+  linkedCount,
   errors,
   selectedCount,
   extras,
@@ -56,6 +55,8 @@ export function CatalogStep({
   selected: (id: string) => RequisitionLine | undefined;
   updateLine: (item: Product, patch: Partial<RequisitionLine>) => void;
   removeLine: (id: string) => void;
+  onLink: (material: Product, returnFocus: () => HTMLButtonElement | null) => void;
+  linkedCount: (id: string) => number;
   errors: Record<string, string>;
   selectedCount: number;
   extras: ReactNode;
@@ -128,6 +129,7 @@ export function CatalogStep({
       <div className="hca-wizard-material-list">
       {visible.map((item) => {
         const line = selected(item.id);
+        const references = linkedCount(item.id);
         const info = itemContext.find((entry) => entry.productId === item.id);
         const choiceId = `${materialGroupId}-${item.id}`;
         return (
@@ -157,9 +159,11 @@ export function CatalogStep({
               <span id={`${choiceId}-label`} className="hca-material-choice-copy">
                 <strong>{item.name}</strong>
                 <small>{item.unit}</small>
+                {references ? <small>{references} {references === 1 ? "ficha vinculada" : "fichas vinculadas"}</small> : null}
               </span>
             </label>
-            <MaterialConsultButton context={context} material={item} menu />
+            <MaterialConsultButton context={context} material={item} menu
+              onLink={line ? returnFocus => onLink(item, returnFocus) : undefined} />
             </div>
             {item.selectionPredecessors?.length ? (
               <p className="mt-2 text-sm">
@@ -259,13 +263,15 @@ export function Review({
 }) {
   const lines = form.lines;
   const extras = form.extraItems.filter((item) => item.name.trim());
+  const displayStock = (item: Pick<RequisitionLine, "currentStock" | "stockObservation">, unit?: string) =>
+    item.stockObservation === "observed" && item.currentStock != null
+      ? formatQuantity(item.currentStock, unit) : formatStockObservation(item.currentStock, item.stockObservation, unit);
   const catalogueRow = (item: RequisitionLine) => ({
     id: item.productId, name: item.productName, urgent: item.urgent,
     consult: <MaterialConsultButton context={context} material={{ id: item.productId, name: item.productName, unit: item.unit }} menu />,
     details: <>
       {item.catalogueExtra ? <small>Material do catálogo · {item.unit}</small> : null}
-      <small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation, item.unit)}</small>
-      <small>{formatStockObservationTime(item.stockObservationAt)}</small>
+      <small>Estoque atual da equipe: {displayStock(item, item.unit)}</small>
       {item.repeatReason ? <small>Reiteração: {item.repeatReason}</small> : null}
       {item.catalogueExtra?.details ? <small className="whitespace-pre-wrap">{item.catalogueExtra.details}</small> : null}
     </>,
@@ -292,8 +298,7 @@ export function Review({
           id: item.id, name: item.name, urgent: item.urgent,
           details: <>
             <small>Cadastro pendente{item.identification ? " · " + item.identification.unit : ""}</small>
-            <small>Estoque da equipe: {formatStockObservation(item.currentStock, item.stockObservation, item.identification?.unit)}</small>
-            <small>{formatStockObservationTime(item.stockObservationAt)}</small>
+            <small>Estoque atual da equipe: {displayStock(item, item.identification?.unit)}</small>
             {item.identification?.details ? <small className="whitespace-pre-wrap">{item.identification.details}</small> : null}
           </>,
         }))]} />

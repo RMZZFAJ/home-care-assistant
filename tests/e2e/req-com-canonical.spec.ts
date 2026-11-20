@@ -22,6 +22,41 @@ async function login(page: Page, patient: string, email: string) {
 const next = (page: Page) => page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 const facts = (patient: string) => sql(`select jsonb_build_object('req',(select jsonb_agg(to_jsonb(r) order by id) from public.requisitions r where care_recipient_id=${q(patient)}),'docs',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${q(patient)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)}));`);
 
+test("REQ guarda no rascunho a ficha escolhida pelo menu do material", async ({ page }) => {
+  const name = "Material para vínculo";
+  const f = await setup({ catalogue: [{ name, category: "medicamentos", unit: "unidade", aliases: [] }] });
+  const productId = f.products[0];
+  const purchase = await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient, p_type: "COM", p_draft: false, p_key: randomUUID(),
+    p_payload: { lines: [{ productId, quantity: "1" }], acquisitionMode: "planned" },
+  });
+  const user = await shiftWorker(f.patient, "admin");
+  const before = facts(f.patient);
+  await page.goto("/login?next=%2Ffichas%2Freq", { waitUntil: "domcontentloaded" });
+  await page.getByLabel("E-mail", { exact: true }).fill(user.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("navigation", { name: "Etapas da requisição", exact: true }))
+    .toBeVisible({ timeout: 45_000 });
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
+  await next(page);
+  await page.getByRole("checkbox", { name, exact: false }).check();
+  const more = page.getByRole("button", { name: "Mais ações de " + name, exact: true });
+  await more.click();
+  await page.getByRole("menuitem", { name: "Vincular a uma ficha", exact: true }).click();
+  const picker = page.getByRole("dialog", { name: "Vincular este material", exact: true });
+  await picker.getByRole("button", { name: "COM", exact: true }).click();
+  await picker.getByRole("checkbox", { name: "Vincular " + purchase.code, exact: true }).check();
+  await picker.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
+  await expect(more).toBeFocused();
+  await expect(page.getByText("1 ficha vinculada", { exact: true })).toBeVisible();
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  await expect.poll(async () => (await rpc(user.client, "creation_draft_context", {
+    p_patient: f.patient, p_kind: "REQ", p_target: null,
+  }))?.content.materialReferences).toEqual([{ productId, documentId: purchase.id }]);
+  expect(facts(f.patient)).toBe(before);
+});
+
 for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and review follow the canonical model in five widths without operational writes`, async ({ page, browser }, info) => {
   const f = await setup({ catalogue: [{ name: "Material de cuidado " + "com nome extenso ".repeat(5) + randomUUID().slice(0, 8), category: "medicamentos", unit: "mL", aliases: [] }] });
   const name = sql(`select name from public.care_recipient_products where care_recipient_id=${q(f.patient)} and product_id=${q(f.products[0])};`);

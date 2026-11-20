@@ -177,7 +177,7 @@ function ExtraItemEditor({ item, isNew, products, selectedIds, limitReached, onC
       </FormField>
       <StockObservationField value={draft.currentStock} mode={draft.stockObservation}
         unit={unit || undefined} error={errors.stock} onChange={change => setDraft({ ...draft, ...change })} />
-      <CheckboxField checked={draft.urgent} label="Reposição urgente" onChange={event => setDraft({ ...draft, urgent: event.currentTarget.checked })} />
+      <CheckboxField className="hca-wizard-material-urgent" checked={draft.urgent} label="Reposição urgente" onChange={event => setDraft({ ...draft, urgent: event.currentTarget.checked })} />
       <FormField label="Detalhes para identificar">
         <TextAreaField rows={2} maxLength={400} value={details} placeholder="Opcional · apresentação ou tamanho" onChange={event => setDetails(event.currentTarget.value)} />
       </FormField>
@@ -210,7 +210,7 @@ function CatalogueExtraEditor({ product, line, pending, onSave, onClose }: {
     <FormField label="Material"><TextInput value={product.name} disabled /></FormField>
     <StockObservationField value={draft.currentStock} mode={draft.stockObservation}
       unit={product.unit} decimals={decimals} error={errors.stock} onChange={change => setDraft({ ...draft, ...change })} />
-    <CheckboxField checked={draft.urgent} label="Reposição urgente" onChange={event => setDraft({ ...draft, urgent: event.currentTarget.checked })} />
+    <CheckboxField className="hca-wizard-material-urgent" checked={draft.urgent} label="Reposição urgente" onChange={event => setDraft({ ...draft, urgent: event.currentTarget.checked })} />
     <FormField label="Detalhes para identificar">
       <TextAreaField rows={2} maxLength={400} value={details} placeholder="Opcional · apresentação ou tamanho" onChange={event => setDetails(event.currentTarget.value)} />
     </FormField>

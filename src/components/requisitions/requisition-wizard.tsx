@@ -21,6 +21,7 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
+import { useWizardMaterialReferences } from "@/components/forms/use-wizard-material-references";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "@/components/documents/document-write-access-notice";
 import { DocumentCatalogueEmpty, DocumentOpeningFailure, DocumentOpeningPending, type OpeningFailure } from "@/components/documents/document-opening-status";
@@ -143,10 +144,13 @@ function PatientRequisition({
     ":" +
     context.patient!.id +
     (sourceId ? ":remaining:" + sourceId : "");
-  const draftContent: RequisitionFormData = {
+  const [draftTouched, setDraftTouched] = useState(false);
+  const materialReferences = useWizardMaterialReferences(context.patient!.id, "REQ", () => setDraftTouched(true));
+  const draftContent = {
     lines: form.lines,
     extraItems: form.extraItems,
     observations: form.observations,
+    ...(materialReferences.links.length ? { materialReferences: materialReferences.links } : {}),
     ...(form.remainingNeed ? { remainingNeed: form.remainingNeed } : {}),
   };
   const privateDraft = useCreationDraft({
@@ -159,8 +163,10 @@ function PatientRequisition({
       if (!draft.content || !("lines" in draft.content)) return false;
       if ((draft.content.remainingNeed?.requisitionId ?? null) !== sourceId)
         return false;
+      const { materialReferences: links, ...rest } = draft.content;
+      materialReferences.setLinks(links ?? []);
       setForm({
-        ...draft.content,
+        ...rest,
         lines: draft.content.lines.map((line) => {
           const product = products.find((item) => item.id === line.productId);
           return product
@@ -180,6 +186,7 @@ function PatientRequisition({
     },
     onDiscard: () => {
       setDraftTouched(false);
+      materialReferences.setLinks([]);
       setForm({ lines: [], extraItems: [], observations: [] });
       setStep(0);
       setFieldErrors({});
@@ -187,7 +194,6 @@ function PatientRequisition({
     },
   });
 
-  const [draftTouched, setDraftTouched] = useState(false);
   const canWrite = may(context, "request");
   const writeAccess = useDocumentWriteAccess(canWrite);
   const consultationRef = useRef<HTMLAnchorElement>(null);
@@ -233,7 +239,7 @@ function PatientRequisition({
           });
           setMessage(saved.intent
             ? "Tentativa desta aba recuperada. Consulte a mesma tentativa antes de iniciar outra requisição."
-            : "Preenchimento desta aba recuperado. Salve um rascunho na conta para retomar em outra sessão ou aparelho.");
+            : "Preenchimento desta aba recuperado.");
           if (saved.intent) {
             frozenRef.current = saved.intent;
             setStep(6);
@@ -367,6 +373,7 @@ function PatientRequisition({
   }
   function removeLine(id: string) {
     setDraftTouched(true);
+    materialReferences.remove(id);
     setForm((current) => ({
       ...current,
       lines: current.lines.filter((line) => line.productId !== id),
@@ -510,6 +517,7 @@ function PatientRequisition({
         ([400, 403, 404, 413, 422].includes(reason.status) ||
           reason.code === "DRAFT_VERSION_CONFLICT" ||
           reason.code === "VERSION_CONFLICT" ||
+          reason.code === "MATERIAL_REFERENCE_CHANGED" ||
           reason.code === "REQUEST_STOCK_CHANGED" ||
           reason.code === "DUPLICATE_REVIEW_REQUIRED");
       if (rejected) {
@@ -626,6 +634,7 @@ function PatientRequisition({
     <div ref={fieldsRef} onChangeCapture={event => {
       if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);
     }} className="hca-document-wizard min-w-0 space-y-5">
+      {materialReferences.picker}
       <Dialog open={reviewStock} title="Confira o estoque da equipe" onClose={() => setReviewStock(false)}>
         {loadingCatalog ? <p role="status">Consultando o estoque atual…</p> : catalogError ? (
           <Notice error>{catalogError}</Notice>
@@ -790,6 +799,7 @@ function PatientRequisition({
             </> : null}
             {currentCategory ? <CatalogStep key={currentCategory} context={context} items={categoryItems}
               itemContext={itemContext} selected={selected} updateLine={updateLine} removeLine={removeLine}
+              onLink={materialReferences.open} linkedCount={materialReferences.count}
               errors={fieldErrors} selectedCount={form.lines.length + form.extraItems.length} extras={extraEditor} /> : null}
             {step === 4 ? extraEditor : null}
             {step === 5 ? (

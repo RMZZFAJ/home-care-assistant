@@ -61,12 +61,26 @@ export function DocumentMaterialList({
   const decode = useCallback((raw: unknown) => {
     const summary = documentMaterialSummary.parse(raw);
     if (summary.documentId !== documentId || summary.patientId !== patientId) throw new Error("A resposta pertence a outra ficha.");
-    return summary.balances;
+    return summary;
   }, [documentId, patientId]);
   const readRevision = `${actorId ?? ""}:${revision}:${epoch}`;
   const summary = useScopedRead(active ? `/api/documents/${documentId}/materials` : null, readRevision, decode);
-  const stock = new Map(summary.loading || summary.error ? [] : summary.data?.map(row => [row.lineId, row]));
-  const selected = position && rows.find(row => row.id === position.lineId);
+  const currentSummary = summary.loading || summary.error ? null : summary.data;
+  const stock = new Map(currentSummary?.balances.map(row => [row.lineId, row]));
+  const references = new Map<string, NonNullable<DocumentMaterialRow["related"]>>();
+  for (const { lineId, document } of currentSummary?.references ?? []) {
+    const list = references.get(lineId) ?? [];
+    list.push({ document, detail: "Referência vinculada a este material" });
+    references.set(lineId, list);
+  }
+  const materialRows = rows.map(row => {
+    const additional = references.get(row.id);
+    return additional ? {
+      ...row, related: [...(row.related ?? []), ...additional.filter(link =>
+        !row.related?.some(previous => previous.document.id === link.document.id))],
+    } : row;
+  });
+  const selected = position && materialRows.find(row => row.id === position.lineId);
 
   useEffect(() => {
     if (!active) return;
@@ -103,7 +117,7 @@ export function DocumentMaterialList({
 
   const filterTitles = { all: "Todos", urgent: "Urgentes", pending: "Pendentes", done: settledLabel, routine: "Rotina" };
   const query = normalizeCatalogText(search);
-  const matching = rows.filter(row => normalizeCatalogText(row.name).includes(query));
+  const matching = materialRows.filter(row => normalizeCatalogText(row.name).includes(query));
   function matches(row: DocumentMaterialRow, value: Filter) {
     switch (value) {
       case "urgent": return Boolean(row.urgent);
@@ -138,7 +152,7 @@ export function DocumentMaterialList({
           return <li key={row.id} data-material-line-id={row.id}>
             <button type="button" className="hca-v7-material-row" data-urgent={row.urgent || undefined}
               aria-label={`Detalhes de ${row.name}${row.urgent ? " · Urgente" : ""}`}
-              aria-describedby={`material-facts-${row.id}`}
+              aria-describedby={[`material-facts-${row.id}`, row.related?.length ? `material-links-${row.id}` : null].filter(Boolean).join(" ")}
               ref={element => { if (element) buttonsRef.current.set(row.id, element); else buttonsRef.current.delete(row.id); }}
               onClick={() => setPosition({ lineId: row.id, section: "stock", page: 1, linked: null, panelScroll: 0 })}>
               <span className="hca-v7-material-title">
@@ -146,7 +160,7 @@ export function DocumentMaterialList({
                 <span className={`ui-badge ui-badge-${row.tone}`}>{row.status}</span><Icon name="chevron" width={15} height={15} />
               </span>
               <small className="hca-v7-material-unit">{row.unit ?? "Unidade não preservada"}</small>
-              {row.related?.length ? <small className="hca-v7-material-document-codes">
+              {row.related?.length ? <small className="hca-v7-material-document-codes" id={`material-links-${row.id}`}>
                 <Icon name="link" width={12} height={12} />
                 {[...new Set(row.related.map(item => item.document.code ?? item.document.kind ?? item.document.type))].join(" · ")}
               </small> : null}

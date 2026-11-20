@@ -35,8 +35,22 @@ export function DeliveryMaterials({ data, active }: { data: SupplyDocument; acti
         ...(receipt ? [{ label: "Recebido declarado", value: amount(receipt.receivedQuantity) },
           { label: "Excedente em apuração", value: amount(receipt.excessQuantity) }] : []),
       ];
+      const origins = data.originDocuments?.filter(origin => origin.productIds.includes(line.product_id)) ?? [];
+      const requests = data.linkedRequisitions?.filter(req =>
+        !origins.some(origin => origin.documentId === req.id)
+        && req.itemIds.some(id => line.requisitionItemIds.includes(id))) ?? [];
       return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, status, done,
         tone: done ? "success" : cancelled ? "danger" : declarationOnly ? "neutral" : "pending",
+        related: [
+          ...origins.map(origin => ({
+            document: { id: origin.documentId, type: origin.type, code: origin.code },
+            detail: "Origem vinculada a este material",
+          })),
+          ...requests.map(req => ({
+            document: { id: req.id, type: "REQ" as const, code: req.code ?? req.protocol },
+            detail: "Requisição vinculada a este material",
+          })),
+        ],
         facts, detail: <>
           {readPresentationConversions(line.presentation_conversions).map(item => <p key={item.id}>{presentationCaption(item)}</p>)}
           {line.requisitionItemIds.length ? <p>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</p> : null}

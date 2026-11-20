@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { api, ApiError, authenticate, patientContext, rpc } from "@/lib/server/api";
-import { parseSupplySources, supplySourceFilter, supplySourceTarget } from "@/lib/validation/supply-sources";
+import { parseSupplySources, sourcePickerTarget, supplySourceFilter } from "@/lib/validation/supply-sources";
 
 const query = z.object({
-  target: supplySourceTarget,
+  target: sourcePickerTarget,
   filter: supplySourceFilter,
   search: z.string().regex(/^[a-zA-Z0-9-]{0,100}$/),
   page: z.coerce.number().int().min(1).max(100000),
@@ -25,9 +25,12 @@ export async function GET(request: Request) {
     });
     if (!parsed.success) throw new ApiError("VALIDATION_ERROR", "Confira os filtros das fichas de origem.");
     const { target, filter, search, page, ids, productId } = parsed.data;
+    const reference = target === "REQ" || target === "BAL";
+    if (reference && !productId) throw new ApiError("VALIDATION_ERROR", "Escolha o material a vincular.");
     const auth = await authenticate();
-    const patient = await patientContext(auth, params.get("careRecipientId"), target === "DEV" ? "ent.create" : target.toLowerCase() + ".create");
-    const data = await rpc(auth.client, "supply_source_options", {
+    const capability = target === "DEV" ? "ent.create" : target === "BAL" ? "bal.count" : target.toLowerCase() + ".create";
+    const patient = await patientContext(auth, params.get("careRecipientId"), capability);
+    const data = await rpc(auth.client, reference ? "material_reference_options" : "supply_source_options", {
       p_patient: patient.id, p_target: target, p_filter: filter, p_search: search,
       p_page: page, p_ids: ids, p_product: productId,
     });

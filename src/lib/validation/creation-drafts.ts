@@ -24,6 +24,7 @@ import {
 } from "./stock-preparations";
 import { z } from "zod";
 import { catalogueExtra, extraMaterialIdentity } from "./extra-material-identity";
+import { materialDocumentReferences } from "./supply-sources";
 import {
   balancePreparationSaveSchema,
   balancePreparationMutationSchema,
@@ -80,6 +81,7 @@ export const requisitionStockReferenceSchema = z.strictObject({
 });
 export const requisitionDraftContent = z
   .object({
+    materialReferences: materialDocumentReferences.optional(),
     lines: z
       .array(
         z
@@ -154,6 +156,7 @@ export const balanceObservationSnapshot = z
   })
   .strict();
 export const balanceDraftContent = balanceObservationSnapshot.extend({
+  materialReferences: materialDocumentReferences.optional(),
   previousObservations: z.array(balanceObservationSnapshot).max(10).optional(),
 });
 const scope = {

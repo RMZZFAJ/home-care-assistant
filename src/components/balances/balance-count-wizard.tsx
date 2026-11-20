@@ -17,6 +17,7 @@ import { StepNavigator } from "@/components/ui/primitives";
 import { PatientSupplyWizard } from "@/components/documents/supply-wizard";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
+import { useWizardMaterialReferences } from "@/components/forms/use-wizard-material-references";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import {
   draftFlowStages,
@@ -241,6 +242,10 @@ function ScheduledCount({
       !sameBalanceContext(preservedContext, currentContext)) ||
     balance.referenceRevision !== referenceRevision ||
     !eligible;
+  const [draftTouched, setDraftTouched] = useState(false);
+  const materialReferences = useWizardMaterialReferences(
+    context.patient!.id, "BAL", () => setDraftTouched(true), editing?.id ?? documentId,
+  );
   const balanceContent = useMemo<BalanceDraftContent>(
     () => ({
       counts,
@@ -258,6 +263,7 @@ function ScheduledCount({
           })),
       ],
       context: preservedContext ?? currentContext,
+      ...(materialReferences.links.length ? { materialReferences: materialReferences.links } : {}),
       ...(previousObservations ? { previousObservations } : {}),
     }),
     [
@@ -269,6 +275,7 @@ function ScheduledCount({
       preservedContext,
       currentContext,
       previousObservations,
+      materialReferences.links,
     ],
   );
   const privateDraft = useCreationDraft({
@@ -287,6 +294,7 @@ function ScheduledCount({
       }
       setPreservedContext(content.context);
       setPreviousObservations(content.previousObservations);
+      materialReferences.setLinks(content.materialReferences ?? []);
       setCounts(content.counts);
       setObservationTimes(content.observationTimes);
       setNotes(content.notes);
@@ -311,6 +319,7 @@ function ScheduledCount({
         return;
       }
       setCounts({});
+      materialReferences.setLinks([]);
       setObservationTimes({});
       setNotes("");
       setDraftMaterials([]);
@@ -323,9 +332,8 @@ function ScheduledCount({
     },
   });
 
-  const [draftTouched, setDraftTouched] = useState(false);
   useLongDraftAutosave(privateDraft, balanceContent, draftTouched && !(busy || uncertain));
-  const missingMaterials = Object.keys(counts).filter(
+  const missingMaterials = [...new Set([...Object.keys(counts), ...materialReferences.links.map(link => link.productId)])].filter(
     (id) => !products.some((product) => product.id === id),
   );
   useEffect(() => {
@@ -1003,13 +1011,15 @@ function ScheduledCount({
               : {counts[id]}
               <ActionButton
                 disabled={busy || uncertain || privateDraft.blocked}
-                onClick={() =>
+                onClick={() => {
+                  materialReferences.remove(id);
+                  setDraftTouched(true);
                   setCounts((current) => {
                     const next = { ...current };
                     delete next[id];
                     return next;
-                  })
-                }
+                  });
+                }}
               >
                 Remover material indisponível
               </ActionButton>
@@ -1060,12 +1070,15 @@ function ScheduledCount({
               <BarcodeScanner onRead={scan} />
             </details>
             <BalanceCountFields
+              context={context}
               products={products}
               counts={counts}
               errors={fieldErrors}
               notes={notes}
               onCount={changeCount}
               onNotes={value => { setNotes(value); setDraftTouched(true); }}
+              onLink={materialReferences.open}
+              linkedCount={materialReferences.count}
             />
           </>
         ) : (
@@ -1096,6 +1109,7 @@ function ScheduledCount({
           </>
         )}
       </fieldset>
+      {materialReferences.picker}
       <fieldset
         disabled={Boolean(cacheError)}
         className="min-w-0"
