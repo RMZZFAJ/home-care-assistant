@@ -6,7 +6,7 @@ import { Dialog } from "@/components/ui/overlays";
 import { CreationDraftPanel } from "./creation-draft-panel";
 
 /** One resume choice; exceptional concurrency/recovery retains its real controls. */
-export function SimpleDraftPanel(props: ComponentProps<typeof CreationDraftPanel>) {
+export function SimpleDraftPanel({ statusInFooter = false, ...props }: ComponentProps<typeof CreationDraftPanel> & { statusInFooter?: boolean }) {
   const { draft, disabled = false, canResume = true, patientName } = props;
   if (!draft.active) return null;
   if (draft.readDenied || draft.protectedReadPending || draft.loadError || draft.error || draft.pending || draft.conflict || draft.kind === "PROGRESS" && draft.consumed)
@@ -19,5 +19,6 @@ export function SimpleDraftPanel(props: ComponentProps<typeof CreationDraftPanel
     <p>Existe um preenchimento salvo para {patientName}. Você pode continuar o último rascunho ou descartá-lo e começar novamente.</p>
     <div className="hca-toolbar">{props.resumeHref ? <Link className="hca-control" href={props.resumeHref}>Continuar rascunho</Link> : <ActionButton variant="primary" disabled={draft.busy || disabled || !canResume} onClick={() => draft.resume()}>{props.resumeLabel ?? "Continuar rascunho"}</ActionButton>}<ActionButton disabled={draft.busy || disabled} onClick={() => void draft.discard()}>{props.discardLabel ?? "Descartar e começar novamente"}</ActionButton></div>
   </Dialog>;
+  if (statusInFooter) return null;
   return draft.backgroundBusy || draft.busy ? <p className="hca-field-help" role="status">Guardando rascunho…</p> : draft.base?.state === "active" ? <p className="hca-field-help" role="status">Último rascunho salvo.</p> : null;
 }

@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**19/11 — cartão e rodapé dos assistentes de L2.** REQ, COM, ENT e DEV
+compartilham a composição das etapas e o rodapé com o estado real do
+rascunho. O aviso de Observações da REQ fica junto do campo com erro. A
+referência móvel foi capturada em 360 e 412 px. Os resultados no produto e
+as diferenças restantes estão no [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **19/11 — Observações da REQ e retomada da CI.** O editor da etapa Observações
 segue o E04-01 com notas numeradas, remoção, foco e retorno da revisão. A REQ
 preserva texto colado acima do limite até a pessoa corrigir. Os quatro

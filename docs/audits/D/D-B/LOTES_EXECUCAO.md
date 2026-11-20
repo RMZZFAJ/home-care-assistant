@@ -182,9 +182,29 @@ O laboratório limita a digitação pelo próprio campo.
 O cenário E04-01 foi aberto em 390 px. O produto foi exercitado no Android e
 iOS emulados. Quatro casos passaram sem retry, incluindo foco ao adicionar,
 remover e editar, bloqueio do texto longo, autosave durante a revisão, emissão
-real, PDF e retomada do extra da COM. As capturas da REQ também mostram os
-ajustes restantes de cabeçalho, rodapé, posição do status do rascunho e aviso
-duplicado na validação. Esses pontos seguem na revisão visual do assistente.
+real, PDF e retomada do extra da COM.
+
+O cartão de preenchimento reúne as cinco etapas, o conteúdo e o rodapé.
+REQ, COM, ENT e DEV usam o mesmo rodapé para navegação e estado do último
+rascunho. A indicação distingue a gravação em curso da confirmação do
+conteúdo e da etapa pelo servidor. Retomada, conflito e recuperação continuam com
+os diálogos próprios. O erro de Observações da REQ permanece junto do campo
+focado. O produto conserva a ação explícita Salvar rascunho em REQ, COM e
+ENT no rodapé. O cabeçalho global, os textos das ações e a saída inicial desses
+assistentes ainda precisam da comparação final com a v7.
+
+A referência foi capturada em 360 e 412 px nos estados E04-01, E05-01,
+E06-01 e E06-16. A primeira rodada dos percursos integrados passou em COM
+e DEV no Android. A REQ em iOS passou pelos controles de edição, posicionamento
+em 360 e 412 px e aviso único. A emissão sofreu `statement timeout` no
+PostgreSQL. O Android aguardava a Visão geral antes de abrir a ficha. A COM
+em iOS chegou à emissão e a DEV em iOS parou na preparação da fixture, com
+timeouts locais. O caso da REQ passou a entrar pelo link direto autorizado
+para testar o assistente com a sessão e o vínculo reais. Na repetição, o
+Android abriu a rota e ficou na consulta do catálogo. O iOS voltou a passar
+pelas verificações de interface e chegou à emissão. As duas larguras do
+produto foram comparadas no navegador. As capturas estão em
+`output/playwright/l2-req-observations/`.
 
 **Complementos para fatos e funções existentes no sistema.** Minhas listas
 pessoais ficam acessíveis na REQ com a visibilidade original, ao lado das
@@ -413,6 +433,12 @@ novo pelo rascunho legado. A regressão agora exige a recusa dos dois pedidos
 concorrentes e a preservação do rascunho, do diário de operações e dos
 materiais emitidos. Seis integrações dirigidas passaram com Auth real,
 incluindo a recuperação idempotente de cancelamento e de identificação.
+
+A [CI de `caa58c87`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44652072739)
+passou nos dois sistemas operacionais, na instalação limpa, na evolução
+legada e nos 825 testes de integração. Os seis jobs de navegador chegaram ao
+comando E2E. Esse resultado pertence ao candidato anterior às mudanças do
+cartão e rodapé.
 
 Na stack local preservada, a rodada SQL sem replay parou na regressão de
 agendamento da REQ, que passou no replay da CI. Dois casos locais de PDF

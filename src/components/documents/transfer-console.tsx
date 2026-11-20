@@ -39,6 +39,7 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
+import { SupplyWizardFooter } from "@/components/forms/wizard-actions";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "./document-write-access-notice";
@@ -675,6 +676,7 @@ function TransferDeclarationEditor({
     <SimpleDraftPanel
       draft={privateDraft}
       current={currentContent}
+      statusInFooter={write && (!!reference && !referenceUnavailable || !!packet)}
       patientName={context.patient?.display_name ?? "Paciente selecionado"}
       disabled={busy || uncertain || !!packet}
       resumeLabel={recoveryOnly ? "Consultar preenchimento salvo" : undefined}
@@ -1211,9 +1213,9 @@ function TransferDeclarationEditor({
                 <h3 ref={observationsHeadingRef} tabIndex={-1}>Observações</h3>
                 <IssuanceObservationsEditor observations={observations} onChange={setObservations} errors={observationErrors} />
                 </> : null}
-                <div className="hca-transfer-wizard-footer">
-                {step > 0 ? <ActionButton onClick={() => { setError(""); setStep(step - 1); }}>Voltar</ActionButton> : null}
-                {step === 0 ? <ActionButton disabled={busy || privateDraft.blocked} onClick={close}>Sair por agora</ActionButton> : null}
+                <SupplyWizardFooter status={{ draft: privateDraft, current: currentContent }} back={step > 0
+                  ? <ActionButton variant="quiet" onClick={() => { setError(""); setStep(step - 1); }}><Icon name="back" width="14" height="14" />Voltar</ActionButton>
+                  : <ActionButton variant="quiet" disabled={busy || privateDraft.blocked} onClick={close}><Icon name="back" width="14" height="14" />Sair por agora</ActionButton>}>
                 <ActionButton
                   type="submit"
                   variant="primary"
@@ -1228,9 +1230,10 @@ function TransferDeclarationEditor({
                     (step === 3 && !lines.length && !pendingExtras.length)
                   }
                 >
+                  <Icon name="arrow" width="14" height="14" />
                   {transferStepActions[step]}
                 </ActionButton>
-                </div>
+                </SupplyWizardFooter>
               </form>
             </>
           ) : (
@@ -1286,9 +1289,9 @@ function TransferDeclarationEditor({
                   O resultado ainda é incerto. Verifique esta tentativa de expedição antes de enviar outra.
                 </Notice>
               ) : null}
-              <div className="hca-transfer-wizard-footer">
-                {!uncertain ? (
+              <SupplyWizardFooter status={uncertain ? undefined : { draft: privateDraft, current: currentContent }} back={!uncertain ? (
                   <ActionButton
+                    variant="quiet"
                     onClick={() => {
                       issuanceFailure.clear();
                       setPacket(null);
@@ -1298,16 +1301,16 @@ function TransferDeclarationEditor({
                       );
                     }}
                   >
-                    Voltar
+                    <Icon name="back" width="14" height="14" />Voltar
                   </ActionButton>
-                ) : null}
+                ) : null}>
                 <ActionButton variant="primary" disabled={busy || reviewingPending} onClick={() => { if (!issuanceFailure.reopen()) void submit(); }}>
                   <Icon name="send" width="16" height="16" />
                   {uncertain
                     ? "Verificar a expedição"
                     : isReturn ? "Expedir devolução" : "Expedir entrega"}
                 </ActionButton>
-              </div>
+              </SupplyWizardFooter>
             </section>
           )}
         </div>

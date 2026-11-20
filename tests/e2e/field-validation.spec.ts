@@ -13,11 +13,16 @@ test.setTimeout(150_000);
 const owned = new Set<string>();
 async function fixture() { const f = await setup(); owned.add(f.patient); return f; }
 test.afterEach(() => { if (owned.size) sql(`update public.care_recipients set is_active=false where id=any(array[${[...owned].map(q).join(",")}]::uuid[])`); owned.clear(); });
-async function login(page: Page, patient: string, role: "professional" | "adminA" | "global" = "adminA", email = fixtures[role].email) {
-  await page.goto("/login");
+async function login(page: Page, patient: string, role: "professional" | "adminA" | "global" = "adminA", email = fixtures[role].email, destination?: string) {
+  await page.goto(destination ? "/login?next=" + encodeURIComponent(destination) : "/login");
   await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  if (destination) {
+    await expect(page).toHaveURL(url => url.pathname === destination);
+    await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", patient);
+    return;
+  }
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, role === "global" ? null : patient);
 }
@@ -47,8 +52,7 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   const writer = await shiftWorker(f.patient);
   let commands = 0;
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/requisitions" && request.method() === "POST") commands++; });
-  await login(page, f.patient, "professional", writer.email);
-  await page.goto("/fichas/req");
+  await login(page, f.patient, "professional", writer.email, "/fichas/req");
   await expect(page.getByText("Carregando catálogo e pendências…", { exact: true })).toHaveCount(0);
   await next(page);
   await page.getByRole("button", { name: "Item extra", exact: true }).click();
@@ -83,6 +87,23 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await addObservation.click();
   const observation = page.getByRole("textbox", { name: "Observação 1", exact: true });
   await expect(observation).toBeFocused();
+  const card = page.locator(".hca-supply-wizard-card");
+  const footer = card.locator(".hca-supply-wizard-footer");
+  await expect(card.getByRole("navigation", { name: "Etapas da requisição" })).toBeVisible();
+  const originalViewport = page.viewportSize();
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 844 });
+    await observation.scrollIntoViewIfNeeded();
+    await expect.poll(() => footer.evaluate(element => {
+      const box = element.getBoundingClientRect();
+      const navigation = document.querySelector(".hca-bottom-navigation")?.getBoundingClientRect();
+      const point = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+      return box.width > 0 && box.x >= 0 && box.right <= innerWidth &&
+        box.bottom <= (navigation?.height ? navigation.top : innerHeight) && element.contains(point);
+    })).toBe(true);
+    await info.attach(`req-observacoes-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+  }
+  if (originalViewport) await page.setViewportSize(originalViewport);
   await addObservation.click();
   await expect(page.getByRole("textbox", { name: "Observação 2", exact: true })).toBeFocused();
   await page.getByRole("button", { name: "Remover observação 2", exact: true }).click();
@@ -90,6 +111,7 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await observation.fill("x".repeat(1001));
   await next(page);
   await errorAt(observation, "A observação deve ter até 1.000 caracteres.");
+  await expect(page.getByText("A observação deve ter até 1.000 caracteres.", { exact: true })).toHaveCount(1);
   await expect.poll(() => observation.evaluate(element => {
     const box = element.getBoundingClientRect();
     const center = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
@@ -115,6 +137,7 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   try {
     await observation.fill(validNote);
     await pendingSave;
+    await expect(footer.getByRole("status")).toHaveText("Salvando rascunho…");
     await next(page);
     await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
     await expect(confirm).toBeDisabled();

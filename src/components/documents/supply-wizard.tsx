@@ -1530,6 +1530,18 @@ export function PatientSupplyWizard({
       return <DocumentCatalogueEmpty patientId={patientId} patientName={context.patient!.display_name}
         mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0} />;
   }
+  const navigation = <StepNavigator
+    steps={steps}
+    active={stage}
+    compact={!isBalance}
+    onChange={nextStage => {
+      if (nextStage === stage) return;
+      issuanceFailure.clear();
+      setStep(isBalance ? nextStage : supplyStageSteps[nextStage]);
+    }}
+    disabled={busy || uncertain || loading || privateDraft.blocked}
+    label={"Etapas da " + type}
+  />;
   return (
     <div onChangeCapture={event => {
       if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);
@@ -1539,6 +1551,7 @@ export function PatientSupplyWizard({
         <SimpleDraftPanel
           draft={privateDraft}
           current={privateContent}
+          statusInFooter={!isBalance && !loadError && !loading}
           resumeHref={resumeHref}
           patientName={context.patient!.display_name}
           disabled={busy || uncertain || loading}
@@ -1615,18 +1628,7 @@ export function PatientSupplyWizard({
         </div>
       ) : (
         <>
-          <StepNavigator
-            steps={steps}
-            active={stage}
-            compact={!isBalance}
-            onChange={(nextStage) => {
-              if (nextStage === stage) return;
-              issuanceFailure.clear();
-              setStep(isBalance ? nextStage : supplyStageSteps[nextStage]);
-            }}
-            disabled={busy || uncertain || loading || privateDraft.blocked}
-            label={"Etapas da " + type}
-          />
+          {isBalance ? navigation : null}
           {message ? <Notice>{message}</Notice> : null}
           {error ? (
             <Notice error>
@@ -1648,11 +1650,13 @@ export function PatientSupplyWizard({
           {loading ? (
             <Notice>Carregando catálogo e vínculos…</Notice>
           ) : (
-            <section className="ui-card">
+            <section className={isBalance ? "ui-card" : "hca-supply-wizard-card"}>
+              {isBalance ? null : navigation}
+              <div className={isBalance ? undefined : "hca-supply-wizard-body"}>
               <div className="mb-6">
-                <p className="eyebrow">
+                {isBalance ? <p className="eyebrow">
                   {type} · {context.patient?.display_name}
-                </p>
+                </p> : null}
                 <h2
                   id="supply-wizard-heading"
                   tabIndex={-1}
@@ -1788,6 +1792,7 @@ export function PatientSupplyWizard({
               ) : null}
               {type === "ENT" && step === supplyStageSteps[4] && form.pendingExtras?.length && !uncertain
                 ? <Notice>{pendingExtraDispatchMessage}</Notice> : null}
+              </div>
               <WizardActions
                 step={stage}
                 total={steps.length}
@@ -1798,6 +1803,7 @@ export function PatientSupplyWizard({
                   (!allowed && !uncertain)
                 }
                 draftBusy={privateDraft.backgroundBusy}
+                supplyStatus={isBalance ? undefined : { draft: privateDraft, current: privateContent }}
                 uncertain={uncertain}
                 blocked={
                   (!(step === 0 && legacyOpeningKey) &&

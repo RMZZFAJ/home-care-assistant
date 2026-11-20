@@ -421,10 +421,8 @@ function PatientRequisition({
       catalogError ||
       Object.keys(errors).length
     ) {
-      setError(
-        Object.values(errors)[0] ?? "Aguarde o catálogo e confira seu acesso.",
-      );
       const key = Object.keys(errors)[0];
+      setError(key?.startsWith("observation:") ? "" : Object.values(errors)[0] ?? "Aguarde o catálogo e confira seu acesso.");
       const product = products.find((item) => key === item.id || key === item.id + ":repeat");
       if (product)
         setStep(selected(product.id)?.catalogueExtra ? 4 : materialCategories.findIndex(category => category.id === product.category) + 1);
@@ -661,6 +659,7 @@ function PatientRequisition({
       {!uncertain ? <SimpleDraftPanel
         draft={privateDraft}
         current={draftContent}
+        statusInFooter
         patientName={context.patient!.display_name}
         resumeHref={resumeHref}
         disabled={saving || uncertain || loadingCatalog}
@@ -707,18 +706,6 @@ function PatientRequisition({
           reasonError={fieldErrors.remainingNeed}
         />
       ) : null}
-      <StepNavigator
-        steps={supplyWizardStages}
-        active={stage}
-        compact
-        onChange={(nextStage) => {
-          if (nextStage === stage) return;
-          issuanceFailure.clear();
-          setStep(stageStart[nextStage]);
-        }}
-        disabled={uncertain || saving || loadingCatalog || privateDraft.blocked}
-        label="Etapas da requisição"
-      />
       {message ? <Notice>{message}</Notice> : null}
       {catalogError ? (
         <Notice error>
@@ -737,8 +724,20 @@ function PatientRequisition({
       {loadingCatalog ? (
         <Notice>Carregando catálogo e pendências…</Notice>
       ) : (
-        <section className="ui-card">
-          <p className="eyebrow">REQ · {context.patient!.display_name}</p>
+        <section className="hca-supply-wizard-card">
+          <StepNavigator
+            steps={supplyWizardStages}
+            active={stage}
+            compact
+            onChange={nextStage => {
+              if (nextStage === stage) return;
+              issuanceFailure.clear();
+              setStep(stageStart[nextStage]);
+            }}
+            disabled={uncertain || saving || privateDraft.blocked}
+            label="Etapas da requisição"
+          />
+          <div className="hca-supply-wizard-body">
           <h2 className="my-4 text-xl font-semibold">{step === 0 ? "Confirme os dados da ficha" : step === 4 ? "Itens extras" : supplyWizardStages[stage]}</h2>
           <fieldset
             disabled={
@@ -848,6 +847,7 @@ function PatientRequisition({
               Nenhum dado será reenviado com uma chave nova.
             </Notice>
           ) : null}
+          </div>
           <WizardActions
             step={stage}
             total={supplyWizardStages.length}
@@ -858,6 +858,7 @@ function PatientRequisition({
               (!may(context, "request") && !uncertain)
             }
             draftBusy={privateDraft.backgroundBusy}
+            supplyStatus={{ draft: privateDraft, current: draftContent }}
             uncertain={uncertain}
             blocked={Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
             finishLabel="Concluir requisição"
