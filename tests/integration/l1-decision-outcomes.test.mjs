@@ -39,7 +39,7 @@ const results = document => sql(`select count(*) from private.document_decision_
 
 
 
-for (const purpose of ["cancel", "archive", "resolve_extra"]) test("REQ " + purpose + " confirms once without saving a form and recovers its exact official result", async () => {
+for (const purpose of ["cancel", "resolve_extra"]) test("REQ " + purpose + " confirms once without saving a form and recovers its exact official result", async () => {
 
   const f = await reqDecisionFixture(purpose), beforeDrafts = drafts(f.patient), p = { p_document: f.req.id, p_key: randomUUID(), p_intention: intention(f) };
 
@@ -59,6 +59,20 @@ for (const purpose of ["cancel", "archive", "resolve_extra"]) test("REQ " + purp
 
   assert.equal(reqDecisionFacts(f), after);
 
+});
+
+test("a new REQ archive requires consolidated review even through the previous decision commands", async () => {
+  const f = await reqDecisionFixture("archive"), before = reqDecisionFacts(f), beforeDrafts = drafts(f.patient);
+  const packet = { p_document: f.req.id, p_key: randomUUID(), p_intention: intention(f) };
+  const decision = await f.client.rpc("execute_document_decision", packet);
+  assert.equal(decision.error?.code, "PT409");
+  assert.equal(decision.error?.message, "consolidated archive review required");
+  const archive = await f.client.rpc("archive_requisition", { p_id: f.req.id, p_reason: packet.p_intention.body.reason });
+  assert.equal(archive.error?.code, "PT409");
+  assert.equal(archive.error?.message, "consolidated archive review required");
+  assert.equal(reqDecisionFacts(f), before);
+  assert.equal(drafts(f.patient), beforeDrafts);
+  assert.equal(results(f.req.id), "0");
 });
 
 

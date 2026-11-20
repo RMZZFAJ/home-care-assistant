@@ -41,11 +41,15 @@ test("delivery task summaries use immutable transfer parties without shipping or
   assert.ifError(declared.response.error); const doc = declared.response.data;
   const stored = JSON.parse(sql(`select declaration from public.ent_transfers where document_id=${q(doc.id)};`));
   sql(`update public.profiles set full_name='Nome atual diferente do registro' where id in (${q(f.initiator.id)},${q(f.counterparty.id)},${q(f.recipient.id)});`);
-  const before = facts(f.patient), result = await list(f.counterparty.client, f.patient, { p_status: "tasks" });
+  const before = facts(f.patient), result = await list(f.counterparty.client, f.patient, { p_status: "transfer_pending" });
   const row = result.data.find(row => row.id === doc.id); assert.ok(row);
-  assert.equal(row.code, null); assert.equal(row.protocol, null); assert.equal(row.task.code, "transfer_decision");
+  assert.equal(row.code, null); assert.equal(row.protocol, null); assert.equal(row.task, null);
   assert.deepEqual(row.deliverySummary, { source: "CARE_TEAM", destination: "FAMILY", recordedByName: stored.actor.name, recipientName: stored.recipient.name, counterpartyName: stored.counterparty.name, receivedByName: null });
   assert.deepEqual(Object.keys(row.deliverySummary).sort(), ["source", "destination", "recordedByName", "recipientName", "counterpartyName", "receivedByName"].sort());
+  const counterpartyTasks = await list(f.counterparty.client, f.patient, { p_status: "tasks" });
+  assert.equal(counterpartyTasks.data.some(task => task.id === doc.id), false);
+  const issuerTasks = await list(f.initiator.client, f.patient, { p_status: "tasks" });
+  assert.equal(issuerTasks.data.find(task => task.id === doc.id)?.task?.code, "transfer_dispatch");
   assert.equal(facts(f.patient), before);
   const anonymous = createClient(env.url, env.anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
   assert.equal((await anonymous.rpc("delivery_task_list", { p_patient: f.patient })).error?.code, "42501");
