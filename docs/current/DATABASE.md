@@ -6,7 +6,7 @@ planejamento de aquisição. O ensaio remoto com rollback validou as
 modalidades aceitas e os grants do helper. Após a aplicação, a consulta
 confirmou a nova versão e a fila vinculada vazia.
 
-O registro anterior do Supabase local e de desenvolvimento estava em 304 migrations até
+O registro de 304 migrations do Supabase local e de desenvolvimento vai até
 `20261119213000`. As duas versões novas conferem a ordem das observações
 contra o rascunho e preservam a justificativa de escolha do recebedor como
 fato próprio. O backup cifrado, o ensaio com rollback e o histórico remoto
