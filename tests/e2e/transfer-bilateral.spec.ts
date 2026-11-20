@@ -1,7 +1,7 @@
 import { expectNoOperationalDocumentAction, openOperationalDocumentAction } from "./document-sections";
 import { selectDocumentSection, openDocumentAction } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page, type TestInfo } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import {
@@ -31,11 +31,12 @@ async function login(page: Page, email: string, patient: string) {
 async function fillDeclaration(
   page: Page,
   f: Awaited<ReturnType<typeof transferFixture>>,
+  info?: TestInfo,
 ) {
   await page.goto("/fichas/" + f.origin.id);
   await openOperationalDocumentAction(page, "Preparar devolução");
   await expect(page).toHaveURL(new RegExp("/fichas/devolucao\\?.*originId=" + f.origin.id));
-  await page.getByRole("button", { name: "Preparar devolução", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Preparar devolução", exact: true })).toHaveCount(0);
   const drawer = page.getByRole("region", {
     name: "Nova devolução",
     exact: true,
@@ -56,7 +57,9 @@ async function fillDeclaration(
   await drawer.getByRole("button", { name: /^Higiene/ }).click();
   const amount = drawer.getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ });
   await expect(amount).toHaveValue("10");
-  await amount.fill("5");
+  if (info) await convertReturnQuantity(page, drawer, info);
+  else await amount.fill("5");
+  await expect(amount).toHaveValue("5");
   const menu = drawer.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true });
   await menu.click();
   await page.getByRole("menuitem", { name: "Vincular a uma ficha", exact: true }).click();
@@ -65,6 +68,9 @@ async function fillDeclaration(
   await materialSources.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
   await expect(menu).toBeFocused();
   await expect(amount).toHaveValue("5");
+  if (info?.project.use.hasTouch) await info.attach("DEV · material com vínculo", {
+    body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
   await drawer.getByRole("button", { name: "Adicionar observação", exact: true }).click();
@@ -75,6 +81,34 @@ async function fillDeclaration(
     );
   return drawer;
 }
+
+async function convertReturnQuantity(page: Page, drawer: Locator, info: TestInfo) {
+  const read = drawer.getByRole("button", { name: "Ler código", exact: true });
+  await read.click();
+  const scanner = page.getByRole("dialog", { name: "Ler código do material", exact: true });
+  const manualCode = scanner.getByRole("textbox", { name: "Código manual", exact: true });
+  await manualCode.fill("12345678");
+  await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
+  await expect(scanner.getByText(/Este código está indisponível/)).toBeVisible();
+  await manualCode.fill("0123456789012");
+  await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
+  const conversion = scanner.getByRole("region", { name: "Conversão da apresentação", exact: true });
+  await expect(conversion).toContainText("Caixa fictícia para devolução");
+  await conversion.getByRole("textbox", { name: "Embalagens", exact: true }).fill("4");
+  const applyQuantity = scanner.getByRole("button", { name: "Atualizar quantidade", exact: true });
+  await expect(applyQuantity).toBeDisabled();
+  await conversion.getByRole("textbox", { name: "Quantidade por embalagem em unidade", exact: true }).fill("2");
+  await expect(conversion).toContainText("8 unidade");
+  await conversion.getByRole("checkbox", { name: "Ajustar quantidade final", exact: true }).check();
+  const finalQuantity = conversion.getByRole("textbox", { name: "Quantidade final em unidade", exact: true });
+  await finalQuantity.fill("5");
+  if (info.project.use.hasTouch) await expect(finalQuantity).toBeInViewport({ ratio: 1 });
+  if (info.project.use.hasTouch) await info.attach("DEV · conferência da conversão", {
+    body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
+  await applyQuantity.click();
+  await expect(read).toBeFocused();
+}
 test("devolução separa expedidor e recebedor, recupera expedição incerta com perda de escrita e recebe três de cinco de material inativo", async ({
   page,
   browser,
@@ -82,6 +116,10 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
   if (!process.env.CI && info.project.name === "ios") test.setTimeout(300_000);
   const f = await transferFixture(),
     before = JSON.parse(transferState(f));
+  await rpc(f.admin, "configure_catalogue_unit", {
+    p_patient: f.patient, p_product: f.products[0], p_unit: "unidade", p_decimals: 0,
+    p_barcode: "0123456789012", p_presentation: "Caixa fictícia para devolução", p_base_quantity: "3",
+  });
   sql(
     `update public.care_recipient_products set is_active=false where care_recipient_id=${sqlLiteral(f.patient)} and product_id=${sqlLiteral(f.products[0])};`,
   );
@@ -102,7 +140,7 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
       (row: { location: string }) => row.location !== "FAMILY",
     ),
   ).toBe(true);
-  const editor = await fillDeclaration(page, f);
+  const editor = await fillDeclaration(page, f, info);
   await editor
     .getByRole("button", { name: "Revisar ficha", exact: true })
     .click();

@@ -80,6 +80,7 @@ import type { TransferPreparation } from "@/types/transfers";
 import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
 import { MaterialConsultButton } from "./catalogue-material-panel";
 import { RelatedDocument } from "./related-document";
+import { ReturnBarcodeDialog } from "./return-barcode-dialog";
 import { SupplySourcePicker, type SupplySourceSelection } from "./supply-source-picker";
 
 export const custodyName = (source: Custody) =>
@@ -102,7 +103,8 @@ export function TransferConsole({ source, routedOriginId }: { source?: Custody; 
 }
 function PatientTransfers({ context, fixedSource, routedOriginId }: { context: WorkspaceContext; fixedSource?: Custody; routedOriginId?: string }) {
   const [source, setSource] = useState<Custody | "">(fixedSource ?? ""),
-    [editing, setEditing] = useState(false),
+    [editing, setEditing] = useState(() => Boolean(routedOriginId && fixedSource === "CARE_TEAM" &&
+      can(context, "ent.create") && can(context, "stock.team.read"))),
     [consulting, setConsulting] = useState(false);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   function endEditing() {
@@ -213,6 +215,7 @@ function TransferDeclarationEditor({
   } | null>(null);
   const initialSourceRef = useRef<SupplySourceOption | null>(null);
   const [routedOriginWarning, setRoutedOriginWarning] = useState(false);
+  const [readingBarcode, setReadingBarcode] = useState(false);
   const [reason, setReason] = useState(""),
     [query, setQuery] = useState(""),
     [lines, setLines] = useState<{ productId: string; quantity: string; extra?: boolean }[]>([]);
@@ -235,6 +238,7 @@ function TransferDeclarationEditor({
     observationsHeadingRef = useRef<HTMLHeadingElement | null>(null),
     originFieldRef = useRef<HTMLSelectElement | null>(null),
     returnOriginRef = useRef<HTMLButtonElement | null>(null),
+    barcodeTriggerRef = useRef<HTMLButtonElement | null>(null),
     reasonFieldRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef(false);
   const patientId = context.patient!.id;
@@ -322,6 +326,7 @@ function TransferDeclarationEditor({
       setOriginId("");
       setSourceSetup(emptySupplySources);
       setSourcePicker(null);
+      setReadingBarcode(false);
       setReason("");
       setObservations([]);
       setObservationErrors({});
@@ -445,6 +450,22 @@ function TransferDeclarationEditor({
       ? [...previous, { productId, quantity: "" }]
       : previous.filter(line => line.productId !== productId));
     setDraftTouched(true);
+  }
+  function updateReturnQuantity(productId: string, amount: string) {
+    setLines(previous => previous.some(row => row.productId === productId)
+      ? previous.map(row => row.productId === productId ? { ...row, quantity: amount } : row)
+      : [...previous, { productId, quantity: amount }]);
+    setSourceSetup(previous => {
+      if (!Object.hasOwn(previous.sourceSeeds, productId)) return previous;
+      const seeds = { ...previous.sourceSeeds };
+      delete seeds[productId];
+      return { ...previous, sourceSeeds: seeds };
+    });
+    setDraftTouched(true);
+  }
+  function closeBarcode() {
+    setReadingBarcode(false);
+    requestAnimationFrame(() => barcodeTriggerRef.current?.focus({ preventScroll: true }));
   }
   useLongDraftAutosave(privateDraft, currentContent, write && draftTouched && !(busy || uncertain || !!packet));
   useEffect(() => {
@@ -1216,9 +1237,16 @@ function TransferDeclarationEditor({
                   A devolução leva materiais do estoque da equipe de volta à família.
                 </p> : null}
                 {step === 1 ? <WizardMaterialCategories category={activeCategory} selected={regularSelection} onChange={next => { setCategory(next); setQuery(""); }} /> : null}
-                <SupplyExtraItems items={pendingExtras} inExtras={step === 2}
+                <div className={isReturn && step === 1 ? "hca-toolbar" : undefined}>
+                  {isReturn && step === 1 ? (
+                    <ActionButton ref={barcodeTriggerRef} variant="quiet" compact onClick={() => setReadingBarcode(true)}>
+                      <Icon name="camera" />Ler código
+                    </ActionButton>
+                  ) : null}
+                  <SupplyExtraItems items={pendingExtras} inExtras={step === 2}
                   catalogue={products.map(({ id, name, unit }) => ({ id, name, unit }))} selected={new Set(selectedIds)}
                   onChange={items => { setPendingExtras(items); setDraftTouched(true); }} onChoose={addExtra} />
+                </div>
                 {isReturn && step === 1 ? <FormField label="Buscar material">
                   <TextInput type="search" value={query} onChange={event => setQuery(event.currentTarget.value)}
                     placeholder="Nome do material" />
@@ -1256,15 +1284,8 @@ function TransferDeclarationEditor({
                         Estoque atual da equipe: {formatQuantity(product.available, product.unit)}.
                       </p>
                       {line ? <FormField label={"Quantidade de " + product.name} required>
-                        <TextInput required inputMode="decimal" value={line.quantity} onChange={event => {
-                          const amount = event.currentTarget.value;
-                          setLines(previous => previous.map(row => row.productId === product.id ? { ...row, quantity: amount } : row));
-                          setSourceSetup(previous => {
-                            const seeds = { ...previous.sourceSeeds };
-                            delete seeds[product.id];
-                            return { ...previous, sourceSeeds: seeds };
-                          });
-                        }} />
+                        <TextInput required inputMode="decimal" value={line.quantity}
+                          onChange={event => updateReturnQuantity(product.id, event.currentTarget.value)} />
                       </FormField> : null}
                     </MaterialChoice>;
                   })}
@@ -1516,6 +1537,15 @@ function TransferDeclarationEditor({
             selection.every(row => previousIds.includes(row.option.id));
           if (!unchanged) applyReturnSources(selection, productId);
           closeSourcePicker();
+        }} /> : null}
+      {readingBarcode && write && !referenceUnavailable ? <ReturnBarcodeDialog patientId={patientId} products={products}
+        amounts={linesByProduct} onClose={closeBarcode} onApply={(product, amount) => {
+          updateReturnQuantity(product.id, amount);
+          if (!linesByProduct.get(product.id)?.extra) {
+            setCategory(materialCategories.find(entry => entry.id === product.category)?.id ?? activeCategory);
+            setQuery("");
+          }
+          closeBarcode();
         }} /> : null}
       <DocumentIssuanceFailure state={issuanceFailure} operation={isReturn ? "Expedição de devolução" : "Expedição de entrega"} onRetry={submit} />
     </section>

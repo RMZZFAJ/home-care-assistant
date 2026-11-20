@@ -307,6 +307,9 @@ visível durante essa espera. Em ambos, a consulta pelo menu de material
 preservou o foco, o filtro e o valor em edição quando o painel fechou.
 A inspeção das capturas confirmou o interruptor horizontal com 32 × 19 px.
 A revisão visual completa de COM, ENT, DEV e dos seus diálogos segue aberta.
+Na captura de uma DEV com divergência a 320 px, o botão flutuante cobre
+parte de Gerar PDF. O PDF foi gerado no teste. A posição do botão nessa
+composição ainda precisa de ajuste.
 
 Na Confirmação da COM e da ENT, Fichas vinculadas abre o seletor de
 origens e permite escolher se a ficha também traz materiais. Cada material
@@ -314,6 +317,8 @@ continua com seu vínculo próprio no menu de três pontos. A avaliação
 familiar de suficiência e a justificativa para múltiplas REQs aparecem
 quando há vínculos que exigem essas informações. O seletor também reconhece
 os vínculos por linha dos rascunhos anteriores.
+A preparação da ENT ainda mostra a avaliação de suficiência como seletor
+na Confirmação. A v7 a mostra com checkbox na etapa Materiais.
 
 Na DEV, a Confirmação tem o mesmo seletor de fichas. O menu de três pontos
 oferece Detalhes do material e Vincular a uma ficha. Cada vínculo pode ser
@@ -327,7 +332,28 @@ exibe a origem específica e o saldo da equipe. A quantidade sugerida
 considera o menor valor entre o recebido na ENT e o saldo atual da equipe,
 na precisão do catálogo. O estoque da equipe é agregado por material. A
 referência à ENT documenta o recebimento e a quantidade sugerida é editável.
-A leitura de código da DEV demonstrada pela v7 continua pendente.
+
+O botão Ler código abre a conferência da apresentação na etapa Materiais.
+A consulta usa o catálogo autorizado do paciente. O diálogo mostra o
+material, a embalagem e o fator cadastrados. Permite corrigir o fator da
+leitura ou ajustar a quantidade final da operação. Ao aplicar, o
+preenchimento guarda a quantidade na unidade-base. A alteração da ficha
+preserva o cadastro do catálogo. A câmera, a foto e o código digitado usam
+o leitor disponível no sistema. A escolha manual na lista continua
+disponível quando o código não é reconhecido.
+
+Quatro casos passaram sem retry em Android e iOS emulados. A DEV avulsa
+retomou o rascunho sem ENT. Na DEV vinculada, a entrada pela ENT já abriu
+a Confirmação. O caso digitou um código desconhecido e depois um cadastrado,
+conferiu a recusa de uma quantidade superior ao saldo, corrigiu o fator e
+aplicou a quantidade final escolhida. A expedição manteve o vínculo e o
+recebimento pessoal. A leitura por câmera física e foto ficou fora desses
+testes.
+
+Depois da comparação a 390 px, os campos de embalagem e fator passaram
+a dividir a mesma linha no modal. A repetição dirigida em Android e iOS
+confirmou que o controle de quantidade final fica inteiro na região
+visível, com captura dos dois navegadores.
 
 O banco registra os vínculos no rascunho e na emissão. O teste com Auth
 real conferiu vínculo por material, isolamento por paciente, rejeição de
@@ -341,6 +367,10 @@ conferiu a importação, ajustou a quantidade, retornou do seletor ao menu
 do material e recuperou a expedição incerta. O recebedor confirmou três
 das cinco unidades. Os dois testes passaram sem retry, conferiram o
 saldo e obtiveram o PDF de acompanhamento.
+
+A CI `44683936418` encontrou dois erros unitários na leitura de rascunhos
+legados da declaração. O commit `4695ad13` omite campos opcionais
+ausentes. Os dez casos unitários de declaração passaram após a correção.
 
 O rodapé dos assistentes L2 mostra o estado da gravação automática e as
 ações de navegação. A confirmação de saída e os controles excepcionais de
