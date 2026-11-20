@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — botão flutuante nas fichas estreitas.** O menu abre para cima.
+A barra de ações reserva espaço ao lado do botão acima da navegação. A
+DEV com divergência foi verificada a 320 px em Android e iOS emulados.
+O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) detalha o clique
+de Gerar PDF, a conciliação e o retorno do foco.
+
 **20/11 — avaliação da necessidade na preparação da ENT.** A caixa da v7
 fica junto ao material ligado a uma REQ. A revisão exibe a avaliação e a
 justificativa de necessidade compartilhada, quando exigida. As duas

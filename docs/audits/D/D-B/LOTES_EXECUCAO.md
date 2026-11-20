@@ -307,9 +307,28 @@ visível durante essa espera. Em ambos, a consulta pelo menu de material
 preservou o foco, o filtro e o valor em edição quando o painel fechou.
 A inspeção das capturas confirmou o interruptor horizontal com 32 × 19 px.
 A revisão visual completa de COM, ENT, DEV e dos seus diálogos segue aberta.
-Na captura de uma DEV com divergência a 320 px, o botão flutuante cobre
-parte de Gerar PDF. O PDF foi gerado no teste. A posição do botão nessa
-composição ainda precisa de ajuste.
+
+A captura inicial de uma DEV com divergência a 320 px mostrou o botão
+flutuante sobre parte de Gerar PDF. A ficha agora reserva uma faixa lateral
+na barra de ações em telas estreitas. O botão **+** mantém o canto inferior
+direito, acima da navegação real, e o menu abre para cima como no E04-08.
+A faixa lateral e o recuo inferior acomodam a navegação do aplicativo,
+que o cenário isolado do laboratório não inclui.
+
+O teste de devolução com recebimento parcial passou no Android e no iOS
+emulados. A 320 × 520 px, Gerar PDF aceitou o teste de clique mesmo alinhado
+verticalmente ao **+**. Conciliar divergência ficou fora da área do botão,
+o menu abriu inteiro acima dele e Escape devolveu o foco. A primeira rodada
+do iOS parou por timeout do banco local durante a expedição. A repetição
+passou após atualizar as estatísticas locais, com retry automático desligado.
+Capturas em `output/playwright/fab-v7-evidence/`. Sem migration neste ajuste.
+
+Na etapa de materiais da COM e da ENT, a leitura ainda ocupa o corpo da
+etapa com câmera, foto e entrada manual. A v7 leva esses controles ao
+diálogo Ler código. O editor de apresentações também aparece na própria
+linha selecionada, com comparação de versões e atualização do catálogo.
+A composição compacta precisa manter a escolha manual, o fator versionado
+e o total sem forçar a leitura de código.
 
 Na Confirmação da COM e da ENT, Fichas vinculadas abre o seletor de
 origens e permite escolher se a ficha também traz materiais. Cada material

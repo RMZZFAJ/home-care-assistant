@@ -22,7 +22,8 @@ export function DocumentFab({ children, triggerRef }: {
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Backdrop className="hca-document-fab-backdrop" />
-        <Menu.Positioner className="hca-floating-positioner hca-l1" side="top" sideOffset={8} align="end">
+        <Menu.Positioner className="hca-floating-positioner hca-l1" positionMethod="fixed"
+          side="top" sideOffset={8} align="end" collisionAvoidance={{ side: "none", align: "shift" }}>
           <Menu.Popup className="hca-menu hca-document-fab-menu" aria-label="Ações operacionais"
             finalFocus={() => !activatedRef.current}>
             <DocumentMoreActionContext value={() => { activatedRef.current = true; }}>

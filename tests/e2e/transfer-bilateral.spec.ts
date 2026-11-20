@@ -285,6 +285,40 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
       await bruno.setViewportSize({ width, height: 900 });
       await audit(bruno, `transfer-direct-receipt-${width}`);
     }
+    if (info.project.use.hasTouch) {
+      await bruno.setViewportSize({ width: 320, height: 520 });
+      const toolbar = bruno.getByRole("group", { name: "Ações da ficha", exact: true });
+      const pdfButton = toolbar.getByRole("button", { name: "Gerar PDF", exact: true });
+      const resolveButton = toolbar.getByRole("button", { name: "Conciliar divergência", exact: true });
+      const fab = bruno.locator(".hca-document-fab");
+      await pdfButton.scrollIntoViewIfNeeded();
+      const fabPosition = (await fab.boundingBox())!;
+      await pdfButton.evaluate((element, y) => {
+        const box = element.getBoundingClientRect();
+        window.scrollBy({ top: box.top + box.height / 2 - y, behavior: "instant" });
+      }, fabPosition.y + fabPosition.height / 2);
+      await expect.poll(async () => {
+        const pdf = (await pdfButton.boundingBox())!;
+        const resolve = (await resolveButton.boundingBox())!;
+        const trigger = (await fab.boundingBox())!;
+        return {
+          pdfSharesHeight: pdf.y < trigger.y + trigger.height && trigger.y < pdf.y + pdf.height,
+          actionsClear: Math.max(pdf.x + pdf.width, resolve.x + resolve.width) < trigger.x,
+        };
+      }).toEqual({ pdfSharesHeight: true, actionsClear: true });
+      await pdfButton.click({ trial: true });
+      await info.attach("DEV · ações e botão flutuante a 320 px", {
+        body: await bruno.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+      });
+      await fab.press("Enter");
+      const menu = bruno.getByRole("menu", { name: "Ações operacionais", exact: true });
+      await expect(menu).toBeInViewport({ ratio: 1 });
+      const popup = (await menu.boundingBox())!;
+      const trigger = (await fab.boundingBox())!;
+      expect(popup.y + popup.height).toBeLessThan(trigger.y);
+      await menu.press("Escape");
+      await expect(fab).toBeFocused();
+    }
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await bruno.setViewportSize({ width: 320, height: 900 });
     await bruno.screenshot({
