@@ -1,5 +1,6 @@
 import { selectMaterialCategory } from "./material-category";
 import { openOperationalDocumentAction, selectDocumentSection } from "./document-sections";
+import { selectDeliveryRecipient } from "./delivery-recipient";
 import { expect, test, type Page } from "@playwright/test";
 import { fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
@@ -39,11 +40,10 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   await expect(page.getByRole("checkbox", { name: name + " unidade", exact: true })).toHaveCount(0);
   await next(page);
   const extra = page.getByLabel("Quantidade — " + name, { exact: true });
-  await extra.fill("2");
   const saved = page.waitForResponse(response => response.request().method() === "POST" &&
     new URL(response.url()).pathname === "/api/drafts" &&
     response.request().postDataJSON().content?.form?.quantities?.[f.products[1]] === "2");
-  await page.getByRole("button", { name: "Salvar rascunho", exact: true }).click();
+  await extra.fill("2");
   const receipt = await saved;
   expect(receipt.ok(), await receipt.text()).toBe(true);
   await page.reload();
@@ -153,10 +153,12 @@ test("L2 COM emite o extra pendente e identifica o material na mesma ficha sem e
 });
 
 test("L2 COM mantém o vínculo geral após desfazer importação e conserva a quantidade editada", async ({ page }, info) => {
+  test.setTimeout(120_000);
   const f = await setup();
+  const admin = await shiftWorker(f.patient, "admin");
   const req = await issue(f.patient, [f.products[0]]);
   const code = sql(`select code from public.operational_documents where id=${q(req.id)}`);
-  await loginDecision(page, fixtures.adminA.email, f.patient);
+  await loginDecision(page, admin.email, f.patient);
   await page.goto(`/fichas/com?requisitionId=${req.id}`);
   const origin = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
   await expect(origin.getByRole("button", { name: code, exact: true })).toBeVisible();
@@ -211,22 +213,25 @@ test("L2 COM mantém o vínculo geral após desfazer importação e conserva a q
 });
 
 test("L2 Preparar entrega parte da COM e traz apenas a quantidade da chegada aprovada", async ({ page }, info) => {
+  test.setTimeout(120_000);
   const f = await purchaseBalanceFixture();
+  const admin = await shiftWorker(f.patient, "admin");
   const sourceLine = f.document.lines.find((line: { product_id: string }) => line.product_id === f.products[0]);
   const arrival = await purchaseBalanceArrival(f, f.document, [{ lineId: sourceLine.id, quantity: "5" }]);
   const com = await purchaseBalanceCommand(f.admin, arrival.document, "validate_receipt", { receiptId: arrival.receipt.id });
-  await loginDecision(page, fixtures.adminA.email, f.patient);
+  await loginDecision(page, admin.email, f.patient);
   await page.goto("/documentos/" + com.id);
   await openOperationalDocumentAction(page, "Preparar entrega");
   const origin = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
   await expect(origin.getByRole("button", { name: com.code, exact: true })).toBeVisible();
   await page.screenshot({ path: `output/playwright/l2-ent-from-com-${info.project.name}.png`, scale: "css" });
-  await page.getByRole("button", { name: "Salvar rascunho", exact: true }).click();
+  await selectDeliveryRecipient(page, "Teste professional", "Destinatário indicado pela família para esta entrega.");
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const draft = JSON.parse(sql(`select content from private.creation_drafts
     where care_recipient_id=${q(f.patient)} and kind='ENT' and purpose='create' and state='active'`));
   expect(draft.form.quantities).toEqual({ [f.products[0]]: "5" });
   expect(draft.sources).toEqual([{ documentId: com.id, general: true, productIds: [f.products[0]] }]);
+  expect(draft.form.recipientId).toBe(fixtures.professional.id);
   await page.reload();
   await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(origin.getByRole("button", { name: com.code, exact: true })).toBeVisible();

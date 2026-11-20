@@ -1213,7 +1213,7 @@ function TransferDeclarationEditor({
                 <h3 ref={observationsHeadingRef} tabIndex={-1}>Observações</h3>
                 <IssuanceObservationsEditor observations={observations} onChange={setObservations} errors={observationErrors} />
                 </> : null}
-                <SupplyWizardFooter status={{ draft: privateDraft, current: currentContent }} back={step > 0
+                <SupplyWizardFooter status={{ draft: privateDraft, current: currentContent, hasEdits: draftTouched }} back={step > 0
                   ? <ActionButton variant="quiet" onClick={() => { setError(""); setStep(step - 1); }}><Icon name="back" width="14" height="14" />Voltar</ActionButton>
                   : <ActionButton variant="quiet" disabled={busy || privateDraft.blocked} onClick={close}><Icon name="back" width="14" height="14" />Sair por agora</ActionButton>}>
                 <ActionButton
@@ -1289,7 +1289,7 @@ function TransferDeclarationEditor({
                   O resultado ainda é incerto. Verifique esta tentativa de expedição antes de enviar outra.
                 </Notice>
               ) : null}
-              <SupplyWizardFooter status={uncertain ? undefined : { draft: privateDraft, current: currentContent }} back={!uncertain ? (
+              <SupplyWizardFooter status={uncertain ? undefined : { draft: privateDraft, current: currentContent, hasEdits: draftTouched }} back={!uncertain ? (
                   <ActionButton
                     variant="quiet"
                     onClick={() => {

@@ -29,6 +29,7 @@ mkdirSync("output/playwright/phase-d", { recursive: true });
 const panel = lastDraftPanel;
 const save = (page: Page) =>
   page.getByRole("button", { name: "Salvar rascunho", exact: true });
+const reqStages = (page: Page) => page.getByRole("navigation", { name: "Etapas da requisição", exact: true });
 const next = (page: Page) =>
   page.getByRole("button", { name: /^(Avançar|Revisar|Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 async function login(
@@ -47,13 +48,13 @@ async function login(
 }
 async function open(page: Page, kind: "REQ" | "BAL", url?: string) {
   await page.goto(url ?? (kind === "REQ" ? "/fichas/req" : "/fichas/bal"));
-  await expect(save(page).or(page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true })).first()).toBeVisible();
+  await expect((kind === "REQ" ? reqStages(page) : save(page)).or(page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true })).first()).toBeVisible();
 }
 async function resume(page: Page) {
   await panel(page)
     .getByRole("button", { name: "Continuar rascunho", exact: true })
     .click();
-  await expect(save(page)).toBeEnabled();
+  await expect(reqStages(page).or(save(page)).first()).toBeVisible();
 }
 async function observations(page: Page) {
   for (let i = 0; i < 3; i++) await next(page);
@@ -94,7 +95,6 @@ test("D3 consulta falha pede nova leitura e JSON inválido após save confirmado
   await expect(panel(page)).toBeVisible();
   await resume(page); await observations(page);
   const observation = page.getByLabel("Observação 1", { exact: true });
-  await observation.fill("Edição mantida após resposta inválida, sem outra emissão");
   const packets: unknown[] = [];
   await page.route("**/api/drafts", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
@@ -105,13 +105,12 @@ test("D3 consulta falha pede nova leitura e JSON inválido após save confirmado
       await route.fulfill({ status: 400, contentType: "application/json", body: "{invalid" });
     } else await route.continue();
   });
-  await save(page).click();
+  await observation.fill("Edição mantida após resposta inválida, sem outra emissão");
   await expect(panel(page)).toContainText("A resposta desta ação não pôde ser confirmada.");
-  await expect(save(page)).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Revisar ficha", exact: true })).toBeDisabled();
   await expect(observation).toHaveValue("Edição mantida após resposta inválida, sem outra emissão");
   expect((await draftContext(f, "REQ")).revision).toBe(2);
   await panel(page).getByRole("button", { name: "Recuperar salvamento ou descarte", exact: true }).click();
-  await expect(save(page)).toBeEnabled();
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Recuperar salvamento ou descarte", exact: true })).toHaveCount(0);
   expect(packets).toHaveLength(2); expect(packets[0]).toEqual(packets[1]);
@@ -194,12 +193,7 @@ test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7
     await page
       .getByLabel("Observação 1", { exact: true })
       .fill("Texto de A salvo na revisão seis");
-    await next(page);
-    await save(page).click();
     await expect.poll(async () => (await draftContext(f)).content.observations).toEqual(["Texto de A salvo na revisão seis"]);
-    await second
-      .getByLabel("Observação 1", { exact: true })
-      .fill("Texto próprio de B que precisa sobreviver ao conflito");
     let failComparison = true;
     await second.route("**/api/drafts?**", async (route) => {
       if (failComparison) {
@@ -213,7 +207,9 @@ test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7
         });
       } else await route.continue();
     });
-    await save(second).click();
+    await second
+      .getByLabel("Observação 1", { exact: true })
+      .fill("Texto próprio de B que precisa sobreviver ao conflito");
     await expect(
       panel(second).getByRole("region", { name: "Minha edição", exact: true }),
     ).toContainText("Texto próprio de B");
@@ -234,7 +230,7 @@ test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7
     });
     await expect(theirs).toContainText("Revisão 6");
     await expect(theirs).toContainText("Texto de A");
-    await expect(theirs).toContainText("Etapa do preenchimentoRevisão");
+    await expect(theirs).toContainText("Etapa do preenchimentoObservações");
     await expect(panel(second).getByRole("region", { name: "Minha edição", exact: true })).toContainText("Etapa do preenchimentoObservações");
     await expect(theirs.getByRole("textbox")).toHaveCount(0);
     for (const width of [320, 390, 768, 1440]) {
@@ -251,10 +247,10 @@ test("REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7
     await expect(
       second.getByLabel("Observação 1", { exact: true }),
     ).toHaveValue("Texto próprio de B que precisa sobreviver ao conflito");
-    await save(second).click();
-    await expect(panel(second)).toBeVisible();
+    await expect(second.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
     await expect.poll(async () => (await draftContext(f)).content.observations).toEqual(["Texto próprio de B que precisa sobreviver ao conflito"]);
     const current = await draftContext(f);
+    expect(current.revision).toBe(7);
     expect(current.navigation).toEqual({ version: 1, stage: "notes" });
     expect(current.content.observations).toEqual([
       "Texto próprio de B que precisa sobreviver ao conflito",
@@ -340,7 +336,7 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   await choice.getByRole("button", { name: "Descartar e começar novamente", exact: true }).click();
   await panel(page).getByRole("button", { name: "Recuperar salvamento ou descarte", exact: true }).click();
   expect(packets).toHaveLength(4); expect(packets[2]).toEqual(packets[3]);
-  await expect(save(page)).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toBeEnabled();
   expect(await draftContext(f)).toBeNull();
   expect((await draftContext(f, "BAL")).id).toBe(saved.id);
   expect(officialState(f)).toBe(before);

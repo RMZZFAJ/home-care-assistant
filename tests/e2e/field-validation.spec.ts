@@ -151,6 +151,7 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   });
   const pendingSave = page.waitForRequest(saveBody);
   const confirm = page.getByRole("button", { name: "Emitir requisição", exact: true });
+  await expect(footer.getByRole("button", { name: "Salvar rascunho", exact: true })).toHaveCount(0);
   try {
     await observation.fill(validNote);
     await pendingSave;

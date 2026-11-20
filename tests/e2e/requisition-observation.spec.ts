@@ -122,9 +122,6 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   expect(await rejected.json()).toMatchObject({ code: "VALIDATION_ERROR" });
   expect(count(f.patient)).toBe("0");
   await input.fill("1,25");
-  await page
-    .getByRole("button", { name: "Salvar rascunho", exact: true })
-    .click();
   await expect(
     page.getByText(
       "Último rascunho salvo.",
@@ -234,9 +231,6 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   await cards[3]
     .getByLabel("Estoque observado com a equipe", { exact: false })
     .fill("7");
-  await page
-    .getByRole("button", { name: "Salvar rascunho", exact: true })
-    .click();
   await expect(
     page.getByText(
       "Último rascunho salvo.",

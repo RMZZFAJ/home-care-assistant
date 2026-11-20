@@ -10,15 +10,16 @@ import { audit } from "./accessibility-audit";
 test.setTimeout(210_000);
 test.afterEach(async({page})=>{await page.unrouteAll({behavior:"wait"});});
 const panel=lastDraftPanel;
-const save=(page:Page)=>page.getByRole("button",{name:"Salvar rascunho",exact:true});
+const stages=(page:Page)=>page.getByRole("navigation",{name:/^Etapas da (COM|ENT)$/});
+const savedStatus=(page:Page)=>page.locator(".hca-supply-wizard-footer").getByRole("status");
 const next=(page:Page)=>page.getByRole("button",{name:/^(Selecionar materiais|Continuar|Revisar ficha)$/}).click();
 async function login(page:Page,patient:string,role="family"){
  await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures[role].email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);await page.bringToFront();
 }
 async function open(page:Page,patient:string,kind:"COM"|"ENT"){
- await page.goto(`/fichas/${kind.toLowerCase()}?careRecipientId=${patient}`);await expect(save(page).or(page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true})).first()).toBeVisible();
+ await page.goto(`/fichas/${kind.toLowerCase()}?careRecipientId=${patient}`);await expect(stages(page).or(panel(page)).first()).toBeVisible({ timeout: 30_000 });
 }
-async function resume(page:Page){await panel(page).getByRole("button",{name:"Continuar rascunho",exact:true}).click();await expect(save(page)).toBeEnabled();}
+async function resume(page:Page){await panel(page).getByRole("button",{name:"Continuar rascunho",exact:true}).click();await expect(stages(page)).toBeVisible();}
 async function widths(page:Page,label:string){for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});await page.evaluate(()=>window.scrollTo({top:0,left:0,behavior:"instant"}));await audit(page,label+" "+width);}}
 const official=(patient:string)=>sql(`select jsonb_build_object('documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${sqlLiteral(patient)}),'events',(select jsonb_agg(to_jsonb(e) order by id) from public.document_events e where document_id in(select id from public.operational_documents where care_recipient_id=${sqlLiteral(patient)})),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)}),'series',(select jsonb_agg(to_jsonb(s) order by type) from public.document_series s where care_recipient_id=${sqlLiteral(patient)}));`);
 const draftContent=(f:{products:string[]},recipient="")=>({form:{quantities:{[f.products[0]]:"1,"},notes:"Preenchimento privado fictício",origin:recipient?"":"donation",source:"FAMILY",recipientId:recipient,recipientReason:recipient?"Pessoa indicada manualmente para esta entrega":""},links:{},materials:f.products.map((id,i)=>({id,name:"Material fictício V4 "+i,unit:"unidade",quantityDecimals:0})),context:{documentId:null,documentVersion:null,requisitionId:null,recipientName:recipient?"Profissional fictício":""}});
@@ -28,8 +29,8 @@ test("COM entre duas sessões conserva decimal incompleto e resolve CAS sem emit
  try{
   const peer=await second.newPage();await login(page,f.patient);await open(page,f.patient,"COM");await resume(page);await next(page);await selectMaterialCategory(page);const quantity=page.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(quantity).toHaveValue("1,");
   await login(peer,f.patient);await open(peer,f.patient,"COM");await resume(peer);await next(peer);await selectMaterialCategory(peer);const other=peer.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(other).toHaveValue("1,");
-  await quantity.fill("2,");await save(page).click();await expect(page.getByText("Último rascunho salvo.",{exact:true})).toBeVisible();
-  await other.fill("3,");await save(peer).click();await expect(panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true})).toBeEnabled();await expect(other).toHaveValue("3,");await expect(panel(peer).getByText("Quantidade: 2, unidade",{exact:true})).toBeVisible();await panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true}).click();await save(peer).click();await expect(save(peer)).toBeEnabled();
+  await quantity.fill("2,");await expect(savedStatus(page)).toHaveText("Último rascunho salvo.");
+  await other.fill("3,");await expect(panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true})).toBeEnabled();await expect(other).toHaveValue("3,");await expect(panel(peer).getByText("Quantidade: 2, unidade",{exact:true})).toBeVisible();await panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true}).click();await expect(savedStatus(peer)).toHaveText("Último rascunho salvo.");
   const row=JSON.parse(sql(`select jsonb_build_object('id',id,'revision',revision,'content',content,'navigation',navigation) from private.creation_drafts where id=${sqlLiteral(saved.id)};`));expect(row.revision).toBe(3);expect(row.content.form.quantities[f.products[0]]).toBe("3,");expect(row.navigation).toEqual({version:1,stage:"higiene"});
   await peer.reload();await expect(panel(peer)).toBeVisible();await expect(panel(peer).getByRole("textbox")).toHaveCount(0);await resume(peer);await expect(peer.locator('[aria-current="step"]')).toContainText("Materiais");await expect(peer.getByRole("button",{name:/^Higiene/,pressed:true})).toBeVisible();await expect(other).toHaveValue("3,");expect(official(f.patient)).toBe(before);await widths(peer,"D3 COM private incomplete form");
  }finally{await second.close();}
@@ -38,8 +39,10 @@ test("COM entre duas sessões conserva decimal incompleto e resolve CAS sem emit
 test("ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",async({page})=>{
  const f=await setup(),owner=await actor("family",f.patient),body=draftContent(f,fixtures.professional.id);body.form.quantities[f.products[0]]="2";
  const saved=await rpc(owner,"supply_draft_command",{p_patient:f.patient,p_kind:"ENT",p_purpose:"create",p_target:null,p_id:null,p_expected:null,p_body:{action:"save",content:body},p_key:randomUUID()});
- await login(page,f.patient);await open(page,f.patient,"ENT");await resume(page);for(let i=0;i<4;i++)await next(page);
- await save(page).click();await expect(save(page)).toBeEnabled();await page.reload();await expect(panel(page)).toBeVisible();await resume(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
+ await login(page,f.patient);await open(page,f.patient,"ENT");await resume(page);for(let i=0;i<3;i++)await next(page);
+ await page.getByRole("button",{name:"Adicionar observação",exact:true}).click();
+ await page.getByLabel("Observação 1",{exact:true}).fill("Separar os materiais para conferência.");await next(page);
+ await expect(savedStatus(page)).toHaveText("Último rascunho salvo.");await page.reload();await expect(panel(page)).toBeVisible();await resume(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
  const packets:Record<string,unknown>[]=[];let documentId="";
  await page.route("**/api/documents",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());const response=await route.fetch();expect(response.ok()).toBe(true);documentId=(await response.json()).data.id;return route.fulfill({response,json:{data:{id:documentId},persistence:"confirmed"}});});
  const lookups: unknown[]=[];
@@ -74,9 +77,9 @@ test("duas fichas ENT não herdam campos de conferência descartada e nenhuma na
 });
 
 test("recuperação de save incerto conserva a chave após revogação real e não revela o cache ao reabrir",async({page})=>{
- const f=await setup(),marker="Observação privada fictícia "+randomUUID(),before=official(f.patient);await login(page,f.patient);await open(page,f.patient,"COM");await page.getByRole("combobox",{name:/Forma de aquisição/}).selectOption("donation");for(let i=0;i<3;i++)await next(page);await page.getByRole("button",{name:"Adicionar observação",exact:true}).click();await page.getByLabel("Observação 1",{exact:true}).fill(marker);
- const packets:unknown[]=[];let lose=true;await page.route("**/api/drafts",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(lose){lose=false;const response=await route.fetch();expect(response.ok()).toBe(true);return route.abort("failed");}return route.continue();});
- await save(page).click();await expect(panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true})).toBeEnabled();
+ const f=await setup(),marker="Observação privada fictícia "+randomUUID(),before=official(f.patient);await login(page,f.patient);await open(page,f.patient,"COM");await page.getByRole("combobox",{name:/Forma de aquisição/}).selectOption("donation");for(let i=0;i<3;i++)await next(page);await page.getByRole("button",{name:"Adicionar observação",exact:true}).click();
+ const packets:unknown[]=[];let lose=true;await page.route("**/api/drafts",async route=>{if(route.request().method()!=="POST")return route.continue();const body=route.request().postDataJSON();if(!body.content?.form?.observations?.includes(marker))return route.continue();packets.push(body);if(lose){lose=false;const response=await route.fetch();expect(response.ok()).toBe(true);return route.abort("failed");}return route.continue();});
+ await page.getByLabel("Observação 1",{exact:true}).fill(marker);await expect(panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true})).toBeEnabled();
  let release!:()=>void,entered!:()=>void;const gate=new Promise<void>(r=>{release=r;}),arrived=new Promise<void>(r=>{entered=r;});let hold=true;
  await page.route("**/api/context",async route=>{if(hold&&route.request().method()==="GET"){const response=await route.fetch();entered();await gate;return route.fulfill({response});}return route.continue();});
  try{
@@ -97,7 +100,6 @@ test("L2 perda de escrita conserva a edição da COM e o vínculo permite consul
   await page.getByRole("button", { name: "Adicionar observação", exact: true }).click();
   const field = page.getByLabel("Observação 1", { exact: true });
   await field.fill(observation);
-  await save(page).click();
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const before = official(f.patient);
   const draftBefore = sql(`select content::text from private.creation_drafts
@@ -115,7 +117,7 @@ test("L2 perda de escrita conserva a edição da COM e o vínculo permite consul
   await expect(notice).toBeVisible();
   await expect(notice).toContainText("O último rascunho salvo poderá ser retomado");
   await expect(field).toHaveCount(0);
-  await expect(save(page)).toHaveCount(0);
+  await expect(stages(page)).toHaveCount(0);
   if (info.project.use.hasTouch) await info.attach("E06-17 acesso de consulta", {
     body: await notice.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
   });
@@ -129,7 +131,7 @@ test("L2 perda de escrita conserva a edição da COM e o vínculo permite consul
          and capability='com.create'`);
   await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
   await expect(field).toHaveValue(observation);
-  await expect(save(page)).toBeEnabled();
+  await expect(stages(page)).toBeVisible();
   expect(official(f.patient)).toBe(before);
 });
 

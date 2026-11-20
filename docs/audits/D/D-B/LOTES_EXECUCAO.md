@@ -200,9 +200,8 @@ a opção Salvar e fechar usa a confirmação do último rascunho antes de
 navegar. A devolução usa o mesmo cabeçalho e mantém seu fluxo de abertura
 e o controle de rascunho da expedição.
 
-O menu autenticado, a escolha inicial da operação na central de entregas
-e devoluções e o botão manual de salvar rascunho são complementos do sistema
-real ao recorte da v7.
+O menu autenticado e a escolha inicial da operação na central de entregas
+e devoluções são complementos do sistema real ao recorte da v7.
 
 Na rodada local de `90576c00`, o build passou e a DEV completou a expedição
 no Android emulado. A abertura da REQ e a emissão da COM no Android
@@ -309,14 +308,34 @@ preservou o foco, o filtro e o valor em edição quando o painel fechou.
 A inspeção das capturas confirmou o interruptor horizontal com 32 × 19 px.
 A revisão visual completa de COM, ENT, DEV e dos seus diálogos segue aberta.
 
-A decisão mais recente do responsável retira o salvamento manual do
-rodapé dos assistentes L2, deixando o estado da gravação automática.
-Também pede uma única entrada para vínculos de ficha na Confirmação.
-A avaliação de suficiência e os vínculos por material precisam continuar
-disponíveis. Esses ajustes seguem em aberto. A escolha entre compra
-e doação passa para o ato de aquisição ou recebimento. O contrato atual
-ainda lê a origem da emissão para distinguir as operações. A transição
-precisa preservar o sentido e o histórico das COMs já emitidas.
+Na Confirmação da COM e da ENT, Fichas vinculadas abre o seletor de
+origens e permite escolher se a ficha também traz materiais. Cada material
+continua com seu vínculo próprio no menu de três pontos. A avaliação
+familiar de suficiência e a justificativa para múltiplas REQs aparecem
+quando há vínculos que exigem essas informações. O seletor também reconhece
+os vínculos por linha dos rascunhos anteriores.
+
+O rodapé dos assistentes L2 mostra o estado da gravação automática e as
+ações de navegação. A confirmação de saída e os controles excepcionais de
+retomada, comparação e recuperação continuam disponíveis. Após a escolha
+de manter a própria edição numa comparação, o rascunho é salvo sobre a
+revisão consultada. A atualização do catálogo mantém aberto o painel de
+listas pessoais da REQ e bloqueia o avanço até concluir a consulta.
+
+Nos testes locais com Auth real no Android emulado, listas pessoais
+reabriram em outra sessão sem copiar contagem, urgência ou justificativa.
+REQ e COM mantiveram as duas edições na comparação e salvaram a edição
+escolhida. Uma resposta inválida e uma revogação durante a recuperação
+mantiveram a chave original. A COM manteve o vínculo geral ao desfazer
+a importação e conservou a quantidade editada no vínculo por material.
+A ENT originada na COM recuperou somente a quantidade aprovada. A ENT
+vinculada a duas REQs exigiu a justificativa e completou a expedição e o
+aceite com os fluxos de leitura do código de barras preservados.
+
+A escolha entre compra e doação passa para o ato de aquisição ou
+recebimento. O contrato atual ainda lê a origem da emissão para distinguir
+as operações. A transição precisa preservar o sentido e o histórico das
+COMs já emitidas. Essa mudança segue em aberto.
 
 ### Decisões e dúvidas de L2
 

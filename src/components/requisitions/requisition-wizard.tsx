@@ -130,6 +130,7 @@ function PatientRequisition({
   const [catalogError, setCatalogError] = useState("");
   const [openingFailure, setOpeningFailure] = useState<OpeningFailure | null>(null);
   const [catalogueTotal, setCatalogueTotal] = useState<number | null>(null);
+  const [catalogueWasAvailable, setCatalogueWasAvailable] = useState(false);
   const [catalogAttempt, setCatalogAttempt] = useState(0);
   const [reviewStock, setReviewStock] = useState(false);
   const contextByProduct = useMemo(
@@ -264,6 +265,7 @@ function PatientRequisition({
           setCatalogError("");
           setOpeningFailure(null);
           setCatalogueTotal(total);
+          if (items.length) setCatalogueWasAvailable(true);
         }
       })
       .catch((reason) => {
@@ -557,12 +559,7 @@ function PatientRequisition({
   if (issuedDocumentId)
     return <Notice>Requisição registrada. <ActionButton onClick={() => openIssued(issuedDocumentId)}>Abrir ficha</ActionButton></Notice>;
   function includeMaterials(ids: string[]) {
-    setForm(current => {
-      const selection = applyMaterialSelection(current.lines,ids,products);
-      const added = new Set(selection.added);
-      return { ...current, lines: selection.lines.map(line =>
-        added.has(line.productId) ? { ...line, ...newStockObservation(line.productId) } : line) };
-    });
+    setForm(current => ({ ...current, lines: applyMaterialSelection(current.lines, ids, products).lines }));
     setDraftTouched(true);
   }
   const selectionLibrary = (readonly = false) => <details className="hca-household-personal">
@@ -594,7 +591,7 @@ function PatientRequisition({
           setCatalogAttempt(current => current + 1);
         }} />;
     }
-    if (!loadingCatalog && !catalogError && !products.length && !draftTouched && step === 0)
+    if (!loadingCatalog && !catalogError && !catalogueWasAvailable && !products.length && !draftTouched && step === 0)
       return <DocumentCatalogueEmpty patientId={context.patient!.id} patientName={context.patient!.display_name}
         mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0} />;
   }
@@ -722,9 +719,6 @@ function PatientRequisition({
           </button>
         </Notice>
       ) : null}
-      {loadingCatalog ? (
-        <Notice>Carregando catálogo e pendências…</Notice>
-      ) : (
         <section className="hca-supply-wizard-card">
           <StepNavigator
             steps={supplyWizardStages}
@@ -735,7 +729,7 @@ function PatientRequisition({
               issuanceFailure.clear();
               setStep(stageStart[nextStage]);
             }}
-            disabled={uncertain || saving || privateDraft.blocked}
+            disabled={uncertain || saving || loadingCatalog || privateDraft.blocked}
             label="Etapas da requisição"
           />
           <div className="hca-supply-wizard-body">
@@ -863,12 +857,11 @@ function PatientRequisition({
             supply={{ kind: "REQ", draft: privateDraft, current: draftContent, hasEdits: draftTouched,
               exitHref: sourceId ? "/fichas/" + encodeURIComponent(sourceId) : "/fichas" }}
             uncertain={uncertain}
-            blocked={Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
+            blocked={loadingCatalog || Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
             onBack={() => {
               issuanceFailure.clear();
               setStep(stageStart[stage - 1]);
             }}
-            onDraft={() => void privateDraft.save(draftContent)}
             onNext={() => {
               if (validate() && (step !== 0 || householdSelectionRef.current?.apply() !== false)) setStep(stageStart[stage + 1]);
             }}
@@ -876,7 +869,6 @@ function PatientRequisition({
           />
           <DocumentIssuanceFailure state={issuanceFailure} operation="Emissão de requisição" onRetry={submit} />
         </section>
-      )}
     </div>
   );
 }

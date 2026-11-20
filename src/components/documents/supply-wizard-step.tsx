@@ -1,5 +1,4 @@
 "use client";
-import { RelatedDocument } from "./related-document";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
@@ -36,7 +35,6 @@ import type {
   SupplyType,
   CatalogProduct,
   PatientPerson,
-  ItemContext,
   DeliveryPreparation,
 } from "@/types/documents";
 export type WizardState = {
@@ -56,6 +54,52 @@ export type WizardState = {
   manualQuantities?: Record<string, string>;
 };
 
+function SupplyRequestAssessments({ type, catalog, links, form, setForm, fieldErrors }: {
+  type: "COM" | "ENT";
+  catalog: CatalogProduct[];
+  links: Record<string, string[]>;
+  form: WizardState;
+  setForm: Dispatch<SetStateAction<WizardState>>;
+  fieldErrors: Record<string, string>;
+}) {
+  const products = catalog.filter(({ id }) => Object.hasOwn(form.quantities, id) &&
+    (links[id]?.length ?? 0) >= (type === "ENT" ? 1 : 2));
+  if (!products.length) return null;
+  return <section className="hca-form-stack" aria-label="Avaliação dos vínculos">
+    <h3>Avaliação dos vínculos</h3>
+    {products.map(({ id, name }) => <fieldset className="hca-form-stack" key={id}>
+      <legend>{name}</legend>
+      {type === "ENT" ? <label className="hca-field">
+        <span>Esta entrega pretende atender a necessidade</span>
+        <select className={inputClass} required value={form.requestFulfillments?.[id] ?? ""}
+          aria-invalid={Boolean(fieldErrors[id + ":fulfillment"])} onChange={(event) => {
+            const choice = event.currentTarget.value as "" | "partial" | "complete";
+            setForm(current => ({ ...current, requestFulfillments: { ...current.requestFulfillments, [id]: choice } }));
+          }}>
+          <option value="">Escolha a avaliação familiar</option>
+          <option value="partial">Parcialmente · continua em aberto</option>
+          <option value="complete">Por completo · necessidade atendida após recebimento</option>
+        </select>
+        <span className="hca-field-help">O recebedor confirma separadamente as quantidades físicas.</span>
+        {fieldErrors[id + ":fulfillment"] ? <span className="ui-field-error">{fieldErrors[id + ":fulfillment"]}</span> : null}
+      </label> : null}
+      {links[id].length > 1 ? <label className="hca-field">
+        <span>Justificativa da necessidade compartilhada</span>
+        <textarea className={inputClass} required minLength={3} maxLength={500}
+          aria-invalid={Boolean(fieldErrors[id + ":shared"])}
+          value={form.sharedNeedReasons?.[id] ?? ""} onChange={(event) => {
+            const reason = event.currentTarget.value;
+            setForm(current => ({ ...current, sharedNeedReasons: { ...current.sharedNeedReasons, [id]: reason } }));
+          }} />
+        <span className="hca-field-help">{type === "ENT"
+          ? "A entrega representa a mesma necessidade nas requisições vinculadas."
+          : "A compra relacionada às requisições ajuda a preparar a entrega."}</span>
+        {fieldErrors[id + ":shared"] ? <span className="ui-field-error">{fieldErrors[id + ":shared"]}</span> : null}
+      </label> : null}
+    </fieldset>)}
+  </section>;
+}
+
 export function SupplyWizardStep({
   step,
   onCategoryChange,
@@ -67,8 +111,6 @@ export function SupplyWizardStep({
   catalog,
   people,
   links,
-  setLinks,
-  requestOptions,
   sourceSection,
   openMaterialSources,
   scan,
@@ -94,8 +136,6 @@ export function SupplyWizardStep({
   catalog: CatalogProduct[];
   people: PatientPerson[];
   links: Record<string, string[]>;
-  setLinks: Dispatch<SetStateAction<Record<string, string[]>>>;
-  requestOptions: ItemContext[];
   sourceSection?: ReactNode;
   openMaterialSources?: (product: CatalogProduct) => void;
   scan: (code: string) => Promise<void>;
@@ -271,114 +311,9 @@ export function SupplyWizardStep({
             </div>
           ) : null}
           {sourceSection}
-          {type !== "BAL" &&
-            requestOptions.some((option) => option.pending.length) ? (
-            <details className="rounded-xl border border-(--line) p-4">
-              <summary className="min-h-11 cursor-pointer text-sm font-semibold">
-                Vincular requisições pendentes
-              </summary>
-              <p className="my-3 text-xs text-(--muted)">
-                Marque explicitamente as linhas atendidas por esta operação. A
-                compra não atende a REQ. Na entrega, a família avalia a suficiência;
-                o recebedor confirma separadamente as quantidades físicas.
-              </p>
-              <div className="space-y-3">
-                {requestOptions
-                  .filter((option) => option.pending.length)
-                  .map((option) => (
-                    <fieldset
-                      className="rounded-lg border border-(--line) p-3"
-                      key={option.productId}
-                    >
-                      <legend className="px-1 text-sm font-semibold">
-                        {
-                          catalog.find(
-                            (product) => product.id === option.productId,
-                          )?.name
-                        }
-                      </legend>
-                      {option.pending.map((request) => (
-                        <label
-                          className="flex min-h-11 items-center gap-3 text-sm"
-                          key={request.lineId}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={
-                              links[option.productId]?.includes(
-                                request.lineId,
-                              ) ?? false
-                            }
-                            onChange={(event) => {
-                              const checked = event.currentTarget.checked;
-                              setLinks((current) => ({
-                                ...current,
-                                [option.productId]: checked
-                                  ? [
-                                    ...(current[option.productId] ?? []),
-                                    request.lineId,
-                                  ]
-                                  : (current[option.productId] ?? []).filter(
-                                    (id) => id !== request.lineId,
-                                  ),
-                              }));
-                              if (checked)
-                                setForm((current) => ({
-                                  ...current,
-                                  quantities: {
-                                    ...current.quantities,
-                                    [option.productId]:
-                                      current.quantities[option.productId] ??
-                                      "",
-                                  },
-                                }));
-                            }}
-                          />
-                          {request.code}
-                          <RelatedDocument
-                            id={request.requisitionId}
-                            label="Conferir REQ"
-                          />
-                        </label>
-                      ))}
-                      {type === "ENT" && form.source === "FAMILY" && links[option.productId]?.length ? <label className="mt-3 block text-sm font-semibold">Esta entrega pretende atender a necessidade<select className={inputClass} required value={form.requestFulfillments?.[option.productId] ?? ""} aria-invalid={Boolean(fieldErrors[option.productId + ":fulfillment"])} onChange={event => { const choice = event.currentTarget.value as "" | "partial" | "complete"; setForm(current => ({ ...current, requestFulfillments: { ...current.requestFulfillments, [option.productId]: choice } })); }}><option value="">Escolha a avaliação familiar</option><option value="partial">Parcialmente · continua em aberto</option><option value="complete">Por completo · necessidade atendida após recebimento</option></select><span className="hca-field-help">O destinatário verá sua decisão em leitura. Ela não confirma expedição, recebimento ou estoque.</span>{fieldErrors[option.productId + ":fulfillment"] ? <span className="ui-field-error">{fieldErrors[option.productId + ":fulfillment"]}</span> : null}</label> : null}
-                      {(links[option.productId]?.length ?? 0) > 1 ? (
-                        <label className="mt-3 block text-sm font-semibold">
-                          Justificativa da necessidade compartilhada
-                          <textarea
-                            className={inputClass}
-                            required
-                            minLength={3}
-                            maxLength={500}
-                            value={
-                              form.sharedNeedReasons?.[option.productId] ?? ""
-                            }
-                            onChange={(event) => {
-                              const reason = event.currentTarget.value;
-                              setForm((current) => ({
-                                ...current,
-                                sharedNeedReasons: {
-                                  ...current.sharedNeedReasons,
-                                  [option.productId]: reason,
-                                },
-                              }));
-                            }}
-                          />
-                          <span className="block text-xs font-normal text-(--muted)">
-                            As REQs representam a mesma necessidade. O estoque
-                            recebe a quantidade desta ENT uma única vez.
-                          </span>
-                          {fieldErrors[option.productId + ":shared"] ? (
-                            <span className="ui-field-error">
-                              {fieldErrors[option.productId + ":shared"]}
-                            </span>
-                          ) : null}
-                        </label>
-                      ) : null}
-                    </fieldset>
-                  ))}
-              </div>
-            </details>
+          {type !== "BAL" && (type === "COM" || form.source === "FAMILY") ? (
+            <SupplyRequestAssessments type={type} catalog={catalog} links={links} form={form}
+              setForm={setForm} fieldErrors={fieldErrors} />
           ) : null}
         </>
       ) : null}

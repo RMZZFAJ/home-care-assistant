@@ -38,7 +38,8 @@ export function StockObservationField({ value, mode, at, suggested, decimals = 6
     <p id={id + "-help"} className="text-xs text-(--muted)">
       {suggested == null
         ? "Vazio significa não informado. Digite 0 somente se observou zero."
-        : "Confira a quantidade sugerida pelo saldo da equipe e ajuste conforme a contagem."}{" "}
+        : value == null ? `Saldo de referência da equipe: ${suggested}. Informe o que você observou.`
+          : "Confira a quantidade sugerida pelo saldo da equipe e ajuste conforme a contagem."}{" "}
       Faixa de 0 a 100000. {decimals ? `Até ${decimals} casas decimais.` : "Somente unidades inteiras."}
     </p>
     <p className="text-xs text-(--muted)">{formatStockObservationTime(at)}</p>

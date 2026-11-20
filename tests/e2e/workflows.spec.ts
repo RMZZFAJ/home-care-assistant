@@ -182,7 +182,6 @@ async function issueSupply(
   if (type === "COM")
     await page.getByLabel("Forma de aquisição").selectOption("donation");
   if (type === "ENT" && requestId) {
-    await page.getByText("Vincular requisições pendentes", { exact: true }).click();
     await page.getByRole("combobox", { name: /^Esta entrega pretende atender a necessidade/ }).selectOption("complete");
   }
   await next(page);
@@ -928,11 +927,16 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     "Teste professional",
     "Pessoa indicada manualmente para receber estes materiais",
   );
-  await page
-    .getByText("Vincular requisições pendentes", { exact: true })
-    .click();
-  await page.getByRole("checkbox", { name: /REQ-0001/ }).check();
-  await page.getByRole("checkbox", { name: /REQ-0002/ }).check();
+  const links = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
+  await expect(page.getByText("Vincular requisições pendentes", { exact: true })).toHaveCount(0);
+  await links.getByRole("button", { name: "Vincular", exact: true }).click();
+  const sourcePicker = page.getByRole("dialog", { name: "Vincular fichas", exact: true });
+  for (const code of ["REQ-0001", "REQ-0002"]) {
+    const option = sourcePicker.getByRole("article").filter({ has: page.getByRole("checkbox", { name: `Vincular ${code}`, exact: true }) });
+    await option.getByRole("checkbox", { name: `Vincular ${code}`, exact: true }).check();
+    await option.getByRole("checkbox", { name: /^Importar materiais/ }).check();
+  }
+  await sourcePicker.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
   await next(page);
   await expect(
     page.locator(".ui-field-error").filter({ hasText: /Justifique/ }),

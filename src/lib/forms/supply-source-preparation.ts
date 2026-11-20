@@ -10,6 +10,30 @@ export type SupplySourcePreparation = {
 
 export const emptySupplySources: SupplySourcePreparation = { sources: [], sourceImports: {}, sourceSeeds: {} };
 
+/** Bring the older line-only selections into the same per-material picker. */
+export function includeSavedRequisitionSources(
+  preparation: SupplySourcePreparation,
+  linkedLines: Record<string, string[]>,
+  requests: ItemContext[],
+): SupplySourcePreparation {
+  const sources = new Map(preparation.sources.map(row => [row.documentId, row]));
+  for (const { productId, pending } of requests) {
+    const selected = linkedLines[productId];
+    if (!selected?.length) continue;
+    for (const { lineId, requisitionId } of pending) {
+      if (!selected.includes(lineId)) continue;
+      const source = sources.get(requisitionId);
+      if (source?.productIds.includes(productId)) continue;
+      sources.set(requisitionId, {
+        documentId: requisitionId,
+        general: source?.general ?? false,
+        productIds: [...(source?.productIds ?? []), productId],
+      });
+    }
+  }
+  return { ...preparation, sources: [...sources.values()] };
+}
+
 export function prepareSupplySources(
   previous: SupplySourcePreparation,
   selections: Selection[],

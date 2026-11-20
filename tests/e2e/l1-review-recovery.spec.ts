@@ -152,15 +152,16 @@ test("L1 pré-vínculo oferece só a necessidade em aberto e descarte exige nova
  const ent=await delivery(f.patient,req,[f.products[0]],{requestFulfillment:"complete"});
  await rpc(receiver,"supply_document_command",{p_id:ent.id,p_action:"receive",p_body:{divergences:[]},p_key:randomUUID(),p_version:ent.version});
  await login(page,f.patient);await page.goto(`/fichas/ent?careRecipientId=${f.patient}&requisitionId=${req.id}`);
- const links=page.locator("details").filter({has:page.getByText("Vincular requisições pendentes",{exact:true})});
- await links.locator("summary").click();
- await expect(links.getByRole("checkbox")).toHaveCount(1);await expect(links.getByRole("checkbox")).toBeChecked();
- const choice=links.getByRole("combobox");await expect(choice).toHaveCount(1);await choice.selectOption("complete");
- await page.getByRole("button",{name:"Salvar rascunho",exact:true}).click();
+ const origins=page.getByRole("region",{name:"Fichas vinculadas",exact:true});
+ const code=sql(`select code from public.operational_documents where id=${q(req.id)}`);
+ await expect(origins.getByRole("button",{name:code,exact:true})).toBeVisible();
+ const assessment=page.getByRole("region",{name:"Avaliação dos vínculos",exact:true});
+ await expect(assessment.getByRole("checkbox")).toHaveCount(0);
+ const choice=assessment.getByRole("combobox");await expect(choice).toHaveCount(1);await choice.selectOption("complete");
  await expect(page.getByText("Último rascunho salvo.",{exact:true})).toBeVisible();
  await page.reload();const resume=page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true});
  await resume.getByRole("button",{name:"Descartar e começar novamente",exact:true}).click();
- await links.locator("summary").click();await expect(links.getByRole("combobox")).toHaveValue("");
+ await expect(choice).toHaveValue("");
  expect(sql("select count(*) from public.operational_documents where care_recipient_id="+q(f.patient)+" and type='ENT'")).toBe("1");
 });
 

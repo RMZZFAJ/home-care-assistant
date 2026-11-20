@@ -443,9 +443,6 @@ test("PWA sem confirmação de atualização aguarda abas, preserva edição e r
         Boolean((await navigator.serviceWorker.getRegistration())?.waiting),
       ),
     ).toBe(true);
-    await peer
-      .getByRole("button", { name: "Salvar rascunho", exact: true })
-      .click();
     await expect(
       peer.getByText(
         "Último rascunho salvo.",

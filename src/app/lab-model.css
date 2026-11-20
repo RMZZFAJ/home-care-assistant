@@ -1409,9 +1409,8 @@
 .hca-supply-wizard-footer-actions,
 .hca-supply-wizard-footer-actions > div { display: flex; align-items: center; gap: 6px; }
 .hca-supply-wizard-footer-actions > div { margin-inline-start: auto; justify-content: flex-end; flex-wrap: wrap; min-width: 0; }
-.hca-supply-wizard-footer-meta { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 2px 8px; }
-.hca-supply-wizard-footer-meta:has(.hca-supply-wizard-status:not(:empty)) { margin-block-start: 9px; }
 .hca-supply-wizard-status { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 0; color: #4a6659; font-size: 11px; }
+.hca-supply-wizard-status:not(:empty) { margin-block-start: 9px; }
 
 @media (max-width: 850px) {
   .hca-supply-wizard-footer {

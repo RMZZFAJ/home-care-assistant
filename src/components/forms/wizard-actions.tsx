@@ -8,11 +8,11 @@ import type { CreationDraftContent } from "@/types/creation-drafts";
 import { supplyWizardCopy, supplyWizardNextLabels, type SupplyWizardKind } from "./supply-wizard-stages";
 import type { CreationDraftController } from "./use-creation-draft";
 
-type DraftStatus = { draft: CreationDraftController; current: CreationDraftContent };
-type SupplyActions = DraftStatus & { kind: SupplyWizardKind; exitHref: string; hasEdits: boolean };
+type DraftStatus = { draft: CreationDraftController; current: CreationDraftContent; hasEdits: boolean };
+type SupplyActions = DraftStatus & { kind: SupplyWizardKind; exitHref: string };
 
-export function SupplyWizardFooter({ back, children, status, draftAction }: {
-  back: ReactNode; children: ReactNode; status?: DraftStatus; draftAction?: ReactNode;
+export function SupplyWizardFooter({ back, children, status }: {
+  back: ReactNode; children: ReactNode; status?: DraftStatus;
 }) {
   const draft = status?.draft;
   let text = "";
@@ -20,10 +20,11 @@ export function SupplyWizardFooter({ back, children, status, draftAction }: {
   if (status && draft?.active) {
     if (draft.backgroundBusy || (draft.busy && draft.pending?.action === "save")) text = "Salvando rascunho…";
     else if (draft.error || draft.loadError || draft.pending || draft.conflict) text = "Verifique o rascunho";
-    else if (!draft.busy && draft.base?.state === "active") {
-      saved = JSON.stringify(draft.base.content) === JSON.stringify(status.current) &&
+    else if (!draft.busy && !draft.blocked) {
+      saved = draft.base?.state === "active" && JSON.stringify(draft.base.content) === JSON.stringify(status.current) &&
         JSON.stringify(draft.base.navigation) === JSON.stringify(draft.navigation);
-      text = saved ? "Último rascunho salvo." : "Alterações a salvar";
+      if (saved) text = "Último rascunho salvo.";
+      else if (status.hasEdits) text = "Alterações a salvar";
     }
   }
   return <footer className="hca-supply-wizard-footer">
@@ -31,10 +32,7 @@ export function SupplyWizardFooter({ back, children, status, draftAction }: {
       {back}
       <div>{children}</div>
     </div>
-    <div className="hca-supply-wizard-footer-meta">
-      <p className="hca-supply-wizard-status" role="status">{saved ? <Icon name="check" width={12} height={12} /> : null}{text}</p>
-      {draftAction}
-    </div>
+    <p className="hca-supply-wizard-status" role="status">{saved ? <Icon name="check" width={12} height={12} /> : null}{text}</p>
   </footer>;
 }
 
@@ -67,7 +65,7 @@ function SupplyWizardExit({ supply, disabled }: { supply: SupplyActions; disable
 
 export function WizardActions({ step, total, saving, draftBusy = false, uncertain, blocked = false, finishLabel = "Confirmar e concluir", onBack, onDraft, onNext, onFinish, supply }: {
   step: number; total: number; saving: boolean; draftBusy?: boolean; uncertain: boolean; blocked?: boolean;
-  onBack: () => void; onDraft: () => void; onNext: () => void; onFinish: () => void;
+  onBack: () => void; onDraft?: () => void; onNext: () => void; onFinish: () => void;
   finishLabel?: string;
   supply?: SupplyActions;
 }) {
@@ -75,7 +73,6 @@ export function WizardActions({ step, total, saving, draftBusy = false, uncertai
     : <ActionButton variant={supply ? "quiet" : undefined} disabled={step === 0 || saving || uncertain} onClick={onBack}>
       {supply ? <Icon name="back" width={14} height={14} /> : null}Voltar
     </ActionButton>;
-  const draftAction = <ActionButton variant={supply ? "quiet" : undefined} disabled={saving || draftBusy || uncertain} onClick={onDraft}>Salvar rascunho</ActionButton>;
   const advance = step === total - 2 ? "Revisar" : "Avançar";
   const finish = supply ? supplyWizardCopy[supply.kind].finish : finishLabel;
   const mainAction = step < total - 1 ? (
@@ -89,6 +86,6 @@ export function WizardActions({ step, total, saving, draftBusy = false, uncertai
         {saving ? "Registrando…" : uncertain ? "Recuperar esta tentativa" : finish}
       </ActionButton>
     );
-  return supply ? <SupplyWizardFooter back={back} status={uncertain ? undefined : supply} draftAction={draftAction}>{mainAction}</SupplyWizardFooter>
-    : <div className="hca-wizard-actions">{back}<div>{draftAction}{mainAction}</div></div>;
+  return supply ? <SupplyWizardFooter back={back} status={uncertain ? undefined : supply}>{mainAction}</SupplyWizardFooter>
+    : <div className="hca-wizard-actions">{back}<div>{onDraft && <ActionButton disabled={saving || draftBusy || uncertain} onClick={onDraft}>Salvar rascunho</ActionButton>}{mainAction}</div></div>;
 }

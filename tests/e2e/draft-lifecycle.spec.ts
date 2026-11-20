@@ -20,7 +20,7 @@ async function login(page: Page, patient: string, role: "professional" | "family
 }
 async function open(page: Page) {
   await page.goto("/fichas/req");
-  await expect(page.getByRole("button", { name: "Salvar rascunho", exact: true }).or(panel(page)).first()).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Etapas da requisição", exact: true }).or(panel(page)).first()).toBeVisible();
   await expect(panel(page).getByText("Consultando seu rascunho no servidor…", { exact: true })).toHaveCount(0);
 }
 
