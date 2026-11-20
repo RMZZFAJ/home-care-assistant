@@ -323,12 +323,42 @@ do iOS parou por timeout do banco local durante a expedição. A repetição
 passou após atualizar as estatísticas locais, com retry automático desligado.
 Capturas em `output/playwright/fab-v7-evidence/`. Sem migration neste ajuste.
 
-Na etapa de materiais da COM e da ENT, a leitura ainda ocupa o corpo da
-etapa com câmera, foto e entrada manual. A v7 leva esses controles ao
-diálogo Ler código. O editor de apresentações também aparece na própria
-linha selecionada, com comparação de versões e atualização do catálogo.
-A composição compacta precisa manter a escolha manual, o fator versionado
-e o total sem forçar a leitura de código.
+Na etapa de materiais da COM e da ENT, a linha mostra a quantidade na
+unidade de estoque. O menu de três pontos abre **Editar embalagens**.
+Esse diálogo acomoda a escolha manual de apresentações cadastradas e a
+comparação de versões, funções do produto que complementam os exemplos
+de conversão da v7. Voltar ao material mantém o preenchimento e devolve
+o foco ao menu da linha. O erro de quantidade indica a linha e leva ao
+controle que abre o editor. A volta de Extras ou Revisão a Materiais
+reabre a última categoria do preenchimento atual. Um novo preenchimento
+começa em Medicamentos.
+
+Na COM, Chromium com Android emulado e WebKit com iOS emulado preservaram
+20 unidades pelo fator de origem. No caso de revisão, voltar manteve
+Higiene e as 24 unidades só entraram após **Adotar fator atual**. O teste
+de perda da resposta preservou a conversão emitida e o crédito único.
+As capturas da linha e do diálogo a 320 px estão em
+`output/playwright/l2-presentation-evidence/`.
+
+O percurso de ENT com duas REQs passou nos dois navegadores emulados,
+sem retry automático na rodada final. O teste aguardou Entrega expedida
+na ficha antes de consultar o trânsito e confirmou o recebimento pelo
+perfil designado. Uma rodada anterior do iOS tinha navegado para o
+estoque enquanto a emissão ainda abria a ficha. Após a retomada do
+Docker, houve timeout na preparação local, anterior à expedição. A
+rodada final passou após atualização das estatísticas da mesma base.
+
+A leitura da COM e da ENT ainda ocupa o corpo da etapa com câmera,
+foto e entrada manual. A v7 reúne esses controles no diálogo Ler código.
+
+Na CI de `b7d5ca1f`, validações Linux e Windows e o job de banco passaram.
+Os cinco jobs de navegador concluídos somaram 52 falhas após a repetição.
+Um caso de recebimento pessoal no iOS passou na segunda tentativa. O
+Chromium 2 foi cancelado após cerca de 40 minutos. A comparação do fator
+obsoleto também falhou nessa CI ao voltar para a categoria incorreta. O
+teste dirigido deste incremento cobre essa correção. Os demais casos de
+abertura, fichas, rascunhos e fluxos do segundo shard seguem em triagem.
+[Execução da CI](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44691631298).
 
 Na Confirmação da COM e da ENT, Fichas vinculadas abre o seletor de
 origens e permite escolher se a ficha também traz materiais. Cada material

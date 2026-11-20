@@ -59,13 +59,7 @@ export function PresentationQuantity({
       quantity(row.base_quantity).gt(0),
   );
   return (
-    <div
-      className="mt-3 min-w-0 space-y-3 rounded-lg border border-(--line) p-3 text-sm"
-      style={{ overflowWrap: "anywhere" }}
-      role="group"
-      aria-label={`Embalagens de ${product.name}`}
-    >
-      <h4 className="font-semibold">Apresentações e equivalência</h4>
+    <div className="hca-form-stack min-w-0 text-sm" style={{ overflowWrap: "anywhere" }}>
       {validationError ? (
         <p id={errorId} className="ui-field-error" role="alert">
           {validationError}

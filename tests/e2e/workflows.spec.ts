@@ -966,9 +966,9 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   const assessment = page.getByRole("checkbox", { name: `Atende integralmente à necessidade de ${product.name}`, exact: true });
   await expect(assessment).not.toBeChecked();
   await assessment.check();
-  await page
-    .getByRole("button", { name: "Ler código de barras", exact: true })
-    .click();
+  const openCamera = page.getByRole("button", { name: "Ler código de barras", exact: true });
+  await openCamera.evaluate(button => button.scrollIntoView({ block: "center", behavior: "instant" }));
+  await openCamera.click();
   await expect(page.getByText(/Acesso à câmera negado/)).toBeVisible();
   await page
     .getByRole("button", { name: "Encerrar câmera", exact: true })
@@ -1056,6 +1056,10 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   const delivery = (await response.json()).data;
   expect(delivery.lines[0].requisitionItemIds).toHaveLength(2);
   expect(delivery.lines[0].family_fulfillment).toBe("complete");
+  const emitted = page.getByRole("dialog", { name: "Entrega expedida", exact: true });
+  await expect(emitted).toBeVisible({ timeout: 65_000 });
+  await expect(page).toHaveURL(url => url.pathname === "/fichas/" + delivery.id);
+  await emitted.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
   await page.goto("/estoque?careRecipientId=" + patient + "&custody=TRANSIT");
   await expect(
     page.getByRole("link", { name: delivery.code, exact: true }),

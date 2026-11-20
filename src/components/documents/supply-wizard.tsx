@@ -141,11 +141,20 @@ export function PatientSupplyWizard({
   recount: boolean;
 }) {
   const [step, setStep] = useState(0);
+  const [lastMaterialsStep, setLastMaterialsStep] = useState(supplyStageSteps[1]);
   const isBalance = type === "BAL";
   const draftFlow = isBalance ? "SUPPLY" : "SUPPLY_CREATE";
   const category = materialCategories[step - 1]?.id;
   const stage = isBalance ? step : category ? 1 : supplyStageSteps.indexOf(step);
   const steps = isBalance ? balanceSteps : supplyWizardStages;
+  function openStep(nextStep: number) {
+    if (!isBalance && materialCategories[nextStep - 1]) setLastMaterialsStep(nextStep);
+    setStep(nextStep);
+  }
+  function openStage(nextStage: number) {
+    const nextStep = isBalance ? nextStage : supplyStageSteps[nextStage];
+    setStep(!isBalance && nextStage === 1 ? lastMaterialsStep : nextStep);
+  }
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
   const householdSelectionRef = useRef<HouseholdListSelectionHandle>(null);
   const [people, setPeople] = useState<PatientPerson[]>([]);
@@ -350,7 +359,7 @@ export function PatientSupplyWizard({
           setSourceSetup({ ...emptySupplySources, sources: [{ documentId: requisitionId, general: true, productIds }] });
         }
         setDraftMaterials(content.materials);
-        setStep(stepForNavigation(draftFlow, draft.navigation));
+        openStep(stepForNavigation(draftFlow, draft.navigation));
         setError("");
         setFieldErrors({});
         return true;
@@ -408,6 +417,7 @@ export function PatientSupplyWizard({
       setPreservedBalanceContext(null);
       setPreviousObservations(undefined);
       setStaleLegacyReference(false);
+      setLastMaterialsStep(supplyStageSteps[1]);
       setStep(0);
       setError("");
       setFieldErrors({});
@@ -919,13 +929,13 @@ export function PatientSupplyWizard({
         const first = Object.keys(errors)[0];
         const product = catalog.find(item => item.id === first ||
           (type === "ENT" && first === item.id + ":shared"));
-        if (product) setStep(extras.has(product.id) ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1);
+        if (product) openStep(extras.has(product.id) ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1);
         else if (first.startsWith("observation:")) setStep(4);
-        else if (all) setStep(first === "lines" ? supplyStageSteps[1] : 0);
+        else if (all) openStage(first === "lines" ? 1 : 0);
       }
       window.setTimeout(
         () =>
-          document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
+          document.querySelector<HTMLElement>('[aria-invalid="true"], [data-wizard-quantity-error="true"]')?.focus(),
         0,
       );
       return false;
@@ -1029,7 +1039,7 @@ export function PatientSupplyWizard({
         setBusy(false);
       }
     }
-    setStep(isBalance ? Math.min(steps.length - 1, step + 1) : supplyStageSteps[stage + 1]);
+    openStage(Math.min(steps.length - 1, stage + 1));
     if (type === "BAL" && step === 4) {
       requestAnimationFrame(() => {
         const heading = document.getElementById("supply-wizard-heading");
@@ -1445,7 +1455,7 @@ export function PatientSupplyWizard({
       formatQuantity(presentation.base_quantity, product?.unit),
     );
     if (product)
-      setStep(
+      openStep(
         form.extraProductIds?.includes(product.id) ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1,
       );
   }
@@ -1553,7 +1563,7 @@ export function PatientSupplyWizard({
     onChange={nextStage => {
       if (nextStage === stage) return;
       issuanceFailure.clear();
-      setStep(isBalance ? nextStage : supplyStageSteps[nextStage]);
+      openStage(nextStage);
     }}
     disabled={busy || uncertain || loading || privateDraft.blocked}
     label={"Etapas da " + type}
@@ -1699,7 +1709,7 @@ export function PatientSupplyWizard({
               >
                 <SupplyWizardStep
                   step={step}
-                  onCategoryChange={nextCategory => setStep(materialCategories.findIndex(item => item.id === nextCategory) + 1)}
+                  onCategoryChange={nextCategory => openStep(materialCategories.findIndex(item => item.id === nextCategory) + 1)}
                   type={type}
                   context={context}
                   form={form}
@@ -1831,7 +1841,7 @@ export function PatientSupplyWizard({
                 }
                 onBack={() => {
                   issuanceFailure.clear();
-                  setStep(isBalance ? step - 1 : supplyStageSteps[stage - 1]);
+                  openStage(stage - 1);
                   setError("");
                 }}
                 onDraft={isBalance ? () => void persist(true) : undefined}

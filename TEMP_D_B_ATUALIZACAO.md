@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — materiais da COM e da ENT.** A linha mostra o total na unidade
+de estoque. Editar embalagens abre pelo menu de três pontos, com escolha de
+apresentações e comparação de versões. Ao voltar a Materiais, o assistente
+reabre a última categoria. O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md)
+detalha os cenários móveis e o complemento à v7.
+
 **20/11 — botão flutuante nas fichas estreitas.** O menu abre para cima.
 A barra de ações reserva espaço ao lado do botão acima da navegação. A
 DEV com divergência foi verificada a 320 px em Android e iOS emulados.

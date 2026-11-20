@@ -31,11 +31,13 @@ export function CatalogueMaterialPanel({ context, material, finalFocus, onClose,
     inlineContext={context} closeText={closeText} detailTitle={detailTitle} finalFocus={finalFocus} onClose={onClose} />;
 }
 
-export function MaterialConsultButton({ context, material, menu = false, onLink }: {
+export function MaterialConsultButton({ context, material, menu = false, onLink, onEditPresentations, presentationErrorId }: {
   context: WorkspaceContext;
   material: Material;
   menu?: boolean;
   onLink?: (returnFocus: () => HTMLButtonElement | null) => void;
+  onEditPresentations?: (returnFocus: () => HTMLButtonElement | null) => void;
+  presentationErrorId?: string;
 }) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -57,13 +59,17 @@ export function MaterialConsultButton({ context, material, menu = false, onLink 
   return <>
     {menu ? <Menu.Root>
       <Menu.Trigger ref={buttonRef} render={<ActionButton compact variant="quiet" className="hca-material-origin-button"
-        aria-label={`Mais ações de ${material.name}`} />}><Icon name="more" /></Menu.Trigger>
+        aria-label={`Mais ações de ${material.name}`} aria-describedby={presentationErrorId}
+        data-wizard-quantity-error={presentationErrorId ? "true" : undefined} />}><Icon name="more" /></Menu.Trigger>
       <MenuPopup>
         <Menu.Item className="hca-menu-item" onClick={openMaterial}>
           <Icon name="eye" />Detalhes do material
         </Menu.Item>
         {onLink ? <Menu.Item className="hca-menu-item" onClick={() => onLink(() => buttonRef.current)}>
           <Icon name="link" />Vincular a uma ficha
+        </Menu.Item> : null}
+        {onEditPresentations ? <Menu.Item className="hca-menu-item" onClick={() => onEditPresentations(() => buttonRef.current)}>
+          <Icon name="box" />Editar embalagens
         </Menu.Item> : null}
       </MenuPopup>
     </Menu.Root> : <ActionButton ref={buttonRef} className="hca-material-consult-button" variant="quiet" compact

@@ -4,6 +4,7 @@ import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
 import { ActionButton, CheckboxField, DefinitionGrid, FormField, TextAreaField } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
+import { Dialog } from "@/components/ui/overlays";
 import { materialCategories, supplyExtrasStep, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
 import type { PendingPurchaseExtra } from "@/lib/validation/pending-purchase-extras";
@@ -129,6 +130,10 @@ export function SupplyWizardStep({
   const [searchByCategory, setSearchByCategory] = useState<
     Record<string, string>
   >({});
+  const [presentationEditor, setPresentationEditor] = useState<{
+    productId: string;
+    returnFocus: () => HTMLButtonElement | null;
+  } | null>(null);
   const search = searchByCategory[category ?? ""] ?? "";
   const visibleProducts = catalog.filter(
     (product) =>
@@ -144,6 +149,8 @@ export function SupplyWizardStep({
   const selected = catalog.filter((product) =>
     Object.hasOwn(form.quantities, product.id),
   );
+  const presentationProduct = presentationEditor && visibleProducts.find(product =>
+    product.id === presentationEditor.productId && Object.hasOwn(form.quantities, product.id));
   const assessesDelivery = type === "ENT" && form.source === "FAMILY";
   const sharedPurchaseNeeds = type === "COM" && step === 0
     ? selected.filter(product => (links[product.id]?.length ?? 0) > 1)
@@ -212,6 +219,11 @@ export function SupplyWizardStep({
           : manual,
       },
     }));
+  }
+  function closePresentationEditor() {
+    const restoreFocus = presentationEditor?.returnFocus;
+    setPresentationEditor(null);
+    if (restoreFocus) requestAnimationFrame(() => restoreFocus()?.focus({ preventScroll: true }));
   }
   return (
     <>
@@ -321,6 +333,9 @@ export function SupplyWizardStep({
                 type === "BAL" || Object.hasOwn(form.quantities, product.id);
               const linkedNeeds = links[product.id]?.length ?? 0;
               const assessmentHelpId = `ent-assessment-${encodeURIComponent(product.id)}`;
+              const usesPresentations = Boolean(form.presentationSelections?.[product.id]?.length);
+              const presentationErrorId = usesPresentations && fieldErrors[product.id]
+                ? `wizard-presentation-error-${encodeURIComponent(product.id)}` : undefined;
               return (
                 <MaterialChoice
                   selected={checked}
@@ -358,7 +373,10 @@ export function SupplyWizardStep({
                     </span>
                   </label>
                   {type !== "BAL" ? <MaterialConsultButton context={context} material={product} menu
-                    onLink={checked && openMaterialSources ? () => openMaterialSources(product) : undefined} /> : null}
+                    onLink={checked && openMaterialSources ? () => openMaterialSources(product) : undefined}
+                    onEditPresentations={checked
+                      ? returnFocus => setPresentationEditor({ productId: product.id, returnFocus }) : undefined}
+                    presentationErrorId={presentationErrorId} /> : null}
                   </div>
                   {isExtraStep ? <ActionButton type="button" onClick={() => selectProduct(product.id, false)}>
                     Remover {product.name}
@@ -378,8 +396,7 @@ export function SupplyWizardStep({
                     {linkedNeeds > 1 ? <SharedNeedReason type="ENT" productId={product.id} form={form}
                       setForm={setForm} error={fieldErrors[product.id + ":shared"]} /> : null}
                   </div> : null}
-                  {checked &&
-                    !form.presentationSelections?.[product.id]?.length ? (
+                  {checked && !usesPresentations ? (
                     <label className="product-quantity text-xs font-semibold">
                       {type === "BAL"
                         ? "Contagem física"
@@ -415,37 +432,32 @@ export function SupplyWizardStep({
                       ) : null}
                     </label>
                   ) : null}
-                  {checked && type !== "BAL" ? (
-                    <div className="col-span-full w-full">
-                      <PresentationQuantity
-                        product={product}
-                        selections={
-                          form.presentationSelections?.[product.id] ?? []
-                        }
-                        manual={
-                          form.manualQuantities?.[product.id] ??
-                          form.quantities[product.id] ??
-                          "0"
-                        }
-                        source={presentations}
-                        error={presentationError}
-                        loading={presentationLoading}
-                        refresh={refreshPresentations}
-                        validationError={
-                          form.presentationSelections?.[product.id]?.length
-                            ? fieldErrors[product.id]
-                            : undefined
-                        }
-                        onChange={(selections, manual) =>
-                          updatePackages(product.id, selections, manual)
-                        }
-                      />
+                  {checked && type !== "BAL" && usesPresentations ? (
+                    <div className="col-span-full text-sm" aria-live="polite">
+                      <p>Quantidade total calculada: <strong>{form.quantities[product.id]
+                        ? formatQuantity(form.quantities[product.id], product.unit)
+                        : "Preencha as quantidades"}</strong></p>
+                      {presentationErrorId ? <p id={presentationErrorId} className="ui-field-error">
+                        {fieldErrors[product.id]}
+                      </p> : null}
                     </div>
                   ) : null}
                 </MaterialChoice>
               );
             })}
           </div>
+          {presentationProduct ? <Dialog open title={`Embalagens de ${presentationProduct.name}`}
+            kicker="Apresentações e equivalência" headingIcon="box" keyboardScrollable
+            onClose={closePresentationEditor} finalFocus={() => false}
+            footer={<ActionButton variant="primary" onClick={closePresentationEditor}>Voltar ao material</ActionButton>}>
+            <PresentationQuantity product={presentationProduct}
+              selections={form.presentationSelections?.[presentationProduct.id] ?? []}
+              manual={form.manualQuantities?.[presentationProduct.id] ?? form.quantities[presentationProduct.id] ?? "0"}
+              source={presentations} error={presentationError} loading={presentationLoading} refresh={refreshPresentations}
+              validationError={form.presentationSelections?.[presentationProduct.id]?.length
+                ? fieldErrors[presentationProduct.id] : undefined}
+              onChange={(selections, manual) => updatePackages(presentationProduct.id, selections, manual)} />
+          </Dialog> : null}
         </>
       ) : null}
       {step === 4 ? (

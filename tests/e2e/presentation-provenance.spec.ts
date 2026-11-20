@@ -22,6 +22,15 @@ async function login(page: Page, patient: string) {
   ).toBeVisible();
   await selectContext(page, patient);
 }
+async function loginToPurchaseWizard(page: Page, patient: string) {
+  const admin = await shiftWorker(patient, "admin");
+  await page.goto("/login?next=%2Ffichas%2Fcom");
+  await page.getByLabel("E-mail", { exact: true }).fill(admin.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page).toHaveURL(url => url.pathname === "/fichas/com");
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", patient);
+}
 async function seed() {
   const f = await setup();
   const result = await rpc(f.admin, "configure_catalogue_unit", {
@@ -100,12 +109,22 @@ async function chooseProduct(page: Page, name: string) {
   await option.click();
   await expect(combo).toHaveValue(name);
 }
-async function wizard(page: Page, patient?: string) {
-  if (patient) await page.goto("/fichas/com?careRecipientId=" + patient);
+async function openPackageEditor(page: Page) {
+  const menu = page.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true });
+  const editor = page.getByRole("dialog", { name: "Embalagens de Material fictício V4 0", exact: true });
+  await menu.click();
+  await page.getByRole("menuitem", { name: "Editar embalagens", exact: true }).click();
+  await expect(editor).toBeVisible();
+  return { editor, menu };
+}
+
+async function wizard(page: Page) {
   await page.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   await selectMaterialCategory(page);
   await page.getByRole("checkbox", { name: /Material fictício V4 0/ }).check();
-  const combo = page.getByRole("combobox", {
+  await expect(page.getByRole("combobox", { name: "Apresentação de Material fictício V4 0", exact: true })).toHaveCount(0);
+  const { editor, menu } = await openPackageEditor(page);
+  const combo = editor.getByRole("combobox", {
     name: "Apresentação de Material fictício V4 0",
     exact: true,
   });
@@ -114,19 +133,22 @@ async function wizard(page: Page, patient?: string) {
   await page
     .getByRole("option", { name: /Pacote fictício com dez unidades/ })
     .click();
-  await page
+  await editor
     .getByRole("button", {
       name: /Adicionar embalagem de Material fictício V4 0/,
     })
     .click();
-  await page
+  await editor
     .getByLabel("Embalagens — Pacote fictício com dez unidades", {
       exact: true,
     })
     .fill("2");
   await expect(
-    page.getByText("Quantidade total calculada:", { exact: false }),
+    editor.getByText("Quantidade total calculada:", { exact: false }),
   ).toContainText("20 unidade");
+  await editor.getByRole("button", { name: "Voltar ao material", exact: true }).click();
+  await expect(menu).toBeFocused();
+  await expect(page.getByText("Quantidade total calculada:", { exact: false })).toContainText("20 unidade");
 }
 async function review(page: Page) {
   await page.getByRole("button", { name: "Continuar", exact: true }).click();
@@ -347,13 +369,7 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
 }, info) => {
   test.setTimeout(170_000);
   const f = await seed();
-  const admin = await shiftWorker(f.patient, "admin");
-  await page.goto("/login?next=%2Ffichas%2Fcom");
-  await page.getByLabel("E-mail", { exact: true }).fill(admin.email);
-  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
-  await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page).toHaveURL(url => url.pathname === "/fichas/com");
-  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
+  await loginToPurchaseWizard(page, f.patient);
   await wizard(page);
   await review(page);
   const attempts: { idempotencyKey: string }[] = [];
@@ -473,10 +489,14 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
 
 test("nova emissão com fator obsoleto conserva a escolha e exige comparação antes de calcular 24", async ({
   page,
-}) => {
+}, info) => {
   const f = await seed();
-  await login(page, f.patient);
-  await wizard(page, f.patient);
+  if (info.project.use.hasTouch) await page.setViewportSize({ width: 320, height: 740 });
+  await loginToPurchaseWizard(page, f.patient);
+  await wizard(page);
+  if (info.project.use.hasTouch) await info.attach("COM · total na linha a 320 px", {
+    body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
   await rpc(f.admin, "catalogue_presentation_command", edit(f, 1));
   await review(page);
   await page
@@ -488,25 +508,31 @@ test("nova emissão com fator obsoleto conserva a escolha e exige comparação a
   await page.getByRole("button", { name: "Voltar", exact: true }).click();
   await page.getByRole("button", { name: "Voltar", exact: true }).click();
   await page.getByRole("button", { name: "Voltar", exact: true }).click();
-  await page
+  await expect(page.getByRole("button", { name: /^Higiene/ })).toHaveAttribute("aria-pressed", "true");
+  const { editor } = await openPackageEditor(page);
+  await editor
     .getByRole("button", {
       name: "Atualizar embalagens de Material fictício V4 0",
       exact: true,
     })
     .click();
-  await expect(page.getByText(/Cadastro atual v2/)).toBeVisible();
+  await expect(editor.getByText(/Cadastro atual v2/)).toBeVisible();
   await expect(
-    page.getByText("Quantidade total calculada:", { exact: false }),
+    editor.getByText("Quantidade total calculada:", { exact: false }),
   ).toContainText("20 unidade");
-  await page
+  if (info.project.use.hasTouch) await info.attach("COM · comparação de fatores a 320 px", {
+    body: await editor.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
+  await editor
     .getByRole("button", {
       name: "Adotar fator atual de Pacote fictício com dez unidades",
       exact: true,
     })
     .click();
   await expect(
-    page.getByText("Quantidade total calculada:", { exact: false }),
+    editor.getByText("Quantidade total calculada:", { exact: false }),
   ).toContainText("24 unidade");
+  await editor.getByRole("button", { name: "Voltar ao material", exact: true }).click();
   await review(page);
   await page
     .getByRole("button", { name: "Emitir compra", exact: true })
