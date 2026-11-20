@@ -7,6 +7,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { purchaseBalanceArrival, purchaseBalanceCommand, purchaseBalanceFixture } from "../integration/purchase-entry-balance-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixtureFile, sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -19,6 +21,81 @@ async function login(page: Page, patient: string, role: "family" | "adminA") {
   await page.getByLabel("E-mail", { exact: true }).fill(fixture[role].email); await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click(); await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
 }
+
+test("E05-11 reúne chegadas de duas compras e uma avulsa e aplica somente as decisões escolhidas", async ({ page }, info) => {
+  test.setTimeout(150_000);
+  const f = await purchaseBalanceFixture();
+  const partial = await purchaseBalanceArrival(f, f.document, [
+    { lineId: f.document.lines[0].id, quantity: "2", expectedQuantity: "6", remainingAction: "wait" },
+  ]);
+  const second = await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient, p_type: "COM", p_draft: false, p_key: randomUUID(),
+    p_payload: { origin: "purchase", lines: [{ productId: f.document.lines[1].product_id, quantity: "3" }] },
+  });
+  const purchased = await purchaseBalanceCommand(f.family, second, "purchase", { lines: [{ lineId: second.lines[0].id, quantity: "3" }] });
+  const complete = await purchaseBalanceArrival(f, purchased, [
+    { lineId: second.lines[0].id, quantity: "3", expectedQuantity: "3" },
+  ]);
+  const { result: unlinked } = await rpc(f.family, "unlinked_arrival_command", {
+    p_patient: f.patient, p_key: randomUUID(), p_body: { origin: "donation", lines: [{ productId: f.document.lines[0].product_id, quantity: "1" }] },
+  });
+  const reviewer = await shiftWorker(f.patient, "admin");
+  await page.goto("/login?next=%2Festoque");
+  await page.getByLabel("E-mail", { exact: true }).fill(reviewer.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page).toHaveURL(url => url.pathname === "/estoque", { timeout: 45_000 });
+  const dialog = await openArrivalReview(page);
+  const firstCard = arrivalCard(dialog.getByRole("region", { name: `Chegadas de ${partial.document.code}`, exact: true }), partial.receipt.id);
+  const secondCard = arrivalCard(dialog.getByRole("region", { name: `Chegadas de ${complete.document.code}`, exact: true }), complete.receipt.id);
+  const unlinkedCard = arrivalCard(dialog.getByRole("region", { name: "Chegadas avulsas", exact: true }), unlinked.id);
+  await expect(firstCard.getByText("Aguardando outra entrega de 4 unidade.", { exact: true })).toBeVisible();
+  await expect(secondCard.getByText("Chegada completa.", { exact: true })).toBeVisible();
+  await expect(unlinkedCard).toContainText(`${unlinked.code} · Doação · Chegada avulsa`);
+  const originalViewport = page.viewportSize();
+  if (info.project.use.hasTouch) {
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 844 });
+      await expect(dialog.getByRole("heading", { level: 2, name: "Conferir chegadas", exact: true })).toHaveCSS("font-size", "20px");
+      await expect(firstCard).toHaveCSS("border-radius", "12px");
+      await expect(dialog.locator("footer button")).toHaveCount(2);
+      await expect.poll(() => dialog.locator("footer button").evaluateAll(buttons =>
+        Math.abs(buttons[0].getBoundingClientRect().top - buttons[1].getBoundingClientRect().top))).toBeLessThan(1);
+      await info.attach(`Conferir chegadas · ${width} px`, {
+        body: await dialog.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png",
+      });
+    }
+  }
+  await page.setViewportSize({ width: 360, height: 540 });
+  const scroll = dialog.getByRole("region", { name: "Conteúdo de Conferir chegadas", exact: true });
+  await scroll.focus();
+  await expect(scroll).toBeFocused();
+  await scroll.press("PageDown");
+  await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBeGreaterThan(0);
+  if (originalViewport) await page.setViewportSize(originalViewport);
+  const fold = firstCard.locator("summary").filter({ hasText: "Estoque familiar" });
+  await expect(fold.locator("svg")).toHaveCount(2);
+  await expect.poll(() => fold.evaluate(node => getComputedStyle(node, "::after").display)).toBe("none");
+  await fold.press("Enter");
+  await expect(firstCard.getByText("Disponíveis hoje: 30 unidade · Após aprovar esta chegada: 32 unidade", { exact: true })).toBeVisible();
+  await secondCard.getByRole("switch").uncheck();
+  await expect(secondCard.getByRole("switch")).not.toBeChecked();
+  await chooseArrivalAction(unlinkedCard, "Abrir pendência", "Confira o número de unidades doadas.");
+  const { result, receipt } = await confirmArrivalReview(page, dialog, true);
+  expect(receipt.results).toHaveLength(2);
+  expect(receipt.results).toEqual(expect.arrayContaining([
+    expect.objectContaining({ receiptId: partial.receipt.id, status: "approved" }),
+    expect.objectContaining({ receiptId: unlinked.id, status: "correction_requested" }),
+  ]));
+  await expect(result.getByText("Chegada aprovada", { exact: true })).toBeVisible();
+  await expect(result.getByText("Correção solicitada", { exact: true })).toBeVisible();
+  expect(sql(`select count(*) from public.stock_movements where reference_id in (${[partial.receipt.id, complete.receipt.id, unlinked.id].map(sqlLiteral).join(",")})`)).toBe("1");
+  await result.getByRole("button", { name: "Concluir", exact: true }).click();
+  await page.goto("/");
+  const remaining = await openArrivalReview(page);
+  await expect(remaining.locator("article[data-receipt-id]")).toHaveCount(1);
+  await expect(arrivalCard(remaining, complete.receipt.id).getByRole("switch")).toBeChecked();
+});
 
 test("COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas", async ({ page }) => {
   test.setTimeout(150_000);

@@ -1,6 +1,6 @@
 # Execução dos lotes L1 a L4
 
-**Atualizado em 19/11/2026.** Branch `feat/phase-d-implementation`,
+**Atualizado em 20/11/2026.** Branch `feat/phase-d-implementation`,
 [PR #7 em rascunho](https://github.com/RMZZFAJ/home-care-assistant/pull/7).
 Este registro acompanha o que entrou no produto, a comparação com cada
 laboratório e as pendências por lote. As evidências das entregas e a fila
@@ -106,12 +106,12 @@ confere com o comando mestre.
   Quando o nome informado é idêntico ao nome ou alias ativo, o contrato
   vigente exige escolher o material correspondente ou informar um nome
   que diferencie o novo item.
-  A escolha explícita de uma sugestão reaparece em Itens extras com o
-  rótulo Material do catálogo. O mesmo produto fica disponível para editar,
-  remover e retomar com a unidade oficial. A revisão mostra a linha somente
-  em Itens extras. A ficha e o PDF preservam a classificação e os detalhes,
-  com os controles vigentes de reiteração e estoque. O laboratório usa
-  registros fictícios para essas etapas.
+  A escolha de uma sugestão abre a categoria do produto em Materiais. O
+  produto pode ser editado, removido e retomado com a unidade oficial. A
+  revisão o mostra na sua categoria, e os detalhes digitados seguem em
+  Observações. A ficha e o PDF preservam a identificação, a contagem e os
+  controles de reiteração. Fichas emitidas e rascunhos legados que registraram
+  a classificação anterior conservam os dados originais.
   P1 continua pendente.
 - **Vínculos e COM E05.** Vínculos por ficha ou material, importação seletiva,
   planejamento e chegada, compras mistas, falta e excesso, correção pelo autor,
@@ -145,6 +145,23 @@ confere com o comando mestre.
   cancelamento, reabertura, arquivo por decisão ou prazo e PDF consolidado
   verificado. Pende conferir o candidato publicado com o banco atualizado e
   os efeitos de comunicação pelos gates do ambiente.
+
+**Conferência conjunta de chegadas.** A comparação com E05-11 a 360 e 412 px
+cobre o título, os cartões compactos, o indicador de falta ou chegada
+completa, o estoque expansível e o rodapé. O corpo permite rolagem por
+teclado e o estoque abre pelo controle nativo com ícone de seta. A
+projeção esclarece o impacto daquela chegada. O sistema acrescenta o
+protocolo CHE e a origem da chegada avulsa, a data completa e os grupos
+acessíveis por compra. As telas de Início, Estoque e COM usam a mesma
+conferência, com escopo de uma compra na ficha.
+
+No Android e iOS emulados, o Estoque reuniu duas COMs e uma doação avulsa.
+O teste conferiu uma chegada parcial e uma completa, desmarcou uma compra
+e abriu pendência na doação. Após simular a perda da resposta, recuperou
+as duas decisões e conferiu um único movimento de estoque. O Início
+mostrou a compra ainda pendente. Também passaram os quatro casos de
+conferência individual e chegada avulsa nos dois navegadores. O incremento
+usa as migrations já instaladas.
 
 **Trechos de composição conferidos.** A barra de cinco etapas, as categorias
 dentro de Materiais, o bloco expandido e o diálogo Organizar listas em E04-04,

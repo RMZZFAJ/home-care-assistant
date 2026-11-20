@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — conferência de chegadas em lote.** O diálogo do Início, Estoque
+e ficha COM segue a composição móvel de E05-11. A lista conserva a origem
+e as decisões por chegada e pode ser percorrida pelo teclado. A expansão
+do saldo informa o efeito de aprovar aquela entrada. O
+[registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) detalha a comparação.
+
 **20/11 — catálogo vazio na COM.** A abertura apresenta o estado do
 catálogo e o atalho de cadastro a quem administra. A ação Planejar com
 item extra mantém a emissão com cadastro pendente e a retomada do

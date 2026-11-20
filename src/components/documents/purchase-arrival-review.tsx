@@ -45,7 +45,7 @@ function ArrivalReviewCard({ row, choice, update }: {
   const title = one?.name ?? `${row.materials.length} materiais`;
   const correction = choice.decision === "request_correction";
   const reject = choice.decision === "reject";
-  return <article className="hca-purchase-line" data-receipt-id={row.receiptId} data-inactive={choice.decision === "skip" || undefined}>
+  return <article className="hca-purchase-line hca-arrival-review-card" data-receipt-id={row.receiptId} data-inactive={choice.decision === "skip" || undefined}>
     <div className="hca-purchase-line-heading">
       <div><h3>{title}</h3>{one ? <p>{formatQuantity(one.quantity, one.unit)} informados</p> : null}</div>
       {correction || reject ? <span className={"hca-purchase-status " + (correction ? "hca-arrival-attention" : "hca-arrival-rejected")}>
@@ -64,7 +64,7 @@ function ArrivalReviewCard({ row, choice, update }: {
         </MenuPopup>
       </Menu.Root>
     </div>
-    <p className="text-sm text-(--muted)">{row.documentCode}{row.origin ? ` · ${unlinkedOriginLabel[row.origin]}` : ""} · {row.author ?? "Autor não preservado"} · {formatBrazilDate(row.submittedAt)}</p>
+    <p className="hca-arrival-review-origin">{row.documentCode}{row.origin ? ` · ${unlinkedOriginLabel[row.origin]} · Chegada avulsa` : ""} · {row.author ?? "Autor não preservado"} · {formatBrazilDate(row.submittedAt)}</p>
     {!one ? <ul className="space-y-2">{row.materials.map(item => <li key={item.lineId}>
       <strong>{item.name} · {formatQuantity(item.quantity, item.unit)} informados</strong><MaterialStatus item={item} />
       <PurchaseArrivalLinks unit={item.unit} linkedPurchase={item.linkedPurchase} priorPlanning={item.priorPlanning} />
@@ -77,9 +77,9 @@ function ArrivalReviewCard({ row, choice, update }: {
     </FormField> : <>
       {one ? <MaterialStatus item={one} /> : null}
       {row.materials.some(item => item.familyStock !== null) ? <details className="hca-arrival-stock">
-        <summary><Icon name="stock" />Estoque familiar</summary>
+        <summary><Icon name="stock" />Estoque familiar<Icon name="down" /></summary>
         {row.materials.map(item => item.familyStock === null ? null : <p key={item.lineId}>
-          {!one ? `${item.name} · ` : ""}Disponíveis hoje: {formatQuantity(item.familyStock, item.unit)} · Após aprovação: {formatQuantity(quantity(item.familyStock).plus(item.quantity).toFixed(), item.unit)}
+          {!one ? `${item.name} · ` : ""}Disponíveis hoje: {formatQuantity(item.familyStock, item.unit)} · Após aprovar esta chegada: {formatQuantity(quantity(item.familyStock).plus(item.quantity).toFixed(), item.unit)}
         </p>)}
       </details> : null}
     </>}
@@ -224,6 +224,7 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
     </ActionButton> : null}
     <Dialog open={open} title={documentId && queue.arrivals.length <= 1 ? "Conferir entrada no estoque" : "Conferir chegadas"}
       kicker={`${documentId ? "COM" : "Chegadas"} · ${patientName}`} subtitle="Os itens marcados entram no estoque familiar. Desmarque para decidir depois ou use os três pontos para pedir correção ou recusar."
+      keyboardScrollable popupClassName="hca-wizard-dialog hca-arrival-review-dialog"
       onClose={requestClose} closeDisabled={busy} finalFocus={returnFocus}
       footer={<><ActionButton disabled={busy} onClick={requestClose}>Voltar</ActionButton>
         {pendingKey ? <ActionButton variant="primary" disabled={busy} onClick={() => void send(true)}>Conferir mesmo resultado</ActionButton>
