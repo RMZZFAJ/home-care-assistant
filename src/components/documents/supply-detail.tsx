@@ -101,7 +101,7 @@ import {
 import { confirmedPurchase, PurchaseResult, type ConfirmedPurchase } from "./purchase-register";
 import { PurchaseArrivalResult } from "./purchase-arrival";
 import { PurchaseArrivalCorrections } from "./purchase-arrival-correction";
-import { PurchaseArrivalReview } from "./purchase-arrival-review";
+import { PurchaseArrivalReview, canReviewPurchaseArrivals, type OpenChangedArrivals } from "./purchase-arrival-review";
 import {
   acquisitionRemaining,
   arrivalRemaining,
@@ -196,6 +196,7 @@ export function SupplyDocumentContent({
   const [transferEditing, setTransferEditing] = useState(false);
   const [archiveDialog, setArchiveDialog] = useState<ArchiveDialogMode | null>(null);
   const archiveReviewRef = useRef<HTMLButtonElement>(null);
+  const changedArrivalsRef = useRef<OpenChangedArrivals>(null);
   const [focusRevision, setFocusRevision] = useState(0);
   const [comparison, setComparison] = useState<SupplyDocument | null>(null);
   const commandFormRef = useRef<HTMLFormElement | null>(null);
@@ -570,6 +571,13 @@ export function SupplyDocumentContent({
   const operationOpen = Boolean(action || review || uncertain || regularizationEditing || balanceReviewEditing || transferEditing);
   const archive = activeDocumentArchive(data?.workflow_data.documentArchive);
   const archived = Boolean(archive);
+  const copyChanges = data && observedData ? supplyChanges(data, observedData) : [];
+  const changedArrivalIds = new Set(copyChanges.flatMap(change => change.arrivalId ? [change.arrivalId] : []));
+  const reviewableChangedArrivals = observedData?.type === "COM" && activeContext && !archived
+    && !activeDocumentArchive(observedData.workflow_data.documentArchive) && canReviewPurchaseArrivals(context)
+    ? observedData.receipts.filter(receipt => receipt.state === "pending" &&
+      receipt.submitted_by !== context.userId && changedArrivalIds.has(receipt.id)).map(receipt => receipt.id)
+    : [];
   const allowed = (cap: string) => Boolean(activeContext && !archived && can(context, cap));
   const followUpState = data && supplyFollowUpState(data.status, data.workflow_data.documentFollowUp);
   const followUpTerminal = followUpState === "completed" || data?.status === "cancelled" && followUpState !== "reopened";
@@ -985,7 +993,10 @@ export function SupplyDocumentContent({
             showFiles={false}
             updateNotice={<>
               {observedData ? <DocumentFreshness code={data.code ?? data.type}
-                changes={supplyChanges(data, observedData)} loading={refreshDisabled} editing={operationOpen} onRefresh={refreshDocument} /> : null}
+                changes={copyChanges} loading={refreshDisabled} editing={operationOpen} onRefresh={refreshDocument}
+                onReviewArrival={reviewableChangedArrivals.length ? opener => changedArrivalsRef.current?.(
+                  reviewableChangedArrivals, () => opener?.isConnected ? opener : refreshButtonRef.current,
+                ) : undefined} /> : null}
               {data.kind === "ENT" && data.protocol && activeContext && context.activeContext?.mode === "patient" && can(context, "ent.read") ? <DocumentFamilyDecisionNotice
                 key={context.userId + ":" + id} id={id} patientId={data.care_recipient_id} userId={context.userId}
                 code={data.code ?? data.type} revision={liveRevision + attempt} blocked={operationOpen || Boolean(archiveDialog)} returnFocus={refreshButtonRef} /> : null}
@@ -1090,7 +1101,7 @@ export function SupplyDocumentContent({
                       ]} />
                     </article>;
                   }) : <p>Compras e entradas físicas anteriores permanecem registradas.</p>} /> : null}
-                {activeContext && !archived && data.type === "COM" ? <PurchaseArrivalReview context={context} documentId={data.id}
+                {activeContext && !archived && data.type === "COM" ? <PurchaseArrivalReview context={context} documentId={data.id} changedArrivalsRef={changedArrivalsRef}
                   hasPending={data.receipts.some(receipt => receipt.state === "pending" && receipt.submitted_by !== context.userId)}
                   onReviewed={async () => {
                     const current = await api<{ data: SupplyDocument }>("/api/documents/" + data.id);

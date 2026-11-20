@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu } from "@base-ui/react/menu";
-import { useId, useRef, useState } from "react";
+import { useId, useImperativeHandle, useRef, useState, type Ref } from "react";
 import { ActionButton, FormField, LoadingIndicator, TextAreaField } from "@/components/ui/controls";
 import { MenuPopup } from "@/components/ui/floating";
 import { Icon } from "@/components/ui/icon";
@@ -86,17 +86,26 @@ function ArrivalReviewCard({ row, choice, update }: {
   </article>;
 }
 
-export function PurchaseArrivalReview({ context, documentId, hasPending, onReviewed }: {
-  context: WorkspaceContext; documentId?: string; hasPending?: boolean; onReviewed?: () => Promise<void>;
-}) {
-  const patient = context.patient;
-  if (!patient || patient.role !== "admin" || !can(context, "com.read") || !can(context, "com.validate")) return null;
-  return <ArrivalReviewEntry key={`${context.userId}:${patient.id}:${documentId ?? "all"}`} patientId={patient.id}
-    patientName={patient.display_name} userId={context.userId} documentId={documentId} hasPending={hasPending} onReviewed={onReviewed} />;
+export type OpenChangedArrivals = (receiptIds: readonly string[], focusAfterClose: () => HTMLButtonElement | null) => void;
+
+export function canReviewPurchaseArrivals(context: WorkspaceContext) {
+  return context.patient?.role === "admin" && can(context, "com.read") && can(context, "com.validate");
 }
 
-function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPending = true, onReviewed }: {
+export function PurchaseArrivalReview({ context, documentId, hasPending, onReviewed, changedArrivalsRef }: {
+  context: WorkspaceContext; documentId?: string; hasPending?: boolean; onReviewed?: () => Promise<void>;
+  changedArrivalsRef?: Ref<OpenChangedArrivals>;
+}) {
+  const patient = context.patient;
+  if (!patient || !canReviewPurchaseArrivals(context)) return null;
+  return <ArrivalReviewEntry key={`${context.userId}:${patient.id}:${documentId ?? "all"}`} patientId={patient.id}
+    patientName={patient.display_name} userId={context.userId} documentId={documentId} hasPending={hasPending}
+    changedArrivalsRef={changedArrivalsRef} onReviewed={onReviewed} />;
+}
+
+function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPending = true, onReviewed, changedArrivalsRef }: {
   patientId: string; patientName: string; userId: string; documentId?: string; hasPending?: boolean; onReviewed?: () => Promise<void>;
+  changedArrivalsRef?: Ref<OpenChangedArrivals>;
 }) {
   const storage = `hca:arrival-review:${userId}:${patientId}`;
   const [pendingKey, setPendingKey] = useState<string | null>(() => {
@@ -110,7 +119,9 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
   const [stage, setStage] = useState(0), [busy, setBusy] = useState(false);
   const [result, setResult] = useState<Extract<ArrivalReviewReceipt, { state: "recorded" }> | null>(null);
   const [refreshFailed, setRefreshFailed] = useState(false);
-  const sendingRef = useRef(false), readingRef = useRef(false), triggerRef = useRef<HTMLButtonElement>(null);
+  const sendingRef = useRef(false), readingRef = useRef<symbol | null>(null), triggerRef = useRef<HTMLButtonElement>(null);
+  const focusAfterCloseRef = useRef<(() => HTMLButtonElement | null) | null>(null);
+  const [changedReceiptIds, setChangedReceiptIds] = useState<readonly string[] | null>(null);
   const formId = useId();
   useOperationActivity(busy, { title: "Registrando decisões das chegadas", stage, steps: onReviewed ? documentReviewSteps : reviewSteps });
   const groups = new Map<string, ArrivalReviewRow[]>();
@@ -125,22 +136,31 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
     selected.push(choice.decision === "approve" ? { ...target, decision: "approve" } : { ...target, decision: choice.decision, reason: choice.reason?.trim() ?? "" });
   }
 
-  async function load(more = false) {
+  async function load(more = false, receiptIds = changedReceiptIds) {
     if (readingRef.current || (more && !queue.next)) return;
-    readingRef.current = true; setLoading(true); setError("");
+    const request = Symbol();
+    readingRef.current = request; setLoading(true); setError("");
     try {
       const query = new URLSearchParams({ careRecipientId: patientId });
       if (documentId) query.set("documentId", documentId);
       if (more && queue.next) { query.set("beforeAt", queue.next.at); query.set("beforeId", queue.next.id); }
       const response = await api<{ data: unknown }>(endpoint + "?" + query);
+      if (readingRef.current !== request) return;
       const page = arrivalReviewQueue.parse(response.data);
       const prior = more ? queue.arrivals : [];
-      const added = page.arrivals.filter(row => !prior.some(item => item.receiptId === row.receiptId));
+      const added = page.arrivals.filter(row =>
+        (!receiptIds || receiptIds.includes(row.receiptId)) && !prior.some(item => item.receiptId === row.receiptId));
       setQueue({ arrivals: [...prior, ...added], next: page.next });
       setChoices(previous => ({ ...(more ? previous : {}), ...Object.fromEntries(added.map((row, index) =>
         [row.receiptId, { decision: prior.length + index < arrivalReviewBatchLimit ? "approve" : "skip" }])) }));
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível consultar as chegadas."); }
-    finally { readingRef.current = false; setLoading(false); }
+    } catch (cause) {
+      if (readingRef.current === request) setError(cause instanceof Error ? cause.message : "Não foi possível consultar as chegadas.");
+    } finally {
+      if (readingRef.current === request) {
+        readingRef.current = null;
+        setLoading(false);
+      }
+    }
   }
   function forget() {
     setPendingKey(null);
@@ -185,21 +205,26 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
       setError("O resultado ainda não pôde ser confirmado. Confira a mesma tentativa antes de repetir a decisão. Se persistir, procure a supervisão.");
     } finally { sendingRef.current = false; setBusy(false); }
   }
-  function openReview() {
+  function openReview(receiptIds: readonly string[] | null = null, focusAfterClose: (() => HTMLButtonElement | null) | null = null) {
+    readingRef.current = null;
+    focusAfterCloseRef.current = focusAfterClose;
+    setChangedReceiptIds(receiptIds);
     setOpen(true); setError(""); setDirty(false);
-    if (!pendingKey) { setQueue({ arrivals: [], next: null }); setChoices({}); void load(); }
+    if (!pendingKey) { setQueue({ arrivals: [], next: null }); setChoices({}); void load(false, receiptIds); }
   }
+  useImperativeHandle(changedArrivalsRef, () => openReview);
+  const returnFocus = () => focusAfterCloseRef.current?.() ?? triggerRef.current;
   function closeReview() { setOpen(false); setExit(false); }
   function requestClose() { if (!pendingKey && dirty) setExit(true); else closeReview(); }
   const changed = result?.results.some(row => ["approved", "rejected", "correction_requested"].includes(row.status));
 
   return <>
-    {hasPending || pendingKey ? <ActionButton ref={triggerRef} variant={documentId ? "primary" : undefined} onClick={openReview}>
+    {hasPending || pendingKey ? <ActionButton ref={triggerRef} variant={documentId ? "primary" : undefined} onClick={() => openReview()}>
       <Icon name="truck" width={16} height={16} />{pendingKey ? "Conferir resultado das chegadas" : "Conferir chegadas"}
     </ActionButton> : null}
     <Dialog open={open} title={documentId && queue.arrivals.length <= 1 ? "Conferir entrada no estoque" : "Conferir chegadas"}
       kicker={`${documentId ? "COM" : "Chegadas"} · ${patientName}`} subtitle="Os itens marcados entram no estoque familiar. Desmarque para decidir depois ou use os três pontos para pedir correção ou recusar."
-      onClose={requestClose} closeDisabled={busy} finalFocus={triggerRef}
+      onClose={requestClose} closeDisabled={busy} finalFocus={returnFocus}
       footer={<><ActionButton disabled={busy} onClick={requestClose}>Voltar</ActionButton>
         {pendingKey ? <ActionButton variant="primary" disabled={busy} onClick={() => void send(true)}>Conferir mesmo resultado</ActionButton>
           : <ActionButton variant="primary" type="submit" form={formId} disabled={loading || !selected.length || selected.length > arrivalReviewBatchLimit}>Confirmar decisões</ActionButton>}</>}>
@@ -207,7 +232,9 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
         {error ? <Notice error>{error}</Notice> : null}
         {pendingKey ? <p>Uma confirmação foi enviada. Consulte seu resultado antes de revisar outra chegada.</p> : <>
           {loading ? <LoadingIndicator label="Consultando chegadas" /> : null}
-          {!loading && !error && !queue.arrivals.length ? <p>Nenhuma chegada aguarda conferência neste momento.</p> : null}
+          {!loading && !error && !queue.arrivals.length ? <p>{queue.next
+            ? "Consulte mais chegadas para localizar as que aguardam conferência."
+            : "Nenhuma chegada aguarda conferência nesta consulta."}</p> : null}
           {!loading && error && !queue.arrivals.length ? <ActionButton onClick={() => void load()}>Consultar chegadas</ActionButton> : null}
           {selected.length > arrivalReviewBatchLimit ? <Notice error>Selecione até {arrivalReviewBatchLimit} chegadas por confirmação.</Notice> : null}
           {[...groups].map(([id, rows]) => <section key={id} aria-label={id === "unlinked" ? "Chegadas avulsas" : `Chegadas de ${rows[0].documentCode}`} className="hca-purchase-list">
@@ -221,7 +248,7 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
     <Dialog open={exit} title="Sair sem concluir?" onClose={() => setExit(false)} subtitle="Se sair agora, suas escolhas serão descartadas."
       footer={<><ActionButton onClick={() => setExit(false)}>Voltar à conferência</ActionButton><ActionButton onClick={closeReview}>Sair e descartar</ActionButton></>}>{null}</Dialog>
     <Dialog open={Boolean(result)} success={Boolean(changed)} onClose={() => setResult(null)}
-      title={changed ? "Decisões registradas" : "Resultado da conferência"} finalFocus={triggerRef}
+      title={changed ? "Decisões registradas" : "Resultado da conferência"} finalFocus={returnFocus}
       footer={<ActionButton variant="primary" onClick={() => setResult(null)}>Concluir</ActionButton>}>
       {refreshFailed ? <Notice>O resultado foi registrado. Use Atualizar ficha para consultar a versão atual.</Notice> : null}
       <ul className="hca-purchase-list">{result?.results.map(row => <li key={row.receiptId} className="hca-purchase-line">

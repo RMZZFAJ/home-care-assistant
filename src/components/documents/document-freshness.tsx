@@ -20,12 +20,15 @@ export function DocumentChangeFacts({ changes }: {
   </dl>;
 }
 
-export function DocumentFreshness({ code, changes, loading, editing, onRefresh }: {
+export function DocumentFreshness({ code, changes, loading, editing, onRefresh, onReviewArrival }: {
   code: string; changes: DocumentChange[]; loading: boolean; editing?: boolean; onRefresh: () => void;
+  onReviewArrival?: (opener: HTMLButtonElement | null) => void;
 }) {
   const [open, setOpen] = useState(false);
   const detailsRef = useRef<HTMLButtonElement>(null);
   const refreshRequestedRef = useRef(false);
+  const changedArrival = changes.some(change => change.arrivalId);
+  const reviewArrival = editing ? undefined : onReviewArrival;
   const review = () => {
     refreshRequestedRef.current = false;
     setOpen(true);
@@ -34,24 +37,31 @@ export function DocumentFreshness({ code, changes, loading, editing, onRefresh }
   return <>
     <aside className="hca-document-freshness">
       <Icon name="refresh" width={17} height={17} />
-      <span role="status">Esta ficha recebeu alterações.</span>
+      <span role="status">{changedArrival ? "A quantidade da chegada mudou." : "Esta ficha recebeu alterações."}</span>
       <ActionButton ref={detailsRef} variant="quiet" compact onClick={review}>Ver o que mudou</ActionButton>
     </aside>
-    <Dialog open={open} title="Esta ficha recebeu alterações" kicker="Ficha atualizada" subtitle={code}
+    <Dialog open={open} title={changedArrival ? "A quantidade recebida mudou" : "Esta ficha recebeu alterações"}
+      kicker={changedArrival ? "Chegada atualizada" : "Ficha atualizada"} subtitle={code}
       headingIcon="refresh" popupClassName="hca-document-change-dialog"
       onClose={() => setOpen(false)} finalFocus={() => refreshRequestedRef.current ? false : detailsRef.current}
       footer={<>
-        <ActionButton variant="quiet" onClick={() => setOpen(false)}>{editing ? "Voltar à operação" : "Voltar à ficha"}</ActionButton>
+        <ActionButton variant={reviewArrival ? "secondary" : "quiet"} onClick={() => setOpen(false)}>
+          {reviewArrival ? <Icon name="link" width={16} height={16} /> : null}
+          {editing ? "Voltar à operação" : reviewArrival ? "Consultar compra" : "Voltar à ficha"}
+        </ActionButton>
         {!editing ? <ActionButton variant="primary" disabled={loading} onClick={() => {
           refreshRequestedRef.current = true;
           setOpen(false);
-          onRefresh();
-        }}>{loading ? "Atualizando…" : "Atualizar agora"}</ActionButton> : null}
+          if (reviewArrival) reviewArrival(detailsRef.current);
+          else onRefresh();
+        }}>{reviewArrival ? "Revisar chegada" : loading ? "Atualizando…" : "Atualizar agora"}</ActionButton> : null}
       </>}>
       {changes.length ? <DocumentChangeFacts changes={changes} /> : null}
       <p className="hca-document-change-note">{editing
         ? "Seu preenchimento foi preservado. A referência da operação será conferida antes da confirmação."
-        : "Atualize a ficha para consultar as informações atuais e gerar um novo PDF. Os exemplares emitidos continuam disponíveis."}</p>
+        : changedArrival
+          ? "A conferência usa as quantidades da versão atual da chegada. A entrada no estoque familiar depende da aprovação."
+          : "Atualize a ficha para consultar as informações atuais e gerar um novo PDF. Os exemplares emitidos continuam disponíveis."}</p>
     </Dialog>
   </>;
 }

@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — chegada corrigida com a COM aberta.** A faixa da v7 distingue
+a mudança na quantidade recebida. Ver o que mudou compara os valores e
+permite abrir a conferência das chegadas alteradas pela fila existente.
+Passaram os dois casos em Android e iOS emulados, sem alteração de estoque.
+O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) detalha a comparação.
+
 **19/11 — cabeçalhos, ajuda e ações dos assistentes de L2.** REQ, COM, ENT e
 DEV agora usam o cabeçalho do laboratório v7 no formulário e ações nomeadas
 por etapa e tipo. A saída da primeira etapa pode confirmar o último

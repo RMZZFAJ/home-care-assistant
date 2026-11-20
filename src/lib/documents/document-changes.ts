@@ -5,7 +5,7 @@ import { documentStatusLabel } from "./presentation";
 import { activeDocumentArchive, documentArchiveLabel } from "./document-archive";
 import { supplyFollowUpState } from "./follow-up-lifecycle";
 
-export type DocumentChange = { id: string; label: string; before: string; after: string };
+export type DocumentChange = { id: string; label: string; before: string; after: string; arrivalId?: string };
 
 export function changedFact(id: string, label: string, before: string, after: string): DocumentChange[] {
   return before === after ? [] : [{ id, label, before, after }];
@@ -86,7 +86,8 @@ export function supplyChanges(before: SupplyDocument, after: SupplyDocument): Do
       const line = nextLines.get(lineId);
       if (!line) continue;
       const amount = (value: string | undefined) => value === undefined ? "Sem registro" : formatQuantity(value, line.unit_snapshot);
-      changes.push(...changedFact(arrival.id + "-" + lineId, line.name_snapshot + " · Quantidade informada na chegada", amount(priorQuantities.get(lineId)), amount(nextQuantities.get(lineId))));
+      const quantityChanges = changedFact(arrival.id + "-" + lineId, line.name_snapshot + " · Quantidade informada na chegada", amount(priorQuantities.get(lineId)), amount(nextQuantities.get(lineId)));
+      changes.push(...quantityChanges.map(change => previous ? { ...change, arrivalId: arrival.id } : change));
     }
   }
   return changes;

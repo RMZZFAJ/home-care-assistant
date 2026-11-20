@@ -243,6 +243,21 @@ nota na conferência. O vínculo documental opcional também fica na Confirmaç�
 onde pode ser revisto se os materiais selecionados divergirem da origem.
 Rascunhos antigos conservam o texto anterior.
 
+Na COM, a mudança de quantidade em uma chegada já registrada usa a faixa
+e a comparação de E05-15. O diálogo mostra o material e o valor anterior
+riscado. Consultar compra retorna à ficha aberta. Quando há chegadas
+alteradas que o vínculo pode conferir, Revisar chegada abre a conferência
+existente, consulta a fila atual e mostra só as parcelas alteradas. A decisão
+continua explícita e a aprovação usa a versão devolvida pela consulta.
+Com edição em curso, o diálogo informa a preservação do preenchimento.
+Sem chegadas elegíveis, Atualizar agora mantém a consulta da ficha disponível.
+A comparação também mostra a mudança real de situação quando a correção
+volta para aprovação. A v7 demonstra apenas a quantidade. A referência e
+as capturas do produto em Android e iOS emulados estão em
+`output/playwright/l2-arrival-update/`. Os dois casos passaram com Auth real
+e sem retry. A conferência excluiu outra chegada pendente da mesma COM,
+restaurou o foco e preservou as duas chegadas sem lançamento de estoque.
+
 **Divergências e dependências.** A v7 reúne etapas que o repositório já
 expunha em entradas usuais e pelo assistente de transferências. Os fluxos
 foram aproximados visualmente com preservação da etapa salva em rascunhos
