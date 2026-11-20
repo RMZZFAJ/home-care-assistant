@@ -200,14 +200,17 @@ export function HouseholdListSelection({
         {loading ? <p role="status">Consultando listas da casa…</p> : null}
         {readError ? <Notice error>{readError}<ActionButton onClick={refresh}>Consultar listas novamente</ActionButton></Notice> : null}
         {!loading && !readError && !rows.length ? <p>A casa ainda não tem listas frequentes.</p> : null}
-        {!loading && !readError ? rows.map(list => <label key={list.id} className="hca-household-list-option" htmlFor={`${bodyId}-list-${list.id}`}>
-          <input id={`${bodyId}-list-${list.id}`} type="checkbox" checked={checked.includes(list.id)} disabled={disabled}
-            onChange={event => {
-              const included = event.currentTarget.checked;
-              setChecked(previous => included ? [...previous, list.id] : previous.filter(id => id !== list.id));
-            }} />
-          <span><strong>{list.name}</strong><small>{list.productIds.length} {list.productIds.length === 1 ? "material" : "materiais"}</small></span>
-        </label>) : null}
+        {!loading && !readError ? rows.map(list => {
+          const id = `${bodyId}-list-${list.id}`;
+          return <label key={list.id} className="hca-household-list-option" htmlFor={id}>
+            <input id={id} type="checkbox" aria-labelledby={`${id}-label`} checked={checked.includes(list.id)} disabled={disabled}
+              onChange={event => {
+                const included = event.currentTarget.checked;
+                setChecked(previous => included ? [...previous, list.id] : previous.filter(id => id !== list.id));
+              }} />
+            <span id={`${id}-label`}><strong>{list.name}</strong><small>{list.productIds.length} {list.productIds.length === 1 ? "material" : "materiais"}</small></span>
+          </label>;
+        }) : null}
         {excludedCount && !loading && !readError ? <Notice>{excludedCount === 1 ? "Um material indisponível ficará fora do preenchimento." : `${excludedCount} materiais indisponíveis ficarão fora do preenchimento.`}</Notice> : null}
         <ActionButton compact variant="quiet" disabled={actionsBlocked} onClick={event => {
           setOrganizeTrigger(event.currentTarget);
@@ -263,15 +266,18 @@ export function HouseholdListSelection({
           <div aria-label="Materiais da lista" role="group" className="hca-household-list-edit">
             {activeMatches.map(product => ({ id: product.id, text: product.name, unit: product.unit }))
               .concat(hiddenEditorIds.map(id => ({ id, text: catalogue.find(product => product.id === id)?.name ?? id, unit: "Indisponível" })))
-              .map(product => <label className="hca-household-list-option" key={product.id} htmlFor={`${bodyId}-material-${product.id}`}>
-                <input id={`${bodyId}-material-${product.id}`} type="checkbox" checked={editor.productIds.includes(product.id)} disabled={saveDisabled}
-                  onChange={event => {
-                    const included = event.currentTarget.checked;
-                    setEditor(current => current && { ...current, productIds: included
-                      ? [...current.productIds, product.id] : current.productIds.filter(id => id !== product.id) });
-                  }} />
-                <span><strong>{product.text}</strong><small>{product.unit}</small></span>
-              </label>)}
+              .map(product => {
+                const id = `${bodyId}-material-${product.id}`;
+                return <label className="hca-household-list-option" key={product.id} htmlFor={id}>
+                  <input id={id} type="checkbox" aria-labelledby={`${id}-label`} checked={editor.productIds.includes(product.id)} disabled={saveDisabled}
+                    onChange={event => {
+                      const included = event.currentTarget.checked;
+                      setEditor(current => current && { ...current, productIds: included
+                        ? [...current.productIds, product.id] : current.productIds.filter(id => id !== product.id) });
+                    }} />
+                  <span id={`${id}-label`}><strong>{product.text}</strong><small>{product.unit}</small></span>
+                </label>;
+              })}
           </div>
         </> : null}
         {!editor && !readError ? <>

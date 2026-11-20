@@ -394,7 +394,53 @@ O commit `97c7991a` corrige o teste com as assinaturas exatas e verifica a
 negativa para `anon` e `authenticated`. A regressão isolada passou no banco
 local. Na [nova CI](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44646528431),
 Windows, Ubuntu e a etapa de migrations também passaram. A etapa de
-integração ainda estava executando na consulta de 19/11.
+integração foi cancelada pelo GitHub quando a PR recebeu `a89e6053`.
+A [CI desse commit](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44648500971)
+passou nas validações Windows, Ubuntu e migrations e iniciou as integrações.
+O [preview](https://vercel.com/rmzzfajs-projects/home-care-assistant/8ZfhxW9MkQGkpELnRQ5EE1s8QkMr)
+ficou pronto com o mesmo SHA. A reconciliação confirmou as mesmas 309 versões
+no repositório, na stack local e no Supabase de desenvolvimento.
+
+Os logs da execução interrompida registraram duas expectativas antigas.
+A lista conserva a transferência pendente e os nomes originais, oferece
+expedição ao autor habilitado e retira a tarefa de concordância da
+contraparte. A REQ exige a revisão consolidada para um novo arquivamento.
+Cinco integrações dirigidas passaram com Auth real após atualizar essas
+regressões no commit `2da302ee`.
+
+Na stack local preservada, a rodada SQL sem replay parou na regressão de
+agendamento da REQ, que passou no replay da CI. Dois casos locais de PDF
+inicial também terminaram com `statement timeout` ao preparar as fichas.
+O teste de permissões direcionado e a emissão de REQ passaram localmente.
+Na rodada de acessibilidade, a abertura do início no Android e a emissão de
+COM no iOS atingiram timeout. Uma sonda local de leitura mediu 8,4 s em
+`private.purchase_arrival_coverage_facts` para um identificador sem ficha,
+com cerca de 36 alocações na tabela. O tempo de `select 1` na mesma sessão
+foi de 0,1 ms. A causa e a extensão da lentidão seguem em investigação.
+
+O SonarCloud da PR registrou oito apontamentos e notas C de confiabilidade
+e segurança no código novo. Quatro S6853 apontaram rótulos cujos textos
+estavam aninhados no JSX do produto. Seleção de materiais da REQ, listas da
+casa, materiais da lista e importação de fichas de origem agora referenciam
+explicitamente o texto visível pelo `aria-labelledby` dos checkboxes.
+A área clicável continua sendo o rótulo nativo.
+[Implementação da regra de rótulos](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/main/src/util/mayHaveAccessibleLabel.js).
+[Análise do SonarCloud](https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=7).
+
+A organização e o uso das listas em REQ, COM e ENT passaram no iOS nas
+duas rodadas. O caso de importação da COM chegou à emissão no iOS na
+primeira rodada. Permanece sem uma rodada completa por timeouts locais.
+No Android, as falhas ocorreram antes dos controles modificados. O build,
+o lint dos componentes e o Markdown passaram.
+
+Os outros quatro apontamentos atingem o HTML aprovado, preservado pelo
+SHA-256 do comando mestre. A política `unsafe-inline` pertence ao laboratório
+autocontido, que fica na raiz fora de `public/` e das rotas e entregáveis do
+aplicativo. O fluxo de produção usa sua própria política. A inspeção estática
+deu confiança alta à classificação sem ação no produto. A declaração CSS
+duplicada, o seletor de arquivo oculto e a expressão usada para ajustar texto
+de demonstração também ficam no HTML de referência. Os quatro apontamentos
+continuam visíveis no SonarCloud.
 
 L3 e L4 ainda não começaram. Quando tiverem ordem e referência aprovadas,
 registrar o escopo de cada lote, suas comparações comprovadas, criações fora

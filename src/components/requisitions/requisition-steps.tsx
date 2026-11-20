@@ -178,16 +178,18 @@ export function CatalogStep({
       {visible.map((item) => {
         const line = selected(item.id);
         const info = itemContext.find((entry) => entry.productId === item.id);
+        const choiceId = `${materialGroupId}-${item.id}`;
         return (
           <MaterialChoice
             key={item.id}
             selected={Boolean(line)}
             className="ui-product-choice"
           >
-            <label className="hca-material-choice-heading" htmlFor={`${materialGroupId}-${item.id}`}>
+            <label className="hca-material-choice-heading" htmlFor={choiceId}>
               <input
-                id={`${materialGroupId}-${item.id}`}
+                id={choiceId}
                 type="checkbox"
+                aria-labelledby={`${choiceId}-label`}
                 checked={Boolean(line)}
                 onChange={() => {
                   if (line) removeLine(item.id);
@@ -197,7 +199,7 @@ export function CatalogStep({
                   } else updateLine(item, {});
                 }}
               />
-              <span className="hca-material-choice-copy">
+              <span id={`${choiceId}-label`} className="hca-material-choice-copy">
                 <strong>{item.name}</strong>
                 <small>{item.unit}</small>
               </span>

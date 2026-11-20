@@ -59,6 +59,7 @@ export function SupplySourcePicker({ patientId, target, current, product, onClos
           {read.data.data.map((option) => {
             const chosen = selected.find((selection) => selection.option.id === option.id);
             const count = new Set(option.materials.map((material) => material.productId)).size;
+            const importId = `${importGroupId}-${option.id}`;
             return <article className="hca-source-result" key={option.id}>
               <div>
                 <input type="checkbox" aria-label={`Vincular ${option.code}`} checked={Boolean(chosen)} onChange={(event) => {
@@ -72,13 +73,13 @@ export function SupplySourcePicker({ patientId, target, current, product, onClos
                   <small>{documentStatuses[option.status] ?? option.status} · {formatBrazilDate(option.createdAt)}</small>
                 </div>
               </div>
-              {chosen && !product ? <label className="hca-source-import" htmlFor={`${importGroupId}-${option.id}`}>
-                <input id={`${importGroupId}-${option.id}`} type="checkbox" checked={chosen.importMaterials} disabled={!count} onChange={(event) => {
+              {chosen && !product ? <label className="hca-source-import" htmlFor={importId}>
+                <input id={importId} type="checkbox" aria-labelledby={`${importId}-label`} checked={chosen.importMaterials} disabled={!count} onChange={(event) => {
                   const importMaterials = event.target.checked;
                   setSelected((list) => list.map((row) => row.option.id === option.id
                     ? { option, importMaterials } : row));
                 }} />
-                <span><strong>Importar materiais</strong>
+                <span id={`${importId}-label`}><strong>Importar materiais</strong>
                   <small>{count ? `${count} ${count === 1 ? "material elegível" : "materiais elegíveis"}` : "Nenhum material elegível agora."}</small>
                 </span>
               </label> : null}
