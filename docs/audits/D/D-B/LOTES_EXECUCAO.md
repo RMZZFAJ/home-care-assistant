@@ -285,6 +285,39 @@ desenvolvimento passou a expor. A aplicação no preview acompanha esse banco
 quando roda com o leitor compatível. Há registro da ausência de transferências na
 conferência histórica de aplicação inicial, sem inferência sobre dados atuais.
 
+### Revisão dos assistentes solicitada em 20/11
+
+Na REQ, Minhas listas pessoais fica dentro de Usar listas frequentes,
+na Confirmação. Listas da casa e listas pessoais mantêm suas permissões e
+seus próprios registros. Quem pode somente consultar mantém a entrada
+autorizada para suas listas. O detalhamento de material abre pelo menu
+de três pontos ao lado do nome. A lista usa seleção com aparência de
+interruptor. A opção Não sei informar fica junto à contagem. O seletor
+completo permanece nos rascunhos legados que exigem reclassificação.
+
+O menu fica no cabeçalho compacto do material na REQ, COM, ENT e DEV.
+COM e ENT usam as opções de vínculo por material já disponíveis.
+A identificação usa os nomes e as unidades reais do paciente.
+A emissão mantém as etapas do carregamento durante a navegação, a
+identificação autorizada da ficha e a confirmação efetiva.
+
+No Chromium com emulação Android e no WebKit com emulação iOS, a REQ
+concluiu a emissão e exibiu o PDF assinado, mesmo com a consulta da ficha
+temporariamente retida no teste. A sequência de carregamento permaneceu
+visível durante essa espera. Em ambos, a consulta pelo menu de material
+preservou o foco, o filtro e o valor em edição quando o painel fechou.
+A inspeção das capturas confirmou o interruptor horizontal com 32 × 19 px.
+A revisão visual completa de COM, ENT, DEV e dos seus diálogos segue aberta.
+
+A decisão mais recente do responsável retira o salvamento manual do
+rodapé dos assistentes L2, deixando o estado da gravação automática.
+Também pede uma única entrada para vínculos de ficha na Confirmação.
+A avaliação de suficiência e os vínculos por material precisam continuar
+disponíveis. Esses ajustes seguem em aberto. A escolha entre compra
+e doação passa para o ato de aquisição ou recebimento. O contrato atual
+ainda lê a origem da emissão para distinguir as operações. A transição
+precisa preservar o sentido e o histórico das COMs já emitidas.
+
 ### Decisões e dúvidas de L2
 
 - **P1 — Reversão de contagem de REQ superada por nova contagem oficial.**

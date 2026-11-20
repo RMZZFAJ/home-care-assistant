@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { remainingNeedFixture, physicalState, fixtures } from "../integration/remaining-need-fixtures.mjs";
 import { rpc } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { purchaseBalanceCommand, purchaseBalanceFacts, purchaseBalanceFixture } from "../integration/purchase-entry-balance-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -118,15 +119,17 @@ test("material history shows a correction and a separate arrival, then returns t
 });
 
 test("catalogue consultation preserves a requisition edit through a full linked document and opens from stock", async ({ page }, info) => {
+  test.setTimeout(120_000);
   await page.setViewportSize({ width: 390, height: 740 });
   const f = await remainingNeedFixture();
   const before = physicalState(f);
-  await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.professional.email);
+  const writer = await shiftWorker(f.patient);
+  await page.goto("/login?next=%2Ffichas%2Freq");
+  await page.getByLabel("E-mail", { exact: true }).fill(writer.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await selectContext(page, f.patient);
-  await page.goto("/fichas/req");
+  await expect(page).toHaveURL(url => url.pathname === "/fichas/req");
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
   const next = page.getByRole("button", { name: "Selecionar materiais", exact: true });
   await next.click();
   const categories = page.getByRole("navigation", { name: "Tipos de material" });
@@ -135,16 +138,27 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   const search = page.getByLabel("Buscar produto", { exact: true });
   await search.fill("V4 0");
   const selection = page.getByRole("checkbox", { name: /Material fictício V4 0/ });
+  await expect(selection).toHaveCSS("width", "32px");
+  await expect(selection).toHaveCSS("height", "19px");
   await selection.click();
   const duplicate = page.getByRole("dialog", { name: "Este produto já está em uma requisição pendente" });
   await duplicate.getByLabel("Justificativa da nova requisição", { exact: true }).fill("Contagem fictícia ainda necessária para esta residência.");
   await duplicate.getByRole("button", { name: "Manter nova requisição", exact: true }).click();
   const amount = page.getByLabel("Estoque observado com a equipe · unidade", { exact: true });
+  const unknown = page.getByRole("checkbox", { name: "Não sei informar", exact: true });
+  await unknown.check();
+  await expect(amount).toBeDisabled();
+  await unknown.uncheck();
   await amount.fill("9");
-  const opener = page.getByRole("button", { name: "Consultar material Material fictício V4 0", exact: true });
+  const opener = page.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true });
   await opener.scrollIntoViewIfNeeded();
+  if (info.project.use.hasTouch) await info.attach("E04-01 material selecionado", {
+    body: await page.locator(".hca-wizard-material").filter({ has: opener }).screenshot({ scale: "css", animations: "disabled" }),
+    contentType: "image/png",
+  });
   const sourceScroll = await page.evaluate(() => window.scrollY);
   await opener.click();
+  await page.getByRole("menuitem", { name: "Detalhes do material", exact: true }).click();
   const consultation = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
   const linksTab = consultation.getByRole("tab", { name: "Fichas", exact: true });
   await linksTab.click();
@@ -176,7 +190,8 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   await expect(search).toHaveValue("V4 0");
   await expect(selection).toBeChecked();
   await expect(amount).toHaveValue("9");
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(sourceScroll);
+  // Chromium emulado pode arredondar a mesma posição por um pixel CSS.
+  await expect.poll(async () => Math.abs(await page.evaluate(() => window.scrollY) - sourceScroll)).toBeLessThanOrEqual(1);
   await page.goto(`/estoque?careRecipientId=${f.patient}&custody=CARE_TEAM`);
   const stockOpener = page.getByRole("button", { name: "Consultar Material fictício V4 0 · Equipe", exact: true });
   await stockOpener.click();

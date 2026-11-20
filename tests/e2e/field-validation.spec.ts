@@ -65,6 +65,12 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await expect(wizardHelp).toBeHidden();
   await expect(help).toBeFocused();
   await expect(page.getByRole("button", { name: "Sair por agora", exact: true })).toBeVisible();
+  const lists = page.getByRole("region", { name: "Seleção de materiais", exact: true });
+  await expect(page.getByText("Minhas listas pessoais", { exact: true })).toBeHidden();
+  await lists.getByRole("button", { name: /^Usar listas frequentes/ }).click();
+  await expect(lists.getByText("Minhas listas pessoais", { exact: true })).toBeVisible();
+  await lists.getByRole("button", { name: /^Selecionar manualmente/ }).click();
+  await expect(page.getByText("Minhas listas pessoais", { exact: true })).toBeHidden();
   await next(page);
   await page.getByRole("button", { name: "Item extra", exact: true }).click();
   const extra = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
@@ -160,9 +166,22 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await expect(extraName).toHaveCount(1);
   await expect(page.getByText("Cadastro pendente · tubo", { exact: true })).toBeVisible();
   const before = sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${q(f.patient)}`);
-  await confirm.click();
+  const openingGate = Promise.withResolvers<void>();
+  await page.route("**/api/requisitions/*/opening", async route => {
+    await openingGate.promise;
+    await route.continue();
+  });
+  const opening = page.waitForRequest(request => /\/api\/requisitions\/[^/]+\/opening$/.test(new URL(request.url()).pathname), { timeout: 65_000 });
+  try {
+    await confirm.click();
+    await opening;
+    await expect(page.getByRole("list", { name: "Etapas da operação" })).toBeVisible();
+    await expect(page.locator(".hca-activity-overlay .activity-card:not(.activity-dynamic)")).toHaveCount(0);
+  } finally {
+    openingGate.resolve();
+  }
   const issued = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
-  await expect(issued).toBeVisible();
+  await expect(issued).toBeVisible({ timeout: 65_000 });
   await page.setViewportSize(info.project.name === "mobile" ? { width: 320, height: 720 } : { width: 390, height: 844 });
   const heading = page.locator("[data-document-heading]");
   await expect(heading).toBeVisible();

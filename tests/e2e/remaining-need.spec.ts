@@ -94,8 +94,8 @@ async function prepare(
   });
   await expect(observation).toHaveValue("2");
   await expect(
-    page.getByLabel("Informação do estoque da equipe", { exact: true }),
-  ).toHaveValue("observed");
+    page.getByRole("checkbox", { name: "Não sei informar", exact: true }),
+  ).not.toBeChecked();
   await observation.fill("0");
   for (let i = 0; i < 3; i++) await next(page);
   await expect(

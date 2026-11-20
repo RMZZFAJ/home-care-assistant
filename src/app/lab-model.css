@@ -871,6 +871,33 @@
   padding: 8px 0 0;
 }
 .hca-l1 .hca-material-origin-button { grid-column: 1 / -1; justify-self: end; }
+.hca-l1 .hca-wizard-material { padding: 11px 0 12px; gap: 8px; border: 0; border-radius: 0; border-block-end: 1px solid #dce6e0; background: #fff; }
+.hca-l1 .hca-wizard-material:not(.is-selected) { background: #fbfcfb; }
+.hca-wizard-material-head { display: flex; gap: 8px; align-items: start; min-width: 0; grid-column: 1 / -1; }
+.hca-wizard-material-head > .hca-material-choice-heading { flex: 1; min-height: 42px; gap: 7px; }
+.hca-wizard-material-head .hca-material-origin-button { flex: none; min-height: 42px; min-width: 32px; padding: 0; }
+.hca-wizard-material-fields, .hca-wizard-material-stock, .hca-wizard-transfer-line { display: grid; gap: 8px; }
+.hca-wizard-material-fields { margin-block-start: 8px; }
+.hca-wizard-material-balance { margin: 0; font-size: 11px; color: var(--hca-muted); }
+.hca-wizard-material-urgent, .hca-wizard-unknown-stock { display: flex; align-items: center; gap: 8px; min-height: 32px; font-size: 12px; }
+.hca-wizard-stock-field { display: grid; gap: 4px; }
+.hca-wizard-stock-field > label:first-of-type { font-size: 12px; }
+.hca-wizard-stock-input { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--hca-muted); }
+.hca-wizard-stock-input input { width: min(125px, 60%); }
+.hca-wizard-material-icon { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 8px; color: #476b5a; background: #e8f2eb; }
+.hca-wizard-material-icon svg { width: 16px; height: 16px; }
+.hca-wizard-material input.hca-wizard-include-switch[type="checkbox"] {
+  order: 1; appearance: none; width: 32px; height: 19px; min-width: 32px; min-height: 19px;
+  margin: 0; border: 1px solid #80958b; border-radius: 12px; background: #c7d4ce;
+  display: grid; place-items: center start; padding: 2px;
+}
+.hca-wizard-include-switch::before { content: ""; width: 13px; height: 13px; border-radius: 50%; background: white; box-shadow: 0 1px 2px #233a3655; }
+.hca-wizard-material input.hca-wizard-include-switch[type="checkbox"]:checked { background: #257365; border-color: #257365; }
+.hca-wizard-include-switch:checked::before { justify-self: end; }
+@media (forced-colors: active) {
+  .hca-wizard-material input.hca-wizard-include-switch[type="checkbox"] { appearance: auto; width: 17px; height: 17px; min-width: 17px; min-height: 17px; }
+  .hca-wizard-include-switch::before { content: none; }
+}
 
 .hca-l1 .hca-purchase-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .hca-l1 .hca-purchase-line {

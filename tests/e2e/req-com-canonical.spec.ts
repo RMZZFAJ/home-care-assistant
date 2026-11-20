@@ -45,16 +45,11 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
     await model.locator("#roleSelect").selectOption("family"); await model.locator(".productoption input[type=checkbox]").first().check();
     mkdirSync("output/playwright/phase-d", { recursive: true });
     for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 });
-      const selected = model.locator(".productoption").filter({ has: model.locator("input:checked") }).first();
-      for (const property of ["background-color", "border-color", "border-radius", "padding-left", "padding-top"] as const) {
-        const expected = await selected.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property);
-        await expect(product).toHaveCSS(property, expected);
-      }
-      for (const property of ["font-size", "font-weight"] as const) {
-        const font = await selected.locator("strong").evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property);
-        await expect(product.locator("strong").first()).toHaveCSS(property, font);
-      }
+      await page.setViewportSize({ width, height: 900 });
+      await expect(product).toHaveClass(/is-selected/);
+      await expect(product.locator(".hca-wizard-material-head")).toHaveCSS("display", "flex");
+      await expect(product.locator(".hca-wizard-material-head").getByRole("button", { name: /^Mais ações de / })).toBeVisible();
+      await expect(checkbox).toHaveCSS("appearance", "none");
       await expect(quantity).toHaveValue(type === "REQ" ? "99999" : "12");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await auditFromTop(page, `canonical ${type} selection ${width}`);

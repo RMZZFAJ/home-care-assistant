@@ -208,21 +208,20 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
       row.getByLabel("Estoque observado com a equipe", { exact: false }),
     ).toHaveValue("0");
     await expect(
-      row.getByLabel("Informação do estoque da equipe", { exact: true }),
-    ).toHaveValue("observed");
+      row.getByRole("checkbox", { name: "Não sei informar", exact: true }),
+    ).not.toBeChecked();
   }
   const zero = cards[0].getByLabel("Estoque observado com a equipe", {
     exact: false,
   });
   await zero.fill("7");
   await zero.fill("");
-  await expect(
-    cards[0].getByLabel("Informação do estoque da equipe", { exact: true }),
-  ).toHaveValue("unfilled");
+  await expect(zero).toHaveValue("");
+  await expect(cards[0].getByRole("checkbox", { name: "Não sei informar", exact: true })).not.toBeChecked();
   await zero.fill("0");
   await cards[1]
-    .getByLabel("Informação do estoque da equipe", { exact: true })
-    .selectOption("unknown");
+    .getByRole("checkbox", { name: "Não sei informar", exact: true })
+    .check();
   await expect(
     cards[1].getByLabel("Estoque observado com a equipe", { exact: false }),
   ).toBeDisabled();
@@ -282,11 +281,12 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
   await hygiene(page);
   await expect(zero).toHaveValue("0");
   await expect(
-    cards[1].getByLabel("Informação do estoque da equipe", { exact: true }),
-  ).toHaveValue("unknown");
+    cards[1].getByRole("checkbox", { name: "Não sei informar", exact: true }),
+  ).toBeChecked();
   await expect(
-    cards[2].getByLabel("Informação do estoque da equipe", { exact: true }),
-  ).toHaveValue("unfilled");
+    cards[2].getByRole("checkbox", { name: "Não sei informar", exact: true }),
+  ).not.toBeChecked();
+  await expect(cards[2].getByLabel("Estoque observado com a equipe", { exact: false })).toHaveValue("");
   await expect(
     cards[3].getByLabel("Estoque observado com a equipe", { exact: false }),
   ).toHaveValue("7");

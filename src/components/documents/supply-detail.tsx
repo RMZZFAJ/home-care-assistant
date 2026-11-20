@@ -103,6 +103,7 @@ import { PurchaseArrivalResult } from "./purchase-arrival";
 import { PurchaseArrivalCorrections } from "./purchase-arrival-correction";
 import { PurchaseArrivalReview, canReviewPurchaseArrivals, type OpenChangedArrivals } from "./purchase-arrival-review";
 import { arrivalRefreshRetryLimit, PurchaseArrivalRefreshFailure } from "./purchase-arrival-refresh-failure";
+import { useIssuanceOpeningActivity } from "./document-issuance-navigation";
 import {
   acquisitionRemaining,
   arrivalRemaining,
@@ -189,7 +190,9 @@ export function SupplyDocumentContent({
   const coveredOperation = registeringPurchase || registeringArrival || reassigningDelivery;
   const refreshingArrival = loading && coveredRead && data?.type === "COM";
   const activityTitle = refreshingArrival ? "Atualizando chegada" : busy ? "Confirmando a operação" : "Consultando a ficha";
-  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation), { title: activityTitle, detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." });
+  const openingIssuance = useIssuanceOpeningActivity(id, context.userId, context.patient?.id);
+  const activity = (!data && openingIssuance) || { title: activityTitle, detail: "Aguarde a confirmação. Os registros e o preenchimento permanecem preservados." };
+  useOperationActivity(loading && coveredRead || (busy && !coveredOperation && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation), activity);
   const [review, setReview] = useState<SupplyReview | null>(null);
   const [uncertain, setUncertain] = useState(false);
   const [closeUncertain, setCloseUncertain] = useState(false);

@@ -53,6 +53,7 @@ import {
 } from "@/components/documents/document-tabs";
 import { DocumentActions } from "@/components/documents/document-actions";
 import { DocumentIssuanceResult } from "@/components/documents/document-issuance-result";
+import { useIssuanceOpeningActivity } from "@/components/documents/document-issuance-navigation";
 import { RequisitionReceiptCard } from "./requisition-receipt";
 import { DocumentMilestones } from "@/components/documents/document-milestones";
 import { DocumentNextStep } from "@/components/documents/document-next-step";
@@ -214,7 +215,9 @@ export function RequisitionDocumentContent({
   const [reading, setReading] = useState(true);
   const [archiveDialog, setArchiveDialog] = useState<ArchiveDialogMode | null>(null);
   const archiveReviewRef = useRef<HTMLButtonElement>(null);
-  useOperationActivity(reading && !data, { title: "Consultando a ficha", detail: "Estamos identificando a requisição e conferindo seu acesso." });
+  const issuing = useIssuanceOpeningActivity(id, context.userId, context.patient?.id);
+  useOperationActivity(reading && !data, issuing ??
+    { title: "Consultando a ficha", detail: "Estamos identificando a requisição e conferindo seu acesso." });
   const refreshButtonRef = useRef<HTMLButtonElement>(null);
   const restoreRefreshFocusRef = useRef(false);
   function refreshDocument() {

@@ -4,6 +4,7 @@ import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
 import { materialCategories, supplyExtrasStep, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
 import type { PendingPurchaseExtra } from "@/lib/validation/pending-purchase-extras";
@@ -434,17 +435,20 @@ export function SupplyWizardStep({
                 <MaterialChoice
                   selected={checked}
                   quantity
-                  className="product-choice"
+                  className={type === "BAL" ? "product-choice" : "product-choice hca-wizard-material"}
                   key={product.id}
                 >
+                  <div className="hca-wizard-material-head">
                   <label className="hca-material-choice-heading">
                     {type !== "BAL" && !isExtraStep ? (
                       <input
                         type="checkbox"
+                        className="hca-wizard-include-switch"
                         checked={checked}
                         onChange={(event) => selectProduct(product.id, event.currentTarget.checked)}
                       />
                     ) : null}
+                    {type !== "BAL" ? <span className="hca-wizard-material-icon"><Icon name={materialCategories.find(entry => entry.id === product.category)?.icon ?? "box"} /></span> : null}
                     <span className="hca-material-choice-copy">
                       <strong>{product.name}</strong>
                       <small>
@@ -463,11 +467,12 @@ export function SupplyWizardStep({
                       ) : null}
                     </span>
                   </label>
+                  {type !== "BAL" ? <MaterialConsultButton context={context} material={product} menu
+                    onLink={checked && openMaterialSources ? () => openMaterialSources(product) : undefined} /> : null}
+                  </div>
                   {isExtraStep ? <ActionButton type="button" onClick={() => selectProduct(product.id, false)}>
                     Remover {product.name}
                   </ActionButton> : null}
-                  {type !== "BAL" ? <MaterialConsultButton context={context} material={product} menu
-                    onLink={checked && openMaterialSources ? () => openMaterialSources(product) : undefined} /> : null}
                   {checked &&
                     !form.presentationSelections?.[product.id]?.length ? (
                     <label className="product-quantity text-xs font-semibold">

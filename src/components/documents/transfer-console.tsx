@@ -1139,18 +1139,17 @@ function TransferDeclarationEditor({
                     const product = reference!.products.find(
                       (p) => p.id === line.productId,
                     );
+                    const name = product?.name ?? currentContent.materials.find(material => material.id === line.productId)?.name ?? "Material indisponível";
                     return (
                       <fieldset
                         key={line.productId}
-                        className="ui-card space-y-3"
+                        aria-label={name}
+                        className="hca-material-choice is-selected hca-wizard-material hca-wizard-transfer-line"
                       >
-                        <legend>
-                          {product?.name ??
-                            currentContent.materials.find(
-                              (material) => material.id === line.productId,
-                            )?.name ??
-                            "Material indisponível"}
-                        </legend>
+                        <div className="hca-wizard-material-head">
+                          <div className="hca-material-choice-copy"><strong>{name}</strong>{product?.unit ? <small>{product.unit}</small> : null}</div>
+                          {product ? <MaterialConsultButton context={context} material={product} menu /> : null}
+                        </div>
                         <p>
                           {product?.active === false
                             ? "Inativo com saldo preservado. "
@@ -1161,7 +1160,6 @@ function TransferDeclarationEditor({
                             : "indisponível"}
                           .
                         </p>
-                        {product ? <MaterialConsultButton context={context} material={product} /> : null}
                         <FormField
                           label={
                             "Quantidade de " +

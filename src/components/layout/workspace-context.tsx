@@ -3,6 +3,7 @@
 import { createContext, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOperationActivity } from "@/components/ui/operation-activity";
+import { useIssuanceOpeningActivity } from "@/components/documents/document-issuance-navigation";
 import { api, ApiError } from "@/lib/client/api";
 import type { PatientContext, WorkspaceContext } from "@/types/workspace";
 import { demoDocuments } from "@/lib/demo-documents";
@@ -195,8 +196,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     return () => window.removeEventListener("pagehide", remember);
   }, [publicPage, revoked, error, loading, selecting, data, patient, pathname, searchParams]);
   const state = { value, data, loading, selecting, error, selectionError, requestedPatientId, load, selectProfile, selectPatient };
+  const issuing = useIssuanceOpeningActivity(documentId, data?.userId, patientId);
   useOperationActivity(!publicPage && !revoked && (loading || selecting), selectionStage === null
-    ? { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." }
+    ? issuing ?? { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." }
     : { title: "Mudando de paciente", stage: selectionStage, steps: selectionSteps, detail: "Aguarde a confirmação da operação." });
   return <Context value={state}>{publicPage ? <>{notices}<div inert={blocked}>{children}</div></>
     : revoked ? <WorkspaceAccessRevoked key={scope} />

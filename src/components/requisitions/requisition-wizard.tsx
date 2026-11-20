@@ -657,7 +657,6 @@ function PatientRequisition({
         </div>
       </Dialog>
       <ComplementOriginHint />
-      {selectionLibrary()}
       {!uncertain ? <SimpleDraftPanel
         draft={privateDraft}
         current={draftContent}
@@ -740,7 +739,8 @@ function PatientRequisition({
             label="Etapas da requisição"
           />
           <div className="hca-supply-wizard-body">
-          <h2 className="my-4 text-xl font-semibold">{step === 0 ? "Confirme os dados da ficha" : step === 4 ? "Itens extras" : supplyWizardStages[stage]}</h2>
+          <h2 className="my-4 text-xl font-semibold">{currentCategory ? "Informe o estoque atual" : step === 0 ? "Confirme os dados da ficha" : step === 4 ? "Itens extras" : supplyWizardStages[stage]}</h2>
+          {currentCategory ? <p className="hca-field-help">Confira o saldo sugerido em cada material e ajuste após a contagem da equipe.</p> : null}
           <fieldset
             disabled={
               saving ||
@@ -760,7 +760,7 @@ function PatientRequisition({
                 userId={context.userId} patientId={context.patient!.id} kind="REQ"
                 catalogue={products} selectedIds={form.lines.map(line => line.productId)}
                 disabled={saving || uncertain || loadingCatalog || Boolean(catalogError) || privateDraft.blocked || !canWrite}
-                onApply={includeMaterials} />
+                onApply={includeMaterials} personalLists={selectionLibrary()} />
             </> : null}
             {currentCategory ? <>
               <WizardMaterialCategories

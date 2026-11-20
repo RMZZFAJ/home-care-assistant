@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useImperativeHandle, useState, type Ref } from "react";
+import { useEffect, useId, useImperativeHandle, useState, type ReactNode, type Ref } from "react";
 import { ActionButton, FormField, TextInput } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Notice } from "@/components/workspace";
@@ -19,7 +19,7 @@ export type HouseholdListSelectionHandle = { apply: () => boolean };
 const endpoint = "/api/catalog/material-lists";
 
 export function HouseholdListSelection({
-  ref, userId, patientId, kind, catalogue, selectedIds, disabled, onApply,
+  ref, userId, patientId, kind, catalogue, selectedIds, disabled, onApply, personalLists,
 }: {
   ref: Ref<HouseholdListSelectionHandle>;
   userId: string;
@@ -29,6 +29,7 @@ export function HouseholdListSelection({
   selectedIds: readonly string[];
   disabled: boolean;
   onApply: (productIds: string[]) => void;
+  personalLists?: ReactNode;
 }) {
   const bodyId = useId();
   const [expanded, setExpanded] = useState(false);
@@ -220,6 +221,7 @@ export function HouseholdListSelection({
           <Icon name="settings" width={16} height={16} />Organizar listas da casa
         </ActionButton>
         {pending && !open ? <p role="status">Há um salvamento de lista para recuperar.</p> : null}
+        {personalLists}
       </div>
     </div>
     {open ? <RecordDrawer key={editor ? "edit" : "organize"} modal exitDialog

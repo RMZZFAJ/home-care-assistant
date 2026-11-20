@@ -16,6 +16,8 @@ import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "@/components/documents/material-review";
 import { MaterialConsultButton } from "@/components/documents/catalogue-material-panel";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
+import { materialCategories } from "@/components/forms/supply-wizard-stages";
 import { IssuanceObservationList } from "@/components/forms/issuance-observations";
 import type { WorkspaceContext } from "@/types/workspace";
 import type {
@@ -183,12 +185,14 @@ export function CatalogStep({
           <MaterialChoice
             key={item.id}
             selected={Boolean(line)}
-            className="ui-product-choice"
+            className="ui-product-choice hca-wizard-material"
           >
+            <div className="hca-wizard-material-head">
             <label className="hca-material-choice-heading" htmlFor={choiceId}>
               <input
                 id={choiceId}
                 type="checkbox"
+                className="hca-wizard-include-switch"
                 aria-labelledby={`${choiceId}-label`}
                 checked={Boolean(line)}
                 onChange={() => {
@@ -199,12 +203,14 @@ export function CatalogStep({
                   } else updateLine(item, {});
                 }}
               />
+              <span className="hca-wizard-material-icon"><Icon name={materialCategories.find(category => category.id === item.category)?.icon ?? "box"} /></span>
               <span id={`${choiceId}-label`} className="hca-material-choice-copy">
                 <strong>{item.name}</strong>
                 <small>{item.unit}</small>
               </span>
             </label>
-            <MaterialConsultButton context={context} material={item} />
+            <MaterialConsultButton context={context} material={item} menu />
+            </div>
             {item.selectionPredecessors?.length ? (
               <p className="mt-2 text-sm">
                 Opção cadastrada para novas escolhas após{" "}
@@ -217,15 +223,24 @@ export function CatalogStep({
             ) : null}
             {line?.catalogueExtra ? <p className="doc-subtle mt-3">Incluído em Itens extras.</p> : null}
             {line && !line.catalogueExtra ? (
-              <div className="mt-4 space-y-3">
-                <p className="text-xs text-(--muted)">
+              <div className="hca-wizard-material-fields">
+                <p className="hca-wizard-material-balance">
                   Família · saldo confirmado deste produto:{" "}
                   {info?.familyStock === null || !info
                     ? "consulta indisponível"
                     : formatQuantity(info.familyStock, item.unit)}
                 </p>
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="hca-wizard-material-stock">
+                  <label className="hca-wizard-material-urgent">
+                    <input
+                      type="checkbox"
+                      checked={line.urgent}
+                      onChange={(event) => updateLine(item, { urgent: event.target.checked })}
+                    />
+                    Reposição urgente
+                  </label>
                   <StockObservationField
+                    compact
                     value={line.currentStock}
                     mode={line.stockObservation}
                     at={line.stockObservationAt}
@@ -236,16 +251,6 @@ export function CatalogStep({
                     errorKey={item.id}
                     onChange={(change) => updateLine(item, change)}
                   />
-                  <label className="flex min-h-11 items-center gap-3 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={line.urgent}
-                      onChange={(event) =>
-                        updateLine(item, { urgent: event.target.checked })
-                      }
-                    />
-                    Reposição urgente
-                  </label>
                 </div>
                 {info?.pending.length ? <RequisitionRepeatReason
                   productId={item.id}

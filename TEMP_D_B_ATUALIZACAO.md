@@ -1,5 +1,12 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — revisão da composição dos assistentes.** A REQ tem um ponto
+de entrada para listas na Confirmação. O menu de material fica junto
+ao nome e a contagem usa a opção Não sei informar. A abertura
+da ficha emitida participa do carregamento em etapas. O
+[registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md)
+acompanha a revisão do rodapé, dos vínculos e da origem da aquisição.
+
 **20/11 — recuperação da atualização de chegada da COM.** O diálogo da v7
 mostra o diagnóstico recolhido. A recuperação consulta a ficha e volta à
 comparação se encontrar mudanças. Após duas tentativas sem sucesso, ficam

@@ -9,14 +9,9 @@ import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { api, ApiError } from "@/lib/client/api";
 import { initialPdfStatusSchema, type InitialPdfStatus } from "@/lib/documents/pdf-issuance";
 import { DocumentShareDialog } from "./document-share-dialog";
-import { useIssuanceResult } from "./document-issuance-navigation";
+import { issuanceSteps, useIssuanceResult } from "./document-issuance-navigation";
 
-export const issuanceSteps = [
-  { label: "Registrando a ficha", icon: "file" },
-  { label: "Conferindo a emissão", icon: "check" },
-  { label: "Processando os avisos da emissão", icon: "bell" },
-  { label: "Gerando o PDF de emissão", icon: "shield" },
-] as const;
+export { issuanceSteps } from "./document-issuance-navigation";
 const titles = {
   REQ: "Requisição emitida",
   COM: "Compra emitida",
