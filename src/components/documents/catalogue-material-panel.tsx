@@ -35,7 +35,7 @@ export function MaterialConsultButton({ context, material, menu = false, onLink 
   context: WorkspaceContext;
   material: Material;
   menu?: boolean;
-  onLink?: () => void;
+  onLink?: (returnFocus: () => HTMLButtonElement | null) => void;
 }) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -62,7 +62,7 @@ export function MaterialConsultButton({ context, material, menu = false, onLink 
         <Menu.Item className="hca-menu-item" onClick={openMaterial}>
           <Icon name="eye" />Detalhes do material
         </Menu.Item>
-        {onLink ? <Menu.Item className="hca-menu-item" onClick={onLink}>
+        {onLink ? <Menu.Item className="hca-menu-item" onClick={() => onLink(() => buttonRef.current)}>
           <Icon name="link" />Vincular a uma ficha
         </Menu.Item> : null}
       </MenuPopup>

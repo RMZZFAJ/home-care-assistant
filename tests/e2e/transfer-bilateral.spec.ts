@@ -1,4 +1,4 @@
-import { expectNoOperationalDocumentAction } from "./document-sections";
+import { expectNoOperationalDocumentAction, openOperationalDocumentAction } from "./document-sections";
 import { selectDocumentSection, openDocumentAction } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -32,13 +32,10 @@ async function fillDeclaration(
   page: Page,
   f: Awaited<ReturnType<typeof transferFixture>>,
 ) {
-  await page.goto("/transferencias");
-  await page
-    .getByRole("combobox", { name: /^Custódia de origem/ })
-    .selectOption("CARE_TEAM");
-  await page
-    .getByRole("button", { name: "Preparar declaração", exact: true })
-    .click();
+  await page.goto("/fichas/" + f.origin.id);
+  await openOperationalDocumentAction(page, "Preparar devolução");
+  await expect(page).toHaveURL(new RegExp("/fichas/devolucao\\?.*originId=" + f.origin.id));
+  await page.getByRole("button", { name: "Preparar devolução", exact: true }).click();
   const drawer = page.getByRole("region", {
     name: "Nova devolução",
     exact: true,
@@ -48,19 +45,26 @@ async function fillDeclaration(
     .getByRole("combobox", { name: /^Recebedor físico designado/ })
     .selectOption(f.recipient.id);
   await drawer.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true }).fill("Quem vai receber tem disponibilidade para a conferência.");
-  await drawer.getByRole("combobox", { name: /^ENT documental de origem/ }).selectOption(f.origin.id);
+  const generalSources = drawer.getByRole("region", { name: "Fichas vinculadas", exact: true });
+  await expect(generalSources).toContainText(f.origin.code!);
+  await generalSources.getByRole("button", { name: "Alterar", exact: true }).click();
+  const sources = page.getByRole("dialog", { name: "Vincular fichas", exact: true });
+  await expect(sources.getByRole("checkbox", { name: "Vincular " + f.origin.code, exact: true })).toBeChecked();
+  await expect(sources.getByRole("checkbox", { name: /^Importar materiais/ })).toBeChecked();
+  await sources.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
   await drawer.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
-  const material = drawer.getByRole("combobox", {
-    name: /^Adicionar material da origem/,
-  });
-  await material.click();
-  await expect(material).toBeInViewport({ ratio: 1 });
-  await material.fill("Material fictício V4 0");
-  await material.press("ArrowDown");
-  await page.getByRole("option", { name: /Material fictício V4 0/ }).click();
-  await drawer
-    .getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ })
-    .fill("5");
+  await drawer.getByRole("button", { name: /^Higiene/ }).click();
+  const amount = drawer.getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ });
+  await expect(amount).toHaveValue("10");
+  await amount.fill("5");
+  const menu = drawer.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true });
+  await menu.click();
+  await page.getByRole("menuitem", { name: "Vincular a uma ficha", exact: true }).click();
+  const materialSources = page.getByRole("dialog", { name: "Vincular este material", exact: true });
+  await expect(materialSources.getByRole("checkbox", { name: "Vincular " + f.origin.code, exact: true })).toBeChecked();
+  await materialSources.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
+  await expect(menu).toBeFocused();
+  await expect(amount).toHaveValue("5");
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
   await drawer.getByRole("button", { name: "Continuar", exact: true }).click();
   await drawer.getByRole("button", { name: "Adicionar observação", exact: true }).click();
@@ -136,6 +140,7 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
   expect(document!.status).toBe("pending_receipt");
   expect(document!.transfer?.agreement).toBeNull();
   expect(document!.transfer?.declaration.actor.id).toBe(f.initiator.id);
+  expect(document!.originDocuments).toMatchObject([{ documentId: f.origin.id, general: true, productIds: [f.products[0]] }]);
   await page.unroute("**/api/transfers");
   await page
     .getByRole("button", {

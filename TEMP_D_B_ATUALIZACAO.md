@@ -1,5 +1,12 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — vínculos e materiais da devolução.** A DEV usa o seletor da v7
+para vincular uma ENT à ficha inteira ou a um material. Ao partir de uma
+entrega recebida, o assistente traz os materiais elegíveis para revisão.
+O menu da linha preserva foco e quantidade. O
+[registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) acompanha as
+verificações móveis, o estado da migration e a leitura de código pendente.
+
 **20/11 — revisão da composição dos assistentes.** A REQ tem um ponto
 de entrada para listas na Confirmação. O menu de material fica junto
 ao nome e a contagem usa a opção Não sei informar. A abertura

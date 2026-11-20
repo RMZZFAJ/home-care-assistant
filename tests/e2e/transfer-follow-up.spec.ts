@@ -63,16 +63,24 @@ async function declareInUi(page: Page, f: Fixture, source: Custody, info: TestIn
   await drawer.getByRole("combobox", { name: /^Recebedor físico designado/ }).selectOption(source === "CARE_TEAM" ? f.recipient.id : f.initiator.id);
   const manualSelection = drawer.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
   if (await manualSelection.isVisible()) await manualSelection.fill("Pessoa indicada está disponível para conferir os materiais.");
-  await expect(drawer.getByRole("combobox", { name: /^ENT documental de origem/ })).toHaveValue("");
+  if (source === "CARE_TEAM") {
+    await expect(drawer.getByRole("region", { name: "Fichas vinculadas", exact: true })).toContainText("Ficha independente");
+  } else await expect(drawer.getByRole("combobox", { name: /^ENT documental de origem/ })).toHaveValue("");
   await drawer.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
-  const material = drawer.getByRole("combobox", { name: /^Adicionar material da origem/ });
-  await material.click(); await material.fill("Material fictício V4 0"); await material.press("ArrowDown");
-  await page.getByRole("option", { name: /Material fictício V4 0/ }).click();
+  if (source === "CARE_TEAM") {
+    await drawer.getByRole("searchbox", { name: "Buscar material", exact: true }).fill("Material fictício V4 0");
+    await drawer.getByRole("switch", { name: "Incluir Material fictício V4 0", exact: true }).check();
+  } else {
+    const material = drawer.getByRole("combobox", { name: /^Adicionar material da origem/ });
+    await material.click(); await material.fill("Material fictício V4 0"); await material.press("ArrowDown");
+    await page.getByRole("option", { name: /Material fictício V4 0/ }).click();
+  }
   const amount = drawer.getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ });
   await amount.fill("2");
   if (source === "CARE_TEAM") {
-    const consult = drawer.getByRole("button", { name: "Consultar material Material fictício V4 0", exact: true });
+    const consult = drawer.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true });
     await consult.click();
+    await page.getByRole("menuitem", { name: "Detalhes do material", exact: true }).click();
     const panel = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
     await expect(panel.getByRole("heading", { name: "Estoque atual", exact: true })).toBeVisible();
     await panel.getByRole("tab", { name: "Histórico", exact: true }).click();

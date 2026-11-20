@@ -3,6 +3,7 @@ import { quantity } from "@/lib/quantity";
 import { draftCommitSchema } from "./creation-drafts";
 import { exactQuantity } from "./documents";
 import { issuedObservations } from "./issuance-observations";
+import { supplySourceLinks } from "./supply-sources";
 
 const identifier = z.string().uuid();
 const reason = z
@@ -26,6 +27,7 @@ export const createTransferSchema = z
         counterpartyId: identifier.optional(),
         recipientId: identifier,
         originDocumentId: identifier.nullable().optional(),
+        sources: supplySourceLinks.optional(),
         referenceHash: z.string().regex(/^[0-9a-f]{64}$/),
         reason: z.union([z.literal(""), reason]),
         observations: issuedObservations.optional(),
@@ -48,6 +50,9 @@ export const createTransferSchema = z
       .refine(value => value.observations === undefined ? Boolean(value.reason) : value.mode === "direct", {
         path: ["reason"], message: "Informe a justificativa da declaração ou use as observações da expedição direta.",
       })
+      .refine(value => value.sources === undefined || (
+        value.mode === "direct" && value.source === "CARE_TEAM" && !value.originDocumentId
+      ), { path: ["sources"], message: "Confira os vínculos da devolução." })
       .refine(
         ({ mode, counterpartyId }) => mode === "direct" ? !counterpartyId : !!counterpartyId,
         { path: ["counterpartyId"], message: "Seleção incompatível com a modalidade da expedição." },

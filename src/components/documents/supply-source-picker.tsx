@@ -8,14 +8,14 @@ import { Notice } from "@/components/workspace";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { formatBrazilDate } from "@/lib/receipt";
 import { documentStatuses } from "@/types/documents";
-import { parseSupplySources, supplySourceFilter, type SupplySourceOption } from "@/lib/validation/supply-sources";
+import { parseSupplySources, supplySourceFilter, type SupplySourceOption, type SupplySourceTarget } from "@/lib/validation/supply-sources";
 import { RelatedDocument } from "./related-document";
 
 export type SupplySourceSelection = { option: SupplySourceOption; importMaterials: boolean };
 
 export function SupplySourcePicker({ patientId, target, current, product, onClose, onApply }: {
   patientId: string;
-  target: "COM" | "ENT";
+  target: SupplySourceTarget;
   current: SupplySourceSelection[];
   product?: { id: string; name: string };
   onClose: () => void;
@@ -35,7 +35,8 @@ export function SupplySourcePicker({ patientId, target, current, product, onClos
   const subtitle = product
     ? "Selecione as fichas relacionadas a este material."
     : "Marque as fichas de origem. Em cada uma, escolha se deseja trazer os materiais.";
-  return <Dialog open title={title} kicker={product?.name ?? (target === "COM" ? "Compra" : "Entrega")} subtitle={subtitle}
+  const targetLabel = { COM: "Compra", ENT: "Entrega", DEV: "Devolução" }[target];
+  return <Dialog open title={title} kicker={product?.name ?? targetLabel} subtitle={subtitle}
     onClose={onClose} keyboardScrollable
     footer={<><ActionButton onClick={onClose}>Voltar</ActionButton>
       <ActionButton variant="primary" onClick={() => onApply(selected)}>

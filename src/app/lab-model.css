@@ -879,6 +879,20 @@
 .hca-wizard-material-fields, .hca-wizard-material-stock, .hca-wizard-transfer-line { display: grid; gap: 8px; }
 .hca-wizard-material-fields { margin-block-start: 8px; }
 .hca-wizard-material-balance { margin: 0; font-size: 11px; color: var(--hca-muted); }
+.hca-wizard-return-source {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 4px 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-inline-start: 2px solid #a9d1b9;
+  border-radius: 0 8px 8px 0;
+  background: #f2f7f3;
+  color: var(--hca-muted);
+  font-size: 11px;
+}
+.hca-wizard-return-source > :nth-child(even) { justify-self: end; text-align: end; }
 .hca-wizard-material-urgent, .hca-wizard-unknown-stock { display: flex; align-items: center; gap: 8px; min-height: 32px; font-size: 12px; }
 .hca-wizard-stock-field { display: grid; gap: 4px; }
 .hca-wizard-stock-field > label:first-of-type { font-size: 12px; }

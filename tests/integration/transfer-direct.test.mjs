@@ -3,6 +3,7 @@ import test from "node:test";
 import { randomUUID } from "node:crypto";
 import { declareTransfer, rpc, transferCommand, transferFixture, transferState } from "./transfer-fixtures.mjs";
 import { declarationBody, declarationCommit, declarationDraftFixture, declarationPacket } from "./transfer-declaration-draft-fixtures.mjs";
+import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 
 test("DEV expede diretamente, preserva a ENT original e reconhece somente o recebimento pessoal", async () => {
   const f = await transferFixture();
@@ -103,4 +104,59 @@ test("expedição consome o rascunho privado e repete o resultado mesmo depois d
   const repeated = await rpc(f.client, "commit_supply_draft", args);
   assert.deepEqual(repeated, { ...first, replayed: true });
   assert.equal(JSON.parse(transferState(f)).ledger.length, before + 1);
+});
+
+test("DEV guarda vínculo de um material no rascunho e no ato, com opções limitadas à custódia e ao paciente", async () => {
+  const foreign = await transferFixture();
+  const f = await declarationDraftFixture();
+  const product = f.products[0];
+  const sourceQuery = {
+    p_patient: f.patient, p_target: "DEV", p_filter: "", p_search: "", p_page: 1,
+    p_ids: [f.origin.id, foreign.origin.id], p_product: product,
+  };
+  const options = await rpc(f.initiator.client, "supply_source_options", sourceQuery);
+  assert.deepEqual(options.data.map(row => row.id), [f.origin.id]);
+  assert.equal(options.data[0].materials[0].available, "10");
+  assert.deepEqual((await rpc(f.initiator.client, "supply_source_options", { ...sourceQuery, p_filter: "COM" })).data, []);
+  assert.deepEqual((await rpc(f.initiator.client, "supply_source_options", { ...sourceQuery, p_product: f.products[1] })).data, []);
+  assert.equal((await f.initiator.client.rpc("supply_source_options", { ...sourceQuery, p_patient: foreign.patient })).error?.code, "42501");
+
+  const draft = declarationPacket(f);
+  const original = draft.p_body.content;
+  original.fields.originId = "";
+  original.fields.originLabel = "";
+  original.fields.counterpartyId = "";
+  const link = { documentId: f.origin.id, general: false, productIds: [product] };
+  original.sources = [link];
+  const saved = await rpc(f.client, "supply_draft_command", draft);
+  const { counterpartyId, ...legacy } = declarationBody(f);
+  assert.ok(counterpartyId);
+  const body = { ...legacy, mode: "direct", originDocumentId: null, sources: [link] };
+  const before = JSON.parse(transferState(f));
+  const altered = declarationCommit(f, saved, { ...body, sources: [{ ...link, general: true }] });
+  assert.equal((await f.client.rpc("commit_supply_draft", altered)).error?.code, "22023");
+  for (const [badLink, code] of [
+    [{ ...link, documentId: foreign.origin.id }, "42501"],
+    [{ ...link, productIds: [f.products[1]] }, "PT409"],
+  ]) {
+    const denied = await f.client.rpc("create_transfer_declaration", {
+      p_patient: f.patient, p_key: randomUUID(), p_body: { ...body, sources: [badLink] },
+    });
+    assert.equal(denied.error?.code, code);
+  }
+  assert.deepEqual(JSON.parse(transferState(f)), before);
+
+  const args = declarationCommit(f, saved, body);
+  const issued = await rpc(f.client, "commit_supply_draft", args);
+  assert.equal(issued.result.transfer.originDocumentId, null);
+  assert.deepEqual(issued.result.originDocuments, [{ ...link, type: "ENT", code: f.origin.code }]);
+  assert.match(issued.result.payload.sourceSet, /^[a-f0-9]{64}$/);
+  assert.equal(Object.hasOwn(issued.result.payload, "sources"), false);
+  const after = JSON.parse(transferState(f));
+  assert.equal(after.ledger.length, before.ledger.length + 1);
+  assert.deepEqual(after.documents.find(document => document.id === f.origin.id),
+    before.documents.find(document => document.id === f.origin.id));
+  assert.deepEqual(await rpc(f.client, "commit_supply_draft", args), { ...issued, replayed: true });
+  assert.deepEqual(JSON.parse(transferState(f)), after);
+  assert.equal(sql(`select count(*) from private.supply_source_sets where care_recipient_id=${q(f.patient)}`), "1");
 });

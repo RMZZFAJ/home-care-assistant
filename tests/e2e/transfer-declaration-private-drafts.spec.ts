@@ -63,6 +63,9 @@ const dialog = (page: Page) => page.getByRole("dialog");
 const editor = (page: Page) => page.getByRole("region", { name: /^Nova (devolução|entrega)$/ });
 const recipient = (page: Page) => editor(page).getByRole("combobox", { name: /^Recebedor físico designado/ });
 const amountField = (page: Page) => editor(page).getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ });
+const searchField = (page: Page, source: Custody) => source === "CARE_TEAM"
+  ? editor(page).getByRole("searchbox", { name: "Buscar material", exact: true })
+  : editor(page).getByRole("combobox", { name: /^Adicionar material da origem/ });
 const observationField = (page: Page) => editor(page).getByLabel("Observação 1", { exact: true });
 const stepButton = (page: Page, name: string) =>
   editor(page).getByRole("navigation", { name: "Etapas da ficha" }).getByRole("button", { name: new RegExp(name + "$") });
@@ -92,16 +95,23 @@ async function fill(page: Page, f: Fixture, amount = "0,") {
   await recipient(page).selectOption(f.recipientId);
   const manualSelection = editor(page).getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
   if (await manualSelection.isVisible()) await manualSelection.fill("Escolha confirmada com a pessoa que fará a conferência.");
-  if (f.originId)
-    await editor(page).getByRole("combobox", { name: /^ENT documental de origem/ }).selectOption(f.originId);
+  if (f.originId) {
+    const general = editor(page).getByRole("region", { name: "Fichas vinculadas", exact: true });
+    await general.getByRole("button", { name: "Vincular", exact: true }).click();
+    const picker = page.getByRole("dialog", { name: "Vincular fichas", exact: true });
+    await picker.getByRole("checkbox", { name: "Vincular " + f.origin.code, exact: true }).check();
+    await picker.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
+  }
   await editor(page).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
-  const search = editor(page).getByRole("combobox", {
-    name: /^Adicionar material da origem/,
-  });
+  const search = searchField(page, f.source === "CARE_TEAM" ? "CARE_TEAM" : "FAMILY");
   await search.click();
   await search.fill("Material fictício V4 0");
-  await search.press("ArrowDown");
-  await page.getByRole("option", { name: /Material fictício V4 0/ }).click();
+  if (f.source === "CARE_TEAM") {
+    await editor(page).getByRole("switch", { name: "Incluir Material fictício V4 0", exact: true }).check();
+  } else {
+    await search.press("ArrowDown");
+    await page.getByRole("option", { name: /Material fictício V4 0/ }).click();
+  }
   await amountField(page).fill("2");
   await continueStep(page);
   await continueStep(page);
@@ -216,11 +226,9 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       await login(page, f);
       await open(page, source);
       await fill(page, f);
-      const search = editor(page).getByRole("combobox", {
-        name: /^Adicionar material da origem/,
-      });
+      const search = searchField(page, source);
       await search.fill("Busca própria ainda sem seleção");
-      await search.press("Escape");
+      if (source === "FAMILY") await search.press("Escape");
       const before = declarationFacts(f),
         packet = await savedDraft(page, f, "Busca própria ainda sem seleção");
       expect(packet.targetDocumentId).toBeNull();
@@ -334,9 +342,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
         await expect(stepButton(peer, "Materiais")).toHaveAttribute("aria-current", "step");
         await expect(amountField(peer)).toHaveValue("0,");
         await expect(
-          editor(peer).getByRole("combobox", {
-            name: /^Adicionar material da origem/,
-          }),
+          searchField(peer, source),
         ).toHaveValue(packet.content.fields.query);
         await stepButton(peer, "Confirmação").click();
         await expect(recipient(peer)).toHaveValue(f.recipientId);

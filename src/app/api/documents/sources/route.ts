@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     if (!parsed.success) throw new ApiError("VALIDATION_ERROR", "Confira os filtros das fichas de origem.");
     const { target, filter, search, page, ids, productId } = parsed.data;
     const auth = await authenticate();
-    const patient = await patientContext(auth, params.get("careRecipientId"), target.toLowerCase() + ".create");
+    const patient = await patientContext(auth, params.get("careRecipientId"), target === "DEV" ? "ent.create" : target.toLowerCase() + ".create");
     const data = await rpc(auth.client, "supply_source_options", {
       p_patient: patient.id, p_target: target, p_filter: filter, p_search: search,
       p_page: page, p_ids: ids, p_product: productId,

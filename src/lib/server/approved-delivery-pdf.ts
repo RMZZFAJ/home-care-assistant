@@ -53,6 +53,7 @@ export async function renderApprovedDeliveryPdf(snapshot: DocumentSnapshot, emis
   appendDocumentOriginContext(layout, snapshot);
   appendDocumentRelated(layout, snapshot, lifecycle, origin);
   if (snapshot.transfer?.originDocumentId) layout.paragraph("Há uma entrega de origem vinculada. Consulte sua referência autorizada na ficha.", "transfer/origin", { size: 9.5 });
+  else if (returned && typeof snapshot.payload.sourceSet === "string") layout.paragraph("Consulte na ficha as referências autorizadas das entregas vinculadas à devolução ou aos seus materiais.", "transfer/origin", { size: 9.5 });
   else if (returned) layout.paragraph("Devolução autônoma da equipe para a família, sem entrega de origem vinculada.", "transfer/origin", { size: 9.5 });
   layout.milestones([
     { label: returned ? "Expedição da devolução" : "Expedição", symbol: "box", detail: formatBrazilDate(at), done: Boolean(at), tone: "blue" },

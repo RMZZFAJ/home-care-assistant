@@ -1290,7 +1290,10 @@ export function SupplyDocumentContent({
           {operationalMenu && (fabActions.length > 0 || canPrepareDelivery || prepareReturn || progressAllowed) ? <DocumentFab triggerRef={fabRef}>
             {fabActions.map(item => renderAction(item, true))}
             {canPrepareDelivery ? <DocumentMoreLink icon="truck" href={`/fichas/ent?purchaseId=${data.id}`}>Preparar entrega</DocumentMoreLink> : null}
-            {prepareReturn ? <DocumentMoreLink icon="undo" href={`/fichas/devolucao?careRecipientId=${data.care_recipient_id}`}>Preparar devolução</DocumentMoreLink> : null}
+            {prepareReturn ? <DocumentMoreLink icon="undo"
+              href={`/fichas/devolucao?careRecipientId=${data.care_recipient_id}${data.lines.some(line => quantity(line.accepted_quantity ?? 0).gt(0)) ? "&originId=" + data.id : ""}`}>
+              Preparar devolução
+            </DocumentMoreLink> : null}
             {progressAllowed ? <DocumentMoreButton icon="plus" onClick={() => tabs.select("progress", true)}>Novo andamento</DocumentMoreButton> : null}
           </DocumentFab> : null}
           {archiveDialog && patientAdmin ? <DocumentArchiveDialog key={`${context.userId}:${id}:${archiveDialog}`} id={id} patientId={data.care_recipient_id}

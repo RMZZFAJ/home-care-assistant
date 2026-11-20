@@ -314,9 +314,33 @@ continua com seu vínculo próprio no menu de três pontos. A avaliação
 familiar de suficiência e a justificativa para múltiplas REQs aparecem
 quando há vínculos que exigem essas informações. O seletor também reconhece
 os vínculos por linha dos rascunhos anteriores.
-Na DEV, a origem documental pertence à expedição. A opção de vínculo
-por material demonstrada pela v7 ainda requer conferência com esse
-contrato.
+
+Na DEV, a Confirmação tem o mesmo seletor de fichas. O menu de três pontos
+oferece Detalhes do material e Vincular a uma ficha. Cada vínculo pode ser
+geral ou indicar os materiais específicos da entrega. Ao partir de uma ENT
+com recebimento registrado, os materiais disponíveis entram no preenchimento
+para revisão. Ao partir de uma DEV avulsa, a importação é uma escolha no
+seletor. A DEV independente continua disponível.
+
+Na lista, o interruptor inclui o item, o menu fica ao lado e o resumo
+exibe a origem específica e o saldo da equipe. A quantidade sugerida
+considera o menor valor entre o recebido na ENT e o saldo atual da equipe,
+na precisão do catálogo. O estoque da equipe é agregado por material. A
+referência à ENT documenta o recebimento e a quantidade sugerida é editável.
+A leitura de código da DEV demonstrada pela v7 continua pendente.
+
+O banco registra os vínculos no rascunho e na emissão. O teste com Auth
+real conferiu vínculo por material, isolamento por paciente, rejeição de
+uma linha que não pertence à entrega, preservação da ENT anterior e uma
+única saída da custódia na repetição da mesma tentativa. O campo legado de
+origem permanece legível nos registros e rascunhos existentes.
+
+O cenário E06-16 foi aberto a 390 px no laboratório. Em Chromium com
+emulação Android e WebKit com emulação iOS, a jornada partiu da ENT,
+conferiu a importação, ajustou a quantidade, retornou do seletor ao menu
+do material e recuperou a expedição incerta. O recebedor confirmou três
+das cinco unidades. Os dois testes passaram sem retry, conferiram o
+saldo e obtiveram o PDF de acompanhamento.
 
 O rodapé dos assistentes L2 mostra o estado da gravação automática e as
 ações de navegação. A confirmação de saída e os controles excepcionais de
@@ -398,8 +422,8 @@ continua sem regra de produto nesta entrega.
 ## Migrations por ambiente
 
 Consulta de 20/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **310 versões em cada banco**,
-com 242 versões anteriores a L1, 18 de L1 e 50 de L2.
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **311 versões em cada banco**,
+com 242 versões anteriores a L1, 18 de L1 e 51 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 As versões em arquivo, na stack local e no desenvolvimento coincidem. A
 fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
@@ -426,7 +450,7 @@ fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 `20261119141610`, `20261119154356`, `20261119175654`, `20261119184524`,
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
-`20261119233039`, `20261120043839`.
+`20261119233039`, `20261120043839`, `20261120052605`.
 
 `20261119212000` e `20261119213000` tratam as observações numeradas e a
 justificativa da designação manual na transferência. `20261119220003`
@@ -455,6 +479,12 @@ rollback. O ensaio conferiu o planejamento, as modalidades antigas, a
 recusa de payload misto e a ausência de grants públicos. A fila apontou
 somente essa migration. Após a aplicação, o histórico remoto registrou a
 versão 310 e a fila voltou a ficar vazia.
+
+`20261120052605` preserva as origens gerais e por material da DEV no
+rascunho e na expedição. Ensaio vinculado com rollback confirmou os grants
+existentes do seletor e a negação a anônimos. O backup cifrado
+`523122f6-617f-4dd7-9326-8974ac6e4eda` foi verificado antes de aplicar
+a única versão pendente.
 
 ### L3 e L4
 

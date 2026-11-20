@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-export const supplySourceTarget = z.enum(["COM", "ENT"]);
+export const supplySourceTarget = z.enum(["COM", "ENT", "DEV"]);
+export type SupplySourceTarget = z.infer<typeof supplySourceTarget>;
 export const supplySourceFilter = z.enum(["", "REQ", "ENT", "COM", "BAL", "DEV"]);
 export const supplySourceLink = z.object({
   documentId: z.uuid(),
@@ -11,11 +12,11 @@ export const supplySourceLink = z.object({
 export const supplySourceLinks = z.array(supplySourceLink).max(100)
   .refine((links) => new Set(links.map((row) => row.documentId)).size === links.length);
 export type SupplySourceLink = z.infer<typeof supplySourceLink>;
-export type SupplySourceOrigin = SupplySourceLink & { type: "REQ" | "COM"; code: string };
+export type SupplySourceOrigin = SupplySourceLink & { type: "REQ" | "COM" | "ENT"; code: string };
 
 const option = z.object({
   id: z.uuid(),
-  type: z.enum(["REQ", "COM"]),
+  type: z.enum(["REQ", "COM", "ENT"]),
   code: z.string().min(1),
   status: z.string(),
   createdAt: z.iso.datetime({ offset: true }),
@@ -35,7 +36,7 @@ const sourceResponse = z.object({
   data: z.array(option).max(100),
 }).strict();
 
-export function parseSupplySources(value: unknown, patientId: string, target: "COM" | "ENT", page: number) {
+export function parseSupplySources(value: unknown, patientId: string, target: SupplySourceTarget, page: number) {
   const result = sourceResponse.parse(value);
   if (result.patientId !== patientId || result.target !== target || result.page !== page)
     throw new Error("A consulta de origem não corresponde a esta ficha.");

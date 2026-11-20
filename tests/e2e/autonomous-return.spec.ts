@@ -39,11 +39,10 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
   await editor.getByRole("combobox", { name: /^Recebedor físico designado/ }).selectOption(f.recipient.id);
   const selectionReason = "A pessoa da família estará presente para receber a devolução.";
   await editor.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true }).fill(selectionReason);
-  await expect(editor.getByRole("combobox", { name: /^ENT documental de origem/ })).toHaveValue("");
+  await expect(editor.getByRole("region", { name: "Fichas vinculadas", exact: true })).toContainText("Ficha independente");
   await editor.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
-  const search = editor.getByRole("combobox", { name: /^Adicionar material da origem/ });
-  await search.click(); await search.fill("Material fictício V4 0"); await search.press("ArrowDown");
-  await page.getByRole("option", { name: /Material fictício V4 0/ }).click();
+  await editor.getByRole("searchbox", { name: "Buscar material", exact: true }).fill("Material fictício V4 0");
+  await editor.getByRole("switch", { name: "Incluir Material fictício V4 0", exact: true }).check();
   await editor.getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ }).fill("5");
   await editor.getByRole("button", { name: "Continuar", exact: true }).click();
   await editor.getByRole("button", { name: "Continuar", exact: true }).click();

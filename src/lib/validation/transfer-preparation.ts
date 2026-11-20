@@ -5,6 +5,7 @@ import { parseTransferReference } from "./transfer-reference";
 import type { TransferDeclaration } from "./transfers";
 import type { Custody } from "@/types/documents";
 import type { TransferPreparation } from "@/types/transfers";
+import { supplySourceLinks } from "./supply-sources";
 const custody = z.enum(["FAMILY", "CARE_TEAM"]);
 const amount = z.string().regex(/^-?\d+(?:\.\d+)?$/);
 const packet = z.object({
@@ -105,6 +106,10 @@ export function requireTransferDeclarationConfirmation(
   const sameId = (left?: string, right?: string) =>
     left?.toLowerCase() === right?.toLowerCase();
   const codePrefix = sent.source === "CARE_TEAM" ? "DEV-" : "ENT-";
+  const actualSources = supplySourceLinks.safeParse(row.originDocuments?.map(({ documentId, general, productIds }) => ({
+    documentId, general, productIds,
+  })) ?? []);
+  const sentSources = sent.sources ?? [];
   if (
     !sameId(person.actor.id, expected.userId) ||
     person.source !== sent.source ||
@@ -118,6 +123,11 @@ export function requireTransferDeclarationConfirmation(
         !row.code?.startsWith(codePrefix) || !row.protocol)) ||
     (actual.originDocumentId ?? "").toLowerCase() !==
       (sent.originDocumentId ?? "").toLowerCase() ||
+    !actualSources.success || actualSources.data.length !== sentSources.length ||
+    sentSources.some(expectedLink => !actualSources.data.some(actualLink =>
+      sameId(actualLink.documentId, expectedLink.documentId) && actualLink.general === expectedLink.general &&
+      actualLink.productIds.length === expectedLink.productIds.length &&
+      expectedLink.productIds.every(id => actualLink.productIds.includes(id)))) ||
     row.lines.length !== sent.lines.length ||
     new Set(row.lines.map((line) => line.product_id)).size !==
       row.lines.length ||

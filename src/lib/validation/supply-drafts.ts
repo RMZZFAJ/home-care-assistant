@@ -230,6 +230,9 @@ export const transferDeclarationDraftContent = receiptDraftContent
   .extend({
     documentVersion: z.null(), observations: issuanceObservationDraft.optional(),
     pendingExtras: pendingPurchaseExtras.optional(),
+    sources: supplySourceLinks.optional(),
+    sourceImports: entries(z.array(text(120).min(1)).max(1000), 100).optional(),
+    sourceSeeds: entries(text(64)).optional(),
   })
   .refine(
     (value) =>

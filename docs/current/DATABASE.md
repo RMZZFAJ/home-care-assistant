@@ -1,5 +1,10 @@
 # Banco de dados
 
+Em 20/11/2026, a migration `20261120052605` levou os bancos local e de
+desenvolvimento a 311 versões. Os vínculos gerais e por material da DEV
+usam o conjunto privado de origens vinculado ao documento. A expedição
+continua usando a movimentação de custódia da transferência.
+
 Em 20/11/2026, o Supabase local e de desenvolvimento chegou a 310
 migrations com `20261120043839`. A emissão da COM passou a registrar o
 planejamento de aquisição. O ensaio remoto com rollback validou as

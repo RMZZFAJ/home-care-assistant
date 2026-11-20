@@ -15,6 +15,7 @@ import {
   TextInput,
 } from "@/components/ui/controls";
 import { SearchSelect } from "@/components/ui/search-select";
+import { MaterialChoice } from "@/components/catalog/material-choice";
 import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { issuanceSteps } from "./document-issuance-result";
@@ -24,6 +25,7 @@ import { Icon, StepNavigator } from "@/components/ui/primitives";
 import { Dialog } from "@/components/ui/overlays";
 import Link from "next/link";
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -57,6 +59,9 @@ import {
   adoptTransferDeclarationReference,
 } from "@/lib/forms/transfer-declaration-draft";
 import { navigationForStep } from "@/lib/forms/draft-navigation";
+import { emptySupplySources, prepareSupplySources } from "@/lib/forms/supply-source-preparation";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import { parseSupplySources, type SupplySourceOption } from "@/lib/validation/supply-sources";
 import {
   parseTransferPreparation,
   requireTransferDeclarationConfirmation,
@@ -74,17 +79,20 @@ import type { Custody, SupplyDocument } from "@/types/documents";
 import type { TransferPreparation } from "@/types/transfers";
 import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
 import { MaterialConsultButton } from "./catalogue-material-panel";
+import { RelatedDocument } from "./related-document";
+import { SupplySourcePicker, type SupplySourceSelection } from "./supply-source-picker";
 
 export const custodyName = (source: Custody) =>
   source === "FAMILY" ? "Família" : "Equipe";
-export function TransferConsole({ source }: { source?: Custody } = {}) {
+export function TransferConsole({ source, routedOriginId }: { source?: Custody; routedOriginId?: string } = {}) {
   const kind = source === "CARE_TEAM" ? "DEV" : source === "FAMILY" ? "ENT" : null;
   return (
     <Workspace title={kind ? supplyWizardCopy[kind].title : "Entregas e devoluções de materiais"}
       heading={kind ? context => <SupplyWizardHeading kind={kind} patient={context.patient!.display_name} /> : undefined}>
       {(context) =>
         context.patient && can(context, "ent.read") ? (
-          <PatientTransfers key={context.patient.id} context={context} fixedSource={source} />
+          <PatientTransfers key={[context.userId, context.patient.id, routedOriginId].join(":")}
+            context={context} fixedSource={source} routedOriginId={routedOriginId} />
         ) : (
           <Notice>Selecione um paciente com acesso às entregas.</Notice>
         )
@@ -92,7 +100,7 @@ export function TransferConsole({ source }: { source?: Custody } = {}) {
     </Workspace>
   );
 }
-function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext; fixedSource?: Custody }) {
+function PatientTransfers({ context, fixedSource, routedOriginId }: { context: WorkspaceContext; fixedSource?: Custody; routedOriginId?: string }) {
   const [source, setSource] = useState<Custody | "">(fixedSource ?? ""),
     [editing, setEditing] = useState(false),
     [consulting, setConsulting] = useState(false);
@@ -164,6 +172,7 @@ function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext;
           key={source + ":" + consulting}
           context={context}
           source={source}
+          routedOriginId={routedOriginId}
           consulting={consulting}
           onClose={endEditing}
           headingRef={headingRef}
@@ -175,12 +184,14 @@ function PatientTransfers({ context, fixedSource }: { context: WorkspaceContext;
 function TransferDeclarationEditor({
   context,
   source,
+  routedOriginId,
   consulting,
   onClose,
   headingRef,
 }: {
   context: WorkspaceContext;
   source: Custody;
+  routedOriginId?: string;
   consulting: boolean;
   onClose: () => void;
   headingRef: RefObject<HTMLHeadingElement | null>;
@@ -195,6 +206,13 @@ function TransferDeclarationEditor({
   const [counterpartyId, setCounterpartyId] = useState(""),
     [recipientId, setRecipientId] = useState(""),
     [originId, setOriginId] = useState("");
+  const [sourceSetup, setSourceSetup] = useState(emptySupplySources);
+  const [sourcePicker, setSourcePicker] = useState<{
+    product?: { id: string; name: string };
+    returnFocus: () => HTMLButtonElement | null;
+  } | null>(null);
+  const initialSourceRef = useRef<SupplySourceOption | null>(null);
+  const [routedOriginWarning, setRoutedOriginWarning] = useState(false);
   const [reason, setReason] = useState(""),
     [query, setQuery] = useState(""),
     [lines, setLines] = useState<{ productId: string; quantity: string; extra?: boolean }[]>([]);
@@ -216,6 +234,7 @@ function TransferDeclarationEditor({
     reviewHeadingRef = useRef<HTMLHeadingElement | null>(null),
     observationsHeadingRef = useRef<HTMLHeadingElement | null>(null),
     originFieldRef = useRef<HTMLSelectElement | null>(null),
+    returnOriginRef = useRef<HTMLButtonElement | null>(null),
     reasonFieldRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef(false);
   const patientId = context.patient!.id;
@@ -237,6 +256,13 @@ function TransferDeclarationEditor({
     () => emptyTransferDeclarationDraft(source),
   );
   const [referenceUnavailable, setReferenceUnavailable] = useState(true);
+  const [draftTouched, setDraftTouched] = useState(false);
+  const startFromOrigin = useCallback((option: SupplySourceOption) => {
+    const result = prepareSupplySources(emptySupplySources, [{ option, importMaterials: true }], {}, {}, []);
+    setLines(Object.entries(result.quantities).map(([productId, amount]) => ({ productId, quantity: amount })));
+    setSourceSetup(result.preparation);
+    setDraftTouched(true);
+  }, []);
   const write =
     can(context, "ent.create") &&
     can(context, source === "FAMILY" ? "stock.family.read" : "stock.team.read");
@@ -263,6 +289,8 @@ function TransferDeclarationEditor({
       setCounterpartyId(values.counterpartyId);
       setRecipientId(values.recipientId);
       setOriginId(values.originId);
+      setSourceSetup(values.sourceSetup ?? emptySupplySources);
+      setRoutedOriginWarning(false);
       setReason(values.reason);
       setObservations(values.observations ?? (values.reason ? [values.reason] : []));
       setPendingExtras(values.pendingExtras ?? []);
@@ -292,6 +320,8 @@ function TransferDeclarationEditor({
       setCounterpartyId("");
       setRecipientId("");
       setOriginId("");
+      setSourceSetup(emptySupplySources);
+      setSourcePicker(null);
       setReason("");
       setObservations([]);
       setObservationErrors({});
@@ -302,6 +332,7 @@ function TransferDeclarationEditor({
       setReviewingPending(false);
       setStep(0);
       setPacket(null);
+      if (initialSourceRef.current) startFromOrigin(initialSourceRef.current);
     },
   });
   useEffect(() => {
@@ -334,6 +365,7 @@ function TransferDeclarationEditor({
     counterpartyId,
     recipientId,
     originId,
+    sourceSetup,
     reason,
     observations,
     pendingExtras,
@@ -346,9 +378,24 @@ function TransferDeclarationEditor({
   const manualRecipient = Boolean(recipientId && recipientId !== reference?.suggested?.professionalId);
   const productsById = new Map(products.map(product => [product.id, product]));
   const activeCategory = category ?? materialCategories.find(item => item.id === productsById.get(lines[0]?.productId)?.category)?.id ?? "medicamentos";
-  const selectedIds = lines.map(line => line.productId);
+  const linesByProduct = new Map(lines.map(line => [line.productId, line]));
+  const selectedIds = [...linesByProduct.keys()];
+  const sourceIds = sourceSetup.sources.length ? sourceSetup.sources.map(link => link.documentId).join(",") : originId;
+  const sourceParams = new URLSearchParams({ careRecipientId: patientId, target: "DEV", ids: sourceIds });
+  const decodeSources = useCallback((value: unknown) => parseSupplySources(value, patientId, "DEV", 1), [patientId]);
+  const originOptions = useScopedRead(isReturn && write && sourceIds ? "/api/documents/sources?" + sourceParams : null,
+    reference?.referenceHash, decodeSources);
+  const sourceOptions = originOptions.data?.data ?? [];
+  const generalSources = sourceSetup.sources.filter(link => link.general);
+  const generalSourceOptions = sourceOptions.filter(option => option.id === originId || generalSources.some(link => link.documentId === option.id));
+  const normalizedQuery = normalizeCatalogText(query);
+  const returnProducts = isReturn && step === 1 ? products.filter(product =>
+    !linesByProduct.get(product.id)?.extra && (normalizedQuery
+      ? (linesByProduct.has(product.id) && product.category === activeCategory) ||
+        normalizeCatalogText(`${product.name} ${product.category}`).includes(normalizedQuery)
+      : product.category === activeCategory)) : [];
   const review = packet?.declaration ?? (reviewingPending ? {
-    recipientId, originDocumentId: originId, reason, observations, lines,
+    recipientId, originDocumentId: originId, reason, observations, lines, sources: sourceSetup.sources,
   } : null);
   const regularSelection = lines.flatMap(line => {
     const product = productsById.get(line.productId);
@@ -357,7 +404,48 @@ function TransferDeclarationEditor({
   const visibleLines = lines.filter(line => step === 2 ? Boolean(line.extra) : !line.extra &&
     (productsById.get(line.productId)?.category ?? "medicamentos") === activeCategory);
 
-  const [draftTouched, setDraftTouched] = useState(false);
+  function currentSourceSelection() {
+    const productId = sourcePicker?.product?.id;
+    return sourceOptions.flatMap(option => {
+      const link = sourceSetup.sources.find(row => row.documentId === option.id);
+      const chosen = productId ? link?.productIds.includes(productId) : link?.general || option.id === originId;
+      return chosen ? [{ option, importMaterials: Boolean(sourceSetup.sourceImports[option.id]?.length) }] : [];
+    });
+  }
+  function closeSourcePicker() {
+    const restore = sourcePicker?.returnFocus;
+    setSourcePicker(null);
+    if (restore) requestAnimationFrame(() => restore()?.focus({ preventScroll: true }));
+  }
+  function applyReturnSources(selections: SupplySourceSelection[], productId?: string) {
+    const previous = originId && productId
+      ? { ...sourceSetup, sources: [...sourceSetup.sources, { documentId: originId, general: true, productIds: [] }] }
+      : sourceSetup;
+    const quantities = Object.fromEntries(lines.map(line => [line.productId, line.quantity]));
+    if (productId && selections.length && !Object.hasOwn(quantities, productId)) quantities[productId] = "";
+    const result = prepareSupplySources(previous, selections, quantities, {}, [], productId);
+    setLines(Object.entries(result.quantities).map(([id, amount]) => ({
+      productId: id, quantity: amount, extra: linesByProduct.get(id)?.extra,
+    })));
+    setSourceSetup(result.preparation);
+    if (productId && selections.length) {
+      const productCategory = productsById.get(productId)?.category;
+      setCategory(materialCategories.find(entry => entry.id === productCategory)?.id ?? activeCategory);
+    }
+    setOriginId("");
+    setDraftTouched(true);
+  }
+  function setReturnMaterial(productId: string, included: boolean) {
+    if (!included) applyReturnSources([], productId);
+    else {
+      const productCategory = productsById.get(productId)?.category;
+      setCategory(materialCategories.find(entry => entry.id === productCategory)?.id ?? activeCategory);
+    }
+    setLines(previous => included
+      ? [...previous, { productId, quantity: "" }]
+      : previous.filter(line => line.productId !== productId));
+    setDraftTouched(true);
+  }
   useLongDraftAutosave(privateDraft, currentContent, write && draftTouched && !(busy || uncertain || !!packet));
   useEffect(() => {
     if (recoveryOnly) return;
@@ -381,7 +469,22 @@ function TransferDeclarationEditor({
           if (catalogue.data.length) throw new Error("A referência de materiais mudou durante a abertura.");
           setEmptyCatalogueTotal(catalogue.total);
         } else setEmptyCatalogueTotal(null);
+        if (!loadedRef.current && isReturn && routedOriginId) {
+          try {
+            const params = new URLSearchParams({ careRecipientId: patientId, target: "DEV", ids: routedOriginId });
+            const payload = await api<unknown>("/api/documents/sources?" + params, undefined, controller.signal);
+            if (controller.signal.aborted) return;
+            const option = parseSupplySources(payload, patientId, "DEV", 1).data.find(row => row.id === routedOriginId);
+            initialSourceRef.current = option
+              ? { ...option, materials: option.materials.filter(row => current.products.some(item => item.id === row.productId)) }
+              : null;
+          } catch {
+            if (controller.signal.aborted) return;
+          }
+        }
         if (!loadedRef.current && !restoredRef.current) {
+          if (initialSourceRef.current) startFromOrigin(initialSourceRef.current);
+          else if (routedOriginId) setRoutedOriginWarning(true);
           setReference(current);
           setRecipientId((previous) => previous || current.suggested?.professionalId || "");
           setBaseline((old) => adoptTransferDeclarationReference(old, current));
@@ -412,7 +515,7 @@ function TransferDeclarationEditor({
         if (!controller.signal.aborted) setRefreshing(false);
       });
     return () => controller.abort();
-  }, [patientId, source, context.userId, attempt, recoveryOnly]);
+  }, [patientId, source, context.userId, attempt, recoveryOnly, isReturn, routedOriginId, startFromOrigin]);
   useEffect(() => {
     if (packet || result || reviewingPending) reviewHeadingRef.current?.focus();
   }, [packet, result, reviewingPending]);
@@ -421,7 +524,7 @@ function TransferDeclarationEditor({
     if (
       !result &&
       !recoveryOnly &&
-      (reason || observations.length || lines.length || pendingExtras.length || counterpartyId || recipientId)
+      (reason || observations.length || lines.length || pendingExtras.length || counterpartyId || recipientId || sourceIds)
     )
       setDiscard(true);
     else onClose();
@@ -483,7 +586,7 @@ function TransferDeclarationEditor({
         "A ENT de origem não corresponde a todos os materiais. Revise o vínculo conhecido ou escolha sem vínculo.",
       );
       setStep(0);
-      requestAnimationFrame(() => originFieldRef.current?.focus());
+      requestAnimationFrame(() => (returnOriginRef.current ?? originFieldRef.current)?.focus());
       return;
     }
     if (manualRecipient && reason.trim().length < 3) {
@@ -512,6 +615,7 @@ function TransferDeclarationEditor({
         mode: "direct",
         recipientId,
         originDocumentId: originId || null,
+        ...(sourceSetup.sources.length ? { sources: sourceSetup.sources } : {}),
         referenceHash: reference.referenceHash,
         reason: reason.trim(),
         observations: observations.map(note => note.trim()),
@@ -700,7 +804,9 @@ function TransferDeclarationEditor({
           "Escolha indisponível"}
         .
       </p>
-      <p>
+      {sourceSetup.sources.length ? <p>Fichas vinculadas: {sourceOptions.length
+        ? sourceOptions.map(option => option.code).join(" · ")
+        : "Vínculos preservados no rascunho"}</p> : <p>
         Origem documental:{" "}
         {currentContent.fields.originLabel || "Sem vínculo informado"} →{" "}
         {originId
@@ -708,7 +814,7 @@ function TransferDeclarationEditor({
               ?.code ?? "Vínculo fora da seleção atual ou indisponível")
           : "Sem vínculo informado"}
         .
-      </p>
+      </p>}
       {currentContent.materials.map((material) => {
         const current = comparison.products.find(
           (product) => product.id === material.id,
@@ -1017,6 +1123,31 @@ function TransferDeclarationEditor({
                   <TextAreaField ref={reasonFieldRef} rows={2} required={manualRecipient} minLength={3} maxLength={1000}
                     value={reason} onChange={event => setReason(event.currentTarget.value)} />
                 </FormField> : null}
+                {isReturn ? <section className="hca-form-stack" aria-label="Fichas vinculadas">
+                  <h3>Fichas vinculadas</h3>
+                  <div className="hca-source-summary">
+                    <span className="hca-source-symbol"><Icon name="link" /></span>
+                    <div>
+                      <strong>{generalSourceOptions.length ? generalSourceOptions.map(option => option.code).join(" · ")
+                        : originId || generalSources.length ? "Origens vinculadas"
+                        : sourceSetup.sources.length ? "Vínculos por material" : "Ficha independente"}</strong>
+                      <small>{Object.values(sourceSetup.sourceImports).some(ids => ids.length)
+                        ? "Materiais elegíveis trazidos das fichas de origem."
+                        : originId || generalSources.length ? "Vínculo geral, sem importar materiais."
+                        : "Vincule uma origem se ela fizer parte deste registro."}</small>
+                    </div>
+                    <ActionButton ref={returnOriginRef} compact variant="quiet"
+                      onClick={() => setSourcePicker({ returnFocus: () => returnOriginRef.current })} disabled={originOptions.loading}>
+                      <Icon name={originId || generalSources.length ? "edit" : "link"} />
+                      {originId || generalSources.length ? "Alterar" : "Vincular"}
+                    </ActionButton>
+                  </div>
+                  {!originOptions.loading && sourceIds && sourceOptions.length < sourceIds.split(",").length
+                    ? <p className="hca-field-help">Uma origem está indisponível. Confira a seleção antes de expedir.</p> : null}
+                  {routedOriginWarning && !sourceIds ? <p className="hca-field-help">
+                    A entrega de origem está indisponível. Você pode vincular outra entrega ou prosseguir com uma devolução independente.
+                  </p> : null}
+                </section> : <>
                 <FormField label="ENT documental de origem, quando conhecida">
                   <SelectField
                     ref={originFieldRef}
@@ -1056,12 +1187,10 @@ function TransferDeclarationEditor({
                   </SelectField>
                 </FormField>
                 <p className="text-sm">
-                  O vínculo é opcional: uma devolução não exige entrega de origem.
-                  {" "}A seleção contém até 100 ENT recentes com aceite na custódia
-                  de origem ({reference!.originTotal} no total). O vínculo
-                  documenta a origem conhecida; não identifica lotes ou presume
-                  disponibilidade dessas unidades.
+                  O vínculo identifica a origem documental conhecida. Até 100 fichas recentes
+                  com aceite nesta custódia ({reference!.originTotal} no total).
                 </p>
+                </>}
                 {!isReturn ? (
                   <HouseholdListSelection ref={householdSelectionRef}
                     key={context.userId + ":" + patientId}
@@ -1082,12 +1211,66 @@ function TransferDeclarationEditor({
                 ) : null}
                 </> : null}
                 {step === 1 || step === 2 ? <>
-                <h3>{step === 2 ? "Itens extras" : supplyWizardStages[step]}</h3>
+                <h3>{step === 2 ? "Itens extras" : isReturn ? "Selecione o que será devolvido" : supplyWizardStages[step]}</h3>
+                {isReturn && step === 1 ? <p className="hca-field-help">
+                  A devolução leva materiais do estoque da equipe de volta à família.
+                </p> : null}
                 {step === 1 ? <WizardMaterialCategories category={activeCategory} selected={regularSelection} onChange={next => { setCategory(next); setQuery(""); }} /> : null}
                 <SupplyExtraItems items={pendingExtras} inExtras={step === 2}
                   catalogue={products.map(({ id, name, unit }) => ({ id, name, unit }))} selected={new Set(selectedIds)}
                   onChange={items => { setPendingExtras(items); setDraftTouched(true); }} onChoose={addExtra} />
-                {step === 1 ? (
+                {isReturn && step === 1 ? <FormField label="Buscar material">
+                  <TextInput type="search" value={query} onChange={event => setQuery(event.currentTarget.value)}
+                    placeholder="Nome do material" />
+                </FormField> : null}
+                {isReturn && step === 1 ? <div className="space-y-3">
+                  {returnProducts.map(product => {
+                    const line = linesByProduct.get(product.id);
+                    const available = quantity(product.available).gt(0);
+                    const materialSources = sourceOptions.filter(option => sourceSetup.sources.some(link =>
+                      link.documentId === option.id && link.productIds.includes(product.id)));
+                    return <MaterialChoice key={product.id} selected={!!line} quantity className="hca-wizard-material hca-wizard-transfer-line">
+                      <div className="hca-wizard-material-head">
+                        <label className="hca-material-choice-heading">
+                          <input type="checkbox" role="switch" className="hca-wizard-include-switch" aria-label={"Incluir " + product.name}
+                            checked={!!line} disabled={!line && !available}
+                            onChange={event => setReturnMaterial(product.id, event.currentTarget.checked)} />
+                          <span className="hca-wizard-material-icon"><Icon name={materialCategories.find(entry => entry.id === product.category)?.icon ?? "box"} /></span>
+                          <span className="hca-material-choice-copy">
+                            <strong>{product.name}</strong>
+                            <small>{product.unit}{!product.active ? " · Inativo" : ""}</small>
+                          </span>
+                        </label>
+                        <MaterialConsultButton context={context} material={product} menu
+                          onLink={(line || available) && !originOptions.loading ? returnFocus => setSourcePicker({ product, returnFocus }) : undefined} />
+                      </div>
+                      {materialSources.map(option => {
+                        const amount = option.materials.find(item => item.productId === product.id)?.available;
+                        return <div className="hca-wizard-return-source" key={option.id}>
+                          <RelatedDocument id={option.id} type="ENT" label={option.code} compact />
+                          <time dateTime={option.createdAt}>{formatBrazilDate(option.createdAt)}</time>
+                          {amount ? <><span>Disponível para devolução</span><strong>{formatQuantity(amount, product.unit)}</strong></> : null}
+                        </div>;
+                      })}
+                      <p className="hca-wizard-material-balance col-span-full">
+                        Estoque atual da equipe: {formatQuantity(product.available, product.unit)}.
+                      </p>
+                      {line ? <FormField label={"Quantidade de " + product.name} required>
+                        <TextInput required inputMode="decimal" value={line.quantity} onChange={event => {
+                          const amount = event.currentTarget.value;
+                          setLines(previous => previous.map(row => row.productId === product.id ? { ...row, quantity: amount } : row));
+                          setSourceSetup(previous => {
+                            const seeds = { ...previous.sourceSeeds };
+                            delete seeds[product.id];
+                            return { ...previous, sourceSeeds: seeds };
+                          });
+                        }} />
+                      </FormField> : null}
+                    </MaterialChoice>;
+                  })}
+                  {!returnProducts.length ? <p role="status">Nenhum material neste filtro.</p> : null}
+                </div> : null}
+                {!isReturn && step === 1 ? (
                 <FormField label="Adicionar material da origem">
                   <SearchSelect
                     query={query}
@@ -1131,11 +1314,12 @@ function TransferDeclarationEditor({
                 </FormField>
                 ) : null}
                 {visibleLines.length === 0 ? (
+                  isReturn && step === 1 ? null :
                   step === 2 && pendingExtras.length ? null : <p>
                     {step === 2 ? "Nenhum item extra incluído." : "Nenhum material selecionado. Informe as quantidades na unidade base."}
                   </p>
                 ) : (
-                  visibleLines.map((line) => {
+                  visibleLines.filter(line => !isReturn || step !== 1 || !productsById.has(line.productId)).map((line) => {
                     const product = reference!.products.find(
                       (p) => p.id === line.productId,
                     );
@@ -1148,7 +1332,8 @@ function TransferDeclarationEditor({
                       >
                         <div className="hca-wizard-material-head">
                           <div className="hca-material-choice-copy"><strong>{name}</strong>{product?.unit ? <small>{product.unit}</small> : null}</div>
-                          {product ? <MaterialConsultButton context={context} material={product} menu /> : null}
+                          {product ? <MaterialConsultButton context={context} material={product} menu
+                            onLink={isReturn && !originOptions.loading ? returnFocus => setSourcePicker({ product, returnFocus }) : undefined} /> : null}
                         </div>
                         <p>
                           {product?.active === false
@@ -1189,13 +1374,8 @@ function TransferDeclarationEditor({
                           />
                         </FormField>
                         <ActionButton
-                          onClick={() =>
-                            setLines((previous) =>
-                              previous.filter(
-                                (row) => row.productId !== line.productId,
-                              ),
-                            )
-                          }
+                          onClick={() => isReturn ? setReturnMaterial(line.productId, false)
+                            : setLines(previous => previous.filter(row => row.productId !== line.productId))}
                         >
                           Remover{" "}
                           {product?.name ??
@@ -1266,13 +1446,23 @@ function TransferDeclarationEditor({
                 <h4>Itens extras pendentes</h4>
                 <MaterialReview rows={pendingExtras.map(pendingExtraReviewRow)} />
               </section> : null}
-              <p>
+              {review.sources?.length ? <section className="hca-document-summary" aria-label="Fichas vinculadas">
+                <h3>Fichas vinculadas</h3>
+                {review.sources.map(link => {
+                  const option = sourceOptions.find(item => item.id === link.documentId);
+                  return <div key={link.documentId}>
+                    {option ? <RelatedDocument id={option.id} type="ENT" label={option.code} compact /> : <p>Origem indisponível para consulta</p>}
+                    {link.general ? <small>Vínculo geral</small> : null}
+                    {link.productIds.length ? <small>{link.productIds.map(id => productsById.get(id)?.name ?? "Material selecionado").join(", ")}</small> : null}
+                  </div>;
+                })}
+              </section> : <p>
                 Origem documental:{" "}
                 {reference?.origins.find(
                   (origin) => origin.id === review.originDocumentId,
                 )?.code ?? "Sem vínculo informado"}
                 .
-              </p>
+              </p>}
               {review.reason ? <p className="whitespace-pre-wrap">
                 {review.observations ? "Justificativa da escolha do recebedor" : "Sua justificativa"}: {review.reason}
               </p> : null}
@@ -1316,6 +1506,17 @@ function TransferDeclarationEditor({
         </div>
       )}
       </div>
+      {sourcePicker ? <SupplySourcePicker patientId={patientId} target="DEV" current={currentSourceSelection()}
+        product={sourcePicker.product} onClose={closeSourcePicker}
+        onApply={selection => {
+          const productId = sourcePicker.product?.id;
+          const previousIds = sourceSetup.sources.filter(link => productId && link.productIds.includes(productId))
+            .map(link => link.documentId);
+          const unchanged = productId && previousIds.length === selection.length &&
+            selection.every(row => previousIds.includes(row.option.id));
+          if (!unchanged) applyReturnSources(selection, productId);
+          closeSourcePicker();
+        }} /> : null}
       <DocumentIssuanceFailure state={issuanceFailure} operation={isReturn ? "Expedição de devolução" : "Expedição de entrega"} onRetry={submit} />
     </section>
   );

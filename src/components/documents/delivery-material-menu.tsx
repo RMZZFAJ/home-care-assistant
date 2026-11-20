@@ -30,6 +30,9 @@ export function DeliveryMaterialMenu({ data, line, disabled }: {
         ]} />
         <RelatedDocument id={data.id} type="ENT" label={data.kind === "DEV" ? "Ver devolução" : "Ver entrega"} compact />
         {data.transfer?.originDocumentId ? <RelatedDocument id={data.transfer.originDocumentId} type="ENT" label="Abrir entrega de origem" compact /> : null}
+        {data.originDocuments?.filter(origin => origin.productIds.includes(line.product_id)).map(origin => (
+          <RelatedDocument key={origin.documentId} id={origin.documentId} type={origin.type} label={origin.code} compact />
+        ))}
         {data.linkedRequisitions?.filter(req => req.itemIds.some(id => line.requisitionItemIds.includes(id))).map(req => (
           <RelatedDocument key={req.id} id={req.id} label={"Ver requisição " + req.code} compact />
         ))}

@@ -1,6 +1,7 @@
 import type { Custody } from "@/types/documents";
 import type { TransferPreparation } from "@/types/transfers";
 import type { TransferDeclarationDraftContent } from "@/lib/validation/supply-drafts";
+import type { SupplySourcePreparation } from "./supply-source-preparation";
 export const transferDeclarationPurpose = (
   source: Custody,
 ): "transfer_declare_family" | "transfer_declare_team" =>
@@ -12,6 +13,7 @@ export type TransferDeclarationValues = {
   reason: string;
   observations?: string[];
   pendingExtras?: TransferDeclarationDraftContent["pendingExtras"];
+  sourceSetup?: SupplySourcePreparation;
   query: string;
   category?: string;
   lines: { productId: string; quantity: string; extra?: boolean }[];
@@ -48,6 +50,7 @@ export function transferDeclarationValues(
     reason: content.fields.reason ?? "",
     observations: content.observations,
     pendingExtras: content.pendingExtras,
+    sourceSetup: { sources: content.sources ?? [], sourceImports: content.sourceImports ?? {}, sourceSeeds: content.sourceSeeds ?? {} },
     query: content.fields.query ?? "",
     ...(content.fields.category ? { category: content.fields.category } : {}),
     step: /^[0-3]$/.test(content.fields.wizardStep ?? "") ? Number(content.fields.wizardStep) : 0,
@@ -91,6 +94,7 @@ export function transferDeclarationDraftContent(
     materials,
     ...(values.observations ? { observations: values.observations } : {}),
     ...(values.pendingExtras?.length ? { pendingExtras: values.pendingExtras } : {}),
+    ...(values.sourceSetup?.sources.length ? values.sourceSetup : {}),
     fields: {
       source: baseline.fields.source,
       referenceHash: baseline.fields.referenceHash ?? "",
