@@ -604,6 +604,16 @@ após a janela de 15 segundos do teste. Os prazos da verificação foram
 ajustados nas operações que incluem abertura e assinatura da ficha. O
 reteste da escolha no catálogo passou até o download do PDF assinado.
 
+O diálogo compartilhado de retomada segue a composição de E04-06. Exibe
+paciente, autor, data, etapa, lista compacta com ícone e quantidade e ações
+lado a lado a 360 e 412 px. No BAL, a lista inclui as contagens zero. O
+rascunho mantém os nomes e as unidades que foram salvos. Seu resumo usa
+essas informações, enquanto o laboratório também apresenta códigos de exemplo.
+Na REQ, a resposta perdida durante a liberação do rascunho já emitido foi
+recuperada com a mesma chave. O teste verificou a abertura de um novo
+preenchimento sem diálogo do resultado anterior e uma única emissão oficial.
+No BAL, o descarte privado preservou uma tentativa de contagem separada.
+
 **Composição da aba Materiais.** REQ, COM, ENT, DEV e BAL usam o mesmo
 cabeçalho, filtro, lista compacta e painel do material. Cada ficha mostra
 as medidas do seu processo. Na linha compacta do BAL ficam a contagem

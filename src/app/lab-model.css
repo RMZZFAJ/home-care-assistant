@@ -1356,6 +1356,13 @@
 .hca-l1 .hca-wizard-dialog .hca-modal-kicker { text-transform: uppercase; letter-spacing: .08em; }
 .hca-l1 .hca-wizard-dialog > .hca-modal-head > button { background: transparent; border-color: transparent; color: #52685e; }
 .hca-l1 .hca-wizard-dialog > .hca-modal-footer { background: #fcfdfb; }
+.hca-l1 .hca-draft-dialog > .hca-modal-footer { flex-wrap: nowrap; }
+.hca-l1 .hca-draft-dialog > .hca-modal-footer > button { flex: 1 1 0; min-width: 0; white-space: normal; }
+.hca-draft-materials h3 { font-size: 14px; font-weight: 650; }
+.hca-draft-materials .hca-material-review { margin-block-start: 10px; }
+.hca-draft-materials .hca-material-review > li { gap: 10px; }
+.hca-draft-materials .hca-material-review strong { font-size: 12px; }
+.hca-draft-material-value { max-width: 45%; text-align: end; overflow-wrap: anywhere; }
 .hca-supply-wizard-card > .hca-five-stage-navigation,
 .hca-transfer-wizard .hca-five-stage-navigation { margin-block-end: 0; border-radius: 13px 13px 0 0; }
 

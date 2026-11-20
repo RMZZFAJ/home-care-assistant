@@ -265,16 +265,28 @@ test("BAL scheduled count stores the packet before an operational POST and refus
 
 test("BAL scheduled private discard preserves a different operational attempt on this device", async ({
   page,
-}) => {
+}, info) => {
   const f = await balanceSetup();
   await open(page, f);
   await fill(page, f);
-  await button(page, "Salvar rascunho").click();
   await expect(
     lastDraftPanel(page),
   ).toHaveText("Último rascunho salvo.");
   await page.reload();
-  await expect(page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true })).toBeVisible();
+  const resume = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
+  await expect(resume).toBeVisible();
+  await expect(resume.getByRole("heading", { name: `Materiais preenchidos · ${f.products.length}`, exact: true })).toBeVisible();
+  const firstCount = resume.getByRole("listitem").filter({ has: page.getByText("Material fictício V4 0", { exact: true }) });
+  await expect(firstCount.getByText("0 unidade", { exact: true })).toBeVisible();
+  const discard = resume.getByRole("button", { name: "Descartar e começar novamente", exact: true });
+  const continueDraft = resume.getByRole("button", { name: "Continuar rascunho", exact: true });
+  const originalViewport = page.viewportSize();
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect.poll(async () => Math.abs((await discard.boundingBox())!.y - (await continueDraft.boundingBox())!.y)).toBeLessThan(1);
+    await info.attach(`Retomada do BAL em ${width} px`, { body: await resume.screenshot(), contentType: "image/png" });
+  }
+  if (originalViewport) await page.setViewportSize(originalViewport);
   const key = ownKey(f),
     saved = JSON.parse(
       (await page.evaluate((k) => sessionStorage.getItem(k), key))!,
@@ -312,7 +324,7 @@ test("BAL scheduled private discard preserves a different operational attempt on
     if (new URL(r.url()).pathname === "/api/documents" && r.method() === "POST")
       writes++;
   });
-  await button(page, "Descartar e começar novamente").click();
+  await discard.click();
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
     "descarte privado não a apagou",
   );

@@ -1517,6 +1517,7 @@ export function PatientSupplyWizard({
           statusInFooter={!loadError && !loading}
           resumeHref={resumeHref}
           patientName={context.patient!.display_name}
+          authorName={context.fullName}
           disabled={busy || uncertain || loading}
         />
       ) : null}

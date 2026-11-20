@@ -225,9 +225,21 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
     .toEqual({ product: null, category: "higiene", unit: "tubo", details });
   expect(sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${q(f.patient)}`)).toBe(before);
   expect(sql(`select o.body from public.requisition_observations o join public.requisitions r on r.id=o.requisition_id where r.care_recipient_id=${q(f.patient)}`)).toBe("x".repeat(1000));
+  const acknowledgementKeys: string[] = [];
+  await page.route("**/api/drafts", async route => {
+    const request = route.request();
+    if (request.method() !== "POST" || request.postDataJSON().action !== "acknowledge") return route.fallback();
+    acknowledgementKeys.push(request.postDataJSON().idempotencyKey);
+    if (acknowledgementKeys.length > 1) return route.continue();
+    const response = await route.fetch();
+    expect(response.ok()).toBe(true);
+    await route.abort("failed");
+  });
   await page.goto("/fichas/req");
   await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toBeEnabled();
   await expect(page.getByRole("dialog", { name: "Resultado anterior confirmado", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true })).toHaveCount(0);
+  expect(acknowledgementKeys).toEqual([expect.any(String), acknowledgementKeys[0]]);
   expect(commands).toBe(1);
 });
 

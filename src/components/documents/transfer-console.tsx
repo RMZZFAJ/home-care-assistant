@@ -826,6 +826,7 @@ function TransferDeclarationEditor({
       current={currentContent}
       statusInFooter={write && (!!reference && !referenceUnavailable || !!packet)}
       patientName={context.patient?.display_name ?? "Paciente selecionado"}
+      authorName={context.fullName}
       disabled={busy || uncertain || !!packet}
       resumeLabel={recoveryOnly ? "Consultar preenchimento salvo" : undefined}
       discardLabel={

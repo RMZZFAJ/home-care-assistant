@@ -23,6 +23,7 @@ import type {
 
 type Packet = Record<string, unknown> & {
   action: "save" | "discard" | "acknowledge";
+  idempotencyKey: string;
   content?: CreationDraftContent;
   navigation?: DraftNavigation;
 };

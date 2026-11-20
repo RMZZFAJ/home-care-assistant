@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
-import { MaterialReview } from "@/components/documents/material-review";
+import { Notice } from "@/components/workspace";
 import { navigationLabel } from "@/lib/forms/draft-navigation";
 import { formatBrazilDate } from "@/lib/receipt";
 import type { CreationDraft } from "@/types/creation-drafts";
@@ -22,47 +22,89 @@ function DraftMaterials({ draft }: { draft: CreationDraft }) {
   const content = draft.content;
   if (!content) return null;
   const quantity = (value: string | undefined, unit: string) => value ? `${value} ${unit}` : "Quantidade pendente";
-  const listed = "lines" in content ? [
-    ...content.lines.map(line => ({ id: line.productId, name: line.productName, urgent: line.urgent,
-      details: <small>{draftStockText(line.currentStock, line.stockObservation, line.unit)}</small> })),
-    ...content.extraItems.map(line => ({ id: line.id, name: line.name, urgent: line.urgent,
-      details: <small>{draftStockText(line.currentStock, line.stockObservation, line.identification?.unit)}</small> })),
-  ] : "form" in content ? content.materials
-    .filter(material => Object.hasOwn(content.form.quantities, material.id))
-    .map(material => ({ id: material.id, name: material.name,
-      details: <small>{quantity(content.form.quantities[material.id], material.unit)}</small> }))
-    : "fields" in content ? content.materials.map(material => ({ id: material.id, name: material.name,
-      details: <small>{quantity(content.fields[material.id + ":transferQuantity"], material.unit)}</small> })) : [];
+  let listed: { id: string; name: string; details: string; urgent?: boolean }[] = [];
+  if ("lines" in content) {
+    listed = [
+      ...content.lines.map(line => ({ id: line.productId, name: line.productName, urgent: line.urgent,
+        details: draftStockText(line.currentStock, line.stockObservation, line.unit) })),
+      ...content.extraItems.map(line => ({ id: line.id, name: line.name, urgent: line.urgent,
+        details: draftStockText(line.currentStock, line.stockObservation, line.identification?.unit) })),
+    ];
+  } else if ("form" in content) {
+    listed = content.materials.filter(material => Object.hasOwn(content.form.quantities, material.id))
+      .map(material => ({ id: material.id, name: material.name,
+        details: quantity(content.form.quantities[material.id], material.unit) }));
+  } else if ("counts" in content) {
+    const linked = new Set(content.materialReferences?.map(link => link.productId));
+    listed = content.materials.filter(material => content.counts[material.id] || linked.has(material.id))
+      .map(material => ({ id: material.id, name: material.name,
+        details: quantity(content.counts[material.id], material.unit) }));
+  } else if ("fields" in content) {
+    listed = content.materials.map(material => ({ id: material.id, name: material.name,
+      details: quantity(content.fields[material.id + ":transferQuantity"], material.unit) }));
+  }
   const extras = "form" in content ? content.form.pendingExtras : "pendingExtras" in content ? content.pendingExtras : [];
-  const rows = [...listed, ...(extras ?? []).map(item => ({ id: item.id, name: item.name,
-    details: <small>{quantity(item.quantity, item.unit)} · Cadastro pendente</small> }))];
-  return <section>
-    <h3>Materiais preenchidos · {rows.length}</h3>
-    {rows.length ? <MaterialReview rows={rows} /> : <p className="hca-field-help">Nenhum material incluído.</p>}
+  for (const item of extras ?? []) {
+    listed.push({ id: item.id, name: item.name, details: `${quantity(item.quantity, item.unit)} · Cadastro pendente` });
+  }
+  return <section className="hca-draft-materials">
+    <h3>Materiais preenchidos · {listed.length}</h3>
+    {listed.length ? <ul className="hca-material-review">
+      {listed.map(row => <li key={row.id}>
+        <span className="hca-wizard-material-icon"><Icon name="box" /></span>
+        <div className="hca-material-review-main">
+          <strong>{row.name}</strong>
+          {row.urgent ? <span className="ui-badge ui-badge-danger">Urgente</span> : null}
+        </div>
+        <strong className="hca-draft-material-value">{row.details}</strong>
+      </li>)}
+    </ul> : <p className="hca-field-help">Nenhum material incluído.</p>}
   </section>;
 }
 
 /** One resume choice; exceptional concurrency/recovery retains its real controls. */
-export function SimpleDraftPanel({ statusInFooter = false, ...props }: ComponentProps<typeof CreationDraftPanel> & { statusInFooter?: boolean }) {
+export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você", ...props }: ComponentProps<typeof CreationDraftPanel> & {
+  statusInFooter?: boolean;
+  authorName?: string;
+}) {
   const { draft, disabled = false, canResume = true, patientName } = props;
-  const { acknowledge, consumed } = draft;
+  const { acknowledge, consumed, recover } = draft;
   const wizard = draft.kind !== "PROGRESS";
   const acknowledgedRef = useRef<string | null>(null);
+  const retriedRef = useRef<string | null>(null);
   const completed = wizard && consumed ? `${consumed.id}:${consumed.revision}` : null;
-  const canAcknowledge = draft.active && !disabled && !draft.loading && !draft.busy && !draft.backgroundBusy && !draft.pending &&
-    !draft.error && !draft.loadError && !draft.conflict && !draft.readDenied && !draft.protectedReadPending;
+  const pendingAcknowledgement = wizard && draft.pending?.action === "acknowledge" ? draft.pending.idempotencyKey : null;
+  const canFinishAcknowledgement = draft.active && !disabled && !draft.loading && !draft.busy && !draft.backgroundBusy &&
+    !draft.loadError && !draft.conflict && !draft.readDenied && !draft.protectedReadPending;
   useEffect(() => {
-    if (!completed || !canAcknowledge || acknowledgedRef.current === completed) return;
+    if (!canFinishAcknowledgement) return;
+    if (pendingAcknowledgement && retriedRef.current !== pendingAcknowledgement) {
+      retriedRef.current = pendingAcknowledgement;
+      void recover();
+      return;
+    }
+    if (!completed || draft.pending || draft.error || acknowledgedRef.current === completed) return;
     acknowledgedRef.current = completed;
     void acknowledge();
-  }, [acknowledge, canAcknowledge, completed]);
+  }, [acknowledge, canFinishAcknowledgement, completed, draft.error, draft.pending, pendingAcknowledgement, recover]);
 
   if (!draft.active) return null;
   if (wizard && draft.busy && draft.pending?.action === "save" && !draft.error && !draft.conflict) return null;
-  if (wizard && draft.busy && draft.pending?.action === "acknowledge" && !draft.error && !draft.conflict) return null;
+  if ((completed || pendingAcknowledgement) && !draft.readDenied && !draft.loadError && !draft.conflict) {
+    if (draft.loading || draft.busy || draft.protectedReadPending || !draft.error) return null;
+    return <Notice error>
+      Não foi possível preparar um novo preenchimento.
+      <ActionButton disabled={disabled} onClick={() => {
+        if (pendingAcknowledgement) void recover();
+        else {
+          acknowledgedRef.current = null;
+          draft.reload();
+        }
+      }}>Tentar novamente</ActionButton>
+    </Notice>;
+  }
   if (draft.readDenied || draft.protectedReadPending || draft.loadError || draft.error || draft.pending || draft.conflict || draft.kind === "PROGRESS" && draft.consumed)
     return <CreationDraftPanel {...props} />;
-  if (completed) return null;
   const offered = draft.offered;
   if (offered?.state === "active") {
     const resume = props.resumeHref ? <Link className="hca-control" href={props.resumeHref}>Continuar rascunho</Link>
@@ -72,13 +114,13 @@ export function SimpleDraftPanel({ statusInFooter = false, ...props }: Component
     const discard = <ActionButton disabled={draft.busy || disabled} onClick={() => void draft.discard()}>
       {wizard ? <Icon name="trash" /> : null}{props.discardLabel ?? "Descartar e começar novamente"}
     </ActionButton>;
-    if (wizard) return <Dialog open title="Continuar seu rascunho?" kicker="Rascunho da ficha" popupClassName="hca-wizard-dialog"
+    if (wizard) return <Dialog open title="Continuar seu rascunho?" kicker="Rascunho da ficha" popupClassName="hca-wizard-dialog hca-draft-dialog"
       subtitle="Você tem um preenchimento salvo para este paciente." closeDisabled onClose={() => {}}
       keyboardScrollable footer={<>{discard}{resume}</>}>
       <div className="hca-form-stack">
         <DefinitionGrid items={[
           { label: "Paciente", value: patientName },
-          { label: "Preenchido por", value: "Você" },
+          { label: "Preenchido por", value: authorName },
           { label: "Última gravação", value: formatBrazilDate(offered.savedAt) },
           { label: "Etapa salva", value: navigationLabel(offered.navigation) },
         ]} />

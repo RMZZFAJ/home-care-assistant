@@ -695,6 +695,7 @@ function PatientRequisition({
         current={draftContent}
         statusInFooter
         patientName={context.patient!.display_name}
+        authorName={context.fullName}
         resumeHref={resumeHref}
         disabled={saving || uncertain || loadingCatalog}
       /> : null}
