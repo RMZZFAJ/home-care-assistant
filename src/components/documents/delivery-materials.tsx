@@ -14,8 +14,9 @@ export function DeliveryMaterials({ data, active }: { data: SupplyDocument; acti
   return <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
     revision={String(data.version)} active={active} label="Materiais da entrega ou transferência" settledLabel="Conferidos"
     today={familyDestination ? { location: "family", label: "Família hoje" } : { location: "team", label: "Equipe hoje" }}
-    heading={<><h2>Produtos e quantidades</h2><p>{declarationOnly ? "Materiais declarados para expedição." : "Expedição, aceite pessoal e conciliação têm registros próprios."}</p>
-      {notes ? <><strong>Observação do recebedor</strong><p className="whitespace-pre-wrap">{notes}</p></> : null}</>}
+    heading={<><h2>Materiais</h2><p>{declarationOnly ? "Materiais declarados para expedição."
+      : familyDestination ? "Do estoque da equipe ao recebimento pela família." : "Expedição, trânsito e recebimento pela equipe."}</p>
+      {notes ? <p className="whitespace-pre-wrap"><strong>Observação do recebedor</strong><br />{notes}</p> : null}</>}
     rows={data.lines.map(line => {
       const receipt = readCountedDeliveryReceipt(line.metadata);
       const cancelled = data.status === "cancelled";

@@ -23,7 +23,7 @@ import {
   documentIssuerName,
 } from "@/lib/documents/presentation";
 import { documentVariant } from "@/lib/documents/variant";
-import { SupplyLineSummary } from "./supply-line-summary";
+import { IssuedBalanceMaterials } from "@/components/balances/balance-materials";
 import { PurchaseMaterials } from "./purchase-materials";
 import { PurchaseExtraResolution } from "./purchase-extra-resolution";
 import { DeliveryMaterials } from "./delivery-materials";
@@ -1331,7 +1331,7 @@ export function SupplyDocumentContent({
                   key={origin.documentId} id={origin.documentId} type={origin.type} label={origin.code} />)}
               </section> : null}
               {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} readOnly={archived} onReviewed={() => setAttempt(value => value + 1)} /> : null}
-              <section className={data.type === "BAL" ? "ui-card" : "hca-materials-section"}>
+              <section className="hca-materials-section">
                 {data.type === "COM" ? <>
                   <PurchaseExtraResolution key={data.id} data={data}
                     mayIdentify={Boolean(activeContext && !archived &&
@@ -1345,25 +1345,8 @@ export function SupplyDocumentContent({
                     }} />
                   {data.lines.length || !purchaseIdentificationPending
                     ? <PurchaseMaterials data={data} active={tabs.value === "materials"} /> : null}
-                </> : data.type === "ENT" ? <DeliveryMaterials data={data} active={tabs.value === "materials"} /> : <>
-                  <h2 className="font-semibold">Produtos e quantidades</h2>
-                  <div className="mt-4 space-y-3">
-                    {data.lines.map((line) => (
-                      <SupplyLineSummary
-                        key={line.id}
-                        line={line}
-                        type={data.type}
-                        status={data.status}
-                        declarationOnly={Boolean(
-                          data.transfer && data.transfer.state !== "dispatched",
-                        )}
-                        purchaseLine={data.purchaseProgress?.lines.find(
-                          (item) => item.lineId === line.id,
-                        )}
-                      />
-                    ))}{" "}
-                  </div>
-                </>}
+                </> : data.type === "ENT" ? <DeliveryMaterials data={data} active={tabs.value === "materials"} />
+                  : <IssuedBalanceMaterials data={data} active={tabs.value === "materials"} />}
                 {data.payload.notes ? (
                   <p className="mt-4 whitespace-pre-wrap text-sm">
                     {data.payload.notes}

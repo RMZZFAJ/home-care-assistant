@@ -102,7 +102,8 @@ export function DocumentMaterialList({
   }
 
   const filterTitles = { all: "Todos", urgent: "Urgentes", pending: "Pendentes", done: settledLabel, routine: "Rotina" };
-  const matching = rows.filter(row => normalizeCatalogText(row.name).includes(normalizeCatalogText(search)));
+  const query = normalizeCatalogText(search);
+  const matching = rows.filter(row => normalizeCatalogText(row.name).includes(query));
   function matches(row: DocumentMaterialRow, value: Filter) {
     switch (value) {
       case "urgent": return Boolean(row.urgent);
@@ -115,8 +116,8 @@ export function DocumentMaterialList({
   const visible = matching.filter(row => matches(row, filter));
   const count = (value: Filter) => matching.filter(row => matches(row, value)).length;
   return <div className="doc-area hca-document-materials">
-    <header className="doc-section-heading"><div>{heading}</div><span className="doc-chip">{rows.length} itens</span></header>
     <section className="doc-card hca-v7-material-list" aria-label={label}>
+      <header className="doc-section-heading hca-v7-material-heading"><div>{heading}</div></header>
       <div className="hca-v7-material-tools">
         <ActionButton variant="quiet" aria-expanded={filterOpen} onClick={() => setFilterOpen(value => !value)}>
           <Icon name="sliders" />{filterTitles[filter]} ({count(filter)})<Icon name="down" />
@@ -145,6 +146,10 @@ export function DocumentMaterialList({
                 <span className={`ui-badge ui-badge-${row.tone}`}>{row.status}</span><Icon name="chevron" width={15} height={15} />
               </span>
               <small className="hca-v7-material-unit">{row.unit ?? "Unidade não preservada"}</small>
+              {row.related?.length ? <small className="hca-v7-material-document-codes">
+                <Icon name="link" width={12} height={12} />
+                {[...new Set(row.related.map(item => item.document.code ?? item.document.kind ?? item.document.type))].join(" · ")}
+              </small> : null}
               <span className="hca-v7-material-facts" id={`material-facts-${row.id}`}>
                 {[...row.facts, { label: today.label, value: balance === undefined || balance === null
                   ? summary.loading ? "Consultando…" : "Não disponível" : formatQuantity(balance, row.unit ?? undefined) }].map(fact =>

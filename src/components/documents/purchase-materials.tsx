@@ -29,7 +29,7 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
   return <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
     revision={String(data.version)} active={active} label="Materiais da compra ou doação" settledLabel="Recebidos"
     today={{ location: "family", label: "Família hoje" }}
-    heading={<><h2>Produtos e quantidades</h2><p>A validação da chegada determina a entrada no estoque.</p>
+    heading={<><h2>Materiais</h2><p>Da autorização à entrada efetiva no estoque familiar.</p>
       {!balances.valid ? <FeedbackBanner tone="error">Não foi possível conferir o saldo das entradas. Use Atualizar ficha.</FeedbackBanner> : null}</>}
     rows={data.lines.map(line => {
       const current = progress.get(line.id);

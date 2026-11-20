@@ -51,6 +51,16 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
   await page.goto("/fichas/" + f.document.id);
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Consultar a contagem conciliada");
   await selectDocumentSection(page, "workflow");
+  const material = page.getByRole("list", { name: "Materiais do balanço", exact: true })
+    .getByRole("button", { name: `Detalhes de ${f.document.lines[0].name_snapshot}`, exact: true });
+  await expect(material).toContainText("Contagem da equipe");
+  await expect(material).toContainText("Saldo na referência");
+  await expect(material).toContainText("Família hoje");
+  await material.click();
+  const materialDrawer = page.getByRole("dialog", { name: f.document.lines[0].name_snapshot, exact: true });
+  await expect(materialDrawer.getByText("Recebido / validado", { exact: true })).toBeVisible();
+  await materialDrawer.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(material).toBeFocused();
   await expect(
     page.getByRole("heading", { name: "Contagem e revisão", exact: true }),
   ).toBeVisible();

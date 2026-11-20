@@ -561,9 +561,9 @@ rascunho em falha ou conflito. O bloco de identidade usa paciente, autor e
 vínculo autenticados. A referência de consulta da DEV permanece associada
 ao saldo e às pessoas verificados no servidor.
 
-Permanecem em revisão visual as variantes de modais de operação, a abertura
-da escolha de recebedor da ENT e os estados de retomada nas fichas. Nenhuma
-migration neste ajuste.
+Permanecem em revisão visual as variantes de modais de operação. A rodada
+seguinte tratou a escolha de recebedor e a retomada dos assistentes. Nenhuma
+migration nesses ajustes.
 
 ### Decisões e dúvidas de L2
 
@@ -603,6 +603,15 @@ no saldo da equipe. A consulta local encontrou o PDF assinado disponível
 após a janela de 15 segundos do teste. Os prazos da verificação foram
 ajustados nas operações que incluem abertura e assinatura da ficha. O
 reteste da escolha no catálogo passou até o download do PDF assinado.
+
+**Composição da aba Materiais.** REQ, COM, ENT, DEV e BAL usam o mesmo
+cabeçalho, filtro, lista compacta e painel do material. Cada ficha mostra
+as medidas do seu processo. O BAL distingue contagem física, saldo na
+referência e saldo familiar atual. Os dados de revisão e aplicação do
+balanço continuam em seus controles próprios na aba. REQ apresenta sob o
+nome do material os códigos de entregas já relacionados à linha. A busca,
+útil para catálogos maiores que o exemplo E04-11, e as demais abas do
+produto foram preservadas.
 
 **Vínculo por material em REQ e BAL.** A extensão solicitada precisa de uma
 referência documental por linha, com verificação independente da leitura da

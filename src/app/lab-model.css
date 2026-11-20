@@ -1509,6 +1509,7 @@
   height: 44px;
 }
 .hca-l1 .hca-v7-material-list { overflow: hidden; }
+.hca-l1 .hca-v7-material-heading { padding: 14px 15px; border-bottom: 1px solid #dde7e0; }
 .hca-l1 .hca-v7-material-list ul { list-style: none; margin: 0; padding: 0; }
 .hca-l1 .hca-v7-material-list li + li { border-top: 1px solid #e3eae6; }
 .hca-l1 .hca-v7-material-tools, .hca-l1 .hca-v7-material-filters {
@@ -1528,6 +1529,10 @@
 .hca-l1 .hca-v7-material-title .ui-badge { font-size: 10px; max-width: 112px; white-space: normal; flex: none; }
 .hca-l1 .hca-v7-material-title svg { margin-left: auto; color: #739084; flex: none; }
 .hca-l1 .hca-v7-material-unit { color: #637469; font-size: 10px; }
+.hca-l1 .hca-v7-material-document-codes {
+  display: flex; align-items: baseline; gap: 5px; color: #2d695b; font-size: 11px; overflow-wrap: anywhere;
+}
+.hca-l1 .hca-v7-material-document-codes svg { flex: none; align-self: center; }
 .hca-l1 .hca-v7-material-facts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 3px 12px; margin-top: 4px; font-variant-numeric: tabular-nums; }
 .hca-l1 .hca-v7-material-facts > span { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 5px; min-width: 0; }
 .hca-l1 .hca-v7-material-facts small { font-size: 10px; color: #637469; }

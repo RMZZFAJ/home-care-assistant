@@ -10,6 +10,7 @@ import { shiftWorker } from "../integration/shift-fixtures.mjs";
 test.setTimeout(180000);
 test.afterEach(async({page})=>{await page.unrouteAll({behavior:"wait"});});
 const drawer=(page:Page)=>page.getByRole("dialog",{name:"Usar lista frequente",exact:true});
+const listSearch = (page: Page) => drawer(page).getByRole("combobox", { name: "Buscar lista frequente", exact: true });
 const panel=(page:Page)=>lastDraftPanel(page);
 async function login(page:Page,patient:string,singlePatientEmail?:string){
   await page.goto(singlePatientEmail ? "/login?next=%2Ffichas%2Freq" : "/login", { waitUntil: "domcontentloaded" });
@@ -28,8 +29,8 @@ async function login(page:Page,patient:string,singlePatientEmail?:string){
   await expect(page.getByRole("navigation", { name: "Etapas da requisição", exact: true }).or(panel(page)).first()).toBeVisible({ timeout: 30_000 });
   await expect(panel(page).getByText("Consultando seu rascunho no servidor…", { exact: true })).toHaveCount(0);
 }
-async function open(page:Page){const trigger=page.getByRole("button",{name:"Usar lista frequente",exact:true});if(!await trigger.isVisible()){const lists=page.getByRole("button",{name:/^Usar listas frequentes/,expanded:false});if(await lists.isVisible())await lists.click();await page.getByText("Minhas listas pessoais",{exact:true}).click();}await trigger.click();await expect(drawer(page)).toBeVisible();await expect(drawer(page).getByText("Consultando suas listas neste paciente…",{exact:true})).toHaveCount(0);await expect(drawer(page).getByText("Atualizando disponibilidade dos materiais…",{exact:true})).toHaveCount(0);await expect(drawer(page).getByRole("combobox")).toBeVisible();}
-async function choose(page:Page,name:string){const combo=drawer(page).getByRole("combobox");await combo.fill(name);await combo.press("ArrowDown");await expect(page.getByRole("option",{name,exact:true})).toBeVisible();await combo.press("Enter");await expect(drawer(page).getByRole("region",{name:"Materiais da lista escolhida",exact:true})).toBeVisible();}
+async function open(page:Page){const trigger=page.getByRole("button",{name:"Usar lista frequente",exact:true});if(!await trigger.isVisible()){const lists=page.getByRole("button",{name:/^Usar listas frequentes/,expanded:false});if(await lists.isVisible())await lists.click();await page.getByText("Minhas listas pessoais",{exact:true}).click();}await trigger.click();await expect(drawer(page)).toBeVisible();await expect(drawer(page).getByText("Consultando suas listas neste paciente…",{exact:true})).toHaveCount(0);await expect(drawer(page).getByText("Atualizando disponibilidade dos materiais…",{exact:true})).toHaveCount(0);await expect(listSearch(page)).toBeVisible();}
+async function choose(page:Page,name:string){const combo=listSearch(page);await combo.fill(name);await combo.press("ArrowDown");await expect(page.getByRole("option",{name,exact:true})).toBeVisible();await combo.press("Enter");await expect(drawer(page).getByRole("region",{name:"Materiais da lista escolhida",exact:true})).toBeVisible();}
 async function seeded(fixture?: Awaited<ReturnType<typeof privateDraftFixture>>) {const f=fixture ?? await privateDraftFixture(),content=reqContent(f);content.lines=f.products.slice(0,2).map((id:string,i:number)=>({...content.lines[0],productId:id,productName:`Material fictício V4 ${i}`,currentStock:"7",urgent:true,repeatReason:"Motivo antigo não reutilizável"}));const saved=await rpc(f.pro,"creation_draft_command",savePacket(f,"REQ",content));return {f,saved};}
 
 test("lista frequente cruza sessões, copia só materiais e nunca estoque7, urgência ou justificativa antiga",async({page,browser})=>{

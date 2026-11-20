@@ -1,10 +1,44 @@
 "use client";
+import { DocumentMaterialList } from "@/components/documents/document-material-list";
 import { DocumentMaterialsTable } from "@/components/documents/document-materials-table";
+import { presentationCaption, readPresentationConversions } from "@/lib/presentation-conversion";
 import { formatQuantity, quantity } from "@/lib/quantity";
+import type { SupplyDocument } from "@/types/documents";
 
 type Amount = string | number | null | undefined;
 export type BalanceMaterial = { id: string; name: string; unit: string; counted: Amount; reference: Amount };
 const available = (value: Amount) => value !== null && value !== undefined && value !== "";
+
+export function IssuedBalanceMaterials({ data, active }: { data: SupplyDocument; active: boolean }) {
+  const applied = Boolean(data.balanceReview?.reconciliationApplied);
+  const closed = data.status === "cancelled" || data.status === "rejected";
+  const reviewed = applied || data.balanceReview?.reviewSatisfied;
+  const status = closed ? "Contagem encerrada" : applied ? "Conciliado" : reviewed ? "Revisado"
+    : data.balanceReview?.reviewRequired ? "Aguardando revisão" : "Contado";
+  return <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
+    revision={String(data.version)} active={active} label="Materiais do balanço" settledLabel="Conferidos"
+    today={{ location: "family", label: "Família hoje" }}
+    heading={<><h2>Materiais</h2><p>Contagem da equipe, referência do balanço e estoque familiar.</p></>}
+    rows={data.lines.map(line => {
+      const expected = line.metadata.expectedQuantity;
+      const reference = typeof expected === "string" || typeof expected === "number" ? expected : null;
+      const amount = (value: Amount) => formatQuantity(value, line.unit_snapshot);
+      const facts = [
+        { label: "Contagem da equipe", value: amount(line.quantity) },
+        { label: "Saldo na referência", value: available(reference) ? amount(reference) : "Referência não disponível" },
+      ];
+      const detail = [...facts, { label: "Recebido / validado", value: amount(line.accepted_quantity) }];
+      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, status,
+        done: !closed && Boolean(reviewed), tone: closed ? "neutral" : reviewed ? "success" : "pending", facts,
+        detail: <>
+          {readPresentationConversions(line.presentation_conversions).map(item => <p key={item.id}>{presentationCaption(item)}</p>)}
+          {line.requisitionItemIds.length ? <p>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</p> : null}
+          <dl className="hca-material-balance-grid">{detail.map(fact =>
+            <div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl>
+        </>,
+      };
+    })} />;
+}
 export function BalanceMaterials({ rows }: { rows: BalanceMaterial[] }) {
   return <DocumentMaterialsTable label="Materiais da contagem" heading={<h3>Contagem física e referência</h3>}
     columns={[{ id: "material", label: "Material" }, { id: "counted", label: "Quantidade física" }, { id: "reference", label: "Referência" }, { id: "difference", label: "Diferença" }]}

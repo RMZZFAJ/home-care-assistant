@@ -692,7 +692,7 @@ export function RequisitionDocumentContent({
             <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
               revision={String(p.version)} active={tabs.value === "materials"} label="Materiais requisitados" settledLabel="Supridos"
               today={{ location: "family", label: "Família hoje" }}
-              heading={<><h2>Materiais e atendimento</h2><p>Estoque observado e avaliação de atendimento têm registros próprios.</p></>}
+              heading={<><h2>Materiais</h2><p>Estoque informado na emissão e avaliação da necessidade.</p></>}
               rows={data.requisition_items.map((item) => {
                 const line = f.lines.find((row) => row.id === item.id);
                 const name = item.product_name_snapshot ?? item.custom_name ?? "Nome não preservado no registro";
