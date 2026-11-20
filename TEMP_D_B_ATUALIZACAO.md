@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — leitura de código na COM e na ENT.** O diálogo Ler código
+confere apresentação, fator e total antes de incluir. Os quatro casos
+dirigidos passaram em Android e iOS emulados, com registro da conversão
+e do ajuste manual na entrega. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — materiais da COM e da ENT.** A linha mostra o total na unidade
 de estoque. Editar embalagens abre pelo menu de três pontos, com escolha de
 apresentações e comparação de versões. Ao voltar a Materiais, o assistente

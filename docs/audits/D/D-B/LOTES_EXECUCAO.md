@@ -348,8 +348,26 @@ estoque enquanto a emissão ainda abria a ficha. Após a retomada do
 Docker, houve timeout na preparação local, anterior à expedição. A
 rodada final passou após atualização das estatísticas da mesma base.
 
-A leitura da COM e da ENT ainda ocupa o corpo da etapa com câmera,
-foto e entrada manual. A v7 reúne esses controles no diálogo Ler código.
+**Ler código** reúne câmera, foto e entrada manual no diálogo da COM e da
+ENT. A conferência segue E05-04, com material, unidade do catálogo,
+apresentação, fator e quantidade a incluir. O seletor oferece apresentações
+cadastradas do mesmo material e a opção de informar outra. Confirmar soma
+a quantidade ao preenchimento. Sair conserva o que já estava na ficha.
+Quando a conversão usa o cadastro, a ficha guarda a versão da apresentação.
+Fator ou total ajustado para aquela leitura entra como quantidade manual
+na unidade padrão. Se a apresentação já selecionada tiver outra versão,
+o diálogo encaminha à comparação em Editar embalagens. Código indisponível
+permite tentar outro ou voltar à lista.
+
+Os quatro casos dirigidos passaram em Android e iOS emulados. Na COM,
+a leitura de uma versão nova ficou bloqueada até a adoção explícita da
+referência. Na ENT, câmera negada, código desconhecido e saída sem aplicar
+preservaram o preenchimento. A digitação e a foto de um EAN fictício
+levaram a cinco unidades expedidas, duas com a conversão cadastrada e três
+pela correção manual. O perfil designado confirmou o recebimento.
+Nos dois navegadores, a rolagem interna mostrou o total inteiro antes de
+confirmar e manteve as ações do diálogo acessíveis. Capturas de E05-04 e
+da entrega em `output/playwright/l2-supply-barcode/`.
 
 Na CI de `b7d5ca1f`, validações Linux e Windows e o job de banco passaram.
 Os cinco jobs de navegador concluídos somaram 52 falhas após a repetição.

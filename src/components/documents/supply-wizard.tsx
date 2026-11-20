@@ -72,11 +72,10 @@ import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/com
 import { SupplySourcePicker, type SupplySourceSelection } from "./supply-source-picker";
 import { emptySupplySources, includeSavedRequisitionSources, prepareSupplySources, type SupplySourcePreparation } from "@/lib/forms/supply-source-preparation";
 import { parseSupplySources } from "@/lib/validation/supply-sources";
-import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
+import { quantity, validQuantity } from "@/lib/quantity";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import type { PresentationsRead } from "@/types/catalogue";
 import { readPresentationConversions } from "@/lib/presentation-conversion";
-import { presentationTotal } from "./presentation-quantity";
 import {
   documentLabels,
   type CatalogProduct,
@@ -1377,88 +1376,6 @@ export function PatientSupplyWizard({
       setBusy(false);
     }
   }
-  async function scan(code: string) {
-    setError("");
-    setMessage("");
-    const result = await api<PresentationsRead>(
-      "/api/catalog/presentations?careRecipientId=" +
-      context.patient!.id +
-      "&barcode=" +
-      encodeURIComponent(code),
-    );
-    const presentation = result.data[0];
-    if (!presentation) {
-      setError(
-        "Código desconhecido. Associe uma apresentação no catálogo ou selecione o produto manualmente. Nenhum item foi criado.",
-      );
-      return;
-    }
-    const product = catalog.find((item) => item.id === presentation.product_id);
-    if (!product || !quantity(presentation.base_quantity).isFinite()) {
-      setError(
-        "Este código não tem material ativo e fator válido neste catálogo. Selecione o material manualmente.",
-      );
-      return;
-    }
-    const previous = form.presentationSelections?.[product.id]?.find(
-      (row) => row.id === presentation.id,
-    );
-    if (previous && previous.version !== presentation.version) {
-      presentations.refresh();
-      setError(
-        "O fator desta apresentação mudou. Compare e adote a referência atual na seção de embalagens antes de ler novamente.",
-      );
-      return;
-    }
-    setForm((current) => {
-      const selections = [
-        ...(current.presentationSelections?.[product.id] ?? []),
-      ];
-      const index = selections.findIndex((row) => row.id === presentation.id);
-      if (index >= 0)
-        selections[index] = {
-          ...selections[index],
-          packages: quantity(selections[index].packages || "0")
-            .plus(1)
-            .toFixed(),
-        };
-      else
-        selections.push({
-          id: presentation.id,
-          version: presentation.version,
-          packages: "1",
-          barcode: presentation.barcode,
-          name: presentation.name,
-          baseQuantity: quantity(presentation.base_quantity).toFixed(),
-          unit: product.unit,
-        });
-      const manual =
-        (current.manualQuantities?.[product.id] ??
-          current.quantities[product.id]) ||
-        "0";
-      return {
-        ...current,
-        presentationSelections: {
-          ...current.presentationSelections,
-          [product.id]: selections,
-        },
-        manualQuantities: { ...current.manualQuantities, [product.id]: manual },
-        quantities: {
-          ...current.quantities,
-          [product.id]: presentationTotal(selections, manual || "0"),
-        },
-      };
-    });
-    setMessage(
-      presentation.name +
-      ": adicionados " +
-      formatQuantity(presentation.base_quantity, product?.unit),
-    );
-    if (product)
-      openStep(
-        form.extraProductIds?.includes(product.id) ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1,
-      );
-  }
   if (privateDraft.readDenied || privateDraft.protectedReadPending)
     return (
       <Notice error>
@@ -1744,7 +1661,12 @@ export function PatientSupplyWizard({
                     </section>
                   ) : undefined}
                   openMaterialSources={linkedTarget && form.source === "FAMILY" && !currentSources.loading ? (product) => setSourcePicker({ product }) : undefined}
-                  scan={scan}
+                  onScannedMaterial={product => {
+                    setError("");
+                    setMessage("");
+                    openStep(form.extraProductIds?.includes(product.id)
+                      ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1);
+                  }}
                   presentations={presentations.data?.data ?? []}
                   presentationError={presentations.error}
                   presentationLoading={presentations.loading}

@@ -966,18 +966,30 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   const assessment = page.getByRole("checkbox", { name: `Atende integralmente à necessidade de ${product.name}`, exact: true });
   await expect(assessment).not.toBeChecked();
   await assessment.check();
-  const openCamera = page.getByRole("button", { name: "Ler código de barras", exact: true });
-  await openCamera.evaluate(button => button.scrollIntoView({ block: "center", behavior: "instant" }));
-  await openCamera.click();
-  await expect(page.getByText(/Acesso à câmera negado/)).toBeVisible();
-  await page
-    .getByRole("button", { name: "Encerrar câmera", exact: true })
-    .click();
-  await page.getByLabel("Código manual").fill("0000000000000");
-  await page.getByRole("button", { name: "Identificar", exact: true }).click();
-  await expect(page.getByText(/Código desconhecido/)).toBeVisible();
-  await page.getByLabel("Código manual").fill("1234567890128");
-  await page.getByRole("button", { name: "Identificar", exact: true }).click();
+  const openBarcode = page.getByRole("button", { name: "Ler código", exact: true });
+  const scanner = page.getByRole("dialog", { name: "Ler código", exact: true });
+  const conversion = scanner.getByRole("region", { name: "Conversão da apresentação", exact: true });
+  await expect(page.getByLabel("Código manual")).toHaveCount(0);
+  await openBarcode.evaluate(button => button.scrollIntoView({ block: "center", behavior: "instant" }));
+  await openBarcode.click();
+  await scanner.getByRole("button", { name: "Ler código de barras", exact: true }).click();
+  await expect(scanner.getByText(/Acesso à câmera negado/)).toBeVisible();
+  await scanner.getByRole("button", { name: "Encerrar câmera", exact: true }).click();
+  await scanner.getByLabel("Código manual").fill("0000000000000");
+  await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
+  const unknownBarcode = page.getByRole("dialog", { name: "Código não cadastrado", exact: true });
+  await expect(unknownBarcode.getByRole("button", { name: "Selecionar na lista", exact: true })).toBeVisible();
+  await unknownBarcode.getByRole("button", { name: "Tentar outro código", exact: true }).click();
+  await scanner.getByLabel("Código manual").fill("1234567890128");
+  await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
+  await expect(conversion).toContainText("Pacote de duas unidades");
+  await scanner.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(openBarcode).toBeFocused();
+  await expect(page.getByText("Quantidade total calculada:", { exact: false })).toHaveCount(0);
+  await openBarcode.click();
+  await scanner.getByLabel("Código manual").fill("1234567890128");
+  await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
+  await scanner.getByRole("button", { name: "Usar material", exact: true }).click();
   await expect(
     page.getByText("Quantidade total calculada:", { exact: false }),
   ).toContainText("2 unidade");
@@ -1021,15 +1033,31 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
       .join("") +
     "</svg>";
   const barcodeImage = await sharp(Buffer.from(svg)).png().toBuffer();
-  await page.getByLabel("Ler de uma foto").setInputFiles({
+  await openBarcode.click();
+  await scanner.getByLabel("Ler de uma foto").setInputFiles({
     name: "ean13-ficticio.png",
     mimeType: "image/png",
     buffer: barcodeImage,
   });
+  await expect(conversion).toContainText("Pacote de duas unidades");
+  await conversion.getByRole("button", { name: "Corrigir", exact: true }).click();
+  await conversion.getByLabel("Tipo de apresentação").selectOption("manual");
+  await conversion.getByLabel("Unidades por apresentação").fill("4");
+  await conversion.getByRole("checkbox", { name: "Corrigir o total convertido", exact: true }).check();
+  await conversion.getByLabel("Total corrigido em unidade").fill("3");
+  await expect(conversion).toContainText("Este ajuste será incluído como quantidade manual");
+  const confirmedAmount = conversion.getByText("Quantidade que entrará na ficha", { exact: true });
+  await confirmedAmount.scrollIntoViewIfNeeded();
+  await expect(confirmedAmount).toBeInViewport({ ratio: 1 });
+  if (info.project.use.hasTouch) {
+    await info.attach("ENT · conferência do código lido", {
+      body: await scanner.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+    });
+  }
+  await scanner.getByRole("button", { name: "Usar material", exact: true }).click();
   await expect(
     page.getByText("Quantidade total calculada:", { exact: false }),
-  ).toContainText("4 unidade");
-  await expect(page.getByText(/Código desconhecido/)).not.toBeVisible();
+  ).toContainText("5 unidade");
   await next(page);
   const shared = page.getByLabel("Justificativa da necessidade compartilhada", { exact: false });
   await expect(shared).toHaveAttribute("aria-invalid", "true");
@@ -1056,6 +1084,10 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   const delivery = (await response.json()).data;
   expect(delivery.lines[0].requisitionItemIds).toHaveLength(2);
   expect(delivery.lines[0].family_fulfillment).toBe("complete");
+  expect(delivery.lines[0].quantity).toBe(5);
+  expect(delivery.lines[0].presentation_conversions).toEqual([
+    expect.objectContaining({ barcode: "1234567890128", packages: "1", convertedQuantity: "2", version: 1 }),
+  ]);
   const emitted = page.getByRole("dialog", { name: "Entrega expedida", exact: true });
   await expect(emitted).toBeVisible({ timeout: 65_000 });
   await expect(page).toHaveURL(url => url.pathname === "/fichas/" + delivery.id);

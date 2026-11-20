@@ -908,6 +908,16 @@
   font-size: 11px;
 }
 .hca-wizard-return-source > :nth-child(even) { justify-self: end; text-align: end; }
+.hca-l1 .hca-supply-barcode-material { border: 0; border-radius: 0; padding-inline: 0; }
+.hca-supply-barcode-presentation {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  border-block: 1px solid var(--line); padding-block: 10px;
+}
+.hca-supply-barcode-presentation small { display: block; color: var(--muted); }
+.hca-supply-barcode-total { display: grid; gap: 2px; padding: 13px; border-radius: 12px; background: #edf6ef; color: var(--primary); }
+.hca-supply-barcode-total > strong { font-size: 18px; }
+.hca-supply-barcode-total small { font-size: 12px; }
+.hca-l1 .hca-supply-barcode .hca-modal-footer > .hca-control { flex: 1 1 0; }
 .hca-wizard-material-urgent, .hca-wizard-unknown-stock { display: flex; align-items: center; gap: 8px; min-height: 32px; font-size: 12px; }
 .hca-wizard-stock-field { display: grid; gap: 4px; }
 .hca-wizard-stock-field > label:first-of-type { font-size: 12px; }

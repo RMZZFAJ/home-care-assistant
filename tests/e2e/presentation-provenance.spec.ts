@@ -509,6 +509,13 @@ test("nova emissão com fator obsoleto conserva a escolha e exige comparação a
   await page.getByRole("button", { name: "Voltar", exact: true }).click();
   await page.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(page.getByRole("button", { name: /^Higiene/ })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Ler código", exact: true }).click();
+  const scanner = page.getByRole("dialog", { name: "Ler código", exact: true });
+  await scanner.getByLabel("Código manual").fill("0123456789012");
+  await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
+  await expect(scanner.getByText(/O fator cadastrado mudou/)).toBeVisible();
+  await expect(scanner.getByRole("button", { name: "Usar material", exact: true })).toBeDisabled();
+  await scanner.getByRole("button", { name: "Voltar", exact: true }).click();
   const { editor } = await openPackageEditor(page);
   await editor
     .getByRole("button", {

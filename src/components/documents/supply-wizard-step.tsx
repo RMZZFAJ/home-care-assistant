@@ -14,13 +14,13 @@ import {
   DeliveryRecipientField,
   DeliveryRecipientReference,
 } from "./delivery-recipient";
-import { useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import {
   inputClass,
   Notice,
   type WorkspaceContext,
 } from "@/components/workspace";
-import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
+import { SupplyBarcodeDialog } from "./supply-barcode-dialog";
 import {
   PresentationQuantity,
   presentationTotal,
@@ -86,7 +86,7 @@ export function SupplyWizardStep({
   links,
   sourceSection,
   openMaterialSources,
-  scan,
+  onScannedMaterial,
   recipientContext,
   recipientComparison,
   recipientError,
@@ -111,7 +111,7 @@ export function SupplyWizardStep({
   links: Record<string, string[]>;
   sourceSection?: ReactNode;
   openMaterialSources?: (product: CatalogProduct) => void;
-  scan: (code: string) => Promise<void>;
+  onScannedMaterial: (product: CatalogProduct) => void;
   recipientContext: DeliveryPreparation | null;
   recipientComparison: DeliveryPreparation | null;
   recipientError: string;
@@ -134,6 +134,8 @@ export function SupplyWizardStep({
     productId: string;
     returnFocus: () => HTMLButtonElement | null;
   } | null>(null);
+  const [barcodeOpen, setBarcodeOpen] = useState(false);
+  const barcodeTriggerRef = useRef<HTMLButtonElement>(null);
   const search = searchByCategory[category ?? ""] ?? "";
   const visibleProducts = catalog.filter(
     (product) =>
@@ -286,7 +288,8 @@ export function SupplyWizardStep({
         <>
           {category && type !== "BAL" ? <>
             <WizardMaterialCategories category={category} selected={selected.filter(item => !extras.has(item.id))} onChange={onCategoryChange} />
-            <div className="hca-toolbar"><BarcodeScanner onRead={scan} />
+            <div className="hca-toolbar"><ActionButton ref={barcodeTriggerRef} compact variant="quiet"
+              onClick={() => setBarcodeOpen(true)}><Icon name="camera" />Ler código</ActionButton>
               {extraControl}
             </div>
           </> : null}
@@ -446,6 +449,14 @@ export function SupplyWizardStep({
               );
             })}
           </div>
+          {barcodeOpen && context.patient ? <SupplyBarcodeDialog patientId={context.patient.id}
+            catalog={catalog} presentations={presentations} form={form}
+            finalFocus={() => barcodeTriggerRef.current ?? document.getElementById("supply-wizard-heading") ?? false}
+            onClose={() => setBarcodeOpen(false)} onApply={({ product, selections, manual }) => {
+              updatePackages(product.id, selections, manual);
+              setBarcodeOpen(false);
+              onScannedMaterial(product);
+            }} /> : null}
           {presentationProduct ? <Dialog open title={`Embalagens de ${presentationProduct.name}`}
             kicker="Apresentações e equivalência" headingIcon="box" keyboardScrollable
             onClose={closePresentationEditor} finalFocus={() => false}
