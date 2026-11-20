@@ -1,5 +1,5 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ActionButton } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/primitives";
@@ -40,16 +40,17 @@ export function SupplyWizardFooter({ back, children, status, draftAction }: {
 
 function SupplyWizardExit({ supply, disabled }: { supply: SupplyActions; disabled: boolean }) {
   const [open, setOpen] = useState(false);
+  const exitButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const { draft, current, hasEdits, exitHref } = supply;
   const busy = draft.busy || draft.backgroundBusy;
 
   return <>
-    <ActionButton variant="quiet" disabled={disabled} onClick={() => {
+    <ActionButton ref={exitButtonRef} variant="quiet" disabled={disabled} onClick={() => {
       if (hasEdits) setOpen(true);
       else router.push(exitHref);
     }}><Icon name="back" width={14} height={14} />Sair por agora</ActionButton>
-    <Dialog open={open} title="Sair por agora?" onClose={() => setOpen(false)} closeDisabled={busy}>
+    <Dialog open={open} title="Sair por agora?" onClose={() => setOpen(false)} closeDisabled={busy} finalFocus={exitButtonRef}>
       <p>Você pode guardar o preenchimento e continuar em outro momento.</p>
       <div className="hca-toolbar">
         <ActionButton disabled={busy} onClick={() => setOpen(false)}>Continuar editando</ActionButton>

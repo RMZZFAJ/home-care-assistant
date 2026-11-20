@@ -204,6 +204,14 @@ O menu autenticado, a escolha inicial da operação na central de entregas
 e devoluções e o botão manual de salvar rascunho são complementos do sistema
 real ao recorte da v7.
 
+Na rodada local de `90576c00`, o build passou e a DEV completou a expedição
+no Android emulado. A abertura da REQ e a emissão da COM no Android
+receberam `DATABASE_UNAVAILABLE`. No iOS, a COM ficou na abertura e a
+DEV ficou no acesso ao vínculo. A REQ conferiu o caminho de navegação,
+o cabeçalho e a ajuda no iOS e identificou a falta de retorno de foco ao
+fechar a ajuda. A correção vincula o foco aos botões que abrem a ajuda e
+a confirmação de saída.
+
 A referência foi capturada em 360 e 412 px nos estados E04-01, E05-01,
 E06-01 e E06-16. A primeira rodada dos percursos integrados passou em COM
 e DEV no Android. A REQ em iOS passou pelos controles de edição, posicionamento
