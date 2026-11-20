@@ -476,7 +476,20 @@ export function PatientSupplyWizard({
   }
   function applySources(selection: SupplySourceSelection[]) {
     const result = prepareSupplySources(effectiveSourceSetup, selection, form.quantities, links, requestOptions, sourcePicker?.product?.id);
-    setForm((current) => ({ ...current, quantities: result.quantities }));
+    setForm((current) => {
+      const next = { ...current, quantities: result.quantities };
+      if (type !== "ENT") return next;
+      const requestFulfillments = { ...current.requestFulfillments };
+      const sharedNeedReasons = { ...current.sharedNeedReasons };
+      for (const id of Object.keys({ ...links, ...result.links })) {
+        const before = links[id] ?? [];
+        const after = result.links[id] ?? [];
+        if (before.length === after.length && before.every(item => after.includes(item))) continue;
+        delete requestFulfillments[id];
+        delete sharedNeedReasons[id];
+      }
+      return { ...next, requestFulfillments, sharedNeedReasons };
+    });
     setLinks(result.links);
     setSourceSetup(result.preparation);
     setSourcePicker(null);
@@ -885,10 +898,11 @@ export function PatientSupplyWizard({
           (type === "BAL" ? ", inclusive zero." : " acima de zero.");
     if (all && !Object.keys(form.quantities).length && !form.pendingExtras?.length)
       errors.lines = "Selecione ou informe ao menos um material.";
-    if (all || step === 0)
+    if (all || (type === "COM" && step === 0) || (type === "ENT" && (category || step === supplyExtrasStep || step === 4)))
       for (const [productId, ids] of Object.entries(links)) {
         if (!Object.hasOwn(form.quantities, productId)) continue;
-        if (type === "ENT" && form.source === "FAMILY" && ids.length && !form.requestFulfillments?.[productId]) errors[productId + ":fulfillment"] = "Escolha se esta entrega atende parcialmente ou por completo à necessidade.";
+        if (!all && ((step === supplyExtrasStep && !extras.has(productId)) ||
+          (category && extras.has(productId)))) continue;
         if (
           ids.length > 1 &&
           (form.sharedNeedReasons?.[productId]?.trim().length ?? 0) < 3
@@ -903,7 +917,8 @@ export function PatientSupplyWizard({
       setError("Confira os campos destacados.");
       if (!isBalance) {
         const first = Object.keys(errors)[0];
-        const product = relevant.find(item => item.id === first);
+        const product = catalog.find(item => item.id === first ||
+          (type === "ENT" && first === item.id + ":shared"));
         if (product) setStep(extras.has(product.id) ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1);
         else if (first.startsWith("observation:")) setStep(4);
         else if (all) setStep(first === "lines" ? supplyStageSteps[1] : 0);
@@ -1074,7 +1089,9 @@ export function PatientSupplyWizard({
           ...(links[product.id]?.length
             ? {
               requisitionItemIds: links[product.id],
-              ...(type === "ENT" && form.source === "FAMILY" && form.requestFulfillments?.[product.id] ? { requestFulfillment: form.requestFulfillments[product.id] as "partial" | "complete" } : {}),
+              ...(type === "ENT" && form.source === "FAMILY" ? {
+                requestFulfillment: form.requestFulfillments?.[product.id] === "complete" ? "complete" : "partial",
+              } : {}),
             }
             : {}),
           ...(links[product.id]?.length || form.extraProductIds?.includes(product.id) ? {
@@ -1666,6 +1683,9 @@ export function PatientSupplyWizard({
                         : "Selecione os materiais a adquirir"
                         : steps[stage]}
                 </h2>
+                {type === "ENT" && form.source === "FAMILY" && category ? <p className="hca-field-help mt-2">
+                  A entrega usa o estoque disponível da família. A avaliação da necessidade acompanha cada item vinculado.
+                </p> : null}
               </div>
               <fieldset
                 disabled={

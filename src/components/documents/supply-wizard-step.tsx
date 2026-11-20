@@ -2,7 +2,7 @@
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
-import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { ActionButton, CheckboxField, DefinitionGrid, FormField, TextAreaField } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { materialCategories, supplyExtrasStep, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
@@ -54,50 +54,22 @@ export type WizardState = {
   manualQuantities?: Record<string, string>;
 };
 
-function SupplyRequestAssessments({ type, catalog, links, form, setForm, fieldErrors }: {
+function SharedNeedReason({ type, productId, form, setForm, error }: {
   type: "COM" | "ENT";
-  catalog: CatalogProduct[];
-  links: Record<string, string[]>;
+  productId: string;
   form: WizardState;
   setForm: Dispatch<SetStateAction<WizardState>>;
-  fieldErrors: Record<string, string>;
+  error?: string;
 }) {
-  const products = catalog.filter(({ id }) => Object.hasOwn(form.quantities, id) &&
-    (links[id]?.length ?? 0) >= (type === "ENT" ? 1 : 2));
-  if (!products.length) return null;
-  return <section className="hca-form-stack" aria-label="Avaliação dos vínculos">
-    <h3>Avaliação dos vínculos</h3>
-    {products.map(({ id, name }) => <fieldset className="hca-form-stack" key={id}>
-      <legend>{name}</legend>
-      {type === "ENT" ? <label className="hca-field">
-        <span>Esta entrega pretende atender a necessidade</span>
-        <select className={inputClass} required value={form.requestFulfillments?.[id] ?? ""}
-          aria-invalid={Boolean(fieldErrors[id + ":fulfillment"])} onChange={(event) => {
-            const choice = event.currentTarget.value as "" | "partial" | "complete";
-            setForm(current => ({ ...current, requestFulfillments: { ...current.requestFulfillments, [id]: choice } }));
-          }}>
-          <option value="">Escolha a avaliação familiar</option>
-          <option value="partial">Parcialmente · continua em aberto</option>
-          <option value="complete">Por completo · necessidade atendida após recebimento</option>
-        </select>
-        <span className="hca-field-help">O recebedor confirma separadamente as quantidades físicas.</span>
-        {fieldErrors[id + ":fulfillment"] ? <span className="ui-field-error">{fieldErrors[id + ":fulfillment"]}</span> : null}
-      </label> : null}
-      {links[id].length > 1 ? <label className="hca-field">
-        <span>Justificativa da necessidade compartilhada</span>
-        <textarea className={inputClass} required minLength={3} maxLength={500}
-          aria-invalid={Boolean(fieldErrors[id + ":shared"])}
-          value={form.sharedNeedReasons?.[id] ?? ""} onChange={(event) => {
-            const reason = event.currentTarget.value;
-            setForm(current => ({ ...current, sharedNeedReasons: { ...current.sharedNeedReasons, [id]: reason } }));
-          }} />
-        <span className="hca-field-help">{type === "ENT"
-          ? "A entrega representa a mesma necessidade nas requisições vinculadas."
-          : "A compra relacionada às requisições ajuda a preparar a entrega."}</span>
-        {fieldErrors[id + ":shared"] ? <span className="ui-field-error">{fieldErrors[id + ":shared"]}</span> : null}
-      </label> : null}
-    </fieldset>)}
-  </section>;
+  return <FormField label="Justificativa da necessidade compartilhada" required error={error}
+    helpText={type === "ENT" ? "Explique por que as requisições representam a mesma necessidade."
+      : "A compra relacionada às requisições ajuda a preparar a entrega."}>
+    <TextAreaField rows={2} required minLength={3} maxLength={500}
+      value={form.sharedNeedReasons?.[productId] ?? ""} onChange={(event) => {
+        const reason = event.currentTarget.value;
+        setForm(current => ({ ...current, sharedNeedReasons: { ...current.sharedNeedReasons, [productId]: reason } }));
+      }} />
+  </FormField>;
 }
 
 export function SupplyWizardStep({
@@ -161,17 +133,21 @@ export function SupplyWizardStep({
   const visibleProducts = catalog.filter(
     (product) =>
       isExtraStep ? extras.has(product.id) : !extras.has(product.id) && product.category === category &&
-      [
+      (fieldErrors[product.id] || fieldErrors[product.id + ":shared"] || [
         product.name,
         ...(product.aliases ?? []),
         ...(product.selectionPredecessors ?? []).map((row) => row.name),
       ].some((name) =>
         normalizeCatalogText(name).includes(normalizeCatalogText(search)),
-      ),
+      )),
   );
   const selected = catalog.filter((product) =>
     Object.hasOwn(form.quantities, product.id),
   );
+  const assessesDelivery = type === "ENT" && form.source === "FAMILY";
+  const sharedPurchaseNeeds = type === "COM" && step === 0
+    ? selected.filter(product => (links[product.id]?.length ?? 0) > 1)
+    : [];
   const pendingExtras = form.pendingExtras ?? [];
   function addExtra(id: string, amount = "", replace?: string) {
     setForm(current => Object.hasOwn(current.quantities, id) ? current : {
@@ -195,8 +171,14 @@ export function SupplyWizardStep({
         delete presentationSelections[id];
         delete manualQuantities[id];
       }
-      return { ...current, quantities, presentationSelections, manualQuantities,
+      const next = { ...current, quantities, presentationSelections, manualQuantities,
         extraProductIds: current.extraProductIds?.filter(extraId => extraId !== id) };
+      if (!include && assessesDelivery) {
+        const requestFulfillments = { ...current.requestFulfillments };
+        delete requestFulfillments[id];
+        return { ...next, requestFulfillments };
+      }
+      return next;
     });
   }
   const reviewRows = step === 5 && type !== "BAL" ? selected.map(product => ({
@@ -204,6 +186,11 @@ export function SupplyWizardStep({
     consult: <MaterialConsultButton context={context} material={product} />,
     details: <><small>{form.quantities[product.id] ? formatQuantity(form.quantities[product.id], product.unit) : "Quantidade pendente"}</small>{form.presentationSelections?.[product.id]?.map(row => <small key={row.id}>{presentationCaption(row)}</small>)}
       {links[product.id]?.length ? <small>{links[product.id].length} {links[product.id].length === 1 ? "necessidade vinculada" : "necessidades vinculadas"}</small> : null}
+      {assessesDelivery && links[product.id]?.length ? <small>
+        {form.requestFulfillments?.[product.id] === "complete" ? "Atendimento integral previsto" : "Atendimento parcial previsto"}
+      </small> : null}
+      {assessesDelivery && (links[product.id]?.length ?? 0) > 1 && form.sharedNeedReasons?.[product.id]
+        ? <small>{form.sharedNeedReasons[product.id]}</small> : null}
     </>,
   })) : [];
   function updatePackages(
@@ -274,10 +261,13 @@ export function SupplyWizardStep({
             </div>
           ) : null}
           {sourceSection}
-          {type !== "BAL" && (type === "COM" || form.source === "FAMILY") ? (
-            <SupplyRequestAssessments type={type} catalog={catalog} links={links} form={form}
-              setForm={setForm} fieldErrors={fieldErrors} />
-          ) : null}
+          {sharedPurchaseNeeds.length ? <section className="hca-form-stack" aria-label="Avaliação dos vínculos">
+            <h3>Avaliação dos vínculos</h3>
+            {sharedPurchaseNeeds.map(({ id, name }) => <fieldset className="hca-form-stack" key={id}>
+              <legend>{name}</legend>
+              <SharedNeedReason type="COM" productId={id} form={form} setForm={setForm} error={fieldErrors[id + ":shared"]} />
+            </fieldset>)}
+          </section> : null}
         </>
       ) : null}
       {category || isExtraStep ? (
@@ -329,6 +319,8 @@ export function SupplyWizardStep({
             {visibleProducts.map((product) => {
               const checked =
                 type === "BAL" || Object.hasOwn(form.quantities, product.id);
+              const linkedNeeds = links[product.id]?.length ?? 0;
+              const assessmentHelpId = `ent-assessment-${encodeURIComponent(product.id)}`;
               return (
                 <MaterialChoice
                   selected={checked}
@@ -371,6 +363,21 @@ export function SupplyWizardStep({
                   {isExtraStep ? <ActionButton type="button" onClick={() => selectProduct(product.id, false)}>
                     Remover {product.name}
                   </ActionButton> : null}
+                  {checked && assessesDelivery && linkedNeeds ? <div className="col-span-full hca-form-stack">
+                    <div>
+                      <CheckboxField label="Atende integralmente à necessidade"
+                        aria-label={`Atende integralmente à necessidade de ${product.name}`}
+                        aria-describedby={assessmentHelpId}
+                        checked={form.requestFulfillments?.[product.id] === "complete"}
+                        onChange={event => {
+                          const choice = event.currentTarget.checked ? "complete" : "partial";
+                          setForm(current => ({ ...current, requestFulfillments: { ...current.requestFulfillments, [product.id]: choice } }));
+                        }} />
+                      <p id={assessmentHelpId} className="hca-field-help">Desmarcado indica atendimento parcial.</p>
+                    </div>
+                    {linkedNeeds > 1 ? <SharedNeedReason type="ENT" productId={product.id} form={form}
+                      setForm={setForm} error={fieldErrors[product.id + ":shared"]} /> : null}
+                  </div> : null}
                   {checked &&
                     !form.presentationSelections?.[product.id]?.length ? (
                     <label className="product-quantity text-xs font-semibold">

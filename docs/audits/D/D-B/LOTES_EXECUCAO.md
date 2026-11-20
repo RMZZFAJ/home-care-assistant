@@ -317,8 +317,21 @@ continua com seu vínculo próprio no menu de três pontos. A avaliação
 familiar de suficiência e a justificativa para múltiplas REQs aparecem
 quando há vínculos que exigem essas informações. O seletor também reconhece
 os vínculos por linha dos rascunhos anteriores.
-A preparação da ENT ainda mostra a avaliação de suficiência como seletor
-na Confirmação. A v7 a mostra com checkbox na etapa Materiais.
+A preparação da ENT mostra **Atende integralmente à necessidade** no
+material ligado a uma REQ, como no cenário E04-10 da v7. Desmarcado indica
+atendimento parcial. A justificativa de várias REQs para a mesma
+necessidade fica no material correspondente e aparece na revisão. A
+revisão mostra o atendimento previsto separadamente da quantidade a
+expedir. Alterar o conjunto de necessidades vinculadas recoloca a
+avaliação do material em parcial. O ato de recebimento continua pessoal.
+
+No Android e iOS emulados, passaram quatro casos dirigidos sem retry
+automático. A caixa marcada gravou o atendimento integral para duas
+REQs. O teste conferiu o foco na justificativa exigida e o recebimento.
+A caixa desmarcada gravou atendimento parcial mesmo com a quantidade
+física inteiramente recebida. A primeira rodada sofreu timeouts no banco
+local. A rodada final usou perfis fictícios com um único paciente e
+acesso direto às fichas, após atualizar as estatísticas da base local.
 
 Na DEV, a Confirmação tem o mesmo seletor de fichas. O menu de três pontos
 oferece Detalhes do material e Vincular a uma ficha. Cada vínculo pode ser
@@ -419,13 +432,14 @@ um timeout da instrução antes da simulação da perda de resposta.
   movimentos posteriores. Outra contagem absoluta bloqueia a reversão até
   definir como registrar a precedência da contagem mais recente. A proposta
   registrada preserva a contagem oficial posterior e marca a antiga como
-  superada.
+  superada. A escolha foi apresentada ao responsável em 20/11.
 - **P2 — Fechamento do excedente recebido em ENT/DEV.** Sem decisão
   registrada. O sistema reconhece inicialmente o expedido e
   guarda o excedente em apuração. Faltam o responsável por confirmar a origem,
   os efeitos da regularização e o desfecho quando a origem não confirmar.
   A proposta registrada vincula o débito e o crédito à mesma entrega após
-  confirmação da origem e disponibilidade pertinente.
+  confirmação da origem e disponibilidade pertinente. A escolha sobre o
+  encerramento após recusa da origem foi apresentada em 20/11.
 
 - **Extras sem identificação em ENT e DEV.** A v7 permite preencher a
   quantidade de um extra pendente. Hoje a expedição oficial exige um produto

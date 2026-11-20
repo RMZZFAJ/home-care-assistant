@@ -30,11 +30,15 @@ function fixtures() {
   >;
 }
 const selectedPatients = new WeakMap<Page, string>();
-async function signIn(page: Page, email: string) {
-  await page.goto("/login");
+async function signIn(page: Page, email: string, destination?: string) {
+  await page.goto(destination ? "/login?next=" + encodeURIComponent(destination) : "/login");
   await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  if (destination) {
+    await expect(page).toHaveURL(url => url.pathname === destination);
+    return;
+  }
   await expect(
     page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
@@ -165,6 +169,8 @@ async function issueSupply(
   productName: string,
   amount: string,
   requestId?: string,
+  fulfillment: "partial" | "complete" = "complete",
+  recipientName = "Teste professional",
 ) {
   await page.goto(
     "/fichas/" +
@@ -176,15 +182,17 @@ async function issueSupply(
   if (type === "ENT")
     await selectDeliveryRecipient(
       page,
-      "Teste professional",
+      recipientName,
       "Pessoa indicada manualmente para receber estes materiais",
     );
-  if (type === "ENT" && requestId) {
-    await page.getByRole("combobox", { name: /^Esta entrega pretende atender a necessidade/ }).selectOption("complete");
-  }
   await next(page);
   if (type === "BAL") await next(page);
   else await selectMaterialCategory(page);
+  if (type === "ENT" && requestId) {
+    const assessment = page.getByRole("checkbox", { name: `Atende integralmente à necessidade de ${productName}`, exact: true });
+    if (fulfillment === "complete") await assessment.check();
+    else await expect(assessment).not.toBeChecked();
+  }
   if (type !== "BAL" && !requestId)
     await page
       .getByRole("checkbox", { name: new RegExp("^" + productName) })
@@ -193,6 +201,8 @@ async function issueSupply(
     .getByLabel("Quantidade — " + productName, { exact: true })
     .fill(amount);
   for (let step = 0; step < 3; step++) await next(page);
+  if (type === "ENT" && requestId)
+    await expect(page.getByText(fulfillment === "complete" ? "Atendimento integral previsto" : "Atendimento parcial previsto", { exact: true })).toBeVisible();
   const pending = page.waitForResponse(
     (r) =>
       (new URL(r.url()).pathname === "/api/documents" &&
@@ -829,12 +839,23 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
   expect(detail.events.length).toBeGreaterThan(2);
 });
 
+async function prepareDeliveryAssessment(page: Page) {
+  const f = await setup();
+  const family = await shiftWorker(f.patient, "admin");
+  const recipient = await shiftWorker(f.patient);
+  await signIn(page, family.email, "/fichas");
+  return {
+    patient: f.patient,
+    product: { id: f.products[0], name: "Material fictício V4 0" },
+    recipient,
+    recipientName: "Profissional fictício de plantão",
+  };
+}
+
 test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite", async ({
   page,
-}) => {
-  await login(page);
-  const { patient, products } = await prepare(page);
-  const product = products[0];
+}, info) => {
+  const { patient, product, recipient, recipientName } = await prepareDeliveryAssessment(page);
   const extra = (
     await post(page, "/api/requisitions", {
       careRecipientId: patient,
@@ -926,7 +947,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await page.goto("/fichas/ent?careRecipientId=" + patient);
   await selectDeliveryRecipient(
     page,
-    "Teste professional",
+    recipientName,
     "Pessoa indicada manualmente para receber estes materiais",
   );
   const links = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
@@ -939,15 +960,12 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     await option.getByRole("checkbox", { name: /^Importar materiais/ }).check();
   }
   await sourcePicker.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
+  await expect(page.getByRole("checkbox", { name: /^Atende integralmente à necessidade/ })).toHaveCount(0);
   await next(page);
-  await expect(
-    page.locator(".ui-field-error").filter({ hasText: /Justifique/ }),
-  ).toBeVisible();
-  await page
-    .getByLabel("Justificativa da necessidade compartilhada", { exact: false })
-    .fill("As duas requisições reiteram a mesma necessidade física.");
-  await page.getByRole("combobox", { name: /^Esta entrega pretende atender a necessidade/ }).selectOption("complete");
-  await next(page);
+  await selectMaterialCategory(page);
+  const assessment = page.getByRole("checkbox", { name: `Atende integralmente à necessidade de ${product.name}`, exact: true });
+  await expect(assessment).not.toBeChecked();
+  await assessment.check();
   await page
     .getByRole("button", { name: "Ler código de barras", exact: true })
     .click();
@@ -1012,17 +1030,19 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     page.getByText("Quantidade total calculada:", { exact: false }),
   ).toContainText("4 unidade");
   await expect(page.getByText(/Código desconhecido/)).not.toBeVisible();
-  for (let step = 0; step < 3; step++) {
-    const shared = page.getByLabel(
-      "Justificativa da necessidade compartilhada",
-      { exact: false },
-    );
-    if (await shared.isVisible())
-      await shared.fill(
-        "As requisições reiteram a mesma necessidade, com um único crédito físico.",
-      );
-    await next(page);
+  await next(page);
+  const shared = page.getByLabel("Justificativa da necessidade compartilhada", { exact: false });
+  await expect(shared).toHaveAttribute("aria-invalid", "true");
+  await expect(shared).toBeFocused();
+  await shared.fill("As requisições reiteram a mesma necessidade, com um único crédito físico.");
+  if (info.project.use.hasTouch) {
+    await assessment.scrollIntoViewIfNeeded();
+    await info.attach("ENT · suficiência no material", {
+      body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+    });
   }
+  for (let step = 0; step < 3; step++) await next(page);
+  await expect(page.getByText("Atendimento integral previsto", { exact: true })).toBeVisible();
   const issuing = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname === "/api/documents" &&
@@ -1035,6 +1055,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   expect(response.ok(), await response.text()).toBeTruthy();
   const delivery = (await response.json()).data;
   expect(delivery.lines[0].requisitionItemIds).toHaveLength(2);
+  expect(delivery.lines[0].family_fulfillment).toBe("complete");
   await page.goto("/estoque?careRecipientId=" + patient + "&custody=TRANSIT");
   await expect(
     page.getByRole("link", { name: delivery.code, exact: true }),
@@ -1043,14 +1064,40 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     page.getByText("Aguardando conferência", { exact: true }),
   ).toBeVisible();
   await logout(page);
-  await login(page, "professional");
-  await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
+  await signIn(page, recipient.email, "/fichas/" + delivery.id);
   await confirmCompleteDeliveryReceipt(page);
   for (const id of [extra.requisitionId, second.requisitionId]) {
     const req = (await (await get(page, "/api/requisitions/" + id)).json())
       .data;
     expect(req.fulfillment.fulfilled).toBe(1);
   }
+});
+
+test("ENT registra atendimento parcial com a caixa de suficiência desmarcada", async ({ page }) => {
+  const { patient, product, recipient, recipientName } = await prepareDeliveryAssessment(page);
+  const request = (await post(page, "/api/requisitions", {
+    careRecipientId: patient,
+    idempotencyKey: randomUUID(),
+    lines: [{ productId: product.id, currentStock: 0, urgent: false }],
+    extraItems: [],
+    observations: [],
+  })).receipt;
+  await post(page, "/api/stock/movements", {
+    careRecipientId: patient,
+    productId: product.id,
+    quantity: "10",
+    action: "inbound",
+    reason: "Entrada fictícia para a entrega parcial",
+    idempotencyKey: randomUUID(),
+  });
+  const delivery = await issueSupply(page, "ENT", patient, product.name, "2", request.requisitionId, "partial", recipientName);
+  expect(delivery.lines[0].family_fulfillment).toBe("partial");
+  await page.goto("/fichas");
+  await logout(page);
+  await signIn(page, recipient.email, "/fichas/" + delivery.id);
+  await confirmCompleteDeliveryReceipt(page);
+  const requirement = (await (await get(page, "/api/requisitions/" + request.requisitionId)).json()).data;
+  expect(requirement.fulfillment.fulfilled).toBe(0);
 });
 
 test("E06-09 troca de recebedor de ENT direta e cancelamento com consentimento preservam os saldos reais", async ({
