@@ -6,7 +6,9 @@ import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
+import { selectDeliveryRecipient } from "./delivery-recipient";
 import { selectDocumentSection } from "./document-sections";
+import { selectMaterialCategory } from "./material-category";
 import { selectProfileSection } from "./profile-sections";
 
 test.setTimeout(150_000);
@@ -147,22 +149,47 @@ test("L1 ciência antiga preserva a referência sem acesso e libera nova ciênci
  expect(sql(`select count(*) from public.requisition_science_events where requisition_id=${q(req.id)} and user_id=${q(fixtures.family.id)} and mode='express'`)).toBe("1");
 });
 
-test("L1 pré-vínculo oferece só a necessidade em aberto e descarte exige nova avaliação familiar",async({page})=>{
- const f=await setup(),req=await issue(f.patient,f.products),receiver=await actor("professional",f.patient);
- const ent=await delivery(f.patient,req,[f.products[0]],{requestFulfillment:"complete"});
- await rpc(receiver,"supply_document_command",{p_id:ent.id,p_action:"receive",p_body:{divergences:[]},p_key:randomUUID(),p_version:ent.version});
- await login(page,f.patient);await page.goto(`/fichas/ent?careRecipientId=${f.patient}&requisitionId=${req.id}`);
- const origins=page.getByRole("region",{name:"Fichas vinculadas",exact:true});
- const code=sql(`select code from public.operational_documents where id=${q(req.id)}`);
- await expect(origins.getByRole("button",{name:code,exact:true})).toBeVisible();
- const assessment=page.getByRole("region",{name:"Avaliação dos vínculos",exact:true});
- await expect(assessment.getByRole("checkbox")).toHaveCount(0);
- const choice=assessment.getByRole("combobox");await expect(choice).toHaveCount(1);await choice.selectOption("complete");
- await expect(page.getByText("Último rascunho salvo.",{exact:true})).toBeVisible();
- await page.reload();const resume=page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true});
- await resume.getByRole("button",{name:"Descartar e começar novamente",exact:true}).click();
- await expect(choice).toHaveValue("");
- expect(sql("select count(*) from public.operational_documents where care_recipient_id="+q(f.patient)+" and type='ENT'")).toBe("1");
+test("L1 pré-vínculo oferece só a necessidade em aberto e descarte exige nova avaliação familiar", async ({ page }) => {
+  const f = await setup();
+  const req = await issue(f.patient, f.products);
+  const receiver = await actor("professional", f.patient);
+  const family = await shiftWorker(f.patient, "family");
+  const ent = await delivery(f.patient, req, [f.products[0]], { requestFulfillment: "complete" });
+  await rpc(receiver, "supply_document_command", {
+    p_id: ent.id, p_action: "receive", p_body: { divergences: [] }, p_key: randomUUID(), p_version: ent.version,
+  });
+  await login(page, f.patient, family.email);
+  await page.goto(`/fichas/ent?careRecipientId=${f.patient}&requisitionId=${req.id}`);
+  const origins = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
+  const code = sql(`select code from public.operational_documents where id=${q(req.id)}`);
+  const receiverName = sql(`select full_name from public.profiles where id=${q(fixtures.professional.id)}`);
+  const assessmentName = /^Atende integralmente à necessidade de /;
+  const choice = page.getByRole("checkbox", { name: "Atende integralmente à necessidade de Material fictício V4 1", exact: true });
+  const satisfied = page.getByRole("checkbox", { name: /^Material fictício V4 0\b/ });
+  const outstanding = page.getByRole("checkbox", { name: /^Material fictício V4 1\b/ });
+  async function openMaterials() {
+    await expect(origins.getByRole("button", { name: code, exact: true })).toBeVisible();
+    await expect(page.getByRole("checkbox", { name: assessmentName })).toHaveCount(0);
+    await selectDeliveryRecipient(page, receiverName, "Recebedor presente para a conferência do material.");
+    await page.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
+    await selectMaterialCategory(page);
+    await expect(satisfied).not.toBeChecked();
+    await expect(outstanding).toBeChecked();
+    await expect(page.getByRole("checkbox", { name: assessmentName })).toHaveCount(1);
+  }
+  await openMaterials();
+  await expect(choice).not.toBeChecked();
+  await choice.check();
+  await expect.poll(() => sql(`select content#>>array['form','requestFulfillments',${q(f.products[1])}]
+    from private.creation_drafts where care_recipient_id=${q(f.patient)} and owner_id=${q(family.id)}
+      and kind='ENT' and state='active'`)).toBe("complete");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  await page.reload();
+  const resume = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
+  await resume.getByRole("button", { name: "Descartar e começar novamente", exact: true }).click();
+  await openMaterials();
+  await expect(choice).not.toBeChecked();
+  expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)} and type='ENT'`)).toBe("1");
 });
 
 test("L1 avaliação restaurada rejeitada libera nova escolha; resposta perdida recupera uma única avaliação",async({page})=>{

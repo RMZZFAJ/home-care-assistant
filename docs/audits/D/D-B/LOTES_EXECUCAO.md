@@ -413,6 +413,12 @@ física inteiramente recebida. A primeira rodada sofreu timeouts no banco
 local. A rodada final usou perfis fictícios com um único paciente e
 acesso direto às fichas, após atualizar as estatísticas da base local.
 
+O teste de pré-vínculo da ENT passou a verificar a avaliação ao lado do
+material, conforme E04-10. Só a necessidade em aberto vem selecionada.
+O teste conferiu a avaliação integral gravada no rascunho e a caixa
+desmarcada após descartá-lo, sem emitir outra entrega. Passou em
+Chromium, Android emulado e iOS emulado sem retry automático.
+
 Na DEV, a Confirmação tem o mesmo seletor de fichas. O menu de três pontos
 oferece Detalhes do material e Vincular a uma ficha. Cada vínculo pode ser
 geral ou indicar os materiais específicos da entrega. Ao partir de uma ENT
