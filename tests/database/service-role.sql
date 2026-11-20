@@ -19,11 +19,27 @@ select pg_temp.assert_ok(not exists(select 1 from pg_class c join pg_namespace n
   where n.nspname='public' and c.relkind='S' and
   (has_sequence_privilege('service_role',c.oid,'USAGE') or has_sequence_privilege('service_role',c.oid,'UPDATE')
    or has_sequence_privilege('service_role',c.oid,'SELECT'))),'service role cannot manufacture sequence values');
+with l2_worker_functions(signature) as (values
+  ('public.claim_initial_document_pdfs(integer)'::regprocedure),
+  ('public.initial_document_pdf(uuid,text,jsonb)'::regprocedure),
+  ('public.claim_initial_pdf_notices(uuid,integer,uuid,boolean)'::regprocedure),
+  ('public.capture_initial_pdf_notices(uuid,boolean)'::regprocedure),
+  ('public.claim_scheduled_document_archives(integer)'::regprocedure),
+  ('public.commit_scheduled_document_archive(uuid)'::regprocedure)
+)
 select pg_temp.assert_ok(not exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
   where n.nspname='public' and not exists(select 1 from pg_depend d where d.classid='pg_proc'::regclass and d.objid=p.oid and d.deptype='e')
     and has_function_privilege('service_role',p.oid,'EXECUTE')
+    and not exists(select 1 from l2_worker_functions w where w.signature=p.oid)
     and p.proname not in ('claim_notification_jobs','validate_notification_job','complete_notification_job','notification_webhook','notification_job_state','notification_document_payload','notification_pdf','finalize_attachment','register_document_pdf','issue_whatsapp_challenge','accept_whatsapp_receipt','flow_exchange','inbound_report_context','ingest_whatsapp_report','notification_safe_failure','acknowledge_no_issues','bind_notification_template','configure_worker_schedule','confirm_whatsapp_science','issue_reminder_challenge','issue_science_challenge','notification_notice_payload','register_document_render','run_operational_schedule','claim_pdf_issuance','claim_pdf_verification','pdf_issuance_public','legacy_pdf_public','claim_web_push_deliveries','prepare_web_push_delivery','complete_web_push_delivery','prepare_web_push_test','complete_web_push_test','record_operations_event','collect_operations_status','settle_attachment_upload','attest_attachment_source','prepare_avatar_change','verify_avatar_change','avatar_cleanup_candidates','ack_avatar_cleanup')),
-  'service role executes only the worker application functions');
+  'service role executes only the worker application functions'),
+  pg_temp.assert_ok(not exists(
+    select 1 from l2_worker_functions w join pg_proc p on p.oid=w.signature
+    where not has_function_privilege('service_role',p.oid,'EXECUTE')
+      or has_function_privilege('anon',p.oid,'EXECUTE')
+      or has_function_privilege('authenticated',p.oid,'EXECUTE')
+      or not p.prosecdef or p.proconfig is distinct from array['search_path=""']::text[]
+  ), 'L2 PDF, notification and archive workers preserve service-only execution and empty search_path');
 
 select pg_temp.assert_ok(not exists(
  select 1 from (values
