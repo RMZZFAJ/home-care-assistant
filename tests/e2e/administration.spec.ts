@@ -563,14 +563,17 @@ test.describe("administração integrada no ambiente local", () => {
         .locator("dd"),
     ).toHaveText("Solicitante desconhecido");
     await selectDocumentSection(page, "materials");
+    const materials = page.getByRole("list", { name: "Materiais requisitados", exact: true });
+    const materialRows = materials.getByRole("listitem");
+    await expect(materialRows).toHaveCount(2);
     await expect(
-      page
+      materials
         .locator("strong")
         .filter({ hasText: new RegExp("^" + customName + "$") }),
     ).toBeVisible();
-    await expect(
-      page.getByText("Não informado no registro legado", { exact: false }),
-    ).toHaveCount(2);
+    for (const item of await materialRows.all()) {
+      await expect(item.getByText("Não informado no registro legado", { exact: true })).toBeVisible();
+    }
     await selectDocumentSection(page, "communications");
 
     await expect(page.getByText("Nenhuma comunicação registrada para esta ficha.", { exact: true })).toBeVisible();

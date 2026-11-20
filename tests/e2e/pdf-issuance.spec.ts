@@ -17,6 +17,7 @@ import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 import { createClient } from "@supabase/supabase-js";
 import { legacyPdfFixture } from "../support/legacy-pdf-fixtures.mjs";
+import type { PdfIssuance } from "@/lib/documents/pdf-issuance";
 test.setTimeout(180000);
 const hash = (bytes: Buffer) =>
   createHash("sha256").update(bytes).digest("hex");
@@ -51,11 +52,14 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   const f = await fixture(page),
     endpoint = `/api/documents/${f.doc.id}/issuances`,
     files = page.getByRole("region", { name: "Arquivos gerados", exact: true });
-  await expect(
-    files.getByText("Nenhum arquivo registrado nesta consulta.", {
-      exact: false,
-    }),
-  ).toBeVisible();
+  const manualExemplars = async () => {
+    const response = await page.request.get(endpoint);
+    expect(response.ok(), await response.text()).toBe(true);
+    const { data } = await response.json() as { data: PdfIssuance[] };
+    return data.filter(row => row.requestedBy !== null);
+  };
+  await expect(files.getByText("PDF inicial", { exact: true })).toBeVisible();
+  expect(await manualExemplars()).toHaveLength(0);
   const keys: string[] = [];
   let lost = true;
   await page.route(`**${endpoint}`, async (route) => {
@@ -86,7 +90,7 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   ).toBeEnabled();
   expect(keys).toHaveLength(2);
   expect(keys[1]).toBe(keys[0]);
-  let rows = (await (await page.request.get(endpoint)).json()).data;
+  let rows = await manualExemplars();
   expect(rows).toHaveLength(1);
   const first = rows[0];
   expect(first.validation).toMatchObject({
@@ -108,11 +112,12 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   expect(hash(a)).toBe(first.sha256);
   expect(a.equals(b)).toBe(true);
   await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
-  await expect(
-    files.getByRole("link", { name: "Baixar PDF", exact: true }),
-  ).toHaveCount(2);
-  rows = (await (await page.request.get(endpoint)).json()).data;
+  await expect.poll(async () => (await manualExemplars()).map(row => row.state)).toEqual(["ready", "ready"]);
+  rows = await manualExemplars();
   expect(rows).toHaveLength(2);
+  for (const row of rows) {
+    await expect(files.locator(`[data-file-id="${row.id}"]`).getByRole("link", { name: "Baixar PDF", exact: true })).toBeVisible();
+  }
   expect(rows[0].id).not.toBe(first.id);
   expect(rows[0].version).toBe(first.version);
   expect(hash(await download(rows[0].id))).not.toBe(first.sha256);

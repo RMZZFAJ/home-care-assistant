@@ -440,6 +440,20 @@ legada e nos 825 testes de integração. Os seis jobs de navegador chegaram ao
 comando E2E. Esse resultado pertence ao candidato anterior às mudanças do
 cartão e rodapé.
 
+Os logs e artefatos desse candidato confirmaram duas falhas repetidas de
+expectativa nos navegadores. Na importação histórica, a contagem agora usa
+a lista visível Materiais requisitados e confere o estoque desconhecido em
+cada um dos dois itens. Na recuperação de PDF, o teste reconhece o PDF
+inicial e conta só os exemplares manuais. A recuperação pela mesma chave,
+as assinaturas, a leitura dos bytes e a emissão explícita continuam sendo
+verificadas. O build, os tipos e o lint dirigido passaram. A repetição
+local ficou no login da administração e na seleção de contexto da fixture
+de PDF, antes das asserções corrigidas. A verificação E2E segue na CI.
+
+O [preview de `f3fe0f08`](https://vercel.com/rmzzfajs-projects/home-care-assistant/HGzAn29N7g9sog74TBkioz9yXQHP)
+ficou pronto com o cartão e o rodapé de L2. O SonarCloud desse candidato
+continuou com os quatro apontamentos do HTML de referência.
+
 Na stack local preservada, a rodada SQL sem replay parou na regressão de
 agendamento da REQ, que passou no replay da CI. Dois casos locais de PDF
 inicial também terminaram com `statement timeout` ao preparar as fichas.
