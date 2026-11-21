@@ -208,7 +208,7 @@ export function RequisitionDocumentContent({
   const [openingRevision, setOpeningRevision] = useState("initial");
   const { data, observedData, setData, acceptRead, stale } = useDocumentCopy<Detail>(requisitionCopyIdentity);
   const [attempt, setAttempt] = useState(0);
-  const [fulfillmentEntry, setFulfillmentEntry] = useState<{ itemId: string; name: string; deliveries: RequisitionDelivery[] } | null>(null);
+  const [fulfillmentEntry, setFulfillmentEntry] = useState<{ itemId: string; name: string; deliveries: RequisitionDelivery[]; returnToReview?: () => void } | null>(null);
   const fulfillmentOpenerRef = useRef<HTMLButtonElement | null>(null);
   const fulfillmentReturnFocusRef = useRef<string | null>(null);
   const [error, setError] = useState("");
@@ -323,6 +323,12 @@ export function RequisitionDocumentContent({
   const canReviewFulfillment = canStartDelivery && data.status !== "cancelled" &&
     ["admin", "family"].includes(context.patient?.role ?? "") && can(context, "ent.read");
   const reviewRequired = f.reviewRequired ?? f.lines.filter(line => line.serviceStatus === "review_required").length;
+  const pendingAssessments = canReviewFulfillment ? f.lines.flatMap(line => {
+    if (line.serviceStatus !== "review_required") return [];
+    const item = data.requisition_items.find(row => row.id === line.id);
+    const deliveries = requisitionDeliveries(line.deliveries).filter(delivery => ["confirmed", "disputed"].includes(delivery.status));
+    return item && deliveries.length ? [{ itemId: item.id, name: item.product_name_snapshot ?? item.custom_name ?? "Material", deliveries }] : [];
+  }) : [];
   const canStartPurchase = lifecycleVisible && can(context, "com.create");
   const operationalMenu = !terminalFollowUp && lifecycleVisible
     && (canStartDelivery || canStartPurchase || offerScience || progressAllowed);
@@ -439,6 +445,13 @@ export function RequisitionDocumentContent({
               disabled={busy || reading}
               preservedFacts={<p>A contagem da emissão e as movimentações posteriores permanecem registradas.</p>}
               onUpdated={() => setAttempt(value => value + 1)} onShowMaterials={() => tabs.select("materials")}
+              blockerActions={{ req_fulfillment: pendingAssessments.map(entry => ({
+                id: entry.itemId, label: `Avaliar necessidade de ${entry.name}`,
+                open: returnToReview => {
+                  fulfillmentOpenerRef.current = null;
+                  setFulfillmentEntry({ ...entry, returnToReview });
+                },
+              })) }}
               onCompleteAndArchive={archiveAllowed && !terminalFollowUp ? () => setArchiveDialog("archive") : undefined}
             /> : null}
           </>
@@ -789,10 +802,12 @@ export function RequisitionDocumentContent({
         ) : null}
       </DocumentTabs>
       {fulfillmentEntry && canReviewFulfillment ? <RequisitionFulfillmentEntry key={`${data.id}:${fulfillmentEntry.itemId}`}
-        context={context} patientId={data.care_recipient_id} {...fulfillmentEntry} opener={fulfillmentOpenerRef}
+        context={context} patientId={data.care_recipient_id} itemId={fulfillmentEntry.itemId} name={fulfillmentEntry.name}
+        deliveries={fulfillmentEntry.deliveries} opener={fulfillmentOpenerRef}
         onClose={() => {
-          fulfillmentReturnFocusRef.current = fulfillmentEntry.itemId;
+          if (!fulfillmentEntry.returnToReview) fulfillmentReturnFocusRef.current = fulfillmentEntry.itemId;
           setFulfillmentEntry(null);
+          fulfillmentEntry.returnToReview?.();
         }} onReviewed={() => setAttempt(value => value + 1)} /> : null}
       {decision ? (
         <RequisitionDecisionEditor

@@ -86,7 +86,7 @@ function ArrivalReviewCard({ row, choice, update }: {
   </article>;
 }
 
-export type OpenChangedArrivals = (receiptIds: readonly string[], focusAfterClose: () => HTMLButtonElement | null) => void;
+export type OpenChangedArrivals = (receiptIds: readonly string[], focusAfterClose: () => HTMLButtonElement | null, onClose?: () => void) => void;
 
 export function canReviewPurchaseArrivals(context: WorkspaceContext) {
   return context.patient?.role === "admin" && can(context, "com.read") && can(context, "com.validate");
@@ -121,6 +121,7 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
   const [refreshFailed, setRefreshFailed] = useState(false);
   const sendingRef = useRef(false), readingRef = useRef<symbol | null>(null), triggerRef = useRef<HTMLButtonElement>(null);
   const focusAfterCloseRef = useRef<(() => HTMLButtonElement | null) | null>(null);
+  const returnToSourceRef = useRef<(() => void) | undefined>(undefined);
   const [changedReceiptIds, setChangedReceiptIds] = useState<readonly string[] | null>(null);
   const formId = useId();
   useOperationActivity(busy, { title: "Registrando decisões das chegadas", stage, steps: onReviewed ? documentReviewSteps : reviewSteps });
@@ -205,16 +206,23 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
       setError("O resultado ainda não pôde ser confirmado. Confira a mesma tentativa antes de repetir a decisão. Se persistir, procure a supervisão.");
     } finally { sendingRef.current = false; setBusy(false); }
   }
-  function openReview(receiptIds: readonly string[] | null = null, focusAfterClose: (() => HTMLButtonElement | null) | null = null) {
+  function openReview(receiptIds: readonly string[] | null = null, focusAfterClose: (() => HTMLButtonElement | null) | null = null, onClose?: () => void) {
     readingRef.current = null;
     focusAfterCloseRef.current = focusAfterClose;
+    returnToSourceRef.current = onClose;
     setChangedReceiptIds(receiptIds);
     setOpen(true); setError(""); setDirty(false);
     if (!pendingKey) { setQueue({ arrivals: [], next: null }); setChoices({}); void load(false, receiptIds); }
   }
   useImperativeHandle(changedArrivalsRef, () => openReview);
   const returnFocus = () => focusAfterCloseRef.current?.() ?? triggerRef.current;
-  function closeReview() { setOpen(false); setExit(false); }
+  function returnToSource() {
+    const resume = returnToSourceRef.current;
+    returnToSourceRef.current = undefined;
+    resume?.();
+  }
+  function closeReview() { setOpen(false); setExit(false); returnToSource(); }
+  function closeResult() { setResult(null); returnToSource(); }
   function requestClose() { if (!pendingKey && dirty) setExit(true); else closeReview(); }
   const changed = result?.results.some(row => ["approved", "rejected", "correction_requested"].includes(row.status));
 
@@ -248,9 +256,9 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
     </Dialog>
     <Dialog open={exit} title="Sair sem concluir?" onClose={() => setExit(false)} subtitle="Se sair agora, suas escolhas serão descartadas."
       footer={<><ActionButton onClick={() => setExit(false)}>Voltar à conferência</ActionButton><ActionButton onClick={closeReview}>Sair e descartar</ActionButton></>}>{null}</Dialog>
-    <Dialog open={Boolean(result)} success={Boolean(changed)} onClose={() => setResult(null)}
+    <Dialog open={Boolean(result)} success={Boolean(changed)} onClose={closeResult}
       title={changed ? "Decisões registradas" : "Resultado da conferência"} finalFocus={returnFocus}
-      footer={<ActionButton variant="primary" onClick={() => setResult(null)}>Concluir</ActionButton>}>
+      footer={<ActionButton variant="primary" onClick={closeResult}>Concluir</ActionButton>}>
       {refreshFailed ? <Notice>O resultado foi registrado. Use Atualizar ficha para consultar a versão atual.</Notice> : null}
       <ul className="hca-purchase-list">{result?.results.map(row => <li key={row.receiptId} className="hca-purchase-line">
         <strong>{row.status === "approved" && queue.arrivals.find(item => item.receiptId === row.receiptId)?.materials.every(item => quantity(item.quantity).eq(0))

@@ -1284,6 +1284,8 @@
 .hca-document-archive .hca-follow-up-prior > span:last-child { max-width: 112px; text-align: center; }
 .hca-document-archive .hca-follow-up-prior > a { font-size: 11px; white-space: nowrap; }
 .hca-document-follow-up .hca-cancellation-checklist strong { display: inline-block; margin-bottom: 3px; }
+.hca-follow-up-resolve { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.hca-follow-up-resolve button { white-space: normal; }
 .hca-document-follow-up .hca-receipt-line { border-width: 1px 0 0; border-radius: 0; padding: 12px 0 0; }
 .hca-l1 .hca-document-follow-up textarea { min-height: 68px; }
 .hca-l1 .hca-modal:has(.hca-document-follow-up) > .hca-modal-content { background: var(--hca-paper); padding: 20px 18px; }

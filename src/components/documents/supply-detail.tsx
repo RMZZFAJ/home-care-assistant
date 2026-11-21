@@ -663,6 +663,9 @@ export function SupplyDocumentContent({
   const followUpState = data && supplyFollowUpState(data.status, data.workflow_data.documentFollowUp);
   const followUpTerminal = followUpState === "completed" || data?.status === "cancelled" && followUpState !== "reopened";
   const purchaseIdentificationPending = data?.type === "COM" && data.purchaseProgress?.identificationPending === true;
+  const pendingArrivalIds = data?.type === "COM" && activeContext && !archived && canReviewPurchaseArrivals(context)
+    ? data.receipts.filter(receipt => receipt.state === "pending" && receipt.submitted_by !== context.userId).map(receipt => receipt.id)
+    : [];
   const patientAdmin = Boolean(activeContext && context.patient?.role === "admin" && can(context, "access.manage"));
   const canReviewCompletion = Boolean(activeContext && !archived && data?.protocol && data.type !== "BAL"
     && !purchaseIdentificationPending
@@ -1175,6 +1178,14 @@ export function SupplyDocumentContent({
                   cancelled={data.status === "cancelled" && followUpState !== "completed"}
                   disabled={busy || operationOpen} onUpdated={() => setAttempt(value => value + 1)}
                   onShowMaterials={() => tabs.select("materials")}
+                  blockerActions={pendingArrivalIds.length ? { com_validation: [{
+                    id: "review-arrivals", label: pendingArrivalIds.length === 1 ? "Revisar chegada" : "Revisar chegadas",
+                    open: returnToReview => {
+                      const open = changedArrivalsRef.current;
+                      if (open) open(pendingArrivalIds, () => moreTriggerRef.current, returnToReview);
+                      else returnToReview();
+                    },
+                  }] } : undefined}
                   onCompleteAndArchive={patientAdmin && !followUpTerminal && !purchaseIdentificationPending ? () => setArchiveDialog("archive") : undefined}
                   preservedFacts={data.type === "ENT" ? data.lines.map(line => {
                     const returned = data.deliveryCancellation?.lines.find(result => result.lineId === line.id);

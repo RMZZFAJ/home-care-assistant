@@ -14,6 +14,8 @@ import { DocumentArchivePolicy } from "./document-archive-policy";
 
 type Purpose = "complete" | "reopen";
 type Blocker = FollowUpReference["blockers"][number];
+type BlockerAction = { id: string; label: string; open: (returnToReview: () => void) => void };
+type FollowUpBlockerActions = Partial<Record<Blocker, BlockerAction[]>>;
 const checks: Record<FollowUpReference["kind"], Blocker[]> = {
   REQ: ["req_fulfillment", "req_delivery"],
   COM: ["com_approval", "com_expectation", "com_arrival", "com_validation"],
@@ -33,7 +35,7 @@ const labels: Record<Blocker, [ready: string, blocked: string, instruction: stri
 };
 
 export function DocumentFollowUpActions({
-  id, patientId, kind, code, patientName, actor, userId, canComplete, canReopen, cancelled, disabled, preservedFacts, onUpdated, onShowMaterials, onCompleteAndArchive, reviewControl,
+  id, patientId, kind, code, patientName, actor, userId, canComplete, canReopen, cancelled, disabled, preservedFacts, onUpdated, onShowMaterials, onCompleteAndArchive, reviewControl, blockerActions,
 }: {
   id: string; patientId: string; kind: FollowUpReference["kind"]; code: string; patientName: string; actor: string; userId: string;
   canComplete: boolean; canReopen: boolean; cancelled: boolean; disabled: boolean;
@@ -42,6 +44,7 @@ export function DocumentFollowUpActions({
   onShowMaterials: () => void;
   onCompleteAndArchive?: () => void;
   reviewControl?: Ref<(opener: HTMLButtonElement | null) => void>;
+  blockerActions?: FollowUpBlockerActions;
 }) {
   const openerRef = useRef<HTMLButtonElement>(null);
   const continueToArchiveRef = useRef(false);
@@ -51,6 +54,7 @@ export function DocumentFollowUpActions({
   const [conflict, setConflict] = useState(false);
   const [discard, setDiscard] = useState<"close" | "materials" | null>(null);
   const [result, setResult] = useState<FollowUpReference | null>(null);
+  const [resolving, setResolving] = useState(false);
   const decision = useDocumentDecision({ userId, documentId: id, domain: "lifecycle", action: purpose ?? "none" });
 
   const readReference = useCallback((value: unknown) => {
@@ -60,11 +64,12 @@ export function DocumentFollowUpActions({
       throw new Error("A referência recebida pertence a outro contexto. Consulte a ficha novamente.");
     return row;
   }, [id, patientId, kind]);
-  const reference = useScopedRead(purpose && !result ? `/api/documents/${id}?reference=follow-up` : null, userId, readReference);
+  const reference = useScopedRead(purpose && !result && !resolving ? `/api/documents/${id}?reference=follow-up` : null, userId, readReference);
   useOperationActivity(reference.loading && Boolean(purpose), { title: "Conferindo situação da ficha" });
 
   const facts = reference.loading || reference.error || conflict ? null : reference.data;
   const reopening = purpose === "reopen";
+  const alreadyCompleted = !reopening && facts?.state === "completed" && !decision.uncertain;
   const unavailable = disabled || !facts || (reopening ? !facts.canReopen : !facts.canComplete || facts.blockers.length > 0);
   const canSend = Boolean(purpose && !unavailable && (!reopening || reason.trim().length >= 3));
   const title = reopening ? "Reverter decisão e reabrir" : "Revisar e concluir";
@@ -83,12 +88,23 @@ export function DocumentFollowUpActions({
   useImperativeHandle(reviewControl, () => (opener: HTMLButtonElement | null) => open("complete", opener));
 
   function closeReview(destination: "close" | "materials" = "close") {
-    if (decision.uncertain || reason.trim()) {
+    if (decision.uncertain || (!alreadyCompleted && reason.trim())) {
       setDiscard(destination);
       return;
     }
     setPurpose(null);
     if (destination === "materials") onShowMaterials();
+  }
+
+  function resolve(action: BlockerAction) {
+    if (decision.busy || decision.uncertain) return;
+    setResolving(true);
+    action.open(() => {
+      reference.refresh();
+      setError("");
+      setConflict(false);
+      setResolving(false);
+    });
   }
 
   async function submit(archiveNext = false) {
@@ -131,17 +147,17 @@ export function DocumentFollowUpActions({
     </ActionButton> : canComplete && !reviewControl ? <ActionButton disabled={disabled} onClick={event => open("complete", event.currentTarget)}>
       <Icon name="check" />Revisar conclusão
     </ActionButton> : null}
-    <Dialog open={Boolean(purpose) && !result} title={title} kicker={`${code} · ${patientName}`}
-      subtitle={reopening ? "A reversão ficará vinculada à decisão anterior." :
+    <Dialog open={Boolean(purpose) && !result && !resolving} keyboardScrollable title={title} kicker={`${code} · ${patientName}`}
+      subtitle={alreadyCompleted ? "A ficha já foi concluída." : reopening ? "A reversão ficará vinculada à decisão anterior." :
         facts?.blockers.length ? "Resolva as pendências antes de concluir a ficha." : "Confira as condições da ficha antes de concluir."}
       finalFocus={openerRef} closeDisabled={decision.busy} onClose={() => closeReview()} footer={<>
         <ActionButton variant="quiet" disabled={decision.busy} onClick={() => closeReview()}><Icon name="back" />Voltar à ficha</ActionButton>
-        {!reopening && onCompleteAndArchive && !decision.uncertain ? <ActionButton disabled={decision.busy || !canSend} onClick={() => void submit(true)}>
+        {!reopening && onCompleteAndArchive && !decision.uncertain && !alreadyCompleted ? <ActionButton disabled={decision.busy || !canSend} onClick={() => void submit(true)}>
           <Icon name="archive" />Concluir e arquivar
         </ActionButton> : null}
-        <ActionButton variant="primary" disabled={decision.busy || !decision.uncertain && !canSend} onClick={() => void submit()}>
+        {!alreadyCompleted ? <ActionButton variant="primary" disabled={decision.busy || !decision.uncertain && !canSend} onClick={() => void submit()}>
           <Icon name={reopening ? "undo" : "check"} />{decision.uncertain ? "Conferir resultado" : confirmation}
-        </ActionButton>
+        </ActionButton> : null}
       </>}>
       <div className="hca-delivery-receipt hca-document-follow-up">
         {error || decision.recoveryMessage ? <Notice error={Boolean(error)}>{error || decision.recoveryMessage}</Notice> : null}
@@ -168,20 +184,27 @@ export function DocumentFollowUpActions({
             <li><Icon name="check-circle" /><div><strong>Decisão anterior preservada</strong><p>A justificativa e a autoria permanecem no histórico.</p></div></li>
           </> : <>
             {(facts.physicalStatus === "cancelled" ? [] : checks[kind]).map(check => facts.blockers.includes(check)
-              ? <li key={check} className="hca-follow-up-blocker"><Icon name="alert" /><details>
-                <summary><strong>{labels[check][1]}</strong></summary>
-                <p>{labels[check][2]}</p>
-                <ActionButton compact disabled={decision.busy || decision.uncertain} onClick={() => closeReview("materials")}>Consultar ficha</ActionButton>
-              </details></li>
+              ? <li key={check} className="hca-follow-up-blocker"><Icon name="alert" />
+                {blockerActions?.[check]?.length ? <div>
+                  <strong>{labels[check][1]}</strong>
+                  <p>{labels[check][2]}</p>
+                  <div className="hca-follow-up-resolve">{blockerActions[check].map(action =>
+                    <ActionButton key={action.id} compact disabled={decision.busy || decision.uncertain} onClick={() => resolve(action)}>{action.label}</ActionButton>)}</div>
+                </div> : <details>
+                  <summary><strong>{labels[check][1]}</strong></summary>
+                  <p>{labels[check][2]}</p>
+                  <ActionButton compact disabled={decision.busy || decision.uncertain} onClick={() => closeReview("materials")}>Consultar ficha</ActionButton>
+                </details>}</li>
               : <li key={check}><Icon name="check-circle" /><strong>{labels[check][0]}</strong></li>)}
             <li><Icon name="check-circle" /><div><strong>Histórico preservado</strong><p>Vínculos, decisões e movimentações continuam disponíveis.</p></div></li>
           </>}
         </ul> : null}
-        {facts && (reopening ? !facts.canReopen : !facts.canComplete) ?
+        {alreadyCompleted && reason.trim() ? <Notice>A observação abaixo ficou apenas nesta revisão. Para registrá-la na ficha, publique um andamento.</Notice> : null}
+        {facts && !alreadyCompleted && (reopening ? !facts.canReopen : !facts.canComplete) ?
           <Notice>A decisão está indisponível para esta ficha e este acesso.</Notice> : null}
         {reopening ? <>{preservedFacts}<Notice><strong>Sem movimentação automática</strong><p>O estoque permanece como está. Uma nova movimentação exige seu próprio registro.</p></Notice></> : null}
         {!decision.uncertain ? <FormField label={reopening ? "Justificativa da reversão" : "Observação da conclusão"} required={reopening}>
-          <TextAreaField rows={3} maxLength={1000} readOnly={decision.busy} value={reason} onChange={event => setReason(event.currentTarget.value)} />
+          <TextAreaField rows={3} maxLength={1000} readOnly={decision.busy || alreadyCompleted} value={reason} onChange={event => setReason(event.currentTarget.value)} />
         </FormField> : null}
         {facts && !reopening && !unavailable && !decision.uncertain && !decision.busy ?
           <DocumentArchivePolicy id={id} patientId={patientId} version={facts.version} /> : null}

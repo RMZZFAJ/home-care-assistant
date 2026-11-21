@@ -1,11 +1,15 @@
 import { openDocumentAction, openDocumentMore, closeDocumentMore } from "./document-sections";
 import { expect, test } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 import { PDF } from "@libpdf/core";
 import { entOperationFixture, entSend } from "../integration/ent-operation-fixtures.mjs";
 import { entTerminalFixture, terminalLedger } from "../integration/ent-terminal-fixtures.mjs";
-import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
+import { actor, delivery, fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { purchaseBalanceCommand } from "../integration/purchase-entry-balance-fixtures.mjs";
 import { generatedPdf, pdfIssuanceReference } from "./generated-pdf";
 import { confirmedOutcome, loginDecision, noPrivateWrites, privateFormCount } from "./l1-decision-policy";
+import { arrivalCard, confirmArrivalReview } from "./purchase-arrival-review";
 
 test.setTimeout(180_000);
 
@@ -97,5 +101,99 @@ test("revisão da ENT exige conferência pessoal e descarta a nota somente após
   expect((await read.json()).data).toMatchObject({
     status: received.status, workflow_data: { acceptedAt: received.workflow_data.acceptedAt, acceptedBy: received.workflow_data.acceptedBy },
   });
+  expect(terminalLedger(patient)).toBe(stock);
+});
+
+test("REQ resolve a avaliação da família e retorna à conclusão com a observação preservada", async ({ page }, info) => {
+  const { admin, patient, products } = await setup();
+  const approver = await shiftWorker(patient, "admin");
+  const req = await issue(patient, [products[0]]);
+  const sent = await delivery(patient, req, [products[0]], { quantity: "5", requestFulfillment: "complete" });
+  const [line] = sent.lines;
+  const team = await actor("professional", patient);
+  await rpc(team, "supply_document_command", {
+    p_id: sent.id, p_action: "receive", p_key: randomUUID(), p_version: sent.version,
+    p_body: { countedReceipt: { lines: [{ lineId: line.id, receivedQuantity: "5", reviewReason: "A equipe solicitou a conferência da necessidade." }] } },
+  });
+  const stock = terminalLedger(patient);
+  await loginDecision(page, approver.email, patient);
+  await page.goto(`/fichas/${req.id}`);
+  await openDocumentAction(page, "Revisar conclusão");
+  const review = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+  const confirm = review.getByRole("button", { name: "Concluir", exact: true });
+  const note = review.getByRole("textbox", { name: "Observação da conclusão" });
+  const assess = review.getByRole("button", { name: `Avaliar necessidade de ${line.name_snapshot}`, exact: true });
+  await expect(assess).toBeVisible();
+  await expect(confirm).toBeDisabled();
+  if (info.project.use.hasTouch) {
+    await page.setViewportSize({ width: 360, height: 844 });
+    const path = info.outputPath("E04-12-revisao.png");
+    await review.screenshot({ path, scale: "css", animations: "disabled" });
+    await info.attach("E04-12 revisão da REQ", { path, contentType: "image/png" });
+  }
+  await note.fill("Resumo fictício para a conclusão da REQ.");
+  await assess.click();
+  const assessment = page.getByRole("dialog", { name: "Reavaliar necessidade", exact: true });
+  await expect(assessment).toContainText("A equipe solicitou a conferência da necessidade.");
+  await assessment.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(note).toHaveValue("Resumo fictício para a conclusão da REQ.");
+  await expect(confirm).toBeDisabled();
+  await assess.click();
+  await assessment.getByRole("textbox", { name: "Justificativa da avaliação" }).fill("O recebido supre a necessidade conferida com a família.");
+  await assessment.getByRole("button", { name: "Registrar avaliação", exact: true }).click();
+  const approved = page.getByRole("dialog", { name: "Avaliação registrada", exact: true });
+  await approved.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(note).toHaveValue("Resumo fictício para a conclusão da REQ.");
+  await expect(assess).toHaveCount(0);
+  await expect(review).toContainText("A ficha já foi concluída.");
+  await expect(confirm).toHaveCount(0);
+  await review.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  expect(await rpc(admin, "document_follow_up_reference", { p_id: req.id })).toMatchObject({ state: "completed", decision: { action: "req.completed" } });
+  expect(terminalLedger(patient)).toBe(stock);
+});
+
+test("COM revisa a chegada a partir do bloqueio e retorna à conclusão com a referência atual", async ({ page }, info) => {
+  const { admin, patient, products } = await setup();
+  const buyer = await shiftWorker(patient, "family");
+  const reviewer = await shiftWorker(patient, "admin");
+  const planned = await rpc(admin, "create_supply_document", {
+    p_patient: patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+    p_payload: { origin: "purchase", lines: [{ productId: products[0], quantity: "6" }] },
+  });
+  const [line] = planned.lines;
+  const purchased = await purchaseBalanceCommand(buyer.client, planned, "purchase", { lines: [{ lineId: line.id, quantity: "6" }] });
+  const pending = await purchaseBalanceCommand(buyer.client, purchased, "receive", { lines: [{ lineId: line.id, quantity: "6", expectedQuantity: "6" }] });
+  const [receipt] = pending.receipts;
+  const initial = terminalLedger(patient);
+  await loginDecision(page, reviewer.email, patient);
+  await page.goto(`/fichas/${planned.id}`);
+  await openDocumentAction(page, "Revisar conclusão");
+  const review = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+  const confirm = review.getByRole("button", { name: "Concluir", exact: true });
+  const note = review.getByRole("textbox", { name: "Observação da conclusão" });
+  const inspectArrival = review.getByRole("button", { name: "Revisar chegada", exact: true });
+  await expect(inspectArrival).toBeVisible();
+  await expect(confirm).toBeDisabled();
+  if (info.project.use.hasTouch) {
+    await page.setViewportSize({ width: 412, height: 844 });
+    const path = info.outputPath("E05-12-revisao.png");
+    await review.screenshot({ path, scale: "css", animations: "disabled" });
+    await info.attach("E05-12 revisão da COM", { path, contentType: "image/png" });
+  }
+  await note.fill("Resumo fictício para a conclusão da COM.");
+  await inspectArrival.click();
+  const arrival = page.getByRole("dialog", { name: "Conferir entrada no estoque", exact: true });
+  await expect(arrivalCard(arrival, receipt.id)).toBeVisible();
+  expect(terminalLedger(patient)).toBe(initial);
+  const { result } = await confirmArrivalReview(page, arrival, true);
+  await result.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(note).toHaveValue("Resumo fictício para a conclusão da COM.");
+  await expect(inspectArrival).toHaveCount(0);
+  await expect(confirm).toBeEnabled();
+  const stock = terminalLedger(patient);
+  expect(JSON.parse(stock)).toHaveLength(JSON.parse(initial).length + 1);
+  await confirm.click();
+  await page.getByRole("dialog", { name: "Ficha concluída", exact: true }).getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  expect(await rpc(admin, "document_follow_up_reference", { p_id: planned.id })).toMatchObject({ state: "completed", lastAct: { reason: "Resumo fictício para a conclusão da COM." } });
   expect(terminalLedger(patient)).toBe(stock);
 });
