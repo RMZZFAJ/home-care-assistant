@@ -204,15 +204,18 @@ test("L1 avaliação restaurada rejeitada libera nova escolha; resposta perdida 
  await expect(dialog).toContainText("referência do recebimento mudou");
  expect(await page.evaluate(key=>sessionStorage.getItem(key),key)).toBeNull();
  await dialog.getByRole("button",{name:"Integralmente",exact:true}).click();
+ await dialog.getByLabel("Justificativa da avaliação").fill("O recebido atende à necessidade da família.");
  await page.route(`**/api/documents/${ent.id}/fulfillment-review`,async route=>{
   const response=await route.fetch();expect(response.ok()).toBe(true);await route.abort("failed");
  });
- await dialog.getByRole("button",{name:"Registrar avaliação familiar",exact:true}).click();
+ await dialog.getByRole("button",{name:"Registrar avaliação",exact:true}).click();
  await expect(dialog).toContainText("conteúdo e a identidade desta avaliação foram preservados");
  await expect(dialog.getByRole("button",{name:"Verificar mesma avaliação",exact:true})).toBeEnabled();
  await page.unroute(`**/api/documents/${ent.id}/fulfillment-review`);await page.reload();
  await dialog.getByRole("button",{name:"Verificar mesma avaliação",exact:true}).click();
- await expect(dialog).toHaveCount(0);
+ const result=page.getByRole("dialog",{name:"Avaliação registrada",exact:true});
+ await expect(result).toContainText("Integralmente suprida");
+ await result.getByRole("button",{name:"Voltar à ficha",exact:true}).click();
  expect(await page.evaluate(key=>sessionStorage.getItem(key),key)).toBeNull();
  expect(sql("select count(*) from private.requisition_fulfillment_reviews where document_id="+q(ent.id))).toBe("1");
  expect(sql("select count(*) from private.requisition_fulfillment_reviews where idempotency_key="+q(packet.key))).toBe("0");

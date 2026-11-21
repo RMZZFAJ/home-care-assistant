@@ -11,6 +11,8 @@ type FollowUpFacts = {
   personalScience: boolean;
   fulfilled: number;
   total: number;
+  reviewRequired?: number;
+  canAssessNeed?: boolean;
 };
 type RequisitionFollowUp = {
   heading: string;
@@ -36,6 +38,12 @@ export function requisitionFollowUp(facts: FollowUpFacts): RequisitionFollowUp {
     heading: "Consultar os materiais da requisição",
     description: "Não há itens apurados para indicar o progresso do atendimento. Consulte o conteúdo preservado; nenhuma conclusão foi inferida.",
     pending: false, label: "Materiais e atendimento", section: "materials",
+  };
+  if (facts.reviewRequired) return {
+    heading: facts.canAssessNeed ? "Avaliar suficiência dos materiais" : "Acompanhar a avaliação familiar",
+    description: facts.reviewRequired === 1 ? "Um material com recebimento registrado aguarda a avaliação da família." :
+      `${facts.reviewRequired} materiais com recebimento registrado aguardam a avaliação da família.`,
+    pending: true, label: "Materiais e atendimento", section: "materials",
   };
   if (facts.fulfilled < facts.total) return {
     heading: "Acompanhar as entregas vinculadas",

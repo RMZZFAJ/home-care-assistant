@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — avaliação de suficiência na REQ e na ENT.** O painel do material
+da REQ abre a avaliação da entrega vinculada. O diálogo mostra o motivo,
+o recebimento e a avaliação anterior e confirma o resultado registrado.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — conciliação de vários materiais de entrega.** Após registrar
 um material, o diálogo de E06-08 mantém a lista e abre o próximo item em
 apuração. A decisão da família permanece identificada e os campos em

@@ -172,6 +172,29 @@ autorizada que existe no registro. Os seis casos de navegador passaram
 sem repetição, incluindo o vínculo da REQ no rascunho e o percurso
 REQ, COM, aprovação de chegada, estoque, ENT parcial e BAL.
 
+**Avaliação familiar a partir de REQ e ENT.** A REQ indica a avaliação
+pendente junto ao item e no próximo passo sugerido quando já há
+recebimento registrado. A ação no painel do material abre o diálogo da
+ENT vinculada. Quando há mais de uma entrega ou linha elegível, o produto
+permite escolher a referência antes de avaliar.
+
+A composição de E04-13, E04-17, E04-18 e E06-15 usa motivo da equipe,
+recebimento menor ou edição de avaliação conforme os fatos da entrega.
+O bloco **Avaliação e fichas de origem** preserva a avaliação anterior,
+a quantidade confirmada, a autoria disponível e os vínculos autorizados.
+O diálogo pede motivo ao registrar, como na v7. A decisão confirmada
+mostra o resultado e retorna ao material de origem. A avaliação continua
+registrada por material da ENT. Nenhuma migration neste ajuste.
+
+O teste com Auth real registrou integral → parcial pela REQ e parcial →
+integral pela ENT. As duas avaliações permaneceram no histórico, o aviso
+chegou à equipe na ficha e o livro de estoque preservou as movimentações.
+As capturas em 360 e 412 px foram comparadas com o motivo e os vínculos
+abertos em E04-17. A atualização do painel substituía o botão durante o
+retorno no iOS. O reteste em Android e iOS confirmou o foco no controle
+do mesmo material após a atualização. A recuperação de resposta perdida
+e a rejeição da referência antiga também passaram nos dois navegadores.
+
 **Conciliação de vários materiais em E06-08.** O diálogo conserva a lista
 quando a decisão de um item deixa outro em apuração. Mostra a diferença
 conciliada e a avaliação familiar já registrada. Abre o próximo material

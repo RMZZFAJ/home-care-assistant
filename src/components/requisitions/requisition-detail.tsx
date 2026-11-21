@@ -8,6 +8,7 @@ import { DocumentFollowUpActions } from "@/components/documents/document-follow-
 import { DocumentArchiveActions, DocumentArchiveDialog, type ArchiveDialogMode } from "@/components/documents/document-archive-dialog";
 import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
 import { RequisitionScienceAction, type RequisitionScienceControl } from "./requisition-science-action";
+import { RequisitionFulfillmentEntry } from "./requisition-fulfillment-entry";
 import { DocumentFab } from "@/components/documents/document-fab";
 import { DocumentCommunications } from "@/components/notifications/document-communications";
 import { DocumentMaterialList } from "@/components/documents/document-material-list";
@@ -207,6 +208,9 @@ export function RequisitionDocumentContent({
   const [openingRevision, setOpeningRevision] = useState("initial");
   const { data, observedData, setData, acceptRead, stale } = useDocumentCopy<Detail>(requisitionCopyIdentity);
   const [attempt, setAttempt] = useState(0);
+  const [fulfillmentEntry, setFulfillmentEntry] = useState<{ itemId: string; name: string; deliveries: RequisitionDelivery[] } | null>(null);
+  const fulfillmentOpenerRef = useRef<HTMLButtonElement | null>(null);
+  const fulfillmentReturnFocusRef = useRef<string | null>(null);
   const [error, setError] = useState("");
   const [readFailed, setReadFailed] = useState(false);
   const [message, setMessage] = useState("");
@@ -316,6 +320,9 @@ export function RequisitionDocumentContent({
   const progressAllowed = !p.archivedAt && context.activeContext?.mode === "patient"
     && context.patient?.id === data.care_recipient_id && can(context, "document.progress.create");
   const canStartDelivery = lifecycleVisible && can(context, "ent.create");
+  const canReviewFulfillment = canStartDelivery && data.status !== "cancelled" &&
+    ["admin", "family"].includes(context.patient?.role ?? "") && can(context, "ent.read");
+  const reviewRequired = f.reviewRequired ?? f.lines.filter(line => line.serviceStatus === "review_required").length;
   const canStartPurchase = lifecycleVisible && can(context, "com.create");
   const operationalMenu = !terminalFollowUp && lifecycleVisible
     && (canStartDelivery || canStartPurchase || offerScience || progressAllowed);
@@ -328,13 +335,13 @@ export function RequisitionDocumentContent({
     fulfilled: f.fulfilled,
     partial: f.partial,
   });
-  const serviceLabel = archive ? documentArchiveLabel(archive) : data.is_historical ? "Registro histórico" : p.archivedAt ? "Arquivada" : data.status === "cancelled" ? "Cancelada" : p.completedAt ? "Atendimento concluído" : f.fulfilled || f.partial ? "Atendimento parcial" : "Aguardando atendimento";
+  const serviceLabel = archive ? documentArchiveLabel(archive) : data.is_historical ? "Registro histórico" : p.archivedAt ? "Arquivada" : data.status === "cancelled" ? "Cancelada" : p.completedAt ? "Atendimento concluído" : reviewRequired ? "Avaliação familiar pendente" : f.fulfilled || f.partial ? "Atendimento parcial" : "Aguardando atendimento";
   const followUp = requisitionFollowUp({
     historical: Boolean(data.is_historical), status: data.status,
     archivedAt: p.archivedAt, completedAt: p.completedAt,
     scienceSatisfied: p.scienceSatisfied, designationPending: p.designationPending,
     eligible: p.eligible, personalScience: p.personalScience,
-    fulfilled: f.fulfilled, total: f.total,
+    fulfilled: f.fulfilled, total: f.total, reviewRequired, canAssessNeed: canReviewFulfillment,
   });
   return (
     <div className="hca-record-detail doc-page">
@@ -395,11 +402,11 @@ export function RequisitionDocumentContent({
         showFiles={false}
         updateNotice={<>
           {observedData ? <DocumentFreshness code={data.code ?? data.protocol}
-            changes={requisitionChanges(data, observedData)} loading={reading || busy} editing={Boolean(decision)} onRefresh={refreshDocument} /> : null}
+            changes={requisitionChanges(data, observedData)} loading={reading || busy} editing={Boolean(decision || fulfillmentEntry)} onRefresh={refreshDocument} /> : null}
           {!data.is_historical && context.activeContext?.mode === "patient" && context.patient?.id === data.care_recipient_id &&
             can(context, "req.read") && can(context, "ent.read") ? <DocumentFamilyDecisionNotice
               key={context.userId + ":" + id} id={id} patientId={data.care_recipient_id} userId={context.userId}
-              code={data.code ?? data.protocol} revision={revision + attempt} blocked={Boolean(decision || archiveDialog)} returnFocus={refreshButtonRef} /> : null}
+              code={data.code ?? data.protocol} revision={revision + attempt} blocked={Boolean(decision || archiveDialog || fulfillmentEntry)} returnFocus={refreshButtonRef} /> : null}
         </>}
         nextStep={
           reading || readFailed ? (
@@ -666,9 +673,7 @@ export function RequisitionDocumentContent({
                       ? "Completo"
                       : ["cancelled", "archived"].includes(documentState)
                         ? "Atendimento preservado no encerramento"
-                        : f.fulfilled
-                          ? "Parcial"
-                          : "Aguardando ENT aceita"}
+                        : reviewRequired ? "Avaliação familiar pendente" : f.fulfilled || f.partial ? "Parcial" : "Aguardando ENT aceita"}
                 </p>
               </div>
               <div className="rounded-lg bg-(--background) p-3">
@@ -696,6 +701,9 @@ export function RequisitionDocumentContent({
               rows={data.requisition_items.map((item) => {
                 const line = f.lines.find((row) => row.id === item.id);
                 const name = item.product_name_snapshot ?? item.custom_name ?? "Nome não preservado no registro";
+                const deliveries = requisitionDeliveries(line?.deliveries ?? []);
+                const reviewable = canReviewFulfillment ? deliveries.filter(delivery => ["confirmed", "disputed"].includes(delivery.status) &&
+                  (line?.serviceStatus === "review_required" || Number(delivery.acceptedQuantity) > 0)) : [];
                 const status = data.is_historical ? "Não apurado no original" : line?.attended ? "Atendido"
                   : line?.serviceStatus === "partial" ? "Parcialmente atendido"
                     : line?.serviceStatus === "review_required" ? "Nova avaliação familiar pendente"
@@ -715,8 +723,22 @@ export function RequisitionDocumentContent({
                       {item.catalogue_extra ? <p>Material do catálogo incluído como extra.</p> : null}
                       {item.catalogue_extra?.details ? <p className="whitespace-pre-wrap">{item.catalogue_extra.details}</p> : null}
                       {item.extra_details ? <p className="whitespace-pre-wrap">{item.extra_details}</p> : null}
+                      {reviewable.length ? <ActionButton ref={button => {
+                        if (!button) return;
+                        if (fulfillmentEntry?.itemId === item.id) fulfillmentOpenerRef.current = button;
+                        if (fulfillmentReturnFocusRef.current === item.id) requestAnimationFrame(() => {
+                          if (!button.isConnected || fulfillmentReturnFocusRef.current !== item.id) return;
+                          button.focus({ preventScroll: true });
+                          if (button.ownerDocument.activeElement === button) fulfillmentReturnFocusRef.current = null;
+                        });
+                      }} onClick={event => {
+                        fulfillmentOpenerRef.current = event.currentTarget;
+                        fulfillmentReturnFocusRef.current = null;
+                        event.currentTarget.focus({ preventScroll: true });
+                        setFulfillmentEntry({ itemId: item.id, name, deliveries: reviewable });
+                      }}>Avaliar suficiência<span className="sr-only"> de {name}</span></ActionButton> : null}
                     </div>,
-                  related: requisitionDeliveries(line?.deliveries ?? []).map(delivery => ({
+                  related: deliveries.map(delivery => ({
                     document: { id: delivery.id, type: "ENT", code: delivery.code ?? "ENT em preparação" },
                     detail: <>
                       {documentStatusLabel(delivery.status)} ·{" "}
@@ -766,6 +788,12 @@ export function RequisitionDocumentContent({
           </DocumentPanel>
         ) : null}
       </DocumentTabs>
+      {fulfillmentEntry && canReviewFulfillment ? <RequisitionFulfillmentEntry key={`${data.id}:${fulfillmentEntry.itemId}`}
+        context={context} patientId={data.care_recipient_id} {...fulfillmentEntry} opener={fulfillmentOpenerRef}
+        onClose={() => {
+          fulfillmentReturnFocusRef.current = fulfillmentEntry.itemId;
+          setFulfillmentEntry(null);
+        }} onReviewed={() => setAttempt(value => value + 1)} /> : null}
       {decision ? (
         <RequisitionDecisionEditor
           key={`${context.userId}:${data.care_recipient_id}:${data.id}:${decision.purpose}:${decision.consulting}`}

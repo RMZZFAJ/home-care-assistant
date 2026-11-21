@@ -112,8 +112,8 @@ test("ENT mantém a conciliação aberta entre cinco materiais e registra só a 
   }
 });
 
-test("ENT solicita reavaliação com a quantidade conferida e mostra à família o motivo da equipe", async ({ page, browser }, info) => {
-  test.setTimeout(75_000);
+test("REQ e ENT usam a mesma avaliação familiar com histórico e recebimento preservado", async ({ page, browser }, info) => {
+  test.setTimeout(120_000);
   const f = await setup(), req = await issue(f.patient, [f.products[0]]);
   const family = await shiftWorker(f.patient, "family");
   const ent = await delivery(f.patient, req, [f.products[0]], { quantity: "5", requestFulfillment: "complete" }) as SupplyDocument;
@@ -128,25 +128,46 @@ test("ENT solicita reavaliação com a quantidade conferida e mostra à família
   const requested = page.getByRole("dialog", { name: "Recebimento confirmado · revisão solicitada", exact: true });
   await expect(requested).toBeVisible();
   await requested.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  const movements = () => sql(`select count(*) from public.stock_movements where care_recipient_id=${q(f.patient)}`);
+  const beforeReview = movements();
   const familyPage = await browser.newPage({
     baseURL: new URL(page.url()).origin, viewport: page.viewportSize() ?? undefined,
     isMobile: info.project.use.isMobile, hasTouch: info.project.use.hasTouch,
   });
   try {
-    await openDelivery(familyPage, f.patient, ent.id, family.email);
+    await openDelivery(familyPage, f.patient, req.id, family.email);
+    await expect(familyPage.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Avaliar suficiência dos materiais");
     await selectDocumentSection(familyPage, "materials");
-    await familyPage.getByRole("button", { name: "Avaliar suficiência de " + line.name_snapshot, exact: true }).click();
+    await familyPage.getByRole("button", { name: "Detalhes de " + line.name_snapshot + " · Urgente", exact: true }).click();
+    const material = familyPage.getByRole("dialog", { name: line.name_snapshot, exact: true });
+    const assess = material.getByRole("button", { name: "Avaliar suficiência de " + line.name_snapshot, exact: true });
+    await assess.click();
     const review = familyPage.getByRole("dialog", { name: "Reavaliar necessidade", exact: true });
     await expect(review).toContainText(reason);
     await expect(review).toContainText("5 unidade recebidos");
-    if (info.project.use.hasTouch) await test.info().attach("Motivo da equipe na reavaliação", {
-      contentType: "image/png", body: await familyPage.screenshot({ animations: "disabled", scale: "css" }),
-    });
+    await expect(review.getByRole("button", { name: "Integralmente", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await review.getByText("Avaliação e fichas de origem", { exact: true }).click();
+    await expect(review.getByText("Integralmente suprida", { exact: true })).toBeVisible();
+    const linked = review.getByRole("button", { name: ent.code!, exact: true });
+    await linked.click();
+    const reference = familyPage.getByRole("dialog", { name: ent.code!, exact: true });
+    await reference.getByRole("button", { name: "Voltar à origem", exact: true }).click();
+    if (info.project.use.hasTouch) for (const width of [360, 412]) {
+      await familyPage.setViewportSize({ width, height: 844 });
+      await expect(review.getByRole("button", { name: "Registrar avaliação", exact: true })).toBeInViewport();
+      const path = info.outputPath(`reavaliacao-${width}.png`);
+      await review.screenshot({ path, animations: "disabled", scale: "css" });
+      await info.attach(`Motivo da equipe na reavaliação ${width} px`, { contentType: "image/png", path });
+    }
     await review.getByRole("button", { name: "Parcialmente", exact: true }).click();
     await review.getByLabel("Justificativa da avaliação").fill("A família manterá o restante da requisição em aberto.");
-    await review.getByRole("button", { name: "Registrar avaliação familiar", exact: true }).click();
-    await expect(review).toHaveCount(0);
-    await expect(familyPage.getByText(/Nova avaliação familiar: atendimento parcial/)).toBeVisible();
+    await review.getByRole("button", { name: "Registrar avaliação", exact: true }).click();
+    const result = familyPage.getByRole("dialog", { name: "Avaliação registrada", exact: true });
+    await expect(result).toContainText("Parcialmente suprida");
+    await result.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+    await expect(material).toBeVisible();
+    await expect(assess).toBeFocused();
+    expect(movements()).toBe(beforeReview);
     await expect(familyPage.getByRole("button", { name: "Ver decisão familiar", exact: true })).toHaveCount(0);
     await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await page.getByRole("button", { name: "Ver decisão familiar", exact: true }).click();
@@ -156,6 +177,23 @@ test("ENT solicita reavaliação com a quantidade conferida e mostra à família
     await expect(response).toContainText("A família manterá o restante da requisição em aberto.");
     await response.getByRole("button", { name: "Entendi", exact: true }).click();
     await expect(response).toHaveCount(0);
+
+    await familyPage.goto("/fichas/" + ent.id);
+    await selectDocumentSection(familyPage, "materials");
+    await familyPage.getByRole("button", { name: "Rever atendimento de " + line.name_snapshot, exact: true }).click();
+    const edit = familyPage.getByRole("dialog", { name: "Rever atendimento do item", exact: true });
+    await expect(edit.getByRole("button", { name: "Parcialmente", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await edit.getByText("Avaliação e fichas de origem", { exact: true }).click();
+    await expect(edit).toContainText("A família manterá o restante da requisição em aberto.");
+    await edit.getByRole("button", { name: "Integralmente", exact: true }).click();
+    await edit.getByLabel("Justificativa da avaliação").fill("A família conferiu que as cinco unidades atendem à necessidade.");
+    await edit.getByRole("button", { name: "Registrar avaliação", exact: true }).click();
+    await expect(result).toContainText("Integralmente suprida");
+    await result.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+    const saved = await rpc(f.admin, "operational_document", { p_id: ent.id }) as SupplyDocument;
+    expect(saved.fulfillmentReviews?.map(entry => entry.decision)).toEqual(["partial", "complete"]);
+    expect(Number(saved.lines[0].accepted_quantity)).toBe(5);
+    expect(movements()).toBe(beforeReview);
   } finally {
     await familyPage.close();
   }
