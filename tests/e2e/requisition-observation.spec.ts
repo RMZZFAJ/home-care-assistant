@@ -9,7 +9,8 @@ import {
   sqlLiteral,
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
-import { setup, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { setup, rpc, fixtures, request } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 import type { ReceiptLine } from "../../src/types/requisition";
@@ -54,6 +55,87 @@ const count = (patient: string) =>
   sql(
     `select count(*) from public.requisitions where care_recipient_id=${sqlLiteral(patient)};`,
   );
+
+test("E04-03 revisa materiais solicitados durante o preenchimento sem descartar a REQ", async ({ page }, info) => {
+  test.setTimeout(90_000);
+  const materials = ["Fralda fictícia", "Compressa fictícia", "Sabonete fictício"];
+  const f = await setup({ catalogue: materials.map(name => ({
+    name, category: "higiene", unit: "unidade", aliases: [],
+  })) });
+  const writer = await shiftWorker(f.patient);
+  await page.goto("/login?next=%2Ffichas%2Freq");
+  await page.getByLabel("E-mail", { exact: true }).fill(writer.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page).toHaveURL(url => url.pathname === "/fichas/req");
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
+  await hygiene(page);
+  for (const name of materials) {
+    const row = card(page, name);
+    await row.getByRole("checkbox", { name: name + " unidade", exact: true }).check();
+    await row.getByRole("checkbox", { name: "Não sei informar", exact: true }).check();
+  }
+  await next(page);
+  await next(page);
+  await page.getByRole("button", { name: "Adicionar observação", exact: true }).click();
+  const observation = "Observação que precisa permanecer na ficha.";
+  await page.getByLabel("Observação 1", { exact: true }).fill(observation);
+  await next(page);
+  await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
+
+  const competingProducts = f.products.slice(0, 2);
+  const [earlier] = await rpc(f.admin, "submit_requisition", {
+    ...request(f.patient, competingProducts),
+    p_lines: competingProducts.map(productId => ({
+      productId, currentStock: null, stockObservation: "unknown", urgent: false,
+    })),
+  });
+  const earlierCode = sql(`select code from public.requisitions where id=${sqlLiteral(earlier.requisition_id)};`);
+  expect(earlierCode).toMatch(/^REQ-/);
+
+  const finish = page.getByRole("button", { name: "Emitir requisição", exact: true });
+  const [rejected] = await Promise.all([
+    page.waitForResponse(response => response.url().endsWith("/api/requisitions") && response.request().method() === "POST"),
+    finish.click(),
+  ]);
+  expect(rejected.ok()).toBe(false);
+  expect(await rejected.json()).toMatchObject({ code: "DUPLICATE_REVIEW_REQUIRED" });
+  const first = page.getByRole("dialog", { name: "Quer manter Fralda fictícia nesta requisição?" });
+  await expect(first).toBeVisible();
+  await info.attach("E04-03 material recém-solicitado", { body: await page.screenshot(), contentType: "image/png" });
+  const consult = first.getByRole("button", { name: `Consultar ${earlierCode}`, exact: true });
+  await expect(consult).toHaveText(`Consultar ${earlierCode}`);
+  await consult.click();
+  const earlierDocument = page.getByRole("dialog", { name: earlierCode, exact: true });
+  await expect(earlierDocument).toBeVisible();
+  await earlierDocument.getByRole("button", { name: "Voltar à origem", exact: true }).click();
+  await expect(consult).toBeFocused();
+  await expect(first.getByRole("button", { name: "Manter na ficha", exact: true })).toBeDisabled();
+  const reason = "A equipe precisa de reposição adicional.";
+  await first.getByLabel("Motivo para manter", { exact: true }).fill(reason);
+  await first.getByRole("button", { name: "Manter na ficha", exact: true }).click();
+
+  const second = page.getByRole("dialog", { name: "Quer manter Compressa fictícia nesta requisição?" });
+  await expect(second.getByLabel("Motivo para manter", { exact: true })).toHaveValue("");
+  await second.getByRole("button", { name: "Retirar da ficha", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
+  await expect(page.getByText(materials[0], { exact: true })).toBeVisible();
+  await expect(page.getByText(materials[1], { exact: true })).toHaveCount(0);
+  await expect(page.getByText(materials[2], { exact: true })).toBeVisible();
+  await expect(page.getByText(observation, { exact: true })).toBeVisible();
+  expect(count(f.patient)).toBe("1");
+
+  await finish.click();
+  await expect(page.getByRole("dialog", { name: "Requisição emitida", exact: true })).toBeVisible();
+  expect(count(f.patient)).toBe("2");
+  const lines = JSON.parse(sql(`select request_intent->'lines' from public.requisitions
+    where care_recipient_id=${sqlLiteral(f.patient)} and created_by=${sqlLiteral(writer.id)};`));
+  expect(lines).toHaveLength(2);
+  expect(lines).toEqual(expect.arrayContaining([
+    expect.objectContaining({ productId: f.products[0], repeatReason: reason }),
+    expect.objectContaining({ productId: f.products[2], repeatReason: null }),
+  ]));
+});
 
 test("observação REQ mantém texto decimal exato, recusa arredondamento e retoma vírgula decimal sem convertê-la em zero", async ({
   page,

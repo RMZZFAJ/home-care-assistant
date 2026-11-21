@@ -1468,6 +1468,7 @@
 .hca-l1 .hca-wizard-dialog .hca-modal-kicker { text-transform: uppercase; letter-spacing: .08em; }
 .hca-l1 .hca-wizard-dialog > .hca-modal-head > button { background: transparent; border-color: transparent; color: #52685e; }
 .hca-l1 .hca-wizard-dialog > .hca-modal-footer { background: #fcfdfb; }
+.hca-requisition-repeat-dialog textarea.hca-text-input { min-height: 85px; }
 .hca-l1 .hca-draft-dialog > .hca-modal-footer { flex-wrap: nowrap; }
 .hca-l1 .hca-draft-dialog > .hca-modal-footer > button { flex: 1 1 0; min-width: 0; white-space: normal; }
 .hca-draft-materials h3 { font-size: 14px; font-weight: 650; }

@@ -42,6 +42,7 @@ import { Dialog, StepNavigator } from "@/components/ui/primitives";
 import { ActionButton, ActionLink } from "@/components/ui/controls";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { RequisitionExtras } from "./requisition-extra-items";
+import { RequisitionRepeatDialog, validRepeatReason } from "./requisition-repeat-dialog";
 
 import {
   CatalogStep,
@@ -102,7 +103,9 @@ function PatientRequisition({
   const [legacyDraft, setLegacyDraft] = useState<{ content: RequisitionDraftContent; savedAt: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [uncertain, setUncertain] = useState(false);
-  useOperationActivity(saving || navigating, {
+  const [loadingCatalog, setLoadingCatalog] = useState(true);
+  const [reviewDuplicates, setReviewDuplicates] = useState(false);
+  useOperationActivity(saving || navigating || (reviewDuplicates && loadingCatalog), {
     title: uncertain ? "Consultando a emissão" : "Emissão da requisição",
     stage: navigating ? 1 : 0, steps: uncertain ? issuanceRecoverySteps : issuanceSteps,
     detail: navigating ? "A requisição foi registrada. Estamos abrindo a ficha."
@@ -128,7 +131,6 @@ function PatientRequisition({
   const issuanceFailure = useIssuanceFailure();
   const [products, setProducts] = useState<Product[]>([]);
   const [itemContext, setItemContext] = useState<ItemContext[]>([]);
-  const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [catalogError, setCatalogError] = useState("");
   const [openingFailure, setOpeningFailure] = useState<OpeningFailure | null>(null);
   const [catalogueTotal, setCatalogueTotal] = useState<number | null>(null);
@@ -331,12 +333,17 @@ function PatientRequisition({
     line.stockObservation === "observed" &&
     (!line.stockReference || line.stockReference.token !== contextByProduct.get(line.productId)?.teamStockReference),
   );
+  const duplicateLines = loadingCatalog || catalogError ? [] : form.lines.filter(line =>
+    contextByProduct.get(line.productId)?.pending.length && !validRepeatReason(line.repeatReason));
+  const duplicateLine = duplicateLines[0];
+
+  function refreshCatalogue() {
+    setLoadingCatalog(true);
+    setCatalogAttempt(attempt => attempt + 1);
+  }
   function openStockReview(refresh: boolean) {
     setReviewStock(true);
-    if (refresh) {
-      setLoadingCatalog(true);
-      setCatalogAttempt((attempt) => attempt + 1);
-    }
+    if (refresh) refreshCatalogue();
   }
   function updateLine(item: Product, patch: Partial<RequisitionLine>) {
     setDraftTouched(true);
@@ -403,9 +410,7 @@ function PatientRequisition({
             ? "Confirme como informar a observação recuperada do rascunho antigo."
             : "Revise a informação do estoque e a precisão da unidade.";
       if (
-        itemContext.find((item) => item.productId === line.productId)?.pending
-          .length &&
-        ((line.repeatReason?.trim().length ?? 0) < 3 || (line.repeatReason?.trim().length ?? 0) > 1000)
+        contextByProduct.get(line.productId)?.pending.length && !validRepeatReason(line.repeatReason)
       )
         errors[line.productId + ":repeat"] =
           "Justifique a nova requisição deste produto, entre três e 1.000 caracteres.";
@@ -447,7 +452,16 @@ function PatientRequisition({
   }
   async function submit() {
     if (saving) return;
-    if (!frozenRef.current && (privateDraft.blocked || privateDraft.backgroundBusy || !validate(true))) return;
+    if (!frozenRef.current) {
+      if (privateDraft.blocked || privateDraft.backgroundBusy) return;
+      if (duplicateLine && may(context, "request")) {
+        setError("");
+        setReviewDuplicates(true);
+        return;
+      }
+      if (!validate(true)) return;
+      setReviewDuplicates(false);
+    }
     if (!frozenRef.current && stockReviewLines.length) {
       openStockReview(false);
       return;
@@ -529,8 +543,11 @@ function PatientRequisition({
           reason instanceof ApiError &&
           reason.code === "DUPLICATE_REVIEW_REQUIRED"
         ) {
-          setCatalogAttempt((value) => value + 1);
-          setStep(1);
+          issuanceFailure.clear();
+          setUncertain(false);
+          setReviewDuplicates(true);
+          refreshCatalogue();
+          return;
         }
       }
       setUncertain(!rejected);
@@ -620,6 +637,24 @@ function PatientRequisition({
       if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);
     }} className="hca-document-wizard min-w-0 space-y-5">
       {materialReferences.picker}
+      {step === 6 && reviewDuplicates && duplicateLine && may(context, "request") ? (
+        <RequisitionRepeatDialog
+          key={duplicateLine.productId}
+          material={duplicateLine.productName}
+          pending={contextByProduct.get(duplicateLine.productId)?.pending ?? []}
+          onClose={() => setReviewDuplicates(false)}
+          onRemove={() => {
+            removeLine(duplicateLine.productId);
+            if (duplicateLines.length === 1) setReviewDuplicates(false);
+          }}
+          onKeep={repeatReason => {
+            setForm(current => ({ ...current, lines: current.lines.map(line =>
+              line.productId === duplicateLine.productId ? { ...line, repeatReason } : line) }));
+            setDraftTouched(true);
+            if (duplicateLines.length === 1) setReviewDuplicates(false);
+          }}
+        />
+      ) : null}
       <Dialog open={reviewStock} title="Confira o estoque da equipe" onClose={() => setReviewStock(false)}>
         {loadingCatalog ? <p role="status">Consultando o estoque atual…</p> : catalogError ? (
           <Notice error>{catalogError}</Notice>
@@ -744,10 +779,7 @@ function PatientRequisition({
           {catalogError}
           <button
             className={buttonClass}
-            onClick={() => {
-              setLoadingCatalog(true);
-              setCatalogAttempt((value) => value + 1);
-            }}
+            onClick={refreshCatalogue}
           >
             Recarregar catálogo
           </button>
@@ -761,6 +793,7 @@ function PatientRequisition({
             onChange={nextStage => {
               if (nextStage === stage) return;
               issuanceFailure.clear();
+              setReviewDuplicates(false);
               setStep(stageStart[nextStage]);
             }}
             disabled={uncertain || saving || loadingCatalog || privateDraft.blocked}
@@ -837,6 +870,9 @@ function PatientRequisition({
             ) : null}
           </fieldset>
           {error ? <Notice error>{error}</Notice> : null}
+          {reviewDuplicates && !loadingCatalog && !catalogError && !duplicateLine ? (
+            <Notice>As pendências foram atualizadas. Confira os materiais antes de emitir novamente.</Notice>
+          ) : null}
           {uncertain ? (
             <Notice>
               Confirme a tentativa preservada antes de iniciar outra requisição.
@@ -861,6 +897,7 @@ function PatientRequisition({
             blocked={loadingCatalog || Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
             onBack={() => {
               issuanceFailure.clear();
+              setReviewDuplicates(false);
               const previous = (currentCategory || step === 4) && adjacentMaterialCategory(currentCategory, products, "previous");
               if (previous) openCategory(previous);
               else setStep(stageStart[stage - 1]);

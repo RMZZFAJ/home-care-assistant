@@ -1,14 +1,13 @@
 "use client";
 import { useId, useState, type ReactNode } from "react";
-import { Dialog } from "@/components/ui/primitives";
 import { RelatedDocument } from "@/components/documents/related-document";
-import { formatBrazilDate } from "@/lib/receipt";
 import { inputClass, Notice } from "@/components/workspace";
 import { normalizeCatalogText as normalize } from "@/lib/catalog-match";
 import { textRows } from "@/lib/text-rows";
 import { formatQuantity } from "@/lib/quantity";
 import { formatStockObservation } from "@/lib/stock-observation";
 import { StockObservationField } from "./stock-observation-field";
+import { RequisitionRepeatDialog } from "./requisition-repeat-dialog";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "@/components/documents/material-review";
 import { MaterialConsultButton } from "@/components/documents/catalogue-material-panel";
@@ -64,7 +63,6 @@ export function CatalogStep({
   const materialGroupId = useId();
   const [search, setSearch] = useState("");
   const [duplicate, setDuplicate] = useState<Product | null>(null);
-  const [repeatReason, setRepeatReason] = useState("");
   const visible = items.filter((item) =>
     [
       item.name,
@@ -74,53 +72,16 @@ export function CatalogStep({
   );
   return (
     <div className="space-y-4">
-      <Dialog
-        open={Boolean(duplicate)}
-        title="Este produto já está em uma requisição pendente"
-        kicker="Requisição"
-        headingIcon="alert"
+      {duplicate ? <RequisitionRepeatDialog
+        key={duplicate.id}
+        material={duplicate.name}
+        pending={itemContext.find(info => info.productId === duplicate.id)?.pending ?? []}
         onClose={() => setDuplicate(null)}
-        footer={<>
-          <ActionButton onClick={() => setDuplicate(null)}>Não incluir o item</ActionButton>
-          <ActionButton variant="primary" disabled={repeatReason.trim().length < 3} onClick={() => {
-            if (duplicate) updateLine(duplicate, { repeatReason: repeatReason.trim() });
-            setDuplicate(null);
-          }}>Manter nova requisição</ActionButton>
-        </>}
-      >
-        <p className="text-sm">
-          Confira a necessidade anterior antes de reiterar {duplicate?.name}. A
-          nova linha não substitui o pedido anterior.
-        </p>
-        <ul className="my-3 space-y-3">
-          {itemContext
-            .find((info) => info.productId === duplicate?.id)
-            ?.pending.map((pending) => (
-              <li
-                key={pending.lineId}
-                className="rounded-lg border border-(--line) p-3 text-sm"
-              >
-                <RelatedDocument
-                  id={pending.requisitionId}
-                  label={pending.code}
-                />
-                <p>
-                  {formatBrazilDate(pending.createdAt)} · Aguardando atendimento
-                </p>
-              </li>
-            ))}
-        </ul>
-        <label className="block text-sm font-semibold">
-          Justificativa da nova requisição
-          <textarea
-            className={inputClass}
-            minLength={3}
-            maxLength={1000}
-            value={repeatReason}
-            onChange={(event) => setRepeatReason(event.target.value)}
-          />
-        </label>
-      </Dialog>
+        onKeep={repeatReason => {
+          updateLine(duplicate, { repeatReason });
+          setDuplicate(null);
+        }}
+      /> : null}
       <WizardMaterialToolbar count={selectedCount} matches={search.trim() ? visible.length : undefined}>{extras}</WizardMaterialToolbar>
       <WizardMaterialSearch value={search} onChange={setSearch} />
       {!visible.length ? (
@@ -150,10 +111,8 @@ export function CatalogStep({
                 checked={Boolean(line)}
                 onChange={() => {
                   if (line) removeLine(item.id);
-                  else if (info?.pending.length) {
-                    setDuplicate(item);
-                    setRepeatReason("");
-                  } else updateLine(item, {});
+                  else if (info?.pending.length) setDuplicate(item);
+                  else updateLine(item, {});
                 }}
               />
               <span className="hca-wizard-material-icon"><Icon name={materialCategories.find(category => category.id === item.category)?.icon ?? "box"} /></span>
