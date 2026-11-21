@@ -79,7 +79,7 @@ import type { DocumentDecisionIntention } from "@/lib/validation/document-decisi
 import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document-header";
 import { DocumentIssuanceResult } from "./document-issuance-result";
 import { canRecordFamilyReview, FamilyFulfillmentReview, type OpenPendingFamilyReview } from "./family-fulfillment-review";
-import { DocumentFreshness } from "./document-freshness";
+import { DocumentChangeFacts, DocumentFreshness } from "./document-freshness";
 import { DocumentFamilyDecisionNotice } from "./document-family-decision-notice";
 import { supplyChanges } from "@/lib/documents/document-changes";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
@@ -606,7 +606,7 @@ export function SupplyDocumentContent({
           setDeliveryConflict(true);
         if (
           data.type === "ENT" &&
-          (initialIntention?.action ?? action) === "consent_cancel" &&
+          (countingDelivery || (initialIntention?.action ?? action) === "consent_cancel") &&
           cause instanceof ApiError &&
           cause.status === 403
         )
@@ -625,7 +625,7 @@ export function SupplyDocumentContent({
     }
   }
   async function comparePurchaseVersion() {
-    if (data?.type === "ENT" && action === "consent_cancel")
+    if (countingDelivery || data?.type === "ENT" && action === "consent_cancel")
       setComparison(null);
     setBusy(true);
     setError("");
@@ -633,10 +633,23 @@ export function SupplyDocumentContent({
       const result = await api<{ data: SupplyDocument; }>(
         "/api/documents/" + id,
       );
-      setComparison(data ? requireSupplyConfirmation({ data: result.data, persistence: "confirmed" }, {
+      const current = data ? requireSupplyConfirmation({ data: result.data, persistence: "confirmed" }, {
         id: data.id, patientId: data.care_recipient_id, type: data.type, minimumVersion: data.version,
-      }) : null);
+      }) : null;
+      if (countingDelivery && current && current.version === data?.version) {
+        setError("A consulta encontrou a mesma versão. Confira o acesso e tente consultar novamente.");
+      } else setComparison(current);
     } catch (cause) {
+      if (countingDelivery && cause instanceof ApiError && [401, 403, 404].includes(cause.status)) {
+        returnToCompletionRef.current = null;
+        setOperationFromCompletion(false);
+        setReadFailed(true);
+        setReadDenied(true);
+        setData(null);
+        setAction(null);
+        setReview(null);
+        setDeliveryConflict(false);
+      }
       setError(
         cause instanceof Error
           ? cause.message
@@ -670,6 +683,15 @@ export function SupplyDocumentContent({
       receipt.submitted_by !== context.userId && changedArrivalIds.has(receipt.id)).map(receipt => receipt.id)
     : [];
   const allowed = (cap: string) => Boolean(activeContext && !archived && can(context, cap));
+  function canReceiveDelivery(document: SupplyDocument) {
+    return document.type === "ENT" && document.status === "pending_receipt" && !document.workflow_data.acceptedAt &&
+      document.care_recipient_id === context.patient?.id && document.recipient_id === context.userId &&
+      !activeDocumentArchive(document.workflow_data.documentArchive) && can(context, "ent.receive");
+  }
+  const observedReceipt = countingDelivery && data && observedData && observedData.version > data.version ? observedData : null;
+  const receiptReference = observedReceipt && observedReceipt.version > (comparison?.version ?? 0) ? observedReceipt : comparison;
+  const receiptUncertain = uncertain || decision.uncertain;
+  const receiptConflict = !receiptUncertain && Boolean(deliveryConflict || observedReceipt);
   const followUpState = data && supplyFollowUpState(data.status, data.workflow_data.documentFollowUp);
   const followUpTerminal = followUpState === "completed" || data?.status === "cancelled" && followUpState !== "reopened";
   const purchaseIdentificationPending = data?.type === "COM" && data.purchaseProgress?.identificationPending === true;
@@ -731,11 +753,7 @@ export function SupplyDocumentContent({
       )
         actions.push("close_expectation");
     } else if (data.type === "ENT") {
-      if (
-        data.status === "pending_receipt" &&
-        data.recipient_id === context.userId &&
-        allowed("ent.receive")
-      )
+      if (canReceiveDelivery(data))
         actions.push("receive", "divergence");
       if (
         hasUnreceivedDispatch &&
@@ -811,6 +829,18 @@ export function SupplyDocumentContent({
         ? "Referência atual carregada. Confira os valores preservados e prepare uma nova revisão antes de decidir."
         : "Resultado atual carregado. O primeiro ato e sua autoria permanecem preservados.",
     );
+  }
+  function adoptReceiptReference() {
+    if (!receiptReference || busy || receiptUncertain) return;
+    setData(receiptReference);
+    setComparison(null);
+    setDeliveryConflict(false);
+    setReview(null);
+    setError("");
+    if (canReceiveDelivery(receiptReference)) return;
+    setAction(null);
+    setMessage("Ficha atualizada. Consulte a situação do recebimento e a pessoa designada.");
+    focusAfterDeliveryResult();
   }
   function adoptReconciliationComparison() {
     if (!comparison) return;
@@ -1741,15 +1771,27 @@ export function SupplyDocumentContent({
         key={data.id}
         data={data} context={context} sender={data.transfer?.declaration.actor.name ?? documentIssuerName(data.canonical_snapshot)}
         review={review ? review.body as CountedDeliveryReceiptBody : null}
-        busy={busy || decision.busy} blocked={deliveryConflict || !actions.includes("receive")} uncertain={uncertain || decision.uncertain}
+        busy={busy || decision.busy} blocked={receiptConflict || !actions.includes("receive")} uncertain={receiptUncertain}
         error={error || decision.recoveryMessage}
         finalFocus={operationOpenerRef}
-        conflict={deliveryConflict ? <Notice>
-          A ficha mudou durante a conferência.
-          {comparison ? <><p>Versão atual {comparison.version} · {comparison.lines.length} materiais.</p>
-            <ActionButton disabled={busy} onClick={adoptDeliveryComparison}>Usar versão atual e revisar novamente</ActionButton></>
-            : <ActionButton disabled={busy} onClick={() => void comparePurchaseVersion()}>Consultar versão atual</ActionButton>}
-        </Notice> : !actions.includes("receive") ? <Notice>O recebimento desta ficha está indisponível para este acesso.</Notice> : null}
+        conflict={receiptConflict ? <section className="hca-form-stack" aria-label="Alterações na conferência">
+          <Notice>A ficha mudou durante a conferência.</Notice>
+          {receiptReference ? <>
+            <DocumentChangeFacts changes={[
+              { id: "version", label: "Versão da ficha", before: String(data.version), after: String(receiptReference.version) },
+              ...supplyChanges(data, receiptReference),
+            ]} />
+            <p className="hca-document-change-note">{canReceiveDelivery(receiptReference)
+              ? "Confira a referência atual. A observação e os valores dos materiais com a mesma unidade serão preservados para revisão."
+              : "A situação atual da ficha exige consulta antes de prosseguir com o recebimento."}</p>
+          </> : null}
+          <div className="hca-toolbar">
+            <ActionButton disabled={busy} onClick={() => void comparePurchaseVersion()}>Consultar versão atual</ActionButton>
+            {receiptReference ? <ActionButton variant="primary" disabled={busy} onClick={adoptReceiptReference}>
+              {canReceiveDelivery(receiptReference) ? "Usar versão atual e revisar novamente" : "Voltar à ficha atual"}
+            </ActionButton> : null}
+          </div>
+        </section> : !actions.includes("receive") ? <Notice>O recebimento desta ficha está indisponível para este acesso.</Notice> : null}
         onReview={(body, different) => {
           const next = { action: "receive", body, summary: "", expectedVersion: data.version };
           setError("");

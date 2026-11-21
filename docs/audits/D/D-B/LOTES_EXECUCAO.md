@@ -248,6 +248,25 @@ expectativa preservaram o estoque. A chegada confirmada registrou uma
 única entrada e a conclusão preservou a observação. As capturas estão em
 `output/playwright/l2-com-closure/`. As mudanças usam as migrations existentes.
 
+**Mudança de versão durante a conferência da ENT e da DEV.** A conferência
+de E06-06 incorpora o comparativo anterior e atual de E04-07 para a mudança
+concorrente. A referência pode vir da atualização ao vivo ou da consulta
+após o conflito. Ao adotar a versão mais recente, a mesma pessoa designada
+mantém a observação, os blocos abertos e os valores dos materiais cuja
+identidade e unidade continuam válidas. A confirmação passa a exigir uma
+nova revisão. Se a ficha já foi conferida ou a pessoa designada mudou,
+o atalho retorna à versão atual da ficha e à revisão de conclusão quando
+essa era a origem.
+
+O reteste passou oito casos em Android e iOS emulados, sem repetição
+automática. A ENT com troca concorrente exigiu a nova versão e uma nova
+confirmação da mesma pessoa designada, com um único movimento de entrada.
+Quando outro recebedor foi designado, a revisão de conclusão retomou a
+observação e o estoque foi preservado. Os casos com DEV conferiram o
+recebimento e a conciliação no mesmo diálogo compartilhado. As capturas
+estão em `output/playwright/l2-receipt-reference/`. A mudança usa as
+migrations existentes.
+
 **Avaliação familiar a partir de REQ e ENT.** A REQ indica a avaliação
 pendente junto ao item e no próximo passo sugerido quando já há
 recebimento registrado. A ação no painel do material abre o diálogo da

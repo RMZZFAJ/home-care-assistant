@@ -1,5 +1,12 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — atualização durante a conferência de recebimento.** ENT e DEV
+mostram a referência anterior e a atual na própria conferência. Quando a
+pessoa continua designada, a adoção preserva a observação e os valores
+compatíveis e exige nova revisão antes do ato. A troca efetiva de recebedor
+retorna à consulta da ficha atual.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — ações da COM na revisão de conclusão.** A pessoa habilitada
 pode autorizar itens, registrar a compra, encerrar a expectativa
 restante e registrar a chegada pela pendência correspondente. A revisão

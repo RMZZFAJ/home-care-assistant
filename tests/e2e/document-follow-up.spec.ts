@@ -459,3 +459,86 @@ test("COM resolve as pendências de autorização, aquisição e chegada pela re
   expect(terminalLedger(patient)).toBe(stock);
   expect(writes).toEqual([]);
 });
+
+for (const reassigned of [false, true]) test(`ENT ${reassigned ? "volta à ficha quando outro recebedor foi designado" : "preserva a conferência ao adotar uma versão mais recente"}`, async ({ page }, info) => {
+  const { admin, patient, products } = await setup();
+  const receiver = await shiftWorker(patient);
+  const sent = await rpc(admin, "create_supply_document", {
+    p_patient: patient, p_type: "ENT", p_key: randomUUID(), p_draft: false,
+    p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: receiver.id,
+      recipientReason: "Conferente designada para a entrega fictícia.", lines: [{ productId: products[0], quantity: "3" }] },
+  }) as SupplyDocument;
+  const [line] = sent.lines;
+  const initialStock = terminalLedger(patient);
+  const closingNote = "Observação da revisão de conclusão da entrega.";
+  const receiptNote = "Recebi duas unidades nesta conferência presencial.";
+  await loginDecision(page, receiver.email, patient);
+  await page.goto(`/fichas/${sent.id}`);
+  await openDocumentAction(page, "Revisar conclusão");
+  const closure = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+  const note = closure.getByRole("textbox", { name: "Observação da conclusão", exact: true });
+  const shortcut = closure.getByRole("button", { name: "Conferir recebimento", exact: true });
+  await note.fill(closingNote);
+  await shortcut.click();
+  const receipt = page.getByRole("dialog", { name: "Conferir recebimento", exact: true });
+  const observedCount = receipt.getByRole("textbox", { name: `Recebidas de ${line.name_snapshot}`, exact: true });
+  await observedCount.fill("2");
+  await receipt.getByText("Adicionar observação ao recebimento", { exact: true }).click();
+  const observation = receipt.getByRole("textbox", { name: "Sua observação no recebimento", exact: true });
+  await observation.fill(receiptNote);
+  await receipt.getByRole("button", { name: "Confirmar recebimento", exact: true }).click();
+
+  const endpoint = `/api/documents/${sent.id}/decisions`;
+  const attempts: { key: string; intention: { expectedVersion: number } }[] = [];
+  let latest = sent;
+  await page.route(`**${endpoint}`, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    attempts.push(route.request().postDataJSON());
+    if (attempts.length !== 1) return route.continue();
+    latest = await entSend(admin, sent, "reassign", { recipientId: fixtures.global.id, reason: "Troca durante a conferência presencial." });
+    if (!reassigned) latest = await entSend(admin, latest, "reassign", { recipientId: receiver.id, reason: "Recebedora original voltou a ficar disponível." });
+    const response = await route.fetch();
+    expect([403, 409]).toContain(response.status());
+    await route.fulfill({ response });
+  });
+  const difference = page.getByRole("dialog", { name: "Confirmar diferença no recebimento", exact: true });
+  await difference.getByRole("button", { name: "Registrar diferença", exact: true }).click();
+  const comparison = page.getByRole("region", { name: "Alterações na conferência", exact: true });
+  const checkCurrent = comparison.getByRole("button", { name: "Consultar versão atual", exact: true });
+  const adopt = comparison.getByRole("button", { name: reassigned ? "Voltar à ficha atual" : "Usar versão atual e revisar novamente", exact: true });
+  await checkCurrent.click();
+  await expect(adopt).toBeEnabled();
+  await expect(comparison).toContainText(`Agora: ${latest.version}`);
+  await expect(receipt.getByRole("button", { name: "Confirmar recebimento", exact: true })).toBeDisabled();
+  expect(terminalLedger(patient)).toBe(initialStock);
+  if (reassigned) await expect(comparison).toContainText("Pessoa designada para receber");
+  if (info.project.use.hasTouch) {
+    const path = info.outputPath("referencia-do-recebimento.png");
+    await comparison.screenshot({ path, scale: "css", animations: "disabled" });
+    await info.attach("Comparação da conferência", { path, contentType: "image/png" });
+  }
+  await adopt.click();
+  expect(attempts).toHaveLength(1);
+  if (reassigned) {
+    await expect(note).toHaveValue(closingNote);
+    await expect(shortcut).toHaveCount(0);
+    await expect(closure.getByRole("button", { name: "Concluir", exact: true })).toBeDisabled();
+    expect(terminalLedger(patient)).toBe(initialStock);
+    return;
+  }
+
+  await expect(observedCount).toHaveValue("2");
+  await expect(observation).toHaveValue(receiptNote);
+  await expect(comparison).toHaveCount(0);
+  await receipt.getByRole("button", { name: "Confirmar recebimento", exact: true }).click();
+  await difference.getByRole("button", { name: "Registrar diferença", exact: true }).click();
+  const result = page.getByRole("dialog", { name: "Recebimento registrado com diferença", exact: true });
+  await result.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(note).toHaveValue(closingNote);
+  expect(attempts.map(attempt => attempt.intention.expectedVersion)).toEqual([sent.version, latest.version]);
+  expect(attempts[0].key).not.toBe(attempts[1].key);
+  const confirmed = await rpc(admin, "operational_document", { p_id: sent.id }) as SupplyDocument;
+  expect(confirmed.events.filter(event => event.action === "ent.receive")).toMatchObject([{ actorId: receiver.id }]);
+  expect(Number(confirmed.lines[0].accepted_quantity)).toBe(2);
+  expect(JSON.parse(terminalLedger(patient))).toHaveLength(JSON.parse(initialStock).length + 1);
+});

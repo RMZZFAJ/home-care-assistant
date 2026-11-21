@@ -2,7 +2,7 @@
 import { IssuanceObservationList } from "@/components/forms/issuance-observations";
 import { issuanceObservations } from "@/lib/documents/issuance-observations";
 
-import { useId, useState, type FormEvent, type ReactNode, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { ActionButton, DefinitionGrid, TextAreaField, TextInput } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
@@ -39,12 +39,20 @@ type ReceiptEditorProps = {
 export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
   const { data, context, review, busy, blocked, uncertain } = props;
   const formId = useId();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const previousVersionRef = useRef(data.version);
+  useEffect(() => {
+    if (previousVersionRef.current === data.version) return;
+    previousVersionRef.current = data.version;
+    contentRef.current?.focus({ preventScroll: true });
+  }, [data.version]);
   const [counts, setCounts] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState("");
   const [requests, setRequests] = useState<Record<string, string>>({});
   const [reasonError, setReasonError] = useState<string | null>(null);
   const [invalidId, setInvalidId] = useState<string | null>(null);
   const [discard, setDiscard] = useState(false);
+  const [openDetails, setOpenDetails] = useState<Record<string, boolean>>({});
   const [requestedStock, setRequestedStock] = useState(false);
   const revision = useLiveRevision();
   const family = data.payload.destination === "FAMILY";
@@ -58,8 +66,14 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
   const stockRows = stock.data?.careRecipientId === data.care_recipient_id && stock.data.custody === custody
     ? stock.data.overview : undefined;
   const shippedAt = data.transfer?.dispatchedAt ?? data.events.find(event => event.action === "ent.submit" || event.action === "ent.issued")?.createdAt ?? null;
-  const rows = data.lines.map(line => ({ line, value: counts[line.id] ?? formatQuantity(line.quantity) }));
+  const rows = data.lines.map(line => {
+    const inputKey = JSON.stringify([line.id, line.product_id, line.unit_snapshot]);
+    return { line, inputKey, value: counts[inputKey] ?? formatQuantity(line.quantity) };
+  });
   const changed = rows.some(({ line, value }) => value !== formatQuantity(line.quantity));
+  function rememberDetails(key: string, open: boolean) {
+    setOpenDetails(current => Boolean(current[key]) === open ? current : { ...current, [key]: open });
+  }
 
   function prepare(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -72,10 +86,10 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
       return;
     }
     setInvalidId(null);
-    const lines = rows.map(({ line, value }) => ({
+    const lines = rows.map(({ line, inputKey, value }) => ({
       lineId: line.id, receivedQuantity: value,
       ...(!family && linkedDeliveryNeed(data,line) && compareDeliveryQuantity(line.quantity,value).difference.isZero()
-        && requests[line.id] !== undefined ? { reviewReason: requests[line.id].trim() } : {}),
+        && requests[inputKey] !== undefined ? { reviewReason: requests[inputKey].trim() } : {}),
     }));
     const invalidRequest = lines.find(line => line.reviewReason !== undefined && line.reviewReason.length < 3);
     if (invalidRequest) {
@@ -108,7 +122,7 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
 
   return <>
     <Dialog open title={title} subtitle={review ? undefined : "Confira as quantidades. Altere apenas o que chegou diferente."}
-      finalFocus={props.finalFocus} closeDisabled={busy} onClose={close} footer={<>
+      finalFocus={props.finalFocus} contentRef={contentRef} keyboardScrollable closeDisabled={busy} onClose={close} footer={<>
         <ActionButton disabled={busy || uncertain} onClick={close}>{review ? "Voltar e editar" : "Voltar"}</ActionButton>
         {review || uncertain
           ? <ActionButton variant="primary" disabled={busy || blocked && !uncertain} onClick={props.onConfirm}>
@@ -137,7 +151,7 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
           {differences.some(({ line }) => !family && line.requisitionItemIds.length) ? <p className="hca-receipt-impact"><Icon name="clock" />
             <span>A família avaliará se a necessidade foi atendida.</span></p> : null}
         </> : <form id={formId} className="hca-delivery-receipt" onSubmit={prepare}>
-          {rows.map(({ line, value }) => {
+          {rows.map(({ line, inputKey, value }) => {
             const difference = validQuantity(value, 6, true) ? compareDeliveryQuantity(line.quantity, value).difference : null;
             const stockRow = stockRows?.find(item => item.productId === line.product_id);
             const confirmed = family ? stockRow?.family?.confirmed : stockRow?.team?.confirmed;
@@ -153,7 +167,7 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
                   aria-describedby={invalidId === line.id ? inputId + "-error" : undefined}
                   onChange={event => {
                     const value = event.currentTarget.value;
-                    setCounts(previous => ({ ...previous, [line.id]: value }));
+                    setCounts(previous => ({ ...previous, [inputKey]: value }));
                     if (invalidId === line.id) setInvalidId(null);
                   }} /><span>{line.unit_snapshot}</span></div>
               </div>
@@ -164,29 +178,31 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
                   <span>{line.family_fulfillment === "complete" ? "Necessidade suprida" : "Pedir nova avaliação"}</span>
                   <input type="checkbox" role="switch" disabled={blocked}
                     aria-label={(line.family_fulfillment === "complete" ? "Necessidade suprida · " : "Pedir nova avaliação · ") + line.name_snapshot}
-                    checked={line.family_fulfillment === "complete" ? requests[line.id] === undefined : requests[line.id] !== undefined}
+                    checked={line.family_fulfillment === "complete" ? requests[inputKey] === undefined : requests[inputKey] !== undefined}
                     onChange={() => setRequests(previous => {
                       const next = { ...previous };
-                      if (next[line.id] === undefined) next[line.id] = "";
-                      else delete next[line.id];
+                      if (next[inputKey] === undefined) next[inputKey] = "";
+                      else delete next[inputKey];
                       return next;
                     })} />
                 </label>
-                {requests[line.id] !== undefined ? <>
+                {requests[inputKey] !== undefined ? <>
                   <label htmlFor={inputId + "-review-reason"}>Motivo do pedido de reavaliação</label>
                   <TextAreaField id={inputId + "-review-reason"} name={line.id + ":reason"} rows={2} maxLength={1000}
                     readOnly={blocked} aria-invalid={reasonError === line.id || undefined}
                     aria-describedby={reasonError === line.id ? inputId + "-review-error" : undefined}
-                    value={requests[line.id]} onChange={event => {
+                    value={requests[inputKey]} onChange={event => {
                       const reason = event.currentTarget.value;
-                      setRequests(previous => ({ ...previous, [line.id]: reason }));
+                      setRequests(previous => ({ ...previous, [inputKey]: reason }));
                       if (reasonError === line.id) setReasonError(null);
                     }} placeholder="O que ainda falta para atender à necessidade?" />
                   {reasonError === line.id ? <p id={inputId + "-review-error"} role="alert">Informe por que o material precisa de nova avaliação.</p> : null}
                 </> : null}
               </div> : difference ? <p className="hca-receipt-family">A família avaliará a necessidade após a conferência da diferença.</p> : null : null}
-              <details className="hca-receipt-fold" onToggle={event => {
-                if (event.currentTarget.open) setRequestedStock(true);
+              <details className="hca-receipt-fold" open={openDetails[inputKey] ?? false} onToggle={event => {
+                const open = event.currentTarget.open;
+                rememberDetails(inputKey, open);
+                if (open) setRequestedStock(true);
               }}>
                 <summary><Icon name="stock" />Consultar estoque<Icon name="down" /></summary>
                 {!mayReadStock ? <p>Consulta de estoque indisponível para este acesso.</p> : stock.loading
@@ -196,7 +212,8 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
               </details>
             </article>;
           })}
-          <details className="hca-receipt-fold">
+          <details className="hca-receipt-fold" open={openDetails.dispatch ?? false}
+            onToggle={event => rememberDetails("dispatch", event.currentTarget.open)}>
             <summary><Icon name="truck" />Dados e observação da expedição<Icon name="down" /></summary>
             <DefinitionGrid items={[
               { label: family ? "Devolução" : "Entrega", value: data.code ?? "Ficha em conferência" },
@@ -206,7 +223,8 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
             <p><strong>Observação de quem expediu</strong></p>
             <IssuanceObservationList observations={issuanceObservations(data.payload)} empty="Sem observação na expedição." />
           </details>
-          <details className="hca-receipt-fold">
+          <details className="hca-receipt-fold" open={openDetails.notes ?? false}
+            onToggle={event => rememberDetails("notes", event.currentTarget.open)}>
             <summary><Icon name="note" />Adicionar observação ao recebimento<Icon name="down" /></summary>
             <label htmlFor={formId + "-notes"}>Sua observação no recebimento</label>
             <TextAreaField id={formId + "-notes"} rows={2} maxLength={1000} value={notes} readOnly={blocked}
