@@ -1517,16 +1517,10 @@ export function SupplyDocumentContent({
               </div>
             </DocumentPanel>
             <DocumentPanel value="materials">
-              {data.originDocuments?.length ? <section className="hca-form-stack" aria-label="Fichas de origem">
-                <h3>Fichas de origem</h3>
-                {data.originDocuments.map((origin) => <RelatedDocument
-                  key={origin.documentId} id={origin.documentId} type={origin.type} label={origin.code} />)}
-              </section> : null}
-              {data.type === "ENT" ? <FamilyFulfillmentReview key={context.userId + ":" + data.id}
-                data={data} context={context} readOnly={archived} reviewControl={familyReviewRef}
-                onReviewed={() => setAttempt(value => value + 1)} /> : null}
               <section className="hca-materials-section">
                 {data.type === "COM" ? <>
+                  {data.lines.length || !purchaseIdentificationPending
+                    ? <PurchaseMaterials data={data} active={tabs.value === "materials"} /> : null}
                   <PurchaseExtraResolution key={data.id} data={data}
                     mayIdentify={Boolean(activeContext && !archived &&
                       ["pending_approval", "approved", "partially_approved", "purchasing", "purchased", "partially_received"].includes(data.status) &&
@@ -1537,8 +1531,6 @@ export function SupplyDocumentContent({
                       });
                       setData(current => current?.id === updated.id && current.version <= updated.version ? updated : current);
                     }} />
-                  {data.lines.length || !purchaseIdentificationPending
-                    ? <PurchaseMaterials data={data} active={tabs.value === "materials"} /> : null}
                 </> : data.type === "ENT" ? <DeliveryMaterials data={data} active={tabs.value === "materials"} />
                   : <IssuedBalanceMaterials data={data} active={tabs.value === "materials"} />}
                 {data.payload.notes ? (
@@ -1547,6 +1539,14 @@ export function SupplyDocumentContent({
                   </p>
                 ) : null}
               </section>
+              {data.originDocuments?.length ? <section className="hca-form-stack" aria-label="Fichas de origem">
+                <h3>Fichas de origem</h3>
+                {data.originDocuments.map((origin) => <RelatedDocument
+                  key={origin.documentId} id={origin.documentId} type={origin.type} label={origin.code} />)}
+              </section> : null}
+              {data.type === "ENT" ? <FamilyFulfillmentReview key={context.userId + ":" + data.id}
+                data={data} context={context} readOnly={archived} reviewControl={familyReviewRef}
+                onReviewed={() => setAttempt(value => value + 1)} /> : null}
 
               {data.type === "ENT" && data.protocol ? (
                 <section className="ui-card">

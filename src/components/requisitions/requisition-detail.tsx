@@ -667,45 +667,6 @@ export function RequisitionDocumentContent({
           </div>
         </DocumentPanel>
         <DocumentPanel value="materials">
-          <section
-            className="doc-card hca-requisition-facts"
-            aria-label="Dimensões independentes da requisição"
-          >
-            <div className="my-4 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-lg bg-(--background) p-3">
-                <p className="text-xs text-(--muted)">Atendimento</p>
-                <strong>
-                  {data.is_historical
-                    ? "Atendimento original não apurado"
-                    : `${f.fulfilled}/${f.total} itens atendidos`}
-                </strong>
-                <p className="text-xs">
-                  {data.is_historical
-                    ? "Os registros preservados não comprovam o atendimento físico do original."
-                    : f.total > 0 && f.fulfilled === f.total
-                      ? "Completo"
-                      : ["cancelled", "archived"].includes(documentState)
-                        ? "Atendimento preservado no encerramento"
-                        : reviewRequired ? "Avaliação familiar pendente" : f.fulfilled || f.partial ? "Parcial" : "Aguardando ENT aceita"}
-                </p>
-              </div>
-              <div className="rounded-lg bg-(--background) p-3">
-                <p className="text-xs text-(--muted)">Documento</p>
-                <strong>
-                  {data.is_historical
-                    ? "Registro histórico"
-                    : p.archivedAt
-                      ? "Arquivado"
-                      : data.status === "cancelled"
-                        ? "Cancelado"
-                        : p.completedAt
-                          ? "Concluído operacionalmente"
-                          : "Em atendimento"}
-                </strong>
-              </div>
-            </div>
-          </section>
-
           <section className="hca-materials-section">
             <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
               revision={String(p.version)} active={tabs.value === "materials"} label="Materiais requisitados" settledLabel="Supridos"
@@ -761,6 +722,41 @@ export function RequisitionDocumentContent({
                   })),
                 };
               })} />
+          </section>
+          <section className="doc-card hca-requisition-facts" aria-label="Dimensões independentes da requisição">
+            <div className="my-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg bg-(--background) p-3">
+                <p className="text-xs text-(--muted)">Atendimento</p>
+                <strong>
+                  {data.is_historical
+                    ? "Atendimento original não apurado"
+                    : `${f.fulfilled}/${f.total} itens atendidos`}
+                </strong>
+                <p className="text-xs">
+                  {data.is_historical
+                    ? "Os registros preservados não comprovam o atendimento físico do original."
+                    : f.total > 0 && f.fulfilled === f.total
+                      ? "Completo"
+                      : ["cancelled", "archived"].includes(documentState)
+                        ? "Atendimento preservado no encerramento"
+                        : reviewRequired ? "Avaliação familiar pendente" : f.fulfilled || f.partial ? "Parcial" : "Aguardando ENT aceita"}
+                </p>
+              </div>
+              <div className="rounded-lg bg-(--background) p-3">
+                <p className="text-xs text-(--muted)">Documento</p>
+                <strong>
+                  {data.is_historical
+                    ? "Registro histórico"
+                    : p.archivedAt
+                      ? "Arquivado"
+                      : data.status === "cancelled"
+                        ? "Cancelado"
+                        : p.completedAt
+                          ? "Concluído operacionalmente"
+                          : "Em atendimento"}
+                </strong>
+              </div>
+            </div>
           </section>
           {!p.archivedAt && can(context, "catalog.manage") &&
             can(context, "req.review") &&

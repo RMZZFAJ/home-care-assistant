@@ -58,6 +58,8 @@ export function DocumentMaterialList({
   const [position, setPosition] = useState<MaterialPanelPosition | null>(null);
   const [epoch, setEpoch] = useState(0);
   const buttonsRef = useRef(new Map<string, HTMLButtonElement>());
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const decode = useCallback((raw: unknown) => {
     const summary = documentMaterialSummary.parse(raw);
     if (summary.documentId !== documentId || summary.patientId !== patientId) throw new Error("A resposta pertence a outra ficha.");
@@ -133,15 +135,19 @@ export function DocumentMaterialList({
     <section className="doc-card hca-v7-material-list" aria-label={label}>
       <header className="doc-section-heading hca-v7-material-heading"><div>{heading}</div></header>
       <div className="hca-v7-material-tools">
-        <ActionButton variant="quiet" aria-expanded={filterOpen} onClick={() => setFilterOpen(value => !value)}>
+        <ActionButton ref={filterButtonRef} variant="quiet" aria-expanded={filterOpen} onClick={() => setFilterOpen(value => !value)}>
           <Icon name="sliders" />{filterTitles[filter]} ({count(filter)})<Icon name="down" />
         </ActionButton>
-        <TextInput type="search" aria-label="Pesquisar material" placeholder="Buscar" value={search}
+        <TextInput ref={searchRef} type="search" aria-label="Pesquisar material" placeholder="Buscar" value={search}
           maxLength={160} onChange={event => setSearch(event.currentTarget.value)} />
       </div>
       {filterOpen ? <div className="hca-v7-material-filters" role="group" aria-label="Filtrar materiais">
         {filters.map(value => <ActionButton key={value} variant={value === filter ? "primary" : "quiet"} aria-pressed={value === filter}
-          onClick={() => { setFilter(value); setFilterOpen(false); }}>{filterTitles[value]} ({count(value)})</ActionButton>)}
+          onClick={() => {
+            setFilter(value);
+            setFilterOpen(false);
+            filterButtonRef.current?.focus();
+          }}>{filterTitles[value]} ({count(value)})</ActionButton>)}
       </div> : null}
       {summary.error ? <div className="hca-v7-material-read-error">
         <p role="status">O saldo atual não pôde ser consultado.</p><ActionButton onClick={summary.refresh}>Atualizar saldo</ActionButton>
@@ -173,7 +179,10 @@ export function DocumentMaterialList({
           </li>;
         })}
       </ul> : <div className="hca-v7-material-read-error"><p role="status">Nenhum material neste filtro.</p>
-        {search ? <ActionButton onClick={() => setSearch("")}>Limpar busca</ActionButton> : null}</div>}
+        {search ? <ActionButton onClick={() => {
+          setSearch("");
+          searchRef.current?.focus();
+        }}>Limpar busca</ActionButton> : null}</div>}
     </section>
     {active && selected && position ? <DocumentMaterialPanel
       row={selected} documentId={documentId} patientId={patientId} revision={readRevision}

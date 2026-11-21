@@ -887,6 +887,20 @@ física e o estoque familiar atual. No painel do material ficam também a
 referência histórica e a diferença. A comparação de toda a contagem fica
 em **Comparar contagem e referência**, dentro de **Contagem e revisão**.
 
+**Ordem da aba Materiais.** A lista compacta abre a aba de REQ, COM, ENT e
+DEV com materiais identificados. Em REQ, o resumo de atendimento e situação
+da ficha fica abaixo. Nas fichas de movimentação, as fichas de origem e as
+ações de avaliação continuam disponíveis abaixo da lista. Na COM, a
+identificação de extras permanece acessível e fica em primeiro plano quando
+é o único conteúdo. São complementos operacionais do produto. O filtro
+retém a busca e devolve o foco ao seletor. Limpar busca devolve o foco ao
+campo de pesquisa. Sem alteração de API, estoque ou migrations.
+Os 34 casos dirigidos passaram em Android e iOS emulados, sem repetição.
+A comparação da lista com o v7 cobriu 320, 360 e 412 px. A rodada também
+confirmou a emissão e abertura de uma nova REQ sem aviso anterior, a
+Ciência familiar em Visão geral, o saldo editado da equipe, a retomada
+de rascunhos, a seleção de recebedor e a DEV autônoma.
+
 **Escolha do recebedor nos assistentes.** A ENT e a DEV usam os mesmos
 cartões de seleção de E06-01 e E06-16, com confirmação no rodapé. Na ENT,
 a escala é consultada ao abrir o diálogo e o plantão inclui o horário

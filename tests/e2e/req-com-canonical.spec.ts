@@ -127,6 +127,8 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials follow 
     p_payload: { origin: "purchase", lines: f.products.map(productId => ({ productId, quantity: "10" })) },
   });
   await openIssuedMaterials(page, f.patient, doc.id);
+  const materials = page.getByRole("tabpanel", { name: "Materiais", exact: true });
+  await expect(materials.locator(":scope > section").first().getByRole("heading", { name: "Materiais", exact: true })).toBeVisible();
   const list = page.getByRole("list", { name: type === "REQ" ? "Materiais requisitados" : "Materiais da compra ou doação", exact: true });
   const items = list.getByRole("listitem");
   await expect(items).toHaveCount(2);
@@ -154,9 +156,16 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} materials follow 
     const search = page.getByRole("searchbox", { name: "Pesquisar material", exact: true });
     await search.fill("OUTRO--MATERIAL"); await expect(items).toHaveCount(1);
     await expect(list).toContainText(names[1]);
+    await materials.getByRole("button", { name: "Todos (1)", exact: true }).click();
+    const pending = materials.getByRole("group", { name: "Filtrar materiais" }).getByRole("button", { name: "Pendentes (1)", exact: true });
+    await pending.focus();
+    await pending.press("Enter");
+    await expect(materials.getByRole("button", { name: "Pendentes (1)", exact: true })).toBeFocused();
+    await expect(search).toHaveValue("OUTRO--MATERIAL");
     await search.fill("Sem correspondência fictícia"); await expect(list).toHaveCount(0);
     const clear = page.getByRole("button", { name: "Limpar busca", exact: true });
     await clear.focus(); await clear.press("Enter"); await expect(items).toHaveCount(2);
+    await expect(search).toBeFocused();
     expect(await items.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")))).toEqual(ids);
     await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
     expect(await page.evaluate(() => matchMedia("(forced-colors: active)").matches && matchMedia("(prefers-reduced-motion: reduce)").matches)).toBe(true);

@@ -113,6 +113,8 @@ test("06.2 dispatched ENT preserves its material facts and reversible v7 search"
   const f = await setup({ catalogue: names.map(name => ({ name, category: "medicamentos", unit: "unidade", aliases: [] })) });
   const doc = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Escolha manual fictícia para conferência da composição", lines: f.products.map(productId => ({ productId, quantity: "7" })) } });
   await openIssuedMaterials(page, f.patient, doc.id);
+  const materials = page.getByRole("tabpanel", { name: "Materiais", exact: true });
+  await expect(materials.locator(":scope > section").first().getByRole("heading", { name: "Materiais", exact: true })).toBeVisible();
   const list = page.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
   const items = list.getByRole("listitem");
   await expect(items).toHaveCount(2);
@@ -154,6 +156,8 @@ test("06.2 autonomous return declaration never presents declared quantities as s
   expect(created.response.error).toBeNull(); const doc = created.response.data;
   expect(doc.transfer.originDocumentId).toBeNull(); expect(doc.protocol).toBeNull();
   await login(page, f.patient); await page.goto("/documentos/" + doc.id); await selectDocumentSection(page, "materials");
+  const materials = page.getByRole("tabpanel", { name: "Materiais", exact: true });
+  await expect(materials.locator(":scope > section").first().getByRole("heading", { name: "Materiais", exact: true })).toBeVisible();
   const list = page.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
   await expect(list.getByRole("listitem")).toHaveCount(1);
   await expect(list.getByText("Expedido", { exact: true })).toHaveCount(0);

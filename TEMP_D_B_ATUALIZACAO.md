@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — ordem da aba Materiais.** A lista compacta abre a aba como no
+v7. Os resumos, vínculos e ações complementares permanecem abaixo da lista.
+Ao aplicar um filtro ou limpar a busca, o foco volta ao controle correspondente.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — atualização durante a conferência de recebimento.** ENT e DEV
 mostram a referência anterior e a atual na própria conferência. Quando a
 pessoa continua designada, a adoção preserva a observação e os valores
