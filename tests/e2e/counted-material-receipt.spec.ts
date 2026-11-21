@@ -100,7 +100,10 @@ test("ENT confere falta e excedente na mesma ficha e recupera confirmação sem 
   await expect(panel.getByText("Recebido declarado", { exact: true })).toBeVisible();
   await expect(panel.getByText("Excedente em apuração", { exact: true })).toBeVisible();
   await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
-  await expect(page.getByText(receiptNote, { exact: true })).toBeVisible();
+  const receiptObservation = page.getByRole("region", { name: "Materiais da entrega ou transferência", exact: true })
+    .getByText("Observação do recebedor", { exact: true }).locator("..");
+  await expect(receiptObservation).toBeVisible();
+  await expect(receiptObservation).toContainText(receiptNote);
   const pdf = await generatedPdf(page, "/api/documents/" + sent.id + "/pdf");
   expect(pdf.ok(), await pdf.text()).toBe(true);
   const pdfBytes = await pdf.body();
