@@ -19,8 +19,10 @@ export const arrivalReviewBatch = arrivalReviewAttempt.extend({
     new Set(entries.map(entry => entry.receiptId)).size === entries.length, "Confira cada chegada uma vez."),
 });
 export const arrivalReviewQueueQuery = z.object({
-  careRecipientId: z.uuid(), documentId: z.uuid().optional(), beforeAt: instant.optional(), beforeId: z.uuid().optional(),
-}).strict().refine(value => Boolean(value.beforeAt) === Boolean(value.beforeId), "Confira a referência da página.");
+  careRecipientId: z.uuid(), documentId: z.uuid().optional(), arrivalId: z.uuid().optional(),
+  beforeAt: instant.optional(), beforeId: z.uuid().optional(),
+}).strict().refine(value => value.arrivalId ? !value.documentId && !value.beforeAt && !value.beforeId
+  : Boolean(value.beforeAt) === Boolean(value.beforeId), "Confira a referência da chegada ou da página.");
 
 const material = z.object({
   lineId: z.uuid(), name: z.string(), unit: z.string(), quantity: amount,

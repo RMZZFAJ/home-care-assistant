@@ -8,6 +8,7 @@ import { purchaseBalanceArrival, purchaseBalanceFixture } from "./purchase-entry
 const command = (patient, body, key = randomUUID()) => ({ p_patient: patient, p_key: key, p_body: body });
 const intake = (client, input) => rpc(client, "unlinked_arrival_command", input);
 const read = (client, patient, id) => rpc(client, "read_unlinked_arrivals", { p_patient: patient, p_id: id });
+const cardReview = (client, patient, id) => rpc(client, "com_unlinked_arrival_review", { p_patient: patient, p_arrival: id });
 const target = (arrival, decision, reason) => ({
   documentId: null, receiptId: arrival.id, version: arrival.version, decision, ...(reason ? { reason } : {}),
 });
@@ -52,6 +53,8 @@ test("CHE and COM share review while correction belongs to the author and preser
     [[null, arrival.id, "donation"], [parcel.document.id, parcel.receipt.id, undefined]]);
   const scoped = await rpc(f.admin, "com_arrival_review_queue", { p_patient: f.patient, p_document: parcel.document.id });
   assert.deepEqual(scoped.arrivals.map(row => row.receiptId), [parcel.receipt.id]);
+  assert.deepEqual(await cardReview(f.admin, f.patient, arrival.id), { arrivals: [global.arrivals[0]], next: null });
+  assert.deepEqual(await cardReview(f.admin, f.patient, parcel.receipt.id), { arrivals: [], next: null });
   const cursor = global.arrivals[0];
   const next = await rpc(f.admin, "com_arrival_review_queue", { p_patient: f.patient, p_before_at: cursor.submittedAt, p_before_id: cursor.receiptId });
   assert.deepEqual(next.arrivals.map(row => row.receiptId), [parcel.receipt.id]);
@@ -74,10 +77,39 @@ test("CHE and COM share review while correction belongs to the author and preser
   assert.deepEqual(await batch(f, entries, key), approved);
   assert.deepEqual(credits(arrival.id), [[productId, "3"]]);
   const after = await read(f.family, f.patient, arrival.id);
+  assert.deepEqual(await cardReview(f.admin, f.patient, arrival.id), { arrivals: [], next: null });
   assert.deepEqual(after.history.map(event => [event.state, event.materials[0].quantity]),
     [["pending", "2"], ["correction_requested", "2"], ["pending", "3"], ["approved", "3"]]);
   assert.equal(after.history[1].reason, "Reconte as embalagens recebidas.");
   assert.deepEqual(await intake(f.family, { ...created, p_body: null }), { key: created.p_key, state: "recorded", result: arrival });
+});
+
+test("CHE card review works beyond the first queue page and keeps patient, author and stock permissions", async () => {
+  const f = await purchaseBalanceFixture();
+  const { result: arrival } = await intake(f.family, command(f.patient, {
+    origin: "donation", lines: [{ productId: f.products[0], quantity: "2" }],
+  }));
+  // Seed newer queue entries under the synthetic patient without writing stock.
+  sql(`insert into private.unlinked_arrivals
+    (care_recipient_id, series, origin, state, submitted_by, submitted_name, created_at, submitted_at, lines)
+    select a.care_recipient_id, a.series + n, a.origin, a.state, a.submitted_by, a.submitted_name,
+      a.created_at + n * interval '1 second', a.submitted_at + n * interval '1 second', a.lines
+    from private.unlinked_arrivals a cross join generate_series(1,31) n where a.id=${q(arrival.id)}`);
+  const page = await rpc(f.admin, "com_arrival_review_queue", { p_patient: f.patient });
+  assert.equal(page.arrivals.length, 30);
+  assert.ok(page.next);
+  assert.ok(!page.arrivals.some(row => row.receiptId === arrival.id));
+  assert.deepEqual((await cardReview(f.admin, f.patient, arrival.id)).arrivals.map(row => row.receiptId), [arrival.id]);
+  assert.equal((await f.family.rpc("com_unlinked_arrival_review", { p_patient: f.patient, p_arrival: arrival.id })).error?.code, "42501");
+  const adminId = f.document.created_by;
+  sql(`insert into public.capability_overrides (care_recipient_id,subject_user,capability,enabled)
+    values (${q(f.patient)},${q(adminId)},'stock.family.read',false)`);
+  assert.equal((await cardReview(f.admin, f.patient, arrival.id)).arrivals[0].materials[0].familyStock, null);
+  sql(`update private.unlinked_arrivals set submitted_by=${q(adminId)} where id=${q(arrival.id)}`);
+  assert.deepEqual(await cardReview(f.admin, f.patient, arrival.id), { arrivals: [], next: null });
+  const other = await purchaseBalanceFixture();
+  assert.deepEqual(await cardReview(other.admin, other.patient, arrival.id), { arrivals: [], next: null });
+  assert.deepEqual(credits(arrival.id), []);
 });
 
 test("CHE rejects cross-context and invalid precision and seals an absent attempt against delayed execution", async () => {

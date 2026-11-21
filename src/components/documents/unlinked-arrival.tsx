@@ -23,6 +23,7 @@ import { unlinkedArrivalDetails, unlinkedArrivalIntent, unlinkedArrivalPage, unl
 import type { PresentationsRead } from "@/types/catalogue";
 import type { WorkspaceContext } from "@/types/workspace";
 import { PurchaseCoverageFields, type ArrivalPlanningChoices } from "./purchase-coverage-fields";
+import { canReviewPurchaseArrivals, type OpenUnlinkedArrival } from "./purchase-arrival-review";
 import { PurchaseArrivalLinks } from "./purchase-arrival-links";
 
 const endpoint = "/api/purchases/arrivals/unlinked";
@@ -282,19 +283,27 @@ function scopedArrivalData(value: unknown, patientId: string) {
 }
 type Cursor = { at: string; id: string };
 
-export function UnlinkedArrivalHistory({ context, revision, arrivalId }: { context: WorkspaceContext; revision: string; arrivalId?: string | null }) {
+export function UnlinkedArrivalHistory({ context, revision, arrivalId, onReview }: {
+  context: WorkspaceContext; revision: string; arrivalId?: string | null; onReview: OpenUnlinkedArrival;
+}) {
   if (!context.patient || !ableToRead(context)) return null;
   return <ArrivalHistory key={`${context.userId}:${context.patient.id}:${context.patient.role}:${can(context, "com.validate")}:${arrivalId ?? ""}`}
-    context={context} revision={revision} arrivalId={arrivalId} />;
+    context={context} revision={revision} arrivalId={arrivalId} onReview={onReview} />;
 }
 
-function ArrivalHistory({ context, revision, arrivalId }: { context: WorkspaceContext; revision: string; arrivalId?: string | null }) {
+function ArrivalHistory({ context, revision, arrivalId, onReview }: {
+  context: WorkspaceContext; revision: string; arrivalId?: string | null; onReview: OpenUnlinkedArrival;
+}) {
   const patient = context.patient!;
   const [pages, setPages] = useState<Cursor[]>([]);
   const [selected, setSelected] = useState<{ id: string; code?: string } | null>(arrivalId ? { id: arrivalId } : null);
   const [correction, setCorrection] = useState<UnlinkedArrivalDetails | null>(null);
+  const [reviewing, setReviewing] = useState(false);
   const openerRef = useRef<HTMLButtonElement | null>(null);
+  const closeDetailRef = useRef<HTMLButtonElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const headingId = useId();
+  const mayReview = canReviewPurchaseArrivals(context);
   const cursor = pages.at(-1);
   const query = new URLSearchParams({ careRecipientId: patient.id });
   if (cursor) { query.set("beforeAt", cursor.at); query.set("beforeId", cursor.id); }
@@ -313,7 +322,7 @@ function ArrivalHistory({ context, revision, arrivalId }: { context: WorkspaceCo
 
   return <section className="ui-card space-y-3" aria-labelledby={headingId} aria-busy={history.loading}>
     <div className="flex flex-wrap items-center justify-between gap-2">
-      <h2 id={headingId}>Chegadas</h2>
+      <h2 id={headingId} tabIndex={-1} ref={headingRef}>Chegadas</h2>
       <ActionButton compact disabled={history.loading} onClick={history.refresh}><Icon name="refresh" />Atualizar chegadas</ActionButton>
     </div>
     {history.loading ? <LoadingIndicator label="Consultando chegadas" /> : null}
@@ -323,9 +332,18 @@ function ArrivalHistory({ context, revision, arrivalId }: { context: WorkspaceCo
       {history.data?.arrivals.map(row => <li className="hca-purchase-line" key={row.id}>
         <div className="hca-purchase-line-heading"><h3>{row.code} · {unlinkedOriginLabel[row.origin]}</h3><ArrivalStatus state={row.state} /></div>
         <p>{row.author} · Chegada avulsa · {formatBrazilDate(row.createdAt)}</p>
-        <ActionButton compact className="justify-self-start" aria-label={`Consultar chegada ${row.code}`} onClick={event => { openerRef.current = event.currentTarget; setSelected(row); }}>
-          <Icon name="arrow" />Consultar chegada
-        </ActionButton>
+        <div className="hca-toolbar">
+          {mayReview && row.state === "pending" ? <ActionButton compact variant="primary" aria-label={`Revisar chegada ${row.code}`} onClick={event => {
+            const card = event.currentTarget.closest("li");
+            onReview(row.id, () => {
+              const consult = card?.querySelector<HTMLButtonElement>("[data-arrival-consult]");
+              return consult?.isConnected ? consult : headingRef.current;
+            });
+          }}><Icon name="check" />Revisar chegada</ActionButton> : null}
+          <ActionButton compact data-arrival-consult aria-label={`Consultar chegada ${row.code}`} onClick={event => { openerRef.current = event.currentTarget; setSelected(row); }}>
+            <Icon name="arrow" />Consultar chegada
+          </ActionButton>
+        </div>
       </li>)}
     </ul>
     {pages.length || history.data?.next ? <div className="flex flex-wrap gap-2">
@@ -334,10 +352,16 @@ function ArrivalHistory({ context, revision, arrivalId }: { context: WorkspaceCo
         const next = history.data?.next; if (next) setPages(previous => [...previous, next]);
       }}>Chegadas anteriores</ActionButton> : null}
     </div> : null}
-    <Dialog open={Boolean(selected) && !correction} title="Detalhes da chegada" kicker="Chegada de materiais"
+    <Dialog open={Boolean(selected) && !correction && !reviewing} title="Detalhes da chegada" kicker="Chegada de materiais"
       subtitle={selectedCode && detail.data ? `${selectedCode} · ${associated ? "chegada associada a uma compra." : "chegada avulsa, sem COM vinculada."}` : selectedCode}
       onClose={() => setSelected(null)} finalFocus={openerRef} footer={<>
-        <ActionButton variant={detail.data?.canCorrect ? undefined : "primary"} onClick={() => setSelected(null)}>Fechar consulta</ActionButton>
+        <ActionButton ref={closeDetailRef} variant={detail.data?.canCorrect || mayReview && detail.data?.state === "pending" ? undefined : "primary"}
+          onClick={() => setSelected(null)}>Fechar consulta</ActionButton>
+        {mayReview && detail.data?.state === "pending" && !detail.loading && !detail.error ? <ActionButton variant="primary" onClick={() => {
+          if (!detail.data) return;
+          setReviewing(true);
+          onReview(detail.data.id, () => closeDetailRef.current ?? openerRef.current ?? headingRef.current, () => setReviewing(false));
+        }}>Revisar chegada</ActionButton> : null}
         {detail.data?.canCorrect && !detail.loading && !detail.error ? <ActionButton variant="primary" onClick={() => setCorrection(detail.data)}>Corrigir chegada</ActionButton> : null}
       </>}>
       {detail.loading ? <LoadingIndicator label="Consultando a chegada" /> : null}

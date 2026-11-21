@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — revisão individual de chegada avulsa.** Revisar chegada abre
+o CHE escolhido pelo cartão ou pela consulta de detalhes. O mesmo
+diálogo confirma a decisão e recupera a resposta. O banco valida a
+elegibilidade sem depender da página da fila.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — cobertura do planejamento de compra.** A COM, a chegada avulsa
 e a correção usam o mesmo controle de cobertura. A chegada aguarda a
 escolha e a quantidade quando a cobertura está ligada. A consulta da
@@ -1057,8 +1063,8 @@ aplicada localmente. Passaram cinco integrações com Auth real e quatro
 execuções do conjunto dirigido no Android e iOS emulados. As duas
 execuções finais da chegada avulsa passaram após a conferência visual,
 sem repetição automática. As capturas estão em
-`output/playwright/l2-unlinked-arrivals/`. A ação de abrir a conferência
-de um único CHE diretamente pelo seu cartão segue pendente.
+`output/playwright/l2-unlinked-arrivals/`. O registro de execução documenta
+o acesso acrescentado depois no cartão de uma chegada.
 
 A cobertura E05-02 usa a COM aberta como origem. Em uma chegada avulsa,
 o seletor indica a compra elegível mais recente e aguarda a escolha da

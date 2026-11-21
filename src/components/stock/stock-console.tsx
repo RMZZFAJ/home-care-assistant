@@ -1,5 +1,5 @@
 "use client";
-import { PurchaseArrivalReview } from "@/components/documents/purchase-arrival-review";
+import { PurchaseArrivalReview, type OpenUnlinkedArrival } from "@/components/documents/purchase-arrival-review";
 import { UnlinkedArrivalAction, UnlinkedArrivalHistory } from "@/components/documents/unlinked-arrival";
 import { FamilyStockPreparation } from "./family-stock-preparation";
 import {
@@ -85,6 +85,7 @@ function PatientStock({
     opener: HTMLElement;
   } | null>(null);
   const historyHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const arrivalReviewRef = useRef<OpenUnlinkedArrival>(null);
   const hasStock =
     can(context, "stock.family.read") || can(context, "stock.team.read");
   const patient = context.patient!.id;
@@ -170,9 +171,9 @@ function PatientStock({
           <h2 id="stock-balances-heading" className="font-semibold">
             Saldos e previsões
           </h2>
-          {showFamilyArrivals ? <div className="flex flex-wrap gap-2">
-            <UnlinkedArrivalAction context={context} />
-            <PurchaseArrivalReview context={context} />
+          {showFamilyArrivals || params.has("arrival") ? <div className="flex flex-wrap gap-2">
+            {showFamilyArrivals ? <UnlinkedArrivalAction context={context} /> : null}
+            <PurchaseArrivalReview context={context} unlinkedArrivalRef={arrivalReviewRef} showTrigger={showFamilyArrivals} />
           </div> : null}
           <button
             className={buttonClass}
@@ -271,7 +272,8 @@ function PatientStock({
           />
         ) : null}
       </section>
-      {showFamilyArrivals || params.has("arrival") ? <UnlinkedArrivalHistory context={context} revision={revision} arrivalId={params.get("arrival")} /> : null}
+      {showFamilyArrivals || params.has("arrival") ? <UnlinkedArrivalHistory context={context} revision={revision} arrivalId={params.get("arrival")}
+        onReview={(...args) => arrivalReviewRef.current?.(...args)} /> : null}
       {custody !== "TRANSIT" && can(context, "stock.family.manage") ? (
         <div className="hca-toolbar">
           <ActionButton

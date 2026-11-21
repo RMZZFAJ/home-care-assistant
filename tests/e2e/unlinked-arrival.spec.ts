@@ -4,7 +4,7 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
 import { purchaseBalanceFixture } from "../integration/purchase-entry-balance-fixtures.mjs";
 import { loginDecision } from "./l1-decision-policy";
-import { arrivalCard, confirmArrivalReview, openArrivalReview } from "./purchase-arrival-review";
+import { arrivalCard, confirmArrivalReview } from "./purchase-arrival-review";
 
 const endpoint = "/api/purchases/arrivals/unlinked";
 
@@ -56,6 +56,7 @@ test("E05-17 E05-18 registra uma doação avulsa, recupera a resposta e vincula 
 
   await page.goto("/estoque");
   await expect(page.getByRole("region", { name: "Saldos e previsões" }).getByRole("button", { name: "Registrar chegada" })).toBeVisible();
+  await expect(page.getByRole("button", { name: `Revisar chegada ${receipt.result.code}` })).toHaveCount(0);
   await page.getByRole("button", { name: "Consultar chegada " + receipt.result.code }).click();
   const details = page.getByRole("dialog", { name: "Detalhes da chegada" });
   await expect(details).toContainText("Aguardando aprovação");
@@ -78,14 +79,37 @@ test("E05-17 E05-18 registra uma doação avulsa, recupera a resposta e vincula 
     isMobile: info.project.use.isMobile, userAgent: info.project.use.userAgent,
   });
   try {
+    const { result: another } = await rpc(f.family, "unlinked_arrival_command", {
+      p_patient: f.patient, p_key: randomUUID(), p_body: { origin: "gift", lines: [{ productId: scanned.product_id, quantity: "1" }] },
+    });
     const reviewer = await admin.newPage();
     await loginDecision(reviewer, fixtures.adminA.email, f.patient);
-    const review = await openArrivalReview(reviewer);
+    await reviewer.goto("/estoque");
+    const consult = reviewer.getByRole("button", { name: `Consultar chegada ${receipt.result.code}`, exact: true });
+    await reviewer.getByRole("button", { name: `Revisar chegada ${receipt.result.code}`, exact: true }).click();
+    const review = reviewer.getByRole("dialog", { name: "Conferir entrada no estoque", exact: true });
     await expect(arrivalCard(review, receipt.result.id)).toContainText("CHE-0001 · Doação");
-    const { result: approved } = await confirmArrivalReview(reviewer, review);
+    await expect(arrivalCard(review, another.id)).toHaveCount(0);
+    await expect(review.getByRole("button", { name: "Mostrar mais chegadas" })).toHaveCount(0);
+    if (info.project.use.hasTouch) {
+      const path = info.outputPath("E05-18-revisao-do-cartao.png");
+      await review.screenshot({ path, scale: "css", animations: "disabled" });
+      await info.attach("E05-18 revisão de uma chegada a partir do cartão", { path, contentType: "image/png" });
+    }
+    await review.getByRole("button", { name: "Voltar", exact: true }).click();
+    await expect(consult).toBeFocused();
+    await consult.click();
+    const reviewerDetails = reviewer.getByRole("dialog", { name: "Detalhes da chegada", exact: true });
+    await reviewerDetails.getByRole("button", { name: "Revisar chegada", exact: true }).click();
+    await expect(arrivalCard(review, receipt.result.id)).toContainText("CHE-0001 · Doação");
+    const { result: approved, receipt: reviewReceipt } = await confirmArrivalReview(reviewer, review, true);
+    expect(reviewReceipt.results.map((item: { receiptId: string }) => item.receiptId)).toEqual([receipt.result.id]);
     await expect(approved).toContainText("Chegada aprovada");
     await approved.getByRole("button", { name: "Concluir" }).click();
-    await reviewer.goto("/estoque");
+    await expect(reviewerDetails).toContainText("Entrada aprovada");
+    await reviewerDetails.getByRole("button", { name: "Fechar consulta" }).click();
+    await expect(reviewer.getByRole("button", { name: `Revisar chegada ${another.code}`, exact: true })).toBeVisible();
+    expect(sql(`select state from private.unlinked_arrivals where id=${sqlLiteral(another.id)}`)).toBe("pending");
     await reviewer.getByRole("region", { name: "Saldos e previsões" }).getByRole("button", { name: "Registrar chegada" }).click();
     const immediate = reviewer.getByRole("dialog", { name: "Registrar chegada" });
     await expect(immediate).toContainText("Aprovação automática · administrador");
@@ -95,7 +119,7 @@ test("E05-17 E05-18 registra uma doação avulsa, recupera a resposta e vincula 
     await immediate.getByRole("textbox", { name: new RegExp("Quantidade recebida · " + scanned.name_snapshot) }).fill("1");
     await immediate.getByRole("button", { name: "Confirmar entrada" }).click();
     const entry = reviewer.getByRole("dialog", { name: "Entrada confirmada" });
-    await expect(entry).toContainText("CHE-0002");
+    await expect(entry).toContainText("CHE-0003");
     await expect(entry).toContainText("Compra externa");
   } finally { await admin.close(); }
   expect(movements()).toBe("2");

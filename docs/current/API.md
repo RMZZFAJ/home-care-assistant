@@ -1894,6 +1894,9 @@ o mínimo remoto conferido permanece em seis caracteres.
   Recebe `careRecipientId`, `documentId` opcional e o cursor `beforeAt` com
   `beforeId`. Sem ficha, inclui chegadas avulsas com `documentId: null` e
   `origin`. Saldo familiar só aparece com autorização de leitura.
+  Com `arrivalId`, consulta somente a chegada avulsa indicada e não aceita
+  `documentId` ou cursor. A leitura usa a mesma autoridade da fila. O
+  resultado fica vazio se a chegada não estiver disponível para conferência.
 - `POST /api/purchases/arrivals/review` confirma `careRecipientId`, `key` e
   `entries`. Cada entrada indica `documentId`, `receiptId`, `version`, `decision`
   e o `reason` exigido para recusa ou correção. A resposta identifica o

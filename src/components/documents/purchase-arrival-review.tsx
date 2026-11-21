@@ -87,25 +87,32 @@ function ArrivalReviewCard({ row, choice, update }: {
 }
 
 export type OpenChangedArrivals = (receiptIds: readonly string[], focusAfterClose: () => HTMLButtonElement | null, onClose?: () => void) => void;
+export type OpenUnlinkedArrival = (arrivalId: string, focusAfterClose: () => HTMLElement | null, onClose?: () => void) => void;
+type ReviewScope = { receiptIds: readonly string[] } | { arrivalId: string };
 
 export function canReviewPurchaseArrivals(context: WorkspaceContext) {
   return context.patient?.role === "admin" && can(context, "com.read") && can(context, "com.validate");
 }
 
-export function PurchaseArrivalReview({ context, documentId, hasPending, onReviewed, changedArrivalsRef }: {
+export function PurchaseArrivalReview({ context, documentId, hasPending, onReviewed, changedArrivalsRef, unlinkedArrivalRef, showTrigger }: {
   context: WorkspaceContext; documentId?: string; hasPending?: boolean; onReviewed?: () => Promise<void>;
   changedArrivalsRef?: Ref<OpenChangedArrivals>;
+  unlinkedArrivalRef?: Ref<OpenUnlinkedArrival>;
+  showTrigger?: boolean;
 }) {
   const patient = context.patient;
   if (!patient || !canReviewPurchaseArrivals(context)) return null;
   return <ArrivalReviewEntry key={`${context.userId}:${patient.id}:${documentId ?? "all"}`} patientId={patient.id}
     patientName={patient.display_name} userId={context.userId} documentId={documentId} hasPending={hasPending}
-    changedArrivalsRef={changedArrivalsRef} onReviewed={onReviewed} />;
+    changedArrivalsRef={changedArrivalsRef} unlinkedArrivalRef={unlinkedArrivalRef} showTrigger={showTrigger} onReviewed={onReviewed} />;
 }
 
-function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPending = true, onReviewed, changedArrivalsRef }: {
+function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPending = true, onReviewed,
+  changedArrivalsRef, unlinkedArrivalRef, showTrigger = true }: {
   patientId: string; patientName: string; userId: string; documentId?: string; hasPending?: boolean; onReviewed?: () => Promise<void>;
   changedArrivalsRef?: Ref<OpenChangedArrivals>;
+  unlinkedArrivalRef?: Ref<OpenUnlinkedArrival>;
+  showTrigger?: boolean;
 }) {
   const storage = `hca:arrival-review:${userId}:${patientId}`;
   const [pendingKey, setPendingKey] = useState<string | null>(() => {
@@ -120,9 +127,10 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
   const [result, setResult] = useState<Extract<ArrivalReviewReceipt, { state: "recorded" }> | null>(null);
   const [refreshFailed, setRefreshFailed] = useState(false);
   const sendingRef = useRef(false), readingRef = useRef<symbol | null>(null), triggerRef = useRef<HTMLButtonElement>(null);
-  const focusAfterCloseRef = useRef<(() => HTMLButtonElement | null) | null>(null);
+  const focusAfterCloseRef = useRef<(() => HTMLElement | null) | null>(null);
   const returnToSourceRef = useRef<(() => void) | undefined>(undefined);
-  const [changedReceiptIds, setChangedReceiptIds] = useState<readonly string[] | null>(null);
+  const [scope, setScope] = useState<ReviewScope | null>(null);
+  const unlinkedArrival = scope && "arrivalId" in scope;
   const formId = useId();
   useOperationActivity(busy, { title: "Registrando decisões das chegadas", stage, steps: onReviewed ? documentReviewSteps : reviewSteps });
   const groups = new Map<string, ArrivalReviewRow[]>();
@@ -137,17 +145,24 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
     selected.push(choice.decision === "approve" ? { ...target, decision: "approve" } : { ...target, decision: choice.decision, reason: choice.reason?.trim() ?? "" });
   }
 
-  async function load(more = false, receiptIds = changedReceiptIds) {
+  async function load(more = false, requested = scope) {
     if (readingRef.current || (more && !queue.next)) return;
     const request = Symbol();
     readingRef.current = request; setLoading(true); setError("");
     try {
       const query = new URLSearchParams({ careRecipientId: patientId });
-      if (documentId) query.set("documentId", documentId);
+      const arrivalId = requested && "arrivalId" in requested ? requested.arrivalId : null;
+      const receiptIds = requested && "receiptIds" in requested ? requested.receiptIds : null;
+      if (arrivalId) query.set("arrivalId", arrivalId);
+      else if (documentId) query.set("documentId", documentId);
       if (more && queue.next) { query.set("beforeAt", queue.next.at); query.set("beforeId", queue.next.id); }
       const response = await api<{ data: unknown }>(endpoint + "?" + query);
       if (readingRef.current !== request) return;
       const page = arrivalReviewQueue.parse(response.data);
+      if (arrivalId && (page.next || page.arrivals.length > 1 ||
+        page.arrivals.some(row => row.documentId !== null || row.receiptId !== arrivalId))) {
+        throw new Error("A consulta não confirmou a chegada selecionada.");
+      }
       const prior = more ? queue.arrivals : [];
       const added = page.arrivals.filter(row =>
         (!receiptIds || receiptIds.includes(row.receiptId)) && !prior.some(item => item.receiptId === row.receiptId));
@@ -206,15 +221,16 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
       setError("O resultado ainda não pôde ser confirmado. Confira a mesma tentativa antes de repetir a decisão. Se persistir, procure a supervisão.");
     } finally { sendingRef.current = false; setBusy(false); }
   }
-  function openReview(receiptIds: readonly string[] | null = null, focusAfterClose: (() => HTMLButtonElement | null) | null = null, onClose?: () => void) {
+  function openReview(requested: ReviewScope | null = null, focusAfterClose: (() => HTMLElement | null) | null = null, onClose?: () => void) {
     readingRef.current = null;
     focusAfterCloseRef.current = focusAfterClose;
     returnToSourceRef.current = onClose;
-    setChangedReceiptIds(receiptIds);
+    setScope(requested);
     setOpen(true); setError(""); setDirty(false);
-    if (!pendingKey) { setQueue({ arrivals: [], next: null }); setChoices({}); void load(false, receiptIds); }
+    if (!pendingKey) { setQueue({ arrivals: [], next: null }); setChoices({}); void load(false, requested); }
   }
-  useImperativeHandle(changedArrivalsRef, () => openReview);
+  useImperativeHandle(changedArrivalsRef, () => (receiptIds, focusAfterClose, onClose) => openReview({ receiptIds }, focusAfterClose, onClose));
+  useImperativeHandle(unlinkedArrivalRef, () => (arrivalId, focusAfterClose, onClose) => openReview({ arrivalId }, focusAfterClose, onClose));
   const returnFocus = () => focusAfterCloseRef.current?.() ?? triggerRef.current;
   function returnToSource() {
     const resume = returnToSourceRef.current;
@@ -227,11 +243,11 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
   const changed = result?.results.some(row => ["approved", "rejected", "correction_requested"].includes(row.status));
 
   return <>
-    {hasPending || pendingKey ? <ActionButton ref={triggerRef} variant={documentId ? "primary" : undefined} onClick={() => openReview()}>
+    {(showTrigger && hasPending) || pendingKey ? <ActionButton ref={triggerRef} variant={documentId ? "primary" : undefined} onClick={() => openReview()}>
       <Icon name="truck" width={16} height={16} />{pendingKey ? "Conferir resultado das chegadas" : "Conferir chegadas"}
     </ActionButton> : null}
-    <Dialog open={open} title={documentId && queue.arrivals.length <= 1 ? "Conferir entrada no estoque" : "Conferir chegadas"}
-      kicker={`${documentId ? "COM" : "Chegadas"} · ${patientName}`} subtitle="Os itens marcados entram no estoque familiar. Desmarque para decidir depois ou use os três pontos para pedir correção ou recusar."
+    <Dialog open={open} title={unlinkedArrival && !pendingKey || documentId && queue.arrivals.length <= 1 ? "Conferir entrada no estoque" : "Conferir chegadas"}
+      kicker={`${documentId ? "COM" : unlinkedArrival ? "Chegada de materiais" : "Chegadas"} · ${patientName}`} subtitle="Os itens marcados entram no estoque familiar. Desmarque para decidir depois ou use os três pontos para pedir correção ou recusar."
       keyboardScrollable popupClassName="hca-wizard-dialog hca-arrival-review-dialog"
       onClose={requestClose} closeDisabled={busy} finalFocus={returnFocus}
       footer={<><ActionButton disabled={busy} onClick={requestClose}>Voltar</ActionButton>
@@ -241,7 +257,7 @@ function ArrivalReviewEntry({ patientId, patientName, userId, documentId, hasPen
         {error ? <Notice error>{error}</Notice> : null}
         {pendingKey ? <p>Uma confirmação foi enviada. Consulte seu resultado antes de revisar outra chegada.</p> : <>
           {loading ? <LoadingIndicator label="Consultando chegadas" /> : null}
-          {!loading && !error && !queue.arrivals.length ? <p>{queue.next
+          {!loading && !error && !queue.arrivals.length ? <p>{unlinkedArrival ? "Esta chegada não está disponível para conferência." : queue.next
             ? "Consulte mais chegadas para localizar as que aguardam conferência."
             : "Nenhuma chegada aguarda conferência nesta consulta."}</p> : null}
           {!loading && error && !queue.arrivals.length ? <ActionButton onClick={() => void load()}>Consultar chegadas</ActionButton> : null}

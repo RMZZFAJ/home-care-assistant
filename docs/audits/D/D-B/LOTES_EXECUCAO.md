@@ -140,8 +140,23 @@ confere com o comando mestre.
   de quantidade superior à pendência, a recuperação da resposta perdida e
   um crédito por chegada. A COM associada conservou a origem no PDF assinado.
   As capturas do laboratório e do produto estão em
-  `output/playwright/l2-coverage-continuity/`. Em E05-18, o acesso à revisão
-  a partir do cartão de uma única chegada avulsa continua pendente.
+  `output/playwright/l2-coverage-continuity/`.
+
+**Revisão de uma chegada avulsa pelo cartão.** Em E05-18, Revisar chegada
+abre a conferência de um único CHE no Estoque. O mesmo acesso fica nos
+detalhes da chegada. A consulta independe da paginação da fila e revalida
+paciente, autoria, versão e autoridade antes de apresentar os dados. A
+aprovação, a recusa, o pedido de correção e a recuperação de resposta
+reutilizam o mecanismo de conferência em lote. Ao voltar, os detalhes ou
+o cartão de origem continuam disponíveis. A ação geral de conferir
+várias chegadas permanece no cabeçalho do Estoque.
+Quatro testes passaram sem repetição em Android e iOS emulados. A
+conferência individual recuperou a decisão após perda de resposta,
+retornou ao detalhe aprovado e preservou a outra chegada pendente.
+A integração verificou a abertura depois dos 30 primeiros registros,
+a restrição de paciente e autoria e a leitura condicionada do saldo.
+Capturas em `output/playwright/l2-arrival-card/`.
+
 - **ENT e DEV E06.** Expedição direta, conferência pessoal, falta e excedente
   em apuração, conciliação, suficiência, troca do recebedor e regularização
   com revisão independente após revogação. Recebimento físico e avaliação
@@ -876,8 +891,8 @@ continua sem regra de produto nesta entrega.
 ## Migrations por ambiente
 
 Consulta de 20/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **313 versões em cada banco**,
-com 242 versões anteriores a L1, 18 de L1 e 53 de L2.
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **314 versões em cada banco**,
+com 242 versões anteriores a L1, 18 de L1 e 54 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 As versões em arquivo, na stack local e no desenvolvimento coincidem. A
 fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
@@ -905,7 +920,14 @@ fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
 `20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`,
-`20261120231639`.
+`20261120231639`, `20261121014430`.
+
+`20261121014430` permite consultar a conferência de um CHE pelo cartão.
+O backup cifrado verificado foi `f954d1bb-9de2-4640-91cd-faf04dc312a6`.
+O ensaio confirmou os grants e executou rollback. A aplicação vinculada
+acrescentou somente esta versão. A consulta confirmou 314 migrations e
+fila vazia no desenvolvimento, com execução pública da RPC restrita ao
+papel autenticado.
 
 `20261120231639` permite cancelar uma COM cujas chegadas estão resolvidas.
 Os bloqueios ficam na transação existente. O ensaio remoto executou o SQL
