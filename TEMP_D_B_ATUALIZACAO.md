@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — outra REQ emitida durante o preenchimento.** A validação de
+duplicidade abre a decisão por material na Revisão, com consulta à ficha
+pendente e justificativa para manter. O teste com dois autores passou em
+Chromium, Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — conversão na leitura de chegadas.** A COM e a chegada avulsa
 mostram a apresentação lida e permitem corrigir a embalagem, o fator e o
 total convertido. O diálogo mostra quanto a nova leitura soma à quantidade
