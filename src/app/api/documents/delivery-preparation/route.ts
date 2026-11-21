@@ -19,7 +19,8 @@ export async function GET(request: Request) {
     const source = params.get("source");
     if (source !== "FAMILY" && source !== "CARE_TEAM")
       throw new ApiError("VALIDATION_ERROR", "Escolha a origem da entrega.");
-    const data = await rpc(auth.client, "delivery_preparation", {
+    const readSchedule = params.get("schedule") === "1";
+    const data = await rpc(auth.client, readSchedule ? "delivery_preparation_with_next_shifts" : "delivery_preparation", {
       p_patient: patient.id,
       p_source: source,
     });

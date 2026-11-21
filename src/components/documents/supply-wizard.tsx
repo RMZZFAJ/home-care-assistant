@@ -834,7 +834,7 @@ export function PatientSupplyWizard({
     api<{ data: DeliveryPreparation; }>(
       "/api/documents/delivery-preparation?careRecipientId=" +
       patientId +
-      "&source=" +
+      "&schedule=1&source=" +
       form.source,
       undefined,
       controller.signal,

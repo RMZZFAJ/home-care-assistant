@@ -731,6 +731,10 @@ preserva aceite, pedido, decisor, consumo referenciado e devolução efetiva.
 GET /api/documents/delivery-preparation recebe careRecipientId/source e exige
 ent.create vigente. Retorna pessoas elegíveis na direção de custódia, escala
 publicada no horário consultado, sugestão somente se inequívoca e referenceHash.
+Com `schedule=1`, a consulta também inclui `nextShifts`, com no máximo um
+plantão futuro publicado por recebedor elegível da equipe. A lista se limita
+ao paciente consultado. O plantão futuro é informativo e fica fora da
+sugestão e da referência usada na expedição.
 Sem pessoa apta, a preparação fica pendente; não se presume recebedor.
 Em payload ENT, recipientReason registra escolha manual/troca e
 recipientReference vincula a referência consultada. Escolha fora da sugestão

@@ -984,6 +984,7 @@
 .hca-recipient-options { min-width: 0; display: grid; gap: 7px; border: 0; padding: 0; margin: 0; }
 .hca-recipient-option { display: flex; align-items: center; gap: 9px; min-height: 56px; padding: 11px 13px; border: 1px solid #dce6df; border-radius: 12px; cursor: pointer; }
 .hca-recipient-option:has(:checked) { border-color: #8bb2a3; background: #f5faf6; }
+.hca-status.hca-recipient-next-shift { color: #43586e; background: #eef1f6; }
 .hca-recipient-option > span { display: grid; justify-items: start; gap: 5px; min-width: 0; overflow-wrap: anywhere; }
 .hca-recipient-option input { flex: none; accent-color: #1d6b59; }
 .hca-recipient-options:disabled .hca-recipient-option { cursor: default; }

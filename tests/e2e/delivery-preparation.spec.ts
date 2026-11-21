@@ -257,18 +257,34 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   }
 });
 
-test("P06 escala sugere, a família pode escolher outra pessoa e o profissional escalado não aceita em seu lugar", async ({
+test("P06 E06-02 escala distingue o próximo plantão e o profissional escalado não aceita em lugar da pessoa escolhida", async ({
   page,
-}) => {
-  const f = await setup(),
-    shift = currentDeliveryShift(f);
+}, info) => {
+  const f = await setup(), shift = currentDeliveryShift(f);
+  let nextShift: ReturnType<typeof currentDeliveryShift> | undefined;
   try {
+    nextShift = currentDeliveryShift(f, fixtures.global.id, 90);
     await open(page, f.patient);
+    if (info.project.name !== "chromium") await page.setViewportSize({ width: info.project.name === "ios" ? 412 : 360, height: 844 });
     const recipient = page.getByRole("region", { name: "Escolha do recebedor", exact: true });
     await expect(recipient).toContainText("Teste professional");
     await expect(recipient).toContainText("Em plantão");
     await expect(explanation(page)).toHaveCount(0);
-    await selectDeliveryRecipient(page, "Teste global", reason);
+    const picker = await openDeliveryRecipient(page);
+    const active = recipientOption(picker, "Teste professional");
+    const upcoming = recipientOption(picker, "Teste global");
+    await expect(active).toBeChecked();
+    await expect(active).toHaveAccessibleDescription(/^Em plantão · /);
+    await expect(upcoming).toHaveAccessibleDescription(/^Próximo plantão · /);
+    await expect(upcoming).toBeEnabled();
+    await info.attach("E06-02 recebedor com plantão atual e próximo", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+    await upcoming.check();
+    const confirm = picker.getByRole("button", { name: "Usar recebedor", exact: true });
+    await expect(confirm).toBeDisabled();
+    await explanation(page).fill(reason);
+    await confirm.click();
+    await expect(picker).toBeHidden();
+    await expect(recipient).toContainText("Próximo plantão");
     await materialsAndReview(page);
     const recipientSummary = page.locator("dl > div").filter({
       has: page.locator("dt").filter({ hasText: /^Recebedor$/ }),
@@ -299,6 +315,7 @@ test("P06 escala sugere, a família pode escolher outra pessoa e o profissional 
     expect(ledger(f.patient)).toBe(before);
   } finally {
     shift.close();
+    nextShift?.close();
   }
 });
 

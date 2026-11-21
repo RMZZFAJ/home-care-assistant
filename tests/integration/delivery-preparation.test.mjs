@@ -96,6 +96,40 @@ const prepare = (f) =>
     p_patient: f.patient,
     p_source: "FAMILY",
   });
+
+test("E06-02 upcoming shifts are limited to the next published shift of eligible recipients", async (t) => {
+  const outside = await setup();
+  const f = await setup();
+  function publishedShift(fixture, person, minutes) {
+    const shift = currentShift(fixture, person, minutes);
+    t.after(shift.close);
+    return shift;
+  }
+  const current = publishedShift(f);
+  const next = publishedShift(f, fixtures.global.id, 90);
+  publishedShift(f, fixtures.global.id, 210);
+  publishedShift(outside, fixtures.global.id, 330);
+  currentShift(f, fixtures.global.id, 20).close();
+
+  const reader = await actor("reader", f.patient);
+  const args = { p_patient: f.patient, p_source: "FAMILY" };
+  const base = await prepare(f);
+  const enriched = await rpc(f.admin, "delivery_preparation_with_next_shifts", args);
+  assert.equal(base.nextShifts, undefined);
+  assert.equal(enriched.referenceHash, base.referenceHash);
+  assert.equal(enriched.suggestedId, fixtures.professional.id);
+  assert.deepEqual(enriched.shifts.map(shift => shift.id), [current.id]);
+  assert.deepEqual(enriched.nextShifts.map(shift => [shift.id, shift.professionalId]), [[next.id, fixtures.global.id]]);
+  assert.deepEqual((await rpc(f.admin, "delivery_preparation_with_next_shifts", { ...args, p_source: "CARE_TEAM" })).nextShifts, []);
+  assert.equal((await reader.rpc("delivery_preparation_with_next_shifts", args)).error?.code, "42501");
+
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.global.id)},'ent.receive',false);`);
+  const revoked = await rpc(f.admin, "delivery_preparation_with_next_shifts", args);
+  assert.equal(revoked.people.some(person => person.id === fixtures.global.id), false);
+  assert.deepEqual(revoked.nextShifts, []);
+});
+
 test("E06-09 reassigns direct ENT once, preserves the dispatch, and transfers personal receipt authority", async () => {
   const f = await setup();
   const shift = currentShift(f);

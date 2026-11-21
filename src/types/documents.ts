@@ -85,11 +85,13 @@ export type DeliveryPreparation = {
     startsAt: string;
     endsAt: string;
   }[];
+  nextShifts?: NextDeliveryShift[];
   suggestedId: string | null;
   state: "suggested" | "ambiguous" | "no_schedule" | "no_eligible_recipient";
   referenceHash: string;
   checkedAt: string;
 };
+type NextDeliveryShift = Pick<DeliveryPreparation["shifts"][number], "id" | "professionalId" | "startsAt" | "endsAt">;
 export type DeliveryRecipientSelection = {
   recipientId: string;
   recipientName: string;
@@ -114,7 +116,7 @@ export type DeliveryReassignmentContext = {
   dispatchedAt: string | null;
   people: DeliveryPreparation["people"];
   shifts: DeliveryPreparation["shifts"];
-  nextShifts: Pick<DeliveryPreparation["shifts"][number], "id" | "professionalId" | "startsAt" | "endsAt">[];
+  nextShifts: NextDeliveryShift[];
   suggestedId: string | null;
 };
 export type DocumentEvent = {

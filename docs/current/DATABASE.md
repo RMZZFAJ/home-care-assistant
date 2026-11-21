@@ -1,5 +1,10 @@
 # Banco de dados
 
+Em 21/11/2026, a migration `20261121111215` levou o local e o
+desenvolvimento a 318 versões. A nova consulta do assistente da ENT
+acrescenta o próximo plantão publicado dos recebedores elegíveis.
+A referência que a expedição revalida continua baseada na escala atual.
+
 Em 21/11/2026, os bancos local e de desenvolvimento chegaram a 317 versões
 com `20261121103655`. A consulta das REQs selecionadas na COM passou a
 retornar as contagens registradas e o saldo familiar permitido. A consulta

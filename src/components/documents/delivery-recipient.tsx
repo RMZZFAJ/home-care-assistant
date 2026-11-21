@@ -14,8 +14,16 @@ import type {
 } from "@/types/documents";
 import type { WizardState } from "./supply-wizard-step";
 
+type RecipientDuty = { text: string; current: boolean };
+
+function DutyBadge({ duty }: { duty: RecipientDuty }) {
+  return <Pill tone={duty.current ? "success" : "neutral"} className={duty.current ? undefined : "hca-recipient-next-shift"}>
+    <Icon name="clock" width={12} height={12} />{duty.text}
+  </Pill>;
+}
+
 export function WizardRecipientCard({ title, name, role, duty, invalid, disabled, onEdit, triggerRef }: {
-  title: string; name?: string; role?: string; duty?: string; invalid?: boolean;
+  title: string; name?: string; role?: string; duty?: RecipientDuty; invalid?: boolean;
   disabled?: boolean; onEdit: () => void; triggerRef: Ref<HTMLButtonElement>;
 }) {
   return <>
@@ -32,18 +40,28 @@ export function WizardRecipientCard({ title, name, role, duty, invalid, disabled
         <strong>{name || "Recebedor a definir"}</strong>
         <small>{role ? roleLabel(role) : "Escolha uma pessoa habilitada para a conferência."}</small>
       </div>
-      {duty ? <Pill tone="success"><Icon name="clock" width={12} height={12} />{duty}</Pill> : null}
+      {duty ? <DutyBadge duty={duty} /> : null}
     </div>
   </>;
 }
 
 const shiftTime = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
+const shiftDay = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeZone: "America/Sao_Paulo" });
 
-function dutyByPerson(shifts: DeliveryPreparation["shifts"]) {
-  const duty = new Map<string, string>();
-  for (const shift of shifts) {
-    if (!duty.has(shift.professionalId)) duty.set(shift.professionalId,
-      `Em plantão · ${shiftTime.format(new Date(shift.startsAt))}–${shiftTime.format(new Date(shift.endsAt))}`);
+function dutyByPerson(preparation: DeliveryPreparation | null) {
+  const duty = new Map<string, RecipientDuty>();
+  if (!preparation) return duty;
+  for (const shift of preparation.shifts) {
+    if (duty.has(shift.professionalId)) continue;
+    duty.set(shift.professionalId, { current: true,
+      text: `Em plantão · ${shiftTime.format(new Date(shift.startsAt))}–${shiftTime.format(new Date(shift.endsAt))}` });
+  }
+  const today = shiftDay.format(new Date(preparation.checkedAt));
+  for (const shift of preparation.nextShifts ?? []) {
+    if (duty.has(shift.professionalId)) continue;
+    const start = new Date(shift.startsAt);
+    const time = shiftDay.format(start) === today ? shiftTime.format(start) : formatBrazilDate(shift.startsAt);
+    duty.set(shift.professionalId, { current: false, text: `Próximo plantão · ${time}` });
   }
   return duty;
 }
@@ -53,14 +71,19 @@ export function WizardRecipientOptions({ label, people, value, onChange, duty, d
   people: DeliveryPreparation["people"];
   value: string;
   onChange: (id: string) => void;
-  duty?: ReadonlyMap<string, string>;
+  duty?: ReadonlyMap<string, RecipientDuty>;
   disabled?: boolean;
   groupRef?: Ref<HTMLFieldSetElement>;
 }) {
   const groupId = useId();
   const [search, setSearch] = useState("");
   const query = normalizeCatalogText(search);
-  const visible = people.filter(person => normalizeCatalogText(person.name).includes(query));
+  const priority = (id: string) => {
+    const shift = duty?.get(id);
+    return shift ? (shift.current ? 0 : 1) : 2;
+  };
+  const visible = people.filter(person => normalizeCatalogText(person.name).includes(query))
+    .sort((first, second) => priority(first.id) - priority(second.id));
   return <fieldset className="hca-recipient-options" ref={groupRef} disabled={disabled}>
     <legend className="sr-only">{label}</legend>
     {people.length > 8 ? <FormField label="Buscar recebedor">
@@ -74,7 +97,7 @@ export function WizardRecipientOptions({ label, people, value, onChange, duty, d
           aria-labelledby={labelId} aria-describedby={`${labelId}-status`} onChange={() => onChange(person.id)} />
         <span>
           <strong id={labelId}>{person.name}</strong>
-          <span id={`${labelId}-status`}>{shift ? <Pill tone="success"><Icon name="clock" width={12} height={12} />{shift}</Pill>
+          <span id={`${labelId}-status`}>{shift ? <DutyBadge duty={shift} />
             : <Pill>{roleLabel(person.role)}</Pill>}</span>
         </span>
       </label>;
@@ -153,7 +176,7 @@ export function DeliveryRecipientField({
   const [reason, setReason] = useState("");
   const chosen = data?.people.find(person => person.id === form.recipientId);
   const selected = data?.people.find(person => person.id === selectedId);
-  const duty = dutyByPerson(data?.shifts ?? []);
+  const duty = dutyByPerson(data);
   const needsReason = Boolean(selectedId &&
     (selectedId !== data?.suggestedId || (previousRecipient && previousRecipient !== selectedId)));
   const missing = fieldErrors.recipientId || fieldErrors.recipientReason || fieldErrors.recipientContext;
@@ -192,7 +215,8 @@ export function DeliveryRecipientField({
     {data?.state === "no_eligible_recipient" ? <Notice>{stateLabels.no_eligible_recipient}</Notice> : null}
     {comparison && !open ? <Notice>Confira a referência atual da escala ao alterar o recebedor.</Notice> : null}
     {open ? <Dialog open title="Escolher quem receberá" kicker="Entrega" popupClassName="hca-wizard-dialog" finalFocus={triggerRef}
-      subtitle="Escolha a pessoa que conferirá os materiais."
+      subtitle={data?.destination === "FAMILY" ? "Escolha a pessoa da família que conferirá os materiais."
+        : "Escolha a pessoa da equipe que conferirá os materiais."}
       onClose={() => setOpen(false)} keyboardScrollable
       footer={<>
         <ActionButton onClick={() => setOpen(false)}>Voltar</ActionButton>

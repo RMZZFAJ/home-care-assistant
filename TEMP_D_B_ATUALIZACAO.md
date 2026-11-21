@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — plantões na escolha do recebedor.** A ENT identifica o plantão
+atual e o próximo para cada pessoa habilitada da equipe. A pessoa escalada
+no momento continua sendo a sugestão quando não há ambiguidade.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — contagens de REQs vinculadas à COM.** A linha de material mostra
 cada contagem registrada, abre a REQ original e destaca a mais recente.
 O saldo familiar atual aparece separadamente, conforme a permissão, e a

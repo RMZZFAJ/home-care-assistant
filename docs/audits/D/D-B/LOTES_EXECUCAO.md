@@ -932,6 +932,21 @@ e preservação da quantidade editada. Capturas e relatório em
 `output/playwright/l2-com-linked-counts/`. CI e preview do incremento
 continuam pendentes.
 
+**E06-02, recebedor da ENT.** O seletor segue a lista do v7, com o plantão
+atual primeiro e o próximo em etiqueta de outra cor. A escala publicada
+é consultada para as pessoas habilitadas do paciente. O plantão futuro
+fica como informação e a sugestão continua reservada ao plantão atual
+inequívoco. Escolher outra pessoa continua exigindo justificativa e o
+recebimento permanece uma ação da pessoa designada. O controle compartilhado
+continua disponível na DEV com as pessoas habilitadas da família.
+Quatro execuções em Android de 360 px e iOS de 412 px emulados passaram
+sem repetição. Elas cobriram a escolha manual, o bloqueio do aceite por
+outra pessoa e a atualização da escala durante o preenchimento. O caso
+novo de integração com Auth real distinguiu plantões mais distantes,
+cancelados, de outro paciente e de pessoas que perderam a permissão.
+As 11 regressões do mesmo arquivo também passaram. Capturas e relatório
+em `output/playwright/l2-recipient-shift/`.
+
 **Continuidade do BAL existente.** Ao adotar a nova referência, o
 salvamento automático guarda as contagens anteriores com data e notas.
 A nova conferência começa com as quantidades vazias. O fluxo cobriu
@@ -1361,7 +1376,7 @@ continua sem regra de produto nesta entrega.
 
 Consulta de 21/11/2026 à stack local `home-care-assistant` e ao Supabase de
 desenvolvimento vinculado `qwfrqychokvhdzakibid`. Os bancos compartilham
-**317 versões**, com 242 versões anteriores a L1, 18 de L1 e 57 de L2.
+**318 versões**, com 242 versões anteriores a L1, 18 de L1 e 58 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 A fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 
@@ -1389,7 +1404,14 @@ A fila de aplicação vinculada está vazia. Produção fica fora desta consulta
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
 `20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`,
 `20261120231639`, `20261121014430`, `20261121063729`, `20261121075902`,
-`20261121103655`.
+`20261121103655`, `20261121111215`.
+
+`20261121111215` acrescenta a leitura dos próximos plantões da equipe na
+ENT sem alterar o formato da consulta anterior ou o identificador da
+referência da expedição. O backup cifrado
+`ba1a61b9-ffab-4745-ae6d-0d9421ca268e` foi verificado. O ensaio confirmou
+os grants e executou rollback. Após a aplicação, o desenvolvimento confirmou
+318 versões e execução da nova consulta restrita a `authenticated`.
 
 `20261121103655` acrescenta a consulta das contagens para REQs vinculadas
 à COM. O formato da consulta anterior continua disponível durante a
