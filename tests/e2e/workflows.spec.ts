@@ -203,6 +203,10 @@ async function issueSupply(
   for (let step = 0; step < 3; step++) await next(page);
   if (type === "ENT" && requestId)
     await expect(page.getByText(fulfillment === "complete" ? "Atendimento integral previsto" : "Atendimento parcial previsto", { exact: true })).toBeVisible();
+  if (type === "ENT")
+    await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  const action = { BAL: "Confirmar e concluir", COM: "Emitir compra", ENT: "Expedir entrega" }[type];
+  const finish = page.getByRole("button", { name: action, exact: true });
   const pending = page.waitForResponse(
     (r) =>
       (new URL(r.url()).pathname === "/api/documents" &&
@@ -211,10 +215,8 @@ async function issueSupply(
       (/\/revise$/.test(new URL(r.url()).pathname) &&
         r.request().method() === "POST"),
   );
-  const action = { BAL: "Confirmar e concluir", COM: "Emitir compra", ENT: "Expedir entrega" }[type];
-  await page
-    .getByRole("button", { name: action, exact: true })
-    .click();
+  if (type === "ENT" && test.info().project.use.hasTouch) await finish.tap();
+  else await finish.click();
   const response = await pending;
   expect(response.ok(), await response.text()).toBeTruthy();
   return (await response.json()).data;

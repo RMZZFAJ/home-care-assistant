@@ -21,6 +21,7 @@ afterEach(async () => {
   }
 });
 describe("operator encrypted backup archive", () => {
+  // Sealing, verifying and restoring all perform real filesystem passes.
   it("authenticates the manifest and every byte before restoring DB and Storage together", async () => {
     const f = await fixture();
     const sealed = await sealBackup(f);
@@ -37,7 +38,7 @@ describe("operator encrypted backup archive", () => {
     expect(JSON.parse(await readFile(join(restored, "RESTORE_VERIFIED.json"), "utf8")).verified).toBe(true);
     await expect(sealBackup(f)).rejects.toThrow();
     await expect(extractBackup({ directory: f.destination, destination: restored, key: f.key })).rejects.toThrow();
-  });
+  }, 20_000);
   it("refuses wrong keys, modified ciphertext and missing objects before plaintext extraction", async () => {
     const f = await fixture(); await sealBackup(f);
     await expect(verifyBackup({ directory: f.destination, key: randomBytes(32) })).rejects.toThrow();
