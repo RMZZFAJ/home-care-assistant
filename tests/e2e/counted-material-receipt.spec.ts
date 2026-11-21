@@ -64,7 +64,6 @@ test("ENT confere falta e excedente na mesma ficha e recupera confirmação sem 
   await review.getByRole("button", { name: "Voltar e editar" }).click();
   await expect(short).toHaveValue("3");
   await expect(excess).toHaveValue("8");
-  await editor.getByText("Adicionar observação ao recebimento", { exact: true }).click();
   await expect(editor.getByRole("textbox", { name: "Sua observação no recebimento" })).toHaveValue(receiptNote);
   await confirm.click();
 

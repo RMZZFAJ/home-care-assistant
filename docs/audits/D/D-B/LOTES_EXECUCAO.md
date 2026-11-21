@@ -897,8 +897,22 @@ Com falha persistente nos avisos, a COM continuou consultável e o diagnóstico
 ficou disponível após duas recuperações. Na perda das duas respostas, uma
 consulta confirmou cada etapa e recuperou o mesmo PDF assinado. A verificação
 conferiu o identificador do exemplar, a versão da ficha e uma única COM.
+A REQ também recuperou o mesmo exemplar assinado após a perda da resposta.
+O teste dirigido em Android e iOS emulados passou nas duas execuções, na
+primeira tentativa, e confirmou um único PDF persistido e a ficha na versão 1.
 
 ### Revisão dos wizards após o retorno do responsável
+
+**E04-03, outra REQ durante o preenchimento.** Se a emissão encontrar uma
+necessidade já solicitada, a Revisão permanece aberta e consulta as pendências
+atuais. O diálogo abre por material, oferece consulta à ficha pelo código e
+pede justificativa para manter o item. O nome da pessoa que emitiu consta na
+ficha consultada. Retirar elimina apenas o item escolhido e seus vínculos.
+As outras linhas e observações continuam na Revisão. O usuário confirma
+novamente a emissão depois de decidir. A regressão dirigida usou dois autores
+com Auth real, confirmou a rejeição, preservou a primeira REQ e verificou a
+segunda emissão com a justificativa e somente as duas linhas mantidas.
+Passou em Chromium, Android e iOS emulados, na primeira tentativa.
 
 A comparação em celular usou E04-01, E05-01, E06-01 e E06-16. A identidade
 da confirmação, a lista contínua, os controles na linha do material, o menu
@@ -1494,9 +1508,18 @@ O manifesto confirmou as 84 migrations protegidas.
 
 A [CI de `b74013c4`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44886723003)
 passou nas validações Windows e Ubuntu, na instalação limpa, na evolução
-legada e em 830 testes de integração. Os seis grupos de navegador estavam
-executando os E2E na consulta de 21/11. O ajuste das chegadas `21a62a69`
-ficou local durante essa execução para evitar o cancelamento do workflow.
+legada e em 830 testes de integração. O grupo Chromium 1 terminou com 264
+testes aprovados e 16 falhas persistentes. O Chromium 2 atingiu o limite de
+40 minutos do job enquanto ainda executava os E2E. O log desse grupo registra
+um teste de encerramento de escala que passou na repetição. Android 1,
+Android 2 e iOS 1 terminaram com 16, 23 e 17 falhas persistentes. iOS 2
+continuava em execução na consulta seguinte.
+
+A validação local de correções dirigidas passou em 12 testes sem repetição.
+Ela cobriu a largura de 320 px na DEV, a descrição acessível dos materiais em
+REQ, COM, ENT e BAL, a categoria inicial quando só há itens de higiene,
+a observação ao voltar da diferença no recebimento, a ciência na Visão geral
+e a emissão concorrente de REQ. Os demais casos da CI seguem em correção.
 
 A [CI 44477574161](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44477574161)
 concluiu com sucesso para `075b4b66` e os 15 checks exibidos na PR estão

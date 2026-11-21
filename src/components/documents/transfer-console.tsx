@@ -1203,7 +1203,7 @@ function TransferDeclarationEditor({
                   Não há pessoa habilitada na custódia de destino para confirmar o recebimento.
                 </Notice>
               ) : null}
-              <form ref={materialFormRef} className="grid gap-4" onSubmit={prepare}>
+              <form ref={materialFormRef} className="grid min-w-0 grid-cols-1 gap-4" onSubmit={prepare}>
                 {step === 0 ? <>
                 <h3>Confirme os dados da {isReturn ? "devolução" : "entrega"}</h3>
                 <SupplyWizardIdentity context={context} kind={isReturn ? "DEV" : "ENT"} />

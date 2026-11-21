@@ -208,8 +208,7 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   const next = page.getByRole("button", { name: "Selecionar materiais", exact: true });
   await next.click();
   const categories = page.getByRole("navigation", { name: "Tipos de material" });
-  await expect(categories.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
-  await categories.getByRole("button", { name: /^Higiene/ }).click();
+  await expect(categories.getByRole("button", { name: /^Higiene/, pressed: true })).toBeVisible();
   const search = page.getByLabel("Buscar material", { exact: true });
   await search.fill("V4 0");
   const selection = page.getByRole("checkbox", { name: /Material fictício V4 0/ });
@@ -296,8 +295,7 @@ test("catalogue consultation from a purchase keeps the quantity when using brows
   const next = page.getByRole("button", { name: "Selecionar materiais", exact: true });
   await next.click();
   const categories = page.getByRole("navigation", { name: "Tipos de material" });
-  await expect(categories.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
-  await categories.getByRole("button", { name: /^Higiene/ }).click();
+  await expect(categories.getByRole("button", { name: /^Higiene/, pressed: true })).toBeVisible();
   await page.getByRole("checkbox", { name: /^Material fictício V4 0/ }).check();
   const amount = page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
   await amount.fill("4");

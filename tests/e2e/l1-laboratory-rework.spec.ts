@@ -87,8 +87,10 @@ test("L1 laboratório: ficha, ciência em etapas e exemplares preservam os atos 
   await expect(page.locator(".doc-feed")).toBeVisible();
   for (const width of [412, 360]) { await page.setViewportSize({ width, height: 940 }); await capture(page, `req-andamentos-${width}`); }
   await selectDocumentSection(page, "materials");
-  await expect(page.getByRole("heading", { name: "Ciência familiar", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ciência familiar", exact: true })).toBeHidden();
   for (const width of [1440, 390]) { await page.setViewportSize({ width, height: 940 }); await capture(page, `req-materiais-${width}`); }
+  await selectDocumentSection(page, "overview");
+  await expect(page.getByRole("heading", { name: "Ciência familiar", exact: true })).toBeVisible();
   let postRelease!: () => void, postSeen!: () => void, readRelease!: () => void, readSeen!: () => void;
   const postGate = new Promise<void>(resolve => { postRelease = resolve; }), posted = new Promise<void>(resolve => { postSeen = resolve; });
   const readGate = new Promise<void>(resolve => { readRelease = resolve; }), read = new Promise<void>(resolve => { readSeen = resolve; });

@@ -54,5 +54,5 @@ export async function expectMobileMaterialRow(row: Locator, reference: Page, wid
   const values = await row.locator(".hca-v7-material-facts b").allTextContents();
   expect(unit.trim()).not.toBe("");
   for (const value of values) expect(value).not.toContain(" " + unit);
-  await expect(row).toHaveAttribute("aria-describedby", /^material-unit-\S+ material-facts-/);
+  await expect(row).toHaveAttribute("aria-describedby", /(?:^|\s)material-unit-\S+\s+material-facts-\S+(?:\s|$)/);
 }
