@@ -1620,6 +1620,11 @@
 .hca-supply-wizard-status { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 0; color: #4a6659; font-size: 11px; }
 .hca-supply-wizard-status:not(:empty) { margin-block-start: 9px; }
 
+@media (min-width: 851px) {
+  .hca-wizard-review-actions { display: flex; align-items: center; gap: 6px; }
+  html:has(.hca-supply-wizard-footer) { scroll-padding-block-end: 105px; }
+}
+
 @media (max-width: 850px) {
   .hca-supply-wizard-footer {
     inset-block-end: calc(var(--hca-bottom-navigation) + env(safe-area-inset-bottom, 0px));
