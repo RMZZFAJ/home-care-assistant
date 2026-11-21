@@ -1381,6 +1381,14 @@ No commit `614402f6`, a análise confirmou quatro apontamentos abertos,
 todos no HTML aprovado. O preview desse commit ficou pronto.
 [Preview de desenvolvimento](https://vercel.com/rmzzfajs-projects/home-care-assistant/9E78g3V6VMvLj4zZQcmeaySYqLVQ).
 
+Em `0333ed78`, os três apontamentos que falharam o gate de confiabilidade
+e segurança ainda estavam no HTML aprovado. A configuração versionada da
+análise automática restringe a exclusão ao caminho exato desse artefato.
+O HTML continua íntegro e executado nas comparações visuais de navegador.
+As regras, a análise do produto e o escopo dos testes permanecem vigentes.
+O efeito no gate exige uma nova análise da PR.
+[Escopo da análise automática](https://docs.sonarsource.com/sonarqube-cloud/appendices/troubleshooting).
+
 L3 e L4 ainda não começaram. Quando tiverem ordem e referência aprovadas,
 registrar o escopo de cada lote, suas comparações comprovadas, criações fora
 do laboratório, conflitos, perguntas e inventário de banco nesta mesma página.
