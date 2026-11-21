@@ -460,7 +460,7 @@ export function PatientSupplyWizard({
   const privateContent = type === "BAL" ? balanceContent : supplyContent;
 
   const [draftTouched, setDraftTouched] = useState(false);
-  useLongDraftAutosave(privateDraft, privateContent, allowed && draftTouched && !(busy || uncertain));
+  useLongDraftAutosave(privateDraft, privateContent, allowed && draftTouched && !(busy || uncertain || saved || recoveredId || navigating));
   const offeredContent = privateDraft.offered?.content;
   const originalSource =
     offeredContent && "form" in offeredContent
@@ -788,7 +788,12 @@ export function PatientSupplyWizard({
       .then(({ data }) => {
         if (controller.signal.aborted) return;
         if (recipientContextRef.current?.source === data.source) {
-          setRecipientComparison(data);
+          if (recipientContextRef.current.referenceHash !== data.referenceHash) setRecipientComparison(data);
+          else {
+            recipientContextRef.current = data;
+            setRecipientContext(data);
+            setRecipientComparison(null);
+          }
         } else {
           recipientContextRef.current = data;
           setRecipientContext(data);
@@ -899,10 +904,12 @@ export function PatientSupplyWizard({
           "Explique a escolha manual ou troca do recebedor com 3 a 1000 caracteres.";
     }
     const extras = new Set(form.extraProductIds);
+    const lastCategory = category && !adjacentMaterialCategory(category, catalog, "next");
     const relevant = catalog.filter(product => {
       if (isBalance) return all || product.category === category;
       if (!Object.hasOwn(form.quantities, product.id)) return false;
-      return all || (product.category === category && !extras.has(product.id)) || (step === supplyExtrasStep && extras.has(product.id));
+      return all || (category && (lastCategory || product.category === category) && !extras.has(product.id)) ||
+        (step === supplyExtrasStep && extras.has(product.id));
     });
     for (const product of relevant)
       if (
@@ -1510,7 +1517,7 @@ export function PatientSupplyWizard({
       if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);
     }} className="hca-document-wizard min-w-0 space-y-5">
       <ComplementOriginHint />
-      {privateDraft.active && !uncertain ? (
+      {privateDraft.active && !issuing && !navigating && !uncertain ? (
         <SimpleDraftPanel
           draft={privateDraft}
           current={privateContent}
@@ -1713,9 +1720,6 @@ export function PatientSupplyWizard({
                       setRecipientContext(recipientComparison);
                       setRecipientComparison(null);
                       setFieldErrors({});
-                      requestAnimationFrame(() =>
-                        document.getElementById("delivery-recipient")?.focus(),
-                      );
                     }
                   }}
                 />

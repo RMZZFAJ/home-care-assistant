@@ -1,6 +1,6 @@
 "use client";
 import { SearchSelect } from "@/components/ui/search-select";
-import { useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useRef, useState, type Dispatch, type Ref, type SetStateAction } from "react";
 
 import { Notice } from "@/components/workspace";
 import { ActionButton, FormField, Pill, TextAreaField } from "@/components/ui/controls";
@@ -13,6 +13,29 @@ import type {
   DeliveryRecipientSelection,
 } from "@/types/documents";
 import type { WizardState } from "./supply-wizard-step";
+
+export function WizardRecipientCard({ title, name, role, onDuty, invalid, disabled, onEdit, triggerRef }: {
+  title: string; name?: string; role?: string; onDuty?: boolean; invalid?: boolean;
+  disabled?: boolean; onEdit: () => void; triggerRef: Ref<HTMLButtonElement>;
+}) {
+  return <>
+    <div className="hca-issuance-observation-heading">
+      <h3>{title}</h3>
+      <ActionButton ref={triggerRef} compact variant="quiet" aria-label={name ? "Alterar recebedor" : "Escolher recebedor"}
+        aria-invalid={invalid || undefined} disabled={disabled} onClick={onEdit}>
+        <Icon name="edit" />{name ? "Alterar" : "Escolher"}
+      </ActionButton>
+    </div>
+    <div className="hca-source-summary hca-wizard-recipient">
+      <span className="hca-source-symbol"><Icon name="user" /></span>
+      <div>
+        <strong>{name || "Recebedor a definir"}</strong>
+        <small>{role ? roleLabel(role) : "Escolha uma pessoa habilitada para a conferência."}</small>
+      </div>
+      {onDuty ? <Pill tone="success"><Icon name="clock" width={12} height={12} />Em plantão</Pill> : null}
+    </div>
+  </>;
+}
 
 const stateLabels = {
   suggested: "A escala sugere uma pessoa para este horário.",
@@ -76,6 +99,9 @@ export function DeliveryRecipientField({
   onAdopt: () => void;
 }) {
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const refreshRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const focusAfterAdoptRef = useRef(false);
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [reason, setReason] = useState("");
@@ -86,9 +112,18 @@ export function DeliveryRecipientField({
   const needsReason = Boolean(selectedId &&
     (selectedId !== data?.suggestedId || (previousRecipient && previousRecipient !== selectedId)));
   const missing = fieldErrors.recipientId || fieldErrors.recipientReason || fieldErrors.recipientContext;
-  const editLabel = chosen ? "Alterar recebedor" : "Escolher recebedor";
+  useEffect(() => {
+    if (!open || comparison || loading || error || !focusAfterAdoptRef.current) return;
+    // Wait for the combobox to apply its enabled state.
+    const frame = requestAnimationFrame(() => {
+      focusAfterAdoptRef.current = false;
+      inputRef.current?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, comparison, loading, error]);
 
   function edit() {
+    focusAfterAdoptRef.current = false;
     setSelectedId(form.recipientId);
     setReason(form.recipientReason ?? "");
     setSearch(null);
@@ -102,19 +137,9 @@ export function DeliveryRecipientField({
   }
 
   return <section className="hca-form-stack" aria-label="Escolha do recebedor">
-    <h3>{data?.destination === "FAMILY" ? "Quem receberá na família" : "Quem receberá na equipe"}</h3>
-    <div className="hca-source-summary hca-wizard-recipient">
-      <span className="hca-source-symbol"><Icon name="user" /></span>
-      <div>
-        <strong>{chosen?.name ?? "Recebedor a definir"}</strong>
-        <small>{chosen ? roleLabel(chosen.role) : "Escolha uma pessoa habilitada para a conferência."}</small>
-        {onDuty ? <Pill tone="success"><Icon name="clock" width={12} height={12} />Em plantão</Pill> : null}
-      </div>
-      <ActionButton ref={triggerRef} compact variant="quiet" aria-label={editLabel} aria-invalid={Boolean(missing)}
-        disabled={loading || (!error && !data?.people.length)} onClick={edit}>
-        <Icon name="edit" />{chosen ? "Alterar" : "Escolher"}
-      </ActionButton>
-    </div>
+    <WizardRecipientCard title={data?.destination === "FAMILY" ? "Quem receberá na família" : "Quem receberá na equipe"}
+      name={chosen?.name} role={chosen?.role} onDuty={onDuty} invalid={Boolean(missing)}
+      disabled={loading || (!error && !data?.people.length)} onEdit={edit} triggerRef={triggerRef} />
     {loading ? <p className="hca-field-help" role="status">Consultando escala e recebedores elegíveis…</p> : null}
     {missing || error ? <Notice error>{missing || error}</Notice> : null}
     {data && !chosen && data.state !== "no_eligible_recipient" ? <p className="hca-field-help">{stateLabels[data.state]}</p> : null}
@@ -129,7 +154,7 @@ export function DeliveryRecipientField({
       </>}>
       <div className="hca-form-stack">
         {data ? <DeliveryRecipientReference data={data} /> : null}
-        <ActionButton compact variant="quiet" disabled={loading} onClick={onRefresh}>
+        <ActionButton ref={refreshRef} compact variant="quiet" disabled={loading} onClick={onRefresh}>
           <Icon name="refresh" />Consultar escala atual
         </ActionButton>
         {loading ? <p role="status">Consultando escala e recebedores elegíveis…</p> : null}
@@ -137,11 +162,16 @@ export function DeliveryRecipientField({
         {comparison ? <section className="hca-form-stack" aria-label="Comparação do recebedor">
           <h3>Referências atualizadas</h3>
           <DeliveryRecipientReference data={comparison} />
-          <ActionButton onClick={onAdopt}>Usar referências atuais</ActionButton>
+          <ActionButton onClick={() => {
+            // Hold focus inside the dialog while the comparison button unmounts.
+            refreshRef.current?.focus({ preventScroll: true });
+            focusAfterAdoptRef.current = true;
+            onAdopt();
+          }}>Usar referências atuais</ActionButton>
         </section> : null}
         <div>
           <label htmlFor="delivery-recipient" className="field-label">Destinatário designado</label>
-          <SearchSelect id="delivery-recipient" query={search ?? selected?.name ?? ""} selectedIds={selected ? [selected.id] : []}
+          <SearchSelect ref={inputRef} id="delivery-recipient" query={search ?? selected?.name ?? ""} selectedIds={selected ? [selected.id] : []}
             disabled={loading || Boolean(error) || Boolean(comparison) || !data?.people.length} required
             aria-describedby="delivery-recipient-help" triggerLabel="Abrir opções de recebedor" placeholder="Busque quem receberá"
             onQueryChange={value => { setSearch(value); setSelectedId(""); }}

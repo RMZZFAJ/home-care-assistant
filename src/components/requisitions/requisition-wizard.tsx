@@ -200,7 +200,7 @@ function PatientRequisition({
   useLongDraftAutosave(
     privateDraft,
     draftContent,
-    canWrite && draftTouched && !saving && !uncertain && requisitionDraftContent.safeParse(draftContent).success,
+    canWrite && draftTouched && !(saving || uncertain || issuedDocumentId || navigating) && requisitionDraftContent.safeParse(draftContent).success,
   );
   const offeredSource =
     privateDraft.offered?.content && "lines" in privateDraft.offered.content
@@ -395,8 +395,9 @@ function PatientRequisition({
         errors.remainingNeed =
           "Informe o motivo da necessidade remanescente, entre3 e1000 caracteres.";
     }
+    const lastCategory = currentCategory && !adjacentMaterialCategory(currentCategory, products, "next");
     const linesToValidate = all ? form.lines : form.lines.filter(line =>
-      currentCategory ? line.category === currentCategory && !line.catalogueExtra : step === 4 && line.catalogueExtra);
+      currentCategory ? (lastCategory || line.category === currentCategory) && !line.catalogueExtra : step === 4 && line.catalogueExtra);
     for (const line of linesToValidate) {
       if (
         !validStockObservation(
@@ -690,7 +691,7 @@ function PatientRequisition({
         </div>
       </Dialog>
       <ComplementOriginHint />
-      {!uncertain ? <SimpleDraftPanel
+      {!saving && !navigating && !uncertain ? <SimpleDraftPanel
         draft={privateDraft}
         current={draftContent}
         statusInFooter

@@ -140,8 +140,8 @@ test("L2 abertura da DEV retoma a identificação depois de recuperar a referên
   await modal.getByRole("button", { name: "Tentar novamente", exact: true }).click();
   await expect(page.getByRole("region", { name: "Nova devolução", exact: true })).toBeVisible();
   expect(writes).toEqual([]);
-  await page.getByRole("combobox", { name: "Recebedor físico designado", exact: true }).selectOption(fixtures.family.id);
-  await page.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true }).fill("Pessoa da família presente para a conferência.");
+  await selectReturnRecipient(page, fixtures.family.id, "Pessoa da família presente para a conferência.");
   await next.click();
   await expect(page.getByRole("button", { name: "Materiais", exact: true })).toHaveAttribute("aria-current", "step");
 });
+import { selectReturnRecipient } from "./delivery-recipient";

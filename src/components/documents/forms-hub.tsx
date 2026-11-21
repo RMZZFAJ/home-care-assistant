@@ -12,7 +12,7 @@ import { Icon } from "@/components/ui/primitives";
 import { documentLabels, type DocumentType } from "@/types/documents";
 
 const descriptions: Record<DocumentType, string> = {
-  REQ: "Informe necessidades, estoque observado e urgência. Acompanhe o atendimento por item.",
+  REQ: "Informe necessidades, estoque atual e urgência. Acompanhe o atendimento por item.",
   COM: "Organize a aquisição da família, aprove itens e valide a entrada no estoque.",
   ENT: "Entrega segue da família para a equipe. Devolução de materiais segue da equipe para a família e não exige uma entrega de origem.",
   BAL: "Conte o estoque da equipe e reconcilie diferenças conforme as regras do paciente.",

@@ -1,5 +1,20 @@
-import type { ReactNode } from "react";
-import { FormField, TextInput } from "@/components/ui/controls";
+import type { ComponentProps, ReactNode } from "react";
+import { ActionButton, FormField, TextInput } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
+
+export function WizardQuantityInput({ unit, ...input }: ComponentProps<typeof TextInput> & { unit?: string }) {
+  if (!unit) return <TextInput {...input} />;
+  return <span className="hca-wizard-stock-input">
+    <TextInput {...input} />
+    <span aria-hidden="true">{unit}</span>
+  </span>;
+}
+
+export function WizardExtraButton({ inExtras, onClick }: { inExtras: boolean; onClick: () => void }) {
+  return <ActionButton variant={inExtras ? "secondary" : "quiet"} compact={!inExtras} onClick={onClick}>
+    <Icon name="plus" />{inExtras ? "Adicionar item extra" : "Item extra"}
+  </ActionButton>;
+}
 
 export function WizardMaterialSearch({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   return <FormField label="Buscar material">

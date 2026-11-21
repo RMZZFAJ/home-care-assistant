@@ -1,5 +1,15 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — seleção de materiais e recebedores nos assistentes.** A
+correspondência do catálogo vai para a categoria de Materiais. A DEV usa
+o mesmo cartão de recebedor da ENT. Os avisos de rascunho ficam fora da
+emissão. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
+**20/11 — ações na revisão de conclusão.** REQ e COM abrem a avaliação
+ou a conferência de chegada direto da pendência. Ao voltar, a revisão
+mantém a observação em edição e confere novamente os bloqueios.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — avaliação de suficiência na REQ e na ENT.** O painel do material
 da REQ abre a avaliação da entrega vinculada. O diálogo mostra o motivo,
 o recebimento e a avaliação anterior e confirma o resultado registrado.

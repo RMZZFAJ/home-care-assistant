@@ -319,7 +319,7 @@ function DraftFieldsSummary({
                   : line.stockObservation === "unfilled" ||
                     line.currentStock === null
                     ? "Estoque não informado"
-                    : `Estoque observado: ${line.currentStock}`}
+                    : `Estoque atual informado: ${line.currentStock}`}
               </p>
               <small>
                 Observação:{" "}

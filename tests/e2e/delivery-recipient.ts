@@ -32,3 +32,11 @@ export async function selectDeliveryRecipient(
   await picker.getByRole("button", { name: "Usar recebedor", exact: true }).click();
   await expect(picker).toBeHidden();
 }
+
+export async function selectReturnRecipient(page: Page, id: string, reason: string) {
+  const picker = await openDeliveryRecipient(page);
+  await picker.getByRole("combobox", { name: "Recebedor físico designado", exact: true }).selectOption(id);
+  await picker.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true }).fill(reason);
+  await picker.getByRole("button", { name: "Usar recebedor", exact: true }).click();
+  await expect(picker).toBeHidden();
+}

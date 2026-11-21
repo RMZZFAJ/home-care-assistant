@@ -15,7 +15,7 @@ const next = (page: Page) => page.getByRole("button", { name: /^(Selecionar mate
 const material = (page: Page) => page.getByRole("checkbox", { name: /^Material fictício V4 0/ });
 const count = (page: Page) => page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
 
-test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para ele", async ({ page }, info) => {
+test("L2 COM encaminha a sugestão de catálogo para Materiais e emite uma única linha", async ({ page }, info) => {
   test.setTimeout(150_000);
   const name = "Complemento fictício de higiene";
   const f = await setup({ catalogue: [
@@ -35,9 +35,8 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   await picker.getByRole("textbox", { name: "Nome do material", exact: true }).fill("curativo auxiliar");
   await picker.getByRole("button", { name: `Usar item do catálogo: ${name} (unidade)`, exact: true }).click();
   await expect(picker).toHaveCount(0);
-  await selectMaterialCategory(page);
-  await expect(page.getByRole("checkbox", { name: name + " unidade", exact: true })).toHaveCount(0);
-  await next(page);
+  await expect(page.getByRole("button", { name: /^Higiene/, pressed: true })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: name + " unidade", exact: true })).toBeChecked();
   const extra = page.getByLabel("Quantidade — " + name, { exact: true });
   const saved = page.waitForResponse(response => response.request().method() === "POST" &&
     new URL(response.url()).pathname === "/api/drafts" &&
@@ -47,9 +46,12 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   expect(receipt.ok(), await receipt.text()).toBe(true);
   await page.reload();
   await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
-  await expect(stages.getByRole("button", { name: "Extras", exact: true })).toHaveAttribute("aria-current", "step");
+  await expect(stages.getByRole("button", { name: "Materiais", exact: true })).toHaveAttribute("aria-current", "step");
   await expect(extra).toHaveValue("2");
-  await info.attach("E05-extra-restaurado", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await info.attach("E05-material-restaurado", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await next(page);
+  await expect(stages.getByRole("button", { name: "Extras", exact: true })).toHaveAttribute("aria-current", "step");
+  await expect(page.getByText(name, { exact: true })).toHaveCount(0);
   await next(page);
   const observation = "A caixa será entregue em dois volumes.";
   const addObservation = page.getByRole("button", { name: "Adicionar observação", exact: true });
@@ -62,8 +64,9 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   await page.getByRole("button", { name: "Remover observação 2", exact: true }).click();
   await next(page);
   const review = page.getByRole("region", { name: "Itens extras", exact: true });
-  await expect(review.getByText(name, { exact: true })).toHaveCount(1);
-  await expect(review.getByText("2 unidade", { exact: true })).toBeVisible();
+  await expect(review.getByText(name, { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Editar materiais de Higiene", exact: true })).toBeVisible();
+  await expect(page.getByText(name, { exact: true })).toHaveCount(1);
   await expect(page.getByText(observation, { exact: true })).toBeVisible();
   const submission = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
   await page.getByRole("button", { name: "Emitir compra", exact: true }).click();
@@ -72,8 +75,9 @@ test("L2 COM recupera o mesmo extra do catálogo e emite uma única linha para e
   const { data: document } = await response.json();
   expect(document.payload.observations).toEqual([observation]);
   expect(document.lines).toMatchObject([
-    { product_id: f.products[1], quantity: expect.anything(), metadata: { catalogueExtra: "true" } },
+    { product_id: f.products[1], quantity: expect.anything() },
   ]);
+  expect(document.lines[0].metadata.catalogueExtra).toBeFalsy();
 });
 
 test("L2 COM emite o extra pendente e identifica o material na mesma ficha sem entrada de estoque", async ({ page }, info) => {

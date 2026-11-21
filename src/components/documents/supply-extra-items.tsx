@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { ExtraMaterialDialog } from "@/components/forms/extra-material-dialog";
+import { WizardExtraButton } from "@/components/forms/wizard-material-tools";
 import { ActionButton, FormField, Pill, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { matchCatalog, normalizeCatalogText, type MatchableCatalogItem } from "@/lib/catalog-match";
@@ -48,7 +49,7 @@ export function SupplyExtraItems({ items, catalogue, selected, inExtras, onChang
         </div>
       </li>)}
     </ul> : null}
-    <ActionButton variant={inExtras ? "secondary" : "quiet"} compact={!inExtras} onClick={() => setEditor({})}><Icon name="plus" />{inExtras ? "Adicionar item extra" : "Item extra"}</ActionButton>
+    <WizardExtraButton inExtras={inExtras} onClick={() => setEditor({})} />
     {editor ? <SupplyExtraEditor item={editor.item} catalogue={catalogue} selected={selected}
       atLimit={items.length >= 20} onClose={() => setEditor(null)}
       onChoose={(product, quantity) => {

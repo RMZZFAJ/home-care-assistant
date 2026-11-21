@@ -168,6 +168,20 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
     from private.requisition_stock_counts where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("2.000000:1.250000");
   expect(sql(`select quantity::text || ':' || source_location
     from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='requisition_count';`)).toBe("0.750000:CARE_TEAM");
+
+  await page.getByRole("dialog", { name: "Requisição emitida", exact: true })
+    .getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
+  await selectDocumentSection(page, "materials");
+  await expect(page.getByRole("heading", { name: "Ciência familiar", exact: true })).toBeHidden();
+  await selectDocumentSection(page, "overview");
+  await expect(page.getByRole("heading", { name: "Ciência familiar", exact: true })).toBeVisible();
+
+  await page.goto("/fichas/req");
+  await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toBeEnabled();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await hygiene(page);
+  await expect(card(page, "Líquido fictício da observação exata").getByRole("checkbox").first()).not.toBeChecked();
+  expect(count(f.patient)).toBe("1");
 });
 
 test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar no dia seguinte e recuperar resposta perdida", async ({

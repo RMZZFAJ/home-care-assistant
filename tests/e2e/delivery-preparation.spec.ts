@@ -348,12 +348,21 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
     await page
       .getByRole("button", { name: "Usar referências atuais", exact: true })
       .click();
-    await expect(
-      page.getByRole("combobox", {
-        name: "Destinatário designado",
-        exact: true,
-      }),
-    ).toBeFocused();
+    const recipientField = page.getByRole("combobox", { name: "Destinatário designado", exact: true });
+    try {
+      await expect(recipientField).toBeFocused();
+    } catch (focusError) {
+      await test.info().attach("recipient-focus", {
+        contentType: "application/json",
+        body: JSON.stringify(await recipientField.evaluate(field => ({
+          activeTag: field.ownerDocument.activeElement?.tagName,
+          activeId: field.ownerDocument.activeElement?.id,
+          activeClass: field.ownerDocument.activeElement?.getAttribute("class"),
+          disabled: field.matches(":disabled"),
+        }))),
+      });
+      throw focusError;
+    }
     await expect(
       page.getByRole("combobox", {
         name: "Destinatário designado",

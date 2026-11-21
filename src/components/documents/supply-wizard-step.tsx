@@ -1,6 +1,6 @@
 "use client";
 import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
-import { WizardMaterialSearch, WizardMaterialToolbar } from "@/components/forms/wizard-material-tools";
+import { WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
@@ -162,17 +162,22 @@ export function SupplyWizardStep({
     ? selected.filter(product => (links[product.id]?.length ?? 0) > 1)
     : [];
   const pendingExtras = form.pendingExtras ?? [];
-  function addExtra(id: string, amount = "", replace?: string) {
+  function adoptCatalogueMaterial(id: string, amount: string, replace?: string) {
+    const product = catalog.find(item => item.id === id);
+    const destination = materialCategories.find(item => item.id === product?.category);
+    if (!destination) return;
     setForm(current => Object.hasOwn(current.quantities, id) ? current : {
       ...current,
       quantities: { ...current.quantities, [id]: amount },
-      extraProductIds: [...(current.extraProductIds ?? []), id],
+      manualQuantities: { ...current.manualQuantities, [id]: amount },
       ...(replace ? { pendingExtras: current.pendingExtras?.filter(item => item.id !== replace) } : {}),
     });
+    setSearchByCategory(current => ({ ...current, [destination.id]: "" }));
+    onCategoryChange(destination.id);
   }
   const extraControl = <SupplyExtraItems items={pendingExtras} catalogue={catalog}
     selected={new Set(Object.keys(form.quantities))} inExtras={isExtraStep}
-    onChange={items => setForm(current => ({ ...current, pendingExtras: items }))} onChoose={addExtra} />;
+    onChange={items => setForm(current => ({ ...current, pendingExtras: items }))} onChoose={adoptCatalogueMaterial} />;
   function selectProduct(id: string, include: boolean) {
     setForm(current => {
       const quantities = { ...current.quantities };
@@ -240,7 +245,7 @@ export function SupplyWizardStep({
             {type === "COM"
               ? "Organize os materiais a adquirir. A família registra a compra ou a doação quando ela acontecer."
               : type === "ENT"
-                ? "Selecione as custódias e a pessoa que confirmará o recebimento. A expedição deixa os materiais em trânsito."
+                ? "A entrega vai da família para a equipe. Indique quem vai receber e conferir os materiais."
                 : "Conte todos os produtos sob responsabilidade familiar que estão com a equipe. Materiais de terceiros ficam fora deste controle."}
           </p>
           {type === "ENT" ? (
@@ -367,11 +372,10 @@ export function SupplyWizardStep({
                         ? "Contagem física"
                         : type === "COM"
                           ? "Quantidade a adquirir"
-                          : "Quantidade expedida"}</span>
-                      <span className={type === "BAL" ? undefined : "hca-wizard-stock-input"}>
-                      <input
-                        className={inputClass}
-                        inputMode="decimal"
+                          : "Quantidade a entregar"}</span>
+                      <WizardQuantityInput
+                        unit={type === "BAL" ? undefined : product.unit}
+                        inputMode={product.quantity_decimals ? "decimal" : "numeric"}
                         value={form.quantities[product.id] ?? ""}
                         aria-label={"Quantidade — " + product.name}
                         aria-invalid={Boolean(fieldErrors[product.id])}
@@ -391,8 +395,6 @@ export function SupplyWizardStep({
                           }));
                         }}
                       />
-                      {type === "BAL" ? null : <span aria-hidden="true">{product.unit}</span>}
-                      </span>
                       {fieldErrors[product.id] ? (
                         <span className="ui-field-error">
                           {fieldErrors[product.id]}

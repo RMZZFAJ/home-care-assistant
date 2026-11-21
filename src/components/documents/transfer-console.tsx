@@ -4,7 +4,7 @@ import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/com
 import { adjacentMaterialCategory, materialCategories, supplyWizardCopy, supplyWizardNextLabels, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
-import { WizardMaterialSearch, WizardMaterialToolbar } from "@/components/forms/wizard-material-tools";
+import { WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { pendingExtraDispatchMessage, pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
 import { MaterialReview } from "./material-review";
 import { IssuanceObservationsEditor, IssuanceObservationList } from "@/components/forms/issuance-observations";
@@ -81,9 +81,51 @@ import type { Custody, SupplyDocument } from "@/types/documents";
 import type { TransferPreparation } from "@/types/transfers";
 import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
 import { MaterialConsultButton } from "./catalogue-material-panel";
+import { WizardRecipientCard } from "./delivery-recipient";
 import { RelatedDocument } from "./related-document";
 import { ReturnBarcodeDialog } from "./return-barcode-dialog";
 import { SupplySourcePicker, type SupplySourceSelection } from "./supply-source-picker";
+
+function ReturnRecipient({ reference, recipientId, savedName, reason, onSelect }: {
+  reference: TransferPreparation; recipientId: string; savedName: string | undefined; reason: string;
+  onSelect: (id: string, reason: string) => void;
+}) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [edit, setEdit] = useState<{ id: string; reason: string } | null>(null);
+  const chosen = reference.people.find(person => person.id === recipientId);
+  const valid = edit && reference.people.some(person => person.id === edit.id);
+  const needsReason = !!edit?.id && edit.id !== reference.suggested?.professionalId;
+
+  return <section className="hca-form-stack" aria-label="Escolha do recebedor">
+    <WizardRecipientCard title="Quem receberá na família" name={chosen?.name || (recipientId ? savedName : undefined)} role={chosen?.role}
+      invalid={!!recipientId && !chosen} disabled={!reference.people.length} triggerRef={triggerRef}
+      onEdit={() => setEdit({ id: recipientId, reason })} />
+    {recipientId && !chosen ? <p className="hca-field-help">A escolha anterior está indisponível. Indique outra pessoa.</p> : null}
+    {edit ? <Dialog open title="Escolher recebedor" kicker="Devolução de materiais"
+      popupClassName="hca-wizard-dialog" finalFocus={triggerRef} onClose={() => setEdit(null)} keyboardScrollable
+      footer={<>
+        <ActionButton onClick={() => setEdit(null)}>Voltar</ActionButton>
+        <ActionButton variant="primary" disabled={!valid || needsReason && edit.reason.trim().length < 3}
+          onClick={() => { onSelect(edit.id, edit.reason.trim()); setEdit(null); }}>
+          <Icon name="check" />Usar recebedor
+        </ActionButton>
+      </>}>
+      <div className="hca-form-stack">
+        <FormField label="Recebedor físico designado" required>
+          <SelectField value={edit.id} onChange={event => setEdit({ ...edit, id: event.currentTarget.value })}>
+            <option value="">Escolha quem recebe pessoalmente</option>
+            {edit.id && !valid ? <option value={edit.id} disabled>{savedName || "Escolha anterior"} · indisponível</option> : null}
+            {reference.people.map(person => <option key={person.id} value={person.id}>{person.name}</option>)}
+          </SelectField>
+        </FormField>
+        {needsReason || edit.reason ? <FormField label="Justificativa da escolha do recebedor" required={needsReason}>
+          <TextAreaField rows={2} minLength={3} maxLength={1000} value={edit.reason}
+            onChange={event => setEdit({ ...edit, reason: event.currentTarget.value })} />
+        </FormField> : null}
+      </div>
+    </Dialog> : null}
+  </section>;
+}
 
 export const custodyName = (source: Custody) =>
   source === "FAMILY" ? "Família" : "Equipe";
@@ -472,7 +514,7 @@ function TransferDeclarationEditor({
     setReadingBarcode(false);
     requestAnimationFrame(() => barcodeTriggerRef.current?.focus({ preventScroll: true }));
   }
-  useLongDraftAutosave(privateDraft, currentContent, write && draftTouched && !(busy || uncertain || !!packet));
+  useLongDraftAutosave(privateDraft, currentContent, write && draftTouched && !(busy || uncertain || packet || result || recoveredId || navigating));
   useEffect(() => {
     if (recoveryOnly) return;
     const controller = new AbortController();
@@ -585,18 +627,24 @@ function TransferDeclarationEditor({
       }
       if (step === 0 && householdSelectionRef.current?.apply() === false) return;
       const materialStep = step === 1 || step === 2;
+      const nextCategory = step === 1 && isReturn && adjacentMaterialCategory(activeCategory, reference.products, "next");
       const stepLines = lines.filter(line => !!line.extra === (step === 2) &&
-        (step !== 1 || !isReturn || productsById.get(line.productId)?.category === activeCategory));
-      if (materialStep && stepLines.some((line) => {
+        (!nextCategory || productsById.get(line.productId)?.category === activeCategory));
+      const invalidLine = materialStep && stepLines.find((line) => {
         const product = reference.products.find((item) => item.id === line.productId);
         return !product || !validQuantity(line.quantity, product.quantityDecimals) || quantity(line.quantity).gt(product.available);
-      })) {
+      });
+      if (invalidLine) {
+        const invalidCategory = materialCategories.find(entry => entry.id === productsById.get(invalidLine.productId)?.category);
+        if (step === 1 && isReturn && invalidCategory && invalidCategory.id !== activeCategory) {
+          setCategory(invalidCategory.id);
+          setQuery("");
+        }
         setError("Escolha os materiais e informe quantidades válidas dentro do saldo disponível.");
         return;
       }
       setError("");
       setQuery("");
-      const nextCategory = step === 1 && isReturn && adjacentMaterialCategory(activeCategory, reference.products, "next");
       if (nextCategory) {
         setCategory(nextCategory);
         return;
@@ -736,9 +784,14 @@ function TransferDeclarationEditor({
     }
   }
   function addExtra(id: string, amount: string, replace?: string) {
-    if (selectedIds.includes(id)) return;
-    setLines(current => [...current, { productId: id, quantity: amount, extra: true }]);
+    const product = productsById.get(id);
+    const destination = materialCategories.find(entry => entry.id === product?.category);
+    if (!destination || selectedIds.includes(id)) return;
+    setLines(current => [...current, { productId: id, quantity: amount }]);
     if (replace) setPendingExtras(current => current.filter(item => item.id !== replace));
+    setCategory(destination.id);
+    setQuery("");
+    setStep(1);
     setDraftTouched(true);
   }
   async function submit() {
@@ -820,7 +873,7 @@ function TransferDeclarationEditor({
     setRefreshing(true);
     setAttempt((value) => value + 1);
   };
-  const privatePanel = !result && !uncertain ? (
+  const privatePanel = !result && !uncertain && !navigating && !(busy && packet) ? (
     <SimpleDraftPanel
       draft={privateDraft}
       current={currentContent}
@@ -1136,6 +1189,9 @@ function TransferDeclarationEditor({
                 {step === 0 ? <>
                 <h3>Confirme os dados da {isReturn ? "devolução" : "entrega"}</h3>
                 <SupplyWizardIdentity context={context} kind={isReturn ? "DEV" : "ENT"} />
+                {isReturn ? <ReturnRecipient reference={reference!} recipientId={recipientId}
+                  savedName={currentContent.fields.recipientLabel} reason={reason}
+                  onSelect={(id, explanation) => { setRecipientId(id); setReason(explanation); setDraftTouched(true); }} /> : <>
                 <FormField label="Recebedor físico designado" required>
                   <SelectField
                     required
@@ -1165,6 +1221,7 @@ function TransferDeclarationEditor({
                   <TextAreaField ref={reasonFieldRef} rows={2} required={manualRecipient} minLength={3} maxLength={1000}
                     value={reason} onChange={event => setReason(event.currentTarget.value)} />
                 </FormField> : null}
+                </>}
                 {isReturn ? <section className="hca-form-stack" aria-label="Fichas vinculadas">
                   <h3>Fichas vinculadas</h3>
                   <div className="hca-source-summary">
@@ -1299,10 +1356,12 @@ function TransferDeclarationEditor({
                       <p className="hca-wizard-material-balance col-span-full">
                         Estoque atual da equipe: {formatQuantity(product.available, product.unit)}.
                       </p>
-                      {line ? <FormField label={"Quantidade de " + product.name} required>
-                        <TextInput required inputMode="decimal" value={line.quantity}
+                      {line ? <label className="hca-wizard-stock-field text-xs font-semibold">
+                        <span>Quantidade a devolver</span>
+                        <WizardQuantityInput aria-label={"Quantidade de " + product.name} required unit={product.unit}
+                          inputMode={product.quantityDecimals ? "decimal" : "numeric"} value={line.quantity}
                           onChange={event => updateReturnQuantity(product.id, event.currentTarget.value)} />
-                      </FormField> : null}
+                      </label> : null}
                     </MaterialChoice>;
                   })}
                   {!returnProducts.length ? <p role="status">Nenhum material neste filtro.</p> : null}

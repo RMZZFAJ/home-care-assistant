@@ -16,6 +16,7 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
 import { loginDecision } from "./l1-decision-policy";
 import { audit } from "./accessibility-audit";
+import { openDeliveryRecipient, selectReturnRecipient } from "./delivery-recipient";
 import { expectMobileMaterialRow, mobileMaterialReference, selectReadyMaterials } from "./l2-mobile-materials";
 import type { Custody, SupplyDocument } from "../../src/types/documents";
 import type { TransferPreparation } from "../../src/types/transfers";
@@ -90,12 +91,17 @@ async function open(page: Page, source: Custody) {
   await page
     .getByRole("button", { name: "Preparar declaração", exact: true })
     .click();
-  await expect(page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true}).or(recipient(page)).first()).toBeVisible();
+  const control = source === "CARE_TEAM" ? editor(page).getByRole("button", { name: /^(Alterar|Escolher) recebedor$/ }) : recipient(page);
+  await expect(page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true}).or(control).first()).toBeVisible();
 }
 async function fill(page: Page, f: Fixture, amount = "0,") {
-  await recipient(page).selectOption(f.recipientId);
-  const manualSelection = editor(page).getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
-  if (await manualSelection.isVisible()) await manualSelection.fill("Escolha confirmada com a pessoa que fará a conferência.");
+  const reason = "Escolha confirmada com a pessoa que fará a conferência.";
+  if (f.source === "CARE_TEAM") await selectReturnRecipient(page, f.recipientId, reason);
+  else {
+    await recipient(page).selectOption(f.recipientId);
+    const manualSelection = editor(page).getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
+    if (await manualSelection.isVisible()) await manualSelection.fill(reason);
+  }
   if (f.originId) {
     const general = editor(page).getByRole("region", { name: "Fichas vinculadas", exact: true });
     await general.getByRole("button", { name: "Vincular", exact: true }).click();
@@ -164,9 +170,7 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
   const start = page.getByRole("button", { name: "Preparar devolução", exact: true });
   await expect(start).toBeVisible({ timeout: 45_000 });
   await start.click();
-  await recipient(page).selectOption(f.recipientId);
-  const reason = editor(page).getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
-  if (await reason.isVisible()) await reason.fill("A pessoa designada receberá esta devolução.");
+  await selectReturnRecipient(page, f.recipientId, "A pessoa designada receberá esta devolução.");
   await editor(page).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   await editor(page).getByRole("button", { name: "Item extra", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
@@ -205,8 +209,11 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
   const product = f.reference.products.find((row: TransferPreparation["products"][number]) => row.id === f.products[0])!;
   await edit.getByLabel("Nome do material", { exact: true }).fill(product.name);
   await edit.getByRole("button", { name: `Usar item do catálogo: ${product.name} (${product.unit})`, exact: true }).click();
+  await expect(stepButton(page, "Materiais")).toHaveAttribute("aria-current", "step");
   await expect(name).toHaveCount(0);
+  await expect(amountField(page)).toHaveValue("2");
   await amountField(page).fill("2");
+  await continueStep(page);
   await continueStep(page);
   await editor(page).getByRole("button", { name: "Revisar ficha", exact: true }).click();
   const confirmed = page.waitForResponse(response => response.request().method() === "POST" &&
@@ -217,8 +224,9 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
   const body = await response.json();
   expect(body).toMatchObject({ persistence: "confirmed", data: {
     transfer: { state: "dispatched" },
-    lines: [{ product_id: product.id, metadata: { catalogueExtra: "true" } }],
+    lines: [{ product_id: product.id }],
   } });
+  expect(body.data.lines[0].metadata.catalogueExtra).toBeFalsy();
   const after = JSON.parse(declarationFacts(f));
   expect(after.ledger).toHaveLength(JSON.parse(before).ledger.length + 1);
   const ref = await mobileMaterialReference(browser, "DEV-0008");
@@ -372,10 +380,13 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
           searchField(peer, source),
         ).toHaveValue(packet.content.fields.query);
         await stepButton(peer, "Confirmação").click();
-        await expect(recipient(peer)).toHaveValue(f.recipientId);
-        await expect(recipient(peer).locator("option:checked")).toContainText(packet.content.fields.recipientLabel);
-        await expect(recipient(peer).locator("option:checked")).toBeDisabled();
-        await recipient(peer).selectOption(replacement!.id);
+        const recipientField = source === "CARE_TEAM"
+          ? (await openDeliveryRecipient(peer)).getByRole("combobox", { name: "Recebedor físico designado", exact: true }) : recipient(peer);
+        await expect(recipientField).toHaveValue(f.recipientId);
+        await expect(recipientField.locator("option:checked")).toContainText(packet.content.fields.recipientLabel);
+        await expect(recipientField.locator("option:checked")).toBeDisabled();
+        await recipientField.selectOption(replacement!.id);
+        if (source === "CARE_TEAM") await peer.getByRole("button", { name: "Usar recebedor", exact: true }).click();
         await editor(peer).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
         await amountField(peer).fill("2");
         if (source === "CARE_TEAM") {

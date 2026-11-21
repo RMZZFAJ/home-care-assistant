@@ -42,10 +42,7 @@ async function fillDeclaration(
     exact: true,
   });
   await expect(drawer.getByRole("combobox", { name: /^Contraparte para concordância/ })).toHaveCount(0);
-  await drawer
-    .getByRole("combobox", { name: /^Recebedor físico designado/ })
-    .selectOption(f.recipient.id);
-  await drawer.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true }).fill("Quem vai receber tem disponibilidade para a conferência.");
+  await selectReturnRecipient(page, f.recipient.id, "Quem vai receber tem disponibilidade para a conferência.");
   const generalSources = drawer.getByRole("region", { name: "Fichas vinculadas", exact: true });
   await expect(generalSources).toContainText(f.origin.code!);
   await generalSources.getByRole("button", { name: "Alterar", exact: true }).click();
@@ -584,3 +581,4 @@ test("conflitos preservam a expedição, exigem adoção explícita e não reabr
   ).toBeDisabled();
   expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);
 });
+import { selectReturnRecipient } from "./delivery-recipient";

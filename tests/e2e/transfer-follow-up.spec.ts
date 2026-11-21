@@ -60,9 +60,13 @@ async function declareInUi(page: Page, f: Fixture, source: Custody, info: TestIn
   await page.getByRole("button", { name: source === "CARE_TEAM" ? "Preparar devolução" : "Preparar declaração", exact: true }).click();
   const drawer = page.getByRole("region", { name: `Nova ${label}`, exact: true });
   await expect(drawer.getByRole("combobox", { name: /^Contraparte para concordância/ })).toHaveCount(0);
-  await drawer.getByRole("combobox", { name: /^Recebedor físico designado/ }).selectOption(source === "CARE_TEAM" ? f.recipient.id : f.initiator.id);
-  const manualSelection = drawer.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
-  if (await manualSelection.isVisible()) await manualSelection.fill("Pessoa indicada está disponível para conferir os materiais.");
+  const reason = "Pessoa indicada está disponível para conferir os materiais.";
+  if (source === "CARE_TEAM") await selectReturnRecipient(page, f.recipient.id, reason);
+  else {
+    await drawer.getByRole("combobox", { name: /^Recebedor físico designado/ }).selectOption(f.initiator.id);
+    const manualSelection = drawer.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true });
+    if (await manualSelection.isVisible()) await manualSelection.fill(reason);
+  }
   if (source === "CARE_TEAM") {
     await expect(drawer.getByRole("region", { name: "Fichas vinculadas", exact: true })).toContainText("Ficha independente");
   } else await expect(drawer.getByRole("combobox", { name: /^ENT documental de origem/ })).toHaveValue("");
@@ -180,3 +184,4 @@ test("Transfer follow-up preserves refusal and withdrawal without shipment or an
   }
   expect(writes).toEqual([]);
 });
+import { selectReturnRecipient } from "./delivery-recipient";

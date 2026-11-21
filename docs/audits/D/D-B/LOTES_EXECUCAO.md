@@ -172,6 +172,17 @@ autorizada que existe no registro. Os seis casos de navegador passaram
 sem repetição, incluindo o vínculo da REQ no rascunho e o percurso
 REQ, COM, aprovação de chegada, estoque, ENT parcial e BAL.
 
+**Resolver pendências durante a revisão de conclusão.** Em E04-12, a
+linha bloqueada abre a avaliação familiar da entrega vinculada. Em
+E05-12, a linha abre a conferência das chegadas elegíveis daquela COM.
+Ao fechar o diálogo ou confirmar a decisão, a revisão de conclusão
+reaparece com a observação em edição e consulta novamente sua referência.
+O comando definitivo continua usando a versão e o hash da referência
+vigente. Quando a pessoa só pode consultar, permanece o acesso ao material
+e a orientação da pendência. Se a última avaliação registra a conclusão
+automática da REQ, a revisão informa o estado oficial e conserva a
+observação em leitura enquanto estiver aberta. Nenhuma migration neste ajuste.
+
 **Avaliação familiar a partir de REQ e ENT.** A REQ indica a avaliação
 pendente junto ao item e no próximo passo sugerido quando já há
 recebimento registrado. A ação no painel do material abre o diálogo da
@@ -682,6 +693,35 @@ ao saldo e às pessoas verificados no servidor.
 Permanecem em revisão visual as variantes de modais de operação. A rodada
 seguinte tratou a escolha de recebedor e a retomada dos assistentes. Nenhuma
 migration nesses ajustes.
+
+### Materiais sugeridos e recebedores nos assistentes
+
+Em E05-01, E06-01 e E06-16, aceitar uma sugestão do catálogo leva à
+categoria do material em Materiais. Uma quantidade digitada é preservada
+quando a unidade corresponde. Extras continua reservado aos cadastros
+pendentes do preenchimento atual. A retomada continua exibindo os itens
+extras de catálogo preservados por versões anteriores. Os controles de
+quantidade com unidade e o botão Item extra são compartilhados.
+
+A DEV passou a apresentar o recebedor no mesmo cartão da ENT e a aplicar
+a escolha somente após confirmação no diálogo. A comparação de escala da
+ENT aparece quando os dados que orientam a escolha mudam. O produto
+conserva as consultas e a comparação de referências reais. Esses recursos
+e a busca compartilhada por nome complementam os exemplos móveis da v7.
+
+Na emissão e na abertura da ficha, os avisos do rascunho ficam fora da
+tela de operação. A retomada de preenchimento ativo e a recuperação de
+tentativa incerta continuam acessíveis em seus respectivos fluxos.
+Ao sair da última categoria, o assistente revisa também os materiais das
+categorias anteriores e volta à lista que tiver uma correção pendente.
+No Android e no iOS emulados, os testes verificaram a nova REQ após a
+emissão, a Ciência familiar em Visão geral, a atualização transacional
+do saldo da equipe, o vínculo de um item pelo menu e a emissão de uma
+única linha ao aproveitar materiais do catálogo em COM e DEV.
+A ENT preservou a pessoa selecionada e sua justificativa ao adotar a nova
+escala, devolveu o foco ao seletor e bloqueou a expedição com referência
+desatualizada nos dois navegadores emulados.
+Nenhuma migration neste ajuste.
 
 ### Decisões e dúvidas de L2
 

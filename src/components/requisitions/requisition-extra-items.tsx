@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { ActionButton, CheckboxField, FormField, Pill, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { ExtraMaterialDialog } from "@/components/forms/extra-material-dialog";
+import { WizardExtraButton } from "@/components/forms/wizard-material-tools";
 import { matchCatalog, normalizeCatalogText } from "@/lib/catalog-match";
 import { extraMaterialUnits } from "@/lib/documents/extra-material-identity";
 import { formatStockObservation, validStockObservation } from "@/lib/stock-observation";
@@ -63,11 +64,11 @@ export function RequisitionExtras({ items, setItems, products, lines, itemContex
         })}
       </ul> : <p className="hca-issuance-observation-empty"><Icon name="stock" />Nenhum item extra incluído.</p>}
     </> : null}
-    <ActionButton variant={showItems ? "secondary" : "quiet"} compact={!showItems} onClick={() => setEditor({
+    <WizardExtraButton inExtras={showItems} onClick={() => setEditor({
       kind: "unlisted",
       item: { id: `extra-${crypto.randomUUID()}`, name: "", currentStock: null, stockObservation: "unknown", urgent: false },
       isNew: true,
-    })}><Icon name="plus" />{showItems ? "Adicionar item extra" : "Item extra"}</ActionButton>
+    })} />
     {editor?.kind === "unlisted" ? <ExtraItemEditor key={editor.item.id} item={editor.item} isNew={editor.isNew} products={products}
       selectedIds={lines.map(line => line.productId)} limitReached={items.length >= 20} onClose={close}
       onChoose={(product, extra, details) => { adopt(product, extra, details); close(); }}
@@ -158,7 +159,12 @@ function ExtraItemEditor({ item, isNew, products, selectedIds, limitReached, onC
         {nearby.slice(0, 5).map(product => <ActionButton key={product.id} compact variant="quiet"
           className="hca-material-suggestion" disabled={selectedIds.includes(product.id)}
           aria-label={`Usar item do catálogo: ${product.name} (${product.unit})`}
-          onClick={() => onChoose(product, draft, details.trim())}>
+          onClick={() => {
+            const sameUnit = !unit || product.unit.localeCompare(unit, "pt-BR", { sensitivity: "base" }) === 0;
+            const adopted = sameUnit || draft.stockObservation !== "observed" ? draft
+              : { ...draft, currentStock: null, stockObservation: "unfilled" as const, stockObservationAt: null };
+            onChoose(product, adopted, details.trim());
+          }}>
           <span><strong>{product.name}</strong><small>{product.unit}</small></span><Icon name="plus" />
         </ActionButton>)}
         <ActionButton className="hca-requisition-extra-other" variant="quiet" compact onClick={() => {

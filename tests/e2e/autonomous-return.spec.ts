@@ -36,9 +36,8 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
   await page.getByRole("button", { name: "Preparar devolução", exact: true }).click();
   const editor = page.getByRole("region", { name: "Nova devolução", exact: true });
   await expect(editor.getByRole("combobox", { name: /^Contraparte para concordância/ })).toHaveCount(0);
-  await editor.getByRole("combobox", { name: /^Recebedor físico designado/ }).selectOption(f.recipient.id);
   const selectionReason = "A pessoa da família estará presente para receber a devolução.";
-  await editor.getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true }).fill(selectionReason);
+  await selectReturnRecipient(page, f.recipient.id, selectionReason);
   await expect(editor.getByRole("region", { name: "Fichas vinculadas", exact: true })).toContainText("Ficha independente");
   await editor.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   await editor.getByRole("searchbox", { name: "Buscar material", exact: true }).fill("Material fictício V4 0");
@@ -123,3 +122,4 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
     await receiver.screenshot({ path: "output/playwright/phase-d/autonomous-return-" + info.project.name + ".png", fullPage: true, animations: "disabled" });
   } finally { await counterContext.close(); await receiverContext.close(); }
 });
+import { selectReturnRecipient } from "./delivery-recipient";
