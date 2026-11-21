@@ -13,7 +13,7 @@ import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { auditFromTop } from "./accessibility-audit";
 import {
   pdfIssuanceSchema,
   type PdfIssuance,
@@ -174,7 +174,12 @@ test("PDF atual preserva a origem congelada e distingue emissão sem expor a pre
     }
     for (const width of [1440, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 950 });
-      await audit(page, "V6 generated files " + label + " " + width);
+      await auditFromTop(page, "V6 generated files " + label + " " + width);
+      if (width === 768) {
+        const more = page.getByRole("button", { name: "Mais opções da ficha", exact: true });
+        await expect(more).toBeInViewport({ ratio: 1 });
+        await more.click({ trial: true });
+      }
     }
   }
   if (info.project.name === "chromium") {
@@ -270,7 +275,9 @@ test("REQ histórica apresenta origem desconhecida nas novas abas sem reimportar
   await page.getByRole("button", { name: "Comparar versões", exact: true }).click();
   await expect(page.getByRole("article", { name: `Conteúdo preservado da versão ${f.doc.version}`, exact: true })).toBeVisible();
   await selectDocumentSection(page, "materials");
-  await expect(page.getByText("Não informado no registro legado", { exact: false })).toHaveCount(detail.data.requisition_items.length);
+  const materials = page.getByRole("list", { name: "Materiais requisitados", exact: true });
+  await expect(materials.getByRole("listitem")).toHaveCount(detail.data.requisition_items.length);
+  await expect(materials.getByText("Não informado no registro legado", { exact: true })).toHaveCount(detail.data.requisition_items.length);
   await selectDocumentSection(page, "communications");
 
   await expect(page.getByText("Nenhuma comunicação registrada para esta ficha.", { exact: true })).toBeVisible();

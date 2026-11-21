@@ -1598,6 +1598,28 @@ O manifesto confirmou as 84 migrations protegidas.
 
 ## Estado de publicação e próximos lotes
 
+Na execução cancelada de `37ac93a9`, o Chromium e o WebKit encontraram
+duas ocorrências do texto de estoque desconhecido para uma única linha da
+REQ histórica. A nova asserção consulta a lista Materiais requisitados da
+aba ativa e mantém a comparação do histórico e dos dados no banco. A
+auditoria do PDF recomeça no topo a cada redimensionamento, com verificação
+de teclado e de área clicável do menu da ficha em 768 px. A primeira
+tentativa de edição no catálogo falhou no iOS e a repetição passou. O
+teste agora aguarda o fechamento da criação e a consulta da lista antes
+de tocar em Editar. [Execução cancelada](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44897709633).
+
+Os seis casos dirigidos passaram em Chromium e iOS emulado, sem retry,
+com build de produção. Quatro larguras e três origens documentais por
+navegador passaram na verificação de teclado, axe e largura da página.
+As asserções de assinatura, conteúdo congelado e exemplar preservado
+também passaram. Os testes locais estão em
+`output/playwright/l2-ci-pdf-catalogue/`. Este ajuste não exige migration.
+
+A execução de `ebb69a60` passou em Windows e Ubuntu, instalação limpa,
+evolução legada e 832 integrações. Os seis grupos iniciaram o comando
+E2E. SonarCloud e preview estavam aprovados para esse SHA.
+[Execução publicada](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44901016690).
+
 A [CI de `b74013c4`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44886723003)
 concluiu com falha. Passaram as validações Windows e Ubuntu, a instalação
 limpa, a evolução legada e 830 testes de integração. Chromium 1, Android 1,

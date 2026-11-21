@@ -117,12 +117,16 @@ test.describe("administração integrada no ambiente local", () => {
     expect(created).toMatchObject({ action: "commit", state: "consumed", purpose: "create" });
     const productId = created.outcome.productId as string;
     expect(productId).toBeTruthy();
+    await expect(page.getByRole("dialog", { name: "Adicionar item exclusivo deste paciente", exact: true })).toBeHidden();
+    await expect(page.getByText("Item salvo e auditado.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Consultando catálogo…", { exact: true })).toBeHidden();
     await expect(
       page.getByRole("cell").filter({ has: page.getByText(originalName, { exact: true }) }),
     ).toBeVisible();
-    await page
-      .getByRole("button", { name: `Editar ${originalName}`, exact: true })
-      .click();
+    const edit = page.getByRole("button", { name: `Editar ${originalName}`, exact: true });
+    if (test.info().project.use.hasTouch) await edit.tap();
+    else await edit.click();
+    await expect(page.getByRole("dialog", { name: "Editar item", exact: true })).toBeVisible();
     await expect(
       page.getByLabel("Nomes alternativos, separados por vírgula", {
         exact: true,
