@@ -36,6 +36,8 @@ test("COM operational source is preserved independently of requisition line fulf
   assert.equal(created.payload.sourceSet.length, 64);
   assert.equal((await rpc(f.admin, "create_supply_document", packet)).id, created.id);
   assert.equal(familyStock(f, f.products[1]), stock);
+  const related = () => rpc(f.admin, "requisition_related_documents", { p_requisition: req.id });
+  assert.deepEqual(await related(), [{ id: created.id, type: "COM", code: created.code, status: created.status }]);
   const changed = await f.admin.rpc("create_supply_document", {
     ...packet, p_payload: { ...packet.p_payload, sources: [] },
   });
@@ -46,8 +48,16 @@ test("COM operational source is preserved independently of requisition line fulf
   assert.equal(forged.error?.code, "42501");
   assert.equal(sql(`select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)} and type='COM'`), "1");
   const draft = await rpc(f.admin, "create_supply_document", { ...packet, p_key: randomUUID(), p_draft: true });
+  assert.equal((await related()).length, 1, "the linked draft stays private");
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(fixtures.adminA.id)},'com.read',false)`);
+  assert.deepEqual(await related(), []);
+  sql(`delete from public.capability_overrides where care_recipient_id=${q(f.patient)}
+    and subject_user=${q(fixtures.adminA.id)} and capability='com.read'`);
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
     values(${q(f.patient)},${q(fixtures.adminA.id)},'req.read',false)`);
+  const denied = await f.admin.rpc("requisition_related_documents", { p_requisition: req.id });
+  assert.equal(denied.error?.code, "42501");
   assert.deepEqual((await list(f, "COM", { p_ids: [req.id] })).data, []);
   const restricted = await rpc(f.admin, "operational_document", { p_id: created.id });
   assert.deepEqual(restricted.originDocuments, []);

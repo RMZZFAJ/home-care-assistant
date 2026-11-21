@@ -8,16 +8,69 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
 
-test("material panel retains its linked consultation, search, and focus after a full document visit", async ({ page }, info) => {
-  await page.setViewportSize({ width: 390, height: 620 });
+test("E04-09 linked purchases and deliveries are consultable from the requisition header", async ({ page }, info) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 390, height: 844 });
   const f = await remainingNeedFixture();
+  const purchase = await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+    p_payload: {
+      origin: "purchase",
+      lines: [{ productId: f.products[0], quantity: "5" }],
+      sources: [{ documentId: f.source.id, general: true, productIds: [] }],
+    },
+  });
+  const unrelated = await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+    p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "5" }] },
+  });
+  const viewer = await shiftWorker(f.patient, "family");
   const before = physicalState(f);
-  await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.professional.email);
+  await page.goto("/login?next=" + encodeURIComponent(`/fichas/${f.source.id}`));
+  await page.getByLabel("E-mail", { exact: true }).fill(viewer.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await selectContext(page, f.patient);
-  await page.goto(`/fichas/${f.source.id}`);
+  await expect(page).toHaveURL(url => url.pathname === `/fichas/${f.source.id}`);
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
+
+  const related = page.getByRole("region", { name: "Fichas relacionadas", exact: true });
+  const buy = related.getByRole("button", { name: "Consultar compra " + purchase.code, exact: true });
+  const delivery = related.getByRole("button", { name: "Consultar entrega " + f.ent.code, exact: true });
+  await expect(buy).toBeVisible();
+  await expect(delivery).toBeVisible();
+  await expect(related.getByText(unrelated.code, { exact: true })).toHaveCount(0);
+  await related.screenshot({ path: info.outputPath("fichas-relacionadas-req.png"), animations: "disabled", scale: "css" });
+
+  for (const [trigger, code] of [[buy, purchase.code], [delivery, f.ent.code]] as const) {
+    await trigger.click();
+    const preview = page.getByRole("dialog", { name: code, exact: true });
+    await expect(preview.getByRole("heading", { name: "Identificação do registro", exact: true })).toBeVisible();
+    if (code === purchase.code) {
+      await preview.getByRole("link", { name: "Abrir " + code, exact: true }).click();
+      await expect(page).toHaveURL(new RegExp(`/fichas/${purchase.id}`));
+      await page.getByRole("button", { name: "Voltar ao painel", exact: true }).click();
+      await expect(preview.getByRole("heading", { name: "Identificação do registro", exact: true })).toBeVisible();
+    }
+    await preview.getByRole("button", { name: "Voltar à origem", exact: true }).click();
+    await expect(trigger).toBeFocused();
+  }
+  await selectDocumentSection(page, "materials");
+  await expect(page.getByRole("region", { name: "Dimensões independentes da requisição" })).toContainText("0/2 itens atendidos");
+  expect(physicalState(f)).toBe(before);
+});
+
+test("material panel retains its linked consultation, search, and focus after a full document visit", async ({ page }, info) => {
+  test.setTimeout(60_000);
+  await page.setViewportSize({ width: 390, height: 620 });
+  const f = await remainingNeedFixture();
+  const viewer = await shiftWorker(f.patient);
+  const before = physicalState(f);
+  await page.goto("/login?next=" + encodeURIComponent(`/fichas/${f.source.id}`));
+  await page.getByLabel("E-mail", { exact: true }).fill(viewer.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page).toHaveURL(url => url.pathname === `/fichas/${f.source.id}`);
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
   await selectDocumentSection(page, "materials");
   const search = page.getByRole("searchbox", { name: "Pesquisar material", exact: true });
   await search.fill("V4 0");

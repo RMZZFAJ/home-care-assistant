@@ -64,7 +64,9 @@ import {
   DocumentTimeline,
   type TimelineEvent,
 } from "@/components/documents/document-timeline";
-import { RelatedDocument } from "@/components/documents/related-document";
+import { RelatedDocument, relatedDocumentLabel } from "@/components/documents/related-document";
+import { MaterialReview } from "@/components/documents/material-review";
+import type { RequisitionRelatedDocuments } from "@/lib/validation/related-document";
 import { RequisitionDecisionEditor } from "./requisition-decision-editor";
 import type { RequisitionStockOutcome } from "./requisition-stock-cancellation";
 import {
@@ -111,6 +113,7 @@ type Detail = {
   requester_name_snapshot?: string;
   recipient_name_snapshot?: string;
   sourceRequisition?: import("@/types/requisition").RequisitionReceipt["sourceRequisition"];
+  relatedDocuments?: RequisitionRelatedDocuments;
   remainingNeeds: {
     id: string;
     code: string | null;
@@ -349,6 +352,7 @@ export function RequisitionDocumentContent({
     eligible: p.eligible, personalScience: p.personalScience,
     fulfilled: f.fulfilled, total: f.total, reviewRequired, canAssessNeed: canReviewFulfillment,
   });
+  const relatedDocuments = (observedData ?? data).relatedDocuments ?? [];
   return (
     <div className="hca-record-detail doc-page">
       {context.patient?.id === data.care_recipient_id ? (
@@ -529,6 +533,19 @@ export function RequisitionDocumentContent({
         onRecorded={setOpeningRevision}
       />
 
+      {relatedDocuments.length > 0 ? (
+        <DocumentSection title="Fichas relacionadas" icon="link" className="hca-requisition-related">
+          <MaterialReview rows={relatedDocuments.map(related => ({
+            id: related.id,
+            name: related.code,
+            icon: related.type === "COM" ? "box" : "truck",
+            details: <small>{relatedDocumentLabel(related.type)} · {documentStatusLabel(related.status)}</small>,
+            consult: <RelatedDocument id={related.id} type={related.type} label={related.code}
+              origin={{ id, patientId: data.care_recipient_id, actorId: context.userId }}
+              actionLabel={related.type === "COM" ? "Consultar compra" : "Consultar entrega"} />,
+          }))} />
+        </DocumentSection>
+      ) : null}
       <DocumentTabs
         rootRef={tabs.rootRef}
         type="REQ"

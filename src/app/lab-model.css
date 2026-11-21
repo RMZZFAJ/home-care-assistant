@@ -879,6 +879,17 @@
   color: var(--primary);
   font-weight: 700;
 }
+.hca-requisition-related { margin-block: 20px; }
+.hca-l1 .hca-requisition-related .doc-card-body { padding-block: 2px; }
+.hca-requisition-related .hca-material-review { margin: 0; }
+.hca-l1 .hca-related-consult {
+  flex: none;
+  min-height: 44px;
+  padding-inline: 4px;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+}
 .hca-l1 .hca-source-result input { accent-color: var(--primary); }
 .hca-l1 .hca-source-import {
   display: flex;

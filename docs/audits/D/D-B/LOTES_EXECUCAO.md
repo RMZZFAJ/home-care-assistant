@@ -244,6 +244,23 @@ fora e a perda de leitura do estoque retirou o cartão. O último reteste
 passou após a recuperação do Auth local, que havia atingido timeout antes
 de abrir a ficha.
 
+**Compra e entrega relacionadas à REQ.** Em E04-09, o cartão acima das
+abas lista COM e ENT efetivamente vinculadas. A consulta inclui a origem
+registrada na ficha e o vínculo por item das entregas anteriores. Uma
+compra com o mesmo material só aparece se houver vínculo registrado. Cada
+linha mostra a situação da ficha e abre o painel de consulta. É possível
+abrir a ficha completa e voltar ao painel da REQ. O cartão usa as
+permissões de leitura de cada ficha e exclui rascunhos. A aquisição,
+o recebimento e a avaliação de suficiência continuam com seus registros
+próprios. As abas e ações já disponíveis na REQ foram preservadas.
+
+O E04-09 e a retomada do painel de materiais passaram em Chromium
+móvel e WebKit iOS emulados. O reteste de Chromium passou após
+confirmar o Auth local com uma identidade fictícia. A integração com
+Auth real confirmou que uma COM vinculada aparece, enquanto rascunhos
+e fichas sem permissão de leitura ficam fora da consulta. O ensaio no
+desenvolvimento conferiu os grants e executou rollback.
+
 **Resolver pendências durante a revisão de conclusão.** Em E04-12, a
 linha bloqueada abre a avaliação familiar da entrega vinculada. Em
 E05-12, a linha abre a conferência das chegadas elegíveis daquela COM.
@@ -1147,12 +1164,11 @@ continua sem regra de produto nesta entrega.
 
 ## Migrations por ambiente
 
-Consulta de 20/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. São **314 versões em cada banco**,
-com 242 versões anteriores a L1, 18 de L1 e 54 de L2.
+Consulta de 21/11/2026 à stack local `home-care-assistant` e ao Supabase de
+desenvolvimento vinculado `qwfrqychokvhdzakibid`. Os bancos compartilham
+**315 versões**, com 242 versões anteriores a L1, 18 de L1 e 55 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
-As versões em arquivo, na stack local e no desenvolvimento coincidem. A
-fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
+A fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 
 ### L1 — Aplicadas no local e no desenvolvimento
 
@@ -1177,7 +1193,14 @@ fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
 `20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`,
-`20261120231639`, `20261121014430`.
+`20261120231639`, `20261121014430`, `20261121063729`.
+
+`20261121063729` acrescenta a consulta de COM e ENT relacionadas à REQ.
+O histórico da stack local foi conferido com o SQL do repositório.
+No desenvolvimento, o backup cifrado
+`a7d8ede0-d7ea-4f94-a1e7-eca1a2b89784` foi verificado antes da aplicação.
+A captura usou o pooler de sessão para os dumps e conferiu o Storage.
+A consulta posterior confirmou a versão e os grants.
 
 `20261121014430` permite consultar a conferência de um CHE pelo cartão.
 O backup cifrado verificado foi `f954d1bb-9de2-4640-91cd-faf04dc312a6`.

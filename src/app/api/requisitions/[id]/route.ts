@@ -10,6 +10,7 @@ import {
 } from "@/lib/server/api";
 import { loadReceipt } from "@/lib/server/receipts";
 import { documentArchiveReference } from "@/lib/documents/document-archive";
+import { requisitionRelatedDocuments } from "@/lib/validation/related-document";
 
 export async function GET(
   _request: Request,
@@ -56,10 +57,11 @@ export async function GET(
       .order("id", { ascending: false })
       .limit(20);
     if (remainingError) databaseError(remainingError);
-    const [notifications, fulfillment, progress] = await Promise.all([
+    const [notifications, fulfillment, progress, relatedDocuments] = await Promise.all([
       rpc(auth.client, "document_delivery_status", { p_document: id }),
       rpc(auth.client, "requisition_fulfillment", { p_requisition: id }),
       rpc(auth.client, "requisition_progress", { p_id: id }),
+      data.status === "draft" ? [] : rpc(auth.client, "requisition_related_documents", { p_requisition: id }),
     ]);
     const documentArchive = progress && typeof progress === "object" && "archivedAt" in progress && progress.archivedAt
       ? documentArchiveReference.parse(await rpc(auth.client, "document_archive_reference", { p_document: id })).archive : null;
@@ -67,6 +69,7 @@ export async function GET(
       data: {
         ...data,
         sourceRequisition: receipt.sourceRequisition,
+        relatedDocuments: requisitionRelatedDocuments.parse(relatedDocuments),
         remainingNeeds: remainingNeeds ?? [],
         remainingNeedTotal: remainingNeedTotal ?? 0,
         requisition_items: data.requisition_items.map((item) => ({

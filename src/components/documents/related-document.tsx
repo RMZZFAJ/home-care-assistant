@@ -1,10 +1,12 @@
 "use client";
 import { useOperationActivity } from "@/components/ui/operation-activity";
-import { useCallback, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActionButton, Pill } from "@/components/ui/controls";
 import { Drawer } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
-import { Notice } from "@/components/workspace";
+import { Notice, primaryClass } from "@/components/workspace";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { formatBrazilDate } from "@/lib/receipt";
 import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
@@ -18,6 +20,7 @@ import { formatQuantity } from "@/lib/quantity";
 import { SupplyLineSummary } from "./supply-line-summary";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { parseRelatedRequisitionRead, parseRelatedSupplyRead } from "@/lib/validation/related-document";
+import { consumeMaterialVisit, materialVisitParam, prepareMaterialVisit } from "@/lib/documents/material-visit";
 
 export function relatedDocumentLabel(kind: DocumentKind) {
   if (kind === "DEV") return "Devolução de materiais";
@@ -28,36 +31,71 @@ export function RelatedDocument({
   id,
   type = "REQ",
   label,
+  actionLabel,
+  origin,
   compact = false,
 }: {
   id: string;
   type?: DocumentType;
   label: string;
+  actionLabel?: string;
+  origin?: { id: string; patientId: string; actorId: string };
   compact?: boolean;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const originId = origin?.id;
+  const patientId = origin?.patientId;
+  const actorId = origin?.actorId;
+  const returnKey = originId && patientId && actorId ? [originId, patientId, actorId, id].join(":") : null;
+  useEffect(() => {
+    if (!returnKey) return;
+    const reopen = () => {
+      if (window.history.state?.hcaRelatedReturn !== returnKey) return;
+      window.history.replaceState({ ...window.history.state, hcaRelatedReturn: null }, "");
+      consumeMaterialVisit();
+      setOpen(true);
+    };
+    const timer = window.setTimeout(reopen, 0);
+    window.addEventListener("popstate", reopen);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("popstate", reopen);
+    };
+  }, [returnKey]);
   const close = () => {
     setOpen(false);
     requestAnimationFrame(() => triggerRef.current?.focus());
   };
+  const href = `/fichas/${id}`;
   return (
     <>
       <button
         ref={triggerRef}
         type="button"
-        aria-label={label}
-        className={compact ? "hca-source-link" : "doc-linked-row"}
+        aria-label={actionLabel ? actionLabel + " " + label : label}
+        className={actionLabel ? "hca-source-link hca-related-consult" : compact ? "hca-source-link" : "doc-linked-row"}
         onClick={(event) => { event.currentTarget.focus(); setOpen(true); }}
       >
-        {compact ? <>{label}<Icon name="external" width={13} height={13} /></> : (
+        {actionLabel ? <><Icon name="link" width={16} height={16} />{actionLabel}</> : compact ? <>{label}<Icon name="external" width={13} height={13} /></> : (
           <><span className="doc-linked-kind" data-type={type}>{type}</span><span className="doc-linked-main"><strong>{label}</strong><small>Consultar ficha</small></span><Icon name="chevron" width={16} height={16} /></>
         )}
       </button>
       {open ? <Drawer open title={label ?? relatedDocumentLabel(type)} kicker="Ficha relacionada"
         popupClassName="hca-material-sheet" keyboardScrollable onClose={close}
-        footer={<ActionButton onClick={close}><Icon name="back" />Voltar à origem</ActionButton>}>
-        <RelatedDocumentBody id={id} type={type} title={label} onClose={close} />
+        footer={<>
+          <ActionButton onClick={close}><Icon name="back" />Voltar à origem</ActionButton>
+          {returnKey && patientId ? <Link href={href} className={primaryClass} onClick={event => {
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            const token = prepareMaterialVisit(id, patientId);
+            if (!token) return;
+            window.history.replaceState({ ...window.history.state, hcaRelatedReturn: returnKey }, "");
+            event.preventDefault();
+            router.push(href + "?" + new URLSearchParams({ [materialVisitParam]: token }));
+          }}>Abrir {label}<Icon name="external" /></Link> : null}
+        </>}>
+        <RelatedDocumentBody id={id} type={type} patientId={patientId} title={label} onClose={close} />
       </Drawer> : null}
     </>
   );

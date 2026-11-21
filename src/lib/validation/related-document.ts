@@ -2,6 +2,14 @@ import { z } from "zod";
 import type { SupplyType } from "@/types/documents";
 import { exactQuantity } from "./documents";
 
+export const requisitionRelatedDocuments = z.array(z.object({
+  id: z.uuid(),
+  type: z.enum(["COM", "ENT"]),
+  code: z.string(),
+  status: z.string(),
+}));
+export type RequisitionRelatedDocuments = z.infer<typeof requisitionRelatedDocuments>;
+
 const line = z.object({
   id: z.string().uuid(), product_id: z.string().min(1),
   name_snapshot: z.string(), unit_snapshot: z.string(), category_snapshot: z.string(),
