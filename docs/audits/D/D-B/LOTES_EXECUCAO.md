@@ -901,6 +901,20 @@ confirmou a emissão e abertura de uma nova REQ sem aviso anterior, a
 Ciência familiar em Visão geral, o saldo editado da equipe, a retomada
 de rascunhos, a seleção de recebedor e a DEV autônoma.
 
+**Rascunhos de Andamentos.** A categoria ou a etapa alterada já caracteriza
+um preenchimento. O salvamento automático e a saída voluntária preservam
+essas escolhas mesmo antes do texto. Ao reabrir um preenchimento ou
+descartar o rascunho, a audiência, as menções e o destaque voltam ao padrão do papel
+vigente. O pacote de publicação já enviado mantém a audiência escolhida
+para a conferência da mesma tentativa. O v7 foi conferido em 390 px. A
+retomada dos quatro campos vem da política L1. Sem migrations novas.
+Os quatro casos finais passaram sem repetição em Android e iOS emulados.
+Com Auth real, quem publicou consultou o novo andamento privado e o
+profissional mencionado no rascunho descartado ficou sem acesso. A rodada
+também confirmou a recuperação do salvamento e da publicação após perda de
+resposta. A automação agora aguarda o fechamento da confirmação de saída e
+a mensagem de publicação antes de consultar o banco.
+
 **Escolha do recebedor nos assistentes.** A ENT e a DEV usam os mesmos
 cartões de seleção de E06-01 e E06-16, com confirmação no rodapé. Na ENT,
 a escala é consultada ao abrir o diálogo e o plantão inclui o horário

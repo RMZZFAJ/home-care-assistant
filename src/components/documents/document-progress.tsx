@@ -75,6 +75,10 @@ const blank = {
   text: "",
   references: [],
 } satisfies ProgressPacket["content"];
+function hasProgressContent(content: ProgressPacket["content"]) {
+  return content.category !== blank.category || content.stage !== blank.stage ||
+    Boolean(content.text || content.references.length);
+}
 const storedDraft = z
   .object({
     content: progressDraftNoteSchema,
@@ -276,6 +280,7 @@ function ProgressContent({
       return true;
     },
     onDiscard(action, resultId) {
+      if (action === "discard") resetPublication();
       if (!pending && !localIntegrityError)
         updateDraft({
           content:
@@ -287,7 +292,8 @@ function ProgressContent({
     },
   });
   const privateContent = { documentType: type, note: content };
-  useLongDraftAutosave(privateDraft, privateContent, !readOnly && open && Boolean(content.text || content.references.length || privateDraft.base?.state === "active") && !pending && !command.busy && !localIntegrityError);
+  const hasDraft = hasProgressContent(content) || privateDraft.base?.state === "active";
+  useLongDraftAutosave(privateDraft, privateContent, !readOnly && open && hasDraft && !pending && !command.busy && !localIntegrityError);
   const locked =
     command.busy ||
     pending !== null ||
@@ -382,7 +388,7 @@ function ProgressContent({
         }
         return;
       }
-      if (next.pending || next.content.text || next.content.references.length)
+      if (next.pending || hasProgressContent(next.content))
         sessionStorage.setItem(storageKey, JSON.stringify(next));
       else sessionStorage.removeItem(storageKey);
     } catch {
@@ -397,6 +403,10 @@ function ProgressContent({
       ...previous,
       content: typeof change === "function" ? change(previous.content) : change,
     });
+  }
+  function resetPublication() {
+    setPublication({ relevance: "normal", mentions: [], visibility: familyOnlyPrivate ? "family" : "public" });
+    setMentionNames({});
   }
   async function checkUncertainPublication() {
     if (
@@ -488,6 +498,7 @@ function ProgressContent({
     if (
       command.busy ||
       pending ||
+      !hasDraft ||
       !writable ||
       privateDraft.blocked || privateDraft.backgroundBusy ||
       localIntegrityError
@@ -551,7 +562,6 @@ function ProgressContent({
           : parseProgressOutcome(value);
       clearEnvelope(packet);
       updateDraft({ content: blank, pending: null }, false);
-      setPublication({ relevance: "normal", mentions: [] });
       setOpen(false);
       setStorageError("");
       setMessage(
@@ -621,7 +631,10 @@ function ProgressContent({
         <div><h2><Icon name="history" width={19} height={19} />Andamentos</h2><p>Registros em ordem cronológica.</p></div>
         <div className="doc-feed-head-actions">
           {!readOnly && (writable || pending || privateDraft.offered || privateDraft.base || privateDraft.consumed || privateDraft.pending) ? (
-            <ActionButton compact variant="quiet" data-progress-editor-trigger ref={openerRef} onClick={() => setOpen(true)}>
+            <ActionButton compact variant="quiet" data-progress-editor-trigger ref={openerRef} onClick={() => {
+              if (!pending) resetPublication();
+              setOpen(true);
+            }}>
               <Icon name="plus" />
               {pending ? "Recuperar publicação" : privateDraft.pending ? "Recuperar preenchimento de andamento" : "Novo andamento"}
             </ActionButton>
@@ -705,7 +718,7 @@ function ProgressContent({
         finalFocus={openerRef}
         onClose={() => {
           if (command.busy || privateDraft.busy || privateDraft.backgroundBusy) return;
-          if (pending || !writable || (!content.text && !content.references.length && !privateDraft.base) || privateDraft.offered || privateDraft.consumed) setOpen(false);
+          if (pending || !writable || !hasDraft || privateDraft.offered || privateDraft.consumed) setOpen(false);
           else setConfirmClose(true);
         }}
       >
@@ -737,7 +750,7 @@ function ProgressContent({
           "documentType" in privateDraft.consumed.consumedResult &&
           !privateDraft.readDenied &&
           !privateDraft.protectedReadPending &&
-          (content.text || content.references.length) &&
+          hasProgressContent(content) &&
           JSON.stringify(content) !==
           JSON.stringify(
             privateDraft.consumed.consumedResult.command.content,
@@ -920,6 +933,7 @@ function ProgressContent({
                 disabled={
                   command.busy || privateDraft.backgroundBusy ||
                   Boolean(pending) ||
+                  !hasDraft ||
                   !writable ||
                   privateDraft.blocked ||
                   localIntegrityError
@@ -931,7 +945,7 @@ function ProgressContent({
               <ActionButton
                 disabled={
                   command.busy || privateDraft.backgroundBusy ||
-                  (!pending && (!writable || privateDraft.blocked))
+                  (!pending && (!hasDraft || !writable || privateDraft.blocked))
                 }
                 onClick={() =>
                   pending ? setOpen(false) : void savePersonal(true)

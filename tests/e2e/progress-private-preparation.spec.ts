@@ -3,9 +3,12 @@ import { randomUUID } from "node:crypto";
 import {
   progressPreparationFixture as fixture,
   fixtures,
+  actor,
+  rpc,
   sql,
   q,
 } from "../integration/progress-preparation-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
@@ -24,9 +27,9 @@ async function peerContext(browser: import("@playwright/test").Browser) {
     serviceWorkers: "block",
   });
 }
-async function login(page: Page, patient: string) {
+async function login(page: Page, patient: string, email = fixtures.family.email) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -57,6 +60,60 @@ const notes = (id: string) =>
       `select count(*) from private.document_progress_notes where document_id=${q(id)}`,
     ),
   );
+
+test("Andamento guarda categoria e etapa antes do texto e descarta a audiência do rascunho anterior", async ({ page }) => {
+  const f = await fixture();
+  const family = await shiftWorker(f.patient, "family");
+  await login(page, f.patient, family.email);
+  await open(page, f.id);
+  const dialog = editor(page);
+  const text = dialog.getByRole("textbox", { name: "Texto do andamento", exact: true });
+  const category = dialog.getByLabel("Categoria", { exact: true });
+  const stage = dialog.getByLabel("Etapa relacionada (opcional)", { exact: true });
+  const saved = dialog.getByText("Último rascunho salvo.", { exact: true });
+  const close = page.getByRole("dialog", { name: "Sair sem publicar o andamento?", exact: true });
+  const choice = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
+
+  await expect(dialog.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toBeDisabled();
+  await category.selectOption("contact");
+  await stage.selectOption("family_science");
+  await expect(saved).toBeVisible();
+  await dialog.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
+  await close.getByRole("button", { name: "Guardar e sair", exact: true }).click();
+  await expect(close).toHaveCount(0);
+  await expect(dialog).toHaveCount(0);
+  await open(page, f.id);
+  await choice.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(category).toHaveValue("contact");
+  await expect(stage).toHaveValue("family_science");
+  await expect(text).toHaveValue("");
+
+  const professionalName = sql("select full_name from public.profiles where id=" + q(fixtures.professional.id));
+  await text.fill("Rascunho com menção @Teste");
+  await dialog.getByRole("button", { name: "@" + professionalName, exact: true }).click();
+  const removeMention = dialog.getByRole("button", { name: "Remover menção a " + professionalName, exact: true });
+  await expect(removeMention).toBeVisible();
+  await dialog.getByRole("button", { name: "Guardar rascunho e fechar", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await showEditor(page);
+  await choice.getByRole("button", { name: "Descartar e começar novamente", exact: true }).click();
+  await expect(text).toHaveValue("");
+  await expect(removeMention).toHaveCount(0);
+  expect(notes(f.id)).toBe(0);
+
+  const body = "Novo registro privado sem menção.";
+  await text.fill(body);
+  await dialog.getByRole("button", { name: "Registrar andamento", exact: true }).click();
+  await expect(page.getByText(/^Andamento publicado\./)).toBeVisible();
+  await expect(dialog).toHaveCount(0);
+  const own = await rpc(family.client, "document_progress", { p_document: f.id, p_filter: "manual" });
+  expect(own.total).toBe(1);
+  expect(own.data[0]).toMatchObject({ text: body, mentions: [], visibility: "family" });
+  const professional = await actor("professional", f.patient);
+  const other = await rpc(professional, "document_progress", { p_document: f.id, p_filter: "manual" });
+  expect(other.total).toBe(0);
+});
+
 test("último Andamento também fica guardado ao fechar voluntariamente, retoma quatro campos e resolve CAS sem publicar", async ({ page, browser }) => {
  const f = await fixture(); await login(page, f.patient); await open(page, f.id);
  const text = editor(page).getByRole("textbox", { name: "Texto do andamento", exact: true });

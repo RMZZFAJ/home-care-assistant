@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — retomada de Andamentos.** O rascunho guarda categoria e etapa
+mesmo antes do texto. As escolhas de publicação pertencem ao editor atual.
+A tentativa enviada mantém sua própria referência para recuperação.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — ordem da aba Materiais.** A lista compacta abre a aba como no
 v7. Os resumos, vínculos e ações complementares permanecem abaixo da lista.
 Ao aplicar um filtro ou limpar a busca, o foco volta ao controle correspondente.
