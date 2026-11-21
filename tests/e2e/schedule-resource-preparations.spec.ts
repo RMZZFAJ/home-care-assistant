@@ -290,9 +290,7 @@ test("resource lost native reply is recovered after reload without another opera
     ]),
   });
   await page.reload();
-  await page
-    .getByText("Meus preenchimentos privados da agenda", { exact: true })
-    .click();
+  await openSchedulePrivateArea(page);
   await button(page, "Consultar ou retomar este preenchimento").click();
   await expect(
     page.getByText("Operação da agenda registrada e conferida.", {

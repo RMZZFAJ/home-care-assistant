@@ -1153,7 +1153,10 @@ test("ENT registra atendimento parcial com a caixa de suficiência desmarcada", 
   });
   const delivery = await issueSupply(page, "ENT", patient, product.name, "2", request.requisitionId, "partial", recipientName);
   expect(delivery.lines[0].family_fulfillment).toBe("partial");
-  await page.goto("/fichas");
+  const emitted = page.getByRole("dialog", { name: "Entrega expedida", exact: true });
+  await expect(emitted).toBeVisible({ timeout: 65_000 });
+  await expect(page).toHaveURL(url => url.pathname === "/fichas/" + delivery.id);
+  await emitted.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
   await logout(page);
   await signIn(page, recipient.email, "/fichas/" + delivery.id);
   await confirmCompleteDeliveryReceipt(page);

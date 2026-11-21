@@ -143,7 +143,10 @@ test("schedule personal history enforces real own RLS and rejects stale or incon
     mode = "live"; await panel.getByRole("button", { name: "Atualizar mudanças", exact: true }).click(); await expect(panel.getByText("Nenhuma alteração corresponde aos filtros consultados.", { exact: true })).toBeVisible();
     expect(scheduleFacts(f.patient)).toBe(before);
     sql(`update public.capability_overrides set enabled=false where care_recipient_id=${q(f.patient)} and subject_user=${q(fixtures.professional.id)} and capability='schedule.read.own';`);
-    await panel.getByRole("button", { name: "Atualizar mudanças", exact: true }).click(); await expect(panel.getByRole("alert")).toBeVisible();
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    const agendaDenied = page.getByRole("alert").filter({ hasText: "Seu vínculo não permite consultar a agenda." });
+    // The workspace may remove the history before its own request renders the denial.
+    await expect(panel.getByRole("alert").or(agendaDenied).first()).toBeVisible();
     await expect.poll(() => ids(panel, "data-schedule-event-id")).toEqual([]);
     expect((await page.request.get(`/api/schedules/events?careRecipientId=${f.patient}`)).status()).toBe(403);
     const foreign = await rpc(await actor("global"), "admin_upsert_recipient", { p_id: null, p_display_name: "Histórico privado fictício", p_is_active: true, p_is_development: true });
