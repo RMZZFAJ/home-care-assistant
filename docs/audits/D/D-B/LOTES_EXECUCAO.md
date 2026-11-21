@@ -468,6 +468,19 @@ Android e iOS emulados. Seis casos de navegador passaram na rodada final,
 incluindo retorno à posição exata do formulário, foco, busca e valores
 digitados, falha de consulta e recusa de acesso a outro paciente.
 
+**Privacidade das chegadas avulsas no Histórico.** A consulta do material
+aplica a mesma regra da ficha CHE. Quem informou e quem tem autoridade
+para conferir podem ver a chegada pendente. Para os demais familiares,
+uma chegada aprovada aparece quando existe permissão de ler o estoque
+familiar. A regra vale para a referência, os eventos e a contagem de
+registros. As movimentações continuam seguindo a regra de custódia.
+
+A integração com Auth real verificou autor, administração, outro
+familiar e revogação da leitura do estoque. Passaram os quatro casos
+dirigidos do contexto de materiais, incluindo a consulta pelo catálogo.
+O Chromium móvel também confirmou a consulta da chegada pelo autor e o
+retorno ao histórico após instalar a migration.
+
 O sistema acrescenta o grupo Outras requisições quando existe uma
 requisição encerrada ou cancelada sem arquivamento formal. A prévia mantém
 a ação Atualizar consulta para recuperar uma falha de leitura. A unidade
@@ -1180,7 +1193,7 @@ continua sem regra de produto nesta entrega.
 
 Consulta de 21/11/2026 à stack local `home-care-assistant` e ao Supabase de
 desenvolvimento vinculado `qwfrqychokvhdzakibid`. Os bancos compartilham
-**315 versões**, com 242 versões anteriores a L1, 18 de L1 e 55 de L2.
+**316 versões**, com 242 versões anteriores a L1, 18 de L1 e 56 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 A fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 
@@ -1207,7 +1220,14 @@ A fila de aplicação vinculada está vazia. Produção fica fora desta consulta
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
 `20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`,
-`20261120231639`, `20261121014430`, `20261121063729`.
+`20261120231639`, `20261121014430`, `20261121063729`, `20261121075902`.
+
+`20261121075902` compartilha a regra de leitura de chegada avulsa entre a
+lista, a ficha e o Histórico do material. A instalação local ocorreu pelo
+preparo da stack. O ensaio vinculado conferiu a função privada e executou
+rollback. O backup cifrado `9b5e810f-4fdb-4ed6-9e02-a04ab01d5b2a` foi
+verificado antes da aplicação no desenvolvimento. Depois, a consulta
+confirmou a versão, a regra compartilhada no Histórico e os grants.
 
 `20261121063729` acrescenta a consulta de COM e ENT relacionadas à REQ.
 O histórico da stack local foi conferido com o SQL do repositório.

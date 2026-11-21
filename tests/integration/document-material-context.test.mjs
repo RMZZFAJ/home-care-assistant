@@ -5,6 +5,7 @@ import { remainingNeedFixture, physicalState } from "./remaining-need-fixtures.m
 import { actor, fixtures, issue, rpc, setup } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { purchaseBalanceCommand, purchaseBalanceFacts, purchaseBalanceFixture } from "./purchase-entry-balance-fixtures.mjs";
+import { shiftWorker } from "./shift-fixtures.mjs";
 
 const read = (client, document, lineId, section, options = {}) => rpc(client, "document_material_context", {
   p_document: document, p_line: lineId ?? null, p_section: section, p_page: 1, ...options,
@@ -110,6 +111,37 @@ test("material decisions retain the frozen arrival quantity and actor, independe
   const professional = await timeline(pro, req.id, req.lines[0].id);
   assert.ok(professional.rows.every(row => row.arrival === null && !row.type.startsWith("arrival.")));
   assert.equal(purchaseBalanceFacts(f), before);
+});
+
+test("material history applies the same visibility as the individual unlinked arrival", async () => {
+  const f = await setup();
+  const [productId] = f.products;
+  const req = await issue(f.patient, [productId]);
+  const family = await actor("family", f.patient);
+  const other = await shiftWorker(f.patient, "family");
+  const register = async (client, quantity) => (await rpc(client, "unlinked_arrival_command", {
+    p_patient: f.patient, p_key: randomUUID(),
+    p_body: { origin: "gift", lines: [{ productId, quantity }] },
+  })).result;
+  const pending = await register(family, "2");
+  const approved = await register(f.admin, "3");
+  const history = client => timeline(client, req.id, req.lines[0].id);
+  const containsArrival = (rows, arrival) => rows.some(row => row.arrival?.id === arrival.id || row.id.startsWith(arrival.id + ":"));
+  assert.equal((await other.client.rpc("read_unlinked_arrivals", { p_patient: f.patient, p_id: pending.id })).error?.code, "42501");
+  assert.equal((await rpc(other.client, "read_unlinked_arrivals", { p_patient: f.patient, p_id: approved.id })).id, approved.id);
+  const owner = await history(family);
+  const reviewer = await history(f.admin);
+  const anotherFamily = await history(other.client);
+  assert.ok(containsArrival(owner.rows, pending));
+  assert.ok(containsArrival(reviewer.rows, pending));
+  assert.ok(!containsArrival(anotherFamily.rows, pending));
+  assert.equal(anotherFamily.total, owner.total - 1);
+  assert.ok(containsArrival(anotherFamily.rows, approved));
+
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values (${q(f.patient)},${q(other.id)},'stock.family.read',false)`);
+  assert.equal((await other.client.rpc("read_unlinked_arrivals", { p_patient: f.patient, p_id: approved.id })).error?.code, "42501");
+  assert.ok(!containsArrival((await history(other.client)).rows, approved));
 });
 
 test("catalogue consultation works before a document exists and respects patient, product and custody boundaries", async () => {
