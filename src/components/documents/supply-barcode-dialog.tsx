@@ -29,6 +29,14 @@ const readPresentations = z.object({
 
 type BarcodeApplication = { product: CatalogProduct; selections: PresentationSelection[]; manual: string };
 
+const manualPresentations = [
+  { value: "box", name: "Caixa", factor: "" },
+  { value: "package", name: "Pacote", factor: "" },
+  { value: "pair", name: "Par", factor: "2" },
+  { value: "unit", name: "Unidade", factor: "1" },
+  { value: "manual", name: "Outra apresentação", factor: "" },
+];
+
 export function SupplyBarcodeDialog({ patientId, catalog, presentations, form, onApply, onClose, finalFocus }: {
   patientId: string;
   catalog: readonly CatalogProduct[];
@@ -40,7 +48,7 @@ export function SupplyBarcodeDialog({ patientId, catalog, presentations, form, o
 }) {
   const [code, setCode] = useState("");
   const [correcting, setCorrecting] = useState(false);
-  const [presentationId, setPresentationId] = useState("");
+  const [presentationChoice, setPresentationChoice] = useState("");
   const [packages, setPackages] = useState("1");
   const [factorOverride, setFactorOverride] = useState<string | null>(null);
   const [manualAmount, setManualAmount] = useState<string | null>(null);
@@ -52,8 +60,11 @@ export function SupplyBarcodeDialog({ patientId, catalog, presentations, form, o
   const product = catalog.find(item => item.id === scanned?.product_id);
   const alternatives = presentations.filter(row => row.active && row.care_recipient_id === patientId &&
     row.product_id === product?.id && row.id !== scanned?.id && validQuantity(String(row.base_quantity), 6));
-  const presentation = presentationId ? alternatives.find(row => row.id === presentationId) : scanned;
-  const factor = factorOverride ?? (presentation ? quantity(presentation.base_quantity).toFixed() : "");
+  const presentation = presentationChoice ? alternatives.find(row => row.id === presentationChoice) : scanned;
+  const manualPresentation = manualPresentations.find(option => option.value === presentationChoice);
+  const presentationName = presentation?.name ?? manualPresentation?.name ?? "Outra apresentação";
+  const defaultFactor = presentation ? quantity(presentation.base_quantity).toFixed() : manualPresentation?.factor ?? "";
+  const factor = factorOverride ?? defaultFactor;
   const calculated = /^[1-9][0-9]{0,8}$/.test(packages) && validQuantity(factor, 6)
     ? quantity(packages).mul(quantity(factor)).toFixed() : "";
   const amount = manualAmount ?? calculated;
@@ -98,7 +109,7 @@ export function SupplyBarcodeDialog({ patientId, catalog, presentations, form, o
   function chooseCode(next: string) {
     setCode(next);
     setCorrecting(false);
-    setPresentationId("");
+    setPresentationChoice("");
     setPackages("1");
     setFactorOverride(null);
     setManualAmount(null);
@@ -133,8 +144,8 @@ export function SupplyBarcodeDialog({ patientId, catalog, presentations, form, o
           </ActionButton>
         </div>
         <div className="hca-supply-barcode-presentation">
-          <div><small>Apresentação</small><strong>{presentation?.name ?? "Outra apresentação"}</strong>
-            <small>{validQuantity(factor, 6) ? formatQuantity(factor, product.unit) : "Confira o fator"} por embalagem</small></div>
+          <div><small>Apresentação</small><strong>{presentationName}{validQuantity(factor, 6)
+            ? ` · ${formatQuantity(factor, product.unit)}` : " · Informe o fator"}</strong></div>
           <ActionButton ref={resultActionRef} variant="quiet" compact aria-expanded={correcting} onClick={() => setCorrecting(value => !value)}>
             <Icon name="edit" />{correcting ? "Recolher" : "Corrigir"}
           </ActionButton>
@@ -142,14 +153,18 @@ export function SupplyBarcodeDialog({ patientId, catalog, presentations, form, o
         {correcting ? <>
           <label className="hca-form-stack text-sm font-semibold">
             Tipo de apresentação
-            <select className={inputClass} value={presentationId} onChange={event => {
-              setPresentationId(event.currentTarget.value);
+            <select className={inputClass} value={presentationChoice} onChange={event => {
+              setPresentationChoice(event.currentTarget.value);
               setFactorOverride(null);
               setManualAmount(null);
             }}>
-              <option value="">{scanned.name}</option>
-              {alternatives.map(row => <option key={row.id} value={row.id}>{row.name}</option>)}
-              <option value="manual">Outra apresentação</option>
+              <optgroup label="Apresentações do catálogo">
+                <option value="">{scanned.name}</option>
+                {alternatives.map(row => <option key={row.id} value={row.id}>{row.name}</option>)}
+              </optgroup>
+              <optgroup label="Conversão manual">
+                {manualPresentations.map(option => <option key={option.value} value={option.value}>{option.name}</option>)}
+              </optgroup>
             </select>
           </label>
           <div className="grid grid-cols-2 items-end gap-3">

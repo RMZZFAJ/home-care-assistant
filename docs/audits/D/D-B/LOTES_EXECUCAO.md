@@ -926,6 +926,31 @@ Nenhuma migration neste ajuste.
 
 ### Decisões e dúvidas de L2
 
+**Correção da leitura de código na COM e na ENT.** Em E05-04 e E06-03,
+o diálogo compartilhado mostra o nome da apresentação e a quantidade por
+embalagem no mesmo resumo. Corrigir inclui Caixa, Pacote, Par e Unidade
+ao lado das apresentações reais do catálogo. Par e Unidade iniciam com
+dois e um, respectivamente. Caixa, Pacote e Outra apresentação exigem
+informar o conteúdo quando são escolhidos como conversão manual.
+Os ajustes manuais entram na unidade oficial do material. A apresentação
+cadastrada usada com o fator original conserva identificação e versão.
+Nenhuma migration acompanha esta alteração.
+
+Em Android e iOS emulados, a correção passou de Par e Unidade para uma
+embalagem com fator informado, e a confirmação deixou a quantidade em
+trânsito até o aceite pessoal. O registro oficial preservou a conversão
+proveniente do catálogo e a soma do ajuste manual. O teste também cobriu
+câmera negada, código indisponível, leitura de EAN por foto e retorno sem
+incluir. A referência das duas fichas foi aberta a 390 px e comparada com
+o diálogo da ENT no iOS emulado. Capturas locais em
+`output/playwright/l2-barcode-conversion/`.
+
+Na COM, o iOS confirmou o bloqueio do fator obsoleto, a adoção do fator
+atual e o registro de 24 unidades. A primeira execução parou na geração
+do PDF ao atingir 15 segundos. O caso passou com a espera de até 65
+segundos já usada pelos demais testes de emissão. Lint, tipos e build
+de produção passaram.
+
 **Revisão seguinte pedida pelo responsável.** A reabertura de um assistente
 reconhece automaticamente um resultado confirmado. A retomada de um
 preenchimento ativo usa o mesmo diálogo com paciente, data, etapa e

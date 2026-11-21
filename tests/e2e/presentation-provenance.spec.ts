@@ -546,7 +546,7 @@ test("nova emissão com fator obsoleto conserva a escolha e exige comparação a
     .click();
   await expect(
     page.getByRole("dialog", { name: "Compra emitida", exact: true }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 65_000 });
   expect(
     sql(
       `select quantity::text from public.document_lines where care_recipient_id=${sqlLiteral(f.patient)};`,

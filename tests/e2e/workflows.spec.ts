@@ -1051,8 +1051,21 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   });
   await expect(conversion).toContainText("Pacote de duas unidades");
   await conversion.getByRole("button", { name: "Corrigir", exact: true }).click();
-  await conversion.getByLabel("Tipo de apresentação").selectOption("manual");
-  await conversion.getByLabel("Unidades por apresentação").fill("4");
+  const presentation = conversion.getByLabel("Tipo de apresentação");
+  const factor = conversion.getByLabel("Unidades por apresentação");
+  const applyScan = scanner.getByRole("button", { name: "Usar material", exact: true });
+  await presentation.selectOption({ label: "Par" });
+  await expect(factor).toHaveValue("2");
+  await expect(conversion.getByText("Par · 2 unidade", { exact: true })).toBeVisible();
+  await presentation.selectOption({ label: "Unidade" });
+  await expect(factor).toHaveValue("1");
+  await presentation.selectOption({ label: "Pacote" });
+  await expect(factor).toHaveValue("");
+  await expect(applyScan).toBeDisabled();
+  await presentation.selectOption({ label: "Caixa" });
+  await expect(factor).toHaveValue("");
+  await factor.fill("4");
+  await expect(conversion.getByText("Caixa · 4 unidade", { exact: true })).toBeVisible();
   await conversion.getByRole("checkbox", { name: "Corrigir o total convertido", exact: true }).check();
   await conversion.getByLabel("Total corrigido em unidade").fill("3");
   await expect(conversion).toContainText("Este ajuste será incluído como quantidade manual");
@@ -1064,7 +1077,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
       body: await scanner.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
     });
   }
-  await scanner.getByRole("button", { name: "Usar material", exact: true }).click();
+  await applyScan.click();
   await expect(
     page.getByText("Quantidade total calculada:", { exact: false }),
   ).toContainText("5 unidade");
