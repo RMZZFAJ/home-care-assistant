@@ -914,6 +914,21 @@ com Auth real, confirmou a rejeição, preservou a primeira REQ e verificou a
 segunda emissão com a justificativa e somente as duas linhas mantidas.
 Passou em Chromium, Android e iOS emulados, na primeira tentativa.
 
+**E05-03, consulta das REQs por material.** O painel atual conserva as
+quantidades em registros separados, com código e data. Falta reproduzir
+os destaques do v7 de contagem mais recente e contagem anterior e conferir
+esse cenário em uma COM com duas REQs vinculadas ao mesmo material.
+
+**Continuidade do BAL existente.** Ao adotar a nova referência, o
+salvamento automático guarda as contagens anteriores com data e notas.
+A nova conferência começa com as quantidades vazias. O fluxo cobriu
+10 regressões em Chromium na primeira tentativa, incluindo retomada em
+outro aparelho, resposta perdida, cópias locais protegidas e reconto.
+Após unificar a gravação da cópia local dos assistentes, três desses
+casos passaram novamente. Também passaram a retomada da COM na etapa
+Materiais após uma atualização da PWA e a recuperação automática do
+mesmo PDF de ENT após perder a resposta da assinatura.
+
 A comparação em celular usou E04-01, E05-01, E06-01 e E06-16. A identidade
 da confirmação, a lista contínua, os controles na linha do material, o menu
 de três pontos e o estado do rascunho no rodapé seguem essa composição. A
@@ -1507,13 +1522,13 @@ O manifesto confirmou as 84 migrations protegidas.
 ## Estado de publicação e próximos lotes
 
 A [CI de `b74013c4`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44886723003)
-passou nas validações Windows e Ubuntu, na instalação limpa, na evolução
-legada e em 830 testes de integração. O grupo Chromium 1 terminou com 264
-testes aprovados e 16 falhas persistentes. O Chromium 2 atingiu o limite de
-40 minutos do job enquanto ainda executava os E2E. O log desse grupo registra
-um teste de encerramento de escala que passou na repetição. Android 1,
-Android 2 e iOS 1 terminaram com 16, 23 e 17 falhas persistentes. iOS 2
-continuava em execução na consulta seguinte.
+concluiu com falha. Passaram as validações Windows e Ubuntu, a instalação
+limpa, a evolução legada e 830 testes de integração. Chromium 1, Android 1,
+Android 2 e iOS 1 terminaram com 16, 16, 23 e 17 falhas persistentes.
+Chromium 2 e iOS 2 atingiram os limites de 40 e 70 minutos. Os logs parciais
+registram 15 e 21 testes que falharam também na repetição e dois casos que
+passaram na repetição, um de encerramento da escala e outro de recuperação
+de expedição da DEV com material inativo.
 
 A validação local de correções dirigidas passou em 12 testes sem repetição.
 Ela cobriu a largura de 320 px na DEV, a descrição acessível dos materiais em

@@ -88,6 +88,16 @@ import {
   type DeliveryPreparation,
 } from "@/types/documents";
 
+function saveWizardCache(key: string, draft: {
+  form: WizardState;
+  links: Record<string, string[]>;
+  sourceSetup?: SupplySourcePreparation;
+  editingId?: string;
+  balanceContent?: BalanceDraftContent;
+}) {
+  sessionStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), ...draft }));
+}
+
 const balanceSteps = draftFlowStages.SUPPLY.map((stage) => stage.label);
 export function SupplyWizard({ type }: { type: SupplyType; }) {
   const params = useSearchParams();
@@ -866,17 +876,13 @@ export function PatientSupplyWizard({
     const timer = window.setTimeout(() => {
       if (frozenRef.current) return;
       try {
-        sessionStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            savedAt: Date.now(),
-            form,
-            links,
-            sourceSetup,
-            editingId: editing?.id,
-            ...(type === "BAL" ? { balanceContent } : {}),
-          }),
-        );
+        saveWizardCache(storageKey, {
+          form,
+          links,
+          sourceSetup,
+          editingId: editing?.id,
+          ...(type === "BAL" ? { balanceContent } : {}),
+        });
       } catch {
         /* The form remains in memory. */
       }
@@ -1037,16 +1043,12 @@ export function PatientSupplyWizard({
           documentId: confirmed.id,
           documentVersion: confirmed.version,
         };
-        sessionStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            savedAt: Date.now(),
-            form,
-            links,
-            editingId: confirmed.id,
-            balanceContent: { ...balanceContent, context: sourceContext },
-          }),
-        );
+        saveWizardCache(storageKey, {
+          form,
+          links,
+          editingId: confirmed.id,
+          balanceContent: { ...balanceContent, context: sourceContext },
+        });
         setEditing(confirmed);
         setPreservedBalanceContext(sourceContext);
         setLegacyOpeningKey(null);
@@ -1385,16 +1387,12 @@ export function PatientSupplyWizard({
         notes: next.notes,
         observationTimes: next.observationTimes,
       };
-      sessionStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          savedAt: Date.now(),
-          form: nextForm,
-          links,
-          editingId: target?.id,
-          balanceContent: next,
-        }),
-      );
+      saveWizardCache(storageKey, {
+        form: nextForm,
+        links,
+        editingId: target?.id,
+        balanceContent: next,
+      });
       setCatalog(products.data);
       setEditing(target);
       setLegacyReference(stock.data);
@@ -1404,6 +1402,7 @@ export function PatientSupplyWizard({
       setDraftMaterials(next.materials);
       setForm(nextForm);
       setFieldErrors({});
+      setDraftTouched(true);
       setStep(0);
       setMessage(
         "Referência atualizada. Confira fisicamente cada material; as observações anteriores continuam preservadas.",

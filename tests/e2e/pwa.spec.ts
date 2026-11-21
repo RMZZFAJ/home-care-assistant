@@ -390,12 +390,15 @@ test("PWA sem confirmação de atualização aguarda abas, preserva edição e r
   const before = official();
   await login(page, f.patient);
   const peer = await context.newPage();
-  async function resume(tab: Page) {
+  async function resume(tab: Page, atMaterials = false) {
     await tab.goto(`/fichas/com?careRecipientId=${f.patient}`);
     await lastDraftPanel(tab)
       .getByRole("button", { name: "Continuar rascunho", exact: true })
       .click();
-    await tab.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
+    const steps = tab.getByRole("navigation", { name: "Etapas da COM", exact: true });
+    await expect(steps.getByRole("button", { name: atMaterials ? "Materiais" : "Confirmação", exact: true }))
+      .toHaveAttribute("aria-current", "step");
+    if (!atMaterials) await tab.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
     await selectMaterialCategory(tab);
     return tab.getByRole("textbox", {
       name: "Quantidade — Material fictício V4 0",
@@ -452,7 +455,7 @@ test("PWA sem confirmação de atualização aguarda abas, preserva edição e r
     await peer.close();
     const reopened = await context.newPage();
     try {
-      await expect(await resume(reopened)).toHaveValue("2,");
+      await expect(await resume(reopened, true)).toHaveValue("2,");
       expect(
         sql(
           `select content#>>'{form,quantities,${f.products[0]}}' from private.creation_drafts where id=${sqlLiteral(saved.id)};`,

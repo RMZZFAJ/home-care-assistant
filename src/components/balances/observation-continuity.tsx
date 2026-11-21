@@ -142,7 +142,7 @@ export function BalanceReferenceReview({
       <p>
         Atualizar consulta novamente as referências. As quantidades novas
         começam vazias; notas e conferências anteriores continuam disponíveis.
-        Salve o preenchimento privado para retomá-lo em outro aparelho.
+        No rodapé, confira se o rascunho está salvo para retomar em outro aparelho.
       </p>
       <ActionButton disabled={disabled} onClick={onAdopt}>
         Atualizar referência e iniciar nova conferência

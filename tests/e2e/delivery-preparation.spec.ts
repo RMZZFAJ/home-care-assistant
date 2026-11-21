@@ -125,6 +125,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   const attempts: unknown[] = [];
   let saved: SupplyDocument | undefined;
   let attemptedPdf: { id: string; issuanceId: string } | undefined;
+  let pdfVerificationReads = 0;
   const releasePdfResponse = Promise.withResolvers<void>();
   const releaseNoticeResponse = Promise.withResolvers<void>();
   const noticeResponses: { noticesPrepared: boolean; noticesNeedAttention: boolean; issuanceId: string | null }[] = [];
@@ -136,7 +137,10 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
     await route.fulfill({ response });
   });
   await page.route("**/api/documents/*/issuances/initial", async route => {
-    if (route.request().method() !== "POST") return route.continue();
+    if (route.request().method() !== "POST") {
+      if (attemptedPdf) pdfVerificationReads += 1;
+      return route.continue();
+    }
     const response = await route.fetch({ timeout: 65_000 });
     expect(response.status(), await response.text()).toBe(200);
     attemptedPdf = await response.json();
@@ -186,10 +190,10 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   const emitted = page.getByRole("dialog", { name: "Entrega expedida", exact: true });
   await expect(emitted).toBeVisible();
   await expect(emitted.getByRole("link", { name: "Consultar avisos", exact: true })).toHaveAttribute("href", `/fichas/${saved!.id}?documentTab=communications`);
-  await expect(emitted.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveCount(0);
-  await emitted.getByRole("button", { name: "Recuperar PDF", exact: true }).click();
   const href = `/api/documents/${saved!.id}/pdf?issuance=${attemptedPdf!.issuanceId}`;
   await expect(emitted.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveAttribute("href", href);
+  await expect(emitted.getByRole("button", { name: "Recuperar PDF", exact: true })).toHaveCount(0);
+  expect(pdfVerificationReads).toBe(1);
   const file = await page.request.get(href);
   expect(file.ok()).toBe(true);
   const text = (await PDF.load(await file.body())).extractText().flatMap(p =>

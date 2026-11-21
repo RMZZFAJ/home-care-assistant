@@ -797,6 +797,7 @@ function ScheduledCount({
       setPreviousObservations(next.previousObservations);
       setNeedsRecount(false);
       setFieldErrors({});
+      setDraftTouched(true);
       setStep(0);
       setMessage(
         "Referência atualizada. Confira fisicamente cada material; as observações anteriores continuam preservadas.",

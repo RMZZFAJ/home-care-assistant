@@ -40,7 +40,8 @@ async function login(page: Page, patient: string, email: string) {
   ).toBeVisible();
   await selectContext(page, patient);
   await page.goto("/fichas/bal");
-  await expect(page.getByRole("button", { name: "Salvar rascunho", exact: true }).or(panel(page)).first()).toBeVisible();
+  const steps = page.getByRole("navigation", { name: /^(Etapas da ficha|Etapas da BAL)$/ });
+  await expect(steps.or(panel(page)).first()).toBeVisible();
 }
 async function stockChange(
   f:
@@ -122,7 +123,6 @@ test("BAL local scheduled fields survive a stock change,reload and explicit fres
   await expect(
     page.getByLabel("Observações da contagem", { exact: true }),
   ).toHaveValue(old.notes);
-  await button(page, "Salvar rascunho").click();
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const saved = await rpc(f.pro.client, "creation_draft_context", {
     p_patient: f.patient,
@@ -189,7 +189,6 @@ test("BAL private optional observations survive reference change,new entry and a
   });
   await expect(input).toHaveValue("");
   await input.fill("2");
-  await button(page, "Salvar rascunho").click();
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const saved = await draftContext(f, "BAL");
   expect(saved.content.previousObservations).toEqual([old]);
@@ -317,7 +316,6 @@ test("BAL private document version and reassigned shift keep old observations wi
   await expect(
     page.getByLabel("Material fictício V4 0 · unidade", { exact: true }),
   ).toHaveValue("");
-  await button(page, "Salvar rascunho").click();
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const own = await rpc(f.pro.client, "creation_draft_context", {
     p_patient: f.patient,

@@ -220,7 +220,7 @@ for (const kind of ["damaged", "other owner"] as const)
       "cópia desta contagem",
     );
     await expect(button(page, "Revisar")).toBeDisabled();
-    await expect(button(page, "Salvar rascunho")).toBeDisabled();
+    await expect(button(page, "Salvar rascunho")).toHaveCount(0);
     expect(await page.evaluate((k) => sessionStorage.getItem(k), key)).toBe(
       raw,
     );

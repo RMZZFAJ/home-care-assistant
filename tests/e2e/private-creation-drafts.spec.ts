@@ -27,9 +27,8 @@ import { balanceSetup } from "../integration/shift-fixtures.mjs";
 test.setTimeout(180_000);
 mkdirSync("output/playwright/phase-d", { recursive: true });
 const panel = lastDraftPanel;
-const save = (page: Page) =>
-  page.getByRole("button", { name: "Salvar rascunho", exact: true });
 const reqStages = (page: Page) => page.getByRole("navigation", { name: "Etapas da requisição", exact: true });
+const balStages = (page: Page) => page.getByRole("navigation", { name: /^(Etapas da ficha|Etapas da BAL)$/ });
 const next = (page: Page) =>
   page.getByRole("button", { name: /^(Avançar|Revisar|Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 async function login(
@@ -48,13 +47,13 @@ async function login(
 }
 async function open(page: Page, kind: "REQ" | "BAL", url?: string) {
   await page.goto(url ?? (kind === "REQ" ? "/fichas/req" : "/fichas/bal"));
-  await expect((kind === "REQ" ? reqStages(page) : save(page)).or(page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true })).first()).toBeVisible();
+  await expect((kind === "REQ" ? reqStages(page) : balStages(page)).or(panel(page)).first()).toBeVisible();
 }
 async function resume(page: Page) {
   await panel(page)
     .getByRole("button", { name: "Continuar rascunho", exact: true })
     .click();
-  await expect(reqStages(page).or(save(page)).first()).toBeVisible();
+  await expect(reqStages(page).or(balStages(page)).first()).toBeVisible();
 }
 async function observations(page: Page) {
   for (let i = 0; i < 3; i++) await next(page);
@@ -65,7 +64,7 @@ test("BAL agendado recupera a revisão em leitura com referências salvas sem no
   await login(page,f.patient,f.pro.email);await open(page,"BAL");
   for(let i=0;i<f.products.length;i++)await page.getByLabel(`Material fictício V4 ${i} · unidade`,{exact:true}).fill("0");
   await next(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
-  await save(page).click();await expect(panel(page)).toContainText("Último rascunho salvo.");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const saved=await draftContext(f,"BAL",f.pro.client);
   expect(saved.navigation).toEqual({version:1,stage:"review"});
   expect(saved.content.context.mode).toBe("scheduled");
@@ -304,14 +303,15 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
       await route.abort("failed");
     } else await route.continue();
   });
-  await save(page).click();
+  const otherCount = page.getByLabel("Quantidade — Material fictício V4 1", { exact: true });
+  await otherCount.fill("0");
   await expect(
     panel(page).getByRole("button", {
       name: "Recuperar salvamento ou descarte",
       exact: true,
     }),
   ).toBeEnabled();
-  await expect(save(page)).toBeDisabled();
+  await expect(otherCount).toBeDisabled();
   await page.reload();
   await panel(page)
     .getByRole("button", {
@@ -327,7 +327,8 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   await expect(page.locator('[aria-current="step"]')).toContainText("Higiene");
   await expect(count).toHaveValue("1,");
   expect(saved.content.counts[f.products[0]]).toBe("1,");
-  expect(saved.content.observationTimes).toEqual(balance.observationTimes);
+  expect(saved.content.counts[f.products[1]]).toBe("0");
+  expect(saved.content.observationTimes[f.products[0]]).toBe(balance.observationTimes[f.products[0]]);
   expect(officialState(f)).toBe(before);
   await open(page, "REQ");
   await expect(panel(page)).toBeVisible();
@@ -367,8 +368,7 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   }
   await open(page, "BAL");
   await resume(page);
-  await next(page);
-  await next(page);
+  await expect(page.locator('[aria-current="step"]')).toContainText("Higiene");
   const firstCount = page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
   const secondCount = page.getByLabel("Quantidade — Material fictício V4 1", { exact: true });
   await firstCount.focus();
@@ -425,14 +425,13 @@ test("reconto BAL privado retoma em outro aparelho e confirma uma única versão
   );
   await login(page, f.patient, counter.email);
   await open(page, "BAL", url);
-  await expect(save(page)).toBeEnabled();
+  await expect(page.getByLabel("Material fictício V4 0 · unidade", { exact: true })).toBeEditable();
   await page
     .getByLabel("Material fictício V4 0 · unidade", { exact: true })
     .fill("1,");
   await page
     .getByLabel("Observações da contagem", { exact: true })
     .fill("Reconto parcial privado da substituta");
-  await save(page).click();
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   expect(
     sql(
@@ -573,7 +572,7 @@ test("abertura BAL antiga com resposta desconhecida recupera a mesma ficha antes
     { storageKey, key, ids: f.products },
   );
   await page.reload();
-  await expect(save(page)).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Avançar", exact: true })).toBeEnabled();
   const recovered = page.waitForResponse(
     (response) =>
       response.request().method() === "POST" &&
@@ -588,8 +587,7 @@ test("abertura BAL antiga com resposta desconhecida recupera a mesma ficha antes
   await page
     .getByLabel("Quantidade — Material fictício V4 0", { exact: true })
     .fill("1,");
-  await save(page).click();
-  await expect(panel(page)).toContainText("Último rascunho salvo.");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const draft = await rpc(f.pro, "creation_draft_context", {
     p_patient: f.patient,
     p_kind: "BAL",
