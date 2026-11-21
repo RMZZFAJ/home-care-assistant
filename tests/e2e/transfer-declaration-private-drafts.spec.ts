@@ -167,9 +167,7 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
   await loginDecision(page, author.email, f.patient);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/fichas/devolucao");
-  const start = page.getByRole("button", { name: "Preparar devolução", exact: true });
-  await expect(start).toBeVisible({ timeout: 45_000 });
-  await start.click();
+  await expect(editor(page)).toBeVisible({ timeout: 45_000 });
   await selectReturnRecipient(page, f.recipientId, "A pessoa designada receberá esta devolução.");
   await editor(page).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   await editor(page).getByRole("button", { name: "Item extra", exact: true }).click();
@@ -187,8 +185,6 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
     fields: { wizardStep: "2" }, pendingExtras: [{ name: item, quantity: "2", unit: "unidade" }],
   });
   await page.reload();
-  await expect(start).toBeVisible({ timeout: 45_000 });
-  await start.click();
   await resume(page);
   await editor(page).getByRole("button", { name: "Comparar referência atual", exact: true }).click();
   await editor(page).getByRole("button", { name: "Adotar referência atual e revisar meus campos", exact: true }).click();

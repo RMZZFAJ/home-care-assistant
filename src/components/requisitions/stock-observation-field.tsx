@@ -43,7 +43,7 @@ export function StockObservationField({ value, mode, suggested, decimals = 6, un
     </label> : null}
     <p id={id + "-help"} className="text-xs text-(--muted)">
       {compact
-        ? "A emissão aplica a contagem ao estoque. Use 0 se acabou ou marque “Não sei informar” para manter o saldo."
+        ? "Confira o saldo atual e ajuste se necessário. Use 0 se o material acabou. Se não puder conferir, marque “Não sei informar” para manter o saldo da equipe."
         : "Informe a quantidade com a equipe. Use 0 se o material acabou ou escolha “Não sei informar”."}
     </p>
     {error ? <p id={id + "-error"} className="ui-field-error">{error}</p> : null}

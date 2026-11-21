@@ -23,7 +23,8 @@ export type WizardMaterialCategory = (typeof materialCategories)[number]["id"];
 
 export function adjacentMaterialCategory(category: WizardMaterialCategory | undefined, products: readonly { category: string }[], direction: "next" | "previous") {
   const current = materialCategories.findIndex(entry => entry.id === category);
-  const candidates = direction === "next" ? materialCategories.slice(current + 1) : materialCategories.slice(0, current).reverse();
+  const candidates = direction === "next" ? materialCategories.slice(current + 1)
+    : materialCategories.slice(0, current < 0 ? materialCategories.length : current).reverse();
   return candidates.find(entry => products.some(product => product.category === entry.id))?.id;
 }
 

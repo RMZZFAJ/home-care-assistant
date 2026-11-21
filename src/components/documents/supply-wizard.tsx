@@ -1121,101 +1121,97 @@ export function PatientSupplyWizard({
         return;
       }
       if (!validate(true)) return;
-      const lines: DraftLine[] = catalog
-        .filter((product) => Object.hasOwn(form.quantities, product.id))
-        .map((product) => ({
-          productId: product.id,
-          quantity: quantity(form.quantities[product.id]).toFixed(),
-          ...(form.presentationSelections?.[product.id]?.length
-            ? {
-              manualQuantity: quantity(
-                form.manualQuantities?.[product.id] ?? "0",
-              ).toFixed(),
-              presentations: form.presentationSelections[product.id].map(
-                (row) => ({
-                  id: row.id,
-                  version: row.version,
-                  packages: row.packages,
-                }),
-              ),
-            }
-            : {}),
-          ...(links[product.id]?.length
-            ? {
-              requisitionItemIds: links[product.id],
-              ...(type === "ENT" && form.source === "FAMILY" ? {
-                requestFulfillment: form.requestFulfillments?.[product.id] === "complete" ? "complete" : "partial",
-              } : {}),
-            }
-            : {}),
-          ...(links[product.id]?.length || form.extraProductIds?.includes(product.id) ? {
-            metadata: {
-              ...(links[product.id]?.length ? { sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "" } : {}),
-              ...(form.extraProductIds?.includes(product.id) ? { catalogueExtra: "true" } : {}),
-            },
-          } : {}),
-        }));
-      const payload: SupplyPayload = {
-        lines,
-        ...(type === "COM" && form.pendingExtras?.length ? { pendingExtras: form.pendingExtras } : {}),
-        notes: form.notes,
-        ...(type !== "BAL" && form.observations ? { observations: form.observations.map(note => note.trim()) } : {}),
-        ...(sources.length ? { sources } : {}),
-        ...(type === "BAL"
-          ? { balanceReferenceRevision: legacyReference!.revision }
-          : {}),
-        ...(type === "COM"
-          ? { acquisitionMode: "planned" as const }
-          : type === "ENT"
-            ? {
-              source: form.source,
-              destination: form.source === "FAMILY" ? "CARE_TEAM" : "FAMILY",
-              recipientId: form.recipientId,
-              recipientReason: form.recipientReason?.trim() || undefined,
-              recipientReference: activeRecipientContext!.referenceHash,
-            }
-            : {}),
-      };
-      const privateCommit =
-        await privateDraft.save(structuredClone(privateContent));
-      if (!privateCommit) return;
-      frozenRef.current = {
-        payload,
-        key: crypto.randomUUID(),
-        submissionKey: crypto.randomUUID(),
-        draft: false,
-        expectedVersion: editing?.version,
-        ...(privateCommit || privateDraft.draftCommit
-          ? {
-            draftCommit: privateCommit
-              ? { id: privateCommit.id, revision: privateCommit.revision }
-              : privateDraft.draftCommit,
-          }
-          : {}),
-      };
     }
-    const recoveringSubmission = uncertain && editing !== null && frozenRef.current.expectedVersion !== undefined
+    const recoveringSubmission = uncertain && editing !== null && frozenRef.current?.expectedVersion !== undefined
       && editing.version > frozenRef.current.expectedVersion;
-    const isIssuance = type !== "BAL" && !frozenRef.current.draft && (!editing?.protocol || recoveringSubmission);
+    const isIssuance = type !== "BAL" && !frozenRef.current?.draft && (!editing?.protocol || recoveringSubmission);
     setIssuing(isIssuance);
     setBusy(true);
     setError("");
     try {
-      sessionStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          form,
-          links,
-          sourceSetup,
-          editingId: editing?.id,
-          intent: frozenRef.current,
-          ...(type === "BAL" ? { balanceContent } : {}),
-        }),
-      );
-    } catch {
-      /* Attempt retained in memory. */
-    }
-    try {
+      if (!frozenRef.current) {
+        const lines: DraftLine[] = catalog
+          .filter((product) => Object.hasOwn(form.quantities, product.id))
+          .map((product) => ({
+            productId: product.id,
+            quantity: quantity(form.quantities[product.id]).toFixed(),
+            ...(form.presentationSelections?.[product.id]?.length
+              ? {
+                manualQuantity: quantity(
+                  form.manualQuantities?.[product.id] ?? "0",
+                ).toFixed(),
+                presentations: form.presentationSelections[product.id].map(
+                  (row) => ({
+                    id: row.id,
+                    version: row.version,
+                    packages: row.packages,
+                  }),
+                ),
+              }
+              : {}),
+            ...(links[product.id]?.length
+              ? {
+                requisitionItemIds: links[product.id],
+                ...(type === "ENT" && form.source === "FAMILY" ? {
+                  requestFulfillment: form.requestFulfillments?.[product.id] === "complete" ? "complete" : "partial",
+                } : {}),
+              }
+              : {}),
+            ...(links[product.id]?.length || form.extraProductIds?.includes(product.id) ? {
+              metadata: {
+                ...(links[product.id]?.length ? { sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "" } : {}),
+                ...(form.extraProductIds?.includes(product.id) ? { catalogueExtra: "true" } : {}),
+              },
+            } : {}),
+          }));
+        const payload: SupplyPayload = {
+          lines,
+          ...(type === "COM" && form.pendingExtras?.length ? { pendingExtras: form.pendingExtras } : {}),
+          notes: form.notes,
+          ...(type !== "BAL" && form.observations ? { observations: form.observations.map(note => note.trim()) } : {}),
+          ...(sources.length ? { sources } : {}),
+          ...(type === "BAL"
+            ? { balanceReferenceRevision: legacyReference!.revision }
+            : {}),
+          ...(type === "COM"
+            ? { acquisitionMode: "planned" as const }
+            : type === "ENT"
+              ? {
+                source: form.source,
+                destination: form.source === "FAMILY" ? "CARE_TEAM" : "FAMILY",
+                recipientId: form.recipientId,
+                recipientReason: form.recipientReason?.trim() || undefined,
+                recipientReference: activeRecipientContext!.referenceHash,
+              }
+              : {}),
+        };
+        const privateCommit =
+          await privateDraft.save(structuredClone(privateContent));
+        if (!privateCommit) return;
+        frozenRef.current = {
+          payload,
+          key: crypto.randomUUID(),
+          submissionKey: crypto.randomUUID(),
+          draft: false,
+          expectedVersion: editing?.version,
+          draftCommit: { id: privateCommit.id, revision: privateCommit.revision },
+        };
+      }
+      try {
+        sessionStorage.setItem(
+          storageKey,
+          JSON.stringify({
+            form,
+            links,
+            sourceSetup,
+            editingId: editing?.id,
+            intent: frozenRef.current,
+            ...(type === "BAL" ? { balanceContent } : {}),
+          }),
+        );
+      } catch {
+        /* Attempt retained in memory. */
+      }
       const intent = frozenRef.current;
       if (isIssuance && uncertain && intent.draftCommit) {
         const resolution = await reconcileIssuance(patientId, intent.draftCommit, intent.key);
@@ -1548,7 +1544,7 @@ export function PatientSupplyWizard({
         <SimpleDraftPanel
           draft={privateDraft}
           current={privateContent}
-          statusInFooter={!loadError && !loading}
+          statusInFooter
           resumeHref={resumeHref}
           patientName={context.patient!.display_name}
           authorName={context.fullName}
@@ -1841,7 +1837,8 @@ export function PatientSupplyWizard({
                 }
                 onBack={() => {
                   issuanceFailure.clear();
-                  const previous = !isBalance && category && adjacentMaterialCategory(category, catalog, "previous");
+                  const previous = !isBalance && (category || step === supplyExtrasStep) &&
+                    adjacentMaterialCategory(category, catalog, "previous");
                   if (previous) openStep(materialCategories.findIndex(item => item.id === previous) + 1);
                   else openStage(stage - 1);
                   setError("");

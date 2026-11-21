@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — abertura e emissão dos assistentes.** Nova devolução entra
+direto na confirmação. A emissão inicia o carregamento por etapas antes
+da gravação final. Voltar de Extras retorna à última lista de materiais.
+Os assistentes compartilham o campo de número e unidade do v7.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — saldo da compra em mãos.** O resultado mostra quanto havia
 antes, quanto entrou e quanto ficou depois na parcela aprovada. O item que
 aguarda a loja conserva a previsão e indica estoque sem alteração.

@@ -52,6 +52,10 @@ test("L2 COM encaminha a sugestão de catálogo para Materiais e emite uma únic
   await next(page);
   await expect(stages.getByRole("button", { name: "Extras", exact: true })).toHaveAttribute("aria-current", "step");
   await expect(page.getByText(name, { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(page.getByRole("button", { name: /^Higiene/, pressed: true })).toBeVisible();
+  await expect(extra).toHaveValue("2");
+  await next(page);
   await next(page);
   const observation = "A caixa será entregue em dois volumes.";
   const addObservation = page.getByRole("button", { name: "Adicionar observação", exact: true });

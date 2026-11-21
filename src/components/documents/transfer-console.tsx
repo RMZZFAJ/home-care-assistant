@@ -26,6 +26,7 @@ import { DocumentIssuanceFailure, issuanceRecoverySteps, reconcileIssuance, useI
 import { Icon, StepNavigator } from "@/components/ui/primitives";
 import { Dialog } from "@/components/ui/overlays";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -142,12 +143,17 @@ export function TransferConsole({ source, routedOriginId }: { source?: Custody; 
   );
 }
 function PatientTransfers({ context, fixedSource, routedOriginId }: { context: WorkspaceContext; fixedSource?: Custody; routedOriginId?: string }) {
+  const router = useRouter();
   const [source, setSource] = useState<Custody | "">(fixedSource ?? ""),
-    [editing, setEditing] = useState(() => Boolean(routedOriginId && fixedSource === "CARE_TEAM" &&
+    [editing, setEditing] = useState(() => Boolean(fixedSource === "CARE_TEAM" &&
       can(context, "ent.create") && can(context, "stock.team.read"))),
     [consulting, setConsulting] = useState(false);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   function endEditing() {
+    if (fixedSource === "CARE_TEAM" && !consulting) {
+      router.push(routedOriginId ? "/fichas/" + encodeURIComponent(routedOriginId) : "/fichas");
+      return;
+    }
     setEditing(false);
     requestAnimationFrame(() => headingRef.current?.focus());
   }
@@ -874,7 +880,7 @@ function TransferDeclarationEditor({
     <SimpleDraftPanel
       draft={privateDraft}
       current={currentContent}
-      statusInFooter={write && (!!reference && !referenceUnavailable || !!packet)}
+      statusInFooter
       patientName={context.patient?.display_name ?? "Paciente selecionado"}
       authorName={context.fullName}
       documentLabel={isReturn ? "Devolução" : "Entrega"}
@@ -1507,9 +1513,10 @@ function TransferDeclarationEditor({
                   ? <ActionButton variant="quiet" onClick={() => {
                     setError("");
                     setQuery("");
-                    const previous = step === 1 && isReturn && reference && adjacentMaterialCategory(activeCategory, reference.products, "previous");
+                    const previous = isReturn && reference && (step === 1 || step === 2) &&
+                      adjacentMaterialCategory(step === 1 ? activeCategory : undefined, reference.products, "previous");
                     if (previous) setCategory(previous);
-                    else setStep(step - 1);
+                    if (!previous || step === 2) setStep(step - 1);
                   }}><Icon name="back" width="14" height="14" />Voltar</ActionButton>
                   : <ActionButton variant="quiet" disabled={busy || privateDraft.blocked} onClick={close}><Icon name="back" width="14" height="14" />Sair por agora</ActionButton>}>
                 <ActionButton

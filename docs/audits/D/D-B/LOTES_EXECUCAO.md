@@ -981,6 +981,44 @@ O status de rascunho fica no rodapé durante o preenchimento. Durante o
 carregamento por etapas da emissão ou expedição, a tela mostra apenas o
 estado da operação. A tentativa oficial mantém a recuperação própria.
 
+**Entrada da DEV e confirmação dos assistentes.** A rota Nova devolução
+abre a confirmação diretamente para quem pode expedir pela equipe.
+Sair volta à ficha de origem quando o fluxo partiu dela, ou à central.
+O campo compartilhado de quantidade segue a borda, a altura e a tipografia
+do controle v7, com a unidade na mesma superfície. O texto da unidade
+usa contraste de 5,22:1 no fundo branco, acima do mínimo de 4,5:1.
+A contagem de seleção, a leitura de código quando aplicável e Item extra
+compartilham a barra compacta. Os tipos do catálogo real e a busca
+permanecem acessíveis em todos os assistentes deste lote.
+Avançar em Materiais percorre as listas com itens. Voltar de Extras retorna
+à última dessas listas. A orientação da REQ distingue saldo zero de saldo
+desconhecido.
+
+Ao emitir REQ, COM ou ENT, o carregamento dinâmico começa na gravação
+final, antes da emissão, e o rodapé deixa de exibir o estado do rascunho.
+Se duas abas reconhecerem a mesma emissão, a segunda relê o preenchimento
+atual ao receber o conflito de versão. Ela abre a nova ficha quando o
+slot está vazio e oferece a retomada quando já existe um rascunho ativo.
+A recuperação de uma emissão com resultado incerto conserva sua chave.
+Sem migrations novas.
+
+Os ensaios de REQ retiveram a resposta da gravação final para verificar
+o carregamento desde o primeiro passo e a ausência do status do rascunho
+no rodapé. Também cobriram o reconhecimento concorrente em duas abas,
+a perda da resposta de reconhecimento, a contagem decimal e a Ciência
+familiar em Visão geral. Em COM, o retorno de Extras preservou a quantidade
+na última lista. A DEV abriu diretamente, retomou a preparação e concluiu
+o recebimento pessoal. A ENT manteve a edição durante a troca de escala
+e só expediu após adoção da referência atual.
+
+A comparação de seleção e revisão da ENT executa as verificações de
+acessibilidade em cinco larguras. O limite desse caso foi de 180 para
+240 segundos após o WebKit chegar à última verificação de teclado e
+atingir o tempo total. As larguras e as verificações foram preservadas.
+O caso completo passou nos dois navegadores emulados. No total, 22 casos
+dirigidos dos assistentes passaram nos resultados finais, além dos quatro
+casos do saldo no resultado da compra mista.
+
 **Avaliação familiar na revisão de conclusão.** Cada material pendente da
 ENT pode abrir o diálogo existente de E06-15 diretamente da revisão, para
 quem tem autorização de avaliar a necessidade. A observação da conclusão

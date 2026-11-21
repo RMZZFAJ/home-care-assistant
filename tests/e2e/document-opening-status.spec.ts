@@ -132,7 +132,6 @@ test("L2 abertura da DEV retoma a identificação depois de recuperar a referên
     return route.fulfill({ status: 503, json: { code: "REFERENCE_UNAVAILABLE", error: "Falha fictícia de consulta." } });
   });
   await page.goto("/fichas/devolucao");
-  await page.getByRole("button", { name: "Preparar devolução", exact: true }).click();
   const modal = page.getByRole("dialog", { name: "Dados da ficha indisponíveis", exact: true });
   await expect(modal).toBeVisible();
   const next = page.getByRole("button", { name: "Selecionar materiais", exact: true });

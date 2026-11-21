@@ -53,10 +53,14 @@ async function captureVisible(locator: Locator, path: string) {
 }
 
 test("06.2 ENT selection and complete readonly review follow the model without shipment", async ({ page, browser }, info) => {
+  test.setTimeout(240_000); // Selection and review each run accessibility checks at five widths.
   const name = "Material de entrega " + "com nome extenso ".repeat(6) + randomUUID().slice(0, 8);
   const f = await setup({ catalogue: [{ name, category: "medicamentos", unit: "unidade", aliases: [] }] });
   await login(page, f.patient); const before = facts(f.patient), writes = watchWrites(page, false, true);
   await page.goto("/fichas/ent");
+  await expect(page.getByRole("region", { name: "Escolha do recebedor", exact: true })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: /origem/i })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Atualizar pessoas e escala", exact: true })).toHaveCount(0);
   const response = await page.request.get(`/api/documents/delivery-preparation?careRecipientId=${f.patient}&source=FAMILY`);
   expect(response.ok()).toBe(true);
   const person = ((await response.json()).data.people as { id: string; name: string }[]).find(p => p.id === fixtures.professional.id);
@@ -72,6 +76,9 @@ test("06.2 ENT selection and complete readonly review follow the model without s
   const lab = pathToFileURL(resolve("hca-laboratorio-02-v7.html")).href;
   try {
     await model.goto(lab + "#E06-01/materials");
+    const referenceSwitch = model.getByRole("switch", { name: "Incluir Dipirona 500 mg", exact: true });
+    await referenceSwitch.click();
+    await expect(referenceSwitch).toHaveAttribute("aria-checked", "true");
     const selected = model.locator("#product-app .material-list .material-row:not(.unselected)").first();
     const card = page.locator(".hca-material-choice").filter({ has: checkbox });
     for (const width of widths) {
@@ -80,6 +87,14 @@ test("06.2 ENT selection and complete readonly review follow the model without s
         await model.setViewportSize({ width, height: 900 });
         for (const property of ["background-color", "border-radius", "padding-top", "padding-left"] as const)
           await expect(card).toHaveCSS(property, await selected.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+        const amount = card.locator(".hca-wizard-stock-input");
+        const referenceAmount = selected.locator(".quantity-control");
+        for (const property of ["border-radius", "min-height", "background-color"] as const)
+          await expect(amount).toHaveCSS(property, await referenceAmount.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+        const toolbar = page.locator(".hca-wizard-material-toolbar");
+        const count = (await toolbar.getByRole("status").boundingBox())!;
+        const itemExtra = (await toolbar.getByRole("button", { name: "Item extra", exact: true }).boundingBox())!;
+        expect(Math.abs(count.y + count.height / 2 - itemExtra.y - itemExtra.height / 2)).toBeLessThan(2);
       }
       await expect(page.getByLabel("Quantidade — " + name, { exact: true })).toHaveValue("12");
       await auditFromTop(page, "canonical ENT selection " + width);

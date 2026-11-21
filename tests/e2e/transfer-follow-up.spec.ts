@@ -56,8 +56,10 @@ async function command(client: Fixture["admin"], doc: SupplyDocument, action: st
 async function declareInUi(page: Page, f: Fixture, source: Custody, info: TestInfo) {
   const label = source === "CARE_TEAM" ? "devolução" : "entrega";
   await page.goto(source === "CARE_TEAM" ? "/fichas/devolucao" : "/transferencias");
-  if (source === "FAMILY") await page.getByRole("combobox", { name: /^Custódia de origem/ }).selectOption(source);
-  await page.getByRole("button", { name: source === "CARE_TEAM" ? "Preparar devolução" : "Preparar declaração", exact: true }).click();
+  if (source === "FAMILY") {
+    await page.getByRole("combobox", { name: /^Custódia de origem/ }).selectOption(source);
+    await page.getByRole("button", { name: "Preparar declaração", exact: true }).click();
+  }
   const drawer = page.getByRole("region", { name: `Nova ${label}`, exact: true });
   await expect(drawer.getByRole("combobox", { name: /^Contraparte para concordância/ })).toHaveCount(0);
   const reason = "Pessoa indicada está disponível para conferir os materiais.";

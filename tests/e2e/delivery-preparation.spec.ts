@@ -64,6 +64,7 @@ const explanation = (page: Page) =>
     exact: true,
   });
 async function finish(page: Page) {
+  await expect(page.locator(".hca-supply-wizard-status")).toHaveText("Último rascunho salvo.");
   const pending = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname === "/api/documents" &&

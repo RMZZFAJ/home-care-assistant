@@ -27,14 +27,15 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
   await page.getByRole("navigation", { name: "Rotina e funções autorizadas", exact: true }).getByRole("link", { name: /Nova devolução de materiais/ }).click();
   await expect(page).toHaveURL(/\/fichas\/devolucao$/);
   await expect(page.getByRole("heading", { name: "Nova devolução", level: 1, exact: true })).toBeVisible();
+  const editor = page.getByRole("region", { name: "Nova devolução", exact: true });
+  await expect(editor).toBeVisible();
+  await expect(page.getByRole("button", { name: "Preparar devolução", exact: true })).toHaveCount(0);
   await expect(page.getByRole("combobox", { name: /^Custódia de origem/ })).toHaveCount(0);
   for (const width of [1440, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 940 });
-    await page.getByRole("button", { name: "Preparar devolução", exact: true }).focus();
+    await editor.getByRole("button", { name: /^(Alterar|Escolher) recebedor$/ }).focus();
     await audit(page, "autonomous-return-entry-" + width);
   }
-  await page.getByRole("button", { name: "Preparar devolução", exact: true }).click();
-  const editor = page.getByRole("region", { name: "Nova devolução", exact: true });
   await expect(editor.getByRole("combobox", { name: /^Contraparte para concordância/ })).toHaveCount(0);
   const selectionReason = "A pessoa da família estará presente para receber a devolução.";
   await selectReturnRecipient(page, f.recipient.id, selectionReason);
@@ -57,7 +58,7 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
   await editor.getByLabel("Observação 2", { exact: true }).fill(packaging);
   expect((await saved).ok()).toBe(true);
   expect(transferState(f)).toBe(before);
-  await page.reload(); await page.getByRole("button", { name: "Preparar devolução", exact: true }).click();
+  await page.reload();
   await page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true }).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await editor.getByRole("button", { name: "Comparar referência atual", exact: true }).click();
   await editor.getByRole("button", { name: "Adotar referência atual e revisar meus campos", exact: true }).click();

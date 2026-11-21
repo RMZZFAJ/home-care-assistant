@@ -452,33 +452,25 @@ function PatientRequisition({
       openStockReview(false);
       return;
     }
-    const savedDraft = !frozenRef.current ? await privateDraft.save(structuredClone(draftContent)) : null;
-    if (!frozenRef.current && !savedDraft) return;
-    if (!frozenRef.current)
-      frozenRef.current = {
-        ...form,
-        ...(savedDraft
-          ? { draftCommit: { id: savedDraft.id, revision: savedDraft.revision } }
-          : {}),
-        careRecipientId: context.patient!.id,
-        idempotencyKey: crypto.randomUUID(),
-      };
-    try {
-      sessionStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          savedAt: Date.now(),
-          form,
-          intent: frozenRef.current,
-        }),
-      );
-    } catch {
-      /* Retained in memory. */
-    }
     setSaving(true);
     setError("");
     try {
+      if (!frozenRef.current) {
+        const savedDraft = await privateDraft.save(structuredClone(draftContent));
+        if (!savedDraft) return;
+        frozenRef.current = {
+          ...form,
+          draftCommit: { id: savedDraft.id, revision: savedDraft.revision },
+          careRecipientId: context.patient!.id,
+          idempotencyKey: crypto.randomUUID(),
+        };
+      }
       const intent = frozenRef.current;
+      try {
+        sessionStorage.setItem(storageKey, JSON.stringify({ savedAt: Date.now(), form, intent }));
+      } catch {
+        /* Retained in memory. */
+      }
       let issuedId: string | undefined;
       if (uncertain && intent.draftCommit) {
         const resolution = await reconcileIssuance(context.patient!.id, intent.draftCommit, intent.idempotencyKey);
@@ -869,9 +861,9 @@ function PatientRequisition({
             blocked={loadingCatalog || Boolean(catalogError) || Boolean(sourceId && !sourceReady)}
             onBack={() => {
               issuanceFailure.clear();
-              const previous = currentCategory && adjacentMaterialCategory(currentCategory, products, "previous");
+              const previous = (currentCategory || step === 4) && adjacentMaterialCategory(currentCategory, products, "previous");
               if (previous) openCategory(previous);
-              else setStep(step === 4 ? materialCategories.length : stageStart[stage - 1]);
+              else setStep(stageStart[stage - 1]);
             }}
             onNext={() => {
               if (!validate() || step === 0 && householdSelectionRef.current?.apply() === false) return;

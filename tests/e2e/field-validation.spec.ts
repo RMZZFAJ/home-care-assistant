@@ -176,6 +176,16 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
     await route.continue();
   });
   const opening = page.waitForRequest(request => /\/api\/requisitions\/[^/]+\/opening$/.test(new URL(request.url()).pathname), { timeout: 65_000 });
+  await expect(footer.getByRole("status")).toHaveText("Último rascunho salvo.");
+  const finalSaveGate = Promise.withResolvers<void>();
+  const finalSaveReached = Promise.withResolvers<void>();
+  await page.route("**/api/drafts", async route => {
+    const request = route.request();
+    if (request.method() !== "POST" || request.postDataJSON().action !== "save") return route.fallback();
+    finalSaveReached.resolve();
+    await finalSaveGate.promise;
+    await route.continue();
+  });
   await page.evaluate(() => {
     let sawDynamic = false;
     const observer = new MutationObserver(() => {
@@ -187,12 +197,18 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   });
   try {
     await confirm.click();
+    await finalSaveReached.promise;
+    await expect(page.getByRole("list", { name: "Etapas da operação" })).toBeVisible();
+    await expect(footer.locator(".hca-supply-wizard-status")).toHaveText("");
+    expect(commands).toBe(0);
+    finalSaveGate.resolve();
     await opening;
     await expect(page.getByRole("list", { name: "Etapas da operação" })).toBeVisible();
     await expect(page.locator(".hca-activity-overlay .activity-card:not(.activity-dynamic)")).toHaveCount(0);
     await expect(page.getByText(/Seu rascunho privado/)).toHaveCount(0);
     await expect(page.locator(".hca-supply-wizard-status").filter({ hasText: /rascunho|alterações a salvar/i })).toHaveCount(0);
   } finally {
+    finalSaveGate.resolve();
     openingGate.resolve();
   }
   const issued = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
@@ -218,6 +234,9 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await expect(issued).toHaveCount(0);
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByText("Cadastro pendente", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ciência familiar", exact: true })).toHaveCount(0);
+  await page.getByRole("tab", { name: "Visão geral", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Ciência familiar", exact: true })).toBeVisible();
   await selectDocumentSection(page, "files");
   await page.locator("summary").filter({ hasText: "Comprovante oficial" }).click();
   await expect(page.getByRole("button", { name: "Imprimir / salvar como PDF", exact: true })).toBeVisible();

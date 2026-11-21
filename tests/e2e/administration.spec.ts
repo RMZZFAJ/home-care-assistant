@@ -643,6 +643,7 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(extra).toHaveCount(0);
     const gaze = page.locator(".hca-wizard-material").filter({ has: page.getByRole("checkbox", { name: "Gaze", exact: false }) });
     await expect(gaze.getByLabel("Estoque atual · pacote", { exact: true })).toHaveValue("3");
+    await expect(gaze.locator("label.hca-wizard-material-urgent")).toHaveCSS("color", "rgb(157, 48, 67)");
     await next.click();
     const diet = page.getByRole("button", { name: /^Dieta/, pressed: true });
     await expect(diet).toBeVisible();
@@ -708,5 +709,25 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(issued).toBeVisible({ timeout: 65_000 });
     const pdf = await page.request.get((await issued.getByRole("link", { name: "Baixar PDF", exact: true }).getAttribute("href"))!);
     expect(pdf.status()).toBe(200);
+    const retiredByAnotherTab = Promise.withResolvers<void>();
+    await page.route("**/api/drafts", async route => {
+      const request = route.request();
+      if (request.method() !== "POST" || request.postDataJSON().action !== "acknowledge") return route.continue();
+      const otherTab = await route.fetch({ postData: { ...request.postDataJSON(), idempotencyKey: randomUUID() } });
+      try {
+        expect(otherTab.ok(), await otherTab.text()).toBe(true);
+        const stale = await route.fetch();
+        expect(stale.status()).toBe(409);
+        await route.fulfill({ response: stale });
+        retiredByAnotherTab.resolve();
+      } catch (reason) {
+        retiredByAnotherTab.reject(reason);
+        throw reason;
+      }
+    });
+    await page.goto(`/fichas/req?careRecipientId=${patientId}`);
+    await retiredByAnotherTab.promise;
+    await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toBeEnabled();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
   });
 });

@@ -418,6 +418,14 @@ export function useCreationDraft({
       return result;
     } catch (reason) {
       if (current !== generationRef.current) return;
+      if (packet.action === "acknowledge" && reason instanceof ApiError && reason.code === "DRAFT_VERSION_CONFLICT") {
+        // Another session may have already retired this result and started a draft.
+        // Read the current slot before offering to resume anything.
+        forgetPending();
+        setLoading(true);
+        setAttempt(value => value + 1);
+        return;
+      }
       const known =
         reason instanceof ApiError &&
         [400, 401, 403, 404, 409, 413, 422].includes(reason.status);
