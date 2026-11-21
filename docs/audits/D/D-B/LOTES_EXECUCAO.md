@@ -229,7 +229,7 @@ dirigida nas mesmas telas e operações da aplicação.
 - **E06-05.** A confirmação incerta preserva a referência da tentativa.
   A recuperação verifica a expedição registrada com a mesma identidade e
   confere que não houve segunda saída de estoque.
-  [Testes de recuperação da ENT](../../../../tests/e2e/supply-private-drafts.spec.ts) e
+  [Recuperação da ENT](../../../../tests/e2e/supply-private-drafts.spec.ts) e
   [da transferência](../../../../tests/e2e/transfer-declaration-private-drafts.spec.ts).
 - **E06-07.** O diálogo de confirmação mostra a falta e o excedente nas
   linhas alteradas. A conferência conserva quantidades, suficiência e efeitos
@@ -238,7 +238,7 @@ dirigida nas mesmas telas e operações da aplicação.
 - **E06-17.** Perder capacidade de escrita mantém o preenchimento disponível
   para consulta autorizada. Revogar o acesso à residência retira seus dados
   da tela, inclusive se uma leitura anterior chegar atrasada.
-  [Teste da consulta privada](../../../../tests/e2e/supply-private-drafts.spec.ts) e
+  [Consulta privada](../../../../tests/e2e/supply-private-drafts.spec.ts) e
   [teste da revogação](../../../../tests/e2e/document-access.spec.ts).
 
 **Autorização do planejamento da COM.** Em E05-06, o diálogo apresenta
