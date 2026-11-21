@@ -257,6 +257,34 @@ conferiu a revisão e expediu após identificar o material. As capturas e o
 relatório estão em `output/playwright/l2-review-v7-233c9dfa/`. Este ajuste
 usa os contratos e as migrations existentes.
 
+**Verificação da CI de `558d49b7`.** Windows, Ubuntu, banco com 832 casos,
+SonarCloud e a prévia de desenvolvimento passaram. Os seis grupos de
+navegador terminaram com 1.668 aprovações de primeira, sete falhas
+persistentes distribuídas em três casos e duas aprovações na segunda
+tentativa. [Execução 44926343700][l2-ci-44926343700].
+
+- Na ENT, o teste agora consulta o rótulo Recebedor físico na revisão e
+  preserva a verificação de que o profissional da escala não pode receber
+  em nome da pessoa escolhida.
+- Na REQ, os controles da revisão ficam lado a lado no desktop e têm
+  espaço de rolagem acima do rodapé. A auditoria de acessibilidade
+  preserva a verificação em quatro larguras.
+- O teste do histórico pessoal aceita o aviso de acesso negado quando a
+  revogação remove o painel, verifica que os registros saíram da tela e
+  mantém a prova de recusa pela API.
+- Os dois testes que passaram na segunda tentativa agora respeitam o
+  estado de abertura dos preenchimentos privados e esperam o resultado
+  da expedição antes de sair da ENT.
+
+Os cinco casos dirigidos passaram de primeira em Chromium, Android e iOS
+emulados. Os relatórios locais estão em
+`output/playwright/l2-ci-44926343700-*` e
+`output/playwright/l2-ci-44926343700/ios2-fixes/`. A CI e o SonarCloud
+precisam validar o novo conjunto no SHA publicado. Nenhuma migration
+foi acrescentada.
+
+[l2-ci-44926343700]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44926343700
+
 **Autorização do planejamento da COM.** Em E05-06, o diálogo apresenta
 a identificação da ficha, a quantidade solicitada e um interruptor por
 material. A quantidade autorizada aparece junto da unidade. O menu de

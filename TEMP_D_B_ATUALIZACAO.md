@@ -1,5 +1,13 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — correções dirigidas após a CI de `558d49b7`.** Os seis grupos
+de navegador terminaram. Corrigimos o acesso ao menu da revisão da REQ
+em desktop e os testes de recebedor, revogação de acesso à agenda,
+recuperação de preenchimento e navegação após a expedição da ENT. Os
+quinze testes dirigidos passaram de primeira em Chromium, Android e iOS
+emulados. A aprovação remota depende do próximo SHA. A rodada usa as
+migrations existentes. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — revisão dos assistentes de L2 no celular.** REQ, COM, ENT e DEV
 usam os títulos, a introdução e os quatro dados de identificação da v7.
 A REQ informa o efeito da emissão sobre o estoque da equipe. Os oito casos
