@@ -26,7 +26,7 @@ test("resultado confirmado permanece acessível quando a consulta do rascunho co
   const f = await declarationDraftFixture("CARE_TEAM");
   await login(page, f);await open(page, "CARE_TEAM");await fill(page, f, "2");
   const before = JSON.parse(declarationFacts(f));
-  let release!: () => void, consumedReads = 0, posts = 0;
+  let release!: () => void, consumedReads = 0, settledReads = 0, posts = 0;
   const gate = new Promise<void>(resolve => { release = resolve; });
   page.on("request", request => {
     if (request.method() === "POST" && new URL(request.url()).pathname === "/api/transfers") posts++;
@@ -35,20 +35,23 @@ test("resultado confirmado permanece acessível quando a consulta do rascunho co
     if (route.request().method() !== "GET" || new URL(route.request().url()).searchParams.get("careRecipientId") !== f.patient)
       return route.continue();
     const response = await route.fetch(), body = await response.json();
-    if (body.data?.state === "consumed") { consumedReads++;await gate; }
-    return route.fulfill({ response, json: body });
+    if (body.data?.state !== "consumed") return route.fulfill({ response, json: body });
+    consumedReads++;
+    await gate;
+    try {
+      await route.fulfill({ response, json: body });
+    } finally {
+      // Navigation may cancel the old request before the held reply is delivered.
+      settledReads++;
+    }
   });
   try {
     await editor(page).getByRole("button", { name: "Revisar ficha", exact: true }).click();
     await editor(page).getByRole("button", { name: "Expedir devolução", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Devolução expedida", exact: true })).toBeVisible();
     await expect.poll(() => consumedReads).toBeGreaterThan(0);
-    const consumed = page.waitForResponse(async response => {
-      const url = new URL(response.url());
-      return url.pathname === "/api/drafts" && url.searchParams.get("careRecipientId") === f.patient
-        && response.request().method() === "GET" && (await response.json()).data?.state === "consumed";
-    });
-    release();await (await consumed).finished();
+    release();
+    await expect.poll(() => settledReads).toBeGreaterThan(0);
     await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
     await expect(page.getByRole("dialog", { name: "Resultado anterior confirmado", exact: true })).toHaveCount(0);
     const result = page.getByRole("dialog", { name: "Devolução expedida", exact: true });
@@ -479,12 +482,8 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
           preparations++;
       });
       await recover(page, source);
-      await expect(
-        dialog(page).getByRole("button", {
-          name: "Começar novo preenchimento",
-          exact: true,
-        }),
-      ).toBeEnabled();
+      const recovered = dialog(page).getByRole("link", { name: "Abrir ficha concluída", exact: true });
+      await expect(recovered).toHaveAttribute("href", `/documentos/${document!.id}`);
       await expect(dialog(page).getByRole("textbox")).toHaveCount(0);
       await expect(
         dialog(page).getByRole("button", {
@@ -504,7 +503,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       expect(row.data.targetDocumentId).toBeNull();
       await dialog(page)
         .getByRole("button", {
-          name: "Começar novo preenchimento",
+          name: "Reconhecer declaração registrada",
           exact: true,
         })
         .click();

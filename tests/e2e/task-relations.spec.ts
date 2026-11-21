@@ -81,9 +81,12 @@ test("relação REQ para ENT abre fatos de expedição em leitura, recupera cons
   await selectDocumentSection(page, "materials");
   expect((await sourceOpening).status()).toBe(200);
   await expect(page.locator(".doc-macro-segment[title^=Atendimento] > i")).toHaveAttribute("style", "width: 0%;");
-  const open = page.getByRole("button", { name: f.ent.code, exact: true });
+  const material = page.getByRole("button", { name: "Detalhes de Material fictício V4 0 · Urgente", exact: true });
+  await material.click();
+  const materialPanel = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
+  const open = materialPanel.getByRole("button", { name: f.ent.code, exact: true });
   await expect(open).toBeVisible();
-  await expect(page.getByRole("cell").filter({ has: open })).toContainText("Quantidade aceita para este item: 2 unidade");
+  await expect(open).toContainText("Quantidade aceita para este item: 2 unidade");
   const response = await page.request.get(`/api/documents/${f.ent.id}`); expect(response.status()).toBe(200);
   const body = await response.json();
   await info.attach("related-read-shape", { body: JSON.stringify({ type: body.data.type, lineTypes: Object.fromEntries(Object.entries(body.data.lines[0]).map(([name, value]) => [name, Array.isArray(value) ? "array" : value === null ? "null" : typeof value])) }), contentType: "application/json" });
@@ -95,7 +98,7 @@ test("relação REQ para ENT abre fatos de expedição em leitura, recupera cons
   const beforeOpenings = await openingHistory();
   let writes = 0;
   page.on("request", request => { if (/^\/api\/(documents|requisitions|stock|balances)/.test(new URL(request.url()).pathname) && request.method() !== "GET") writes++; });
-  await open.click(); const dialog = page.getByRole("dialog").filter({ visible: true }); await expect(dialog).toHaveCount(1);
+  await open.click(); const dialog = page.getByRole("dialog", { name: f.ent.code, exact: true }); await expect(dialog).toBeVisible();
   await expect(dialog.getByText("Expedido", { exact: true })).toBeVisible();
   await expect(dialog).toContainText("10 un"); await expect(dialog.getByText("Aceito", { exact: true })).toBeVisible();
   await expect(dialog.locator("input,textarea,select,[aria-invalid]")).toHaveCount(0);

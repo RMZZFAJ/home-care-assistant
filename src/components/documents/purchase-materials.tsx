@@ -98,10 +98,13 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
       const entered = current?.validatedQuantity ?? line.accepted_quantity;
       const hasPending = decision?.tone === "pending" || decimal(current?.pendingValidationQuantity ?? 0).gt(0);
       const done = decimal(entered).gt(0) && decimal(entered).gte(line.approved_quantity) && !hasPending;
+      const shortageClosed = Boolean(current && !hasPending && !done
+        && decimal(current.closedShortQuantity ?? 0).gt(0)
+        && decimal(current.unarrivedQuantity).isZero() && decimal(current.remainingExpectation).isZero());
       const arrived = current
         ? formatQuantity(decimal(entered).plus(current.pendingValidationQuantity).plus(arrival?.correctionQuantity ?? 0).toFixed())
         : "Não informado neste registro";
-      const status = hasPending ? "Em conferência" : done ? "Entrada aprovada"
+      const status = shortageClosed ? "Falta encerrada" : hasPending ? "Em conferência" : done ? "Entrada aprovada"
         : Number(entered) > 0 ? "Entrada parcial" : Number(line.purchased_quantity) > 0 ? "Aguardando chegada"
           : Number(line.approved_quantity) > 0 ? "Autorizado" : "Em avaliação";
       const detail = [
@@ -120,14 +123,15 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
         { label: "Saldo após última entrada", value: balances.valid
           ? <EntryBalance fact={balances.facts.find(fact => fact.lineId === line.id)} unit={line.unit_snapshot} receipts={data.receipts} /> : "Saldo não conferido" },
       ];
-      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, done,
-        ...(decision ?? { status, tone: done ? "success" : hasPending || decimal(entered).gt(0) ? "pending" : "neutral" }),
+      const currentDecision = shortageClosed ? undefined : decision;
+      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, done, pending: !done && !shortageClosed,
+        ...(currentDecision ?? { status, tone: done ? "success" : hasPending || !shortageClosed && decimal(entered).gt(0) ? "pending" : "neutral" }),
         related: data.originDocuments?.filter(origin => origin.productIds.includes(line.product_id)).map(origin => ({
           document: { id: origin.documentId, type: origin.type, code: origin.code },
           detail: "Origem vinculada a este material",
         })),
         facts: [{ label: "Pedido / autorizado", value: `${formatQuantity(line.quantity)} / ${formatQuantity(line.approved_quantity)}` },
-          { label: "Comprado", value: formatQuantity(line.purchased_quantity) },
+          { label: data.payload.origin === "donation" ? "Doado" : "Comprado", value: formatQuantity(line.purchased_quantity) },
           { label: "Chegou / entrou", value: `${arrived} / ${formatQuantity(entered)}` }],
         detail: <>
           {decision ? <p><strong>{decision.status}</strong>{decision.statusDetail ? <> · {decision.statusDetail}</> : null}</p> : null}

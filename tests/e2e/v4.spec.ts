@@ -175,7 +175,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     await justification.fill("Necessidade revisada após consulta contextual");
     await family.getByRole("link").filter({ hasText: receipt.code }).click();
     await family.getByRole("dialog", { name: "Ciência antes de abrir a requisição", exact: true }).getByRole("button", { name: "Confirmar ciência e abrir", exact: true }).click();
-    await selectDocumentSection(family, "workflow");
+    await selectDocumentSection(family, "overview");
     await expect(
       family.getByText("Confirmação em diálogo antes de abrir", { exact: false }),
     ).toBeVisible({ timeout: 15000 });
@@ -189,7 +189,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
       pro.getByRole("checkbox", { name: /Material V4 visual/ }),
     ).toBeChecked();
     await pro.goto("/historico/" + receipt.requisitionId);
-    await selectDocumentSection(pro, "workflow");
+    await selectDocumentSection(pro, "overview");
     await expect(
       pro.getByText("Confirmação em diálogo antes de abrir", { exact: false }),
     ).toBeVisible();

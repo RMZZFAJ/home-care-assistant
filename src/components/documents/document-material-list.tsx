@@ -21,6 +21,7 @@ export type DocumentMaterialRow = {
   tone: "neutral" | "pending" | "success" | "danger";
   urgent?: boolean;
   done: boolean;
+  pending?: boolean;
   facts: { label: string; value: ReactNode }[];
   detail?: ReactNode;
   related?: { document: LinkedMaterialDocument; detail: ReactNode }[];
@@ -124,7 +125,7 @@ export function DocumentMaterialList({
   function matches(row: DocumentMaterialRow, value: Filter) {
     switch (value) {
       case "urgent": return Boolean(row.urgent);
-      case "pending": return !row.done;
+      case "pending": return row.pending ?? !row.done;
       case "done": return row.done;
       case "routine": return !row.urgent;
       default: return true;

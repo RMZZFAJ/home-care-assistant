@@ -555,6 +555,7 @@ test("rascunho anterior conserva 0 e 7 para revisão sem classificá-los como ob
     },
   );
   await page.reload();
+  await page.getByRole("dialog").getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await hygiene(page);
   for (const [index, line] of lines.entries()) {
     await expect(

@@ -19,7 +19,7 @@ import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 
-test("Abas comparam os tokens L1 na mesma área de leitura em cinco larguras", async ({ page, browser }, info) => {
+test("Abas comparam os tokens L1 e preservam o espaço para o menu L2 em cinco larguras", async ({ page, browser }, info) => {
   const f = await setup(), req = await issue(f.patient, f.products);
   await login(page, f.patient);
   await page.goto(`/documentos/${req.id}`);
@@ -32,7 +32,7 @@ test("Abas comparam os tokens L1 na mesma área de leitura em cinco larguras", a
     await model.locator("#product-app").getByRole("tab", { name: /^Materiais/ }).click();
     const pairs: [string,string,string[]][] = [
       [".hca-document-header", ".doc-hero", ["background-color","border","border-radius","box-shadow","overflow"]],
-      [".hca-document-identity", ".doc-hero-top", ["display","gap","align-items","justify-content","padding","flex-direction"]],
+      [".hca-document-identity", ".doc-hero-top", ["display","gap","align-items","justify-content","padding-block-start","padding-block-end","padding-inline-start","flex-direction"]],
       [".hca-document-name", ".doc-hero-name", ["display","gap","align-items","min-width"]],
       ["[data-document-heading]", ".doc-hero-name h1", ["font-size","font-weight","line-height","letter-spacing","color"]],
       [".hca-document-header .hca-document-type", ".doc-kind", ["display","width","height","border-radius","background-color","color","font-size","font-weight"]],
@@ -55,6 +55,19 @@ test("Abas comparam os tokens L1 na mesma área de leitura em cinco larguras", a
       expect(await model.locator("#product-app .doc-page").evaluate(el => el.getBoundingClientRect().width)).toBeCloseTo(readingWidth, 1);
       for (const [actual, expected, keys] of pairs)
         expect(await page.locator(actual).first().evaluate(styles,keys), actual+" "+width).toEqual(await model.locator("#product-app "+expected).first().evaluate(styles,keys));
+      // L2 adds a three-dot menu to the header and reserves its own inline space.
+      const header = page.getByRole("region", { name: "Resumo da ficha", exact: true });
+      const menu = header.getByRole("button", { name: "Mais opções da ficha", exact: true });
+      await expect(menu).toBeVisible();
+      const [identity, tags, menuBox] = await Promise.all([
+        header.locator(".hca-document-name").boundingBox(),
+        header.locator(".hca-document-tags").boundingBox(),
+        menu.boundingBox(),
+      ]);
+      if (!identity || !tags || !menuBox) throw new Error(`Missing document header bounds at ${width}px`);
+      expect(identity.x + identity.width).toBeLessThanOrEqual(menuBox.x);
+      expect(tags.x + tags.width).toBeLessThanOrEqual(menuBox.x);
+      await menu.click({ trial: true });
       // Later owner comments supersede the reference's separate workflow tab.
       await expect(page.getByRole("tab", {name:"Atendimento",exact:true})).toHaveCount(0);
       await expect(page.getByRole("tab", {name:"Histórico",exact:true})).toHaveCount(0);

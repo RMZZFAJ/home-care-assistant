@@ -663,7 +663,7 @@ test("histórico filtra código e período e conserva o documento de paciente re
     page.getByRole("region", { name: "Resumo da ficha", exact: true }).getByText(req.recipientName, { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Observação original", { exact: true }),
+    page.getByRole("tabpanel", { name: "Visão geral", exact: true }).getByText("Observação original", { exact: true }),
   ).toBeVisible();
   const recovered = await page.request.post("/api/requisitions", {
     data: {

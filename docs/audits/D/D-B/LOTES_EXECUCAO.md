@@ -1431,9 +1431,9 @@ continua sem regra de produto nesta entrega.
 
 Consulta de 21/11/2026 à stack local `home-care-assistant` e ao Supabase de
 desenvolvimento vinculado `qwfrqychokvhdzakibid`. Os bancos compartilham
-**318 versões**, com 242 versões anteriores a L1, 18 de L1 e 58 de L2.
+**319 versões**, com 242 versões anteriores a L1, 18 de L1 e 59 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
-A fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
+A fila vinculada está vazia. Produção fica fora desta consulta.
 
 ### L1 — Aplicadas no local e no desenvolvimento
 
@@ -1459,7 +1459,14 @@ A fila de aplicação vinculada está vazia. Produção fica fora desta consulta
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
 `20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`,
 `20261120231639`, `20261121014430`, `20261121063729`, `20261121075902`,
-`20261121103655`, `20261121111215`.
+`20261121103655`, `20261121111215`, `20261121140535`.
+
+`20261121140535` usa a autorização de leitura da REQ na consulta de vínculos
+quando o paciente está inativo. A integração local com Auth confirmou a
+leitura e a recusa após remover `req.read`. No desenvolvimento, o ensaio
+com rollback confirmou execução restrita a `authenticated`. O backup
+cifrado `6bc87c6f-7fe2-4f5d-95bd-8e1671f114e5` foi verificado antes da
+aplicação. O histórico após a aplicação coincide com os arquivos locais.
 
 `20261121111215` acrescenta a leitura dos próximos plantões da equipe na
 ENT sem alterar o formato da consulta anterior ou o identificador da
@@ -1619,6 +1626,82 @@ correção de chegada e quantidade identificada pelo nome acessível completo.
 O manifesto confirmou as 84 migrations protegidas.
 
 ## Estado de publicação e próximos lotes
+
+### Verificação do candidato de L2 em 21/11
+
+O commit `9297ed38` mantém o código de produto de `18819b44`. As duas
+mudanças são no teste local de backup e na automação da expedição da ENT.
+O teste de backup usa um limite de 20 segundos para o caso que sela,
+verifica e extrai arquivos reais. A validação Windows anterior interrompeu
+esse caso ao atingir cinco segundos, com os outros 1.122 testes aprovados.
+No Windows local passaram sete testes dos dois arquivos de backup e os
+cinco casos do arquivo alterado na repetição dirigida.
+[Job Windows anterior](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44904833625/job/136848146714).
+
+No build local de `18819b44`, Android e iOS emulados passaram pela DEV
+autônoma, pela resolução das pendências da COM e pela navegação de Mais
+até os Andamentos privados de L1. A jornada REQ → COM → ENT parcial → BAL
+passou no Android. A primeira tentativa no iOS ficou na revisão da ENT.
+A conferência local encontrou a REQ e a COM já registradas e nenhuma ENT.
+Na repetição dirigida, o teste aguardou o rascunho salvo e usou toque nativo.
+Passaram a jornada até o BAL e o caso com avaliação parcial na ENT.
+Relatórios em `output/playwright/l2-candidate-18819b44/`.
+
+As oito integrações dirigidas de `9297ed38` usaram Auth real no banco
+local. Uma contagem posterior de REQ ou BAL preservou o saldo e impediu a
+reversão antiga, inclusive quando a contagem posterior não gerou movimento.
+Na ENT e na DEV, o excedente declarado ficou em apuração. O crédito se
+limitou ao recebimento reconhecido dentro do expedido. O extra sem
+identificação foi retomado no rascunho e bloqueou a expedição. A COM mista permitiu
+comprar e receber a linha identificada, preservando a pendência do extra.
+Esses resultados verificam os limites vigentes enquanto as decisões de
+P1, P2 e dos extras em ENT/DEV seguem abertas.
+Log em `output/playwright/l2-candidate-9297ed38/reserved-stock-integration.log`.
+
+As 318 versões até `20261121111215` coincidem no repositório, na stack
+local e no desenvolvimento. O contrato retornado pelo banco de
+desenvolvimento coincide com `protocol: 1` e `schema: 2` da aplicação.
+O SHA-256 do laboratório confere com o comando mestre. A instalação limpa,
+a evolução legada e as validações de Windows e Ubuntu passaram na CI
+desse SHA. O Windows aprovou os 1.123 testes unitários, incluindo os cinco
+de backup. No Ubuntu, 1.122 passaram e um caso específico de Windows foi
+ignorado em `trusted-executable.test.ts`. SonarCloud passou.
+A Vercel confirmou o preview no mesmo commit. A consulta com
+autenticação da Vercel obteve o HTML da aplicação em `/login` e
+`/recuperar-senha`. As jornadas com Auth do aplicativo foram exercitadas
+localmente. As 832 integrações da CI passaram, sem casos ignorados.
+Chromium, Android emulado e iOS emulado passaram pela preparação e pelo
+teste de partida do navegador nos seis grupos. Todos chegaram ao comando
+E2E. A execução terminou com falha. Android 1 registrou 278 aprovações e
+duas falhas persistentes. Chromium 2, Android 2 e iOS 2 registraram 265
+aprovações e 14 falhas persistentes cada. iOS 1 registrou 277 aprovações e
+três falhas persistentes. Chromium 1 atingiu o limite do job após registrar
+duas falhas persistentes e uma aprovação na repetição. Esse caso de COM
+falhou na seleção da aba Materiais na primeira tentativa.
+
+A DEV ainda era testada com uma tarefa de concordância da contraparte, e
+o teste de cabeçalho esperava o espaçamento de L1 antes do menu de três
+pontos autorizado em L2. Após as correções, esses dois casos passaram
+localmente nos três projetos de navegador, sem repetição. A rodada inicial
+dos 14 casos do Chromium 2 aprovou dez. A rodada final aprovou 16 casos
+dirigidos sem retry em Chromium, Android e iOS emulados. Ela incluiu os
+quatro retestes, a COM que passou na repetição da CI, a recuperação na
+agenda e as auditorias móveis de REQ e ENT. O primeiro arranque dessa
+rodada parou antes dos casos na consulta local ao Supabase. A repetição
+usou a mesma instância, sem reset. Build, tipos, lint dirigido e guard de
+84 migrations históricas passaram.
+
+A COM passou a identificar falta encerrada sem contabilizá-la como entrada
+ou pendência e a usar o rótulo Doado quando é esse o fato. A consulta
+explícita do último preenchimento em ENT/DEV mostra o resultado já
+registrado ao autor que perdeu a capacidade de expedir, sem repetir o ato.
+O início de novo preenchimento continua direto. O histórico de REQ viabiliza
+ler vínculos autorizados de pacientes inativos. As capturas e logs dirigidos
+estão em `output/playwright/l2-ci-44906482026-*`. A nova CI ainda precisa
+validar a instalação limpa, a evolução legada e a matriz de navegador.
+[Job Android 1](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44906482026/job/136858828652).
+[Preview da branch](https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app).
+[CI de `9297ed38`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44906482026).
 
 Na execução cancelada de `37ac93a9`, o Chromium e o WebKit encontraram
 duas ocorrências do texto de estoque desconhecido para uma única linha da

@@ -550,9 +550,7 @@ test("resource lost acknowledgement preserves another edition through completed 
       button(page, "Recuperar reconhecimento do resultado"),
     ).toBeVisible();
     await page.reload();
-    await page
-      .getByText("Meus preenchimentos privados da agenda", { exact: true })
-      .click();
+    await openSchedulePrivateArea(page);
     await expect(
       page.getByText("Resultado reconhecido", { exact: false }),
     ).toBeVisible();

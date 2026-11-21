@@ -1,5 +1,17 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — candidato de L2 publicado para revisão no celular.** A prévia
+da PR 7 e o SonarCloud passaram em `9297ed38`. A CI do mesmo SHA aprovou
+Windows, Ubuntu, instalação limpa, evolução legada e 832 integrações.
+Os seis grupos E2E chegaram aos testes de navegador. A CI terminou com
+falhas em cinco grupos e interrupção do Chromium 1. As correções passaram
+em rodadas dirigidas locais. A CI do novo commit ainda precisa concluir.
+As 319 versões de migrations conferem nos ambientes local e de
+desenvolvimento, incluindo a correção da consulta histórica da REQ.
+O roteiro para revisão, os resultados e as decisões
+sobre a contagem de REQ, o excedente e os extras de ENT/DEV ficam no
+[registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — estoque e urgência da REQ e consulta da avaliação na ENT.** A
 requisição agrupa a urgência, a justificativa e o estoque na ordem da v7.
 A ENT abre uma consulta da avaliação registrada na conciliação, com

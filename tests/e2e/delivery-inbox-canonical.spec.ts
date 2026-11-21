@@ -73,10 +73,19 @@ test("ENT-02 canonical task preserves recorded names,exact navigation and return
   } finally { await context.close(); }
 });
 
-test("ENT-02 autonomous return keeps three parties and suspends a stale task without inventing missing legacy names", async ({ page }) => {
+test("ENT-02 autonomous return preserves recorded parties and suspends a stale dispatch task", async ({ page, browser }) => {
   const f = await transferFixture(), created = await declareTransfer(f, { originDocumentId: null }); expect(created.response.error).toBeNull();
   const doc = created.response.data, declaration = doc.transfer.declaration;
-  await login(page, f.patient, f.counterparty.email); const before = facts(f.patient), posted = writes(page);
+  const inboxUrl = "/entregas?careRecipientId=" + f.patient;
+  const family = await browser.newContext();
+  try {
+    const familyPage = await family.newPage();
+    await login(familyPage, f.patient, f.counterparty.email);
+    await familyPage.goto(inboxUrl);
+    await expect(familyPage.getByText("Não há tarefa executável", { exact: false })).toBeVisible();
+    await expect(card(familyPage, doc.id)).toHaveCount(0);
+  } finally { await family.close(); }
+  await login(page, f.patient, f.initiator.email); const before = facts(f.patient), posted = writes(page);
   let mode = "live";
   await page.route("**/api/deliveries?*", async route => {
     if (mode === "error") return route.fulfill({ status: 503, json: { code: "UNAVAILABLE", error: "Tarefa atual não confirmada neste ensaio" } });
@@ -85,10 +94,11 @@ test("ENT-02 autonomous return keeps three parties and suspends a stale task wit
     return route.fulfill({ response, json: body });
   });
   try {
-    await page.goto("/entregas?careRecipientId=" + f.patient); const row = card(page, doc.id);
+    await page.goto(inboxUrl); const row = card(page, doc.id);
     await expect(row).toContainText("Devolução de materiais"); await expect(row).toContainText("Equipe → Família");
     await expect(row).toContainText(declaration.actor.name); await expect(row).toContainText(declaration.counterparty.name); await expect(row).toContainText(declaration.recipient.name);
     await expect(row.getByRole("link", { name: "Registro sem expedição", exact: true })).toBeVisible();
+    await expect(row).toContainText("Expedir materiais");
     const cta = row.getByRole("link", { name: "Abrir tarefa", exact: true }); await cta.focus(); mode = "error";
     await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await expect(page.getByRole("alert").filter({ hasText: "Tarefa atual não confirmada" })).toBeVisible(); await expect(cta).toHaveAttribute("aria-disabled", "true");

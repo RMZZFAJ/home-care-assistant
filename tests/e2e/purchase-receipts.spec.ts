@@ -340,7 +340,16 @@ test("COM registra a falta sem anunciar entrada quando nenhuma unidade chega", a
   await result.getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(page.getByText("Conferência registrada sem movimentação de estoque.", { exact: true })).toBeVisible();
   await expect(page.getByText(/Não foi possível conferir o saldo das entradas/)).toHaveCount(0);
-  await expect(page.getByText("Sem entrada validada", { exact: true }).first()).toHaveCount(1);
+  const material = page.getByRole("button", { name: "Detalhes de " + line.name_snapshot, exact: true });
+  await expect(material).toContainText("Falta encerrada");
+  await expect(material).toContainText("0 / 0");
+  const materials = page.getByRole("region", { name: "Materiais da compra ou doação", exact: true });
+  await materials.getByRole("button", { name: "Todos (1)", exact: true }).click();
+  await expect(materials.getByRole("button", { name: "Pendentes (0)", exact: true })).toBeVisible();
+  await expect(materials.getByRole("button", { name: "Recebidos (0)", exact: true })).toBeVisible();
+  await materials.getByRole("button", { name: "Todos (1)", exact: true }).last().click();
+  await material.click();
+  await expect(page.getByRole("dialog", { name: line.name_snapshot, exact: true }).getByText("Sem entrada validada", { exact: true })).toBeVisible();
   const read = await rpc(f.admin, "operational_document", { p_id: document.id });
   expect(read.receipts.find((receipt: { id: string }) => receipt.id === pending.receipts[0].id).state).toBe("approved");
   expect(Number(read.purchaseProgress.lines[0].closedShortQuantity)).toBe(6);

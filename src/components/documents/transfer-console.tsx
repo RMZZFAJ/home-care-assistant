@@ -880,6 +880,7 @@ function TransferDeclarationEditor({
       draft={privateDraft}
       current={currentContent}
       statusInFooter
+      showConsumedResult={consulting}
       onExitDraft={onClose}
       patientName={context.patient?.display_name ?? "Paciente selecionado"}
       authorName={context.fullName}

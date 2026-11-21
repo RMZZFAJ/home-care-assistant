@@ -16,7 +16,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { openDeliveryRecipient, recipientOption, selectDeliveryRecipient } from "./delivery-recipient";
-import { audit, auditFromTop } from "./accessibility-audit";
+import { auditFromTop } from "./accessibility-audit";
 import type { SupplyDocument } from "../../src/types/documents";
 
 test.setTimeout(150_000);
@@ -99,7 +99,7 @@ test("C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantid
     await expect(refresh).toBeEnabled(); await expect(material).toBeVisible(); await expect(refresh).toBeFocused();
   }
   expect(writes).toBe(0); expect(historyHashes(doc.id)).toBe(before); expect(ledger(f.patient)).toBe(stock);
-  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "immutable ENT read " + width); }
+  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await auditFromTop(page, "immutable ENT read " + width); }
 });
 
 test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto", async ({

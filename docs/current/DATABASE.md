@@ -1,5 +1,10 @@
 # Banco de dados
 
+Em 21/11/2026, a migration `20261121140535` levou o local e o
+desenvolvimento a 319 versões. A consulta de vínculos da REQ respeita a
+permissão de leitura também no histórico de pacientes inativos.
+[Inventário e verificação](../audits/D/D-B/LOTES_EXECUCAO.md#migrations-por-ambiente).
+
 Em 21/11/2026, a migration `20261121111215` levou o local e o
 desenvolvimento a 318 versões. A nova consulta do assistente da ENT
 acrescenta o próximo plantão publicado dos recebedores elegíveis.

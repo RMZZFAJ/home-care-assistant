@@ -65,8 +65,9 @@ function DraftMaterials({ content }: { content: CreationDraftContent | null }) {
 }
 
 /** One resume choice; exceptional concurrency/recovery retains its real controls. */
-export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você", documentLabel, exitHref, onExitDraft, legacy, ...props }: ComponentProps<typeof CreationDraftPanel> & {
+export function SimpleDraftPanel({ statusInFooter = false, showConsumedResult = false, authorName = "Você", documentLabel, exitHref, onExitDraft, legacy, ...props }: ComponentProps<typeof CreationDraftPanel> & {
   statusInFooter?: boolean;
+  showConsumedResult?: boolean;
   authorName?: string;
   documentLabel?: string;
   exitHref?: string;
@@ -80,8 +81,9 @@ export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você",
   const label = documentLabel ?? (draft.kind ? draftLabels[draft.kind] : undefined);
   const acknowledgedRef = useRef<string | null>(null);
   const retriedRef = useRef<string | null>(null);
-  const completed = wizard && consumed ? `${consumed.id}:${consumed.revision}` : null;
-  const pendingAcknowledgement = wizard && draft.pending?.action === "acknowledge" ? draft.pending.idempotencyKey : null;
+  const autoAcknowledge = wizard && !showConsumedResult;
+  const completed = autoAcknowledge && consumed ? `${consumed.id}:${consumed.revision}` : null;
+  const pendingAcknowledgement = autoAcknowledge && draft.pending?.action === "acknowledge" ? draft.pending.idempotencyKey : null;
   const canFinishAcknowledgement = draft.active && !disabled && !draft.loading && !draft.busy && !draft.backgroundBusy &&
     !draft.loadError && !draft.conflict && !draft.readDenied && !draft.protectedReadPending;
   useEffect(() => {
@@ -111,7 +113,7 @@ export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você",
       }}>Tentar novamente</ActionButton>
     </Notice>;
   }
-  if (draft.readDenied || draft.protectedReadPending || draft.loadError || draft.error || draft.pending || draft.conflict || draft.kind === "PROGRESS" && draft.consumed)
+  if (draft.readDenied || draft.protectedReadPending || draft.loadError || draft.error || draft.pending || draft.conflict || (!wizard || showConsumedResult) && draft.consumed)
     return <CreationDraftPanel {...props} />;
   const offered = draft.offered;
   const local = wizard && !draft.loading && !draft.base && !offered ? legacy : undefined;

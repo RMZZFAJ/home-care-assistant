@@ -166,14 +166,26 @@ test("COM donation follow-up keeps its origin and freshness; revoked read access
     status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Consulta atual da doação fictícia indisponível", retryable: true },
   }));
   await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
-  await expect(page.getByRole("alert").filter({ hasText: "Consulta atual da doação fictícia indisponível" })).toBeVisible();
+  const failure = page.getByRole("dialog", { name: "Não foi possível atualizar a chegada", exact: true });
+  await expect(failure).toContainText("A ficha continua na última versão consultada.");
+  await failure.getByText("Detalhes para suporte", { exact: true }).click();
+  await expect(failure.locator("pre")).toContainText("Código: DATABASE_UNAVAILABLE");
+  await failure.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: "O acompanhamento atual não foi confirmado" })).toContainText("O acompanhamento atual não foi confirmado");
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Aquisição e chegadas", exact: true })).toHaveCount(0);
   await page.unroute(`**/api/documents/${doc.id}`);
   await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
+  await failure.getByRole("button", { name: "Tentar novamente", exact: true }).click();
+  await expect(failure).toBeHidden();
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Informar a chegada da doação");
   await selectDocumentSection(page, "materials");
-  await expect(panel(page)).toContainText("Adquirido");
+  const material = panel(page).getByRole("button", { name: "Detalhes de " + doc.lines[0].name_snapshot, exact: true });
+  await expect(material).toContainText("Doado");
+  await expect(material).not.toContainText("Comprado");
+  await material.click();
+  const details = page.getByRole("dialog", { name: doc.lines[0].name_snapshot, exact: true });
+  await expect(details.locator('[data-material-fact="Adquirido"]')).toContainText("2 unidade");
+  await details.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await expect(panel(page).getByRole("textbox")).toHaveCount(0);
   expect(facts(f.patient)).toBe(before);
 

@@ -69,7 +69,7 @@ function Inbox({ context }: { context: WorkspaceContext }) {
   return (
     <>
       <p className="text-sm text-(--muted)">
-        Suas tarefas incluem concordância e expedição de transferências,
+        Suas tarefas incluem expedição de transferências,
         recebimento pessoal, decisões de cancelamento e
         encaminhamentos administrativos designados. A consulta não confirma
         recebimento.

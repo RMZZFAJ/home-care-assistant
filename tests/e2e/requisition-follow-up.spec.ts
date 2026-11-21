@@ -1,5 +1,4 @@
 import { expectNoOperationalDocumentAction } from "./document-sections";
-import { openOperationalDocumentAction } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { actor, delivery, fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
@@ -8,7 +7,7 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
-import { audit } from "./accessibility-audit";
+import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(150_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
@@ -93,7 +92,7 @@ test("REQ follow-up reaches pending ENT and partial fulfillment; stale reads and
   await selectDocumentSection(page, "materials");
   await expect(page.getByRole("region", { name: "Dimensões independentes da requisição" })).toContainText("1/2 itens atendidos");
   await page.setViewportSize({ width: 320, height: 900 });
-  await audit(page, "REQ partial follow-up");
+  await auditFromTop(page, "REQ partial follow-up");
 
   await page.route(`**/api/requisitions/${req.id}`, route => route.fulfill({
     status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Consulta atual fictícia indisponível", retryable: true },
@@ -158,7 +157,7 @@ test("REQ completed fulfillment keeps personal science separate and archived fol
     await page.route(`**/api/requisitions/${req.id}/science`, route => route.fulfill({
       status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Registro de ciência fictício recusado", retryable: true },
     }));
-    await openOperationalDocumentAction(page, "Registrar minha ciência");
+    await page.getByRole("button", { name: "Dar ciência", exact: true }).click();
     await page.getByRole("button", { name: "Confirmar minha ciência", exact: true }).click();
     const uncertainScience = page.getByRole("dialog", { name: "Resultado da ciência", exact: true });
     await expect(uncertainScience).toContainText("Esta tentativa continua preservada");

@@ -421,8 +421,8 @@ test("conflitos preservam a expedição, exigem adoção explícita e não reabr
   expect(officialPosts).toHaveLength(0);
   expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);
   await expect(
-    editor.getByLabel("Observação 1", { exact: true }),
-  ).toHaveValue(/Devolução física de cinco/);
+    editor.getByRole("listitem").filter({ hasText: "Devolução física de cinco" }),
+  ).toBeVisible();
   await expect(
     editor.getByRole("textbox", {
       name: /^Quantidade de Material fictício V4 0/,

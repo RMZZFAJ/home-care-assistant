@@ -37,8 +37,8 @@ test("COM devolve a mesma chegada ao autor e credita só o que foi reenviado e a
 
   await page.context().clearCookies();
   await loginDecision(page, fixtures.family.email, f.patient);
-  await page.goto(path);
-  await selectDocumentSection(page, "workflow");
+  await page.goto(path + "?documentTab=materials");
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
   await page.getByRole("button", { name: "Corrigir chegada", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "Corrigir chegada", exact: true });
   await expect(editor.getByText(note, { exact: true })).toBeVisible();
