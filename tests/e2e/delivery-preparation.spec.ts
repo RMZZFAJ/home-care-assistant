@@ -286,8 +286,8 @@ test("P06 E06-02 escala distingue o próximo plantão e o profissional escalado 
     await expect(picker).toBeHidden();
     await expect(recipient).toContainText("Próximo plantão");
     await materialsAndReview(page);
-    const recipientSummary = page.locator("dl > div").filter({
-      has: page.locator("dt").filter({ hasText: /^Recebedor$/ }),
+    const recipientSummary = page.locator(".hca-wizard-review-identity > div").filter({
+      has: page.locator("dt").filter({ hasText: /^Recebedor físico$/ }),
     }).locator("dd");
     await expect(recipientSummary).toBeVisible();
     await expect(recipientSummary).toContainText("Teste global");
