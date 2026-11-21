@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type RefObject } from "react";
+import { useImperativeHandle, useRef, useState, type Ref, type RefObject } from "react";
 import { z } from "zod";
 import { ActionButton, DefinitionGrid, FormField, TextAreaField } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
@@ -35,9 +35,15 @@ const definitiveRejection = (cause: unknown) => cause instanceof ApiError && cau
 
 type Opening = { lineId: string; onClose: () => void; opener: RefObject<HTMLButtonElement | null> };
 type Outcome = { line?: SupplyLine; decision?: Decision; reason: string };
+export type OpenPendingFamilyReview = (lineId: string, onClose: () => void) => boolean;
 
-export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = false, opening }: {
+export function canRecordFamilyReview(data: SupplyDocument, context: WorkspaceContext, readOnly: boolean) {
+  return !readOnly && ["confirmed", "disputed"].includes(data.status) && canAssessDeliveryNeed(data, context);
+}
+
+export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = false, opening, reviewControl }: {
   data: SupplyDocument; context: WorkspaceContext; onReviewed: () => void; readOnly?: boolean; opening?: Opening;
+  reviewControl?: Ref<OpenPendingFamilyReview>;
 }) {
   const storageKey = `hca:fulfillment-review:${context.userId}:${data.id}`;
   const [pending, setPending] = useState<Packet | null>(() => {
@@ -55,6 +61,7 @@ export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = 
   const [discard, setDiscard] = useState(false);
   const [version, setVersion] = useState(data.version);
   const openerRef = useRef<HTMLButtonElement | null>(null);
+  const returnToReviewRef = useRef<(() => void) | null>(null);
   const family = useCommandIntent<Packet, unknown>((raw, packet) => {
     const result = resultSchema.safeParse(raw);
     return result.success && result.data.key === packet.key && result.data.documentId === data.id &&
@@ -70,7 +77,7 @@ export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = 
   const samePatient = context.patient?.id === data.care_recipient_id;
   const canRecoverFamily = samePatient && can(context, "ent.read");
   const active = !readOnly && samePatient && ["confirmed", "disputed"].includes(data.status);
-  const eligible = active && canAssessDeliveryNeed(data, context);
+  const eligible = canRecordFamilyReview(data, context, readOnly);
   const receiver = active && data.payload.destination === "CARE_TEAM" && context.userId === data.recipient_id && can(context, "ent.receive");
   const lines = data.lines.filter(line => data.workflow_data.acceptedAt && linkedDeliveryNeed(data, line));
   const selected = lines.find(line => line.id === lineId);
@@ -95,9 +102,27 @@ export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = 
     setVersion(data.version);
   }
 
+  useImperativeHandle(reviewControl, () => (requestedId, onClose) => {
+    if (!eligible || busy || lineId || outcome) return false;
+    const requested = lines.find(line => line.id === requestedId);
+    if (!requested || !awaitsDeliveryNeed(data, requested)) return false;
+
+    returnToReviewRef.current = onClose;
+    openerRef.current = null;
+    show(requested);
+    if (pending) setLineId(pending.lineId);
+    return true;
+  });
+
   function close() {
     setDiscard(false);
     setLineId(null);
+    const returnToReview = returnToReviewRef.current;
+    returnToReviewRef.current = null;
+    if (returnToReview) {
+      returnToReview();
+      return;
+    }
     opening?.onClose();
     const trigger = (opening?.opener ?? openerRef).current;
     requestAnimationFrame(() => requestAnimationFrame(() => {

@@ -9,7 +9,7 @@ import { actor, delivery, fixtures, issue, rpc, setup } from "../integration/v4-
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { purchaseBalanceCommand } from "../integration/purchase-entry-balance-fixtures.mjs";
 import { generatedPdf, pdfIssuanceReference } from "./generated-pdf";
-import { confirmedOutcome, loginDecision, noPrivateWrites, privateFormCount } from "./l1-decision-policy";
+import { confirmedOutcome, loginDecision, loseDecisionResponse, noPrivateWrites, privateFormCount } from "./l1-decision-policy";
 import { arrivalCard, confirmArrivalReview } from "./purchase-arrival-review";
 import type { SupplyDocument } from "../../src/types/documents";
 
@@ -226,6 +226,107 @@ test("REQ resolve a avaliação da família e retorna à conclusão com a observ
   await review.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   expect(await rpc(admin, "document_follow_up_reference", { p_id: req.id })).toMatchObject({ state: "completed", decision: { action: "req.completed" } });
   expect(terminalLedger(patient)).toBe(stock);
+});
+
+test("ENT abre cada avaliação familiar pendente pela revisão de conclusão", async ({ page, browser }, info) => {
+  const { admin, patient, products } = await setup();
+  const approver = await shiftWorker(patient, "admin");
+  const req = await issue(patient, products);
+  const sent = await delivery(patient, req, products, { quantity: "5", requestFulfillment: "complete" }) as SupplyDocument;
+  const [first, second] = sent.lines;
+  const reason = (name: string) => `A equipe solicitou nova avaliação de ${name} para o próximo plantão.`;
+  const team = await actor("professional", patient);
+  await entSend(team, sent, "receive", { countedReceipt: { lines: sent.lines.map(line => ({
+    lineId: line.id, receivedQuantity: "5", reviewReason: reason(line.name_snapshot),
+  })) } });
+  const stock = terminalLedger(patient);
+  const endpoint = `/api/documents/${sent.id}/fulfillment-review`;
+  const url = `/fichas/${sent.id}`;
+  await loginDecision(page, approver.email, patient);
+  await page.goto(url);
+
+  const teamPage = await browser.newPage({
+    baseURL: new URL(page.url()).origin, viewport: page.viewportSize() ?? undefined,
+    isMobile: info.project.use.isMobile, hasTouch: info.project.use.hasTouch,
+  });
+  try {
+    await loginDecision(teamPage, fixtures.professional.email, patient);
+    await teamPage.goto(url);
+    await openDocumentAction(teamPage, "Revisar conclusão");
+    const readOnly = teamPage.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+    await expect(readOnly).toContainText("Aguardando decisão familiar");
+    await expect(readOnly.getByRole("button", { name: /^Avaliar necessidade de / })).toHaveCount(0);
+  } finally {
+    await teamPage.close();
+  }
+
+  await openDocumentAction(page, "Revisar conclusão");
+  const closure = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+  const note = closure.getByRole("textbox", { name: "Observação da conclusão", exact: true });
+  const confirm = closure.getByRole("button", { name: "Concluir", exact: true });
+  const shortcut = (line: SupplyDocument["lines"][number]) =>
+    closure.getByRole("button", { name: `Avaliar necessidade de ${line.name_snapshot}`, exact: true });
+  const observation = "Observação da conclusão a preservar durante as duas avaliações.";
+  await note.fill(observation);
+  await expect(confirm).toBeDisabled();
+  const privateWrites = noPrivateWrites(page);
+  await shortcut(first).click();
+  const evaluation = page.getByRole("dialog", { name: "Reavaliar necessidade", exact: true });
+  await expect(evaluation).toContainText(reason(first.name_snapshot));
+  await expect(evaluation).toContainText("5 unidade recebidos");
+  await evaluation.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(note).toHaveValue(observation);
+  await expect(confirm).toBeDisabled();
+  expect(terminalLedger(patient)).toBe(stock);
+
+  await shortcut(first).click();
+  if (info.project.use.hasTouch) {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const path = info.outputPath("E06-15-avaliacao-pela-revisao.png");
+    await evaluation.screenshot({ path, scale: "css", animations: "disabled" });
+    await info.attach("E06-15 avaliação da família", { path, contentType: "image/png" });
+  }
+  await evaluation.getByRole("button", { name: "Parcialmente", exact: true }).click();
+  await evaluation.getByRole("textbox", { name: "Justificativa da avaliação", exact: true })
+    .fill("A quantidade recebida cobre apenas parte da necessidade.");
+  const packets = await loseDecisionResponse(page, endpoint);
+  await evaluation.getByRole("button", { name: "Registrar avaliação", exact: true }).click();
+  const recovery = page.getByRole("dialog", { name: "Verificar avaliação familiar", exact: true });
+  await expect(recovery.getByRole("button", { name: "Verificar mesma avaliação", exact: true })).toBeEnabled();
+  await page.unroute("**" + endpoint);
+  expect(packets).toHaveLength(1);
+  const recovered = page.waitForResponse(response =>
+    new URL(response.url()).pathname === endpoint && response.request().method() === "POST");
+  await recovery.getByRole("button", { name: "Verificar mesma avaliação", exact: true }).click();
+  const response = await recovered;
+  expect(response.ok()).toBe(true);
+  expect(response.request().postDataJSON()).toEqual(packets[0]);
+  expect(await response.json()).toMatchObject({ recovered: true, lineId: first.id });
+  const saved = page.getByRole("dialog", { name: "Avaliação registrada", exact: true });
+  await saved.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(note).toHaveValue(observation);
+  await expect(shortcut(first)).toHaveCount(0);
+  await expect(shortcut(second)).toBeVisible();
+  await expect(confirm).toBeDisabled();
+
+  await shortcut(second).click();
+  await expect(evaluation).toContainText(reason(second.name_snapshot));
+  await evaluation.getByRole("button", { name: "Integralmente", exact: true }).click();
+  await evaluation.getByRole("textbox", { name: "Justificativa da avaliação", exact: true })
+    .fill("A quantidade recebida supre a necessidade deste material.");
+  await evaluation.getByRole("button", { name: "Registrar avaliação", exact: true }).click();
+  await saved.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(note).toHaveValue(observation);
+  await expect(closure).toContainText("Necessidade avaliada");
+  await expect(confirm).toBeEnabled();
+  const current = await rpc(admin, "operational_document", { p_id: sent.id }) as SupplyDocument;
+  expect(current.fulfillmentReviews).toMatchObject([
+    { lineId: first.id, actorId: approver.id, decision: "partial" },
+    { lineId: second.id, actorId: approver.id, decision: "complete" },
+  ]);
+  expect(current.lines.map(line => Number(line.accepted_quantity))).toEqual([5, 5]);
+  expect(terminalLedger(patient)).toBe(stock);
+  expect(privateWrites).toEqual([]);
 });
 
 test("COM revisa a chegada a partir do bloqueio e retorna à conclusão com a referência atual", async ({ page }, info) => {

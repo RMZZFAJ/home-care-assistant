@@ -39,7 +39,7 @@ import { DocumentArchiveActions, DocumentArchiveDialog, type ArchiveDialogMode }
 import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
 import { supplyFollowUpState } from "@/lib/documents/follow-up-lifecycle";
 import { cancelledTransitReturn, readCountedDeliveryReceipt, verifyCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
-import { deliveryTransit } from "@/lib/documents/family-fulfillment";
+import { awaitsDeliveryNeed, deliveryTransit } from "@/lib/documents/family-fulfillment";
 import { countedDeliveryReceiptBody, deliveryResolutionBody, type CountedDeliveryReceiptBody, type DeliveryResolutionBody } from "@/lib/validation/delivery-receipt";
 import {
   DeliveryDispatchFacts,
@@ -78,7 +78,7 @@ import { purchaseArrivalBody } from "@/lib/validation/purchase-arrival";
 import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document-header";
 import { DocumentIssuanceResult } from "./document-issuance-result";
-import { FamilyFulfillmentReview } from "./family-fulfillment-review";
+import { canRecordFamilyReview, FamilyFulfillmentReview, type OpenPendingFamilyReview } from "./family-fulfillment-review";
 import { DocumentFreshness } from "./document-freshness";
 import { DocumentFamilyDecisionNotice } from "./document-family-decision-notice";
 import { supplyChanges } from "@/lib/documents/document-changes";
@@ -149,6 +149,7 @@ export function SupplyDocumentContent({
   const fabRef = useRef<HTMLButtonElement>(null);
   const reviewControlRef = useRef<(opener: HTMLButtonElement | null) => void>(null);
   const returnToCompletionRef = useRef<(() => void) | null>(null);
+  const familyReviewRef = useRef<OpenPendingFamilyReview>(null);
   const [fileActionTarget, setFileActionTarget] =
     useState<HTMLDivElement | null>(null);
   const editingRef = useRef(false);
@@ -677,6 +678,9 @@ export function SupplyDocumentContent({
     && !followUpTerminal && data.status !== "rejected" && data.status !== "administratively_closed"
     && (patientAdmin || (data.type === "COM" ? allowed("com.approve")
       : data.recipient_id === context.userId && allowed("ent.receive") || data.created_by === context.userId && allowed("ent.create"))));
+  const pendingFamilyReviews = data?.kind === "ENT" && canReviewCompletion && canRecordFamilyReview(data, context, archived)
+    ? data.lines.filter(line => awaitsDeliveryNeed(data, line))
+    : [];
   const progressAllowed = allowed("document.progress.create");
   const canPrepareDelivery = data?.type === "COM" && allowed("ent.create")
     && data.lines.some(line => quantity(line.accepted_quantity).gt(0));
@@ -1222,6 +1226,12 @@ export function SupplyDocumentContent({
                       id: "delivery-reconciliation", label: "Conciliar divergência",
                       open: returnToReview => openFromCompletion("resolve", returnToReview),
                     }] : undefined,
+                    ent_need: pendingFamilyReviews.map(line => ({
+                      id: line.id, label: `Avaliar necessidade de ${line.name_snapshot}`,
+                      open: returnToReview => {
+                        if (!familyReviewRef.current?.(line.id, returnToReview)) returnToReview();
+                      },
+                    })),
                   } : pendingArrivalIds.length ? {
                     com_validation: [{
                       id: "review-arrivals", label: pendingArrivalIds.length === 1 ? "Revisar chegada" : "Revisar chegadas",
@@ -1417,7 +1427,9 @@ export function SupplyDocumentContent({
                 {data.originDocuments.map((origin) => <RelatedDocument
                   key={origin.documentId} id={origin.documentId} type={origin.type} label={origin.code} />)}
               </section> : null}
-              {data.type === "ENT" ? <FamilyFulfillmentReview data={data} context={context} readOnly={archived} onReviewed={() => setAttempt(value => value + 1)} /> : null}
+              {data.type === "ENT" ? <FamilyFulfillmentReview key={context.userId + ":" + data.id}
+                data={data} context={context} readOnly={archived} reviewControl={familyReviewRef}
+                onReviewed={() => setAttempt(value => value + 1)} /> : null}
               <section className="hca-materials-section">
                 {data.type === "COM" ? <>
                   <PurchaseExtraResolution key={data.id} data={data}
