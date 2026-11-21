@@ -10,6 +10,7 @@ import { api } from "@/lib/client/api";
 import { documentArchiveAttempt, documentArchiveCommand, documentArchiveReference, type DocumentArchiveAttempt, type DocumentArchiveCommand } from "@/lib/documents/document-archive";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useScopedRead } from "@/lib/use-scoped-read";
+import { useOperationSupport } from "./use-operation-support";
 
 export type ArchiveDialogMode = "archive" | "review";
 type View = ArchiveDialogMode | "reverse";
@@ -24,6 +25,41 @@ const resultDetails = {
   confirm: "A ficha está encerrada e o PDF consolidado está disponível.",
   reverse: "A condição anterior foi restaurada. O PDF daquela versão está preservado nos arquivos da ficha.",
 };
+const archiveFailureTitles = {
+  archive: "Não foi possível arquivar a ficha",
+  confirm: "Não foi possível confirmar o encerramento",
+  reverse: "Não foi possível reverter o arquivamento",
+};
+const recoveryLimit = 2;
+
+type ArchiveFailure = {
+  action: DocumentArchiveCommand["action"];
+  outcome: "rejected" | "uncertain";
+  description: string;
+  cause?: unknown;
+};
+
+function ArchiveFailureDialog({ failure, attempts, onClose, onRecover }: {
+  failure: ArchiveFailure; attempts: number; onClose: () => void; onRecover?: () => void;
+}) {
+  const title = archiveFailureTitles[failure.action];
+  const { copy, details } = useOperationSupport({
+    operation: descriptions[failure.action === "confirm" ? "review" : failure.action][0],
+    result: title, cause: failure.cause, fallbackCode: "ARQUIVO_SEM_CONFIRMACAO",
+    attempts, attemptLabel: "Tentativas de recuperação",
+  });
+  const exhausted = failure.outcome === "uncertain" && attempts >= recoveryLimit;
+
+  return <Dialog open failure={failure.outcome} title={title} subtitle={failure.description} onClose={onClose}
+    footer={<>
+      <ActionButton onClick={onClose}>{failure.outcome === "uncertain" ? "Voltar à ficha" : "Voltar à revisão"}</ActionButton>
+      {onRecover && !exhausted ? <ActionButton variant="primary" onClick={onRecover}><Icon name="refresh" />Conferir resultado</ActionButton>
+        : <ActionButton variant="primary" onClick={() => void copy()}><Icon name="copy" />Copiar detalhes</ActionButton>}
+    </>}>
+    {exhausted ? <p className="hca-issuance-retry-limit">O resultado ainda está sem confirmação. Copie os detalhes para o responsável pelo sistema antes de tentar arquivar ou decidir novamente.</p> : null}
+    {details}
+  </Dialog>;
+}
 
 function DownloadConsolidated({ archive, compactLabel = false }: { archive: DocumentArchiveAttempt; compactLabel?: boolean }) {
   return archive.issuanceId ? <ActionLink href={`/api/documents/${archive.documentId}/pdf?issuance=${archive.issuanceId}`} download
@@ -59,6 +95,8 @@ export function DocumentArchiveDialog({ id, patientId, code, patientName, actor,
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState<DocumentArchiveCommand | null>(null);
   const [error, setError] = useState("");
+  const [failure, setFailure] = useState<ArchiveFailure | null>(null);
+  const [recoveryAttempts, setRecoveryAttempts] = useState(0);
   const [result, setResult] = useState<{ action: DocumentArchiveCommand["action"]; archive: DocumentArchiveAttempt } | null>(null);
   const sendingRef = useRef(false);
   const endpoint = `/api/documents/${id}/lifecycle/archive`;
@@ -92,7 +130,7 @@ export function DocumentArchiveDialog({ id, patientId, code, patientName, actor,
   }
 
   async function apply(action: DocumentArchiveCommand["action"]) {
-    if (sendingRef.current || disabled) return;
+    if (sendingRef.current || disabled || pending && recoveryAttempts >= recoveryLimit) return;
     const input = pending ?? {
       key: crypto.randomUUID(), version: facts!.version, referenceHash: facts!.referenceHash, action,
       ...(action === "archive" ? { mode, ...(mode === "other" ? { reason } : {}) } : action === "reverse" ? { reason } : {}),
@@ -102,22 +140,29 @@ export function DocumentArchiveDialog({ id, patientId, code, patientName, actor,
     sendingRef.current = true;
     setBusy(true);
     setError("");
+    setFailure(null);
+    if (pending) setRecoveryAttempts(count => count + 1);
     setPending(parsed.data);
     try {
       const applied = documentArchiveAttempt.parse(await api(endpoint, parsed.data));
       if (applied.documentId !== id || action !== "archive" && applied.decision !== action)
         throw new Error("A resposta ainda não confirmou esta decisão.");
       if (!applied.archivedAt) {
-        setError("O PDF consolidado ainda está em processamento. Confira o resultado desta mesma tentativa.");
+        setFailure({ action, outcome: "uncertain", description: "O PDF consolidado ainda está em processamento. Confira o resultado desta mesma tentativa." });
         return;
       }
       setResult({ action, archive: applied });
-    } catch (failure) {
-      if (failure instanceof ApiError && failure.code !== "PERSISTENCE_UNCONFIRMED" && [400, 401, 403, 404, 409].includes(failure.status)) {
+    } catch (cause) {
+      if (!pending && cause instanceof ApiError && cause.code !== "PERSISTENCE_UNCONFIRMED" && [400, 401, 403, 404, 409].includes(cause.status)) {
         setPending(null);
         reference.refresh();
+        setFailure({ action, cause, outcome: "rejected", description: cause.status === 409
+          ? "A referência mudou. Confira a situação atual da ficha antes de confirmar novamente."
+          : "O sistema recusou esta solicitação. Confira a referência e seu acesso antes de continuar." });
+      } else {
+        setFailure({ action, cause, outcome: "uncertain",
+          description: "A ação ainda está sem confirmação. Confira o resultado desta mesma tentativa." });
       }
-      setError(failure instanceof Error ? failure.message : "Não foi possível confirmar o resultado.");
     } finally {
       sendingRef.current = false;
       setBusy(false);
@@ -126,7 +171,7 @@ export function DocumentArchiveDialog({ id, patientId, code, patientName, actor,
 
   function finish() { onUpdated(); onClose(); }
   return <>
-    <Dialog open={!result && !discard} title={title} subtitle={archive?.decision === "confirm" ? "A confirmação já foi registrada. Consulte o PDF consolidado." : subtitle} kicker={`${code} · ${patientName}`}
+    <Dialog open={!result && !discard && !failure} title={title} subtitle={archive?.decision === "confirm" ? "A confirmação já foi registrada. Consulte o PDF consolidado." : subtitle} kicker={`${code} · ${patientName}`}
       onClose={close} closeDisabled={busy} finalFocus={finalFocus}
       footer={<>
         <ActionButton variant="quiet" disabled={busy} onClick={close}><Icon name="back" />Voltar à ficha</ActionButton>
@@ -200,5 +245,8 @@ export function DocumentArchiveDialog({ id, patientId, code, patientName, actor,
       finalFocus={finalFocus} footer={<ActionButton variant="primary" onClick={finish}>Concluir</ActionButton>}>
       <DownloadConsolidated archive={result.archive} />
     </Dialog> : null}
+    {failure && !discard ? <ArchiveFailureDialog failure={failure} attempts={recoveryAttempts}
+      onClose={pending ? close : () => setFailure(null)}
+      onRecover={pending ? () => void apply(pending.action) : undefined} /> : null}
   </>;
 }

@@ -9,6 +9,7 @@ import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { loginDecision } from "./l1-decision-policy";
+import type { DocumentArchiveCommand } from "../../src/lib/documents/document-archive";
 
 test.setTimeout(120_000);
 
@@ -43,9 +44,24 @@ test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT s
   await reasonField.scrollIntoViewIfNeeded();
   await expect(reasonField).toBeInViewport();
   await info.attach("motivo-do-arquivamento", { body: await archive.screenshot(), contentType: "image/png" });
+  const commands: DocumentArchiveCommand[] = [];
+  let appliedStatus: number | undefined;
+  await page.route(`**${endpoint}`, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    commands.push(route.request().postDataJSON());
+    if (commands.length !== 1) return route.continue();
+    appliedStatus = (await route.fetch()).status();
+    await route.abort();
+  });
   await archiveButton.click();
+  const failure = page.getByRole("dialog", { name: "Não foi possível arquivar a ficha", exact: true });
+  await expect(failure).toBeVisible({ timeout: 65_000 });
+  await expect.poll(() => appliedStatus).toBe(200);
+  await failure.getByRole("button", { name: "Conferir resultado", exact: true }).click();
   const archived = page.getByRole("dialog", { name: "Ficha arquivada", exact: true });
   await expect(archived).toBeVisible({ timeout: 65_000 });
+  expect(commands).toEqual([commands[0], commands[0]]);
+  await page.unroute(`**${endpoint}`);
   await archived.getByRole("button", { name: "Concluir", exact: true }).click();
   await openDocumentMore(page);
   await expect(page.getByRole("menuitem", { name: "Revisar conclusão", exact: true })).toHaveCount(0);
@@ -71,6 +87,50 @@ test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT s
   const preserved = await page.request.get(url);
   expect(preserved.status()).toBe(200);
   expect((await preserved.body()).equals(await original.body())).toBe(true);
+  expect(terminalLedger(patient)).toBe(stock);
+});
+
+test("falha de arquivamento mantém a mesma tentativa e oferece diagnóstico após duas recuperações", async ({ page }, info) => {
+  const { patient, doc } = await entTerminalFixture({ kind: "cancelled" });
+  const endpoint = `/api/documents/${doc.id}/lifecycle/archive`;
+  await page.setViewportSize({ width: 390, height: 844 });
+  await loginDecision(page, fixtures.adminA.email, patient);
+  const stock = terminalLedger(patient);
+  const commands: DocumentArchiveCommand[] = [];
+  const correlation = randomUUID();
+  await page.route(`**${endpoint}`, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    commands.push(route.request().postDataJSON());
+    await route.fulfill({ status: 503, json: {
+      code: "PERSISTENCE_UNCONFIRMED", correlationId: correlation, error: "Mensagem fictícia que não pertence ao diagnóstico.",
+    } });
+  });
+  await page.goto(`/fichas/${doc.id}`);
+  await openDocumentAction(page, "Arquivar ficha");
+  const archive = page.getByRole("dialog", { name: "Arquivar ficha", exact: true });
+  await archive.getByRole("button", { name: "Arquivar e consolidar PDF", exact: true }).click();
+  const failure = page.getByRole("dialog", { name: "Não foi possível arquivar a ficha", exact: true });
+  const recover = failure.getByRole("button", { name: "Conferir resultado", exact: true });
+  await recover.click();
+  await expect.poll(() => commands.length).toBe(2);
+  await recover.click();
+  await expect(failure).toBeVisible();
+  await expect(recover).toHaveCount(0);
+  await expect(failure.getByText("Mensagem fictícia que não pertence ao diagnóstico.")).toHaveCount(0);
+  const details = failure.locator("details");
+  await expect(details).not.toHaveAttribute("open", "");
+  await expect(failure.getByRole("button", { name: "Copiar detalhes", exact: true })).toBeVisible();
+  await details.getByText("Detalhes para suporte", { exact: true }).click();
+  await expect(details).toContainText("PERSISTENCE_UNCONFIRMED");
+  await expect(details).toContainText(correlation);
+  await expect(details).toContainText("Tentativas de recuperação: 2");
+  expect(commands).toEqual([commands[0], commands[0], commands[0]]);
+  expect(await page.evaluate(() => [innerWidth, document.documentElement.scrollWidth])).toEqual([390, 390]);
+  await info.attach("arquivamento-sem-confirmacao-390", { body: await failure.screenshot({ scale: "css" }), contentType: "image/png" });
+  await failure.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await page.getByRole("dialog", { name: "Sair antes de conferir o resultado?", exact: true })
+    .getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  expect(await (await page.request.get(endpoint)).json()).toMatchObject({ condition: "cancelled", archive: null });
   expect(terminalLedger(patient)).toBe(stock);
 });
 
