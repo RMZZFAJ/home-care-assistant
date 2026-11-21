@@ -926,6 +926,29 @@ Nenhuma migration neste ajuste.
 
 ### Decisões e dúvidas de L2
 
+**Leitura de código na DEV.** O botão em Materiais de E06-16 abre o
+mesmo diálogo de identificação e conversão da COM e da ENT. O resultado
+exibe material, unidade e apresentação. Corrigir expande os campos de
+quantidade e permite escolher Caixa, Pacote, Par ou Unidade. Um código
+desconhecido oferece nova leitura ou retorno à seleção manual.
+
+A DEV mostra o saldo disponível da equipe. Quando o material já está
+preenchido, a confirmação substitui a quantidade após validar esse saldo.
+O total fica no preenchimento e só movimenta estoque na expedição. COM e
+ENT conservam o cálculo acumulado e a versão da apresentação cadastrada.
+Nenhuma migration acompanha o ajuste.
+
+O v7 foi conferido a 390 px. Em Android e iOS emulados, a DEV reconheceu
+a apresentação de um material inativo ainda com saldo, bloqueou 12 unidades
+quando havia 10, aplicou a correção para 5 e devolveu o foco à ação de leitura.
+A expedição foi recuperada após perda de resposta com um único lançamento.
+O destinatário recebeu 3 unidades e 2 permaneceram em trânsito. A primeira
+rodada parou no seletor de apresentação. A segunda encontrou a indicação
+de material inativo na revisão com inicial maiúscula. As duas verificações
+foram corrigidas e o reteste final passou sem repetição automática.
+COM e ENT também passaram em Android e iOS emulados. Capturas locais em
+`output/playwright/l2-dev-barcode/`.
+
 **Correção da leitura de código na COM e na ENT.** Em E05-04 e E06-03,
 o diálogo compartilhado mostra o nome da apresentação e a quantidade por
 embalagem no mesmo resumo. Corrigir inclui Caixa, Pacote, Par e Unidade

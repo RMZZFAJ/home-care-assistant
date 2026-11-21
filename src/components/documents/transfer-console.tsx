@@ -515,7 +515,6 @@ function TransferDeclarationEditor({
   }
   function closeBarcode() {
     setReadingBarcode(false);
-    requestAnimationFrame(() => barcodeTriggerRef.current?.focus({ preventScroll: true }));
   }
   useLongDraftAutosave(privateDraft, currentContent, write && draftTouched && !(busy || uncertain || packet || result || recoveredId || navigating));
   useEffect(() => {
@@ -1649,7 +1648,7 @@ function TransferDeclarationEditor({
           closeSourcePicker();
         }} /> : null}
       {readingBarcode && write && !referenceUnavailable ? <ReturnBarcodeDialog patientId={patientId} products={products}
-        amounts={linesByProduct} onClose={closeBarcode} onApply={(product, amount) => {
+        amounts={linesByProduct} onClose={closeBarcode} finalFocus={() => barcodeTriggerRef.current ?? false} onApply={(product, amount) => {
           updateReturnQuantity(product.id, amount);
           if (!linesByProduct.get(product.id)?.extra) {
             setCategory(materialCategories.find(entry => entry.id === product.category)?.id ?? activeCategory);

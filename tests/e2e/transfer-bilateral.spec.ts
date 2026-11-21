@@ -82,23 +82,36 @@ async function fillDeclaration(
 async function convertReturnQuantity(page: Page, drawer: Locator, info: TestInfo) {
   const read = drawer.getByRole("button", { name: "Ler código", exact: true });
   await read.click();
-  const scanner = page.getByRole("dialog", { name: "Ler código do material", exact: true });
+  const scanner = page.getByRole("dialog", { name: "Ler código", exact: true });
   const manualCode = scanner.getByRole("textbox", { name: "Código manual", exact: true });
   await manualCode.fill("12345678");
   await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
-  await expect(scanner.getByText(/Este código está indisponível/)).toBeVisible();
+  const unknownCode = page.getByRole("dialog", { name: "Código não cadastrado", exact: true });
+  await expect(unknownCode.getByRole("button", { name: "Selecionar na lista", exact: true })).toBeVisible();
+  await unknownCode.getByRole("button", { name: "Tentar outro código", exact: true }).click();
   await manualCode.fill("0123456789012");
   await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
   const conversion = scanner.getByRole("region", { name: "Conversão da apresentação", exact: true });
-  await expect(conversion).toContainText("Caixa fictícia para devolução");
-  await conversion.getByRole("textbox", { name: "Embalagens", exact: true }).fill("4");
+  await expect(conversion).toContainText("Caixa fictícia para devolução · 3 unidade");
+  await expect(conversion).toContainText("Estoque atual da equipe: 10 unidade");
+  await expect(conversion.getByLabel("Quantidade lida", { exact: true })).toHaveCount(0);
+  await conversion.getByRole("button", { name: "Corrigir", exact: true }).click();
+  await conversion.getByLabel("Quantidade lida", { exact: true }).fill("4");
   const applyQuantity = scanner.getByRole("button", { name: "Atualizar quantidade", exact: true });
   await expect(applyQuantity).toBeDisabled();
-  await conversion.getByRole("textbox", { name: "Quantidade por embalagem em unidade", exact: true }).fill("2");
+  await expect(conversion.getByText("A quantidade excede o estoque disponível para devolução.", { exact: true })).toBeVisible();
+  const presentation = conversion.getByRole("combobox", { name: "Tipo de apresentação", exact: true });
+  const factor = conversion.getByLabel("Unidades por apresentação", { exact: true });
+  await presentation.selectOption({ label: "Caixa" });
+  await expect(factor).toHaveValue("");
+  await expect(applyQuantity).toBeDisabled();
+  await presentation.selectOption({ label: "Par" });
+  await expect(factor).toHaveValue("2");
   await expect(conversion).toContainText("8 unidade");
-  await conversion.getByRole("checkbox", { name: "Ajustar quantidade final", exact: true }).check();
-  const finalQuantity = conversion.getByRole("textbox", { name: "Quantidade final em unidade", exact: true });
+  await conversion.getByRole("checkbox", { name: "Corrigir o total convertido", exact: true }).check();
+  const finalQuantity = conversion.getByLabel("Total corrigido em unidade", { exact: true });
   await finalQuantity.fill("5");
+  await finalQuantity.scrollIntoViewIfNeeded();
   if (info.project.use.hasTouch) await expect(finalQuantity).toBeInViewport({ ratio: 1 });
   if (info.project.use.hasTouch) await info.attach("DEV · conferência da conversão", {
     body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
@@ -142,7 +155,7 @@ test("devolução separa expedidor e recebedor, recupera expedição incerta com
     .getByRole("button", { name: "Revisar ficha", exact: true })
     .click();
   const review = editor;
-  await expect(review.getByText(/inativo com saldo/)).toBeVisible();
+  await expect(review.getByText("5 unidade · Inativo com saldo", { exact: true })).toBeVisible();
   const packets: unknown[] = [];
   let document: SupplyDocument | undefined;
   await page.route("**/api/transfers", async (route) => {

@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — leitura de código na DEV.** A devolução usa a mesma conferência
+de apresentação e conversão da COM e da ENT. A prévia informa o saldo da
+equipe e identifica quando a nova quantidade substituirá a linha.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — correção da leitura de código na COM e na ENT.** O diálogo
 apresenta o fator no resumo e oferece as opções Caixa, Pacote, Par e Unidade
 do v7. As apresentações cadastradas continuam disponíveis. A conversão
