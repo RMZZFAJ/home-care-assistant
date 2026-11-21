@@ -7,9 +7,11 @@ import { Dialog } from "@/components/ui/overlays";
 import { Notice } from "@/components/workspace";
 import { navigationLabel } from "@/lib/forms/draft-navigation";
 import { formatBrazilDate } from "@/lib/receipt";
-import type { CreationDraftContent } from "@/types/creation-drafts";
+import type { CreationDraftContent, DraftKind } from "@/types/creation-drafts";
 import type { StockObservation } from "@/types/requisition";
 import { CreationDraftPanel } from "./creation-draft-panel";
+
+const draftLabels: Partial<Record<DraftKind, string>> = { REQ: "Requisição", COM: "Compra", ENT: "Entrega", BAL: "Balanço" };
 
 function draftStockText(value: string | number | null, mode?: StockObservation, unit?: string) {
   if (mode === "unknown") return "Não sei informar";
@@ -62,14 +64,16 @@ function DraftMaterials({ content }: { content: CreationDraftContent | null }) {
 }
 
 /** One resume choice; exceptional concurrency/recovery retains its real controls. */
-export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você", legacy, ...props }: ComponentProps<typeof CreationDraftPanel> & {
+export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você", documentLabel, legacy, ...props }: ComponentProps<typeof CreationDraftPanel> & {
   statusInFooter?: boolean;
   authorName?: string;
+  documentLabel?: string;
   legacy?: { content: CreationDraftContent; savedAt: string; resume: () => void; discard: () => void };
 }) {
   const { draft, disabled = false, canResume = true, patientName } = props;
   const { acknowledge, consumed, recover } = draft;
   const wizard = draft.kind !== "PROGRESS";
+  const label = documentLabel ?? (draft.kind ? draftLabels[draft.kind] : undefined);
   const acknowledgedRef = useRef<string | null>(null);
   const retriedRef = useRef<string | null>(null);
   const completed = wizard && consumed ? `${consumed.id}:${consumed.revision}` : null;
@@ -119,8 +123,8 @@ export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você",
     }}>
       {wizard ? <Icon name="trash" /> : null}{props.discardLabel ?? "Descartar e começar novamente"}
     </ActionButton>;
-    if (wizard) return <Dialog open title="Continuar seu rascunho?" kicker="Rascunho da ficha" popupClassName="hca-wizard-dialog hca-draft-dialog"
-      subtitle="Você tem um preenchimento salvo para este paciente." closeDisabled onClose={() => {}}
+    if (wizard) return <Dialog open title="Continuar seu rascunho?" kicker={label ? `${label} · rascunho` : "Rascunho da ficha"} popupClassName="hca-wizard-dialog hca-draft-dialog"
+      subtitle="Você tem um rascunho desta ficha para este paciente." closeDisabled onClose={() => {}}
       keyboardScrollable footer={<>{discard}{resume}</>}>
       <div className="hca-form-stack">
         <DefinitionGrid items={[

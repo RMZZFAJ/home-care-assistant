@@ -862,6 +862,7 @@ function PatientRequisition({
               (!may(context, "request") && !uncertain)
             }
             draftBusy={privateDraft.backgroundBusy}
+            hideDraftStatus={saving || navigating}
             supply={{ kind: "REQ", draft: privateDraft, current: draftContent, hasEdits: draftTouched,
               exitHref: sourceId ? "/fichas/" + encodeURIComponent(sourceId) : "/fichas" }}
             uncertain={uncertain}

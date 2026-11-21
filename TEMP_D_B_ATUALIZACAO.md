@@ -1,5 +1,13 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — escolha de recebedor e revisão de necessidade.** ENT e DEV
+compartilham os cartões de seleção do v7. O diálogo da ENT consulta a
+escala na abertura e mostra o horário do plantão. Os assistentes
+identificam a ficha no diálogo de retomada. A revisão de conclusão da ENT
+abre a avaliação familiar de cada material pendente e preserva a
+observação em edição.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — recebimento e conciliação pela revisão de conclusão.** ENT e
 DEV abrem a conferência pessoal ou a conciliação do saldo em trânsito
 pela pendência. Ao voltar, a revisão recupera a observação em edição e

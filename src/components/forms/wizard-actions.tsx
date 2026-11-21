@@ -63,8 +63,8 @@ function SupplyWizardExit({ supply, disabled }: { supply: SupplyActions; disable
   </>;
 }
 
-export function WizardActions({ step, total, saving, draftBusy = false, uncertain, blocked = false, finishLabel = "Confirmar e concluir", onBack, onNext, onFinish, supply, draftStatus }: {
-  step: number; total: number; saving: boolean; draftBusy?: boolean; uncertain: boolean; blocked?: boolean;
+export function WizardActions({ step, total, saving, draftBusy = false, hideDraftStatus = false, uncertain, blocked = false, finishLabel = "Confirmar e concluir", onBack, onNext, onFinish, supply, draftStatus }: {
+  step: number; total: number; saving: boolean; draftBusy?: boolean; hideDraftStatus?: boolean; uncertain: boolean; blocked?: boolean;
   onBack: () => void; onNext: () => void; onFinish: () => void;
   finishLabel?: string;
   supply?: SupplyActions;
@@ -87,5 +87,5 @@ export function WizardActions({ step, total, saving, draftBusy = false, uncertai
         {saving ? "Registrando…" : uncertain ? "Recuperar esta tentativa" : finish}
       </ActionButton>
     );
-  return <SupplyWizardFooter back={back} status={uncertain ? undefined : supply ?? draftStatus}>{mainAction}</SupplyWizardFooter>;
+  return <SupplyWizardFooter back={back} status={uncertain || hideDraftStatus ? undefined : supply ?? draftStatus}>{mainAction}</SupplyWizardFooter>;
 }

@@ -849,6 +849,47 @@ as medidas do seu processo. Na linha compacta do BAL ficam a contagem
 física e o estoque familiar atual. No painel do material ficam também a
 referência histórica e a diferença. A comparação de toda a contagem fica
 em **Comparar contagem e referência**, dentro de **Contagem e revisão**.
+
+**Escolha do recebedor nos assistentes.** A ENT e a DEV usam os mesmos
+cartões de seleção de E06-01 e E06-16, com confirmação no rodapé. Na ENT,
+a escala é consultada ao abrir o diálogo e o plantão inclui o horário
+quando consta da referência. Uma mudança de escala abre a comparação no
+próprio diálogo e preserva a escolha e a justificativa em edição. A busca
+complementa a referência nas listas com mais de oito pessoas. A DEV mostra
+os papéis da família e explica quando o recebedor anterior ficou
+indisponível. O seletor de inclusão dos quatro assistentes fica entre a
+identificação do material e o menu de ações. O diálogo de retomada
+identifica o tipo da ficha, inclusive DEV, e apresenta os materiais salvos.
+As categorias exibidas vêm do catálogo do paciente.
+
+A busca em Materiais conserva o filtro e cabe ao lado dele no celular.
+O status de rascunho fica no rodapé durante o preenchimento. Durante o
+carregamento por etapas da emissão ou expedição, a tela mostra apenas o
+estado da operação. A tentativa oficial mantém a recuperação própria.
+
+**Avaliação familiar na revisão de conclusão.** Cada material pendente da
+ENT pode abrir o diálogo existente de E06-15 diretamente da revisão, para
+quem tem autorização de avaliar a necessidade. A observação da conclusão
+permanece em edição. Ao voltar, a ficha consulta novamente as pendências.
+A avaliação da necessidade é posterior ao recebimento e conserva o saldo
+físico. Uma resposta incerta usa a confirmação da mesma tentativa. As duas
+mudanças de interface usam as migrations existentes.
+
+A primeira rodada passou 30 casos em Android e iOS emulados sem
+repetição. Ela conferiu o percurso entre categorias, os vínculos por
+material, a escolha do catálogo a partir de Extras, a retomada, a emissão
+de REQ com ajuste de estoque e a abertura de outra REQ. Incluiu Ciência
+familiar em Visão geral, a troca de recebedor, a DEV autônoma e o retorno
+à conclusão após avaliar cada material de uma ENT. As capturas locais
+estão em `output/playwright/l2-wizard-consistency/`.
+
+O reteste confirmou a busca reversível e a ausência do status de
+rascunho durante o carregamento por etapas da emissão. No teste de catálogo, a
+auditoria da COM no iOS ultrapassou o prazo com milhares de vínculos de
+pacientes acumulados na conta de teste compartilhada. O ensaio passou a
+usar identidades isoladas, com os mesmos papéis, mantendo as verificações
+de teclado, acessibilidade, categorias, revisão e ausência de gravação.
+Os seis casos de catálogo passaram em Android e iOS emulados, sem retries.
 A revisão e a aplicação do balanço têm seus controles próprios na aba.
 REQ apresenta sob o nome do material os códigos de entregas já relacionados
 à linha. A busca para catálogos maiores que o exemplo E04-11 e as demais

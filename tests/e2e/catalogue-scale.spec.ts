@@ -3,19 +3,21 @@ import { mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { setup, fixtures } from "../integration/v4-fixtures.mjs";
 import { identityPhysicalState } from "../integration/catalogue-identity-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { openDeliveryRecipient, recipientOption } from "./delivery-recipient";
 
 test.setTimeout(240_000);
 async function login(
   page: Page,
   patient: string,
-  role: "adminA" | "professional",
+  email: string,
 ) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -46,8 +48,14 @@ for (const count of [1, 5, 20, 100]) {
       aliases: [`Atalho ação ${String(i + 1).padStart(3, "0")}`],
     }));
     let f: Awaited<ReturnType<typeof setup>>, before: string;
+    let professionalEmail: string, adminEmail: string;
     test.beforeAll(async () => {
       f = await setup({ catalogue: definitions });
+      // Keep real roles while preventing accumulated shared fixture
+      // memberships from dominating the catalogue and accessibility checks.
+      const [professional, admin] = await Promise.all([shiftWorker(f.patient), shiftWorker(f.patient, "admin")]);
+      professionalEmail = professional.email;
+      adminEmail = admin.email;
       before = identityPhysicalState(f);
     });
     for (const type of ["REQ", "COM", "ENT"] as const) {
@@ -58,7 +66,7 @@ for (const count of [1, 5, 20, 100]) {
           await login(
             page,
             f.patient,
-            type === "REQ" ? "professional" : "adminA",
+            type === "REQ" ? professionalEmail : adminEmail,
           );
           const catalog = await page.request.get(
             `/api/catalog?careRecipientId=${f.patient}`,
@@ -83,44 +91,30 @@ for (const count of [1, 5, 20, 100]) {
               throw new Error(
                 "The controlled ENT fixture requires its authorized eligible recipient",
               );
-            await page.getByRole("button", { name: /^(Alterar|Escolher) recebedor$/ }).click();
-            const picker = page.getByRole("dialog", { name: "Escolher recebedor", exact: true });
-            const receiver = picker.getByRole("combobox", {
-              name: "Destinatário designado",
-              exact: true,
-            });
-            // A native click can leave a subpixel beyond the viewport edge.
-            // Scroll the real control fully into view; keep the original ratio.
-            await receiver.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
-            await receiver.click();
-            await expect(receiver).toHaveAttribute("aria-expanded", "true");
-            await receiver.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
-            const geometry = () => receiver.evaluate(node => {
-              const r = node.getBoundingClientRect(), control = node.closest(".hca-search-select") ?? node;
+            const picker = await openDeliveryRecipient(page);
+            const receiver = recipientOption(picker, person.name);
+            const card = receiver.locator("..");
+            await receiver.check();
+            await card.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
+            const geometry = () => card.evaluate(node => {
+              const r = node.getBoundingClientRect();
               const x = r.left + r.width / 2, y = r.top + r.height / 2;
               return {
                 bounds: { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: innerWidth, height: innerHeight },
                 inside: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight,
-                edges: [[x, r.top + 1], [x, r.bottom - 1], [r.left + 1, y], [r.right - 1, y]].map(([px, py]) => control.contains(document.elementFromPoint(px, py))),
+                edges: [[x, r.top + 1], [x, r.bottom - 1], [r.left + 1, y], [r.right - 1, y]].map(([px, py]) => node.contains(document.elementFromPoint(px, py))),
               };
             });
             try {
               await expect.poll(geometry).toMatchObject({ inside: true, edges: [true, true, true, true] });
-              await expect(receiver).toBeInViewport({ ratio: 1 });
+              await expect(card).toBeInViewport({ ratio: 1 });
             } catch (failure) {
               await info.attach("recipient-geometry", { contentType: "application/json", body: JSON.stringify(await geometry()) });
               throw failure;
             }
-            await receiver.fill(person.name);
-            await receiver.press("ArrowDown");
-            await page
-              .getByRole("option", { name: person.name, exact: true })
-              .or(page.getByRole("option", { name: `${person.name} · Em plantão`, exact: true }))
-              .click();
-            await page
-              .getByLabel("Justificativa da escolha do recebedor", {
-                exact: true,
-              })
+            await expect(receiver).toBeChecked();
+            await picker
+              .getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true })
               .fill(
                 "Escolha manual fictícia para percorrer a seleção de materiais",
               );
@@ -208,6 +202,10 @@ for (const count of [1, 5, 20, 100]) {
             path: `output/playwright/phase-d/catalogue-${count}-${type}-${info.project.name}.png`,
             fullPage: true,
           });
+          for (const category of count > 1 ? [/^Higiene/, /^Dieta/] : []) {
+            await next(page);
+            await expect(categories.getByRole("button", { name: category, pressed: true })).toBeVisible();
+          }
           for (let step = 0; step < 3; step++)
             await next(page);
           await expect(
@@ -248,22 +246,15 @@ for (const count of [1, 5, 20, 100]) {
             contentType: "application/json",
           });
         } catch (failure) {
-          mkdirSync("output/playwright/phase-d", { recursive: true });
-          await info.attach(`catalogue-${count}-${type}-failed-page`, {
-            body: JSON.stringify(
-              {
-                url: page.url(),
-                headings: await page.getByRole("heading").allTextContents(),
-              },
-              null,
-              2,
-            ),
-            contentType: "application/json",
-          });
-          await page.screenshot({
-            path: `output/playwright/phase-d/catalogue-${count}-${type}-${info.project.name}-failure.png`,
-            fullPage: true,
-          });
+          if (!page.isClosed()) {
+            try {
+              await info.attach(`catalogue-${count}-${type}-failed-page`, {
+                body: JSON.stringify({ url: page.url(), headings: await page.getByRole("heading").allTextContents() }, null, 2),
+                contentType: "application/json",
+              });
+              await page.screenshot({ path: info.outputPath("catalogue-failure.png"), fullPage: true });
+            } catch { /* Playwright may close the page while reporting a timeout. */ }
+          }
           throw failure;
         }
       });

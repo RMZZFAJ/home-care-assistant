@@ -380,13 +380,19 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
           searchField(peer, source),
         ).toHaveValue(packet.content.fields.query);
         await stepButton(peer, "Confirmação").click();
-        const recipientField = source === "CARE_TEAM"
-          ? (await openDeliveryRecipient(peer)).getByRole("combobox", { name: "Recebedor físico designado", exact: true }) : recipient(peer);
-        await expect(recipientField).toHaveValue(f.recipientId);
-        await expect(recipientField.locator("option:checked")).toContainText(packet.content.fields.recipientLabel);
-        await expect(recipientField.locator("option:checked")).toBeDisabled();
-        await recipientField.selectOption(replacement!.id);
-        if (source === "CARE_TEAM") await peer.getByRole("button", { name: "Usar recebedor", exact: true }).click();
+        if (source === "CARE_TEAM") {
+          const picker = await openDeliveryRecipient(peer);
+          await expect(picker.getByText(packet.content.fields.recipientLabel + " · indisponível", { exact: true })).toBeVisible();
+          await expect(picker.getByRole("radio", { checked: true })).toHaveCount(0);
+          await picker.locator(`input[type=radio][value="${replacement!.id}"]`).check();
+          await picker.getByRole("button", { name: "Usar recebedor", exact: true }).click();
+        } else {
+          const recipientField = recipient(peer);
+          await expect(recipientField).toHaveValue(f.recipientId);
+          await expect(recipientField.locator("option:checked")).toContainText(packet.content.fields.recipientLabel);
+          await expect(recipientField.locator("option:checked")).toBeDisabled();
+          await recipientField.selectOption(replacement!.id);
+        }
         await editor(peer).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
         await amountField(peer).fill("2");
         if (source === "CARE_TEAM") {

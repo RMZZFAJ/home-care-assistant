@@ -136,7 +136,7 @@ export function DocumentMaterialList({
         <ActionButton variant="quiet" aria-expanded={filterOpen} onClick={() => setFilterOpen(value => !value)}>
           <Icon name="sliders" />{filterTitles[filter]} ({count(filter)})<Icon name="down" />
         </ActionButton>
-        <TextInput type="search" aria-label="Pesquisar material" placeholder="Pesquisar material" value={search}
+        <TextInput type="search" aria-label="Pesquisar material" placeholder="Buscar" value={search}
           maxLength={160} onChange={event => setSearch(event.currentTarget.value)} />
       </div>
       {filterOpen ? <div className="hca-v7-material-filters" role="group" aria-label="Filtrar materiais">

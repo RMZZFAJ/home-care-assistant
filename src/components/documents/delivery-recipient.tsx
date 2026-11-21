@@ -1,12 +1,12 @@
 "use client";
-import { SearchSelect } from "@/components/ui/search-select";
-import { useEffect, useRef, useState, type Dispatch, type Ref, type SetStateAction } from "react";
+import { useEffect, useId, useRef, useState, type Dispatch, type Ref, type SetStateAction } from "react";
 
 import { Notice } from "@/components/workspace";
-import { ActionButton, FormField, Pill, TextAreaField } from "@/components/ui/controls";
+import { ActionButton, FormField, Pill, TextAreaField, TextInput } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
 import { roleLabel } from "@/lib/role-labels";
+import { normalizeCatalogText } from "@/lib/catalog-match";
 import { formatBrazilDate } from "@/lib/receipt";
 import type {
   DeliveryPreparation,
@@ -14,8 +14,8 @@ import type {
 } from "@/types/documents";
 import type { WizardState } from "./supply-wizard-step";
 
-export function WizardRecipientCard({ title, name, role, onDuty, invalid, disabled, onEdit, triggerRef }: {
-  title: string; name?: string; role?: string; onDuty?: boolean; invalid?: boolean;
+export function WizardRecipientCard({ title, name, role, duty, invalid, disabled, onEdit, triggerRef }: {
+  title: string; name?: string; role?: string; duty?: string; invalid?: boolean;
   disabled?: boolean; onEdit: () => void; triggerRef: Ref<HTMLButtonElement>;
 }) {
   return <>
@@ -32,9 +32,55 @@ export function WizardRecipientCard({ title, name, role, onDuty, invalid, disabl
         <strong>{name || "Recebedor a definir"}</strong>
         <small>{role ? roleLabel(role) : "Escolha uma pessoa habilitada para a conferência."}</small>
       </div>
-      {onDuty ? <Pill tone="success"><Icon name="clock" width={12} height={12} />Em plantão</Pill> : null}
+      {duty ? <Pill tone="success"><Icon name="clock" width={12} height={12} />{duty}</Pill> : null}
     </div>
   </>;
+}
+
+const shiftTime = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
+
+function dutyByPerson(shifts: DeliveryPreparation["shifts"]) {
+  const duty = new Map<string, string>();
+  for (const shift of shifts) {
+    if (!duty.has(shift.professionalId)) duty.set(shift.professionalId,
+      `Em plantão · ${shiftTime.format(new Date(shift.startsAt))}–${shiftTime.format(new Date(shift.endsAt))}`);
+  }
+  return duty;
+}
+
+export function WizardRecipientOptions({ label, people, value, onChange, duty, disabled, groupRef }: {
+  label: string;
+  people: DeliveryPreparation["people"];
+  value: string;
+  onChange: (id: string) => void;
+  duty?: ReadonlyMap<string, string>;
+  disabled?: boolean;
+  groupRef?: Ref<HTMLFieldSetElement>;
+}) {
+  const groupId = useId();
+  const [search, setSearch] = useState("");
+  const query = normalizeCatalogText(search);
+  const visible = people.filter(person => normalizeCatalogText(person.name).includes(query));
+  return <fieldset className="hca-recipient-options" ref={groupRef} disabled={disabled}>
+    <legend className="sr-only">{label}</legend>
+    {people.length > 8 ? <FormField label="Buscar recebedor">
+      <TextInput type="search" value={search} onChange={event => setSearch(event.currentTarget.value)} />
+    </FormField> : null}
+    {visible.map(person => {
+      const shift = duty?.get(person.id);
+      const labelId = `${groupId}-${person.id}`;
+      return <label key={person.id} className="hca-recipient-option">
+        <input type="radio" name={groupId} value={person.id} checked={value === person.id}
+          aria-labelledby={labelId} aria-describedby={`${labelId}-status`} onChange={() => onChange(person.id)} />
+        <span>
+          <strong id={labelId}>{person.name}</strong>
+          <span id={`${labelId}-status`}>{shift ? <Pill tone="success"><Icon name="clock" width={12} height={12} />{shift}</Pill>
+            : <Pill>{roleLabel(person.role)}</Pill>}</span>
+        </span>
+      </label>;
+    })}
+    {!visible.length && query ? <p role="status">Nenhum recebedor encontrado.</p> : null}
+  </fieldset>;
 }
 
 const stateLabels = {
@@ -99,25 +145,25 @@ export function DeliveryRecipientField({
   onAdopt: () => void;
 }) {
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const refreshRef = useRef<HTMLButtonElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const groupRef = useRef<HTMLFieldSetElement>(null);
+  const helpRef = useRef<HTMLParagraphElement>(null);
   const focusAfterAdoptRef = useRef(false);
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [reason, setReason] = useState("");
-  const [search, setSearch] = useState<string | null>(null);
   const chosen = data?.people.find(person => person.id === form.recipientId);
   const selected = data?.people.find(person => person.id === selectedId);
-  const onDuty = chosen && data?.shifts.some(shift => shift.professionalId === chosen.id);
+  const duty = dutyByPerson(data?.shifts ?? []);
   const needsReason = Boolean(selectedId &&
     (selectedId !== data?.suggestedId || (previousRecipient && previousRecipient !== selectedId)));
   const missing = fieldErrors.recipientId || fieldErrors.recipientReason || fieldErrors.recipientContext;
   useEffect(() => {
     if (!open || comparison || loading || error || !focusAfterAdoptRef.current) return;
-    // Wait for the combobox to apply its enabled state.
     const frame = requestAnimationFrame(() => {
       focusAfterAdoptRef.current = false;
-      inputRef.current?.focus({ preventScroll: true });
+      const first = groupRef.current?.querySelector<HTMLInputElement>("input:checked")
+        ?? groupRef.current?.querySelector<HTMLInputElement>("input");
+      first?.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);
   }, [open, comparison, loading, error]);
@@ -126,8 +172,8 @@ export function DeliveryRecipientField({
     focusAfterAdoptRef.current = false;
     setSelectedId(form.recipientId);
     setReason(form.recipientReason ?? "");
-    setSearch(null);
     setOpen(true);
+    if (!comparison) onRefresh();
   }
 
   function apply() {
@@ -138,14 +184,15 @@ export function DeliveryRecipientField({
 
   return <section className="hca-form-stack" aria-label="Escolha do recebedor">
     <WizardRecipientCard title={data?.destination === "FAMILY" ? "Quem receberá na família" : "Quem receberá na equipe"}
-      name={chosen?.name} role={chosen?.role} onDuty={onDuty} invalid={Boolean(missing)}
+      name={chosen?.name} role={chosen?.role} duty={chosen && duty.get(chosen.id)} invalid={Boolean(missing)}
       disabled={loading || (!error && !data?.people.length)} onEdit={edit} triggerRef={triggerRef} />
     {loading ? <p className="hca-field-help" role="status">Consultando escala e recebedores elegíveis…</p> : null}
-    {missing || error ? <Notice error>{missing || error}</Notice> : null}
+    {!open && (missing || error) ? <Notice error>{missing || error}</Notice> : null}
     {data && !chosen && data.state !== "no_eligible_recipient" ? <p className="hca-field-help">{stateLabels[data.state]}</p> : null}
     {data?.state === "no_eligible_recipient" ? <Notice>{stateLabels.no_eligible_recipient}</Notice> : null}
     {comparison && !open ? <Notice>Confira a referência atual da escala ao alterar o recebedor.</Notice> : null}
-    {open ? <Dialog open title="Escolher recebedor" kicker="Entrega de materiais" popupClassName="hca-wizard-dialog" finalFocus={triggerRef}
+    {open ? <Dialog open title="Escolher quem receberá" kicker="Entrega" popupClassName="hca-wizard-dialog" finalFocus={triggerRef}
+      subtitle="Escolha a pessoa que conferirá os materiais."
       onClose={() => setOpen(false)} keyboardScrollable
       footer={<>
         <ActionButton onClick={() => setOpen(false)}>Voltar</ActionButton>
@@ -153,40 +200,20 @@ export function DeliveryRecipientField({
           onClick={apply}><Icon name="check" />Usar recebedor</ActionButton>
       </>}>
       <div className="hca-form-stack">
-        {data ? <DeliveryRecipientReference data={data} /> : null}
-        <ActionButton ref={refreshRef} compact variant="quiet" disabled={loading} onClick={onRefresh}>
-          <Icon name="refresh" />Consultar escala atual
-        </ActionButton>
         {loading ? <p role="status">Consultando escala e recebedores elegíveis…</p> : null}
-        {error ? <Notice error>{error}</Notice> : null}
+        {error ? <Notice error>{error}<ActionButton compact onClick={onRefresh}>Tentar consultar novamente</ActionButton></Notice> : null}
         {comparison ? <section className="hca-form-stack" aria-label="Comparação do recebedor">
           <h3>Referências atualizadas</h3>
           <DeliveryRecipientReference data={comparison} />
-          <ActionButton onClick={() => {
-            // Hold focus inside the dialog while the comparison button unmounts.
-            refreshRef.current?.focus({ preventScroll: true });
+          <ActionButton disabled={loading || Boolean(error)} onClick={() => {
+            helpRef.current?.focus({ preventScroll: true });
             focusAfterAdoptRef.current = true;
             onAdopt();
           }}>Usar referências atuais</ActionButton>
         </section> : null}
-        <div>
-          <label htmlFor="delivery-recipient" className="field-label">Destinatário designado</label>
-          <SearchSelect ref={inputRef} id="delivery-recipient" query={search ?? selected?.name ?? ""} selectedIds={selected ? [selected.id] : []}
-            disabled={loading || Boolean(error) || Boolean(comparison) || !data?.people.length} required
-            aria-describedby="delivery-recipient-help" triggerLabel="Abrir opções de recebedor" placeholder="Busque quem receberá"
-            onQueryChange={value => { setSearch(value); setSelectedId(""); }}
-            onSelectionChange={ids => {
-              const person = data?.people.find(candidate => candidate.id === ids[0]);
-              if (!person) return;
-              setSelectedId(person.id);
-              setSearch(null);
-            }}
-            options={data?.people.filter(person => !search || person.name.toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR")))
-              .map(person => ({ value: person.id, label: person.name, content: <>
-                {person.name}{data.shifts.some(shift => shift.professionalId === person.id) ? " · Em plantão" : ""}
-              </> })) ?? []} />
-          <p id="delivery-recipient-help" className="hca-field-help">Somente a pessoa que receber fisicamente pode confirmar o recebimento.</p>
-        </div>
+        <WizardRecipientOptions label="Destinatário designado" people={data?.people ?? []} value={selectedId}
+          onChange={setSelectedId} duty={duty} disabled={loading || Boolean(error) || Boolean(comparison)} groupRef={groupRef} />
+        <p ref={helpRef} tabIndex={-1} className="hca-field-help">Somente a pessoa que receber fisicamente pode confirmar o recebimento.</p>
         {needsReason || reason ? <FormField label="Justificativa da escolha do recebedor" required={needsReason}>
           <TextAreaField rows={3} minLength={3} maxLength={1000} value={reason} onChange={event => setReason(event.currentTarget.value)} />
         </FormField> : null}

@@ -15,7 +15,7 @@ import {
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { openDeliveryRecipient, selectDeliveryRecipient } from "./delivery-recipient";
+import { openDeliveryRecipient, recipientOption, selectDeliveryRecipient } from "./delivery-recipient";
 import { audit, auditFromTop } from "./accessibility-audit";
 import type { SupplyDocument } from "../../src/types/documents";
 
@@ -167,6 +167,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
     await uncertain.getByRole("button", { name: "Consultar resultado", exact: true }).click();
     const processingNotices = page.getByRole("dialog", { name: "Processando os avisos da emissão", exact: true });
     await expect(processingNotices).toBeVisible({ timeout: 65_000 });
+    await expect(page.locator(".hca-supply-wizard-status").filter({ hasText: /rascunho|alterações a salvar/i })).toHaveCount(0);
     await expect.poll(() => noticeResponses.length).toBe(1);
     expect(noticeResponses[0]).toMatchObject({ noticesPrepared: true, noticesNeedAttention: true, issuanceId: null });
     await info.attach("emissao-processando-avisos", {
@@ -305,7 +306,6 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
   await selectDeliveryRecipient(page, "Teste professional", reason);
   await materialsAndReview(page);
   await page.getByRole("navigation", { name: "Etapas da ENT" }).getByRole("button", { name: "Confirmação", exact: true }).click();
-  await openDeliveryRecipient(page);
   await page.route("**/api/documents/delivery-preparation?**", (route) =>
     route.fulfill({
       status: 503,
@@ -316,9 +316,8 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
       }),
     }),
   );
-  await page
-    .getByRole("button", { name: "Consultar escala atual", exact: true })
-    .click();
+  const picker = await openDeliveryRecipient(page);
+  await expect(picker.getByRole("button", { name: "Consultar escala atual", exact: true })).toHaveCount(0);
   await expect(
     page
       .getByText(/Consulta de recebedores indisponível|Não foi possível/)
@@ -329,26 +328,19 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
   await page.unroute("**/api/documents/delivery-preparation?**");
   const shift = currentDeliveryShift(f, fixtures.global.id);
   try {
-    await page
-      .getByRole("button", { name: "Consultar escala atual", exact: true })
-      .click();
+    await picker.getByRole("button", { name: "Tentar consultar novamente", exact: true }).click();
     await expect(
       page.getByRole("region", {
         name: "Comparação do recebedor",
         exact: true,
       }),
     ).toContainText("Teste global");
-    await expect(
-      page.getByRole("combobox", {
-        name: "Destinatário designado",
-        exact: true,
-      }),
-    ).toBeDisabled();
+    const recipientField = recipientOption(picker, "Teste professional");
+    await expect(recipientField).toBeDisabled();
     await expect(explanation(page)).toHaveValue(reason);
     await page
       .getByRole("button", { name: "Usar referências atuais", exact: true })
       .click();
-    const recipientField = page.getByRole("combobox", { name: "Destinatário designado", exact: true });
     try {
       await expect(recipientField).toBeFocused();
     } catch (focusError) {
@@ -363,12 +355,8 @@ test("P06 erro de consulta e escala alterada preservam edição e exigem adotar 
       });
       throw focusError;
     }
-    await expect(
-      page.getByRole("combobox", {
-        name: "Destinatário designado",
-        exact: true,
-      }),
-    ).toHaveValue("Teste professional");
+    await expect(recipientField).toBeChecked();
+    await page.screenshot({ path: test.info().outputPath("ENT-escolher-recebedor.png"), animations: "disabled" });
     await page.getByRole("button", { name: "Usar recebedor", exact: true }).click();
     await next(page);
     await selectMaterialCategory(page);

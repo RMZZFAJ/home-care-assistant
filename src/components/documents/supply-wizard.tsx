@@ -1827,6 +1827,7 @@ export function PatientSupplyWizard({
                   (!allowed && !uncertain)
                 }
                 draftBusy={privateDraft.backgroundBusy}
+                hideDraftStatus={issuing || navigating}
                 supply={type === "BAL" ? undefined : { kind: type, draft: privateDraft, current: privateContent,
                   hasEdits: draftTouched, exitHref: exitDocumentId ? "/fichas/" + encodeURIComponent(exitDocumentId) : "/fichas" }}
                 draftStatus={isBalance ? { draft: privateDraft, current: privateContent, hasEdits: draftTouched } : undefined}

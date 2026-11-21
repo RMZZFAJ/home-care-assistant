@@ -81,7 +81,7 @@ import type { Custody, SupplyDocument } from "@/types/documents";
 import type { TransferPreparation } from "@/types/transfers";
 import { materialTransferLabel } from "@/lib/documents/transfer-follow-up";
 import { MaterialConsultButton } from "./catalogue-material-panel";
-import { WizardRecipientCard } from "./delivery-recipient";
+import { WizardRecipientCard, WizardRecipientOptions } from "./delivery-recipient";
 import { RelatedDocument } from "./related-document";
 import { ReturnBarcodeDialog } from "./return-barcode-dialog";
 import { SupplySourcePicker, type SupplySourceSelection } from "./supply-source-picker";
@@ -101,7 +101,7 @@ function ReturnRecipient({ reference, recipientId, savedName, reason, onSelect }
       invalid={!!recipientId && !chosen} disabled={!reference.people.length} triggerRef={triggerRef}
       onEdit={() => setEdit({ id: recipientId, reason })} />
     {recipientId && !chosen ? <p className="hca-field-help">A escolha anterior está indisponível. Indique outra pessoa.</p> : null}
-    {edit ? <Dialog open title="Escolher recebedor" kicker="Devolução de materiais"
+    {edit ? <Dialog open title="Escolher quem receberá" kicker="Devolução" subtitle="Escolha quem conferirá a devolução na família."
       popupClassName="hca-wizard-dialog" finalFocus={triggerRef} onClose={() => setEdit(null)} keyboardScrollable
       footer={<>
         <ActionButton onClick={() => setEdit(null)}>Voltar</ActionButton>
@@ -111,13 +111,9 @@ function ReturnRecipient({ reference, recipientId, savedName, reason, onSelect }
         </ActionButton>
       </>}>
       <div className="hca-form-stack">
-        <FormField label="Recebedor físico designado" required>
-          <SelectField value={edit.id} onChange={event => setEdit({ ...edit, id: event.currentTarget.value })}>
-            <option value="">Escolha quem recebe pessoalmente</option>
-            {edit.id && !valid ? <option value={edit.id} disabled>{savedName || "Escolha anterior"} · indisponível</option> : null}
-            {reference.people.map(person => <option key={person.id} value={person.id}>{person.name}</option>)}
-          </SelectField>
-        </FormField>
+        {edit.id && !valid ? <p className="hca-field-help">{savedName || "Escolha anterior"} · indisponível</p> : null}
+        <WizardRecipientOptions label="Recebedor físico designado" people={reference.people} value={edit.id}
+          onChange={id => setEdit(current => current && { ...current, id })} />
         {needsReason || edit.reason ? <FormField label="Justificativa da escolha do recebedor" required={needsReason}>
           <TextAreaField rows={2} minLength={3} maxLength={1000} value={edit.reason}
             onChange={event => setEdit({ ...edit, reason: event.currentTarget.value })} />
@@ -881,6 +877,7 @@ function TransferDeclarationEditor({
       statusInFooter={write && (!!reference && !referenceUnavailable || !!packet)}
       patientName={context.patient?.display_name ?? "Paciente selecionado"}
       authorName={context.fullName}
+      documentLabel={isReturn ? "Devolução" : "Entrega"}
       disabled={busy || uncertain || !!packet}
       resumeLabel={recoveryOnly ? "Consultar preenchimento salvo" : undefined}
       discardLabel={
@@ -1606,7 +1603,7 @@ function TransferDeclarationEditor({
                   O resultado ainda é incerto. Verifique esta tentativa de expedição antes de enviar outra.
                 </Notice>
               ) : null}
-              <SupplyWizardFooter status={uncertain ? undefined : { draft: privateDraft, current: currentContent, hasEdits: draftTouched }} back={!uncertain ? (
+              <SupplyWizardFooter status={busy || navigating || uncertain ? undefined : { draft: privateDraft, current: currentContent, hasEdits: draftTouched }} back={!uncertain ? (
                   <ActionButton
                     variant="quiet"
                     onClick={() => {
