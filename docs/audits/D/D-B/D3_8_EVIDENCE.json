@@ -1,0 +1,398 @@
+{
+  "sourceBaseSha": "ebc44644b39f547cd47f3fab2d782898d0489e5e",
+  "candidateIdentifiedByLfSourceHashes": true,
+  "files": [
+    {
+      "file": "src/components/admin/accept-invitation.tsx",
+      "sha256LfUtf8": "b44628eeeb77f450a934e6b1f9a4b9c93c587d4599539e9ec74c774476ef8011"
+    },
+    {
+      "file": "src/components/admin/admin-fields.tsx",
+      "sha256LfUtf8": "594b1298dc16c818f377d18aa93a22c71d76dbe5833dad558c82a7f62f99781f"
+    },
+    {
+      "file": "src/components/admin/membership-management.tsx",
+      "sha256LfUtf8": "2dea54ba121f3cb875f0948de01d74edf0971b4bddef26f5d8ff4695bf35044f"
+    },
+    {
+      "file": "src/components/app-shell.tsx",
+      "sha256LfUtf8": "57600967147a92030ce7ae0c5e4e006a572dfba6de475d2731a9e744ddc41f39"
+    },
+    {
+      "file": "src/components/documents/document-history.tsx",
+      "sha256LfUtf8": "59671159e647eb71da6364c8ed03df2b97936d138d7cf928b5278d06389eeeb0"
+    },
+    {
+      "file": "src/components/guides/user-guide.tsx",
+      "sha256LfUtf8": "2a5aa6936bd6d14f16d47c66e54615bd792c85e62f661d1ce83d55f9a166b299"
+    },
+    {
+      "file": "src/components/layout/workspace-context.tsx",
+      "sha256LfUtf8": "f0da41c5c2c8062e03578cb23e7959902688c6489276a874fb504d1952b5788b"
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "sha256LfUtf8": "117a6a205f239ea58518a17276cc5716d11066363a5edcc84aeda87222a68a8f"
+    },
+    {
+      "file": "src/components/navigation/more-actions.tsx",
+      "sha256LfUtf8": "b18f2893177b163655b7410a289a8c4fedf74fd13c21f0badf89878d6e65689a"
+    },
+    {
+      "file": "src/components/notifications/notification-bell.tsx",
+      "sha256LfUtf8": "8767af2aa8f3715627771779a3645a6ad820a90b315f16f18e2f36af8fb13bee"
+    },
+    {
+      "file": "src/components/notifications/notification-center.tsx",
+      "sha256LfUtf8": "1d4f490ad79c7924255652ca2ab5e1c50171dae0edf7d1ffb10958ca21cdbfee"
+    },
+    {
+      "file": "src/components/schedules/schedule-console.tsx",
+      "sha256LfUtf8": "d7b5a187914b49a53c4e2251a77a877ce44748ee816599d30ad484ad8fabeb81"
+    },
+    {
+      "file": "src/components/ui/primitives.tsx",
+      "sha256LfUtf8": "549f5d10de79f1441b5f4bea173ac3eff856a8fe6d2cf8715e604b89a794b708"
+    },
+    {
+      "file": "src/lib/documents/presentation.ts",
+      "sha256LfUtf8": "9414c7622acbccbe544467f27080afe21fbe9af7291b9e6658d6f2f9866e895c"
+    },
+    {
+      "file": "src/lib/notifications/navigation.ts",
+      "sha256LfUtf8": "6ac10ec66ca6c59550cc8e255b7b89a5d9a07f75ad75c987bc08c60c5e06bddd"
+    },
+    {
+      "file": "src/lib/role-labels.ts",
+      "sha256LfUtf8": "99a1497296818b7314a026093e92552d43eb2f540dcc78a8db9f48a656551db9"
+    },
+    {
+      "file": "src/lib/schedules/presentation.ts",
+      "sha256LfUtf8": "75eb269fd98aaa74d8a00c1950412e69858c0c24a5482bb4ef80de2f097f4e3e"
+    },
+    {
+      "file": "tests/e2e/language-navigation-filters.spec.ts",
+      "sha256LfUtf8": "da10f1e317d375c6df70ab1a37695562f9c3fb008fc0fdc0191d1cc832a8db13"
+    },
+    {
+      "file": "tests/language-navigation.test.ts",
+      "sha256LfUtf8": "0b4445bb86954343f469bf1d0cfd0240f6a975ba00974ee1400115a11581a689"
+    }
+  ],
+  "first21CaseSources": [
+    {
+      "file": "src/components/admin/accept-invitation.tsx",
+      "sha256LfUtf8": "b44628eeeb77f450a934e6b1f9a4b9c93c587d4599539e9ec74c774476ef8011"
+    },
+    {
+      "file": "src/components/admin/admin-fields.tsx",
+      "sha256LfUtf8": "594b1298dc16c818f377d18aa93a22c71d76dbe5833dad558c82a7f62f99781f"
+    },
+    {
+      "file": "src/components/admin/membership-management.tsx",
+      "sha256LfUtf8": "2dea54ba121f3cb875f0948de01d74edf0971b4bddef26f5d8ff4695bf35044f"
+    },
+    {
+      "file": "src/components/app-shell.tsx",
+      "sha256LfUtf8": "57600967147a92030ce7ae0c5e4e006a572dfba6de475d2731a9e744ddc41f39"
+    },
+    {
+      "file": "src/components/documents/document-history.tsx",
+      "sha256LfUtf8": "59671159e647eb71da6364c8ed03df2b97936d138d7cf928b5278d06389eeeb0"
+    },
+    {
+      "file": "src/components/guides/user-guide.tsx",
+      "sha256LfUtf8": "2a5aa6936bd6d14f16d47c66e54615bd792c85e62f661d1ce83d55f9a166b299"
+    },
+    {
+      "file": "src/components/layout/workspace-context.tsx",
+      "sha256LfUtf8": "f0da41c5c2c8062e03578cb23e7959902688c6489276a874fb504d1952b5788b"
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "sha256LfUtf8": "117a6a205f239ea58518a17276cc5716d11066363a5edcc84aeda87222a68a8f"
+    },
+    {
+      "file": "src/components/navigation/more-actions.tsx",
+      "sha256LfUtf8": "b18f2893177b163655b7410a289a8c4fedf74fd13c21f0badf89878d6e65689a"
+    },
+    {
+      "file": "src/components/notifications/notification-bell.tsx",
+      "sha256LfUtf8": "8767af2aa8f3715627771779a3645a6ad820a90b315f16f18e2f36af8fb13bee"
+    },
+    {
+      "file": "src/components/notifications/notification-center.tsx",
+      "sha256LfUtf8": "1d4f490ad79c7924255652ca2ab5e1c50171dae0edf7d1ffb10958ca21cdbfee"
+    },
+    {
+      "file": "src/components/schedules/schedule-console.tsx",
+      "sha256LfUtf8": "d7b5a187914b49a53c4e2251a77a877ce44748ee816599d30ad484ad8fabeb81"
+    },
+    {
+      "file": "src/lib/documents/presentation.ts",
+      "sha256LfUtf8": "80c0442d8ae961ae09c25a8f0f3a16880f7e0ea17d3a4d7fd7cc41dd8d52cfb1"
+    },
+    {
+      "file": "src/lib/notifications/navigation.ts",
+      "sha256LfUtf8": "818db26fcab24781885bdeb1001dbc7a94730dfd1acef9cc47b9da6e364311b8"
+    },
+    {
+      "file": "src/lib/role-labels.ts",
+      "sha256LfUtf8": "99a1497296818b7314a026093e92552d43eb2f540dcc78a8db9f48a656551db9"
+    },
+    {
+      "file": "src/lib/schedules/presentation.ts",
+      "sha256LfUtf8": "75eb269fd98aaa74d8a00c1950412e69858c0c24a5482bb4ef80de2f097f4e3e"
+    },
+    {
+      "file": "tests/e2e/language-navigation-filters.spec.ts",
+      "sha256LfUtf8": "ce6314812e30607c7388956110e5c5e9ebc9d37cfbcd755075a85d5405b14468"
+    },
+    {
+      "file": "tests/language-navigation.test.ts",
+      "sha256LfUtf8": "a7cba310a6fe3843ceea18d6ea06055d63f260110f1a9eec26d2b13c67937a9e"
+    }
+  ],
+  "fallback3CaseSources": [
+    {
+      "file": "src/components/admin/accept-invitation.tsx",
+      "sha256LfUtf8": "b44628eeeb77f450a934e6b1f9a4b9c93c587d4599539e9ec74c774476ef8011"
+    },
+    {
+      "file": "src/components/admin/admin-fields.tsx",
+      "sha256LfUtf8": "594b1298dc16c818f377d18aa93a22c71d76dbe5833dad558c82a7f62f99781f"
+    },
+    {
+      "file": "src/components/admin/membership-management.tsx",
+      "sha256LfUtf8": "2dea54ba121f3cb875f0948de01d74edf0971b4bddef26f5d8ff4695bf35044f"
+    },
+    {
+      "file": "src/components/app-shell.tsx",
+      "sha256LfUtf8": "57600967147a92030ce7ae0c5e4e006a572dfba6de475d2731a9e744ddc41f39"
+    },
+    {
+      "file": "src/components/documents/document-history.tsx",
+      "sha256LfUtf8": "59671159e647eb71da6364c8ed03df2b97936d138d7cf928b5278d06389eeeb0"
+    },
+    {
+      "file": "src/components/guides/user-guide.tsx",
+      "sha256LfUtf8": "2a5aa6936bd6d14f16d47c66e54615bd792c85e62f661d1ce83d55f9a166b299"
+    },
+    {
+      "file": "src/components/layout/workspace-context.tsx",
+      "sha256LfUtf8": "f0da41c5c2c8062e03578cb23e7959902688c6489276a874fb504d1952b5788b"
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "sha256LfUtf8": "117a6a205f239ea58518a17276cc5716d11066363a5edcc84aeda87222a68a8f"
+    },
+    {
+      "file": "src/components/navigation/more-actions.tsx",
+      "sha256LfUtf8": "b18f2893177b163655b7410a289a8c4fedf74fd13c21f0badf89878d6e65689a"
+    },
+    {
+      "file": "src/components/notifications/notification-bell.tsx",
+      "sha256LfUtf8": "8767af2aa8f3715627771779a3645a6ad820a90b315f16f18e2f36af8fb13bee"
+    },
+    {
+      "file": "src/components/notifications/notification-center.tsx",
+      "sha256LfUtf8": "1d4f490ad79c7924255652ca2ab5e1c50171dae0edf7d1ffb10958ca21cdbfee"
+    },
+    {
+      "file": "src/components/schedules/schedule-console.tsx",
+      "sha256LfUtf8": "d7b5a187914b49a53c4e2251a77a877ce44748ee816599d30ad484ad8fabeb81"
+    },
+    {
+      "file": "src/components/ui/primitives.tsx",
+      "sha256LfUtf8": "549f5d10de79f1441b5f4bea173ac3eff856a8fe6d2cf8715e604b89a794b708"
+    },
+    {
+      "file": "src/lib/documents/presentation.ts",
+      "sha256LfUtf8": "0391e14e495e057363599f69799810160f17ea4f84f3650a3b0a25316400fa66"
+    },
+    {
+      "file": "src/lib/notifications/navigation.ts",
+      "sha256LfUtf8": "6ac10ec66ca6c59550cc8e255b7b89a5d9a07f75ad75c987bc08c60c5e06bddd"
+    },
+    {
+      "file": "src/lib/role-labels.ts",
+      "sha256LfUtf8": "99a1497296818b7314a026093e92552d43eb2f540dcc78a8db9f48a656551db9"
+    },
+    {
+      "file": "src/lib/schedules/presentation.ts",
+      "sha256LfUtf8": "75eb269fd98aaa74d8a00c1950412e69858c0c24a5482bb4ef80de2f097f4e3e"
+    },
+    {
+      "file": "tests/e2e/language-navigation-filters.spec.ts",
+      "sha256LfUtf8": "56ba56e6c0c2cd30247089e724f47abb6cb2e1d796b1596ce9cf4833a3b79c9f"
+    },
+    {
+      "file": "tests/language-navigation.test.ts",
+      "sha256LfUtf8": "0b4445bb86954343f469bf1d0cfd0240f6a975ba00974ee1400115a11581a689"
+    }
+  ],
+  "unitCasesPassed": 46,
+  "languageNavigationCases": 19,
+  "unchangedGovernancePresentationCases": 27,
+  "productionCasesDistinctPassed": 21,
+  "productionExecutionsPassed": 27,
+  "productionRuns": [
+    {
+      "passed": 21,
+      "log": "d3-language-browser-acceptance.log"
+    },
+    {
+      "passed": 3,
+      "log": "d3-language-browser-fallback-recheck.log"
+    },
+    {
+      "passed": 3,
+      "log": "d3-language-browser-family-stock.log"
+    }
+  ],
+  "projects": [
+    "chromium",
+    "mobile",
+    "ios"
+  ],
+  "sixAuthProfiles": [
+    "adminA",
+    "family",
+    "professional",
+    "supervisor",
+    "reader",
+    "global"
+  ],
+  "fourViewportSurfaces": [
+    "history chips and unknown document badge",
+    "delivery empty selection",
+    "stock empty selection"
+  ],
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "authWasRealInBrowser": true,
+  "separateAuthRpcSuiteRun": false,
+  "scheduleEventProducers": [
+    {
+      "name": "schedule_command",
+      "eventCalls": [
+        "result:=to_jsonb(typ);perform private.schedule_event(p_patient,null,null,null,'schedule.type',reason,before_row,result);",
+        "result:=to_jsonb(ser);perform private.schedule_event(p_patient,ser.id,null,worker,'schedule.'||ser.status,reason,null,result);",
+        "result:=to_jsonb(ser);perform private.schedule_event(p_patient,ser.id,null,worker,'schedule.'||p_action,reason,before_row,result);",
+        "result:=to_jsonb(proposal);perform private.schedule_event(p_patient,s.series_id,s.id,s.professional_id,'schedule.change_requested',reason,to_jsonb(s),result);",
+        "result:=to_jsonb(proposal);perform private.schedule_event(p_patient,null,proposal.shift_id,proposal.professional_id,'schedule.change_decided',reason,null,result);",
+        "result:=to_jsonb(s);perform private.schedule_event(p_patient,s.series_id,s.id,worker,'schedule.'||p_action,reason,before_row,result);"
+      ],
+      "actionBranches": [
+        "p_action='type'",
+        "p_action='series'",
+        "p_action in ('approve','reject','end_series')",
+        "p_action='approve'",
+        "p_action='end_series'",
+        "p_action='reject'",
+        "p_action='approve'",
+        "p_action='propose_change'",
+        "p_action in ('decide_change','close_obsolete')",
+        "p_action='decide_change'",
+        "p_action='close_obsolete'",
+        "p_action='close_obsolete'",
+        "p_action in ('change','cancel')",
+        "p_action='cancel'"
+      ]
+    }
+  ],
+  "localMigrations": 133,
+  "lastReconciledRemoteMigrations": 121,
+  "newMigrations": 0,
+  "remoteDBApplied": false,
+  "historicalProtectedMigrations": 84,
+  "localVerification": {
+    "cron": [
+      {
+        "name": "hca-notification-worker",
+        "active": true,
+        "schedule": "* * * * *"
+      },
+      {
+        "name": "hca-operational-lifecycle",
+        "active": true,
+        "schedule": "* * * * *"
+      }
+    ],
+    "faultHelpers": 0,
+    "faultTriggers": 0,
+    "localMigrations": 133,
+    "scheduleCommandSourceSha256": "c1dc924b02ae2cdb961039977d4d3b11e168217f5b7919481bc9f7b132cd65e0",
+    "fileMigrations": 133
+  },
+  "reuseBoundary": "The21-case production run covers five new scenarios and two existing notification regressions in all3 projects. Unknown badge fallback and alert ref preservation were added afterward: final46 unit checks cover the pure presentation/link contracts and3 history checks cover the changed badge. Final3 stock checks use the family role; the prior administrator variant is preserved separately. Source hashes identify both tested stages. Schedule events and governance commands retain their behavior; presentation is shared and tested. Delivery/stock query guards already existed and were proved, not rewritten.",
+  "counterproofs": [
+    "science_required and archive_pending have matching visual and accessible labels; removing the start date preserves other filters and authorized patient",
+    "Unknown filter, document status, role and prototype keys use explicit human fallbacks; an unknown document state is neutral instead of a claimed pending status",
+    "All5 patient role labels remain separate from global administration; real six-profile navigation does not add unavailable catalogue capability",
+    "All12 typed notification destination cases preserve patient and target reference; document priority discards unrelated reminder ref; real COM notification reaches its authorized document",
+    "Unread notification Badge is not nested in a paragraph; real notice still reaches the same document without changing official events or stock",
+    "Delivery confirmed-empty response held behind newer pending-receipt data cannot overwrite the current filter even when fetch disregards abort",
+    "Stock transit-empty response held behind newer family stock data cannot replace that data; old-scope rows are not shown as current; family and administrator variants checked",
+    "500 remains an error, never a false empty; real delivery empty and controlled stock-empty responses render distinctly; filter focus and original document/stock snapshots remain intact",
+    "Existing bell/center delay, failure, invalid response and scoped empty regressions retain read retry and do not create clinical science"
+  ],
+  "controlledAdapters": [
+    "Stock-empty response replaces the authorized response body; stored stock remains30. This proves query rendering, not an empty physical stock.",
+    "Future status replaces one authorized document summary field; stored events and document status remain unchanged.",
+    "Read500 and inverse response timing are controlled; authorized nonempty results come from real local APIs."
+  ],
+  "diagnosticResults": {
+    "initial": "3/5; native selectOption did not establish focus for either query test",
+    "recheck": "2/3; app alert locator also matched the Next route announcer",
+    "fixes": "Establish keyboard focus before selection; scope alert to main. Assertions retained. Badge paragraph nesting fixed. Anchored grep matched no full Playwright title; exact case count is listed before subsequent runs.",
+    "isAcceptance": false
+  },
+  "basePublishedCIObservedBeforeNewPush": {
+    "sha": "ebc44644b39f547cd47f3fab2d782898d0489e5e",
+    "run": 42351683111,
+    "database": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "browsers": "IN_PROGRESS",
+    "validatesCandidate": false
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "humanPhysicalProviderApproval": false,
+  "remaining": [
+    "C-AC-014: resolve each notice ref at destination, including schedule period and stock alert-specific view; preserved URL alone is not that proof",
+    "Other D3 criteria, session24h, contextual decision drafts, guides and remaining long lists",
+    "D4,D5,backup automation,monitoring and final remote reconciliation",
+    "CI of published SHA;human,AT,physical device,provider and operational D-C/D6 gates"
+  ],
+  "logs": [
+    "output/phase-d-work/d3-language-unit-first.log",
+    "output/phase-d-work/d3-language-unit-final.log",
+    "output/phase-d-work/d3-language-types-after-fallback.log",
+    "output/phase-d-work/d3-language-lint-after-fallback.log",
+    "output/phase-d-work/d3-language-browser-diagnostic.log",
+    "output/phase-d-work/d3-language-browser-diagnostic-recheck.log",
+    "output/phase-d-work/d3-language-browser-diagnostic-recheck-selected.log",
+    "output/phase-d-work/d3-language-browser-acceptance.log",
+    "output/phase-d-work/d3-language-browser-fallback-recheck.log",
+    "output/phase-d-work/d3-language-browser-family-stock.log"
+  ],
+  "documentationValidation": {
+    "markdownFiles": 2,
+    "markdownIssues": 0,
+    "localLinks": "PASS",
+    "canonicalRows": 105,
+    "canonicalColumnsUnchanged": 29,
+    "sourceFingerprintChecks": 19,
+    "historicalMigrationsChanged": 0,
+    "newMigrations": 0
+  },
+  "postValidationFormatting": {
+    "file": "src/lib/documents/presentation.ts",
+    "change": "Removed only the extra blank line at EOF flagged by git diff --check; executable text unchanged."
+  }
+}

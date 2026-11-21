@@ -1,0 +1,75 @@
+{
+  "sourceSha": "0c5d4148d8085f128dc3d9750b05493876bf1fd2",
+  "sourceTreeDirty": true,
+  "appliedAtObservation": "2026-11-07T01:00:16.471Z",
+  "project": "qwfrqychokvhdzakibid",
+  "migrationCountBefore": 113,
+  "migrationCountAfter": 121,
+  "migrations": [
+    {
+      "file": "20261106040155_phase_d2_optional_recount.sql",
+      "sha256": "fceda88954314a39108a1df1dccda5ddc66a64a406d19ad4584f93d43f341744"
+    },
+    {
+      "file": "20261106073728_phase_d2_bilateral_transfers.sql",
+      "sha256": "c1d25139e7ba47a092ac590b52dcc73a33c12aaee8ec964d3dfa145e43acbc7f"
+    },
+    {
+      "file": "20261106075328_phase_d2_preserve_bal_draft_recount.sql",
+      "sha256": "6766b08b802ba55c9b752842e86c12abc9424053bf2e8758388d42e900116a68"
+    },
+    {
+      "file": "20261106161707_phase_d2_catalogue_successors.sql",
+      "sha256": "3c84d81d8f90a854d9aa103f01905f3cbebfeac634005e427f08be695ccc575a"
+    },
+    {
+      "file": "20261106181435_phase_d2_requisition_remaining_need.sql",
+      "sha256": "30f7a333bc30738275e9e67bb50ec85833f053203895073730a4014a6cefbcd7"
+    },
+    {
+      "file": "20261106185554_phase_d2_private_req_bal_drafts.sql",
+      "sha256": "3aed11ea1e7921934d93b88d5e89a85f56d1ffa0a7f3bebe31aa450c88d7bc6d"
+    },
+    {
+      "file": "20261106203000_phase_d2_private_bal_reference.sql",
+      "sha256": "4cfd8a147272229557031e2937b95535ad7f7fd98b196bc6881e0e6be6f4c04e"
+    },
+    {
+      "file": "20261106211500_phase_d2_selected_shift_dates.sql",
+      "sha256": "4c26a0641119eee14d356824515d77e99070cf1bb62e94744a8638eff930bde0"
+    }
+  ],
+  "backupId": "e3c45e45-b4b7-45fd-b58d-666bca46f992",
+  "manifestSha256": "964a7be1124fdb93479e16dc98631000d51237b3720be4753ff3122cd8f80fce",
+  "restoredTables": 122,
+  "storageObjects": 29,
+  "pdfDigests": 28,
+  "sqlHistoryMatches": 113,
+  "liveCatalogueComparison": {
+    "views": true,
+    "columns": true,
+    "indexes": true,
+    "defaults": true,
+    "policies": true,
+    "triggers": true,
+    "functions": true,
+    "relations": true,
+    "constraints": false,
+    "table_grants": true,
+    "function_grants": true
+  },
+  "constraintQualification": "Remote presentation_finite_factor validated; local legacy NaN fixture retains NOT VALID with same predicate",
+  "preserved": {
+    "authUsers": 8,
+    "profiles": 6,
+    "documents": 12,
+    "documentEvents": 145,
+    "stockMovements": 8,
+    "storageObjects": 29
+  },
+  "unexpectedOriginalRowChanges": [],
+  "cronOriginalStatesPreserved": true,
+  "operationalGo": false,
+  "sqlHistoryMatchesAfter": 121,
+  "constraintPredicateIdentical": true
+}

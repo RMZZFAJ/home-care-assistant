@@ -1,8 +1,10 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { SettingsSection } from "@/components/forms/settings-section";
 import Image from "next/image";
 import { useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { safeReturnPath } from "@/lib/safe-return-path";
 import {
@@ -21,6 +23,7 @@ export function MfaSettings() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  useOperationActivity(busy, { title: "Confirmando a verificação de segurança", detail: "Aguarde a confirmação da solicitação." });
   const [attempt, setAttempt] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -112,7 +115,7 @@ export function MfaSettings() {
       setAttempt((value) => value + 1);
       const next = params.get("next");
       if (next)
-        window.location.assign(safeReturnPath(next, window.location.origin));
+        window.location.assign("/acesso/continuar?next=" + encodeURIComponent(safeReturnPath(next, window.location.origin)));
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Não foi possível verificar.",
@@ -140,7 +143,7 @@ export function MfaSettings() {
   }
   return (
     <SettingsSection title="Autenticação em duas etapas" summary="Autenticador e verificação adicional de segurança" initiallyOpen={params.get("mfa") === "required"}>
-      
+
       <p className="my-3 text-sm">
         Após ativar o autenticador, a administração exige verificação AAL2.
         Guarde o acesso ao autenticador; não compartilhe o QR.
@@ -201,7 +204,7 @@ export function MfaSettings() {
                   required
                 />
               </label>
-              <button className={primaryClass} disabled={busy}>
+              <button type="submit" className={primaryClass} disabled={busy}>
                 Verificar código
               </button>
             </form>
@@ -218,6 +221,7 @@ export function MfaSettings() {
           </button>
         </>
       )}
+      {params.get("mfa") !== "required" && !verified ? <Link className={buttonClass + " mt-3"} href={"/acesso/continuar?next=" + encodeURIComponent(params.get("next") ?? "/")}>Continuar sem configurar agora</Link> : null}
     </SettingsSection>
   );
 }

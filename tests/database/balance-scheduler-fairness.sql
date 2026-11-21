@@ -4,8 +4,15 @@ set local timezone='UTC';
 -- are temporarily outside this transaction's test batch, never reset/deleted.
 update public.bal_regimes set enabled=false where enabled;
 create temporary table bal_scheduler_fixture (id uuid primary key, shift_type_id uuid not null, enabled boolean not null) on commit drop;
+-- Keep the new regime IDs adjacent to a controlled cursor. Existing formal
+-- recount candidates remain eligible; they must not make this first-batch
+-- assertion depend on unrelated preserved fixtures. All state rolls back.
 insert into bal_scheduler_fixture
-select gen_random_uuid(),gen_random_uuid(),number<=101 from generate_series(1,102) as number;
+select (prefix||lpad(to_hex(number),12,'0'))::uuid,gen_random_uuid(),number<=101
+from generate_series(1,102) as number
+cross join (select left(gen_random_uuid()::text,24) prefix) seed;
+update private.bal_scheduler_progress set last_patient=
+  (select left(min(id::text),24)||'000000000000' from bal_scheduler_fixture)::uuid;
 
 do $test$
 declare v_owner uuid; v_count integer; v_disabled uuid;

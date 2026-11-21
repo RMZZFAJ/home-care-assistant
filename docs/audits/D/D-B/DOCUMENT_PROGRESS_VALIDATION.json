@@ -1,0 +1,652 @@
+{
+  "at": "2026-11-09T09:52:49.425923+00:00",
+  "baseSha": "dc8f9704132aeb56fe84dc0c4cf4010de1e0b3f7",
+  "sourceLfSha256": {
+    "src/app/api/documents/[id]/progress/references/route.ts": "492bea85a2a106de9b9e99372cafa7b57f02ea537ede9144f902aad85067d7e8",
+    "src/app/api/documents/[id]/progress/route.ts": "dcd1d62c57b27ef86e9e45b047d7af06b72302cef8489b3f0e648e1f05f7ab71",
+    "src/app/canonical-ui.css": "bdcc8403b5337a75cd2a865bd6b7f08cf910cfb66acacb1d36d8e52e3f7b7818",
+    "src/components/documents/document-progress.tsx": "18f6ba82b590551ca4f233d02f116198a07277c38a7f19bb1a9920e55141a97a",
+    "src/components/documents/supply-detail.tsx": "efc1eb203d3ccd03ea0611f8a6a110b7c2e7b9fafc14baa6b448e5729dfbcc93",
+    "src/components/requisitions/requisition-detail.tsx": "923ee298ef6613e48a00b1e74f4dcade8eaae42f9426ccc98641893f17e8c6de",
+    "src/lib/capability-labels.ts": "713b5704f2c90f06e4f30cdb2402726d35aa81574f31da948fe557cc9dba7fa9",
+    "src/lib/validation/document-progress.ts": "4b694956515732368bc63948ff94c8472aec8f006c1e586dc11557ce4d3ec572",
+    "supabase/migrations/20261109091550_phase_d3_document_progress.sql": "91ebeb03994d0b4fc8dac82ee7993454a00b5e0412236143ca5dad7cfb6c657a",
+    "tests/e2e/document-progress.spec.ts": "65daa4e85af86af50d2e44a5c20b4025d9fe067f962a7acb0256f4786aebcfd3",
+    "tests/e2e/web-push.spec.ts": "3dbcfdd18893d63ccc3ca4dfca6a9b6b33983e00d61171758e8eb44003f62126",
+    "tests/integration/document-progress.test.mjs": "2c5b4e211ae2aaf0a9b82490f6dcdb41dce3c67e9f2ca19d6657aa1054fcfc6d"
+  },
+  "database": {
+    "realAuthCases": 4,
+    "logs": {
+      "prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+      "integration-final.log": "0d55d637ea825564ca32e168566e00b8ba879469316362a4b433aea5f993bde4",
+      "integration-inactive.log": "bbc7ccb9ad4c9d3b741f4a5dc8be9519a5f55afe6bb6c2c55805488ac180da9c",
+      "lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "advisors-local.log": "99231a677bddc8d3d1a8d62b46c8583a2c4b930e20c5cef0410abdadfe9c6a74"
+    },
+    "boundaries": [
+      "Concurrent same intent inserts one note",
+      "Auth authorship/name snapshot",
+      "Document bytes and existing effects preserved",
+      "Cross-patient and unreadable references refused or omitted",
+      "Reader/global/anon/direct table and service privileges negative",
+      "Permission revocation recovery requires continued read",
+      "Inactive patient new publication denied",
+      "43 notes fully paginated",
+      "Reminders/audit excluded"
+    ]
+  },
+  "browser": {
+    "distinctApprovedCases": 19,
+    "rounds": {
+      "principal": {
+        "stats": {
+          "total": 6,
+          "expected": 4,
+          "unexpected": 2,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 27,
+              "column": 5
+            },
+            "duration": 22481,
+            "outcome": "unexpected",
+            "ok": false
+          },
+          {
+            "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 27,
+              "column": 5
+            },
+            "duration": 23177,
+            "outcome": "unexpected",
+            "ok": false
+          },
+          {
+            "title": "Andamentos alcançam todos os registros, separam fatos e ocultam consulta recusada sem apagar edição própria",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 83,
+              "column": 5
+            },
+            "duration": 6467,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Andamentos funcionam em REQ COM ENT e BAL sem modificar versões ou movimentos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 112,
+              "column": 5
+            },
+            "duration": 11017,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Andamentos alcançam todos os registros, separam fatos e ocultam consulta recusada sem apagar edição própria",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 83,
+              "column": 5
+            },
+            "duration": 9120,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Andamentos funcionam em REQ COM ENT e BAL sem modificar versões ou movimentos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 112,
+              "column": 5
+            },
+            "duration": 13546,
+            "outcome": "expected",
+            "ok": true
+          }
+        ],
+        "reportLfSha256": "78169e322b68012ac0ed7483f55f91d232e85dda4978e2bb6e9f2221e1e512c1"
+      },
+      "final": {
+        "stats": {
+          "total": 6,
+          "expected": 6,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 27,
+              "column": 5
+            },
+            "duration": 14356,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 27,
+              "column": 5
+            },
+            "duration": 18374,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "documentos comuns, histórico com URL e estoque têm apresentação real em desktop e mobile",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "fluent-experience.spec.ts",
+              "line": 72,
+              "column": 5
+            },
+            "duration": 27088,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "documentos comuns, histórico com URL e estoque têm apresentação real em desktop e mobile",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "fluent-experience.spec.ts",
+              "line": 72,
+              "column": 5
+            },
+            "duration": 40286,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe2 de3 e mantém1 pendente",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "requisition-pdf-personal-receipt.spec.ts",
+              "line": 287,
+              "column": 5
+            },
+            "duration": 14692,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "ENT pessoal mostra todas as linhas e expedição em leitura; Sheila recebe2 de3 e mantém1 pendente",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "requisition-pdf-personal-receipt.spec.ts",
+              "line": 287,
+              "column": 5
+            },
+            "duration": 20235,
+            "outcome": "expected",
+            "ok": true
+          }
+        ],
+        "reportLfSha256": "938cdb970f745767ca759388e8445968f710e99a301f3d65f3c2e751c45746dc"
+      },
+      "visual": {
+        "stats": {
+          "total": 1,
+          "expected": 1,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 27,
+              "column": 5
+            },
+            "duration": 25803,
+            "outcome": "expected",
+            "ok": true
+          }
+        ],
+        "reportLfSha256": "892e049aef18fc05f24b7841149b506ea5bab381ec73fa8a9f4e912f0e0dcee0"
+      },
+      "ciRecheck": {
+        "stats": {
+          "total": 9,
+          "expected": 8,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "preparação recusada explica a falha, bloqueia permissão Push e recupera o worker real sem reinstalar",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "web-push.spec.ts",
+              "line": 375,
+              "column": 5
+            },
+            "duration": 10992,
+            "outcome": "unexpected",
+            "ok": false
+          },
+          {
+            "title": "C-FINAL023 anexos ocultam lista recusada e recuperam leitura sem perder arquivo escolhido",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "attachment-attempts.spec.ts",
+              "line": 57,
+              "column": 5
+            },
+            "duration": 14843,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "timeout nativo30s depois do commit conserva a intenção e recupera ready sem novo upload",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "attachment-attempts.spec.ts",
+              "line": 176,
+              "column": 5
+            },
+            "duration": 37811,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "foto preserva avatar válido após revogação no commit e retoma o upload real em outra sessão sem novo objeto",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "avatar-recovery.spec.ts",
+              "line": 103,
+              "column": 5
+            },
+            "duration": 16616,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "seleção em REQ mantém alias, teclado, categoria e entrada manual",
+            "path": [
+              "catálogo com 1 itens"
+            ],
+            "projectName": "ios",
+            "location": {
+              "file": "catalogue-scale.spec.ts",
+              "line": 54,
+              "column": 11
+            },
+            "duration": 16935,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "seleção em REQ mantém alias, teclado, categoria e entrada manual",
+            "path": [
+              "catálogo com 100 itens"
+            ],
+            "projectName": "ios",
+            "location": {
+              "file": "catalogue-scale.spec.ts",
+              "line": 54,
+              "column": 11
+            },
+            "duration": 16720,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "relato anterior ao centésimo é acessível por referência e por todas as páginas, sem vazio falso em falha de leitura",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "consumption.spec.ts",
+              "line": 693,
+              "column": 5
+            },
+            "duration": 8668,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "D3 sino distingue demora falha e conteúdo e recupera por consulta sem registrar ciência",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "notification-read-states.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 13918,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "transfer-bilateral.spec.ts",
+              "line": 70,
+              "column": 5
+            },
+            "duration": 31685,
+            "outcome": "expected",
+            "ok": true
+          }
+        ],
+        "reportLfSha256": "20bf050a87b756427760497b2a6852634c0befe4c0eca1d815e13103c55a6662"
+      },
+      "pwaOrigin": {
+        "stats": {
+          "total": 1,
+          "expected": 1,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "preparação recusada explica a falha, bloqueia permissão Push e recupera o worker real sem reinstalar",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "web-push.spec.ts",
+              "line": 375,
+              "column": 5
+            },
+            "duration": 14909,
+            "outcome": "expected",
+            "ok": true
+          }
+        ],
+        "reportLfSha256": "b0c7f04f0fccb1ac1eaa67c74c64b7ca619ecc8b127e4d077185305dea018f97"
+      }
+    },
+    "reusedBoundary": "Four principal cases cover pagination/read denial and all four document types. Later changes affect strict draft envelope,reference search/insert limits and safe malformed-read messages;these paths are exercised in final recovery cases.Official runner builds current sources;no mutable DB suite in parallel.",
+    "artifacts": [
+      {
+        "name": "keyboard-entry-Andamento-editor-320",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\a1e87f24014290e17338b166f7b9093bbe927c2f0ac67f05433617cc2313f9df.json",
+        "sha256": "a1e87f24014290e17338b166f7b9093bbe927c2f0ac67f05433617cc2313f9df"
+      },
+      {
+        "name": "axe-Andamento-editor-320",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\3194c6eb998dbf54209b15a195e679af3fc9687fe79493af2d9e524f716d21dd.json",
+        "sha256": "3194c6eb998dbf54209b15a195e679af3fc9687fe79493af2d9e524f716d21dd"
+      },
+      {
+        "name": "axe-Andamento-editor-390",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\b6cb2be5cfe184d0469dd787d2f18f77ce1f59bfd2ab3c53449bfee48c8c2b22.json",
+        "sha256": "b6cb2be5cfe184d0469dd787d2f18f77ce1f59bfd2ab3c53449bfee48c8c2b22"
+      },
+      {
+        "name": "axe-Andamento-editor-768",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\6caa44acb075ac07b6a93fe13015e4f9c88942671a694e5c9579d32fd4748e2a.json",
+        "sha256": "6caa44acb075ac07b6a93fe13015e4f9c88942671a694e5c9579d32fd4748e2a"
+      },
+      {
+        "name": "axe-Andamento-editor-1024",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\9817bfef93dd6f5dbcbfc0ec531727da7bd631c1636a8133fe15c5d9f4f2127d.json",
+        "sha256": "9817bfef93dd6f5dbcbfc0ec531727da7bd631c1636a8133fe15c5d9f4f2127d"
+      },
+      {
+        "name": "axe-Andamento-editor-1440",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\27f90d214977f8a467db88e39c85c2b9f1361985e387b02511e75ad683890e2b.json",
+        "sha256": "27f90d214977f8a467db88e39c85c2b9f1361985e387b02511e75ad683890e2b"
+      },
+      {
+        "name": "keyboard-entry-Andamento-publicado",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752.json",
+        "sha256": "fc0107096609fcddf71df9599b1346f3507f078772f16b5b5f2d130ee8502752"
+      },
+      {
+        "name": "axe-Andamento-publicado",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\33a27822d93429701f06734b6f4cd0b50214ea9f252643d4f7c2545b9b78e9d9.json",
+        "sha256": "33a27822d93429701f06734b6f4cd0b50214ea9f252643d4f7c2545b9b78e9d9"
+      },
+      {
+        "name": "axe-Andamento-editor-320",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\59508d8baaa5d8d15bed5787d3a1893331229b8b7cd1597eb6f00dbccba89d95.json",
+        "sha256": "59508d8baaa5d8d15bed5787d3a1893331229b8b7cd1597eb6f00dbccba89d95"
+      },
+      {
+        "name": "axe-Andamento-editor-390",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\1451f84ccede7940635e698f01ac8fcc7add993645ef5d648b45008ada6834a1.json",
+        "sha256": "1451f84ccede7940635e698f01ac8fcc7add993645ef5d648b45008ada6834a1"
+      },
+      {
+        "name": "axe-Andamento-editor-768",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\dbac8185b1da5d6a5ded41d5e1a5fc6e9bbcb67bd6ecae930394b95edb48af34.json",
+        "sha256": "dbac8185b1da5d6a5ded41d5e1a5fc6e9bbcb67bd6ecae930394b95edb48af34"
+      },
+      {
+        "name": "axe-Andamento-editor-1024",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\805043ec76ae7f49510d9f060ddd578eda20010ecbdca8fa14f2b0ddaffc45b4.json",
+        "sha256": "805043ec76ae7f49510d9f060ddd578eda20010ecbdca8fa14f2b0ddaffc45b4"
+      },
+      {
+        "name": "axe-Andamento-editor-1440",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\c280ac07be90819d95d566ec7daa61a73e3a87c1463916cc3e82abbe9012927e.json",
+        "sha256": "c280ac07be90819d95d566ec7daa61a73e3a87c1463916cc3e82abbe9012927e"
+      },
+      {
+        "name": "axe-Andamento-publicado",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\33a27822d93429701f06734b6f4cd0b50214ea9f252643d4f7c2545b9b78e9d9.json",
+        "sha256": "33a27822d93429701f06734b6f4cd0b50214ea9f252643d4f7c2545b9b78e9d9"
+      },
+      {
+        "name": "axe-ENT-personal-full-line-review-1440",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\36a0c23c8e182a6bae712c2cb8ad8e1dc2d99e7b67659da30e798a1bb2b09397.json",
+        "sha256": "36a0c23c8e182a6bae712c2cb8ad8e1dc2d99e7b67659da30e798a1bb2b09397"
+      },
+      {
+        "name": "axe-ENT-personal-full-line-review-768",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\3e8aaa8893c5db57210aca9d3bd2a84a3ee916fc9396ee01e03672be18095bdd.json",
+        "sha256": "3e8aaa8893c5db57210aca9d3bd2a84a3ee916fc9396ee01e03672be18095bdd"
+      },
+      {
+        "name": "axe-ENT-personal-full-line-review-390",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\5b1bf94192c0e622f9500ee7e97bf4de3077d6e1bb738766d5d3d9a191490942.json",
+        "sha256": "5b1bf94192c0e622f9500ee7e97bf4de3077d6e1bb738766d5d3d9a191490942"
+      },
+      {
+        "name": "axe-ENT-personal-full-line-review-320",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\ae84ea437248fc7d170c844692c8bf1ce66c1fe801ea0c86ddda9024404babca.json",
+        "sha256": "ae84ea437248fc7d170c844692c8bf1ce66c1fe801ea0c86ddda9024404babca"
+      },
+      {
+        "name": "axe-ENT-personal-full-line-review-1440",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\a274300a7fb4c5a78ed21d8c9856a0730e642b28bbac072f3f2eb84ff44e2d64.json",
+        "sha256": "a274300a7fb4c5a78ed21d8c9856a0730e642b28bbac072f3f2eb84ff44e2d64"
+      },
+      {
+        "name": "axe-ENT-personal-full-line-review-768",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\ea5b4a2acda2247062ffa6f0651c878152996da87fa0b28cd408fe53f6a7bd21.json",
+        "sha256": "ea5b4a2acda2247062ffa6f0651c878152996da87fa0b28cd408fe53f6a7bd21"
+      },
+      {
+        "name": "axe-ENT-personal-full-line-review-390",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\213b1cb9525b86740b127d88bb9da60efba7f0d6c817845ea2e49d4f32ff4b98.json",
+        "sha256": "213b1cb9525b86740b127d88bb9da60efba7f0d6c817845ea2e49d4f32ff4b98"
+      },
+      {
+        "name": "axe-ENT-personal-full-line-review-320",
+        "path": "output\\phase-d-work\\andamentos\\final-browser-artifacts\\af845dce28f0dcf2003d2465ed6d31ea8a6469900784c61356088461dfebbaef.json",
+        "sha256": "af845dce28f0dcf2003d2465ed6d31ea8a6469900784c61356088461dfebbaef"
+      }
+    ],
+    "reuseBoundary": "Four principal feature cases and six final cases retained. Visual followup exercises shared feed styles and recovery in WebKit at five widths;root scroll safe area is subsequently exercised by nine specific CI cases.Only PWA visual-task origin changed in its last recheck;all worker/permission/subscription assertions retained.Whole SHA CI remains required. Contextual cases include catalogue sizes1 and100 as separate scenarios.",
+    "visualArtifacts": [
+      {
+        "name": "axe-Andamento-editor-320",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\40d0a6494decd06cbfa5e608b2b542a5ebbbae6a2fb5157e6a6e30df86d9e0dd.json",
+        "sha256": "40d0a6494decd06cbfa5e608b2b542a5ebbbae6a2fb5157e6a6e30df86d9e0dd"
+      },
+      {
+        "name": "axe-Andamento-editor-390",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\2a3a29be1afc6bd693f855cefc00550d3afba00b93d9b447ef8c6a2307be8f8e.json",
+        "sha256": "2a3a29be1afc6bd693f855cefc00550d3afba00b93d9b447ef8c6a2307be8f8e"
+      },
+      {
+        "name": "axe-Andamento-editor-768",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\0fa96eb61769a2610f8162d321f33f8aca71a15e96fbf06a7df97f554586cacb.json",
+        "sha256": "0fa96eb61769a2610f8162d321f33f8aca71a15e96fbf06a7df97f554586cacb"
+      },
+      {
+        "name": "axe-Andamento-editor-1024",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\3f0e963b59a3f185c3916d01d48595be667a92a2e39e0597cde1141bbf891635.json",
+        "sha256": "3f0e963b59a3f185c3916d01d48595be667a92a2e39e0597cde1141bbf891635"
+      },
+      {
+        "name": "axe-Andamento-editor-1440",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\f227b58f42b3e13c6bd84487d05117f6a4c54ef870ef543a95d0fcfc49ec1380.json",
+        "sha256": "f227b58f42b3e13c6bd84487d05117f6a4c54ef870ef543a95d0fcfc49ec1380"
+      },
+      {
+        "name": "axe-Andamento-publicado-320",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\0d6c536827886ceb4b42acf406ad3a4fd6aaca53caf6a3857c9ccdb11732b6c1.json",
+        "sha256": "0d6c536827886ceb4b42acf406ad3a4fd6aaca53caf6a3857c9ccdb11732b6c1"
+      },
+      {
+        "name": "Andamento publicado 320",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\e7be155fbb8e8a038008c15380f963239e12e1bb.png",
+        "sha256": "ecf36b3cbdda6d76124d7c348db9c79add5ed514033f36eb9cc086fd194659c4"
+      },
+      {
+        "name": "axe-Andamento-publicado-390",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\4b4d60feb105eb388eb043f3928618044bc62095a86adad06fe3139e1b6b9f73.json",
+        "sha256": "4b4d60feb105eb388eb043f3928618044bc62095a86adad06fe3139e1b6b9f73"
+      },
+      {
+        "name": "Andamento publicado 390",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\74a29184258f1536ef23fba79beb197de425a908.png",
+        "sha256": "91acf9c89ba5e9f09964284bfc5e8fb2e2a20640df29189cd5470345d086b983"
+      },
+      {
+        "name": "axe-Andamento-publicado-768",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\b15642df44bc4d85d2f62e531d05e8e07966cf038c3d030961e79c5ad25d1452.json",
+        "sha256": "b15642df44bc4d85d2f62e531d05e8e07966cf038c3d030961e79c5ad25d1452"
+      },
+      {
+        "name": "Andamento publicado 768",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\50908b87d43d89e1ec603bb37594e0d45a2fceb6.png",
+        "sha256": "988a4bd9a2a6c6a56b5eb5120c42c5249a6648c47f6a9561ffd7baa39a8780b8"
+      },
+      {
+        "name": "axe-Andamento-publicado-1024",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\d0941af4e389b99c12270ce243f7ad4a2a06e54562f29c1557116b8c1e867b5b.json",
+        "sha256": "d0941af4e389b99c12270ce243f7ad4a2a06e54562f29c1557116b8c1e867b5b"
+      },
+      {
+        "name": "Andamento publicado 1024",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\8fec108f486851ad5588eada8285d7c52c63a429.png",
+        "sha256": "89400f1a12bde71975cb000d11a2299fd4bf2b4098534c52bca180ef4adce36e"
+      },
+      {
+        "name": "axe-Andamento-publicado-1440",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\85a8f4a66687a0be45eec88f797c7669713c136f4c388bf1690dcc90734bca36.json",
+        "sha256": "85a8f4a66687a0be45eec88f797c7669713c136f4c388bf1690dcc90734bca36"
+      },
+      {
+        "name": "Andamento publicado 1440",
+        "path": "output\\phase-d-work\\andamentos\\visual-browser-artifacts\\5088060f465452a52852eb1db4b6322089df602b.png",
+        "sha256": "069ecabfc36b3b58d1c9b41685e3d1b8f3eca25994747b1fca16eafd23bfd1a4"
+      }
+    ]
+  },
+  "counterproofs": {
+    "firstRound": "bc9dd07cb973f4dc27ac93cd02f970b25ab7abd4a395779c3767c1577f4e633d",
+    "draftEnvelope": "dfe65bdd5a527a7771e2648aea684271523ca655b2e5041a1a40d8fddd533393",
+    "referenceScope": "3fb599359adf7e756a4da99dc67e4c380d0b4115ca1bd297d995a4983e9762e2",
+    "corrections": [
+      "Accessible textbox selector instead of label raw text with hidden asterisk",
+      "BAL fixture counts every required product",
+      "Strict draft envelope excludes UI error metadata",
+      "Reference API explicitly binds source document and patient;legacy list contract unchanged",
+      "Reference insertion keeps2000-unit limit without truncating text",
+      "Canonical muted token preserves WCAG contrast for auxiliary text",
+      "Root scroll safe area uses actual header height;directed WebKit recheck",
+      "PWA visual task starts at its real section after viewport change;no rule or business assertion removed"
+    ],
+    "lowContrastPrototype": "7b0d0282825aec748b394d743f0a564c6188b6fd9b77b756637da5447ccfccc5",
+    "bodyTargetUnderHeader": "25056ff5846a6b2a7d4be50ad212a8105530499d8d34f0b7f3e8c3d1cc999226",
+    "ciViewport": "7bf44d0cd47fe848d0bf42f0dd79f49ea92450f2d7cf3632d4268e5ebba0d43e"
+  },
+  "remote": "DOCUMENT_PROGRESS_REMOTE.json",
+  "advisors": "DOCUMENT_PROGRESS_ADVISORS.json",
+  "baselineMigrationsUnchanged": true,
+  "localFunctionRefinement": "New unpublished165 functions refined locally before publication;no reset or historical migration-file changes. Final definitions match remote165.",
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "first30Preserved": true,
+    "PARTIAL": 49,
+    "PASS": 56
+  },
+  "remaining": [
+    "REQ/COM/ENT/BAL tabs",
+    "Canonical progress header and all surfaces",
+    "Own SHA CI clean/legacy/integration/browser",
+    "Human/AT/physical/provider and D-C/D6"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false,
+  "goalComplete": false,
+  "validation": {
+    "compiler": "PASS in official current-source runner build",
+    "lint": "PASS;directed sources/tests",
+    "markdown": "PASS;5 files;0 issues",
+    "CI": "Own SHA required;prior149 Windows/Ubuntu/database PASS;iOS jobs FAIL;directed9 contextual cases PASS locally",
+    "links": "PASS;relative targets exist",
+    "json": "PASS",
+    "sourceHashes": "PASS;12 files;LF-normalized",
+    "canonicalMatrix": "PASS;105x39;first30 unchanged",
+    "diffCheck": "PASS"
+  }
+}

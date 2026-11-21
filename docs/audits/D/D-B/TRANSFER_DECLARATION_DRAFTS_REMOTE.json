@@ -1,0 +1,1659 @@
+{
+  "projectId": "qwfrqychokvhdzakibid",
+  "migration": "20261109183902_phase_d3_transfer_declaration_private_drafts.sql",
+  "preflight": {
+    "versions": {
+      "last": "20261109175803",
+      "count": 173,
+      "sha256": "20b36c404f07a589537949e8bcbbc25d44d999ab3b136dd30b1253c6dd87f8e7"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "name": "creation_draft_navigation_valid",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "252f4a8cbdf7d1e5c0c7cba8a66737afe69f39e3cc1c7b04dab77eaa1f6cb22e",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_regularization_draft_intent",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "3b26e761209db4741043ea3acfc049501cc0697d7c66b087812878dab2d6e8eb",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_supply_draft_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "2937ed1a6efbac28ae83493fdea173ffab07d4e1f1839d7c881989a6cb8ecc52",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "require_transfer_draft_authority",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "9721cb78f18ddf130214afb86d84247302e31e931c8ff4a14e37566a1f24a94b",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "commit_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "1bcd8f36367bd37ac1ab2e9b8700c0050cbe3ca8bfdadf097676be74cacba6fa",
+        "serviceRole": false,
+        "authenticated": true,
+        "securityDefiner": true
+      }
+    ],
+    "privateTable": {
+      "anon": false,
+      "authenticated": false
+    },
+    "purposeConstraint": "CHECK ((((kind = ANY (ARRAY['REQ'::text, 'BAL'::text])) AND (purpose = 'create'::text) AND ((kind = 'BAL'::text) OR (target_document_id IS NULL))) OR ((kind = ANY (ARRAY['COM'::text, 'ENT'::text])) AND (((purpose = 'create'::text) AND (target_document_id IS NULL)) OR ((purpose = 'revise'::text) AND (target_document_id IS NOT NULL)))) OR ((kind = 'COM'::text) AND (purpose = ANY (ARRAY['approve'::text, 'purchase'::text, 'receive'::text, 'validate_receipt'::text, 'reject_receipt'::text, 'close_expectation'::text, 'cancel'::text])) AND (target_document_id IS NOT NULL)) OR ((kind = 'ENT'::text) AND (purpose = ANY (ARRAY['receive'::text, 'divergence'::text, 'reassign'::text, 'resolve'::text, 'cancel'::text, 'refuse_cancellation'::text, 'withdraw_cancellation'::text, 'consent_cancel'::text, 'propose_regularization'::text, 'approve_regularization'::text, 'reject_regularization'::text, 'withdraw_regularization'::text, 'record_regularization_finding'::text, 'transfer_agree'::text, 'transfer_decline'::text, 'transfer_withdraw'::text, 'transfer_dispatch'::text])) AND (target_document_id IS NOT NULL))))"
+  },
+  "predecessorExactlyMatchesPublished173": true,
+  "dryRunCandidates": [
+    "20261109183902_phase_d3_transfer_declaration_private_drafts.sql"
+  ],
+  "seeds": [],
+  "roles": [],
+  "vaultUpdated": false,
+  "post": {
+    "versions": {
+      "last": "20261109183902",
+      "count": 174,
+      "sha256": "992cf1c9536fa067d8fc264a98525ac389d5370667d45fd7ba9493130edcf208"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "name": "creation_draft_navigation_valid",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "f16154b8679b7bf2c9cab9d05ebc1e5d4a27df48ab522b29d8f91dfb633bc4c0",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_regularization_draft_intent",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "3b26e761209db4741043ea3acfc049501cc0697d7c66b087812878dab2d6e8eb",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_supply_draft_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "b2ed57f7698f2f42920c704661bde17467834306f552fe41baee1e610f7b5997",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "require_transfer_declaration_draft_intent",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "37b5d8ce61eb6f438f06ff66ab2df89d7e237d8a97c2b34f60dbdd8e33655adb",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_transfer_draft_authority",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "9721cb78f18ddf130214afb86d84247302e31e931c8ff4a14e37566a1f24a94b",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "validate_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "d550a3be24602705696b10ed3b52d0e27bbc635f2e11a79fb063f49449650dd7",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "commit_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "d2b62dab9bbc58de762bc8ea4376a0dbffd5e842d6f218f978de2776f4648ad8",
+        "serviceRole": false,
+        "authenticated": true,
+        "securityDefiner": true
+      }
+    ],
+    "privateTable": {
+      "anon": false,
+      "authenticated": false
+    },
+    "purposeConstraint": "CHECK ((((kind = ANY (ARRAY['REQ'::text, 'BAL'::text])) AND (purpose = 'create'::text) AND ((kind = 'BAL'::text) OR (target_document_id IS NULL))) OR ((kind = ANY (ARRAY['COM'::text, 'ENT'::text])) AND (((purpose = 'create'::text) AND (target_document_id IS NULL)) OR ((purpose = 'revise'::text) AND (target_document_id IS NOT NULL)))) OR ((kind = 'ENT'::text) AND (purpose = ANY (ARRAY['transfer_declare_family'::text, 'transfer_declare_team'::text])) AND (target_document_id IS NULL)) OR ((kind = 'COM'::text) AND (purpose = ANY (ARRAY['approve'::text, 'purchase'::text, 'receive'::text, 'validate_receipt'::text, 'reject_receipt'::text, 'close_expectation'::text, 'cancel'::text])) AND (target_document_id IS NOT NULL)) OR ((kind = 'ENT'::text) AND (purpose = ANY (ARRAY['receive'::text, 'divergence'::text, 'reassign'::text, 'resolve'::text, 'cancel'::text, 'refuse_cancellation'::text, 'withdraw_cancellation'::text, 'consent_cancel'::text, 'propose_regularization'::text, 'approve_regularization'::text, 'reject_regularization'::text, 'withdraw_regularization'::text, 'record_regularization_finding'::text, 'transfer_agree'::text, 'transfer_decline'::text, 'transfer_withdraw'::text, 'transfer_dispatch'::text])) AND (target_document_id IS NOT NULL))))"
+  },
+  "postMatchesLocal174": true,
+  "pendingMigrations": [],
+  "advisorsSameExcludingObservedAt": true,
+  "advisors": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 44,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+      "identities": [
+        {
+          "name": "attachment_attempts",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "attachment_uploads",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "authority_sessions",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "avatar_changes",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "bal_commands",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "bal_scheduler_progress",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "legacy_reminder_checkpoints",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "legacy_reminder_failures",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "legacy_reminder_gaps",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "legacy_reminder_progress",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "membership_authority",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "membership_invitation_intents",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "operational_scheduler_failures",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "operations_commands",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "operations_components",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "operations_config",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "operations_events",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "operations_history",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "operations_incidents",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "patient_guide_settings",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "phase_d3_commands",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "professional_credential_reviews",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "professional_declarations",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "requisition_scheduler_progress",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "residence_preparations",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "schedule_commands",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "scheduler_health",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "transfer_commands",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "user_guide_progress",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "web_push_attempts",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "web_push_deliveries",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "web_push_device_events",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "web_push_devices",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "worker_authority",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "workspace_invalidation_queue",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "workspace_revisions",
+          "type": "table",
+          "schema": "private"
+        },
+        {
+          "name": "document_series",
+          "type": "table",
+          "schema": "public"
+        },
+        {
+          "name": "flow_sessions",
+          "type": "table",
+          "schema": "public"
+        },
+        {
+          "name": "historical_requisition_imports",
+          "type": "table",
+          "schema": "public"
+        },
+        {
+          "name": "inbound_messages",
+          "type": "table",
+          "schema": "public"
+        },
+        {
+          "name": "reminder_challenges",
+          "type": "table",
+          "schema": "public"
+        },
+        {
+          "name": "requisition_import_batches",
+          "type": "table",
+          "schema": "public"
+        },
+        {
+          "name": "science_challenges",
+          "type": "table",
+          "schema": "public"
+        },
+        {
+          "name": "whatsapp_challenges",
+          "type": "table",
+          "schema": "public"
+        }
+      ]
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public",
+      "identities": [
+        {
+          "name": "unaccent",
+          "type": "extension",
+          "schema": "public"
+        }
+      ]
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 3,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable",
+      "identities": [
+        {
+          "name": "invitation_preview",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_token_hash text",
+          "security_definer": true
+        },
+        {
+          "name": "invitation_registration_allowed",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_token_hash text, p_email text",
+          "security_definer": true
+        },
+        {
+          "name": "verify_document_integrity",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_id uuid, p_version integer, p_hash text",
+          "security_definer": true
+        }
+      ]
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 167,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+      "identities": [
+        {
+          "name": "abandon_attachment_attempt",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "abandon_my_avatar_change",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "accept_invitation",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_token_hash text",
+          "security_definer": true
+        },
+        {
+          "name": "acknowledge_requisition",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_mode text, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "acknowledge_requisition",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_mode text, p_version integer, p_material_identity text",
+          "security_definer": true
+        },
+        {
+          "name": "acknowledge_shift_reminder",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_ref uuid, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "admin_adopt_product",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_care_recipient_id uuid, p_product_id text",
+          "security_definer": true
+        },
+        {
+          "name": "admin_create_invitation",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_care_recipient_id uuid, p_email text, p_role public.profile_role, p_can_manage_stock boolean, p_can_count_stock boolean, p_token_hash text, p_expires_at timestamp with time zone",
+          "security_definer": true
+        },
+        {
+          "name": "admin_list_memberships",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_care_recipient_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "admin_list_products",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "admin_list_profiles",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "admin_list_recipients",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "admin_resend_invitation",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_invitation_id uuid, p_token_hash text, p_expires_at timestamp with time zone",
+          "security_definer": true
+        },
+        {
+          "name": "admin_set_membership_status",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_care_recipient_id uuid, p_user_id uuid, p_status text",
+          "security_definer": true
+        },
+        {
+          "name": "admin_set_profile",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_user_id uuid, p_full_name text, p_role public.profile_role, p_status text, p_global_scope boolean",
+          "security_definer": true
+        },
+        {
+          "name": "admin_upsert_membership",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_care_recipient_id uuid, p_user_id uuid, p_role public.profile_role, p_can_manage_stock boolean, p_can_count_stock boolean",
+          "security_definer": true
+        },
+        {
+          "name": "admin_upsert_product",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id text, p_name text, p_category public.product_category, p_unit text, p_aliases text[], p_is_active boolean",
+          "security_definer": true
+        },
+        {
+          "name": "admin_upsert_recipient",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_display_name text, p_is_active boolean, p_is_development boolean",
+          "security_definer": true
+        },
+        {
+          "name": "admin_upsert_recipient_product",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_care_recipient_id uuid, p_product_id text, p_name text, p_category public.product_category, p_unit text, p_aliases text[], p_is_active boolean, p_description text, p_sort_order integer",
+          "security_definer": true
+        },
+        {
+          "name": "archive_requisition",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_reason text",
+          "security_definer": true
+        },
+        {
+          "name": "attachment_attempts",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_document uuid, p_movement uuid, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "balance_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "balance_count_reference",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "balance_recount_context",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "balance_workspace",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "begin_attachment_upload",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_source_hash text, p_hash text, p_token uuid",
+          "security_definer": true
+        },
+        {
+          "name": "begin_my_avatar_change",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_key uuid, p_hash text, p_size integer, p_name text, p_reference integer",
+          "security_definer": true
+        },
+        {
+          "name": "bind_validated_attachment",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "can_access_recipient",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_recipient_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "can_manage_recipient",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_recipient_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "catalogue_identity_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_product text, p_successor text, p_reference text, p_body jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "catalogue_identity_context",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_product text, p_successor text, p_page integer",
+          "security_definer": true
+        },
+        {
+          "name": "catalogue_presentation_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_id uuid, p_version integer, p_body jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "claim_notification_jobs",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_limit integer, p_worker_id uuid, p_external_enabled boolean",
+          "security_definer": true
+        },
+        {
+          "name": "commit_creation_draft",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_expected integer, p_target uuid, p_body jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "commit_supply_draft",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_expected integer, p_target uuid, p_body jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "complete_notification_job",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_worker_id uuid, p_state text, p_provider_reference text, p_error text",
+          "security_definer": true
+        },
+        {
+          "name": "complete_pdf_issuance",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_token text, p_hash text, p_size integer, p_validation jsonb, p_key_version text, p_trust_revision text",
+          "security_definer": true
+        },
+        {
+          "name": "configure_catalogue_unit",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_product text, p_unit text, p_decimals integer, p_barcode text, p_presentation text, p_base_quantity numeric",
+          "security_definer": true
+        },
+        {
+          "name": "configure_notification_rule",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_event text, p_role text, p_channels text[], p_pdf boolean, p_cooldown integer, p_quiet_start integer, p_quiet_end integer",
+          "security_definer": true
+        },
+        {
+          "name": "configure_patient_access",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_kind text, p_change jsonb, p_key uuid, p_version integer, p_request_id uuid, p_decision text",
+          "security_definer": true
+        },
+        {
+          "name": "configure_patient_guide",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_expected integer, p_show boolean, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "configure_recipient_notification",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_care_recipient_id uuid, p_recipient_user_id uuid, p_recipient_group text, p_channel text, p_destination text, p_enabled boolean, p_include_team_alerts boolean",
+          "security_definer": true
+        },
+        {
+          "name": "configure_stock_alert",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_care_recipient_id uuid, p_product_id text, p_location text, p_low_threshold numeric, p_critical_threshold numeric, p_is_enabled boolean",
+          "security_definer": true
+        },
+        {
+          "name": "confirm_extraordinary_consumption",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_accept boolean",
+          "security_definer": true
+        },
+        {
+          "name": "consumption_report",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "create_flow_session",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_hash text",
+          "security_definer": true
+        },
+        {
+          "name": "create_measurement_unit",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_code text, p_name text, p_dimension text, p_decimals integer",
+          "security_definer": true
+        },
+        {
+          "name": "create_patient_with_administrator",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_name text, p_development boolean, p_administrator_email text",
+          "security_definer": true
+        },
+        {
+          "name": "create_receipt_flow_session",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_hash text",
+          "security_definer": true
+        },
+        {
+          "name": "create_supply_document",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_type text, p_payload jsonb, p_key uuid, p_draft boolean",
+          "security_definer": true
+        },
+        {
+          "name": "create_transfer_declaration",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_body jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "creation_draft_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_kind text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "creation_draft_context",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_kind text, p_target uuid",
+          "security_definer": true
+        },
+        {
+          "name": "current_profile_role",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "decide_consumption_report",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_accept boolean, p_reason text, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "decline_invitation",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_token_hash text",
+          "security_definer": true
+        },
+        {
+          "name": "delivery_preparation",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_source text",
+          "security_definer": true
+        },
+        {
+          "name": "delivery_task_list",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_scope text, p_status text, p_page integer, p_size integer",
+          "security_definer": true
+        },
+        {
+          "name": "document_delivery_status",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid",
+          "security_definer": true
+        },
+        {
+          "name": "document_navigation_context",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "document_notice_tracking_policy",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid",
+          "security_definer": true
+        },
+        {
+          "name": "document_progress",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_filter text, p_page integer, p_size integer",
+          "security_definer": true
+        },
+        {
+          "name": "document_progress_publish",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_key uuid, p_body jsonb",
+          "security_definer": true
+        },
+        {
+          "name": "family_stock_movement",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_product text, p_quantity numeric, p_action text, p_reason text, p_key uuid, p_reference uuid",
+          "security_definer": true
+        },
+        {
+          "name": "find_patient_product_by_alias",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_care_recipient_id uuid, p_query text",
+          "security_definer": true
+        },
+        {
+          "name": "finish_my_avatar_change",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "global_patient_administration",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_section text",
+          "security_definer": true
+        },
+        {
+          "name": "guide_context",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "guide_progress_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_scope text, p_expected integer, p_step integer, p_status text, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "import_historical_requisitions",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_source_hash text, p_rows jsonb",
+          "security_definer": true
+        },
+        {
+          "name": "invitation_preview",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_token_hash text",
+          "security_definer": true
+        },
+        {
+          "name": "invitation_registration_allowed",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_token_hash text, p_email text",
+          "security_definer": true
+        },
+        {
+          "name": "is_global_administrator",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "mark_notification_seen",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "membership_impact",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_user uuid",
+          "security_definer": true
+        },
+        {
+          "name": "my_active_context",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "my_avatar_change",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "my_requisition_science_preference",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "my_session_valid",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "my_sessions",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "my_web_push_devices",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "my_workspace",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "notification_job_state",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "notification_reference",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_ref uuid, p_area text, p_namespace text",
+          "security_definer": true
+        },
+        {
+          "name": "operational_document",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "operational_document_list",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_type text, p_status text, p_search text, p_from timestamp with time zone, p_to timestamp with time zone, p_page integer, p_size integer",
+          "security_definer": true
+        },
+        {
+          "name": "operational_tasks",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "operations_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_environment text, p_action text, p_id uuid, p_expected integer, p_payload jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "operations_diagnostics",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_environment text, p_page integer, p_size integer, p_state text",
+          "security_definer": true
+        },
+        {
+          "name": "operations_history",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_environment text, p_incident uuid, p_page integer, p_size integer",
+          "security_definer": true
+        },
+        {
+          "name": "patient_audit_page",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_query text, p_reference uuid, p_action text, p_entity_type text, p_from timestamp with time zone, p_to timestamp with time zone, p_page integer, p_size integer",
+          "security_definer": true
+        },
+        {
+          "name": "patient_capabilities",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "patient_capability_definitions",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "patient_delivery_impact",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "patient_directory",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "patient_governance",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "patient_governance_changes",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_status text, p_kind text, p_query text, p_page integer, p_size integer",
+          "security_definer": true
+        },
+        {
+          "name": "patient_notification_rules",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "patient_professional_credential",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_subject uuid, p_before timestamp with time zone, p_before_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "pdf_archive",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_version integer, p_before timestamp with time zone, p_kind text, p_reference text, p_limit integer",
+          "security_definer": true
+        },
+        {
+          "name": "pdf_issuance",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "pdf_issuance_stage",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_token text, p_step text, p_error text",
+          "security_definer": true
+        },
+        {
+          "name": "pdf_issuances",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_before timestamp with time zone, p_before_id uuid, p_limit integer",
+          "security_definer": true
+        },
+        {
+          "name": "prepare_attachment_attempt",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_document uuid, p_movement uuid, p_filename text, p_mime text, p_bytes bigint, p_key uuid, p_source_hash text, p_source_bytes bigint, p_source_mime text, p_hash text, p_transformation text",
+          "security_definer": true
+        },
+        {
+          "name": "process_internal_notifications",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_limit integer",
+          "security_definer": true
+        },
+        {
+          "name": "recent_session",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "recipient_can",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_recipient_id uuid, p_operation text",
+          "security_definer": true
+        },
+        {
+          "name": "recipient_role",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_recipient_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "record_requisition_opening",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_material_identity text, p_version integer, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "register_verified_phone",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "report_consumption_from_reminder",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_reminder uuid, p_kind text, p_location text, p_text text, p_lines jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "report_extraordinary_consumption",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_kind text, p_location text, p_text text, p_lines jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "requisition_delivery_status",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_requisition_ids uuid[]",
+          "security_definer": true
+        },
+        {
+          "name": "requisition_fulfillment",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_requisition uuid",
+          "security_definer": true
+        },
+        {
+          "name": "requisition_fulfillments",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_ids uuid[]",
+          "security_definer": true
+        },
+        {
+          "name": "requisition_item_context",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_products text[]",
+          "security_definer": true
+        },
+        {
+          "name": "requisition_opening_context",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "requisition_progress",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "requisition_selections",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "reserve_attachment",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_document uuid, p_movement uuid, p_filename text, p_mime text, p_bytes bigint, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "reserve_pdf_issuance",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "reserve_pdf_issuance_v10",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "reserve_pdf_issuance_v7",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "reserve_pdf_issuance_v8",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "reserve_pdf_issuance_v9",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_document uuid, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "residence_preparation_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_expected integer, p_action text, p_content jsonb, p_step integer, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "residence_preparation_page",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_page integer, p_size integer, p_query text",
+          "security_definer": true
+        },
+        {
+          "name": "residence_preparation_status",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "residence_preparations",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "resolve_balance_assignment",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_cycle uuid, p_shift uuid, p_reason text, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "resolve_requisition_item",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_item uuid, p_product text, p_reason text, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "resolve_web_push",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "retry_notification_job",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_confirm_uncertain boolean",
+          "security_definer": true
+        },
+        {
+          "name": "review_flow_submission",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_accept boolean, p_kind text, p_text text, p_lines jsonb",
+          "security_definer": true
+        },
+        {
+          "name": "review_professional_credential",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_subject uuid, p_expected bigint, p_outcome text, p_note text, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "revise_and_submit_supply_document",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean, p_submit boolean, p_submission_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "revise_supply_document",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+          "security_definer": true
+        },
+        {
+          "name": "revoke_invitation",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_invitation_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "revoke_web_push_session",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "save_requisition_selection",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_name text, p_products text[], p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "schedule_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "schedule_workspace",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_from date, p_until date",
+          "security_definer": true
+        },
+        {
+          "name": "scheduler_health",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "",
+          "security_definer": true
+        },
+        {
+          "name": "select_active_context",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "set_my_avatar",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_path text",
+          "security_definer": true
+        },
+        {
+          "name": "set_requisition_science_preference",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_mode text, p_consent boolean, p_version integer, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "stock_consumption_metrics",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_from timestamp with time zone, p_to timestamp with time zone",
+          "security_definer": true
+        },
+        {
+          "name": "stock_history",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_product text, p_from timestamp with time zone, p_to timestamp with time zone, p_location text, p_page integer, p_size integer",
+          "security_definer": true
+        },
+        {
+          "name": "stock_overview",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "stock_transit",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid",
+          "security_definer": true
+        },
+        {
+          "name": "submit_remaining_requisition",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_care_recipient_id uuid, p_idempotency_key uuid, p_lines jsonb, p_extra_items jsonb, p_observations jsonb, p_source uuid, p_source_version integer, p_reason text",
+          "security_definer": true
+        },
+        {
+          "name": "submit_requisition",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_care_recipient_id uuid, p_idempotency_key uuid, p_payload_hash text, p_lines jsonb, p_extra_items jsonb, p_observations jsonb",
+          "security_definer": true
+        },
+        {
+          "name": "subscribe_web_push",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_subscription jsonb, p_label text, p_key_version text",
+          "security_definer": true
+        },
+        {
+          "name": "supplement_consumption_report",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_text text, p_lines jsonb, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "supply_document_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "supply_draft_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_kind text, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+          "security_definer": true
+        },
+        {
+          "name": "supply_draft_context",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_patient uuid, p_kind text, p_purpose text, p_target uuid",
+          "security_definer": true
+        },
+        {
+          "name": "supply_revision_receipt",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_payload jsonb, p_key uuid, p_version integer, p_recount boolean",
+          "security_definer": true
+        },
+        {
+          "name": "transfer_command",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_id uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+          "security_definer": true
+        },
+        {
+          "name": "transfer_preparation",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_patient uuid, p_source text",
+          "security_definer": true
+        },
+        {
+          "name": "transition_requisition_status",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_requisition_id uuid, p_to_status public.requisition_status, p_reason text",
+          "security_definer": true
+        },
+        {
+          "name": "update_my_profile",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_name text, p_registration text, p_state text, p_category text, p_preferences jsonb",
+          "security_definer": true
+        },
+        {
+          "name": "validate_notification_job",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_worker_id uuid",
+          "security_definer": true
+        },
+        {
+          "name": "verify_document_integrity",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "p_id uuid, p_version integer, p_hash text",
+          "security_definer": true
+        },
+        {
+          "name": "web_push_device_command",
+          "schema": "public",
+          "language": "plpgsql",
+          "arguments": "p_id uuid, p_action text",
+          "security_definer": true
+        },
+        {
+          "name": "workspace_revision",
+          "schema": "public",
+          "language": "sql",
+          "arguments": "",
+          "security_definer": true
+        }
+      ]
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+      "identities": [
+        {
+          "type": "auth",
+          "entity": "Auth"
+        }
+      ]
+    }
+  ],
+  "localAuthoring": {
+    "unpublishedMigration": "supabase/migrations/20261109183902_phase_d3_transfer_declaration_private_drafts.sql",
+    "beforeLfSha256": "9a522c265e2d54a68f94992e726f05226fe6447b3c90ae27133b294b7937fb4a",
+    "afterLfSha256": "f7a3dcfef218758b741c2e27604dafff895b32229af0106f3d5b701113fd99d3",
+    "localFunctionReplaced": "private.validate_supply_draft",
+    "historyUntouched": true,
+    "migrationReplayed": false,
+    "remoteUnchanged173": true,
+    "reason": "Qualify new material alias against the existing PLpgSQL variable x;correct unpublished SQL before remote use",
+    "local174StatementsArePreservedAuthoringIteration": true
+  },
+  "limits": "Remote received final corrected candidate once. Local authoring history retains intermediate statements; final function definitions and grants match. No historical migration rewritten, reset, remote fixture/Auth mutation or redundant backup."
+}

@@ -1,0 +1,62 @@
+{
+  "baseline": "7b7c97a1bcf060f05e1f0b1a00ef8738fddabeaf",
+  "normalization": "UTF-8; CRLF to LF",
+  "reportedDiagnostics": 35,
+  "markdownLanguageService": {
+    "engine": "Installed VS Code Markdown language service",
+    "results": [
+      {
+        "file": "docs/audits/C/C7-decision-closure/BACKUP_OPERATING_MODEL_FOR_OWNER.md",
+        "before": 12,
+        "after": 0,
+        "codes": [
+          "link.no-such-reference"
+        ],
+        "beforeSha256": "d4062f5e61a95e0ea848f3dcb7d4c47d3fc39cb6defec541a8d051d0948e2017",
+        "afterSha256": "b8c1879b58c5dd3fbdc204f5d21fb575eb9ca498fc3ef14239243349857469eb"
+      },
+      {
+        "file": "docs/audits/C/C7-decision-closure/PDF_SIGNING_ISSUANCE_AND_VERIFICATION.md",
+        "before": 10,
+        "after": 0,
+        "codes": [
+          "link.no-such-reference"
+        ],
+        "beforeSha256": "d15dd10c41d2d37dea83e14a5cd8362cf3db3aa5d98652a2f1a63c80cfe7b3a1",
+        "afterSha256": "7685a08622c158016009289822e09ad912ba751b192048d54bd451d85188173b"
+      },
+      {
+        "file": "docs/audits/C/C7-decision-closure/SCIENCE_AS_IS_TO_BE_ANALYSIS.md",
+        "before": 1,
+        "after": 0,
+        "codes": [
+          "link.no-such-reference"
+        ],
+        "beforeSha256": "c50a55bba92f54ec789a1c796e935090424dfa9007f3984dd60823eeb90160d7",
+        "afterSha256": "37e39e126e5f3d87dbb77b35fc6bd55d8e228e2b1ce920666ae1b48445eba759"
+      },
+      {
+        "file": "docs/current/API.md",
+        "before": 2,
+        "after": 0,
+        "codes": [
+          "link.no-such-reference"
+        ],
+        "beforeSha256": "df97a130a3283bf67daf5d174e563283d95e24798a5267099ec2790d6166022c",
+        "afterSha256": "18698581079521e98d0189ce1bc1298169406132cc0ca33ca90b80f8dd40e331"
+      }
+    ],
+    "positiveControl": 1,
+    "negativeControl": 0,
+    "proseAndDecisionsUnchanged": true
+  },
+  "tailwind": {
+    "diagnostics": 10,
+    "from": "break-words",
+    "to": "wrap-break-word",
+    "equivalentInstalledCompilerOutput": "overflow-wrap: break-word;"
+  },
+  "additionalWrappedPlaceholdersEscaped": 3,
+  "rulesDisabled": false,
+  "historicalManifestRewritten": false
+}

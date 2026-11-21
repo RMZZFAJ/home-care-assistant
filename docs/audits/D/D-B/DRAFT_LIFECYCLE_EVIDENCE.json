@@ -1,0 +1,119 @@
+{
+  "recordedAt": "2026-11-08T22:33:18.324470+00:00",
+  "baseSha": "bca3933d2ea51af245517ed02fbba2077c41990c",
+  "sourceLfSha256": {
+    "src/components/requisitions/requisition-wizard.tsx": "e94b25da8681c6aea9fa06e9784f45062872d6dfbe0cfe172588a91a01446773",
+    "src/components/balances/balance-count-wizard.tsx": "efbe7fd6578d5ec05568443943b4293c0e64f54715379b7f049b2f7296d94b16",
+    "src/components/forms/creation-draft-panel.tsx": "37cedc9349d51a13b9addfca6cd0001e6521695cf8d69c202b445094e777b5ab",
+    "tests/e2e/draft-lifecycle.spec.ts": "c8b897cc9c1d491ea371d168537a4bf6af9abdf0b66284d26e0b45e7e4f7c78a"
+  },
+  "ownerAuthority": "OWNER_EXECUTION_ORDER.txt VI.4 no draft TTL and VII.1 recovery across devices/sessions; supersedes the old local24h expectation without editing canonical columns.",
+  "validation": {
+    "finalProductionPassed": 12,
+    "distinctNewCases": 9,
+    "distinctExistingLegacyConsumerCases": 3,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "totalBrowserExecutions": 17,
+    "passingExecutions": 14,
+    "preservedFailingExecutions": 3,
+    "initialTypeCheckRejectedBeforeBrowser": true,
+    "types": true,
+    "affectedLint": true,
+    "generalSuitesRepeatedLocally": false,
+    "mutableDatabaseSuiteParallelWithE2e": false
+  },
+  "cohorts": {
+    "baseline": "1 FAIL: old buffer discards the committed REQ recovery key after24h",
+    "firstProductRun": "1 PASS REQ replay,1 FAIL in a test fixture using nonexistent updated_at;10 not run",
+    "fixtureRecheck": "1 PASS account/session isolation,1 FAIL in test assumption that optional-review BAL remains submitted;7 not run",
+    "final": "12 PASS, including approved BAL with real movements. Maximum-failures notices are not additional cases."
+  },
+  "counterproofs": {
+    "reqExactCommittedRequestReplayed": true,
+    "newTabDoesNotInheritLocalEnvelope": true,
+    "balExactApprovedRequestReplayedWithSameIdVersion": true,
+    "balLedgerNonemptyBeforeReplay": true,
+    "noNewOfficialEffectOnReplayOrPrivateResume": true,
+    "differentUserPositiveOwnDraftNotJustDenied": true,
+    "patientSwitchDoesNotExposePreviousDraft": true,
+    "logoutClearsLocalCopiesNotServerDrafts": true,
+    "freshContextRecoversSamePrivateIdRevisionContentHashAndStage": true,
+    "legacyZeroAndSevenRemainUnclassified": true
+  },
+  "clockQualification": "Only freshly created fictional private metadata and local recovery-envelope timestamps aged26h. No canonical event/body/hash clock changed; no elapsed-day, physical-device or server-clock-advance proof.",
+  "policyQualification": "Optional BAL review already applies reconciliation immediately. Test initially expected submitted; source private.apply_bal/create_supply_document and existing policy justified approved. Final fixture counts1 and requires nonempty real ledger, not a weakened any-status assertion.",
+  "preservation": {
+    "editableBalCacheStillRequiresMatchingAssignmentAndReference": true,
+    "pendingRouteAllowlistUnchanged": true,
+    "authorizationSchemaRpcGrantsUnchanged": true,
+    "sessionStorageIsOptionalTabCopyNotCrossSessionPromise": true,
+    "noOfficialRecordCreatedJustForTyping": true,
+    "privateCacheAndOfflineReplayRulesUnchanged": true
+  },
+  "newMigrations": 0,
+  "remoteObservation": "DRAFT_LIFECYCLE_REMOTE_OBSERVATION.json",
+  "baseObservation": "CI_BCA3933_OBSERVATION.json",
+  "logsLfSha256": {
+    "draft-lifecycle-before-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-lifecycle-before.log": "82731c2162fa6385ad2494fe1c1e3e53408bbc555cb7e0debfb928cd24420a5b",
+    "draft-lifecycle-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-lifecycle-final-production.log": "0e408d26508010b9b0fc07b23832756224e866c31fbfe8c04a008a90305a093e",
+    "draft-lifecycle-final-source-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-lifecycle-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-lifecycle-fixture-error.log": "d1c37494465b885b04f7c112497af2f4e9004789d5277e8e02054e48e894861f",
+    "draft-lifecycle-initial-types.log": "d709b6b492854e89f5ad854ed9f805b51d846d1fb0450075f8801c5e7d08d091",
+    "draft-lifecycle-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-lifecycle-markdown-ci-update.log": "9171dcb18d52331562b7ead7c06441dca1dcbf8cee706b9c71eb011b60b4be02",
+    "draft-lifecycle-markdown-recheck.log": "87512770283eea24e57f363c05a6a0697a92ea037a9b122af8e4ca3f8a07d931",
+    "draft-lifecycle-markdown.log": "83a5f33fa3de27c3b8288e68482fa9f77db53f93863cc78316eaecd6e026b993",
+    "draft-lifecycle-recheck-production.log": "0f7f4e52a845b48a11d38e9689a4ac890be4e6f5a2e0b94336c443da074c1a85",
+    "draft-lifecycle-types-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-lifecycle-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "preservedRawArtifactSha256": {
+    "draft-lifecycle-before-artifacts\\baseline-spec.txt": "7a2fbed761177e613f0251580fa00c5b7ab85b6138a18d7e09e29a6d60afa2a7",
+    "draft-lifecycle-before-artifacts\\draft-lifecycle-REQ-conser-1c5a9-outra-aba-não-herda-a-cópia-chromium\\error-context.md": "b385e5898eb7d8ba81a691a5a640964e3ef561c5558fd0abb7e86498b57dd18b",
+    "draft-lifecycle-before-artifacts\\draft-lifecycle-REQ-conser-1c5a9-outra-aba-não-herda-a-cópia-chromium\\test-failed-1.png": "b8c3e295dacc8b534a786bdcc0cd9b14f2ef15aa0f8c046d8591025a3e89eb12",
+    "draft-lifecycle-fixture-error-artifacts\\fixture-error-spec.txt": "52c997f53cfe55e62a9cefb7aa25b802c21c3b017369a069e4cbb9ec8a8ddeee",
+    "draft-lifecycle-fixture-error-artifacts\\draft-lifecycle-REQ-salva--fa507-gout-limpa-só-a-cópia-local-chromium\\error-context.md": "410a66c75c34c64a81ac5def2b58a3e263082d0a8063aaa9b8654af9447c5cab",
+    "draft-lifecycle-fixture-error-artifacts\\draft-lifecycle-REQ-salva--fa507-gout-limpa-só-a-cópia-local-chromium\\test-failed-1.png": "3878570f4a62a0d65f57cf1754e0269e56ec797f4e36e26b44c172eb6e800401",
+    "draft-lifecycle-policy-error-artifacts\\policy-error-spec.txt": "f7eb23c3285a4ae4fa671ad860bca0e507ac7a35849a64e5ffee0dbe401e7660",
+    "draft-lifecycle-policy-error-artifacts\\draft-lifecycle-BAL-agenda-b049d-o-após-concluir-a-obrigação-chromium\\error-context.md": "dec3f41dc5418f72315ba64d876d3b13eb530e17058fb6fd5026ec301de4f5d6",
+    "draft-lifecycle-policy-error-artifacts\\draft-lifecycle-BAL-agenda-b049d-o-após-concluir-a-obrigação-chromium\\test-failed-1.png": "be9f85260473b0037e34f5533864e20c4319fd5c84074d87be43a544497527ef"
+  },
+  "remaining": [
+    "Own published SHA CI",
+    "Other executable D-B requirements",
+    "Human/AT/physical-device and D-C/D6 gates"
+  ],
+  "goalComplete": false,
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "counts": {
+      "PASS": 46,
+      "PARTIAL": 50,
+      "NOT_STARTED": 9
+    },
+    "canonicalColumnsPreserved": 29,
+    "changedCriteria": [
+      "C-AC-032"
+    ],
+    "approvedComplementAddedFromCurrentOwnerOrder": true
+  },
+  "supportLfSha256": {
+    "OWNER_EXECUTION_ORDER.txt": "b06ff5581d6a9bcbe32107787e2f34a7096daca4079d7b3574f5a8bd1e804730",
+    "CI_BCA3933_OBSERVATION.json": "89d1c5be24c01accce0424df4d547ef95c3bca3fceef7deff1faf59c87f7dc0c",
+    "DRAFT_LIFECYCLE_REMOTE_OBSERVATION.json": "22c89eaac73a71a65cb91722fbda5ea10f653b66acd52f62eb69098cb5d7203e"
+  },
+  "documentationValidation": {
+    "localLinks": 203,
+    "canonicalColumnsPreserved": 29,
+    "approvedComplementOnlyChangedFor": "C-AC-032",
+    "markdownQualification": "Six files passed initially; TESTING line-length corrected and passed; three subsequent CI-status edits passed."
+  }
+}

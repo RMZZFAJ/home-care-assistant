@@ -1,0 +1,68 @@
+{
+  "sha": "60c419b468a36b981872a70d210bddd5d13835ab",
+  "runId": 42667937000,
+  "jobs": [
+    {
+      "id": 129336708548,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42667937000
+    },
+    {
+      "id": 129336708884,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42667937000
+    },
+    {
+      "id": 129336709109,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 42667937000
+    },
+    {
+      "id": 129346367033,
+      "name": "browser (mobile)",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_id": 42667937000
+    },
+    {
+      "id": 129346367112,
+      "name": "browser (chromium)",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_id": 42667937000
+    },
+    {
+      "id": 129346367167,
+      "name": "browser (ios-1)",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_id": 42667937000
+    },
+    {
+      "id": 129346368504,
+      "name": "browser (ios-2)",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_id": 42667937000
+    }
+  ],
+  "preview": {
+    "deploymentId": "dpl_5xw29yEw75vgMasVVAqMj21LQ9H9",
+    "state": "READY",
+    "url": "https://home-care-assistant-8eylfdpol-rmzzfajs-projects.vercel.app"
+  },
+  "limits": [
+    "Point-in-time observation; browser jobs still running.",
+    "This SHA does not validate the next transfer preparation commit.",
+    "Sonar deferred by owner; no production approval."
+  ],
+  "assembledAt": "2026-11-09T18:29:55.964Z",
+  "fullMetadataArchiveSha256": "5163e37e1edef720de68ac9855c14a91ae10a2bf8709e86d3a05703ac99df89d",
+  "runUrl": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42667937000"
+}

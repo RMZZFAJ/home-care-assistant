@@ -1,0 +1,11 @@
+{
+  "recordedAt": "2026-11-08T20:21:32.518Z",
+  "project": "qwfrqychokvhdzakibid",
+  "operation": "Read-only migration count/max-version",
+  "database": "postgres",
+  "migrations": 156,
+  "lastVersion": "20261108194000",
+  "newMigrationsInThisBatch": 0,
+  "remoteMutation": false,
+  "previousFullSqlReconciliation": "REGULARIZATION_PDF_REMOTE_MIGRATIONS.json"
+}

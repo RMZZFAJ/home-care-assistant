@@ -1,0 +1,98 @@
+{
+  "syntheticOnly": true,
+  "root": "public-root.crt",
+  "rootFingerprint": "63613aa2e8c31d83a18d07ab215f4b921cf3d7b7cc182246c3e98a000218f05c",
+  "privateKeysRetained": false,
+  "source": "production local E2E D4.3 before public-key budget guard; all four revalidated after guard",
+  "artifacts": [
+    {
+      "file": "com-signed.pdf",
+      "sha256": "4752a49367766abcd8278e61252116d4f418e5c68d85f2e5b52e3f59ea40617f",
+      "size": 55263,
+      "issuanceId": "4c7aa625-947a-4af3-be6e-3fa790eb9e8e",
+      "verificationCode": "1AB634CDA91DCEBF8729DC4394837DDB",
+      "version": 1,
+      "expected": {
+        "status": "verified",
+        "accepted": true,
+        "wholeFile": true,
+        "signerTrust": "internal",
+        "timestampTrust": "internal"
+      }
+    },
+    {
+      "file": "req-signed.pdf",
+      "sha256": "1d34a082a61cad188301d0d2e0d3561c2c8aacfbb2315127f0aa1b25fa225e9f",
+      "size": 56104,
+      "issuanceId": "566fbac4-2745-4fc9-b2d8-33b7c63f4cbe",
+      "verificationCode": "B452F36BF93E834504AB297B8E13BB30",
+      "version": 3,
+      "expected": {
+        "status": "verified",
+        "accepted": true,
+        "wholeFile": true,
+        "signerTrust": "internal",
+        "timestampTrust": "internal"
+      }
+    },
+    {
+      "file": "ent-signed.pdf",
+      "sha256": "23c926af52a312643dfabfe668af8b8d1c247cfd66c5fab7e97248ad214ccc19",
+      "size": 56315,
+      "issuanceId": "584b06b6-5919-4723-acbc-18dc807a37fb",
+      "verificationCode": "F52A9F7CA8A1358E8403E2789E988AF8",
+      "version": 1,
+      "expected": {
+        "status": "verified",
+        "accepted": true,
+        "wholeFile": true,
+        "signerTrust": "internal",
+        "timestampTrust": "internal"
+      }
+    },
+    {
+      "file": "bal-signed.pdf",
+      "sha256": "b3a14d7e78aa1cc80c6460795dcfa716c79cf49bb454ee7d341098bed5ab5b14",
+      "size": 56152,
+      "issuanceId": "a286a891-0380-42c3-99ad-f55377920d7c",
+      "verificationCode": "40F3EC09708FA072C987EBDC14502F4B",
+      "version": 1,
+      "expected": {
+        "status": "verified",
+        "accepted": true,
+        "wholeFile": true,
+        "signerTrust": "internal",
+        "timestampTrust": "internal"
+      }
+    },
+    {
+      "file": "com-altered.pdf",
+      "sha256": "bfa5e6dc98d1fe76e4f355cccda28931782dde5de527bddc8e1403e017e57e7a",
+      "size": 55263,
+      "expected": {
+        "status": "invalid_signature",
+        "documentSignature": "invalid"
+      }
+    },
+    {
+      "file": "com-appended.pdf",
+      "sha256": "653c620021b48958a170c665a7b54447c779bc2b96e6db34438edf0cd98e4d30",
+      "size": 55289,
+      "expected": {
+        "status": "verified",
+        "accepted": false,
+        "wholeFile": false
+      }
+    },
+    {
+      "file": "com-no-timestamp.pdf",
+      "sha256": "bbaefe2779c72eaaa2be07bcad57c6b51eb30c76891d048f1caea3836e4785f9",
+      "size": 55263,
+      "expected": {
+        "status": "invalid_timestamp",
+        "documentSignature": "valid",
+        "timestamp": "invalid"
+      }
+    }
+  ]
+}

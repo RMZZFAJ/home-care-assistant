@@ -62,7 +62,7 @@ A busca cobriu as migrations em ordem e as rotas requisitions. Na superfície
 vigente identificada:
 
 - src/app/api/requisitions/route.ts oferece GET de lista e POST de submit.
-  src/app/api/requisitions/[id]/route.ts exporta GET. Ciência, estado e
+  `src/app/api/requisitions/[id]/route.ts` exporta GET. Ciência, estado e
   resolução têm comandos específicos, sem editor material geral.
 
 - submit_requisition vigente, em

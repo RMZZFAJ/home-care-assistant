@@ -1,8 +1,16 @@
 # Testes e reprodução
 
+**Gate visual vigente:**[Modelo Integral](../ui-ux/CANONICAL_MODEL.md).
+Exigir paridade de todos os recursos, comparação em cinco viewports, teclado,
+foco/retorno, contraste/disabled e regressões dos consumidores. Prova da antiga
+aparência Fluent não aprova a nova; abas e Andamentos exigem provas próprias.
+
 Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
-C não executou testes funcionais. B8 demonstra lacunas de oráculo PDF,
-NULL SQL, revisão axe e readiness do helper; verde parcial não homologa
+C não executou testes funcionais. D-A iniciou a correção dos instrumentos
+de B8: NULL SQL, revisão axe, readiness e proteção de ferramentas/exportação.
+O contrato de oráculo PDF foi criado em D0; integração ao renderer permanece
+em D4. Resultados por incremento no
+[checkpoint D-A](../audits/D/D-A/CHECKPOINT.md); verde parcial não homologa
 produto.
 Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
 em [C](../audits/C/README.md); decisões aprovadas não equivalem a
@@ -26,7 +34,68 @@ O guard verifica migrations históricas e o contrato removido no código ativo.
 Testes unitários cobrem validação, redirects, limites, erros, snapshots e
 worker/provedor com transporte falso. Não utilizam credenciais reais.
 
+## Validação proporcional por incremento
+
+O runner coleta os casos com --list antes do build e da criação das chaves
+efêmeras. Erro de importação, sintaxe ou seleção termina com falha nessa etapa;
+nenhum caso de navegador foi validado por essa coleta. --list explícito consulta
+a seleção sem iniciar servidor ou provisionar chaves. Uma coleta válida segue
+para o build de produção e a execução normal, com a mesma stack guardada.
+
+Para diagnóstico local dirigido, HCA_E2E_DIAGNOSTIC=true no mesmo runner usa
+Next dev e evita reconstruir toda a aplicação a cada hipótese. Verificação da
+stack/origem, identidades fictícias e bloqueio de envio externo continuam
+obrigatórios. Esse resultado deve ser rotulado DIAGNOSTIC_ONLY e não substitui
+o aceite com build de produção. Sem a variável, o runner mantém build/start;
+na CI o modo diagnóstico é sempre ignorado. Fontes ficam estáveis durante cada
+execução. Consolidar alterações do mesmo fluxo antes da rodada de aceite.
+
+Os comandos gerais acima continuam na CI da PR. Não é necessário executá-los
+todos localmente a cada edição e repetir a mesma matriz após cada correção.
+Antes de publicar um conjunto coerente, selecionar a evidência que discrimina
+o defeito e percorre suas camadas afetadas. Localizar os consumidores do
+contrato alterado, inclusive fixtures/seletores existentes; escolher os casos
+afetados além dos novos, sem precisar duplicar a suíte inteira:
+
+| Mudança | Evidência local | CI geral |
+| --- | --- | --- |
+| Regra/contrato | Regressão, negativa e fronteira/API | Checks e unitários |
+| Banco/autorização | Preparo, Auth real, RLS e locks | Replay e integrações |
+| Fluxo visual | Tarefa, teclado/layout e efeito no banco | Navegadores |
+| Documento | Markdown, links e preservação | Checks documentais |
+
+Depois de uma falha, corrigir a causa e repetir seus casos afetados. Uma
+formatação, texto ou ajuste isolado não exige novo replay do banco ou repetição
+de todos os navegadores. Ampliar a rodada local quando existir uma dependência
+transversal, nova hipótese, falha comprovada ou indisponibilidade da CI
+necessária; registrar a justificativa. Não diminuir asserções ou desativar
+regras para economizar execução.
+
+Registrar comandos/casos realmente executados, falhas intermediárias e limites
+no checkpoint/matriz. Consultar a CI por SHA em pontos de entrega, sem polling
+contínuo. Check pendente, execução cancelada ou verde de um commit anterior
+não validam o novo SHA. A publicação progressiva pode continuar enquanto a CI
+trabalha; a conclusão depende da cobertura exigida com resultado próprio.
+
+Exemplos de seleção, conservando os guards do ambiente:
+
+```sh
+npm test -- tests/api/delivery-preparation-contract.test.ts
+node --test --test-name-pattern="P06 late product FK" tests/integration/delivery-preparation.test.mjs
+npm run e2e -- tests/e2e/delivery-preparation.spec.ts --project=chromium
+```
+
+Não alterar fontes durante E2E nem disputar as identidades/fixtures com outra
+suíte mutável. Replay local conserva as exigências de consentimento e backup
+abaixo; aproveitar o job efêmero de CI evita substituir dados locais novamente.
+
 ## Banco local de desenvolvimento
+
+No PowerShell deste workspace, use npm.cmd quando repassar flags após --,
+por exemplo `npm.cmd run test:migrations -- --replay-local --backup CAMINHO`.
+Isso preserva os argumentos para os guards; o shim npm.ps1 observado omitiu
+o separador nessa execução. A ausência de consentimento/backup continua
+rejeitando replay. Os demais sistemas usam o npm da versão fixada normalmente.
 
 Requisitos: Docker e Supabase CLI 2.121.0. O harness usa o projeto
 home-care-assistant neste repositório: API 54321, banco 54322 e Mailpit 54324.
@@ -49,6 +118,11 @@ test:migrations **recria os dados desse banco local**: primeiro com a cadeia
 completa e depois na versão 019 com fixtures legadas antes do upgrade.
 Guarde backup antes de autorizar a substituição de dados a preservar.
 Os helpers recusam hosts remotos e selecionam explicitamente o destino local.
+Fixtures pausam os jobs hca-operational-lifecycle/hca-notification-worker pela
+API cron.alter_job, após reset e upgrade inclusive. Isso evita que cron
+consuma a fila ou altere estado durante os controles. Registrar/reconciliar a
+situação anterior dos jobs ao encerrar a missão; não reativar destinos
+externos por consequência do teste.
 O vínculo administrativo do CLI com um projeto remoto não muda o destino
 da suíte. Nunca executar reset, fixtures ou E2E no remoto.
 
@@ -112,6 +186,18 @@ separadamente.
 
 ## Navegador
 
+`npm run test:harness` executa somente controles sintéticos, sem aplicação,
+banco ou fixtures, nos três projetos. Verifica navegação pronta, tardia e
+indisponível; não substitui E2E do produto. A CI executa esses controles antes
+do projeto E2E correspondente. O helper aguarda a variante real do shell,
+sem escolher o menu móvel durante a hidratação desktop.
+
+Axe mantém violações como falha e anexa JSON com incomplete por regra,
+superfície e estado, além de anotação de revisão pendente. Incomplete não é
+violação automática nem conformidade: exige revisão específica, separada de
+aceite humano de foco/reflow/AT. Asserções SQL compartilhadas têm controles
+que reprovam quantidade incorreta, NULL e linha ausente.
+
 ```sh
 npx playwright install chromium webkit
 npm run e2e
@@ -123,6 +209,12 @@ envio externo e gera build separado em `.next-e2e`. Inicia servidor em 3100,
 sem reaproveitar processo desconhecido. Os projetos Chromium desktop, Pixel 7
 e WebKit/iPhone 13 usam dados fictícios. Relatórios não são versionados;
 traces ficam desabilitados para evitar registrar credenciais de Auth.
+
+Depois da coleta, o runner executa um build de produção novo antes de iniciar
+o Playwright. Falha de compilação impede a abertura dos casos; o prazo de
+prontidão HTTP mede a inicialização do servidor já compilado. Os limites de
+prontidão e das asserções continuam próprios, sem aumento para acomodar a
+compilação.
 
 A extensão Playwright do VS Code pode descobrir testes sem banco ou variáveis
 do runner. Ao executar, tanto o servidor quanto o globalSetup verificam a
@@ -157,18 +249,44 @@ Instalação limpa, evolução legada, SQL/RLS e integrações Auth executam uma
 no job de banco. Após sua aprovação, Chromium desktop, Pixel 7 e iPhone 13
 executam em jobs isolados, com a mesma stack local e provisionamento Auth
 fictício em cada runner efêmero. Cada projeto mantém todos os seus cenários.
-O check agregado database-and-browser exige sucesso no banco e nos três
-projetos. Não há exclusão de testes nem uso do Supabase remoto na suíte.
+O check agregado database-and-browser exige sucesso no banco e em todos os
+jobs browser. Chromium,mobile e iOS dividem cada coleção completa em
+shard1/2 e shard2/2,com stack própria e execução serial por runner. O limite
+de40min por job permanece;as partes Chromium cobrem161+160 dos321 casos
+na seleção D3.48,sem remover cenários.
+A união das partes precisa cobrir toda a coleção sem interseção. Não há
+exclusão de testes nem uso do Supabase remoto na suíte.
+
+Suítes web comuns usam serviceWorkers=block para interceptações HTTP chegarem
+ao consumidor. pwa.spec.ts habilita workers reais nos três projetos e verifica
+manifesto, cache estritamente público, navegação offline, atualização com duas
+abas, preservação e recuperação do mesmo rascunho. O fault adapter do contrato
+público é explícito e limitado; não simula Auth, persistência ou estado do worker.
+Convite controlado não comprova instalação física no sistema operacional.
+Ver [contrato e limites PWA](../audits/D/D-B/PWA_RUNTIME.md).
+
+O workflow agrupa execuções por PR e cancela as superadas quando chega outro
+commit. O SHA mais recente continua executando a matriz inteira. Pushes na
+master usam grupos únicos por run_id; não são cancelados por essa regra.
+Cancelamento e execução pendente não aprovam um SHA. A configuração usa a
+[concorrência nativa do GitHub](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency).
 
 ## Linux local
 
 scripts/verify-linux.sh roda dentro de container Node 24.22.0 com o
 repositório
 montado somente para leitura em /workspace. Copia código para área temporária,
-exclui .env, Git e caches, mas B8-M004 demonstra que a lista atual não exclui
-.private/.venv. Não executar essa exportação sobre workspace com conteúdo
-privado até correção autorizada D0. O objetivo é instalação limpa/lint/tipos/
-testes/build; a falha de fronteira de arquivo não foi corrigida nesta C.
+exclui .env, Git, caches, .private, .venv e arquivos de backup conforme
+scripts/verification-export.exclude. Teste de sentinelas usa a mesma lista,
+sem copiar conteúdo privado do workspace. O objetivo é instalação limpa,
+lint, tipos, testes e build; não equivale à homologação de produção.
+
+Ferramentas de relatório reutilizáveis exigem `--output-dir` explícito e
+registram SHA/data em RUN_METADATA.json. Saída no repositório usa output/ ou
+docs/audits/D/; destinos históricos são recusados. Arquivo existente só pode
+ser substituído com `--overwrite`. Verificador legado que cria fixtures
+exige `--replay-local --backup` antes de provisionar. A ferramenta combinada
+Meta está bloqueada até a separação inspect/submit e autorização D7.
 
 ## Documentação e auditorias datadas
 
@@ -176,3 +294,277 @@ Para C/editorial, validar Markdown, links, matrizes e hashes. Não executar
 probes históricos para atualizar relatórios: podem alterar fixtures ou
 sobrescrever evidência. Caminhos anteriores ficam no mapa de relocação;
 scripts datados exigem adaptação/guardas antes de reutilizar em D0.
+
+## Rascunhos privados REQ/BAL
+
+A suíte Auth private-drafts cobre save parcial, privacidade, CAS, descarte e
+consumo nativo; private-bal-reference cobre snapshot de ledger sem efeito,
+conflito após espera e perda real de sessão. session-deadline observa expiração
+Auth durante locks. Execute somente o arquivo/caso afetado após preparo local.
+O runner scripts/run-e2e.mjs com tests/e2e/private-creation-drafts.spec.ts cobre
+dois aparelhos, conflito5/6/7, respostas perdidas de save/descarte, arquivo
+ready preservado, BAL legado e reconto. Os consumidores anteriores em
+requisition-observation.spec.ts, presentation-provenance.spec.ts e
+workflows.spec.ts mantêm os contratos de observação, conversão e histórico.
+Replay limpo/legado e suites gerais permanecem nos jobs da CI por SHA;
+novos casos dirigidos não exigem repetir localmente suites gerais inalteradas.
+
+## Datas escolhidas e BAL em janela nova
+
+selected-shift-dates.test.mjs cobre12 datas em45 dias,19–07 por instantes UTC,
+tipo obsoleto, conflito reservado com rollback integral, corte, proposta após
+corte e perda real de sessão durante espera. bal-new-window.test.mjs cobre
+contadoras1/2, revisões independentes e ajuste físico causal.
+selected-dates-new-window.spec.ts verifica calendário entre meses, retorno da
+revisão, exceção/corte e reconto; schedules.spec.ts e
+schedule-decisions.spec.ts preservam consumidores anteriores.
+
+Nos painéis, overflow apenas do documento não detecta recorte interno. A
+tarefa de datas confronta os limites horizontais de campos/dias com o drawer e
+exige números em uma linha, além de axe e inspeção da captura. Essas
+verificações não substituem avaliação humana de AT.
+
+## Pares finais D-A
+
+requisition-pdf-personal-receipt.spec.ts confronta extra M1/SCI/PDF antigo e
+novo, expedição ENT em leitura com duas linhas e aceite2/3 pessoal, retirada
+familiar5→4 e programação BAL sexta/noturno/fuso. Emissões intermediárias
+legítimas não são duplicação: cada versão solicitada precisa de registro,
+caminho e SHA próprios. O arquivo anterior precisa permanecer idêntico.
+return-transfer-equivalence.test.mjs compara seis pacientes em três pares de
+percursos: integral, parcial e consumo anterior com inativação antes do aceite.
+
+Consumidores anteriores são selecionados conforme componente alterado.
+Rechecks repetem somente falhas/caminhos afetados. Checkpoint preserva as
+falhas de fixture/oráculo e a correção real de foco; não se reduz axe, grants,
+RLS ou asserção material para obter verde. Clean/legado e suítes gerais ficam
+na CI por SHA. Testes locais não atestam AT/aparelho/provedor/restore.
+
+O audit anexa geometria dos elementos quando há transbordamento horizontal;
+asserções de largura e axe permanecem obrigatórias. Para seleção pontual por
+--test-list, os caminhos são relativos a tests/e2e; conferir --list e exigir a
+contagem esperada antes de executar. Saída0 com zero casos não é evidência.
+
+## Web Push e compatibilidade PWA
+
+tests/integration/web-push.test.mjs usa Auth real local para isolamento,
+reconsentimento, produtor REQ nativo, concorrência, leases e revogação. O runner
+oficial prepara a stack existente; não execute a suíte junto com E2E mutável.
+O SQL de grants pode ser dirigido com
+node scripts/test-migrations.mjs --sql-only --sql-file service-role.sql.
+
+tests/e2e/web-push.spec.ts usa worker/API/banco reais, com capacidade nativa e
+transporte explicitamente controlados. O runner força envio externo desligado e
+gera VAPID efêmero protegido. Esses casos não comprovam permissão do sistema,
+recebimento físico ou provedor. Unidade confere RFC8291 e VAPID independentemente
+com Node crypto, além dos controles de cache/ativação e payload genérico.
+As coortes, contraprovas e fontes congeladas constam em
+[D5.2](../audits/D/D-B/D5_2_EVIDENCE.json). CI do novo SHA permanece obrigatória.
+
+## Lembretes legados e backup
+
+legacy-reminder-scheduler.test.mjs cobre101 configurações elegíveis em três
+rodadas, downtime, backlog, fonte alterada, falha isolada, rollback e BAL moderno.
+notice-reference.test.mjs e requisition-scheduler.test.mjs são consumidores
+compatíveis obrigatórios desse produtor; o lote dirigido passou16/16 com Auth
+real/serviço. Não há mudança de interface que exija novo build E2E local.
+
+backup-retention.test.mjs usa filesystem real/crypto e calendário controlado;
+backup-snapshots.test.mjs acrescenta SQL real e mutantes de versão/causa/negócio.
+O lote final9/9 não é47 dias de operação nem perda do computador. CLI/captura e
+restore reais são evidência separada em [OPS.2](../audits/D/D-B/OPS_2_EVIDENCE.json).
+Não executar testes mutáveis de banco junto ao E2E. Agenda e fornecedor externo
+permanecem desligados; captura/probe não fazem reset ou importação de roles.
+
+## Comparação de versões documentais
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/version-history.test.ts
+npm run e2e -- tests/e2e/version-history.spec.ts tests/e2e/pdf-source-facts.spec.ts
+```
+
+A unidade cobre número exato, identidade da linha, proveniência, ausência de
+versão e revalidação após a consulta. O E2E usa Auth/RLS reais, dados fictícios,
+rename/revogação, erro/retry, teclado, acervo e vínculos de versão/hash/bytes.
+O runner confere a stack local e mantém envio externo desabilitado. Diagnóstico
+com HCA_E2E_DIAGNOSTIC=true usa Next dev e não substitui a produção.
+
+Após correção, repetir os casos afetados e conservar as coortes/hashes das
+provas inalteradas. A inspeção dos campos de48 snapshots sintéticos não é48
+fluxos executados nem prova de todos os estados, AT, impressão ou aparelho.
+[Resultados e contraprovas](../audits/D/D-B/DOCUMENT_VERSION_HISTORY_EVIDENCE.json).
+
+## Etapa de rascunho privado
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/draft-navigation.test.ts \
+  tests/api/private-drafts-contract.test.ts tests/supply-draft-models.test.ts
+node --test --test-concurrency=1 tests/integration/draft-navigation.test.mjs \
+  tests/integration/private-drafts.test.mjs \
+  tests/integration/supply-private-drafts.test.mjs
+draft_cases='BAL agendado recupera|D3 consulta falha|REQ em dois aparelhos'
+draft_cases="$draft_cases|BAL parcial recupera|COM entre duas|ENT emite com"
+npm run e2e -- tests/e2e/private-creation-drafts.spec.ts \
+  tests/e2e/supply-private-drafts.spec.ts \
+  --project=chromium --grep "$draft_cases"
+```
+
+Executar após test:db:prepare no projeto local, sem reset. A suíte Auth recusa
+etapa de outro domínio/finalidade, verifica CAS/replay, cliente legado sem etapa,
+hash de conteúdo estável e ausência de efeito oficial por salvamento. O E2E
+consulta a persistência independente, retoma etapas e compara versões em leitura.
+Não rodar a suíte mutável junto ao E2E. A CI cobre a suíte completa nos três
+motores; não repetir todos os builds locais a cada ajuste.
+[Coortes, vínculos e limites](../audits/D/D-B/DRAFT_NAVIGATION.md).
+
+## Seleção frequente e foco da verificação
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/recurring-selection.test.ts
+node --test --test-concurrency=1 \
+  tests/integration/recurring-selection.test.mjs
+npm run e2e -- tests/e2e/recurring-selection.spec.ts --project=chromium
+npm run test:harness -- tests/harness/keyboard-entry.spec.ts
+npm run e2e -- tests/e2e/public-verification.spec.ts \
+  --grep 'resolve QR e código sem conta'
+```
+
+O ensaio confere payload e linhas emitidas, sem copiar estoque7/urgência/motivo
+antigos. Outra sessão usa a mesma lista privada; outra conta não a lê.
+CAS de nome, replay, revogação e esperas observadas usam Auth real. Checkbox que
+se torna inelegível não habilita confirmação vazia. Metadados e saves não emitem
+atos oficiais; só a confirmação explícita posterior cria a REQ fictícia.
+
+O oráculo aguarda o landmark sair de inert/aria-hidden e mantém suas negativas.
+A verificação pública exige foco no resultado montado e o código formatado
+completo antes da próxima consulta. Não foram aumentados timeouts nem removidas
+regras. CI f0840dc falhou e permanece reprovada; as correções locais exigem CI
+própria no próximo SHA. [Coortes](../audits/D/D-B/RECURRING_SELECTION.md).
+
+## PDF técnico da regularização ENT
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/pdf-regularization.test.ts \
+  tests/pdf-fidelity.test.ts
+node --test --test-concurrency=1 tests/integration/pdf-regularization.test.mjs
+npm run e2e -- tests/e2e/pdf-regularization.spec.ts
+```
+
+Preparar a stack local com test:db:prepare, sem reset; não executar Auth mutável
+em paralelo ao E2E. O caso gera V9 com fatos V8, recupera V7 e compara bytes,
+confere aceite/ledger por leitura independente e verifica código/upload sem
+sessão de aplicativo. Outros casos preservam desconhecido e rejeição.
+O corpus só contém dados fictícios e certificados públicos de teste.
+[Provas e limites](../audits/D/D-B/REGULARIZATION_PDF.md).
+
+## Datas da preparação, expedição e exemplar ENT
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/ent-temporal-pdf.test.ts
+node --test --test-concurrency=1 tests/integration/ent-temporal.test.mjs
+npm run e2e -- tests/e2e/ent-temporal.spec.ts
+.venv/Scripts/python.exe docs/audits/D/D-B/d4-fidelity-proof/verify.py \
+  docs/audits/D/D-B/d4-ent-clocks-proof/CORPUS.json \
+  --output output/ent-clocks-independent.json
+```
+
+O runner verifica a stack local. As fixtures controlam somente a data armazenada
+de novos registros fictícios, preservando eventos/hashes; não desabilitam
+triggers nem usam o remoto. Não executar a suíte Auth mutável junto ao E2E.
+O teste separa datas por rótulo, mantém duas emissões distintas e os bytes de
+cada download; não é ensaio físico ou espera real de24 horas.
+[Coortes e reuso de C108](../audits/D/D-B/ENT_TEMPORAL.md).
+
+## Estado terminal e versão preservada no PDF ENT
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/pdf-ent-terminal.test.ts
+node --test --test-concurrency=1 tests/integration/ent-terminal.test.mjs
+npm run e2e -- tests/e2e/ent-terminal.spec.ts
+.venv/Scripts/python.exe docs/audits/D/D-B/d4-ent-terminal-proof/verify.py \
+  docs/audits/D/D-B/d4-ent-terminal-proof/CORPUS.json \
+  --output output/ent-terminal-independent.json
+```
+
+Usar a stack local existente, test:db:prepare incremental e Auth fictício;
+não executar a suíte Auth mutável junto ao E2E. Preservar os testes temporais
+e de regularização existentes: novas intenções ENT usam V9, replay conserva
+a revisão original. Dois hashes legados e o V8 real preservam inclusive a
+orientação antiga, enquanto V9 e o aviso no acervo têm critérios próprios.
+[Coortes, falha preservada e limites](../audits/D/D-B/ENT_TERMINAL.md).
+
+## Teclado ao continuar, descartar e salvar no catálogo
+
+```sh
+npm run e2e -- tests/e2e/record-drawer-focus.spec.ts \
+  tests/e2e/administration.spec.ts \
+  --grep 'RecordDrawer|catálogo edita nomes alternativos' --max-failures=1
+```
+
+Runner local com Auth fictício; nenhuma suíte mutável de banco em paralelo.
+O teste retém um POST legítimo sem simular sucesso, confere busy e o libera;
+descarte não grava e salvar cria uma única linha. O foco exige destinos próprios
+do contexto. Hidden é uma intervenção controlada para exercitar o fallback.
+Não é ensaio humano/AT ou aparelho físico.
+[Coortes e contraprovas](../audits/D/D-B/DRAWER_FOCUS.md).
+
+## Retenção, sessão e titular do rascunho
+
+```sh
+npm run e2e -- tests/e2e/draft-lifecycle.spec.ts \
+  tests/e2e/requisition-observation.spec.ts \
+  --grep 'REQ conserva|REQ salva|BAL agendada|rascunho anterior conserva' \
+  --max-failures=1
+```
+
+O runner confere a stack local. As fixtures controlam somente metadata de
+novos rascunhos fictícios e envelopes locais; não alteram relógios/eventos
+oficiais. Sem suíte mutável de banco em paralelo. REQ e BAL repetem comandos
+reais já confirmados, com a mesma chave, sem duplicar ficha ou ledger.
+A retomada entre sessões exige rascunho salvo na conta; a cópia de aba é
+opcional. [Coortes, contraprovas e limites](../audits/D/D-B/DRAFT_LIFECYCLE.md).
+
+## Credenciais profissionais e regressões D3.17
+
+Depois de test:db:prepare na stack local autorizada, executar o teste Auth
+tests/integration/credentials.test.mjs e o unitário professional-credential.
+O runner E2E recebe credentials.spec.ts e record-drawer-focus.spec.ts. Não
+executar suítes mutáveis de banco simultaneamente ao E2E. Regressões dirigidas
+abrangem C026 REQ, menu family e recurring-selection nos três motores; o
+harness keyboard-entry preserva controles negativos inert/aria-hidden/Tab e
+acrescenta main oculto preservado e dois main visíveis. Não reduzir regras Axe.
+[Coortes e contraprovas](../audits/D/D-B/PROFESSIONAL_CREDENTIALS_EVIDENCE.json).
+
+## Limite de leitura histórica D3.18
+
+Unitários document-history-read.test.ts e version-history.test.ts; produção
+pelo runner e2e com tests/e2e/version-history.spec.ts nos três motores. A nova
+contraprova intercepta200 com sete projeções inválidas e exige erro de seção,
+retry/foco, zero pageerror e ausência de comandos/efeitos oficiais. Os quatro
+consumidores existentes são preservados e reexecutados; nenhum teste mutável
+de banco corre em paralelo. Axe segue habilitado. Não se infere integridade
+criptográfica a partir da validação de uma projeção JSON.
+[Resultados e contraprovas](../audits/D/D-B/HISTORY_READ_BOUNDARY_EVIDENCE.json).
+
+## Leituras diárias D3.19
+
+O runner dirigido abrange attachment-attempts, delivery-preparation,
+preparation-continuity, public-verification e schedule-decisions. Executar
+apenas C-FINAL023 e os consumidores de recuperação/fingerprint/limite4MB,
+recebedor, preparação/guia e conflito discriminados no manifesto. A lista
+test-list-invert preservou dez PASS atuais e selecionou os29 restantes;
+coleção, identidade dos casos e logs vinculados, sem diminuir Axe.
+Crons pausados pela fixture de anexos são restaurados pelo afterAll; conferir
+estado final. Não rodar suíte mutável de banco simultaneamente. O teste do guia
+pessoal não substitui GUI-04 ou prova de restore operacional.
+[Coortes e contraprovas](../audits/D/D-B/DAILY_READ_RECOVERY_EVIDENCE.json).
+
+## Barreira de commit de credenciais
+
+O painel de tentativa preservada comprova intenção local, antes da conclusão
+do POST. O teste credencial familiar recupera resposta perdida deve reter a
+requisição, comprovar zero registros, liberar e esperar requestfailed depois
+do200 upstream antes de afirmar o commit. Não trocar por sleep ou timeout.
+Reexecutar esse caso nos três motores; replay precisa conservar pacote/chave
+e não duplicar a conferência.
+[Contraprova CI e correção](../audits/D/D-B/CREDENTIAL_COMMIT_BARRIER_EVIDENCE.json).

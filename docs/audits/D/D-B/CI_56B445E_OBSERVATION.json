@@ -1,0 +1,255 @@
+{
+  "sha": "56b445e08672f800865bba95c8f7a35570d71699",
+  "runId": 42626918002,
+  "jobs": [
+    {
+      "id": 129193153047,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129193153446,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129193153594,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129200393465,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 129200393564,
+      "name": "browser (chromium)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129200393655,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 129200394554,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "failedAndFlaky": [
+    {
+      "jobId": 129200393655,
+      "title": "[ios] › tests/e2e/attachment-attempts.spec.ts:59:5 › C-FINAL023 anexos ocultam lista recusada e recuperam leitura sem perder arquivo escolhido ",
+      "firstError": "Error: immutable attachment read 390"
+    },
+    {
+      "jobId": 129200393655,
+      "title": "[ios] › tests/e2e/catalogue-scale.spec.ts:54:11 › catálogo com 20 itens › seleção em REQ mantém alias, teclado, categoria e entrada manual ",
+      "firstError": "Error: catalogue-20-REQ-320"
+    },
+    {
+      "jobId": 129200393655,
+      "title": "[ios] › tests/e2e/catalogue-scale.spec.ts:54:11 › catálogo com 100 itens › seleção em REQ mantém alias, teclado, categoria e entrada manual ",
+      "firstError": "Error: catalogue-100-REQ-320"
+    },
+    {
+      "jobId": 129200393655,
+      "title": "[ios] › tests/e2e/delivery-preparation.spec.ts:97:5 › P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto ",
+      "firstError": "Error: expect(locator).toContainText(expected) failed",
+      "locator": "Locator: getByRole('region', { name: 'Indicação do recebedor', exact: true })"
+    },
+    {
+      "jobId": 129200393655,
+      "title": "[ios] › tests/e2e/delivery-regularization.spec.ts:132:5 › P05 proposta e conferência independentes preservam autoria, recuperam o mesmo ato e produzem dossiê PDF ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('button', { name: 'Conferir proposta', exact: true })"
+    },
+    {
+      "jobId": 129200393655,
+      "title": "[ios] › tests/e2e/delivery-regularization.spec.ts:311:5 › P05 profissional futuro encontra sua tarefa e relata apenas apuração própria sem substituir o aceite ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('button', { name: 'Registrar apuração própria', exact: true })"
+    },
+    {
+      "jobId": 129200393655,
+      "title": "[ios] › tests/e2e/language-navigation-filters.spec.ts:39:5 › aviso real de compra abre a ficha e conserva o paciente anunciado ",
+      "firstError": "Error: expect(locator).toBeVisible() failed",
+      "locator": "Locator: getByText('COM-0001', { exact: true })"
+    },
+    {
+      "jobId": 129200393655,
+      "title": "[ios] › tests/e2e/catalogue-scale.spec.ts:54:11 › catálogo com 5 itens › seleção em REQ mantém alias, teclado, categoria e entrada manual ",
+      "firstError": "Error: catalogue-5-REQ-320"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/pdf-fidelity.spec.ts:69:5 › REQ leva observação zero/decimal/desconhecida, tempo e atendimento por item ao PDF atual e conserva a versão anterior e a origem legada ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('tab', { name: /^(Atendimento|Aquisição|Contagem e revisão)$/ })"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/pdf-fidelity.spec.ts:120:5 › BAL identifica primeira contagem e reconto, conserva parecer e aprovação antiga sem apresentá-los como vigentes e mantém o exemplar anterior ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('tab', { name: /^(Atendimento|Aquisição|Contagem e revisão)$/ })"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/pdf-source-facts.spec.ts:31:5 › PDF atual assina fatos de rascunho e origens físicas conhecida e desconhecida; intenção V5 permanece recuperável ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('tab', { name: 'Arquivos gerados', exact: true })"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/purchase-receipts.spec.ts:81:5 › COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for locator('form').filter({ has: getByRole('button', { name: 'Revisar operação', exact: true }) }).getByRole('button', { name: 'Revisar operação', exact: true })"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/workflows.spec.ts:196:5 › REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real ",
+      "firstError": "Error: expect(locator).toBeVisible() failed",
+      "locator": "Locator: getByText('0/1 linhas integralmente conferidas', { exact: true })"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/workflows.spec.ts:360:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API ",
+      "firstError": "Error: expect(locator).toBeVisible() failed",
+      "locator": "Locator: getByText('8/10 linhas integralmente conferidas', { exact: true })"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/workflows.spec.ts:535:5 › histórico filtra código e período e conserva o documento de paciente renomeado e inativo ",
+      "firstError": "Error: expect(locator).toBeVisible() failed",
+      "locator": "Locator: locator('p').filter({ hasText: 'Paciente: Homologação E2E 28a427c6' })"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/workflows.spec.ts:692:5 › BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('button', { name: 'Mais', exact: true })"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/workflows.spec.ts:773:5 › item extra identificado, múltiplas REQ, scanner e trânsito até o aceite ",
+      "firstError": "TimeoutError: locator.selectOption: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('combobox', { name: 'Produto correspondente', exact: true })"
+    },
+    {
+      "jobId": 129200393465,
+      "title": "[ios] › tests/e2e/purchase-receipts.spec.ts:119:5 › COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos ",
+      "firstError": "Error: expect(locator).toBeFocused() failed",
+      "locator": "Locator: getByRole('link', { name: 'Ir para o conteúdo', exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/delivery-preparation.spec.ts:97:5 › P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto ",
+      "firstError": "Error: expect(locator).toContainText(expected) failed",
+      "locator": "Locator: getByRole('region', { name: 'Indicação do recebedor', exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/delivery-regularization.spec.ts:132:5 › P05 proposta e conferência independentes preservam autoria, recuperam o mesmo ato e produzem dossiê PDF ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('button', { name: 'Conferir proposta', exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/delivery-regularization.spec.ts:311:5 › P05 profissional futuro encontra sua tarefa e relata apenas apuração própria sem substituir o aceite ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('button', { name: 'Registrar apuração própria', exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/delivery-regularization.spec.ts:441:5 › P05 conflito preserva campos próprios e só permite nova proposta após comparar e adotar a referência atual ",
+      "firstError": "Error: expect(locator).toBeFocused() failed",
+      "locator": "Locator:  getByLabel('Sua justificativa', { exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/language-navigation-filters.spec.ts:39:5 › aviso real de compra abre a ficha e conserva o paciente anunciado ",
+      "firstError": "Error: expect(locator).toBeVisible() failed",
+      "locator": "Locator: getByText('COM-0001', { exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/pdf-fidelity.spec.ts:69:5 › REQ leva observação zero/decimal/desconhecida, tempo e atendimento por item ao PDF atual e conserva a versão anterior e a origem legada ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('tab', { name: /^(Atendimento|Aquisição|Contagem e revisão)$/ })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/pdf-fidelity.spec.ts:120:5 › BAL identifica primeira contagem e reconto, conserva parecer e aprovação antiga sem apresentá-los como vigentes e mantém o exemplar anterior ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('tab', { name: /^(Atendimento|Aquisição|Contagem e revisão)$/ })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/pdf-source-facts.spec.ts:31:5 › PDF atual assina fatos de rascunho e origens físicas conhecida e desconhecida; intenção V5 permanece recuperável ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('tab', { name: 'Arquivos gerados', exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/purchase-receipts.spec.ts:81:5 › COM conflito compara a expectativa atual, preserva o motivo e exige nova concordância antes de dispensar ",
+      "firstError": "TimeoutError: locator.click: Timeout 15000ms exceeded.",
+      "locator": "- waiting for locator('form').filter({ has: getByRole('button', { name: 'Revisar operação', exact: true }) }).getByRole('button', { name: 'Revisar operação', exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/selected-dates-new-window.spec.ts:113:5 › doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07 ",
+      "firstError": "Error: expect(locator).toBeFocused() failed",
+      "locator": "Locator:  getByRole('dialog', { name: 'Programação de plantões', exact: true }).getByRole('button', { name: 'Revisar alteração', exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/stock-origins.spec.ts:36:5 › histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos ",
+      "firstError": "Error: expect(locator).toBeFocused() failed",
+      "locator": "Locator:  getByRole('dialog', { name: 'Origem da movimentação', exact: true }).getByRole('heading', { name: 'Movimento consultado', exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/workflows.spec.ts:196:5 › REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real ",
+      "firstError": "Error: expect(locator).toBeVisible() failed",
+      "locator": "Locator: getByText('0/1 linhas integralmente conferidas', { exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/workflows.spec.ts:360:5 › dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API ",
+      "firstError": "Error: expect(locator).toBeVisible() failed",
+      "locator": "Locator: getByText('8/10 linhas integralmente conferidas', { exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/workflows.spec.ts:535:5 › histórico filtra código e período e conserva o documento de paciente renomeado e inativo ",
+      "firstError": "Error: expect(locator).toBeVisible() failed",
+      "locator": "Locator: locator('p').filter({ hasText: 'Paciente: Homologação E2E 083481a8' })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/workflows.spec.ts:692:5 › BAL obrigatório reconta após alteração de estoque e preserva versões antes de cancelamento ",
+      "firstError": "Error: expect(locator).toHaveCount(expected) failed",
+      "locator": "Locator:  getByRole('button', { name: 'Solicitar cancelamento', exact: true, disabled: false })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/workflows.spec.ts:773:5 › item extra identificado, múltiplas REQ, scanner e trânsito até o aceite ",
+      "firstError": "TimeoutError: locator.selectOption: Timeout 15000ms exceeded.",
+      "locator": "- waiting for getByRole('combobox', { name: 'Produto correspondente', exact: true })"
+    },
+    {
+      "jobId": 129200394554,
+      "title": "[mobile] › tests/e2e/web-push.spec.ts:149:5 › Web Push liga consentimento real de API, evento interno, worker controlado e destino Auth sem ciência ou cruzamento de aparelhos ",
+      "firstError": "Error: push-profile"
+    }
+  ]
+}

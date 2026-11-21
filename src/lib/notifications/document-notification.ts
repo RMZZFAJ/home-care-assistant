@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomBytes } from "node:crypto";
-import { renderDocumentPdf } from "@/lib/server/document-pdf";
+import type { DocumentSnapshot } from "@/lib/server/operational-pdf";
+import { notificationPdf } from "@/lib/server/pdf-issuance";
+import { configuredAppOrigin } from "@/lib/server/app-origin";
 import { rpc } from "@/lib/server/api";
 import { formatBrazilDate } from "@/lib/receipt";
 import {
@@ -71,7 +73,7 @@ export async function prepareDocumentNotification(
     type: string;
     version: number;
     hash: string;
-    snapshot: Parameters<typeof renderDocumentPdf>[0];
+    snapshot: DocumentSnapshot;
     eventKey: string;
     recipientName: string;
     shortPatientName: string;
@@ -227,11 +229,8 @@ export async function prepareDocumentNotification(
     acceptanceToken,
     ...(pdfHeader
       ? {
-          attachment: {
-            bytes: await renderDocumentPdf(snapshot, payload.hash),
-            filename: `${payload.code}-v${payload.version}-r4.pdf`,
-          },
-        }
+        attachment: await notificationPdf(client, job.id, workerId, configuredAppOrigin()),
+      }
       : {}),
   };
 }

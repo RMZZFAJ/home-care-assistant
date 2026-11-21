@@ -78,11 +78,13 @@ o login; o acesso correto já foi confirmado por consulta de migrations.
 
 ```sh
 npm run supabase:project -- doctor
-npm run supabase:project -- db push --dry-run
+node scripts/supabase-project.mjs db push --dry-run
 ```
 
-Use o mesmo wrapper para a aplicação revisada. Ele recusa troca de identidade
-ou destino. O login explícito é `npm run supabase:project -- login`.
+Use `node scripts/supabase-project.mjs db push --apply` para aplicar a fila
+revisada. A chamada direta do Node preserva a opção de execução no PowerShell.
+O wrapper exige o modo explícito e recusa troca de identidade ou destino.
+O login explícito é `npm run supabase:project -- login`.
 
 O banco local home-care-assistant é o ambiente de desenvolvimento e testes.
 Reset local requer a proteção descrita em [Testes](TESTING.md). Reset remoto,
@@ -105,8 +107,9 @@ as ações efetivamente concluídas. Autorização não é evidência de execuç
 
 ## Ativação gradual do BAL
 
-A cadeia Fluent inclui escalas persistentes e BAL por plantão. Aplicar as
-migrations não habilita nenhum paciente. Após backup, validação e deploy,
+A cadeia histórica de migrations inclui escalas persistentes e BAL por plantão.
+Os nomes SQL históricos são preservados; não definem a aparência vigente.
+Aplicar as migrations não habilita nenhum paciente. Após backup, validação e deploy,
 ative pela interface autenticada somente o paciente de homologação autorizado.
 Confirme agenda, atribuição, elegibilidade e avisos no aplicativo antes de
 habilitar outro paciente. Preserve os regimes existentes; não use fixtures

@@ -1,7 +1,10 @@
 import { readFileSync, readdirSync } from "node:fs";
-import { sql, getTestEnvironment } from "./test-environment.mjs";
+import { sql, getTestEnvironment, assertLocalReplay } from "./test-environment.mjs";
 import { seedFixtures } from "./seed-test-fixtures.mjs";
 
+// This legacy tool provisions fixtures before its rollback transaction.
+// Require explicit consent and the verified backup before that mutation.
+assertLocalReplay();
 getTestEnvironment();
 await seedFixtures();
 const applied = new Set(
@@ -19,6 +22,6 @@ const migrations = readdirSync("supabase/migrations")
   .join("\n");
 console.log(
   sql(
-    `begin;\n${migrations}\n${readFileSync("tests/database/supply-workflows.sql", "utf8")}\nrollback;`,
+    `begin;\n${migrations}\n${readFileSync("tests/database/assertions.sql", "utf8")}\n${readFileSync("tests/database/assume-context.sql", "utf8")}\n${readFileSync("tests/database/supply-workflows.sql", "utf8")}\nrollback;`,
   ),
 );

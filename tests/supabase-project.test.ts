@@ -16,6 +16,19 @@ describe("Supabase project boundary",() => {
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("outside the project update workflow");
   });
+  it.each([
+    [[]], [["--dry-run=false"]], [["--dry-run", "--dry-run=false"]], [["--dry-run", "--apply"]],
+  ])("rejects an absent or ambiguous migration mode: %j", (mode) => {
+    const result = command(["db", "push", ...mode], { SUPABASE_ACCESS_TOKEN: "fixture-not-a-real-token" });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("Specify exactly one migration mode");
+    expect(result.stderr).not.toContain("Remove SUPABASE_ACCESS_TOKEN");
+  });
+  it.each(["--dry-run", "--apply"])("checks the pinned connection after accepting %s", (mode) => {
+    const result = command(["db", "push", mode], { SUPABASE_ACCESS_TOKEN: "fixture-not-a-real-token" });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("Remove SUPABASE_ACCESS_TOKEN");
+  });
   it("does not silently accept an inherited account token",() => {
     const result=command(["doctor"],{SUPABASE_ACCESS_TOKEN:"fixture-not-a-real-token"});
     expect(result.status).toBe(1);

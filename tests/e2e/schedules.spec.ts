@@ -2,11 +2,15 @@ import { test, expect } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
-import { fixturePassword, patientA } from "../../scripts/test-constants.mjs";
+import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { setup } from "../integration/v4-fixtures.mjs";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 
 test("agenda publica uma programação real, recusa conflito e preserva contexto no mobile", async ({ page }, info) => {
+  // A private creator slot belongs to the account/patient across devices.
+  // Each engine must start with its own patient, without erasing another result.
+  const patientA = (await setup()).patient;
   const fixture = JSON.parse(readFileSync(fixtureFile, "utf8"));
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixture.adminA.email);
@@ -21,11 +25,17 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   const drawer = page.getByRole("dialog", { name: "Tipo de plantão", exact: true });
   await drawer.getByLabel("Nome do plantão", { exact: true }).fill(name);
   await drawer.getByLabel("Início local", { exact: true }).fill("19:00");
+  const duration = drawer.getByLabel("Duração em minutos", { exact: true });
+  await duration.fill("720.5"); expect(await duration.evaluate((element: HTMLInputElement) => element.checkValidity())).toBe(false);
+  await duration.fill("720"); expect(await duration.evaluate((element: HTMLInputElement) => element.checkValidity())).toBe(true);
+  expect(await drawer.locator('input[name="end"], input[name="endsLocal"]').count()).toBe(0);
   await audit(page,"shift type drawer");
   await expect(drawer.getByLabel("Nome do plantão", { exact: true })).toHaveValue(name);
   await drawer.getByRole("button", { name: "Revisar alteração", exact: true }).click();
   await page.getByRole("dialog", { name: "Revisar escala", exact: true }).getByRole("button", { name: "Confirmar gravação", exact: true }).click();
-  await expect(drawer).not.toBeVisible();
+  await expect(page.getByText("Tipo de plantão registrado.", { exact: true })).toBeVisible();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   // Unique future date keeps retained local histories from overlapping test runs.
   const date = new Date(Date.UTC(2100, 0, 1 + Math.floor(Math.random() * 30000))).toISOString().slice(0, 10);
   await page.getByRole("button", { name: "Nova programação", exact: true }).click();
@@ -36,7 +46,9 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   await form.getByLabel("Primeiro dia / âncora", { exact: true }).fill(date);
   await form.getByRole("button", { name: "Revisar alteração", exact: true }).click();
   await page.getByRole("dialog", { name: "Revisar escala", exact: true }).getByRole("button", { name: "Confirmar gravação", exact: true }).click();
-  await expect(form).not.toBeVisible();
+  await expect(page.getByText("Programação de plantões registrada.", { exact: true })).toBeVisible();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.getByLabel("Data de referência", { exact: true }).fill(date);
   await expect(page.getByRole("article", { name: name + " · Teste professional", exact: true }).filter({ visible: true })).toContainText("Publicado");
   const end = new Date(date + "T12:00:00Z"); end.setUTCDate(end.getUTCDate() + 1);
@@ -44,16 +56,25 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   expect(stored.ok()).toBe(true);
   const data = (await stored.json()).data;
   const shift = data.shifts.find((s: { type_name: string }) => s.type_name === name);
+  expect(Date.parse(shift.ends_at) - Date.parse(shift.starts_at)).toBe(720 * 60_000);
+  expect(new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(shift.ends_at))).toBe(end.toISOString().slice(0, 10));
   const overlap = await page.request.post("/api/schedules", { data: { careRecipientId: patientA, idempotencyKey: randomUUID(), command: { action: "series", body: { professionalId: fixture.professional.id, shiftTypeId: shift.shift_type_id, timezone: "America/Sao_Paulo", recurrence: "once", weekdays: [], anchorDate: date, validUntil: date, notes: "Conflito deve ser recusado" } } } });
   expect(overlap.status()).toBe(409);
   await page.setViewportSize({ width: 1366, height: 900 });
+  const agenda = page.locator(".hca-agenda-desktop");
+  await expect(agenda).toHaveAttribute("tabindex", "0");
+  await agenda.focus();await expect(agenda).toBeFocused();
+  const scrollBefore = await agenda.evaluate(element => element.scrollLeft);
+  await agenda.press("ArrowRight");
+  await expect.poll(() => agenda.evaluate(element => element.scrollLeft)).toBeGreaterThan(scrollBefore);
   mkdirSync("output/playwright/fluent", { recursive: true });
   await page.screenshot({ path: `output/playwright/fluent/escalas-desktop-${info.project.name}.png`, fullPage: true, animations: "disabled" });
   await page.setViewportSize({ width: 390, height: 844 });
+  await expect(agenda).not.toHaveAttribute("tabindex", "0");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await expect(page.getByRole("article", { name: name + " · Teste professional", exact: true }).filter({ visible: true })).toBeVisible();
   await page.screenshot({ path: `output/playwright/fluent/escalas-mobile-${info.project.name}.png`, fullPage: true, animations: "disabled" });
-  await audit(page,"daily mobile schedule");
+  await auditFromTop(page,"daily mobile schedule");
   const cancel = await page.request.post("/api/schedules", { data: { careRecipientId: patientA, idempotencyKey: randomUUID(), expectedVersion: shift.version, command: { action: "cancel", body: { id: shift.id, reason: "Fim da verificação fictícia" } } } });
   expect(cancel.ok()).toBe(true);
 });

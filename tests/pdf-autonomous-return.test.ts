@@ -1,0 +1,93 @@
+import { currentPdfFixture } from "./support/current-pdf-fixture";
+import { expect, it } from "vitest";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { PDFDocument } from "pdf-lib";
+import { composeIssuance, validateIssuanceContent } from "@/lib/server/pdf-content";
+import { documentVariant } from "@/lib/documents/variant";
+import { fidelityEmission, fidelitySourceFacts, legacyFidelitySnapshots } from "./support/pdf-fidelity-fixtures";
+const id = (n: number) => "90000000-0000-4000-8000-" + String(n).padStart(12, "0");
+const stamp = "2026-11-11T12:00:00Z";
+function source() {
+  const snapshot = structuredClone(legacyFidelitySnapshots.find(item => item.type === "ENT")!);
+  snapshot.id = id(1); snapshot.version = 3; snapshot.status = "pending_receipt";
+  snapshot.createdAt = stamp;
+  snapshot.code = "ENT-0001"; snapshot.protocol = "ENT-20261111-AUTONOMA";
+  snapshot.payload = { source: "CARE_TEAM", destination: "FAMILY", notes: "Devolução própria de material preservado." };
+  snapshot.workflow = {};
+  snapshot.sourceFacts = {
+    ...fidelitySourceFacts, issuedAt: stamp, documentCreatedAt: stamp, registeredAt: stamp,
+    issuerId: id(20), issuerName: "Profissional declarante", historyActors: [
+      { version: 1, id: id(20), name: "Profissional declarante", source: "event_snapshot" },
+      { version: 2, id: id(21), name: "Familiar da concordância", source: "event_snapshot" },
+      { version: 3, id: id(20), name: "Profissional declarante", source: "event_snapshot" },
+    ]
+  };
+  snapshot.history = [
+    { action: "ent.transfer.declared", actorName: "Profissional declarante", createdAt: stamp, version: 1 },
+    { action: "ent.transfer.agreed", actorName: "Familiar da concordância", createdAt: stamp, version: 2 },
+    { action: "ent.issued", actorName: "Profissional declarante", createdAt: stamp, version: 3 },
+  ];
+  snapshot.documentFacts = { schemaVersion: 1, deliveryResolutions: [], purchaseReceiptEvents: [] };
+  snapshot.lines = [{
+    id: id(2), product_id: "material-preservado", name_snapshot: "Material da devolução autônoma", unit_snapshot: "unidade",
+    quantity: "5", accepted_quantity: "0", reconciled_quantity: "0", fully_checked: false, metadata: {}
+  }];
+  snapshot.transfer = {
+    state: "dispatched", originDocumentId: null, dispatchedAt: stamp,
+    declaration: {
+      actor: { id: id(20), name: "Profissional declarante" }, counterparty: { id: id(21), name: "Familiar da concordância" },
+      recipient: { id: id(22), name: "Familiar do recebimento" }, source: "CARE_TEAM", destination: "FAMILY",
+      reason: "Retorno autônomo sem entrega de origem vinculada.", recordedAt: stamp, referenceHash: "b".repeat(64)
+    },
+    agreement: {
+      actor: { id: id(21), name: "Familiar da concordância" }, reason: "Concordância própria sem aceite físico.",
+      decision: "agree", recordedAt: stamp, documentVersion: 2
+    }, withdrawal: null
+  };
+  snapshot.actors = { recipient: { id: id(22), name: "Familiar do recebimento" } };
+  return snapshot;
+}
+const emission = { ...fidelityEmission, requestedAt: "2026-11-11T12:30:00Z", rendererRevision: 16 as const, representation: "operational" as const };
+
+it("V14 names an autonomous return and preserves separate authors and pending personal receipt", async () => {
+  const snapshot = source(), plan = await composeIssuance(currentPdfFixture(snapshot), "a".repeat(64), emission);
+  expect((await validateIssuanceContent(plan.bytes, plan)).passed).toBe(true);
+  expect((await PDFDocument.load(plan.bytes)).getTitle()).toContain("Devolução de materiais");
+  expect(plan.runs.map(run=>run.text).join(" ")).toContain("Devolução");
+  expect(plan.semanticFacts!["transfer/declaration"]).toContain("Profissional declarante");
+  expect(plan.semanticFacts!["transfer/people"]).toContain("Familiar do recebimento");
+  expect(plan.runs.map(run => run.text).join(" ")).toContain("sem entrega de origem vinculada");
+  expect(plan.semanticFacts!["receipt/state"]).toContain("Nenhum aceite é presumido");
+  const changed = structuredClone(snapshot); changed.payload = { ...snapshot.payload, source: "FAMILY", destination: "CARE_TEAM" };
+  await expect(composeIssuance(changed, "a".repeat(64), emission)).rejects.toMatchObject({ code: "CONTENT_INVALID" });
+  changed.transfer!.declaration.source = "FAMILY"; changed.transfer!.declaration.destination = "CARE_TEAM";
+  const wrong = await composeIssuance(currentPdfFixture(changed), "a".repeat(64), emission);
+  await expect(validateIssuanceContent(plan.bytes, wrong)).rejects.toMatchObject({ code: "CONTENT_INVALID" });
+  mkdirSync("output/pdf", { recursive: true }); writeFileSync("output/pdf/autonomous-return-controlled.pdf", plan.bytes);
+}, 30000);
+
+it("retired V10 no longer selects a generic ENT representation", async () => {
+  const snapshot = source();
+  expect(documentVariant("ENT", snapshot.payload)).toBe("Devolução de materiais");
+  await expect(composeIssuance(currentPdfFixture(snapshot), "a".repeat(64), { ...fidelityEmission, rendererRevision: 10 })).rejects.toMatchObject({ code: "CONTENT_INVALID" });
+}, 30000);
+
+it("V14 does not infer family or team custody from a missing historical route", async () => {
+  const snapshot = source(); snapshot.payload = {}; snapshot.transfer = undefined;
+  const plan = await composeIssuance(currentPdfFixture(snapshot), "a".repeat(64), emission);
+  expect((await PDFDocument.load(plan.bytes)).getTitle()).toContain("Movimentação de materiais · percurso não preservado");
+  expect(plan.semanticFacts!["transfer/declaration"]).toBeUndefined();
+  expect(plan.runs.map(run=>run.text).join(" ")).not.toContain("Família para Equipe");
+}, 30000);
+
+it("V15 preserves the autonomous return route, authorship and pending receipt while adding lifecycle facts", async () => {
+  const snapshot = source();
+  snapshot.lifecycleFacts = { schemaVersion: 1, documentId: snapshot.id, version: snapshot.version, cancellation: { state: "not_cancelled", act: null, acknowledgements: [] }, complements: [] };
+  const plan = await composeIssuance(currentPdfFixture(snapshot), "a".repeat(64), { ...emission, rendererRevision: 16 });
+  expect((await validateIssuanceContent(plan.bytes, plan)).passed).toBe(true);
+  expect((await PDFDocument.load(plan.bytes)).getTitle()).toContain("Devolução de materiais");
+  expect(plan.semanticFacts!["transfer/people"]).toContain("Familiar do recebimento");
+  expect(plan.runs.map(run => run.text).join(" ")).toContain("sem entrega de origem vinculada");
+  expect(plan.semanticFacts!["receipt/state"]).toContain("Nenhum aceite é presumido");
+  expect(plan.semanticFacts!["cancellation/actor"]).toBeUndefined();
+}, 30000);

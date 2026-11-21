@@ -1,0 +1,238 @@
+{
+  "at": "2026-11-08T08:05:43.201745+00:00",
+  "sourceBase": "f05754d581beaa6da410610d35982ca003e53a65",
+  "criteria": [
+    "C-AC-026",
+    "C-AC-030",
+    "C-AC-031"
+  ],
+  "sourceLfSha256": {
+    "src/app/design-system.css": "5fca42f620901ffa169ebcbcc7f4016b495652585627bc6fe3e77d970f14ddcf",
+    "src/components/admin/membership-management.tsx": "2dea54ba121f3cb875f0948de01d74edf0971b4bddef26f5d8ff4695bf35044f",
+    "src/components/admin/policy-console.tsx": "20b85bf0e5e0918109aacd86cf59d71d6fb5456b7634e215ca13f7bfe79e4916",
+    "src/components/admin/policy-rules.tsx": "58f5766a4dd9f8edb6f1a9c51f961e907f1b7c4797e2aa1342e6ba052abf1b42",
+    "src/components/catalog/presentation-management.tsx": "87676a8e9d57518029932422a67a8592bc5cbf4490f9b5a14e324c31d28cb862",
+    "src/components/requisitions/requisition-steps.tsx": "762781395ebe2764baed61d6c4fca473f6c042a225c40317d46e22ee1831e38d",
+    "src/components/requisitions/requisition-wizard.tsx": "6aa868fb38fc2fba4d8c7b4353f2b57cf9ec263a7d3544b91ebc597e8b2e147d",
+    "src/components/requisitions/stock-observation-field.tsx": "d2d18a6d6072bee9c362b3c0783f68fe559b432451cc32268d64519a94f0d17f",
+    "src/lib/governance-presentation.ts": "e5c78a66bca612f192a5dd6d5a54a8f69f4c4fa96a8de632f79bdbbce370730c",
+    "src/lib/validation/catalogue.ts": "1c0149d68ca4ccae7953a6cd8911e851eca63e721e403945c9ac8606a82fe4a1",
+    "src/lib/validation/governance.ts": "f9f4077069c190387c226f41afa09215d1ee513fc0e9430f3c9196f1bbd13265",
+    "src/lib/validation/requisition.ts": "217d5f1e633fc913c6ac1f199e6a82f23d19e2d1d47ec88d55c728a629ab361c",
+    "supabase/migrations/20261108023830_phase_d3_explicit_short_name_removal.sql": "69fd11f16ba4cd84e30d161e82d6666ff1169a8d43ba9807ede23fdf3681cb64",
+    "tests/e2e/field-validation.spec.ts": "3859f1a070c19f0a1f82c61737efbb8daefaddeea1d6d5b9d09cd75537d3e5f6",
+    "tests/e2e/governance-recovery.spec.ts": "c76ba18e1d250e1d0c52fed0cd04f597f568e9f0941f3687eee064ad6b09e9c1",
+    "tests/e2e/membership-continuity.spec.ts": "38d20b3cd3003b80fc033c083872aeee2b1b92c342d5193f420b859d29c264f9",
+    "tests/field-validation.test.ts": "46ede6ffccf9aae3f91ec8e082adb0defd68376995da5c6b6e280ed621a69c6c",
+    "tests/integration/short-name.test.mjs": "fd92c748e80dd6417afb05be4f50328043387acb93dc07ca16bc42eb5b43565e"
+  },
+  "validation": {
+    "unit": {
+      "distinct": 41,
+      "passed": 41,
+      "unchangedValidationSourcesReused": true
+    },
+    "auth": {
+      "distinct": 3,
+      "completedExecutions": 4,
+      "passedExecutions": 3,
+      "failedExecutions": 1,
+      "qualification": "Initial wrong current.settings path in one test corrected to actual current.data.settings; only that case rerun. HTTP Auth, current context, revocation, anonymous/service, global proposal/local approval, replay, history and other patient assertions all passed."
+    },
+    "types": {
+      "exitCode": 0
+    },
+    "affectedLint": {
+      "exitCode": 0
+    },
+    "migrationPrepare": {
+      "reset": false,
+      "postRebootStackVerified": true
+    },
+    "production": {
+      "distinctPassingCases": 21,
+      "completedExecutions": 37,
+      "passedExecutions": 35,
+      "failedExecutions": 2,
+      "cohorts": [
+        {
+          "log": "field-validation-production-interrupted.log",
+          "reuse": "C026 Chromium2 only",
+          "sourceLfSha256": {
+            "src/components/catalog/presentation-management.tsx": "87676a8e9d57518029932422a67a8592bc5cbf4490f9b5a14e324c31d28cb862",
+            "src/components/requisitions/requisition-steps.tsx": "762781395ebe2764baed61d6c4fca473f6c042a225c40317d46e22ee1831e38d",
+            "src/components/requisitions/requisition-wizard.tsx": "6aa868fb38fc2fba4d8c7b4353f2b57cf9ec263a7d3544b91ebc597e8b2e147d",
+            "src/components/requisitions/stock-observation-field.tsx": "d2d18a6d6072bee9c362b3c0783f68fe559b432451cc32268d64519a94f0d17f",
+            "src/lib/validation/catalogue.ts": "1c0149d68ca4ccae7953a6cd8911e851eca63e721e403945c9ac8606a82fe4a1",
+            "src/lib/validation/requisition.ts": "217d5f1e633fc913c6ac1f199e6a82f23d19e2d1d47ec88d55c728a629ab361c"
+          }
+        },
+        {
+          "log": "field-validation-production-mobile-ios.log",
+          "reuse": "C026 mobile2 and iOS2 only; affected policy/member consumers rerun"
+        },
+        {
+          "log": "field-validation-production-final.log",
+          "currentFinalSources": true,
+          "passed": 15
+        }
+      ],
+      "qualification": "21 unique approvals composed from three qualified cohorts; not one all-green run. Only policy-scoped CSS/classes, policy confirmation timing and two directed test files evolved. C026 runtime/validation source hashes stayed exact; new policy CSS has no consumer in REQ/presentations.",
+      "interruption": "Host reboot interrupted the first run after7 Chromium passes and one mobile login stability failure. No source/timeout change for that mobile recheck; unfinished cases have no approval.",
+      "legacyBudget": "One WebKit legacy revocation case hit the old30s total during viewport/audit. Only that case now has60s for fixture/Auth/four audits/final readback; action/expect15s and every assertion retained."
+    },
+    "diagnostic": {
+      "completedExecutions": 9,
+      "passedExecutions": 5,
+      "failedExecutions": 4,
+      "acceptanceProof": false
+    },
+    "visual": {
+      "widths": [
+        320,
+        390,
+        768,
+        1440
+      ],
+      "axeAndKeyboard": true,
+      "nativeFieldBounds": true,
+      "openerFocusAfterConfirmedPolicy": true,
+      "humanAtOrPhysicalDevice": false
+    }
+  },
+  "counterproofs": [
+    "REQ error label changed the accessible name; labelledby now fixes the name and describedby keeps the error.",
+    "Opening a policy before its confirmed current-version read caused a stale CAS; edit/close now waits for the read and restores opener focus.",
+    "Visual inspection found native controls extending8..9px past320 despite page-level overflow passing. A native control bounds assertion now detects that clipping.",
+    "The first broad sizing patch overlapped Fluent fields and failed axe; replaced with scoped minimum/maximum sizing, preserving Fluent grid/slot layout.",
+    "Two preflights rejected post-backup activity and a third capture rejected changing incident/history rows. Both valid older captures/probes and all refusals are retained. The accepted preflight separately records activity since the verified backup, requires unchanged live schema, all150 history SQLs and Storage, no removed source rows and backup age under1h; final preservation compares the immediate pre-migration snapshot. No backup comparison was weakened or failed capture promoted."
+  ],
+  "interruption": {
+    "interruptedAttempt": "a70961f2-42d1-4340-9cb4-8a261f7a0231",
+    "partialCaptureRetained": true,
+    "at": "2026-11-08T07:26:32.8058474Z",
+    "remoteMigrationApplied": false,
+    "liveBackupProcesses": 0,
+    "oldLockQuarantined": true,
+    "validBackupProduced": false,
+    "lockPredatedBoot": true,
+    "bootAt": "2026-11-08T03:04:22.5000000Z"
+  },
+  "actualBackup": {
+    "state": "verified",
+    "backupId": "e5c5148c-98aa-4b96-92ca-40c1e253048e",
+    "files": 79,
+    "bytes": 11059964,
+    "manifestSha256": "6c10c4cbe977a5f7d20f7ee3c8cfea94a111af196326b5f2cbf7e687bb178618",
+    "verified": true,
+    "mode": "critical",
+    "at": "2026-11-08T07:40:58.618Z",
+    "retentionComplete": true,
+    "captureCleanupComplete": true,
+    "dailySlots": 1,
+    "weeklySlots": 1,
+    "missedDailyWindow": false,
+    "operationalExternalBackupActive": false,
+    "recoveryD6Proved": false,
+    "telemetry": "disabled"
+  },
+  "isolatedRestoreAndUpgrade": {
+    "backupId": "e5c5148c-98aa-4b96-92ca-40c1e253048e",
+    "files": 79,
+    "bytes": 11059964,
+    "manifestSha256": "6c10c4cbe977a5f7d20f7ee3c8cfea94a111af196326b5f2cbf7e687bb178618",
+    "verified": true,
+    "restoredTables": 151,
+    "stableTableDigestsMatched": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "foreignKeysChecked": true,
+    "storageObjectsVerified": 33,
+    "pdfDigestsVerified": 32,
+    "signedIssuanceDigestsVerified": 1,
+    "migrationsAppliedToProbe": [
+      "20261108023830_phase_d3_explicit_short_name_removal.sql"
+    ],
+    "catalogueComparison": {
+      "views": false,
+      "columns": true,
+      "indexes": true,
+      "defaults": true,
+      "policies": true,
+      "triggers": true,
+      "functions": true,
+      "relations": true,
+      "constraints": false,
+      "table_grants": true,
+      "function_grants": true
+    },
+    "cronEnabled": false,
+    "networkExtensionEnabled": false,
+    "seconds": 2.911,
+    "operationalRecoveryGate": "D6_NOT_SATISFIED_BY_THIS_PROBE"
+  },
+  "remote": {
+    "before": 150,
+    "after": 151,
+    "pending": 0,
+    "preflight": "FIELD_VALIDATION_REMOTE_PREFLIGHT.json",
+    "post": "FIELD_VALIDATION_REMOTE_MIGRATIONS.json",
+    "advisors": "FIELD_VALIDATION_REMOTE_ADVISORS.json"
+  },
+  "baseCi": {
+    "receipt": "CI_F05754D_OBSERVATION.json",
+    "conclusion": "success",
+    "validatesUnpublishedIncrement": false
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "missionComplete": false,
+  "operationalGo": false,
+  "limits": [
+    "New published SHA needs its own CI including clean/legacy migration replay and full integration",
+    "No remote Auth/business fixture, reset, external transport activation, merge or production promotion",
+    "Isolated restored DB and recovered file hashes are not provider Storage recovery, independent key/device recovery, operational RPO/RTO or D6",
+    "Human/physical AT and D-C remain separate"
+  ],
+  "logLfSha256": {
+    "form-field-unit.log": "6612f0ba649188a0245c8ccd36e881a8fd59e6606c0196b5240fb864eefbd092",
+    "short-name-preflight.log": "a66206c094d80f81806dd8367d991ffbc2b38dcaaa4115e700c207324999cada",
+    "short-name-integration.log": "94e2249d557cae34e6b39e322ce459f9e4e8bde869b680b38c5ac28ef4b4c9b6",
+    "short-name-replay-recheck.log": "be35620b76309901cfe7a69437cd1a80bd112cba32f8602dd73c124cef33ab0c",
+    "short-name-local-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "field-post-reboot-local-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "field-validation-diagnostic.log": "7d206b569fd037a2eed2210d1f96ba7cc99629bb50aaaaca1fb8f97ad74e899f",
+    "field-validation-diagnostic-recheck.log": "cda9c11c0f4ecbc2f78631d95716c98a986a06735a91db57d2263585b691da70",
+    "field-validation-production-interrupted.log": "6ec43f9d9d8540a241b4c61918935d1d68f159d8e8d0a7f43cf1f8fc465f7fa2",
+    "field-validation-production-mobile-ios.log": "f4729aa667373e8e6aa8b80e76e29f027314cb0001463b9dbbbb10ef12e30e67",
+    "field-short-name-geometry-diagnostic.log": "b877f686fa85562ebd36cfae98079221a29601bf43b4a8012864dca75848121d",
+    "field-short-name-geometry-recheck.log": "9136bc2efc61d06686f7ec0f7d58df04fb11ace40a58b7d96be3da8571d24335",
+    "field-short-name-layout-final-diagnostic.log": "9314038da827b2402526a8db0b00afba52271bb486143c2e1ef1ae7719ad8b77",
+    "field-validation-production-final.log": "d3581f5630b030f4b8d242cce446bdccb17216e0eb597cf3bcf19d62fbd9bde1",
+    "field-types-final2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "field-lint-final2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "field-remote-preflight.log": "4fd77fe1956b693b5f9fdbe8bb9beb131e8f756baf1a908eba2ee5bf5ba2b5e4",
+    "field-remote-preflight-final.log": "f6f83112f759da6227da5486fabeb85f0746f0be37f944345c17bb18f67ccc34",
+    "field-critical-capture-publication.log": "8033c0f0cbba2e9e8fc0a0c2330b825a483cb058c7f874f778232eec3b8076f9",
+    "field-critical-capture-final.log": "9601f685ec3a031021ec9e3eb9d1c18697996bed5db8ced9bd5568af40a5f3e9",
+    "field-upgrade-probe-final.log": "5510c2df817e487b532ec284e3b97a5df34addd19956ac864565b80de7c5f9d5",
+    "field-preflight-activity-qualified.log": "789c7752b4f95e2b908399e3a56fa4e88bcb831889eebfa452417f966535524a",
+    "field-apply-publication.log": "6a808c81b2143926e07572b920b05b3d83bcec1333aaa6eb60332677f7562bbb",
+    "field-post-publication.log": "6331348b6016771264594369619f12ad241cd55124c6de7688016df06b19451e"
+  },
+  "screenshotsSha256": {
+    "C026-apresentacao-chromium.png": "d25d7916d81f99c3a463b14301678215e30a3fec813151e8bd49a7a0e577bdee",
+    "C026-apresentacao-ios.png": "84fe05f2e767d95e596da77fff9acd8dba1c0ad5617a550cfb9ca13a9cdeaa1f",
+    "C026-apresentacao-mobile.png": "a64e687b8e933313dd18b25e8c545b36c6e8538a57c1c60231ed83457ee5be72",
+    "C026-observacao-chromium.png": "5b7bed27e4589091329402b321456c77c1ccd570f1908c1166d1b3862062083a",
+    "C026-observacao-ios.png": "431cd4f3c402ba02bf0bfdeb8f7ba47fddc5d85a180fe729d903a8d4764d40b7",
+    "C026-observacao-mobile.png": "8b78c4ee4774612f3c2478d0cb8fe6e94e1d2faedd5717f98be7440ddbe7dbe0",
+    "C031-nome-curto-chromium.png": "8fd5f3c0382bad507c59082d9564d0af9094acca3d21264cf4340f15b69a415d",
+    "C031-nome-curto-ios.png": "71b3f653faaaab342c7d0a5bdf2da571d9a1222bb9d2d22a779075e930c618cc",
+    "C031-nome-curto-mobile.png": "95c4aac979929a0de3298ce231f5fdc2c4eb6bbfdead9906023a3f0912c6c6a2"
+  }
+}

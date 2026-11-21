@@ -1,0 +1,85 @@
+{
+  "increment": "D3.56",
+  "base": "e497e98f10a59bd5257c026f435b53165468bedd",
+  "scope": "scheduled and optional BAL observation continuity plus legacy opening recovery",
+  "unitTests": 31,
+  "realAuthTests": 3,
+  "browser": {
+    "distinctQualified": 45,
+    "firstCohortUnaffected": 12,
+    "legacyCohort": {
+      "total": 33,
+      "expected": 32,
+      "unexpected": 1,
+      "flaky": 0,
+      "skipped": 0,
+      "ok": false
+    },
+    "legacyCohortUnaffected": 30,
+    "focusRecheck": {
+      "total": 3,
+      "expected": 3,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "ok": true
+    },
+    "engines": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "firstAbortedAfterKnownLegacyFailure": true,
+    "newPhysicalDeviceProof": false
+  },
+  "migration": {
+    "version": "20261110214907",
+    "before": 197,
+    "after": 198,
+    "validatorAndAclMatch": true,
+    "dryRunEmpty": true,
+    "previousDefinitionRetained": true
+  },
+  "sourcesLfSha256": {
+    "src/components/balances/balance-count-wizard.tsx": "2de29e38df7725868f43c578f6c492758527ddf859a46a42e694a4cb98b54207",
+    "src/components/balances/observation-continuity.tsx": "c16b0e82627b87e0c641665cf04ddbd787a8a8f6619bb48c452e36dac66263ba",
+    "src/components/documents/supply-wizard.tsx": "99ebad39d074d9bd932feaebd4222117ea917f240e66bde33c3df857eaea47f6",
+    "src/components/forms/creation-draft-panel.tsx": "0c1242f6a278609969c97f530b88c108883c034fa1303e8350e75605d3df4314",
+    "src/lib/balances/count-attempt.ts": "227046ae902d1f7399b3895431e3156fdde8c83306c2ec96efd98d8a9c7bd652",
+    "src/lib/balances/observation-continuity.ts": "6d31e7a21e63d6a3fe023f90efa7d15459ef8cec70bebae1cac1d7c9d794ee9e",
+    "src/lib/validation/creation-drafts.ts": "24c095de1c79a30ac8658d2d229c63581f5e53e02e586157613fc15362489e37",
+    "supabase/migrations/20261110214907_phase_d3_bal_observation_continuity.sql": "6def6fecffc0587ea3a7af664d80f5230e13d8ac110ed0e63f3230d0d5b9bb6f",
+    "tests/balance-observation-continuity.test.ts": "28c1ce85fb3dcb6131fd577c223851b01a24fe5d6635d0b13ddfb94293e0251b",
+    "tests/integration/bal-observation-continuity.test.mjs": "e7805558d532a569e35d2d5c780d7fd77c3fd4aa2612a76911782153030f6fa4",
+    "tests/e2e/bal-observation-continuity.spec.ts": "3c5cf245342ffc7032c9e173887ed98b06cd74bc5a461802b4add6032a205786",
+    "tests/e2e/balance-count-recovery.spec.ts": "23a00c9e66877155c41e6e89969889cf68e851e84ee9b60371999f54fdcc4cd0",
+    "tests/e2e/private-creation-drafts.spec.ts": "e01d0abf76929b734f68210adf26b4ca9cfbdb6492eeb0d5e325a70faf5319bb",
+    "tests/e2e/balance-shifts.spec.ts": "fa72a10af72075db9b4abe15eb21079321917a49c2538e33f54680f4195047d0",
+    "tests/e2e/draft-lifecycle.spec.ts": "c8b897cc9c1d491ea371d168537a4bf6af9abdf0b66284d26e0b45e7e4f7c78a"
+  },
+  "criteria": {
+    "total": 105,
+    "localPass": 56,
+    "partial": 49,
+    "visualEstimate": 60,
+    "formsEstimate": 90,
+    "recoveryEstimate": 90
+  },
+  "previousCi": {
+    "run": 42908042331,
+    "coreAndDatabase": "success",
+    "failedShards": [
+      "chromium-2",
+      "mobile-2",
+      "ios-2"
+    ],
+    "scheduleCounterproof": "pending revision 1 to rejected revision 2, events 3 to 4, with one command"
+  },
+  "ownCi": "required",
+  "remaining": [
+    "CI failures already observed",
+    "operational catalogue/admin/profile form continuity",
+    "full UI parity",
+    "physical, human and provider gates"
+  ]
+}

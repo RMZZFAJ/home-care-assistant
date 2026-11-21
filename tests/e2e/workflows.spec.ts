@@ -1,4 +1,11 @@
+import { selectMaterialCategory } from "./material-category";
+import { expectNoOperationalDocumentAction } from "./document-sections";
+import { openOperationalDocumentAction } from "./document-sections";
+import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, openDocumentAction, confirmCompleteDeliveryReceipt } from "./document-sections";
+import { generatedPdf } from "./generated-pdf";
+import { confirmArrivalReview, openArrivalReview } from "./purchase-arrival-review";
 import { selectContext } from "./auth-context";
+import { selectDeliveryRecipient } from "./delivery-recipient";
 import { openNavigation } from "./navigation";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
@@ -11,6 +18,9 @@ import {
   sqlLiteral,
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { setup } from "../integration/v4-fixtures.mjs";
+import { currentDeliveryShift } from "../integration/delivery-preparation-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 test.setTimeout(240_000);
 function fixtures() {
   assertLocalProject();
@@ -20,17 +30,28 @@ function fixtures() {
   >;
 }
 const selectedPatients = new WeakMap<Page, string>();
-async function login(page: Page, role = "global") {
-  await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures()[role].email);
+async function signIn(page: Page, email: string, destination?: string) {
+  await page.goto(destination ? "/login?next=" + encodeURIComponent(destination) : "/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  if (destination) {
+    await expect(page).toHaveURL(url => url.pathname === destination);
+    return;
+  }
   await expect(
     page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
   await expect(
     page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
   ).toBeVisible();
+}
+async function login(page: Page, role = "global", preparedPatient?: string) {
+  await signIn(page, fixtures()[role].email);
+  if (preparedPatient) {
+    await post(page, "/api/context", { careRecipientId: preparedPatient });
+    return;
+  }
   await selectContext(
     page,
     selectedPatients.get(page) ??
@@ -90,9 +111,12 @@ async function prepare(page: Page, count = 1) {
   return { patient, products };
 }
 async function next(page: Page) {
-  await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
+  await page.getByRole("button", { name: /^(Avançar|Revisar|Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 }
-async function confirm(page: Page) {
+async function confirm(
+  page: Page,
+  expectedMessage = "Operação confirmada e registrada na ficha.",
+) {
   await page
     .getByRole("button", { name: "Revisar operação", exact: true })
     .click();
@@ -100,7 +124,7 @@ async function confirm(page: Page) {
   await expect(dialog).toBeVisible();
   const pending = page.waitForResponse(
     (response) =>
-      /\/api\/documents\/[a-f0-9-]+$/.test(new URL(response.url()).pathname) &&
+      /\/api\/documents\/[a-f0-9-]+\/decisions$/.test(new URL(response.url()).pathname) &&
       response.request().method() === "POST",
   );
   await dialog
@@ -110,7 +134,7 @@ async function confirm(page: Page) {
   expect(response.ok(), await response.text()).toBeTruthy();
   await expect(dialog).not.toBeVisible();
   await expect(
-    page.getByText("Operação confirmada e registrada na ficha.", {
+    page.getByText(expectedMessage, {
       exact: false,
     }),
   ).toBeVisible();
@@ -118,21 +142,21 @@ async function confirm(page: Page) {
 async function issueReq(page: Page, patient: string, productName: string) {
   await page.goto("/fichas/req?careRecipientId=" + patient);
   await next(page);
-  await next(page);
+  await page.getByRole("navigation", { name: "Tipos de material" }).getByRole("button", { name: /^Higiene/ }).click();
   await page
     .getByRole("checkbox", { name: new RegExp("^" + productName) })
     .check();
   await page
-    .getByLabel("Estoque observado com a equipe", { exact: false })
+    .getByLabel("Estoque atual", { exact: false })
     .fill("2");
-  for (let step = 0; step < 4; step++) await next(page);
+  for (let step = 0; step < 3; step++) await next(page);
   const pending = page.waitForResponse(
     (r) =>
       new URL(r.url()).pathname === "/api/requisitions" &&
       r.request().method() === "POST",
   );
   await page
-    .getByRole("button", { name: "Concluir requisição", exact: true })
+    .getByRole("button", { name: "Emitir requisição", exact: true })
     .click();
   const response = await pending;
   expect(response.ok(), await response.text()).toBeTruthy();
@@ -140,11 +164,13 @@ async function issueReq(page: Page, patient: string, productName: string) {
 }
 async function issueSupply(
   page: Page,
-  type: string,
+  type: "BAL" | "COM" | "ENT",
   patient: string,
   productName: string,
   amount: string,
   requestId?: string,
+  fulfillment: "partial" | "complete" = "complete",
+  recipientName = "Teste professional",
 ) {
   await page.goto(
     "/fichas/" +
@@ -154,13 +180,19 @@ async function issueSupply(
       (requestId ? "&requisitionId=" + requestId : ""),
   );
   if (type === "ENT")
-    await page
-      .getByLabel("Destinatário designado", { exact: false })
-      .selectOption(fixtures().professional.id);
-  if (type === "COM")
-    await page.getByLabel("Forma de aquisição").selectOption("donation");
+    await selectDeliveryRecipient(
+      page,
+      recipientName,
+      "Pessoa indicada manualmente para receber estes materiais",
+    );
   await next(page);
-  await next(page);
+  if (type === "BAL") await next(page);
+  else await selectMaterialCategory(page);
+  if (type === "ENT" && requestId) {
+    const assessment = page.getByRole("checkbox", { name: `Atende integralmente à necessidade de ${productName}`, exact: true });
+    if (fulfillment === "complete") await assessment.check();
+    else await expect(assessment).not.toBeChecked();
+  }
   if (type !== "BAL" && !requestId)
     await page
       .getByRole("checkbox", { name: new RegExp("^" + productName) })
@@ -169,6 +201,8 @@ async function issueSupply(
     .getByLabel("Quantidade — " + productName, { exact: true })
     .fill(amount);
   for (let step = 0; step < 3; step++) await next(page);
+  if (type === "ENT" && requestId)
+    await expect(page.getByText(fulfillment === "complete" ? "Atendimento integral previsto" : "Atendimento parcial previsto", { exact: true })).toBeVisible();
   const pending = page.waitForResponse(
     (r) =>
       (new URL(r.url()).pathname === "/api/documents" &&
@@ -177,15 +211,16 @@ async function issueSupply(
       (/\/revise$/.test(new URL(r.url()).pathname) &&
         r.request().method() === "POST"),
   );
+  const action = { BAL: "Confirmar e concluir", COM: "Emitir compra", ENT: "Expedir entrega" }[type];
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: action, exact: true })
     .click();
   const response = await pending;
   expect(response.ok(), await response.text()).toBeTruthy();
   return (await response.json()).data;
 }
 
-test("REQ → COM doação → validação → estoque familiar → ENT parcial → BAL real", async ({
+test("REQ → planejamento COM → compra → validação → estoque familiar → ENT parcial → BAL real", async ({
   page,
 }) => {
   await login(page);
@@ -195,6 +230,12 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await login(page, "professional");
   const req = await issueReq(page, patient, product.name);
   expect(req.code).toBe("REQ-0001");
+  await page.getByRole("dialog", { name: "Requisição emitida", exact: true })
+    .getByRole("button", { name: "Acompanhar ficha", exact: true }).click({ timeout: 60_000 });
+  const teamAfterRequisition = (
+    await (await get(page, "/api/stock/balances?careRecipientId=" + patient)).json()
+  ).overview[0].team.confirmed;
+  expect(Number(teamAfterRequisition)).toBe(2);
   await logout(page);
   await login(page, "family");
   const purchase = await issueSupply(
@@ -206,7 +247,10 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
     req.requisitionId,
   );
   expect(purchase.code).toBe("COM-0001");
+  expect(purchase.payload.acquisitionMode).toBe("planned");
   expect(purchase.status).toBe("pending_approval");
+  await page.getByRole("dialog", { name: "Compra emitida", exact: true })
+    .getByRole("button", { name: "Acompanhar ficha", exact: true }).click({ timeout: 60_000 });
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
   await expect(
     page.getByRole("button", { name: "Aprovar itens", exact: true }),
@@ -217,18 +261,30 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await page
     .getByRole("button", { name: "Aprovar itens", exact: true })
     .click();
-  await confirm(page);
+  await page.getByRole("dialog", { name: "Autorizar a compra", exact: true })
+    .getByRole("button", { name: "Autorizar selecionados", exact: true }).click();
+  await page.getByRole("dialog", { name: "Compra autorizada", exact: true })
+    .getByRole("button", { name: "Concluir", exact: true }).click();
   await logout(page);
   await login(page, "family");
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Registrar aquisição", exact: true })
-    .click();
-  await confirm(page);
-  await page
-    .getByRole("button", { name: "Confirmar recebimento", exact: true })
-    .click();
-  await confirm(page);
+  await openOperationalDocumentAction(page, "Registrar compra realizada");
+  const acquisition = page.getByRole("dialog", { name: "Registrar compra", exact: true });
+  await acquisition
+    .getByLabel(product.name + " · unidade", { exact: true })
+    .fill("10");
+  await acquisition.getByRole("button", { name: "Confirmar compra", exact: true }).click();
+  await page.getByRole("dialog", { name: "Compra registrada", exact: true })
+    .getByRole("button", { name: "Concluir", exact: true }).click();
+  await openOperationalDocumentAction(page, "Registrar chegada");
+  const arrivalEditor = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
+  await arrivalEditor
+    .getByRole("textbox", { name: "Recebidos agora · " + product.name + " · unidade", exact: true })
+    .fill("10");
+  await arrivalEditor.getByRole("button", { name: "Enviar para aprovação", exact: true }).click();
+  const arrival = page.getByRole("dialog", { name: "Chegada enviada para aprovação", exact: true });
+  await expect(arrival).toBeVisible();
+  await arrival.getByRole("button", { name: "Concluir", exact: true }).click();
   let stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
@@ -236,10 +292,9 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await logout(page);
   await login(page, "adminA");
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Validar recebimento", exact: true })
-    .click();
-  await confirm(page);
+  const review = await openArrivalReview(page);
+  const approval = await confirmArrivalReview(page, review);
+  await approval.result.getByRole("button", { name: "Concluir", exact: true }).click();
   stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
@@ -256,38 +311,43 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   );
   expect(delivery.code).toBe("ENT-0001");
   expect(delivery.status).toBe("pending_receipt");
+  await page.getByRole("dialog", { name: "Entrega expedida", exact: true })
+    .getByRole("button", { name: "Acompanhar ficha", exact: true }).click({ timeout: 60_000 });
   await logout(page);
   await login(page, "professional");
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Informar divergência", exact: true })
-    .click();
+  await openDocumentAction(page, "Informar divergência");
   await page
     .getByRole("checkbox", { name: new RegExp("^" + product.name) })
     .check();
   await page.getByLabel("Efetivamente recebido").fill("6");
   await confirm(page);
+  await expandDocumentMilestones(page);
   await expect(
-    page.getByText("0/1 linhas integralmente conferidas", { exact: true }),
+    page.getByRole("list", { name: "Marcos da ficha", exact: true }).getByText("0/1 linhas integralmente conferidas", { exact: true }),
   ).toBeVisible();
   stock = await (
     await get(page, "/api/stock/balances?careRecipientId=" + patient)
   ).json();
-  expect(Number(stock.overview[0].team.confirmed)).toBe(6);
+  expect(Number(stock.overview[0].team.confirmed)).toBe(Number(teamAfterRequisition) + 6);
   expect(Number(stock.overview[0].team.incoming)).toBe(4);
   expect(stock.overview[0].family).toBeNull();
   await page.goto(
     "/historico/" + req.requisitionId + "?careRecipientId=" + patient,
   );
+  await selectDocumentSection(page, "materials");
   await expect(
-    page.getByText("1/1 itens atendidos", { exact: true }),
+    page.getByText("0/1 itens atendidos", { exact: true }),
   ).toBeVisible();
   const png = await sharp({
     create: { width: 4, height: 4, channels: 3, background: "#ffffff" },
   })
     .png()
     .toBuffer();
-  await page.getByRole("button", { name: "Anexos e ficha física", exact: true }).click();
+  await selectDocumentSection(page, "attachments");
+  await page
+    .getByRole("button", { name: "Adicionar anexo", exact: true })
+    .click();
   await page.getByLabel("Adicionar foto ou PDF").setInputFiles({
     name: "ficha-fisica.png",
     mimeType: "image/png",
@@ -297,7 +357,8 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   await expect(
     page.getByRole("link", { name: "ficha-fisica.png", exact: true }),
   ).toBeVisible();
-  const pdf = await get(page,
+  const pdf = await generatedPdf(
+    page,
     "/api/documents/" + req.requisitionId + "/pdf",
   );
   expect(pdf.ok(), await pdf.text()).toBeTruthy();
@@ -329,8 +390,8 @@ test("REQ → COM doação → validação → estoque familiar → ENT parcial 
   ).json();
   expect(Number(stock.overview[0].team.confirmed)).toBe(5);
   await page.goto("/historico?careRecipientId=" + patient);
-  await page.getByRole("button", { name: /Pesquisar e filtrar/ }).click();
-  await page.getByLabel("Ficha", { exact: true }).selectOption("ENT");
+  await page.getByRole("button", { name: /Filtros/ }).click();
+  await page.getByLabel("Tipo de ficha", { exact: true }).selectOption("ENT");
   await page
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();
@@ -367,20 +428,19 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     })
   ).receipt;
   const detail = (
-    await (
-      await get(page, "/api/requisitions/" + req.requisitionId)
-    ).json()
+    await (await get(page, "/api/requisitions/" + req.requisitionId)).json()
   ).data;
   const first = await post(page, "/api/documents", {
     careRecipientId: patient,
     type: "ENT",
     payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
       source: "FAMILY",
       destination: "CARE_TEAM",
       recipientId: fixtures().professional.id,
       lines: detail.requisition_items
         .slice(0, 5)
-        .map((line: { id: string; product_id: string }) => ({
+        .map((line: { id: string; product_id: string }) => ({ requestFulfillment: "complete",
           productId: line.product_id,
           quantity: "10",
           requisitionItemIds: [line.id],
@@ -393,6 +453,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     careRecipientId: patient,
     type: "ENT",
     payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
       source: "FAMILY",
       destination: "CARE_TEAM",
       recipientId: fixtures().professional.id,
@@ -407,28 +468,25 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
   await logout(page);
   await login(page, "professional");
   await page.goto("/fichas/" + first.data.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Confirmar recebimento", exact: true })
-    .click();
-  await confirm(page);
+  await confirmCompleteDeliveryReceipt(page);
   await page.goto(
     "/historico/" + req.requisitionId + "?careRecipientId=" + patient,
   );
+  await selectDocumentSection(page, "materials");
   await expect(
     page.getByText("5/10 itens atendidos", { exact: true }),
   ).toBeVisible();
   await page.goto("/fichas/" + second.data.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Informar divergência", exact: true })
-    .click();
+  await openDocumentAction(page, "Informar divergência");
   const editor = page.locator("form");
   await editor.getByRole("checkbox").nth(8).check();
   await editor.getByRole("checkbox").nth(9).check();
   await editor.getByLabel("Efetivamente recebido").nth(0).fill("0");
   await editor.getByLabel("Efetivamente recebido").nth(1).fill("0");
   await confirm(page);
+  await expandDocumentMilestones(page);
   await expect(
-    page.getByText("8/10 linhas integralmente conferidas", { exact: true }),
+    page.getByRole("list", { name: "Marcos da ficha", exact: true }).getByText("8/10 linhas integralmente conferidas", { exact: true }),
   ).toBeVisible();
   expect(
     (await get(page, "/api/documents/" + first.data.id)).ok(),
@@ -439,7 +497,10 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
         data: {
           careRecipientId: patient,
           type: "COM",
-          payload: { lines: [{ productId: products[0].id, quantity: "1" }] },
+          payload: {
+            origin: "purchase",
+            lines: [{ productId: products[0].id, quantity: "1" }],
+          },
           idempotencyKey: randomUUID(),
           draft: false,
         },
@@ -447,9 +508,7 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
     ).status(),
   ).toBe(403);
   const navigation = await openNavigation(page);
-  await expect(
-    navigation.nav.locator('a[href="/fichas/com"]'),
-  ).toHaveCount(0);
+  await expect(navigation.nav.locator('a[href="/fichas/com"]')).toHaveCount(0);
   await navigation.close();
   await logout(page);
   await login(page, "reader");
@@ -473,16 +532,22 @@ test("dez linhas: 5/10 REQ, 8/10 ENT e permissões negativas na interface e API"
   ).toBe(403);
 });
 
+async function openRequisitionReview(page: Page) {
+  const { patient, products } = await setup();
+  selectedPatients.set(page, patient);
+  await login(page, "professional");
+  await page.goto("/fichas/req?careRecipientId=" + patient);
+  await next(page);
+  await page.getByRole("navigation", { name: "Tipos de material" }).getByRole("button", { name: /^Higiene/ }).click();
+  await page.getByRole("checkbox", { name: /^Material fictício V4 0/ }).check();
+  for (let step = 0; step < 3; step++) await next(page);
+  return { patient, productId: products[0] };
+}
+
 test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async ({
   page,
 }) => {
-  await login(page);
-  const { patient, products } = await prepare(page);
-  await page.goto("/fichas/req?careRecipientId=" + patient);
-  await next(page);
-  await next(page);
-  await page.getByRole("checkbox", { name: /^Material 01/ }).check();
-  for (let step = 0; step < 4; step++) await next(page);
+  const { patient, productId } = await openRequisitionReview(page);
   let savedId = "";
   await page.route("**/api/requisitions", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
@@ -491,28 +556,60 @@ test("resposta perdida e recarga recuperam a mesma REQ e seu protocolo", async (
     await route.abort("failed");
   });
   await page
-    .getByRole("button", { name: "Concluir requisição", exact: true })
+    .getByRole("button", { name: "Emitir requisição", exact: true })
     .click();
-  await expect(
-    page.getByRole("button", { name: "Recuperar esta tentativa", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true })).toBeVisible();
   await page.unroute("**/api/requisitions");
   await page.reload();
   await page
     .getByRole("button", { name: "Recuperar esta tentativa", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
+    page.getByRole("dialog", { name: "Requisição emitida", exact: true }),
   ).toBeVisible();
   const listing = await (
-    await get(page,
-      "/api/documents?careRecipientId=" + patient + "&type=REQ",
-    )
+    await get(page, "/api/documents?careRecipientId=" + patient + "&type=REQ")
   ).json();
   expect(listing.total).toBe(1);
   expect(listing.data[0].id).toBe(savedId);
   expect(listing.data[0].code).toBe("REQ-0001");
-  expect(products).toHaveLength(1);
+  const detail = await get(page, "/api/requisitions/" + savedId);
+  expect(detail.ok()).toBe(true);
+  expect((await detail.json()).receipt.lines.map((line: { productId: string }) => line.productId)).toEqual([productId]);
+});
+
+test("emissão sem registro confirma ausência, preserva o rascunho e só reenvia sob nova chave após ação explícita", async ({ page }, info) => {
+  const { patient } = await openRequisitionReview(page);
+
+  const writes: Record<string, unknown>[] = [];
+  await page.route("**/api/requisitions", async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    writes.push(route.request().postDataJSON());
+    return writes.length === 1 ? route.abort("failed") : route.continue();
+  });
+  const count = async () => (await (await get(page, "/api/documents?careRecipientId=" + patient + "&type=REQ")).json()).total;
+
+  await page.getByRole("button", { name: "Emitir requisição", exact: true }).click();
+  const warning = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
+  await expect(warning).toBeVisible();
+  await expect(warning.getByText(/Seu rascunho está salvo/)).toHaveCount(0);
+  await warning.getByRole("button", { name: "Consultar resultado", exact: true }).click();
+  const failure = page.getByRole("dialog", { name: "Não foi possível gravar a ficha", exact: true });
+  await expect(failure.getByText(/Seu rascunho está salvo/)).toBeVisible();
+  await expect(failure.locator("details")).not.toHaveAttribute("open");
+  await expect(failure.getByText("Detalhes para suporte", { exact: true })).toBeVisible();
+  expect(await failure.locator("summary").evaluate(element => getComputedStyle(element, "::after").display)).toBe("none");
+  expect(await count()).toBe(0);
+  expect(writes).toHaveLength(1);
+  await info.attach("modal-de-falha-confirmada", {
+    body: await failure.screenshot({ animations: "disabled" }),
+    contentType: "image/png",
+  });
+  await failure.getByRole("button", { name: "Tentar novamente", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Requisição emitida", exact: true })).toBeVisible();
+  expect(writes).toHaveLength(2);
+  expect(writes[1].idempotencyKey).not.toBe(writes[0].idempotencyKey);
+  expect(await count()).toBe(1);
 });
 
 test("histórico filtra código e período e conserva o documento de paciente renomeado e inativo", async ({
@@ -520,13 +617,14 @@ test("histórico filtra código e período e conserva o documento de paciente re
 }) => {
   await login(page);
   const { patient, products } = await prepare(page);
+  const intentKey = randomUUID();
   const req = (
     await post(page, "/api/requisitions", {
       careRecipientId: patient,
       lines: [{ productId: products[0].id, currentStock: 2, urgent: false }],
       extraItems: [],
       observations: ["Observação original"],
-      idempotencyKey: randomUUID(),
+      idempotencyKey: intentKey,
     })
   ).receipt;
   await post(page, "/api/admin", {
@@ -537,28 +635,47 @@ test("histórico filtra código e período e conserva o documento de paciente re
     isDevelopment: true,
   });
   await page.goto("/historico?careRecipientId=" + patient);
-  await page.getByRole("button", { name: /Pesquisar e filtrar/ }).click();
-  await page.getByLabel("Código ou protocolo").fill("REQ-0001");
+  await page.getByRole("button", { name: /Filtros/ }).click();
+  await page.getByLabel("Buscar por código ou protocolo").fill("REQ-0001");
   await page
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();
   await expect(page).toHaveURL(/search=REQ-0001/);
-  await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
+  await expect(
+    page.locator("body style[data-make-styles-rehydration]"),
+  ).toHaveCount(0);
   await expect
-    .poll(() => page.evaluate(() =>
-      document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-    ))
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <=
+          document.documentElement.clientWidth,
+      ),
+    )
     .toBe(true);
   await expect(
     page.getByRole("link").filter({ hasText: "REQ-0001" }),
   ).toBeVisible();
   await page.getByRole("link").filter({ hasText: "REQ-0001" }).click();
   await expect(
-    page.locator("p").filter({ hasText: "Paciente: " + req.recipientName }),
+    page.getByRole("region", { name: "Resumo da ficha", exact: true }).getByText(req.recipientName, { exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText("Observação original", { exact: true }),
   ).toBeVisible();
+  const recovered = await page.request.post("/api/requisitions", {
+    data: {
+      careRecipientId: patient,
+      lines: [{ productId: products[0].id, currentStock: 2, urgent: false }],
+      extraItems: [],
+      observations: ["Observação original"],
+      idempotencyKey: intentKey,
+    },
+  });
+  expect(recovered.ok(), await recovered.text()).toBe(true);
+  expect((await recovered.json()).receipt.requisitionId).toBe(
+    req.requisitionId,
+  );
   const denied = await page.request.post("/api/requisitions", {
     data: {
       careRecipientId: patient,
@@ -569,6 +686,7 @@ test("histórico filtra código e período e conserva o documento de paciente re
     },
   });
   expect(denied.status()).toBe(409);
+  expect(await denied.json()).toMatchObject({ code: "PATIENT_INACTIVE" });
 });
 
 test("estoque familiar: revisão, paginação, filtro e correção compensatória auditável", async ({
@@ -593,18 +711,23 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   await page.getByRole("button", { name: "Próxima", exact: true }).click();
   await expect(page.getByText("2 / 2", { exact: true })).toBeVisible();
   const history = await (
-    await get(page,
+    await get(
+      page,
       "/api/stock/movements?careRecipientId=" + patient + "&page=2",
     )
   ).json();
   const reference = history.data[0].id;
-  await page.getByRole("button", { name: "Movimentar estoque familiar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Movimentar estoque familiar", exact: true })
+    .click();
   await page
     .getByLabel("Operação", { exact: true })
     .selectOption("correction_out");
   await page.getByLabel("Produto", { exact: true }).selectOption(product.id);
   await page.getByLabel("Quantidade", { exact: true }).fill("1");
-  await page.getByLabel("Movimento original a compensar").selectOption(reference);
+  await page
+    .getByLabel("Movimento original a compensar")
+    .selectOption(reference);
   await page
     .getByLabel("Motivo", { exact: true })
     .fill("Correção auditável E2E");
@@ -635,7 +758,14 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   });
   await page.reload();
   await expect(
-    page.getByRole("row", { name: product.name + " · Família", exact: true }).or(page.getByRole("article", { name: product.name + " · Família", exact: true })),
+    page
+      .getByRole("row", { name: product.name + " · Família", exact: true })
+      .or(
+        page.getByRole("article", {
+          name: product.name + " · Família",
+          exact: true,
+        }),
+      ),
   ).toContainText("Inativo");
 });
 
@@ -678,7 +808,6 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
   let interceptRead = true;
   await page.route("**/api/documents/" + bal.id, async (route) => {
     if (interceptRead && route.request().method() === "GET") {
-      interceptRead = false;
       observedRead.resolve();
       await heldRead.promise;
     }
@@ -689,26 +818,28 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
     .click();
   await observedRead.promise;
   try {
+    // The pending read may expose no header yet; all matching reads stay held.
     await expect(
-      page.getByRole("button", {
+      page.getByRole("menuitem", {
         name: "Solicitar cancelamento",
         exact: true,
         disabled: false,
       }),
     ).toHaveCount(0);
   } finally {
+    interceptRead = false;
     heldRead.resolve();
   }
+  await openDocumentMore(page);
   await page
-    .getByRole("button", { name: "Solicitar cancelamento", exact: true })
+    .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
     .click();
   await page
     .getByLabel("Motivo / justificativa")
     .fill("Contagem descartada após revisão operacional");
   await confirm(page);
-  const detail = (
-    await (await get(page, "/api/documents/" + bal.id)).json()
-  ).data;
+  const detail = (await (await get(page, "/api/documents/" + bal.id)).json())
+    .data;
   expect(detail.status).toBe("cancelled");
   expect(
     detail.events.some(
@@ -718,12 +849,23 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
   expect(detail.events.length).toBeGreaterThan(2);
 });
 
+async function prepareDeliveryAssessment(page: Page) {
+  const f = await setup();
+  const family = await shiftWorker(f.patient, "admin");
+  const recipient = await shiftWorker(f.patient);
+  await signIn(page, family.email, "/fichas");
+  return {
+    patient: f.patient,
+    product: { id: f.products[0], name: "Material fictício V4 0" },
+    recipient,
+    recipientName: "Profissional fictício de plantão",
+  };
+}
+
 test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite", async ({
   page,
-}) => {
-  await login(page);
-  const { patient, products } = await prepare(page);
-  const product = products[0];
+}, info) => {
+  const { patient, product, recipient, recipientName } = await prepareDeliveryAssessment(page);
   const extra = (
     await post(page, "/api/requisitions", {
       careRecipientId: patient,
@@ -752,6 +894,8 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await page.goto(
     "/historico/" + extra.requisitionId + "?careRecipientId=" + patient,
   );
+  await selectDocumentSection(page, "materials");
+  await page.getByRole("button", { name: "Identificar item extra", exact: true }).click();
   await page
     .getByRole("combobox", { name: "Produto correspondente", exact: true })
     .selectOption(product.id);
@@ -767,9 +911,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     .click();
   await expect(page.getByRole("dialog")).not.toBeVisible();
   const original = (
-    await (
-      await get(page, "/api/requisitions/" + extra.requisitionId)
-    ).json()
+    await (await get(page, "/api/requisitions/" + extra.requisitionId)).json()
   ).data.requisition_items[0];
   expect(original.product_id).toBeNull();
   expect(original.resolution.product_id).toBe(product.id);
@@ -813,37 +955,54 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     });
   });
   await page.goto("/fichas/ent?careRecipientId=" + patient);
-  await page
-    .getByLabel("Destinatário designado", { exact: false })
-    .selectOption(fixtures().professional.id);
-  await page
-    .getByText("Vincular requisições pendentes", { exact: true })
-    .click();
-  await page.getByRole("checkbox", { name: /REQ-0001/ }).check();
-  await page.getByRole("checkbox", { name: /REQ-0002/ }).check();
+  await selectDeliveryRecipient(
+    page,
+    recipientName,
+    "Pessoa indicada manualmente para receber estes materiais",
+  );
+  const links = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
+  await expect(page.getByText("Vincular requisições pendentes", { exact: true })).toHaveCount(0);
+  await links.getByRole("button", { name: "Vincular", exact: true }).click();
+  const sourcePicker = page.getByRole("dialog", { name: "Vincular fichas", exact: true });
+  for (const code of ["REQ-0001", "REQ-0002"]) {
+    const option = sourcePicker.getByRole("article").filter({ has: page.getByRole("checkbox", { name: `Vincular ${code}`, exact: true }) });
+    await option.getByRole("checkbox", { name: `Vincular ${code}`, exact: true }).check();
+    await option.getByRole("checkbox", { name: /^Importar materiais/ }).check();
+  }
+  await sourcePicker.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
+  await expect(page.getByRole("checkbox", { name: /^Atende integralmente à necessidade/ })).toHaveCount(0);
   await next(page);
+  await selectMaterialCategory(page);
+  const assessment = page.getByRole("checkbox", { name: `Atende integralmente à necessidade de ${product.name}`, exact: true });
+  await expect(assessment).not.toBeChecked();
+  await assessment.check();
+  const openBarcode = page.getByRole("button", { name: "Ler código", exact: true });
+  const scanner = page.getByRole("dialog", { name: "Ler código", exact: true });
+  const conversion = scanner.getByRole("region", { name: "Conversão da apresentação", exact: true });
+  await expect(page.getByLabel("Código manual")).toHaveCount(0);
+  await openBarcode.evaluate(button => button.scrollIntoView({ block: "center", behavior: "instant" }));
+  await openBarcode.click();
+  await scanner.getByRole("button", { name: "Ler código de barras", exact: true }).click();
+  await expect(scanner.getByText(/Acesso à câmera negado/)).toBeVisible();
+  await scanner.getByRole("button", { name: "Encerrar câmera", exact: true }).click();
+  await scanner.getByLabel("Código manual").fill("0000000000000");
+  await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
+  const unknownBarcode = page.getByRole("dialog", { name: "Código não cadastrado", exact: true });
+  await expect(unknownBarcode.getByRole("button", { name: "Selecionar na lista", exact: true })).toBeVisible();
+  await unknownBarcode.getByRole("button", { name: "Tentar outro código", exact: true }).click();
+  await scanner.getByLabel("Código manual").fill("1234567890128");
+  await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
+  await expect(conversion).toContainText("Pacote de duas unidades");
+  await scanner.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(openBarcode).toBeFocused();
+  await expect(page.getByText("Quantidade total calculada:", { exact: false })).toHaveCount(0);
+  await openBarcode.click();
+  await scanner.getByLabel("Código manual").fill("1234567890128");
+  await scanner.getByRole("button", { name: "Identificar", exact: true }).click();
+  await scanner.getByRole("button", { name: "Usar material", exact: true }).click();
   await expect(
-    page.locator(".ui-field-error").filter({ hasText: /Justifique/ }),
-  ).toBeVisible();
-  await page
-    .getByLabel("Justificativa da necessidade compartilhada", { exact: false })
-    .fill("As duas requisições reiteram a mesma necessidade física.");
-  await next(page);
-  await page
-    .getByRole("button", { name: "Ler código de barras", exact: true })
-    .click();
-  await expect(page.getByText(/Acesso à câmera negado/)).toBeVisible();
-  await page
-    .getByRole("button", { name: "Encerrar câmera", exact: true })
-    .click();
-  await page.getByLabel("Código manual").fill("0000000000000");
-  await page.getByRole("button", { name: "Identificar", exact: true }).click();
-  await expect(page.getByText(/Código desconhecido/)).toBeVisible();
-  await page.getByLabel("Código manual").fill("1234567890128");
-  await page.getByRole("button", { name: "Identificar", exact: true }).click();
-  await expect(
-    page.getByLabel("Quantidade — " + product.name, { exact: true }),
-  ).toHaveValue("2");
+    page.getByText("Quantidade total calculada:", { exact: false }),
+  ).toContainText("2 unidade");
   // A real EAN-13 image exercises the fallback decoder independently of the camera stub.
   const left = [
     "0001101",
@@ -884,38 +1043,78 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
       .join("") +
     "</svg>";
   const barcodeImage = await sharp(Buffer.from(svg)).png().toBuffer();
-  await page.getByLabel("Ler de uma foto").setInputFiles({
+  await openBarcode.click();
+  await scanner.getByLabel("Ler de uma foto").setInputFiles({
     name: "ean13-ficticio.png",
     mimeType: "image/png",
     buffer: barcodeImage,
   });
-  await expect(
-    page.getByLabel("Quantidade — " + product.name, { exact: true }),
-  ).toHaveValue("4");
-  await expect(page.getByText(/Código desconhecido/)).not.toBeVisible();
-  for (let step = 0; step < 3; step++) {
-    const shared = page.getByLabel(
-      "Justificativa da necessidade compartilhada",
-      { exact: false },
-    );
-    if (await shared.isVisible())
-      await shared.fill(
-        "As requisições reiteram a mesma necessidade, com um único crédito físico.",
-      );
-    await next(page);
+  await expect(conversion).toContainText("Pacote de duas unidades");
+  await conversion.getByRole("button", { name: "Corrigir", exact: true }).click();
+  const presentation = conversion.getByLabel("Tipo de apresentação");
+  const factor = conversion.getByLabel("Unidades por apresentação");
+  const applyScan = scanner.getByRole("button", { name: "Usar material", exact: true });
+  await presentation.selectOption({ label: "Par" });
+  await expect(factor).toHaveValue("2");
+  await expect(conversion.getByText("Par · 2 unidade", { exact: true })).toBeVisible();
+  await presentation.selectOption({ label: "Unidade" });
+  await expect(factor).toHaveValue("1");
+  await presentation.selectOption({ label: "Pacote" });
+  await expect(factor).toHaveValue("");
+  await expect(applyScan).toBeDisabled();
+  await presentation.selectOption({ label: "Caixa" });
+  await expect(factor).toHaveValue("");
+  await factor.fill("4");
+  await expect(conversion.getByText("Caixa · 4 unidade", { exact: true })).toBeVisible();
+  await conversion.getByRole("checkbox", { name: "Corrigir o total convertido", exact: true }).check();
+  await conversion.getByLabel("Total corrigido em unidade").fill("3");
+  await expect(conversion).toContainText("Este ajuste será incluído como quantidade manual");
+  const confirmedAmount = conversion.getByText("Quantidade que entrará na ficha", { exact: true });
+  await confirmedAmount.scrollIntoViewIfNeeded();
+  await expect(confirmedAmount).toBeInViewport({ ratio: 1 });
+  if (info.project.use.hasTouch) {
+    await info.attach("ENT · conferência do código lido", {
+      body: await scanner.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+    });
   }
+  await applyScan.click();
+  await expect(
+    page.getByText("Quantidade total calculada:", { exact: false }),
+  ).toContainText("5 unidade");
+  await next(page);
+  const shared = page.getByLabel("Justificativa da necessidade compartilhada", { exact: false });
+  await expect(shared).toHaveAttribute("aria-invalid", "true");
+  await expect(shared).toBeFocused();
+  await shared.fill("As requisições reiteram a mesma necessidade, com um único crédito físico.");
+  if (info.project.use.hasTouch) {
+    await assessment.scrollIntoViewIfNeeded();
+    await info.attach("ENT · suficiência no material", {
+      body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+    });
+  }
+  for (let step = 0; step < 3; step++) await next(page);
+  await expect(page.getByText("Atendimento integral previsto", { exact: true })).toBeVisible();
   const issuing = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname === "/api/documents" &&
       response.request().method() === "POST",
   );
   await page
-    .getByRole("button", { name: "Confirmar e concluir", exact: true })
+    .getByRole("button", { name: "Expedir entrega", exact: true })
     .click();
   const response = await issuing;
   expect(response.ok(), await response.text()).toBeTruthy();
   const delivery = (await response.json()).data;
   expect(delivery.lines[0].requisitionItemIds).toHaveLength(2);
+  expect(delivery.lines[0].family_fulfillment).toBe("complete");
+  expect(delivery.lines[0].quantity).toBe(5);
+  expect(delivery.lines[0].presentation_conversions).toEqual([
+    expect.objectContaining({ barcode: "1234567890128", packages: "1", convertedQuantity: "2", version: 1 }),
+  ]);
+  const emitted = page.getByRole("dialog", { name: "Entrega expedida", exact: true });
+  await expect(emitted).toBeVisible({ timeout: 65_000 });
+  await expect(page).toHaveURL(url => url.pathname === "/fichas/" + delivery.id);
+  await emitted.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
   await page.goto("/estoque?careRecipientId=" + patient + "&custody=TRANSIT");
   await expect(
     page.getByRole("link", { name: delivery.code, exact: true }),
@@ -924,59 +1123,111 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     page.getByText("Aguardando conferência", { exact: true }),
   ).toBeVisible();
   await logout(page);
-  await login(page, "professional");
-  await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Confirmar recebimento", exact: true })
-    .click();
-  await confirm(page);
+  await signIn(page, recipient.email, "/fichas/" + delivery.id);
+  await confirmCompleteDeliveryReceipt(page);
   for (const id of [extra.requisitionId, second.requisitionId]) {
-    const req = (
-      await (await get(page, "/api/requisitions/" + id)).json()
-    ).data;
+    const req = (await (await get(page, "/api/requisitions/" + id)).json())
+      .data;
     expect(req.fulfillment.fulfilled).toBe(1);
   }
 });
 
-test("alteração de destinatário e cancelamento bilateral preservam os saldos reais", async ({
-  page,
-}) => {
-  await login(page);
-  const { patient, products } = await prepare(page);
-  const product = products[0];
+test("ENT registra atendimento parcial com a caixa de suficiência desmarcada", async ({ page }) => {
+  const { patient, product, recipient, recipientName } = await prepareDeliveryAssessment(page);
+  const request = (await post(page, "/api/requisitions", {
+    careRecipientId: patient,
+    idempotencyKey: randomUUID(),
+    lines: [{ productId: product.id, currentStock: 0, urgent: false }],
+    extraItems: [],
+    observations: [],
+  })).receipt;
   await post(page, "/api/stock/movements", {
     careRecipientId: patient,
     productId: product.id,
     quantity: "10",
     action: "inbound",
-    reason: "Entrada para cancelamento bilateral",
+    reason: "Entrada fictícia para a entrega parcial",
     idempotencyKey: randomUUID(),
   });
+  const delivery = await issueSupply(page, "ENT", patient, product.name, "2", request.requisitionId, "partial", recipientName);
+  expect(delivery.lines[0].family_fulfillment).toBe("partial");
+  await page.goto("/fichas");
+  await logout(page);
+  await signIn(page, recipient.email, "/fichas/" + delivery.id);
+  await confirmCompleteDeliveryReceipt(page);
+  const requirement = (await (await get(page, "/api/requisitions/" + request.requisitionId)).json()).data;
+  expect(requirement.fulfillment.fulfilled).toBe(0);
+});
+
+test("E06-09 troca de recebedor de ENT direta e cancelamento com consentimento preservam os saldos reais", async ({
+  page,
+}, info) => {
+  const { patient, products } = await setup();
+  const product = { id: products[0], name: "Material fictício V4 0" };
+  const receiver = await shiftWorker(patient, "admin");
+  const nextWorker = await shiftWorker(patient);
+  sql(`update public.profiles set full_name='Conferente do plantão atual' where id=${sqlLiteral(receiver.id)};
+    update public.profiles set full_name='Conferente do próximo plantão' where id=${sqlLiteral(nextWorker.id)};
+    insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values
+      (${sqlLiteral(patient)},${sqlLiteral(fixtures().adminA.id)},'ent.receive',false),
+      (${sqlLiteral(patient)},${sqlLiteral(fixtures().global.id)},'ent.receive',false),
+      (${sqlLiteral(patient)},${sqlLiteral(fixtures().family.id)},'ent.cancel',true);`);
+  await page.setViewportSize({ width: 390, height: 760 });
+  await login(page, "family", patient);
+  currentDeliveryShift({ patient }, receiver.id);
+  currentDeliveryShift({ patient }, nextWorker.id, 60);
+  const preparation = (await (await get(page, "/api/transfers/preparation?source=FAMILY&careRecipientId=" + patient)).json()).data;
   const delivery = (
-    await post(page, "/api/documents", {
+    await post(page, "/api/transfers", {
       careRecipientId: patient,
-      type: "ENT",
-      payload: {
+      declaration: {
+        mode: "direct",
+        referenceHash: preparation.referenceHash,
+        reason: "Escolha manual fictícia para este recebimento",
         source: "FAMILY",
-        destination: "CARE_TEAM",
         recipientId: fixtures().professional.id,
         lines: [{ productId: product.id, quantity: "4" }],
       },
       idempotencyKey: randomUUID(),
-      draft: false,
     })
   ).data;
+  expect(delivery.transfer.declaration.mode).toBe("direct");
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Alterar destinatário", exact: true })
-    .click();
-  await page.getByLabel("Novo destinatário").selectOption(fixtures().adminA.id);
-  await page
-    .getByLabel("Motivo / justificativa")
-    .fill("Administrador receberá os materiais nesta ocasião");
-  await confirm(page);
+  await expect(page.getByRole("heading", { name: delivery.code, exact: true })).toBeVisible();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+  await openOperationalDocumentAction(page, "Trocar recebedor");
+  const editor = page.getByRole("dialog", { name: "Trocar recebedor", exact: true });
+  const onDuty = editor.getByRole("button", { name: /Em plantão/, pressed: true });
+  await expect(onDuty).toBeVisible();
+  await expect(onDuty.locator(".hca-reassignment-choice")).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(editor.getByRole("button", { name: /Próximo plantão/, pressed: false })).toBeVisible();
+  await expect(editor.getByText("Ainda não registrada", { exact: true })).toBeVisible();
+  await info.attach("E06-09-trocar-recebedor", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  const reason = "Administrador receberá os materiais nesta ocasião";
+  await editor.getByLabel("Motivo da troca").fill(reason);
+  await editor.getByRole("button", { name: "Voltar", exact: true }).click();
+  const exit = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });
+  await exit.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+  await expect(editor.getByLabel("Motivo da troca")).toHaveValue(reason);
+  const decisionPath = "**/api/documents/" + delivery.id + "/decisions";
+  let sent = 0;
+  await page.route(decisionPath, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    sent++;
+    const response = await route.fetch();
+    expect(response.ok(), await response.text()).toBeTruthy();
+    await route.abort("failed");
+  });
+  await editor.getByRole("button", { name: "Confirmar novo recebedor", exact: true }).click();
+  const success = page.getByRole("dialog", { name: "Recebedor atualizado", exact: true });
+  await expect(success.getByText(reason, { exact: true })).toBeVisible();
+  await expect(success.getByText("Recebedor anterior", { exact: true })).toBeVisible();
+  await info.attach("E06-09-recebedor-atualizado", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await success.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await page.unroute(decisionPath);
+  expect(sent).toBe(1);
   await logout(page);
-  await login(page, "professional");
+  await login(page, "professional", patient);
   const denied = await page.request.post("/api/documents/" + delivery.id, {
     data: {
       action: "receive",
@@ -987,28 +1238,26 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
   });
   expect(denied.status()).toBe(403);
   await logout(page);
-  await login(page, "adminA");
+  await signIn(page, receiver.email);
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
-  await page
-    .getByRole("button", { name: "Confirmar recebimento", exact: true })
-    .click();
-  await confirm(page);
-  await page
-    .getByRole("button", { name: "Alterar destinatário", exact: true })
-    .count()
-    .then((count) => expect(count).toBe(0));
+  await confirmCompleteDeliveryReceipt(page);
+  await expectNoOperationalDocumentAction(page, "Trocar recebedor");
   await logout(page);
-  await login(page);
+  await login(page, "family", patient);
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
+  await expect(page.getByRole("heading", { name: delivery.code, exact: true })).toBeVisible();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+  await openDocumentMore(page);
   await page
-    .getByRole("button", { name: "Solicitar cancelamento", exact: true })
+    .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
     .click();
   await page
-    .getByLabel("Motivo / justificativa")
+    .getByLabel("Motivo do pedido de cancelamento")
     .fill("Devolução integral acordada com o recebedor");
-  await confirm(page);
+  await page.getByRole("button", { name: "Enviar pedido", exact: true }).click();
+  await page.getByRole("dialog", { name: "Aguardando decisão do recebedor" }).getByRole("button", { name: "Voltar à ficha" }).click();
   await expect(
-    page.getByText("Cancelamento aguardando consentimento", { exact: true }),
+    page.locator(".hca-document-header").getByText("Cancelamento aguardando consentimento", { exact: true }),
   ).toBeVisible();
   let stock = (
     await (
@@ -1016,27 +1265,41 @@ test("alteração de destinatário e cancelamento bilateral preservam os saldos 
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(4);
-  expect(Number(stock.family.confirmed)).toBe(6);
+  expect(Number(stock.family.confirmed)).toBe(26);
   await logout(page);
-  await login(page, "adminA");
+  await signIn(page, receiver.email);
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);
   await page
     .getByRole("button", {
-      name: "Consentir e reconciliar cancelamento",
+      name: "Analisar pedido de cancelamento",
       exact: true,
     })
     .click();
   await page
-    .getByLabel("Motivo / justificativa")
+    .getByLabel("Motivo da sua decisão")
     .fill("Quatro unidades efetivamente devolvidas à família");
-  await confirm(page);
+  await expect(
+    page.getByRole("dialog", { name: "Analisar pedido de cancelamento" }).getByText("0 unidade", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(page.locator('input[name$=":consumed"]')).toHaveCount(0);
+  const actualReturn = page.getByRole("textbox", {
+    name: `Quantidade fisicamente devolvida · ${product.name}`,
+    exact: true,
+  });
+  await expect(actualReturn).toHaveValue("4");
+  await actualReturn.fill("4");
+  await page.getByRole("switch", { name: "Conferi a devolução física e as referências de consumo" }).check();
+  await page.getByRole("button", { name: "Consentir e registrar devolução", exact: true }).click();
+  await page.getByRole("dialog", { name: "Ficha cancelada" }).getByRole("button", { name: "Voltar à ficha" }).click();
   stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(0);
-  expect(Number(stock.family.confirmed)).toBe(10);
+  expect(Number(stock.family.confirmed)).toBe(30);
 });
 
 test("Flow exige revisão do autor e confirmação autorizada antes de debitar estoque", async ({
@@ -1058,6 +1321,7 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
       careRecipientId: patient,
       type: "ENT",
       payload: {
+        recipientReason: "Escolha manual fictícia para este recebimento",
         source: "FAMILY",
         destination: "CARE_TEAM",
         recipientId: fixtures().professional.id,
@@ -1120,21 +1384,39 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
     ).json()
   ).overview[0];
   expect(Number(stock.team.confirmed)).toBe(5);
-  await expect(
-    page.getByText("Consumo · Equipe · Aguardando confirmação", {
-      exact: true,
-    }),
-  ).toBeVisible();
+  const reports = (
+    await (
+      await get(page, "/api/consumption?careRecipientId=" + patient)
+    ).json()
+  ).data;
+  expect(reports).toHaveLength(1);
+  const report = reports[0];
+  const reportRow = page.locator(`[data-consumption-id="${report.id}"]`);
+  await expect(reportRow.locator(".hca-consumption-main strong")).toHaveText("Consumo · Equipe");
+  await expect(reportRow.locator(".hca-consumption-end")).toContainText("Aguardando conferência");
+  expect(report).toMatchObject({
+    kind: "consumption",
+    location: "CARE_TEAM",
+    status: "reported",
+    version: 1,
+  });
   await logout(page);
   await login(page, "adminA");
-  await page.goto("/consumo?careRecipientId=" + patient);
+  await page.goto("/consumo?careRecipientId=" + patient + "&ref=" + report.id);
   await page
-    .getByRole("button", { name: "Confirmar relato e movimento", exact: true })
+    .getByRole("button", { name: "Conferir consumo", exact: true })
     .click();
-  await page.getByRole("dialog").getByRole("button", { name: "Confirmar consumo", exact: true }).click();
-  await expect(
-    page.getByText("Consumo · Equipe · Confirmado", { exact: true }),
-  ).toBeVisible();
+  const decision = page.getByRole("dialog", {
+    name: "Revisar confirmação do consumo",
+    exact: true,
+  });
+  await decision.getByRole("button",{name:"Revisar confirmação",exact:true}).click();
+  await expect(decision.locator("input,textarea,select")).toHaveCount(0);
+  await decision
+    .getByRole("button", { name: "Confirmar consumo e descontar", exact: true })
+    .click();
+  await expect(reportRow.locator(".hca-consumption-main strong")).toHaveText("Consumo · Equipe");
+  await expect(reportRow.locator(".hca-consumption-end")).toContainText("Confirmado");
   stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)

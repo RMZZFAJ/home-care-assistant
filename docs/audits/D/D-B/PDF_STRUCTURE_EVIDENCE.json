@@ -1,0 +1,95 @@
+{
+  "at": "2026-11-09T01:57:00.179922+00:00",
+  "baseSha": "059bce0ba05d06234825696a84f0ef803e39abaa",
+  "sourceLfSha256": {
+    "src/lib/server/pdf-structure.ts": "0c02f758f8c735a2495d85377d2afbf4bbe686bddf6b5c463e55a3241d4e1aec",
+    "src/lib/server/pdf-structure-validation.ts": "7f247399acfe429c600bc46651c553144ec3b1496ac27bb1a8a6c5e219d87c42",
+    "src/lib/server/operational-pdf.ts": "c322d9934f722ed0c026404843b28981211d84255a3919152315918bdc7874e3",
+    "src/lib/server/pdf-content.ts": "eaf4d286b16ee255699c8be01c056f45e9866d29edb054330d5f60eedb106dda",
+    "src/lib/server/pdf-issuance.ts": "ab0497f107b789f65d88279d1a2db4fcb2ee27a9dbaf91f252c07ee1b6a97ba6",
+    "tests/pdf-structure.test.ts": "c052a391d17b9ab10f78583c509061201db7a522845976b481836e8c846afa01",
+    "tests/support/pdf-v9-structure-baseline.json": "aa533546b4c2e70f88860d9e723b34c31869661c76e638f8a2efa64d63db361f",
+    "tests/integration/pdf-structure.test.mjs": "653d7bb2677802408c8f55ab4f46463d745097a1be05cfd7144c69d0d9bfc09d",
+    "tests/e2e/pdf-source-facts.spec.ts": "0be299d036d4cf8e5bf6c2f0f911875c2f748ff596ad46e36189f593556a4e7f",
+    "tests/e2e/ent-temporal.spec.ts": "15197665164883a697dbef456d829038589fc1deaf1dca26607e8a203710f065",
+    "tests/e2e/ent-terminal.spec.ts": "d70179e1afed7e6872d2ed7ad3f538e234eb6f55569ad455ff3128e5488ebf3a",
+    "tests/e2e/pdf-regularization.spec.ts": "096cd30e24fcbba3c025e0543455c304a93fa511a9baac688e206c0c3db5ced2",
+    "supabase/migrations/20261109013649_phase_d4_tagged_pdf_revision.sql": "a5f644576b82797646a07a5f50a3e9cc481e8365715e29e465383704f020bfe7",
+    "docs/audits/D/D-B/d4-structure-proof/verify.py": "6b4ad8b1868c7c48ba238acf17a1bfa5033c820e5fcf6ed5df68e99e58a7ba46"
+  },
+  "unchangedConsumerLfSha256": {
+    "tests/pdf-fidelity.test.ts": "6039761e6d859c1a2fc88932e2244ba2353029a3a7fe73ce5cd05305b5d22180",
+    "tests/pdf-ent-terminal.test.ts": "05defe43bd1baa867d2766676378a1af086150e752e5fee2b9f4d6fbfb9ba5d7",
+    "tests/pdf-content.test.ts": "ba39f6e73c168de051304b559d0431e41edc0e93311d1b6153e74ee323cad5ce",
+    "tests/integration/pdf-fidelity.test.mjs": "d4431c094aa14ae5ebd2e68fb469d22ce13194d471304a5fbf19c74b518acebd",
+    "tests/integration/ent-terminal.test.mjs": "b420148d198679a6c80090441ad9f5735d1bb25894a7da3045ee609a1344d133",
+    "tests/e2e/pdf-fidelity.spec.ts": "3b9e202b19b880ed883ee6030c5aa539f95de76408d1c62551df931309fdcc24",
+    "tests/e2e/pdf-issuance.spec.ts": "1b8b8589ad5193aedf0c6590f965eaa6fb95ccd851a9445ede2f5a0ac9474ce9"
+  },
+  "validation": {
+    "directedPdfPassed": 44,
+    "newPdfCases": 9,
+    "existingPdfCases": 35,
+    "reproducibilityRechecks": 9,
+    "authPassed": 12,
+    "newAuthCases": 5,
+    "existingAuthCases": 7,
+    "productionChromiumPassed": 18,
+    "independentUnsigned": 7,
+    "independentSigned": 6,
+    "independentActualApplicationIssuances": 11,
+    "v9ExactGoldens": 6,
+    "pixelComparedPages": 22,
+    "oversizedPages": 14,
+    "types": true,
+    "affectedLint": true,
+    "globalLocalSuitesRepeated": false,
+    "mutableDbParallelWithE2e": false
+  },
+  "counterproofs": {
+    "invalidStructureMutations": 9,
+    "independentMissingHeaderScopeRejected": true,
+    "initialInlineTjNotRejected": "Preserved failing test;grammar corrected and rechecked",
+    "initialHistoricalCodePrefixAssumption": "Preserved verifier failure;fixture labels and frozen IDs/version/hash now qualify the code;product bytes unchanged"
+  },
+  "cohortQualification": "Final unit change only regenerates already hash-qualified V9 baseline artifacts;9 new cases rerun.35 old test sources unchanged.Production and migration code frozen during E2E.6 legacy V9 hashes captured before renderer change;V4-V8 byte regressions also retained.",
+  "logLfSha256": {
+    "pdf-structure-baseline.log": "fc256a4e24f28c6d6098ddce916281f56335e897ab1a7c42b7e8fa6a17ffd989",
+    "pdf-structure-legacy.log": "f06386e8ef4ad4167efb2c8e779d9b8150f5a76649640391096fcd6cd5352fa0",
+    "pdf-structure-unit.log": "d204cf753418094ca2c2c0f8e883210a00a7faea388de297e119748dea6f281a",
+    "pdf-structure-regression.log": "f53266452e697172d769a4200dcd5464eaef3a3b3ed204d400ad9ffa481ff2d9",
+    "pdf-structure-auth.log": "6ba9f36e41eb4c3a27e37fa3b892228c14f17e973aece24536a4aa855e8c448a",
+    "pdf-structure-e2e.log": "4489516ab332e659cd20495c20e954a3171de15d6fbd977b7648ed750bed8e26",
+    "pdf-structure-unit-repro.log": "8d14da9f72cbe41c9def778056a23e4f6cf1cf5c598995699428898b7437ade7",
+    "pdf-structure-independent-application.log": "30dff2f17dca344fd973a1d591b9730a7613b20bdd92649cb2208000a9a0514c",
+    "pdf-structure-independent-final.log": "19b87e9ae6eabd15ee54bfc886030dfc6a4934b80e882d24f0a7e04523ca0aea",
+    "pdf-structure-remote-dry-run.log": "eff6f3216c05946404d41cbc10c397241779a1fdf6b422965d315ac6e3573f7c",
+    "pdf-structure-remote-apply.log": "f5f219e385997c720b9e051253bc59b09e727d0d82ad5e2ba12f2b0761438740"
+  },
+  "independentProof": "d4-structure-proof/VERIFICATION.json",
+  "preservedExemplars": "d4-structure-proof/EXEMPLARS.json",
+  "remote": "PDF_STRUCTURE_REMOTE_MIGRATIONS.json",
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "canonicalColumnsPreserved": 29,
+    "approvedComplementsPreserved": true,
+    "counts": {
+      "PARTIAL": 53,
+      "PASS": 48,
+      "NOT_STARTED": 4
+    },
+    "changedCriteria": [
+      "C-AC-111"
+    ]
+  },
+  "remainingGate": [
+    "Own published SHA CI",
+    "Human AT and physical tasks as specified",
+    "Other criterion-specific states and D-C/D6"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "pdfUaApproved": false,
+  "operationalGo": false,
+  "goalComplete": false
+}

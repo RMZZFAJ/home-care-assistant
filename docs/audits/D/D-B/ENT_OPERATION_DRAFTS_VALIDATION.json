@@ -1,0 +1,713 @@
+{
+  "assembledAt": "2026-11-09T14:31:05.742629+00:00",
+  "baseSha": "56b445e08672f800865bba95c8f7a35570d71699",
+  "sourceLfSha256": {
+    "src/app/api/drafts/route.ts": "f5b61dae148105cc79a1dfa509025cad8d28aa0ae899d6d2ccc73129247076d6",
+    "src/components/documents/supply-command-editor.tsx": "1257c38ecf781fe377cf071a45e33a8099d7f8ab9724b04cebab47b719b3885e",
+    "src/components/documents/supply-command-fields.tsx": "e86469fcf1679222802b9b864bea445388072a47fad006bd3cb892850948b0ab",
+    "src/components/forms/creation-draft-panel.tsx": "6c82b81260d61013747bb8725a6e7a982e2b7b1f81fa01473b8458bce67b1c2d",
+    "src/lib/forms/delivery-draft-reference.ts": "1d0109942a47b870be16e5876eec7eac9be2ea9c1cadf0d6213d15a0e6b0366e",
+    "src/lib/forms/draft-navigation.ts": "4bbd91323178e9defb6b74d795c4bdb5a60bd8ea918dd9a08340fe6553fa30b0",
+    "src/lib/validation/creation-drafts.ts": "34b98821a148e1232a53ea30ac8181f9b09f269917f5af957f8df259c5027e2f",
+    "src/lib/validation/supply-drafts.ts": "f32056ac486e2719744a770271c29b8117c48fc9759cb046620f013379bcaa4c",
+    "supabase/migrations/20261109135205_phase_d3_ent_operation_private_drafts.sql": "6b830b2db61be7c8d7bd942f76edad0076df32a4f77767ed5d2c0543b220b5d7",
+    "tests/com-action-drafts.test.ts": "32af4d2b3e56c97249b35b86ff94e837de36abad6402ac49f2abbb2380ef38d7",
+    "tests/e2e/attachment-attempts.spec.ts": "2a871a45e774bd3282ee28a0e6ec3e1bfe7ff8e47a310f7d8920fb4e6011793b",
+    "tests/e2e/catalogue-scale.spec.ts": "75ade998d3d4b91e69e1d8c2f560d369a27338e6b4cbaec48ac0abed33cad52d",
+    "tests/e2e/delivery-preparation.spec.ts": "d80702db555c122d6fc80e3d371743a7f47e05a9d9e1ce89551eba7746181124",
+    "tests/e2e/delivery-regularization.spec.ts": "d9bdb008760362c9f9d7bfd4d7ab844af0dfc20e4106e820dd9897220c9d5586",
+    "tests/e2e/ent-operation-private-drafts.spec.ts": "74933df06dad26f4f61eae2ba0f754c8d62d22b4cbe9130e0f54cd501a49d293",
+    "tests/e2e/language-navigation-filters.spec.ts": "baf84751beec10cdd5e51cdc794579d3a478bfc289a39aa765a1fa310a1694e3",
+    "tests/ent-operation-drafts.test.ts": "a31d6aa2f55999cde61f44de1890042aa470cccf29059bc1cb878fe3bf985377",
+    "tests/integration/ent-operation-fixtures.mjs": "7acf861e90c38b31f9ebf3e0c7f0dddd488fbf6be714c748246cb49f7ae07cd1",
+    "tests/integration/ent-operation-post-authority.test.mjs": "eadf8e6086aa2234852af3a42903c1b7f86f7a98d0d1f663240757dc3f31e3c3",
+    "tests/integration/ent-operation-private-drafts.test.mjs": "3c522ce7118361621b550bc71d4b2a6e7fa0201d0a9c21f3fdb9ba65ed01d09d"
+  },
+  "unitApi": {
+    "cases": 28,
+    "passed": 28
+  },
+  "realAuthDatabase": {
+    "distinctCases": 42,
+    "passed": 42,
+    "rounds": {
+      "initial": {
+        "cases": 40,
+        "passed": 39,
+        "failed": 1
+      },
+      "newEntAndFirstPost": {
+        "cases": 11,
+        "passed": 11
+      },
+      "postAuthorityFinal": {
+        "cases": 2,
+        "passed": 2
+      }
+    },
+    "reuse": "30 unchanged COM/creation/navigation cases plus10 ENT and2 post-authority cases; repeats do not inflate42",
+    "counterproof": "access.manage ignores overrides; oracle repaired to real administrator-to-reader role change; read retained but clinical write denied"
+  },
+  "browser": {
+    "distinctEntAndCompatibilityCases": 20,
+    "additionalDistinctExistingConsumerCases": 10,
+    "distinctApprovedCases": 30,
+    "identity": "file + path + title + project; latest directed outcome, excluding mutable line numbers",
+    "rounds": {
+      "ent-operation-initial": {
+        "stats": {
+          "total": 20,
+          "expected": 14,
+          "unexpected": 6,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "reportSha256": "e16812f75496b184f217912021144be5822d69ce8ee0aaaba4f4626e9f4a9077",
+        "cases": [
+          {
+            "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM conserva desmarcação de confirmação salva ao retomar o rascunho",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 380,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM conserva desmarcação de confirmação salva ao retomar o rascunho",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 380,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 121,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-cancellation.spec.ts",
+              "line": 121,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT retoma destinatário em outra sessão preserva pessoa indisponível e recupera uma troca sem repeti-la",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 65,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: Local SQL failed: ERROR:  new row for relation \"care_recipient_memberships\" violates check constraint \"care_recipient_memberships_status_check\"\nDETAIL:  Failing row contains (e3616d37-fac9-404a-a796-bc61708c9b3d, 48ac7353-77ee-4335-8cae-1b03a862bab7, 6e367208-daa0-4a01-989e-e7f78e869734, professional, f, f, 2026-11-09 14:13:05.55088+00, inactive).\n\n\u001b[90m   at \u001b[39m..\\..\\scripts\\test-environment.mjs:179\n\n  177 |   );\n  178 |   if (result.status !== 0)\n> 179 |     throw new Error(`Local SQL failed: ${result.stderr.trim()}`);\n      |           ^\n  180 |   return result.stdout.trim();\n  181 | }\n  182 |\n\u001b[2m    at sql (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\scripts\\test-environment.mjs:179:11)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Proje"
+            ]
+          },
+          {
+            "title": "ENT conciliação preserva material decimal e solução pessoal indisponível até escolha e referência explícitas",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 162,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT cancelamento pending retoma motivo e fechar a revisão não antecipa cancelamento ou devolução",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 255,
+              "column": 7
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT cancelamento accepted retoma motivo e fechar a revisão não antecipa cancelamento ou devolução",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 255,
+              "column": 7
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT recusa retoma o pedido original e só adota outro pedido após comparação explícita",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 291,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "TimeoutError: locator.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('textbox', { name: 'Motivo / justificativa', exact: true })\u001b[22m\n\n\n  296 |   await login(page, f.patient, \"professional\");\n  297 |   await open(page, f.document.id, \"Recusar pedido de cancelamento\");\n> 298 |   await reason(page).fill(entReason);\n      |                      ^\n  299 |   await save(page);\n  300 |   let newer = await entSend(f.admin, f.document, \"withdraw_cancellation\", {\n  301 |     requestId: original.id,\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\ent-operation-private-drafts.spec.ts:298:22\u001b[22m"
+            ]
+          },
+          {
+            "title": "ENT retirada retoma justificativa e recupera a mesma intenção depois de resposta perdida",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 369,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "TimeoutError: locator.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('textbox', { name: 'Motivo / justificativa', exact: true })\u001b[22m\n\n\n  373 |   await login(page, f.patient);\n  374 |   await open(page, f.document.id, \"Retirar meu pedido de cancelamento\");\n> 375 |   await reason(page).fill(entReason);\n      |                      ^\n  376 |   await save(page);\n  377 |   await open(page, f.document.id, \"Retirar meu pedido de cancelamento\");\n  378 |   await resume(page);\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\ent-operation-private-drafts.spec.ts:375:22\u001b[22m"
+            ]
+          },
+          {
+            "title": "ENT retoma destinatário em outra sessão preserva pessoa indisponível e recupera uma troca sem repeti-la",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 65,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: Local SQL failed: ERROR:  new row for relation \"care_recipient_memberships\" violates check constraint \"care_recipient_memberships_status_check\"\nDETAIL:  Failing row contains (3a383048-ae7a-41e4-a273-b984787a9d87, d656f14f-a751-4f9a-a676-52df28d0a4c5, 6e367208-daa0-4a01-989e-e7f78e869734, professional, f, f, 2026-11-09 14:15:39.640162+00, inactive).\n\n\u001b[90m   at \u001b[39m..\\..\\scripts\\test-environment.mjs:179\n\n  177 |   );\n  178 |   if (result.status !== 0)\n> 179 |     throw new Error(`Local SQL failed: ${result.stderr.trim()}`);\n      |           ^\n  180 |   return result.stdout.trim();\n  181 | }\n  182 |\n\u001b[2m    at sql (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\scripts\\test-environment.mjs:179:11)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Proj"
+            ]
+          },
+          {
+            "title": "ENT conciliação preserva material decimal e solução pessoal indisponível até escolha e referência explícitas",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 162,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT cancelamento pending retoma motivo e fechar a revisão não antecipa cancelamento ou devolução",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 255,
+              "column": 7
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT cancelamento accepted retoma motivo e fechar a revisão não antecipa cancelamento ou devolução",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 255,
+              "column": 7
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT recusa retoma o pedido original e só adota outro pedido após comparação explícita",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 291,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "TimeoutError: locator.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('textbox', { name: 'Motivo / justificativa', exact: true })\u001b[22m\n\n\n  296 |   await login(page, f.patient, \"professional\");\n  297 |   await open(page, f.document.id, \"Recusar pedido de cancelamento\");\n> 298 |   await reason(page).fill(entReason);\n      |                      ^\n  299 |   await save(page);\n  300 |   let newer = await entSend(f.admin, f.document, \"withdraw_cancellation\", {\n  301 |     requestId: original.id,\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\ent-operation-private-drafts.spec.ts:298:22\u001b[22m"
+            ]
+          },
+          {
+            "title": "ENT retirada retoma justificativa e recupera a mesma intenção depois de resposta perdida",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 369,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "TimeoutError: locator.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('textbox', { name: 'Motivo / justificativa', exact: true })\u001b[22m\n\n\n  373 |   await login(page, f.patient);\n  374 |   await open(page, f.document.id, \"Retirar meu pedido de cancelamento\");\n> 375 |   await reason(page).fill(entReason);\n      |                      ^\n  376 |   await save(page);\n  377 |   await open(page, f.document.id, \"Retirar meu pedido de cancelamento\");\n  378 |   await resume(page);\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\ent-operation-private-drafts.spec.ts:375:22\u001b[22m"
+            ]
+          },
+          {
+            "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "supply-private-drafts.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "supply-private-drafts.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      },
+      "ent-operation-final": {
+        "stats": {
+          "total": 6,
+          "expected": 6,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "reportSha256": "4b722ed7f8586952f53ca8db313642ff0e1e499a63f8c593f1ac11b70af7ac04",
+        "cases": [
+          {
+            "title": "ENT retoma destinatário em outra sessão preserva pessoa indisponível e recupera uma troca sem repeti-la",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 65,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT recusa retoma o pedido original e só adota outro pedido após comparação explícita",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 291,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT retirada retoma justificativa e recupera a mesma intenção depois de resposta perdida",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 369,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT retoma destinatário em outra sessão preserva pessoa indisponível e recupera uma troca sem repeti-la",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 65,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT recusa retoma o pedido original e só adota outro pedido após comparação explícita",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 291,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT retirada retoma justificativa e recupera a mesma intenção depois de resposta perdida",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "ent-operation-private-drafts.spec.ts",
+              "line": 369,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      },
+      "ent-operation-ci-repair-initial": {
+        "stats": {
+          "total": 10,
+          "expected": 9,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "reportSha256": "e3edf8dcbe46fa163a3435c3d58323c63ae2ed63dc5fec0e5df1a44543c97f9c",
+        "cases": [
+          {
+            "title": "C-FINAL023 anexos ocultam lista recusada e recuperam leitura sem perder arquivo escolhido",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "attachment-attempts.spec.ts",
+              "line": 59,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "seleção em REQ mantém alias, teclado, categoria e entrada manual",
+            "path": [
+              "catálogo com 1 itens"
+            ],
+            "projectName": "ios",
+            "location": {
+              "file": "catalogue-scale.spec.ts",
+              "line": 54,
+              "column": 11
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "seleção em REQ mantém alias, teclado, categoria e entrada manual",
+            "path": [
+              "catálogo com 5 itens"
+            ],
+            "projectName": "ios",
+            "location": {
+              "file": "catalogue-scale.spec.ts",
+              "line": 54,
+              "column": 11
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "seleção em REQ mantém alias, teclado, categoria e entrada manual",
+            "path": [
+              "catálogo com 20 itens"
+            ],
+            "projectName": "ios",
+            "location": {
+              "file": "catalogue-scale.spec.ts",
+              "line": 54,
+              "column": 11
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "seleção em REQ mantém alias, teclado, categoria e entrada manual",
+            "path": [
+              "catálogo com 100 itens"
+            ],
+            "projectName": "ios",
+            "location": {
+              "file": "catalogue-scale.spec.ts",
+              "line": 54,
+              "column": 11
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-preparation.spec.ts",
+              "line": 73,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "P06 escolha manual exige motivo, revisa quem recebe e recupera uma única expedição sem aceite substituto",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-preparation.spec.ts",
+              "line": 97,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "P05 proposta e conferência independentes preservam autoria, recuperam o mesmo ato e produzem dossiê PDF",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 132,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "P05 profissional futuro encontra sua tarefa e relata apenas apuração própria sem substituir o aceite",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 312,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByText('Encerramento administrativo · situação física ainda desconhecida', { exact: true })\nExpected: visible\nReceived: hidden\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText('Encerramento administrativo · situação física ainda desconhecida', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Encerramento administrativo · situação física ainda desconhecida', { exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <p class=\"mt-3 text-xs\">Encerramento administrativo · situação física ain…</p>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  353 |       { exact: true },\n  354 |     ),\n> 355 |   )"
+            ]
+          },
+          {
+            "title": "aviso real de compra abre a ficha e conserva o paciente anunciado",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "language-navigation-filters.spec.ts",
+              "line": 39,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      },
+      "ent-operation-ci-repair-middle": {
+        "stats": {
+          "total": 1,
+          "expected": 0,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "reportSha256": "187b1a0f891ae38aaa6147e6f46a26fa65a4cdfb1ae5e0274f901857da181677",
+        "cases": [
+          {
+            "title": "P05 profissional futuro encontra sua tarefa e relata apenas apuração própria sem substituir o aceite",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 312,
+              "column": 5
+            },
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByText('Encerramento administrativo · situação física ainda desconhecida', { exact: true })\nExpected: visible\nReceived: hidden\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" getByText('Encerramento administrativo · situação física ainda desconhecida', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Encerramento administrativo · situação física ainda desconhecida', { exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <p class=\"mt-3 text-xs\">Encerramento administrativo · situação física ain…</p>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  354 |       { exact: true },\n  355 |     ),\n> 356 |   )"
+            ]
+          }
+        ]
+      },
+      "ent-operation-ci-repair-final": {
+        "stats": {
+          "total": 1,
+          "expected": 1,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "reportSha256": "e7b5b27919675d816153f10436766f2e82013209616c0a444d5d37fcb92fe487",
+        "cases": [
+          {
+            "title": "P05 profissional futuro encontra sua tarefa e relata apenas apuração própria sem substituir o aceite",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-regularization.spec.ts",
+              "line": 312,
+              "column": 5
+            },
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      }
+    },
+    "reuse": [
+      "Product sources frozen throughout every runner; no mutable database suite in parallel",
+      "Only6 failed new ENT cases repeated after test-only fixture/accessibility-label corrections;14 approved cases preserved",
+      "CI repair9 approved cases preserved;one finding case repeated after selecting its Materials tab;middle wrong Overview selection and original failure retained",
+      "Only notification test heading selector changed;five unrelated list selectors preserved",
+      "No increased timeouts,removed assertions,cases,axe rules or backend negatives"
+    ]
+  },
+  "logLfSha256": {
+    "ent-operation-unit.log": "2f35ffc3ca4f30575a573e3908531b7fb5e8cf5525268340192f84a7498a3093",
+    "ent-operation-db-tests.log": "dbc3ddfb4f44c64e8e5bfe58a80caa714b8724ca7fb24dbf92de8cde034d7e3e",
+    "ent-operation-db-final.log": "ec05018b91612d875e8c52c0cb9ffacf3a566def344f6ea17c9cd105f6e4bdeb",
+    "ent-operation-post-final.log": "f95aa762fbd009aad0e343f7b97a878ac7232ac1ca9f8086a6ac7689ecbd6b9a",
+    "ent-operation-e2e-initial.log": "58cf0d33b21d11c202b7d896af555f0f98d25253a241072da139c39550f17cbc",
+    "ent-operation-e2e-final.log": "5303726085f196d5c19071b804d2d5a1a2a8c489a3bfd62518713b67b6b0a862",
+    "ent-operation-ci-repair-e2e.log": "23ebf1b65f430b9cca7e4586aa50270e72ea802352e57c9fc94caaffb1a8700b",
+    "ent-operation-ci-repair-final.log": "a025a7b820828d770b0b610d50e261c422d28183adf8d433593db60f819f20c7",
+    "ent-operation-ci-repair-final2.log": "bef610671a7598a24c7afdab87ca8269a10b5c76a187ef68ba34a2604d273745",
+    "ent-operation-types-final.log": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+    "ent-operation-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-operation-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-operation-e2e-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ent-operation-markdown.log": "3525207016e69540fe72736cae90c53c89237d48cf804d89c900290c27ab5e27",
+    "ent-operation-final-selectors-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "visual": {
+    "axe": "directed approved cases;no full assistive/human approval",
+    "inspectedViewportCaptures": [
+      {
+        "project": "chromium",
+        "sha256": "1006b8befcc6020c870320e8010f44a7e1492f918c170daccca93dcff61525c9"
+      },
+      {
+        "project": "ios",
+        "sha256": "cbf9bc5fb1b01196c47b27f4b9bea96ed0bb88fa81057e00ec949c1a9a864ebc"
+      }
+    ]
+  },
+  "ci": {
+    "priorShaObservation": "CI_56B445E_OBSERVATION.json",
+    "priorValidation": "Windows/Ubuntu/database PASS;Preview READY;browsers fail or pending as observed",
+    "ownShaRequired": true,
+    "remainingKnownFailures": [
+      "Cross-patient context selection before tabs in PDF consumers",
+      "COM close-expectation stale private reference adoption in existing consumer",
+      "Workflow exact text duplicates and new tab/header locations",
+      "BAL pending new-target read must not assert controls of old document",
+      "Mobile dialog focus and Web Push audit regression;other full-CI findings remain subject to directed verification"
+    ]
+  },
+  "remote": "ENT_OPERATION_DRAFTS_REMOTE.json",
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30ColumnsUnchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "historicalMigrationsUnchanged": 84,
+    "newMigrations": 1
+  },
+  "limits": [
+    "Five new ENT purposes,not all ENT contextual forms",
+    "consent_cancel consumption references,administrative regularization,transfer,BAL/REQ contextual decisions remain",
+    "CI own SHA,full canonical parity and66/171 remain",
+    "No physical/human/AT/provider equivalence;Sonar deferred;PR7 Draft;production NO-GO",
+    "No new signature,backup,monitoring or transport approval"
+  ],
+  "documentation": {
+    "markdownFiles": 5,
+    "localLinksChecked": 345,
+    "markdownIssues": 0
+  }
+}

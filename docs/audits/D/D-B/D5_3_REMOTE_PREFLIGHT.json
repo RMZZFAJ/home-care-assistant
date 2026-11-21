@@ -1,0 +1,115 @@
+{
+  "status": "PREFLIGHT_ACCEPTED_FOR_PENDING_ONLY_APPLICATION",
+  "at": "2026-11-07T22:04:22.454Z",
+  "project": "qwfrqychokvhdzakibid",
+  "sourceHead": "40161055629b710e6c495941d4931ffd3c4b4656",
+  "sourceDirty": true,
+  "ownerAmendment": "OWNER_AMENDMENTS.md#reconciliação-remota-antecipada--fechamento-de-d51",
+  "before": 144,
+  "target": 145,
+  "pending": [
+    {
+      "file": "20261107213013_phase_d5_legacy_reminder_recovery.sql",
+      "sha256": "d8811bd76b19bbc583d303e6fb592144cd099743219f8fb3326d4ffad0e631be"
+    }
+  ],
+  "remoteHistorySqlMatched": 144,
+  "remoteStructuralDrift": [],
+  "backup": {
+    "id": "6681a390-179c-4172-83db-22338589ad5e",
+    "manifestSha256": "ce349754ef70a5ab33505b63f7496aa7e915b54d4ddbc731102dccb484b00c36",
+    "files": 78,
+    "bytes": 10304691,
+    "authenticated": true,
+    "restoredTables": 139,
+    "stableTableDigestsMatched": true,
+    "foreignKeysChecked": true,
+    "storageObjects": 32,
+    "pdfDigests": 31,
+    "signedIssuanceDigests": 0,
+    "probeUpgradeMigrations": 1,
+    "seconds": 4.574,
+    "destination": "Operator computer outside Git; owner-only ACL; separate encryption key",
+    "operationalExternalBackupActive": false
+  },
+  "catalogueComparison": {
+    "views": false,
+    "columns": true,
+    "indexes": true,
+    "defaults": true,
+    "policies": true,
+    "triggers": true,
+    "functions": true,
+    "relations": true,
+    "constraints": false,
+    "table_grants": true,
+    "function_grants": true
+  },
+  "compatibility": {
+    "status": "LEGACY_SCHEDULER_COMPATIBLE_WITH_REMOTE_144",
+    "existingIdentitiesPreserved": 386,
+    "existingPublicIdentitiesPreserved": 229,
+    "existingFunctionAuthoritiesAndGrantsPreserved": true,
+    "changedDefinitions": [
+      "private.enqueue_scheduled_reminders",
+      "public.fluent_pre_shift_scheduler"
+    ],
+    "publicEntryUnchanged": "run_operational_schedule()",
+    "response": "Prior keys retained; additive legacyReminderPatients/Failures/Gaps; published worker forwards schedule JSON",
+    "obligationProducers": "Existing enqueue_notice and operational_reminders, no new business-obligation engine; modern BAL producer retained",
+    "initialHistoricalBackfill": false,
+    "probeQualifications": {
+      "views": "Existing pg_dump/reparse alias normalization; live catalogue comparison required after apply",
+      "constraints": "Only known presentation_finite_factor local validation qualification; exact predicate"
+    },
+    "previewHead": "40161055629b710e6c495941d4931ffd3c4b4656",
+    "productionHead": "8ec979aac340bbc19ec64288bf0acf3abea4711a"
+  },
+  "localValidation": {
+    "realAuthConsumers": "16/16; six scheduler cases, nine personal reference cases and existing concurrent REQ scheduler",
+    "baselineCounterproof": "95/101 eligible configurations after three rounds on old implementation; fixture enum failure kept separately",
+    "preflight": "Rolled-back DDL/current/catchup/policy-version-gap/failure-recovery/grants PASS; alias ambiguity corrected before local apply",
+    "filesystem": "9/9 final; six retention/integrity/concurrency and three snapshots, including real SQL negative policy/version/cause/business changes",
+    "backupCli": "Actual critical capture and independent verify PASS; scheduling disabled",
+    "sourceCaptureContract": "Actual remote capture used v1; v2 projection/query proved on real local SQL and backwards v1 restore proved",
+    "typesLint": "Affected Node/scripts lint PASS; no TS/UI runtime changed from 4016105",
+    "ciBase": "4016105 database and validate Linux/Windows SUCCESS; browsers in progress at last observation",
+    "currentCi": "NOT_PUBLISHED_YET"
+  },
+  "sourcePreservation": {
+    "stableTablesMatchedImmediatelyBeforeApply": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.scheduler_health"
+    ]
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0,
+    "originalCronStates": [
+      {
+        "active": true,
+        "name": "hca-notification-worker",
+        "schedule": "* * * * *"
+      },
+      {
+        "active": true,
+        "name": "hca-operational-lifecycle",
+        "schedule": "* * * * *"
+      }
+    ]
+  },
+  "dryRun": {
+    "pending": 1,
+    "seeds": [],
+    "roles": [],
+    "skipVault": true
+  },
+  "limits": [
+    "No operational GO",
+    "No reset, remote fixtures, Auth configuration or external transport activation",
+    "Probe restore is not a D6 operational recovery test",
+    "Current source CI remains separate"
+  ]
+}

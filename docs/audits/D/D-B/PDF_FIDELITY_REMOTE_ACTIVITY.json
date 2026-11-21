@@ -1,0 +1,42 @@
+{
+  "at": "2026-11-08T10:40:39.601Z",
+  "project": "qwfrqychokvhdzakibid",
+  "firstPostSnapshot": "fidelity-state-post-post1.json",
+  "firstPostRefusalPreserved": true,
+  "originalHistoryRows": 21,
+  "allOriginalHistoryRowsByteExact": true,
+  "appendedHistoryRows": 1,
+  "incidentRows": 8,
+  "onlyChangedIncident": {
+    "environment": "preview",
+    "component": "application",
+    "code": "HEARTBEAT_STALE",
+    "oldSeverity": "warning",
+    "newSeverity": "critical",
+    "oldVersion": 1,
+    "newVersion": 2,
+    "changedStableFields": [
+      "severity",
+      "version"
+    ],
+    "systemAction": "escalated",
+    "observedAt": "2026-11-08T10:26:00.137446+00:00",
+    "actor": "system"
+  },
+  "beforeMigrationTransaction": true,
+  "readOnlyReconstructionMatchesCapturedPreAndPostDigests": true,
+  "closedEnumCandidates": 3,
+  "laterActivityNotMisclassifiedAsDdlChange": [
+    {
+      "action": "recovered",
+      "at": "2026-11-08T10:34:00.189839+00:00",
+      "version": 3
+    }
+  ],
+  "otherStableTables": 149,
+  "all151TablesByteEqual": false,
+  "backupComparatorWeakened": false,
+  "remoteRowsModifiedByQualification": false,
+  "localRealRowsModified": false,
+  "qualification": "Existing preview heartbeat incident escalated before the CLI apply. Original history prefix is byte-exact and adding that exact immutable event reproduces captured post history. Only severity/version of one original incident reproduce the captured post stable digest among three schema-enum candidates. Later recovery is separate. No blanket exclusions, remote mutation or product-monitor suppression."
+}

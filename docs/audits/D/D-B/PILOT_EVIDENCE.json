@@ -1,0 +1,73 @@
+{
+  "at": "2026-11-08T00:16:17.981545+00:00",
+  "sourceBaseSha": "1e11536f4a4f25c7167bd58af211fd9580f1bf23",
+  "scope": "DOCUMENTARY_PILOT_RUNBOOK_USING_EXISTING_IMPLEMENTED_CONTROLS",
+  "runbook": "PILOT_AND_CONTINGENCY.md",
+  "controls": [
+    "Private resumable global preparation before patient creation",
+    "Explicit state/timezone/initial administrator and distinct continuity owner/substitute",
+    "Planning never creates or accepts a membership; global creator receives no clinical role",
+    "CAS review and same-intention recovery preserve fields and prevent duplicate creation",
+    "Patient-scoped links for catalogue, stock, schedules, BAL and communication",
+    "preparationStatus.productionApproved is always false; human/physical gates separate"
+  ],
+  "reusedEvidence": {
+    "file": "D3_5_EVIDENCE.json",
+    "exactLfSourceHashesMatched": {
+      "src/components/guides/residence-preparation.tsx": "ffde465f580c3916295dc459191bcf532ea39da0ef9c7fb880fcddd6bdd9ff80",
+      "src/app/api/residence-preparations/route.ts": "dc6ff82305dc1a98c89fe46c021ba0c0b5da61010031f3d56ca16a027a54db65",
+      "src/lib/validation/residence-preparation.ts": "49a2f436e2f46b266d37d783d256d61acf4a0f55fb337c620de5e33cd0301104",
+      "src/lib/guide-content.ts": "458d602bdc4a57d90ee2d8512bbe5c7d6529f46c2fc600fe4ed649eaf9e239a1",
+      "supabase/migrations/20261107035508_phase_d3_residence_preparation_and_guides.sql": "09439e691682dd64e623a27c95327cf7c39275de79778b872c5a6e488ca69481",
+      "supabase/migrations/20261107040539_phase_d3_preparation_read_models.sql": "e7f96dc3a54477890dc6d14b18b9ca3f3ad8be7b8d9a2f1300b2c5fedc7781c9"
+    },
+    "recordedCases": {
+      "unit": 5,
+      "authBackend": 7,
+      "productionBrowserDistinct": 18
+    },
+    "reusedNotRerun": true,
+    "qualification": "Only unchanged preparation consumers and incremental DB contracts are reused. This does not approve current SHA CI, current global runtime, physical devices, human actors or operational GO. OPS3 observability/authority is separately tested."
+  },
+  "currentRemote": 148,
+  "currentCi": {
+    "sha": "1e11536f4a4f25c7167bd58af211fd9580f1bf23",
+    "run": 42428525557,
+    "status": "SUCCESS",
+    "observedAt": "2026-11-08T00:56:10.831060+00:00",
+    "receipt": "CI_1E11536_OBSERVATION.json",
+    "validatesNoticeTrackingIncrement": false
+  },
+  "newProductSourceChanges": false,
+  "newMigrations": 0,
+  "newRemoteBusinessOrAuthFixture": false,
+  "designations": {
+    "residence": "NOT_SELECTED_BY_AGENT",
+    "operationalResponsible": "OWNER_TO_DESIGNATE",
+    "substitute": "OWNER_TO_DESIGNATE",
+    "backupKeyCustodian": "OWNER_TO_DESIGNATE"
+  },
+  "gates": {
+    "actualFirstResidence": "PENDING_OWNER",
+    "rolesAndAcceptance": "PENDING_OWNER",
+    "physicalDeviceAndAT": "PENDING_D_C_D6",
+    "providerHomologation": "NOT_APPROVED",
+    "independentBackupAndKeyRecovery": "PENDING_D6",
+    "operationalRpoRto": "NOT_PROVED",
+    "externalAvailability": "NOT_PROVED_BY_INTERNAL_MONITOR",
+    "operationalGo": false
+  },
+  "missionComplete": false,
+  "runbookLfSha256": "e4e9e5d5831e3be938f5ba61e43a709c032ff8a9425bf2eebaf4b355b74faf9c",
+  "documentaryValidation": {
+    "markdown": "PASS after shortening table cells without rule suppression",
+    "localLinks": "PASS 136 local targets across six changed Markdown files",
+    "functionalTestsRepeatedForDocs": false,
+    "logLfSha256": {
+      "pilot-markdown.log": "06df4b81d182725e7d9aa867d80a38776d961cd2949cd87635a27215382ec0d8",
+      "pilot-markdown-recheck.log": "38bf8a67f07f4e3936a813a38269eecc4b267f012671131ef53776e3935bce44",
+      "pilot-markdown-final.log": "2464909026cd5ddf4de15adf1212558739b7375cf9726b17ed7cd9cfccf0003f",
+      "notice-stage-markdown.log": "686c5faf1118cdcc77f1be230b9f928184afcac2385be1698e0caba44f64f6a6"
+    }
+  }
+}

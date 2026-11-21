@@ -5,6 +5,7 @@ import { setInterval, clearInterval } from "node:timers";
 import { createClient } from "@supabase/supabase-js";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { archiveIntention, sealSignedArchive } from "./document-archive-fixtures.mjs";
 
 import {
   env,
@@ -69,10 +70,11 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
   assert.ifError(secondLines.error);
   const family = await actor("family", patient);
   const payload = {
+    recipientReason: "Escolha manual fictícia para este recebimento",
     source: "FAMILY",
     destination: "CARE_TEAM",
     recipientId: fixtures.professional.id,
-    lines: products.map((productId, i) => ({
+    lines: products.map((productId, i) => ({ requestFulfillment: "complete",
       productId,
       quantity: i ? "2" : "10",
       requisitionItemIds: [
@@ -137,12 +139,12 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
     currentSnapshot.canonical_snapshot.fulfillmentLines.filter(
       (line) => line.attended,
     ).length,
-    2,
+    1,
   );
   assert.equal(
     (await rpc(pro, "requisition_fulfillment", { p_requisition: req.id }))
       .fulfilled,
-    2,
+    1,
   );
   assert.equal(
     (
@@ -150,7 +152,7 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
         p_requisition: second.requisition_id,
       })
     ).fulfilled,
-    1,
+    0,
   );
   assert.equal(
     (await rpc(pro, "requisition_progress", { p_id: req.id })).completedAt,
@@ -170,6 +172,16 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
   });
   assert.equal(fixed.status, "confirmed");
   assert.equal(fixed.fullyCheckedLines, 1);
+  assert.equal((await rpc(admin, "requisition_progress", { p_id: req.id })).completedAt, null);
+  const stockBeforeReview = sql(`select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(patient)}`);
+  await rpc(family, "review_request_fulfillment", {
+    p_document: ent.id, p_line: first.id, p_decision: "complete",
+    p_reason: "As seis unidades recebidas atendem a necessidade compartilhada",
+    p_key: randomUUID(), p_version: fixed.version,
+  });
+  assert.equal(sql(`select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(patient)}`), stockBeforeReview);
+  assert.equal((await rpc(pro, "requisition_fulfillment", { p_requisition: req.id })).fulfilled, 2);
+  assert.equal((await rpc(pro, "requisition_fulfillment", { p_requisition: second.requisition_id })).fulfilled, 1);
   const finished = await rpc(admin, "requisition_progress", { p_id: req.id });
   assert.ok(finished.completedAt);
   assert.equal(finished.manualArchiveRequired, false);
@@ -200,11 +212,21 @@ test("V4: shared needs, partial receipt, formal resolution and science remain in
       })
     ).error,
   );
-  const archived = await rpc(admin, "archive_requisition", {
-    p_id: req.id,
-    p_reason: "Conferência administrativa concluída",
-  });
-  assert.ok(archived.archivedAt);
+  const reviewed = await rpc(admin, "document_archive_reference", { p_document: req.id });
+  const reason = "Conferência administrativa concluída";
+  const current = await rpc(admin, "requisition_decision_context", { p_id: req.id });
+  assert.equal((await admin.rpc("execute_document_decision", {
+    p_document: req.id, p_key: randomUUID(), p_intention: {
+      domain: "requisition", action: "archive", expectedVersion: current.documentVersion,
+      referenceHash: current.referenceHash, body: { reason },
+    },
+  })).error?.code, "PT409");
+  const intent = archiveIntention(reviewed, reason);
+  const archived = await sealSignedArchive(admin, intent);
+  assert.ok(archived.archivedAt && archived.issuanceId);
+  const recovered = await rpc(admin, "archive_requisition", { p_id: req.id, p_reason: reason });
+  assert.equal(recovered.archivedAt, archived.archivedAt);
+  assert.equal(recovered.archiveReason, reason);
 });
 
 test("V4: local changes apply immediately; global proposals need a different local person", async () => {
@@ -212,7 +234,7 @@ test("V4: local changes apply immediately; global proposals need a different loc
   const local = await rpc(admin, "configure_patient_access", {
     p_patient: patient,
     p_kind: "settings",
-    p_change: { scienceByDispatch: false },
+    p_change: { scienceRequired: false },
     p_key: randomUUID(),
     p_version: 1,
   });
@@ -269,12 +291,12 @@ test("V4: completion without science permanently blocks automatic archive and pr
   await rpc(admin, "configure_patient_access", {
     p_patient: patient,
     p_kind: "settings",
-    p_change: { scienceByDispatch: false },
+    p_change: { scienceRoles: ["family"], scienceUsers: [] },
     p_key: randomUUID(),
     p_version: 1,
   });
   const req = await issue(patient, [products[0]]),
-    ent = await delivery(patient, req, [products[0]]);
+    ent = await delivery(patient, req, [products[0]], {}, "adminA");
   const pro = await actor("professional", patient);
   await rpc(pro, "supply_document_command", {
     p_id: ent.id,
@@ -294,6 +316,7 @@ test("V4: completion without science permanently blocks automatic archive and pr
     auth: { persistSession: false },
   });
   await rpc(service, "run_operational_schedule");
+  await rpc(service, "claim_scheduled_document_archives", { p_limit: 2 });
   assert.equal(
     (await rpc(admin, "requisition_progress", { p_id: req.id })).archivedAt,
     null,
@@ -307,26 +330,23 @@ test("V4: completion without science permanently blocks automatic archive and pr
   assert.equal(progress.scienceSatisfied, true);
   assert.equal(progress.manualArchiveRequired, true);
   await rpc(service, "run_operational_schedule");
+  await rpc(service, "claim_scheduled_document_archives", { p_limit: 2 });
   assert.equal(
     (await rpc(admin, "requisition_progress", { p_id: req.id })).archivedAt,
     null,
   );
-  assert.ok(
-    (
-      await rpc(admin, "archive_requisition", {
-        p_id: req.id,
-        p_reason: "Arquivamento manual com evidência da exceção",
-      })
-    ).archivedAt,
-  );
+  assert.equal(sql(`select count(*) from private.document_archive_attempts where document_id=${sqlLiteral(req.id)} and prepared_by is null`), "0");
+  const review = await rpc(admin, "document_archive_reference", { p_document: req.id });
+  const attempt = await sealSignedArchive(admin, archiveIntention(review, "Arquivamento manual com evidência da exceção"));
+  assert.ok(attempt.archivedAt && attempt.issuanceId);
 });
 
-test("V4: automatic science requires both policy and personal consent, preserving its actual origin", async () => {
+test("V4: legacy header visibility consent cannot record new SCI and the manual alternative remains available", async () => {
   const { patient, admin, products } = await setup();
   await rpc(admin, "configure_patient_access", {
     p_patient: patient,
     p_kind: "settings",
-    p_change: { scienceAutomatic: true, scienceByDispatch: false },
+    p_change: { scienceAutomatic: true },
     p_key: randomUUID(),
     p_version: 1,
   });
@@ -369,16 +389,18 @@ test("V4: automatic science requires both policy and personal consent, preservin
       scienceWhatsApp: false,
     },
   });
-  const accepted = await rpc(family, "acknowledge_requisition", {
+  assert.ok((await family.rpc("acknowledge_requisition", {
     p_id: req.id,
     p_mode: "app_visible",
     p_version: 1,
-  });
+  })).error);
+  assert.equal((await rpc(family, "requisition_progress", { p_id: req.id })).science.length, 0);
+  const accepted = await rpc(family, "acknowledge_requisition", { p_id: req.id, p_mode: "express", p_version: 1 });
   assert.equal(accepted.scienceSatisfied, true);
-  assert.equal(accepted.science[0].mode, "app_visible");
+  assert.equal(accepted.science[0].mode, "express");
   const repeated = await rpc(family, "acknowledge_requisition", {
     p_id: req.id,
-    p_mode: "app_visible",
+    p_mode: "express",
     p_version: 1,
   });
   assert.equal(repeated.science.length, 1);
@@ -827,7 +849,7 @@ test("V4: purpose-bound receipt Flow preserves partial stock and no-issues never
   );
 });
 
-test("V4: WhatsApp science requires verified contact, consent and correlated template evidence (local provider contract)", async () => {
+test("V4: WhatsApp read remains communication and new identified SCI awaits external homologation (local contract)", async () => {
   const { patient, admin, products } = await setup(),
     service = createClient(env.url, env.serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -862,7 +884,7 @@ test("V4: WhatsApp science requires verified contact, consent and correlated tem
     p_change: {
       scienceWhatsApp: true,
       scienceAutomatic: true,
-      scienceByDispatch: false,
+      scienceByDispatch: true,
     },
     p_key: randomUUID(),
     p_version: 1,
@@ -903,7 +925,7 @@ test("V4: WhatsApp science requires verified contact, consent and correlated tem
       p_worker: first.worker,
       p_hash: hash,
     }),
-    true,
+    false,
   );
   assert.equal(
     await rpc(service, "confirm_whatsapp_science", {
@@ -919,12 +941,12 @@ test("V4: WhatsApp science requires verified contact, consent and correlated tem
       p_phone: "15555550102",
       p_hash: hash,
     }),
-    true,
+    false,
   );
   assert.equal(
     (await rpc(family, "requisition_progress", { p_id: first.req.id }))
-      .science[0].mode,
-    "whatsapp_confirm",
+      .science.length,
+    0,
   );
   assert.equal(
     await rpc(service, "confirm_whatsapp_science", {
@@ -968,7 +990,8 @@ test("V4: WhatsApp science requires verified contact, consent and correlated tem
   });
   assert.equal(
     (await rpc(family, "requisition_progress", { p_id: second.req.id }))
-      .science[0].mode,
-    "whatsapp_read",
+      .science.length,
+    0,
   );
+  assert.equal(sql(`select state from public.requisition_notifications where id=${sqlLiteral(second.job.id)};`), "read", "Provider communication evidence survives without creating SCI");
 });

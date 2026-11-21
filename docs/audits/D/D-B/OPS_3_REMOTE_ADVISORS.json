@@ -1,0 +1,29 @@
+{
+  "at": "2026-11-08T00:05:26.010325+00:00",
+  "project": "qwfrqychokvhdzakibid",
+  "before": {
+    "rls_enabled_no_policy": 33,
+    "extension_in_public": 1,
+    "anon_security_definer_function_executable": 3,
+    "authenticated_security_definer_function_executable": 144,
+    "auth_leaked_password_protection": 1
+  },
+  "after": {
+    "rls_enabled_no_policy": 39,
+    "extension_in_public": 1,
+    "anon_security_definer_function_executable": 3,
+    "authenticated_security_definer_function_executable": 148,
+    "auth_leaked_password_protection": 1
+  },
+  "expectedDelta": {
+    "rls_enabled_no_policy": 6,
+    "authenticated_security_definer_function_executable": 4
+  },
+  "interpretation": "Six new private technical tables intentionally have no direct grants/policies. Four authenticated RPCs guard current global/patient authority. No new anonymous definer path. Existing public unaccent and leaked-password warning remain external configuration gates.",
+  "remediation": "https://supabase.com/docs/guides/database/database-linter",
+  "rawLfSha256": {
+    "before": "75e2abc2d20b4ccd9c1f667c90203675d14d7e1daaa30cfcf9a19b2405a3cc8d",
+    "after": "d5557f17b3bdcf8d2a7a576f620e4e0d398e15405a6311165cd6995c7115e8d6"
+  },
+  "operationalGo": false
+}

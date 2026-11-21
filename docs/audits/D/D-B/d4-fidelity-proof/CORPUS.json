@@ -1,0 +1,909 @@
+[
+  {
+    "label": "ent-received",
+    "file": "ent-received-d04402e7-7a7d-4eac-9815-6b621a60ce3f.pdf",
+    "code": "ENT-0001",
+    "publicRoot": "public-root-01b2ee582fa9b58c.crt",
+    "issuanceId": "d04402e7-7a7d-4eac-9815-6b621a60ce3f",
+    "documentId": "e37870c9-e451-41e0-a21f-348aa1cce718",
+    "version": 2,
+    "rendererRevision": 7,
+    "sha256": "9dc513fa241fa2df81a9c589dfbe2b8e520110577f55d935cf81c129f28f822a",
+    "sourceHash": "c7acbd70163316dddb34eb1a86b4ca82dbd0dfab3cb99709994a76795f3553b3",
+    "expectedText": [
+      "Lacre avariado no recebimento original; a nota deve sobreviver às resoluções.",
+      "Material avariado"
+    ],
+    "absentText": [
+      "Devolução à origem",
+      "Falta ou perda conciliada"
+    ],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T09:57:42.005121+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 5ab15b70",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T09:57:42.005121+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T09:57:41.982707+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/fichas/e37870c9-e451-41e0-a21f-348aa1cce718"
+  },
+  {
+    "label": "ent-returned",
+    "file": "ent-returned-cbeabeef-6f89-4756-89e1-eb4666fb6237.pdf",
+    "code": "ENT-0001",
+    "publicRoot": "public-root-01b2ee582fa9b58c.crt",
+    "issuanceId": "cbeabeef-6f89-4756-89e1-eb4666fb6237",
+    "documentId": "e37870c9-e451-41e0-a21f-348aa1cce718",
+    "version": 3,
+    "rendererRevision": 7,
+    "sha256": "c6047ffb76e69b6c1774581ca4acca5f0ef181e3594ea5f51fbbc6251cf0893f",
+    "sourceHash": "86789c797396b0f474bc8603fea26f17ec2c4d7fd490c167cddbe9fa7a9115b2",
+    "expectedText": [
+      "Lacre avariado no recebimento original; a nota deve sobreviver às resoluções.",
+      "Devolução à origem",
+      "Uma unidade avariada foi devolvida à origem."
+    ],
+    "absentText": [
+      "Outra unidade faltante foi conciliada sem inventar devolução."
+    ],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T09:57:42.005121+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 5ab15b70",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T09:57:42.005121+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 3
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T09:57:41.982707+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [
+        {
+          "lineId": "80559fc0-1dca-443f-9d5b-4e92c26e8312",
+          "reason": "Uma unidade avariada foi devolvida à origem.",
+          "actorId": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "eventId": "3689bcd0-63c8-40f5-80af-5b0f250f7c42",
+          "version": 3,
+          "quantity": "1",
+          "actorName": "Teste professional",
+          "recordedAt": "2026-11-08T09:57:42.094497+00:00",
+          "resolution": "returned"
+        }
+      ],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/fichas/e37870c9-e451-41e0-a21f-348aa1cce718"
+  },
+  {
+    "label": "ent-missing",
+    "file": "ent-missing-300671f7-0341-4a78-bc58-62ffbdaa4ec3.pdf",
+    "code": "ENT-0001",
+    "publicRoot": "public-root-01b2ee582fa9b58c.crt",
+    "issuanceId": "300671f7-0341-4a78-bc58-62ffbdaa4ec3",
+    "documentId": "e37870c9-e451-41e0-a21f-348aa1cce718",
+    "version": 4,
+    "rendererRevision": 7,
+    "sha256": "acc27f66731569ed4a994424ea71331fec907bea0bd293f62effd1d5c584a18e",
+    "sourceHash": "1bb752b4843ceccdf6a834d74739f2e776c86ee8ef3a392745a962106be73201",
+    "expectedText": [
+      "Lacre avariado no recebimento original; a nota deve sobreviver às resoluções.",
+      "Devolução à origem",
+      "Falta ou perda conciliada",
+      "Outra unidade faltante foi conciliada sem inventar devolução."
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T09:57:42.005121+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 5ab15b70",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T09:57:42.005121+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 3
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 4
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T09:57:41.982707+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [
+        {
+          "lineId": "80559fc0-1dca-443f-9d5b-4e92c26e8312",
+          "reason": "Uma unidade avariada foi devolvida à origem.",
+          "actorId": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "eventId": "3689bcd0-63c8-40f5-80af-5b0f250f7c42",
+          "version": 3,
+          "quantity": "1",
+          "actorName": "Teste professional",
+          "recordedAt": "2026-11-08T09:57:42.094497+00:00",
+          "resolution": "returned"
+        },
+        {
+          "lineId": "80559fc0-1dca-443f-9d5b-4e92c26e8312",
+          "reason": "Outra unidade faltante foi conciliada sem inventar devolução.",
+          "actorId": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "eventId": "1b40d3ec-9d99-408c-b173-b2bf1f629122",
+          "version": 4,
+          "quantity": "1",
+          "actorName": "Teste professional",
+          "recordedAt": "2026-11-08T09:57:42.18688+00:00",
+          "resolution": "missing"
+        }
+      ],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/fichas/e37870c9-e451-41e0-a21f-348aa1cce718"
+  },
+  {
+    "label": "com-receipts",
+    "file": "com-receipts-b8d9e839-c19d-4ab2-a9a2-fd1f0ed9f747.pdf",
+    "code": "COM-0001",
+    "publicRoot": "public-root-01b2ee582fa9b58c.crt",
+    "issuanceId": "b8d9e839-c19d-4ab2-a9a2-fd1f0ed9f747",
+    "documentId": "82f1c41d-2eaf-4b88-b86d-902f5b5561cf",
+    "version": 7,
+    "rendererRevision": 7,
+    "sha256": "d281225a8da79a2e70a08e6c43e8bf1010dc8d2c144c51cbfb3288bf3a55d0fd",
+    "sourceHash": "59a97aa92e6c47844516a862ad2ae9bf51415c878d9abd060d177c03d3aa6296",
+    "expectedText": [
+      "COMPRA DE INSUMOS DA FAMÍLIA",
+      "Aguardando conferência",
+      "Recebimento rejeitado",
+      "Recebimento validado",
+      "1ccf220b-cf44-4f47-9ca8-a14224f72279",
+      "76eda554-a005-45fe-aecd-8bea2cdfb24a",
+      "9a276e30-4be0-4a5b-abff-f64c73f5e22e",
+      "Registro de chegada rejeitado; não comprova entrada de material."
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T09:57:49.085154+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 9341248f",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T09:57:49.085154+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 3
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 4
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 5
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 6
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 7
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T09:57:49.075321+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": [
+        {
+          "action": "com.receive",
+          "actorId": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "eventId": "c4c57685-454f-4bfe-9f55-e2eda2ff6270",
+          "version": 3,
+          "actorName": "Teste family",
+          "receiptId": "1ccf220b-cf44-4f47-9ca8-a14224f72279",
+          "recordedAt": "2026-11-08T09:57:49.290785+00:00"
+        },
+        {
+          "action": "com.reject_receipt",
+          "actorId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "eventId": "4b1c03d2-a92c-4d6d-830f-cfdeba02baa6",
+          "version": 4,
+          "actorName": "Teste adminA",
+          "receiptId": "1ccf220b-cf44-4f47-9ca8-a14224f72279",
+          "recordedAt": "2026-11-08T09:57:49.326087+00:00"
+        },
+        {
+          "action": "com.receive",
+          "actorId": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "eventId": "9679cc26-9fb9-4343-90f4-3b373ad5f631",
+          "version": 5,
+          "actorName": "Teste family",
+          "receiptId": "76eda554-a005-45fe-aecd-8bea2cdfb24a",
+          "recordedAt": "2026-11-08T09:57:49.502525+00:00"
+        },
+        {
+          "action": "com.validate_receipt",
+          "actorId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "eventId": "a7dbc10c-2f4a-48aa-bce6-7c5f6dbf865c",
+          "version": 6,
+          "actorName": "Teste adminA",
+          "receiptId": "76eda554-a005-45fe-aecd-8bea2cdfb24a",
+          "recordedAt": "2026-11-08T09:57:49.555906+00:00"
+        },
+        {
+          "action": "com.receive",
+          "actorId": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "eventId": "2be2552e-93c7-417a-83bf-2a4ce5b2d3bd",
+          "version": 7,
+          "actorName": "Teste family",
+          "receiptId": "9a276e30-4be0-4a5b-abff-f64c73f5e22e",
+          "recordedAt": "2026-11-08T09:57:49.775934+00:00"
+        }
+      ]
+    },
+    "viewPath": "/fichas/dfd7c43a-2b01-433d-b5f2-0e08fff23b0c"
+  },
+  {
+    "label": "com-v6-recovered",
+    "file": "com-v6-recovered-2879179e-f242-404c-b832-ca695a55493a.pdf",
+    "code": "COM-0001",
+    "publicRoot": "public-root-01b2ee582fa9b58c.crt",
+    "issuanceId": "2879179e-f242-404c-b832-ca695a55493a",
+    "documentId": "82f1c41d-2eaf-4b88-b86d-902f5b5561cf",
+    "version": 7,
+    "rendererRevision": 6,
+    "sha256": "2520452cc8d1800234c9c27fd758ba1893a3a9405e69803bde3b960f73992a6c",
+    "sourceHash": "59a97aa92e6c47844516a862ad2ae9bf51415c878d9abd060d177c03d3aa6296",
+    "expectedText": [
+      "1ccf220b-cf44-4f47-9ca8-a14224f72279",
+      "76eda554-a005-45fe-aecd-8bea2cdfb24a",
+      "9a276e30-4be0-4a5b-abff-f64c73f5e22e"
+    ],
+    "absentText": [
+      "Evento desta parcela"
+    ],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T09:57:49.085154+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 9341248f",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T09:57:49.085154+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 3
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 4
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 5
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 6
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 7
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T09:57:49.075321+00:00"
+    },
+    "documentFacts": null,
+    "viewPath": "/fichas/dfd7c43a-2b01-433d-b5f2-0e08fff23b0c"
+  },
+  {
+    "label": "com-donation",
+    "file": "com-donation-df25cd8d-bd16-4d9c-b13d-a3e0493ac561.pdf",
+    "code": "COM-0002",
+    "publicRoot": "public-root-01b2ee582fa9b58c.crt",
+    "issuanceId": "df25cd8d-bd16-4d9c-b13d-a3e0493ac561",
+    "documentId": "dfd7c43a-2b01-433d-b5f2-0e08fff23b0c",
+    "version": 1,
+    "rendererRevision": 7,
+    "sha256": "978696616303dd72596ae040ef4df1f37ab952a153a95cbf1f224e80cb95c84b",
+    "sourceHash": "eca1d8358b8b075c6f58a2a143f031a8467cdbd89b93c4ed590127c1a669b783",
+    "expectedText": [
+      "DOAÇÃO DE INSUMOS À FAMÍLIA"
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T09:57:55.246571+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 9341248f",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T09:57:55.246571+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T09:57:55.2369+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/fichas/dfd7c43a-2b01-433d-b5f2-0e08fff23b0c"
+  },
+  {
+    "label": "bal-first",
+    "file": "bal-first-019919f8-4ab0-4925-9eb7-42c3ad813dbf.pdf",
+    "code": "BAL-0001",
+    "publicRoot": "public-root-01b2ee582fa9b58c.crt",
+    "issuanceId": "019919f8-4ab0-4925-9eb7-42c3ad813dbf",
+    "documentId": "2f17c19a-a5bd-4eb7-91db-c54bff1aee4d",
+    "version": 1,
+    "rendererRevision": 7,
+    "sha256": "b88bf4a7a825499d433ce5f680220f3cfada8bf39bf8f490f83ec20838cdc518",
+    "sourceHash": "37c25879d94f5d62be7363593fe04a40140d4837de806bbefbdcd39994ffba71",
+    "expectedText": [
+      "PRIMEIRA CONTAGEM DESTA FICHA",
+      "Primeira contagem desta ficha, sem afirmar primeira contagem da residência."
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T09:57:58.435205+00:00",
+      "issuerId": "959960bf-c2e6-4766-87d8-16b26c640dbc",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Profissional fictício de plantão",
+      "patientName": "Homologação fictícia V4 27ee2831",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T09:57:58.435205+00:00",
+      "historyActors": [
+        {
+          "id": "959960bf-c2e6-4766-87d8-16b26c640dbc",
+          "name": "Profissional fictício de plantão",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T09:57:58.419302+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/fichas/2f17c19a-a5bd-4eb7-91db-c54bff1aee4d"
+  },
+  {
+    "label": "bal-recount",
+    "file": "bal-recount-1ed0b420-6039-4d5a-ad4c-40e9e2f3f37a.pdf",
+    "code": "BAL-0001",
+    "publicRoot": "public-root-01b2ee582fa9b58c.crt",
+    "issuanceId": "1ed0b420-6039-4d5a-ad4c-40e9e2f3f37a",
+    "documentId": "2f17c19a-a5bd-4eb7-91db-c54bff1aee4d",
+    "version": 3,
+    "rendererRevision": 7,
+    "sha256": "752bf6870a711633318ffd1ac3575c742cfb0dad720483d8a12e25311ee1abb5",
+    "sourceHash": "20d67ef4622f6eccc6db64f87fcf994090fb071c230383ec52890357bcff15b0",
+    "expectedText": [
+      "RECONTO DO ESTOQUE DA EQUIPE",
+      "Parecer independente da primeira contagem preservada.",
+      "Registro de contagem anterior; não é parecer vigente da contagem atual.",
+      "Aprovação de contagem anterior; não é aprovação vigente da contagem atual.",
+      "Nova contagem física com autoria e política próprias."
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T09:57:58.435205+00:00",
+      "issuerId": "959960bf-c2e6-4766-87d8-16b26c640dbc",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Profissional fictício de plantão",
+      "patientName": "Homologação fictícia V4 27ee2831",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T09:57:58.435205+00:00",
+      "historyActors": [
+        {
+          "id": "959960bf-c2e6-4766-87d8-16b26c640dbc",
+          "name": "Profissional fictício de plantão",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "959960bf-c2e6-4766-87d8-16b26c640dbc",
+          "name": "Profissional fictício de plantão",
+          "source": "event_snapshot",
+          "version": 3
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T09:57:58.419302+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/fichas/2f17c19a-a5bd-4eb7-91db-c54bff1aee4d"
+  },
+  {
+    "label": "req-before-acceptance",
+    "file": "req-before-acceptance-01bd777e-7bf3-44fb-aab5-008fada6bbb6.pdf",
+    "code": "REQ-0001",
+    "publicRoot": "public-root-dd6706035a36d7b1.crt",
+    "issuanceId": "01bd777e-7bf3-44fb-aab5-008fada6bbb6",
+    "documentId": "607dd893-9dcb-4769-b425-e0e01c838ff1",
+    "version": 1,
+    "rendererRevision": 7,
+    "sha256": "172082f836eb0ba82d8252fcca5a3152c6707b29a1464023d0755fb66d7d8e7c",
+    "sourceHash": "c7f3f2b762a4846668e9b8401f3397175a6f95eed79a419f454c24c5d037d4ef",
+    "expectedText": [
+      "0 unidade (observado)",
+      "1,234567 mL (observado)",
+      "Não sei informar",
+      "Não informado",
+      "Registro no rascunho (horário do dispositivo)",
+      "FIM DA OBSERVAÇÃO REQ",
+      "Sem aceite positivo registrado"
+    ],
+    "absentText": [
+      "Atendimento com aceite positivo registrado"
+    ],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T10:10:44.531744+00:00",
+      "issuerId": "56df9007-7b26-4a89-a6db-6df8946dd579",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste professional",
+      "patientName": "Homologação fictícia V4 b59f3849",
+      "issuerSource": "origin_record",
+      "registeredAt": "2026-11-08T10:10:44.526336+00:00",
+      "historyActors": [
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T10:10:44.497433+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/historico/607dd893-9dcb-4769-b425-e0e01c838ff1"
+  },
+  {
+    "label": "req-current",
+    "file": "req-current-aeb8bf8f-e8d5-4d6e-857c-6b1a2c2df441.pdf",
+    "code": "REQ-0001",
+    "publicRoot": "public-root-dd6706035a36d7b1.crt",
+    "issuanceId": "aeb8bf8f-e8d5-4d6e-857c-6b1a2c2df441",
+    "documentId": "607dd893-9dcb-4769-b425-e0e01c838ff1",
+    "version": 4,
+    "rendererRevision": 7,
+    "sha256": "6aef0ebb7e365c3ea495bc220c67eb535f06d4c779d1f149e07786a0e9f86615",
+    "sourceHash": "a00d38487156bd34def4e7a3f14ce7106507e6d04ec212a065197a2d255ddce5",
+    "expectedText": [
+      "0 unidade (observado)",
+      "1,234567 mL (observado)",
+      "Não sei informar",
+      "Não informado",
+      "Registro no rascunho (horário do dispositivo)",
+      "FIM DA OBSERVAÇÃO REQ",
+      "Atendimento com aceite positivo registrado",
+      "Sem aceite positivo registrado"
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T10:10:44.531744+00:00",
+      "issuerId": "56df9007-7b26-4a89-a6db-6df8946dd579",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste professional",
+      "patientName": "Homologação fictícia V4 b59f3849",
+      "issuerSource": "origin_record",
+      "registeredAt": "2026-11-08T10:10:44.526336+00:00",
+      "historyActors": [
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 3
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 4
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T10:10:44.497433+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/historico/607dd893-9dcb-4769-b425-e0e01c838ff1"
+  },
+  {
+    "label": "req-legacy",
+    "file": "req-legacy-3ad8ba42-5c13-4c90-9fe6-6a2c5370139d.pdf",
+    "code": "HC-000008",
+    "publicRoot": "public-root-dd6706035a36d7b1.crt",
+    "issuanceId": "3ad8ba42-5c13-4c90-9fe6-6a2c5370139d",
+    "documentId": "062613bf-8702-441d-992d-18499dcaaab8",
+    "version": 1,
+    "rendererRevision": 7,
+    "sha256": "f3c78f0e268a2bba9a2e9586d37675f237eb531dd6608676c7dcc1e1bc7b2730",
+    "sourceHash": "9db48db6a3713a5617f75b21af7a79a71c3649dfa56c59eea862b71983c1ae9f",
+    "expectedText": [
+      "REQUISIÇÃO HISTÓRICA DE MATERIAIS",
+      "Horário da informação desconhecido",
+      "Atendimento não apurado na origem histórica"
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": null,
+      "issuerId": null,
+      "historical": true,
+      "importedAt": "2026-11-07T14:07:51.245427+00:00",
+      "issuerName": "Autora literal da ficha física",
+      "patientName": "Homologação fictícia V4 78c45db2",
+      "issuerSource": "origin_record",
+      "registeredAt": "2026-11-07T14:07:51.270812+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "import_record",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": null
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/historico/607dd893-9dcb-4769-b425-e0e01c838ff1"
+  },
+  {
+    "label": "bal-first",
+    "file": "bal-first-3228827d-e318-4303-b0e4-ec7d21cfacb4.pdf",
+    "code": "BAL-0001",
+    "publicRoot": "public-root-dd6706035a36d7b1.crt",
+    "issuanceId": "3228827d-e318-4303-b0e4-ec7d21cfacb4",
+    "documentId": "a8c23138-c6a6-4a51-80a3-b72420cab980",
+    "version": 1,
+    "rendererRevision": 7,
+    "sha256": "fa2d00105050825f27b488157ff75329878a0f34aa9810854e519cee25b8f6b9",
+    "sourceHash": "b1ee0f5f751894ffc9295dc2822cebe37773bf875d9b866bbe97db16ef3ed79c",
+    "expectedText": [
+      "PRIMEIRA CONTAGEM DESTA FICHA",
+      "Primeira contagem desta ficha, sem afirmar primeira contagem da residência."
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T10:11:03.651969+00:00",
+      "issuerId": "9ebc5df1-5821-43bb-8a20-2907c52729c8",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Profissional fictício de plantão",
+      "patientName": "Homologação fictícia V4 9b8f0aa0",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T10:11:03.651969+00:00",
+      "historyActors": [
+        {
+          "id": "9ebc5df1-5821-43bb-8a20-2907c52729c8",
+          "name": "Profissional fictício de plantão",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T10:11:03.625504+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/fichas/7d1a08cc-0d27-4579-a884-79f869fdb841"
+  },
+  {
+    "label": "bal-recount",
+    "file": "bal-recount-36ab6c23-44d7-4a6a-9794-ef5c116acda1.pdf",
+    "code": "BAL-0001",
+    "publicRoot": "public-root-dd6706035a36d7b1.crt",
+    "issuanceId": "36ab6c23-44d7-4a6a-9794-ef5c116acda1",
+    "documentId": "a8c23138-c6a6-4a51-80a3-b72420cab980",
+    "version": 3,
+    "rendererRevision": 7,
+    "sha256": "85cbb6169bbb7f89871caaf57aee42acabc8aab0fb5c285467fd4c8537658d83",
+    "sourceHash": "635f0039e99acba6007e02fac5dcc9bbcaa9786e23dfd34303940ecff5d423cf",
+    "expectedText": [
+      "RECONTO DO ESTOQUE DA EQUIPE",
+      "Parecer independente da primeira contagem preservada.",
+      "Registro de contagem anterior; não é parecer vigente da contagem atual.",
+      "Aprovação de contagem anterior; não é aprovação vigente da contagem atual.",
+      "Nova contagem física com autoria e política próprias."
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T10:11:03.651969+00:00",
+      "issuerId": "9ebc5df1-5821-43bb-8a20-2907c52729c8",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Profissional fictício de plantão",
+      "patientName": "Homologação fictícia V4 9b8f0aa0",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T10:11:03.651969+00:00",
+      "historyActors": [
+        {
+          "id": "9ebc5df1-5821-43bb-8a20-2907c52729c8",
+          "name": "Profissional fictício de plantão",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "9ebc5df1-5821-43bb-8a20-2907c52729c8",
+          "name": "Profissional fictício de plantão",
+          "source": "event_snapshot",
+          "version": 3
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T10:11:03.625504+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/fichas/7d1a08cc-0d27-4579-a884-79f869fdb841"
+  },
+  {
+    "label": "bal-legacy",
+    "file": "bal-legacy-ac297aa5-4dd4-4ed5-84b1-346660e6b64d.pdf",
+    "code": "BAL-0001",
+    "publicRoot": "public-root-dd6706035a36d7b1.crt",
+    "issuanceId": "ac297aa5-4dd4-4ed5-84b1-346660e6b64d",
+    "documentId": "7d1a08cc-0d27-4579-a884-79f869fdb841",
+    "version": 1,
+    "rendererRevision": 7,
+    "sha256": "388a0723ad2c960a730809a11ba0ee65e9354610e9e9a780c105c6ed29640a35",
+    "sourceHash": "ceb07d17f38699d5f1ef414402f10cec69ea6de400a8a41759ce8eeb0a398b48",
+    "expectedText": [
+      "CONTEXTO DE PLANTÃO NÃO PRESERVADO",
+      "Revisão facultativa"
+    ],
+    "absentText": [],
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T10:11:02.159647+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 70d36c10",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T10:11:02.159647+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T10:11:02.144439+00:00"
+    },
+    "documentFacts": {
+      "schemaVersion": 1,
+      "deliveryResolutions": [],
+      "purchaseReceiptEvents": []
+    },
+    "viewPath": "/fichas/7d1a08cc-0d27-4579-a884-79f869fdb841"
+  }
+]

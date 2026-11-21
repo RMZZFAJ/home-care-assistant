@@ -1,0 +1,39 @@
+{
+  "syntheticLocalFixtures": true,
+  "bindings": [
+    {
+      "engine": "chromium",
+      "documentId": "845ceaa5-161f-4ef2-b2f8-28cb0ddfb497",
+      "selectedVersion": 2,
+      "beforeVersion": 1,
+      "fileVersion": 2,
+      "fileSubject": "Representação de versão histórica · conteúdo v2 · renderizador V7",
+      "sourceHash": "7462336539ef45d7993a74c52515dd75c44eb7bcda3101c576a66206f2664f97",
+      "sha256": "4ca836e5a168d8875c0c7593365436025806511737f49054490e5c6948506b91",
+      "identityMatchesFrozenEvent": true
+    },
+    {
+      "engine": "mobile",
+      "documentId": "927e7b1b-da7a-40a8-a464-ba2c7af0b957",
+      "selectedVersion": 2,
+      "beforeVersion": 1,
+      "fileVersion": 2,
+      "fileSubject": "Representação de versão histórica · conteúdo v2 · renderizador V7",
+      "sourceHash": "52e7a6bf681e64e293097364fa2052c33fb3d302e08a96adf029df666dedd4bc",
+      "sha256": "9d43ea14e586ae9a6bc87c9ae8b56cf6ed695fa2e28da2ad4dd4539ec41a204a",
+      "identityMatchesFrozenEvent": true
+    },
+    {
+      "engine": "ios",
+      "documentId": "13cd93a2-24b6-4034-919c-53b303b5c59d",
+      "selectedVersion": 2,
+      "beforeVersion": 1,
+      "fileVersion": 2,
+      "fileSubject": "Representação de versão histórica · conteúdo v2 · renderizador V7",
+      "sourceHash": "3dd00b5467219d6448ca3c6ce9ed3fda4f7996402281d6133bfb9e014ce7aea7",
+      "sha256": "7e8d876f5041e32e924d90debb4cfe746c0bb6dad6da39294e132d8906bf337f",
+      "identityMatchesFrozenEvent": true
+    }
+  ],
+  "proof": "Embedded file version/sourceHash match the exact DB event. Successful case also verifies repeated download bytes, no extra issuance and unchanged event bodies/ledger. Not a new independent signature/trust validation."
+}

@@ -1,0 +1,60 @@
+{
+  "observedAt": "2026-11-07T22:06:32.818Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 29
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN",
+      "count": 1
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 3
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 144
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1
+    }
+  ],
+  "after": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 33
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN",
+      "count": 1
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 3
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 144
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1
+    }
+  ],
+  "approvalClaim": false,
+  "note": "Four new private RLS tables have no direct client/service grants. Existing function authorities and grants retained; one new private policy helper has no client/service execute. No additional authenticated or anonymous public entry. Historical extension/password warnings unchanged; no Auth configuration changed."
+}

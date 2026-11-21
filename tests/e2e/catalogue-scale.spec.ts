@@ -1,0 +1,263 @@
+import { expect, test, type Page } from "@playwright/test";
+import { mkdirSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { setup, fixtures } from "../integration/v4-fixtures.mjs";
+import { identityPhysicalState } from "../integration/catalogue-identity-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
+import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { selectContext } from "./auth-context";
+import { audit } from "./accessibility-audit";
+import { openDeliveryRecipient, recipientOption } from "./delivery-recipient";
+
+test.setTimeout(240_000);
+async function login(
+  page: Page,
+  patient: string,
+  email: string,
+) {
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Visão geral", exact: true }),
+  ).toBeVisible();
+  await selectContext(page, patient);
+}
+const next = (page: Page) =>
+  page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
+const status = (page: Page) =>
+  page.getByRole("status", {
+    name: "Resultado da busca e seleção de materiais",
+    exact: true,
+  });
+const selectedText = (count: number) =>
+  `${count} ${count === 1 ? "material selecionado" : "materiais selecionados"}`;
+
+for (const count of [1, 5, 20, 100]) {
+  test.describe(`catálogo com ${count} itens`, () => {
+    const definitions = Array.from({ length: count }, (_, i) => ({
+      name: (
+        `Material ${String(i + 1).padStart(3, "0")} ` +
+        "IdentificaçãoExtensa".repeat(6) +
+        " para seleção manual"
+      ).slice(0, 158),
+      category: ["medicamentos", "higiene", "dieta"][i % 3],
+      unit: "unidade",
+      aliases: [`Atalho ação ${String(i + 1).padStart(3, "0")}`],
+    }));
+    let f: Awaited<ReturnType<typeof setup>>, before: string;
+    let professionalEmail: string, adminEmail: string;
+    test.beforeAll(async () => {
+      f = await setup({ catalogue: definitions });
+      // Keep real roles while preventing accumulated shared fixture
+      // memberships from dominating the catalogue and accessibility checks.
+      const [professional, admin] = await Promise.all([shiftWorker(f.patient), shiftWorker(f.patient, "admin")]);
+      professionalEmail = professional.email;
+      adminEmail = admin.email;
+      before = identityPhysicalState(f);
+    });
+    for (const type of ["REQ", "COM", "ENT"] as const) {
+      test(`seleção em ${type} mantém alias, teclado, categoria e entrada manual`, async ({
+        page,
+      }, info) => {
+        try {
+          await login(
+            page,
+            f.patient,
+            type === "REQ" ? professionalEmail : adminEmail,
+          );
+          const catalog = await page.request.get(
+            `/api/catalog?careRecipientId=${f.patient}`,
+          );
+          expect(catalog.ok()).toBe(true);
+          expect((await catalog.json()).data).toHaveLength(count);
+          await page.goto(
+            `/fichas/${type.toLowerCase()}?careRecipientId=${f.patient}`,
+          );
+          if (type === "ENT") {
+            const preparation = await page.request.get(
+              `/api/documents/delivery-preparation?careRecipientId=${f.patient}&source=FAMILY`,
+            );
+            expect(preparation.ok()).toBe(true);
+            const person = (
+              (await preparation.json()).data.people as {
+                id: string;
+                name: string;
+              }[]
+            ).find((row) => row.id === fixtures.professional.id);
+            if (!person)
+              throw new Error(
+                "The controlled ENT fixture requires its authorized eligible recipient",
+              );
+            const picker = await openDeliveryRecipient(page);
+            const receiver = recipientOption(picker, person.name);
+            const card = receiver.locator("..");
+            await receiver.check();
+            await card.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
+            const geometry = () => card.evaluate(node => {
+              const r = node.getBoundingClientRect();
+              const x = r.left + r.width / 2, y = r.top + r.height / 2;
+              return {
+                bounds: { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: innerWidth, height: innerHeight },
+                inside: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight,
+                edges: [[x, r.top + 1], [x, r.bottom - 1], [r.left + 1, y], [r.right - 1, y]].map(([px, py]) => node.contains(document.elementFromPoint(px, py))),
+              };
+            });
+            try {
+              await expect.poll(geometry).toMatchObject({ inside: true, edges: [true, true, true, true] });
+              await expect(card).toBeInViewport({ ratio: 1 });
+            } catch (failure) {
+              await info.attach("recipient-geometry", { contentType: "application/json", body: JSON.stringify(await geometry()) });
+              throw failure;
+            }
+            await expect(receiver).toBeChecked();
+            await picker
+              .getByRole("textbox", { name: "Justificativa da escolha do recebedor", exact: true })
+              .fill(
+                "Escolha manual fictícia para percorrer a seleção de materiais",
+              );
+            await picker.getByRole("button", { name: "Usar recebedor", exact: true }).click();
+          }
+          await next(page);
+          const categories = page.getByRole("navigation", { name: "Tipos de material", exact: true });
+          await expect(
+            categories.getByRole("button", { name: /^Medicamentos/, pressed: true }),
+          ).toBeVisible();
+          const filter = () => page.getByRole("searchbox", { name: "Buscar material", exact: true });
+          const choice = (index: number) =>
+            page.getByRole("checkbox", {
+              name: definitions[index].name + " unidade",
+              exact: true,
+            });
+          await filter().click();
+          await filter().fill("  ATALHO--AÇÃO--001  ");
+          await expect(choice(0)).toBeVisible();
+          await expect(status(page)).toContainText("1 material encontrado");
+          await filter().focus();
+          await page.keyboard.press("Tab");
+          await expect(choice(0)).toBeFocused();
+          await page.keyboard.press("Space");
+          await expect(choice(0)).toBeChecked();
+          await expect(status(page)).toContainText(selectedText(1));
+          if (type !== "REQ")
+            await page
+              .getByRole("textbox", {
+                name: "Quantidade — " + definitions[0].name,
+                exact: true,
+              })
+              .fill("1");
+          await filter().fill("Sem correspondência no catálogo");
+          await expect(status(page)).toContainText("0 materiais encontrados");
+          await expect(status(page)).toContainText(selectedText(1));
+          await filter().fill(definitions[0].aliases[0]);
+          await expect(choice(0)).toBeChecked();
+          await categories.getByRole("button", { name: /^Higiene/ }).click();
+          await expect(
+            categories.getByRole("button", { name: /^Higiene/, pressed: true }),
+          ).toBeVisible();
+          await expect(status(page)).toContainText(selectedText(1));
+          if (count > 1) {
+            await filter().fill(definitions[1].aliases[0]);
+            await expect(choice(1)).not.toBeChecked();
+            await filter().focus();
+            await page.keyboard.press("Tab");
+            await expect(choice(1)).toBeFocused();
+            await page.keyboard.press("Space");
+            if (type !== "REQ")
+              await page
+                .getByRole("textbox", {
+                  name: "Quantidade — " + definitions[1].name,
+                  exact: true,
+                })
+                .fill("2");
+            await expect(status(page)).toContainText(selectedText(2));
+          }
+          await categories
+            .getByRole("button", { name: /Medicamentos/ })
+            .click();
+          await filter().fill(definitions[0].aliases[0]);
+          await expect(choice(0)).toBeChecked();
+          if (type !== "REQ")
+            await expect(
+              page.getByRole("textbox", {
+                name: "Quantidade — " + definitions[0].name,
+                exact: true,
+              }),
+            ).toHaveValue("1");
+          await expect(status(page)).toContainText(
+            selectedText(count > 1 ? 2 : 1),
+          );
+          for (const width of [320, 390, 768, 1440]) {
+            await page.setViewportSize({ width, height: 900 });
+            // Measure the responsive composition from its beginning; a retained
+            // offset can leave an unrelated control halfway under the header.
+            await page.evaluate(() => window.scrollTo(0, 0));
+            await audit(page, `catalogue-${count}-${type}-${width}`);
+          }
+          mkdirSync("output/playwright/phase-d", { recursive: true });
+          await page.setViewportSize({ width: 320, height: 900 });
+          await page.screenshot({
+            path: `output/playwright/phase-d/catalogue-${count}-${type}-${info.project.name}.png`,
+            fullPage: true,
+          });
+          for (const category of count > 1 ? [/^Higiene/, /^Dieta/] : []) {
+            await next(page);
+            await expect(categories.getByRole("button", { name: category, pressed: true })).toBeVisible();
+          }
+          for (let step = 0; step < 3; step++)
+            await next(page);
+          await expect(
+            page.getByRole("heading", { name: "Revisão", exact: true }),
+          ).toBeVisible();
+          await expect(
+            page.getByText(definitions[0].name, { exact: false }).first(),
+          ).toBeVisible();
+          if (count > 1)
+            await expect(
+              page.getByText(definitions[1].name, { exact: false }).first(),
+            ).toBeVisible();
+          for (const width of [320, 390, 768, 1440]) {
+            await page.setViewportSize({ width, height: 900 });
+            await audit(page, `catalogue-review-${count}-${type}-${width}`);
+          }
+          const after = identityPhysicalState(f),
+            requestCount = Number(
+              sql(
+                `select count(*) from public.requisitions where care_recipient_id=${sqlLiteral(f.patient)};`,
+              ),
+            );
+          expect(after).toBe(before);
+          expect(requestCount).toBe(0);
+          await info.attach("catalogue-scale-independent-state", {
+            body: JSON.stringify(
+              {
+                patient: f.patient,
+                expectedCount: count,
+                materialIds: f.products,
+                requestCount,
+                beforeSha256: createHash("sha256").update(before).digest("hex"),
+                afterSha256: createHash("sha256").update(after).digest("hex"),
+              },
+              null,
+              2,
+            ),
+            contentType: "application/json",
+          });
+        } catch (failure) {
+          if (!page.isClosed()) {
+            try {
+              await info.attach(`catalogue-${count}-${type}-failed-page`, {
+                body: JSON.stringify({ url: page.url(), headings: await page.getByRole("heading").allTextContents() }, null, 2),
+                contentType: "application/json",
+              });
+              await page.screenshot({ path: info.outputPath("catalogue-failure.png"), fullPage: true });
+            } catch { /* Playwright may close the page while reporting a timeout. */ }
+          }
+          throw failure;
+        }
+      });
+    }
+  });
+}

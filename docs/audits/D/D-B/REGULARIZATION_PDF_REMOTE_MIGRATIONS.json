@@ -1,0 +1,39 @@
+{
+  "status": "APPLIED_AND_POST_VALIDATED",
+  "at": "2026-11-08T19:51:06.399Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": 155,
+  "after": 156,
+  "pending": 0,
+  "migration": "20261108194000_phase_d4_regularization_pdf_facts.sql",
+  "lfSha256": "a08c24e03d2efe7c564b69cc01d21b94301bd098525ea9d785803e0a7c18a00d",
+  "historySqlMatched": 156,
+  "relevantLocalRemoteFunctionDefinitionsAndGrantsExact": true,
+  "legacyReservationEntrypointsUnchanged": true,
+  "privateHelpersRemainClosed": true,
+  "cronJobsUnchanged": true,
+  "health": {
+    "database": "postgres",
+    "invalid_indexes": 0,
+    "jobs": [
+      {
+        "active": true,
+        "name": "hca-notification-worker"
+      },
+      {
+        "active": true,
+        "name": "hca-operational-lifecycle"
+      }
+    ],
+    "last_version": "20261108194000",
+    "migrations": 156,
+    "waiting_locks": 0
+  },
+  "validationPolicy": "Development test data; owner dispensed routine full backup/restore/data comparison",
+  "fullBackupRestoreOrDataComparisonRepeated": false,
+  "noReset": true,
+  "noRemoteAuthOrFixturesCreated": true,
+  "externalTransportActivated": false,
+  "productionPromoted": false,
+  "operationalGo": false
+}

@@ -1,0 +1,272 @@
+{
+  "sourceBaseSha": "3c61697475308145c92300827c45caa0c6272842",
+  "status": "PARTIAL_LOCAL_CRYPTO_ENGINE_NOT_APPLICATION_ISSUANCE",
+  "files": [
+    {
+      "file": "package.json",
+      "sha256LfUtf8": "888968f7143c8cf11e0c726825f6209afe518c49310a09287edad4f6daa5b282"
+    },
+    {
+      "file": "package-lock.json",
+      "sha256LfUtf8": "105e47c951980ba9690550304444fafad34a72f1fd6fe3c9cf496150d628285c"
+    },
+    {
+      "file": "src/lib/server/pdf-signing/cms.ts",
+      "sha256LfUtf8": "ea2773edbb943d74b3fb0210855c3855788bc2075734ba9078e41de1e988a298"
+    },
+    {
+      "file": "src/lib/server/pdf-signing/internal-tsa.ts",
+      "sha256LfUtf8": "df646888575e1ea35b5f011329b675eefb4acf0a48fba92be70810340c277b0b"
+    },
+    {
+      "file": "src/lib/server/pdf-signing/sign.ts",
+      "sha256LfUtf8": "70de842b8f9c8bace3691c535ac101f96665c5f870b1df82d55606160e676113"
+    },
+    {
+      "file": "src/lib/server/pdf-signing/verify.ts",
+      "sha256LfUtf8": "014ce9b579c504bd81476328b3a6ece2ca4bc0f62c3efd4719b25e9d0168eb22"
+    },
+    {
+      "file": "tests/pdf-signing.test.ts",
+      "sha256LfUtf8": "b4c3ba9d94172395aef5c03ef538322692dadc0771f201c7f0282f9d88dd6de9"
+    },
+    {
+      "file": "tests/support/test-signing-identity.mjs",
+      "sha256LfUtf8": "03e42d4e3d746839c2901a7cf69d23cdb71758be7b11a446a603ce634d1e77a0"
+    }
+  ],
+  "pinnedDependencies": {
+    "@libpdf/core": "0.5.3",
+    "pkijs": "3.4.3",
+    "asn1js": "3.1.0"
+  },
+  "unitCryptoCasesPassed": 6,
+  "independentVerifier": "pyHanko0.38.1; explicit ephemeral root; no network",
+  "independentValid": {
+    "independentVerifier": "pyHanko0.38.1",
+    "integrity": true,
+    "signatureValid": true,
+    "trustedByExplicitInternalRoot": true,
+    "coverage": "ENTIRE_FILE",
+    "subFilter": "/ETSI.CAdES.detached",
+    "timestampPresent": true,
+    "timestampIntegrity": true,
+    "timestampSignatureValid": true,
+    "timestampTrustedByInternalRoot": true,
+    "timeIndependentFromSystem": false,
+    "externalTrust": false,
+    "padesSignedAttributes": [
+      "content_type",
+      "message_digest",
+      "signing_certificate_v2"
+    ],
+    "padesUnsignedAttributes": [
+      "signature_time_stamp_token"
+    ],
+    "accepted": true
+  },
+  "independentNoTimestamp": {
+    "independentVerifier": "pyHanko0.38.1",
+    "integrity": true,
+    "signatureValid": true,
+    "trustedByExplicitInternalRoot": true,
+    "coverage": "ENTIRE_FILE",
+    "subFilter": "/ETSI.CAdES.detached",
+    "timestampPresent": false,
+    "timestampIntegrity": false,
+    "timestampSignatureValid": false,
+    "timestampTrustedByInternalRoot": false,
+    "timeIndependentFromSystem": false,
+    "externalTrust": false,
+    "padesSignedAttributes": [
+      "content_type",
+      "message_digest",
+      "signing_certificate_v2"
+    ],
+    "padesUnsignedAttributes": [],
+    "accepted": false
+  },
+  "independentOtherImprint": {
+    "independentVerifier": "pyHanko0.38.1",
+    "integrity": true,
+    "signatureValid": true,
+    "trustedByExplicitInternalRoot": true,
+    "coverage": "ENTIRE_FILE",
+    "subFilter": "/ETSI.CAdES.detached",
+    "timestampPresent": true,
+    "timestampIntegrity": false,
+    "timestampSignatureValid": true,
+    "timestampTrustedByInternalRoot": false,
+    "timeIndependentFromSystem": false,
+    "externalTrust": false,
+    "padesSignedAttributes": [
+      "content_type",
+      "message_digest",
+      "signing_certificate_v2"
+    ],
+    "padesUnsignedAttributes": [
+      "signature_time_stamp_token"
+    ],
+    "accepted": false
+  },
+  "independentPolicyOidExact": "2.25.286883468022885394573621170177492655468",
+  "independentPolicyUuid": "d7d3bf04-708b-4499-9dfe-57f710981d6c",
+  "artifactHashes": {
+    "d4-node-tsa-runtime.pdf": "c54aa035456e7739bbceeb1e33c3b2181ef3342dfadcd5e8a95bb773dd9fd7a5",
+    "d4-node-no-timestamp.pdf": "32d484e211f9be36409305110a39cda5b45fd7099b73780770406ab0001429b6",
+    "d4-node-other-imprint.pdf": "049aebd27767d7faad4178538698abc7ea82a6b2dc0aee3167331062a298f857"
+  },
+  "privateKeys": "OpenSSL encrypted RSA3072 generated in new protected OS temp directory; owner-only ACL on Windows; guarded cleanup ran in afterAll; no tracked private key",
+  "keyCustodyOperationalConfigured": false,
+  "runtimeTsaUsesExternalProcess": false,
+  "opensslUsedOnlyForEphemeralTestPki": true,
+  "humanPhysicalProviderApproval": false,
+  "timeIndependent": false,
+  "externalTrust": false,
+  "counterproofs": [
+    "Covered byte fails digest; appended bytes preserve original signature but fail immutable whole-file policy",
+    "Missing timestamp is refused even though CMS remains valid",
+    "Valid RFC3161 token for different signature fails imprint in Node and independent pyHanko",
+    "Unknown root is not damaged bytes; explicit revoked signer is not unknown chain",
+    "Expected certificate fingerprint mismatch fails; TSA-only certificate cannot sign document",
+    "Future timestamp and unavailable TSA yield no accepted PDF; no B-B or unsigned fallback",
+    "Concurrent timestamps for identical digest use distinct serials and valid CMS",
+    "PKIJS constructor BER chunking was refused; generation changed to DER without relaxing verifier"
+  ],
+  "localVerification": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "cryptoUnit": "6/6",
+    "independent": "valid accepted; missing/mismatched timestamp refused"
+  },
+  "browserOrAuthRepetition": "Not run: no application UI, API or DB consumer changed in this increment. Whole candidate CI remains required.",
+  "newMigrations": 0,
+  "localMigrations": 136,
+  "lastReconciledRemoteMigrations": 121,
+  "remoteApplied": false,
+  "audit": {
+    "metadata": {
+      "info": 0,
+      "low": 0,
+      "moderate": 23,
+      "high": 3,
+      "critical": 0,
+      "total": 26
+    },
+    "advisoryPackageVersionsMatchBaseline": true,
+    "newSigningPackagesMentioned": false,
+    "forcedFix": false
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "ciObservedForBase": {
+    "sha": "3c61697475308145c92300827c45caa0c6272842",
+    "run": 42360570173,
+    "database": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "browsers": "IN_PROGRESS",
+    "validatesThisIncrement": false
+  },
+  "remaining": [
+    "Wire application issuance reserve/render/content oracle/sign/verify/immutable upload/ready/download/history",
+    "Provision real key custody, environments, versions, rotation, incident/recovery and public trust policy",
+    "Public QR/manual/upload verification with resource limits and privacy; validate real REQ/COM/ENT/BAL outputs",
+    "D3 remaining;D5;backup automation/monitoring;final remote migrations;CI and D-C/D6 gates"
+  ],
+  "logs": [
+    {
+      "file": "output/phase-d-work/d4-node-crypto-der-recheck.log",
+      "sha256": "d41421a52d3056f8be8ff7878a1b943c9870676960fa84368a600ea56cb09edc"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-crypto-final.log",
+      "sha256": "715baeac0f1019217bf17fd982827e1654508e46827546ab302661184a030c4c"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-crypto-first.log",
+      "sha256": "2128bc8ae0d8f4bd54181285f2d03aac36b1e4472bd2cbb2c1314f4bd43c601f"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-crypto-independent-candidates.log",
+      "sha256": "b15ecedd0cc7d53516339798a72de7397179b0f34f7a7f19d731641cfc07d7c0"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-crypto-stable.log",
+      "sha256": "cc483549ab6673174ab2a96763f9deeb2a995be8728b1843c244eceb1d327686"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-lint-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-lint-first.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-lint-stable.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-no-timestamp-independent-stable.log",
+      "sha256": "edad4c55c8392418d09f55837d1bcd7b96436b61def5c7ec067e58e703441d38"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-no-timestamp-independent.log",
+      "sha256": "edad4c55c8392418d09f55837d1bcd7b96436b61def5c7ec067e58e703441d38"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-other-imprint-independent-stable.log",
+      "sha256": "40c35cbecd79a076f42be8dd143936fa4f0e6539237fd014328616c26c3218e9"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-other-imprint-independent.log",
+      "sha256": "ab7bf08652540be5c59640f63d33d7bc67ce9aff18fe33a1097a12ac449a7f5e"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-pyhanko-first.log",
+      "sha256": "66aa7b44a26cb978347c917e28d8e7e74ca3b2a011939f79ad4498080187d4cf"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-source-format.log",
+      "sha256": "0aa2762f5e6991b067340b25a8d9f6f8490c440546011ae7591171842784c032"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-tsa-runtime-independent-stable.log",
+      "sha256": "66aa7b44a26cb978347c917e28d8e7e74ca3b2a011939f79ad4498080187d4cf"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-tsa-runtime-independent.log",
+      "sha256": "66aa7b44a26cb978347c917e28d8e7e74ca3b2a011939f79ad4498080187d4cf"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-types-after-fixes.log",
+      "sha256": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-types-final.log",
+      "sha256": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-types-first.log",
+      "sha256": "6ffecd46ff287a5d8764ce072a46a0a5143a02feedb5e32d67bfb95d68c799e1"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-types-recheck.log",
+      "sha256": "46b6608d5a66acb3435788272cab87003f9a29286e0c08b72021dbdf87e6a738"
+    },
+    {
+      "file": "output/phase-d-work/d4-node-types-stable.log",
+      "sha256": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b"
+    }
+  ],
+  "artifactArchive": "output/phase-d-work/d4-node-stable-artifacts",
+  "publicTestRootSha256LfUtf8": "e44d88a794341aa76f7d085789840d9004c2e0f4ba7292d8e179070e652f3817",
+  "documentationValidation": {
+    "canonicalRows": 105,
+    "canonicalColumnsUnchanged": 29,
+    "localLinksChecked": 30,
+    "localLinks": "PASS",
+    "markdownFiles": 2,
+    "markdownIssues": 0
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "increment": "D3.54",
+  "baseSha": "cb33a1c68ffffd217761c657241251dc72f9921d",
+  "status": "LOCAL_VALIDATED_REMOTE_RECONCILED_OWN_SHA_CI_REQUIRED",
+  "unitApi": {
+    "uniqueQualified": 58,
+    "base": "schedule-resource-unit-final.log:57PASS",
+    "storageRecheck": "schedule-resource-storage-recheck.log:18PASS;one added identity"
+  },
+  "database": {
+    "uniqueQualified": 23,
+    "full": "schedule-resource-auth-final.log:22PASS;one incorrect assertion",
+    "historyRecheck": "schedule-resource-auth-history-recheck.log:1PASS;test expectation corrected without SQL change",
+    "prepare": "schedule-resource-prepare-final.log:PASS;no reset",
+    "nativeDefinitionsChanged": 0,
+    "unindexedNewForeignKeys": 0,
+    "localMigrations": 197,
+    "remoteMigrationsObserved": 196,
+    "localFunctions": 24,
+    "newTables": 2,
+    "newIndexes": 11
+  },
+  "browser": {
+    "production": {
+      "total": 38,
+      "expected": 34,
+      "unexpected": 3,
+      "flaky": 0,
+      "skipped": 1,
+      "ok": false
+    },
+    "recheck": {
+      "total": 10,
+      "expected": 10,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "ok": true
+    },
+    "qualifiedUniqueBeforeFinalVisual": 40,
+    "finalVisual": {
+      "total": 13,
+      "expected": 13,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "ok": true
+    },
+    "diagnosticModeIsNotProductionProof": true,
+    "sourceFilesStableAcrossProductionCohort": 37,
+    "subsequentIndexOnlySqlChange": "owner/cursor covering index;native bodies and permissions unchanged",
+    "limits": [
+      "Previous WebKit own-list entry failure did not reproduce in recheck;slow local case retained,not claimed as a demonstrated runtime fix.",
+      "Android/Chrome and WebKit emulation are not physical-device or production acceptance."
+    ],
+    "qualifiedDistinct": 40
+  },
+  "invariants": {
+    "criteria": 105,
+    "passLocal": 56,
+    "partial": 49,
+    "uiStates": 18,
+    "formConsumers": 50,
+    "formTags": 52,
+    "visualEstimatePercent": 60,
+    "formsEstimatePercent": 90,
+    "recoveryEstimateAfterQualifiedLotPercent": 90
+  },
+  "sourceLfSha256": {
+    "src/app/api/schedules/resource-preparations/commit/route.ts": "50f3e6c6895530baa16e59047256f0e5dc8bcc264f8634ad35591f5b1baaccd7",
+    "src/app/api/schedules/resource-preparations/list/route.ts": "7ee15a056cdc5bac3ef6f7d38ce40a254f7acecda50146e325137358854ddf92",
+    "src/app/api/schedules/resource-preparations/recovery/route.ts": "49c154aac74e56ce8821f889ef59b062a42e1026c14e949b0c963745a03ab0e9",
+    "src/app/api/schedules/resource-preparations/reference/route.ts": "2c0cffa26bcee739d988ca539c858372131d5fada43be801f449eb66637d180e",
+    "src/app/api/schedules/resource-preparations/route.ts": "412499e735f357acaf3c2f50a69f3c6d6ffdaa5ee0f2b44eef1a6de8886f3e0f",
+    "src/components/forms/creation-draft-panel.tsx": "fbc06892d3e2e6e089d69dab3d701a7e6f7e02e10a6cb443f7bc6f90e87c0164",
+    "src/components/forms/use-creation-draft.ts": "3513135eba614fe92298db239c4e6309e9bef2ca22a4e6311b4aca547ed67177",
+    "src/components/schedules/schedule-console.tsx": "6cd459ec72bab80d330e0d49d8f3a7915fe064e53f989881f7b105b8f3bec271",
+    "src/components/schedules/schedule-creation-preparation.tsx": "35423bc9241842a443230f4609edbe5f179c621008daf0988149df6fc410782d",
+    "src/components/schedules/schedule-forms.tsx": "c9371807ca512121a790ab883df9817075150c225f48ce456ef01db2a1dd3da9",
+    "src/components/schedules/schedule-resource-fields.tsx": "be8f05911ffe2c2cf94c53e959d4cebfbd3640ff0e14a9b1d1cbc7d3deae1595",
+    "src/components/schedules/schedule-resource-list.tsx": "d0ba3e7a377b7da9af1d3ff55f28635bb27b2fdff80f943634af72113cb3cf34",
+    "src/components/schedules/schedule-resource-preparation.tsx": "daa2454b290a77dcff03a48abf0d0db7e2ad745833326d2662989c61237fd4e1",
+    "src/components/schedules/schedule-resource-reference.tsx": "5800138e67d76622f22b9228a814c1e5eb5496cff61a1828c471f89c2e9fa75a",
+    "src/components/schedules/schedule-resource-summary.tsx": "8b1fb433e49c21ba80e64346f464fc7f6d8287dd0404d6141eceffcfd4d5014f",
+    "src/components/schedules/schedule-review.tsx": "4981f8dd99eef8aafb55096ce9d1c90943b9a09b8be250122d89be276ed98812",
+    "src/lib/forms/draft-navigation.ts": "3eafe9f937378be2672114b733c101d147dee094f92f40a5268b5df51824277d",
+    "src/lib/schedules/creation.ts": "f67489540ec198611dca293ba20374367df8532fae8f3f6c0301a142595f0a17",
+    "src/lib/schedules/resource-local.ts": "1b0526aa8cbac783c0cea1978ef19ea495723f2a1ff3a379697b81ae100762cf",
+    "src/lib/schedules/resource-preparations.ts": "0903ff22ac1fc9928872f49b1c95d008187b660ab0e7b73da571dfe46e267a7e",
+    "src/lib/schedules/resource-transport.ts": "42bd5f1bf67f3e8525342e6cd3877f79c2dda614c095c508748a416f04a31c45",
+    "src/lib/validation/creation-drafts.ts": "3fbce545827838e8bcb2f856936a509eece21a56fb4f01925f10eff266eed37d",
+    "src/lib/validation/private-draft-results.ts": "e2d0daca7896e2d79e110c168c1164481c94ad3c3d4b19385e144c6fd0030e13",
+    "src/lib/validation/schedule-resource-preparations.ts": "d5db4a9d922f39082e81f0010daef619bcaff9f7adee7c677aabd649ac98fc1f",
+    "src/lib/validation/supply-drafts.ts": "1207c73885190a04a0b463469336835e281c9551b7bdc72136e81610e8f0ea44",
+    "src/types/creation-drafts.ts": "284e2cca1f751ff8100c291f01ccbdf896045eeca6768a522da9ca2e2f71a65c",
+    "src/types/schedules.ts": "7b45ff679a207332d30972e07be19f3b027587462cfa6c7ca07e6369cbfc594e",
+    "supabase/migrations/20261110181208_phase_d3_schedule_resource_preparations.sql": "516dd9fdbcf650c4b92e4db0c5718cb2dc2aea85231edf731a8bc8d76b30dab1",
+    "tests/api/schedule-resource-preparations-contract.test.ts": "dc2eb3555061753d663379aef0b163d97c9029b2fe762f75069ec5715b7d9b00",
+    "tests/e2e/schedule-confirmation-recovery.spec.ts": "3700e4393565a143101b319a529c50ca5c2cd5e9bc6420aeb4052b2ba454982f",
+    "tests/e2e/schedule-decisions.spec.ts": "f94de107ecdf4d6ea989066355697906a534bf0b85c786bb32a73c62e931e559",
+    "tests/e2e/schedule-resource-preparations.spec.ts": "a9aa8eee635a98a56155a13f85d5daab4f52508af797869f1e3289d31aeee919",
+    "tests/e2e/selected-dates-new-window.spec.ts": "9b5a8269746e5db6fc74a7708964e72cde6c869a18f60becf68b0e9c7e2e05a2",
+    "tests/integration/lock-barrier.mjs": "2032a816d72b2a881d3f45ef4358503f29ee1ec33f27d2e49084cdca86cbe5e7",
+    "tests/integration/schedule-resource-fixtures.mjs": "f78c3467cd7786327abe4cd457ce65cbb7297a521feff2907c088c824ff62b06",
+    "tests/integration/schedule-resource-preparations.test.mjs": "194452ad6039156e108baf9522597d74b3e019ab8cb98be074935db3f1b55791",
+    "tests/schedule-resource-preparations.test.ts": "daca8b2ed3c6ec8ebe2f7436f540e531d5c53883cceeed81a11efb3db5f22820"
+  },
+  "boundary": "PR7 Draft;no merge,manual deploy,production release,remote fixtures/Auth,reset,external activation or heavy redundant backup;goal active;Sonar owner-deferred",
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "before": 196,
+    "after": 197,
+    "latest": "20261110181208",
+    "definitionsConfigAclMatched": 24,
+    "tablesRlsGrantsFksMatched": 2,
+    "indexesMatched": 11,
+    "permissionProbesPassedWithRollback": 5,
+    "probeCount": 0,
+    "newUnindexedForeignKeys": 0,
+    "dryRunPending": 0,
+    "previousGlobalAdvisorsNotApproved": true,
+    "advisors": {
+      "security": {
+        "before": [
+          {
+            "name": "rls_enabled_no_policy",
+            "count": 56
+          },
+          {
+            "name": "extension_in_public",
+            "count": 1
+          },
+          {
+            "name": "anon_security_definer_function_executable",
+            "count": 3
+          },
+          {
+            "name": "authenticated_security_definer_function_executable",
+            "count": 195
+          },
+          {
+            "name": "auth_leaked_password_protection",
+            "count": 1
+          }
+        ],
+        "after": [
+          {
+            "name": "rls_enabled_no_policy",
+            "count": 58
+          },
+          {
+            "name": "extension_in_public",
+            "count": 1
+          },
+          {
+            "name": "anon_security_definer_function_executable",
+            "count": 3
+          },
+          {
+            "name": "authenticated_security_definer_function_executable",
+            "count": 202
+          },
+          {
+            "name": "auth_leaked_password_protection",
+            "count": 1
+          }
+        ]
+      },
+      "performance": {
+        "before": [
+          {
+            "name": "unindexed_foreign_keys",
+            "count": 124
+          },
+          {
+            "name": "auth_rls_initplan",
+            "count": 11
+          },
+          {
+            "name": "unused_index",
+            "count": 47
+          }
+        ],
+        "after": [
+          {
+            "name": "unindexed_foreign_keys",
+            "count": 124
+          },
+          {
+            "name": "auth_rls_initplan",
+            "count": 11
+          },
+          {
+            "name": "unused_index",
+            "count": 55
+          }
+        ]
+      }
+    },
+    "metadataLfSha256": {
+      "schedule-resource-remote-before.json": "f68b73c80753ff33a727c9b9eb9357b840e1bca74d151daab76090f7ee9d5e95",
+      "schedule-resource-remote-after.json": "c14796e0c256a579a4f88a6409ca9addfe772a6196fdc95ae3466114667937e9"
+    }
+  },
+  "static": {
+    "typecheck": "PASS;schedule-resource-types-visual-final.log",
+    "affectedLint": "PASS;schedule-resource-lint-visual-final.log",
+    "finalDocumentaryChecks": "PASS:105x39/first30/statuses;18UI;50/52inventory/hash;37source hashes;196historical SQL and84manifest untouched;105nontechnical items;active old utility0;owned links;canonical instructions",
+    "markdown": "PASS:11owned Markdown files;two MD013 wraps corrected and rechecked"
+  }
+}

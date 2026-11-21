@@ -1,0 +1,372 @@
+{
+  "increment": "D3.61",
+  "base": "1db17f8c9a8817d2a4b45a880151f59866bf3701",
+  "scope": [
+    "alertRule",
+    "notificationRecipient",
+    "membership",
+    "membershipStatus"
+  ],
+  "validation": {
+    "unitAndApi": 23,
+    "realAuthDistinct": 6,
+    "ownTransitionRecovery": "exact receipt and original live authenticated session only; another session denied",
+    "targetedLint": "pass",
+    "types": "pass",
+    "historicalMigrationsPreserved": 84,
+    "browser": {
+      "first": {
+        "startTime": "2026-11-11T01:35:58.866Z",
+        "duration": 302944.678,
+        "expected": 17,
+        "skipped": 0,
+        "unexpected": 4,
+        "flaky": 0
+      },
+      "recheck": {
+        "startTime": "2026-11-11T01:44:38.114Z",
+        "duration": 215279.787,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "inlineContinuationCounterexample": {
+        "startTime": "2026-11-11T01:50:32.636Z",
+        "duration": 276610.11600000004,
+        "expected": 7,
+        "skipped": 0,
+        "unexpected": 2,
+        "flaky": 0
+      },
+      "qualified": {
+        "startTime": "2026-11-11T01:55:59.945Z",
+        "duration": 291286.711,
+        "expected": 18,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 33,
+      "engines": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "recipientAxeWidths": [
+        320,
+        390,
+        768,
+        1150,
+        1440
+      ]
+    },
+    "counterproofs": [
+      "private incomplete fields survive CAS races without native mutation",
+      "duplicate native confirmations share one owner key and one audit event",
+      "revocation during a waited command rolls back and records no receipt",
+      "own deliberate transition never enables a new command or a receipt in another session",
+      "global proposals preserve distinct local approval",
+      "forged or mismatched receipt models are rejected",
+      "earlier catalogue response oracle was updated to the native receipt while preserving independent catalogue assertions",
+      "inline second-save stale reference was reproduced in Chromium/Mobile and corrected through revision invalidation",
+      "bell failure injection now begins after its first confirmed read; ENT CI flake passed unchanged in all three engines"
+    ]
+  },
+  "remote": {
+    "from": 202,
+    "to": 205,
+    "finalDryRunEmpty": true,
+    "remoteHistoryTokensMatchRepository": true,
+    "nativeFunctionsPreserved": true,
+    "scopedCatalogueMatchesLocal": true,
+    "sessionlessRollbackProbes": 2,
+    "seedOrAuthRemoteChanges": false,
+    "advisorsAdded": [
+      "two private RLS tables intentionally closed",
+      "two authenticated RPCs with database authorization",
+      "three unused indexes for the new private tables"
+    ],
+    "controls": {
+      "documents": 15,
+      "movements": 11,
+      "objects": 34,
+      "profiles": 7,
+      "users": 9
+    },
+    "tables": {
+      "administrative_preparation_commands": {
+        "acl": "{postgres=arwdDxtm/postgres}",
+        "directAccess": {
+          "anon": false,
+          "authenticated": false,
+          "service_role": false
+        },
+        "indexes": [
+          "CREATE INDEX administrative_preparation_command_fk ON private.administrative_preparation_commands USING btree (preparation_id)",
+          "CREATE UNIQUE INDEX administrative_preparation_commands_pkey ON private.administrative_preparation_commands USING btree (owner_id, key)"
+        ],
+        "policies": 0,
+        "rls": true
+      },
+      "administrative_preparations": {
+        "acl": "{postgres=arwdDxtm/postgres}",
+        "directAccess": {
+          "anon": false,
+          "authenticated": false,
+          "service_role": false
+        },
+        "indexes": [
+          "CREATE INDEX administrative_preparation_patient_fk ON private.administrative_preparations USING btree (patient_id)",
+          "CREATE UNIQUE INDEX administrative_preparation_slot ON private.administrative_preparations USING btree (owner_id, patient_id, mode, purpose, subject_id) NULLS NOT DISTINCT WHERE (state = ANY (ARRAY['active'::text, 'consumed'::text]))",
+          "CREATE INDEX administrative_preparation_subject_fk ON private.administrative_preparations USING btree (subject_id)",
+          "CREATE UNIQUE INDEX administrative_preparations_pkey ON private.administrative_preparations USING btree (id)"
+        ],
+        "policies": 0,
+        "rls": true
+      }
+    },
+    "functions": {
+      "admin_set_membership_status(uuid,uuid,text)": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "c6198a9b392e5b136c06e0a08209db01ce3a7725481117e0b6135b2ea6c6da7a",
+        "service": false
+      },
+      "admin_upsert_membership(uuid,uuid,profile_role,boolean,boolean)": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "51d283321ff25c17d7589aa0dd5308f2fd410bc79e7c48ce21bbbe1262e4fef3",
+        "service": false
+      },
+      "administrative_preparation_command(uuid,text,text,uuid,text,uuid,uuid,integer,jsonb,text)": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "0c6d864817618676bf5de06fe77c1c2bbccc67ab124170cf53f77907c30c2613",
+        "service": false
+      },
+      "administrative_preparation_read(uuid,text,text,uuid,uuid,text,text)": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "b80288d1762ad1b87be3036b4f289ade659bf589508bf7190e9cab82227e3152",
+        "service": false
+      },
+      "can_access_recipient(uuid)": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "3ceeb5d4aaff863cbeb45158a633a52e71c694e6b204d1b8d700d3efe2699992",
+        "service": false
+      },
+      "can_manage_recipient(uuid)": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "08dabab34732fc84ecf0e4858296774915456026862f3c2f60f3d8cc7379711c",
+        "service": false
+      },
+      "configure_patient_access(uuid,text,jsonb,uuid,integer,uuid,text)": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "59428a54e35463ee45ff60829f6c4961e78ae0fc00ff3a2db95abdb3aca3e99b",
+        "service": false
+      },
+      "configure_recipient_notification(uuid,uuid,text,text,text,boolean,boolean)": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=public"
+        ],
+        "definer": true,
+        "hash": "e95600469b00531c063b4f3c9ec879ecce9530b6ae93e31cd94fd68056b71bd3",
+        "service": false
+      },
+      "configure_stock_alert(uuid,text,text,numeric,numeric,boolean)": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "6cbb8b1b829a4f9f945a00270366d2e83ea79f8a4a34ffb726ebf41dc1cccb25",
+        "service": false
+      },
+      "private.admin_assurance()": {
+        "acl": "{postgres=X/postgres}",
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "59e6089be10e7ddcc898c6d823248780e752bd6310b50a2860eb93b7a0c77675",
+        "service": false
+      },
+      "private.administrative_preparation_reference(uuid,text,text,uuid,text,text)": {
+        "acl": "{postgres=X/postgres}",
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": false,
+        "hash": "782caaea7b77c0d4d12906aeb410a06c957c748c9419c7d3379ad5d77e1fea84",
+        "service": false
+      },
+      "private.auth_session()": {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "b8484b7869321105c50e770ea958628749a9df1c8f308945b20aead55aa4892b",
+        "service": false
+      },
+      "private.commit_administrative_preparation(uuid,text,text,uuid,jsonb,text,uuid)": {
+        "acl": "{postgres=X/postgres}",
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": false,
+        "hash": "2d0601f07a6567fcc484a0cdfefed35b1ffe5a26115d1af20b480f41a833b1cb",
+        "service": false
+      },
+      "private.require_administrative_preparation_scope(uuid,text,text,uuid,boolean)": {
+        "acl": "{postgres=X/postgres}",
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "9f8bba444afd3cdd1bf1dee258069354442de5dfced782f31b8ae4456c5a4f9c",
+        "service": false
+      },
+      "private.require_cap(uuid,text)": {
+        "acl": "{postgres=X/postgres}",
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "hash": "542935c969ace6ba2aef0eaf8751a9a1d62db4001e084bffb574f9773821bdc8",
+        "service": false
+      },
+      "private.validate_administrative_preparation_fields(text,uuid,jsonb)": {
+        "acl": "{postgres=X/postgres}",
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": false,
+        "hash": "5021dab8607fedc274bb0dae00e6caee56af8fc4dc9baa780967330bb048acc2",
+        "service": false
+      }
+    },
+    "localPreviouslyAppliedMetadataDifferences": [
+      "20261105200752",
+      "20261105205707",
+      "20261105215000",
+      "20261105224000",
+      "20261106003523",
+      "20261106012400",
+      "20261106031520",
+      "20261106040155",
+      "20261106073728",
+      "20261106161707",
+      "20261106181435",
+      "20261106185554",
+      "20261106203000",
+      "20261109091550",
+      "20261109183902",
+      "20261109203428",
+      "20261109222649",
+      "20261110001316",
+      "20261110214907"
+    ]
+  },
+  "criteria": {
+    "localPass": 56,
+    "partial": 49,
+    "visualEstimate": 60,
+    "formsEstimate": 90,
+    "recoveryEstimate": 90
+  },
+  "remaining": [
+    "own SHA full CI and Preview",
+    "other administration/profile forms",
+    "66 compositions and 171 relations",
+    "physical/human/provider/operational gates",
+    "Sonar deferred by owner"
+  ],
+  "sourceLfSha256": {
+    "src/app/api/admin/preparations/route.ts": "8b88b4e98016b1160ac97b47a9ad303c7dbe7a60de0134856b84d86203dbc3b5",
+    "src/app/api/admin/route.ts": "0f5e50a5b1335d4512702d34845942a1ff42b33ece674f42b287ffcd02f7bfb0",
+    "src/components/admin/admin-console.tsx": "6f186c90baf1c6b8066a84e1f6469e91b2e92ff6e329cceced1d23ce50ec7fe6",
+    "src/components/admin/administrative-pending-recovery.tsx": "38a880e85174f16bfbb7b092c29129975d3015fd7f5e5ab32092faea7073419b",
+    "src/components/admin/administrative-preparation-editor.tsx": "181071f79d5dbb778019cb9e389b04766c90831150c234dd05801fc52dd9468c",
+    "src/components/admin/alert-settings.tsx": "7de91e3011d2f7858466ef39621cfca8bc3c5a0cf3b7866d335c6208f49eddf2",
+    "src/components/admin/membership-management.tsx": "302077e9398d4b07270f11fb03c31b7835f6fd99b19bbcfe421f724d270eb85f",
+    "src/components/admin/notification-settings.tsx": "8bd3214a1ea0daf07d76645ed8a962595a347ad5969051c5bff89cbaf6899500",
+    "src/components/catalog/catalogue-preparation-controls.tsx": "09ad3c360c24b85749f63aba5323ed3794d377b602c4bc6ba35ca888cb454821",
+    "src/components/catalog/use-catalogue-preparation.ts": "aebf0231ef9f61bd7232e398cdaa2503573d61ea3484ef1d48cc3db925a91c38",
+    "src/components/forms/preparation-controls.tsx": "539ffc847259876294422453a4caf1fc8e669d5d6bf4176bc50df7084a062829",
+    "src/components/forms/use-scoped-preparation.ts": "849d6903b702592e21fba4f346d34a778066e304eb22846f2fa39e7426dbfe55",
+    "src/components/profile-console.tsx": "3d4ef682ea73f02c37c3aba41884e67c0df74d394bb7ee33b4443806fbb56aea",
+    "src/lib/server/administrative-preparation.ts": "d8ece324fe5ba469924c2d88d91a3d67d576faea7c5e2e51c9bc2cc098b6b13e",
+    "src/lib/server/api.ts": "6f59c43b4d8696309ffcdeadca32efeb84beb7fe5ff52bfeab44db4b637d95b0",
+    "src/lib/validation/administrative-preparation.ts": "e69319bf42d4f2479504f6053a63e3ed75ece9c22b7b537276cec803e993ab01",
+    "supabase/migrations/20261111010628_phase_d3_administrative_preparations.sql": "b5ffffb43a9ff2e08dff3d19eb3a719ab4ed2a4fcb019e59b09eb3916906f463",
+    "supabase/migrations/20261111012930_phase_d3_administrative_preparation_qualifiers.sql": "428ff59c42a3f4f89628792e795af06ce9b55953ec18f2f5b024e4d76cacd916",
+    "supabase/migrations/20261111013009_phase_d3_administrative_result_variables.sql": "25b66fac3652eb9ddf79514d2e9b93be1c0d15ac20b501a0bc6ea62fd503b3ad",
+    "tests/administrative-preparations.test.ts": "f0b05fe14521a07531961525a718e4f2fd34e274aa6419fe443983d3b8ae56f2",
+    "tests/api/administrative-preparations-contract.test.ts": "de85535f19389ea40cda980b4a5576d15c779970cc0c7575381a4da6be269162",
+    "tests/e2e/administration.spec.ts": "e0159613857e2452c7ea4787afc50762defdb43ebaa5cce659eeb6e3c0a2bad3",
+    "tests/e2e/administrative-preparations.spec.ts": "822eb5fda4fb1a52884586696970ba59d80e7b239cfa57f63eb523a9a4c0e872",
+    "tests/e2e/governance-recovery.spec.ts": "4b8ea9919eaa96cf4206cd22c1adca0b43df85d5ec7acd1257bacb803621d73e",
+    "tests/e2e/membership-continuity.spec.ts": "7873dff664122461efb578dbbeab0294263cec9e15eaeb9b18e02d5be2726757",
+    "tests/e2e/notification-read-states.spec.ts": "4ea25bb22df780eabdb3548e6ac62a6a5970a0b97570746ef74ea04f135fd000",
+    "tests/integration/administrative-preparations.test.mjs": "241382ca84b932d9d0388926e2a1ce4e048ec53f2774009754a74dcaa69496fd"
+  }
+}

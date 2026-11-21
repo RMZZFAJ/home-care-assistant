@@ -1,0 +1,146 @@
+{
+  "projectId": "qwfrqychokvhdzakibid",
+  "migration": {
+    "version": "20261109151449",
+    "file": "supabase/migrations/20261109151449_phase_d3_ent_consent_private_draft.sql",
+    "lfSha256": "d2dcd0fba734eef5ad37350f39de737a0a78877206a592874e6f50062cf79a18",
+    "appliedSourceLfSha256": "42a5830d36639d7baf51216db33c9d77fa5d7f1bbb61022ae2cf4d03f3fc0834",
+    "firstCommitFormatting": "Removed one empty EOF line from the new uncommitted migration;all SQL statements and database definitions unchanged"
+  },
+  "preflight": [
+    {
+      "applied": 169,
+      "last_version": "20261109135205",
+      "digest": "694f6e8a1796476d6f4b342f30e6984ffc95b1e3b6b2e26b326e0061a924f0bc"
+    }
+  ],
+  "predecessorFunctions": [
+    {
+      "schema": "private",
+      "name": "creation_draft_navigation_valid",
+      "body_sha256": "c810ef4196a8a7fcbca2ec071db12e86bc9f162df3cbc121acc851ecc89ace8d",
+      "security_definer": false,
+      "config": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "require_supply_draft_scope",
+      "body_sha256": "fdd49b8db364b35983dffee7eca16c56d3ba5f2cce571313e8e9a5a7790031de",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "commit_supply_draft",
+      "body_sha256": "d23d456e59053ce28a4a829a02ff596ed62d6b03a8f10a55271e795435431971",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ]
+    }
+  ],
+  "predecessorBodiesMatchLocal169": true,
+  "dryRunOnlyCandidate": true,
+  "seeds": [],
+  "roles": [],
+  "post": {
+    "versions": {
+      "last": "20261109151449",
+      "count": 170,
+      "sha256": "3fdee128262781b3b427dc0ea52803f280585b8b0e4835ebb69023e752afe1b7",
+      "pendingMigrations": 0
+    },
+    "functions": [
+      {
+        "anon": false,
+        "name": "creation_draft_navigation_valid",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "2dbd724a7efda8d0da3eac4fdf8dab1095f70d25265420260e5a9386fc90dc4c",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_ent_consent_draft_intent",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "0920f7b894c253becfed4d5fbd73ab8171def789f0a68401aec094607821f5f1",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_supply_draft_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "6c87d13eacf95ba28de33cbc09a441d881ec368fdf1e347b33c4fac7c1abc041",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "commit_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "049a1145e895d665662a8a95359b541d3bb6e9e09f496b585ed2598c5e0051c7",
+        "serviceRole": false,
+        "authenticated": true,
+        "securityDefiner": true
+      }
+    ],
+    "privateTable": {
+      "anon": false,
+      "authenticated": false
+    }
+  },
+  "postMatchesLocal170": true,
+  "advisors": {
+    "sameExcludingObservedAt": true,
+    "normalizedSha256": "9e37a302db386639f1df2d874104b81a4048f2992c19eef5bffc6e83fe986531",
+    "lintKinds": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO"
+      },
+      {
+        "name": "extension_in_public",
+        "level": "WARN"
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "level": "WARN"
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "level": "WARN"
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "level": "WARN"
+      }
+    ]
+  },
+  "limits": [
+    "No remote reset,fixtures,Auth,Vault,production or external messages",
+    "No redundant backup/restore per owner direction",
+    "Directed metadata comparison;not global security or provider approval"
+  ],
+  "preflightNoWaitingLocks": true,
+  "preflightNoOldTransactions": true
+}

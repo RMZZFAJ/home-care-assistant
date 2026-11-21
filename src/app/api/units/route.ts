@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { catalogueCommitFor, catalogueReceipt } from "@/lib/validation/catalogue-preparation";
+import { runCatalogueAttempt } from "@/lib/server/catalogue-preparation";
 import {
   api,
   authenticate,
@@ -24,7 +26,7 @@ export async function POST(request: Request) {
     const auth = await authenticate();
     const input = await readJson(
       request,
-      z
+      z.union([catalogueCommitFor("unit_create"), z
         .object({
           careRecipientId: uuid.nullable(),
           code: z.string().trim().min(1).max(30),
@@ -32,8 +34,12 @@ export async function POST(request: Request) {
           dimension: z.enum(["count", "volume", "mass", "package"]),
           decimals: z.number().int().min(0).max(6),
         })
-        .strict(),
+        .strict()]),
     );
+    if ("cataloguePreparation" in input) {
+      const receipt = catalogueReceipt.parse(await runCatalogueAttempt(auth, input.cataloguePreparation));
+      return NextResponse.json({ id: receipt.outcome && "unitId" in receipt.outcome ? receipt.outcome.unitId : null, receipt });
+    }
     return NextResponse.json({
       id: await rpc(auth.client, "create_measurement_unit", {
         p_patient: input.careRecipientId,

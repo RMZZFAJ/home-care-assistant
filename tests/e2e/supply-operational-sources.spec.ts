@@ -1,0 +1,371 @@
+import { selectMaterialCategory } from "./material-category";
+import { selectDocumentSection } from "./document-sections";
+import { selectDeliveryRecipient } from "./delivery-recipient";
+import { expect, test, type Page } from "@playwright/test";
+import { randomUUID } from "node:crypto";
+import { actor, fixtures, issue, request, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import {
+  purchaseBalanceArrival, purchaseBalanceCommand, purchaseBalanceFixture,
+} from "../integration/purchase-entry-balance-fixtures.mjs";
+import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
+import { loginDecision } from "./l1-decision-policy";
+import { audit } from "./accessibility-audit";
+
+const next = (page: Page) => page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
+const material = (page: Page) => page.getByRole("checkbox", { name: /^Material fictício V4 0/ });
+const count = (page: Page) => page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
+
+test("E05-03 COM distingue as contagens das REQs vinculadas e o saldo familiar atual", async ({ page }, info) => {
+  test.setTimeout(100_000);
+  const f = await setup(), professional = await actor("professional", f.patient);
+  const family = await shiftWorker(f.patient, "family");
+  const [productId] = f.products;
+  async function requestRecorded(quantity: string, hoursAgo: number) {
+    const [row] = await rpc(professional, "submit_requisition", {
+      ...request(f.patient, [productId]),
+      p_lines: [{ productId, currentStock: quantity, stockObservation: "observed",
+        stockObservationAt: new Date(Date.now() - hoursAgo * 3_600_000).toISOString(), urgent: false,
+        repeatReason: "Contagem fictícia registrada em outro horário" }],
+    });
+    return { id: row.requisition_id, code: sql(`select code from public.requisitions where id=${q(row.requisition_id)}`) };
+  }
+  const recent = await requestRecorded("16", 1);
+  const earlier = await requestRecorded("8", 3);
+  await loginDecision(page, family.email, f.patient);
+  await page.setViewportSize({ width: info.project.name === "ios" ? 412 : 360, height: 844 });
+  await page.goto("/fichas/com");
+  const priorClient = await page.request.get(`/api/documents/sources?careRecipientId=${f.patient}&target=COM&ids=${recent.id}`);
+  expect(priorClient.ok(), await priorClient.text()).toBe(true);
+  const originalOptions = await priorClient.json();
+  expect(originalOptions.familyStock).toBeUndefined();
+  expect(originalOptions.data[0].materials[0].observation).toBeUndefined();
+  await next(page);
+  const menuTrigger = page.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true });
+  await menuTrigger.click();
+  await page.getByRole("menuitem", { name: "Vincular a uma ficha", exact: true }).click();
+  const picker = page.getByRole("dialog", { name: "Vincular este material", exact: true });
+  for (const { code } of [earlier, recent]) {
+    await picker.getByRole("checkbox", { name: "Vincular " + code, exact: true }).check();
+  }
+  await picker.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
+
+  const counts = page.getByRole("list", { name: "Contagens das REQs vinculadas", exact: true });
+  const mostRecent = counts.getByRole("listitem").first();
+  const previous = counts.getByRole("listitem").last();
+  await expect(counts.getByRole("listitem")).toHaveCount(2);
+  await expect(mostRecent).toContainText(recent.code);
+  await expect(mostRecent).toContainText("16 unidade");
+  await expect(mostRecent).toContainText("Mais recente");
+  await expect(previous).toContainText(earlier.code);
+  await expect(previous).toContainText("8 unidade");
+  await expect(previous).toContainText("Contagem anterior");
+  await expect(page.getByText("Estoque familiar hoje: 30 unidade", { exact: true })).toBeVisible();
+  await expect(count(page)).toHaveValue("");
+  await count(page).fill("4");
+  const original = previous.getByRole("button", { name: earlier.code, exact: true });
+  await original.click();
+  const reference = page.getByRole("dialog", { name: earlier.code, exact: true });
+  await expect(reference).toContainText("8 unidade");
+  await reference.getByRole("button", { name: "Voltar à origem", exact: true }).click();
+  await expect(original).toBeFocused();
+  await expect(count(page)).toHaveValue("4");
+  await counts.evaluate(element => element.scrollIntoView({ block: "center" }));
+  await info.attach("E05-03 material com duas REQs", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await rpc(f.admin, "family_stock_movement", {
+    p_patient: f.patient, p_product: productId, p_quantity: "2", p_action: "inbound",
+    p_reason: "Crédito fictício após a consulta", p_key: randomUUID(),
+  });
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await expect(page.getByText("Estoque familiar hoje: 32 unidade", { exact: true })).toBeVisible();
+  await expect(mostRecent).toContainText("16 unidade");
+  await expect(count(page)).toHaveValue("4");
+  await menuTrigger.click();
+  await page.getByRole("menuitem", { name: "Detalhes do material", exact: true }).click();
+  const materialPanel = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
+  const countCards = materialPanel.locator("article").filter({ hasText: /Mais recente|Contagem anterior/ });
+  await expect(countCards.first()).toContainText(recent.code);
+  await expect(countCards.last()).toContainText(earlier.code);
+  await materialPanel.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+  await expect(menuTrigger).toBeFocused();
+});
+
+test("L2 COM encaminha a sugestão de catálogo para Materiais e emite uma única linha", async ({ page }, info) => {
+  test.setTimeout(150_000);
+  const name = "Complemento fictício de higiene";
+  const f = await setup({ catalogue: [
+    { name: "Medicamento fictício da compra", category: "medicamentos", unit: "unidade", aliases: [] },
+    { name, category: "higiene", unit: "unidade", aliases: ["Curativo auxiliar"] },
+  ] });
+  const admin = await shiftWorker(f.patient, "admin");
+  await loginDecision(page, admin.email, f.patient);
+  await page.setViewportSize({ width: 390, height: 760 });
+  await page.goto("/fichas/com");
+  const stages = page.getByRole("navigation", { name: "Etapas da COM", exact: true });
+  await expect(stages.getByRole("button")).toHaveText([/Confirmação/, /Materiais/, /Extras/, /Observações/, /Revisão/]);
+  await next(page);
+  await expect(page.getByRole("button", { name: /^Medicamentos/, pressed: true })).toBeVisible();
+  await page.getByRole("button", { name: "Item extra", exact: true }).click();
+  const picker = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
+  await picker.getByRole("textbox", { name: "Nome do material", exact: true }).fill("curativo auxiliar");
+  await picker.getByRole("button", { name: `Usar item do catálogo: ${name} (unidade)`, exact: true }).click();
+  await expect(picker).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Higiene/, pressed: true })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: name + " unidade", exact: true })).toBeChecked();
+  const extra = page.getByLabel("Quantidade — " + name, { exact: true });
+  const saved = page.waitForResponse(response => response.request().method() === "POST" &&
+    new URL(response.url()).pathname === "/api/drafts" &&
+    response.request().postDataJSON().content?.form?.quantities?.[f.products[1]] === "2");
+  await extra.fill("2");
+  const receipt = await saved;
+  expect(receipt.ok(), await receipt.text()).toBe(true);
+  await page.reload();
+  await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(stages.getByRole("button", { name: "Materiais", exact: true })).toHaveAttribute("aria-current", "step");
+  await expect(extra).toHaveValue("2");
+  await info.attach("E05-material-restaurado", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await next(page);
+  await expect(stages.getByRole("button", { name: "Extras", exact: true })).toHaveAttribute("aria-current", "step");
+  await expect(page.getByText(name, { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(page.getByRole("button", { name: /^Higiene/, pressed: true })).toBeVisible();
+  await expect(extra).toHaveValue("2");
+  await next(page);
+  await next(page);
+  const observation = "A caixa será entregue em dois volumes.";
+  const addObservation = page.getByRole("button", { name: "Adicionar observação", exact: true });
+  await addObservation.click();
+  await page.getByLabel("Observação 1", { exact: true }).fill(observation);
+  await addObservation.click();
+  await next(page);
+  await expect(page.getByLabel("Observação 2", { exact: true })).toBeFocused();
+  await info.attach("E05-observacoes-numeradas", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await page.getByRole("button", { name: "Remover observação 2", exact: true }).click();
+  await next(page);
+  const review = page.getByRole("region", { name: "Itens extras", exact: true });
+  await expect(review.getByText(name, { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Editar material " + name, exact: true }).click();
+  await expect(page.getByLabel("Quantidade — " + name, { exact: true })).toBeFocused();
+  for (let step = 0; step < 3; step++) await next(page);
+  await expect(page.getByText(name, { exact: true })).toHaveCount(1);
+  await expect(page.getByText(observation, { exact: true })).toBeVisible();
+  const automatic = page.getByText("Administração · aprovação automática", { exact: true });
+  const required = page.getByText("Um administrador precisa autorizar os materiais identificados antes da compra.", { exact: true });
+  await expect(automatic).toBeVisible();
+  await expect(page.getByText("Sua autorização já acompanha esta compra", { exact: true })).toBeVisible();
+  const override = `care_recipient_id=${q(f.patient)} and subject_user=${q(admin.id)} and capability='com.approve'`;
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(admin.id)},'com.approve',false)`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  await expect(required).toBeVisible();
+  await expect(automatic).toHaveCount(0);
+  sql(`delete from public.capability_overrides where ${override}`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  await expect(automatic).toBeVisible();
+  await info.attach("E05-07 aprovação na revisão", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await expect(page.locator(".hca-supply-wizard-status")).toHaveText("Último rascunho salvo.");
+  const submission = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
+  await page.getByRole("button", { name: "Emitir compra", exact: true }).click();
+  const response = await submission;
+  expect(response.ok(), await response.text()).toBe(true);
+  const { data: document } = await response.json();
+  expect(document.status).toBe("approved");
+  expect(document.payload.observations).toEqual([observation]);
+  expect(document.lines).toMatchObject([
+    { product_id: f.products[1], quantity: expect.anything() },
+  ]);
+  expect(document.lines[0].metadata.catalogueExtra).toBeFalsy();
+  expect(Number(document.lines[0].approved_quantity)).toBe(2);
+});
+
+test("L2 COM emite o extra pendente e identifica o material na mesma ficha sem entrada de estoque", async ({ page }, info) => {
+  test.setTimeout(150_000);
+  const f = await setup(), admin = await shiftWorker(f.patient, "admin");
+  const name = "Protetor de tecido reforçado fictício";
+  const details = "Acabamento lavável para reposição de teste.";
+  const stock = () => sql(`select jsonb_agg(to_jsonb(m) order by m.id) from public.stock_movements m where care_recipient_id=${q(f.patient)}`);
+  const before = stock();
+  await loginDecision(page, admin.email, f.patient);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/fichas/com");
+  await next(page);
+  await page.getByRole("button", { name: "Item extra", exact: true }).click();
+  const picker = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
+  await picker.getByRole("textbox", { name: "Nome do material", exact: true }).fill(name);
+  await picker.getByRole("textbox", { name: "Quantidade", exact: true }).fill("2");
+  await picker.getByRole("button", { name: "Adicionar material", exact: true }).click();
+  const unit = picker.getByRole("combobox", { name: "Unidade de medida", exact: true });
+  await expect(unit).toBeFocused();
+  await unit.selectOption("unidade");
+  await expect(unit).not.toHaveAttribute("aria-invalid", "true");
+  await picker.getByRole("textbox", { name: "Detalhes para identificar", exact: true }).fill(details);
+  await info.attach("E05-modal-extra-pendente", { body: await picker.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await picker.getByRole("button", { name: "Adicionar material", exact: true }).click();
+  await next(page);
+  await expect(page.getByText(name, { exact: true })).toHaveCount(1);
+  await expect(page.getByText("Cadastro pendente", { exact: true })).toBeVisible();
+  const edit = page.getByRole("button", { name: "Editar " + name, exact: true });
+  await edit.click();
+  const editDialog = page.getByRole("dialog", { name: "Editar item extra", exact: true });
+  await expect(editDialog.getByRole("textbox", { name: "Detalhes para identificar", exact: true })).toHaveValue(details);
+  await editDialog.getByRole("button", { name: "Salvar alteração", exact: true }).click();
+  await next(page);
+  await next(page);
+  const review = page.getByRole("region", { name: "Itens extras", exact: true });
+  await expect(review.getByText(name, { exact: true })).toHaveCount(1);
+  await expect(review.getByText("2 unidade · Cadastro pendente", { exact: true })).toBeVisible();
+  const request = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
+  await page.getByRole("button", { name: "Emitir compra", exact: true }).click();
+  const response = await request;
+  expect(response.ok(), await response.text()).toBe(true);
+  const { data: document } = await response.json();
+  expect(document.lines).toEqual([]);
+  expect(document.payload.pendingExtras).toMatchObject([{ name, unit: "unidade", quantity: "2", details }]);
+  expect(stock()).toBe(before);
+  const issued = page.getByRole("dialog", { name: "Compra emitida", exact: true });
+  const download = issued.getByRole("link", { name: "Baixar PDF", exact: true });
+  await expect(download).toBeVisible();
+  expect((await page.request.get((await download.getAttribute("href"))!)).status()).toBe(200);
+  await issued.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
+  await selectDocumentSection(page, "materials");
+  const pending = page.getByRole("region", { name: "Materiais com cadastro pendente", exact: true });
+  await expect(pending.getByText(name, { exact: true })).toBeVisible();
+  const catalogued = await rpc(f.admin, "admin_upsert_recipient_product", {
+    p_care_recipient_id: f.patient, p_product_id: null, p_name: name,
+    p_category: "higiene", p_unit: "unidade", p_aliases: [], p_is_active: true,
+  });
+  await pending.getByRole("button", { name: "Identificar " + name, exact: true }).click();
+  const identify = page.getByRole("dialog", { name: "Identificar material extra", exact: true });
+  await identify.getByRole("combobox", { name: "Produto correspondente", exact: true }).fill(name);
+  await page.getByRole("option", { name: name + " · unidade", exact: true }).click();
+  const identified = page.waitForResponse(response => response.request().method() === "POST" &&
+    new URL(response.url()).pathname === "/api/documents/" + document.id &&
+    response.request().postDataJSON().action === "resolve_purchase_extra");
+  await identify.getByRole("button", { name: "Confirmar identificação", exact: true }).click();
+  const identifiedResponse = await identified;
+  expect(identifiedResponse.ok(), await identifiedResponse.text()).toBe(true);
+  expect((await identifiedResponse.json()).data.lines).toMatchObject([{ product_id: catalogued.product_id, name_snapshot: name }]);
+  await expect(page.getByRole("button", { name: "Detalhes de " + name, exact: true })).toBeVisible();
+  await expect(pending).toHaveCount(0);
+  const current = await page.request.get("/api/documents/" + document.id);
+  expect((await current.json()).data.lines).toMatchObject([{ product_id: catalogued.product_id, name_snapshot: name }]);
+  expect(stock()).toBe(before);
+});
+
+test("L2 COM mantém o vínculo geral após desfazer importação e conserva a quantidade editada", async ({ page }, info) => {
+  test.setTimeout(120_000);
+  const f = await setup();
+  const admin = await shiftWorker(f.patient, "admin");
+  const req = await issue(f.patient, [f.products[0]]);
+  const code = sql(`select code from public.operational_documents where id=${q(req.id)}`);
+  await loginDecision(page, admin.email, f.patient);
+  await page.goto(`/fichas/com?requisitionId=${req.id}`);
+  const origin = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
+  await expect(page.getByLabel("Forma de aquisição", { exact: false })).toHaveCount(0);
+  await expect(origin.getByRole("button", { name: code, exact: true })).toBeVisible();
+  await expect(origin).toContainText("Materiais elegíveis trazidos");
+  await expect(origin.getByRole("button", { name: "Alterar", exact: true })).toHaveCount(1);
+  await next(page);
+  await selectMaterialCategory(page);
+  await expect(material(page)).toBeChecked();
+  await expect(count(page)).toHaveValue("");
+  await count(page).fill("3");
+  await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await origin.getByRole("button", { name: "Alterar", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Vincular fichas", exact: true });
+  await dialog.getByRole("button", { name: "BAL", exact: true }).click();
+  await expect(dialog.getByText("Nenhuma ficha disponível para este vínculo.")).toBeVisible();
+  await dialog.getByRole("button", { name: "REQ", exact: true }).click();
+  await expect(dialog.getByRole("checkbox", { name: "Vincular " + code, exact: true })).toBeChecked();
+  const bring = dialog.getByRole("checkbox", { name: /Importar materiais/ });
+  await expect(bring).toBeChecked();
+  await audit(page, "L2 seletor de fichas de origem");
+  await page.screenshot({ path: `output/playwright/l2-supply-origin-picker-${info.project.name}.png`, scale: "css" });
+  await bring.uncheck();
+  await dialog.getByRole("button", { name: "Aplicar vínculos" }).click();
+  await expect(origin.getByRole("button", { name: code, exact: true })).toBeVisible();
+  await expect(origin).toContainText("sem importar materiais");
+  await next(page);
+  await selectMaterialCategory(page);
+  await expect(material(page)).toBeChecked();
+  await expect(count(page)).toHaveValue("3");
+  const menuTrigger = page.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true });
+  async function openMaterialOrigin() {
+    await menuTrigger.click();
+    await page.getByRole("menuitem", { name: "Vincular a uma ficha", exact: true }).click();
+    return page.getByRole("dialog", { name: "Vincular este material", exact: true });
+  }
+  await material(page).uncheck();
+  await expect(page.getByRole("button", { name: "Vincular a uma ficha", exact: true })).toHaveCount(0);
+  const itemOrigin = await openMaterialOrigin();
+  await itemOrigin.getByRole("checkbox", { name: "Vincular " + code, exact: true }).check();
+  await expect(itemOrigin.getByRole("checkbox", { name: /Importar materiais/ })).toHaveCount(0);
+  await itemOrigin.getByRole("button", { name: "Aplicar vínculos" }).click();
+  await expect(menuTrigger).toBeFocused();
+  await expect(material(page)).toBeChecked();
+  await expect(material(page)).toHaveAccessibleName(/Vinculado à REQ/);
+  await expect(count(page)).toHaveValue("");
+  await count(page).fill("3");
+  await expect(count(page)).toHaveValue("3");
+  const removeItemOrigin = await openMaterialOrigin();
+  await removeItemOrigin.getByRole("checkbox", { name: "Vincular " + code, exact: true }).uncheck();
+  await removeItemOrigin.getByRole("button", { name: "Aplicar vínculos" }).click();
+  await expect(material(page)).not.toHaveAccessibleName(/Vinculado à REQ/);
+  for (let index = 0; index < 3; index++) await next(page);
+  const pending = page.waitForResponse((response) => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
+  await page.getByRole("button", { name: "Emitir compra", exact: true }).click();
+  const response = await pending;
+  expect(response.ok(), await response.text()).toBe(true);
+  const result = (await response.json()).data;
+  expect(result.payload.acquisitionMode).toBe("planned");
+  expect(result.payload.origin).toBeUndefined();
+  expect(result.originDocuments).toMatchObject([{ documentId: req.id, general: true, productIds: [] }]);
+  expect(result.lines[0].requisitionItemIds).toEqual([]);
+});
+
+test("L2 Preparar entrega parte da COM e traz apenas a quantidade da chegada aprovada", async ({ page }, info) => {
+  test.setTimeout(240_000);
+  const f = await purchaseBalanceFixture();
+  const admin = await shiftWorker(f.patient, "admin");
+  const sourceLine = f.document.lines.find((line: { product_id: string }) => line.product_id === f.products[0]);
+  const arrival = await purchaseBalanceArrival(f, f.document, [{ lineId: sourceLine.id, quantity: "5" }]);
+  const approved = await purchaseBalanceCommand(f.admin, arrival.document, "validate_receipt", { receiptId: arrival.receipt.id });
+  const other = approved.lines.find((line: { product_id: string }) => line.product_id === f.products[1]);
+  const { document: com } = await purchaseBalanceArrival(f, approved, [{ lineId: other.id, quantity: "3" }]);
+  await loginDecision(page, admin.email, f.patient);
+  await page.goto("/documentos/" + com.id);
+  const ready = page.getByRole("region", { name: "Materiais disponíveis para entregar", exact: true });
+  await expect(ready.getByRole("listitem")).toHaveCount(1);
+  await expect(ready).toContainText(sourceLine.name_snapshot);
+  await expect(ready).toContainText("5 unidade disponíveis para entregar");
+  await expect(ready).not.toContainText(other.name_snapshot);
+  await rpc(f.admin, "family_stock_movement", {
+    p_patient: f.patient, p_product: f.products[0], p_action: "outbound", p_quantity: "31",
+    p_reason: "Saída fictícia para conferir a disponibilidade antes da entrega", p_key: randomUUID(),
+  });
+  await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
+  await expect(ready).toContainText("4 unidade disponíveis para entregar");
+  await info.attach("E05-19 materiais disponíveis", { body: await ready.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await ready.getByRole("listitem").getByRole("link", { name: "Preparar entrega", exact: true }).click();
+  const origin = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
+  await expect(origin.getByRole("button", { name: com.code, exact: true })).toBeVisible();
+  await page.screenshot({ path: `output/playwright/l2-ent-from-com-${info.project.name}.png`, scale: "css" });
+  await selectDeliveryRecipient(page, "Teste professional", "Destinatário indicado pela família para esta entrega.");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  const draft = JSON.parse(sql(`select content from private.creation_drafts
+    where care_recipient_id=${q(f.patient)} and kind='ENT' and purpose='create' and state='active'`));
+  expect(draft.form.quantities).toEqual({ [f.products[0]]: "4" });
+  expect(draft.sources).toEqual([{ documentId: com.id, general: true, productIds: [f.products[0]] }]);
+  expect(draft.form.recipientId).toBe(fixtures.professional.id);
+  await page.reload();
+  await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(origin.getByRole("button", { name: com.code, exact: true })).toBeVisible();
+  expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)} and type='ENT'`)).toBe("0");
+  await page.goto("/documentos/" + com.id);
+  await expect(ready).toBeVisible();
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(admin.id)},'stock.family.read',false)`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  await expect(ready).toHaveCount(0);
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeVisible();
+});

@@ -83,7 +83,7 @@ do $$declare n public.requisition_notifications;w uuid:=gen_random_uuid();begin
 end;$$;
 select pg_temp.login('adminA');
 do $$declare d jsonb;begin
- d:=public.create_supply_document('20000000-0000-4000-8000-000000000001','ENT',jsonb_build_object('source','FAMILY','destination','CARE_TEAM','recipientId',(select id from fixture_users where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','10'))),gen_random_uuid(),false);
+ d:=public.create_supply_document('20000000-0000-4000-8000-000000000001','ENT',jsonb_build_object('recipientReason','Escolha manual fictícia para este recebimento','source','FAMILY','destination','CARE_TEAM','recipientId',(select id from fixture_users where name='professional'),'lines',jsonb_build_array(jsonb_build_object('productId','fralda','quantity','10'))),gen_random_uuid(),false);
  perform pg_temp.login('professional');
  perform public.supply_document_command((d->>'id')::uuid,'receive','{"divergences":[]}',gen_random_uuid(),(d->>'version')::integer);
  perform pg_temp.login('adminA');

@@ -1,0 +1,140 @@
+{
+  "at": "2026-11-11T14:46:29.744234+00:00",
+  "increment": "D3.81",
+  "checkpoint": "06.2",
+  "status": "COMPLETE_LOCAL_SCOPED_7_OF_7",
+  "baseSha": "d26295923aca27dafa449b7a8803ad59cc0650b2",
+  "previousBodyEvidence": "ENT_TRANSFER_CANONICAL_VALIDATION.json",
+  "completedComposition": "ENT-02",
+  "distinctQualifiedBrowserCases": 15,
+  "qualification": {
+    "unchangedPassingCases": 6,
+    "finalAffectedCases": 9
+  },
+  "rounds": {
+    "first": {
+      "startTime": "2026-11-11T14:32:04.709Z",
+      "duration": 272194.226,
+      "expected": 6,
+      "skipped": 0,
+      "unexpected": 9,
+      "flaky": 0
+    },
+    "final": {
+      "startTime": "2026-11-11T14:39:34.149Z",
+      "duration": 130973.276,
+      "expected": 9,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "cases": [
+    {
+      "file": "delivery-list-completeness.spec.ts",
+      "title": "delivery list reaches more than100 own tasks and separates the authorized history without executing receipt",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "delivery-regularization.spec.ts",
+      "title": "C043 caixa padrão oferece decisão pessoal de cancelamento e remove a tarefa após recusa sem movimentar",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "delivery-inbox-canonical.spec.ts",
+      "title": "ENT-02 canonical task preserves recorded names,exact navigation and return filters across five widths",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "delivery-inbox-canonical.spec.ts",
+      "title": "ENT-02 autonomous return keeps three parties and suspends a stale task without inventing missing legacy names",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "delivery-list-completeness.spec.ts",
+      "title": "delivery list refuses corrupt successful reads,preserves only matching scope and removes denied content",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    }
+  ],
+  "unitCases": 9,
+  "realAuthCases": 3,
+  "nativeAuthCoverage": [
+    "Task filtering before pagination with22 drafts,personal cancellation,empty page2,invalid/null filters and foreign patient.",
+    "Ordinary issuer/recipient snapshots remain unchanged after profile renames;personal receipt actor remains distinct and historically preserved after another rename.",
+    "Autonomous no-origin return retains three declaration parties;no stock,shipment or balance fabrication;anonymous,foreign and revoked capability denied;explicit execute ACL excludes anon/service_role."
+  ],
+  "visual": {
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "reference": "Canonical offline HTML delivery records;computed card/icon properties.",
+    "allAxeRules": "Enabled",
+    "media": "Forced colors and reduced motion in three browser profiles",
+    "inspection": "320px mobile viewport inspected with long names;capture contains a legitimate in-progress refresh and disabled task,not a claim of fresh data.",
+    "limits": "Browser emulation does not prove a physical Android/PWA,assistive technology or native400% zoom."
+  },
+  "positive": [
+    "Native list scope,task computation,ordering and pagination unchanged;enrichment only for paged rows.",
+    "Snapshot names never replaced by current profile names;unavailable legacy facts stay explicit.",
+    "Own participation includes transfer parties;does not mislabel them as designated recipients.",
+    "Task CTA opens workflow tab;ordinary tracking opens detail;navigation makes no operational writes.",
+    "Selection/page survive reload,Back and Forward;patient switch resets foreign selection.",
+    "503 preserves only scoped old data,focus and recovery while suspending stale task;corrupt envelopes fail explicitly and authorization refusal removes data."
+  ],
+  "counterproof": {
+    "initialFailures": 9,
+    "causes": [
+      "Literal inactive navigation color from model failed AA at4.43;use existing accessible muted token.",
+      "Ambiguous alert selector also matched the Next route announcer;scope to actual failure banner."
+    ],
+    "preserved": "delivery-inbox-first.json and delivery-inbox-first-artifacts",
+    "repeat": "Only nine affected browser cases repeated;the six unchanged passes retained."
+  },
+  "checks": {
+    "localPrepare": "PASS207 without reset",
+    "types": "PASS",
+    "affectedLint": "PASS",
+    "markdown": "PASS",
+    "cleanInstallAndLegacyEvolution": "CI for own published SHA required;no additional local reset"
+  },
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "migrations": 207,
+    "latest": "20261111140250",
+    "sameAsLocal": true,
+    "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+    "reconciliation": "Dry-run selected only207;incremental apply succeeded;final dry-run empty. No Vault sync,reset,Auth changes or remote fixtures.",
+    "advisorsUnchanged": true
+  },
+  "limits": [
+    "Original105 acceptance statuses remain57PASS/48PARTIAL;18 UI statuses unchanged.",
+    "06.2 is locally complete;06.3–06.6,other app consumers and joint stage19 remain.",
+    "DOC-A/B/C/D unchanged;PDF appearance,mentions,20-minute views,cancellation science and simplified drafts pending in their own blocks.",
+    "Own published SHA CI and human/provider gates required;no merge or production.",
+    "Sonar:OWNER_DEFERRED_SONAR_CONFIGURATION;no Quality Gate approval."
+  ]
+}

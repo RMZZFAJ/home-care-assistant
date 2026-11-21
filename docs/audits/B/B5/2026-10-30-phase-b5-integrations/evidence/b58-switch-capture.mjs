@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
+import {checkedCliPath} from './cli-file-path.mjs';
 import {execFileSync} from 'node:child_process';
 import {writeFileSync,readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {sql,sqlLiteral as lit,getTestEnvironment} from '../../../../scripts/test-environment.mjs';
 assert.equal(process.versions.node,'24.22.0');getTestEnvironment();
-const cli=process.argv[2];assert(cli?.endsWith('playwright-cli.js'));
+const cli=checkedCliPath(process.argv[2]);
 const output=execFileSync(process.execPath,[cli,'-s=b5','run-code','--filename','docs/audits/2026-10-30-phase-b5-integrations/evidence/b58-switch.js'],{encoding:'utf8',windowsHide:true,timeout:25000});
 const line=output.split('\n').find(x=>x.startsWith('{"id":"B58-U02"'));assert(line);const result=JSON.parse(line);
 // The initial expectation of stale selection was REFUTED: AppWorkspace remounts

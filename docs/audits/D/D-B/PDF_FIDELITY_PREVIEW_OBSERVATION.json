@@ -1,0 +1,62 @@
+{
+  "at": "2026-11-08T11:10:23.364Z",
+  "sha": "df498810cf43a353c8c6c894333807fbb6956e38",
+  "deployment": "https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app",
+  "stableBranchOrigin": true,
+  "accessMechanism": "Authenticated Vercel CLI operator request; not a physical browser session",
+  "anonymousWorkerStatus": 302,
+  "workerRevision": "4e3683f38559910158c56094",
+  "workerSha256": "a79f878dbed1cba5ceec7e91218d4e97e1e35e3963022f900222933651e456f9",
+  "workerNoStore": true,
+  "workerScope": "/",
+  "sameOriginCredentials": true,
+  "publicAssetsPinned": true,
+  "assets": [
+    {
+      "path": "/offline.html",
+      "status": 200,
+      "bytes": 1240,
+      "sha256": "17c0b345e45e346bed1c902d571d1d356e49c11370bcf8399e29db740346f2be",
+      "contentType": "text/html"
+    },
+    {
+      "path": "/pwa/icon-192.png",
+      "status": 200,
+      "bytes": 4337,
+      "sha256": "3db33a5782601af84b014224ace5224cea54c3978f4f0b81b1d3e40b46debdd5",
+      "contentType": "image/png"
+    },
+    {
+      "path": "/pwa/icon-512.png",
+      "status": 200,
+      "bytes": 16558,
+      "sha256": "5dfad9eacff835464bccd604d0eece85c443113259d58f601766b80ac0387c2e",
+      "contentType": "image/png"
+    },
+    {
+      "path": "/pwa/apple-180.png",
+      "status": 200,
+      "bytes": 3962,
+      "sha256": "fb50d55d9511def1c233da9bd158b7fc498bf2bc259fe738603da207e849d9df",
+      "contentType": "image/png"
+    }
+  ],
+  "runtime": {
+    "status": 200,
+    "state": "ready",
+    "protocol": 1,
+    "schema": 1
+  },
+  "applicationAuth": {
+    "withoutSessionHttp": 401,
+    "code": "SESSION_EXPIRED"
+  },
+  "previewOriginProp": true,
+  "protectionSettingsChanged": false,
+  "applicationAuthCreated": false,
+  "remoteFixtureCreated": false,
+  "externalPushTransportActivated": false,
+  "productionPromoted": false,
+  "physicalDeviceRetested": false,
+  "operationalGo": false
+}

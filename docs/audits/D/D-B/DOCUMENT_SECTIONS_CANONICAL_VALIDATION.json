@@ -1,0 +1,382 @@
+{
+  "at": "2026-11-11T17:31:46.348533+00:00",
+  "increment": "D3.84",
+  "checkpoint": "06.5",
+  "status": "COMPLETE_LOCAL_SCOPED_9_COMPOSITIONS",
+  "baseSha": "039ba7053e4ad51910077a6763db16e67f3e8109",
+  "compositions": [
+    "DOC-01",
+    "DOC-02",
+    "DOC-03",
+    "DOC-04",
+    "DOC-05",
+    "ARQ-01",
+    "ARQ-02",
+    "RAS-01",
+    "RAS-02"
+  ],
+  "distinctQualifiedCases": 45,
+  "rounds": [
+    {
+      "report": "document-sections-first.json",
+      "stats": {
+        "startTime": "2026-11-11T16:49:04.860Z",
+        "duration": 837932.737,
+        "expected": 33,
+        "skipped": 0,
+        "unexpected": 9,
+        "flaky": 0
+      }
+    },
+    {
+      "report": "document-sections-final.json",
+      "stats": {
+        "startTime": "2026-11-11T17:05:27.953Z",
+        "duration": 661833.7420000001,
+        "expected": 11,
+        "skipped": 0,
+        "unexpected": 2,
+        "flaky": 0
+      }
+    },
+    {
+      "report": "document-sections-focus-final.json",
+      "stats": {
+        "startTime": "2026-11-11T17:18:59.826Z",
+        "duration": 133652.273,
+        "expected": 6,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "report": "document-sections-callback-final.json",
+      "stats": {
+        "startTime": "2026-11-11T17:23:05.590Z",
+        "duration": 98232.167,
+        "expected": 1,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "report": "document-sections-dialog-final.json",
+      "stats": {
+        "startTime": "2026-11-11T17:28:55.594Z",
+        "duration": 152715.693,
+        "expected": 4,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  ],
+  "cases": [
+    {
+      "file": "attachment-attempts.spec.ts",
+      "title": "C-FINAL023 anexos ocultam lista recusada e recuperam leitura sem perder arquivo escolhido",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "attachment-attempts.spec.ts",
+      "title": "anexo confirmado com resposta perdida congela escolha e GET recupera o mesmo arquivo sem outro upload",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "attachment-attempts.spec.ts",
+      "title": "perda antes da reserva conserva arquivo e chave e permite concluir a mesma intenção",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "attachment-attempts.spec.ts",
+      "title": "reserva preparada permite abandono explícito recuperável sem apagar história ou criar ato operacional",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "attachment-attempts.spec.ts",
+      "title": "PDF com ressalva é recusado com explicação e limite4MB é verificado antes de enviar",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "attachment-attempts.spec.ts",
+      "title": "upload concluído no Storage é recuperado após recarga sem arquivo local e vinculado uma única vez",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "attachment-attempts.spec.ts",
+      "title": "retomada após recarga confere o original e a recuperação recusa bytes divergentes do Storage",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "attachment-attempts.spec.ts",
+      "title": "timeout nativo30s depois do commit conserva a intenção e recupera ready sem novo upload",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "document-list.spec.ts",
+      "title": "document list reaches more than100 REQ and old pending records with stable order,URL and late-filter protection",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "document-sections-canonical.spec.ts",
+      "title": "06.5 native archive attachments and historical facts share canonical rows without issuing on consultation",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "document-sections-canonical.spec.ts",
+      "title": "06.5 public reference and native signed file retain distinct results in canonical forms and facts",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "document-sections-canonical.spec.ts",
+      "title": "06.5 private resume summary and native CAS comparison retain both complete editions without official effects",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "private-creation-drafts.spec.ts",
+      "title": "REQ em dois aparelhos compara revisões5 e6, mantém o texto de B e salva7 sem renovar a data observada",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "private-creation-drafts.spec.ts",
+      "title": "BAL parcial recupera o mesmo save após resposta perdida; REQ fica separada e descarte preserva ficha e arquivo ready",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "public-verification.spec.ts",
+      "title": "C-FINAL023 verificação separa falha do serviço de código digitado inválido sem produzir emissão",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "public-verification.spec.ts",
+      "title": "verificação pública resolve QR e código sem conta e discrimina bytes de outra emissão",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "supply-private-drafts.spec.ts",
+      "title": "COM entre duas sessões conserva decimal incompleto e resolve CAS sem emitir protocolo ou ficha",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "supply-private-drafts.spec.ts",
+      "title": "dois alvos de divergência ENT retomam isoladamente e descarte privado não aceita a entrega",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "transfer-declaration-private-drafts.spec.ts",
+      "title": "declaração FAMILY retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "version-history.spec.ts",
+      "title": "Histórico rejeita resposta200 inválida ou de outra versão como falha de leitura recuperável",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "version-history.spec.ts",
+      "title": "Histórico COM compara snapshots, não usa nome/catálogo posterior e conserva o arquivo e a seleção ao voltar",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "version-history.spec.ts",
+      "title": "Histórico ENT separa motivo e ressalva por versão, recupera erro da seção e mantém foco de seleção durante demora",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "version-history.spec.ts",
+      "title": "Histórico REQ e BAL usa a mesma leitura congelada, preserva decimal, observação desconhecida e contagem",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "version-history.spec.ts",
+      "title": "Histórico permite leitura autorizada sem capacidades de compra e recusa comando sem alterar a ficha",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "attachment-attempts.spec.ts",
+      "title": "abandon dialog clears server metadata after native membership denial without abandoning the reservation",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "record-drawer-focus.spec.ts",
+      "title": "RecordDrawer 390: continuar, descartar, Escape e salvar conservam foco e intenção",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "record-drawer-focus.spec.ts",
+      "title": "RecordDrawer 1440: continuar, descartar, Escape e salvar conservam foco e intenção",
+      "projects": [
+        "chromium"
+      ]
+    }
+  ],
+  "positive": [
+    "Canonical file row preserves native issuance and attachment facts,actions,legacy unknowns and exact downloads.",
+    "Historical event and field comparisons retain frozen author/material names,versions,hashes and exact source bindings.",
+    "Public registry,bytes,signature,chain and time results remain distinct;real signed artifacts and private401 are exercised.",
+    "Native draft resumption,CAS,explicit manual choices and scoped discard retain both editions and no official effects.",
+    "More than100 document records,filters,URL and late-response protection remain covered.",
+    "Native multipart recovery,original fingerprint,mismatch rejection,read denial,passive PDF limits and abandonment remain covered.",
+    "Native revoked membership denies PATCH and removes server metadata while preserving the quarantine reservation and official facts.",
+    "Final compact Dialog uses existing Base UI finalFocus with a stable resolver;RecordDrawer source is unchanged from the base."
+  ],
+  "visual": {
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "reference": "Offline approved HTML file row and style classes;probes add only original model classes,no CSS or application DOM changes.",
+    "probes": [
+      "kv",
+      "feed/event",
+      "record"
+    ],
+    "allAxeRules": "Enabled",
+    "media": "Forced colors,reduced motion",
+    "inspection": "PASS native320 captures of attachment,issuance,verification,private comparison and final compact confirmation inspected;real scroll,hit-tests and full dialog bounds.",
+    "notProved": "Physical device,AT,native400% zoom or provider."
+  },
+  "counterproof": {
+    "reports": [
+      "document-sections-first.json",
+      "document-sections-final.json",
+      "document-sections-focus-final.json",
+      "document-sections-callback-final.json",
+      "document-sections-dialog-final.json"
+    ],
+    "artifacts": "First through fourth artifact archives and first/second custom captures retained in ignored output/phase-d-work/ui-canonical.",
+    "causes": [
+      "Initial new test checkpoint preceded the authorized attachment;capture after that operation and independently preserve all original events.",
+      "New archive test used issuance-list endpoint with archive schema;use native /archive endpoint.",
+      "CAS comparison was already loading automatically;await both native editions rather than race a transient disabled consultation button.",
+      "Legacy audit retained scroll after resize and encountered normal sticky-header overlap;use shared real scroll-to-top audit with all rules enabled.",
+      "Confirmed abandonment removed its opener;explicit outcome-dependent focus destination is required.",
+      "Inspection selected existing compact Dialog for the short confirmation;editing-drawer extension removed."
+    ]
+  },
+  "checks": {
+    "types": "PASS",
+    "affectedLint": "PASS",
+    "build": "PASS guarded runner reached browser cases",
+    "markdown": "PASS five changed Markdown files;zero issues"
+  },
+  "remote": {
+    "newSql": false,
+    "expectedMigrations": 207,
+    "reconciliation": "PASS final linked skip-vault dry-run: Remote database is up to date;no pending migration."
+  },
+  "limits": [
+    "Original105 criterion states remain57PASS/48PARTIAL;18 UI states unchanged.",
+    "Original06.5 visual compositions only;06.6,joint stage19 and other surfaces remain.",
+    "DOC-A/B/C/D keep their own gates:full simplified resume policy,new PDF appearance and new documentary policies are not declared implemented by this increment.",
+    "PDF renderer,signer,TSA,byte storage,authorization,cache and transport contracts unchanged.",
+    "Own SHA CI,human/device/provider and final integration gates required;no merge or production.",
+    "Sonar:OWNER_DEFERRED_SONAR_CONFIGURATION;no Quality Gate approval."
+  ],
+  "qualification": {
+    "unchangedFirstRound": 29,
+    "retainedSecondRound": 10,
+    "legacyCompatibilityConsumers": 2,
+    "finalCompactDialogCases": 4,
+    "retainedByRound": [
+      29,
+      10,
+      2,
+      0,
+      4
+    ]
+  },
+  "baseCiObservation": {
+    "sha": "039ba7053e4ad51910077a6763db16e67f3e8109",
+    "run": 43059003409,
+    "conclusion": "failure",
+    "passed": [
+      "database",
+      "validate (ubuntu-latest)",
+      "validate (windows-latest)"
+    ],
+    "nextCheckpoint": "06.6",
+    "issues": [
+      "Stale selectors or copy in canonical-foundation,requisition-follow-up,transfer-bilateral,v4,workflows,read-state-consumers,COM preparation.",
+      "Viewport/scroll and focus in BAL recovery,catalogue-scale,RecordDrawer initial read and document-tab selection.",
+      "WebKit installation:runner DNS/index APT failure;not a product execution result."
+    ],
+    "logs": "Ignored output/phase-d-work/ci-d383-<job>.log",
+    "ownSha": "Required after publication;no global CI approval."
+  }
+}

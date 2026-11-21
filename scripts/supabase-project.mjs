@@ -1,8 +1,9 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, resolve } from "node:path";
+import { delimiter, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { trustedExecutable } from "./trusted-executable.mjs";
 
 export const projectRef = "qwfrqychokvhdzakibid";
 const workspace = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -19,10 +20,19 @@ function environment() {
   delete env.SUPABASE_PROFILE;
   delete env.SUPABASE_WORKDIR;
   delete env.SUPABASE_NO_KEYRING;
+  for (const name of Object.keys(env)) {
+    if (name.toUpperCase() === "PATH") delete env[name];
+  }
+  // Keep OS tools and Docker's credential helper available without the caller's search path.
+  env.PATH = (process.platform === "win32"
+    ? ["C:\\Windows\\System32", "C:\\Program Files\\Docker\\Docker\\resources\\bin"]
+    : ["/usr/bin", "/bin", "/usr/local/bin"]
+  ).join(delimiter);
   return env;
 }
 function execute(args, capture = true) {
-  const result = spawnSync("supabase", [...args,"--profile",profile,"--workdir",workspace], {env:environment(),encoding:"utf8",stdio:capture?["ignore","pipe","pipe"]:"inherit"});
+  const env = environment();
+  const result = spawnSync(trustedExecutable("supabase"), [...args,"--profile",profile,"--workdir",workspace], {env,encoding:"utf8",stdio:capture?["ignore","pipe","pipe"]:"inherit"});
   if (result.error || result.status !== 0) throw new Error(capture ? result.stderr?.trim() || "Supabase command failed." : "Supabase command failed.");
   return result.stdout;
 }
@@ -43,6 +53,13 @@ function verifyAccess(user) {
 export function runProjectCommand(args) {
   if (args.some((argument) => /^--(?:profile|workdir|project-ref|db-url)(?:=|$)/.test(argument))) throw new Error("Target/profile overrides are not accepted by the project wrapper.");
   if (["unlink","logout"].includes(args[0]) || args[0] === "projects" && args[1] !== "list" || args[0] === "db" && args[1] === "reset" || args[0] === "migration" && args[1] === "repair") throw new Error("This operation is outside the project update workflow. Local resets use the backed-up, explicitly authorized test harness.");
+  if (args[0] === "db" && args[1] === "push") {
+    const modes = args.filter(argument => argument === "--apply" || /^--dry-run(?:=|$)/.test(argument));
+    if (modes.length !== 1 || (modes[0] !== "--dry-run" && modes[0] !== "--apply")) {
+      throw new Error("Specify exactly one migration mode. Run node scripts/supabase-project.mjs db push --dry-run to preview, or use --apply to apply.");
+    }
+    if (modes[0] === "--apply") args = args.filter(argument => argument !== "--apply");
+  }
   if (args[0] === "login") {
     mkdirSync(cliHome,{recursive:true});
     writeFileSync(profile,"name: home-care-assistant\napi_url: https://api.supabase.com\ndashboard_url: https://supabase.com/dashboard\nproject_host: supabase.co\npooler_host: supabase.com\n",{mode:0o600});

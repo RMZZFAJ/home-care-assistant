@@ -1,9 +1,12 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { CATALOG } from "../src/lib/catalog.ts";
+import { prepareReportOutput } from "./report-output.mjs";
+import { assertLocalProject } from "./test-environment.mjs";
 
-const outputRoot = "docs/audits/2026-10-21";
+const output = prepareReportOutput();
+assertLocalProject();
 const containers = {
   local: "supabase_db_home-care-assistant",
 };
@@ -91,8 +94,8 @@ for (const definition of local.patientDefinitions) {
   if(JSON.stringify(normalizedAliases(definition.aliases))!==JSON.stringify(normalizedAliases(model.aliases)))overrides.aliases++;
 }
 const report={generatedAt:new Date().toISOString(),method:"Local development database; BEGIN READ ONLY; no patient identities queried.",reference:{source:"src/lib/catalog.ts",sha256:createHash("sha256").update(readFileSync("src/lib/catalog.ts")).digest("hex"),count:expected.length},local:{...local.metadata,...local.patientCounts,comparison:compare(expected,local.products),ambiguities:ambiguities(local.products),inactiveTemplateIds:local.products.filter((item)=>!item.active).map((item)=>item.id)},patientDefinitions:{count:local.patientDefinitions.length,scopes:scopes.size,exclusive,inactive:local.patientDefinitions.filter((item)=>!item.active).length,overrides,ambiguousTerms:[...scopes.values()].reduce((sum,items)=>sum+ambiguities(items,false),0)},limits:["Patient customizations are intentional capabilities, not automatic inconsistencies.","New patients start empty until explicit adoption.","Remote database reconciliation is recorded separately in EXECUTION.md."]};
-writeFileSync(`${outputRoot}/CATALOGUE_AUDIT.json`,JSON.stringify(report,null,2)+"\n");
-writeFileSync(`${outputRoot}/CATALOGUE_AUDIT.md`,`# Auditoria do catálogo local
+output.write("CATALOGUE_AUDIT.json",JSON.stringify(report,null,2)+"\n");
+output.write("CATALOGUE_AUDIT.md",`# Auditoria do catálogo local
 
 Gerada em ${report.generatedAt} com consultas somente leitura.
 

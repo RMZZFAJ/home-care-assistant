@@ -1,0 +1,60 @@
+{
+  "observedAt": "2026-11-07T21:23:14.233Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 25
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN",
+      "count": 1
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 3
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 139
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1
+    }
+  ],
+  "after": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 29
+    },
+    {
+      "name": "extension_in_public",
+      "level": "WARN",
+      "count": 1
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 3
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 144
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1
+    }
+  ],
+  "approvalClaim": false,
+  "note": "New four private tables have RLS and no direct anon/Auth/service grants. Five new personal SECURITY DEFINER RPCs are authenticated-only and revalidate Auth/session/ownership; three workers are service-only. Exact live grants, safe search_path and unchanged previous functions were verified separately. Historical unaccent and leaked-password warnings unchanged. No Auth configuration or external transport activation."
+}

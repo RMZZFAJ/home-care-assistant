@@ -1,10 +1,11 @@
 /* Captures only the sanitized result returned by the already-open CLI session.
  * CLI logs/cookies stay in private LOCALAPPDATA. Does not log requests/headers. */
 import assert from 'node:assert/strict';
+import {checkedCliPath} from './cli-file-path.mjs';
 import {execFileSync} from 'node:child_process';
 import {writeFileSync} from 'node:fs';
 assert.equal(process.versions.node,'24.22.0');
-const cli=process.argv[2];assert(cli?.endsWith('playwright-cli.js'),'Pass installed Playwright CLI path');
+const cli=checkedCliPath(process.argv[2]);
 const output=execFileSync(process.execPath,[cli,'-s=b5','run-code','--filename','docs/audits/2026-10-30-phase-b5-integrations/evidence/b58-after.js'],{encoding:'utf8',windowsHide:true,timeout:55000});
 const line=output.split('\n').find(x=>x.startsWith('{"beforeReload"'));assert(line,'CLI result absent');const data=JSON.parse(line);
 assert.equal(data.beforeReload.flowQueries,0);assert.equal(data.beforeReload.flowVisible,false);assert(data.beforeReload.events>0);assert(data.beforeReload.contextQueries>0);assert(data.beforeReload.bellQueries>0);assert.equal(data.afterReloadVisible,true);

@@ -1,0 +1,211 @@
+import { lastDraftPanel } from "./l1-long-draft-panel";
+import { selectMaterialCategory } from "./material-category";
+import { expect,test,type Page } from "@playwright/test";
+import { randomUUID } from "node:crypto";
+import { setup,actor,rpc,fixtures } from "../integration/v4-fixtures.mjs";
+import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { sql,sqlLiteral } from "../../scripts/test-environment.mjs";
+import { selectContext } from "./auth-context";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { loginDecision } from "./l1-decision-policy";
+import { audit } from "./accessibility-audit";
+test.setTimeout(210_000);
+test.afterEach(async({page})=>{await page.unrouteAll({behavior:"wait"});});
+const panel=lastDraftPanel;
+const stages=(page:Page)=>page.getByRole("navigation",{name:/^Etapas da (COM|ENT)$/});
+const savedStatus=(page:Page)=>page.locator(".hca-supply-wizard-footer").getByRole("status");
+const next=(page:Page)=>page.getByRole("button",{name:/^(Selecionar materiais|Continuar|Revisar ficha)$/}).click();
+async function login(page:Page,patient:string,role="family"){
+ await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures[role].email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);await page.bringToFront();
+}
+async function open(page:Page,patient:string,kind:"COM"|"ENT"){
+ await page.goto(`/fichas/${kind.toLowerCase()}?careRecipientId=${patient}`);await expect(stages(page).or(panel(page)).first()).toBeVisible({ timeout: 30_000 });
+}
+async function resume(page:Page){await panel(page).getByRole("button",{name:"Continuar rascunho",exact:true}).click();await expect(stages(page)).toBeVisible();}
+async function widths(page:Page,label:string){for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});await page.evaluate(()=>window.scrollTo({top:0,left:0,behavior:"instant"}));await audit(page,label+" "+width);}}
+const official=(patient:string)=>sql(`select jsonb_build_object('documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${sqlLiteral(patient)}),'events',(select jsonb_agg(to_jsonb(e) order by id) from public.document_events e where document_id in(select id from public.operational_documents where care_recipient_id=${sqlLiteral(patient)})),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)}),'series',(select jsonb_agg(to_jsonb(s) order by type) from public.document_series s where care_recipient_id=${sqlLiteral(patient)}));`);
+const draftContent=(f:{products:string[]},recipient="")=>({form:{quantities:{[f.products[0]]:"1,"},notes:"Preenchimento privado fictício",origin:recipient?"":"donation",source:"FAMILY",recipientId:recipient,recipientReason:recipient?"Pessoa indicada manualmente para esta entrega":""},links:{},materials:f.products.map((id,i)=>({id,name:"Material fictício V4 "+i,unit:"unidade",quantityDecimals:0})),context:{documentId:null,documentVersion:null,requisitionId:null,recipientName:recipient?"Profissional fictício":""}});
+
+test("COM entre duas sessões conserva decimal incompleto e resolve CAS sem emitir protocolo ou ficha",async({page,browser})=>{
+ const f=await setup(),owner=await shiftWorker(f.patient,"family"),body=draftContent(f),saved=await rpc(owner.client,"supply_draft_command",{p_patient:f.patient,p_kind:"COM",p_purpose:"create",p_target:null,p_id:null,p_expected:null,p_body:{action:"save",content:body},p_key:randomUUID()}),before=official(f.patient),second=await browser.newContext();
+ try{
+  const peer=await second.newPage();await loginDecision(page,owner.email,f.patient);await open(page,f.patient,"COM");await resume(page);await next(page);await selectMaterialCategory(page);const quantity=page.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(quantity).toHaveValue("1,");
+  await loginDecision(peer,owner.email,f.patient);await open(peer,f.patient,"COM");await resume(peer);await next(peer);await selectMaterialCategory(peer);const other=peer.getByRole("textbox",{name:"Quantidade — Material fictício V4 0",exact:true});await expect(other).toHaveValue("1,");
+  await quantity.fill("2,");await expect(savedStatus(page)).toHaveText("Último rascunho salvo.");
+  await other.fill("3,");await expect(panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true})).toBeEnabled();await expect(other).toHaveValue("3,");await expect(panel(peer).getByText("Quantidade: 2, unidade",{exact:true})).toBeVisible();await panel(peer).getByRole("button",{name:"Manter minha edição para salvar nova revisão",exact:true}).click();await expect(savedStatus(peer)).toHaveText("Último rascunho salvo.");
+  const row=JSON.parse(sql(`select jsonb_build_object('id',id,'revision',revision,'content',content,'navigation',navigation) from private.creation_drafts where id=${sqlLiteral(saved.id)};`));expect(row.revision).toBe(3);expect(row.content.form.quantities[f.products[0]]).toBe("3,");expect(row.navigation).toEqual({version:1,stage:"higiene"});
+  await peer.reload();await expect(panel(peer)).toBeVisible();await expect(panel(peer).getByRole("textbox")).toHaveCount(0);
+  await expect(panel(peer)).toContainText("Última gravação");
+  await expect(panel(peer)).toContainText("Etapa salva");
+  await expect(panel(peer).getByRole("listitem").filter({ hasText: "Material fictício V4 0" })).toContainText("3, unidade");
+  await resume(peer);await expect(peer.locator('[aria-current="step"]')).toContainText("Materiais");await expect(peer.getByRole("button",{name:/^Higiene/,pressed:true})).toBeVisible();await expect(other).toHaveValue("3,");expect(official(f.patient)).toBe(before);await widths(peer,"D3 COM private incomplete form");
+ }finally{await second.close();}
+});
+
+test("ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",async({page})=>{
+ const f=await setup(),owner=await actor("family",f.patient),body=draftContent(f,fixtures.professional.id);body.form.quantities[f.products[0]]="2";
+ const saved=await rpc(owner,"supply_draft_command",{p_patient:f.patient,p_kind:"ENT",p_purpose:"create",p_target:null,p_id:null,p_expected:null,p_body:{action:"save",content:body},p_key:randomUUID()});
+ await login(page,f.patient);await open(page,f.patient,"ENT");await resume(page);for(let i=0;i<3;i++)await next(page);
+ await page.getByRole("button",{name:"Adicionar observação",exact:true}).click();
+ await page.getByLabel("Observação 1",{exact:true}).fill("Separar os materiais para conferência.");await next(page);
+ await expect(savedStatus(page)).toHaveText("Último rascunho salvo.");await page.reload();await expect(panel(page)).toBeVisible();await resume(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
+ const packets:Record<string,unknown>[]=[];let documentId="";
+ await page.route("**/api/documents",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());const response=await route.fetch();expect(response.ok()).toBe(true);documentId=(await response.json()).data.id;return route.fulfill({response,json:{data:{id:documentId},persistence:"confirmed"}});});
+ const lookups: unknown[]=[];
+ await page.route("**/api/drafts/issuance/reconcile", async route => {
+   lookups.push(route.request().postDataJSON());
+   if (lookups.length===1) return route.fulfill({status:403,json:{code:"FORBIDDEN",error:"Texto privado do ensaio"}});
+   return route.continue();
+ });
+ await page.getByRole("button",{name:"Expedir entrega",exact:true}).click();
+ const modal=page.getByRole("dialog",{name:"Resultado ainda não confirmado",exact:true});
+ const recover=modal.getByRole("button",{name:"Consultar resultado",exact:true});
+ await expect(recover).toBeEnabled();expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");expect(packets[0].draftCommit).toMatchObject({id:saved.id});
+ await recover.click();await expect(recover).toBeEnabled();
+ await modal.getByText("Detalhes para suporte",{exact:true}).click();
+ await expect(modal.locator("pre")).toContainText("FORBIDDEN");
+ await expect(modal.locator("pre")).not.toContainText("Texto privado");
+ await recover.click();
+ // The result waits for notice preparation and signed PDF generation, each with its own transport budget.
+ await expect(page.getByRole("dialog",{name:"Entrega expedida",exact:true})).toBeVisible({timeout:65_000});
+ expect(packets).toHaveLength(1);expect(lookups).toHaveLength(2);expect(lookups[0]).toEqual(lookups[1]);
+ expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");expect(sql(`select consumed_document_id from private.creation_drafts where id=${sqlLiteral(saved.id)};`)).toBe(documentId);expect(sql(`select state from private.creation_drafts where id=${sqlLiteral(saved.id)};`)).toBe("consumed");
+});
+
+test("duas fichas ENT não herdam campos de conferência descartada e nenhuma navegação aceita recebimento",async({page})=>{
+ const f=await setup(),make=()=>rpc(f.admin,"create_supply_document",{p_patient:f.patient,p_type:"ENT",p_payload:{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício",lines:f.products.map(productId=>({productId,quantity:"2"}))},p_key:randomUUID(),p_draft:false}),first=await make(),second=await make(),before=official(f.patient);
+ await login(page,f.patient,"professional");
+ for(const doc of [first,second]){ await page.goto(`/fichas/${doc.id}`);await openDocumentAction(page, "Informar divergência");
+  const field=page.getByRole("textbox",{name:"Observações da divergência",exact:true}); await expect(field).toHaveValue(""); await field.fill("Conferência que será descartada sem aceitar entrega.");
+  await page.getByRole("button",{name:"Fechar ação",exact:true}).click(); const guard=page.getByRole("dialog",{name:"Sair sem concluir?",exact:true});await guard.getByRole("button",{name:"Sair e descartar",exact:true}).click();
+ }
+ expect(official(f.patient)).toBe(before);expect(sql(`select count(*) from private.creation_drafts where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("0");
+});
+
+test("recuperação de save incerto conserva a chave após revogação real e não revela o cache ao reabrir",async({page})=>{
+ const f=await setup(),marker="Observação privada fictícia "+randomUUID(),before=official(f.patient);await login(page,f.patient);await open(page,f.patient,"COM");for(let i=0;i<3;i++)await next(page);await page.getByRole("button",{name:"Adicionar observação",exact:true}).click();
+ const packets:unknown[]=[];let lose=true;await page.route("**/api/drafts",async route=>{if(route.request().method()!=="POST")return route.continue();const body=route.request().postDataJSON();if(!body.content?.form?.observations?.includes(marker))return route.continue();packets.push(body);if(lose){lose=false;const response=await route.fetch();expect(response.ok()).toBe(true);return route.abort("failed");}return route.continue();});
+ await page.getByLabel("Observação 1",{exact:true}).fill(marker);await expect(panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true})).toBeEnabled();
+ let release!:()=>void,entered!:()=>void;const gate=new Promise<void>(r=>{release=r;}),arrived=new Promise<void>(r=>{entered=r;});let hold=true;
+ await page.route("**/api/context",async route=>{if(hold&&route.request().method()==="GET"){const response=await route.fetch();entered();await gate;return route.fulfill({response});}return route.continue();});
+ try{
+  sql(`update public.care_recipient_memberships set role='reader' where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.family.id)};`);await page.evaluate(()=>window.dispatchEvent(new Event("hca:profile-updated")));await arrived;
+  await panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true}).click();await expect(page.getByText(marker,{exact:true})).toHaveCount(0);expect(packets).toHaveLength(2);expect(packets[0]).toEqual(packets[1]);
+  hold=false;release();await page.reload();await expect(page.getByText(marker,{exact:true})).toHaveCount(0);expect(await page.evaluate(()=>Object.keys(sessionStorage).some(key=>key.startsWith("hca:private-draft-command:")&&sessionStorage.getItem(key)?.includes("Observação privada fictícia")))).toBe(true);
+ }finally{hold=false;release?.();sql(`update public.care_recipient_memberships set role='family' where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.family.id)};`);}
+ await page.reload();await expect(panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true})).toBeEnabled();await panel(page).getByRole("button",{name:"Recuperar salvamento ou descarte",exact:true}).click();await expect(page.getByText("Último rascunho salvo.",{exact:true})).toBeVisible();expect(packets).toHaveLength(3);expect(packets[2]).toEqual(packets[0]);expect(official(f.patient)).toBe(before);
+});
+
+test("L2 perda de escrita conserva a edição da COM e o vínculo permite consulta", async ({ page }, info) => {
+  const f = await setup();
+  const observation = "Preenchimento preservado durante mudança de acesso";
+  await login(page, f.patient);
+  await open(page, f.patient, "COM");
+  for (let step = 0; step < 3; step++) await next(page);
+  await page.getByRole("button", { name: "Adicionar observação", exact: true }).click();
+  const field = page.getByLabel("Observação 1", { exact: true });
+  await field.fill(observation);
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  const before = official(f.patient);
+  const draftBefore = sql(`select content::text from private.creation_drafts
+    where care_recipient_id=${sqlLiteral(f.patient)} and owner_id=${sqlLiteral(fixtures.family.id)} and kind='COM' and state='active'`);
+  expect(draftBefore).toContain(observation);
+  const inReadOnly: string[] = [];
+  page.on("request", request => {
+    if (request.method() === "POST" && ["/api/drafts", "/api/documents"].includes(new URL(request.url()).pathname)) inReadOnly.push(request.url());
+  });
+
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+       values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.family.id)},'com.create',false)`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  const notice = page.getByRole("dialog", { name: "Seu acesso agora é de consulta", exact: true });
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText("O último rascunho salvo poderá ser retomado");
+  await expect(field).toHaveCount(0);
+  await expect(stages(page)).toHaveCount(0);
+  if (info.project.use.hasTouch) await info.attach("E06-17 acesso de consulta", {
+    body: await notice.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
+  await notice.getByRole("button", { name: "Consultar ficha", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Consultar fichas autorizadas", exact: true })).toBeFocused();
+  expect(inReadOnly).toEqual([]);
+  expect(official(f.patient)).toBe(before);
+
+  sql(`update public.capability_overrides set enabled=true
+       where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.family.id)}
+         and capability='com.create'`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  await expect(field).toHaveValue(observation);
+  await expect(stages(page)).toBeVisible();
+  expect(official(f.patient)).toBe(before);
+});
+
+test("revisão legada HTTP prova a primeira etapa salva de COM ENT BAL e recupera somente a submissão pendente",async({page,browser})=>{
+ const f=await setup(),second=await browser.newContext(),pro=await second.newPage();await login(page,f.patient,"adminA");await login(pro,f.patient,"professional");
+ try{for(const kind of ["COM","ENT","BAL"]){
+  const payload={lines:f.products.map(productId=>({productId,quantity:"2"})),...(kind==="COM"?{origin:"purchase"}:kind==="ENT"?{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício"}:{notes:"Contagem fictícia"})},client=kind==="BAL"?await actor("professional",f.patient):f.admin,target=kind==="BAL"?pro:page;
+  const doc=await rpc(client,"create_supply_document",{p_patient:f.patient,p_type:kind,p_payload:payload,p_key:randomUUID(),p_draft:true}),body={payload:{...payload,notes:"Revisão legada HTTP fictícia"},idempotencyKey:randomUUID(),submissionKey:randomUUID(),expectedVersion:doc.version,recount:false,submit:true};
+  const revised=await rpc(client,"revise_supply_document",{p_id:doc.id,p_payload:body.payload,p_key:body.idempotencyKey,p_version:doc.version,p_recount:false}),before=official(f.patient);
+  sql(`create function private.phase_d3_legacy_http_fault() returns trigger language plpgsql set search_path='' as $$begin if new.status is distinct from old.status and new.status<>'draft' then raise exception 'controlled legacy submission failure' using errcode='PT499';end if;return new;end;$$;create trigger phase_d3_legacy_http_fault before update on public.operational_documents for each row when(old.id=${sqlLiteral(doc.id)}::uuid) execute function private.phase_d3_legacy_http_fault();`);
+  try{const failed=await target.request.post(`/api/documents/${doc.id}/revise`,{data:body}),error=await failed.json();expect(failed.status()).toBe(503);expect(error).toMatchObject({code:"REVISION_SAVED_SUBMISSION_PENDING",retryable:true,confirmedStage:{kind:"revision",documentId:doc.id,idempotencyKey:body.idempotencyKey,version:revised.version}});expect(error.error).toContain(`A revisão ${revised.version} desta ficha foi salva.`);expect(JSON.stringify(error)).not.toContain("controlled legacy");expect(official(f.patient)).toBe(before);}finally{sql("drop trigger if exists phase_d3_legacy_http_fault on public.operational_documents;drop function if exists private.phase_d3_legacy_http_fault();");}
+  const success=await target.request.post(`/api/documents/${doc.id}/revise`,{data:body});expect(success.ok(),await success.text()).toBe(true);const result=await success.json(),after=official(f.patient);expect(result.persistence).toBe("confirmed");expect(result.data.status).not.toBe("draft");const replay=await target.request.post(`/api/documents/${doc.id}/revise`,{data:body});expect(await replay.json()).toEqual(result);expect(official(f.patient)).toBe(after);expect(sql(`select count(*) from public.document_events where document_id=${sqlLiteral(doc.id)} and action=${sqlLiteral(kind.toLowerCase()+".draft_updated")};`)).toBe("1");
+ }}finally{await second.close();}
+});
+
+for(const kind of ["COM","ENT","BAL"] as const)test(`${kind} revisão legada no formulário mostra a versão salva e conserva ambas as chaves após recarga e rejeição da recuperação`,async({page})=>{
+ const f=await setup(),role=kind==="BAL"?"professional":"adminA",owner=kind==="BAL"?await actor(role,f.patient):f.admin,payload={lines:f.products.map(productId=>({productId,quantity:"2"})),notes:"Revisão legada do formulário",...(kind==="COM"?{origin:"purchase"}:kind==="ENT"?{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício"}:{})},doc=await rpc(owner,"create_supply_document",{p_patient:f.patient,p_type:kind,p_payload:payload,p_key:randomUUID(),p_draft:true}),intent={payload,key:randomUUID(),submissionKey:randomUUID(),draft:false,expectedVersion:doc.version},revised=await rpc(owner,"revise_supply_document",{p_id:doc.id,p_payload:payload,p_key:intent.key,p_version:doc.version,p_recount:false}),before=official(f.patient);
+ await login(page,f.patient,role);const storageKey=`hca:v2:draft:${kind}:${fixtures[role].id}:${f.patient}:${doc.id}:standalone:edit`;
+ await page.evaluate(({key,envelope})=>sessionStorage.setItem(key,JSON.stringify(envelope)),{key:storageKey,envelope:{savedAt:Date.now(),editingId:doc.id,intent,links:{},form:{quantities:Object.fromEntries(f.products.map(id=>[id,"2"])),notes:payload.notes,origin:"purchase",source:"FAMILY",recipientId:"",recipientReason:""}}});
+ const packets:Record<string,unknown>[]=[];await page.route(`**/api/documents/${doc.id}/revise`,async route=>{packets.push(route.request().postDataJSON());if(packets.length===2)return route.fulfill({status:409,json:{code:"VERSION_CONFLICT",error:"Recuperação temporariamente rejeitada neste ensaio"}});return route.continue();});
+ sql(`create function private.phase_d3_legacy_form_fault() returns trigger language plpgsql set search_path='' as $$begin if new.status is distinct from old.status and new.status<>'draft' then raise exception 'controlled legacy form submission failure' using errcode='PT499';end if;return new;end;$$;create trigger phase_d3_legacy_form_fault before update on public.operational_documents for each row when(old.id=${sqlLiteral(doc.id)}::uuid) execute function private.phase_d3_legacy_form_fault();`);
+ try{
+  await page.goto(`/fichas/${kind.toLowerCase()}?documentId=${doc.id}`);const recover=page.getByRole("button",{name:"Recuperar esta tentativa",exact:true});await expect(recover).toBeEnabled();await recover.click();await expect(page.getByText(new RegExp(`A revisão ${revised.version} desta ficha foi salva`))).toBeVisible();expect(official(f.patient)).toBe(before);
+  await page.reload();await expect(recover).toBeEnabled();await recover.click();await expect(recover).toBeEnabled();await recover.click();await expect(page.getByText(new RegExp(`A revisão ${revised.version} desta ficha foi salva`))).toBeVisible();expect(packets).toHaveLength(3);for(const packet of packets){expect(packet.idempotencyKey).toBe(intent.key);expect(packet.submissionKey).toBe(intent.submissionKey);expect(packet.expectedVersion).toBe(doc.version);expect(packet.payload).toEqual(payload);}expect(official(f.patient)).toBe(before);await widths(page,"D3 legacy confirmed revision pending submission");
+ }finally{sql("drop trigger if exists phase_d3_legacy_form_fault on public.operational_documents;drop function if exists private.phase_d3_legacy_form_fault();");}
+ await page.getByRole("button",{name:"Recuperar esta tentativa",exact:true}).click();await expect(kind==="BAL" ? page.getByText("Documento persistido",{exact:true}) : page.getByRole("dialog",{name:kind==="COM" ? "Compra emitida" : "Entrega expedida",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"Recuperar esta tentativa",exact:true})).toHaveCount(0);expect(packets).toHaveLength(4);expect(packets[3]).toEqual(packets[0]);expect(await page.evaluate(key=>sessionStorage.getItem(key),storageKey)).toBeNull();expect(sql(`select count(*) from public.document_events where document_id=${sqlLiteral(doc.id)} and action=${sqlLiteral(kind.toLowerCase()+".draft_updated")};`)).toBe("1");
+});
+
+test("recuperação HTTP legada não adota edição posterior e reconhece as duas etapas já confirmadas",async({page,browser})=>{
+ const f=await setup(),second=await browser.newContext(),pro=await second.newPage();await login(page,f.patient,"adminA");await login(pro,f.patient,"professional");
+ try{for(const kind of ["COM","ENT","BAL"]){
+  const payload={lines:f.products.map(productId=>({productId,quantity:"2"})),...(kind==="COM"?{origin:"purchase"}:kind==="ENT"?{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício"}:{notes:"Contagem fictícia"})},client=kind==="BAL"?await actor("professional",f.patient):f.admin,target=kind==="BAL"?pro:page;
+  for(const alreadySubmitted of [true,false]){
+   const doc=await rpc(client,"create_supply_document",{p_patient:f.patient,p_type:kind,p_payload:payload,p_key:randomUUID(),p_draft:true}),body={payload:{...payload,notes:"Intenção legada original"},idempotencyKey:randomUUID(),submissionKey:randomUUID(),expectedVersion:doc.version,recount:false,submit:true},revised=await rpc(client,"revise_supply_document",{p_id:doc.id,p_payload:body.payload,p_key:body.idempotencyKey,p_version:doc.version,p_recount:false});
+   if(alreadySubmitted)await rpc(client,"supply_document_command",{p_id:doc.id,p_action:"submit",p_body:{},p_key:body.submissionKey,p_version:revised.version});else await rpc(client,"revise_supply_document",{p_id:doc.id,p_payload:{...payload,notes:"Edição posterior preservada"},p_key:randomUUID(),p_version:revised.version,p_recount:false});
+   const before=official(f.patient),response=await target.request.post(`/api/documents/${doc.id}/revise`,{data:body}),result=await response.json();
+   if(alreadySubmitted){expect(response.ok(),JSON.stringify(result)).toBe(true);expect(result.persistence).toBe("confirmed");expect(result.data.status).not.toBe("draft");const mismatch=await target.request.post(`/api/documents/${doc.id}/revise`,{data:{...body,submissionKey:randomUUID()}});expect(mismatch.status()).toBe(409);expect(await mismatch.json()).toMatchObject({code:"IDEMPOTENCY_CONFLICT"});}
+   else{expect(response.status()).toBe(503);expect(result).toMatchObject({code:"REVISION_SAVED_SUBMISSION_PENDING",confirmedStage:{version:revised.version}});expect(sql(`select status from public.operational_documents where id=${sqlLiteral(doc.id)};`)).toBe("draft");}
+   expect(official(f.patient)).toBe(before);
+  }
+ }}finally{await second.close();}
+});
+
+test("COM recupera no formulário as duas etapas legadas já confirmadas sem exigir outra revisão",async({page})=>{
+ const f=await setup(),payload={lines:f.products.map(productId=>({productId,quantity:"2"})),origin:"purchase",notes:"Duas etapas legadas confirmadas"},doc=await rpc(f.admin,"create_supply_document",{p_patient:f.patient,p_type:"COM",p_payload:payload,p_key:randomUUID(),p_draft:true}),intent={payload,key:randomUUID(),submissionKey:randomUUID(),draft:false,expectedVersion:doc.version},revised=await rpc(f.admin,"revise_supply_document",{p_id:doc.id,p_payload:payload,p_key:intent.key,p_version:doc.version,p_recount:false});
+ await rpc(f.admin,"supply_document_command",{p_id:doc.id,p_action:"submit",p_body:{},p_key:intent.submissionKey,p_version:revised.version});const before=official(f.patient);await login(page,f.patient,"adminA");const key=`hca:v2:draft:COM:${fixtures.adminA.id}:${f.patient}:${doc.id}:standalone:edit`;
+ await page.evaluate(({key,envelope})=>sessionStorage.setItem(key,JSON.stringify(envelope)),{key,envelope:{savedAt:Date.now(),editingId:doc.id,intent,links:{},form:{quantities:Object.fromEntries(f.products.map(id=>[id,"2"])),notes:payload.notes,origin:"purchase",source:"FAMILY",recipientId:"",recipientReason:""}}});
+ await page.goto(`/fichas/com?documentId=${doc.id}`);await page.getByRole("button",{name:"Recuperar esta tentativa",exact:true}).click();await expect(page.getByRole("dialog",{name:"Compra emitida",exact:true})).toBeVisible();expect(await page.evaluate(key=>sessionStorage.getItem(key),key)).toBeNull();expect(official(f.patient)).toBe(before);
+});
+
+test("ENT com saldo insuficiente reconhece a revisão legada salva e recupera a expedição HTTP sem repetir revisão",async({page})=>{
+ const f=await setup(),payload={lines:f.products.map(productId=>({productId,quantity:"2"})),source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício"},doc=await rpc(f.admin,"create_supply_document",{p_patient:f.patient,p_type:"ENT",p_payload:payload,p_key:randomUUID(),p_draft:true}),body={payload:{...payload,lines:f.products.map(productId=>({productId,quantity:"31"}))},idempotencyKey:randomUUID(),submissionKey:randomUUID(),expectedVersion:doc.version,recount:false,submit:true};
+ const revised=await rpc(f.admin,"revise_supply_document",{p_id:doc.id,p_payload:body.payload,p_key:body.idempotencyKey,p_version:doc.version,p_recount:false}),before=official(f.patient);
+ await login(page,f.patient,"adminA");const failed=await page.request.post(`/api/documents/${doc.id}/revise`,{data:body}),error=await failed.json();expect(failed.status()).toBe(503);expect(error).toMatchObject({code:"REVISION_SAVED_SUBMISSION_PENDING",confirmedStage:{kind:"revision",documentId:doc.id,idempotencyKey:body.idempotencyKey,version:revised.version}});expect(official(f.patient)).toBe(before);
+ // A real new stock fact resolves the shortage. Neither the revision payload nor
+ // either idempotency key changes; the old receipt remains the same event.
+ for(const product of f.products)await rpc(f.admin,"family_stock_movement",{p_patient:f.patient,p_product:product,p_quantity:"5",p_action:"inbound",p_reason:"Reposição fictícia após insuficiência comprovada",p_key:randomUUID()});
+ const success=await page.request.post(`/api/documents/${doc.id}/revise`,{data:body});expect(success.ok(),await success.text()).toBe(true);expect((await success.json()).data.status).toBe("pending_receipt");const after=official(f.patient);expect((await page.request.post(`/api/documents/${doc.id}/revise`,{data:body})).ok()).toBe(true);expect(official(f.patient)).toBe(after);expect(sql(`select count(*) from public.document_events where document_id=${sqlLiteral(doc.id)} and action='ent.draft_updated';`)).toBe("1");
+});
+
+test("revisão HTTP de COM ENT BAL reverte as duas etapas na falha e recupera as mesmas chaves",async({page,browser})=>{
+ const f=await setup(),second=await browser.newContext(),pro=await second.newPage();await login(page,f.patient,"adminA");await login(pro,f.patient,"professional");
+ try{for(const kind of ["COM","ENT","BAL"]){
+  const payload={lines:f.products.map(productId=>({productId,quantity:"2"})),...(kind==="COM"?{origin:"purchase"}:kind==="ENT"?{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Recebedor manual fictício"}:{notes:"Contagem fictícia"})},client=kind==="BAL"?await actor("professional",f.patient):f.admin,target=kind==="BAL"?pro:page;
+  const doc=await rpc(client,"create_supply_document",{p_patient:f.patient,p_type:kind,p_payload:payload,p_key:randomUUID(),p_draft:true}),body={payload:{...payload,notes:"Revisão HTTP fictícia"},idempotencyKey:randomUUID(),submissionKey:randomUUID(),expectedVersion:doc.version,recount:false,submit:true},before=official(f.patient);
+  sql(`create function private.phase_d3_submit_fault() returns trigger language plpgsql set search_path='' as $$begin if new.status is distinct from old.status and new.status<>'draft' then raise exception 'controlled second-stage submission failure' using errcode='PT499';end if;return new;end;$$;create trigger phase_d3_submit_fault before update on public.operational_documents for each row when(old.id=${sqlLiteral(doc.id)}::uuid) execute function private.phase_d3_submit_fault();`);
+  try{const failed=await target.request.post(`/api/documents/${doc.id}/revise`,{data:body});expect(failed.status()).toBe(503);const error=await failed.json();expect(error).toMatchObject({code:"DATABASE_UNAVAILABLE"});expect(JSON.stringify(error)).not.toContain("controlled second-stage");expect(official(f.patient)).toBe(before);}finally{sql("drop trigger if exists phase_d3_submit_fault on public.operational_documents;drop function if exists private.phase_d3_submit_fault();");}
+  const confirmed=await target.request.post(`/api/documents/${doc.id}/revise`,{data:body});expect(confirmed.ok(),await confirmed.text()).toBe(true);const result=await confirmed.json(),after=official(f.patient);expect(result.persistence).toBe("confirmed");expect(result.data.version).toBeGreaterThan(doc.version);expect(result.data.status).not.toBe("draft");
+  const replay=await target.request.post(`/api/documents/${doc.id}/revise`,{data:body});expect(replay.ok()).toBe(true);expect(await replay.json()).toEqual(result);expect(official(f.patient)).toBe(after);
+ }}finally{await second.close();}
+});
+import { openDocumentAction } from "./document-sections";

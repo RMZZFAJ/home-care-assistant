@@ -3,11 +3,17 @@ import { expect, type Page } from "@playwright/test";
 export async function openNavigation(page: Page) {
   const origin = page.url();
   let nav = page.getByRole("navigation", { name: "Navegação principal", exact: true });
+  const trigger = page.getByRole("button", { name: "Abrir navegação", exact: true });
+  const more = page.getByRole("navigation", { name: "Navegação do plantão", exact: true }).getByRole("link", { name: "Mais", exact: true });
+  // isVisible is an immediate observation. Wait for an actual shell variant
+  // before selecting its path; hydration may initially expose none of them.
+  await expect.poll(async () => await nav.isVisible() || await trigger.isVisible() || await more.isVisible(), {
+    message: "An authorized navigation variant must be ready",
+  }).toBe(true);
   if (!await nav.isVisible()) {
-    const trigger = page.getByRole("button", { name: "Abrir navegação", exact: true });
     if (await trigger.isVisible()) await trigger.click();
     else {
-      await page.getByRole("navigation", { name: "Navegação do plantão", exact: true }).getByRole("link", { name: "Mais", exact: true }).click();
+      await more.click();
       nav = page.getByRole("navigation", { name: "Rotina e funções autorizadas", exact: true });
     }
   }

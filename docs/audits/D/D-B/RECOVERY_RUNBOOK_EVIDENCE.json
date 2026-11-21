@@ -1,0 +1,140 @@
+{
+  "at": "2026-11-09T06:37:13.562486+00:00",
+  "baseSha": "76fabb66fbbe31647af9b7c800a566f014943f76",
+  "sourceLfSha256": {
+    "src/lib/operations/recovery.ts": "5687bb5d7aed8afaf87d12bff6dcf67e53556db6ff5c4da76ae40ffdadb53baf",
+    "src/components/admin/recovery-runbook.tsx": "7df0ca7d19d9def1e7cd63ac9ee27054d9bc1eac1ad25104d314fcf7c33f0538",
+    "src/components/admin/operations-console.tsx": "cfa442186588f37f0a026474f8b316b72087323b5c7014d90e307284c940ec36",
+    "tests/operations-recovery.test.ts": "c7a726c7f7883d3f2d0a3770c27983e07641ee2272568f15d28d6ccd8cff1397",
+    "tests/e2e/operations-monitoring.spec.ts": "2622106e12a875777622267530eefba2a899915ac88531b52a37a07eb6208e77",
+    "tests/e2e/task-relations.spec.ts": "a3ed2210e1574443eab3ecc7c6c5e27a761f02d29242a1e623266403791a5745"
+  },
+  "validation": {
+    "unitPassed": 18,
+    "supportChromiumPassed": 3,
+    "relatedBoundaryChromiumAndIosPassed": 2,
+    "viewports": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "axeViolations": 0,
+    "typecheck": "PASS",
+    "directedLint": "PASS",
+    "newSql": 0,
+    "allWritesObservedDuringRelatedConsultation": 0,
+    "sourceOpeningHistoryUnchanged": true,
+    "supportBusinessLedgerScienceOutboxUnchanged": true
+  },
+  "counterproofs": [
+    "Native disabled retry lost focus; assertion failed, aria-disabled guard corrected; original log/image/context hashes retained.",
+    "Interrupted recheck has no terminal result and is not counted as PASS.",
+    "Recent failed or mismatched copy/probe cannot borrow older success. Component observations newer than available events do not confirm a report.",
+    "503/loading/malformed or wrong-environment response cannot present the runbook as current. Local role refused403.",
+    "Prior iOS CI relation test failed twice at writes1 instead of0; source REQ uses post-render opening POST. Current test explicitly completes that source action before related ENT observation, keeps the same all-route zero-write assertion and adds exact opening-history equality."
+  ],
+  "standingDailyReadQualification": {
+    "receipt": "DAILY_READ_RECOVERY_EVIDENCE.json",
+    "unchangedLfSha256": {
+      "src/app/design-system.css": "0e3cf858ad107429fd73db09f28461e7111f3fd8aa2d68d804565d471f57433c",
+      "src/components/documents/attachments.tsx": "c1317a938124bb767a4ada92039e9d66b7a20bfaddf1deed7e4de991aa34c2fd",
+      "src/components/documents/public-verification.tsx": "c5cc8b7a8fa8c8896cb3b6f399d3bd13e1da0fb1f2a5952c52caec5a4bd7a265",
+      "src/components/documents/supply-detail.tsx": "4ade06cecf8316b3d64b9b3a2d49c1592fd0002faf8c46f0040d511bf48a87c1",
+      "src/components/guides/user-guide.tsx": "fbdc3dcd427e8e6ab0db6fc30f67591177469dfed6dbe7be472bbf5bb3bf115b",
+      "src/components/schedules/schedule-console.tsx": "d79520a260c51125d3b3f4fe7a418f50cf63e08755c2dba530f7f9f4539de514",
+      "tests/e2e/attachment-attempts.spec.ts": "62cb73d48b9655502de69707b7aa260e29316450b340427936daa27d16ab7a44",
+      "tests/e2e/delivery-preparation.spec.ts": "af8e7434eb567a0cac99ef3905f1356467dcce603a31cff2a527d9730068b09c",
+      "tests/e2e/public-verification.spec.ts": "b6a587fc5c508aff4ccc2a05c9005a9fbf2f6dfb6c0d2f5970f9431c6906c6e7",
+      "tests/e2e/schedule-decisions.spec.ts": "d454b35cf299fa689e2ab008327b52bd1ee85451db998e297fdfa4d570a35fa3"
+    },
+    "guideReadCaseLfSha256": "448f423c20586b4497b7bf2250de9bf4bd8d31ca168913ac5f039f2fac75edd6",
+    "sharedSetupUnchanged": true,
+    "qualifyingCommit": "033b936a32c6a20a1dc15db7b8d53d4a025f1416",
+    "notNewExecution": true
+  },
+  "standingOpsQualification": {
+    "receipt": "OPS_3_EVIDENCE.json",
+    "unchangedLfSha256": {
+      "supabase/migrations/20261107223318_phase_db_operational_observability.sql": "cd36221fb7f4320fab4bfacb41043a125ad80b123a7cfeb0c2f7d9c2aef6d9d5",
+      "supabase/migrations/20261107233144_phase_db_operational_conflict_response.sql": "d7378cb165c7037c715eeb2b4499fbd9b6da17b470763683b6ef4f0c4a34f575",
+      "src/lib/operations/contracts.ts": "dd1a098e896eaa410abfec471dd18993cdd90f749f1cfde059f678268489eac8",
+      "src/lib/operations/events.ts": "dbd34e70798ce78219dd175685cdabc1b2436124ac6d1bfdce24d2709531ee16",
+      "src/lib/server/operations-observer.ts": "122e4a8755f8669a6efaa656519f1ebdbd8b260d331bdf266d3e8d54c3fe5dc5",
+      "src/app/api/runtime/route.ts": "2114d572fdcdf72b3ad07bed5c114066d20e356c018b8f294428ba75d0e020ab",
+      "src/app/api/notifications/worker/route.ts": "89364edac35708ed76c15e8255654ace11e47fb822b0ea550ccce95d5cea37b7",
+      "src/app/api/operations/route.ts": "9300617eb66440891bf1f1196d811b4d70b56fdd5f8cdd2a4b6cb5e1a50e48ce",
+      "src/app/api/operations/impact/route.ts": "0dbcadeba7af93c75db3e610c84b30f344459ce97eaf544b14e00d19927b4ae9",
+      "src/components/admin/administration-navigation.tsx": "df83708e4850a64f0605bdefb3b926b3bf5eea6db64deca3c173bbc5123e2568",
+      "src/components/notifications/delivery-impact.tsx": "b7aeb78774a6506ffb10d0572bd0a75ebd0c66881c85405a3ddd7dad91af6f58",
+      "src/components/notifications/notification-center.tsx": "2cb07f1e80e79ef13aeec9c2cc1449cf81e1bdbbf5f6887c781741ddd18114c3",
+      "scripts/operations-telemetry.mjs": "0006c4fc8b573ade1ea94a52d9942a206d5f136b6f14fc4f7c9f7f1eedae4380",
+      "scripts/operations-backup.mjs": "1b390460c4be7ca2af36e3602a50f08defa200bba53a7845aa4a4b5f19f24ba6",
+      "scripts/restore-backup-probe.mjs": "0d1f3502b8bb8c79582fe6049f60eec53852280c9214c1001649afa2f9d35743",
+      "scripts/backup-snapshots.mjs": "b42ca6e64b3e7c78635689f2887639bed00225acfc212fefa7cd23884ec34c26",
+      "scripts/backup-archive.mjs": "b065b7bf636a93503f86067cfaff6a70c36f27ac57cc1ee931833808b7306b1c",
+      "tests/integration/operations-monitoring.test.mjs": "7cd8a05e41a57738c8b39201496f2a42db5c1ad56b0637e7cfaffabb57232bd0",
+      "tests/integration/operations-telemetry.test.mjs": "20516ee1d85dc59a5b6d07310f24813711209227a55be5d239254cd40af5950f",
+      "tests/integration/backup-snapshots.test.mjs": "0c682f0ae66ca07ca472483c51e70e63d48472c1e5809e1f3335c7976cbd05e0",
+      "tests/e2e/accessibility.spec.ts": "3acd7e40408bcbf37c1f4afdec329ac8e8d632c09c312382ae877195486efac8",
+      "tests/operations-monitoring.test.ts": "f9695877429fe18723739f5f978dac06ac89272142424d3bc22613fb9252f1fc"
+    },
+    "scope": "Only matching files are reused; changed consumers are not granted prior full-source approval; current3 browser cases and parent DB CI qualify affected boundaries.",
+    "newBackupOrRestoreClaimed": false
+  },
+  "logLfSha256": {
+    "output\\phase-d-work\\gui04-unit-final.log": "2a4b8148262c5cce7a27f4f095c953d710b9762afbba2424823faa62dd1cf39e",
+    "output\\phase-d-work\\gui04-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "output\\phase-d-work\\gui04-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "output\\phase-d-work\\gui04-e2e-focus-failure.log": "3b7224cec0a58db7d87cee24ab3bb946ba88c2ad50a48d92520f322f7f91aa85",
+    "output\\phase-d-work\\gui04-e2e-interrupted.log": "858f8704132b99ff9738ca636651cce03a6238922c2b6ff89cfb0a1090375e08",
+    "output\\phase-d-work\\gui04-e2e-recheck.log": "d0de59209934a233a0d1238be63ca0d918ed5959440a7e9df3850da907d04f00",
+    "output\\phase-d-work\\gui04-related-boundary.log": "ab437e66f9efad93727aee4db39fcea0755c740fca92dc187a70a1ad03758bfe",
+    "output/phase-d-work/gui04-markdown.log": "203a490d5f4c099847592a93e323085cf18f620ca4a1c0cefdcf2c993d4b4642",
+    "output/phase-d-work/gui04-lint-unit-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "initialFocusFailureArtifacts": {
+    "output\\phase-d-work\\gui04-first-failure\\error-context.md": "f2e5d58bc0938f2ca0195c8a80472cc1d6e6ae5086fa610ec1dd39de337d652f",
+    "output\\phase-d-work\\gui04-first-failure\\test-failed-1.png": "2b5a354219b9f687e60559d52c547a33a577a1269a8ec5c4d06202e67605732d"
+  },
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "first30Preserved": true,
+    "counts": {
+      "PARTIAL": 48,
+      "PASS": 56,
+      "NOT_STARTED": 1
+    },
+    "passScope": "C-FINAL-AC-023 local composed read/error contract; C-FINAL-AC-025 only started GUI-04 composition,66 tasks not approved"
+  },
+  "remote": "RECOVERY_RUNBOOK_REMOTE_OBSERVATION.json",
+  "baseCi": "CI_76FABB6_OBSERVATION.json",
+  "reactReview": {
+    "pureReadModel": true,
+    "noEffectOrWaterfallAdded": true,
+    "stableKeys": true,
+    "existingScopedFetchAndAcl": true,
+    "readOnlyOutputs": true,
+    "focusedRetryGuarded": true
+  },
+  "remainingGate": [
+    "own SHA CI and preview",
+    "66 compositions /171 relations reconciliation and comparison in five viewports",
+    "GUI-04 responsible/substitute designation, real incident exercise and external custody/destination",
+    "physical devices and AT/human D-C gates",
+    "quarantine/operational restore/RPO/RTO D6"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false,
+  "goalComplete": false,
+  "documentationValidation": {
+    "markdown": "PASS;0 issues;4 files",
+    "links": "PASS;local dossier targets exist",
+    "json": "PASS",
+    "matrix": "105x39;first30 columns identical to parent",
+    "sql": "no new or edited migration",
+    "diffCheck": "PASS"
+  }
+}

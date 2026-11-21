@@ -1,0 +1,445 @@
+{
+  "baseSha": "88a4b5baa526b2b272e0489ecdbb78c6192a0be5",
+  "sourceLfSha256": {
+    "src/app/api/drafts/route.ts": "7a8737d69ee0347ba8af5cb99baa390456e2ae6b8a31fd65bfc78cc2d8aae2f2",
+    "src/app/api/requisitions/[id]/archive/route.ts": "8a3f9aedee1f27ce5bc8a7640b709c44d8356eac4582f6ba0ff86717653eb7ff",
+    "src/app/api/requisitions/[id]/decision-context/route.ts": "a05dbf9a12b3a24bbae0c4e19b0ed4d479cd71916b499a6d7bbd585739353345",
+    "src/app/api/requisitions/[id]/resolve/route.ts": "3067c4f1ad6723ad9022ed49f5299033e853375d97cf4c829fcb10526b99b50b",
+    "src/app/api/requisitions/[id]/status/route.ts": "3bd105825f05de0e1cd7ddcd63d0eedc91f3cbab38c4afde5baf1d637a89ff83",
+    "src/components/forms/creation-draft-panel.tsx": "dc2b515714081955c5a606fa9134e31a8c31d974e528a82b54637f74530f0510",
+    "src/components/forms/record-drawer.tsx": "936d7e5a2bb1c409aa6479284933ddab0696a5edc30fbc1dd5dac4d78e8691d7",
+    "src/components/forms/use-creation-draft.ts": "0304b71bae448e2949eacb1c4ce2f5f27f96328823db78e808fe24b64e9700b5",
+    "src/components/requisitions/requisition-decision-editor.tsx": "5e87ff7ed86b19e3baa574be7f61862f64bebbdced48ed88101c1b371d0b3c79",
+    "src/components/requisitions/requisition-detail.tsx": "aca0e394aeb1066de25265a1a920c1f75f055e4531e1eb6024466ba40eb04f82",
+    "src/components/requisitions/resolve-extra-item.tsx": "0d963453a871dc2c04bb87b297fb267c15536f8cdd74a6d8e8b7c8eb258b98b5",
+    "src/lib/forms/draft-navigation.ts": "5d5ef79ab297c3f99ba7ade891df4ec988c989a948d7bacb9be6f77526310605",
+    "src/lib/forms/requisition-decision-draft.ts": "db2c391006ceb8565358a68910c056a5c1fed0a24c1efc20ab98b88285f37b41",
+    "src/lib/server/requisition-draft.ts": "ded17520ca183b21257b49c5c6d21c220eae7f7489eea2d5fe52f8a61d008846",
+    "src/lib/validation/creation-drafts.ts": "71c0a57c20d75583fc5fe2cb587608392cc8317b34d2324b3f8de0605616ceb5",
+    "src/lib/validation/private-draft-results.ts": "3382e4e9477d7cc1facf1b976a87fe2506274141abb471d6cf1e52b8e06c9662",
+    "src/lib/validation/requisition-decisions.ts": "be18943bc175a0c1c1c0eafddcdc7519f4eae06812be58203a2dfe8febed17b6",
+    "src/lib/validation/supply-drafts.ts": "2c2481c08ff868eafaf2d5e55118eccb9ee5419361d5a820373fbaf6611669f6",
+    "supabase/migrations/20261109203428_phase_d3_requisition_decision_drafts.sql": "87f025b44bba3b7cbb688790c529d96f47844c54a3d0489d4f157e52275c18d6",
+    "tests/api/private-drafts-contract.test.ts": "c34fee5c785b3f3d23857a86764a314628a9f4288c07fcbf6555ca5c5b3c2ed6",
+    "tests/e2e/document-tabs.spec.ts": "bb879d916900d9d55211a3774b0659078720568841ef23d824fe364f35f53848",
+    "tests/e2e/record-drawer-focus.spec.ts": "cf3675c524e4f0af1751ce1bb72430772b3bb28f799c1c86ed5f34de3df68d4d",
+    "tests/e2e/requisition-decision-private-drafts.spec.ts": "c193a71d9543c173151541e05df119a95ca8f054087cae0f1ac83756ff47051c",
+    "tests/e2e/requisition-pdf-personal-receipt.spec.ts": "f0d86bd0449e59f49ceeb075770c025a6be0ed497dfa65eeabe0c6d49a2393e2",
+    "tests/e2e/workflows.spec.ts": "3ddc6e6564beb7c47f084dd6a6193a5710bb22c7c8e34676e8124369b6704355",
+    "tests/integration/requisition-decision-draft-fixtures.mjs": "583cc9c8ca16f8f18103106d2180ad726d2de90572478eab8e49abb699a9b5b0",
+    "tests/integration/requisition-decision-private-drafts.test.mjs": "0de0b5af83aecadccb4e4668fed95a75fcd66028f5c5bf10abc5494bdacc7053",
+    "tests/requisition-decision-drafts.test.ts": "1da13f91bb0f02e88795ee6b9d2da9c061eb8eac2f415bf45356b075e1be2c4e"
+  },
+  "unitApi": {
+    "distinct": 34,
+    "specificRepeatedAfterAvailabilityChange": 13,
+    "logs": [
+      "req-decisions-unit-final.log",
+      "req-decisions-unit-availability.log"
+    ]
+  },
+  "realAuth": {
+    "distinct": 16,
+    "qualifiedSuccesses": {
+      "req-decisions-auth-complete.log": 12,
+      "req-decisions-immutability-probes.log": 3,
+      "req-decisions-historical-read-final.log": 1
+    },
+    "limits": "Three original fixtures illegally relabeled issued material and were rejected. Corrected probes retain that invariant. Historical readonly source found genuine missing lifecycle;fixed helper,then passed. No positive historical-mutation scenario claimed. Reuse twelve unaffected Auth successes after nullable historical-only read repair."
+  },
+  "browser": {
+    "distinct": 20,
+    "byProject": {
+      "mobile": 10,
+      "ios": 10
+    },
+    "latestCases": [
+      {
+        "title": "Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação real",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "document-tabs.spec.ts",
+          "line": 597,
+          "column": 5
+        },
+        "duration": 19516,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação real",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "document-tabs.spec.ts",
+          "line": 597,
+          "column": 5
+        },
+        "duration": 16690,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ archive retoma preenchimento parcial entre sessões,bloqueia referência403 e200 inválido e confirma somente após adoção explícita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 110,
+          "column": 7
+        },
+        "duration": 21412,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ cancel retoma preenchimento parcial entre sessões,bloqueia referência403 e200 inválido e confirma somente após adoção explícita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 110,
+          "column": 7
+        },
+        "duration": 19030,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ resolve_extra retoma preenchimento parcial entre sessões,bloqueia referência403 e200 inválido e confirma somente após adoção explícita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 110,
+          "column": 7
+        },
+        "duration": 25296,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ resposta perdida recupera o pacote exato após perda das duas capacidades e reconhece resultado após reload sem novo POST",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 289,
+          "column": 5
+        },
+        "duration": 14029,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ revalida acesso sem substituir edição própria e compara revisão privada alterada por outra sessão",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 373,
+          "column": 5
+        },
+        "duration": 12494,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ archive retoma preenchimento parcial entre sessões,bloqueia referência403 e200 inválido e confirma somente após adoção explícita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 110,
+          "column": 7
+        },
+        "duration": 24666,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ cancel retoma preenchimento parcial entre sessões,bloqueia referência403 e200 inválido e confirma somente após adoção explícita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 110,
+          "column": 7
+        },
+        "duration": 24113,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ resolve_extra retoma preenchimento parcial entre sessões,bloqueia referência403 e200 inválido e confirma somente após adoção explícita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 110,
+          "column": 7
+        },
+        "duration": 33957,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ resposta perdida recupera o pacote exato após perda das duas capacidades e reconhece resultado após reload sem novo POST",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 289,
+          "column": 5
+        },
+        "duration": 15128,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ revalida acesso sem substituir edição própria e compara revisão privada alterada por outra sessão",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "requisition-decision-private-drafts.spec.ts",
+          "line": 373,
+          "column": 5
+        },
+        "duration": 12973,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "M1 mantém material e ciência após resolução de extra, atendimento e duas emissões PDF",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "requisition-pdf-personal-receipt.spec.ts",
+          "line": 85,
+          "column": 5
+        },
+        "duration": 27338,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "M1 mantém material e ciência após resolução de extra, atendimento e duas emissões PDF",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "requisition-pdf-personal-receipt.spec.ts",
+          "line": 85,
+          "column": 5
+        },
+        "duration": 31789,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "item extra identificado, múltiplas REQ, scanner e trânsito até o aceite",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "workflows.spec.ts",
+          "line": 772,
+          "column": 5
+        },
+        "duration": 33666,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "item extra identificado, múltiplas REQ, scanner e trânsito até o aceite",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "workflows.spec.ts",
+          "line": 772,
+          "column": 5
+        },
+        "duration": 44548,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "RecordDrawer 390: continuar, descartar, Escape e salvar conservam foco e intenção",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "record-drawer-focus.spec.ts",
+          "line": 16,
+          "column": 38
+        },
+        "duration": 13705,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "RecordDrawer 1440: continuar, descartar, Escape e salvar conservam foco e intenção",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "record-drawer-focus.spec.ts",
+          "line": 16,
+          "column": 38
+        },
+        "duration": 10972,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "RecordDrawer 390: continuar, descartar, Escape e salvar conservam foco e intenção",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "record-drawer-focus.spec.ts",
+          "line": 16,
+          "column": 38
+        },
+        "duration": 12523,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "RecordDrawer 1440: continuar, descartar, Escape e salvar conservam foco e intenção",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "record-drawer-focus.spec.ts",
+          "line": 16,
+          "column": 38
+        },
+        "duration": 15102,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      }
+    ],
+    "rounds": [
+      {
+        "name": "req-decisions-revalidation",
+        "stats": {
+          "total": 16,
+          "expected": 14,
+          "unexpected": 2,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "reportSha256": "3da7097a1418b6f6a5be78e75da960d5e140a3ac8b1191d8b08281670d2e1481"
+      },
+      {
+        "name": "req-decisions-affected",
+        "stats": {
+          "total": 6,
+          "expected": 6,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "reportSha256": "f6d76892af645cab25323ffe6a7b7d5af4583e2aa580e9155ada4aff3f740fb4"
+      }
+    ],
+    "qualification": "14 successes retained;2 failed revalidation cases corrected/repeated;4 strengthened RecordDrawer cases added. Two earlier stopped runs are counterproof only. Final runs use HCA_E2E_DIAGNOSTIC=true:Next dev,not production-build acceptance. All runner sources frozen;no parallel mutable DB suite. Only shared revalidation same-confirmed-revision branch and fieldset focus selection changed before directed repeat;previous resumed-copy and official-action semantics unchanged. Own-SHA CI remains required.",
+    "axe": true,
+    "fourWidths": true,
+    "successImagesInspected": [
+      "req-decisions-revalidation/84077a9ef0a59bc9f4ccdfcc0fc5ab67600383f9.png",
+      "req-decisions-revalidation/1ab1fca603297b45691887688b18147c64ad238b.png"
+    ],
+    "physicalDeviceProof": false
+  },
+  "directedChecks": {
+    "types": "PASS",
+    "lint": "PASS",
+    "generalChecks": "Own-SHA CI;not repeated locally without new global hypothesis"
+  },
+  "logSha256": {
+    "req-decisions-affected-e2e.log": "65dc1395f8b944ede10d1d17464c5fa1f7934b0ba73bc82b55bfe1c36f687488",
+    "req-decisions-affected-list.log": "9effae190814fe5429df794e6801ccfa4ddad066fa84b7c792b1666bf82aed43",
+    "req-decisions-auth-additional.log": "f2cfc9170c1a6536e9509bf0632a180f4d071c10ad02c27d1c243ad13ee84347",
+    "req-decisions-auth-complete.log": "06e34390feb2eee57efcab973e9580ba3198cca169cdbfd8622d35931793e81e",
+    "req-decisions-auth-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "req-decisions-auth-final.log": "025326f6c5121000e9f0e2c2b7760aff7cf4a71e0f8f95e3144fb6e6594d6e08",
+    "req-decisions-auth-initial.log": "79e7bbd6de7c24588d723fc67afb4618babb84c97968cdaf6f6bc5484da2c290",
+    "req-decisions-db-prepare-final.log": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43",
+    "req-decisions-db-prepare.log": "a297384aca683f4428ab5740e9a1b98322f63e95d5ca550ed9d012c51747d568",
+    "req-decisions-diagnostic-list.log": "bc273b514b24475fe4afd6d4a7be12037bbeea86b9a780389318f9d0eeb865f6",
+    "req-decisions-e2e-diagnostic.log": "ab9fc5db2da2577f7cb2cb30113955bf24742aa6a33f12af63d5a34724ff3071",
+    "req-decisions-e2e-initial.log": "7967d3a804d595074c261c7dfa332a80d13293e82ba8c7ba87e5afee1a1bdb31",
+    "req-decisions-e2e-list.log": "0f59dbfbc3328c56d0ec138dbac4d6903979722247e5c22aa58bd5c74fd0590b",
+    "req-decisions-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "req-decisions-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "req-decisions-historical-read-final.log": "68f97169fd853d4196301ff23231e3a4a6d6f851b329fb6d9405629c6ca76ca0",
+    "req-decisions-historical-read.log": "f69e81711d27b70905b493caf724d45e624b51e00f2705cfb48e7d899bb0923b",
+    "req-decisions-immutability-probes.log": "cbe39068cb5d73c802193ea636ca9c4435fbf694d6e6d6057a624255c6054760",
+    "req-decisions-lint-current.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "req-decisions-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "req-decisions-lint-initial.log": "539890c234e11874b0f020f5ea2131a23b33d909b8f32dcb8511775dc565e1d9",
+    "req-decisions-markdown-report-final.log": "d5db70258b4186713fde3c77d5326536a76d4915cd8f242c10924b1d5eb614bf",
+    "req-decisions-markdown.log": "27c113073fb54d5deff78529371d1f9f98824a857df9685a90b0e1b89402e332",
+    "req-decisions-remote-apply.log": "362fb7e85105bb49963577c408dfd7ac8274e096dbaed918a79d5fedff069675",
+    "req-decisions-remote-clean.log": "d77102c47dbe17725adfd88b5aed2ce8316cf1842517c1af4897c58aa8b70caf",
+    "req-decisions-remote-dry-run.log": "c8dc5af5518b51baf114f16cd70c8eeddf2caa8030ff19321bbed61262eaea00",
+    "req-decisions-revalidation-e2e.log": "468974fd92350ecb470fd36841ba8380a18940428c9fee0f1313166e128a93a9",
+    "req-decisions-revalidation-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "req-decisions-revalidation-list.log": "3ce6ffc9ae7cf8810cba31c8ac49cc9d628f3130cf1a306f1ee45626f0c5f462",
+    "req-decisions-revalidation-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "req-decisions-test-fixes-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "req-decisions-test-fixes-types.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "req-decisions-types-browser.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "req-decisions-types-current.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "req-decisions-types-final.log": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+    "req-decisions-types-initial.log": "cf30de237cf9a1ce65662a141bf0b3cfdd5d065354adc848e8138edd9569c259",
+    "req-decisions-types-second.log": "bb43bd1dfd12576b2e366c95a81802d6446f7ec66a9abaf0eb63032051a908c9",
+    "req-decisions-unit-availability.log": "b5821efa1ade408704d840d7025d1fe2c157b07aff8399eb8890303c33112461",
+    "req-decisions-unit-final.log": "309718c6130efe745f3366a99521091e58aea7f797c12a4a54fd511f8f879502",
+    "req-decisions-unit-initial.log": "5ad0f29e1e337afb81c119f715a0902d6f3e8424e0c3ce7d92000c896003dfd6"
+  },
+  "authoring": "REQ_DECISION_DRAFTS_REMOTE.json:unpublished175 corrected locally without replay/history rewrite;remote received final candidate once",
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30Unchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "uiRequirements": 18,
+    "historicalMigrationsUnchanged": 84,
+    "localRemoteMigrations": 175
+  },
+  "previousCi": "CI_88A4B5B_OBSERVATION.json:FAIL;local directed correction does not approve older SHA",
+  "limits": [
+    "BAL contextual decisions and full canonical66/171 parity remain partial",
+    "No new signature,backup,monitoring,provider,physical-device or production approval",
+    "Sonar owner-deferred;PR7 Draft;goal active"
+  ],
+  "documentation": {
+    "markdown": "PASS:6 initially clean;temporary report renumbering corrected and repeated clean;AGENTS clean",
+    "localLinksChecked": 342,
+    "first30ColumnsUnchanged": true,
+    "temporaryReportCriteria": 105,
+    "visualEstimate": 60,
+    "formsVisualEstimate": 75
+  }
+}

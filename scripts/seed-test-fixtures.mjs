@@ -7,6 +7,7 @@ import {
   sqlLiteral,
   testDataRoot,
   fixtureFile,
+  pauseLocalAutomationForTests,
 } from "./test-environment.mjs";
 
 import {
@@ -20,6 +21,7 @@ export { fixtureFile };
 
 export async function seedFixtures({ legacy = false } = {}) {
   const env = getTestEnvironment();
+  pauseLocalAutomationForTests();
   mkdirSync(testDataRoot, { recursive: true });
   const admin = createClient(env.url, env.serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -129,7 +131,7 @@ export async function seedFixtures({ legacy = false } = {}) {
       on conflict(id) do nothing;`);
   }
   writeFileSync(fixtureFile, JSON.stringify(fixtures));
-  await waitForLocalDataApi();
+  await waitForLocalDataApi({ legacy });
   return fixtures;
 }
 

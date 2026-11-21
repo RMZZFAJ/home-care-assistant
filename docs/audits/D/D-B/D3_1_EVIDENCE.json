@@ -1,0 +1,74 @@
+{
+  "sourceBaseSha": "4315eb9367046a8606f7cdfef1331f92db915722",
+  "sourceTreeDirty": true,
+  "files": [
+    {
+      "file": "next.config.ts",
+      "sha256LfUtf8": "331128f9968e776838225e06892e631eaa259f1afd0cb39b48ed397e8451e9a0"
+    },
+    {
+      "file": "src/app/global-not-found.tsx",
+      "sha256LfUtf8": "324ed480b4bd3034af500350073a78d4ceef90083e1fa78f05b2a9bc3b844ae8"
+    },
+    {
+      "file": "src/lib/client/api.ts",
+      "sha256LfUtf8": "963d79d9318c7f7fa2f27fc55e6fc9416f823bb57aa52f9844024491aae2a25f"
+    },
+    {
+      "file": "src/lib/server/api.ts",
+      "sha256LfUtf8": "c0c5b93de9814608f809ef7eab5b2b81adacef92beac7d05d5f57641b57ec380"
+    },
+    {
+      "file": "src/components/admin/accept-invitation.tsx",
+      "sha256LfUtf8": "4475d06dd67f68afc94ae42c1716e7b52bfcb5a135011aae8a090dac3c1d318c"
+    },
+    {
+      "file": "src/components/profile/science-preference.tsx",
+      "sha256LfUtf8": "280e2d4ee7fe38e93f8e2e3310ce33f6a617eda3ed0da3def45ad51d6a2a47da"
+    },
+    {
+      "file": "src/components/schedules/selected-shift-dates.tsx",
+      "sha256LfUtf8": "94e94ca5c9ee63a90dde42abb63939d57b5e2a905f988324652a8e7fbc3d0838"
+    },
+    {
+      "file": "tests/client-api.test.ts",
+      "sha256LfUtf8": "ce22f090c5ede3d21a1b965e612d5ac601ee2e5c56059e1b7b9a60d95407bae5"
+    },
+    {
+      "file": "tests/api/guards.test.ts",
+      "sha256LfUtf8": "dfa8889942e3210a85b0b6a69a6c1c886ffe3704a99464481ed892f4673f3d1f"
+    },
+    {
+      "file": "tests/e2e/private-creation-drafts.spec.ts",
+      "sha256LfUtf8": "d701bf11175f9e641d7b92553e61f9a245a62575acd84b514445929c8043dbcf"
+    },
+    {
+      "file": "tests/e2e/accessibility-audit.ts",
+      "sha256LfUtf8": "894269ee83f1840952c15b5841b3a1a5dc9b862a2d22fb497d3cebd50d275965"
+    }
+  ],
+  "unitAndApiCasesPassed": 28,
+  "browserDistinctCasesPassed": 10,
+  "projects": [
+    "chromium",
+    "mobile",
+    "ios"
+  ],
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "initialBrowserCases": {
+    "passed": 6,
+    "failed": 3
+  },
+  "failuresRetained": [
+    "fixed audit expected-title assumption, three projects",
+    "corrected new 403 fixture missing isDevelopment; no product authorization failure"
+  ],
+  "remoteMigrationsAdded": 0,
+  "humanPhysicalApproval": false,
+  "sonarApproved": false
+}

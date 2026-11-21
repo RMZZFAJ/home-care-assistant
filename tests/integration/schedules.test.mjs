@@ -43,7 +43,7 @@ test("schedules persist proposals, overnight recurrences, revisions, scope and c
   assert.equal(workspace.shifts[1].starts_at, `${secondDate}T22:00:00+00:00`);
   const shift = workspace.shifts[0];
   const change = await command(pro.client, patient, "propose_change", { id: shift.id, reason: "Correção pontual fictícia", startsAt: `${anchorDate}T23:00:00Z`, endsAt: `${nextDate}T11:00:00Z` }, shift.version);
-  await command(admin, patient, "decide_change", { id: change.id, approve: true, reason: "Ajuste autorizado" });
+  await command(admin, patient, "decide_change", { id: change.id, approve: true, reason: "Ajuste autorizado" }, change.version);
   workspace = await rpc(pro.client, "schedule_workspace", range);
   assert.equal(workspace.shifts[0].is_exception, true);
   assert.equal(workspace.changes.length, 0);

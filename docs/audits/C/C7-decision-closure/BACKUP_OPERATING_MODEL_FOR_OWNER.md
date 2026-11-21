@@ -18,8 +18,8 @@ dependentes de custo, equipe e ensaio real.
   **Trabalho do proprietário:** Conferir resumo diário e acionar operador na
   falha
 
-  **Custo a cotar:** Operador [a cotar]; armazenamento [a cotar] GB; saída [a
-  cotar] GB; ensaio [a cotar]; total/mês [a cotar]
+  **Custo a cotar:** Operador \[a cotar\]; armazenamento \[a cotar\] GB; saída \[a
+  cotar\] GB; ensaio \[a cotar\]; total/mês \[a cotar\]
 
 - **Opção:** B — recursos nativos Supabase + cópia independente de objetos
 
@@ -29,8 +29,8 @@ dependentes de custo, equipe e ensaio real.
   **Trabalho do proprietário:** Aprovar despesas, ler exceções e participar do
   ensaio
 
-  **Custo a cotar:** Plano [a cotar]; PITR/janela [a cotar]; objetos/saída [a
-  cotar]; gestão/chaves [a cotar]; total [a cotar]
+  **Custo a cotar:** Plano \[a cotar\]; PITR/janela \[a cotar\]; objetos/saída \[a
+  cotar\]; gestão/chaves \[a cotar\]; total \[a cotar\]
 
 - **Opção:** C — operador gerenciado com restauração contratada
 
@@ -39,8 +39,8 @@ dependentes de custo, equipe e ensaio real.
 
   **Trabalho do proprietário:** Revisar relatório e substituir titular ausente
 
-  **Custo a cotar:** Mensalidade [a cotar]; franquia [a cotar]; emergência [a
-  cotar]; restore/teste [a cotar]; impostos/câmbio [a cotar]
+  **Custo a cotar:** Mensalidade \[a cotar\]; franquia \[a cotar\]; emergência \[a
+  cotar\]; restore/teste \[a cotar\]; impostos/câmbio \[a cotar\]
 
 <!-- c-table:end -->
 

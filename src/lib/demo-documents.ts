@@ -63,13 +63,13 @@ export const demoDocuments: Record<string, DocumentSnapshot> =
         actors:
           kind === "REQ"
             ? {
-                ...actors,
-                issuer: {
-                  name: "Juliana - Técnica de Enfermagem",
-                  registration: "000.000 - Exemplo",
-                  state: "SP",
-                },
-              }
+              ...actors,
+              issuer: {
+                name: "Juliana - Técnica de Enfermagem",
+                registration: "000.000 - Exemplo",
+                state: "SP",
+              },
+            }
             : actors,
         lines: material.map(([name, unit, amount], row) => ({
           id: "demo-line-" + row,
@@ -89,20 +89,20 @@ export const demoDocuments: Record<string, DocumentSnapshot> =
         sciencePolicy:
           kind === "REQ"
             ? {
-                science_satisfied_at: complete
-                  ? "2026-10-22T11:00:00.000Z"
-                  : undefined,
-              }
+              science_satisfied_at: complete
+                ? "2026-10-22T11:00:00.000Z"
+                : undefined,
+            }
             : undefined,
         scienceEvents:
           kind === "REQ" && complete
             ? [
-                {
-                  actor_name: "Adriana - Familiar",
-                  mode: "express",
-                  created_at: "2026-10-22T11:00:00.000Z",
-                },
-              ]
+              {
+                actor_name: "Adriana - Familiar",
+                mode: "express",
+                created_at: "2026-10-22T11:00:00.000Z",
+              },
+            ]
             : [],
         workflow:
           kind === "ENT" && complete
@@ -117,24 +117,36 @@ export const demoDocuments: Record<string, DocumentSnapshot> =
           },
           ...(complete
             ? [
-                {
-                  action:
-                    kind === "REQ"
-                      ? "req.science_satisfied"
-                      : kind === "ENT"
-                        ? "ent.receive"
-                        : "bal.approve",
-                  actorName: kind === "ENT" ? "Juliana" : "Adriana",
-                  createdAt:
-                    kind === "REQ"
-                      ? "2026-10-22T11:00:00.000Z"
-                      : "2026-10-22T12:18:00.000Z",
-                  version: 2,
-                },
-              ]
+              {
+                action:
+                  kind === "REQ"
+                    ? "req.science_satisfied"
+                    : kind === "ENT"
+                      ? "ent.receive"
+                      : "bal.approve",
+                actorName: kind === "ENT" ? "Juliana" : "Adriana",
+                createdAt:
+                  kind === "REQ"
+                    ? "2026-10-22T11:00:00.000Z"
+                    : "2026-10-22T12:18:00.000Z",
+                version: 2,
+              },
+            ]
             : []),
         ],
       };
       return [id, snapshot];
     }),
   );
+
+/** Synthetic demonstration only; never used for authenticated records. */
+export function demoPdfSnapshot(input: DocumentSnapshot): DocumentSnapshot {
+  const snapshot = structuredClone(input);
+  snapshot.lines.forEach((line, index) => { line.id = '99000000-0000-4000-8000-' + String(index + 1).padStart(12, '0'); });
+  snapshot.sourceFacts = { schemaVersion: 1, historical: false, sourceCreatedAt: null, importedAt: null, registeredAt: snapshot.createdAt, documentCreatedAt: snapshot.createdAt, draftCreatedAt: null, issuedAt: snapshot.createdAt, issuerId: null, issuerName: snapshot.actors?.issuer?.name ?? null, issuerSource: 'unknown', patientName: snapshot.actors?.patient?.name ?? null, patientSource: 'unknown', historyActors: [] };
+  snapshot.documentFacts = { schemaVersion: 1, deliveryResolutions: [], purchaseReceiptEvents: [] };
+  snapshot.lifecycleFacts = { schemaVersion: 1, documentId: snapshot.id, version: snapshot.version, cancellation: { state: 'not_cancelled', act: null, acknowledgements: [] }, complements: [] };
+  snapshot.balanceApplication = { state: 'not_applied', lines: [] }; snapshot.balanceReviewCorrections = [];
+  snapshot.purchaseEntryBalances = snapshot.lines.map(line => ({ lineId: line.id, state: 'unavailable', quantity: null, entry: null }));
+  return snapshot;
+}

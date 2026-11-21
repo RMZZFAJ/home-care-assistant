@@ -1,0 +1,99 @@
+{
+  "status": "APPLIED_AND_POST_VALIDATED",
+  "at": "2026-11-08T08:03:10.243Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": 150,
+  "after": 151,
+  "applied": 1,
+  "pending": 0,
+  "historySqlMatched": 151,
+  "catalogueComparison": {
+    "views": true,
+    "columns": true,
+    "indexes": true,
+    "defaults": true,
+    "policies": true,
+    "triggers": true,
+    "functions": true,
+    "relations": true,
+    "constraints": false,
+    "table_grants": true,
+    "function_grants": true
+  },
+  "constraintQualification": "Only the known presentation_finite_factor validation flag differs from local retained NaN fixture; exact predicate retained",
+  "preservation": {
+    "originalTableProjections": 151,
+    "originalRowsMatched": true,
+    "unexpectedChanges": [],
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "authUsers": 9,
+    "profiles": 7,
+    "storageObjects": 33,
+    "cronDigestUnchanged": true,
+    "vaultDigestUnchanged": true,
+    "baseline": "Immediate pre-migration snapshot (field-state-pre-recheck1), not the older backup point",
+    "preflightAt": "2026-11-08T07:59:20.912Z"
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0
+  },
+  "runtimeMarker": {
+    "anonymousRestHttp": 200,
+    "protocol": 1,
+    "schema": 1
+  },
+  "technicalPrivateGrants": 0,
+  "shortNameContracts": [
+    {
+      "anon": false,
+      "authenticated": true,
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "name": "configure_patient_access",
+      "nullRemoval": true,
+      "service": false
+    },
+    {
+      "anon": false,
+      "authenticated": false,
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "name": "v4_configure_patient_access",
+      "nullRemoval": true,
+      "service": false
+    },
+    {
+      "anon": false,
+      "authenticated": false,
+      "config": [
+        "search_path=\"\""
+      ],
+      "definer": true,
+      "name": "v4_review_patient_access",
+      "nullRemoval": true,
+      "service": false
+    }
+  ],
+  "omissionPreserves": true,
+  "explicitNullRemoval": true,
+  "oldProposalsNotRewritten": true,
+  "noStoragePolicyChanges": true,
+  "noReset": true,
+  "noFixtures": true,
+  "noAuthConfigurationChanges": true,
+  "noExternalTransportActivation": true,
+  "operationalGo": false,
+  "currentSourceCi": "NOT_PUBLISHED_YET"
+}

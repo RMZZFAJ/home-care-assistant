@@ -1,0 +1,173 @@
+{
+  "assembledAt": "2026-11-09T12:46:54.858313+00:00",
+  "projectId": "qwfrqychokvhdzakibid",
+  "migration": "supabase/migrations/20261109122657_phase_d3_com_action_private_drafts.sql",
+  "migrationLfSha256": "c9f7def3505f79b7fc156c6b88be5d5efdb61f7e839999b0b809b50b9e818e30",
+  "preflight": [
+    {
+      "applied": 165,
+      "last_version": "20261109091550",
+      "incompatible_drafts": 0,
+      "waiting_locks": 0,
+      "old_transactions": 0
+    }
+  ],
+  "baselineFunctionBodies": [
+    {
+      "schema": "public",
+      "name": "commit_supply_draft",
+      "body_sha256": "3e45f1d74318f9293cf1050b9e913b0c7d3a3d02a4a32ee90d91964d4bede1a0",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "creation_draft_navigation_valid",
+      "body_sha256": "13958560cb33877a629afa43a088a79cb9bcae710d97fb96f3452b4776c875bf",
+      "security_definer": false,
+      "config": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "require_supply_draft_scope",
+      "body_sha256": "bd79cb68292229fb68ed2566e05a5c30b8c9e3b38b724a3a337a637bccc60ad0",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "validate_supply_draft",
+      "body_sha256": "5c685da084c888a6f38d08ba64a8b71899ef897a301ea367ae94675ea1472db0",
+      "security_definer": true,
+      "config": [
+        "search_path=\"\""
+      ]
+    }
+  ],
+  "allFourBaselineBodiesVerified": [
+    "commit_supply_draft",
+    "creation_draft_navigation_valid",
+    "require_supply_draft_scope",
+    "validate_supply_draft"
+  ],
+  "dryRun": {
+    "migrations": [
+      "20261109122657_phase_d3_com_action_private_drafts.sql"
+    ],
+    "seeds": [],
+    "roles": [],
+    "logLfSha256": "5d6df44fcbe2b767b2845df42173d988f5b9a7fd3d89a4a2d6fd3d1624f8cac4"
+  },
+  "application": {
+    "command": "node scripts/supabase-project.mjs db push --linked --skip-vault --yes",
+    "migrations": [
+      "20261109122657_phase_d3_com_action_private_drafts.sql"
+    ],
+    "seeds": [],
+    "roles": [],
+    "logLfSha256": "8639e0f74e830fab64b9b506f914500d22cb09be2275fdcaadc9873a97fdea83"
+  },
+  "post": {
+    "functions": [
+      {
+        "name": "commit_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "fa31eeb66369c5950abd8e79ae8b1778713a2662664d7e673898323918e5f952",
+        "securityDefiner": true
+      },
+      {
+        "name": "creation_draft_navigation_valid",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "e01bef3454a65c84e4c1ea4594ed9391990b20919821edc2789fcf8549169bf0",
+        "securityDefiner": false
+      },
+      {
+        "name": "require_supply_draft_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "2a40552f224126ab8c3971c1305df8b31b311af86f6327155c99e8a3864e2d00",
+        "securityDefiner": true
+      },
+      {
+        "name": "validate_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "506b3a9fb6bcda1fb398f30a228d00fcc38caebb87eb4ac23712010ca9939d0e",
+        "securityDefiner": true
+      }
+    ],
+    "migrations": {
+      "applied": 166,
+      "lastVersion": "20261109122657",
+      "versionSha256": "bdf830814fa964f87f4ab4b2954a615dcabb0466703cdc8a4b006ff0ca69a720"
+    },
+    "anonCanCommit": false,
+    "serviceCanCommit": false,
+    "anonDirectDraftRead": false,
+    "authenticatedCanCommit": true,
+    "authenticatedDirectDraftRead": false
+  },
+  "allFourBodiesMatchCandidate": true,
+  "localVersionDigestEqualsRemote": true,
+  "securityAdvisors": {
+    "unchangedExceptObservedAt": true,
+    "normalization": "Only observed_at excluded; all findings and metadata remain identical",
+    "stableSha256": "76a8217b5ba8c0de3b2e51cd39fd7497f8aec6712b7d5a9c436398af067a0c36",
+    "existingFindings": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "findings": 44
+      },
+      {
+        "name": "extension_in_public",
+        "level": "WARN",
+        "findings": 1
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "level": "WARN",
+        "findings": 3
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "level": "WARN",
+        "findings": 167
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "level": "WARN",
+        "findings": 1
+      }
+    ]
+  },
+  "counterproofs": [
+    {
+      "stage": "read-only preflight",
+      "sqlstate": "42601",
+      "cause": "extra closing parenthesis in inspection query",
+      "outcome": "corrected query proved zero incompatible rows before application; no DDL or migration had been sent"
+    }
+  ],
+  "limits": [
+    "No new reset, remote fixtures, Auth/Vault changes or redundant backup",
+    "Existing security warnings retained; not a global security approval",
+    "New SHA clean/legacy/full integration CI remains required; remote test database is not production approval"
+  ]
+}

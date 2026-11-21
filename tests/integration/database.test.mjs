@@ -213,6 +213,7 @@ test("concurrent family withdrawals cannot overspend and ENT acceptance preserve
     p_patient: patientA,
     p_type: "ENT",
     p_payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
       source: "FAMILY",
       destination: "CARE_TEAM",
       recipientId: fixtures.professional.id,

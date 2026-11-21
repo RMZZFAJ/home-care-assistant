@@ -1,0 +1,164 @@
+{
+  "recordedAt": "2026-11-08T19:59:49.591392+00:00",
+  "sourceBase": "3add56f070b2d9682fcb7de3811d2201dbeefe50",
+  "sourceLfSha256": {
+    "src/app/api/documents/[id]/issuances/route.ts": "f17f36e2ac416858abe699b6cfeecb4c467f2cbe7e41b7fe7de87ce4e7fb85f1",
+    "src/app/api/documents/[id]/pdf/route.ts": "21ae914664adc55c0e32eb310404d98f296a4112a4268c8de747a3178a806021",
+    "src/app/api/verification/route.ts": "d7487e2fe3a697170a79e7b5a0301992417eb606f90ea2e9413ae03575c8997a",
+    "src/lib/documents/pdf-fidelity.ts": "f10da4136054f5a062a4083d56e876ccb28917abe27910b6548c3efea90a1165",
+    "src/lib/documents/pdf-issuance.ts": "da60c01ac7b2bc8f770dcf46af8015b870c3f5169d1430a707ca41f0dbaa3f7e",
+    "src/lib/documents/pdf-source-facts.ts": "78169d9248226c072599fd19fde27f355973513bf2e02b5602ab9fae0f9c9451",
+    "src/lib/quantity.ts": "afe8fcaf09d9388d7f40f65c5a9904a25c53ec31a0bc8183f13ce1f330325601",
+    "src/lib/receipt.ts": "a42301aa2cd71068772a80aac32389ca0ec087d218288f80fb0ebc910d2cc999",
+    "src/lib/server/operational-pdf.ts": "e9e607c046bd204dbcdc9c760ed5c4d0dc6d80efe7e1918ef61b854fdd062ef0",
+    "src/lib/server/pdf-content.ts": "330e365eb74460553caee45967c36dab7605d132282e444b2f263fdda6c9d223",
+    "src/lib/server/pdf-issuance.ts": "df3ec253a26ef14bcc017d077c02fb6cf4f570172bc1dd09bf4d0861819e3e71",
+    "src/lib/server/pdf-signing/public-verifier.ts": "55bc8425b1af80c6626ef57739bb5718e6f5f4e587af5ed10e69f30924f0f7fb",
+    "src/lib/server/pdf-signing/sign.ts": "70de842b8f9c8bace3691c535ac101f96665c5f870b1df82d55606160e676113",
+    "src/lib/server/pdf-signing/verify.ts": "6df028ba39a831e8b41c8c667091179186ed5ec1df2fd1fae72f94a4374a691f",
+    "src/lib/server/public-pdf.ts": "62c5afc52144ed3ea3431d860a25acd6a76466b0d7f0250e23859e4ae5412ca8",
+    "supabase/migrations/20261108194000_phase_d4_regularization_pdf_facts.sql": "a08c24e03d2efe7c564b69cc01d21b94301bd098525ea9d785803e0a7c18a00d",
+    "tests/e2e/pdf-regularization.spec.ts": "1c351e02c2550927b428ff561916c7ed3188371057eac6e44ace3834efed60b3",
+    "tests/integration/pdf-regularization-fixtures.mjs": "f10fbd31a92555039f1799115225ffec6c50ad87a13dfc1e9ec56480a6ecf228",
+    "tests/integration/pdf-regularization.test.mjs": "7d634da4cedd6a7864a9af25ab4c44137e8664b6ad6e2b7b1b5c577757e04dab",
+    "tests/pdf-fidelity.test.ts": "6039761e6d859c1a2fc88932e2244ba2353029a3a7fe73ce5cd05305b5d22180",
+    "tests/pdf-regularization.test.ts": "7a6fe1207de36d9e3e806988923c424b0f71287d64aed5f5d42bee2d87576e4c",
+    "tests/support/pdf-fidelity-fixtures.ts": "24a111fbedf90b3746b4fd9777f074bc458e9109dfd85e81fc0a799a5fe1ed63",
+    "tests/support/pdf-regularization-fixtures.ts": "7b16e197f639d938f03142deda536e932543916ed3fa650718a7ce41bbc41554"
+  },
+  "sourceQualification": {
+    "productionInitialTestLfSha256": "50a9650709480c2907632ee0cd42baf34fb22d13f87049430f8d849157a656f5",
+    "finalTestLfSha256": "1c351e02c2550927b428ff561916c7ed3188371057eac6e44ace3834efed60b3",
+    "runtimeChangesAfterNinePassingCases": false,
+    "testChangeAfterInitialCohort": "Added browser engine to artifact filename and anonymous code/upload verification. Extended main scenario then passed in final production cohort. No runtime source changed."
+  },
+  "validation": {
+    "newUnitDistinctPassed": 5,
+    "existingFidelityUnitDistinctPassed": 10,
+    "unitCohorts": {
+      "initialExecuted": 15,
+      "passed": 14,
+      "failed": 1,
+      "affectedRecheckPassed": 5,
+      "qualification": "Marker split over wrapped lines; assertion corrected, no painter/source changed"
+    },
+    "authDistinctPassed": 3,
+    "authCohorts": {
+      "initialExecuted": 3,
+      "passed": 1,
+      "failed": 2,
+      "affectedRecheckPassed": 2,
+      "qualification": "Fixture external patient binding and equivalent decimal text fixed; no runtime changes"
+    },
+    "productionBrowser": {
+      "initialPassed": 9,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "distinctScenarios": 3,
+      "finalExtendedChromiumPassed": 1,
+      "publicCodeAndUploadWithoutApplicationSession": true,
+      "anonymousPublicResponseExcludesPrivateFacts": true,
+      "signedPdfGenerationsInInitialCohort": 18
+    },
+    "independentSignedArtifacts": 6,
+    "internalWholeFileSignatureAndTimestampPassed": true,
+    "independentNegativeOracle": [
+      "wrong ledger executor refused",
+      "wrong after reconciliation refused"
+    ],
+    "legacyControlledDigest": "ce53b0422c5bf0ccfe27ae445d4d817d755447598a1b33468475cbf42fc06caa",
+    "olderRendererControlledDigestChecks": 18,
+    "finalTypes": true,
+    "affectedLint": true,
+    "extraProductionStartFailure": "Evidence copy named .spec.ts outside its original imports entered TypeScript include. Renamed raw copy to .txt; types and the directed production start passed. No product code or rule relaxed."
+  },
+  "remote": {
+    "status": "APPLIED_AND_POST_VALIDATED",
+    "at": "2026-11-08T19:51:06.399Z",
+    "project": "qwfrqychokvhdzakibid",
+    "before": 155,
+    "after": 156,
+    "pending": 0,
+    "migration": "20261108194000_phase_d4_regularization_pdf_facts.sql",
+    "lfSha256": "a08c24e03d2efe7c564b69cc01d21b94301bd098525ea9d785803e0a7c18a00d",
+    "historySqlMatched": 156,
+    "relevantLocalRemoteFunctionDefinitionsAndGrantsExact": true,
+    "legacyReservationEntrypointsUnchanged": true,
+    "privateHelpersRemainClosed": true,
+    "cronJobsUnchanged": true,
+    "health": {
+      "database": "postgres",
+      "invalid_indexes": 0,
+      "jobs": [
+        {
+          "active": true,
+          "name": "hca-notification-worker"
+        },
+        {
+          "active": true,
+          "name": "hca-operational-lifecycle"
+        }
+      ],
+      "last_version": "20261108194000",
+      "migrations": 156,
+      "waiting_locks": 0
+    },
+    "validationPolicy": "Development test data; owner dispensed routine full backup/restore/data comparison",
+    "fullBackupRestoreOrDataComparisonRepeated": false,
+    "noReset": true,
+    "noRemoteAuthOrFixturesCreated": true,
+    "externalTransportActivated": false,
+    "productionPromoted": false,
+    "operationalGo": false
+  },
+  "ci": {
+    "baseline": "CI_3ADD56F_OBSERVATION.json",
+    "superseded": "CI_105DC9D_OBSERVATION.json",
+    "newSource": "Requires CI of its own published SHA"
+  },
+  "logsLfSha256": {
+    "regularization-pdf-auth-recheck.log": "50d43e18e3af5f75e9e42fb0eb506cb6abe01d10e7988734db0d5e42af431384",
+    "regularization-pdf-auth.log": "428e403deedd1cf171c9193bf446be5fd6d280f98c596c5c1d32122011ce5b20",
+    "regularization-pdf-final-lint.log": "e1561e98496445fc27ca4936edbb089bc1a705529b73cb8ec6566aa23323f299",
+    "regularization-pdf-final-types-after-archive.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regularization-pdf-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regularization-pdf-hook-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regularization-pdf-independent-negatives.log": "c3524eeb056099fbc950279ca8ca16d12d657135bddafb46441e73eda19c791a",
+    "regularization-pdf-independent.log": "d787fe973f93ab83dda293a7e4ef427a15326340cfb1482c8274ba8937374e4c",
+    "regularization-pdf-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regularization-pdf-local-prepare.log": "837b0adb0c945e1aca7fb3df31bf2a6e1098030938dbbe37aef8a34181a3f2ac",
+    "regularization-pdf-production.log": "c16124b777a77f4e22087bd3dbf4384031a1005b4477db4789ef74e47675d868",
+    "regularization-pdf-public-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regularization-pdf-public-production-recheck.log": "280ba97dc277f5ad942039715ba74ea14cb3a8ba31cf6fd1f211ab598490e1fa",
+    "regularization-pdf-public-production.log": "9379cc3aca133206620b33075b3d150cca862c1c2b59ff250c25c2e403f3479d",
+    "regularization-pdf-public-types-diagnostic.log": "7fa0f94165814be57ec9d9bec2c213767da3ca80ec5682cf2c61bf37585ee185",
+    "regularization-pdf-remote-apply.log": "2710bbd2617ba5ae2032f57570cd8a57dd6a9edf8b07608229fe87c8b4f111b1",
+    "regularization-pdf-remote-directory-failure.log": "02fd83a50cbd10574682814ab750c81887b718cbc09bd1ee4495d5498ae96a9b",
+    "regularization-pdf-remote-post.log": "95cef2bdfe03e9a58f7f530de91510113f447ddb69610d245f56bdb198a1b639",
+    "regularization-pdf-remote-preflight.log": "ad39e660ed2345f32f33f2bf77714f06c62294fb20efa2f33c16e2141c413a22",
+    "regularization-pdf-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "regularization-pdf-unit-final.log": "842ce4d906e75f1a08f71068631d73d1dc68ada48ef2231790c4819b4fb96db6",
+    "regularization-pdf-unit.log": "3421869756b07d44d63773bfd0a9ab954254bc675c3fa7685929c2997be3ec72",
+    "regularization-pdf-whitespace.log": "f0e0f8a79fabf93c70169fc84bc02d1443c92dc0daf658a6af70ab619bfe8c9a",
+    "regularization-v7-before.log": "c499fdd9c088bd370b90ee3d7f71166993b8e555835eadba5666bfeb7a4f6742",
+    "regularization-v7-capture.log": "5da3a316cd8c5e117477976409bc12470438a8a145e7de06974aa5c66745245e",
+    "regularization-pdf-markdown-final.log": "93a82cf06d3477431bfbcc7b740fb41d40341a8be7348a845619897f449d7e41"
+  },
+  "boundaries": [
+    "PDF appearance unchanged; only technical fields added",
+    "No external send or revoked credential restoration",
+    "Internal trust/TSA is not ICP-Brasil, independent time or external revocation",
+    "No tagged-PDF, human, AT, physical-device, D-C/D6 approval",
+    "Remote development data; owner dispensed repeated full backup/restore/data comparisons",
+    "PR7 Draft, no merge or production promotion; goal active"
+  ],
+  "documentationValidation": {
+    "markdownFiles": 7,
+    "localLinks": 178,
+    "canonicalColumnsPreserved": 29,
+    "onlyCriterionChanged": "C7-AC-002"
+  }
+}

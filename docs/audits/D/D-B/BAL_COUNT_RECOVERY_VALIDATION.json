@@ -1,0 +1,111 @@
+{
+  "increment": "D3.55",
+  "baseSha": "877028c10ac5a8e287e6c54dd4c91bca628c26ef",
+  "status": "LOCAL_QUALIFIED_REMOTE_HISTORY_RECONCILED_OWN_SHA_CI_REQUIRED",
+  "scope": "scheduled BAL frozen attempts and response validation;not complete BAL reference/field continuity",
+  "unitApi": {
+    "qualifiedDistinct": 18,
+    "base": "count-recovery-unit-current.log:17PASS",
+    "recheck": "count-recovery-unit-recheck.log:10PASS;one new identity"
+  },
+  "browser": {
+    "initial": "count-recovery-production:0/18;2ambiguous alert selectors;16not run",
+    "qualified": {
+      "total": 21,
+      "expected": 21,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "ok": true
+    },
+    "archive": "output/phase-d-work/ui-canonical/count-recovery-recheck",
+    "sourcesStable": 8,
+    "realAuth": true,
+    "remoteOrPhysicalDeviceProof": false
+  },
+  "static": {
+    "typecheck": "count-recovery-types-qualified.log",
+    "lint": "count-recovery-lint-qualified.log",
+    "markdown": "PASS:8 affected Markdown files;initial two MD013 lines retained and wrapped"
+  },
+  "database": {
+    "newMigrations": 0,
+    "nativeFunctionsChanged": 0,
+    "remoteBaseline": 197,
+    "remoteCountVerified": 197,
+    "remoteLatestVersion": "20261110181208",
+    "remoteDryRun": "upToDate:true;migrations:[]",
+    "remoteMutationThisLot": false
+  },
+  "inventoryCorrection": "inventory-console is unreferenced;POST retired410;historical GET retained",
+  "globalState": {
+    "criteria": 105,
+    "localPass": 56,
+    "partial": 49,
+    "uiStates": 18,
+    "formSources": 50,
+    "formTags": 52,
+    "visualEstimate": 60,
+    "formsEstimate": 90,
+    "recoveryEstimate": 90
+  },
+  "sourceLfSha256": {
+    "src/app/api/documents/route.ts": "830a8742a877109b88bdca617dd94045054b12276472e1147caf3d8c0e111f41",
+    "src/app/api/documents/[id]/revise/route.ts": "cfb455be1950c98608189dc4b059ccf1664d733fc60e1ac4ff88a5ecee7b29fb",
+    "src/components/balances/balance-count-wizard.tsx": "2df855f3a851e4fd2e0441eeb03869be4113ef84d0817249a02eecab1f180d35",
+    "src/lib/balances/count-attempt.ts": "de85c8bf02bf0ead63240b97a70ee3a12bae3cfc215678ee69bde446b205dc0c",
+    "src/lib/supply/write-confirmation.ts": "0c929f1daab946fd9686fd5bcea4132597d18b12739c1be5b0d8fb02b5dfe557",
+    "src/lib/validation/documents.ts": "5b8aa35de5b76407b918b2efa6ac2905d7a90320e09b55bda33d5c5cc69c3b31",
+    "tests/balance-count-attempt.test.ts": "1a90970428943de57083c1d92cda052c14f20449edc1c3fee1a727d2a1f4f4fa",
+    "tests/e2e/balance-count-recovery.spec.ts": "23a00c9e66877155c41e6e89969889cf68e851e84ee9b60371999f54fdcc4cd0"
+  },
+  "remaining": [
+    "stale scheduled/optional BAL reference and field continuity",
+    "catalogue/admin/profile ordinary fields",
+    "all66/171 compositions",
+    "own SHA CI;human,physical,provider and operational gates"
+  ],
+  "boundary": "PR7 Draft;no merge/manual deploy/production;Sonar owner-deferred;goal active",
+  "closureInvariants": {
+    "acceptance": [
+      105,
+      39
+    ],
+    "immutableColumns": 30,
+    "statusesUnchanged": true,
+    "uiStatusesUnchanged": 18,
+    "inventorySources": 50,
+    "formTags": 52,
+    "inventoryHashesCurrent": true,
+    "sourceFreezeUnchanged": 8,
+    "tempCriteria": 105,
+    "migrationsUnchanged": 197,
+    "activeLegacyWrapUtility": 0,
+    "historicalWrapMentions": [
+      {
+        "file": "docs/archive/evolution/EXECUTION.md",
+        "line": 244
+      },
+      {
+        "file": "docs/audits/D/D-A/EDITOR_DIAGNOSTICS_REPAIRS.json",
+        "line": 55
+      },
+      {
+        "file": "docs/audits/D/D-B/CHECKPOINT.md",
+        "line": 3018
+      },
+      {
+        "file": "docs/audits/D/D-B/PREVIEW_RECOVERY_AND_STATUS.md",
+        "line": 23
+      }
+    ],
+    "staticTypecheck": "PASS",
+    "staticLint": "PASS",
+    "remote": {
+      "count": 197,
+      "latest": "20261110181208",
+      "dryRun": "PASS_EMPTY",
+      "newMigrations": 0
+    }
+  }
+}

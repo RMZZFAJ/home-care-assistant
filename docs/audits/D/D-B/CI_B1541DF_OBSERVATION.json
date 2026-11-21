@@ -1,0 +1,59 @@
+{
+  "at": "2026-11-08T10:15:08.634Z",
+  "sha": "b1541df18f7e3198cc35002c170ab9281e3a40e8",
+  "runId": 42466270684,
+  "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42466270684",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "id": 128686403822,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128686403960,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128686404070,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128689732427,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128689732460,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128689732472,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128689732544,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128696705054,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "validatesUnpublishedD4Increment": false,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION"
+}

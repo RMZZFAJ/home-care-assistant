@@ -1,0 +1,147 @@
+{
+  "at": "2026-11-09T01:22:54.995473+00:00",
+  "baseSha": "c8e2f8efc7ba721dbfe5f4aa924b16385b882057",
+  "sourceLfSha256": {
+    "src/components/documents/related-document.tsx": "82fed951f793e2b3a20269b5ec512f358f164998a5dceac307316759dee970fc",
+    "src/lib/validation/related-document.ts": "4d76bbea9af5630993a08ab0ba549adb3e7ace263ec9541bcd14ae3375924018",
+    "src/components/documents/supply-line-summary.tsx": "bb63498758cac5a26e0bb382ff40cd2aa340f1a82f2860bc43ea91464908bb65",
+    "src/components/requisitions/requisition-opening.tsx": "a99528537e5ac06d06302b954fdd8065747544dd7a6edeb0bb7bfdd1cd15403c",
+    "src/components/requisitions/requisition-display.tsx": "d9303400ffd900472b8ee3ec96308ed65e2bd8562b8bae94bf5b4a1306adce0d",
+    "src/components/ui/primitives.tsx": "549f5d10de79f1441b5f4bea173ac3eff856a8fe6d2cf8715e604b89a794b708",
+    "src/lib/use-scoped-read.ts": "ce28917d3c9c4c8a6983c3ed0f92899594cd8321108442bbfbca001c089e72f0",
+    "tests/related-document-read.test.ts": "e20254b7681f9d645bb9a3b4aea2792d6a3cec1b8941b3210195f73849886d9a",
+    "tests/e2e/task-relations.spec.ts": "ad5243947a7b39058c60b7902f0d15c96ba505792c5fb9bcc3d551999412061e",
+    "tests/e2e/requisition-science.spec.ts": "7d7fc6cbb23abc14b0ce23375f76ecc2e53ab737f48b97558f0f9c756b2779a7",
+    "tests/e2e/stock-origins.spec.ts": "a6cf64181ad4d78cc53a9c6d93199471ac7b949dcf5f9d8edd1a31754e2a8409"
+  },
+  "unchangedConsumerBindings": [
+    {
+      "file": "src/components/documents/supply-wizard-step.tsx",
+      "unchangedLfSha256": "a607d6439ec581e5026f4569926f328f72c1bf12d40e2589f2707098410bcf40",
+      "callSites": 1
+    },
+    {
+      "file": "src/components/documents/transfer-details.tsx",
+      "unchangedLfSha256": "f99a4bed2c86bca0d1c8b5b17b04c00bd4525c6c240e50d6161985ec3b54e5cb",
+      "callSites": 1
+    },
+    {
+      "file": "src/components/requisitions/remaining-need-reference.tsx",
+      "unchangedLfSha256": "77369c1b2b8d054a01fe5e34f35e65040aeaa9512776582c74bd383aad1bac6a",
+      "callSites": 1
+    },
+    {
+      "file": "src/components/requisitions/requisition-detail.tsx",
+      "unchangedLfSha256": "829c427e79ecf06fd36da5367c80e0c9e69466c59180812e8cafe8555e80b012",
+      "callSites": 3
+    },
+    {
+      "file": "src/components/requisitions/requisition-receipt.tsx",
+      "unchangedLfSha256": "d550ff2737bf1f8683c3aaf1f6ce5ab5835bd907ad1d67629812c3459a7d657a",
+      "callSites": 1
+    },
+    {
+      "file": "src/components/requisitions/requisition-steps.tsx",
+      "unchangedLfSha256": "762781395ebe2764baed61d6c4fca473f6c042a225c40317d46e22ee1831e38d",
+      "callSites": 2
+    }
+  ],
+  "validation": {
+    "unitPassed": 4,
+    "currentProductionPassed": 3,
+    "newCases": 3,
+    "existingCases": 18,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "newAxeScans": 12,
+    "widths": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "types": true,
+    "affectedLint": true,
+    "globalSuitesRepeatedLocally": false,
+    "mutableDbParallelWithE2e": false,
+    "qualifiedDistinctPassed": 21,
+    "existingPassedRetained": 18,
+    "totalExecutions": 29,
+    "passingExecutions": 25,
+    "failingExecutionsPreserved": 4
+  },
+  "cohorts": {
+    "baseline": "1 FAIL ambiguous quantity label and absent unit",
+    "firstCorrection": "1 FAIL lost return focus;quantity facts already passed",
+    "final": "3 PASS final source in all3 engines",
+    "regression": "20 PASS/1 FAIL WebKit return focus;18 existing cases retained",
+    "explicitFocusAttempt": "2 PASS/1 FAIL WebKit return focus;not accepted as a fix"
+  },
+  "oracles": [
+    "actual Auth browser reads and other-patient403",
+    "physicalState SQL equality before/after",
+    "zero document/requisition/stock/balance writes",
+    "no inputs or emission controls in consultation",
+    "section503 recovery and mismatched200 refusal"
+  ],
+  "logLfSha256": {
+    "task-relations-baseline.log": "8f75d26c7a4a5ca59ecb0a5c2856e3a701a778411d0ddbbd8a0e8f48a7b9ccdd",
+    "task-relations-fixed.log": "d2d0d936a87644d6d9425c01ba911d32893c621537f68cbe2a36db4bd39790bd",
+    "task-relations-regression.log": "fcce6a541cea8f97f6e1f29120eb32af86409beb655b1ce2c95300181bfa6099",
+    "task-relations-unit.log": "56828d8d3314ca64e24f4d3fccc2530637dad02bdfd35302fdd4332698f3a43e",
+    "task-relations-final.log": "a0d5c8c9494bc1ed81232bbddad4366e747767687f3e8316ad587659d288f2be",
+    "task-relations-focus-attempt.log": "d7ebde18736cd39b15e5b69cb36095733746f718a5603a8930730d7729145014"
+  },
+  "preservedBaselineContexts": {
+    "output\\phase-d-work\\task-relations-baseline\\context.md": "19e5e170a9195516c79c7e5868e0aa7d3b30122a29e96c84bd444d18052a99a4",
+    "output\\phase-d-work\\task-relations-focus-baseline\\context.md": "ae6aafe320a8a67e4a8be1881d65ceebfef0cee442801042701c4f873358c168",
+    "output/phase-d-work/task-relations-webkit-baseline/context.md": "b93655ba978b5bb7aabf315ec1b02fddb9dee524d8267109ac8840f3ac06358a",
+    "output/phase-d-work/task-relations-webkit-focus-attempt/context.md": "b93655ba978b5bb7aabf315ec1b02fddb9dee524d8267109ac8840f3ac06358a"
+  },
+  "baselineScreenshotSha256": "7ec89fef232de488a4b2d125021b2cce8892dc1e09056af5dad01ef96bb4d653",
+  "remote": {
+    "local": 161,
+    "remote": 161,
+    "pending": 0,
+    "mutations": false,
+    "newMigrations": 0,
+    "metadataObservation": "RELATED_READ_REMOTE_OBSERVATION.json"
+  },
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "canonicalColumnsPreserved": 29,
+    "complementsPreserved": true,
+    "counts": {
+      "PARTIAL": 53,
+      "PASS": 48,
+      "NOT_STARTED": 4
+    },
+    "changedCriteria": [
+      "C-FINAL-AC-024"
+    ]
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "remainingGate": [
+    "Remaining relation semantic reconciliation",
+    "Own published SHA CI",
+    "Human AT and physical device gates"
+  ],
+  "operationalGo": false,
+  "goalComplete": false,
+  "reuseQualification": {
+    "onlyChangeSinceRegression": "Opener ref/explicit focus and immediate related-dialog unmount followed by animation-frame restoration;both read component bodies proved textually unchanged",
+    "unchangedDecoderAndNativeContent": true,
+    "existingTestsUnchanged": true,
+    "finalOpenerAndReturnFocusRetestedAllEngines": true,
+    "previousNewPassesNotDoubleCounted": true,
+    "beforeLfSha256": "b0ae4341b6b501c9105ad3de824c5d6c65356574bfe386a9800ba4c1bf04d4ec"
+  },
+  "instrumentFailure": {
+    "beforeTests": "Ignored source snapshot mistakenly saved with .tsx extension and included by tsconfig; renamed to .txt; no product or config workaround",
+    "logLfSha256": "03a07276be78dabcac87a782f919051eb833483db12ce123bd4a7b74745ba164"
+  }
+}

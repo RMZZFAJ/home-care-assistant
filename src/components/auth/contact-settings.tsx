@@ -85,7 +85,7 @@ export function ContactSettings({
             required
           />
         </label>
-        <button className={buttonClass} disabled={busy}>
+        <button type="submit" className={buttonClass} disabled={busy}>
           Solicitar alteração de e-mail
         </button>
       </form>
@@ -110,7 +110,7 @@ export function ContactSettings({
               required
             />
           </label>
-          <button className={buttonClass} disabled={busy}>
+          <button type="submit" className={buttonClass} disabled={busy}>
             Enviar código de verificação
           </button>
         </form>
@@ -129,7 +129,7 @@ export function ContactSettings({
               required
             />
           </label>
-          <button className={primaryClass} disabled={busy}>
+          <button type="submit" className={primaryClass} disabled={busy}>
             Verificar celular
           </button>
         </form>

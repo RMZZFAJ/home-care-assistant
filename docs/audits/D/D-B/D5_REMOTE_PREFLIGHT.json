@@ -1,0 +1,186 @@
+{
+  "status": "PREFLIGHT_ACCEPTED_FOR_PENDING_ONLY_APPLICATION",
+  "at": "2026-11-07T19:31:28.381Z",
+  "project": "qwfrqychokvhdzakibid",
+  "sourceHead": "fc98664ae8e8690ea2facd7742983d890e5d8b77",
+  "sourceDirty": true,
+  "ownerAmendment": "OWNER_AMENDMENTS.md#reconciliação-remota-antecipada--fechamento-de-d51",
+  "before": 121,
+  "target": 143,
+  "pending": [
+    {
+      "file": "20261107013356_phase_d3_governance_recovery.sql",
+      "sha256": "7b8df17b29111e557db134b256ebd368db84cc9854563574442170f537414472"
+    },
+    {
+      "file": "20261107015914_phase_d3_governance_compatibility.sql",
+      "sha256": "f9400254ec6a4f9ccd9c09a8705caae325fe7d490122833422c24f3136893fe3"
+    },
+    {
+      "file": "20261107020304_phase_d3_governance_own_transition.sql",
+      "sha256": "639aefecf564d071cc0d8bd2cf574ae558a74fe7bbbf50043cb04f011bde2bbe"
+    },
+    {
+      "file": "20261107021123_phase_d3_open_governance_requests.sql",
+      "sha256": "6083cd3ddba2e3081e1edb0a8ff27c6a457658ea499d80ae55ebce70d60bbd4c"
+    },
+    {
+      "file": "20261107022731_phase_d3_complete_scoped_history.sql",
+      "sha256": "c7164da72e70f9423aad155e3fce31d8315964984ccf4b0ec462d45242a77aac"
+    },
+    {
+      "file": "20261107031505_phase_d3_governance_read_compatibility.sql",
+      "sha256": "f9b87f9f7d8cc7753182e9875fed8a38759073776186c9b7a3c45f2018a1b956"
+    },
+    {
+      "file": "20261107035508_phase_d3_residence_preparation_and_guides.sql",
+      "sha256": "09439e691682dd64e623a27c95327cf7c39275de79778b872c5a6e488ca69481"
+    },
+    {
+      "file": "20261107040539_phase_d3_preparation_read_models.sql",
+      "sha256": "e7f96dc3a54477890dc6d14b18b9ca3f3ad8be7b8d9a2f1300b2c5fedc7781c9"
+    },
+    {
+      "file": "20261107044658_phase_d3_guide_context_intent.sql",
+      "sha256": "de78b790d01914b3a3b12298a31b55cb6fa6ecda4daef28985c9551747154631"
+    },
+    {
+      "file": "20261107055526_phase_d3_supply_private_drafts.sql",
+      "sha256": "c7f77cd10bbdeb60bd926f81e3668b4da36621f8785e8208a8398c9cd4770e0b"
+    },
+    {
+      "file": "20261107070558_phase_d3_legacy_revision_recovery.sql",
+      "sha256": "92b2fc6417a5819440a7d97760c909c04f4be98e5662fb4cd2b87fab58769e21"
+    },
+    {
+      "file": "20261107072253_phase_d3_legacy_submission_version.sql",
+      "sha256": "c7803ef00a1506116339c201813fad218ccd326bebc78cf1574a04d70287d88a"
+    },
+    {
+      "file": "20261107082257_phase_d3_notice_reference_resolution.sql",
+      "sha256": "460813898ae5478254df879c3d948d88c9faab0e56824b3a1bf25c8dcde2f1dc"
+    },
+    {
+      "file": "20261107084512_phase_d3_notice_reference_consistency.sql",
+      "sha256": "ac6af99c4885efae3aa7e40e38ebf507a1c25fade858a065ed38d50a593b28db"
+    },
+    {
+      "file": "20261107090824_phase_d3_notice_reference_timezones.sql",
+      "sha256": "97f30cf65468dffb0f7667de63fabf8bf7cea8eb24d82d1601896203383426b0"
+    },
+    {
+      "file": "20261107104648_phase_d4_pdf_issuance_lifecycle.sql",
+      "sha256": "67d4eb97793a4436de810ffc70b93849810a49baed4ce361c4dc29191be9a905"
+    },
+    {
+      "file": "20261107113421_phase_d4_public_verification_limits.sql",
+      "sha256": "ac05324ded3bf7ab6519c4e56f9deef3aadddf0bc7357316faffb80a88512294"
+    },
+    {
+      "file": "20261107115300_phase_d4_verification_admission_time.sql",
+      "sha256": "d172a4606941cb0e187a1292425e6d901abe2e0fc86250cefdaafd2ca7e2ccbe"
+    },
+    {
+      "file": "20261107123000_phase_d4_document_archive.sql",
+      "sha256": "0bfd98f12619b6839db9f1dc278d0d395426ba116a0da73e6068857debc50fdd"
+    },
+    {
+      "file": "20261107150000_phase_d4_pdf_source_facts.sql",
+      "sha256": "30f92d2f608b8c3d5aebb6c49d0cf370a7387b6ec2dcc002c83af0268f0fb330"
+    },
+    {
+      "file": "20261107161000_phase_d5_runtime_contract.sql",
+      "sha256": "1cc51c89bf7c84b3e7813cdca4a6e9e43ec7f2eec6a96e098799697432804683"
+    },
+    {
+      "file": "20261107162000_phase_d5_runtime_least_privilege.sql",
+      "sha256": "f6896d1c61242d9d10018df9674f39fa41acd4dc1e2e1bf04589ea686c9839d9"
+    }
+  ],
+  "remoteHistorySqlMatched": 121,
+  "remoteStructuralDrift": [],
+  "backup": {
+    "id": "88477945-31c5-4239-a029-693aa520d5a7",
+    "manifestSha256": "866f74c00d81d53c45cd3b28245b742b01ef44ca3dfa245b58cebe999f226eff",
+    "files": 78,
+    "bytes": 9289109,
+    "authenticated": true,
+    "restoredTables": 129,
+    "stableTableDigestsMatched": true,
+    "foreignKeysChecked": true,
+    "storageObjects": 32,
+    "pdfDigests": 31,
+    "signedIssuanceDigests": 0,
+    "probeUpgradeMigrations": 22,
+    "seconds": 8.639,
+    "destination": "Operator computer outside Git; owner-only ACL; separate encryption key",
+    "operationalExternalBackupActive": false
+  },
+  "catalogueComparison": {
+    "views": false,
+    "columns": true,
+    "indexes": true,
+    "defaults": true,
+    "policies": true,
+    "triggers": true,
+    "functions": true,
+    "relations": true,
+    "constraints": false,
+    "table_grants": true,
+    "function_grants": true
+  },
+  "compatibility": {
+    "productionSha": "8ec979aac340bbc19ec64288bf0acf3abea4711a",
+    "publicFunctionIdentitiesReferencedByProduction": 97,
+    "missingFunctionIdentities": [],
+    "lostConsumerGrants": [],
+    "originalRemoteCatalogueMatchesRecorded121": true,
+    "liveViewMatchesLocal": true,
+    "probeViewQualification": "pg_dump/reparse adds AS text alias in second UNION branch",
+    "constraintQualification": "presentation_finite_factor validated remotely; local retained legacy NaN fixture keeps same predicate NOT VALID"
+  },
+  "localValidation": {
+    "directedProductionBrowsers": "15/15; Chromium/mobile/WebKit; 8.5 minutes; stable current runtime cohort",
+    "runtimeAuth": "1/1; real local Auth plus anon and least-privilege negatives",
+    "unit": "4 worker policy + 3 runtime API + 2 command gate; PASS",
+    "historicalGuard": "84 unchanged",
+    "ciBase": "fc98664 database and both validate jobs PASS; Chromium/mobile PASS; iOS timeout/cancelled, aggregate FAILURE",
+    "currentCi": "NOT_PUBLISHED_YET"
+  },
+  "sourcePreservation": {
+    "stableTablesMatchedImmediatelyBeforeApply": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.scheduler_health"
+    ]
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0,
+    "originalCronStates": [
+      {
+        "active": true,
+        "name": "hca-notification-worker",
+        "schedule": "* * * * *"
+      },
+      {
+        "active": true,
+        "name": "hca-operational-lifecycle",
+        "schedule": "* * * * *"
+      }
+    ]
+  },
+  "dryRun": {
+    "pending": 22,
+    "seeds": [],
+    "roles": [],
+    "skipVault": true
+  },
+  "limits": [
+    "No operational GO",
+    "No reset, remote fixtures, Auth configuration or external transport activation",
+    "Probe restore is not a D6 operational recovery test",
+    "Current source CI remains separate"
+  ]
+}

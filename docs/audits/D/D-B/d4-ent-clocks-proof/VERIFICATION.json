@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "artifacts": [
+    {
+      "label": "ent-prepared-1",
+      "file": "prepared-1-3bed7685-02a6-4af4-bcf9-72723a869fa0.pdf",
+      "sha256": "f25bdf34fd3ae612de4e43f46dabe9d7beb239fe9b27f94387696031df756a6e",
+      "pages": 3,
+      "rendererRevision": 7,
+      "facts": "PASS",
+      "eventAssociation": "PASS",
+      "textBoundsAndFooter": "PASS",
+      "publicRootSha256": "62a5e76d411df3a58b16136a691db1761b999b4154f119e8d3b3c41032e2625c",
+      "signature": "ENTIRE_FILE",
+      "timestampTrustedToProvidedInternalRoot": true
+    },
+    {
+      "label": "ent-prepared-2",
+      "file": "prepared-2-4d0158b4-108c-42f2-9387-a3c88f36bb02.pdf",
+      "sha256": "8d50b6edfc6edde0e490f42aa16bf535d8f6c082685399181c9bf05cbc9ac8b8",
+      "pages": 3,
+      "rendererRevision": 7,
+      "facts": "PASS",
+      "eventAssociation": "PASS",
+      "textBoundsAndFooter": "PASS",
+      "publicRootSha256": "62a5e76d411df3a58b16136a691db1761b999b4154f119e8d3b3c41032e2625c",
+      "signature": "ENTIRE_FILE",
+      "timestampTrustedToProvidedInternalRoot": true
+    },
+    {
+      "label": "ent-private-1",
+      "file": "private-1-76cdfd19-5efb-43ae-add7-b32b1bfc8c89.pdf",
+      "sha256": "ecc04edba3fc9dcc83cf8e49d21176e5524f42b0a1e9cf185ed037fbd6bd7850",
+      "pages": 3,
+      "rendererRevision": 7,
+      "facts": "PASS",
+      "eventAssociation": "PASS",
+      "textBoundsAndFooter": "PASS",
+      "publicRootSha256": "62a5e76d411df3a58b16136a691db1761b999b4154f119e8d3b3c41032e2625c",
+      "signature": "ENTIRE_FILE",
+      "timestampTrustedToProvidedInternalRoot": true
+    },
+    {
+      "label": "ent-private-2",
+      "file": "private-2-7978c72e-7033-46d5-943b-3098d8e78e2d.pdf",
+      "sha256": "639a56b14c85d78c646515b26457aa5e9f6311ebba2581aafd28f21e9c2f34cb",
+      "pages": 3,
+      "rendererRevision": 7,
+      "facts": "PASS",
+      "eventAssociation": "PASS",
+      "textBoundsAndFooter": "PASS",
+      "publicRootSha256": "62a5e76d411df3a58b16136a691db1761b999b4154f119e8d3b3c41032e2625c",
+      "signature": "ENTIRE_FILE",
+      "timestampTrustedToProvidedInternalRoot": true
+    }
+  ],
+  "dependencies": {
+    "pdfplumber": "0.11.10",
+    "pypdf": "6.21.4",
+    "pyHanko": "0.38.1",
+    "pyhanko-certvalidator": "0.33.0"
+  },
+  "visualRedesignApproval": false,
+  "taggedPdfOrAssistiveTechnologyApproval": false,
+  "externalTimeIndependenceOrTrust": false,
+  "externalRevocationProof": false
+}

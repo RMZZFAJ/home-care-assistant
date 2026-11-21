@@ -4,12 +4,15 @@ import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { isAbsolute, join, dirname } from "node:path";
 import { sql } from "./test-environment.mjs";
+import { prepareReportOutput } from "./report-output.mjs";
 
-const root = "docs/audits/2026-10-21";
+const output = prepareReportOutput();
+if (!process.argv.includes("--inspect-remote")) throw new Error("Remote inspection requires explicit --inspect-remote and current authorization.");
+const root = "docs/audits/_historical/2026-10-21";
 function remote(file) {
   return JSON.parse(execFileSync(process.execPath, ["scripts/supabase-project.mjs", "db", "query", "--linked", "--file", isAbsolute(file) ? file : `${root}/${file}`, "--output-format", "json"], { encoding: "utf8", maxBuffer: 2_000_000 }));
 }
-function save(name, value) { writeFileSync(`${root}/${name}.json`, JSON.stringify(value, null, 2) + "\n"); }
+function save(name, value) { output.write(`${name}.json`, JSON.stringify(value, null, 2) + "\n"); }
 function canonical(value) {
   if (Array.isArray(value)) return value.map(canonical);
   if (value && typeof value === "object") return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
@@ -56,7 +59,7 @@ if (!aggregateUnchanged) {
   }
   // IDs and query remain beside the private backup, never in the repository.
   const queryFile = join(dirname(backup), "remote-original-records-integrity.sql");
-  writeFileSync(queryFile, query, { mode: 0o600 });
+  writeFileSync(queryFile, query, { flag: "wx", mode: 0o600 });
   const original = remote(queryFile).rows[0].integrity;
   dataPreserved = preservedKeys.every((key) => before[key] === original[key]);
   baselineVerification = { backupSha256: sha256, originalRecordHashesPreserved: dataPreserved, original, newRequests: after.requests - before.requests, newItems: after.items - before.items };

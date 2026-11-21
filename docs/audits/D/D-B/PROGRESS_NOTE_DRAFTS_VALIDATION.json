@@ -1,0 +1,804 @@
+{
+  "increment": "D3.50",
+  "baseSha": "264dd8484d1503ce36de84582544ad1341197c30",
+  "status": "DIRECTED_LOCAL_IMPLEMENTATION_VALIDATED_OWN_SHA_CI_REQUIRED",
+  "sourceLfSha256": {
+    "src/app/api/documents/progress-preparations/commit/route.ts": "5b3c4e90b5b039282f1608ba1559275bd26bf3601d347eec8132adbd02e2d2fb",
+    "src/app/api/documents/progress-preparations/recovery/route.ts": "72cff813217e389f37ee1f3914026fe5c078e3fa32e97e9d0a7f6f9718db5269",
+    "src/app/api/documents/progress-preparations/route.ts": "2ca4d00d58dc96d35800dea42cef4c1f043a9b27810943b384e1e025134499c5",
+    "src/components/balances/balance-workspace-preparation.tsx": "9b9605e3cd8fc793157524442fce7e4bb3716e01654ce192316c8f1fe3d64313",
+    "src/components/documents/document-progress.tsx": "d63bb191c5fd4bd504545dd8718f957c18abad1cc10a10bec7b89970077bad23",
+    "src/components/documents/progress-preparation-summary.tsx": "86a349fe0da52b0139376e9e0694d2137bde8c4b8046ee2c7e4b35336ac94548",
+    "src/components/forms/creation-draft-panel.tsx": "d76f732a5a69a223e7e5ea98534445524bcae6a5eb2d5bba16f8f231900f727e",
+    "src/components/forms/use-creation-draft.ts": "96657efc067135883b7d0d6ffde3a35cc393b686e73962de129a25955c71e69c",
+    "src/components/schedules/schedule-confirmation-panel.tsx": "ccbc7f06134e0704756980389bdc9c0816a7d843d8a24f20eb9546db12ca4060",
+    "src/components/schedules/schedule-console.tsx": "f34d1281623e14a5ea6c760d3e532afea01b3e4e42297844e54de77ae5c34a15",
+    "src/lib/forms/draft-navigation.ts": "4ced13efc9911aff7efe7715e21efe43b44e70102114da33181c74309e07d27e",
+    "src/lib/validation/creation-drafts.ts": "858ed36a2dbfa6204bd35b7febe2bbef7cd062f0dfe923d6d9c28e34c4ca8ca2",
+    "src/lib/validation/document-progress.ts": "b8c5ab11b89a2c0c14cde985ae684efd8d864b3bd05915df00ec5bc06935aa20",
+    "src/lib/validation/private-draft-results.ts": "63b5c560aadbfe5b09e5adafdf5c2b6810d3a87a59a68a61e2a554102269dc49",
+    "src/lib/validation/progress-preparations.ts": "77d151a9abaa30aa963eb8f588625b533cb7be785456ff0079b1b5ff4be8dd5a",
+    "src/lib/validation/supply-drafts.ts": "b9079478b077df2804abeb2c907fb0a40552699bbe0e36a02c83fcc2f6d5fc3b",
+    "src/types/creation-drafts.ts": "599f6d4ef2ccfca8a498ba9f5aabf9957e3e6cbb23128a497f11122cb8495133",
+    "supabase/migrations/20261110113612_phase_d3_progress_note_private_preparations.sql": "e0b09f9d880fa93048efa17a16520b25c32e1b02260be6bf9c31358978e5c67b",
+    "supabase/migrations/20261110122145_phase_d3_progress_uncertain_resolution.sql": "c440765e4b56c0b54257a195183462da92e03593e7e1e99f0ae84bd154ee9ab6",
+    "tests/api/progress-preparations-contract.test.ts": "87840a3d1f1538ff959d3a3c5ffaa71419b6f7faeb030f02b7eafcc1dab6a443",
+    "tests/e2e/document-progress.spec.ts": "d74ead7e50b70416506a83f14cfe01a4239ce6cefc95f35af4d494f8d1f435e1",
+    "tests/e2e/flow-private-preparation.spec.ts": "26f116ac4b75095d77729c84aee7b2042489fd725b6ff4fdc2201255d6e97004",
+    "tests/e2e/progress-private-preparation.spec.ts": "c5a93c77998be29a92f0b077655cd8a142d874898bb98b26f8220cc53eafbab2",
+    "tests/integration/progress-preparation-fixtures.mjs": "2ac84a7e697f784cb48cb1fa4346b8fd740f27f520464e1ddbab366e12a2eb66",
+    "tests/integration/progress-preparations.test.mjs": "8d07b3abb6739aaafb7124d98261db2fedbbffd4cf6330f23fe233a41772708e",
+    "tests/integration/progress-recovery.test.mjs": "c0cb66a6a408a484ce19213820c4873ea215d142436e10f5e68956aece43dae5",
+    "tests/progress-preparations.test.ts": "cf553898e803c3086c5b0b4c5790f136a7e008c79f7214ad5d480933fc86ebdc"
+  },
+  "unitApi": {
+    "pass": 35,
+    "fail": 0,
+    "reportLfSha256": "814678c899a82974b197d9f80c1b52a64e853bf33c0e59b6bc0c2ff0acce610c"
+  },
+  "realAuth": {
+    "qualifiedDistinct": 11,
+    "pass": 11,
+    "fail": 0,
+    "stack": "home-care-assistant;API127.0.0.1:54321;DB127.0.0.1:54322",
+    "cohorts": [
+      {
+        "passed": 9,
+        "logLfSha256": "100c35f0a09b8e48cfcfeee30f8dc7258f28675605c310f1fdd9bacc9422174b"
+      },
+      {
+        "passed": 2,
+        "logLfSha256": "1d1979015d820a4ecb47a91f5a29cf3c0c6d9b89d4de58b170e89bb5c6722d39"
+      }
+    ],
+    "coverage": [
+      "REQ COM ENT BAL partial save/replay/native atomic commit",
+      "real concurrent CAS and identical native commands",
+      "owner/patient/read/write/inactive isolation",
+      "stage UTF16 duplicate/cross-patient reference/native key collision negatives",
+      "live reference label redaction",
+      "late revoke rollback of native/private/journal/audit",
+      "uncertain absence versus immutable key/CAS proof",
+      "recovery actually waits original key and rechecks access after wait"
+    ]
+  },
+  "browser": {
+    "qualifiedDistinctProduction": 28,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "qualifiedCases": [
+      {
+        "project": "mobile",
+        "title": "Andamentos alcançam todos os registros, separam fatos e ocultam consulta recusada sem apagar edição própria",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "mobile",
+        "title": "Andamentos funcionam em REQ COM ENT e BAL sem modificar versões ou movimentos",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "ios",
+        "title": "Andamentos alcançam todos os registros, separam fatos e ocultam consulta recusada sem apagar edição própria",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "ios",
+        "title": "Andamentos funcionam em REQ COM ENT e BAL sem modificar versões ou movimentos",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "mobile",
+        "title": "save privado e publicação perdidos preservam pacotes distintos,envelope divergente e recuperação sem escrita",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "mobile",
+        "title": "referência legada de publicação ainda recupera o mesmo POST nativo após perda de resposta",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "mobile",
+        "title": "outra sessão conclui a preparação durante resultado incerto e a edição original sobrevive ao reconhecimento perdido",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "ios",
+        "title": "save privado e publicação perdidos preservam pacotes distintos,envelope divergente e recuperação sem escrita",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "ios",
+        "title": "referência legada de publicação ainda recupera o mesmo POST nativo após perda de resposta",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "ios",
+        "title": "outra sessão conclui a preparação durante resultado incerto e a edição original sobrevive ao reconhecimento perdido",
+        "archive": "progress-private-production-first"
+      },
+      {
+        "project": "chromium",
+        "title": "mudança do alvo durante a aprovação conserva a justificativa e o destino congelado, sem aprovar outra versão",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "mobile",
+        "title": "mudança do alvo durante a aprovação conserva a justificativa e o destino congelado, sem aprovar outra versão",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "ios",
+        "title": "mudança do alvo durante a aprovação conserva a justificativa e o destino congelado, sem aprovar outra versão",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "chromium",
+        "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "mobile",
+        "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "ios",
+        "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "chromium",
+        "title": "andamento privado retoma em outra sessão e compara CAS sem publicar texto ou perder a edição própria",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "mobile",
+        "title": "andamento privado retoma em outra sessão e compara CAS sem publicar texto ou perder a edição própria",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "ios",
+        "title": "andamento privado retoma em outra sessão e compara CAS sem publicar texto ou perder a edição própria",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "chromium",
+        "title": "agenda recupera a confirmação após recarregar sem reenviar a programação e recusa recibo de outra intenção",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "mobile",
+        "title": "agenda recupera a confirmação após recarregar sem reenviar a programação e recusa recibo de outra intenção",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "ios",
+        "title": "agenda recupera a confirmação após recarregar sem reenviar a programação e recusa recibo de outra intenção",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "chromium",
+        "title": "conflito mantém a revisão visível e não aprova a nova versão automaticamente",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "mobile",
+        "title": "conflito mantém a revisão visível e não aprova a nova versão automaticamente",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "ios",
+        "title": "conflito mantém a revisão visível e não aprova a nova versão automaticamente",
+        "archive": "progress-private-production-fix"
+      },
+      {
+        "project": "chromium",
+        "title": "Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativo e não apaga envelope divergente",
+        "archive": "progress-private-flow-production"
+      },
+      {
+        "project": "mobile",
+        "title": "Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativo e não apaga envelope divergente",
+        "archive": "progress-private-flow-production"
+      },
+      {
+        "project": "ios",
+        "title": "Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativo e não apaga envelope divergente",
+        "archive": "progress-private-flow-production"
+      }
+    ],
+    "cohorts": [
+      {
+        "archive": "progress-private-production-first",
+        "stats": {
+          "total": 14,
+          "expected": 10,
+          "unexpected": 4,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "manifestLfSha256": "75440f8a2ecc6a6749d87f35ee8473b67c87655b420d69ade604cb3456d1b5ff",
+        "reportSha256": "a0fad80cb15fb2dd4ecc89b755a66b64d753d3ff177677a89b03385a5c4ad77b"
+      },
+      {
+        "archive": "progress-private-production-fix",
+        "stats": {
+          "total": 18,
+          "expected": 15,
+          "unexpected": 3,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "manifestLfSha256": "ac18b0dc0ddf7235067ff856a531103964cf671386c3240c8e5a0422226677dc",
+        "reportSha256": "479b7e99bd6afb8553e981f09e57c4273ef4d8f74f0be9db7f3b47e6a89cdbf8"
+      },
+      {
+        "archive": "progress-private-flow-production",
+        "stats": {
+          "total": 3,
+          "expected": 3,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "manifestLfSha256": "8a7c25e22fd41c7955d6d2dbfa4ee7da5d7ecb69618942b036469b7f1ceec113",
+        "reportSha256": "8d1ec262811a4c6769bec552b9e8e6593e0cfbdf5fbaa3dcdbe64e31c7821335"
+      }
+    ],
+    "reuse": "Ten unchanged successful cases from first production cohort plus fifteen affected successes from second;only Flow rechecked after status expectation change. No duplicate case counted.",
+    "diagnostic": {
+      "stats": {
+        "total": 3,
+        "expected": 2,
+        "unexpected": 1,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": false
+      },
+      "acceptance": false,
+      "limit": "Chromium setup context DATABASE_UNAVAILABLE before feature;mobile and ios passed in diagnostic mode;production recheck required."
+    },
+    "visual": {
+      "widths": [
+        320,
+        390,
+        768,
+        1024,
+        1440
+      ],
+      "privateEditorWidths": [
+        1440,
+        1150,
+        850,
+        500,
+        320
+      ],
+      "axe": true,
+      "inspected320": [
+        "chromium",
+        "ios"
+      ],
+      "global66Compositions171RelationsApproved": false
+    }
+  },
+  "counterproofs": [
+    "Initial units32/33 identified Zod codepoint maximum versus UTF16 native/HTML;explicit .length limit repaired.",
+    "First production10/14:reload preceded async save completion;CAS comparison was already fetched. Tests now await completion/inspect actual comparison without removing content/stock/auth oracles.",
+    "Second production15/18:Flow real revoked-membership read returned404 NOT_FOUND while test expected403;test now also asserts safe error code.",
+    "Diagnostic Flow2/3:Chromium context503 during setup retained;not accepted as feature approval.",
+    "Own native and private pending envelopes are separate;different valid envelope retained.",
+    "Unknown absence never treated as not-applied;actual advisory wait and late access revoke tested.",
+    "Another session completion and lost winner acknowledgment preserve explicitly chosen local edition."
+  ],
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "name": "home-care-assistant",
+    "preStatus": "ACTIVE_HEALTHY",
+    "pre": {
+      "tables": [],
+      "indexes": [],
+      "versions": {
+        "count": 190,
+        "latest": "20261110105845",
+        "linesSha256": "ad20288c5f1cd015b9b349de256f726e6e0c44a2fb22a8171aa8036d24102eb7"
+      },
+      "functions": [
+        {
+          "anon": false,
+          "auth": true,
+          "name": "auth_session",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "",
+          "bodyLfSha256": "b8484b7869321105c50e770ea958628749a9df1c8f308945b20aead55aa4892b",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "progress_note_view",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p private.document_progress_notes",
+          "bodyLfSha256": "865ce39d05f5553b6a93d9f725391d07cd1364759bf175a8c68f606c852e4679",
+          "securityDefiner": false
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "require_cap",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p_patient uuid, p_cap text",
+          "bodyLfSha256": "542935c969ace6ba2aef0eaf8751a9a1d62db4001e084bffb574f9773821bdc8",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "can_access_recipient",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_recipient_id uuid",
+          "bodyLfSha256": "3ceeb5d4aaff863cbeb45158a633a52e71c694e6b204d1b8d700d3efe2699992",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "document_progress",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_document uuid, p_filter text, p_page integer, p_size integer",
+          "bodyLfSha256": "e0219b51c3885968ce0b201e71214f82a680bd5657c18516983c0646aa9af2dc",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "document_progress_publish",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_document uuid, p_key uuid, p_body jsonb",
+          "bodyLfSha256": "155e79626ab226039e74d73c4a39bd430837a0d9e9b869ec623d106aa6015530",
+          "securityDefiner": true
+        }
+      ],
+      "temporaryProbes": 0
+    },
+    "post": {
+      "tables": [
+        {
+          "acl": [
+            "postgres=arwdDxtm/postgres"
+          ],
+          "rls": true,
+          "name": "progress_preparation_commands",
+          "policies": 0,
+          "anonSelect": false,
+          "authInsert": false,
+          "authSelect": false
+        },
+        {
+          "acl": [
+            "postgres=arwdDxtm/postgres"
+          ],
+          "rls": true,
+          "name": "progress_preparations",
+          "policies": 0,
+          "anonSelect": false,
+          "authInsert": false,
+          "authSelect": false
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX progress_preparation_command_fk ON private.progress_preparation_commands USING btree (preparation_id)",
+        "CREATE UNIQUE INDEX progress_preparation_commands_pkey ON private.progress_preparation_commands USING btree (owner_id, idempotency_key)",
+        "CREATE INDEX progress_preparation_document_fk ON private.progress_preparations USING btree (document_id)",
+        "CREATE INDEX progress_preparation_note_fk ON private.progress_preparations USING btree (consumed_resource_id)",
+        "CREATE INDEX progress_preparation_patient_fk ON private.progress_preparations USING btree (care_recipient_id)",
+        "CREATE UNIQUE INDEX progress_preparation_slot ON private.progress_preparations USING btree (owner_id, care_recipient_id, document_id) WHERE (state = ANY (ARRAY['active'::text, 'consumed'::text]))",
+        "CREATE UNIQUE INDEX progress_preparations_pkey ON private.progress_preparations USING btree (id)"
+      ],
+      "versions": {
+        "count": 192,
+        "latest": "20261110122145",
+        "linesSha256": "2fd52e7b652197ad8c9802d05dc05eabe1775abe0755374eb08756efd3cea62a"
+      },
+      "functions": [
+        {
+          "anon": false,
+          "auth": true,
+          "name": "auth_session",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "",
+          "bodyLfSha256": "b8484b7869321105c50e770ea958628749a9df1c8f308945b20aead55aa4892b",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "progress_note_view",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p private.document_progress_notes",
+          "bodyLfSha256": "865ce39d05f5553b6a93d9f725391d07cd1364759bf175a8c68f606c852e4679",
+          "securityDefiner": false
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "progress_preparation_view",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "d private.progress_preparations",
+          "bodyLfSha256": "74bbd72602adbfa16be12eb788e00c437b1616482306fb253170a5e73de6f4a5",
+          "securityDefiner": false
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "require_cap",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p_patient uuid, p_cap text",
+          "bodyLfSha256": "542935c969ace6ba2aef0eaf8751a9a1d62db4001e084bffb574f9773821bdc8",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "require_progress_preparation_scope",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p_patient uuid, p_target uuid, p_write boolean",
+          "bodyLfSha256": "1ffa3d0f9aeacb44baccd9a5b5063e06755ae87aa2f1baf20378cbb156464a71",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "validate_progress_preparation",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p_content jsonb, p_navigation jsonb, p_type text",
+          "bodyLfSha256": "7e25f8fecd9cbc807effa3ea588fa8928d4b5c0b551f517df0602921a5f6d7f9",
+          "securityDefiner": false
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "can_access_recipient",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_recipient_id uuid",
+          "bodyLfSha256": "3ceeb5d4aaff863cbeb45158a633a52e71c694e6b204d1b8d700d3efe2699992",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "commit_progress_preparation",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+          "bodyLfSha256": "f3704ac3194340c6c937e2322d235dd5623019e6842d575cdc32c49d01aff07d",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "document_progress",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_document uuid, p_filter text, p_page integer, p_size integer",
+          "bodyLfSha256": "e0219b51c3885968ce0b201e71214f82a680bd5657c18516983c0646aa9af2dc",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "document_progress_publish",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_document uuid, p_key uuid, p_body jsonb",
+          "bodyLfSha256": "155e79626ab226039e74d73c4a39bd430837a0d9e9b869ec623d106aa6015530",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "progress_preparation_command",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+          "bodyLfSha256": "9cc05b392529320851e2a5700580c1aca88f4492ee9e4a0951116a2a0eff3cd8",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "progress_preparation_context",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text, p_target uuid",
+          "bodyLfSha256": "f4686c7ab3f3f5de99a280d070c6e721c7972486a05ea7cbccb9a36bf7cbf1ee",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "progress_preparation_recovery",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+          "bodyLfSha256": "dd28377b8aca17149e41d7361e9429051266973994f2867461b79f04ff9715d5",
+          "securityDefiner": true
+        }
+      ],
+      "temporaryProbes": 0
+    },
+    "localPostExactMatch": true,
+    "additiveFunctions": 7,
+    "unchangedNativeFunctions": 6,
+    "closedRlsTables": 2,
+    "indexes": 7,
+    "dryBeforeOnly": [
+      "20261110113612_phase_d3_progress_note_private_preparations.sql",
+      "20261110122145_phase_d3_progress_uncertain_resolution.sql"
+    ],
+    "appliedOnce": true,
+    "dryAfterEmpty": true,
+    "publishedMigrationsUnchanged": 190,
+    "destructiveReset": false,
+    "remoteFixturesAuthMutation": false,
+    "heavyBackupRepeated": false,
+    "safety": "Owner explicitly authorizes lightweight preflight/postcheck for disposable synthetic remote;project/history/native compatibility/dry-run/ACL checked before incremental apply.",
+    "advisors": {
+      "security": {
+        "counts": {
+          "rls_enabled_no_policy": 54,
+          "extension_in_public": 1,
+          "anon_security_definer_function_executable": 3,
+          "authenticated_security_definer_function_executable": 191,
+          "auth_leaked_password_protection": 1
+        },
+        "newFindings": [
+          {
+            "name": "rls_enabled_no_policy",
+            "level": "INFO",
+            "metadata": {
+              "name": "progress_preparation_commands",
+              "type": "table",
+              "schema": "private"
+            },
+            "detail": "Table \\`private.progress_preparation_commands\\` has RLS enabled, but no policies exist"
+          },
+          {
+            "name": "rls_enabled_no_policy",
+            "level": "INFO",
+            "metadata": {
+              "name": "progress_preparations",
+              "type": "table",
+              "schema": "private"
+            },
+            "detail": "Table \\`private.progress_preparations\\` has RLS enabled, but no policies exist"
+          },
+          {
+            "name": "authenticated_security_definer_function_executable",
+            "level": "WARN",
+            "metadata": {
+              "name": "commit_progress_preparation",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+              "security_definer": true
+            },
+            "detail": "Function `public.commit_progress_preparation(p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/commit_progress_preparation`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+          },
+          {
+            "name": "authenticated_security_definer_function_executable",
+            "level": "WARN",
+            "metadata": {
+              "name": "progress_preparation_command",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+              "security_definer": true
+            },
+            "detail": "Function `public.progress_preparation_command(p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/progress_preparation_command`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+          },
+          {
+            "name": "authenticated_security_definer_function_executable",
+            "level": "WARN",
+            "metadata": {
+              "name": "progress_preparation_context",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_patient uuid, p_purpose text, p_target uuid",
+              "security_definer": true
+            },
+            "detail": "Function `public.progress_preparation_context(p_patient uuid, p_purpose text, p_target uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/progress_preparation_context`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+          },
+          {
+            "name": "authenticated_security_definer_function_executable",
+            "level": "WARN",
+            "metadata": {
+              "name": "progress_preparation_recovery",
+              "schema": "public",
+              "language": "plpgsql",
+              "arguments": "p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+              "security_definer": true
+            },
+            "detail": "Function `public.progress_preparation_recovery(p_patient uuid, p_purpose text, p_target uuid, p_id uuid, p_expected integer, p_body jsonb, p_key uuid)` can be executed by the `authenticated` role as a `SECURITY DEFINER` function via `/rest/v1/rpc/progress_preparation_recovery`. Revoke `EXECUTE` or switch it to `SECURITY INVOKER` if that is not intentional."
+          }
+        ]
+      },
+      "performance": {
+        "counts": {
+          "unindexed_foreign_keys": 124,
+          "auth_rls_initplan": 11,
+          "unused_index": 44
+        },
+        "newFindings": [
+          {
+            "name": "unused_index",
+            "level": "INFO",
+            "metadata": {
+              "name": "progress_preparations",
+              "type": "table",
+              "schema": "private"
+            },
+            "detail": "Index \\`progress_preparation_patient_fk\\` on table \\`private.progress_preparations\\` has not been used"
+          },
+          {
+            "name": "unused_index",
+            "level": "INFO",
+            "metadata": {
+              "name": "progress_preparations",
+              "type": "table",
+              "schema": "private"
+            },
+            "detail": "Index \\`progress_preparation_document_fk\\` on table \\`private.progress_preparations\\` has not been used"
+          },
+          {
+            "name": "unused_index",
+            "level": "INFO",
+            "metadata": {
+              "name": "progress_preparations",
+              "type": "table",
+              "schema": "private"
+            },
+            "detail": "Index \\`progress_preparation_note_fk\\` on table \\`private.progress_preparations\\` has not been used"
+          },
+          {
+            "name": "unused_index",
+            "level": "INFO",
+            "metadata": {
+              "name": "progress_preparation_commands",
+              "type": "table",
+              "schema": "private"
+            },
+            "detail": "Index \\`progress_preparation_command_fk\\` on table \\`private.progress_preparation_commands\\` has not been used"
+          }
+        ]
+      }
+    }
+  },
+  "baseCi": {
+    "sha": "264dd8484d1503ce36de84582544ad1341197c30",
+    "run": 42807945197,
+    "observed": "2026-11-10",
+    "core": {
+      "database": "success",
+      "ubuntu": "success",
+      "windows": "success"
+    },
+    "browsers": {
+      "mobile-1": "success",
+      "chromium-1": "failure:bal-deferral focus",
+      "chromium-2": "failure:schedule frozen conflict review",
+      "mobile-2": "failure:schedule frozen conflict review",
+      "ios-1": "failure:Flow revoked membership refresh detached; administration flaky",
+      "ios-2": "failure:schedule frozen conflict review; workflows flaky"
+    },
+    "gate": "NOT_APPROVED; fixes and own new SHA CI required"
+  },
+  "regressions": [
+    "Schedule obsolete known receipt retains frozen review and disabled approval;all3engines passed.",
+    "BAL reason focus restored after DOM busy/review transition;all3engines passed.",
+    "Flow child read uses real revoked Auth under frozen prior shell presentation;no RPC/auth stub."
+  ],
+  "matrix": {
+    "criteria": 105,
+    "columns": 39,
+    "first30Preserved": true,
+    "statusesPreserved": true,
+    "pass": 56,
+    "partial": 49,
+    "uiStates": 18,
+    "visualEstimatePercent": 60,
+    "formsEstimatePercent": 90,
+    "recoveryEstimatePercent": 85
+  },
+  "remaining": [
+    "Private incomplete schedule preparation",
+    "Inventory count and remaining administration/catalogue/profile continuity",
+    "All66/171 composition and operational variants",
+    "Technical PDF/trust/key recovery and other D-B gates",
+    "Own published SHA clean/legacy/full integration/all browser CI",
+    "Sonar owner-deferred;human/physical/provider/operational gates separate"
+  ],
+  "boundary": "PR7 Draft;no merge/manual deployment/production release;no private cache/offline replay;goal active",
+  "static": {
+    "typecheck": "PASS;progress-private-ci-fix-types.log;exit0",
+    "affectedSourceLint": "PASS;progress-private-import-lint.log + progress-private-ci-fix-lint.log + progress-private-flow-status-lint.log;exit0",
+    "newOrRenamedUtility": "PASS:zero active source/HTML occurrences;four historical documentary mentions retained as traceability",
+    "markdownLinksAndInvariants": "PASS:11 Markdown files/0issues;owned local Markdown links exist;105criteria/39columns/first30 and states preserved;18UIstates preserved;owner report105items/no documentary links"
+  }
+}

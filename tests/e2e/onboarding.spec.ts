@@ -124,8 +124,9 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await page
     .getByRole("link", { name: "Abrir Home Care Assistant", exact: true })
     .click();
+  // The header can be ready before the authorized context chooser mounts.
   await expect(
-    page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
+    page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
   await selectContext(page, patientA);
   const context = await (await page.request.get("/api/context")).json();
@@ -134,15 +135,46 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
     context.data.patients.map((patient: { id: string }) => patient.id),
   ).toEqual([patientA]);
   expect(context.data.fullName).toBe("Pessoa convidada E2E");
-  await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
+  // Closing the modal during pending Auth must not strand the navigation.
+  let releaseLogout!: () => void;
+  const logoutGate = new Promise<void>((resolve) => {
+    releaseLogout = resolve;
+  });
+  await page.route("**/auth/v1/logout**", async (route) => {
+    await logoutGate;
+    await route.continue();
+  });
+  const authLogout = page.waitForRequest(
+    (request) =>
+      new URL(request.url()).pathname === "/auth/v1/logout" &&
+      request.method() === "POST",
+  );
+  try {
+    await page.getByLabel("Menu do usuário", { exact: true }).click();
+    await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
+    await authLogout;
+    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("menu", { name: "Ações do usuário", exact: true }),
+    ).toHaveCount(0);
+  } finally {
+    releaseLogout();
+  }
+  await expect(page).toHaveURL(/\/login$/);
+  await page.unroute("**/auth/v1/logout**");
   await page.getByLabel("E-mail", { exact: true }).fill(email);
+  await expect(
+    page.getByRole("heading", { name: "Entrar", exact: true }),
+  ).toBeVisible();
+
   await page
     .getByRole("button", { name: "Esqueci minha senha", exact: true })
     .click();
-  await expect(
-    page.getByText("Se o e-mail estiver autorizado", { exact: false }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/login\?access=recover/);
+  await expect(page.getByLabel("E-mail", { exact: true })).toHaveValue(email);
+  await expect(page.getByText("Se o e-mail estiver autorizado", { exact: false })).toHaveCount(0);
+  await page.getByRole("button", { name: "Solicitar link de recuperação", exact: true }).click();
+  await expect(page.getByText("Se o e-mail estiver autorizado", { exact: false })).toBeVisible();
   await page.goto(await confirmationLink(page, email, "Reset"));
   await expect(
     page.getByRole("heading", { name: "Definir nova senha" }),

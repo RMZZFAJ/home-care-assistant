@@ -1,0 +1,10 @@
+.hca-context-selection > h2 { font-size: 19px; font-weight: 700; }
+.hca-context-selection > p { margin-top: 12px; color: var(--hca-muted); font-size: 12px; }
+.hca-context-selection .hca-context-search { display: block; max-width: 480px; margin-top: 19px; }
+.hca-context-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px; margin-top: 20px; }
+.hca-context-option.hca-control { min-height: 72px; justify-content: flex-start; align-items: flex-start; gap: 13px; text-align: left; white-space: normal; padding: 16px 19px; }
+.hca-context-option > svg { flex: none; color: var(--hca-teal); margin-top: 2px; }
+.hca-context-option > span { display: grid; gap: 3px; min-width: 0; overflow-wrap: anywhere; }
+.hca-context-option strong { font-size: 13px; font-weight: 670; }
+.hca-context-option small { color: var(--hca-muted); font-size: 11px; font-weight: 400; }
+@media (max-width: 500px) { .hca-context-option.hca-control { padding: 14px; } }

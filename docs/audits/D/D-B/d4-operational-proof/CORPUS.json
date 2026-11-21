@@ -1,0 +1,239 @@
+[
+  {
+    "label": "REQ-cancelled",
+    "file": "REQ-cancelled.pdf",
+    "sha256": "62aa807cb07fc10b3e53ab5628a1eedc067c7d7ec15433d6a43a6a6631018f47",
+    "type": "REQ",
+    "code": "REQ-0007",
+    "version": 1,
+    "status": "cancelled",
+    "expected": [
+      "Cancelado"
+    ],
+    "forbidden": [
+      "EM ANDAMENTO",
+      "Pendente nesta versão",
+      "A pessoa designada deve conferir",
+      "Providenciar ENT e conferir recebimento"
+    ],
+    "long": false,
+    "publicRoot": "root-public.pem",
+    "pages": 4,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "56efe464af4ca8ae4486acae756e3b22db274bf174f4e5c35aba1892905b05b1"
+  },
+  {
+    "label": "COM-cancelled",
+    "file": "COM-cancelled.pdf",
+    "sha256": "abfc9844a09d7993f66eb2992e9feff3effefd65184db47ee81da6f84a4e8f58",
+    "type": "COM",
+    "code": "COM-0003",
+    "version": 1,
+    "status": "cancelled",
+    "expected": [
+      "Cancelado"
+    ],
+    "forbidden": [
+      "EM ANDAMENTO",
+      "Pendente nesta versão",
+      "A pessoa designada deve conferir",
+      "Providenciar ENT e conferir recebimento"
+    ],
+    "long": false,
+    "publicRoot": "root-public.pem",
+    "pages": 3,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "34156a3f27305be9d24eaa12417fd8230064894665d23513b01bed23f95d53da"
+  },
+  {
+    "label": "ENT-cancelled",
+    "file": "ENT-cancelled.pdf",
+    "sha256": "c280b6f32170ad6b52b7eff326c30be9273b8fa4fe86eb68acbee406167cc9b2",
+    "type": "ENT",
+    "code": "ENT-0012",
+    "version": 1,
+    "status": "cancelled",
+    "expected": [
+      "Cancelado"
+    ],
+    "forbidden": [
+      "EM ANDAMENTO",
+      "Pendente nesta versão",
+      "A pessoa designada deve conferir",
+      "Providenciar ENT e conferir recebimento"
+    ],
+    "long": false,
+    "publicRoot": "root-public.pem",
+    "pages": 4,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "c29db23365ebe922c6e117f393df1f3002e01072c8036574ed4020a78692ff2b"
+  },
+  {
+    "label": "REQ-historical-unknown",
+    "file": "REQ-historical-unknown.pdf",
+    "sha256": "c6f7da89c6a302ef542db65dfa8ecf38b407535070998b6c2865b178561d3697",
+    "type": "REQ",
+    "code": "REQ-0007",
+    "version": 1,
+    "status": "submitted",
+    "expected": [
+      "Ciência original",
+      "Não comprovada",
+      "Consulta histórica; sem pendência operacional",
+      "Preservar o registro histórico"
+    ],
+    "forbidden": [
+      "Pendente nesta versão",
+      "Ciência e atendimento pendentes",
+      "Providenciar ENT e conferir recebimento"
+    ],
+    "long": false,
+    "publicRoot": "root-public.pem",
+    "pages": 4,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "03f3196feb24f647a0994bf5b5a4223376ef901c95a8f90c4c91f2a987ab4746"
+  },
+  {
+    "label": "REQ-partial",
+    "file": "REQ-partial.pdf",
+    "sha256": "d31e52f669ab9c59eab54567ac769e95e0824f3eff6f1740e87eb3b7dd26ad11",
+    "type": "REQ",
+    "code": "REQ-0007",
+    "version": 1,
+    "status": "submitted",
+    "expected": [
+      "Linhas atendidas",
+      "Linhas pendentes",
+      "2 de 6"
+    ],
+    "forbidden": [
+      "Quantidade solicitada"
+    ],
+    "long": false,
+    "publicRoot": "root-public.pem",
+    "pages": 4,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "f9e00c56e53f479f2fd618d36d20b78f284113369829fe4b2bcd4322d59bd861"
+  },
+  {
+    "label": "ENT-partial",
+    "file": "ENT-partial.pdf",
+    "sha256": "497cc96b661b8e1c5ae13ace63055aef6a1f73c097be0002a83e315ed0b50ab8",
+    "type": "ENT",
+    "code": "ENT-0012",
+    "version": 1,
+    "status": "pending_receipt",
+    "expected": [
+      "PARCIAL_ENT_MATERIAL",
+      "Os aceites positivos são preservados independentemente das divergências.",
+      "Divergência aberta"
+    ],
+    "forbidden": [
+      "A pessoa designada deve conferir",
+      "Integralmente conferido"
+    ],
+    "long": false,
+    "publicRoot": "root-public.pem",
+    "pages": 3,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "2dd0ed05e267c7e35ab0e361650e48738c90a8e0c8db3a67c0b681fe6b63af8a"
+  },
+  {
+    "label": "REQ-long",
+    "file": "REQ-long.pdf",
+    "sha256": "da40b9fa618dfc61b65d7c8bd974791de9ad35d5d3849f91bf4f58d2443e37ea",
+    "type": "REQ",
+    "code": "REQ-0007",
+    "version": 1,
+    "status": "submitted",
+    "expected": [
+      "FIM_NOME_160",
+      "FIM_B6_MATERIAIS_REQ",
+      "FIM_B6_NOTAS_REQ",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "FIM_B6_ANEXO"
+    ],
+    "forbidden": [],
+    "long": true,
+    "publicRoot": "root-public.pem",
+    "pages": 20,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "1be2506968e76bc826cb2d95b0ab2b635845c9e846f53e22e6dd476d0d6882e0"
+  },
+  {
+    "label": "COM-long",
+    "file": "COM-long.pdf",
+    "sha256": "292e0c0d2a6717a044a430df2a9317057b578218f5472da7c94d62a89c646664",
+    "type": "COM",
+    "code": "COM-0003",
+    "version": 1,
+    "status": "approved",
+    "expected": [
+      "FIM_NOME_160",
+      "FIM_B6_MATERIAIS_COM",
+      "FIM_B6_NOTAS_COM",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "FIM_B6_ANEXO"
+    ],
+    "forbidden": [],
+    "long": true,
+    "publicRoot": "root-public.pem",
+    "pages": 15,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "a1bf00ceb396f40220c4b91b93ffa2b5ed8a3142b11787c46c279890672cc1bd"
+  },
+  {
+    "label": "ENT-long",
+    "file": "ENT-long.pdf",
+    "sha256": "6b3ccf65d5e78bed5f401d10b922e944693ea668d0c802588c5d758b39a2cedd",
+    "type": "ENT",
+    "code": "ENT-0012",
+    "version": 1,
+    "status": "pending_receipt",
+    "expected": [
+      "FIM_NOME_160",
+      "FIM_B6_MATERIAIS_ENT",
+      "FIM_B6_NOTAS_ENT",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "FIM_B6_ANEXO"
+    ],
+    "forbidden": [],
+    "long": true,
+    "publicRoot": "root-public.pem",
+    "pages": 15,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "65434656c2b384cf79c9265805b0d5909d49947ee263a5855ca8c1ff6c50eb44"
+  },
+  {
+    "label": "BAL-long",
+    "file": "BAL-long.pdf",
+    "sha256": "9be5cc6ae16d808ddd1f34989187c8177ffd568e2089b2217eff823d44e5b3c9",
+    "type": "BAL",
+    "code": "BAL-0004",
+    "version": 2,
+    "status": "approved",
+    "expected": [
+      "FIM_NOME_160",
+      "FIM_B6_MATERIAIS_BAL",
+      "FIM_B6_NOTAS_BAL",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "FIM_B6_ANEXO"
+    ],
+    "forbidden": [],
+    "long": true,
+    "publicRoot": "root-public.pem",
+    "pages": 15,
+    "controlledRendererProbe": true,
+    "actualApplicationIssuance": false,
+    "sourceJsonSha256": "8db42f564b94663e09fa7a0097b3da6d8d2b8588297746ca3b9466589992e7b7"
+  }
+]
