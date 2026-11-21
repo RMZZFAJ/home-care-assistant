@@ -175,7 +175,7 @@ export function SupplyDocumentContent({
   const [transitCancellationResult, setTransitCancellationResult] = useState<SupplyDocument | null>(null);
   const [purchaseCancellationResult, setPurchaseCancellationResult] = useState<string | null>(null);
   const [cancellationStatus, setCancellationStatus] = useState<SupplyDocument | null>(null);
-  const [reconciliationResult, setReconciliationResult] = useState<{ data: SupplyDocument; body: DeliveryResolutionBody } | null>(null);
+  const [reconciliationResult, setReconciliationResult] = useState<{ data: SupplyDocument; body: DeliveryResolutionBody; nextLineId?: string } | null>(null);
   const [purchaseUpdating, setPurchaseUpdating] = useState(false);
   const purchaseReadAttemptRef = useRef<number | null>(null);
   useOperationActivity(purchaseUpdating, { title: "Registrando compra", stage: 2, steps: purchaseActivitySteps });
@@ -469,14 +469,20 @@ export function SupplyDocumentContent({
       const result = { data: requireSupplyConfirmation({ data: outcome.result, persistence: "confirmed" }, {
         patientId: data.care_recipient_id, type: data.type, id, minimumVersion: intention.expectedVersion,
       }) };
-      resultFocusRef.current = true;
-      setFocusRevision((value) => value + 1);
+      const resolution = reconcilingDelivery && intention.action === "resolve" ? deliveryResolutionBody.parse(intention.body) : null;
+      const nextLineId = resolution && result.data.status === "disputed" && result.data.version >= data.version
+        ? result.data.lines.find(line => line.id !== resolution.lineId && deliveryTransit(line).gt(0) && readCountedDeliveryReceipt(line.metadata))?.id
+        : undefined;
+      if (!nextLineId) {
+        resultFocusRef.current = true;
+        setFocusRevision((value) => value + 1);
+        setAction(null);
+      }
       if (result.data.version >= data.version) { setData(result.data); setReadFailed(false); }
       setAttempt(value => value + 1);
       pendingRef.current = null;
       setUncertain(false);
       setReview(null);
-      setAction(null);
       setPurchaseConflict(false);
       setDeliveryConflict(false);
       setComparison(null);
@@ -490,9 +496,9 @@ export function SupplyDocumentContent({
         setDeliveryReceiptResult(result.data);
         return;
       }
-      if (reconcilingDelivery && intention.action === "resolve") {
+      if (resolution) {
         setMessage("");
-        setReconciliationResult({ data: result.data, body: deliveryResolutionBody.parse(intention.body) });
+        setReconciliationResult({ data: result.data, body: resolution, nextLineId });
         return;
       }
       if (intention.action === "cancel" && intention.body.transitReturned === true) {
@@ -866,6 +872,7 @@ export function SupplyDocumentContent({
             (item === "cancel" && (data.type === "COM" || hasUnreceivedDispatch || hasPersonalReceipt)) || item === "consent_cancel" || item === "withdraw_cancellation") {
             setError("");
             setReview(null);
+            if (item === "resolve") setReconciliationResult(null);
             setAction(item);
             return;
           }
@@ -1680,11 +1687,14 @@ export function SupplyDocumentContent({
           resultFocusRef.current = true;
           setFocusRevision(value => value + 1);
         }} /> : null}
-      {data && reconcilingDelivery && !readDenied ? <DeliveryReconciliation
+      {data && reconcilingDelivery && !readDenied && activeContext ? <DeliveryReconciliation
         key={data.id}
         data={data} context={context}
         busy={busy || decision.busy} blocked={deliveryConflict || !actions.includes("resolve")} uncertain={uncertain || decision.uncertain}
         error={error || decision.recoveryMessage} finalFocus={operationOpenerRef}
+        latest={reconciliationResult?.data.id === id && reconciliationResult.nextLineId ? {
+          version: reconciliationResult.data.version, lineId: reconciliationResult.body.lineId, nextLineId: reconciliationResult.nextLineId,
+        } : undefined}
         conflict={deliveryConflict ? <Notice>
           A ficha mudou durante a conciliação.
           {comparison ? <ActionButton disabled={busy} onClick={adoptReconciliationComparison}>Usar versão atual e revisar novamente</ActionButton> :
@@ -1700,12 +1710,13 @@ export function SupplyDocumentContent({
           if (uncertain || decision.uncertain) { setCloseUncertain(true); return; }
           setAction(null);
           setReview(null);
+          setReconciliationResult(null);
           setError("");
           setDeliveryConflict(false);
           setComparison(null);
           setAttempt(value => value + 1);
         }} /> : null}
-      {reconciliationResult?.data.id === id && !readDenied && activeContext ? <DeliveryReconciliationResult
+      {reconciliationResult?.data.id === id && !reconciliationResult.nextLineId && !readDenied && activeContext ? <DeliveryReconciliationResult
         {...reconciliationResult} onClose={() => {
           setReconciliationResult(null);
           resultFocusRef.current = true;

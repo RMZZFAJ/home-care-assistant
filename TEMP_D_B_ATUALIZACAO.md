@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — conciliação de vários materiais de entrega.** Após registrar
+um material, o diálogo de E06-08 mantém a lista e abre o próximo item em
+apuração. A decisão da família permanece identificada e os campos em
+edição ficam disponíveis enquanto o diálogo estiver aberto.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — autorização do planejamento da COM.** O diálogo de E05-06
 apresenta os materiais e seus vínculos, com seleção, quantidade e motivo
 de ajuste. A confirmação mostra as quantidades autorizadas. O

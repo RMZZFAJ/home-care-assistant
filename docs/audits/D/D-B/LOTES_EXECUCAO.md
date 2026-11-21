@@ -172,6 +172,31 @@ autorizada que existe no registro. Os seis casos de navegador passaram
 sem repetição, incluindo o vínculo da REQ no rascunho e o percurso
 REQ, COM, aprovação de chegada, estoque, ENT parcial e BAL.
 
+**Conciliação de vários materiais em E06-08.** O diálogo conserva a lista
+quando a decisão de um item deixa outro em apuração. Mostra a diferença
+conciliada e a avaliação familiar já registrada. Abre o próximo material
+com foco no título e mantém os campos em edição dos outros materiais na
+sessão aberta. Fechar com campos preenchidos pede confirmação para
+descartá-los. As decisões confirmadas permanecem na ficha.
+
+A comparação em 360 e 412 px usa o estado de cinco materiais da v7.
+O laboratório apresenta uma lista com um editor aberto por vez. O
+produto inclui o resultado da quantidade e do destino registrados e
+indica quando permanece saldo em apuração. A mesma interface é usada
+na devolução, com os destinos físicos correspondentes e sem avaliação
+de suficiência de REQ. Nenhuma migration nesse ajuste.
+
+A regressão de cinco linhas confirmou foco, preservação do preenchimento
+da próxima linha, recuperação de uma única decisão após perda da resposta
+e o saldo dos dois primeiros materiais com Auth real. O descarte conservou
+a decisão já registrada. O PDF assinado manteve o destino apurado, a
+justificativa e a avaliação familiar. O caso de falta e excedente na mesma
+ENT também conferiu a observação do recebedor em Materiais e no PDF.
+Esses dois casos e o pedido de reavaliação da equipe passaram em Android
+e iOS emulados. O reteste do pedido usou uma conta familiar com vínculo
+isolado e o mesmo viewport da pessoa da equipe. O limite anterior de
+30 segundos havia interrompido essa jornada ao alternar de sessão no iOS.
+
 **Conferência conjunta de chegadas.** A comparação com E05-11 a 360 e 412 px
 cobre o título, os cartões compactos, o indicador de falta ou chegada
 completa, o estoque expansível e o rodapé. O corpo permite rolagem por

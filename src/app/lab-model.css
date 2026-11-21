@@ -1183,6 +1183,7 @@
 .hca-reconcile-assessment strong { color: var(--hca-ink); font-size: 12px; }
 .hca-reconcile-assessment small { font-size: 11px; }
 .hca-reconcile-assessment input { flex-shrink: 0; }
+.hca-l1 .hca-modal:has(.hca-delivery-reconciliation) > .hca-modal-footer { align-items: center; background: #fafcfb; }
 .hca-l1 .hca-modal:has(.hca-delivery-reconciliation) > .hca-modal-footer > button { width: 108px; line-height: 1.3; white-space: normal; }
 .hca-overlay:has(.hca-regularization-dialog) > .hca-modal-backdrop,
 .hca-overlay:has(.hca-regularization-dialog) > .hca-modal-viewport { position: fixed; inset: var(--app-header-height, 65px) 0 0; }
