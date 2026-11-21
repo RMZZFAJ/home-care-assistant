@@ -15,6 +15,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ReactNode,
   type SetStateAction,
 } from "react";
 import {
@@ -70,7 +71,8 @@ import { RelatedDocument } from "./related-document";
 import { SupplyWizardStep, type WizardState } from "./supply-wizard-step";
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
 import { SupplySourcePicker, type SupplySourceSelection } from "./supply-source-picker";
-import { emptySupplySources, includeSavedRequisitionSources, prepareSupplySources, type SupplySourcePreparation } from "@/lib/forms/supply-source-preparation";
+import { emptySupplySources, includeSavedRequisitionSources, prepareSupplySources, purchaseMaterialSources, type SupplySourcePreparation } from "@/lib/forms/supply-source-preparation";
+import { useLiveRevision } from "@/lib/use-live-revision";
 import { parseSupplySources } from "@/lib/validation/supply-sources";
 import { quantity, validQuantity } from "@/lib/quantity";
 import { useScopedRead } from "@/lib/use-scoped-read";
@@ -248,6 +250,8 @@ export function PatientSupplyWizard({
     ":" +
     (recount ? "recount" : "edit");
   const canReadRequests = can(context, "req.read");
+  const canReadFamilyStock = can(context, "stock.family.read");
+  const sourceRevision = useLiveRevision();
   const allowed = can(
     context,
     type === "BAL" ? "bal.count" : type.toLowerCase() + ".create",
@@ -264,10 +268,23 @@ export function PatientSupplyWizard({
     return parseSupplySources(value, patientId, linkedTarget, 1);
   }, [patientId, linkedTarget]);
   const currentSources = useScopedRead(
-    linkedTarget && sourceIds ? `/api/documents/sources?careRecipientId=${patientId}&target=${linkedTarget}&ids=${sourceIds}` : null,
-    "",
+    linkedTarget && sourceIds ? `/api/documents/sources?careRecipientId=${patientId}&target=${linkedTarget}&ids=${sourceIds}${type === "COM" ? "&observations=1" : ""}` : null,
+    type === "COM" ? `${sourceRevision}:${canReadRequests}:${canReadFamilyStock}` : "",
     readSources,
   );
+  const purchaseSources = type === "COM" && canReadRequests && !currentSources.loading && !currentSources.error && currentSources.data
+    ? { byProduct: purchaseMaterialSources(sources, currentSources.data.data),
+      familyStock: canReadFamilyStock ? currentSources.data.familyStock : undefined } : undefined;
+  const readingPurchaseSources = type === "COM" && canReadRequests && sources.some(source => source.productIds.length > 0);
+  let purchaseSourceNotice: ReactNode = null;
+  if (readingPurchaseSources && currentSources.loading) {
+    purchaseSourceNotice = <p className="hca-field-help" role="status">Consultando fichas vinculadas…</p>;
+  } else if (readingPurchaseSources && currentSources.error) {
+    purchaseSourceNotice = <Notice error>
+      Não foi possível consultar as fichas vinculadas.{" "}
+      <ActionButton compact onClick={currentSources.refresh}>Tentar novamente</ActionButton>
+    </Notice>;
+  }
   const generalSourceOptions = (currentSources.data?.data ?? []).filter(option =>
     sources.some(row => row.documentId === option.id && row.general));
   const presentations = useScopedRead<PresentationsRead>(
@@ -1708,6 +1725,8 @@ export function PatientSupplyWizard({
                   catalog={catalog}
                   people={people}
                   links={links}
+                  purchaseSources={purchaseSources}
+                  purchaseSourceNotice={purchaseSourceNotice}
                   sourceSection={linkedTarget && step === 0 ? (
                     <section className="hca-form-stack" aria-label="Fichas vinculadas">
                       <h3>Fichas vinculadas</h3>

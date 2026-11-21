@@ -15,7 +15,7 @@ import { documentStatusLabel } from "@/lib/documents/presentation";
 import { materialVisitParam, prepareMaterialVisit } from "@/lib/documents/material-visit";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
-import { formatStockObservation, formatStockObservationTime } from "@/lib/stock-observation";
+import { formatStockObservation, formatStockObservationTime, newestStockObservationsFirst } from "@/lib/stock-observation";
 import type { DocumentKind, DocumentType } from "@/types/documents";
 import type { WorkspaceContext } from "@/types/workspace";
 import type { DocumentMaterialRow } from "./document-material-list";
@@ -170,7 +170,9 @@ export function DocumentMaterialPanel({
     router.push(url.pathname + url.search);
   }
   const displayQuantity = (value: string | null) => value === null ? "Não disponível nesta consulta" : formatQuantity(value, row.unit ?? undefined);
-  const observations = data?.section === "stock" ? data.observations.filter(observation => observation.documentId !== documentId) : [];
+  const observations = data?.section === "stock"
+    ? newestStockObservationsFirst(data.observations.filter(observation => observation.documentId !== documentId)) : [];
+  const latestObservation = observations.find(observation => observation.observation === "observed" && observation.quantity !== null);
   const links = data?.section === "links" ? data.rows.filter(item => item.id !== documentId) : [];
   const linkGroups = [
     { label: "Requisições em acompanhamento", rows: links.filter(item => item.kind === "REQ" && !item.archived && !closedRequisitionStatuses.has(item.status)) },
@@ -212,6 +214,10 @@ export function DocumentMaterialPanel({
               {link({ id: observation.documentId, code: observation.code, type: "REQ" }, formatBrazilDate(observation.createdAt))}
               <strong>{formatStockObservation(observation.quantity, observation.observation ?? undefined, observation.unit ?? undefined)}</strong>
               <small>{formatStockObservationTime(observation.observedAt, observation.timeSource ?? "legacy_unknown")}</small>
+              {observation.observation === "observed" && observation.quantity !== null
+                ? <Pill tone={observation === latestObservation ? "success" : "neutral"}>
+                  {observation === latestObservation ? "Mais recente" : "Contagem anterior"}
+                </Pill> : null}
             </article>)}</div><p className="hca-material-observation-note">
               Cada quantidade foi registrada na requisição correspondente. Os valores ficam preservados separadamente do saldo atual.
             </p></> : <p>{data.observations.length ? "Nenhuma contagem de outra requisição disponível para este material." : "Nenhuma contagem de requisição disponível para este material."}</p>}

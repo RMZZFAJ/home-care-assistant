@@ -20,7 +20,8 @@ const lineScope = scope.extend({
   documentId: z.uuid().nullable(), lineId: z.uuid().nullable(),
   productId: z.string().nullable(), page: z.number().int().positive(),
 });
-const observationMode = z.enum(["observed", "unknown", "unfilled", "legacy_unclassified"]);
+export const materialHistoryObservation = z.enum(["observed", "unknown", "unfilled", "legacy_unclassified"]);
+export const stockObservationTimeSource = z.enum(["client_draft", "server_submission", "legacy_unknown"]);
 const historyRecord = z.object({
   type: z.string(), createdAt: date, author: z.string().nullable(),
   document: document.nullable(), arrival: z.object({ id: z.uuid(), code: z.string() }).nullable(),
@@ -36,16 +37,15 @@ export const materialHistoryRow = z.discriminatedUnion("kind", [
     unit: z.string().nullable(), reason: z.string().nullable(), detail: z.string().nullable(),
   }),
 ]);
-export const materialHistoryObservation = observationMode;
 export type MaterialHistoryRow = z.infer<typeof materialHistoryRow>;
 export const documentMaterialPanel = z.discriminatedUnion("section", [
   lineScope.extend({
     section: z.literal("stock"), ...balances,
     observations: z.array(z.object({
       documentId: z.uuid(), code: z.string().nullable(), createdAt: date,
-      quantity: quantity.nullable(), observation: observationMode.nullable(),
+      quantity: quantity.nullable(), observation: materialHistoryObservation.nullable(),
       unit: z.string().nullable(), observedAt: date.nullable(),
-      timeSource: z.enum(["client_draft", "server_submission", "legacy_unknown"]).nullable(),
+      timeSource: stockObservationTimeSource.nullable(),
     })),
   }),
   lineScope.extend({

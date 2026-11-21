@@ -2,6 +2,12 @@ import { formatQuantity, quantity, validQuantity } from "./quantity";
 import { formatBrazilDate } from "./receipt";
 import type { StockObservation, StockObservationTimeSource } from "@/types/requisition";
 
+export function newestStockObservationsFirst<T extends { observedAt: string | null; createdAt: string }>(rows: readonly T[]) {
+  return [...rows].sort((first, second) =>
+    Date.parse(second.observedAt ?? second.createdAt) - Date.parse(first.observedAt ?? first.createdAt) ||
+    Date.parse(second.createdAt) - Date.parse(first.createdAt));
+}
+
 export function formatStockObservationTime(at?: string | null, source: StockObservationTimeSource = "client_draft") {
   if (!at || source === "legacy_unknown") return "Horário da informação desconhecido";
   return (source === "client_draft" ? "Registro no rascunho (horário do dispositivo): " : "Informação recebida na emissão: ") + formatBrazilDate(at);

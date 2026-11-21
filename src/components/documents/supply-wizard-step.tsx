@@ -4,7 +4,8 @@ import { focusWizardMaterial, WizardCatalogueReview, WizardMaterialSearch, Wizar
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
-import { ActionButton, CheckboxField, DefinitionGrid, FormField, TextAreaField } from "@/components/ui/controls";
+import { RelatedDocument } from "./related-document";
+import { ActionButton, CheckboxField, DefinitionGrid, FormField, Pill, TextAreaField } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
 import { FeedbackBanner } from "@/components/ui/feedback";
@@ -33,6 +34,9 @@ import type {
   ProductPresentation,
 } from "@/types/catalogue";
 import { formatQuantity } from "@/lib/quantity";
+import { formatBrazilDate } from "@/lib/receipt";
+import { formatStockObservation, newestStockObservationsFirst } from "@/lib/stock-observation";
+import type { PurchaseMaterialSource } from "@/lib/forms/supply-source-preparation";
 import { normalizeCatalogText } from "@/lib/catalog-match";
 import { presentationCaption } from "@/lib/presentation-conversion";
 import type {
@@ -76,6 +80,39 @@ function SharedNeedReason({ type, productId, form, setForm, error }: {
   </FormField>;
 }
 
+function PurchaseSourceCounts({ sources, familyStock, unit }: {
+  sources: PurchaseMaterialSource[];
+  familyStock?: string;
+  unit: string;
+}) {
+  const ordered = newestStockObservationsFirst(sources.map(source => ({ ...source, ...source.observation })));
+  const latest = ordered.find(source => source.mode === "observed" && source.quantity !== null);
+  return <div className="hca-wizard-source-counts">
+    <ul aria-label="Contagens das REQs vinculadas">
+      {ordered.map(source => {
+        const counted = source.mode === "observed" && source.quantity !== null;
+        const mostRecent = source.lineId === latest?.lineId;
+        const recordedAt = source.observedAt ?? source.createdAt;
+        return <li key={source.lineId}>
+          <RelatedDocument id={source.id} label={source.code} compact compactIcon="link" />
+          <time dateTime={recordedAt}>{formatBrazilDate(recordedAt)}</time>
+          <small>Estoque informado na REQ</small>
+          <strong>{counted
+            ? formatQuantity(source.quantity, source.unit ?? undefined)
+            : formatStockObservation(source.quantity, source.mode ?? undefined, source.unit ?? undefined)}</strong>
+          {counted && ordered.length > 1 ? <>
+            <small>{source.requesterName}</small>
+            <Pill tone={mostRecent ? "success" : "neutral"}>
+              {mostRecent ? "Mais recente" : "Contagem anterior"}
+            </Pill>
+          </> : null}
+        </li>;
+      })}
+    </ul>
+    {familyStock !== undefined ? <p><Icon name="home" width={14} height={14} />Estoque familiar hoje: {formatQuantity(familyStock, unit)}</p> : null}
+  </div>;
+}
+
 export function SupplyWizardStep({
   step,
   onCategoryChange,
@@ -89,6 +126,8 @@ export function SupplyWizardStep({
   catalog,
   people,
   links,
+  purchaseSources,
+  purchaseSourceNotice,
   sourceSection,
   openMaterialSources,
   onScannedMaterial,
@@ -116,6 +155,8 @@ export function SupplyWizardStep({
   catalog: CatalogProduct[];
   people: PatientPerson[];
   links: Record<string, string[]>;
+  purchaseSources?: { byProduct: Map<string, PurchaseMaterialSource[]>; familyStock?: Record<string, string> };
+  purchaseSourceNotice?: ReactNode;
   sourceSection?: ReactNode;
   openMaterialSources?: (product: CatalogProduct, returnFocus: () => HTMLButtonElement | null) => void;
   onScannedMaterial: (product: CatalogProduct) => void;
@@ -296,6 +337,7 @@ export function SupplyWizardStep({
             </WizardMaterialToolbar>
             <WizardMaterialSearch value={search} onChange={value => setSearchByCategory(current => ({ ...current, [category]: value }))} />
           </> : null}
+          {purchaseSourceNotice}
           {!visibleProducts.length && !(isExtraStep && pendingExtras.length) ? (
             <Notice>
               {isExtraStep ? "Nenhum item extra incluído." : "Nenhum material nesta busca. Ajuste ou limpe o filtro; suas seleções continuam preservadas."}
@@ -306,6 +348,7 @@ export function SupplyWizardStep({
               const checked =
                 type === "BAL" || Object.hasOwn(form.quantities, product.id);
               const linkedNeeds = links[product.id]?.length ?? 0;
+              const sourceCounts = checked ? purchaseSources?.byProduct.get(product.id) : undefined;
               const assessmentHelpId = `ent-assessment-${encodeURIComponent(product.id)}`;
               const usesPresentations = Boolean(form.presentationSelections?.[product.id]?.length);
               const presentationErrorId = usesPresentations && fieldErrors[product.id]
@@ -353,6 +396,8 @@ export function SupplyWizardStep({
                       ? returnFocus => setPresentationEditor({ productId: product.id, returnFocus }) : undefined}
                     presentationErrorId={presentationErrorId} /> : null}
                   </div>
+                  {sourceCounts?.length ? <PurchaseSourceCounts sources={sourceCounts}
+                    familyStock={purchaseSources?.familyStock?.[product.id]} unit={product.unit} /> : null}
                   {isExtraStep ? <ActionButton type="button" onClick={() => selectProduct(product.id, false)}>
                     Remover {product.name}
                   </ActionButton> : null}

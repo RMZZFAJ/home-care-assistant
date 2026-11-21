@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { materialHistoryObservation, stockObservationTimeSource } from "./document-material-context";
 
 export const supplySourceTarget = z.enum(["COM", "ENT", "DEV"]);
 export type SupplySourceTarget = z.infer<typeof supplySourceTarget>;
@@ -21,6 +22,14 @@ export const supplySourceLinks = z.array(supplySourceLink).max(100)
 export type SupplySourceLink = z.infer<typeof supplySourceLink>;
 export type SupplySourceOrigin = SupplySourceLink & { type: "REQ" | "COM" | "ENT"; code: string };
 
+const recordedStock = z.string().regex(/^-?\d+(?:\.\d+)?$/);
+const sourceObservation = z.object({
+  quantity: recordedStock.nullable(),
+  mode: materialHistoryObservation.nullable(),
+  unit: z.string().nullable(),
+  observedAt: z.iso.datetime({ offset: true }).nullable(),
+  timeSource: stockObservationTimeSource.nullable(),
+}).strict();
 const option = z.object({
   id: z.uuid(),
   type: z.enum(["REQ", "COM", "ENT", "BAL"]),
@@ -28,19 +37,23 @@ const option = z.object({
   code: z.string().min(1),
   status: z.string(),
   createdAt: z.iso.datetime({ offset: true }),
+  requesterName: z.string().nullable().optional(),
   materials: z.array(z.object({
     lineId: z.uuid(),
     productId: z.string().min(1),
     available: z.string().regex(/^\d+(?:\.\d+)?$/).nullable(),
+    observation: sourceObservation.optional(),
   }).strict()).max(1000),
 }).strict();
 export type SupplySourceOption = z.infer<typeof option>;
+export type SupplySourceObservation = z.infer<typeof sourceObservation>;
 
 const sourceResponse = z.object({
   patientId: z.uuid(),
   target: sourcePickerTarget,
   page: z.number().int().positive(),
   total: z.number().int().nonnegative(),
+  familyStock: z.record(z.string(), recordedStock).optional(),
   data: z.array(option).max(100),
 }).strict();
 

@@ -3,7 +3,7 @@ import { selectDocumentSection } from "./document-sections";
 import { selectDeliveryRecipient } from "./delivery-recipient";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
-import { fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { actor, fixtures, issue, request, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
   purchaseBalanceArrival, purchaseBalanceCommand, purchaseBalanceFixture,
@@ -15,6 +15,80 @@ import { audit } from "./accessibility-audit";
 const next = (page: Page) => page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
 const material = (page: Page) => page.getByRole("checkbox", { name: /^Material fictício V4 0/ });
 const count = (page: Page) => page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
+
+test("E05-03 COM distingue as contagens das REQs vinculadas e o saldo familiar atual", async ({ page }, info) => {
+  test.setTimeout(100_000);
+  const f = await setup(), professional = await actor("professional", f.patient);
+  const family = await shiftWorker(f.patient, "family");
+  const [productId] = f.products;
+  async function requestRecorded(quantity: string, hoursAgo: number) {
+    const [row] = await rpc(professional, "submit_requisition", {
+      ...request(f.patient, [productId]),
+      p_lines: [{ productId, currentStock: quantity, stockObservation: "observed",
+        stockObservationAt: new Date(Date.now() - hoursAgo * 3_600_000).toISOString(), urgent: false,
+        repeatReason: "Contagem fictícia registrada em outro horário" }],
+    });
+    return { id: row.requisition_id, code: sql(`select code from public.requisitions where id=${q(row.requisition_id)}`) };
+  }
+  const recent = await requestRecorded("16", 1);
+  const earlier = await requestRecorded("8", 3);
+  await loginDecision(page, family.email, f.patient);
+  await page.setViewportSize({ width: info.project.name === "ios" ? 412 : 360, height: 844 });
+  await page.goto("/fichas/com");
+  const priorClient = await page.request.get(`/api/documents/sources?careRecipientId=${f.patient}&target=COM&ids=${recent.id}`);
+  expect(priorClient.ok(), await priorClient.text()).toBe(true);
+  const originalOptions = await priorClient.json();
+  expect(originalOptions.familyStock).toBeUndefined();
+  expect(originalOptions.data[0].materials[0].observation).toBeUndefined();
+  await next(page);
+  const menuTrigger = page.getByRole("button", { name: "Mais ações de Material fictício V4 0", exact: true });
+  await menuTrigger.click();
+  await page.getByRole("menuitem", { name: "Vincular a uma ficha", exact: true }).click();
+  const picker = page.getByRole("dialog", { name: "Vincular este material", exact: true });
+  for (const { code } of [earlier, recent]) {
+    await picker.getByRole("checkbox", { name: "Vincular " + code, exact: true }).check();
+  }
+  await picker.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
+
+  const counts = page.getByRole("list", { name: "Contagens das REQs vinculadas", exact: true });
+  const mostRecent = counts.getByRole("listitem").first();
+  const previous = counts.getByRole("listitem").last();
+  await expect(counts.getByRole("listitem")).toHaveCount(2);
+  await expect(mostRecent).toContainText(recent.code);
+  await expect(mostRecent).toContainText("16 unidade");
+  await expect(mostRecent).toContainText("Mais recente");
+  await expect(previous).toContainText(earlier.code);
+  await expect(previous).toContainText("8 unidade");
+  await expect(previous).toContainText("Contagem anterior");
+  await expect(page.getByText("Estoque familiar hoje: 30 unidade", { exact: true })).toBeVisible();
+  await expect(count(page)).toHaveValue("");
+  await count(page).fill("4");
+  const original = previous.getByRole("button", { name: earlier.code, exact: true });
+  await original.click();
+  const reference = page.getByRole("dialog", { name: earlier.code, exact: true });
+  await expect(reference).toContainText("8 unidade");
+  await reference.getByRole("button", { name: "Voltar à origem", exact: true }).click();
+  await expect(original).toBeFocused();
+  await expect(count(page)).toHaveValue("4");
+  await counts.evaluate(element => element.scrollIntoView({ block: "center" }));
+  await info.attach("E05-03 material com duas REQs", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await rpc(f.admin, "family_stock_movement", {
+    p_patient: f.patient, p_product: productId, p_quantity: "2", p_action: "inbound",
+    p_reason: "Crédito fictício após a consulta", p_key: randomUUID(),
+  });
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await expect(page.getByText("Estoque familiar hoje: 32 unidade", { exact: true })).toBeVisible();
+  await expect(mostRecent).toContainText("16 unidade");
+  await expect(count(page)).toHaveValue("4");
+  await menuTrigger.click();
+  await page.getByRole("menuitem", { name: "Detalhes do material", exact: true }).click();
+  const materialPanel = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
+  const countCards = materialPanel.locator("article").filter({ hasText: /Mais recente|Contagem anterior/ });
+  await expect(countCards.first()).toContainText(recent.code);
+  await expect(countCards.last()).toContainText(earlier.code);
+  await materialPanel.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+  await expect(menuTrigger).toBeFocused();
+});
 
 test("L2 COM encaminha a sugestão de catálogo para Materiais e emite uma única linha", async ({ page }, info) => {
   test.setTimeout(150_000);

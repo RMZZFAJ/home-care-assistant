@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
-import { fixtures, issue, rpc, setup } from "./v4-fixtures.mjs";
+import { actor, fixtures, issue, request, rpc, setup } from "./v4-fixtures.mjs";
 import {
   purchaseBalanceArrival,
   purchaseBalanceCommand,
@@ -13,6 +13,43 @@ const list = (f, target, extra = {}) => rpc(f.admin, "supply_source_options", {
   p_patient: f.patient, p_target: target, p_filter: "", p_search: "", p_page: 1, ...extra,
 });
 const familyStock = (f, product) => Number(sql(`select private.stock_quantity(${q(f.patient)},${q(product)},'FAMILY')`));
+
+test("COM selecionada lê a contagem original e o saldo familiar com permissões independentes", async () => {
+  const f = await setup(), family = await actor("family", f.patient);
+  const other = await setup();
+  const professional = await actor("professional", f.patient);
+  const req = (await rpc(professional, "submit_requisition", {
+    ...request(f.patient, [f.products[0]]),
+    p_lines: [{ productId: f.products[0], stockObservation: "observed", currentStock: "0", urgent: false }],
+  }))[0];
+  const foreign = await issue(other.patient, [other.products[0]]);
+  const read = (ids) => rpc(family, "purchase_source_observation_options", {
+    p_patient: f.patient, p_filter: "", p_search: "", p_page: 1, p_ids: ids,
+  });
+  const result = await read([req.requisition_id, foreign.id]);
+  assert.deepEqual(result.data.map(row => row.id), [req.requisition_id]);
+  assert.equal(result.data[0].materials[0].available, null);
+  assert.equal(result.data[0].materials[0].observation.quantity, "0");
+  assert.equal(result.data[0].materials[0].observation.mode, "observed");
+  assert.equal(result.data[0].materials[0].observation.unit, "unidade");
+  assert.equal(typeof result.data[0].requesterName, "string");
+  assert.deepEqual(result.familyStock, { [f.products[0]]: "30" });
+  const priorClient = await rpc(family, "supply_source_options", {
+    p_patient: f.patient, p_target: "COM", p_filter: "", p_search: "", p_page: 1, p_ids: [req.requisition_id],
+  });
+  assert.equal(priorClient.familyStock, undefined);
+  assert.equal(priorClient.data[0].materials[0].observation, undefined);
+  assert.equal(priorClient.data[0].requesterName, undefined);
+
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(fixtures.family.id)},'stock.family.read',false)`);
+  const stockDenied = await read([req.requisition_id]);
+  assert.equal(stockDenied.familyStock, undefined);
+  assert.equal(stockDenied.data[0].materials[0].observation.quantity, "0");
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(fixtures.family.id)},'req.read',false)`);
+  assert.deepEqual((await read([req.requisition_id, foreign.id])).data, []);
+});
 
 test("COM operational source is preserved independently of requisition line fulfillment", async () => {
   const f = await setup();

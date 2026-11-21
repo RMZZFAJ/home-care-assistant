@@ -1,5 +1,11 @@
 # Banco de dados
 
+Em 21/11/2026, os bancos local e de desenvolvimento chegaram a 317 versões
+com `20261121103655`. A consulta das REQs selecionadas na COM passou a
+retornar as contagens registradas e o saldo familiar permitido. A consulta
+anterior mantém o mesmo formato para as versões já publicadas.
+[Inventário e verificações de L1 e L2](../audits/D/D-B/LOTES_EXECUCAO.md).
+
 Em 20/11/2026, a migration `20261120052605` levou os bancos local e de
 desenvolvimento a 311 versões. Os vínculos gerais e por material da DEV
 usam o conjunto privado de origens vinculado ao documento. A expedição

@@ -1,5 +1,5 @@
 import type { ItemContext } from "@/types/documents";
-import type { SupplySourceLink, SupplySourceOption } from "@/lib/validation/supply-sources";
+import type { SupplySourceLink, SupplySourceObservation, SupplySourceOption } from "@/lib/validation/supply-sources";
 
 type Selection = { option: SupplySourceOption; importMaterials: boolean };
 export type SupplySourcePreparation = {
@@ -9,6 +9,24 @@ export type SupplySourcePreparation = {
 };
 
 export const emptySupplySources: SupplySourcePreparation = { sources: [], sourceImports: {}, sourceSeeds: {} };
+
+export type PurchaseMaterialSource = Pick<SupplySourceOption, "id" | "code" | "createdAt" | "requesterName"> &
+  { lineId: string; observation: SupplySourceObservation };
+
+export function purchaseMaterialSources(links: SupplySourceLink[], options: SupplySourceOption[]) {
+  const byProduct = new Map<string, PurchaseMaterialSource[]>();
+  const byDocument = new Map(links.map(link => [link.documentId, new Set(link.productIds)]));
+  for (const { id, code, createdAt, requesterName, materials } of options) {
+    const products = byDocument.get(id);
+    for (const { productId, lineId, observation } of materials) {
+      if (!observation || !products?.has(productId)) continue;
+      const references = byProduct.get(productId) ?? [];
+      references.push({ id, code, createdAt, requesterName, lineId, observation });
+      byProduct.set(productId, references);
+    }
+  }
+  return byProduct;
+}
 
 /** Bring the older line-only selections into the same per-material picker. */
 export function includeSavedRequisitionSources(

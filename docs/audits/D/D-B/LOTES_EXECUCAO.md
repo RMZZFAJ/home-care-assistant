@@ -914,10 +914,23 @@ com Auth real, confirmou a rejeição, preservou a primeira REQ e verificou a
 segunda emissão com a justificativa e somente as duas linhas mantidas.
 Passou em Chromium, Android e iOS emulados, na primeira tentativa.
 
-**E05-03, consulta das REQs por material.** O painel atual conserva as
-quantidades em registros separados, com código e data. Falta reproduzir
-os destaques do v7 de contagem mais recente e contagem anterior e conferir
-esse cenário em uma COM com duas REQs vinculadas ao mesmo material.
+**E05-03, consulta das REQs por material.** O cartão da COM reúne as REQs
+vinculadas à linha no menu do material. Cada referência abre a ficha e
+mostra a contagem registrada e sua data. Com mais de uma contagem, o
+horário da observação determina os destaques Mais recente e Contagem
+anterior. O saldo familiar atual fica abaixo, sujeito à permissão de
+leitura do estoque familiar, e a quantidade a adquirir continua editável.
+O painel de material também preserva e ordena as contagens separadas.
+Três integrações com Auth real cobriram zero, isolamento entre pacientes,
+permissões independentes e o formato mantido para a consulta anterior.
+O cartão segue a faixa compacta do v7 com link, data e valor. A variante
+com duas contagens acrescenta autoria e os destaques na mesma faixa.
+A busca de materiais continua disponível no controle compartilhado com REQ.
+Quatro execuções passaram em Android de 360 px e iOS de 412 px emulados,
+sem repetição. A conferência incluiu retorno do foco, atualização do saldo
+e preservação da quantidade editada. Capturas e relatório em
+`output/playwright/l2-com-linked-counts/`. CI e preview do incremento
+continuam pendentes.
 
 **Continuidade do BAL existente.** Ao adotar a nova referência, o
 salvamento automático guarda as contagens anteriores com data e notas.
@@ -1348,7 +1361,7 @@ continua sem regra de produto nesta entrega.
 
 Consulta de 21/11/2026 à stack local `home-care-assistant` e ao Supabase de
 desenvolvimento vinculado `qwfrqychokvhdzakibid`. Os bancos compartilham
-**316 versões**, com 242 versões anteriores a L1, 18 de L1 e 56 de L2.
+**317 versões**, com 242 versões anteriores a L1, 18 de L1 e 57 de L2.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
 A fila de aplicação vinculada está vazia. Produção fica fora desta consulta.
 
@@ -1375,7 +1388,16 @@ A fila de aplicação vinculada está vazia. Produção fica fora desta consulta
 `20261119203458`, `20261119204118`, `20261119212000`, `20261119213000`,
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
 `20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`,
-`20261120231639`, `20261121014430`, `20261121063729`, `20261121075902`.
+`20261120231639`, `20261121014430`, `20261121063729`, `20261121075902`,
+`20261121103655`.
+
+`20261121103655` acrescenta a consulta das contagens para REQs vinculadas
+à COM. O formato da consulta anterior continua disponível durante a
+atualização do aplicativo. O backup cifrado
+`53acaf5c-0d73-41ab-8b92-be2b5a6c401b` foi verificado. O ensaio vinculado
+validou os grants e executou rollback. Após a aplicação, a consulta
+confirmou 317 versões, fila vazia e execução da nova RPC restrita a
+`authenticated`.
 
 `20261121075902` compartilha a regra de leitura de chegada avulsa entre a
 lista, a ficha e o Histórico do material. A instalação local ocorreu pelo

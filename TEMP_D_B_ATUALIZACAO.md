@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — contagens de REQs vinculadas à COM.** A linha de material mostra
+cada contagem registrada, abre a REQ original e destaca a mais recente.
+O saldo familiar atual aparece separadamente, conforme a permissão, e a
+quantidade a adquirir continua sob controle de quem preenche a COM.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — outra REQ emitida durante o preenchimento.** A validação de
 duplicidade abre a decisão por material na Revisão, com consulta à ficha
 pendente e justificativa para manter. O teste com dois autores passou em
