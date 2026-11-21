@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — cobertura do planejamento de compra.** A COM, a chegada avulsa
+e a correção usam o mesmo controle de cobertura. A chegada aguarda a
+escolha e a quantidade quando a cobertura está ligada. A consulta da
+origem conserva o preenchimento. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — seleção de materiais e recebedores nos assistentes.** A
 correspondência do catálogo vai para a categoria de Materiais. A DEV usa
 o mesmo cartão de recebedor da ENT. Os avisos de rascunho ficam fora da

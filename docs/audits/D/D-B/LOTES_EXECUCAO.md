@@ -126,6 +126,22 @@ confere com o comando mestre.
   extra aguarda cadastro. A ficha conserva a pendência até a identificação.
   Testes dirigidos conferiram emissão, recebimento e crédito único. Pendem
   revisão visual agrupada e CI do candidato que reúne os incrementos.
+  Em E05-02, a origem pode ser consultada sem fechar o preenchimento. A
+  escolha de cobrir outra compra exige um planejamento disponível e uma
+  quantidade válida antes do envio. Se a consulta falhar, a escolha continua
+  marcada, com ação de consultar novamente. Quem optar por registrar somente
+  a chegada pode desligar a cobertura. A comparação de uma nova versão
+  preserva a escolha em edição. O resumo mostra a quantidade que entra uma
+  única vez, no registro direto ou após aprovação. O seletor de compras
+  anteriores atende residências com mais de um planejamento elegível para
+  o mesmo material. Este ajuste usa os contratos e as migrations vigentes.
+  Seis testes em Android e iOS emulados passaram sem repetição. Conferiram
+  a consulta da origem, o bloqueio durante carregamento e falha, a rejeição
+  de quantidade superior à pendência, a recuperação da resposta perdida e
+  um crédito por chegada. A COM associada conservou a origem no PDF assinado.
+  As capturas do laboratório e do produto estão em
+  `output/playwright/l2-coverage-continuity/`. Em E05-18, o acesso à revisão
+  a partir do cartão de uma única chegada avulsa continua pendente.
 - **ENT e DEV E06.** Expedição direta, conferência pessoal, falta e excedente
   em apuração, conciliação, suficiência, troca do recebedor e regularização
   com revisão independente após revogação. Recebimento físico e avaliação

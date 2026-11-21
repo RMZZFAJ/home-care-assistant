@@ -149,8 +149,12 @@ function ArrivalEditor({ context, correction, onClose, returnFocus }: {
     try { sessionStorage.removeItem(storage); } catch { /* The current view still holds the confirmed result. */ }
   }
   function validIntent(): UnlinkedArrivalIntent | null {
-    if (!lines.length || lines.some(line => !validQuantity(line.amount, line.quantity_decimals))) return null;
-    const materials = lines.map(line => ({ productId: line.id, quantity: quantity(line.amount).toFixed(), ...line.planning }));
+    if (!lines.length || lines.some(line => !validQuantity(line.amount, line.quantity_decimals) ||
+      (line.planning?.coverageRequested && !line.planning.coverage))) return null;
+    const materials = lines.map(line => ({ productId: line.id, quantity: quantity(line.amount).toFixed(),
+      ...(line.planning?.association ? { association: line.planning.association } : {}),
+      ...(line.planning?.coverage ? { coverage: line.planning.coverage } : {}),
+    }));
     if (materials.some(line => line.coverage && (!validQuantity(line.coverage.quantity, 6) ||
       quantity(line.coverage.quantity).gt(line.quantity)))) return null;
     const parsed = unlinkedArrivalIntent.safeParse(correction
@@ -248,7 +252,7 @@ function ArrivalEditor({ context, correction, onClose, returnFocus }: {
                 onChange={event => updateAmount(row.id, event.currentTarget.value)} />
             </FormField>
             <PurchaseCoverageFields patientId={patient.id} productId={row.id} material={row.name} unit={row.unit}
-              received={row.amount} value={row.planning ?? {}} onChange={planning => {
+              received={row.amount} value={row.planning ?? {}} directCredit={direct} onChange={planning => {
                 setLines(previous => previous.map(item => item.id === row.id ? { ...item, planning } : item));
                 setDirty(true);
               }} />

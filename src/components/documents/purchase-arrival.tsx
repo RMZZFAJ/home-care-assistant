@@ -12,7 +12,7 @@ import type { PresentationsRead } from "@/types/catalogue";
 import type { PurchaseReceipt, SupplyDocument, SupplyLine } from "@/types/documents";
 import type { ProductStock } from "@/types/stock";
 import { SupplyLineSummary } from "./supply-line-summary";
-import { PurchaseCoverageFields, type ArrivalPlanningChoices } from "./purchase-coverage-fields";
+import { PurchaseCoverageFields, restoreArrivalPlanning, type ArrivalPlanningChoices } from "./purchase-coverage-fields";
 
 type ArrivalField = { selected: boolean; value: string; remaining: string; excess: boolean; };
 type ScannedArrival = { id: string; label: string; factor: string; unit: string; };
@@ -64,7 +64,8 @@ export function PurchaseArrivalFields({ data, lines, fields, directCredit, mayRe
   const [packages, setPackages] = useState("1");
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [scanError, setScanError] = useState("");
-  const [planning, setPlanning] = useState<Record<string, ArrivalPlanningChoices>>({});
+  const [planning, setPlanning] = useState<Record<string, ArrivalPlanningChoices>>(() =>
+    Object.fromEntries(lines.map(line => [line.id, restoreArrivalPlanning(fields, line.id)])));
   const scanRevisionRef = useRef(0);
   const readingStockRef = useRef(false);
   const [stock, setStock] = useState<ProductStock[] | null>(null);
@@ -178,8 +179,8 @@ export function PurchaseArrivalFields({ data, lines, fields, directCredit, mayRe
           </label> : null}
           <PurchaseCoverageFields patientId={data.care_recipient_id} productId={line.product_id} material={line.name_snapshot}
             unit={line.unit_snapshot} source={{ id: data.id, code: data.code }} received={field.value}
+            formLineId={line.id} directCredit={directCredit}
             value={planning[line.id] ?? {}} onChange={value => setPlanning(previous => ({ ...previous, [line.id]: value }))} />
-          {planning[line.id]?.coverage ? <input type="hidden" name={line.id + ":coverage"} value={JSON.stringify(planning[line.id].coverage)} /> : null}
           <details className="hca-arrival-stock" onToggle={event => { if (event.currentTarget.open) void readStock(); }}>
             <summary><Icon name="stock" />Estoque familiar</summary>
             {stockLoading ? <p role="status">Consultando o saldo familiar…</p> : null}

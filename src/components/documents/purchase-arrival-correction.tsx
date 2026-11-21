@@ -62,8 +62,8 @@ function ArrivalCorrectionQuantity({ document, receipt, item, line }: {
       <span>Conferi {formatQuantity(physical.minus(expected).toFixed(), line.unit_snapshot)} a mais.</span>
     </label> : null}
     <PurchaseCoverageFields patientId={document.care_recipient_id} productId={line.product_id} material={line.name_snapshot}
-      unit={line.unit_snapshot} source={{ id: document.id, code: document.code }} received={value} value={planning} onChange={setPlanning} />
-    {planning.coverage ? <input type="hidden" name={line.id + ":coverage"} value={JSON.stringify(planning.coverage)} /> : null}
+      unit={line.unit_snapshot} source={{ id: document.id, code: document.code }} received={value}
+      formLineId={line.id} value={planning} onChange={setPlanning} />
     <Dialog open={showDetails} title="Detalhes do material" onClose={() => setShowDetails(false)} finalFocus={optionsRef}>
       <SupplyLineSummary line={line} type="COM" status={document.status}
         purchaseLine={document.purchaseProgress?.lines.find(row => row.lineId === line.id)} />

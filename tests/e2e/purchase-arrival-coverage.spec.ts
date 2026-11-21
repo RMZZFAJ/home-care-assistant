@@ -34,13 +34,55 @@ test("E05-02 associa automaticamente a COM de origem e cobre só a quantidade es
   const dialog = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
   await expect(dialog.getByText("Compra de origem", { exact: false })).toContainText(purchase.code);
   await expect(dialog.getByRole("combobox", { name: /Qual compra recebeu/ })).toHaveCount(0);
-  await dialog.locator(`input[name="${line.id}"]`).fill("8");
-  await coverEarlier(dialog, line.name_snapshot, older.lines[0].id, "3");
+  const received = dialog.locator(`input[name="${line.id}"]`);
+  await received.fill("8");
+  const origin = dialog.getByRole("button", { name: purchase.code, exact: true });
+  await origin.click();
+  const originPanel = page.getByRole("dialog", { name: purchase.code, exact: true });
+  await expect(originPanel.getByRole("heading", { name: "Identificação do registro", exact: true })).toBeVisible();
+  await originPanel.getByRole("button", { name: "Voltar à origem", exact: true }).click();
+  await expect(received).toHaveValue("8");
+
+  const targetUrl = "**/api/purchases/arrivals/targets?**";
+  let release!: () => void;
+  const hold = new Promise<void>(resolve => { release = resolve; });
+  await page.route(targetUrl, async route => {
+    await hold;
+    await route.fulfill({ status: 503, json: { code: "DEPENDENCY_UNAVAILABLE", error: "Consulta de planejamentos indisponível." } });
+  });
+  const coverageSwitch = dialog.getByRole("switch", { name: "Cobrir outro planejamento · " + line.name_snapshot });
+  const target = dialog.getByRole("combobox", { name: "Planejamento anterior · " + line.name_snapshot });
+  const send = dialog.getByRole("button", { name: "Enviar para aprovação", exact: true });
+  const endpoint = `/api/documents/${purchase.id}/decisions`;
+  const earlyWrites: string[] = [];
+  await page.route("**" + endpoint, async route => {
+    earlyWrites.push(route.request().method());
+    await route.abort();
+  });
+  try {
+    await coverageSwitch.check();
+    await expect(dialog.getByText("Consultando planejamentos…", { exact: true })).toBeVisible();
+    await send.click();
+    expect(await target.evaluate((field: HTMLSelectElement) => field.validity.valueMissing)).toBe(true);
+    release();
+    await expect(dialog.getByRole("alert")).toContainText("Consulta de planejamentos indisponível.");
+    await send.click();
+    await expect(coverageSwitch).toBeChecked();
+    expect(earlyWrites).toEqual([]);
+  } finally { release(); await page.unroute(targetUrl); }
+  await dialog.getByRole("button", { name: "Consultar planejamentos novamente" }).click();
+  await target.selectOption(older.lines[0].id);
+  const coveredAmount = dialog.getByRole("textbox", { name: "Cobertas por esta chegada · " + line.name_snapshot });
+  await coveredAmount.fill("6");
+  await expect(coveredAmount).toHaveAttribute("aria-invalid", "true");
+  await send.click();
+  expect(earlyWrites).toEqual([]);
+  await page.unroute("**" + endpoint);
+  await coveredAmount.fill("3");
   await expect(dialog.getByText(`também cobrem o planejamento da ${older.code}`, { exact: false })).toBeVisible();
   if (info.project.use.hasTouch) await info.attach("E05-02 cobertura a partir da COM", {
     body: await page.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png",
   });
-  const endpoint = `/api/documents/${purchase.id}/decisions`;
   const packets = await loseDecisionResponse(page, endpoint);
   await confirmDecisionAndReconcile(page, purchase.id, dialog.getByRole("button", { name: "Enviar para aprovação" }));
   await page.unroute("**" + endpoint);
