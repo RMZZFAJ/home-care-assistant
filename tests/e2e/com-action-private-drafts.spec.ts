@@ -172,6 +172,7 @@ test("COM compra mista da família preserva a previsão e recupera uma chegada p
   const result = page.getByRole("dialog", { name: "Compra registrada", exact: true });
   await expect(result.getByText("Previsão da loja 19/01/2027", { exact: true })).toBeVisible();
   await expect(result.getByText("Chegada aguardando aprovação do administrador", { exact: true })).toBeVisible();
+  await expect(result.getByText("Estoque familiar", { exact: true })).toHaveCount(0);
   await audit(page, "COM resultado da compra mista");
   if (info.project.use.hasTouch) {
     const path = info.outputPath("compra-mista-resultado.png");
@@ -189,4 +190,55 @@ test("COM compra mista da família preserva a previsão e recupera uma chegada p
   await page.getByText("Previsões informadas pela loja", { exact: true }).click();
   await expect(page.getByText(/^Previsão 19\/01\/2027/)).toBeVisible();
   expect(writes).toEqual([]);
+});
+
+test("E05-20 a compra mista mostra o saldo da parcela creditada e a previsão da loja", async ({ page }, info) => {
+  const f = await setup();
+  const buyer = await shiftWorker(f.patient, "admin");
+  const doc = await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+    p_payload: { origin: "purchase", lines: f.products.map(productId => ({ productId, quantity: "10" })) },
+  });
+  const [inHand, online] = doc.lines;
+  const stock = (productId: string) => Number(sql(`select private.stock_quantity(${q(f.patient)},${q(productId)},'FAMILY')`));
+  const before = stock(inHand.product_id), onlineBefore = stock(online.product_id);
+  expect(before).toBeGreaterThan(0);
+  await loginDecision(page, buyer.email, f.patient);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/fichas/" + doc.id);
+  await selectDocumentSection(page, "materials");
+  await openOperationalDocumentAction(page, "Registrar compra realizada");
+  const form = page.getByRole("dialog", { name: "Registrar compra", exact: true });
+  await form.getByRole("textbox", { name: inHand.name_snapshot + " · " + inHand.unit_snapshot, exact: true }).fill("3");
+  await form.getByRole("textbox", { name: online.name_snapshot + " · " + online.unit_snapshot, exact: true }).fill("4");
+  await form.getByRole("switch", { name: "Já está em mãos · " + inHand.name_snapshot, exact: true }).check();
+  await form.getByLabel("Previsão da loja · " + online.name_snapshot, { exact: true }).fill("2027-01-19");
+  await confirmedOutcome(page, doc.id, "Confirmar compra");
+
+  const result = page.getByRole("dialog", { name: "Compra registrada", exact: true });
+  const received = result.getByRole("listitem").filter({ hasText: inHand.name_snapshot });
+  const future = result.getByRole("listitem").filter({ hasText: online.name_snapshot });
+  await expect(received).toContainText("Chegada validada e incorporada ao estoque familiar");
+  await expect(future).toContainText("Previsão da loja 19/01/2027 · Estoque sem alteração");
+  await expect(future.getByText("Estoque familiar", { exact: true })).toHaveCount(0);
+  await received.getByText("Estoque familiar", { exact: true }).click();
+  for (const [label, amount] of [["Antes da entrada", before], ["Entrada confirmada", 3], ["Depois da entrada", before + 3]] as const) {
+    const fact = received.getByText(label, { exact: true }).locator("..");
+    await expect(fact.locator("dd")).toHaveText(`${amount} ${inHand.unit_snapshot}`);
+  }
+  if (info.project.use.hasTouch) await info.attach("E05-20 saldo da parcela", {
+    body: await result.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
+  const persisted = await rpc(f.admin, "operational_document", { p_id: doc.id });
+  expect(persisted.receipts).toMatchObject([{ state: "approved", lines: [{ lineId: inHand.id, quantity: "3" }] }]);
+  expect(persisted.purchaseEntryBalances).toContainEqual(expect.objectContaining({ lineId: inHand.id, state: "known", entry: expect.objectContaining({ receiptId: persisted.receipts[0].id }) }));
+  expect(stock(inHand.product_id)).toBe(before + 3);
+  expect(stock(online.product_id)).toBe(onlineBefore);
+
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(buyer.id)},'stock.family.read',false)`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  await expect(received.getByText("Acesso ao estoque familiar restrito.", { exact: true })).toBeVisible();
+  await expect(received.getByText("Antes da entrada", { exact: true })).toHaveCount(0);
+  await expect(received.getByText("Depois da entrada", { exact: true })).toHaveCount(0);
 });

@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — saldo da compra em mãos.** O resultado mostra quanto havia
+antes, quanto entrou e quanto ficou depois na parcela aprovada. O item que
+aguarda a loja conserva a previsão e indica estoque sem alteração.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — comparação no cancelamento após recebimento.** A revisão mostra
 o retorno mínimo e o consumo confirmado por material. Quando a referência
 muda, a comparação mostra os valores anterior e atual e conserva a

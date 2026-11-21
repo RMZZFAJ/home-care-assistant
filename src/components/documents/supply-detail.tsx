@@ -2000,7 +2000,8 @@ export function SupplyDocumentContent({
           </button>
         </div>
       </Dialog>
-      {purchaseResult?.documentId === id && !readDenied && !purchaseUpdating ? <PurchaseResult result={purchaseResult} onClose={() => {
+      {purchaseResult?.documentId === id && activeContext && !readDenied && !purchaseUpdating ? <PurchaseResult result={purchaseResult}
+        mayReadStock={can(context, "stock.family.read")} onClose={() => {
         setPurchaseResult(null);
         if (returnToCompletion()) return;
         resultFocusRef.current = true;

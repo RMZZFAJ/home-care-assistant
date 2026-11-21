@@ -204,6 +204,22 @@ autorizada que existe no registro. Os seis casos de navegador passaram
 sem repetição, incluindo o vínculo da REQ no rascunho e o percurso
 REQ, COM, aprovação de chegada, estoque, ENT parcial e BAL.
 
+**Compra física e previsão da loja.** O resultado de E05-20 foi conferido
+em 390 px, com um item em mãos e outro aguardando a loja. O produto conserva
+essas linhas e acrescenta a consulta recolhida de Estoque familiar para a
+parcela creditada. Ela usa o saldo histórico capturado no ato e identifica
+quanto havia antes, quanto entrou e quanto ficou depois. O saldo anterior é
+a diferença entre o saldo capturado e o crédito confirmado daquela parcela.
+A consulta exige acesso ao estoque familiar. O item com previsão informa
+que o estoque ficou como estava. A chegada pendente continua distinguida da
+entrada confirmada. Sem migrations novas.
+
+No Chromium móvel e WebKit iOS emulados, quatro casos passaram sem
+repetição com build de produção. O cenário de entrada aprovada conferiu
+30 unidades antes, crédito de 3 e saldo de 33. A parcela de 4 unidades
+permaneceu aguardando a loja. A revogação de leitura ocultou o saldo com
+o modal aberto. A chegada pendente continuou sem saldo de entrada.
+
 **Resolver pendências durante a revisão de conclusão.** Em E04-12, a
 linha bloqueada abre a avaliação familiar da entrega vinculada. Em
 E05-12, a linha abre a conferência das chegadas elegíveis daquela COM.

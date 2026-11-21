@@ -4,11 +4,12 @@ import { useRef, useState } from "react";
 import { Menu } from "@base-ui/react/menu";
 import { MenuPopup } from "@/components/ui/floating";
 import { Icon } from "@/components/ui/icon";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
-import { formatQuantity } from "@/lib/quantity";
+import { formatQuantity, quantity } from "@/lib/quantity";
 import { acquisitionRemaining, formatPurchaseDate } from "@/lib/documents/purchase";
 import type { PurchaseSelection } from "@/lib/validation/purchase-command";
+import { requirePurchaseEntryBalances, type PurchaseEntryBalances } from "@/lib/validation/purchase-entry-balances";
 import type { PurchaseProgressLine, PurchaseReceipt, SupplyDocument, SupplyLine } from "@/types/documents";
 import { SupplyLineSummary } from "./supply-line-summary";
 
@@ -73,10 +74,12 @@ export function PurchaseFormLine({ line, progress, status, fieldId, fields, mayR
   </article>;
 }
 
+type EntryStock = { before: string; entered: string; after: string } | "restricted" | "unavailable";
+
 export type ConfirmedPurchase = {
   documentId: string;
   summary: string;
-  materials: Array<{ id: string; name: string; amount: string; status: string; }>;
+  materials: Array<{ id: string; name: string; amount: string; status: string; waitingForStore: boolean; entryStock?: EntryStock }>;
 };
 
 export function confirmedPurchase(document: SupplyDocument, lines: PurchaseSelection, receipt?: PurchaseReceipt): ConfirmedPurchase {
@@ -91,30 +94,63 @@ export function confirmedPurchase(document: SupplyDocument, lines: PurchaseSelec
     receipt ? effects[receipt.state] : null,
     waiting ? (receipt ? "Os demais materiais aguardam a entrega da loja." : "Os materiais aguardam a entrega da loja.") : null,
   ].filter(Boolean).join(" ");
+  let balances: PurchaseEntryBalances = [];
+  if (receipt?.state === "approved" && document.purchaseEntryBalances) {
+    try {
+      balances = requirePurchaseEntryBalances(document.purchaseEntryBalances, document);
+    } catch {
+      // An unavailable historical balance does not invalidate the confirmed purchase.
+    }
+  }
+  const balanceByLine = new Map(balances.map(balance => [balance.lineId, balance]));
   return { documentId: document.id, summary, materials: lines.map(line => {
     const material = document.lines.find(item => item.id === line.lineId);
     const arrival = line.inHand ? receipt : undefined;
+    const unit = material?.unit_snapshot;
     let status = line.expectedDate ? "Previsão da loja " + formatPurchaseDate(line.expectedDate) : "Aguardando entrega da loja";
     if (arrival?.state === "approved") status = "Chegada validada e incorporada ao estoque familiar";
     if (arrival?.state === "pending") status = "Chegada aguardando aprovação do administrador";
     if (arrival?.state === "rejected") status = "Chegada registrada e posteriormente rejeitada";
     if (arrival?.state === "correction_requested") status = "Chegada aguardando correção pelo autor";
+    let entryStock: EntryStock | undefined;
+    if (arrival?.state === "approved") {
+      const balance = balanceByLine.get(line.lineId);
+      entryStock = "unavailable";
+      if (balance?.entry?.receiptId === arrival.id) {
+        if (balance.state === "restricted") entryStock = "restricted";
+        if (balance.state === "known") entryStock = {
+          before: formatQuantity(quantity(balance.quantity).minus(balance.entry.enteredQuantity).toFixed(), unit),
+          entered: formatQuantity(balance.entry.enteredQuantity, unit),
+          after: formatQuantity(balance.quantity, unit),
+        };
+      }
+    }
     return {
       id: line.lineId,
       name: material?.name_snapshot ?? "Material da compra",
-      amount: formatQuantity(line.quantity, material?.unit_snapshot),
-      status,
+      amount: formatQuantity(line.quantity, unit),
+      status, waitingForStore: !line.inHand, entryStock,
     };
   }) };
 }
 
-export function PurchaseResult({ result, onClose }: { result: ConfirmedPurchase; onClose: () => void }) {
+export function PurchaseResult({ result, mayReadStock, onClose }: { result: ConfirmedPurchase; mayReadStock: boolean; onClose: () => void }) {
   return <Dialog open success title="Compra registrada" subtitle={result.summary} onClose={onClose}
     footer={<ActionButton variant="primary" onClick={onClose}><Icon name="check" />Concluir</ActionButton>}>
     <ul className="hca-purchase-list">
       {result.materials.map(line => <li className="hca-purchase-line" key={line.id}>
         <div className="hca-purchase-line-heading"><strong>{line.name}</strong><span>{line.amount}</span></div>
-        <p className="hca-purchase-limit">{line.status}</p>
+        <p className="hca-purchase-limit"><span>{line.status}</span>{line.waitingForStore ? " · Estoque sem alteração" : null}</p>
+        {line.entryStock ? <details className="hca-arrival-stock">
+          <summary><Icon name="stock" />Estoque familiar</summary>
+          {!mayReadStock || line.entryStock === "restricted" ? <p>Acesso ao estoque familiar restrito.</p>
+            : line.entryStock === "unavailable" ? <p>Saldo desta entrada indisponível.</p>
+              : <DefinitionGrid items={[
+                { label: "Antes da entrada", value: line.entryStock.before },
+                { label: "Entrada confirmada", value: line.entryStock.entered },
+                { label: "Depois da entrada", value: line.entryStock.after },
+              ]} />}
+        </details> : null}
       </li>)}
     </ul>
   </Dialog>;
