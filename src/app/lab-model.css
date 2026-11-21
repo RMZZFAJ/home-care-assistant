@@ -1596,15 +1596,6 @@
 .hca-transfer-wizard-review h2,
 .hca-transfer-wizard-result h3 { color: #193332; font-size: 1.15rem; font-weight: 750; }
 
-.hca-transfer-wizard-summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin: 0;
-}
-
-.hca-transfer-wizard-summary dt { color: #52685e; font-size: .75rem; margin-bottom: 4px; }
-.hca-transfer-wizard-summary dd { margin: 0; color: #284939; font-size: .85rem; overflow-wrap: anywhere; }
 .hca-wizard-review-identity { gap: 16px 24px; }
 @media (max-width: 500px) { .hca-wizard-review-identity { gap: 16px; } }
 

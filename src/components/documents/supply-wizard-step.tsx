@@ -1,11 +1,11 @@
 "use client";
-import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
+import { SupplyWizardIdentity, SupplyWizardReviewIdentity } from "@/components/forms/supply-wizard-identity";
 import { focusWizardMaterial, WizardCatalogueReview, WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
 import { RelatedDocument } from "./related-document";
-import { ActionButton, CheckboxField, DefinitionGrid, FormField, Pill, TextAreaField } from "@/components/ui/controls";
+import { ActionButton, CheckboxField, FormField, Pill, TextAreaField } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
 import { FeedbackBanner } from "@/components/ui/feedback";
@@ -515,30 +515,22 @@ export function SupplyWizardStep({
       ) : null}
       {step === 5 ? (
         <>
-          {type === "COM" ? <DefinitionGrid className="hca-wizard-review-identity" items={[
-            { label: "Pessoa assistida", value: context.patient?.display_name },
-            { label: "Responsável", value: context.fullName },
-          ]} /> : <div className={type === "ENT" ? "hca-form-stack" : "rounded-xl bg-(--background) p-4 text-sm"}>
-            {type === "ENT" ? <DefinitionGrid className="hca-wizard-review-identity" items={[
-              { label: "Pessoa assistida", value: context.patient?.display_name },
-              { label: "Responsável", value: context.fullName },
+          {type === "BAL" ? <div className="rounded-xl bg-(--background) p-4 text-sm">
+            <strong>{context.patient?.display_name}</strong>
+            <p className="mt-1 text-xs text-(--muted)">Responsável: {context.fullName}</p>
+          </div> : <SupplyWizardReviewIdentity context={context} kind={type}
+            destination={type === "ENT" && form.source === "CARE_TEAM" ? "Estoque da família" : undefined}
+            additional={type === "ENT" ? [
               { label: "Percurso", value: form.source === "FAMILY" ? "Família → Equipe" : "Equipe → Família" },
-              { label: "Recebedor", value: recipientContext?.people.find(person => person.id === form.recipientId)?.name ?? people.find(person => person.id === form.recipientId)?.name ?? "Pessoa não disponível na referência atual" },
-            ]} /> : <><strong>{context.patient?.display_name}</strong>
-              <p className="mt-1 text-xs text-(--muted)">
-                Responsável: {context.fullName}
-              </p></>}
-            {type === "ENT" && recipientContext ? (
-              <div className="mt-3 space-y-2">
-                <DeliveryRecipientReference data={recipientContext} />
-                {form.recipientReason ? (
-                  <p className="whitespace-pre-wrap">
-                    Justificativa da escolha: {form.recipientReason}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-          </div>}
+              { label: "Recebedor físico", value: recipientContext?.people.find(person => person.id === form.recipientId)?.name ?? people.find(person => person.id === form.recipientId)?.name ?? "Pessoa não disponível na referência atual" },
+            ] : undefined}
+          />}
+          {type === "ENT" && recipientContext ? <div className="mt-3 space-y-2">
+            <DeliveryRecipientReference data={recipientContext} />
+            {form.recipientReason ? <p className="whitespace-pre-wrap">
+              Justificativa da escolha: {form.recipientReason}
+            </p> : null}
+          </div> : null}
           {type !== "BAL" ? <>
             <WizardCatalogueReview rows={reviewRows.filter(row => !extras.has(row.id))} onEdit={(category, materialId) => {
               setSearchByCategory(current => ({ ...current, [category]: "" }));

@@ -37,7 +37,7 @@ import { focusWizardMaterial } from "@/components/forms/wizard-material-tools";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
 import { IssuanceObservationsEditor } from "@/components/forms/issuance-observations";
-import { adjacentMaterialCategory, materialCategories, supplyWizardCopy, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
+import { adjacentMaterialCategory, materialCategories, supplyWizardCopy, supplyWizardReviewIntro, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { Dialog, StepNavigator } from "@/components/ui/primitives";
 import { ActionButton, ActionLink } from "@/components/ui/controls";
 import { formatQuantity, quantity } from "@/lib/quantity";
@@ -801,7 +801,8 @@ function PatientRequisition({
             label="Etapas da requisição"
           />
           <div className="hca-supply-wizard-body">
-          <h2 className="my-4 text-xl font-semibold">{currentCategory ? "Informe o estoque atual" : step === 0 ? "Confirme os dados da ficha" : step === 4 ? "Itens extras" : supplyWizardStages[stage]}</h2>
+          <h2 className="my-4 text-xl font-semibold">{currentCategory ? "Informe o estoque atual" : step === 0 ? "Confirme os dados da ficha" : step === 4 ? "Itens extras" : step === 6 ? supplyWizardCopy.REQ.reviewTitle : supplyWizardStages[stage]}</h2>
+          {step === 6 ? <p className="hca-wizard-intro">{supplyWizardReviewIntro}</p> : null}
           {currentCategory ? <p className="hca-field-help">Confira o saldo sugerido em cada material e ajuste após a contagem da equipe.</p> : null}
           <fieldset
             disabled={
@@ -851,8 +852,6 @@ function PatientRequisition({
               <Review
                 context={context}
                 form={form}
-                recipientName={context.patient!.display_name}
-                requesterName={context.fullName}
                 onEditMaterial={(category, materialId) => {
                   openCategory(category);
                   focusWizardMaterial(() => fieldsRef.current, materialId);

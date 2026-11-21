@@ -63,7 +63,7 @@ import {
 import { supplyDraftContent, type SupplyDraftContent } from "@/lib/validation/supply-drafts";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
-import { adjacentMaterialCategory, materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardCopy, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
+import { adjacentMaterialCategory, materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardCopy, supplyWizardReviewIntro, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
 import { issuanceObservationErrors } from "@/lib/documents/issuance-observations";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
 import { ActionButton } from "@/components/ui/controls";
@@ -1694,10 +1694,12 @@ export function PatientSupplyWizard({
                 >
                   {step === supplyExtrasStep ? "Itens extras"
                     : !isBalance && step === 0 ? "Confirme os dados da ficha"
+                      : type !== "BAL" && step === 5 ? supplyWizardCopy[type].reviewTitle
                       : !isBalance && category ? type === "ENT" ? "Prepare os materiais da entrega"
                         : "Selecione os materiais a adquirir"
                         : steps[stage]}
                 </h2>
+                {type !== "BAL" && step === 5 ? <p className="hca-wizard-intro">{supplyWizardReviewIntro}</p> : null}
                 {type === "ENT" && form.source === "FAMILY" && category ? <p className="hca-field-help mt-2">
                   A entrega usa o estoque disponível da família. A avaliação da necessidade acompanha cada item vinculado.
                 </p> : null}

@@ -22,3 +22,19 @@ export function SupplyWizardIdentity({ context, kind }: { context: WorkspaceCont
     ]} />
   </div>;
 }
+
+export function SupplyWizardReviewIdentity({ context, kind, destination, additional = [] }: {
+  context: WorkspaceContext;
+  kind: SupplyWizardKind;
+  destination?: string;
+  additional?: readonly { label: string; value: string }[];
+}) {
+  const copy = supplyWizardCopy[kind];
+  return <DefinitionGrid className="hca-wizard-review-identity" items={[
+    { label: "Paciente", value: context.patient?.display_name },
+    { label: "Preenchido por", value: context.fullName },
+    { label: "Tipo de ficha", value: copy.label },
+    { label: "Destino", value: destination ?? copy.destination },
+    ...additional,
+  ]} />;
+}

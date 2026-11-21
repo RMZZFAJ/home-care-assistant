@@ -160,7 +160,7 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
     await pendingSave;
     await expect(footer.getByRole("status")).toHaveText("Salvando rascunho…");
     await next(page);
-    await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Revise antes de emitir", exact: true })).toBeVisible();
     await expect(confirm).toBeDisabled();
   } finally { resumeSave(); }
   await page.getByRole("button", { name: "Editar observações", exact: true }).click();

@@ -51,7 +51,7 @@ async function materialsAndReview(page: Page) {
   await next(page);
   await next(page);
   await expect(
-    page.getByRole("heading", { name: "Revisão", exact: true }),
+    page.getByRole("heading", { name: "Revise antes de expedir", exact: true }),
   ).toBeVisible();
 }
 const ledger = (patient: string) =>

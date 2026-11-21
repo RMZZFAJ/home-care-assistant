@@ -99,7 +99,7 @@ async function prepare(
   await observation.fill("0");
   for (let i = 0; i < 3; i++) await next(page);
   await expect(
-    page.getByRole("heading", { name: "Revisão", exact: true }),
+    page.getByRole("heading", { name: "Revise antes de emitir", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("textbox")).toHaveCount(0);
   await expect(source(page)).toContainText(text);

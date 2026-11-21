@@ -209,7 +209,7 @@ for (const count of [1, 5, 20, 100]) {
           for (let step = 0; step < 3; step++)
             await next(page);
           await expect(
-            page.getByRole("heading", { name: "Revisão", exact: true }),
+            page.getByRole("heading", { name: type === "ENT" ? "Revise antes de expedir" : "Revise antes de emitir", exact: true }),
           ).toBeVisible();
           await expect(
             page.getByText(definitions[0].name, { exact: false }).first(),

@@ -100,10 +100,11 @@ test("06.2 ENT selection and complete readonly review follow the model without s
       await auditFromTop(page, "canonical ENT selection " + width);
     }
     for (let step = 0; step < 3; step++) await next();
-    await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Revise antes de expedir", exact: true })).toBeVisible();
     await model.goto(lab + "?state=review#E06-01/review");
     await expect(model.locator("#product-app .wizard-content h2")).toHaveText("Revise antes de expedir");
     const grid = page.locator(".hca-wizard-review-identity");
+    await expect(grid.locator("dt")).toHaveText(["Paciente", "Preenchido por", "Tipo de ficha", "Destino", "Percurso", "Recebedor físico"]);
     await expect(grid).toContainText(person.name); await expect(grid).toContainText("Família → Equipe");
     await expect(page.getByText("Justificativa da escolha: " + reason, { exact: true })).toBeVisible();
     await expect(page.locator(".hca-material-review")).toContainText(name); await expect(page.locator(".hca-material-review")).toContainText("12 unidade");

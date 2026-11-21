@@ -241,6 +241,22 @@ dirigida nas mesmas telas e operações da aplicação.
   [Consulta privada](../../../../tests/e2e/supply-private-drafts.spec.ts) e
   [teste da revogação](../../../../tests/e2e/document-access.spec.ts).
 
+**Identificação e efeito da emissão na revisão dos assistentes.** A REQ e
+a COM usam o título Revise antes de emitir. A ENT e a DEV usam Revise antes
+de expedir. Os quatro assistentes apresentam a introdução e a mesma grade
+de paciente, autoria, tipo e destino prevista na v7. ENT e DEV mantêm o
+recebedor real, e ENT mantém o percurso e a referência da escala. A revisão
+da REQ explica quando o estoque informado altera o saldo da equipe e
+quando esse saldo será preservado. As opções de edição continuam junto aos
+materiais, aos extras e às observações.
+
+Oito casos dirigidos passaram de primeira em Android e iOS emulados.
+REQ, COM e ENT passaram nas comparações de seleção e revisão, com nomes
+longos e auditoria de acessibilidade. O caso DEV retomou um extra pendente,
+conferiu a revisão e expediu após identificar o material. As capturas e o
+relatório estão em `output/playwright/l2-review-v7-233c9dfa/`. Este ajuste
+usa os contratos e as migrations existentes.
+
 **Autorização do planejamento da COM.** Em E05-06, o diálogo apresenta
 a identificação da ficha, a quantidade solicitada e um interruptor por
 material. A quantidade autorizada aparece junto da unidade. O menu de

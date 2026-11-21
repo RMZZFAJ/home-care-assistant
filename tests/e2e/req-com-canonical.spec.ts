@@ -94,7 +94,11 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
       }
     }
     for (let step = 0; step < 3; step++) await next(page);
-    await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Revise antes de emitir", exact: true })).toBeVisible();
+    await expect(page.locator(".hca-wizard-review-identity dt")).toHaveText(["Paciente", "Preenchido por", "Tipo de ficha", "Destino"]);
+    const destination = type === "REQ" ? "Família · avaliação da necessidade" : "Família · aquisição de materiais";
+    await expect(page.getByText(destination, { exact: true })).toBeVisible();
+    if (type === "REQ") await expect(page.getByText("O estoque será atualizado ao emitir", { exact: true })).toBeVisible();
     await expect(page.getByText(name, { exact: false }).first()).toBeVisible();
     const reviewRecord = page.locator(".hca-wizard-review-group .hca-material-review li").first();
     const modelRecord = model.locator("#product-app .review-group .material-row").first();

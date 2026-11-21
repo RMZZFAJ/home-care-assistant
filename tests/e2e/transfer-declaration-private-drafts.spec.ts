@@ -194,6 +194,9 @@ test("L2 DEV retoma o extra pendente, protege a revisão e expede após escolha 
   await expect(name).toHaveCount(1);
   await continueStep(page);
   await editor(page).getByRole("button", { name: "Revisar ficha", exact: true }).click();
+  const reviewIdentity = editor(page).locator(".hca-wizard-review-identity");
+  await expect(reviewIdentity.locator("dt")).toHaveText(["Paciente", "Preenchido por", "Tipo de ficha", "Destino", "Recebedor físico"]);
+  await expect(reviewIdentity).toContainText("Estoque da família");
   const pendingExtra = editor(page).getByRole("region", { name: "Itens extras", exact: true })
     .getByRole("listitem").filter({ has: page.getByText(item, { exact: true }) });
   await expect(pendingExtra).toHaveCount(1);

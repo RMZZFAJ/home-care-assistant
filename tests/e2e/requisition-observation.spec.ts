@@ -42,7 +42,7 @@ async function hygiene(page: Page) {
 async function review(page: Page) {
   for (let step = 0; step < 3; step++) await next(page);
   await expect(
-    page.getByRole("heading", { name: "Revisão", exact: true }),
+    page.getByRole("heading", { name: "Revise antes de emitir", exact: true }),
   ).toBeVisible();
 }
 const card = (page: Page, name: string) =>
@@ -82,7 +82,7 @@ test("E04-03 revisa materiais solicitados durante o preenchimento sem descartar 
   const observation = "Observação que precisa permanecer na ficha.";
   await page.getByLabel("Observação 1", { exact: true }).fill(observation);
   await next(page);
-  await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Revise antes de emitir", exact: true })).toBeVisible();
 
   const competingProducts = f.products.slice(0, 2);
   const [earlier] = await rpc(f.admin, "submit_requisition", {
@@ -119,7 +119,7 @@ test("E04-03 revisa materiais solicitados durante o preenchimento sem descartar 
   const second = page.getByRole("dialog", { name: "Quer manter Compressa fictícia nesta requisição?" });
   await expect(second.getByLabel("Motivo para manter", { exact: true })).toHaveValue("");
   await second.getByRole("button", { name: "Retirar da ficha", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Revise antes de emitir", exact: true })).toBeVisible();
   await expect(page.getByText(materials[0], { exact: true })).toBeVisible();
   await expect(page.getByText(materials[1], { exact: true })).toHaveCount(0);
   await expect(page.getByText(materials[2], { exact: true })).toBeVisible();

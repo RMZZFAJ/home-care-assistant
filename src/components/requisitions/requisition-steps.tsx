@@ -11,10 +11,12 @@ import { RequisitionRepeatDialog } from "./requisition-repeat-dialog";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "@/components/documents/material-review";
 import { MaterialConsultButton } from "@/components/documents/catalogue-material-panel";
-import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { ActionButton } from "@/components/ui/controls";
+import { FeedbackBanner } from "@/components/ui/feedback";
 import { Icon } from "@/components/ui/icon";
 import { materialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { IssuanceObservationList } from "@/components/forms/issuance-observations";
+import { SupplyWizardReviewIdentity } from "@/components/forms/supply-wizard-identity";
 import { WizardCatalogueReview, WizardMaterialSearch, WizardMaterialToolbar } from "@/components/forms/wizard-material-tools";
 import type { WorkspaceContext } from "@/types/workspace";
 import type {
@@ -206,22 +208,19 @@ export function RequisitionRepeatReason({ productId, pending, value, error, onCh
 export function Review({
   context,
   form,
-  recipientName,
-  requesterName,
   onEditMaterial,
   onEditExtras,
   onEditObservations,
 }: {
   context: WorkspaceContext;
   form: RequisitionFormData;
-  recipientName: string;
-  requesterName: string;
   onEditMaterial: (category: WizardMaterialCategory, materialId: string) => void;
   onEditExtras: () => void;
   onEditObservations: () => void;
 }) {
   const lines = form.lines;
   const extras = form.extraItems.filter((item) => item.name.trim());
+  const updatesStock = lines.some(item => item.stockObservation === "observed" && item.currentStock != null);
   const displayStock = (item: Pick<RequisitionLine, "currentStock" | "stockObservation">, unit?: string) =>
     item.stockObservation === "observed" && item.currentStock != null
       ? formatQuantity(item.currentStock, unit) : formatStockObservation(item.currentStock, item.stockObservation, unit);
@@ -240,7 +239,7 @@ export function Review({
   });
   return (
     <div className="space-y-6" style={{ overflowWrap: "anywhere" }}>
-      <DefinitionGrid className="hca-wizard-review-identity" items={[{ label: "Solicitante", value: requesterName }, { label: "Pessoa assistida", value: recipientName }]} />
+      <SupplyWizardReviewIdentity context={context} kind="REQ" />
       <WizardCatalogueReview rows={lines.filter(item => !item.catalogueExtra).map(catalogueRow)} onEdit={onEditMaterial} />
       <section className="hca-document-summary">
         <div className="hca-issuance-observation-heading">
@@ -263,6 +262,9 @@ export function Review({
         </div>
         <IssuanceObservationList observations={form.observations.filter((item) => item.trim())} />
       </section>
+      <FeedbackBanner heading={updatesStock ? "O estoque será atualizado ao emitir" : "O saldo da equipe será mantido"}>
+        <p>Só os materiais do catálogo com estoque informado atualizam o saldo da equipe. “Não sei informar” preserva o saldo atual.</p>
+      </FeedbackBanner>
     </div>
   );
 }

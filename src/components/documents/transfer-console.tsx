@@ -1,9 +1,9 @@
 "use client";
 
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
-import { adjacentMaterialCategory, materialCategories, supplyWizardCopy, supplyWizardNextLabels, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
+import { adjacentMaterialCategory, materialCategories, supplyWizardCopy, supplyWizardNextLabels, supplyWizardReviewIntro, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
-import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
+import { SupplyWizardIdentity, SupplyWizardReviewIdentity } from "@/components/forms/supply-wizard-identity";
 import { focusWizardMaterial, WizardCatalogueReview, WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { pendingExtraDispatchMessage, pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
 import { MaterialReview } from "./material-review";
@@ -1542,14 +1542,10 @@ function TransferDeclarationEditor({
             </>
           ) : (
             <section className="hca-transfer-wizard-review">
-              <h2 ref={reviewHeadingRef} tabIndex={-1}>Revise antes de expedir</h2>
-              <p className="hca-field-help">Confira os materiais e as informações que acompanharão esta ficha.</p>
-              <dl className="hca-transfer-wizard-summary hca-wizard-review-identity">
-                <div><dt>Paciente</dt><dd>{context.patient?.display_name}</dd></div>
-                <div><dt>Preenchido por</dt><dd>{context.fullName}</dd></div>
-                <div><dt>Destino</dt><dd>{isReturn ? "Estoque da família" : "Estoque da equipe"}</dd></div>
-                <div><dt>Recebedor físico</dt><dd>{personName(review.recipientId)}</dd></div>
-              </dl>
+              <h2 ref={reviewHeadingRef} tabIndex={-1}>{supplyWizardCopy[isReturn ? "DEV" : "ENT"].reviewTitle}</h2>
+              <p className="hca-wizard-intro">{supplyWizardReviewIntro}</p>
+              <SupplyWizardReviewIdentity context={context} kind={isReturn ? "DEV" : "ENT"}
+                additional={[{ label: "Recebedor físico", value: personName(review.recipientId) }]} />
               {isReturn ? <WizardCatalogueReview rows={catalogueReviewRows} disabled={uncertain || busy}
                 onEdit={(category, materialId) => {
                   setCategory(category);

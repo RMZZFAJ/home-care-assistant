@@ -1,11 +1,12 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
-**21/11 — candidato de L2 publicado para revisão no celular.** A prévia
-da PR 7 e o SonarCloud passaram em `9297ed38`. A CI do mesmo SHA aprovou
-Windows, Ubuntu, instalação limpa, evolução legada e 832 integrações.
-Os seis grupos E2E chegaram aos testes de navegador. A CI terminou com
-falhas em cinco grupos e interrupção do Chromium 1. As correções passaram
-em rodadas dirigidas locais. A CI do novo commit ainda precisa concluir.
+**21/11 — revisão dos assistentes de L2 no celular.** REQ, COM, ENT e DEV
+usam os títulos, a introdução e os quatro dados de identificação da v7.
+A REQ informa o efeito da emissão sobre o estoque da equipe. Os oito casos
+dirigidos passaram de primeira em Android e iOS emulados. Em `233c9dfa`,
+Windows, Ubuntu, SonarCloud e a prévia da PR 7 foram aprovados. O job de
+banco desse SHA ainda estava na integração quando a rodada local concluiu.
+A CI precisa validar o novo código de revisão no SHA em que for publicado.
 As 319 versões de migrations conferem nos ambientes local e de
 desenvolvimento, incluindo a correção da consulta histórica da REQ.
 O roteiro para revisão, os resultados e as decisões
