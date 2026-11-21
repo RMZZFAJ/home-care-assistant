@@ -55,7 +55,8 @@ function OperationEditor(
   const com = props.kind === "COM";
   const purchase = props.purpose === "purchase" && props.data.payload.origin !== "donation";
   const arrival = com && props.purpose === "receive";
-  const coveredEditor = purchase || arrival;
+  const approval = com && props.purpose === "approve";
+  const coveredEditor = purchase || arrival || approval;
   const directCredit = props.context.patient?.role === "admin" && can(props.context, "com.validate");
   const purchaseFormId = useId();
   const personalReceipt =
@@ -345,17 +346,22 @@ function OperationEditor(
     </section>
   );
   if (!coveredEditor) return content;
-  const subtitle = purchase ? "Marque os materiais que já estão com você." :
+  const subtitle = approval ? "Marque os itens que a família pode comprar e confirme a quantidade autorizada para cada um." :
+    purchase ? "Marque os materiais que já estão com você." :
     directCredit ? "Marque o que chegou. Sua confirmação libera as quantidades no estoque familiar." :
       "Marque o que chegou. A família poderá usar essas quantidades após a aprovação do administrador.";
-  return <Dialog open title={purchase ? "Registrar compra" : "Registrar chegada"} subtitle={subtitle}
+  const rejectsAll = approval && props.data.lines.every(line => current.fields[`${line.id}:selected`] === "");
+  const confirmLabel = approval ? (rejectsAll ? "Recusar todos" : "Autorizar selecionados") : purchase ? "Confirmar compra" :
+    directCredit ? "Confirmar entrada" : "Enviar para aprovação";
+  return <Dialog open title={approval ? "Autorizar a compra" : purchase ? "Registrar compra" : "Registrar chegada"} subtitle={subtitle}
     kicker={props.context.patient?.display_name ? "COM · " + props.context.patient.display_name.toLocaleUpperCase("pt-BR") : "COM"}
+    popupClassName={approval ? "hca-purchase-approval-dialog" : undefined}
     onClose={requestClose} closeDisabled={props.confirmationPending}
     footer={<>
       <ActionButton onClick={requestClose} disabled={props.confirmationPending}>Voltar</ActionButton>
       <ActionButton type="submit" variant="primary" form={purchaseFormId}
         disabled={props.reviewDisabled || stale || props.recoveryOnly}>
-        {purchase ? "Confirmar compra" : directCredit ? "Confirmar entrada" : "Enviar para aprovação"}
+        {confirmLabel}
       </ActionButton>
     </>}>{content}</Dialog>;
 }

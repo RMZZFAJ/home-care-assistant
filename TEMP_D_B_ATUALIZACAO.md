@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — autorização do planejamento da COM.** O diálogo de E05-06
+apresenta os materiais e seus vínculos, com seleção, quantidade e motivo
+de ajuste. A confirmação mostra as quantidades autorizadas. O
+[registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md) descreve a recusa
+mantida pelo produto e a separação entre autorização, aquisição e entrada.
+
 **20/11 — cancelamento da COM e prazo de arquivamento.** A revisão de
 E05-13 mostra as chegadas e os créditos de estoque preservados. A COM pode ser
 cancelada após resolver as chegadas. A revisão de conclusão e os diálogos

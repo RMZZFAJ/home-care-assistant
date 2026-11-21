@@ -146,6 +146,32 @@ confere com o comando mestre.
   verificado. Pende conferir o candidato publicado com o banco atualizado e
   os efeitos de comunicação pelos gates do ambiente.
 
+**Autorização do planejamento da COM.** Em E05-06, o diálogo apresenta
+a identificação da ficha, a quantidade solicitada e um interruptor por
+material. A quantidade autorizada aparece junto da unidade. O menu de
+três pontos abre os detalhes, e o vínculo consultável mostra a origem do
+material quando ela existe. O motivo do ajuste aparece ao alterar a
+quantidade. O resultado apresenta os materiais autorizados e seus valores.
+
+A recusa total continua disponível quando todos os materiais são
+desmarcados. A justificativa de recusa complementa a v7, pois o banco
+exige um motivo para toda alteração da quantidade solicitada, inclusive
+quando fica zero. Os motivos integram o ato oficial já existente. A
+autorização usa a mesma capacidade, a versão vigente e a confirmação com
+a mesma chave quando a resposta se perde. Nenhuma migration neste ajuste.
+
+O teste dirigido abriu os detalhes e a REQ vinculada, manteve a quantidade
+ao desmarcar e selecionar novamente e exigiu as justificativas antes de
+enviar. No Android e no iOS emulados, a resposta perdida recuperou uma
+única autorização. A parcela recusada ficou com autorização zero e a
+autorização preservou as quantidades compradas, recebidas e o livro de
+estoque. A aquisição e a chegada ocorreram em atos separados.
+As capturas de 360 e 412 px foram comparadas com E05-06. O cenário usa
+dois vínculos de exemplo. Na aplicação, cada linha mostra apenas a origem
+autorizada que existe no registro. Os seis casos de navegador passaram
+sem repetição, incluindo o vínculo da REQ no rascunho e o percurso
+REQ, COM, aprovação de chegada, estoque, ENT parcial e BAL.
+
 **Conferência conjunta de chegadas.** A comparação com E05-11 a 360 e 412 px
 cobre o título, os cartões compactos, o indicador de falta ou chegada
 completa, o estoque expansível e o rodapé. O corpo permite rolagem por

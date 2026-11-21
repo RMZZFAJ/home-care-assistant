@@ -26,6 +26,7 @@ import {
   arrivalRemaining,
 } from "@/lib/documents/purchase";
 import { PurchaseFormLine } from "./purchase-register";
+import { PurchaseApprovalFields, purchaseApprovalSummary } from "./purchase-approval";
 import { PurchaseArrivalFields } from "./purchase-arrival";
 import { coverageFromForm } from "./purchase-coverage-fields";
 import { Icon } from "@/components/ui/icon";
@@ -84,6 +85,7 @@ export function CommandEditorFields({
   const instanceId = useId();
   const registeringPurchase = action === "purchase" && data.payload.origin !== "donation";
   const registeringArrival = action === "receive" && data.type === "COM";
+  const authorizingPurchase = action === "approve" && data.type === "COM";
   const mayReceivePurchase = can(context, "com.receive");
   const directPurchaseCredit = mayReceivePurchase && context.patient?.role === "admin" && can(context, "com.validate");
   const [reasonText, setReasonText] = useState(
@@ -211,17 +213,16 @@ export function CommandEditorFields({
           return line.name_snapshot + " · " + formatQuantity(row.quantity, line.unit_snapshot) +
             " recebidos de " + formatQuantity(row.expectedQuantity, line.unit_snapshot);
         }).join("\n");
-      } else if (action === "approve" || action === "purchase") {
+      } else if (authorizingPurchase) {
+        ({ body, summary } = purchaseApprovalSummary(data, form));
+      } else if (action === "purchase") {
         const values = lines
           .flatMap((line) => {
             const value = String(form.get(line.id) ?? "").trim();
-            if (!value && action !== "approve") return [];
+            if (!value) return [];
             if (!validQuantity(value, 6, true))
               throw new Error("Confira a quantidade de " + line.name_snapshot);
-            const limit =
-              action === "approve"
-                ? quantity(line.quantity)
-                : acquisitionRemaining(line);
+            const limit = acquisitionRemaining(line);
             if (quantity(value).gt(limit))
               throw new Error(
                 "A quantidade supera o limite deste ato para " +
@@ -233,15 +234,10 @@ export function CommandEditorFields({
             const expectedDate = String(form.get(line.id + ":expectedDate") ?? "");
             return [{ ...amount, inHand, ...(!inHand && expectedDate ? { expectedDate } : {}) }];
           })
-          .filter(
-            (line) => action === "approve" || quantity(line.quantity).gt(0),
-          );
+          .filter((line) => quantity(line.quantity).gt(0));
         if (!values.length)
           throw new Error("Informe ao menos uma quantidade positiva.");
-        body = {
-          lines: values,
-          ...(action === "approve" && reason ? { reason } : {}),
-        };
+        body = { lines: values };
         summary = values
           .map((value) => {
             const line = data.lines.find((line) => line.id === value.lineId)!;
@@ -337,7 +333,6 @@ export function CommandEditorFields({
     }
   }
   const needsReason = [
-    "approve",
     "divergence",
     "close_expectation",
     "resolve",
@@ -348,7 +343,7 @@ export function CommandEditorFields({
     <form
       id={formId}
       ref={formElementRef}
-      className={registeringPurchase || registeringArrival ? "hca-purchase-list" : "mt-5 space-y-4 border-t border-(--line) pt-5"}
+      className={registeringPurchase || registeringArrival || authorizingPurchase ? "hca-purchase-list" : "mt-5 space-y-4 border-t border-(--line) pt-5"}
       onSubmit={submit}
       onChange={() => setFieldRevision((value) => value + 1)}
     >
@@ -369,12 +364,10 @@ export function CommandEditorFields({
       {registeringArrival ? <PurchaseArrivalFields data={data} lines={lines} fields={initialDraft?.fields}
         mayReadStock={can(context, "stock.family.read")}
         directCredit={directPurchaseCredit} /> : null}
-      {action === "approve" || (action === "purchase" && !registeringPurchase)
+      {authorizingPurchase ? <PurchaseApprovalFields data={data} fields={initialDraft?.fields} /> : null}
+      {action === "purchase" && !registeringPurchase
         ? lines.map((line) => {
-          const remaining =
-            action === "approve"
-              ? line.quantity
-              : acquisitionRemaining(line).toFixed();
+          const remaining = acquisitionRemaining(line).toFixed();
           return (
             <div key={line.id} className="space-y-1">
               <label
@@ -390,11 +383,7 @@ export function CommandEditorFields({
                 type="text"
                 inputMode="decimal"
                 maxLength={64}
-                defaultValue={
-                  initialDraft?.fields[line.id] ??
-                  (action === "approve" ? remaining : "")
-                }
-                required={action === "approve"}
+                defaultValue={initialDraft?.fields[line.id] ?? ""}
                 aria-describedby={instanceId + line.id + "-help"}
               />
               <p
@@ -403,9 +392,7 @@ export function CommandEditorFields({
               >
                 Limite deste ato:{" "}
                 {formatQuantity(remaining, line.unit_snapshot)}.{" "}
-                {action === "purchase"
-                    ? "Informe somente o adquirido nesta parcela."
-                    : "Aprovar não registra aquisição ou entrada no estoque."}
+                Informe somente o adquirido nesta parcela.
               </p>
             </div>
           );
@@ -603,7 +590,7 @@ export function CommandEditorFields({
             rows={3}
             minLength={3}
             maxLength={1000}
-            required={!["approve", "divergence"].includes(action)}
+            required={action !== "divergence"}
           />
         </label>
       ) : null}

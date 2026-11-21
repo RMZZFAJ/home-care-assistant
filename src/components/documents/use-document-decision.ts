@@ -12,9 +12,9 @@ export class DocumentDecisionFailure extends Error {
 /** Only a confirmed command's key survives this form. Fields never become a draft. */
 type DecisionVerifier = (result: Record<string, unknown>, intention: DocumentDecisionIntention, key: string) => void;
 
-export function useDocumentDecision({ userId, documentId, domain, action, patientId, purchaseArrival = false, deliveryCancellationRequest = false }: {
+export function useDocumentDecision({ userId, documentId, domain, action, patientId, purchaseApproval = false, purchaseArrival = false, deliveryCancellationRequest = false }: {
   userId: string; documentId: string; domain: DocumentDecisionIntention["domain"]; action: string; patientId?: string;
-  purchaseArrival?: boolean; deliveryCancellationRequest?: boolean;
+  purchaseApproval?: boolean; purchaseArrival?: boolean; deliveryCancellationRequest?: boolean;
 }) {
   const storageKey = `hca:official-decision:${userId}:${documentId}:${domain}:${action}`;
   const endpoint = domain === "balance_workspace" ? `/api/balances/decisions/${documentId}?careRecipientId=${patientId}` : `/api/documents/${documentId}/decisions`;
@@ -30,7 +30,7 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
       let key: string | null = null;
       try { key = sessionStorage.getItem(storageKey); } catch { /* The in-memory command remains independent. */ }
       if (!key || !/^[a-f0-9-]{36}$/.test(key)) return;
-      sendingRef.current = true; setBusy(true); setStage(1);
+      sendingRef.current = true; setBusy(true); setStage(purchaseApproval ? 2 : 1);
       try {
         const result = requireDocumentDecisionReceipt(await api(reconcileEndpoint, { key }), { documentId, key, domain, action });
         if (!active) return;
@@ -44,7 +44,7 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
       } finally { sendingRef.current = false; if (active) setBusy(false); }
     });
     return () => { active = false; };
-  }, [storageKey, reconcileEndpoint, documentId, domain, action]);
+  }, [storageKey, reconcileEndpoint, documentId, domain, action, purchaseApproval]);
   const cancellingRequisition = domain === "requisition" && action === "cancel";
   const cancellingSupply = domain === "supply" && action === "cancel";
   const purchasing = domain === "supply" && action === "purchase";
@@ -60,12 +60,16 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
     title: followUp ? (action === "reopen" ? "Reabrindo acompanhamento" : "Registrando conclusão")
       : deliveryCancellationRequest ? "Enviando pedido de cancelamento" : consentingDelivery ? "Registrando consentimento e devolução"
       : changingCancellationRequest ? "Registrando a decisão" : cancellingRequisition || cancellingSupply ? "Registrando cancelamento" : purchasing ? "Registrando compra"
-      : resendingArrival ? "Reenviando chegada" : purchaseArrival ? "Registrando chegada"
+      : purchaseApproval ? "Autorizando compra" : resendingArrival ? "Reenviando chegada" : purchaseArrival ? "Registrando chegada"
         : receiving ? "Confirmando recebimento" : reassigningDelivery ? "Atualizando recebedor" : reconcilingDelivery ? "Registrando conciliação"
           : requestingDeliveryReview ? "Enviando pedido de reavaliação" : "Concluindo a ação",
     detail: "Aguarde a conferência do resultado antes de tentar novamente.",
     stage,
-    steps: purchasing ? purchaseActivitySteps : [
+    steps: purchaseApproval ? [
+      { label: "Conferindo materiais selecionados", icon: "box" },
+      { label: "Registrando a decisão", icon: "file" },
+      { label: "Atualizando o acompanhamento", icon: "check" },
+    ] : purchasing ? purchaseActivitySteps : [
       { label: followUp ? "Conferindo a decisão e o histórico" : deliveryCancellationRequest ? "Conferindo o recebimento" : consentingDelivery ? "Conferindo devolução e consumo"
         : changingCancellationRequest ? "Conferindo a autoria" : cancellingRequisition || cancellingSupply ? "Conferindo os efeitos no estoque" : resendingArrival ? "Conferindo o lançamento"
         : purchaseArrival ? "Registrando as quantidades recebidas" : receiving ? "Registrando a conferência"
@@ -79,7 +83,7 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
   function forget() { if (currentRef.current?.scope === storageKey) currentRef.current = null; try { sessionStorage.removeItem(storageKey); } catch { /* No permission or result comes from storage. */ } }
   function previous() { if (currentRef.current?.scope === storageKey) return currentRef.current.key; try { const value = sessionStorage.getItem(storageKey); return value && /^[a-f0-9-]{36}$/.test(value) ? value : null; } catch { return null; } }
   async function settle(key: string, intention?: DocumentDecisionIntention, verify?: DecisionVerifier) {
-    setStage(1);
+    setStage(purchaseApproval ? 2 : 1);
     const result = requireDocumentDecisionReceipt(await api(reconcileEndpoint, { key }), { documentId, key, domain, action }, intention);
     if (result.state === "applied") verify?.(result.result, result.intention, key);
     forget(); setUncertain(false);
@@ -98,7 +102,7 @@ export function useDocumentDecision({ userId, documentId, domain, action, patien
     const parsed = documentDecisionIntention.safeParse(input);
     if (!parsed.success) throw new DocumentDecisionFailure("Confira os campos antes de confirmar. Nenhuma solicitação foi enviada.", "not_applied", parsed.error);
     const intention = parsed.data, key = crypto.randomUUID();
-    sendingRef.current = true; setBusy(true); setStage(0); setError(""); remember(key);
+    sendingRef.current = true; setBusy(true); setStage(purchaseApproval ? 1 : 0); setError(""); remember(key);
     try {
       const result = requireDocumentDecisionReceipt(await api(endpoint, { key, intention }), { documentId, key, domain, action }, intention);
       if (result.state !== "applied") throw new Error("A confirmação não contém um ato aplicado.");

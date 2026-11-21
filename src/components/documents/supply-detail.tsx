@@ -72,6 +72,7 @@ import { formatQuantity, quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
+import { purchaseApprovalBody } from "@/lib/validation/documents";
 import { purchaseCommandBody } from "@/lib/validation/purchase-command";
 import { purchaseArrivalBody } from "@/lib/validation/purchase-arrival";
 import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
@@ -101,6 +102,7 @@ import {
   PurchaseExpectationComparison,
 } from "./purchase-details";
 import { confirmedPurchase, PurchaseResult, type ConfirmedPurchase } from "./purchase-register";
+import { PurchaseApprovalResult } from "./purchase-approval";
 import { PurchaseArrivalResult } from "./purchase-arrival";
 import { PurchaseArrivalCorrections } from "./purchase-arrival-correction";
 import { PurchaseArrivalReview, canReviewPurchaseArrivals, type OpenChangedArrivals } from "./purchase-arrival-review";
@@ -166,6 +168,7 @@ export function SupplyDocumentContent({
   const [openRecoveredComparison, setOpenRecoveredComparison] = useState(false);
   const [message, setMessage] = useState("");
   const [purchaseResult, setPurchaseResult] = useState<ConfirmedPurchase | null>(null);
+  const [purchaseApprovalResult, setPurchaseApprovalResult] = useState<SupplyDocument | null>(null);
   const [arrivalResult, setArrivalResult] = useState<{ documentId: string; receipt: PurchaseReceipt } | null>(null);
   const [deliveryReceiptResult, setDeliveryReceiptResult] = useState<SupplyDocument | null>(null);
   const [reassignmentResult, setReassignmentResult] = useState<SupplyDocument | null>(null);
@@ -177,6 +180,7 @@ export function SupplyDocumentContent({
   const purchaseReadAttemptRef = useRef<number | null>(null);
   useOperationActivity(purchaseUpdating, { title: "Registrando compra", stage: 2, steps: purchaseActivitySteps });
   const [action, setAction] = useState<DocumentAction | null>(null);
+  const authorizingPurchase = action === "approve" && data?.type === "COM";
   const registeringPurchase = action === "purchase" && data?.payload.origin !== "donation";
   const registeringArrival = action === "receive" && data?.type === "COM";
   const countingDelivery = action === "receive" && data?.type === "ENT";
@@ -193,7 +197,7 @@ export function SupplyDocumentContent({
     data.lines.some(line => quantity(line.accepted_quantity).gt(0)));
   const reviewingCancellation = data?.type === "ENT" && (action === "cancel" && hasPersonalReceipt ||
     action === "consent_cancel" || action === "refuse_cancellation" || action === "withdraw_cancellation");
-  const coveredOperation = registeringPurchase || registeringArrival || reassigningDelivery;
+  const coveredOperation = authorizingPurchase || registeringPurchase || registeringArrival || reassigningDelivery;
   const refreshingArrival = loading && coveredRead && data?.type === "COM";
   const activityTitle = refreshingArrival ? "Atualizando chegada" : busy ? "Confirmando a operação" : "Consultando a ficha";
   const openingIssuance = useIssuanceOpeningActivity(id, context.userId, context.patient?.id);
@@ -204,7 +208,7 @@ export function SupplyDocumentContent({
   const [closeUncertain, setCloseUncertain] = useState(false);
   const decision = useDocumentDecision({
     userId: context.userId, documentId: id, domain: "supply", action: review?.action ?? action ?? "none",
-    purchaseArrival: registeringArrival, deliveryCancellationRequest: reviewingCancellation && action === "cancel",
+    purchaseApproval: authorizingPurchase, purchaseArrival: registeringArrival, deliveryCancellationRequest: reviewingCancellation && action === "cancel",
   });
   const [purchaseConflict, setPurchaseConflict] = useState(false);
   const [deliveryConflict, setDeliveryConflict] = useState(false);
@@ -404,6 +408,15 @@ export function SupplyDocumentContent({
           const { lines } = purchaseCommandBody.parse(accepted.body);
           requirePurchaseArrival(read, lines);
         }
+        if (accepted.action === "approve" && read.type === "COM") {
+          const { lines } = purchaseApprovalBody.parse(accepted.body);
+          const approved = new Map(read.lines.map(line => [line.id, line.approved_quantity]));
+          const event = read.events.find(item => item.version === accepted.expectedVersion + 1 && item.actorId === context.userId && item.action === "com.approve");
+          if (!event || lines.some(({ lineId, quantity: expected }) => {
+            const amount = approved.get(lineId);
+            return amount === undefined || !quantity(amount).eq(expected);
+          })) throw new Error("Não foi possível verificar as quantidades autorizadas.");
+        }
         if (accepted.action === "receive" && read.type === "COM") {
           requirePurchaseReceipt(read, purchaseArrivalBody.parse(accepted.body).lines, key);
         }
@@ -497,6 +510,11 @@ export function SupplyDocumentContent({
         setCancellationStatus(result.data);
         return;
       }
+      if (intention.action === "approve" && result.data.type === "COM") {
+        setMessage("");
+        setPurchaseApprovalResult(result.data);
+        return;
+      }
       if (intention.action === "purchase" && result.data.payload.origin !== "donation") {
         const { lines } = purchaseCommandBody.parse(intention.body);
         setMessage("");
@@ -512,8 +530,6 @@ export function SupplyDocumentContent({
         setArrivalResult({ documentId: id, receipt });
       }
       const purchaseMessages: Record<string, string> = {
-        approve:
-          "Decisão de aprovação registrada. Quantidades adquiridas e recebidas não mudaram.",
         purchase: "Aquisição registrada. A chegada terá seu próprio registro.",
         receive:
           receipt?.state === "approved" && zeroArrival
@@ -858,7 +874,7 @@ export function SupplyDocumentContent({
           tabs.select("workflow");
           setAction(item);
           setReview(null);
-          if (item === "purchase" || (item === "receive" && data.type === "COM")) setError("");
+          if (item === "approve" || item === "purchase" || (item === "receive" && data.type === "COM")) setError("");
         }}
       >
         {data.type === "COM" && item === "receive"
@@ -974,7 +990,7 @@ export function SupplyDocumentContent({
         {loading && data ? "Atualizando consulta da ficha…" : ""}
       </span>
       {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
-      {error && !countingDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation ? <Notice error>{error}</Notice> : null}
+      {error && !authorizingPurchase && !countingDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {!coveredOperation && !cancellingPurchase ? purchaseConflictPanel : null}
       {deliveryConflict && data?.type === "ENT" && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation ? (
@@ -1794,6 +1810,7 @@ export function SupplyDocumentContent({
         title={
           review?.action === "close_expectation"
             ? "Revisar encerramento da expectativa"
+            : authorizingPurchase ? "Conferir resultado da autorização"
             : registeringPurchase
               ? "Conferir resultado da compra"
               : registeringArrival ? "Conferir resultado da chegada"
@@ -1848,6 +1865,11 @@ export function SupplyDocumentContent({
       </Dialog>
       {purchaseResult?.documentId === id && !readDenied && !purchaseUpdating ? <PurchaseResult result={purchaseResult} onClose={() => {
         setPurchaseResult(null);
+        resultFocusRef.current = true;
+        setFocusRevision(value => value + 1);
+      }} /> : null}
+      {purchaseApprovalResult?.id === id && !readDenied && activeContext ? <PurchaseApprovalResult data={purchaseApprovalResult} onClose={() => {
+        setPurchaseApprovalResult(null);
         resultFocusRef.current = true;
         setFocusRevision(value => value + 1);
       }} /> : null}

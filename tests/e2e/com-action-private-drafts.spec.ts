@@ -1,7 +1,7 @@
 import { openOperationalDocumentAction } from "./document-sections";
 import { test, expect } from "@playwright/test";
 import { randomUUID } from "node:crypto";
-import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { setup, issue, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { loginDecision, noPrivateWrites, privateFormCount, confirmedOutcome } from "./l1-decision-policy";
 import { selectDocumentSection } from "./document-sections";
@@ -41,20 +41,82 @@ test("COM libera a compra do item identificado enquanto o extra aguarda cadastro
   expect(Number(saved.lines[0].purchased_quantity)).toBe(2);
 });
 
-test("COM aprovação, aquisição e chegada são atos separados sem rascunhos e cada resposta perdida é conferida uma vez", async ({ page }) => {
- const f = await setup(), family = await actor("family", f.patient), writes = noPrivateWrites(page);
- let doc = await rpc(family, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "2" }] }, p_key: randomUUID(), p_draft: false });
- await loginDecision(page, fixtures.adminA.email, f.patient);
+test("COM aprovação, aquisição e chegada são atos separados sem rascunhos e cada resposta perdida é conferida uma vez", async ({ page }, info) => {
+ const f = await setup(), family = await shiftWorker(f.patient, "family"), approver = await shiftWorker(f.patient, "admin");
+ const writes = noPrivateWrites(page);
+ const req = await issue(f.patient, [f.products[0]]);
+ let doc = await rpc(family.client, "create_supply_document", {
+  p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+  p_payload: {
+   origin: "purchase", lines: f.products.map(productId => ({
+    productId, quantity: "3",
+    ...(productId === f.products[0] ? { requisitionItemIds: [req.lines[0].id] } : {}),
+   })),
+   sources: [{ documentId: req.id, general: false, productIds: [f.products[0]] }],
+  },
+ });
+ const approvedLine = doc.lines.find((line: { product_id: string }) => line.product_id === f.products[0]);
+ const excludedLine = doc.lines.find((line: { product_id: string }) => line.product_id === f.products[1]);
+ const stock = () => sql(`select count(*) from public.stock_movements where care_recipient_id=${q(f.patient)}`);
+ const initialStock = stock();
+ await loginDecision(page, approver.email, f.patient);
  for (const label of ["Aprovar itens", "Registrar compra realizada", "Registrar chegada"]) {
   await page.goto("/fichas/" + doc.id); await selectDocumentSection(page, "workflow"); if (label === "Aprovar itens") await page.getByRole("button", { name: label, exact: true }).click();
   else await openOperationalDocumentAction(page, label);
-  await page.locator(`input[name="${doc.lines[0].id}"]`).fill(label === "Aprovar itens" ? "2" : "1");
+  const isApproval = label === "Aprovar itens";
+  if (isApproval) {
+   const editor = page.getByRole("dialog", { name: "Autorizar a compra", exact: true });
+   const confirm = editor.getByRole("button", { name: "Autorizar selecionados", exact: true });
+   const selection = (name: string) => editor.getByRole("switch", { name: `Autorizar · ${name}`, exact: true });
+   const qty = (line: typeof approvedLine) => editor.getByRole("textbox", { name: `${line.name_snapshot} · ${line.unit_snapshot}`, exact: true });
+   if (info.project.use.hasTouch) {
+    for (const width of [360, 412]) {
+     await page.setViewportSize({ width, height: 844 });
+     await expect(confirm).toBeInViewport();
+     await info.attach(`E05-06-${width}`, { body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png" });
+    }
+   }
+   await expect(qty(approvedLine)).toHaveValue("3");
+   await editor.getByRole("button", { name: `Opções de ${approvedLine.name_snapshot}`, exact: true }).click();
+   await page.getByRole("menuitem", { name: "Detalhes do material", exact: true }).click();
+   const details = page.getByRole("dialog", { name: "Detalhes do material", exact: true });
+   await expect(details.getByRole("heading", { name: approvedLine.name_snapshot, exact: true })).toBeVisible();
+   await details.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
+   const origin = doc.originDocuments[0].code;
+   await editor.getByRole("button", { name: origin, exact: true }).click();
+   const reference = page.getByRole("dialog", { name: origin, exact: true });
+   await reference.getByRole("button", { name: "Voltar à origem", exact: true }).click();
+   await qty(approvedLine).fill("2");
+   await selection(excludedLine.name_snapshot).uncheck();
+   await expect(qty(excludedLine)).toBeHidden();
+   await selection(approvedLine.name_snapshot).uncheck();
+   await expect(editor.getByRole("button", { name: "Recusar todos", exact: true })).toBeVisible();
+   await selection(approvedLine.name_snapshot).check();
+   await expect(qty(approvedLine)).toHaveValue("2");
+   await confirm.click();
+   await expect(editor.getByText(`Informe o motivo do ajuste de ${approvedLine.name_snapshot}.`, { exact: true })).toBeVisible();
+   await editor.getByRole("textbox", { name: `Motivo do ajuste · ${approvedLine.name_snapshot}`, exact: true }).fill("Quantidade conferida pela família.");
+   await confirm.click();
+   await expect(editor.getByText("Informe o motivo da recusa dos materiais desmarcados.", { exact: true })).toBeVisible();
+   await editor.getByRole("textbox", { name: "Motivo dos materiais desmarcados", exact: true }).fill("Material indisponível para esta compra.");
+  } else await page.locator(`input[name="${approvedLine.id}"]`).fill("1");
   await expect(page.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toHaveCount(0);
   const isPurchase = label === "Registrar compra realizada";
   const isArrival = label === "Registrar chegada";
-  if (!isPurchase && !isArrival) await page.getByRole("button", { name: "Revisar operação", exact: true }).click();
   await audit(page, "COM ato sem rascunho");
-  await confirmedOutcome(page, doc.id, isPurchase ? "Confirmar compra" : isArrival ? "Confirmar entrada" : "Confirmar operação");
+  await confirmedOutcome(page, doc.id, isPurchase ? "Confirmar compra" : isArrival ? "Confirmar entrada" : "Autorizar selecionados");
+  if (isApproval) {
+   const result = page.getByRole("dialog", { name: "Compra autorizada", exact: true });
+   await expect(result.getByText(approvedLine.name_snapshot, { exact: true })).toBeVisible();
+   await expect(result.getByText(`2 ${approvedLine.unit_snapshot}`, { exact: true })).toBeVisible();
+   await expect(result.getByText(excludedLine.name_snapshot, { exact: true })).toHaveCount(0);
+   await result.getByRole("button", { name: "Concluir", exact: true }).click();
+   const confirmed = await rpc(f.admin, "operational_document", { p_id: doc.id });
+   expect(confirmed.lines.map((line: typeof approvedLine) => [line.id, Number(line.quantity), Number(line.approved_quantity), Number(line.purchased_quantity), Number(line.accepted_quantity)]))
+    .toEqual(expect.arrayContaining([[approvedLine.id, 3, 2, 0, 0], [excludedLine.id, 3, 0, 0, 0]]));
+   expect(confirmed.events.filter((event: { action: string }) => event.action === "com.approve")).toMatchObject([{ actorId: approver.id }]);
+   expect(stock()).toBe(initialStock);
+  }
   if (isPurchase) {
    const result = page.getByRole("dialog", { name: "Compra registrada", exact: true });
    await expect(result.getByText("Aguardando entrega da loja", { exact: true })).toBeVisible();
@@ -66,7 +128,7 @@ test("COM aprovação, aquisição e chegada são atos separados sem rascunhos e
   doc = await rpc(f.admin, "operational_document", { p_id: doc.id });
  }
  expect(privateFormCount(f.patient)).toBe("0"); expect(writes).toEqual([]);
- expect(sql(`select purchased_quantity=1 from public.document_lines where id=${q(doc.lines[0].id)}`)).toBe("t");
+ expect(sql(`select purchased_quantity=1 from public.document_lines where id=${q(approvedLine.id)}`)).toBe("t");
 });
 
 test("COM compra mista da família preserva a previsão e recupera uma chegada pendente", async ({ page }, info) => {

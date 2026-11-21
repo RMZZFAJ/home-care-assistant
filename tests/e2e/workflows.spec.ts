@@ -230,6 +230,8 @@ test("REQ → planejamento COM → compra → validação → estoque familiar �
   await login(page, "professional");
   const req = await issueReq(page, patient, product.name);
   expect(req.code).toBe("REQ-0001");
+  await page.getByRole("dialog", { name: "Requisição emitida", exact: true })
+    .getByRole("button", { name: "Acompanhar ficha", exact: true }).click({ timeout: 60_000 });
   const teamAfterRequisition = (
     await (await get(page, "/api/stock/balances?careRecipientId=" + patient)).json()
   ).overview[0].team.confirmed;
@@ -247,6 +249,8 @@ test("REQ → planejamento COM → compra → validação → estoque familiar �
   expect(purchase.code).toBe("COM-0001");
   expect(purchase.payload.acquisitionMode).toBe("planned");
   expect(purchase.status).toBe("pending_approval");
+  await page.getByRole("dialog", { name: "Compra emitida", exact: true })
+    .getByRole("button", { name: "Acompanhar ficha", exact: true }).click({ timeout: 60_000 });
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
   await expect(
     page.getByRole("button", { name: "Aprovar itens", exact: true }),
@@ -257,7 +261,10 @@ test("REQ → planejamento COM → compra → validação → estoque familiar �
   await page
     .getByRole("button", { name: "Aprovar itens", exact: true })
     .click();
-  await confirm(page, "Decisão de aprovação registrada.");
+  await page.getByRole("dialog", { name: "Autorizar a compra", exact: true })
+    .getByRole("button", { name: "Autorizar selecionados", exact: true }).click();
+  await page.getByRole("dialog", { name: "Compra autorizada", exact: true })
+    .getByRole("button", { name: "Concluir", exact: true }).click();
   await logout(page);
   await login(page, "family");
   await page.goto("/fichas/" + purchase.id + "?careRecipientId=" + patient);
@@ -270,10 +277,11 @@ test("REQ → planejamento COM → compra → validação → estoque familiar �
   await page.getByRole("dialog", { name: "Compra registrada", exact: true })
     .getByRole("button", { name: "Concluir", exact: true }).click();
   await openOperationalDocumentAction(page, "Registrar chegada");
-  await page
-    .getByLabel(product.name + " · unidade", { exact: true })
+  const arrivalEditor = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
+  await arrivalEditor
+    .getByRole("textbox", { name: "Recebidos agora · " + product.name + " · unidade", exact: true })
     .fill("10");
-  await page.getByRole("dialog", { name: "Registrar chegada", exact: true }).getByRole("button", { name: "Enviar para aprovação", exact: true }).click();
+  await arrivalEditor.getByRole("button", { name: "Enviar para aprovação", exact: true }).click();
   const arrival = page.getByRole("dialog", { name: "Chegada enviada para aprovação", exact: true });
   await expect(arrival).toBeVisible();
   await arrival.getByRole("button", { name: "Concluir", exact: true }).click();
@@ -303,6 +311,8 @@ test("REQ → planejamento COM → compra → validação → estoque familiar �
   );
   expect(delivery.code).toBe("ENT-0001");
   expect(delivery.status).toBe("pending_receipt");
+  await page.getByRole("dialog", { name: "Entrega expedida", exact: true })
+    .getByRole("button", { name: "Acompanhar ficha", exact: true }).click({ timeout: 60_000 });
   await logout(page);
   await login(page, "professional");
   await page.goto("/fichas/" + delivery.id + "?careRecipientId=" + patient);

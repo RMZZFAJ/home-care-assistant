@@ -201,6 +201,7 @@ const commandLines = z
   .min(1)
   .max(1000);
 const reason = z.string().trim().min(3).max(1000);
+export const purchaseApprovalBody = z.object({ lines: commandLines, reason: reason.optional() }).strict();
 export const supplyCommandSchema = z
   .object({
     action: z.enum([
@@ -269,7 +270,7 @@ export const supplyCommandSchema = z
       submit: z.object({}).strict(),
       apply_balance: balanceApplicationBody,
       approve: z.union([
-        z.object({ lines: commandLines, reason: reason.optional() }).strict(),
+        purchaseApprovalBody,
         z
           .object({
             group: z.enum(["family", "supervisor"]),
