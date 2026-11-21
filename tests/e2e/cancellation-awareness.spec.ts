@@ -83,12 +83,16 @@ for (const type of ["REQ", "COM"]) test(type + " preserves original facts and re
   await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
   await expect(notice).toContainText("Ciência familiar registrada por");
   await expect(confirm).toBeEnabled();
-  await confirm.focus(); await expect(confirm).toBeFocused();
-  const target = await confirm.evaluate(element => {
+  await confirm.focus();
+  await expect.poll(() => confirm.evaluate(element => {
     const box = element.getBoundingClientRect(), hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
-    return { width: box.width, height: box.height, covered: !hit || !element.contains(hit) };
-  });
-  expect(target.width).toBeGreaterThanOrEqual(24); expect(target.height).toBeGreaterThanOrEqual(24); expect(target.covered).toBe(false);
+    return {
+      focused: element === document.activeElement,
+      minimumSize: box.width >= 24 && box.height >= 24,
+      covered: !hit || !element.contains(hit),
+    };
+  }), { message: "The focused cancellation control must settle in a clickable area" })
+    .toEqual({ focused: true, minimumSize: true, covered: false });
   await confirm.click();
   await expect(notice).toContainText("Acesso recusado na resposta controlada.");
   await expect(notice).not.toContainText("Cancelamento registrado por");

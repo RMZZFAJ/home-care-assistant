@@ -1,6 +1,6 @@
 # Execução dos lotes L1 a L4
 
-**Atualizado em 20/11/2026.** Branch `feat/phase-d-implementation`,
+**Atualizado em 21/11/2026.** Branch `feat/phase-d-implementation`,
 [PR #7 em rascunho](https://github.com/RMZZFAJ/home-care-assistant/pull/7).
 Este registro acompanha o que entrou no produto, a comparação com cada
 laboratório e as pendências por lote. As evidências das entregas e a fila
@@ -11,7 +11,7 @@ e nas [matrizes de execução](ACCEPTANCE_EXECUTION.csv) e
 | Lote | Situação | Referências vigentes |
 | --- | --- | --- |
 | L1 | Implementado e revisado, com evidência de cenários específicos | [Ordem E01–E03](../../../../HCA_L1_LOTE_CODEX_E01_E03.md), [laboratório v3](../../../../hca-laboratorio-01-v3-final.html) e [comentários v3](../../../../hca-l01-v3-comentarios.json) |
-| L2 | Em execução na mesma branch | [Comando mestre](../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md) e [laboratório v7 aprovado](../../../../hca-laboratorio-02-v7.html) |
+| L2 | Em validação na mesma branch | [Comando mestre](../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md) e [laboratório v7 aprovado](../../../../hca-laboratorio-02-v7.html) |
 | L3 | Futuro | Ordem e laboratório a registrar quando o lote for definido |
 | L4 | Futuro | Ordem e laboratório a registrar quando o lote for definido |
 
@@ -207,6 +207,39 @@ Capturas em `output/playwright/l2-arrival-card/`.
   cancelamento, reabertura, arquivo por decisão ou prazo e PDF consolidado
   verificado. Pende conferir o candidato publicado com o banco atualizado e
   os efeitos de comunicação pelos gates do ambiente.
+
+**Referências dos estados compartilhados.** Os cenários abaixo têm cobertura
+dirigida nas mesmas telas e operações da aplicação.
+
+- **E04-15.** A preparação de uma nova REQ mostra o atendimento anterior e o
+  atual da ficha de origem. Adotar a versão atual conserva a seleção, o zero
+  informado e o motivo próprio. [Teste de continuidade da REQ](../../../../tests/e2e/remaining-need.spec.ts).
+- **E05-08.** Na mesma compra, a família marca quais itens estão em mãos e
+  conserva a previsão para os demais. Recuperar a resposta confirma a parcela
+  pendente sem repetir o ato. [Teste da compra mista](../../../../tests/e2e/com-action-private-drafts.spec.ts).
+- **E05-10.** O registro pelo administrador mostra o efeito previsto no saldo
+  familiar. Confirmar a entrada aplica o recebimento autorizado no mesmo ato,
+  incluindo a confirmação da quantidade excedente quando ela existe.
+  [Teste da chegada](../../../../tests/e2e/purchase-receipts.spec.ts).
+- **E06-04.** A ENT importa itens de duas REQs selecionadas. A avaliação da
+  necessidade continua associada ao material. O caminho da COM importa somente
+  a parcela aprovada e mantém o vínculo consultável.
+  [Teste da ENT vinculada](../../../../tests/e2e/workflows.spec.ts) e
+  [teste da origem COM](../../../../tests/e2e/supply-operational-sources.spec.ts).
+- **E06-05.** A confirmação incerta preserva a referência da tentativa.
+  A recuperação verifica a expedição registrada com a mesma identidade e
+  confere que não houve segunda saída de estoque.
+  [Testes de recuperação da ENT](../../../../tests/e2e/supply-private-drafts.spec.ts) e
+  [da transferência](../../../../tests/e2e/transfer-declaration-private-drafts.spec.ts).
+- **E06-07.** O diálogo de confirmação mostra a falta e o excedente nas
+  linhas alteradas. A conferência conserva quantidades, suficiência e efeitos
+  físicos separados, inclusive após perda da resposta.
+  [Teste do recebimento com diferença](../../../../tests/e2e/counted-material-receipt.spec.ts).
+- **E06-17.** Perder capacidade de escrita mantém o preenchimento disponível
+  para consulta autorizada. Revogar o acesso à residência retira seus dados
+  da tela, inclusive se uma leitura anterior chegar atrasada.
+  [Teste da consulta privada](../../../../tests/e2e/supply-private-drafts.spec.ts) e
+  [teste da revogação](../../../../tests/e2e/document-access.spec.ts).
 
 **Autorização do planejamento da COM.** Em E05-06, o diálogo apresenta
 a identificação da ficha, a quantidade solicitada e um interruptor por
@@ -1678,6 +1711,8 @@ aprovações e 14 falhas persistentes cada. iOS 1 registrou 277 aprovações e
 três falhas persistentes. Chromium 1 atingiu o limite do job após registrar
 duas falhas persistentes e uma aprovação na repetição. Esse caso de COM
 falhou na seleção da aba Materiais na primeira tentativa.
+[Job Android 1](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44906482026/job/136858828652).
+[CI de `9297ed38`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44906482026).
 
 A DEV ainda era testada com uma tarefa de concordância da contraparte, e
 o teste de cabeçalho esperava o espaçamento de L1 antes do menu de três
@@ -1697,11 +1732,37 @@ explícita do último preenchimento em ENT/DEV mostra o resultado já
 registrado ao autor que perdeu a capacidade de expedir, sem repetir o ato.
 O início de novo preenchimento continua direto. O histórico de REQ viabiliza
 ler vínculos autorizados de pacientes inativos. As capturas e logs dirigidos
-estão em `output/playwright/l2-ci-44906482026-*`. A nova CI ainda precisa
-validar a instalação limpa, a evolução legada e a matriz de navegador.
-[Job Android 1](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44906482026/job/136858828652).
+estão em `output/playwright/l2-ci-44906482026-*`.
+
+Em `d10a4ed7`, Windows, Ubuntu, SonarCloud, instalação limpa e evolução
+legada passaram. A Vercel confirmou a prévia do mesmo SHA e entregou o HTML
+da aplicação em `/login` e `/recuperar-senha`. As 832 integrações de banco
+passaram, sem casos ignorados. Os seis grupos de Chromium, Android emulado
+e iOS emulado passaram no teste de partida e iniciaram a suíte E2E.
+O Chromium-1 concluiu com 279 casos aprovados e um caso de COM recuperado
+na segunda tentativa. O clique focou Materiais, mas manteve Visão geral
+selecionada e a URL intacta. A causa permanece em investigação. O Android
+emulado concluiu com 280 e 279 casos, sem repetições nos dois grupos.
+O iOS-2 encerrou com 279 aprovações sem repetição. O iOS-1 aprovou 279
+casos de primeira e recuperou a ciência do cancelamento de COM na segunda
+tentativa. A primeira leitura de geometria foi feita durante a atualização.
+O teste agora aguarda foco, área de 24 × 24 px e centro clicável na mesma
+amostra. O controle continua exigindo o foco real do navegador. REQ e COM
+passaram de primeira no iOS emulado na rodada local dirigida, com as cinco
+larguras e o PDF assinado. Evidência em
+`output/playwright/l2-ci-44915193954-cancellation/`.
+O Chromium-2 foi interrompido aos 40 minutos, depois do caso 267. As duas
+tentativas de auditar a revisão de nova REQ a 768 px mediram o botão de
+ajuda encoberto pelo cabeçalho fixo, após a troca de largura com a página
+rolada. A auditoria agora inicia no topo em cada largura, com as regras de
+acessibilidade e teclado preservadas. Os grupos Chromium têm 55 minutos.
+Os nove casos locais dirigidos passaram sem repetição no Chromium, Android
+e iOS emulados. A rodada cobriu a revisão a 320, 390, 768 e 1440 px,
+emissão vinculada com recuperação e preservação do PDF, os três atos de
+COM e a navegação por abas. Relatório e evidências locais em
+`output/playwright/l2-ci-44915193954-directed/`.
+[CI de `d10a4ed7`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44915193954).
 [Preview da branch](https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app).
-[CI de `9297ed38`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44906482026).
 
 Na execução cancelada de `37ac93a9`, o Chromium e o WebKit encontraram
 duas ocorrências do texto de estoque desconhecido para uma única linha da

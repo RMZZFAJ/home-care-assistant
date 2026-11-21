@@ -13,7 +13,7 @@ import {
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { audit, auditFromTop } from "./accessibility-audit";
+import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 const next = (page: Page) =>
@@ -122,7 +122,7 @@ test("nova REQ vinculada preserva aceite parcial e PDF anterior; resposta perdid
     oldHash = createHash("sha256").update(oldBytes).digest("hex");
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    await audit(page, `remaining-need-review-${width}`);
+    await auditFromTop(page, `remaining-need-review-${width}`);
   }
   mkdirSync("output/playwright/phase-d", { recursive: true });
   await page.setViewportSize({ width: 320, height: 900 });
