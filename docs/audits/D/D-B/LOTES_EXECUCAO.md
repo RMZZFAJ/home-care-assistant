@@ -11,7 +11,7 @@ e nas [matrizes de execução](ACCEPTANCE_EXECUTION.csv) e
 | Lote | Situação | Referências vigentes |
 | --- | --- | --- |
 | L1 | Implementado e revisado, com evidência de cenários específicos | [Ordem E01–E03](../../../../HCA_L1_LOTE_CODEX_E01_E03.md), [laboratório v3](../../../../hca-laboratorio-01-v3-final.html) e [comentários v3](../../../../hca-l01-v3-comentarios.json) |
-| L2 | Em validação na mesma branch | [Comando mestre](../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md) e [laboratório v7 aprovado](../../../../hca-laboratorio-02-v7.html) |
+| L2 | Escopo aprovado implementado, com verificação local dirigida e CI final pendente | [Comando mestre](../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md) e [laboratório v7 aprovado](../../../../hca-laboratorio-02-v7.html) |
 | L3 | Futuro | Ordem e laboratório a registrar quando o lote for definido |
 | L4 | Futuro | Ordem e laboratório a registrar quando o lote for definido |
 
@@ -51,8 +51,9 @@ e [resultados de CI](L1_CI_STABILIZATION.md). A comparação atesta os padrões
 especificados e os estados exercitados. A paridade visual integral e a
 homologação humana, assistiva e em aparelhos físicos continuam abertas.
 
-**Criado ou completado para o produto real.** Ciência familiar em Materiais,
-com fatos pessoais, históricos e dispensados. Identificação técnica do
+**Criado ou completado para o produto real.** Ciência familiar com fatos
+pessoais, históricos e dispensados. Em L2, a ciência da REQ foi movida de
+Materiais para Visão geral. Identificação técnica do
 exemplar e modalidades Ficha, Expandido e Auditoria. Comunicações com
 tentativas, canais e recuperação. Cartões do próximo plantão, estoque crítico,
 acervo e orientação inicial. Verificação técnica contextual, operação
@@ -86,6 +87,14 @@ cenários e 175 variantes foram abertos no laboratório. A evidência do produto
 
 O HTML aprovado conserva uma linha original com espaço final. Seu SHA-256
 confere com o comando mestre.
+
+O candidato segue para avaliação da implementação pela PR 7. Os registros
+abaixo ligam as superfícies móveis de E04–E06 aos atos oficiais, às negativas
+de permissão, aos efeitos separados de estoque e suficiência, aos PDFs e
+às comunicações. Também registram as mudanças autorizadas sobre L1 e as
+[reservas de produto](#decisões-e-dúvidas-de-l2). A CI, o Sonar e a prévia
+do SHA final ainda precisam de resultado próprio. O roteiro permanece
+disponível para a conferência visual do responsável no celular.
 
 ### Conferência no celular
 
@@ -284,6 +293,103 @@ precisam validar o novo conjunto no SHA publicado. Nenhuma migration
 foi acrescentada.
 
 [l2-ci-44926343700]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44926343700
+
+**Verificação de `140b4297` em 21/11.** Os seis grupos passaram. Os
+logs registraram 1.675 aprovações de primeira e duas na segunda tentativa,
+sem falhas persistentes. A revisão da REQ a 1440 px passou de primeira nos
+três grupos que executaram o caso. A seleção de recebedor, o histórico da
+agenda, a retomada privada e a ENT parcial também passaram de primeira
+nos grupos correspondentes. [CI 44936427732][l2-ci-44936427732].
+
+Nos 17 arquivos de regressão diretamente ligados ao lote, os logs registram
+76 aprovações por navegador, 228 no total em Chromium, Android e iOS emulados.
+Os casos exercitam emissão, recebimento, suficiência, arquivamento, PDFs,
+revogação e retomada. A conferência visual usa as comparações dirigidas do lote.
+
+- No Chromium-1, o item do catálogo foi gravado, mas o editor para consultar
+  o comprovante não apareceu na primeira tentativa após recarregar. Cinco
+  execuções locais com o teste original e oito com rastreamento passaram de
+  primeira. Nas oito, a atualização inicial antecedeu o clique no botão
+  habilitado e o editor abriu em seguida. A causa da ocorrência na CI segue
+  em aberto. Relatório em `output/playwright/l2-catalogue-reload-diagnostics/`.
+- No Android-1, o registro da compra mista preservou a chegada pendente e
+  a previsão da loja. Depois da recarga, o toque adicional selecionou
+  Arquivos gerados. O teste local passou a confirmar que a aba Materiais
+  permanece selecionada ao recarregar. Quatro execuções locais completaram
+  o percurso, duas no Android e duas no iOS. A primeira rodada também
+  teve um timeout na preparação do banco, antes da navegação.
+- As capturas anteriores da revisão de ENT eram gravadas após a última
+  largura auditada, 1440 px, inclusive com nomes de projeto móvel. O teste
+  agora mede 390 px e anexa a identificação e os materiais ao relatório.
+  Android e iOS emulados passaram de primeira. As novas imagens e a
+  referência do laboratório estão em
+  `output/playwright/l2-ent-review-mobile-140b4297/`.
+
+Os dois ajustes de teste estão locais. As provas de estoque, autorias e
+acessibilidade foram preservadas. Não foi necessária migration.
+
+**Falha de arquivamento da v7.** O commit local `8b6af7a4` aplica a composição
+de E04-12 no fluxo real. O modal apresenta o resultado incerto e oferece duas
+recuperações com a chave e os dados da solicitação original. Os detalhes
+para suporte abrem sob demanda e podem ser
+copiados. Se a referência for recusada na primeira solicitação, a revisão
+é atualizada antes de nova confirmação. A validação dos campos permanece
+junto à revisão.
+
+Dez casos de arquivamento, confirmação e reversão passaram de primeira no
+Android e no iOS emulados. A confirmação recuperada após perda da resposta
+preservou o PDF assinado. Uma resposta 503 controlada comprovou o
+limite de duas recuperações, com saldo e condição da ficha preservados.
+Build, tipos e lint dirigido passaram. As capturas a 390 px e o relatório
+estão em `output/playwright/l2-archive-failure-mobile/`. O commit usa os
+contratos e migrations do candidato e aguarda a própria CI após publicação.
+
+**Retomada do arquivamento após recarga.** O commit local `1a1395a9`
+conserva a identificação técnica na sessão. Ao voltar à ficha, a ação
+Conferir tentativa de arquivamento recupera o ato aplicado ou retoma a
+preparação do PDF. Quando o banco comprova que o ato ficou sem aplicação,
+encerra a chave e o envio tardio recebe `409`. A primeira rodada de
+navegador identificou o mapeamento incorreto dessa recusa como `503`.
+A segunda rodada confirmou a classificação e a preservação do estoque.
+
+Passaram 12 casos em Android e iOS emulados, dois de integração com Auth
+real, 23 de contrato/API e o build. Os casos incluem perda de resposta,
+recarga antes do PDF, arquivamento automático, confirmação e reversão.
+O relatório está em `output/playwright/l2-archive-reconcile-verified/`.
+A migration `20261121202419` está aplicada na stack local e no
+[desenvolvimento autorizado](#migrations-por-ambiente).
+
+**Falhas de conclusão e reabertura.** O commit local `c63cb408` usa o
+mesmo modal de resultado do arquivamento, com diagnóstico copiável e
+até duas recuperações. Uma incerteza consulta a chave original. Quando
+o servidor comprova a ausência do ato, a tentativa explícita usa nova
+chave e a observação ainda aberta. As decisões usam a reconciliação e o
+esquema existentes.
+
+Na primeira rodada, 12 casos passaram e dois detectaram que voltar do
+aviso de descarte recolhia a pendência expandida. A revisão passou a ficar
+montada durante o aviso. Na repetição dirigida, os seis casos de Android
+e iOS emulados passaram de primeira. A prova inclui perda de resposta na
+reabertura, preservação do PDF anterior, descarte da observação e rejeição
+dos envios tardios na conclusão. Build, tipos e lint dirigido passaram.
+Relatório e capturas a 390 px em `output/playwright/l2-follow-up-failure-verified/`.
+
+**Revisão e falhas de cancelamento.** Em REQ e COM, a justificativa fica na
+própria revisão, conforme E04-14 e E05-13. Na REQ, o ajuste de estoque exige
+escolha explícita quando aplicável. ENT e DEV usam o mesmo diálogo de falha
+ao cancelar antes do recebimento e nas decisões posteriores ao recebimento.
+O texto continua disponível enquanto o formulário está aberto. A saída
+descarta os campos e mantém a chave técnica quando existe incerteza sobre
+o ato. O fluxo confere a chave original antes de oferecer um novo envio.
+Os testes cobrem recusa de envio tardio, perda de resposta, limite de
+recuperações e efeito único no estoque. Build, tipos e lint dirigido passaram.
+Passaram 21 das 22 execuções iniciais em Android e iOS emulados. A compra
+mista falhou no login da massa de teste com timeout do Auth, antes de abrir
+a tela. O caso passou na execução isolada, em novo build e sem retry do
+runner. Relatórios em `output/playwright/l2-cancellation-final/` e
+`output/playwright/l2-cancellation-com-recheck/`.
+
+[l2-ci-44936427732]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44936427732
 
 **Autorização do planejamento da COM.** Em E05-06, o diálogo apresenta
 a identificação da ficha, a quantidade solicitada e um interruptor por
@@ -1506,11 +1612,12 @@ continua sem regra de produto nesta entrega.
 
 ## Migrations por ambiente
 
-Consulta de 21/11/2026 à stack local `home-care-assistant` e ao Supabase de
-desenvolvimento vinculado `qwfrqychokvhdzakibid`. Os bancos compartilham
-**319 versões**, com 242 versões anteriores a L1, 18 de L1 e 59 de L2.
+Na reconciliação de 21/11/2026, a stack local `home-care-assistant` e o
+Supabase de desenvolvimento `qwfrqychokvhdzakibid` têm **320 versões**,
+com 242 anteriores a L1, 18 de L1 e 60 de L2. O plano de aplicação está
+vazio e as 84 migrations históricas continuam protegidas.
 Os SQL de cada versão ficam em [supabase/migrations](../../../../supabase/migrations/).
-A fila vinculada está vazia. Produção fica fora desta consulta.
+Produção fica fora desta consulta.
 
 ### L1 — Aplicadas no local e no desenvolvimento
 
@@ -1536,7 +1643,7 @@ A fila vinculada está vazia. Produção fica fora desta consulta.
 `20261119220003`, `20261119221703`, `20261119224330`, `20261119231733`,
 `20261119233039`, `20261120043839`, `20261120052605`, `20261120214300`,
 `20261120231639`, `20261121014430`, `20261121063729`, `20261121075902`,
-`20261121103655`, `20261121111215`, `20261121140535`.
+`20261121103655`, `20261121111215`, `20261121140535`, `20261121202419`.
 
 `20261121140535` usa a autorização de leitura da REQ na consulta de vínculos
 quando o paciente está inativo. A integração local com Auth confirmou a
@@ -1629,6 +1736,21 @@ rascunho e na expedição. Ensaio vinculado com rollback confirmou os grants
 existentes do seletor e a negação a anônimos. O backup cifrado
 `523122f6-617f-4dd7-9326-8974ac6e4eda` foi verificado antes de aplicar
 a única versão pendente.
+
+### L2 — Reconciliação do arquivamento no desenvolvimento
+
+`20261121202419` acrescenta a reconciliação autenticada da tentativa de
+arquivo, confirmação e reversão. O banco recupera o ato aplicado ou a
+preparação apta. Quando comprova a ausência do ato, encerra a chave sob
+bloqueio e recusa seu envio tardio. A preparação vigente e os PDFs
+consolidados anteriores conservam seus identificadores.
+
+A aplicação foi precedida pelo ensaio vinculado com rollback e pela
+verificação do backup integral cifrado `3dbe809f-6554-41f7-8577-e1d58738e5fa`.
+O pós-check confirmou as 320 versões, execução da operação por
+`authenticated`, RLS na tabela privada e ausência de leitura e gravação
+diretas pelos papéis de aplicação. O plano de aplicação posterior ficou
+vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamento--320-versões).
 
 ### L3 e L4
 

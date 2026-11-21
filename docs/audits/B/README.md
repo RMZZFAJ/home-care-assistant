@@ -1,9 +1,9 @@
 # Fase B — aprofundamentos especializados
 
-B1–B8 encerrados como diagnóstico em outubro de 2026, sem correções.
-NO-GO e os dois P1 herdados permanecem. C planeja a evolução; D NÃO INICIADA.
-Os estados C/D não iniciados nos relatórios abaixo são fotografias da data,
-não instruções para apagar o histórico ou ignorar a autorização posterior.
+B1–B8 encerraram o diagnóstico em outubro de 2026. Os relatórios preservam
+as conclusões e o NO-GO daquele momento. As correções e os limites de
+evidência posteriores estão na [Fase D](../D/README.md) e na
+[lista de achados conciliados](../PR7_ACHADOS.csv).
 
 <!-- c-table:start -->
 

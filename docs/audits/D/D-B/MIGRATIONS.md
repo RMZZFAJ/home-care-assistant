@@ -3,7 +3,30 @@
 Projeto único autorizado: `qwfrqychokvhdzakibid`. Sem reset, seed ou remoção
 de dados remotos. As 84 migrations históricas permanecem protegidas.
 
-## Estado atual — revisão dos avisos do Supabase
+Consulte o [inventário vigente por ambiente](LOTES_EXECUCAO.md#migrations-por-ambiente)
+para as aplicações posteriores.
+
+## Retomada do arquivamento — 320 versões
+
+Em 21/11/2026, o plano vinculado mostrou apenas
+`20261121202419_l2_reconcile_archive_attempt.sql`. O ensaio com rollback
+conferiu a execução por usuário autenticado e as guardas da tentativa de
+arquivamento. A primeira cópia integral atingiu o limite de tempo na leitura
+do esquema. A segunda foi selada e verificada antes da aplicação.
+
+O backup integral cifrado `3dbe809f-6554-41f7-8577-e1d58738e5fa` contém 84
+arquivos e 19.216.767 bytes. O SHA-256 do pacote cifrado é
+`7660d3dd6c00d5690db261e299b4fd968e96b96ab512ab0c6cdac80790a279d0`.
+O backup complementar `1ebd400c-3dee-4fcb-8997-a2f3d0f78e30` conserva as
+definições e os grants das três funções afetadas. O pacote integral apoia
+esta aplicação. O ensaio operacional de recuperação D6 segue pendente.
+
+A aplicação elevou o desenvolvimento a 320 versões, igualando o local.
+O pós-check confirmou a nova versão, execução das três operações por
+`authenticated`, recusa aos papéis `anon` e `service_role`, RLS e ausência
+de acesso direto à tabela privada. O plano vinculado ficou vazio.
+
+## Revisão dos avisos do Supabase em 13/11/2026
 
 Local e remoto em242, após240→241→242. O acréscimo de teste pessoal de Push
 usa20261113001837 e20261113002720, aplicadas depois do término da CI anterior

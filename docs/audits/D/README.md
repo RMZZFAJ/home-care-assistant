@@ -1,20 +1,13 @@
 # Fase D — implementação
 
-**D-A consolidada tecnicamente em ambiente local**, autorizada em 05/11/2026.
-Escopo D0–D2; CI do SHA publicado e liberação permanecem independentes;
-[checkpoint e aceites](D-A/CHECKPOINT.md). A conclusão de um incremento não
-representa conclusão de um lote ou liberação do produto.
+**D-A consolidou D0–D2**, com autorização de 05/11/2026.
+[Checkpoint e aceites de D-A](D-A/CHECKPOINT.md).
 
-O [handoff C](../C/C6-acceptance-handoff/PHASE_D_IMPLEMENTATION_HANDOFF.md) e
-os
-[lotes futuros](../C/C5-execution-roadmap/PHASE_D_WORK_PACKAGES.md)
-especificam
-o planejamento de origem. A autorização corrente permite implementar,
-testar localmente, commitar e publicar no
-[Draft PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7), sem merge.
-O consentimento histórico de replay D-A não autoriza novos resets nesta missão.
-[D-B está em execução](D-B/README.md), autorizada em 06/11/2026. Suas duas
-aplicações remotas têm autorização e procedimentos próprios: as oito pendências
-D-A foram aplicadas após preflight/backup/restore e pós-verificação, remoto121.
-Migrations D-B aguardam implementação/testes e novo preflight. D-C, envio externo,
-merge, deploy e liberação definitiva continuam fora da missão. Produção NO-GO.
+**D-B implementou incrementos de D3–D5 e as revisões L1/L2**, com validação
+conjunta em andamento na [PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7),
+em rascunho. O [registro L1–L4](D-B/LOTES_EXECUCAO.md) conserva a situação
+das migrations por ambiente. [Índice D-B](D-B/README.md).
+
+O [handoff C10](../C/C10-pr-handoff/PHASE_D_HANDOFF_UPDATED.md) preserva o plano
+de origem. A [preparação do fechamento](../FECHAMENTO_PR7.md) mostra sua
+conciliação com a execução e os gates de D-C/D6 e D7. Produção permanece NO-GO.

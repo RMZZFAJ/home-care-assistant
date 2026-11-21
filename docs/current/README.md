@@ -4,12 +4,10 @@
 Fluent UI foi descartado como aparência. Contratos AS_IS continuam como prova
 funcional; não são aprovação da nova UI, das abas ou de Andamentos.
 
-Contratos implementados do candidato D-B na branch
-`feat/phase-d-implementation`, com o incremento L1 sobre `56babc7`,
-após a base
-integrada PR6 `8ec979a`. Auditorias A/B preservam a origem dos desvios.
-O [estado canônico](PROJECT_STATUS.md) identifica branch/SHA e limites. Não
-confundir requisito de integridade com garantia universal já demonstrada.
+Contratos implementados do candidato D-B, incluindo as revisões L1/L2
+posteriores à base integrada pela PR 6. Auditorias A/B preservam a origem
+dos desvios. O [estado do projeto](PROJECT_STATUS.md) aponta para o candidato,
+as evidências e os limites da implementação.
 
 - [Arquitetura](ARCHITECTURE.md), [banco](DATABASE.md),
   [segurança](SECURITY.md)

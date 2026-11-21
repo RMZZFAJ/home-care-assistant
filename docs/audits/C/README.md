@@ -1,8 +1,8 @@
 # Fase C — especificação, decisões e organização documental
 
-Autorização de 30/10/2026; fechamento editorial em 04/11/2026. **D NÃO
-INICIADA. Produção NO-GO.** C transforma diagnóstico em planejamento; nenhuma
-correção de produto é alegada.
+Autorização em 30/10/2026 e fechamento editorial em 04/11/2026. C transformou
+o diagnóstico em planejamento. A PR 6 integrou o pacote à base que antecede a
+[execução de D](../D/README.md). Produção permanece NO-GO.
 
 **Fechamento mais recente: C7–C10, 04/11/2026.** C0–C6 abaixo conserva o
 contexto da primeira parte; matrizes vivas foram refinadas, com fontes
@@ -12,12 +12,13 @@ anteriores arquivadas exatamente em C10.
 
 - [C8 — direção aprovada, superfícies e controles](C8-visual-blueprint/README.md).
 
-- [C9 — 161 critérios/casos de design](C9-acceptance-refinement/README.md).
+- [C9 — 187 casos no fechamento de design](C9-acceptance-refinement/README.md).
 
 - [C10 — validação, publicação e handoff](C10-pr-handoff/README.md).
 
-P02 individual permanece OWNER_REVIEW_REQUIRED. Assinatura P09-B é mínimo; BAL
-revisão facultativa e draft por tipo estão decididos. Sem início de D.
+P02 foi aprovado no fechamento. A assinatura incorporada de P09-B, a revisão
+BAL facultativa e o rascunho por tipo foram decididos. As políticas posteriores
+de L1/L2 estão no [registro de execução](../D/D-B/LOTES_EXECUCAO.md).
 
 <!-- c-table:start -->
 
@@ -84,5 +85,5 @@ preservado.
 
 P02 OWNER_APPROVED; 66 fichas/262 controles originais revistos, catálogo de
 274 controles/424 usos e 187 casos planejados.
-[Entrega vigente](C10-pr-handoff/README.md). D NÃO INICIADA; sem merge. Gates
-específicos não são aprovados por documento.
+[Entrega histórica](C10-pr-handoff/README.md). Para a passagem do plano à
+execução, consulte a [matriz de fechamento da PR 7](../PR7_CRITERIOS.csv).

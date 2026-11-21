@@ -1,5 +1,9 @@
 # D-B — execução de D3, D4 e D5
 
+O [fechamento da PR 7](../../FECHAMENTO_PR7.md) reúne o candidato atual,
+as pendências de L1/L2 e a continuidade de D-C/D6. Os relatórios por marcos
+abaixo registram a data e o ambiente de cada verificação.
+
 Missão autorizada em 06/11/2026, America/Sao_Paulo. **EM EXECUÇÃO; produção
 NO-GO.** A ordem integral preservada em [OWNER_EXECUTION_ORDER.txt](OWNER_EXECUTION_ORDER.txt)
 atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitoramento.

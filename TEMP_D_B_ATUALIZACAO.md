@@ -1,5 +1,27 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
+e as pendências para a próxima etapa. Este acompanhamento conserva o
+histórico dos incrementos de D-B.
+
+**21/11 — revisão e recuperação dos cancelamentos de L2.** REQ e COM
+recebem a justificativa na própria revisão. REQ exige a escolha de ajuste
+quando há efeito de estoque. ENT e DEV seguem o padrão de recuperação nos
+cancelamentos e nas decisões de cancelamento. A retomada do arquivamento
+foi aplicada ao desenvolvimento após backup verificado. O local e o
+desenvolvimento têm 320 versões. A PR segue em rascunho durante a validação
+do candidato final. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
+**21/11 — retomada do arquivamento de L2.** O resultado pode ser conferido
+ao voltar à ficha após recarregar ou fechar a revisão. Passaram 12 casos
+dirigidos em Android e iOS emulados. A versão `20261121202419` foi primeiro
+aplicada na stack local. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
+**21/11 — falhas de conclusão e reabertura.** Os dois fluxos usam o modal de
+falha com recuperação da chave original quando há incerteza. Os seis casos
+dirigidos do ajuste final passaram em Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — correções dirigidas após a CI de `558d49b7`.** Os seis grupos
 de navegador terminaram. Corrigimos o acesso ao menu da revisão da REQ
 em desktop e os testes de recebedor, revogação de acesso à agenda,
@@ -15,8 +37,8 @@ dirigidos passaram de primeira em Android e iOS emulados. Em `233c9dfa`,
 Windows, Ubuntu, SonarCloud e a prévia da PR 7 foram aprovados. O job de
 banco desse SHA ainda estava na integração quando a rodada local concluiu.
 A CI precisa validar o novo código de revisão no SHA em que for publicado.
-As 319 versões de migrations conferem nos ambientes local e de
-desenvolvimento, incluindo a correção da consulta histórica da REQ.
+Naquele ponto, 319 versões conferiam nos ambientes local e de desenvolvimento,
+incluindo a correção da consulta histórica da REQ.
 O roteiro para revisão, os resultados e as decisões
 sobre a contagem de REQ, o excedente e os extras de ENT/DEV ficam no
 [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).

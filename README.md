@@ -5,17 +5,16 @@ Fluent UI. Em E01–E03, a referência posterior é o laboratório L1 com os
 comentários v3, conforme o [lote vigente](HCA_L1_LOTE_CODEX_E01_E03.md).
 
 Gestão operacional por paciente com Next.js, React, TypeScript e Supabase.
-REQ, COM, ENT e BAL distinguem necessidade, aquisição, entrega, contagem,
-ciência e estoque por movimentos. O sistema não prescreve ou decide conduta
+REQ, COM, ENT, DEV e BAL distinguem necessidade, aquisição, entrega, devolução,
+contagem, ciência e estoque por movimentos. O sistema não decide conduta
 clínica.
 
 ## Estado e documentação
 
-**D-B em execução; produção e merge não autorizados.** A branch é
-`feat/phase-d-implementation`; a PR #7 permanece Draft. O L1 partiu de `56babc7`.
-O [registro L1](docs/audits/D/D-B/L1_IMPLEMENTATION.md) identifica o trabalho local.
-A primeira versão
-estável de produto será 1.0.0; não está sendo publicada nesta missão.
+**D-B em validação na [PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7).**
+A PR está em rascunho na branch `feat/phase-d-implementation`. O
+[fechamento da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne a execução A–D,
+as evidências e a fila de continuidade. Produção permanece NO-GO.
 
 - [Acompanhamento principal e sequência restante](TEMP_D_B_ATUALIZACAO.md).
 - [Execução dos lotes L1 a L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
@@ -33,9 +32,10 @@ pendentes. Os mecanismos de rascunho existentes ficam preservados; sua
 simplificação dos quatro campos de Andamentos foi autorizada no L1. A expansão
 de persistência e os outros adiamentos continuam separados.
 
-A e B encerraram o diagnóstico; C registra o planejamento histórico; D-A
-consolidou D0–D2. Esses marcos não aprovam automaticamente a CI do candidato
-atual, serviços externos, aparelhos físicos ou liberação operacional.
+A e B encerraram o diagnóstico. C consolidou as decisões e o projeto
+integrados pela PR 6. D-A consolidou D0–D2. Na D-B, os incrementos de D3–D5
+e L1/L2 seguem para validação conjunta. A primeira liberação estável
+prevista é 1.0.0 e depende dos gates operacionais.
 
 ## Desenvolvimento
 

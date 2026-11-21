@@ -1,18 +1,15 @@
 # Estado do projeto e registros históricos
 
-O [acompanhamento principal](../../TEMP_D_B_ATUALIZACAO.md) é a fonte do
-andamento da D-B: trabalho publicado/local, sequência, pendências e responsáveis.
-Os [contratos atuais](README.md) descrevem o implementado. A
-[matriz](../audits/D/D-B/ACCEPTANCE_EXECUTION.csv) detalha os critérios.
+O [fechamento da PR 7](../audits/FECHAMENTO_PR7.md) registra o candidato em
+avaliação, os gates e a fila de continuidade. Os [contratos atuais](README.md)
+descrevem o implementado. O [andamento D-B](../../TEMP_D_B_ATUALIZACAO.md)
+preserva os incrementos e o [registro L1–L4](../audits/D/D-B/LOTES_EXECUCAO.md)
+detalha a paridade, as reservas e as migrations por ambiente.
 
-Produção NO-GO; branch local feat/phase-d-implementation, com L1 sobre 56babc7.
-A PR #7 da base continua Draft. O [L1](../audits/D/D-B/L1_IMPLEMENTATION.md)
-registra implementação e publicação autorizada de 27e2f3e em 14/11/2026,
-schema remoto 255 e CI própria com falhas. A decisão posterior mantém o mínimo
-de senha em 6; ajuste local ainda não publicado. O aceite humano continua
-separado. A D-A encerrou
-D0–D2 localmente; a D-B implementa D3–D5 e os complementos visuais/documentais.
-A liberação estável futura será 1.0.0, sem renumerar revisões internas.
+Produção permanece NO-GO. D-A consolidou D0–D2. D-B abrange D3–D5, L1 e L2.
+A [PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7) segue em rascunho.
+A primeira liberação estável prevista é 1.0.0 e depende de aceite humano
+e operacional.
 
 ## Registros históricos preservados
 
