@@ -75,6 +75,7 @@ test("E04-03 revisa materiais solicitados durante o preenchimento sem descartar 
     await row.getByRole("checkbox", { name: name + " unidade", exact: true }).check();
     await row.getByRole("checkbox", { name: "Não sei informar", exact: true }).check();
   }
+  await card(page, materials[0]).getByRole("checkbox", { name: "Reposição urgente", exact: true }).check();
   await next(page);
   await next(page);
   await page.getByRole("button", { name: "Adicionar observação", exact: true }).click();
@@ -123,7 +124,26 @@ test("E04-03 revisa materiais solicitados durante o preenchimento sem descartar 
   await expect(page.getByText(materials[1], { exact: true })).toHaveCount(0);
   await expect(page.getByText(materials[2], { exact: true })).toBeVisible();
   await expect(page.getByText(observation, { exact: true })).toBeVisible();
+  await expect(page.getByText("Sua justificativa para manter nessa REQ", { exact: true })).toBeVisible();
+  await expect(page.getByText(reason, { exact: true })).toBeVisible();
   expect(count(f.patient)).toBe("1");
+
+  await page.getByRole("button", { name: `Editar material ${materials[0]}`, exact: true }).click();
+  const urgentMaterial = card(page, materials[0]);
+  await expect(urgentMaterial).toHaveAttribute("data-urgent", "true");
+  await expect(urgentMaterial.getByRole("checkbox", { name: "Reposição urgente", exact: true })).toBeChecked();
+  await expect(urgentMaterial.getByRole("button", { name: earlierCode, exact: true })).toBeVisible();
+  const repeatReason = urgentMaterial.getByLabel("Sua justificativa para manter nessa REQ", { exact: true });
+  await expect(repeatReason).toHaveValue(reason);
+  await expect(repeatReason).toHaveCSS("min-height", "86px");
+  await expect(urgentMaterial.getByLabel("Estoque atual · unidade", { exact: true })).toBeDisabled();
+  if (info.project.use.hasTouch) {
+    await urgentMaterial.evaluate(element => element.scrollIntoView({ block: "center", behavior: "instant" }));
+    await info.attach("E04-02 urgência e estoque desconhecido", {
+      body: await urgentMaterial.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+    });
+  }
+  await review(page);
 
   await finish.click();
   await expect(page.getByRole("dialog", { name: "Requisição emitida", exact: true })).toBeVisible();
@@ -132,7 +152,7 @@ test("E04-03 revisa materiais solicitados durante o preenchimento sem descartar 
     where care_recipient_id=${sqlLiteral(f.patient)} and created_by=${sqlLiteral(writer.id)};`));
   expect(lines).toHaveLength(2);
   expect(lines).toEqual(expect.arrayContaining([
-    expect.objectContaining({ productId: f.products[0], repeatReason: reason }),
+    expect.objectContaining({ productId: f.products[0], repeatReason: reason, urgent: true, stockObservation: "unknown" }),
     expect.objectContaining({ productId: f.products[2], repeatReason: null }),
   ]));
 });

@@ -138,33 +138,14 @@ export function CatalogStep({
             {line?.catalogueExtra ? <p className="doc-subtle mt-3">Incluído em Itens extras.</p> : null}
             {line && !line.catalogueExtra ? (
               <div className="hca-wizard-material-fields">
-                <p className="hca-wizard-material-balance">
-                  Família · saldo confirmado deste produto:{" "}
-                  {info?.familyStock === null || !info
-                    ? "consulta indisponível"
-                    : formatQuantity(info.familyStock, item.unit)}
-                </p>
-                <div className="hca-wizard-material-stock">
-                  <label className="hca-wizard-material-urgent">
-                    <input
-                      type="checkbox"
-                      checked={line.urgent}
-                      onChange={(event) => updateLine(item, { urgent: event.target.checked })}
-                    />
-                    Reposição urgente
-                  </label>
-                  <StockObservationField
-                    compact
-                    value={line.currentStock}
-                    mode={line.stockObservation}
-                    suggested={info?.teamStock}
-                    unit={item.unit}
-                    decimals={item.quantity_decimals ?? 0}
-                    error={errors[item.id]}
-                    errorKey={item.id}
-                    onChange={(change) => updateLine(item, change)}
+                <label className="hca-wizard-material-urgent">
+                  <input
+                    type="checkbox"
+                    checked={line.urgent}
+                    onChange={(event) => updateLine(item, { urgent: event.target.checked })}
                   />
-                </div>
+                  Reposição urgente
+                </label>
                 {info?.pending.length ? <RequisitionRepeatReason
                   productId={item.id}
                   pending={info.pending}
@@ -172,6 +153,23 @@ export function CatalogStep({
                   error={errors[item.id + ":repeat"]}
                   onChange={repeatReason => updateLine(item, { repeatReason })}
                 /> : null}
+                <StockObservationField
+                  compact
+                  value={line.currentStock}
+                  mode={line.stockObservation}
+                  suggested={info?.teamStock}
+                  unit={item.unit}
+                  decimals={item.quantity_decimals ?? 0}
+                  error={errors[item.id]}
+                  errorKey={item.id}
+                  onChange={(change) => updateLine(item, change)}
+                />
+                <p className="hca-wizard-material-balance">
+                  Família · saldo confirmado deste produto:{" "}
+                  {info?.familyStock === null || !info
+                    ? "consulta indisponível"
+                    : formatQuantity(info.familyStock, item.unit)}
+                </p>
               </div>
             ) : null}
           </MaterialChoice>
@@ -191,13 +189,14 @@ export function RequisitionRepeatReason({ productId, pending, value, error, onCh
   const labelId = useId();
   const errorId = error ? labelId + "-error" : undefined;
   return <div className="hca-material-pending">
-    <p>Este produto ainda tem requisição pendente:{" "}
-      {pending.map(row => <RelatedDocument key={row.lineId} id={row.requisitionId} label={row.code} />)}
-    </p>
-    <label className="mt-3 block font-semibold">
-      <span id={labelId}>Motivo da nova requisição</span>
+    <div className="hca-wizard-repeat-references">
+      {pending.map(row => <RelatedDocument key={row.lineId} id={row.requisitionId} label={row.code} compact compactIcon="link" />)}
+    </div>
+    <p>{pending.length === 1 ? "Este material também está em uma requisição aberta." : "Este material também está em outras requisições abertas."}</p>
+    <label className="block font-semibold">
+      <span id={labelId}>Sua justificativa para manter nessa REQ</span>
       <textarea aria-labelledby={labelId} data-field-error={productId + ":repeat"} aria-describedby={errorId}
-        className={inputClass} value={value ?? ""} minLength={3} maxLength={1000} aria-invalid={Boolean(error)}
+        className={inputClass} rows={2} value={value ?? ""} minLength={3} maxLength={1000} aria-invalid={Boolean(error)}
         onChange={event => onChange(event.target.value || undefined)} />
       {error ? <span id={errorId} className="ui-field-error">{error}</span> : null}
     </label>
@@ -232,7 +231,10 @@ export function Review({
     details: <>
       {item.catalogueExtra ? <small>Material do catálogo · {item.unit}</small> : null}
       <small>Estoque atual da equipe: {displayStock(item, item.unit)}</small>
-      {item.repeatReason ? <small>Reiteração: {item.repeatReason}</small> : null}
+      {item.repeatReason ? <div className="hca-wizard-review-repeat">
+        <strong>Sua justificativa para manter nessa REQ</strong>
+        <small>{item.repeatReason}</small>
+      </div> : null}
       {item.catalogueExtra?.details ? <small className="whitespace-pre-wrap">{item.catalogueExtra.details}</small> : null}
     </>,
   });

@@ -58,9 +58,11 @@ export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = 
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const [consultedReviewId, setConsultedReviewId] = useState<string | null>(null);
   const [discard, setDiscard] = useState(false);
   const [version, setVersion] = useState(data.version);
   const openerRef = useRef<HTMLButtonElement | null>(null);
+  const consultationOpenerRef = useRef<HTMLButtonElement | null>(null);
   const returnToReviewRef = useRef<(() => void) | null>(null);
   const family = useCommandIntent<Packet, unknown>((raw, packet) => {
     const result = resultSchema.safeParse(raw);
@@ -82,6 +84,8 @@ export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = 
   const lines = data.lines.filter(line => data.workflow_data.acceptedAt && linkedDeliveryNeed(data, line));
   const selected = lines.find(line => line.id === lineId);
   const latest = selected ? currentDeliveryNeed(data, selected) : undefined;
+  const consultedReview = data.fulfillmentReviews?.find(review => review.id === consultedReviewId);
+  const consultedLine = consultedReview ? lines.find(line => line.id === consultedReview.lineId) : undefined;
   const request = selected ? deliveryNeedRequest(selected.metadata) : null;
   const previous = latest?.decision ?? selected?.family_fulfillment;
   const received = Boolean(selected && quantity(selected.accepted_quantity).gt(0));
@@ -103,7 +107,7 @@ export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = 
   }
 
   useImperativeHandle(reviewControl, () => (requestedId, onClose) => {
-    if (!eligible || busy || lineId || outcome) return false;
+    if (!eligible || busy || lineId || outcome || consultedLine) return false;
     const requested = lines.find(line => line.id === requestedId);
     if (!requested || !awaitsDeliveryNeed(data, requested)) return false;
 
@@ -204,6 +208,8 @@ export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = 
           const review = currentDeliveryNeed(data, line);
           const waiting = awaitsDeliveryNeed(data, line);
           const received = quantity(line.accepted_quantity).gt(0);
+          const recordedDuringReconciliation = review && data.events.some(event =>
+            event.action === "ent.resolve" && event.version === review.expectedVersion + 1 && event.actorId === review.actorId);
           return <article className="hca-receipt-line" key={line.id}>
             <header><div>
               <h3>{line.name_snapshot}</h3>
@@ -212,6 +218,14 @@ export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = 
             {waiting ? <Notice>Aguardando avaliação familiar.</Notice> : null}
             {review ? <p>{familyReviewDescription(review)}</p> : null}
             {!waiting && !review ? <p>{line.family_fulfillment === "complete" ? "Necessidade integralmente atendida" : "Atendimento parcial · necessidade em aberto"}</p> : null}
+            {recordedDuringReconciliation && canRecoverFamily ? <ActionButton variant="quiet"
+              aria-label={"Consultar avaliação registrada de " + line.name_snapshot}
+              onClick={event => {
+                consultationOpenerRef.current = event.currentTarget;
+                setConsultedReviewId(review.id);
+              }}>
+              Consultar avaliação registrada
+            </ActionButton> : null}
             {eligible && (waiting || received) ? <ActionButton disabled={Boolean(pending) || busy} onClick={event => { openerRef.current = event.currentTarget; show(line); }}>
               {review ? "Rever atendimento de " : "Avaliar suficiência de "}{line.name_snapshot}
             </ActionButton> : null}
@@ -224,6 +238,21 @@ export function FamilyFulfillmentReview({ data, context, onReviewed, readOnly = 
         {team.uncertain && !lineId ? <ActionButton onClick={() => { setRequesting(true); setLineId(lines[0]?.id ?? data.id); }}>Verificar pedido de reavaliação</ActionButton> : null}
       </div>
     </DocumentSection> : null}
+      {consultedReview && consultedLine && canRecoverFamily ? <Dialog open title="Avaliação registrada na conciliação"
+        popupClassName="hca-recorded-fulfillment-dialog" keyboardScrollable finalFocus={consultationOpenerRef}
+        onClose={() => setConsultedReviewId(null)}
+        footer={<ActionButton variant="primary" onClick={() => setConsultedReviewId(null)}>Voltar à ficha</ActionButton>}>
+        <div className="hca-delivery-receipt"><article className="hca-receipt-line">
+          <header><div><h3>{consultedLine.name_snapshot}</h3>
+            <p>Recebido: {formatQuantity(consultedReview.acceptedQuantity, consultedLine.unit_snapshot)}</p></div>
+            <DeliveryMaterialMenu data={data} line={consultedLine} disabled={false} />
+          </header>
+          <p className="hca-purchase-status" data-tone="success"><Icon name="check-circle" />
+            {consultedReview.decision === "complete" ? "Integralmente suprida" : "Parcialmente suprida"}
+          </p>
+          <p>{consultedReview.actorName} já avaliou a necessidade ao resolver a diferença desta entrega.</p>
+        </article></div>
+      </Dialog> : null}
       <Dialog open={Boolean(lineId)} title={title} subtitle={subtitle} keyboardScrollable closeDisabled={busy}
         finalFocus={opening?.opener ?? openerRef} onClose={requestClose} footer={<>
         <ActionButton disabled={busy} onClick={requestClose}>Voltar</ActionButton>

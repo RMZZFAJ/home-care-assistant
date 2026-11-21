@@ -417,6 +417,17 @@ e iOS emulados. O reteste do pedido usou uma conta familiar com vínculo
 isolado e o mesmo viewport da pessoa da equipe. O limite anterior de
 30 segundos havia interrompido essa jornada ao alternar de sessão no iOS.
 
+**E06-18, consulta da avaliação registrada na conciliação.** Em Materiais,
+o material cuja avaliação vigente foi gravada no ato de conciliar tem a
+ação Consultar avaliação registrada. O diálogo do v7 usa o recebimento e
+a autoria preservados, com acesso ao material e às fichas vinculadas.
+A associação vem da versão do evento oficial de conciliação. Uma nova
+avaliação segue disponível conforme a permissão e o estado da ficha.
+Os testes em Android e iOS emulados recarregaram a ENT antes da consulta,
+conferiram o retorno de foco e verificaram a mesma versão e avaliações
+antes e depois. A avaliação independente também passou nos dois navegadores.
+Capturas em `output/playwright/l2-req-need-parity/`. Sem nova migration.
+
 **Conferência conjunta de chegadas.** A comparação com E05-11 a 360 e 412 px
 cobre o título, os cartões compactos, o indicador de falta ou chegada
 completa, o estoque expansível e o rodapé. O corpo permite rolagem por
@@ -964,6 +975,17 @@ validados nos dois navegadores emulados. O BAL no iOS excedeu o tempo
 da asserção enquanto consultava o plantão na primeira rodada e passou
 isoladamente. A DEV também passou após incluir a saída pelo diálogo e
 a reabertura com as duas observações preservadas.
+
+**E04-02, itens, estoque atual e urgência.** A linha selecionada organiza a
+urgência acima da REQ aberta e da justificativa de reiteração. O campo
+de estoque vem em seguida, com a opção Não sei informar. O saldo da família,
+que a aplicação já consultava, continua em leitura abaixo do estoque da
+equipe. A revisão conserva o fundo de urgência e exibe a justificativa.
+A comparação móvel usou o laboratório a 390 px. Android e iOS emulados
+voltaram da revisão para o item, recuperaram a justificativa e emitiram com
+urgência e estoque desconhecido preservados. Os dois casos passaram na
+repetição dirigida da altura final do campo. Capturas em
+`output/playwright/l2-req-need-parity/`. Sem nova migration.
 
 **E06-11, decisão de cancelamento da ENT recebida.** O diálogo usa a
 composição do v7 para mostrar quem recebeu, a quantidade devolvida e

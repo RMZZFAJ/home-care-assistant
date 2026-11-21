@@ -101,6 +101,26 @@ test("ENT mantém a conciliação aberta entre cinco materiais e registra só a 
   await expect(result).toContainText("Permaneceu com a família");
   await expect(result).toContainText("2 unidade");
   await result.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  const beforeConsultation = await rpc(f.admin, "operational_document", { p_id: ent.id }) as SupplyDocument;
+  await page.reload();
+  await selectDocumentSection(page, "materials");
+  const consult = page.getByRole("button", { name: `Consultar avaliação registrada de ${first.name_snapshot}`, exact: true });
+  await consult.click();
+  const assessment = page.getByRole("dialog", { name: "Avaliação registrada na conciliação", exact: true });
+  await expect(assessment.getByRole("heading", { name: first.name_snapshot, exact: true })).toBeVisible();
+  await expect(assessment).toContainText("Recebido: 3 unidade");
+  await expect(assessment).toContainText("Integralmente suprida");
+  await expect(assessment).toContainText(confirmed.fulfillmentReviews![0].actorName);
+  await expect(assessment.getByRole("button", { name: `Opções de ${first.name_snapshot}`, exact: true })).toBeVisible();
+  await expect(assessment.getByRole("button", { name: "Registrar avaliação", exact: true })).toHaveCount(0);
+  if (info.project.use.hasTouch) await info.attach("E06-18 avaliação registrada", {
+    body: await assessment.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
+  await assessment.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(consult).toBeFocused();
+  const afterConsultation = await rpc(f.admin, "operational_document", { p_id: ent.id }) as SupplyDocument;
+  expect(afterConsultation.version).toBe(beforeConsultation.version);
+  expect(afterConsultation.fulfillmentReviews).toEqual(beforeConsultation.fulfillmentReviews);
   expect(privateWrites).toEqual([]);
   const pdf = await generatedPdf(page, "/api/documents/" + ent.id + "/pdf");
   expect(pdf.ok(), await pdf.text()).toBe(true);

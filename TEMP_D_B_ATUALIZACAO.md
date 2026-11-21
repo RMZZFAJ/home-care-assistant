@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — estoque e urgência da REQ e consulta da avaliação na ENT.** A
+requisição agrupa a urgência, a justificativa e o estoque na ordem da v7.
+A ENT abre uma consulta da avaliação registrada na conciliação, com
+quantidade recebida, autoria e vínculos. Os casos dirigidos passaram em
+Android e iOS emulados. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — decisão de cancelamento da ENT recebida.** A decisão mostra o
 consumo confirmado junto da devolução. O resultado da recusa identifica
 quem decidiu, quando e por qual motivo. Os quatro casos em Android e iOS
