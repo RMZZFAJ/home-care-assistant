@@ -65,7 +65,9 @@ test("L2 COM encaminha a sugestão de catálogo para Materiais e emite uma únic
   await next(page);
   const review = page.getByRole("region", { name: "Itens extras", exact: true });
   await expect(review.getByText(name, { exact: true })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Editar materiais de Higiene", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Editar material " + name, exact: true }).click();
+  await expect(page.getByLabel("Quantidade — " + name, { exact: true })).toBeFocused();
+  for (let step = 0; step < 3; step++) await next(page);
   await expect(page.getByText(name, { exact: true })).toHaveCount(1);
   await expect(page.getByText(observation, { exact: true })).toBeVisible();
   const submission = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");

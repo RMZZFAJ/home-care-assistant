@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — revisão por material e retomada dos assistentes.** A revisão de
+REQ, COM, ENT e DEV abre o campo do material escolhido. A criação nova de
+REQ, COM e ENT guarda o preenchimento em um único rascunho privado. Cópias
+locais antigas com conteúdo entram no diálogo de retomada quando o servidor
+ainda está sem rascunho. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — revisão individual de chegada avulsa.** Revisar chegada abre
 o CHE escolhido pelo cartão ou pela consulta de detalhes. O mesmo
 diálogo confirma a decisão e recupera a resposta. O banco valida a

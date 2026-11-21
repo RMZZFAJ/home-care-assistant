@@ -32,6 +32,9 @@ test("REQ conserva tentativa real já confirmada em buffer local de mais de24h e
   expect(issued.ok()).toBe(true);
   const original = (await issued.json()).receipt;
   expect(original.requisitionId).toBeTruthy();
+  const signed = await page.request.post(`/api/documents/${original.requisitionId}/issuances/initial`, { timeout: 65_000 });
+  expect(signed.ok()).toBe(true);
+  expect(await signed.json()).toMatchObject({ state: "ready", issuanceId: expect.any(String) });
   const before = officialState(f), storageKey = `hca:v2:requisition:${fixtures.professional.id}:${f.patient}`;
   await page.evaluate(({ storageKey, form, command }) => {
     sessionStorage.setItem(storageKey, JSON.stringify({ savedAt: Date.now() - 26 * 60 * 60 * 1000, form, intent: command }));
@@ -52,7 +55,11 @@ test("REQ conserva tentativa real já confirmada em buffer local de mais de24h e
   expect(response.request().postDataJSON()).toEqual(command);
   expect(response.ok()).toBe(true);
   expect((await response.json()).receipt).toEqual(original);
-  await expect(page.getByText(original.protocol, { exact: false }).first()).toBeVisible();
+  const result = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
+  expect(original.code).toBeTruthy();
+  await expect(result).toContainText(original.code, { timeout: 65_000 });
+  await result.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
+  await expect(page).toHaveURL(url => url.pathname === "/fichas/" + original.requisitionId);
   expect(await page.evaluate(key => sessionStorage.getItem(key), storageKey)).toBeNull();
   expect(officialState(f)).toBe(before);
 });

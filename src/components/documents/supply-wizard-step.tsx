@@ -1,6 +1,6 @@
 "use client";
 import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
-import { WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
+import { focusWizardMaterial, WizardCatalogueReview, WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { MaterialChoice } from "@/components/catalog/material-choice";
 import { MaterialReview } from "./material-review";
 import { MaterialConsultButton } from "./catalogue-material-panel";
@@ -140,6 +140,7 @@ export function SupplyWizardStep({
   } | null>(null);
   const [barcodeOpen, setBarcodeOpen] = useState(false);
   const barcodeTriggerRef = useRef<HTMLButtonElement>(null);
+  const materialListRef = useRef<HTMLDivElement>(null);
   const search = searchByCategory[category ?? ""] ?? "";
   const visibleProducts = catalog.filter(
     (product) =>
@@ -297,7 +298,7 @@ export function SupplyWizardStep({
               {isExtraStep ? "Nenhum item extra incluído." : "Nenhum material nesta busca. Ajuste ou limpe o filtro; suas seleções continuam preservadas."}
             </Notice>
           ) : null}
-          <div className={type === "BAL" || isExtraStep ? "space-y-3" : "hca-wizard-material-list"}>
+          <div ref={materialListRef} className={type === "BAL" || isExtraStep ? "space-y-3" : "hca-wizard-material-list"}>
             {visibleProducts.map((product) => {
               const checked =
                 type === "BAL" || Object.hasOwn(form.quantities, product.id);
@@ -312,6 +313,7 @@ export function SupplyWizardStep({
                   quantity
                   className={type === "BAL" ? "product-choice" : "product-choice hca-wizard-material"}
                   key={product.id}
+                  materialId={product.id}
                 >
                   <div className="hca-wizard-material-head">
                   <label className="hca-material-choice-heading">
@@ -465,11 +467,11 @@ export function SupplyWizardStep({
       ) : null}
       {step === 5 ? (
         <>
-          {type === "COM" ? <DefinitionGrid items={[
+          {type === "COM" ? <DefinitionGrid className="hca-wizard-review-identity" items={[
             { label: "Pessoa assistida", value: context.patient?.display_name },
             { label: "Responsável", value: context.fullName },
           ]} /> : <div className={type === "ENT" ? "hca-form-stack" : "rounded-xl bg-(--background) p-4 text-sm"}>
-            {type === "ENT" ? <DefinitionGrid items={[
+            {type === "ENT" ? <DefinitionGrid className="hca-wizard-review-identity" items={[
               { label: "Pessoa assistida", value: context.patient?.display_name },
               { label: "Responsável", value: context.fullName },
               { label: "Percurso", value: form.source === "FAMILY" ? "Família → Equipe" : "Equipe → Família" },
@@ -490,16 +492,11 @@ export function SupplyWizardStep({
             ) : null}
           </div>}
           {type !== "BAL" ? <>
-            {materialCategories.map(category => {
-              const rows = reviewRows.filter(row => row.category === category.id && !extras.has(row.id));
-              return rows.length ? <section key={category.id}>
-                <div className="hca-issuance-observation-heading">
-                  <h3>{category.label}</h3>
-                  <ActionButton compact variant="quiet" aria-label={`Editar materiais de ${category.label}`} onClick={() => onCategoryChange(category.id)}>Editar</ActionButton>
-                </div>
-                <MaterialReview rows={rows} />
-              </section> : null;
-            })}
+            <WizardCatalogueReview rows={reviewRows.filter(row => !extras.has(row.id))} onEdit={(category, materialId) => {
+              setSearchByCategory(current => ({ ...current, [category]: "" }));
+              onCategoryChange(category);
+              focusWizardMaterial(() => materialListRef.current, materialId);
+            }} />
             <section aria-label="Itens extras">
               <div className="hca-issuance-observation-heading">
                 <h3>Itens extras</h3>

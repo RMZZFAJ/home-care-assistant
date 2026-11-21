@@ -190,6 +190,7 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
     await opening;
     await expect(page.getByRole("list", { name: "Etapas da operação" })).toBeVisible();
     await expect(page.locator(".hca-activity-overlay .activity-card:not(.activity-dynamic)")).toHaveCount(0);
+    await expect(page.getByText(/Seu rascunho privado/)).toHaveCount(0);
   } finally {
     openingGate.resolve();
   }

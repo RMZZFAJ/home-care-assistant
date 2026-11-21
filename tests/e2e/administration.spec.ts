@@ -679,7 +679,13 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(reviewMaterial.getByText("Estoque atual da equipe: 3 pacote", { exact: true })).toBeVisible();
     await expect(reviewMaterial.getByText("Urgente", { exact: true })).toBeVisible();
     await expect(page.getByText(details, { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Editar materiais de Higiene", exact: true })).toBeVisible();
+    await reviewMaterial.getByRole("button", { name: "Editar material Gaze", exact: true }).click();
+    await expect(page.getByLabel("Estoque atual · pacote", { exact: true })).toBeFocused();
+    await expect(page.getByLabel("Estoque atual · pacote", { exact: true })).toHaveValue("3");
+    await next.click();
+    await next.click();
+    await next.click();
+    await page.getByRole("button", { name: "Revisar ficha", exact: true }).click();
     await expect(page.getByRole("button", { name: "Editar itens extras", exact: true })).toBeVisible();
     const pending = page.waitForResponse(
       (response) =>

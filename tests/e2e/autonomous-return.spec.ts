@@ -66,6 +66,13 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
   await page.setViewportSize({ width: 390, height: 820 });
   await info.attach("E06-observacoes-dev", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
   await editor.getByRole("button", { name: "Revisar ficha", exact: true }).click();
+  await editor.getByRole("button", { name: "Editar material Material fictício V4 0", exact: true }).click();
+  const amountToReturn = editor.getByRole("textbox", { name: /^Quantidade de Material fictício V4 0/ });
+  await expect(amountToReturn).toBeFocused();
+  await expect(amountToReturn).toHaveValue("5");
+  await editor.getByRole("button", { name: "Continuar", exact: true }).click();
+  await editor.getByRole("button", { name: "Continuar", exact: true }).click();
+  await editor.getByRole("button", { name: "Revisar ficha", exact: true }).click();
   await expect(editor.getByRole("list").filter({ hasText: packaging }).getByRole("listitem")).toHaveText([reason, packaging]);
   const recorded = page.waitForResponse(response => new URL(response.url()).pathname === "/api/transfers" && response.request().method() === "POST");
   await editor.getByRole("button", { name: "Expedir devolução", exact: true }).click();

@@ -4,7 +4,7 @@ import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/com
 import { adjacentMaterialCategory, materialCategories, supplyWizardCopy, supplyWizardNextLabels, supplyWizardStages, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
-import { WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
+import { focusWizardMaterial, WizardCatalogueReview, WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { pendingExtraDispatchMessage, pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
 import { MaterialReview } from "./material-review";
 import { IssuanceObservationsEditor, IssuanceObservationList } from "@/components/forms/issuance-observations";
@@ -283,6 +283,7 @@ function TransferDeclarationEditor({
     originFieldRef = useRef<HTMLSelectElement | null>(null),
     returnOriginRef = useRef<HTMLButtonElement | null>(null),
     barcodeTriggerRef = useRef<HTMLButtonElement | null>(null),
+    materialFormRef = useRef<HTMLFormElement>(null),
     reasonFieldRef = useRef<HTMLTextAreaElement | null>(null);
   const loadedRef = useRef(false);
   const patientId = context.patient!.id;
@@ -1006,6 +1007,21 @@ function TransferDeclarationEditor({
       return <DocumentCatalogueEmpty patientId={patientId} patientName={context.patient!.display_name}
         mayManage={can(context, "catalog.manage")} hasInactive={emptyCatalogueTotal > 0} />;
   }
+  const reviewRows = (review?.lines ?? []).map(line => {
+    const product = productsById.get(line.productId);
+    const material = product ?? currentContent.materials.find(item => item.id === line.productId);
+    return {
+      id: line.productId,
+      name: material?.name ?? "Material indisponível",
+      category: product?.category ?? "medicamentos",
+      extra: linesByProduct.get(line.productId)?.extra,
+      details: <small>{formatQuantity(line.quantity, material?.unit)}
+        {product?.active === false ? " · Inativo com saldo" : ""}</small>,
+      consult: product ? <MaterialConsultButton context={context} material={product} menu /> : null,
+    };
+  });
+  const catalogueReviewRows = reviewRows.filter(row => !row.extra);
+  const extraReviewRows = [...reviewRows.filter(row => row.extra), ...pendingExtras.map(pendingExtraReviewRow)];
   return (
     <section
       className="hca-transfer-wizard"
@@ -1185,7 +1201,7 @@ function TransferDeclarationEditor({
                   Não há pessoa habilitada na custódia de destino para confirmar o recebimento.
                 </Notice>
               ) : null}
-              <form className="grid gap-4" onSubmit={prepare}>
+              <form ref={materialFormRef} className="grid gap-4" onSubmit={prepare}>
                 {step === 0 ? <>
                 <h3>Confirme os dados da {isReturn ? "devolução" : "entrega"}</h3>
                 <SupplyWizardIdentity context={context} kind={isReturn ? "DEV" : "ENT"} />
@@ -1330,7 +1346,7 @@ function TransferDeclarationEditor({
                     const available = quantity(product.available).gt(0);
                     const materialSources = sourceOptions.filter(option => sourceSetup.sources.some(link =>
                       link.documentId === option.id && link.productIds.includes(product.id)));
-                    return <MaterialChoice key={product.id} selected={!!line} quantity className="hca-wizard-material hca-wizard-transfer-line">
+                    return <MaterialChoice key={product.id} materialId={product.id} selected={!!line} quantity className="hca-wizard-material hca-wizard-transfer-line">
                       <div className="hca-wizard-material-head">
                         <label className="hca-material-choice-heading">
                           <input type="checkbox" role="switch" className="hca-wizard-include-switch" aria-label={"Incluir " + product.name}
@@ -1423,6 +1439,7 @@ function TransferDeclarationEditor({
                     return (
                       <fieldset
                         key={line.productId}
+                        data-wizard-material={line.productId}
                         aria-label={name}
                         className="hca-material-choice is-selected hca-wizard-material hca-wizard-transfer-line"
                       >
@@ -1522,39 +1539,33 @@ function TransferDeclarationEditor({
             <section className="hca-transfer-wizard-review">
               <h2 ref={reviewHeadingRef} tabIndex={-1}>Revise antes de expedir</h2>
               <p className="hca-field-help">Confira os materiais e as informações que acompanharão esta ficha.</p>
-              <dl className="hca-transfer-wizard-summary">
+              <dl className="hca-transfer-wizard-summary hca-wizard-review-identity">
                 <div><dt>Paciente</dt><dd>{context.patient?.display_name}</dd></div>
                 <div><dt>Preenchido por</dt><dd>{context.fullName}</dd></div>
                 <div><dt>Destino</dt><dd>{isReturn ? "Estoque da família" : "Estoque da equipe"}</dd></div>
                 <div><dt>Recebedor físico</dt><dd>{personName(review.recipientId)}</dd></div>
               </dl>
-              <div className="hca-issuance-observation-heading">
-                <h3>Materiais</h3>
-                <ActionButton compact variant="quiet" aria-label="Editar materiais do catálogo" disabled={uncertain || busy}
-                  onClick={() => editReviewedStep(1)}>Editar</ActionButton>
-              </div>
-              {review.lines.map((line) => {
-                const product = reference?.products.find(
-                  (p) => p.id === line.productId,
-                );
-                return (
-                  <article className="hca-transfer-wizard-material" key={line.productId}>
-                    <strong>{product?.name ?? "Material selecionado"}</strong>
-                    <p>{formatQuantity(line.quantity, product?.unit)}
-                      {lines.find((item) => item.productId === line.productId)?.extra ? " · Item extra" : ""}
-                      {product?.active === false ? " · inativo com saldo" : ""}
-                    </p>
-                    {product ? <MaterialConsultButton context={context} material={product} menu /> : null}
-                  </article>
-                );
-              })}
+              {isReturn ? <WizardCatalogueReview rows={catalogueReviewRows} disabled={uncertain || busy}
+                onEdit={(category, materialId) => {
+                  setCategory(category);
+                  setQuery("");
+                  editReviewedStep(1);
+                  focusWizardMaterial(() => materialFormRef.current, materialId);
+                }} /> : <section>
+                <div className="hca-issuance-observation-heading">
+                  <h3>Materiais</h3>
+                  <ActionButton compact variant="quiet" aria-label="Editar materiais do catálogo" disabled={uncertain || busy}
+                    onClick={() => editReviewedStep(1)}>Editar</ActionButton>
+                </div>
+                <MaterialReview rows={catalogueReviewRows} />
+              </section>}
               <section aria-label="Itens extras">
                 <div className="hca-issuance-observation-heading">
                   <h3>Itens extras</h3>
                   <ActionButton compact variant="quiet" aria-label="Editar itens extras" disabled={uncertain || busy}
                     onClick={() => editReviewedStep(2)}>Editar</ActionButton>
                 </div>
-                {pendingExtras.length ? <MaterialReview rows={pendingExtras.map(pendingExtraReviewRow)} />
+                {extraReviewRows.length ? <MaterialReview rows={extraReviewRows} />
                   : <p className="hca-field-help">Nenhum item extra pendente.</p>}
               </section>
               {review.sources?.length ? <section className="hca-document-summary" aria-label="Fichas vinculadas">

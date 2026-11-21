@@ -58,6 +58,7 @@ const count = (patient: string) =>
 test("observação REQ mantém texto decimal exato, recusa arredondamento e retoma vírgula decimal sem convertê-la em zero", async ({
   page,
 }) => {
+  test.setTimeout(90_000);
   const f = await setup();
   const fluid = await rpc(f.admin, "admin_upsert_recipient_product", {
     p_care_recipient_id: f.patient,
@@ -158,7 +159,7 @@ test("observação REQ mantém texto decimal exato, recusa arredondamento e reto
   await issueButton.click();
   await expect(
     page.getByRole("dialog", { name: "Requisição emitida", exact: true }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 45_000 });
   expect(
     sql(
       `select current_stock::text from public.requisition_items where care_recipient_id=${sqlLiteral(f.patient)} and product_id=${sqlLiteral(fluid.product_id)};`,

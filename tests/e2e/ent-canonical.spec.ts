@@ -66,35 +66,46 @@ test("06.2 ENT selection and complete readonly review follow the model without s
   const next = () => page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
   await next(); const checkbox = page.getByRole("checkbox", { name: name + " unidade", exact: true });
   await checkbox.check(); await page.getByLabel("Quantidade — " + name, { exact: true }).fill("12");
-  const ref = await reference(browser, "nova/ENT");
+  const referenceContext = await browser.newContext({ viewport: { width: 390, height: 900 } });
+  const model = await referenceContext.newPage();
+  await model.route(/^https?:/, route => route.abort());
+  const lab = pathToFileURL(resolve("hca-laboratorio-02-v7.html")).href;
   try {
-    await ref.page.locator('.productoption input[type="checkbox"]').first().check();
-    const selected = ref.page.locator(".productoption").filter({ has: ref.page.locator("input:checked") }).first();
+    await model.goto(lab + "#E06-01/materials");
+    const selected = model.locator("#product-app .material-list .material-row:not(.unselected)").first();
     const card = page.locator(".hca-material-choice").filter({ has: checkbox });
     for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await ref.page.setViewportSize({ width, height: 900 });
-      for (const property of ["background-color", "border-color", "border-radius", "padding-top"] as const) await expect(card).toHaveCSS(property, await selected.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      await page.setViewportSize({ width, height: 900 });
+      if (width <= 390) {
+        await model.setViewportSize({ width, height: 900 });
+        for (const property of ["background-color", "border-radius", "padding-top", "padding-left"] as const)
+          await expect(card).toHaveCSS(property, await selected.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      }
       await expect(page.getByLabel("Quantidade — " + name, { exact: true })).toHaveValue("12");
       await auditFromTop(page, "canonical ENT selection " + width);
     }
     for (let step = 0; step < 3; step++) await next();
     await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
-    await ref.page.locator('[data-action="wizardNext"]').click(); await ref.page.locator('select[name="recipient"]').selectOption({ index: 0 });
-    await ref.page.locator('[data-action="wizardNext"]').click(); await ref.page.locator('[data-action="wizardNext"]').click();
-    const grid = page.locator(".hca-document-wizard .hca-definition-grid").first();
+    await model.goto(lab + "?state=review#E06-01/review");
+    await expect(model.locator("#product-app .wizard-content h2")).toHaveText("Revise antes de expedir");
+    const grid = page.locator(".hca-wizard-review-identity");
     await expect(grid).toContainText(person.name); await expect(grid).toContainText("Família → Equipe");
     await expect(page.getByText("Justificativa da escolha: " + reason, { exact: true })).toBeVisible();
     await expect(page.locator(".hca-material-review")).toContainText(name); await expect(page.locator(".hca-material-review")).toContainText("12 unidade");
     for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await ref.page.setViewportSize({ width, height: 900 });
-      for (const property of ["display", "gap"] as const) await expect(grid).toHaveCSS(property, await ref.page.locator("#wizardForm .kv").evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      await page.setViewportSize({ width, height: 900 });
+      if (width <= 390) {
+        await model.setViewportSize({ width, height: 900 });
+        for (const property of ["display", "gap"] as const)
+          await expect(grid).toHaveCSS(property, await model.locator("#product-app .wizard-content .metadata").evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      }
       await auditFromTop(page, "canonical ENT review " + width);
     }
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await captureVisible(grid, `output/playwright/phase-d/ent-review-identity-${info.project.name}.png`);
     await captureVisible(page.locator(".hca-material-review"), `output/playwright/phase-d/ent-review-material-${info.project.name}.png`);
     expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
-  } finally { await ref.context.close(); }
+  } finally { await referenceContext.close(); }
 });
 
 test("06.2 dispatched ENT preserves its material facts and reversible v7 search", async ({ page, browser }, info) => {

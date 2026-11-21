@@ -26,13 +26,14 @@ import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "@/components/documents/document-write-access-notice";
 import { DocumentCatalogueEmpty, DocumentOpeningFailure, DocumentOpeningPending, type OpeningFailure } from "@/components/documents/document-opening-status";
 import { CatalogueOpeningError, readWizardCatalogue } from "@/lib/client/wizard-catalogue";
-import { requisitionDraftContent } from "@/lib/validation/creation-drafts";
+import { requisitionDraftContent, type RequisitionDraftContent } from "@/lib/validation/creation-drafts";
 import { RecurringSelection } from "./recurring-selection";
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
 import { applyMaterialSelection } from "@/lib/requisitions/recurring-selection";
 import { navigationForStep, stepForNavigation } from "@/lib/forms/draft-navigation";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { WizardActions } from "@/components/forms/wizard-actions";
+import { focusWizardMaterial } from "@/components/forms/wizard-material-tools";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { SupplyWizardIdentity } from "@/components/forms/supply-wizard-identity";
 import { IssuanceObservationsEditor } from "@/components/forms/issuance-observations";
@@ -98,7 +99,7 @@ function PatientRequisition({
   const { navigating, openIssued } = useIssuanceNavigation(context.userId, context.patient!.id);
   const [issuedDocumentId, setIssuedDocumentId] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [legacyDraft, setLegacyDraft] = useState<{ content: RequisitionDraftContent; savedAt: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [uncertain, setUncertain] = useState(false);
   useOperationActivity(saving || navigating, {
@@ -134,6 +135,7 @@ function PatientRequisition({
   const [catalogueWasAvailable, setCatalogueWasAvailable] = useState(false);
   const [catalogAttempt, setCatalogAttempt] = useState(0);
   const [reviewStock, setReviewStock] = useState(false);
+  const patientId = context.patient!.id;
   const contextByProduct = useMemo(
     () => new Map(itemContext.map((item) => [item.productId, item])),
     [itemContext],
@@ -185,6 +187,7 @@ function PatientRequisition({
       return true;
     },
     onDiscard: () => {
+      setLegacyDraft(null);
       setDraftTouched(false);
       materialReferences.setLinks([]);
       setForm({ lines: [], extraItems: [], observations: [] });
@@ -221,7 +224,7 @@ function PatientRequisition({
         const saved = JSON.parse(raw);
         if (
           (saved.form?.careRecipientId &&
-            saved.form.careRecipientId !== context.patient!.id)
+          saved.form.careRecipientId !== patientId)
         ) {
           sessionStorage.removeItem(storageKey);
           return;
@@ -232,18 +235,22 @@ function PatientRequisition({
           Array.isArray(saved.form.extraItems) &&
           Array.isArray(saved.form.observations)
         ) {
-          setForm({
+          const restored = {
             ...saved.form,
             lines: saved.form.lines.map(restoreStockObservation),
             extraItems: saved.form.extraItems.map(restoreStockObservation),
-          });
-          setMessage(saved.intent
-            ? "Tentativa desta aba recuperada. Consulte a mesma tentativa antes de iniciar outra requisição."
-            : "Preenchimento desta aba recuperado.");
+          };
           if (saved.intent) {
             frozenRef.current = saved.intent;
+            setForm(restored);
             setStep(6);
             setUncertain(true);
+          } else {
+            const { lines, extraItems, observations, remainingNeed } = restored;
+            const oldDraft = requisitionDraftContent.safeParse({ lines, extraItems, observations, remainingNeed });
+            if (oldDraft.success && (lines.length || extraItems.length || observations.some((note: string) => note.trim()) || remainingNeed?.reason?.trim())) {
+              setLegacyDraft({ content: oldDraft.data, savedAt: new Date(saved.savedAt).toISOString() });
+            } else sessionStorage.removeItem(storageKey);
           }
         }
       } catch {
@@ -251,7 +258,7 @@ function PatientRequisition({
       }
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [storageKey, context.patient]);
+  }, [storageKey, patientId]);
   useEffect(() => {
     const controller = new AbortController();
     readWizardCatalogue(context.patient!.id, controller.signal)
@@ -291,21 +298,6 @@ function PatientRequisition({
       });
     return () => controller.abort();
   }, [context.patient, catalogAttempt]);
-  useEffect(() => {
-    if (issuedDocumentId || uncertain || saving || loadingCatalog) return;
-    const timer = window.setTimeout(() => {
-      if (frozenRef.current) return;
-      try {
-        sessionStorage.setItem(
-          storageKey,
-          JSON.stringify({ savedAt: Date.now(), form }),
-        );
-      } catch {
-        /* In-memory draft remains available. */
-      }
-    }, 500);
-    return () => window.clearTimeout(timer);
-  }, [form, issuedDocumentId, loadingCatalog, saving, storageKey, uncertain]);
   const currentCategory = materialCategories[step - 1]?.id;
   const stage = currentCategory ? 1 : stageStart.indexOf(step);
   function openCategory(category: WizardMaterialCategory) {
@@ -607,7 +599,7 @@ function PatientRequisition({
           setCatalogAttempt(current => current + 1);
         }} />;
     }
-    if (!loadingCatalog && !catalogError && !catalogueWasAvailable && !products.length && !draftTouched && step === 0)
+    if (!loadingCatalog && !catalogError && !catalogueWasAvailable && !products.length && !draftTouched && !legacyDraft && step === 0)
       return <DocumentCatalogueEmpty patientId={context.patient!.id} patientName={context.patient!.display_name}
         mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0} />;
   }
@@ -697,6 +689,19 @@ function PatientRequisition({
         statusInFooter
         patientName={context.patient!.display_name}
         authorName={context.fullName}
+        legacy={legacyDraft ? { ...legacyDraft, resume: () => {
+          setForm(legacyDraft.content);
+          setDraftTouched(true);
+          setLegacyDraft(null);
+          void privateDraft.save(legacyDraft.content, { background: true }).then(result => {
+            if (result?.state === "active") {
+              try { sessionStorage.removeItem(storageKey); } catch { /* Server copy confirmed. */ }
+            }
+          });
+        }, discard: () => {
+          sessionStorage.removeItem(storageKey);
+          setLegacyDraft(null);
+        } } : undefined}
         resumeHref={resumeHref}
         disabled={saving || uncertain || loadingCatalog}
       /> : null}
@@ -742,7 +747,6 @@ function PatientRequisition({
           reasonError={fieldErrors.remainingNeed}
         />
       ) : null}
-      {message ? <Notice>{message}</Notice> : null}
       {catalogError ? (
         <Notice error>
           {catalogError}
@@ -823,7 +827,10 @@ function PatientRequisition({
                 form={form}
                 recipientName={context.patient!.display_name}
                 requesterName={context.fullName}
-                onEditCategory={openCategory}
+                onEditMaterial={(category, materialId) => {
+                  openCategory(category);
+                  focusWizardMaterial(() => fieldsRef.current, materialId);
+                }}
                 onEditExtras={() => setStep(4)}
                 onEditObservations={() => {
                   setStep(5);

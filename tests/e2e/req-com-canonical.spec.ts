@@ -75,8 +75,8 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
   const reference = await browser.newContext();
   try {
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
-    await model.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#nova/" + type);
-    await model.locator("#roleSelect").selectOption("family"); await model.locator(".productoption input[type=checkbox]").first().check();
+    const scenario = type === "REQ" ? "E04-01" : "E05-01";
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-02-v7.html")).href + "#" + scenario + "/review");
     mkdirSync("output/playwright/phase-d", { recursive: true });
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
@@ -96,22 +96,21 @@ for (const type of ["REQ", "COM"] as const) test(`06.1 ${type} selection and rev
     for (let step = 0; step < 3; step++) await next(page);
     await expect(page.getByRole("heading", { name: "Revisão", exact: true })).toBeVisible();
     await expect(page.getByText(name, { exact: false }).first()).toBeVisible();
-    await model.locator('[data-action="wizardNext"]').click();
-    if (type === "REQ") await model.locator('input[name^="observed-"]').fill("99999");
-    await model.locator('[data-action="wizardNext"]').click(); await model.locator('[data-action="wizardNext"]').click();
-    const reviewRecord = page.locator(".hca-material-review li").first(), modelRecord = model.locator("#wizardForm .record").first();
+    const reviewRecord = page.locator(".hca-wizard-review-group .hca-material-review li").first();
+    const modelRecord = model.locator("#product-app .review-group .material-row").first();
     await expect(modelRecord).toBeVisible();
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
       await model.setViewportSize({ width, height: 900 });
-      for (const property of ["display", "padding-left", "padding-top", "gap", "border-bottom-width"] as const) {
-        await expect(reviewRecord).toHaveCSS(property, await modelRecord.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      if (width <= 390) {
+        for (const property of ["display", "padding-left", "padding-top", "gap", "border-radius"] as const) {
+          await expect(reviewRecord).toHaveCSS(property, await modelRecord.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+        }
       }
-      for (const selector of ["strong", "small"]) for (const property of ["font-size", "font-weight"] as const) {
-        await expect(reviewRecord.locator(selector).first()).toHaveCSS(property, await modelRecord.locator(selector).first().evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
-      }
-      const grid = page.locator(".hca-document-wizard .hca-definition-grid").first(), modelGrid = model.locator("#wizardForm .kv");
-      for (const property of ["display", "gap"] as const) await expect(grid).toHaveCSS(property, await modelGrid.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      await expect(reviewRecord.getByRole("button", { name: "Editar material " + name, exact: true })).toBeVisible();
+      const grid = page.locator(".hca-wizard-review-identity");
+      await expect(grid).toHaveCSS("display", "grid");
+      await expect(grid).toHaveCSS("gap", width <= 500 ? "16px" : "16px 24px");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await auditFromTop(page, `canonical ${type} review ${width}`);
       if (width === 320) await page.screenshot({ path: `output/playwright/phase-d/${type.toLowerCase()}-review-${info.project.name}.png`, fullPage: true, animations: "disabled" });

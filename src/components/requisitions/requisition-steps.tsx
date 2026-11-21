@@ -16,7 +16,7 @@ import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { materialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { IssuanceObservationList } from "@/components/forms/issuance-observations";
-import { WizardMaterialSearch, WizardMaterialToolbar } from "@/components/forms/wizard-material-tools";
+import { WizardCatalogueReview, WizardMaterialSearch, WizardMaterialToolbar } from "@/components/forms/wizard-material-tools";
 import type { WorkspaceContext } from "@/types/workspace";
 import type {
   RequisitionFormData,
@@ -135,6 +135,7 @@ export function CatalogStep({
         return (
           <MaterialChoice
             key={item.id}
+            materialId={item.id}
             selected={Boolean(line)}
             urgent={line?.urgent}
             className="ui-product-choice hca-wizard-material"
@@ -249,7 +250,7 @@ export function Review({
   form,
   recipientName,
   requesterName,
-  onEditCategory,
+  onEditMaterial,
   onEditExtras,
   onEditObservations,
 }: {
@@ -257,7 +258,7 @@ export function Review({
   form: RequisitionFormData;
   recipientName: string;
   requesterName: string;
-  onEditCategory: (category: WizardMaterialCategory) => void;
+  onEditMaterial: (category: WizardMaterialCategory, materialId: string) => void;
   onEditExtras: () => void;
   onEditObservations: () => void;
 }) {
@@ -267,7 +268,7 @@ export function Review({
     item.stockObservation === "observed" && item.currentStock != null
       ? formatQuantity(item.currentStock, unit) : formatStockObservation(item.currentStock, item.stockObservation, unit);
   const catalogueRow = (item: RequisitionLine) => ({
-    id: item.productId, name: item.productName, urgent: item.urgent,
+    id: item.productId, name: item.productName, category: item.category, urgent: item.urgent,
     consult: <MaterialConsultButton context={context} material={{ id: item.productId, name: item.productName, unit: item.unit }} menu />,
     details: <>
       {item.catalogueExtra ? <small>Material do catálogo · {item.unit}</small> : null}
@@ -278,17 +279,8 @@ export function Review({
   });
   return (
     <div className="space-y-6" style={{ overflowWrap: "anywhere" }}>
-      <DefinitionGrid items={[{ label: "Solicitante", value: requesterName }, { label: "Pessoa assistida", value: recipientName }]} />
-      {materialCategories.map(category => {
-        const group = lines.filter(item => item.category === category.id && !item.catalogueExtra);
-        return group.length ? <section key={category.id} className="hca-document-summary">
-          <div className="hca-issuance-observation-heading">
-            <h3>{category.label}</h3>
-            <ActionButton compact variant="quiet" aria-label={`Editar materiais de ${category.label}`} onClick={() => onEditCategory(category.id)}>Editar</ActionButton>
-          </div>
-          <MaterialReview rows={group.map(catalogueRow)} />
-        </section> : null;
-      })}
+      <DefinitionGrid className="hca-wizard-review-identity" items={[{ label: "Solicitante", value: requesterName }, { label: "Pessoa assistida", value: recipientName }]} />
+      <WizardCatalogueReview rows={lines.filter(item => !item.catalogueExtra).map(catalogueRow)} onEdit={onEditMaterial} />
       <section className="hca-document-summary">
         <div className="hca-issuance-observation-heading">
           <h3>Itens extras</h3>

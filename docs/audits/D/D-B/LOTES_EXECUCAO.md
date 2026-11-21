@@ -803,6 +803,30 @@ recuperada com a mesma chave. O teste verificou a abertura de um novo
 preenchimento sem diálogo do resultado anterior e uma única emissão oficial.
 No BAL, o descarte privado preservou uma tentativa de contagem separada.
 
+**Edição a partir da revisão e retomada no mesmo dispositivo.** Os
+assistentes de REQ, COM, ENT e DEV usam a mesma composição para o
+catálogo na revisão. Cada linha abre a categoria correspondente e
+leva o foco à quantidade ou ao controle disponível daquele material.
+Itens extras e Observações têm suas próprias ações de edição.
+A DEV usa os mesmos grupos, com a identificação e o estado dos
+materiais de devolução.
+
+Novas REQ, COM e ENT usam o rascunho privado do servidor para retomar
+o preenchimento. Quando o servidor ainda não tem rascunho, uma cópia
+local antiga com conteúdo utilizável pode ser retomada ou descartada
+no mesmo diálogo. O histórico da etapa só aparece quando foi gravado.
+O pacote da tentativa oficial permanece independente para a conferência
+de um resultado incerto.
+
+Na rodada final, dez casos passaram sem repetição em Android e iOS
+emulados. A comparação em 320 e 390 px usou E04-01, E05-01 e E06-01
+para conferir a composição dos cartões de revisão e a seleção da ENT.
+Os testes conferiram foco no material, acessibilidade nas cinco
+larguras e recuperação da mesma REQ e do mesmo PDF já assinado.
+Rodadas dirigidas anteriores verificaram a retomada das cópias locais,
+a revisão da DEV, o saldo decimal exato da REQ e a nova REQ após
+emissão, com carregamento por etapas até o resultado.
+
 **Composição da aba Materiais.** REQ, COM, ENT, DEV e BAL usam o mesmo
 cabeçalho, filtro, lista compacta e painel do material. Cada ficha mostra
 as medidas do seu processo. Na linha compacta do BAL ficam a contagem

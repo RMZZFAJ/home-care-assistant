@@ -59,7 +59,7 @@ import {
   BalancePreviousObservations,
   BalanceReferenceReview,
 } from "@/components/balances/observation-continuity";
-import type { SupplyDraftContent } from "@/lib/validation/supply-drafts";
+import { supplyDraftContent, type SupplyDraftContent } from "@/lib/validation/supply-drafts";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
 import { adjacentMaterialCategory, materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardCopy, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
@@ -212,6 +212,7 @@ export function PatientSupplyWizard({
   const [recoveredId, setRecoveredId] = useState<string | null>(null);
   const issuanceFailure = useIssuanceFailure();
   const [message, setMessage] = useState("");
+  const [legacyDraft, setLegacyDraft] = useState<{ content: SupplyDraftContent; savedAt: string } | null>(null);
   const [editing, setEditing] = useState<SupplyDocument | null>(null);
   const [saved, setSaved] = useState<SupplyDocument | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -387,6 +388,7 @@ export function PatientSupplyWizard({
       return true;
     },
     onDiscard: () => {
+      setLegacyDraft(null);
       setDraftTouched(false);
       setPlanningWithoutCatalogue(false);
       const defaults = sourceDefaultsRef.current;
@@ -584,31 +586,54 @@ export function PatientSupplyWizard({
           if (raw) {
             const envelope = JSON.parse(raw);
             if (envelope.form && typeof envelope.form.quantities === "object") {
-              restored = envelope.form;
-              if (type === "BAL") {
-                restoredBalance = balanceDraftContent.parse(
-                  envelope.balanceContent ?? {
-                    counts: restored!.quantities,
-                    observationTimes: restored!.observationTimes ?? {},
-                    notes: restored!.notes,
-                    materials: [],
-                    context: {
-                      mode: "legacy",
-                      documentId: envelope.editingId ?? null,
-                      documentVersion: null,
-                      assignmentId: null,
-                      assignmentVersion: null,
-                      referenceRevision: null,
-                    },
-                  },
-                );
-              }
-              if (envelope.links && typeof envelope.links === "object")
-                setLinks(envelope.links);
-              if (envelope.sourceSetup?.sources) restoredSources = envelope.sourceSetup;
               recoveredId = envelope.editingId;
               if (envelope.intent?.key && envelope.intent?.payload)
                 preserved = envelope.intent;
+              if (type !== "BAL" && !recoveredId && !preserved) {
+                const legacy = supplyDraftContent.safeParse({
+                  form: envelope.form,
+                  links: envelope.links ?? {},
+                  ...envelope.sourceSetup,
+                  materials: products.data.map(product => ({
+                    id: product.id, name: product.name, unit: product.unit, quantityDecimals: product.quantity_decimals ?? 0,
+                  })),
+                  context: {
+                    documentId: null, documentVersion: null, requisitionId, purchaseId,
+                    recipientName: settings.directory.find(person => person.id === envelope.form.recipientId)?.name ?? "",
+                  },
+                });
+                if (legacy.success) {
+                  const old = legacy.data;
+                  const hasEdits = Object.keys(old.form.quantities).length || old.form.pendingExtras?.length ||
+                    old.form.notes || old.form.observations?.some(note => note.trim()) || old.form.recipientReason ||
+                    old.form.source === "CARE_TEAM" || old.sources?.length || Object.keys(old.links).length;
+                  if (hasEdits) setLegacyDraft({ content: old, savedAt: new Date(envelope.savedAt).toISOString() });
+                  else sessionStorage.removeItem(storageKey);
+                }
+              } else {
+                restored = envelope.form;
+                if (type === "BAL") {
+                  restoredBalance = balanceDraftContent.parse(
+                    envelope.balanceContent ?? {
+                      counts: restored!.quantities,
+                      observationTimes: restored!.observationTimes ?? {},
+                      notes: restored!.notes,
+                      materials: [],
+                      context: {
+                        mode: "legacy",
+                        documentId: envelope.editingId ?? null,
+                        documentVersion: null,
+                        assignmentId: null,
+                        assignmentVersion: null,
+                        referenceRevision: null,
+                      },
+                    },
+                  );
+                }
+                if (envelope.links && typeof envelope.links === "object")
+                  setLinks(envelope.links);
+                if (envelope.sourceSetup?.sources) restoredSources = envelope.sourceSetup;
+              }
             } else if (type === "BAL")
               throw Error("Invalid saved balance fields");
             else sessionStorage.removeItem(storageKey);
@@ -771,6 +796,8 @@ export function PatientSupplyWizard({
     type,
     attempt,
     documentId,
+    requisitionId,
+    purchaseId,
     recount,
     canReadRequests,
   ]);
@@ -835,7 +862,7 @@ export function PatientSupplyWizard({
   const activeRecipientContext =
     recipientContext?.source === form.source ? recipientContext : null;
   useEffect(() => {
-    if (loading || loadError || saved || uncertain || busy) return;
+    if ((type !== "BAL" && !editing) || loading || loadError || saved || uncertain || busy) return;
     const timer = window.setTimeout(() => {
       if (frozenRef.current) return;
       try {
@@ -1486,7 +1513,7 @@ export function PatientSupplyWizard({
           setAttempt(current => current + 1);
         }} />;
     }
-    if (!loading && !loadError && !catalog.length && !documentId && !editing && !draftTouched &&
+    if (!loading && !loadError && !catalog.length && !documentId && !editing && !draftTouched && !legacyDraft &&
       step === 0 && !planningWithoutCatalogue) {
       if (privateDraft.loading) return <DocumentOpeningPending />;
       if (!privateDraft.blocked && privateDraft.base?.state !== "active")
@@ -1525,6 +1552,25 @@ export function PatientSupplyWizard({
           resumeHref={resumeHref}
           patientName={context.patient!.display_name}
           authorName={context.fullName}
+          legacy={legacyDraft ? { ...legacyDraft, resume: () => {
+            const content = legacyDraft.content;
+            setForm(content.form);
+            setLinks(content.links);
+            if (content.sources) setSourceSetup({
+              sources: content.sources, sourceImports: content.sourceImports ?? {}, sourceSeeds: content.sourceSeeds ?? {},
+            });
+            setDraftMaterials(content.materials);
+            setDraftTouched(true);
+            setLegacyDraft(null);
+            void privateDraft.save(content, { background: true }).then(result => {
+              if (result?.state === "active") {
+                try { sessionStorage.removeItem(storageKey); } catch { /* Server copy confirmed. */ }
+              }
+            });
+          }, discard: () => {
+            sessionStorage.removeItem(storageKey);
+            setLegacyDraft(null);
+          } } : undefined}
           disabled={busy || uncertain || loading}
         />
       ) : null}

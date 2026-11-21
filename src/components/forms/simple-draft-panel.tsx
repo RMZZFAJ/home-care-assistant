@@ -7,7 +7,7 @@ import { Dialog } from "@/components/ui/overlays";
 import { Notice } from "@/components/workspace";
 import { navigationLabel } from "@/lib/forms/draft-navigation";
 import { formatBrazilDate } from "@/lib/receipt";
-import type { CreationDraft } from "@/types/creation-drafts";
+import type { CreationDraftContent } from "@/types/creation-drafts";
 import type { StockObservation } from "@/types/requisition";
 import { CreationDraftPanel } from "./creation-draft-panel";
 
@@ -18,8 +18,7 @@ function draftStockText(value: string | number | null, mode?: StockObservation, 
   return mode === "observed" ? typed : `${typed} · Conferência pendente`;
 }
 
-function DraftMaterials({ draft }: { draft: CreationDraft }) {
-  const content = draft.content;
+function DraftMaterials({ content }: { content: CreationDraftContent | null }) {
   if (!content) return null;
   const quantity = (value: string | undefined, unit: string) => value ? `${value} ${unit}` : "Quantidade pendente";
   let listed: { id: string; name: string; details: string; urgent?: boolean }[] = [];
@@ -63,9 +62,10 @@ function DraftMaterials({ draft }: { draft: CreationDraft }) {
 }
 
 /** One resume choice; exceptional concurrency/recovery retains its real controls. */
-export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você", ...props }: ComponentProps<typeof CreationDraftPanel> & {
+export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você", legacy, ...props }: ComponentProps<typeof CreationDraftPanel> & {
   statusInFooter?: boolean;
   authorName?: string;
+  legacy?: { content: CreationDraftContent; savedAt: string; resume: () => void; discard: () => void };
 }) {
   const { draft, disabled = false, canResume = true, patientName } = props;
   const { acknowledge, consumed, recover } = draft;
@@ -106,12 +106,17 @@ export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você",
   if (draft.readDenied || draft.protectedReadPending || draft.loadError || draft.error || draft.pending || draft.conflict || draft.kind === "PROGRESS" && draft.consumed)
     return <CreationDraftPanel {...props} />;
   const offered = draft.offered;
-  if (offered?.state === "active") {
-    const resume = props.resumeHref ? <Link className="hca-control" href={props.resumeHref}>Continuar rascunho</Link>
-      : <ActionButton variant="primary" disabled={draft.busy || disabled || !canResume} onClick={() => draft.resume()}>
+  const local = wizard && !draft.loading && !draft.base && !offered ? legacy : undefined;
+  const summary = offered?.state === "active" ? offered : local;
+  if (summary) {
+    const resume = !local && props.resumeHref ? <Link className="hca-control" href={props.resumeHref}>Continuar rascunho</Link>
+      : <ActionButton variant="primary" disabled={draft.busy || disabled || !canResume} onClick={() => local ? local.resume() : draft.resume()}>
         {props.resumeLabel ?? "Continuar rascunho"}{wizard ? <Icon name="arrow" /> : null}
       </ActionButton>;
-    const discard = <ActionButton disabled={draft.busy || disabled} onClick={() => void draft.discard()}>
+    const discard = <ActionButton disabled={draft.busy || disabled} onClick={() => {
+      if (local) local.discard();
+      else void draft.discard();
+    }}>
       {wizard ? <Icon name="trash" /> : null}{props.discardLabel ?? "Descartar e começar novamente"}
     </ActionButton>;
     if (wizard) return <Dialog open title="Continuar seu rascunho?" kicker="Rascunho da ficha" popupClassName="hca-wizard-dialog hca-draft-dialog"
@@ -121,10 +126,10 @@ export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você",
         <DefinitionGrid items={[
           { label: "Paciente", value: patientName },
           { label: "Preenchido por", value: authorName },
-          { label: "Última gravação", value: formatBrazilDate(offered.savedAt) },
-          { label: "Etapa salva", value: navigationLabel(offered.navigation) },
+          { label: "Última gravação", value: formatBrazilDate(summary.savedAt) },
+          { label: "Etapa salva", value: local ? "Etapa não registrada" : navigationLabel(offered?.navigation) },
         ]} />
-        <DraftMaterials draft={offered} />
+        <DraftMaterials content={summary.content} />
       </div>
     </Dialog>;
     return <Dialog open title="Continuar seu rascunho?" closeDisabled onClose={() => {}}>
