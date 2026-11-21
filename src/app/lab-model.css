@@ -1631,7 +1631,7 @@
 .hca-l1 .hca-v7-material-title strong { color: #243d32; font-size: 14px; font-weight: 650; line-height: 1.3; letter-spacing: -.15px; overflow-wrap: anywhere; }
 .hca-l1 .hca-v7-material-title .ui-badge { font-size: 10px; max-width: 112px; white-space: normal; flex: none; }
 .hca-l1 .hca-v7-material-title svg { margin-left: auto; color: #739084; flex: none; }
-.hca-l1 .hca-v7-material-unit { color: #637469; font-size: 10px; }
+.hca-l1 .hca-v7-material-unit { color: #637469; font-size: 10px; overflow-wrap: anywhere; }
 .hca-l1 .hca-v7-material-document-codes {
   display: flex; align-items: baseline; gap: 5px; color: #2d695b; font-size: 11px; overflow-wrap: anywhere;
 }

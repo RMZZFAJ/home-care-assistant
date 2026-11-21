@@ -17,6 +17,7 @@ export type DocumentMaterialRow = {
   name: string;
   unit: string | null;
   status: string;
+  statusDetail?: string;
   tone: "neutral" | "pending" | "success" | "danger";
   urgent?: boolean;
   done: boolean;
@@ -158,14 +159,16 @@ export function DocumentMaterialList({
           return <li key={row.id} data-material-line-id={row.id}>
             <button type="button" className="hca-v7-material-row" data-urgent={row.urgent || undefined}
               aria-label={`Detalhes de ${row.name}${row.urgent ? " · Urgente" : ""}`}
-              aria-describedby={[`material-unit-${row.id}`, `material-facts-${row.id}`, row.related?.length ? `material-links-${row.id}` : null].filter(Boolean).join(" ")}
+              aria-describedby={[`material-status-${row.id}`, `material-unit-${row.id}`, `material-facts-${row.id}`,
+                row.statusDetail ? `material-status-detail-${row.id}` : null, row.related?.length ? `material-links-${row.id}` : null].filter(Boolean).join(" ")}
               ref={element => { if (element) buttonsRef.current.set(row.id, element); else buttonsRef.current.delete(row.id); }}
               onClick={() => setPosition({ lineId: row.id, section: "stock", page: 1, linked: null, panelScroll: 0 })}>
               <span className="hca-v7-material-title">
                 <strong>{row.name}</strong>
-                <span className={`ui-badge ui-badge-${row.tone}`}>{row.status}</span><Icon name="chevron" width={15} height={15} />
+                <span className={`ui-badge ui-badge-${row.tone}`} id={`material-status-${row.id}`}>{row.status}</span><Icon name="chevron" width={15} height={15} />
               </span>
               <small className="hca-v7-material-unit" id={`material-unit-${row.id}`}>{row.unit ?? "Unidade não preservada"}</small>
+              {row.statusDetail ? <small className="hca-v7-material-unit" id={`material-status-detail-${row.id}`}>{row.statusDetail}</small> : null}
               {row.related?.length ? <small className="hca-v7-material-document-codes" id={`material-links-${row.id}`}>
                 <Icon name="link" width={12} height={12} />
                 {[...new Set(row.related.map(item => item.document.code ?? item.document.kind ?? item.document.type))].join(" · ")}

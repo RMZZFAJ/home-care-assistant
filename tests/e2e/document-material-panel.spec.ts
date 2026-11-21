@@ -128,8 +128,10 @@ test("material panel retains its linked consultation, search, and focus after a 
 });
 
 test("material history shows a correction and a separate arrival, then returns to the exact entry", async ({ page }, info) => {
+  test.setTimeout(120_000);
   await page.setViewportSize({ width: 390, height: 700 });
   const f = await purchaseBalanceFixture();
+  const viewer = await shiftWorker(f.patient, "family");
   const line = f.document.lines.find((item: { product_id: string }) => item.product_id === f.products[0]);
   const pending = await purchaseBalanceCommand(f.family, f.document, "receive", {
     lines: [{ lineId: line.id, quantity: "4", expectedQuantity: "6", remainingAction: "wait" }],
@@ -138,18 +140,22 @@ test("material history shows a correction and a separate arrival, then returns t
   const correction = await purchaseBalanceCommand(f.admin, pending, "request_receipt_correction", {
     receiptId: pending.receipts[0].id, reason,
   });
-  const { result: arrival } = await rpc(f.family, "unlinked_arrival_command", {
+  const { result: arrival } = await rpc(viewer.client, "unlinked_arrival_command", {
     p_patient: f.patient, p_key: randomUUID(), p_body: { origin: "gift", lines: [{ productId: line.product_id, quantity: "2" }] },
   });
   const before = purchaseBalanceFacts(f);
-  await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.goto("/login?next=" + encodeURIComponent(`/fichas/${f.document.id}`));
+  await page.getByLabel("E-mail", { exact: true }).fill(viewer.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await selectContext(page, f.patient);
-  await page.goto(`/fichas/${f.document.id}`);
+  await expect(page).toHaveURL(url => url.pathname === `/fichas/${f.document.id}`);
+  await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
   await selectDocumentSection(page, "materials");
-  await page.getByRole("button", { name: "Detalhes de Material fictício V4 0", exact: true }).click();
+  const material = page.getByRole("button", { name: "Detalhes de Material fictício V4 0", exact: true });
+  await expect(material).toHaveAccessibleDescription(/Correção solicitada.*Chegou \/ entrou 4 \/ 0/);
+  await expect(material).toContainText(reason);
+  await material.screenshot({ path: info.outputPath("material-com-correcao.png"), animations: "disabled", scale: "css" });
+  await material.click();
   const panel = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
   const history = panel.getByRole("tab", { name: "Histórico", exact: true });
   await history.click();
@@ -169,6 +175,22 @@ test("material history shows a correction and a separate arrival, then returns t
   await expect(history).toHaveAttribute("aria-selected", "true");
   await expect(arrivalLink).toBeFocused();
   expect(purchaseBalanceFacts(f)).toBe(before);
+  await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+
+  const resubmitted = await purchaseBalanceCommand(f.family, correction, "resubmit_receipt", {
+    receiptId: pending.receipts[0].id, lines: [{ lineId: line.id, quantity: "5", expectedQuantity: "6", remainingAction: "wait" }],
+  });
+  await page.reload();
+  await selectDocumentSection(page, "materials");
+  await expect(material).toHaveAccessibleDescription(/Aguardando nova aprovação.*Chegou \/ entrou 5 \/ 0/);
+  await expect(material).toContainText("Motivo da correção anterior: " + reason);
+  const refusal = "A parcela informada ainda não chegou.";
+  await purchaseBalanceCommand(f.admin, resubmitted, "reject_receipt", { receiptId: pending.receipts[0].id, reason: refusal });
+  await page.reload();
+  await selectDocumentSection(page, "materials");
+  await expect(material).toHaveAccessibleDescription(/Chegada recusada.*Chegou \/ entrou 0 \/ 0/);
+  await expect(material).toContainText(refusal);
+  expect(JSON.parse(purchaseBalanceFacts(f)).stock).toEqual(JSON.parse(before).stock);
 });
 
 test("catalogue consultation preserves a requisition edit through a full linked document and opens from stock", async ({ page }, info) => {

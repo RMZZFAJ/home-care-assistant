@@ -1,8 +1,29 @@
 import type { PurchaseReceipt, SupplyDocument } from "@/types/documents";
+import { quantity } from "@/lib/quantity";
 import { receiptStates } from "./purchase";
 
 export type ReceiptFilter = { query: string; state: "" | PurchaseReceipt["state"] };
 const text = (value: string) => value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLocaleLowerCase("pt-BR");
+
+/** Surface the outstanding arrival first while keeping declared amounts separate from validated entries. */
+export function purchaseMaterialArrivals(receipts: readonly PurchaseReceipt[]) {
+  const priority = { correction_requested: 2, pending: 1, approved: 0, rejected: 0 };
+  const lastChange = (receipt: PurchaseReceipt) => {
+    const correction = receipt.corrections?.at(-1);
+    return Date.parse(receipt.validated_at ?? correction?.resubmittedAt ?? correction?.requestedAt ?? receipt.created_at);
+  };
+  const ordered = [...receipts].sort((a, b) => priority[b.state] - priority[a.state]
+    || lastChange(b) - lastChange(a) || a.id.localeCompare(b.id));
+  const byMaterial = new Map<string, { receipt: PurchaseReceipt; correctionQuantity: ReturnType<typeof quantity> }>();
+  for (const receipt of ordered) {
+    for (const line of receipt.lines) {
+      const material = byMaterial.get(line.lineId) ?? { receipt, correctionQuantity: quantity(0) };
+      if (receipt.state === "correction_requested") material.correctionQuantity = material.correctionQuantity.plus(line.quantity);
+      byMaterial.set(line.lineId, material);
+    }
+  }
+  return byMaterial;
+}
 
 export function purchaseReceiptRows(
   receipts: readonly PurchaseReceipt[],

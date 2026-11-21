@@ -244,6 +244,20 @@ fora e a perda de leitura do estoque retirou o cartão. O último reteste
 passou após a recuperação do Auth local, que havia atingido timeout antes
 de abrir a ficha.
 
+**Estados de chegada por material na COM.** No recorte E05-14, a lista
+e o painel usam a decisão registrada para distinguir chegada aguardando
+aprovação, correção solicitada, reenvio e recusa. O motivo fica junto à
+linha. Quando há várias parcelas, uma correção em aberto tem prioridade
+no cartão. A coluna Chegou / entrou conserva o valor informado em
+correção e a entrada aprovada em campos distintos. A recusa retira a
+parcela do total atual, com seu motivo e valor preservados no histórico.
+
+A referência foi aberta a 390 px. Chromium móvel e WebKit iOS emulados
+confirmaram correção, reenvio e recusa, com os valores 4 / 0, 5 / 0 e
+0 / 0 e sem mudança no livro de estoque. A regressão de navegação manteve
+a volta ao ponto exato no painel e o foco do vínculo. O conjunto unitário
+passou oito casos. Essa mudança de interface usa as migrations existentes.
+
 **Compra e entrega relacionadas à REQ.** Em E04-09, o cartão acima das
 abas lista COM e ENT efetivamente vinculadas. A consulta inclui a origem
 registrada na ficha e o vínculo por item das entregas anteriores. Uma

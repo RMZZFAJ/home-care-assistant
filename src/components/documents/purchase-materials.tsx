@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useCallback, useMemo } from "react";
-import { DocumentMaterialList } from "./document-material-list";
+import { DocumentMaterialList, type DocumentMaterialRow } from "./document-material-list";
 import { formatQuantity, quantity as decimal } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { FeedbackBanner } from "@/components/ui/feedback";
@@ -13,7 +13,8 @@ import { useScopedRead } from "@/lib/use-scoped-read";
 import { parseSupplySources } from "@/lib/validation/supply-sources";
 import { requirePurchaseEntryBalances, type PurchaseEntryBalance } from "@/lib/validation/purchase-entry-balances";
 import { readPresentationConversions, presentationCaption } from "@/lib/presentation-conversion";
-import type { SupplyDocument } from "@/types/documents";
+import type { PurchaseReceipt, SupplyDocument } from "@/types/documents";
+import { purchaseMaterialArrivals } from "@/lib/documents/purchase-receipt-list";
 import { MaterialReview } from "./material-review";
 
 export function PurchaseDeliveryAvailability({ data, revision }: { data: SupplyDocument; revision: string }) {
@@ -62,8 +63,23 @@ function EntryBalance({ fact, unit, receipts }: { fact?: PurchaseEntryBalance; u
       <small>Parcela {ordinal} · entrada de {formatQuantity(entry.enteredQuantity, unit)}</small></> : null}
   </>;
 }
+function arrivalPresentation(receipt?: PurchaseReceipt): Pick<DocumentMaterialRow, "status" | "statusDetail" | "tone"> | undefined {
+  const correction = receipt?.corrections?.at(-1);
+  switch (receipt?.state) {
+    case "correction_requested":
+      return { status: "Correção solicitada", tone: "pending", statusDetail: correction?.reason };
+    case "pending":
+      return correction?.resubmittedAt
+        ? { status: "Aguardando nova aprovação", tone: "pending", statusDetail: `Motivo da correção anterior: ${correction.reason}` }
+        : { status: "Aguardando aprovação", tone: "pending" };
+    case "rejected":
+      return { status: "Chegada recusada", tone: "danger", statusDetail: receipt.reason ?? undefined };
+  }
+}
+
 export function PurchaseMaterials({ data, active }: { data: SupplyDocument; active: boolean }) {
   const progress = useMemo(() => new Map(data.purchaseProgress?.lines.map(line => [line.lineId, line])), [data.purchaseProgress]);
+  const arrivals = useMemo(() => purchaseMaterialArrivals(data.receipts), [data.receipts]);
   const balances = useMemo(() => {
     if (data.purchaseEntryBalances === undefined) return { valid: true, facts: [] };
     try { return { valid: true, facts: requirePurchaseEntryBalances(data.purchaseEntryBalances, { version: data.version, lines: data.lines, receipts: data.receipts, events: data.events }) }; }
@@ -76,10 +92,15 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
       {!balances.valid ? <FeedbackBanner tone="error">Não foi possível conferir o saldo das entradas. Use Atualizar ficha.</FeedbackBanner> : null}</>}
     rows={data.lines.map(line => {
       const current = progress.get(line.id);
+      const arrival = arrivals.get(line.id);
+      const decision = arrivalPresentation(arrival?.receipt);
       const quantity = (value: string | number | undefined) => value === undefined ? "Não informado neste registro" : formatQuantity(value, line.unit_snapshot);
       const entered = current?.validatedQuantity ?? line.accepted_quantity;
-      const hasPending = Number(current?.pendingValidationQuantity ?? 0) > 0;
-      const done = Number(entered) > 0 && Number(entered) >= Number(line.approved_quantity) && !hasPending;
+      const hasPending = decision?.tone === "pending" || decimal(current?.pendingValidationQuantity ?? 0).gt(0);
+      const done = decimal(entered).gt(0) && decimal(entered).gte(line.approved_quantity) && !hasPending;
+      const arrived = current
+        ? formatQuantity(decimal(entered).plus(current.pendingValidationQuantity).plus(arrival?.correctionQuantity ?? 0).toFixed())
+        : "Não informado neste registro";
       const status = hasPending ? "Em conferência" : done ? "Entrada aprovada"
         : Number(entered) > 0 ? "Entrada parcial" : Number(line.purchased_quantity) > 0 ? "Aguardando chegada"
           : Number(line.approved_quantity) > 0 ? "Autorizado" : "Em avaliação";
@@ -94,19 +115,22 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
           ...(Number(current.closedShortQuantity ?? 0) > 0 ? [{ label: "Falta encerrada", value: quantity(current.closedShortQuantity) }] : []),
           ...(Number(current.approvedExcessQuantity ?? 0) > 0 ? [{ label: "Excedente validado", value: quantity(current.approvedExcessQuantity) }] : []),
         ] : []),
+        ...(arrival?.correctionQuantity.gt(0)
+          ? [{ label: "Chegada informada em correção", value: quantity(arrival.correctionQuantity.toFixed()) }] : []),
         { label: "Saldo após última entrada", value: balances.valid
           ? <EntryBalance fact={balances.facts.find(fact => fact.lineId === line.id)} unit={line.unit_snapshot} receipts={data.receipts} /> : "Saldo não conferido" },
       ];
-      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, status, done,
-        tone: done ? "success" : hasPending || Number(entered) > 0 ? "pending" : "neutral",
+      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, done,
+        ...(decision ?? { status, tone: done ? "success" : hasPending || decimal(entered).gt(0) ? "pending" : "neutral" }),
         related: data.originDocuments?.filter(origin => origin.productIds.includes(line.product_id)).map(origin => ({
           document: { id: origin.documentId, type: origin.type, code: origin.code },
           detail: "Origem vinculada a este material",
         })),
         facts: [{ label: "Pedido / autorizado", value: `${formatQuantity(line.quantity)} / ${formatQuantity(line.approved_quantity)}` },
           { label: "Comprado", value: formatQuantity(line.purchased_quantity) },
-          { label: "Chegou / entrou", value: `${current ? formatQuantity(decimal(entered).plus(current.pendingValidationQuantity).toFixed()) : "Não informado neste registro"} / ${formatQuantity(entered)}` }],
+          { label: "Chegou / entrou", value: `${arrived} / ${formatQuantity(entered)}` }],
         detail: <>
+          {decision ? <p><strong>{decision.status}</strong>{decision.statusDetail ? <> · {decision.statusDetail}</> : null}</p> : null}
           {readPresentationConversions(line.presentation_conversions).map(item => <p key={item.id}>{presentationCaption(item)}</p>)}
           {line.requisitionItemIds.length ? <p>{line.requisitionItemIds.length} linha(s) REQ explicitamente vinculada(s).</p> : null}
           <dl className="hca-material-balance-grid">{detail.map(fact => <div key={fact.label} data-material-fact={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl>
