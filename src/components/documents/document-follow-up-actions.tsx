@@ -9,13 +9,18 @@ import { ApiError, Notice } from "@/components/workspace";
 import { followUpReference, type FollowUpReference } from "@/lib/documents/follow-up-lifecycle";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useScopedRead } from "@/lib/use-scoped-read";
+import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import { DocumentDecisionFailure, useDocumentDecision } from "./use-document-decision";
 import { DocumentArchivePolicy } from "./document-archive-policy";
+import { DocumentOperationFailureDialog, operationRecoveryLimit } from "./document-operation-failure-dialog";
 
 type Purpose = "complete" | "reopen";
 type Blocker = FollowUpReference["blockers"][number];
 type BlockerAction = { id: string; label: string; open: (returnToReview: () => void) => void };
 type FollowUpBlockerActions = Partial<Record<Blocker, BlockerAction[]>>;
+type FollowUpFailure = { outcome: "rejected" | "uncertain"; description: string; cause?: unknown };
+const uncertainDecision = "A ação ainda está sem confirmação. Confira o resultado da mesma tentativa.";
+const rejectedDecision = "A conferência confirmou que esta tentativa não alterou a ficha.";
 const checks: Record<FollowUpReference["kind"], Blocker[]> = {
   REQ: ["req_fulfillment", "req_delivery"],
   COM: ["com_approval", "com_expectation", "com_arrival", "com_validation"],
@@ -50,12 +55,17 @@ export function DocumentFollowUpActions({
   const continueToArchiveRef = useRef(false);
   const [purpose, setPurpose] = useState<Purpose | null>(null);
   const [reason, setReason] = useState("");
-  const [error, setError] = useState("");
+  const [failure, setFailure] = useState<FollowUpFailure | null>(null);
+  const [recoveryAttempts, setRecoveryAttempts] = useState(0);
   const [conflict, setConflict] = useState(false);
   const [discard, setDiscard] = useState<"close" | "materials" | null>(null);
   const [result, setResult] = useState<FollowUpReference | null>(null);
   const [resolving, setResolving] = useState(false);
   const decision = useDocumentDecision({ userId, documentId: id, domain: "lifecycle", action: purpose ?? "none" });
+  const uncertain = decision.uncertain || failure?.outcome === "uncertain";
+  const activeFailure = failure ?? (decision.uncertain && decision.recoveryMessage
+    ? { outcome: "uncertain" as const, description: uncertainDecision } : null);
+  const exhausted = recoveryAttempts >= operationRecoveryLimit;
 
   const readReference = useCallback((value: unknown) => {
     const raw = value && typeof value === "object" && "data" in value ? value.data : null;
@@ -65,11 +75,11 @@ export function DocumentFollowUpActions({
     return row;
   }, [id, patientId, kind]);
   const reference = useScopedRead(purpose && !result && !resolving ? `/api/documents/${id}?reference=follow-up` : null, userId, readReference);
-  useOperationActivity(reference.loading && Boolean(purpose), { title: "Conferindo situação da ficha" });
+  useOperationActivity(reference.loading && Boolean(purpose) && !activeFailure, { title: "Conferindo situação da ficha" });
 
   const facts = reference.loading || reference.error || conflict ? null : reference.data;
   const reopening = purpose === "reopen";
-  const alreadyCompleted = !reopening && facts?.state === "completed" && !decision.uncertain;
+  const alreadyCompleted = !reopening && facts?.state === "completed" && !uncertain;
   const unavailable = disabled || !facts || (reopening ? !facts.canReopen : !facts.canComplete || facts.blockers.length > 0);
   const canSend = Boolean(purpose && !unavailable && (!reopening || reason.trim().length >= 3));
   const title = reopening ? "Reverter decisão e reabrir" : "Revisar e concluir";
@@ -80,7 +90,8 @@ export function DocumentFollowUpActions({
     openerRef.current = opener;
     continueToArchiveRef.current = false;
     setReason("");
-    setError("");
+    setFailure(null);
+    setRecoveryAttempts(0);
     setConflict(false);
     reference.refresh();
     setPurpose(next);
@@ -88,37 +99,45 @@ export function DocumentFollowUpActions({
   useImperativeHandle(reviewControl, () => (opener: HTMLButtonElement | null) => open("complete", opener));
 
   function closeReview(destination: "close" | "materials" = "close") {
-    if (decision.uncertain || (!alreadyCompleted && reason.trim())) {
+    if (uncertain || (!alreadyCompleted && reason.trim())) {
       setDiscard(destination);
       return;
     }
     setPurpose(null);
+    setFailure(null);
     if (destination === "materials") onShowMaterials();
   }
 
   function resolve(action: BlockerAction) {
-    if (decision.busy || decision.uncertain) return;
+    if (decision.busy || uncertain) return;
     setResolving(true);
     action.open(() => {
       reference.refresh();
-      setError("");
+      setFailure(null);
       setConflict(false);
       setResolving(false);
     });
   }
 
-  async function submit(archiveNext = false) {
-    if (!purpose || decision.busy || !decision.uncertain && (!canSend || !facts)) return;
-    if (!decision.uncertain) continueToArchiveRef.current = archiveNext;
-    setError("");
+  function reviewCurrentReference() {
+    reference.refresh();
+    setConflict(false);
+    setFailure(null);
+  }
+
+  async function submit(archiveNext = false, recovering = false) {
+    if (!purpose || decision.busy || (recovering && exhausted) || (!uncertain && (!canSend || !facts))) return;
+    if (!uncertain) continueToArchiveRef.current = archiveNext;
+    if (recovering) setRecoveryAttempts(attempts => attempts + 1);
+    setFailure(null);
     try {
-      const verify = (value: unknown) => {
+      const verify = (value: unknown, intention: DocumentDecisionIntention) => {
         const row = readReference({ data: value });
         if (row.state !== (reopening ? "reopened" : "completed") || row.lastAct?.actorId !== userId ||
-          (facts && row.version <= facts.version))
+          row.version <= intention.expectedVersion)
           throw new Error("Confira o resultado da decisão antes de tentar novamente.");
       };
-      const outcome = decision.uncertain ? await decision.checkPrevious(verify) : await decision.execute({
+      const outcome = uncertain ? await decision.checkPrevious(verify) : await decision.execute({
         domain: "lifecycle", action: purpose, body: { reason: reason.trim() },
         expectedVersion: facts!.version, referenceHash: facts!.referenceHash,
       }, verify);
@@ -130,40 +149,53 @@ export function DocumentFollowUpActions({
           onCompleteAndArchive();
         } else setResult(completed);
       }
-      if (outcome?.state === "not_applied") setError("A conferência confirmou que esta tentativa não alterou a ficha.");
-    } catch (failure) {
-      setError(failure instanceof Error ? failure.message : "Não foi possível confirmar a decisão.");
-      if (failure instanceof DocumentDecisionFailure && failure.outcome === "not_applied" &&
-        failure.cause instanceof ApiError && failure.cause.status === 409) setConflict(true);
+      if (outcome?.state === "not_applied") {
+        setFailure({ outcome: "rejected", description: rejectedDecision });
+      } else if (uncertain && !outcome) {
+        setFailure({ outcome: "uncertain", description: uncertainDecision });
+      }
+    } catch (error) {
+      const cause = error instanceof DocumentDecisionFailure ? error.cause : error;
+      if (error instanceof DocumentDecisionFailure && error.outcome === "not_applied") {
+        const referenceChanged = cause instanceof ApiError && cause.status === 409;
+        setConflict(referenceChanged);
+        setFailure({ outcome: "rejected", cause, description: referenceChanged
+          ? `${rejectedDecision} Confira a situação atual antes de confirmar novamente.` : rejectedDecision });
+      } else setFailure({ outcome: "uncertain", cause, description: uncertainDecision });
     }
   }
 
   const prior = facts?.decision;
   const priorLabel = facts?.state === "cancelled" ? "Cancelada" : "Concluída";
   const closeResult = () => { setResult(null); setPurpose(null); onUpdated(); };
+  const recoveryAction = !uncertain && (conflict || reference.error) ? { label: "Consultar referência atual", onClick: reviewCurrentReference }
+    : !exhausted && (uncertain || canSend) ? {
+      label: uncertain ? "Conferir resultado" : "Tentar novamente",
+      onClick: () => void submit(continueToArchiveRef.current, true),
+    } : undefined;
   return <>
     {canReopen ? <ActionButton disabled={disabled} onClick={event => open("reopen", event.currentTarget)}>
       <Icon name="refresh" />{cancelled ? "Reverter cancelamento" : "Reverter conclusão"}
     </ActionButton> : canComplete && !reviewControl ? <ActionButton disabled={disabled} onClick={event => open("complete", event.currentTarget)}>
       <Icon name="check" />Revisar conclusão
     </ActionButton> : null}
-    <Dialog open={Boolean(purpose) && !result && !resolving} keyboardScrollable title={title} kicker={`${code} · ${patientName}`}
+    <Dialog open={Boolean(purpose) && !result && !resolving && !activeFailure} keyboardScrollable title={title} kicker={`${code} · ${patientName}`}
       subtitle={alreadyCompleted ? "A ficha já foi concluída." : reopening ? "A reversão ficará vinculada à decisão anterior." :
         facts?.blockers.length ? "Resolva as pendências antes de concluir a ficha." : "Confira as condições da ficha antes de concluir."}
       finalFocus={openerRef} closeDisabled={decision.busy} onClose={() => closeReview()} footer={<>
         <ActionButton variant="quiet" disabled={decision.busy} onClick={() => closeReview()}><Icon name="back" />Voltar à ficha</ActionButton>
-        {!reopening && onCompleteAndArchive && !decision.uncertain && !alreadyCompleted ? <ActionButton disabled={decision.busy || !canSend} onClick={() => void submit(true)}>
+        {!reopening && onCompleteAndArchive && !uncertain && !alreadyCompleted ? <ActionButton disabled={decision.busy || !canSend} onClick={() => void submit(true)}>
           <Icon name="archive" />Concluir e arquivar
         </ActionButton> : null}
-        {!alreadyCompleted ? <ActionButton variant="primary" disabled={decision.busy || !decision.uncertain && !canSend} onClick={() => void submit()}>
-          <Icon name={reopening ? "undo" : "check"} />{decision.uncertain ? "Conferir resultado" : confirmation}
+        {!alreadyCompleted ? <ActionButton variant="primary" disabled={decision.busy || (uncertain ? exhausted : !canSend)} onClick={() => void submit(false, uncertain)}>
+          <Icon name={reopening ? "undo" : "check"} />{uncertain ? "Conferir resultado" : confirmation}
         </ActionButton> : null}
       </>}>
       <div className="hca-delivery-receipt hca-document-follow-up">
-        {error || decision.recoveryMessage ? <Notice error={Boolean(error)}>{error || decision.recoveryMessage}</Notice> : null}
+        {decision.recoveryMessage && !uncertain ? <Notice>{decision.recoveryMessage}</Notice> : null}
         {reference.error || conflict ? <Notice error>
           {reference.error || "A ficha mudou durante a revisão. Confira a nova referência."}
-          <ActionButton compact onClick={() => { reference.refresh(); setConflict(false); setError(""); }}>Consultar referência atual</ActionButton>
+          <ActionButton compact onClick={reviewCurrentReference}>Consultar referência atual</ActionButton>
         </Notice> : null}
         <DefinitionGrid items={[
           { label: "Ficha", value: code }, { label: "Paciente", value: patientName },
@@ -189,11 +221,11 @@ export function DocumentFollowUpActions({
                   <strong>{labels[check][1]}</strong>
                   <p>{labels[check][2]}</p>
                   <div className="hca-follow-up-resolve">{blockerActions[check].map(action =>
-                    <ActionButton key={action.id} compact disabled={decision.busy || decision.uncertain} onClick={() => resolve(action)}>{action.label}</ActionButton>)}</div>
+                    <ActionButton key={action.id} compact disabled={decision.busy || uncertain} onClick={() => resolve(action)}>{action.label}</ActionButton>)}</div>
                 </div> : <details>
                   <summary><strong>{labels[check][1]}</strong></summary>
                   <p>{labels[check][2]}</p>
-                  <ActionButton compact disabled={decision.busy || decision.uncertain} onClick={() => closeReview("materials")}>Consultar ficha</ActionButton>
+                  <ActionButton compact disabled={decision.busy || uncertain} onClick={() => closeReview("materials")}>Consultar ficha</ActionButton>
                 </details>}</li>
               : <li key={check}><Icon name="check-circle" /><strong>{labels[check][0]}</strong></li>)}
             <li><Icon name="check-circle" /><div><strong>Histórico preservado</strong><p>Vínculos, decisões e movimentações continuam disponíveis.</p></div></li>
@@ -203,25 +235,31 @@ export function DocumentFollowUpActions({
         {facts && !alreadyCompleted && (reopening ? !facts.canReopen : !facts.canComplete) ?
           <Notice>A decisão está indisponível para esta ficha e este acesso.</Notice> : null}
         {reopening ? <>{preservedFacts}<Notice><strong>Sem movimentação automática</strong><p>O estoque permanece como está. Uma nova movimentação exige seu próprio registro.</p></Notice></> : null}
-        {!decision.uncertain ? <FormField label={reopening ? "Justificativa da reversão" : "Observação da conclusão"} required={reopening}>
+        {!uncertain ? <FormField label={reopening ? "Justificativa da reversão" : "Observação da conclusão"} required={reopening}>
           <TextAreaField rows={3} maxLength={1000} readOnly={decision.busy || alreadyCompleted} value={reason} onChange={event => setReason(event.currentTarget.value)} />
         </FormField> : null}
-        {facts && !reopening && !unavailable && !decision.uncertain && !decision.busy ?
+        {facts && !reopening && !unavailable && !uncertain && !decision.busy ?
           <DocumentArchivePolicy id={id} patientId={patientId} version={facts.version} /> : null}
       </div>
     </Dialog>
-    {discard ? <Dialog open title={decision.uncertain ? "Sair antes de conferir o resultado?" : "Sair sem concluir?"}
+    {discard ? <Dialog open title={uncertain ? "Sair antes de conferir o resultado?" : "Sair sem concluir?"}
       onClose={() => setDiscard(null)} footer={<>
         <ActionButton onClick={() => setDiscard(null)}>Voltar à revisão</ActionButton>
         <ActionButton variant="primary" onClick={() => {
           setDiscard(null);
           setPurpose(null);
+          setFailure(null);
           if (discard === "materials") onShowMaterials();
-          else if (decision.uncertain) onUpdated();
+          else if (uncertain) onUpdated();
         }}>
-          {decision.uncertain ? "Voltar à ficha" : "Sair e descartar"}
+          {uncertain ? "Voltar à ficha" : "Sair e descartar"}
         </ActionButton>
-      </>}><p>{decision.uncertain ? "A referência da tentativa continua disponível para conferência." : "Os valores digitados nesta decisão serão descartados."}</p></Dialog> : null}
+      </>}><p>{uncertain ? "A referência da tentativa continua disponível para conferência." : "Os valores digitados nesta decisão serão descartados."}</p></Dialog> : null}
+    {purpose && activeFailure && !discard && !result && !decision.busy ? <DocumentOperationFailureDialog
+      {...activeFailure} title={reopening ? "Não foi possível reabrir o acompanhamento" : "Não foi possível concluir a ficha"}
+      operation={confirmation} fallbackCode="DECISAO_SEM_CONFIRMACAO" attempts={recoveryAttempts}
+      onClose={() => closeReview()} closeLabel="Voltar à ficha" action={recoveryAction}
+      exhaustedMessage={exhausted ? "Copie os detalhes para a supervisão e volte à ficha." : undefined} /> : null}
     {result ? <Dialog open success title={result.state === "reopened" ? "Acompanhamento reaberto" : "Ficha concluída"}
       subtitle={result.state === "reopened" ? "A decisão anterior e a justificativa permanecem no histórico." : "A conclusão foi registrada na ficha."}
       onClose={closeResult} footer={<ActionButton variant="primary" onClick={closeResult}>Voltar à ficha</ActionButton>}>

@@ -10,7 +10,7 @@ import { api } from "@/lib/client/api";
 import { documentArchiveAttempt, documentArchiveCommand, documentArchiveIdentity, documentArchiveRecovery, documentArchiveReference, type DocumentArchiveAttempt, type DocumentArchiveIdentity } from "@/lib/documents/document-archive";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useScopedRead } from "@/lib/use-scoped-read";
-import { useOperationSupport } from "./use-operation-support";
+import { DocumentOperationFailureDialog, operationRecoveryLimit } from "./document-operation-failure-dialog";
 
 export type ArchiveDialogMode = "archive" | "review" | "recovery";
 type View = "archive" | "review" | "reverse";
@@ -31,7 +31,6 @@ const archiveFailureTitles = {
   confirm: "Não foi possível confirmar o encerramento",
   reverse: "Não foi possível reverter o arquivamento",
 };
-const recoveryLimit = 2;
 const recoveryEvent = "hca:document-archive-recovery";
 
 type ArchiveFailure = {
@@ -84,23 +83,13 @@ function archiveUncertain(action: DocumentArchiveIdentity["action"], cause?: unk
 function ArchiveFailureDialog({ failure, attempts, onClose, onRecover }: {
   failure: ArchiveFailure; attempts: number; onClose: () => void; onRecover?: () => void;
 }) {
-  const title = archiveFailureTitles[failure.action];
-  const { copy, details } = useOperationSupport({
-    operation: descriptions[failure.action === "confirm" ? "review" : failure.action][0],
-    result: title, cause: failure.cause, fallbackCode: "ARQUIVO_SEM_CONFIRMACAO",
-    attempts, attemptLabel: "Tentativas de recuperação",
-  });
-  const exhausted = failure.outcome === "uncertain" && attempts >= recoveryLimit;
-
-  return <Dialog open failure={failure.outcome} title={title} subtitle={failure.description} onClose={onClose}
-    footer={<>
-      <ActionButton onClick={onClose}>{failure.outcome === "uncertain" ? "Voltar à ficha" : "Voltar à revisão"}</ActionButton>
-      {onRecover && !exhausted ? <ActionButton variant="primary" onClick={onRecover}><Icon name="refresh" />Conferir resultado</ActionButton>
-        : <ActionButton variant="primary" onClick={() => void copy()}><Icon name="copy" />Copiar detalhes</ActionButton>}
-    </>}>
-    {exhausted ? <p className="hca-issuance-retry-limit">O resultado ainda está sem confirmação. Copie os detalhes para o responsável pelo sistema antes de tentar arquivar ou decidir novamente.</p> : null}
-    {details}
-  </Dialog>;
+  const exhausted = failure.outcome === "uncertain" && attempts >= operationRecoveryLimit;
+  return <DocumentOperationFailureDialog {...failure} title={archiveFailureTitles[failure.action]}
+    operation={descriptions[failure.action === "confirm" ? "review" : failure.action][0]}
+    fallbackCode="ARQUIVO_SEM_CONFIRMACAO" attempts={attempts} onClose={onClose}
+    closeLabel={failure.outcome === "uncertain" ? "Voltar à ficha" : "Voltar à revisão"}
+    action={onRecover && !exhausted ? { label: "Conferir resultado", onClick: onRecover } : undefined}
+    exhaustedMessage={exhausted ? "O resultado ainda está sem confirmação. Copie os detalhes para o responsável pelo sistema antes de tentar arquivar ou decidir novamente." : undefined} />;
 }
 
 function DownloadConsolidated({ archive, compactLabel = false }: { archive: DocumentArchiveAttempt; compactLabel?: boolean }) {
@@ -226,7 +215,7 @@ export function DocumentArchiveDialog({ id, patientId, code, patientName, actor,
   }
 
   async function recover() {
-    if (sendingRef.current || !pending || recoveryAttempts >= recoveryLimit) return;
+    if (sendingRef.current || !pending || recoveryAttempts >= operationRecoveryLimit) return;
     const { action, key } = pending;
     sendingRef.current = true;
     setBusy(true);

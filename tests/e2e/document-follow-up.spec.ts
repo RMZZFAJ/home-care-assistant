@@ -40,9 +40,27 @@ test("administrador reabre uma ENT mantendo a devolução, o cancelamento e o ex
   await info.attach("revisao-da-reabertura", { body: await page.screenshot(), contentType: "image/png" });
   const reason = "Reabertura fictícia para acompanhar a documentação";
   await review.getByRole("textbox", { name: "Justificativa da reversão" }).fill(reason);
-  await confirmedOutcome(page, doc.id, "Reabrir acompanhamento");
+  const decisionEndpoint = `/api/documents/${doc.id}/decisions`;
+  const packets = await loseDecisionResponse(page, decisionEndpoint);
+  const recoveryKeys: string[] = [];
+  await page.route(`**${decisionEndpoint}/reconcile`, async route => {
+    recoveryKeys.push(route.request().postDataJSON().key);
+    if (recoveryKeys.length > 2) return route.continue();
+    await route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Consulta fictícia indisponível." } });
+  });
+  await confirm.click();
+  const failure = page.getByRole("dialog", { name: "Não foi possível reabrir o acompanhamento", exact: true });
+  await expect(failure).toHaveAttribute("data-outcome", "uncertain");
+  const recover = failure.getByRole("button", { name: "Conferir resultado", exact: true });
+  await recover.click();
+  await expect.poll(() => recoveryKeys.length).toBe(2);
+  await recover.click();
 
   const success = page.getByRole("dialog", { name: "Acompanhamento reaberto", exact: true });
+  await expect(success).toBeVisible();
+  expect(packets).toHaveLength(1);
+  expect(recoveryKeys).toEqual([recoveryKeys[0], recoveryKeys[0], recoveryKeys[0]]);
+  expect(packets[0]).toMatchObject({ key: recoveryKeys[0], intention: { action: "reopen", body: { reason } } });
   await success.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await openDocumentMore(page);
   await expect(page.getByRole("menuitem", { name: "Revisar conclusão", exact: true })).toBeVisible();
@@ -68,6 +86,65 @@ test("administrador reabre uma ENT mantendo a devolução, o cancelamento e o ex
   const preserved = await page.request.get(`${endpoint}?issuance=${originalIssuance.id}`);
   expect(preserved.status()).toBe(200);
   expect((await preserved.body()).equals(originalBytes)).toBe(true);
+});
+
+test("falha na conclusão limita as tentativas e preserva a observação na revisão", async ({ page }, info) => {
+  const { document, patient } = await entOperationFixture("accepted");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await loginDecision(page, fixtures.adminA.email, patient);
+  const stock = terminalLedger(patient);
+  const privateWrites = noPrivateWrites(page);
+  const endpoint = `/api/documents/${document.id}/decisions`;
+  const packets: { key: string; intention: { body: { reason: string } } }[] = [];
+  const correlationId = randomUUID();
+  await page.route(`**${endpoint}`, async route => {
+    packets.push(route.request().postDataJSON());
+    await route.fulfill({ status: 503, json: {
+      code: "DATABASE_UNAVAILABLE", correlationId, error: "Detalhe interno fictício da falha.",
+    } });
+  });
+  await page.goto(`/fichas/${document.id}`);
+  await openDocumentAction(page, "Revisar conclusão");
+  const review = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+  const observation = "Observação fictícia mantida enquanto a revisão está aberta.";
+  await review.getByRole("textbox", { name: "Observação da conclusão" }).fill(observation);
+  await review.getByRole("button", { name: "Concluir", exact: true }).click();
+  const failure = page.getByRole("dialog", { name: "Não foi possível concluir a ficha", exact: true });
+  await expect(failure).toHaveAttribute("data-outcome", "rejected");
+  await expect(failure.getByText("A conferência confirmou que esta tentativa não alterou a ficha.", { exact: true })).toBeVisible();
+  const retry = failure.getByRole("button", { name: "Tentar novamente", exact: true });
+  await retry.click();
+  await expect.poll(() => packets.length).toBe(2);
+  await retry.click();
+  await expect(failure).toBeVisible();
+  await expect(retry).toHaveCount(0);
+  await expect(failure.getByText("Detalhe interno fictício da falha.")).toHaveCount(0);
+  const details = failure.locator("details");
+  await expect(details).not.toHaveAttribute("open", "");
+  await details.getByText("Detalhes para suporte", { exact: true }).click();
+  await expect(details).toContainText(correlationId);
+  await expect(details).toContainText("Tentativas de recuperação: 2");
+  await expect(failure.getByRole("button", { name: "Copiar detalhes", exact: true })).toHaveCount(2);
+  expect(new Set(packets.map(packet => packet.key)).size).toBe(3);
+  expect(packets.map(packet => packet.intention.body.reason)).toEqual([observation, observation, observation]);
+  expect(await page.evaluate(() => [innerWidth, document.documentElement.scrollWidth])).toEqual([390, 390]);
+  await info.attach("falha-conclusao-390", { body: await failure.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png" });
+
+  await failure.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  const discard = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });
+  await discard.getByRole("button", { name: "Voltar à revisão", exact: true }).click();
+  await expect(failure).toBeVisible();
+  await expect(retry).toHaveCount(0);
+  await failure.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await discard.getByRole("button", { name: "Sair e descartar", exact: true }).click();
+  await page.unroute(`**${endpoint}`);
+  for (const packet of packets) expect((await page.request.post(endpoint, { data: packet })).status()).toBe(409);
+  const facts = await (await page.request.get(`/api/documents/${document.id}?reference=follow-up`)).json();
+  expect(facts.data).toMatchObject({ state: "open", canComplete: true });
+  expect(privateWrites).toEqual([]);
+  expect(terminalLedger(patient)).toBe(stock);
+  await openDocumentAction(page, "Revisar conclusão");
+  await expect(review.getByRole("textbox", { name: "Observação da conclusão" })).toBeEmpty();
 });
 
 test("revisão da ENT exige conferência pessoal e descarta a nota somente após confirmação", async ({ page }, info) => {
