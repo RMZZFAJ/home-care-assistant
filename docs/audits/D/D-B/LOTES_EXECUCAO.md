@@ -965,6 +965,21 @@ da asserção enquanto consultava o plantão na primeira rodada e passou
 isoladamente. A DEV também passou após incluir a saída pelo diálogo e
 a reabertura com as duas observações preservadas.
 
+**E06-11, decisão de cancelamento da ENT recebida.** O diálogo usa a
+composição do v7 para mostrar quem recebeu, a quantidade devolvida e
+o consumo confirmado por material com acesso ao relato. O resultado da
+recusa mostra a autoria, o instante e a justificativa da decisão. Quando
+há várias referências de consumo, o produto mantém a lista consultável
+com cada origem. Os atalhos para referências e histórico usam os atos
+reais da ficha. O ajuste dispensa migration.
+Quatro execuções em Android de 360 px e iOS de 412 px emulados passaram
+na primeira tentativa com build de produção. Cobriram consentimento,
+retorno físico, consumo preservado, recuperação sem duplicar a decisão,
+recusa e retirada do pedido. Duas integrações com Auth real confirmaram
+a preservação dos atos na reabertura da ENT, DEV e COM.
+Capturas do v7 e do produto em `output/playwright/l2-delivery-cancel/`.
+A validação da CI deste incremento segue pendente.
+
 **Continuidade do BAL existente.** Ao adotar a nova referência, o
 salvamento automático guarda as contagens anteriores com data e notas.
 A nova conferência começa com as quantidades vazias. O fluxo cobriu

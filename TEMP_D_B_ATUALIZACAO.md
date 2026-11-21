@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — decisão de cancelamento da ENT recebida.** A decisão mostra o
+consumo confirmado junto da devolução. O resultado da recusa identifica
+quem decidiu, quando e por qual motivo. Os quatro casos em Android e iOS
+emulados e as duas integrações dirigidas passaram localmente.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — retomada do rascunho da COM.** O diálogo compartilhado usa o
 título e as ações do v7. Fechar guarda a última versão para depois.
 Continuar abre a etapa salva e Descartar e começar remove somente o

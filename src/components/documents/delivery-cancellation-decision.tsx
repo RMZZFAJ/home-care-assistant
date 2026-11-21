@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
 import { z } from "zod";
-import { ActionButton, DefinitionGrid, FormField, Pill, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, FormField, Pill, SelectField, TextAreaField } from "@/components/ui/controls";
+import { WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { Icon } from "@/components/ui/icon";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { Dialog } from "@/components/ui/overlays";
@@ -26,11 +27,14 @@ const previewSchema = z.object({ data: z.object({
 
 function receiverName(data: SupplyDocument) {
   const receipt = data.events.find(event => event.action === "ent.receive");
-  const author = data.workflow_data.acceptedBy;
+  const author = data.workflow_data.acceptedBy ?? receipt?.actorId;
   const selection = data.workflow_data.recipientSelection;
-  if (receipt && receipt.actorId === author && selection && selection.recipientId === author) return selection.recipientName;
-  return data.transfer && data.transfer.declaration.recipient.id === author ? data.transfer.declaration.recipient.name
-    : selection?.recipientName ?? "Recebedor original";
+  if (selection?.recipientId === author && selection?.recipientName) return selection.recipientName;
+  const declared = data.transfer?.declaration.recipient;
+  if (declared?.id === author && declared?.name) return declared.name;
+  const outcome = data.deliveryCancellation?.request.outcome;
+  if (outcome?.actorId === author && outcome?.actorName) return outcome.actorName;
+  return "Recebedor original";
 }
 
 export function DeliveryCancellationDecision({ action, data, patientName, actor, busy, blocked, uncertain, error, conflict, finalFocus, focusRevision, onAction, onCompare, onSubmit, onRecover, onClose, onCloseUncertain }: {
@@ -104,6 +108,7 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
   };
 
   const receiver = receiverName(data);
+  const patient = documentPatientName(data.canonical_snapshot, patientName);
   const title = requesting ? "Solicitar cancelamento" : withdrawing ? "Retirar pedido de cancelamento" : "Analisar pedido de cancelamento";
   const submitLabel = requesting ? "Enviar pedido" : withdrawing ? "Retirar pedido" : consenting ? "Consentir e registrar devolução" : "Recusar cancelamento";
   const subtitle = requesting ? "Confira o pedido antes de encaminhá-lo ao recebedor original."
@@ -121,9 +126,10 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
   }
 
   return <>
-    <Dialog open title={title} kicker={data.code ?? undefined} subtitle={subtitle}
+    <Dialog open title={title} kicker={[data.code, patient].filter(Boolean).join(" · ")} subtitle={subtitle}
+      popupClassName="hca-cancellation-dialog" keyboardScrollable
       closeDisabled={busy} finalFocus={finalFocus} onClose={close} footer={<>
-        <ActionButton disabled={busy || uncertain} onClick={close}>{withdrawing ? "Manter pedido" : "Voltar à ficha"}</ActionButton>
+        <ActionButton variant="quiet" disabled={busy || uncertain} onClick={close}><Icon name="back" />{withdrawing ? "Manter pedido" : "Voltar à ficha"}</ActionButton>
         <ActionButton variant={requesting && !uncertain ? "danger" : "primary"} disabled={busy || !uncertain && !canSubmit}
           onClick={uncertain ? onRecover : submit}>
           <Icon name={requesting ? "send" : "check"} />{uncertain ? "Conferir resultado" : submitLabel}
@@ -135,7 +141,7 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
         {requesting ? <>
           <DefinitionGrid items={[
             { label: "Ficha", value: data.code },
-            { label: "Paciente", value: documentPatientName(data.canonical_snapshot, patientName) },
+            { label: "Paciente", value: patient },
             { label: "Responsável pela ação", value: actor },
             { label: "Referência", value: formatBrazilDate(data.events.find(item => item.version === data.version)?.createdAt ?? data.created_at) },
           ]} />
@@ -176,22 +182,25 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
           {transit ? <Notice>Concilie o material ainda em trânsito antes de consentir.</Notice> : null}
           {!showSources && !conflict ? <Notice error>As fontes de consumo estão indisponíveis para esta decisão. Atualize as referências ou registre sua recusa.</Notice> : null}
           {rows.map(({ line, value, valid }) => <article className="hca-receipt-line" key={line.lineId}>
-            <header><div><h3>{line.name}</h3><p>{line.unit}</p></div></header>
+            <header className="hca-cancellation-material">
+              <span className="hca-wizard-material-icon"><Icon name="box" /></span>
+              <div><h3>{line.name}</h3><p>{line.unit}</p></div>
+            </header>
             <DefinitionGrid className="hca-cancellation-quantities" items={[
               { label: "Recebido", value: formatQuantity(line.acceptedQuantity, line.unit) },
-              { label: "Consumo confirmado disponível", value: formatQuantity(line.availableConsumedQuantity, line.unit) },
+              { label: "Consumo disponível", value: formatQuantity(line.availableConsumedQuantity, line.unit) },
               { label: "Retorno esperado", value: formatQuantity(line.minimumReturnQuantity, line.unit) },
             ]} />
             {quantity(line.acceptedQuantity).gt(0) ? <FormField label={<>Quantidade fisicamente devolvida<span className="sr-only"> · {line.name}</span></>}
               error={valid ? undefined : "Informe o retorno físico dentro do saldo e da precisão deste material."}>
-              <TextInput inputMode="decimal" maxLength={64} value={value} readOnly={busy || blocked} onChange={event => {
+              <WizardQuantityInput unit={line.unit} inputMode="decimal" maxLength={64} value={value} readOnly={busy || blocked} onChange={event => {
                 const next = event.currentTarget.value;
                 setReturns(previous => ({ ...previous, [line.lineId]: next }));
                 setCheckedReference(null);
               }} />
             </FormField> : null}
             {valid ? <p>Consumo a referenciar: {formatQuantity(quantity(line.acceptedQuantity).minus(quantity(value)).toFixed(), line.unit)}</p> : null}
-            <DeliveryConsumptionReferences line={line} />
+            <DeliveryConsumptionReferences line={line} inDecision />
           </article>)}
           {rows.length && !transit ? <label className="hca-purchase-switch hca-reconcile-assessment">
             <span><strong>Conferi a devolução física e as referências de consumo</strong><small id={hintId}>Meu consentimento ficará registrado com a minha autoria.</small></span>
@@ -232,31 +241,38 @@ export function DeliveryCancellationStatusDialog({ data, patientName, onClose, o
   const pending = request.status === "pending" && !reference.historical;
   const declined = request.status === "refused";
   const consented = request.status === "consented";
+  const patient = documentPatientName(data.canonical_snapshot, patientName);
   const title = pending ? "Aguardando decisão do recebedor" : declined ? "Cancelamento não autorizado"
     : consented ? "Ficha cancelada" : reference.historical ? "Pedido anterior preservado" : "Pedido retirado";
   const subtitle = pending ? "O pedido foi encaminhado a quem registrou o recebimento." :
     declined || request.status === "withdrawn" ? "O recebimento e o estoque permanecem como estavam." :
       consented ? "A devolução real e o consumo confirmado permanecem registrados na ficha." : undefined;
-  return <Dialog open title={title} kicker={data.code ?? undefined} subtitle={subtitle} success={consented} onClose={onClose} footer={<>
-    <ActionButton onClick={onClose}>Voltar à ficha</ActionButton>
-    {pending && onWithdraw ? <ActionButton onClick={onWithdraw}>Retirar pedido</ActionButton> : null}
-    {declined ? <ActionButton onClick={onHistory}>Consultar histórico</ActionButton> : null}
+  return <Dialog open title={title} kicker={[data.code, patient].filter(Boolean).join(" · ")} subtitle={subtitle}
+    success={consented} popupClassName="hca-cancellation-dialog" keyboardScrollable onClose={onClose} footer={<>
+    <ActionButton variant="quiet" onClick={onClose}><Icon name="back" />Voltar à ficha</ActionButton>
+    {pending && onWithdraw ? <ActionButton onClick={onWithdraw}><Icon name="undo" />Retirar pedido</ActionButton> : null}
+    {declined ? <ActionButton onClick={onHistory}><Icon name="history" />Consultar histórico</ActionButton> : null}
   </>}>
     <div className="hca-delivery-receipt hca-cancellation-decision">
       {!consented ? <DefinitionGrid items={[
         { label: "Ficha", value: data.code },
-        { label: "Paciente", value: documentPatientName(data.canonical_snapshot, patientName) },
+        { label: "Paciente", value: patient },
       ]} /> : null}
-      <div className="hca-receipt-line"><header><div><h3>{receiverName(data)}</h3><p>Recebedor original</p></div>
+      <div className="hca-follow-up-prior hca-cancellation-context-row"><Icon name="user" /><div><h3>{receiverName(data)}</h3><p>Recebedor original</p></div>
         {pending ? <Pill tone="warning">Decisão pendente</Pill> : declined ? <Pill tone="danger">Recusado</Pill> : null}
-      </header></div>
+      </div>
       <DefinitionGrid items={[
         { label: "Solicitado por", value: request.requestedName ?? "Nome histórico não preservado" },
         { label: "Data do pedido", value: formatBrazilDate(request.requestedAt) },
         { label: "Motivo", value: request.reason, wide: true },
         ...(request.outcome ? [{ label: "Decisão de", value: request.outcome.actorName ?? "Nome histórico não preservado" },
-          { label: "Motivo da decisão", value: request.outcome.reason, wide: true }] : []),
+          { label: "Data da decisão", value: formatBrazilDate(request.outcome.recordedAt) },
+          ...(declined ? [] : [{ label: "Motivo da decisão", value: request.outcome.reason, wide: true }])] : []),
       ]} />
+      {declined && request.outcome ? <div className="hca-follow-up-prior hca-cancellation-context-row">
+        <Icon name="comment" />
+        <div><h3>Motivo da recusa</h3><p className="whitespace-pre-wrap">{request.outcome.reason}</p></div>
+      </div> : null}
       {pending ? <Notice><strong>Estoque preservado</strong><p>O pedido não movimenta materiais. A decisão cabe ao recebedor original.</p></Notice> : null}
       {consented ? reference.lines.map(line => <article className="hca-receipt-line" key={line.lineId}>
         <h3>{line.name}</h3>

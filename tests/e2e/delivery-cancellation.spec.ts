@@ -218,6 +218,14 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
       .click();
     const consentReview = decisionDialog(recipient);
     await expect(returnField(recipient)).toHaveValue("1");
+    const preserved = consentReview.getByRole("region", { name: "Consumo confirmado", exact: true });
+    await expect(preserved).toContainText("1 unidade");
+    await expect(preserved).toContainText("Preservado");
+    await expect(preserved.getByRole("link", { name: "Consultar relato de consumo", exact: true })).toHaveAttribute("href", `/consumo?ref=${f.consumption}`);
+    if (info.project.use.hasTouch) {
+      await recipient.setViewportSize({ width: info.project.name === "ios" ? 412 : 360, height: 844 });
+      await info.attach("E06-11 decisão com consumo confirmado", { body: await recipient.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png" });
+    }
     await expect(
       consentReview.locator('input[name$=":consumed"]'),
     ).toHaveCount(0);
@@ -348,7 +356,7 @@ test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real 
 test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pode ser retirado preservando os fatos", async ({
   page,
   browser,
-}) => {
+}, info) => {
   test.setTimeout(120_000);
   const f = await prepared({ request: true }),
     before = ledger(f.patient),
@@ -391,6 +399,14 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
       .click();
     await expect(recipient.locator(".hca-activity-overlay")).toHaveCount(0);
     await expect(refusal).toHaveCount(0);
+    const refusalResult = recipient.getByRole("dialog", { name: "Cancelamento não autorizado", exact: true });
+    await expect(refusalResult).toContainText("Motivo da recusa");
+    await expect(refusalResult).toContainText("Recebedor mantém os materiais e recusa este pedido");
+    await expect(refusalResult).toContainText("Data da decisão");
+    if (info.project.use.hasTouch) {
+      await recipient.setViewportSize({ width: info.project.name === "ios" ? 412 : 360, height: 844 });
+      await info.attach("E06-11 recusa e autoria", { body: await recipient.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png" });
+    }
     await closeStatus(recipient, "Cancelamento não autorizado");
     await withdrawal
       .getByRole("button", { name: "Retirar pedido", exact: true })

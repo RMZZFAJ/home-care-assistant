@@ -1341,11 +1341,21 @@
 .hca-document-archive-policy p { color: var(--hca-muted); font-size: 11px; }
 .hca-document-archive-policy > button { grid-column: 2 / -1; justify-self: start; }
 .hca-cancellation-decision { gap: 12px; }
+.hca-l1 .hca-cancellation-dialog > .hca-modal-content { background: var(--hca-paper); padding: 18px; }
+.hca-l1 .hca-cancellation-dialog .hca-modal-kicker { text-transform: uppercase; letter-spacing: .08em; }
+.hca-cancellation-decision .hca-cancellation-material { align-items: center; justify-content: flex-start; gap: 10px; }
+.hca-cancellation-decision .hca-wizard-stock-input { max-width: min(100%, 180px); }
+.hca-cancellation-decision .hca-cancellation-context-row { padding: 9px 0; border-top: 1px solid var(--hca-line); overflow-wrap: anywhere; }
+.hca-cancellation-context-row :is(h3, h4) { margin: 0 0 3px; font-size: 13px; font-weight: 650; }
+.hca-cancellation-context-row .ui-link { font-size: 11px; }
 .hca-cancellation-decision .hca-cancellation-quantities { grid-template-columns: repeat(3, minmax(0, 1fr)); padding-top: 9px; border-top: 1px solid var(--hca-line); gap: 8px; }
 .hca-l1 .hca-cancellation-decision textarea { min-height: 68px; }
 .hca-l1 .hca-modal:has(.hca-cancellation-decision) > .hca-modal-footer { flex-wrap: nowrap; }
 .hca-l1 .hca-modal:has(.hca-cancellation-decision) > .hca-modal-footer > button { min-width: 0; white-space: normal; }
 .hca-l1 .hca-modal:has(.hca-cancellation-decision) > .hca-modal-footer > button:last-child { max-width: 68%; }
+@media (max-width: 500px) {
+  .hca-l1 .hca-cancellation-dialog { width: calc(100vw - 20px); }
+}
 .hca-document-follow-up { gap: 21px; font-size: 12px; }
 .hca-document-follow-up .hca-cancellation-quantities { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .hca-document-follow-up :is(details, .hca-follow-up-prior > div) { min-width: 0; }

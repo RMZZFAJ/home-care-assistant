@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Notice } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
-import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, Pill } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
 import { DocumentChangeFacts } from "./document-freshness";
 import type {
   DeliveryCancellationContext,
@@ -21,9 +22,23 @@ const cancellationStatuses = {
 
 export function DeliveryConsumptionReferences({
   line,
+  inDecision = false,
 }: {
   line: DeliveryCancellationLine;
+  inDecision?: boolean;
 }) {
+  const [first] = line.consumptionReferences;
+  if (inDecision && first && line.consumptionReferences.length === 1) return (
+    <section className="hca-follow-up-prior hca-cancellation-context-row" aria-label="Consumo confirmado">
+      <Icon name="history" />
+      <div>
+        <h4>Consumo confirmado</h4>
+        <p>{formatQuantity(first.quantity, line.unit)} · {formatBrazilDate(first.recordedAt)}</p>
+        <Link href={"/consumo?ref=" + first.reportId} prefetch={false} className="ui-link">Consultar relato de consumo</Link>
+      </div>
+      <Pill tone="success">Preservado</Pill>
+    </section>
+  );
   return line.consumptionReferences.length ? (
     <details className="my-2">
       <summary>Consultar referências do consumo confirmado</summary>
