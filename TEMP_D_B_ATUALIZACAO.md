@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — ações da COM na revisão de conclusão.** A pessoa habilitada
+pode autorizar itens, registrar a compra, encerrar a expectativa
+restante e registrar a chegada pela pendência correspondente. A revisão
+consulta os bloqueios atuais ao voltar e conserva a observação em edição.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — escolha de recebedor e revisão de necessidade.** ENT e DEV
 compartilham os cartões de seleção do v7. O diálogo da ENT consulta a
 escala na abertura e mostra o horário do plantão. Os assistentes

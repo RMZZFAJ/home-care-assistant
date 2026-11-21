@@ -88,9 +88,6 @@ export function CommandEditorFields({
   const authorizingPurchase = action === "approve" && data.type === "COM";
   const mayReceivePurchase = can(context, "com.receive");
   const directPurchaseCredit = mayReceivePurchase && context.patient?.role === "admin" && can(context, "com.validate");
-  const [reasonText, setReasonText] = useState(
-    initialDraft?.fields.reason ?? "",
-  );
   const [divergent, setDivergent] = useState<string[]>(
     initialDraft?.divergentIds ?? [],
   );
@@ -585,8 +582,7 @@ export function CommandEditorFields({
           <textarea
             className={inputClass}
             name="reason"
-            value={reasonText}
-            onChange={(event) => setReasonText(event.target.value)}
+            defaultValue={initialDraft?.fields.reason ?? ""}
             rows={3}
             minLength={3}
             maxLength={1000}

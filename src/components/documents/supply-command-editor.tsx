@@ -29,6 +29,8 @@ type OperationEditorProps = CommandEditorProps & {
   purchaseFeedback?: string;
   purchaseConflictContent?: ReactNode;
   confirmationPending?: boolean;
+  fromCompletion?: boolean;
+  obscured?: boolean;
 };
 export function CommandEditor(props: OperationEditorProps) {
   const purpose = props.action;
@@ -170,8 +172,8 @@ function OperationEditor(
 
       {!coveredEditor ? <p>Confira os dados antes de confirmar. Ao sair, os campos desta ação serão descartados.</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
-      {coveredEditor && props.purchaseFeedback ? <Notice error>{props.purchaseFeedback}</Notice> : null}
-      {coveredEditor ? props.purchaseConflictContent : null}
+      {(coveredEditor || props.fromCompletion) && props.purchaseFeedback ? <Notice error>{props.purchaseFeedback}</Notice> : null}
+      {coveredEditor || props.fromCompletion ? props.purchaseConflictContent : null}
       {confirmationReset ? (
         <Notice>
           A confirmação anterior foi desmarcada porque a referência mudou.
@@ -345,7 +347,12 @@ function OperationEditor(
       </Dialog>
     </section>
   );
-  if (!coveredEditor) return content;
+  if (!coveredEditor) return com && props.fromCompletion
+    ? <Dialog open={!props.obscured} keepMounted title={props.purpose === "close_expectation" ? "Encerrar expectativa restante" : "Registrar aquisição"}
+      kicker={props.data.code ?? "COM"} keyboardScrollable closeDisabled={props.confirmationPending} onClose={requestClose}>
+      {content}
+    </Dialog>
+    : content;
   const subtitle = approval ? "Marque os itens que a família pode comprar e confirme a quantidade autorizada para cada um." :
     purchase ? "Marque os materiais que já estão com você." :
     directCredit ? "Marque o que chegou. Sua confirmação libera as quantidades no estoque familiar." :

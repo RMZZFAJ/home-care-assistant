@@ -182,6 +182,7 @@ export function SupplyDocumentContent({
   const purchaseReadAttemptRef = useRef<number | null>(null);
   useOperationActivity(purchaseUpdating, { title: "Registrando compra", stage: 2, steps: purchaseActivitySteps });
   const [action, setAction] = useState<DocumentAction | null>(null);
+  const [operationFromCompletion, setOperationFromCompletion] = useState(false);
   const authorizingPurchase = action === "approve" && data?.type === "COM";
   const registeringPurchase = action === "purchase" && data?.payload.origin !== "donation";
   const registeringArrival = action === "receive" && data?.type === "COM";
@@ -314,6 +315,7 @@ export function SupplyDocumentContent({
       if (!controller.signal.aborted) {
         if (changedScope) {
           returnToCompletionRef.current = null;
+          setOperationFromCompletion(false);
           setCoveredRead(true);
           setArrivalReadFailure(null);
           setOpenRecoveredComparison(false);
@@ -359,6 +361,7 @@ export function SupplyDocumentContent({
           ) {
             arrivalReadRef.current = null;
             returnToCompletionRef.current = null;
+            setOperationFromCompletion(false);
             setArrivalReadFailure(null);
             setOpenRecoveredComparison(false);
             setReadDenied(true);
@@ -583,6 +586,7 @@ export function SupplyDocumentContent({
               ? cancellationMessages[intention.action]
               : "Operação confirmada e registrada na ficha. Consulte os eventos e as notificações para acompanhar o processamento.",
       );
+      if (intention.action === "close_expectation" || intention.action === "purchase" && result.data.payload.origin === "donation") returnToCompletion();
     } catch (reason) {
       const failure = reason instanceof DocumentDecisionFailure ? reason : null;
       const cause = failure?.cause ?? reason;
@@ -871,35 +875,38 @@ export function SupplyDocumentContent({
   const prepareReturn = operationalMenu && data?.type === "ENT" && data.kind !== "DEV"
     && allowed("ent.create") && allowed("stock.team.read");
 
-  function openOperation(item: DocumentAction, opener: HTMLButtonElement | null) {
+  function openOperation(item: DocumentAction, opener: HTMLButtonElement | null, fromCompletion = false) {
     operationOpenerRef.current = opener;
+    setOperationFromCompletion(fromCompletion);
     setReview(null);
     if (item === "reassign" || (item === "receive" && data?.type === "ENT") || (item === "resolve" && hasCountedTransit) ||
       (item === "cancel" && (data?.type === "COM" || hasUnreceivedDispatch || hasPersonalReceipt)) ||
       item === "consent_cancel" || item === "withdraw_cancellation") {
       setError("");
       if (item === "resolve") setReconciliationResult(null);
-    } else {
+    } else if (!fromCompletion) {
       decisionFocusRef.current = true;
       setFocusRevision(value => value + 1);
       tabs.select("workflow");
       if (item === "approve" || item === "purchase" || (item === "receive" && data?.type === "COM")) setError("");
     }
+    if (fromCompletion) setError("");
     setAction(item);
   }
 
-  function openFromCompletion(item: "receive" | "resolve", resume: () => void) {
+  function openFromCompletion(item: DocumentAction, resume: () => void) {
     if (!actions.includes(item) || busy || operationOpen) {
       resume();
       return;
     }
     returnToCompletionRef.current = resume;
-    openOperation(item, null);
+    openOperation(item, null, true);
   }
 
   function returnToCompletion() {
     const resume = returnToCompletionRef.current;
     returnToCompletionRef.current = null;
+    setOperationFromCompletion(false);
     resume?.();
     return Boolean(resume);
   }
@@ -997,6 +1004,46 @@ export function SupplyDocumentContent({
       )}
     </section>
   ) : null;
+  const commandEditor = data && action ? <CommandEditor
+    key={data.id + action}
+    referenceAdoptionRef={referenceAdoptionRef}
+    fromCompletion={operationFromCompletion}
+    obscured={Boolean(review)}
+    recoveryOnly={!actions.includes(action)}
+    action={action}
+    purchaseFeedback={error}
+    purchaseConflictContent={purchaseConflictPanel}
+    confirmationPending={busy || uncertain}
+    data={data}
+    context={context}
+    formRef={commandFormRef}
+    reviewDisabled={busy || uncertain || purchaseConflict || deliveryConflict}
+    onCancel={() => {
+      setAction(null);
+      setPurchaseConflict(false);
+      setDeliveryConflict(false);
+      setComparison(null);
+      setAttempt(value => value + 1);
+      if (returnToCompletion()) {
+        setError("");
+        return;
+      }
+      const opener = operationOpenerRef.current;
+      if (opener?.isConnected && opener.getClientRects().length && !opener.matches(":disabled")) opener.focus();
+      else moreTriggerRef.current?.focus();
+    }}
+    onReview={(command, body, summary, draftCommit, expectedVersion) => {
+      const next = {
+        action: command,
+        body,
+        summary,
+        expectedVersion: expectedVersion ?? data.version,
+        ...(draftCommit ? { draftCommit } : {}),
+      };
+      setReview(next);
+      if (coveredOperation) void execute(next);
+    }}
+  /> : null;
   if (!data && loading) return null;
   return (
     <div className="hca-record-detail doc-page">
@@ -1038,9 +1085,9 @@ export function SupplyDocumentContent({
         {loading && data ? "Atualizando consulta da ficha…" : ""}
       </span>
       {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
-      {error && !authorizingPurchase && !countingDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation ? <Notice error>{error}</Notice> : null}
+      {error && !operationFromCompletion && !authorizingPurchase && !countingDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      {!coveredOperation && !cancellingPurchase ? purchaseConflictPanel : null}
+      {!coveredOperation && !cancellingPurchase && !operationFromCompletion ? purchaseConflictPanel : null}
       {deliveryConflict && data?.type === "ENT" && !countingDelivery && !reconcilingDelivery && !cancellingTransit && !reviewingCancellation ? (
         <section className="ui-card space-y-3">
           <Notice error>
@@ -1232,15 +1279,33 @@ export function SupplyDocumentContent({
                         if (!familyReviewRef.current?.(line.id, returnToReview)) returnToReview();
                       },
                     })),
-                  } : pendingArrivalIds.length ? {
-                    com_validation: [{
+                  } : data.type === "COM" ? {
+                    com_approval: actions.includes("approve") ? [{
+                      id: "approve-purchase", label: "Autorizar a compra",
+                      open: returnToReview => openFromCompletion("approve", returnToReview),
+                    }] : undefined,
+                    com_expectation: [
+                      ...(actions.includes("purchase") ? [{
+                        id: "register-purchase", label: data.payload.origin === "donation" ? "Registrar aquisição" : "Registrar compra",
+                        open: (resume: () => void) => openFromCompletion("purchase", resume),
+                      }] : []),
+                      ...(actions.includes("close_expectation") ? [{
+                        id: "close-expectation", label: actionLabels.close_expectation,
+                        open: (resume: () => void) => openFromCompletion("close_expectation", resume),
+                      }] : []),
+                    ],
+                    com_arrival: actions.includes("receive") ? [{
+                      id: "register-arrival", label: "Registrar chegada",
+                      open: returnToReview => openFromCompletion("receive", returnToReview),
+                    }] : undefined,
+                    com_validation: pendingArrivalIds.length ? [{
                       id: "review-arrivals", label: pendingArrivalIds.length === 1 ? "Revisar chegada" : "Revisar chegadas",
                       open: returnToReview => {
                         const open = changedArrivalsRef.current;
                         if (open) open(pendingArrivalIds, () => moreTriggerRef.current, returnToReview);
                         else returnToReview();
                       },
-                    }],
+                    }] : undefined,
                   } : undefined}
                   onCompleteAndArchive={patientAdmin && !followUpTerminal && !purchaseIdentificationPending ? () => setArchiveDialog("archive") : undefined}
                   preservedFacts={data.type === "ENT" ? data.lines.map(line => {
@@ -1573,65 +1638,14 @@ export function SupplyDocumentContent({
                   ) : null}
                 </section>
               ) : null}
-              {!countingDelivery && !reassigningDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation && (actions.length || action) ? (
+              {!operationFromCompletion && !countingDelivery && !reassigningDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation && (actions.length || action) ? (
                 <section className="ui-card">
                   <h2>
                     {action && !actions.includes(action)
                       ? "Seu preenchimento preservado"
                       : "Próxima ação"}
                   </h2>
-                  {action ? (
-                    <CommandEditor
-                      key={data.id + action}
-                      referenceAdoptionRef={referenceAdoptionRef}
-                      recoveryOnly={!actions.includes(action)}
-                      action={action}
-                      purchaseFeedback={error}
-                      purchaseConflictContent={purchaseConflictPanel}
-                      confirmationPending={busy || uncertain}
-                      data={data}
-                      context={context}
-                      formRef={commandFormRef}
-                      reviewDisabled={
-                        busy ||
-                        uncertain ||
-                        purchaseConflict ||
-                        deliveryConflict
-                      }
-                      onCancel={() => {
-                        setAction(null);
-                        setPurchaseConflict(false);
-                        setDeliveryConflict(false);
-                        setComparison(null);
-                        setAttempt((value) => value + 1);
-                        const opener = operationOpenerRef.current;
-                        if (
-                          opener?.isConnected &&
-                          opener.getClientRects().length &&
-                          !opener.matches(":disabled")
-                        )
-                          opener.focus();
-                        else moreTriggerRef.current?.focus();
-                      }}
-                      onReview={(
-                        command,
-                        body,
-                        summary,
-                        draftCommit,
-                        expectedVersion,
-                      ) => {
-                        const next = {
-                          action: command,
-                          body,
-                          summary,
-                          expectedVersion: expectedVersion ?? data.version,
-                          ...(draftCommit ? { draftCommit } : {}),
-                        };
-                        setReview(next);
-                        if (coveredOperation) void execute(next);
-                      }}
-                    />
-                  ) : null}
+                  {commandEditor}
                   {!action ? (
                     <p className="hca-field-help">
                       Escolha uma ação autorizada no cabeçalho. Consultar as
@@ -1693,6 +1707,7 @@ export function SupplyDocumentContent({
           </DocumentTabs>
         </>
       ) : null}
+      {operationFromCompletion && data?.type === "COM" && activeContext && !readDenied ? commandEditor : null}
       {data && reassigningDelivery && !readDenied && activeContext ? <DeliveryReassignment
         key={data.id}
         data={data} patientName={context.patient?.display_name ?? "Paciente identificado na ficha"}
@@ -1945,17 +1960,20 @@ export function SupplyDocumentContent({
       </Dialog>
       {purchaseResult?.documentId === id && !readDenied && !purchaseUpdating ? <PurchaseResult result={purchaseResult} onClose={() => {
         setPurchaseResult(null);
+        if (returnToCompletion()) return;
         resultFocusRef.current = true;
         setFocusRevision(value => value + 1);
       }} /> : null}
       {purchaseApprovalResult?.id === id && !readDenied && activeContext ? <PurchaseApprovalResult data={purchaseApprovalResult} onClose={() => {
         setPurchaseApprovalResult(null);
+        if (returnToCompletion()) return;
         resultFocusRef.current = true;
         setFocusRevision(value => value + 1);
       }} /> : null}
       {arrivalResult?.documentId === id && data && !readDenied ? <PurchaseArrivalResult receipt={arrivalResult.receipt} lines={data.lines}
         onClose={() => {
           setArrivalResult(null);
+          if (returnToCompletion()) return;
           resultFocusRef.current = true;
           setFocusRevision(value => value + 1);
         }} /> : null}

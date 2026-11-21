@@ -374,3 +374,88 @@ test("COM revisa a chegada a partir do bloqueio e retorna à conclusão com a re
   expect(await rpc(admin, "document_follow_up_reference", { p_id: planned.id })).toMatchObject({ state: "completed", lastAct: { reason: "Resumo fictício para a conclusão da COM." } });
   expect(terminalLedger(patient)).toBe(stock);
 });
+
+test("COM resolve as pendências de autorização, aquisição e chegada pela revisão de conclusão", async ({ page }, info) => {
+  const { admin, patient, products } = await setup();
+  const family = await shiftWorker(patient, "family");
+  const reviewer = await shiftWorker(patient, "admin");
+  const planned = await rpc(family.client, "create_supply_document", {
+    p_patient: patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+    p_payload: { origin: "purchase", lines: [{ productId: products[0], quantity: "6" }] },
+  }) as SupplyDocument;
+  const [line] = planned.lines;
+  const originalStock = terminalLedger(patient);
+  const observation = "Observação de conclusão preservada ao resolver as pendências desta compra.";
+  await loginDecision(page, reviewer.email, patient);
+  await page.goto(`/fichas/${planned.id}`);
+  await openDocumentAction(page, "Revisar conclusão");
+  const closure = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+  const note = closure.getByRole("textbox", { name: "Observação da conclusão", exact: true });
+  const confirm = closure.getByRole("button", { name: "Concluir", exact: true });
+  const authorize = closure.getByRole("button", { name: "Autorizar a compra", exact: true });
+  const writes = noPrivateWrites(page);
+  await note.fill(observation);
+  await expect(confirm).toBeDisabled();
+  await authorize.click();
+  const approval = page.getByRole("dialog", { name: "Autorizar a compra", exact: true });
+  await approval.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(note).toHaveValue(observation);
+  expect(terminalLedger(patient)).toBe(originalStock);
+  await authorize.click();
+  await approval.getByRole("button", { name: "Autorizar selecionados", exact: true }).click();
+  await page.getByRole("dialog", { name: "Compra autorizada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(note).toHaveValue(observation);
+  await expect(authorize).toHaveCount(0);
+
+  const register = closure.getByRole("button", { name: "Registrar compra", exact: true });
+  await register.click();
+  const purchase = page.getByRole("dialog", { name: "Registrar compra", exact: true });
+  await purchase.getByRole("textbox", { name: `${line.name_snapshot} · ${line.unit_snapshot}`, exact: true }).fill("4");
+  await purchase.getByRole("button", { name: "Confirmar compra", exact: true }).click();
+  await page.getByRole("dialog", { name: "Compra registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(note).toHaveValue(observation);
+  expect(terminalLedger(patient)).toBe(originalStock);
+
+  const endExpectation = closure.getByRole("button", { name: "Encerrar expectativa restante", exact: true });
+  await endExpectation.click();
+  const expectation = page.getByRole("dialog", { name: "Encerrar expectativa restante", exact: true });
+  const reason = expectation.getByRole("textbox", { name: "Motivo / justificativa", exact: true });
+  const waiver = "As duas unidades restantes não serão adquiridas.";
+  const prepare = expectation.getByRole("button", { name: "Revisar operação", exact: true });
+  await reason.fill(waiver);
+  await expectation.getByRole("checkbox", { name: "Conferi o resumo e confirmo dispensar somente a expectativa não adquirida.", exact: true }).check();
+  await expect(reason).toHaveValue(waiver);
+  await prepare.click();
+  const waiverReview = page.getByRole("dialog", { name: "Revisar encerramento da expectativa", exact: true });
+  await waiverReview.getByRole("button", { name: "Manter restante", exact: true }).click();
+  await expect(reason).toHaveValue(waiver);
+  await prepare.click();
+  await waiverReview.getByRole("button", { name: "Confirmar encerramento da expectativa", exact: true }).click();
+  await expect(note).toHaveValue(observation);
+  await expect(endExpectation).toHaveCount(0);
+  await expect(confirm).toBeDisabled();
+  expect(terminalLedger(patient)).toBe(originalStock);
+  const updated = await rpc(admin, "operational_document", { p_id: planned.id }) as SupplyDocument;
+  expect(Number(updated.lines[0].waived_quantity)).toBe(2);
+
+  if (info.project.use.hasTouch) {
+    const path = info.outputPath("E05-12-registrar-chegada.png");
+    await closure.screenshot({ path, scale: "css", animations: "disabled" });
+    await info.attach("Revisão após encerrar a expectativa", { path, contentType: "image/png" });
+  }
+  await closure.getByRole("button", { name: "Registrar chegada", exact: true }).click();
+  const arrival = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
+  await arrival.locator(`input[name="${line.id}"]`).fill("4");
+  await arrival.getByRole("button", { name: "Confirmar entrada", exact: true }).click();
+  await page.getByRole("dialog", { name: "Entrada confirmada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(note).toHaveValue(observation);
+  await expect(page.locator('[role="tab"][aria-selected="true"]')).toHaveText("Visão geral");
+  await expect(confirm).toBeEnabled();
+  const stock = terminalLedger(patient);
+  expect(JSON.parse(stock)).toHaveLength(JSON.parse(originalStock).length + 1);
+  await confirm.click();
+  await page.getByRole("dialog", { name: "Ficha concluída", exact: true }).getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  expect(await rpc(admin, "document_follow_up_reference", { p_id: planned.id })).toMatchObject({ state: "completed", lastAct: { reason: observation } });
+  expect(terminalLedger(patient)).toBe(stock);
+  expect(writes).toEqual([]);
+});

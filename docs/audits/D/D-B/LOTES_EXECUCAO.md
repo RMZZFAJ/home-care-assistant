@@ -230,6 +230,24 @@ Build, TypeScript e lint dos arquivos alterados passaram. O recorte é de
 interface e testes. As referências de 390 px estão em
 `output/playwright/l2-ent-dev-follow-up/`.
 
+Na COM, o padrão de E05-12 também abre a autorização, o registro da compra,
+o encerramento da expectativa não adquirida e o registro da chegada
+quando a pendência admite o ato e a pessoa tem acesso. O encerramento usa
+o formulário e a confirmação existentes em diálogo. Ao voltar de qualquer
+dessas operações, a revisão relê os bloqueios e conserva a observação e a
+aba de origem. Autorizar, adquirir, encerrar expectativa e confirmar a
+entrada continuam sendo atos próprios com os comandos vigentes.
+
+O laboratório demonstra o atalho de conferência da chegada. Os quatro
+atalhos complementares usam o mesmo padrão para os demais bloqueios reais.
+No iOS emulado, o primeiro ensaio revelou perda do motivo ao preencher a
+dispensa. O formulário passou a manter o texto ao alternar entre edição
+e confirmação. Os 12 casos do reteste passaram em Android e iOS emulados,
+sem repetição automática. A autorização, a compra e o encerramento da
+expectativa preservaram o estoque. A chegada confirmada registrou uma
+única entrada e a conclusão preservou a observação. As capturas estão em
+`output/playwright/l2-com-closure/`. As mudanças usam as migrations existentes.
+
 **Avaliação familiar a partir de REQ e ENT.** A REQ indica a avaliação
 pendente junto ao item e no próximo passo sugerido quando já há
 recebimento registrado. A ação no painel do material abre o diálogo da
