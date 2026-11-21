@@ -87,6 +87,36 @@ cenários e 175 variantes foram abertos no laboratório. A evidência do produto
 O HTML aprovado conserva uma linha original com espaço final. Seu SHA-256
 confere com o comando mestre.
 
+### Conferência no celular
+
+Use um paciente de homologação e entre com o papel de cada ato. A prévia
+acompanha a PR 7.
+[Preview da branch](https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app).
+
+- **Fichas → Nova requisição** (`/fichas/req`). Em Materiais, passe pelas
+  categorias e compare um estoque conhecido com outro desconhecido. A edição
+  pela revisão volta ao item. O vínculo de um material fica em seus três
+  pontos. Após a emissão, abra a ficha e depois inicie uma nova REQ.
+- **Fichas → Nova compra** (`/fichas/com`) e **Estoque** (`/estoque`). Vincule
+  uma REQ, autorize o planejamento e registre parte da compra como em mãos.
+  Confira o saldo disponível para ENT. Em uma chegada posterior, combine
+  leitura do código e quantidade manual e confira a entrada de estoque após
+  a aprovação aplicável.
+- **Fichas → Nova entrega** (`/fichas/ent`) e **Nova devolução**
+  (`/fichas/devolucao`). Confira a custódia de origem e o recebedor. A pessoa
+  designada confirma o recebimento. Compare a quantidade expedida, a
+  efetivamente recebida e o saldo em trânsito quando houver diferença. Na ENT,
+  confira a avaliação familiar separadamente.
+- **Ficha emitida → Materiais**. Selecione um item e abra Estoque, Histórico e
+  Fichas vinculadas. Ao voltar de uma ficha relacionada, a seleção, o filtro e
+  a posição são restaurados. Na REQ, Ciência familiar está em Visão geral.
+- **Ficha concluída ou cancelada → Mais**. Use a revisão de arquivamento em
+  ficha fictícia, baixe o PDF consolidado e confira a confirmação ou a reversão
+  administrativa. Na reversão, o exemplar já emitido permanece disponível e os
+  Andamentos voltam a aceitar registros autorizados.
+
+### Jornadas e verificações
+
 - **REQ e formulários E04–E06.** Cinco etapas da v7, categorias em Materiais,
   listas da casa, consulta, urgência e retomada na categoria exata. Contagem
   de equipe e emissão transacionais. Cancelamento compara o estoque antes e
@@ -422,6 +452,23 @@ laboratório usou a composição de E04-12, E04-14, E05-12, E05-13 e E06-10.
 O produto preserva os dados reais inclusive quando o prazo configurado é
 de 11 dias. O teste de conclusão e arquivo verificou a preservação do PDF
 assinado após reverter o arquivamento.
+
+O candidato local `21a62a69` passou seis casos de arquivamento da ENT em
+Android e iOS emulados, sem repetição automática. A interface abriu as duas
+revisões, concluiu a ficha e emitiu o PDF consolidado no arquivamento.
+Os casos com Auth real verificaram o perfil PAdES-B-T, o reenvio pela mesma
+chave, as restrições de emissão e de Andamentos durante o arquivo e os atos
+de confirmação e reversão. O estoque e os bytes do PDF foram preservados.
+As capturas locais estão em `output/playwright/l2-archive-current/`.
+
+Na comparação com o arquivamento manual de E05-13 a 390 px, o seletor de
+motivo da aplicação fica abaixo dos três itens da revisão. No reteste em
+Android e iOS, **Outro motivo** exigiu justificativa. A mesma justificativa
+apareceu na confirmação administrativa, e a reversão preservou o exemplar
+e o estoque. A primeira rodada atingiu o limite de espera do teste durante
+a assinatura e ao abrir o menu. A rodada final usou um administrador de
+teste com vínculo isolado, aguardou a ficha e deu à assinatura a janela
+da rota. Os dois casos passaram sem repetição automática.
 
 As 29 integrações dirigidas usaram Auth real. A verificação conferiu
 recusa sem autoridade, manutenção de pedidos com chegadas abertas,
@@ -1445,6 +1492,12 @@ O manifesto confirmou as 84 migrations protegidas.
 
 ## Estado de publicação e próximos lotes
 
+A [CI de `b74013c4`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44886723003)
+passou nas validações Windows e Ubuntu, na instalação limpa, na evolução
+legada e em 830 testes de integração. Os seis grupos de navegador estavam
+executando os E2E na consulta de 21/11. O ajuste das chegadas `21a62a69`
+ficou local durante essa execução para evitar o cancelamento do workflow.
+
 A [CI 44477574161](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44477574161)
 concluiu com sucesso para `075b4b66` e os 15 checks exibidos na PR estão
 aprovados para esse SHA. O workflow foi executado uma vez e os logs dos seis
@@ -1512,7 +1565,15 @@ Na rodada de acessibilidade, a abertura do início no Android e a emissão de
 COM no iOS atingiram timeout. Uma sonda local de leitura mediu 8,4 s em
 `private.purchase_arrival_coverage_facts` para um identificador sem ficha,
 com cerca de 36 alocações na tabela. O tempo de `select 1` na mesma sessão
-foi de 0,1 ms. A causa e a extensão da lentidão seguem em investigação.
+foi de 0,1 ms. A causa dessa medição ficou indeterminada.
+
+Na nova sonda de leitura de 21/11, a stack local tinha 47 alocações e
+10.764 fichas. A primeira execução de `EXPLAIN ANALYZE` para um
+identificador sem ficha levou 11,7 ms. A consulta repetida e os casos
+com compra coberta, compra de origem e chegada avulsa levaram de 5,4 a
+6,8 ms. A consulta ausente retornou uma lista vazia e os casos com vínculo
+retornaram de um a dois registros. A medição anterior de 8,4 s não se
+repetiu. A sonda foi somente leitura.
 
 O SonarCloud da PR registrou oito apontamentos e notas C de confiabilidade
 e segurança no código novo. Quatro S6853 apontaram rótulos cujos textos
