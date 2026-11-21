@@ -104,6 +104,14 @@ test("COM operational source is preserved independently of requisition line fulf
   });
   assert.equal(revise.error?.code, "42501");
   assert.equal((await rpc(f.admin, "operational_document", { p_id: draft.id })).payload.sourceSet, draft.payload.sourceSet);
+
+  sql(`delete from public.capability_overrides where care_recipient_id=${q(f.patient)}
+    and subject_user=${q(fixtures.adminA.id)} and capability='req.read';
+    update public.care_recipients set is_active=false where id=${q(f.patient)};`);
+  assert.deepEqual(await related(), [{ id: created.id, type: "COM", code: created.code, status: created.status }]);
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(fixtures.adminA.id)},'req.read',false)`);
+  assert.equal((await f.admin.rpc("requisition_related_documents", { p_requisition: req.id })).error?.code, "42501");
 });
 
 test("ENT imports only approved COM arrivals within available family stock", async () => {
