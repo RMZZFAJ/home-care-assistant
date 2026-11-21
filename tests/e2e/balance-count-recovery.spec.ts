@@ -273,12 +273,12 @@ test("BAL scheduled private discard preserves a different operational attempt on
     lastDraftPanel(page),
   ).toHaveText("Último rascunho salvo.");
   await page.reload();
-  const resume = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
+  const resume = page.getByRole("dialog", { name: "Continuar o preenchimento?", exact: true });
   await expect(resume).toBeVisible();
   await expect(resume.getByRole("heading", { name: `Materiais preenchidos · ${f.products.length}`, exact: true })).toBeVisible();
   const firstCount = resume.getByRole("listitem").filter({ has: page.getByText("Material fictício V4 0", { exact: true }) });
   await expect(firstCount.getByText("0 unidade", { exact: true })).toBeVisible();
-  const discard = resume.getByRole("button", { name: "Descartar e começar novamente", exact: true });
+  const discard = resume.getByRole("button", { name: "Descartar e começar", exact: true });
   const continueDraft = resume.getByRole("button", { name: "Continuar rascunho", exact: true });
   const originalViewport = page.viewportSize();
   for (const width of [360, 412]) {

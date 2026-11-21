@@ -59,7 +59,11 @@ test("autonomous return resumes its preparation, ships from the daily entry and 
   expect((await saved).ok()).toBe(true);
   expect(transferState(f)).toBe(before);
   await page.reload();
-  await page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true }).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  const draft = page.getByRole("dialog", { name: "Continuar o preenchimento?", exact: true });
+  await draft.getByRole("button", { name: "Fechar sem descartar rascunho", exact: true }).click();
+  await expect(page).toHaveURL(url => url.pathname === "/fichas");
+  await page.goto("/fichas/devolucao");
+  await draft.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await editor.getByRole("button", { name: "Comparar referência atual", exact: true }).click();
   await editor.getByRole("button", { name: "Adotar referência atual e revisar meus campos", exact: true }).click();
   await expect(editor.getByLabel("Observação 1", { exact: true })).toHaveValue(reason);

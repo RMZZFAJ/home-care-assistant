@@ -933,6 +933,7 @@ function ScheduledCount({
       draft={privateDraft}
       current={balanceContent}
       statusInFooter={initial.eligibility.available && !cacheError}
+      exitHref="/balancos"
       patientName={context.patient!.display_name}
       authorName={context.fullName}
       disabled={busy || uncertain || Boolean(cacheError)}

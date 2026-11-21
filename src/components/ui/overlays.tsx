@@ -15,6 +15,7 @@ type OverlayProps = {
   footer?: ReactNode;
   onClose: () => void;
   closeDisabled?: boolean;
+  dismissOnOutsideClick?: boolean;
   closeLabel?: string;
   finalFocus?: ComponentProps<typeof BaseDialog.Popup>["finalFocus"];
   id?: string;
@@ -26,10 +27,10 @@ type OverlayProps = {
   contentRef?: ComponentProps<"div">["ref"];
 };
 
-function Overlay({ open, title, kicker, subtitle, headingIcon, children, navigation, footer, onClose, closeDisabled = false, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false, keepMounted = false, success = false, failure, popupClassName, contentRef }: OverlayProps & { side?: "start" | "end" }) {
+function Overlay({ open, title, kicker, subtitle, headingIcon, children, navigation, footer, onClose, closeDisabled = false, dismissOnOutsideClick = true, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false, keepMounted = false, success = false, failure, popupClassName, contentRef }: OverlayProps & { side?: "start" | "end" }) {
   const titleId = useId();
   const outcome = success ? "success" : failure;
-  return <BaseDialog.Root open={open} disablePointerDismissal={closeDisabled} onOpenChange={(next, details) => {
+  return <BaseDialog.Root open={open} disablePointerDismissal={closeDisabled || !dismissOnOutsideClick} onOpenChange={(next, details) => {
     if (next) return;
     if (closeDisabled) details.cancel(); else onClose();
   }}>

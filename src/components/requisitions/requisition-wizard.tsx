@@ -714,6 +714,7 @@ function PatientRequisition({
         draft={privateDraft}
         current={draftContent}
         statusInFooter
+        exitHref={sourceId ? "/fichas/" + encodeURIComponent(sourceId) : "/fichas"}
         patientName={context.patient!.display_name}
         authorName={context.fullName}
         legacy={legacyDraft ? { ...legacyDraft, resume: () => {

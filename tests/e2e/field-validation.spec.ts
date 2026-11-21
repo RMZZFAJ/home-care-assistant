@@ -259,7 +259,7 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
   await page.goto("/fichas/req");
   await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toBeEnabled();
   await expect(page.getByRole("dialog", { name: "Resultado anterior confirmado", exact: true })).toHaveCount(0);
-  await expect(page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "Continuar o preenchimento?", exact: true })).toHaveCount(0);
   expect(acknowledgementKeys).toEqual([expect.any(String), acknowledgementKeys[0]]);
   expect(commands).toBe(1);
 });

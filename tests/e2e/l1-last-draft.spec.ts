@@ -22,7 +22,7 @@ for (const kind of ["REQ", "COM"] as const) test(`${kind}: uma cópia local anti
   await page.evaluate(({ key, form }) => sessionStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), form })), { key, form });
   const url = `/fichas/${kind.toLowerCase()}?careRecipientId=${f.patient}`;
   await page.goto(url);
-  const choice = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
+  const choice = page.getByRole("dialog", { name: "Continuar o preenchimento?", exact: true });
   await expect(choice).toContainText("Material fictício V4 0");
   await expect(choice).toContainText("Etapa não registrada");
   await choice.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
@@ -32,13 +32,13 @@ for (const kind of ["REQ", "COM"] as const) test(`${kind}: uma cópia local anti
   await page.reload();
   await expect(choice).toContainText("Material fictício V4 0");
   await expect(choice).not.toContainText("Etapa não registrada");
-  await choice.getByRole("button", { name: "Descartar e começar novamente", exact: true }).click();
+  await choice.getByRole("button", { name: "Descartar e começar", exact: true }).click();
   await expect(choice).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toBeEnabled();
   expect(await page.evaluate(key => sessionStorage.getItem(key), key)).toBeNull();
 });
 
-for (const kind of ["REQ", "COM", "ENT", "BAL"] as const) test(`${kind}: somente o último rascunho guarda campos parciais sem bloquear digitação; retomada oferece continuar ou descartar`, async ({ page }) => {
+for (const kind of ["REQ", "COM", "ENT", "BAL"] as const) test(`${kind}: somente o último rascunho guarda campos parciais sem bloquear digitação; retomada oferece continuar ou descartar`, async ({ page }, info) => {
   const f = fixture, professional = kind === "REQ" || kind === "BAL";
   // A fresh real Auth identity keeps this draft test independent of the retained
   // fixture accounts' patient chooser and of unrelated prior test memberships.
@@ -59,9 +59,23 @@ for (const kind of ["REQ", "COM", "ENT", "BAL"] as const) test(`${kind}: somente
     } },
   });
   const before = officialState(f), url = `/fichas/${kind.toLowerCase()}?careRecipientId=${f.patient}`;
+  if (kind === "COM" && info.project.name !== "chromium") {
+    await page.setViewportSize({ width: info.project.name === "ios" ? 412 : 360, height: 844 });
+  }
   await loginDecision(page, user.email, f.patient); await page.goto(url);
-  const choice = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
-  await expect(choice).toBeVisible(); await choice.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  const choice = page.getByRole("dialog", { name: "Continuar o preenchimento?", exact: true });
+  await expect(choice).toBeVisible();
+  if (kind === "COM") {
+    await expect(choice).toContainText("Última gravação");
+    await expect(choice).toContainText("Etapa salva");
+    await expect(choice.getByRole("listitem").filter({ hasText: "Material fictício V4 0" })).toContainText("1, unidade");
+    await info.attach("E05-05 resumo do rascunho", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+    await choice.getByRole("button", { name: "Fechar sem descartar rascunho", exact: true }).click();
+    await expect(page).toHaveURL(value => value.pathname === "/fichas");
+    await page.goto(url);
+    await expect(choice).toContainText("1, unidade");
+  }
+  await choice.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   const input = kind === "REQ" ? page.getByLabel("Observação 1", { exact: true }) : page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
   const value = kind === "REQ" ? "Último texto salvo discretamente, sem emitir ficha." : "3,";
   await expect(input).toBeEnabled(); await input.fill(value);
@@ -73,7 +87,7 @@ for (const kind of ["REQ", "COM", "ENT", "BAL"] as const) test(`${kind}: somente
   await expect(input).toBeEnabled(); expect(officialState(f)).toBe(before);
   await page.reload(); await expect(choice).toBeVisible(); await choice.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(input).toHaveValue(value); await audit(page, "L1 último rascunho " + kind);
-  await page.reload(); await choice.getByRole("button", { name: "Descartar e começar novamente", exact: true }).click();
+  await page.reload(); await choice.getByRole("button", { name: "Descartar e começar", exact: true }).click();
   await expect(choice).toHaveCount(0);
   // A discard must not be followed by saving the newly empty form.
   await page.waitForTimeout(1200);

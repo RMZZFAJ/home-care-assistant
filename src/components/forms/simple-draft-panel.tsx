@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, type ComponentProps } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
@@ -64,13 +65,16 @@ function DraftMaterials({ content }: { content: CreationDraftContent | null }) {
 }
 
 /** One resume choice; exceptional concurrency/recovery retains its real controls. */
-export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você", documentLabel, legacy, ...props }: ComponentProps<typeof CreationDraftPanel> & {
+export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você", documentLabel, exitHref, onExitDraft, legacy, ...props }: ComponentProps<typeof CreationDraftPanel> & {
   statusInFooter?: boolean;
   authorName?: string;
   documentLabel?: string;
+  exitHref?: string;
+  onExitDraft?: () => void;
   legacy?: { content: CreationDraftContent; savedAt: string; resume: () => void; discard: () => void };
 }) {
   const { draft, disabled = false, canResume = true, patientName } = props;
+  const router = useRouter();
   const { acknowledge, consumed, recover } = draft;
   const wizard = draft.kind !== "PROGRESS";
   const label = documentLabel ?? (draft.kind ? draftLabels[draft.kind] : undefined);
@@ -113,18 +117,21 @@ export function SimpleDraftPanel({ statusInFooter = false, authorName = "Você",
   const local = wizard && !draft.loading && !draft.base && !offered ? legacy : undefined;
   const summary = offered?.state === "active" ? offered : local;
   if (summary) {
-    const resume = !local && props.resumeHref ? <Link className="hca-control" href={props.resumeHref}>Continuar rascunho</Link>
+    const resumeContent = <>{wizard ? <Icon name="arrow" /> : null}{props.resumeLabel ?? "Continuar rascunho"}</>;
+    const resume = !local && props.resumeHref ? <Link className="hca-control hca-control--primary btn btn-primary" href={props.resumeHref}>{resumeContent}</Link>
       : <ActionButton variant="primary" disabled={draft.busy || disabled || !canResume} onClick={() => local ? local.resume() : draft.resume()}>
-        {props.resumeLabel ?? "Continuar rascunho"}{wizard ? <Icon name="arrow" /> : null}
+        {resumeContent}
       </ActionButton>;
     const discard = <ActionButton disabled={draft.busy || disabled} onClick={() => {
       if (local) local.discard();
       else void draft.discard();
     }}>
-      {wizard ? <Icon name="trash" /> : null}{props.discardLabel ?? "Descartar e começar novamente"}
+      {wizard ? <Icon name="trash" /> : null}{props.discardLabel ?? (wizard ? "Descartar e começar" : "Descartar e começar novamente")}
     </ActionButton>;
-    if (wizard) return <Dialog open title="Continuar seu rascunho?" kicker={label ? `${label} · rascunho` : "Rascunho da ficha"} popupClassName="hca-wizard-dialog hca-draft-dialog"
-      subtitle="Você tem um rascunho desta ficha para este paciente." closeDisabled onClose={() => {}}
+    if (wizard) return <Dialog open title="Continuar o preenchimento?" kicker={label ? `${label} · rascunho` : "Rascunho da ficha"} popupClassName="hca-wizard-dialog hca-draft-dialog"
+      subtitle="Você tem um rascunho desta ficha para este paciente." dismissOnOutsideClick={false}
+      closeDisabled={!(exitHref || onExitDraft) || draft.busy || disabled} closeLabel="Fechar sem descartar rascunho"
+      onClose={onExitDraft ?? (() => { if (exitHref) router.push(exitHref); })}
       keyboardScrollable footer={<>{discard}{resume}</>}>
       <div className="hca-form-stack">
         <DefinitionGrid items={[

@@ -84,7 +84,7 @@ test("L2 abertura distingue catálogo vazio e inativo e oferece cadastro somente
   await item.getByRole("button", { name: "Adicionar material", exact: true }).click();
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   await page.reload();
-  const resume = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
+  const resume = page.getByRole("dialog", { name: "Continuar o preenchimento?", exact: true });
   await resume.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(page.getByText("Protetor lavável fictício", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Continuar", exact: true }).click();

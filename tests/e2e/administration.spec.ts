@@ -661,7 +661,7 @@ test.describe("administração integrada no ambiente local", () => {
       return { observations: saved?.content?.observations, lines: saved?.content?.lines?.length, stage: saved?.navigation?.stage };
     }).toEqual({ observations: ["Usar no kit do plantão."], lines: 1, stage: "dieta" });
     await page.reload();
-    await expect(page.getByRole("dialog", { name: "Continuar seu rascunho?" })).toContainText("Gaze");
+    await expect(page.getByRole("dialog", { name: "Continuar o preenchimento?" })).toContainText("Gaze");
     await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
     await expect(diet).toBeVisible();
     await next.click();

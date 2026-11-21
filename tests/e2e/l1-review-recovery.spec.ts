@@ -185,8 +185,8 @@ test("L1 pré-vínculo oferece só a necessidade em aberto e descarte exige nova
       and kind='ENT' and state='active'`)).toBe("complete");
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   await page.reload();
-  const resume = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
-  await resume.getByRole("button", { name: "Descartar e começar novamente", exact: true }).click();
+  const resume = page.getByRole("dialog", { name: "Continuar o preenchimento?", exact: true });
+  await resume.getByRole("button", { name: "Descartar e começar", exact: true }).click();
   await openMaterials();
   await expect(choice).not.toBeChecked();
   expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)} and type='ENT'`)).toBe("1");

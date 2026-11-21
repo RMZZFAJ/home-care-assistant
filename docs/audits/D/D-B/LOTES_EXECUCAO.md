@@ -929,8 +929,10 @@ A busca de materiais continua disponível no controle compartilhado com REQ.
 Quatro execuções passaram em Android de 360 px e iOS de 412 px emulados,
 sem repetição. A conferência incluiu retorno do foco, atualização do saldo
 e preservação da quantidade editada. Capturas e relatório em
-`output/playwright/l2-com-linked-counts/`. CI e preview do incremento
-continuam pendentes.
+`output/playwright/l2-com-linked-counts/`. Para `37ac93a9`, Windows,
+Ubuntu, Sonar e o job de banco passaram. O log do banco registra 831
+integrações aprovadas. O preview foi publicado e os testes de navegador
+entraram em execução. [CI de `37ac93a9`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/44897709633).
 
 **E06-02, recebedor da ENT.** O seletor segue a lista do v7, com o plantão
 atual primeiro e o próximo em etiqueta de outra cor. A escala publicada
@@ -946,6 +948,22 @@ novo de integração com Auth real distinguiu plantões mais distantes,
 cancelados, de outro paciente e de pessoas que perderam a permissão.
 As 11 regressões do mesmo arquivo também passaram. Capturas e relatório
 em `output/playwright/l2-recipient-shift/`.
+
+**E05-05, retomada do rascunho da COM.** O diálogo compartilhado usa o
+título e as ações do v7. Fechar sai do assistente e guarda o rascunho como
+estava. Continuar reabre a etapa salva, e Descartar e começar
+remove somente aquele preenchimento privado. A lista usa os nomes e
+quantidades do rascunho. Os códigos curtos de demonstração não têm campo
+equivalente no catálogo atual. A persistência usa o mesmo contrato e
+este ajuste dispensa migration.
+Capturas da COM em Android de 360 px e iOS de 412 px emulados em
+`output/playwright/l2-purchase-draft/`. As duas execuções da COM
+confirmaram a quantidade preservada ao fechar e reabrir, a volta à etapa
+salva e o descarte sem novos atos oficiais. Os cinco assistentes foram
+validados nos dois navegadores emulados. O BAL no iOS excedeu o tempo
+da asserção enquanto consultava o plantão na primeira rodada e passou
+isoladamente. A DEV também passou após incluir a saída pelo diálogo e
+a reabertura com as duas observações preservadas.
 
 **Continuidade do BAL existente.** Ao adotar a nova referência, o
 salvamento automático guarda as contagens anteriores com data e notas.

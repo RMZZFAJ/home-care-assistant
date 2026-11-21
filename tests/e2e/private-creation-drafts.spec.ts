@@ -332,9 +332,9 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   expect(officialState(f)).toBe(before);
   await open(page, "REQ");
   await expect(panel(page)).toBeVisible();
-  const choice = page.getByRole("dialog", { name: "Continuar seu rascunho?", exact: true });
+  const choice = page.getByRole("dialog", { name: "Continuar o preenchimento?", exact: true });
   for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, `last-draft-discard-${width}`); }
-  await choice.getByRole("button", { name: "Descartar e começar novamente", exact: true }).click();
+  await choice.getByRole("button", { name: "Descartar e começar", exact: true }).click();
   await panel(page).getByRole("button", { name: "Recuperar salvamento ou descarte", exact: true }).click();
   expect(packets).toHaveLength(4); expect(packets[2]).toEqual(packets[3]);
   await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toBeEnabled();

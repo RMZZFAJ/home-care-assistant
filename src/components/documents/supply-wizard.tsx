@@ -1539,6 +1539,7 @@ export function PatientSupplyWizard({
     }
   }
   const exitDocumentId = documentId ?? routedSourceId;
+  const exitHref = exitDocumentId ? "/fichas/" + encodeURIComponent(exitDocumentId) : "/fichas";
   const navigation = <StepNavigator
     steps={steps}
     active={stage}
@@ -1561,6 +1562,7 @@ export function PatientSupplyWizard({
           draft={privateDraft}
           current={privateContent}
           statusInFooter
+          exitHref={exitHref}
           resumeHref={resumeHref}
           patientName={context.patient!.display_name}
           authorName={context.fullName}
@@ -1846,7 +1848,7 @@ export function PatientSupplyWizard({
                 draftBusy={privateDraft.backgroundBusy}
                 hideDraftStatus={issuing || navigating}
                 supply={type === "BAL" ? undefined : { kind: type, draft: privateDraft, current: privateContent,
-                  hasEdits: draftTouched, exitHref: exitDocumentId ? "/fichas/" + encodeURIComponent(exitDocumentId) : "/fichas" }}
+                  hasEdits: draftTouched, exitHref }}
                 draftStatus={isBalance ? { draft: privateDraft, current: privateContent, hasEdits: draftTouched } : undefined}
                 uncertain={uncertain}
                 blocked={

@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — retomada do rascunho da COM.** O diálogo compartilhado usa o
+título e as ações do v7. Fechar guarda a última versão para depois.
+Continuar abre a etapa salva e Descartar e começar remove somente o
+preenchimento privado ativo. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — plantões na escolha do recebedor.** A ENT identifica o plantão
 atual e o próximo para cada pessoa habilitada da equipe. A pessoa escalada
 no momento continua sendo a sugestão quando não há ambiguidade.

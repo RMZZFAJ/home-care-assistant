@@ -92,7 +92,7 @@ async function open(page: Page, source: Custody) {
     .getByRole("button", { name: "Preparar declaração", exact: true })
     .click();
   const control = source === "CARE_TEAM" ? editor(page).getByRole("button", { name: /^(Alterar|Escolher) recebedor$/ }) : recipient(page);
-  await expect(page.getByRole("dialog",{name:"Continuar seu rascunho?",exact:true}).or(control).first()).toBeVisible();
+  await expect(page.getByRole("dialog",{name:"Continuar o preenchimento?",exact:true}).or(control).first()).toBeVisible();
 }
 async function fill(page: Page, f: Fixture, amount = "0,") {
   const reason = "Escolha confirmada com a pessoa que fará a conferência.";
@@ -333,7 +333,7 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
             editor(peer).getByText("Disponível na origem:", { exact: false }),
           ).toHaveCount(0);
           await expect(
-            peer.getByRole("dialog", { name: "Continuar seu rascunho?" }),
+            peer.getByRole("dialog", { name: "Continuar o preenchimento?" }),
           ).toHaveCount(0);
         }
         sql(
