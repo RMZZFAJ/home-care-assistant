@@ -214,6 +214,22 @@ e a orientação da pendência. Se a última avaliação registra a conclusão
 automática da REQ, a revisão informa o estado oficial e conserva a
 observação em leitura enquanto estiver aberta. Nenhuma migration neste ajuste.
 
+Na ENT e na DEV, a composição de E05-12 foi aplicada às pendências de
+recebimento pessoal e de conciliação do saldo em trânsito. Quem pode registrar
+o ato abre o mesmo diálogo da ficha pelo atalho da pendência. A operação
+registra o próprio resultado, e o retorno reabre a revisão com a observação
+preservada e consulta os bloqueios atuais. A conciliação usa os materiais e
+as quantidades reais, na composição de E06-08.
+
+Os quatro casos dirigidos passaram em Android e iOS emulados. Conferiram
+o fechamento sem movimento, a resposta perdida do recebimento, duas
+versões oficiais para os dois atos pessoais e a preservação da observação.
+Nas mesmas plataformas, a regressão da ENT confirmou que o administrador
+sem designação só consulta, e a da COM confirmou a revisão de chegada.
+Build, TypeScript e lint dos arquivos alterados passaram. O recorte é de
+interface e testes. As referências de 390 px estão em
+`output/playwright/l2-ent-dev-follow-up/`.
+
 **Avaliação familiar a partir de REQ e ENT.** A REQ indica a avaliação
 pendente junto ao item e no próximo passo sugerido quando já há
 recebimento registrado. A ação no painel do material abre o diálogo da

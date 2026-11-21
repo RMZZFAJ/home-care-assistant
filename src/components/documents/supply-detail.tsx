@@ -148,6 +148,7 @@ export function SupplyDocumentContent({
   const tabs = useDocumentTabs(can(context, "audit.read"));
   const fabRef = useRef<HTMLButtonElement>(null);
   const reviewControlRef = useRef<(opener: HTMLButtonElement | null) => void>(null);
+  const returnToCompletionRef = useRef<(() => void) | null>(null);
   const [fileActionTarget, setFileActionTarget] =
     useState<HTMLDivElement | null>(null);
   const editingRef = useRef(false);
@@ -311,6 +312,7 @@ export function SupplyDocumentContent({
     queueMicrotask(() => {
       if (!controller.signal.aborted) {
         if (changedScope) {
+          returnToCompletionRef.current = null;
           setCoveredRead(true);
           setArrivalReadFailure(null);
           setOpenRecoveredComparison(false);
@@ -355,6 +357,7 @@ export function SupplyDocumentContent({
             [401, 403, 404].includes(reason.status)
           ) {
             arrivalReadRef.current = null;
+            returnToCompletionRef.current = null;
             setArrivalReadFailure(null);
             setOpenRecoveredComparison(false);
             setReadDenied(true);
@@ -474,8 +477,10 @@ export function SupplyDocumentContent({
         ? result.data.lines.find(line => line.id !== resolution.lineId && deliveryTransit(line).gt(0) && readCountedDeliveryReceipt(line.metadata))?.id
         : undefined;
       if (!nextLineId) {
-        resultFocusRef.current = true;
-        setFocusRevision((value) => value + 1);
+        if (!returnToCompletionRef.current) {
+          resultFocusRef.current = true;
+          setFocusRevision((value) => value + 1);
+        }
         setAction(null);
       }
       if (result.data.version >= data.version) { setData(result.data); setReadFailed(false); }
@@ -788,7 +793,10 @@ export function SupplyDocumentContent({
         setAction(null);
         if (comparison.deliveryCancellation) setCancellationStatus(comparison);
       }
-    } else if (!pending) setAction(null);
+    } else if (!pending) {
+      setAction(null);
+      returnToCompletion();
+    }
     setFocusRevision((value) => value + 1);
     setMessage(
       pending || (action === "cancel" && reviewingCancellation && ["confirmed", "disputed"].includes(comparison.status))
@@ -805,7 +813,10 @@ export function SupplyDocumentContent({
     setDeliveryConflict(false);
     setError("");
     setReview(null);
-    if (!stillDisputed) setAction(null);
+    if (!stillDisputed) {
+      setAction(null);
+      returnToCompletion();
+    }
   }
   function renderDeliveryComparison(ready: boolean) {
     if (!data || !comparison) return null;
@@ -856,6 +867,45 @@ export function SupplyDocumentContent({
   const prepareReturn = operationalMenu && data?.type === "ENT" && data.kind !== "DEV"
     && allowed("ent.create") && allowed("stock.team.read");
 
+  function openOperation(item: DocumentAction, opener: HTMLButtonElement | null) {
+    operationOpenerRef.current = opener;
+    setReview(null);
+    if (item === "reassign" || (item === "receive" && data?.type === "ENT") || (item === "resolve" && hasCountedTransit) ||
+      (item === "cancel" && (data?.type === "COM" || hasUnreceivedDispatch || hasPersonalReceipt)) ||
+      item === "consent_cancel" || item === "withdraw_cancellation") {
+      setError("");
+      if (item === "resolve") setReconciliationResult(null);
+    } else {
+      decisionFocusRef.current = true;
+      setFocusRevision(value => value + 1);
+      tabs.select("workflow");
+      if (item === "approve" || item === "purchase" || (item === "receive" && data?.type === "COM")) setError("");
+    }
+    setAction(item);
+  }
+
+  function openFromCompletion(item: "receive" | "resolve", resume: () => void) {
+    if (!actions.includes(item) || busy || operationOpen) {
+      resume();
+      return;
+    }
+    returnToCompletionRef.current = resume;
+    openOperation(item, null);
+  }
+
+  function returnToCompletion() {
+    const resume = returnToCompletionRef.current;
+    returnToCompletionRef.current = null;
+    resume?.();
+    return Boolean(resume);
+  }
+
+  function focusAfterDeliveryResult() {
+    if (returnToCompletion()) return;
+    resultFocusRef.current = true;
+    setFocusRevision(value => value + 1);
+  }
+
   function renderAction(item: DocumentAction, inFab = false) {
     if (!data) return null;
     const menuAction = inFab || secondaryDocumentActions.has(item);
@@ -869,23 +919,7 @@ export function SupplyDocumentContent({
         // disable a retained opener between pointerdown and pointerup. Existing
         // version/identity checks still authorize and validate confirmation.
         disabled={busy || uncertain}
-        onClick={(event) => {
-          operationOpenerRef.current = inFab ? fabRef.current : menuAction ? moreTriggerRef.current : event.currentTarget;
-          if (item === "reassign" || (item === "receive" && data.type === "ENT") || (item === "resolve" && hasCountedTransit) ||
-            (item === "cancel" && (data.type === "COM" || hasUnreceivedDispatch || hasPersonalReceipt)) || item === "consent_cancel" || item === "withdraw_cancellation") {
-            setError("");
-            setReview(null);
-            if (item === "resolve") setReconciliationResult(null);
-            setAction(item);
-            return;
-          }
-          decisionFocusRef.current = true;
-          setFocusRevision((value) => value + 1);
-          tabs.select("workflow");
-          setAction(item);
-          setReview(null);
-          if (item === "approve" || item === "purchase" || (item === "receive" && data.type === "COM")) setError("");
-        }}
+        onClick={(event) => openOperation(item, inFab ? fabRef.current : menuAction ? moreTriggerRef.current : event.currentTarget)}
       >
         {data.type === "COM" && item === "receive"
           ? inFab ? "Registrar chegada" : "Informar nova chegada"
@@ -1170,6 +1204,7 @@ export function SupplyDocumentContent({
                 {followUpTerminal && progressAllowed && tabs.value !== "progress" ? <ActionButton onClick={() => tabs.select("progress", true)}><Icon name="plus" />Novo andamento</ActionButton> : null}
                 {archive ? <DocumentArchiveActions archive={archive} reviewRef={archiveReviewRef} onReview={patientAdmin ? () => setArchiveDialog("review") : undefined} /> : null}
                 {activeContext && !archived && data.protocol && data.type !== "BAL" ? <DocumentFollowUpActions
+                  key={context.userId + ":" + data.id}
                   id={data.id} patientId={data.care_recipient_id} kind={data.type === "COM" ? "COM" : data.kind === "DEV" ? "DEV" : "ENT"}
                   code={data.code ?? data.protocol} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado na ficha")}
                   userId={context.userId} actor={context.fullName}
@@ -1178,14 +1213,25 @@ export function SupplyDocumentContent({
                   cancelled={data.status === "cancelled" && followUpState !== "completed"}
                   disabled={busy || operationOpen} onUpdated={() => setAttempt(value => value + 1)}
                   onShowMaterials={() => tabs.select("materials")}
-                  blockerActions={pendingArrivalIds.length ? { com_validation: [{
-                    id: "review-arrivals", label: pendingArrivalIds.length === 1 ? "Revisar chegada" : "Revisar chegadas",
-                    open: returnToReview => {
-                      const open = changedArrivalsRef.current;
-                      if (open) open(pendingArrivalIds, () => moreTriggerRef.current, returnToReview);
-                      else returnToReview();
-                    },
-                  }] } : undefined}
+                  blockerActions={data.type === "ENT" ? {
+                    ent_receipt: actions.includes("receive") ? [{
+                      id: "delivery-receipt", label: "Conferir recebimento",
+                      open: returnToReview => openFromCompletion("receive", returnToReview),
+                    }] : undefined,
+                    ent_difference: hasCountedTransit && actions.includes("resolve") ? [{
+                      id: "delivery-reconciliation", label: "Conciliar divergência",
+                      open: returnToReview => openFromCompletion("resolve", returnToReview),
+                    }] : undefined,
+                  } : pendingArrivalIds.length ? {
+                    com_validation: [{
+                      id: "review-arrivals", label: pendingArrivalIds.length === 1 ? "Revisar chegada" : "Revisar chegadas",
+                      open: returnToReview => {
+                        const open = changedArrivalsRef.current;
+                        if (open) open(pendingArrivalIds, () => moreTriggerRef.current, returnToReview);
+                        else returnToReview();
+                      },
+                    }],
+                  } : undefined}
                   onCompleteAndArchive={patientAdmin && !followUpTerminal && !purchaseIdentificationPending ? () => setArchiveDialog("archive") : undefined}
                   preservedFacts={data.type === "ENT" ? data.lines.map(line => {
                     const returned = data.deliveryCancellation?.lines.find(result => result.lineId === line.id);
@@ -1691,12 +1737,12 @@ export function SupplyDocumentContent({
           setDeliveryConflict(false);
           setComparison(null);
           setAttempt(value => value + 1);
+          returnToCompletion();
         }} /> : null}
       {deliveryReceiptResult?.id === id && !readDenied && activeContext ? <CountedDeliveryReceiptResult
         data={deliveryReceiptResult} onClose={() => {
           setDeliveryReceiptResult(null);
-          resultFocusRef.current = true;
-          setFocusRevision(value => value + 1);
+          focusAfterDeliveryResult();
         }} /> : null}
       {data && reconcilingDelivery && !readDenied && activeContext ? <DeliveryReconciliation
         key={data.id}
@@ -1726,12 +1772,12 @@ export function SupplyDocumentContent({
           setDeliveryConflict(false);
           setComparison(null);
           setAttempt(value => value + 1);
+          returnToCompletion();
         }} /> : null}
       {reconciliationResult?.data.id === id && !reconciliationResult.nextLineId && !readDenied && activeContext ? <DeliveryReconciliationResult
         {...reconciliationResult} onClose={() => {
           setReconciliationResult(null);
-          resultFocusRef.current = true;
-          setFocusRevision(value => value + 1);
+          focusAfterDeliveryResult();
         }} /> : null}
       {data && reviewingDirectCancellation && !readDenied && activeContext ? <DocumentCancellationReview
         key={data.id}
@@ -1908,7 +1954,14 @@ export function SupplyDocumentContent({
       }} /> : null}
       <Dialog open={closeUncertain} title="Fechar sem resultado confirmado?" onClose={() => setCloseUncertain(false)}>
         <p>O resultado continua sem confirmação. Fechar descarta os campos desta tela. Procure a supervisão e confira o resultado antes de repetir a ação.</p>
-        <div className="hca-toolbar"><ActionButton onClick={() => setCloseUncertain(false)}>Voltar à conferência</ActionButton><ActionButton onClick={() => { setCloseUncertain(false); setReview(null); setAction(null); pendingRef.current = null; setUncertain(false); }}>Fechar e procurar supervisão</ActionButton></div>
+        <div className="hca-toolbar"><ActionButton onClick={() => setCloseUncertain(false)}>Voltar à conferência</ActionButton><ActionButton onClick={() => {
+          setCloseUncertain(false);
+          setReview(null);
+          setAction(null);
+          pendingRef.current = null;
+          setUncertain(false);
+          returnToCompletion();
+        }}>Fechar e procurar supervisão</ActionButton></div>
       </Dialog>
     </div>
   );

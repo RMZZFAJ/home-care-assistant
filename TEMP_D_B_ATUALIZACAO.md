@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**20/11 — recebimento e conciliação pela revisão de conclusão.** ENT e
+DEV abrem a conferência pessoal ou a conciliação do saldo em trânsito
+pela pendência. Ao voltar, a revisão recupera a observação em edição e
+consulta o estado atual da ficha. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **20/11 — revisão por material e retomada dos assistentes.** A revisão de
 REQ, COM, ENT e DEV abre o campo do material escolhido. A criação nova de
 REQ, COM e ENT guarda o preenchimento em um único rascunho privado. Cópias

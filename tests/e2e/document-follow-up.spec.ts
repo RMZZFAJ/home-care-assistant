@@ -4,12 +4,14 @@ import { randomUUID } from "node:crypto";
 import { PDF } from "@libpdf/core";
 import { entOperationFixture, entSend } from "../integration/ent-operation-fixtures.mjs";
 import { entTerminalFixture, terminalLedger } from "../integration/ent-terminal-fixtures.mjs";
+import { autonomousReturnFixture } from "../integration/autonomous-return-fixtures.mjs";
 import { actor, delivery, fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { purchaseBalanceCommand } from "../integration/purchase-entry-balance-fixtures.mjs";
 import { generatedPdf, pdfIssuanceReference } from "./generated-pdf";
 import { confirmedOutcome, loginDecision, noPrivateWrites, privateFormCount } from "./l1-decision-policy";
 import { arrivalCard, confirmArrivalReview } from "./purchase-arrival-review";
+import type { SupplyDocument } from "../../src/types/documents";
 
 test.setTimeout(180_000);
 
@@ -78,6 +80,7 @@ test("revisão da ENT exige conferência pessoal e descarta a nota somente após
   const review = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
   await review.getByText("Conferência pessoal pendente", { exact: true }).click();
   await expect(review.getByRole("button", { name: "Concluir", exact: true })).toBeDisabled();
+  await expect(review.getByRole("button", { name: "Conferir recebimento", exact: true })).toHaveCount(0);
   const observation = review.getByRole("textbox", { name: "Observação da conclusão" });
   await observation.fill("Nota temporária da revisão pendente");
   await review.getByRole("button", { name: "Consultar ficha", exact: true }).click();
@@ -102,6 +105,79 @@ test("revisão da ENT exige conferência pessoal e descarta a nota somente após
     status: received.status, workflow_data: { acceptedAt: received.workflow_data.acceptedAt, acceptedBy: received.workflow_data.acceptedBy },
   });
   expect(terminalLedger(patient)).toBe(stock);
+});
+
+for (const kind of ["ENT", "DEV"] as const) test(`${kind} abre o recebimento e a conciliação pela revisão de conclusão`, async ({ page }, info) => {
+  const f = kind === "DEV" ? await autonomousReturnFixture() : null;
+  const { patient, admin, products } = f ?? await setup();
+  const recipient = f?.recipient ?? await shiftWorker(patient);
+  const line = { productId: products[0], quantity: "3" };
+  const dispatched = f ? await rpc(f.initiator.client, "create_transfer_declaration", {
+    p_patient: patient, p_key: randomUUID(), p_body: {
+      mode: "direct", source: "CARE_TEAM", recipientId: recipient.id, originDocumentId: null,
+      referenceHash: (await rpc(f.initiator.client, "transfer_preparation", { p_patient: patient, p_source: "CARE_TEAM" })).referenceHash,
+      reason: "Recebedor fictício da devolução direta.", lines: [line],
+    },
+  }) as SupplyDocument : await rpc(admin, "create_supply_document", {
+    p_patient: patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: {
+      source: "FAMILY", destination: "CARE_TEAM", recipientId: recipient.id,
+      recipientReason: "Recebedor fictício da entrega direta.", lines: [line],
+    },
+  }) as SupplyDocument;
+  const { id } = dispatched;
+  expect(dispatched.kind).toBe(kind);
+  await loginDecision(page, recipient.email, patient);
+  await page.goto("/fichas/" + id);
+  await openDocumentAction(page, "Revisar conclusão");
+  const closure = page.getByRole("dialog", { name: "Revisar e concluir", exact: true });
+  const receiptShortcut = closure.getByRole("button", { name: "Conferir recebimento", exact: true });
+  const observation = closure.getByRole("textbox", { name: "Observação da conclusão", exact: true });
+  const note = "Observação temporária antes da conferência pessoal.";
+  await observation.fill(note);
+  await expect(closure.getByRole("button", { name: "Concluir", exact: true })).toBeDisabled();
+  const before = terminalLedger(patient);
+  const writes = noPrivateWrites(page);
+  await receiptShortcut.click();
+  const receiving = page.getByRole("dialog", { name: "Conferir recebimento", exact: true });
+  await expect(closure).toHaveCount(0);
+  await receiving.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(observation).toHaveValue(note);
+  expect(terminalLedger(patient)).toBe(before);
+
+  await receiptShortcut.click();
+  await receiving.getByRole("textbox", { name: /^Recebidas de / }).fill("1");
+  await receiving.getByRole("button", { name: "Confirmar recebimento", exact: true }).click();
+  await confirmedOutcome(page, id, "Registrar diferença");
+  await page.unroute(`**/api/documents/${id}/decisions`);
+  const received = page.getByRole("dialog", { name: "Recebimento registrado com diferença", exact: true });
+  await received.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(closure.getByText("Recebimento registrado", { exact: true })).toBeVisible();
+  await expect(observation).toHaveValue(note);
+  await expect(receiptShortcut).toHaveCount(0);
+  const reconcileShortcut = closure.getByRole("button", { name: "Conciliar divergência", exact: true });
+  if (info.project.use.hasTouch) {
+    await reconcileShortcut.scrollIntoViewIfNeeded();
+    await info.attach(`Revisão da ${kind} com conciliação disponível`, { body: await closure.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png" });
+  }
+
+  await reconcileShortcut.click();
+  const reconciliation = page.getByRole("dialog", { name: "Resolver diferença de quantidade", exact: true });
+  await expect(reconciliation.getByLabel("Quantidade esclarecida")).toHaveValue("2");
+  await reconciliation.getByLabel("Como foi conferido?").fill("Duas unidades do segundo volume chegaram depois.");
+  await reconciliation.getByRole("button", { name: "Registrar decisão do item", exact: true }).click();
+  await page.getByRole("dialog", { name: "Diferença conciliada", exact: true }).getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(closure.getByText("Quantidades conciliadas", { exact: true })).toBeVisible();
+  await expect(observation).toHaveValue(note);
+  expect(writes).toEqual([]);
+
+  const current = await rpc(admin, "operational_document", { p_id: id }) as SupplyDocument;
+  expect(current.workflow_data.acceptedBy).toBe(recipient.id);
+  expect(current.lines.map(item => Number(item.accepted_quantity))).toEqual([3]);
+  expect(current.events.filter(event => ["ent.receive", "ent.resolve"].includes(event.action))
+    .sort((left, right) => left.version - right.version)
+    .map(event => [event.action, event.actorId])).toEqual([["ent.receive", recipient.id], ["ent.resolve", recipient.id]]);
+  expect(current.version).toBe(dispatched.version + 2);
+  expect(current.workflow_data.documentFollowUp).toEqual(dispatched.workflow_data.documentFollowUp);
 });
 
 test("REQ resolve a avaliação da família e retorna à conclusão com a observação preservada", async ({ page }, info) => {
