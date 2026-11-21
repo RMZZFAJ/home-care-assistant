@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — recuperação dos avisos e do PDF inicial.** O resultado da emissão
+mantém a ficha registrada em consulta. Quando uma etapa auxiliar falha,
+identifica a pendência e oferece o diagnóstico e a recuperação da mesma
+solicitação. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — retomada de Andamentos.** O rascunho guarda categoria e etapa
 mesmo antes do texto. As escolhas de publicação pertencem ao editor atual.
 A tentativa enviada mantém sua própria referência para recuperação.

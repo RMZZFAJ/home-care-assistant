@@ -734,6 +734,22 @@ Android também confirmou a recuperação e o crédito único. A última
 rodada no Android parou na emissão inicial. O PostgreSQL local registrou
 um timeout da instrução antes da simulação da perda de resposta.
 
+**Falha parcial depois de registrar a ficha.** O resultado conserva a
+confirmação da emissão e informa se a pendência está na consulta, nos avisos
+ou no PDF inicial. A recuperação começa pela consulta da solicitação
+existente. Após perder a resposta de uma etapa auxiliar, a interface consulta
+o mesmo identificador antes de avançar. O download aparece após confirmar o
+exemplar. O diagnóstico recolhido informa operação, código, referência quando
+disponível e contagem de tentativas. Depois de duas recuperações explícitas,
+o botão de copiar fica junto às ações de compartilhar e acompanhar a ficha.
+Essa composição combina o resultado e o suporte de E04-07 a 390 px para a
+falha parcial da seção 12.3 do mestre. Sem migrations novas.
+Quatro verificações passaram em Android e iOS emulados, sem repetição.
+Com falha persistente nos avisos, a COM continuou consultável e o diagnóstico
+ficou disponível após duas recuperações. Na perda das duas respostas, uma
+consulta confirmou cada etapa e recuperou o mesmo PDF assinado. A verificação
+conferiu o identificador do exemplar, a versão da ficha e uma única COM.
+
 ### Revisão dos wizards após o retorno do responsável
 
 A comparação em celular usou E04-01, E05-01, E06-01 e E06-16. A identidade
