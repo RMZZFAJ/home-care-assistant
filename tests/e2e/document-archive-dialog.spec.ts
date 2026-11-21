@@ -9,7 +9,7 @@ import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { loginDecision } from "./l1-decision-policy";
-import type { DocumentArchiveCommand } from "../../src/lib/documents/document-archive";
+import type { DocumentArchiveCommand, DocumentArchiveIdentity } from "../../src/lib/documents/document-archive";
 
 test.setTimeout(120_000);
 
@@ -57,12 +57,23 @@ test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT s
   const failure = page.getByRole("dialog", { name: "Não foi possível arquivar a ficha", exact: true });
   await expect(failure).toBeVisible({ timeout: 65_000 });
   await expect.poll(() => appliedStatus).toBe(200);
+  const originalIdentity = { key: commands[0].key, action: "archive" };
+  const savedIdentity = await page.evaluate(() => Object.entries(sessionStorage)
+    .find(([key]) => key.startsWith("hca:official-archive:"))?.[1]);
+  expect(JSON.parse(savedIdentity!)).toEqual(originalIdentity);
+  await page.reload();
+  const recoverArchive = page.getByRole("button", { name: "Conferir tentativa de arquivamento", exact: true });
+  await recoverArchive.click();
+  const resolution = page.waitForRequest(request => request.url().endsWith(`${endpoint}/reconcile`) && request.method() === "POST");
   await failure.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  expect((await resolution).postDataJSON()).toEqual(originalIdentity);
   const archived = page.getByRole("dialog", { name: "Ficha arquivada", exact: true });
   await expect(archived).toBeVisible({ timeout: 65_000 });
-  expect(commands).toEqual([commands[0], commands[0]]);
+  expect(commands).toHaveLength(1);
+  expect(sql(`select count(*) from private.document_archive_attempts where document_id=${q(document.id)} and prepared_by is not null`)).toBe("1");
   await page.unroute(`**${endpoint}`);
   await archived.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(recoverArchive).toHaveCount(0);
   await openDocumentMore(page);
   await expect(page.getByRole("menuitem", { name: "Revisar conclusão", exact: true })).toHaveCount(0);
   await closeDocumentMore(page);
@@ -97,10 +108,12 @@ test("falha de arquivamento mantém a mesma tentativa e oferece diagnóstico ap�
   await loginDecision(page, fixtures.adminA.email, patient);
   const stock = terminalLedger(patient);
   const commands: DocumentArchiveCommand[] = [];
+  const recoveries: DocumentArchiveIdentity[] = [];
   const correlation = randomUUID();
-  await page.route(`**${endpoint}`, async route => {
+  await page.route(`**${endpoint}{,/reconcile}`, async route => {
     if (route.request().method() !== "POST") return route.continue();
-    commands.push(route.request().postDataJSON());
+    if (route.request().url().endsWith("/reconcile")) recoveries.push(route.request().postDataJSON());
+    else commands.push(route.request().postDataJSON());
     await route.fulfill({ status: 503, json: {
       code: "PERSISTENCE_UNCONFIRMED", correlationId: correlation, error: "Mensagem fictícia que não pertence ao diagnóstico.",
     } });
@@ -112,7 +125,7 @@ test("falha de arquivamento mantém a mesma tentativa e oferece diagnóstico ap�
   const failure = page.getByRole("dialog", { name: "Não foi possível arquivar a ficha", exact: true });
   const recover = failure.getByRole("button", { name: "Conferir resultado", exact: true });
   await recover.click();
-  await expect.poll(() => commands.length).toBe(2);
+  await expect.poll(() => recoveries.length).toBe(1);
   await recover.click();
   await expect(failure).toBeVisible();
   await expect(recover).toHaveCount(0);
@@ -124,13 +137,62 @@ test("falha de arquivamento mantém a mesma tentativa e oferece diagnóstico ap�
   await expect(details).toContainText("PERSISTENCE_UNCONFIRMED");
   await expect(details).toContainText(correlation);
   await expect(details).toContainText("Tentativas de recuperação: 2");
-  expect(commands).toEqual([commands[0], commands[0], commands[0]]);
+  expect(commands).toHaveLength(1);
+  const originalIdentity = { key: commands[0].key, action: "archive" };
+  expect(recoveries).toEqual([originalIdentity, originalIdentity]);
   expect(await page.evaluate(() => [innerWidth, document.documentElement.scrollWidth])).toEqual([390, 390]);
   await info.attach("arquivamento-sem-confirmacao-390", { body: await failure.screenshot({ scale: "css" }), contentType: "image/png" });
   await failure.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await page.getByRole("dialog", { name: "Sair antes de conferir o resultado?", exact: true })
     .getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await page.unroute(`**${endpoint}{,/reconcile}`);
+  await page.getByRole("button", { name: "Conferir tentativa de arquivamento", exact: true }).click();
+  await recover.click();
+  await expect(failure.getByText(/a conferência confirmou que esta tentativa não alterou a ficha/i)).toBeVisible();
+  expect((await page.request.post(endpoint, { data: commands[0] })).status()).toBe(409);
+  expect(sql(`select count(*) from private.document_archive_attempts where document_id=${q(doc.id)}`)).toBe("0");
   expect(await (await page.request.get(endpoint)).json()).toMatchObject({ condition: "cancelled", archive: null });
+  expect(terminalLedger(patient)).toBe(stock);
+});
+
+test("recarga retoma a preparação original e gera um único PDF consolidado", async ({ page }) => {
+  const { admin, patient, doc } = await entTerminalFixture({ kind: "cancelled" });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await loginDecision(page, fixtures.adminA.email, patient);
+  const endpoint = `/api/documents/${doc.id}/lifecycle/archive`;
+  const stock = terminalLedger(patient);
+  let reservedId: string | undefined;
+  await page.route(`**${endpoint}`, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    const command: DocumentArchiveCommand = route.request().postDataJSON();
+    if (command.action !== "archive") throw new Error("Expected an archive command");
+    const reserved = await rpc(admin, "prepare_document_archive", {
+      p_document: doc.id, p_key: command.key, p_version: command.version, p_reference: command.referenceHash,
+      p_mode: command.mode, p_reason: command.reason ?? "",
+    });
+    reservedId = reserved.id;
+    await route.abort();
+  });
+  await page.goto(`/fichas/${doc.id}`);
+  await openDocumentAction(page, "Arquivar ficha");
+  await page.getByRole("dialog", { name: "Arquivar ficha", exact: true })
+    .getByRole("button", { name: "Arquivar e consolidar PDF", exact: true }).click();
+  const failure = page.getByRole("dialog", { name: "Não foi possível arquivar a ficha", exact: true });
+  await expect(failure).toBeVisible();
+  expect(reservedId).toBeTruthy();
+  expect(await (await page.request.get(endpoint)).json()).toMatchObject({ condition: "cancelled", archive: null });
+  await page.unroute(`**${endpoint}`);
+  await page.reload();
+  await page.getByRole("button", { name: "Conferir tentativa de arquivamento", exact: true }).click();
+  await failure.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const archived = page.getByRole("dialog", { name: "Ficha arquivada", exact: true });
+  await expect(archived).toBeVisible({ timeout: 65_000 });
+  const link = await archived.getByRole("link", { name: "Baixar PDF consolidado", exact: true }).getAttribute("href");
+  const current = await (await page.request.get(endpoint)).json();
+  expect(current).toMatchObject({ condition: "archived", archive: { id: reservedId } });
+  expect(link).toContain(current.archive.issuanceId);
+  expect((await page.request.get(link!)).status()).toBe(200);
+  expect(sql(`select count(*) from private.document_archive_attempts where document_id=${q(doc.id)}`)).toBe("1");
   expect(terminalLedger(patient)).toBe(stock);
 });
 

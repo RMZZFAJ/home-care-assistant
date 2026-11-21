@@ -41,6 +41,23 @@ export const documentArchiveCommand = z.discriminatedUnion("action", [
   "Informe o motivo do arquivamento.");
 export type DocumentArchiveCommand = z.infer<typeof documentArchiveCommand>;
 
+export const documentArchiveIdentity = z.strictObject({
+  key: z.uuid(), action: z.enum(["archive", "confirm", "reverse"]),
+});
+export type DocumentArchiveIdentity = z.infer<typeof documentArchiveIdentity>;
+
+const recoveryIdentity = { ...documentArchiveIdentity.shape, documentId: z.uuid() };
+export const documentArchiveRecovery = z.discriminatedUnion("state", [
+  z.object({ ...recoveryIdentity, state: z.literal("not_applied") }),
+  z.object({ ...recoveryIdentity, state: z.literal("prepared"), archive: documentArchiveAttempt }),
+  z.object({ ...recoveryIdentity, state: z.literal("applied"), archive: documentArchiveAttempt }),
+]).refine(result => {
+  if (result.state === "not_applied") return true;
+  if (result.archive.documentId !== result.documentId) return false;
+  if (result.state === "prepared") return result.action === "archive" && result.archive.archivedAt === null;
+  return Boolean(result.archive.archivedAt) && (result.action === "archive" || result.archive.decision === result.action);
+});
+
 export const frozenDocumentArchive = z.object({ ...base, reviewedAt: z.iso.datetime({ offset: true }) });
 export function frozenArchiveFacts(value: unknown) {
   if (value === undefined) return [];

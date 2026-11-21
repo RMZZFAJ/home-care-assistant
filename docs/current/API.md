@@ -688,6 +688,15 @@ e instante, preservam os bytes do consolidado e deixam o estoque como está.
 As consultas e os arquivos anteriores permanecem disponíveis. Enquanto
 o arquivo está ativo, os Andamentos e novas emissões manuais ficam bloqueados.
 
+`POST /api/documents/:id/lifecycle/archive/reconcile` recebe somente `key` e
+`action`. O banco consulta a tentativa da pessoa autorizada e responde com
+`applied` e os dados do ato quando já foi aplicado. Uma preparação ainda
+válida retoma a mesma solicitação de PDF. Enquanto ela está em processamento,
+a API responde `202` com `prepared`. O resultado `not_applied` encerra a chave
+sob bloqueio, e um comando tardio com essa chave recebe `409`. A tela conserva
+a identificação técnica na sessão para consulta após recarregar ou fechar a
+revisão. Os campos do formulário ficam na revisão aberta.
+
 ## ENT e DEV — cancelamento físico e decisão do recebedor
 
 Com a expedição em trânsito e sem conferência pessoal, `cancel` exige

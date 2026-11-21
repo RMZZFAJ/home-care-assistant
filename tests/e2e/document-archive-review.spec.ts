@@ -45,9 +45,19 @@ for (const decision of ["reverse", "confirm"] as const) {
 
     const decisionCommand = { action: decision, version: archived.version, key: randomUUID(), referenceHash: archived.referenceHash,
       ...(decision === "reverse" ? { reason: "Restaurar acompanhamento anterior da entrega" } : {}) };
+    const abandonedKey = randomUUID();
+    const absent = await page.request.post(`${url}/reconcile`, { data: { action: decision, key: abandonedKey } });
+    expect(absent.status(), await absent.text()).toBe(200);
+    expect(await absent.json()).toEqual({ action: decision, key: abandonedKey, documentId: doc.id, state: "not_applied" });
+    const late = await page.request.post(url, { data: { ...decisionCommand, key: abandonedKey } });
+    expect(late.status()).toBe(409);
+    expect(await late.json()).toMatchObject({ code: "VERSION_CONFLICT" });
     const actual = await page.request.post(url, { data: decisionCommand });
     expect(actual.status(), await actual.text()).toBe(200);
     expect(await actual.json()).toMatchObject({ decision, issuanceId: completed.issuanceId });
+    const recovered = await page.request.post(`${url}/reconcile`, { data: { action: decision, key: decisionCommand.key } });
+    expect(recovered.status(), await recovered.text()).toBe(200);
+    expect(await recovered.json()).toMatchObject({ state: "applied", archive: { decision, issuanceId: completed.issuanceId } });
     const current = await (await page.request.get(url)).json();
     expect(current.condition).toBe(decision === "reverse" ? "cancelled" : "archived");
     expect(current.canDecide).toBe(false);

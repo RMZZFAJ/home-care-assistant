@@ -52,7 +52,7 @@ export function databaseError(
     throw new ApiError("VERSION_CONFLICT", "Confira o estoque atual antes de cancelar a requisição. Sua justificativa foi preservada.", 409);
   if (error?.code === "PT409" && /^(document changed before confirmation|(?:requisition|balance) reference changed (?:before|after) confirmation)$/.test(message))
     throw new ApiError("VERSION_CONFLICT", "A referência da ficha mudou. Compare os dados atuais e revise seus campos antes de confirmar novamente.", 409);
-  if (error?.code === "PT409" && /^(?:this )?command was settled without an act; confirm a new attempt$/.test(message))
+  if (error?.code === "PT409" && /^(?:(?:this )?command was settled without an act; confirm a new attempt|archive command was reconciled without an act)$/.test(message))
     throw new ApiError("VERSION_CONFLICT", "A conferência encerrou esta tentativa sem alteração. Revise os campos e confirme uma nova tentativa.", 409);
   if (error?.code === "PT409" && /^family evaluation (reference changed|no longer applicable)$/.test(message))
     throw new ApiError("VERSION_CONFLICT", "A referência do recebimento mudou. Atualize a ficha e confira as quantidades antes de preparar a avaliação familiar.", 409);

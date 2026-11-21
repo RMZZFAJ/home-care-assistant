@@ -12,6 +12,7 @@ const command = (review, mode = "policy", reason = "") => ({
   p_document: review.documentId, p_key: randomUUID(), p_version: review.version,
   p_reference: review.referenceHash, p_mode: mode, p_reason: reason,
 });
+const settlement = intent => ({ p_document: intent.p_document, p_key: intent.p_key, p_action: "archive" });
 
 test("archive preparation is admin-only and keeps the official document and stock until a verified PDF exists", async () => {
   const fixture = await entTerminalFixture({ kind: "cancelled" });
@@ -21,6 +22,7 @@ test("archive preparation is admin-only and keeps the official document and stoc
   assert.equal(read.canArchive, true);
   const intent = command(read, "other", "Arquivo fictício que aguarda assinatura.");
   assert.equal((await owner.rpc("prepare_document_archive", intent)).error?.code, "42501");
+  assert.equal((await owner.rpc("settle_document_archive", settlement(intent))).error?.code, "42501");
   const before = sql(`select content_hash from public.operational_documents where id=${q(doc.id)}`);
   const stock = terminalLedger(patient);
   const [first, second] = await Promise.all([
@@ -28,6 +30,9 @@ test("archive preparation is admin-only and keeps the official document and stoc
   ]);
   assert.deepEqual(first, second);
   assert.equal(first.archivedAt, null);
+  assert.deepEqual(await rpc(admin, "settle_document_archive", settlement(intent)), {
+    state: "prepared", action: "archive", documentId: doc.id, key: intent.p_key, archive: first,
+  });
   const candidate = await rpc(worker, "initial_document_pdf", { p_request: first.id, p_action: "reserve" });
   assert.equal(candidate.snapshot.archiveFacts.reason, intent.p_reason);
   assert.equal(candidate.snapshot.archiveFacts.sourceVersion, doc.version);
@@ -60,6 +65,10 @@ test("a concurrent progress publication changes the archive reference without ch
   const current = await reference(admin, doc.id);
   assert.equal(current.version, reviewed.version);
   assert.notEqual(current.referenceHash, reviewed.referenceHash);
+  const closed = await rpc(admin, "settle_document_archive", settlement(intent));
+  assert.deepEqual(closed, { state: "not_applied", action: "archive", documentId: doc.id, key: intent.p_key });
+  assert.deepEqual(await rpc(admin, "settle_document_archive", settlement(intent)), closed);
+  assert.equal((await admin.rpc("prepare_document_archive", intent)).error?.code, "PT409");
   assert.equal((await admin.rpc("prepare_document_archive", { ...intent, p_key: randomUUID() })).error?.code, "PT409");
   assert.equal((await admin.rpc("commit_document_archive", { p_document: doc.id, p_request: attempt.id })).error?.code, "PT409");
   assert.equal((await reference(admin, doc.id)).condition, "cancelled");

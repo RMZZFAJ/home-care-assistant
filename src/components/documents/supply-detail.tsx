@@ -35,7 +35,7 @@ import { PurchaseCancellationFacts, PurchaseCancellationResult, purchaseCancella
 import { DeliveryCancellationDecision, DeliveryCancellationStatusDialog, type CancellationAction } from "./delivery-cancellation-decision";
 import { DocumentFollowUpActions } from "./document-follow-up-actions";
 import { DocumentFab } from "./document-fab";
-import { DocumentArchiveActions, DocumentArchiveDialog, type ArchiveDialogMode } from "./document-archive-dialog";
+import { DocumentArchiveActions, DocumentArchiveDialog, DocumentArchiveRecoveryAction, type ArchiveDialogMode } from "./document-archive-dialog";
 import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
 import { supplyFollowUpState } from "@/lib/documents/follow-up-lifecycle";
 import { cancelledTransitReturn, readCountedDeliveryReceipt, verifyCountedDeliveryReceipt } from "@/lib/documents/delivery-receipt";
@@ -1284,6 +1284,8 @@ export function SupplyDocumentContent({
                   .map(item => renderAction(item))}
                 {followUpTerminal && progressAllowed && tabs.value !== "progress" ? <ActionButton onClick={() => tabs.select("progress", true)}><Icon name="plus" />Novo andamento</ActionButton> : null}
                 {archive ? <DocumentArchiveActions archive={archive} reviewRef={archiveReviewRef} onReview={patientAdmin ? () => setArchiveDialog("review") : undefined} /> : null}
+                {patientAdmin ? <DocumentArchiveRecoveryAction id={id} patientId={data.care_recipient_id} userId={context.userId}
+                  disabled={busy || operationOpen || Boolean(archiveDialog)} onOpen={() => setArchiveDialog("recovery")} /> : null}
                 {activeContext && !archived && data.protocol && data.type !== "BAL" ? <DocumentFollowUpActions
                   key={context.userId + ":" + data.id}
                   id={data.id} patientId={data.care_recipient_id} kind={data.type === "COM" ? "COM" : data.kind === "DEV" ? "DEV" : "ENT"}
@@ -1490,7 +1492,7 @@ export function SupplyDocumentContent({
           </DocumentFab> : null}
           {archiveDialog && patientAdmin ? <DocumentArchiveDialog key={`${context.userId}:${id}:${archiveDialog}`} id={id} patientId={data.care_recipient_id}
             code={data.code ?? data.protocol ?? data.type} patientName={documentPatientName(data.canonical_snapshot, context.patient?.display_name ?? "Paciente identificado na ficha")}
-            actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
+            actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "recovery" ? refreshButtonRef : archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
             onClose={() => setArchiveDialog(null)} onUpdated={() => setAttempt(value => value + 1)} /> : null}
           {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext && !archived)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
           {canPrepareDelivery && allowed("stock.family.read") ? <PurchaseDeliveryAvailability

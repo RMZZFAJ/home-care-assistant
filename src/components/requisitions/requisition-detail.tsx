@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/icon";
 import { DocumentComplementsPanel } from "@/components/documents/document-complements";
 import { DocumentCancellationNotice } from "@/components/documents/document-cancellation-notice";
 import { DocumentFollowUpActions } from "@/components/documents/document-follow-up-actions";
-import { DocumentArchiveActions, DocumentArchiveDialog, type ArchiveDialogMode } from "@/components/documents/document-archive-dialog";
+import { DocumentArchiveActions, DocumentArchiveDialog, DocumentArchiveRecoveryAction, type ArchiveDialogMode } from "@/components/documents/document-archive-dialog";
 import { activeDocumentArchive, documentArchiveLabel } from "@/lib/documents/document-archive";
 import { RequisitionScienceAction, type RequisitionScienceControl } from "./requisition-science-action";
 import { RequisitionFulfillmentEntry } from "./requisition-fulfillment-entry";
@@ -439,6 +439,8 @@ export function RequisitionDocumentContent({
             {terminalFollowUp && progressAllowed && tabs.value !== "progress" ? <ActionButton onClick={() => tabs.select("progress", true)}><Icon name="plus" />Novo andamento</ActionButton> : null}
             {!data.is_historical ? <RequisitionScienceAction id={id} userId={context.userId} version={p.version} materialIdentity={p.materialIdentity} mayRecord={Boolean(offerScience)} disabled={busy || reading} control={operationalMenu ? scienceControlRef : undefined} onRecorded={() => setAttempt(value => value + 1)} /> : null}
             {archive ? <DocumentArchiveActions archive={archive} reviewRef={archiveReviewRef} onReview={archiveAllowed ? () => setArchiveDialog("review") : undefined} /> : null}
+            {archiveAllowed ? <DocumentArchiveRecoveryAction id={id} patientId={data.care_recipient_id} userId={context.userId}
+              disabled={busy || Boolean(archiveDialog)} onOpen={() => setArchiveDialog("recovery")} /> : null}
             {lifecycleVisible ? <DocumentFollowUpActions
               id={id} patientId={data.care_recipient_id} kind="REQ" code={data.code ?? data.protocol}
               patientName={context.patient?.display_name ?? "Paciente identificado na ficha"}
@@ -523,7 +525,7 @@ export function RequisitionDocumentContent({
       </DocumentFab> : null}
       {archiveDialog && archiveAllowed ? <DocumentArchiveDialog key={`${context.userId}:${id}:${archiveDialog}`} id={id} patientId={data.care_recipient_id}
         code={data.code ?? data.protocol} patientName={data.recipient_name_snapshot ?? context.patient?.display_name ?? "Paciente identificado na ficha"}
-        actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
+        actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "recovery" ? refreshButtonRef : archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
         onClose={() => setArchiveDialog(null)} onUpdated={() => setAttempt(value => value + 1)} /> : null}
       {data.status === "cancelled" ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={!p.archivedAt && data.care_recipient_id === context.patient?.id} onRecorded={() => setAttempt(value => value + 1)} /> : null}
       <RequisitionDisplay
