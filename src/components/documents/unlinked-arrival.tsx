@@ -3,7 +3,6 @@ import { MaterialVisitReturn } from "./material-visit-return";
 
 import { useCallback, useId, useRef, useState, type RefObject } from "react";
 import { Menu } from "@base-ui/react/menu";
-import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
 import { ActionButton, FormField, LoadingIndicator, SelectField, TextInput } from "@/components/ui/controls";
 import { MenuPopup } from "@/components/ui/floating";
 import { Icon } from "@/components/ui/icon";
@@ -20,8 +19,8 @@ import { parseCatalogueCollectionRead } from "@/lib/validation/catalogue-list";
 import { unlinkedArrivalDetails, unlinkedArrivalIntent, unlinkedArrivalPage, unlinkedArrivalReceipt, unlinkedOrigin,
   unlinkedOriginLabel, unlinkedOrigins, type UnlinkedArrival, type UnlinkedArrivalDetails,
   type UnlinkedArrivalIntent } from "@/lib/validation/unlinked-arrival";
-import type { PresentationsRead } from "@/types/catalogue";
 import type { WorkspaceContext } from "@/types/workspace";
+import { ArrivalBarcodeDialog } from "./arrival-barcode-dialog";
 import { PurchaseCoverageFields, type ArrivalPlanningChoices } from "./purchase-coverage-fields";
 import { canReviewPurchaseArrivals, type OpenUnlinkedArrival } from "./purchase-arrival-review";
 import { PurchaseArrivalLinks } from "./purchase-arrival-links";
@@ -89,10 +88,7 @@ function ArrivalEditor({ context, correction, onClose, returnFocus }: {
   const [busy, setBusy] = useState(false);
   const sendingRef = useRef(false);
   const [scanner, setScanner] = useState(false);
-  const scanRevisionRef = useRef(0);
-  const [scanned, setScanned] = useState<{ item: CatalogItem; name: string; factor: string } | null>(null);
-  const [packages, setPackages] = useState("1");
-  const [scanError, setScanError] = useState("");
+  const scannerTriggerRef = useRef<HTMLButtonElement>(null);
   const formId = useId();
   const decodeCatalog = useCallback((raw: unknown) => parseCatalogueCollectionRead(raw, patient.id, false), [patient.id]);
   const catalog = useScopedRead(correction || key || result ? null : "/api/catalog?" +
@@ -111,35 +107,6 @@ function ArrivalEditor({ context, correction, onClose, returnFocus }: {
   function updateAmount(id: string, amount: string) {
     setLines(previous => previous.map(line => line.id === id ? { ...line, amount } : line));
     setDirty(true);
-  }
-  function closeScanner() { scanRevisionRef.current++; setScanner(false); }
-  async function readCode(code: string) {
-    const revision = ++scanRevisionRef.current;
-    setScanned(null); setScanError("");
-    const response = await api<PresentationsRead>("/api/catalog/presentations?" + new URLSearchParams({ careRecipientId: patient.id, barcode: code }));
-    if (scanRevisionRef.current !== revision) return;
-    const presentation = response.data.find(item => item.active);
-    const item = catalog.data?.data.find(row => row.id === presentation?.product_id);
-    if (!item || !presentation || !quantity(presentation.base_quantity).gt(0)) {
-      setScanError("O código não corresponde a material ativo deste paciente. Você pode escolher o material manualmente.");
-      return;
-    }
-    setPackages("1");
-    setScanned({ item, name: presentation.name, factor: quantity(presentation.base_quantity).toFixed() });
-  }
-  function addScan() {
-    if (!scanned || !/^[1-9][0-9]{0,8}$/.test(packages)) return;
-    const row = lines.find(item => item.id === scanned.item.id);
-    const before = row?.amount || "0";
-    if (!validQuantity(before, scanned.item.quantity_decimals, true)) {
-      setScanError("Confira a quantidade digitada antes de acrescentar embalagens."); return;
-    }
-    const after = quantity(before).plus(quantity(scanned.factor).mul(packages)).toFixed();
-    if (!validQuantity(after, scanned.item.quantity_decimals)) {
-      setScanError("A quantidade convertida excede o limite ou a precisão do material."); return;
-    }
-    if (row) updateAmount(row.id, after); else add(scanned.item, after);
-    closeScanner();
   }
   function requestClose() {
     if (sendingRef.current) return;
@@ -232,8 +199,8 @@ function ArrivalEditor({ context, correction, onClose, returnFocus }: {
             </SelectField></FormField>
             <div className="hca-purchase-line-heading">
               <strong>Materiais recebidos</strong>
-              <ActionButton variant="quiet" compact disabled={catalog.loading || !catalog.data || Boolean(catalog.error) || lines.length >= 100}
-                onClick={() => { setScanned(null); setScanError(""); setScanner(true); }}><Icon name="camera" />Ler código</ActionButton>
+              <ActionButton ref={scannerTriggerRef} variant="quiet" compact disabled={catalog.loading || !catalog.data || Boolean(catalog.error) || lines.length >= 100}
+                onClick={() => setScanner(true)}><Icon name="camera" />Ler código</ActionButton>
             </div>
             {catalog.loading ? <LoadingIndicator label="Consultando materiais" /> : null}
             {catalog.error ? <><Notice error>{catalog.error}</Notice><ActionButton onClick={catalog.refresh}>Consultar materiais novamente</ActionButton></> : null}
@@ -262,14 +229,13 @@ function ArrivalEditor({ context, correction, onClose, returnFocus }: {
         </>}
       </form>
     </Dialog>
-    <Dialog open={scanner} title="Ler código do material" onClose={closeScanner}
-      footer={<><ActionButton onClick={closeScanner}>Voltar ao preenchimento</ActionButton>
-        {scanned ? <ActionButton variant="primary" disabled={!/^[1-9][0-9]{0,8}$/.test(packages)} onClick={addScan}>Acrescentar quantidade</ActionButton> : null}</>}>
-      {scanner ? <BarcodeScanner onRead={readCode} /> : null}
-      {scanError ? <Notice error>{scanError}</Notice> : null}
-      {scanned ? <><p>{scanned.name} · {formatQuantity(scanned.factor, scanned.item.unit)} por embalagem</p>
-        <FormField label="Embalagens recebidas"><TextInput inputMode="numeric" value={packages} onChange={event => setPackages(event.currentTarget.value)} /></FormField></> : null}
-    </Dialog>
+    {scanner && catalog.data && !catalog.error ? <ArrivalBarcodeDialog patientId={patient.id} products={catalog.data.data}
+      precision={product => product.quantity_decimals} currentAmount={product => lines.find(row => row.id === product.id)?.amount}
+      onClose={() => setScanner(false)} finalFocus={() => scannerTriggerRef.current ?? false}
+      onApply={(product, amount) => {
+        if (lines.some(row => row.id === product.id)) updateAmount(product.id, amount); else add(product, amount);
+        setScanner(false);
+      }} /> : null}
     <Dialog open={exit} title="Sair sem concluir?" subtitle="Se sair agora, o preenchimento será descartado."
       onClose={() => setExit(false)} footer={<><ActionButton variant="primary" onClick={() => setExit(false)}>Voltar ao preenchimento</ActionButton>
         <ActionButton onClick={onClose}>Sair e descartar</ActionButton></>}>{null}</Dialog>

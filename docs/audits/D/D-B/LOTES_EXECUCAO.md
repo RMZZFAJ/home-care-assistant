@@ -926,6 +926,37 @@ Nenhuma migration neste ajuste.
 
 ### Decisões e dúvidas de L2
 
+**Leitura de código nas chegadas.** A COM de E05-09 e a chegada avulsa
+de E05-17 usam a conferência compartilhada. A apresentação, a quantidade
+de embalagens e o fator aparecem assim que o código é reconhecido. O
+seletor inclui os formatos do laboratório e a apresentação cadastrada
+reconhecida. A escolha de outra embalagem com conteúdo variável exige
+informar o fator. A quantidade final usa a unidade oficial do material.
+
+Ao confirmar uma leitura, o sistema mostra a soma com a quantidade já
+digitada e atualiza o preenchimento. Essa continuidade complementa o
+exemplo da v7, que preenche uma leitura de cada vez. Os atos de aprovação,
+o controle de excesso e os lançamentos de estoque continuam no registro
+da chegada. A COM só oferece os materiais que aguardam chegada. O diálogo
+permite tentar novamente quando a consulta do código falha e retorna o
+foco à ação de leitura. Nenhuma migration acompanha o ajuste.
+
+Em Android e iOS emulados, a COM recuperou a consulta do código após falha
+simulada, somou seis unidades a duas já digitadas e exigiu confirmação
+para o excedente. O primeiro Android parou na consulta de contexto do
+login. O reteste usou um administrador de teste vinculado apenas ao
+paciente do cenário. A captura final no iOS confirma os campos em linhas
+como na referência móvel de 390 px. O mesmo build passou a leitura e
+expedição da ENT com conversão do catálogo e ajuste manual.
+
+A doação avulsa converteu quatro pares em oito unidades, recuperou a
+resposta perdida e creditou o estoque uma vez após aprovação. No iOS,
+uma execução mostrou o resultado aprovado sem retornar à consulta ao
+clicar. O reteste trouxe a página revisora para frente, aguardou a saída
+do diálogo anterior e confirmou o retorno aos detalhes. Os retestes
+passaram em Android e iOS sem repetição automática. Capturas em
+`output/playwright/l2-arrival-barcode/`.
+
 **Leitura de código na DEV.** O botão em Materiais de E06-16 abre o
 mesmo diálogo de identificação e conversão da COM e da ENT. O resultado
 exibe material, unidade e apresentação. Corrigir expande os campos de

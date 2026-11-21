@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — conversão na leitura de chegadas.** A COM e a chegada avulsa
+mostram a apresentação lida e permitem corrigir a embalagem, o fator e o
+total convertido. O diálogo mostra quanto a nova leitura soma à quantidade
+já preenchida. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — leitura de código na DEV.** A devolução usa a mesma conferência
 de apresentação e conversão da COM e da ENT. A prévia informa o saldo da
 equipe e identifica quando a nova quantidade substituirá a linha.

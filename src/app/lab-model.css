@@ -1038,6 +1038,14 @@
 .hca-l1 .hca-purchase-quantity { position: relative; display: block; width: 42%; }
 .hca-l1 .hca-purchase-quantity input { width: 100%; padding-right: 3.35rem; }
 .hca-l1 .hca-purchase-quantity > span { position: absolute; inset-inline-end: 8px; top: 50%; translate: 0 -50%; pointer-events: none; max-width: 2.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.hca-l1 .hca-arrival-barcode-result .hca-source-summary { display: flex; justify-content: space-between; padding-block: 0; }
+.hca-arrival-barcode-quantities { display: grid; gap: 7px; }
+.hca-arrival-barcode-quantities > .hca-field {
+  display: grid; grid-template-columns: minmax(0, 1fr) min(42%, 108px); align-items: center; gap: 8px;
+}
+.hca-l1 .hca-arrival-barcode-quantities .hca-purchase-quantity { width: 100%; }
+.hca-l1 .hca-arrival-barcode-result .hca-supply-barcode-total { gap: 3px; padding: 7px 8px; border-radius: 6px; }
+.hca-arrival-barcode-increment { display: flex; align-items: center; gap: 5px; font-size: 12px; }
 .hca-l1 .hca-purchase-options { flex: none; min-width: 30px; min-height: 30px; padding: 3px; }
 .hca-l1 .hca-purchase-switch { display: inline-flex; align-items: center; gap: 7px; flex: none; font-size: 11px; color: var(--muted); cursor: pointer; min-height: 32px; }
 .hca-l1 .hca-purchase-switch input {

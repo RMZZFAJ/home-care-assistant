@@ -43,22 +43,31 @@ type Application = {
   details?: ReactNode;
 };
 
-const manualPresentations = [
+const standardPresentations = [
   { value: "box", name: "Caixa", factor: "" },
   { value: "package", name: "Pacote", factor: "" },
   { value: "pair", name: "Par", factor: "2" },
   { value: "unit", name: "Unidade", factor: "1" },
-  { value: "manual", name: "Outra apresentação", factor: "" },
+];
+const otherPresentation = { value: "manual", name: "Outra apresentação", factor: "" };
+const manualPresentations = [...standardPresentations, otherPresentation];
+const arrivalPresentations = [
+  ...standardPresentations,
+  { value: "bottle", name: "Frasco", factor: "" },
+  { value: "tube", name: "Tubo", factor: "" },
+  { value: "roll", name: "Rolo", factor: "" },
+  otherPresentation,
 ];
 
 export function MaterialBarcodeDialog<Product extends Material>({
-  patientId, products, presentations = [], precision, maxPackageDigits = 9, prepareApplication, onClose, finalFocus,
+  patientId, products, presentations = [], precision, maxPackageDigits = 9, arrival = false, prepareApplication, onClose, finalFocus,
 }: {
   patientId: string;
   products: readonly Product[];
   presentations?: readonly ProductPresentation[];
   precision: (product: Product) => number;
   maxPackageDigits?: number;
+  arrival?: boolean;
   prepareApplication: (conversion: MaterialBarcodeConversion<Product>) => Application;
   onClose: () => void;
   finalFocus?: () => HTMLElement | false;
@@ -78,7 +87,8 @@ export function MaterialBarcodeDialog<Product extends Material>({
   const alternatives = presentations.filter(row => row.active && row.care_recipient_id === patientId &&
     row.product_id === product?.id && row.id !== scanned?.id && validQuantity(String(row.base_quantity), 6));
   const presentation = presentationChoice ? alternatives.find(row => row.id === presentationChoice) : scanned;
-  const manualPresentation = manualPresentations.find(option => option.value === presentationChoice);
+  const manualOptions = arrival ? arrivalPresentations : manualPresentations;
+  const manualPresentation = manualOptions.find(option => option.value === presentationChoice);
   const presentationName = presentation?.name ?? manualPresentation?.name ?? "Outra apresentação";
   const defaultFactor = presentation ? quantity(presentation.base_quantity).toFixed() : manualPresentation?.factor ?? "";
   const factor = factorOverride ?? defaultFactor;
@@ -106,18 +116,21 @@ export function MaterialBarcodeDialog<Product extends Material>({
     setManualAmount(null);
   }
 
-  return <Dialog open title={unknown ? "Código não cadastrado" : "Ler código"}
-    kicker="Identificação do material" subtitle={unknown
-      ? "O código informado está indisponível para os materiais desta ficha."
-      : "Confira o material e sua unidade padrão antes de incluir."}
+  const title = arrival ? "Ler código da chegada" : "Ler código";
+  const subtitle = arrival ? "Confira a apresentação e a quantidade que serão usadas neste lançamento."
+    : "Confira o material e sua unidade padrão antes de incluir.";
+  const unknownSubtitle = arrival ? "O código informado não corresponde a um material disponível nesta chegada."
+    : "O código informado está indisponível para os materiais desta ficha.";
+  return <Dialog open title={unknown ? "Código não cadastrado" : title}
+    kicker={arrival ? undefined : "Identificação do material"} subtitle={unknown ? unknownSubtitle : subtitle}
     onClose={onClose} finalFocus={finalFocus} keyboardScrollable popupClassName="hca-supply-barcode"
     footer={unknown ? <>
       <ActionButton ref={resultActionRef} onClick={() => chooseCode("")}>Tentar outro código</ActionButton>
       <ActionButton variant="primary" onClick={onClose}>Selecionar na lista</ActionButton>
     </> : <>
-      <ActionButton onClick={onClose}>Voltar</ActionButton>
+      <ActionButton onClick={onClose}>{arrival ? "Voltar à chegada" : "Voltar"}</ActionButton>
       {result ? <ActionButton variant="primary" disabled={!validAmount || !result.apply} onClick={result.apply}>
-        <Icon name="check" />{result.label ?? "Usar material"}
+        <Icon name="check" />{result.label ?? (arrival ? "Usar esta quantidade" : "Usar material")}
       </ActionButton> : null}
     </>}>
     <div className="hca-form-stack">
@@ -125,24 +138,25 @@ export function MaterialBarcodeDialog<Product extends Material>({
       {read.loading ? <p role="status">Consultando o catálogo…</p> : null}
       {read.error ? <Notice error>{read.error} <ActionButton ref={resultActionRef} onClick={read.refresh}>Tentar novamente</ActionButton></Notice> : null}
       {unknown ? <Notice>Selecione o material pela lista ou leia outro código.</Notice> : null}
-      {result && product && scanned ? <section className="hca-form-stack" aria-label="Conversão da apresentação">
+      {result && product && scanned ? <section className={arrival ? "hca-purchase-line hca-arrival-barcode-result" : "hca-form-stack"}
+        aria-label="Conversão da apresentação">
         <div className="hca-source-summary hca-supply-barcode-material">
-          <span className="hca-source-symbol"><Icon name="box" /></span>
-          <div><strong>{product.name}</strong><small>{code} · Unidade do catálogo: {product.unit}</small></div>
-          <ActionButton variant="quiet" compact aria-label="Ler outro código" onClick={() => chooseCode("")}>
+          {!arrival ? <span className="hca-source-symbol"><Icon name="box" /></span> : null}
+          <div><strong>{product.name}</strong><small>{arrival ? `Unidade do estoque · ${product.unit}` : `${code} · Unidade do catálogo: ${product.unit}`}</small></div>
+          <ActionButton ref={arrival ? resultActionRef : undefined} variant="quiet" compact aria-label="Ler outro código" onClick={() => chooseCode("")}>
             <Icon name="refresh" />
           </ActionButton>
         </div>
-        <div className="hca-supply-barcode-presentation">
+        {!arrival ? <div className="hca-supply-barcode-presentation">
           <div><small>Apresentação</small><strong>{presentationName}{validQuantity(factor, 6)
             ? ` · ${formatQuantity(factor, product.unit)}` : " · Informe o fator"}</strong></div>
           <ActionButton ref={resultActionRef} variant="quiet" compact aria-expanded={correcting} onClick={() => setCorrecting(value => !value)}>
             <Icon name="edit" />{correcting ? "Recolher" : "Corrigir"}
           </ActionButton>
-        </div>
-        {correcting ? <>
+        </div> : null}
+        {arrival || correcting ? <>
           <label className="hca-form-stack text-sm font-semibold">
-            Tipo de apresentação
+            {arrival ? "Apresentação lida" : "Tipo de apresentação"}
             <select className={inputClass} value={presentationChoice} onChange={event => {
               setPresentationChoice(event.currentTarget.value);
               setFactorOverride(null);
@@ -153,16 +167,22 @@ export function MaterialBarcodeDialog<Product extends Material>({
                 {alternatives.map(row => <option key={row.id} value={row.id}>{row.name}</option>)}
               </optgroup>
               <optgroup label="Conversão manual">
-                {manualPresentations.map(option => <option key={option.value} value={option.value}>{option.name}</option>)}
+                {manualOptions.map(option => <option key={option.value} value={option.value}>{option.name}</option>)}
               </optgroup>
             </select>
           </label>
-          <div className="grid grid-cols-2 items-end gap-3">
-            <FormField label="Quantidade lida">
-              <TextInput inputMode="numeric" maxLength={maxPackageDigits} value={packages} onChange={event => setPackages(event.currentTarget.value)} />
+          <div className={arrival ? "hca-arrival-barcode-quantities" : "grid grid-cols-2 items-end gap-3"}>
+            <FormField label={arrival ? "Embalagens recebidas" : "Quantidade lida"}>
+              <span className={arrival ? "hca-purchase-quantity" : "contents"}>
+                <TextInput inputMode="numeric" maxLength={maxPackageDigits} value={packages} onChange={event => setPackages(event.currentTarget.value)} />
+                {arrival ? <span aria-hidden="true">emb.</span> : null}
+              </span>
             </FormField>
-            <FormField label="Unidades por apresentação">
-              <TextInput inputMode="decimal" maxLength={17} value={factor} onChange={event => setFactorOverride(event.currentTarget.value)} />
+            <FormField label={arrival ? "Por embalagem" : "Unidades por apresentação"}>
+              <span className={arrival ? "hca-purchase-quantity" : "contents"}>
+                <TextInput inputMode="decimal" maxLength={17} value={factor} onChange={event => setFactorOverride(event.currentTarget.value)} />
+                {arrival ? <span aria-hidden="true">{product.unit}</span> : null}
+              </span>
             </FormField>
           </div>
           <CheckboxField label="Corrigir o total convertido" checked={manualAmount !== null}
@@ -172,8 +192,13 @@ export function MaterialBarcodeDialog<Product extends Material>({
           </FormField> : null}
         </> : null}
         <div className="hca-supply-barcode-total" aria-live="polite">
-          <strong>{validAmount ? formatQuantity(amount, product.unit) : "Confira os valores"}</strong>
-          <small>Quantidade que entrará na ficha</small>
+          {arrival ? <span className="hca-arrival-barcode-increment">
+            <Icon name={validAmount ? "check" : "info"} width={14} height={14} />
+            {validAmount ? `${formatQuantity(amount, product.unit)} nesta leitura` : "Confira os valores"}
+          </span> : <>
+            <strong>{validAmount ? formatQuantity(amount, product.unit) : "Confira os valores"}</strong>
+            <small>Quantidade que entrará na ficha</small>
+          </>}
           {result.summary}
         </div>
         {result.details}

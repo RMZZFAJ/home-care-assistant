@@ -1,21 +1,19 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
 import { ActionButton, SelectField, TextInput } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
-import { api, Notice } from "@/components/workspace";
+import { api } from "@/components/workspace";
 import { arrivalRemaining } from "@/lib/documents/purchase";
 import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
-import type { PresentationsRead } from "@/types/catalogue";
 import type { PurchaseReceipt, SupplyDocument, SupplyLine } from "@/types/documents";
 import type { ProductStock } from "@/types/stock";
+import { ArrivalBarcodeDialog } from "./arrival-barcode-dialog";
 import { SupplyLineSummary } from "./supply-line-summary";
 import { PurchaseCoverageFields, restoreArrivalPlanning, type ArrivalPlanningChoices } from "./purchase-coverage-fields";
 
 type ArrivalField = { selected: boolean; value: string; remaining: string; excess: boolean; };
-type ScannedArrival = { id: string; label: string; factor: string; unit: string; };
 
 export function PurchaseArrivalResult({ receipt, lines, onClose }: {
   receipt: PurchaseReceipt; lines: SupplyLine[]; onClose: () => void;
@@ -60,13 +58,10 @@ export function PurchaseArrivalFields({ data, lines, fields, directCredit, mayRe
     excess: fields?.[line.id + ":excess"] === "on",
   }])));
   const [scanner, setScanner] = useState(false);
-  const [scanned, setScanned] = useState<ScannedArrival | null>(null);
-  const [packages, setPackages] = useState("1");
+  const scannerTriggerRef = useRef<HTMLButtonElement>(null);
   const [detailsId, setDetailsId] = useState<string | null>(null);
-  const [scanError, setScanError] = useState("");
   const [planning, setPlanning] = useState<Record<string, ArrivalPlanningChoices>>(() =>
     Object.fromEntries(lines.map(line => [line.id, restoreArrivalPlanning(fields, line.id)])));
-  const scanRevisionRef = useRef(0);
   const readingStockRef = useRef(false);
   const [stock, setStock] = useState<ProductStock[] | null>(null);
   const [stockLoading, setStockLoading] = useState(false);
@@ -75,40 +70,6 @@ export function PurchaseArrivalFields({ data, lines, fields, directCredit, mayRe
 
   function update(id: string, patch: Partial<ArrivalField>) {
     setValues(old => ({ ...old, [id]: { ...old[id], ...patch } }));
-  }
-  async function readCode(code: string) {
-    const revision = ++scanRevisionRef.current;
-    setScanned(null);
-    setScanError("");
-    const query = new URLSearchParams({ careRecipientId: data.care_recipient_id, barcode: code });
-    const response = await api<PresentationsRead>("/api/catalog/presentations?" + query);
-    if (scanRevisionRef.current !== revision) return;
-    const match = response.data.find(item => item.active);
-    const line = match && lines.find(item => item.product_id === match.product_id);
-    if (!match || !line || !quantity(match.base_quantity).gt(0)) {
-      setScanError("O código não corresponde a um material que ainda aguarda chegada nesta COM. Você pode preencher manualmente.");
-      return;
-    }
-    setPackages("1");
-    setScanned({ id: line.id, label: match.name, factor: quantity(match.base_quantity).toFixed(), unit: line.unit_snapshot });
-  }
-  function closeScanner() {
-    scanRevisionRef.current++;
-    setScanner(false);
-  }
-  function applyScan() {
-    if (!scanned || !/^[1-9][0-9]{0,8}$/.test(packages)) return;
-    const value = values[scanned.id]?.value || "0";
-    if (!validQuantity(value, 6, true)) {
-      setScanError("Confira a quantidade que já foi digitada antes de acrescentar as embalagens.");
-      return;
-    }
-    update(scanned.id, {
-      selected: true,
-      value: quantity(value).plus(quantity(scanned.factor).mul(packages)).toFixed(),
-      excess: false,
-    });
-    closeScanner();
   }
   async function readStock() {
     if (!mayReadStock || stock || readingStockRef.current) return;
@@ -132,7 +93,7 @@ export function PurchaseArrivalFields({ data, lines, fields, directCredit, mayRe
     {directCredit ? <p className="hca-purchase-administrator"><Icon name="shield" />Aprovação automática · administrador</p> : null}
     <div className="hca-purchase-line-heading">
       <span className="inline-flex items-center gap-2 text-sm"><Icon name="truck" />{data.code} · {lines.length} materiais</span>
-      <ActionButton variant="quiet" compact onClick={() => { setScanned(null); setScanError(""); setScanner(true); }}>
+      <ActionButton ref={scannerTriggerRef} variant="quiet" compact onClick={() => setScanner(true)}>
         <Icon name="camera" />Ler código
       </ActionButton>
     </div>
@@ -197,17 +158,13 @@ export function PurchaseArrivalFields({ data, lines, fields, directCredit, mayRe
       {details ? <SupplyLineSummary line={details} type="COM" status={data.status}
         purchaseLine={data.purchaseProgress?.lines.find(row => row.lineId === details.id)} /> : null}
     </Dialog>
-    <Dialog open={scanner} title="Ler código" subtitle="Identifique uma apresentação para acrescentar a quantidade à chegada."
-      onClose={closeScanner}>
-      <BarcodeScanner onRead={readCode} />
-      {scanError ? <Notice error>{scanError}</Notice> : null}
-      {scanned ? <div className="hca-purchase-line mt-3">
-        <strong>{scanned.label}</strong><p>{formatQuantity(scanned.factor, scanned.unit)} por embalagem</p>
-        <label className="hca-purchase-field"><span>Embalagens</span>
-          <TextInput inputMode="numeric" value={packages} onChange={event => setPackages(event.currentTarget.value)} />
-        </label>
-        <ActionButton variant="primary" onClick={applyScan} disabled={!/^[1-9][0-9]{0,8}$/.test(packages)}>Usar quantidade</ActionButton>
-      </div> : null}
-    </Dialog>
+    {scanner ? <ArrivalBarcodeDialog patientId={data.care_recipient_id}
+      products={lines.map(line => ({ id: line.product_id, lineId: line.id, name: line.name_snapshot, unit: line.unit_snapshot }))}
+      precision={() => 6} currentAmount={product => values[product.lineId]?.value}
+      onClose={() => setScanner(false)} finalFocus={() => scannerTriggerRef.current ?? false}
+      onApply={(product, value) => {
+        update(product.lineId, { selected: true, value, excess: false });
+        setScanner(false);
+      }} /> : null}
   </>;
 }

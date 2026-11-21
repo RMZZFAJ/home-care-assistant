@@ -1,6 +1,6 @@
 import { expectNoOperationalDocumentAction } from "./document-sections";
 import { openOperationalDocumentAction } from "./document-sections";
-import { confirmDecisionAndReconcile, confirmedOutcome, noPrivateWrites } from "./l1-decision-policy";
+import { confirmDecisionAndReconcile, confirmedOutcome, loginDecision, noPrivateWrites } from "./l1-decision-policy";
 import { selectDocumentSection, openDocumentMore } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
@@ -238,18 +238,46 @@ test("COM chegada combina código e preenchimento manual e exige confirmação d
       productId: scanned.product_id, barcode: "1234567890128", name: "Pacote com quatro unidades", baseQuantity: "4", active: true,
     },
   });
-  await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
+  const administrator = await shiftWorker(f.patient, "admin");
+  await loginDecision(page, administrator.email, f.patient);
+  await page.goto("/fichas/" + document.id);
   await selectDocumentSection(page, "workflow");
   await openOperationalDocumentAction(page, "Registrar chegada");
   const arrival = page.getByRole("dialog", { name: "Registrar chegada", exact: true });
-  await arrival.getByRole("button", { name: "Ler código", exact: true }).click();
-  const reader = page.getByRole("dialog", { name: "Ler código", exact: true });
+  const scannedAmount = arrival.getByRole("textbox", {
+    name: `Recebidos agora · ${scanned.name_snapshot} · ${scanned.unit_snapshot}`, exact: true,
+  });
+  await arrival.getByRole("switch", { name: "Chegou · " + scanned.name_snapshot, exact: true }).click();
+  await scannedAmount.fill("2");
+  await page.route("**/api/catalog/presentations?*barcode=1234567890128", route => route.abort("failed"), { times: 1 });
+  const scanTrigger = arrival.getByRole("button", { name: "Ler código", exact: true });
+  await scanTrigger.click();
+  const reader = page.getByRole("dialog", { name: "Ler código da chegada", exact: true });
   await reader.getByLabel("Código manual").fill("1234567890128");
   await reader.getByRole("button", { name: "Identificar", exact: true }).click();
-  await expect(reader.getByText("4 unidade por embalagem", { exact: true })).toBeVisible();
-  await reader.getByRole("textbox", { name: "Embalagens", exact: true }).fill("2");
-  await reader.getByRole("button", { name: "Usar quantidade", exact: true }).click();
-  await expect(arrival.locator(`input[name="${scanned.id}"]`)).toHaveValue("8");
+  await reader.getByRole("button", { name: "Tentar novamente", exact: true }).click();
+  const presentation = reader.getByRole("combobox", { name: "Apresentação lida", exact: true });
+  const factor = reader.getByRole("textbox", { name: "Por embalagem", exact: true });
+  const apply = reader.getByRole("button", { name: "Usar esta quantidade", exact: true });
+  await expect(factor).toHaveValue("4");
+  await presentation.selectOption({ label: "Caixa" });
+  await expect(factor).toHaveValue("");
+  await expect(apply).toBeDisabled();
+  await factor.fill("3");
+  await reader.getByRole("textbox", { name: "Embalagens recebidas", exact: true }).fill("2");
+  await expect(reader).toContainText("Total na chegada após incluir: 8 unidade");
+  if (info.project.use.hasTouch) {
+    expect(await factor.evaluate(input => {
+      const label = (input as HTMLInputElement).labels?.[0];
+      return Boolean(label && label.getBoundingClientRect().right <= input.getBoundingClientRect().left);
+    })).toBe(true);
+    await info.attach("E05-09 conversão de chegada", {
+      body: await reader.screenshot({ scale: "css", animations: "disabled" }), contentType: "image/png",
+    });
+  }
+  await apply.click();
+  await expect(scanTrigger).toBeFocused();
+  await expect(scannedAmount).toHaveValue("8");
   await arrival.getByRole("switch", { name: "Chegou · " + manual.name_snapshot, exact: true }).click();
   await arrival.getByRole("textbox", {
     name: `Recebidos agora · ${manual.name_snapshot} · ${manual.unit_snapshot}`, exact: true,

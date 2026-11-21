@@ -23,12 +23,16 @@ test("E05-17 E05-18 registra uma doação avulsa, recupera a resposta e vincula 
   await picker.fill(manual.name_snapshot);
   await page.getByRole("option", { name: manual.name_snapshot, exact: true }).click();
   await form.getByRole("textbox", { name: new RegExp("Quantidade recebida · " + manual.name_snapshot) }).fill("3");
-  await form.getByRole("button", { name: "Ler código", exact: true }).click();
-  const scanner = page.getByRole("dialog", { name: "Ler código do material", exact: true });
+  const read = form.getByRole("button", { name: "Ler código", exact: true });
+  await read.click();
+  const scanner = page.getByRole("dialog", { name: "Ler código da chegada", exact: true });
   await scanner.getByRole("textbox", { name: "Código manual" }).fill(barcode);
   await scanner.getByRole("button", { name: "Identificar" }).click();
-  await scanner.getByRole("textbox", { name: "Embalagens recebidas" }).fill("2");
-  await scanner.getByRole("button", { name: "Acrescentar quantidade" }).click();
+  await scanner.getByRole("combobox", { name: "Apresentação lida", exact: true }).selectOption({ label: "Par" });
+  await expect(scanner.getByRole("textbox", { name: "Por embalagem", exact: true })).toHaveValue("2");
+  await scanner.getByRole("textbox", { name: "Embalagens recebidas", exact: true }).fill("4");
+  await scanner.getByRole("button", { name: "Usar esta quantidade", exact: true }).click();
+  await expect(read).toBeFocused();
   await expect(form.getByRole("textbox", { name: new RegExp("Quantidade recebida · " + scanned.name_snapshot) })).toHaveValue("8");
 
   const attempts: string[] = [];
@@ -83,6 +87,7 @@ test("E05-17 E05-18 registra uma doação avulsa, recupera a resposta e vincula 
       p_patient: f.patient, p_key: randomUUID(), p_body: { origin: "gift", lines: [{ productId: scanned.product_id, quantity: "1" }] },
     });
     const reviewer = await admin.newPage();
+    await reviewer.bringToFront();
     await loginDecision(reviewer, fixtures.adminA.email, f.patient);
     await reviewer.goto("/estoque");
     const consult = reviewer.getByRole("button", { name: `Consultar chegada ${receipt.result.code}`, exact: true });
@@ -105,7 +110,9 @@ test("E05-17 E05-18 registra uma doação avulsa, recupera a resposta e vincula 
     const { result: approved, receipt: reviewReceipt } = await confirmArrivalReview(reviewer, review, true);
     expect(reviewReceipt.results.map((item: { receiptId: string }) => item.receiptId)).toEqual([receipt.result.id]);
     await expect(approved).toContainText("Chegada aprovada");
-    await approved.getByRole("button", { name: "Concluir" }).click();
+    await expect(reviewer.locator(".hca-arrival-review-dialog")).toHaveCount(0);
+    await approved.getByRole("button", { name: "Concluir", exact: true }).click();
+    await expect(approved).toBeHidden();
     await expect(reviewerDetails).toContainText("Entrada aprovada");
     await reviewerDetails.getByRole("button", { name: "Fechar consulta" }).click();
     await expect(reviewer.getByRole("button", { name: `Revisar chegada ${another.code}`, exact: true })).toBeVisible();
