@@ -481,7 +481,9 @@ test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pod
 
 test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução e exige outra revisão", async ({
   page,
-}) => {
+}, info) => {
+  // Includes fixture preparation, two official decisions and both reference reads.
+  test.setTimeout(90_000);
   const f = await prepared({ request: true });
   await login(page, f.patient, "professional");
   await page.goto("/fichas/" + f.document.id);
@@ -493,9 +495,8 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
     })
     .click();
   await returnField(page).fill("1");
-  await decisionDialog(page)
-    .getByRole("textbox", { name: "Motivo da sua decisão", exact: true })
-    .fill("Conciliação própria com fonte revisada");
+  const reason = decisionDialog(page).getByRole("textbox", { name: "Motivo da sua decisão", exact: true });
+  await reason.fill("Conciliação própria com fonte revisada");
   await physicalCheck(page).check();
   await consume(f);
   const stock = ledger(f.patient),
@@ -517,12 +518,20 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
       exact: true,
     })
     .click();
-  await expect(
-    page.getByText(
-      "Consumo disponível revisado: 1 unidade · Atual: 2 unidade",
-      { exact: true },
-    ),
-  ).toBeVisible();
+  const comparison = decisionDialog(page).getByRole("region", { name: "Comparação da conciliação", exact: true });
+  await expect(comparison.getByText("O saldo para retorno mudou.", { exact: true })).toBeVisible();
+  for (const [label, before, after] of [
+    ["Retorno mínimo para conciliar", "1 unidade", "0 unidade"],
+    ["Consumo confirmado disponível", "1 unidade", "2 unidade"],
+  ]) {
+    const fact = comparison.getByText(label, { exact: true }).locator("..");
+    await expect(fact.locator("del")).toHaveText(`Antes: ${before}`);
+    await expect(fact.locator("strong")).toHaveText(`Agora: ${after}`);
+  }
+  expect(payloads).toHaveLength(1);
+  if (info.project.use.hasTouch) await info.attach("E06-12 saldo antes e agora", {
+    body: await comparison.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
   await page
     .getByRole("button", {
       name: "Usar referência atual e revisar novamente",
@@ -530,6 +539,7 @@ test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução
     })
     .click();
   await expect(returnField(page)).toHaveValue("1");
+  await expect(reason).toHaveValue("Conciliação própria com fonte revisada");
   await expect(returnField(page)).toBeFocused();
   await expect(physicalCheck(page)).not.toBeChecked();
   await returnField(page).fill("0");
@@ -671,12 +681,9 @@ test("ENT atualiza uma fonte indisponível por consulta e comparação, preserva
   await decisionDialog(page)
     .getByRole("button", { name: "Atualizar referências", exact: true })
     .click();
-  await expect(
-    page.getByRole("heading", {
-      name: "Comparação da conciliação",
-      exact: true,
-    }),
-  ).toBeVisible();
+  const comparison = decisionDialog(page).getByRole("region", { name: "Comparação da conciliação", exact: true });
+  await expect(comparison.getByText("Retorno mínimo para conciliar", { exact: true })).toBeVisible();
+  await expect(comparison.locator("del")).toHaveCount(0);
   await page
     .getByRole("button", {
       name: "Usar referência atual e revisar novamente",

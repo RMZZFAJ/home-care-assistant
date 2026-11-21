@@ -4,6 +4,7 @@ import { Notice } from "@/components/workspace";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { DocumentChangeFacts } from "./document-freshness";
 import type {
   DeliveryCancellationContext,
   DeliveryCancellationLine,
@@ -181,43 +182,40 @@ export function DeliveryCancellationComparison({
   original: SupplyDocument;
   current: SupplyDocument;
 }) {
+  const originalReference = original.deliveryCancellation;
+  const previous = new Map(originalReference?.sourceAccess === false ? [] : originalReference?.lines.map(line => [line.lineId, line]));
+  const reference = current.deliveryCancellation;
+  const amounts = [
+    { field: "minimumReturnQuantity", label: "Retorno mínimo para conciliar" },
+    { field: "availableConsumedQuantity", label: "Consumo confirmado disponível" },
+  ] as const;
+  const rows = reference?.sourceAccess === false ? [] : (reference?.lines ?? []).map(line => {
+    const prior = previous.get(line.lineId);
+    const facts = amounts.flatMap(({ field, label }) => {
+      if (line[field] === undefined) return [];
+      const before = prior?.[field] === undefined ? undefined : formatQuantity(prior[field], prior.unit);
+      const after = formatQuantity(line[field], line.unit);
+      return [{ id: field, label, before: before === after ? undefined : before, after }];
+    });
+    return { line, facts };
+  }).filter(row => row.facts.length);
+  const returnChanged = rows.some(row => row.facts.some(fact => fact.id === "minimumReturnQuantity" && fact.before !== undefined));
   return (
-    <section className="space-y-3">
+    <section className="hca-form-stack" aria-label="Comparação da conciliação">
       <h3 className="font-semibold">Comparação da conciliação</h3>
+      {returnChanged ? <p className="font-semibold">O saldo para retorno mudou.</p> : null}
       <p>
         Versão revisada: {original.version} · Versão atual: {current.version}
       </p>
       <p>
         Pedido atual:{" "}
-        {current.deliveryCancellation
-          ? cancellationStatuses[current.deliveryCancellation.request.status]
-          : "sem pedido vigente"}
+        {reference ? cancellationStatuses[reference.request.status] : "sem pedido vigente"}
       </p>
-      {original.lines.map((line) => {
-        const before = original.deliveryCancellation?.lines.find(
-            (item) => item.lineId === line.id,
-          ),
-          after = current.deliveryCancellation?.lines.find(
-            (item) => item.lineId === line.id,
-          );
-        return (
-          <div key={line.id}>
-            <strong>{line.name_snapshot}</strong>
-            <p className="text-sm">
-              Consumo disponível revisado:{" "}
-              {formatQuantity(
-                before?.availableConsumedQuantity,
-                line.unit_snapshot,
-              )}{" "}
-              · Atual:{" "}
-              {formatQuantity(
-                after?.availableConsumedQuantity,
-                line.unit_snapshot,
-              )}
-            </p>
-          </div>
-        );
-      })}
+      {rows.map(({ line, facts }) => <article className="hca-receipt-line" key={line.lineId}>
+        <h4>{line.name}</h4>
+        <DocumentChangeFacts changes={facts} />
+      </article>)}
+      {returnChanged ? <p className="hca-document-change-note">Revise a quantidade fisicamente devolvida considerando o retorno mínimo atualizado.</p> : null}
     </section>
   );
 }

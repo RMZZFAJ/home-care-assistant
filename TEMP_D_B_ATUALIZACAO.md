@@ -1,5 +1,11 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — comparação no cancelamento após recebimento.** A revisão mostra
+o retorno mínimo e o consumo confirmado por material. Quando a referência
+muda, a comparação mostra os valores anterior e atual e conserva a
+devolução e a justificativa digitadas.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — recuperação dos avisos e do PDF inicial.** O resultado da emissão
 mantém a ficha registrada em consulta. Quando uma etapa auxiliar falha,
 identifica a pendência e oferece o diagnóstico e a recuperação da mesma

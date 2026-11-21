@@ -171,6 +171,7 @@ Capturas em `output/playwright/l2-arrival-card/`.
   próximo passo, comparação de mudanças e retirada da ficha quando cai o acesso.
   A abertura distingue erro de consulta, referência indisponível e catálogo
   vazio. Pende a revisão móvel final dos grupos de estados afetados.
+
 - **Emissão e ciclo E04–E06.** Sobreposição de confirmação, reconciliação da
   emissão, avisos no PDF inicial assinado, revisão de pendências, conclusão,
   cancelamento, reabertura, arquivo por decisão ou prazo e PDF consolidado
@@ -358,6 +359,22 @@ dispensa anterior e uma única ocorrência nova no histórico. Os percursos
 móveis em Android e iOS emulados conferiram o rodapé a 360 e 412 px,
 o cancelamento sem rascunho, a recuperação da resposta perdida e o
 retorno ao menu de origem com a aba Andamentos preservada.
+
+**Saldo alterado no cancelamento após recebimento.** Em E06-12, a comparação
+mostra, por material, o retorno mínimo para conciliar e o consumo confirmado
+disponível. O valor anterior aparece riscado quando há diferença e os
+rótulos Antes e Agora são lidos por tecnologia assistiva. A quantidade
+fisicamente devolvida e a justificativa continuam na revisão ao adotar a
+referência. Uma nova conferência física é exigida antes de consentir.
+Quando a referência anterior estava indisponível ao perfil, a comparação
+mostra os valores atuais autorizados. A referência foi conferida a 390 px.
+Sem migrations novas.
+Com Auth real, os dois casos dirigidos passaram em Android e iOS emulados.
+Uma nova unidade consumida mudou o retorno mínimo de uma unidade para zero
+na mesma versão da ficha. A adoção preservou os campos e exigiu outra
+conferência antes de efetivar a decisão. No iOS, o primeiro ensaio atingiu
+30 segundos no fim da jornada. O caso passou em 54,5 segundos no reteste,
+com o limite total de 90 segundos e os limites individuais preservados.
 
 **Trechos de composição conferidos.** A barra de cinco etapas, as categorias
 dentro de Materiais, o bloco expandido e o diálogo Organizar listas em E04-04,
