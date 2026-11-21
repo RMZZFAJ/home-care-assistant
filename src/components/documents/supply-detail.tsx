@@ -24,7 +24,7 @@ import {
 } from "@/lib/documents/presentation";
 import { documentVariant } from "@/lib/documents/variant";
 import { IssuedBalanceMaterials } from "@/components/balances/balance-materials";
-import { PurchaseMaterials } from "./purchase-materials";
+import { PurchaseDeliveryAvailability, PurchaseMaterials } from "./purchase-materials";
 import { PurchaseExtraResolution } from "./purchase-extra-resolution";
 import { DeliveryMaterials } from "./delivery-materials";
 import { CountedDeliveryReceipt, CountedDeliveryReceiptResult } from "./delivery-receipt";
@@ -1493,6 +1493,8 @@ export function SupplyDocumentContent({
             actor={context.fullName} userId={context.userId} initial={archiveDialog} finalFocus={archiveDialog === "review" ? archiveReviewRef : moreTriggerRef}
             onClose={() => setArchiveDialog(null)} onUpdated={() => setAttempt(value => value + 1)} /> : null}
           {data.status === "cancelled" && data.protocol ? <DocumentCancellationNotice key={`${context.userId}:${id}`} document={data} userId={context.userId} activeContext={Boolean(activeContext && !archived)} onRecorded={() => setAttempt(value => value + 1)} /> : null}
+          {canPrepareDelivery && allowed("stock.family.read") ? <PurchaseDeliveryAvailability
+            key={`${context.userId}:${data.id}`} data={data} revision={`${data.version}:${liveRevision}:${attempt}`} /> : null}
           <DocumentTabs
             rootRef={tabs.rootRef}
             type={data.type}

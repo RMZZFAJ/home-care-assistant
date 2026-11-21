@@ -220,6 +220,30 @@ repetição com build de produção. O cenário de entrada aprovada conferiu
 permaneceu aguardando a loja. A revogação de leitura ocultou o saldo com
 o modal aberto. A chegada pendente continuou sem saldo de entrada.
 
+**Aprovação na revisão e entrega com a COM ainda aberta.** Em E05-07,
+a revisão mostra a aprovação automática quando o papel na residência
+é de administração e a capacidade de aprovar está vigente. A explicação
+trata apenas dos materiais identificados. Para quem depende de outra
+autorização, a revisão explica a aprovação do planejamento.
+
+Em E05-19, o cartão acima das abas lista os materiais disponíveis para
+entregar. Ele consulta a mesma referência que o assistente de ENT.
+Cada quantidade considera a entrada aprovada na COM e o saldo atual da
+família. O cartão exige permissão vigente de criar ENT e ler o estoque
+familiar. Da lista é possível abrir a preparação vinculada à COM. Para
+vários materiais elegíveis, uma ação abre a entrega com todos eles.
+A ficha mantém a consulta e o vínculo geral de origem por suas ações
+existentes. Sem migrations novas.
+
+Os quatro casos dirigidos passaram em Chromium móvel e WebKit iOS
+emulados. Com Auth real, a revisão mudou após revogar e restaurar a
+aprovação. A COM foi emitida com autorização das duas unidades
+identificadas no teste. A entrega importou quatro unidades do material
+aprovado após uma saída do estoque familiar. A parcela pendente ficou de
+fora e a perda de leitura do estoque retirou o cartão. O último reteste
+passou após a recuperação do Auth local, que havia atingido timeout antes
+de abrir a ficha.
+
 **Resolver pendências durante a revisão de conclusão.** Em E04-12, a
 linha bloqueada abre a avaliação familiar da entrega vinculada. Em
 E05-12, a linha abre a conferência das chegadas elegíveis daquela COM.

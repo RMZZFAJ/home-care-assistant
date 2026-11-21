@@ -1,5 +1,10 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+**21/11 — aprovação na revisão e entrega parcial da COM.** A revisão
+explica se a própria emissão autoriza os materiais identificados. A COM
+mostra o saldo que pode seguir para a ENT enquanto outra chegada aguarda
+aprovação. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+
 **21/11 — abertura e emissão dos assistentes.** Nova devolução entra
 direto na confirmação. A emissão inicia o carregamento por etapas antes
 da gravação final. Voltar de Extras retorna à última lista de materiais.

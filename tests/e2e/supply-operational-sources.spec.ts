@@ -1,7 +1,8 @@
 import { selectMaterialCategory } from "./material-category";
-import { openOperationalDocumentAction, selectDocumentSection } from "./document-sections";
+import { selectDocumentSection } from "./document-sections";
 import { selectDeliveryRecipient } from "./delivery-recipient";
 import { expect, test, type Page } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 import { fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
@@ -74,16 +75,33 @@ test("L2 COM encaminha a sugestão de catálogo para Materiais e emite uma únic
   for (let step = 0; step < 3; step++) await next(page);
   await expect(page.getByText(name, { exact: true })).toHaveCount(1);
   await expect(page.getByText(observation, { exact: true })).toBeVisible();
+  const automatic = page.getByText("Administração · aprovação automática", { exact: true });
+  const required = page.getByText("Um administrador precisa autorizar os materiais identificados antes da compra.", { exact: true });
+  await expect(automatic).toBeVisible();
+  await expect(page.getByText("Sua autorização já acompanha esta compra", { exact: true })).toBeVisible();
+  const override = `care_recipient_id=${q(f.patient)} and subject_user=${q(admin.id)} and capability='com.approve'`;
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(admin.id)},'com.approve',false)`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  await expect(required).toBeVisible();
+  await expect(automatic).toHaveCount(0);
+  sql(`delete from public.capability_overrides where ${override}`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  await expect(automatic).toBeVisible();
+  await info.attach("E05-07 aprovação na revisão", { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await expect(page.locator(".hca-supply-wizard-status")).toHaveText("Último rascunho salvo.");
   const submission = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/documents");
   await page.getByRole("button", { name: "Emitir compra", exact: true }).click();
   const response = await submission;
   expect(response.ok(), await response.text()).toBe(true);
   const { data: document } = await response.json();
+  expect(document.status).toBe("approved");
   expect(document.payload.observations).toEqual([observation]);
   expect(document.lines).toMatchObject([
     { product_id: f.products[1], quantity: expect.anything() },
   ]);
   expect(document.lines[0].metadata.catalogueExtra).toBeFalsy();
+  expect(Number(document.lines[0].approved_quantity)).toBe(2);
 });
 
 test("L2 COM emite o extra pendente e identifica o material na mesma ficha sem entrada de estoque", async ({ page }, info) => {
@@ -232,15 +250,29 @@ test("L2 COM mantém o vínculo geral após desfazer importação e conserva a q
 });
 
 test("L2 Preparar entrega parte da COM e traz apenas a quantidade da chegada aprovada", async ({ page }, info) => {
-  test.setTimeout(120_000);
+  test.setTimeout(240_000);
   const f = await purchaseBalanceFixture();
   const admin = await shiftWorker(f.patient, "admin");
   const sourceLine = f.document.lines.find((line: { product_id: string }) => line.product_id === f.products[0]);
   const arrival = await purchaseBalanceArrival(f, f.document, [{ lineId: sourceLine.id, quantity: "5" }]);
-  const com = await purchaseBalanceCommand(f.admin, arrival.document, "validate_receipt", { receiptId: arrival.receipt.id });
+  const approved = await purchaseBalanceCommand(f.admin, arrival.document, "validate_receipt", { receiptId: arrival.receipt.id });
+  const other = approved.lines.find((line: { product_id: string }) => line.product_id === f.products[1]);
+  const { document: com } = await purchaseBalanceArrival(f, approved, [{ lineId: other.id, quantity: "3" }]);
   await loginDecision(page, admin.email, f.patient);
   await page.goto("/documentos/" + com.id);
-  await openOperationalDocumentAction(page, "Preparar entrega");
+  const ready = page.getByRole("region", { name: "Materiais disponíveis para entregar", exact: true });
+  await expect(ready.getByRole("listitem")).toHaveCount(1);
+  await expect(ready).toContainText(sourceLine.name_snapshot);
+  await expect(ready).toContainText("5 unidade disponíveis para entregar");
+  await expect(ready).not.toContainText(other.name_snapshot);
+  await rpc(f.admin, "family_stock_movement", {
+    p_patient: f.patient, p_product: f.products[0], p_action: "outbound", p_quantity: "31",
+    p_reason: "Saída fictícia para conferir a disponibilidade antes da entrega", p_key: randomUUID(),
+  });
+  await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
+  await expect(ready).toContainText("4 unidade disponíveis para entregar");
+  await info.attach("E05-19 materiais disponíveis", { body: await ready.screenshot({ animations: "disabled" }), contentType: "image/png" });
+  await ready.getByRole("listitem").getByRole("link", { name: "Preparar entrega", exact: true }).click();
   const origin = page.getByRole("region", { name: "Fichas vinculadas", exact: true });
   await expect(origin.getByRole("button", { name: com.code, exact: true })).toBeVisible();
   await page.screenshot({ path: `output/playwright/l2-ent-from-com-${info.project.name}.png`, scale: "css" });
@@ -248,11 +280,18 @@ test("L2 Preparar entrega parte da COM e traz apenas a quantidade da chegada apr
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const draft = JSON.parse(sql(`select content from private.creation_drafts
     where care_recipient_id=${q(f.patient)} and kind='ENT' and purpose='create' and state='active'`));
-  expect(draft.form.quantities).toEqual({ [f.products[0]]: "5" });
+  expect(draft.form.quantities).toEqual({ [f.products[0]]: "4" });
   expect(draft.sources).toEqual([{ documentId: com.id, general: true, productIds: [f.products[0]] }]);
   expect(draft.form.recipientId).toBe(fixtures.professional.id);
   await page.reload();
   await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(origin.getByRole("button", { name: com.code, exact: true })).toBeVisible();
   expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)} and type='ENT'`)).toBe("0");
+  await page.goto("/documentos/" + com.id);
+  await expect(ready).toBeVisible();
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(admin.id)},'stock.family.read',false)`);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
+  await expect(ready).toHaveCount(0);
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeVisible();
 });

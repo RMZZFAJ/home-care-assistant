@@ -1696,6 +1696,9 @@ export function PatientSupplyWizard({
               >
                 <SupplyWizardStep
                   step={step}
+                  purchaseApproval={type === "COM" && !editing?.protocol
+                    ? context.patient?.role === "admin" && can(context, "com.approve") ? "automatic" : "required"
+                    : undefined}
                   onCategoryChange={nextCategory => openStep(materialCategories.findIndex(item => item.id === nextCategory) + 1)}
                   onEditStage={openStage}
                   type={type}

@@ -1,12 +1,55 @@
 "use client";
-import { useMemo } from "react";
+import Link from "next/link";
+import { useCallback, useMemo } from "react";
 import { DocumentMaterialList } from "./document-material-list";
 import { formatQuantity, quantity as decimal } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { FeedbackBanner } from "@/components/ui/feedback";
+import { ActionButton } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
+import { DocumentSection } from "@/components/ui/model-section";
+import { primaryClass } from "@/components/workspace";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import { parseSupplySources } from "@/lib/validation/supply-sources";
 import { requirePurchaseEntryBalances, type PurchaseEntryBalance } from "@/lib/validation/purchase-entry-balances";
 import { readPresentationConversions, presentationCaption } from "@/lib/presentation-conversion";
 import type { SupplyDocument } from "@/types/documents";
+import { MaterialReview } from "./material-review";
+
+export function PurchaseDeliveryAvailability({ data, revision }: { data: SupplyDocument; revision: string }) {
+  const patientId = data.care_recipient_id;
+  const decode = useCallback((value: unknown) => parseSupplySources(value, patientId, "ENT", 1), [patientId]);
+  const params = new URLSearchParams({ careRecipientId: patientId, target: "ENT", type: "COM", ids: data.id });
+  const read = useScopedRead("/api/documents/sources?" + params, revision, decode);
+  const source = read.data?.data.find(option => option.id === data.id && option.type === "COM");
+  const eligible = new Map(source?.materials.map(material => [material.lineId, material]));
+  const rows = data.lines.flatMap(line => {
+    const material = eligible.get(line.id);
+    return material?.available && material.productId === line.product_id && decimal(material.available).gt(0)
+      ? [{ line, available: material.available }] : [];
+  });
+  if (read.loading || !rows.length && !read.error) return null;
+
+  const prepareDelivery = <Link className={primaryClass + " hca-control--compact shrink-0"} href={`/fichas/ent?purchaseId=${data.id}`}>
+    <Icon name="truck" />Preparar entrega
+  </Link>;
+  return <DocumentSection title="Materiais disponíveis para entregar" icon="truck">
+    {read.error ? <div className="hca-form-stack">
+      <p role="status">Não foi possível consultar os materiais disponíveis para entrega.</p>
+      <div><ActionButton compact onClick={read.refresh}>Consultar novamente</ActionButton></div>
+    </div> : <div className="hca-form-stack">
+      <p className="hca-field-help">A entrega usa apenas o saldo que já está disponível.</p>
+      <MaterialReview rows={rows.map(({ line, available }) => ({
+        id: line.id,
+        name: line.name_snapshot,
+        icon: "box",
+        details: <small>{formatQuantity(available, line.unit_snapshot)} disponíveis para entregar</small>,
+        consult: rows.length === 1 ? prepareDelivery : undefined,
+      }))} />
+      {rows.length > 1 ? <div>{prepareDelivery}</div> : null}
+    </div>}
+  </DocumentSection>;
+}
 
 function EntryBalance({ fact, unit, receipts }: { fact?: PurchaseEntryBalance; unit: string; receipts: SupplyDocument["receipts"] }) {
   if (!fact) return <>Não disponível no registro</>;

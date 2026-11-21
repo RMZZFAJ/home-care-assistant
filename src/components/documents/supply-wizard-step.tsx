@@ -7,6 +7,7 @@ import { MaterialConsultButton } from "./catalogue-material-panel";
 import { ActionButton, CheckboxField, DefinitionGrid, FormField, TextAreaField } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
+import { FeedbackBanner } from "@/components/ui/feedback";
 import { materialCategories, supplyExtrasStep, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { pendingExtraReviewRow, SupplyExtraItems } from "./supply-extra-items";
 import type { PendingPurchaseExtra } from "@/lib/validation/pending-purchase-extras";
@@ -80,6 +81,7 @@ export function SupplyWizardStep({
   onCategoryChange,
   onEditStage,
   type,
+  purchaseApproval,
   context,
   form,
   setForm,
@@ -106,6 +108,7 @@ export function SupplyWizardStep({
   onCategoryChange: (category: string) => void;
   onEditStage: (stage: 2 | 3) => void;
   type: SupplyType;
+  purchaseApproval?: "automatic" | "required";
   context: WorkspaceContext;
   form: WizardState;
   setForm: Dispatch<SetStateAction<WizardState>>;
@@ -541,13 +544,17 @@ export function SupplyWizardStep({
           </section> : form.notes ? (
             <p className="whitespace-pre-wrap text-sm">{form.notes}</p>
           ) : null}
-          <Notice>
-            {type === "ENT"
-              ? "Ao concluir, as quantidades serão expedidas e aguardarão recebimento. Confira origem, destinatário e materiais."
-              : type === "BAL"
-                ? "Ao concluir, os ajustes seguirão a política de aprovação do paciente. Confira todas as contagens."
-                : "A aprovação dos itens e o recebimento serão acompanhados nesta ficha. Nenhum pagamento é necessário para registrar uma doação."}
-          </Notice>
+          {type === "ENT" ? <Notice>Ao concluir, as quantidades serão expedidas e aguardarão recebimento. Confira origem, destinatário e materiais.</Notice>
+            : type === "BAL" ? <Notice>Ao concluir, os ajustes seguirão a política de aprovação do paciente. Confira todas as contagens.</Notice>
+              : purchaseApproval && selected.length ? <div className="hca-form-stack">
+                {purchaseApproval === "automatic" ? <>
+                  <p className="hca-purchase-administrator"><Icon name="shield" />Administração · aprovação automática</p>
+                  <FeedbackBanner tone="success" heading="Sua autorização já acompanha esta compra">
+                    <p>Os materiais identificados serão autorizados no momento da emissão.</p>
+                  </FeedbackBanner>
+                </> : <Notice>Um administrador precisa autorizar os materiais identificados antes da compra.</Notice>}
+                {pendingExtras.length ? <p className="hca-field-help">Os itens sem identificação aguardam cadastro.</p> : null}
+              </div> : null}
         </>
       ) : null}
     </>
