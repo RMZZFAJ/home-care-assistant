@@ -10,12 +10,15 @@ import {
 import { z } from "zod";
 import {
   ActionButton,
+  DefinitionGrid,
   FormField,
   SelectField,
   TextAreaField,
 } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
 import {
   api,
+  ApiError,
   can,
   Notice,
   type WorkspaceContext,
@@ -25,6 +28,7 @@ import { RequisitionStockCancellationDialog, type RequisitionStockOutcome } from
 import { DraftContentSummary } from "@/components/forms/creation-draft-panel";
 import { useDocumentDecision, DocumentDecisionFailure } from "@/components/documents/use-document-decision";
 import { DocumentArchivePolicy } from "@/components/documents/document-archive-policy";
+import { DocumentOperationFailureDialog, operationRecoveryLimit, type DocumentOperationFailure } from "@/components/documents/document-operation-failure-dialog";
 import type { DocumentDecisionIntention } from "@/lib/validation/document-decisions";
 import {
   adoptRequisitionDecisionReference,
@@ -50,6 +54,8 @@ type Reference = {
   document: RequisitionDecisionReference;
   products: RequisitionDecisionProduct[];
 };
+type CancellationFailure = DocumentOperationFailure & { stockChoice?: RequisitionStockChoice; reviewReference?: boolean };
+const cancellationUnconfirmed = "O resultado continua sem confirmação. Confira a mesma tentativa antes de repetir o cancelamento.";
 const productResponse = z.object({
   data: z
     .array(
@@ -86,6 +92,7 @@ export function RequisitionDecisionEditor({
   onClose: () => void;
   onSaved: (stockOutcome?: RequisitionStockOutcome) => void;
 }) {
+  const isCancellation = purpose === "cancel";
   const [baseline, setBaseline] = useState<ReceiptDraftContent | null>(null),
     [fields, setFields] = useState<Record<string, string>>({});
   const [reference, setReference] = useState<Reference | null>(null),
@@ -101,6 +108,8 @@ export function RequisitionDecisionEditor({
     field: string;
     message: string;
   } | null>(null);
+  const [cancellationFailure, setCancellationFailure] = useState<CancellationFailure | null>(null);
+  const [recoveryAttempts, setRecoveryAttempts] = useState(0);
   const restoredRef = useRef(false),
     returnFocusRef = useRef(false),
     headingRef = useRef<HTMLHeadingElement>(null),
@@ -119,7 +128,10 @@ export function RequisitionDecisionEditor({
         (purpose !== "cancel" || can(context, "req.create")) &&
         (purpose !== "resolve_extra" || can(context, "catalog.manage"));
   const decision = useDocumentDecision({ userId: context.userId, documentId: id, domain: "requisition", action: purpose });
-  const uncertain = decision.uncertain;
+  const uncertain = decision.uncertain || cancellationFailure?.outcome === "uncertain";
+  const recoveryExhausted = recoveryAttempts >= operationRecoveryLimit;
+  const activeFailure: CancellationFailure | null = cancellationFailure ?? (purpose === "cancel" && decision.uncertain && decision.recoveryMessage
+    ? { outcome: "uncertain", description: cancellationUnconfirmed } : null);
   useOperationActivity(!reference && !error && !consulting && scopeMatches, { title: "Consultando a requisição", detail: "Estamos conferindo a referência autorizada para este preenchimento." });
   const readReference = useCallback(
     async (
@@ -304,7 +316,10 @@ export function RequisitionDecisionEditor({
       setUnavailable(false);
       pendingRef.current = packet.data;
       setReviewing(true);
-      if (purpose === "cancel" && current.document.stockCancellation) setChoosingStock(true);
+      if (isCancellation) {
+        if (current.document.stockCancellation) setChoosingStock(true);
+        else await confirm();
+      }
     } catch (cause) {
       setError(errorText(cause));
       returnFocusRef.current = true;
@@ -316,8 +331,8 @@ export function RequisitionDecisionEditor({
     requireRequisitionDecisionResult(row, { action: purpose, body: requisitionDecisionPacketSchema.shape.body.parse(intention.body) }, { id, patientId });
   }
   const stockComparison = purpose === "cancel" ? reference?.document.stockCancellation : undefined;
-  async function confirm(stockChoice?: RequisitionStockChoice) {
-    if (busy || !scopeMatches) return;
+  async function confirm(stockChoice?: RequisitionStockChoice, recovering = false) {
+    if (busy || !scopeMatches || (recovering && recoveryExhausted)) return;
     const packet = pendingRef.current;
     if (!packet && !uncertain) return;
     if (!uncertain && stockComparison && !stockChoice) {
@@ -326,6 +341,8 @@ export function RequisitionDecisionEditor({
     }
     setChoosingStock(false);
     setBusy(true); setError("");
+    setCancellationFailure(null);
+    if (recovering) setRecoveryAttempts(count => count + 1);
     try {
       const outcome = uncertain ? await decision.checkPrevious(verifyDecision) : await decision.execute({
         domain: "requisition", action: purpose, body: {
@@ -334,7 +351,15 @@ export function RequisitionDecisionEditor({
         },
         expectedVersion: packet!.expectedVersion, referenceHash: fields.referenceHash,
       }, verifyDecision);
-      if (!outcome) return;
+      if (!outcome) {
+        if (purpose === "cancel" && uncertain) setCancellationFailure({ outcome: "uncertain", description: cancellationUnconfirmed, stockChoice });
+        return;
+      }
+      if (purpose === "cancel" && outcome.state === "not_applied") {
+        setCancellationFailure({ outcome: "rejected", description: "A conferência confirmou que nada foi alterado nesta tentativa.",
+          stockChoice, reviewReference: !packet || Boolean(stockComparison && !stockChoice) });
+        return;
+      }
       pendingRef.current = null; setReviewing(false);
       if (outcome.state === "applied") {
         setDirty(false);
@@ -347,6 +372,14 @@ export function RequisitionDecisionEditor({
       }
       else setError("A conferência confirmou que nada foi alterado. Seus campos continuam nesta tela. Se o erro persistir, procure a supervisão.");
     } catch (cause) {
+      if (purpose === "cancel") {
+        const rejected = cause instanceof DocumentDecisionFailure && cause.outcome === "not_applied";
+        const source = cause instanceof DocumentDecisionFailure ? cause.cause : cause;
+        setCancellationFailure({ outcome: rejected ? "rejected" : "uncertain", cause: source, stockChoice,
+          description: rejected ? "A conferência confirmou que nada foi alterado nesta tentativa." : cancellationUnconfirmed,
+          reviewReference: rejected && source instanceof ApiError && [401, 403, 409].includes(source.status) });
+        return;
+      }
       setError(errorText(cause));
       if (cause instanceof DocumentDecisionFailure && cause.outcome === "not_applied") { pendingRef.current = null; setReviewing(false); returnFocusRef.current = true; }
     }
@@ -371,6 +404,12 @@ export function RequisitionDecisionEditor({
       reasonRef.current?.focus();
     }
   }, [baseline, readOnly, busy]);
+  function refreshCancellationReview() {
+    pendingRef.current = null;
+    setCancellationFailure(null);
+    setReviewing(false);
+    void compare();
+  }
   if (choosingStock && scopeMatches && stockComparison && reference) return (
     <RequisitionStockCancellationDialog
       code={reference.document.code}
@@ -387,23 +426,39 @@ export function RequisitionDecisionEditor({
   return (
     <RecordDrawer
       exitDialog
+      modal={isCancellation}
+      keyboardScrollable={isCancellation}
+      popupClassName={isCancellation ? "hca-wizard-dialog hca-cancellation-review" : undefined}
+      kicker={isCancellation && reference ? `${reference.document.code} · ${context.patient?.display_name ?? "Paciente identificado na ficha"}` : undefined}
+      subtitle={isCancellation ? "Confira os efeitos desta decisão antes de confirmar." : undefined}
       title={
-        reviewing
+        isCancellation ? "Revisar e cancelar" : reviewing
           ? "Revisar decisão da requisição"
-          : stockComparison && purpose === "cancel"
-            ? "Revisar e cancelar"
           : requisitionDecisionLabels[purpose]
       }
-      busy={busy}
+      busy={busy || decision.busy}
       hasUnsavedChanges={dirty}
       uncertainOutcome={uncertain || decision.uncertain}
       restoreFocusTo={restoreFocusTo}
       restoreFocusFallbackRef={restoreFocusFallbackRef}
       onClose={onClose}
+      footer={isCancellation ? requestClose => <>
+        <ActionButton variant="quiet" disabled={busy || decision.busy} onClick={requestClose}><Icon name="back" />Voltar à ficha</ActionButton>
+        {!readOnly && !uncertain ? <ActionButton variant="danger" disabled={!allowed || busy || decision.busy} onClick={() => void review()}>
+          <Icon name="close" />Confirmar cancelamento
+        </ActionButton> : null}
+      </> : undefined}
+      recovery={requestClose => scopeMatches && activeFailure && !busy && !decision.busy ? <DocumentOperationFailureDialog
+        {...activeFailure} title="Não foi possível cancelar a requisição" operation="Cancelar requisição"
+        fallbackCode="CANCELAMENTO_SEM_CONFIRMACAO" attempts={recoveryAttempts} closeLabel="Voltar à ficha" onClose={requestClose}
+        action={activeFailure.reviewReference ? { label: "Consultar versão atual", onClick: refreshCancellationReview }
+          : !recoveryExhausted && (uncertain || allowed) ? { label: uncertain ? "Conferir resultado" : "Tentar novamente",
+            onClick: () => void confirm(activeFailure.stockChoice, true) } : undefined}
+        exhaustedMessage={recoveryExhausted ? "Copie os detalhes para a supervisão e volte à ficha." : undefined} /> : null}
     >
       <div className="hca-form-stack">
-        {decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
-        {error || decision.error ? <Notice error>{error || decision.error}</Notice> : null}
+        {!activeFailure && decision.recoveryMessage ? <Notice>{decision.recoveryMessage}</Notice> : null}
+        {!activeFailure && (error || decision.error) ? <Notice error>{error || decision.error}</Notice> : null}
         {!scopeMatches ? (
           <Notice>
             O paciente selecionado mudou. Feche esta consulta para continuar no
@@ -488,12 +543,25 @@ export function RequisitionDecisionEditor({
                 ) : null}
               </section>
             ) : null}
-            <h3 ref={headingRef} tabIndex={-1}>
+            {isCancellation && reference && !unavailable ? <>
+              <DefinitionGrid items={[
+                { label: "Ficha", value: reference.document.code },
+                { label: "Paciente", value: context.patient?.display_name ?? "Paciente identificado na ficha" },
+                { label: "Responsável pela ação", value: context.fullName },
+                { label: "Referência", value: `Versão ${reference.document.documentVersion}` },
+              ]} />
+              <ul className="hca-cancellation-checklist">
+                <li><Icon name="check-circle" /><div><strong>Vínculos e histórico</strong><p>Os registros anteriores serão preservados.</p></div></li>
+                <li><Icon name="file" /><div><strong>Atendimento registrado</strong><p>{reference.document.fulfillment.fulfilled} de {reference.document.fulfillment.total} materiais atendidos.</p></div></li>
+              </ul>
+              {stockComparison ? <p className="hca-field-help">Na confirmação, você escolhe se mantém ou reverte o ajuste de estoque da emissão.</p> : null}
+            </> : null}
+            {!isCancellation ? <h3 ref={headingRef} tabIndex={-1}>
               {reviewing
                 ? "Conferir decisão antes de confirmar"
                 : "Preencher decisão"}
-            </h3>
-            {!unavailable && reference ? (
+            </h3> : null}
+            {!isCancellation && !unavailable && reference ? (
               <p>
                 {reference.document.code} · versão{" "}
                 {reference.document.documentVersion}.{" "}
@@ -507,7 +575,7 @@ export function RequisitionDecisionEditor({
                 )}
               </p>
             ) : null}
-            {reviewing ? (
+            {!isCancellation && reviewing ? (
               <>
                 <p>
                   <strong>{requisitionDecisionLabels[purpose]}</strong>
@@ -560,9 +628,7 @@ export function RequisitionDecisionEditor({
                         ? "Recuperar mesma decisão"
                         : purpose === "archive"
                           ? "Confirmar arquivamento"
-                          : purpose === "cancel"
-                            ? "Confirmar cancelamento"
-                            : "Confirmar associação"}
+                          : "Confirmar associação"}
                   </ActionButton>
                 </div>
               </>
@@ -689,7 +755,7 @@ export function RequisitionDecisionEditor({
                   label={
                     purpose === "resolve_extra"
                       ? "Justificativa da associação"
-                      : "Justificativa"
+                      : isCancellation ? "Motivo do cancelamento" : "Justificativa"
                   }
                 >
                   <TextAreaField
@@ -705,15 +771,15 @@ export function RequisitionDecisionEditor({
                 </FormField>
                 {purpose === "cancel" && reference && !unavailable && !uncertain ?
                   <DocumentArchivePolicy id={id} patientId={patientId} version={reference.document.documentVersion} /> : null}
-                <ActionButton
+                {!isCancellation ? <ActionButton
                   variant="primary"
                   type="submit"
                   disabled={!allowed || busy}
                 >
                   {purpose === "resolve_extra"
                     ? "Revisar associação"
-                    : stockComparison ? "Confirmar cancelamento" : "Revisar decisão"}
-                </ActionButton>
+                    : "Revisar decisão"}
+                </ActionButton> : null}
               </form>
             )}
           </>

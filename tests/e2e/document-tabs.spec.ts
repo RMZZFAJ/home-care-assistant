@@ -431,16 +431,16 @@ test("Mais revisa cancelamento com foco, fecha sem efeito e respeita revogação
     .getByRole("menuitem", { name: "Cancelar requisição", exact: true })
     .click();
   const dialog = page.getByRole("dialog", {
-    name: "Cancelar requisição",
+    name: "Revisar e cancelar",
     exact: true,
   });
   await expect(dialog).toBeVisible();
   await expect(page.locator(".hca-document-identifiers")).toHaveCount(0);
   await expect(
-    dialog.getByRole("textbox", { name: "Justificativa", exact: true }),
+    dialog.getByRole("textbox", { name: "Motivo do cancelamento", exact: true }),
   ).toBeFocused();
   await dialog
-    .getByRole("textbox", { name: "Justificativa", exact: true })
+    .getByRole("textbox", { name: "Motivo do cancelamento", exact: true })
     .fill("Motivo fictício ainda não confirmado");
   await dialog.press("Escape");
   const discard = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });

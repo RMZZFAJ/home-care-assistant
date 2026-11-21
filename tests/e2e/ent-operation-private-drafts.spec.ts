@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { entOperationFixture, entFacts, entReason } from "../integration/ent-operation-fixtures.mjs";
 import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
 import { openDocumentMore } from "./document-sections";
-import { loginDecision, noPrivateWrites, privateFormCount, confirmedOutcome } from "./l1-decision-policy";
+import { loginDecision, noPrivateWrites, privateFormCount, confirmedOutcome, loseDecisionResponse } from "./l1-decision-policy";
 import { audit } from "./accessibility-audit";
 import { generatedPdf } from "./generated-pdf";
 import { PDF } from "@libpdf/core";
@@ -61,6 +61,18 @@ for (const mode of ["pending", "accepted"] as const) test(`ENT cancelamento ${mo
  await page.getByRole("dialog", { name: "Sair sem concluir?" }).getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
  expect(entFacts(f)).toBe(before); await expect(reason).toHaveValue(entReason);
  await audit(page, "ENT pedido de cancelamento sem rascunho");
- await confirmedOutcome(page, f.document.id, "Enviar pedido"); expect(privateFormCount(f.patient)).toBe("0"); expect(writes).toEqual([]);
+ const endpoint = `/api/documents/${f.document.id}/decisions`;
+ const packets = await loseDecisionResponse(page, endpoint);
+ await page.route(`**${endpoint}/reconcile`, route => route.fulfill({ status: 503, json: {
+   code: "DATABASE_UNAVAILABLE", error: "Consulta fictícia indisponível.",
+ } }), { times: 1 });
+ await request.getByRole("button", { name: "Enviar pedido", exact: true }).click();
+ const failure = page.getByRole("dialog", { name: "Não foi possível confirmar a decisão de cancelamento", exact: true });
+ await expect(failure).toHaveAttribute("data-outcome", "uncertain");
+ const receipt = page.waitForResponse(response => response.url().endsWith(`${endpoint}/reconcile`));
+ await failure.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+ expect((await (await receipt).json()).data).toMatchObject({ state: "applied", documentId: f.document.id });
+ await expect(failure).toHaveCount(0);
+ expect(packets).toHaveLength(1); expect(privateFormCount(f.patient)).toBe("0"); expect(writes).toEqual([]);
  expect((await rpc(f.admin, "operational_document", { p_id: f.document.id })).status).toBe("cancellation_pending");
 });

@@ -5,7 +5,7 @@ import { Dialog, Drawer } from "@/components/ui/overlays";
 /** Contextual editing keeps the list and its filters in place. */
 export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false, modal = false, kicker, subtitle, popupClassName, footer }: {
   title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
-  recovery?: ReactNode;
+  recovery?: ReactNode | ((requestClose: () => void) => ReactNode);
   hasUnsavedChanges?: boolean;
   keyboardScrollable?: boolean;
   uncertainOutcome?: boolean;
@@ -47,7 +47,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
   };
   const Surface = modal ? Dialog : Drawer;
   return <Surface open title={title} kicker={kicker} subtitle={subtitle} popupClassName={popupClassName} footer={footer?.(requestClose)} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false} keyboardScrollable={keyboardScrollable}>
-      {recovery}
+      {typeof recovery === "function" ? recovery(requestClose) : recovery}
       {exitDialog ? <Dialog open={discard} title={uncertainOutcome ? "Fechar sem resultado confirmado?" : "Sair sem concluir?"} onClose={continueEditing} finalFocus={false}>
         <p>{uncertainOutcome ? "O resultado da tentativa continua sem confirmação. Fechar descarta os campos desta tela. Procure a supervisão e confira o resultado antes de repetir a ação." : "O preenchimento desta ação será descartado. Fechar não confirma a alteração."}</p>
         <div className="hca-toolbar"><button type="button" className="hca-control" disabled={busy || preventClose} onClick={continueEditing}>Voltar ao preenchimento</button><button type="button" className="hca-control hca-control--primary" disabled={busy || preventClose} onClick={() => { if (!busy && !preventClose) onClose(); }}>{uncertainOutcome ? "Fechar e procurar supervisão" : "Sair e descartar"}</button></div>

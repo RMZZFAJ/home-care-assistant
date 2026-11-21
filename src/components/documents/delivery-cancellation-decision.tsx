@@ -7,6 +7,7 @@ import { WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { Icon } from "@/components/ui/icon";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { Dialog } from "@/components/ui/overlays";
+import { DocumentOperationFailureDialog, operationRecoveryLimit, type DocumentOperationFailure } from "./document-operation-failure-dialog";
 import { Notice } from "@/components/workspace";
 import { documentPatientName } from "@/lib/documents/presentation";
 import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
@@ -37,7 +38,7 @@ function receiverName(data: SupplyDocument) {
   return "Recebedor original";
 }
 
-export function DeliveryCancellationDecision({ action, data, patientName, actor, busy, blocked, uncertain, error, conflict, finalFocus, focusRevision, onAction, onCompare, onSubmit, onRecover, onClose, onCloseUncertain }: {
+export function DeliveryCancellationDecision({ action, data, patientName, actor, busy, blocked, uncertain, error, failure, conflict, finalFocus, focusRevision, onAction, onCompare, onSubmit, onRecover, onReviewReference, onClose, onCloseUncertain }: {
   action: CancellationAction;
   data: SupplyDocument;
   patientName: string;
@@ -46,6 +47,7 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
   blocked: boolean;
   uncertain: boolean;
   error: string;
+  failure: DocumentOperationFailure | null;
   conflict?: ReactNode;
   finalFocus: RefObject<HTMLButtonElement | null>;
   focusRevision: number;
@@ -53,6 +55,7 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
   onCompare: () => void;
   onSubmit: (body: Record<string, unknown>) => void;
   onRecover: () => void;
+  onReviewReference: () => void;
   onClose: () => void;
   onCloseUncertain: () => void;
 }) {
@@ -63,6 +66,9 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
   const [returns, setReturns] = useState<Record<string, string>>({});
   const [checkedReference, setCheckedReference] = useState<string | null>(null);
   const [discard, setDiscard] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const exhausted = attempts >= operationRecoveryLimit;
+  const activeFailure = !busy && !discard ? failure : null;
   const hintId = useId();
   const fieldsRef = useRef<HTMLDivElement>(null);
   const previousFocusRevisionRef = useRef(focusRevision);
@@ -85,7 +91,7 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
     return parsed.data.data;
   }, [id, patientId, version]);
   const preview = useScopedRead(requesting ? `/api/documents/${id}?reference=cancellation-preview` : null, `${version}:${focusRevision}`, decodePreview);
-  useOperationActivity(preview.loading, { title: "Consultando saldo da entrega" });
+  useOperationActivity(preview.loading && !activeFailure, { title: "Consultando saldo da entrega" });
   const previewData = !preview.loading && !preview.error && preview.data?.sourceReady ? preview.data : null;
   const showSources = consenting && !blocked && reference?.sourceReady && reference.sourceAccess !== false && reference.referenceHash;
   const transit = quantity(reference?.unresolvedTransit ?? "0").gt(0);
@@ -125,13 +131,22 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
     else if (request && !consenting) onSubmit({ ...body, requestId: request.id });
   }
 
+  function retry() {
+    if (exhausted || busy || !uncertain && !canSubmit) return;
+    setAttempts(count => count + 1);
+    if (uncertain) onRecover();
+    else submit();
+  }
+  const failureAction = !uncertain && conflict ? { label: "Voltar à revisão", onClick: onReviewReference }
+    : !exhausted && (uncertain || canSubmit) ? { label: uncertain ? "Conferir resultado" : "Tentar novamente", onClick: retry } : undefined;
+
   return <>
-    <Dialog open title={title} kicker={[data.code, patient].filter(Boolean).join(" · ")} subtitle={subtitle}
+    <Dialog open={!activeFailure} title={title} kicker={[data.code, patient].filter(Boolean).join(" · ")} subtitle={subtitle}
       popupClassName="hca-cancellation-dialog" keyboardScrollable
       closeDisabled={busy} finalFocus={finalFocus} onClose={close} footer={<>
         <ActionButton variant="quiet" disabled={busy || uncertain} onClick={close}><Icon name="back" />{withdrawing ? "Manter pedido" : "Voltar à ficha"}</ActionButton>
-        <ActionButton variant={requesting && !uncertain ? "danger" : "primary"} disabled={busy || !uncertain && !canSubmit}
-          onClick={uncertain ? onRecover : submit}>
+        <ActionButton variant={requesting && !uncertain ? "danger" : "primary"} disabled={busy || (uncertain ? exhausted : !canSubmit)}
+          onClick={uncertain ? retry : submit}>
           <Icon name={requesting ? "send" : "check"} />{uncertain ? "Conferir resultado" : submitLabel}
         </ActionButton>
       </>}>
@@ -170,6 +185,7 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
         {!requesting && !withdrawing && !uncertain ? <FormField label="Sua decisão">
           <SelectField value={action} disabled={busy || blocked} onChange={event => {
             setCheckedReference(null);
+            setAttempts(0);
             onAction(event.currentTarget.value === "consent_cancel" ? "consent_cancel" : "refuse_cancellation");
           }}>
             <option value="consent_cancel">Consentir com o cancelamento</option>
@@ -221,6 +237,10 @@ export function DeliveryCancellationDecision({ action, data, patientName, actor,
           </FormField>}
       </div>
     </Dialog>
+    {activeFailure ? <DocumentOperationFailureDialog {...activeFailure} title="Não foi possível confirmar a decisão de cancelamento"
+      operation={submitLabel} fallbackCode="CANCELAMENTO_SEM_CONFIRMACAO" attempts={attempts}
+      onClose={close} closeLabel="Voltar à ficha" action={failureAction}
+      exhaustedMessage={exhausted ? "Copie os detalhes para a supervisão e volte à ficha." : undefined} /> : null}
     {discard ? <Dialog open title="Sair sem concluir?" onClose={() => setDiscard(false)} footer={<>
       <ActionButton onClick={() => setDiscard(false)}>Voltar ao preenchimento</ActionButton>
       <ActionButton variant="primary" onClick={onClose}>Sair e descartar</ActionButton>

@@ -117,9 +117,14 @@ test("06.2 ENT selection and complete readonly review follow the model without s
       }
       await auditFromTop(page, "canonical ENT review " + width);
     }
-    mkdirSync("output/playwright/phase-d", { recursive: true });
-    await captureVisible(grid, `output/playwright/phase-d/ent-review-identity-${info.project.name}.png`);
-    await captureVisible(page.locator(".hca-material-review"), `output/playwright/phase-d/ent-review-material-${info.project.name}.png`);
+    await page.setViewportSize({ width: 390, height: 900 });
+    await expect.poll(() => page.evaluate(() => innerWidth)).toBe(390);
+    const identityCapture = info.outputPath("ent-review-identity-390.png");
+    const materialCapture = info.outputPath("ent-review-material-390.png");
+    await captureVisible(grid, identityCapture);
+    await captureVisible(page.locator(".hca-material-review"), materialCapture);
+    await info.attach("ENT review identity at 390 px", { path: identityCapture, contentType: "image/png" });
+    await info.attach("ENT review material at 390 px", { path: materialCapture, contentType: "image/png" });
     expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
   } finally { await referenceContext.close(); }
 });

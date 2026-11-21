@@ -6,14 +6,12 @@ import { Dialog } from "@/components/ui/overlays";
 import { useOperationSupport } from "./use-operation-support";
 
 export const operationRecoveryLimit = 2;
+export type DocumentOperationFailure = { outcome: "rejected" | "uncertain"; description: string; cause?: unknown };
 
 export function DocumentOperationFailureDialog({
   title, description, outcome, cause, operation, fallbackCode, attempts, exhaustedMessage, onClose, closeLabel, action,
-}: {
+}: DocumentOperationFailure & {
   title: string;
-  description: string;
-  outcome: "rejected" | "uncertain";
-  cause?: unknown;
   operation: string;
   fallbackCode: string;
   attempts: number;

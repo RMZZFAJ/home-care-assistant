@@ -185,8 +185,9 @@ test("COM compra mista da família preserva a previsão e recupera uma chegada p
   expect(persisted.receipts.map((receipt: { state: string; lines: unknown[]; }) => [receipt.state, receipt.lines]))
     .toEqual([["pending", [{ lineId: inHand.id, quantity: "3" }]]]);
   expect(persisted.purchaseSchedule).toEqual([expect.objectContaining({ lineId: online.id, expectedDate: "2027-01-19" })]);
+  await expect(page).toHaveURL(url => url.pathname === "/fichas/" + doc.id && url.searchParams.get("documentTab") === "materials");
   await page.reload();
-  await selectDocumentSection(page, "workflow");
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
   await page.getByText("Previsões informadas pela loja", { exact: true }).click();
   await expect(page.getByText(/^Previsão 19\/01\/2027/)).toBeVisible();
   expect(writes).toEqual([]);

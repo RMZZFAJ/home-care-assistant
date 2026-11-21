@@ -31,6 +31,7 @@ import { CountedDeliveryReceipt, CountedDeliveryReceiptResult } from "./delivery
 import { canReconcileFromFamily, DeliveryReconciliation, DeliveryReconciliationResult } from "./delivery-reconciliation";
 import { DeliveryTransitCancellationFacts, DeliveryTransitCancellationResult } from "./delivery-transit-cancellation";
 import { DocumentCancellationReview } from "./document-cancellation-review";
+import type { DocumentOperationFailure } from "./document-operation-failure-dialog";
 import { PurchaseCancellationFacts, PurchaseCancellationResult, purchaseCancellationBlockers } from "./purchase-cancellation";
 import { DeliveryCancellationDecision, DeliveryCancellationStatusDialog, type CancellationAction } from "./delivery-cancellation-decision";
 import { DocumentFollowUpActions } from "./document-follow-up-actions";
@@ -176,6 +177,7 @@ export function SupplyDocumentContent({
   const [reassignmentResult, setReassignmentResult] = useState<SupplyDocument | null>(null);
   const [transitCancellationResult, setTransitCancellationResult] = useState<SupplyDocument | null>(null);
   const [purchaseCancellationResult, setPurchaseCancellationResult] = useState<string | null>(null);
+  const [cancellationFailure, setCancellationFailure] = useState<DocumentOperationFailure | null>(null);
   const [cancellationStatus, setCancellationStatus] = useState<SupplyDocument | null>(null);
   const [reconciliationResult, setReconciliationResult] = useState<{ data: SupplyDocument; body: DeliveryResolutionBody; nextLineId?: string } | null>(null);
   const [purchaseUpdating, setPurchaseUpdating] = useState(false);
@@ -200,6 +202,7 @@ export function SupplyDocumentContent({
     data.lines.some(line => quantity(line.accepted_quantity).gt(0)));
   const reviewingCancellation = data?.type === "ENT" && (action === "cancel" && hasPersonalReceipt ||
     action === "consent_cancel" || action === "refuse_cancellation" || action === "withdraw_cancellation");
+  const cancellationOperation = reviewingDirectCancellation || reviewingCancellation;
   const coveredOperation = authorizingPurchase || registeringPurchase || registeringArrival || reassigningDelivery;
   const refreshingArrival = loading && coveredRead && data?.type === "COM";
   const activityTitle = refreshingArrival ? "Atualizando chegada" : busy ? "Confirmando a operação" : "Consultando a ficha";
@@ -405,6 +408,7 @@ export function SupplyDocumentContent({
     if (!pendingRef.current && !checking) return;
     setBusy(true);
     setError("");
+    if (cancellationOperation) setCancellationFailure(null);
     const initialIntention = pendingRef.current;
     try {
       const verify = (row: Record<string, unknown>, accepted: DocumentDecisionIntention, key: string) => {
@@ -470,6 +474,10 @@ export function SupplyDocumentContent({
       if (!outcome) return;
       if (outcome.state === "not_applied") {
         pendingRef.current = null; setUncertain(false); setReview(null);
+        if (cancellationOperation) {
+          setCancellationFailure({ outcome: "rejected", description: "A conferência confirmou que nada foi alterado nesta tentativa." });
+          return;
+        }
         setError("A conferência confirmou que nada foi alterado. Seus campos continuam nesta tela para tentar novamente. Se persistir, procure a supervisão."); return;
       }
       const intention = { ...outcome.intention, idempotencyKey: outcome.key };
@@ -590,7 +598,7 @@ export function SupplyDocumentContent({
     } catch (reason) {
       const failure = reason instanceof DocumentDecisionFailure ? reason : null;
       const cause = failure?.cause ?? reason;
-      const rejected = failure?.outcome === "not_applied" || cause instanceof ApiError && [400, 401, 403, 404, 409, 422].includes(cause.status);
+      const rejected = failure?.outcome === "not_applied" || (!cancellationOperation || !failure) && cause instanceof ApiError && [400, 401, 403, 404, 409, 422].includes(cause.status);
       if (rejected) {
         if (
           data.type === "COM" &&
@@ -615,6 +623,13 @@ export function SupplyDocumentContent({
         setReview(null);
       }
       setUncertain(failure ? failure.outcome === "uncertain" : uncertain || !rejected);
+      const needsConsentReview = rejected && cause instanceof ApiError && [403, 409].includes(cause.status);
+      if (reviewingDirectCancellation || reviewingCancellation && !needsConsentReview) {
+        setCancellationFailure({ outcome: rejected ? "rejected" : "uncertain", cause, description: rejected
+          ? "A conferência confirmou que nada foi alterado nesta tentativa."
+          : "O resultado continua sem confirmação. Confira a mesma tentativa antes de repetir o cancelamento." });
+        return;
+      }
       setError(
         reason instanceof Error
           ? reason.message
@@ -909,6 +924,7 @@ export function SupplyDocumentContent({
     operationOpenerRef.current = opener;
     setOperationFromCompletion(fromCompletion);
     setReview(null);
+    setCancellationFailure(null);
     if (item === "reassign" || (item === "receive" && data?.type === "ENT") || (item === "resolve" && hasCountedTransit) ||
       (item === "cancel" && (data?.type === "COM" || hasUnreceivedDispatch || hasPersonalReceipt)) ||
       item === "consent_cancel" || item === "withdraw_cancellation") {
@@ -1858,6 +1874,9 @@ export function SupplyDocumentContent({
         busy={busy || decision.busy} blocked={deliveryConflict || !actions.includes("cancel") || cancellingPurchase && (
           purchaseConflict || stale || purchaseCancellation.unavailable || purchaseCancellation.awaitingArrival || purchaseCancellation.awaitingReview)}
         uncertain={uncertain || decision.uncertain} error={error || decision.recoveryMessage}
+        failure={cancellationFailure ?? (decision.uncertain && decision.recoveryMessage ? {
+          outcome: "uncertain", description: "O resultado continua sem confirmação. Confira a mesma tentativa antes de repetir o cancelamento.",
+        } : null)}
         finalFocus={operationOpenerRef}
         conflict={cancellingPurchase ? purchaseConflictPanel : deliveryConflict ? <Notice>
           A ficha mudou durante a revisão. Confira a situação atual antes de cancelar.
@@ -1878,10 +1897,12 @@ export function SupplyDocumentContent({
           void execute(next);
         }}
         onRecover={() => void execute()}
+        onReviewReference={() => setCancellationFailure(null)}
         onClose={() => {
           setAction(null);
           setReview(null);
           setError("");
+          setCancellationFailure(null);
           setDeliveryConflict(false);
           setPurchaseConflict(false);
           setComparison(null);
@@ -1902,6 +1923,9 @@ export function SupplyDocumentContent({
         patientName={context.patient?.display_name ?? "Paciente identificado na ficha"} actor={context.fullName}
         busy={busy || decision.busy} blocked={deliveryConflict || !actions.includes(action === "refuse_cancellation" ? "consent_cancel" : action!)}
         uncertain={uncertain || decision.uncertain} error={error || decision.recoveryMessage}
+        failure={cancellationFailure ?? (decision.uncertain && decision.recoveryMessage ? {
+          outcome: "uncertain", description: "O resultado continua sem confirmação. Confira a mesma tentativa antes de repetir a decisão.",
+        } : null)}
         finalFocus={operationOpenerRef}
         conflict={deliveryConflict ? <Notice>
           O pedido, a versão ou as referências da conciliação mudaram. Seus campos permanecem nesta revisão.
@@ -1916,7 +1940,8 @@ export function SupplyDocumentContent({
             : <ActionButton onClick={() => void comparePurchaseVersion()}>Consultar pedido e referências atuais</ActionButton>}
         </Notice> : null}
         focusRevision={focusRevision}
-        onAction={next => { setAction(next); setReview(null); setError(""); }}
+        onAction={next => { setAction(next); setReview(null); setError(""); setCancellationFailure(null); }}
+        onReviewReference={() => setCancellationFailure(null)}
         onCompare={() => { setDeliveryConflict(true); void comparePurchaseVersion(); }}
         onSubmit={body => {
           const next = { action: action!, body, summary: "", expectedVersion: data.version };
@@ -1929,6 +1954,7 @@ export function SupplyDocumentContent({
           setReview(null);
           setError("");
           setDeliveryConflict(false);
+          setCancellationFailure(null);
           setComparison(null);
           setAttempt(value => value + 1);
         }}
