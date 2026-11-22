@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID, randomBytes, createHmac } from "node:crypto";
-import { setInterval, clearInterval } from "node:timers";
+import { performance } from "node:perf_hooks";
+import { setTimeout as delay } from "node:timers/promises";
 import { createClient } from "@supabase/supabase-js";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -432,7 +433,7 @@ test("V4: legacy header visibility consent cannot record new SCI and the manual 
 
 test(
   "V4: two Auth sessions receive private invalidations; another user's topic is refused",
-  { timeout: 35000 },
+  { timeout: 75000 },
   async () => {
     const { patient, products } = await setup();
     const family = await actor("family", patient),
@@ -471,31 +472,18 @@ test(
       const a = subscribe(family, fixtures.family.id),
         b = subscribe(pro, fixtures.professional.id);
       await Promise.all([a.ready, b.ready]);
-      // Require the real database stream, not merely a joined WebSocket, to be ready.
-      await new Promise((resolve, reject) => {
-        let interval;
-        let timeout;
-        const check = () => {
-          if (a.received.length && b.received.length) {
-            clearInterval(interval);
-            clearTimeout(timeout);
-            resolve();
-          }
-        };
-        a.listeners.push(check);
-        b.listeners.push(check);
-        const ping = () =>
-          sql(
-            `select realtime.send('{"revision":0}'::jsonb,'invalidate','hca:user:${fixtures.family.id}',true);select realtime.send('{"revision":0}'::jsonb,'invalidate','hca:user:${fixtures.professional.id}',true);`,
-          );
-        interval = setInterval(ping, 400);
-        timeout = setTimeout(() => {
-          clearInterval(interval);
-          reject(new Error("Database broadcast stream is not ready"));
-        }, 10000);
-        ping();
-        check();
-      });
+      // Let the sockets process events between synchronous container queries.
+      // Both channels must see this database probe before the real operation.
+      const probeId = randomUUID();
+      const payload = sqlLiteral(JSON.stringify({ revision: 0, id: probeId }));
+      const heard = (subscription) => subscription.received.some(event => event.id === probeId && event.revision === 0);
+      const deadline = performance.now() + 25_000;
+      while (!heard(a) || !heard(b)) {
+        if (performance.now() >= deadline) throw new Error("Database broadcast stream is not ready");
+        sql(`select realtime.send(${payload}::jsonb,'invalidate','hca:user:${fixtures.family.id}',true);
+          select realtime.send(${payload}::jsonb,'invalidate','hca:user:${fixtures.professional.id}',true);`);
+        await delay(350);
+      }
       const changes = [a, b].map(
         (subscription) =>
           new Promise((resolve) =>

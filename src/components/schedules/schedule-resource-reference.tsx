@@ -45,7 +45,7 @@ export function ScheduleResourceReferenceFacts({
             },
             { label: "Versão", value: reference.version },
             { label: "Primeiro dia", value: series.anchor_date },
-            { label: "Último dia", value: series.valid_until },
+            { label: series.open_ended ? "Ocorrências registradas até" : "Último dia", value: series.valid_until },
             {
               label: "Encerrada a partir de",
               value: series.ended_on ?? "Não encerrada",

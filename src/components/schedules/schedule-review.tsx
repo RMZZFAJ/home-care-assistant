@@ -2,6 +2,7 @@
 import { DefinitionGrid } from "@/components/ui/controls";
 import { Notice } from "@/components/workspace";
 import { civilInstant } from "@/lib/schedules/time";
+import { timeAfter } from "@/lib/schedules/residence-hours";
 import type { ScheduleCommand } from "@/lib/validation/schedules";
 import type {
   ScheduleWorkspace,
@@ -130,8 +131,9 @@ export function ScheduleSeriesOccurrences({ series }: { series: ShiftSeries }) {
   return (
     <details open>
       <summary>
-        {series.occurrences.length} plantões na programação completa
+        {series.occurrences.length} plantões {series.open_ended ? "registrados até " + series.valid_until : "na programação completa"}
       </summary>
+      {series.continuation_blocked ? <Notice error>Há um conflito na geração dos próximos plantões. Confira a agenda e a disponibilidade do profissional.</Notice> : null}
       <ul>
         {series.occurrences.map((shift) => (
           <li key={shift.id}>
@@ -170,22 +172,32 @@ export function ScheduleReviewDetails({ review }: { review: ScheduleReview }) {
       { label: "Duração", value: command.body.durationMinutes + " minutos" },
       { label: "Uso futuro", value: (command.body.active === false ? "Indisponível" : "Disponível") + ". Ocorrências anteriores conservam seus horários." },
     ]} />;
-  if (command.action === "series")
+  if (command.action === "series") {
+    const type = data.types.find(row => row.id === command.body.shiftTypeId);
+    const timing = command.body.residenceHours;
+    const end = timing?.endsLocal ? { time: timing.endsLocal, nextDay: timing.endsLocal <= timing.startsLocal }
+      : timing && type ? timeAfter(timing.startsLocal, type.duration_minutes) : null;
     return <DefinitionGrid items={[
       { label: "Profissional", value: data.professionals.find(person => person.id === command.body.professionalId)?.name ?? "Profissional indisponível" },
       { label: "Tipo de plantão", value: data.types.find(type => type.id === command.body.shiftTypeId)?.name ?? "Tipo de plantão indisponível" },
-      { label: "Período", value: command.body.anchorDate.split("-").reverse().join("/") + " a " + command.body.validUntil.split("-").reverse().join("/") },
+      { label: "Período", value: command.body.anchorDate.split("-").reverse().join("/")
+        + (command.body.recurrence === "once" ? "" : command.body.validUntil
+          ? " a " + command.body.validUntil.split("-").reverse().join("/") : " · sem data de término") },
       { label: "Fuso", value: command.body.timezone },
+      ...(timing && end ? [{ label: timing.endsLocal ? "Horário especial" : "Horário da residência",
+        value: timing.startsLocal + " às " + end.time + (end.nextDay ? " · término no dia seguinte" : "") }] : []),
       { label: "Repetição", value: command.body.recurrence === "dates" ? "Datas escolhidas" : command.body.recurrence === "once" ? "Data específica" : command.body.recurrence === "cycle" ? command.body.workHours + " horas de trabalho / " + command.body.restHours + " horas de descanso" : command.body.weekdays.map(day => ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][day]).join(", ") },
       ...(command.body.recurrence === "dates" ? [{ label: "Plantões selecionados", wide: true, value: <ol className="hca-form-stack">{(command.body.dates ?? []).map(day => {
-        const type = data.types.find(row => row.id === command.body.shiftTypeId);
         if (!type) return <li key={day}>Tipo indisponível; retorne à preparação.</li>;
-        const start = civilInstant(day + "T" + type.starts_local.slice(0,5), command.body.timezone), end = new Date(Date.parse(start) + type.duration_minutes * 60000).toISOString();
-        return <li key={day}>{scheduleStamp(start, command.body.timezone)} → {scheduleStamp(end, command.body.timezone)}</li>;
+        if (timing && end) return <li key={day}>{day.split("-").reverse().join("/")} · {timing.startsLocal} às {end.time}{end.nextDay ? " do dia seguinte" : ""}</li>;
+        const start = civilInstant(day + "T" + type.starts_local.slice(0,5), command.body.timezone);
+        const finish = new Date(Date.parse(start) + type.duration_minutes * 60000).toISOString();
+        return <li key={day}>{scheduleStamp(start, command.body.timezone)} → {scheduleStamp(finish, command.body.timezone)}</li>;
       })}</ol> }] : []),
       { label: "Notas", value: command.body.notes || "Sem notas", wide: true },
       { label: "Consequência", value: "A capacidade vigente determina publicação ou proposta para aprovação. Nenhuma programação comprova presença.", wide: true },
     ]} />;
+  }
   if (
     command.action === "approve" ||
     command.action === "reject" ||

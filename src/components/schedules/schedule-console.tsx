@@ -34,9 +34,10 @@ import {
 } from "./use-schedule-confirmation";
 import { ScheduleConfirmationPanel } from "./schedule-confirmation-panel";
 import { useScrollableRegion } from "@/components/ui/use-scrollable-region";
+import { useResidenceHours } from "./use-residence-hours";
 
-const today = () =>
-  new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(
+const today = (timeZone = "America/Sao_Paulo") =>
+  new Intl.DateTimeFormat("sv-SE", { timeZone }).format(
     new Date(),
   );
 const stateLabels: Record<string, string> = {
@@ -218,6 +219,7 @@ function Agenda({
   const patient = context.patient!,
     team = can(context, "schedule.manage.team"),
     publishOwn = can(context, "schedule.manage.own");
+  const residence = useResidenceHours(patient.id, true);
   const params = useSearchParams(),
     reference = params.get("ref"),
     notice = useNotificationReference(
@@ -226,8 +228,11 @@ function Agenda({
       reference,
       params.get("refKind") ?? "auto",
     );
-  const [fallbackDay] = useState(() => { const requested = params.get("day"); return requested && /^\d{4}-\d{2}-\d{2}$/.test(requested) && !Number.isNaN(Date.parse(requested)) && new Date(requested).toISOString().slice(0, 10) === requested ? requested : today(); }),
-    [chosenDay, setChosenDay] = useState<{
+  const requested = params.get("day");
+  const fallbackDay = requested && /^\d{4}-\d{2}-\d{2}$/.test(requested)
+    && !Number.isNaN(Date.parse(requested)) && new Date(requested).toISOString().slice(0, 10) === requested
+    ? requested : today(residence.data?.hours?.timezone);
+  const [chosenDay, setChosenDay] = useState<{
       reference: string | null;
       day: string;
     } | null>(null);
@@ -462,7 +467,7 @@ function Agenda({
                   <article className="hca-record" key={series.id}>
                     <span>
                       {series.professional_name} · {series.type_name} ·{" "}
-                      {series.anchor_date} a {series.valid_until}
+                      {series.anchor_date}{series.open_ended ? " · sem data de término" : " a " + series.valid_until}
                     </span>
                     <ActionButton
                       disabled={busy || uncertain}
@@ -578,13 +583,15 @@ function Agenda({
             ))}
             {currentData.series
               .filter(
-                (series) => series.status === "published" && !series.ended_on,
+                (series) => series.status === "published" && !series.ended_on
+                  && (series.recurrence !== "once" || !series.residence_version),
               )
               .map((series) => (
                 <div className="hca-record" key={series.id}>
                   <span>
-                    {series.professional_name} · {series.anchor_date} a{" "}
-                    {series.valid_until}
+                    {series.professional_name} · {series.anchor_date}
+                    {series.open_ended ? " · sem data de término" : " a " + series.valid_until}
+                    {series.continuation_blocked ? " · próximos plantões aguardam revisão" : ""}
                   </span>
                   {team ||
                   (publishOwn && series.professional_id === context.userId) ? (

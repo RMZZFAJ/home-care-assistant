@@ -15,6 +15,7 @@ import {
 import { PermissionMatrix } from "./permission-matrix";
 import { NotificationMatrix } from "./notification-matrix";
 import { PolicyRules } from "./policy-rules";
+import { ScheduleResidenceSettings } from "./schedule-residence-settings";
 import { Icon, type IconName } from "@/components/ui/primitives";
 import "./administration.css";
 
@@ -286,6 +287,8 @@ function Policies({ context }: { context: WorkspaceContext }) {
       })}</nav>
       <div hidden={tab !== "rules"}>
         <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={recovery} error={error} message={message} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
+        {tab === "rules" && context.activeContext?.mode === "patient" && can(context, "schedule.types.manage")
+          ? <ScheduleResidenceSettings key={patientId} patientId={patientId} /> : null}
       </div>
       {tab === "permissions" ? (
         <PermissionMatrix

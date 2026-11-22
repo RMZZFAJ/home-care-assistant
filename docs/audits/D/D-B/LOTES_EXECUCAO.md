@@ -2126,9 +2126,11 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
 - **E08 — Plantões e balanços.** Em execução. A admissão da contagem
   iniciada no plantão já preserva a retomada. A área reúne Plantões,
   Balanços e Histórico com as permissões de cada leitura. A ficha tem
-  abas próprias para Revisões e Contagens. Restam a configuração de
-  horários por residência, os encaminhamentos de alterações e o wizard
-  de contagem com cinco etapas e materiais extras.
+  abas próprias para Revisões e Contagens. O cadastro consulta os
+  horários por residência onde já configurados. Restam completar a
+  administração dos tipos e a transição das residências sem configuração,
+  os encaminhamentos de alterações e o wizard de contagem com cinco etapas
+  e materiais extras.
 - **E09 — Arquivos e verificação.** Em execução. A consulta pública exibe
   registro, correspondência, assinatura e carimbo separadamente. Os detalhes
   autorizados abrem em painel e revalidam o acesso. O resultado público
@@ -2436,6 +2438,44 @@ Passaram oito casos do seletor, acervo e painel de material, quatro
 regressões de L1 e quatro casos finais de anexação, versão preservada,
 validação pública e alto contraste. Os recortes passaram em Chromium e
 Android emulado, com retentativas desativadas.
+
+### Cadastro de plantões com horários da residência
+
+Em Configurações, o administrador local registra fuso, início diurno e
+início noturno. O cadastro usa a duração do tipo, o período escolhido e a
+versão dos horários que o usuário conferiu. Horário especial permite
+informar início e término, inclusive no dia seguinte. As ocorrências já
+gravadas conservam os intervalos. O plantão isolado exibe somente a data
+do plantão. A série interna dá suporte às chaves atuais da agenda.
+
+A repetição pode ficar sem data final. O banco registra até 56 dias e
+estende a janela antes de restarem 28 dias. Se houver sobreposição ou
+um horário civil inválido, a extensão inteira é revertida e a agenda
+indica revisão. A próxima tentativa usa a mesma cadência e os horários
+preservados. O encerramento impede a geração posterior. As regras
+atuais de publicação, proposta e recuperação continuam no mesmo contrato.
+Residências ainda sem regras registradas usam o cadastro anterior durante
+a transição.
+
+A migration `20261122232848_l3_residence_schedule_hours.sql` está aplicada
+nos bancos local e remoto. A primeira captura remota encontrou falha de
+autenticação no dump de esquema. A nova captura foi validada em
+`2964fb31-e0d2-451b-a544-8ea8267d2f33` e a fila remota ficou vazia.
+O acesso fictício de administração cadastrou os horários de Helena Duarte
+Nogueira com base nos plantões já preservados. A leitura autenticada
+confirmou 07h, 19h e America/Sao_Paulo, na versão 1. O remoto passou a
+338 migrations aplicadas.
+
+Passaram três integrações dirigidas com Auth real. Elas cobrem o recorte
+por paciente, a versão concorrente, a retentativa, o plantão noturno,
+24 horas, as datas civis, a extensão, a sobreposição e o encerramento.
+As integrações existentes de preparação e datas escolhidas também
+passaram no recorte local. O teste Realtime que encerrou a CI de
+`042617dc` agora aguarda o identificador da própria sonda nas duas
+sessões antes de registrar a requisição. O teste dirigido passou.
+Seis casos em Chromium, Android e iOS emulados passaram sem retentativas.
+Eles exercitaram configurações, fechamento do cadastro sem edição,
+plantão especial, recorrência aberta, conflito e navegação da agenda.
 
 ## L4
 

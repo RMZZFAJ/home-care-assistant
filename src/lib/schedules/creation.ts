@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { scheduleBody } from "@/lib/validation/schedules";
 import type { ScheduleWorkspace, ShiftType } from "@/types/schedules";
+import { residenceHours, shiftDayPeriod, shiftLocalTime, type ResidenceHours } from "./residence-hours";
 
 const text = (max: number) =>
   z.string().refine((v) => v.length <= max, `Use até ${max} caracteres.`);
@@ -46,6 +47,12 @@ export const scheduleCreationFields = z.discriminatedUnion("form", [
       timezone: text(80),
       notes: text(2000),
       reason: text(1000),
+      residence: residenceHours.extend({
+        period: shiftDayPeriod,
+        special: z.boolean(),
+        specialStart: shiftLocalTime.or(z.literal("")),
+        specialEnd: shiftLocalTime.or(z.literal("")),
+      }).strict().optional(),
     })
     .strict()
     .refine((v) => Boolean(v.shiftTypeId) === (v.shiftTypeVersion !== null)),
@@ -115,6 +122,7 @@ export function scheduleCreationCommand(fields: ScheduleCreationFields) {
   }
   if (fields.recurrence === "weekly" && !fields.weekdays.length)
     throw new Error("Selecione ao menos um dia da semana.");
+  const residence = fields.residence;
   return scheduleBody.parse({
     action: "series",
     body: {
@@ -133,9 +141,34 @@ export function scheduleCreationCommand(fields: ScheduleCreationFields) {
           }
         : {}),
       anchorDate: fields.from,
-      validUntil: fields.recurrence === "once" ? fields.from : fields.until,
+      validUntil: fields.recurrence === "once" ? fields.from
+        : residence && fields.recurrence !== "dates" ? fields.until || null : fields.until,
       notes: fields.notes,
       ...(fields.reason ? { reason: fields.reason } : {}),
+      ...(residence ? {
+        shiftTypeVersion: fields.shiftTypeVersion,
+        residenceHours: {
+          version: residence.version,
+          period: residence.period,
+          startsLocal: residence.special ? residence.specialStart : residence.period === "day" ? residence.dayStart : residence.nightStart,
+          endsLocal: residence.special ? residence.specialEnd : null,
+        },
+      } : {}),
     },
   });
+}
+
+export function adoptResidenceHours(fields: Extract<ScheduleCreationFields, { form: "series" }>, hours: ResidenceHours) {
+  const current = fields.residence;
+  return {
+    ...fields,
+    timezone: hours.timezone,
+    residence: {
+      ...hours,
+      period: current?.period ?? "day",
+      special: current?.special ?? false,
+      specialStart: current?.specialStart ?? "",
+      specialEnd: current?.specialEnd ?? "",
+    },
+  } as const;
 }

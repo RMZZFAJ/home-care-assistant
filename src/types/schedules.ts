@@ -33,6 +33,9 @@ export type ShiftSeries = {
   weekdays: number[];
   anchor_date: string;
   valid_until: string;
+  open_ended?: boolean;
+  residence_version?: number | null;
+  continuation_blocked?: boolean;
   ended_on: string | null;
   status: string;
   version: number;

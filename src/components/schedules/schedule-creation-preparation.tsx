@@ -18,6 +18,7 @@ import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import { calendarPeriod } from "@/lib/schedules/calendar";
 import {
   initialScheduleSeries,
+  adoptResidenceHours,
   initialScheduleType,
   scheduleCreationFields,
   scheduleCreationCommand,
@@ -35,6 +36,7 @@ import {
   type ScheduleRecovery,
 } from "@/lib/validation/schedule-preparations";
 import { ScheduleForm } from "./schedule-forms";
+import { useResidenceHours } from "./use-residence-hours";
 import { ScheduleReviewDetails } from "./schedule-review";
 import {
   SchedulePreparationSummary,
@@ -185,7 +187,9 @@ export function ScheduleCreationPreparation({
     decodeSource,
   );
   const data = mayRead && !source.loading && !source.error ? source.data : null;
-  const [fields, setFields] = useState<ScheduleCreationFields>(
+  const residenceRead = useResidenceHours(patient.id, purpose === "schedule_series_create" && mayRead);
+  const residence = residenceRead.data?.hours;
+  const [storedFields, setStoredFields] = useState<ScheduleCreationFields>(
     () =>
       initial.value?.fields ??
       (purpose === "shift_type_create"
@@ -193,6 +197,11 @@ export function ScheduleCreationPreparation({
         : initialScheduleSeries(empty, userId, team, today)),
   );
   const [working, setWorking] = useState(Boolean(initial.value));
+  const fields = !working && storedFields.form === "series" && residence
+    ? adoptResidenceHours({ ...storedFields, recurrence: "once", until: "" }, residence)
+    : storedFields;
+  const residenceMismatch = fields.form === "series" && fields.residence
+    && (!residence || fields.residence.version !== residence.version);
   const [datesMonth, setDatesMonth] = useState<string | null>(null);
   const [discardChoice, setDiscardChoice] = useState<{
     draftId: string;
@@ -273,7 +282,7 @@ export function ScheduleCreationPreparation({
       )
         return false;
       try {
-        setFields(row.content.schedule);
+        setStoredFields(row.content.schedule);
         setDatesMonth(null);
         setWorking(true);
         setPacket(null);
@@ -292,7 +301,7 @@ export function ScheduleCreationPreparation({
       setPacket(null);
       setProof(null);
       if (action === "acknowledge" && localRef.current?.mode === "carry") {
-        setFields(localRef.current.fields);
+        setStoredFields(localRef.current.fields);
         setWorking(true);
       } else {
         try {
@@ -304,7 +313,7 @@ export function ScheduleCreationPreparation({
           return;
         }
         setDatesMonth(null);
-        setFields(
+        setStoredFields(
           purpose === "shift_type_create"
             ? initialScheduleType()
             : initialScheduleSeries(data ?? empty, userId, team, today),
@@ -387,6 +396,8 @@ export function ScheduleCreationPreparation({
     if (!writable || publishing || pending || draft.blocked || integrityError)
       return;
     try {
+      if (purpose === "schedule_series_create" && (residenceRead.loading || residenceRead.error || residenceMismatch))
+        throw new Error("Confira os horários atuais da residência antes de revisar.");
       const command = scheduleCreationCommand(fields);
       if (
         fields.form === "series" &&
@@ -548,7 +559,7 @@ export function ScheduleCreationPreparation({
         fields: pending.fields,
       };
       writeLocal(next, pending);
-      setFields(next.fields);
+      setStoredFields(next.fields);
       setWorking(true);
       setPacket(null);
       setProof(null);
@@ -569,6 +580,7 @@ export function ScheduleCreationPreparation({
     !draft.offered &&
     !draft.consumed &&
     !draft.pending &&
+    working &&
     (Boolean(carry) ||
       !equal(
         fields,
@@ -699,7 +711,7 @@ export function ScheduleCreationPreparation({
                 <ActionButton
                   disabled={publishing || draft.busy}
                   onClick={() => {
-                    setFields(carry.fields);
+                    setStoredFields(carry.fields);
                     setWorking(true);
                     void draft.reportConflict();
                   }}
@@ -834,7 +846,19 @@ export function ScheduleCreationPreparation({
           ) : null}
           {!hiddenEditor && writable ? (
             <>
-              <fieldset className="min-w-0" disabled={publishing || draft.busy}>
+              {residenceRead.error ? <Notice error>
+                Os horários da residência estão indisponíveis. Seu preenchimento foi preservado.
+                <ActionButton onClick={residenceRead.refresh}>Consultar horários novamente</ActionButton>
+              </Notice> : null}
+              {!residenceRead.loading && residence && fields.form === "series" && (!fields.residence || residenceMismatch) ? <Notice>
+                Os horários da residência estão disponíveis para este plantão.
+                <ActionButton onClick={() => {
+                  setStoredFields(adoptResidenceHours(fields, residence));
+                  setWorking(true);
+                  setError("");
+                }}>Adotar horários da residência</ActionButton>
+              </Notice> : null}
+              <fieldset className="min-w-0" disabled={publishing || draft.busy || residenceRead.loading}>
                 <ScheduleForm
                   editor={
                     purpose === "shift_type_create"
@@ -857,7 +881,7 @@ export function ScheduleCreationPreparation({
                       value.from.slice(0, 7) !== fields.from.slice(0, 7)
                     )
                       setDatesMonth(null);
-                    setFields(value);
+                    setStoredFields(value);
                     setWorking(true);
                     setError("");
                   }}

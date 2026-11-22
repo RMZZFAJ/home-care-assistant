@@ -45,6 +45,10 @@ fieldset input[type=checkbox] { width:20px; height:20px; flex-shrink:0; accent-c
 .hca-schedule-form, .hca-schedule-form>*, .hca-schedule-review, .hca-schedule-review>* { min-width:0; max-width:100%; overflow-wrap:anywhere; }
 .hca-schedule-form :where(.hca-field,.hca-text-input) { min-width:0; width:100%; max-width:100%; }
 .hca-schedule-form select { min-width:0; width:100%; }
+.hca-schedule-hours { display:flex; align-items:flex-start; gap:12px; padding:14px; border:1px solid var(--hca-line); border-radius:12px; background:var(--hca-bg); }
+.hca-schedule-hours > svg { flex:none; }
+.hca-schedule-hours > div { display:grid; gap:3px; }
+.hca-schedule-hours span, .hca-schedule-hours small { color:var(--hca-muted); }
 
 .hca-record-drawer .hca-date-grid button { padding:4px; white-space:nowrap; overflow-wrap:normal; font-variant-numeric:tabular-nums; }
 

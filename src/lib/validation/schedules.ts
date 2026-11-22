@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { shiftDayPeriod, shiftLocalTime } from "@/lib/schedules/residence-hours";
 const id = z.uuid();
 const date = z.iso.date();
 const instant = z.iso.datetime({ offset: true });
@@ -45,13 +46,23 @@ export const scheduleBody = z.discriminatedUnion("action", [
             .union([z.literal(24), z.literal(36), z.literal(48)])
             .optional(),
           anchorDate: date,
-          validUntil: date,
+          validUntil: date.nullable(),
           notes: z.string().max(2000),
           reason: reason.optional(),
           replacesId: id.optional(),
+          residenceHours: z.object({
+            version: z.number().int().positive().max(2147483647),
+            period: shiftDayPeriod,
+            startsLocal: shiftLocalTime,
+            endsLocal: shiftLocalTime.nullable(),
+          }).strict().optional(),
         })
         .strict()
         .superRefine((value, ctx) => {
+          if (value.validUntil === null && (!value.residenceHours || !["weekly", "cycle"].includes(value.recurrence)))
+            ctx.addIssue({ code: "custom", path: ["validUntil"], message: "Informe o último dia desta programação." });
+          if (value.residenceHours && (!value.shiftTypeVersion || value.replacesId))
+            ctx.addIssue({ code: "custom", path: ["shiftTypeVersion"], message: "Confira a referência do tipo e dos horários da residência." });
           if (value.recurrence === "dates") {
             if (
               !value.dates?.length ||
@@ -70,7 +81,7 @@ export const scheduleBody = z.discriminatedUnion("action", [
               value.dates &&
               (new Set(value.dates).size !== value.dates.length ||
                 value.dates.some(
-                  (day) => day < value.anchorDate || day > value.validUntil,
+                  (day) => day < value.anchorDate || !value.validUntil || day > value.validUntil,
                 ))
             )
               ctx.addIssue({
@@ -80,7 +91,7 @@ export const scheduleBody = z.discriminatedUnion("action", [
               });
           } else if (
             value.dates !== undefined ||
-            value.shiftTypeVersion !== undefined
+            value.shiftTypeVersion !== undefined && !value.residenceHours
           )
             ctx.addIssue({
               code: "custom",
