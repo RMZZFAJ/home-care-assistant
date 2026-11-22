@@ -73,6 +73,7 @@ export const supplyPayload = z
         id: identifier,
         version: z.number().int().positive(),
         referenceRevision: z.string().regex(/^\d+$/).max(20),
+        admissionId: identifier.optional(),
       })
       .strict()
       .optional(),

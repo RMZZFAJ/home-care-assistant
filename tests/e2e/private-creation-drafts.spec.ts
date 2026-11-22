@@ -47,7 +47,8 @@ async function login(
 }
 async function open(page: Page, kind: "REQ" | "BAL", url?: string) {
   await page.goto(url ?? (kind === "REQ" ? "/fichas/req" : "/fichas/bal"));
-  await expect((kind === "REQ" ? reqStages(page) : balStages(page)).or(panel(page)).first()).toBeVisible();
+  const stages = kind === "REQ" ? reqStages(page) : balStages(page).or(page.getByRole("button", { name: "Iniciar contagem", exact: true }));
+  await expect(stages.or(panel(page)).first()).toBeVisible();
 }
 async function resume(page: Page) {
   await panel(page)
@@ -425,6 +426,7 @@ test("reconto BAL privado retoma em outro aparelho e confirma uma única versão
   );
   await login(page, f.patient, counter.email);
   await open(page, "BAL", url);
+  await page.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
   await expect(page.getByLabel("Material fictício V4 0 · unidade", { exact: true })).toBeEditable();
   await page
     .getByLabel("Material fictício V4 0 · unidade", { exact: true })

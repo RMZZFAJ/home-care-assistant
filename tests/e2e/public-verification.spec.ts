@@ -277,6 +277,16 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
     await expect(result).toContainText(
       "Os bytes coincidem com o exemplar registrado",
     );
+    await result.getByRole("button", { name: "Verificar outro PDF", exact: true }).click();
+    const optional = page.getByLabel("Código do documento · opcional", { exact: true });
+    if (!(await optional.isVisible()))
+      await page.getByText("Também tenho um código", { exact: true }).click();
+    await optional.fill("F".repeat(32));
+    await file.setInputFiles({ name: "exemplar-com-codigo-desconhecido.pdf", mimeType: "application/pdf", buffer: f.a.bytes });
+    await checkFile.click();
+    await expect(result).toContainText("Código informado sem registro");
+    await expect(result).toContainText("Correspondência exata");
+    await expect(result.getByRole("heading", { name: "Emissão identificada pelo arquivo" })).toBeFocused();
   }
   await result.getByRole("button",{name:"Verificar outro PDF",exact:true}).click();
   await file.setInputFiles({

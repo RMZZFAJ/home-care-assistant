@@ -57,6 +57,7 @@ export type SupplyPayload = {
     id: string;
     version: number;
     referenceRevision: string;
+    admissionId?: string;
   };
   balanceContext?: {
     cycleId: string;

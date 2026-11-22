@@ -296,7 +296,7 @@ export function ConsumptionDetail({
                 ) : null}
               </div>
             </section>
-          ) : (
+          ) : legacy ? (
             <section>
               <h3 className="font-semibold">
                 Decisão preservada · versão{" "}
@@ -315,7 +315,7 @@ export function ConsumptionDetail({
                     : "Consumo confirmado com movimentos vinculados ao relato."}
               </p>
             </section>
-          )}
+          ) : null}
           {data.movements.length ? (
             <section>
               <h3 className="font-semibold">{data.workflow_mode === "direct" ? "Movimentos do consumo" : "Movimentos desta confirmação"}</h3>

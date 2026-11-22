@@ -47,8 +47,9 @@ export function VerificationResult({ result, headingRef, code, file, onEdit, onF
   const verified = analysis?.verification;
   const byCode = result.referenceOnly;
   const match = reference.found && reference.bytesMatch === true;
-  const another = reference.found && result.fileReference?.found &&
-    result.fileReference.verificationCode !== reference.verificationCode;
+  const fileReference = result.fileReference?.found ? result.fileReference : null;
+  const another = reference.found && fileReference && fileReference.verificationCode !== reference.verificationCode;
+  const byFile = !reference.found && fileReference?.bytesMatch === true;
   const [details, setDetails] = useState(false);
   const detailsButtonRef = useRef<HTMLButtonElement>(null);
   const analysisOutcome = analysis && analysis.status !== "verified" ? analysisOutcomes[analysis.status] : null;
@@ -62,7 +63,7 @@ export function VerificationResult({ result, headingRef, code, file, onEdit, onF
       : revoked ? "Certificado revogado"
         : result.policyStatus === "unavailable" ? "Confiança ainda não conferida"
           : unknownTrust ? "Confiança não reconhecida"
-            : analysisOutcome?.[0] ?? (match ? "Arquivo correspondente" : "O arquivo não corresponde");
+            : analysisOutcome?.[0] ?? (byFile ? "Emissão identificada pelo arquivo" : match ? "Arquivo correspondente" : "O arquivo não corresponde");
   const message = byCode
     ? reference.found
       ? "Este código corresponde a uma emissão do Home Care Assistant. Envie o arquivo para verificar seus bytes."
@@ -71,14 +72,16 @@ export function VerificationResult({ result, headingRef, code, file, onEdit, onF
       : revoked ? "Um certificado desta emissão consta como revogado na política vigente."
         : result.policyStatus === "unavailable" ? "A conferência do registro e do conteúdo está abaixo. A análise técnica aguarda a política de confiança."
           : unknownTrust ? "A análise conferiu os elementos técnicos, mas a cadeia de confiança não foi reconhecida."
-            : analysisOutcome?.[1] ?? (match
+            : analysisOutcome?.[1] ?? (byFile
+              ? "O arquivo corresponde a uma emissão registrada. Confira o código recebido com o remetente."
+              : match
               ? "Os bytes coincidem com o exemplar registrado."
               : reference.found ? "Os bytes divergem da emissão consultada." : "Nenhum exemplar registrado corresponde aos bytes apresentados.");
   const tone = revoked ? "danger" : byCode && reference.found ? "info" : match && recognized ? "success" : "warning";
   const symbol = tone === "success" ? "check-circle" : tone === "info" ? "file" : "alert";
   const evidence = [
-    { label: "Registro da emissão", value: reference.found ? "Localizado" : "Não localizado", tone: reference.found ? "success" : "warning" },
-    { label: "Conteúdo do arquivo", value: byCode ? "Ainda não conferido" : another ? "Exemplar de outra emissão" : match ? "Correspondência exata" : "Sem correspondência", tone: byCode ? "neutral" : match ? "success" : "warning" },
+    { label: "Registro da emissão", value: reference.found ? "Localizado" : byFile ? "Código informado sem registro" : "Não localizado", tone: reference.found ? "success" : "warning" },
+    { label: "Conteúdo do arquivo", value: byCode ? "Ainda não conferido" : another ? "Exemplar de outra emissão" : byFile || match ? "Correspondência exata" : "Sem correspondência", tone: byCode ? "neutral" : byFile || match ? "success" : "warning" },
     { label: "Assinatura técnica", value: analysis?.documentSignature === "valid" ? "Integridade conferida" : analysis?.documentSignature === "invalid" ? "Não confirmada" : analysis?.documentSignature === "absent" ? "Não encontrada" : "Não avaliada", tone: analysis?.documentSignature === "valid" ? "success" : analysis?.documentSignature === "invalid" ? "danger" : "neutral" },
     { label: "Carimbo de tempo", value: analysis?.timestamp === "valid" ? "Integridade conferida" : analysis?.timestamp === "invalid" ? "Não confirmado" : "Não avaliado", tone: analysis?.timestamp === "valid" ? "success" : analysis?.timestamp === "invalid" ? "warning" : "neutral" },
   ];
@@ -139,6 +142,10 @@ export function VerificationResult({ result, headingRef, code, file, onEdit, onF
         <DefinitionGrid items={[
           { label: source, value: byCode ? sourceHint : source },
           { label: "Registro da emissão", value: reference.found ? formatBrazilDate(reference.registeredAt) : "Não localizado" },
+          ...((byFile || another) && fileReference ? [
+            { label: "Registro do arquivo enviado", value: formatBrazilDate(fileReference.registeredAt) },
+            { label: "Código do arquivo enviado", value: "HCA-" + fileReference.verificationCode.match(/.{4}/g)?.join("-") },
+          ] : []),
           ...(result.fileSha256 ? [{ label: "SHA-256 do arquivo enviado", value: result.fileSha256, wide: true }] : []),
         ]} />
         {verified ? <DefinitionGrid items={[

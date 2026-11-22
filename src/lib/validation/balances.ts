@@ -11,6 +11,20 @@ export const balanceCommandSchema = z.object({ careRecipientId: id, idempotencyK
 export type BalanceCommand = z.infer<typeof balanceCommandSchema>["command"];
 
 const revision = z.string().regex(/^\d{1,20}$/);
+const admissionScope = {
+  assignmentId: id,
+  assignmentVersion: z.number().int().positive().max(2147483647),
+  documentId: id.nullable(),
+  documentVersion: z.number().int().positive().max(2147483647).nullable(),
+};
+export const balanceCountAdmissionRequest = z.object({ careRecipientId: id, ...admissionScope }).strict()
+  .refine(value => (value.documentId === null) === (value.documentVersion === null));
+export const balanceCountAdmission = z.object({
+  ...admissionScope,
+  id,
+  admittedAt: z.iso.datetime({ offset: true }),
+}).strict();
+export type BalanceCountAdmission = z.infer<typeof balanceCountAdmission>;
 const countReferenceRead = z.object({
   careRecipientId: id,
   data: z.object({
@@ -22,7 +36,11 @@ const countReviewRead = z.object({
   careRecipientId: id,
   data: z.object({
     referenceRevision: revision,
-    eligibility: z.object({ available: z.boolean(), assignment: z.object({ id }).nullable() }),
+    eligibility: z.object({
+      available: z.boolean(),
+      assignment: z.object({ id, version: admissionScope.assignmentVersion }).nullable(),
+      admission: balanceCountAdmission.nullish(),
+    }),
   }),
 });
 export function parseBalanceCountReference(value: unknown, patientId: string) {

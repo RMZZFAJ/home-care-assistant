@@ -131,7 +131,7 @@ export function StockOverview({
           { label: "Entrada em trânsito", value: formatQuantity(stock.incoming, selectedProduct.unit) },
           { label: "Divergência pendente", value: formatQuantity(stock.disputed ?? "0", selectedProduct.unit) },
           ...purchaseFacts(stock).map(item => ({ label: item.label, value: formatQuantity(item.value, selectedProduct.unit) })),
-          { label: "Consumo confirmado · 30 dias", value: formatQuantity(metrics.find(item =>
+          { label: "Consumo registrado · 30 dias", value: formatQuantity(metrics.find(item =>
             item.productId === selectedProduct.productId && item.location === key)?.quantity ?? "0", selectedProduct.unit) },
           { label: "Atualização do saldo", value: <StockUpdate updatedAt={stock.updatedAt} queriedAt={queriedAt} /> },
         ]} />

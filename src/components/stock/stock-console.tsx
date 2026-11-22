@@ -69,6 +69,7 @@ function PatientStock({
   const liveRevision = useLiveRevision();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [transitProduct, setTransitProduct] = useState<string>();
   const [balanceFilter, setBalanceFilter] = useState<StockBalanceFilter>("all");
   const [custody, setCustody] = useState(initialCustody);
   const [showFilters, setShowFilters] = useState(false);
@@ -221,7 +222,7 @@ function PatientStock({
             <TextInput
               leading={<Icon name="search" />}
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => { setTransitProduct(undefined); setSearch(event.target.value); }}
             />
           </FormField>
           <FormField label="Custódia">
@@ -229,6 +230,7 @@ function PatientStock({
               aria-label="Custódia"
               value={custody}
               onChange={(event) => {
+                setTransitProduct(undefined);
                 setCustody(event.target.value);
                 setPage(1);
               }}
@@ -267,6 +269,7 @@ function PatientStock({
           <TransitStock
             documents={stock.data.transit}
             search={search}
+            productId={transitProduct}
             loading={stock.loading}
             showEmpty={!stock.error}
           />
@@ -283,7 +286,7 @@ function PatientStock({
             ]}
             metrics={stock.data.metrics}
             queriedAt={stock.queriedAt}
-            onTransit={product => { setSearch(product.name); setCustody("TRANSIT"); setPage(1); }}
+            onTransit={product => { setTransitProduct(product.productId); setSearch(product.name); setCustody("TRANSIT"); setPage(1); }}
             filter={balanceFilter}
             showEmpty={!stock.loading && !stock.error}
           />

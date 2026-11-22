@@ -180,6 +180,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     await expect(
       counter.getByRole("heading", { name: "Balanço de estoque", exact: true }),
     ).toBeVisible();
+    await counter.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
     const catalogue = (
       await (
         await counter.request.get("/api/catalog?careRecipientId=" + f.patient)

@@ -33,11 +33,14 @@ test("one family operation groups its ledger rows, replays in another order and 
   assert.equal(receipt.movementIds.length, 2);
   assert.equal(receipt.key, input.p_key);
   assert.deepEqual(await rpc(owner, "commit_family_stock_operation", {
-    ...input, p_lines: [...input.p_lines].reverse(),
+    ...input, p_lines: [...input.p_lines].reverse().map(line => ({ ...line, quantity: line.quantity + ".0" })),
   }), receipt);
   const result = { p_patient: f.patient, p_key: input.p_key };
   assert.deepEqual(await rpc(owner, "family_stock_operation_result", result), receipt);
   assert.equal((await owner.rpc("commit_family_stock_operation", { ...input, p_reason: "Uma intenção diferente." })).error?.code, "23505");
+  assert.equal((await owner.rpc("commit_family_stock_operation", {
+    ...input, p_lines: [{ ...input.p_lines[0], quantity: "7" }, input.p_lines[1]],
+  })).error?.code, "23505");
   assert.equal(sql("select count(*) from private.family_stock_operation_movements where operation_id=" + q(receipt.id)), "2");
   assert.deepEqual(await f.stock(), [starting[0] + 4, starting[1] + 5]);
   const professional = await actor("professional", f.patient);
@@ -151,8 +154,8 @@ test("dispatch and receipt of the same ENT retain two proven acts with independe
 test("approved purchase, physical arrival and available stock use independent quantities", async t => {
   const f = await stockFixture(t);
   const family = await actor("family", f.patient);
-  const overview = async () =>
-    (await rpc(f.admin, "stock_overview", { p_patient: f.patient })).find(row => row.productId === f.products[0]).family;
+  const overview = async (client = f.admin) =>
+    (await rpc(client, "stock_overview", { p_patient: f.patient })).find(row => row.productId === f.products[0]).family;
   const before = await overview();
   let order = await rpc(f.admin, "create_supply_document", {
     p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
@@ -178,4 +181,11 @@ test("approved purchase, physical arrival and available stock use independent qu
   assert.equal(Number(approved.purchaseAwaiting), 3);
   assert.equal(Number(approved.purchasePendingValidation), 0);
   assert.equal(Number(approved.confirmed), Number(before.confirmed) + 2);
+  const { data: { user } } = await family.auth.getUser();
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(user.id)},'com.read',false)`);
+  assert.equal((await family.rpc("operational_document", { p_id: order.id })).error?.code, "42501");
+  const restricted = await overview(family);
+  assert.equal(restricted.purchasePending, approved.purchasePending);
+  assert.equal(restricted.purchaseAwaiting, approved.purchaseAwaiting);
 });

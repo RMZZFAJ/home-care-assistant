@@ -68,7 +68,8 @@ export function FamilyStockOperation({
   const selectedProducts = new Set(lines.map(line => line.productId));
   const canConfirm = !review || !review.materials.some(material => {
     const selected = lines.find(line => line.productId === material.productId);
-    return selected && ((!correction && !material.active) || (!isInbound && material.quantity !== null && quantity(material.quantity).lt(selected.quantity)));
+    return selected && ((!correction && !material.active) ||
+      (!isInbound && material.quantity !== null && quantity(material.quantity).lt(quantity(selected.quantity))));
   });
   useOperationActivity(busy, {
     title: uncertain ? "Conferindo a movimentação" : review ? "Registrando movimentação" : "Consultando saldos",

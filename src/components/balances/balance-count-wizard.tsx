@@ -40,8 +40,8 @@ import type {
   SupplyDocument,
   SupplyPayload,
 } from "@/types/documents";
-import type { BalanceWorkspace } from "@/types/balances";
-import { parseBalanceCountReference, parseBalanceCountReview } from "@/lib/validation/balances";
+import type { BalanceAssignment, BalanceWorkspace } from "@/types/balances";
+import { balanceCountAdmission, parseBalanceCountReference, parseBalanceCountReview, type BalanceCountAdmission } from "@/lib/validation/balances";
 import { useBalanceWorkspace } from "./use-balance-workspace";
 import { BalanceCountFields, BalanceReviewRows } from "./balance-count-fields";
 import {
@@ -209,10 +209,19 @@ function ScheduledCount({
   const formatBrazilDate = (value: string | null) =>
     formatZonedDate(value, initial.regime?.timezone);
   const storageKey = `hca:v2:bal-count:${context.userId}:${context.patient!.id}:${documentId ?? "new"}`;
-  const eligible =
-    balance.eligibility.available &&
+  const [started, setStarted] = useState<{ workspace: BalanceWorkspace; admission: BalanceCountAdmission } | null>(null);
+  const [discardedAdmissionId, setDiscardedAdmissionId] = useState<string | null>(null);
+  const candidate = started?.workspace === balance ? started.admission : balance.eligibility.admission;
+  const candidateMatches = candidate && assignment && candidate.id !== discardedAdmissionId &&
+    candidate.assignmentId === assignment.id && candidate.assignmentVersion === assignment.version &&
+    candidate.documentId === (editing?.id ?? null) && candidate.documentVersion === (editing?.version ?? null);
+  const sameAssignment =
     balance.eligibility.assignment?.id === assignment?.id &&
     balance.eligibility.assignment?.version === assignment?.version;
+  const admission = candidateMatches && sameAssignment && can(context, "bal.count") ? candidate : null;
+  const canStart = sameAssignment && balance.eligibility.available && can(context, "bal.count") &&
+    balance.eligibility.documentId === (editing?.id ?? null);
+  const eligible = admission !== null;
   const [observationTimes, setObservationTimes] = useState<
     Record<string, string | null>
   >({});
@@ -305,6 +314,9 @@ function ScheduledCount({
       return true;
     },
     onDiscard: () => {
+      setDiscardedAdmissionId(admission?.id ?? null);
+      setStarted(null);
+      reload();
       setDraftTouched(false);
       try {
         clearIdleCountCache(sessionStorage, storageKey, {
@@ -560,6 +572,35 @@ function ScheduledCount({
       if (error === "Confira os campos destacados.") setError("");
     }
   }
+  async function confirmAdmission(targetAssignment: BalanceAssignment, target: SupplyDocument | null) {
+    const body = {
+      careRecipientId: context.patient!.id, assignmentId: targetAssignment.id, assignmentVersion: targetAssignment.version,
+      documentId: target?.id ?? null, documentVersion: target?.version ?? null,
+    };
+    const response = await api<{ data: unknown }>("/api/balances/count-admission", body);
+    const confirmed = balanceCountAdmission.parse(response.data);
+    if (confirmed.assignmentId !== body.assignmentId || confirmed.assignmentVersion !== body.assignmentVersion ||
+      confirmed.documentId !== body.documentId || confirmed.documentVersion !== body.documentVersion) {
+      throw new Error("O início confirmado pertence a outra contagem.");
+    }
+    return confirmed;
+  }
+  async function startCount() {
+    if (!assignment || !canStart || busy || privateDraft.blocked || cacheError) return;
+    setBusy(true);
+    setError("");
+    try {
+      const confirmed = await confirmAdmission(assignment, editing);
+      setStarted({ workspace: balance, admission: confirmed });
+      setDiscardedAdmissionId(null);
+      reload();
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "Não foi possível iniciar esta contagem.");
+      reload();
+    } finally {
+      setBusy(false);
+    }
+  }
   async function review() {
     if (needsReferenceReview || !sourceReady || !validate()) return;
     setBusy(true);
@@ -580,8 +621,10 @@ function ScheduledCount({
         );
       }
       if (
-        !state.data.eligibility.available ||
-        state.data.eligibility.assignment?.id !== assignment?.id
+        !admission ||
+        state.data.eligibility.admission?.id !== admission.id ||
+        state.data.eligibility.assignment?.id !== assignment?.id ||
+        state.data.eligibility.assignment?.version !== assignment?.version
       ) {
         setNeedsRecount(true);
         throw new Error(
@@ -610,9 +653,9 @@ function ScheduledCount({
       return;
     if (!pendingRef.current) {
       if (needsReferenceReview || !validate()) return;
-      if (!eligible || !assignment) {
+      if (!admission || !assignment) {
         setError(
-          "A contagem exige o plantão ativo e a profissional designada.",
+          "Confirme o início com a atribuição vigente antes de concluir.",
         );
         return;
       }
@@ -626,6 +669,7 @@ function ScheduledCount({
           id: assignment.id,
           version: assignment.version,
           referenceRevision,
+          admissionId: admission.id,
         },
       };
       const savedDraft = await privateDraft.save(structuredClone(balanceContent));
@@ -733,8 +777,8 @@ function ScheduledCount({
           : Promise.resolve(null),
       ]);
       if (
-        !state.data.eligibility.available ||
-        !state.data.eligibility.assignment
+        !state.data.eligibility.assignment ||
+        (!state.data.eligibility.available && !state.data.eligibility.admission)
       )
         throw Error(
           "O plantão não está disponível para você. Os valores anteriores foram mantidos.",
@@ -749,6 +793,7 @@ function ScheduledCount({
           "Esta ficha não permite outra contagem. Consulte seu acompanhamento; o preenchimento foi preservado.",
         );
       const target = documentRead?.data ?? null;
+      const confirmed = await confirmAdmission(state.data.eligibility.assignment, target);
       const nextContext: BalanceDraftContent["context"] = {
         mode: "scheduled",
         documentId: target?.id ?? null,
@@ -788,6 +833,8 @@ function ScheduledCount({
       setProducts(catalog.data);
       setEditing(target);
       setAssignment(state.data.eligibility.assignment);
+      setStarted({ workspace: balance, admission: confirmed });
+      setDiscardedAdmissionId(null);
       setReferenceRevision(state.data.referenceRevision);
       setCounts(next.counts);
       setObservationTimes(next.observationTimes);
@@ -917,7 +964,7 @@ function ScheduledCount({
       </Notice>
     );
   const referencePanel =
-    needsReferenceReview && !uncertain && !cacheError ? (
+    needsReferenceReview && (eligible || preservedContext || needsRecount) && !uncertain && !cacheError ? (
       <BalanceReferenceReview
         source={balanceContent}
         current={currentContext}
@@ -932,14 +979,14 @@ function ScheduledCount({
     <SimpleDraftPanel
       draft={privateDraft}
       current={balanceContent}
-      statusInFooter={initial.eligibility.available && !cacheError}
+      statusInFooter={eligible && !cacheError}
       exitHref="/balancos"
       patientName={context.patient!.display_name}
       authorName={context.fullName}
       disabled={busy || uncertain || Boolean(cacheError)}
     />
   );
-  if (!initial.eligibility.available && !uncertain)
+  if (!eligible && !uncertain)
     return (
       <div className="hca-form-stack">
         {draftPanel}
@@ -948,10 +995,16 @@ function ScheduledCount({
         {cacheError ? <Notice error>{cacheError}</Notice> : null}
         <section className="ui-card hca-form-stack">
           {error ? <Notice error>{error}</Notice> : null}
-          <Notice>
-            A contagem é disponibilizada exclusivamente à pessoa designada
-            durante o plantão real. Consulte a programação e o acompanhamento.
-          </Notice>
+          {canStart ? <>
+            <h2 className="font-semibold">Confirme o início da contagem</h2>
+            <p>{context.patient!.display_name} · {context.fullName}</p>
+            <p>Iniciar neste plantão permite concluir a mesma contagem depois do horário.</p>
+            <ActionButton variant="primary" disabled={busy || privateDraft.blocked || Boolean(cacheError)}
+              onClick={() => void startCount()}>Iniciar contagem</ActionButton>
+          </> : <Notice>
+            Uma nova contagem pode ser iniciada pela pessoa designada durante o plantão.
+            Consulte a programação e o acompanhamento.
+          </Notice>}
           <p>
             {formatBrazilDate(
               balance.eligibility.assignment?.starts_at ?? null,
@@ -993,13 +1046,9 @@ function ScheduledCount({
           {formatBrazilDate(assignment?.ends_at ?? null)}
         </small>
       </section>
-      {!eligible && !uncertain ? (
+      {eligible && !balance.eligibility.available && !uncertain ? (
         <Notice>
-          A contagem está indisponível fora do plantão ou para outro
-          responsável. Os dados preenchidos permanecem visíveis.
-          <Link href="/balancos" prefetch={false}>
-            Consultar agendamento e pendências
-          </Link>
+          Esta contagem foi iniciada no plantão e pode ser concluída agora.
         </Notice>
       ) : null}
       {!products.length ? <Notice>O catálogo ativo está vazio.</Notice> : null}

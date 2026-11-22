@@ -553,6 +553,7 @@ test("BAL em janela nova mostra a contagem de Sheila17 e conserva Juliana18 e se
     before = JSON.parse(recountState(f));
   await login(page, f.patient, f.second.email);
   await page.goto(`/fichas/bal?documentId=${f.document.id}&recount=true`);
+  await page.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
   await expect(
     page.getByText(f.target.type_name, { exact: false }),
   ).toBeVisible();

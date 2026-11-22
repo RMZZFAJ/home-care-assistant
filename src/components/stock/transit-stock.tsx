@@ -10,21 +10,21 @@ export type { TransitDocument } from "@/types/stock";
 export function TransitStock({
   documents,
   search,
+  productId,
   loading,
   showEmpty = true,
 }: {
   documents: TransitDocument[];
   search: string;
+  productId?: string;
   loading: boolean;
   showEmpty?: boolean;
 }) {
-  const visible = documents.filter((doc) =>
-    doc.lines.some((line) =>
-      line.name
-        .toLocaleLowerCase("pt-BR")
-        .includes(search.toLocaleLowerCase("pt-BR")),
-    ),
-  );
+  const term = search.trim().toLocaleLowerCase("pt-BR");
+  const visible = documents.map(doc => ({
+    ...doc,
+    lines: doc.lines.filter(line => productId ? line.productId === productId : line.name.toLocaleLowerCase("pt-BR").includes(term)),
+  })).filter(doc => doc.lines.length);
   return (
     <div className="hca-form-stack hca-transit-stock">
       <p className="text-sm leading-6 text-(--muted)">

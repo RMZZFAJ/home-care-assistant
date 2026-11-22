@@ -95,6 +95,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
     await expect(
       counter.getByRole("heading", { name: "Balanço de estoque", exact: true }),
     ).toBeVisible();
+    await counter.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
     const catalogue = (
       await (
         await counter.request.get("/api/catalog?careRecipientId=" + f.patient)

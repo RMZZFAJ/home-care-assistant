@@ -227,7 +227,9 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
               { label: "Período da atribuição", value: formatBrazilDate(a.starts_at) + " → " + formatBrazilDate(a.ends_at), wide: true },
             ]} />
             <p>
-              {data.eligibility.available
+              {data.eligibility.admission
+                ? "Contagem iniciada neste plantão. Você pode concluir o mesmo preenchimento."
+                : data.eligibility.available
                 ? "Contagem disponível para você durante este plantão."
                 : new Date(a.starts_at).getTime() > now
                   ? "Contagem agendada; aguarde o início do plantão."
@@ -236,7 +238,7 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
                     : "O prazo ou a atribuição mudou. Aguarde a atualização formal."}
             </p>
             <div className="hca-toolbar">
-              {data.eligibility.available ? (
+              {data.eligibility.available || data.eligibility.admission ? (
                 <Link
                   href={
                     "/fichas/bal" +
@@ -249,7 +251,7 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
                   className="ui-button ui-button-primary"
                   prefetch={false}
                 >
-                  Fazer balanço
+                  {data.eligibility.admission ? "Continuar contagem" : "Fazer balanço"}
                 </Link>
               ) : null}
               {approve || canRequest ? (

@@ -136,6 +136,7 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
     if (activeRef.current || (!pending && (!reference || draft.blocked || draft.backgroundBusy))) return;
     activeRef.current = true; setBusy(true); setError("");
     let packet = pending;
+    let posted = false;
     try {
       if (!packet) {
         const saved = sameDraft ? draft.draftCommit : await draft.save(content);
@@ -157,20 +158,27 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
         finish(data, packet);
         return;
       }
+      posted = true;
       finish((await api<{ data: unknown }>(endpoint, packet)).data, packet);
     } catch (reason) {
-      if (packet && reason instanceof ApiError && reason.code === "VERSION_CONFLICT") {
+      if (posted && reason instanceof ApiError && reason.code === "VERSION_CONFLICT") {
         retain(null);
         setReceiptAbsent(false);
         if (reference) {
           setPrevious(reference.materials);
           try { setReference(await getReference()); }
           catch { setReference(null); setStep(3); }
-        }
+        } else setStep(0);
         void draft.reportConflict();
         setError("O estoque ou o rascunho mudou. Confira as referências atualizadas e revise novamente.");
       } else {
-        if (!pending && reason instanceof ApiError && reason.status > 0 && reason.status < 500) retain(null);
+        if (posted && reason instanceof ApiError &&
+          ["INVALID_OPERATION", "INSUFFICIENT_STOCK", "VALIDATION_ERROR"].includes(reason.code ?? "")) {
+          retain(null);
+          setReceiptAbsent(false);
+          setReference(null);
+          setStep(pending ? 0 : 1);
+        }
         setError(reason instanceof Error ? reason.message : "Não foi possível confirmar o registro.");
       }
     } finally { activeRef.current = false; setBusy(false); }

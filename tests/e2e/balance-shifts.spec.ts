@@ -230,6 +230,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   await expect(
     page.getByRole("heading", { name: "Balanço de estoque", exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
   await expect(
     page
       .getByRole("list", {

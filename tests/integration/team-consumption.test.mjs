@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { actor, fixtures, issue, rpc, setup } from "./v4-fixtures.mjs";
+import { personalReminderFixture, reminderState, shiftReminder } from "./notice-reference-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 
 async function teamFixture(t) {
@@ -38,10 +39,21 @@ async function teamFixture(t) {
 
 test("team consumption issues directly, corrects by differences, and compensates only once", async t => {
   const f = await teamFixture(t);
+  const periodStart = sql("select clock_timestamp()");
+  const metrics = periodEnd => rpc(f.admin, "stock_consumption_metrics", {
+    p_patient: f.patient, p_from: periodStart, p_to: periodEnd,
+  });
+  const metricValues = rows => f.products.map(id => {
+    const row = rows.find(entry => entry.productId === id && entry.location === "CARE_TEAM");
+    return row ? Number(row.quantity) : null;
+  });
   const started = await f.quantities();
   const issue = { action: "issue", observation: "Materiais utilizados durante o plantão.", lines: f.lines([4, 3]) };
   const key = randomUUID();
   const initial = await f.command(issue, key);
+  const issueCutoff = sql("select clock_timestamp()");
+  const initialMetrics = await metrics(issueCutoff);
+  assert.deepEqual(metricValues(initialMetrics), [4, 3]);
   assert.deepEqual(await f.command({ ...issue, lines: [...issue.lines].reverse() }, key), initial);
   assert.deepEqual(await f.quantities(), started.map((row, i) => ({ ...row, team: row.team - [4, 3][i] })));
   assert.deepEqual(await rpc(f.professional, "team_consumption_result", { p_patient: f.patient, p_key: key }), initial);
@@ -55,12 +67,18 @@ test("team consumption issues directly, corrects by differences, and compensates
   const correct = { action: "correct", reportId: initial.id, expectedVersion: 1, reason: "Conferência do registro de uso.", lines: f.lines([2, 4]) };
   const fixed = await f.command(correct, randomUUID(), f.admin);
   assert.equal(fixed.version, 2);
+  const correctionCutoff = sql("select clock_timestamp()");
+  const correctedMetrics = await metrics(correctionCutoff);
+  assert.deepEqual(metricValues(correctedMetrics), [2, 4]);
   assert.deepEqual(await f.quantities(), started.map((row, i) => ({ ...row, team: row.team - [2, 4][i] })));
   const cancelled = { action: "cancel", reportId: initial.id, expectedVersion: 2, reason: "Registro substituído pela equipe do plantão." };
   const cancelKey = randomUUID();
   const final = await f.command(cancelled, cancelKey);
   assert.deepEqual(await f.command(cancelled, cancelKey), final);
   assert.deepEqual(await f.quantities(), started);
+  assert.deepEqual(await metrics(issueCutoff), initialMetrics);
+  assert.deepEqual(await metrics(correctionCutoff), correctedMetrics);
+  assert.deepEqual(metricValues(await metrics(sql("select clock_timestamp()"))), [null, null]);
   const result = await rpc(f.professional, "consumption_record_detail", { p_id: initial.id });
   assert.equal(result.status, "cancelled");
   assert.deepEqual(result.acts.map(row => row.action), ["issue", "correct", "cancel"]);
@@ -71,6 +89,28 @@ test("team consumption issues directly, corrects by differences, and compensates
   });
   assert.equal(history.total, 3);
   assert.ok(history.data.every(group => group.rows.length === 2));
+});
+
+test("a shortage acknowledges only the actor's selected reminder and remains recoverable", async t => {
+  const f = await personalReminderFixture();
+  t.after(() => sql("update public.care_recipients set is_active=false where id=" + q(f.patient)));
+  const unrelated = shiftReminder(f, f.pro.id, true);
+  const before = JSON.parse(reminderState(f));
+  const unrelatedBefore = reminderState(f, unrelated);
+  const packet = {
+    p_patient: f.patient, p_key: randomUUID(), p_reference: null,
+    p_body: { action: "shortage", observation: "Reposição necessária para a troca da equipe.", reminderId: f.reminder },
+  };
+  const receipt = await rpc(f.pro.client, "submit_team_consumption", packet);
+  const after = JSON.parse(reminderState(f));
+  assert.ok(after.reminder.acknowledged_at);
+  assert.ok(after.notices.length > 0 && after.notices.every(notice => notice.seen_at));
+  assert.deepEqual(after.stock, before.stock);
+  assert.equal(reminderState(f, unrelated), unrelatedBefore);
+  const report = await rpc(f.pro.client, "consumption_record_detail", { p_id: receipt.id });
+  assert.equal(report.source_reminder_id, f.reminder);
+  assert.deepEqual(await rpc(f.pro.client, "submit_team_consumption", packet), receipt);
+  assert.deepEqual(await rpc(f.pro.client, "team_consumption_result", { p_patient: f.patient, p_key: packet.p_key }), receipt);
 });
 
 test("shortages can be repeated without ledger writes and failed or stale commands leave no partial changes", async t => {
@@ -131,8 +171,19 @@ test("server review revalidates stock and retires only the exact confirmed draft
   assert.equal((await readDraft()).revision, saved.revision);
   packet.p_reference = (await f.reference()).referenceHash;
   const confirmed = await rpc(f.professional, "submit_team_consumption", packet);
-  assert.deepEqual(await rpc(f.professional, "submit_team_consumption", packet), confirmed);
   assert.equal(await readDraft(), null);
+  const newer = await rpc(f.professional, "consumption_preparation_command", {
+    p_patient: f.patient, p_purpose: "consumption_report_team", p_target: f.patient,
+    p_id: null, p_expected: null, p_key: randomUUID(),
+    p_body: { action: "save",
+      content: { ...content, consumption: { ...content.consumption, text: "Próximo plantão, registro em preenchimento." } },
+      navigation: { version: 1, stage: "consumption_preparation" } },
+  });
+  const beforeReplay = await readDraft();
+  assert.equal(beforeReplay.id, newer.id);
+  assert.equal(beforeReplay.revision, newer.revision);
+  assert.deepEqual(await rpc(f.professional, "submit_team_consumption", packet), confirmed);
+  assert.deepEqual(await readDraft(), beforeReplay);
   assert.deepEqual(await rpc(f.professional, "team_consumption_result", { p_patient: f.patient, p_key: key }), confirmed);
 });
 

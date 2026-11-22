@@ -21,6 +21,7 @@ async function open(page: Page, f: Awaited<ReturnType<typeof balanceSetup>>) {
   ).toBeVisible();
   await selectContext(page, f.patient);
   await page.goto("/fichas/bal");
+  await button(page, "Iniciar contagem").click();
   await expect(button(page, "Revisar")).toBeEnabled();
 }
 const ownKey = (f: Awaited<ReturnType<typeof balanceSetup>>) =>
@@ -43,6 +44,27 @@ async function fill(page: Page, f: Awaited<ReturnType<typeof balanceSetup>>) {
     page.getByRole("heading", { name: "Revisão da contagem", exact: true }),
   ).toBeVisible();
 }
+
+test("BAL iniciado no plantão retoma o rascunho e conclui após o horário", async ({ page }) => {
+  const f = await balanceSetup({ stableCurrentWindow: true });
+  await open(page, f);
+  const state = await rpc(f.pro.client, "balance_workspace", { p_patient: f.patient });
+  const assignment = state.eligibility.assignment;
+  expect(state.eligibility.admission).not.toBeNull();
+  for (let index = 0; index < f.products.length; index++)
+    await page.getByLabel(`Material fictício V4 ${index} · unidade`, { exact: true }).fill(index ? "0" : "2");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  sql(`update public.bal_assignments set ends_at=clock_timestamp() where id=${q(assignment.id)};
+    select private.process_bal_patient(${q(f.patient)})`);
+  await page.reload();
+  await lastDraftPanel(page).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(page.getByText("Esta contagem foi iniciada no plantão e pode ser concluída agora.", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Material fictício V4 0 · unidade", { exact: true })).toHaveValue("2");
+  await button(page, "Revisar").click();
+  await expect(page.getByRole("heading", { name: "Revisão da contagem", exact: true })).toBeVisible();
+  await button(page, "Confirmar contagem").click();
+  await expect(page.getByRole("link", { name: "Abrir ficha BAL", exact: true })).toBeVisible();
+});
 
 test("BAL review keeps physical fields after an invalid read and uses its own authorized stock reference", async ({ page }) => {
   const f = await balanceSetup();

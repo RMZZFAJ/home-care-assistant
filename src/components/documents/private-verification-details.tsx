@@ -26,6 +26,7 @@ export function PrivateVerificationDetails({ code }: { code: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const openerRef = useRef<HTMLButtonElement>(null);
+  const interactionRef = useRef(0);
   const revision = useLiveRevision();
 
   useEffect(() => {
@@ -63,18 +64,23 @@ export function PrivateVerificationDetails({ code }: { code: string }) {
   const hasKnownDetails = Boolean(actorId && read.data && !read.error);
   const denied = Boolean(actorId && read.error);
   const login = "/login?next=" + encodeURIComponent("/verificar?code=" + code);
-  const close = () => setPanel(null);
+  const close = () => {
+    interactionRef.current++;
+    setPanel(null);
+  };
 
   async function select() {
+    const interaction = ++interactionRef.current;
     setBusy(true);
     setError("");
     try {
       decode(await api("/api/verification/details", { code }));
       refresh();
       window.dispatchEvent(new Event("hca:context-changed"));
-      setPanel("details");
+      if (interaction === interactionRef.current) setPanel("details");
     } catch {
-      setError("Não foi possível confirmar seu acesso aos detalhes desta emissão.");
+      if (interaction === interactionRef.current)
+        setError("Não foi possível confirmar seu acesso aos detalhes desta emissão.");
     } finally {
       setBusy(false);
     }

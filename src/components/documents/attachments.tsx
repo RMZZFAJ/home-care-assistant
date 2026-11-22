@@ -60,7 +60,9 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     return () => window.removeEventListener("beforeunload", warn);
   }, [frozen, modalOnly]);
   const query = new URLSearchParams({ careRecipientId: patientId, ...(contingencyId ? { contingencyId } : documentId ? { documentId } : { movementId: movementId! }) }).toString();
-  const unresolved = files.some(file => file.state === "quarantine" && file.tracked && file.uploadKey);
+  const reservations = files.filter(file => file.state === "quarantine" && file.tracked && file.uploadKey);
+  const unresolved = reservations.length > 0;
+  const releasable = reservations.filter(file => file.canAbandon);
   const newPreparationBlocked = !frozen && !resumeTarget && (loading || Boolean(readError) || !modalOnly && unresolved);
   useEffect(() => {
     const controller = new AbortController();
@@ -190,9 +192,11 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     try {
       const body = await commandFor(file, "recover"), receipt = confirmedAttachment(body, file.sourceSha256!, file.id);
       if (!receipt) {
-        const pending = z.object({ id: z.uuid(), persistence: z.literal("unconfirmed") }).safeParse(body);
+      const pending = z.object({ id: z.uuid(), persistence: z.literal("unconfirmed"), canAbandon: z.boolean() }).safeParse(body);
         if (!pending.success || pending.data.id !== file.id) throw new Error("Não foi possível confirmar esta tentativa.");
-        setMessage("O envio ainda não está confirmado. Consulte novamente ou retome com o mesmo arquivo. Resultado pendente impede o abandono.");
+      setMessage(pending.data.canAbandon
+        ? "O envio ainda não está confirmado. Você pode retomar com o mesmo arquivo ou abandonar a reserva incompleta."
+        : "O envio ainda não está confirmado. Consulte novamente ou retome com o mesmo arquivo. Resultado pendente impede o abandono.");
       } else {
         if (pendingRef.current?.key === file.uploadKey) clearPending();
         setResumeTarget(current => current?.id === file.id ? null : current);
@@ -202,19 +206,35 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     } catch (reason) { if (!deniedRead(reason)) setError(reason instanceof Error ? reason.message : "Não foi possível consultar a tentativa."); }
     finally { setBusy(false); }
   }
+  async function confirmAbandon(file: Attachment) {
+    const parsed = z.object({ id: z.uuid(), persistence: z.literal("abandoned") }).safeParse(await commandFor(file, "abandon"));
+    if (!parsed.success || parsed.data.id !== file.id)
+      throw new Error("O abandono não pôde ser confirmado. Consulte ou repita a mesma ação antes de escolher outro arquivo.");
+  }
   async function abandon(file: Attachment) {
     setBusy(true); setError(""); setFileInvalid(false);
     try {
-      const parsed = z.object({ id: z.uuid(), persistence: z.literal("abandoned") }).safeParse(await commandFor(file, "abandon"));
-      if (!parsed.success) throw new Error("O abandono não pôde ser confirmado. Consulte ou repita a mesma ação antes de escolher outro arquivo.");
-      const result = parsed.data;
-      if (result.id !== file.id) throw new Error("A resposta não corresponde a esta tentativa.");
+      await confirmAbandon(file);
       if (pendingRef.current?.key === file.uploadKey) clearPending();
       if (resumeTarget?.id === file.id) setResumeTarget(null);
       abandonFocusRef.current = refreshRef.current;
       setAbandonTarget(null); setAttempt(value => value + 1); setMessage("Tentativa abandonada. O histórico foi preservado; você pode preparar outro arquivo.");
     } catch (reason) { if (!deniedRead(reason)) setError(reason instanceof Error ? reason.message : "Não foi possível confirmar o abandono."); }
     finally { setBusy(false); }
+  }
+  async function releaseUnusedReservations() {
+    if (busy || frozen || !releasable.length) return;
+    setBusy(true); setError(""); setMessage("");
+    try {
+      for (const file of releasable) await confirmAbandon(file);
+      setMessage("Vagas liberadas. Você pode selecionar um arquivo para enviar.");
+      focusFileRef.current = true;
+    } catch (reason) {
+      if (!deniedRead(reason)) setError("A liberação de todas as vagas ainda não foi confirmada. Confira os anexos e tente novamente.");
+    } finally {
+      setAttempt(value => value + 1);
+      setBusy(false);
+    }
   }
   const visibleFiles = modalOnly ? files.filter(file => file.state === "ready") : files;
   return <section className="doc-area" aria-label="Anexos e ficha física"><header className="doc-section-heading"><div><h2>Anexos</h2><p>Arquivos vinculados à ficha, separados dos exemplares emitidos.</p></div><div className="doc-heading-actions"><button ref={refreshRef} className={buttonClass} type="button" disabled={busy} onClick={() => { recoveredRef.current.clear(); setLoading(true); setAttempt(value => value + 1); }}><Icon name="refresh" />Atualizar anexos</button>{writable ? <button ref={addButtonRef} className={primaryClass} type="button" disabled={busy || newPreparationBlocked} onClick={() => setAdding(true)}><Icon name="plus" />{!modalOnly && frozen ? "Recuperar envio do anexo" : "Adicionar anexo"}</button> : null}</div></header>
@@ -262,8 +282,14 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
         </button>
       </>}>
       <form id={attachmentFormId} className="hca-form-stack" onSubmit={upload}>
-        {error ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
+        {error && !abandonTarget ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
+        {message ? <Notice>{message}</Notice> : null}
         {readError ? <Notice error>{readError}</Notice> : null}
+        {!frozen && releasable.length ? <div className="hca-form-stack">
+          <p>Há vagas reservadas por envios que não começaram. Você pode liberá-las para escolher um arquivo.</p>
+          <button type="button" className={buttonClass} disabled={busy || loading || Boolean(readError)}
+            onClick={() => void releaseUnusedReservations()}>Liberar vagas de envios incompletos</button>
+        </div> : null}
         <label className="hca-attachment-picker" data-selected={Boolean(selectedFile)}>
           {selectedFile ? <>
             {selectedFile.type === "application/pdf" ? <PdfFormatMark /> : <Icon name="image" width={26} height={26} />}

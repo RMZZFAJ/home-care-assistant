@@ -25,9 +25,11 @@ const lines = z
 const text = z.string().trim().min(3).max(2000);
 const version = z.number().int().positive().max(2147483647);
 export const consumptionStatus = z.enum(["reported", "confirmed", "rejected", "recorded", "cancelled", "communicated"]);
-const teamScope = { careRecipientId: z.uuid(), idempotencyKey: z.uuid() };
+const teamId = z.uuid().transform(value => value.toLowerCase());
+const teamScope = { careRecipientId: teamId, idempotencyKey: teamId };
+export const teamConsumptionAttempt = z.object(teamScope).strict();
 const teamObservation = z.string().trim().max(2000).optional();
-const teamRevision = { reportId: z.uuid(), expectedVersion: version, reason: z.string().trim().min(3).max(1000) };
+const teamRevision = { reportId: teamId, expectedVersion: version, reason: z.string().trim().min(3).max(1000) };
 const requiredLines = lines.refine(value => value.length > 0, "Selecione pelo menos um material.");
 const teamAction = z.enum(["issue", "correct", "cancel", "shortage"]);
 const referenceHash = z.string().regex(/^[a-f0-9]{64}$/);
@@ -43,12 +45,12 @@ export const teamConsumptionReference = z.object({
 }).strict();
 export const teamConsumptionCommand = z.discriminatedUnion("action", [
   z.object({
-    ...teamScope, action: z.literal("issue"), observation: teamObservation, reminderId: z.uuid().optional(),
-    lines: requiredLines, referenceHash, draft: z.object({ id: z.uuid(), revision: version }).strict().optional(),
+    ...teamScope, action: z.literal("issue"), observation: teamObservation, reminderId: teamId.optional(),
+    lines: requiredLines, referenceHash, draft: z.object({ id: teamId, revision: version }).strict().optional(),
   }).strict(),
   z.object({ ...teamScope, ...teamRevision, action: z.literal("correct"), observation: teamObservation, lines: requiredLines }).strict(),
   z.object({ ...teamScope, ...teamRevision, action: z.literal("cancel") }).strict(),
-  z.object({ ...teamScope, action: z.literal("shortage"), observation: text, repeatedReportId: z.uuid().optional(), reminderId: z.uuid().optional(), lines: lines.optional() }).strict(),
+  z.object({ ...teamScope, action: z.literal("shortage"), observation: text, repeatedReportId: teamId.optional(), reminderId: teamId.optional(), lines: lines.optional() }).strict(),
 ]);
 export const teamConsumptionReceipt = z.object({
   id: z.uuid(), operationId: z.uuid(), careRecipientId: z.uuid(), idempotencyKey: z.uuid(),

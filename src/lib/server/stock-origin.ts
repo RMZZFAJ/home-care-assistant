@@ -115,7 +115,7 @@ export async function stockMovementOrigin(
       reportId = data?.id ?? null;
     }
     if (!reportId) return unavailable();
-    const report = (await rpc(client, "consumption_report", {
+    const report = (await rpc(client, "consumption_record_detail", {
       p_id: reportId,
     })) as ConsumptionReport;
     if (!report.movements.some((row) => row.id === movement.id))

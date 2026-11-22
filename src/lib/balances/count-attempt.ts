@@ -248,6 +248,7 @@ export function requireCountConfirmation(
         !lines.has(l.product_id) ||
         !quantity(lines.get(l.product_id)!).eq(l.quantity),
     ) ||
+    body.payload.balanceAssignment?.admissionId !== result.payload.balanceAssignment?.admissionId ||
     (result.payload.notes ?? "") !== (body.payload.notes ?? "")
   )
     throw Error(

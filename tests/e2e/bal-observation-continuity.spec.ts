@@ -41,7 +41,7 @@ async function login(page: Page, patient: string, email: string) {
   await selectContext(page, patient);
   await page.goto("/fichas/bal");
   const steps = page.getByRole("navigation", { name: /^(Etapas da ficha|Etapas da BAL)$/ });
-  await expect(steps.or(panel(page)).first()).toBeVisible();
+  await expect(steps.or(panel(page)).or(button(page, "Iniciar contagem")).first()).toBeVisible();
 }
 async function stockChange(
   f:
@@ -84,6 +84,7 @@ test("BAL local scheduled fields survive a stock change,reload and explicit fres
 }, info) => {
   const f = await balanceSetup();
   await login(page, f.patient, f.pro.email);
+  await button(page, "Iniciar contagem").click();
   await expect(button(page, "Revisar")).toBeEnabled();
   await page
     .getByLabel("Material fictício V4 0 · unidade", { exact: true })
@@ -230,6 +231,7 @@ test("BAL scheduled failed source read preserves the exact local copy and recove
 }) => {
   const f = await balanceSetup();
   await login(page, f.patient, f.pro.email);
+  await button(page, "Iniciar contagem").click();
   await expect(button(page, "Revisar")).toBeEnabled();
   await page
     .getByLabel("Material fictício V4 0 · unidade", { exact: true })

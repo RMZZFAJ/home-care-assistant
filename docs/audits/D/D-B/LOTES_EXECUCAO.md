@@ -1758,19 +1758,23 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 
 | Migration de L3 | Local | Remoto |
 | --- | --- | --- |
-| `20261122180206_l3_document_attachment_attempts` | Aplicada | Pendente |
-| `20261122181454_l3_family_stock_operations` | Aplicada | Pendente |
-| `20261122183711_l3_stock_operation_history` | Aplicada | Pendente |
-| `20261122184410_l3_stock_document_act_links` | Aplicada | Pendente |
-| `20261122184629_l3_stock_custody_overview` | Aplicada | Pendente |
-| `20261122185603_l3_team_consumption` | Aplicada | Pendente |
-| `20261122191150_l3_team_consumption_review` | Aplicada | Pendente |
-| `20261122191908_l3_consumption_shortage_notices` | Aplicada | Pendente |
-| `20261122193611_l3_consumption_progress_subjects` | Aplicada | Pendente |
-| `20261122195318_l3_versioned_consumption_reads` | Aplicada | Pendente |
+| `20261122180206_l3_document_attachment_attempts` | Aplicada | Aplicada |
+| `20261122181454_l3_family_stock_operations` | Aplicada | Aplicada |
+| `20261122183711_l3_stock_operation_history` | Aplicada | Aplicada |
+| `20261122184410_l3_stock_document_act_links` | Aplicada | Aplicada |
+| `20261122184629_l3_stock_custody_overview` | Aplicada | Aplicada |
+| `20261122185603_l3_team_consumption` | Aplicada | Aplicada |
+| `20261122191150_l3_team_consumption_review` | Aplicada | Aplicada |
+| `20261122191908_l3_consumption_shortage_notices` | Aplicada | Aplicada |
+| `20261122193611_l3_consumption_progress_subjects` | Aplicada | Aplicada |
+| `20261122195318_l3_versioned_consumption_reads` | Aplicada | Aplicada |
+| `20261122201849_l3_balance_count_admissions` | Aplicada | Aplicada |
+| `20261122212641_l3_stock_review_repairs` | Aplicada | Aplicada |
 
-Local em 330 versões, após aplicação sem reset. Remoto em 320 versões, com
-`20261121202419` como a última aplicada.
+O replay de instalação limpa e evolução da CI passou para `acf440ef`
+com 330 versões. Local e remoto têm 332 versões. A aplicação das duas
+migrations subsequentes foi precedida pelo backup cifrado verificado
+`cbc6795c-3189-4834-a475-7c1f0b09d031`. A fila vinculada ficou vazia.
 
 L4 aguarda definição.
 
@@ -2110,8 +2114,10 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   Os Andamentos de consumo e falta usam as abas e a publicação compartilhadas
   das fichas. Restam a integração do histórico ao painel de material,
   a continuidade pelo canal existente e a conferência visual final.
-- **E08 — Plantões e balanços.** Pendente. Inclui configuração de horários
-  por residência e admissão de contagem que sobrevive ao término do plantão.
+- **E08 — Plantões e balanços.** Em execução. A admissão da contagem
+  iniciada no plantão já preserva a retomada. Restam a área unificada,
+  a configuração de horários por residência, os encaminhamentos de
+  alterações e a organização da contagem e da ficha.
 - **E09 — Arquivos e verificação.** Em execução. A consulta pública exibe
   registro, correspondência, assinatura e carimbo separadamente. Os detalhes
   autorizados abrem em painel e revalidam o acesso. O resultado público
@@ -2155,8 +2161,8 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
 - O wizard de cinco etapas usa o slot privado do consumo da equipe para
   o último preenchimento e guarda a tentativa oficial separadamente.
   Correção, cancelamento e aviso de falta usam operações curtas, com
-  consulta por chave em caso de resposta incerta. As métricas somam os
-  registros diretos vigentes no período e os fatos legados.
+  consulta por chave em caso de resposta incerta. As métricas de um período
+  fechado preservam os lançamentos e ajustes conhecidos até seu término.
 - Os Andamentos combinam atos oficiais e comentários manuais. A publicação
   usa as mesmas regras de autoria, audiência familiar, menção individual,
   rascunho, concorrência e recuperação das fichas. A referência aponta para
@@ -2178,19 +2184,68 @@ incluindo a leitura dos dois contratos sob Auth e revogação de acesso.
 Em Chromium, passaram os dois casos de paginação/filtros e a jornada
 de publicação, correção e cancelamento no candidato com leitura versionada.
 
-O primeiro deploy da PR 8 passou em login, seleção de paciente, fichas,
-saldo da equipe e configuração de Web Push. A consulta de consumo ainda
-exige as migrations no banco remoto. A configuração de verificação do
-Preview desta branch passou a incluir as raízes públicas e as impressões
-do emissor de produção para conferir PDFs do banco compartilhado. A
-aplicação dessa configuração depende do próximo deploy.
+A [PR 8](https://github.com/RMZZFAJ/home-care-assistant/pull/8) continua
+em rascunho. O Preview de `acf440ef` passou em login, seleção de
+paciente, fichas, estoque da equipe, histórico agrupado, lista de consumo
+e configuração de Web Push. A política da branch inclui os certificados
+públicos do emissor de produção. A consulta pública reconheceu um PDF
+já emitido no banco compartilhado.
+
+O Preview registrou o aviso de gaze de Helena e recuperou o mesmo recibo
+pela chave original. A ficha exibiu o estado comunicado e o fato automático
+em Andamentos. O aviso gerou zero movimentos. A lista em produção respondeu
+normalmente e preservou seu recorte de estados.
 
 A primeira captura de resguardo foi colocada em quarentena por mudanças
 em três tabelas de telemetria. O cron do ciclo operacional falhava por
 ausência dos cursores de REQ, BAL e lembretes legados. Os três registros
 técnicos foram repostos com os defaults das migrations originais e o
-cron voltou a concluir. A nova captura deve ser verificada antes da
-aplicação das migrations de L3.
+cron voltou a concluir. Na nova tentativa houve atividade de usuários
+durante a captura dividida. Antes das migrations foi conferido um dump
+de snapshot único do PostgreSQL, com 42 objetos de Storage, no arquivo
+cifrado `392cbbee-f419-4ac9-9a83-6f093954b64d`. A verificação leu o arquivo
+integralmente. A restauração em outro banco permanece por ensaiar.
+
+O SonarCloud e o job de banco passaram em `acf440ef`. O recorte do Sonar exclui
+somente os dois HTMLs de referência aprovados de L2 e L3. Ambos permanecem
+nas comparações de navegador. O CodeRabbit publicou a primeira revisão
+automática na PR em rascunho.
+
+### Início de contagem no plantão
+
+- O profissional designado confirma **Iniciar contagem** dentro da janela.
+  O servidor registra a pessoa, o paciente, a versão da atribuição e, em caso de
+  reconto, a ficha e sua versão. A mesma autorização permite retomar e concluir
+  depois do horário. Perda de acesso ou mudança de versão exigem nova conferência.
+- O descarte confirmado encerra a autorização associada ao rascunho. Ao expirar,
+  a programação distingue a contagem iniciada de uma atribuição que ficou sem
+  contagem. A emissão persiste o horário real e recupera o mesmo resultado
+  por chave.
+- Passaram três integrações dirigidas com Auth real, incluindo nova contagem,
+  reconto depois do horário, descarte e tentativa com versão incorreta.
+  O fluxo de retomada após a janela passou em Chromium, Android e iOS
+  emulados no build de produção local.
+
+### Primeira revisão automatizada de L3
+
+- Os 11 comentários inline sobre estados ou controles da simulação foram
+  registrados como referência para validar a implementação real. A fonte
+  aprovada do laboratório permaneceu preservada.
+- O produto usa a emissão encontrada pelos bytes mesmo quando o código
+  digitado não está no registro. O painel fechado durante a confirmação
+  de acesso não reabre após a resposta. A consulta por arquivo com código
+  desconhecido passou no Chromium.
+- Corrigidos o vínculo do lembrete ao emitir aviso, a origem dos movimentos do
+  consumo direto, os rótulos exclusivos dos relatos legados e a busca de
+  trânsito por identidade de catálogo. A visualização do saldo familiar
+  continua exibindo as quantidades agregadas de compra sob autorização de
+  estoque. A abertura da COM continua regida pela autorização da ficha.
+- Os testes dirigidos cobriram as métricas antes e depois de correções, o
+  lembrete escolhido, a preservação de um rascunho posterior após repetição
+  da emissão e o reenvio de quantidade numericamente equivalente sem nova
+  movimentação. A forma originalmente aceita de comandos anteriores continua
+  válida para recuperar recibos cujo hash tenha sido calculado antes da
+  normalização.
 
 ### Verificação pública
 
@@ -2211,8 +2266,10 @@ aplicação das migrations de L3.
 ### Anexos da ficha
 
 - Ao fechar o modal, a próxima abertura começa com uma seleção vazia. O
-  acervo mostra os arquivos confirmados. A reserva incompleta pode ser
-  encerrada tecnicamente quando a consulta prova que o envio não começou.
+  acervo mostra os arquivos confirmados. O modal oferece liberação de vagas
+  antigas quando o servidor confirma que os respectivos envios não começaram.
+  Uma seleção anterior exige escolher o arquivo novamente. A liberação
+  após recarga foi verificada com a API real no Chromium.
 - A resposta perdida pode ser recuperada no mesmo modal. Ao recarregar
   a ficha, uma consulta técnica confirma o arquivo já armazenado, quando
   o hash e a autorização conferem.

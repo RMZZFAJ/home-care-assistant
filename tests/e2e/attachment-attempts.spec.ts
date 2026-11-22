@@ -157,6 +157,34 @@ test("fechar o modal encerra a reserva sem fila e preserva o histórico", async 
   expect(rows(f.doc.id).filter((row: { state: string }) => row.state === "ready")).toHaveLength(1);
 });
 
+test("o modal libera uma reserva incompleta preservada após recarregar a ficha", async ({ page }) => {
+  const f = await fixture(page), before = facts(f.doc.id);
+  const reservation = await page.request.post("/api/attachments?prepare=1", {
+    headers: { origin: new URL(page.url()).origin },
+    multipart: { careRecipientId: f.patient, documentId: f.doc.id, idempotencyKey: randomUUID(), file: f.file },
+  });
+  expect(reservation.ok(), await reservation.text()).toBe(true);
+  const [pending] = rows(f.doc.id);
+  expect(pending.state).toBe("quarantine");
+
+  await page.reload();
+  await selectDocumentSection(page, "attachments");
+  await expect(page.getByText("Nenhum anexo registrado.", { exact: true })).toBeVisible();
+  await expect(page.getByText(f.file.name, { exact: true })).toHaveCount(0);
+  await add(page).click();
+  const upload = page.getByRole("dialog", { name: "Adicionar anexo", exact: true });
+  await expect(upload.getByText(f.file.name, { exact: true })).toHaveCount(0);
+  const release = upload.getByRole("button", { name: "Liberar vagas de envios incompletos", exact: true });
+  await release.click();
+  await expect(upload).toBeVisible();
+  await expect(release).toHaveCount(0);
+  await expect(upload.getByText("Vagas liberadas. Você pode selecionar um arquivo para enviar.", { exact: true })).toBeVisible();
+  await expect(picker(page)).toBeEnabled();
+  expect(rows(f.doc.id).map(({ id, state }: { id: string; state: string }) => ({ id, state })))
+    .toEqual([{ id: pending.id, state: "abandoned" }]);
+  expect(facts(f.doc.id)).toBe(before);
+});
+
 test("revogação ao fechar a seleção preserva a reserva sem abandonar sem autorização", async ({ page }) => {
   const f = await fixture(page), before = facts(f.doc.id);
   await loseConfirmedResponse(page, "prepareAndAbandon");
