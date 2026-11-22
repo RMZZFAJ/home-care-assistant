@@ -11,7 +11,7 @@ export function DeliveryMaterials({ data, active }: { data: SupplyDocument; acti
   const declarationOnly = Boolean(data.transfer && data.transfer.state !== "dispatched");
   const notes = typeof data.workflow_data.receiptNotes === "string" ? data.workflow_data.receiptNotes.trim() : "";
   const familyDestination = data.kind === "DEV" || data.payload.destination === "FAMILY";
-  return <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
+  return <DocumentMaterialList key={data.id} documentId={data.id} documentCode={data.code ?? data.protocol} patientId={data.care_recipient_id}
     revision={String(data.version)} active={active} label="Materiais da entrega ou transferência" settledLabel="Conferidos"
     today={familyDestination ? { location: "family", label: "Família hoje" } : { location: "team", label: "Equipe hoje" }}
     heading={<><h2>Materiais</h2><p>{declarationOnly ? "Materiais declarados para expedição."

@@ -20,7 +20,7 @@ export function IssuedBalanceMaterials({ data, active }: { data: SupplyDocument;
   const reviewed = applied || data.balanceReview?.reviewSatisfied;
   const status = closed ? "Contagem encerrada" : applied ? "Conciliado" : reviewed ? "Revisado"
     : data.balanceReview?.reviewRequired ? "Aguardando revisão" : "Contado";
-  return <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
+  return <DocumentMaterialList key={data.id} documentId={data.id} documentCode={data.code ?? data.protocol} patientId={data.care_recipient_id}
     revision={String(data.version)} active={active} label="Materiais do balanço" settledLabel="Conferidos"
     today={{ location: "family", label: "Estoque familiar" }}
     heading={<><h2>Materiais</h2><p>Contagem da equipe e estoque familiar atual.</p></>}

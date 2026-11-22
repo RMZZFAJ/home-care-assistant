@@ -687,7 +687,7 @@ export function RequisitionDocumentContent({
         </DocumentPanel>
         <DocumentPanel value="materials">
           <section className="hca-materials-section">
-            <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
+            <DocumentMaterialList key={data.id} documentId={data.id} documentCode={data.code ?? data.protocol} patientId={data.care_recipient_id}
               revision={String(p.version)} active={tabs.value === "materials"} label="Materiais requisitados" settledLabel="Supridos"
               today={{ location: "family", label: "Família hoje" }}
               heading={<><h2>Materiais</h2><p>Estoque informado na emissão e avaliação da necessidade.</p></>}

@@ -10,11 +10,11 @@ import { useScopedRead } from "@/lib/use-scoped-read";
 import { unlinkedArrivalDetails } from "@/lib/validation/unlinked-arrival";
 import type { WorkspaceContext } from "@/types/workspace";
 import type { LinkedMaterialDocument } from "./document-material-panel";
-import { MaterialVisitContext } from "./material-visit-context";
+import { MaterialVisitContext, MaterialVisitProductContext } from "./material-visit-context";
 import { SupplyDocumentContent } from "./supply-detail";
 import { UnlinkedArrivalFacts } from "./unlinked-arrival";
 
-export type MaterialVisitTarget = { kind: "document"; reference: LinkedMaterialDocument }
+export type MaterialVisitTarget = { kind: "document"; reference: LinkedMaterialDocument; productId: string | null }
   | { kind: "arrival"; reference: { id: string; code: string } };
 
 export function MaterialFullVisit({ target, context, onClose, finalFocus }: {
@@ -30,12 +30,14 @@ export function MaterialFullVisit({ target, context, onClose, finalFocus }: {
       <Icon name="back" width={14} height={14} />Voltar ao painel
     </button>}>
     <MaterialVisitContext value={context}>
+      <MaterialVisitProductContext value={target.kind === "document" ? target.productId : null}>
       <div onSubmit={event => event.stopPropagation()}>
         {target.kind === "arrival" ? <MaterialArrival id={id} patientId={context.patient!.id} />
           : target.reference.type === "REQ" ? <RequisitionOpening id={id} withinDialog onCancel={onClose}>
             <RequisitionDocumentContent id={id} context={context} />
           </RequisitionOpening> : <SupplyDocumentContent id={id} context={context} />}
       </div>
+      </MaterialVisitProductContext>
     </MaterialVisitContext>
   </Drawer>;
 }

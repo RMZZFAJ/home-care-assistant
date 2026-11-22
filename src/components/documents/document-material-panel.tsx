@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { lazy, Suspense, use, useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Tabs } from "@base-ui/react/tabs";
-import { ActionButton, LoadingIndicator, Pill } from "@/components/ui/controls";
+import { ActionButton, LoadingIndicator, Pill, TextInput } from "@/components/ui/controls";
 import { Drawer } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
 import { PageLoadingActivity } from "@/components/ui/operation-activity";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { useScopedRead } from "@/lib/use-scoped-read";
-import { documentMaterialPanel, materialPanelSections, type MaterialPanelSection } from "@/lib/validation/document-material-context";
+import { documentMaterialPanel, materialLinkKinds, materialPanelSections, type MaterialLinkFilters } from "@/lib/validation/document-material-context";
 import { documentStatusLabel } from "@/lib/documents/presentation";
 import { materialVisitParam, prepareMaterialVisit } from "@/lib/documents/material-visit";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -21,30 +21,39 @@ import type { WorkspaceContext } from "@/types/workspace";
 import type { DocumentMaterialRow } from "./document-material-list";
 import { RelatedDocumentBody, relatedDocumentLabel } from "./related-document";
 import { DocumentMaterialHistory } from "./document-material-history";
+import { MaterialStockHistory } from "./material-stock-history";
 import { MaterialVisitContext } from "./material-visit-context";
 import type { MaterialVisitTarget } from "./material-full-visit";
 
 const MaterialFullVisit = lazy(() => import("./material-full-visit").then(module => ({ default: module.MaterialFullVisit })));
 
 export type LinkedMaterialDocument = { id: string; code: string | null; type: DocumentType; kind?: DocumentKind };
+export const documentMaterialSections = ["document", ...materialPanelSections] as const;
+type PanelSection = typeof documentMaterialSections[number];
 export type MaterialPanelPosition = {
   lineId: string;
-  section: MaterialPanelSection;
+  section: PanelSection;
   page: number;
   panelScroll: number;
   focusEntry?: string;
+  linkFilters?: MaterialLinkFilters;
+  linkSearchOpen?: boolean;
+  movementPage?: number;
+  expandedMovements?: string[];
   linked: LinkedMaterialDocument | null;
 };
-const labels = { stock: "Estoque", history: "Histórico", links: "Fichas" };
+const labels = { document: "Nesta ficha", stock: "Estoque", history: "Histórico", links: "Fichas" };
 const linkedIcons = { REQ: "note", COM: "box", ENT: "truck", DEV: "truck", BAL: "stock" } as const;
+const allLinkFilters: MaterialLinkFilters = { kind: null, search: "" };
 const closedRequisitionStatuses = new Set(["cancelled", "completed", "delivered", "historical"]);
 
 export function DocumentMaterialPanel({
-  row, documentId, patientId, revision, position, onPosition, onNavigate, finalFocus, onClose, inlineContext,
-  closeText = "Voltar à ficha", detailTitle = "Em acompanhamento nesta ficha",
+  row, documentId, documentCode, patientId, revision, position, onPosition, onNavigate, finalFocus, onClose, inlineContext,
+  closeText = "Voltar à ficha", detailTitle = "Material nesta ficha",
 }: {
-  row: Pick<DocumentMaterialRow, "id" | "name" | "unit" | "detail" | "related">;
+  row: Pick<DocumentMaterialRow, "id" | "productId" | "name" | "unit" | "detail" | "related">;
   documentId?: string;
+  documentCode?: string | null;
   patientId: string;
   revision: string;
   position: MaterialPanelPosition;
@@ -57,6 +66,10 @@ export function DocumentMaterialPanel({
   detailTitle?: string;
 }) {
   const { section, page, linked } = position;
+  const { kind: linkKind, search: linkSearch } = position.linkFilters ?? allLinkFilters;
+  const [linkText, setLinkText] = useState(linkSearch);
+  const contextual = Boolean(documentId);
+  const sections: readonly PanelSection[] = contextual ? documentMaterialSections : materialPanelSections;
   const router = useRouter();
   const inheritedContext = use(MaterialVisitContext);
   const visitContext = inlineContext ?? inheritedContext;
@@ -74,15 +87,25 @@ export function DocumentMaterialPanel({
     const material = documentId ? data.lineId : data.productId;
     if (data.documentId !== (documentId ?? null) || data.patientId !== patientId || material !== row.id
       || data.section !== section || data.page !== page) throw new Error("A resposta pertence a outra consulta.");
+    if (data.section === "links" && (!data.filters || data.filters.kind !== linkKind || data.filters.search !== linkSearch))
+      throw new Error("Os resultados pertencem a outra busca de fichas.");
+    if (data.section === "history" && data.rows.some(row => row.kind !== "decision"))
+      throw new Error("Não foi possível identificar as decisões desta consulta.");
     return data;
-  }, [documentId, patientId, row.id, section, page]);
+  }, [documentId, patientId, row.id, section, page, linkKind, linkSearch]);
   const query = new URLSearchParams({ section, page: String(page) });
   if (documentId) query.set("line", row.id);
   else { query.set("productId", row.id); query.set("careRecipientId", patientId); }
+  if (section === "links") {
+    if (linkKind) query.set("kind", linkKind);
+    if (linkSearch) query.set("search", linkSearch);
+  }
+  if (section === "history") query.set("view", "decisions");
   const endpoint = documentId ? `/api/documents/${documentId}/materials` : "/api/catalog/material";
   const { loading, data, error, refresh } = useScopedRead(
-    endpoint + "?" + query, revision, decode,
+    section === "document" ? null : endpoint + "?" + query, revision, decode,
   );
+  const productId = documentId ? row.productId ?? data?.productId ?? null : row.id;
   useEffect(() => {
     if (!inlineVisit) return;
     const close = () => {
@@ -91,8 +114,8 @@ export function DocumentMaterialPanel({
     window.addEventListener("popstate", close);
     return () => window.removeEventListener("popstate", close);
   }, [inlineVisit]);
-  useEffect(() => {
-    if (loading || !data || restoredScrollRef.current) return;
+  const restorePanel = useCallback(() => {
+    if (restoredScrollRef.current) return;
     restoredScrollRef.current = true;
     if (contentRef.current) {
       contentRef.current.scrollTop = position.panelScroll;
@@ -101,7 +124,12 @@ export function DocumentMaterialPanel({
           ?.focus({ preventScroll: true });
       }
     }
-  }, [loading, data, position.panelScroll, position.focusEntry]);
+  }, [position.panelScroll, position.focusEntry]);
+  useEffect(() => {
+    if (loading || section !== "document" && !data) return;
+    if (data?.section === "history" && data.available && data.productId && position.expandedMovements?.length) return;
+    restorePanel();
+  }, [loading, data, section, position.expandedMovements?.length, restorePanel]);
   useEffect(() => {
     if (linked || loading || !linkedReturnFocusRef.current) return;
     const frame = requestAnimationFrame(() => {
@@ -116,9 +144,13 @@ export function DocumentMaterialPanel({
     });
     return () => cancelAnimationFrame(frame);
   }, [linked, loading, position.panelScroll]);
-  function select(next: MaterialPanelSection, nextPage = 1) {
+  function select(next: PanelSection, nextPage = 1) {
     if (contentRef.current) contentRef.current.scrollTop = 0;
     onPosition({ ...position, section: next, page: nextPage, panelScroll: 0 });
+  }
+  function filterLinks(filters: MaterialLinkFilters) {
+    if (contentRef.current) contentRef.current.scrollTop = 0;
+    onPosition({ ...position, linkFilters: filters, page: 1, panelScroll: 0 });
   }
   function link(record: LinkedMaterialDocument, detail?: ReactNode, options: { timeline?: boolean; status?: string; archived?: boolean; attention?: boolean } = {}) {
     if (record.id === documentId) return null;
@@ -162,11 +194,12 @@ export function DocumentMaterialPanel({
       return;
     }
     onNavigate?.({ ...position, focusEntry, panelScroll: contentRef.current?.scrollTop ?? position.panelScroll });
-    const token = prepareMaterialVisit(target.reference.id, patientId);
+    const token = prepareMaterialVisit(target.reference.id, patientId, target.kind === "document" ? target.productId : null);
     if (!token) return;
     event.preventDefault();
     const url = new URL(href, window.location.origin);
     url.searchParams.set(materialVisitParam, token);
+    if (target.kind === "document") url.searchParams.set("documentTab", "materials");
     router.push(url.pathname + url.search);
   }
   const displayQuantity = (value: string | null) => value === null ? "Não disponível nesta consulta" : formatQuantity(value, row.unit ?? undefined);
@@ -184,17 +217,47 @@ export function DocumentMaterialPanel({
     <MaterialFullVisit context={visitContext} target={inlineVisit.target} onClose={closeVisit}
       finalFocus={() => inlineVisit.opener?.isConnected ? inlineVisit.opener : false} />
   </Suspense> : null;
+  const contextFacts = <section>
+    <h3>{detailTitle}</h3>
+    {documentCode ? <p><Icon name="file" width={17} height={17} /> <strong>{documentCode}</strong></p> : null}
+    {row.detail}
+    {row.related?.length ? <div className="hca-material-linked-list">{row.related.map(item =>
+      <div key={item.document.id}>{link(item.document, item.detail)}</div>
+    )}</div> : null}
+    {!row.detail && !row.related?.length ? <p>Não há dados adicionais para este material.</p> : null}
+  </section>;
   return <Tabs.Root value={section} onValueChange={value => {
-    if (materialPanelSections.some(item => item === value)) select(value as MaterialPanelSection);
+    const next = sections.find(item => item === value);
+    if (next) select(next);
   }}>
     <Drawer open title={row.name} kicker="Consulta de material" subtitle={row.unit ? "Unidade padrão · " + row.unit : undefined}
       popupClassName="hca-material-sheet" keyboardScrollable contentRef={contentRef} finalFocus={finalFocus} onClose={onClose}
       navigation={<Tabs.List aria-label="Consulta do material" className="hca-material-sheet-tabs">
-        {materialPanelSections.map(item => <Tabs.Tab value={item} key={item} data-material-section>{labels[item]}</Tabs.Tab>)}
+        {sections.map(item => <Tabs.Tab value={item} key={item} data-material-section
+          aria-label={item === "document" && documentCode ? `${labels.document} · ${documentCode}` : undefined}>
+          {item === "document" && documentCode ? documentCode : labels[item]}
+        </Tabs.Tab>)}
       </Tabs.List>}
       footer={<ActionButton onClick={onClose}><Icon name="back" />{closeText}</ActionButton>}>
       <Tabs.Panel value={section} className="hca-material-sheet-body">
-        {loading ? <LoadingIndicator label="Consultando material" /> : error ? <div role="alert" className="hca-v7-material-read-error">
+        {section === "links" ? <>
+          <nav aria-label="Tipos de ficha relacionada" className="hca-document-file-nav">
+            {[null, ...materialLinkKinds].map(kind => <button key={kind ?? "all"} type="button"
+              aria-pressed={linkKind === kind} onClick={() => filterLinks({ kind, search: linkSearch })}>{kind ?? "Todas"}</button>)}
+          </nav>
+          <ActionButton variant="quiet" aria-expanded={Boolean(position.linkSearchOpen)}
+            onClick={() => onPosition({ ...position, linkSearchOpen: !position.linkSearchOpen })}>
+            <Icon name="search" />Buscar fichas vinculadas
+          </ActionButton>
+          {position.linkSearchOpen ? <form className="hca-toolbar" role="search" aria-label="Busca de fichas vinculadas"
+            onSubmit={event => { event.preventDefault(); event.stopPropagation(); filterLinks({ kind: linkKind, search: linkText.trim().toLowerCase() }); }}>
+            <TextInput type="search" aria-label="Número da ficha" placeholder="Número da ficha" maxLength={160}
+              value={linkText} onChange={event => setLinkText(event.currentTarget.value)} />
+            <ActionButton type="submit">Buscar</ActionButton>
+            {linkSearch ? <ActionButton onClick={() => { setLinkText(""); filterLinks({ kind: linkKind, search: "" }); }}>Limpar</ActionButton> : null}
+          </form> : null}
+        </> : null}
+        {section === "document" ? contextFacts : loading ? <LoadingIndicator label="Consultando material" /> : error ? <div role="alert" className="hca-v7-material-read-error">
           <p>{error}</p><ActionButton onClick={refresh}>Tentar novamente</ActionButton>
         </div> : data?.section === "stock" ? <>
           <section><h3>Estoque atual</h3><dl className="hca-material-balance-grid">
@@ -203,12 +266,7 @@ export function DocumentMaterialPanel({
             <div><dt>Equipe · disponível</dt><dd>{displayQuantity(data.team)}</dd>
               {data.team !== null ? <dd className="hca-material-balance-note">Contagens e recebimentos confirmados</dd> : null}</div>
           </dl></section>
-          {row.detail || row.related?.length ? <section><h3>{detailTitle}</h3>
-            {row.detail}
-            {row.related?.length ? <div className="hca-material-linked-list">{row.related.map(item =>
-              <div key={item.document.id}>{link(item.document, item.detail)}</div>
-            )}</div> : null}
-          </section> : null}
+          {!contextual && (row.detail || row.related?.length) ? contextFacts : null}
           <section><h3>Estoque informado nas requisições</h3>
             {observations.length ? <><div className="hca-material-linked-list">{observations.map(observation => <article key={observation.documentId}>
               {link({ id: observation.documentId, code: observation.code, type: "REQ" }, formatBrazilDate(observation.createdAt))}
@@ -222,7 +280,24 @@ export function DocumentMaterialPanel({
               Cada quantidade foi registrada na requisição correspondente. Os valores ficam preservados separadamente do saldo atual.
             </p></> : <p>{data.observations.length ? "Nenhuma contagem de outra requisição disponível para este material." : "Nenhuma contagem de requisição disponível para este material."}</p>}
           </section>
-        </> : data?.section === "history" ? <DocumentMaterialHistory rows={data.rows} movementsAvailable={data.available}
+        </> : data?.section === "history" ? <DocumentMaterialHistory rows={data.rows.filter(row => row.kind === "decision")} movementsAvailable={data.available}
+          movements={data.available && data.productId ? <MaterialStockHistory
+            patientId={patientId} productId={data.productId} revision={revision} page={position.movementPage ?? 1}
+            onPage={movementPage => onPosition({ ...position, movementPage })}
+            expanded={position.expandedMovements ?? []} onRead={restorePanel}
+            onToggle={(id, open) => {
+              const expanded = position.expandedMovements ?? [];
+              if (expanded.includes(id) !== open) onPosition({
+                ...position, expandedMovements: open ? [...expanded, id].slice(-100) : expanded.filter(item => item !== id),
+              });
+            }}
+            renderDocumentLink={(movement, operation) => {
+              const kind = materialLinkKinds.find(value => value === operation.origin);
+              return movement.reference_document_id && kind ? link({
+                id: movement.reference_document_id, code: operation.documentCode,
+                type: kind === "DEV" ? "ENT" : kind, kind,
+              }, undefined, { timeline: true }) : null;
+            }} /> : null}
           unit={row.unit} reference={record => {
             if (record.document) return link(record.document, undefined, { timeline: true });
             if (!record.arrival) return null;
@@ -241,7 +316,7 @@ export function DocumentMaterialPanel({
                 attention: !item.archived && ["fulfillment_partial", "partially_received", "disputed"].includes(item.status) })}
           </div>)}</div>
         </section> : null) : <section><h3>Fichas relacionadas</h3>
-          <p>Nenhuma ficha relacionada disponível neste vínculo.</p>
+          <p>{linkKind || linkSearch ? "Nenhuma ficha corresponde aos filtros." : "Nenhuma ficha relacionada disponível neste vínculo."}</p>
         </section> : null}
         {data && data.section !== "stock" && (data.total > 20 || page > 1) ? <div className="hca-material-pagination">
           <ActionButton disabled={page === 1} onClick={() => select(section, page - 1)}>Anterior</ActionButton>
@@ -256,7 +331,7 @@ export function DocumentMaterialPanel({
           <ActionButton onClick={closeLinked}><Icon name="back" />Voltar ao material</ActionButton>
           <Link href={`/fichas/${linked.id}`} className="ui-button ui-button-primary"
             onClick={event => { inlineOpenerRef.current = event.currentTarget; }}
-            onNavigate={event => visit(`/fichas/${linked.id}`, { kind: "document", reference: linked }, event)}>
+            onNavigate={event => visit(`/fichas/${linked.id}`, { kind: "document", reference: linked, productId }, event)}>
             <Icon name="external" />Abrir {linked.code ?? "ficha"}
           </Link>
         </>}>

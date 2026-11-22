@@ -503,7 +503,7 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
     const fullValue = observed ? `${line.currentStock} ${line.unit} (observado)` : shortValue;
     await expect(material.locator(".hca-v7-material-facts > span").filter({ hasText: "Informado na REQ" }).locator("b")).toHaveText(shortValue);
     await material.click();
-    const panel = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Em acompanhamento nesta ficha", exact: true }) });
+    const panel = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Material nesta ficha", exact: true }) });
     await expect(panel.getByText("Informado nesta REQ", { exact: true }).locator("..")).toContainText(fullValue);
     await expect(panel.getByText("Registro no rascunho (horário do dispositivo):", { exact: false }).first()).toBeVisible();
     await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();

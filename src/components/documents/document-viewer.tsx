@@ -4,13 +4,15 @@ import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { RequisitionDocumentContent } from "@/components/requisitions/requisition-detail";
 import { SupplyDocumentContent } from "./supply-detail";
 import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
-import { MaterialVisitReturn } from "./material-visit-return";
+import { MaterialVisitReturn, useMaterialVisit } from "./material-visit-return";
+import { MaterialVisitProductContext } from "./material-visit-context";
 
 /** All document URLs use the same frame; adapters retain their domain contracts. */
 export function DocumentViewer({ id }: { id: string }) {
   const { data, loading } = useWorkspaceState();
   const document =
     data?.documentContext?.id === id ? data.documentContext : null;
+  const visit = useMaterialVisit(id, document?.patientId ?? "");
   return (
     <Workspace
       documentPage
@@ -22,7 +24,7 @@ export function DocumentViewer({ id }: { id: string }) {
     >
       {(context) =>
         document ? (
-          <>
+          <MaterialVisitProductContext value={visit || null}>
             <MaterialVisitReturn targetId={id} patientId={document.patientId} />
             {document.type === "REQ" ? (
               <RequisitionOpening standalone key={id} id={id}>
@@ -31,9 +33,10 @@ export function DocumentViewer({ id }: { id: string }) {
             ) : (
               <SupplyDocumentContent key={id} id={id} context={context} />
             )}
-          </>
+          </MaterialVisitProductContext>
         ) : (
           <>
+            {context.patient ? <MaterialVisitReturn targetId={id} patientId={context.patient.id} /> : null}
             <h1>Acompanhamento da ficha</h1>
             <Notice error={!loading}>
               {loading

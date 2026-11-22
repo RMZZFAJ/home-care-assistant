@@ -27,22 +27,14 @@ const decisionLabels: Record<string, { title: string; icon: IconName }> = {
   "arrival.correction": { title: "Correção de chegada avulsa solicitada", icon: "note" },
   "arrival.resubmitted": { title: "Chegada avulsa corrigida e reenviada", icon: "refresh" },
 };
-const custody: Record<string, string> = { FAMILY: "Família", CARE_TEAM: "Equipe", TRANSIT: "Em trânsito" };
 const resolutions: Record<string, string> = {
   received: "Recebimento complementar", missing: "Falta confirmada",
   returned: "Material devolvido à origem", not_sent: "Material não enviado",
 };
 
-function present(row: MaterialHistoryRow, defaultUnit: string | null) {
-  const amount = row.quantity === null ? null : formatQuantity(row.quantity, (row.kind === "decision" ? row.unit : defaultUnit) ?? undefined);
-  if (row.kind === "movement") {
-    const label = row.type === "adjustment" ? "Ajuste de estoque"
-      : row.type === "consumption" ? "Consumo registrado"
-        : row.destination === "TRANSIT" ? "Materiais expedidos"
-          : row.destination ? "Entrada no estoque" : "Saída do estoque";
-    const icon = row.destination === "TRANSIT" ? "truck" : "history";
-    return { title: label, icon, text: `${amount} · ${custody[row.source ?? ""] ?? "Entrada"} → ${custody[row.destination ?? ""] ?? "Retirada"}` } as const;
-  }
+type MaterialDecision = Extract<MaterialHistoryRow, { kind: "decision" }>;
+function present(row: MaterialDecision, defaultUnit: string | null) {
+  const amount = row.quantity === null ? null : formatQuantity(row.quantity, row.unit ?? defaultUnit ?? undefined);
   const label = decisionLabels[row.type] ?? { title: documentEventLabel(row.type), icon: "history" as const };
   switch (row.type) {
     case "req.issued": {
@@ -61,22 +53,25 @@ function present(row: MaterialHistoryRow, defaultUnit: string | null) {
   }
 }
 
-export function DocumentMaterialHistory({ rows, movementsAvailable, unit, reference }: {
-  rows: MaterialHistoryRow[];
+export function DocumentMaterialHistory({ rows, movementsAvailable, movements, unit, reference }: {
+  rows: MaterialDecision[];
   movementsAvailable: boolean;
+  movements?: ReactNode;
   unit: string | null;
-  reference: (row: MaterialHistoryRow) => ReactNode;
+  reference: (row: MaterialDecision) => ReactNode;
 }) {
-  return <section>
+  return <section className="hca-form-stack">
     <h3>Movimentações e decisões</h3>
     {!movementsAvailable ? <p>Os movimentos de estoque dependem do acesso à custódia.</p> : null}
+    {movements}
+    <h4>Decisões registradas</h4>
     {rows.length ? <ol className="hca-material-timeline">{rows.map(item => {
       const entry = present(item, unit);
       return <li key={item.id}>
         <span className="hca-material-timeline-icon"><Icon name={entry.icon} width={15} height={15} /></span>
         <div className="hca-material-timeline-main"><strong>{entry.title}</strong>
           {entry.text ? <p>{entry.text}</p> : null}
-          {item.kind === "decision" && item.reason ? <p className="whitespace-pre-wrap">{item.reason}</p> : null}
+          {item.reason ? <p className="whitespace-pre-wrap">{item.reason}</p> : null}
           {reference(item)}
           <small>{item.author ?? "Autoria indisponível"} · {formatBrazilDate(item.createdAt)}</small>
         </div>

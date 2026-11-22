@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { ActionButton, Pill } from "@/components/ui/controls";
 import { Icon, type IconName } from "@/components/ui/icon";
 import { formatQuantity } from "@/lib/quantity";
@@ -18,11 +19,14 @@ export const stockOperationOrigins = {
   other: { title: "Movimentação", icon: "history" },
 } satisfies Record<StockOperationHistory["origin"], { title: string; icon: IconName }>;
 
-export function StockMovementHistory({ operations, canCorrect = false, onOrigin, onCorrect }: {
+export function StockMovementHistory({ operations, canCorrect = false, onOrigin, onCorrect, renderDocumentLink, expanded, onToggle }: {
   operations: StockOperationHistory[];
   canCorrect?: boolean;
   onOrigin: (movement: StockOperationMovement, target: HTMLElement) => void;
   onCorrect?: (movement: StockOperationMovement, target: HTMLElement) => void;
+  renderDocumentLink?: (movement: StockOperationMovement, operation: StockOperationHistory) => ReactNode;
+  expanded?: readonly string[];
+  onToggle?: (id: string, open: boolean) => void;
 }) {
   return <div className="hca-stock-ledger" aria-label="Movimentos do estoque">
     {operations.map(operation => {
@@ -32,7 +36,8 @@ export function StockMovementHistory({ operations, canCorrect = false, onOrigin,
       const tone = inbound ? "success" : outbound ? "danger" : "neutral";
       const custody = Array.from(new Set(operation.rows.map(row => custodyLabels[row.custody]))).join(" / ");
       const materialCount = new Set(operation.rows.map(row => row.product_id)).size;
-      return <details key={operation.id} className="hca-stock-act" data-stock-act={operation.id}>
+      return <details key={operation.id} className="hca-stock-act" data-stock-act={operation.id}
+        open={expanded?.includes(operation.id)} onToggle={onToggle ? event => onToggle(operation.id, event.currentTarget.open) : undefined}>
         <summary>
           <span className={"hca-stock-act-icon ui-badge-" + tone}><Icon name={origin.icon} width={19} height={19} /></span>
           <span className="hca-stock-act-heading">
@@ -56,7 +61,8 @@ export function StockMovementHistory({ operations, canCorrect = false, onOrigin,
             </button>
             {operation.origin === "manual" ? <p className="hca-stock-act-reason">{row.justification}</p> : null}
             {row.reference_document_id || canCorrect && row.reference_type === "family_manual" ? <div className="hca-stock-act-links">
-              {row.reference_document_id ? <Link href={"/fichas/" + row.reference_document_id}>{row.reference_type === "delivery_regularization" ? "Abrir dossiê administrativo" : "Abrir ficha"}</Link> : null}
+              {row.reference_document_id ? renderDocumentLink ? renderDocumentLink(row, operation)
+                : <Link href={"/fichas/" + row.reference_document_id}>{row.reference_type === "delivery_regularization" ? "Abrir dossiê administrativo" : "Abrir ficha"}</Link> : null}
               {canCorrect && onCorrect && row.reference_type === "family_manual" ? <ActionButton variant="quiet" onClick={event => onCorrect(row, event.currentTarget)}>Corrigir este movimento</ActionButton> : null}
             </div> : null}
           </div>)}

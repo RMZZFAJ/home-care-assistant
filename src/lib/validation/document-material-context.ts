@@ -16,6 +16,12 @@ export const documentMaterialSummary = scope.extend({
   })).optional(),
 });
 export const materialPanelSections = ["stock", "history", "links"] as const;
+export const materialLinkKinds = ["REQ", "COM", "ENT", "DEV", "BAL"] as const;
+export const materialLinkFilters = z.object({
+  kind: z.enum(materialLinkKinds).nullable(),
+  search: z.string().trim().max(160).transform(value => value.toLowerCase()),
+});
+export type MaterialLinkFilters = z.infer<typeof materialLinkFilters>;
 const lineScope = scope.extend({
   documentId: z.uuid().nullable(), lineId: z.uuid().nullable(),
   productId: z.string().nullable(), page: z.number().int().positive(),
@@ -55,6 +61,7 @@ export const documentMaterialPanel = z.discriminatedUnion("section", [
   lineScope.extend({
     section: z.literal("links"), total: z.number().int().nonnegative(),
     rows: z.array(document.extend({ archived: z.boolean() })),
+    filters: materialLinkFilters.optional(),
   }),
 ]);
 export type MaterialPanelSection = typeof materialPanelSections[number];

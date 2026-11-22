@@ -1772,6 +1772,8 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261122212641_l3_stock_review_repairs` | Aplicada | Aplicada |
 | `20261122215240_l3_pdf_archive_revision_filters` | Aplicada | Aplicada |
 | `20261122215605_l3_bind_balance_draft_admission` | Aplicada | Aplicada |
+| `20261122222145_l3_material_link_filters` | Aplicada | Aplicada |
+| `20261122223500_l3_material_history_decisions` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2117,8 +2119,10 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   consumo direto, correção, cancelamento e reiteração de avisos. As ações
   e o wizard já chamam a API do novo contrato no checkout local.
   Os Andamentos de consumo e falta usam as abas e a publicação compartilhadas
-  das fichas. Restam a integração do histórico ao painel de material,
-  a continuidade pelo canal existente e a conferência visual final.
+  das fichas. O painel compartilhado usa o histórico por operação e
+  consulta as fichas relacionadas com filtros no servidor. Restam
+  a integração do painel ao detalhe de consumo, a continuidade pelo
+  canal existente e a conferência visual final.
 - **E08 — Plantões e balanços.** Em execução. A admissão da contagem
   iniciada no plantão já preserva a retomada. A área reúne Plantões,
   Balanços e Histórico com as permissões de cada leitura. A ficha tem
@@ -2373,6 +2377,28 @@ revogação de leitura e a comparação do rascunho de consumo antes de
 registrar o valor da revisão escolhida. O primeiro ensaio de consumo
 esperava o código da API dentro de `error`. A asserção foi corrigida
 para o campo `code`, e o caso passou nos dois projetos.
+
+### Painel compartilhado de material
+
+O painel aberto da ficha começa na aba identificada pelo seu código.
+Ela mostra os dados do material naquela ficha. Estoque, Histórico e
+Fichas também podem ser consultados ao abrir o painel do estoque ou
+durante um preenchimento. A busca aplica número e tipo no banco sob
+as permissões do paciente. O retorno preserva o filtro e o item de
+origem. A ficha relacionada abre em Materiais com destaque para o item.
+
+O Histórico usa o agrupamento do estoque geral, com atos expansíveis
+e consulta de saldo anterior, efeito, saldo posterior e origem. As
+decisões da ficha têm paginação própria. As duas integrações dirigidas
+confirmaram o recorte por material, a revogação do acesso e a separação
+entre os movimentos de uma ENT e a decisão de recebimento. A fila de
+migrations ficou vazia após a aplicação no remoto, que passou a 336.
+O resguardo anterior à aplicação foi
+`206469ab-732d-46cf-89ed-c830cd7606cd`.
+Os oito casos finais em Chromium e Android emulado passaram
+sem retentativas. Exercitaram a busca, o destaque do material, a
+volta ao filtro e ao preenchimento, a abertura do ato de estoque,
+os saldos e a recuperação de foco.
 
 ## L4
 

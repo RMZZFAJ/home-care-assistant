@@ -6,6 +6,7 @@ import {
   balContent, confirmPacket, draftContext, fixtures, officialState, reqContent, rpc, savePacket,
 } from "./private-draft-fixtures.mjs";
 import { setup } from "./v4-fixtures.mjs";
+import { remainingNeedFixture } from "./remaining-need-fixtures.mjs";
 
 const options = (f, target, product, filter = "") => ({
   p_patient: f.patient, p_target: target, p_product: product,
@@ -50,6 +51,23 @@ test("material references follow draft revision, authorization and material iden
   assert.equal(projected.length, 1);
   assert.equal(projected[0].document.id, relatedPurchase.id);
   assert.equal(projected[0].document.kind, "COM");
+  const lookup = {
+    p_patient: null, p_product: null, p_document: requisitionId, p_line: projected[0].lineId,
+    p_kind: "COM", p_search: relatedPurchase.code, p_page: 1,
+  };
+  const linked = await rpc(f.admin, "material_related_fichas", lookup);
+  assert.deepEqual(linked.filters, { kind: "COM", search: relatedPurchase.code.toLowerCase() });
+  assert.equal(linked.total, 1);
+  assert.deepEqual(linked.rows.map(row => row.id), [relatedPurchase.id]);
+  assert.equal((await rpc(f.admin, "material_related_fichas", { ...lookup, p_search: "%" })).total, 0);
+  assert.equal((await rpc(f.admin, "material_related_fichas", { ...lookup, p_kind: "DEV" })).total, 0);
+  assert.equal((await f.admin.rpc("material_related_fichas", {
+    ...lookup, p_line: otherMaterialPurchase.lines[0].id,
+  })).error?.code, "42501");
+  const catalogue = await rpc(f.admin, "material_related_fichas", {
+    ...lookup, p_patient: f.patient, p_product: product, p_document: null, p_line: null,
+  });
+  assert.deepEqual(catalogue.rows.map(row => row.id), [relatedPurchase.id]);
 
   const balanceLines = f.products.map(productId => ({ productId, quantity: "0" }));
   const balanceDraft = await rpc(f.admin, "creation_draft_command", savePacket(f, "BAL", {
@@ -67,4 +85,29 @@ test("material references follow draft revision, authorization and material iden
   assert.deepEqual(await references(f.admin, requisitionId), []);
   const denied = await rpc(f.admin, "material_reference_options", options(f, "REQ", product, "COM"));
   assert.equal(denied.total, 0);
+  const hidden = await rpc(f.admin, "material_related_fichas", lookup);
+  assert.equal(hidden.total, 0);
+  assert.deepEqual(hidden.rows, []);
+});
+
+test("the material history keeps documentary decisions separate from grouped physical effects", async () => {
+  const f = await remainingNeedFixture();
+  const document = { p_document: f.ent.id, p_line: f.ent.lines[0].id, p_page: 1 };
+  const mixed = await rpc(f.admin, "document_material_context", {
+    ...document, p_section: "history", p_include_decisions: true,
+  });
+  const decisions = await rpc(f.admin, "material_documentary_history", {
+    ...document, p_patient: null, p_product: null,
+  });
+  assert.ok(mixed.rows.some(row => row.kind === "movement"));
+  assert.ok(decisions.rows.some(row => row.type === "ent.receive"));
+  assert.deepEqual(decisions.rows, mixed.rows.filter(row => row.kind === "decision"));
+  assert.equal(decisions.total, decisions.rows.length);
+  const grouped = await rpc(f.admin, "stock_operation_history", {
+    p_patient: f.patient, p_product: f.products[0], p_page: 1, p_size: 20,
+    p_from: null, p_to: null, p_location: null, p_origin: null, p_search: null,
+  });
+  const deliveryActs = grouped.data.filter(operation => operation.documentCode === f.ent.code);
+  assert.ok(deliveryActs.length > 1);
+  assert.equal(new Set(deliveryActs.map(operation => operation.id)).size, deliveryActs.length);
 });

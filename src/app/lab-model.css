@@ -1705,9 +1705,10 @@
 .hca-l1 .hca-material-sheet > .hca-modal-content > .space-y-4 { padding: 20px; }
 .hca-l1 .hca-material-sheet > .hca-modal-footer { flex: none; background: #fafcfb; }
 .hca-l1 .hca-material-sheet > .hca-modal-footer > button:only-child { width: 100%; }
-.hca-l1 .hca-material-sheet-tabs { flex: none; display: flex; gap: 24px; padding: 0 20px; border-bottom: 1px solid #dde7e0; }
-.hca-l1 .hca-material-sheet-tabs button { border: 0; padding: 12px 0; background: transparent; color: #637469; border-bottom: 2px solid transparent; font-size: 12px; font-weight: 650; }
+.hca-l1 .hca-material-sheet-tabs { flex: none; display: flex; gap: clamp(12px, 5vw, 24px); overflow-x: auto; padding: 0 20px; border-bottom: 1px solid #dde7e0; }
+.hca-l1 .hca-material-sheet-tabs button { border: 0; padding: 12px 0; background: transparent; color: #637469; border-bottom: 2px solid transparent; font-size: 12px; font-weight: 650; white-space: nowrap; }
 .hca-l1 .hca-material-sheet-tabs button[aria-selected="true"] { border-bottom-color: #156f66; color: #156f66; }
+.hca-l1 .hca-v7-material-row[data-visit-material="true"] { border-color: var(--teal, #156f66); box-shadow: inset 3px 0 0 var(--teal, #156f66); }
 .hca-l1 .hca-material-sheet-body { padding: 20px; }
 .hca-l1 .hca-material-sheet-body section + section { margin-top: 22px; }
 .hca-l1 .hca-material-sheet-body h3 { margin: 0 0 10px; color: #24473c; font-size: 13px; font-weight: 650; }
