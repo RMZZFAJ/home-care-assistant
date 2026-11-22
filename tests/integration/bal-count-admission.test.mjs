@@ -83,6 +83,21 @@ test("an admitted late count keeps its authorization through creation and revisi
   assert.equal((await workspace(f)).assignments.find(row => row.id === f.assignment.id).status, "counted");
 });
 
+test("an in-window first BAL draft cannot abandon its valid admission by omitting the key", async t => {
+  const f = await setupAdmission(t);
+  const subject = { ...f.command.p_payload.balanceAssignment };
+  delete subject.admissionId;
+  const command = { ...f.command, p_draft: true, p_payload: { ...f.command.p_payload, balanceAssignment: subject } };
+  const draft = await rpc(f.pro.client, "create_supply_document", command);
+  assert.equal(draft.payload.balanceContext.admissionId, f.record.id);
+  assert.equal((await rpc(f.pro.client, "create_supply_document", command)).id, draft.id);
+  f.closeWindow();
+  sql(`select private.process_bal_patient(${q(f.patient)})`);
+  const resumed = await workspace(f);
+  assert.equal(resumed.eligibility.available, false);
+  assert.deepEqual(resumed.eligibility.admission, { ...f.record, documentId: draft.id, documentVersion: draft.version });
+});
+
 test("discarding the scheduled draft closes admission and forbids a fresh start after expiry", async t => {
   const f = await setupAdmission(t);
   const draftScope = { p_patient: f.patient, p_kind: "BAL", p_target: null };

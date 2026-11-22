@@ -1,6 +1,7 @@
 import { selectProfileSection } from "./profile-sections";
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
+import { generateStandardPdf } from "./generated-pdf";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { fixtureFile, sql } from "../../scripts/test-environment.mjs";
@@ -198,7 +199,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
       pro.getByRole("list", { name: "Materiais requisitados", exact: true }).getByRole("button", { name: /^Detalhes de Material V4 visual/ }),
     ).toHaveCount(1);
     await selectDocumentSection(family, "files");
-    await family.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+    await generateStandardPdf(family);
     await expect(
       family.getByRole("button", { name: "Compartilhar PDF", exact: true }),
     ).toBeEnabled({ timeout: 15000 });

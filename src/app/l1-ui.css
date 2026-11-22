@@ -37,8 +37,7 @@
 .hca-l1 .hca-document-meta dt { display: flex; align-items: center; gap: 6px; }
 .hca-l1 .hca-suggestion-link { display: block; border: 0; padding: 0; background: transparent; color: inherit; text-align: left; }
 .hca-l1 .hca-suggestion-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-.hca-l1 .hca-file-identification { margin: 8px 0 0; padding: 7px 0 0; font-size: 11px; }
-.hca-l1 .hca-file-identification summary { font-size: 11px; min-height: 25px; }
+.hca-l1 .hca-file-details-lead { display: flex; align-items: center; gap: 12px; }
 .hca-l1 .doc-file-list { list-style: none; margin: 0; }
 .hca-l1 .doc-pdf-icon[data-file-kind=PDF] { color: #a64450; border-color: #efdde0; background: #fcf3f4; }
 .hca-l1 .doc-pdf-icon[data-file-kind=IMG] { color: #39774e; background: #edf6eb; }

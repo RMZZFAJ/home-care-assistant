@@ -38,7 +38,7 @@ export function DeliveryMaterials({ data, active }: { data: SupplyDocument; acti
       const requests = data.linkedRequisitions?.filter(req =>
         !origins.some(origin => origin.documentId === req.id)
         && req.itemIds.some(id => line.requisitionItemIds.includes(id))) ?? [];
-      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, status, done,
+      return { id: line.id, productId: line.product_id, name: line.name_snapshot, unit: line.unit_snapshot, status, done,
         tone: done ? "success" : cancelled ? "danger" : declarationOnly ? "neutral" : "pending",
         related: [
           ...origins.map(origin => ({

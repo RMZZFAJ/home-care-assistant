@@ -706,7 +706,8 @@ export function RequisitionDocumentContent({
                   ? formatQuantity(item.current_stock)
                   : formatStockObservation(item.current_stock, item.stock_observation);
                 return {
-                  id: item.id, name, unit: item.unit_snapshot ?? null, urgent: item.urgent, done: Boolean(line?.attended),
+                  id: item.id, productId: item.product_id ?? item.resolution?.product_id, name,
+                  unit: item.unit_snapshot ?? null, urgent: item.urgent, done: Boolean(line?.attended),
                   status, tone: data.is_historical ? "neutral" : line?.attended ? "success" : "pending",
                   facts: [{ label: "Informado na REQ", value: reported }],
                   detail: <div className="space-y-2">

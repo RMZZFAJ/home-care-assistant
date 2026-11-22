@@ -28,12 +28,12 @@ it("keeps historical and unavailable references distinct from zero or approval",
   expect(unavailable.pending).toBe(true);
 });
 it("does not turn an approved status into evidence of reconciliation", () => {
-  expect(balanceFollowUp({ ...count, status: "approved" })).toMatchObject({ pending: true, heading: "Consultar o efeito da contagem" });
+  expect(balanceFollowUp({ ...count, status: "approved" })).toMatchObject({ pending: true, heading: "Consultar o efeito da contagem", section: "reviews" });
   expect(balanceFollowUp({ ...count, balanceReview: undefined })).toMatchObject({ heading: "Consultar os fatos da contagem" });
 });
 it("preserves a real past reconciliation after later movements", () => {
   const data: Facts = { ...count, status: "approved", balanceReview: { ...review!, reviewRequired: false, reconciliationApplied: true, referenceState: "historical" } };
-  expect(balanceFollowUp(data)).toMatchObject({ heading: "Consultar a contagem conciliada", pending: false });
+  expect(balanceFollowUp(data)).toMatchObject({ heading: "Consultar a contagem conciliada", pending: false, section: "reviews" });
   expect(balanceFollowUp(data).description).toContain("saldo atual é uma consulta distinta");
   expect(balanceFollowUp({ ...data, protocol: null }).heading).toBe("Consultar os fatos da contagem");
   expect(supplyMilestones({ ...data, protocol: null, type: "BAL", totalLines: 1, fullyCheckedLines: 0 })[3].state).not.toBe("done");

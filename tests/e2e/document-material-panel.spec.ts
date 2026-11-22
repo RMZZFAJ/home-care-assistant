@@ -144,10 +144,15 @@ test("material panel retains its linked consultation, search, and focus after a 
   await expect(preview.getByRole("heading", { name: "Quantidades da movimentação", exact: true })).toBeVisible();
   await expect(preview).toContainText("Material fictício V4 0");
   await preview.screenshot({ path: info.outputPath("previa-entre-fichas.png"), scale: "css", animations: "disabled" });
+  const destinationSummary = `**/api/documents/${f.ent.id}/materials`;
+  await page.route(destinationSummary, route => route.fulfill({
+    status: 503, json: { code: "DATABASE_UNAVAILABLE", message: "Saldo temporariamente indisponível." },
+  }));
   await preview.getByRole("link", { name: "Abrir " + f.ent.code, exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/fichas/${f.ent.id}`));
   await expect(page.getByRole("tab", { name: "Visão geral", exact: true })).toBeVisible();
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByText("O saldo atual não pôde ser consultado.", { exact: true })).toBeVisible();
   const destination = page.getByRole("button", { name: /^Detalhes de Material fictício V4 0/ });
   await expect(destination).toHaveAttribute("data-visit-material", "true");
   await expect(destination).toBeFocused();
@@ -158,6 +163,7 @@ test("material panel retains its linked consultation, search, and focus after a 
   await expect(code).toHaveValue(f.ent.code.toLowerCase());
   await expect(panel.getByRole("tab", { name: "Fichas", exact: true })).toHaveAttribute("aria-selected", "true");
   await expect(link).toBeFocused();
+  await page.unroute(destinationSummary);
   await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await expect(search).toHaveValue("V4 0");
   await expect(material).toBeFocused();

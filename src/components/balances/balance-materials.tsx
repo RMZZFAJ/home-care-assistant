@@ -36,7 +36,7 @@ export function IssuedBalanceMaterials({ data, active }: { data: SupplyDocument;
         { label: "Diferença na contagem", value: formatDifference(line.quantity, reference, line.unit_snapshot) },
         { label: "Recebido / validado", value: amount(line.accepted_quantity) },
       ];
-      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, status,
+      return { id: line.id, productId: line.product_id, name: line.name_snapshot, unit: line.unit_snapshot, status,
         done: !closed && Boolean(reviewed), tone: closed ? "neutral" : reviewed ? "success" : "pending", facts,
         detail: <>
           {readPresentationConversions(line.presentation_conversions).map(item => <p key={item.id}>{presentationCaption(item)}</p>)}

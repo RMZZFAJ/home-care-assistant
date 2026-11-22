@@ -127,9 +127,9 @@ export function DocumentMaterialPanel({
   }, [position.panelScroll, position.focusEntry]);
   useEffect(() => {
     if (loading || section !== "document" && !data) return;
-    if (data?.section === "history" && data.available && data.productId && position.expandedMovements?.length) return;
+    if (data?.section === "history" && data.available && data.productId) return;
     restorePanel();
-  }, [loading, data, section, position.expandedMovements?.length, restorePanel]);
+  }, [loading, data, section, restorePanel]);
   useEffect(() => {
     if (linked || loading || !linkedReturnFocusRef.current) return;
     const frame = requestAnimationFrame(() => {

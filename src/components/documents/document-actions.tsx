@@ -2,6 +2,7 @@
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { z } from "zod";
 import { PdfDocumentOptions } from "./pdf-document-options";
+import { PdfFileDetails } from "./pdf-file-details";
 import { pdfDocumentOptionsSchema, documentModeLabel, type PdfDocumentOptions as DocumentOptions } from "@/lib/documents/pdf-modes";
 import { FileRecord } from "@/components/ui/file-record";
 import Link from "next/link";
@@ -119,7 +120,7 @@ function GeneratedFiles({
   const [initialBusy, setInitialBusy] = useState(false);
   const [initialError, setInitialError] = useState("");
   const [filter, setFilter] = useState<ArchiveFilter>("all");
-  const [basisVersion, setBasisVersion] = useState<number>();
+  const [confirmedVersion, setConfirmedVersion] = useState(0);
   const [rows, setRows] = useState<PdfArchiveEntry[]>([]),
     [next, setNext] = useState<ArchivePage | null>(null),
     [loading, setLoading] = useState(true),
@@ -129,6 +130,7 @@ function GeneratedFiles({
     [readError, setReadError] = useState(""),
     [pending, setPending] = useState<Intention | null>(null);
   const [optionsOpen, setOptionsOpen] = useState(false), [integrityError, setIntegrityError] = useState(false);
+  const [detail, setDetail] = useState<{ id: string; opener: HTMLButtonElement; open: boolean } | null>(null);
   const [archiveDenied, setArchiveDenied] = useState(false);
   const [archiveErrorDismissed, setArchiveErrorDismissed] = useState(false);
   const [activityStage, setActivityStage] = useState(0);
@@ -170,7 +172,7 @@ function GeneratedFiles({
           || page.data.data.some(entry => filter === "current" ? entry.issuance.version !== basis : entry.issuance.version >= basis)))
           throw new Error("A resposta não corresponde ao filtro de exemplares selecionado.");
         if (own !== sequenceRef.current) return;
-        setBasisVersion(basis);
+        if (basis !== undefined) setConfirmedVersion(previous => Math.max(previous, basis));
         setRows((current) =>
           cursor
             ? [
@@ -373,7 +375,7 @@ function GeneratedFiles({
         );
     }
   }
-  const currentVersion = Math.max(version ?? 0, basisVersion ?? 0);
+  const currentVersion = Math.max(version ?? 0, confirmedVersion);
   const visibleRows = rows.filter(entry => {
     if (archiveVersion ? entry.issuance.version !== archiveVersion
       : filter === "current" && entry.issuance.version !== currentVersion) return false;
@@ -382,6 +384,7 @@ function GeneratedFiles({
     return !options || (options.mode !== "audit" || canAudit) && (!options.sections.includes("access") || canAccess);
   });
   const verification = visibleRows.find(entry => entry.issuance.state === "ready")?.issuance;
+  const selectedFile = active && detail ? visibleRows.find(entry => entry.issuance.id === detail.id)?.issuance : undefined;
   return (
     <section aria-labelledby={headingId} className="doc-area hca-document-files print:hidden">
       <header className="doc-section-heading"><div><h2 id={headingId}>Arquivos gerados</h2><p>Exemplares emitidos a partir desta ficha.</p></div><div className="doc-heading-actions">
@@ -389,10 +392,12 @@ function GeneratedFiles({
           <button
             className={buttonClass}
             type="button"
+            aria-haspopup={pending ? undefined : "dialog"}
             disabled={busy || initialBusy || integrityError || generationBlocked && !pending}
             onClick={() => {
               onAction?.();
-              void generate();
+              if (pending) void generate();
+              else setOptionsOpen(true);
             }}
           >
             <Icon name="file" />
@@ -412,7 +417,6 @@ function GeneratedFiles({
         >
           Atualizar arquivos
         </button>
-        {!readOnly ? <button className={buttonClass} type="button" disabled={busy || initialBusy || Boolean(pending) || integrityError || generationBlocked} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button> : null}
       </div></header>
       {archiveVersion === undefined ? <nav className="hca-document-file-nav" aria-label="Filtrar exemplares">
         {archiveFilters.map(([value, label]) => <button key={value} type="button" aria-pressed={filter === value}
@@ -437,8 +441,11 @@ function GeneratedFiles({
             onClick={() => void retryInitial()}>Recuperar PDF inicial</button>}
         </>}
       </div> : null}
-      <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={!readOnly && optionsOpen} onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} code={code} onGenerate={value => { setOptionsOpen(false); onAction?.(); void generate(value); }} />
-      {message ? <p role="status">{message}</p> : null}
+      <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={!readOnly && optionsOpen}
+        onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} code={code}
+        blocked={generationBlocked || integrityError || initialBusy || busy || Boolean(pending)}
+        onGenerate={value => { setOptionsOpen(false); void generate(value); }} />
+      {message && !busy && !initialBusy ? <p role="status">{message}</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {readError ? <Notice error>{readError}</Notice> : null}
       <Dialog open={active && Boolean(readError) && !archiveErrorDismissed && !optionsOpen && !busy && !initialBusy}
@@ -465,7 +472,7 @@ function GeneratedFiles({
           return (
             <FileRecord key={row.id} identity={row.id} mime="application/pdf"
               title={<>{code} · {row.documentOptions ? documentModeLabel(row.documentOptions) : "Ficha"}{earlier ? <span className="doc-chip">Conteúdo anterior</span> : null}</>}
-              actions={<>              {row.state === "ready" ? (
+              actions={<>{row.state === "ready" ? (
                 <>
                   <a
                     className={buttonClass}
@@ -501,9 +508,11 @@ function GeneratedFiles({
                     : "O arquivo ficará disponível após assinatura, validação e confirmação do armazenamento."}
                 </p>
               )}
-              </>}
+              <button className="btn btn-icon" type="button" aria-haspopup="dialog" aria-label="Identificação do exemplar"
+                title="Identificação do exemplar" onClick={event => setDetail({ id: row.id, opener: event.currentTarget, open: true })}>
+                <Icon name="more" />
+              </button></>}
             >
-              <p className="doc-file-edition">{row.id}</p>
               <div className="doc-file-meta"><span><Icon name="user" width={13} height={13} />{row.requestedName}</span><span><Icon name="clock" width={13} height={13} /><time dateTime={row.readyAt ?? row.requestedAt}>{formatBrazilDate(row.readyAt ?? row.requestedAt)}</time></span>{row.state !== "ready" ? <span>{steps[row.step]}</span> : null}</div>
               {row.representation === "derived" ? (
                 <p className="text-sm">
@@ -511,19 +520,13 @@ function GeneratedFiles({
                   indicado.
                 </p>
               ) : null}
-              <details className="doc-help-details hca-file-identification">
-                <summary>Identificação do exemplar</summary>
-                <p>Conteúdo da revisão {row.version}. {steps[row.step]}.</p>
-                {earlier ? <p>Este exemplar preserva o conteúdo de uma revisão anterior da ficha. Atualizações posteriores mantêm o conteúdo desta emissão.</p> : null}
-                <p>Solicitado em {formatBrazilDate(row.requestedAt)}.{row.readyAt ? ` Emissão concluída em ${formatBrazilDate(row.readyAt)}. Assinatura técnica e carimbo internos.` : ""}</p>
-                <p className="break-all">
-                  Código: HCA-{row.verificationCode.match(/.{4}/g)?.join("-")}
-                </p>
-              </details>
             </FileRecord>
           );
         })}
       </ul></div>
+      {selectedFile && detail ? <PdfFileDetails key={selectedFile.id} file={selectedFile} documentCode={code} open={detail.open}
+        status={steps[selectedFile.step]} previous={selectedFile.version < currentVersion} onClose={() => setDetail({ ...detail, open: false })}
+        finalFocus={() => detail.opener.isConnected ? detail.opener : archiveRetryRef.current ?? false} /> : null}
       <p className="doc-footnote"><Icon name="info" width={14} height={14} />Visualizar ou baixar reutiliza o mesmo exemplar. Cada nova geração cria um exemplar.</p>
       {verification ? <Link className="btn btn-ghost" href={`/verificar/emissao/${verification.verificationCode}?returnTo=${encodeURIComponent(`/documentos/${id}?documentTab=files`)}`}><Icon name="shield" />Abrir validação pública</Link> : null}
       {next ? (

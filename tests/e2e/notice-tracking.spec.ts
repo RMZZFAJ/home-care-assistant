@@ -1,5 +1,6 @@
 import { selectDocumentSection } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
+import { generateStandardPdf } from "./generated-pdf";
 import { randomUUID, createHash } from "node:crypto";
 import { actor, fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -55,7 +56,7 @@ test("prazo5 encerra só o acompanhamento e preserva PDF lento com bytes confirm
   await selectDocumentSection(page, "communications"); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "pending");
     const before = facts(f.doc.id), files = page.getByRole("region", { name: "Arquivos gerados", exact: true });
     await selectDocumentSection(page, "files");
-    await page.getByRole("button", { name: "Gerar PDF", exact: true }).click(); await first;
+    await generateStandardPdf(page); await first;
     await page.clock.fastForward(5000); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "elapsed");
     await expect(page.locator(".hca-activity-overlay")).toBeVisible();
     await expect(page.locator("button").filter({ hasText: /^Gerando PDF…$/ })).toBeDisabled(); expect(failed).toEqual([]);

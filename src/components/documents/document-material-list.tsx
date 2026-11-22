@@ -89,7 +89,7 @@ export function DocumentMaterialList({
     const additional = references.get(row.id);
     return {
       ...row,
-      productId: stock.get(row.id)?.productId ?? null,
+      productId: row.productId ?? stock.get(row.id)?.productId ?? null,
       related: additional ? [...(row.related ?? []), ...additional.filter(link =>
         !row.related?.some(previous => previous.document.id === link.document.id))] : row.related,
     };

@@ -47,7 +47,7 @@ export function balanceFollowUp(data: Facts): Step {
       : "A referência necessária para apurar o efeito desta contagem não está disponível. Consulte o reconto autorizado; não foi presumido saldo zero, aprovação ou conciliação.",
   };
   if (data.status === "approved" && review.reconciliationApplied) return {
-    ...counts, heading: "Consultar a contagem conciliada", pending: false,
+    ...reviews, heading: "Consultar a contagem conciliada", pending: false,
     description: "A contagem aprovada tem conciliação registrada. Consulte as diferenças e as revisões com autoria própria. Movimentos posteriores não apagam esse efeito histórico nem autorizam reaplicá-lo; o saldo atual é uma consulta distinta.",
   };
   if (data.status === "submitted" && review.reviewSatisfied) return {
@@ -59,7 +59,7 @@ export function balanceFollowUp(data: Facts): Step {
     description: "A contagem foi registrada e aguarda as revisões previstas na política atual. Cada revisão tem autoria própria, distinta de quem contou. Consulte separadamente as revisões, a referência e o efeito de conciliação, sem presumir conclusão.",
   };
   return {
-    ...counts, heading: "Consultar o efeito da contagem", pending: !review.reconciliationApplied,
+    ...reviews, heading: "Consultar o efeito da contagem", pending: !review.reconciliationApplied,
     description: "Consulte a contagem, as revisões e o efeito efetivamente registrado. O estado documental, sozinho, não comprova ajuste de estoque; não repita uma operação para tentar atualizar esta consulta.",
   };
 }

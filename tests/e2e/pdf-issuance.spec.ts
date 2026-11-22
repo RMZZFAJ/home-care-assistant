@@ -1,5 +1,6 @@
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
+import { generateStandardPdf } from "./generated-pdf";
 import { randomUUID, createHash } from "node:crypto";
 import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import {
@@ -74,6 +75,11 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   });
   await selectDocumentSection(page, "overview");
   await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  const options = page.getByRole("dialog", { name: "Gerar PDF", exact: true });
+  await expect(options).toBeVisible();
+  await options.getByRole("button", { name: "Cancelar", exact: true }).click();
+  expect(keys).toEqual([]);
+  await generateStandardPdf(page);
   await expect(page.getByRole("tab", {name:"Arquivos",exact:true})).toHaveAttribute("aria-selected","true");
   await expect(
     page.getByRole("button", { name: "Recuperar emissão", exact: true }),
@@ -111,7 +117,7 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
     b = await download(first.id);
   expect(hash(a)).toBe(first.sha256);
   expect(a.equals(b)).toBe(true);
-  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await generateStandardPdf(page);
   await expect.poll(async () => (await manualExemplars()).map(row => row.state)).toEqual(["ready", "ready"]);
   rows = await manualExemplars();
   expect(rows).toHaveLength(2);
@@ -280,7 +286,7 @@ test("PDF em REQ, ENT e BAL conserva fonte e estoque e exige leitura privada atu
       page.getByRole("button", { name: "Gerar PDF", exact: true }),
     ).toBeEnabled();
     const before = source(doc.id);
-    await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+    await generateStandardPdf(page);
     await expect(
       files.getByRole("link", { name: "Baixar PDF", exact: true }),
     ).toHaveCount(1);
@@ -348,7 +354,7 @@ test("Acervo consolidado recusa seletores experimentais e preserva exemplares at
  await expect(page.getByRole("tab",{name:"Arquivos",exact:true})).toHaveAttribute("aria-selected","true");
  await expect(page.getByRole("button",{name:"Anexos",exact:true})).toHaveAttribute("aria-pressed","true");
  await selectDocumentSection(page,"files");
- await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
+ await generateStandardPdf(page);
  const files=page.getByRole("region",{name:"Arquivos gerados",exact:true});await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
  const filters=files.getByRole("navigation",{name:"Filtrar exemplares",exact:true});
  await filters.getByRole("button",{name:"Anteriores",exact:true}).click();
@@ -368,12 +374,15 @@ test("Acervo consolidado recusa seletores experimentais e preserva exemplares at
    p_body: { lines: [{ lineId: f.doc.lines[0].id, quantity: "1" }] },
  });
  expect(approved.version).toBeGreaterThan(f.doc.version);
- await page.getByRole("button",{name:"Atualizar ficha",exact:true}).click();
+ await refresh.click();
  await expect(filters.getByRole("button",{name:"Atuais",exact:true})).toHaveAttribute("aria-pressed","true");
  await expect(files.getByText("Nenhum exemplar neste filtro.",{exact:true})).toBeVisible();
  await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(0);
  await filters.getByRole("button",{name:"Anteriores",exact:true}).click();
  await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
+ await filters.getByRole("button",{name:"Todos",exact:true}).click();
+ await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
+ await expect(files.getByText("Conteúdo anterior",{exact:true})).toBeVisible();
  sql(`update public.care_recipient_memberships set status='revoked' where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.family.id)}`);
  expect([401,403]).toContain((await page.request.get(url+"/archive")).status());expect([401,403]).toContain((await page.request.get(url+"/pdf?issuance="+rows[0].issuance.id)).status());
 });

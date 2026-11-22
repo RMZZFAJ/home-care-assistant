@@ -11,9 +11,10 @@ const modes = [
   { value: "audit", label: "Relatório de auditoria", description: "Consulta de rastreabilidade conforme as permissões da ficha.", icon: "shield" },
 ] as const;
 
-export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAccess, code }: {
+export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAccess, code, blocked }: {
   open: boolean; onClose: () => void; onGenerate: (value?: PdfDocumentOptions) => void;
   canAudit: boolean; canAccess: boolean; code: string;
+  blocked: boolean;
 }) {
   const modeGroupId = useId();
   const [mode, setMode] = useState<"record" | "expanded" | "audit">("expanded");
@@ -21,10 +22,10 @@ export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAcc
   const [interval, setInterval] = useState(false), [from, setFrom] = useState(""), [through, setThrough] = useState("");
   const [purpose, setPurpose] = useState(""), [error, setError] = useState("");
   const denied = mode === "audit" && !canAudit || mode !== "record" && sections.includes("access") && !canAccess;
-  return <Dialog open={open} onClose={onClose} title="Escolher conteúdo do PDF" subtitle={code} headingIcon="file">
+  return <Dialog open={open} onClose={onClose} title="Gerar PDF" subtitle={code + " · Escolha o conteúdo do exemplar"} headingIcon="file">
     <form className="hca-form" onSubmit={event => {
       event.preventDefault();
-      if (denied) return;
+      if (denied || blocked) return;
       if (mode === "record") { onGenerate(); return; }
       const parsed = pdfDocumentOptionsSchema.safeParse({
         mode, sections, period: { from: interval ? from : null, through: interval ? through : null, timeZone: "America/Sao_Paulo" },
@@ -69,8 +70,9 @@ export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAcc
         </> : null}
       </> : null}
       {denied ? <Notice error>Seu acesso atual não permite a seleção indicada. Escolha uma modalidade e seções autorizadas.</Notice> : null}
+      {blocked ? <Notice error>Atualize a ficha e confira se existe uma emissão a recuperar antes de gerar outro exemplar.</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
-      <div className="hca-toolbar"><ActionButton onClick={onClose}>Voltar</ActionButton><ActionButton type="submit" variant="primary" disabled={denied}>Emitir exemplar selecionado</ActionButton></div>
+      <div className="hca-toolbar"><ActionButton onClick={onClose}>Cancelar</ActionButton><ActionButton type="submit" variant="primary" disabled={denied || blocked}><Icon name="file" />Gerar PDF</ActionButton></div>
     </form>
   </Dialog>;
 }

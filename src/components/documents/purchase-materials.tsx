@@ -124,7 +124,7 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
           ? <EntryBalance fact={balances.facts.find(fact => fact.lineId === line.id)} unit={line.unit_snapshot} receipts={data.receipts} /> : "Saldo não conferido" },
       ];
       const currentDecision = shortageClosed ? undefined : decision;
-      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, done, pending: !done && !shortageClosed,
+      return { id: line.id, productId: line.product_id, name: line.name_snapshot, unit: line.unit_snapshot, done, pending: !done && !shortageClosed,
         ...(currentDecision ?? { status, tone: done ? "success" : hasPending || !shortageClosed && decimal(entered).gt(0) ? "pending" : "neutral" }),
         related: data.originDocuments?.filter(origin => origin.productIds.includes(line.product_id)).map(origin => ({
           document: { id: origin.documentId, type: origin.type, code: origin.code },

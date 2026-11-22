@@ -16,6 +16,7 @@ import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { auditFromTop } from "./accessibility-audit";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 
 test.setTimeout(180_000);
 const widths=[320,390,768,1024,1440],digest=(bytes:Buffer)=>createHash("sha256").update(bytes).digest("hex");
@@ -33,20 +34,13 @@ async function model(browser:Browser){
   await page.evaluate(()=>{const probe=document.createElement("div");probe.id="canonical-style-probes";probe.innerHTML='<dl class="kv"><dt>Referência</dt><dd>Preservada</dd></dl><ol class="feed"><li class="event"><span class="event-mark"></span><div class="event-body"></div></li></ol><div class="record"><span class="record-icon"></span><div class="record-main"></div></div>';document.body.append(probe);});
   return {context,page};
 }
-async function laboratoryModel(browser: Browser, scenario = "E03-27") {
+async function laboratoryModel(browser: Browser) {
   const context = await browser.newContext(), page = await context.newPage();
   await page.route(/^https?:/, route => route.abort());
-  await page.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/cenario/" + scenario);
+  await page.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/cenario/E03-27");
   const close = page.locator("#lab-bar [data-action='lab-toggle']");
-  if (scenario === "E03-71") {
-    await expect(close).toBeVisible();
-    if (await close.getAttribute("aria-expanded") !== "true") await close.click();
-    await page.getByRole("button", { name: "Inspecionar", exact: true }).click();
-    await page.getByRole("button", { name: "Preparar PDF fictício para conferência", exact: true }).click();
-  }
   if (await close.getAttribute("aria-expanded") === "true") await close.click();
-  if (scenario === "E03-71") await page.getByRole("button", { name: "Conferir PDF", exact: true }).click();
-  await expect(page.locator(scenario === "E03-27" ? ".doc-file-card" : ".pv-result").first()).toBeVisible();
+  await expect(page.locator(".doc-file-card").first()).toBeVisible();
   return { context, page };
 }
 async function styles(actual:Locator,reference:Locator,properties:readonly string[]){for(const p of properties)await expect(actual).toHaveCSS(p,await reference.evaluate((n,p)=>getComputedStyle(n).getPropertyValue(p),p));}
@@ -61,7 +55,7 @@ async function capture(node:Locator,file:string){
 const official=(patient:string,id:string)=>sql("select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id="+q(id)+"),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id="+q(id)+"),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id="+q(patient)+"));");
 
 test("06.5 native archive attachments and historical facts share canonical rows without issuing on consultation",async({page,browser},info)=>{
-  const f=await versionHistoryFixture();await login(page,f.patient);
+  const f=await versionHistoryFixture(),viewer=await shiftWorker(f.patient,"admin");await login(page,f.patient,viewer.email);
   const pdf=await generatedPdf(page,"/api/documents/"+f.doc.id+"/pdf?version="+f.approved.version);expect(pdf.status()).toBe(200);
   const bytes=await pdf.body(),issuance=new URL(pdf.url()).searchParams.get("issuance")!;
   await page.goto("/fichas/"+f.doc.id);await selectDocumentSection(page,"attachments");await page.getByRole("button",{name:"Adicionar anexo",exact:true}).click();
@@ -74,7 +68,13 @@ test("06.5 native archive attachments and historical facts share canonical rows 
   try{
     const attachment=page.getByRole("list",{name:"Arquivos anexados",exact:true}).getByRole("listitem");await expect(attachment).toHaveCount(1);
     for(const width of widths){await page.setViewportSize({width,height:1100});await lab.page.setViewportSize({width,height:1100});await fileParity(attachment,lab.page);await auditFromTop(page,"L1 attachment "+width);if(width===320)await capture(attachment,"attachment-canonical-"+info.project.name);}
-    await page.goto("/documentos/"+f.doc.id+"/arquivos?version="+f.approved.version);const row=page.locator('[data-file-id="'+issuance+'"]');await row.getByText("Identificação do exemplar",{exact:true}).click();await expect(row).toContainText("Conteúdo da revisão "+f.approved.version);
+    await page.goto("/documentos/"+f.doc.id+"/arquivos?version="+f.approved.version);const row=page.locator('[data-file-id="'+issuance+'"]');
+    const details = row.getByRole("button", { name: "Identificação do exemplar", exact: true });
+    await details.click();
+    const panel = page.getByRole("dialog", { name: "Ficha", exact: true });
+    await expect(panel).toContainText("Conteúdo da revisão "+f.approved.version);
+    await panel.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
+    await expect(details).toBeFocused();
     for(const width of widths){await page.setViewportSize({width,height:1100});await lab.page.setViewportSize({width,height:1100});await fileParity(row,lab.page);await auditFromTop(page,"L1 issuance "+width);if(width===320)await capture(row,"issuance-canonical-"+info.project.name);}
     const download=await page.request.get(await row.getByRole("link",{name:"Baixar PDF",exact:true}).getAttribute("href")??"");expect(download.status()).toBe(200);expect(digest(await download.body())).toBe(digest(bytes));
     await page.goto("/fichas/"+f.doc.id);await selectDocumentSection(page,"history");await page.getByRole("button",{name:"Versões e integridade",exact:true}).click();await page.getByRole("button",{name:"Consultar versão "+f.approved.version,exact:true}).click();
@@ -90,18 +90,32 @@ test("06.5 native archive attachments and historical facts share canonical rows 
   }finally{await ref.context.close();await lab.context.close();}
 });
 
-test("06.5 public reference and native signed file retain distinct results in canonical forms and facts",async({page,browser},info)=>{
+test("06.5 public reference and native signed file retain distinct results in canonical forms and facts",async({page},info)=>{
   const f=await setup(),owner=await actor("family",f.patient),doc=await rpc(owner,"create_supply_document",{p_patient:f.patient,p_type:"COM",p_payload:{origin:"purchase",lines:[{productId:f.products[0],quantity:"1"}]},p_key:randomUUID(),p_draft:false});await login(page,f.patient);
   const pdf=await generatedPdf(page,"/api/documents/"+doc.id+"/pdf"),bytes=await pdf.body(),id=new URL(pdf.url()).searchParams.get("issuance");expect(pdf.status()).toBe(200);
   const archive=pdfArchivePageSchema.parse(await(await page.request.get("/api/documents/"+doc.id+"/archive")).json()),entry=archive.data.find(e=>e.kind==="issuance"&&e.issuance.id===id);if(entry?.kind!=="issuance")throw Error("Native issuance missing from archive");
   const before=official(f.patient,doc.id),count=sql("select count(*) from private.pdf_issuances where document_id="+q(doc.id));await page.context().clearCookies();expect((await page.request.get("/api/context")).status()).toBe(401);
   await page.goto("/verificar/emissao/"+entry.issuance.verificationCode);const result=page.getByRole("region",{name:"Resultado da verificação",exact:true});await expect(result).toContainText("Envie o arquivo para verificar seus bytes");
-  const ref=await laboratoryModel(browser,"E03-71");try{
-    for(const width of widths){await page.setViewportSize({width,height:1100});await ref.page.setViewportSize({width,height:1100});await auditFromTop(page,"canonical code reference "+width);}
-    const filename="Exemplar com nome completo "+"preservado ".repeat(10)+".pdf";await page.getByRole("tab",{name:"Conferir PDF",exact:true}).click();await page.getByLabel("Arquivo PDF para conferir",{exact:true}).setInputFiles({name:filename,mimeType:"application/pdf",buffer:bytes});await expect(page.locator(".hca-selected-file")).toContainText(filename);await page.getByRole("button",{name:"Conferir PDF",exact:true}).click();await expect(result).toContainText("Os bytes coincidem");await expect(result).toContainText("Cadeia interna reconhecida");await result.getByText("Detalhes da conferência",{exact:true}).click();
-    for(const width of widths){await page.setViewportSize({width,height:1100});await ref.page.setViewportSize({width,height:1100});await styles(result.locator(".hca-definition-grid"),ref.page.locator(".pv-details dl"),["display","gap"]);await auditFromTop(page,"canonical signed file result "+width);if(width===320){/* Complete technical results exceed one viewport; verify each actual section without hiding fields. */await capture(result.locator(".pv-evidence"),"verification-canonical-"+info.project.name);await capture(result.locator(".hca-definition-grid"),"verification-technical-"+info.project.name);}}
-    await page.emulateMedia({forcedColors:"active",reducedMotion:"reduce"});await auditFromTop(page,"verification forced colors");expect((await page.request.get("/api/documents/"+doc.id+"/pdf?issuance="+id)).status()).toBe(401);expect(official(f.patient,doc.id)).toBe(before);expect(sql("select count(*) from private.pdf_issuances where document_id="+q(doc.id))).toBe(count);
-  }finally{await ref.context.close();}
+  for(const width of widths){await page.setViewportSize({width,height:1100});await auditFromTop(page,"canonical code reference "+width);}
+  const filename="Exemplar com nome completo "+"preservado ".repeat(10)+".pdf";
+  await result.getByRole("button",{name:"Verificar o PDF recebido",exact:true}).click();
+  await page.getByLabel("Arquivo PDF para conferir",{exact:true}).setInputFiles({name:filename,mimeType:"application/pdf",buffer:bytes});
+  await expect(page.locator(".hca-verify-selected-file")).toContainText(filename);
+  await page.getByRole("button",{name:"Verificar arquivo PDF",exact:true}).click();
+  await expect(result).toContainText("Os bytes coincidem");
+  const details=result.getByRole("button",{name:"Ver detalhes da conferência",exact:true}), technical=page.getByRole("dialog",{name:"Detalhes da conferência",exact:true});
+  for(const width of widths){
+    await page.setViewportSize({width,height:1100});
+    await auditFromTop(page,"canonical signed file result "+width);
+    if(width===320)await capture(result.locator(".hca-verify-evidence-list"),"verification-canonical-"+info.project.name);
+    await details.click();
+    await expect(technical).toContainText("Cadeia interna reconhecida");
+    await expect(technical).toContainText(digest(bytes));
+    await auditFromTop(page,"canonical technical details "+width);
+    if(width===320)await technical.screenshot({path:"output/playwright/phase-d/verification-technical-"+info.project.name+".png",animations:"disabled"});
+    await technical.getByRole("button",{name:"Fechar",exact:true}).click();await expect(details).toBeFocused();
+  }
+  await page.emulateMedia({forcedColors:"active",reducedMotion:"reduce"});await auditFromTop(page,"verification forced colors");expect((await page.request.get("/api/documents/"+doc.id+"/pdf?issuance="+id)).status()).toBe(401);expect(official(f.patient,doc.id)).toBe(before);expect(sql("select count(*) from private.pdf_issuances where document_id="+q(doc.id))).toBe(count);
 });
 
 test("06.5 private resume choice and native CAS comparison retain both complete editions without official effects",async({page,browser},info)=>{

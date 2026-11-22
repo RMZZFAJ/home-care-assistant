@@ -1,6 +1,6 @@
 import { PDF } from "@libpdf/core";
 import { formatBrazilDate } from "../../src/lib/receipt";
-import { CURRENT_PDF_REVISION } from "./generated-pdf";
+import { CURRENT_PDF_REVISION, generateStandardPdf } from "./generated-pdf";
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
@@ -70,9 +70,7 @@ test("PDF atual preserva a origem congelada e distingue emissão sem expor a pre
             `/api/documents/${f.doc.id}/issuances` &&
           response.request().method() === "POST", { timeout: 60_000 },
       );
-      await page
-        .getByRole("button", { name: "Gerar PDF", exact: true })
-        .click();
+      await generateStandardPdf(page);
       const result = await generated;
       expect(result.status(), await result.text()).toBe(200);
       row = pdfIssuanceSchema.parse(await result.json());
@@ -219,7 +217,7 @@ test("PDF atual recusa caractere sem representação antes de assinar ou persist
   const sent = page.waitForResponse(
     (r) => r.url().endsWith(endpoint) && r.request().method() === "POST",
   );
-  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await generateStandardPdf(page);
   const response = await sent;
   expect(response.status()).toBe(503);
   expect(await response.json()).toMatchObject({

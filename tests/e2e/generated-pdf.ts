@@ -10,6 +10,14 @@ const intentions = new WeakMap<
   APIRequestContext,
   Map<string, { key: string; issuance?: string }>
 >();
+
+export async function generateStandardPdf(page: Page) {
+  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  const options = page.getByRole("dialog", { name: "Gerar PDF", exact: true });
+  await options.getByRole("radio", { name: "Ficha", exact: true }).check();
+  await options.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+}
+
 /** A test's explicit PDF-generation action. Subsequent reads recover its exact issuance. */
 export async function generatedPdf(page: Page, legacyUrl: string, reserveLegacy?: (key: string, version: number) => Promise<unknown>) {
   const url = new URL(legacyUrl, "http://local.test"),

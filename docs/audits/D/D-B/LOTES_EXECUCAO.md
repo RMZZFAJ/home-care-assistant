@@ -2400,6 +2400,43 @@ sem retentativas. Exercitaram a busca, o destaque do material, a
 volta ao filtro e ao preenchimento, a abertura do ato de estoque,
 os saldos e a recuperação de foco.
 
+### Identificação de arquivos e revisão seguinte
+
+O acervo oferece uma única entrada para gerar PDF. O seletor inicia com
+Ficha ampliada, como no laboratório. Também oferece Ficha e, quando
+autorizado, Relatório de auditoria. Fechar o seletor não inicia emissão.
+A recuperação mantém a seleção original e abre diretamente a mesma
+tentativa. Os três pontos do exemplar abrem sua identificação, com
+revisão, origem, período, complementos, assinatura e código consultáveis.
+Visualizar, baixar e compartilhar reutilizam o mesmo arquivo armazenado.
+
+Os cinco comentários do CodeRabbit em `89f37b5d` foram conferidos.
+O acervo mantém a última revisão confirmada ao voltar para Todos.
+A ficha identifica a linha de origem mesmo se a consulta de saldo falhar.
+O Histórico aguarda as movimentações antes de restaurar posição e foco.
+Os atalhos sobre conciliação abrem Revisões, onde consta o ato de aplicação.
+A migration `20261122225705_l3_preserve_first_balance_admission.sql`
+vincula a admissão válida à primeira contagem criada dentro do plantão,
+mesmo quando o cliente omite sua chave. Após o fim da janela, a chave
+continua obrigatória. Cinco integrações dirigidas com Auth real passaram.
+A migration está aplicada localmente e no Supabase remoto, com 337 versões
+e fila vazia. A primeira captura foi rejeitada ao detectar alterações nas
+tabelas de monitoramento. A nova captura foi verificada sob o resguardo
+`60bffb5a-dcc4-4c50-b56a-4b1e3776d54b` antes da aplicação.
+
+As regressões de L1 agora usam os controles atuais de consulta pública.
+A leitura de um código mantém a comparação de bytes como ação separada.
+Os testes verificam o arquivo assinado e o SHA-256 no painel técnico.
+A auditoria em alto contraste detectou texto claro sobre o fundo forçado
+do navegador. O cabeçalho passou a usar as cores do sistema nesse modo.
+A auditoria do acervo usa um administrador de um único paciente para
+exercitar a permissão de anexar e evitar que os vínculos acumulados de
+outros testes afetem o tempo de análise do navegador.
+Passaram oito casos do seletor, acervo e painel de material, quatro
+regressões de L1 e quatro casos finais de anexação, versão preservada,
+validação pública e alto contraste. Os recortes passaram em Chromium e
+Android emulado, com retentativas desativadas.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

@@ -431,6 +431,16 @@
 .hca-verify-help-option h3 { margin: 0 0 6px; font-size: 17px; font-weight: 680; color: #355c43; }
 .hca-verify-help-option p { margin: 0; }
 
+@media (forced-colors: active) {
+  .hca-verify-hero {
+    background: Canvas;
+    color: CanvasText;
+    border-color: CanvasText;
+  }
+  .hca-verify-hero :is(h1, p, .hca-verify-eyebrow, .hca-verify-traits) { color: CanvasText; }
+  .hca-verify-hero::after { display: none; }
+}
+
 @media (max-width: 380px) {
   .hca-verify-hero { padding-inline: 18px; }
   .hca-verify-hero h1 { font-size: 26px; }

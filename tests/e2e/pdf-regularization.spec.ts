@@ -7,7 +7,7 @@ import { regularizationPdfFixture,regularizationLedger } from "../integration/pd
 import { fixtures,rpc } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql,sqlLiteral } from "../../scripts/test-environment.mjs";
-import { generatedPdf, CURRENT_PDF_REVISION, pdfIssuanceReference } from "./generated-pdf";
+import { generatedPdf, generateStandardPdf, CURRENT_PDF_REVISION, pdfIssuanceReference } from "./generated-pdf";
 import { selectContext } from "./auth-context";
 test.setTimeout(180000);
 type Fixture=Awaited<ReturnType<typeof regularizationPdfFixture>>;
@@ -62,7 +62,7 @@ test("ENT regularizada gera PDF técnico pela interface, recupera a mesma reserv
   await selectDocumentSection(page, "files");
   const files=page.getByRole("region",{name:"Arquivos gerados",exact:true});
   const existing=await page.request.get(`/api/documents/${f.doc.id}/issuances`);expect((await existing.json()).data).toHaveLength(1);
-  await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
+  await generateStandardPdf(page);
   await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
   const link=await files.getByRole("link",{name:"Baixar PDF",exact:true}).getAttribute("href");expect(link).toBeTruthy();
   const current=await inspect(page,f,"approved-current",await page.request.get(link!),CURRENT_PDF_REVISION);
