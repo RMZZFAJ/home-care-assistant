@@ -17,13 +17,14 @@ export function ShiftBalanceHub({ entry }: { entry: Exclude<View, "history"> }) 
   const historyRequested = params.get("view") === "history" || scheduleHistoryRequested;
   return <Workspace title="Plantões e balanços">
     {context => context.patient ? <ShiftBalanceContent key={context.userId + ":" + context.patient.id}
-      context={context} requested={historyRequested ? "history" : entry} scheduleHistoryRequested={scheduleHistoryRequested} /> :
+      context={context} entry={entry} requested={historyRequested ? "history" : entry} scheduleHistoryRequested={scheduleHistoryRequested} /> :
       <Notice>Selecione um paciente para consultar plantões e balanços.</Notice>}
   </Workspace>;
 }
 
-function ShiftBalanceContent({ context, requested, scheduleHistoryRequested }: {
+function ShiftBalanceContent({ context, entry, requested, scheduleHistoryRequested }: {
   context: WorkspaceContext;
+  entry: Exclude<View, "history">;
   requested: View;
   scheduleHistoryRequested: boolean;
 }) {
@@ -31,9 +32,10 @@ function ShiftBalanceContent({ context, requested, scheduleHistoryRequested }: {
   const shifts = can(context, "schedule.read.team") || can(context, "schedule.read.own");
   const balances = can(context, "bal.read");
   const scheduleDenied = scheduleHistoryRequested && !shifts;
-  if (!shifts && !balances) return <Notice error>{scheduleDenied
-    ? "Seu vínculo não permite consultar a agenda."
-    : "Seu vínculo não permite consultar plantões ou balanços."}</Notice>;
+  const scheduleRecoveryOnly = entry === "shifts" && !shifts;
+  if (!shifts && !balances) return scheduleRecoveryOnly
+    ? <PatientSchedule context={context} />
+    : <Notice error>Seu vínculo não permite consultar plantões ou balanços.</Notice>;
 
   let view = requested;
   if (view === "shifts" && !shifts) view = "balances";
@@ -46,7 +48,7 @@ function ShiftBalanceContent({ context, requested, scheduleHistoryRequested }: {
       {balances ? <Link href={"/balancos?" + patientQuery} aria-current={view === "balances" ? "page" : undefined} prefetch={false}>Balanços</Link> : null}
       <Link href={historyPath + "?" + patientQuery + "&view=history"} aria-current={view === "history" ? "page" : undefined} prefetch={false}>Histórico</Link>
     </nav>
-    {view === "shifts" ? <PatientSchedule context={context} /> : null}
+    {view === "shifts" || scheduleRecoveryOnly ? <PatientSchedule context={context} /> : null}
     {view === "balances" ? <>
       <BalanceNotice context={context} />
       <BalanceFollowUp context={context} />
@@ -58,7 +60,7 @@ function ShiftBalanceContent({ context, requested, scheduleHistoryRequested }: {
         <BalanceAssignmentHistory patientId={patient.id} />
       </> : null}
       {shifts ? <ScheduleHistory patientId={patient.id} readerId={context.userId} /> : null}
-      {scheduleDenied ? <Notice error>Seu vínculo não permite consultar a agenda.</Notice> : null}
+      {scheduleDenied && !scheduleRecoveryOnly ? <Notice error>Seu vínculo não permite consultar a agenda.</Notice> : null}
     </> : null}
   </div>;
 }

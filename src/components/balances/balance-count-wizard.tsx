@@ -964,7 +964,7 @@ function ScheduledCount({
       </Notice>
     );
   const referencePanel =
-    needsReferenceReview && (eligible || preservedContext || needsRecount) && !uncertain && !cacheError ? (
+    needsReferenceReview && (eligible || preservedContext || draftTouched || needsRecount) && !uncertain && !cacheError ? (
       <BalanceReferenceReview
         source={balanceContent}
         current={currentContext}

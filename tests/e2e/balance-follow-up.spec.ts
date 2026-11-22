@@ -33,11 +33,14 @@ for (const policy of ["required", "optional"] as const) {
     const initial = policy === "required" ? "Acompanhar as revisões do balanço" : "Consultar a contagem conciliada";
     await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByText(initial, { exact: true })).toBeVisible();
     const before = balState(f.document.id);
-    const next = page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Contagem e revisão", exact: true });
+    const label = policy === "required" ? "Revisões" : "Contagens";
+    const next = page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: `Abrir ${label}`, exact: true });
     await next.focus();
     await next.press("Enter");
-    await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toBeFocused();
-    await expect(page.getByRole("heading", { name: "Contagem e revisão", exact: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: label, exact: true })).toBeFocused();
+    await expect(page.getByRole("heading", { name: policy === "required" ? /^Revisões da contagem/ : "Contagem física" })).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole("tab", { name: label, exact: true })).toHaveAttribute("aria-selected", "true");
     expect(balState(f.document.id)).toBe(before);
 
     await receiveBalanceMaterials(f);
@@ -68,7 +71,7 @@ for (const policy of ["required", "optional"] as const) {
       await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
       await expect(page.locator(".hca-activity-overlay")).toBeVisible();
       await expect(page.getByText("Atualizando o acompanhamento da ficha…", { exact: false })).toHaveCount(0);
-      await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: "Abrir Contagem e revisão", exact: true })).toHaveCount(0);
+      await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: /^Abrir (Revisões|Contagens)$/ })).toHaveCount(0);
     } finally { release(); }
     await failed;
     await expect(page.getByRole("status").filter({ hasText: "O acompanhamento atual não foi confirmado" })).toContainText("O acompanhamento atual não foi confirmado");

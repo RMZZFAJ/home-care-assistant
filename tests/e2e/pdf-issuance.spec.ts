@@ -361,6 +361,19 @@ test("Acervo consolidado recusa seletores experimentais e preserva exemplares at
  const rows=(await(await page.request.get(url+"/archive")).json()).data;expect(rows).toHaveLength(1);expect(rows[0]).toMatchObject({kind:"issuance",issuance:{rendererRevision:16,state:"ready"}});
  const first=await page.request.get(url+"/pdf?issuance="+rows[0].issuance.id);expect(first.ok()).toBe(true);const digest=hash(await first.body());
  expect(hash(await(await page.request.get(url+"/pdf?issuance="+rows[0].issuance.id)).body())).toBe(digest);
+ await filters.getByRole("button",{name:"Atuais",exact:true}).click();
+ await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
+ const approved = await rpc(f.admin, "supply_document_command", {
+   p_id: f.doc.id, p_action: "approve", p_key: randomUUID(), p_version: f.doc.version,
+   p_body: { lines: [{ lineId: f.doc.lines[0].id, quantity: "1" }] },
+ });
+ expect(approved.version).toBeGreaterThan(f.doc.version);
+ await page.getByRole("button",{name:"Atualizar ficha",exact:true}).click();
+ await expect(filters.getByRole("button",{name:"Atuais",exact:true})).toHaveAttribute("aria-pressed","true");
+ await expect(files.getByText("Nenhum exemplar neste filtro.",{exact:true})).toBeVisible();
+ await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(0);
+ await filters.getByRole("button",{name:"Anteriores",exact:true}).click();
+ await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
  sql(`update public.care_recipient_memberships set status='revoked' where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.family.id)}`);
  expect([401,403]).toContain((await page.request.get(url+"/archive")).status());expect([401,403]).toContain((await page.request.get(url+"/pdf?issuance="+rows[0].issuance.id)).status());
 });

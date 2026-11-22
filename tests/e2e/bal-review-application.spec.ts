@@ -13,7 +13,7 @@ import { generatedPdf } from "./generated-pdf";
 test.setTimeout(180_000);
 const stock = (patient: string) => sql("select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id="+q(patient));
 async function openReview(page: Page) {
- await selectDocumentSection(page, "workflow");
+ await selectDocumentSection(page, "reviews");
  await page.getByRole("button", { name: "Revisão da família", exact: true }).click();
  return page.getByRole("dialog", { name: "Revisar contagem do balanço", exact: true });
 }
@@ -60,7 +60,7 @@ test("BAL keeps an unsaved item review separate from stock application and recov
  await applyDialog.getByRole("button", { name: "Confirmar aplicação da contagem", exact: true }).click();
  await expect(page.getByRole("button", { name: "Consultar aplicação desta tentativa", exact: true })).toBeEnabled();
  const applied = stock(f.patient);expect(applied).not.toBe(before);expect(posts).toBe(1);
- await page.reload();await selectDocumentSection(page, "workflow");
+ await page.reload();await selectDocumentSection(page, "reviews");
  expect(posts).toBe(1);await page.getByRole("button", { name: "Consultar aplicação desta tentativa", exact: true }).click();
  await expect(page.getByRole("button", { name: "Consultar aplicação desta tentativa", exact: true })).toHaveCount(0);
  await expect(page.getByRole("heading", { name: "Aplicação da contagem ao estoque", exact: true })).toBeFocused();

@@ -61,8 +61,9 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
   await expect(materialDrawer.getByText("Recebido / validado", { exact: true })).toBeVisible();
   await materialDrawer.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await expect(material).toBeFocused();
+  await selectDocumentSection(page, "reviews");
   await expect(
-    page.getByRole("heading", { name: "Contagem e revisão", exact: true }),
+    page.getByRole("heading", { name: /^Revisões da contagem/ }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Revisão da família", exact: true }),
@@ -74,7 +75,7 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
     const reviewer = await context.newPage();
     await login(reviewer, fixtures.family.email, f.patient);
     await reviewer.goto("/fichas/" + f.document.id);
-    await selectDocumentSection(reviewer, "workflow");
+    await selectDocumentSection(reviewer, "reviews");
     await reviewer
       .getByRole("button", { name: "Revisão da família", exact: true })
       .click();
@@ -122,8 +123,7 @@ test("BAL facultativo preserva autoria e observações, recupera parecer própri
     expect(attempts).toHaveLength(1);
     await expect(
       reviewer.getByRole("heading", {
-        name: "Contagem e revisão",
-        exact: true,
+        name: /^Revisões da contagem/,
       }),
     ).toBeFocused();
     await expect(reviewer.getByText(comment, { exact: true })).toBeVisible();
@@ -182,7 +182,7 @@ test("BAL com referência alterada conserva o parecer e adota explicitamente o n
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar as revisões do balanço");
-  await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "reviews");
   let releaseInitial!: () => void;
   const initialHeld = new Promise<void>((resolve) => {
     releaseInitial = resolve;

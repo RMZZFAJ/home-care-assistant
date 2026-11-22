@@ -1771,6 +1771,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261122201849_l3_balance_count_admissions` | Aplicada | Aplicada |
 | `20261122212641_l3_stock_review_repairs` | Aplicada | Aplicada |
 | `20261122215240_l3_pdf_archive_revision_filters` | Aplicada | Aplicada |
+| `20261122215605_l3_bind_balance_draft_admission` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2120,9 +2121,10 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   a continuidade pelo canal existente e a conferência visual final.
 - **E08 — Plantões e balanços.** Em execução. A admissão da contagem
   iniciada no plantão já preserva a retomada. A área reúne Plantões,
-  Balanços e Histórico com as permissões de cada leitura. Restam a
-  configuração de horários por residência, os encaminhamentos de
-  alterações e a organização da agenda, da contagem e da ficha.
+  Balanços e Histórico com as permissões de cada leitura. A ficha tem
+  abas próprias para Revisões e Contagens. Restam a configuração de
+  horários por residência, os encaminhamentos de alterações e o wizard
+  de contagem com cinco etapas e materiais extras.
 - **E09 — Arquivos e verificação.** Em execução. A consulta pública exibe
   registro, correspondência, assinatura e carimbo separadamente. Os detalhes
   autorizados abrem em painel e revalidam o acesso. O resultado público
@@ -2324,6 +2326,53 @@ ficha. A seleção incompleta fica no modal, com recuperação técnica separada
   Chromium e Android emulado. O caso de doação passou nos dois projetos
   após a correção de contraste do modo selecionado, preservando o conteúdo
   essencial e o período dos complementos.
+
+O [Preview de `ee733107`](https://home-care-assistant-5mkeusb0t-rmzzfajs-projects.vercel.app)
+respondeu à verificação de conexão e reconheceu pelo código um PDF de
+Helena já emitido. As variáveis de Supabase, assinatura de PDF e Web Push
+estavam no escopo de Preview. A política de confiança da branch inclui
+os certificados públicos necessários para consultar PDFs de produção no
+banco compartilhado. A PR segue em rascunho. SonarCloud e as validações
+Ubuntu e Windows passaram nesse commit.
+
+### Revisões e contagens na ficha de BAL
+
+Revisões e Contagens passaram a ser abas independentes da mesma ficha.
+Revisões reúne decisões por grupo, diferenças por material e o ato de
+aplicar a contagem ao estoque. Contagens mostra autoria, hora, referência,
+contexto do plantão, reconto e links para as versões preservadas. Os atalhos
+de acompanhamento levam à aba correspondente e a URL preserva a escolha.
+A identificação e os registros preservados continuam acessíveis em Mais.
+Passaram 28 casos de navegador, 14 em Chromium e 14 em Android emulado,
+sem retentativas. Os casos incluem uso a 320 px, revogação, atraso,
+retomada, revisão independente e aplicação única no estoque.
+
+### Segunda revisão automatizada de L3
+
+O CodeRabbit publicou sete apontamentos em `ee733107`. O retorno de
+uma ficha aberta no histórico de Plantões mantém a origem e a busca.
+A leitura da agenda pode ser revogada sem ocultar a recuperação das
+tentativas próprias. Uma revisão concorrente de rascunho de consumo
+rejeita a tentativa antiga e abre a comparação com a revisão do servidor.
+O acervo atualiza o filtro se a revisão da ficha mudar. Uma consulta
+por versão exata valida a própria versão.
+
+A recuperação da referência de uma contagem permanece disponível
+quando a atribuição muda enquanto há edição. A nova migration
+vincula a admissão à primeira versão documental do rascunho na mesma
+transação. A integração comprovou que criação, revisão e emissão do
+mesmo BAL após o fim do plantão preservam a autorização original.
+Passaram 14 integrações dirigidas com Auth real. No remoto, a
+migration foi aplicada após validar o resguardo
+`314c56c4-2ded-47fa-9d2f-3c5abf6411ba`. A fila ficou vazia
+com 334 migrations aplicadas.
+
+Chromium e Android emulado confirmaram o retorno à agenda filtrada,
+a atualização do acervo, a recuperação da confirmação após
+revogação de leitura e a comparação do rascunho de consumo antes de
+registrar o valor da revisão escolhida. O primeiro ensaio de consumo
+esperava o código da API dentro de `error`. A asserção foi corrigida
+para o campo `code`, e o caso passou nos dois projetos.
 
 ## L4
 

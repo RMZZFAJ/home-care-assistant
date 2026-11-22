@@ -2,10 +2,9 @@
 
 import { Tabs } from "@base-ui/react/tabs";
 import { usePathname, useSearchParams } from "next/navigation";
-import { use, useCallback, useEffect, useRef, useState, type ReactNode, type Ref } from "react";
+import { use, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type Ref } from "react";
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/primitives";
-import type { DocumentType } from "@/types/documents";
 import { MaterialVisitContext } from "./material-visit-context";
 
 export type DocumentTab =
@@ -14,6 +13,8 @@ export type DocumentTab =
   | "progress"
   | "workflow"
   | "communications"
+  | "reviews"
+  | "counts"
   | "files"
   | "attachments"
   | "history"
@@ -26,33 +27,37 @@ const baseTabs: { id: DocumentTab; label: string; icon: IconName; }[] = [
   { id: "files", label: "Arquivos", icon: "forms" },
   { id: "attachments", label: "Anexos", icon: "link" },
 ];
+const balanceTabs = [
+  { id: "reviews", label: "Revisões", icon: "check-circle" },
+  { id: "counts", label: "Contagens", icon: "history" },
+] as const;
+const balanceOrder: readonly DocumentTab[] = ["overview", "progress", "materials", "reviews", "counts", "files", "communications", "attachments"];
 
-function tabFromUrl(params: Pick<URLSearchParams, "get" | "has">, auditAllowed: boolean): DocumentTab {
+function tabFromUrl(params: Pick<URLSearchParams, "get" | "has">, valid: readonly string[]): DocumentTab {
   const requested = params.get("documentTab");
-  const valid = [...baseTabs.map(tab => tab.id), "history", ...(auditAllowed ? ["audit"] : [])];
   // Previously emitted links opened records in Visão geral.
   if (params.has("progressRecord") && (requested === null || requested === "overview")) return "progress";
   return requested === "workflow" ? "materials" : valid.includes(requested ?? "")
     ? requested as DocumentTab : params.has("historyVersion") ? "history" : "overview";
 }
 
-export function useDocumentTabs(auditAllowed: boolean) {
+export function useDocumentTabs(auditAllowed: boolean, showBalanceTabs = false) {
   const embedded = use(MaterialVisitContext) !== null;
   const rootRef = useRef<HTMLDivElement>(null);
   const focusSelectionRef = useRef(false);
   const params = useSearchParams();
   const pathname = usePathname();
-  const source = JSON.stringify([embedded ? "consulta" : pathname, embedded ? "" : params.toString(), auditAllowed]);
+  const source = JSON.stringify([embedded ? "consulta" : pathname, embedded ? "" : params.toString(), auditAllowed, showBalanceTabs]);
   const [selection, setSelection] = useState<{ source: string; value: DocumentTab } | null>(null);
-  const valid = [
-    ...baseTabs.map((tab) => tab.id),
+  const valid = useMemo(() => [
+    ...(showBalanceTabs ? balanceOrder : baseTabs.map(tab => tab.id)),
     "history",
     ...(auditAllowed ? ["audit"] : []),
-  ];
+  ], [auditAllowed, showBalanceTabs]);
   // A menu command and the native URL update can share a React batch. Keep the
   // visible panel controlled immediately, until the router snapshot catches up.
   // Scope the optimistic choice to that exact URL snapshot and permission set.
-  const value = selection?.source === source ? selection.value : embedded ? "materials" : tabFromUrl(params, auditAllowed);
+  const value = selection?.source === source ? selection.value : embedded ? "materials" : tabFromUrl(params, valid);
   const focusSelectedTab = useCallback((next: DocumentTab) => {
     const trigger = next === "progress"
       ? rootRef.current?.querySelector<HTMLElement>("[data-progress-editor-trigger]")
@@ -61,10 +66,10 @@ export function useDocumentTabs(auditAllowed: boolean) {
   }, []);
   useEffect(() => {
     if (embedded) return;
-    const navigate = () => setSelection({ source, value: tabFromUrl(new URLSearchParams(window.location.search), auditAllowed) });
+    const navigate = () => setSelection({ source, value: tabFromUrl(new URLSearchParams(window.location.search), valid) });
     window.addEventListener("popstate", navigate);
     return () => window.removeEventListener("popstate", navigate);
-  }, [source, auditAllowed, embedded]);
+  }, [source, valid, embedded]);
   useEffect(() => {
     if (!focusSelectionRef.current && value !== "history") return;
     focusSelectionRef.current = false;
@@ -93,7 +98,7 @@ export function useDocumentTabs(auditAllowed: boolean) {
 }
 
 export function DocumentTabs({
-  type,
+  showBalanceTabs = false,
   value,
   onSelect,
   auditAllowed,
@@ -101,7 +106,7 @@ export function DocumentTabs({
   rootRef,
   sections,
 }: {
-  type?: DocumentType;
+  showBalanceTabs?: boolean;
   value: DocumentTab;
   onSelect: (value: DocumentTab) => void;
   auditAllowed: boolean;
@@ -109,8 +114,9 @@ export function DocumentTabs({
   rootRef?: Ref<HTMLDivElement>;
   sections?: readonly DocumentTab[];
 }) {
+  const availableTabs = showBalanceTabs ? [...baseTabs, ...balanceTabs].sort((a, b) => balanceOrder.indexOf(a.id) - balanceOrder.indexOf(b.id)) : baseTabs;
   const tabs = [
-    ...baseTabs.filter(tab => tab.id !== "attachments" && (!sections || sections.includes(tab.id))),
+    ...availableTabs.filter(tab => tab.id !== "attachments" && (!sections || sections.includes(tab.id))),
     ...(auditAllowed
       ? [{ id: "audit" as const, label: "Auditoria", icon: "history" as const }]
       : []),
@@ -128,13 +134,7 @@ export function DocumentTabs({
         {tabs.map((tab) => (
           <Tabs.Tab key={tab.id} value={tab.id} className="hca-document-tab">
             <Icon name={tab.icon} />
-            {tab.id === "workflow"
-              ? type === "COM"
-                ? "Aquisição"
-                : type === "BAL"
-                  ? "Contagem e revisão"
-                  : "Atendimento"
-              : tab.label}
+            {tab.label}
           </Tabs.Tab>
         ))}
       </Tabs.List>
@@ -170,7 +170,7 @@ export function DocumentPanel({
   children: ReactNode;
 }) {
   return (
-    <Tabs.Panel value={value} keepMounted aria-label={value === "history" ? "Identificação e registros preservados" : value === "audit" ? "Auditoria" : value === "workflow" ? "Materiais" : baseTabs.find(tab => tab.id === value)?.label} className="hca-document-panel">
+    <Tabs.Panel value={value} keepMounted aria-label={value === "history" ? "Identificação e registros preservados" : value === "audit" ? "Auditoria" : value === "workflow" ? "Materiais" : [...baseTabs, ...balanceTabs].find(tab => tab.id === value)?.label} className="hca-document-panel">
       {children}
     </Tabs.Panel>
   );

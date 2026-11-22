@@ -551,7 +551,6 @@ export function RequisitionDocumentContent({
       ) : null}
       <DocumentTabs
         rootRef={tabs.rootRef}
-        type="REQ"
         value={tabs.value}
         onSelect={tabs.select}
         auditAllowed={can(context, "audit.read")}

@@ -161,7 +161,15 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
       posted = true;
       finish((await api<{ data: unknown }>(endpoint, packet)).data, packet);
     } catch (reason) {
-      if (posted && reason instanceof ApiError && reason.code === "VERSION_CONFLICT") {
+      if (posted && reason instanceof ApiError && reason.code === "DRAFT_VERSION_CONFLICT") {
+        retain(null);
+        setReceiptAbsent(false);
+        setReference(null);
+        setPrevious([]);
+        setStep(pending ? 0 : 1);
+        await draft.reportConflict();
+        setError("O rascunho foi atualizado. Confira a versão mais recente antes de emitir.");
+      } else if (posted && reason instanceof ApiError && reason.code === "VERSION_CONFLICT") {
         retain(null);
         setReceiptAbsent(false);
         if (reference) {
@@ -169,7 +177,7 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
           try { setReference(await getReference()); }
           catch { setReference(null); setStep(3); }
         } else setStep(0);
-        void draft.reportConflict();
+        await draft.reportConflict();
         setError("O estoque ou o rascunho mudou. Confira as referências atualizadas e revise novamente.");
       } else {
         if (posted && reason instanceof ApiError &&

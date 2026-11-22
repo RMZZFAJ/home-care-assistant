@@ -92,7 +92,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar as revisões do balanço");
-  await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "counts");
   await page
     .getByRole("link", { name: "Designar reconto", exact: true })
     .click();
@@ -243,7 +243,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     `update public.capability_overrides set enabled=true where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.family.id)} and capability='bal.approve.family';`,
   );
   await page.goto("/fichas/" + f.document.id);
-  await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "reviews");
   await page
     .getByRole("button", { name: "Revisão da família", exact: true })
     .click();

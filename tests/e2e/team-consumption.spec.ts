@@ -27,12 +27,14 @@ async function fixture() {
 }
 
 async function openConsumption(page: Page, f: Awaited<ReturnType<typeof fixture>>) {
-  await page.goto("/login?next=" + encodeURIComponent("/consumo?careRecipientId=" + f.patient));
+  await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(f.professional.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Consumo e faltas", exact: true })).toBeVisible({ timeout: 30000 });
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, f.patient);
+  await page.goto("/consumo?careRecipientId=" + f.patient);
+  await expect(page.getByRole("heading", { name: "Consumo e faltas", exact: true })).toBeVisible();
 }
 
 test("consumo preserva o último rascunho, recupera a baixa e permite correção e cancelamento", async ({ page }) => {
@@ -93,4 +95,58 @@ test("consumo preserva o último rascunho, recupera a baixa e permite correção
   await cancellation.getByRole("button", { name: "Confirmar", exact: true }).click();
   await expect(detail.getByText("Cancelado", { exact: true })).toBeVisible();
   expect(Number(balance())).toBe(10);
+});
+
+test("consumo compara a revisão mais recente quando o envio é rejeitado por outro editor", async ({ page }) => {
+  const f = await fixture();
+  const balance = () => Number(sql(`select private.stock_quantity(${q(f.patient)},${q(f.products[0])},'CARE_TEAM')::text`));
+  await openConsumption(page, f);
+  await page.getByRole("button", { name: "Registrar consumo", exact: true }).click();
+  const wizard = page.getByRole("dialog", { name: "Registrar consumo", exact: true });
+  await wizard.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
+  await wizard.getByRole("button", { name: /^Higiene/ }).click();
+  await wizard.getByRole("checkbox", { name: f.name, exact: true }).check();
+  await wizard.getByRole("textbox", { name: "Quantidade consumida · " + f.name, exact: true }).fill("4");
+  await wizard.getByRole("button", { name: "Continuar", exact: true }).click();
+  await wizard.getByRole("button", { name: "Continuar", exact: true }).click();
+  await wizard.getByRole("button", { name: "Revisar consumo", exact: true }).click();
+  await expect(wizard.getByText(/Após o consumo · 6/)).toBeVisible();
+  await expect(wizard.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+
+  await page.route("**/api/consumption/records", async route => {
+    const requested = route.request().postDataJSON();
+    const scope = { careRecipientId: f.patient, purpose: "consumption_report_team", targetResourceId: f.patient };
+    const read = await page.request.get("/api/consumption/preparations?" + new URLSearchParams(scope));
+    expect(read.status(), await read.text()).toBe(200);
+    const { data: draft } = await read.json();
+    expect(draft).toMatchObject({ id: requested.draft.id, revision: requested.draft.revision });
+    const update = await page.request.post("/api/consumption/preparations", { data: {
+      ...scope, kind: "CONSUMPTION", targetDocumentId: null,
+      action: "save", id: draft.id, expectedRevision: draft.revision, idempotencyKey: randomUUID(),
+      content: { ...draft.content, consumption: { ...draft.content.consumption,
+        text: "Revisão concorrente preservada.", lines: [{ productId: f.products[0], name: f.name, unit: "unidade", quantity: "3" }] } },
+      navigation: draft.navigation,
+    } });
+    expect(update.ok(), await update.text()).toBe(true);
+    const rejected = await route.fetch();
+    expect(rejected.status()).toBe(409);
+    expect(await rejected.json()).toMatchObject({ code: "DRAFT_VERSION_CONFLICT" });
+    return route.fulfill({ response: rejected });
+  }, { times: 1 });
+  await wizard.getByRole("button", { name: "Registrar consumo", exact: true }).click();
+  await expect(wizard.getByText("O rascunho foi atualizado. Confira a versão mais recente antes de emitir.", { exact: true })).toBeVisible();
+  await expect(wizard.getByRole("button", { name: "Conferir resultado", exact: true })).toHaveCount(0);
+  const storageKey = `hca:official-team-consumption:${f.professional.id}:${f.patient}`;
+  expect(await page.evaluate(key => sessionStorage.getItem(key), storageKey)).toBeNull();
+  expect(balance()).toBe(10);
+  await page.getByRole("button", { name: "Usar versão salva no servidor", exact: true }).click();
+  await expect(wizard.getByRole("textbox", { name: "Quantidade consumida · " + f.name, exact: true })).toHaveValue("3");
+  await wizard.getByRole("button", { name: "Continuar", exact: true }).click();
+  await wizard.getByRole("button", { name: "Continuar", exact: true }).click();
+  await expect(wizard.getByRole("textbox", { name: "Observações", exact: true })).toHaveValue("Revisão concorrente preservada.");
+  await wizard.getByRole("button", { name: "Revisar consumo", exact: true }).click();
+  await expect(wizard.getByText(/Após o consumo · 7/)).toBeVisible();
+  await wizard.getByRole("button", { name: "Registrar consumo", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Detalhe do relato", exact: true })).toContainText("Registrado");
+  expect(balance()).toBe(7);
 });

@@ -56,6 +56,33 @@ test("a real admission survives expiry and resumes the same BAL exactly once", a
   assert.equal((await workspace(f)).assignments.find(row => row.id === f.assignment.id).status, "counted");
 });
 
+test("an admitted late count keeps its authorization through creation and revision of its documentary draft", async t => {
+  const f = await setupAdmission(t);
+  f.closeWindow();
+  const command = { ...f.command, p_draft: true };
+  const draft = await rpc(f.pro.client, "create_supply_document", command);
+  assert.equal(draft.status, "draft");
+  assert.equal((await rpc(f.pro.client, "create_supply_document", command)).id, draft.id);
+  sql(`select private.process_bal_patient(${q(f.patient)})`);
+  const first = await workspace(f);
+  assert.equal(first.eligibility.available, false);
+  assert.equal(first.eligibility.documentId, draft.id);
+  assert.deepEqual(first.eligibility.admission, { ...f.record, documentId: draft.id, documentVersion: draft.version });
+
+  const revision = await rpc(f.pro.client, "revise_supply_document", {
+    p_id: draft.id, p_version: draft.version, p_recount: false, p_key: randomUUID(),
+    p_payload: { ...f.command.p_payload, notes: "Quantidades conferidas após o encerramento do plantão." },
+  });
+  assert.equal(revision.version, draft.version + 1);
+  const next = (await workspace(f)).eligibility.admission;
+  assert.deepEqual(next, { ...f.record, documentId: draft.id, documentVersion: revision.version });
+  const issued = await rpc(f.pro.client, "supply_document_command", {
+    p_id: draft.id, p_action: "submit", p_body: {}, p_key: randomUUID(), p_version: revision.version,
+  });
+  assert.equal(issued.payload.balanceContext.admissionId, f.record.id);
+  assert.equal((await workspace(f)).assignments.find(row => row.id === f.assignment.id).status, "counted");
+});
+
 test("discarding the scheduled draft closes admission and forbids a fresh start after expiry", async t => {
   const f = await setupAdmission(t);
   const draftScope = { p_patient: f.patient, p_kind: "BAL", p_target: null };

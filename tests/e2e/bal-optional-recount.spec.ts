@@ -31,7 +31,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Consultar a contagem conciliada");
-  await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "counts");
   const versions = page.getByRole("region", {
     name: "Versões das contagens físicas",
     exact: true,
@@ -170,7 +170,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
   }
   await page.goto("/fichas/" + f.document.id);
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Consultar a contagem conciliada");
-  await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "counts");
   const document = (
     await (await page.request.get("/api/documents/" + f.document.id)).json()
   ).data as SupplyDocument;

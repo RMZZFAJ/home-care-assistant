@@ -6,6 +6,8 @@ export type DocumentSection =
   | "progress"
   | "workflow"
   | "communications"
+  | "reviews"
+  | "counts"
   | "files"
   | "attachments"
   | "history"
@@ -16,6 +18,8 @@ const labels = {
   progress: "Andamentos",
   workflow: "Materiais",
   communications: "Comunicações",
+  reviews: "Revisões",
+  counts: "Contagens",
   files: "Arquivos",
   attachments: "Arquivos",
   history: "Identificação e registros preservados",
@@ -70,6 +74,7 @@ async function pressSectionControl(page: Page, control: Locator) {
 }
 
 export async function openBalanceComparison(page: Page) {
+  await selectDocumentSection(page, "counts");
   const summary = page.locator("summary").filter({ hasText: /^Comparar contagem e referência$/ });
   const table = page.getByRole("table", { name: "Materiais da contagem", exact: true });
   if (await summary.locator("..").getAttribute("open") === null) await summary.click();

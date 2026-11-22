@@ -82,6 +82,28 @@ const facts = (patient: string) =>
       `select count(*) from public.shift_events where care_recipient_id=${q(patient)} and action='schedule.type' and (after_state->>'version')::integer>1`,
     ),
   );
+test("a confirmação do próprio plantão permanece acessível sem leitura da agenda", async ({ page }) => {
+  const f = await prepare(page);
+  await page.route("**/api/schedules", async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    const committed = await route.fetch();
+    expect(committed.ok()).toBe(true);
+    return route.abort("failed");
+  }, { times: 1 });
+  await submitLegacy(page, f.legacy);
+  expect(facts(f.patient)).toBe(1);
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values (${q(f.patient)},${q(fixtures.adminA.id)},'schedule.read.team',false),
+           (${q(f.patient)},${q(fixtures.adminA.id)},'schedule.read.own',false)`);
+  await page.reload();
+  await expect(page.getByText(/^Seu vínculo não permite consultar a agenda/)).toBeVisible();
+  await page.getByText("Meus preenchimentos privados da agenda", { exact: true }).click();
+  await expect(page.getByRole("button", { name: "Retomar minha programação", exact: true })).toBeVisible();
+  await panel(page).getByRole("button", { name: "Consultar confirmação da escala", exact: true }).click();
+  await expect(panel(page)).toContainText("Confirmação encontrada");
+  expect(facts(f.patient)).toBe(1);
+});
+
 test("agenda recupera a confirmação após recarregar sem reenviar a alteração e recusa recibo de outra intenção", async ({
   page,
 }, info) => {

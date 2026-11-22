@@ -119,6 +119,7 @@ function GeneratedFiles({
   const [initialBusy, setInitialBusy] = useState(false);
   const [initialError, setInitialError] = useState("");
   const [filter, setFilter] = useState<ArchiveFilter>("all");
+  const [basisVersion, setBasisVersion] = useState<number>();
   const [rows, setRows] = useState<PdfArchiveEntry[]>([]),
     [next, setNext] = useState<ArchivePage | null>(null),
     [loading, setLoading] = useState(true),
@@ -160,12 +161,16 @@ function GeneratedFiles({
           throw new Error(
             "Não foi possível confirmar a lista de arquivos. Consulte novamente.",
           );
+        if (archiveVersion && page.data.data.some(entry => entry.issuance.version !== archiveVersion))
+          throw new Error("A resposta não corresponde à versão consultada.");
         const basis = page.data.basisVersion;
-        if (filter !== "all" && (page.data.filter !== filter || basis === undefined
+        if (!archiveVersion && filter !== "all" && (page.data.filter !== filter || basis === undefined
+          || version !== undefined && basis < version
           || bookmark && bookmark.basisVersion !== basis
           || page.data.data.some(entry => filter === "current" ? entry.issuance.version !== basis : entry.issuance.version >= basis)))
           throw new Error("A resposta não corresponde ao filtro de exemplares selecionado.");
         if (own !== sequenceRef.current) return;
+        setBasisVersion(basis);
         setRows((current) =>
           cursor
             ? [
@@ -201,7 +206,7 @@ function GeneratedFiles({
         if (own === sequenceRef.current) setLoading(false);
       }
     },
-    [id, archiveVersion, filter],
+    [id, archiveVersion, filter, version],
   );
   function selectFilter(nextFilter: ArchiveFilter) {
     if (nextFilter === filter) return;
@@ -368,7 +373,10 @@ function GeneratedFiles({
         );
     }
   }
+  const currentVersion = Math.max(version ?? 0, basisVersion ?? 0);
   const visibleRows = rows.filter(entry => {
+    if (archiveVersion ? entry.issuance.version !== archiveVersion
+      : filter === "current" && entry.issuance.version !== currentVersion) return false;
     if (entry.kind !== "issuance") return true;
     const options = entry.issuance.documentOptions;
     return !options || (options.mode !== "audit" || canAudit) && (!options.sections.includes("access") || canAccess);
@@ -453,7 +461,7 @@ function GeneratedFiles({
       ) : null}
       <div className="doc-card doc-file-acervo"><ul className="doc-file-list doc-file-list-compact" aria-label="Exemplares registrados">
         {visibleRows.map((entry) => {
-          const row = entry.issuance, earlier = version !== undefined && row.version < version;
+          const row = entry.issuance, earlier = row.version < currentVersion;
           return (
             <FileRecord key={row.id} identity={row.id} mime="application/pdf"
               title={<>{code} · {row.documentOptions ? documentModeLabel(row.documentOptions) : "Ficha"}{earlier ? <span className="doc-chip">Conteúdo anterior</span> : null}</>}

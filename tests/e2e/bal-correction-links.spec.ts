@@ -18,7 +18,7 @@ test("BAL shows actual later corrections, exact version links and masked stock w
  await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures.family.email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
  await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,f.patient);
  const writes:string[]=[];page.on("request",r=>{if(new URL(r.url()).pathname==="/api/documents/"+f.document.id&&r.method()==="POST")writes.push(r.method());});
- await page.goto("/fichas/"+f.document.id);await selectDocumentSection(page,"workflow");
+ await page.goto("/fichas/"+f.document.id);await selectDocumentSection(page,"reviews");
  const region=page.getByRole("region",{name:"Atos posteriores vinculados a este material",exact:true});
  await expect(region).toContainText("Reconto 2");await expect(region).toContainText("contado neste reconto: 2 unidade");
  await expect(region).toContainText("Reconto registrado; contagem não aplicada ao estoque.");
@@ -36,8 +36,12 @@ test("BAL shows actual later corrections, exact version links and masked stock w
    await expect.poll(()=>scroll.evaluate(node=>node.scrollLeft)).toBeGreaterThan(0);
    await scroll.evaluate(node=>{node.scrollLeft=0;});
   }
-  await link.focus();await audit(page,"bal-correction-links-"+width);
+  await audit(page,"bal-count-comparison-"+width);
+  await selectDocumentSection(page,"reviews");
+  await link.focus();await expect(link).toBeFocused();await audit(page,"bal-correction-links-"+width);
+  await selectDocumentSection(page,"counts");
  }
+ await selectDocumentSection(page,"reviews");
  mkdirSync("output/playwright/phase-d",{recursive:true});await region.screenshot({path:"output/playwright/phase-d/bal-correction-pending-"+info.project.name+".png",animations:"disabled"});
  expect(stock(f.patient)).toBe(before);expect(writes).toEqual([]);
  const applied=await applyCorrection(f),after=stock(f.patient);expect(after).not.toBe(before);

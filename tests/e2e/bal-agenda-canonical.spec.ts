@@ -96,6 +96,13 @@ test("06.3 BAL canonical readonly materials preserve physical zero,original refe
       await auditFromTop(page, "BAL comparison " + width);
     }
     await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" }); await auditFromTop(page, "BAL forced colors reduced motion");
+    const history = "/escalas?" + new URLSearchParams({ careRecipientId: f.patient, view: "history", search: doc.code });
+    await page.goto(history);
+    await page.getByRole("link", { name: new RegExp(doc.code) }).click();
+    const back = page.getByRole("navigation", { name: "Localização da ficha", exact: true }).getByRole("link", { name: "Fichas", exact: true });
+    await expect(back).toHaveAttribute("href", history);
+    await back.click();
+    await expect(page).toHaveURL(url => url.pathname === "/escalas" && url.searchParams.get("view") === "history" && url.searchParams.get("search") === doc.code);
     expect(sql(`select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${q(doc.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}));`)).toBe(before); expect(sent).toEqual([]);
   } finally { await ref.context.close(); }
 });

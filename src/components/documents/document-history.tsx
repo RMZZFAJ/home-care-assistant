@@ -34,7 +34,8 @@ const historyFilters = historyStatusLabels;
 export function DocumentRow({ row }: { row: DocumentSummary; }) {
   const { value: context } = useWorkspaceState();
   const pathname = usePathname(), params = useSearchParams();
-  const fromHistory = pathname === "/historico" || pathname === "/balancos" && params.get("view") === "history";
+  const fromHistory = pathname === "/historico" ||
+    (pathname === "/balancos" || pathname === "/escalas") && params.get("view") === "history";
   const returnTo = fromHistory ? "?returnTo=" + encodeURIComponent(pathname + (params.size ? "?" + params.toString() : "")) : "";
   return (
     <Link
