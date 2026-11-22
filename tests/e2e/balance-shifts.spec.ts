@@ -221,7 +221,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   ).toBeVisible();
   await page.getByRole("link", { name: /Balanço do seu plantão/ }).click();
   await expect(
-    page.getByRole("heading", { name: "Balanços e plantões", exact: true }),
+    page.getByRole("heading", { name: "Plantões e balanços", exact: true }),
   ).toBeVisible();
   await page
     .getByRole("main")

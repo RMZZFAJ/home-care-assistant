@@ -80,7 +80,14 @@ test("schedule history reaches all202 events beyond the old100 limit with origin
   const legacy = await (await page.request.get(`/api/schedules?careRecipientId=${f.patient}&from=2026-11-01&until=2026-11-30`)).json();
   expect(legacy.data.events).toHaveLength(100); expect(legacy.data.events.some((row: { id: string }) => row.id === f.oldest)).toBe(false);
   const writes: string[] = []; page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/schedules") && request.method() !== "GET") writes.push(request.url()); });
-  await page.goto(`/escalas?careRecipientId=${f.patient}`); await page.locator("summary").filter({ hasText: /^Histórico de mudanças$/ }).click();
+  await page.goto(`/escalas?careRecipientId=${f.patient}`);
+  const area = page.getByRole("navigation", { name: "Plantões e balanços", exact: true });
+  await expect(area.getByRole("link", { name: "Plantões", exact: true })).toHaveAttribute("aria-current", "page");
+  await area.getByRole("link", { name: "Balanços", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Programação do balanço", exact: true })).toBeVisible();
+  await area.getByRole("link", { name: "Histórico", exact: true }).click();
+  await expect(area.getByRole("link", { name: "Histórico", exact: true })).toHaveAttribute("aria-current", "page");
+  await page.locator("summary").filter({ hasText: /^Histórico de mudanças$/ }).click();
   const panel = schedulePanel(page), seen: string[] = [];
   for (let offset = 0; offset < all.length; offset += 20) {
     await expect.poll(() => ids(panel, "data-schedule-event-id")).toEqual(all.slice(offset, offset + 20)); seen.push(...await ids(panel, "data-schedule-event-id") as string[]);

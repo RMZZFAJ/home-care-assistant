@@ -43,7 +43,7 @@ async function login(page: Page, patient: string) {
   await selectContext(page, patient);
   await page.goto("/escalas");
   await expect(
-    page.getByRole("heading", { name: "Escalas e plantões", exact: true }),
+    page.getByRole("heading", { name: "Plantões e balanços", exact: true }),
   ).toBeVisible();
 }
 async function peerContext(browser: Browser) {

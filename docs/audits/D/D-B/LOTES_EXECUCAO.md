@@ -2115,9 +2115,10 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   das fichas. Restam a integração do histórico ao painel de material,
   a continuidade pelo canal existente e a conferência visual final.
 - **E08 — Plantões e balanços.** Em execução. A admissão da contagem
-  iniciada no plantão já preserva a retomada. Restam a área unificada,
-  a configuração de horários por residência, os encaminhamentos de
-  alterações e a organização da contagem e da ficha.
+  iniciada no plantão já preserva a retomada. A área reúne Plantões,
+  Balanços e Histórico com as permissões de cada leitura. Restam a
+  configuração de horários por residência, os encaminhamentos de
+  alterações e a organização da agenda, da contagem e da ficha.
 - **E09 — Arquivos e verificação.** Em execução. A consulta pública exibe
   registro, correspondência, assinatura e carimbo separadamente. Os detalhes
   autorizados abrem em painel e revalidam o acesso. O resultado público
@@ -2225,6 +2226,21 @@ automática na PR em rascunho.
   reconto depois do horário, descarte e tentativa com versão incorreta.
   O fluxo de retomada após a janela passou em Chromium, Android e iOS
   emulados no build de produção local.
+
+### Área de Plantões e balanços
+
+- `/escalas` abre Plantões e `/balancos` abre Balanços. A aba Histórico
+  usa a consulta de fichas filtrada para BAL e as consultas de atribuições
+  e alterações autorizadas. Links existentes da agenda continuam resolvendo
+  filtros e páginas. O menu principal apresenta uma única entrada.
+- O caso dirigido percorreu 202 mudanças da agenda, manteve os filtros por
+  URL e conferiu acessibilidade a 320 px. A verificação de vínculo continua
+  sendo feita pela API e pelo RLS. A área informa perda de acesso quando
+  um vínculo deixa de permitir a agenda consultada. A revogação real e a
+  publicação com recusa de sobreposição passaram na rodada dirigida final
+  em Chromium.
+- O teste unitário de leitura do BAL passou após incluir a versão real da
+  atribuição em seu cenário válido. A versão ausente é recusada.
 
 ### Primeira revisão automatizada de L3
 

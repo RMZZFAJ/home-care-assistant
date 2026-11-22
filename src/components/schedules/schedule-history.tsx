@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useState, type FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ActionButton, FormField, SelectField, TextInput } from "@/components/ui/controls";
 import { Notice } from "@/components/workspace";
 import { useScopedRead } from "@/lib/use-scoped-read";
@@ -19,7 +19,7 @@ export function ScheduleHistory({ patientId, readerId }: { patientId: string; re
   </details>;
 }
 function ScheduleHistoryContent({ patientId, readerId }: { patientId: string; readerId: string }) {
-  const params = useSearchParams(), router = useRouter(), revision = useLiveRevision();
+  const params = useSearchParams(), pathname = usePathname(), router = useRouter(), revision = useLiveRevision();
   const queryText = (params.get(names.query) ?? "").trim(), action = (params.get(names.action) ?? "").trim();
   const reference = (params.get(names.reference) ?? "").trim(), from = (params.get(names.from) ?? "").trim(), to = (params.get(names.to) ?? "").trim();
   const values: ScheduleHistoryFilters = { query: queryText, action, reference, from, to };
@@ -36,7 +36,7 @@ function ScheduleHistoryContent({ patientId, readerId }: { patientId: string; re
     const next = new URLSearchParams(params.toString()); next.set("scheduleHistoryPage", String(nextPage));
     for (const [key, value] of Object.entries(nextValues)) { if (value) next.set(names[key as keyof ScheduleHistoryFilters], value); else next.delete(names[key as keyof ScheduleHistoryFilters]); }
     if (JSON.stringify({ ...values, ...nextValues }) === filterKey && nextPage === page) read.refresh();
-    if (next.toString() !== params.toString()) router.push("/escalas?" + next, { scroll: false });
+    if (next.toString() !== params.toString()) router.push(pathname + "?" + next, { scroll: false });
   };
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); const form = new FormData(event.currentTarget);

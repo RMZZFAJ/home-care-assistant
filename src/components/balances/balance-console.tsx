@@ -12,7 +12,6 @@ import {
   api,
   can,
   Notice,
-  Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
 import {
@@ -25,33 +24,7 @@ import { weekDays, type BalanceEditor } from "./balance-forms";
 import { DeferralFacts } from "./balance-deferral-facts";
 import { useBalanceWorkspace } from "./use-balance-workspace";
 import type { DocumentSummary } from "@/types/documents";
-import { BalanceNotice } from "@/components/notifications/balance-notice";
-
-export function BalanceConsole() {
-  return (
-    <Workspace title="Balanços e plantões">
-      {(context) =>
-        context.patient && can(context, "bal.read") ? (
-          <>
-            <BalanceNotice
-              key={"reference:" + context.patient.id}
-              context={context}
-            />
-            <FollowUp
-              key={"followup:" + context.patient.id}
-              context={context}
-            />
-          </>
-        ) : (
-          <Notice error>
-            Selecione um paciente com permissão para consultar balanços.
-          </Notice>
-        )
-      }
-    </Workspace>
-  );
-}
-function FollowUp({ context }: { context: WorkspaceContext; }) {
+export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
   const router = useRouter(),
     params = useSearchParams(),
     recountDocumentId = params.get("recountDocumentId");
@@ -195,23 +168,6 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
               Nova contagem
             </Link>
           ) : null}
-          {can(context, "schedule.read.own") ||
-            can(context, "schedule.read.team") ? (
-            <Link
-              href="/escalas"
-              className="ui-button ui-button-secondary"
-              prefetch={false}
-            >
-              Consultar escala
-            </Link>
-          ) : null}
-          <Link
-            href="/historico?type=BAL"
-            className="ui-button ui-button-secondary"
-            prefetch={false}
-          >
-            Histórico de fichas BAL
-          </Link>
         </div>
         {configure && !data.types.length ? (
           <p>Cadastre os tipos de plantão na escala antes da ativação.</p>
@@ -489,33 +445,6 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
           ))}
         </section>
       ) : null}
-      <details className="ui-card">
-        <summary>Atribuições e atrasos históricos</summary>
-        {data.assignments.map((s) => (
-          <p key={s.id}>
-            {s.professional_name} · {formatBrazilDate(s.starts_at)} →{" "}
-            {formatBrazilDate(s.ends_at)} ·{" "}
-            {s.status === "missed"
-              ? "Não realizado no prazo"
-              : s.status === "deferred"
-                ? "Adiado por decisão familiar"
-                : s.status === "invalidated"
-                  ? "Escala alterada; atribuição preservada no histórico"
-                  : s.status === "counted"
-                    ? "Contagem registrada"
-                    : "Designado"}
-          </p>
-        ))}
-      </details>
-      <details className="ui-card">
-        <summary>Eventos auditáveis</summary>
-        {data.events.map((event) => (
-          <p key={event.id}>
-            {formatBrazilDate(event.created_at)} ·{" "}
-            {documentEventLabel(event.action)} · {event.reason}
-          </p>
-        ))}
-      </details>
       {recountDocumentId ? (
         <BalanceRecountAssignment
           context={context}
@@ -565,4 +494,33 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
       ) : null}
     </div>
   );
+}
+
+const assignmentStatus: Record<string, string> = {
+  missed: "Não realizado no prazo",
+  deferred: "Adiado por decisão familiar",
+  invalidated: "Escala alterada; atribuição preservada no histórico",
+  counted: "Contagem registrada",
+  active: "Designado",
+};
+
+export function BalanceAssignmentHistory({ patientId }: { patientId: string }) {
+  const { data, error, reload } = useBalanceWorkspace(patientId);
+  const format = (value: string) => formatZonedDate(value, data?.regime?.timezone);
+  if (error) return <Notice error>{error} <ActionButton onClick={reload}>Tentar novamente</ActionButton></Notice>;
+  if (!data) return <LoadingIndicator label="Consultando atribuições de balanço" />;
+  return <>
+    <details className="ui-card">
+      <summary>Atribuições e atrasos históricos</summary>
+      {data.assignments.length ? data.assignments.map(assignment => <p key={assignment.id}>
+        {assignment.professional_name} · {format(assignment.starts_at)} → {format(assignment.ends_at)} · {assignmentStatus[assignment.status] ?? "Atribuição registrada"}
+      </p>) : <p>Nenhuma atribuição registrada.</p>}
+    </details>
+    <details className="ui-card">
+      <summary>Eventos auditáveis</summary>
+      {data.events.length ? data.events.map(event => <p key={event.id}>
+        {format(event.created_at)} · {documentEventLabel(event.action)} · {event.reason}
+      </p>) : <p>Nenhum evento registrado.</p>}
+    </details>
+  </>;
 }

@@ -9,7 +9,8 @@ export function useHistoryReturn() {
   const fallback = "/historico" + (patientId ? "?careRecipientId=" + patientId : "");
   const path = safeReturnPath(params.get("returnTo"), "https://history.invalid");
   const url = new URL(path, "https://history.invalid");
-  if (url.pathname !== "/historico" || !patientId || url.searchParams.has("careRecipientId") && url.searchParams.get("careRecipientId") !== patientId) return fallback;
+  const balanceHistory = url.pathname === "/balancos" && url.searchParams.get("view") === "history";
+  if ((!balanceHistory && url.pathname !== "/historico") || !patientId || url.searchParams.has("careRecipientId") && url.searchParams.get("careRecipientId") !== patientId) return fallback;
   url.searchParams.set("careRecipientId", patientId);
   return url.pathname + url.search;
 }

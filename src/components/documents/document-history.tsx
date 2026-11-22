@@ -34,7 +34,8 @@ const historyFilters = historyStatusLabels;
 export function DocumentRow({ row }: { row: DocumentSummary; }) {
   const { value: context } = useWorkspaceState();
   const pathname = usePathname(), params = useSearchParams();
-  const returnTo = pathname === "/historico" ? "?returnTo=" + encodeURIComponent(pathname + (params.size ? "?" + params.toString() : "")) : "";
+  const fromHistory = pathname === "/historico" || pathname === "/balancos" && params.get("view") === "history";
+  const returnTo = fromHistory ? "?returnTo=" + encodeURIComponent(pathname + (params.size ? "?" + params.toString() : "")) : "";
   return (
     <Link
       className="av-record"
@@ -59,24 +60,11 @@ export function DocumentRow({ row }: { row: DocumentSummary; }) {
   );
 }
 export function DocumentHistory() {
-  const params = useSearchParams();
   return (
     <Workspace title="Histórico de fichas">
       {(context) =>
         context.patient ? (
-          <HistoryContent
-            key={context.patient.id}
-            context={context}
-            initial={{
-              ...empty,
-              type: params.get("type") ?? "",
-              status: params.get("status") ?? "",
-              search: params.get("search") ?? "",
-              from: params.get("from") ?? "",
-              to: params.get("to") ?? "",
-            }}
-            initialPage={Math.max(1, Number(params.get("page")) || 1)}
-          />
+          <HistoryContent key={context.patient.id} context={context} />
         ) : (
           <Notice>Selecione um paciente para consultar o histórico.</Notice>
         )
@@ -84,29 +72,34 @@ export function DocumentHistory() {
     </Workspace>
   );
 }
-function HistoryContent({
+export function HistoryContent({
   context,
-  initial,
-  initialPage,
+  balanceOnly = false,
 }: {
   context: WorkspaceContext;
-  initial: Filters;
-  initialPage: number;
+  balanceOnly?: boolean;
 }) {
-  const router = useRouter();
-  const filters = initial;
-  const [draft, setDraft] = useState(initial);
+  const router = useRouter(), params = useSearchParams();
+  const filters: Filters = {
+    type: balanceOnly ? "BAL" : params.get("type") ?? "",
+    status: params.get("status") ?? "",
+    search: params.get("search") ?? "",
+    from: params.get("from") ?? "",
+    to: params.get("to") ?? "",
+  };
+  const defaults = balanceOnly ? { ...empty, type: "BAL" } : empty;
+  const page = Math.max(1, Number(params.get("page")) || 1);
+  const [draft, setDraft] = useState(filters);
   const [showFilters, setShowFilters] = useState(
-    Object.values(initial).some(Boolean),
+    Object.entries(filters).some(([key, value]) => value && (!balanceOnly || key !== "type")),
   );
-  const queryKey = JSON.stringify([initial, initialPage]);
+  const queryKey = JSON.stringify([filters, page]);
   const [previousQuery, setPreviousQuery] = useState(queryKey);
   if (previousQuery !== queryKey) {
     // Back/forward restores the query without replacing the focused form.
     setPreviousQuery(queryKey);
-    setDraft(initial);
+    setDraft(filters);
   }
-  const page = initialPage;
   const liveRevision = useLiveRevision();
   const patientId = context.patient!.id;
   const decode = useCallback((value: unknown) => parseDocumentListRead(value, {
@@ -126,13 +119,17 @@ function HistoryContent({
       return;
     }
     const query = new URLSearchParams({ careRecipientId: context.patient!.id });
-    for (const [key, value] of Object.entries(next)) if (value) query.set(key, value);
+    for (const [key, value] of Object.entries(next)) if (value && (!balanceOnly || key !== "type")) query.set(key, value);
+    if (balanceOnly) {
+      query.set("view", "history");
+      for (const [key, value] of params) if (key.startsWith("scheduleHistory")) query.set(key, value);
+    }
     if (nextPage > 1) query.set("page", String(nextPage));
-    router.push("/historico?" + query, { scroll: false });
+    router.push((balanceOnly ? "/balancos?" : "/historico?") + query, { scroll: false });
   };
   const setPage = (value: number) => navigate(filters, value);
   const setFilters = (value: Filters) => navigate(value);
-  const active = Object.entries(filters).filter(([, value]) => value).map(([key, value]) => ({ key, ...historyFilterPresentation(key, value) }));
+  const active = Object.entries(filters).filter(([key, value]) => value && (!balanceOnly || key !== "type")).map(([key, value]) => ({ key, ...historyFilterPresentation(key, value) }));
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setShowFilters(false);
@@ -148,11 +145,11 @@ function HistoryContent({
         <button className="btn history-filter-toggle" type="button" onClick={() => setShowFilters(current => !current)} aria-expanded={showFilters} aria-controls="history-filters"><Icon name="sliders" />Filtros{filterCount ? <span className="badge badge-neutral">{filterCount}</span> : null}</button>
       </div>
       {showFilters ? <div id="history-filters" className="history-filter-fields"><div className="form-grid">
-        <label className="field">Tipo de ficha<select className="input" aria-label="Tipo de ficha" value={draft.type} onChange={event => setDraft({ ...draft, type: event.target.value })}><option value="">Todas autorizadas</option>{context.patient?.capabilities?.["ent.read"] ? <option value="DEV">DEV · Devolução de materiais</option> : null}{Object.entries(documentLabels).filter(([type]) => context.patient?.capabilities?.[type.toLowerCase() + ".read"]).map(([type, label]) => <option key={type} value={type}>{type} · {label}</option>)}</select></label>
+        {!balanceOnly ? <label className="field">Tipo de ficha<select className="input" aria-label="Tipo de ficha" value={draft.type} onChange={event => setDraft({ ...draft, type: event.target.value })}><option value="">Todas autorizadas</option>{context.patient?.capabilities?.["ent.read"] ? <option value="DEV">DEV · Devolução de materiais</option> : null}{Object.entries(documentLabels).filter(([type]) => context.patient?.capabilities?.[type.toLowerCase() + ".read"]).map(([type, label]) => <option key={type} value={type}>{type} · {label}</option>)}</select></label> : null}
         <label className="field">Situação<select className="input" aria-label="Situação" value={draft.status} onChange={event => setDraft({ ...draft, status: event.target.value })}><option value="">Todas</option>{Object.entries(historyFilters).map(([status, label]) => <option key={status} value={status}>{label}</option>)}</select></label>
         <label className="field">De<input className="input" type="date" value={draft.from} onChange={event => setDraft({ ...draft, from: event.target.value })} /></label>
         <label className="field">Até<input className="input" type="date" value={draft.to} min={draft.from} onChange={event => setDraft({ ...draft, to: event.target.value })} /></label>
-      </div><div className="filter-actions"><button className="btn btn-ghost" type="button" onClick={() => { setFilters(empty); setDraft(empty); setPreviousVisible(false); }}>Limpar filtros</button><button className="btn btn-primary" type="submit">Aplicar filtros</button></div></div> : null}
+      </div><div className="filter-actions"><button className="btn btn-ghost" type="button" onClick={() => { setFilters(defaults); setDraft(defaults); setPreviousVisible(false); }}>Limpar filtros</button><button className="btn btn-primary" type="submit">Aplicar filtros</button></div></div> : null}
     </form>
     <p className="sr-only" role="status">{active.length ? "Filtros ativos: " + active.map(item => item.text).join(". ") + "." : "Nenhum filtro ativo."}</p>
     {active.length ? <div className="filter-chips" aria-label="Filtros ativos" role="group">{active.map(({ key, text, removeLabel }) => <button key={key} className="filter-chip" type="button" aria-label={removeLabel} onClick={() => { setFilters({ ...filters, [key]: "" }); setDraft({ ...draft, [key]: "" }); setPreviousVisible(false); }}>{text}<Icon name="close" width={12} height={12} /></button>)}</div> : null}</section>

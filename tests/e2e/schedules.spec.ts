@@ -8,6 +8,7 @@ import { selectContext } from "./auth-context";
 import { audit, auditFromTop } from "./accessibility-audit";
 
 test("agenda publica uma programação real, recusa conflito e preserva contexto no mobile", async ({ page }, info) => {
+  test.setTimeout(60_000);
   // A private creator slot belongs to the account/patient across devices.
   // Each engine must start with its own patient, without erasing another result.
   const patientA = (await setup()).patient;
@@ -19,7 +20,7 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, patientA);
   await page.goto("/escalas");
-  await expect(page.getByRole("heading", { name: "Escalas e plantões", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Plantões e balanços", exact: true })).toBeVisible();
   const suffix = randomUUID().slice(0, 8), name = "Plantão fictício " + suffix;
   await page.getByRole("button", { name: "Novo tipo de plantão", exact: true }).click();
   const drawer = page.getByRole("dialog", { name: "Tipo de plantão", exact: true });

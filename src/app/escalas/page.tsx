@@ -1,3 +1,3 @@
 import { AuthenticatedPage } from "@/components/authenticated-page";
-import { ScheduleConsole } from "@/components/schedules/schedule-console";
-export default function Page() { return <AuthenticatedPage><ScheduleConsole /></AuthenticatedPage>; }
+import { ShiftBalanceHub } from "@/components/schedules/shift-balance-hub";
+export default function Page() { return <AuthenticatedPage><ShiftBalanceHub entry="shifts" /></AuthenticatedPage>; }

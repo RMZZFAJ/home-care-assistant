@@ -450,6 +450,9 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 
 .hca-stock-console { overflow-wrap: anywhere; }
 .hca-stock-ledger { display: grid; gap: 8px; margin-top: 14px; }
+.hca-shift-hub-nav { display: flex; gap: clamp(12px, 5vw, 24px); border-bottom: 1px solid var(--hca-line); }
+.hca-shift-hub-nav a { min-height: 44px; display: inline-flex; align-items: center; padding-inline: 4px; border-bottom: 3px solid transparent; color: var(--hca-muted); font-size: 14px; font-weight: 650; }
+.hca-shift-hub-nav a[aria-current=page] { border-bottom-color: var(--hca-teal); color: var(--hca-teal); }
 .hca-stock-act { border: 1px solid var(--hca-line); border-radius: 13px; background: white; }
 .hca-stock-act > summary { list-style: none; display: grid; grid-template-columns: 36px minmax(0, 1fr) 17px; align-items: center; gap: 10px; padding: 12px; cursor: pointer; border-radius: inherit; }
 .hca-stock-act > summary::-webkit-details-marker { display: none; }

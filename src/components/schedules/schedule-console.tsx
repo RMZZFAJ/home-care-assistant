@@ -19,7 +19,6 @@ import { NotificationReference } from "@/components/notifications/notification-r
 import {
   can,
   Notice,
-  Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
 import { useLiveRevision } from "@/lib/use-live-revision";
@@ -48,26 +47,7 @@ const stateLabels: Record<string, string> = {
   obsolete: "Obsoleto",
 };
 import { ScheduleShift } from "./schedule-shift";
-import { ScheduleHistory } from "./schedule-history";
-export function ScheduleConsole() {
-  return (
-    <Workspace title="Escalas e plantões">
-      {(context) =>
-        context.patient ? (
-          <PatientSchedule
-            key={context.userId + ":" + context.patient.id}
-            context={context}
-          />
-        ) : (
-          <Notice error>
-            Selecione um vínculo com permissão para consultar escalas.
-          </Notice>
-        )
-      }
-    </Workspace>
-  );
-}
-function PatientSchedule({ context }: { context: WorkspaceContext }) {
+export function PatientSchedule({ context }: { context: WorkspaceContext }) {
   const [creationMessage, setCreationMessage] = useState("");
   const [privateRefresh, setPrivateRefresh] = useState(0);
   const ownSummaryRef = useRef<HTMLElement>(null);
@@ -627,7 +607,6 @@ function Agenda({
                 </div>
               ))}
           </details>
-          <ScheduleHistory patientId={patient.id} readerId={context.userId} />
         </>
       ) : null}
     </div>
