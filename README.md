@@ -11,10 +11,12 @@ clínica.
 
 ## Estado e documentação
 
-**D-B em validação na [PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7).**
-A PR está em rascunho na branch `feat/phase-d-implementation`. O
-[fechamento da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne a execução A–D,
-as evidências e a fila de continuidade. Produção permanece NO-GO.
+**L3 em execução na branch `feat/phase-d-continuation`.** A
+[PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7) foi incorporada
+a `master`. Seu [registro de fechamento](docs/audits/FECHAMENTO_PR7.md)
+reúne a execução A–D, as evidências e a fila de continuidade. L3 segue o
+[comando mestre v4](HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e o
+[laboratório aprovado](hca-laboratorio-03-v4-aprovado.html).
 
 - [Acompanhamento principal e sequência restante](TEMP_D_B_ATUALIZACAO.md).
 - [Execução dos lotes L1 a L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).

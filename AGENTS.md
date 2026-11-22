@@ -41,7 +41,9 @@ E01–E03 e padrões compartilhados seguem a revisão posterior L1: laboratório
 mais comentários v3, conforme HCA_L1_LOTE_CODEX_E01_E03.md. O HTML antecede os
 comentários. Materiais reúne o acompanhamento; identificação técnica fica em Mais.
 E04–E06 seguem hca-laboratorio-02-v7.html e HCA_L2_COMANDO_MESTRE_CODEX_V7.md.
-O comando mestre delimita as mudanças sobre L1. Atualize o registro de execução
+E07–E09 seguem hca-laboratorio-03-v4-aprovado.html e
+HCA_L3_COMANDO_MESTRE_CODEX_V4.md. Os comandos mestres delimitam as mudanças
+sobre os lotes anteriores. Atualize o registro de execução
 em docs/audits/D/D-B/LOTES_EXECUCAO.md nos fechamentos relevantes dos lotes.
 Não misturar estilos, usar tema pronto ou apenas recobrir componentes Fluent.
 Usar componentes reutilizáveis coerentes com o modelo; criar os ausentes sem

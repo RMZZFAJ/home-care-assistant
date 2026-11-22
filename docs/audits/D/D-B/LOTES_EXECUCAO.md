@@ -1756,7 +1756,14 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 
 ### L3 e L4
 
-Nenhuma migration atribuída.
+| Migration de L3 | Local | Remoto |
+| --- | --- | --- |
+| `20261122180206_l3_document_attachment_attempts` | Aplicada | Pendente |
+
+Local em 321 versões, após aplicação sem reset. Remoto em 320 versões, com
+`20261121202419` como a última aplicada.
+
+L4 aguarda definição.
 
 ## Triagem dos avisos de 19/11/2026
 
@@ -2095,7 +2102,8 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   autorizados abrem em painel e revalidam o acesso. O resultado público
   omite identificadores internos. A indisponibilidade da política de confiança
   preserva a consulta do registro e a comparação de bytes já concluídas.
-  Ainda faltam o acervo, a anexação e verificações dos outros estados.
+  A retentativa da anexação permanece no modal. Ainda faltam a atualização
+  do acervo e verificações dos outros estados.
 
 ### Verificação pública
 
@@ -2113,8 +2121,26 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   Chromium corrigida antes da última rodada. Passaram 12 testes do
   verificador e do contrato de dados.
 
-A primeira alteração de E09 usa o esquema existente. As migrations dos
-contratos restantes serão identificadas aqui por ambiente após validação.
+### Anexos da ficha
+
+- Ao fechar o modal, a próxima abertura começa com uma seleção vazia. O
+  acervo mostra os arquivos confirmados. A reserva incompleta pode ser
+  encerrada tecnicamente quando a consulta prova que o envio não começou.
+- A resposta perdida pode ser recuperada no mesmo modal. Ao recarregar
+  a ficha, uma consulta técnica confirma o arquivo já armazenado, quando
+  o hash e a autorização conferem.
+- Duas sessões da mesma pessoa submetendo o mesmo original à mesma
+  ficha usam uma única reserva. Uma nova seleção pode usar outro nome
+  e outra chave, preservando os bytes e a identidade do anexo anterior.
+- Passaram 11 testes de integração com Auth e Storage reais, três testes
+  unitários de anexação e nove casos Chromium em duas rodadas dirigidas.
+  A primeira rodada teve um erro de leitura do corpo multipart no teste
+  de nova seleção. A repetição verificou a chave oficial da reserva.
+
+A consulta pública de E09 usa o esquema existente. A anexação usa a primeira
+migration de L3, registrada na seção de migrations por ambiente. Ela guarda
+o vínculo entre tentativas da mesma pessoa e os bytes já submetidos à mesma
+ficha. A seleção incompleta fica no modal, com recuperação técnica separada.
 
 ## L4
 

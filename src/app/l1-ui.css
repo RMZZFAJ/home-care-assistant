@@ -43,6 +43,35 @@
 .hca-l1 .doc-pdf-icon[data-file-kind=PDF] { color: #a64450; border-color: #efdde0; background: #fcf3f4; }
 .hca-l1 .doc-pdf-icon[data-file-kind=IMG] { color: #39774e; background: #edf6eb; }
 .hca-l1 .doc-pdf-icon[data-file-kind=DOC] { color: #286699; background: #edf3fa; }
+.hca-l1 .hca-attachment-picker {
+  position: relative;
+  display: flex;
+  min-height: 156px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 17px;
+  border: 1px dashed #8db49d;
+  border-radius: 12px;
+  background: #f4f9f5;
+  color: #365848;
+  text-align: center;
+}
+.hca-l1 .hca-attachment-picker[data-selected=true] {
+  min-height: 64px;
+  flex-direction: row;
+  justify-content: flex-start;
+  border-style: solid;
+  padding: 10px 12px;
+  text-align: left;
+}
+.hca-l1 .hca-attachment-picker[data-selected=true] > span:not(.doc-pdf-icon) { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.hca-l1 .hca-attachment-picker svg { flex: none; }
+.hca-l1 .hca-attachment-picker small { display: block; color: var(--hca-muted); }
+.hca-l1 .hca-attachment-picker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.hca-l1 .hca-attachment-picker:focus-within { outline: 2px solid var(--hca-teal); outline-offset: 2px; }
+.hca-l1 .hca-attachment-destination { display: flex; align-items: center; gap: 7px; color: var(--hca-muted); }
 .hca-l1 .doc-file-list .doc-help-details p { overflow-wrap: anywhere; }
 .hca-l1 .doc-footnote { display: flex; align-items: flex-start; gap: 7px; color: var(--hca-muted); font-size: 11px; }
 .hca-l1 .doc-footnote svg { flex: none; margin-top: 2px; }
