@@ -1,0 +1,26 @@
+{
+  "recordedAt": "2026-11-08T21:58:47.221Z",
+  "sha": "827531e29b2816126f8fd82b06dbdba4d64fa3c7",
+  "runId": 42527354257,
+  "jobs": [
+    {
+      "name": "validate (ubuntu-latest)",
+      "id": 128873904580,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "database",
+      "id": 128873904812,
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "name": "validate (windows-latest)",
+      "id": 128873904839,
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "qualification": "Bounded observation: remaining jobs not approved. Does not validate the new drawer changes."
+}

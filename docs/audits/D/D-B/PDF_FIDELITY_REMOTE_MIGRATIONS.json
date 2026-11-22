@@ -1,0 +1,127 @@
+{
+  "status": "APPLIED_AND_POST_VALIDATED_WITH_OPERATIONAL_ACTIVITY_QUALIFIED",
+  "at": "2026-11-08T10:41:59.346Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": 151,
+  "after": 152,
+  "applied": 1,
+  "pending": 0,
+  "historySqlMatched": 152,
+  "catalogueComparison": {
+    "views": true,
+    "columns": true,
+    "indexes": true,
+    "defaults": true,
+    "policies": true,
+    "triggers": true,
+    "functions": true,
+    "relations": true,
+    "constraints": false,
+    "table_grants": true,
+    "function_grants": true
+  },
+  "constraintQualification": "Only the known local presentation_finite_factor validation flag differs; remote retains the exact validated predicate",
+  "preservation": {
+    "originalTableProjections": 151,
+    "all151TablesByteEqual": false,
+    "businessAndCustodyStableDigestsMatched": true,
+    "otherStableTables": 149,
+    "qualifiedOperationalTables": [
+      "private.operations_history",
+      "private.operations_incidents"
+    ],
+    "operationalQualification": "PDF_FIDELITY_REMOTE_ACTIVITY.json",
+    "unexpectedOtherChanges": [],
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_history",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "authUsersAtFirstPost": 9,
+    "profilesAtFirstPost": 7,
+    "storageObjectsAtFirstPost": 33,
+    "cronDigestUnchanged": true,
+    "vaultDigestUnchanged": true,
+    "firstPostRefusalPreserved": true
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0
+  },
+  "security": {
+    "functions": [
+      {
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "freeze_pdf_fidelity_facts",
+        "schema": "private",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": false,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "freeze_pdf_source_facts",
+        "schema": "private",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "reserve_pdf_issuance",
+        "schema": "public",
+        "service": false
+      },
+      {
+        "anon": false,
+        "authenticated": true,
+        "config": [
+          "search_path=\"\""
+        ],
+        "definer": true,
+        "name": "reserve_pdf_issuance_v7",
+        "schema": "public",
+        "service": false
+      }
+    ],
+    "legacy_default": "6",
+    "marker": {
+      "protocol": 1,
+      "schema": 1
+    },
+    "new_revision_rows": 0
+  },
+  "anonymousNewRpcDenied": {
+    "http": 401,
+    "code": "42501"
+  },
+  "runtimeMarker": {
+    "http": 200,
+    "protocol": 1,
+    "schema": 1
+  },
+  "legacyDefault6": true,
+  "newRpcCreates7OnlyOnExplicitNewConsumer": true,
+  "oldIntentionAndReadyBytesUnchanged": true,
+  "noStoragePolicyChanges": true,
+  "noReset": true,
+  "noRemoteFixtureOrAuthCreated": true,
+  "noExternalTransportActivation": true,
+  "operationalGo": false,
+  "newSourceCi": "NOT_PUBLISHED_YET"
+}

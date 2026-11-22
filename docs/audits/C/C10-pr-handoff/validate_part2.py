@@ -17,13 +17,40 @@ OUT = Path(__file__).resolve().parent
 NEW_FOLDERS = ["C7-decision-closure","C8-visual-blueprint","C9-acceptance-refinement","C10-pr-handoff"]
 
 
+def root_path(value):
+    path = Path(value).resolve()
+    if not path.is_relative_to(ROOT):
+        raise ValueError("Validation input must remain inside the repository")
+    return path
+
+
+def markdown_hrefs(body):
+    """Scan inline link destinations once; malformed labels cannot backtrack."""
+    cursor = 0
+    while True:
+        marker = body.find("](", cursor)
+        if marker < 0:
+            return
+        label = body.rfind("[", cursor, marker)
+        if label < 0:
+            cursor = marker + 2
+            continue
+        closing = body.find(")", marker + 2)
+        if closing < 0:
+            return
+        destination = body[marker + 2:closing]
+        if destination and not destination[0].isspace():
+            yield destination.split(maxsplit=1)[0]
+        cursor = closing + 1
+
+
 def read(path):
-    with path.open(encoding="utf-8-sig",newline="") as stream:
+    with root_path(path).open(encoding="utf-8-sig",newline="") as stream:
         return list(csv.DictReader(stream))
 
 
 def digest(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return hashlib.sha256(root_path(path).read_bytes()).hexdigest()
 
 
 def git(*args):
@@ -32,11 +59,11 @@ def git(*args):
 
 def targets():
     changed = git("diff","--name-only","HEAD").splitlines()
-    paths = {ROOT/p for p in changed if (ROOT/p).is_file() and (p == "README.md" or p.startswith("docs/"))}
+    paths = {root_path(ROOT/p) for p in changed if root_path(ROOT/p).is_file() and (p == "README.md" or p.startswith("docs/"))}
     paths |= {p for folder in NEW_FOLDERS for p in (BASE/folder).rglob("*") if p.is_file() and "__pycache__" not in str(p)}
     # After commit, preserve the complete set of changed living files too.
     baseline = json.loads((OUT/"evidence/BASELINE.json").read_text(encoding="utf-8"))
-    paths |= {ROOT/p for p,h in baseline["tracked_worktree_sha256"].items() if (ROOT/p).is_file() and digest(ROOT/p)!=h and (p == "README.md" or p.startswith("docs/"))}
+    paths |= {root_path(ROOT/p) for p,h in baseline["tracked_worktree_sha256"].items() if root_path(ROOT/p).is_file() and digest(ROOT/p)!=h and (p == "README.md" or p.startswith("docs/"))}
     return paths
 
 
@@ -159,8 +186,8 @@ def main():
     link_errors=[]
     for path in sorted(p for p in files if p.suffix==".md"):
         body=path.read_text(encoding="utf-8")
-        for match in re.finditer(r"\[[^\]]*\]\(([^\s)]+)(?:\s+[^)]*)?\)",body):
-            href=match[1].strip("<>")
+        for destination in markdown_hrefs(body):
+            href=destination.strip("<>")
             if re.match(r"(?:https?://|mailto:|#)",href):continue
             location=unquote(href.split("#",1)[0])
             target=(path.parent/location).resolve()

@@ -1,0 +1,79 @@
+{
+  "at": "2026-11-08T19:12:26.111Z",
+  "sha": "f0840dcf3be5fb05ce9cd39fc6e1cd84713edf01",
+  "runId": 42506037367,
+  "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42506037367",
+  "jobs": [
+    {
+      "id": 128808775542,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128808775759,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128808775833,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128812616669,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 128812616672,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128812616678,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 128812616697,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 128821412412,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "status": "FAILED_NOT_APPROVED",
+  "findings": [
+    {
+      "surface": "requisition-observation",
+      "state": "Old consumer advanced twice after a draft now correctly resumes at Higiene; update the consumer assertion, preserve exact decimal and ledger checks."
+    },
+    {
+      "surface": "keyboard entry",
+      "state": "Focus attempt during the deliberate inert runtime barrier; wait for an interactive landmark, then retain visible-origin, Tab, trap and hidden-stop assertions."
+    },
+    {
+      "surface": "public verification",
+      "state": "CI first attempt truncated formatted input and retry passed. A stronger focus check reproduced a real WebKit failure locally. Result focus now follows DOM commit instead of a racing animation frame; public code shape and integrity rules unchanged."
+    }
+  ],
+  "artifact": {
+    "name": "browser-test-report-chromium",
+    "id": 13627879284,
+    "sha256": "76ea8969bd791c7779b6d826b9899d5ada2d2de6e194d41d51fdb29fe0840f64",
+    "preservedLocally": true,
+    "rawCredentialsOrPayloadPromoted": false
+  },
+  "newSourceCi": "Requires its own published SHA; directed local passes do not turn this run green."
+}

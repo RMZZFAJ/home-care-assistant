@@ -1,0 +1,727 @@
+import { confirmDecisionAndReconcile } from "./l1-decision-policy";
+import { selectDocumentSection, openDocumentMore } from "./document-sections";
+import { generatedPdf } from "./generated-pdf";
+import { expect, test, type Page } from "@playwright/test";
+import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import {
+  fixtureFile,
+  sql,
+  sqlLiteral,
+} from "../../scripts/test-environment.mjs";
+import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { selectContext } from "./auth-context";
+import { audit } from "./accessibility-audit";
+import type { SupplyDocument } from "../../src/types/documents";
+
+async function login(
+  page: Page,
+  patient: string,
+  role: "adminA" | "professional",
+) {
+  const identities = JSON.parse(readFileSync(fixtureFile, "utf8"));
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(identities[role].email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Visão geral", exact: true }),
+  ).toBeVisible();
+  await selectContext(page, patient);
+}
+async function prepared({ request = false, partial = false } = {}) {
+  const f = await setup(),
+    professional = await actor("professional", f.patient);
+  let document = (await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient,
+    p_type: "ENT",
+    p_payload: {
+      recipientReason: "Escolha manual fictícia para este recebimento",
+      source: "FAMILY",
+      destination: "CARE_TEAM",
+      recipientId: fixtures.professional.id,
+      lines: [{ productId: f.products[0], quantity: partial ? "3" : "2" }],
+    },
+    p_key: randomUUID(),
+    p_draft: false,
+  })) as SupplyDocument;
+  document = (await rpc(professional, "supply_document_command", {
+    p_id: document.id,
+    p_action: "receive",
+    p_body: {
+      divergences: partial
+        ? [{ lineId: document.lines[0].id, acceptedQuantity: "2" }]
+        : [],
+    },
+    p_key: randomUUID(),
+    p_version: document.version,
+  })) as SupplyDocument;
+  const consumption = await consume({ ...f, professional });
+  if (request)
+    document = (await rpc(f.admin, "supply_document_command", {
+      p_id: document.id,
+      p_action: "cancel",
+      p_body: { reason: "Pedido fictício original da família" },
+      p_key: randomUUID(),
+      p_version: document.version,
+    })) as SupplyDocument;
+  return { ...f, professional, document, consumption };
+}
+async function consume(f: {
+  patient: string;
+  products: string[];
+  professional: Awaited<ReturnType<typeof actor>>;
+  admin: Awaited<ReturnType<typeof actor>>;
+}) {
+  const id = await rpc(f.professional, "report_extraordinary_consumption", {
+    p_patient: f.patient,
+    p_kind: "consumption",
+    p_location: "CARE_TEAM",
+    p_text: "Consumo fictício confirmado para conciliação ENT",
+    p_lines: [{ productId: f.products[0], quantity: "1" }],
+    p_key: randomUUID(),
+  });
+  await rpc(f.admin, "decide_consumption_report", {
+    p_id: id,
+    p_accept: true,
+    p_reason: null,
+    p_key: randomUUID(),
+    p_version: 1,
+  });
+  return id;
+}
+const editor = (page: Page) =>
+  page.locator("form").filter({
+    has: page.getByRole("button", { name: "Revisar operação", exact: true }),
+  });
+const cancellation = (page: Page) =>
+  page.getByRole("region", { name: "Cancelamento da entrega", exact: true });
+const requestDialog = (page: Page) => page.getByRole("dialog", { name: "Solicitar cancelamento", exact: true });
+const decisionDialog = (page: Page) => page.getByRole("dialog", { name: "Analisar pedido de cancelamento", exact: true });
+const withdrawalDialog = (page: Page) => page.getByRole("dialog", { name: "Retirar pedido de cancelamento", exact: true });
+const returnField = (page: Page) =>
+  decisionDialog(page).getByRole("textbox", {
+    name: "Quantidade fisicamente devolvida · Material fictício V4 0",
+    exact: true,
+  });
+const physicalCheck = (page: Page) => decisionDialog(page).getByRole("switch", {
+  name: "Conferi a devolução física e as referências de consumo", exact: true,
+});
+const consentButton = (page: Page) => decisionDialog(page).getByRole("button", {
+  name: "Consentir e registrar devolução", exact: true,
+});
+async function closeStatus(page: Page, title: string) {
+  const status = page.getByRole("dialog", { name: title, exact: true });
+  await status.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(status).toHaveCount(0);
+}
+const ledger = (patient: string) =>
+  sql(
+    `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)};`,
+  );
+async function review(page: Page) {
+  await editor(page)
+    .getByRole("button", { name: "Revisar operação", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Revisar operação definitiva",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator("input,textarea,select")).toHaveCount(0);
+  return dialog;
+}
+
+test("ENT pede cancelamento sem estorno e o recebedor concilia devolução real com consumo em leitura, recuperando uma única decisão", async ({
+  page,
+  browser,
+}, info) => {
+  test.setTimeout(150_000);
+  const f = await prepared(),
+    before = ledger(f.patient);
+  await login(page, f.patient, "adminA");
+  await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
+  await openDocumentMore(page);
+  await page
+    .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
+    .click();
+  const requestReview = requestDialog(page);
+  await expect(requestReview.getByText("Consumo confirmado disponível", { exact: true })).toBeVisible();
+  await expect(requestReview.getByText("1 unidade", { exact: true })).toHaveCount(2);
+  if (info.project.use.hasTouch) await info.attach("Solicitação após recebimento", {
+    contentType: "image/png", body: await page.screenshot({ animations: "disabled", scale: "css" }),
+  });
+  await requestReview
+    .getByRole("textbox", { name: "Motivo do pedido de cancelamento", exact: true })
+    .fill("Pedido fictício: conciliar o material já recebido");
+  const requestPayloads: unknown[] = [];
+  await page.route("**/api/documents/" + f.document.id + "/decisions", async (route) => {
+    if (route.request().method() !== "POST") {
+      await route.continue();
+      return;
+    }
+    requestPayloads.push(route.request().postDataJSON());
+    if (requestPayloads.length === 1) {
+      await route.fetch();
+      await route.abort("failed");
+    } else await route.continue();
+  });
+  await confirmDecisionAndReconcile(page, f.document.id, requestReview.getByRole("button", { name: "Enviar pedido", exact: true }));
+  await expect(requestReview).toHaveCount(0);
+  await page.unroute("**/api/documents/" + f.document.id + "/decisions");
+  expect(requestPayloads).toHaveLength(1);
+  expect(ledger(f.patient)).toBe(before);
+  const pendingStatus = page.getByRole("dialog", { name: "Aguardando decisão do recebedor", exact: true });
+  await expect(pendingStatus).toContainText("Estoque preservado");
+  await closeStatus(page, "Aguardando decisão do recebedor");
+  await expect(
+    cancellation(page).getByRole("heading", {
+      name: "Pedido de cancelamento vigente",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Analisar pedido de cancelamento",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  const pending = (await rpc(f.admin, "operational_document", {
+    p_id: f.document.id,
+  })) as SupplyDocument;
+  const pendingPdf = await generatedPdf(
+    page,
+    `/api/documents/${pending.id}/pdf`,
+  );
+  expect(pendingPdf.ok()).toBe(true);
+  if (info.project.name === "chromium") {
+    mkdirSync("output/pdf/phase-d", { recursive: true });
+    writeFileSync(
+      `output/pdf/phase-d/delivery-cancellation-${pending.id}-v${pending.version}-pending.pdf`,
+      await pendingPdf.body(),
+      { flag: "wx" },
+    );
+  }
+  const recipientContext = await browser.newContext(),
+    recipient = await recipientContext.newPage();
+  try {
+    await login(recipient, f.patient, "professional");
+    await recipient.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(recipient, "workflow");
+    await recipient
+      .getByRole("button", {
+        name: "Analisar pedido de cancelamento",
+        exact: true,
+      })
+      .click();
+    const consentReview = decisionDialog(recipient);
+    await expect(returnField(recipient)).toHaveValue("1");
+    const preserved = consentReview.getByRole("region", { name: "Consumo confirmado", exact: true });
+    await expect(preserved).toContainText("1 unidade");
+    await expect(preserved).toContainText("Preservado");
+    await expect(preserved.getByRole("link", { name: "Consultar relato de consumo", exact: true })).toHaveAttribute("href", `/consumo?ref=${f.consumption}`);
+    if (info.project.use.hasTouch) {
+      await recipient.setViewportSize({ width: info.project.name === "ios" ? 412 : 360, height: 844 });
+      await info.attach("E06-11 decisão com consumo confirmado", { body: await recipient.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png" });
+    }
+    await expect(
+      consentReview.locator('input[name$=":consumed"]'),
+    ).toHaveCount(0);
+    await expect(
+      consentReview.getByText(
+        "Pedido fictício: conciliar o material já recebido",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await returnField(recipient).fill("1,0");
+    await consentReview
+      .getByRole("textbox", { name: "Motivo da sua decisão", exact: true })
+      .fill("Uma unidade foi consumida e uma foi fisicamente devolvida");
+    await expect(consentButton(recipient)).toBeDisabled();
+    await physicalCheck(recipient).check();
+    await expect(
+      consentReview.getByText("Consumo a referenciar: 1 unidade", {
+        exact: false,
+      }),
+    ).toBeVisible();
+    for (const width of [1440, 768, 390, 320]) {
+      await recipient.setViewportSize({ width, height: 900 });
+      await audit(recipient, "ENT cancellation review " + width);
+      const back = await consentReview.getByRole("button", { name: "Voltar à ficha", exact: true }).boundingBox();
+      const confirm = await consentButton(recipient).boundingBox();
+      expect(back).not.toBeNull();
+      expect(confirm).not.toBeNull();
+      expect(Math.abs(back!.y - confirm!.y)).toBeLessThan(2);
+      expect(
+        await recipient.evaluate(
+          () =>
+            document.documentElement.scrollWidth <=
+            document.documentElement.clientWidth,
+        ),
+      ).toBe(true);
+    }
+    mkdirSync("output/playwright/phase-d", { recursive: true });
+    await recipient.screenshot({
+      path: `output/playwright/phase-d/delivery-cancellation-review-${info.project.name}.png`,
+      animations: "disabled",
+    });
+    const payloads: unknown[] = [];
+    await recipient.route(
+      "**/api/documents/" + f.document.id + "/decisions",
+      async (route) => {
+        if (route.request().method() !== "POST") {
+          await route.continue();
+          return;
+        }
+        payloads.push(route.request().postDataJSON());
+        if (payloads.length === 1) {
+          await route.fetch();
+          await route.abort("failed");
+        } else await route.continue();
+      },
+    );
+    await confirmDecisionAndReconcile(recipient, f.document.id, consentButton(recipient));
+    await expect(consentReview).toHaveCount(0);
+    await closeStatus(recipient, "Ficha cancelada");
+    expect(payloads).toHaveLength(1);
+    await expect(recipient.locator(".hca-document-header [data-document-heading]")).toBeFocused();
+    await expect(
+      cancellation(recipient).getByText("Consentido e conciliado", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    // The other tab keeps its viewed copy until the explicit refresh.
+    await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
+    await expect(
+      cancellation(page).getByText("Consentido e conciliado", { exact: true }),
+    ).toBeVisible();
+    const final = (await rpc(f.professional, "operational_document", {
+      p_id: f.document.id,
+    })) as SupplyDocument;
+    expect(final.status).toBe("cancelled");
+    await expect(
+      recipient.getByText(
+        "Os fatos anteriores permanecem preservados. Consulte as devoluções e o consumo efetivamente conciliados, quando existentes.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    expect(final.deliveryCancellation?.request.outcome?.actorId).toBe(
+      fixtures.professional.id,
+    );
+    expect(Number(final.deliveryCancellation?.lines[0].returnQuantity)).toBe(1);
+    expect(Number(final.deliveryCancellation?.lines[0].consumedQuantity)).toBe(
+      1,
+    );
+    expect(
+      final.deliveryCancellation?.lines[0].consumptionReferences[0].reportId,
+    ).toBe(f.consumption);
+    expect(
+      sql(
+        `select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='consumption';`,
+      ),
+    ).toBe("1");
+    expect(
+      sql(
+        `select count(*) from public.delivery_consumption_allocations where document_id=${sqlLiteral(final.id)};`,
+      ),
+    ).toBe("1");
+    expect(
+      final.events.filter((event) => event.action === "ent.consent_cancel"),
+    ).toHaveLength(1);
+    const finalPdf = await generatedPdf(
+      recipient,
+      `/api/documents/${final.id}/pdf`,
+    );
+    expect(finalPdf.ok()).toBe(true);
+    expect((await finalPdf.body()).equals(await pendingPdf.body())).toBe(false);
+    if (info.project.name === "chromium")
+      writeFileSync(
+        `output/pdf/phase-d/delivery-cancellation-${final.id}-v${final.version}-consented.pdf`,
+        await finalPdf.body(),
+        { flag: "wx" },
+      );
+    await audit(recipient, "ENT cancellation result 320");
+    await recipient.screenshot({
+      path: `output/playwright/phase-d/delivery-cancellation-result-${info.project.name}.png`,
+      fullPage: true,
+      animations: "disabled",
+    });
+  } finally {
+    await recipientContext.close();
+  }
+});
+
+test("ENT recusa do recebedor conflita com retirada antiga, e um novo pedido pode ser retirado preservando os fatos", async ({
+  page,
+  browser,
+}, info) => {
+  test.setTimeout(120_000);
+  const f = await prepared({ request: true }),
+    before = ledger(f.patient),
+    requestId = f.document.deliveryCancellation!.request.id;
+  await login(page, f.patient, "adminA");
+  await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
+  await page
+    .getByRole("button", {
+      name: "Retirar meu pedido de cancelamento",
+      exact: true,
+    })
+    .click();
+  const withdrawal = withdrawalDialog(page);
+  const reason = withdrawal.getByRole("textbox", {
+    name: "Motivo da retirada",
+    exact: true,
+  });
+  await expect(reason).toHaveValue("");
+  await reason.fill("Justificativa própria preservada para retirar o pedido");
+  const recipientContext = await browser.newContext(),
+    recipient = await recipientContext.newPage();
+  try {
+    await login(recipient, f.patient, "professional");
+    await recipient.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(recipient, "workflow");
+    await recipient
+      .getByRole("button", {
+        name: "Analisar pedido de cancelamento",
+        exact: true,
+      })
+      .click();
+    const refusal = decisionDialog(recipient);
+    await refusal.getByRole("combobox", { name: "Sua decisão" }).selectOption("refuse_cancellation");
+    await refusal
+      .getByRole("textbox", { name: "Motivo da sua decisão", exact: true })
+      .fill("Recebedor mantém os materiais e recusa este pedido");
+    await refusal
+      .getByRole("button", { name: "Recusar cancelamento", exact: true })
+      .click();
+    await expect(recipient.locator(".hca-activity-overlay")).toHaveCount(0);
+    await expect(refusal).toHaveCount(0);
+    const refusalResult = recipient.getByRole("dialog", { name: "Cancelamento não autorizado", exact: true });
+    await expect(refusalResult).toContainText("Motivo da recusa");
+    await expect(refusalResult).toContainText("Recebedor mantém os materiais e recusa este pedido");
+    await expect(refusalResult).toContainText("Data da decisão");
+    if (info.project.use.hasTouch) {
+      await recipient.setViewportSize({ width: info.project.name === "ios" ? 412 : 360, height: 844 });
+      await info.attach("E06-11 recusa e autoria", { body: await recipient.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png" });
+    }
+    await closeStatus(recipient, "Cancelamento não autorizado");
+    await withdrawal
+      .getByRole("button", { name: "Retirar pedido", exact: true })
+      .click();
+    await expect(reason).toHaveValue(
+      "Justificativa própria preservada para retirar o pedido",
+    );
+    await expect(
+      withdrawal.getByRole("button", {
+        name: "Retirar pedido",
+        exact: true,
+      }),
+    ).toBeDisabled();
+    await page
+      .getByRole("button", {
+        name: "Consultar pedido e referências atuais",
+        exact: true,
+      })
+      .click();
+    await expect(
+      page.getByText("Pedido atual: Recusado pelo recebedor", { exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", {
+        name: "Mostrar resultado atual do pedido",
+        exact: true,
+      })
+      .click();
+    await closeStatus(page, "Cancelamento não autorizado");
+    await expect(
+      cancellation(page).getByText("Recusado pelo recebedor", { exact: true }),
+    ).toBeVisible();
+    expect(ledger(f.patient)).toBe(before);
+    await openDocumentMore(page);
+    await page
+      .getByRole("menuitem", { name: "Solicitar cancelamento", exact: true })
+      .click();
+    const next = requestDialog(page);
+    await next
+      .getByRole("textbox", { name: "Motivo do pedido de cancelamento", exact: true })
+      .fill("Novo pedido fictício separado da decisão anterior");
+    await next
+      .getByRole("button", { name: "Enviar pedido", exact: true })
+      .click();
+    await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+    await expect(next).toHaveCount(0);
+    await page.getByRole("dialog", { name: "Aguardando decisão do recebedor" })
+      .getByRole("button", {
+        name: "Retirar pedido",
+        exact: true,
+      })
+      .click();
+    // Showing the previous official result ends the short decision. Reopening
+    // starts empty for the new request and cannot inherit the failed intention.
+    await expect(reason).toBeEnabled();
+    await expect(reason).toHaveValue("");
+    await expect(page.getByRole("button", { name: "Continuar rascunho", exact: true })).toHaveCount(0);
+    expect(ledger(f.patient)).toBe(before);
+    await reason.fill("Solicitante retirou somente o pedido novo");
+    await withdrawal
+      .getByRole("button", { name: "Retirar pedido", exact: true })
+      .click();
+    await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+    await expect(withdrawal).toHaveCount(0);
+    await closeStatus(page, "Pedido retirado");
+    await expect(
+      cancellation(page).getByText("Retirado pelo solicitante", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    const result = (await rpc(f.admin, "operational_document", {
+      p_id: f.document.id,
+    })) as SupplyDocument;
+    expect(result.status).toBe("confirmed");
+    expect(result.deliveryCancellation?.request.id).not.toBe(requestId);
+    expect(result.deliveryCancellation?.history[0].status).toBe("refused");
+    expect(result.deliveryCancellation?.history[0].outcome?.actorId).toBe(
+      fixtures.professional.id,
+    );
+    expect(result.deliveryCancellation?.request.outcome?.actorId).toBe(
+      fixtures.adminA.id,
+    );
+    expect(ledger(f.patient)).toBe(before);
+  } finally {
+    await recipientContext.close();
+  }
+});
+
+test("ENT compara nova fonte de consumo na mesma versão, preserva a devolução e exige outra revisão", async ({
+  page,
+}, info) => {
+  // Includes fixture preparation, two official decisions and both reference reads.
+  test.setTimeout(90_000);
+  const f = await prepared({ request: true });
+  await login(page, f.patient, "professional");
+  await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
+  await page
+    .getByRole("button", {
+      name: "Analisar pedido de cancelamento",
+      exact: true,
+    })
+    .click();
+  await returnField(page).fill("1");
+  const reason = decisionDialog(page).getByRole("textbox", { name: "Motivo da sua decisão", exact: true });
+  await reason.fill("Conciliação própria com fonte revisada");
+  await physicalCheck(page).check();
+  await consume(f);
+  const stock = ledger(f.patient),
+    payloads: {
+      key: string;
+      intention: { expectedVersion: number; body: { referenceHash: string } };
+    }[] = [];
+  await page.route("**/api/documents/" + f.document.id + "/decisions", async (route) => {
+    if (route.request().method() === "POST")
+      payloads.push(route.request().postDataJSON());
+    await route.continue();
+  });
+  await consentButton(page).click();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+  await expect(consentButton(page)).toBeDisabled();
+  await page
+    .getByRole("button", {
+      name: "Consultar pedido e referências atuais",
+      exact: true,
+    })
+    .click();
+  const comparison = decisionDialog(page).getByRole("region", { name: "Comparação da conciliação", exact: true });
+  await expect(comparison.getByText("O saldo para retorno mudou.", { exact: true })).toBeVisible();
+  for (const [label, before, after] of [
+    ["Retorno mínimo para conciliar", "1 unidade", "0 unidade"],
+    ["Consumo confirmado disponível", "1 unidade", "2 unidade"],
+  ]) {
+    const fact = comparison.getByText(label, { exact: true }).locator("..");
+    await expect(fact.locator("del")).toHaveText(`Antes: ${before}`);
+    await expect(fact.locator("strong")).toHaveText(`Agora: ${after}`);
+  }
+  expect(payloads).toHaveLength(1);
+  if (info.project.use.hasTouch) await info.attach("E06-12 saldo antes e agora", {
+    body: await comparison.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
+  });
+  await page
+    .getByRole("button", {
+      name: "Usar referência atual e revisar novamente",
+      exact: true,
+    })
+    .click();
+  await expect(returnField(page)).toHaveValue("1");
+  await expect(reason).toHaveValue("Conciliação própria com fonte revisada");
+  await expect(returnField(page)).toBeFocused();
+  await expect(physicalCheck(page)).not.toBeChecked();
+  await returnField(page).fill("0");
+  await expect(
+    decisionDialog(page).getByText("Consumo a referenciar: 2 unidade", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await physicalCheck(page).check();
+  await consentButton(page).click();
+  await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
+  await expect(decisionDialog(page)).toHaveCount(0);
+  await closeStatus(page, "Ficha cancelada");
+  expect(payloads).toHaveLength(2);
+  expect(payloads[0].intention.expectedVersion).toBe(payloads[1].intention.expectedVersion);
+  expect(payloads[0].key).not.toBe(payloads[1].key);
+  expect(payloads[0].intention.body.referenceHash).not.toBe(
+    payloads[1].intention.body.referenceHash,
+  );
+  expect(ledger(f.patient)).toBe(stock);
+  const result = (await rpc(f.professional, "operational_document", {
+    p_id: f.document.id,
+  })) as SupplyDocument;
+  expect(
+    result.deliveryCancellation?.lines[0].consumptionReferences,
+  ).toHaveLength(2);
+  expect(typeof result.deliveryCancellation?.lines[0].returnQuantity).toBe(
+    "string",
+  );
+  expect(Number(result.deliveryCancellation?.lines[0].returnQuantity)).toBe(0);
+  expect(Number(result.deliveryCancellation?.lines[0].consumedQuantity)).toBe(
+    2,
+  );
+});
+
+test("ENT mantém pedido e trânsito parcial até conciliação real, sem oferecer recebimento por administrador alheio", async ({
+  page,
+}) => {
+  const f = await prepared({ request: true, partial: true }),
+    before = ledger(f.patient);
+  await login(page, f.patient, "adminA");
+  await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
+  await expect(
+    page.getByRole("button", {
+      name: "Analisar pedido de cancelamento",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await expect(
+    cancellation(page).getByText("Há material em trânsito sem conciliação.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Conciliar divergência", exact: true })
+    .click();
+  const resolution = editor(page).getByRole("combobox", {
+    name: "Resolução",
+    exact: true,
+  });
+  await expect(resolution.locator('option[value="received"]')).toHaveCount(0);
+  await resolution.selectOption("returned");
+  await editor(page)
+    .getByRole("textbox", {
+      name: "Quantidade conciliada neste ato",
+      exact: true,
+    })
+    .fill("1");
+  await editor(page)
+    .getByRole("textbox", { name: "Motivo / justificativa", exact: true })
+    .fill("Unidade em trânsito retornou fisicamente à custódia de origem");
+  const decision = await review(page);
+  await decision
+    .getByRole("button", { name: "Confirmar operação", exact: true })
+    .click();
+  await expect(decision).toHaveCount(0);
+  await expect(
+    cancellation(page).getByRole("heading", {
+      name: "Pedido de cancelamento vigente",
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(ledger(f.patient)).not.toBe(before);
+  const result = (await rpc(f.admin, "operational_document", {
+    p_id: f.document.id,
+  })) as SupplyDocument;
+  expect(result.status).toBe("cancellation_pending");
+  expect(typeof result.deliveryCancellation?.unresolvedTransit).toBe("string");
+  expect(Number(result.deliveryCancellation?.unresolvedTransit)).toBe(0);
+  expect(result.deliveryCancellation?.request.id).toBe(
+    f.document.deliveryCancellation?.request.id,
+  );
+  expect(Number(result.lines[0].accepted_quantity)).toBe(2);
+  expect(Number(result.lines[0].reconciled_quantity)).toBe(1);
+});
+
+test("ENT atualiza uma fonte indisponível por consulta e comparação, preservando a justificativa própria", async ({
+  page,
+}) => {
+  // The total budget includes cold Auth/database preparation and both source
+  // comparison round trips. Per-action/assertion timeouts remain unchanged.
+  test.setTimeout(90_000);
+  const setupStarted = Date.now();
+  const f = await test.step("Preparar a fonte autorizada", () => prepared({ request: true })),
+    before = ledger(f.patient);
+  test.info().annotations.push({ type: "fixture-ms", description: String(Date.now() - setupStarted) });
+  sql(
+    `insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled) values(${sqlLiteral(f.patient)},'stock.team.read',${sqlLiteral(fixtures.professional.id)},false);`,
+  );
+  await login(page, f.patient, "professional");
+  await page.goto("/fichas/" + f.document.id);
+  await selectDocumentSection(page, "workflow");
+  await expect(
+    cancellation(page).getByText(
+      "As referências de consumo não estão disponíveis para o seu acesso atual.",
+      { exact: false },
+    ),
+  ).toBeVisible();
+  await page
+    .getByRole("button", {
+      name: "Analisar pedido de cancelamento",
+      exact: true,
+    })
+    .click();
+  await expect(consentButton(page)).toBeDisabled();
+  await expect(returnField(page)).toHaveCount(0);
+  await decisionDialog(page).getByRole("combobox", { name: "Sua decisão" }).selectOption("refuse_cancellation");
+  const reason = decisionDialog(page).getByRole("textbox", {
+    name: "Motivo da sua decisão",
+    exact: true,
+  });
+  await reason.fill(
+    "Justificativa própria preservada durante atualização da fonte",
+  );
+  sql(
+    `update public.capability_overrides set enabled=true where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.professional.id)} and capability='stock.team.read';`,
+  );
+  await decisionDialog(page)
+    .getByRole("button", { name: "Atualizar referências", exact: true })
+    .click();
+  const comparison = decisionDialog(page).getByRole("region", { name: "Comparação da conciliação", exact: true });
+  await expect(comparison.getByText("Retorno mínimo para conciliar", { exact: true })).toBeVisible();
+  await expect(comparison.locator("del")).toHaveCount(0);
+  await page
+    .getByRole("button", {
+      name: "Usar referência atual e revisar novamente",
+      exact: true,
+    })
+    .click();
+  await expect(reason).toHaveValue(
+    "Justificativa própria preservada durante atualização da fonte",
+  );
+  await expect(reason).toBeFocused();
+  await expect(page.locator('[aria-invalid="true"]')).toHaveCount(0);
+  await decisionDialog(page)
+    .getByRole("button", { name: "Voltar à ficha", exact: true })
+    .click();
+  await page.getByRole("dialog", { name: "Sair sem concluir?" }).getByRole("button", { name: "Sair e descartar", exact: true }).click();
+  await expect(cancellation(page).getByText(
+    "As referências de consumo não estão disponíveis para o seu acesso atual.", { exact: false },
+  )).toHaveCount(0);
+  expect(ledger(f.patient)).toBe(before);
+  const current = (await rpc(f.professional, "operational_document", {
+    p_id: f.document.id,
+  })) as SupplyDocument;
+  expect(current.status).toBe("cancellation_pending");
+  expect(current.deliveryCancellation?.request.outcome).toBeUndefined();
+});

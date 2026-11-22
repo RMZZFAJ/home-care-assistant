@@ -1,0 +1,287 @@
+{
+  "at": "2026-11-08T19:22:06.572228+00:00",
+  "sourceBase": "f0840dcf3be5fb05ce9cd39fc6e1cd84713edf01",
+  "sourceLfSha256": {
+    "src/app/api/requisitions/selections/route.ts": "7bb34318f7d026774cb9846f8886827bc73688248c09090a5c7b54ad74166716",
+    "src/components/documents/public-verification.tsx": "01f96560c32c1ac8767b20592601083f02c35eec1a9da3204e5c65b25654fc51",
+    "src/components/forms/record-drawer.tsx": "36eff23130422348c976f74ccc74fcd3787012dcd544ecff9bcd742db6c4db00",
+    "src/components/requisitions/recurring-selection.tsx": "32b102ea56e7f6fc3b8aa112e6627aae0891893db1747f8113771026f01deb8f",
+    "src/components/requisitions/requisition-wizard.tsx": "e53455a71f5a0854c5f13cb0b5047b9149253f9089890b781534f3c16906aa16",
+    "src/lib/client/api.ts": "25e10d620d19874ac5c2a949b562bcc85968ce60cfdf676d2ee292ddfc3e0473",
+    "src/lib/client/use-command-intent.ts": "1caeaba894934e66b62aafa01a7fd01eb1412d9d3cf2338cad5750ce6815292d",
+    "src/lib/requisitions/recurring-selection.ts": "dd924b51832c8e82c0d5d58553e7b539b74c4f82f9ad813007e0b41314d20859",
+    "src/lib/stock-observation.ts": "14a7e5dc2d5ac6a1026c4b43bb4b3ce9b5b48328057eea46c41f5dfb80074bb9",
+    "src/lib/validation/recurring-selection.ts": "99a27e538edc9be80c57e38276710bbc4cbd73c94911955ab544d98dace33e31",
+    "supabase/migrations/20261108174500_phase_d3_requisition_selections.sql": "696d3d935e95f74670c2a7781d5d99da80d1d65361c9409ff9290ac082bbe159",
+    "supabase/migrations/20261108181000_phase_d3_selection_text_product_identity.sql": "6bfa01bca35ba8334e23c82a56e8479fe170aa30ddce12d3ecda8b258d7cebbb",
+    "tests/e2e/keyboard-entry.ts": "0b5f64eacde9d4c10743e8213f8f29f5a324e7530708340e8817f2c45805f9d3",
+    "tests/e2e/private-creation-drafts.spec.ts": "e01d0abf76929b734f68210adf26b4ca9cfbdb6492eeb0d5e325a70faf5319bb",
+    "tests/e2e/public-verification.spec.ts": "7964a954476c31659373125d5d2c60d2e1e130bc9cd4122efcd15b1cc0f5209e",
+    "tests/e2e/recurring-selection.spec.ts": "a45c6a95047c568636d89d7f887c5b57104f1bb62ddfa686a361227518fcfbfc",
+    "tests/e2e/requisition-observation.spec.ts": "98432308b3a5bdabba0cb04de61c701488c2f434650080733053ea5d84103c72",
+    "tests/harness/keyboard-entry.spec.ts": "ff4eda64c4941bc487a81f6fd16d87a2054b6a2763273e13401145d076c8752b",
+    "tests/integration/private-draft-fixtures.mjs": "33240baddd49986800f3b009d8d3d74e4e6ef05f67508574ad309483ea5dedcd",
+    "tests/integration/recurring-selection.test.mjs": "d25155bc50868577984ffe8ed1228f28f31bde492e4809558f864eb4eec08412",
+    "tests/integration/v4-fixtures.mjs": "7fd6385329df90dd99e2a712aa23599dda32ca190dba82a87f4c8c1778d94a7c",
+    "tests/recurring-selection.test.ts": "344b917ee8176966de952de9c7402dacdc0c1ec66627e21ec608a76a6581dcab"
+  },
+  "featureInitialCohortLfSha256": {
+    "src/app/api/requisitions/selections/route.ts": "7bb34318f7d026774cb9846f8886827bc73688248c09090a5c7b54ad74166716",
+    "src/components/forms/record-drawer.tsx": "36eff23130422348c976f74ccc74fcd3787012dcd544ecff9bcd742db6c4db00",
+    "src/components/requisitions/recurring-selection.tsx": "9067dc9047a4bde3118512313da427bf4a2c25b9680b83f93f0d2ad30929ac71",
+    "src/components/requisitions/requisition-wizard.tsx": "e53455a71f5a0854c5f13cb0b5047b9149253f9089890b781534f3c16906aa16",
+    "src/lib/client/api.ts": "25e10d620d19874ac5c2a949b562bcc85968ce60cfdf676d2ee292ddfc3e0473",
+    "src/lib/client/use-command-intent.ts": "1caeaba894934e66b62aafa01a7fd01eb1412d9d3cf2338cad5750ce6815292d",
+    "src/lib/requisitions/recurring-selection.ts": "dd924b51832c8e82c0d5d58553e7b539b74c4f82f9ad813007e0b41314d20859",
+    "src/lib/stock-observation.ts": "14a7e5dc2d5ac6a1026c4b43bb4b3ce9b5b48328057eea46c41f5dfb80074bb9",
+    "src/lib/validation/recurring-selection.ts": "99a27e538edc9be80c57e38276710bbc4cbd73c94911955ab544d98dace33e31",
+    "supabase/migrations/20261108174500_phase_d3_requisition_selections.sql": "696d3d935e95f74670c2a7781d5d99da80d1d65361c9409ff9290ac082bbe159",
+    "supabase/migrations/20261108181000_phase_d3_selection_text_product_identity.sql": "6bfa01bca35ba8334e23c82a56e8479fe170aa30ddce12d3ecda8b258d7cebbb",
+    "tests/e2e/private-creation-drafts.spec.ts": "e01d0abf76929b734f68210adf26b4ca9cfbdb6492eeb0d5e325a70faf5319bb",
+    "tests/e2e/recurring-selection.spec.ts": "b6d6aa19a9b4fad90a62b3557431a1bc0092f7c0e4bbb8e3ae2755f8e54700ff",
+    "tests/integration/private-draft-fixtures.mjs": "33240baddd49986800f3b009d8d3d74e4e6ef05f67508574ad309483ea5dedcd",
+    "tests/integration/recurring-selection.test.mjs": "d25155bc50868577984ffe8ed1228f28f31bde492e4809558f864eb4eec08412",
+    "tests/integration/v4-fixtures.mjs": "7fd6385329df90dd99e2a712aa23599dda32ca190dba82a87f4c8c1778d94a7c",
+    "tests/recurring-selection.test.ts": "344b917ee8176966de952de9c7402dacdc0c1ec66627e21ec608a76a6581dcab"
+  },
+  "cohortQualification": "Initial five production cases are bound separately. Final eligibility guard and its stronger stale-checkbox case changed only the two listed leaves; valid apply and stale/duplicate cases passed again. Recovery logic is unchanged. CI repair touches its own public component/test helpers; source-specific cohorts are separate. New SHA still requires full CI. Final line-ending normalization emitted byte-identical JavaScript; separately bound below.",
+  "validation": {
+    "unit": {
+      "distinctPassed": 5,
+      "initialModelBeforeTextFixPassed": 5,
+      "finalTextModelPassed": 5
+    },
+    "realAuth": {
+      "distinctPassed": 4,
+      "cohorts": [
+        {
+          "executed": 3,
+          "passed": 0,
+          "failed": 3,
+          "reason": "Prototype incorrectly required UUID product IDs"
+        },
+        {
+          "executed": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "executed": 1,
+          "passed": 1,
+          "failed": 0,
+          "scope": "observed key/name waits, no partial effects, table/helper/anon denial"
+        }
+      ]
+    },
+    "diagnosticDev": {
+      "executions": 7,
+      "passed": 4,
+      "failed": 3,
+      "distinctPassingScenarios": 3,
+      "productionEvidence": false,
+      "counterproofs": "Two missing-open ArrowDown assumptions; nonexistent third fixture product; final availability and actual issuance passed"
+    },
+    "featureProduction": {
+      "executions": 7,
+      "passed": 7,
+      "failed": 0,
+      "initial": 5,
+      "finalEligibility": 2,
+      "distinct": 5,
+      "newFeatureDistinct": 3,
+      "existingDraftConsumersDistinct": 2,
+      "engine": "Chromium"
+    },
+    "ciRepairProduction": {
+      "executions": 12,
+      "passed": 11,
+      "failed": 1,
+      "distinctPassingCases": 9,
+      "qualification": "REQ exact-decimal and whole accessibility flows passed in all three engines; public focus initially failed in WebKit, then passed in all three after committed-result focus. Interactive-landmark oracle was strengthened separately by final harness negatives."
+    },
+    "harness": {
+      "initialWholeHarnessPassed": 36,
+      "finalKeyboardPassed": 24,
+      "finalKeyboardDistinctPerEngine": 8,
+      "engines": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "rulesOrTimeoutsRelaxed": false
+    },
+    "types": true,
+    "affectedLint": true,
+    "ciBase": "CI_F0840DC_OBSERVATION.json FAILED; not reclassified",
+    "newSourceCi": "PENDING_PUBLICATION"
+  },
+  "backend": {
+    "newPrivateTables": 2,
+    "newFunctions": 3,
+    "existingFunctionsAndGrantsPreserved": 410,
+    "productIdentity": "Opaque text, bounded120; UUID only for list/user/patient/command identities",
+    "storedFields": "id,owner_id,care_recipient_id,name,product_ids,created_at",
+    "newWriteCapability": "req.create; replay/live read req.read",
+    "ownOtherDevice": true,
+    "otherOwnerExcluded": true,
+    "officialEffectOnListSaveOrApply": false,
+    "explicitLaterIssuancePayloadAndRowsChecked": true
+  },
+  "backup": {
+    "backupId": "520ddb89-8135-4cc8-b472-afc132922446",
+    "state": "verified",
+    "files": 80,
+    "bytes": 11341372,
+    "manifestSha256": "cfee3d479e92cd10ba67c079dae1575e5a5d607c05f5f403e89bbf8798e3e7cb"
+  },
+  "restoreAndUpgrade": {
+    "backupId": "520ddb89-8135-4cc8-b472-afc132922446",
+    "files": 80,
+    "bytes": 11341372,
+    "manifestSha256": "cfee3d479e92cd10ba67c079dae1575e5a5d607c05f5f403e89bbf8798e3e7cb",
+    "verified": true,
+    "restoredTables": 151,
+    "stableTableDigestsMatched": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "foreignKeysChecked": true,
+    "storageObjectsVerified": 34,
+    "pdfDigestsVerified": 33,
+    "signedIssuanceDigestsVerified": 2,
+    "migrationsAppliedToProbe": [
+      "20261108174500_phase_d3_requisition_selections.sql",
+      "20261108181000_phase_d3_selection_text_product_identity.sql"
+    ],
+    "catalogueComparison": {
+      "views": false,
+      "columns": true,
+      "indexes": true,
+      "defaults": true,
+      "policies": true,
+      "triggers": true,
+      "functions": true,
+      "relations": true,
+      "constraints": false,
+      "table_grants": true,
+      "function_grants": true
+    },
+    "cronEnabled": false,
+    "networkExtensionEnabled": false,
+    "seconds": 4.283,
+    "operationalRecoveryGate": "D6_NOT_SATISFIED_BY_THIS_PROBE"
+  },
+  "remotePost": {
+    "status": "APPLIED_AND_POST_VALIDATED",
+    "at": "2026-11-08T18:32:11.771Z",
+    "project": "qwfrqychokvhdzakibid",
+    "before": 153,
+    "after": 155,
+    "pending": 0,
+    "historySqlMatched": 155,
+    "restoredUpgradedCatalogueExactExceptDocumentedRestoreAlias": true,
+    "preservation": {
+      "oldTables": 151,
+      "allOldStableDigestsExact": true,
+      "oldColumnsProjectedOut": [],
+      "onlyNewHistoryRowsComparedSeparately": true,
+      "volatileClockDifferences": [
+        "private.bal_scheduler_progress",
+        "private.legacy_reminder_progress",
+        "private.operations_components",
+        "private.operations_incidents",
+        "private.scheduler_health"
+      ],
+      "newTableRows": {
+        "commands": 0,
+        "selections": 0
+      },
+      "cronUnchanged": true,
+      "vaultUnchanged": true,
+      "storagePoliciesUnchanged": true
+    },
+    "health": {
+      "waitingLocks": 0,
+      "longTransactions": 0,
+      "invalidIndexes": 0
+    },
+    "noReset": true,
+    "noRemoteFixtureOrAuthCreated": true,
+    "noExternalTransportActivation": true,
+    "operationalGo": false
+  },
+  "refusedEarlierPreflight": {
+    "log": "recurring-selection-remote-preflight.log",
+    "unexpected": [
+      "auth.refresh_tokens",
+      "auth.sessions",
+      "auth.users",
+      "private.operations_history",
+      "private.operations_incidents"
+    ],
+    "action": "Fresh independently verified and restored backup; strict comparator retained; no DDL on refused preflight"
+  },
+  "counterproofs": {
+    "migration": "Initial155 attempt rolled back because UUID-typed array_position CHECK needed equivalent text CHECK; failed attempt was not applied or rewritten as history",
+    "ui": "Stale checked member could formerly leave Add enabled with zero eligible entries; original UI retained by LF hash, final live deactivation/return case passes",
+    "publicFocus": "WebKit heading existed without focus before product fix; error/screenshot retained locally; committed-result layout effect passes three engines",
+    "ciArtifactSha256": "76ea8969bd791c7779b6d826b9899d5ada2d2de6e194d41d51fdb29fe0840f64"
+  },
+  "logLfSha256": {
+    "recurring-ci-keyboard-harness-final.log": "aa1c91f0683102e03271fc89fc6d6fe369185df28def102075cccefda0b763be",
+    "recurring-ci-keyboard-harness.log": "6cc27cc2bb9f18a7c7636a46ec41768d041fa6e291203c84bbffb4a1b914c9a1",
+    "recurring-ci-production-recheck.log": "1aa877821367b48b3e92753225927f41f8dd9939f30a085be52b3de719627f73",
+    "recurring-ci-public-focus-final.log": "12ccbe4e7cde33fd3980402bfc39421ea59170b2573c27e2879c747d360536f2",
+    "recurring-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "recurring-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "recurring-selection-auth-locks.log": "b4d9230ae60c6ba06982e2a153fb823b16b9a2cd00f77f4875f0079abc6cd1de",
+    "recurring-selection-auth-text.log": "b5adf4cae8547e47df77b15447ead6bdafe710f1b6881b6c81b23042c2e54ba8",
+    "recurring-selection-auth.log": "43ce223f895d88dd46cb1d5716673852b199600e77df96125de378b1e2318d7e",
+    "recurring-selection-diagnostic-availability.log": "9020bfaf0d40cdf7949f3d916d256536de96847cb07093b37cb5a81db859506d",
+    "recurring-selection-diagnostic-issuance.log": "0c4fb531a31c662d68075aa36fc751072f32d26150050963ef12a9126a2c082e",
+    "recurring-selection-diagnostic-recheck.log": "800640eb5af02771ad17939be9884a7dc895d2d02788d6f9f28c74ab4fa8cd03",
+    "recurring-selection-diagnostic.log": "126ea9e00c71a5c13b9c4784413c8e0870f70919f68f7adf840f0ccfb3d81144",
+    "recurring-selection-lint-publish.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "recurring-selection-lint-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "recurring-selection-lint.log": "8870abd20868ba2a7c8fd83e643cac8a1ae440c344e5ae98101d85477f4f9773",
+    "recurring-selection-local-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "recurring-selection-production-eligibility.log": "460af26a87a77796ba57bb987661de65110c2144c36499cbc38d2926fddeddfe",
+    "recurring-selection-production.log": "ffd2ead86f992959563a74f07fb87f51680500ec19064bda711617917ecb5797",
+    "recurring-selection-remote-apply-console.log": "8d804394fc3112e221b024daf03bd73afc546c9ce3bf6357cfbcbd551f885f87",
+    "recurring-selection-remote-apply.log": "8e6db1bb4c33464b94bff4e20e16073dea0521efb8e85ce7a16ac309fb30316b",
+    "recurring-selection-remote-backup-close.log": "b9e5b36994db32e2f68280e8bbd5d1cb34341502b4e963068b3e15a8df2d4369",
+    "recurring-selection-remote-backup.log": "02eb63f8ec532a582dc132fdf6986a2d5bffa2a93b8ce7e0e0158aed7c26aa94",
+    "recurring-selection-remote-dry-run.log": "cb771aa5317c4bf501d5283c594e11587c34b5b25550a67bc8ac8740ad0fc79f",
+    "recurring-selection-remote-post.log": "064d294c5643010ca475245b0c5526c53bafd4f2035ba9ddda006295b4867848",
+    "recurring-selection-remote-preflight-close.log": "910bef1c17e6aab9d7b8728f240bd90a5b481a9a545f06284418eaf3ca3c2b58",
+    "recurring-selection-remote-preflight.log": "530a3d3f627b1f4318fc4ae1a0276aeb366cdae24cf2ba0037513123864b0cc3",
+    "recurring-selection-text-local-prepare-recheck.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "recurring-selection-text-local-prepare.log": "0435b972b3bc2b2ba208c4ab92de1b53cfd3ba1adcadec7e9a31edf93ce3036b",
+    "recurring-selection-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "recurring-selection-types-publish.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "recurring-selection-types-recheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "recurring-selection-types.log": "032edaf321f0fff0a69e58a26d21ff730c50f532c35892e8d3893715212e8768",
+    "recurring-selection-unit-text.log": "03084964924b8cbe7e536dd21d69febaea3c3f31e81ba889556be7ff9440fc13",
+    "recurring-selection-unit.log": "cd94efa149621bdf3f106b62f6949f15c073d3a7c4c9e014683e19c00dd3e691"
+  },
+  "boundaries": [
+    "PR7 Draft; no merge or production promotion",
+    "Remote no Auth/fixtures/reset or external transport activation",
+    "No PDF appearance change; internal signer/TSA not ICP-Brasil or external time",
+    "Backup probe does not satisfy D6, RPO/RTO or off-machine key independence",
+    "Physical S24/AT/human and full new-SHA CI remain gates",
+    "Sonar owner deferred"
+  ],
+  "whitespaceNormalization": {
+    "path": "src/components/requisitions/recurring-selection.tsx",
+    "testedSourceLfSha256": "50404d6f86c81ef0d7c4e7692c9b38ada8f176b58740e90d63ca679ec95cf906",
+    "publishedSourceLfSha256": "32b102ea56e7f6fc3b8aa112e6627aae0891893db1747f8113771026f01deb8f",
+    "emittedJavaScriptSha256": "89f52b67a99d4db77e6b47a3dd843d77abd730911eef36736db91df7a4f68b42",
+    "emittedJavaScriptIdentical": true,
+    "scope": "Repeated carriage returns normalized; no runtime code or tests changed after qualified cohorts."
+  }
+}

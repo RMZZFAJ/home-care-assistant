@@ -1,0 +1,249 @@
+{
+  "at": "2026-11-09T00:32:11.071637+00:00",
+  "baseSha": "3a6bdc95351f4155c901e2464d0969643157b793",
+  "sourceLfSha256": {
+    "src/app/design-system.css": "0e3cf858ad107429fd73db09f28461e7111f3fd8aa2d68d804565d471f57433c",
+    "src/components/documents/attachments.tsx": "c1317a938124bb767a4ada92039e9d66b7a20bfaddf1deed7e4de991aa34c2fd",
+    "src/components/documents/public-verification.tsx": "c5cc8b7a8fa8c8896cb3b6f399d3bd13e1da0fb1f2a5952c52caec5a4bd7a265",
+    "src/components/documents/supply-detail.tsx": "4ade06cecf8316b3d64b9b3a2d49c1592fd0002faf8c46f0040d511bf48a87c1",
+    "src/components/guides/user-guide.tsx": "fbdc3dcd427e8e6ab0db6fc30f67591177469dfed6dbe7be472bbf5bb3bf115b",
+    "src/components/schedules/schedule-console.tsx": "d79520a260c51125d3b3f4fe7a418f50cf63e08755c2dba530f7f9f4539de514",
+    "tests/e2e/attachment-attempts.spec.ts": "62cb73d48b9655502de69707b7aa260e29316450b340427936daa27d16ab7a44",
+    "tests/e2e/delivery-preparation.spec.ts": "af8e7434eb567a0cac99ef3905f1356467dcce603a31cff2a527d9730068b09c",
+    "tests/e2e/preparation-continuity.spec.ts": "4c62cfe9ce085c4a9dd5cc1f565ea4ee4643ec332d466aae0644bc687642acd6",
+    "tests/e2e/public-verification.spec.ts": "b6a587fc5c508aff4ccc2a05c9005a9fbf2f6dfb6c0d2f5970f9431c6906c6e7",
+    "tests/e2e/schedule-decisions.spec.ts": "d454b35cf299fa689e2ab008327b52bd1ee85451db998e297fdfa4d570a35fa3"
+  },
+  "validation": {
+    "currentProductionDistinctPassed": 39,
+    "newCases": 15,
+    "existingConsumers": 24,
+    "currentPassReusedFromEarlierCohort": 10,
+    "remainingRunPassed": 29,
+    "totalExecutions": 51,
+    "passingExecutions": 44,
+    "failingExecutionsPreserved": 7,
+    "newAxeScans": 60,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "types": true,
+    "affectedLint": true,
+    "globalSuitesRepeatedLocally": false,
+    "mutableDbSuiteParallelWithE2e": false
+  },
+  "cohorts": {
+    "baselinePrivateRead": "2 FAIL stale attachments/guide",
+    "baselineFocus": "3 FAIL ENT/scale/code focus",
+    "initialProduct": "5 PASS/1 FAIL test readiness wait;30 not run",
+    "currentProduct": "10 PASS/1 FAIL test alert scope;28 not run",
+    "remainder": "29 PASS;ten current-source successes retained;no pending or failed case excluded"
+  },
+  "coverage": {
+    "ENT-03": "read503/403;facts not invalid;focus;no new receipt",
+    "ESC-03": "read503;focus;immutable before/after/zone;own reason remains editable",
+    "DOC-02": "unchanged D3.18 bindings;historical proof reused with parent refresh-only change qualification",
+    "DOC-05": "code/file invalid focus;GET and POST503;selected PDF preserved;real unsigned analysis;no new issuance",
+    "ARQ-02": "same frozen intention after GET503/403;no second upload;source/hash rejection and explicit abandonment preserved",
+    "GUI-04": "NOT_CLOSED;personal guide test is not the operational runbook"
+  },
+  "historyReused": {
+    "manifest": "HISTORY_READ_BOUNDARY_EVIDENCE.json",
+    "unchangedSourceBindings": 9,
+    "qualification": "Parent refresh button changed focus/guard only;history decoder/renderer/API/event sources unchanged. Prior tests are not new executions."
+  },
+  "preparationSourceQualification": [
+    {
+      "file": "src/app/api/guides/route.ts",
+      "oldLfSha256": "80495ca79a00beeb1827d96701f62cf1a904c942585dddc6825f41a4b87bcf1d",
+      "currentLfSha256": "80495ca79a00beeb1827d96701f62cf1a904c942585dddc6825f41a4b87bcf1d"
+    },
+    {
+      "file": "src/app/api/residence-preparations/route.ts",
+      "oldLfSha256": "dc6ff82305dc1a98c89fe46c021ba0c0b5da61010031f3d56ca16a027a54db65",
+      "currentLfSha256": "dc6ff82305dc1a98c89fe46c021ba0c0b5da61010031f3d56ca16a027a54db65"
+    },
+    {
+      "file": "src/components/guides/residence-preparation.tsx",
+      "oldLfSha256": "ffde465f580c3916295dc459191bcf532ea39da0ef9c7fb880fcddd6bdd9ff80",
+      "currentLfSha256": "ffde465f580c3916295dc459191bcf532ea39da0ef9c7fb880fcddd6bdd9ff80"
+    },
+    {
+      "file": "src/components/guides/user-guide.tsx",
+      "oldLfSha256": "ca9d01771aaf4434636636550dc6c21d80db5aee2b71a92d20a14528c78ba824",
+      "currentLfSha256": "fbdc3dcd427e8e6ab0db6fc30f67591177469dfed6dbe7be472bbf5bb3bf115b"
+    },
+    {
+      "file": "src/lib/guide-content.ts",
+      "oldLfSha256": "458d602bdc4a57d90ee2d8512bbe5c7d6529f46c2fc600fe4ed649eaf9e239a1",
+      "currentLfSha256": "458d602bdc4a57d90ee2d8512bbe5c7d6529f46c2fc600fe4ed649eaf9e239a1"
+    },
+    {
+      "file": "src/lib/validation/guides.ts",
+      "oldLfSha256": "99156a31f781b8dfef1cb33dfc3591ece43ae92e9440ded21f09c6ee7c9fe56c",
+      "currentLfSha256": "99156a31f781b8dfef1cb33dfc3591ece43ae92e9440ded21f09c6ee7c9fe56c"
+    },
+    {
+      "file": "src/lib/validation/residence-preparation.ts",
+      "oldLfSha256": "49a2f436e2f46b266d37d783d256d61acf4a0f55fb337c620de5e33cd0301104",
+      "currentLfSha256": "49a2f436e2f46b266d37d783d256d61acf4a0f55fb337c620de5e33cd0301104"
+    },
+    {
+      "file": "supabase/migrations/20261107035508_phase_d3_residence_preparation_and_guides.sql",
+      "oldLfSha256": "09439e691682dd64e623a27c95327cf7c39275de79778b872c5a6e488ca69481",
+      "currentLfSha256": "09439e691682dd64e623a27c95327cf7c39275de79778b872c5a6e488ca69481"
+    },
+    {
+      "file": "supabase/migrations/20261107040539_phase_d3_preparation_read_models.sql",
+      "oldLfSha256": "e7f96dc3a54477890dc6d14b18b9ca3f3ad8be7b8d9a2f1300b2c5fedc7781c9",
+      "currentLfSha256": "e7f96dc3a54477890dc6d14b18b9ca3f3ad8be7b8d9a2f1300b2c5fedc7781c9"
+    },
+    {
+      "file": "tests/e2e/preparation-continuity.spec.ts",
+      "oldLfSha256": "f875e391179d4e752471e2054fa80a78dc7f627add82fa447e5dd0bf18982c31",
+      "currentLfSha256": "4c62cfe9ce085c4a9dd5cc1f565ea4ee4643ec332d466aae0644bc687642acd6"
+    },
+    {
+      "file": "tests/integration/preparation-guides.test.mjs",
+      "oldLfSha256": "522583cf8abf26c6cf9b6d6a35af8ffed5440353df345fd7b2a083f43e472b80",
+      "currentLfSha256": "522583cf8abf26c6cf9b6d6a35af8ffed5440353df345fd7b2a083f43e472b80"
+    },
+    {
+      "file": "tests/preparation-guide-models.test.ts",
+      "oldLfSha256": "15537d8724532186b331afcf9dbc63a09e7130e6fab14842997f57562cffe97f",
+      "currentLfSha256": "15537d8724532186b331afcf9dbc63a09e7130e6fab14842997f57562cffe97f"
+    }
+  ],
+  "databaseCi": {
+    "receipt": "DAILY_READ_CI_BASE.json",
+    "integration395Passed": true,
+    "preparationGuideAuth7Passed": true,
+    "noBackendOrMigrationChangeThisLot": true
+  },
+  "scopeEffects": {
+    "newAttachmentReadWrites": 0,
+    "newEntReadWrites": 0,
+    "newScheduleReadWrites": 0,
+    "newGuideExplicitConfigurationWrites": 1,
+    "guideProgressUnchanged": true,
+    "publicAnalysisRequestsAreNotIssuance": true,
+    "newClinicalEffectsFromReads": 0
+  },
+  "logsLfSha256": {
+    "immutable-read-baseline.log": "90231c67fcf572aff6207d63845df0f55d45ee72ff79b48a0954d71a562415f2",
+    "immutable-read-collection.log": "05ee993aa5f609353600ac825c9abf0f6a710dfe8b234c104b230e40eb3fb2c6",
+    "immutable-read-focus-baseline.log": "effea09bfbde3bb925998f409485fed0053b3349b9ddd2094718284e9690b79a",
+    "immutable-read-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "immutable-read-lint-publish.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "immutable-read-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "immutable-read-production-final.log": "1930bc0989a89b2825d56bbf24a999836d7e984ca456e9e7eb9f841ea749ac4d",
+    "immutable-read-production-remaining.log": "057ab3dea8939eb887b8b297d0c1a7524875a8eb0759715e9df60c21f853f553",
+    "immutable-read-production.log": "4ce2b9400f6b1a907fcdd1e426ae4da845c0a804e0054271be1b0722f05d08fb",
+    "immutable-read-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "immutable-read-types-publish.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "immutable-read-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "immutable-read-markdown-initial.log": "fe4f848c4dd218c3aee85c473ff0f3f489240b5e5d333727ec13b74afb939cfd",
+    "immutable-read-markdown.log": "f1970a291952d8b4f45146ca7836c7cab947f3363ac2a4aa3c9095b0303e07c8",
+    "immutable-read-markdown-last.log": "2b3a39c1930dd24a9f6e5f82ddaaa34d21075dff2bd222d72d472941bae69a74"
+  },
+  "listsLfSha256": {
+    "immutable-read-completed.list": "6fe4816b1842913ee6f397fe12fd5c19ef1df83162d7f9814ef249aaff5c984d"
+  },
+  "baselineBinarySha256": {
+    "immutable-read-baseline-attachment.png": "72af0a6243e77ec45549645277ee7371e6ba81f5e7bd5ea0c5bbff0ca3e3f0cb",
+    "immutable-read-baseline-guide.png": "b6f8f460b0808f45633a7f58f798d00e1e13a8f26aacdf45927e45c8a5a0ca97",
+    "immutable-read-first-ENT.png": "646fe5761b3bbcbc7047f1215649c0adeacbfd302686683067003f4c90b0d8e1",
+    "immutable-read-focus-baseline-delivery-preparation-C-FIN-39ec5-igem-ou-quantidade-expedida-chromium.png": "79c375375f80c52e1288ad9cc44cb6676b840c283c40f87eea5ff7a67eafb9ef",
+    "immutable-read-focus-baseline-public-verification-C-FINA-33536-válido-sem-produzir-emissão-chromium.png": "7a168b3842ac5aef208b829ebe3533276b08bef746ddd5e4d23a6991431f644f",
+    "immutable-read-focus-baseline-schedule-decisions.png": "9492176957d819564e43fd71fcfb5bfa4295c7fe6427a648d94ae610460d98c3",
+    "immutable-read-public-scope.png": "1edc9f060878ba18540622d665aa0d5ff26f4741a75dfe76e9ae4aa2a4fcd2a0"
+  },
+  "baselineContextLfSha256": {
+    "immutable-read-baseline-attachment-context.txt": "196cdfd39bc89d5a4ad58dec01c253b2b2bc0eac4e3a7e48dc04353aa45f214a",
+    "immutable-read-baseline-guide-context.txt": "f0bd17a43ab9af77a4fb5b3620098dc8eedd4fdf0af1ac94bcd6d24fc44cae96",
+    "immutable-read-first-ENT-context.txt": "1d52d14ba7b1322ad6f1bf2a01a8fd8b28076e3e6d164174e12676d1fb2e1eff",
+    "immutable-read-focus-baseline-delivery-preparation-C-FIN-39ec5-igem-ou-quantidade-expedida-chromium-context.txt": "bf92b85bff12391b8b9d2f4813b7f832a46d3c7018485353974602661c60b0e9",
+    "immutable-read-focus-baseline-public-verification-C-FINA-33536-válido-sem-produzir-emissão-chromium-context.txt": "a5a60346a7f08755fd8558bd90d043f7e0e44e08f7e4f69af439029b543b92ea",
+    "immutable-read-focus-baseline-schedule-decisions-context.txt": "ab996d20eafc935e0d5ba8d191946bde224b54cdb1ea014b2114582d8fce197a",
+    "immutable-read-public-scope-context.txt": "f4e3bd3bfdfb71729b5608118dd036a2b44777bed57b44020518326282d61dad"
+  },
+  "protectedDatabaseCiLogLfSha256": "628147ee8f1f043ff3de6aea5241c44c79b7d0fe002dd320834f0ab0a96d3bd4",
+  "localPostflight": {
+    "at": "2026-11-09T00:32:10.470Z",
+    "url": "http://127.0.0.1:54321",
+    "migrations": 161,
+    "jobs": [
+      {
+        "name": "hca-notification-worker",
+        "active": true
+      },
+      {
+        "name": "hca-operational-lifecycle",
+        "active": true
+      }
+    ]
+  },
+  "remote": {
+    "lastProvenCount": 161,
+    "noMigrationChange": true,
+    "noRemoteMutation": true,
+    "noRepeatedFullBackupRestore": true,
+    "appliedReceipt": "CREDENTIAL_REMOTE_MIGRATIONS.json",
+    "readOnlyCurrentObservation": "DAILY_READ_REMOTE_OBSERVATION.json",
+    "versionsMatchedNow": 161,
+    "pendingNow": 0
+  },
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "canonicalColumnsPreserved": 29,
+    "approvedComplementsUnchanged": true,
+    "counts": {
+      "PARTIAL": 52,
+      "PASS": 48,
+      "NOT_STARTED": 5
+    },
+    "changedCriteria": [
+      "C-FINAL-AC-023",
+      "C-NEW-AC-027"
+    ]
+  },
+  "remainingGate": [
+    "GUI-04 recovery runbook software/read validation",
+    "GUI-01/02/03 adoption delegation role walkthrough consolidation",
+    "Published SHA CI",
+    "Human/AT/physical-device/actual zoom and D-C/D6"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false,
+  "goalComplete": false,
+  "supportLfSha256": {
+    "DAILY_READ_RECOVERY.md": "292dc6ce9b2a6e0522cb9a6f7374b43ad6a5db97e01c2a465cce2a52f9ca5fe9",
+    "DAILY_READ_CI_BASE.json": "1cbf1aa68e0ad14fa2b2a6f22954290db4f1f3d604a74a3f87ab51cfc7bd5952",
+    "CREDENTIAL_REMOTE_MIGRATIONS.json": "2d60339836d30bf89bcfb6a930318924ce2b78057ce86708e63837bceb3463f9",
+    "HISTORY_READ_BOUNDARY_EVIDENCE.json": "8b2c333d1015c40d9509c9ec158385bc85d6779bdafaa85a14c7256287d65af1",
+    "D3_5_EVIDENCE.json": "a0aea31275966661507ef7db664385c6623a5deef12f5aba4c77d8e8c901f360",
+    "OWNER_EXECUTION_ORDER.txt": "b06ff5581d6a9bcbe32107787e2f34a7096daca4079d7b3574f5a8bd1e804730",
+    "DAILY_READ_REMOTE_OBSERVATION.json": "6fbb02a525825821a4423b460e0b7893b74d6974138aa977526db968b123f7ad"
+  },
+  "documentationValidation": {
+    "markdownFiles": 5,
+    "markdownIssues": 0,
+    "localLinks": 215,
+    "canonicalColumnsPreservedAgainstBase": 29,
+    "approvedComplementsUnchanged": true,
+    "changedCriteria": [
+      "C-NEW-AC-027",
+      "C-FINAL-AC-023"
+    ],
+    "initialMarkdownLineLengthIssuesCorrected": 6
+  },
+  "reactReview": {
+    "hooks": "Primitive request key and cleanup;no synchronous effect loop or new shared server state",
+    "focus": "Stable guarded controls;invalid focus after editable control is released",
+    "inputs": "Only actual local file/code validation marks an input invalid;read errors remain sections",
+    "bundle": "No runtime dependency added;PDFDocument import is test-only"
+  }
+}

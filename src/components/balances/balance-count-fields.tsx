@@ -1,10 +1,43 @@
 "use client";
-import { Field, Input, Textarea } from "@fluentui/react-components";
+import { FormField, TextAreaField, TextInput } from "@/components/ui/controls";
+import { MaterialConsultButton } from "@/components/documents/catalogue-material-panel";
+
 import type { CatalogProduct } from "@/types/documents";
-import { formatQuantity, quantity } from "@/lib/quantity";
-export function BalanceCountFields({ products, counts, errors, notes, onCount, onNotes }: { products: CatalogProduct[]; counts: Record<string,string>; errors: Record<string,string>; notes: string; onCount: (id: string, value: string) => void; onNotes: (value: string) => void }) {
-  return <div className="hca-form-stack">{products.map(p => <div className="hca-count-row" key={p.id} data-product={p.id}><Field label={`${p.name} · ${p.unit}`} validationState={errors[p.id] ? "error" : "none"} validationMessage={errors[p.id]}><Input value={counts[p.id] ?? ""} inputMode={(p.quantity_decimals ?? 0) > 0 ? "decimal" : "numeric"} autoComplete="off" aria-required maxLength={24} placeholder="Quantidade física" onChange={e => onCount(p.id, e.target.value)} /></Field></div>)}<Field label="Observações da contagem"><Textarea value={notes} onChange={e => onNotes(e.target.value)} maxLength={2000} /></Field></div>;
+import type { WorkspaceContext } from "@/types/workspace";
+import { BalanceMaterials } from "./balance-materials";
+export function BalanceCountFields({ context, products, counts, errors, notes, onCount, onNotes, onLink, linkedCount }: {
+  context: WorkspaceContext;
+  products: CatalogProduct[];
+  counts: Record<string,string>;
+  errors: Record<string,string>;
+  notes: string;
+  onCount: (id: string, value: string) => void;
+  onNotes: (value: string) => void;
+  onLink: (material: CatalogProduct, returnFocus: () => HTMLButtonElement | null) => void;
+  linkedCount: (id: string) => number;
+}) {
+  return <div className="hca-form-stack">
+    {products.map(product => {
+      const links = linkedCount(product.id);
+      return <div className="hca-count-row" key={product.id} data-product={product.id}>
+        <div className="flex items-start gap-2.5">
+          <div className="min-w-0 flex-1">
+            <FormField label={`${product.name} · ${product.unit}`} error={errors[product.id]}>
+              <TextInput value={counts[product.id] ?? ""} inputMode={product.quantity_decimals ? "decimal" : "numeric"}
+                autoComplete="off" aria-required maxLength={24} placeholder="Quantidade física"
+                onChange={event => onCount(product.id, event.currentTarget.value)} />
+            </FormField>
+            {links ? <small>{links} {links === 1 ? "ficha vinculada" : "fichas vinculadas"}</small> : null}
+          </div>
+          <MaterialConsultButton context={context} material={product} menu onLink={returnFocus => onLink(product, returnFocus)} />
+        </div>
+      </div>;
+    })}
+    <FormField label="Observações da contagem">
+      <TextAreaField value={notes} onChange={event => onNotes(event.currentTarget.value)} maxLength={2000} />
+    </FormField>
+  </div>;
 }
 export function BalanceReviewRows({ products, counts, reference }: { products: CatalogProduct[]; counts: Record<string,string>; reference: Record<string,string> }) {
-  return <div className="hca-records">{products.map(p => { const delta = quantity(counts[p.id] ?? "0").minus(reference[p.id] ?? "0"); return <article className="hca-record" key={p.id}><div className="hca-record-main"><strong>{p.name}</strong><p>Quantidade física: {formatQuantity(counts[p.id], p.unit)}</p><small>Referência: {formatQuantity(reference[p.id] ?? "0", p.unit)}</small><p>{delta.isZero() ? "Sem diferença" : "Diferença: " + formatQuantity(delta.toFixed(), p.unit)}</p></div></article>; })}</div>;
+  return <BalanceMaterials rows={products.map(p => ({ id: p.id, name: p.name, unit: p.unit, counted: counts[p.id], reference: reference[p.id] }))} />;
 }

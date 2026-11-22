@@ -1,9 +1,23 @@
 "use client";
+import { ComplementOriginHint } from "@/components/documents/complement-origin-hint";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { DocumentIssuanceFailure, issuanceRecoverySteps, reconcileIssuance, useIssuanceFailure } from "./document-issuance-failure";
+import { issuanceSteps } from "./document-issuance-result";
+import { useIssuanceNavigation } from "./document-issuance-navigation";
 import { DocumentActions } from "./document-actions";
+import { RequisitionOpening } from "@/components/requisitions/requisition-opening";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type SetStateAction,
+} from "react";
 import {
   api,
   ApiError,
@@ -15,10 +29,55 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
+import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
+import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
+import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
+import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "./document-write-access-notice";
+import { DocumentCatalogueEmpty, DocumentOpeningFailure, DocumentOpeningPending, type OpeningFailure } from "./document-opening-status";
+import { CatalogueOpeningError, readWizardCatalogue } from "@/lib/client/wizard-catalogue";
+import {
+  draftFlowStages,
+  navigationForStep,
+  stepForNavigation,
+} from "@/lib/forms/draft-navigation";
+import {
+  BalanceObservationTimes,
+} from "@/components/forms/creation-draft-panel";
+import type { BalanceCountReference } from "@/types/balances";
+import { parseBalanceCountReference } from "@/lib/validation/balances";
+import { BalanceReviewRows } from "@/components/balances/balance-count-fields";
+import { pendingExtraDispatchMessage } from "./supply-extra-items";
+import {
+  balanceDraftContent,
+  type BalanceDraftContent,
+} from "@/lib/validation/creation-drafts";
+import {
+  beginBalanceObservation,
+  sameBalanceContext,
+} from "@/lib/balances/observation-continuity";
+import {
+  BalancePreviousObservations,
+  BalanceReferenceReview,
+} from "@/components/balances/observation-continuity";
+import { supplyDraftContent, type SupplyDraftContent } from "@/lib/validation/supply-drafts";
+import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
+import { adjacentMaterialCategory, materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardCopy, supplyWizardReviewIntro, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
+import { issuanceObservationErrors } from "@/lib/documents/issuance-observations";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
+import { ActionButton } from "@/components/ui/controls";
+import { RelatedDocument } from "./related-document";
 import { SupplyWizardStep, type WizardState } from "./supply-wizard-step";
-import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
+import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
+import { SupplySourcePicker, type SupplySourceSelection } from "./supply-source-picker";
+import { emptySupplySources, includeSavedRequisitionSources, prepareSupplySources, purchaseMaterialSources, type SupplySourcePreparation } from "@/lib/forms/supply-source-preparation";
+import { useLiveRevision } from "@/lib/use-live-revision";
+import { parseSupplySources } from "@/lib/validation/supply-sources";
+import { quantity, validQuantity } from "@/lib/quantity";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import type { PresentationsRead } from "@/types/catalogue";
+import { readPresentationConversions } from "@/lib/presentation-conversion";
 import {
   documentLabels,
   type CatalogProduct,
@@ -28,42 +87,52 @@ import {
   type SupplyPayload,
   type SupplyType,
   type ItemContext,
+  type DeliveryPreparation,
 } from "@/types/documents";
 
-const steps = [
-  "Identificação",
-  "Medicamentos",
-  "Higiene",
-  "Dieta",
-  "Observações",
-  "Revisão",
-];
-type SourceRequest = {
-  care_recipient_id: string;
-  requisition_items: {
-    id: string;
-    product_id: string | null;
-    resolution?: { product_id: string } | null;
-  }[];
-};
-export function SupplyWizard({ type }: { type: SupplyType }) {
+function saveWizardCache(key: string, draft: {
+  form: WizardState;
+  links: Record<string, string[]>;
+  sourceSetup?: SupplySourcePreparation;
+  editingId?: string;
+  balanceContent?: BalanceDraftContent;
+}) {
+  sessionStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), ...draft }));
+}
+
+const balanceSteps = draftFlowStages.SUPPLY.map((stage) => stage.label);
+export function SupplyWizard({ type }: { type: SupplyType; }) {
   const params = useSearchParams();
+  const kind = type === "BAL" ? null : type;
   return (
-    <Workspace title={documentLabels[type]} compact>
-      {(context) =>
-        context.patient ? (
+    <Workspace title={kind ? supplyWizardCopy[kind].title : documentLabels[type]} compact
+      heading={kind ? context => <SupplyWizardHeading kind={kind} patient={context.patient!.display_name} /> : undefined}>
+      {(context) => {
+        if (!context.patient)
+          return <Notice>Selecione um paciente para abrir uma ficha.</Notice>;
+        const wizard = (
           <PatientSupplyWizard
             key={context.patient.id + params.toString()}
             context={context}
             type={type}
             requisitionId={params.get("requisitionId")}
+            purchaseId={params.get("purchaseId")}
             documentId={params.get("documentId")}
             recount={params.get("recount") === "true"}
           />
+        );
+        const requisitionId = params.get("requisitionId");
+        return requisitionId ? (
+          <RequisitionOpening
+            key={context.patient.id + params.toString()}
+            id={requisitionId}
+          >
+            {wizard}
+          </RequisitionOpening>
         ) : (
-          <Notice>Selecione um paciente para abrir uma ficha.</Notice>
-        )
-      }
+          wizard
+        );
+      }}
     </Workspace>
   );
 }
@@ -71,35 +140,93 @@ export function PatientSupplyWizard({
   context,
   type,
   requisitionId,
+  purchaseId = null,
   documentId,
   recount,
 }: {
   context: WorkspaceContext;
   type: SupplyType;
   requisitionId: string | null;
+  purchaseId?: string | null;
   documentId: string | null;
   recount: boolean;
 }) {
   const [step, setStep] = useState(0);
+  const [lastMaterialsStep, setLastMaterialsStep] = useState(supplyStageSteps[1]);
+  const isBalance = type === "BAL";
+  const draftFlow = isBalance ? "SUPPLY" : "SUPPLY_CREATE";
+  const category = materialCategories[step - 1]?.id;
+  const stage = isBalance ? step : category ? 1 : supplyStageSteps.indexOf(step);
+  const steps = isBalance ? balanceSteps : supplyWizardStages;
+  function openStep(nextStep: number) {
+    if (!isBalance && materialCategories[nextStep - 1]) setLastMaterialsStep(nextStep);
+    setStep(nextStep);
+  }
+  function openStage(nextStage: number) {
+    const nextStep = isBalance ? nextStage : supplyStageSteps[nextStage];
+    setStep(!isBalance && nextStage === 1 ? lastMaterialsStep : nextStep);
+  }
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
+  const householdSelectionRef = useRef<HouseholdListSelectionHandle>(null);
   const [people, setPeople] = useState<PatientPerson[]>([]);
+  const [recipientContext, setRecipientContext] =
+    useState<DeliveryPreparation | null>(null);
+  const recipientContextRef = useRef<DeliveryPreparation | null>(null);
+  const [recipientComparison, setRecipientComparison] =
+    useState<DeliveryPreparation | null>(null);
+  const [recipientError, setRecipientError] = useState("");
+  const [recipientPending, setRecipientPending] = useState(false);
+  const [recipientLoadedSource, setRecipientLoadedSource] = useState("");
+  const [recipientAttempt, setRecipientAttempt] = useState(0);
   const [form, setForm] = useState<WizardState>({
     quantities: {},
     notes: "",
-    origin: "purchase",
+    origin: "",
     source: "FAMILY",
     recipientId: "",
+    recipientReason: "",
   });
   const [links, setLinks] = useState<Record<string, string[]>>({});
+  const [sourceSetup, setSourceSetup] = useState<SupplySourcePreparation>(emptySupplySources);
+  const [sourcePicker, setSourcePicker] = useState<{ product?: CatalogProduct; returnFocus: () => HTMLButtonElement | null } | null>(null);
+  const sourceTriggerRef = useRef<HTMLButtonElement>(null);
+  const sourceDefaultsRef = useRef<ReturnType<typeof prepareSupplySources> | null>(null);
   const [requestOptions, setRequestOptions] = useState<ItemContext[]>([]);
+  const effectiveSourceSetup = includeSavedRequisitionSources(sourceSetup, links, requestOptions);
+  const sources = effectiveSourceSetup.sources
+    .map((row) => ({
+      ...row,
+      productIds: row.productIds.filter((id) => {
+        if (!Object.hasOwn(form.quantities, id)) return false;
+        const reqLines = requestOptions.find((option) => option.productId === id)?.pending
+          .filter((line) => line.requisitionId === row.documentId);
+        return !reqLines?.length || reqLines.some((line) => links[id]?.includes(line.lineId));
+      }),
+    }))
+    .filter((row) => row.general || row.productIds.length);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [openingFailure, setOpeningFailure] = useState<OpeningFailure | null>(null);
+  const [catalogueTotal, setCatalogueTotal] = useState<number | null>(null);
+  const [planningWithoutCatalogue, setPlanningWithoutCatalogue] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [issuing, setIssuing] = useState(false);
+  const [uncertain, setUncertain] = useState(false);
+  const { navigating, openIssued } = useIssuanceNavigation(context.userId, context.patient!.id);
+  useOperationActivity((busy && issuing) || navigating, {
+    title: uncertain ? "Consultando a emissão" : "Emissão da ficha",
+    stage: navigating ? 1 : 0, steps: uncertain ? issuanceRecoverySteps : issuanceSteps,
+    detail: navigating ? "A ficha foi registrada. Estamos abrindo o acompanhamento."
+      : uncertain ? "Aguarde a confirmação desta tentativa." : "Estamos conferindo os materiais e registrando a ficha.",
+  });
   const [error, setError] = useState("");
+  const [recoveredId, setRecoveredId] = useState<string | null>(null);
+  const issuanceFailure = useIssuanceFailure();
   const [message, setMessage] = useState("");
+  const [legacyDraft, setLegacyDraft] = useState<{ content: SupplyDraftContent; savedAt: string } | null>(null);
   const [editing, setEditing] = useState<SupplyDocument | null>(null);
   const [saved, setSaved] = useState<SupplyDocument | null>(null);
-  const [uncertain, setUncertain] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const frozenRef = useRef<{
     payload: SupplyPayload;
@@ -107,6 +234,7 @@ export function PatientSupplyWizard({
     draft: boolean;
     submissionKey: string;
     expectedVersion?: number;
+    draftCommit?: { id: string; revision: number; };
   } | null>(null);
   const storageKey =
     "hca:v2:draft:" +
@@ -118,90 +246,435 @@ export function PatientSupplyWizard({
     ":" +
     (documentId ?? "new") +
     ":" +
-    (requisitionId ?? "standalone") +
+    (requisitionId ?? purchaseId ?? "standalone") +
     ":" +
     (recount ? "recount" : "edit");
   const canReadRequests = can(context, "req.read");
+  const canReadFamilyStock = can(context, "stock.family.read");
+  const sourceRevision = useLiveRevision();
   const allowed = can(
     context,
     type === "BAL" ? "bal.count" : type.toLowerCase() + ".create",
   );
+  const writeAccess = useDocumentWriteAccess(allowed);
+  const consultationRef = useRef<HTMLAnchorElement>(null);
+  const patientId = context.patient!.id;
+  const linkedTarget = type === "BAL" ? null : type;
+  const routedSourceId = linkedTarget ? requisitionId ?? purchaseId : null;
+  const sourceIds = sources.map((row) => row.documentId)
+    .sort((first, second) => first.localeCompare(second, "en")).join(",");
+  const readSources = useCallback((value: unknown) => {
+    if (!linkedTarget) throw new Error("Esta ficha não admite vínculos de emissão.");
+    return parseSupplySources(value, patientId, linkedTarget, 1);
+  }, [patientId, linkedTarget]);
+  const currentSources = useScopedRead(
+    linkedTarget && sourceIds ? `/api/documents/sources?careRecipientId=${patientId}&target=${linkedTarget}&ids=${sourceIds}${type === "COM" ? "&observations=1" : ""}` : null,
+    type === "COM" ? `${sourceRevision}:${canReadRequests}:${canReadFamilyStock}` : "",
+    readSources,
+  );
+  const purchaseSources = type === "COM" && canReadRequests && !currentSources.loading && !currentSources.error && currentSources.data
+    ? { byProduct: purchaseMaterialSources(sources, currentSources.data.data),
+      familyStock: canReadFamilyStock ? currentSources.data.familyStock : undefined } : undefined;
+  const readingPurchaseSources = type === "COM" && canReadRequests && sources.some(source => source.productIds.length > 0);
+  let purchaseSourceNotice: ReactNode = null;
+  if (readingPurchaseSources && currentSources.loading) {
+    purchaseSourceNotice = <p className="hca-field-help" role="status">Consultando fichas vinculadas…</p>;
+  } else if (readingPurchaseSources && currentSources.error) {
+    purchaseSourceNotice = <Notice error>
+      Não foi possível consultar as fichas vinculadas.{" "}
+      <ActionButton compact onClick={currentSources.refresh}>Tentar novamente</ActionButton>
+    </Notice>;
+  }
+  const generalSourceOptions = (currentSources.data?.data ?? []).filter(option =>
+    sources.some(row => row.documentId === option.id && row.general));
+  const presentations = useScopedRead<PresentationsRead>(
+    type !== "BAL"
+      ? `/api/catalog/presentations?careRecipientId=${patientId}`
+      : null,
+  );
+  const [legacyReference, setLegacyReference] =
+    useState<BalanceCountReference | null>(null);
+  const [staleLegacyReference, setStaleLegacyReference] = useState(false);
+  const [legacyOpeningKey, setLegacyOpeningKey] = useState<string | null>(null);
+  const [draftMaterials, setDraftMaterials] = useState<
+    BalanceDraftContent["materials"]
+  >([]);
+  const [preservedBalanceContext, setPreservedBalanceContext] = useState<
+    BalanceDraftContent["context"] | null
+  >(null);
+  const [previousObservations, setPreviousObservations] =
+    useState<BalanceDraftContent["previousObservations"]>(undefined);
+  const currentBalanceContext = useMemo<BalanceDraftContent["context"]>(
+    () => ({
+      mode: "legacy",
+      documentId: editing?.id ?? null,
+      documentVersion: editing?.version ?? null,
+      assignmentId: null,
+      assignmentVersion: null,
+      referenceRevision: legacyReference?.revision ?? null,
+    }),
+    [editing?.id, editing?.version, legacyReference?.revision],
+  );
+  const needsBalanceReview =
+    type === "BAL" &&
+    (staleLegacyReference ||
+      (preservedBalanceContext !== null &&
+        !sameBalanceContext(preservedBalanceContext, currentBalanceContext)));
+  const balanceContent = useMemo<BalanceDraftContent>(
+    () => ({
+      counts: form.quantities,
+      observationTimes: form.observationTimes ?? {},
+      notes: form.notes,
+      materials: [
+        ...draftMaterials,
+        ...catalog
+          .filter((product) => !draftMaterials.some((m) => m.id === product.id))
+          .map((product) => ({
+            id: product.id,
+            name: product.name,
+            unit: product.unit,
+            quantityDecimals: product.quantity_decimals ?? 0,
+          })),
+      ],
+      context: preservedBalanceContext ?? currentBalanceContext,
+      ...(previousObservations ? { previousObservations } : {}),
+    }),
+    [
+      form.quantities,
+      form.observationTimes,
+      form.notes,
+      draftMaterials,
+      catalog,
+      preservedBalanceContext,
+      currentBalanceContext,
+      previousObservations,
+    ],
+  );
+  const privateDraft = useCreationDraft({
+    userId: context.userId,
+    patientId,
+    kind: type,
+    navigation: navigationForStep(draftFlow, step),
+    purpose:
+      type === "BAL"
+        ? "create"
+        : editing?.id || documentId
+          ? "revise"
+          : "create",
+    targetDocumentId: editing?.id ?? documentId,
+    enabled:
+      !loading && !loadError && can(context, type.toLowerCase() + ".read"),
+    onResume: (draft) => {
+      const content = draft.content;
+      if (content && "form" in content) {
+        if (
+          content.context.documentId !== (editing?.id ?? null) ||
+          content.context.documentVersion !== (editing?.version ?? null) ||
+          content.context.requisitionId !== requisitionId ||
+          (content.context.purchaseId ?? null) !== purchaseId
+        ) {
+          setError(
+            "O contexto deste preenchimento mudou. Abra o alvo original ou compare com a ficha vigente antes de continuar.",
+          );
+          return false;
+        }
+        setForm(content.form);
+        setLinks(content.links);
+        if (content.sources) setSourceSetup({
+          sources: content.sources, sourceImports: content.sourceImports ?? {}, sourceSeeds: content.sourceSeeds ?? {},
+        });
+        else if (sourceDefaultsRef.current && requisitionId) {
+          const defaults = sourceDefaultsRef.current;
+          const productIds = defaults.preparation.sources[0].productIds.filter((product) =>
+            defaults.links[product]?.some((id) => content.links[product]?.includes(id)));
+          setSourceSetup({ ...emptySupplySources, sources: [{ documentId: requisitionId, general: true, productIds }] });
+        }
+        setDraftMaterials(content.materials);
+        openStep(stepForNavigation(draftFlow, draft.navigation));
+        setError("");
+        setFieldErrors({});
+        return true;
+      }
+      if (!content || !("counts" in content)) return false;
+      if (content.context.documentId !== (editing?.id ?? null)) {
+        setError("Abra a ficha original para recuperar este preenchimento.");
+        return false;
+      }
+      setPreservedBalanceContext(content.context);
+      setPreviousObservations(content.previousObservations);
+      setForm((current) => ({
+        ...current,
+        quantities: content.counts,
+        observationTimes: content.observationTimes,
+        notes: content.notes,
+      }));
+      setDraftMaterials(content.materials);
+      setStep(stepForNavigation(draftFlow, draft.navigation));
+      setError("");
+      setFieldErrors({});
+      return true;
+    },
+    onDiscard: () => {
+      setLegacyDraft(null);
+      setDraftTouched(false);
+      setPlanningWithoutCatalogue(false);
+      const defaults = sourceDefaultsRef.current;
+      if (type !== "BAL") {
+        setLinks(defaults?.links ?? {});
+        setSourceSetup(defaults?.preparation ?? emptySupplySources);
+      }
+      setForm((current) => ({
+        ...current,
+        quantities: type === "BAL"
+          ? Object.fromEntries(catalog.map((product) => [product.id, ""]))
+          : defaults?.quantities ?? {},
+        ...(type !== "BAL"
+          ? {
+            origin: "" as const,
+            source: "FAMILY" as const,
+            recipientId: "",
+            recipientReason: "",
+            sharedNeedReasons: {},
+            presentationSelections: {},
+            manualQuantities: {},
+            requestFulfillments: {},
+            extraProductIds: undefined,
+            pendingExtras: undefined,
+            observations: undefined,
+          }
+          : {}),
+        observationTimes: {},
+        notes: "",
+      }));
+      setDraftMaterials([]);
+      setPreservedBalanceContext(null);
+      setPreviousObservations(undefined);
+      setStaleLegacyReference(false);
+      setLastMaterialsStep(supplyStageSteps[1]);
+      setStep(0);
+      setError("");
+      setFieldErrors({});
+      sessionStorage.removeItem(storageKey);
+    },
+  });
+  const supplyExtraIds = form.extraProductIds?.filter(id => Object.hasOwn(form.quantities, id));
+  const supplyContent: SupplyDraftContent = {
+    form: {
+      quantities: form.quantities,
+      ...(supplyExtraIds?.length ? { extraProductIds: supplyExtraIds } : {}),
+      ...(type !== "BAL" && form.pendingExtras?.length ? { pendingExtras: form.pendingExtras } : {}),
+      notes: form.notes,
+      observations: form.observations,
+      origin: form.origin,
+      source: form.source,
+      recipientId: form.recipientId,
+      recipientReason: form.recipientReason,
+      sharedNeedReasons: form.sharedNeedReasons,
+      requestFulfillments: form.requestFulfillments,
+      presentationSelections: form.presentationSelections,
+      manualQuantities: form.manualQuantities,
+    },
+    links,
+    ...sourceSetup,
+    sources,
+    materials: balanceContent.materials,
+    context: {
+      documentId: editing?.id ?? null,
+      documentVersion: editing?.version ?? null,
+      requisitionId,
+      ...(purchaseId ? { purchaseId } : {}),
+      recipientName: people.find((p) => p.id === form.recipientId)?.name ?? "",
+    },
+  };
+  const privateContent = type === "BAL" ? balanceContent : supplyContent;
+
+  const [draftTouched, setDraftTouched] = useState(false);
+  useLongDraftAutosave(privateDraft, privateContent, allowed && draftTouched && !(busy || uncertain || saved || recoveredId || navigating));
+  const offeredContent = privateDraft.offered?.content;
+  const originalSource =
+    offeredContent && "form" in offeredContent
+      ? offeredContent.context.requisitionId
+      : null;
+  const originalPurchase = offeredContent && "form" in offeredContent ? offeredContent.context.purchaseId ?? null : null;
+  const resumeHref =
+    (originalSource !== requisitionId || originalPurchase !== purchaseId) &&
+      offeredContent &&
+      "form" in offeredContent
+      ? `/fichas/${type.toLowerCase()}?careRecipientId=${patientId}${originalSource ? "&requisitionId=" + originalSource : originalPurchase ? "&purchaseId=" + originalPurchase : ""}`
+      : undefined;
+  const missingBalanceMaterials = Object.keys(form.quantities).filter(
+    (id) => !catalog.some((product) => product.id === id),
+  );
+  function updateForm(value: SetStateAction<WizardState>) {
+    setDraftTouched(true);
+    setForm((current) => {
+      const next = typeof value === "function" ? value(current) : value;
+      if (type !== "BAL") return next;
+      const times = { ...current.observationTimes, ...next.observationTimes };
+      for (const [id, quantity] of Object.entries(next.quantities))
+        if (quantity !== current.quantities[id])
+          times[id] = new Date().toISOString();
+      return { ...next, observationTimes: times };
+    });
+  }
+  function closeSourcePicker() {
+    const returnFocus = sourcePicker?.returnFocus;
+    setSourcePicker(null);
+    if (returnFocus) requestAnimationFrame(() => returnFocus()?.focus({ preventScroll: true }));
+  }
+  function applySources(selection: SupplySourceSelection[]) {
+    const productId = sourcePicker?.product?.id;
+    const quantities = productId && selection.length && !Object.hasOwn(form.quantities, productId)
+      ? { ...form.quantities, [productId]: "" } : form.quantities;
+    const result = prepareSupplySources(effectiveSourceSetup, selection, quantities, links, requestOptions, productId);
+    setForm((current) => {
+      const next = { ...current, quantities: result.quantities };
+      if (type !== "ENT") return next;
+      const requestFulfillments = { ...current.requestFulfillments };
+      const sharedNeedReasons = { ...current.sharedNeedReasons };
+      for (const id of Object.keys({ ...links, ...result.links })) {
+        const before = links[id] ?? [];
+        const after = result.links[id] ?? [];
+        if (before.length === after.length && before.every(item => after.includes(item))) continue;
+        delete requestFulfillments[id];
+        delete sharedNeedReasons[id];
+      }
+      return { ...next, requestFulfillments, sharedNeedReasons };
+    });
+    setLinks(result.links);
+    setSourceSetup(result.preparation);
+    closeSourcePicker();
+    setDraftTouched(true);
+  }
   useEffect(() => {
     const controller = new AbortController();
-    const patientId = context.patient!.id;
     Promise.all([
-      api<{ data: CatalogProduct[] }>(
-        "/api/catalog?careRecipientId=" + patientId,
-        undefined,
-        controller.signal,
-      ),
-      api<{ directory: PatientPerson[] }>(
+      type === "BAL"
+        ? api<{ data: CatalogProduct[]; }>("/api/catalog?careRecipientId=" + patientId, undefined, controller.signal)
+          .then(result => ({ ...result, total: null }))
+        : readWizardCatalogue(patientId, controller.signal),
+      api<{ directory: PatientPerson[]; }>(
         "/api/patient-settings?careRecipientId=" + patientId,
         undefined,
         controller.signal,
       ),
-      requisitionId
-        ? api<{ data: SourceRequest }>(
-            "/api/requisitions/" + requisitionId,
-            undefined,
-            controller.signal,
-          )
+      routedSourceId && linkedTarget && allowed
+        ? api<unknown>(
+          `/api/documents/sources?careRecipientId=${patientId}&target=${linkedTarget}&ids=${encodeURIComponent(routedSourceId)}`,
+          undefined,
+          controller.signal,
+        ).then(readSources)
+        : Promise.resolve(null),
+      type === "BAL"
+        ? api<unknown>(
+          `/api/balances?careRecipientId=${patientId}&reference=true`,
+          undefined,
+          controller.signal,
+        ).then(value => parseBalanceCountReference(value, patientId))
         : Promise.resolve(null),
     ])
-      .then(async ([products, settings, source]) => {
+      .then(async ([products, settings, source, stockReference]) => {
         if (controller.signal.aborted) return;
         setCatalog(products.data);
+        setLegacyReference(stockReference?.data ?? null);
+        setStaleLegacyReference(false);
         setPeople(settings.directory);
-        if (type !== "BAL" && canReadRequests) {
-          const options = await api<{ data: ItemContext[] }>(
+        let options: ItemContext[] = [];
+        if (type !== "BAL" && canReadRequests && products.data.length) {
+          const response = await api<{ data: ItemContext[]; }>(
             "/api/requisitions/item-context?careRecipientId=" +
-              patientId +
-              "&productIds=" +
-              products.data
-                .map((product) => encodeURIComponent(product.id))
-                .join(","),
+            patientId +
+            "&productIds=" +
+            products.data
+              .map((product) => encodeURIComponent(product.id))
+              .join(","),
             undefined,
             controller.signal,
           );
           if (controller.signal.aborted) return;
-          setRequestOptions(options.data);
+          if (!Array.isArray(response.data)) throw new Error("Não foi possível conferir a referência de materiais.");
+          options = response.data;
+          setRequestOptions(options);
         }
-        if (source && source.data.care_recipient_id !== patientId)
-          throw new Error(
-            "A requisição pertence a outro paciente. Selecione o contexto correspondente.",
-          );
-        const sourceLinks: Record<string, string[]> = {};
-        for (const item of source?.data.requisition_items ?? []) {
-          const productId = item.product_id ?? item.resolution?.product_id;
-          if (productId) (sourceLinks[productId] ??= []).push(item.id);
-        }
-        setLinks(sourceLinks);
+        const origin = source?.data.find((row) => row.id === routedSourceId);
+        const prepared = origin
+          ? prepareSupplySources(emptySupplySources, [{ option: origin, importMaterials: true }], {}, {}, options)
+          : { quantities: {}, links: {}, preparation: emptySupplySources };
+        sourceDefaultsRef.current = origin ? prepared : null;
+        setLinks(prepared.links);
+        setSourceSetup(prepared.preparation);
         let restored: WizardState | undefined;
+        let restoredSources: SupplySourcePreparation | undefined;
+        let restoredBalance: BalanceDraftContent | undefined;
         let preserved: typeof frozenRef.current = null;
         let recoveredId: string | undefined;
         try {
           const raw = sessionStorage.getItem(storageKey);
           if (raw) {
             const envelope = JSON.parse(raw);
-            if (
-              Date.now() - envelope.savedAt < 86_400_000 &&
-              envelope.form &&
-              typeof envelope.form.quantities === "object"
-            ) {
-              restored = envelope.form;
-              if (envelope.links && typeof envelope.links === "object")
-                setLinks(envelope.links);
+            if (envelope.form && typeof envelope.form.quantities === "object") {
               recoveredId = envelope.editingId;
               if (envelope.intent?.key && envelope.intent?.payload)
                 preserved = envelope.intent;
-            } else sessionStorage.removeItem(storageKey);
+              if (type !== "BAL" && !recoveredId && !preserved) {
+                const legacy = supplyDraftContent.safeParse({
+                  form: envelope.form,
+                  links: envelope.links ?? {},
+                  ...envelope.sourceSetup,
+                  materials: products.data.map(product => ({
+                    id: product.id, name: product.name, unit: product.unit, quantityDecimals: product.quantity_decimals ?? 0,
+                  })),
+                  context: {
+                    documentId: null, documentVersion: null, requisitionId, purchaseId,
+                    recipientName: settings.directory.find(person => person.id === envelope.form.recipientId)?.name ?? "",
+                  },
+                });
+                if (legacy.success) {
+                  const old = legacy.data;
+                  const hasEdits = Object.keys(old.form.quantities).length || old.form.pendingExtras?.length ||
+                    old.form.notes || old.form.observations?.some(note => note.trim()) || old.form.recipientReason ||
+                    old.form.source === "CARE_TEAM" || old.sources?.length || Object.keys(old.links).length;
+                  if (hasEdits) setLegacyDraft({ content: old, savedAt: new Date(envelope.savedAt).toISOString() });
+                  else sessionStorage.removeItem(storageKey);
+                }
+              } else {
+                restored = envelope.form;
+                if (type === "BAL") {
+                  restoredBalance = balanceDraftContent.parse(
+                    envelope.balanceContent ?? {
+                      counts: restored!.quantities,
+                      observationTimes: restored!.observationTimes ?? {},
+                      notes: restored!.notes,
+                      materials: [],
+                      context: {
+                        mode: "legacy",
+                        documentId: envelope.editingId ?? null,
+                        documentVersion: null,
+                        assignmentId: null,
+                        assignmentVersion: null,
+                        referenceRevision: null,
+                      },
+                    },
+                  );
+                }
+                if (envelope.links && typeof envelope.links === "object")
+                  setLinks(envelope.links);
+                if (envelope.sourceSetup?.sources) restoredSources = envelope.sourceSetup;
+              }
+            } else if (type === "BAL")
+              throw Error("Invalid saved balance fields");
+            else sessionStorage.removeItem(storageKey);
           }
         } catch {
+          if (type === "BAL")
+            throw Error(
+              "Não foi possível conferir a cópia local do balanço. Ela foi preservada; nenhum envio foi realizado.",
+            );
           /* A damaged optional draft cannot change authority or catalogue data. */
         }
         if (documentId || recoveredId) {
           const existing = (
-            await api<{ data: SupplyDocument }>(
+            await api<{ data: SupplyDocument; }>(
               "/api/documents/" + (documentId ?? recoveredId),
               undefined,
               controller.signal,
@@ -218,6 +691,23 @@ export function PatientSupplyWizard({
           )
             throw new Error("Esta ficha não permite edição neste contexto.");
           setEditing(existing);
+          if (existing.originDocuments) setSourceSetup({
+            ...emptySupplySources,
+            sources: existing.originDocuments.map(({ documentId, general, productIds }) => ({ documentId, general, productIds })),
+          });
+          if (type === "BAL" && !recount)
+            setPreservedBalanceContext({
+              mode: existing.payload.balanceAssignment ? "scheduled" : "legacy",
+              documentId: existing.id,
+              documentVersion: existing.version,
+              assignmentId: existing.payload.balanceAssignment?.id ?? null,
+              assignmentVersion:
+                existing.payload.balanceAssignment?.version ?? null,
+              referenceRevision:
+                existing.payload.balanceAssignment?.referenceRevision ??
+                existing.payload.balanceReferenceRevision ??
+                null,
+            });
           setLinks(
             Object.fromEntries(
               existing.lines.map((line) => [
@@ -227,6 +717,7 @@ export function PatientSupplyWizard({
             ),
           );
           setForm({
+            requestFulfillments: Object.fromEntries(existing.lines.map(line => [line.product_id, line.family_fulfillment ?? ""])),
             quantities: Object.fromEntries(
               existing.lines.map((line) => [
                 line.product_id,
@@ -234,17 +725,34 @@ export function PatientSupplyWizard({
               ]),
             ),
             notes: existing.payload.notes ?? "",
-            origin: existing.payload.origin ?? "purchase",
+            observations: existing.payload.observations,
+            extraProductIds: existing.lines.filter(line => line.metadata.catalogueExtra === "true").map(line => line.product_id),
+            pendingExtras: existing.payload.pendingExtras,
+            origin: existing.payload.origin ?? "",
             source: existing.payload.source ?? "FAMILY",
             recipientId: existing.recipient_id ?? "",
+            recipientReason: existing.payload.recipientReason ?? "",
             sharedNeedReasons: Object.fromEntries(
               existing.lines.map((line) => [
                 line.product_id,
                 String(line.metadata.sharedNeedReason ?? ""),
               ]),
             ),
+            presentationSelections: Object.fromEntries(
+              existing.lines.map((line) => [
+                line.product_id,
+                readPresentationConversions(line.presentation_conversions),
+              ]),
+            ),
+            manualQuantities: Object.fromEntries(
+              existing.lines.map((line) => [
+                line.product_id,
+                String(line.metadata.manualQuantity ?? line.quantity),
+              ]),
+            ),
           });
-          if (restored && !documentId) setForm(restored);
+          if (restored && (preserved || !documentId || type === "BAL"))
+            setForm(restored);
           if (preserved) {
             frozenRef.current = preserved;
             setUncertain(true);
@@ -268,17 +776,36 @@ export function PatientSupplyWizard({
         else if (source)
           setForm((current) => ({
             ...current,
-            quantities: Object.fromEntries(
-              Object.keys(sourceLinks).map((id) => [id, ""]),
-            ),
+            quantities: prepared.quantities,
           }));
+        if (restoredSources) setSourceSetup(restoredSources);
+        if (source && !origin)
+          setMessage("A ficha de origem está indisponível para este vínculo. Confira as origens antes de continuar.");
+        if (type === "BAL") {
+          setLegacyOpeningKey(
+            documentId || recoveredId || preserved
+              ? null
+              : sessionStorage.getItem(storageKey + ":start"),
+          );
+        }
+        if (restoredBalance) {
+          setPreservedBalanceContext(restoredBalance.context);
+          setPreviousObservations(restoredBalance.previousObservations);
+          setDraftMaterials(restoredBalance.materials);
+        }
         setLoading(false);
+        setLoadError("");
+        setOpeningFailure(null);
+        setCatalogueTotal(products.total);
         setError("");
       })
       .catch((reason) => {
         if (!controller.signal.aborted) {
           setLoading(false);
-          setError(
+          setOpeningFailure(reason instanceof CatalogueOpeningError
+            ? { source: "catalogue", cause: reason.cause }
+            : { source: "reference", cause: reason });
+          setLoadError(
             reason instanceof Error
               ? reason.message
               : "Não foi possível carregar o formulário.",
@@ -287,45 +814,153 @@ export function PatientSupplyWizard({
       });
     return () => controller.abort();
   }, [
-    context.patient,
-    requisitionId,
+    patientId,
+    routedSourceId,
+    linkedTarget,
+    readSources,
+    allowed,
     storageKey,
     type,
     attempt,
     documentId,
+    requisitionId,
+    purchaseId,
     recount,
     canReadRequests,
   ]);
   useEffect(() => {
-    if (loading || saved || uncertain || busy) return;
+    if (type !== "ENT" || loading || loadError || uncertain || saved) return;
+    const controller = new AbortController();
+    api<{ data: DeliveryPreparation; }>(
+      "/api/documents/delivery-preparation?careRecipientId=" +
+      patientId +
+      "&schedule=1&source=" +
+      form.source,
+      undefined,
+      controller.signal,
+    )
+      .then(({ data }) => {
+        if (controller.signal.aborted) return;
+        if (recipientContextRef.current?.source === data.source) {
+          if (recipientContextRef.current.referenceHash !== data.referenceHash) setRecipientComparison(data);
+          else {
+            recipientContextRef.current = data;
+            setRecipientContext(data);
+            setRecipientComparison(null);
+          }
+        } else {
+          recipientContextRef.current = data;
+          setRecipientContext(data);
+          setRecipientComparison(null);
+          setForm((current) =>
+            current.recipientId
+              ? current
+              : { ...current, recipientId: data.suggestedId ?? "" },
+          );
+        }
+        setRecipientError("");
+        setRecipientPending(false);
+        setRecipientLoadedSource(data.source);
+      })
+      .catch((reason) => {
+        if (!controller.signal.aborted) {
+          setRecipientError(
+            reason instanceof Error
+              ? reason.message
+              : "Não foi possível consultar os recebedores. Atualize esta seção.",
+          );
+          setRecipientPending(false);
+          setRecipientLoadedSource(form.source);
+        }
+      });
+    return () => controller.abort();
+  }, [
+    type,
+    patientId,
+    form.source,
+    loading,
+    loadError,
+    uncertain,
+    saved,
+    recipientAttempt,
+  ]);
+  const recipientLoading =
+    recipientPending || recipientLoadedSource !== form.source;
+  const activeRecipientContext =
+    recipientContext?.source === form.source ? recipientContext : null;
+  useEffect(() => {
+    if ((type !== "BAL" && !editing) || loading || loadError || saved || uncertain || busy) return;
     const timer = window.setTimeout(() => {
       if (frozenRef.current) return;
       try {
-        sessionStorage.setItem(
-          storageKey,
-          JSON.stringify({
-            savedAt: Date.now(),
-            form,
-            links,
-            editingId: editing?.id,
-          }),
-        );
+        saveWizardCache(storageKey, {
+          form,
+          links,
+          sourceSetup,
+          editingId: editing?.id,
+          ...(type === "BAL" ? { balanceContent } : {}),
+        });
       } catch {
         /* The form remains in memory. */
       }
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [form, links, editing, loading, saved, storageKey, uncertain, busy]);
+  }, [
+    form,
+    links,
+    sourceSetup,
+    editing,
+    loading,
+    loadError,
+    saved,
+    storageKey,
+    uncertain,
+    busy,
+    type,
+    balanceContent,
+  ]);
   function validate(all = false) {
     const errors: Record<string, string> = {};
-    const category = ["medicamentos", "higiene", "dieta"][step - 1];
+    if (type !== "BAL" && (all || step === 4))
+      Object.assign(errors, issuanceObservationErrors(form.observations ?? []));
     if (type === "ENT" && (all || step === 0) && !form.recipientId)
       errors.recipientId = "Selecione quem receberá esta entrega.";
-    const relevant = catalog.filter(
-      (product) =>
-        (all || product.category === category) &&
-        (type === "BAL" || Object.hasOwn(form.quantities, product.id)),
-    );
+    if (type === "ENT" && (all || step === 0)) {
+      if (recipientLoading || recipientError || !activeRecipientContext)
+        errors.recipientContext =
+          "Consulte as pessoas e a escala antes de continuar. Os demais campos foram preservados.";
+      else if (recipientComparison)
+        errors.recipientContext =
+          "Compare e adote explicitamente as referências atuais antes de continuar.";
+      else if (
+        !activeRecipientContext.people.some(
+          (person) => person.id === form.recipientId,
+        )
+      )
+        errors.recipientId =
+          "Escolha uma pessoa que continue elegível para receber nesta direção.";
+      if (
+        activeRecipientContext &&
+        !recipientError &&
+        !recipientLoading &&
+        !recipientComparison &&
+        form.recipientId &&
+        (form.recipientId !== activeRecipientContext?.suggestedId ||
+          (editing?.recipient_id &&
+            editing.recipient_id !== form.recipientId)) &&
+        (form.recipientReason?.trim().length ?? 0) < 3
+      )
+        errors.recipientReason =
+          "Explique a escolha manual ou troca do recebedor com 3 a 1000 caracteres.";
+    }
+    const extras = new Set(form.extraProductIds);
+    const lastCategory = category && !adjacentMaterialCategory(category, catalog, "next");
+    const relevant = catalog.filter(product => {
+      if (isBalance) return all || product.category === category;
+      if (!Object.hasOwn(form.quantities, product.id)) return false;
+      return all || (category && (lastCategory || product.category === category) && !extras.has(product.id)) ||
+        (step === supplyExtrasStep && extras.has(product.id));
+    });
     for (const product of relevant)
       if (
         !validQuantity(
@@ -340,10 +975,13 @@ export function PatientSupplyWizard({
             ? "quantidade válida"
             : "unidades inteiras") +
           (type === "BAL" ? ", inclusive zero." : " acima de zero.");
-    if (all && !Object.keys(form.quantities).length)
-      errors.lines = "Selecione ao menos um produto.";
-    if (all || step === 0)
+    if (all && !Object.keys(form.quantities).length && !form.pendingExtras?.length)
+      errors.lines = "Selecione ou informe ao menos um material.";
+    if (all || (type === "COM" && step === 0) || (type === "ENT" && (category || step === supplyExtrasStep || step === 4)))
       for (const [productId, ids] of Object.entries(links)) {
+        if (!Object.hasOwn(form.quantities, productId)) continue;
+        if (!all && ((step === supplyExtrasStep && !extras.has(productId)) ||
+          (category && !relevant.some(product => product.id === productId)))) continue;
         if (
           ids.length > 1 &&
           (form.sharedNeedReasons?.[productId]?.trim().length ?? 0) < 3
@@ -351,12 +989,22 @@ export function PatientSupplyWizard({
           errors[productId + ":shared"] =
             "Justifique por que essas requisições representam a mesma necessidade.";
       }
+    if (type === "ENT" && form.source !== "FAMILY" && sources.length)
+      errors.sources = "Retire os vínculos de origem da entrega antes de preparar a devolução.";
     setFieldErrors(errors);
     if (Object.keys(errors).length) {
       setError("Confira os campos destacados.");
+      if (!isBalance) {
+        const first = Object.keys(errors)[0];
+        const product = catalog.find(item => item.id === first ||
+          (type === "ENT" && first === item.id + ":shared"));
+        if (product) openStep(extras.has(product.id) ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1);
+        else if (first.startsWith("observation:")) setStep(4);
+        else if (all) openStage(first === "lines" ? 1 : 0);
+      }
       window.setTimeout(
         () =>
-          document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
+          document.querySelector<HTMLElement>('[aria-invalid="true"], [data-wizard-quantity-error="true"]')?.focus(),
         0,
       );
       return false;
@@ -365,30 +1013,64 @@ export function PatientSupplyWizard({
     return true;
   }
   async function next() {
-    if (!validate()) return;
-    if (type === "BAL" && step === 0 && !editing) {
+    const openingKey = step === 0 && !editing ? legacyOpeningKey : null;
+    if (!openingKey && (needsBalanceReview || !validate())) return;
+    if (step === 0 && householdSelectionRef.current?.apply() === false) return;
+    // Retain recovery of an old, already-started documentary opening. New
+    // entry never creates this key or an operational draft.
+    if (openingKey) {
       setBusy(true);
       try {
-        const key = storageKey + ":start";
-        let idempotencyKey = sessionStorage.getItem(key);
-        if (!idempotencyKey) {
-          idempotencyKey = crypto.randomUUID();
-          sessionStorage.setItem(key, idempotencyKey);
-        }
-        const result = await api<{ data: SupplyDocument }>("/api/documents", {
+        const result = await api<unknown>("/api/documents", {
           careRecipientId: context.patient!.id,
           type: "BAL",
           payload: {
-            lines: catalog.map((product) => ({
-              productId: product.id,
+            lines: Object.keys(form.quantities).map((productId) => ({
+              productId,
               quantity: "0",
             })),
             notes: "",
           },
-          idempotencyKey,
+          idempotencyKey: openingKey,
           draft: true,
         });
-        setEditing(result.data);
+        const confirmed = requireSupplyConfirmation(result, {
+          patientId,
+          type: "BAL",
+        });
+        if (
+          confirmed.created_by !== context.userId ||
+          !("idempotency_key" in confirmed) ||
+          confirmed.idempotency_key !== openingKey ||
+          confirmed.status !== "draft"
+        ) {
+          throw Error(
+            "A resposta não confirmou a abertura original desta ficha em edição.",
+          );
+        }
+        const hasObservations =
+          Object.values(balanceContent.counts).some((value) => value !== "") ||
+          Object.values(balanceContent.observationTimes).some(
+            (value) => value !== null,
+          ) ||
+          balanceContent.notes !== "" ||
+          Boolean(balanceContent.previousObservations?.length);
+        const sourceContext = {
+          ...(hasObservations ? balanceContent.context : currentBalanceContext),
+          documentId: confirmed.id,
+          documentVersion: confirmed.version,
+        };
+        saveWizardCache(storageKey, {
+          form,
+          links,
+          editingId: confirmed.id,
+          balanceContent: { ...balanceContent, context: sourceContext },
+        });
+        setEditing(confirmed);
+        setPreservedBalanceContext(sourceContext);
+        setLegacyOpeningKey(null);
+        setError("");
+        if (hasObservations && needsBalanceReview) return;
       } catch (reason) {
         setError(
           reason instanceof Error
@@ -400,166 +1082,394 @@ export function PatientSupplyWizard({
         setBusy(false);
       }
     }
-    setStep((current) => Math.min(steps.length - 1, current + 1));
-  }
-  async function persist(draft: boolean) {
-    if (!frozenRef.current) {
-      if (!validate(true)) {
-        if (draft) {
-          try {
-            sessionStorage.setItem(
-              storageKey,
-              JSON.stringify({ savedAt: Date.now(), form }),
-            );
-            setMessage(
-              "Rascunho salvo neste dispositivo. Complete os campos para emitir a ficha.",
-            );
-          } catch {
-            setError("Não foi possível salvar o rascunho neste dispositivo.");
-          }
+    if (type === "BAL" && step === 4) {
+      setBusy(true);
+      try {
+        const current = (
+          await api<unknown>(
+            `/api/balances?careRecipientId=${patientId}&reference=true`,
+          ).then(value => parseBalanceCountReference(value, patientId))
+        ).data;
+        if (!legacyReference || current.revision !== legacyReference.revision) {
+          setStaleLegacyReference(true);
+          setError(
+            "O estoque mudou desde o início da contagem. Preserve os valores para conferir e inicie uma nova conferência antes de concluir.",
+          );
+          return;
         }
+      } catch (reason) {
+        setError((reason as Error).message);
+        return;
+      } finally {
+        setBusy(false);
+      }
+    }
+    const nextCategory = !isBalance && (step === 0 || category) && adjacentMaterialCategory(category, catalog, "next");
+    if (nextCategory) openStep(materialCategories.findIndex(item => item.id === nextCategory) + 1);
+    else openStage(Math.min(steps.length - 1, stage + 1));
+    if (type === "BAL" && step === 4) {
+      requestAnimationFrame(() => {
+        const heading = document.getElementById("supply-wizard-heading");
+        heading?.focus({ preventScroll: true });
+        heading?.scrollIntoView({ block: "start", behavior: "instant" });
+      });
+    }
+  }
+  async function persist() {
+    if (busy || privateDraft.backgroundBusy) return;
+    if (
+      !frozenRef.current &&
+      (privateDraft.blocked || missingBalanceMaterials.length)
+    )
+      return;
+    if (!frozenRef.current) {
+      if (type === "ENT" && form.pendingExtras?.length) {
+        setError(pendingExtraDispatchMessage);
         return;
       }
-      const lines: DraftLine[] = catalog
-        .filter((product) => Object.hasOwn(form.quantities, product.id))
-        .map((product) => ({
-          productId: product.id,
-          quantity: quantity(form.quantities[product.id]).toFixed(),
-          ...(links[product.id]?.length
-            ? {
-                requisitionItemIds: links[product.id],
-                metadata: {
-                  sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "",
-                },
-              }
-            : {}),
-        }));
-      const payload: SupplyPayload = {
-        lines,
-        notes: form.notes,
-        ...(type === "COM"
-          ? { origin: form.origin }
-          : type === "ENT"
-            ? {
-                source: form.source,
-                destination: form.source === "FAMILY" ? "CARE_TEAM" : "FAMILY",
-                recipientId: form.recipientId,
-              }
-            : {}),
-      };
-      frozenRef.current = {
-        payload,
-        key: crypto.randomUUID(),
-        submissionKey: crypto.randomUUID(),
-        draft,
-        expectedVersion: editing?.version,
-      };
+      if (type === "BAL" && (needsBalanceReview || !legacyReference)) return;
+      if (
+        type === "BAL" &&
+        !editing &&
+        sessionStorage.getItem(storageKey + ":start")
+      ) {
+        setError(
+          "Recupere a abertura anterior na etapa de identificação antes de concluir esta contagem.",
+        );
+        setStep(0);
+        return;
+      }
+      if (!validate(true)) return;
     }
+    const recoveringSubmission = uncertain && editing !== null && frozenRef.current?.expectedVersion !== undefined
+      && editing.version > frozenRef.current.expectedVersion;
+    const isIssuance = type !== "BAL" && !frozenRef.current?.draft && (!editing?.protocol || recoveringSubmission);
+    setIssuing(isIssuance);
     setBusy(true);
     setError("");
     try {
-      sessionStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          savedAt: Date.now(),
-          form,
-          links,
-          editingId: editing?.id,
-          intent: frozenRef.current,
-        }),
-      );
-    } catch {
-      /* Attempt retained in memory. */
-    }
-    try {
-      const result = await api<{ data: SupplyDocument }>(
+      if (!frozenRef.current) {
+        const lines: DraftLine[] = catalog
+          .filter((product) => Object.hasOwn(form.quantities, product.id))
+          .map((product) => ({
+            productId: product.id,
+            quantity: quantity(form.quantities[product.id]).toFixed(),
+            ...(form.presentationSelections?.[product.id]?.length
+              ? {
+                manualQuantity: quantity(
+                  form.manualQuantities?.[product.id] ?? "0",
+                ).toFixed(),
+                presentations: form.presentationSelections[product.id].map(
+                  (row) => ({
+                    id: row.id,
+                    version: row.version,
+                    packages: row.packages,
+                  }),
+                ),
+              }
+              : {}),
+            ...(links[product.id]?.length
+              ? {
+                requisitionItemIds: links[product.id],
+                ...(type === "ENT" && form.source === "FAMILY" ? {
+                  requestFulfillment: form.requestFulfillments?.[product.id] === "complete" ? "complete" : "partial",
+                } : {}),
+              }
+              : {}),
+            ...(links[product.id]?.length || form.extraProductIds?.includes(product.id) ? {
+              metadata: {
+                ...(links[product.id]?.length ? { sharedNeedReason: form.sharedNeedReasons?.[product.id] ?? "" } : {}),
+                ...(form.extraProductIds?.includes(product.id) ? { catalogueExtra: "true" } : {}),
+              },
+            } : {}),
+          }));
+        const payload: SupplyPayload = {
+          lines,
+          ...(type === "COM" && form.pendingExtras?.length ? { pendingExtras: form.pendingExtras } : {}),
+          notes: form.notes,
+          ...(type !== "BAL" && form.observations ? { observations: form.observations.map(note => note.trim()) } : {}),
+          ...(sources.length ? { sources } : {}),
+          ...(type === "BAL"
+            ? { balanceReferenceRevision: legacyReference!.revision }
+            : {}),
+          ...(type === "COM"
+            ? { acquisitionMode: "planned" as const }
+            : type === "ENT"
+              ? {
+                source: form.source,
+                destination: form.source === "FAMILY" ? "CARE_TEAM" : "FAMILY",
+                recipientId: form.recipientId,
+                recipientReason: form.recipientReason?.trim() || undefined,
+                recipientReference: activeRecipientContext!.referenceHash,
+              }
+              : {}),
+        };
+        const privateCommit =
+          await privateDraft.save(structuredClone(privateContent));
+        if (!privateCommit) return;
+        frozenRef.current = {
+          payload,
+          key: crypto.randomUUID(),
+          submissionKey: crypto.randomUUID(),
+          draft: false,
+          expectedVersion: editing?.version,
+          draftCommit: { id: privateCommit.id, revision: privateCommit.revision },
+        };
+      }
+      try {
+        sessionStorage.setItem(
+          storageKey,
+          JSON.stringify({
+            form,
+            links,
+            sourceSetup,
+            editingId: editing?.id,
+            intent: frozenRef.current,
+            ...(type === "BAL" ? { balanceContent } : {}),
+          }),
+        );
+      } catch {
+        /* Attempt retained in memory. */
+      }
+      const intent = frozenRef.current;
+      if (isIssuance && uncertain && intent.draftCommit) {
+        const resolution = await reconcileIssuance(patientId, intent.draftCommit, intent.key);
+        if (resolution.state === "not_applied") {
+          frozenRef.current = null;
+          try { sessionStorage.removeItem(storageKey); } catch { /* The server has closed the old key. */ }
+          setUncertain(false);
+          issuanceFailure.report({ outcome: "rejected", cause: issuanceFailure.failure?.cause,
+            draftSaved: resolution.draftSaved, retryable: resolution.draftSaved && allowed });
+          return;
+        }
+        if (editing && resolution.documentId !== editing.id)
+          throw new Error("A confirmação não corresponde à ficha revisada.");
+        try { sessionStorage.removeItem(storageKey); } catch { /* Issuance is already confirmed. */ }
+        setRecoveredId(resolution.documentId);
+        openIssued(resolution.documentId);
+        setUncertain(false);
+        issuanceFailure.clear();
+        return;
+      }
+      const result = await api<{ data: SupplyDocument; }>(
         editing ? "/api/documents/" + editing.id + "/revise" : "/api/documents",
         editing
           ? {
-              payload: frozenRef.current.payload,
-              idempotencyKey: frozenRef.current.key,
-              submissionKey: frozenRef.current.submissionKey,
-              expectedVersion: frozenRef.current.expectedVersion,
-              recount,
-              submit: !frozenRef.current.draft,
-            }
+            payload: frozenRef.current.payload,
+            idempotencyKey: frozenRef.current.key,
+            submissionKey: frozenRef.current.submissionKey,
+            expectedVersion: frozenRef.current.expectedVersion,
+            recount,
+            ...(frozenRef.current.draftCommit
+              ? {
+                draftCommit: frozenRef.current.draftCommit,
+                ...(type !== "BAL" ? { draftKind: type } : {}),
+              }
+              : {}),
+            submit: !frozenRef.current.draft,
+          }
           : {
-              careRecipientId: context.patient!.id,
-              type,
-              payload: frozenRef.current.payload,
-              idempotencyKey: frozenRef.current.key,
-              draft: frozenRef.current.draft,
-            },
+            careRecipientId: context.patient!.id,
+            type,
+            payload: frozenRef.current.payload,
+            idempotencyKey: frozenRef.current.key,
+            draft: frozenRef.current.draft,
+            ...(frozenRef.current.draftCommit
+              ? { draftCommit: frozenRef.current.draftCommit }
+              : {}),
+          },
       );
-      setSaved(result.data);
-      sessionStorage.removeItem(storageKey);
-      sessionStorage.removeItem(storageKey + ":start");
+      const confirmed = requireSupplyConfirmation(result, {
+        patientId,
+        type,
+        id: editing?.id,
+        observations: frozenRef.current.payload.observations,
+        ...(type === "COM" ? { pendingExtras: frozenRef.current.payload.pendingExtras ?? [],
+          acquisitionMode: frozenRef.current.payload.acquisitionMode } : {}),
+        minimumVersion: frozenRef.current.expectedVersion !== undefined
+          ? frozenRef.current.expectedVersion + 1
+          : editing
+            ? editing.version + 1
+            : 1,
+      });
+      if (isIssuance && confirmed.protocol && confirmed.status !== "draft") openIssued(confirmed.id);
+      setSaved(confirmed);
+      try {
+        sessionStorage.removeItem(storageKey);
+        sessionStorage.removeItem(storageKey + ":start");
+      } catch { /* The server has confirmed the document. */ }
       setUncertain(false);
+      issuanceFailure.clear();
     } catch (reason) {
       const known =
         reason instanceof ApiError &&
         [400, 403, 404, 409, 413, 422].includes(reason.status);
-      if (known) frozenRef.current = null;
-      setUncertain(!known);
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "Não foi possível confirmar a gravação.",
+      if (known && !uncertain) {
+        frozenRef.current = null;
+        try { sessionStorage.removeItem(storageKey); } catch { /* Storage may be unavailable. */ }
+      }
+      if (
+        type === "BAL" &&
+        reason instanceof ApiError &&
+        reason.code === "INVENTORY_CONFLICT"
+      )
+        setStaleLegacyReference(true);
+      if (
+        reason instanceof ApiError &&
+        reason.code === "DRAFT_VERSION_CONFLICT" &&
+        !uncertain
+      ) {
+        await privateDraft.reportConflict();
+        setStep(0);
+      }
+      if (
+        type === "ENT" &&
+        reason instanceof ApiError &&
+        reason.status === 409 &&
+        !uncertain
+      ) {
+        setRecipientPending(true);
+        setRecipientAttempt((value) => value + 1);
+        setStep(0);
+      }
+      setUncertain(uncertain || !known);
+      if (isIssuance && frozenRef.current?.draftCommit && (uncertain || !known)) {
+        issuanceFailure.report({ outcome: type === "COM" && uncertain ? "lookup_failed" : "uncertain",
+          cause: reason, draftSaved: type === "COM" && !uncertain });
+      } else {
+        issuanceFailure.clear();
+        setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a gravação.");
+      }
+    } finally {
+      setBusy(false);
+      setIssuing(false);
+    }
+  }
+  async function adoptBalanceReference() {
+    if (
+      busy ||
+      uncertain ||
+      privateDraft.blocked ||
+      type !== "BAL" ||
+      legacyOpeningKey
+    )
+      return;
+    setBusy(true);
+    setError("");
+    try {
+      const [stock, products, documentRead] = await Promise.all([
+        api<unknown>(
+          `/api/balances?careRecipientId=${patientId}&reference=true`,
+        ).then(value => parseBalanceCountReference(value, patientId)),
+        api<{ data: CatalogProduct[]; }>(
+          `/api/catalog?careRecipientId=${patientId}`,
+        ),
+        editing
+          ? api<{ data: SupplyDocument; }>("/api/documents/" + editing.id)
+          : Promise.resolve(null),
+      ]);
+      if (
+        documentRead &&
+        (documentRead.data.type !== "BAL" ||
+          documentRead.data.care_recipient_id !== patientId ||
+          !(
+            documentRead.data.status === "draft" ||
+            (recount && documentRead.data.status === "submitted")
+          ))
+      )
+        throw Error(
+          "Esta ficha não permite outra contagem. Consulte o acompanhamento; os valores foram preservados.",
+        );
+      const target = documentRead?.data ?? null;
+      const next = beginBalanceObservation(
+        balanceContent,
+        {
+          mode: "legacy",
+          documentId: target?.id ?? null,
+          documentVersion: target?.version ?? null,
+          assignmentId: null,
+          assignmentVersion: null,
+          referenceRevision: stock.data.revision,
+        },
+        products.data.map((p) => ({
+          id: p.id,
+          name: p.name,
+          unit: p.unit,
+          quantityDecimals: p.quantity_decimals ?? 0,
+        })),
       );
+      const nextForm = {
+        ...form,
+        quantities: next.counts,
+        notes: next.notes,
+        observationTimes: next.observationTimes,
+      };
+      saveWizardCache(storageKey, {
+        form: nextForm,
+        links,
+        editingId: target?.id,
+        balanceContent: next,
+      });
+      setCatalog(products.data);
+      setEditing(target);
+      setLegacyReference(stock.data);
+      setStaleLegacyReference(false);
+      setPreservedBalanceContext(next.context);
+      setPreviousObservations(next.previousObservations);
+      setDraftMaterials(next.materials);
+      setForm(nextForm);
+      setFieldErrors({});
+      setDraftTouched(true);
+      setStep(0);
+      setMessage(
+        "Referência atualizada. Confira fisicamente cada material; as observações anteriores continuam preservadas.",
+      );
+      requestAnimationFrame(() =>
+        document.getElementById("supply-wizard-heading")?.focus(),
+      );
+    } catch (reason) {
+      setError((reason as Error).message);
     } finally {
       setBusy(false);
     }
   }
-  async function scan(code: string) {
-    setError("");
-    setMessage("");
-    const result = await api<{
-      data: { product_id: string; name: string; base_quantity: string }[];
-    }>(
-      "/api/catalog/presentations?careRecipientId=" +
-        context.patient!.id +
-        "&barcode=" +
-        encodeURIComponent(code),
-    );
-    const presentation = result.data[0];
-    if (!presentation) {
-      setError(
-        "Código desconhecido. Associe uma apresentação no catálogo ou selecione o produto manualmente. Nenhum item foi criado.",
-      );
-      return;
-    }
-    setForm((current) => ({
-      ...current,
-      quantities: {
-        ...current.quantities,
-        [presentation.product_id]: quantity(
-          current.quantities[presentation.product_id] || "0",
-        )
-          .plus(presentation.base_quantity)
-          .toFixed(),
-      },
-    }));
-    const product = catalog.find((item) => item.id === presentation.product_id);
-    setMessage(
-      presentation.name +
-        ": adicionados " +
-        formatQuantity(presentation.base_quantity, product?.unit),
-    );
-    if (product)
-      setStep(
-        ["medicamentos", "higiene", "dieta"].indexOf(product.category) + 1,
-      );
-  }
-  if (!allowed)
+  if (privateDraft.readDenied || privateDraft.protectedReadPending)
     return (
-      <Notice>
-        Seu vínculo não permite emitir esta ficha. Consulte as fichas
-        autorizadas no histórico.
+      <Notice error>
+        Revalide o acesso antes de exibir o preenchimento preservado. A
+        tentativa original continua guardada.
+        <button
+          type="button"
+          className={buttonClass}
+          onClick={privateDraft.reload}
+        >
+          Revalidar acesso ao rascunho
+        </button>
       </Notice>
     );
+  if (!can(context, type.toLowerCase() + ".read"))
+    return (
+      <Notice>
+        Seu vínculo atual não permite consultar este preenchimento. A tentativa
+        original continua preservada.
+      </Notice>
+    );
+  if (!allowed && !uncertain && !privateDraft.pending)
+    return (
+      <div className="hca-form-stack">
+        <Notice>Seu vínculo permite consultar as fichas autorizadas no histórico.</Notice>
+        <div><Link className={buttonClass} ref={consultationRef} href={documentId ? "/fichas/" + documentId : "/historico"}>
+          Consultar fichas autorizadas
+        </Link></div>
+        <DocumentWriteAccessNotice {...writeAccess} draftSaved={privateDraft.base?.state === "active"} consultationRef={consultationRef} />
+      </div>
+    );
+  if (recoveredId)
+    return <Notice>Ficha registrada. <Link href={"/fichas/" + recoveredId}>Acompanhar ficha</Link></Notice>;
   if (saved)
     return (
       <section className="ui-card mx-auto max-w-3xl">
+        <ComplementOriginHint />
         <span className="ui-badge ui-badge-success">Documento persistido</span>
         <h2 className="mt-4 text-2xl font-semibold">
           {saved.code ?? "Rascunho salvo"}
@@ -573,7 +1483,9 @@ export function PatientSupplyWizard({
             : type === "ENT"
               ? "Entrega registrada. O recebimento depende da confirmação do destinatário designado."
               : type === "COM"
-                ? "Compra registrada. Acompanhe a aprovação, aquisição e validação do recebimento."
+                ? saved.payload.origin === "donation"
+                  ? "Doação registrada. Acompanhe as parcelas e a validação da chegada."
+                  : "Compra registrada. Acompanhe a aprovação, aquisição e validação do recebimento."
                 : saved.status === "approved"
                   ? "Balanço concluído e estoque reconciliado."
                   : "Balanço registrado e aguardando as revisões configuradas."}
@@ -602,68 +1514,368 @@ export function PatientSupplyWizard({
         ) : null}
       </section>
     );
+  if (type !== "BAL" && !uncertain && !privateDraft.pending && !privateDraft.consumed) {
+    if (catalogueTotal === null) {
+      if (loading || !openingFailure) return <DocumentOpeningPending />;
+      const originId = documentId ?? routedSourceId;
+      return <DocumentOpeningFailure failure={openingFailure} attempts={attempt}
+        operation={type === "COM" ? "Abrir compra" : "Abrir entrega"}
+        back={originId ? "/fichas/" + originId : "/fichas"} onRetry={() => {
+          setLoading(true);
+          setAttempt(current => current + 1);
+        }} />;
+    }
+    if (!loading && !loadError && !catalog.length && !documentId && !editing && !draftTouched && !legacyDraft &&
+      step === 0 && !planningWithoutCatalogue) {
+      if (privateDraft.loading) return <DocumentOpeningPending />;
+      if (!privateDraft.blocked && privateDraft.base?.state !== "active")
+        return <DocumentCatalogueEmpty patientId={patientId} patientName={context.patient!.display_name}
+          mayManage={can(context, "catalog.manage")} hasInactive={catalogueTotal > 0}
+          onPlanExtra={type === "COM" ? () => {
+            setPlanningWithoutCatalogue(true);
+            openStep(supplyExtrasStep);
+            requestAnimationFrame(() => document.getElementById("supply-wizard-heading")?.focus());
+          } : undefined} />;
+    }
+  }
+  const exitDocumentId = documentId ?? routedSourceId;
+  const exitHref = exitDocumentId ? "/fichas/" + encodeURIComponent(exitDocumentId) : "/fichas";
+  const navigation = <StepNavigator
+    steps={steps}
+    active={stage}
+    compact={!isBalance}
+    onChange={nextStage => {
+      if (nextStage === stage) return;
+      issuanceFailure.clear();
+      openStage(nextStage);
+    }}
+    disabled={busy || uncertain || loading || privateDraft.blocked}
+    label={"Etapas da " + type}
+  />;
   return (
-    <div className="mx-auto max-w-4xl">
-      <StepNavigator
-        steps={steps}
-        active={step}
-        onChange={setStep}
-        disabled={busy || uncertain || loading}
-        label={"Etapas da " + type}
-      />
-      {message ? <Notice>{message}</Notice> : null}
-      {error ? (
-        <Notice error>
-          {error}
-          {loading ? null : (
-            <button
-              type="button"
-              className={buttonClass}
-              onClick={() => {
-                setLoading(true);
-                setAttempt((value) => value + 1);
-              }}
-            >
-              Recarregar dados
-            </button>
-          )}
+    <div onChangeCapture={event => {
+      if (event.currentTarget.contains(event.target as Node)) setDraftTouched(true);
+    }} className="hca-document-wizard min-w-0 space-y-5">
+      <ComplementOriginHint />
+      {privateDraft.active && !issuing && !navigating && !uncertain ? (
+        <SimpleDraftPanel
+          draft={privateDraft}
+          current={privateContent}
+          statusInFooter
+          exitHref={exitHref}
+          resumeHref={resumeHref}
+          patientName={context.patient!.display_name}
+          authorName={context.fullName}
+          legacy={legacyDraft ? { ...legacyDraft, resume: () => {
+            const content = legacyDraft.content;
+            setForm(content.form);
+            setLinks(content.links);
+            if (content.sources) setSourceSetup({
+              sources: content.sources, sourceImports: content.sourceImports ?? {}, sourceSeeds: content.sourceSeeds ?? {},
+            });
+            setDraftMaterials(content.materials);
+            setDraftTouched(true);
+            setLegacyDraft(null);
+            void privateDraft.save(content, { background: true }).then(result => {
+              if (result?.state === "active") {
+                try { sessionStorage.removeItem(storageKey); } catch { /* Server copy confirmed. */ }
+              }
+            });
+          }, discard: () => {
+            sessionStorage.removeItem(storageKey);
+            setLegacyDraft(null);
+          } } : undefined}
+          disabled={busy || uncertain || loading}
+        />
+      ) : null}
+      {legacyOpeningKey && !loading && !loadError ? (
+        <Notice>
+          Na primeira etapa, use {isBalance ? "Avançar" : "Selecionar materiais"} para recuperar a abertura anterior desta ficha.
         </Notice>
       ) : null}
-      {loading ? (
-        <Notice>Carregando catálogo e vínculos…</Notice>
+      {needsBalanceReview && !uncertain && !loading && !loadError ? (
+        <BalanceReferenceReview
+          source={balanceContent}
+          current={currentBalanceContext}
+          disabled={
+            busy ||
+            privateDraft.blocked ||
+            !allowed ||
+            Boolean(legacyOpeningKey)
+          }
+          onAdopt={() => void adoptBalanceReference()}
+        />
+      ) : null}
+      {type === "BAL" && !loading && !loadError ? (
+        <BalancePreviousObservations content={balanceContent} />
+      ) : null}
+      {missingBalanceMaterials.length ? (
+        <Notice error>
+          Há materiais fora do catálogo ativo. Confira os valores preservados
+          antes de removê-los.
+          {missingBalanceMaterials.map((id) => (
+            <div key={id}>
+              {draftMaterials.find((material) => material.id === id)?.name ??
+                "Material indisponível"}
+              : {form.quantities[id]}
+              <button
+                className={buttonClass}
+                disabled={busy || uncertain || privateDraft.blocked || !allowed}
+                onClick={() =>
+                  setForm((current) => {
+                    const next = { ...current.quantities };
+                    delete next[id];
+                    return { ...current, quantities: next };
+                  })
+                }
+              >
+                Remover material indisponível
+              </button>
+            </div>
+          ))}
+        </Notice>
+      ) : null}
+      {loadError ? (
+        <div className="space-y-3">
+          <Notice error>{loadError}</Notice>
+          <button
+            type="button"
+            className={buttonClass}
+            onClick={() => {
+              setLoading(true);
+              setLoadError("");
+              setAttempt((value) => value + 1);
+            }}
+          >
+            Recarregar dados
+          </button>
+          <Link
+            className={buttonClass}
+            href={requisitionId ? "/historico/" + requisitionId : "/fichas"}
+          >
+            Voltar
+          </Link>
+        </div>
       ) : (
-        <section className="ui-card">
-          <div className="mb-6">
-            <p className="eyebrow">
-              {type} · {context.patient?.display_name}
-            </p>
-            <h2 className="mt-2 text-xl font-semibold">{steps[step]}</h2>
-          </div>
-          <fieldset disabled={busy || uncertain} className="min-w-0 space-y-5">
-            <SupplyWizardStep
-              step={step}
-              type={type}
-              context={context}
-              form={form}
-              setForm={setForm}
-              fieldErrors={fieldErrors}
-              catalog={catalog}
-              people={people}
-              links={links}
-              setLinks={setLinks}
-              requestOptions={requestOptions}
-              requisitionId={requisitionId}
-              scan={scan}
-            />
-          </fieldset>
-          {uncertain ? (
-            <Notice>
-              A confirmação da gravação está pendente. Recupere a mesma
-              tentativa antes de iniciar outra.
+        <>
+          {isBalance ? navigation : null}
+          {message ? <Notice>{message}</Notice> : null}
+          {error ? (
+            <Notice error>
+              {error}
+              {loading ? null : (
+                <button
+                  type="button"
+                  className={buttonClass}
+                  onClick={() => {
+                    setLoading(true);
+                    setAttempt((value) => value + 1);
+                  }}
+                >
+                  Recarregar dados
+                </button>
+              )}
             </Notice>
           ) : null}
-          <WizardActions step={step} total={6} saving={busy} uncertain={uncertain} onBack={() => { setStep((value) => value - 1); setError(""); }} onDraft={() => void persist(true)} onNext={next} onFinish={() => void persist(false)} />
-        </section>
+          {loading ? (
+            <Notice>Carregando catálogo e vínculos…</Notice>
+          ) : (
+            <section className={isBalance ? "ui-card" : "hca-supply-wizard-card"}>
+              {isBalance ? null : navigation}
+              <div className={isBalance ? undefined : "hca-supply-wizard-body"}>
+              <div className="mb-6">
+                {isBalance ? <p className="eyebrow">
+                  {type} · {context.patient?.display_name}
+                </p> : null}
+                <h2
+                  id="supply-wizard-heading"
+                  tabIndex={-1}
+                  className="mt-2 text-xl font-semibold"
+                >
+                  {step === supplyExtrasStep ? "Itens extras"
+                    : !isBalance && step === 0 ? "Confirme os dados da ficha"
+                      : type !== "BAL" && step === 5 ? supplyWizardCopy[type].reviewTitle
+                      : !isBalance && category ? type === "ENT" ? "Prepare os materiais da entrega"
+                        : "Selecione os materiais a adquirir"
+                        : steps[stage]}
+                </h2>
+                {type !== "BAL" && step === 5 ? <p className="hca-wizard-intro">{supplyWizardReviewIntro}</p> : null}
+                {type === "ENT" && form.source === "FAMILY" && category ? <p className="hca-field-help mt-2">
+                  A entrega usa o estoque disponível da família. A avaliação da necessidade acompanha cada item vinculado.
+                </p> : null}
+              </div>
+              <fieldset
+                disabled={
+                  busy ||
+                  uncertain ||
+                  privateDraft.blocked ||
+                  !allowed ||
+                  needsBalanceReview
+                }
+                className="min-w-0 space-y-5"
+              >
+                <SupplyWizardStep
+                  step={step}
+                  purchaseApproval={type === "COM" && !editing?.protocol
+                    ? context.patient?.role === "admin" && can(context, "com.approve") ? "automatic" : "required"
+                    : undefined}
+                  onCategoryChange={nextCategory => openStep(materialCategories.findIndex(item => item.id === nextCategory) + 1)}
+                  onEditStage={openStage}
+                  type={type}
+                  context={context}
+                  form={form}
+                  setForm={updateForm}
+                  fieldErrors={fieldErrors}
+                  catalog={catalog}
+                  people={people}
+                  links={links}
+                  purchaseSources={purchaseSources}
+                  purchaseSourceNotice={purchaseSourceNotice}
+                  sourceSection={linkedTarget && step === 0 ? (
+                    <section className="hca-form-stack" aria-label="Fichas vinculadas">
+                      <h3>Fichas vinculadas</h3>
+                      <div className="hca-source-summary">
+                        <span className="hca-source-symbol"><Icon name="link" /></span>
+                        <div>
+                          {generalSourceOptions.length ? <div className="hca-source-summary-links">
+                            {generalSourceOptions.map(option => <RelatedDocument key={option.id} id={option.id} type={option.type} label={option.code} compact />)}
+                          </div> : <strong>{sources.some(row => row.general) ? "Origens vinculadas" : sources.length ? "Vínculos por material" : "Ficha independente"}</strong>}
+                          <small>{sources.some((row) => row.productIds.some((productId) => sourceSetup.sourceImports[row.documentId]?.includes(productId)))
+                            ? "Materiais elegíveis trazidos das fichas de origem."
+                            : sources.length ? "Vínculo registrado sem importar materiais." : "Vincule uma origem se ela fizer parte deste registro."}</small>
+                        </div>
+                        <ActionButton ref={sourceTriggerRef} compact variant="quiet"
+                          onClick={() => setSourcePicker({ returnFocus: () => sourceTriggerRef.current })}
+                          disabled={currentSources.loading || type === "ENT" && form.source !== "FAMILY"}>
+                          <Icon name={sources.some(row => row.general) ? "edit" : "link"} />
+                          {sources.some((row) => row.general) ? "Alterar" : "Vincular"}
+                        </ActionButton>
+                      </div>
+                      {sources.length > (currentSources.data?.data.length ?? 0) && !currentSources.loading
+                        ? <p className="hca-field-help">Uma origem está indisponível. Confira a seleção antes de emitir.</p> : null}
+                      {fieldErrors.sources ? <Notice error>{fieldErrors.sources}</Notice> : null}
+                      {type === "ENT" && form.source !== "FAMILY" && sources.length ? (
+                        <ActionButton onClick={() => { setSourceSetup(emptySupplySources); setLinks({}); setDraftTouched(true); }}>Retirar origens da entrega</ActionButton>
+                      ) : null}
+                    </section>
+                  ) : undefined}
+                  openMaterialSources={linkedTarget && form.source === "FAMILY" && !currentSources.loading
+                    ? (product, returnFocus) => setSourcePicker({ product, returnFocus }) : undefined}
+                  onScannedMaterial={product => {
+                    setError("");
+                    setMessage("");
+                    openStep(form.extraProductIds?.includes(product.id)
+                      ? supplyExtrasStep : materialCategories.findIndex(item => item.id === product.category) + 1);
+                  }}
+                  presentations={presentations.data?.data ?? []}
+                  presentationError={presentations.error}
+                  presentationLoading={presentations.loading}
+                  refreshPresentations={presentations.refresh}
+                  recipientContext={activeRecipientContext}
+                  recipientComparison={recipientComparison}
+                  recipientError={recipientError}
+                  recipientLoading={recipientLoading}
+                  previousRecipient={editing?.recipient_id}
+                  refreshRecipients={() => {
+                    setRecipientPending(true);
+                    setRecipientError("");
+                    setRecipientAttempt((value) => value + 1);
+                  }}
+                  adoptRecipients={() => {
+                    if (recipientComparison) {
+                      recipientContextRef.current = recipientComparison;
+                      setRecipientContext(recipientComparison);
+                      setRecipientComparison(null);
+                      setFieldErrors({});
+                    }
+                  }}
+                />
+                {step === 0 && (type === "COM" || type === "ENT" && form.source === "FAMILY") ? (
+                  <HouseholdListSelection ref={householdSelectionRef} key={context.userId + ":" + patientId + ":" + type}
+                    userId={context.userId} patientId={patientId} kind={type} catalogue={catalog}
+                    selectedIds={Object.keys(form.quantities)}
+                    disabled={busy || uncertain || loading || privateDraft.blocked || !allowed}
+                    onApply={ids => {
+                      setForm(current => ({
+                        ...current,
+                        quantities: {
+                          ...Object.fromEntries(ids.map(id => [id, ""])),
+                          ...current.quantities,
+                        },
+                      }));
+                      setDraftTouched(true);
+                    }} />
+                ) : null}
+                {sourcePicker && linkedTarget ? <SupplySourcePicker
+                  patientId={patientId}
+                  target={linkedTarget}
+                  product={sourcePicker.product}
+                  current={(currentSources.data?.data ?? []).flatMap((option) => {
+                    const link = sources.find((row) => row.documentId === option.id);
+                    return link && (sourcePicker.product ? link.productIds.includes(sourcePicker.product.id) : link.general)
+                      ? [{ option, importMaterials: Boolean(sourceSetup.sourceImports[option.id]?.length) }] : [];
+                  })}
+                  onClose={closeSourcePicker}
+                  onApply={applySources}
+                /> : null}
+              </fieldset>
+              {type === "BAL" && step === 5 ? (
+                <>
+                  <BalanceReviewRows
+                    products={catalog}
+                    counts={form.quantities}
+                    reference={legacyReference?.quantities ?? {}}
+                  />
+                  <BalanceObservationTimes content={balanceContent} />
+                </>
+              ) : null}
+              {uncertain ? (
+                <Notice>
+                  A confirmação da gravação está pendente. Recupere a mesma
+                  tentativa antes de iniciar outra.
+                </Notice>
+              ) : null}
+              {type === "ENT" && step === supplyStageSteps[4] && form.pendingExtras?.length && !uncertain
+                ? <Notice>{pendingExtraDispatchMessage}</Notice> : null}
+              </div>
+              <WizardActions
+                step={stage}
+                total={steps.length}
+                saving={
+                  busy ||
+                  privateDraft.busy || (isBalance && privateDraft.backgroundBusy) ||
+                  (privateDraft.blocked && !uncertain) ||
+                  (!allowed && !uncertain)
+                }
+                draftBusy={privateDraft.backgroundBusy}
+                hideDraftStatus={issuing || navigating}
+                supply={type === "BAL" ? undefined : { kind: type, draft: privateDraft, current: privateContent,
+                  hasEdits: draftTouched, exitHref }}
+                draftStatus={isBalance ? { draft: privateDraft, current: privateContent, hasEdits: draftTouched } : undefined}
+                uncertain={uncertain}
+                blocked={
+                  (!(step === 0 && legacyOpeningKey) &&
+                    (needsBalanceReview ||
+                      missingBalanceMaterials.length > 0)) ||
+                  (type === "ENT" && (step === 0 && recipientLoading ||
+                    step === supplyStageSteps[4] && !!form.pendingExtras?.length))
+                }
+                onBack={() => {
+                  issuanceFailure.clear();
+                  const previous = !isBalance && (category || step === supplyExtrasStep) &&
+                    adjacentMaterialCategory(category, catalog, "previous");
+                  if (previous) openStep(materialCategories.findIndex(item => item.id === previous) + 1);
+                  else openStage(stage - 1);
+                  setError("");
+                }}
+                onNext={next}
+                onFinish={() => { if (!issuanceFailure.reopen()) void persist(); }}
+              />
+              <DocumentIssuanceFailure state={issuanceFailure} purchase={type === "COM"}
+                operation={type === "COM" ? "Emissão de ficha de compras" : "Expedição de entrega"} onRetry={persist} />
+            </section>
+          )}
+        </>
       )}
     </div>
   );

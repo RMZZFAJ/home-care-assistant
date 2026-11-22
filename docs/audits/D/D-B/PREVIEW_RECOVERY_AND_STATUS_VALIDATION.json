@@ -1,0 +1,271 @@
+{
+  "assembledAt": "2026-11-09T20:26:35.469794+00:00",
+  "baseSha": "cb83e84b6c9c69b2e44bcf955586904f08ad02da",
+  "sourceLfSha256": {
+    "src/components/admin/membership-management.tsx": "255883a288ec6b25d6611cbffd71b83226dd1f1cdad0caf231fe555d7b7fe129",
+    "src/components/admin/membership-impact.tsx": "3cadae28773256a578b8954affdd76fb283e1a835e1ca5bfd7b2ebbad35b0523",
+    "src/components/admin/governance-proposals.tsx": "b16c1cbaab92ffb6a56fc4dbb9c2dc7b8199dc73ca2d8c1607ad4cd9dd492f24",
+    "src/components/guides/residence-preparation.tsx": "275cacf6f0ce3d4599cde85140e5a8e819ad4c02e74d6e462ef5dd23cd51b51e",
+    "src/components/stock/consumption-lines.tsx": "bb9fbbbe6087cf20f2c2af321f2102940f134afde7882112cb894dacacfe2ca8",
+    "src/components/stock/consumption-editor.tsx": "e4f8e551b694991c5b76666678f033687f8fc69df8ec300fc7e16da95bfdd008",
+    "src/components/stock/consumption-detail.tsx": "752cf5e8e845f1d017fe80ed175aa3e56f026df65b32fe465264d6622d68a393",
+    "src/components/stock/consumption-decision.tsx": "0aa075c102dd0fc0dde8650f7d6a655c5c0585161e4c4a0268bd667999cab549",
+    "src/components/requisitions/requisition-display.tsx": "682d879060717ce26290e0964ed66af77f716a25a19de7cb673a72c75efae63f",
+    "src/components/stock/consumption-console.tsx": "beaf1cebf8f060982d8f05cdeabb566d5269ab2bbbe8077444f4547a72607e01",
+    "src/components/balances/balance-recount-assignment.tsx": "79750f8a1ee5a167e3135bc1b2f219fde2089a587fc9a2534cb9de1a1c14cd7d",
+    "src/components/notifications/notification-reference.tsx": "04efc4e3ee1371e1c8244c558cd9c78b767e8ee495f1c258288040ee3f1d7485",
+    "src/components/documents/delivery-regularization.tsx": "ce9d91767e44cfc9b29e724746c01eee4b223d38d730eebe818e0383d8491eb2",
+    "src/components/documents/delivery-cancellation.tsx": "c40be6dc2a0aab201c1929c96fd3fc3981c5f6d7e650d5145734da9e78a8b806",
+    "src/components/documents/delivery-recipient.tsx": "b7960f862dc10a933e3cf136d1648f655685402a6efb5b30aba6b0858766c891",
+    "src/components/documents/document-timeline.tsx": "8de1391781a2183045e2ffd0f9d0d50fd967994308431ea8d5bb42a57adaa57c",
+    "src/components/documents/transfer-console.tsx": "8cd78ca3ca49314a1193a85a61ce4dd7fa9dd1aad0f5eaaa9e80a3d2c3153cdf",
+    "tests/e2e/document-tabs.spec.ts": "7bd3ae7a67dd895a34946e47609d450acf7c24b40708d06962280503cca6cdc2",
+    "tests/e2e/attachment-attempts.spec.ts": "2a871a45e774bd3282ee28a0e6ec3e1bfe7ff8e47a310f7d8920fb4e6011793b",
+    "tests/e2e/document-sections.ts": "911f8d379c981d7246cd7403d994426b77b071fd6213a564d4ec228d1f761001",
+    "tests/e2e/transfer-declaration-private-drafts.spec.ts": "fad0871b42744b75da00712095f3718f3d6e63066c39ce06d82cd0a1eb463c5a"
+  },
+  "browser": {
+    "stats": {
+      "total": 6,
+      "expected": 6,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "ok": true
+    },
+    "cases": [
+      {
+        "title": "anexo confirmado com resposta perdida congela escolha e GET recupera o mesmo arquivo sem outro upload",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "attachment-attempts.spec.ts",
+          "line": 84,
+          "column": 5
+        },
+        "duration": 125594,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "anexo confirmado com resposta perdida congela escolha e GET recupera o mesmo arquivo sem outro upload",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "attachment-attempts.spec.ts",
+          "line": 84,
+          "column": 5
+        },
+        "duration": 17214,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "document-tabs.spec.ts",
+          "line": 497,
+          "column": 5
+        },
+        "duration": 29293,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "document-tabs.spec.ts",
+          "line": 497,
+          "column": 5
+        },
+        "duration": 10402,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração CARE_TEAM retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 114,
+          "column": 7
+        },
+        "duration": 132251,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração CARE_TEAM retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 114,
+          "column": 7
+        },
+        "duration": 91621,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      }
+    ],
+    "reportSha256": "c714f3f71d013bd2c5088369470b9fabeff6153fd9e820d217e2dd2349913466"
+  },
+  "screenshotsInspected": 2,
+  "checks": {
+    "affectedLint": "PASS",
+    "typesBeforePureClassReplacement": "PASS",
+    "classReplacementBytewiseOnly": true,
+    "tailwind": "4.3.3;wrap-break-word=>overflow-wrap:break-word",
+    "source21Frozen": true,
+    "productionBuild": "PASS via official E2E runner",
+    "browserEngines": [
+      "Chromium mobile",
+      "WebKit"
+    ],
+    "mutableDatabaseSuiteOverlapped": false,
+    "timeLimitIncreased": false,
+    "reqConsumerChanged": false
+  },
+  "utilityChanges": [
+    {
+      "path": "src/components/admin/membership-management.tsx",
+      "occurrences": 1,
+      "beforeSha256": "689b2b3628c42c08712a7ee7c9b4444398457e07281a2649a7553035ce250de2",
+      "afterSha256": "255883a288ec6b25d6611cbffd71b83226dd1f1cdad0caf231fe555d7b7fe129"
+    },
+    {
+      "path": "src/components/admin/membership-impact.tsx",
+      "occurrences": 1,
+      "beforeSha256": "c8fa2d29047f9bb5de4f8a0cb021a4196ff37a43afe5d560924a44b48d15c747",
+      "afterSha256": "3cadae28773256a578b8954affdd76fb283e1a835e1ca5bfd7b2ebbad35b0523"
+    },
+    {
+      "path": "src/components/admin/governance-proposals.tsx",
+      "occurrences": 2,
+      "beforeSha256": "99ac27d4cfdd9fa5ddfa994a543d1d79c03b5e6633c7a2bb866d45f8d00529c6",
+      "afterSha256": "b16c1cbaab92ffb6a56fc4dbb9c2dc7b8199dc73ca2d8c1607ad4cd9dd492f24"
+    },
+    {
+      "path": "src/components/guides/residence-preparation.tsx",
+      "occurrences": 1,
+      "beforeSha256": "0f5c328e9c01b82c7bd9e5650dc1f867846a44fb83e2544dd386ed16c949524b",
+      "afterSha256": "f03cd51443b263f27c8f810712c88f2fb1c9ce56b8b1d5cc09df3352d9b5d233"
+    },
+    {
+      "path": "src/components/stock/consumption-lines.tsx",
+      "occurrences": 1,
+      "beforeSha256": "1d7316ea45d7ae1c6dafeaddee515b9dd44605eb35dfce5781bcac9192664dd9",
+      "afterSha256": "bb9fbbbe6087cf20f2c2af321f2102940f134afde7882112cb894dacacfe2ca8"
+    },
+    {
+      "path": "src/components/stock/consumption-editor.tsx",
+      "occurrences": 2,
+      "beforeSha256": "8bb52bb6f680aff69c430cc77a25b5b65d20e6e308d60e074b8580994cbe678e",
+      "afterSha256": "32a3d6a78fa87b3af3d248a4b56765c776ca97536109bd25dd90d6ba205bac86"
+    },
+    {
+      "path": "src/components/stock/consumption-detail.tsx",
+      "occurrences": 3,
+      "beforeSha256": "47da24adf294e42e16286ab2e5834a0a21d6cfabd3fb0ca2a19126da9abbee2d",
+      "afterSha256": "752cf5e8e845f1d017fe80ed175aa3e56f026df65b32fe465264d6622d68a393"
+    },
+    {
+      "path": "src/components/stock/consumption-decision.tsx",
+      "occurrences": 1,
+      "beforeSha256": "350e50f692700690af2326d8939ce28225f20037faed6c32b2570abc36e78b78",
+      "afterSha256": "0aa075c102dd0fc0dde8650f7d6a655c5c0585161e4c4a0268bd667999cab549"
+    },
+    {
+      "path": "src/components/requisitions/requisition-display.tsx",
+      "occurrences": 1,
+      "beforeSha256": "d72354aef547b47b0ab83ad52ef787c80195534da988505719133068b5d824f5",
+      "afterSha256": "682d879060717ce26290e0964ed66af77f716a25a19de7cb673a72c75efae63f"
+    },
+    {
+      "path": "src/components/stock/consumption-console.tsx",
+      "occurrences": 1,
+      "beforeSha256": "21ca16f54999d48fa38b8a59cd5296cb52cc80bf4f6286c618afc63cf6efbb2a",
+      "afterSha256": "beaf1cebf8f060982d8f05cdeabb566d5269ab2bbbe8077444f4547a72607e01"
+    },
+    {
+      "path": "src/components/balances/balance-recount-assignment.tsx",
+      "occurrences": 7,
+      "beforeSha256": "224994a7030262f76f694881dc7ef1705e320a6b4ce9da67e7a4b187a55e5c83",
+      "afterSha256": "4a445638805452264f666630ea7ece4b6869825e3e16bdc74d8920f83443332d"
+    },
+    {
+      "path": "src/components/notifications/notification-reference.tsx",
+      "occurrences": 2,
+      "beforeSha256": "6847ca992f081e0802ef403be21a9ed19f6c393241fec9bf078a809660c9c2e6",
+      "afterSha256": "e0df6e51775c08d001791eb285f670025341f42e877cb8345e4b0e68ba8633b1"
+    },
+    {
+      "path": "src/components/documents/delivery-regularization.tsx",
+      "occurrences": 9,
+      "beforeSha256": "4cbf1642e2b25062bc07a606e539d52df51c31858caba73ad9368c6b9881be58",
+      "afterSha256": "3ac8c252f88e61fab5c323e11a066092c48e3d7a4aa6ca0f156a28ce881d7ee8"
+    },
+    {
+      "path": "src/components/documents/delivery-cancellation.tsx",
+      "occurrences": 2,
+      "beforeSha256": "150f6030528357b954a4705d0225846b2864d6c5106c21999f2d9df78ec7838f",
+      "afterSha256": "c40be6dc2a0aab201c1929c96fd3fc3981c5f6d7e650d5145734da9e78a8b806"
+    },
+    {
+      "path": "src/components/documents/delivery-recipient.tsx",
+      "occurrences": 1,
+      "beforeSha256": "d236f2b0c1e7f13efa8c2fce5cbbd574f0f12eac2c339b6c95ad1d83c92588ed",
+      "afterSha256": "14dce468ba78c944f5ddfc64fe26964708d465bbdbf0c10601ab7933366df62d"
+    },
+    {
+      "path": "src/components/documents/document-timeline.tsx",
+      "occurrences": 3,
+      "beforeSha256": "5db4731c2a3448e68cb8b003c17570a10a44558303a862d947fa4faaf1a72e5c",
+      "afterSha256": "68dc9128788784b68b49d3854820157aba23289f9124822d628fb532e80601e8"
+    }
+  ],
+  "temporaryReport": {
+    "file": "TEMP_D_B_ATUALIZACAO.md",
+    "criteria": 105,
+    "internallyCompleted": 56,
+    "partial": 49,
+    "visualEstimatePercent": 60,
+    "limits": "Editorial estimates, not measured approved screens, effort or elapsed time.105 titles checked against execution matrix, responsibilities and remaining sequence included;no links/evidence in user report."
+  },
+  "logLfSha256": {
+    "output\\phase-d-work\\ui-canonical\\req-recovery-e2e.log": "e76371e45003cc4df69da6245e2d43ff6ae4c3f8d3f821a9b4450ba84207a677",
+    "output\\phase-d-work\\ui-canonical\\req-recovery-e2e-list.log": "96528b519157cf66a34f454c54acf282d8f6accbd45af7e7f35b3754e9ba422b",
+    "output\\phase-d-work\\ui-canonical\\req-recovery-types.log": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+    "output\\phase-d-work\\ui-canonical\\req-recovery-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "output\\phase-d-work\\ui-canonical\\req-recovery-db-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "output\\phase-d-work\\ui-canonical\\wrap-break-word-css.log": "256c85766a2308954bc6c7766e67f212d8f3b289508441966b7aabac44a589ff",
+    "output\\phase-d-work\\ui-canonical\\wrap-break-word-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "output\\phase-d-work\\ui-canonical\\req-recovery-markdown.log": "a43b0b12da511e4186b65e4558044f770f0c1188af2d8e3e5d0e6ae756c6f352",
+    "output\\phase-d-work\\ui-canonical\\req-recovery-markdown-final.log": "a21a5fbda74d4e0aed78c7e2656a1328edf559d5f7d763dfc914bb44ebc86fb4"
+  },
+  "remote": "No new SQL;174 reconciled before preceding commit;see TRANSFER_DECLARATION_DRAFTS_REMOTE.json",
+  "ci": "Prior f233be9 failed; own published SHA CI mandatory",
+  "limits": [
+    "Attachment flake not reproduced in either directed engine;no speculative tab fix",
+    "No HTTP authorization,cache,replay,private data or notification contract relaxed",
+    "No physical-device,human AT,provider,production,signature trust or operational recovery approval",
+    "Two transient context.read DATABASE_UNAVAILABLE logs retained;all6 cases passed without retry"
+  ],
+  "documentation": {
+    "markdownFiles": 6,
+    "localLinksChecked": 335,
+    "all105CriteriaTitlesRetained": true,
+    "temporaryLfSha256": "a0c30bb113ed760f16c0ade0b69bb4af1b23b9ecc29a2ebc2320f2c1ade93e44"
+  }
+}

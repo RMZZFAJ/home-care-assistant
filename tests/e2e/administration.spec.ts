@@ -1,8 +1,11 @@
+import { selectDocumentSection } from "./document-sections";
 import { selectContext } from "./auth-context";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
   assertLocalProject,
   sql,
@@ -111,14 +114,19 @@ test.describe("administração integrada no ambiente local", () => {
       .getByLabel("Nomes alternativos, separados por vírgula", { exact: true })
       .fill("Material auxiliar, Apoio operacional");
     const created = await submit(page, "Salvar item", "product");
-    const productId = created.data.product_id as string;
+    expect(created).toMatchObject({ action: "commit", state: "consumed", purpose: "create" });
+    const productId = created.outcome.productId as string;
     expect(productId).toBeTruthy();
+    await expect(page.getByRole("dialog", { name: "Adicionar item exclusivo deste paciente", exact: true })).toBeHidden();
+    await expect(page.getByText("Item salvo e auditado.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Consultando catálogo…", { exact: true })).toBeHidden();
     await expect(
-      page.getByRole("cell", { name: originalName, exact: true }),
+      page.getByRole("cell").filter({ has: page.getByText(originalName, { exact: true }) }),
     ).toBeVisible();
-    await page
-      .getByRole("button", { name: `Editar ${originalName}`, exact: true })
-      .click();
+    const edit = page.getByRole("button", { name: `Editar ${originalName}`, exact: true });
+    if (test.info().project.use.hasTouch) await edit.tap();
+    else await edit.click();
+    await expect(page.getByRole("dialog", { name: "Editar item", exact: true })).toBeVisible();
     await expect(
       page.getByLabel("Nomes alternativos, separados por vírgula", {
         exact: true,
@@ -133,7 +141,7 @@ test.describe("administração integrada no ambiente local", () => {
       .uncheck();
     await submit(page, "Salvar item", "product");
     await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
-    const article = page.getByRole("row").filter({ has: page.getByRole("cell", { name: finalName, exact: true }) });
+    const article = page.getByRole("row").filter({ has: page.getByRole("cell").filter({ has: page.getByText(finalName, { exact: true }) }) });
     await expect(article.getByText("Inativo", { exact: true })).toBeVisible();
     await expect(article).toContainText("higiene");
     await expect(article.getByText("pacote", { exact: true })).toBeVisible();
@@ -213,7 +221,7 @@ test.describe("administração integrada no ambiente local", () => {
         response.request().postDataJSON().action === "membershipStatus",
     );
     await member.getByRole("button", { name: "Revogar", exact: true }).click();
-    await page.getByRole("button", { name: "Confirmar alteração", exact: true }).click();
+    await page.getByRole("button", { name: "Revogar agora", exact: true }).click();
     expect((await revoked).ok()).toBeTruthy();
     await expect(
       page.getByText("Estado do vínculo atualizado.", { exact: true }),
@@ -523,10 +531,10 @@ test.describe("administração integrada no ambiente local", () => {
       await page.request.get(`/api/requisitions/${after.data[0].id}`)
     ).json();
     expect(detail.receipt.lines).toMatchObject([
-      { productId: "fralda", currentStock: null },
+      { productId: "fralda", currentStock: null, stockObservation: "legacy_unclassified" },
     ]);
     expect(detail.receipt.extraItems).toMatchObject([
-      { name: customName, currentStock: null, urgent: true },
+      { name: customName, currentStock: null, urgent: true, stockObservation: "legacy_unclassified" },
     ]);
     expect(
       detail.data.requisition_items.find(
@@ -543,22 +551,36 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("heading", { name: protocol, exact: true }),
     ).toBeVisible();
+    const metadata = page.locator(".hca-document-meta > div");
     await expect(
-      page.locator(".hca-document-date"),
-    ).toHaveText(/^Data original desconhecida · Versão \d+$/);
+      metadata
+        .filter({ has: page.locator("dt", { hasText: /^Registro original$/ }) })
+        .locator("dd"),
+    ).toHaveText("Data original desconhecida");
+    await selectDocumentSection(page, "history");
+    await page.getByRole("button", { name: "Linha do tempo", exact: true }).click();
+  await page.getByRole("button", { name: "Comparar versões", exact: true }).click();
+    await expect(page.getByRole("article", { name: /^Conteúdo preservado da versão \d+$/ })).toBeVisible();
     await expect(
-      page.getByText("Solicitante: Solicitante desconhecido", { exact: true }),
-    ).toBeVisible();
+      metadata
+        .filter({ has: page.locator("dt", { hasText: /^Solicitante$/ }) })
+        .locator("dd"),
+    ).toHaveText("Solicitante desconhecido");
+    await selectDocumentSection(page, "materials");
+    const materials = page.getByRole("list", { name: "Materiais requisitados", exact: true });
+    const materialRows = materials.getByRole("listitem");
+    await expect(materialRows).toHaveCount(2);
     await expect(
-      page
+      materials
         .locator("strong")
         .filter({ hasText: new RegExp("^" + customName + "$") }),
     ).toBeVisible();
-    await expect(
-      page.getByText("Estoque desconhecido", { exact: false }),
-    ).toHaveCount(2);
-    await page.getByRole("button", { name: /^Avisos e acompanhamento/ }).click();
-    await expect(page.getByText("Nenhum aviso disponível.", { exact: true })).toBeVisible();
+    for (const item of await materialRows.all()) {
+      await expect(item.getByText("Não informado no registro legado", { exact: true })).toBeVisible();
+    }
+    await selectDocumentSection(page, "communications");
+
+    await expect(page.getByText("Nenhuma comunicação registrada para esta ficha.", { exact: true })).toBeVisible();
     const retry = await page.request.post("/api/admin", {
       data: { action: "historicalImport", rows, preview: false },
     });
@@ -581,88 +603,102 @@ test.describe("administração integrada no ambiente local", () => {
 
   test("sugestões por alias e grafia ambígua só associam o produto após escolha explícita", async ({
     page,
-  }) => {
-    await login(page);
-    const patientId = await createPatient(page);
-    let productId = "";
-    for (const [name, aliases] of [
-      ["Gaze", ["Compressa alternativa"]],
-      ["Gaza", []],
-    ] as const) {
-      const response = await page.request.post("/api/admin", {
-        data: {
-          action: "product",
-          careRecipientId: patientId,
-          id: null,
-          name,
-          category: "higiene",
-          unit: "pacote",
-          aliases,
-          description: null,
-          sortOrder: 0,
-          isActive: true,
-        },
-      });
-      expect(response.ok()).toBeTruthy();
-      const saved = await response.json();
-      if (name === "Gaze") productId = saved.data.product_id;
-    }
-    expect(productId).toBeTruthy();
+  }, info) => {
+    test.setTimeout(180_000);
+    const { patient: patientId, products: [productId] } = await setup({
+      catalogue: [
+        { name: "Gaze", aliases: ["Compressa alternativa"], category: "higiene", unit: "pacote" },
+        { name: "Gaza", aliases: [], category: "dieta", unit: "pacote" },
+      ],
+    });
+    const writer = await shiftWorker(patientId);
+    await page.goto("/login");
+    await page.getByLabel("E-mail", { exact: true }).fill(writer.email);
+    await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+    await page.getByRole("button", { name: "Entrar", exact: true }).click();
+    await page.waitForURL(url => url.pathname === "/");
     await page.goto(`/fichas/req?careRecipientId=${patientId}`);
-    for (let step = 0; step < 4; step++)
-      await page.getByRole("button", { name: "Avançar", exact: true }).click();
+    const next = page.getByRole("button", { name: /^(Selecionar materiais|Continuar)$/ });
+    await next.click();
     await page
-      .getByRole("button", { name: "+ Incluir novo item", exact: true })
+      .getByRole("button", { name: "Item extra", exact: true })
       .click();
-    await page
-      .getByLabel("Nome", { exact: true })
-      .fill("compressa alternativa");
-    await expect(
-      page.getByText("Nome alternativo reconhecido no catálogo.", {
-        exact: true,
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Remover item 1", exact: true }),
-    ).toBeVisible();
+    const extra = page.getByRole("dialog", { name: "Adicionar item extra", exact: true });
+    const name = extra.getByRole("textbox", { name: "Nome do material", exact: true });
+    await name.fill("compressa alternativa");
+    await expect(extra.getByText("É um destes materiais?", { exact: true })).toBeVisible();
+    await info.attach("extra-req-sugestoes", { body: await extra.screenshot(), contentType: "image/png" });
     await expect(
       page.getByRole("button", { name: /^Usar item do catálogo:/ }),
     ).toHaveCount(1);
-    await page.getByLabel("Nome", { exact: true }).fill("gazi");
-    await expect(
-      page.getByText(
-        "Correspondência ambígua: há mais de um item possível. Escolha explicitamente o correto.",
-        { exact: true },
-      ),
-    ).toBeVisible();
+    await name.fill("gazi");
     await expect(
       page.getByRole("button", { name: /^Usar item do catálogo:/ }),
     ).toHaveCount(2);
-    await page.getByLabel("Estoque atual", { exact: true }).fill("3");
+    await extra.getByRole("combobox", { name: "Informação do estoque da equipe" }).selectOption("observed");
+    await extra.getByLabel("Estoque atual", { exact: false }).fill("3");
     await page
       .getByRole("checkbox", { name: "Reposição urgente", exact: true })
       .check();
-    await expect(
-      page.getByRole("button", { name: "Remover item 1", exact: true }),
-    ).toBeVisible();
+    await extra.getByRole("textbox", { name: "Detalhes para identificar", exact: true }).fill("Usar no kit do plantão.");
     await page
       .getByRole("button", { name: /^Usar item do catálogo: Gaze \(pacote\)/ })
       .click();
-    await expect(
-      page.getByRole("button", { name: "Remover item 1", exact: true }),
-    ).toHaveCount(0);
-    for (let step = 0; step < 2; step++)
-      await page.getByRole("button", { name: /^Avançar$|^Revisar$/ }).click();
-    await expect(
-      page.getByText("Gaze — estoque atual: 3 (urgente)", { exact: true }),
-    ).toBeVisible();
+    await expect(extra).toHaveCount(0);
+    const gaze = page.locator(".hca-wizard-material").filter({ has: page.getByRole("checkbox", { name: "Gaze", exact: false }) });
+    await expect(gaze.getByLabel("Estoque atual · pacote", { exact: true })).toHaveValue("3");
+    await expect(gaze.locator("label.hca-wizard-material-urgent")).toHaveCSS("color", "rgb(157, 48, 67)");
+    await next.click();
+    const diet = page.getByRole("button", { name: /^Dieta/, pressed: true });
+    await expect(diet).toBeVisible();
+    await next.click();
+    await expect(page.getByText("Nenhum item extra incluído.", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Adicionar item extra", exact: true }).click();
+    await name.fill("Gaza");
+    await extra.getByRole("button", { name: /^Usar item do catálogo: Gaza \(pacote\)/ }).click();
+    await expect(diet).toBeVisible();
+    await page.getByRole("checkbox", { name: /^Gaza\b/ }).uncheck();
+    const details = "Usar no kit da noite.";
+    await expect.poll(async () => {
+      const response = await page.request.get(`/api/drafts?careRecipientId=${patientId}&kind=REQ`);
+      const saved = (await response.json()).data;
+      return { observations: saved?.content?.observations, lines: saved?.content?.lines?.length, stage: saved?.navigation?.stage };
+    }).toEqual({ observations: ["Usar no kit do plantão."], lines: 1, stage: "dieta" });
+    await page.reload();
+    await expect(page.getByRole("dialog", { name: "Continuar o preenchimento?" })).toContainText("Gaze");
+    await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+    await expect(diet).toBeVisible();
+    await next.click();
+    await expect(page.getByText("Nenhum item extra incluído.", { exact: true })).toBeVisible();
+    await next.click();
+    const observation = page.locator(".hca-issuance-observations textarea");
+    await expect(observation).toHaveValue("Usar no kit do plantão.");
+    await observation.fill(details);
+    await page.getByRole("button", { name: "Revisar ficha", exact: true }).click();
+    const reviewMaterial = page.locator(".hca-material-review li").filter({
+      has: page.locator("strong").filter({ hasText: /^Gaze$/ }),
+    });
+    await expect(reviewMaterial).toHaveCount(1);
+    await expect(reviewMaterial.locator("xpath=ancestor::section[1]").getByRole("heading", { name: "Higiene", exact: true })).toBeVisible();
+    await expect(reviewMaterial.getByText("Gaze", { exact: true })).toBeVisible();
+    await expect(reviewMaterial.getByText("Estoque atual da equipe: 3 pacote", { exact: true })).toBeVisible();
+    await expect(reviewMaterial.getByText("Urgente", { exact: true })).toBeVisible();
+    await expect(page.getByText(details, { exact: true })).toBeVisible();
+    await reviewMaterial.getByRole("button", { name: "Editar material Gaze", exact: true }).click();
+    await expect(page.getByLabel("Estoque atual · pacote", { exact: true })).toBeFocused();
+    await expect(page.getByLabel("Estoque atual · pacote", { exact: true })).toHaveValue("3");
+    await next.click();
+    await next.click();
+    await next.click();
+    await page.getByRole("button", { name: "Revisar ficha", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Editar itens extras", exact: true })).toBeVisible();
     const pending = page.waitForResponse(
       (response) =>
         new URL(response.url()).pathname === "/api/requisitions" &&
         response.request().method() === "POST",
     );
     await page
-      .getByRole("button", { name: "Concluir requisição", exact: true })
+      .getByRole("button", { name: "Emitir requisição", exact: true })
       .click();
     const response = await pending;
     expect(response.ok()).toBeTruthy();
@@ -670,9 +706,32 @@ test.describe("administração integrada no ambiente local", () => {
     expect(persisted.receipt.lines).toMatchObject([
       { productId, productName: "Gaze", currentStock: 3, urgent: true },
     ]);
+    expect(persisted.receipt.lines).toHaveLength(1);
+    expect(persisted.receipt.lines[0].catalogueExtra).toBeFalsy();
     expect(persisted.receipt.extraItems).toHaveLength(0);
-    await expect(
-      page.getByRole("heading", { name: "Comprovante oficial", exact: true }),
-    ).toBeVisible();
+    const issued = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
+    await expect(issued).toBeVisible({ timeout: 65_000 });
+    const pdf = await page.request.get((await issued.getByRole("link", { name: "Baixar PDF", exact: true }).getAttribute("href"))!);
+    expect(pdf.status()).toBe(200);
+    const retiredByAnotherTab = Promise.withResolvers<void>();
+    await page.route("**/api/drafts", async route => {
+      const request = route.request();
+      if (request.method() !== "POST" || request.postDataJSON().action !== "acknowledge") return route.continue();
+      const otherTab = await route.fetch({ postData: { ...request.postDataJSON(), idempotencyKey: randomUUID() } });
+      try {
+        expect(otherTab.ok(), await otherTab.text()).toBe(true);
+        const stale = await route.fetch();
+        expect(stale.status()).toBe(409);
+        await route.fulfill({ response: stale });
+        retiredByAnotherTab.resolve();
+      } catch (reason) {
+        retiredByAnotherTab.reject(reason);
+        throw reason;
+      }
+    });
+    await page.goto(`/fichas/req?careRecipientId=${patientId}`);
+    await retiredByAnotherTab.promise;
+    await expect(page.getByRole("button", { name: "Selecionar materiais", exact: true })).toBeEnabled();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
   });
 });

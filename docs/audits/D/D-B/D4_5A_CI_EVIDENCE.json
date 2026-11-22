@@ -1,0 +1,72 @@
+{
+  "sourceBaseSha": "d17e309a04901a2841e21a17285122abf1259fbf",
+  "sourceLfSha256": {
+    "src/components/layout/workspace-shell.tsx": "cb1aa0c13564f6a3af14b90faacb1e6c956ad469448f9995ec59e18dda37771a",
+    "tests/e2e/read-history.spec.ts": "1d616f754111d6261433df3e2c13ce969f56db172f3a96b7cfe4a627f8258e2d",
+    "tests/e2e/pdf-issuance.spec.ts": "1b8b8589ad5193aedf0c6590f965eaa6fb95ccd851a9445ede2f5a0ac9474ce9",
+    "tests/e2e/profile-focus.spec.ts": "14c75f83c74f41e326a60f6a43e6ff2df688f7241551ffa9a7b5f3f54376af2f"
+  },
+  "baselineShellLfSha256": "fb47bc799af44ac51ca5987a8e3dac132e8e82841c95d1434ee89b38a826295d",
+  "baseline": {
+    "threeCaseDiagnostic": {
+      "passed": 2,
+      "failed": 1,
+      "log": "d4-ci-baseline-diagnostic.log",
+      "failure": "Initial history read held, realtime invalidation bypassed controlled first-read delay"
+    },
+    "delayedFocus": {
+      "passed": 0,
+      "failed": 1,
+      "log": "d4-focus-race-baseline.log",
+      "failure": "ArrowDown destination no longer focused after delayed frame callbacks"
+    }
+  },
+  "diagnosticFinal": {
+    "passed": 3,
+    "log": "d4-ci-diagnostic-fixed.log",
+    "notAcceptance": true
+  },
+  "stage": "PASS_LOCAL_DIRECTED_PRODUCTION; D-B incomplete",
+  "failedCiSha": "dbc7171834dba4eb6338b60a22b8d57f7b84747b",
+  "failedCiRun": 42377491003,
+  "failedCiUrl": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42377491003",
+  "implementation": [
+    "Deferred initial focus skips a menu where keyboard navigation already owns focus; selected context focus unchanged",
+    "History delay fixture holds every initial request across live invalidations, then releases the cohort; error/retry/empty/stale-response checks retained",
+    "Archive revocation verifies current HTTP denial, full private surface removal and context selection; no click on an already unmounted control"
+  ],
+  "production": {
+    "passed": 9,
+    "failed": 0,
+    "projects": [
+      "chromium",
+      "mobile",
+      "ios"
+    ],
+    "log": "output/phase-d-work/d4-ci-production.log",
+    "sameStableSourceCohort": true
+  },
+  "types": "PASS output/phase-d-work/d4-ci-types.log",
+  "lint": "PASS output/phase-d-work/d4-ci-lint.log",
+  "migrations": {
+    "local": 141,
+    "remoteLastReconciled": 121,
+    "pending": 20,
+    "newInThisIncrement": 0,
+    "remoteChanged": false
+  },
+  "limits": [
+    "Diagnostic is not acceptance",
+    "CI of published SHA is separate and still required",
+    "Sonar configuration/remediation owner-deferred",
+    "No new human/AT/physical/external/operational acceptance; production NO-GO; PR permanent Draft"
+  ],
+  "logLfSha256": {
+    "d4-ci-baseline-diagnostic.log": "f4e476e0ced7e9569391c2b9900c220d943aa7510b4416a19c44394a06531659",
+    "d4-focus-race-baseline.log": "2834de1c441eba32aa102f013d7bfd5110185a91efa5c07508750aa8a47b2475",
+    "d4-ci-diagnostic-fixed.log": "4da78814a22b0c8963787fe81806212bacbee4dcf0a7e769e28ae31d98812569",
+    "d4-ci-production.log": "694f7fea3db42bb8d0e51389d00625f3795f57572b138597ccb16a83dd426cd7",
+    "d4-ci-types.log": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+    "d4-ci-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

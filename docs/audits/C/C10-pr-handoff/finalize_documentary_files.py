@@ -12,11 +12,19 @@ BASE=ROOT/"docs/audits/C"
 OUT=Path(__file__).resolve().parent
 
 
+def document_path(value):
+    path = Path(value).resolve()
+    if not path.is_relative_to(ROOT) or (path != ROOT / "README.md" and not path.is_relative_to(ROOT / "docs")):
+        raise ValueError("Documentary target must remain inside docs or the root README")
+    return path
+
+
 def read(path):
-    with path.open(encoding="utf-8-sig",newline="") as stream:return list(csv.DictReader(stream))
+    with document_path(path).open(encoding="utf-8-sig",newline="") as stream:return list(csv.DictReader(stream))
 
 
 def manifest_digest(path):
+    path=document_path(path)
     raw=path.read_bytes()
     policy="EXACT_BYTES"
     if path.suffix in {".md",".csv",".py",".json",".txt"}:
@@ -42,6 +50,7 @@ def main():
     csv_files={ROOT/p for p in changed if p.endswith(".csv") and p.startswith("docs/") and (ROOT/p).is_file()}
     csv_files|={p for name in ["C7-decision-closure","C8-visual-blueprint","C9-acceptance-refinement","C10-pr-handoff"] for p in (BASE/name).rglob("*.csv")}
     csv_files|={p for name in ["C7-decision-closure","C8-visual-blueprint","C9-acceptance-refinement","C10-pr-handoff"] for p in (BASE/name).rglob("*") if p.is_file() and p.suffix in {".json",".txt",".py",".md"} and "__pycache__" not in str(p)}
+    csv_files={document_path(path) for path in csv_files}
     for path in csv_files:
         raw=path.read_bytes(); normalized=raw.replace(b"\r\n",b"\n")
         if raw!=normalized:path.write_bytes(normalized)

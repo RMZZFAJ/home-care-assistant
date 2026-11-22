@@ -1,0 +1,1180 @@
+{
+  "assembledAt": "2026-11-09T13:34:37.843252+00:00",
+  "baseSha": "fcf04fa3b756c0f6788a7eeb2bd919dedf51d169",
+  "sourceLfSha256": {
+    "src/app/api/drafts/route.ts": "3905a4f82a80777896323939513fd7b1b47ff6ec98d386335e083b22246e9964",
+    "src/components/documents/document-timeline.tsx": "f201658d5d2c8feb18bc1d6029c5792f4c9abc21068163d2497fc62243ee4036",
+    "src/components/documents/supply-command-editor.tsx": "a0de397ae8d9929ad35a967931bc6a8473cf572a52b2278d2532e0babec8cd7b",
+    "src/components/documents/supply-command-fields.tsx": "c96efd787d9ee2d3d86393796a81d9f495b63dc4ccffc6f7bbe510d0fa56d864",
+    "src/components/forms/creation-draft-panel.tsx": "6ed000d697eb861c8685ce8931d126860d23c33d050b721044f01d8c808ebd1e",
+    "src/lib/forms/draft-navigation.ts": "4a3f8f47f4d6574fdbc4092f201aeaf1ed1f18b57a00aeb9c682a5c4dc4761ac",
+    "src/lib/validation/creation-drafts.ts": "1832b54b6062869dfbb63ef59a67f222c8b2854f1d989162186b47f73f4bf9e0",
+    "src/lib/validation/private-draft-results.ts": "df9a2c18c2f8b770cd04c81b70190ceb5d6d664fa97e3ad1115629badc88f081",
+    "src/lib/validation/supply-drafts.ts": "1a4d72bfe61cdec0cf3366a2167026db786e63b9fb40686d8d71582ccd97796e",
+    "tests/com-action-drafts.test.ts": "9838ce0c7ec6fd230e4ac59b7f0cbc6c3f5012e63bddf99176d6f2cee83f6aef",
+    "tests/e2e/com-action-private-drafts.spec.ts": "fe6f2b4954805630867b8dba2390b0a5e34922238db4db0487bf9c016b516cc0",
+    "src/components/documents/draft-reference-comparison.tsx": "ba8fb7a1f9bdf8177495465925de27c9fd08d7dfd2399dcadccd745544d10e0f",
+    "supabase/migrations/20261109125807_phase_d3_com_decision_private_drafts.sql": "650792f87365ac52d0ba5cf6637afdd9fc1fc7f3dc8f30f7cad6ae871eacc5a6",
+    "supabase/migrations/20261109130033_phase_d3_com_decision_intent_binding.sql": "984e5142e7eeee0248047593ea2e91ebc7b34e35cb0963c0148ddf574fe66168",
+    "tests/e2e/com-decision-private-drafts.spec.ts": "a7c51fe7d0c738ff55fdbbef47d84818e21b9c727cbe1cc77d80556719ff50f0",
+    "tests/integration/com-decision-fixtures.mjs": "f3530eee62800bbdd6ddb7fb0c7c04355d621b72defdd5143b74ecaa5aeba27c",
+    "tests/integration/com-decision-private-drafts.test.mjs": "21c9b4ce8ab53447ac2590367ea65faa10bb536d9f7e10ff5e924d65f4376a8f"
+  },
+  "unitApi": {
+    "cases": 23,
+    "passed": 23
+  },
+  "realAuthDatabase": {
+    "cases": 30,
+    "passed": 30,
+    "scope": "Seven COM purpose contracts plus real existing private creation/revision/receipt/navigation; concurrency, other admin privacy, revoke under lock, saved receipt/checkbox binding, exact replay and distinct stock effects"
+  },
+  "browser": {
+    "distinctApprovedCases": 20,
+    "identity": "file + path + title + project; latest directed outcome",
+    "rounds": {
+      "com-decisions-initial": {
+        "stats": {
+          "total": 18,
+          "expected": 9,
+          "unexpected": 9,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 41,
+              "column": 5
+            },
+            "duration": 34884,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 146,
+              "column": 5
+            },
+            "duration": 8820,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 41,
+              "column": 5
+            },
+            "duration": 39909,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 146,
+              "column": 5
+            },
+            "duration": 9004,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: page.screenshot: Cannot take screenshot larger than 32767 pixels on any dimension\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m    - disabled all CSS animations\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n\n\n  225 |   ).toBeVisible();\n  226 |   await audit(page, \"COM comparison with preserved missing material\");\n> 227 |   await info.attach(\"comparacao-operacao-com\", { body: await page.screenshot({ fullPage: true, animations: \"disabled\" }), contentType: \"image/png\" });\n      |                                                                   ^\n  228 |   const adopt = comparison.getByRole(\"button\", {\n  229 |     name: \"Usar referência vigente e manter preenchimento\",\n  230 |     exact: true,\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-action-private-drafts.spec.ts:227:67\u001b[22m",
+                "codeframe": "  127 |         expect(official(id, f.patient)).toBe(committed);\n  128 |       } else await expect(review).toHaveCount(0);\n  129 |     } finally {\n  130 |       await peerContext.close();\n  131 |     }\n  132 |   }\n  133 |   await page.goto(`/documentos/${id}`);\n  134 |   await page.getByRole(\"button\", { name: \"Registrar aquisição\", exact: true }).click();\n  135 |   const after = official(id, f.patient);\n  136 |   await page.getByRole(\"button\", { name: \"Confirmar resultado e começar novo preenchimento\", exact: true }).click();\n  137 |   await expect(field(page, line)).toHaveValue(\"\");\n  138 |   expect(official(id, f.patient)).toBe(after);\n  139 |   expect(\n  140 |     sql(\n  141 |       `select coalesce(sum(quantity),0)=1 from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`,\n  142 |     ),\n  143 |   ).toBe(\"t\");\n  144 | });\n  145 |\n  146 | test(\"COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente\", async ({\n  147 |   page,\n  148 | }, info) => {\n  149 |   const f = await fixture();\n  150 |   let document = await rpc(f.admin, \"supply_document_command\", {\n  151 |     p_id: f.document.id,\n  152 |     p_action: \"approve\",\n  153 |     p_body: { lines: [{ lineId: f.document.lines[0].id, quantity: \"2\" }] },\n  154 |     p_key: randomUUID(),\n  155 |     p_version: f.document.version,\n  156 |   });\n  157 |   const line = document.lines[0],\n  158 |     removed = randomUUID();\n  159 |   await rpc(f.admin, \"supply_draft_command\", {\n  160 |     p_patient: f.patient,\n  161 |     p_kind: \"COM\",\n  162 |     p_purpose: \"purchase\",\n  163 |     p_target: document.id,\n  164 |     p_id: null,\n  165 |     p_expected: null,\n  166 |     p_key: randomUUID(),\n  167 |     p_body: {\n  168 |       action: \"save\",\n  169 |       content: {\n  170 |         documentVersion: document.version,\n  171 |         fields: { [line.id]: \"1,\", [removed]: \"0,5\" },\n  172 |         divergentIds: [],\n  173 |         materials: [\n  174 |           {\n  175 |             id: line.id,\n  176 |             name: line.name_snapshot,\n  177 |             unit: line.unit_snapshot,\n  178 |             quantityDecimals: 0,\n  179 |           },\n  180 |           {\n  181 |             id: removed,\n  182 |             name: \"Referência ausente fictícia\",\n  183 |             unit: \"unidade\",\n  184 |             quantityDecimals: 1,\n  185 |           },\n  186 |         ],\n  187 |       },\n  188 |       navigation: { version: 1, stage: \"acquisition\" },\n  189 |     },\n  190 |   });\n  191 |   document = await rpc(f.admin, \"supply_document_command\", {\n  192 |     p_id: document.id,\n  193 |     p_action: \"purchase\",\n  194 |     p_body: { lines: [{ lineId: line.id, quantity: \"1\" }] },\n  195 |     p_key: randomUUID(),\n  196 |     p_version: document.version,\n  197 |   });\n  198 |   const before = official(document.id, f.patient);\n  199 |   await login(page, f.patient);\n  200 |   await page.goto(`/documentos/${document.id}`);\n  201 |   await page\n  202 |     .getByRole(\"button\", { name: \"Registrar aquisição\", exact: true })\n  203 |     .click();\n  204 |   await page\n  205 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  206 |     .click();\n  207 |   await expect(field(page, line.id)).toHaveValue(\"1,\");\n  208 |   await expect(\n  209 |     page.getByRole(\"button\", { name: \"Revisar operação\", exact: true }),\n  210 |   ).toBeDisabled();\n  211 |   await page\n  212 |     .getByRole(\"button\", {\n  213 |       name: \"Comparar referência da operação\",\n  214 |       exact: true,\n  215 |     })\n  216 |     .click();\n  217 |   const comparison = page.getByRole(\"region\", {\n  218 |     name: \"Comparação da referência da operação\",\n  219 |     exact: true,\n  220 |   });\n  221 |   await expect(\n  222 |     comparison.getByText(\"Referência ausente fictícia: 0,5 unidade\", {\n  223 |       exact: true,\n  224 |     }),\n  225 |   ).toBeVisible();\n  226 |   await audit(page, \"COM comparison with preserved missing material\");\n> 227 |   await info.attach(\"comparacao-operacao-com\", { body: await page.screenshot({ fullPage: true, animations: \"disabled\" }), contentType: \"image/png\" });\n      |                                                                   ^ Error: page.screenshot: Cannot take screenshot larger than 32767 pixels on any dimension\n  228 |   const adopt = comparison.getByRole(\"button\", {\n  229 |     name: \"Usar referência vigente e manter preenchimento\",\n  230 |     exact: true,\n  231 |   });\n  232 |   await expect(adopt).toBeDisabled();\n  233 |   expect(official(document.id, f.patient)).toBe(before);\n  234 |   await comparison\n  235 |     .getByRole(\"button\", {\n  236 |       name: \"Retirar estes valores do preenchimento privado\",\n  237 |       exact: true,\n  238 |     })\n  239 |     .click();\n  240 |   await adopt.click();\n  241 |   await expect(field(page, line.id)).toHaveValue(\"1,\");\n  242 |   await field(page, line.id).fill(\"1\");\n  243 |   await page\n  244 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  245 |     .click();\n  246 |   const review = page.getByRole(\"dialog\", {\n  247 |     name: \"Revisar operação definitiva\",\n  248 |     exact: true,\n  249 |   });\n  250 |   await review\n  251 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  252 |     .click();\n  253 |   await expect(review).toHaveCount(0);\n  254 |   await selectDocumentSection(page, \"workflow\");\n  255 |   expect(\n  256 |     sql(\n  257 |       `select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`,\n  258 |     ),\n  259 |   ).toBe(\"0\");\n  260 | });\n  261 |\n  262 | //"
+              }
+            ]
+          },
+          {
+            "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 20858,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "TimeoutError: locator.selectOption: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Recebimento pendente', { exact: true })\u001b[22m\n\n\n  59 |     await page\n  60 |       .getByLabel(\"Recebimento pendente\", { exact: true })\n> 61 |       .selectOption(f.secondReceipt.id);\n     |        ^\n  62 |     if (purpose === \"reject_receipt\")\n  63 |       await page\n  64 |         .getByLabel(\"Motivo / justificativa\", { exact: true })\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:61:8\u001b[22m",
+                "codeframe": "   1 | import { expect, test, type Page } from \"@playwright/test\";\n   2 | import { fixtures, rpc } from \"../integration/v4-fixtures.mjs\";\n   3 | import {\n   4 |   decisionFixture,\n   5 |   decisionFacts,\n   6 |   decisionReason,\n   7 |   send,\n   8 | } from \"../integration/com-decision-fixtures.mjs\";\n   9 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   10 | import { sql, sqlLiteral } from \"../../scripts/test-environment.mjs\";\n   11 | import { selectContext } from \"./auth-context\";\n   12 | import { openDocumentMore } from \"./document-sections\";\n   13 | import { audit } from \"./accessibility-audit\";\n   14 | test.setTimeout(180000);\n   15 | async function login(page: Page, patient: string) {\n   16 |   await page.goto(\"/login\");\n   17 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   18 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   19 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   20 |   await expect(\n   21 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   22 |   ).toBeVisible();\n   23 |   await selectContext(page, patient);\n   24 | }\n   25 | async function open(page: Page, id: string, label: string, more = false) {\n   26 |   await page.goto(`/documentos/${id}`);\n   27 |   if (more) await openDocumentMore(page);\n   28 |   await page.getByRole(\"button\", { name: label, exact: true }).click();\n   29 | }\n   30 | async function save(page: Page) {\n   31 |   const response = page.waitForResponse(\n   32 |     (r) =>\n   33 |       new URL(r.url()).pathname === \"/api/drafts\" &&\n   34 |       r.request().method() === \"POST\",\n   35 |   );\n   36 |   await page\n   37 |     .getByRole(\"button\", { name: \"Salvar preenchimento privado\", exact: true })\n   38 |     .click();\n   39 |   expect((await response).ok()).toBe(true);\n   40 | }\n   41 | const credit = (patient: string, value: number) =>\n   42 |   sql(\n   43 |     `select coalesce(sum(quantity),0)=${value} from public.stock_movements where care_recipient_id=${sqlLiteral(patient)} and reference_type='purchase_receipt';`,\n   44 |   );\n   45 |\n   46 | for (const purpose of [\"validate_receipt\", \"reject_receipt\"] as const)\n   47 |   test(`COM ${purpose} retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque`, async ({\n   48 |     page,\n   49 |     browser,\n   50 |   }, info) => {\n   51 |     const f = await decisionFixture(),\n   52 |       label =\n   53 |         purpose === \"validate_receipt\"\n   54 |           ? \"Validar recebimento\"\n   55 |           : \"Rejeitar recebimento\";\n   56 |     await login(page, f.patient);\n   57 |     await open(page, f.document.id, label);\n   58 |     const before = decisionFacts(f);\n   59 |     await page\n   60 |       .getByLabel(\"Recebimento pendente\", { exact: true })\n>  61 |       .selectOption(f.secondReceipt.id);\n      |        ^ TimeoutError: locator.selectOption: Timeout 15000ms exceeded.\n   62 |     if (purpose === \"reject_receipt\")\n   63 |       await page\n   64 |         .getByLabel(\"Motivo / justificativa\", { exact: true })\n   65 |         .fill(decisionReason);\n   66 |     await save(page);\n   67 |     expect(decisionFacts(f)).toBe(before);\n   68 |     if (purpose === \"reject_receipt\")\n   69 |       await send(f.admin, f.document, \"validate_receipt\", {\n   70 |         receiptId: f.secondReceipt.id,\n   71 |       });\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await open(peer, f.document.id, label);\n   80 |       await peer\n   81 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   82 |         .click();\n   83 |       const selection = peer.getByLabel(\"Recebimento pendente\", {\n   84 |         exact: true,\n   85 |       });\n   86 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n   87 |       let selected = f.secondReceipt.id;\n   88 |       if (purpose === \"reject_receipt\") {\n   89 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n   90 |           \"Parcela preservada indisponível para esta decisão\",\n   91 |         );\n   92 |         await expect(\n   93 |           peer.getByLabel(\"Motivo / justificativa\", { exact: true }),\n   94 |         ).toHaveValue(decisionReason);\n   95 |         await peer\n   96 |           .getByRole(\"button\", {\n   97 |             name: \"Comparar referência da operação\",\n   98 |             exact: true,\n   99 |           })\n  100 |           .click();\n  101 |         await peer\n  102 |           .getByRole(\"button\", {\n  103 |             name: \"Usar referência vigente e manter preenchimento\",\n  104 |             exact: true,\n  105 |           })\n  106 |           .click();\n  107 |         await expect(selection).toHaveValue(f.secondReceipt.id);\n  108 |         await peer\n  109 |           .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  110 |           .click();\n  111 |         await expect(\n  112 |           peer.getByRole(\"dialog\", {\n  113 |             name: \"Revisar operação definitiva\",\n  114 |             exact: true,\n  115 |           }),\n  116 |         ).toHaveCount(0);\n  117 |         await expect(\n  118 |           peer.getByText(\"Selecione uma parcela pendente para conferir.\", {\n  119 |             exact: true,\n  120 |           }),\n  121 |         ).toBeVisible();\n  122 |         await selection.selectOption(f.firstReceipt.id);\n  123 |         selected = f.firstReceipt.id;\n  124 |       } else expect(decisionFacts(f)).toBe(before);\n  125 |       await audit(peer, \"COM private receipt selection \" + purpose);\n  126 |       const requests: Record<string, unknown>[] = [];\n  127 |       let dropped = false;\n  128 |       await peer.route(`**/api/documents/${f.document.id}`, async (route) => {\n  129 |         if (route.request().method() !== \"POST\") return route.continue();\n  130 |         requests.push(route.request().postDataJSON());\n  131 |         if (purpose === \"validate_receipt\" && !dropped) {\n  132 |           dropped = true;\n  133 |           const response = await route.fetch();\n  134 |           expect(response.ok()).toBe(true);\n  135 |           return route.abort(\"failed\");\n  136 |         }\n  137 |         return route.continue();\n  138 |       });\n  139 |       const prior = decisionFacts(f);\n  140 |       await peer\n  141 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  142 |         .click();\n  143 |       const review = peer.getByRole(\"dialog\", {\n  144 |         name: \"Revisar operação definitiva\",\n  145 |         exact: true,\n  146 |       });\n  147 |       await review\n  148 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  149 |         .click();\n  150 |       if (purpose === \"validate_receipt\") {\n  151 |         await expect(\n  152 |           review.getByRole(\"button\", {\n  153 |             name: \"Recuperar tentativa\",\n  154 |             exact: true,\n  155 |           }),\n  156 |         ).toBeVisible();\n  157 |         const committed = decisionFacts(f);\n  158 |         await peer.reload();\n  159 |         await peer.getByRole(\"button\", { name: label, exact: true }).click();\n  160 |         await peer\n  161 |           .getByRole(\"button\", {"
+              }
+            ]
+          },
+          {
+            "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 21157,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "TimeoutError: locator.selectOption: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Recebimento pendente', { exact: true })\u001b[22m\n\n\n  59 |     await page\n  60 |       .getByLabel(\"Recebimento pendente\", { exact: true })\n> 61 |       .selectOption(f.secondReceipt.id);\n     |        ^\n  62 |     if (purpose === \"reject_receipt\")\n  63 |       await page\n  64 |         .getByLabel(\"Motivo / justificativa\", { exact: true })\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:61:8\u001b[22m",
+                "codeframe": "   1 | import { expect, test, type Page } from \"@playwright/test\";\n   2 | import { fixtures, rpc } from \"../integration/v4-fixtures.mjs\";\n   3 | import {\n   4 |   decisionFixture,\n   5 |   decisionFacts,\n   6 |   decisionReason,\n   7 |   send,\n   8 | } from \"../integration/com-decision-fixtures.mjs\";\n   9 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   10 | import { sql, sqlLiteral } from \"../../scripts/test-environment.mjs\";\n   11 | import { selectContext } from \"./auth-context\";\n   12 | import { openDocumentMore } from \"./document-sections\";\n   13 | import { audit } from \"./accessibility-audit\";\n   14 | test.setTimeout(180000);\n   15 | async function login(page: Page, patient: string) {\n   16 |   await page.goto(\"/login\");\n   17 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   18 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   19 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   20 |   await expect(\n   21 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   22 |   ).toBeVisible();\n   23 |   await selectContext(page, patient);\n   24 | }\n   25 | async function open(page: Page, id: string, label: string, more = false) {\n   26 |   await page.goto(`/documentos/${id}`);\n   27 |   if (more) await openDocumentMore(page);\n   28 |   await page.getByRole(\"button\", { name: label, exact: true }).click();\n   29 | }\n   30 | async function save(page: Page) {\n   31 |   const response = page.waitForResponse(\n   32 |     (r) =>\n   33 |       new URL(r.url()).pathname === \"/api/drafts\" &&\n   34 |       r.request().method() === \"POST\",\n   35 |   );\n   36 |   await page\n   37 |     .getByRole(\"button\", { name: \"Salvar preenchimento privado\", exact: true })\n   38 |     .click();\n   39 |   expect((await response).ok()).toBe(true);\n   40 | }\n   41 | const credit = (patient: string, value: number) =>\n   42 |   sql(\n   43 |     `select coalesce(sum(quantity),0)=${value} from public.stock_movements where care_recipient_id=${sqlLiteral(patient)} and reference_type='purchase_receipt';`,\n   44 |   );\n   45 |\n   46 | for (const purpose of [\"validate_receipt\", \"reject_receipt\"] as const)\n   47 |   test(`COM ${purpose} retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque`, async ({\n   48 |     page,\n   49 |     browser,\n   50 |   }, info) => {\n   51 |     const f = await decisionFixture(),\n   52 |       label =\n   53 |         purpose === \"validate_receipt\"\n   54 |           ? \"Validar recebimento\"\n   55 |           : \"Rejeitar recebimento\";\n   56 |     await login(page, f.patient);\n   57 |     await open(page, f.document.id, label);\n   58 |     const before = decisionFacts(f);\n   59 |     await page\n   60 |       .getByLabel(\"Recebimento pendente\", { exact: true })\n>  61 |       .selectOption(f.secondReceipt.id);\n      |        ^ TimeoutError: locator.selectOption: Timeout 15000ms exceeded.\n   62 |     if (purpose === \"reject_receipt\")\n   63 |       await page\n   64 |         .getByLabel(\"Motivo / justificativa\", { exact: true })\n   65 |         .fill(decisionReason);\n   66 |     await save(page);\n   67 |     expect(decisionFacts(f)).toBe(before);\n   68 |     if (purpose === \"reject_receipt\")\n   69 |       await send(f.admin, f.document, \"validate_receipt\", {\n   70 |         receiptId: f.secondReceipt.id,\n   71 |       });\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await open(peer, f.document.id, label);\n   80 |       await peer\n   81 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   82 |         .click();\n   83 |       const selection = peer.getByLabel(\"Recebimento pendente\", {\n   84 |         exact: true,\n   85 |       });\n   86 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n   87 |       let selected = f.secondReceipt.id;\n   88 |       if (purpose === \"reject_receipt\") {\n   89 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n   90 |           \"Parcela preservada indisponível para esta decisão\",\n   91 |         );\n   92 |         await expect(\n   93 |           peer.getByLabel(\"Motivo / justificativa\", { exact: true }),\n   94 |         ).toHaveValue(decisionReason);\n   95 |         await peer\n   96 |           .getByRole(\"button\", {\n   97 |             name: \"Comparar referência da operação\",\n   98 |             exact: true,\n   99 |           })\n  100 |           .click();\n  101 |         await peer\n  102 |           .getByRole(\"button\", {\n  103 |             name: \"Usar referência vigente e manter preenchimento\",\n  104 |             exact: true,\n  105 |           })\n  106 |           .click();\n  107 |         await expect(selection).toHaveValue(f.secondReceipt.id);\n  108 |         await peer\n  109 |           .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  110 |           .click();\n  111 |         await expect(\n  112 |           peer.getByRole(\"dialog\", {\n  113 |             name: \"Revisar operação definitiva\",\n  114 |             exact: true,\n  115 |           }),\n  116 |         ).toHaveCount(0);\n  117 |         await expect(\n  118 |           peer.getByText(\"Selecione uma parcela pendente para conferir.\", {\n  119 |             exact: true,\n  120 |           }),\n  121 |         ).toBeVisible();\n  122 |         await selection.selectOption(f.firstReceipt.id);\n  123 |         selected = f.firstReceipt.id;\n  124 |       } else expect(decisionFacts(f)).toBe(before);\n  125 |       await audit(peer, \"COM private receipt selection \" + purpose);\n  126 |       const requests: Record<string, unknown>[] = [];\n  127 |       let dropped = false;\n  128 |       await peer.route(`**/api/documents/${f.document.id}`, async (route) => {\n  129 |         if (route.request().method() !== \"POST\") return route.continue();\n  130 |         requests.push(route.request().postDataJSON());\n  131 |         if (purpose === \"validate_receipt\" && !dropped) {\n  132 |           dropped = true;\n  133 |           const response = await route.fetch();\n  134 |           expect(response.ok()).toBe(true);\n  135 |           return route.abort(\"failed\");\n  136 |         }\n  137 |         return route.continue();\n  138 |       });\n  139 |       const prior = decisionFacts(f);\n  140 |       await peer\n  141 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  142 |         .click();\n  143 |       const review = peer.getByRole(\"dialog\", {\n  144 |         name: \"Revisar operação definitiva\",\n  145 |         exact: true,\n  146 |       });\n  147 |       await review\n  148 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  149 |         .click();\n  150 |       if (purpose === \"validate_receipt\") {\n  151 |         await expect(\n  152 |           review.getByRole(\"button\", {\n  153 |             name: \"Recuperar tentativa\",\n  154 |             exact: true,\n  155 |           }),\n  156 |         ).toBeVisible();\n  157 |         const committed = decisionFacts(f);\n  158 |         await peer.reload();\n  159 |         await peer.getByRole(\"button\", { name: label, exact: true }).click();\n  160 |         await peer\n  161 |           .getByRole(\"button\", {"
+              }
+            ]
+          },
+          {
+            "title": "COM só adota referência oficial conferida e exige nova confirmação de expectativa após mudança de versão",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 194,
+              "column": 5
+            },
+            "duration": 25497,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Motivo / justificativa', { exact: true })\nExpected: \u001b[32m\"Decisão operacional fictícia preservada\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByLabel('Motivo / justificativa', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Motivo / justificativa', { exact: true })\u001b[22m\n\n\n  296 |   await expect(\n  297 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n> 298 |   ).toHaveValue(decisionReason);\n      |     ^\n  299 |   expect(decisionFacts(f)).toBe(afterChange);\n  300 |   await page\n  301 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:298:5\u001b[22m",
+                "codeframe": "  198 |   await login(page, f.patient);\n  199 |   await open(page, f.document.id, \"Encerrar expectativa restante\", true);\n  200 |   const confirm = page.getByRole(\"checkbox\", {\n  201 |     name: /Conferi o resumo e confirmo dispensar/,\n  202 |   });\n  203 |   await page\n  204 |     .getByLabel(\"Motivo / justificativa\", { exact: true })\n  205 |     .fill(decisionReason);\n  206 |   await confirm.check();\n  207 |   const before = decisionFacts(f);\n  208 |   await save(page);\n  209 |   expect(decisionFacts(f)).toBe(before);\n  210 |   const newer = await send(f.family, f.document, \"purchase\", {\n  211 |     lines: [{ lineId: f.document.lines[0].id, quantity: \"1\" }],\n  212 |   });\n  213 |   let mode = \"denied\";\n  214 |   await page.route(`**/api/documents/${f.document.id}/history?*`, (route) =>\n  215 |     mode === \"denied\"\n  216 |       ? route.fulfill({\n  217 |           status: 403,\n  218 |           contentType: \"application/json\",\n  219 |           body: JSON.stringify({\n  220 |             code: \"FORBIDDEN\",\n  221 |             error: \"Consulta de teste recusada\",\n  222 |           }),\n  223 |         })\n  224 |       : mode === \"malformed\"\n  225 |         ? route.fulfill({\n  226 |             status: 200,\n  227 |             contentType: \"application/json\",\n  228 |             body: JSON.stringify({ data: { documentId: \"outro\" } }),\n  229 |           })\n  230 |         : route.continue(),\n  231 |   );\n  232 |   await open(page, f.document.id, \"Encerrar expectativa restante\", true);\n  233 |   await page\n  234 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  235 |     .click();\n  236 |   await expect(confirm).toBeChecked();\n  237 |   await page\n  238 |     .getByRole(\"button\", {\n  239 |       name: \"Comparar referência da operação\",\n  240 |       exact: true,\n  241 |     })\n  242 |     .click();\n  243 |   const comparison = page.getByRole(\"region\", {\n  244 |       name: \"Fatos oficiais das referências da operação\",\n  245 |       exact: true,\n  246 |     }),\n  247 |     adopt = page.getByRole(\"button\", {\n  248 |       name: \"Usar referência vigente e manter preenchimento\",\n  249 |       exact: true,\n  250 |     });\n  251 |   await expect(\n  252 |     comparison.getByText(/Não foi possível conferir as referências oficiais/),\n  253 |   ).toBeVisible();\n  254 |   await expect(adopt).toBeDisabled();\n  255 |   await expect(comparison.getByRole(\"article\")).toHaveCount(0);\n  256 |   mode = \"malformed\";\n  257 |   await comparison\n  258 |     .getByRole(\"button\", {\n  259 |       name: \"Consultar novamente as referências da operação\",\n  260 |       exact: true,\n  261 |     })\n  262 |     .click();\n  263 |   await expect(\n  264 |     comparison.getByText(/A resposta do histórico não pôde ser conferida/),\n  265 |   ).toBeVisible();\n  266 |   await expect(adopt).toBeDisabled();\n  267 |   await expect(confirm).toBeChecked();\n  268 |   mode = \"pass\";\n  269 |   await comparison\n  270 |     .getByRole(\"button\", {\n  271 |       name: \"Consultar novamente as referências da operação\",\n  272 |       exact: true,\n  273 |     })\n  274 |     .click();\n  275 |   await expect(\n  276 |     comparison.getByRole(\"article\", {\n  277 |       name: `Conteúdo preservado da versão ${f.document.version}`,\n  278 |       exact: true,\n  279 |     }),\n  280 |   ).toBeVisible();\n  281 |   await expect(\n  282 |     comparison.getByRole(\"article\", {\n  283 |       name: `Conteúdo preservado da versão ${newer.version}`,\n  284 |       exact: true,\n  285 |     }),\n  286 |   ).toBeVisible();\n  287 |   expect(new URL(page.url()).searchParams.has(\"historyVersion\")).toBe(false);\n  288 |   await audit(page, \"COM exact official draft comparison\");\n  289 |   await info.attach(\"comparacao-oficial-operacao-com\", {\n  290 |     body: await page.screenshot({ fullPage: false, animations: \"disabled\" }),\n  291 |     contentType: \"image/png\",\n  292 |   });\n  293 |   const afterChange = decisionFacts(f);\n  294 |   await adopt.click();\n  295 |   await expect(confirm).not.toBeChecked();\n  296 |   await expect(\n  297 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n> 298 |   ).toHaveValue(decisionReason);\n      |     ^ Error: expect(locator).toHaveValue(expected) failed\n  299 |   expect(decisionFacts(f)).toBe(afterChange);\n  300 |   await page\n  301 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  302 |     .click();\n  303 |   await expect(page.getByRole(\"dialog\")).toHaveCount(0);\n  304 |   await confirm.check();\n  305 |   await page\n  306 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  307 |     .click();\n  308 |   const review = page.getByRole(\"dialog\", {\n  309 |     name: \"Revisar encerramento da expectativa\",\n  310 |     exact: true,\n  311 |   });\n  312 |   await review\n  313 |     .getByRole(\"button\", {\n  314 |       name: \"Confirmar encerramento da expectativa\",\n  315 |       exact: true,\n  316 |     })\n  317 |     .click();\n  318 |   await expect(review).toHaveCount(0);\n  319 |   expect(\n  320 |     sql(\n  321 |       `select purchased_quantity=5 and waived_quantity=5 from public.document_lines where document_id=${sqlLiteral(f.document.id)};`,\n  322 |     ),\n  323 |   ).toBe(\"t\");\n  324 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  325 | });\n  326 |\n  327 | test(\"COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar\", async ({\n  328 |   page,\n  329 | }) => {\n  330 |   const f = await decisionFixture(false);\n  331 |   await login(page, f.patient);\n  332 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  333 |   const before = decisionFacts(f);\n  334 |   await page\n  335 |     .getByLabel(\"Motivo / justificativa\", { exact: true })\n  336 |     .fill(decisionReason);\n  337 |   await save(page);\n  338 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  339 |   await page\n  340 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  341 |     .click();\n  342 |   await expect(\n  343 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n  344 |   ).toHaveValue(decisionReason);\n  345 |   await page\n  346 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  347 |     .click();\n  348 |   const review = page.getByRole(\"dialog\", {\n  349 |     name: \"Revisar operação definitiva\",\n  350 |     exact: true,\n  351 |   });\n  352 |   await expect(review).toBeVisible();\n  353 |   await review.press(\"Escape\");\n  354 |   await expect(review).toHaveCount(0);\n  355 |   expect(decisionFacts(f)).toBe(before);\n  356 |   await page\n  357 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  358 |     .click();\n  359 |   await review\n  360 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  361 |     .click();\n  362 |   await expect(review).toHaveCount(0);\n  363 |   expect(\n  364 |     (await rpc(f.admin, \"operational_document\", { p_id: f.document.id }))\n  365 |       .status,\n  366 |   ).toBe(\"cancelled\");\n  367 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  368 | });\n  369 |\n  370 | //"
+              }
+            ]
+          },
+          {
+            "title": "COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 327,
+              "column": 5
+            },
+            "duration": 22690,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Motivo / justificativa', { exact: true })\nExpected: \u001b[32m\"Decisão operacional fictícia preservada\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByLabel('Motivo / justificativa', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Motivo / justificativa', { exact: true })\u001b[22m\n\n\n  342 |   await expect(\n  343 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n> 344 |   ).toHaveValue(decisionReason);\n      |     ^\n  345 |   await page\n  346 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  347 |     .click();\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:344:5\u001b[22m",
+                "codeframe": "  244 |       name: \"Fatos oficiais das referências da operação\",\n  245 |       exact: true,\n  246 |     }),\n  247 |     adopt = page.getByRole(\"button\", {\n  248 |       name: \"Usar referência vigente e manter preenchimento\",\n  249 |       exact: true,\n  250 |     });\n  251 |   await expect(\n  252 |     comparison.getByText(/Não foi possível conferir as referências oficiais/),\n  253 |   ).toBeVisible();\n  254 |   await expect(adopt).toBeDisabled();\n  255 |   await expect(comparison.getByRole(\"article\")).toHaveCount(0);\n  256 |   mode = \"malformed\";\n  257 |   await comparison\n  258 |     .getByRole(\"button\", {\n  259 |       name: \"Consultar novamente as referências da operação\",\n  260 |       exact: true,\n  261 |     })\n  262 |     .click();\n  263 |   await expect(\n  264 |     comparison.getByText(/A resposta do histórico não pôde ser conferida/),\n  265 |   ).toBeVisible();\n  266 |   await expect(adopt).toBeDisabled();\n  267 |   await expect(confirm).toBeChecked();\n  268 |   mode = \"pass\";\n  269 |   await comparison\n  270 |     .getByRole(\"button\", {\n  271 |       name: \"Consultar novamente as referências da operação\",\n  272 |       exact: true,\n  273 |     })\n  274 |     .click();\n  275 |   await expect(\n  276 |     comparison.getByRole(\"article\", {\n  277 |       name: `Conteúdo preservado da versão ${f.document.version}`,\n  278 |       exact: true,\n  279 |     }),\n  280 |   ).toBeVisible();\n  281 |   await expect(\n  282 |     comparison.getByRole(\"article\", {\n  283 |       name: `Conteúdo preservado da versão ${newer.version}`,\n  284 |       exact: true,\n  285 |     }),\n  286 |   ).toBeVisible();\n  287 |   expect(new URL(page.url()).searchParams.has(\"historyVersion\")).toBe(false);\n  288 |   await audit(page, \"COM exact official draft comparison\");\n  289 |   await info.attach(\"comparacao-oficial-operacao-com\", {\n  290 |     body: await page.screenshot({ fullPage: false, animations: \"disabled\" }),\n  291 |     contentType: \"image/png\",\n  292 |   });\n  293 |   const afterChange = decisionFacts(f);\n  294 |   await adopt.click();\n  295 |   await expect(confirm).not.toBeChecked();\n  296 |   await expect(\n  297 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n  298 |   ).toHaveValue(decisionReason);\n  299 |   expect(decisionFacts(f)).toBe(afterChange);\n  300 |   await page\n  301 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  302 |     .click();\n  303 |   await expect(page.getByRole(\"dialog\")).toHaveCount(0);\n  304 |   await confirm.check();\n  305 |   await page\n  306 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  307 |     .click();\n  308 |   const review = page.getByRole(\"dialog\", {\n  309 |     name: \"Revisar encerramento da expectativa\",\n  310 |     exact: true,\n  311 |   });\n  312 |   await review\n  313 |     .getByRole(\"button\", {\n  314 |       name: \"Confirmar encerramento da expectativa\",\n  315 |       exact: true,\n  316 |     })\n  317 |     .click();\n  318 |   await expect(review).toHaveCount(0);\n  319 |   expect(\n  320 |     sql(\n  321 |       `select purchased_quantity=5 and waived_quantity=5 from public.document_lines where document_id=${sqlLiteral(f.document.id)};`,\n  322 |     ),\n  323 |   ).toBe(\"t\");\n  324 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  325 | });\n  326 |\n  327 | test(\"COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar\", async ({\n  328 |   page,\n  329 | }) => {\n  330 |   const f = await decisionFixture(false);\n  331 |   await login(page, f.patient);\n  332 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  333 |   const before = decisionFacts(f);\n  334 |   await page\n  335 |     .getByLabel(\"Motivo / justificativa\", { exact: true })\n  336 |     .fill(decisionReason);\n  337 |   await save(page);\n  338 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  339 |   await page\n  340 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  341 |     .click();\n  342 |   await expect(\n  343 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n> 344 |   ).toHaveValue(decisionReason);\n      |     ^ Error: expect(locator).toHaveValue(expected) failed\n  345 |   await page\n  346 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  347 |     .click();\n  348 |   const review = page.getByRole(\"dialog\", {\n  349 |     name: \"Revisar operação definitiva\",\n  350 |     exact: true,\n  351 |   });\n  352 |   await expect(review).toBeVisible();\n  353 |   await review.press(\"Escape\");\n  354 |   await expect(review).toHaveCount(0);\n  355 |   expect(decisionFacts(f)).toBe(before);\n  356 |   await page\n  357 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  358 |     .click();\n  359 |   await review\n  360 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  361 |     .click();\n  362 |   await expect(review).toHaveCount(0);\n  363 |   expect(\n  364 |     (await rpc(f.admin, \"operational_document\", { p_id: f.document.id }))\n  365 |       .status,\n  366 |   ).toBe(\"cancelled\");\n  367 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  368 | });\n  369 |\n  370 | //"
+              }
+            ]
+          },
+          {
+            "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 21788,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "TimeoutError: locator.selectOption: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Recebimento pendente', { exact: true })\u001b[22m\n\n\n  59 |     await page\n  60 |       .getByLabel(\"Recebimento pendente\", { exact: true })\n> 61 |       .selectOption(f.secondReceipt.id);\n     |        ^\n  62 |     if (purpose === \"reject_receipt\")\n  63 |       await page\n  64 |         .getByLabel(\"Motivo / justificativa\", { exact: true })\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:61:8\u001b[22m",
+                "codeframe": "   1 | import { expect, test, type Page } from \"@playwright/test\";\n   2 | import { fixtures, rpc } from \"../integration/v4-fixtures.mjs\";\n   3 | import {\n   4 |   decisionFixture,\n   5 |   decisionFacts,\n   6 |   decisionReason,\n   7 |   send,\n   8 | } from \"../integration/com-decision-fixtures.mjs\";\n   9 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   10 | import { sql, sqlLiteral } from \"../../scripts/test-environment.mjs\";\n   11 | import { selectContext } from \"./auth-context\";\n   12 | import { openDocumentMore } from \"./document-sections\";\n   13 | import { audit } from \"./accessibility-audit\";\n   14 | test.setTimeout(180000);\n   15 | async function login(page: Page, patient: string) {\n   16 |   await page.goto(\"/login\");\n   17 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   18 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   19 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   20 |   await expect(\n   21 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   22 |   ).toBeVisible();\n   23 |   await selectContext(page, patient);\n   24 | }\n   25 | async function open(page: Page, id: string, label: string, more = false) {\n   26 |   await page.goto(`/documentos/${id}`);\n   27 |   if (more) await openDocumentMore(page);\n   28 |   await page.getByRole(\"button\", { name: label, exact: true }).click();\n   29 | }\n   30 | async function save(page: Page) {\n   31 |   const response = page.waitForResponse(\n   32 |     (r) =>\n   33 |       new URL(r.url()).pathname === \"/api/drafts\" &&\n   34 |       r.request().method() === \"POST\",\n   35 |   );\n   36 |   await page\n   37 |     .getByRole(\"button\", { name: \"Salvar preenchimento privado\", exact: true })\n   38 |     .click();\n   39 |   expect((await response).ok()).toBe(true);\n   40 | }\n   41 | const credit = (patient: string, value: number) =>\n   42 |   sql(\n   43 |     `select coalesce(sum(quantity),0)=${value} from public.stock_movements where care_recipient_id=${sqlLiteral(patient)} and reference_type='purchase_receipt';`,\n   44 |   );\n   45 |\n   46 | for (const purpose of [\"validate_receipt\", \"reject_receipt\"] as const)\n   47 |   test(`COM ${purpose} retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque`, async ({\n   48 |     page,\n   49 |     browser,\n   50 |   }, info) => {\n   51 |     const f = await decisionFixture(),\n   52 |       label =\n   53 |         purpose === \"validate_receipt\"\n   54 |           ? \"Validar recebimento\"\n   55 |           : \"Rejeitar recebimento\";\n   56 |     await login(page, f.patient);\n   57 |     await open(page, f.document.id, label);\n   58 |     const before = decisionFacts(f);\n   59 |     await page\n   60 |       .getByLabel(\"Recebimento pendente\", { exact: true })\n>  61 |       .selectOption(f.secondReceipt.id);\n      |        ^ TimeoutError: locator.selectOption: Timeout 15000ms exceeded.\n   62 |     if (purpose === \"reject_receipt\")\n   63 |       await page\n   64 |         .getByLabel(\"Motivo / justificativa\", { exact: true })\n   65 |         .fill(decisionReason);\n   66 |     await save(page);\n   67 |     expect(decisionFacts(f)).toBe(before);\n   68 |     if (purpose === \"reject_receipt\")\n   69 |       await send(f.admin, f.document, \"validate_receipt\", {\n   70 |         receiptId: f.secondReceipt.id,\n   71 |       });\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await open(peer, f.document.id, label);\n   80 |       await peer\n   81 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   82 |         .click();\n   83 |       const selection = peer.getByLabel(\"Recebimento pendente\", {\n   84 |         exact: true,\n   85 |       });\n   86 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n   87 |       let selected = f.secondReceipt.id;\n   88 |       if (purpose === \"reject_receipt\") {\n   89 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n   90 |           \"Parcela preservada indisponível para esta decisão\",\n   91 |         );\n   92 |         await expect(\n   93 |           peer.getByLabel(\"Motivo / justificativa\", { exact: true }),\n   94 |         ).toHaveValue(decisionReason);\n   95 |         await peer\n   96 |           .getByRole(\"button\", {\n   97 |             name: \"Comparar referência da operação\",\n   98 |             exact: true,\n   99 |           })\n  100 |           .click();\n  101 |         await peer\n  102 |           .getByRole(\"button\", {\n  103 |             name: \"Usar referência vigente e manter preenchimento\",\n  104 |             exact: true,\n  105 |           })\n  106 |           .click();\n  107 |         await expect(selection).toHaveValue(f.secondReceipt.id);\n  108 |         await peer\n  109 |           .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  110 |           .click();\n  111 |         await expect(\n  112 |           peer.getByRole(\"dialog\", {\n  113 |             name: \"Revisar operação definitiva\",\n  114 |             exact: true,\n  115 |           }),\n  116 |         ).toHaveCount(0);\n  117 |         await expect(\n  118 |           peer.getByText(\"Selecione uma parcela pendente para conferir.\", {\n  119 |             exact: true,\n  120 |           }),\n  121 |         ).toBeVisible();\n  122 |         await selection.selectOption(f.firstReceipt.id);\n  123 |         selected = f.firstReceipt.id;\n  124 |       } else expect(decisionFacts(f)).toBe(before);\n  125 |       await audit(peer, \"COM private receipt selection \" + purpose);\n  126 |       const requests: Record<string, unknown>[] = [];\n  127 |       let dropped = false;\n  128 |       await peer.route(`**/api/documents/${f.document.id}`, async (route) => {\n  129 |         if (route.request().method() !== \"POST\") return route.continue();\n  130 |         requests.push(route.request().postDataJSON());\n  131 |         if (purpose === \"validate_receipt\" && !dropped) {\n  132 |           dropped = true;\n  133 |           const response = await route.fetch();\n  134 |           expect(response.ok()).toBe(true);\n  135 |           return route.abort(\"failed\");\n  136 |         }\n  137 |         return route.continue();\n  138 |       });\n  139 |       const prior = decisionFacts(f);\n  140 |       await peer\n  141 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  142 |         .click();\n  143 |       const review = peer.getByRole(\"dialog\", {\n  144 |         name: \"Revisar operação definitiva\",\n  145 |         exact: true,\n  146 |       });\n  147 |       await review\n  148 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  149 |         .click();\n  150 |       if (purpose === \"validate_receipt\") {\n  151 |         await expect(\n  152 |           review.getByRole(\"button\", {\n  153 |             name: \"Recuperar tentativa\",\n  154 |             exact: true,\n  155 |           }),\n  156 |         ).toBeVisible();\n  157 |         const committed = decisionFacts(f);\n  158 |         await peer.reload();\n  159 |         await peer.getByRole(\"button\", { name: label, exact: true }).click();\n  160 |         await peer\n  161 |           .getByRole(\"button\", {"
+              }
+            ]
+          },
+          {
+            "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 21659,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "TimeoutError: locator.selectOption: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Recebimento pendente', { exact: true })\u001b[22m\n\n\n  59 |     await page\n  60 |       .getByLabel(\"Recebimento pendente\", { exact: true })\n> 61 |       .selectOption(f.secondReceipt.id);\n     |        ^\n  62 |     if (purpose === \"reject_receipt\")\n  63 |       await page\n  64 |         .getByLabel(\"Motivo / justificativa\", { exact: true })\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:61:8\u001b[22m",
+                "codeframe": "   1 | import { expect, test, type Page } from \"@playwright/test\";\n   2 | import { fixtures, rpc } from \"../integration/v4-fixtures.mjs\";\n   3 | import {\n   4 |   decisionFixture,\n   5 |   decisionFacts,\n   6 |   decisionReason,\n   7 |   send,\n   8 | } from \"../integration/com-decision-fixtures.mjs\";\n   9 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   10 | import { sql, sqlLiteral } from \"../../scripts/test-environment.mjs\";\n   11 | import { selectContext } from \"./auth-context\";\n   12 | import { openDocumentMore } from \"./document-sections\";\n   13 | import { audit } from \"./accessibility-audit\";\n   14 | test.setTimeout(180000);\n   15 | async function login(page: Page, patient: string) {\n   16 |   await page.goto(\"/login\");\n   17 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   18 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   19 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   20 |   await expect(\n   21 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   22 |   ).toBeVisible();\n   23 |   await selectContext(page, patient);\n   24 | }\n   25 | async function open(page: Page, id: string, label: string, more = false) {\n   26 |   await page.goto(`/documentos/${id}`);\n   27 |   if (more) await openDocumentMore(page);\n   28 |   await page.getByRole(\"button\", { name: label, exact: true }).click();\n   29 | }\n   30 | async function save(page: Page) {\n   31 |   const response = page.waitForResponse(\n   32 |     (r) =>\n   33 |       new URL(r.url()).pathname === \"/api/drafts\" &&\n   34 |       r.request().method() === \"POST\",\n   35 |   );\n   36 |   await page\n   37 |     .getByRole(\"button\", { name: \"Salvar preenchimento privado\", exact: true })\n   38 |     .click();\n   39 |   expect((await response).ok()).toBe(true);\n   40 | }\n   41 | const credit = (patient: string, value: number) =>\n   42 |   sql(\n   43 |     `select coalesce(sum(quantity),0)=${value} from public.stock_movements where care_recipient_id=${sqlLiteral(patient)} and reference_type='purchase_receipt';`,\n   44 |   );\n   45 |\n   46 | for (const purpose of [\"validate_receipt\", \"reject_receipt\"] as const)\n   47 |   test(`COM ${purpose} retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque`, async ({\n   48 |     page,\n   49 |     browser,\n   50 |   }, info) => {\n   51 |     const f = await decisionFixture(),\n   52 |       label =\n   53 |         purpose === \"validate_receipt\"\n   54 |           ? \"Validar recebimento\"\n   55 |           : \"Rejeitar recebimento\";\n   56 |     await login(page, f.patient);\n   57 |     await open(page, f.document.id, label);\n   58 |     const before = decisionFacts(f);\n   59 |     await page\n   60 |       .getByLabel(\"Recebimento pendente\", { exact: true })\n>  61 |       .selectOption(f.secondReceipt.id);\n      |        ^ TimeoutError: locator.selectOption: Timeout 15000ms exceeded.\n   62 |     if (purpose === \"reject_receipt\")\n   63 |       await page\n   64 |         .getByLabel(\"Motivo / justificativa\", { exact: true })\n   65 |         .fill(decisionReason);\n   66 |     await save(page);\n   67 |     expect(decisionFacts(f)).toBe(before);\n   68 |     if (purpose === \"reject_receipt\")\n   69 |       await send(f.admin, f.document, \"validate_receipt\", {\n   70 |         receiptId: f.secondReceipt.id,\n   71 |       });\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await open(peer, f.document.id, label);\n   80 |       await peer\n   81 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   82 |         .click();\n   83 |       const selection = peer.getByLabel(\"Recebimento pendente\", {\n   84 |         exact: true,\n   85 |       });\n   86 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n   87 |       let selected = f.secondReceipt.id;\n   88 |       if (purpose === \"reject_receipt\") {\n   89 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n   90 |           \"Parcela preservada indisponível para esta decisão\",\n   91 |         );\n   92 |         await expect(\n   93 |           peer.getByLabel(\"Motivo / justificativa\", { exact: true }),\n   94 |         ).toHaveValue(decisionReason);\n   95 |         await peer\n   96 |           .getByRole(\"button\", {\n   97 |             name: \"Comparar referência da operação\",\n   98 |             exact: true,\n   99 |           })\n  100 |           .click();\n  101 |         await peer\n  102 |           .getByRole(\"button\", {\n  103 |             name: \"Usar referência vigente e manter preenchimento\",\n  104 |             exact: true,\n  105 |           })\n  106 |           .click();\n  107 |         await expect(selection).toHaveValue(f.secondReceipt.id);\n  108 |         await peer\n  109 |           .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  110 |           .click();\n  111 |         await expect(\n  112 |           peer.getByRole(\"dialog\", {\n  113 |             name: \"Revisar operação definitiva\",\n  114 |             exact: true,\n  115 |           }),\n  116 |         ).toHaveCount(0);\n  117 |         await expect(\n  118 |           peer.getByText(\"Selecione uma parcela pendente para conferir.\", {\n  119 |             exact: true,\n  120 |           }),\n  121 |         ).toBeVisible();\n  122 |         await selection.selectOption(f.firstReceipt.id);\n  123 |         selected = f.firstReceipt.id;\n  124 |       } else expect(decisionFacts(f)).toBe(before);\n  125 |       await audit(peer, \"COM private receipt selection \" + purpose);\n  126 |       const requests: Record<string, unknown>[] = [];\n  127 |       let dropped = false;\n  128 |       await peer.route(`**/api/documents/${f.document.id}`, async (route) => {\n  129 |         if (route.request().method() !== \"POST\") return route.continue();\n  130 |         requests.push(route.request().postDataJSON());\n  131 |         if (purpose === \"validate_receipt\" && !dropped) {\n  132 |           dropped = true;\n  133 |           const response = await route.fetch();\n  134 |           expect(response.ok()).toBe(true);\n  135 |           return route.abort(\"failed\");\n  136 |         }\n  137 |         return route.continue();\n  138 |       });\n  139 |       const prior = decisionFacts(f);\n  140 |       await peer\n  141 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  142 |         .click();\n  143 |       const review = peer.getByRole(\"dialog\", {\n  144 |         name: \"Revisar operação definitiva\",\n  145 |         exact: true,\n  146 |       });\n  147 |       await review\n  148 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  149 |         .click();\n  150 |       if (purpose === \"validate_receipt\") {\n  151 |         await expect(\n  152 |           review.getByRole(\"button\", {\n  153 |             name: \"Recuperar tentativa\",\n  154 |             exact: true,\n  155 |           }),\n  156 |         ).toBeVisible();\n  157 |         const committed = decisionFacts(f);\n  158 |         await peer.reload();\n  159 |         await peer.getByRole(\"button\", { name: label, exact: true }).click();\n  160 |         await peer\n  161 |           .getByRole(\"button\", {"
+              }
+            ]
+          },
+          {
+            "title": "COM só adota referência oficial conferida e exige nova confirmação de expectativa após mudança de versão",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 194,
+              "column": 5
+            },
+            "duration": 27744,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Motivo / justificativa', { exact: true })\nExpected: \u001b[32m\"Decisão operacional fictícia preservada\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByLabel('Motivo / justificativa', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Motivo / justificativa', { exact: true })\u001b[22m\n\n\n  296 |   await expect(\n  297 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n> 298 |   ).toHaveValue(decisionReason);\n      |     ^\n  299 |   expect(decisionFacts(f)).toBe(afterChange);\n  300 |   await page\n  301 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:298:5\u001b[22m",
+                "codeframe": "  198 |   await login(page, f.patient);\n  199 |   await open(page, f.document.id, \"Encerrar expectativa restante\", true);\n  200 |   const confirm = page.getByRole(\"checkbox\", {\n  201 |     name: /Conferi o resumo e confirmo dispensar/,\n  202 |   });\n  203 |   await page\n  204 |     .getByLabel(\"Motivo / justificativa\", { exact: true })\n  205 |     .fill(decisionReason);\n  206 |   await confirm.check();\n  207 |   const before = decisionFacts(f);\n  208 |   await save(page);\n  209 |   expect(decisionFacts(f)).toBe(before);\n  210 |   const newer = await send(f.family, f.document, \"purchase\", {\n  211 |     lines: [{ lineId: f.document.lines[0].id, quantity: \"1\" }],\n  212 |   });\n  213 |   let mode = \"denied\";\n  214 |   await page.route(`**/api/documents/${f.document.id}/history?*`, (route) =>\n  215 |     mode === \"denied\"\n  216 |       ? route.fulfill({\n  217 |           status: 403,\n  218 |           contentType: \"application/json\",\n  219 |           body: JSON.stringify({\n  220 |             code: \"FORBIDDEN\",\n  221 |             error: \"Consulta de teste recusada\",\n  222 |           }),\n  223 |         })\n  224 |       : mode === \"malformed\"\n  225 |         ? route.fulfill({\n  226 |             status: 200,\n  227 |             contentType: \"application/json\",\n  228 |             body: JSON.stringify({ data: { documentId: \"outro\" } }),\n  229 |           })\n  230 |         : route.continue(),\n  231 |   );\n  232 |   await open(page, f.document.id, \"Encerrar expectativa restante\", true);\n  233 |   await page\n  234 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  235 |     .click();\n  236 |   await expect(confirm).toBeChecked();\n  237 |   await page\n  238 |     .getByRole(\"button\", {\n  239 |       name: \"Comparar referência da operação\",\n  240 |       exact: true,\n  241 |     })\n  242 |     .click();\n  243 |   const comparison = page.getByRole(\"region\", {\n  244 |       name: \"Fatos oficiais das referências da operação\",\n  245 |       exact: true,\n  246 |     }),\n  247 |     adopt = page.getByRole(\"button\", {\n  248 |       name: \"Usar referência vigente e manter preenchimento\",\n  249 |       exact: true,\n  250 |     });\n  251 |   await expect(\n  252 |     comparison.getByText(/Não foi possível conferir as referências oficiais/),\n  253 |   ).toBeVisible();\n  254 |   await expect(adopt).toBeDisabled();\n  255 |   await expect(comparison.getByRole(\"article\")).toHaveCount(0);\n  256 |   mode = \"malformed\";\n  257 |   await comparison\n  258 |     .getByRole(\"button\", {\n  259 |       name: \"Consultar novamente as referências da operação\",\n  260 |       exact: true,\n  261 |     })\n  262 |     .click();\n  263 |   await expect(\n  264 |     comparison.getByText(/A resposta do histórico não pôde ser conferida/),\n  265 |   ).toBeVisible();\n  266 |   await expect(adopt).toBeDisabled();\n  267 |   await expect(confirm).toBeChecked();\n  268 |   mode = \"pass\";\n  269 |   await comparison\n  270 |     .getByRole(\"button\", {\n  271 |       name: \"Consultar novamente as referências da operação\",\n  272 |       exact: true,\n  273 |     })\n  274 |     .click();\n  275 |   await expect(\n  276 |     comparison.getByRole(\"article\", {\n  277 |       name: `Conteúdo preservado da versão ${f.document.version}`,\n  278 |       exact: true,\n  279 |     }),\n  280 |   ).toBeVisible();\n  281 |   await expect(\n  282 |     comparison.getByRole(\"article\", {\n  283 |       name: `Conteúdo preservado da versão ${newer.version}`,\n  284 |       exact: true,\n  285 |     }),\n  286 |   ).toBeVisible();\n  287 |   expect(new URL(page.url()).searchParams.has(\"historyVersion\")).toBe(false);\n  288 |   await audit(page, \"COM exact official draft comparison\");\n  289 |   await info.attach(\"comparacao-oficial-operacao-com\", {\n  290 |     body: await page.screenshot({ fullPage: false, animations: \"disabled\" }),\n  291 |     contentType: \"image/png\",\n  292 |   });\n  293 |   const afterChange = decisionFacts(f);\n  294 |   await adopt.click();\n  295 |   await expect(confirm).not.toBeChecked();\n  296 |   await expect(\n  297 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n> 298 |   ).toHaveValue(decisionReason);\n      |     ^ Error: expect(locator).toHaveValue(expected) failed\n  299 |   expect(decisionFacts(f)).toBe(afterChange);\n  300 |   await page\n  301 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  302 |     .click();\n  303 |   await expect(page.getByRole(\"dialog\")).toHaveCount(0);\n  304 |   await confirm.check();\n  305 |   await page\n  306 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  307 |     .click();\n  308 |   const review = page.getByRole(\"dialog\", {\n  309 |     name: \"Revisar encerramento da expectativa\",\n  310 |     exact: true,\n  311 |   });\n  312 |   await review\n  313 |     .getByRole(\"button\", {\n  314 |       name: \"Confirmar encerramento da expectativa\",\n  315 |       exact: true,\n  316 |     })\n  317 |     .click();\n  318 |   await expect(review).toHaveCount(0);\n  319 |   expect(\n  320 |     sql(\n  321 |       `select purchased_quantity=5 and waived_quantity=5 from public.document_lines where document_id=${sqlLiteral(f.document.id)};`,\n  322 |     ),\n  323 |   ).toBe(\"t\");\n  324 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  325 | });\n  326 |\n  327 | test(\"COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar\", async ({\n  328 |   page,\n  329 | }) => {\n  330 |   const f = await decisionFixture(false);\n  331 |   await login(page, f.patient);\n  332 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  333 |   const before = decisionFacts(f);\n  334 |   await page\n  335 |     .getByLabel(\"Motivo / justificativa\", { exact: true })\n  336 |     .fill(decisionReason);\n  337 |   await save(page);\n  338 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  339 |   await page\n  340 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  341 |     .click();\n  342 |   await expect(\n  343 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n  344 |   ).toHaveValue(decisionReason);\n  345 |   await page\n  346 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  347 |     .click();\n  348 |   const review = page.getByRole(\"dialog\", {\n  349 |     name: \"Revisar operação definitiva\",\n  350 |     exact: true,\n  351 |   });\n  352 |   await expect(review).toBeVisible();\n  353 |   await review.press(\"Escape\");\n  354 |   await expect(review).toHaveCount(0);\n  355 |   expect(decisionFacts(f)).toBe(before);\n  356 |   await page\n  357 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  358 |     .click();\n  359 |   await review\n  360 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  361 |     .click();\n  362 |   await expect(review).toHaveCount(0);\n  363 |   expect(\n  364 |     (await rpc(f.admin, \"operational_document\", { p_id: f.document.id }))\n  365 |       .status,\n  366 |   ).toBe(\"cancelled\");\n  367 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  368 | });\n  369 |\n  370 | //"
+              }
+            ]
+          },
+          {
+            "title": "COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 327,
+              "column": 5
+            },
+            "duration": 24409,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Motivo / justificativa', { exact: true })\nExpected: \u001b[32m\"Decisão operacional fictícia preservada\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByLabel('Motivo / justificativa', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Motivo / justificativa', { exact: true })\u001b[22m\n\n\n  342 |   await expect(\n  343 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n> 344 |   ).toHaveValue(decisionReason);\n      |     ^\n  345 |   await page\n  346 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  347 |     .click();\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:344:5\u001b[22m",
+                "codeframe": "  244 |       name: \"Fatos oficiais das referências da operação\",\n  245 |       exact: true,\n  246 |     }),\n  247 |     adopt = page.getByRole(\"button\", {\n  248 |       name: \"Usar referência vigente e manter preenchimento\",\n  249 |       exact: true,\n  250 |     });\n  251 |   await expect(\n  252 |     comparison.getByText(/Não foi possível conferir as referências oficiais/),\n  253 |   ).toBeVisible();\n  254 |   await expect(adopt).toBeDisabled();\n  255 |   await expect(comparison.getByRole(\"article\")).toHaveCount(0);\n  256 |   mode = \"malformed\";\n  257 |   await comparison\n  258 |     .getByRole(\"button\", {\n  259 |       name: \"Consultar novamente as referências da operação\",\n  260 |       exact: true,\n  261 |     })\n  262 |     .click();\n  263 |   await expect(\n  264 |     comparison.getByText(/A resposta do histórico não pôde ser conferida/),\n  265 |   ).toBeVisible();\n  266 |   await expect(adopt).toBeDisabled();\n  267 |   await expect(confirm).toBeChecked();\n  268 |   mode = \"pass\";\n  269 |   await comparison\n  270 |     .getByRole(\"button\", {\n  271 |       name: \"Consultar novamente as referências da operação\",\n  272 |       exact: true,\n  273 |     })\n  274 |     .click();\n  275 |   await expect(\n  276 |     comparison.getByRole(\"article\", {\n  277 |       name: `Conteúdo preservado da versão ${f.document.version}`,\n  278 |       exact: true,\n  279 |     }),\n  280 |   ).toBeVisible();\n  281 |   await expect(\n  282 |     comparison.getByRole(\"article\", {\n  283 |       name: `Conteúdo preservado da versão ${newer.version}`,\n  284 |       exact: true,\n  285 |     }),\n  286 |   ).toBeVisible();\n  287 |   expect(new URL(page.url()).searchParams.has(\"historyVersion\")).toBe(false);\n  288 |   await audit(page, \"COM exact official draft comparison\");\n  289 |   await info.attach(\"comparacao-oficial-operacao-com\", {\n  290 |     body: await page.screenshot({ fullPage: false, animations: \"disabled\" }),\n  291 |     contentType: \"image/png\",\n  292 |   });\n  293 |   const afterChange = decisionFacts(f);\n  294 |   await adopt.click();\n  295 |   await expect(confirm).not.toBeChecked();\n  296 |   await expect(\n  297 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n  298 |   ).toHaveValue(decisionReason);\n  299 |   expect(decisionFacts(f)).toBe(afterChange);\n  300 |   await page\n  301 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  302 |     .click();\n  303 |   await expect(page.getByRole(\"dialog\")).toHaveCount(0);\n  304 |   await confirm.check();\n  305 |   await page\n  306 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  307 |     .click();\n  308 |   const review = page.getByRole(\"dialog\", {\n  309 |     name: \"Revisar encerramento da expectativa\",\n  310 |     exact: true,\n  311 |   });\n  312 |   await review\n  313 |     .getByRole(\"button\", {\n  314 |       name: \"Confirmar encerramento da expectativa\",\n  315 |       exact: true,\n  316 |     })\n  317 |     .click();\n  318 |   await expect(review).toHaveCount(0);\n  319 |   expect(\n  320 |     sql(\n  321 |       `select purchased_quantity=5 and waived_quantity=5 from public.document_lines where document_id=${sqlLiteral(f.document.id)};`,\n  322 |     ),\n  323 |   ).toBe(\"t\");\n  324 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  325 | });\n  326 |\n  327 | test(\"COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar\", async ({\n  328 |   page,\n  329 | }) => {\n  330 |   const f = await decisionFixture(false);\n  331 |   await login(page, f.patient);\n  332 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  333 |   const before = decisionFacts(f);\n  334 |   await page\n  335 |     .getByLabel(\"Motivo / justificativa\", { exact: true })\n  336 |     .fill(decisionReason);\n  337 |   await save(page);\n  338 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  339 |   await page\n  340 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  341 |     .click();\n  342 |   await expect(\n  343 |     page.getByLabel(\"Motivo / justificativa\", { exact: true }),\n> 344 |   ).toHaveValue(decisionReason);\n      |     ^ Error: expect(locator).toHaveValue(expected) failed\n  345 |   await page\n  346 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  347 |     .click();\n  348 |   const review = page.getByRole(\"dialog\", {\n  349 |     name: \"Revisar operação definitiva\",\n  350 |     exact: true,\n  351 |   });\n  352 |   await expect(review).toBeVisible();\n  353 |   await review.press(\"Escape\");\n  354 |   await expect(review).toHaveCount(0);\n  355 |   expect(decisionFacts(f)).toBe(before);\n  356 |   await page\n  357 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  358 |     .click();\n  359 |   await review\n  360 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  361 |     .click();\n  362 |   await expect(review).toHaveCount(0);\n  363 |   expect(\n  364 |     (await rpc(f.admin, \"operational_document\", { p_id: f.document.id }))\n  365 |       .status,\n  366 |   ).toBe(\"cancelled\");\n  367 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  368 | });\n  369 |\n  370 | //"
+              }
+            ]
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 11969,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 119,
+              "column": 5
+            },
+            "duration": 12390,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 14814,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 119,
+              "column": 5
+            },
+            "duration": 16147,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "supply-private-drafts.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "duration": 8583,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "supply-private-drafts.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "duration": 11637,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "f7a0da274a24876a3ba70488c70c77f27c2dcc59a7966b351e907d2149ba6473"
+      },
+      "com-decisions-checkbox-counterproof": {
+        "stats": {
+          "total": 1,
+          "expected": 0,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "COM conserva desmarcação de confirmação salva ao retomar o rascunho",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 370,
+              "column": 5
+            },
+            "duration": 9653,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: not \u001b[32m\"on\"\u001b[39m\n\n  373 |   await page.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true }).fill(decisionReason); await checkbox.check(); const before = decisionFacts(f); await save(page);\n  374 |   await open(page, f.document.id, \"Encerrar expectativa restante\", true); await page.getByRole(\"button\", { name: \"Continuar rascunho\", exact: true }).click(); await expect(checkbox).toBeChecked(); await checkbox.uncheck(); await save(page);\n> 375 |   const response = await page.request.get(`/api/drafts?careRecipientId=${f.patient}&kind=COM&purpose=close_expectation&targetDocumentId=${f.document.id}`); expect(response.ok()).toBe(true); expect((await response.json()).data.content.fields.confirmed).not.toBe(\"on\");\n      |                                                                                                                                                                                                                                                                 ^\n  376 |   await open(page, f.document.id, \"Encerrar expectativa restante\", true); await page.getByRole(\"button\", { name: \"Continuar rascunho\", exact: true }).click(); await expect(checkbox).not.toBeChecked(); expect(decisionFacts(f)).toBe(before);\n  377 | });\n  378 |\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:375:257\u001b[22m",
+                "codeframe": "  275 |   await expect(\n  276 |     comparison.getByRole(\"article\", {\n  277 |       name: `Conteúdo preservado da versão ${f.document.version}`,\n  278 |       exact: true,\n  279 |     }),\n  280 |   ).toBeVisible();\n  281 |   await expect(\n  282 |     comparison.getByRole(\"article\", {\n  283 |       name: `Conteúdo preservado da versão ${newer.version}`,\n  284 |       exact: true,\n  285 |     }),\n  286 |   ).toBeVisible();\n  287 |   expect(new URL(page.url()).searchParams.has(\"historyVersion\")).toBe(false);\n  288 |   await audit(page, \"COM exact official draft comparison\");\n  289 |   await info.attach(\"comparacao-oficial-operacao-com\", {\n  290 |     body: await page.screenshot({ fullPage: false, animations: \"disabled\" }),\n  291 |     contentType: \"image/png\",\n  292 |   });\n  293 |   const afterChange = decisionFacts(f);\n  294 |   await adopt.click();\n  295 |   await expect(confirm).not.toBeChecked();\n  296 |   await expect(\n  297 |     page.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true }),\n  298 |   ).toHaveValue(decisionReason);\n  299 |   expect(decisionFacts(f)).toBe(afterChange);\n  300 |   await page\n  301 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  302 |     .click();\n  303 |   await expect(page.getByRole(\"dialog\")).toHaveCount(0);\n  304 |   await confirm.check();\n  305 |   await page\n  306 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  307 |     .click();\n  308 |   const review = page.getByRole(\"dialog\", {\n  309 |     name: \"Revisar encerramento da expectativa\",\n  310 |     exact: true,\n  311 |   });\n  312 |   await review\n  313 |     .getByRole(\"button\", {\n  314 |       name: \"Confirmar encerramento da expectativa\",\n  315 |       exact: true,\n  316 |     })\n  317 |     .click();\n  318 |   await expect(review).toHaveCount(0);\n  319 |   expect(\n  320 |     sql(\n  321 |       `select purchased_quantity=5 and waived_quantity=5 from public.document_lines where document_id=${sqlLiteral(f.document.id)};`,\n  322 |     ),\n  323 |   ).toBe(\"t\");\n  324 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  325 | });\n  326 |\n  327 | test(\"COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar\", async ({\n  328 |   page,\n  329 | }) => {\n  330 |   const f = await decisionFixture(false);\n  331 |   await login(page, f.patient);\n  332 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  333 |   const before = decisionFacts(f);\n  334 |   await page\n  335 |     .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n  336 |     .fill(decisionReason);\n  337 |   await save(page);\n  338 |   await open(page, f.document.id, \"Solicitar cancelamento\", true);\n  339 |   await page\n  340 |     .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n  341 |     .click();\n  342 |   await expect(\n  343 |     page.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true }),\n  344 |   ).toHaveValue(decisionReason);\n  345 |   await page\n  346 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  347 |     .click();\n  348 |   const review = page.getByRole(\"dialog\", {\n  349 |     name: \"Revisar operação definitiva\",\n  350 |     exact: true,\n  351 |   });\n  352 |   await expect(review).toBeVisible();\n  353 |   await review.press(\"Escape\");\n  354 |   await expect(review).toHaveCount(0);\n  355 |   expect(decisionFacts(f)).toBe(before);\n  356 |   await page\n  357 |     .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  358 |     .click();\n  359 |   await review\n  360 |     .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  361 |     .click();\n  362 |   await expect(review).toHaveCount(0);\n  363 |   expect(\n  364 |     (await rpc(f.admin, \"operational_document\", { p_id: f.document.id }))\n  365 |       .status,\n  366 |   ).toBe(\"cancelled\");\n  367 |   expect(credit(f.patient, 0)).toBe(\"t\");\n  368 | });\n  369 |\n  370 | test(\"COM conserva desmarcação de confirmação salva ao retomar o rascunho\", async ({ page }) => {\n  371 |   const f = await decisionFixture(); await login(page, f.patient); await open(page, f.document.id, \"Encerrar expectativa restante\", true);\n  372 |   const checkbox = page.getByRole(\"checkbox\", { name: /Conferi o resumo e confirmo dispensar/ });\n  373 |   await page.getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true }).fill(decisionReason); await checkbox.check(); const before = decisionFacts(f); await save(page);\n  374 |   await open(page, f.document.id, \"Encerrar expectativa restante\", true); await page.getByRole(\"button\", { name: \"Continuar rascunho\", exact: true }).click(); await expect(checkbox).toBeChecked(); await checkbox.uncheck(); await save(page);\n> 375 |   const response = await page.request.get(`/api/drafts?careRecipientId=${f.patient}&kind=COM&purpose=close_expectation&targetDocumentId=${f.document.id}`); expect(response.ok()).toBe(true); expect((await response.json()).data.content.fields.confirmed).not.toBe(\"on\");\n      |                                                                                                                                                                                                                                                                 ^ Error: expect(received).not.toBe(expected) // Object.is equality\n  376 |   await open(page, f.document.id, \"Encerrar expectativa restante\", true); await page.getByRole(\"button\", { name: \"Continuar rascunho\", exact: true }).click(); await expect(checkbox).not.toBeChecked(); expect(decisionFacts(f)).toBe(before);\n  377 | });\n  378 |\n  379 | //"
+              }
+            ]
+          }
+        ],
+        "reportSha256": "1ac4dcbe53795ffe468c0f99a5d79e7714bf2c579263c3d637289798d9a21d82"
+      },
+      "com-decisions-after-checkbox": {
+        "stats": {
+          "total": 20,
+          "expected": 16,
+          "unexpected": 4,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 41,
+              "column": 5
+            },
+            "duration": 34774,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 146,
+              "column": 5
+            },
+            "duration": 8321,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 41,
+              "column": 5
+            },
+            "duration": 39640,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-action-private-drafts.spec.ts",
+              "line": 146,
+              "column": 5
+            },
+            "duration": 10065,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 25893,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Recebimento pendente', { exact: true })\nExpected: \u001b[32m\"7baf453f-461e-4109-bbd3-ef61cc3daebb\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByLabel('Recebimento pendente', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Recebimento pendente', { exact: true })\u001b[22m\n\n\n  88 |         exact: true,\n  89 |       });\n> 90 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n     |                               ^\n  91 |       let selected = f.secondReceipt.id;\n  92 |       if (purpose === \"reject_receipt\") {\n  93 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:90:31\u001b[22m",
+                "codeframe": "   1 | import { expect, test, type Page } from \"@playwright/test\";\n   2 | import { fixtures, rpc } from \"../integration/v4-fixtures.mjs\";\n   3 | import {\n   4 |   decisionFixture,\n   5 |   decisionFacts,\n   6 |   decisionReason,\n   7 |   send,\n   8 | } from \"../integration/com-decision-fixtures.mjs\";\n   9 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   10 | import { sql, sqlLiteral } from \"../../scripts/test-environment.mjs\";\n   11 | import { selectContext } from \"./auth-context\";\n   12 | import { openDocumentMore } from \"./document-sections\";\n   13 | import { audit } from \"./accessibility-audit\";\n   14 | test.setTimeout(180000);\n   15 | async function login(page: Page, patient: string) {\n   16 |   await page.goto(\"/login\");\n   17 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   18 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   19 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   20 |   await expect(\n   21 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   22 |   ).toBeVisible();\n   23 |   await selectContext(page, patient);\n   24 | }\n   25 | async function open(page: Page, id: string, label: string, more = false) {\n   26 |   await page.goto(`/documentos/${id}`);\n   27 |   if (more) await openDocumentMore(page);\n   28 |   await page.getByRole(\"button\", { name: label, exact: true }).click();\n   29 | }\n   30 | async function save(page: Page) {\n   31 |   const response = page.waitForResponse(\n   32 |     (r) =>\n   33 |       new URL(r.url()).pathname === \"/api/drafts\" &&\n   34 |       r.request().method() === \"POST\",\n   35 |   );\n   36 |   await page\n   37 |     .getByRole(\"button\", { name: \"Salvar preenchimento privado\", exact: true })\n   38 |     .click();\n   39 |   expect((await response).ok()).toBe(true);\n   40 | }\n   41 | const credit = (patient: string, value: number) =>\n   42 |   sql(\n   43 |     `select coalesce(sum(quantity),0)=${value} from public.stock_movements where care_recipient_id=${sqlLiteral(patient)} and reference_type='purchase_receipt';`,\n   44 |   );\n   45 |\n   46 | for (const purpose of [\"validate_receipt\", \"reject_receipt\"] as const)\n   47 |   test(`COM ${purpose} retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque`, async ({\n   48 |     page,\n   49 |     browser,\n   50 |   }, info) => {\n   51 |     const f = await decisionFixture(),\n   52 |       label =\n   53 |         purpose === \"validate_receipt\"\n   54 |           ? \"Validar recebimento\"\n   55 |           : \"Rejeitar recebimento\";\n   56 |     await login(page, f.patient);\n   57 |     await open(page, f.document.id, label);\n   58 |     const before = decisionFacts(f);\n   59 |     await page\n   60 |       .getByRole(\"combobox\", { name: \"Recebimento pendente\", exact: true })\n   61 |       .selectOption(f.secondReceipt.id);\n   62 |     if (purpose === \"reject_receipt\")\n   63 |       await page\n   64 |         .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n   65 |         .fill(decisionReason);\n   66 |     await save(page);\n   67 |     expect(decisionFacts(f)).toBe(before);\n   68 |     if (purpose === \"reject_receipt\")\n   69 |       await send(f.admin, f.document, \"validate_receipt\", {\n   70 |         receiptId: f.secondReceipt.id,\n   71 |       });\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await open(peer, f.document.id, label);\n   80 |       const privateSummary = peer.getByRole(\"region\", { name: \"Rascunho privado\", exact: true });\n   81 |       await expect(privateSummary.getByText(\"Parcela no preenchimento\", { exact: true })).toBeVisible();\n   82 |       await expect(privateSummary).toContainText(\"Teste family\");\n   83 |       await expect(privateSummary).not.toContainText(\"receiptId\");\n   84 |       await peer\n   85 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   86 |         .click();\n   87 |       const selection = peer.getByLabel(\"Recebimento pendente\", {\n   88 |         exact: true,\n   89 |       });\n>  90 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n      |                               ^ Error: expect(locator).toHaveValue(expected) failed\n   91 |       let selected = f.secondReceipt.id;\n   92 |       if (purpose === \"reject_receipt\") {\n   93 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n   94 |           \"Parcela preservada indisponível para esta decisão\",\n   95 |         );\n   96 |         await expect(\n   97 |           peer.getByRole(\"textbox\", {\n   98 |             name: \"Motivo / justificativa\",\n   99 |             exact: true,\n  100 |           }),\n  101 |         ).toHaveValue(decisionReason);\n  102 |         await peer\n  103 |           .getByRole(\"button\", {\n  104 |             name: \"Comparar referência da operação\",\n  105 |             exact: true,\n  106 |           })\n  107 |           .click();\n  108 |         await peer\n  109 |           .getByRole(\"button\", {\n  110 |             name: \"Usar referência vigente e manter preenchimento\",\n  111 |             exact: true,\n  112 |           })\n  113 |           .click();\n  114 |         await expect(selection).toHaveValue(f.secondReceipt.id);\n  115 |         await peer\n  116 |           .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  117 |           .click();\n  118 |         await expect(\n  119 |           peer.getByRole(\"dialog\", {\n  120 |             name: \"Revisar operação definitiva\",\n  121 |             exact: true,\n  122 |           }),\n  123 |         ).toHaveCount(0);\n  124 |         await expect(\n  125 |           peer.getByText(\"Selecione uma parcela pendente para conferir.\", {\n  126 |             exact: true,\n  127 |           }),\n  128 |         ).toBeVisible();\n  129 |         await selection.selectOption(f.firstReceipt.id);\n  130 |         selected = f.firstReceipt.id;\n  131 |       } else expect(decisionFacts(f)).toBe(before);\n  132 |       await audit(peer, \"COM private receipt selection \" + purpose);\n  133 |       const requests: Record<string, unknown>[] = [];\n  134 |       let dropped = false;\n  135 |       await peer.route(`**/api/documents/${f.document.id}`, async (route) => {\n  136 |         if (route.request().method() !== \"POST\") return route.continue();\n  137 |         requests.push(route.request().postDataJSON());\n  138 |         if (purpose === \"validate_receipt\" && !dropped) {\n  139 |           dropped = true;\n  140 |           const response = await route.fetch();\n  141 |           expect(response.ok()).toBe(true);\n  142 |           return route.abort(\"failed\");\n  143 |         }\n  144 |         return route.continue();\n  145 |       });\n  146 |       const prior = decisionFacts(f);\n  147 |       await peer\n  148 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  149 |         .click();\n  150 |       const review = peer.getByRole(\"dialog\", {\n  151 |         name: \"Revisar operação definitiva\",\n  152 |         exact: true,\n  153 |       });\n  154 |       await review\n  155 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  156 |         .click();\n  157 |       if (purpose === \"validate_receipt\") {\n  158 |         await expect(\n  159 |           review.getByRole(\"button\", {\n  160 |             name: \"Recuperar tentativa\",\n  161 |             exact: true,\n  162 |           }),\n  163 |         ).toBeVisible();\n  164 |         const committed = decisionFacts(f);\n  165 |         await peer.reload();\n  166 |         await peer.getByRole(\"button\", { name: label, exact: true }).click();\n  167 |         await peer\n  168 |           .getByRole(\"button\", {\n  169 |             name: \"Confirmar resultado e começar novo preenchimento\",\n  170 |             exact: true,\n  171 |           })\n  172 |           .click();\n  173 |         await expect(\n  174 |           peer.getByRole(\"combobox\", {\n  175 |             name: \"Recebimento pendente\",\n  176 |             exact: true,\n  177 |           }),\n  178 |         ).toHaveValue(f.firstReceipt.id);\n  179 |         expect(decisionFacts(f)).toBe(committed);\n  180 |       } else {\n  181 |         await expect(review).toHaveCount(0);\n  182 |         expect(decisionFacts(f)).not.toBe(prior);\n  183 |       }\n  184 |       expect(requests).toHaveLength(1);\n  185 |       expect(requests[0].body).toMatchObject({ receiptId: selected });\n  186 |       expect(requests[0].draftCommit).toBeTruthy();\n  187 |       const actual = await rpc(f.admin, \"operational_document\", {\n  188 |         p_id: f.document.id,\n  189 |       });\n  190 |       expect("
+              }
+            ]
+          },
+          {
+            "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 26939,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Recebimento pendente', { exact: true })\nExpected: \u001b[32m\"b3be8e4c-3105-4358-87cb-0442150211ee\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByLabel('Recebimento pendente', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Recebimento pendente', { exact: true })\u001b[22m\n\n\n  88 |         exact: true,\n  89 |       });\n> 90 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n     |                               ^\n  91 |       let selected = f.secondReceipt.id;\n  92 |       if (purpose === \"reject_receipt\") {\n  93 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:90:31\u001b[22m",
+                "codeframe": "   1 | import { expect, test, type Page } from \"@playwright/test\";\n   2 | import { fixtures, rpc } from \"../integration/v4-fixtures.mjs\";\n   3 | import {\n   4 |   decisionFixture,\n   5 |   decisionFacts,\n   6 |   decisionReason,\n   7 |   send,\n   8 | } from \"../integration/com-decision-fixtures.mjs\";\n   9 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   10 | import { sql, sqlLiteral } from \"../../scripts/test-environment.mjs\";\n   11 | import { selectContext } from \"./auth-context\";\n   12 | import { openDocumentMore } from \"./document-sections\";\n   13 | import { audit } from \"./accessibility-audit\";\n   14 | test.setTimeout(180000);\n   15 | async function login(page: Page, patient: string) {\n   16 |   await page.goto(\"/login\");\n   17 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   18 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   19 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   20 |   await expect(\n   21 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   22 |   ).toBeVisible();\n   23 |   await selectContext(page, patient);\n   24 | }\n   25 | async function open(page: Page, id: string, label: string, more = false) {\n   26 |   await page.goto(`/documentos/${id}`);\n   27 |   if (more) await openDocumentMore(page);\n   28 |   await page.getByRole(\"button\", { name: label, exact: true }).click();\n   29 | }\n   30 | async function save(page: Page) {\n   31 |   const response = page.waitForResponse(\n   32 |     (r) =>\n   33 |       new URL(r.url()).pathname === \"/api/drafts\" &&\n   34 |       r.request().method() === \"POST\",\n   35 |   );\n   36 |   await page\n   37 |     .getByRole(\"button\", { name: \"Salvar preenchimento privado\", exact: true })\n   38 |     .click();\n   39 |   expect((await response).ok()).toBe(true);\n   40 | }\n   41 | const credit = (patient: string, value: number) =>\n   42 |   sql(\n   43 |     `select coalesce(sum(quantity),0)=${value} from public.stock_movements where care_recipient_id=${sqlLiteral(patient)} and reference_type='purchase_receipt';`,\n   44 |   );\n   45 |\n   46 | for (const purpose of [\"validate_receipt\", \"reject_receipt\"] as const)\n   47 |   test(`COM ${purpose} retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque`, async ({\n   48 |     page,\n   49 |     browser,\n   50 |   }, info) => {\n   51 |     const f = await decisionFixture(),\n   52 |       label =\n   53 |         purpose === \"validate_receipt\"\n   54 |           ? \"Validar recebimento\"\n   55 |           : \"Rejeitar recebimento\";\n   56 |     await login(page, f.patient);\n   57 |     await open(page, f.document.id, label);\n   58 |     const before = decisionFacts(f);\n   59 |     await page\n   60 |       .getByRole(\"combobox\", { name: \"Recebimento pendente\", exact: true })\n   61 |       .selectOption(f.secondReceipt.id);\n   62 |     if (purpose === \"reject_receipt\")\n   63 |       await page\n   64 |         .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n   65 |         .fill(decisionReason);\n   66 |     await save(page);\n   67 |     expect(decisionFacts(f)).toBe(before);\n   68 |     if (purpose === \"reject_receipt\")\n   69 |       await send(f.admin, f.document, \"validate_receipt\", {\n   70 |         receiptId: f.secondReceipt.id,\n   71 |       });\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await open(peer, f.document.id, label);\n   80 |       const privateSummary = peer.getByRole(\"region\", { name: \"Rascunho privado\", exact: true });\n   81 |       await expect(privateSummary.getByText(\"Parcela no preenchimento\", { exact: true })).toBeVisible();\n   82 |       await expect(privateSummary).toContainText(\"Teste family\");\n   83 |       await expect(privateSummary).not.toContainText(\"receiptId\");\n   84 |       await peer\n   85 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   86 |         .click();\n   87 |       const selection = peer.getByLabel(\"Recebimento pendente\", {\n   88 |         exact: true,\n   89 |       });\n>  90 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n      |                               ^ Error: expect(locator).toHaveValue(expected) failed\n   91 |       let selected = f.secondReceipt.id;\n   92 |       if (purpose === \"reject_receipt\") {\n   93 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n   94 |           \"Parcela preservada indisponível para esta decisão\",\n   95 |         );\n   96 |         await expect(\n   97 |           peer.getByRole(\"textbox\", {\n   98 |             name: \"Motivo / justificativa\",\n   99 |             exact: true,\n  100 |           }),\n  101 |         ).toHaveValue(decisionReason);\n  102 |         await peer\n  103 |           .getByRole(\"button\", {\n  104 |             name: \"Comparar referência da operação\",\n  105 |             exact: true,\n  106 |           })\n  107 |           .click();\n  108 |         await peer\n  109 |           .getByRole(\"button\", {\n  110 |             name: \"Usar referência vigente e manter preenchimento\",\n  111 |             exact: true,\n  112 |           })\n  113 |           .click();\n  114 |         await expect(selection).toHaveValue(f.secondReceipt.id);\n  115 |         await peer\n  116 |           .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  117 |           .click();\n  118 |         await expect(\n  119 |           peer.getByRole(\"dialog\", {\n  120 |             name: \"Revisar operação definitiva\",\n  121 |             exact: true,\n  122 |           }),\n  123 |         ).toHaveCount(0);\n  124 |         await expect(\n  125 |           peer.getByText(\"Selecione uma parcela pendente para conferir.\", {\n  126 |             exact: true,\n  127 |           }),\n  128 |         ).toBeVisible();\n  129 |         await selection.selectOption(f.firstReceipt.id);\n  130 |         selected = f.firstReceipt.id;\n  131 |       } else expect(decisionFacts(f)).toBe(before);\n  132 |       await audit(peer, \"COM private receipt selection \" + purpose);\n  133 |       const requests: Record<string, unknown>[] = [];\n  134 |       let dropped = false;\n  135 |       await peer.route(`**/api/documents/${f.document.id}`, async (route) => {\n  136 |         if (route.request().method() !== \"POST\") return route.continue();\n  137 |         requests.push(route.request().postDataJSON());\n  138 |         if (purpose === \"validate_receipt\" && !dropped) {\n  139 |           dropped = true;\n  140 |           const response = await route.fetch();\n  141 |           expect(response.ok()).toBe(true);\n  142 |           return route.abort(\"failed\");\n  143 |         }\n  144 |         return route.continue();\n  145 |       });\n  146 |       const prior = decisionFacts(f);\n  147 |       await peer\n  148 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  149 |         .click();\n  150 |       const review = peer.getByRole(\"dialog\", {\n  151 |         name: \"Revisar operação definitiva\",\n  152 |         exact: true,\n  153 |       });\n  154 |       await review\n  155 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  156 |         .click();\n  157 |       if (purpose === \"validate_receipt\") {\n  158 |         await expect(\n  159 |           review.getByRole(\"button\", {\n  160 |             name: \"Recuperar tentativa\",\n  161 |             exact: true,\n  162 |           }),\n  163 |         ).toBeVisible();\n  164 |         const committed = decisionFacts(f);\n  165 |         await peer.reload();\n  166 |         await peer.getByRole(\"button\", { name: label, exact: true }).click();\n  167 |         await peer\n  168 |           .getByRole(\"button\", {\n  169 |             name: \"Confirmar resultado e começar novo preenchimento\",\n  170 |             exact: true,\n  171 |           })\n  172 |           .click();\n  173 |         await expect(\n  174 |           peer.getByRole(\"combobox\", {\n  175 |             name: \"Recebimento pendente\",\n  176 |             exact: true,\n  177 |           }),\n  178 |         ).toHaveValue(f.firstReceipt.id);\n  179 |         expect(decisionFacts(f)).toBe(committed);\n  180 |       } else {\n  181 |         await expect(review).toHaveCount(0);\n  182 |         expect(decisionFacts(f)).not.toBe(prior);\n  183 |       }\n  184 |       expect(requests).toHaveLength(1);\n  185 |       expect(requests[0].body).toMatchObject({ receiptId: selected });\n  186 |       expect(requests[0].draftCommit).toBeTruthy();\n  187 |       const actual = await rpc(f.admin, \"operational_document\", {\n  188 |         p_id: f.document.id,\n  189 |       });\n  190 |       expect("
+              }
+            ]
+          },
+          {
+            "title": "COM só adota referência oficial conferida e exige nova confirmação de expectativa após mudança de versão",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 204,
+              "column": 5
+            },
+            "duration": 11530,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 337,
+              "column": 5
+            },
+            "duration": 8284,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM conserva desmarcação de confirmação salva ao retomar o rascunho",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 380,
+              "column": 5
+            },
+            "duration": 9725,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 28272,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Recebimento pendente', { exact: true })\nExpected: \u001b[32m\"aa627b6d-10c9-4500-864c-57effea5231f\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByLabel('Recebimento pendente', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Recebimento pendente', { exact: true })\u001b[22m\n\n\n  88 |         exact: true,\n  89 |       });\n> 90 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n     |                               ^\n  91 |       let selected = f.secondReceipt.id;\n  92 |       if (purpose === \"reject_receipt\") {\n  93 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:90:31\u001b[22m",
+                "codeframe": "   1 | import { expect, test, type Page } from \"@playwright/test\";\n   2 | import { fixtures, rpc } from \"../integration/v4-fixtures.mjs\";\n   3 | import {\n   4 |   decisionFixture,\n   5 |   decisionFacts,\n   6 |   decisionReason,\n   7 |   send,\n   8 | } from \"../integration/com-decision-fixtures.mjs\";\n   9 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   10 | import { sql, sqlLiteral } from \"../../scripts/test-environment.mjs\";\n   11 | import { selectContext } from \"./auth-context\";\n   12 | import { openDocumentMore } from \"./document-sections\";\n   13 | import { audit } from \"./accessibility-audit\";\n   14 | test.setTimeout(180000);\n   15 | async function login(page: Page, patient: string) {\n   16 |   await page.goto(\"/login\");\n   17 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   18 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   19 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   20 |   await expect(\n   21 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   22 |   ).toBeVisible();\n   23 |   await selectContext(page, patient);\n   24 | }\n   25 | async function open(page: Page, id: string, label: string, more = false) {\n   26 |   await page.goto(`/documentos/${id}`);\n   27 |   if (more) await openDocumentMore(page);\n   28 |   await page.getByRole(\"button\", { name: label, exact: true }).click();\n   29 | }\n   30 | async function save(page: Page) {\n   31 |   const response = page.waitForResponse(\n   32 |     (r) =>\n   33 |       new URL(r.url()).pathname === \"/api/drafts\" &&\n   34 |       r.request().method() === \"POST\",\n   35 |   );\n   36 |   await page\n   37 |     .getByRole(\"button\", { name: \"Salvar preenchimento privado\", exact: true })\n   38 |     .click();\n   39 |   expect((await response).ok()).toBe(true);\n   40 | }\n   41 | const credit = (patient: string, value: number) =>\n   42 |   sql(\n   43 |     `select coalesce(sum(quantity),0)=${value} from public.stock_movements where care_recipient_id=${sqlLiteral(patient)} and reference_type='purchase_receipt';`,\n   44 |   );\n   45 |\n   46 | for (const purpose of [\"validate_receipt\", \"reject_receipt\"] as const)\n   47 |   test(`COM ${purpose} retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque`, async ({\n   48 |     page,\n   49 |     browser,\n   50 |   }, info) => {\n   51 |     const f = await decisionFixture(),\n   52 |       label =\n   53 |         purpose === \"validate_receipt\"\n   54 |           ? \"Validar recebimento\"\n   55 |           : \"Rejeitar recebimento\";\n   56 |     await login(page, f.patient);\n   57 |     await open(page, f.document.id, label);\n   58 |     const before = decisionFacts(f);\n   59 |     await page\n   60 |       .getByRole(\"combobox\", { name: \"Recebimento pendente\", exact: true })\n   61 |       .selectOption(f.secondReceipt.id);\n   62 |     if (purpose === \"reject_receipt\")\n   63 |       await page\n   64 |         .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n   65 |         .fill(decisionReason);\n   66 |     await save(page);\n   67 |     expect(decisionFacts(f)).toBe(before);\n   68 |     if (purpose === \"reject_receipt\")\n   69 |       await send(f.admin, f.document, \"validate_receipt\", {\n   70 |         receiptId: f.secondReceipt.id,\n   71 |       });\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await open(peer, f.document.id, label);\n   80 |       const privateSummary = peer.getByRole(\"region\", { name: \"Rascunho privado\", exact: true });\n   81 |       await expect(privateSummary.getByText(\"Parcela no preenchimento\", { exact: true })).toBeVisible();\n   82 |       await expect(privateSummary).toContainText(\"Teste family\");\n   83 |       await expect(privateSummary).not.toContainText(\"receiptId\");\n   84 |       await peer\n   85 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   86 |         .click();\n   87 |       const selection = peer.getByLabel(\"Recebimento pendente\", {\n   88 |         exact: true,\n   89 |       });\n>  90 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n      |                               ^ Error: expect(locator).toHaveValue(expected) failed\n   91 |       let selected = f.secondReceipt.id;\n   92 |       if (purpose === \"reject_receipt\") {\n   93 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n   94 |           \"Parcela preservada indisponível para esta decisão\",\n   95 |         );\n   96 |         await expect(\n   97 |           peer.getByRole(\"textbox\", {\n   98 |             name: \"Motivo / justificativa\",\n   99 |             exact: true,\n  100 |           }),\n  101 |         ).toHaveValue(decisionReason);\n  102 |         await peer\n  103 |           .getByRole(\"button\", {\n  104 |             name: \"Comparar referência da operação\",\n  105 |             exact: true,\n  106 |           })\n  107 |           .click();\n  108 |         await peer\n  109 |           .getByRole(\"button\", {\n  110 |             name: \"Usar referência vigente e manter preenchimento\",\n  111 |             exact: true,\n  112 |           })\n  113 |           .click();\n  114 |         await expect(selection).toHaveValue(f.secondReceipt.id);\n  115 |         await peer\n  116 |           .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  117 |           .click();\n  118 |         await expect(\n  119 |           peer.getByRole(\"dialog\", {\n  120 |             name: \"Revisar operação definitiva\",\n  121 |             exact: true,\n  122 |           }),\n  123 |         ).toHaveCount(0);\n  124 |         await expect(\n  125 |           peer.getByText(\"Selecione uma parcela pendente para conferir.\", {\n  126 |             exact: true,\n  127 |           }),\n  128 |         ).toBeVisible();\n  129 |         await selection.selectOption(f.firstReceipt.id);\n  130 |         selected = f.firstReceipt.id;\n  131 |       } else expect(decisionFacts(f)).toBe(before);\n  132 |       await audit(peer, \"COM private receipt selection \" + purpose);\n  133 |       const requests: Record<string, unknown>[] = [];\n  134 |       let dropped = false;\n  135 |       await peer.route(`**/api/documents/${f.document.id}`, async (route) => {\n  136 |         if (route.request().method() !== \"POST\") return route.continue();\n  137 |         requests.push(route.request().postDataJSON());\n  138 |         if (purpose === \"validate_receipt\" && !dropped) {\n  139 |           dropped = true;\n  140 |           const response = await route.fetch();\n  141 |           expect(response.ok()).toBe(true);\n  142 |           return route.abort(\"failed\");\n  143 |         }\n  144 |         return route.continue();\n  145 |       });\n  146 |       const prior = decisionFacts(f);\n  147 |       await peer\n  148 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  149 |         .click();\n  150 |       const review = peer.getByRole(\"dialog\", {\n  151 |         name: \"Revisar operação definitiva\",\n  152 |         exact: true,\n  153 |       });\n  154 |       await review\n  155 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  156 |         .click();\n  157 |       if (purpose === \"validate_receipt\") {\n  158 |         await expect(\n  159 |           review.getByRole(\"button\", {\n  160 |             name: \"Recuperar tentativa\",\n  161 |             exact: true,\n  162 |           }),\n  163 |         ).toBeVisible();\n  164 |         const committed = decisionFacts(f);\n  165 |         await peer.reload();\n  166 |         await peer.getByRole(\"button\", { name: label, exact: true }).click();\n  167 |         await peer\n  168 |           .getByRole(\"button\", {\n  169 |             name: \"Confirmar resultado e começar novo preenchimento\",\n  170 |             exact: true,\n  171 |           })\n  172 |           .click();\n  173 |         await expect(\n  174 |           peer.getByRole(\"combobox\", {\n  175 |             name: \"Recebimento pendente\",\n  176 |             exact: true,\n  177 |           }),\n  178 |         ).toHaveValue(f.firstReceipt.id);\n  179 |         expect(decisionFacts(f)).toBe(committed);\n  180 |       } else {\n  181 |         await expect(review).toHaveCount(0);\n  182 |         expect(decisionFacts(f)).not.toBe(prior);\n  183 |       }\n  184 |       expect(requests).toHaveLength(1);\n  185 |       expect(requests[0].body).toMatchObject({ receiptId: selected });\n  186 |       expect(requests[0].draftCommit).toBeTruthy();\n  187 |       const actual = await rpc(f.admin, \"operational_document\", {\n  188 |         p_id: f.document.id,\n  189 |       });\n  190 |       expect("
+              }
+            ]
+          },
+          {
+            "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 28665,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Recebimento pendente', { exact: true })\nExpected: \u001b[32m\"6c8963bc-226a-416d-97a7-6e527d40c28e\"\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" getByLabel('Recebimento pendente', { exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Recebimento pendente', { exact: true })\u001b[22m\n\n\n  88 |         exact: true,\n  89 |       });\n> 90 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n     |                               ^\n  91 |       let selected = f.secondReceipt.id;\n  92 |       if (purpose === \"reject_receipt\") {\n  93 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\com-decision-private-drafts.spec.ts:90:31\u001b[22m",
+                "codeframe": "   1 | import { expect, test, type Page } from \"@playwright/test\";\n   2 | import { fixtures, rpc } from \"../integration/v4-fixtures.mjs\";\n   3 | import {\n   4 |   decisionFixture,\n   5 |   decisionFacts,\n   6 |   decisionReason,\n   7 |   send,\n   8 | } from \"../integration/com-decision-fixtures.mjs\";\n   9 | import { fixturePassword } from \"../../scripts/test-constants.mjs\";\n   10 | import { sql, sqlLiteral } from \"../../scripts/test-environment.mjs\";\n   11 | import { selectContext } from \"./auth-context\";\n   12 | import { openDocumentMore } from \"./document-sections\";\n   13 | import { audit } from \"./accessibility-audit\";\n   14 | test.setTimeout(180000);\n   15 | async function login(page: Page, patient: string) {\n   16 |   await page.goto(\"/login\");\n   17 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.adminA.email);\n   18 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   19 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   20 |   await expect(\n   21 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   22 |   ).toBeVisible();\n   23 |   await selectContext(page, patient);\n   24 | }\n   25 | async function open(page: Page, id: string, label: string, more = false) {\n   26 |   await page.goto(`/documentos/${id}`);\n   27 |   if (more) await openDocumentMore(page);\n   28 |   await page.getByRole(\"button\", { name: label, exact: true }).click();\n   29 | }\n   30 | async function save(page: Page) {\n   31 |   const response = page.waitForResponse(\n   32 |     (r) =>\n   33 |       new URL(r.url()).pathname === \"/api/drafts\" &&\n   34 |       r.request().method() === \"POST\",\n   35 |   );\n   36 |   await page\n   37 |     .getByRole(\"button\", { name: \"Salvar preenchimento privado\", exact: true })\n   38 |     .click();\n   39 |   expect((await response).ok()).toBe(true);\n   40 | }\n   41 | const credit = (patient: string, value: number) =>\n   42 |   sql(\n   43 |     `select coalesce(sum(quantity),0)=${value} from public.stock_movements where care_recipient_id=${sqlLiteral(patient)} and reference_type='purchase_receipt';`,\n   44 |   );\n   45 |\n   46 | for (const purpose of [\"validate_receipt\", \"reject_receipt\"] as const)\n   47 |   test(`COM ${purpose} retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque`, async ({\n   48 |     page,\n   49 |     browser,\n   50 |   }, info) => {\n   51 |     const f = await decisionFixture(),\n   52 |       label =\n   53 |         purpose === \"validate_receipt\"\n   54 |           ? \"Validar recebimento\"\n   55 |           : \"Rejeitar recebimento\";\n   56 |     await login(page, f.patient);\n   57 |     await open(page, f.document.id, label);\n   58 |     const before = decisionFacts(f);\n   59 |     await page\n   60 |       .getByRole(\"combobox\", { name: \"Recebimento pendente\", exact: true })\n   61 |       .selectOption(f.secondReceipt.id);\n   62 |     if (purpose === \"reject_receipt\")\n   63 |       await page\n   64 |         .getByRole(\"textbox\", { name: \"Motivo / justificativa\", exact: true })\n   65 |         .fill(decisionReason);\n   66 |     await save(page);\n   67 |     expect(decisionFacts(f)).toBe(before);\n   68 |     if (purpose === \"reject_receipt\")\n   69 |       await send(f.admin, f.document, \"validate_receipt\", {\n   70 |         receiptId: f.secondReceipt.id,\n   71 |       });\n   72 |     const peerContext = await browser.newContext({\n   73 |       baseURL: info.project.use.baseURL,\n   74 |       viewport: page.viewportSize() ?? undefined,\n   75 |     });\n   76 |     try {\n   77 |       const peer = await peerContext.newPage();\n   78 |       await login(peer, f.patient);\n   79 |       await open(peer, f.document.id, label);\n   80 |       const privateSummary = peer.getByRole(\"region\", { name: \"Rascunho privado\", exact: true });\n   81 |       await expect(privateSummary.getByText(\"Parcela no preenchimento\", { exact: true })).toBeVisible();\n   82 |       await expect(privateSummary).toContainText(\"Teste family\");\n   83 |       await expect(privateSummary).not.toContainText(\"receiptId\");\n   84 |       await peer\n   85 |         .getByRole(\"button\", { name: \"Continuar rascunho\", exact: true })\n   86 |         .click();\n   87 |       const selection = peer.getByLabel(\"Recebimento pendente\", {\n   88 |         exact: true,\n   89 |       });\n>  90 |       await expect(selection).toHaveValue(f.secondReceipt.id);\n      |                               ^ Error: expect(locator).toHaveValue(expected) failed\n   91 |       let selected = f.secondReceipt.id;\n   92 |       if (purpose === \"reject_receipt\") {\n   93 |         await expect(selection.locator(\"option:checked\")).toHaveText(\n   94 |           \"Parcela preservada indisponível para esta decisão\",\n   95 |         );\n   96 |         await expect(\n   97 |           peer.getByRole(\"textbox\", {\n   98 |             name: \"Motivo / justificativa\",\n   99 |             exact: true,\n  100 |           }),\n  101 |         ).toHaveValue(decisionReason);\n  102 |         await peer\n  103 |           .getByRole(\"button\", {\n  104 |             name: \"Comparar referência da operação\",\n  105 |             exact: true,\n  106 |           })\n  107 |           .click();\n  108 |         await peer\n  109 |           .getByRole(\"button\", {\n  110 |             name: \"Usar referência vigente e manter preenchimento\",\n  111 |             exact: true,\n  112 |           })\n  113 |           .click();\n  114 |         await expect(selection).toHaveValue(f.secondReceipt.id);\n  115 |         await peer\n  116 |           .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  117 |           .click();\n  118 |         await expect(\n  119 |           peer.getByRole(\"dialog\", {\n  120 |             name: \"Revisar operação definitiva\",\n  121 |             exact: true,\n  122 |           }),\n  123 |         ).toHaveCount(0);\n  124 |         await expect(\n  125 |           peer.getByText(\"Selecione uma parcela pendente para conferir.\", {\n  126 |             exact: true,\n  127 |           }),\n  128 |         ).toBeVisible();\n  129 |         await selection.selectOption(f.firstReceipt.id);\n  130 |         selected = f.firstReceipt.id;\n  131 |       } else expect(decisionFacts(f)).toBe(before);\n  132 |       await audit(peer, \"COM private receipt selection \" + purpose);\n  133 |       const requests: Record<string, unknown>[] = [];\n  134 |       let dropped = false;\n  135 |       await peer.route(`**/api/documents/${f.document.id}`, async (route) => {\n  136 |         if (route.request().method() !== \"POST\") return route.continue();\n  137 |         requests.push(route.request().postDataJSON());\n  138 |         if (purpose === \"validate_receipt\" && !dropped) {\n  139 |           dropped = true;\n  140 |           const response = await route.fetch();\n  141 |           expect(response.ok()).toBe(true);\n  142 |           return route.abort(\"failed\");\n  143 |         }\n  144 |         return route.continue();\n  145 |       });\n  146 |       const prior = decisionFacts(f);\n  147 |       await peer\n  148 |         .getByRole(\"button\", { name: \"Revisar operação\", exact: true })\n  149 |         .click();\n  150 |       const review = peer.getByRole(\"dialog\", {\n  151 |         name: \"Revisar operação definitiva\",\n  152 |         exact: true,\n  153 |       });\n  154 |       await review\n  155 |         .getByRole(\"button\", { name: \"Confirmar operação\", exact: true })\n  156 |         .click();\n  157 |       if (purpose === \"validate_receipt\") {\n  158 |         await expect(\n  159 |           review.getByRole(\"button\", {\n  160 |             name: \"Recuperar tentativa\",\n  161 |             exact: true,\n  162 |           }),\n  163 |         ).toBeVisible();\n  164 |         const committed = decisionFacts(f);\n  165 |         await peer.reload();\n  166 |         await peer.getByRole(\"button\", { name: label, exact: true }).click();\n  167 |         await peer\n  168 |           .getByRole(\"button\", {\n  169 |             name: \"Confirmar resultado e começar novo preenchimento\",\n  170 |             exact: true,\n  171 |           })\n  172 |           .click();\n  173 |         await expect(\n  174 |           peer.getByRole(\"combobox\", {\n  175 |             name: \"Recebimento pendente\",\n  176 |             exact: true,\n  177 |           }),\n  178 |         ).toHaveValue(f.firstReceipt.id);\n  179 |         expect(decisionFacts(f)).toBe(committed);\n  180 |       } else {\n  181 |         await expect(review).toHaveCount(0);\n  182 |         expect(decisionFacts(f)).not.toBe(prior);\n  183 |       }\n  184 |       expect(requests).toHaveLength(1);\n  185 |       expect(requests[0].body).toMatchObject({ receiptId: selected });\n  186 |       expect(requests[0].draftCommit).toBeTruthy();\n  187 |       const actual = await rpc(f.admin, \"operational_document\", {\n  188 |         p_id: f.document.id,\n  189 |       });\n  190 |       expect("
+              }
+            ]
+          },
+          {
+            "title": "COM só adota referência oficial conferida e exige nova confirmação de expectativa após mudança de versão",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 204,
+              "column": 5
+            },
+            "duration": 13645,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 337,
+              "column": 5
+            },
+            "duration": 10182,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM conserva desmarcação de confirmação salva ao retomar o rascunho",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 380,
+              "column": 5
+            },
+            "duration": 11551,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 11788,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 119,
+              "column": 5
+            },
+            "duration": 12322,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 15447,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 119,
+              "column": 5
+            },
+            "duration": 15213,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "supply-private-drafts.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "duration": 8457,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "supply-private-drafts.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "duration": 11123,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "9471908a6d3a72fa81c3b79ed7e0211fd9bf4d58b504150996389441e3acc1d9"
+      },
+      "com-decisions-receipt-final": {
+        "stats": {
+          "total": 6,
+          "expected": 6,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 17680,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 14131,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 18981,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "com-decision-private-drafts.spec.ts",
+              "line": 47,
+              "column": 7
+            },
+            "duration": 16475,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 12117,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 15596,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "79c6acaf7d682998f5b4a7b652858a88a8f361c0ed6f05542e28784de4f9a972"
+      }
+    },
+    "latest": [
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "com-action-private-drafts.spec.ts",
+          "line": 41,
+          "column": 5
+        },
+        "duration": 34774,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "com-action-private-drafts.spec.ts",
+          "line": 146,
+          "column": 5
+        },
+        "duration": 8321,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM retoma aprovação aquisição e chegada entre sessões e recupera uma aquisição sem duplicar fato",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "com-action-private-drafts.spec.ts",
+          "line": 41,
+          "column": 5
+        },
+        "duration": 39640,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM compara rascunho obsoleto preserva decimal e exige decisão explícita sobre material ausente",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "com-action-private-drafts.spec.ts",
+          "line": 146,
+          "column": 5
+        },
+        "duration": 10065,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-receipt-final",
+        "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 47,
+          "column": 7
+        },
+        "duration": 17680,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-receipt-final",
+        "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 47,
+          "column": 7
+        },
+        "duration": 14131,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM só adota referência oficial conferida e exige nova confirmação de expectativa após mudança de versão",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 204,
+          "column": 5
+        },
+        "duration": 11530,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 337,
+          "column": 5
+        },
+        "duration": 8284,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-receipt-final",
+        "title": "COM validate_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 47,
+          "column": 7
+        },
+        "duration": 18981,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-receipt-final",
+        "title": "COM reject_receipt retoma a parcela exata em outra sessão sem trocar seleção nem duplicar estoque",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 47,
+          "column": 7
+        },
+        "duration": 16475,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM só adota referência oficial conferida e exige nova confirmação de expectativa após mudança de versão",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 204,
+          "column": 5
+        },
+        "duration": 13645,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM recupera motivo de cancelamento e fechar a revisão preserva ficha e rascunho antes de confirmar",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 337,
+          "column": 5
+        },
+        "duration": 10182,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-receipt-final",
+        "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 19,
+          "column": 5
+        },
+        "duration": 12117,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 119,
+          "column": 5
+        },
+        "duration": 12322,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-receipt-final",
+        "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 19,
+          "column": 5
+        },
+        "duration": 15596,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "purchase-receipts.spec.ts",
+          "line": 119,
+          "column": 5
+        },
+        "duration": 15213,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "supply-private-drafts.spec.ts",
+          "line": 36,
+          "column": 5
+        },
+        "duration": 8457,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "ENT emite com rascunho privado e conserva a mesma confirmação após200 inválido e403 na recuperação",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "supply-private-drafts.spec.ts",
+          "line": 36,
+          "column": 5
+        },
+        "duration": 11123,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM conserva desmarcação de confirmação salva ao retomar o rascunho",
+        "path": [],
+        "projectName": "chromium",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 380,
+          "column": 5
+        },
+        "duration": 9725,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "round": "com-decisions-after-checkbox",
+        "title": "COM conserva desmarcação de confirmação salva ao retomar o rascunho",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "com-decision-private-drafts.spec.ts",
+          "line": 380,
+          "column": 5
+        },
+        "duration": 11551,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      }
+    ]
+  },
+  "visual": {
+    "captures": [
+      {
+        "project": "chromium",
+        "file": "a1ebc4262735f9c57a18350afd3365cb30eca1fa.png",
+        "sha256": "058457c328f8a28c041891eacbddd1686ab6030f06e5d72efb56ca613280fc6c"
+      },
+      {
+        "project": "ios",
+        "file": "f0a18e3ac9d09885cd0b84c4634673ad22158183.png",
+        "sha256": "28a897b71c9ac93c6b7127adb37edf9280102776064e7cd14b4720350462139e"
+      }
+    ],
+    "scope": "Official reference comparison; actual desktop/mobile viewport images inspected; Axe on forms and references",
+    "limits": "No full UI, human/AT or physical device approval; full facts remain readable; viewport capture avoids WebKit32767px artifact limit"
+  },
+  "validation": {
+    "unitApi": "PASS23",
+    "realAuth": "PASS30",
+    "typesBuild": "Direct types plus final official E2E production build PASS; initial import error corrected",
+    "lint": "PASS affected consumers, with receipt/test-only repetition after caption change",
+    "contracts": "PASS84 protected migrations unchanged"
+  },
+  "logsLfSha256": {
+    "com-decisions-db-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "com-decisions-db-prepare-final.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "com-decisions-db-tests.log": "98e27d57c6905a2ee6cc7157f1fccf5da37fc8d271b51f0b639c112b7c15d534",
+    "com-decisions-unit-final.log": "1c9825254d40993a52b1926d4fa73a22c713b3937942f69a8a0a491e7c288003",
+    "com-decisions-types.log": "06657442fda34f67b0aa647c3bd406bb1ba97999840faaad25a04b9494721e62",
+    "com-decisions-types-final.log": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+    "com-decisions-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "com-decisions-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "com-decisions-receipt-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "com-decisions-contracts.log": "fa4deead48764fff4ad5a30b4b612da8dc310070ec685493d8c95105b59ff39f",
+    "com-decisions-e2e-initial.log": "07bc626dfdbed8a2660c567269bb1a0d00105fc6feb07877c076adb5b8224b86",
+    "com-decisions-checkbox-counterproof.log": "61b23eb400ccf72da46341a6d10c37975d3e062010c38b55a3ccbc193d925b12",
+    "com-decisions-e2e-final.log": "58eae8078bfa6ede050d50191136ad4e7372e99f752b2bd213822e38d0517a17",
+    "com-decisions-receipt-final.log": "c3c13fc03d2da9aa323fff8e437c363778c7c0affc8c38927f22763cefe6f301"
+  },
+  "remoteEvidence": "COM_DECISION_DRAFTS_REMOTE.json",
+  "observation": {
+    "sha": "fcf04fa3b756c0f6788a7eeb2bd919dedf51d169",
+    "ciRunId": 42620221968,
+    "ci": {
+      "validate (windows-latest)": "success",
+      "validate (ubuntu-latest)": "success",
+      "database": "success",
+      "browser (chromium)": "in_progress",
+      "browser (mobile)": "in_progress",
+      "browser (ios-1)": "in_progress",
+      "browser (ios-2)": "in_progress"
+    },
+    "preview": "READY",
+    "scope": "prior SHA observed during increment; not approval of new sources"
+  },
+  "counterproofs": [
+    "Real unchecked checkbox omission from FormData resurrected a saved on value; discriminating persisted-read test failed before explicit off capture and passed in both engines afterward",
+    "Exact label selectors after remount did not match full labels; accessible role/name oracles keep exact selection/content assertions",
+    "One multiline selector was missed by the first replacement; repaired through TypeScript AST and only affected cases repeated",
+    "iOS full-page screenshot exceeded32767px after expanding frozen facts; viewport capture retained all content and assertions",
+    "Initial type check exposed a missing draftFlow import in refactoring; corrected before successful build/browser execution"
+  ],
+  "qualifiedReuse": [
+    "Sources frozen per runner; no concurrent mutable database suites",
+    "Final receipt-only source change adds human ordinal/author to option and private label; six affected receipt/legacy cases executed; fourteen unaffected approved cases retained",
+    "Repeated cases never inflate20 distinct outcomes",
+    "Existing Fluent removal evidence and current zero imports correct a stale remaining-gate statement; no new full canonical parity claim"
+  ],
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30ColumnsUnchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "historicalMigrationsUnchanged": 84,
+    "newMigrations": 2
+  },
+  "limits": [
+    "Other ENT/BAL/REQ contextual forms remain;D-B-AC-001 partial",
+    "New SHA clean/legacy/full integration CI remains required",
+    "Full UI and66/171 reconciliation remain",
+    "No new signature/provider/backup/monitoring approval;Sonar deferred;PR7 Draft;production NO-GO"
+  ],
+  "documentation": {
+    "markdownFiles": 5,
+    "localLinksChecked": 336,
+    "markdownLogLfSha256": "acb12fdf4c80ed81177b91dd78a97300083c4081ef18d96cd85055b3c9afe42a"
+  }
+}

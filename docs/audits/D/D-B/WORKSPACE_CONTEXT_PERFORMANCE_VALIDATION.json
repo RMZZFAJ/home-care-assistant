@@ -1,0 +1,702 @@
+{
+  "increment": "D3.52",
+  "baseSha": "19a2397e2ea634ccb839a0984e982f62bc47ea6f",
+  "status": "DIRECTED_LOCAL_VALIDATED_REMOTE_RECONCILED_OWN_SHA_CI_REQUIRED",
+  "sourceLfSha256": {
+    "src/app/canonical-ui.css": "b9912b2f73cc9231c7d3c23571e76d08084ba9f3540e97715fc5630b5c5c1d06",
+    "src/components/forms/record-drawer.tsx": "9fb214ce72cff4fed57ec122ed4fdeeaabb3a242d5bf9ef93acd36bee6a83c9b",
+    "src/components/schedules/schedule-creation-fields.tsx": "46fc4272fb26798f45e4d115d74a0f7904989c9bfe15e94bc614adf5df6b113c",
+    "src/components/schedules/schedule-creation-preparation.tsx": "ab856b9ee49f5d3c3f54e16c79abf5783dc4334e63220c7f0fe074dbc7bdeaf1",
+    "src/components/schedules/schedule-forms.tsx": "b04d59626b710838eb72c8c8d14e4df72c4185441efff05cf727d93b8344ec66",
+    "src/components/schedules/selected-shift-dates.tsx": "385870dcb2e387cdcc845094194df2003bae8c37e34dd1e985b3ab405d9ec3b7",
+    "src/components/ui/overlays.tsx": "138f45cac1ba55e6353c3fb36cd10ca7745c974e01dd0d2dff97f830abac9591",
+    "supabase/migrations/20261110154616_phase_d3_workspace_context_read_performance.sql": "ec7cd98d6b96f3d4ee7dab21d2e1941691b7f422c7973b784196cbe7a53836c4",
+    "tests/e2e/schedule-confirmation-recovery.spec.ts": "b6a3e6b1465e1a17006450276a79ac1319023e01d53928c921e843eda64d34ac",
+    "tests/e2e/selected-dates-new-window.spec.ts": "02be17cb4b582d5673854894abe8c0a96ef366e7ff9b79b3a1399a13db4bf556",
+    "tests/integration/workspace-context.test.mjs": "45a3698e2fa4cabe9e73ec7bd4d6999a800165d447070ec955fcc953646e14c1"
+  },
+  "performance": {
+    "beforeRpc": [
+      {
+        "actor": "adminA",
+        "milliseconds": 7700,
+        "error": null,
+        "patients": 3241,
+        "activeCapabilities": 1
+      },
+      {
+        "actor": "global",
+        "milliseconds": 6456,
+        "error": null,
+        "patients": 3664,
+        "activeCapabilities": 0
+      }
+    ],
+    "afterRpcOnly": [
+      {
+        "actor": "adminA",
+        "sample": 0,
+        "milliseconds": 139,
+        "patients": 3252,
+        "activeCapabilities": 1
+      },
+      {
+        "actor": "adminA",
+        "sample": 1,
+        "milliseconds": 120,
+        "patients": 3252,
+        "activeCapabilities": 1
+      },
+      {
+        "actor": "adminA",
+        "sample": 2,
+        "milliseconds": 118,
+        "patients": 3252,
+        "activeCapabilities": 1
+      },
+      {
+        "actor": "global",
+        "sample": 0,
+        "milliseconds": 47,
+        "patients": 3675,
+        "activeCapabilities": 0
+      },
+      {
+        "actor": "global",
+        "sample": 1,
+        "milliseconds": 51,
+        "patients": 3675,
+        "activeCapabilities": 0
+      },
+      {
+        "actor": "global",
+        "sample": 2,
+        "milliseconds": 49,
+        "patients": 3675,
+        "activeCapabilities": 0
+      }
+    ],
+    "afterGoldenAndContextValidation": [
+      {
+        "actor": "adminA",
+        "sample": 0,
+        "milliseconds": 287,
+        "patients": 3241,
+        "activeCapabilities": 1,
+        "contractEqualsBefore": true
+      },
+      {
+        "actor": "adminA",
+        "sample": 1,
+        "milliseconds": 240,
+        "patients": 3241,
+        "activeCapabilities": 1,
+        "contractEqualsBefore": true
+      },
+      {
+        "actor": "adminA",
+        "sample": 2,
+        "milliseconds": 269,
+        "patients": 3241,
+        "activeCapabilities": 1,
+        "contractEqualsBefore": true
+      },
+      {
+        "actor": "global",
+        "sample": 0,
+        "milliseconds": 146,
+        "patients": 3664,
+        "activeCapabilities": 0,
+        "contractEqualsBefore": true
+      },
+      {
+        "actor": "global",
+        "sample": 1,
+        "milliseconds": 106,
+        "patients": 3664,
+        "activeCapabilities": 0,
+        "contractEqualsBefore": true
+      },
+      {
+        "actor": "global",
+        "sample": 2,
+        "milliseconds": 71,
+        "patients": 3664,
+        "activeCapabilities": 0,
+        "contractEqualsBefore": true
+      }
+    ],
+    "golden": {
+      "wholePatientsArrayIncludingOrderAndCapabilities": true,
+      "topFields": [
+        "userId",
+        "fullName",
+        "isGlobalAdmin",
+        "globalAdministrationAllowed",
+        "avatarPath"
+      ],
+      "activeContext": "equals contemporaneous my_active_context RPC;timestamps not compared across different Auth sessions",
+      "performedBeforeNewFixtures": true,
+      "rawDirectoryPayloadCommitted": false
+    },
+    "limits": "local observations,n1before andn3after each actor;different retained sizes after regression fixtures;not SLA/provider/production/physical evidence",
+    "noTimeoutIncreaseOrDataDeletion": true
+  },
+  "realAuth": {
+    "qualifiedDistinct": 7,
+    "newWorkspaceTests": 5,
+    "existingAuthorityConsumers": 2,
+    "metadataHelperRecheck": {
+      "passed": 2,
+      "reason": "unused destructured variable fixed without suppressing lint",
+      "notAdditionalIdentities": true
+    },
+    "stack": "home-care-assistant;API127.0.0.1:54321;DB127.0.0.1:54322",
+    "coverage": [
+      "complete directory and native capability scope",
+      "overrides/inactive/revoked membership",
+      "global identity versus local membership/authority",
+      "anon/service/expired real Auth session denied;Auth-only execute",
+      "SQL bridge with Auth-issued session and authenticated role;valid worker scope with/without selected UI;wrongbackend/transaction/user rejected;rollback clean"
+    ]
+  },
+  "browser": {
+    "qualifiedDistinctProduction": 15,
+    "qualifiedCases": [
+      {
+        "project": "chromium",
+        "title": "seis perfis abrem destinos pessoais e unidades com nomes compatíveis e sem ampliar capacidades",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "mobile",
+        "title": "seis perfis abrem destinos pessoais e unidades com nomes compatíveis e sem ampliar capacidades",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "ios",
+        "title": "seis perfis abrem destinos pessoais e unidades com nomes compatíveis e sem ampliar capacidades",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "chromium",
+        "title": "agenda recupera a confirmação após recarregar sem reenviar a alteração e recusa recibo de outra intenção",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "chromium",
+        "title": "agenda só reenvia explicitamente a tentativa não encontrada e preserva envelope divergente",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "mobile",
+        "title": "agenda recupera a confirmação após recarregar sem reenviar a alteração e recusa recibo de outra intenção",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "mobile",
+        "title": "agenda só reenvia explicitamente a tentativa não encontrada e preserva envelope divergente",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "ios",
+        "title": "agenda recupera a confirmação após recarregar sem reenviar a alteração e recusa recibo de outra intenção",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "ios",
+        "title": "agenda só reenvia explicitamente a tentativa não encontrada e preserva envelope divergente",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "chromium",
+        "title": "mudança do tipo prova tentativa não aplicada sem alterar revisão privada e exige adoção explícita",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "mobile",
+        "title": "mudança do tipo prova tentativa não aplicada sem alterar revisão privada e exige adoção explícita",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "ios",
+        "title": "mudança do tipo prova tentativa não aplicada sem alterar revisão privada e exige adoção explícita",
+        "archive": "context-schedule-production"
+      },
+      {
+        "project": "chromium",
+        "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+        "archive": "context-scroll-production"
+      },
+      {
+        "project": "mobile",
+        "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+        "archive": "context-scroll-production"
+      },
+      {
+        "project": "ios",
+        "title": "doze datas em45 dias mantêm seleção entre meses e após conflito reservado antes de publicar a prévia19–07",
+        "archive": "context-scroll-production"
+      }
+    ],
+    "cohorts": [
+      {
+        "name": "context-schedule-production",
+        "stats": {
+          "total": 15,
+          "expected": 12,
+          "unexpected": 3,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "manifestLfSha256": "fe9f37c369b08a73e79f0b2a1473e849e3fb7d6f1a68f7ab159ece1a88c63e06"
+      },
+      {
+        "name": "context-calendar-production",
+        "stats": {
+          "total": 3,
+          "expected": 0,
+          "unexpected": 3,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "manifestLfSha256": "0165517c1973e4f66a748ffd3e1e47ef803b53ca1c653d6bd9e6a7c92f3042c9"
+      },
+      {
+        "name": "context-scroll-production",
+        "stats": {
+          "total": 3,
+          "expected": 3,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "manifestLfSha256": "33505b4f09789e1510641642620ccae6f5d349df669d890a5271a9b6c2817a97"
+      }
+    ],
+    "setupCounterproofs": [
+      {
+        "name": "context-performance-production-interrupted",
+        "qualified": 0,
+        "skipped": 2
+      },
+      {
+        "name": "context-performance-production-recheck",
+        "qualified": 0,
+        "reason": "generated JSON build diagnostic corrupt;93bytes archived and only that artifact regenerated"
+      },
+      {
+        "name": "anchored initial selector",
+        "qualified": 0,
+        "reason": "collection rejected zero cases before build"
+      }
+    ],
+    "sourceFreezeStable": true,
+    "reuse": "12 unaffected passing cases retained;optional scroll region defaults off for other consumers;month props default to original local calendar behavior",
+    "axeRulesUnchanged": true,
+    "selectedDatesWidths": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "legacyRecoveryWidths": [
+      1440,
+      1150,
+      850,
+      500,
+      320
+    ],
+    "pageDownAndMonthAndReturnFocus": true,
+    "twelveStoredDatesAndTimesVerified": true,
+    "screenshotsInspected": [
+      "selected-dates-review-mobile.png",
+      "selected-dates-review-ios.png"
+    ],
+    "physicalOrHumanApproval": false
+  },
+  "counterproofs": [
+    "Before read workload near8s statement timeout;full response preserved after candidate-bounded native checks.",
+    "CI legacy schedules transport tests still intercepted series creation;now exercise actual existing type edits and preserve exact native packet recovery.",
+    "New private program known rejection discarded review;review now stays read-only with disabled confirmation until explicit return.",
+    "Calendar returned from February to January after unmount;controlled ephemeral month now survives review/conflict.",
+    "Axe scrollable-region-focusable failed all engines;opt-in named tab-focusable content region and actual PageDown fix,not rule exclusion.",
+    "Second review now awaits committed readiness before visual inspection;server series loaded from actual receipt under exact patient."
+  ],
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "health": "ACTIVE_HEALTHY",
+    "pre": {
+      "versions": {
+        "count": 195,
+        "latest": "20261110143034",
+        "linesSha256": "b8d1cb3aa0828d94152bb07794599554565b26c038cbf3650b4112992b222287"
+      },
+      "functions": [
+        {
+          "anon": false,
+          "auth": false,
+          "name": "admin_assurance",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "59e6089be10e7ddcc898c6d823248780e752bd6310b50a2860eb93b7a0c77675"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "auth_session",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "volatile": "v",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "b8484b7869321105c50e770ea958628749a9df1c8f308945b20aead55aa4892b"
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "global_identity",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "714759835dfa81d2e007d7766747cf059a5ed924770e18738ee4f25be933c89f"
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "has_patient_authority",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "volatile": "s",
+          "signature": "p_patient uuid",
+          "securityDefiner": true,
+          "definitionLfSha256": "e57724284b1217b309d0aef879c94293411a1f975fa84e5e52aee2d1bcc53441"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "can_access_recipient",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "p_recipient_id uuid",
+          "securityDefiner": true,
+          "definitionLfSha256": "3ceeb5d4aaff863cbeb45158a633a52e71c694e6b204d1b8d700d3efe2699992"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "is_global_administrator",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "cab6ef2dd02200274895029f0ee9be593c80992883e42572c9ee29c216506afa"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "my_active_context",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "a7db53eac1de315af1b7e151f81fa61becfab47e09be9767ba366f2e751a142e"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "my_workspace",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "1e0a5e277675324f2adbd6b0f118b89699980902e0a60031bc9737fc3b943b99"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "patient_capabilities",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "p_patient uuid",
+          "securityDefiner": true,
+          "definitionLfSha256": "9a721ab93f264effc7df1a02d5b69f15c6e2c856b3aea27e1970de38bdd5f609"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "recipient_role",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "p_recipient_id uuid",
+          "securityDefiner": true,
+          "definitionLfSha256": "a20c7a89e654e21ab8d7a56a7cd25bf767f09425797824032d29761c666d068e"
+        }
+      ],
+      "probeCount": 0,
+      "workerProbeRows": 0
+    },
+    "preReconfirmedEqual": true,
+    "post": {
+      "versions": {
+        "count": 196,
+        "latest": "20261110154616",
+        "linesSha256": "0a3f77170623eafbf7fb80f4a9beaee828f3978fee44420376dd1c92973c11c0"
+      },
+      "functions": [
+        {
+          "anon": false,
+          "auth": false,
+          "name": "admin_assurance",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "59e6089be10e7ddcc898c6d823248780e752bd6310b50a2860eb93b7a0c77675"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "auth_session",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "volatile": "v",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "b8484b7869321105c50e770ea958628749a9df1c8f308945b20aead55aa4892b"
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "global_identity",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "714759835dfa81d2e007d7766747cf059a5ed924770e18738ee4f25be933c89f"
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "has_patient_authority",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "volatile": "s",
+          "signature": "p_patient uuid",
+          "securityDefiner": true,
+          "definitionLfSha256": "e57724284b1217b309d0aef879c94293411a1f975fa84e5e52aee2d1bcc53441"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "can_access_recipient",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "p_recipient_id uuid",
+          "securityDefiner": true,
+          "definitionLfSha256": "3ceeb5d4aaff863cbeb45158a633a52e71c694e6b204d1b8d700d3efe2699992"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "is_global_administrator",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "cab6ef2dd02200274895029f0ee9be593c80992883e42572c9ee29c216506afa"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "my_active_context",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "a7db53eac1de315af1b7e151f81fa61becfab47e09be9767ba366f2e751a142e"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "my_workspace",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "",
+          "securityDefiner": true,
+          "definitionLfSha256": "339c8c51d5e4ceb9d4b6d2f2723621c2924a9d4b6a0c6193762b4bfb47da4f45"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "patient_capabilities",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "p_patient uuid",
+          "securityDefiner": true,
+          "definitionLfSha256": "9a721ab93f264effc7df1a02d5b69f15c6e2c856b3aea27e1970de38bdd5f609"
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "recipient_role",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "volatile": "s",
+          "signature": "p_recipient_id uuid",
+          "securityDefiner": true,
+          "definitionLfSha256": "a20c7a89e654e21ab8d7a56a7cd25bf767f09425797824032d29761c666d068e"
+        }
+      ],
+      "probeCount": 0,
+      "workerProbeRows": 0
+    },
+    "equalToLocal": true,
+    "changedOnly": "public.my_workspace body",
+    "unchangedNativeDependencies": 9,
+    "tablesIndexesSignaturesOrAclAdded": 0,
+    "newTables": 0,
+    "newIndexes": 0,
+    "dryBefore": [
+      "20261110154616_phase_d3_workspace_context_read_performance.sql"
+    ],
+    "dryAfterEmpty": true,
+    "advisors": "not repeated:existing function only;no new signature/grants/schema;previous findings remain unapproved",
+    "backupPolicy": "owner disposable synthetic remote amendment;no redundant heavy backup",
+    "resetOrRemoteFixturesOrAuthWrites": false
+  },
+  "baseCi": {
+    "sha": "19a2397e2ea634ccb839a0984e982f62bc47ea6f",
+    "run": 42846321685,
+    "core": "Windows/Ubuntu/database success",
+    "browsers": "three success;mobile2/chromium2/ios2 failure in two legacy recovery consumers and selected dates;other flakes retained",
+    "gate": "not approved;new own SHA CI required"
+  },
+  "logLfSha256": {
+    "context-performance-prepare.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "context-performance-before.log": "bb12507ab87ae28847065dbdd0dc2258824355d09888d5b5b10878469cc53196",
+    "context-performance-after.log": "ebbaa15af73a01aa7ab988b7016756b51a315b8f2e899fcbb6fca2fe68845d2d",
+    "context-performance-auth.log": "47ea6323f228d7cab3d9195a34e5fed425240941b952d4cee152c9b4d3473ce9",
+    "context-performance-metadata-auth.log": "30dd4b2483d3a865aa5d91a82c84239b48fcc63e8f6b2a4d926eba23ba977cde",
+    "context-performance-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "context-schedule-recovery-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "context-schedule-recovery-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "context-calendar-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "context-calendar-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "context-scroll-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "context-scroll-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "context-performance-dry-before.log": "67a70fd67315126922b1d168b7f95e87232d6d44bf62f789542e408477e90454",
+    "context-performance-remote-push.log": "c0815cf1039d087bb24c053c223022ed6063f5017e382a980eed60b37e3d786d",
+    "context-performance-dry-after.log": "61694dbe27d758db19357f3815840fd60a8a56e0523cc0c289267b8196a2bbcc"
+  },
+  "corruptGeneratedDiagnosticLfSha256": "dbcfcc77f5774ed3333f3963eb84a324fd967de4d62c96631be6af1d6b3fe136",
+  "matrix": {
+    "criteria": 105,
+    "columns": 39,
+    "first30AndStatusesPreserved": true,
+    "pass": 56,
+    "partial": 49,
+    "uiStates": 18,
+    "inventory": "49consumers/51formtags;hashes current",
+    "visualEstimatePercent": 60,
+    "formsEstimatePercent": 90,
+    "recoveryEstimatePercent": 85
+  },
+  "static": {
+    "typecheck": "PASS;directed source final types log",
+    "lint": "PASS;new Auth test and affected TSX/E2E sources;no rule suppression",
+    "reactReview": "client-only state;optional shared controls;effects for focus only and cleanup;accessible readonly/scrollable review;no dependency additions",
+    "documentaryChecks": "PASS:10Markdown/0issues;owned links;105x39/first30/statuses56PASS49PARTIAL;18UIstates;49/51inventory hashes;84manifest and195prior SQL preserved;source hashes;plain report105criteria;active old utility0;AGENTS preserved",
+    "finalInvariantsLfSha256": "139d07d3eb17d9252a8646e8b7cdbd78b0b19f601365edefca218ab99006d225"
+  },
+  "remaining": [
+    "private existing-target schedule editors and decisions",
+    "inventory counts/admin/catalogue/profile continuity",
+    "full66/171 UI and operational variants",
+    "PDF technical trust/key recovery and remaining D-B",
+    "own SHA clean/legacy/full integration/all browser CI",
+    "owner-deferred Sonar;human/physical/provider/operational gates separate"
+  ],
+  "boundary": "PR7 Draft;no merge/manual deployment/production release;goal active"
+}

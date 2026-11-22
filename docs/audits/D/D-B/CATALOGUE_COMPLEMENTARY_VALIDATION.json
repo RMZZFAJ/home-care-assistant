@@ -1,0 +1,176 @@
+{
+  "increment": "D3.59",
+  "base": "3828aaf07eb791b0a04c93bd0c17d5905d311385",
+  "scope": [
+    "local and global unit creation",
+    "patient unit and precision",
+    "presentation create and edit",
+    "catalogue identity and successor"
+  ],
+  "validation": {
+    "localAuthDistinct": 9,
+    "newAuthDistinct": 4,
+    "types": "pass",
+    "targetedLint": "pass",
+    "historicalMigrationsPreserved": 84,
+    "browser": {
+      "first": {
+        "startTime": "2026-11-11T00:33:47.994Z",
+        "duration": 150373.005,
+        "expected": 8,
+        "skipped": 20,
+        "unexpected": 2,
+        "flaky": 0
+      },
+      "final": {
+        "startTime": "2026-11-11T00:38:16.996Z",
+        "duration": 325101.555,
+        "expected": 25,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "qualifiedReusedChromium": 5,
+      "distinctQualified": 30,
+      "engines": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    "counterproofs": [
+      "Initial synthetic products with stock history correctly refused precision change",
+      "Shared global fixture receipt had to be acknowledged before repeating unit creation",
+      "Initial native order field lost number semantics, restored type/min/max/step",
+      "Initial fresh-key test used legacy key location, now changes only the key of the new exact envelope",
+      "Exact original attempt remains recoverable after reload, write revocation or stale material reference under the appropriate read authority",
+      "New intent is denied after losing write authority"
+    ]
+  },
+  "remote": {
+    "from": 200,
+    "to": 201,
+    "version": "20261111001758",
+    "finalDryRunEmpty": true,
+    "orderedHistoryMatchesLocal": true,
+    "definitionsAndPermissionsMatchLocal": true,
+    "nativeDefinitionsAndPermissionsPreserved": true,
+    "functions": {
+      "private.catalogue_complementary_reference(uuid,text,text,text,text)": {
+        "anon": false,
+        "authenticated": false,
+        "service": false,
+        "sha256": "edda8a50534a65b648bac8133e9550e83aec75989632237318b6a94542d17f36"
+      },
+      "private.commit_catalogue_complementary_preparation(uuid,text,text,text,jsonb,text,uuid)": {
+        "anon": false,
+        "authenticated": false,
+        "service": false,
+        "sha256": "7a9af8dda2d854798e6af579156e767b7927f570b8d51fb64b22dd1f1074b97c"
+      },
+      "private.require_catalogue_preparation_access(uuid,text,text,text,boolean)": {
+        "anon": false,
+        "authenticated": false,
+        "service": false,
+        "sha256": "d62f5116785e1e87b866bd16adb15be574d9e4b5a4c303daa1076138f26782bd"
+      },
+      "private.require_catalogue_preparation_scope(uuid,text,text,text)": {
+        "anon": false,
+        "authenticated": false,
+        "service": false,
+        "sha256": "c2b362e0a23ce22e58ddbf2f560446e58ed2050788f2bed696ba350ef2daa96b"
+      },
+      "private.validate_catalogue_complementary_fields(text,jsonb)": {
+        "anon": false,
+        "authenticated": false,
+        "service": false,
+        "sha256": "3bd1bd8efd1eea7df966da869f16da8c89943c5f9107e1918c143dcb6bbc32ea"
+      },
+      "public.catalogue_identity_command(uuid,text,text,text,jsonb,uuid)": {
+        "anon": false,
+        "authenticated": true,
+        "service": false,
+        "sha256": "9c7711c1bde7aa48a68afa0d6ffc2c678e9269db2eee995ccc7679abb94e4bf8"
+      },
+      "public.catalogue_preparation_command(uuid,text,text,text,text,uuid,uuid,integer,jsonb,text)": {
+        "anon": false,
+        "authenticated": true,
+        "service": false,
+        "sha256": "fbf63c00a5c151bab0ca8fa5f0274c5669361e2b83d534ca64a754a1c98492e5"
+      },
+      "public.catalogue_preparation_current(uuid,text,text,text,text)": {
+        "anon": false,
+        "authenticated": true,
+        "service": false,
+        "sha256": "04606ddfc6d4512f0e3b16fae0894fad6d22411d9b4f4bb06e1d00580e5499a6"
+      },
+      "public.catalogue_preparation_read(uuid,text,text,text,uuid)": {
+        "anon": false,
+        "authenticated": true,
+        "service": false,
+        "sha256": "cedf739695e9732c56e86c47b358e51ae9c467df6c94d17c56014e6130a80b43"
+      },
+      "public.catalogue_presentation_command(uuid,uuid,integer,jsonb,uuid)": {
+        "anon": false,
+        "authenticated": true,
+        "service": false,
+        "sha256": "b4f9db90d4297a756368f3c0e5c8287cdd04fb7a678578fdb2ed5b1f5eecddd2"
+      },
+      "public.configure_catalogue_unit(uuid,text,text,integer,text,text,numeric)": {
+        "anon": false,
+        "authenticated": true,
+        "service": false,
+        "sha256": "e312e2e6ca7113e6bb4c5c42281121f819271aa6078700112c1323401143ab58"
+      },
+      "public.create_measurement_unit(uuid,text,text,text,integer)": {
+        "anon": false,
+        "authenticated": true,
+        "service": false,
+        "sha256": "331d2bea1514838487880ec49df38ea3e28e36f3e18d8dd74c3578068902a7ca"
+      }
+    },
+    "rls": true,
+    "relatedAdvisors": {
+      "rls_enabled_no_policy": 2,
+      "authenticated_security_definer_function_executable": 3,
+      "unused_index": 4
+    }
+  },
+  "criteria": {
+    "localPass": 56,
+    "partial": 49,
+    "visualEstimate": 60,
+    "formsEstimate": 90,
+    "recoveryEstimate": 90
+  },
+  "remaining": [
+    "published SHA CI",
+    "read-only rediscovery of an exact attempt outside an open editor",
+    "remaining administrative/profile consumers",
+    "66/171 visual parity",
+    "D-C human/device/provider gates"
+  ],
+  "sourceLfSha256": {
+    "src/app/api/admin/catalogue-preparations/route.ts": "87101ab27005834ee5158e3880e707185f20e51f69889722c945cd283612f0b5",
+    "src/app/api/admin/route.ts": "b7d6d51905835d0be252f477c4a0e7e5eff01903fc18d8c68b0125bb6bd746fb",
+    "src/app/api/catalog/identities/route.ts": "ad0101097fb2f00fa013d84472f0052aeb04f8fea3d09286c0660712b44bc780",
+    "src/app/api/catalog/presentations/route.ts": "27dcc95ad1ce6b1373dbd56e84dbab25d230758a354bba6683271d8047a105bb",
+    "src/app/api/units/route.ts": "f2b917f3e75fe8cdd6eb5f281d88de873a62ab590fde01e245842354c26599d7",
+    "src/components/admin/catalogue-management.tsx": "00288228562e235a94d8ff0692be2755b69ad291f096d4d4247150672fc7a42e",
+    "src/components/admin/catalogue-preparation-editor.tsx": "679e03c4903015381d42458f591d0c334c908d4388a80242c12304ad7bf2b75d",
+    "src/components/catalog/catalogue-complementary-reference.ts": "5ea876e7eec1d59ce7975965c2683672abdb0edeb394e7363ac30660d2bbf368",
+    "src/components/catalog/catalogue-identity-management.tsx": "ed836e1332c9612dfb2d82bc9c64b744acb2bb4ba1a7a1c8bdc1e5e6dbef6c3d",
+    "src/components/catalog/catalogue-preparation-controls.tsx": "44f4dcc6745be2d81746e1e3b5151cb735327c44d87d718da74f0f8b4dfa999c",
+    "src/components/catalog/presentation-management.tsx": "b642b0ec929a97fe7967dcd9cc2d258c1206192196eca1845e900c0c05797b0f",
+    "src/components/catalog/unit-console.tsx": "7d11368ffc5e8836d297146e4e2ee52e50a42b96456841aed385178704eaa547",
+    "src/components/catalog/unit-preparation-editor.tsx": "5408cb7fafb5c2da19783fefcf0b876ce94437053ee78e992eab1025a379986f",
+    "src/components/catalog/use-catalogue-preparation.ts": "af697cf3e85c225eb1844d9e700614aca05f3fb0e0087adf846c860f40700570",
+    "src/lib/server/catalogue-preparation.ts": "78249eb5b20898b42fa27b53e4a52179fdb45b2b23c16c9fb4425c1c93f46991",
+    "src/lib/validation/catalogue-preparation.ts": "b08b4df948b6bc8c862f21caf9df090ea111eb6e73f04941f5b2ef72f629b8a4",
+    "supabase/migrations/20261111001758_phase_d3_catalogue_complementary_preparations.sql": "7b19b1db22f5b5a98c12473511a4e3cd3cde68bd1025a4ad40c98c09c6bfc2f9",
+    "tests/e2e/catalogue-identities.spec.ts": "1c784057e99523d6b5ccd182b502d0cb1bb5db4d272792b979f169d02d8499bd",
+    "tests/e2e/presentation-provenance.spec.ts": "be56928299f963adaa3fa6d3ffdb6cbf8e5be8416ede05cf166986f9084f206e",
+    "tests/e2e/typed-fields.spec.ts": "cf9639916d1b1bad131a49d5d39903386d91893258f1e5859a811cc1eda5de19",
+    "tests/integration/catalogue-complementary-preparations.test.mjs": "5c6f4d8a2a555da3d7443e2fe20bafef5ec8c3e2acb345bcc45118ab5a3cebd1"
+  }
+}

@@ -1,5 +1,8 @@
 import { mkdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { dirname } from "node:path";
+import { trustedExecutable } from "./trusted-executable.mjs";
+import { startLocalWithPortRetry } from "./local-start-retry.mjs";
 import {
   testRoot,
   testDataRoot,
@@ -9,11 +12,14 @@ import {
 } from "./test-environment.mjs";
 
 assertLocalProject({ running: false });
+const supabase = trustedExecutable("supabase");
+const commandEnvironment = { ...process.env, PATH: dirname(trustedExecutable("docker")) };
 mkdirSync(testDataRoot, { recursive: true });
 if (process.argv.includes("--restart")) {
   assertLocalProject();
-  const stopped = spawnSync("supabase", ["stop", "--workdir", testRoot], {
+  const stopped = spawnSync(supabase, ["stop", "--workdir", testRoot], {
     encoding: "utf8",
+    env: commandEnvironment,
   });
   if (stopped.status !== 0) {
     process.stderr.write(stopped.stderr);
@@ -33,10 +39,20 @@ for (const args of [
 ]) {
   // Validate the running container and localhost endpoints before the first database mutation.
   if (args[0] === "migration") getTestEnvironment();
-  const result = spawnSync("supabase", args, { encoding: "utf8" });
+  const run = () => spawnSync(supabase, args, { encoding: "utf8", env: commandEnvironment });
+  const result = args[0] === "start"
+    ? await startLocalWithPortRetry(run, {
+        onRetry: (attempt, delay) => console.error(
+          `Local Supabase port collision; retrying start (${attempt}/3) in ${delay / 1000}s.`,
+        ),
+      })
+    : run();
   // start/status may print local credentials: report success only, never their output.
   if (result.status !== 0) {
     process.stderr.write(result.stderr);
+    // migration up can put its SQL diagnostic on stdout. Unlike start/status,
+    // this command's output contains migration SQL, not local credentials.
+    if (args[0] === "migration") process.stderr.write(result.stdout);
     process.exit(result.status ?? 1);
   }
 }

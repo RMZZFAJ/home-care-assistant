@@ -1,0 +1,94 @@
+{
+  "status": "PREFLIGHT_ACCEPTED_FOR_PENDING_ONLY_APPLICATION",
+  "at": "2026-11-08T17:33:47.047Z",
+  "project": "qwfrqychokvhdzakibid",
+  "sourceBase": "8a17202526908286c155246d13985fad5903d4e6",
+  "before": 152,
+  "target": 153,
+  "pending": 1,
+  "historySqlMatched": 152,
+  "compatibility": {
+    "existingFunctionIdentities": 409,
+    "changedDefinitions": [
+      "private.creation_draft_view",
+      "public.creation_draft_command",
+      "public.supply_draft_command"
+    ],
+    "addedFunctions": [
+      "private.creation_draft_navigation_valid"
+    ],
+    "oldIdentitiesAndGrantsPreserved": true,
+    "newNullablePrivateColumn": true,
+    "strictMetadataCheck": true,
+    "noBusinessContentOrHashChange": true,
+    "legacySaveOmissionClearsOnlyNavigation": true,
+    "viewsEquivalentWithDocumentedRestoreAlias": true,
+    "unchangedIndexesDefaultsPoliciesRelationsTriggersTableGrants": true,
+    "noBusinessDml": true
+  },
+  "backup": {
+    "backupId": "c9e7e422-377e-46a8-a01e-03046c66d1d3",
+    "files": 80,
+    "bytes": 11320337,
+    "manifestSha256": "96b16f6a884349686c0594e950b4bb4e3b028aca633d90e01c7733206f3b0dfe",
+    "verified": true,
+    "restoredTables": 151,
+    "stableTableDigestsMatched": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "foreignKeysChecked": true,
+    "storageObjectsVerified": 34,
+    "pdfDigestsVerified": 33,
+    "signedIssuanceDigestsVerified": 2,
+    "migrationsAppliedToProbe": [
+      "20261108124300_phase_d3_draft_navigation.sql"
+    ],
+    "catalogueComparison": {
+      "views": false,
+      "columns": true,
+      "indexes": true,
+      "defaults": true,
+      "policies": true,
+      "triggers": true,
+      "functions": true,
+      "relations": true,
+      "constraints": false,
+      "table_grants": true,
+      "function_grants": true
+    },
+    "cronEnabled": false,
+    "networkExtensionEnabled": false,
+    "seconds": 14.419,
+    "operationalRecoveryGate": "D6_NOT_SATISFIED_BY_THIS_PROBE"
+  },
+  "sourcePreservation": {
+    "tables": 151,
+    "activitySinceBackup": [],
+    "storageAndHistoryExactSinceBackup": true,
+    "immediateSnapshot": "p2"
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0,
+    "cron": [
+      {
+        "active": true,
+        "name": "hca-notification-worker",
+        "schedule": "* * * * *"
+      },
+      {
+        "active": true,
+        "name": "hca-operational-lifecycle",
+        "schedule": "* * * * *"
+      }
+    ]
+  },
+  "remoteFixturesOrAuthCreated": false,
+  "operationalGo": false
+}

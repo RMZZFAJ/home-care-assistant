@@ -1,0 +1,107 @@
+{
+  "sha": "e2e99d2ee0fa6f4de22910adb097087de12588b2",
+  "workflowRun": 42786674329,
+  "status": "COMPLETED_NOT_GREEN",
+  "jobs": [
+    {
+      "id": 129729519350,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129729519491,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129729519624,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129739146290,
+      "name": "browser (mobile-2)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 129739146297,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "cancelled"
+    },
+    {
+      "id": 129739146301,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 129739146333,
+      "name": "browser (mobile-1)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 129739146342,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 129758230397,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "preview": {
+    "id": "dpl_91JhnSuf8iErMAfzSQZcN4VCtxsB",
+    "url": "home-care-assistant-e07t0c5cd-rmzzfajs-projects.vercel.app",
+    "state": "READY",
+    "target": null
+  },
+  "definitiveFailures": [
+    {
+      "file": "tests/e2e/preparation-continuity.spec.ts",
+      "title": "D3 duas sessões atualizam consumo",
+      "projects": [
+        "mobile",
+        "ios"
+      ],
+      "cause": "Fixture tried to fill before explicit custody selection;new real private purpose needs that choice"
+    },
+    {
+      "file": "tests/e2e/fluent-experience.spec.ts",
+      "title": "ocorrências e notificações",
+      "projects": [
+        "mobile",
+        "ios"
+      ],
+      "cause": "Same missing custody selection"
+    },
+    {
+      "file": "tests/e2e/schedules.spec.ts",
+      "projects": [
+        "mobile"
+      ],
+      "cause": "Click did not leave a dialog in the CI snapshot;unchanged directed local recheck passed;not declared globally fixed"
+    }
+  ],
+  "chromium": {
+    "conclusion": "cancelled",
+    "startedAt": "2026-11-10T09:18:07Z",
+    "endedAt": "2026-11-10T09:58:08Z",
+    "configuredTimeoutMinutes": 40,
+    "interpretation": "Cancellation coincides with the40 minute job budget;budget inferred from timing. Candidate splits full Chromium selection into1/2 and2/2,keeps timeout40,fail-fast false and all-project aggregate."
+  },
+  "limits": [
+    "Six additional iOS cases were flaky;no global stability approval",
+    "No prior-SHA success approves the new candidate",
+    "Fixture adjustments retain actual data,scope and side-effect assertions;portaled Flow background remains inert",
+    "No CI test exclusion,retry increase,timeout increase,merge or production deployment"
+  ]
+}

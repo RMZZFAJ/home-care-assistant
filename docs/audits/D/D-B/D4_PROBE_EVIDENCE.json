@@ -1,0 +1,122 @@
+{
+  "status": "ISOLATED_TECHNICAL_PROBE_NOT_PRODUCT_ACCEPTANCE",
+  "signature": {
+    "library": "@libpdf/core@0.5.3",
+    "purpose": "ISOLATED_PROBE_NOT_PRODUCT",
+    "profileRequested": "B-T",
+    "tsa": "internal OpenSSL RFC3161 adapter; not serverless implementation",
+    "timestampResponseVerifiedByOpenSSL": true,
+    "sha256": "f49477acffc746564e583f041ee565a3a8a46e3468176f60356d4dc44addc31c",
+    "bytes": 26464,
+    "warnings": []
+  },
+  "independentVerification": {
+    "independentVerifier": "pyHanko0.38.1",
+    "integrity": true,
+    "signatureValid": true,
+    "trustedByExplicitInternalRoot": true,
+    "coverage": "ENTIRE_FILE",
+    "subFilter": "/ETSI.CAdES.detached",
+    "timestampPresent": true,
+    "timestampIntegrity": true,
+    "timestampSignatureValid": true,
+    "timestampTrustedByInternalRoot": true,
+    "timeIndependentFromSystem": false,
+    "externalTrust": false,
+    "padesSignedAttributes": [
+      "content_type",
+      "message_digest",
+      "signing_certificate_v2"
+    ],
+    "padesUnsignedAttributes": [
+      "signature_time_stamp_token"
+    ],
+    "accepted": true
+  },
+  "changedCoveredByte": {
+    "independentVerifier": "pyHanko0.38.1",
+    "integrity": false,
+    "signatureValid": true,
+    "trustedByExplicitInternalRoot": false,
+    "coverage": "ENTIRE_FILE",
+    "subFilter": "/ETSI.CAdES.detached",
+    "timestampPresent": true,
+    "timestampIntegrity": true,
+    "timestampSignatureValid": true,
+    "timestampTrustedByInternalRoot": true,
+    "timeIndependentFromSystem": false,
+    "externalTrust": false,
+    "padesSignedAttributes": [
+      "content_type",
+      "message_digest",
+      "signing_certificate_v2"
+    ],
+    "padesUnsignedAttributes": [
+      "signature_time_stamp_token"
+    ],
+    "accepted": false
+  },
+  "appendedBytes": {
+    "independentVerifier": "pyHanko0.38.1",
+    "integrity": true,
+    "signatureValid": true,
+    "trustedByExplicitInternalRoot": true,
+    "coverage": "ENTIRE_REVISION",
+    "subFilter": "/ETSI.CAdES.detached",
+    "timestampPresent": true,
+    "timestampIntegrity": true,
+    "timestampSignatureValid": true,
+    "timestampTrustedByInternalRoot": true,
+    "timeIndependentFromSystem": false,
+    "externalTrust": false,
+    "padesSignedAttributes": [
+      "content_type",
+      "message_digest",
+      "signing_certificate_v2"
+    ],
+    "padesUnsignedAttributes": [
+      "signature_time_stamp_token"
+    ],
+    "accepted": false
+  },
+  "publicTestRootSha256Der": "5e0f7b940147a0cb786c7a785e0727123881da3c6d0a1c783d238240c4ef2f55",
+  "files": [
+    {
+      "file": "docs/audits/D/D-B/d4-probe/README.md",
+      "sha256": "3afd820fe37ab1094492b341584d5aa91d651d60217a9d4d92e6e3734aaa8f70"
+    },
+    {
+      "file": "docs/audits/D/D-B/d4-probe/signed-proof.pdf",
+      "sha256": "f49477acffc746564e583f041ee565a3a8a46e3468176f60356d4dc44addc31c"
+    },
+    {
+      "file": "docs/audits/D/D-B/d4-probe/signing-proof.mjs",
+      "sha256": "09bf894ddb3afa7d8b896e64b9dcab9566a190630da31a6a114e1ca125288e56"
+    },
+    {
+      "file": "docs/audits/D/D-B/d4-probe/test-root-public.pem",
+      "sha256": "0328a28466abf124d10e08bf690cf090a7d1b3d36c8bad37a04bfcd0b69adf63"
+    },
+    {
+      "file": "docs/audits/D/D-B/d4-probe/verify-proof.py",
+      "sha256": "5addcfadda4a734a5e32a80882583d5766b9adb1c695eb058d8de4282b096d8d"
+    }
+  ],
+  "runtimeDependencyInstalledInApp": false,
+  "library": "@libpdf/core0.5.3 isolated prefix; MIT; Node>=20",
+  "independentVerifier": "pyHanko0.38.1; network disabled; explicit local test root; external revocation unproven",
+  "keyCustody": "LOCALAPPDATA home-care-assistant/signature-poc; inherited access removed; current Windows account only; encrypted RSA3072 private keys; no private material in repository",
+  "render": "pdfplumber text+133character bounds passed; pypdfium2 image visually inspected; one fictional page",
+  "limitations": [
+    "OpenSSL internal TSA adapter is proof-only, not serverless runtime implementation",
+    "Internal TSA has no external time independence or universal certificate trust",
+    "No actual business PDF, no runtime content oracle, no immutable issuance/Storage/history/public verification",
+    "No operational PKI rotation/recovery/revocation or ICP-Brasil trust claim; no D4 criterion complete"
+  ],
+  "initialFailure": "OpenSSL uses successive password lines when passin/passout reference the same file; separate protected file paths fixed export without exposing values",
+  "sources": [
+    "https://github.com/LibPDF-js/core",
+    "https://github.com/LibPDF-js/core/blob/main/content/docs/guides/signatures/index.mdx",
+    "https://docs.pyhanko.eu/en/latest/lib-guide/signing.html"
+  ]
+}

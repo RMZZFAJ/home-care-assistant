@@ -1,0 +1,56 @@
+{
+  "recordedAt": "2026-11-08T22:34:59.860Z",
+  "sha": "bca3933d2ea51af245517ed02fbba2077c41990c",
+  "runId": 42528931588,
+  "jobs": [
+    {
+      "name": "database",
+      "id": 128878676617,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "validate (windows-latest)",
+      "id": 128878676807,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "validate (ubuntu-latest)",
+      "id": 128878676888,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (mobile)",
+      "id": 128882591969,
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "name": "browser (chromium)",
+      "id": 128882591970,
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "name": "browser (ios-1)",
+      "id": 128882592030,
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "name": "browser (ios-2)",
+      "id": 128882592183,
+      "status": "in_progress",
+      "conclusion": null
+    }
+  ],
+  "preview": {
+    "id": "dpl_6vFX2fHZLiVoQVTbGenw95C7a4xN",
+    "sha": "bca3933d2ea51af245517ed02fbba2077c41990c",
+    "state": "READY",
+    "stableOrigin": "https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app"
+  },
+  "qualification": "Database and both validate jobs succeeded; four browser jobs still in progress. Does not approve new draft-lifecycle changes. Preview runtime API/PWA unchanged from the qualified 827531e probe; that probe was not rerun."
+}

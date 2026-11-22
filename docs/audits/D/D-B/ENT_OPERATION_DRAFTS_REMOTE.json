@@ -1,0 +1,155 @@
+{
+  "assembledAt": "2026-11-09T14:27:07.854942+00:00",
+  "projectId": "qwfrqychokvhdzakibid",
+  "migration": {
+    "supabase/migrations/20261109135205_phase_d3_ent_operation_private_drafts.sql": "6b830b2db61be7c8d7bd942f76edad0076df32a4f77767ed5d2c0543b220b5d7"
+  },
+  "preflight": [
+    {
+      "applied": 168,
+      "last_version": "20261109130033",
+      "incompatible_drafts": 0,
+      "waiting_locks": 0,
+      "old_transactions": 0
+    }
+  ],
+  "predecessorBodiesMatchLocal168": true,
+  "predecessorFunctions": [
+    {
+      "schema": "public",
+      "name": "commit_supply_draft",
+      "bodysha256": "4b35937b3063633460953eb3852b2de903826d70248dcd5a19789744e33ea505",
+      "securitydefiner": true,
+      "config": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "creation_draft_navigation_valid",
+      "bodysha256": "a1aea129f65a91f4acddca7c4ae096da18cc9700e465fb336cfcaa3470c56d39",
+      "securitydefiner": false,
+      "config": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "require_supply_draft_scope",
+      "bodysha256": "775ee00c30a5ce59feec4f43b817695d1b6c0dae034c031f7d01a11e7b9cc39b",
+      "securitydefiner": true,
+      "config": [
+        "search_path=\"\""
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "supply_draft_command",
+      "bodysha256": "bcf5031916cfdb45ca0f5fca60782385abf08143afffeb6ab78939ba7f12826f",
+      "securitydefiner": true,
+      "config": [
+        "search_path=\"\""
+      ]
+    }
+  ],
+  "dryRunOnlyCandidate": true,
+  "seeds": [],
+  "roles": [],
+  "post": {
+    "versions": {
+      "last": "20261109135205",
+      "count": 169,
+      "sha256": "694f6e8a1796476d6f4b342f30e6984ffc95b1e3b6b2e26b326e0061a924f0bc"
+    },
+    "functions": [
+      {
+        "anon": false,
+        "name": "creation_draft_navigation_valid",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "c810ef4196a8a7fcbca2ec071db12e86bc9f162df3cbc121acc851ecc89ace8d",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": false
+      },
+      {
+        "anon": false,
+        "name": "require_supply_draft_scope",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "private",
+        "bodySha256": "fdd49b8db364b35983dffee7eca16c56d3ba5f2cce571313e8e9a5a7790031de",
+        "serviceRole": false,
+        "authenticated": false,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "commit_supply_draft",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "d23d456e59053ce28a4a829a02ff596ed62d6b03a8f10a55271e795435431971",
+        "serviceRole": false,
+        "authenticated": true,
+        "securityDefiner": true
+      },
+      {
+        "anon": false,
+        "name": "supply_draft_command",
+        "config": [
+          "search_path=\"\""
+        ],
+        "schema": "public",
+        "bodySha256": "32f2274a4bacaca6d5ac99ce2f80b1cbb7f7324dad15133e343ed21be340b8ec",
+        "serviceRole": false,
+        "authenticated": true,
+        "securityDefiner": true
+      }
+    ],
+    "privateTable": {
+      "anon": false,
+      "authenticated": false
+    }
+  },
+  "postMatchesLocal169": true,
+  "advisors": {
+    "sameExcludingObservedAt": true,
+    "normalizedSha256": "b4f5f3dd762c57458071f68c34ddde730e5b2e6885803154e72112f77e3e0d6a",
+    "lintKinds": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO"
+      },
+      {
+        "name": "extension_in_public",
+        "level": "WARN"
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "level": "WARN"
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "level": "WARN"
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "level": "WARN"
+      }
+    ],
+    "existingWarningsRetained": true
+  },
+  "operations": {
+    "reset": false,
+    "remoteFixtures": false,
+    "authMutation": false,
+    "vaultMutation": false,
+    "redundantBackup": false,
+    "externalIntegration": false
+  }
+}

@@ -1,0 +1,1025 @@
+{
+  "assembledAt": "2026-11-09T11:52:49.377171+00:00",
+  "baseSha": "9ad124b5101483cdc7483328ed2e3d87ab31f158",
+  "sourceLfSha256": {
+    "src/app/canonical-ui.css": "cc81537e9212cdaf3ea04ef1e094ae569bb0b3c6008464195cae7ed28451ce91",
+    "src/components/app-shell.tsx": "df29637a711e6bf1673af81107d0ae8bfb1430145824fda4ddbcfcb09e648d4c",
+    "src/components/documents/document-action-slot.tsx": "d88146ae5dd3121f5626e5640aa7020388b6616bb260ba3e6743040926c417b1",
+    "src/components/documents/document-actions.tsx": "f67de1d8dc5ef9daf743d7ed2b1e33bd7690286013c4455b88f978827b8173f4",
+    "src/components/documents/document-breadcrumb.tsx": "0ccaebe4b5876f71ec9fc8cd33e0e45af40673b371b12c941699004f6af32143",
+    "src/components/documents/document-header.tsx": "d9ae0d090ad32e3d6401355c42daa8b8d36f196437546b1a35d93e0d8dd56b54",
+    "src/components/documents/document-milestones.tsx": "b293810dedb8cfb18349728a830f833807ffad9065d4c78871a4375ee24e5a47",
+    "src/components/documents/document-progress.tsx": "7b45a5b826ddd4bdc457017a2993c8943e955f9c08b787a57ab607c2cd216b4b",
+    "src/components/documents/document-viewer.tsx": "b4c4cf0335ee6b183551f662abdcfe0a19e59308fde29d5ea790ffaf86012106",
+    "src/components/documents/supply-detail.tsx": "63c8d4db3de9ebed031469f161173f9525d1339b040b60e394818a5413090ae5",
+    "src/components/requisitions/requisition-detail.tsx": "e84536379db07f17cdb4b9ac7033d0549d15ec37f081e0aa62df1222f7cce6a9",
+    "src/components/requisitions/requisition-opening.tsx": "20bfaa6bf75b6032b410cd0beb94ef3de16a095fd3a26994fc888ca9a939a17d",
+    "src/lib/documents/milestones.ts": "d5d02db45cb0a4b279d910e2098f47f52f3f24f212152417f423eaeb2713fd55",
+    "src/lib/documents/presentation.ts": "7cd39d01eda10854e27cb42b670bd8ed75267bdc883dd1f183af79ea8571b94b",
+    "src/theme/tokens.css": "7a7ab4c177ddd5b3aa08b58ef5b2b27dae8d846910a10e4ea8b46c69e18641fa",
+    "tests/document-milestones.test.ts": "9fe0647af0e8edf39ac8cd6aa8b2e4db0cc8ffcdf6fdebdca6599e32ae7a47a4",
+    "tests/document-presentation.test.ts": "4f33ff9aa9d115eeacc9ee9ba07502765be842e26d41443443bcb94735b7c329",
+    "tests/e2e/delivery-cancellation.spec.ts": "585eeffb146ee6865d9c807f72460bbf6b21745a4f62cfdc83110db2a41f34a4",
+    "tests/e2e/delivery-preparation.spec.ts": "730d5867f15c11712a8a8dfa94bc78522a9df4968b7a2d5658ccba60e510d8e7",
+    "tests/e2e/document-progress.spec.ts": "23c7270ee68bf2ae3323db86a6f514a57bba10ed6be0a943623cc658ab7fc34b",
+    "tests/e2e/document-tabs.spec.ts": "e25cf3ac5edd1d514efa86117ee36451c1be05bfb75cdc6d37875b1375d8afd0",
+    "tests/e2e/ent-temporal.spec.ts": "58bf6702dbbea55684853829e9f763e372f08c138aca430aa3c4169df301c51d",
+    "tests/e2e/notice-tracking.spec.ts": "5de45096f3001ab0c61d3e0c1cd9bdb9937f0c9e5ad4fdc7c9ae540a668569a1",
+    "tests/e2e/pdf-issuance.spec.ts": "e953b98aabbb068f7cd59799bd39db9d8a9ccafbc6cca7798a2ae84d85573971",
+    "tests/e2e/pdf-regularization.spec.ts": "84ec4dfad41fe40a3fc6f96f22e51a5b295f4497cbd1e4742e2f7ce3f3732d66",
+    "tests/e2e/pdf-source-facts.spec.ts": "cc7c00f2b1b779d39824f1ca63853262a1f44ebb754bd7ae08d155aa0367770d",
+    "tests/e2e/task-relations.spec.ts": "49bb229d6ec7940df3b4794e007783f2002236c954c97ad6979b19d448a30848"
+  },
+  "unit": {
+    "cases": 7,
+    "passed": 7
+  },
+  "browser": {
+    "distinctApprovedCases": 22,
+    "identity": "file + path + title + project; latest directed outcome",
+    "rounds": {
+      "hero-initial": {
+        "stats": {
+          "total": 18,
+          "expected": 15,
+          "unexpected": 3,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "delivery-preparation.spec.ts",
+              "line": 73,
+              "column": 5
+            },
+            "duration": 23536,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "summary": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeFocused\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('button', { name: 'Atualizar ficha', exact: true })\nExpected: focused\nReceived: inactive\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeFocused\" getByRole('button', { name: 'Atualizar ficha', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Atualizar ficha', exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <button type=\"button\" aria-label=\"Atualizar ficha\" class=\"hca-control hca-control--secondary\">…</button>\u001b[22m\n\u001b[2m       - unexpected value \"inactive\"\u001b[22m\n\n\n  88 |     await expect(page.locator('[aria-invalid=\"true\"]')).toHaveCount(0);\n  89 |     if (status === 403) await expect(material).toHaveCount(0);\n> 90 |     await expect(refresh).toBeFocused(); await refresh.press(\"Enter\");\n     |                           ^\n  91 |     awa",
+                "sha256": "537a21d041cc8a7e2fd131ffce401aee2b85d8a71b438e36b0fe51b9f184b870"
+              }
+            ]
+          },
+          {
+            "title": "C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-preparation.spec.ts",
+              "line": 73,
+              "column": 5
+            },
+            "duration": 21813,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "summary": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeFocused\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByRole('button', { name: 'Atualizar ficha', exact: true })\nExpected: focused\nReceived: inactive\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeFocused\" getByRole('button', { name: 'Atualizar ficha', exact: true }) with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('button', { name: 'Atualizar ficha', exact: true })\u001b[22m\n\u001b[2m    33 × locator resolved to <button type=\"button\" aria-label=\"Atualizar ficha\" class=\"hca-control hca-control--secondary\">…</button>\u001b[22m\n\u001b[2m       - unexpected value \"inactive\"\u001b[22m\n\n\n  88 |     await expect(page.locator('[aria-invalid=\"true\"]')).toHaveCount(0);\n  89 |     if (status === 403) await expect(material).toHaveCount(0);\n> 90 |     await expect(refresh).toBeFocused(); await refresh.press(\"Enter\");\n     |                           ^\n  91 |     awa",
+                "sha256": "537a21d041cc8a7e2fd131ffce401aee2b85d8a71b438e36b0fe51b9f184b870"
+              }
+            ]
+          },
+          {
+            "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 19336,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-progress.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 25772,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 21,
+              "column": 5
+            },
+            "duration": 6641,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 253,
+              "column": 5
+            },
+            "duration": 37343,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Abas conservam conferência ENT não salva e recuperam seleção por URL e histórico sem conceder auditoria",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 405,
+              "column": 5
+            },
+            "duration": 8997,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 21,
+              "column": 5
+            },
+            "duration": 10691,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 253,
+              "column": 5
+            },
+            "duration": 41484,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "summary": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeFocused\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('tabpanel')\nExpected: focused\nError: strict mode violation: getByRole('tabpanel') resolved to 2 elements:\n    1) <div inert=\"\" tabindex=\"-1\" data-index=\"0\" role=\"tabpanel\" id=\"base-ui-_r_c_\" data-ending-style=\"\" class=\"hca-document-panel\" data-orientation=\"horizontal\" aria-labelledby=\"base-ui-_r_5_\" data-activation-direction=\"right\">…</div> aka getByRole('tabpanel', { name: 'Visão geral' })\n    2) <div tabindex=\"0\" data-index=\"1\" role=\"tabpanel\" id=\"base-ui-_r_f_\" data-starting-style=\"\" class=\"hca-document-panel\" data-orientation=\"horizontal\" aria-labelledby=\"base-ui-_r_6_\" data-activation-direction=\"right\">…</div> aka getByRole('tabpanel', { name: 'Materiais' })\n\nCall log:\n\u001b[2m  - Expect \"toBeFocused\" getByRole('tabpanel') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole(",
+                "sha256": "253a27f60702e994c2210fddaf93f365f4e932d4149d7935e1896fc83bcec7c6"
+              }
+            ]
+          },
+          {
+            "title": "Abas conservam conferência ENT não salva e recuperam seleção por URL e histórico sem conceder auditoria",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 405,
+              "column": 5
+            },
+            "duration": 11005,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "PDF recupera intenção após resposta inválida, mantém bytes e permite nova emissão explícita",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "pdf-issuance.spec.ts",
+              "line": 48,
+              "column": 5
+            },
+            "duration": 9751,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "PDF recupera intenção após resposta inválida, mantém bytes e permite nova emissão explícita",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "pdf-issuance.spec.ts",
+              "line": 48,
+              "column": 5
+            },
+            "duration": 12590,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 10656,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "COM chegada nova começa vazia e a decisão da parcela conserva quantidades declaradas",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "purchase-receipts.spec.ts",
+              "line": 19,
+              "column": 5
+            },
+            "duration": 13299,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevive à falha de abertura sem duplicar",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "requisition-science.spec.ts",
+              "line": 44,
+              "column": 5
+            },
+            "duration": 15575,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevive à falha de abertura sem duplicar",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "requisition-science.spec.ts",
+              "line": 44,
+              "column": 5
+            },
+            "duration": 18091,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "stock-origins.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "duration": 9272,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "stock-origins.spec.ts",
+              "line": 36,
+              "column": 5
+            },
+            "duration": 13955,
+            "outcome": "expected",
+            "ok": true
+          }
+        ],
+        "reportSha256": "d710c40d58409d495279effd295bce7657ac8d4282f1ec91c0c5d5677f60c592",
+        "artifacts": [
+          {
+            "name": "screenshot",
+            "file": "09bed679324d51c142d83af5e674a44f1e800685.png",
+            "sha256": "f464e0aad7d588ae7d12549077b0ee5e0ea291e802cf54766e4154a58cc99f61",
+            "case": "C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida",
+            "project": "chromium"
+          },
+          {
+            "name": "error-context",
+            "file": "b10800379dbe66bbaa5be016e1810353a7ec8aef.md",
+            "sha256": "8493d05f3dc47282e2afce61e96a339b77d27215f61c8b1b62af78c85664ecb0",
+            "case": "C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida",
+            "project": "chromium"
+          },
+          {
+            "name": "screenshot",
+            "file": "fe2b8e7c63b6c6763a3831030662cc25ea0a89b3.png",
+            "sha256": "7bd73ea9d923c4b6e3f7499a984f7f975b3739170bdac032233ba2cff945e5cb",
+            "case": "C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida",
+            "project": "ios"
+          },
+          {
+            "name": "error-context",
+            "file": "b10800379dbe66bbaa5be016e1810353a7ec8aef.md",
+            "sha256": "8493d05f3dc47282e2afce61e96a339b77d27215f61c8b1b62af78c85664ecb0",
+            "case": "C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida",
+            "project": "ios"
+          },
+          {
+            "name": "Andamento publicado 320",
+            "file": "1521c13853966af6bfe18afca2b004d2700befa9.png",
+            "sha256": "bed5c78693dfdc15d74b37aa6bdd90a5ed2efe1740b4e0dcef3d317f0a7f3655",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "chromium"
+          },
+          {
+            "name": "Andamento publicado 390",
+            "file": "7631b1fc44acf927702615026fd993cb25624e89.png",
+            "sha256": "9676d3425ed2fd8828416f7cbcfa1996e5c92dff131341a26a94836cf46fd241",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "chromium"
+          },
+          {
+            "name": "Andamento publicado 768",
+            "file": "524cef1f518cc3c28c33caf565102ceb8a1d1467.png",
+            "sha256": "9015cd1301b62d12ffbebbb62efe9ffc2947ceb803424cd20904b61619837be7",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "chromium"
+          },
+          {
+            "name": "Andamento publicado 1024",
+            "file": "ae37d0b66f65f4dd343587ff4343f7664bd6eb9e.png",
+            "sha256": "f42499d16be295832765ec6df219f71edf280b870931c3d00ceab34966c885e0",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "chromium"
+          },
+          {
+            "name": "Andamento publicado 1440",
+            "file": "ee34fe298ab23e0ac56e2f040db4055009ab1773.png",
+            "sha256": "5738427a6dba8bfee8bdafa8cb9dc7ebe0d41a56c483faedbb436c8dd00ec18c",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "chromium"
+          },
+          {
+            "name": "Andamento publicado 320",
+            "file": "d759c1e1a0dea3806e17697a5571c4cb1a3b93d6.png",
+            "sha256": "3a31f00e4d776e26c38a5753825a807bd6bda6d87163b79cc2f9b6966881184a",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "ios"
+          },
+          {
+            "name": "Andamento publicado 390",
+            "file": "89dc19d7e6167d915255e1d34ca030660e7a3b7b.png",
+            "sha256": "0159bb6289baeb7aa40b347f593243311f979b16ed250dc5258f3dc164079a24",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "ios"
+          },
+          {
+            "name": "Andamento publicado 768",
+            "file": "b644c0840592370d28b32453e763001e22677114.png",
+            "sha256": "bf9d5190cd64bc9d2aa4cdd1e19f6efa66a2ad2786e6e6041bb779eb13f3fcdc",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "ios"
+          },
+          {
+            "name": "Andamento publicado 1024",
+            "file": "9d384389332b7191ce00b2e264ac9d8de338e126.png",
+            "sha256": "a06bd286df38151915bff54f400c6fba0b1918bbd7efb05ab9267dd1890265cd",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "ios"
+          },
+          {
+            "name": "Andamento publicado 1440",
+            "file": "a7831b3d9145d7426cafd95d70b8316d45185b98.png",
+            "sha256": "c65307100436d1eb6864801ea2ed7e3336fc267af1d66949e86b16479b8d790b",
+            "case": "Andamento conserva rascunho, recupera publicação após reload com a mesma chave e não altera ficha, estoque ou autoria",
+            "project": "ios"
+          },
+          {
+            "name": "abas-modelo-320",
+            "file": "108fd5c6c0e239b150142905471db1b84a800c69.png",
+            "sha256": "1a4b36c0863661023d84d5eb6af67e6a96e65707f349f5c728a5007b34d8c1d2",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-reais-320",
+            "file": "6802d503bcea1208f68d5ecd5ce3227ae95c42a6.png",
+            "sha256": "3a1a67f8541dd402b1f7cb6416db7ca2530fdc837d48b2299b490baeaed14548",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-modelo-390",
+            "file": "f1b0a891debfa640736160426882e36624110b9b.png",
+            "sha256": "ed132873737a1925da992a4b6c48b31a2a592b557eb757ec2ae0d95815cd7e5f",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-reais-390",
+            "file": "ca3b87abdf8a3301404fd654b91c16f7169f3a4c.png",
+            "sha256": "d5f0ed0aee5f11320eba589015bf74dc4a9d76409b0a935ea7e1843f796e8545",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-modelo-768",
+            "file": "9db51f05e0ec0b2ac7028efee280f2c116174889.png",
+            "sha256": "53c23314f7aa07ed6c7dd72bebba60d9dca8da278d836005b2840fbefad1d626",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-reais-768",
+            "file": "956a318190171296b523e6226e0731c93559cfe5.png",
+            "sha256": "67eae508d387819b974a9d446550c55b15bd077c66137973198471e4dd9f137a",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-modelo-1024",
+            "file": "e3d2942a1054a9539f958c1ba695d17dfebc77e6.png",
+            "sha256": "9ea325c7b06e39c1ed9daaa8c0fb48cb94362478acee35ee0220978e1fa19354",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-reais-1024",
+            "file": "8a078e732d0de6bedecb5983031404c935872fba.png",
+            "sha256": "cd0f25c21107508eb57eb15b3b58d136ffc6040bd793a5ecfcb1a0180bb84634",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-modelo-1440",
+            "file": "85a26917a341f88ecbf538b4cc19c0f22d367f94.png",
+            "sha256": "060484a093f4a5dec874f7ae598ebe1c400e8ce272c6072d1495609d9d6d024a",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-reais-1440",
+            "file": "1b3c805414dfc7a127d6db46d825211d51605506.png",
+            "sha256": "9281fe9f103a06e0eff1b8bb2153bd21afb1bf8d60edfadf7fbdf7c464b72604",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "chromium"
+          },
+          {
+            "name": "REQ-abas",
+            "file": "9b3031be291f93aad78e2af292c4c3d40c99c868.png",
+            "sha256": "f65ad87002748883a935eb73643339e186b81cca4784619c9ac11a3ffa95cb7b",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "chromium"
+          },
+          {
+            "name": "COM-abas",
+            "file": "210638d90aa6e85b9b9456c91e874f065b1c61a2.png",
+            "sha256": "d5765927c73267ac11357c6b5a1ac62976d2bea0f20d7266fe9eb16191faa235",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "chromium"
+          },
+          {
+            "name": "ENT-abas",
+            "file": "6d29c338253ba61b34bcd6f2793578cc813b3a0b.png",
+            "sha256": "11e8674e7597abadb0ca8b5ff9bc6197e86e78571feb1c520188a92d632c464a",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "chromium"
+          },
+          {
+            "name": "BAL-abas",
+            "file": "392edbe957b695b6de1d1c848848ab367acdb8a5.png",
+            "sha256": "6128896aefd96abead5e39522b15b349ba90d46074d7fef8fa8e9149739c94e9",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "chromium"
+          },
+          {
+            "name": "abas-modelo-320",
+            "file": "5bbba816fa2a687cd38a3e5bd43e47f1ce757d4c.png",
+            "sha256": "2180ed83a92f06beb520354f2b81bec3f32f74635d52a03db5a0a469fe2d3cb5",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "abas-reais-320",
+            "file": "62b520191f0db9b4322d8878bbd84e1b852e1325.png",
+            "sha256": "c33dd0ce1d0768f83453bb1a34ea70c1fa1d114bce9da9d7f1ea6fe421a13281",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "abas-modelo-390",
+            "file": "0b42735513cd8571c69f89a488ef7b86791a8d40.png",
+            "sha256": "695108ed45765daa824f8a110cff93b126f6cb659b88055568980355c7d80528",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "abas-reais-390",
+            "file": "f09c64ccafdc6628bea67f255136432f28cf542a.png",
+            "sha256": "51873ca09790dd05c39732cd5cef0c8c6090ce91d2073d85eccf5ce49aff8c08",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "abas-modelo-768",
+            "file": "ab4f390c31e7ea7a4a09d6d8d4d7b816d903e8ca.png",
+            "sha256": "023f03abd418dae55ae78a1824c94e0436a2889d1ee806443ad155844189b2a8",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "abas-reais-768",
+            "file": "5f979404e757bb198af239fbf59e2a00f3222c21.png",
+            "sha256": "e3147a89b82b62fffc148d1f5660d41110cdf27534b5a31ef351551ffc39b0f5",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "abas-modelo-1024",
+            "file": "637e0f295422e83fdb04ed51d63f9d39dbe4346d.png",
+            "sha256": "f1fa5622be32251d12d7d0736f55a13ed05716097f301001ecf2da405541f12d",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "abas-reais-1024",
+            "file": "9aff0961dfc6a62865dd2fb1c6504ae6361d213d.png",
+            "sha256": "ec433d6bded7e2ba8a4977620f278d64c75ce0c89000ad91e9ece78447c3ab62",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "abas-modelo-1440",
+            "file": "0c70d061f941ade870a67718329933854f7895c5.png",
+            "sha256": "8a22d600b9ac6f6a74055276cf37be65fde7ed8df4cff2b6786623df3353765c",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "abas-reais-1440",
+            "file": "4ea7585f88942bbd3d770b349524aa3d7706d43e.png",
+            "sha256": "53cbdea65517407495ad3350d4d80d458e587202961d823eac244cc2a8e5becb",
+            "case": "Abas comparam tipografia, espaçamento e navegação fixa ao HTML canônico em cinco larguras",
+            "project": "ios"
+          },
+          {
+            "name": "REQ-abas",
+            "file": "10c6294d32ecdf894897343ffbc6231c31433ed2.png",
+            "sha256": "214438035f1bedc5bb0c80857e5cc32fd8eb6d95c3d921209d6b3c3a811a2c22",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "ios"
+          },
+          {
+            "name": "COM-abas",
+            "file": "7c20db6e91f7f231a6aee55e0ae37329cfb3b413.png",
+            "sha256": "9878e6138b568aa7fb9731a06c806f10fd29282ad8dfd4d1352e537dd60e824a",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "ios"
+          },
+          {
+            "name": "ENT-abas",
+            "file": "711b733d9763b18af4de1fdf4ae447689ed7e235.png",
+            "sha256": "59476963a45d58171b74224ac4e1b5c5cc08975ba20c6093210612cb51b562b9",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "ios"
+          },
+          {
+            "name": "screenshot",
+            "file": "efe9c546e2d10dfe41f7b49ff2fcb9eb9a7039b1.png",
+            "sha256": "dfea1c9bc49bf3842fd3aad0c6ff6442b645adedfc70107edaabea5c3975955c",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "ios"
+          },
+          {
+            "name": "error-context",
+            "file": "a3c90513de6616142f6116c2877bb520e40d45d7.md",
+            "sha256": "bcb528fcb3d3361fc67c5cf446c8707c12ccca4fc1e1b03a388fc302737a4e63",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "ios"
+          },
+          {
+            "name": "P02 dialogue PDF",
+            "file": "4cb68b02b0b5d67182458c5e08f10cad09ac26da.pdf",
+            "sha256": "14679b2adab4d5200a8485fb2465efc622cb4fd958d4972c682a57f30bfc349e",
+            "case": "P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevive à falha de abertura sem duplicar",
+            "project": "chromium"
+          }
+        ]
+      },
+      "hero-recheck": {
+        "stats": {
+          "total": 6,
+          "expected": 6,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "delivery-preparation.spec.ts",
+              "line": 73,
+              "column": 5
+            },
+            "duration": 12924,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "C-FINAL023 ENT recupera consulta sem pedir correção de origem ou quantidade expedida",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "delivery-preparation.spec.ts",
+              "line": 73,
+              "column": 5
+            },
+            "duration": 12784,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 253,
+              "column": 5
+            },
+            "duration": 36990,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 253,
+              "column": 5
+            },
+            "duration": 46909,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "relação REQ para ENT abre fatos de expedição em leitura, recupera consulta e recusa outro paciente",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "task-relations.spec.ts",
+              "line": 20,
+              "column": 5
+            },
+            "duration": 9424,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "relação REQ para ENT abre fatos de expedição em leitura, recupera consulta e recusa outro paciente",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "task-relations.spec.ts",
+              "line": 20,
+              "column": 5
+            },
+            "duration": 11774,
+            "outcome": "expected",
+            "ok": true
+          }
+        ],
+        "reportSha256": "7cd0b5b8121d471b7c5f1f962c817ed4b2f3c1f92a8a197d8d8fbab5e6a123da",
+        "artifacts": [
+          {
+            "name": "REQ-abas",
+            "file": "37eca535f96c94a25af3b88584c5eeab996e9d94.png",
+            "sha256": "0f78c0c1ca6d627594c8164bd4670e90143aa82a625c5a0f925a0b91d5247e86",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "chromium"
+          },
+          {
+            "name": "COM-abas",
+            "file": "210638d90aa6e85b9b9456c91e874f065b1c61a2.png",
+            "sha256": "d5765927c73267ac11357c6b5a1ac62976d2bea0f20d7266fe9eb16191faa235",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "chromium"
+          },
+          {
+            "name": "ENT-abas",
+            "file": "6d29c338253ba61b34bcd6f2793578cc813b3a0b.png",
+            "sha256": "11e8674e7597abadb0ca8b5ff9bc6197e86e78571feb1c520188a92d632c464a",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "chromium"
+          },
+          {
+            "name": "BAL-abas",
+            "file": "392edbe957b695b6de1d1c848848ab367acdb8a5.png",
+            "sha256": "6128896aefd96abead5e39522b15b349ba90d46074d7fef8fa8e9149739c94e9",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "chromium"
+          },
+          {
+            "name": "REQ-abas",
+            "file": "8cc50b32c69343fd37e1defb9ed2d2bc0b4e7793.png",
+            "sha256": "19e6aa968dcb64f0b2ab20e2bbe16183df4425d383c3166f5d7dea9a65c6ed34",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "ios"
+          },
+          {
+            "name": "COM-abas",
+            "file": "7c20db6e91f7f231a6aee55e0ae37329cfb3b413.png",
+            "sha256": "9878e6138b568aa7fb9731a06c806f10fd29282ad8dfd4d1352e537dd60e824a",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "ios"
+          },
+          {
+            "name": "ENT-abas",
+            "file": "711b733d9763b18af4de1fdf4ae447689ed7e235.png",
+            "sha256": "59476963a45d58171b74224ac4e1b5c5cc08975ba20c6093210612cb51b562b9",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "ios"
+          },
+          {
+            "name": "BAL-abas",
+            "file": "5f96f6fac85bdba92bd176897245e460933e94f0.png",
+            "sha256": "33cc4807f611170bf713ab50e7b11bb66d1c67607315e76b4a824f67673eca96",
+            "case": "Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navegação sem novos efeitos",
+            "project": "ios"
+          }
+        ]
+      },
+      "hero-req-initial": {
+        "stats": {
+          "total": 4,
+          "expected": 2,
+          "unexpected": 2,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 497,
+              "column": 5
+            },
+            "duration": 7187,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "summary": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('alert')\nExpected substring: \u001b[32m\"Consulta REQ recusada ou indisponível fictícia\"\u001b[39m\nError: strict mode violation: getByRole('alert') resolved to 2 elements:\n    1) <div role=\"alert\" class=\"hca-banner hca-banner--error\">…</div> aka getByRole('alert').filter({ hasText: 'Consulta REQ recusada ou' })\n    2) <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\"></div> aka locator('[id=\"__next-route-announcer__\"]')\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('alert') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('alert')\u001b[22m\n\n\n  523 |     await refresh.focus();\n  524 |     await refresh.press(\"Enter\");\n> 525 |     await expect(page.getByRole(\"alert\")).toContainText(\n      |                                           ^\n  526 |   ",
+                "sha256": "e87257ae1814ba9e84435974876d3922f5cf3a7f984a304dbe44bd334517136f"
+              }
+            ]
+          },
+          {
+            "title": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 497,
+              "column": 5
+            },
+            "duration": 6839,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "summary": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('alert')\nExpected substring: \u001b[32m\"Consulta REQ recusada ou indisponível fictícia\"\u001b[39m\nError: strict mode violation: getByRole('alert') resolved to 2 elements:\n    1) <div role=\"alert\" class=\"hca-banner hca-banner--error\">…</div> aka getByRole('alert').filter({ hasText: 'Consulta REQ recusada ou' })\n    2) <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\"></div> aka locator('[id=\"__next-route-announcer__\"]')\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" getByRole('alert') with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('alert')\u001b[22m\n\u001b[2m    - locator resolved to <div role=\"alert\" aria-live=\"assertive\" id=\"__next-route-announcer__\"></div>\u001b[22m\n\u001b[2m    - unexpected value \"\"\u001b[22m\n\n\n  523 |     await refresh.focus();\n  524 |     await refr",
+                "sha256": "624dd4c0af4ebc1f174fe2c682329b799d342e3b207160390de4ed8b0e298200"
+              }
+            ]
+          },
+          {
+            "title": "P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevive à falha de abertura sem duplicar",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "requisition-science.spec.ts",
+              "line": 44,
+              "column": 5
+            },
+            "duration": 17055,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevive à falha de abertura sem duplicar",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "requisition-science.spec.ts",
+              "line": 44,
+              "column": 5
+            },
+            "duration": 19273,
+            "outcome": "expected",
+            "ok": true
+          }
+        ],
+        "reportSha256": "f8d94ebae93870c66b82bd75f395309c1037b37af3671e4b21e28706cfbe4a01",
+        "artifacts": [
+          {
+            "name": "screenshot",
+            "file": "c80466d9e646126f09db18d660f049fba4eff065.png",
+            "sha256": "74c5b7349cbf1add4aa0a7b0412c86a2c57694bd07149929a6ee0863c31233d8",
+            "case": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+            "project": "chromium"
+          },
+          {
+            "name": "error-context",
+            "file": "e4ff4b3058201c761e33803432a6c71b3037754b.md",
+            "sha256": "b282192bbb053d4cc0a1b983065e532da02919d158029e133d4423238bbb3a23",
+            "case": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+            "project": "chromium"
+          },
+          {
+            "name": "screenshot",
+            "file": "eea803700396986c23f4bef0907985836869175a.png",
+            "sha256": "6bece3f627220e351bb01c887ff11e2e38ff32b3a420d12e165399dad7f882e4",
+            "case": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+            "project": "ios"
+          },
+          {
+            "name": "error-context",
+            "file": "935236c71b141b48a3270aad1afe201a66369fe1.md",
+            "sha256": "f1461d57e32111fe1ff5a99b307bd5dc70afa4154b23adc4fb0515848c016b09",
+            "case": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+            "project": "ios"
+          },
+          {
+            "name": "P02 dialogue PDF",
+            "file": "ea365c4e5ad1a4236fac421fb26b911f4c28131d.pdf",
+            "sha256": "765200d380c83b794bd2b55c565d134cdf984f847a4c0c01789c9f674d0a7657",
+            "case": "P02 diálogo antecede conteúdo, voltar é inerte e SCI confirmada sobrevive à falha de abertura sem duplicar",
+            "project": "chromium"
+          }
+        ]
+      },
+      "hero-req-final": {
+        "stats": {
+          "total": 2,
+          "expected": 2,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 497,
+              "column": 5
+            },
+            "duration": 7460,
+            "outcome": "expected",
+            "ok": true
+          },
+          {
+            "title": "REQ retira conteúdo recusado e conserva foco de recuperação sem alterar fatos documentais",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "document-tabs.spec.ts",
+              "line": 497,
+              "column": 5
+            },
+            "duration": 7820,
+            "outcome": "expected",
+            "ok": true
+          }
+        ],
+        "reportSha256": "c68fbd40dc8916a91ae92fcd378d31991da331ede8a99d1d1de630015c2a2eea",
+        "artifacts": []
+      }
+    }
+  },
+  "logsSha256": {
+    "hero-unit-final.log": "44d91236b0517d3a8fc09d29ebcb7222bbaa16184c7c54646c0efc51ef7e1fd5",
+    "hero-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hero-req-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "hero-build-counterproof.log": "f06bc6b52e819d43e1756b4596cff5639417849c08d7867fa1eb41d4e829a429",
+    "hero-types-counterproof.log": "dec76bfcbc876559f369032b9fb60b2d70bb6407cb3729c64ce563267fad3070",
+    "hero-req-build-counterproof.log": "b9d8805d05d0d5590367c9fa427b184a6b36ae320a654b533e7f0dcd6c3ced9e",
+    "hero-req-types.log": "1e0063534309c5f752c8ab0127f35e973da7a5b57afe45454a786b3ce07e1ad1"
+  },
+  "types": "Official production E2E runner build; initial test-oracle type failures are counterproofs, not executed browser cases",
+  "observation": {
+    "assembledAt": "2026-11-09 11:52:48 UTC",
+    "sha": "9ad124b5101483cdc7483328ed2e3d87ab31f158",
+    "ci": {
+      "runId": 42606424039,
+      "note": "Captured earlier in this increment; does not approve new sources.",
+      "jobs": [
+        {
+          "id": 129123483545,
+          "name": "validate (windows-latest)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 129123483691,
+          "name": "validate (ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 129123483844,
+          "name": "database",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 129131441872,
+          "name": "browser (mobile)",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "id": 129131441968,
+          "name": "browser (ios-1)",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "id": 129131441979,
+          "name": "browser (chromium)",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "id": 129131441988,
+          "name": "browser (ios-2)",
+          "status": "in_progress",
+          "conclusion": null
+        }
+      ]
+    },
+    "preview": {
+      "id": "dpl_Ewdf8LNuu1NbxUmZFxtVUnZ3qKHR",
+      "state": "READY",
+      "url": "https://home-care-assistant-7776j13q4-rmzzfajs-projects.vercel.app"
+    },
+    "database": {
+      "project": "qwfrqychokvhdzakibid",
+      "local": 165,
+      "remote": 165,
+      "last": "20261109091550",
+      "versionsSha256": "8d7a2e0d48bd9705fa90ca5d48415162f0fbb111326425ce6dc7657d59f6a5a2",
+      "pending": 0,
+      "newSql": 0,
+      "remoteReadOnly": true
+    }
+  },
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30ColumnsUnchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "apiRpcSqlChanges": 0,
+    "originalHtmlSha256": "2f66791f0a9f8fc19ef1a021bdcce8a1bcca25264641fecddb4d4391a0ace9ff"
+  },
+  "qualifiedReuse": [
+    "Factual milestone percentage adds line counts only; seven units and actual partial REQ/ENT relation verify it",
+    "Header refresh changes are verified by original ENT recovery and new REQ denied-read cases in both engines",
+    "REQ read guard changes are verified by P02 dialogue and actual UI recovery from controlled503/403 responses; they do not replace existing real Auth/RLS proofs",
+    "Passed visual comparison and unaffected PDF/progress/stock/receipt behavior reused only for unchanged paths; all final source hashes are listed",
+    "No mutation suites ran alongside E2E"
+  ],
+  "limits": [
+    "Full secondary action organization, record/screen parity and66/171 reconciliation remain pending",
+    "Emulation is not human/AT/Android physical-device approval",
+    "No new signature, provider, backup or monitoring approval",
+    "Own published SHA CI remains required"
+  ],
+  "documentation": {
+    "markdownFiles": 6,
+    "localLinksChecked": 285,
+    "markdownLogSha256": "095c6c2ce2b81b497ecb878ccfcc5fcdbee4fb9114bb86290e9058285ba948f8"
+  }
+}

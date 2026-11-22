@@ -4,15 +4,12 @@ import { Suspense, type ReactNode } from "react";
 import { headers } from "next/headers";
 import { safeReturnPath } from "@/lib/safe-return-path";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { PageLoadingActivity } from "@/components/ui/operation-activity";
 
 export function AuthenticatedPage({ children }: { children: ReactNode }) {
   return (
     <Suspense
-      fallback={
-        <main className="p-6" role="status">
-          Validando acesso…
-        </main>
-      }
+      fallback={<PageLoadingActivity title="Validando acesso" detail="Estamos verificando sua sessão." />}
     >
       <SessionGate>{children}</SessionGate>
     </Suspense>

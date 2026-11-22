@@ -1,0 +1,23 @@
+.hca-profile { min-width: 0; }
+.hca-profile-panel { display: grid; gap: 16px; min-width: 0; }
+.hca-profile-panel[hidden] { display: none; }
+.hca-profile-panel .hca-settings-section { padding: 21px; }
+.hca-profile-panel .hca-settings-section > h2 { font-size: 19px; font-weight: 700; line-height: 1.35; }
+.hca-profile-panel .hca-settings-summary { margin: 7px 0 0; padding: 0; font-size: 12px; color: var(--hca-muted); }
+.hca-profile-panel .hca-settings-content { padding: 0; margin-top: 19px; }
+.hca-profile-panel .hca-settings-content > p { font-size: 13px; }
+.hca-profile-panel .hca-settings-content > p + p { margin-top: 10px; }
+.hca-profile-panel .hca-settings-content > button { margin-top: 16px; }
+.hca-profile-panel label { font-size: 12px; font-weight: 650; }
+.hca-profile-panel label .ui-input, .hca-profile-panel label .hca-text-input { font-weight: inherit; }
+.hca-profile-devices { margin-top: 19px; }
+.hca-profile-device { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 14px; padding: 18px 0; align-items: start; border-top: 1px solid var(--hca-line); }
+.hca-profile-device > .hca-icon { color: var(--hca-teal); margin-top: 4px; }
+.hca-profile-device h3 { font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.hca-profile-device p { color: var(--hca-muted); font-size: 12px; margin-top: 5px; }
+.hca-profile-device-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; max-width: 330px; }
+@media (max-width: 850px) {
+  .hca-profile-device { grid-template-columns: 30px minmax(0, 1fr); gap: 10px; }
+  .hca-profile-device-actions { grid-column: 2; justify-content: flex-start; max-width: none; }
+}
+@media (max-width: 850px) { .hca-profile-panel .hca-settings-section { padding: 17px; } }

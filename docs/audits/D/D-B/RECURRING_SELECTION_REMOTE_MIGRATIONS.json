@@ -1,0 +1,39 @@
+{
+  "status": "APPLIED_AND_POST_VALIDATED",
+  "at": "2026-11-08T18:32:11.771Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": 153,
+  "after": 155,
+  "pending": 0,
+  "historySqlMatched": 155,
+  "restoredUpgradedCatalogueExactExceptDocumentedRestoreAlias": true,
+  "preservation": {
+    "oldTables": 151,
+    "allOldStableDigestsExact": true,
+    "oldColumnsProjectedOut": [],
+    "onlyNewHistoryRowsComparedSeparately": true,
+    "volatileClockDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "newTableRows": {
+      "commands": 0,
+      "selections": 0
+    },
+    "cronUnchanged": true,
+    "vaultUnchanged": true,
+    "storagePoliciesUnchanged": true
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0
+  },
+  "noReset": true,
+  "noRemoteFixtureOrAuthCreated": true,
+  "noExternalTransportActivation": true,
+  "operationalGo": false
+}

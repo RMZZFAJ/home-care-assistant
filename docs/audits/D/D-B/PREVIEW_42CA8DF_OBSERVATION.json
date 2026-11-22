@@ -1,0 +1,28 @@
+{
+  "at": "2026-11-08T01:19:36.203Z",
+  "startedAt": "2026-11-08T01:19:15.294Z",
+  "sha": "42ca8dfa888ca89e3bdf69af8f3fa2896255bef8",
+  "deployment": "https://home-care-assistant-rg1mr5e92-rmzzfajs-projects.vercel.app",
+  "ready": true,
+  "results": [
+    {
+      "name": "runtime",
+      "status": 200,
+      "body": {
+        "state": "ready",
+        "protocol": 1,
+        "schema": 1
+      }
+    },
+    {
+      "name": "private",
+      "status": 401,
+      "code": "SESSION_EXPIRED",
+      "noApplicationSession": true
+    }
+  ],
+  "applicationAuthCreated": false,
+  "remoteBusinessFixtureCreated": false,
+  "sharedBypassLinkCreated": false,
+  "operationalGo": false
+}

@@ -1,0 +1,58 @@
+{
+  "sourceBaseSha": "fee8bfecea50958c4f968488e96f2eb999e9cf54",
+  "stage": "PASS_ISOLATED_LEGACY_RESTORE_AND_READY_REFERENCE_COVERAGE; operations incomplete",
+  "implementation": [
+    "Probe compares every ready private.pdf_issuances reference with authenticated captured Storage SHA",
+    "to_regclass check avoids parsing a missing table in pre-D-B backups",
+    "Unfinished intentions do not require nonexistent ready bytes; ready files are mandatory",
+    "Counters distinguish total PDF digests and signed issuance digests"
+  ],
+  "sqlRegression": {
+    "passed": 1,
+    "isolatedDatabaseOnExistingLocalContainer": true,
+    "sourceDataUnchanged": true,
+    "checks": [
+      "Legacy schema without issuance table accepted",
+      "Ready signed bytes missing rejected",
+      "Ready signed bytes matching accepted",
+      "Uncertain intention without upload excluded",
+      "Altered signed bytes digest rejected",
+      "No pg_cron or pg_net extension"
+    ],
+    "log": "output/phase-d-work/ops-ready-pdf-coverage.log"
+  },
+  "actualLegacyRestore": {
+    "backupId": "e3c45e45-b4b7-45fd-b58d-666bca46f992",
+    "manifestSha256": "964a7be1124fdb93479e16dc98631000d51237b3720be4753ff3122cd8f80fce",
+    "protectedExternalDestination": true,
+    "ownerAclRestricted": true,
+    "sourceDatabaseUnchanged": true,
+    "restoredTables": 122,
+    "stableTableDigestsMatched": true,
+    "foreignKeysChecked": true,
+    "storageObjectsVerified": 29,
+    "pdfDigestsVerified": 28,
+    "signedIssuanceDigestsVerified": 0,
+    "cronEnabled": false,
+    "networkExtensionEnabled": false,
+    "seconds": 4.702,
+    "operationalRecoveryGate": "D6_NOT_SATISFIED_BY_THIS_PROBE"
+  },
+  "lint": "PASS output/phase-d-work/ops-ready-pdf-lint.log",
+  "sourceLfSha256": {
+    "scripts/restore-backup-probe.mjs": "0898bab702195b8efee4ff69f51397a5dd9a761e9f66c19352220a175c987a56",
+    "tests/integration/backup-pdf-coverage.test.mjs": "d79b408e40499470922ce37bab52946578e7c9808636f67534941f29db450f17"
+  },
+  "logLfSha256": {
+    "ops-ready-pdf-coverage.log": "783d2e7846d0f98657e65feedf26093c365470fd66044133d03646547b10e743",
+    "ops-ready-pdf-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ops-ready-pdf-legacy-restore.json": "8943a213df7987afadbf185472baede549cc5c3def1545b8f20500c7ce0056ec"
+  },
+  "limits": [
+    "Ready reference SQL regression is controlled; no claim of full signed production dataset restoration",
+    "Original encrypted remote capture predates D-B and has zero signed issuance rows",
+    "4.702s probe duration is not operational RTO; RPO/RTO24h/8h remain D6 targets",
+    "Daily scheduling7+4 retention, independent external destination, signing key recovery and monitoring remain pending",
+    "No remote change/reset/deploy/merge; local141 remote121; PR Draft production NO-GO"
+  ]
+}

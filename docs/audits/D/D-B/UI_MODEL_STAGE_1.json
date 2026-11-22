@@ -1,0 +1,782 @@
+{
+  "at": "2026-11-09T07:18:49.590488+00:00",
+  "baseSha": "25d1b708dd54262a77d8d97cd994b5d26ab3203c",
+  "canonicalHtml": {
+    "path": "Home_Care_Assistant_Modelo_Integral.html",
+    "bytes": 222275,
+    "sha256": "2f66791f0a9f8fc19ef1a021bdcce8a1bcca25264641fecddb4d4391a0ace9ff",
+    "externalReferences": 0,
+    "embeddedInventorySurfaces": 58,
+    "runtimeImportedDemoData": false
+  },
+  "sourceLfSha256": {
+    "src/app/canonical-ui.css": "85c4b4de38a7058c0ebe66c04d0a62dfd7b1c9804d5ce7b7952c0f56e3cac279",
+    "src/app/design-system.css": "287f95819f8ad4668c0a03e21d5c787330276f379fd791cd7034222c45981870",
+    "src/app/layout.tsx": "f651415c369463ffe36f572708694000b4093e80c947111983150710d3ae3fcf",
+    "src/theme/tokens.css": "0b74c4413712604a4edaf04f5484045df4b9ae90bbb1ea3f6efacbd325c9c5af",
+    "src/components/ui/icon.tsx": "31979fc9dbcdcae0ecced438b9f489c6df24e27690bc4f709ce01c030097f4a5",
+    "src/components/ui/overlays.tsx": "092c2701b697eea18b14eba74e64797e17fd50113b65004894f9c9700c085821",
+    "src/components/ui/primitives.tsx": "2f14fa8e4ee473e1035a54d6e9616cefa2772a2bdea428e8143838b472d62880",
+    "src/components/forms/record-drawer.tsx": "1a0a97e1cbda443132a4e4175a4717c52784820ca297fa382362c339d0e439d9",
+    "src/components/forms/settings-section.tsx": "761f1cd3f1b5b1edbc97b13acc1fc6f88d856c732a403454938e895641378a38",
+    "src/components/layout/workspace-shell.tsx": "dcdd123fb966b5f968364499f4577c30e528652d106cb2302ab7e706c8fc00bb",
+    "src/components/navigation/workspace-navigation.tsx": "f2f65d98d36701ffc7cf01a837b16da2695952d3e3fa564c7318b30c5fcb4e33",
+    "next.config.ts": "dab49964ff7ce0a78e77cf3096446288112a2cce11b1a29c09704be46dff0f56",
+    "package.json": "113a688f63893365f77095a087ae96d5757fb2acf9bb2b97cb6428fdbc799b61",
+    "package-lock.json": "4f656dc2b6c56b30a4170aceeb63cb4b128d4feef64a8f651c2aabf00829a75c",
+    "tests/e2e/canonical-foundation.spec.ts": "ae7f01b6b5c0ae9dcb228d7096064305bfddaa63f742f3bc02a0bad525f3d884",
+    "tests/e2e/purchase-receipts.spec.ts": "9c1c23303c0133d3a205ce521acc7101826f09d38153ab8046cbaf9a5b4b9fc9"
+  },
+  "validation": {
+    "productionBrowserPassed": 12,
+    "cohorts": {
+      "drawerAndRead": 6,
+      "canonicalComparison": 2,
+      "REQAndCOM": 4
+    },
+    "engines": [
+      "chromium",
+      "ios"
+    ],
+    "canonicalModalWidths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "canonicalModalStyleComparisons": 10,
+    "canonicalModalAxeScans": 10,
+    "prototypeAndProductImages": 20,
+    "forcedColorsAndReducedMotion": "keyboard proof in both projects",
+    "scope": "Shared foundation only;not full-system comparison or physical device/AT proof",
+    "typecheck": "PASS",
+    "directedLint": "PASS"
+  },
+  "comparisonImages": {
+    "canonical-reference-320-fa67bf51a8.png": {
+      "name": "canonical-reference-320",
+      "sha256": "fa67bf51a8cd1a90db66184480ec6fbd39130ae5c65ae792b10c9b4076d6ace5",
+      "bytes": 171085
+    },
+    "current-modal-320-b4799bc270.png": {
+      "name": "current-modal-320",
+      "sha256": "b4799bc270b5fc243fc8e6c1acb988661dcb0eef4ee4e96254028349618e45d2",
+      "bytes": 171040
+    },
+    "canonical-reference-390-0bda3b95b3.png": {
+      "name": "canonical-reference-390",
+      "sha256": "0bda3b95b3a73c7892c1bda3336cb169f62dcd620005bfd9be62e9ad0c0fbde9",
+      "bytes": 170104
+    },
+    "current-modal-390-b92b6476e8.png": {
+      "name": "current-modal-390",
+      "sha256": "b92b6476e822c728a7b3fdba6670a3d6a2f23466a1bb029fc44d87ee6f08ba4f",
+      "bytes": 163688
+    },
+    "canonical-reference-768-7cea300a77.png": {
+      "name": "canonical-reference-768",
+      "sha256": "7cea300a775a0a006e9f4c05636aa6576fc157452c725ea1b0a3c08797b4c3d9",
+      "bytes": 206954
+    },
+    "current-modal-768-27f4fc6f02.png": {
+      "name": "current-modal-768",
+      "sha256": "27f4fc6f02099fd4deeb82bdf27f3e64f315e78ac58f887032fd6278eb018d32",
+      "bytes": 190339
+    },
+    "canonical-reference-1024-865b784de6.png": {
+      "name": "canonical-reference-1024",
+      "sha256": "865b784de6955c7f0a7b3acad0e71da74d6b28dbdb7a1705302008c64531f239",
+      "bytes": 277705
+    },
+    "current-modal-1024-1b739c172f.png": {
+      "name": "current-modal-1024",
+      "sha256": "1b739c172f53662a145970e4db0ec25f6ee818f70c885373560bd57c13ea0ec1",
+      "bytes": 211829
+    },
+    "canonical-reference-1440-7f0d34163e.png": {
+      "name": "canonical-reference-1440",
+      "sha256": "7f0d34163e375218a3585e7a7b09d205fc3863357a4f151d748244d7ec0b6dba",
+      "bytes": 323413
+    },
+    "current-modal-1440-99813edba1.png": {
+      "name": "current-modal-1440",
+      "sha256": "99813edba18b52c813a5146a5df0386590baded0bd3145e90299dbed56cce85a",
+      "bytes": 223266
+    },
+    "canonical-reference-320-86185fc59e.png": {
+      "name": "canonical-reference-320",
+      "sha256": "86185fc59e0f88236c46e115c3622ec9b762f899519d8fb0fce4de66fcf4fa07",
+      "bytes": 675910
+    },
+    "current-modal-320-d8c9af7bf9.png": {
+      "name": "current-modal-320",
+      "sha256": "d8c9af7bf90d1279178bde2d3e3bfc7c1040395a7e86c43cd79fc6451acdfa01",
+      "bytes": 406854
+    },
+    "canonical-reference-390-23b03bd744.png": {
+      "name": "canonical-reference-390",
+      "sha256": "23b03bd744eaef84fded466b22dc0c18ac4d0914ba80701f35403b09c964ab05",
+      "bytes": 649864
+    },
+    "current-modal-390-1d0e5395b7.png": {
+      "name": "current-modal-390",
+      "sha256": "1d0e5395b707e179adc08f27c64686006b01df9097727d7d6d6cca097028bdae",
+      "bytes": 415208
+    },
+    "canonical-reference-768-8594f25cb6.png": {
+      "name": "canonical-reference-768",
+      "sha256": "8594f25cb693b24396a24718572a5a8e4b5a0884cfa643b3a7c07773be79a89e",
+      "bytes": 678058
+    },
+    "current-modal-768-20fa7ce299.png": {
+      "name": "current-modal-768",
+      "sha256": "20fa7ce299dcdf4d62aa594cd1ba9dd57102627bbf1476d80a0c832f0fdcbaf9",
+      "bytes": 535268
+    },
+    "canonical-reference-1024-78faae2207.png": {
+      "name": "canonical-reference-1024",
+      "sha256": "78faae220723863d552e25c0244a6332e844f51020a35b667845863c62e36e93",
+      "bytes": 801173
+    },
+    "current-modal-1024-eb7e2391b6.png": {
+      "name": "current-modal-1024",
+      "sha256": "eb7e2391b655692e0a14f0239763c38ee5f61ad4c8e80af52b00aedf8c262cb8",
+      "bytes": 584810
+    },
+    "canonical-reference-1440-58d696de76.png": {
+      "name": "canonical-reference-1440",
+      "sha256": "58d696de76609afba06e9fee330a021265c46ca3cba1c7d9e38b61c1eb7d80d5",
+      "bytes": 940739
+    },
+    "current-modal-1440-758cbcff79.png": {
+      "name": "current-modal-1440",
+      "sha256": "758cbcff7917d7a41d866bf3743a35e71308061f21d389af2ab8197af0d3200a",
+      "bytes": 635170
+    }
+  },
+  "logLfSha256": {
+    "overlays-e2e.log": "4299ca0b10855414c12ad96dd03bcdf9b21f2048d48724494f26c2ada3b083c1",
+    "canonical-visual-first.log": "250baeaf8f658652431b6566d933fb4739d823585f60dc5fbf133f297dba5eee",
+    "canonical-visual-navigation-fixture.log": "c5465c18015d799bb6f83b5301ffb919cc6e61701f006cf67b75f82bae8da28e",
+    "canonical-visual-final.log": "6318c263028500480faa9375be765f895bf57e817ecf0795890d57782c7755ef",
+    "consumers-contrast-failure.log": "5a97645f2ebd908a467141aa6ee4fa1f5575b4802ce43aeb4d76a2cfb4a9d0af",
+    "consumers-e2e-recheck.log": "d3a62e46f6d836b7105b9ce3840c3601dab21c8c215e6cb69c9fda87944619bc",
+    "types-stage-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lint-consumers-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "counterproofs": [
+    "Removed six legacy step-button rules after actual contrast1.11 failure;Axe unchanged,consumer repeat4/4 PASS.",
+    "Initial visual instrument assumed focus-visible after programmatic focus without foreground/keyboard;updated to actual keyboard.",
+    "Navigation instrument originally tried professional hidden drawer;now tests global account in separate authenticated context without changing actor or permissions.",
+    "Purchase badge selector uses accessible status text instead of Fluent internal class;geometry and business assertions unchanged."
+  ],
+  "initialFailureArtifacts": {
+    "output\\phase-d-work\\ui-canonical\\contrast-failure\\test-failed-1.png": "01fc1e471c632a5b63c1a88221d410c0e01516573404082877bf96f9af27a129",
+    "output\\phase-d-work\\ui-canonical\\first-visual-check\\test-failed-1.png": "9a6b0d75a80cc93b2dae120f5792266322caf6e90ae157aacadda68caab02365",
+    "output\\phase-d-work\\ui-canonical\\first-visual-check\\test-failed-2.png": "1201b6acb8828f1e5884c54933edeab80a447aaed4d2b46a0daa3f9058d0c547"
+  },
+  "reactReview": {
+    "headlessSharedOverlayWithStableIdentity": true,
+    "nativeStatesAndControls": true,
+    "iconPathsFromCanonicalSource": true,
+    "existingDirtyAndUncertainCommandsPreserved": true,
+    "noPrivateCacheOrOfflineReplayAdded": true,
+    "noEffectsOrWaterfallAdded": true
+  },
+  "remainingFluentImports": [
+    {
+      "file": "src/components/admin/admin-fields.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Checkbox",
+        "Field as FluentField",
+        "Input",
+        "Select",
+        "type InputProps"
+      ]
+    },
+    {
+      "file": "src/components/admin/administration-navigation.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Menu",
+        "MenuItemLink",
+        "MenuList",
+        "MenuPopover",
+        "MenuTrigger",
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/admin/audit-history.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Field",
+        "Input",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/admin/catalogue-management.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Badge",
+        "Button",
+        "Field as FluentField",
+        "Input",
+        "Select",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/components/admin/credential-review.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Checkbox",
+        "Field",
+        "Select",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/admin/global-accounts.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Badge",
+        "Button",
+        "Field as FluentField",
+        "Input",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/admin/governance-proposals.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Field",
+        "Input",
+        "Select",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/components/admin/membership-impact.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/admin/membership-management.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Badge",
+        "Button",
+        "Field as FluentField",
+        "Input",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/admin/notification-matrix.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Checkbox",
+        "Input",
+        "Select",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow",
+        "Tooltip"
+      ]
+    },
+    {
+      "file": "src/components/admin/permission-matrix.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Badge",
+        "Button",
+        "Input",
+        "Menu",
+        "MenuItemRadio",
+        "MenuList",
+        "MenuPopover",
+        "MenuTrigger",
+        "Select",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/components/admin/policy-console.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/admin/policy-rules.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Checkbox",
+        "Field",
+        "Input",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/app-shell.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Input",
+        "MessageBar",
+        "MessageBarBody",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/auth/login-form.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Field",
+        "Input",
+        "MessageBar",
+        "MessageBarBody",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/auth/logout-button.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "MenuItem"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-console.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Badge",
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-count-fields.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Field",
+        "Input",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-count-wizard.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "ProgressBar",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-forms.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Checkbox",
+        "Field",
+        "Input",
+        "Select",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/balances/balance-recount-assignment.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Combobox",
+        "Field",
+        "Option",
+        "Spinner",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/catalog/catalogue-identity-management.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/catalog/presentation-management.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/catalog/unit-console.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Input",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/components/dashboard/dashboard-summary.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "ProgressBar"
+      ]
+    },
+    {
+      "file": "src/components/dashboard/task-list.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Badge"
+      ]
+    },
+    {
+      "file": "src/components/dashboard.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/documents/balance-review.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/documents/delivery-inbox.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Select",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/documents/delivery-recipient.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/documents/delivery-regularization.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/documents/presentation-quantity.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/documents/supply-command-fields.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "useMergedRefs"
+      ]
+    },
+    {
+      "file": "src/components/documents/transfer-console.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Combobox",
+        "Field",
+        "Input",
+        "Option",
+        "Select",
+        "Spinner",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/documents/transfer-details.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Field",
+        "Spinner",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/forms/creation-draft-panel.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/forms/settings-section.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/forms/wizard-actions.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/guides/residence-preparation.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Avatar",
+        "Button",
+        "MenuDivider",
+        "MenuItem",
+        "MenuItemRadio",
+        "MenuList",
+        "Popover",
+        "PopoverSurface",
+        "PopoverTrigger",
+        "Select"
+      ]
+    },
+    {
+      "file": "src/components/notifications/notification-bell.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Popover",
+        "PopoverSurface",
+        "PopoverTrigger"
+      ]
+    },
+    {
+      "file": "src/components/notifications/notification-center.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Badge",
+        "Checkbox"
+      ]
+    },
+    {
+      "file": "src/components/notifications/notification-reference.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/requisitions/recurring-selection.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/requisitions/remaining-need-reference.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/schedules/schedule-console.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Badge",
+        "Button",
+        "Field",
+        "Input",
+        "Select",
+        "Spinner",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/schedules/schedule-forms.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Checkbox",
+        "Field",
+        "Input",
+        "Select",
+        "Textarea"
+      ]
+    },
+    {
+      "file": "src/components/schedules/selected-shift-dates.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/consumption-console.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/consumption-decision.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/consumption-detail.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/consumption-editor.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Combobox",
+        "Option"
+      ]
+    },
+    {
+      "file": "src/components/stock/movement-origin.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button",
+        "Spinner"
+      ]
+    },
+    {
+      "file": "src/components/stock/stock-console.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Button"
+      ]
+    },
+    {
+      "file": "src/components/stock/stock-overview.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "Badge",
+        "Button",
+        "Table",
+        "TableBody",
+        "TableCell",
+        "TableHeader",
+        "TableHeaderCell",
+        "TableRow"
+      ]
+    },
+    {
+      "file": "src/theme/providers.tsx",
+      "module": "@fluentui/react-components",
+      "imports": [
+        "createDOMRenderer",
+        "FluentProvider",
+        "RendererProvider",
+        "renderToStyleElements",
+        "SSRProvider",
+        "webLightTheme"
+      ]
+    }
+  ],
+  "acceptance": {
+    "legacyRows": 105,
+    "legacyColumns": 39,
+    "first30Preserved": true,
+    "legacyCounts": {
+      "PASS": 56,
+      "PARTIAL": 49,
+      "NOT_STARTED": 0
+    },
+    "additionalUiRequirements": 18,
+    "newUiApproved": false
+  },
+  "databaseAndBaseCi": "UI_MODEL_BASE_OBSERVATION.json",
+  "remainingGate": [
+    "56 Fluent consumers/provider/styles/dependency",
+    "full shell/forms/tables/all-role parity",
+    "REQ/COM/ENT/BAL tabs and real persisted Andamentos",
+    "66 compositions/171 relations and full visual comparison",
+    "own SHA CI",
+    "physical/AT/human/provider D-C/D6"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false,
+  "goalComplete": false,
+  "documentationValidation": {
+    "markdown": "PASS;22 files;0 issues",
+    "newLinks": "PASS",
+    "json": "PASS",
+    "matrix": "105x39;first30 columns preserved;additional18 UI requirements and58 consumers",
+    "sql": "No new/edited migration",
+    "html": "Original222275 bytes and SHA256 pinned with -text attribute",
+    "logSha256": "f574be6df9988df108c12046c1902f448f2446f005344c5309162ca796c22923"
+  }
+}

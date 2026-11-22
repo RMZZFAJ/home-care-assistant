@@ -1,0 +1,72 @@
+{
+  "at": "2026-11-08T02:06:15.773Z",
+  "sha": "42ca8dfa888ca89e3bdf69af8f3fa2896255bef8",
+  "run": 42432090406,
+  "url": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42432090406",
+  "jobs": [
+    {
+      "id": 128583006530,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128583006662,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128583006751,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128585896129,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128585896139,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 128585896166,
+      "name": "browser (mobile)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 128585896172,
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 128591643263,
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "failure": {
+    "consumer": "tests/e2e/v4.spec.ts:249",
+    "cause": "Old mocked notifications response omitted waitSeconds and expected the previous fixed-deadline caption.",
+    "scope": "Same contract mismatch in Chromium, mobile and ios-2; ios-1 passed its shard.",
+    "fix": "Mock now includes waitSeconds10 and checks elapsed observation message without claiming processing or delivery.",
+    "localRecheck": "PASS three engines; real consumer retained"
+  },
+  "flaky": {
+    "consumer": "tests/e2e/delivery-cancellation.spec.ts:640",
+    "scope": "mobile source-comparison case, passed retry",
+    "productFixClaimed": false,
+    "localDirectedRecheck": "Mobile/iOS PASS; cold Chromium total30s timeout retained, targeted90s case-budget recheck PASS; per-action15s unchanged; no product fix claimed"
+  },
+  "qualifiedToShaOnly": true,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "pr": "DRAFT_NO_MERGE"
+}

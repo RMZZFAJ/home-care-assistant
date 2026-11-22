@@ -17,6 +17,7 @@ import {
 } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { archiveIntention, sealSignedArchive } from "./document-archive-fixtures.mjs";
 
 test("V4 review: archive rechecks revoked capability after waiting for the patient transaction lock", async () => {
   const { patient, admin, products } = await setup();
@@ -30,6 +31,9 @@ test("V4 review: archive rechecks revoked capability after waiting for the patie
     p_version: ent.version,
   });
   const archiver = await actor("global", patient);
+  const review = await rpc(archiver, "document_archive_reference", { p_document: req.id });
+  assert.equal(review.canArchive, true);
+  const intent = archiveIntention(review, "Tentativa concorrente após revogação");
   const version = (
     await rpc(admin, "patient_governance", { p_patient: patient })
   ).data.version;
@@ -78,16 +82,13 @@ test("V4 review: archive rechecks revoked capability after waiting for the patie
     );
     await until(() => output.includes("archive_lock_ready"));
     archive = archiver
-      .rpc("archive_requisition", {
-        p_id: req.id,
-        p_reason: "Tentativa concorrente após revogação",
-      })
+      .rpc("prepare_document_archive", intent)
       .abortSignal(AbortSignal.timeout(10000))
       .then((result) => result);
     await until(
       () =>
         sql(
-          "select exists(select 1 from pg_stat_activity where datname='postgres' and state='active' and wait_event='advisory' and query like '%archive_requisition%')",
+          "select exists(select 1 from pg_stat_activity where datname='postgres' and state='active' and wait_event='advisory' and query like '%prepare_document_archive%')",
         ) === "t",
     );
     // The SQL bridge uses an actual Auth session, then the same policy RPC as HTTP.
@@ -116,6 +117,7 @@ test("V4 review: archive rechecks revoked capability after waiting for the patie
       (await rpc(admin, "requisition_progress", { p_id: req.id })).archivedAt,
       null,
     );
+    assert.equal(sql(`select count(*) from private.document_archive_attempts where document_id=${sqlLiteral(req.id)}`), "0");
     assert.equal(
       sql(
         "select count(*) from public.document_events where document_id=" +
@@ -153,14 +155,16 @@ test("V4 review: collective science and dashboard archive filters match authorit
     const { patient, admin, products } = await setup(),
       family = await actor("family", patient);
     await policy(admin, patient, {
-      scienceByDispatch: false,
+      scienceByDispatch: true,
       scienceRequired: mode !== "disabled",
-      scienceRequirement: mode === "all" ? "all" : "any",
+      scienceRequirement: "any",
       scienceRoles: [],
       scienceUsers:
         mode === "unassigned" ? [] : [fixtures.adminA.id, fixtures.family.id],
     });
     const req = await issue(patient, [products[0]]);
+    // A persisted legacy ALL remains historical; its effective rule is ANY.
+    if (mode === "all") sql(`update public.requisition_lifecycle set policy=policy||'{"scienceRequirement":"all"}'::jsonb where requisition_id=${sqlLiteral(req.id)};`);
     assert.equal(
       (await rpc(family, "operational_tasks", { p_patient: patient }))
         .sciencePending,
@@ -171,7 +175,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
       assert.equal(
         (await rpc(admin, "operational_tasks", { p_patient: patient }))
           .sciencePending,
-        mode === "all" ? 1 : 0,
+        0,
       );
       assert.equal(
         (
@@ -181,7 +185,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
             p_status: "science_required",
           })
         ).total,
-        mode === "all" ? 1 : 0,
+        0,
       );
       if (mode === "all") {
         assert.equal(
@@ -190,7 +194,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
               sqlLiteral(req.id) +
               " and recipient_user_id=" +
               sqlLiteral(fixtures.family.id) +
-              " and event_key='req.science_recorded' and channel='internal'",
+              " and event_key='req.science_satisfied' and channel='internal'",
           ),
           "1",
         );
@@ -198,11 +202,13 @@ test("V4 review: collective science and dashboard archive filters match authorit
           sql(
             "select count(*) from public.requisition_notifications where document_id=" +
               sqlLiteral(req.id) +
-              " and event_key='req.science_recorded' and channel='whatsapp'",
+              " and event_key='req.science_satisfied' and channel='whatsapp'",
           ),
           "0",
         );
+        assert.equal((await rpc(admin, "requisition_progress", { p_id: req.id })).personalScience, false);
         await acknowledge(admin, req.id);
+        assert.equal((await rpc(admin, "requisition_progress", { p_id: req.id })).personalScience, true);
       }
       assert.equal(
         (await rpc(admin, "operational_tasks", { p_patient: patient }))
@@ -224,7 +230,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
     family = await actor("family", patient),
     pro = await actor("professional", patient);
   await policy(admin, patient, {
-    scienceByDispatch: false,
+    scienceByDispatch: true,
     scienceRoles: ["family"],
     scienceUsers: [],
     archiveDays: 7,
@@ -234,7 +240,7 @@ test("V4 review: collective science and dashboard archive filters match authorit
     const req = await issue(patient, [product]);
     ids.push(req.id);
     if (index === 0) await acknowledge(family, req.id);
-    const ent = await delivery(patient, req, [product]);
+    const ent = await delivery(patient, req, [product], {}, "adminA");
     await rpc(pro, "supply_document_command", {
       p_id: ent.id,
       p_action: "receive",
@@ -298,10 +304,11 @@ test("V4 review: collective science and dashboard archive filters match authorit
     null,
   );
   await archiveCapability(null);
-  await rpc(admin, "archive_requisition", {
-    p_id: ids[0],
-    p_reason: "Arquivamento manual de cenário fictício revisado",
-  });
+  const review = await rpc(admin, "document_archive_reference", { p_document: ids[0] });
+  const reason = "Arquivamento manual de cenário fictício revisado";
+  assert.equal((await admin.rpc("archive_requisition", { p_id: ids[0], p_reason: reason })).error?.code, "PT409");
+  const archived = await sealSignedArchive(admin, archiveIntention(review, reason));
+  assert.ok(archived.issuanceId);
   await issue(patient, [products[0]]);
   tasks = await rpc(admin, "operational_tasks", { p_patient: patient });
   list = await rpc(admin, "operational_document_list", {
@@ -444,7 +451,7 @@ test("V4 review: global membership approval requires intended recipient acceptan
   );
   assert.equal(
     (
-      await rpc(admin, "patient_governance", { p_patient: patient })
+      await rpc(admin, "patient_governance_changes", { p_patient: patient, p_status: "applied", p_query: accepted.id })
     ).changes.find((c) => c.id === accepted.id).status,
     "applied",
   );
@@ -740,7 +747,7 @@ test("V4 review: external queue rejects app-only events and holds unapproved tem
   const draft = await rpc(family, "create_supply_document", {
     p_patient: patient,
     p_type: "COM",
-    p_payload: { lines: [{ productId: products[0], quantity: "1" }] },
+    p_payload: { origin:"purchase", lines: [{ productId: products[0], quantity: "1" }] },
     p_key: randomUUID(),
     p_draft: true,
   });

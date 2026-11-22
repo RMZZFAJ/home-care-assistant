@@ -1,0 +1,51 @@
+{
+  "recordedAt": "2026-11-08T21:48:03.044Z",
+  "sha": "9987804a11d198a114d8ede3c8f0bee703ce55a6",
+  "run": 42524033479,
+  "status": "in_progress",
+  "jobs": [
+    {
+      "id": 128863499030,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128863499291,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128863499376,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128867257885,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 128867257908,
+      "name": "browser (chromium)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 128867257936,
+      "name": "browser (mobile)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 128867257968,
+      "name": "browser (ios-1)",
+      "status": "in_progress",
+      "conclusion": null
+    }
+  ],
+  "qualification": "D4.9 only; does not validate uncommitted D4.10."
+}

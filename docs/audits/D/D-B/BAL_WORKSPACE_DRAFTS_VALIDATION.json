@@ -1,0 +1,424 @@
+{
+  "increment": "D3.44",
+  "baseSha": "33bf6b8348bfc2725c4916476c07c581f927d96c",
+  "sourceLfSha256": {
+    "src/app/api/balances/preparations/commit/route.ts": "f2d0e338f99c7d9b430d1ab8522a3b38614f92b83364a23d65a53d9a112b1613",
+    "src/app/api/balances/preparations/list/route.ts": "72352548befb5d3e2617a68ad751a575adccb547b091f952a518306b30e018fb",
+    "src/app/api/balances/preparations/reference/route.ts": "25b058c60932129216da349d97fefbc00122edb3cb2d2b4c1bd6d1a95fa734ec",
+    "src/app/api/balances/preparations/route.ts": "628f390ee1252d7d2b3339ca07761e7dedba2912bf1f33be9384f67431bc63c0",
+    "src/components/balances/balance-configuration-facts.tsx": "8ddd76abdcbbc922e62541ca43f884f2694be499747ed2af5330d40d240aed56",
+    "src/components/balances/balance-console.tsx": "63f310c0fc7a6db3c499a7f52cb3fc4365620895f56b45e9efac39b67980dc1d",
+    "src/components/balances/balance-forms.tsx": "36a679be45d4bdf1f1a779c86a5e7f5cb08af112ad917201448c5f7ef4da61de",
+    "src/components/balances/balance-preparation-fields.tsx": "64edfc25fd7da81895556550cc1d93b1b385a3c49f45c098f2b263c06b16e48d",
+    "src/components/balances/balance-preparations-list.tsx": "b123e1ecfa89a13d92b3eb8b97f089ca04def7a91f47e6e3f025bf9120f868b9",
+    "src/components/balances/balance-workspace-preparation.tsx": "2b4a8794c0932f84c9f355c7bb1cf78c54338ced11323e2ae8693f9b34c0b15d",
+    "src/components/forms/creation-draft-panel.tsx": "85fb674ba457901394d237e05b0feea1efa97afac066a271dfaa262b20ef5307",
+    "src/components/forms/use-creation-draft.ts": "57d1985caee81f43ff735dabefa0af8993fc5b77a624b6e85fb230318fbf28f0",
+    "src/lib/forms/balance-preparation-purposes.ts": "acbaaebcf51910d15a9aefebb3bed4d24d4e939503dc72fcd916a82f55d41b11",
+    "src/lib/forms/balance-preparation.ts": "99e12e8353dcf8e1edb84ae55fa4398154752ab569f01ed9d958f30cfd6486c4",
+    "src/lib/forms/draft-navigation.ts": "05a53de43d6f6b95e39eed42451b06e92076e3824cfad7322f81257005bc1c12",
+    "src/lib/server/api.ts": "9563f8f5c241a4234fce86751e2b6b37f02fa05c58e1b98e9d74a679f701417c",
+    "src/lib/validation/balance-preparations.ts": "cbc292962d7c8ae745574efd007fbfc8813655c5905f386dab28af98bdfd1137",
+    "src/lib/validation/creation-drafts.ts": "e1110aab0040a3f37b21c5bebf3cb9aa7e0240ef0b15aeb7ab6d91a316e18a80",
+    "src/lib/validation/private-draft-results.ts": "7cf5e7a4b15a727f8a5caed1b274674ddd5240c94a9efb50e2bc4c7dbf68ed0f",
+    "src/lib/validation/supply-drafts.ts": "aa379ccd48c0104ffbcb2a6081c22dda40fb74659121f6d6259cb959483cb2be",
+    "src/types/creation-drafts.ts": "5e56dd451bf7290599ae8e35ae492d62e66957eade882c2a633caa28dff5e722",
+    "supabase/migrations/20261110001316_phase_d3_balance_workspace_preparations.sql": "237338a2169277838fe74493e270c8d6cd4443e70db0816bef571a24a6da0135",
+    "tests/api/balance-preparations-contract.test.ts": "45eabe9a11cbc86c4abb8e4cad6386662113ef72f05fa9f7572a96dfedb6201d",
+    "tests/balance-preparations.test.ts": "785c01b5afe8ab32661e3b5c85d4c5b800784d5f12492ee1b4ece91808dd6a49",
+    "tests/e2e/bal-deferral-decisions.spec.ts": "a085407ca090ed8fe737be9977548a78a6f80ae810f016029fb9b6a089cd7842",
+    "tests/e2e/balance-preparation-steps.ts": "ce937f1d243f2839787c4a8ffd0f266cba856f6995399be0c89094d6201b4115",
+    "tests/e2e/balance-shifts.spec.ts": "fa72a10af72075db9b4abe15eb21079321917a49c2538e33f54680f4195047d0",
+    "tests/e2e/balance-workspace-private-drafts.spec.ts": "39e1d8554bf2af725f951e4bb8e92c6fd56d8f3e316a99d92e30edee86579d35",
+    "tests/integration/balance-preparation-fixtures.mjs": "8f5285f30b7bd9967d11ac3818f32ddd4aed3c9562cb95fd9a2a9022e4aa8a86",
+    "tests/integration/balance-preparations.test.mjs": "12eabb4e99ac4916b4023b095fa380dbccb1015c124f55c6aa6d7f61fd580c38"
+  },
+  "unitAndApi": {
+    "passed": 36,
+    "files": 5
+  },
+  "realAuth": {
+    "distinctPassed": 13,
+    "affectedAssignFixtureRecheckPassed": 1,
+    "cases": [
+      "BAL workspace cannot attach an old native key to a new private preparation;the same private packet still recovers",
+      "BAL private resource targets remain exact beyond the native request page;two intentions have independent cursor slots",
+      "BAL workspace configure:private raw save,real anchor,sealed native decision,one concurrent commit,and personal recovery after write loss",
+      "BAL workspace assign:private raw save,real anchor,sealed native decision,one concurrent commit,and personal recovery after write loss",
+      "BAL workspace request_deferral:private raw save,real anchor,sealed native decision,one concurrent commit,and personal recovery after write loss",
+      "BAL workspace defer:private raw save,real anchor,sealed native decision,one concurrent commit,and personal recovery after write loss",
+      "BAL workspace approve_deferral:private raw save,real anchor,sealed native decision,one concurrent commit,and personal recovery after write loss",
+      "BAL workspace reject_deferral:private raw save,real anchor,sealed native decision,one concurrent commit,and personal recovery after write loss",
+      "BAL workspace two real sessions CAS;foreign owner;material copy;wrong patient and purpose remain rejected",
+      "BAL workspace configure:authority revoked after private journal rolls back native decision and private consumption",
+      "BAL workspace request_deferral:authority revoked after private journal rolls back native decision and private consumption",
+      "BAL workspace approve_deferral:authority revoked after private journal rolls back native decision and private consumption",
+      "BAL workspace fresh reference is sealed;late regime mutation after journal rolls back the native command"
+    ]
+  },
+  "browser": {
+    "latestDistinctPassed": 22,
+    "mobile": 11,
+    "ios": 11,
+    "productionBuildCases": 12,
+    "diagnosticUnchangedLegacyCasesReused": 10,
+    "latestCases": [
+      {
+        "file": "bal-deferral-decisions.spec.ts",
+        "title": "BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria própria e recuperação sem mudar prazo",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-mobile-first",
+        "durationMs": 18383
+      },
+      {
+        "file": "bal-deferral-decisions.spec.ts",
+        "title": "mudança do alvo durante a aprovação conserva a justificativa e o destino congelado, sem aprovar outra versão",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-mobile-focus-partial",
+        "durationMs": 12921
+      },
+      {
+        "file": "bal-document-private-drafts.spec.ts",
+        "title": "BAL review_family retoma entre sessões,compara conflito e referências recusadas,e recupera confirmação exata após perda de escrita",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-mobile-focus-partial",
+        "durationMs": 31783
+      },
+      {
+        "file": "balance-shifts.spec.ts",
+        "title": "BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-mobile-focus-partial",
+        "durationMs": 25897
+      },
+      {
+        "file": "balance-shifts.spec.ts",
+        "title": "supervisão solicita adiamento, família decide e o prazo só muda após a aprovação",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-mobile-focus-partial",
+        "durationMs": 13242
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão configure:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 26881
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão assign:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 21554
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão request_deferral:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 10742
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão defer:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 19350
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão approve_deferral:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 19291
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão reject_deferral:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "mobile",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 20289
+      },
+      {
+        "file": "bal-deferral-decisions.spec.ts",
+        "title": "BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria própria e recuperação sem mudar prazo",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-ios-first",
+        "durationMs": 25470
+      },
+      {
+        "file": "bal-deferral-decisions.spec.ts",
+        "title": "mudança do alvo durante a aprovação conserva a justificativa e o destino congelado, sem aprovar outra versão",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-ios-first",
+        "durationMs": 21465
+      },
+      {
+        "file": "bal-document-private-drafts.spec.ts",
+        "title": "BAL review_family retoma entre sessões,compara conflito e referências recusadas,e recupera confirmação exata após perda de escrita",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-ios-first",
+        "durationMs": 99977
+      },
+      {
+        "file": "balance-shifts.spec.ts",
+        "title": "BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-ios-first",
+        "durationMs": 40998
+      },
+      {
+        "file": "balance-shifts.spec.ts",
+        "title": "supervisão solicita adiamento, família decide e o prazo só muda após a aprovação",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-ios-remaining-failed",
+        "durationMs": 55954
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão configure:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 31673
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão assign:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 31410
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão request_deferral:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 19343
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão defer:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 31503
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão approve_deferral:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 32358
+      },
+      {
+        "file": "balance-workspace-private-drafts.spec.ts",
+        "title": "BAL por plantão reject_deferral:cópia entre sessões,decisão única e recuperação após perda de resposta e escrita",
+        "project": "ios",
+        "outcome": "expected",
+        "cohort": "bal-workspace-stable-recovery-pass",
+        "durationMs": 34263
+      }
+    ],
+    "cohorts": [
+      {
+        "name": "bal-workspace-mobile-first",
+        "stats": {
+          "total": 11,
+          "expected": 1,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 9,
+          "ok": false
+        },
+        "reportSha256": "bcaaa3705c4d1d7d6c8f8e6bc60f945a59eabdac01258be749bd321aac63d292"
+      },
+      {
+        "name": "bal-workspace-mobile-focus-partial",
+        "stats": {
+          "total": 10,
+          "expected": 5,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 4,
+          "ok": false
+        },
+        "reportSha256": "340cb3802fe7f542fd98117187f0da8835468ac6e0f59ec5808b125adabd026c"
+      },
+      {
+        "name": "bal-workspace-mobile-workers-pass",
+        "stats": {
+          "total": 5,
+          "expected": 5,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "reportSha256": "1173eea66b18803b6d6666923ffc07a7a8a4d16d23869700e8990b1177c41646"
+      },
+      {
+        "name": "bal-workspace-ios-first",
+        "stats": {
+          "total": 11,
+          "expected": 4,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 6,
+          "ok": false
+        },
+        "reportSha256": "9cd8d0460aaf2220eb90757051b3c917d676391627bb5a5df36eb32ea3f3ad92"
+      },
+      {
+        "name": "bal-workspace-ios-remaining-failed",
+        "stats": {
+          "total": 7,
+          "expected": 1,
+          "unexpected": 6,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "reportSha256": "79c1a1798dbabf66f0afce8ae748c2fc42e5ca2b6420e90eeab2803dabe7c032"
+      },
+      {
+        "name": "bal-workspace-ios-production-failed",
+        "stats": {
+          "total": 6,
+          "expected": 0,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 5,
+          "ok": false
+        },
+        "reportSha256": "3e89ebdcb6cc292032e23389e7123257cd5272255f71550be81b6680c361d076"
+      },
+      {
+        "name": "bal-workspace-stable-recovery-pass",
+        "stats": {
+          "total": 12,
+          "expected": 12,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "reportSha256": "3d4969bf40be13e7f27e1c2e8990ace626a2f9b020884794fa17eb2fb37a3d03"
+      }
+    ],
+    "sourceFreezeVerified": true,
+    "reuseQualification": "The final production cohort reruns all six new purposes on both engines. Five legacy cases per engine remain unchanged; the multi-user legacy iOS decision passed after receiving the same total case budget as its preceding multi-user case. Per-action/assertion limits remain15s.",
+    "noParallelMutableDatabaseSuite": true
+  },
+  "logs": {
+    "bal-workspace-db-prepare.log": {
+      "lfSha256": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+      "bytes": 209
+    },
+    "bal-workspace-auth-initial.log": {
+      "lfSha256": "ad745f96f00008fea938b62bde72b4a5de532781345b4392f25ef0eae9b6beee",
+      "bytes": 13568
+    },
+    "bal-workspace-auth-final.log": {
+      "lfSha256": "ef9982239afec324b64a9c525a912ef3f075623f4f8720d9cdcd9dd2166ee3be",
+      "bytes": 2011
+    },
+    "bal-workspace-auth-distinct-workers.log": {
+      "lfSha256": "db7c9657531d811745d047d6d09fcd5f52ff78570b382bf6f4a2bf24a70d8d6d",
+      "bytes": 277
+    },
+    "bal-workspace-unit-api-final.log": {
+      "lfSha256": "954a2faf9f865ac441c8aad52173012548260f37f472e945a42a930b46109bba",
+      "bytes": 219
+    },
+    "bal-workspace-types-final.log": {
+      "lfSha256": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+      "bytes": 59
+    },
+    "bal-workspace-lint-final.log": {
+      "lfSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "bal-workspace-stable-recovery.log": {
+      "lfSha256": "7ba360561e2f4cea9225fe4827bc5db173246e09c710ef6a47266464f438f1de",
+      "bytes": 5933
+    }
+  },
+  "screenshots": [
+    {
+      "case": "mobile configure success",
+      "path": "output\\phase-d-work\\ui-canonical\\bal-workspace-mobile-focus-partial\\a362459c8a10ed3e3f6e7162987e974b02107d9e.png",
+      "sha256": "72aadc8b8a6a427290e88d57a79142fcef792f84453f35e65effdc9948d498a4",
+      "inspected": true,
+      "scope": "320 CSS-pixel viewport;canonical drawer and visible controls/support;vertical scrolling intentional;not whole-app or physical proof"
+    },
+    {
+      "case": "iOS assign success",
+      "path": "output\\phase-d-work\\ui-canonical\\bal-workspace-stable-recovery-pass\\74665a5d63c60659b58920edc4f75f0dcc95a93a.png",
+      "sha256": "ac23596342d1718cc069352cb58b41948431c4dff1d9729c748f67bcfc675b30",
+      "inspected": true,
+      "scope": "320 CSS-pixel viewport;canonical drawer and visible controls/support;vertical scrolling intentional;not whole-app or physical proof"
+    }
+  ],
+  "counterproofs": [
+    "Local unpublished JSON extraction precedence caused22P02; failed run retained; final remote candidate applied once.",
+    "A legacy native idempotency key falsely consumed a fresh private preparation without a new native effect. Final guard rejects it; own private replay remains exact.",
+    "Legacy label selector did not match required visual marker; accessible role/name selectors retain the required fields.",
+    "A legacy mutation occurred before async review; test now observes focused review before mutating real target.",
+    "Clearing the same-scope list on refresh detached the opener; retained keyed rows preserve focus;403 still clears protected content.",
+    "Two synthetic workers shared the exact display label; fixture names made distinct without choosing first or changing authority.",
+    "Legacy iOS multi-user case exhausted total30s while validating its second session; same120s case budget as preceding flow,15s action/assertion limits retained; passed56s.",
+    "iOS reload exposed a transient review recovery control replaced by the consumed-row read. Production reproduced; screenshot proves persistent recovery remains. Final tests wait actual injected loss and consumed read, then use persistent recovery; no product timeout increase.",
+    "Next-dev assign loading exceeded action limit in one failed cohort; final production assign must pass unchanged business assertions."
+  ],
+  "limits": [
+    "Own published SHA CI still required for clean install,legacy evolution and full integration.",
+    "Emulation and axe are not physical, human or assistive-technology homologation.",
+    "Full66 compositions/171 relations and remaining D-B criteria are not closed.",
+    "Sonar owner-deferred; no production promotion, merge, external delivery or operational restore approval.",
+    "Generic shared resume wording and full canonical composition review remain in the integrated form/UI lot."
+  ],
+  "typecheck": "PASS",
+  "directedLint": "PASS",
+  "matrices": {
+    "criteria": 105,
+    "columns": 39,
+    "first30Preserved": true,
+    "PASS": 56,
+    "PARTIAL": 49,
+    "visualRows": 18
+  },
+  "documentationChecks": {
+    "matricesFirst30AndStatusesPreserved": true,
+    "criteria": 105,
+    "PASS": 56,
+    "PARTIAL": 49,
+    "visualRows": 18,
+    "ownerReportCriteria": 105,
+    "sourceLfHashesMatched": 30,
+    "markdownFilesPassed": 10,
+    "newLinksResolve": true,
+    "gitDiffCheck": "PASS"
+  },
+  "documentationCheckLfSha256": "b48ed3d449d6d49ace02b6b49d5504e196ca4453555adb194cdb568fd2f5eb12"
+}

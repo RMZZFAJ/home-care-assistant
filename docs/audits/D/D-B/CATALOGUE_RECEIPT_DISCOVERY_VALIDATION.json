@@ -1,0 +1,133 @@
+{
+  "increment": "D3.60",
+  "base": "b4dad9558b5bb473ade3e4831a8f3d2402f5f194",
+  "scope": "own catalogue receipts and exact retained attempt after closing its editor and losing write access",
+  "validation": {
+    "realAuthDistinct": 11,
+    "catalogueHistoryEntries": 106,
+    "newEntryDuringPaging": true,
+    "legacyUnknownTimestampPreserved": true,
+    "types": "pass",
+    "targetedLint": "pass",
+    "historicalMigrationsPreserved": 84,
+    "browser": {
+      "initial": {
+        "startTime": "2026-11-11T00:53:32.048Z",
+        "duration": 348358.201,
+        "expected": 11,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "targetedRecheck": {
+        "startTime": "2026-11-11T01:00:42.468Z",
+        "duration": 146690.62900000002,
+        "expected": 3,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "distinctQualified": 13,
+      "engines": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "axeViewports": [
+        320,
+        390,
+        768,
+        1150,
+        1440
+      ]
+    },
+    "counterproofs": [
+      "Other owner and foreign cursor denied or empty; membership revocation blocks reads",
+      "Forged receipt key did not clear a retained attempt",
+      "Reopened editor fixture initially missed a reactivation click in Chromium; the same scenario was rechecked without edits to that flow",
+      "Local production build verifies one official record after a lost confirmation, no write on receipt lookup"
+    ]
+  },
+  "remote": {
+    "from": 201,
+    "to": 202,
+    "version": "20261111004656",
+    "finalDryRunEmpty": true,
+    "scopedObjectsMatchLocal": true,
+    "directTableAccess": {
+      "anon": false,
+      "authenticated": false,
+      "service_role": false
+    },
+    "functions": {
+      "private.require_catalogue_receipt_scope(uuid,text)": {
+        "anon": false,
+        "authenticated": false,
+        "hash": "f15c7c23d47ae3e0f839bf825c9a999b5bc2dfab7b23d3df85f973d82f28304c",
+        "service": false
+      },
+      "private.stamp_catalogue_preparation_confirmation()": {
+        "anon": false,
+        "authenticated": false,
+        "hash": "6ad1b1fba5fb44227fbc4bc24456b046ba4b9e037625da1272198b61cd19b1d8",
+        "service": false
+      },
+      "public.catalogue_preparation_command(uuid,text,text,text,text,uuid,uuid,integer,jsonb,text)": {
+        "anon": false,
+        "authenticated": true,
+        "hash": "fbf63c00a5c151bab0ca8fa5f0274c5669361e2b83d534ca64a754a1c98492e5",
+        "service": false
+      },
+      "public.catalogue_preparation_read(uuid,text,text,text,uuid)": {
+        "anon": false,
+        "authenticated": true,
+        "hash": "cedf739695e9732c56e86c47b358e51ae9c467df6c94d17c56014e6130a80b43",
+        "service": false
+      },
+      "public.catalogue_preparation_receipts(uuid,text,uuid)": {
+        "anon": false,
+        "authenticated": true,
+        "hash": "ef0e06f121942f264b6c5246c3e32e2ab6ad30729a51e27492b28ad67ead77f6",
+        "service": false
+      }
+    },
+    "validCursorIndex": true,
+    "relatedAdvisors": [
+      "authenticated_security_definer_function_executable",
+      "unused_index"
+    ]
+  },
+  "criteria": {
+    "localPass": 56,
+    "partial": 49,
+    "visualEstimate": 60,
+    "formsEstimate": 90,
+    "recoveryEstimate": 90
+  },
+  "remaining": [
+    "own SHA CI and Preview",
+    "administrative and profile forms",
+    "66/171 visual parity",
+    "D-C external gates"
+  ],
+  "sourceLfSha256": {
+    "src/app/api/admin/catalogue-preparations/receipts/route.ts": "8f1b593e67abc7f48665a07675293fb7611bca1f9c17d471645e88c16cb38239",
+    "src/app/comprovantes-catalogo/page.tsx": "516c9939e4495c3a77ecf044133987eb2951f3ead80bda765828cb7669252361",
+    "src/components/admin/admin-console.tsx": "ad28bc4e69be2b5a29d93dcf606446d9ad654ddabd1f008060baa844c6ac616c",
+    "src/components/admin/catalogue-preparation-editor.tsx": "52be824d5ac27e02f0f815e9631d42cbb4ffdd076e2530b1fc87258d52c25ac9",
+    "src/components/catalog/catalogue-identity-management.tsx": "1df7210131eebec35b5be57209b8ec16901ead8ce2e88aec6fdead685fc91a64",
+    "src/components/catalog/catalogue-receipt-console.tsx": "c550fb194e68f86ce06dc90cbb19c6a58db54cec465db9eb72d67e705dd4d5f3",
+    "src/components/catalog/presentation-management.tsx": "de7c514274e3f83b88e1b329bb4ee0be014c7c8b0376481eb0528f2e58072d50",
+    "src/components/catalog/unit-console.tsx": "a36a46bd1822627726370f201e89af971c611ac00355e33ed51aaa484d38c013",
+    "src/components/catalog/unit-preparation-editor.tsx": "abc15439231771340bd5008c4e792daa7008902b9080573361ba78e6e45c3e9f",
+    "src/components/catalog/use-catalogue-preparation.ts": "59dd7097fc188dcb947031f2523f28cd772e891b2e82cc7680636bcc01e60b95",
+    "src/components/navigation/more-actions.tsx": "5a2920ab35c41bee3d9c505267eae6327aa650bece224c42858d284838eb883f",
+    "src/components/navigation/workspace-navigation.tsx": "bc9be847175cdb1137561ad2ca9fdc0ccf61d5987facf2ae5b6c41fca4343c4e",
+    "src/lib/client/catalogue-attempt-storage.ts": "f12110a0c0c958ba05a811776419b1042ec82e75029d374fe4c7fcd305888127",
+    "src/lib/safe-return-path.ts": "fc9a549070036ecf7d579391d0219776ca2cc397f63e11cc235c57b3cba66b52",
+    "src/lib/validation/catalogue-preparation.ts": "bb9c7ce4d8981db49465591369b0dfc547e3845d42b041ecf2e7c798049023cc",
+    "supabase/migrations/20261111004656_phase_d3_catalogue_receipt_discovery.sql": "76caece3987d3237f4006ef83ada0e81b7921eb3e36979c4be0a7d7888712816",
+    "tests/e2e/catalogue-receipt-discovery.spec.ts": "71f5b986f7cc3178b0ff43717145f946087d37bf9e851684a7ccdc84727f4e57",
+    "tests/integration/catalogue-receipt-discovery.test.mjs": "2fb152165cdfd280e31b8cdbeac9f4eb0e14d73d69b876fbe01e2c1ba7fdbc82"
+  }
+}

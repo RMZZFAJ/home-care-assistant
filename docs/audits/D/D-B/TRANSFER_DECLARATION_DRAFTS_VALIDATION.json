@@ -1,0 +1,628 @@
+{
+  "assembledAt": "2026-11-09T20:08:24.285208+00:00",
+  "baseSha": "f233be91e93c974d3aff7a829e31db82f0850325",
+  "sourceLfSha256": {
+    "src/app/api/drafts/route.ts": "e0dae342eaac045790796e267870769213c6ee4b0bf46af7ac4cbc81f9a226ee",
+    "src/app/api/transfers/route.ts": "09ef12dc09679091f5723ba41c65eab4fb3793a4e2db933e492eebe612b48d91",
+    "src/components/documents/delivery-regularization.tsx": "797865cc1a1dd91bb7fc08e1790c7f3de1a65813fc5a8cc363fcaf32abfc9ef1",
+    "src/components/documents/supply-command-editor.tsx": "0e4d7b0092c7dc3eef51000a55117c3b9fe1c1041907f912880a6513b3edf1e3",
+    "src/components/documents/transfer-console.tsx": "69c914ff406d8f32a1bcd1db0cab8e5a905b8b47297428518e60837ffa049c09",
+    "src/components/documents/transfer-decision-editor.tsx": "e54e89f05c10956447b16f265d9b11e39185e0d28012c0270b0fbb43ccb1a2b0",
+    "src/components/forms/creation-draft-panel.tsx": "6258006dcf2283a59a1e8ff582da8565af507524d14059557b409e5fb5ee90d9",
+    "src/lib/forms/draft-navigation.ts": "7a44806e6eac57b87088018f921d0bfc8b753a792b2fbc7811173d49882a6b9f",
+    "src/lib/forms/transfer-declaration-draft.ts": "ff45f2a4b4f949ce1e025bda2eaaf3a6248e1fa4ad1c5e1e49c2dc06c6a92022",
+    "src/lib/validation/creation-drafts.ts": "b5fd10b5055b5cf5b75e8750d1596b908b012463dc18c4e2b8cd14df03573c4f",
+    "src/lib/validation/private-draft-results.ts": "442faa59c936512889f52070426d6a5f717b5682f4bb215ac451af1c527bc59a",
+    "src/lib/validation/supply-drafts.ts": "3e380e83279afbc63b537811f3a827a90839df6a13dce470ec96ca2492b50537",
+    "src/lib/validation/transfer-preparation.ts": "07dca58a8e3a289bba14cb544494383ddbfeb75b8d8d754d338d274bda3e1868",
+    "src/lib/validation/transfers.ts": "f9b6877d658840cfb3941818a24cdf9582a97176c00d7914baec58644617aeb8",
+    "src/types/creation-drafts.ts": "02fe34d6efa356338565794ffb83978e20fe5c4a64700fa1cde501ec5f007333",
+    "supabase/migrations/20261109183902_phase_d3_transfer_declaration_private_drafts.sql": "f7a3dcfef218758b741c2e27604dafff895b32229af0106f3d5b701113fd99d3",
+    "tests/e2e/transfer-bilateral.spec.ts": "eb0d296ee77b7e60e5ecbdd7b62b2e35e011b50def59b9f454276dd35e0d6ed7",
+    "tests/e2e/transfer-declaration-private-drafts.spec.ts": "fad0871b42744b75da00712095f3718f3d6e63066c39ce06d82cd0a1eb463c5a",
+    "tests/integration/transfer-declaration-draft-fixtures.mjs": "89b84ccc8dae6d60241368b4bf6fd3e4489a4d5dd397e571f506a79b44af38c7",
+    "tests/integration/transfer-declaration-private-drafts.test.mjs": "6ff9e9c6b06f307266b49448ff7d44f2df35fd142f5f370d9887021e14408e37",
+    "tests/transfer-declaration-drafts.test.ts": "434bcbe656008653e65ced71c5bd165aa88c80043906aaebc87a79c402cc0ed1"
+  },
+  "unitApi": {
+    "passed": 41,
+    "files": [
+      "tests/transfer-declaration-drafts.test.ts",
+      "tests/transfer-decision-drafts.test.ts",
+      "tests/api/private-drafts-contract.test.ts",
+      "tests/api/transfer-contract.test.ts",
+      "tests/draft-navigation.test.ts",
+      "tests/regularization-drafts.test.ts"
+    ]
+  },
+  "realAuth": {
+    "passed": 8,
+    "initialPassed": 0,
+    "initialFailed": 8,
+    "authoringCorrection": {
+      "unpublishedMigration": "supabase/migrations/20261109183902_phase_d3_transfer_declaration_private_drafts.sql",
+      "beforeLfSha256": "9a522c265e2d54a68f94992e726f05226fe6447b3c90ae27133b294b7937fb4a",
+      "afterLfSha256": "f7a3dcfef218758b741c2e27604dafff895b32229af0106f3d5b701113fd99d3",
+      "localFunctionReplaced": "private.validate_supply_draft",
+      "historyUntouched": true,
+      "migrationReplayed": false,
+      "remoteUnchanged173": true,
+      "reason": "Qualify new material alias against the existing PLpgSQL variable x;correct unpublished SQL before remote use",
+      "local174StatementsArePreservedAuthoringIteration": true
+    },
+    "limits": "Initial failures retained: ambiguous x alias and upstream timeout. Qualified alias corrected only in unpublished174; final eight Auth scenarios pass. No mutable suite overlapped E2E."
+  },
+  "browser": {
+    "initial": {
+      "stats": {
+        "total": 16,
+        "expected": 14,
+        "unexpected": 2,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": false
+      },
+      "cases": [
+        {
+          "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 71,
+            "column": 5
+          },
+          "duration": 29980,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 338,
+            "column": 5
+          },
+          "duration": 21519,
+          "outcome": "unexpected",
+          "ok": false,
+          "errors": [
+            {
+              "message": "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Registrar declaração sem expedir', exact: true })\u001b[22m\n\n\n  370 |       exact: true,\n  371 |     })\n> 372 |     .click();\n      |      ^\n  373 |   editor = page.getByRole(\"dialog\", {\n  374 |     name: \"Preparar transferência física\",\n  375 |     exact: true,\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\transfer-bilateral.spec.ts:372:6\u001b[22m",
+              "codeframe": "  272 |         sql(\n  273 |           `select private.stock_quantity(${sqlLiteral(f.patient)},${sqlLiteral(f.products[0])},'CARE_TEAM');`,\n  274 |         ),\n  275 |       ),\n  276 |     ).toBe(5);\n  277 |     expect(\n  278 |       Number(\n  279 |         sql(\n  280 |           `select private.stock_quantity(${sqlLiteral(f.patient)},${sqlLiteral(f.products[0])},'FAMILY');`,\n  281 |         ),\n  282 |       ),\n  283 |     ).toBe(23);\n  284 |     expect(\n  285 |       Number(\n  286 |         sql(\n  287 |           `select private.stock_quantity(${sqlLiteral(f.patient)},${sqlLiteral(f.products[0])},'TRANSIT');`,\n  288 |         ),\n  289 |       ),\n  290 |     ).toBe(2);\n  291 |     for (const width of [320, 390, 768, 1440]) {\n  292 |       await bruno.setViewportSize({ width, height: 900 });\n  293 |       await audit(bruno, `transfer-three-actors-${width}`);\n  294 |     }\n  295 |     mkdirSync(\"output/playwright/phase-d\", { recursive: true });\n  296 |     await bruno.setViewportSize({ width: 320, height: 900 });\n  297 |     await bruno.screenshot({\n  298 |       path: `output/playwright/phase-d/transfer-${id}-${info.project.name}.png`,\n  299 |       fullPage: true,\n  300 |     });\n  301 |     mkdirSync(\"output/pdf/phase-d\", { recursive: true });\n  302 |     const base = `output/pdf/phase-d/transfer-${id}-v${received.version}`;\n  303 |     const pdf = await generatedPdf(\n  304 |       bruno,\n  305 |       `/api/documents/${id}/pdf?version=${received.version}`,\n  306 |     );\n  307 |     expect(pdf.ok()).toBe(true);\n  308 |     const bytes = await pdf.body();\n  309 |     writeFileSync(base + \".pdf\", bytes);\n  310 |     writeFileSync(\n  311 |       base + \"-source.json\",\n  312 |       JSON.stringify(\n  313 |         {\n  314 |           document: received,\n  315 |           before,\n  316 |           after: JSON.parse(transferState(f)),\n  317 |           sha256: createHash(\"sha256\").update(bytes).digest(\"hex\"),\n  318 |         },\n  319 |         null,\n  320 |         2,\n  321 |       ),\n  322 |     );\n  323 |     writeFileSync(\n  324 |       base + \"-database.json\",\n  325 |       sql(\n  326 |         `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(id)}),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id=${sqlLiteral(id)}),'renders',(select jsonb_agg(to_jsonb(r)) from private.pdf_issuances r where state='ready' and document_id=${sqlLiteral(id)}));`,\n  327 |       ),\n  328 |     );\n  329 |     expect(\n  330 |       (await bruno.request.get(`/api/documents/${id}/pdf?version=1`)).status(),\n  331 |     ).toBe(400);\n  332 |   } finally {\n  333 |     await anaContext.close();\n  334 |     await brunoContext.close();\n  335 |   }\n  336 | });\n  337 |\n  338 | test(\"conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado\", async ({\n  339 |   page,\n  340 | }) => {\n  341 |   const f = await transferFixture();\n  342 |   await login(page, f.initiator.email, f.patient);\n  343 |   let editor = await fillDeclaration(page, f);\n  344 |   const report = await rpc(\n  345 |     f.initiator.client,\n  346 |     \"report_extraordinary_consumption\",\n  347 |     {\n  348 |       p_patient: f.patient,\n  349 |       p_kind: \"consumption\",\n  350 |       p_location: \"CARE_TEAM\",\n  351 |       p_text: \"Consumo que torna a referência da preparação obsoleta\",\n  352 |       p_lines: [{ productId: f.products[0], quantity: \"1\" }],\n  353 |       p_key: crypto.randomUUID(),\n  354 |     },\n  355 |   );\n  356 |   await rpc(f.admin, \"decide_consumption_report\", {\n  357 |     p_id: report,\n  358 |     p_accept: true,\n  359 |     p_reason: null,\n  360 |     p_key: crypto.randomUUID(),\n  361 |     p_version: 1,\n  362 |   });\n  363 |   const ledger = JSON.parse(transferState(f)).ledger;\n  364 |   await editor\n  365 |     .getByRole(\"button\", { name: \"Revisar declaração\", exact: true })\n  366 |     .click();\n  367 |   await page\n  368 |     .getByRole(\"button\", {\n  369 |       name: \"Registrar declaração sem expedir\",\n  370 |       exact: true,\n  371 |     })\n> 372 |     .click();\n      |      ^ TimeoutError: locator.click: Timeout 15000ms exceeded.\n  373 |   editor = page.getByRole(\"dialog\", {\n  374 |     name: \"Preparar transferência física\",\n  375 |     exact: true,\n  376 |   });\n  377 |   await expect(\n  378 |     editor.getByRole(\"textbox\", {\n  379 |       name: /^Sua justificativa para a transferência/,\n  380 |     }),\n  381 |   ).toHaveValue(/Devolução física de cinco/);\n  382 |   await expect(\n  383 |     editor.getByRole(\"textbox\", {\n  384 |       name: /^Quantidade de Material fictício V4 0/,\n  385 |     }),\n  386 |   ).toHaveValue(\"5\");\n  387 |   await expect(\n  388 |     editor.getByRole(\"button\", { name: \"Revisar declaração\", exact: true }),\n  389 |   ).toBeDisabled();\n  390 |   let failed = false;\n  391 |   await page.route(\"**/api/transfers/preparation?*\", async (route) => {\n  392 |     if (!failed) {\n  393 |       failed = true;\n  394 |       await route.fulfill({\n  395 |         status: 503,\n  396 |         json: { error: \"Referência temporariamente indisponível\" },\n  397 |       });\n  398 |     } else await route.continue();\n  399 |   });\n  400 |   await editor\n  401 |     .getByRole(\"button\", { name: \"Comparar referência atual\", exact: true })\n  402 |     .click();\n  403 |   await expect(\n  404 |     editor.getByText(/Referência temporariamente indisponível/),\n  405 |   ).toBeVisible();\n  406 |   await editor\n  407 |     .getByRole(\"button\", { name: \"Comparar referência atual\", exact: true })\n  408 |     .click();\n  409 |   await expect(\n  410 |     editor.getByRole(\"region\", {\n  411 |       name: \"Comparação da referência da transferência\",\n  412 |       exact: true,\n  413 |     }),\n  414 |   ).toContainText(\"atual 9\");\n  415 |   await editor\n  416 |     .getByRole(\"button\", {\n  417 |       name: \"Adotar referência atual e revisar meus campos\",\n  418 |       exact: true,\n  419 |     })\n  420 |     .click();\n  421 |   await editor\n  422 |     .getByRole(\"button\", { name: \"Revisar declaração\", exact: true })\n  423 |     .click();\n  424 |   await page\n  425 |     .getByRole(\"button\", {\n  426 |       name: \"Registrar declaração sem expedir\",\n  427 |       exact: true,\n  428 |     })\n  429 |     .click();\n  430 |   await expect(\n  431 |     page.getByRole(\"heading\", { name: \"Declaração confirmada\", exact: true }),\n  432 |   ).toBeVisible();\n  433 |   expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);\n  434 |   const d = JSON.parse(transferState(f)).documents.find(\n  435 |     (doc: SupplyDocument) => doc.status === \"transfer_pending\",\n  436 |   ) as SupplyDocument;\n  437 |   await page.unroute(\"**/api/transfers/preparation?*\");\n  438 |   await page.goto(\"/login\");\n  439 |   // Use a separate Auth identity with its own selected patient context.\n  440 |   await page.context().clearCookies();\n  441 |   await login(page, f.counterparty.email, f.patient);\n  442 |   await page.goto(\"/documentos/\" + d.id);\n  443 |   await selectDocumentSection(page, \"workflow\");\n  444 |   await page\n  445 |     .getByRole(\"button\", { name: \"Concordar com a transferência\", exact: true })\n  446 |     .click();\n  447 |   const reason = page.getByRole(\"textbox\", {\n  448 |     name: /^Sua justificativa para este ato/,\n  449 |   });\n  450 |   await reason.fill(\n  451 |     \"Parecer próprio preservado enquanto o declarante encerra sua proposta.\",\n  452 |   );\n  453 |   const withdrawn = await transferCommand(\n  454 |     f.initiator.client,\n  455 |     d.id,\n  456 |     \"withdraw\",\n  457 |     d.version,\n  458 |     { reason: \"Declarante encerra pessoalmente antes da concordância\" },\n  459 |   );\n  460 |   expect(withdrawn.error).toBeNull();\n  461 |   await page\n  462 |     .getByRole(\"button\", { name: \"Revisar meu ato\", exact: true })\n  463 |     .click();\n  464 |   // The mandatory private save now detects the closed act before an official POST.\n  465 |   await expect(page.getByRole(\"button\", { name: \"Confirmar decisão\", exact: true })).toHaveCount(0);\n  466 |   await expect(reason).toHaveValue(/Parecer próprio preservado/);\n  467 |   await expect(reason).toBeFocused();\n  468 |   await page.getByRole(\"button\", { name: \"Consultar e comparar transferência atual\", exact: true }).click();\n  469 |   await expect(page.getByRole(\"button\", { name: \"Adotar estado atual e revisar minha decisão\", exact: true })).toBeDisabled();\n  470 |   await expect(\n  471 |     page.getByRole(\"button\", { name: \"Revisar meu ato\", exact: true }),\n  472 |   ).toBeDisabled();"
+            }
+          ]
+        },
+        {
+          "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 71,
+            "column": 5
+          },
+          "duration": 36604,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 338,
+            "column": 5
+          },
+          "duration": 22384,
+          "outcome": "unexpected",
+          "ok": false,
+          "errors": [
+            {
+              "message": "TimeoutError: locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Registrar declaração sem expedir', exact: true })\u001b[22m\n\n\n  370 |       exact: true,\n  371 |     })\n> 372 |     .click();\n      |      ^\n  373 |   editor = page.getByRole(\"dialog\", {\n  374 |     name: \"Preparar transferência física\",\n  375 |     exact: true,\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\transfer-bilateral.spec.ts:372:6\u001b[22m",
+              "codeframe": "  272 |         sql(\n  273 |           `select private.stock_quantity(${sqlLiteral(f.patient)},${sqlLiteral(f.products[0])},'CARE_TEAM');`,\n  274 |         ),\n  275 |       ),\n  276 |     ).toBe(5);\n  277 |     expect(\n  278 |       Number(\n  279 |         sql(\n  280 |           `select private.stock_quantity(${sqlLiteral(f.patient)},${sqlLiteral(f.products[0])},'FAMILY');`,\n  281 |         ),\n  282 |       ),\n  283 |     ).toBe(23);\n  284 |     expect(\n  285 |       Number(\n  286 |         sql(\n  287 |           `select private.stock_quantity(${sqlLiteral(f.patient)},${sqlLiteral(f.products[0])},'TRANSIT');`,\n  288 |         ),\n  289 |       ),\n  290 |     ).toBe(2);\n  291 |     for (const width of [320, 390, 768, 1440]) {\n  292 |       await bruno.setViewportSize({ width, height: 900 });\n  293 |       await audit(bruno, `transfer-three-actors-${width}`);\n  294 |     }\n  295 |     mkdirSync(\"output/playwright/phase-d\", { recursive: true });\n  296 |     await bruno.setViewportSize({ width: 320, height: 900 });\n  297 |     await bruno.screenshot({\n  298 |       path: `output/playwright/phase-d/transfer-${id}-${info.project.name}.png`,\n  299 |       fullPage: true,\n  300 |     });\n  301 |     mkdirSync(\"output/pdf/phase-d\", { recursive: true });\n  302 |     const base = `output/pdf/phase-d/transfer-${id}-v${received.version}`;\n  303 |     const pdf = await generatedPdf(\n  304 |       bruno,\n  305 |       `/api/documents/${id}/pdf?version=${received.version}`,\n  306 |     );\n  307 |     expect(pdf.ok()).toBe(true);\n  308 |     const bytes = await pdf.body();\n  309 |     writeFileSync(base + \".pdf\", bytes);\n  310 |     writeFileSync(\n  311 |       base + \"-source.json\",\n  312 |       JSON.stringify(\n  313 |         {\n  314 |           document: received,\n  315 |           before,\n  316 |           after: JSON.parse(transferState(f)),\n  317 |           sha256: createHash(\"sha256\").update(bytes).digest(\"hex\"),\n  318 |         },\n  319 |         null,\n  320 |         2,\n  321 |       ),\n  322 |     );\n  323 |     writeFileSync(\n  324 |       base + \"-database.json\",\n  325 |       sql(\n  326 |         `select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id=${sqlLiteral(id)}),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id=${sqlLiteral(id)}),'renders',(select jsonb_agg(to_jsonb(r)) from private.pdf_issuances r where state='ready' and document_id=${sqlLiteral(id)}));`,\n  327 |       ),\n  328 |     );\n  329 |     expect(\n  330 |       (await bruno.request.get(`/api/documents/${id}/pdf?version=1`)).status(),\n  331 |     ).toBe(400);\n  332 |   } finally {\n  333 |     await anaContext.close();\n  334 |     await brunoContext.close();\n  335 |   }\n  336 | });\n  337 |\n  338 | test(\"conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado\", async ({\n  339 |   page,\n  340 | }) => {\n  341 |   const f = await transferFixture();\n  342 |   await login(page, f.initiator.email, f.patient);\n  343 |   let editor = await fillDeclaration(page, f);\n  344 |   const report = await rpc(\n  345 |     f.initiator.client,\n  346 |     \"report_extraordinary_consumption\",\n  347 |     {\n  348 |       p_patient: f.patient,\n  349 |       p_kind: \"consumption\",\n  350 |       p_location: \"CARE_TEAM\",\n  351 |       p_text: \"Consumo que torna a referência da preparação obsoleta\",\n  352 |       p_lines: [{ productId: f.products[0], quantity: \"1\" }],\n  353 |       p_key: crypto.randomUUID(),\n  354 |     },\n  355 |   );\n  356 |   await rpc(f.admin, \"decide_consumption_report\", {\n  357 |     p_id: report,\n  358 |     p_accept: true,\n  359 |     p_reason: null,\n  360 |     p_key: crypto.randomUUID(),\n  361 |     p_version: 1,\n  362 |   });\n  363 |   const ledger = JSON.parse(transferState(f)).ledger;\n  364 |   await editor\n  365 |     .getByRole(\"button\", { name: \"Revisar declaração\", exact: true })\n  366 |     .click();\n  367 |   await page\n  368 |     .getByRole(\"button\", {\n  369 |       name: \"Registrar declaração sem expedir\",\n  370 |       exact: true,\n  371 |     })\n> 372 |     .click();\n      |      ^ TimeoutError: locator.click: Timeout 15000ms exceeded.\n  373 |   editor = page.getByRole(\"dialog\", {\n  374 |     name: \"Preparar transferência física\",\n  375 |     exact: true,\n  376 |   });\n  377 |   await expect(\n  378 |     editor.getByRole(\"textbox\", {\n  379 |       name: /^Sua justificativa para a transferência/,\n  380 |     }),\n  381 |   ).toHaveValue(/Devolução física de cinco/);\n  382 |   await expect(\n  383 |     editor.getByRole(\"textbox\", {\n  384 |       name: /^Quantidade de Material fictício V4 0/,\n  385 |     }),\n  386 |   ).toHaveValue(\"5\");\n  387 |   await expect(\n  388 |     editor.getByRole(\"button\", { name: \"Revisar declaração\", exact: true }),\n  389 |   ).toBeDisabled();\n  390 |   let failed = false;\n  391 |   await page.route(\"**/api/transfers/preparation?*\", async (route) => {\n  392 |     if (!failed) {\n  393 |       failed = true;\n  394 |       await route.fulfill({\n  395 |         status: 503,\n  396 |         json: { error: \"Referência temporariamente indisponível\" },\n  397 |       });\n  398 |     } else await route.continue();\n  399 |   });\n  400 |   await editor\n  401 |     .getByRole(\"button\", { name: \"Comparar referência atual\", exact: true })\n  402 |     .click();\n  403 |   await expect(\n  404 |     editor.getByText(/Referência temporariamente indisponível/),\n  405 |   ).toBeVisible();\n  406 |   await editor\n  407 |     .getByRole(\"button\", { name: \"Comparar referência atual\", exact: true })\n  408 |     .click();\n  409 |   await expect(\n  410 |     editor.getByRole(\"region\", {\n  411 |       name: \"Comparação da referência da transferência\",\n  412 |       exact: true,\n  413 |     }),\n  414 |   ).toContainText(\"atual 9\");\n  415 |   await editor\n  416 |     .getByRole(\"button\", {\n  417 |       name: \"Adotar referência atual e revisar meus campos\",\n  418 |       exact: true,\n  419 |     })\n  420 |     .click();\n  421 |   await editor\n  422 |     .getByRole(\"button\", { name: \"Revisar declaração\", exact: true })\n  423 |     .click();\n  424 |   await page\n  425 |     .getByRole(\"button\", {\n  426 |       name: \"Registrar declaração sem expedir\",\n  427 |       exact: true,\n  428 |     })\n  429 |     .click();\n  430 |   await expect(\n  431 |     page.getByRole(\"heading\", { name: \"Declaração confirmada\", exact: true }),\n  432 |   ).toBeVisible();\n  433 |   expect(JSON.parse(transferState(f)).ledger).toEqual(ledger);\n  434 |   const d = JSON.parse(transferState(f)).documents.find(\n  435 |     (doc: SupplyDocument) => doc.status === \"transfer_pending\",\n  436 |   ) as SupplyDocument;\n  437 |   await page.unroute(\"**/api/transfers/preparation?*\");\n  438 |   await page.goto(\"/login\");\n  439 |   // Use a separate Auth identity with its own selected patient context.\n  440 |   await page.context().clearCookies();\n  441 |   await login(page, f.counterparty.email, f.patient);\n  442 |   await page.goto(\"/documentos/\" + d.id);\n  443 |   await selectDocumentSection(page, \"workflow\");\n  444 |   await page\n  445 |     .getByRole(\"button\", { name: \"Concordar com a transferência\", exact: true })\n  446 |     .click();\n  447 |   const reason = page.getByRole(\"textbox\", {\n  448 |     name: /^Sua justificativa para este ato/,\n  449 |   });\n  450 |   await reason.fill(\n  451 |     \"Parecer próprio preservado enquanto o declarante encerra sua proposta.\",\n  452 |   );\n  453 |   const withdrawn = await transferCommand(\n  454 |     f.initiator.client,\n  455 |     d.id,\n  456 |     \"withdraw\",\n  457 |     d.version,\n  458 |     { reason: \"Declarante encerra pessoalmente antes da concordância\" },\n  459 |   );\n  460 |   expect(withdrawn.error).toBeNull();\n  461 |   await page\n  462 |     .getByRole(\"button\", { name: \"Revisar meu ato\", exact: true })\n  463 |     .click();\n  464 |   // The mandatory private save now detects the closed act before an official POST.\n  465 |   await expect(page.getByRole(\"button\", { name: \"Confirmar decisão\", exact: true })).toHaveCount(0);\n  466 |   await expect(reason).toHaveValue(/Parecer próprio preservado/);\n  467 |   await expect(reason).toBeFocused();\n  468 |   await page.getByRole(\"button\", { name: \"Consultar e comparar transferência atual\", exact: true }).click();\n  469 |   await expect(page.getByRole(\"button\", { name: \"Adotar estado atual e revisar minha decisão\", exact: true })).toBeDisabled();\n  470 |   await expect(\n  471 |     page.getByRole(\"button\", { name: \"Revisar meu ato\", exact: true }),\n  472 |   ).toBeDisabled();"
+            }
+          ]
+        },
+        {
+          "title": "declaração FAMILY retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 114,
+            "column": 7
+          },
+          "duration": 20888,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração FAMILY recupera resultado consumido após reload e perda de escrita sem novo POST oficial",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 310,
+            "column": 7
+          },
+          "duration": 13075,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração FAMILY conserva consulta e descarte privados após perder leitura da origem",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 395,
+            "column": 7
+          },
+          "duration": 11775,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração CARE_TEAM retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 114,
+            "column": 7
+          },
+          "duration": 23414,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração CARE_TEAM recupera resultado consumido após reload e perda de escrita sem novo POST oficial",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 310,
+            "column": 7
+          },
+          "duration": 13051,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração CARE_TEAM conserva consulta e descarte privados após perder leitura da origem",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 395,
+            "column": 7
+          },
+          "duration": 11751,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração FAMILY retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 114,
+            "column": 7
+          },
+          "duration": 55696,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração FAMILY recupera resultado consumido após reload e perda de escrita sem novo POST oficial",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 310,
+            "column": 7
+          },
+          "duration": 34510,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração FAMILY conserva consulta e descarte privados após perder leitura da origem",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 395,
+            "column": 7
+          },
+          "duration": 33079,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração CARE_TEAM retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 114,
+            "column": 7
+          },
+          "duration": 33516,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração CARE_TEAM recupera resultado consumido após reload e perda de escrita sem novo POST oficial",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 310,
+            "column": 7
+          },
+          "duration": 16330,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "declaração CARE_TEAM conserva consulta e descarte privados após perder leitura da origem",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-declaration-private-drafts.spec.ts",
+            "line": 395,
+            "column": 7
+          },
+          "duration": 23693,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        }
+      ],
+      "reportSha256": "bfc5ed2e7b4ddf04f9ec79802124ab01c7ed14fe47c2291fa15b5ad8dad4e534"
+    },
+    "affectedLegacyRepeat": {
+      "stats": {
+        "total": 2,
+        "expected": 2,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "cases": [
+        {
+          "title": "conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado",
+          "path": [],
+          "projectName": "mobile",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 338,
+            "column": 5
+          },
+          "duration": 15074,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "title": "conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado",
+          "path": [],
+          "projectName": "ios",
+          "location": {
+            "file": "transfer-bilateral.spec.ts",
+            "line": 338,
+            "column": 5
+          },
+          "duration": 22652,
+          "outcome": "expected",
+          "ok": true,
+          "errors": []
+        }
+      ],
+      "reportSha256": "1e4e9af8fa6259514adc56490d320695365accb34f784f12344bb9ead8eec562"
+    },
+    "finalDistinctPassed": 16,
+    "finalCases": [
+      {
+        "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "transfer-bilateral.spec.ts",
+          "line": 71,
+          "column": 5
+        },
+        "duration": 29980,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "transfer-bilateral.spec.ts",
+          "line": 338,
+          "column": 5
+        },
+        "duration": 15074,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "transferência separa três autores, recupera declaração incerta com perda de escrita e recebe três de cinco de material inativo",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "transfer-bilateral.spec.ts",
+          "line": 71,
+          "column": 5
+        },
+        "duration": 36604,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "conflitos preservam campos da declaração e da contraparte, exigem adoção explícita e não reabrem ato encerrado",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "transfer-bilateral.spec.ts",
+          "line": 338,
+          "column": 5
+        },
+        "duration": 22652,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração FAMILY retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 114,
+          "column": 7
+        },
+        "duration": 20888,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração FAMILY recupera resultado consumido após reload e perda de escrita sem novo POST oficial",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 310,
+          "column": 7
+        },
+        "duration": 13075,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração FAMILY conserva consulta e descarte privados após perder leitura da origem",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 395,
+          "column": 7
+        },
+        "duration": 11775,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração CARE_TEAM retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 114,
+          "column": 7
+        },
+        "duration": 23414,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração CARE_TEAM recupera resultado consumido após reload e perda de escrita sem novo POST oficial",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 310,
+          "column": 7
+        },
+        "duration": 13051,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração CARE_TEAM conserva consulta e descarte privados após perder leitura da origem",
+        "path": [],
+        "projectName": "mobile",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 395,
+          "column": 7
+        },
+        "duration": 11751,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração FAMILY retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 114,
+          "column": 7
+        },
+        "duration": 55696,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração FAMILY recupera resultado consumido após reload e perda de escrita sem novo POST oficial",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 310,
+          "column": 7
+        },
+        "duration": 34510,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração FAMILY conserva consulta e descarte privados após perder leitura da origem",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 395,
+          "column": 7
+        },
+        "duration": 33079,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração CARE_TEAM retoma campos parciais entre sessões,nega403 e200 inválido e preserva pessoa inelegível até troca explícita",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 114,
+          "column": 7
+        },
+        "duration": 33516,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração CARE_TEAM recupera resultado consumido após reload e perda de escrita sem novo POST oficial",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 310,
+          "column": 7
+        },
+        "duration": 16330,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "title": "declaração CARE_TEAM conserva consulta e descarte privados após perder leitura da origem",
+        "path": [],
+        "projectName": "ios",
+        "location": {
+          "file": "transfer-declaration-private-drafts.spec.ts",
+          "line": 395,
+          "column": 7
+        },
+        "duration": 23693,
+        "outcome": "expected",
+        "ok": true,
+        "errors": []
+      }
+    ],
+    "reuse": "Initial14 successes retained; only two legacy conflict cases repeated after explicit pre-review and post-review race assertions. Original20 sources unchanged; legacy spec was source21. No product source changed during either run.",
+    "legacyPrefix": {
+      "unrelatedLegacyPrefixUnchanged": true,
+      "baseline": "f233be91e93c974d3aff7a829e31db82f0850325",
+      "lfPrefixSha256": "562b379ddb204ce0ed7dafdea26acdc75abb6db67d1726ae110bf8999ec59512",
+      "scope": "All original imports,helpers and first bilateral test retained exactly with LF normalization;only the final conflict case changed"
+    },
+    "screenshotsInspected": 4,
+    "viewports": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "axe": true,
+    "limits": "Chromium mobile and WebKit emulation, not physical Android/iOS or human AT approval."
+  },
+  "checks": {
+    "affectedTypes": "PASS",
+    "affectedLint": "PASS",
+    "historical84": "UNCHANGED",
+    "matrix": "105x39; first30 unchanged;56PASS/49PARTIAL",
+    "uiRows": 18
+  },
+  "logSha256": {
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-unit.log": "1557a01af2860d4c9c5e0ab6ef94b881881e3ba9bcbc31eacec99f00696f2a10",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-auth-first.log": "6a523b6c33cf5cf3444efe297bc7efc579d7c1721bda545adeb0d2cfafe82dc8",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-auth-fixed.log": "9d61ca7a2eaa72a832d7b67cd14d88dea9d36b5d93c41726d2bef5ca2e356e99",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-db-prepare.log": "c2dd922f1d7549b7b3f622ef6dc164b14d4c8a0fb16703dbba3ee6cb1e36762d",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-db-prepare-alias.log": "9f0fea1560bad88d82cd91bacb303060129f654b118d41e98f8a0ca3e8d11014",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-types-final.log": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-legacy-types.log": "f3ce5d236fa8e1aa1b9f9a38a36405b7329b57fac4a38addbba21a34e0022b60",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-legacy-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-e2e-list.log": "7b0624b65badb075fd906098f711ffed2d345501b929ca51ce3e38f902bcd7e9",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-e2e-first.log": "a2993053be5f9f58f29b8fe19111769b8a092a8bfbcd74955fcd828aabe63ab9",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-legacy-list-final.log": "bf95732b76ca6cdf8bb6715fdadb2423d14de1e4fc1667aedbaa64bd9173796c",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-legacy-e2e.log": "603a0354daf979a341cb235859ac600b7e315d2588e2ef302945102367133388",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-remote-dry-run.log": "9005e9941443055d3ebf8102f9e29fc49f8373c66fadcc048b566c5c15f49973",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-remote-push.log": "313522461747d36163ee750c51bbd3953c98e5508a9595836a810a77a66e8410",
+    "output\\phase-d-work\\ui-canonical\\transfer-declaration-remote-clean.log": "61694dbe27d758db19357f3815840fd60a8a56e0523cc0c289267b8196a2bbcc"
+  },
+  "remote": "TRANSFER_DECLARATION_DRAFTS_REMOTE.json",
+  "ci": "CI_F233BE9_OBSERVATION.json; candidate own-SHA CI remains mandatory",
+  "limits": [
+    "BAL/REQ contextual decisions and full canonical66/171 parity remain partial",
+    "No additional PDF styling, signature/provider, physical-device, backup restore or production approval"
+  ],
+  "documentation": {
+    "markdownFiles": [
+      "docs/audits/D/D-B/TRANSFER_DECLARATION_DRAFTS.md",
+      "docs/audits/D/D-B/README.md",
+      "docs/audits/D/D-B/CHECKPOINT.md",
+      "docs/current/PROJECT_STATUS.md"
+    ],
+    "localLinksChecked": 330,
+    "first30ColumnsUnchanged": true
+  }
+}

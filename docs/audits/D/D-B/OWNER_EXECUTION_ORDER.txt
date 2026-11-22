@@ -1,0 +1,1141 @@
+# MISSÃO — IMPLEMENTAÇÃO INTEGRAL DA FASE D-B (D3 + D4 + D5)
+## HOME CARE ASSISTANT | CONTINUIDADE DA D-A | MIGRATIONS REMOTAS | EXECUÇÃO END-TO-END
+
+Você está iniciando uma nova conversa, mas **não está iniciando um projeto novo**.
+
+Sua missão é dar continuidade ao desenvolvimento do **Home Care Assistant**, utilizando o repositório, os contratos, as decisões de produto e as evidências já produzidas nas Fases A, B, C e D-A.
+
+O responsável pelo produto aprovou expressamente a execução integral da **Fase D-B**, composta pelos lotes **D3, D4 e D5**, incluindo os complementos e decisões descritos neste comando.
+
+**Esta é uma ordem de implementação, não apenas de planejamento ou auditoria.**
+
+Você deve investigar o estado real, reconciliar o planejamento existente, implementar, testar, corrigir, documentar, commitar, publicar e produzir evidências até o encerramento técnico da missão, respeitando os gates de segurança e as ações externas que permanecerem condicionadas.
+
+Não substitua a execução por um relatório de intenções.
+
+---
+
+# I — IDENTIFICAÇÃO E ESTADO DO PROJETO
+
+**Repositório:** `RMZZFAJ/home-care-assistant`
+
+**Branch a preservar:** `feat/phase-d-implementation`
+
+**Pull Request:** `#7`
+
+**Estado obrigatório da PR:** `Draft`
+
+**Supabase remoto autorizado para migrations:** `qwfrqychokvhdzakibid`
+
+**Referência inicial conhecida da branch:**
+
+`aa9f168a790e1d1730f3134314132ac65fba6b14`
+
+Essa referência deve ser tratada apenas como ponto conhecido. Antes de qualquer intervenção, consulte novamente o GitHub e utilize o HEAD efetivo.
+
+## Estado conhecido da D-A
+
+A Fase D-A implementou D0–D2 e consolidou localmente os 81 critérios de sua matriz de execução.
+
+Na última verificação:
+
+- A PR #7 permanecia aberta, Draft e sem merge.
+- Havia 121 migrations locais, com 84 migrations históricas protegidas.
+- A CI principal estava aprovada, incluindo banco, Windows, Ubuntu, Chromium, Mobile Chromium e WebKit.
+- O SonarCloud ainda apresentava Quality Gate reprovado, com Security Rating B e Reliability Rating D no código novo.
+- O ambiente remoto possuía 113 migrations aplicadas.
+- D-B e D-C ainda não haviam sido implementadas.
+- Produção permanecia NO-GO.
+
+**Confirme tudo novamente. Não presuma que esse retrato continua atual.**
+
+A D-A estabeleceu contratos operacionais relevantes para REQ, COM, ENT, BAL, estoque, custódias, escalas, rascunhos, identidade, ciência, autorização, idempotência, versões e recuperação.
+
+Esses contratos são a fundação da D-B, não funcionalidades a serem reconstruídas sem justificativa.
+
+---
+
+# II — DOCUMENTOS E PRECEDÊNCIA
+
+Antes de implementar, leia e confronte o planejamento existente, priorizando:
+
+1. `docs/current/PROJECT_STATUS.md`
+2. `docs/audits/D/D-A/CHECKPOINT.md`
+3. `docs/audits/D/D-A/ACCEPTANCE_EXECUTION.csv`
+4. `docs/audits/C/C5-execution-roadmap/PHASE_D_WORK_PACKAGES.md`
+5. `docs/audits/C/C5-execution-roadmap/RELEASE_CUTS_AND_GATES.md`
+6. `docs/audits/C/C9-acceptance-refinement/ACCEPTANCE_CASES.csv`
+7. `docs/audits/C/C9-acceptance-refinement/GAP_AND_ACCEPTANCE_MATRIX.csv`, se existente; descubra o nome canônico efetivo.
+8. `docs/audits/C/C7-decision-closure/GATE_CLASSIFICATION.csv`
+9. `docs/audits/C/C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md`
+10. `docs/audits/C/C7-decision-closure/PDF_SIGNING_ISSUANCE_AND_VERIFICATION.md`
+11. `docs/audits/C/C8-visual-blueprint/`
+12. As especificações C3 e contratos C4 correspondentes a D3, D4 e D5.
+13. As auditorias B1–B6 e seus achados pertinentes.
+
+Localize outros documentos canônicos relevantes pela estrutura real do repositório.
+
+**Regra de precedência:** as decisões expressamente aprovadas neste comando atualizam ou complementam propostas técnicas anteriores, sem revogar inadvertidamente outras regras aprovadas.
+
+Diferencie continuamente:
+
+- Decisão de produto aprovada.
+- Proposta técnica ainda não aprovada.
+- Funcionalidade realmente implementada.
+- Teste executado.
+- Evidência local.
+- Homologação externa.
+- Gate de liberação.
+
+Não apresente documentos de planejamento como prova de implementação.
+
+---
+
+# III — GOVERNANÇA DE GIT E CONTINUIDADE DA EXECUÇÃO
+
+## Regras obrigatórias
+
+1. Continue na branch `feat/phase-d-implementation`.
+2. Mantenha a **PR #7 em Draft** durante toda a missão.
+3. Não faça merge na `master`.
+4. Não crie uma nova branch nem uma PR paralela sem necessidade técnica incontornável.
+5. Faça commits incrementais, coesos e semanticamente identificados por lote ou funcionalidade.
+6. Publique os commits na branch remota ao longo da implementação.
+7. Atualize a descrição da PR, se necessário, para refletir a continuidade D-A → D-B.
+8. Preserve a rastreabilidade entre commit, critérios, testes e evidências.
+9. Não reescreva migrations históricas.
+10. Não execute reset destrutivo do banco remoto.
+
+Sugestão de organização dos commits:
+
+- `chore(d-b): reconcile scope and remote migrations`
+- `feat(d3): ...`
+- `feat(d4): ...`
+- `feat(d5): ...`
+- `feat(ops): ...`
+- `test(d-b): ...`
+- `docs(d-b): ...`
+
+Os nomes são ilustrativos, não um limite para a quantidade de commits.
+
+**Não acumule toda a implementação em um único commit final.**
+
+Os checkpoints devem informar o HEAD correspondente às evidências. Ao atualizar a PR, não alterar seu estado Draft.
+
+---
+
+# IV — PRIMEIRA AÇÃO OPERACIONAL: MIGRATIONS PENDENTES NO SUPABASE REMOTO
+
+O responsável **autoriza expressamente aplicar no projeto Supabase remoto as migrations já concluídas na D-A**.
+
+A última comparação identificou:
+
+- 121 migrations no repositório.
+- 113 migrations aplicadas no remoto.
+- Oito migrations pendentes.
+
+As oito identificadas foram:
+
+1. `20261106040155_phase_d2_optional_recount.sql`
+2. `20261106073728_phase_d2_bilateral_transfers.sql`
+3. `20261106075328_phase_d2_preserve_bal_draft_recount.sql`
+4. `20261106161707_phase_d2_catalogue_successors.sql`
+5. `20261106181435_phase_d2_requisition_remaining_need.sql`
+6. `20261106185554_phase_d2_private_req_bal_drafts.sql`
+7. `20261106203000_phase_d2_private_bal_reference.sql`
+8. `20261106211500_phase_d2_selected_shift_dates.sql`
+
+Essa lista é uma referência de auditoria, não autorização para aplicar cegamente arquivos desatualizados.
+
+## IV.1 — Preflight obrigatório
+
+Antes da aplicação:
+
+- Confirmar identidade, projeto, ambiente e permissões da conexão Supabase.
+- Consultar novamente o histórico remoto de migrations.
+- Comparar versões e conteúdo com a branch atual.
+- Identificar divergências, migrations remotas desconhecidas e possíveis alterações manuais.
+- Revisar dependências, ordem, locks, RLS, grants, funções privilegiadas e compatibilidade.
+- Avaliar se o schema novo permanece compatível com versões da aplicação eventualmente publicadas na Vercel.
+- Produzir uma cópia de segurança apropriada ao risco da alteração, fora do repositório, com integridade verificável.
+- Verificar a possibilidade real de recuperação antes da alteração.
+- Registrar estado anterior, incluindo contagens e controles não sensíveis.
+
+Não considerar um backup válido apenas porque um arquivo foi criado.
+
+**Se houver incompatibilidade potencialmente destrutiva com a aplicação atualmente publicada, contenha a aplicação das migrations, documente a causa e proponha uma evolução compatível. Não transforme essa autorização em permissão para indisponibilizar o ambiente.**
+
+## IV.2 — Aplicação
+
+Após o preflight satisfatório:
+
+- Aplicar somente as migrations efetivamente pendentes, na ordem correta.
+- Usar o fluxo oficial de migrations do projeto.
+- Não reaplicar migrations já registradas.
+- Não executar seeds de testes.
+- Não apagar usuários, perfis, catálogo, documentos ou configurações existentes.
+- Não sobrescrever dados para fazer um teste passar.
+- Não alterar as 84 migrations históricas protegidas.
+
+## IV.3 — Pós-aplicação
+
+Comprovar:
+
+- Histórico remoto de migrations sincronizado.
+- Ausência de drift inesperado.
+- Funções, triggers, políticas, grants e RLS consistentes.
+- Integridade dos documentos e custódias.
+- Preservação dos usuários e acessos existentes.
+- Contratos de leitura e comandos relevantes da D-A funcionando.
+- Nenhum efeito externo indevido provocado por jobs, cron ou notificações.
+
+Registrar o resultado no checkpoint da missão.
+
+**Essa aplicação inicial deve ocorrer antes da implementação dependente de D-B, não ser deixada apenas para o final.**
+
+---
+
+# V — OBJETIVO GERAL DA D-B
+
+Executar integralmente:
+
+**D3 — Recuperação de edição, listas e experiência.**
+
+**D4 — Arquivos, PDFs, emissão, assinatura e integridade do exemplar.**
+
+**D5 — PWA, notificações internas e Web Push.**
+
+O planejamento C9 relaciona aproximadamente **75 critérios canônicos** a esses lotes, considerando D3, D4, D5 e critérios compartilhados D3/D4.
+
+Confronte o número e a classificação com a matriz efetiva antes de começar.
+
+Não interprete o número como limite absoluto: os complementos aprovados neste comando devem receber critérios e testes adicionais próprios, sem substituir ou reduzir a cobertura original.
+
+O objetivo é entregar os lotes de ponta a ponta, com produtores e consumidores reais, não somente componentes isolados, mocks ou APIs sem integração.
+
+---
+
+# VI — DECISÕES DE PRODUTO DEFINITIVAS PARA ESTA MISSÃO
+
+## VI.1 — Operação inicial
+
+A primeira utilização pretendida será em **uma única residência: a residência do responsável pelo produto**.
+
+A arquitetura deve continuar compatível com outras residências e pacientes futuramente.
+
+Não converter o sistema em uma aplicação estruturalmente single-tenant apenas porque o piloto inicial será limitado a uma residência.
+
+A liberação com dados reais dependerá dos gates aplicáveis de D-C.
+
+## VI.2 — Backup
+
+Política inicial aprovada:
+
+- Backup diário.
+- Backup extraordinário antes de migrations e alterações críticas.
+- Retenção de sete cópias diárias e quatro semanais.
+- Criptografia.
+- Manifesto e hashes.
+- Destino independente do ambiente operacional.
+- Testes de recuperação em ambiente isolado.
+- Objetivo inicial de RPO até 24 horas.
+- Objetivo inicial de RTO até oito horas.
+
+RPO/RTO são metas a demonstrar, não garantias presumidas.
+
+**Não há autorização nem necessidade de contratar agora uma plataforma empresarial de backup.**
+
+Implementar uma base funcional com a infraestrutura existente e arquitetura substituível para provedores posteriores.
+
+## VI.3 — Monitoramento
+
+Aprovado:
+
+- Monitoramento interno dos processos relevantes.
+- Estados e histórico de incidentes.
+- Severidades.
+- Reconhecimento e tratamento dos incidentes.
+- Alertas internos e visão administrativa autorizada.
+- Interfaces para integração futura com monitoramento externo.
+
+Não é necessário contratar observabilidade externa nesta etapa.
+
+Entretanto, não afirmar que o monitoramento interno detecta a indisponibilidade total da própria aplicação sem verificador independente.
+
+## VI.4 — Retenção e exclusão
+
+Aprovado:
+
+- Sem exclusão automática de documentos oficiais na primeira versão.
+- Preservação dos PDFs emitidos e assinados.
+- Preservação dos eventos, autoria e versões.
+- Rascunhos privados descartáveis pelo próprio titular.
+- Descarte de rascunho não apaga documento oficial nem objeto já confirmado.
+- Limpeza técnica apenas de objetos temporários efetivamente abandonados, mediante critérios seguros e auditáveis.
+- Retenção de logs técnicos limitada e minimizada.
+
+A política futura de eliminação de documentos oficiais fica diferida para análise específica.
+
+Não inventar TTL de rascunhos ou prazo genérico de descarte.
+
+## VI.5 — Assinatura criptográfica
+
+Aprovado:
+
+**Assinatura PAdES-B-T com certificado interno do sistema e carimbo criptográfico de tempo interno, com arquitetura preparada desde a origem para ICP-Brasil e serviços de confiança externos.**
+
+Esta implementação não pode ser descartável.
+
+O responsável não aceita criar um mecanismo improvisado que precise ser integralmente refeito quando houver migração para ICP-Brasil.
+
+O mecanismo atual deve funcionar efetivamente com certificado interno e conter abstrações para futuras alternativas de certificado, chave, assinatura, TSA, validação e confiança.
+
+## VI.6 — Verificação documental
+
+Implementar agora em D4:
+
+1. Consulta por QR Code.
+2. Consulta por código digitável.
+3. Verificação mediante upload do arquivo PDF.
+
+Esses três caminhos pertencem à primeira entrega de D-B.
+
+## VI.7 — Emissão e histórico dentro das fichas
+
+A experiência aprovada é simples:
+
+**O usuário clica em “Gerar PDF” e o sistema realiza a emissão autorizada.**
+
+Cada ficha operacional deverá conter uma área específica para consultar os arquivos já gerados.
+
+Essa área terá histórico rastreável, acesso às cópias efetivamente emitidas e recuperação dos exemplares originais.
+
+Não exigir uma sequência desnecessária de formulários, opções ou confirmações para simplesmente gerar o documento.
+
+Os requisitos de autorização, idempotência, assinatura e integridade continuam obrigatórios, mas não precisam transformar a ação em uma experiência complicada.
+
+## VI.8 — UI/UX
+
+Manter os lotes e a direção visual aprovados.
+
+D3 deve implementar as melhorias de experiência já previstas.
+
+Toda interface criada ou alterada deve respeitar o blueprint C8 e o Fluent UI 2.
+
+**Não incluir nesta missão uma reconstrução visual integral de todas as páginas.**
+
+Uma revisão visual transversal adicional será avaliada depois da D-B, antes da homologação definitiva.
+
+---
+
+# VII — EXECUÇÃO D3: EXPERIÊNCIA, EDIÇÃO E RECUPERAÇÃO
+
+Implemente integralmente o lote D3, incluindo os critérios canônicos correspondentes.
+
+## Escopo mínimo
+
+### 1. Recuperação de rascunhos
+
+Aproveitar e ampliar o núcleo de rascunhos persistentes construído na D-A.
+
+Garantir:
+
+- Recuperação entre aparelhos e sessões.
+- Preservação das revisões do servidor.
+- Concorrência por CAS.
+- Recuperação após resposta perdida.
+- Continuidade da mesma intenção.
+- Comparação de alterações conflitantes.
+- Retomada sem duplicar fichas.
+- Descarte seguro de rascunho próprio.
+
+Não antecipar a criação de um documento oficial quando o usuário apenas começa a preencher um formulário.
+
+### 2. Listas, busca e históricos
+
+Implementar as consultas e recuperações previstas nos contratos.
+
+Conferir:
+
+- Busca por campos relevantes.
+- Filtros adequados à finalidade.
+- Ordenação.
+- Paginação ou cursores estáveis.
+- Volumes de 50 e 100 ou mais registros.
+- Pendências antigas.
+- Vínculos entre origem e consequência.
+- Navegação entre documento, movimento, ocorrência e histórico.
+- Resposta atrasada ou invertida sem contaminar o estado atual.
+
+### 3. Estados de interface
+
+Tratar corretamente:
+
+- Carregando.
+- Vazio após consulta válida.
+- Falha de leitura.
+- Falha de gravação.
+- Confirmação persistida.
+- Resultado incerto.
+- Conflito de versão.
+- Perda de autorização.
+- Contexto alterado.
+- Recuperação de conexão.
+- Retorno após conclusão parcial.
+
+Não apresentar uma resposta perdida como confirmação de falha definitiva.
+
+Não apagar o conteúdo do usuário ao ocorrer erro de rede.
+
+### 4. Formulários e navegação
+
+Aplicar os contratos C8 nos consumidores de D3.
+
+Usar controles compatíveis com o dado e sua finalidade: combobox, seleção múltipla, data, horário, quantidade decimal, texto, justificativa e valores somente de leitura.
+
+Preservar:
+
+- Máscaras e unidades.
+- Texto auxiliar.
+- Validação contextual.
+- Mensagens compreensíveis.
+- Foco e teclado.
+- Leitura por tecnologias assistivas.
+- Layout móvel.
+- Revisão antes de decisões com efeitos relevantes.
+- Distinção entre edição e confirmação.
+
+Campos `READ_ONLY` não devem ser transformados em inputs desabilitados apenas para manter aparência de formulário.
+
+### 5. Contexto e orientação
+
+Implementar os caminhos previstos para navegação, convites, orientação dos públicos e preparação da primeira residência, nos limites atribuídos a D3.
+
+Respeitar a exclusividade do administrador global na criação de residência e a separação entre capacidades globais e locais.
+
+Não criar uma central genérica adicional se o mesmo objetivo puder ser atendido por uma superfície prevista e mais simples.
+
+## Critério de conclusão D3
+
+Uma pessoa autorizada deve conseguir localizar uma tarefa existente, entender seu estado, retomar uma edição, resolver conflito e recuperar o resultado anterior sem duplicar efeitos nem depender de intervenção técnica.
+
+---
+
+# VIII — EXECUÇÃO D4: PDF, ARQUIVOS, PAdES E VERIFICAÇÃO
+
+Este é um dos principais lotes da missão.
+
+## VIII.1 — Fidelidade dos PDFs
+
+Implementar os requisitos documentais já estabelecidos.
+
+Os PDFs de REQ, COM, ENT e BAL devem preservar:
+
+- Conteúdo histórico correto.
+- Identidade da ficha e versão.
+- Autoria efetiva dos atos.
+- Datas próprias de cada fato.
+- Quantidades e unidades.
+- Estados parciais e terminais.
+- Referências causais.
+- Diferenças entre declaração, expedição, recebimento e atendimento.
+- Ciência registrada, sem inventar assinatura pessoal.
+- Ressalvas, observações e anexos conforme o contrato.
+- Histórico e proveniência quando aplicáveis.
+- Legibilidade, paginação e geometria adequadas.
+
+Corrigir problemas documentados em B6 e C3/C4, inclusive o tratamento de conteúdos extensos, anotações, arquivos legados e fidelidade semântica.
+
+Integrar efetivamente o oráculo de PDF sem texto definido em D0.
+
+## VIII.2 — Arquitetura de emissão
+
+Implementar o ciclo:
+
+**Intenção de emissão → composição → validação do conteúdo → assinatura → validação criptográfica → persistência imutável → registro final → disponibilização.**
+
+Cada emissão deverá ter identidade própria, separada da versão de negócio.
+
+Registrar, conforme aplicável:
+
+- `issuance_id`.
+- Documento e versão de origem.
+- Tipo de PDF.
+- Identidade do solicitante da geração.
+- Instante de solicitação e emissão.
+- Revisão do renderizador.
+- Identidade do assinador técnico.
+- Certificado utilizado.
+- Informação temporal.
+- Hash dos bytes finais.
+- Tamanho.
+- Caminho do objeto.
+- Estado da emissão.
+- Resultado da validação.
+
+Esses são requisitos conceituais; modele nomes e tabelas conforme os contratos reais e a arquitetura existente.
+
+Baixar uma emissão já registrada deve recuperar **os mesmos bytes**.
+
+Pedir uma nova geração explícita pode produzir outra emissão, com outra identidade e assinatura.
+
+A repetição da mesma intenção após timeout não deve produzir uma emissão duplicada.
+
+Nenhum PDF pode ser anunciado como íntegro e pronto antes de estar efetivamente assinado, validado e persistido.
+
+## VIII.3 — PAdES-B-T com certificado interno
+
+Implementar assinatura PDF criptográfica incorporada, interoperável e verificável.
+
+A arquitetura deve possuir separação explícita entre:
+
+- Renderização do documento.
+- Orquestração de emissão.
+- Provedor de assinatura.
+- Provedor e custódia de chaves.
+- Certificado e cadeia.
+- Autoridade de carimbo de tempo.
+- Verificador criptográfico.
+- Política de confiança.
+- Persistência imutável.
+- Consulta pública de verificação.
+
+O certificado inicial será interno, destinado à assinatura técnica do **Home Care Assistant**.
+
+Não atribuir a assinatura criptográfica ao profissional ou familiar apenas porque foi essa pessoa quem criou ou confirmou um ato.
+
+### Carimbo do tempo
+
+O objetivo aprovado é PAdES-B-T com carimbo tecnicamente compatível com RFC 3161.
+
+A TSA inicial poderá ser interna.
+
+Entretanto:
+
+- Um horário gravado pelo servidor não é automaticamente um carimbo criptográfico.
+- Uma TSA interna não oferece, por si só, independência temporal ou confiança de terceiro.
+- O verificador deve distinguir carimbo interno válido de carimbo emitido por autoridade externa confiável.
+- Não declarar conformidade B-T sem gerar e validar efetivamente o token temporal exigido.
+
+Não fazer fallback silencioso para B-B ou para PDF sem assinatura.
+
+Se algum requisito impedir o perfil aprovado, registrar o bloqueio e não declarar o critério como concluído.
+
+### Evolução futura para ICP-Brasil
+
+Projetar adaptadores e contratos que permitam posteriormente:
+
+- Certificado e cadeia ICP-Brasil.
+- Assinatura remota ou local autorizada.
+- KMS/HSM ou outro mecanismo apropriado de custódia.
+- TSA externa.
+- Consultas de revogação.
+- Evolução para perfis de preservação de longo prazo, quando escolhidos.
+- Políticas de validação por cadeia e época da assinatura.
+
+Não presumir que a evolução para ICP-Brasil se limitará à troca de um arquivo de certificado.
+
+O núcleo documental, as identidades de emissão e a interface de verificação devem continuar reutilizáveis.
+
+### Segurança das chaves
+
+Nunca armazenar chave privada, senha de PFX/P12, token de assinatura ou material equivalente no Git, browser, QR Code, PDF, log ou tabela acessível ao usuário.
+
+Definir uma solução inicial compatível com a infraestrutura disponível, com:
+
+- Separação de ambientes.
+- Acesso mínimo.
+- Segredos protegidos.
+- Rotação.
+- Identificação de versões de chave.
+- Renovação do certificado.
+- Procedimento de comprometimento.
+- Recuperação adequada.
+- Auditoria do uso.
+
+Avaliar as limitações reais da Vercel e do ambiente de execução.
+
+Não depender de processo residente ou recurso incompatível com o runtime escolhido.
+
+Escolher bibliotecas e infraestrutura com base em compatibilidade, segurança, manutenção e testes reais, sem instalar soluções improvisadas de criptografia.
+
+## VIII.4 — Área “Arquivos gerados” dentro de cada ficha
+
+Implementar uma área documental integrada aos detalhes de REQ, COM, ENT e BAL.
+
+Nome funcional sugerido: **Arquivos gerados**.
+
+Exibir histórico das emissões daquele documento, com apresentação humana compreensível.
+
+Cada entrada deverá permitir identificar:
+
+- Tipo do documento.
+- Versão de negócio.
+- Data e horário da emissão.
+- Pessoa que solicitou a geração.
+- Identificação da emissão.
+- Estado do arquivo.
+- Situação da assinatura.
+- Ações de visualizar e baixar o exemplar registrado.
+- Eventual relação com outras emissões.
+
+O usuário não deve precisar compreender `issuance_id`, hash ou estrutura de Storage para usar a funcionalidade.
+
+Esses dados poderão aparecer em detalhes técnicos ou na verificação.
+
+### Ação principal
+
+**Gerar PDF** deve executar a emissão correspondente, sem formulário intermediário injustificado.
+
+Durante a geração:
+
+- Exibir andamento real.
+- Evitar duplo clique gerador de duplicidade.
+- Recuperar a mesma intenção em caso de resposta perdida.
+- Diferenciar arquivo pronto, falha e estado incerto.
+- Preservar o histórico.
+- Disponibilizar o arquivo quando pronto.
+
+**Não sobrescrever a emissão anterior para economizar registros.**
+
+Não regenerar silenciosamente um exemplar histórico ao clicar em download.
+
+## VIII.5 — Página pública de verificação documental
+
+Ampliar a implementação atual de `/verificar/[id]` ou criar rota canônica compatível, preservando a resolução dos QR Codes já emitidos.
+
+A página deverá oferecer três jornadas:
+
+### A. QR Code
+
+O QR deve conduzir à referência correta da emissão, sem divulgar dados sensíveis.
+
+Consultar a emissão referenciada e apresentar os resultados efetivamente verificáveis.
+
+O QR isolado não poderá ser apresentado como prova de integridade dos bytes que o usuário está segurando.
+
+### B. Código digitável
+
+Criar código de verificação:
+
+- Legível.
+- Não sequencial.
+- Resistente à enumeração.
+- Vinculado à emissão correta.
+- Compatível com futuras emissões e verificações.
+- Distinto do protocolo operacional quando necessário.
+
+O usuário poderá digitar esse código sem possuir conta.
+
+Não transformar o código público em autorização para acessar dados privados.
+
+### C. Upload do arquivo
+
+Permitir selecionar um PDF e verificar:
+
+- Se corresponde a uma emissão registrada.
+- Se os bytes correspondem ao exemplar oficial.
+- Se a assinatura está criptograficamente íntegra.
+- Se há alteração posterior incompatível.
+- Qual certificado o assinou.
+- Qual a situação da cadeia de confiança.
+- Qual a situação do carimbo de tempo.
+- Se o certificado é interno ou de uma cadeia externa reconhecida.
+
+Não confiar em hash ou metadados fornecidos pelo próprio arquivo sem verificação.
+
+Proteger a rota contra arquivos excessivos, inválidos, cargas maliciosas, enumeração e abuso de processamento.
+
+Não armazenar permanentemente o PDF enviado por um visitante apenas para verificar sua autenticidade.
+
+### Resultados discriminados
+
+O verificador não deverá apresentar apenas “válido” ou “inválido” quando o estado real for mais específico.
+
+Separar, por exemplo:
+
+- Emissão localizada ou não localizada.
+- Exemplar coincidente ou divergente.
+- Assinatura íntegra ou adulterada.
+- Cadeia reconhecida, interna, desconhecida ou inválida.
+- Informação temporal validada ou não validável.
+- Arquivo legado sem assinatura incorporada.
+- Serviço temporariamente indisponível.
+
+Ausência de referência ou falha de infraestrutura não pode ser anunciada automaticamente como falsificação.
+
+A página pública deve preservar a privacidade do paciente, familiares, profissionais e materiais.
+
+## VIII.6 — Compatibilidade histórica
+
+Preservar os PDFs já emitidos e registrados.
+
+Não acrescentar assinatura retroativa aos bytes antigos fingindo que ela existia no momento original.
+
+Classificar corretamente os exemplares legados.
+
+Se uma nova representação de documento histórico for solicitada, ela deverá constituir nova emissão, com origem e momento claramente identificados.
+
+## VIII.7 — Oráculos e testes de D4
+
+Exigir, no mínimo, cenários demonstrando:
+
+- Duas emissões distintas da mesma versão.
+- Download repetido com bytes idênticos.
+- Retry da mesma emissão sem duplicidade.
+- Interrupção antes e depois da assinatura.
+- Interrupção após upload e antes do registro ready.
+- PDF adulterado.
+- QR legítimo copiado para PDF adulterado.
+- Código de verificação inexistente.
+- Upload de PDF de outra emissão.
+- Certificado interno válido.
+- Certificado desconhecido.
+- Assinatura inválida.
+- Token temporal válido e adulterado.
+- Arquivo histórico sem assinatura.
+- Cache com bytes divergentes.
+- Negação de acesso privado.
+- PDF estruturalmente válido, mas sem conteúdo obrigatório.
+- Documento longo, paginação, impressão e extração de conteúdo.
+
+Não considerar hash correto como substituto de fidelidade documental.
+
+---
+
+# IX — EXECUÇÃO D5: PWA, PUSH E NOTIFICAÇÕES
+
+Implementar integralmente D5, respeitando C3, C4, C9 e os contratos já existentes da D-A.
+
+## IX.1 — PWA
+
+Implementar e validar:
+
+- Manifesto.
+- Instalação.
+- Ícones e identificação.
+- Service worker.
+- Atualização segura.
+- Controle de versões.
+- Tratamento de incompatibilidade entre aplicação e schema.
+- Experiência apropriada em desktop e dispositivos móveis.
+
+O cache não pode armazenar indiscriminadamente PDFs, APIs autenticadas, dados privados ou informações de pacientes.
+
+Não prometer edição transacional offline sem um modelo específico aprovado.
+
+## IX.2 — Web Push
+
+Implementar:
+
+- Consentimento por usuário e aparelho.
+- Inscrição e revogação.
+- Preferências.
+- Chaves e segredos protegidos.
+- Integração com eventos internos.
+- Deduplicação.
+- Tentativas e estados.
+- Tratamento de falhas.
+- Deep links seguros.
+- Troca de conta.
+- Sessão expirada.
+- Dispositivo compartilhado.
+
+A notificação push não equivale a ciência expressa, entrega física ou confirmação de recebimento.
+
+Mensagens exibidas em tela bloqueada não devem revelar dados sensíveis do paciente.
+
+## IX.3 — Notificações internas
+
+Reutilizar o sistema persistente de eventos, tarefas e outbox.
+
+Não criar um segundo motor de obrigação.
+
+Reconciliar os mecanismos legados de lembretes e agendamentos previstos em OPS-01.
+
+Não desativar um mecanismo antigo sem demonstrar que sua obrigação continua atendida pela implementação substituta.
+
+## IX.4 — Integrações diferidas
+
+Não ativar nesta missão:
+
+- WhatsApp/Meta/Flows reais.
+- SMS operacional.
+- Serviços comerciais externos não aprovados.
+- Integrações que impliquem contratação ou envio de dados reais não autorizado.
+
+D7 continua separada.
+
+Os testes de push deverão distinguir transportes simulados e provedores reais.
+
+Homologação em aparelhos reais pertence à D-C.
+
+---
+
+# X — BASE OPERACIONAL DE BACKUP, RECUPERAÇÃO E MONITORAMENTO
+
+Além dos critérios canônicos D3–D5, o responsável aprova a preparação técnica de uma infraestrutura inicial enxuta.
+
+Isso não transforma D-B em D6, mas exige implementar bases concretas que possam ser verificadas e posteriormente homologadas.
+
+## X.1 — Backup
+
+Investigar e aproveitar os recursos já existentes.
+
+O script `scripts/backup-local-database.mjs` é um instrumento de backup local de testes. Não tratá-lo como solução completa para o ambiente remoto.
+
+Desenhar e implementar um mecanismo que contemple, conforme necessário:
+
+- Banco PostgreSQL.
+- Identidades e vínculos necessários à recuperação.
+- Schema, migrations, funções, grants e RLS.
+- Documentos, eventos, protocolos e custódias.
+- PDFs e anexos no Storage.
+- Manifestos e hashes.
+- Configurações recuperáveis.
+- Referências e estados de workers/outbox.
+- Versões e material público de validação.
+- Custódia e recuperação das chaves de assinatura, por procedimento seguro e separado.
+
+**Banco e Storage precisam de cobertura coerente.** Um dump PostgreSQL não contém os bytes dos arquivos armazenados no Storage.
+
+Implementar política inicial de sete backups diários e quatro semanais, além de backup pré-alteração crítica.
+
+A solução deve admitir armazenamento em destino externo controlado, sem depender da contratação imediata de fornecedor especializado.
+
+É aceitável implementar e testar inicialmente um adaptador de filesystem criptografado sob controle do operador, com interface para outros destinos.
+
+Não é aceitável colocar cópias contendo dados sensíveis em commits, artefatos públicos de CI ou logs.
+
+### Recuperação
+
+Preparar os scripts, manifestos e procedimentos para restauração isolada.
+
+A prova completa de recuperação operacional, com cron e egress em quarentena e medição de RPO/RTO, continuará como gate de D6.
+
+Se ainda não houver destino independente efetivamente configurado, declarar expressamente que **backup operacional externo não está ativo**, mesmo que o software esteja pronto.
+
+## X.2 — Monitoramento
+
+Implementar uma base interna com eventos persistentes e observabilidade dos processos críticos.
+
+Cobrir:
+
+- Saúde da aplicação.
+- Acesso ao banco.
+- Falhas e atrasos de jobs.
+- Outbox e notificações.
+- Falhas de emissão e assinatura.
+- Falhas de integridade documental.
+- Execuções de backup.
+- Incidentes de segurança pertinentes.
+- Estados de recuperação.
+
+Separar estados operacionais de alertas técnicos globais.
+
+O administrador global não deve ganhar acesso indevido a dados clínicos ou operacionais locais apenas por visualizar incidentes técnicos.
+
+Criar interface extensível para fornecedores de monitoramento externos, com adaptadores e configuração por ambiente.
+
+Não ativar serviços externos por padrão.
+
+Os limites e severidades devem ser configuráveis, testados e documentados. Não inventar SLA contratual ou suporte 24 horas.
+
+Registrar claramente que disponibilidade externa não fica comprovada por checks que dependam da própria aplicação.
+
+## X.3 — Preparação do piloto
+
+Preparar documentação e controles para a primeira residência:
+
+- Configuração inicial.
+- Atores e capacidades.
+- Procedimento de contingência.
+- Responsável operacional e substituto a designar.
+- Incidentes.
+- Backup.
+- Recuperação.
+- Integridade documental.
+- Desativação segura de canais não homologados.
+
+Não declarar GO para operação real sem os gates de D-C.
+
+---
+
+# XI — VALIDAÇÕES E CRITÉRIOS DE ACEITE
+
+Antes de desenvolver, reconcilie os critérios da Fase C com esta ordem.
+
+Crie uma matriz de execução D-B com rastreabilidade entre:
+
+- Critério canônico.
+- Complemento aprovado.
+- Requisito.
+- Consumidor.
+- Arquivos alterados.
+- Migrations.
+- Testes positivos.
+- Contraprovas.
+- Evidência.
+- SHA.
+- Estado efetivo.
+- Gate externo remanescente.
+
+Não crie aprovações genéricas para critérios que exigem provas diferentes.
+
+## Testes esperados
+
+Aplique os instrumentos adequados a cada domínio:
+
+**Banco:** SQL real, RLS, Auth, concorrência, locks, grants, funções e idempotência.
+
+**API:** validação, autorização, versões, falhas, retries e recuperação.
+
+**Interface:** Playwright, Chromium, Mobile e WebKit, teclado, foco, acessibilidade, geometria e responsividade.
+
+**PDF:** inspeção estrutural, extração de conteúdo, comparação de bytes, assinatura, cadeia, TSA e verificação pública.
+
+**Storage:** objeto certo, hash certo, autorização, falha parcial e recuperação.
+
+**PWA/Push:** cache, inscrição, revogação, troca de usuário, expiração e transporte simulado.
+
+**Operação:** backup, manifesto, observabilidade, alertas e mecanismos de integração.
+
+Quando pertinente, execute instalação limpa e atualização de base legada.
+
+Não alterar expectativas dos testes para mascarar erro do produto.
+
+Não obter aprovação mediante remoção de testes, `force click`, sleeps arbitrários, ampliação indiscriminada de timeouts ou redução de regras de segurança.
+
+### Segurança e SonarCloud
+
+Investigue os apontamentos atuais de Reliability D e Security B.
+
+Corrija os problemas efetivos.
+
+Se houver falso positivo, documente sua natureza e demonstre por que não representa o defeito indicado.
+
+Não desative o Quality Gate para declarar sucesso.
+
+O encerramento técnico deve apresentar o estado real de todas as verificações do SHA final.
+
+---
+
+# XII — SEGUNDA APLICAÇÃO REMOTA: MIGRATIONS PRODUZIDAS PELA D-B
+
+**O responsável autoriza expressamente que, ao final da implementação de D-B, sejam aplicadas ao mesmo projeto Supabase remoto as novas migrations criadas nesta missão.**
+
+Projeto:
+
+`qwfrqychokvhdzakibid`
+
+Essa é uma segunda aplicação, distinta daquela prevista na Seção IV.
+
+## Procedimento obrigatório
+
+1. Concluir a implementação e os testes locais dos contratos dependentes.
+2. Revisar todas as novas migrations.
+3. Executar os controles de schema, autorização e segurança.
+4. Confirmar novamente o estado remoto.
+5. Verificar compatibilidade com a aplicação eventualmente publicada.
+6. Preparar backup pré-migration apropriado.
+7. Aplicar apenas as migrations novas e pendentes.
+8. Conferir o histórico remoto.
+9. Validar funcionamento e integridade.
+10. Registrar resultados, hashes e evidências.
+11. Corrigir eventuais problemas por migrations incrementais compatíveis.
+12. Confirmar a ausência de alterações destrutivas não autorizadas.
+
+Não faça reset remoto.
+
+Não apague dados para simplificar a migração.
+
+Não altere históricos protegidos.
+
+Não considere a aplicação de uma migration suficiente para afirmar que uma função está operacional: valide seus consumidores reais.
+
+### Separação entre migration e produção
+
+A autorização para evoluir o schema remoto **não autoriza automaticamente promover a aplicação para produção nem liberar dados reais**.
+
+Preserve a PR Draft.
+
+O rollout funcional e a liberação operacional continuam sujeitos aos gates apropriados.
+
+---
+
+# XIII — DOCUMENTAÇÃO E EVIDÊNCIAS
+
+Crie a estrutura de execução de D-B coerente com a organização documental existente.
+
+Sugestão:
+
+`docs/audits/D/D-B/`
+
+Utilize a convenção efetivamente adotada no repositório.
+
+A entrega deve conter:
+
+### 1. Checkpoint incremental
+
+Registrar decisões, implementações, falhas, correções, rechecks, limites e SHAs por incremento.
+
+### 2. Matriz de aceitação
+
+Confrontar os aproximadamente 75 critérios canônicos de D-B e todos os complementos aprovados nesta ordem.
+
+### 3. Relatório de migrations
+
+Duas seções distintas:
+
+- Migrations D-A aplicadas no início.
+- Migrations D-B aplicadas ao final.
+
+Registrar estado anterior e posterior do remoto.
+
+### 4. Dossiê documental
+
+Descrever a arquitetura efetivamente implementada de emissão, assinatura, certificado, carimbo, armazenamento, histórico e verificação pública.
+
+### 5. Dossiê operacional
+
+Descrever backup, retenção, recuperação, monitoramento, alertas e o que permanece dependente de serviços externos.
+
+### 6. Riscos e gates residuais
+
+Distinguir:
+
+- Implementação concluída.
+- Teste local concluído.
+- Verificação CI concluída.
+- Verificação remota concluída.
+- Teste físico pendente.
+- Serviço externo pendente.
+- Homologação operacional pendente.
+
+### 7. Documentação corrente
+
+Atualizar `docs/current` para refletir exclusivamente o que foi realmente implementado e comprovado.
+
+Evitar documentos duplicados, contratos contraditórios ou informação histórica apresentada como estado atual.
+
+---
+
+# XIV — RESTRIÇÕES INEGOCIÁVEIS
+
+Durante toda a missão:
+
+- Não substituir autoridade do banco por permissões visuais.
+- Não permitir aceite físico em nome de outra pessoa.
+- Não converter ciência em assinatura pessoal.
+- Não produzir movimentos de estoque fictícios.
+- Não apagar fatos históricos ao corrigir operações.
+- Não alterar bytes de PDF já emitido e registrado.
+- Não reemitir silenciosamente arquivo histórico.
+- Não declarar hash ou QR como assinatura digital.
+- Não declarar certificado interno como ICP-Brasil.
+- Não alegar confiança externa inexistente para TSA interna.
+- Não criar chaves privadas no código ou no repositório.
+- Não colocar informações privadas em URLs públicas de verificação.
+- Não criar duplicidade após resposta perdida.
+- Não apagar rascunho oficial ou registro ready no descarte.
+- Não fazer reset remoto.
+- Não ativar Meta/Flows reais.
+- Não fazer merge.
+- Não declarar produção GO.
+- Não transformar pendências de D6 em falsas aprovações de D-B.
+
+Preserve também a UI anterior de devolução e os caminhos legados protegidos até que a retirada seja expressamente autorizada e a equivalência necessária esteja demonstrada.
+
+---
+
+# XV — FORMA DE EXECUÇÃO
+
+Execute a missão nesta sequência:
+
+**Etapa 1 — Reconciliação inicial.**
+
+Verificar HEAD, PR, CI, SonarCloud, documentação e critérios D-B. Identificar apenas incompatibilidades materiais ou decisões ainda não contempladas por esta ordem.
+
+**Etapa 2 — Atualização inicial do Supabase remoto.**
+
+Aplicar as migrations pendentes da D-A conforme a Seção IV, com preflight, backup, compatibilidade e pós-validação.
+
+**Etapa 3 — D3.**
+
+Implementar e validar experiência, recuperação, listas, estados, formulários e navegação.
+
+**Etapa 4 — D4.**
+
+Implementar fidelidade documental, histórico de emissões, PAdES-B-T interno, TSA, arquitetura preparada para ICP-Brasil e verificação por QR, código e upload.
+
+**Etapa 5 — D5.**
+
+Implementar PWA, notificações internas, Web Push e os controles associados.
+
+**Etapa 6 — Base operacional.**
+
+Concluir os componentes iniciais de backup, recuperação, monitoramento e extensibilidade sem contratação externa.
+
+**Etapa 7 — Consolidação técnica.**
+
+Executar regressões, integração, verificações de segurança, correções e CI.
+
+**Etapa 8 — Atualização final do Supabase remoto.**
+
+Aplicar as migrations novas de D-B conforme a Seção XII e validar o resultado.
+
+**Etapa 9 — Encerramento documental.**
+
+Consolidar evidências, atualizar a PR Draft e produzir parecer final.
+
+Faça commits e pushes incrementais durante as etapas, não somente ao final.
+
+Não interrompa desnecessariamente a missão para solicitar aprovação sobre escolhas técnicas ordinárias já cobertas pelos contratos ou expressamente delegadas.
+
+Quando houver alternativas equivalentes, prefira a mais simples, segura, testável e extensível, registrando a decisão.
+
+Se identificar um bloqueio real envolvendo credenciais, contratação, alteração destrutiva, confiança criptográfica, incompatibilidade remota ou outro requisito externo não autorizado, preserve o estado, documente precisamente o impeditivo e avance nas partes independentes.
+
+Não marque como concluído aquilo que ficou bloqueado.
+
+---
+
+# XVI — CRITÉRIO DE ENCERRAMENTO DA MISSÃO
+
+A D-B somente poderá ser declarada tecnicamente concluída quando:
+
+1. Os critérios aplicáveis de D3, D4 e D5 estiverem implementados e comprovados.
+2. Os complementos aprovados neste comando tiverem testes próprios.
+3. A experiência de recuperação funcionar em seus consumidores reais.
+4. Os PDFs forem fiéis, versionados, assinados e recuperáveis.
+5. O PAdES-B-T interno estiver efetivamente implementado e validado.
+6. A arquitetura criptográfica estiver preparada para a evolução futura a ICP-Brasil.
+7. O histórico “Arquivos gerados” estiver integrado às fichas.
+8. A verificação por QR, código e upload estiver funcional.
+9. PWA e Web Push estiverem implementados dentro do escopo autorizado.
+10. A base técnica de backup e monitoramento estiver implementada, com limitações operacionais identificadas.
+11. As migrations pendentes de D-A tiverem sido tratadas no remoto.
+12. As migrations novas de D-B tiverem sido tratadas no remoto.
+13. A CI e os controles de qualidade do SHA final tiverem sido verificados.
+14. As evidências, limitações e decisões estiverem documentadas.
+15. A branch e a PR #7 permanecerem preservadas, sem merge.
+
+Se algum item obrigatório não passar, não declare conclusão integral.
+
+Ao final, apresente ao responsável um relatório executivo objetivo contendo:
+
+- HEAD final.
+- Quantidade de commits.
+- Estado da PR.
+- Critérios aprovados, parciais e pendentes.
+- Funcionalidades efetivamente entregues.
+- Migrations remotas aplicadas, separando D-A e D-B.
+- Resultado de CI e SonarCloud.
+- Estado de PAdES e verificação documental.
+- Estado de backup e monitoramento.
+- Pendências externas ou de D-C.
+- Recomendação técnica fundamentada para a próxima fase.
+
+**Resultado esperado: D-B implementada de ponta a ponta, rastreável, tecnicamente validada e preparada para D-C, sem antecipar indevidamente a liberação operacional.**
+
+INICIE A EXECUÇÃO.

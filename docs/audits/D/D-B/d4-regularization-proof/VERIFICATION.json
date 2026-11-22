@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "artifacts": [
+    {
+      "file": "unknown-5ff0e829-2183-43c2-9119-29695b728594.pdf",
+      "label": "unknown",
+      "sha256": "22bb2f647dd19c0f0c3c93889f3133b90d61ee158e01a3da08b744b3cafbcd78",
+      "revision": 8,
+      "pages": 4,
+      "facts": "PASS",
+      "signature": "ENTIRE_FILE",
+      "timestampInternalRoot": true
+    },
+    {
+      "file": "approved-current-c7558518-d002-4fe1-a7f6-cba928989a5a.pdf",
+      "label": "approved-current",
+      "sha256": "9e56debc7fbe44b07a63ae00cb81fd359edf4b6e5cb709b2760789414965018d",
+      "revision": 8,
+      "pages": 4,
+      "facts": "PASS",
+      "signature": "ENTIRE_FILE",
+      "timestampInternalRoot": true
+    },
+    {
+      "file": "old-v7-recovered-2197fc11-575e-4792-9918-a843e685b592.pdf",
+      "label": "old-v7-recovered",
+      "sha256": "29f287b02c1021117103904013790cd1c01800602a5da4ec3565cc7966b438da",
+      "revision": 7,
+      "pages": 4,
+      "facts": "PASS",
+      "signature": "ENTIRE_FILE",
+      "timestampInternalRoot": true
+    },
+    {
+      "file": "original-before-proposal-fba38656-04c7-4888-9b2d-b1b248ede56c.pdf",
+      "label": "original-before-proposal",
+      "sha256": "58f146e51145333054f959402247a8f841509f3a30d673d7a2146872a49f0d3c",
+      "revision": 7,
+      "pages": 3,
+      "facts": "PASS",
+      "signature": "ENTIRE_FILE",
+      "timestampInternalRoot": true
+    },
+    {
+      "file": "proposal-before-decision-159a0f51-e827-4c7b-932e-57d0368f2cbc.pdf",
+      "label": "proposal-before-decision",
+      "sha256": "d613c6bec4019208dd518246d46c1918e6fd3cc71f1805901a2c57ac7ab4de08",
+      "revision": 8,
+      "pages": 4,
+      "facts": "PASS",
+      "signature": "ENTIRE_FILE",
+      "timestampInternalRoot": true
+    },
+    {
+      "file": "rejected-acfd6600-c2e7-4622-8961-dfd01bcd43d8.pdf",
+      "label": "rejected",
+      "sha256": "1988125723761cff3c0d82419df705fcfd73d645d165d71a23a5c1368c7eae5e",
+      "revision": 8,
+      "pages": 4,
+      "facts": "PASS",
+      "signature": "ENTIRE_FILE",
+      "timestampInternalRoot": true
+    }
+  ],
+  "dependencies": {
+    "pdfplumber": "0.11.10",
+    "pypdf": "6.21.4",
+    "pyHanko": "0.38.1",
+    "pyhanko-certvalidator": "0.33.0"
+  },
+  "externalTrustOrTime": false,
+  "externalRevocation": false,
+  "styleOrHumanApproval": false
+}

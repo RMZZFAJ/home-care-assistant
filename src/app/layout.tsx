@@ -1,30 +1,42 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import "./globals.css";
 import "./design-system.css";
 import { LiveSession } from "@/components/live-session";
-import { ThemeProvider } from "@/theme/providers";
+import { OperationActivityHost, PageLoadingActivity } from "@/components/ui/operation-activity";
 import "@/theme/tokens.css";
+import "./canonical-ui.css";
+import "./l1-ui.css";
 import { WorkspaceProvider } from "@/components/layout/workspace-context";
+import { PwaProvider } from "@/components/pwa/pwa-provider";
+import { stablePreviewOrigin } from "@/lib/pwa/preview-origin";
 
 export const metadata: Metadata = {
   title: "Home Care Assistant",
   description:
     "Gestão segura de requisições de insumos para assistência domiciliar.",
+  appleWebApp: { capable: true, title: "Home Care", statusBarStyle: "default" },
+  icons: { apple: "/pwa/apple-180.png" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#173b3a",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{ children: React.ReactNode; }>) {
   return (
     <html lang="pt-BR">
       <body>
-        <ThemeProvider>
-          <Suspense fallback={<main className="p-6" role="status">Carregando seu espaço de cuidado…</main>}>
-            <WorkspaceProvider>{children}</WorkspaceProvider>
+        <div className="hca-app-root hca-theme hca-l1">
+          <Suspense fallback={<PageLoadingActivity title="Preparando seu espaço de cuidado" />}>
+            <PwaProvider previewOrigin={stablePreviewOrigin(process.env.VERCEL_ENV, process.env.VERCEL_BRANCH_URL)}><WorkspaceProvider>{children}</WorkspaceProvider></PwaProvider>
           </Suspense>
           <LiveSession />
-        </ThemeProvider>
+          <OperationActivityHost />
+        </div>
       </body>
     </html>
   );

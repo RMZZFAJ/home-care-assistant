@@ -1,0 +1,130 @@
+"use client";
+import { ActionButton } from "@/components/ui/controls";
+import { useState } from "react";
+
+import { Notice } from "@/components/workspace";
+
+export const selectedDayLabel = (value: string) =>
+  value.split("-").reverse().join("/");
+export function SelectedShiftDates({
+  from,
+  until,
+  selected,
+  onChange,
+  month: controlledMonth,
+  onMonthChange,
+}: {
+  from: string;
+  until: string;
+  selected: string[];
+  onChange: (dates: string[]) => void;
+  month?: string | null;
+  onMonthChange?: (month: string) => void;
+}) {
+  const [localMonth, setLocalMonth] = useState(from.slice(0, 7));
+  const month = controlledMonth ?? localMonth;
+  const first = new Date(month + "-01T12:00:00Z");
+  const days = new Date(
+    Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+  const label = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "UTC",
+    month: "long",
+    year: "numeric",
+  }).format(first);
+  function move(delta: number) {
+    const date = new Date(first);
+    date.setUTCMonth(date.getUTCMonth() + delta);
+    const next = date.toISOString().slice(0, 7);
+    if (onMonthChange) onMonthChange(next);
+    else setLocalMonth(next);
+  }
+  function toggle(date: string) {
+    onChange(
+      selected.includes(date)
+        ? selected.filter((value) => value !== date)
+        : [...selected, date].sort((a, b) => a.localeCompare(b, "en")),
+    );
+  }
+  const invalid = selected.filter((date) => date < from || date > until);
+  return (
+    <section
+      className="hca-form-stack hca-selected-dates"
+      aria-label="Selecionar datas dos plantões"
+    >
+      <h3>{label}</h3>
+      <div className="hca-toolbar">
+        <ActionButton
+          type="button"
+          aria-label="Mês anterior das datas"
+          onClick={() => move(-1)}
+        >
+          Anterior
+        </ActionButton>
+        <ActionButton
+          type="button"
+          aria-label="Próximo mês das datas"
+          onClick={() => move(1)}
+        >
+          Próximo
+        </ActionButton>
+      </div>
+      <p>
+        Selecione os dias desejados. Trocar o mês conserva a seleção e o horário
+        do tipo de plantão.
+      </p>
+      <div
+        className="hca-date-grid"
+        role="group"
+        aria-label={"Dias de " + label}
+      >
+        {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day) => (
+          <span className="text-center text-xs" key={day}>
+            {day}
+          </span>
+        ))}
+        {Array.from({ length: days }, (_, index) => {
+          const day = index + 1,
+            date = month + "-" + String(day).padStart(2, "0");
+          return (
+            <button
+              key={date}
+              type="button"
+              className="ui-button"
+              style={
+                day === 1
+                  ? { gridColumnStart: first.getUTCDay() + 1 }
+                  : undefined
+              }
+              aria-label={"Dia " + selectedDayLabel(date)}
+              aria-pressed={selected.includes(date)}
+              disabled={date < from || date > until}
+              onClick={() => toggle(date)}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+      <p role="status">{selected.length} datas selecionadas</p>
+      {invalid.length ? (
+        <Notice error>
+          Há datas fora do período escolhido. Remova-as ou ajuste o período
+          antes de revisar.
+        </Notice>
+      ) : null}
+      <div className="hca-toolbar" aria-label="Datas escolhidas">
+        {selected.map((date) => (
+          <ActionButton
+            key={date}
+            type="button"
+            aria-label={"Remover data " + selectedDayLabel(date)}
+            onClick={() => toggle(date)}
+          >
+            {selectedDayLabel(date)} ×
+          </ActionButton>
+        ))}
+      </div>
+    </section>
+  );
+}

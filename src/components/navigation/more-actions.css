@@ -1,0 +1,9 @@
+.hca-more-help { margin-bottom: 18px; font-size: 13px; color: var(--hca-muted); }
+.hca-more-destinations { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.hca-more-destination { display: block; padding: 21px; background: var(--hca-paper); border: 1px solid var(--hca-line); border-radius: var(--hca-radius); box-shadow: var(--hca-shadow); color: var(--hca-teal); text-decoration: none; min-width: 0; overflow-wrap: anywhere; }
+.hca-more-destination:hover { border-color: var(--hca-teal); background: #f7fbf8; }
+.hca-more-destination > .hca-icon { flex: none; color: var(--hca-teal); }
+.hca-more-destination h2 { font-size: 15px; font-weight: 700; line-height: 1.4; margin-top: 19px; }
+.hca-more-destination p { font-size: 12px; line-height: 1.6; color: var(--hca-muted); }
+@media (max-width: 850px) { .hca-more-destinations { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hca-more-destination { padding: 17px; } }
+@media (max-width: 500px) { .hca-more-destinations { grid-template-columns: minmax(0, 1fr); } }

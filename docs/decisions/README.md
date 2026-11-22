@@ -1,5 +1,9 @@
 # Decisões humanas do produto
 
+**Ordem posterior de 09/11/2026:**o [Modelo Integral](../ui-ux/CANONICAL_MODEL.md)
+substitui Fluent e a direção visual anterior em todo o sistema, preservando
+funções, contratos e recursos. Inclui fichas em abas e Andamentos reais.
+
 **Precedência atual:**
 [adendo C7](../audits/C/C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md).
 As respostas de 04/11/2026 substituem recomendações anteriores conflitantes.
@@ -26,9 +30,10 @@ não aprovam política pendente. O10 existe e deve ser preservada; O17/O18 e
 WhatsApp/Meta/Flows foram adiados. DEC-028/029/030 refinam regras anteriores
 sem reescrever fatos passados. D precisa de autorização própria.
 
-## Fechamento definitivo de 04/11/2026
+## Fechamento documental de C em 04/11/2026
 
 P02 OWNER_APPROVED; 66 fichas/262 controles originais revistos, catálogo de
 274 controles/424 usos e 187 casos planejados.
-[Entrega vigente](../audits/C/C10-pr-handoff/README.md). D NÃO INICIADA; sem
-merge. Gates específicos não são aprovados por documento.
+[Entrega histórica](../audits/C/C10-pr-handoff/README.md).
+As reservas posteriores de L2 e os gates da execução aparecem no
+[fechamento da PR 7](../audits/FECHAMENTO_PR7.md).

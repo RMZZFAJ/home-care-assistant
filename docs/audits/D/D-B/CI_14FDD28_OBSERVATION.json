@@ -1,0 +1,59 @@
+{
+  "observedAt": "2026-11-10T08:44:16.074Z",
+  "sha": "14fdd284f9962104063e83616725cff02d9c96d0",
+  "workflowRun": 42769763583,
+  "jobs": [
+    {
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (mobile-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (chromium)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (mobile-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "database-and-browser",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "preview": {
+    "id": "dpl_8TzAfNSFuF4hDFiDuaEGifvPm4C6",
+    "url": "home-care-assistant-12ujakqxy-rmzzfajs-projects.vercel.app",
+    "state": "READY",
+    "target": null
+  },
+  "limit": "Previous D3.46 SHA,181 migrations;does not validate D3.47 or187 migrations."
+}

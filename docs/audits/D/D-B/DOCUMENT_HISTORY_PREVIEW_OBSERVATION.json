@@ -1,0 +1,67 @@
+{
+  "at": "2026-11-08T12:39:47.932Z",
+  "sha": "8a17202526908286c155246d13985fad5903d4e6",
+  "deployment": "https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app",
+  "stableBranchOrigin": true,
+  "accessMechanism": "Authenticated Vercel CLI operator request; not a physical browser session",
+  "anonymousWorkerStatus": 302,
+  "workerRevision": "85e8e9bcfd2051f9bdd7557a",
+  "workerSha256": "ff7e19f6eabfc4cd9f6b7a91075eb224a38a8f8c5cbadb8c737c13d34b78aa56",
+  "workerNoStore": true,
+  "workerScope": "/",
+  "sameOriginCredentials": true,
+  "publicAssetsPinned": true,
+  "assets": [
+    {
+      "path": "/offline.html",
+      "status": 200,
+      "bytes": 1240,
+      "sha256": "17c0b345e45e346bed1c902d571d1d356e49c11370bcf8399e29db740346f2be",
+      "contentType": "text/html"
+    },
+    {
+      "path": "/pwa/icon-192.png",
+      "status": 200,
+      "bytes": 4337,
+      "sha256": "3db33a5782601af84b014224ace5224cea54c3978f4f0b81b1d3e40b46debdd5",
+      "contentType": "image/png"
+    },
+    {
+      "path": "/pwa/icon-512.png",
+      "status": 200,
+      "bytes": 16558,
+      "sha256": "5dfad9eacff835464bccd604d0eece85c443113259d58f601766b80ac0387c2e",
+      "contentType": "image/png"
+    },
+    {
+      "path": "/pwa/apple-180.png",
+      "status": 200,
+      "bytes": 3962,
+      "sha256": "fb50d55d9511def1c233da9bd158b7fc498bf2bc259fe738603da207e849d9df",
+      "contentType": "image/png"
+    }
+  ],
+  "runtime": {
+    "status": 200,
+    "state": "ready",
+    "protocol": 1,
+    "schema": 1
+  },
+  "applicationAuth": {
+    "withoutSessionHttp": 401,
+    "code": "SESSION_EXPIRED"
+  },
+  "previewOriginProp": true,
+  "protectionSettingsChanged": false,
+  "applicationAuthCreated": false,
+  "remoteFixtureCreated": false,
+  "externalPushTransportActivated": false,
+  "productionPromoted": false,
+  "physicalDeviceRetested": false,
+  "operationalGo": false,
+  "historyApplicationAuth": {
+    "withoutSessionHttp": 401,
+    "code": "SESSION_EXPIRED",
+    "remoteFixtureCreated": false
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "status": "PREFLIGHT_ACCEPTED_FOR_PENDING_ONLY_APPLICATION",
+  "at": "2026-11-08T02:03:52.292Z",
+  "project": "qwfrqychokvhdzakibid",
+  "sourceBase": "42ca8dfa888ca89e3bdf69af8f3fa2896255bef8",
+  "before": 148,
+  "target": 150,
+  "pending": 2,
+  "remoteHistorySqlMatched": 148,
+  "compatibility": {
+    "existingIdentitiesPreserved": 399,
+    "existingPublicIdentitiesPreserved": 236,
+    "authoritiesAndGrantsPreserved": true,
+    "changedDefinitions": [
+      "public.finalize_attachment",
+      "public.reserve_attachment"
+    ],
+    "behavior": "Legacy signatures and authorities retained; reserve excludes formal abandoned rows from capacity; finalize rejects terminal/null mismatches and requires tracked source attestation and existing Storage; upload policy locks the same row as abandonment",
+    "newTechnicalData": "Two private RLS tables without direct grants; owner attempts, frozen fingerprints, service-only source attestation/receipts; legacy provenance remains unknown; no TTL or object deletion",
+    "storagePolicyChange": {
+      "name": "storage.objects.evidence_upload",
+      "onlyChangedStoragePolicy": true,
+      "sameAuthenticatedInsertRole": true,
+      "intent": "Current authority plus active tracked send; row lock serializes with abandonment; legacy authorized quarantine upload retained"
+    }
+  },
+  "backup": {
+    "backupId": "012a5c4b-a398-4632-b403-597da91d708e",
+    "files": 79,
+    "bytes": 10922839,
+    "manifestSha256": "780588a5ebca622b092fdc4952e1c6787bae0fda77ac97cd44dc176cdb87faea",
+    "verified": true,
+    "restoredTables": 149,
+    "stableTableDigestsMatched": true,
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ],
+    "foreignKeysChecked": true,
+    "storageObjectsVerified": 33,
+    "pdfDigestsVerified": 32,
+    "signedIssuanceDigestsVerified": 1,
+    "migrationsAppliedToProbe": [
+      "20261108010230_phase_d3_attachment_attempts.sql",
+      "20261108011800_phase_d3_attachment_source_attestation.sql"
+    ],
+    "catalogueComparison": {
+      "views": false,
+      "columns": true,
+      "indexes": true,
+      "defaults": true,
+      "policies": true,
+      "triggers": true,
+      "functions": true,
+      "relations": true,
+      "constraints": false,
+      "table_grants": true,
+      "function_grants": true
+    },
+    "cronEnabled": false,
+    "networkExtensionEnabled": false,
+    "seconds": 5.392,
+    "operationalRecoveryGate": "D6_NOT_SATISFIED_BY_THIS_PROBE"
+  },
+  "originalTableProjections": 149,
+  "sourcePreservation": {
+    "unexpectedChanges": [],
+    "volatileSnapshotDifferences": [
+      "private.bal_scheduler_progress",
+      "private.legacy_reminder_progress",
+      "private.operations_components",
+      "private.operations_incidents",
+      "private.scheduler_health"
+    ]
+  },
+  "health": {
+    "waitingLocks": 0,
+    "longTransactions": 0,
+    "invalidIndexes": 0,
+    "originalCronStates": [
+      {
+        "active": true,
+        "name": "hca-notification-worker",
+        "schedule": "* * * * *"
+      },
+      {
+        "active": true,
+        "name": "hca-operational-lifecycle",
+        "schedule": "* * * * *"
+      }
+    ]
+  },
+  "dryRun": {
+    "pending": 2,
+    "seeds": [],
+    "roles": [],
+    "skipVault": true
+  },
+  "operationalExternalBackupActive": false,
+  "operationalGo": false
+}

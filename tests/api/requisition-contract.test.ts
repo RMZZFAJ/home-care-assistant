@@ -4,6 +4,19 @@ import { POST } from "@/app/api/requisitions/route";
 
 const base = { careRecipientId: "10000000-0000-4000-8000-000000000001", lines: [{ productId: "product", productName: "Produto", category: "higiene", currentStock: 0, urgent: false }], extraItems: [], observations: [], idempotencyKey: "20000000-0000-4000-8000-000000000001" };
 describe("requisition API contract", () => {
+  it("preserva zero observado, desconhecido e ausência como fatos distintos", () => {
+    const parse = (line: Record<string, unknown>) => requisitionInputSchema.parse({ ...base, lines: [{ productId: "product", urgent: false, ...line }] }).lines[0];
+    expect(parse({ stockObservation: "observed", currentStock: 0 })).toMatchObject({ stockObservation: "observed", currentStock: 0 });
+    expect(parse({ stockObservation: "observed", currentStock: "1.234567" }).currentStock).toBe(1.234567);
+    expect(parse({ stockObservation: "unknown", currentStock: null })).toMatchObject({ stockObservation: "unknown", currentStock: null });
+    expect(parse({ stockObservation: "unfilled" })).toMatchObject({ stockObservation: "unfilled", currentStock: null });
+    expect(parse({})).toMatchObject({ currentStock: null });
+    expect(parse({ stockObservation: "observed", currentStock: 7, stockObservationAt: "2026-11-04T15:12:30-03:00" }).stockObservationAt).toBe("2026-11-04T15:12:30-03:00");
+    for (const stockObservationAt of ["tomorrow", "2026-11-04T15:12:30", "2026-11-04T18:12:30.1234567Z", "infinity"])
+      expect(requisitionInputSchema.safeParse({ ...base, lines: [{ ...base.lines[0], stockObservationAt }] }).success).toBe(false);
+    for (const line of [{ stockObservation: "observed", currentStock: null }, { stockObservation: "unknown", currentStock: 0 }, { stockObservation: "unfilled", currentStock: 7 }, { stockObservation: "legacy_unclassified", currentStock: 0 }])
+      expect(requisitionInputSchema.safeParse({ ...base, lines: [{ productId: "product", urgent: false, ...line }] }).success).toBe(false);
+  });
   it("requires explicit patient and supports patient catalogues larger than the legacy seed", () => {
     expect(requisitionInputSchema.safeParse({ ...base, careRecipientId: undefined }).success).toBe(false);
     expect(requisitionInputSchema.safeParse({ ...base, lines: Array.from({ length: 40 }, (_, i) => ({ ...base.lines[0], productId: `product-${i}` })) }).success).toBe(true);

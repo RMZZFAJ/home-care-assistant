@@ -1,0 +1,90 @@
+{
+  "at": "2026-11-09T03:56:21.294010+00:00",
+  "baseSha": "9b8260e47a66a792f2e0cbb50f5894713c725646",
+  "sourceLfSha256": {
+    "src/components/admin/admin-fields.tsx": "f16d7564da1c65d3e7a76143c3b4c81e62b5c9193c5e46d1cd828e31dac7aa0b",
+    "src/components/admin/catalogue-management.tsx": "1ba252610c07a3d35000497c213d1d0ac1761329d8bd8c64c322a9eec21cead2",
+    "tests/e2e/typed-fields.spec.ts": "ded70034b7ed38d3b7077fabaa4c10020de3be83671aae687bfbf74cb94e8f94",
+    "tests/e2e/schedules.spec.ts": "af9cfd40f0e6eed4097951bc8720f0434e08635ef3c62208db2ee375204811e5"
+  },
+  "unchangedBoundaryLfSha256": {
+    "src/app/api/units/route.ts": "96268caaa8b02dab52beeb7f9760c817ae4d2c98e7e73318486e5c2207ee2995",
+    "src/app/api/catalog/route.ts": "618a42c227be4b81179f5a6f3c4fac6a6dd7759f2216486b5979d950618c11e5",
+    "src/app/api/admin/route.ts": "5903b449bede762579f8cba08ec0365e1589a6f32400b9ac2035088c67cd52e8",
+    "src/lib/validation/catalogue.ts": "1c0149d68ca4ccae7953a6cd8911e851eca63e721e403945c9ac8606a82fe4a1",
+    "src/lib/validation/schedules.ts": "01d1fb7c939c3fabad18eaeace5e635ca9b95a7ecda2e0b14645f606b125e12d",
+    "src/components/catalog/unit-console.tsx": "d880828f8e540d39a745424d36eec74f0a24708411114baf0e99c332d1b85516",
+    "src/components/catalog/presentation-management.tsx": "87676a8e9d57518029932422a67a8592bc5cbf4490f9b5a14e324c31d28cb862",
+    "src/components/auth/login-form.tsx": "3ebbe8dcb8fd5bd9503c03ad7e09ce78129ea0c95ca6c95302f753ea75c15651",
+    "src/components/auth/new-password-field.tsx": "7cdf5fb54b5db791aebd4c0f941f4fb534926a8542a8a48522e64c146e20a5d0",
+    "src/components/auth/mfa-settings.tsx": "a40df5c7f6fe34c1c55446880e3652bc59856b8b4edc3c257645e661cd992931",
+    "tests/field-validation.test.ts": "46ede6ffccf9aae3f91ec8e082adb0defd68376995da5c6b6e280ed621a69c6c",
+    "tests/password.test.ts": "dff611f13f148cf3dc63103be24c37f63d00bdddd149c2105c384249033ae275",
+    "tests/api/catalogue-contract.test.ts": "4c9ed9f60dd5faf03eb429ba580972b196d0c692586e8f376c6bc4043e657071",
+    "tests/auth.test.ts": "2f6738d66c400caaf8074987b7aabbd08daceb0ce8323ee20e81691dc1324bdc"
+  },
+  "logLfSha256": {
+    "typed-fields-baseline.log": "d745341605ff87aa5282a45f9f3b3a71de57418f5162ed53da5d96369d2c1eca",
+    "typed-fields-select-instrument.log": "576697876dcd38f0666029343cc8f4735ca4f4973c2c38feb3bbcd19c7a124d1",
+    "typed-fields-context-instrument.log": "13adca2511e076c6d58cf5a285292176340b5581c1208fcd13f74858a97de7d5",
+    "typed-fields-step-up-instrument.log": "99881982874ccf65f310dee2704ea3d7456dedc0ed72cdc3a222706e3f2be218",
+    "typed-fields-mfa-final.log": "21dd5fd5b8fea1600f451497a6c20b1f8f73845cb79e74a5b2b5c8d2bf8851a5",
+    "typed-fields-unit.log": "dda6c77313ffbb21dc234ddc8a41b7bfd61c08a47b6bb08d95f09a3493e1b335",
+    "typed-fields-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "typed-fields-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "validation": {
+    "unitPassed": 22,
+    "distinctQualifiedChromiumCases": 3,
+    "newBrowserCases": 2,
+    "extendedExistingScheduleCase": 1,
+    "localMobileOrWebkitClaim": false,
+    "otherBrowserCasesRetainedInCi": true,
+    "nativeIntegerAndPrecisionBounds": true,
+    "realHttpAndPostgresPersistence": true,
+    "textualLeadingZeros": true,
+    "completeUnitAndDeniedGlobalScope": true,
+    "overnight720MinutesNextLocalDay": true,
+    "realLocalTotpEnrollmentVerificationCleanup": true,
+    "syntheticOtpDiscardedOnReload": true,
+    "authTraceVideoScreenshotsDisabled": true,
+    "passwordChanged": false,
+    "privateSecretSaved": false,
+    "ledgerChanged": false,
+    "types": true,
+    "affectedLint": true,
+    "globalLocalSuitesRepeated": false,
+    "mutableDbParallelWithE2e": false
+  },
+  "cohortQualification": "The step-up log contains successful catalogue/unit/barcode and schedule Chromium cases. Final helper change adds expected profile destination only when stepUp=true;default false paths remain equal and product sources unchanged. MFA case separately passed on final source. Mobile/WebKit remain programmed in CI rather than repeating all local successes after each instrument fix.",
+  "counterproofs": {
+    "baselineNativeNegativeOrderAccepted": true,
+    "initialSelectLabelAssumption": "Accessible role select and existing material search selectors used",
+    "actorWithoutExplicitPatient": "Denied global selection;fixture corrected,authorization unchanged",
+    "mfaLoginExpectedOverview": "Legitimate step-up profile redirect recognized;product unchanged"
+  },
+  "remote": {
+    "file": "TYPED_FIELDS_REMOTE_OBSERVATION.json",
+    "versions": 164,
+    "pending": 0,
+    "mutations": false
+  },
+  "matrix": {
+    "rows": 105,
+    "columns": 39,
+    "first30Preserved": true,
+    "counts": {
+      "PARTIAL": 52,
+      "PASS": 51,
+      "NOT_STARTED": 2
+    }
+  },
+  "remainingGate": [
+    "Finite decision/line/capability group consumers",
+    "Own published SHA CI",
+    "Human AT/physical device and D-C/D6 as specified"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "operationalGo": false,
+  "goalComplete": false
+}

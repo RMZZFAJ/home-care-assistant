@@ -1,4 +1,13 @@
 export type ProductCategory = "medicamentos" | "higiene" | "dieta";
+export type StockObservation =
+  | "observed"
+  | "unknown"
+  | "unfilled"
+  | "legacy_unclassified";
+export type StockObservationTimeSource =
+  | "client_draft"
+  | "server_submission"
+  | "legacy_unknown";
 export type RequisitionStatus =
   | "draft"
   | "submitted"
@@ -19,22 +28,32 @@ export type CatalogItem = {
   category: ProductCategory;
   unit: string;
   quantity_decimals?: number;
+  selectionPredecessors?: { id: string; name: string; unit: string }[];
 };
+
+export type RequisitionStockReference = { token: string; quantity: string | null };
 
 export type RequisitionLine = {
   productId: string;
   productName: string;
   category: ProductCategory;
   unit?: string;
-  currentStock: number;
+  currentStock: string | number | null;
+  stockObservation?: StockObservation;
+  stockObservationAt?: string | null;
+  stockReference?: RequisitionStockReference;
   urgent: boolean;
   repeatReason?: string;
+  catalogueExtra?: import("@/lib/documents/extra-material-identity").CatalogueExtra;
 };
 
 export type ExtraItem = {
   id: string;
   name: string;
-  currentStock: number;
+  identification?: import("@/lib/documents/extra-material-identity").ExtraMaterialIdentity;
+  currentStock: string | number | null;
+  stockObservation?: StockObservation;
+  stockObservationAt?: string | null;
   urgent: boolean;
 };
 
@@ -42,13 +61,16 @@ export type RequisitionFormData = {
   lines: RequisitionLine[];
   extraItems: ExtraItem[];
   observations: string[];
+  remainingNeed?: { requisitionId: string; version: number; reason: string };
 };
 
 export type ReceiptLine = Omit<RequisitionLine, "currentStock"> & {
   currentStock: number | null;
+  stockObservationTimeSource?: StockObservationTimeSource;
 };
 export type ReceiptExtraItem = Omit<ExtraItem, "currentStock"> & {
   currentStock: number | null;
+  stockObservationTimeSource?: StockObservationTimeSource;
 };
 
 export type RequisitionReceipt = {
@@ -62,4 +84,11 @@ export type RequisitionReceipt = {
   recipientName: string;
   createdAt: string | null;
   legacyReconstructed?: boolean;
+  sourceRequisition?: {
+    id: string;
+    code: string | null;
+    protocol: string;
+    version: number;
+    reason: string;
+  } | null;
 };

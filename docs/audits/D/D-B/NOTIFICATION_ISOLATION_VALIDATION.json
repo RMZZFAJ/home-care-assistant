@@ -1,0 +1,389 @@
+{
+  "assembledAt": "2026-11-09T17:45:18.323661+00:00",
+  "baseSha": "3109e833b08a74f89d48168eb8fda4d4afa8e1aa",
+  "sourceLfSha256": {
+    "src/components/notifications/notification-bell.tsx": "6f3f201e73eed69644bb0ec25840598dec848281884b3dbd88ceeaab4d5285f2",
+    "src/components/ui/floating.tsx": "2128b4c76d51e2e79d006f74aaf1fee5e114286560c17c3d1f6ea5e841b050ec",
+    "tests/e2e/notification-isolation.spec.ts": "c6c98d960616f9653364db13e10902058bedc5770ffad28035c6c3d70a78fef7"
+  },
+  "installedLibrary": {
+    "version": "1.9.0",
+    "modalCondition": "modal !== false && hasClosePart",
+    "sourceSha256": {
+      "popover/popup/PopoverPopup.js": "d4d01160ec6af7b7dc65a2cfa9bd2cc253897c1f8b913d39e36fac46f5e37781",
+      "popover/close/PopoverClose.js": "28c44208735d3ed099cf7e58e691d13c21b3ee0097956525afa171a57b3fb73b",
+      "internals/useAnchorPositioning.d.ts": "824caa47b70dd50af7e8123c676b1bb33cf1543c0a4ef19d05adb748967c94ea"
+    }
+  },
+  "browser": {
+    "distinctApproved": 8,
+    "projects": {
+      "ios": 3,
+      "chromium": 2,
+      "mobile": 3
+    },
+    "identity": "file+path+title+project;latest outcome;mutable lines excluded",
+    "rounds": {
+      "notification-isolation-before": {
+        "stats": {
+          "total": 1,
+          "expected": 0,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha sem ciência e preserva abertura explícita do aviso",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "notification-isolation.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            "duration": 24306,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: Open notification dialog must isolate the mounted onboarding controls\n\nOpen notification dialog must isolate the mounted onboarding controls\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\nCall Log:\n- Timeout 15000ms exceeded while waiting on the predicate\n\n  103 |         },\n  104 |       )\n> 105 |       .toBe(true);\n      |        ^\n  106 |     await expect(\n  107 |       page.getByRole(\"button\", { name: \"Fechar por agora\", exact: true }),\n  108 |     ).toHaveCount(0);\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\notification-isolation.spec.ts:105:8\u001b[22m",
+                "codeframe": "   5 | import { sql, sqlLiteral as q } from \"../../scripts/test-environment.mjs\";\n   6 | import { selectContext } from \"./auth-context\";\n   7 | import { audit } from \"./accessibility-audit\";\n   8 | test.setTimeout(180000);\n   9 | const popup = (page: Page) =>\n   10 |   page.getByRole(\"dialog\", { name: \"Notificações\", exact: true });\n   11 | const trigger = (page: Page) =>\n   12 |   page.getByRole(\"button\", { name: /^Notificações/ });\n   13 | const guide = (page: Page) =>\n   14 |   page.locator('section[aria-label=\"Apresentação opcional\"]');\n   15 | test(\"D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha sem ciência e preserva abertura explícita do aviso\", async ({\n   16 |   page,\n   17 | }, info) => {\n   18 |   const f = await setup(),\n   19 |     family = await actor(\"family\", f.patient);\n   20 |   const doc = await rpc(family, \"create_supply_document\", {\n   21 |     p_patient: f.patient,\n   22 |     p_type: \"COM\",\n   23 |     p_payload: {\n   24 |       origin: \"purchase\",\n   25 |       lines: [{ productId: f.products[0], quantity: \"1\" }],\n   26 |     },\n   27 |     p_key: randomUUID(),\n   28 |     p_draft: false,\n   29 |   });\n   30 |   const notification = sql(\n   31 |     `select id from public.requisition_notifications where document_id=${q(doc.id)} and recipient_user_id=${q(fixtures.family.id)} and channel='internal' limit 1;`,\n   32 |   );\n   33 |   const facts = () =>\n   34 |     sql(\n   35 |       `select jsonb_build_object('seen',(select seen_at from public.requisition_notifications where id=${q(notification)}),'events',(select count(*) from public.document_events where document_id=${q(doc.id)}),'stock',(select count(*) from public.stock_movements where care_recipient_id=${q(f.patient)}));`,\n   36 |     );\n   37 |   await page.goto(\"/login\");\n   38 |   await page.getByLabel(\"E-mail\", { exact: true }).fill(fixtures.family.email);\n   39 |   await page.getByLabel(\"Senha\", { exact: true }).fill(fixturePassword);\n   40 |   await page.getByRole(\"button\", { name: \"Entrar\", exact: true }).click();\n   41 |   await expect(\n   42 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   43 |   ).toBeVisible();\n   44 |   await selectContext(page, f.patient);\n   45 |   await expect(guide(page)).toBeVisible();\n   46 |   const beforeGuide = (await (await page.request.get(\"/api/guides\")).json())\n   47 |     .data;\n   48 |   expect(beforeGuide).toMatchObject({\n   49 |     patientId: f.patient,\n   50 |     showOnFirstAccess: true,\n   51 |     progress: { revision: 0, status: null },\n   52 |   });\n   53 |   const before = facts();\n   54 |   let writes = 0;\n   55 |   page.on(\"request\", (request) => {\n   56 |     if (\n   57 |       request.method() !== \"GET\" &&\n   58 |       [\"/api/guides\", \"/api/notifications\"].includes(\n   59 |         new URL(request.url()).pathname,\n   60 |       )\n   61 |     )\n   62 |       writes++;\n   63 |   });\n   64 |   try {\n   65 |     await page.setViewportSize({ width: 768, height: 900 });\n   66 |     await page.evaluate(() => window.scrollTo(0, 0));\n   67 |     await expect(\n   68 |       page.getByRole(\"button\", { name: \"Fechar por agora\", exact: true }),\n   69 |     ).toBeEnabled();\n   70 |     await trigger(page).click();\n   71 |     await expect(popup(page)).toBeVisible();\n   72 |     await expect(\n   73 |       popup(page).getByText(doc.code, { exact: true }),\n   74 |     ).toBeVisible();\n   75 |     await info.attach(\"notification-onboarding-geometry\", {\n   76 |       body: JSON.stringify(\n   77 |         await guide(page).evaluate((element) => ({\n   78 |           guide: element.getBoundingClientRect().toJSON(),\n   79 |           isolated: Boolean(element.closest('[aria-hidden=\"true\"],[inert]')),\n   80 |           controls: Array.from(element.querySelectorAll(\"button\")).map(\n   81 |             (button) => ({\n   82 |               text: button.textContent,\n   83 |               box: button.getBoundingClientRect().toJSON(),\n   84 |             }),\n   85 |           ),\n   86 |         })),\n   87 |         null,\n   88 |         2,\n   89 |       ),\n   90 |       contentType: \"application/json\",\n   91 |     });\n   92 |     // Background stays mounted; only the open popup participates in navigation.\n   93 |     await expect(guide(page)).toHaveCount(1);\n   94 |     await expect\n   95 |       .poll(\n   96 |         () =>\n   97 |           guide(page).evaluate((element) =>\n   98 |             Boolean(element.closest('[aria-hidden=\"true\"],[inert]')),\n   99 |           ),\n  100 |         {\n  101 |           message:\n  102 |             \"Open notification dialog must isolate the mounted onboarding controls\",\n  103 |         },\n  104 |       )\n> 105 |       .toBe(true);\n      |        ^ Error: Open notification dialog must isolate the mounted onboarding controls\n  106 |     await expect(\n  107 |       page.getByRole(\"button\", { name: \"Fechar por agora\", exact: true }),\n  108 |     ).toHaveCount(0);\n  109 |     await expect(page.locator('[id=\"notification-panel\"]')).toHaveCount(1);\n  110 |     const close = popup(page).getByRole(\"button\", {\n  111 |       name: \"Fechar notificações\",\n  112 |       exact: true,\n  113 |     });\n  114 |     await close.focus();\n  115 |     for (const key of [\"Tab\", \"Tab\", \"Tab\", \"Tab\", \"Shift+Tab\", \"Shift+Tab\"]) {\n  116 |       await page.keyboard.press(key);\n  117 |       await expect\n  118 |         .poll(() =>\n  119 |           popup(page).evaluate((element) =>\n  120 |             element.contains(document.activeElement),\n  121 |           ),\n  122 |         )\n  123 |         .toBe(true);\n  124 |     }\n  125 |     for (const width of [768, 320, 390, 1440]) {\n  126 |       await page.setViewportSize({ width, height: 900 });\n  127 |       await audit(page, \"notification isolation with onboarding \" + width);\n  128 |     }\n  129 |     expect(facts()).toBe(before);\n  130 |     expect(writes).toBe(0);\n  131 |     await info.attach(\"notification-isolation\", {\n  132 |       body: await page.screenshot({ animations: \"disabled\" }),\n  133 |       contentType: \"image/png\",\n  134 |     });\n  135 |     await page.keyboard.press(\"Escape\");\n  136 |     await expect(popup(page)).toHaveCount(0);\n  137 |     await expect(trigger(page)).toBeFocused();\n  138 |     await expect(\n  139 |       page.getByRole(\"button\", { name: \"Fechar por agora\", exact: true }),\n  140 |     ).toBeEnabled();\n  141 |     await trigger(page).click();\n  142 |     await popup(page)\n  143 |       .getByRole(\"button\", { name: \"Fechar notificações\", exact: true })\n  144 |       .click();\n  145 |     await expect(popup(page)).toHaveCount(0);\n  146 |     await expect(trigger(page)).toBeFocused();\n  147 |     expect(facts()).toBe(before);\n  148 |     expect(writes).toBe(0);\n  149 |     expect((await (await page.request.get(\"/api/guides\")).json()).data).toEqual(\n  150 |       beforeGuide,\n  151 |     );\n  152 |     await trigger(page).click();\n  153 |     await popup(page)\n  154 |       .getByRole(\"link\", { name: \"Consultar histórico completo\", exact: true })\n  155 |       .click();\n  156 |     await expect(page).toHaveURL(/\\/notificacoes\\?/);\n  157 |     expect(facts()).toBe(before);\n  158 |     expect(writes).toBe(0);\n  159 |     await page.goto(\"/\");\n  160 |     await expect(guide(page)).toBeVisible();\n  161 |     await trigger(page).click();\n  162 |     const marked = page.waitForResponse(\n  163 |       (response) =>\n  164 |         new URL(response.url()).pathname === \"/api/notifications\" &&\n  165 |         response.request().method() === \"POST\",\n  166 |     );\n  167 |     await popup(page).getByRole(\"link\").filter({ hasText: doc.code }).click();\n  168 |     expect((await marked).ok()).toBe(true);\n  169 |     await expect(page).toHaveURL(new RegExp(\"/fichas/\" + doc.id));\n  170 |     expect(\n  171 |       sql(\n  172 |         `select seen_at is not null from public.requisition_notifications where id=${q(notification)};`,\n  173 |       ),\n  174 |     ).toBe(\"t\");\n  175 |     expect(writes).toBe(1);\n  176 |     expect((await (await page.request.get(\"/api/guides\")).json()).data).toEqual(\n  177 |       beforeGuide,\n  178 |     );\n  179 |     expect(\n  180 |       sql(\n  181 |         `select count(*) from public.document_events where document_id=${q(doc.id)};`,\n  182 |       ),\n  183 |     ).toBe(String(JSON.parse(before).events));\n  184 |   } finally {\n  185 |     await info.attach(\"notification-isolation-final-state\", {\n  186 |       body: JSON.stringify({\n  187 |         writes,\n  188 |         popupCount: await popup(page).count(),\n  189 |         guideProgress: (await (await page.request.get(\"/api/guides\")).json())\n  190 |           .data.progress,\n  191 |       }),\n  192 |       contentType: \"application/json\",\n  193 |     });\n  194 |   }\n  195 | });\n  196 |\n  197 | //"
+              }
+            ]
+          }
+        ],
+        "reportSha256": "5e215c573df31e4b04bcdb07ad31fbeec7d906e4ec876a55b7595a670f1fc8a1"
+      },
+      "notification-isolation-initial": {
+        "stats": {
+          "total": 8,
+          "expected": 7,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha sem ciência e preserva abertura explícita do aviso",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "notification-isolation.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            "duration": 12957,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha sem ciência e preserva abertura explícita do aviso",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "notification-isolation.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            "duration": 7162,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: notification isolation with onboarding 320 overflow\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m320\u001b[39m\nReceived:    \u001b[31m644\u001b[39m\n\n\u001b[90m   at \u001b[39maccessibility-audit.ts:86\n\n  84 |       });\n  85 |   }\n> 86 |   expect(size.content, label + \" overflow\").toBeLessThanOrEqual(size.width);\n     |                                             ^\n  87 | }\n  88 |\n\u001b[2m    at audit (C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\accessibility-audit.ts:86:45)\u001b[22m\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\notification-isolation.spec.ts:127:7\u001b[22m",
+                "codeframe": "   1 | import {expect, test} from \"@playwright/test\";\n   2 | import AxeBuilder from \"@axe-core/playwright\";\n   3 | import { accessibilityEvidence } from \"../support/accessibility-results\";\n   4 | import { assertKeyboardEntry } from \"./keyboard-entry\";\n   5 | export async function audit(page: import(\"@playwright/test\").Page, label: string, expectedTitle = \"Home Care Assistant\") {\n   6 |   await expect(page).toHaveTitle(expectedTitle);\n   7 |   if (label === \"login\") await expect(page.getByLabel(\"E-mail\", { exact: true })).toBeEnabled();\n   8 |   // Establish a known sequential origin before testing keyboard movement.\n   9 |   // BODY alone does not identify that origin after pointer/viewport changes.\n  10 |   // Keep all axe rules and the hidden/sentinel focus assertions enabled.\n  11 |   if (await page.evaluate(() => !document.activeElement || [document.body, document.documentElement].includes(document.activeElement as HTMLElement))) {\n  12 |     await page.evaluate(() => {\n  13 |       const state: { events: unknown[]; cleanup?: () => void } = { events: [] };\n  14 |       const target = (element: EventTarget | null) => element instanceof HTMLElement ? { tag: element.tagName, role: element.getAttribute(\"role\"), tabIndex: element.tabIndex, dummy: element.hasAttribute(\"data-tabster-dummy\"), hidden: Boolean(element.closest('[aria-hidden=\"true\"]')) } : null;\n  15 |       const record = (event: Event) => { if (!(event instanceof KeyboardEvent) || [\"Tab\", \"Enter\"].includes(event.key)) state.events.push({ type: event.type, target: target(event.target), active: target(document.activeElement), documentFocused: document.hasFocus() }); };\n  16 |       for (const name of [\"focusin\", \"focusout\", \"keydown\"]) document.addEventListener(name, record, true);\n  17 |       state.cleanup = () => { for (const name of [\"focusin\", \"focusout\", \"keydown\"]) document.removeEventListener(name, record, true); };\n  18 |       (window as unknown as { hcaFocusEvidence: typeof state }).hcaFocusEvidence = state;\n  19 |     });\n  20 |     try {\n  21 |       await assertKeyboardEntry(page, label);\n  22 |     } finally {\n  23 |       const focus = await page.evaluate(() => {\n  24 |         const state = (window as unknown as { hcaFocusEvidence: { events: unknown[]; cleanup: () => void } }).hcaFocusEvidence;\n  25 |         state.cleanup();\n  26 |         return { events: state.events, activeTag: document.activeElement?.tagName, documentFocused: document.hasFocus() };\n  27 |       });\n  28 |       await test.info().attach(\"keyboard-entry-\" + label.replaceAll(/[^a-z0-9-]/gi, \"-\"), { body: JSON.stringify(focus, null, 2), contentType: \"application/json\" });\n  29 |     }\n  30 |   }\n  31 |   await page.waitForFunction(() => document.getAnimations().every((animation) => animation.playState !== \"running\" || animation.effect?.getComputedTiming().iterations === Infinity));\n  32 |   const result = await new AxeBuilder({ page })\n  33 |     .withTags([\"wcag2a\", \"wcag2aa\", \"wcag21aa\", \"wcag22aa\"])\n  34 |     .analyze();\n  35 |   const evidence = accessibilityEvidence(label, result);\n  36 |   if (result.violations.some(item => item.id === \"target-size\")) {\n  37 |     const header = await page.locator(\".app-header\").evaluateAll(elements => elements.map(header => ({\n  38 |       bounds: header.getBoundingClientRect().toJSON(),\n  39 |       controls: Array.from(header.querySelectorAll<HTMLElement>(\"button,select,a\")).map(element => {\n  40 |         const bounds = element.getBoundingClientRect(), style = getComputedStyle(element);\n  41 |         return { tag: element.tagName, className: element.className, bounds: bounds.toJSON(), padding: style.padding, lineHeight: style.lineHeight, display: style.display,\n  42 |           hit: [0.1, 0.5, 0.9].map(fraction => document.elementsFromPoint(bounds.left + bounds.width * fraction, bounds.top + bounds.height / 2).slice(0, 4).map(hit => ({ tag: hit.tagName, className: hit.getAttribute(\"class\") }))) };\n  43 |       }),\n  44 |     })));\n  45 |     await test.info().attach(\"header-target-geometry\", { body: JSON.stringify(header, null, 2), contentType: \"application/json\" });\n  46 |   }\n  47 |   await test.info().attach(\"axe-\" + label.replaceAll(/[^a-z0-9-]/gi, \"-\"), {\n  48 |     body: JSON.stringify(evidence, null, 2), contentType: \"application/json\",\n  49 |   });\n  50 |   if (evidence.reviewRequired.length) test.info().annotations.push({\n  51 |     type: \"accessibility-review-required\",\n  52 |     description: label + \": \" + evidence.reviewRequired.map((item) => item.rule).join(\", \"),\n  53 |   });\n  54 |   expect(result.violations, label).toEqual([]);\n  55 |   const size = await page.evaluate(() => ({\n  56 |     width: document.documentElement.clientWidth,\n  57 |     content: document.documentElement.scrollWidth,\n  58 |   }));\n  59 |   if (size.content > size.width) {\n  60 |     const overflow = await page.evaluate(() =>\n  61 |       Array.from(document.querySelectorAll<HTMLElement>(\"body *\"))\n  62 |         .filter((element) => {\n  63 |           const box = element.getBoundingClientRect();\n  64 |           return (\n  65 |             box.width > 0 &&\n  66 |             (box.left < 0 || box.right > document.documentElement.clientWidth)\n  67 |           );\n  68 |         })\n  69 |         .map((element) => ({\n  70 |           tag: element.tagName,\n  71 |           class: element.className,\n  72 |           label: element.getAttribute(\"aria-label\"),\n  73 |           width: element.getBoundingClientRect().width,\n  74 |           left: element.getBoundingClientRect().left,\n  75 |           right: element.getBoundingClientRect().right,\n  76 |           overflow: getComputedStyle(element).overflowX,\n  77 |         })),\n  78 |     );\n  79 |     await test\n  80 |       .info()\n  81 |       .attach(\"horizontal-overflow-\" + label.replaceAll(/[^a-z0-9-]/gi, \"-\"), {\n  82 |         body: JSON.stringify({ ...size, elements: overflow }, null, 2),\n  83 |         contentType: \"application/json\",\n  84 |       });\n  85 |   }\n> 86 |   expect(size.content, label + \" overflow\").toBeLessThanOrEqual(size.width);\n     |                                             ^ Error: notification isolation with onboarding 320 overflow\n  87 | }\n  88 |\n  89 | //"
+              }
+            ]
+          },
+          {
+            "title": "D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha sem ciência e preserva abertura explícita do aviso",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "notification-isolation.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            "duration": 15346,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 sino distingue demora falha e conteúdo e recupera por consulta sem registrar ciência",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "notification-read-states.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 9276,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 sino distingue demora falha e conteúdo e recupera por consulta sem registrar ciência",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "notification-read-states.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 8939,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 sino distingue demora falha e conteúdo e recupera por consulta sem registrar ciência",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "notification-read-states.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 11295,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 guia pode ser pulado recuperado reaberto e configurado sem ciência ou mudança de permissões",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "preparation-continuity.spec.ts",
+              "line": 100,
+              "column": 5
+            },
+            "duration": 22907,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 guia pode ser pulado recuperado reaberto e configurado sem ciência ou mudança de permissões",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "preparation-continuity.spec.ts",
+              "line": 100,
+              "column": 5
+            },
+            "duration": 28308,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "dc5f440f023f1c421f5a2b573e37c0f337b01679008b5db3e726e3c1281f2adc"
+      },
+      "notification-isolation-resize": {
+        "stats": {
+          "total": 1,
+          "expected": 0,
+          "unexpected": 1,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "cases": [
+          {
+            "title": "D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha sem ciência e preserva abertura explícita do aviso",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "notification-isolation.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            "duration": 22786,
+            "outcome": "unexpected",
+            "ok": false,
+            "errors": [
+              {
+                "message": "Error: Notification positioning must settle within the resized layout viewport\n\nNotification positioning must settle within the resized layout viewport\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\nCall Log:\n- Timeout 15000ms exceeded while waiting on the predicate\n\n  140 |           },\n  141 |         )\n> 142 |         .toBe(true);\n      |          ^\n  143 |       await audit(page, \"notification isolation with onboarding \" + width);\n  144 |     }\n  145 |     expect(facts()).toBe(before);\n\u001b[2m    at C:\\Users\\renat\\Projetos_Dev\\home-care-assistant\\tests\\e2e\\notification-isolation.spec.ts:142:10\u001b[22m",
+                "codeframe": "   42 |     page.getByRole(\"heading\", { name: \"Visão geral\", exact: true }),\n   43 |   ).toBeVisible();\n   44 |   await selectContext(page, f.patient);\n   45 |   await expect(guide(page)).toBeVisible();\n   46 |   const beforeGuide = (await (await page.request.get(\"/api/guides\")).json())\n   47 |     .data;\n   48 |   expect(beforeGuide).toMatchObject({\n   49 |     patientId: f.patient,\n   50 |     showOnFirstAccess: true,\n   51 |     progress: { revision: 0, status: null },\n   52 |   });\n   53 |   const before = facts();\n   54 |   let writes = 0;\n   55 |   page.on(\"request\", (request) => {\n   56 |     if (\n   57 |       request.method() !== \"GET\" &&\n   58 |       [\"/api/guides\", \"/api/notifications\"].includes(\n   59 |         new URL(request.url()).pathname,\n   60 |       )\n   61 |     )\n   62 |       writes++;\n   63 |   });\n   64 |   try {\n   65 |     await page.setViewportSize({ width: 768, height: 900 });\n   66 |     await page.evaluate(() => window.scrollTo(0, 0));\n   67 |     await expect(\n   68 |       page.getByRole(\"button\", { name: \"Fechar por agora\", exact: true }),\n   69 |     ).toBeEnabled();\n   70 |     await trigger(page).click();\n   71 |     await expect(popup(page)).toBeVisible();\n   72 |     await expect(\n   73 |       popup(page).getByText(doc.code, { exact: true }),\n   74 |     ).toBeVisible();\n   75 |     await info.attach(\"notification-onboarding-geometry\", {\n   76 |       body: JSON.stringify(\n   77 |         await guide(page).evaluate((element) => ({\n   78 |           guide: element.getBoundingClientRect().toJSON(),\n   79 |           isolated: Boolean(element.closest('[aria-hidden=\"true\"],[inert]')),\n   80 |           controls: Array.from(element.querySelectorAll(\"button\")).map(\n   81 |             (button) => ({\n   82 |               text: button.textContent,\n   83 |               box: button.getBoundingClientRect().toJSON(),\n   84 |             }),\n   85 |           ),\n   86 |         })),\n   87 |         null,\n   88 |         2,\n   89 |       ),\n   90 |       contentType: \"application/json\",\n   91 |     });\n   92 |     // Background stays mounted; only the open popup participates in navigation.\n   93 |     await expect(guide(page)).toHaveCount(1);\n   94 |     await expect\n   95 |       .poll(\n   96 |         () =>\n   97 |           guide(page).evaluate((element) =>\n   98 |             Boolean(element.closest('[aria-hidden=\"true\"],[inert]')),\n   99 |           ),\n  100 |         {\n  101 |           message:\n  102 |             \"Open notification dialog must isolate the mounted onboarding controls\",\n  103 |         },\n  104 |       )\n  105 |       .toBe(true);\n  106 |     await expect(\n  107 |       page.getByRole(\"button\", { name: \"Fechar por agora\", exact: true }),\n  108 |     ).toHaveCount(0);\n  109 |     await expect(page.locator('[id=\"notification-panel\"]')).toHaveCount(1);\n  110 |     const close = popup(page).getByRole(\"button\", {\n  111 |       name: \"Fechar notificações\",\n  112 |       exact: true,\n  113 |     });\n  114 |     await close.focus();\n  115 |     for (const key of [\"Tab\", \"Tab\", \"Tab\", \"Tab\", \"Shift+Tab\", \"Shift+Tab\"]) {\n  116 |       await page.keyboard.press(key);\n  117 |       await expect\n  118 |         .poll(() =>\n  119 |           popup(page).evaluate((element) =>\n  120 |             element.contains(document.activeElement),\n  121 |           ),\n  122 |         )\n  123 |         .toBe(true);\n  124 |     }\n  125 |     for (const width of [768, 320, 390, 1440]) {\n  126 |       await page.setViewportSize({ width, height: 900 });\n  127 |       await expect\n  128 |         .poll(\n  129 |           () =>\n  130 |             popup(page).evaluate((element) => {\n  131 |               const rect = element.getBoundingClientRect();\n  132 |               return (\n  133 |                 rect.left >= 0 &&\n  134 |                 rect.right <= document.documentElement.clientWidth\n  135 |               );\n  136 |             }),\n  137 |           {\n  138 |             message:\n  139 |               \"Notification positioning must settle within the resized layout viewport\",\n  140 |           },\n  141 |         )\n> 142 |         .toBe(true);\n      |          ^ Error: Notification positioning must settle within the resized layout viewport\n  143 |       await audit(page, \"notification isolation with onboarding \" + width);\n  144 |     }\n  145 |     expect(facts()).toBe(before);\n  146 |     expect(writes).toBe(0);\n  147 |     await info.attach(\"notification-isolation\", {\n  148 |       body: await page.screenshot({ animations: \"disabled\" }),\n  149 |       contentType: \"image/png\",\n  150 |     });\n  151 |     await page.keyboard.press(\"Escape\");\n  152 |     await expect(popup(page)).toHaveCount(0);\n  153 |     await expect(trigger(page)).toBeFocused();\n  154 |     await expect(\n  155 |       page.getByRole(\"button\", { name: \"Fechar por agora\", exact: true }),\n  156 |     ).toBeEnabled();\n  157 |     await trigger(page).click();\n  158 |     await popup(page)\n  159 |       .getByRole(\"button\", { name: \"Fechar notificações\", exact: true })\n  160 |       .click();\n  161 |     await expect(popup(page)).toHaveCount(0);\n  162 |     await expect(trigger(page)).toBeFocused();\n  163 |     expect(facts()).toBe(before);\n  164 |     expect(writes).toBe(0);\n  165 |     expect((await (await page.request.get(\"/api/guides\")).json()).data).toEqual(\n  166 |       beforeGuide,\n  167 |     );\n  168 |     await trigger(page).click();\n  169 |     await popup(page)\n  170 |       .getByRole(\"link\", { name: \"Consultar histórico completo\", exact: true })\n  171 |       .click();\n  172 |     await expect(page).toHaveURL(/\\/notificacoes\\?/);\n  173 |     expect(facts()).toBe(before);\n  174 |     expect(writes).toBe(0);\n  175 |     await page.goto(\"/\");\n  176 |     await expect(guide(page)).toBeVisible();\n  177 |     await trigger(page).click();\n  178 |     const marked = page.waitForResponse(\n  179 |       (response) =>\n  180 |         new URL(response.url()).pathname === \"/api/notifications\" &&\n  181 |         response.request().method() === \"POST\",\n  182 |     );\n  183 |     await popup(page).getByRole(\"link\").filter({ hasText: doc.code }).click();\n  184 |     expect((await marked).ok()).toBe(true);\n  185 |     await expect(page).toHaveURL(new RegExp(\"/fichas/\" + doc.id));\n  186 |     expect(\n  187 |       sql(\n  188 |         `select seen_at is not null from public.requisition_notifications where id=${q(notification)};`,\n  189 |       ),\n  190 |     ).toBe(\"t\");\n  191 |     expect(writes).toBe(1);\n  192 |     expect((await (await page.request.get(\"/api/guides\")).json()).data).toEqual(\n  193 |       beforeGuide,\n  194 |     );\n  195 |     expect(\n  196 |       sql(\n  197 |         `select count(*) from public.document_events where document_id=${q(doc.id)};`,\n  198 |       ),\n  199 |     ).toBe(String(JSON.parse(before).events));\n  200 |     expect(\n  201 |       sql(\n  202 |         `select count(*) from public.stock_movements where care_recipient_id=${q(f.patient)};`,\n  203 |       ),\n  204 |     ).toBe(String(JSON.parse(before).stock));\n  205 |   } finally {\n  206 |     await info.attach(\"notification-layout-viewport\", {\n  207 |       body: JSON.stringify(\n  208 |         await page.evaluate(() => ({\n  209 |           innerWidth,\n  210 |           clientWidth: document.documentElement.clientWidth,\n  211 |           scrollWidth: document.documentElement.scrollWidth,\n  212 |           scrollX,\n  213 |           visual: visualViewport && {\n  214 |             width: visualViewport.width,\n  215 |             height: visualViewport.height,\n  216 |             scale: visualViewport.scale,\n  217 |             left: visualViewport.offsetLeft,\n  218 |             top: visualViewport.offsetTop,\n  219 |           },\n  220 |           popups: Array.from(document.querySelectorAll('[role=\"dialog\"]')).map(\n  221 |             (element) => element.getBoundingClientRect().toJSON(),\n  222 |           ),\n  223 |         })),\n  224 |         null,\n  225 |         2,\n  226 |       ),\n  227 |       contentType: \"application/json\",\n  228 |     });\n  229 |     await info.attach(\"notification-isolation-final-state\", {\n  230 |       body: JSON.stringify({\n  231 |         writes,\n  232 |         popupCount: await popup(page).count(),\n  233 |         guideProgress: (await (await page.request.get(\"/api/guides\")).json())\n  234 |           .data.progress,\n  235 |       }),\n  236 |       contentType: \"application/json\",\n  237 |     });\n  238 |   }\n  239 | });\n  240 |\n  241 | //"
+              }
+            ]
+          }
+        ],
+        "reportSha256": "f62f2fae8f02195168b959c23171c4d2e32e8a45d768ecfa50d3b33f928c2bf9"
+      },
+      "notification-isolation-final": {
+        "stats": {
+          "total": 6,
+          "expected": 6,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "cases": [
+          {
+            "title": "D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha sem ciência e preserva abertura explícita do aviso",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "notification-isolation.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            "duration": 15723,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha sem ciência e preserva abertura explícita do aviso",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "notification-isolation.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            "duration": 11326,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha sem ciência e preserva abertura explícita do aviso",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "notification-isolation.spec.ts",
+              "line": 15,
+              "column": 5
+            },
+            "duration": 14746,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 sino distingue demora falha e conteúdo e recupera por consulta sem registrar ciência",
+            "path": [],
+            "projectName": "chromium",
+            "location": {
+              "file": "notification-read-states.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 9521,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 sino distingue demora falha e conteúdo e recupera por consulta sem registrar ciência",
+            "path": [],
+            "projectName": "mobile",
+            "location": {
+              "file": "notification-read-states.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 8577,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "title": "D3 sino distingue demora falha e conteúdo e recupera por consulta sem registrar ciência",
+            "path": [],
+            "projectName": "ios",
+            "location": {
+              "file": "notification-read-states.spec.ts",
+              "line": 28,
+              "column": 5
+            },
+            "duration": 10793,
+            "outcome": "expected",
+            "ok": true,
+            "errors": []
+          }
+        ],
+        "reportSha256": "07f182733f4291eef243e77faea3bc5f7ab5b6a18d7d8eb0081598a32c00d685"
+      }
+    },
+    "qualifiedReuse": "The two passing guide cases do not open the bell and retain default positioning;only the six affected bell cases repeated after fixed positioning. Sources frozen per runner;no mutable DB suite in parallel.",
+    "invariants": [
+      "Guide remains mounted;outside AT/key navigation isolated only while open",
+      "Escape/button restore focus and expose guide again",
+      "No guide progress or notification write while opening,closing,consulting history",
+      "Explicit item open marks seen once;document event and stock counts unchanged",
+      "Existing delay/error/retry and guide skip/recovery/configuration consumers retained",
+      "Four viewport widths and axe retained"
+    ],
+    "viewportImagesInspected": [
+      "notification-isolation-final/0980973ff5c2a778d04a991ddc6b8025322ea665.png",
+      "notification-isolation-final/514a0db1b5ecefdb9aa1b4c6a1f15c6f5664257b.png"
+    ]
+  },
+  "resizeCounterproof": {
+    "clientWidth": 320,
+    "scrollWidth": 644,
+    "visualViewportWidth": 644,
+    "scale": 0.4968944191932678,
+    "waitDidNotResolve": true,
+    "fix": "Supported fixed position strategy for sticky-header notification popup;default unchanged for other consumer"
+  },
+  "checks": {
+    "types": "PASS",
+    "lint": "PASS",
+    "noAxeRuleExcluded": true,
+    "noTimeoutIncreased": true,
+    "noUnitMirrorAdded": true,
+    "reactReview": "No new hooks/effects/dependencies;serializable optional position prop;registered accessible close;other consumer default preserved"
+  },
+  "remote": {
+    "applied": 172,
+    "last": "20261109170235",
+    "digest": "c3997db7aea8dbbd002e040ba5b34057d4d6c9f94fc784e06deda18eca7932ae",
+    "pending": 0,
+    "newMigrations": 0,
+    "priorReconciliation": "REGULARIZATION_DRAFTS_REMOTE.json"
+  },
+  "ci": "CI_3109E83_OBSERVATION.json",
+  "preservation": {
+    "matrixRows": 105,
+    "matrixColumns": 39,
+    "first30Unchanged": true,
+    "pass": 56,
+    "partial": 49,
+    "uiRequirements": 18
+  },
+  "logSha256": {
+    "notification-isolation-after.log": "94013a5ce0cbaf8cf76865e1182e206077f70d1944e7db1445a7c7577331d25a",
+    "notification-isolation-before.log": "05e853f6e5512464fca0d8148cd38a6491f345df9e03e634c41721fe651d5004",
+    "notification-isolation-fixed-position.log": "0e1352162f9d2f64239d3186b2f19feb9d71596d84c8e4a8309655bef523c965",
+    "notification-isolation-lint-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "notification-isolation-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "notification-isolation-resize.log": "df9af7392d8824365d5165dcba24ab7fd211d3d84ddf75b5d847f4a1bdaac667",
+    "notification-isolation-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "notification-isolation-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "limits": [
+    "Own SHA full CI and full canonical66/171 parity remain",
+    "Transfers,BAL/REQ contextual decisions and external gates remain",
+    "No physical-device,human AT or provider approval",
+    "Sonar deferred;PR7 Draft;no merge/production",
+    "No new signature,backup or monitoring approval"
+  ],
+  "documentation": {
+    "markdownFiles": 4,
+    "localLinksChecked": 319,
+    "syntheticAuthorizationRedacted": true,
+    "markdownIssues": 0
+  }
+}

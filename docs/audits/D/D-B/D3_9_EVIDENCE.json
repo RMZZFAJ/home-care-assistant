@@ -1,0 +1,306 @@
+{
+  "sourceBaseSha": "639b5cb575422bf807aec1a425aae6a4fa783a12",
+  "candidateIdentifiedByLfSourceHashes": true,
+  "files": [
+    {
+      "file": "src/app/api/consumption/route.ts",
+      "sha256LfUtf8": "2b822e4d18a0beb8cd590c09c2823cbd6955053cf5cd4a58f45f339e96d3a5a7"
+    },
+    {
+      "file": "src/app/api/notifications/target/route.ts",
+      "sha256LfUtf8": "436ac712d2dfec81ccd03bb9534ce3c107a40b1369466e04cc99bbe9d0905b29"
+    },
+    {
+      "file": "src/components/balances/balance-console.tsx",
+      "sha256LfUtf8": "0640d528c9e5923fc673b6ab15c201447bf1f6b40e136b4dcb3b68ef6d8ac7b6"
+    },
+    {
+      "file": "src/components/balances/balance-count-wizard.tsx",
+      "sha256LfUtf8": "eb7db9c4992930cbdd1726b02243c8be181216c27e4920f44dd552af92fe6f59"
+    },
+    {
+      "file": "src/components/documents/delivery-inbox.tsx",
+      "sha256LfUtf8": "342d171390f120495075039234c137864c6c7f8b8ef4430dee99a35990dc55ec"
+    },
+    {
+      "file": "src/components/notifications/balance-notice.tsx",
+      "sha256LfUtf8": "bbafdd0e4c35813017b29c416ec31381182da13f04895c9c787877c5ac284a45"
+    },
+    {
+      "file": "src/components/notifications/notification-reference.tsx",
+      "sha256LfUtf8": "0cc5232e94d8caa26962b5f32923f4e60071465cf69365bbba600bfab7cc2a71"
+    },
+    {
+      "file": "src/components/schedules/schedule-console.tsx",
+      "sha256LfUtf8": "3e3a9ad980eac94b39728c5558eeb5d697641f5952e293ab5bc5a02861d0ef8d"
+    },
+    {
+      "file": "src/components/stock/consumption-console.tsx",
+      "sha256LfUtf8": "e4ba8e88baf034f2d8cecc80dcc9ea6a1e5c85edf618597ff5917e5c60b1b15e"
+    },
+    {
+      "file": "src/components/stock/consumption-detail.tsx",
+      "sha256LfUtf8": "3b18d317efdbcf3d19568ec64366ef2229b43e5406d75097bafee48392b11ba3"
+    },
+    {
+      "file": "src/components/stock/consumption-editor.tsx",
+      "sha256LfUtf8": "5688fd5637ba5efd6e6a172153422778b57bb06a5c728423b08e9138532d17c6"
+    },
+    {
+      "file": "src/components/stock/stock-console.tsx",
+      "sha256LfUtf8": "eee9bd8ded73f42612bdde8701632f54b492e792ebf8c31b5512e1127d048c27"
+    },
+    {
+      "file": "src/lib/notifications/navigation.ts",
+      "sha256LfUtf8": "01d90a97167a657096e2ed1932a30bd978fe8585e586cfa2f4e9a23d7dcd525c"
+    },
+    {
+      "file": "src/lib/notifications/use-notification-reference.ts",
+      "sha256LfUtf8": "b8741a7a3739a7173d7c6cc769c2d7fa7653481ff241c70e01067caf989fce67"
+    },
+    {
+      "file": "src/lib/validation/consumption.ts",
+      "sha256LfUtf8": "38322ea37b47537061ae50501ce079050fe85228d518f5b70de1915996ae5021"
+    },
+    {
+      "file": "src/lib/validation/notification-reference.ts",
+      "sha256LfUtf8": "2fce879e23aa81c229bea9e0d453501da59cd8471adceec3f7690cf3fb93af45"
+    },
+    {
+      "file": "src/theme/tokens.css",
+      "sha256LfUtf8": "96c07e7ebd04be4262fd2d157acee57b66d0f15fa9d3e27f6f5a08e5a0f81295"
+    },
+    {
+      "file": "src/types/consumption.ts",
+      "sha256LfUtf8": "fbb102798fa008c7ac498a291793502ee9684ec3857e34d3304a7154e36b4156"
+    },
+    {
+      "file": "supabase/migrations/20261107082257_phase_d3_notice_reference_resolution.sql",
+      "sha256LfUtf8": "460813898ae5478254df879c3d948d88c9faab0e56824b3a1bf25c8dcde2f1dc"
+    },
+    {
+      "file": "supabase/migrations/20261107084512_phase_d3_notice_reference_consistency.sql",
+      "sha256LfUtf8": "91837e5385a7d8bf5f3d511c9424fc6dba351e0e3090a37da4efb06244cc1f28"
+    },
+    {
+      "file": "supabase/migrations/20261107090824_phase_d3_notice_reference_timezones.sql",
+      "sha256LfUtf8": "d2bb07e84b0160d303e27d928f570e59c41a6e189557c0fca5f17edb0753b35f"
+    },
+    {
+      "file": "tests/e2e/notification-read-states.spec.ts",
+      "sha256LfUtf8": "8fda384a0cc78d533f98c053437075a4910efe30f487343f06f3ebbc27e85e0a"
+    },
+    {
+      "file": "tests/e2e/notification-targets.spec.ts",
+      "sha256LfUtf8": "b23017a4de3e688b5092452e1ac796a6e923ecbbc36dbec14df0776ff472fc3b"
+    },
+    {
+      "file": "tests/integration/notice-reference-fixtures.mjs",
+      "sha256LfUtf8": "c017458c1eddaa2d4d66b6e4859f7c9cfc12eee30a77bc7d4c4de358b068a445"
+    },
+    {
+      "file": "tests/integration/notice-reference.test.mjs",
+      "sha256LfUtf8": "872f3d8f32e8b6fbee501b6210d9b298af38e20a6c7eca5cf0e1756752e4d6fd"
+    },
+    {
+      "file": "tests/language-navigation.test.ts",
+      "sha256LfUtf8": "0860e7bac34e540726c38140b5fb8ede2cd6dd6e96b1f640ee29d3b47074fe8b"
+    },
+    {
+      "file": "tests/notification-reference.test.ts",
+      "sha256LfUtf8": "babfe4f87575d958c2a389504ab360a10e0e71d511dea65870f013bb51f3f981"
+    }
+  ],
+  "authCasesPassed": 9,
+  "unitAndApiCasesPassed": 27,
+  "productionBrowserExecutionsPassed": 27,
+  "productionCasesDistinct": 9,
+  "projects": [
+    "chromium",
+    "mobile",
+    "ios"
+  ],
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "fourViewportSurfaces": [
+    "future schedule event",
+    "BAL assignment event",
+    "filtered stock alert",
+    "personal no-issues recovery",
+    "linked personal occurrence"
+  ],
+  "authWasReal": true,
+  "localMigrations": 136,
+  "lastReconciledRemoteMigrations": 121,
+  "newMigrations": [
+    "20261107082257",
+    "20261107084512",
+    "20261107090824"
+  ],
+  "remoteDBApplied": false,
+  "historicalProtectedMigrations": 84,
+  "localMetadata": {
+    "crons": [
+      {
+        "name": "hca-notification-worker",
+        "active": true,
+        "schedule": "* * * * *"
+      },
+      {
+        "name": "hca-operational-lifecycle",
+        "active": true,
+        "schedule": "* * * * *"
+      }
+    ],
+    "migrations": 136,
+    "faultHelpers": 0,
+    "faultTriggers": 0
+  },
+  "localVerification": {
+    "types": "PASS",
+    "changedSourcesLint": "PASS",
+    "unitApi": "27/27",
+    "authRpc": "9/9",
+    "productionBrowsers": "27/27",
+    "build": "production E2E runner build passed"
+  },
+  "reusedCompatibleEvidence": {
+    "D3_8": "six patient/global profiles, units/profile routes and document notice navigation; no changed capability or document route contract",
+    "D3_7": "unchanged atomic legacy revision protocol; broad regression remains on candidate CI"
+  },
+  "counterproofs": [
+    "Future event+60 days is opened at its actual Manaus calendar date, not notice creation day; event and current window use their own timezone",
+    "BAL event resolves assignment and weeks; legacy BAL reminder does not manufacture a retroactive count",
+    "Stock alert observed balance is distinct from live ledger balance; clicking product history changes no stock or document",
+    "Reading a reminder does not acknowledge it; review alone does not write; owner-only no-issues writes one audit with unchanged shifts/stock/SCI",
+    "Same acknowledgement packet recovers after lost response, reload and403; one acknowledgement audit and no report",
+    "Bound report freezes reminder/custody; lost response replays same packet, one linked report, no debit; origin and filtered history return the actual report",
+    "Foreign patient reference and malformed200 do not present success or personal action on protected facts",
+    "Observed command lock then selected-patient change denies and rolls back journal/effects; same legitimate intention can retry",
+    "PT499 after inner report origin update rolls back report, acknowledgement, notice seen and journal; same-key retry succeeds once",
+    "PT499 at no-issues audit insert rolls back acknowledgement/seen; same-key retry succeeds once",
+    "Confirmed result is readable with surviving read rights after losing creation capability; fresh command denied; old standalone key cannot retrobind",
+    "Helper/anonymous/service execution and direct consumption writes stay closed; composite origin FK rejects another patient"
+  ],
+  "controlledAdapters": [
+    "Browser response loss/403/malformed200; actions that reached DB used real local Auth/HTTP",
+    "Scoped rollback triggers in Auth suite removed in finally; absence confirmed by final metadata"
+  ],
+  "diagnosticResults": {
+    "first": "2/4 passed; stock return link touch target and missing getByLabel resolution were corrected",
+    "recheck": "3/4 passed; remaining assertion expected reminder card while successful save correctly opened report detail",
+    "authFirst": "5/6 passed; future fixture reused same reminder period and hit legacy uniqueness; corrected future period, final9/9",
+    "types": "initial clean; parallel Next startup removed generated types during tsc; rerun stable then fixed fixture return inference; final passed",
+    "lint": "unused test imports/ref name corrected; rules unchanged"
+  },
+  "basePublishedCI": {
+    "sha": "639b5cb575422bf807aec1a425aae6a4fa783a12",
+    "run": 42354352749,
+    "database": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "browserChromium": "FAILURE preparation portal; center one retry",
+    "browserMobile": "SUCCESS",
+    "browserIos": "FAILURE delivery Select overflow320",
+    "candidateValidatedByThisRun": false
+  },
+  "candidateCI": "Gate for the published SHA; no approval inferred here",
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "humanPhysicalProviderApproval": false,
+  "remaining": [
+    "C7/contextual decision drafts and session24h/other D3",
+    "D-B-AC-020 OPS-01 legacy scheduler progress/catch-up and D5",
+    "D4 actual issuance/signing/public verification; isolated probe is not implementation",
+    "Backup automation/monitoring and authorized final remote reconciliation",
+    "Candidate CI and D-C/D6 human/AT/physical/provider gates"
+  ],
+  "logs": [
+    {
+      "file": "output/phase-d-work/d3-reference-auth-first.log",
+      "sha256": "31078d33b7de9c306c68ccc23f2010216a8622f83191501ce2a374365eaf4d7d"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-auth-consistency.log",
+      "sha256": "878336899c1570cf4d24e1d3a9fc1eb744df0ab944d0c51ea006fb06b9457ca4"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-auth-timezone.log",
+      "sha256": "6436188826065583d8ed9b3661ac506136a03f200fdc6d8dd4e44d9d30c63532"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-timezone-prepare.log",
+      "sha256": "1f6a9a24e27b70c506d24255e369078fcf01b939a12476119d514c4bcb33bc43"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-browser-diagnostic.log",
+      "sha256": "59e118e382f4ebfbbaea0bfd9b7461a39f30437521b5cf2df3667389d877085e"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-browser-diagnostic-recheck.log",
+      "sha256": "0a20ded2decab33163e99fc76f5c81c54c879db65166823493549543d4e6bc98"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-browser-acceptance.log",
+      "sha256": "95f87ba2ac8e384061d0d47d9a7202730da537ddf216b1f781bfc34c3d0b5a3f"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-browser-acceptance-list.log",
+      "sha256": "df1cd0b741e7441fcfae381ae414c644a01d6b8901a207f2201922bea83fa3b0"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-unit-stable.log",
+      "sha256": "f95e237a35bde7a5535bf3bed01b6e338744f4ee4cbd58911866b0cdf8a519fe"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-types-first.log",
+      "sha256": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-types-final.log",
+      "sha256": "ecab32879215f39bc9b5e714cff5f7998e23669d987f33e9b84184daa9b17e7d"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-types-stable.log",
+      "sha256": "ebc36936040fe2540d7bc34614b321daa067ca0a1389d73a265aab89fe1844d0"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-types-pass.log",
+      "sha256": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-lint-first.log",
+      "sha256": "300269e4fd56684a65a0789299640ee1a4db6c7c6b0dd0acf4308e3feea26961"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-lint-final.log",
+      "sha256": "ab14990ae38585fa80818b9d18de4e3d52beab6b4a25855d079290ba455da157"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-lint-stable.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "output/phase-d-work/d3-reference-fixture-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "output/phase-d-work/d3-language-ci-failed.log",
+      "sha256": "d48ee5afd20cffbead99f47f4cfe55c97faada014cea4fc88980612e7f60dc40"
+    }
+  ],
+  "documentationValidation": {
+    "canonicalRows": 105,
+    "canonicalColumnsUnchanged": 29,
+    "sourceFingerprints": 27,
+    "historicalMigrationsUnchanged": 84,
+    "markdownFiles": 5,
+    "markdownIssues": 0,
+    "localLinksChecked": 33,
+    "localLinks": "PASS",
+    "stagedGitDiffCheck": "One new blank line at EOF, migration20261107090824 line81; the already applied local migration was preserved byte-for-byte. No rule suppressed; functional checks pass."
+  }
+}

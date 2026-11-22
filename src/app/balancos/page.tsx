@@ -1,3 +1,4 @@
 import { AuthenticatedPage } from "@/components/authenticated-page";
 import { BalanceConsole } from "@/components/balances/balance-console";
-export default function Page() { return <AuthenticatedPage><BalanceConsole /></AuthenticatedPage>; }
+import { Suspense } from "react";
+export default function Page() { return <AuthenticatedPage><Suspense fallback={<p>Carregando balanços…</p>}><BalanceConsole /></Suspense></AuthenticatedPage>; }

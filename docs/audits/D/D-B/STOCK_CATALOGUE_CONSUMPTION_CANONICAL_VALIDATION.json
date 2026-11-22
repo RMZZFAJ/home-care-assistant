@@ -1,0 +1,298 @@
+{
+  "at": "2026-11-11T16:29:16.683234+00:00",
+  "increment": "D3.83",
+  "checkpoint": "06.4",
+  "status": "COMPLETE_LOCAL_SCOPED_12_COMPOSITIONS",
+  "baseSha": "ef7e3a9ab52e88789e0fb2d73a5bf249e1c17ecb",
+  "compositions": [
+    "EST-01",
+    "EST-02",
+    "EST-03",
+    "CAT-01",
+    "CAT-02",
+    "CAT-03",
+    "CAT-04",
+    "CAT-05",
+    "CON-01",
+    "CON-02",
+    "CON-03",
+    "CON-04"
+  ],
+  "distinctQualifiedCases": 54,
+  "qualification": {
+    "unchangedPassingCases": 42,
+    "secondPassingCases": 8,
+    "finalAffectedAndAddedConsumers": 4
+  },
+  "rounds": {
+    "first": {
+      "startTime": "2026-11-11T15:58:30.983Z",
+      "duration": 1270145.9500000002,
+      "expected": 45,
+      "skipped": 0,
+      "unexpected": 7,
+      "flaky": 0
+    },
+    "second": {
+      "startTime": "2026-11-11T16:20:46.195Z",
+      "duration": 264803.91599999997,
+      "expected": 8,
+      "skipped": 0,
+      "unexpected": 1,
+      "flaky": 0
+    },
+    "final": {
+      "startTime": "2026-11-11T16:26:21.796Z",
+      "duration": 148731.46300000002,
+      "expected": 4,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "cases": [
+    {
+      "file": "catalogue-contracts.spec.ts",
+      "title": "delegado do catálogo usa as duas rotas equivalentes sem administrar vínculos; fatores inválidos não deixam alterações",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "catalogue-contracts.spec.ts",
+      "title": "apresentação fracionária pode ser configurada na interface existente por delegado legítimo",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "catalogue-directory-completeness.spec.ts",
+      "title": "catalogue directory rejects incomplete collections,keeps confirmed filters and removes content after real read denial",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "catalogue-identities.spec.ts",
+      "title": "sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera a mesma intenção após perda de escrita",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "catalogue-identities.spec.ts",
+      "title": "compensação de inativo mantém a referência visível e usa uma única superfície de revisão",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "catalogue-preparation.spec.ts",
+      "title": "catalogue restores partial input and recovers a lost confirmation without replay after reload",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "consumption-follow-up.spec.ts",
+      "title": "Consumption follow-up CARE_TEAM preserves supplements and decisions against stale reads and shows the actual debit source",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "consumption-list-completeness.spec.ts",
+      "title": "consumption list rejects corrupt pages and clears previous content after a denied continuation",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "consumption.spec.ts",
+      "title": "consumo textual recebe complemento próprio, revisão em leitura e confirmação recuperável com débito único e outra sessão atualizada",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "consumption.spec.ts",
+      "title": "falta conferida e rejeição motivada têm revisões próprias e nenhuma baixa de estoque",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "stock-catalogue-consumption-canonical.spec.ts",
+      "title": "06.4 stock transit and movement cards retain four factual quantities and distinguish current catalogue from preserved origin",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "stock-catalogue-consumption-canonical.spec.ts",
+      "title": "06.4 catalogue units and presentations retain aliases,precision,leading zero and conversion across canonical table cards",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "stock-catalogue-consumption-canonical.spec.ts",
+      "title": "06.4 consumption canonical record preserves original author,complete text and structured declaration without debit",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "stock-history-completeness.spec.ts",
+      "title": "stock history visits more than100 native movements in exact order, resets filters and preserves facts",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "stock-origins.spec.ts",
+      "title": "histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "stock-origins.spec.ts",
+      "title": "origem aplica RLS do movimento e do recurso, sem converter acesso ao estoque em leitura de COM",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "stock-private-preparation.spec.ts",
+      "title": "movimentação privada retoma em outra sessão,compara saldo e recupera uma única entrada após resposta perdida",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "stock-private-preparation.spec.ts",
+      "title": "compensação privada preserva referência fora da página,retoma sem replay e confirma uma única entrada histórica",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "stock-read-validation.spec.ts",
+      "title": "stock history refuses incomplete totals and foreign page or filter responses while keeping independent balances",
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ]
+    },
+    {
+      "file": "workflows.spec.ts",
+      "title": "item extra identificado, múltiplas REQ, scanner e trânsito até o aceite",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "administration.spec.ts",
+      "title": "catálogo edita nomes alternativos e inativa preservando a identidade",
+      "projects": [
+        "chromium"
+      ]
+    },
+    {
+      "file": "record-drawer-focus.spec.ts",
+      "title": "RecordDrawer 390: continuar, descartar, Escape e salvar conservam foco e intenção",
+      "projects": [
+        "chromium"
+      ]
+    }
+  ],
+  "reuse": {
+    "evidence": "STOCK_CANONICAL_LIST_VALIDATION.json",
+    "scope": "StockOverview source,presentation helpers and native read/filter contracts unchanged;stock-console diff affects movement history only;new CSS scoped to TableFrame,transit and consumption records. Prior canonical balance-table qualification retained,not a fresh whole-phase approval."
+  },
+  "positive": [
+    "Native quantities,ledger,scope,filters,pagination,origin identities and independent authorization preserved.",
+    "Current catalogue names/units are explicitly identified;frozen documentary origin retains original names after rename;unknown and restricted facts not fabricated.",
+    "Catalogue aliases and exact precision remain visible;presentation code retains leading zero and exact conversion;unit/history/successor operations keep their original guards.",
+    "Consumption record keeps complete text and historical author after profile rename;report/supplement/decision remain distinct from debit.",
+    "Real Auth negative,recovery,concurrency,personal intent and no-replay assertions retained in existing consumers.",
+    "Barcode manual/image path tested with a real synthetic EAN image and controlled denied camera;no physical-camera proof."
+  ],
+  "visual": {
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440
+    ],
+    "reference": "Offline canonical HTML table/card and record/icon geometry,with actual application functions preserved.",
+    "allAxeRules": "Enabled",
+    "media": "Forced colors,reduced motion",
+    "inspection": "PASS catalogue320,movement320 and corrected consumption320 captures inspected;actual scroll and hit-tests,no hidden navigation.",
+    "notProved": "Physical device,AT,native400% zoom or provider.",
+    "longContent": "Native full report uses canonical file-record mobile action placement;readable main width,actions below and no overlap asserted."
+  },
+  "counterproof": {
+    "preserved": "stock-catalogue-consumption-first.json,stock-catalogue-consumption-final.json and both artifact archives;final four cases in stock-catalogue-consumption-focus-final.json",
+    "causes": [
+      "First cold fixture Auth request timed out;repeat original case without changing limits or product.",
+      "Old exact catalogue-cell selectors omitted newly visible aliases;assert original name within its real cell.",
+      "Movement source link had17px target too close to reference summary;increase useful target/spacing and keep axe enabled."
+    ],
+    "additionalCauses": [
+      "Keyboard helper attempted focus while the initial catalogue load still disabled the button;wait for enabled state before focusing.",
+      "Visual inspection found full consumption text compressed into a narrow column at320px;responsive actions move below full content without hiding text."
+    ],
+    "strategy": "Repeat affected cases and identified existing consumers only;all other passing results retained."
+  },
+  "checks": {
+    "types": "PASS",
+    "affectedLint": "PASS",
+    "markdown": "PASS five changed Markdown files;zero issues"
+  },
+  "remote": {
+    "newSql": false,
+    "expectedMigrations": 207,
+    "reconciliation": "PASS final linked skip-vault dry-run: Remote database is up to date; no pending migration."
+  },
+  "limits": [
+    "Original105 criterion states remain57PASS/48PARTIAL;18 UI states unchanged.",
+    "06.4 local scope only;06.5–06.6,joint stage19 and other surfaces remain.",
+    "DOC-A/B/C/D retain their own completion gates;no new PDF-appearance or documentary-policy approval.",
+    "Own published SHA CI,human/device/provider and final integration gates required;no merge or production.",
+    "Sonar:OWNER_DEFERRED_SONAR_CONFIGURATION;no Quality Gate approval."
+  ]
+}

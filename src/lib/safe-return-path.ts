@@ -27,11 +27,15 @@ export function safeReturnPath(value: string | null, origin: string): string {
       "/notificacoes",
       "/consumo",
       "/unidades",
+      "/comprovantes-catalogo",
       "/mais",
+      "/guias",
       "/entregas",
       "/documentos",
       "/escalas",
       "/balancos",
+      "/verificar",
+      "/acesso/continuar",
     ];
     if (
       !allowed.some(
@@ -41,7 +45,7 @@ export function safeReturnPath(value: string | null, origin: string): string {
       )
     )
       return "/";
-    return `${target.pathname}${target.search}`;
+    return `${target.pathname}${target.search}${target.hash}`;
   } catch {
     return "/";
   }

@@ -1,0 +1,146 @@
+{
+  "sourceBaseSha": "3d9afdf974a1624d154cab7edc441c93f4ddba64",
+  "sourceTreeDirty": true,
+  "files": [
+    {
+      "file": "src/app/api/admin/route.ts",
+      "sha256LfUtf8": "d82c1d278062ebac01a2692831db270327adc0d8e8dfbad1a60a042b233ac254"
+    },
+    {
+      "file": "src/app/api/patient-settings/route.ts",
+      "sha256LfUtf8": "5bd80d595b5d2e84d78781484f3bf36798bc3da682ef2dcd3881cb566481d25f"
+    },
+    {
+      "file": "src/app/design-system.css",
+      "sha256LfUtf8": "77532abf926365b1f836345d9b4b71a774d39f20731be2bc8b408100ac5b2b85"
+    },
+    {
+      "file": "src/components/admin/admin-console.tsx",
+      "sha256LfUtf8": "0ba446078bf4c4afd85304e5082544d5db47447d09d063135755a34114a63ebf"
+    },
+    {
+      "file": "src/components/admin/catalogue-management.tsx",
+      "sha256LfUtf8": "672141765609a4fab62448c5f8d400aeee68017a382f1252ed5a5e7efbc60c04"
+    },
+    {
+      "file": "src/components/admin/membership-management.tsx",
+      "sha256LfUtf8": "114b211fbaeeb1a0c4c2337be7c2c501b6a8afa55587c7d9cbb78a738eed6303"
+    },
+    {
+      "file": "src/components/admin/notification-matrix.tsx",
+      "sha256LfUtf8": "2b6bf51993dce48ae2b6d803ed3ac8e59d5a4d32ac11f38b64edab8d959c83cb"
+    },
+    {
+      "file": "src/components/admin/policy-console.tsx",
+      "sha256LfUtf8": "2bb6624991ff62bc758bc2e05edcf281bd45d5ae52d025e7457b76aa342f1d2a"
+    },
+    {
+      "file": "src/components/admin/policy-rules.tsx",
+      "sha256LfUtf8": "99d69813182f57567fb23e49c2d5f6d1f80bd648726773f9cd76f22c73bbfb2a"
+    },
+    {
+      "file": "src/components/admin/governance-proposals.tsx",
+      "sha256LfUtf8": "e3ac5e38a5c408bb606cf82d2a4fe6c76b86e51b7b8b177d1b6d258023ddfa74"
+    },
+    {
+      "file": "src/components/forms/record-drawer.tsx",
+      "sha256LfUtf8": "fc44de409066c7cfdc52c450c0996d98b34b14fd9cc7d820d5b17259fdd8f827"
+    },
+    {
+      "file": "src/lib/client/use-command-intent.ts",
+      "sha256LfUtf8": "7a624bac7230719bd7096a9375d407cd987282e76d725ebead5e7613b791bac6"
+    },
+    {
+      "file": "src/lib/governance-presentation.ts",
+      "sha256LfUtf8": "fc467591343fd61af5b4b38d93e3b8addf1d74c3cb3ebcaec000aa6ae42a632f"
+    },
+    {
+      "file": "src/lib/validation/governance.ts",
+      "sha256LfUtf8": "f08c9322a638c9ec03b2ada6a9265b724c384b600699b799dd87bc1e5d932120"
+    },
+    {
+      "file": "tests/e2e/governance-recovery.spec.ts",
+      "sha256LfUtf8": "c76ba18e1d250e1d0c52fed0cd04f597f568e9f0941f3687eee064ad6b09e9c1"
+    },
+    {
+      "file": "tests/e2e/v4-review.spec.ts",
+      "sha256LfUtf8": "ac0b1381e5c142b307ad69848f5141e84912a91378d6d61152a8c1bcef7326f8"
+    },
+    {
+      "file": "tests/governance-presentation.test.ts",
+      "sha256LfUtf8": "016eed05c73124e2d3e36a0e8b1fa66772c29afbc3a6b810de41e682784a61ce"
+    },
+    {
+      "file": "tests/integration/governance-recovery.test.mjs",
+      "sha256LfUtf8": "3c93e13c060c5269b520e2059a1c7a8cd480a7def25d3b3f387f00b534947df4"
+    },
+    {
+      "file": "tests/integration/lock-barrier.mjs",
+      "sha256LfUtf8": "fcf8ccf97b9ee5791339fd355595cada5a1f28b79d6a9f234f7a7a94b85b8430"
+    },
+    {
+      "file": "supabase/migrations/20261107013356_phase_d3_governance_recovery.sql",
+      "sha256LfUtf8": "7b8df17b29111e557db134b256ebd368db84cc9854563574442170f537414472"
+    },
+    {
+      "file": "supabase/migrations/20261107015914_phase_d3_governance_compatibility.sql",
+      "sha256LfUtf8": "f9400254ec6a4f9ccd9c09a8705caae325fe7d490122833422c24f3136893fe3"
+    },
+    {
+      "file": "supabase/migrations/20261107020304_phase_d3_governance_own_transition.sql",
+      "sha256LfUtf8": "639aefecf564d071cc0d8bd2cf574ae558a74fe7bbbf50043cb04f011bde2bbe"
+    },
+    {
+      "file": "supabase/migrations/20261107021123_phase_d3_open_governance_requests.sql",
+      "sha256LfUtf8": "6083cd3ddba2e3081e1edb0a8ff27c6a457658ea499d80ae55ebce70d60bbd4c"
+    }
+  ],
+  "protectedHistoricalMigrationsUnchanged": 84,
+  "localMigrations": 125,
+  "remoteMigrations": 121,
+  "remoteDBApplied": false,
+  "unitCasesPassed": 27,
+  "authDistinctCasesPassed": 8,
+  "newBrowserDistinctCasesPassed": 9,
+  "existingBrowserConsumersPassed": 3,
+  "projects": [
+    "chromium",
+    "mobile",
+    "ios"
+  ],
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "scopeLimits": [
+    "No human AT or physical-device approval",
+    "In-task command memory is not a new persistent private draft",
+    "Other D3 consumers and operational-document NULL pagination remain pending",
+    "No final remote D-B application or operational release"
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "logs": [
+    "output/phase-d-work/d3-governance-unit-open.log",
+    "output/phase-d-work/d3-governance-auth-completion.log",
+    "output/phase-d-work/d3-governance-read-models.log",
+    "output/phase-d-work/d3-governance-open-auth.log",
+    "output/playwright/phase-d/d3-governance-first.log",
+    "output/playwright/phase-d/d3-governance-recheck.log",
+    "output/playwright/phase-d/d3-governance-list-recheck.log",
+    "output/playwright/phase-d/d3-governance-final-consumers.log",
+    "output/playwright/phase-d/d3-governance-compatibility-recheck.log",
+    "output/playwright/phase-d/d3-governance-late-editor-recheck.log"
+  ],
+  "counterproofs": [
+    "Recovery inherited disabled fieldset: fixed outside frozen fields",
+    "320px native select overflow: scoped minimum/maximum sizing fixed",
+    "Nonexistent-patient negative initially expected403 but contract404; replaced with real inaccessible fixture patient",
+    "Own authority change required preserving the existing second-administrator contract, without allowing last-admin removal",
+    "Pending-only initial query hid awaiting-acceptance invitation: open filter preserves both actionable states",
+    "Explicit version review must await the authoritative read before enabling another command",
+    "Late completion must close only the editor that originated it",
+    "Malformed post-commit JSON, recovery403 and semantically invalid200 preserve one identical command and one database proposal"
+  ]
+}

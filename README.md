@@ -1,38 +1,41 @@
 # Home Care Assistant
 
+**Aparência vigente:** o [Modelo Integral](docs/ui-ux/CANONICAL_MODEL.md) substitui
+Fluent UI. Em E01–E03, a referência posterior é o laboratório L1 com os
+comentários v3, conforme o [lote vigente](HCA_L1_LOTE_CODEX_E01_E03.md).
+
 Gestão operacional por paciente com Next.js, React, TypeScript e Supabase.
-REQ, COM, ENT e BAL distinguem necessidade, aquisição, entrega, contagem,
-ciência e estoque por movimentos. O sistema não prescreve ou decide conduta
+REQ, COM, ENT, DEV e BAL distinguem necessidade, aquisição, entrega, devolução,
+contagem, ciência e estoque por movimentos. O sistema não decide conduta
 clínica.
 
 ## Estado e documentação
 
-**Produção NO-GO.** A e B1–B8 estão encerradas como diagnóstico; C concluiu o
-planejamento documental C0–C10. **D NÃO INICIADA.** Base funcional auditada:
-`37cb7f85e96e551d6419871f94dd950712e2565b`. O estado de deploy produtivo nesta
-missão é NOT_VERIFIED; preview documental não é homologação do produto.
+**D-B em validação na [PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7).**
+A PR está em rascunho na branch `feat/phase-d-implementation`. O
+[fechamento da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne a execução A–D,
+as evidências e a fila de continuidade. Produção permanece NO-GO.
 
-- [Portal por público](docs/README.md).
+- [Acompanhamento principal e sequência restante](TEMP_D_B_ATUALIZACAO.md).
+- [Execução dos lotes L1 a L4](docs/audits/D/D-B/LOTES_EXECUCAO.md).
+- [Portal da documentação](docs/README.md) e
+  [contratos implementados](docs/current/README.md).
+- [Ordens vigentes e matriz de aceitação](docs/audits/D/D-B/README.md).
+- [Decisões](docs/decisions/README.md) e [histórico](docs/audits/README.md).
 
-- [Estado por fonte e SHA](docs/current/PROJECT_STATUS.md).
+Fichas em abas, Andamentos, rascunhos próprios, PWA e Web Push têm implementação
+no candidato. Ficha, Ficha Ampliada e auditoria restrita usam a aparência
+documental aprovada e o pipeline real de emissão, guarda e verificação.
+Os PDFs usam certificado e TSA internos, sem afirmar ICP-Brasil. O
+acompanhamento distingue implementação, validação técnica e avaliação humana
+pendentes. Os mecanismos de rascunho existentes ficam preservados; sua
+simplificação dos quatro campos de Andamentos foi autorizada no L1. A expansão
+de persistência e os outros adiamentos continuam separados.
 
-- [Contratos implementados e desvios conhecidos](docs/current/README.md).
-
-- [Decisões humanas](docs/decisions/README.md) e
-  [projeto C](docs/audits/C/README.md).
-
-- [Auditorias preservadas](docs/audits/README.md) e
-  [plano D](docs/audits/D/README.md).
-
-PWA/push, modalidades futuras de ciência, rascunhos entre aparelhos e
-verificador de exemplar são requisitos planejados; não são anunciados como
-implementados. Os dois P1 herdados continuam abertos até correção/regressão
-autorizada.
-
-O [fechamento definitivo C7–C10](docs/audits/C/C10-pr-handoff/README.md)
-registra P02 OWNER_APPROVED, 66 fichas e 262 controles originais revistos.
-Catálogo atual: 274 controles/424 usos; 187 aceites planejados. Draft PR 6
-permanece para revisão, sem merge ou início D.
+A e B encerraram o diagnóstico. C consolidou as decisões e o projeto
+integrados pela PR 6. D-A consolidou D0–D2. Na D-B, os incrementos de D3–D5
+e L1/L2 seguem para validação conjunta. A primeira liberação estável
+prevista é 1.0.0 e depende dos gates operacionais.
 
 ## Desenvolvimento
 
@@ -57,7 +60,8 @@ remoto.
 Mudança funcional autorizada usa os gates de contratos, lint, Markdown, tipos,
 unitários/build e, conforme contrato, banco/Auth/E2E pelo runner local. Os
 comandos e marcos estão no guia de testes; não há afirmação de CI verde atual
-baseada em PR antigo. Nesta C, verificações são documentais e de preservação;
-não se repetem suítes funcionais por alteração editorial. Deploy, migrations
+baseada em PR antigo. Alterações exclusivamente documentais recebem conferência
+de Markdown, links e preservação; suítes funcionais seguem o risco da mudança.
+Deploy, migrations
 remotas, envio, PR e merge dependem de autorização específica, nunca de relato
 histórico.

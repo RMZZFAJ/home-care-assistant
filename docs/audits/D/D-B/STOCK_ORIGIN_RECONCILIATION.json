@@ -1,0 +1,50 @@
+{
+  "at": "2026-11-08T17:34:46.389475+00:00",
+  "criterion": "C-NEW-AC-023",
+  "sourceSha": "8a17202526908286c155246d13985fad5903d4e6",
+  "sourceLfSha256": {
+    "src/app/api/stock/movements/[id]/origin/route.ts": "4b24d8096cb8c79755aa706069ed5dded2d3b5137dacda5075d3c476703f69e0",
+    "src/lib/server/stock-origin.ts": "ef65929633952ae07d44fb2daa72199dea1639642822f7558aa7dccc578a53ac",
+    "src/components/stock/movement-origin.tsx": "0950dc7370c419b8544145842fae44ffebdd5151bd7271ac142c1f9d6b68c0a8",
+    "src/components/stock/stock-console.tsx": "eee9bd8ded73f42612bdde8701632f54b492e792ebf8c31b5512e1127d048c27",
+    "src/types/stock-origin.ts": "8e5bea09d0272a80eaf63a8b5f3cd54b7bf20b2a860a205496423ab376e5dbab",
+    "tests/e2e/stock-origins.spec.ts": "a6cf64181ad4d78cc53a9c6d93199471ac7b949dcf5f9d8edd1a31754e2a8409",
+    "tests/integration/stock-origin-fixtures.mjs": "13433cabf9fd0f0c99d68699b2093e253150c4c7435949b278ca47675ef6eaa2",
+    "src/lib/server/api.ts": "cbb5b8d64dee338f04ddbe61365d8f276a6b86c12258d8e3fc283aac14c66d96"
+  },
+  "reuseQualified": true,
+  "newLocalExecution": false,
+  "ciRun": 42480516297,
+  "ciUrl": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42480516297",
+  "jobs": [
+    {
+      "job_id": 128734040413,
+      "rows": [
+        "2026-11-08T13:02:49.5532276Z   ✓  181 [chromium] › tests/e2e/stock-origins.spec.ts:36:5 › histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos (8.9s)",
+        "2026-11-08T13:02:54.6604347Z   ✓  182 [chromium] › tests/e2e/stock-origins.spec.ts:212:5 › origem aplica RLS do movimento e do recurso, sem converter acesso ao estoque em leitura de COM (5.1s)"
+      ]
+    },
+    {
+      "job_id": 128734040364,
+      "rows": [
+        "2026-11-08T13:07:34.6150960Z   ✓  181 [mobile] › tests/e2e/stock-origins.spec.ts:36:5 › histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos (11.2s)",
+        "2026-11-08T13:07:42.0652724Z   ✓  182 [mobile] › tests/e2e/stock-origins.spec.ts:212:5 › origem aplica RLS do movimento e do recurso, sem converter acesso ao estoque em leitura de COM (7.4s)"
+      ]
+    },
+    {
+      "job_id": 128734040371,
+      "rows": []
+    },
+    {
+      "job_id": 128734040440,
+      "rows": [
+        "2026-11-08T12:59:59.6617507Z   ✓   69 [ios] › tests/e2e/stock-origins.spec.ts:36:5 › histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos (23.0s)",
+        "2026-11-08T13:00:06.7151296Z   ✓   70 [ios] › tests/e2e/stock-origins.spec.ts:212:5 › origem aplica RLS do movimento e do recurso, sem converter acesso ao estoque em leitura de COM (7.0s)"
+      ]
+    }
+  ],
+  "executions": 6,
+  "distinctCases": 2,
+  "unchangedContracts": "Migration153 changes only private draft navigation; grants/policies and stock origin consumers stay unchanged",
+  "humanPhysicalGate": "D6; not claimed"
+}

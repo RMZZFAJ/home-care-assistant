@@ -1,0 +1,82 @@
+{
+  "at": "2026-11-09T04:40:43.555Z",
+  "sha": "86025ba59e3367a6a16e15ccef6f70aad4bf04a5",
+  "runId": 42561306401,
+  "jobs": [
+    {
+      "id": 128978228283,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "activeSteps": []
+    },
+    {
+      "id": 128978228561,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "activeSteps": []
+    },
+    {
+      "id": 128978228663,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success",
+      "activeSteps": []
+    },
+    {
+      "id": 128983385589,
+      "name": "browser (ios-1)",
+      "status": "in_progress",
+      "conclusion": null,
+      "activeSteps": [
+        "Run npm ci"
+      ]
+    },
+    {
+      "id": 128983385617,
+      "name": "browser (chromium)",
+      "status": "in_progress",
+      "conclusion": null,
+      "activeSteps": [
+        "Run supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359"
+      ]
+    },
+    {
+      "id": 128983385618,
+      "name": "browser (ios-2)",
+      "status": "in_progress",
+      "conclusion": null,
+      "activeSteps": [
+        "Run npm run test:db:prepare"
+      ]
+    },
+    {
+      "id": 128983385625,
+      "name": "browser (mobile)",
+      "status": "in_progress",
+      "conclusion": null,
+      "activeSteps": [
+        "Run npm ci"
+      ]
+    }
+  ],
+  "preview": {
+    "id": "dpl_AddFVP31SjCo36eoQm481J1Ko1v3",
+    "state": "READY",
+    "sha": "86025ba59e3367a6a16e15ccef6f70aad4bf04a5"
+  },
+  "scope": "Parent SHA:Windows/Ubuntu/database SUCCESS including clean/legacy and full integration;browser jobs confirmed live;not approval of next SHA",
+  "globalApproval": false,
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "criticalDatabaseSteps": [
+    {
+      "check": "test:migrations",
+      "conclusion": "success"
+    },
+    {
+      "check": "test:integration",
+      "conclusion": "success"
+    }
+  ]
+}

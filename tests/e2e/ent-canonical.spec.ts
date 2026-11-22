@@ -1,0 +1,202 @@
+import { isDocumentAccessReport } from "./display-access-report";
+import { expect, test, type Browser, type Page, type Locator } from "@playwright/test";
+import { randomUUID } from "node:crypto";
+import { mkdirSync } from "node:fs";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+import { setup, fixtures, rpc } from "../integration/v4-fixtures.mjs";
+import { transferFixture, declareTransfer } from "../integration/transfer-fixtures.mjs";
+import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
+import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { selectContext } from "./auth-context";
+import { selectDocumentSection } from "./document-sections";
+import { expectMobileMaterialRow, mobileMaterialReference, openIssuedMaterials } from "./l2-mobile-materials";
+import { selectDeliveryRecipient } from "./delivery-recipient";
+import { auditFromTop } from "./accessibility-audit";
+
+test.setTimeout(180_000);
+const widths = [320, 390, 768, 1024, 1440];
+const facts = (patient: string) => sql(`select jsonb_build_object('docs',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${q(patient)}),'lines',(select jsonb_agg(to_jsonb(l) order by l.id) from public.document_lines l join public.operational_documents d on d.id=l.document_id where d.care_recipient_id=${q(patient)}),'events',(select jsonb_agg(to_jsonb(e) order by e.id) from public.document_events e where care_recipient_id=${q(patient)}),'transfers',(select jsonb_agg(to_jsonb(t) order by document_id) from public.ent_transfers t where care_recipient_id=${q(patient)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)}));`);
+async function login(page: Page, patient: string) {
+  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
+}
+async function reference(browser: Browser, route: string) {
+  const context = await browser.newContext(), page = await context.newPage();
+  await page.route(/^https?:/, route => route.abort());
+  const l1 = route.startsWith("l1:");
+  await page.goto(pathToFileURL(resolve(l1 ? "hca-laboratorio-01-v3-final.html" : "Home_Care_Assistant_Modelo_Integral.html")).href + "#" + (l1 ? route.slice(3) : route));
+  if (l1) await page.locator("#product-app").getByRole("tab", { name: /^Materiais/ }).click();
+  else await page.locator("#roleSelect").selectOption("family");
+  return { context, page };
+}
+async function referenceReview(model: Page) {
+  await model.locator('.productoption input[type="checkbox"]').first().check();
+  await model.locator('[data-action="wizardNext"]').click();
+  await model.locator('select[name="recipient"]').selectOption({ index: 0 });
+  await model.locator('[data-action="wizardNext"]').click(); await model.locator('[data-action="wizardNext"]').click();
+  await expect(model.locator("#wizardForm .kv")).toBeVisible();
+}
+function watchWrites(page: Page, allowAccess = false, allowDrafts = false) {
+  const writes: string[] = [];
+  page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !(allowDrafts && new URL(request.url()).pathname === "/api/drafts") && !(allowAccess && isDocumentAccessReport(request))) writes.push(request.url()); });
+  return writes;
+}
+async function captureVisible(locator: Locator, path: string) {
+  await locator.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
+  expect(await locator.evaluate(node => {
+    const box = node.getBoundingClientRect(), x = (Math.max(0, box.left) + Math.min(innerWidth, box.right)) / 2;
+    return [box.top + 12, box.bottom - 12].every(y => y > 0 && y < innerHeight && node.contains(document.elementFromPoint(x, y)));
+  }), "The actual scrolled content must be clear of fixed navigation").toBe(true);
+  await locator.screenshot({ path, animations: "disabled" });
+}
+
+test("06.2 ENT selection and complete readonly review follow the model without shipment", async ({ page, browser }, info) => {
+  test.setTimeout(240_000); // Selection and review each run accessibility checks at five widths.
+  const name = "Material de entrega " + "com nome extenso ".repeat(6) + randomUUID().slice(0, 8);
+  const f = await setup({ catalogue: [{ name, category: "medicamentos", unit: "unidade", aliases: [] }] });
+  await login(page, f.patient); const before = facts(f.patient), writes = watchWrites(page, false, true);
+  await page.goto("/fichas/ent");
+  await expect(page.getByRole("region", { name: "Escolha do recebedor", exact: true })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: /origem/i })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Atualizar pessoas e escala", exact: true })).toHaveCount(0);
+  const response = await page.request.get(`/api/documents/delivery-preparation?careRecipientId=${f.patient}&source=FAMILY`);
+  expect(response.ok()).toBe(true);
+  const person = ((await response.json()).data.people as { id: string; name: string }[]).find(p => p.id === fixtures.professional.id);
+  if (!person) throw new Error("The native preparation must include the eligible recipient");
+  const reason = "Escolha pessoal fictícia para conferir a revisão visual da entrega";
+  await selectDeliveryRecipient(page, person.name, reason);
+  const next = () => page.getByRole("button", { name: /^(Selecionar materiais|Continuar|Revisar ficha)$/ }).click();
+  await next(); const checkbox = page.getByRole("checkbox", { name: name + " unidade", exact: true });
+  await checkbox.check(); await page.getByLabel("Quantidade — " + name, { exact: true }).fill("12");
+  const referenceContext = await browser.newContext({ viewport: { width: 390, height: 900 } });
+  const model = await referenceContext.newPage();
+  await model.route(/^https?:/, route => route.abort());
+  const lab = pathToFileURL(resolve("hca-laboratorio-02-v7.html")).href;
+  try {
+    await model.goto(lab + "#E06-01/materials");
+    const referenceSwitch = model.getByRole("switch", { name: "Incluir Dipirona 500 mg", exact: true });
+    await referenceSwitch.click();
+    await expect(referenceSwitch).toHaveAttribute("aria-checked", "true");
+    const selected = model.locator("#product-app .material-list .material-row:not(.unselected)").first();
+    const card = page.locator(".hca-material-choice").filter({ has: checkbox });
+    for (const width of widths) {
+      await page.setViewportSize({ width, height: 900 });
+      if (width <= 390) {
+        await model.setViewportSize({ width, height: 900 });
+        for (const property of ["background-color", "border-radius", "padding-top", "padding-left"] as const)
+          await expect(card).toHaveCSS(property, await selected.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+        const amount = card.locator(".hca-wizard-stock-input");
+        const referenceAmount = selected.locator(".quantity-control");
+        for (const property of ["border-radius", "min-height", "background-color"] as const)
+          await expect(amount).toHaveCSS(property, await referenceAmount.evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+        const toolbar = page.locator(".hca-wizard-material-toolbar");
+        const count = (await toolbar.getByRole("status").boundingBox())!;
+        const itemExtra = (await toolbar.getByRole("button", { name: "Item extra", exact: true }).boundingBox())!;
+        expect(Math.abs(count.y + count.height / 2 - itemExtra.y - itemExtra.height / 2)).toBeLessThan(2);
+      }
+      await expect(page.getByLabel("Quantidade — " + name, { exact: true })).toHaveValue("12");
+      await auditFromTop(page, "canonical ENT selection " + width);
+    }
+    for (let step = 0; step < 3; step++) await next();
+    await expect(page.getByRole("heading", { name: "Revise antes de expedir", exact: true })).toBeVisible();
+    await model.goto(lab + "?state=review#E06-01/review");
+    await expect(model.locator("#product-app .wizard-content h2")).toHaveText("Revise antes de expedir");
+    const grid = page.locator(".hca-wizard-review-identity");
+    await expect(grid.locator("dt")).toHaveText(["Paciente", "Preenchido por", "Tipo de ficha", "Destino", "Percurso", "Recebedor físico"]);
+    await expect(grid).toContainText(person.name); await expect(grid).toContainText("Família → Equipe");
+    await expect(page.getByText("Justificativa da escolha: " + reason, { exact: true })).toBeVisible();
+    await expect(page.locator(".hca-material-review")).toContainText(name); await expect(page.locator(".hca-material-review")).toContainText("12 unidade");
+    for (const width of widths) {
+      await page.setViewportSize({ width, height: 900 });
+      if (width <= 390) {
+        await model.setViewportSize({ width, height: 900 });
+        for (const property of ["display", "gap"] as const)
+          await expect(grid).toHaveCSS(property, await model.locator("#product-app .wizard-content .metadata").evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      }
+      await auditFromTop(page, "canonical ENT review " + width);
+    }
+    await page.setViewportSize({ width: 390, height: 900 });
+    await expect.poll(() => page.evaluate(() => innerWidth)).toBe(390);
+    const identityCapture = info.outputPath("ent-review-identity-390.png");
+    const materialCapture = info.outputPath("ent-review-material-390.png");
+    await captureVisible(grid, identityCapture);
+    await captureVisible(page.locator(".hca-material-review"), materialCapture);
+    await info.attach("ENT review identity at 390 px", { path: identityCapture, contentType: "image/png" });
+    await info.attach("ENT review material at 390 px", { path: materialCapture, contentType: "image/png" });
+    expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
+  } finally { await referenceContext.close(); }
+});
+
+test("06.2 dispatched ENT preserves its material facts and reversible v7 search", async ({ page, browser }, info) => {
+  const names = ["Material expedido " + "com nome extenso ".repeat(6) + randomUUID().slice(0, 8), "Outro material " + randomUUID().slice(0, 8)];
+  const f = await setup({ catalogue: names.map(name => ({ name, category: "medicamentos", unit: "unidade", aliases: [] })) });
+  const doc = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false, p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id, recipientReason: "Escolha manual fictícia para conferência da composição", lines: f.products.map(productId => ({ productId, quantity: "7" })) } });
+  await openIssuedMaterials(page, f.patient, doc.id);
+  const materials = page.getByRole("tabpanel", { name: "Materiais", exact: true });
+  await expect(materials.locator(":scope > section").first().getByRole("heading", { name: "Materiais", exact: true })).toBeVisible();
+  const list = page.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
+  const items = list.getByRole("listitem");
+  await expect(items).toHaveCount(2);
+  const first = list.getByRole("button", { name: "Detalhes de " + names[0], exact: true });
+  const before = facts(f.patient), writes = watchWrites(page, true), ids = await items.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")));
+  await first.click();
+  const panel = page.getByRole("dialog", { name: names[0], exact: true });
+  for (const [label, value] of [["Expedido", "7 unidade"], ["Recebido", "0 unidade"], ["Conciliado", "0 unidade"], ["Em trânsito", "7 unidade"]])
+    await expect(panel.locator(`[data-material-fact="${label}"] dd`)).toHaveText(value);
+  await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(first).toBeFocused();
+  const ref = await mobileMaterialReference(browser, "ENT-0019");
+  try {
+    for (const width of [320, 360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expectMobileMaterialRow(first, ref.page, width);
+      expect(await list.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
+      await auditFromTop(page, "canonical dispatched ENT " + width);
+      if (width === 320) {
+        mkdirSync("output/playwright/phase-d", { recursive: true });
+        await captureVisible(first, `output/playwright/phase-d/ent-materials-first-${info.project.name}.png`);
+        await captureVisible(items.last(), `output/playwright/phase-d/ent-materials-last-${info.project.name}.png`);
+      }
+    }
+    const search = page.getByRole("searchbox", { name: "Pesquisar material", exact: true });
+    await search.fill("OUTRO--MATERIAL"); await expect(items).toHaveCount(1);
+    await search.fill("Sem correspondência fictícia"); await expect(list).toHaveCount(0);
+    const clear = page.getByRole("button", { name: "Limpar busca", exact: true }); await clear.focus(); await clear.press("Enter");
+    await expect(items).toHaveCount(2);
+    expect(await items.evaluateAll(nodes => nodes.map(node => node.getAttribute("data-material-line-id")))).toEqual(ids);
+    expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
+  } finally {
+    await ref.context.close();
+  }
+});
+
+test("06.2 autonomous return declaration never presents declared quantities as shipped or received", async ({ page, browser }) => {
+  const f = await transferFixture(), created = await declareTransfer(f, { originDocumentId: null });
+  expect(created.response.error).toBeNull(); const doc = created.response.data;
+  expect(doc.transfer.originDocumentId).toBeNull(); expect(doc.protocol).toBeNull();
+  await login(page, f.patient); await page.goto("/documentos/" + doc.id); await selectDocumentSection(page, "materials");
+  const materials = page.getByRole("tabpanel", { name: "Materiais", exact: true });
+  await expect(materials.locator(":scope > section").first().getByRole("heading", { name: "Materiais", exact: true })).toBeVisible();
+  const list = page.getByRole("list", { name: "Materiais da entrega ou transferência", exact: true });
+  await expect(list.getByRole("listitem")).toHaveCount(1);
+  await expect(list.getByText("Expedido", { exact: true })).toHaveCount(0);
+  await expect(list.locator(".hca-v7-material-unit")).toHaveText("unidade");
+  await expect(list.locator(".hca-v7-material-facts > span").filter({ hasText: "Declarado" }).locator("b")).toHaveText("5");
+  const before = facts(f.patient), writes = watchWrites(page);
+  await selectDocumentSection(page, "workflow");
+  const region = page.getByRole("region", { name: "Expedição e histórico da transferência", exact: true }), grid = region.locator(".hca-definition-grid").first();
+  await expect(region).toContainText("Esta devolução pode ser registrada de forma autônoma");
+  for (const label of ["Declarante", "Registrada em", "Contraparte designada para concordância", "Recebedor físico designado"]) await expect(grid.locator("dt").filter({ hasText: label })).toBeVisible();
+  const ref = await reference(browser, "nova/ENT");
+  try {
+    await referenceReview(ref.page);
+    for (const width of widths) {
+      await page.setViewportSize({ width, height: 900 }); await ref.page.setViewportSize({ width, height: 900 });
+      for (const property of ["display", "gap"] as const) await expect(grid).toHaveCSS(property, await ref.page.locator("#wizardForm .kv").evaluate((node, property) => getComputedStyle(node).getPropertyValue(property), property));
+      await auditFromTop(page, "canonical autonomous return facts " + width);
+    }
+    expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
+  } finally { await ref.context.close(); }
+});

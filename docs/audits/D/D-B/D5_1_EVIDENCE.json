@@ -1,0 +1,488 @@
+{
+  "at": "2026-11-07T19:36:51.507951+00:00",
+  "sourceHead": "fc98664ae8e8690ea2facd7742983d890e5d8b77",
+  "sourceDirty": true,
+  "runtimeCohortUnchangedDuringFinalProduction": true,
+  "sources": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "5d2b9993e65cd2342927d1d49c821b0f4e0e1c2b85bd3cf1994b43c49e5cee29",
+      "mode": "text-lf"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "0df16be3f03ab6d4e5b6aa2fe8aea1c62af41efc2902db6cc3ae38421181f2ec",
+      "mode": "text-lf"
+    },
+    {
+      "path": "next.config.ts",
+      "sha256": "dbd96044c8641d6963b8dd84a3954397f71848d9c7e51cdb7beae9fb1a4acbab",
+      "mode": "text-lf"
+    },
+    {
+      "path": "package.json",
+      "sha256": "cb7b071eb9ad58bbffbd61e1b46568a6cab3fb2e54af8e2075345638f10b7ab0",
+      "mode": "text-lf"
+    },
+    {
+      "path": "playwright.config.ts",
+      "sha256": "2cd47e3142207ef3af0e92a0d05f00ad6fa7fae3a7204d83d701ae7f49f97471",
+      "mode": "text-lf"
+    },
+    {
+      "path": "proxy.ts",
+      "sha256": "f5e274532a65545b34dcb945910a8bcba9443cbb8695099fdff65698b1a8da2c",
+      "mode": "text-lf"
+    },
+    {
+      "path": "public/offline.html",
+      "sha256": "17c0b345e45e346bed1c902d571d1d356e49c11370bcf8399e29db740346f2be",
+      "mode": "text-lf"
+    },
+    {
+      "path": "public/pwa/apple-180.png",
+      "sha256": "fb50d55d9511def1c233da9bd158b7fc498bf2bc259fe738603da207e849d9df",
+      "mode": "binary"
+    },
+    {
+      "path": "public/pwa/icon-192.png",
+      "sha256": "3db33a5782601af84b014224ace5224cea54c3978f4f0b81b1d3e40b46debdd5",
+      "mode": "binary"
+    },
+    {
+      "path": "public/pwa/icon-512.png",
+      "sha256": "5dfad9eacff835464bccd604d0eece85c443113259d58f601766b80ac0387c2e",
+      "mode": "binary"
+    },
+    {
+      "path": "public/pwa/icon.svg",
+      "sha256": "7d1707cf1f26a0aea02f65f1b3e78d01349db79050d5cf905a4aa4b8f5bbfd67",
+      "mode": "text-lf"
+    },
+    {
+      "path": "scripts/build-pwa.mjs",
+      "sha256": "90fa3d3f1d0ce4993beae4ab4926cb4e3126190d4083ea7b46812adcaca25e8c",
+      "mode": "text-lf"
+    },
+    {
+      "path": "scripts/pwa-worker.js",
+      "sha256": "3f10e097590e35c7072e4dc4ab0f7f8005b6bfa466166d36e5d19daad853c3e5",
+      "mode": "text-lf"
+    },
+    {
+      "path": "scripts/start-e2e-server.mjs",
+      "sha256": "50bc4990e6e53ff68166d8b5293df43b5235d791f3624f6e35e8636abc7f6fd3",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/app/api/runtime/route.ts",
+      "sha256": "bef2b866d1f3ca0d5febb5c5ac2e0744325515d12360ae159f8193a8190705a9",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/app/layout.tsx",
+      "sha256": "46f22a82e86d052fbcd47af0e5d1443303f87f1699842226cc6f04404ff49a21",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/app/manifest.ts",
+      "sha256": "18b4df739a5739d0caf702c112194f8dda55929c2b0855db975e1b32f72da50e",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/components/app-shell.tsx",
+      "sha256": "6936b8a96f809bc04fdb903e12e6c7e1a345c67c13bba1c63f39148c9d955829",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/components/documents/attachments.tsx",
+      "sha256": "95418693e5f14069d1ceb8bd2a971c38f0a206db14280d84ce6257fa544080d5",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/components/layout/workspace-context.tsx",
+      "sha256": "5aabf52cf79e3272723b09469e02f359a430863fed8b36169b1ddf4255c09379",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/components/layout/workspace-shell.tsx",
+      "sha256": "4ba429ecf61ed4a50adf06096e65a749893f10a0f7af7613989cdc0bf1c38c96",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/components/profile-console.tsx",
+      "sha256": "4730675fad60746b803b978ee975f4ed387eb5de8e8520c424e651657ae01f41",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/components/pwa/pwa-provider.tsx",
+      "sha256": "7569dfef7083986e95739838a0571d19f0f44f2b0d83a76a2db5cde945e3b944",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/components/pwa/pwa-settings.tsx",
+      "sha256": "36f01c3cda6dfd3933f19e76c3b3850fdb81f9292339e6fa3136bb88412c2863",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/lib/client/api.ts",
+      "sha256": "25e10d620d19874ac5c2a949b562bcc85968ce60cfdf676d2ee292ddfc3e0473",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/lib/pwa/contract.json",
+      "sha256": "a7ecb172b6c5f432fdd66b95e02c670a63e7bdda472dd40812c830e75916613a",
+      "mode": "text-lf"
+    },
+    {
+      "path": "src/theme/tokens.css",
+      "sha256": "9ce513ade0de19381c8116a1db8f0c1b7e6efdbe8120d0c3c62946f068823cb4",
+      "mode": "text-lf"
+    },
+    {
+      "path": "supabase/migrations/20261107161000_phase_d5_runtime_contract.sql",
+      "sha256": "1cc51c89bf7c84b3e7813cdca4a6e9e43ec7f2eec6a96e098799697432804683",
+      "mode": "text-lf"
+    },
+    {
+      "path": "supabase/migrations/20261107162000_phase_d5_runtime_least_privilege.sql",
+      "sha256": "f6896d1c61242d9d10018df9674f39fa41acd4dc1e2e1bf04589ea686c9839d9",
+      "mode": "text-lf"
+    },
+    {
+      "path": "tests/api/runtime.test.ts",
+      "sha256": "a3b82cd014c96738c54bec6632f646336e773b6af4c3680300938b188ac597f0",
+      "mode": "text-lf"
+    },
+    {
+      "path": "tests/e2e/pwa.spec.ts",
+      "sha256": "f1acc549b12c309bdf74e9e85de64ec3628013d17933664340cdcb62e81ef67f",
+      "mode": "text-lf"
+    },
+    {
+      "path": "tests/integration/pwa-runtime.test.mjs",
+      "sha256": "a59462ff3b0dfad7814407513fcacdde5b4bcc4005d496121445cc1fa72097b3",
+      "mode": "text-lf"
+    },
+    {
+      "path": "tests/pwa-worker.test.ts",
+      "sha256": "745090f48001fa6707e807f21ea32e699b12285db4eb6906df0e86e8d416b8b6",
+      "mode": "text-lf"
+    },
+    {
+      "path": "tests/runtime-command-gate.test.ts",
+      "sha256": "998122e1772f014b0e354d4f854e4a649a8f6060d67271d1b6b463ec8ce0782b",
+      "mode": "text-lf"
+    }
+  ],
+  "implementation": [
+    "pt-BR manifest and public PNG icons",
+    "strict four-entry public worker cache; private HTML/API/PDF never cached",
+    "offline public navigation fallback; no queue/replay/forced reload",
+    "anonymous SQL protocol marker, public API correlation and safe distinct 503 states",
+    "availability gate before private writes including open portal and private uploads; server authorization remains mandatory",
+    "nonfatal failed context selection preserves mounted fields",
+    "real two-tab waiting worker with exact confirmed COM draft recovery",
+    "install gesture and unsupported-worker web fallback",
+    "iOS-only CI shards preserve complete serial collection"
+  ],
+  "accepted": {
+    "productionBrowsers": {
+      "passed": 15,
+      "failed": 0,
+      "minutes": 8.5,
+      "projects": [
+        "chromium",
+        "mobile",
+        "ios"
+      ],
+      "casesPerProject": 5,
+      "pwaCasesPerProject": 4,
+      "existingAccessibilityJourneyPerProject": 1,
+      "realBackend": true,
+      "realServiceWorkerInPwaSpec": true
+    },
+    "distinctUnitCases": {
+      "workerPolicy": 4,
+      "runtimeApi": 3,
+      "runtimeCommandGate": 2,
+      "passed": 9
+    },
+    "realAuthRuntimeMarker": {
+      "passed": 1,
+      "anonAlsoChecked": true,
+      "serviceRoleExecuteDenied": true,
+      "privateTableAccessDenied": true
+    },
+    "typesAndAffectedLint": "PASS",
+    "historicalMigrationGuard": 84,
+    "shardCollection": {
+      "all": 182,
+      "first": 94,
+      "second": 88,
+      "intersection": 0,
+      "unionExact": true,
+      "collectionOnly": true,
+      "executionClaim": false
+    }
+  },
+  "counterproofs": {
+    "initialUnit": "quoted placeholder replacement originally hit comment; worker policy tests failed and generator was corrected",
+    "initialAuth": "fixture lacked patient context; direct real Auth login tests context-independent marker",
+    "initialDiagnostic": "cold fixture timeout and real sticky-header context target obstruction; no reset or force click",
+    "firstProduction": "13 passed, 2 iOS failures; public offline keyboard entry and undelivered page.route fault around real worker corrected",
+    "latestPortalDiagnostic": "1 WebKit PASS; blocked context radio creates zero POST attempts and preserves private unsaved field",
+    "restoreCapture": "CLI requires experimental flag and relative Windows destination; both rejected copies preserved; accepted read-only copy verifies all32 objects",
+    "postCatalogue": "initial byte-order comparison reported all sections different because Management API reordered object keys; semantic comparison plus independent Python comparison confirms ten exact sections and the known constraint qualification"
+  },
+  "ciBase": {
+    "sha": "fc98664ae8e8690ea2facd7742983d890e5d8b77",
+    "run": 42384637140,
+    "database": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "chromium": "SUCCESS",
+    "mobile": "SUCCESS",
+    "ios": "CANCELLED_TIMEOUT_40_MINUTES",
+    "observedIosPassedCaseRows": 162,
+    "observedIosAssertionFailures": 0,
+    "aggregate": "FAILURE",
+    "doesNotValidateCurrentSources": true
+  },
+  "currentSourceCi": "NOT_PUBLISHED_YET",
+  "remotePreflight": "D5_REMOTE_PREFLIGHT.json",
+  "remotePostValidation": "D5_REMOTE_MIGRATIONS.json",
+  "remoteAdvisors": "D5_REMOTE_ADVISORS.json",
+  "testingBoundaries": [
+    "Ordinary HTTP-fault web cases block workers; PWA spec explicitly enables real workers in all three engines",
+    "Only /api/runtime uses an explicit counted window.fetch fault adapter; recovery uses real SQL/HTTP",
+    "Actual database Auth, draft persistence, worker lifecycle and offline navigation are not mocked",
+    "Controlled beforeinstallprompt is not physical OS installation",
+    "Different worker URL with same code exercises actual lifecycle, not release promotion",
+    "Diagnostic dev runs are not production acceptance",
+    "Local restore is not operational RTO or recovery after operator-computer loss"
+  ],
+  "remaining": [
+    "Physical notebook/Android tablet/Android phone/iPhone installation and AT in D-C/D6",
+    "Web Push/VAPID/background delivery and D5 notifications work",
+    "C024 session revocation and cross-patient freshness combinations",
+    "C038 native400% zoom and continuous300-character/URL corpus",
+    "Remaining D3/D4, signing custody/rotation/recovery, backup7+4 and monitoring",
+    "CI and Vercel preview for the published SHA"
+  ],
+  "logs": [
+    {
+      "path": "output/phase-d-work/d5-pwa-unit-initial.log",
+      "sha256": "b7355419a608b0a27dcf586cd4a95734c4ec7379918863d2e8312687d32eaccb",
+      "summaryLines": [
+        "❯ tests/pwa-worker.test.ts:73:13",
+        "Test Files  1 failed | 1 passed (2)",
+        "Tests  4 failed | 3 passed (7)",
+        "Duration  469ms (transform 53%, tests 25%, import 16%, worker 6%)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-unit-accepted.log",
+      "sha256": "1a533075fd67fbab99c56e85b58ab0895ec6038fb803dced7f7e59072dc7f208",
+      "summaryLines": [
+        "Test Files  2 passed (2)",
+        "Tests  7 passed (7)",
+        "Duration  1.50s (transform 40%, tests 25%, import 18%, worker 16%)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-auth-initial.log",
+      "sha256": "33864092103fd8d525ce678438c40367727a902560eeee4903368ac1767e20b8",
+      "summaryLines": [
+        "✖ failing tests:",
+        "test at tests\\integration\\pwa-runtime.test.mjs:7:1",
+        "at actor (file:///C:/Users/renat/Projetos_Dev/home-care-assistant/tests/integration/v4-fixtures.mjs:36:10)",
+        "at async TestContext.<anonymous> (file:///C:/Users/renat/Projetos_Dev/home-care-assistant/tests/integration/pwa-runtime.test.mjs:13:30)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-auth-accepted.log",
+      "sha256": "51c47b793afe4ad7077d10a4612302ed2f9bcd17edbb258da46a7b8b6a6d078b",
+      "summaryLines": [
+        "ℹ tests 1"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-lint-candidate.log",
+      "sha256": "c608136bdb66ff3c25ae32e2c452874ee6342daf9c0e9bb9775ff9cea2cec8a8",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-diagnostic.log",
+      "sha256": "c783e22eb9a2735f921329f6ab063e52ddacedd2edf166599f2be8c6ea4fcfeb",
+      "summaryLines": [
+        "2 failed",
+        "[chromium] › tests\\e2e\\pwa.spec.ts:51:5 › PWA real oferece manifesto, ícones e fallback público sem cache de API, ficha ou PDF privado",
+        "[chromium] › tests\\e2e\\pwa.spec.ts:156:5 › PWA conserva edição em offline, falha e incompatibilidade e só libera após consulta real compatível",
+        "2 passed (4.8m)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-diagnostic-recheck.log",
+      "sha256": "3dc4313c967dc54a00a9e7e7d9696211da0d7a8ea1b0497098ea4549720190a0",
+      "summaryLines": [
+        "test-results\\pwa-PWA-real-oferece-manif-a137b-de-API-ficha-ou-PDF-privado-chromium\\test-failed-1.png",
+        "1 failed",
+        "[chromium] › tests\\e2e\\pwa.spec.ts:51:5 › PWA real oferece manifesto, ícones e fallback público sem cache de API, ficha ou PDF privado",
+        "1 passed (2.5m)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-diagnostic-private-cache.log",
+      "sha256": "6cb5f79e8728daa2eec1ad50f872ce5b621446223cb74d82ea7d63fdaf858c51",
+      "summaryLines": [
+        "E2E collection passed before application build; no browser case was executed by this preflight.",
+        "ok 1 [chromium] › tests\\e2e\\pwa.spec.ts:51:5 › PWA real oferece manifesto, ícones e fallback público sem cache de API, ficha ou PDF privado (1.4m)",
+        "1 passed (2.8m)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-production.log",
+      "sha256": "4712d5cb0c9a8be76692f8b84560f6c6b1078354b28638fd34ba04d98c083e7b",
+      "summaryLines": [
+        "2 failed",
+        "[ios] › tests\\e2e\\pwa.spec.ts:51:5 › PWA real oferece manifesto, ícones e fallback público sem cache de API, ficha ou PDF privado",
+        "[ios] › tests\\e2e\\pwa.spec.ts:156:5 › PWA conserva edição em offline, falha e incompatibilidade e só libera após consulta real compatível",
+        "13 passed (8.7m)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-ios-diagnostic.log",
+      "sha256": "84c05260a7d554cb04a65f044d47db73697fe54c0496f007de0459f072e48771",
+      "summaryLines": [
+        "Running 2 tests using 1 worker",
+        "ok 1 [ios] › tests\\e2e\\pwa.spec.ts:52:5 › PWA real oferece manifesto, ícones e fallback público sem cache de API, ficha ou PDF privado (1.7m)",
+        "ok 2 [ios] › tests\\e2e\\pwa.spec.ts:157:5 › PWA conserva edição em offline, falha e incompatibilidade e só libera após consulta real compatível (48.8s)",
+        "2 passed (3.6m)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-runtime-correlation-unit.log",
+      "sha256": "4813d28d7bef1d0c35fad25e1d83199a430c2650aef8aa3932ca2623c4918e95",
+      "summaryLines": [
+        "Test Files  1 passed (1)",
+        "Tests  3 passed (3)",
+        "Duration  4.47s (transform 47%, import 44%, tests 9%)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-runtime-gate-unit.log",
+      "sha256": "64ae79305c2b8b1f7c836e340647edf6a7ec750022e71b58b74cc34bd18a66dc",
+      "summaryLines": [
+        "Test Files  2 passed (2)",
+        "Tests  5 passed (5)",
+        "Duration  1.36s (import 78%, transform 15%, tests 5%, worker 2%)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-portal-gate-diagnostic.log",
+      "sha256": "e71d1cb2e28ec27138c187929b59bfbcb94c5f4d234b0fb53da06dea2b1176c8",
+      "summaryLines": [
+        "E2E collection passed before application build; no browser case was executed by this preflight.",
+        "ok 1 [ios] › tests\\e2e\\pwa.spec.ts:157:5 › PWA conserva edição em offline, falha e incompatibilidade e só libera após consulta real compatível (38.6s)",
+        "1 passed (1.1m)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-gate-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-gate-types.log",
+      "sha256": "3db89b3454880dec511f03b9185bbae8051730910c5b4c2377c86ba1e85bd10b",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-pwa-production-final.log",
+      "sha256": "0c36eb1507c940e83238b95e03d4e071e7b5d4fd6137a7894e2e8eff46d59a09",
+      "summaryLines": [
+        "ok 13 [ios] › tests\\e2e\\pwa.spec.ts:157:5 › PWA conserva edição em offline, falha e incompatibilidade e só libera após consulta real compatível (21.6s)",
+        "ok 14 [ios] › tests\\e2e\\pwa.spec.ts:309:5 › PWA aguarda todas as abas, não recarrega edição e recupera o mesmo rascunho confirmado após reabrir (16.7s)",
+        "ok 15 [ios] › tests\\e2e\\pwa.spec.ts:435:5 › PWA oferece instalação somente por gesto e mantém web quando o worker não está disponível (10.2s)",
+        "15 passed (8.5m)"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-ios-shard-collection-final.json",
+      "sha256": "85e0f02318768e468381c2bac8cbb6fdd403a016f6bfab8ab560ab8afd03bc3c",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-contract-guard.log",
+      "sha256": "052a2532a549a7e1ee2d9d72d556c5455cdda83816be9e6961081ee469149492",
+      "summaryLines": [
+        "Contract guard passed; 84 historical migrations unchanged."
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-backup-seal.log",
+      "sha256": "e769cc78c8548f6bf5f659eb7b0decc004b70cdac699bf8802a9031bca45c2d3",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-backup-verify.log",
+      "sha256": "8359a0c0ef190448bb26297e0ac16815c4b15d62e07bba140354a22538a5cd7a",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-upgrade-probe.log",
+      "sha256": "36f58d780f351567ac43ff3ef6b8dbc724150b59a9410da1af0eafcb91e488e2",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-preflight.log",
+      "sha256": "15b98068e8ff5df7572c2293139fa8020e771ad2c46615140e6d85c19671b68a",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-post-serialization-counterproof.log",
+      "sha256": "be6c3b029ddbbff80a5f5485f40951c2daea8cf0dece9bf88b7a3d3bbf18ed2f",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-post-validation.log",
+      "sha256": "e8ff41793b8a25609e59bdc9c494b392f120ccb35ac603457fd7a4cec9951e46",
+      "summaryLines": []
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-capture-status.log",
+      "sha256": "edda06fc38c89ae64d4db51830da802c0638220d0e0fdb4e2cbcc65dd864f558",
+      "summaryLines": [
+        "if(result.error||result.status!==0)throw new Error(`Protected capture step failed: ${label}; diagnostics remain outside Git`);",
+        "Error: Protected capture step failed: storage-document-receipts; diagnostics remain outside Git"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-storage-capture-status.log",
+      "sha256": "64dc4661dba62321d8778a2eeeaab0008e41eba26572ad8822936575ac6d1761",
+      "summaryLines": [
+        "function run(args,label){const r=spawnSync('C:/Users/renat/tools/bin/supabase.exe',[...args,'--profile',profile],{encoding:'utf8',maxBuffer:32_000_000,timeout:240_000});save(label+'.log',(r.stderr??'')+'\\n'+(r.stdout??''));if(r.error||r.status!==0)throw new Error('Capture step failed; protected diagnostics: '+label);return r.stdout;}",
+        "Error: Capture step failed; protected diagnostics: storage-document-receipts-accepted"
+      ]
+    },
+    {
+      "path": "output/phase-d-work/d5-remote-storage-relative-status.log",
+      "sha256": "299ae82fc466e716e3f023336b2cd39667b1502bb5f0ca03bb83ef85cd265853",
+      "summaryLines": []
+    }
+  ],
+  "visuals": [
+    {
+      "path": "output/playwright/phase-d/pwa-offline-ios.png",
+      "sha256": "c43ce9916499121f891c677ad9f0d06394e4b1d4792ed95ac4bbdacfbda86790",
+      "visuallyInspected": true
+    },
+    {
+      "path": "output/playwright/phase-d/pwa-update-ios.png",
+      "sha256": "f0588343610eb552946458e25d59df28dee202ce32124ad34d1de2f9d34e4479",
+      "visuallyInspected": true
+    }
+  ],
+  "operationalGo": false
+}

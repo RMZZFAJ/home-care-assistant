@@ -1,15 +1,11 @@
 "use client";
+import { CheckboxField, FormField, SelectField, TextInput, type TextInputProps } from "@/components/ui/controls";
 import { useId } from "react";
-import { Checkbox, Field as FluentField, Input, Select, type InputProps } from "@fluentui/react-components";
+
 export type Row = Record<string, unknown>;
 
-export const roles = {
-  admin: "Administrador do paciente",
-  supervisor: "Supervisor",
-  professional: "Profissional",
-  family: "Familiar",
-  reader: "Leitor",
-};
+import {roleLabels as roles} from "@/lib/role-labels";
+export {roles};
 export function text(row: Row, key: string) {
   return row[key] == null ? "" : String(row[key]);
 }
@@ -22,24 +18,33 @@ export function Field({
   value = "",
   type = "text",
   required = false,
+  min,
+  max,
+  step,
 }: {
   name: string;
   label: string;
   value?: string | number;
-  type?: InputProps["type"];
+  type?: TextInputProps["type"];
   required?: boolean;
+  min?: number;
+  max?: number;
+  step?: number;
 }) {
   const id = useId();
   return (
-    <FluentField label={{ children: label, htmlFor: id }}>
-      <Input
+    <FormField label={label} htmlFor={id}>
+      <TextInput
         id={id}
         name={name}
         defaultValue={String(value)}
         type={type}
         required={required}
+        min={min}
+        max={max}
+        step={step}
       />
-    </FluentField>
+    </FormField>
   );
 }
 export function Check({
@@ -51,18 +56,18 @@ export function Check({
   label: string;
   checked?: boolean;
 }) {
-  return <Checkbox name={name} defaultChecked={checked} label={label} />;
+  return <CheckboxField name={name} defaultChecked={checked} label={label} />;
 }
 export function RoleSelect({ value = "professional" }: { value?: string }) {
   return (
-    <FluentField label="Função neste paciente">
-      <Select name="role" defaultValue={value}>
+    <FormField label="Função neste paciente">
+      <SelectField name="role" defaultValue={value}>
         {Object.entries(roles).map(([key, label]) => (
           <option key={key} value={key}>
             {label}
           </option>
         ))}
-      </Select>
-    </FluentField>
+      </SelectField>
+    </FormField>
   );
 }

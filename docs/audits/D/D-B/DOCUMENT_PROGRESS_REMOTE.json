@@ -1,0 +1,65 @@
+{
+  "status": "APPLIED_AND_POST_VALIDATED",
+  "at": "2026-11-09T09:48:24.134Z",
+  "project": "qwfrqychokvhdzakibid",
+  "before": 164,
+  "after": 165,
+  "pending": 0,
+  "migrations": {
+    "20261109091550_phase_d3_document_progress.sql": "91ebeb03994d0b4fc8dac82ee7993454a00b5e0412236143ca5dad7cfb6c657a"
+  },
+  "versionDigest": "8d7a2e0d48bd9705fa90ca5d48415162f0fbb111326425ce6dc7657d59f6a5a2",
+  "localRemoteFunctionsMatched": {
+    "private.preserve_document_progress_note()": "51b1f0843632886d63e509f82b26676f310190ab9d1b7ec3002a38e4a5fa107b",
+    "document_progress_publish(uuid,uuid,jsonb)": "155e79626ab226039e74d73c4a39bd430837a0d9e9b869ec623d106aa6015530",
+    "document_progress(uuid,text,integer,integer)": "e0219b51c3885968ce0b201e71214f82a680bd5657c18516983c0646aa9af2dc",
+    "private.progress_note_view(private.document_progress_notes)": "865ce39d05f5553b6a93d9f725391d07cd1364759bf175a8c68f606c852e4679"
+  },
+  "explicitPrivileges": {
+    "rls": true,
+    "readAnon": false,
+    "readAuth": true,
+    "directAnon": false,
+    "publishAnon": false,
+    "publishAuth": true,
+    "readService": false,
+    "directService": false,
+    "publishService": false,
+    "directAuthenticated": false
+  },
+  "capability": {
+    "roles": [
+      "admin",
+      "family",
+      "supervisor",
+      "professional"
+    ],
+    "critical": false
+  },
+  "invalidIndexes": 0,
+  "waitingLocks": 0,
+  "prerequisitesMatched": {
+    "private.auth_session()": "b8484b7869321105c50e770ea958628749a9df1c8f308945b20aead55aa4892b",
+    "private.can(uuid,text)": "a896fd8189bd10e1c927040f9c073cb1489211542f63d1517a7663640f5312b7",
+    "private.invalidate_workspace()": "41205293029f5f8e86f0b43ebc77f9b0a59919c2a82f36c65d0299a566c5ccc0",
+    "private.require_cap(uuid,text)": "542935c969ace6ba2aef0eaf8751a9a1d62db4001e084bffb574f9773821bdc8",
+    "private.bal_comment_units(text)": "3517ea581a500038b58c50b73f22242bec9c629f7f09a8eed4b7084875ba7086"
+  },
+  "dryRun": {
+    "upToDate": false,
+    "dryRun": true,
+    "migrations": [
+      "20261109091550_phase_d3_document_progress.sql"
+    ],
+    "seeds": [],
+    "roles": [],
+    "message": "Finished supabase db push."
+  },
+  "noReset": true,
+  "noRemoteFixtureOrAuthMutation": true,
+  "noRolesSeedsOrVault": true,
+  "backupPolicy": "Owner classified remote DB as disposable test data;no redundant full backup/restore for additive165",
+  "cleanLegacyIntegration": "Own SHA CI required;no duplicate local reset",
+  "advisors": "DOCUMENT_PROGRESS_ADVISORS.json",
+  "operationalGo": false
+}

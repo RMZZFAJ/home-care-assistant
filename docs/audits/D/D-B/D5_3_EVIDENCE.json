@@ -1,0 +1,76 @@
+{
+  "sourceBaseSha": "40161055629b710e6c495941d4931ffd3c4b4656",
+  "at": "2026-11-07T22:22:07.569259+00:00",
+  "sourceLfSha256": {
+    "supabase/migrations/20261107213013_phase_d5_legacy_reminder_recovery.sql": "d8811bd76b19bbc583d303e6fb592144cd099743219f8fb3326d4ffad0e631be",
+    "tests/integration/legacy-reminder-scheduler.test.mjs": "17eeedafa3a0e381b022f4ad836fbf4ba8e0835179bff9ff4030e073db9017cc",
+    "scripts/operator-files.mjs": "1a62ebebb4bf4c3903b3e83183d023e320199ceb19b53ed1ff248bf25fc14193",
+    "scripts/backup-filesystem-store.mjs": "db4085cf62cd66b22d2a2570cd4d0a10e46012bc8af4bb47ce9937ea225d406a",
+    "scripts/backup-remote-capture.mjs": "918e2b9a56a3c888e2d0e42c411b863be809cc2c8ffe8b51092a40f72db39c28",
+    "scripts/backup-snapshots.mjs": "2e3873c401db4c638b0c3d40cac8d1740c839831c64de6d09d9be4c14227cf77",
+    "scripts/operations-backup.mjs": "7ef4656e70b0beaa703e7866c40499c2afcbfc9289f16d4135b375c4ea02fefb",
+    "scripts/restore-backup-probe.mjs": "4fd76baa9d11680bf1b6770ecbee5e0e425c065735c3bb4331b70bbb7af4caa2",
+    "tests/integration/backup-retention.test.mjs": "b520a37bf856e365793f60c0d8a666d3c6f589dceac3d6da45e47fe572416d2f",
+    "tests/integration/backup-snapshots.test.mjs": "10c821b976b96cc1c694bada529e63d5b32238406032a40ae7c5da012a4e8c16"
+  },
+  "operationalGo": false,
+  "missionComplete": false,
+  "prState": "DRAFT_NO_MERGE",
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "stage": "LOCAL_SERVICE_AUTH_CONSUMERS_AND_REMOTE_145_PASS; CI of next SHA pending",
+  "newSchedulerCases": 6,
+  "directedPassed": 16,
+  "existingReferenceCases": 9,
+  "existingConcurrentReqCase": 1,
+  "implementation": [
+    "100-patient cursor excludes empty defaults; cursor and effects roll back together",
+    "Existing operational_reminders/enqueue_notice producers retained; modern BAL producer preserved",
+    "Seven original dates per visit catch up without fabricating attendance, count or acknowledgement",
+    "Policy fingerprint/version/updated_at continuity required; unknown intervals recorded as technical gaps",
+    "Malformed candidate isolated with private minimal failure history; valid candidates continue",
+    "Existing public service entry and grants retained; additive safe aggregate counters"
+  ],
+  "counterproofs": {
+    "productBaseline": "Three real old service rounds reached 95/101 eligible configurations",
+    "fixtureBaselineFailure": "Assumed nonexistent enum before exercising producer; separated from material counterproof",
+    "ddlPreflight": "Ambiguous alias corrected before local apply; no applied migration rewritten"
+  },
+  "validation": {
+    "localPrepare": "PASS existing stack, no reset",
+    "affectedNodeLint": "PASS",
+    "historicalGuard": "84 unchanged",
+    "authRead": "Past original reminder located with actual Auth; reading did not acknowledge",
+    "concurrency": "Two independent service workers, dedup and rollback",
+    "browser": "No TS/UI runtime changes from 4016105; no redundant local E2E build"
+  },
+  "remote": {
+    "before": 144,
+    "after": 145,
+    "pending": 0,
+    "historySqlMatched": 145,
+    "originalTablesPreserved": 139,
+    "preflight": "D5_3_REMOTE_PREFLIGHT.json",
+    "post": "D5_3_REMOTE_MIGRATIONS.json",
+    "advisors": "D5_3_REMOTE_ADVISORS.json"
+  },
+  "ciBaseObservation": "4016105 run42415801564 terminal SUCCESS: database, validate Ubuntu/Windows, chromium/mobile/ios1/ios2 and aggregate; not approval of unpublished increments",
+  "remainingGates": [
+    "CI of published SHA",
+    "Global support/incident consumer in OPS.3",
+    "D-C/D6 human/physical/operational gates"
+  ],
+  "logLfSha256": {
+    "d5-legacy-baseline-counterproof.log": "92ec9a432ea27822ddd6332b2d384071d78245633322bda7f94becdf5356cb85",
+    "d5-legacy-baseline-material.log": "b7172e432d78335c338074676caea717d45e3b4b5b4780c308b6f032f17490c8",
+    "d5-legacy-preflight-console.log": "5100afea039fe40c6d31466f0fc43d19fd42cf9f5cc918c800ac0e7e371352f5",
+    "d5-legacy-preflight-final-console.log": "e37feb9f369b056f1f36bd0c667604a97961577dcb7b29d386cbeea1f414f2bc",
+    "d5-legacy-prepare.log": "837b0adb0c945e1aca7fb3df31bf2a6e1098030938dbbe37aef8a34181a3f2ac",
+    "d5-legacy-auth-consumers.log": "d7279ca9658feaa61a70ff8ced9dff9c7f8a9e7b6b23c022ebcbb78f7f2b5365",
+    "d5-legacy-remote-upgrade-probe.log": "6d15b09b814f3ec53a8e52b256268517570f45ee903e5f7eddbfebcb0f721f53",
+    "d5-legacy-remote-finalization.log": "da30767b200b5f653785840ac1af0f0794d16e19ba5c0711beb26761ea77e3a8",
+    "d5-legacy-remote-preflight.log": "856a2fe52803cc035203fc9337664d30772c604cecf174e954d6c8cf628adb17",
+    "d5-legacy-remote-apply.log": "cc6786b87d31e99037b1ea516518356b84c2c04bf9c8437bbdc3cace8367bc62",
+    "d5-legacy-remote-postcheck.log": "920478e6b998f83ef666e11188f01c2015c598b08d1513955695f08dd8f29986",
+    "d5-legacy-contracts.log": "fa4deead48764fff4ad5a30b4b612da8dc310070ec685493d8c95105b59ff39f"
+  }
+}

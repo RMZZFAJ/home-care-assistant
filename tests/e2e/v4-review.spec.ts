@@ -1,3 +1,4 @@
+import { selectDocumentSection, openDocumentMore, closeDocumentMore } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -92,9 +93,9 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         idempotencyKey: randomUUID(),
         expectedVersion: (await governance(other)).version,
       });
-    await expect(page.getByText("Arquivamento após 7 dias da conclusão", { exact: true })).toBeVisible();
+    await expect(page.getByText("Arquivamento 7 dias após conclusão ou cancelamento", { exact: true })).toBeVisible();
     await revisePolicy({ archiveDays: 8 });
-    await expect(page.getByText("Arquivamento após 8 dias da conclusão", { exact: true })).toBeVisible({ timeout: 45000 });
+    await expect(page.getByText("Arquivamento 8 dias após conclusão ou cancelamento", { exact: true })).toBeVisible({ timeout: 45000 });
     await page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true }).click();
     await page.getByLabel("Primeiro lembrete (horas)", { exact: true }).fill("3");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
@@ -102,7 +103,7 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     expect((await governance(page)).settings.archiveDays).toBe(8);
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
-    const archiveDays = page.getByLabel("Arquivar após conclusão (dias)", { exact: true });
+    const archiveDays = page.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true });
     await expect(archiveDays).toHaveValue("8");
     await archiveDays.fill("9");
     await revisePolicy({ archiveDays: 10 });
@@ -110,7 +111,11 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     await expect(archiveDays).toHaveValue("9");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
     await expect(page.getByRole("alert").filter({ hasText: "configuração mudou em outra sessão" })).toBeVisible();
+    await expect(archiveDays).toHaveValue("9");
+    await expect(archiveDays).toBeDisabled();
+    await page.getByRole("dialog").getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
     await expect(archiveDays).toHaveValue("10");
     await archiveDays.fill("11");
@@ -174,6 +179,8 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         .getByRole("alert")
         .filter({ hasText: "configuração mudou em outra sessão" }),
     ).toBeVisible();
+    await expect(end).toBeDisabled();
+    await cell.getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
     await expect(end).toBeEnabled();
     await expect(end).toHaveValue("");
     expect((await persisted()).quiet_start).toBe(20);
@@ -200,8 +207,13 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
       });
       await start.selectOption("19");
       await expect(page.getByRole("alert").first()).toBeVisible();
+      if (failure === "network") {
+        await expect(start).toBeDisabled();
+        expect((await persisted()).quiet_start).toBe(20);
+        await cell.getByRole("button", { name: "Recuperar mesma alteração", exact: true }).click();
+      }
       await expect(start).toBeEnabled();
-      await expect(start).toHaveValue("20");
+      await expect(start).toHaveValue(failure === "network" ? "19" : "20");
       expect((await persisted()).cooldown_minutes).toBe(23);
       await page.unrouteAll({ behavior: "wait" });
     }
@@ -227,7 +239,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       await post(family, "/api/documents", {
         careRecipientId: patient,
         type: "COM",
-        payload: { lines: [{ productId: product, quantity: "1" }] },
+        payload: { origin:"purchase", lines: [{ productId: product, quantity: "1" }] },
         idempotencyKey: randomUUID(),
         draft: false,
       })
@@ -250,12 +262,13 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
         sqlLiteral(row),
     );
     await family.goto("/fichas/" + receipt.requisitionId);
+    await selectDocumentSection(family, "communications");
     const statuses = family.getByRole("region", {
-      name: "Notificações da ficha",
+      name: "Comunicações da ficha",
       exact: true,
     });
     await expect(
-      statuses.getByText("Disponível no aplicativo", { exact: false }).first(),
+      statuses.getByText("Aviso criado no aplicativo", { exact: false }).first(),
     ).toBeVisible();
     const response = await family.request.get(
       "/api/notifications?surface=bell&careRecipientId=" + patient,
@@ -279,6 +292,9 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       bell.getByRole("link").filter({ hasText: receipt.code }),
     ).toHaveCount(1);
     await family.keyboard.press("Escape");
+    // The 25 newer silent records occupy the first communications page.
+    await statuses.getByRole("button", { name: "Próximas", exact: true }).click();
+    await expect(statuses.getByText("2 / 2", { exact: true })).toBeVisible();
     // Controlled local provider evidence, not an external Meta delivery.
     sql(
       "update public.requisition_notifications set channel='whatsapp',destination='+15555550102',state='read',read_at=now(),provider_reference='local-contract-" +
@@ -404,11 +420,12 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
         careRecipientId: patient,
         type: "ENT",
         payload: {
+          recipientReason: "Escolha manual fictícia para este recebimento",
           source: "FAMILY",
           destination: "CARE_TEAM",
           recipientId: fixtures().professional.id,
           lines: [
-            { productId: product, quantity: "10", requisitionItemIds: [item] },
+            { requestFulfillment: "complete", productId: product, quantity: "10", requisitionItemIds: [item] },
           ],
         },
         idempotencyKey: randomUUID(),
@@ -444,12 +461,21 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     await expect(
       page.getByRole("heading", { name: req.code, exact: false }),
     ).toBeVisible();
+    await openDocumentMore(page);
     await expect(
-      page.getByRole("button", {
-        name: "Revisar arquivamento manual",
+      page.getByRole("menuitem", {
+        name: "Arquivar ficha",
         exact: true,
       }),
     ).toHaveCount(0);
+    await closeDocumentMore(page);
+    const lifecycleArchive = "/api/documents/" + req.requisitionId + "/lifecycle/archive";
+    const withheld = await (await page.request.get(lifecycleArchive)).json();
+    expect(withheld).toMatchObject({ condition: "completed", canArchive: false });
+    const deniedNewArchive = await page.request.post(lifecycleArchive, {
+      data: { action: "archive", mode: "policy", key: randomUUID(), version: withheld.version, referenceHash: withheld.referenceHash },
+    });
+    expect(deniedNewArchive.status()).toBe(403);
     const forbiddenArchive = await page.request.post(
       "/api/requisitions/" + req.requisitionId + "/archive",
       { data: { reason: "Tentativa proibida por capacidade explícita" } },
@@ -497,9 +523,18 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
         ).json()
       ).total,
     ).toBe(1);
-    await post(page, "/api/requisitions/" + req.requisitionId + "/archive", {
-      reason: "Conclusão fictícia revisada pelo administrador local.",
-    });
+    const legacyEndpoint = "/api/requisitions/" + req.requisitionId + "/archive";
+    const canonical = "/api/documents/" + req.requisitionId + "/lifecycle/archive";
+    const reason = "Conclusão fictícia revisada pelo administrador local.";
+    const unreviewed = await page.request.post(legacyEndpoint, { data: { reason } });
+    expect(unreviewed.status()).toBe(409);
+    expect(await unreviewed.json()).toMatchObject({ code: "INVALID_OPERATION" });
+    const reference = await (await page.request.get(canonical)).json();
+    const command = { action: "archive", key: randomUUID(), version: reference.version, referenceHash: reference.referenceHash, mode: "other", reason };
+    const result = await post(page, legacyEndpoint, command);
+    expect(result).toMatchObject({ documentId: req.requisitionId, issuanceId: expect.any(String), reason });
+    expect(await post(page, canonical, command)).toEqual(result);
+    expect((await post(page, legacyEndpoint, { reason })).data.archivedAt).toBe(result.archivedAt);
     await expect(
       page.getByRole("link").filter({ hasText: req.code }),
     ).toHaveCount(0);

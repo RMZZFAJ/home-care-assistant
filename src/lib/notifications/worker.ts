@@ -13,15 +13,17 @@ export async function processNotifications(
   client: SupabaseClient,
   limit = 25,
   provider?: NotificationProvider,
+  initialRequestId?: string,
 ) {
   const config = metaConfiguration();
   const external =
     provider ?? (config ? new MetaWhatsAppProvider(config) : null);
   const workerId = randomUUID();
-  const { data, error } = await client.rpc("claim_notification_jobs", {
-    p_limit: Math.min(50, Math.max(1, limit)),
+  const { data, error } = await client.rpc(initialRequestId ? "claim_initial_pdf_notices" : "claim_notification_jobs", {
+    p_limit: Math.min(initialRequestId ? 10 : 50, Math.max(1, limit)),
     p_worker_id: workerId,
     p_external_enabled: external !== null,
+    ...(initialRequestId ? { p_request: initialRequestId } : {}),
   });
   if (error) databaseError(error);
   const jobs = (data ?? []) as NotificationJob[];

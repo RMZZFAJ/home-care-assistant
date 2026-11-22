@@ -1,12 +1,11 @@
 # Operação por paciente
 
-Contrato AS_IS da base funcional `37cb7f85e96e551d6419871f94dd950712e2565b`.
-Este guia descreve percursos existentes e invariantes; B2/B3 mostram
-exceções sem conclusão adequada em COM parcial, cancelamento ENT com consumo,
-sucessão, relato textual e produto inativo. Não há aprovação de operação real.
-Estado e limites: [PROJECT_STATUS](PROJECT_STATUS.md). Planejamento futuro
-em [C](../audits/C/README.md); decisões aprovadas não equivalem a
-implementação.
+Este guia descreve percursos implementados e seus invariantes na D-B.
+A base AS_IS `37cb7f85e96e551d6419871f94dd950712e2565b` e os achados B2/B3
+permanecem históricos; não descrevem automaticamente as limitações atuais.
+O [acompanhamento principal](../../TEMP_D_B_ATUALIZACAO.md) distingue entregas,
+validação pendente e próximos gates. Não há liberação operacional. Planos
+em [C](../audits/C/README.md) conservam seu caráter de especificação.
 
 ## Acesso e navegação
 
@@ -16,12 +15,91 @@ efetivas desse vínculo; administração global é independente da função loca
 O sino reúne atualizações do paciente e o perfil permite editar identidade,
 foto, registro profissional, preferências, contatos e sessões.
 
+Acesso pessoal separa Entrar, Recuperar e Aceitar convite. O link de convite
+mostra paciente, função, permissões, emissor e validade somente para a conta
+convidada com e-mail confirmado. Confira o resumo antes de aceitar ou recusar.
+Se a confirmação não chegar, a página preserva essa decisão na mesma aba.
+Consultar resultado sem reenviar apenas lê; Recuperar decisão do convite
+confere o resultado e pode reenviar a mesma escolha. Não escolha a decisão
+oposta nem crie outro cadastro para resolver uma resposta incerta.
+
+Mudar perfil apresenta apenas os vínculos autorizados e, quando disponível,
+a administração global separada. A escolha identifica o paciente e sua função;
+não altera o vínculo. Pessoas e vínculos permite pesquisar, editar, revogar,
+reativar e conferir credenciais pelas permissões existentes. Contas globais
+continua sendo uma área distinta da administração local do paciente.
+
+Meu perfil reúne as abas Meu perfil, Segurança, Avisos e aplicativo,
+Dispositivos e Ajuda. Dados pessoais, foto e vínculos ficam em Meu perfil;
+senha, autenticador, contatos e sessões ficam em Segurança. Avisos e aplicativo
+reúne instalação, atualização, ativação de avisos e preferência de ciência;
+Dispositivos permite consultar, pausar e desativar inscrições da própria conta.
+A troca de aba conserva os campos e as confirmações em andamento, sem salvar
+automaticamente o preenchimento comum. Instalação, permissão de avisos,
+inscrição e entrega continuam sendo estados diferentes.
+
+## Administração e regras
+
 Um administrador global cria pacientes e configura os primeiros
-administradores locais. Alterações críticas exigem proposta e aprovação de
-outra identidade administradora do mesmo paciente. A administração de acesso
-da função Administrador é preservada; revogue o vínculo para remover a função.
+administradores locais. Na atuação global, mudanças da configuração de um
+paciente geram propostas para um administrador local distinto do proponente.
+No vínculo local, alterações autorizadas seguem a confirmação própria da ação;
+elas não exigem automaticamente outra proposta. A administração de acesso da
+função Administrador é preservada; revogue o vínculo para remover a função.
 Convites são compartilhados manualmente, não contêm credenciais e exigem
 aceite pela conta correspondente com e-mail confirmado.
+
+Administração → Paciente reúne o cadastro e os atalhos autorizados para pessoas,
+catálogo e alertas. Permissões, comunicação e regras separa Regras, Permissões,
+Notificações e Pessoas e propostas. As regras de BAL, ciência, comunicação e
+arquivamento têm edição contextual; documentos existentes conservam a política
+da emissão. Consultar ou comparar uma proposta não a aprova. A comparação
+mantém a proposta registrada e a configuração vigente distintas; uma proposta
+obsoleta exige revisar a configuração antes de preparar outra intenção.
+
+Uma consulta de regras de avisos malsucedida oferece nova consulta na própria
+seção e suspende alterações até confirmar os dados. Recusa de acesso retira a
+configuração antes exibida. Uma confirmação de alteração ainda incerta usa
+Recuperar mesma alteração; consultar a lista não substitui essa recuperação.
+
+## Preparação local
+
+Depois do cadastro global, uma pessoa com vínculo local competente pode abrir
+Guias e ajuda → Acompanhar preparação local. A tela reúne os registros
+autorizados de pessoas, materiais, estoque, escalas, BAL e comunicação, com
+encaminhamento aos fluxos próprios. Criar o paciente não concede vínculo local
+a quem fez o cadastro. Materiais são adotados por escolha explícita; a abertura
+de estoque usa a movimentação familiar existente, com origem, quantidade e
+motivo. Convites continuam dependendo de aceite pessoal.
+
+Contagens de registros não aprovam estoque físico, presença, ciência,
+recebimento ou início do atendimento. Informações restritas são identificadas
+sem aparecer como zero. Falhas de consulta permitem atualizar a seção; uma
+recusa de acesso retira os dados antes exibidos. A contingência tem declaração
+e conciliação próprias, descritas abaixo.
+
+## Contingência e retorno ao aplicativo
+
+Em Guias e ajuda → Regularizar contingência, selecione o processo e procure
+primeiro o registro existente. Registre somente os fatos conhecidos; mantenha
+data, horário, fuso, pessoas, materiais e custódia desconhecidos como tais.
+A autoria digital é a sua sessão, separada de quem realizou ou recebeu o
+fato físico. Confirme a declaração para anexar o registro físico pelo fluxo
+seguro de fotos/PDFs. A declaração original permanece preservada.
+
+Informações complementares e pedidos de esclarecimento formam histórico
+próprio. A conciliação exige outra pessoa com competência local. Ela compara
+a declaração, os documentos já existentes e as evidências prontas; vincular
+não repete o fato operacional, não movimenta estoque e não assina por um
+recebedor ausente. Caso ainda falte o ato digital, use o processo próprio e
+volte para vincular o resultado legítimo. Não invente dados para encerrar.
+
+Depois de perda de resposta, confira a mesma tentativa, inclusive após
+recarregar a página. O aplicativo recupera o resultado existente ou encerra
+a referência ainda não executada, impedindo chegada tardia. Guarde o
+registro físico até conferir o resultado. O formulário comum não recebe
+salvamento de rascunho neste fluxo. Piloto, responsáveis e ensaio físico
+continuam sujeitos às designações e aos gates operacionais.
 
 ## Catálogo, unidades e scanner
 
@@ -91,19 +169,35 @@ exige família e/ou supervisão, conforme qualquer grupo ou todos os grupos,
 com identidades distintas. Estoque alterado desde a referência exige reconto.
 As contagens e aprovações anteriores permanecem na história.
 
+Na ficha, Contagem e revisão mostra o contador efetivo e suas observações em
+leitura. Uma pessoa distinta e elegível pode registrar parecer próprio de até
+2.000 caracteres. A revisão é facultativa no primeiro uso e também pode ocorrer
+após a conciliação; nesse caso não repete movimentos nem valida saldo posterior.
+Se a referência de uma contagem ainda pendente mudou, é necessário reconto.
+O parecer digitado permanece durante a comparação: consulte a referência atual,
+adote explicitamente a contagem válida e confira antes de confirmar. Resultado
+incerto congela a intenção; Recupere a revisão para consultar o mesmo ato.
+
 ## Histórico, documentos e notificações
 
 Use a lupa para abrir pesquisa e filtros de ficha, situação, período e código
 ou protocolo. O paciente continua no cabeçalho e filtros ativos são
 removíveis.
 O documento preserva snapshots, versões e SHA-256, além de anexos privados e
-PDFs por versão. O hash compara conteúdo; não substitui uma assinatura digital
+PDFs por versão. A aba Versões e integridade reúne o histórico de acessos.
+Se o registro de uma consulta não for confirmado, a recuperação aparece nessa
+aba, preservando o conteúdo e os controles da ficha. Acesso não substitui
+ciência nem recebimento. O hash compara conteúdo; não substitui uma assinatura digital
 nem protege contra um administrador do banco que altere dados e controles.
 
 Gravação, envio ao provedor, entrega, leitura e ciência no aplicativo são
 independentes. Falha externa não desfaz o documento. Resultado incerto exige
 conciliação antes de reenviar. Em falha de rede, recupere a mesma tentativa
-para evitar duplicação; rascunhos locais expiram em 24 horas.
+para evitar duplicação. Não há expiração automática de24h para rascunhos.
+Para retomar em outra aba, sessão ou aparelho, use Salvar rascunho na conta.
+A cópia local é opcional e pode desaparecer ao fechar a aba; sair da conta
+limpa essa cópia, preservando o rascunho já salvo no servidor. Resolva uma
+tentativa incerta antes de iniciar outro envio.
 
 ## Relatos e canais externos
 
@@ -140,6 +234,13 @@ adiamento, que só altera prazo e responsabilidade após decisão familiar.
 Troca de horário de um plantão com BAL vigente exige essa decisão antes de
 alterar a agenda. Substituição no mesmo período conserva a janela.
 
+A decisão de adiamento mostra destino, versão e período da proposta em leitura,
+separados do plantão atual. Se o alvo mudou, não é possível aprovar outra versão
+silenciosamente; a família pode recusar o pedido pendente com motivo próprio.
+Outro destino exige outro pedido. A recusa preserva prazos e responsabilidade;
+nome e motivo do decisor permanecem na consulta. Conflito conserva a justificativa.
+Em resposta perdida, recupere a mesma confirmação antes de iniciar outra.
+
 Contagem física e revisão são etapas distintas. Na revisão, referência e
 diferenças ficam visíveis. Uma mudança no estoque exige nova conferência; uma
 resposta perdida oferece recuperação da mesma tentativa. Semanas anteriores
@@ -151,6 +252,68 @@ e continua do ponto confirmado no lote seguinte. A posição é interna ao
 worker;
 a configuração e sua versão pertencem às decisões da família. Obrigações,
 atribuições e cursor participam da mesma transação.
+
+## Guias e preparação da residência
+
+Em Guias e ajuda, consulte as seis etapas do seu papel, avance, volte, pule ou
+recomece. O progresso pode ser reaberto no perfil. Concluir o guia não registra
+ciência, recebimento ou conclusão de uma tarefa operacional. Os links mantêm
+o paciente autorizado; mudar de papel ou paciente exige consultar o guia
+correspondente.
+
+A administração global prepara o cadastro da residência e indica responsáveis.
+As tarefas de catálogo, estoque, vínculos e regras continuam nos fluxos locais
+autorizados. Os resumos mostram registros disponíveis; não atestam conferência
+física nem o início do atendimento. Se a consulta de pessoas falhar, recupere
+a consulta antes de selecionar responsáveis ou revisar a criação. O restante
+do preenchimento é preservado.
+
+Na preparação global, os sete números abrem as etapas sem concluir suas
+tarefas. Navegar conserva os campos em edição; Salvar e retomar continua
+sendo a ação explícita para guardar a preparação. Depois da criação, nome,
+estado e fuso registrados aparecem em leitura. Os resumos de escalas, BAL e
+conferência distinguem configuração registrada de execução física.
+
+## Central técnica e continuidade
+
+Administração global → Monitoramento e suporte reúne Visão técnica,
+Continuidade, Residências e contas e Eventos e política. O ambiente selecionado
+identifica as observações; ausência de atividade registrada não comprova saúde.
+As abas conservam os campos da política e a confirmação em andamento.
+
+Em Visão técnica, Investigar incidente abre o contexto, os motivos de
+acompanhamento e encerramento e sua referência. Uma resposta perdida mantém
+o ambiente bloqueado para recuperar a mesma alteração. Conflito exige consultar
+a versão atual; guardar outra política depende da revisão explícita dessa
+referência. O histórico mantém os atos e as versões anteriores.
+
+Eventos e política permite consultar tentativas do banco compartilhado.
+Web Push mostra as tentativas efetivamente registradas; a fila legada apresenta
+seu resultado atual, sem inventar histórico anterior ausente. Paciente,
+destinatário, destino, chave e conteúdo do aviso ficam fora dessa consulta.
+Aceite de transporte não comprova ciência ou recebimento. A visão global não
+concede ações locais de reenvio. A fila autorizada do paciente conserva sua
+própria revisão e exige confirmação explícita de conciliação antes de repetir
+um resultado incerto. Consultar, abrir ou cancelar essa revisão não autoriza
+outra tentativa nem ativa canais postergados.
+
+Em Continuidade, confira a cópia, o ensaio e os passos de isolamento,
+reconciliação e retomada. Registros compatíveis não substituem a conferência
+dos arquivos. Um resultado posterior de falha impede apresentar sucesso
+anterior como confirmação atual. Não há restauração ou reativação automática
+pelo painel. Responsável, substituto, canal e prazos operacionais precisam ser
+definidos antes da liberação.
+
+O mecanismo de backup contempla banco, Auth, histórico, permissões e bytes do
+Storage. A política mantém sete datas diárias, quatro semanas e cópias críticas
+preservadas. A captura e o arquivo cifrado são conferidos antes da retenção;
+mudança estável da fonte ou objeto ausente impede confirmar a cópia. Chaves e
+configuração permanecem separadas, fora do Git. A recuperação usa um destino
+novo e isolado, sem substituir o banco de origem ou ativar agendamentos e
+saídas de mensagens. RPO de 24 horas e RTO de 8 horas são metas a comprovar em
+operação. A rotina externa e o monitor externo não estão ativos.
+Os procedimentos do operador estão em [backup](../audits/D/D-B/BACKUP_PIPELINE.md)
+e [custódia documental](../audits/D/D-B/SIGNING_CUSTODY.md).
 
 ## Desenvolvimento e preservação
 

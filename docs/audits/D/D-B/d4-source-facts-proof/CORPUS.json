@@ -1,0 +1,95 @@
+[
+  {
+    "label": "private-draft",
+    "file": "private-draft.pdf",
+    "sha256": "0a5661d9860f313804076e98e863730550c087d36709d1644bb91c4975f8ffdd",
+    "requestedAt": "2026-11-07T14:41:57.818972+00:00",
+    "requestedName": "Solicitante atual fictício após o ato",
+    "sourceHash": "c36fa79e72f30817e6d6b5163dd985486d87fa3f36ee4a28d3a9560732e670c9",
+    "sourceFacts": {
+      "issuedAt": "2026-11-07T14:41:52.041836+00:00",
+      "issuerId": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste family",
+      "patientName": "Homologação fictícia V4 3e23a494",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-07T14:41:52.041836+00:00",
+      "historyActors": [
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": "2026-11-01T12:00:00+00:00",
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-07T14:41:51.992154+00:00"
+    }
+  },
+  {
+    "label": "historical-null",
+    "file": "historical-null.pdf",
+    "sha256": "c9c7d8929489e78ff51e7c65ad74825c27764892b19c801d51209e530113f9d3",
+    "requestedAt": "2026-11-07T14:42:06.437729+00:00",
+    "requestedName": "Teste family",
+    "sourceHash": "9db48db6a3713a5617f75b21af7a79a71c3649dfa56c59eea862b71983c1ae9f",
+    "sourceFacts": {
+      "issuedAt": null,
+      "issuerId": null,
+      "historical": true,
+      "importedAt": "2026-11-07T14:07:51.245427+00:00",
+      "issuerName": "Autora literal da ficha física",
+      "patientName": "Homologação fictícia V4 78c45db2",
+      "issuerSource": "origin_record",
+      "registeredAt": "2026-11-07T14:07:51.270812+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "import_record",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": null
+    }
+  },
+  {
+    "label": "historical-known",
+    "file": "historical-known.pdf",
+    "sha256": "33bc53adbab33fc5c69e22157c7cbf02bc874fb3f82fb2615ed423ff76dd5fd8",
+    "requestedAt": "2026-11-07T14:42:13.257317+00:00",
+    "requestedName": "Teste family",
+    "sourceHash": "ea9b42255c9a56d02d54cbcc5a189d1f0a2eee67820b3bb974abb46c206bc24c",
+    "sourceFacts": {
+      "issuedAt": null,
+      "issuerId": null,
+      "historical": true,
+      "importedAt": "2026-11-07T14:04:21.037104+00:00",
+      "issuerName": "Autora literal da ficha física",
+      "patientName": "Homologação fictícia V4 9f7051bc",
+      "issuerSource": "origin_record",
+      "registeredAt": "2026-11-07T14:04:21.047851+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        }
+      ],
+      "patientSource": "import_record",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": "2020-03-01T12:00:00+00:00",
+      "documentCreatedAt": null
+    }
+  }
+]

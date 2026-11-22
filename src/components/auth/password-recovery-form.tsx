@@ -1,16 +1,22 @@
 "use client";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useClientReady } from "@/lib/use-client-ready";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { NewPasswordField } from "./new-password-field";
+import { AccessFrame } from "./access-frame";
+import { ActionButton, FormField, TextInput } from "@/components/ui/controls";
+import { Notice, inputClass, buttonClass } from "@/components/workspace";
 
 export function PasswordRecoveryForm() {
   const ready = useClientReady();
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
+  useOperationActivity(busy, { title: "Atualizando sua senha", detail: "Aguarde a confirmação da solicitação." });
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   async function submit(event: FormEvent) {
@@ -23,7 +29,7 @@ export function PasswordRecoveryForm() {
       return;
     }
     if (password !== confirmation) {
-      setError("Use pelo menos 12 caracteres e confirme a mesma senha.");
+      setError("As senhas precisam ser iguais. Confira a confirmação.");
       return;
     }
     setBusy(true);
@@ -59,38 +65,22 @@ export function PasswordRecoveryForm() {
     }
   }
   return (
-    <main className="mx-auto max-w-md space-y-5 p-6">
-      <h1 className="text-2xl font-semibold">Definir nova senha</h1>
+    <AccessFrame active="recovery" title="Definir nova senha">
       {done ? (
-        <p role="status">
+        <Notice>
           Senha atualizada.{" "}
-          <Link className="underline" href="/">
+          <Link tabIndex={0} className={buttonClass} href="/">
             Acessar o sistema
           </Link>
-        </p>
+        </Notice>
       ) : (
-        <form onSubmit={submit} className="space-y-4">
+        <form onSubmit={submit} className="hca-access-form">
           <p className="text-sm">
             Abra esta página pelo link de recuperação ou ativação recebido.
           </p>
-          <label className="block">
-            Nova senha
-            <input
-              className="mt-1 w-full rounded border p-3"
-              type="password"
-              disabled={!ready || busy}
-              autoComplete="new-password"
-              minLength={12}
-              maxLength={72}
-              required
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </label>
-          <label className="block">
-            Confirmar nova senha
-            <input
-              className="mt-1 w-full rounded border p-3"
+          <NewPasswordField className={inputClass} disabled={!ready || busy} value={password} onChange={setPassword} />
+          <FormField label="Confirmar nova senha">
+            <TextInput
               type="password"
               disabled={!ready || busy}
               autoComplete="new-password"
@@ -98,23 +88,20 @@ export function PasswordRecoveryForm() {
               value={confirmation}
               onChange={(event) => setConfirmation(event.target.value)}
             />
-          </label>
-          {error && (
-            <p role="alert" className="text-red-700">
-              {error}
-            </p>
-          )}
-          <button
-            className="rounded bg-(--brand) px-4 py-3 text-white disabled:opacity-50"
+          </FormField>
+          {error ? <Notice error>{error}</Notice> : null}
+          <ActionButton
+            type="submit"
+            variant="primary"
             disabled={busy || !ready}
           >
             {busy ? "Atualizando..." : "Salvar nova senha"}
-          </button>
+          </ActionButton>
         </form>
       )}
-      <Link href="/login" className="inline-block underline">
+      <Link tabIndex={0} href="/login" className={`${buttonClass} mt-4`}>
         Voltar ao login
       </Link>
-    </main>
+    </AccessFrame>
   );
 }

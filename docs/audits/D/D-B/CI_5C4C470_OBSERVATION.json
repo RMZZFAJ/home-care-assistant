@@ -1,0 +1,71 @@
+{
+  "observedAt": "2026-11-09 17:11:16 UTC",
+  "sha": "5c4c4701f87172edbe6515d3f0f3117380e4229f",
+  "runId": 42655189226,
+  "runUrl": "https://github.com/RMZZFAJ/home-care-assistant/actions/runs/42655189226",
+  "jobs": [
+    {
+      "id": 129291692083,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129291692342,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129291692777,
+      "name": "database",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129300835787,
+      "name": "browser (mobile)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129300835859,
+      "name": "browser (ios-2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129300835920,
+      "name": "browser (chromium)",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "id": 129300836009,
+      "name": "browser (ios-1)",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "preview": {
+    "state": "READY",
+    "deploymentId": "dpl_45PRmULjdfiZtjWBzgKkWVu2whEG",
+    "url": "https://home-care-assistant-2qxijlaab-rmzzfajs-projects.vercel.app"
+  },
+  "knownFailure": {
+    "jobId": 129300836009,
+    "file": "notification-read-states.spec.ts",
+    "line": 28,
+    "project": "ios",
+    "label": "D3 notification bell768",
+    "rule": "target-size",
+    "observed": "Onboarding close button partially obscured by notification link;21.1x41 exposed space;17px neighbor clearance",
+    "failed": 1,
+    "passed": 139,
+    "nextAction": "Investigate overlapping nonmodal surfaces and test without suppressing axe or marking tutorial complete"
+  },
+  "limits": [
+    "Own SHA complete CI required",
+    "Sonar owner-deferred;PR7 Draft;no production release"
+  ]
+}

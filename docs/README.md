@@ -1,13 +1,46 @@
 # Documentação do Home Care Assistant
 
-**Estado atual:** [fonte por SHA](current/PROJECT_STATUS.md). Produção NO-GO;
-A e B1–B8 concluídas como diagnóstico; C é planejamento e organização; **D NÃO
-INICIADA**. Decisão aprovada não é funcionalidade implementada.
+Para conferir a entrega e retomar a auditoria, comece pelo
+[fechamento A–D da PR 7](audits/FECHAMENTO_PR7.md).
 
-Entrada mais recente: [C7–C10](audits/C/C10-pr-handoff/README.md),
-[decisões vigentes](audits/C/C7-decision-closure/PRODUCT_DECISIONS_C7_ADDENDUM.md),
-[projeto visual](audits/C/C8-visual-blueprint/README.md) e
-[casos de aceite](audits/C/C9-acceptance-refinement/README.md).
+**UI/UX vigente:**[Modelo Integral](ui-ux/CANONICAL_MODEL.md), aprovado
+em 09/11/2026, substitui Fluent e a direção visual anterior. Aplicar a todos
+os recursos existentes/futuros sem reduzir funções. O acompanhamento abaixo
+conserva o estado da implementação e das validações.
+
+**Revisão posterior E01–E03:** [Lote L1](../HCA_L1_LOTE_CODEX_E01_E03.md),
+[laboratório v3](../hca-laboratorio-01-v3-final.html) mais
+[comentários posteriores](../hca-l01-v3-comentarios.json).
+[Implementação e verificações locais](audits/D/D-B/L1_IMPLEMENTATION.md).
+
+**Lotes L1 a L4:** o [registro de execução](audits/D/D-B/LOTES_EXECUCAO.md)
+reúne a comparação com os laboratórios, os complementos do produto, as
+pendências por lote e o inventário de migrations por ambiente. A referência de
+L2 é o [laboratório v7](../hca-laboratorio-02-v7.html), com as regras do
+[comando mestre](../HCA_L2_COMANDO_MESTRE_CODEX_V7.md). A
+[consolidação intermediária](../HCA_L2_DECISOES_VIGENTES_E_PENDENCIAS.md)
+serve como apoio histórico.
+
+**Andamento da D-B:** [acompanhamento principal](../TEMP_D_B_ATUALIZACAO.md),
+com capacidades entregues, trabalho local, fila e responsabilidades. A
+[matriz](audits/D/D-B/ACCEPTANCE_EXECUTION.csv) detalha os 105 critérios.
+
+**Ordens vigentes:** [Ordem Mestre](audits/D/D-B/OWNER_EXECUTION_ORDER.txt),
+[complemento documental](documents/01_COMANDO_COMPLEMENTAR_PDFS.md) e
+[complemento executivo](audits/D/D-B/OWNER_EXECUTION_SUPPLEMENT.txt). O último
+prevalece nos conflitos de método e rascunhos. A
+[composição PDF aprovada](documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md)
+permanece obrigatória; a aplicação conserva o Modelo Integral.
+
+**Implementado:** [contratos atuais](current/README.md). Fichas, Andamentos,
+PWA/Push e emissão/verificação assinada já têm implementação, com pendências
+indicadas no acompanhamento. Rascunhos existentes ficam congelados em escopo e
+apresentação fora da simplificação de Andamentos aprovada no L1; expansão
+não autorizada permanece OWNER-DEFERRED. Produção NO-GO.
+
+**Histórico e planejamento.** A/B registram o diagnóstico. C conserva o
+projeto integrado pela PR 6. D-A registra D0–D2. D-B reúne a execução de
+D3–D5 e L1/L2, com validação conjunta e homologação ainda pendentes.
 
 <!-- c-table:start -->
 
@@ -63,9 +96,10 @@ contratos/amostras, não aprovação/publicação externa. Não há duas versõe
 ativas concorrentes dos contratos principais. Dados fictícios e arquivos
 privados não são operação real.
 
-## Fechamento definitivo de 04/11/2026
+## Fechamento documental de C em 04/11/2026
 
 P02 OWNER_APPROVED; 66 fichas/262 controles originais revistos, catálogo de
 274 controles/424 usos e 187 casos planejados.
-[Entrega vigente](audits/C/C10-pr-handoff/README.md). D NÃO INICIADA; sem
-merge. Gates específicos não são aprovados por documento.
+[Entrega histórica C](audits/C/C10-pr-handoff/README.md). A PR 6 integrou
+esse pacote à base. A [Fase D](audits/D/README.md) registra a execução
+posterior na PR 7.

@@ -1,5 +1,8 @@
 # Auditorias, planejamento e execução
 
+O [fechamento da PR 7](FECHAMENTO_PR7.md) cruza os achados A/B, os critérios
+C/D e a execução atual. Os pacotes abaixo preservam as provas de cada fase.
+
 <!-- c-table:start -->
 
 - **Seção:** A
@@ -23,9 +26,9 @@
 
 - **Seção:** D
 
-  **Significado:** Execução futura, **NÃO INICIADA**
+  **Significado:** Execução D-A e D-B. Homologação D-C/D6 pendente.
 
-  **Entrada:** [Reserva D](D/README.md).
+  **Entrada:** [Fase D](D/README.md).
 
 - **Seção:** Histórico precursor
 
@@ -35,8 +38,7 @@
 
 <!-- c-table:end -->
 
-NO-GO de produção permanece. Relatório antigo conserva o estado da data em que
-foi escrito; não se reescreve para simular uma fase posterior. C reúne165 IDs
-em
-121 causas e distingue28 finalidades novas aprovadas do diagnóstico. Mapas e
-manifestos da migração são próprios, sem recalcular os manifestos das provas.
+Produção permanece NO-GO. Os relatórios datados preservam os estados de sua
+execução. C reúne 165 achados em 121 causas e identifica 28 finalidades
+aprovadas. A [matriz de fechamento](PR7_CRITERIOS.csv) liga o plano de C aos
+registros posteriores de D-A e D-B.

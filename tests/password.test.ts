@@ -10,8 +10,13 @@ describe("configured Auth password boundaries", () => {
     );
   });
   it("checks encoded size and minimum length without truncating", () => {
-    expect(newPasswordSchema.safeParse("á".repeat(36)).success).toBe(true);
-    expect(newPasswordSchema.safeParse("á".repeat(37)).success).toBe(false);
-    expect(newPasswordSchema.safeParse("short1!").success).toBe(false);
+    expect(newPasswordSchema.safeParse("A1!a" + "á".repeat(34)).success).toBe(true);
+    expect(newPasswordSchema.safeParse("A1!a" + "á".repeat(35)).success).toBe(false);
+    expect(newPasswordSchema.safeParse("Aa1!x").success).toBe(false);
+  });
+  it("requires every approved group at the six-character boundary", () => {
+    expect(newPasswordSchema.safeParse("Aa1!xx").success).toBe(true);
+    expect(newPasswordSchema.safeParse("Aa1!xxx").success).toBe(true);
+    for (const value of ["aa1!xx", "AA1!XX", "Aa!!xx", "Aa11xx", "á".repeat(12)]) expect(newPasswordSchema.safeParse(value).success).toBe(false);
   });
 });

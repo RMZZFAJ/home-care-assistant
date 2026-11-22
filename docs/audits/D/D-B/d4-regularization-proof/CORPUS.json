@@ -1,0 +1,1158 @@
+[
+  {
+    "label": "unknown",
+    "file": "unknown-5ff0e829-2183-43c2-9119-29695b728594.pdf",
+    "publicRoot": "root-e552dc52c19019a3.crt",
+    "sha256": "22bb2f647dd19c0f0c3c93889f3133b90d61ee158e01a3da08b744b3cafbcd78",
+    "identity": {
+      "id": "5ff0e829-2183-43c2-9119-29695b728594",
+      "verificationCode": "6076F011834F440432E402879CA74728",
+      "requestedAt": "2026-11-08T19:45:41.668381+00:00",
+      "documentId": "d3a87edc-18b3-492f-879c-78aeffd0cb18",
+      "version": 4,
+      "sourceHash": "79f7c94e63ec624504603d92a04a5a7d24e40b6a259c5d477d788937730c9679",
+      "rendererRevision": 8
+    },
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T19:45:37.35838+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 852c8fab",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T19:45:37.35838+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 3
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 4
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T19:45:37.330125+00:00"
+    },
+    "caseFacts": {
+      "id": "8182f1cc-9610-4546-a38e-5f97fa1bdccb",
+      "state": "approved",
+      "decision": {
+        "lines": [
+          {
+            "name": "Material fictício V4 0",
+            "unit": "unidade",
+            "lineId": "7fe30455-66fa-47db-aace-42a0c936fdcf",
+            "productId": "patient-37f3af20-37b8-4d46-b303-be53ab2d13e4",
+            "movementIds": [],
+            "missingQuantity": "0",
+            "pendingQuantity": "3.000000",
+            "unknownQuantity": "3.000000",
+            "acceptedQuantity": "2.000000",
+            "quantityDecimals": 0,
+            "receivedQuantity": "0",
+            "returnedQuantity": "0",
+            "expeditedQuantity": "5.000000",
+            "priorReconciledQuantity": "0.000000"
+          }
+        ],
+        "action": "review_regularization",
+        "intent": {
+          "accept": true,
+          "caseId": "8182f1cc-9610-4546-a38e-5f97fa1bdccb",
+          "reason": "Conferência independente confirma somente os efeitos físicos apurados"
+        },
+        "reason": "Conferência independente confirma somente os efeitos físicos apurados",
+        "actorId": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "version": 4,
+        "actorName": "Teste family",
+        "recordedAt": "2026-11-08T19:45:37.819914+00:00"
+      },
+      "findings": [],
+      "proposal": {
+        "basis": "Conferência física fictícia conserva uma unidade de destino desconhecido; não presume aceite pessoal",
+        "lines": [
+          {
+            "name": "Material fictício V4 0",
+            "unit": "unidade",
+            "lineId": "7fe30455-66fa-47db-aace-42a0c936fdcf",
+            "productId": "patient-37f3af20-37b8-4d46-b303-be53ab2d13e4",
+            "missingQuantity": "0",
+            "pendingQuantity": "3.000000",
+            "unknownQuantity": "3.000000",
+            "acceptedQuantity": "2.000000",
+            "quantityDecimals": 0,
+            "receivedQuantity": "0",
+            "returnedQuantity": "0",
+            "expeditedQuantity": "5.000000",
+            "priorReconciledQuantity": "0.000000"
+          }
+        ],
+        "reason": "Regularização documental após indisponibilidade da recebedora original",
+        "proposedName": "Teste adminA",
+        "reviewerName": "Teste family",
+        "personalReceipt": false,
+        "unknownQuantity": "3.000000",
+        "followUpOwnerName": "Teste adminA"
+      },
+      "document_id": "d3a87edc-18b3-492f-879c-78aeffd0cb18",
+      "proposed_at": "2026-11-08T19:45:37.729797+00:00",
+      "proposed_by": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "reviewer_id": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "before_snapshot": {
+        "lines": [
+          {
+            "id": "7fe30455-66fa-47db-aace-42a0c936fdcf",
+            "metadata": {
+              "receipt": {
+                "notes": "Uma unidade não foi confirmada pelo recebedor",
+                "lineId": "7fe30455-66fa-47db-aace-42a0c936fdcf",
+                "acceptedQuantity": "2"
+              },
+              "issueOpen": true
+            },
+            "quantity": 5,
+            "product_id": "patient-37f3af20-37b8-4d46-b303-be53ab2d13e4",
+            "document_id": "d3a87edc-18b3-492f-879c-78aeffd0cb18",
+            "fully_checked": false,
+            "name_snapshot": "Material fictício V4 0",
+            "unit_snapshot": "unidade",
+            "waived_quantity": 0,
+            "accepted_quantity": 2,
+            "approved_quantity": 0,
+            "care_recipient_id": "b4610cb2-d4a3-431b-be96-8a128a9793a1",
+            "category_snapshot": "higiene",
+            "purchased_quantity": 0,
+            "reconciled_quantity": 0,
+            "presentation_conversions": []
+          }
+        ],
+        "status": "disputed",
+        "version": 2,
+        "acceptedAt": "2026-11-08T19:45:37.423084+00:00",
+        "acceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+        "receiptName": "Teste professional",
+        "recipientId": "56df9007-7b26-4a89-a6db-6df8946dd579"
+      },
+      "care_recipient_id": "b4610cb2-d4a3-431b-be96-8a128a9793a1",
+      "reference_version": 3,
+      "follow_up_owner_id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7"
+    },
+    "lineAfter": {
+      "id": "7fe30455-66fa-47db-aace-42a0c936fdcf",
+      "metadata": {
+        "receipt": {
+          "notes": "Uma unidade não foi confirmada pelo recebedor",
+          "lineId": "7fe30455-66fa-47db-aace-42a0c936fdcf",
+          "acceptedQuantity": "2"
+        },
+        "issueOpen": true,
+        "physicalUnknownQuantity": "3.000000",
+        "administrativeRegularizationId": "8182f1cc-9610-4546-a38e-5f97fa1bdccb"
+      },
+      "quantity": 5,
+      "product_id": "patient-37f3af20-37b8-4d46-b303-be53ab2d13e4",
+      "document_id": "d3a87edc-18b3-492f-879c-78aeffd0cb18",
+      "fully_checked": false,
+      "name_snapshot": "Material fictício V4 0",
+      "unit_snapshot": "unidade",
+      "waived_quantity": 0,
+      "accepted_quantity": 2,
+      "approved_quantity": 0,
+      "care_recipient_id": "b4610cb2-d4a3-431b-be96-8a128a9793a1",
+      "category_snapshot": "higiene",
+      "purchased_quantity": 0,
+      "reconciled_quantity": 0,
+      "presentation_conversions": []
+    },
+    "movements": [],
+    "originalAcceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+    "sourceHash": "79f7c94e63ec624504603d92a04a5a7d24e40b6a259c5d477d788937730c9679"
+  },
+  {
+    "label": "approved-current",
+    "file": "approved-current-c7558518-d002-4fe1-a7f6-cba928989a5a.pdf",
+    "publicRoot": "root-e552dc52c19019a3.crt",
+    "sha256": "9e56debc7fbe44b07a63ae00cb81fd359edf4b6e5cb709b2760789414965018d",
+    "identity": {
+      "id": "c7558518-d002-4fe1-a7f6-cba928989a5a",
+      "verificationCode": "7B4D24FAFD5FD94E26201DB26CB8F231",
+      "requestedAt": "2026-11-08T19:45:26.156012+00:00",
+      "documentId": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "version": 4,
+      "sourceHash": "0d989cf59b0a6c7b50adc0a90c5884fa1545964ab85f2e51c3c7f51b9a8267bb",
+      "rendererRevision": 8
+    },
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T19:45:19.439291+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 666786dc",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T19:45:19.439291+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 3
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 4
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T19:45:19.404562+00:00"
+    },
+    "caseFacts": {
+      "id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+      "state": "approved",
+      "decision": {
+        "lines": [
+          {
+            "name": "Material fictício V4 0",
+            "unit": "unidade",
+            "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+            "productId": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+            "movementIds": [
+              "13aed623-be36-4c1a-bf23-fa8d7766f5f9",
+              "207ab70d-f315-4d82-91c3-24ba18dcfc15"
+            ],
+            "missingQuantity": "1",
+            "pendingQuantity": "3.000000",
+            "unknownQuantity": "1.000000",
+            "acceptedQuantity": "2.000000",
+            "quantityDecimals": 0,
+            "receivedQuantity": "0",
+            "returnedQuantity": "1",
+            "expeditedQuantity": "5.000000",
+            "priorReconciledQuantity": "0.000000"
+          }
+        ],
+        "action": "review_regularization",
+        "intent": {
+          "accept": true,
+          "caseId": "253dab37-da06-40ad-ab10-b8feb7c40624",
+          "reason": "Conferência independente confirma somente os efeitos físicos apurados"
+        },
+        "reason": "Conferência independente confirma somente os efeitos físicos apurados",
+        "actorId": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "version": 4,
+        "actorName": "Teste family",
+        "recordedAt": "2026-11-08T19:45:19.973663+00:00"
+      },
+      "findings": [],
+      "proposal": {
+        "basis": "Conferência física fictícia conserva uma unidade de destino desconhecido; não presume aceite pessoal",
+        "lines": [
+          {
+            "name": "Material fictício V4 0",
+            "unit": "unidade",
+            "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+            "productId": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+            "missingQuantity": "1",
+            "pendingQuantity": "3.000000",
+            "unknownQuantity": "1.000000",
+            "acceptedQuantity": "2.000000",
+            "quantityDecimals": 0,
+            "receivedQuantity": "0",
+            "returnedQuantity": "1",
+            "expeditedQuantity": "5.000000",
+            "priorReconciledQuantity": "0.000000"
+          }
+        ],
+        "reason": "Regularização documental após indisponibilidade da recebedora original",
+        "proposedName": "Teste adminA",
+        "reviewerName": "Teste family",
+        "personalReceipt": false,
+        "unknownQuantity": "1.000000",
+        "followUpOwnerName": "Teste adminA"
+      },
+      "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "proposed_at": "2026-11-08T19:45:19.939326+00:00",
+      "proposed_by": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "reviewer_id": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "before_snapshot": {
+        "lines": [
+          {
+            "id": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+            "metadata": {
+              "receipt": {
+                "notes": "Uma unidade não foi confirmada pelo recebedor",
+                "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+                "acceptedQuantity": "2"
+              },
+              "issueOpen": true
+            },
+            "quantity": 5,
+            "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+            "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+            "fully_checked": false,
+            "name_snapshot": "Material fictício V4 0",
+            "unit_snapshot": "unidade",
+            "waived_quantity": 0,
+            "accepted_quantity": 2,
+            "approved_quantity": 0,
+            "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+            "category_snapshot": "higiene",
+            "purchased_quantity": 0,
+            "reconciled_quantity": 0,
+            "presentation_conversions": []
+          }
+        ],
+        "status": "disputed",
+        "version": 2,
+        "acceptedAt": "2026-11-08T19:45:19.565395+00:00",
+        "acceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+        "receiptName": "Teste professional",
+        "recipientId": "56df9007-7b26-4a89-a6db-6df8946dd579"
+      },
+      "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+      "reference_version": 3,
+      "follow_up_owner_id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7"
+    },
+    "lineAfter": {
+      "id": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+      "metadata": {
+        "receipt": {
+          "notes": "Uma unidade não foi confirmada pelo recebedor",
+          "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+          "acceptedQuantity": "2"
+        },
+        "issueOpen": true,
+        "physicalUnknownQuantity": "1.000000",
+        "administrativeRegularizationId": "253dab37-da06-40ad-ab10-b8feb7c40624"
+      },
+      "quantity": 5,
+      "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+      "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "fully_checked": false,
+      "name_snapshot": "Material fictício V4 0",
+      "unit_snapshot": "unidade",
+      "waived_quantity": 0,
+      "accepted_quantity": 2,
+      "approved_quantity": 0,
+      "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+      "category_snapshot": "higiene",
+      "purchased_quantity": 0,
+      "reconciled_quantity": 2,
+      "presentation_conversions": []
+    },
+    "movements": [
+      {
+        "id": "13aed623-be36-4c1a-bf23-fa8d7766f5f9",
+        "quantity": 1,
+        "created_at": "2026-11-08T19:45:19.972974+00:00",
+        "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+        "payload_hash": null,
+        "performed_by": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "reference_id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+        "justification": "Devolução física apurada em regularização administrativa: Conferência independente confirma somente os efeitos físicos apurados",
+        "movement_type": "outbound",
+        "reference_type": "delivery_regularization",
+        "idempotency_key": null,
+        "source_location": "TRANSIT",
+        "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+        "movement_revision": 10530,
+        "destination_location": "FAMILY",
+        "source_balance_after": 2,
+        "source_balance_before": 3,
+        "extraordinary_confirmed": false,
+        "destination_balance_after": 26,
+        "destination_balance_before": 25
+      },
+      {
+        "id": "207ab70d-f315-4d82-91c3-24ba18dcfc15",
+        "quantity": 1,
+        "created_at": "2026-11-08T19:45:19.972974+00:00",
+        "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+        "payload_hash": null,
+        "performed_by": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "reference_id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+        "justification": "Falta apurada em regularização administrativa: Conferência independente confirma somente os efeitos físicos apurados",
+        "movement_type": "outbound",
+        "reference_type": "delivery_regularization",
+        "idempotency_key": null,
+        "source_location": "TRANSIT",
+        "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+        "movement_revision": 10532,
+        "destination_location": null,
+        "source_balance_after": 1,
+        "source_balance_before": 2,
+        "extraordinary_confirmed": false,
+        "destination_balance_after": null,
+        "destination_balance_before": null
+      }
+    ],
+    "originalAcceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+    "sourceHash": "0d989cf59b0a6c7b50adc0a90c5884fa1545964ab85f2e51c3c7f51b9a8267bb"
+  },
+  {
+    "label": "old-v7-recovered",
+    "file": "old-v7-recovered-2197fc11-575e-4792-9918-a843e685b592.pdf",
+    "publicRoot": "root-e552dc52c19019a3.crt",
+    "sha256": "29f287b02c1021117103904013790cd1c01800602a5da4ec3565cc7966b438da",
+    "identity": {
+      "id": "2197fc11-575e-4792-9918-a843e685b592",
+      "verificationCode": "AD06676ABF24BAC73B72852AEA1428F5",
+      "requestedAt": "2026-11-08T19:45:20.180641+00:00",
+      "documentId": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "version": 4,
+      "sourceHash": "0d989cf59b0a6c7b50adc0a90c5884fa1545964ab85f2e51c3c7f51b9a8267bb",
+      "rendererRevision": 7
+    },
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T19:45:19.439291+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 666786dc",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T19:45:19.439291+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 3
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 4
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T19:45:19.404562+00:00"
+    },
+    "caseFacts": {
+      "id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+      "state": "approved",
+      "decision": {
+        "lines": [
+          {
+            "name": "Material fictício V4 0",
+            "unit": "unidade",
+            "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+            "productId": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+            "movementIds": [
+              "13aed623-be36-4c1a-bf23-fa8d7766f5f9",
+              "207ab70d-f315-4d82-91c3-24ba18dcfc15"
+            ],
+            "missingQuantity": "1",
+            "pendingQuantity": "3.000000",
+            "unknownQuantity": "1.000000",
+            "acceptedQuantity": "2.000000",
+            "quantityDecimals": 0,
+            "receivedQuantity": "0",
+            "returnedQuantity": "1",
+            "expeditedQuantity": "5.000000",
+            "priorReconciledQuantity": "0.000000"
+          }
+        ],
+        "action": "review_regularization",
+        "intent": {
+          "accept": true,
+          "caseId": "253dab37-da06-40ad-ab10-b8feb7c40624",
+          "reason": "Conferência independente confirma somente os efeitos físicos apurados"
+        },
+        "reason": "Conferência independente confirma somente os efeitos físicos apurados",
+        "actorId": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "version": 4,
+        "actorName": "Teste family",
+        "recordedAt": "2026-11-08T19:45:19.973663+00:00"
+      },
+      "findings": [],
+      "proposal": {
+        "basis": "Conferência física fictícia conserva uma unidade de destino desconhecido; não presume aceite pessoal",
+        "lines": [
+          {
+            "name": "Material fictício V4 0",
+            "unit": "unidade",
+            "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+            "productId": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+            "missingQuantity": "1",
+            "pendingQuantity": "3.000000",
+            "unknownQuantity": "1.000000",
+            "acceptedQuantity": "2.000000",
+            "quantityDecimals": 0,
+            "receivedQuantity": "0",
+            "returnedQuantity": "1",
+            "expeditedQuantity": "5.000000",
+            "priorReconciledQuantity": "0.000000"
+          }
+        ],
+        "reason": "Regularização documental após indisponibilidade da recebedora original",
+        "proposedName": "Teste adminA",
+        "reviewerName": "Teste family",
+        "personalReceipt": false,
+        "unknownQuantity": "1.000000",
+        "followUpOwnerName": "Teste adminA"
+      },
+      "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "proposed_at": "2026-11-08T19:45:19.939326+00:00",
+      "proposed_by": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "reviewer_id": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "before_snapshot": {
+        "lines": [
+          {
+            "id": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+            "metadata": {
+              "receipt": {
+                "notes": "Uma unidade não foi confirmada pelo recebedor",
+                "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+                "acceptedQuantity": "2"
+              },
+              "issueOpen": true
+            },
+            "quantity": 5,
+            "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+            "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+            "fully_checked": false,
+            "name_snapshot": "Material fictício V4 0",
+            "unit_snapshot": "unidade",
+            "waived_quantity": 0,
+            "accepted_quantity": 2,
+            "approved_quantity": 0,
+            "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+            "category_snapshot": "higiene",
+            "purchased_quantity": 0,
+            "reconciled_quantity": 0,
+            "presentation_conversions": []
+          }
+        ],
+        "status": "disputed",
+        "version": 2,
+        "acceptedAt": "2026-11-08T19:45:19.565395+00:00",
+        "acceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+        "receiptName": "Teste professional",
+        "recipientId": "56df9007-7b26-4a89-a6db-6df8946dd579"
+      },
+      "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+      "reference_version": 3,
+      "follow_up_owner_id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7"
+    },
+    "lineAfter": {
+      "id": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+      "metadata": {
+        "receipt": {
+          "notes": "Uma unidade não foi confirmada pelo recebedor",
+          "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+          "acceptedQuantity": "2"
+        },
+        "issueOpen": true,
+        "physicalUnknownQuantity": "1.000000",
+        "administrativeRegularizationId": "253dab37-da06-40ad-ab10-b8feb7c40624"
+      },
+      "quantity": 5,
+      "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+      "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "fully_checked": false,
+      "name_snapshot": "Material fictício V4 0",
+      "unit_snapshot": "unidade",
+      "waived_quantity": 0,
+      "accepted_quantity": 2,
+      "approved_quantity": 0,
+      "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+      "category_snapshot": "higiene",
+      "purchased_quantity": 0,
+      "reconciled_quantity": 2,
+      "presentation_conversions": []
+    },
+    "movements": [
+      {
+        "id": "13aed623-be36-4c1a-bf23-fa8d7766f5f9",
+        "quantity": 1,
+        "created_at": "2026-11-08T19:45:19.972974+00:00",
+        "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+        "payload_hash": null,
+        "performed_by": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "reference_id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+        "justification": "Devolução física apurada em regularização administrativa: Conferência independente confirma somente os efeitos físicos apurados",
+        "movement_type": "outbound",
+        "reference_type": "delivery_regularization",
+        "idempotency_key": null,
+        "source_location": "TRANSIT",
+        "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+        "movement_revision": 10530,
+        "destination_location": "FAMILY",
+        "source_balance_after": 2,
+        "source_balance_before": 3,
+        "extraordinary_confirmed": false,
+        "destination_balance_after": 26,
+        "destination_balance_before": 25
+      },
+      {
+        "id": "207ab70d-f315-4d82-91c3-24ba18dcfc15",
+        "quantity": 1,
+        "created_at": "2026-11-08T19:45:19.972974+00:00",
+        "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+        "payload_hash": null,
+        "performed_by": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "reference_id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+        "justification": "Falta apurada em regularização administrativa: Conferência independente confirma somente os efeitos físicos apurados",
+        "movement_type": "outbound",
+        "reference_type": "delivery_regularization",
+        "idempotency_key": null,
+        "source_location": "TRANSIT",
+        "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+        "movement_revision": 10532,
+        "destination_location": null,
+        "source_balance_after": 1,
+        "source_balance_before": 2,
+        "extraordinary_confirmed": false,
+        "destination_balance_after": null,
+        "destination_balance_before": null
+      }
+    ],
+    "originalAcceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+    "sourceHash": "0d989cf59b0a6c7b50adc0a90c5884fa1545964ab85f2e51c3c7f51b9a8267bb"
+  },
+  {
+    "label": "original-before-proposal",
+    "file": "original-before-proposal-fba38656-04c7-4888-9b2d-b1b248ede56c.pdf",
+    "publicRoot": "root-e552dc52c19019a3.crt",
+    "sha256": "58f146e51145333054f959402247a8f841509f3a30d673d7a2146872a49f0d3c",
+    "identity": {
+      "id": "fba38656-04c7-4888-9b2d-b1b248ede56c",
+      "verificationCode": "B7E283589E895612403E9454ED60145A",
+      "requestedAt": "2026-11-08T19:45:30.782032+00:00",
+      "documentId": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "version": 2,
+      "sourceHash": "2083f0354ec4ab2a1ab1a72e5921eaf642800640f52ffa38be18551e7c131a30",
+      "rendererRevision": 7
+    },
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T19:45:19.439291+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 666786dc",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T19:45:19.439291+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T19:45:19.404562+00:00"
+    },
+    "caseFacts": null,
+    "lineAfter": {
+      "id": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+      "metadata": {
+        "receipt": {
+          "notes": "Uma unidade não foi confirmada pelo recebedor",
+          "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+          "acceptedQuantity": "2"
+        },
+        "issueOpen": true,
+        "physicalUnknownQuantity": "1.000000",
+        "administrativeRegularizationId": "253dab37-da06-40ad-ab10-b8feb7c40624"
+      },
+      "quantity": 5,
+      "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+      "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "fully_checked": false,
+      "name_snapshot": "Material fictício V4 0",
+      "unit_snapshot": "unidade",
+      "waived_quantity": 0,
+      "accepted_quantity": 2,
+      "approved_quantity": 0,
+      "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+      "category_snapshot": "higiene",
+      "purchased_quantity": 0,
+      "reconciled_quantity": 2,
+      "presentation_conversions": []
+    },
+    "movements": [
+      {
+        "id": "13aed623-be36-4c1a-bf23-fa8d7766f5f9",
+        "quantity": 1,
+        "created_at": "2026-11-08T19:45:19.972974+00:00",
+        "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+        "payload_hash": null,
+        "performed_by": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "reference_id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+        "justification": "Devolução física apurada em regularização administrativa: Conferência independente confirma somente os efeitos físicos apurados",
+        "movement_type": "outbound",
+        "reference_type": "delivery_regularization",
+        "idempotency_key": null,
+        "source_location": "TRANSIT",
+        "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+        "movement_revision": 10530,
+        "destination_location": "FAMILY",
+        "source_balance_after": 2,
+        "source_balance_before": 3,
+        "extraordinary_confirmed": false,
+        "destination_balance_after": 26,
+        "destination_balance_before": 25
+      },
+      {
+        "id": "207ab70d-f315-4d82-91c3-24ba18dcfc15",
+        "quantity": 1,
+        "created_at": "2026-11-08T19:45:19.972974+00:00",
+        "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+        "payload_hash": null,
+        "performed_by": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "reference_id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+        "justification": "Falta apurada em regularização administrativa: Conferência independente confirma somente os efeitos físicos apurados",
+        "movement_type": "outbound",
+        "reference_type": "delivery_regularization",
+        "idempotency_key": null,
+        "source_location": "TRANSIT",
+        "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+        "movement_revision": 10532,
+        "destination_location": null,
+        "source_balance_after": 1,
+        "source_balance_before": 2,
+        "extraordinary_confirmed": false,
+        "destination_balance_after": null,
+        "destination_balance_before": null
+      }
+    ],
+    "originalAcceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+    "sourceHash": "2083f0354ec4ab2a1ab1a72e5921eaf642800640f52ffa38be18551e7c131a30"
+  },
+  {
+    "label": "proposal-before-decision",
+    "file": "proposal-before-decision-159a0f51-e827-4c7b-932e-57d0368f2cbc.pdf",
+    "publicRoot": "root-e552dc52c19019a3.crt",
+    "sha256": "d613c6bec4019208dd518246d46c1918e6fd3cc71f1805901a2c57ac7ab4de08",
+    "identity": {
+      "id": "159a0f51-e827-4c7b-932e-57d0368f2cbc",
+      "verificationCode": "53313FE1A52267C30DEB01242FE64AD3",
+      "requestedAt": "2026-11-08T19:45:32.232958+00:00",
+      "documentId": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "version": 3,
+      "sourceHash": "99c6e8e75f574efbf5a89d604d8b3695306a66130d80e28b489f5dc574b302c8",
+      "rendererRevision": 8
+    },
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T19:45:19.439291+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 666786dc",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T19:45:19.439291+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 3
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T19:45:19.404562+00:00"
+    },
+    "caseFacts": {
+      "id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+      "state": "pending",
+      "decision": null,
+      "findings": [],
+      "proposal": {
+        "basis": "Conferência física fictícia conserva uma unidade de destino desconhecido; não presume aceite pessoal",
+        "lines": [
+          {
+            "name": "Material fictício V4 0",
+            "unit": "unidade",
+            "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+            "productId": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+            "missingQuantity": "1",
+            "pendingQuantity": "3.000000",
+            "unknownQuantity": "1.000000",
+            "acceptedQuantity": "2.000000",
+            "quantityDecimals": 0,
+            "receivedQuantity": "0",
+            "returnedQuantity": "1",
+            "expeditedQuantity": "5.000000",
+            "priorReconciledQuantity": "0.000000"
+          }
+        ],
+        "reason": "Regularização documental após indisponibilidade da recebedora original",
+        "proposedName": "Teste adminA",
+        "reviewerName": "Teste family",
+        "personalReceipt": false,
+        "unknownQuantity": "1.000000",
+        "followUpOwnerName": "Teste adminA"
+      },
+      "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "proposed_at": "2026-11-08T19:45:19.939326+00:00",
+      "proposed_by": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "reviewer_id": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "before_snapshot": {
+        "lines": [
+          {
+            "id": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+            "metadata": {
+              "receipt": {
+                "notes": "Uma unidade não foi confirmada pelo recebedor",
+                "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+                "acceptedQuantity": "2"
+              },
+              "issueOpen": true
+            },
+            "quantity": 5,
+            "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+            "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+            "fully_checked": false,
+            "name_snapshot": "Material fictício V4 0",
+            "unit_snapshot": "unidade",
+            "waived_quantity": 0,
+            "accepted_quantity": 2,
+            "approved_quantity": 0,
+            "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+            "category_snapshot": "higiene",
+            "purchased_quantity": 0,
+            "reconciled_quantity": 0,
+            "presentation_conversions": []
+          }
+        ],
+        "status": "disputed",
+        "version": 2,
+        "acceptedAt": "2026-11-08T19:45:19.565395+00:00",
+        "acceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+        "receiptName": "Teste professional",
+        "recipientId": "56df9007-7b26-4a89-a6db-6df8946dd579"
+      },
+      "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+      "reference_version": 3,
+      "follow_up_owner_id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7"
+    },
+    "lineAfter": {
+      "id": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+      "metadata": {
+        "receipt": {
+          "notes": "Uma unidade não foi confirmada pelo recebedor",
+          "lineId": "1a7a87ac-42ca-4283-90e8-8bf5dd9b767a",
+          "acceptedQuantity": "2"
+        },
+        "issueOpen": true,
+        "physicalUnknownQuantity": "1.000000",
+        "administrativeRegularizationId": "253dab37-da06-40ad-ab10-b8feb7c40624"
+      },
+      "quantity": 5,
+      "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+      "document_id": "762f5b93-8703-41a9-925d-00d3e62ac6c7",
+      "fully_checked": false,
+      "name_snapshot": "Material fictício V4 0",
+      "unit_snapshot": "unidade",
+      "waived_quantity": 0,
+      "accepted_quantity": 2,
+      "approved_quantity": 0,
+      "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+      "category_snapshot": "higiene",
+      "purchased_quantity": 0,
+      "reconciled_quantity": 2,
+      "presentation_conversions": []
+    },
+    "movements": [
+      {
+        "id": "13aed623-be36-4c1a-bf23-fa8d7766f5f9",
+        "quantity": 1,
+        "created_at": "2026-11-08T19:45:19.972974+00:00",
+        "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+        "payload_hash": null,
+        "performed_by": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "reference_id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+        "justification": "Devolução física apurada em regularização administrativa: Conferência independente confirma somente os efeitos físicos apurados",
+        "movement_type": "outbound",
+        "reference_type": "delivery_regularization",
+        "idempotency_key": null,
+        "source_location": "TRANSIT",
+        "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+        "movement_revision": 10530,
+        "destination_location": "FAMILY",
+        "source_balance_after": 2,
+        "source_balance_before": 3,
+        "extraordinary_confirmed": false,
+        "destination_balance_after": 26,
+        "destination_balance_before": 25
+      },
+      {
+        "id": "207ab70d-f315-4d82-91c3-24ba18dcfc15",
+        "quantity": 1,
+        "created_at": "2026-11-08T19:45:19.972974+00:00",
+        "product_id": "patient-484fe973-c26d-4cc2-9d6b-61cd121189b1",
+        "payload_hash": null,
+        "performed_by": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "reference_id": "253dab37-da06-40ad-ab10-b8feb7c40624",
+        "justification": "Falta apurada em regularização administrativa: Conferência independente confirma somente os efeitos físicos apurados",
+        "movement_type": "outbound",
+        "reference_type": "delivery_regularization",
+        "idempotency_key": null,
+        "source_location": "TRANSIT",
+        "care_recipient_id": "24438ffa-6154-4c65-8b44-ba911702cc00",
+        "movement_revision": 10532,
+        "destination_location": null,
+        "source_balance_after": 1,
+        "source_balance_before": 2,
+        "extraordinary_confirmed": false,
+        "destination_balance_after": null,
+        "destination_balance_before": null
+      }
+    ],
+    "originalAcceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+    "sourceHash": "99c6e8e75f574efbf5a89d604d8b3695306a66130d80e28b489f5dc574b302c8"
+  },
+  {
+    "label": "rejected",
+    "file": "rejected-acfd6600-c2e7-4622-8961-dfd01bcd43d8.pdf",
+    "publicRoot": "root-e552dc52c19019a3.crt",
+    "sha256": "1988125723761cff3c0d82419df705fcfd73d645d165d71a23a5c1368c7eae5e",
+    "identity": {
+      "id": "acfd6600-c2e7-4622-8961-dfd01bcd43d8",
+      "verificationCode": "A2DBB6E718C9820B642BEA1B08390236",
+      "requestedAt": "2026-11-08T19:45:49.142295+00:00",
+      "documentId": "0ab9ac70-d643-47a3-a123-7ef957374f98",
+      "version": 4,
+      "sourceHash": "ab460bd64fd37fa90c1c6e729e2a95cc78bc890123be7ea666b498f5fbb7c061",
+      "rendererRevision": 8
+    },
+    "sourceFacts": {
+      "issuedAt": "2026-11-08T19:45:44.835699+00:00",
+      "issuerId": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "historical": false,
+      "importedAt": null,
+      "issuerName": "Teste adminA",
+      "patientName": "Homologação fictícia V4 85ee0b20",
+      "issuerSource": "event_snapshot",
+      "registeredAt": "2026-11-08T19:45:44.835699+00:00",
+      "historyActors": [
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 1
+        },
+        {
+          "id": "56df9007-7b26-4a89-a6db-6df8946dd579",
+          "name": "Teste professional",
+          "source": "event_snapshot",
+          "version": 2
+        },
+        {
+          "id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+          "name": "Teste adminA",
+          "source": "event_snapshot",
+          "version": 3
+        },
+        {
+          "id": "561b3aad-d122-48dc-980b-618f0826fba7",
+          "name": "Teste family",
+          "source": "event_snapshot",
+          "version": 4
+        }
+      ],
+      "patientSource": "event_snapshot",
+      "schemaVersion": 1,
+      "draftCreatedAt": null,
+      "sourceCreatedAt": null,
+      "documentCreatedAt": "2026-11-08T19:45:44.810601+00:00"
+    },
+    "caseFacts": {
+      "id": "d4b2b138-9548-466a-b5c8-22c38a9d699b",
+      "state": "rejected",
+      "decision": {
+        "lines": [],
+        "action": "review_regularization",
+        "intent": {
+          "accept": false,
+          "caseId": "d4b2b138-9548-466a-b5c8-22c38a9d699b",
+          "reason": "Evidência insuficiente: proposta rejeitada sem alterar o estoque"
+        },
+        "reason": "Evidência insuficiente: proposta rejeitada sem alterar o estoque",
+        "actorId": "561b3aad-d122-48dc-980b-618f0826fba7",
+        "version": 4,
+        "actorName": "Teste family",
+        "recordedAt": "2026-11-08T19:45:45.203441+00:00"
+      },
+      "findings": [],
+      "proposal": {
+        "basis": "Conferência física fictícia conserva uma unidade de destino desconhecido; não presume aceite pessoal",
+        "lines": [
+          {
+            "name": "Material fictício V4 0",
+            "unit": "unidade",
+            "lineId": "bab2d6eb-8862-4102-b5ee-a8250cbaead5",
+            "productId": "patient-ba56be86-b283-4ff7-a305-0d4c8e608180",
+            "missingQuantity": "1",
+            "pendingQuantity": "3.000000",
+            "unknownQuantity": "1.000000",
+            "acceptedQuantity": "2.000000",
+            "quantityDecimals": 0,
+            "receivedQuantity": "0",
+            "returnedQuantity": "1",
+            "expeditedQuantity": "5.000000",
+            "priorReconciledQuantity": "0.000000"
+          }
+        ],
+        "reason": "Regularização documental após indisponibilidade da recebedora original",
+        "proposedName": "Teste adminA",
+        "reviewerName": "Teste family",
+        "personalReceipt": false,
+        "unknownQuantity": "1.000000",
+        "followUpOwnerName": "Teste adminA"
+      },
+      "document_id": "0ab9ac70-d643-47a3-a123-7ef957374f98",
+      "proposed_at": "2026-11-08T19:45:45.135151+00:00",
+      "proposed_by": "bdc6527a-5653-46f4-b4f7-81f3c9504be7",
+      "reviewer_id": "561b3aad-d122-48dc-980b-618f0826fba7",
+      "before_snapshot": {
+        "lines": [
+          {
+            "id": "bab2d6eb-8862-4102-b5ee-a8250cbaead5",
+            "metadata": {
+              "receipt": {
+                "notes": "Uma unidade não foi confirmada pelo recebedor",
+                "lineId": "bab2d6eb-8862-4102-b5ee-a8250cbaead5",
+                "acceptedQuantity": "2"
+              },
+              "issueOpen": true
+            },
+            "quantity": 5,
+            "product_id": "patient-ba56be86-b283-4ff7-a305-0d4c8e608180",
+            "document_id": "0ab9ac70-d643-47a3-a123-7ef957374f98",
+            "fully_checked": false,
+            "name_snapshot": "Material fictício V4 0",
+            "unit_snapshot": "unidade",
+            "waived_quantity": 0,
+            "accepted_quantity": 2,
+            "approved_quantity": 0,
+            "care_recipient_id": "49173bc5-96a2-45cc-ba57-bed0664674bb",
+            "category_snapshot": "higiene",
+            "purchased_quantity": 0,
+            "reconciled_quantity": 0,
+            "presentation_conversions": []
+          }
+        ],
+        "status": "disputed",
+        "version": 2,
+        "acceptedAt": "2026-11-08T19:45:44.871512+00:00",
+        "acceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+        "receiptName": "Teste professional",
+        "recipientId": "56df9007-7b26-4a89-a6db-6df8946dd579"
+      },
+      "care_recipient_id": "49173bc5-96a2-45cc-ba57-bed0664674bb",
+      "reference_version": 3,
+      "follow_up_owner_id": "bdc6527a-5653-46f4-b4f7-81f3c9504be7"
+    },
+    "lineAfter": {
+      "id": "bab2d6eb-8862-4102-b5ee-a8250cbaead5",
+      "metadata": {
+        "receipt": {
+          "notes": "Uma unidade não foi confirmada pelo recebedor",
+          "lineId": "bab2d6eb-8862-4102-b5ee-a8250cbaead5",
+          "acceptedQuantity": "2"
+        },
+        "issueOpen": true
+      },
+      "quantity": 5,
+      "product_id": "patient-ba56be86-b283-4ff7-a305-0d4c8e608180",
+      "document_id": "0ab9ac70-d643-47a3-a123-7ef957374f98",
+      "fully_checked": false,
+      "name_snapshot": "Material fictício V4 0",
+      "unit_snapshot": "unidade",
+      "waived_quantity": 0,
+      "accepted_quantity": 2,
+      "approved_quantity": 0,
+      "care_recipient_id": "49173bc5-96a2-45cc-ba57-bed0664674bb",
+      "category_snapshot": "higiene",
+      "purchased_quantity": 0,
+      "reconciled_quantity": 0,
+      "presentation_conversions": []
+    },
+    "movements": [],
+    "originalAcceptedBy": "56df9007-7b26-4a89-a6db-6df8946dd579",
+    "sourceHash": "ab460bd64fd37fa90c1c6e729e2a95cc78bc890123be7ea666b498f5fbb7c061"
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "at": "2026-11-08T21:57:07.692Z",
+  "declaredSha": "827531e29b2816126f8fd82b06dbdba4d64fa3c7",
+  "stableOrigin": "https://home-care-assistant-git-feat-phase-d-i-3d8824-rmzzfajs-projects.vercel.app",
+  "anonymousWorkerStatus": 302,
+  "runtimeStatus": 200,
+  "runtimeState": "ready",
+  "issuancesWithoutApplicationSessionStatus": 401,
+  "qualification": "Deployment SHA checked through Vercel API before and after this bounded functional read; unchanged PWA cache logic did not trigger another full asset/browser suite.",
+  "deploymentProtectionChanged": false,
+  "applicationSessionCreated": false,
+  "remoteFixtureCreated": false,
+  "externalTransportActivated": false,
+  "productionPromoted": false,
+  "physicalDeviceRetested": false,
+  "deploymentBeforeAndAfter": {
+    "before": {
+      "id": "dpl_7uaGY3bL4XKjZvQHh6oQpqQEHDTV",
+      "sha": "827531e29b2816126f8fd82b06dbdba4d64fa3c7",
+      "state": "READY"
+    },
+    "after": {
+      "id": "dpl_7uaGY3bL4XKjZvQHh6oQpqQEHDTV",
+      "sha": "827531e29b2816126f8fd82b06dbdba4d64fa3c7",
+      "state": "READY"
+    },
+    "probe": "ent-terminal-preview-observation.json"
+  }
+}

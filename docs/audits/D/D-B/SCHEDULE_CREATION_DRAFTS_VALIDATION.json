@@ -1,0 +1,569 @@
+{
+  "increment": "D3.51",
+  "baseSha": "86f8f6e062e645b16fa53b1dd2889edc31758bc3",
+  "status": "DIRECTED_LOCAL_VALIDATED_REMOTE_RECONCILED_OWN_SHA_CI_REQUIRED",
+  "scope": [
+    "new shift types",
+    "new schedule series;once/weekly/cycle/dates",
+    "existing-target private editors remain pending"
+  ],
+  "sourceLfSha256": {
+    "src/app/api/schedules/preparations/commit/route.ts": "c2b434599085265007c08b932764752f61409fda5b9131e3653f67565eabad7f",
+    "src/app/api/schedules/preparations/recovery/route.ts": "8caceb63a357a568b0dafb5cba351508e273e4345a99ae3f54a400b922d0d3c0",
+    "src/app/api/schedules/preparations/route.ts": "bd599ea41e2de1e7de046eb8b54892e8f8d3fb552627d069c4cb3d930adec20a",
+    "src/components/forms/creation-draft-panel.tsx": "3f6fcbe111f59d756007319667ff66f68400438d55fe8c7453064587fcb9d202",
+    "src/components/forms/use-creation-draft.ts": "eef51f8297c09ba329e73ec76a96d90e6d596599ac59c3732d78cea1c3cab082",
+    "src/components/schedules/schedule-console.tsx": "ac7f01d4c30a1fceb221aa26d7c96a14f3b758e23fdfdb69cb4e4894431ddce8",
+    "src/components/schedules/schedule-creation-fields.tsx": "607533e3386c1316b670a88f1fedd9e3312fb04960857c57ccb2d6e75fcd7b02",
+    "src/components/schedules/schedule-creation-preparation.tsx": "b0667d101925a193ce8f65d78b3e4de6a7e328909c338887bcb5727fd0d185a8",
+    "src/components/schedules/schedule-forms.tsx": "b08879c4fa9479f88574bfe436d9fa59eca48026faa54897f2e89e41d2eff2e6",
+    "src/components/schedules/schedule-preparation-summary.tsx": "f639fd2e0c020354864a1b9dc358487d34f403d85a63c01c3c8dad8a99a2b2d3",
+    "src/lib/forms/draft-navigation.ts": "8f2f4bed608b04a3118f9d6dfca83cd24071615c506dee6e5af2bf024eb21c35",
+    "src/lib/schedules/creation.ts": "cca48c71f1307f769a4fffe7154f0199e56d2e96dc5a425a7debcc2b85a11453",
+    "src/lib/validation/creation-drafts.ts": "1abb65e20055d68d5a2acecb012bb5fc0499239bf5b8d68267c4b556757179a2",
+    "src/lib/validation/private-draft-results.ts": "85b3a6333a928be588e74c35e29f339823ff38f7b2920e7ddf3a94fd2cc53f22",
+    "src/lib/validation/schedule-preparations.ts": "9e1aa610c475f269d924dafeb7202f1a3871aeab7f8c4767a5788ee6df7ee202",
+    "src/lib/validation/supply-drafts.ts": "29c6db833ceac4b79b9b1efc3f74a60912328328f9292121c0710c0866746770",
+    "src/types/creation-drafts.ts": "2820ec52d020dc90811de70f630166d29778cb3dad78167ed0dd8fd5c11784f7",
+    "supabase/migrations/20261110133620_phase_d3_schedule_creation_preparations.sql": "ec464555e8044e1521cf84d0488cbf2bbc5416b4db7c0659956f574522b103da",
+    "supabase/migrations/20261110140905_phase_d3_schedule_creation_recovery.sql": "8259277cb4837fe08c7fc95cbae9c8488e9544ea8b40d97220e773da249f25d9",
+    "supabase/migrations/20261110143034_phase_d3_schedule_source_recovery.sql": "4207eab7f889e76b0712b19c5a55097d6bfaabd6d525739681b719c25f6400bf",
+    "tests/api/schedule-preparations-contract.test.ts": "39df95e95e9128e7d54add485f384e734f6c2ef4e5e9a3488d20dc53e15eb02f",
+    "tests/e2e/purchase-receipts.spec.ts": "3fa65f7920aada4ea08cda26774768859e841440ef30c976e310a8cea74505fc",
+    "tests/e2e/schedule-private-preparation.spec.ts": "0a6c1d212500785a85abf3dcd1bc5275a153c690c449cf72857b784a7b62004c",
+    "tests/e2e/schedules.spec.ts": "60cc8d4e2b957f363449fbfa474182f001b37069fafb416822066b119c0b8576",
+    "tests/integration/schedule-creation-recovery.test.mjs": "a02a012e15ef5478a95bc67e9c0f7b95115b244b302a5552b41a78ef3c08d563",
+    "tests/integration/schedule-preparation-fixtures.mjs": "c5dd4d1a2882da4007981c9302bc4c865e24e7972cca3d1b122c12eecfee395f",
+    "tests/integration/schedule-preparations.test.mjs": "0b8d5f01c2ed29fab51068bda65987d9c92901c76408924e4cbe34313c89c615",
+    "tests/schedule-preparations.test.ts": "685aacdf03e09f332f457fac5f3f53c007ab16e4e5c104564e6e405354fbdc29"
+  },
+  "unitApi": {
+    "pass": 43,
+    "fail": 0,
+    "reportLfSha256": "7aea8116761681bb0eae84ab0a5043bb37783813c161254360842a9405908674"
+  },
+  "realAuth": {
+    "qualifiedDistinct": 13,
+    "core": {
+      "firstPassed": 7,
+      "firstFixtureContextFailures": 2,
+      "scopeRecheckPassed": 2,
+      "distinctQualified": 9
+    },
+    "recovery": 2,
+    "sourceAdvance": 1,
+    "ownOnlyProposal": 1,
+    "stack": "home-care-assistant;API127.0.0.1:54321;DB127.0.0.1:54322",
+    "logLfSha256": {
+      "schedule-private-auth-first.log": "439f0a8974f1f654ae761208dfdf4c011b0e96875a4890e8781aca03a16d0a41",
+      "schedule-private-auth-scopes.log": "9617915aa6669b57a5914b76f19da652a0c75ab67d69973db0c4b1b67241f2f1",
+      "schedule-private-recovery-auth.log": "9254e040540c0e3c77f68f63321a5e95beff9ecf7553a439c445ddd00ef3525a",
+      "schedule-private-source-auth.log": "bda5a5404698db5271e9362fbd01d25ec7591eefae23e6b31d892c6b04ff04ef",
+      "schedule-private-proposal-auth.log": "ad52aba90dedeff4f46bc5cd1395012d8f36f4864c349e6d86c8be53a2f00407",
+      "schedule-private-source-recovery-before.log": "296a13cda50f7886386f2b1233a20dd71c64d9af4c59878213e0e5c414b55289"
+    }
+  },
+  "browser": {
+    "qualifiedDistinctProduction": 12,
+    "qualifiedCases": [
+      {
+        "project": "mobile",
+        "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+        "archive": "schedule-private-production-recheck"
+      },
+      {
+        "project": "ios",
+        "title": "COM encerra apenas expectativa não adquirida, preserva conferência da parcela e emite PDFs distintos dos dois fatos",
+        "archive": "schedule-private-production-recheck"
+      },
+      {
+        "project": "mobile",
+        "title": "tipo privado retoma entre sessões,compara CAS e continua consultável sem permissão de escrita",
+        "archive": "schedule-private-production-first"
+      },
+      {
+        "project": "mobile",
+        "title": "programação parcial sobrevive ao recarregamento e publicação perdida é consultada sem escrita nem exposição após revogação",
+        "archive": "schedule-private-production-first"
+      },
+      {
+        "project": "mobile",
+        "title": "conclusão em outra sessão preserva edição original após reconhecimento perdido e recarregamento",
+        "archive": "schedule-private-production-recheck"
+      },
+      {
+        "project": "ios",
+        "title": "tipo privado retoma entre sessões,compara CAS e continua consultável sem permissão de escrita",
+        "archive": "schedule-private-production-first"
+      },
+      {
+        "project": "ios",
+        "title": "programação parcial sobrevive ao recarregamento e publicação perdida é consultada sem escrita nem exposição após revogação",
+        "archive": "schedule-private-production-first"
+      },
+      {
+        "project": "mobile",
+        "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+        "archive": "schedule-private-production-recheck"
+      },
+      {
+        "project": "mobile",
+        "title": "mudança do tipo prova tentativa não aplicada sem alterar revisão privada e exige adoção explícita",
+        "archive": "schedule-private-production-recheck"
+      },
+      {
+        "project": "ios",
+        "title": "conclusão em outra sessão preserva edição original após reconhecimento perdido e recarregamento",
+        "archive": "schedule-private-production-recheck"
+      },
+      {
+        "project": "ios",
+        "title": "mudança do tipo prova tentativa não aplicada sem alterar revisão privada e exige adoção explícita",
+        "archive": "schedule-private-production-recheck"
+      },
+      {
+        "project": "ios",
+        "title": "agenda publica uma programação real, recusa conflito e preserva contexto no mobile",
+        "archive": "schedule-private-production-recheck"
+      }
+    ],
+    "cohorts": [
+      {
+        "name": "schedule-private-production-first",
+        "stats": {
+          "total": 12,
+          "expected": 8,
+          "unexpected": 4,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": false
+        },
+        "manifestLfSha256": "a8936b04170ef31a094af219169fc78df0b2b8858d8bdcf97dd2191d531374ab"
+      },
+      {
+        "name": "schedule-private-production-recheck",
+        "stats": {
+          "total": 8,
+          "expected": 8,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "manifestLfSha256": "53b743fcfa2d5bf6078ac8bd3cf5e327145170924045d4d52202553b0f711c2c"
+      }
+    ],
+    "sourceFreezeStable": true,
+    "fiveWidths": [
+      1440,
+      1150,
+      850,
+      500,
+      320
+    ],
+    "axe": "unchanged WCAG tags/rules;whole-page COM check uses existing known-origin helper",
+    "screenshots320Inspected": true,
+    "physicalDeviceEvidence": false
+  },
+  "counterproofs": [
+    "Before195 type version advanced while private revision1:unknown;new proof passes without business effects.",
+    "Title changed to pending before native result completed;tests now await actual dialog closure.",
+    "A creator slot persists across engines;native schedule regression now isolates patient per case instead of erasing prior result.",
+    "Own publication waits original key and rechecks live Auth after wait.",
+    "Native active=false was ignored;new row,event and journal now preserve false.",
+    "CAS fixture switched active patient;positive original context restored before denied foreign references.",
+    "Private shape/purpose/actor/target,UTF16,numeric blank/scientific,all four modes,native key reuse,late revoke rollback qualified."
+  ],
+  "localContextIntermittence": {
+    "patientsObserved": 3659,
+    "membershipsObserved": 17675,
+    "authenticatorStatementTimeout": "8s",
+    "observation": "503 retained;first cohort helper received no data;final cohort completed with errors visible in logs",
+    "limits": "performance follow-up Codex;no timeout increase,data deletion,reset or global approval"
+  },
+  "remote": {
+    "project": "qwfrqychokvhdzakibid",
+    "status": "ACTIVE_HEALTHY",
+    "pre": {
+      "tables": [],
+      "indexes": [],
+      "versions": {
+        "count": 192,
+        "latest": "20261110122145",
+        "linesSha256": "2fd52e7b652197ad8c9802d05dc05eabe1775abe0755374eb08756efd3cea62a"
+      },
+      "functions": [
+        {
+          "anon": false,
+          "auth": true,
+          "name": "auth_session",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "",
+          "bodyLfSha256": "b8484b7869321105c50e770ea958628749a9df1c8f308945b20aead55aa4892b",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "require_cap",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p_patient uuid, p_cap text",
+          "bodyLfSha256": "542935c969ace6ba2aef0eaf8751a9a1d62db4001e084bffb574f9773821bdc8",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "can_access_recipient",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_recipient_id uuid",
+          "bodyLfSha256": "3ceeb5d4aaff863cbeb45158a633a52e71c694e6b204d1b8d700d3efe2699992",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_command",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+          "bodyLfSha256": "2b17a3303c9ac0bf12604665d954a85722202bfa32c0129e6a157adefd797804",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_confirmation",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_key uuid",
+          "bodyLfSha256": "75fd77da62ee94b72e2a0db2989a7b0452a1e744309de768fc1147fac32d2c7a",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_workspace",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_from date, p_until date",
+          "bodyLfSha256": "26c09895c0ccfa3de9bfc8b7a3a6377523fc56d94f0bdca93cce899ddc8969b2",
+          "securityDefiner": true
+        }
+      ],
+      "temporaryProbes": 0
+    },
+    "post": {
+      "tables": [
+        {
+          "acl": [
+            "postgres=arwdDxtm/postgres"
+          ],
+          "rls": true,
+          "name": "schedule_preparation_commands",
+          "policies": 0,
+          "anonSelect": false,
+          "authInsert": false,
+          "authSelect": false
+        },
+        {
+          "acl": [
+            "postgres=arwdDxtm/postgres"
+          ],
+          "rls": true,
+          "name": "schedule_preparations",
+          "policies": 0,
+          "anonSelect": false,
+          "authInsert": false,
+          "authSelect": false
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX schedule_preparation_command_fk ON private.schedule_preparation_commands USING btree (preparation_id)",
+        "CREATE UNIQUE INDEX schedule_preparation_commands_pkey ON private.schedule_preparation_commands USING btree (owner_id, idempotency_key)",
+        "CREATE INDEX schedule_preparation_patient_fk ON private.schedule_preparations USING btree (care_recipient_id)",
+        "CREATE INDEX schedule_preparation_series_fk ON private.schedule_preparations USING btree (consumed_series_id)",
+        "CREATE UNIQUE INDEX schedule_preparation_slot ON private.schedule_preparations USING btree (owner_id, care_recipient_id, purpose) WHERE (state = ANY (ARRAY['active'::text, 'consumed'::text]))",
+        "CREATE INDEX schedule_preparation_type_fk ON private.schedule_preparations USING btree (consumed_type_id)",
+        "CREATE UNIQUE INDEX schedule_preparations_pkey ON private.schedule_preparations USING btree (id)"
+      ],
+      "versions": {
+        "count": 195,
+        "latest": "20261110143034",
+        "linesSha256": "b8d1cb3aa0828d94152bb07794599554565b26c038cbf3650b4112992b222287"
+      },
+      "functions": [
+        {
+          "anon": false,
+          "auth": true,
+          "name": "auth_session",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "",
+          "bodyLfSha256": "b8484b7869321105c50e770ea958628749a9df1c8f308945b20aead55aa4892b",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "require_cap",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p_patient uuid, p_cap text",
+          "bodyLfSha256": "542935c969ace6ba2aef0eaf8751a9a1d62db4001e084bffb574f9773821bdc8",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "require_schedule_preparation_scope",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text, p_write boolean",
+          "bodyLfSha256": "54b08dfd546d510ba6e843bc4a0689a16fb379c3f448c3b012996594d928e9e5",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "schedule_creation_command",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p_content jsonb",
+          "bodyLfSha256": "5184fbeedc39c5f3fe3d0f317ea6f29ceec35048ea2f2b5248ea59e3551b2f29",
+          "securityDefiner": false
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "schedule_preparation_view",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "d private.schedule_preparations",
+          "bodyLfSha256": "6c34364a1d01a64617914aa541131fdb8718bf36a43f6f9830f42bfe29927490",
+          "securityDefiner": false
+        },
+        {
+          "anon": false,
+          "auth": false,
+          "name": "validate_schedule_preparation",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "private",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text, p_content jsonb, p_navigation jsonb, p_previous jsonb",
+          "bodyLfSha256": "fe491525ea206c57760499308f14c77b32e16f72df4b901ca267746a94acbc4a",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "can_access_recipient",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_recipient_id uuid",
+          "bodyLfSha256": "3ceeb5d4aaff863cbeb45158a633a52e71c694e6b204d1b8d700d3efe2699992",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "commit_schedule_preparation",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+          "bodyLfSha256": "6e859d15be35284e0a81beae2852926872b958e5f62455652be077b144929396",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_command",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_action text, p_body jsonb, p_key uuid, p_version integer",
+          "bodyLfSha256": "7510df6a4bd26a392f0f9651cec91868f6ea86db2c3c4cac7db67a08b8d67ac6",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_confirmation",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_key uuid",
+          "bodyLfSha256": "75fd77da62ee94b72e2a0db2989a7b0452a1e744309de768fc1147fac32d2c7a",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_preparation_command",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+          "bodyLfSha256": "5d2f52ace012d80cddcd8ec39c5a9a15349a362290f70276b206ec310dcc5c06",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_preparation_context",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text",
+          "bodyLfSha256": "f05f4d00213375e43037a07eac0d5e708186f172cbf1d6a054ca6c919a722aa8",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_preparation_recovery",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_purpose text, p_id uuid, p_expected integer, p_body jsonb, p_key uuid",
+          "bodyLfSha256": "50fe9ece10d0245072de9e4f44e796cbad0922f369dafe62aa49ebe7327347e5",
+          "securityDefiner": true
+        },
+        {
+          "anon": false,
+          "auth": true,
+          "name": "schedule_workspace",
+          "config": [
+            "search_path=\"\""
+          ],
+          "schema": "public",
+          "service": false,
+          "signature": "p_patient uuid, p_from date, p_until date",
+          "bodyLfSha256": "26c09895c0ccfa3de9bfc8b7a3a6377523fc56d94f0bdca93cce899ddc8969b2",
+          "securityDefiner": true
+        }
+      ],
+      "temporaryProbes": 0
+    },
+    "equalToLocalMetadata": true,
+    "newFunctions": 8,
+    "nativeFunctionsUnchanged": 5,
+    "nativeChangedOnly": "schedule_command;single guarded active flag insertion;defaulttrue backward compatibility",
+    "nativeExpectedHash": "7510df6a4bd26a392f0f9651cec91868f6ea86db2c3c4cac7db67a08b8d67ac6",
+    "dryRunBefore": [
+      "20261110133620_phase_d3_schedule_creation_preparations.sql",
+      "20261110140905_phase_d3_schedule_creation_recovery.sql",
+      "20261110143034_phase_d3_schedule_source_recovery.sql"
+    ],
+    "dryRunAfterEmpty": true,
+    "backupPolicy": "owner disposable synthetic remote amendment;no redundant heavy backup",
+    "remoteFixturesOrAuthWrites": false,
+    "reset": false,
+    "advisors": {
+      "securityClasses": 5,
+      "performanceClasses": 3,
+      "closedRlsTables": 56,
+      "authenticatedDefiners": 195,
+      "unusedIndexes": 48,
+      "newUnindexedForeignKeys": 0,
+      "newFindings": "2 closed RLS tables;4 intended Auth RPCs;4 unused FK indexes",
+      "previousFindingsApproved": false
+    },
+    "logLfSha256": {
+      "schedule-private-remote-dry-before.log": "f855848c9619dcfbff928a752b291f64282f5a068ee47f58d85a3547d85af9d6",
+      "schedule-private-remote-push.log": "621e0ea4cd3d4bd9321ec02101b8911330842ab33236e8e734927e75b73d2b8f",
+      "schedule-private-remote-dry-after.log": "61694dbe27d758db19357f3815840fd60a8a56e0523cc0c289267b8196a2bbcc"
+    }
+  },
+  "baseCi": {
+    "sha": "86f8f6e062e645b16fa53b1dd2889edc31758bc3",
+    "run": 42824033869,
+    "core": "Windows/Ubuntu/database success",
+    "browsers": "five shards success;iOS2 failure COM partially obscured target320;stock/v4/push flaky",
+    "gate": "not approved;own SHA CI required"
+  },
+  "matrix": {
+    "criteria": 105,
+    "columns": 39,
+    "first30Preserved": true,
+    "statusesPreserved": true,
+    "pass": 56,
+    "partial": 49,
+    "uiStates": 18,
+    "inventoryConsumers": 49,
+    "inventoryFormTags": 51,
+    "visualEstimatePercent": 60,
+    "formsEstimatePercent": 90,
+    "recoveryEstimatePercent": 85
+  },
+  "static": {
+    "typecheck": "PASS;schedule-private-prebrowser2-types.log;regression-types.log",
+    "affectedLint": "PASS;schedule-private-prebrowser2-lint.log;regression-lint.log",
+    "finalDocumentaryChecks": "PASS:11Markdown files/0issues;owned links;105x39/first30/statuses;18UIstates;49/51inventory hashes;84manifest and192prior SQL;source hashes;nontechnical report105items;active old utility0;AGENTS preserved",
+    "finalInvariantsReportLfSha256": "943c02ff6e29af3b690871b3150f69ffeed2ce3a22466ae14a861015b0450d71"
+  },
+  "remaining": [
+    "private existing-target schedule editors/decisions",
+    "context read performance with large retained local fixture populations",
+    "inventory count/admin/catalogue/profile continuity",
+    "full66/171 UI and operational variants",
+    "PDF technical trust/key recovery and other D-B gates",
+    "own SHA clean/legacy/full integration/all browser CI",
+    "owner-deferred Sonar;human/physical/provider/operational gates separate"
+  ],
+  "boundary": "PR7 Draft;no merge/manual deployment/production release;goal active"
+}

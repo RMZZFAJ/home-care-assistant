@@ -1,0 +1,33 @@
+{
+  "at": "2026-11-09T04:12:27.349Z",
+  "sha": "1b89ce9822f26d32fc503dd0ed06de031ea9d908",
+  "runId": 42559213140,
+  "jobs": [
+    {
+      "id": 128971800918,
+      "name": "validate (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "activeSteps": []
+    },
+    {
+      "id": 128971801090,
+      "name": "validate (windows-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "activeSteps": []
+    },
+    {
+      "id": 128971801297,
+      "name": "database",
+      "status": "in_progress",
+      "conclusion": null,
+      "activeSteps": [
+        "Run npm run test:integration"
+      ]
+    }
+  ],
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "globalApproval": false,
+  "scope": "Parent SHA only;database integration confirmed live at observation"
+}

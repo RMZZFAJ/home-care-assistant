@@ -1,0 +1,235 @@
+{
+  "sourceBaseSha": "5ab486491a6aff64f79f705e8be4ad0acfa486fd",
+  "sourceTreeDirty": true,
+  "files": [
+    {
+      "file": "src/app/api/documents/[id]/revise/route.ts",
+      "sha256LfUtf8": "8908f737b5bc3059b1640d5db76e62e100e8e0a65d14a3199053712ca0e9132a"
+    },
+    {
+      "file": "src/app/api/documents/[id]/route.ts",
+      "sha256LfUtf8": "67ab73d3b3b93dc27de3ef8336457f807757291ba7becf05f0ad7c5bd2c87176"
+    },
+    {
+      "file": "src/app/api/documents/route.ts",
+      "sha256LfUtf8": "bebcf85ea9978b596c099c1b9eedbce1816a01aeb6ca84b38827b37dde41a763"
+    },
+    {
+      "file": "src/app/api/drafts/route.ts",
+      "sha256LfUtf8": "1b5fe957fad52d4aff3b734a9e25209a75cfc861b984866593c6bf14811ddf5b"
+    },
+    {
+      "file": "src/components/documents/supply-command-editor.tsx",
+      "sha256LfUtf8": "fa7c3be4ec33f212e05465cd78dab797f78d61de5e5e357167deabbcf48a4f09"
+    },
+    {
+      "file": "src/components/documents/supply-command-fields.tsx",
+      "sha256LfUtf8": "daab33e8b33c0adf6fef99719d408653844119fe1573742b1eb1679e58c94db2"
+    },
+    {
+      "file": "src/components/documents/supply-detail.tsx",
+      "sha256LfUtf8": "539020e0274915326ce2e4245552935f24bc5a816479e346546d89146be592ae"
+    },
+    {
+      "file": "src/components/documents/supply-wizard.tsx",
+      "sha256LfUtf8": "985d02b77b354d23ce838d31a00d7cab5157343ffd49e1dc483809f69cc9c802"
+    },
+    {
+      "file": "src/components/forms/creation-draft-panel.tsx",
+      "sha256LfUtf8": "10cce3172843d4b1010ec1735b4548fa68fef62494fd3323bbad62cb9dfd23b2"
+    },
+    {
+      "file": "src/components/forms/use-creation-draft.ts",
+      "sha256LfUtf8": "bbc57fd4a4e113076f49d31f03bc54ee66b43b04e57a4a1e3dc8fba0f238a59f"
+    },
+    {
+      "file": "src/components/layout/workspace-context.tsx",
+      "sha256LfUtf8": "7433dfe474328ce85cd1e8d4694f316d5458930957795d624996a22748432098"
+    },
+    {
+      "file": "src/components/layout/workspace-shell.tsx",
+      "sha256LfUtf8": "78c6de25920689a3da598942c420cb9e215702a694c6237fbca86227532011bf"
+    },
+    {
+      "file": "src/lib/validation/creation-drafts.ts",
+      "sha256LfUtf8": "c49a49efc6ef5f775723ef44e7f07c40364cb5e7922a415f78174231e70a2e85"
+    },
+    {
+      "file": "src/lib/validation/documents.ts",
+      "sha256LfUtf8": "55866dfeaabfc5f3232cf4bc3ce1b6f01db22504f8137ea5954d4796b039503c"
+    },
+    {
+      "file": "src/lib/validation/private-draft-results.ts",
+      "sha256LfUtf8": "7fb7ae17ea5d7a711a6d39bf7ff552ecddbb1a3f31be6c8f9529b0b4075107ef"
+    },
+    {
+      "file": "src/lib/validation/supply-confirmation.ts",
+      "sha256LfUtf8": "aba819bce4ac6ee7869a82a7b4e224877ee4dbe2ab24a0da209f1e122f637e09"
+    },
+    {
+      "file": "src/lib/validation/supply-drafts.ts",
+      "sha256LfUtf8": "03ad59e8855d4b2796d1f6590885562f3f24bf4f67465609ddae8529b100a06f"
+    },
+    {
+      "file": "src/types/creation-drafts.ts",
+      "sha256LfUtf8": "575afd6dbf4ab6d53eb95a11704ff46066ce6047268acda2f76c73cb5bd18c3d"
+    },
+    {
+      "file": "supabase/migrations/20261107055526_phase_d3_supply_private_drafts.sql",
+      "sha256LfUtf8": "c7f77cd10bbdeb60bd926f81e3668b4da36621f8785e8208a8398c9cd4770e0b"
+    },
+    {
+      "file": "tests/api/private-drafts-contract.test.ts",
+      "sha256LfUtf8": "183ce751209a885a083e863f55e8cdef4180abc7cc1284532a3773f8bd42cccc"
+    },
+    {
+      "file": "tests/e2e/preparation-continuity.spec.ts",
+      "sha256LfUtf8": "99ded7aea1907c96b0451aaf62f7074ecef7ff914f003a80980bcb6e18d8bcce"
+    },
+    {
+      "file": "tests/e2e/supply-private-drafts.spec.ts",
+      "sha256LfUtf8": "bf2f9d49333fcafac9c1ce6f24bc7b607c2231098bf1b41ac51246af3c72535e"
+    },
+    {
+      "file": "tests/e2e/transfer-bilateral.spec.ts",
+      "sha256LfUtf8": "584db4c189fcc7dd20fecd74efd8c1ddb0c8de1bc5f6c989fd060dab86193510"
+    },
+    {
+      "file": "tests/integration/supply-private-drafts.test.mjs",
+      "sha256LfUtf8": "b324bf8ec7cdfa5519f3a6107a1ddc2ecd2d71275ff435c40271fee96aa86eea"
+    },
+    {
+      "file": "tests/supply-draft-models.test.ts",
+      "sha256LfUtf8": "950b5d7723f0e3078ed2ca07ce9e6b0b60d9f29a4af685d26fbe98ed2fa93fbc"
+    }
+  ],
+  "first19CaseSourceChanges": {
+    "src/app/api/documents/[id]/revise/route.ts": "8908f737b5bc3059b1640d5db76e62e100e8e0a65d14a3199053712ca0e9132a",
+    "src/app/api/documents/[id]/route.ts": "67ab73d3b3b93dc27de3ef8336457f807757291ba7becf05f0ad7c5bd2c87176",
+    "src/app/api/documents/route.ts": "bebcf85ea9978b596c099c1b9eedbce1816a01aeb6ca84b38827b37dde41a763",
+    "src/app/api/drafts/route.ts": "1b5fe957fad52d4aff3b734a9e25209a75cfc861b984866593c6bf14811ddf5b",
+    "src/components/documents/supply-command-editor.tsx": "fa7c3be4ec33f212e05465cd78dab797f78d61de5e5e357167deabbcf48a4f09",
+    "src/components/documents/supply-command-fields.tsx": "daab33e8b33c0adf6fef99719d408653844119fe1573742b1eb1679e58c94db2",
+    "src/components/documents/supply-detail.tsx": "539020e0274915326ce2e4245552935f24bc5a816479e346546d89146be592ae",
+    "src/components/documents/supply-wizard.tsx": "985d02b77b354d23ce838d31a00d7cab5157343ffd49e1dc483809f69cc9c802",
+    "src/components/forms/creation-draft-panel.tsx": "10cce3172843d4b1010ec1735b4548fa68fef62494fd3323bbad62cb9dfd23b2",
+    "src/components/forms/use-creation-draft.ts": "bbc57fd4a4e113076f49d31f03bc54ee66b43b04e57a4a1e3dc8fba0f238a59f",
+    "src/lib/validation/creation-drafts.ts": "c49a49efc6ef5f775723ef44e7f07c40364cb5e7922a415f78174231e70a2e85",
+    "src/lib/validation/documents.ts": "55866dfeaabfc5f3232cf4bc3ce1b6f01db22504f8137ea5954d4796b039503c",
+    "src/lib/validation/private-draft-results.ts": "7fb7ae17ea5d7a711a6d39bf7ff552ecddbb1a3f31be6c8f9529b0b4075107ef",
+    "src/lib/validation/supply-confirmation.ts": "aba819bce4ac6ee7869a82a7b4e224877ee4dbe2ab24a0da209f1e122f637e09",
+    "src/lib/validation/supply-drafts.ts": "03ad59e8855d4b2796d1f6590885562f3f24bf4f67465609ddae8529b100a06f",
+    "src/types/creation-drafts.ts": "575afd6dbf4ab6d53eb95a11704ff46066ce6047268acda2f76c73cb5bd18c3d",
+    "supabase/migrations/20261107055526_phase_d3_supply_private_drafts.sql": "c7f77cd10bbdeb60bd926f81e3668b4da36621f8785e8208a8398c9cd4770e0b",
+    "tests/api/private-drafts-contract.test.ts": "183ce751209a885a083e863f55e8cdef4180abc7cc1284532a3773f8bd42cccc",
+    "tests/e2e/supply-private-drafts.spec.ts": "bf2f9d49333fcafac9c1ce6f24bc7b607c2231098bf1b41ac51246af3c72535e",
+    "tests/integration/supply-private-drafts.test.mjs": "b324bf8ec7cdfa5519f3a6107a1ddc2ecd2d71275ff435c40271fee96aa86eea",
+    "tests/supply-draft-models.test.ts": "950b5d7723f0e3078ed2ca07ce9e6b0b60d9f29a4af685d26fbe98ed2fa93fbc"
+  },
+  "localMigrations": 131,
+  "remoteMigrations": 121,
+  "remoteDBApplied": false,
+  "historicalProtectedMigrations": 84,
+  "localVerification": {
+    "cron": [
+      {
+        "name": "hca-notification-worker",
+        "active": true,
+        "schedule": "* * * * *"
+      },
+      {
+        "name": "hca-operational-lifecycle",
+        "active": true,
+        "schedule": "* * * * *"
+      }
+    ],
+    "faultHelpers": 0,
+    "faultTriggers": 0,
+    "localMigrations": 131
+  },
+  "authDistinctCasesPassed": 8,
+  "unitAndApiCasesPassed": 11,
+  "productionPrivateRun": {
+    "casesPassed": 19,
+    "newCases": 15,
+    "existingReqBalChromiumCases": 4
+  },
+  "productionCiRecheck": {
+    "firstRunCasesPassed": 18,
+    "firstRunCasesFailed": 1,
+    "affectedRecheckPassed": 1,
+    "exactPriorCiFailures": 13,
+    "guideCases": 3,
+    "privateFormCases": 3
+  },
+  "productionCasesDistinctPassed": 35,
+  "projects": [
+    "chromium",
+    "mobile",
+    "ios"
+  ],
+  "privateAndGuideViewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "diagnosticModeIsAcceptance": false,
+  "humanPhysicalProviderApproval": false,
+  "basePublishedCI": {
+    "sha": "5ab486491a6aff64f79f705e8be4ad0acfa486fd",
+    "run": 42344391368,
+    "database": "SUCCESS",
+    "validateUbuntu": "SUCCESS",
+    "validateWindows": "SUCCESS",
+    "browsers": "FAILURE",
+    "failedBrowserCases": 13,
+    "validatesCandidate": false
+  },
+  "sonar": "OWNER_DEFERRED_SONAR_CONFIGURATION",
+  "logs": [
+    "output/phase-d-work/d3-supply-drafts-db-prepare.log",
+    "output/phase-d-work/d3-supply-drafts-auth-first.log",
+    "output/phase-d-work/d3-supply-drafts-auth-recheck.log",
+    "output/phase-d-work/d3-supply-drafts-purpose-recheck.log",
+    "output/phase-d-work/d3-supply-drafts-unit-first.log",
+    "output/phase-d-work/d3-supply-drafts-unit-recheck.log",
+    "output/phase-d-work/d3-supply-drafts-unit-final-pre-browser.log",
+    "output/phase-d-work/d3-supply-drafts-types-final.log",
+    "output/phase-d-work/d3-supply-final-types-after-ci-fix.log",
+    "output/phase-d-work/d3-supply-drafts-lint-pre-browser.log",
+    "output/phase-d-work/d3-supply-drafts-lint-affected-final.log",
+    "output/phase-d-work/d3-supply-drafts-lint-affected-recheck.log",
+    "output/phase-d-work/d3-supply-drafts-browser-tests-lint.log",
+    "output/phase-d-work/d3-supply-final-lint-after-ci-fix.log",
+    "output/phase-d-work/d3-supply-drafts-browser-diagnostic.log",
+    "output/phase-d-work/d3-supply-drafts-browser-diagnostic-recheck.log",
+    "output/phase-d-work/d3-supply-drafts-joint-acceptance.log",
+    "output/phase-d-work/d3-5-ci-failed.log",
+    "output/phase-d-work/d3-supply-ci-fix-acceptance.log",
+    "output/phase-d-work/d3-supply-transfer-consumer-recheck.log"
+  ],
+  "counterproofs": [
+    "COM/ENT incomplete exact decimal survives two Auth devices; CAS rejects stale writes without official document, protocol or stock effect",
+    "One active creation slot per user/patient/type; two ENT targets and receive/divergence purposes stay independent; discard leaves issued delivery intact",
+    "Confirmation consumes a private revision and replays one immutable result; changed fingerprint or second key does not duplicate a document or receipt",
+    "Observed slot lock followed by context change denies the save and rolls back draft revision and journal; legitimate return permits the same intention",
+    "New COM/ENT confirmations save privately before final issuance; malformed200 does not confirm a document;403 during recovery retains both exact packet and key",
+    "Real family-to-reader revocation hides private content; reload retains the pending key without exposing cache; restored authority recovers the original save",
+    "REQ/BAL existing consumers retain malformed-response recovery, CAS, original observation dates, ready-file preservation and one native recount version",
+    "Fresh COM/ENT/BAL revision plus submit share one transaction. A target-specific local trigger proves second-stage failure, full rollback and one retry through Auth RPC and HTTP",
+    "Fault helper and trigger were removed in finally; failure returns safe DATABASE_UNAVAILABLE503 without raw SQL message; original500 expectation was corrected to the documented API alias",
+    "Private helpers/direct tables and anonymous/service entrypoints remain closed; legacy REQ/BAL functions cannot operate on COM slots",
+    "Prior CI failed13 visual cases after optional guide presentation was inserted on operational screens. Presentation now belongs to home; manual help remains available and navigation records no progress/SCI",
+    "Exact prior CI failures plus guide home/manual and private form checks pass locally; no axe rule or assertion was disabled",
+    "Recheck18/19 exposed the transfer consumer still querying a spinbutton after receipt quantity became exact text; its textbox selector and original stock/author/recovery assertions pass1/1"
+  ],
+  "remaining": [
+    "C-AC-077: recover revisions already committed by the older two-stage handler; fresh atomic intention tests do not prove that legacy branch",
+    "C-AC-032: complete explicit24h/session-close/user-switch matrix; server drafts have no automatic TTL",
+    "C7-AC-005: complete authority transitions across the remaining operational consumers",
+    "D-B-AC-001: extend contextual persistence to remaining approval/correction/request forms",
+    "Remaining D3, GUI controls and real guide assets; all D4/D5 and operational requirements",
+    "CI of published candidate, final authorized remote reconciliation and D-C/D6 gates"
+  ]
+}

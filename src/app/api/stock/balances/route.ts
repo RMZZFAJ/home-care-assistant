@@ -4,19 +4,24 @@ import {
   authenticate,
   databaseError,
   patientContext,
+  parseQuery,
   rpc,
 } from "@/lib/server/api";
+import { stockCustodySelection } from "@/lib/validation/stock-reads";
 
 export async function GET(request: Request) {
   return api("stock.balances", async () => {
+    const params = new URL(request.url).searchParams;
+    const custody = parseQuery(stockCustodySelection, params.get("custody") ?? "");
     const auth = await authenticate();
     const patient = await patientContext(
       auth,
       new URL(request.url).searchParams.get("careRecipientId"),
     );
-    const params = new URL(request.url).searchParams;
-    if (params.get("custody") === "TRANSIT")
+    if (custody === "TRANSIT")
       return NextResponse.json({
+        careRecipientId: patient.id,
+        custody,
         data: [],
         overview: [],
         metrics: [],
@@ -50,6 +55,8 @@ export async function GET(request: Request) {
       }),
     ]);
     return NextResponse.json({
+      careRecipientId: patient.id,
+      custody,
       data: balances.data ?? [],
       overview,
       metrics,

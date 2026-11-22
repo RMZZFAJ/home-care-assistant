@@ -69,11 +69,11 @@ Não colocar chave privada, PFX/senha ou token em Git, PDF, QR, browser ou log.
 Backup/recuperação das chaves segue mecanismo aprovado; não exportar chave não
 exportável para cumprir um checklist.
 
-Cotação obrigatória: certificado/renovação [a cotar]; KMS/HSM por mês/operação
-[a cotar]; assinador por emissão [a cotar]; TSA por carimbo [a cotar];
-validação OCSP/CRL [a cotar]; retenção de objetos [a cotar];
-suporte/recuperação [a cotar]; moeda/data/validade [a cotar]; total estimado
-para [a cotar] emissões/mês [a cotar]. Sem contratação nesta C.
+Cotação obrigatória: certificado/renovação \[a cotar\]; KMS/HSM por mês/operação
+\[a cotar\]; assinador por emissão \[a cotar\]; TSA por carimbo \[a cotar\];
+validação OCSP/CRL \[a cotar\]; retenção de objetos \[a cotar\];
+suporte/recuperação \[a cotar\]; moeda/data/validade \[a cotar\]; total estimado
+para \[a cotar\] emissões/mês \[a cotar\]. Sem contratação nesta C.
 
 ## Privacidade e verificador
 
