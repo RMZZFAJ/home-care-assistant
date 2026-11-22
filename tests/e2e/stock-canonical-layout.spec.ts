@@ -56,13 +56,13 @@ async function login(page: Page, role: "adminA" | "professional") {
 }
 const balances = (page: Page) =>
   page.getByRole("region", { name: "Saldos e previsões", exact: true });
-const table = (page: Page) =>
-  balances(page).getByRole("table", {
+const materials = (page: Page) =>
+  balances(page).getByRole("region", {
     name: "Saldos por produto e custódia",
     exact: true,
   });
 const row = (page: Page, index: number, custody = "Família") =>
-  table(page).getByRole("row", {
+  materials(page).getByRole("region", {
     name: names[index] + " · " + custody,
     exact: true,
   });
@@ -83,7 +83,7 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
   await expect(
     balances(page)
       .getByRole("status")
-      .filter({ hasText: "101 saldos neste filtro" }),
+      .filter({ hasText: "101 materiais neste filtro" }),
   ).toBeVisible();
   const response = await page.request.get(
     `/api/stock/balances?careRecipientId=${fixture.patient}`,
@@ -104,8 +104,8 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
   for (let number = 1; number <= 7; number++) {
     await expect(pages).toContainText(`${number} / 7`);
     reached.push(
-      ...(await table(page)
-        .getByRole("row", { name: /^Material canônico/ })
+      ...(await materials(page)
+        .getByRole("region", { name: /^Material canônico/ })
         .evaluateAll((rows) => rows.map((r) => r.getAttribute("aria-label")!))),
     );
     if (number < 7)
@@ -130,35 +130,29 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
   });
   await filter.selectOption("low");
   await expect(
-    table(page).getByRole("row", { name: /^Material canônico/ }),
+    materials(page).getByRole("region", { name: /^Material canônico/ }),
   ).toHaveCount(2);
   await expect(row(page, 0)).toContainText("Abaixo do mínimo");
-  await expect(row(page, 0)).toContainText("Inativo");
+  await expect(materials(page).getByRole("article").filter({
+    has: page.getByRole("region", { name: names[0] + " · Família", exact: true }),
+  })).toContainText("Inativo");
   await expect(row(page, 1)).toContainText("No mínimo");
   await filter.selectOption("zero");
   await expect(
-    table(page).getByRole("row", { name: /^Material canônico/ }),
+    materials(page).getByRole("region", { name: /^Material canônico/ }),
   ).toHaveCount(1);
-  await expect(row(page, 100)).toContainText(
-    "Saldo zero · mínimo não definido",
-  );
-  const opener = row(page, 100).getByRole("button", {
+  await expect(row(page, 100)).toContainText("Zerado");
+  const opener = materials(page).getByRole("button", {
     name: "Consultar " + names[100] + " · Família",
     exact: true,
   });
   for (const width of [1440, 1150, 850, 500, 320]) {
     await page.setViewportSize({ width, height: 940 });
-    await expect(row(page, 100)).toHaveCSS(
-      "display",
-      width <= 850 ? "grid" : "table-row",
-    );
-    await expect(
-      table(page).getByRole("columnheader", { name: "Mínimo", exact: true }),
-    ).toHaveCount(1);
+    await expect(row(page, 100)).toHaveCSS("display", "grid");
+    await expect(row(page, 100)).toHaveAttribute("data-tone", "danger");
     await expect(
       row(page, 100)
-        .getByRole("cell")
-        .filter({ hasText: /^Não definido$/ }),
+        .getByText("Mínimo não definido", { exact: true }),
     ).toBeVisible();
     await auditFromTop(page, `stock-canonical-${width}`);
     if (width === 1440 || width === 320)
@@ -171,18 +165,15 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
   }
   await opener.click();
   const detail = page.getByRole("dialog", {
-    name: names[100] + " · Família",
+    name: names[100],
     exact: true,
   });
   await expect(
-    detail
-      .locator(".hca-stock-available")
-      .getByText("0 unidade", { exact: true }),
-  ).toBeVisible();
+    detail.locator("dt").filter({ hasText: /^Saldo confirmado$/ }).locator("+ dd"),
+  ).toHaveText("0 unidade");
   for (const label of [
     "Entrada em trânsito",
-    "Projeção após entradas previstas",
-    "Consumo extraordinário confirmado · 30 dias",
+    "Consumo confirmado · 30 dias",
     "Divergência pendente",
   ]) {
     await expect(
@@ -228,11 +219,11 @@ test("filtro de estoque conserva autorização real da equipe e não revela sald
   await expect(
     balances(page)
       .getByRole("status")
-      .filter({ hasText: "101 saldos neste filtro" }),
+      .filter({ hasText: "101 materiais neste filtro" }),
   ).toBeVisible();
   await expect(row(page, 0, "Equipe")).toContainText("0 unidade");
   await expect(
-    table(page).getByRole("row", { name: / · Família$/ }),
+    materials(page).getByRole("region", { name: / · Família$/ }),
   ).toHaveCount(0);
   const denied = await page.request.post("/api/stock/movements", {
     data: {

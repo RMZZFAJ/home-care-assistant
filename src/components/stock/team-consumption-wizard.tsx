@@ -1,0 +1,275 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { MaterialConsultButton } from "@/components/documents/catalogue-material-panel";
+import { MaterialReview } from "@/components/documents/material-review";
+import { RecordDrawer } from "@/components/forms/record-drawer";
+import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
+import { SupplyWizardIdentity, SupplyWizardReviewIdentity } from "@/components/forms/supply-wizard-identity";
+import { materialCategories, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
+import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
+import { SupplyWizardFooter } from "@/components/forms/wizard-actions";
+import { WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
+import type { ReminderOrigin } from "@/components/notifications/notification-reference";
+import { ActionButton, CheckboxField, FormField, TextAreaField } from "@/components/ui/controls";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { StepNavigator } from "@/components/ui/primitives";
+import { Notice, type WorkspaceContext } from "@/components/workspace";
+import { api, ApiError } from "@/lib/client/api";
+import { navigationForStep } from "@/lib/forms/draft-navigation";
+import { formatQuantity, quantity } from "@/lib/quantity";
+import { teamConsumptionCommand, teamConsumptionReceipt, teamConsumptionReference, type TeamConsumptionCommand } from "@/lib/validation/consumption";
+import { consumptionPreparationContentSchema, type ConsumptionPreparationContent } from "@/lib/validation/consumption-preparations";
+import { exactQuantity } from "@/lib/validation/exact-quantity";
+import type { CatalogProduct } from "@/types/documents";
+
+type Issue = Extract<TeamConsumptionCommand, { action: "issue" }>;
+type Line = ConsumptionPreparationContent["consumption"]["lines"][number];
+type MaterialBalance = ReturnType<typeof teamConsumptionReference.parse>["materials"][number];
+const stages = ["Confirmação", "Materiais", "Itens extras", "Observações", "Revisão"];
+const endpoint = "/api/consumption/records";
+const categories = new Set<string>(materialCategories.map(entry => entry.id));
+
+export function TeamConsumptionWizard({ context, products, balances, materialLoading, materialError, retryMaterials, opener, sourceReminder, onClose, onSaved }: {
+  context: WorkspaceContext;
+  products: CatalogProduct[];
+  balances: ReadonlyMap<string, string>;
+  materialLoading: boolean;
+  materialError: string;
+  retryMaterials: () => void;
+  opener: HTMLElement;
+  sourceReminder?: ReminderOrigin;
+  onClose: () => void;
+  onSaved: (id: string) => void;
+}) {
+  const patient = context.patient!;
+  const storageKey = `hca:official-team-consumption:${context.userId}:${patient.id}`;
+  const [pending, setPending] = useState<Issue | null>(() => {
+    try {
+      const value = teamConsumptionCommand.safeParse(JSON.parse(sessionStorage.getItem(storageKey) ?? "null"));
+      return value.success && value.data.action === "issue" && value.data.careRecipientId === patient.id ? value.data : null;
+    } catch { return null; }
+  });
+  const [step, setStep] = useState(pending ? 4 : 0);
+  const [category, setCategory] = useState<WizardMaterialCategory>("medicamentos");
+  const [query, setQuery] = useState("");
+  const [lines, setLines] = useState<Line[]>([]);
+  const [observation, setObservation] = useState("");
+  const [reminder, setReminder] = useState(sourceReminder?.id ?? "");
+  const [reference, setReference] = useState<ReturnType<typeof teamConsumptionReference.parse> | null>(null);
+  const [previous, setPrevious] = useState<MaterialBalance[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [receiptAbsent, setReceiptAbsent] = useState(false);
+  const [error, setError] = useState("");
+  const activeRef = useRef(false);
+  const draft = useCreationDraft({
+    userId: context.userId, patientId: patient.id, kind: "CONSUMPTION",
+    purpose: "consumption_report_team", targetResourceId: patient.id,
+    navigation: navigationForStep("CONSUMPTION", 0),
+    onResume: saved => {
+      const parsed = consumptionPreparationContentSchema.safeParse(saved.content);
+      if (!parsed.success || parsed.data.consumption.kind === "shortage") return false;
+      const stored = parsed.data.consumption;
+      setLines(stored.lines);
+      setObservation(stored.text);
+      setReminder(stored.reminderId);
+      setStep(1);
+      return true;
+    },
+    onDiscard: () => { setLines([]); setObservation(""); setStep(0); },
+  });
+  const content: ConsumptionPreparationContent = {
+    consumption: { kind: "consumption", location: "CARE_TEAM", text: observation, reason: "", reminderId: reminder, lines },
+    reference: null, referenceHash: null,
+  };
+  const edited = lines.length > 0 || Boolean(observation.trim());
+  const sameDraft = draft.base?.state === "active" && JSON.stringify(draft.base.content) === JSON.stringify(content);
+  useLongDraftAutosave(draft, content, edited && !busy && !pending);
+  useOperationActivity(busy, { title: pending ? "Conferindo o registro" : step === 4 ? "Registrando consumo" : "Conferindo estoque da equipe" });
+
+  function retain(packet: Issue | null) {
+    setPending(packet);
+    try {
+      if (packet) sessionStorage.setItem(storageKey, JSON.stringify(packet));
+      else sessionStorage.removeItem(storageKey);
+    } catch { /* A live attempt is still retained by the wizard. */ }
+  }
+  async function getReference() {
+    const query = new URLSearchParams({ careRecipientId: patient.id });
+    for (const item of lines) query.append("productId", item.productId);
+    const { data } = await api<{ data: unknown }>(endpoint + "?" + query);
+    const current = teamConsumptionReference.parse(data);
+    if (current.careRecipientId !== patient.id || current.materials.length !== lines.length
+      || current.materials.some(material => !lines.some(line => line.productId === material.productId)))
+      throw new Error("A consulta não corresponde aos materiais selecionados.");
+    return current;
+  }
+  function validLines() {
+    if (!lines.length) { setError("Selecione pelo menos um material."); return false; }
+    const invalid = lines.find(line => {
+      const parsed = exactQuantity.safeParse(line.quantity);
+      return !parsed.success || !quantity(parsed.data).gt(0);
+    });
+    if (invalid) { setError("Informe uma quantidade positiva para " + invalid.name + "."); return false; }
+    return true;
+  }
+  async function review() {
+    if (activeRef.current || !validLines()) return;
+    activeRef.current = true; setBusy(true); setError("");
+    try {
+      setReference(await getReference());
+      setPrevious([]);
+      setStep(4);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Não foi possível consultar o estoque.");
+    } finally { activeRef.current = false; setBusy(false); }
+  }
+  function finish(raw: unknown, packet: Issue) {
+    const receipt = teamConsumptionReceipt.parse(raw);
+    if (receipt.careRecipientId !== patient.id || receipt.idempotencyKey !== packet.idempotencyKey || receipt.action !== "issue")
+      throw new Error("A confirmação pertence a outra tentativa.");
+    retain(null);
+    onSaved(receipt.id);
+  }
+  async function submit() {
+    if (activeRef.current || (!pending && (!reference || draft.blocked || draft.backgroundBusy))) return;
+    activeRef.current = true; setBusy(true); setError("");
+    let packet = pending;
+    try {
+      if (!packet) {
+        const saved = sameDraft ? draft.draftCommit : await draft.save(content);
+        if (!saved || reference === null) { setError("Confira o salvamento do rascunho antes de emitir."); return; }
+        const data = teamConsumptionCommand.parse({
+          action: "issue", careRecipientId: patient.id, idempotencyKey: crypto.randomUUID(),
+          observation, reminderId: reminder || undefined,
+          lines: lines.map(({ productId, quantity, unit }) => ({ productId, quantity, unit })),
+          draft: { id: saved.id, revision: saved.revision }, referenceHash: reference.referenceHash,
+        });
+        if (data.action !== "issue") return;
+        packet = data;
+        retain(packet);
+      } else if (!receiptAbsent) {
+        const { data } = await api<{ data: unknown }>(endpoint + "?" + new URLSearchParams({
+          careRecipientId: patient.id, idempotencyKey: packet.idempotencyKey,
+        }));
+        if (data === null) { setReceiptAbsent(true); return; }
+        finish(data, packet);
+        return;
+      }
+      finish((await api<{ data: unknown }>(endpoint, packet)).data, packet);
+    } catch (reason) {
+      if (packet && reason instanceof ApiError && reason.code === "VERSION_CONFLICT") {
+        retain(null);
+        setReceiptAbsent(false);
+        if (reference) {
+          setPrevious(reference.materials);
+          try { setReference(await getReference()); }
+          catch { setReference(null); setStep(3); }
+        }
+        void draft.reportConflict();
+        setError("O estoque ou o rascunho mudou. Confira as referências atualizadas e revise novamente.");
+      } else {
+        if (!pending && reason instanceof ApiError && reason.status > 0 && reason.status < 500) retain(null);
+        setError(reason instanceof Error ? reason.message : "Não foi possível confirmar o registro.");
+      }
+    } finally { activeRef.current = false; setBusy(false); }
+  }
+  async function close() {
+    if (busy || draft.backgroundBusy) return;
+    if (edited && !pending && !draft.blocked && !sameDraft) {
+      const saved = await draft.save(content);
+      if (!saved) return;
+    }
+    onClose();
+  }
+  function toggle(product: CatalogProduct, selected: boolean) {
+    setLines(items => selected ? [...items, { productId: product.id, name: product.name, unit: product.unit, quantity: "" }]
+      : items.filter(item => item.productId !== product.id));
+    setError("");
+  }
+  const materialStep = step === 1 || step === 2;
+  const choices = products.filter(item =>
+    (step === 1 ? item.category === category : !categories.has(item.category)) &&
+    (quantity(balances.get(item.id) ?? 0).gt(0) || lines.some(line => line.productId === item.id)) &&
+    item.name.toLocaleLowerCase("pt-BR").includes(query.trim().toLocaleLowerCase("pt-BR")));
+  const cannotIssue = !reference || reference.materials.some(material => {
+    const amount = exactQuantity.safeParse(lines.find(line => line.productId === material.productId)?.quantity);
+    return !amount.success || quantity(amount.data).gt(material.quantity) || quantity(amount.data).decimalPlaces() > material.decimals;
+  });
+  const ready = pending || !draft.loading && !draft.offered && !draft.readDenied && !draft.loadError && !draft.protectedReadPending;
+  return <RecordDrawer title="Registrar consumo" kicker="Consumo do plantão" subtitle={patient.display_name}
+    onClose={() => { void close(); }} restoreFocusTo={opener} busy={busy} preventClose={draft.busy || draft.backgroundBusy}
+    popupClassName="hca-wizard-dialog hca-team-consumption-wizard" trackChanges={false} keyboardScrollable
+    footer={() => <SupplyWizardFooter back={<ActionButton variant="quiet" disabled={busy || Boolean(pending) && step > 0}
+      onClick={() => step ? setStep(step - 1) : void close()}>{step ? "Voltar" : "Sair por agora"}</ActionButton>}
+    status={pending ? undefined : { draft, current: content, hasEdits: edited }}>
+      {step === 4 ? <ActionButton variant="primary" disabled={busy || (!pending && (cannotIssue || draft.blocked || draft.backgroundBusy))}
+        onClick={() => void submit()}>{pending ? receiptAbsent ? "Reenviar a mesma tentativa" : "Conferir resultado" : "Registrar consumo"}</ActionButton>
+        : <ActionButton variant="primary" disabled={busy || !ready || draft.blocked} onClick={() => {
+          setError(""); setQuery("");
+          if (step === 3) void review();
+          else setStep(step + 1);
+        }}>{step === 0 ? "Selecionar materiais" : step === 3 ? "Revisar consumo" : "Continuar"}</ActionButton>}
+    </SupplyWizardFooter>}>
+    {!pending ? <SimpleDraftPanel draft={draft} current={content} disabled={busy} patientName={patient.display_name}
+      authorName={context.fullName} documentLabel="Consumo" statusInFooter onExitDraft={onClose} /> : null}
+    {error ? <Notice error>{error}</Notice> : null}
+    {pending ? <Notice>{receiptAbsent
+      ? "A confirmação ainda não foi encontrada. Você pode reenviar a mesma tentativa com segurança."
+      : "Confira o resultado desta tentativa antes de registrar outro consumo."}</Notice> : ready ? <>
+      <StepNavigator steps={stages} active={step} onChange={setStep} compact label="Etapas do consumo" disabled={busy || draft.blocked} />
+      {step === 0 ? <>
+        <SupplyWizardIdentity context={context} kind="CON" />
+        {reminder ? <Notice>Consumo vinculado ao lembrete do plantão.</Notice> : null}
+        <p>As quantidades registradas serão descontadas do estoque da equipe.</p>
+      </> : null}
+      {materialStep ? <div className="hca-form-stack">
+        <h3>{step === 1 ? "Materiais consumidos" : "Itens extras"}</h3>
+        {step === 2 ? <p>Selecione materiais identificados no estoque da equipe fora das categorias anteriores.</p> : null}
+        {step === 1 ? <WizardMaterialCategories category={category} selected={products.filter(item => lines.some(line => line.productId === item.id))}
+          onChange={next => { setCategory(next); setQuery(""); }} /> : null}
+        <WizardMaterialSearch value={query} onChange={setQuery} />
+        <WizardMaterialToolbar count={lines.length} matches={choices.length} />
+        {materialError ? <Notice error>{materialError} <ActionButton onClick={retryMaterials}>Atualizar materiais</ActionButton></Notice>
+          : materialLoading ? <p role="status">Consultando materiais e saldos…</p>
+            : !choices.length ? <p>Nenhum material disponível nesta lista.</p> : null}
+        {choices.map(product => {
+          const line = lines.find(item => item.productId === product.id);
+          return <article key={product.id} className="ui-card hca-form-stack">
+            <div className="hca-wizard-material-head">
+              <CheckboxField label={product.name} checked={Boolean(line)} onChange={event => toggle(product, event.currentTarget.checked)} />
+              <MaterialConsultButton context={context} material={product} menu />
+            </div>
+            {line ? <>
+              <small>Estoque da equipe · {formatQuantity(balances.get(product.id) ?? "0", product.unit)}</small>
+              <FormField label={"Quantidade consumida · " + product.name}><WizardQuantityInput unit={product.unit} inputMode="decimal" maxLength={64}
+                value={line.quantity} onChange={event => {
+                  const value = event.currentTarget.value;
+                  setLines(items => items.map(item => item.productId === product.id ? { ...item, quantity: value } : item));
+                }} /></FormField>
+            </> : null}
+          </article>;
+        })}
+      </div> : null}
+      {step === 3 ? <FormField label="Observações" helpText="Opcional"><TextAreaField rows={5} maxLength={2000}
+        value={observation} onChange={event => setObservation(event.currentTarget.value)} /></FormField> : null}
+      {step === 4 && reference ? <div className="hca-form-stack">
+        <SupplyWizardReviewIdentity context={context} kind="CON" />
+        <h3>Impacto no estoque</h3>
+        <MaterialReview rows={reference.materials.map(material => {
+          const used = quantity(lines.find(item => item.productId === material.productId)?.quantity ?? "0");
+          const prior = previous.find(entry => entry.productId === material.productId);
+          const after = quantity(material.quantity).minus(used).toFixed();
+          return { id: material.productId, name: material.name, details: <div>
+            {prior && prior.quantity !== material.quantity ? <small>Saldo na revisão anterior · {formatQuantity(prior.quantity, material.unit)}</small> : null}
+            <p>Saldo {formatQuantity(material.quantity, material.unit)} · Uso {formatQuantity(used.toFixed(), material.unit)}</p>
+            <small>{quantity(after).isNegative() ? "Saldo insuficiente" : "Após o consumo · " + formatQuantity(after, material.unit)}</small>
+          </div> };
+        })} />
+        {cannotIssue ? <Notice error>Confira o saldo e a precisão da unidade de cada material.</Notice> : null}
+        {observation ? <p className="whitespace-pre-wrap">{observation}</p> : null}
+      </div> : null}
+    </> : <p role="status">Consultando o último preenchimento…</p>}
+  </RecordDrawer>;
+}

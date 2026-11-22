@@ -760,14 +760,9 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   });
   await page.reload();
   await expect(
-    page
-      .getByRole("row", { name: product.name + " · Família", exact: true })
-      .or(
-        page.getByRole("article", {
-          name: product.name + " · Família",
-          exact: true,
-        }),
-      ),
+    page.getByRole("article").filter({
+      has: page.getByRole("region", { name: product.name + " · Família", exact: true }),
+    }),
   ).toContainText("Inativo");
 });
 

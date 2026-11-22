@@ -4,11 +4,12 @@ import { setup, fixtures, rpc } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
+import { stockMovement } from "./stock-operation";
 
 test.setTimeout(120_000);
 const history = (page: Page) => page.getByRole("region", { name: "Histórico auditável", exact: true });
-const rows = (page: Page) => history(page).locator("tbody tr[data-movement-id]");
-const ids = (page: Page) => rows(page).locator("details p.break-all").allTextContents();
+const rows = (page: Page) => history(page).locator("[data-movement-id]");
+const ids = (page: Page) => rows(page).evaluateAll(elements => elements.map(element => element.getAttribute("data-movement-id") ?? ""));
 const expected = (patient: string, product?: string): string[] => JSON.parse(sql(`select jsonb_agg(id::text order by created_at desc,id desc) from public.stock_movements where care_recipient_id=${q(patient)} and (source_location='FAMILY' or destination_location='FAMILY')${product ? ` and product_id=${q(product)}` : ""};`));
 const facts = (patient: string) => sql(`select jsonb_build_object('stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)}),'documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${q(patient)}));`);
 async function login(page: Page, patient: string) {
@@ -34,6 +35,37 @@ async function traverse(page: Page, order: string[]) {
   expect(read).toEqual(order);
   expect(new Set(read).size).toBe(order.length);
 }
+
+test("a reviewed family movement records two materials in one operation and preserves exact origin", async ({ page }) => {
+  const f = await setup();
+  await login(page, f.patient);
+  await page.goto(`/estoque?careRecipientId=${f.patient}&custody=FAMILY`);
+  await page.getByRole("button", { name: "Movimentar estoque familiar", exact: true }).click();
+  const drawer = page.getByRole("dialog", { name: /^(Movimentar estoque familiar|Confirmar movimentação familiar)$/ });
+  await drawer.getByRole("combobox", { name: "Produto", exact: true }).selectOption(f.products[0]);
+  await drawer.getByRole("textbox", { name: "Quantidade", exact: true }).fill("4");
+  await drawer.getByRole("button", { name: "Adicionar material", exact: true }).click();
+  await drawer.getByRole("combobox", { name: "Produto 2", exact: true }).selectOption(f.products[1]);
+  await drawer.getByRole("textbox", { name: "Quantidade 2", exact: true }).fill("7");
+  await drawer.getByRole("textbox", { name: "Motivo", exact: true }).fill("Reposição após a conferência das duas reservas.");
+  await expect(drawer.getByRole("button", { name: /Salvar rascunho/ })).toHaveCount(0);
+  await drawer.getByRole("button", { name: "Revisar movimentação", exact: true }).click();
+  await expect(drawer.getByText("Saldo após a movimentação", { exact: true })).toHaveCount(2);
+  const saved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/stock/operations" && response.request().method() === "POST");
+  await drawer.getByRole("button", { name: "Confirmar", exact: true }).click();
+  const response = await saved;
+  expect(response.status()).toBe(201);
+  const { data } = await response.json();
+  const act = page.locator(`[data-stock-act="family:${data.id}"]`);
+  await expect(act.locator("summary")).toContainText("2 materiais");
+  await expect(act).not.toHaveAttribute("open", "");
+  expect(await act.locator("[data-movement-id]").count()).toBe(2);
+  const movement = await stockMovement(page, data.movementIds[0]);
+  await movement.getByRole("button", { name: /^Consultar origem ·/ }).click();
+  const detail = page.getByRole("dialog", { name: "Origem da movimentação" });
+  await expect(detail.getByText("Saldo anterior", { exact: true })).toBeVisible();
+  await expect(detail.getByText("Saldo posterior", { exact: true })).toBeVisible();
+});
 
 test("stock history visits more than100 native movements in exact order, resets filters and preserves facts", async ({ page }) => {
   const f = await setup();

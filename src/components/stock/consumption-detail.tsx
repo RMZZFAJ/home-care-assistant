@@ -1,6 +1,8 @@
 "use client";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { FeedbackBanner } from "@/components/ui/feedback";
+import { DocumentProgress } from "@/components/documents/document-progress";
+import { DocumentPanel, DocumentTabs, useDocumentTabs } from "@/components/documents/document-tabs";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
@@ -21,7 +23,8 @@ import { ConsumptionPrivateResults } from "./consumption-private-results";
 import { ConsumptionLines } from "./consumption-lines";
 import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDecision } from "./consumption-decision";
-import { consumptionFollowUp, consumptionLocationLabel, consumptionReadStampMatches, mergeConsumptionRead } from "@/lib/consumption/follow-up";
+import { TeamConsumptionAction, type TeamConsumptionActionKind } from "./team-consumption-action";
+import { consumptionFollowUp, consumptionLocationLabel, consumptionReadStampMatches, consumptionStateLabels, mergeConsumptionRead } from "@/lib/consumption/follow-up";
 
 export function ConsumptionDetail({
   id,
@@ -31,6 +34,7 @@ export function ConsumptionDetail({
   catalogLoading,
   onCatalogRetry,
   onChange,
+  onOpenRecord,
   onClose,
 }: {
   id: string;
@@ -40,6 +44,7 @@ export function ConsumptionDetail({
   catalogLoading: boolean;
   onCatalogRetry: () => void;
   onChange: () => void;
+  onOpenRecord: (id: string) => void;
   onClose: () => void;
 }) {
   const [data, setData] = useState<ConsumptionReport | null>(null),
@@ -48,6 +53,7 @@ export function ConsumptionDetail({
     [message, setMessage] = useState(""),
     [reading, setReading] = useState(true);
   const [editor, setEditor] = useState<HTMLElement | null>(null),
+    [teamAction, setTeamAction] = useState<{ kind: TeamConsumptionActionKind; opener: HTMLElement; report: ConsumptionReport } | null>(null),
     [decision, setDecision] = useState<{
       report: ConsumptionReport;
       accept: boolean;
@@ -56,6 +62,7 @@ export function ConsumptionDetail({
     headingRef = useRef<HTMLHeadingElement>(null),
     firstFocusRef = useRef(false);
   const { loading, selecting } = useWorkspaceState();
+  const tabs = useDocumentTabs(false);
   useEffect(() => {
     if (!data || reading || loading || selecting || firstFocusRef.current) return;
     // URL/context reads keep this detail mounted but inert under the loading
@@ -144,11 +151,17 @@ export function ConsumptionDetail({
     (data.location !== "FAMILY" ||
       ["admin", "family"].includes(context.patient!.role));
   const followUp = data ? consumptionFollowUp(data) : null;
+  const legacy = data?.workflow_mode === "legacy" || data?.workflow_mode === undefined;
+  const mayWriteTeam = context.patient?.is_active !== false && can(context, "consumption.team.write");
+  const mayWrite = Boolean(data && !reading && !error && mayWriteTeam);
+  const canAmend = mayWrite && data?.status === "recorded" && (data.reported_by === context.userId || can(context, "consumption.team.correct"));
+  const progressType = data?.kind === "shortage" ? "FAL" : "CON";
+  const recordLabel = progressType + "-" + id.slice(0, 8).toUpperCase();
   return (
     <section className="ui-card space-y-4" aria-label="Detalhe do relato">
       <div className="hca-toolbar">
         <h2 className="font-semibold" tabIndex={-1} ref={headingRef}>
-          Relato e conferência
+          {data && !legacy ? data.kind === "shortage" ? "Aviso de falta" : "Consumo do plantão" : "Relato e conferência"}
         </h2>
         <ActionButton onClick={onClose}>Voltar à lista</ActionButton>
         <ActionButton onClick={() => { setReading(true); setAttempt((value) => value + 1); }}>
@@ -175,17 +188,30 @@ export function ConsumptionDetail({
       {data ? (
         <>
           <DefinitionGrid items={[
-            { label: "Tipo", value: data.kind === "shortage" ? "Falta de material" : "Consumo extraordinário" },
+            { label: "Tipo", value: data.kind === "shortage" ? "Falta de material" : legacy ? "Consumo extraordinário" : "Consumo do plantão" },
             { label: "Custódia", value: consumptionLocationLabel(data.location) },
-            { label: "Situação", value: data.status === "reported" ? "Aguardando conferência" : data.status === "confirmed" ? "Confirmado" : "Rejeitado" },
+            { label: "Situação", value: consumptionStateLabels[data.status] },
             { label: "Versão", value: data.version },
-            { label: "Referência", value: data.id, wide: true },
+            { label: "Referência", value: recordLabel },
           ]} />
+          {canAmend || mayWrite && data.status === "communicated" ? <div className="hca-toolbar">
+            {canAmend ? <>
+              <ActionButton onClick={event => setTeamAction({ kind: "correct", opener: event.currentTarget, report: data })}>Corrigir consumo</ActionButton>
+              <ActionButton onClick={event => setTeamAction({ kind: "cancel", opener: event.currentTarget, report: data })}>Cancelar consumo</ActionButton>
+            </> : <ActionButton onClick={event => setTeamAction({ kind: "shortage", opener: event.currentTarget, report: data })}>Reiterar aviso</ActionButton>}
+          </div> : null}
           {reading || error ? (
             <p className="text-sm text-(--muted)">
               Última consulta confirmada; os dados preservados não representam uma nova atualização.
             </p>
           ) : null}
+          <DocumentTabs auditAllowed={false} sections={["materials", "progress"]}
+            value={tabs.value === "progress" ? "progress" : "materials"} onSelect={tabs.select} rootRef={tabs.rootRef}>
+          <DocumentPanel value="materials">
+          <details>
+            <summary>Identificação do registro</summary>
+            <p className="break-all">{data.id}</p>
+          </details>
           {data.source_reminder_id ? (
             <Link
               href={
@@ -214,7 +240,7 @@ export function ConsumptionDetail({
               key={revision.id}
             >
               <h3 className="font-semibold">
-                Complemento · versão {revision.version}
+                {legacy ? "Complemento" : "Correção"} · versão {revision.version}
               </h3>
               <DefinitionGrid items={[{ label: "Complementado por", value: revision.actor_name ?? "Nome não preservado" },{ label: "Registrado em", value: formatBrazilDate(revision.created_at) }]} />
               <p className="my-2 whitespace-pre-wrap wrap-break-word">
@@ -292,7 +318,7 @@ export function ConsumptionDetail({
           )}
           {data.movements.length ? (
             <section>
-              <h3 className="font-semibold">Movimentos desta confirmação</h3>
+              <h3 className="font-semibold">{data.workflow_mode === "direct" ? "Movimentos do consumo" : "Movimentos desta confirmação"}</h3>
               <ul className="space-y-3">
                 {data.movements.map((movement) => (
                   <li className="wrap-break-word text-sm" key={movement.id}>
@@ -306,8 +332,8 @@ export function ConsumptionDetail({
                         (line) => line.productId === movement.productId,
                       )?.unit,
                     )}{" "}
-                    · saída de{" "}
-                    {consumptionLocationLabel(movement.source)} ·{" "}
+                    · {movement.source ? "saída de " : "entrada em "}
+                    {consumptionLocationLabel(movement.source ?? movement.destination)} ·{" "}
                     {formatBrazilDate(movement.createdAt)}
                     <details className="mt-2">
                       <summary>Referência do movimento</summary>
@@ -318,7 +344,7 @@ export function ConsumptionDetail({
               </ul>
             </section>
           ) : null}
-          <section
+          {legacy ? <section
             className="hca-form-stack"
             aria-label="Meus preenchimentos privados do relato"
           >
@@ -342,7 +368,20 @@ export function ConsumptionDetail({
                 Minha rejeição preservada
               </ActionButton>
             </div>
-          </section>
+          </section> : null}
+          </DocumentPanel>
+          <DocumentPanel value="progress">
+            <DocumentProgress id={id} type={progressType} patientId={context.patient!.id} context={context}
+              code={recordLabel} readOnly={context.patient?.is_active === false} />
+          </DocumentPanel>
+          </DocumentTabs>
+          {teamAction && mayWriteTeam ? <TeamConsumptionAction context={context} kind={teamAction.kind} report={teamAction.report}
+            products={products} opener={teamAction.opener} onClose={() => setTeamAction(null)} onSaved={recordId => {
+              setTeamAction(null);
+              onChange();
+              if (recordId !== id) onOpenRecord(recordId);
+              else { setReading(true); setAttempt(value => value + 1); }
+            }} /> : null}
           {editor ? (
             <ConsumptionEditor
               context={context}

@@ -66,7 +66,7 @@ import {
   mentionsEveryone,
 } from "@/lib/validation/document-progress";
 import type { CreationDraft } from "@/types/creation-drafts";
-import type { DocumentType } from "@/types/documents";
+import type { ProgressSubjectType } from "@/lib/validation/document-progress";
 
 type Reference = z.infer<typeof progressReferenceRow>;
 const blank = {
@@ -126,7 +126,7 @@ function loadDraft(
 
 type ProgressProps = {
   id: string;
-  type: DocumentType;
+  type: ProgressSubjectType;
   patientId: string;
   context: WorkspaceContext;
   code: string;

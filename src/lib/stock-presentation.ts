@@ -1,7 +1,7 @@
 import { quantity } from "@/lib/quantity";
 import type { ProductStock, StockCustody } from "@/types/stock";
 
-export type StockBalanceFilter = "all" | "low" | "zero";
+export type StockBalanceFilter = "all" | "low" | "zero" | "undefined";
 export type StockBalanceRow = {
   product: ProductStock;
   custody: "FAMILY" | "CARE_TEAM";
@@ -20,6 +20,7 @@ export function stockBalanceSituation(stock: StockCustody) {
       isZero,
       atOrBelowMinimum,
     } as const;
+  if (isZero) return { label: "Zerado", tone: "danger", isZero, atOrBelowMinimum } as const;
   if (stock.minimum !== null) {
     const comparison = confirmed.comparedTo(stock.minimum);
     return {
@@ -29,14 +30,14 @@ export function stockBalanceSituation(stock: StockCustody) {
           : comparison === 0
             ? "No mínimo"
             : "Regular",
-      tone: comparison <= 0 ? "warning" : "success",
+      tone: comparison < 0 ? "danger" : comparison === 0 ? "warning" : "success",
       isZero,
       atOrBelowMinimum,
     } as const;
   }
   return {
-    label: isZero ? "Saldo zero · mínimo não definido" : "Mínimo não definido",
-    tone: isZero ? "warning" : "neutral",
+    label: "Mínimo não definido",
+    tone: "neutral",
     isZero,
     atOrBelowMinimum,
   } as const;
@@ -59,6 +60,7 @@ export function stockBalanceRows(
       const situation = stockBalanceSituation(stock);
       if (filter === "low" && !situation.atOrBelowMinimum) continue;
       if (filter === "zero" && !situation.isZero) continue;
+      if (filter === "undefined" && stock.minimum !== null) continue;
       rows.push({ product, stock, custody: key });
     }
     return rows;

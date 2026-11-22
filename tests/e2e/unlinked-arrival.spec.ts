@@ -5,6 +5,7 @@ import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
 import { purchaseBalanceFixture } from "../integration/purchase-entry-balance-fixtures.mjs";
 import { loginDecision } from "./l1-decision-policy";
 import { arrivalCard, confirmArrivalReview } from "./purchase-arrival-review";
+import { stockMovement } from "./stock-operation";
 
 const endpoint = "/api/purchases/arrivals/unlinked";
 
@@ -137,7 +138,7 @@ test("E05-17 E05-18 registra uma doação avulsa, recupera a resposta e vincula 
   await details.getByRole("button", { name: "Fechar consulta" }).click();
   const movementId = sql(`select id from public.stock_movements where reference_type='unlinked_arrival'
     and reference_id=${sqlLiteral(receipt.result.id)} and product_id=${sqlLiteral(manual.product_id)}`);
-  await page.locator(`[data-movement-id="${movementId}"]`).getByRole("button", { name: "Consultar origem", exact: true }).click();
+  await (await stockMovement(page, movementId)).getByRole("button", { name: /^Consultar origem ·/ }).click();
   const provenance = page.getByRole("dialog", { name: "Origem da movimentação" });
   await expect(provenance.getByRole("region", { name: "Chegada de origem" })).toContainText("CHE-0001 · Chegada avulsa");
 });

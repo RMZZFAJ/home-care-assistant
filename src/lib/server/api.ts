@@ -32,6 +32,8 @@ export function databaseError(
   const message = error?.message ?? "";
   if (error?.code === "PT409" && message === "requisition stock reference changed")
     throw new ApiError("REQUEST_STOCK_CHANGED", "O estoque mudou durante o preenchimento. Sua contagem foi preservada para conferência.", 409);
+  if (error?.code === "PT409" && message === "stock reference changed; confirm the reviewed materials again")
+    throw new ApiError("VERSION_CONFLICT", "O estoque mudou. Compare a referência atualizada antes de confirmar a movimentação.", 409);
   if (error?.code === "PT409" && message === "operational source material changed")
     throw new ApiError("VERSION_CONFLICT", "Um material deixou de estar disponível na ficha de origem. Confira os vínculos antes de confirmar.", 409);
   if (error?.code === "PT409" && message === "purchase coverage changed")

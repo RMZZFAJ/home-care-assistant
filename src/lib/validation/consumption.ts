@@ -24,6 +24,37 @@ const lines = z
   );
 const text = z.string().trim().min(3).max(2000);
 const version = z.number().int().positive().max(2147483647);
+export const consumptionStatus = z.enum(["reported", "confirmed", "rejected", "recorded", "cancelled", "communicated"]);
+const teamScope = { careRecipientId: z.uuid(), idempotencyKey: z.uuid() };
+const teamObservation = z.string().trim().max(2000).optional();
+const teamRevision = { reportId: z.uuid(), expectedVersion: version, reason: z.string().trim().min(3).max(1000) };
+const requiredLines = lines.refine(value => value.length > 0, "Selecione pelo menos um material.");
+const teamAction = z.enum(["issue", "correct", "cancel", "shortage"]);
+const referenceHash = z.string().regex(/^[a-f0-9]{64}$/);
+export const teamConsumptionProducts = z.array(z.string().min(1).max(120)).min(1).max(100)
+  .refine(items => items.length === new Set(items).size, "Selecione cada material uma única vez.");
+export const teamConsumptionReference = z.object({
+  careRecipientId: z.uuid(), referenceHash,
+  materials: z.array(z.object({
+    productId: z.string().min(1), name: z.string().min(1), unit: z.string().min(1),
+    decimals: z.number().int().min(0).max(6), quantity: z.string().regex(/^-?\d+(?:\.\d+)?$/),
+    updatedAt: z.iso.datetime({ offset: true }).nullable(),
+  })).min(1).max(100),
+}).strict();
+export const teamConsumptionCommand = z.discriminatedUnion("action", [
+  z.object({
+    ...teamScope, action: z.literal("issue"), observation: teamObservation, reminderId: z.uuid().optional(),
+    lines: requiredLines, referenceHash, draft: z.object({ id: z.uuid(), revision: version }).strict().optional(),
+  }).strict(),
+  z.object({ ...teamScope, ...teamRevision, action: z.literal("correct"), observation: teamObservation, lines: requiredLines }).strict(),
+  z.object({ ...teamScope, ...teamRevision, action: z.literal("cancel") }).strict(),
+  z.object({ ...teamScope, action: z.literal("shortage"), observation: text, repeatedReportId: z.uuid().optional(), reminderId: z.uuid().optional(), lines: lines.optional() }).strict(),
+]);
+export const teamConsumptionReceipt = z.object({
+  id: z.uuid(), operationId: z.uuid(), careRecipientId: z.uuid(), idempotencyKey: z.uuid(),
+  action: teamAction, version, recordedAt: z.iso.datetime({ offset: true }),
+}).strict();
+export type TeamConsumptionCommand = z.infer<typeof teamConsumptionCommand>;
 export const consumptionCommand = z.discriminatedUnion("action", [
   z
     .object({
@@ -86,7 +117,7 @@ export function consumptionResultConfirmed(value:unknown,packet:Exclude<z.infer<
 export const consumptionFilters = z
   .object({
     kind: z.enum(["consumption", "shortage"]).optional(),
-    status: z.enum(["reported", "confirmed", "rejected"]).optional(),
+    status: consumptionStatus.optional(),
     search: z.string().trim().max(120).default(""),
     from: z.iso.date().optional(),
     to: z.iso.date().optional(),
@@ -100,7 +131,8 @@ export const consumptionFilters = z
 const consumptionPage = z.object({
   data: z.array(z.object({
     id: z.uuid(), care_recipient_id: z.uuid(), kind: z.enum(["consumption", "shortage"]),
-    location: z.enum(["FAMILY", "CARE_TEAM"]), status: z.enum(["reported", "confirmed", "rejected"]),
+    location: z.enum(["FAMILY", "CARE_TEAM"]), status: consumptionStatus,
+    workflow_mode: z.enum(["legacy", "direct", "shortage"]).optional(),
     body: z.string(), created_at: z.iso.datetime({ offset: true }), version: z.number().int().positive(),
     reported_by: z.uuid(), reported_name: z.string().nullable(),
   })).max(20),

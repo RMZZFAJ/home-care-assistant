@@ -42,7 +42,8 @@ describe("exact stock presentation", () => {
       atOrBelowMinimum: false,
     });
     expect(stockBalanceSituation(stock("0", "0"))).toMatchObject({
-      label: "No mínimo",
+      label: "Zerado",
+      tone: "danger",
       atOrBelowMinimum: true,
       isZero: true,
     });

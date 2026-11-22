@@ -1,4 +1,5 @@
 import { generatedPdf } from "./generated-pdf";
+import { stockMovement } from "./stock-operation";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
 import type { CatalogueAttempt } from "../../src/lib/validation/catalogue-preparation";
@@ -405,13 +406,7 @@ test("compensação de inativo mantém a referência visível e usa uma única s
     );
   await login(page, f.patient);
   await page.goto(`/estoque?careRecipientId=${f.patient}`);
-  const history = page.getByRole("region", {
-      name: "Histórico auditável",
-      exact: true,
-    }),
-    row = history
-      .locator("tbody tr[data-movement-id]")
-      .filter({ has: page.getByText(original.id, { exact: true }) });
+  const row = await stockMovement(page, original.id);
   await row
     .getByRole("button", { name: "Corrigir este movimento", exact: true })
     .click();

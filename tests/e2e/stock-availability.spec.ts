@@ -55,19 +55,13 @@ test("estoque isola saldos válidos da falha inicial do histórico e recupera se
   ).toBeVisible();
   await expect(
     balances
-      .getByRole("row", {
+      .getByRole("region", {
         name: "Material fictício V4 0 · Família",
         exact: true,
-      })
-      .or(
-        balances.getByRole("article", {
-          name: "Material fictício V4 0 · Família",
-          exact: true,
-        }),
-      ),
+      }),
   ).toContainText("30");
   await expect(
-    balances.getByText("Nenhum produto encontrado", { exact: true }),
+    balances.getByText("Nenhum material encontrado", { exact: true }),
   ).toHaveCount(0);
   await expect(
     history.getByText("Sem movimentações neste filtro", { exact: true }),
@@ -156,7 +150,7 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
     }),
   ).toBeVisible();
   await expect(
-    balances.getByText("Nenhum produto encontrado", { exact: true }),
+    balances.getByText("Nenhum material encontrado", { exact: true }),
   ).toHaveCount(0);
   await expect(
     history.getByText("Saldo fictício controlado de homologação V4", {
@@ -186,16 +180,10 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
     .click();
   await expect(
     balances
-      .getByRole("row", {
+      .getByRole("region", {
         name: "Material fictício V4 0 · Família",
         exact: true,
-      })
-      .or(
-        balances.getByRole("article", {
-          name: "Material fictício V4 0 · Família",
-          exact: true,
-        }),
-      ),
+      }),
   ).toContainText("30");
   stockFailure = true;
   await balances
@@ -211,16 +199,10 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
   ).toBeVisible();
   await expect(
     balances
-      .getByRole("row", {
+      .getByRole("region", {
         name: "Material fictício V4 0 · Família",
         exact: true,
-      })
-      .or(
-        balances.getByRole("article", {
-          name: "Material fictício V4 0 · Família",
-          exact: true,
-        }),
-      ),
+      }),
   ).toContainText("30");
   // A failure under another custody must not label old FAMILY data as CARE_TEAM.
   await page
@@ -232,7 +214,7 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
     }),
   ).toBeVisible();
   await expect(
-    balances.getByRole("row", { name: /Material fictício/ }),
+    balances.getByRole("region", { name: /Material fictício/ }),
   ).toHaveCount(0);
   await expect(
     history.getByText("Histórico ainda não consultado com sucesso.", {
@@ -255,15 +237,9 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
   ).toBeVisible();
   await expect(
     balances
-      .getByRole("row", {
+      .getByRole("region", {
         name: "Material fictício V4 0 · Equipe",
         exact: true,
-      })
-      .or(
-        balances.getByRole("article", {
-          name: "Material fictício V4 0 · Equipe",
-          exact: true,
-        }),
-      ),
+      }),
   ).toContainText("0");
 });

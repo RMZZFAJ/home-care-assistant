@@ -15,6 +15,11 @@ const custody = z.object({
   confirmed: stockNumber,
   incoming: stockNumber,
   minimum: stockNumber.nullable(),
+  updatedAt: instant.nullable().optional(),
+  disputed: stockNumber.optional(),
+  purchaseExpected: stockNumber.optional(),
+  purchaseAwaiting: stockNumber.optional(),
+  purchasePendingValidation: stockNumber.optional(),
 });
 const product = z.object({
   productId, name: z.string().min(1), unit: z.string().min(1),
@@ -67,6 +72,25 @@ export type StockHistoryScope = {
   productId: string; location: string; from: string; to: string;
 };
 
+export const stockOperationFilter = z.enum(["manual", "COM", "CON", "REQ", "ENT", "DEV", "BAL", "inventory", "other"]);
+const operationMovement = movement.extend({
+  name: z.string().nullable(), unit: z.string().nullable(), custody: stockLocation,
+  before: stockNumber.nullable(), after: stockNumber.nullable(),
+  direction: z.enum(["inbound", "outbound"]),
+});
+const operationGroup = z.object({
+  id: z.string().regex(/^[a-z_]+:[a-f0-9-]{36}$/),
+  recordedAt: instant, origin: stockOperationFilter, documentCode: z.string().nullable(),
+  actor: z.string().nullable(), rows: z.array(operationMovement).min(1),
+});
+const operationsRead = historyRead.omit({ data: true, balances: true }).extend({
+  data: z.array(operationGroup),
+  filters: historyFilters.extend({ origin: stockOperationFilter.nullable(), search: z.string().nullable() }),
+});
+export type StockOperationHistory = z.infer<typeof operationGroup>;
+export type StockOperationMovement = z.infer<typeof operationMovement>;
+export type StockOperationScope = StockHistoryScope & { origin: string; search: string };
+
 function unique(values: string[]) {
   return new Set(values).size === values.length;
 }
@@ -94,5 +118,20 @@ export function parseStockHistory(value: unknown, expected: StockHistoryScope): 
     || result.data.length !== count || !unique(result.data.map(row => row.id))) {
     throw new Error("A resposta recebida não corresponde à consulta do histórico. Atualize o histórico novamente.");
   }
+  return result;
+}
+
+export function parseStockOperationHistory(value: unknown, expected: StockOperationScope) {
+  const parsed = operationsRead.safeParse(value);
+  if (!parsed.success) throw new Error("A resposta do histórico de operações não pôde ser conferida.");
+  const result = parsed.data;
+  const count = Math.min(result.pageSize, Math.max(0, result.total - (result.page - 1) * result.pageSize));
+  if (result.careRecipientId !== expected.careRecipientId || result.page !== expected.page || result.pageSize !== expected.pageSize
+    || Object.entries(result.filters).some(([key, field]) => field !== (expected[key as keyof StockOperationScope] || null))
+    || result.data.length !== count || !unique(result.data.map(group => group.id))
+    || !unique(result.data.flatMap(group => group.rows.map(row => row.id)))
+    || result.data.some(group => (expected.origin && expected.origin !== group.origin) || group.rows.some(row =>
+      (expected.location && expected.location !== row.custody) || (expected.productId && expected.productId !== row.product_id))))
+    throw new Error("A resposta recebida não corresponde à consulta do histórico de operações.");
   return result;
 }

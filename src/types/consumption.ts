@@ -9,7 +9,8 @@ export type ConsumptionSummary = {
   care_recipient_id: string;
   kind: "consumption" | "shortage";
   location: "FAMILY" | "CARE_TEAM";
-  status: "reported" | "confirmed" | "rejected";
+  status: "reported" | "confirmed" | "rejected" | "recorded" | "cancelled" | "communicated";
+  workflow_mode?: "legacy" | "direct" | "shortage";
   body: string;
   created_at: string;
   version: number;
@@ -44,9 +45,18 @@ export type ConsumptionReport = ConsumptionSummary & {
     id: string;
     productId: string;
     quantity: string;
-    source: string;
+    source: string | null;
     destination: string | null;
     createdAt: string;
+  }[];
+  acts?: {
+    id: string;
+    action: "issue" | "correct" | "cancel" | "shortage";
+    version: number;
+    by: string | null;
+    at: string;
+    reason: string | null;
+    repeatedReportId: string | null;
   }[];
   replayed?: boolean;
 };

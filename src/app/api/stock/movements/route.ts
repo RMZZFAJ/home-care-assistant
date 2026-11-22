@@ -11,6 +11,7 @@ import {
   saoPauloDateBoundary,
 } from "@/lib/server/api";
 import { familyStockMovementSchema } from "@/lib/validation/stock";
+import { parseStockOperationHistory, stockOperationFilter } from "@/lib/validation/stock-reads";
 export async function GET(request: Request) {
   return api("stock.list", async () => {
     const auth = await authenticate();
@@ -21,15 +22,36 @@ export async function GET(request: Request) {
     const to = params.get("to");
     if (from && to && from > to)
       throw new ApiError("INVALID_DATE", "Período inválido.");
-    const history = (await rpc(auth.client, "stock_history", {
+    const scope = {
+      careRecipientId: patient.id, page, pageSize,
+      productId: params.get("productId") || "",
+      location: params.get("location") || "",
+      from: from || "", to: to || "",
+    };
+    const args = {
       p_patient: patient.id,
-      p_product: params.get("productId") || null,
+      p_product: scope.productId || null,
       p_from: from ? saoPauloDateBoundary(from) : null,
       p_to: to ? saoPauloDateBoundary(to, true) : null,
-      p_location: params.get("location") || null,
+      p_location: scope.location || null,
       p_page: page,
       p_size: pageSize,
-    })) as { data: unknown[]; total: number };
+    };
+    if (params.get("view") === "operations") {
+      const origin = params.get("origin") ?? "";
+      const search = (params.get("search") ?? "").trim();
+      if (origin && !stockOperationFilter.safeParse(origin).success || search.length > 160)
+        throw new ApiError("VALIDATION_ERROR", "Confira os filtros de origem e busca.");
+      const history = await rpc(auth.client, "stock_operation_history", {
+        ...args, p_origin: origin || null, p_search: search || null,
+      }) as { data: unknown[]; total: number };
+      const response = {
+        ...history, careRecipientId: patient.id, page, pageSize,
+        filters: { productId: args.p_product, location: args.p_location, from: from || null, to: to || null, origin: origin || null, search: search || null },
+      };
+      return NextResponse.json(parseStockOperationHistory(response, { ...scope, origin, search }), { headers: { "cache-control": "private, no-store" } });
+    }
+    const history = (await rpc(auth.client, "stock_history", args)) as { data: unknown[]; total: number };
     const balances = await auth.client
       .from("current_stock_balances")
       .select("product_id,location,balance")

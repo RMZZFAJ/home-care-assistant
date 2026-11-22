@@ -1,6 +1,6 @@
 "use client";
 import { ActionButton } from "@/components/ui/controls";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -17,10 +17,14 @@ import { formatBrazilDate } from "@/lib/receipt";
 import type { CatalogProduct } from "@/types/documents";
 import type { ConsumptionSummary } from "@/types/consumption";
 import { ConsumptionEditor } from "./consumption-editor";
+import { TeamConsumptionWizard } from "./team-consumption-wizard";
+import { TeamConsumptionAction } from "./team-consumption-action";
 import { ConsumptionRecord } from "./consumption-record";
 import { ConsumptionDetail } from "./consumption-detail";
 import { FlowReviews } from "./flow-reviews";
 import { parseConsumptionListRead } from "@/lib/validation/consumption";
+import { parseStockBalances } from "@/lib/validation/stock-reads";
+import { useScopedRead } from "@/lib/use-scoped-read";
 import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
 import {
   NotificationReference,
@@ -30,7 +34,7 @@ import {
 type Cursor = { at: string; id: string };
 export function ConsumptionConsole() {
   return (
-    <Workspace title="Faltas e consumo extraordinário">
+    <Workspace title="Consumo e faltas">
       {(context) =>
         context.patient ? (
           <Reports key={context.patient.id} context={context} />
@@ -90,6 +94,18 @@ function Reports({ context }: { context: WorkspaceContext }) {
     [message, setMessage] = useState(""),
     [referenceError, setReferenceError] = useState("");
   const [editorOrigin, setEditorOrigin] = useState<ReminderOrigin | null>(null);
+  const [teamEditor, setTeamEditor] = useState<HTMLElement | null>(null);
+  const [shortage, setShortage] = useState<HTMLElement | null>(null);
+  const mayRecordTeam = can(context, "consumption.team.write") && context.patient?.is_active !== false;
+  const decodeTeamStock = useCallback(
+    (raw: unknown) => parseStockBalances(raw, { careRecipientId: patient, custody: "CARE_TEAM" }),
+    [patient],
+  );
+  const stock = useScopedRead(
+    mayRecordTeam ? `/api/stock/balances?careRecipientId=${patient}&custody=CARE_TEAM` : null,
+    `${live}:${attempt}`,
+    decodeTeamStock,
+  );
   const listHeadingRef = useRef<HTMLHeadingElement>(null),
     triggerRef = useRef<HTMLElement | null>(null),
     generationRef = useRef(0),
@@ -255,12 +271,18 @@ function Reports({ context }: { context: WorkspaceContext }) {
         context={context}
         onReport={(origin, opener) => {
           setEditorOrigin(origin);
-          setEditor(opener);
+          if (mayRecordTeam) setTeamEditor(opener);
+          else setEditor(opener);
         }}
       />
       {message ? <Notice>{message}</Notice> : null}
       <div className="hca-toolbar">
-        {can(context, "consumption.report") ? (
+        {mayRecordTeam ? <ActionButton variant="primary" onClick={event => {
+          setEditorOrigin(null);
+          setTeamEditor(event.currentTarget);
+        }}>Registrar consumo</ActionButton> : null}
+        {mayRecordTeam ? <ActionButton onClick={event => setShortage(event.currentTarget)}>Avisar falta</ActionButton> : null}
+        {!mayRecordTeam && can(context, "consumption.report") ? (
           <ActionButton
             variant="primary"
             onClick={(event) => {
@@ -326,6 +348,9 @@ function Reports({ context }: { context: WorkspaceContext }) {
               <option value="reported">Aguardando conferência</option>
               <option value="confirmed">Confirmado</option>
               <option value="rejected">Rejeitado</option>
+              <option value="recorded">Registrado</option>
+              <option value="cancelled">Cancelado</option>
+              <option value="communicated">Comunicado à família</option>
             </select>
           </label>
           <label className="block text-sm">
@@ -420,6 +445,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           catalogLoading={catalogLoading}
           onCatalogRetry={catalogRetry}
           onChange={() => setAttempt((value) => value + 1)}
+          onOpenRecord={open}
           onClose={() => {
             open(null);
             requestAnimationFrame(() => {
@@ -450,6 +476,26 @@ function Reports({ context }: { context: WorkspaceContext }) {
           }}
         />
       ) : null}
+      {teamEditor && mayRecordTeam ? <TeamConsumptionWizard context={context} products={products}
+        balances={new Map((stock.data?.overview ?? []).flatMap(item => item.team ? [[item.productId, item.team.confirmed] as const] : []))}
+        materialLoading={stock.loading || catalogLoading}
+        materialError={stock.error || catalogError}
+        retryMaterials={() => { stock.refresh(); catalogRetry(); }}
+        opener={teamEditor} sourceReminder={editorOrigin ?? undefined}
+        onClose={() => { setTeamEditor(null); setEditorOrigin(null); }}
+        onSaved={id => {
+          setTeamEditor(null);
+          setEditorOrigin(null);
+          setMessage("Consumo registrado no estoque da equipe.");
+          setAttempt(value => value + 1);
+          open(id);
+        }} /> : null}
+      {shortage && mayRecordTeam ? <TeamConsumptionAction context={context} kind="shortage" products={products}
+        opener={shortage} onClose={() => setShortage(null)} onSaved={id => {
+          setShortage(null);
+          setAttempt(value => value + 1);
+          open(id);
+        }} /> : null}
       <FlowReviews
         key={context.userId}
         context={context}

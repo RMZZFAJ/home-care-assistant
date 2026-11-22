@@ -1759,8 +1759,16 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | Migration de L3 | Local | Remoto |
 | --- | --- | --- |
 | `20261122180206_l3_document_attachment_attempts` | Aplicada | Pendente |
+| `20261122181454_l3_family_stock_operations` | Aplicada | Pendente |
+| `20261122183711_l3_stock_operation_history` | Aplicada | Pendente |
+| `20261122184410_l3_stock_document_act_links` | Aplicada | Pendente |
+| `20261122184629_l3_stock_custody_overview` | Aplicada | Pendente |
+| `20261122185603_l3_team_consumption` | Aplicada | Pendente |
+| `20261122191150_l3_team_consumption_review` | Aplicada | Pendente |
+| `20261122191908_l3_consumption_shortage_notices` | Aplicada | Pendente |
+| `20261122193611_l3_consumption_progress_subjects` | Aplicada | Pendente |
 
-Local em 321 versões, após aplicação sem reset. Remoto em 320 versões, com
+Local em 329 versões, após aplicação sem reset. Remoto em 320 versões, com
 `20261121202419` como a última aplicada.
 
 L4 aguarda definição.
@@ -2093,8 +2101,14 @@ O efeito no gate exige uma nova análise da PR.
 A v4 governa 35 cenários de E07, E08 e E09. A ordem e o laboratório foram
 preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
 
-- **E07 — Estoque e consumo.** Pendente. Inclui movimentos agrupados por ato,
-  movimentação familiar multimaterial e consumo da equipe com baixa direta.
+- **E07 — Estoque e consumo.** Em execução. A movimentação familiar
+  multimaterial, o histórico geral por ato e os cartões de saldo por
+  custódia têm implementação local. O banco local já registra
+  consumo direto, correção, cancelamento e reiteração de avisos. As ações
+  e o wizard já chamam a API do novo contrato no checkout local.
+  Os Andamentos de consumo e falta usam as abas e a publicação compartilhadas
+  das fichas. Restam a integração do histórico ao painel de material,
+  a continuidade pelo canal existente e a conferência visual final.
 - **E08 — Plantões e balanços.** Pendente. Inclui configuração de horários
   por residência e admissão de contagem que sobrevive ao término do plantão.
 - **E09 — Arquivos e verificação.** Em execução. A consulta pública exibe
@@ -2104,6 +2118,63 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   preserva a consulta do registro e a comparação de bytes já concluídas.
   A retentativa da anexação permanece no modal. Ainda faltam a atualização
   do acervo e verificações dos outros estados.
+
+### Movimentação familiar e histórico geral
+
+- Entrada, retirada e correção usam revisão e uma transação única. A
+  correção mantém o vínculo ao lançamento original. A revisão compara
+  as referências por material. Só uma tentativa já submetida pode ser
+  recuperada, pela chave original.
+- O histórico pagina por ato e permite consultar o efeito granular na
+  custódia autorizada. A expedição e o recebimento da mesma ENT são atos
+  diferentes. Os novos atos usam uma associação explícita por comando.
+  Lançamentos antigos sem vínculo conclusivo continuam individuais.
+- Cinco integrações com Auth e banco locais passaram. Elas cobrem
+  gravação e retentativa multimaterial, reversão integral por saldo
+  insuficiente, concorrência, filtros e paginação, restrição por custódia
+  e separação de expedição e recebimento da mesma ficha. Confirmaram também
+  os instantes próprios de cada custódia, a chegada COM pendente de
+  validação e o saldo que só aumenta após a validação.
+- Nove casos Chromium passaram no recorte inicial, incluindo criação de
+  um ato multimaterial, saldos na consulta granular, recuperação de
+  consulta, acesso restrito, paginação e validação defensiva de payload.
+
+### Contrato de consumo da equipe
+
+- A migration local diferencia consumo direto, aviso de falta e os
+  relatos legados. Cada baixa, correção ou compensação tem seu próprio
+  ato e pode ser consultada por chave. O aviso é reiterável e não gera
+  movimentação de estoque.
+- Três testes de integração com Auth real passaram. Verificaram a baixa
+  imediata, a correção pela diferença, a compensação única, o histórico
+  granular, a leitura da família, o encaminhamento interno ao familiar
+  autorizado, saldo insuficiente e concorrência de duas correções da mesma
+  versão. A revisão antiga foi recusada preservando o rascunho, e a revisão
+  atualizada encerrou exatamente o rascunho confirmado.
+- O wizard de cinco etapas usa o slot privado do consumo da equipe para
+  o último preenchimento e guarda a tentativa oficial separadamente.
+  Correção, cancelamento e aviso de falta usam operações curtas, com
+  consulta por chave em caso de resposta incerta. As métricas somam os
+  registros diretos vigentes no período e os fatos legados.
+- Os Andamentos combinam atos oficiais e comentários manuais. A publicação
+  usa as mesmas regras de autoria, audiência familiar, menção individual,
+  rascunho, concorrência e recuperação das fichas. A referência aponta para
+  o registro pelo identificador integral e abre a aba do andamento quando
+  há um comentário específico.
+- Passaram 24 testes de integração dirigidos, incluindo os contratos de
+  Andamentos anteriores. A nova jornada cobre referências entre falta,
+  consumo e REQ, perda de acesso, visibilidade familiar com menção e
+  recuperação do envio sem alteração do estoque.
+- O build de produção local concluiu. Após corrigir o seletor do campo
+  obrigatório de Andamentos, a jornada passou em Chromium, Android e iOS
+  emulados em uma rodada diagnóstica sem repetição.
+
+O Preview e produção consultam o mesmo Supabase. O `master` publicado
+valida a lista de consumo contra três estados. A criação de registros
+com os estados novos depende de um contrato de leitura compatível entre
+os dois deploys. O dry-run identificou somente as nove migrations de L3.
+A primeira captura de resguardo encontrou mudanças em três tabelas de
+operações durante a cópia e foi colocada em quarentena pelo verificador.
 
 ### Verificação pública
 

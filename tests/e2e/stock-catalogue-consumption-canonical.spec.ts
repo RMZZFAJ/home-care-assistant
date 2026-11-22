@@ -9,6 +9,7 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { auditFromTop } from "./accessibility-audit";
+import { stockMovement } from "./stock-operation";
 
 test.setTimeout(180_000);
 const widths = [320,390,768,1024,1440];
@@ -38,7 +39,7 @@ async function capture(node: Locator, file: string) {
   mkdirSync("output/playwright/phase-d",{recursive:true});await node.screenshot({path:`output/playwright/phase-d/${file}.png`,animations:"disabled"});
 }
 
-test("06.4 stock transit and movement cards retain four factual quantities and distinguish current catalogue from preserved origin", async ({page,browser},info) => {
+test("06.4 stock transit and movement cards retain four factual quantities and distinguish current catalogue from preserved origin", async ({page},info) => {
   const originalName="Material histórico "+"com nome preservado ".repeat(5)+randomUUID().slice(0,8),currentName="Nome atual do cadastro "+randomUUID().slice(0,8);
   const f=await setup({catalogue:catalogue(originalName)});
   const doc=await rpc(f.admin,"create_supply_document",{p_patient:f.patient,p_type:"ENT",p_key:randomUUID(),p_draft:false,p_payload:{source:"FAMILY",destination:"CARE_TEAM",recipientId:fixtures.professional.id,recipientReason:"Escolha pessoal fictícia para conferir trânsito",lines:[{productId:f.products[0],quantity:"5"}]}});
@@ -47,19 +48,17 @@ test("06.4 stock transit and movement cards retain four factual quantities and d
   await page.goto(`/estoque?careRecipientId=${f.patient}&custody=TRANSIT`);
   const transit=page.locator(".hca-transit-stock"),line=transit.locator(".hca-transit-material");await expect(line).toContainText(originalName);
   for(const [label,value] of [["Expedido","5 unidade"],["Aceito no destino","0 unidade"],["Conciliado","0 unidade"],["Aguardando conferência","5 unidade"]])await expect(line.locator(".hca-definition-grid > div").filter({has:page.getByText(label,{exact:true})}).locator("dd")).toHaveText(value);
-  const ref=await model(browser,"estoque/movimentos");
-  try {
     for(const width of widths){await page.setViewportSize({width,height:1100});await auditFromTop(page,"canonical transit "+width);}
     await page.goto(`/estoque?careRecipientId=${f.patient}&custody=FAMILY`);
-    const table=page.getByRole("table",{name:"Movimentos do estoque",exact:true});await expect(table.locator("tbody tr")).toHaveCount(2);
-    await expect(table).toContainText(currentName);await expect(page.getByText(/Nomes e unidades desta lista identificam o cadastro atual/)).toBeVisible();
-    for(const width of widths){await page.setViewportSize({width,height:1100});await ref.page.setViewportSize({width,height:1100});await tableParity(table,ref.page,width);await auditFromTop(page,"canonical movement history "+width);if(width===320)await capture(table.locator("tbody tr").first(),"stock-movement-"+info.project.name);}
-    await page.emulateMedia({forcedColors:"active",reducedMotion:"reduce"});await auditFromTop(page,"stock history forced colors");await page.emulateMedia({forcedColors:"none",reducedMotion:"no-preference"});
+    await expect(page.locator("[data-stock-act]")).toHaveCount(2);
     const movement=sql(`select id::text from public.stock_movements where care_recipient_id=${q(f.patient)} and reference_id=${q(doc.id)} order by id limit 1;`);
-    await table.locator(`[data-movement-id="${movement}"]`).getByRole("button",{name:"Consultar origem",exact:true}).click();
+    const row = await stockMovement(page, movement);
+    await expect(row).toContainText(currentName);
+    for(const width of widths){await page.setViewportSize({width,height:1100});await auditFromTop(page,"canonical movement history "+width);if(width===320)await capture(row,"stock-movement-"+info.project.name);}
+    await page.emulateMedia({forcedColors:"active",reducedMotion:"reduce"});await auditFromTop(page,"stock history forced colors");await page.emulateMedia({forcedColors:"none",reducedMotion:"no-preference"});
+    await row.getByRole("button",{name:/^Consultar origem ·/}).click();
     const drawer=page.getByRole("dialog",{name:"Origem da movimentação",exact:true});await expect(drawer.getByRole("region",{name:"Material na ficha de origem",exact:true})).toContainText(originalName);
     expect(facts(f.patient)).toBe(before);expect(sent).toEqual([]);
-  }finally{await ref.context.close();}
 });
 
 test("06.4 catalogue units and presentations retain aliases,precision,leading zero and conversion across canonical table cards", async ({page,browser},info) => {

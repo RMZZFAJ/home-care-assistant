@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     let query = auth.client
       .from("consumption_reports")
       .select(
-        "id,care_recipient_id,kind,location,status,body,created_at,version,reported_by,reported_name",
+        "id,care_recipient_id,kind,location,status,body,created_at,version,reported_by,reported_name,workflow_mode",
       )
       .eq("care_recipient_id", patient.id)
       .order("created_at", { ascending: false })

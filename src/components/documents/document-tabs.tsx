@@ -99,16 +99,18 @@ export function DocumentTabs({
   auditAllowed,
   children,
   rootRef,
+  sections,
 }: {
-  type: DocumentType;
+  type?: DocumentType;
   value: DocumentTab;
   onSelect: (value: DocumentTab) => void;
   auditAllowed: boolean;
   children: ReactNode;
   rootRef?: Ref<HTMLDivElement>;
+  sections?: readonly DocumentTab[];
 }) {
   const tabs = [
-    ...baseTabs,
+    ...baseTabs.filter(tab => !sections || sections.includes(tab.id)),
     ...(auditAllowed
       ? [{ id: "audit" as const, label: "Auditoria", icon: "history" as const }]
       : []),
@@ -136,7 +138,7 @@ export function DocumentTabs({
           </Tabs.Tab>
         ))}
       </Tabs.List>
-      <div hidden={value !== "history"} className="hca-document-technical-nav"><Tabs.List aria-label="Consulta técnica da ficha"><Tabs.Tab value="history" className="hca-document-tab">Identificação e registros preservados</Tabs.Tab></Tabs.List><button type="button" className="ui-button" onClick={() => onSelect("overview")}>Voltar à ficha</button></div>
+      {!sections ? <div hidden={value !== "history"} className="hca-document-technical-nav"><Tabs.List aria-label="Consulta técnica da ficha"><Tabs.Tab value="history" className="hca-document-tab">Identificação e registros preservados</Tabs.Tab></Tabs.List><button type="button" className="ui-button" onClick={() => onSelect("overview")}>Voltar à ficha</button></div> : null}
       {children}
     </Tabs.Root>
   );

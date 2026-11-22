@@ -1,4 +1,5 @@
 import { startFocusProbe, attachFocusProbe } from "./focus-diagnostics";
+import { stockMovement } from "./stock-operation";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -90,12 +91,9 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
     } else await route.continue();
   });
   // Select by the immutable movement identity without guessing a receipt as a document.
-  const row = history
-    .locator("tbody tr[data-movement-id]")
-    .filter({ has: page.getByText(receiptMovement.id, { exact: true }) });
+  const row = await stockMovement(page, receiptMovement.id);
   const opener = row.getByRole("button", {
-    name: "Consultar origem",
-    exact: true,
+    name: /^Consultar origem ·/,
   });
   await opener.click();
   await expect(
@@ -176,11 +174,9 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
       expect(origin.document.id).toBe(target);
       expect(origin.document.type).toBe(kind === "bal" ? "BAL" : "ENT");
     }
-    const item = history
-      .locator("tbody tr[data-movement-id]")
-      .filter({ has: page.getByText(movement.id, { exact: true }) });
+    const item = await stockMovement(page, movement.id);
     await item
-      .getByRole("button", { name: "Consultar origem", exact: true })
+      .getByRole("button", { name: /^Consultar origem ·/ })
       .click();
     await expect(
       drawer(page).getByRole("region", {
@@ -199,11 +195,9 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
   await history
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();
-  const compensation = history
-    .locator("tbody tr[data-movement-id]")
-    .filter({ has: page.getByText(f.compensationId, { exact: true }) });
+  const compensation = await stockMovement(page, f.compensationId);
   await compensation
-    .getByRole("button", { name: "Consultar origem", exact: true })
+    .getByRole("button", { name: /^Consultar origem ·/ })
     .click();
   await expect(
     drawer(page).getByRole("heading", {

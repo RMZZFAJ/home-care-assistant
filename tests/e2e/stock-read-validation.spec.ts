@@ -47,7 +47,7 @@ test("stock rejects malformed balances and transit, preserves the last verified 
   });
   await page.goto(`/estoque?careRecipientId=${f.patient}&custody=FAMILY`);
   const balances = region(page, "Saldos e previsões");
-  const row = balances.getByRole("row", { name: "Material fictício V4 0 · Família", exact: true });
+  const row = balances.getByRole("region", { name: "Material fictício V4 0 · Família", exact: true });
   await expect(row).toContainText("26");
   for (const invalid of ["incomplete", "number", "patient", "custody"] as const) {
     mode = invalid;
@@ -55,7 +55,7 @@ test("stock rejects malformed balances and transit, preserves the last verified 
     await expect(balances.getByRole("alert")).toContainText("resposta");
     await expect(balances.getByText("Última consulta válida", { exact: false })).toBeVisible();
     await expect(row).toContainText("26");
-    await expect(balances.getByText("Nenhum produto encontrado", { exact: true })).toHaveCount(0);
+    await expect(balances.getByText("Nenhum material encontrado", { exact: true })).toHaveCount(0);
   }
   mode = "live";
   await balances.getByRole("button", { name: "Atualizar saldos", exact: true }).click();
@@ -91,7 +91,7 @@ test("stock history refuses incomplete totals and foreign page or filter respons
     const body = await response.json();
     if (mode === "incomplete") return route.fulfill({ response, json: { data: [] } });
     if (mode === "count") body.total = 0;
-    if (mode === "number") body.data[0].quantity = "Infinity";
+    if (mode === "number") body.data[0].rows[0].quantity = "Infinity";
     if (mode === "page") body.page = 1;
     if (mode === "filter") body.filters.productId = null;
     return route.fulfill({ response, json: body });
@@ -100,32 +100,32 @@ test("stock history refuses incomplete totals and foreign page or filter respons
   const history = region(page, "Histórico auditável"), balances = region(page, "Saldos e previsões");
   await expect(history.getByRole("alert")).toContainText("resposta");
   await expect(history.getByText("Sem movimentações neste filtro", { exact: true })).toHaveCount(0);
-  await expect(balances.getByRole("row", { name: "Material fictício V4 0 · Família", exact: true })).toContainText("51");
+  await expect(balances.getByRole("region", { name: "Material fictício V4 0 · Família", exact: true })).toContainText("51");
   mode = "live";
   await history.getByRole("button", { name: "Atualizar histórico", exact: true }).click();
-  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(20);
+  await expect(history.locator("[data-stock-act]")).toHaveCount(20);
   for (const invalid of ["count", "number"] as const) {
     mode = invalid;
     await history.getByRole("button", { name: "Atualizar histórico", exact: true }).click();
     await expect(history.getByRole("alert")).toContainText("resposta");
-    await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(20);
+    await expect(history.locator("[data-stock-act]")).toHaveCount(20);
   }
   mode = "page";
   await history.getByRole("navigation", { name: "Páginas das movimentações", exact: true }).getByRole("button", { name: "Próxima", exact: true }).click();
   await expect(history.getByRole("alert")).toContainText("resposta");
-  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(0);
+  await expect(history.locator("[data-stock-act]")).toHaveCount(0);
   mode = "live";
   await history.getByRole("button", { name: "Atualizar histórico", exact: true }).click();
-  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(3);
+  await expect(history.locator("[data-stock-act]")).toHaveCount(3);
   await history.getByRole("button", { name: "Filtrar", exact: true }).click();
   await history.getByRole("combobox", { name: "Produto", exact: true }).selectOption(f.products[1]);
   mode = "filter";
   await history.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect(history.getByRole("alert")).toContainText("resposta");
-  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(0);
+  await expect(history.locator("[data-stock-act]")).toHaveCount(0);
   mode = "live";
   await history.getByRole("button", { name: "Atualizar histórico", exact: true }).click();
-  await expect(history.locator("tbody tr[data-movement-id]")).toHaveCount(1);
+  await expect(history.locator("[data-stock-act]")).toHaveCount(1);
   await expect(history.getByText("Sem movimentações neste filtro", { exact: true })).toHaveCount(0);
   expect(state(f.patient)).toBe(before);
 });

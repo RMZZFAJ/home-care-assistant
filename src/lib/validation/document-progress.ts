@@ -16,13 +16,19 @@ export const progressStages = {
   receipt: "Recebimento",
   count: "Contagem",
   review: "Revisão",
+  correction: "Correção",
+  communication: "Aviso à família",
 } as const;
 export const stagesByDocument = {
   REQ: ["issuance", "family_science", "fulfillment", "completion"],
   COM: ["issuance", "acquisition", "receipt", "completion"],
   ENT: ["issuance", "dispatch", "receipt", "completion"],
   BAL: ["issuance", "count", "review", "completion"],
+  CON: ["issuance", "correction", "completion"],
+  FAL: ["communication", "completion"],
 } as const;
+export const progressSubjectType = z.enum(["REQ", "COM", "ENT", "BAL", "CON", "FAL"]);
+export type ProgressSubjectType = z.infer<typeof progressSubjectType>;
 const uuid = z.string().uuid();
 const instant = z.string().datetime({ offset: true });
 export const progressFilter = z.enum(["all", "automatic", "manual"]);
@@ -40,6 +46,8 @@ export const progressContent = z
         "receipt",
         "count",
         "review",
+        "correction",
+        "communication",
       ])
       .nullable(),
     text: z
@@ -90,7 +98,7 @@ const manual = z
           .object({
             id: uuid,
             code: z.string().nullable(),
-            type: z.enum(["REQ", "COM", "ENT", "BAL"]),
+            type: progressSubjectType,
             kind: z.enum(["document", "progress"]).optional(),
             documentId: uuid.optional(),
             excerpt: z.string().optional(),
@@ -120,7 +128,7 @@ export const automaticProgressSchema = automatic;
 const page = z
   .object({
     documentId: uuid,
-    documentType: z.enum(["REQ", "COM", "ENT", "BAL"]),
+    documentType: progressSubjectType,
     filter: progressFilter,
     page: z.number().int().positive(),
     size: z.number().int().min(1).max(50),
@@ -143,7 +151,7 @@ const outcome = z
 export const progressReferenceRow = z.object({
   id: uuid,
   code: z.string().nullable(),
-  type: z.enum(["REQ", "COM", "ENT", "BAL"]),
+  type: progressSubjectType,
   kind: z.enum(["document", "progress"]).optional(),
   documentId: uuid.optional(),
   excerpt: z.string().optional(),

@@ -2,6 +2,9 @@
 import { PurchaseArrivalReview, type OpenUnlinkedArrival } from "@/components/documents/purchase-arrival-review";
 import { UnlinkedArrivalAction, UnlinkedArrivalHistory } from "@/components/documents/unlinked-arrival";
 import { FamilyStockPreparation } from "./family-stock-preparation";
+import { FamilyStockOperation } from "./family-stock-operation";
+import type { StockOperationInput } from "@/lib/validation/stock-operation";
+import type { CatalogProduct } from "@/types/documents";
 import {
   ActionButton,
   FormField,
@@ -27,11 +30,11 @@ import { EmptyState, Icon } from "@/components/ui/primitives";
 import { TransitStock } from "./transit-stock";
 import { formatBrazilDate } from "@/lib/receipt";
 
-import { parseStockBalances, parseStockHistory } from "@/lib/validation/stock-reads";
+import { parseStockBalances, parseStockOperationHistory } from "@/lib/validation/stock-reads";
 import { StockOverview } from "./stock-overview";
 
 import { useScopedRead } from "@/lib/use-scoped-read";
-import { StockMovementHistory } from "./stock-movement-history";
+import { StockMovementHistory, stockOperationOrigins } from "./stock-movement-history";
 import { MovementOrigin } from "./movement-origin";
 import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
 import { NotificationReference } from "@/components/notifications/notification-reference";
@@ -69,17 +72,19 @@ function PatientStock({
   const [balanceFilter, setBalanceFilter] = useState<StockBalanceFilter>("all");
   const [custody, setCustody] = useState(initialCustody);
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({ productId: "", from: "", to: "" });
+  const [filters, setFilters] = useState({ productId: "", from: "", to: "", origin: "", search: "" });
   const [filterFields, setFilterFields] = useState(filters);
   const changeFilter = (field: keyof typeof filters, value: string) =>
     setFilterFields(current => ({ ...current, [field]: value }));
-  const [operation, setOperation] = useState("inbound");
+  const [operation, setOperation] = useState<StockOperationInput["action"]>("inbound");
   const [movementEditor, setMovementEditor] = useState<HTMLElement | null>(
     null,
   );
   const [movementProductId, setMovementProductId] = useState("");
   const [referenceId, setReferenceId] = useState("");
+  const [legacyEditor, setLegacyEditor] = useState(false);
   const [savedMovement, setSavedMovement] = useState<string | null>(null);
+  const [savedMovementIds, setSavedMovementIds] = useState<string[]>([]);
   const [origin, setOrigin] = useState<{
     id: string;
     opener: HTMLElement;
@@ -88,6 +93,8 @@ function PatientStock({
   const arrivalReviewRef = useRef<OpenUnlinkedArrival>(null);
   const hasStock =
     can(context, "stock.family.read") || can(context, "stock.team.read");
+  const hasFamily = can(context, "stock.family.read");
+  const canMoveFamily = can(context, "stock.family.manage");
   const patient = context.patient!.id;
   const params = useSearchParams(),
     notice = useNotificationReference(
@@ -98,7 +105,7 @@ function PatientStock({
     );
   const revision = `${attempt}:${liveRevision}`;
   const decodeBalances = useCallback((value: unknown) => parseStockBalances(value, { careRecipientId: patient, custody }), [patient, custody]);
-  const decodeHistory = useCallback((value: unknown) => parseStockHistory(value, {
+  const decodeHistory = useCallback((value: unknown) => parseStockOperationHistory(value, {
     careRecipientId: patient, page, pageSize: 20, location: custody, ...filters,
   }), [patient, page, custody, filters]);
   const stock = useScopedRead(
@@ -114,6 +121,7 @@ function PatientStock({
       ? "/api/stock/movements?" +
           new URLSearchParams({
             careRecipientId: patient,
+            view: "operations",
             page: String(page),
             location: custody,
             ...filters,
@@ -123,16 +131,23 @@ function PatientStock({
     decodeHistory,
   );
   const products = stock.data?.overview ?? [];
-  const movements = history.data?.data ?? [];
+  const operations = history.data?.data ?? [];
+  const movements = operations.flatMap(operation => operation.rows);
   const total = history.data?.total ?? 0;
-  const hasFamily = can(context, "stock.family.read");
+  const legacy = useScopedRead<{ data: { id: string } | null }>(hasFamily || canMoveFamily
+    ? "/api/stock/preparations?" + new URLSearchParams({ careRecipientId: patient, targetResourceId: patient, purpose: "family_movement" })
+    : null, revision);
+  const catalogue = useScopedRead<{ data: CatalogProduct[] }>(canMoveFamily && !hasStock
+    ? "/api/catalog?" + new URLSearchParams({ careRecipientId: patient, includeInactive: "true" })
+    : null, revision);
+  const movementProducts = hasStock ? products : (catalogue.data?.data ?? []).map(item => ({
+    productId: item.id, name: item.name, unit: item.unit, active: item.active !== false,
+  }));
   const showFamilyArrivals = hasFamily && custody !== "CARE_TEAM" && custody !== "TRANSIT";
   const hasTeam = can(context, "stock.team.read");
-  const visible = products.filter((product) =>
-    product.name
-      .toLocaleLowerCase("pt-BR")
-      .includes(search.toLocaleLowerCase("pt-BR")),
-  );
+  const wantedMaterial = search.trim().toLocaleLowerCase("pt-BR");
+  const visible = products.filter(product => [product.name, product.productId].some(value =>
+    value.toLocaleLowerCase("pt-BR").includes(wantedMaterial)));
   return (
     <div className="hca-stock-console space-y-5">
       <NotificationReference
@@ -157,6 +172,7 @@ function PatientStock({
         <MovementOrigin
           patientId={patient}
           movementId={origin.id}
+          effect={movements.find(row => row.id === origin.id)}
           opener={origin.opener}
           onClose={() => setOrigin(null)}
           restoreFocusFallbackRef={historyHeadingRef}
@@ -239,14 +255,13 @@ function PatientStock({
                 <option value="all">Todos os saldos</option>
                 <option value="low">No mínimo ou abaixo</option>
                 <option value="zero">Saldo zero</option>
+                <option value="undefined">Sem mínimo definido</option>
               </SelectField>
             </FormField>
           ) : null}
         </div>
         <p className="mt-4 text-xs leading-5 text-(--muted)">
-          Saldo confirmado está disponível na custódia. Trânsito e compras
-          pendentes são previsões e dependem de recebimento válido. Somente a
-          ENT aceita atende as linhas REQ.
+          Trânsito, compras e chegadas aguardando validação aparecem em separado.
         </p>
         {custody === "TRANSIT" && stock.data ? (
           <TransitStock
@@ -267,6 +282,8 @@ function PatientStock({
               ...(hasTeam ? ["CARE_TEAM"] : []),
             ]}
             metrics={stock.data.metrics}
+            queriedAt={stock.queriedAt}
+            onTransit={product => { setSearch(product.name); setCustody("TRANSIT"); setPage(1); }}
             filter={balanceFilter}
             showEmpty={!stock.loading && !stock.error}
           />
@@ -274,12 +291,13 @@ function PatientStock({
       </section>
       {showFamilyArrivals || params.has("arrival") ? <UnlinkedArrivalHistory context={context} revision={revision} arrivalId={params.get("arrival")}
         onReview={(...args) => arrivalReviewRef.current?.(...args)} /> : null}
-      {custody !== "TRANSIT" && can(context, "stock.family.manage") ? (
+      {custody !== "TRANSIT" && canMoveFamily ? (
         <div className="hca-toolbar">
           <ActionButton
             variant="primary"
             onClick={(event) => {
               setOperation("inbound");
+              setLegacyEditor(false);
               setMovementProductId("");
               setReferenceId("");
               setMovementEditor(event.currentTarget);
@@ -290,11 +308,11 @@ function PatientStock({
           </ActionButton>
         </div>
       ) : null}
-      {(hasFamily || can(context, "stock.family.manage")) &&
-      custody !== "TRANSIT" ? (
+      {legacy.data?.data?.id && custody !== "TRANSIT" ? (
         <ActionButton
           onClick={(event) => {
             setOperation("inbound");
+            setLegacyEditor(true);
             setMovementProductId("");
             setReferenceId("");
             setMovementEditor(event.currentTarget);
@@ -303,9 +321,18 @@ function PatientStock({
           Consultar meu preenchimento familiar
         </ActionButton>
       ) : null}
-      {movementEditor &&
-      custody !== "TRANSIT" &&
-      (hasFamily || can(context, "stock.family.manage")) ? (
+      {movementEditor && custody !== "TRANSIT" && canMoveFamily && !legacyEditor ? <FamilyStockOperation
+        context={context} initial={{ action: operation, productId: movementProductId, referenceId }}
+        products={movementProducts} movements={movements} opener={movementEditor} fallbackRef={historyHeadingRef}
+        onClose={() => setMovementEditor(null)}
+        onCommitted={receipt => {
+          setSavedMovementIds(receipt.movementIds);
+          setSavedMovement(receipt.movementIds[0]);
+          setMovementEditor(null);
+          setMessage("Movimentação familiar confirmada. O histórico original foi preservado.");
+          setAttempt(value => value + 1);
+        }} /> : null}
+      {movementEditor && legacyEditor && custody !== "TRANSIT" && (hasFamily || canMoveFamily) ? (
         <FamilyStockPreparation
           context={context}
           initialValues={{
@@ -331,6 +358,7 @@ function PatientStock({
           restoreFocusFallbackRef={historyHeadingRef}
           onClose={() => setMovementEditor(null)}
           onCommitted={(id) => {
+            setSavedMovementIds([id]);
             setSavedMovement(id);
             setMovementEditor(null);
             setMessage(
@@ -340,6 +368,11 @@ function PatientStock({
           }}
         />
       ) : null}
+      {savedMovementIds.length > 1 ? <FormField label="Movimento para anexar comprovante">
+        <SelectField value={savedMovement ?? ""} onChange={event => setSavedMovement(event.currentTarget.value)}>
+          {savedMovementIds.map((id, index) => <option key={id} value={id}>Movimento {index + 1} da operação confirmada</option>)}
+        </SelectField>
+      </FormField> : null}
       {savedMovement ? (
         <Attachments
           patientId={context.patient!.id}
@@ -404,14 +437,20 @@ function PatientStock({
             onSubmit={(event) => {
               event.preventDefault();
               const form = new FormData(event.currentTarget);
-              setFilters({
-                productId: String(form.get("productId")),
-                from: String(form.get("from")),
-                to: String(form.get("to")),
-              });
+              setFilters({ ...filterFields, search: String(form.get("search")).trim() });
               setPage(1);
             }}
           >
+            <FormField label="Buscar no histórico">
+              <TextInput name="search" placeholder="Material, ficha ou movimento" maxLength={160}
+                value={filterFields.search} onChange={event => changeFilter("search", event.currentTarget.value)} />
+            </FormField>
+            <FormField label="Origem">
+              <SelectField name="origin" value={filterFields.origin} onChange={event => changeFilter("origin", event.currentTarget.value)}>
+                <option value="">Todas</option>
+                {Object.entries(stockOperationOrigins).map(([value, entry]) => <option key={value} value={value}>{entry.title}</option>)}
+              </SelectField>
+            </FormField>
             <label className="text-sm">
               Produto
               <select
@@ -451,9 +490,10 @@ function PatientStock({
             <button type="submit" className={primaryClass}>Aplicar filtros</button>
           </form>
         ) : null}
-        <StockMovementHistory movements={movements} products={products} canCorrect={can(context,"stock.family.manage")}
+        <StockMovementHistory operations={operations} canCorrect={can(context,"stock.family.manage")}
           onOrigin={(movement,target) => setOrigin({ id: movement.id, opener: target })}
           onCorrect={(movement,target) => {
+            setLegacyEditor(false);
             setOperation(movement.source_location === "FAMILY" ? "correction_in" : "correction_out");
             setMovementProductId(movement.product_id); setReferenceId(movement.id); setMovementEditor(target);
           }} />
