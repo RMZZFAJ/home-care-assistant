@@ -1767,8 +1767,9 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261122191150_l3_team_consumption_review` | Aplicada | Pendente |
 | `20261122191908_l3_consumption_shortage_notices` | Aplicada | Pendente |
 | `20261122193611_l3_consumption_progress_subjects` | Aplicada | Pendente |
+| `20261122195318_l3_versioned_consumption_reads` | Aplicada | Pendente |
 
-Local em 329 versões, após aplicação sem reset. Remoto em 320 versões, com
+Local em 330 versões, após aplicação sem reset. Remoto em 320 versões, com
 `20261121202419` como a última aplicada.
 
 L4 aguarda definição.
@@ -2170,11 +2171,26 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   emulados em uma rodada diagnóstica sem repetição.
 
 O Preview e produção consultam o mesmo Supabase. O `master` publicado
-valida a lista de consumo contra três estados. A criação de registros
-com os estados novos depende de um contrato de leitura compatível entre
-os dois deploys. O dry-run identificou somente as nove migrations de L3.
-A primeira captura de resguardo encontrou mudanças em três tabelas de
-operações durante a cópia e foi colocada em quarentena pelo verificador.
+valida a lista de consumo contra três estados. A leitura de L3 usa RPCs
+com os novos estados e referências, e a versão publicada recebe os tipos
+que conhece. Passaram 15 integrações dirigidas de consumo e Andamentos,
+incluindo a leitura dos dois contratos sob Auth e revogação de acesso.
+Em Chromium, passaram os dois casos de paginação/filtros e a jornada
+de publicação, correção e cancelamento no candidato com leitura versionada.
+
+O primeiro deploy da PR 8 passou em login, seleção de paciente, fichas,
+saldo da equipe e configuração de Web Push. A consulta de consumo ainda
+exige as migrations no banco remoto. A configuração de verificação do
+Preview desta branch passou a incluir as raízes públicas e as impressões
+do emissor de produção para conferir PDFs do banco compartilhado. A
+aplicação dessa configuração depende do próximo deploy.
+
+A primeira captura de resguardo foi colocada em quarentena por mudanças
+em três tabelas de telemetria. O cron do ciclo operacional falhava por
+ausência dos cursores de REQ, BAL e lembretes legados. Os três registros
+técnicos foram repostos com os defaults das migrations originais e o
+cron voltou a concluir. A nova captura deve ser verificada antes da
+aplicação das migrations de L3.
 
 ### Verificação pública
 

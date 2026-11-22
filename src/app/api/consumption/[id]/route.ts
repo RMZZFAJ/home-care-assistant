@@ -7,7 +7,7 @@ export async function GET(
   return api("consumption.detail", async () => {
     const auth = await authenticate();
     return NextResponse.json({
-      data: await rpc(auth.client, "consumption_report", {
+      data: await rpc(auth.client, "consumption_record_detail", {
         p_id: parseUuid((await context.params).id),
       }),
     });

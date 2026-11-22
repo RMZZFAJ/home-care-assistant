@@ -3,7 +3,6 @@ import {
   api,
   ApiError,
   authenticate,
-  databaseError,
   patientContext,
   readJson,
   rpc,
@@ -42,41 +41,15 @@ export async function GET(request: Request) {
       );
     const auth = await authenticate(),
       patient = await patientContext(auth, params.get("careRecipientId"));
-    let query = auth.client
-      .from("consumption_reports")
-      .select(
-        "id,care_recipient_id,kind,location,status,body,created_at,version,reported_by,reported_name,workflow_mode",
-      )
-      .eq("care_recipient_id", patient.id)
-      .order("created_at", { ascending: false })
-      .order("id", { ascending: false })
-      .limit(21);
-    if (filters.data.kind) query = query.eq("kind", filters.data.kind);
-    if(filters.data.sourceReminder)query=query.eq("source_reminder_id",filters.data.sourceReminder);
-    if (filters.data.status) query = query.eq("status", filters.data.status);
-    if (filters.data.search)
-      query = query.ilike(
-        "body",
-        "%" +
-          filters.data.search.replaceAll("%", "\\%").replaceAll("_", "\\_") +
-          "%",
-      );
-    if (filters.data.from)
-      query = query.gte("created_at", saoPauloDateBoundary(filters.data.from));
-    if (filters.data.to)
-      query = query.lt(
-        "created_at",
-        saoPauloDateBoundary(filters.data.to, true),
-      );
-    if (before?.success)
-      query = query.or(
-        `created_at.lt.${before.data.at},and(created_at.eq.${before.data.at},id.lt.${before.data.id})`,
-      );
-    const result = await query;
-    if (result.error) databaseError(result.error);
-    if (!Array.isArray(result.data)) throw new ApiError("INTERNAL_ERROR", "A consulta dos relatos não pôde ser conferida.", 500);
-    const rows = result.data,
-      data = rows.slice(0, 20),
+    const { kind, status, search, sourceReminder, from, to } = filters.data;
+    const rows = await rpc(auth.client, "consumption_record_list", {
+      p_patient: patient.id, p_kind: kind ?? null, p_status: status ?? null, p_search: search,
+      p_reminder: sourceReminder ?? null, p_from: from ? saoPauloDateBoundary(from) : null,
+      p_until: to ? saoPauloDateBoundary(to, true) : null,
+      p_before_at: before?.data.at ?? null, p_before_id: before?.data.id ?? null,
+    });
+    if (!Array.isArray(rows)) throw new ApiError("INTERNAL_ERROR", "A consulta dos relatos não pôde ser conferida.", 500);
+    const data = rows.slice(0, 20),
       last = data.at(-1);
     const body = {
       data,

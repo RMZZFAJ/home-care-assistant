@@ -17,9 +17,10 @@ export async function GET(request: Request, context: Context) {
       || params.getAll("from").length > 1 || params.getAll("through").length > 1 || !period.success
       || !/^[1-9]\d{0,5}$/.test(selectedPage)) throw new ApiError("VALIDATION_ERROR", "Escolha uma página, um filtro e um período válidos.");
     const auth = await authenticate();
-    const data = period.data.from || period.data.through
-      ? await rpc(auth.client, "document_progress_period", { p_document: parseUuid(id), p_filter: filter.data, p_page: Number(selectedPage), p_size: 20, p_from: period.data.from, p_through: period.data.through })
-      : await rpc(auth.client, "document_progress", { p_document: parseUuid(id), p_filter: filter.data, p_page: Number(selectedPage), p_size: 20 });
+    const data = await rpc(auth.client, "record_progress", {
+      p_document: parseUuid(id), p_filter: filter.data, p_page: Number(selectedPage),
+      p_size: 20, p_from: period.data.from, p_through: period.data.through,
+    });
     return NextResponse.json({ data }, { headers });
   });
 }
@@ -29,7 +30,7 @@ export async function POST(request: Request, context: Context) {
     const { id } = await context.params;
     const input = await readJson(request, publishProgress);
     const auth = await authenticate();
-    const result = await rpc(auth.client, "document_progress_publish", { p_document: parseUuid(id), p_key: input.key, p_body: progressPublicationBody(input) });
+    const result = await rpc(auth.client, "publish_record_progress", { p_document: parseUuid(id), p_key: input.key, p_body: progressPublicationBody(input) });
     return NextResponse.json(result, { headers });
   });
 }

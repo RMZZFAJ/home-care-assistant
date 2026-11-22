@@ -45,7 +45,7 @@ test("team consumption issues directly, corrects by differences, and compensates
   assert.deepEqual(await f.command({ ...issue, lines: [...issue.lines].reverse() }, key), initial);
   assert.deepEqual(await f.quantities(), started.map((row, i) => ({ ...row, team: row.team - [4, 3][i] })));
   assert.deepEqual(await rpc(f.professional, "team_consumption_result", { p_patient: f.patient, p_key: key }), initial);
-  const detail = await rpc(f.admin, "consumption_report", { p_id: initial.id });
+  const detail = await rpc(f.admin, "consumption_record_detail", { p_id: initial.id });
   assert.equal(detail.status, "recorded");
   assert.equal(detail.decision, null);
   assert.equal(detail.movements.length, 2);
@@ -61,7 +61,7 @@ test("team consumption issues directly, corrects by differences, and compensates
   const final = await f.command(cancelled, cancelKey);
   assert.deepEqual(await f.command(cancelled, cancelKey), final);
   assert.deepEqual(await f.quantities(), started);
-  const result = await rpc(f.professional, "consumption_report", { p_id: initial.id });
+  const result = await rpc(f.professional, "consumption_record_detail", { p_id: initial.id });
   assert.equal(result.status, "cancelled");
   assert.deepEqual(result.acts.map(row => row.action), ["issue", "correct", "cancel"]);
   assert.equal(result.movements.length, 6);
@@ -80,7 +80,7 @@ test("shortages can be repeated without ledger writes and failed or stale comman
   const repeat = await f.command({ action: "shortage", repeatedReportId: shortage.id, observation: "A equipe segue aguardando a reposição." });
   assert.notEqual(shortage.id, repeat.id);
   const family = await actor("family", f.patient);
-  const familyRead = await rpc(family, "consumption_report", { p_id: repeat.id });
+  const familyRead = await rpc(family, "consumption_record_detail", { p_id: repeat.id });
   assert.equal(familyRead.status, "communicated");
   assert.equal(familyRead.acts[0].repeatedReportId, shortage.id);
   assert.deepEqual(familyRead.movements, []);
@@ -154,15 +154,15 @@ test("Andamentos link real consumption, shortage and document records without ch
 
   const publication = { relevance: "attention", visibility: "family", mentions: [fixtures.professional.id] };
   const commit = { ...scope, p_id: draft.id, p_expected: draft.revision, p_key: randomUUID(), p_body: { ...note, publication } };
-  const published = await rpc(family, "commit_progress_preparation", commit);
+  const published = await rpc(family, "commit_record_progress_preparation", commit);
   assert.equal(published.receipt.documentType, "FAL");
   assert.equal(published.receipt.nativeResult.note.authorId, fixtures.family.id);
   assert.deepEqual(published.receipt.nativeResult.note.references.map(row => row.type), ["CON", "REQ"]);
-  const recovered = await rpc(family, "progress_preparation_recovery", commit);
+  const recovered = await rpc(family, "recover_record_progress_preparation", commit);
   assert.equal(recovered.status, "applied");
   assert.equal(recovered.confirmation.receipt.resourceId, published.receipt.resourceId);
 
-  await rpc(family, "document_progress_publish", {
+  await rpc(family, "publish_record_progress", {
     p_document: shortage.id, p_key: randomUUID(), p_body: { ...note, text: "Alinhamento familiar privado." },
   });
   const feed = await rpc(f.professional, "document_progress", { p_document: shortage.id });
@@ -171,17 +171,28 @@ test("Andamentos link real consumption, shortage and document records without ch
   assert.equal((await rpc(f.professional, "document_progress_location", {
     p_document: shortage.id, p_note: published.receipt.resourceId,
   })).page, 1);
-  const reference = await rpc(f.professional, "document_progress_references", {
+  const referenceQuery = {
     p_document: requisition.id, p_search: published.receipt.resourceId,
-  });
+    p_page: 1,
+  };
+  const reference = await rpc(f.professional, "record_progress_references", referenceQuery);
   assert.equal(reference.data[0].type, "FAL");
   assert.equal(reference.data[0].documentId, shortage.id);
+  assert.equal((await rpc(f.professional, "document_progress_references", referenceQuery)).total, 0);
+  const legacyReport = await f.admin.from("consumption_reports").select("id,status").eq("care_recipient_id", f.patient);
+  assert.ifError(legacyReport.error);
+  assert.deepEqual(legacyReport.data, []);
+  assert.equal((await f.admin.rpc("consumption_report", { p_id: consumption.id })).error?.code, "42501");
+  const listInput = {
+    p_patient: f.patient, p_kind: "consumption", p_status: "recorded", p_search: "",
+    p_reminder: null, p_from: null, p_until: null, p_before_at: null, p_before_id: null,
+  };
+  assert.deepEqual((await rpc(f.professional, "consumption_record_list", listInput)).map(row => row.id), [consumption.id]);
 
   sql(`insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled)
     values(${q(f.patient)},'stock.team.read',${q(fixtures.professional.id)},false)`);
   assert.equal((await f.professional.rpc("document_progress", { p_document: shortage.id })).error?.code, "42501");
-  assert.equal((await rpc(f.professional, "document_progress_references", {
-    p_document: requisition.id, p_search: published.receipt.resourceId,
-  })).total, 0);
+  assert.equal((await rpc(f.professional, "record_progress_references", referenceQuery)).total, 0);
+  assert.deepEqual(await rpc(f.professional, "consumption_record_list", listInput), []);
   assert.deepEqual(await f.quantities(), stock);
 });
