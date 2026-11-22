@@ -33,7 +33,18 @@ OAuth quando utilizado e serviço de e-mail operacional. Localmente, Mailpit
 captura mensagens sem envio externo. WhatsApp exige configuração explícita;
 ausência de credenciais não pode produzir estado de entrega externo.
 
+O fluxo de login por Google está implementado. Enquanto o cliente OAuth
+aguarda credenciais e habilitação no Supabase Auth, o botão informa que o
+acesso estará disponível em breve. Depois de configurar o cliente Google e
+os retornos autorizados, defina `NEXT_PUBLIC_GOOGLE_SIGN_IN_ENABLED=true` no
+ambiente correspondente e publique um novo build para conferir login e convite.
+
 ## Atualização controlada
+
+Até a entrada oficial em uso, o banco remoto desta instalação é uma base
+de testes descartável. A reinicialização autorizada pelo responsável usa
+os acessos indicados e o catálogo vigente como base. Documentos e chaves
+de ensaios anteriores ficam fora da política de confiança da nova base.
 
 1. Revisar diff, matriz, relatório de segurança e resultados locais.
 2. Confirmar a identidade do CLI, organização e ID do projeto remoto correto.

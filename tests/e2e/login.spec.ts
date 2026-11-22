@@ -13,6 +13,19 @@ test("exibe a tela de login", async ({ page }) => {
   await expect(page.getByLabel("Senha", { exact: true })).toBeVisible();
 });
 
+test("informa que o Google estará disponível em breve sem iniciar OAuth", async ({ page }) => {
+  let authorizationRequests = 0;
+  await page.route("**/auth/v1/authorize?**", async (route) => {
+    authorizationRequests += 1;
+    await route.abort();
+  });
+  await page.goto("/login");
+  await page.getByRole("button", { name: "Continuar com Google", exact: true }).click();
+  await expect(page.getByRole("status", { name: "" }).filter({ hasText: "Em breve, você poderá entrar com sua conta Google." })).toBeVisible();
+  await expect(page).toHaveURL(/\/login$/);
+  expect(authorizationRequests).toBe(0);
+});
+
 test("login apresenta falha de credencial e de rede e permite recuperar a sessão", async ({
   page,
 }) => {

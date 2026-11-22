@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api, buttonClass, inputClass, Notice, primaryClass } from "@/components/workspace";
 import { NewPasswordField } from "@/components/auth/new-password-field";
+import { googleComingSoon, googleSignInEnabled } from "@/lib/auth/google";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -121,7 +122,13 @@ export function AcceptInvitation() {
   }
   async function google() {
     if (busy) return;
-    setBusy(true); setError("");
+    setError("");
+    if (!googleSignInEnabled) {
+      setNotice(googleComingSoon);
+      return;
+    }
+    setNotice("");
+    setBusy(true);
     try {
       const client = createSupabaseBrowserClient();
       if (!client) throw new Error("Serviço de acesso indisponível.");

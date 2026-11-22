@@ -24,6 +24,11 @@ precisa de procedimento operacional verificado.
 
 ## Configuração e ambientes
 
+O gerador aceita `local`, `preview` e `production` como terceiro argumento.
+O padrão continua `local`. Para VAPID, o ambiente é o quarto argumento,
+depois da URI de contato. Cada ambiente recebe uma custódia própria em
+diretório protegido fora do repositório.
+
 HCA_PDF_SIGNING_SECRET contém JSON privado com environment, keyVersion,
 signerP12, signerPassword, timestampP12 e timestampPassword. P12 são base64.
 HCA_PDF_TRUST_POLICY é JSON separado, com environment, revision, roots

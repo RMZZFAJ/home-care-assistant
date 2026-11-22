@@ -5,16 +5,19 @@ import { randomBytes, X509Certificate, createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { trustedExecutable } from "./trusted-executable.mjs";
 
-// Local provisioning only. Never uploads secrets or activates an external service.
-const [targetArg, version] = process.argv.slice(2);
+// Provision files on this machine without uploading them to any environment.
+const [targetArg, version, environment = "local"] = process.argv.slice(2);
+const environments = { local: "Local", preview: "Preview", production: "Production" };
 if (
   !targetArg ||
   !path.isAbsolute(targetArg) ||
-  !/^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$/.test(version ?? "")
+  !/^[A-Za-z0-9][A-Za-z0-9_.-]{0,95}$/.test(version ?? "") ||
+  !Object.hasOwn(environments, environment)
 )
   throw new Error(
-    "Usage: node scripts/create-local-pdf-custody.mjs ABSOLUTE_NEW_DIRECTORY KEY_VERSION",
+    "Usage: node scripts/create-local-pdf-custody.mjs ABSOLUTE_NEW_DIRECTORY KEY_VERSION [local|preview|production]",
   );
+const subject = "Home Care Assistant " + environments[environment] + " Technical ";
 const target = path.resolve(targetArg),
   workspace = await realpath(process.cwd());
 const parent = await realpath(path.dirname(target)),
@@ -68,7 +71,7 @@ run([
   "3650",
   "-sha256",
   "-subj",
-  "/CN=Home Care Assistant Local Technical Root",
+  "/CN=" + subject + "Root",
   "-addext",
   "basicConstraints=critical,CA:TRUE,pathlen:0",
   "-addext",
@@ -95,7 +98,7 @@ for (const [name, eku] of [
     "-out",
     file(name + ".csr"),
     "-subj",
-    "/CN=Home Care Assistant Local Technical " + name,
+    "/CN=" + subject + name,
   ]);
   await save(
     name + ".ext",
@@ -146,7 +149,7 @@ await save(
   "trust.json",
   JSON.stringify(
     {
-      environment: "local",
+      environment,
       revision: version,
       roots: [
         { pem: await readFile(file("root.crt"), "utf8"), trust: "internal" },
@@ -167,7 +170,7 @@ await save(
 await save(
   "runtime-secret.json",
   JSON.stringify({
-    environment: "local",
+    environment,
     keyVersion: version,
     signerP12: (await readFile(file("signer.p12"))).toString("base64"),
     signerPassword: passwords.signer,
@@ -177,7 +180,7 @@ await save(
 );
 console.log(
   JSON.stringify({
-    environment: "local",
+    environment,
     keyVersion: version,
     custodyDirectory: target,
     trustFile: file("trust.json"),

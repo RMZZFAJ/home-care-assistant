@@ -12,6 +12,7 @@ import { safeReturnPath } from "@/lib/safe-return-path";
 import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { AccessFrame } from "./access-frame";
 import { completeEntry, entrySteps } from "@/lib/auth/complete-entry";
+import { googleComingSoon, googleSignInEnabled } from "@/lib/auth/google";
 
 export function LoginForm() {
   const router = useRouter();
@@ -125,9 +126,14 @@ export function LoginForm() {
   }
 
   async function signInWithGoogle() {
+    setError("");
+    if (!googleSignInEnabled) {
+      setNotice(googleComingSoon);
+      return;
+    }
+    setNotice("");
     setStage(null);
     setSubmitting(true);
-    setError("");
     const supabase = createSupabaseBrowserClient();
     if (!supabase) {
       setError("O serviço de acesso está indisponível. Tente novamente em instantes.");
@@ -159,7 +165,7 @@ export function LoginForm() {
       <div className="auth-feedback" ref={feedbackRef} tabIndex={-1}>
         {searchParams.get("error") ? <FeedbackBanner tone="warning" role="alert">Não foi possível concluir a autenticação. O link pode ter expirado. Entre novamente ou solicite outro link.</FeedbackBanner> : null}
         {error ? <FeedbackBanner tone="error" role="alert">{error}</FeedbackBanner> : null}
-        {notice ? <FeedbackBanner tone="success" role="status">{notice}</FeedbackBanner> : null}
+        {notice ? <FeedbackBanner tone={recovery ? "success" : "info"} role="status">{notice}</FeedbackBanner> : null}
       </div><form onSubmit={recovery ? event => { event.preventDefault(); void recoverPassword(); } : submit} className="auth-form hca-access-form">
         <FormField label={"E-mail"} htmlFor={"login-email"}><TextInput id="login-email" name="email" required disabled={!ready || loading} type="email" autoComplete="email" value={email} onChange={event => setEmail(event.currentTarget.value)} /></FormField>
         {!recovery ? <FormField label={"Senha"} htmlFor={"login-password"}><PasswordInput id="login-password" name="password" required disabled={!ready || loading} autoComplete="current-password" value={password} onChange={event => setPassword(event.currentTarget.value)} /></FormField> : null}

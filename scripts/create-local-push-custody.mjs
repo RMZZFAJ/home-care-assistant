@@ -12,8 +12,8 @@ import {
 } from "node:path";
 import { generateVAPIDKeys } from "web-push";
 
-// Local provisioning only: no registration, provider request or environment upload.
-const [directory, version, subject] = process.argv.slice(2);
+// Provision files on this machine without registering them or contacting a provider.
+const [directory, version, subject, environment = "local"] = process.argv.slice(2);
 const external = (path) => {
   const child = relative(process.cwd(), path);
   return isAbsolute(child) || child === ".." || child.startsWith(".." + sep);
@@ -23,7 +23,8 @@ try {
     !directory ||
     !isAbsolute(directory) ||
     !external(resolve(directory)) ||
-    !/^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/.test(version ?? "")
+    !/^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/.test(version ?? "") ||
+    !["local", "preview", "production"].includes(environment)
   )
     throw new Error("Invalid target or version");
   const contact = new URL(subject);
@@ -59,13 +60,13 @@ try {
   if (ec.getPublicKey().toString("base64url") !== pair.publicKey)
     throw new Error("Generated key mismatch");
   const secret = {
-    environment: "local",
+    environment,
     keyVersion: version,
     subject,
     ...pair,
   };
   const publicInfo = {
-    environment: "local",
+    environment,
     keyVersion: version,
     subject,
     publicKey: pair.publicKey,
