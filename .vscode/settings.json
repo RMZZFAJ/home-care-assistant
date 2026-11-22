@@ -1,5 +1,7 @@
 {
     "markdown.validate.enabled": true,
+    "java.server.launchMode": "LightWeight",
+    "java.autobuild.enabled": false,
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
     "python.analysis.exclude": [
         "**/node_modules",
