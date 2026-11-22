@@ -57,9 +57,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   const requestedPatientId = searchParams.get("careRecipientId");
   const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})(?:\/arquivos)?$/.exec(pathname)?.[1];
   const segment = pathname.split("/")[2];
+  const publicVerification = pathname === "/verificar" || pathname.startsWith("/verificar/");
   const publicPage = ["/login", "/recuperar-senha", "/convites/aceitar"].includes(pathname)
     || pathname === "/acesso/continuar"
-    || pathname === "/verificar" || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);
+    || publicVerification || Boolean(segment && demoDocuments[segment]);
   const [data, setData] = useState<ContextData | null>(null);
   const [patientId, setPatientId] = useState("");
   const [loadingRead, setLoadingRead] = useState(true);
@@ -200,7 +201,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   useOperationActivity(!publicPage && !revoked && (loading || selecting), selectionStage === null
     ? issuing ?? { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." }
     : { title: "Mudando de paciente", stage: selectionStage, steps: selectionSteps, detail: "Aguarde a confirmação da operação." });
-  return <Context value={state}>{publicPage ? <>{notices}<div inert={blocked}>{children}</div></>
+  return <Context value={state}>{publicPage ? <>{publicVerification ? null : notices}<div inert={blocked}>{children}</div></>
     : revoked ? <WorkspaceAccessRevoked key={scope} />
     : <WorkspaceShell showOnboarding={pathname === "/"}>{children}</WorkspaceShell>}</Context>;
 }

@@ -1,7 +1,9 @@
 # Execução dos lotes L1 a L4
 
-**Atualizado em 21/11/2026.** Branch `feat/phase-d-implementation`,
-[PR #7 em rascunho](https://github.com/RMZZFAJ/home-care-assistant/pull/7).
+**Atualizado em 22/11/2026.** L3 em execução na branch
+`feat/phase-d-continuation`, avançada a partir de `master` em `fab595c7`.
+A [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7) reúne
+o histórico de L1 e L2.
 Este registro acompanha o que entrou no produto, a comparação com cada
 laboratório e as pendências por lote. As evidências das entregas e a fila
 transversal ficam no [acompanhamento D-B](../../../../TEMP_D_B_ATUALIZACAO.md)
@@ -12,7 +14,7 @@ e nas [matrizes de execução](ACCEPTANCE_EXECUTION.csv) e
 | --- | --- | --- |
 | L1 | Implementado e revisado, com evidência de cenários específicos | [Ordem E01–E03](../../../../HCA_L1_LOTE_CODEX_E01_E03.md), [laboratório v3](../../../../hca-laboratorio-01-v3-final.html) e [comentários v3](../../../../hca-l01-v3-comentarios.json) |
 | L2 | Escopo aprovado implementado, com verificação local dirigida e CI final pendente | [Comando mestre](../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md) e [laboratório v7 aprovado](../../../../hca-laboratorio-02-v7.html) |
-| L3 | Futuro | Ordem e laboratório a registrar quando o lote for definido |
+| L3 | Em execução | [Comando mestre v4](../../../../HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e [laboratório v4 aprovado](../../../../hca-laboratorio-03-v4-aprovado.html) |
 | L4 | Futuro | Ordem e laboratório a registrar quando o lote for definido |
 
 Em cada incremento, registre o commit, os cenários conferidos, o que foi
@@ -2079,6 +2081,41 @@ As regras, a análise do produto e o escopo dos testes permanecem vigentes.
 O efeito no gate exige uma nova análise da PR.
 [Escopo da análise automática](https://docs.sonarsource.com/sonarqube-cloud/appendices/troubleshooting).
 
-L3 e L4 ainda não começaram. Quando tiverem ordem e referência aprovadas,
-registrar o escopo de cada lote, suas comparações comprovadas, criações fora
-do laboratório, conflitos, perguntas e inventário de banco nesta mesma página.
+## L3 — Estoque, plantões e verificação
+
+A v4 governa 35 cenários de E07, E08 e E09. A ordem e o laboratório foram
+preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
+
+- **E07 — Estoque e consumo.** Pendente. Inclui movimentos agrupados por ato,
+  movimentação familiar multimaterial e consumo da equipe com baixa direta.
+- **E08 — Plantões e balanços.** Pendente. Inclui configuração de horários
+  por residência e admissão de contagem que sobrevive ao término do plantão.
+- **E09 — Arquivos e verificação.** Em execução. A consulta pública exibe
+  registro, correspondência, assinatura e carimbo separadamente. Os detalhes
+  autorizados abrem em painel e revalidam o acesso. O resultado público
+  omite identificadores internos. A indisponibilidade da política de confiança
+  preserva a consulta do registro e a comparação de bytes já concluídas.
+  Ainda faltam o acervo, a anexação e verificações dos outros estados.
+
+### Verificação pública
+
+- A comparação da tela inicial com E09-06 usou capturas do laboratório e do
+  produto em 360 e 412 px. A marca, o cabeçalho, a ajuda, a hierarquia do
+  formulário e as opções Código/PDF seguem a v4. O navegador do produto
+  permite rolar a página inteira.
+- O laboratório não define a representação da perda de acesso durante um
+  painel aberto. O produto retira os detalhes enquanto revalida e mantém
+  o resultado público disponível ao voltar.
+- A verificação local dirigida passou com três jornadas Chromium no
+  candidato final deste recorte, incluindo QR, consulta por código, PDF de
+  outra emissão, login e revogação real. A rodada anterior passou os três
+  casos em Android e os três em iOS emulados, com uma falha intermitente em
+  Chromium corrigida antes da última rodada. Passaram 12 testes do
+  verificador e do contrato de dados.
+
+A primeira alteração de E09 usa o esquema existente. As migrations dos
+contratos restantes serão identificadas aqui por ambiente após validação.
+
+## L4
+
+Aguardando ordem e referência aprovadas.

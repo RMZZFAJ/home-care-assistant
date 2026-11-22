@@ -4,6 +4,11 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**22/11 — início de L3.** A branch `feat/phase-d-continuation` recebeu
+o commit `fab595c7` por avanço direto. A ordem e o laboratório v4
+organizam o lote em estoque e consumo, plantões e balanços, e arquivos
+e verificação. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação).
+
 **21/11 — revisão e recuperação dos cancelamentos de L2.** REQ e COM
 recebem a justificativa na própria revisão. REQ exige a escolha de ajuste
 quando há efeito de estoque. ENT e DEV seguem o padrão de recuperação nos

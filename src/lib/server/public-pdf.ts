@@ -65,34 +65,25 @@ async function lookup(
     p_hash: hash,
   })) as PublicPdfResult["reference"];
 }
-async function policyStatus(
+function policyStatus(
   reference: PublicPdfResult["reference"],
-): Promise<PublicPdfResult["policyStatus"]> {
+  trust: Awaited<ReturnType<typeof loadPdfTrust>> | null,
+): PublicPdfResult["policyStatus"] {
+  if (!trust) return "unavailable";
   if (!reference.found) return null;
-  try {
-    const trust = await loadPdfTrust();
-    if (
-      trust.revokedFingerprints.includes(reference.certificateFingerprint) ||
-      trust.revokedFingerprints.includes(
-        reference.timestampCertificateFingerprint,
-      )
-    )
-      return "revoked";
-    const recognized = trust.issuers.some(
-      (i) =>
-        i.signerFingerprint === reference.certificateFingerprint &&
-        i.timestampFingerprint === reference.timestampCertificateFingerprint,
-    );
-    return !recognized
-      ? "unknown"
-      : trust.roots.every((r) => r.trust === "internal")
-        ? "recognized_internal"
-        : trust.roots.every((r) => r.trust === "external")
-          ? "recognized_external"
-          : "unknown";
-  } catch {
-    return "unavailable";
-  }
+  if (
+    trust.revokedFingerprints.includes(reference.certificateFingerprint) ||
+    trust.revokedFingerprints.includes(reference.timestampCertificateFingerprint)
+  ) return "revoked";
+  const recognized = trust.issuers.some(
+    (issuer) =>
+      issuer.signerFingerprint === reference.certificateFingerprint &&
+      issuer.timestampFingerprint === reference.timestampCertificateFingerprint,
+  );
+  if (!recognized) return "unknown";
+  if (trust.roots.every((root) => root.trust === "internal")) return "recognized_internal";
+  if (trust.roots.every((root) => root.trust === "external")) return "recognized_external";
+  return "unknown";
 }
 export async function publicPdfReference(request: Request, code: string) {
   const server = await budget(request, false),
@@ -102,7 +93,7 @@ export async function publicPdfReference(request: Request, code: string) {
     fileReference: null,
     analysis: null,
     fileSha256: null,
-    policyStatus: await policyStatus(reference),
+    policyStatus: reference.found ? policyStatus(reference, await loadPdfTrust().catch(() => null)) : null,
     referenceOnly: true,
   });
 }
@@ -182,27 +173,17 @@ export async function publicPdfUpload(request: Request, code: string | null) {
     hash = createHash("sha256").update(bytes).digest("hex");
   const reference = await lookup(server, code, hash),
     fileReference = code ? await lookup(server, null, hash) : reference;
-  let trust;
-  try {
-    trust = await loadPdfTrust();
-  } catch {
-    throw new ApiError(
-      "VERIFICATION_UNAVAILABLE",
-      "A política de confiança está temporariamente indisponível. Tente novamente.",
-      503,
-      true,
-    );
-  }
-  const analysis = await verifyPublicPdf(bytes, {
+  const trust = await loadPdfTrust().catch(() => null);
+  const analysis = trust ? await verifyPublicPdf(bytes, {
     roots: trust.roots,
     revokedFingerprints: trust.revokedFingerprints,
-  });
+  }) : null;
   return publicPdfResultSchema.parse({
     reference,
     fileReference,
     analysis,
     fileSha256: hash,
-    policyStatus: await policyStatus(reference),
+    policyStatus: policyStatus(fileReference, trust),
     referenceOnly: false,
   });
 }

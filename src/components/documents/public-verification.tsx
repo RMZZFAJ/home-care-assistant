@@ -11,9 +11,9 @@ import {
   useLayoutEffect,
   useRef,
   useState,
-  type RefObject,
 } from "react";
-import { ActionButton, DefinitionGrid, TextInput } from "@/components/ui/controls";
+import { ActionButton, TextInput } from "@/components/ui/controls";
+import { Dialog } from "@/components/ui/overlays";
 import { api, errorMessage } from "@/lib/client/api";
 import {
   publicPdfLimit,
@@ -21,17 +21,11 @@ import {
   verificationCodeSchema,
   type PublicPdfResult,
 } from "@/lib/documents/public-verification";
-import { formatBrazilDate } from "@/lib/receipt";
+import { PdfFormatMark } from "@/components/ui/file-record";
 import { PrivateVerificationDetails } from "./private-verification-details";
 import { safeReturnPath } from "@/lib/safe-return-path";
-const trustLabels = {
-  internal: "Cadeia interna reconhecida",
-  external: "Cadeia externa reconhecida pela política configurada",
-  unknown_chain: "Cadeia desconhecida",
-  invalid_chain: "Cadeia inválida",
-  revoked: "Certificado revogado na política interna",
-  expired: "Certificado expirado na época do carimbo",
-};
+import { VerificationResult } from "./public-verification-result";
+import "./public-verification.css";
 export function PublicVerification({
   initialCode = "",
   returnTo,
@@ -45,6 +39,8 @@ export function PublicVerification({
     helpId = useId(),
     errorId = useId();
   const [method, setMethod] = useState<"code" | "file">("code");
+  const [fileCodeOpen, setFileCodeOpen] = useState(Boolean(initialCode));
+  const [helpOpen, setHelpOpen] = useState(false);
   const [code, setCode] = useState(initialCode),
     [file, setFile] = useState<File | null>(null),
     [busy, setBusy] = useState(false),
@@ -57,8 +53,10 @@ export function PublicVerification({
   const headingRef = useRef<HTMLHeadingElement>(null),
     codeInputRef = useRef<HTMLInputElement>(null),
     fileInputRef = useRef<HTMLInputElement>(null),
+    helpButtonRef = useRef<HTMLButtonElement>(null),
     requestRef = useRef<AbortController | null>(null),
     sequenceRef = useRef(0),
+    focusFormRef = useRef(false),
     focusResultRef = useRef<number | null>(null);
   useLayoutEffect(() => {
     // Focus only after the matching result and its heading have committed.
@@ -67,11 +65,15 @@ export function PublicVerification({
       focusResultRef.current = null;
       headingRef.current?.focus();
     }
+    if (!result && focusFormRef.current) {
+      focusFormRef.current = false;
+      (method === "code" ? codeInputRef : fileInputRef).current?.focus();
+    }
     if (error && !busy) {
-      if (errorField === "code") codeInputRef.current?.focus();
+      if (errorField === "code" && (method === "code" || fileCodeOpen)) codeInputRef.current?.focus();
       if (errorField === "file") fileInputRef.current?.focus();
     }
-  }, [result, error, errorField, busy]);
+  }, [result, error, errorField, busy, method, fileCodeOpen]);
   const cancel = useCallback(() => {
     requestRef.current?.abort();
     sequenceRef.current++;
@@ -165,6 +167,7 @@ export function PublicVerification({
     }
     const parsed = code.trim() ? verificationCodeSchema.safeParse(code) : null;
     if (parsed && !parsed.success) {
+      setFileCodeOpen(true);
       codeInputRef.current?.focus();
       setErrorField("code");
       setError(
@@ -221,128 +224,153 @@ export function PublicVerification({
       if (sequence === sequenceRef.current) setBusy(false);
     }
   }
-  const codeField = (kind: "code" | "file") => <div className="field"><label htmlFor={codeId + kind}>Código de verificação</label><TextInput ref={method === kind ? codeInputRef : undefined} id={codeId + kind} value={code} disabled={busy} required={kind === "code"} onChange={event => { setCode(event.target.value); setError(""); setResult(null); }} maxLength={64} spellCheck={false} autoComplete="off" placeholder="HCA-…" aria-describedby={helpId + (error && errorField === "code" ? " " + errorId : "")} aria-invalid={Boolean(error) && errorField === "code"} /><small>{kind === "file" ? "Opcional: informe para comparar o arquivo com uma emissão específica." : "Use o código completo impresso no documento."}</small></div>;
-  return <div className="hca-public-access"><PublicHeader label="Verificação pública" /><div className="hca-public-verification-content">
-    <main className="public-validator"><header className="pv-heading"><span className="pv-seal"><Icon name="shield" width={27} height={27} /></span><div><div className="eyebrow">Consulta pública</div><h1 tabIndex={-1}>Verificar documento</h1><p>Consulte a emissão ou confira um PDF recebido. Não é necessário entrar na conta.</p></div></header>
-      <div className="pv-privacy" id={helpId}><Icon name="lock" width={16} height={16} /><span>Dados do paciente, materiais e responsáveis não aparecem na parte pública desta consulta. O código consulta o registro; envie o PDF para conferir o arquivo em suas mãos.</span></div>
-      <Tabs.Root value={method} onValueChange={value => { if (value === "code" || value === "file") { setMethod(value); setError(""); } }} className="card pv-query">
-        <Tabs.List className="pv-methods" aria-label="Forma de verificação"><Tabs.Tab value="code" className={method === "code" ? "active" : ""} disabled={busy}><Icon name="lock" width={18} height={18} />Consultar código</Tabs.Tab><Tabs.Tab value="file" className={method === "file" ? "active" : ""} disabled={busy}><Icon name="file" width={18} height={18} />Conferir PDF</Tabs.Tab></Tabs.List>
-        {error ? <p id={errorId} role="alert" className="ui-notice ui-notice-error pv-feedback">{error}</p> : null}
-        <Tabs.Panel value="code"><form className="pv-form" aria-label="Consultar código" onSubmit={event => { event.preventDefault(); void query(code); }}>{codeField("code")}<div className="pv-submit"><ActionButton variant="primary" disabled={busy} type="submit"><Icon name="search" />Consultar código</ActionButton></div></form></Tabs.Panel>
-        <Tabs.Panel value="file"><form className="pv-form" aria-label="Conferir arquivo PDF" onSubmit={event => { event.preventDefault(); void upload(); }}>{codeField("file")}<div className="pv-file-picker"><label className="pv-file-input" htmlFor={fileId}><Icon name="upload" width={25} height={25} /><strong>Escolher arquivo PDF</strong><span>Até 4 MB</span><TextInput ref={fileInputRef} id={fileId} type="file" aria-label="Arquivo PDF para conferir" disabled={busy} accept="application/pdf,.pdf" onChange={event => { setFile(event.target.files?.[0] ?? null); setError(""); setResult(null); }} aria-describedby={helpId + (error && errorField === "file" ? " " + errorId : "")} aria-invalid={Boolean(error) && errorField === "file"} /></label>{file ? <div className="pv-file-selected"><Icon name="file" width={23} height={23} /><div><strong className="hca-selected-file">{file.name}</strong><small>{Math.ceil(file.size / 1024)} KB</small></div><ActionButton className="btn-icon" aria-label="Remover arquivo" disabled={busy} onClick={() => { setFile(null); setResult(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}><Icon name="close" /></ActionButton></div> : null}</div><p className="hca-field-help">O arquivo é analisado em memória e não é guardado no acervo. Limites temporários protegem o serviço contra abuso.</p><div className="pv-submit"><ActionButton variant="primary" disabled={busy} type="submit"><Icon name="shield" />Conferir PDF</ActionButton></div></form></Tabs.Panel>
-      </Tabs.Root>
-      {result ? <VerificationResult result={result} headingRef={headingRef} /> : null}
-      {result?.reference.found ? <PrivateVerificationDetails key={result.reference.verificationCode} code={result.reference.verificationCode} /> : null}
-      <footer className="pv-footer"><Link href={originReturn && originReturn !== "/" ? originReturn : "/login?next=" + encodeURIComponent("/verificar" + (result?.reference.found ? "?code=" + result.reference.verificationCode : ""))} className="btn btn-ghost"><Icon name="arrow" style={{ transform: "rotate(180deg)" }} />{originReturn && originReturn !== "/" ? "Voltar à ficha" : "Acessar o sistema"}</Link><p>Consultar um código e conferir o arquivo são verificações distintas.</p><p>Assinatura técnica do Home Care Assistant e TSA internos não representam assinatura pessoal, ICP-Brasil ou independência temporal de terceiro. Revogação externa por OCSP/CRL não é consultada nesta etapa.</p></footer>
-    </main></div></div>;
-}
 
-function VerificationResult({
-  result,
-  headingRef,
-}: {
-  result: PublicPdfResult;
-  headingRef: RefObject<HTMLHeadingElement | null>;
-}) {
-  const ref = result.reference,
-    analysis = result.analysis,
-    verification = analysis?.verification;
-  const statuses = {
-    verified: "Análise criptográfica concluída",
-    unsigned: "Sem assinatura incorporada",
-    invalid_signature: "Assinatura criptográfica inválida",
-    invalid_timestamp: "Carimbo temporal ausente ou inválido",
-    unreadable: "Não foi possível interpretar a assinatura deste PDF",
-    unsupported: "Perfil do PDF não suportado nesta verificação",
-    processing_limit: "Análise interrompida pelo limite de processamento",
-  };
-  return (
-    <section
-      aria-label="Resultado da verificação"
-      className={"pv-result hca-verification-result" + (!ref.found || !result.referenceOnly && (!ref.bytesMatch || !verification?.accepted) ? " tone-warning" : "")}
-    >
-      <div className="pv-result-heading"><span className="pv-result-symbol"><Icon name={ref.found ? "shield" : "search"} width={26} height={26} /></span><div><h2 ref={headingRef} tabIndex={-1}>
-        {ref.found ? "Emissão localizada" : "Emissão não localizada"}
-      </h2><p>{result.referenceOnly ? "O código corresponde a uma consulta do registro. Envie o PDF para conferir o exemplar." : ref.found && ref.bytesMatch ? "O arquivo corresponde aos bytes do exemplar registrado. Confira também os resultados de assinatura abaixo." : "Confira o resultado específico do registro e do arquivo apresentado."}</p></div></div>
-      <div className="pv-evidence"><div><small>Registro de emissão</small><strong>{ref.found ? "Localizado" : "Não localizado"}</strong></div><div><small>Arquivo apresentado</small><strong>{result.referenceOnly ? "Ainda não conferido" : ref.found && ref.bytesMatch ? "Correspondente" : "Sem correspondência"}</strong></div><div><small>Assinatura e carimbo</small><strong>{result.referenceOnly ? "Consultar no PDF" : verification?.accepted ? "Conferidos sob política interna" : "Não confirmados"}</strong></div></div>
-      <details className="pv-details"><summary>Detalhes da conferência<Icon name="down" width={16} height={16} /></summary><div className="hca-form-stack hca-verification-technical">
-      {ref.found ? (
-        <>
-          <p>Registro concluído em {formatBrazilDate(ref.registeredAt)}.</p>
-          <p className="break-all">
-            Código: HCA-{ref.verificationCode.match(/.{4}/g)?.join("-")}
-          </p>
-        </>
-      ) : (
-        <p>
-          A ausência de referência não comprova falsificação. Confira o código
-          ou consulte quem forneceu o arquivo.
-        </p>
-      )}
-      {result.referenceOnly ? (
-        <>
-          <p>
-            O registro informa assinatura e carimbo conferidos na emissão. Envie
-            o arquivo para verificar seus bytes e sua assinatura agora.
-          </p>
-          {ref.found ? (
-            <p>
-              {result.policyStatus === "revoked"
-                ? "A política interna atual marca um certificado desta emissão como revogado."
-                : result.policyStatus === "unavailable"
-                  ? "A política atual de confiança está indisponível."
-                  : result.policyStatus === "unknown"
-                    ? "O certificado registrado não foi reconhecido pela política atual."
-                    : "O par de certificados registrado consta na política de confiança atual."}
-            </p>
-          ) : null}
-        </>
-      ) : (
-        <>
-          <p className="font-semibold">
-            {ref.found
-              ? ref.bytesMatch
-                ? "Os bytes coincidem com o exemplar registrado."
-                : "Os bytes divergem da emissão consultada."
-              : "Nenhum exemplar registrado corresponde a estes bytes."}
-          </p>
-          {result.fileReference?.found &&
-            ref.found &&
-            result.fileReference.issuanceId !== ref.issuanceId ? (
-            <p>
-              O PDF corresponde a outra emissão registrada. O código consultado
-              pertence a outro exemplar.
-            </p>
-          ) : null}
-          {analysis ? (
-            <p className="font-semibold">{statuses[analysis.status]}</p>
-          ) : null}
-          {analysis?.documentSignature === "valid" ? (
-            <p>Assinatura do documento: criptograficamente íntegra.</p>
-          ) : null}
-          {analysis?.status === "processing_limit" ? (
-            <p>
-              O limite de análise não permite concluir se o arquivo foi
-              adulterado. Solicite outro exemplar ou tente novamente.
-            </p>
-          ) : null}
-          {verification ? (
-            <DefinitionGrid items={[
-              { label: "Cobertura dos bytes", value: verification.wholeFile ? "A assinatura cobre o arquivo inteiro." : "Há bytes acrescentados após a assinatura. O arquivo completo não é aceito como exemplar imutável.", wide: true },
-              { label: "Confiança do assinador", value: trustLabels[verification.signerTrust] },
-              { label: "Carimbo de tempo", value: "Token RFC3161 criptograficamente íntegro · " + formatBrazilDate(verification.timestampAt) },
-              { label: "Confiança da TSA", value: trustLabels[verification.timestampTrust] },
-              { label: "Aceite técnico sob a política atual", value: verification.accepted ? "Aceito para integridade e confiança configurada." : "Não aceito sob a política atual. Consulte os resultados específicos acima." },
-              { label: "Certificado que assinou · SHA-256", value: verification.certificateFingerprint, wide: true },
-              { label: "Certificado da TSA · SHA-256", value: verification.timestampCertificateFingerprint, wide: true },
-            ]} />
-          ) : null}
-          <p className="break-all text-xs">
-            SHA-256 do arquivo enviado: {result.fileSha256}
-          </p>
-        </>
-      )}
-      </div></details>
-    </section>
-  );
+  function changeMethod(next: "code" | "file") {
+    focusFormRef.current = !!result;
+    setMethod(next);
+    setError("");
+    setResult(null);
+    if (next === "file" && code.trim()) setFileCodeOpen(true);
+  }
+  function resetConsultation() {
+    cancel();
+    changeMethod("code");
+    setBusy(false);
+    setCode("");
+    setFile(null);
+    setFileCodeOpen(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    const url = new URL(window.location.href);
+    url.pathname = "/verificar";
+    url.searchParams.delete("code");
+    url.hash = "";
+    window.history.replaceState(null, "", url.pathname + url.search);
+  }
+  const codeField = (kind: "code" | "file") => <div className="field">
+    <label htmlFor={codeId + kind}>{kind === "code" ? "Código do documento" : "Código do documento · opcional"}</label>
+    <TextInput ref={method === kind ? codeInputRef : undefined}
+      id={codeId + kind} value={code} disabled={busy} required={kind === "code"}
+      onChange={event => { setCode(event.target.value); setError(""); }}
+      maxLength={64} spellCheck={false} autoComplete="off" autoCapitalize="characters"
+      placeholder={kind === "code" ? "HCA-XXXX-XXXX-XXXX-…" : "HCA-…"}
+      aria-describedby={helpId + kind + (error && errorField === "code" ? " " + errorId : "")}
+      aria-invalid={Boolean(error) && errorField === "code"} />
+    <small id={helpId + kind}>{kind === "code"
+      ? "Encontre o código no documento, próximo ao QR Code."
+      : "Use para conferir se este PDF pertence à emissão esperada."}</small>
+  </div>;
+
+  const detailsReference = result?.fileReference?.found ? result.fileReference : result?.reference;
+  const detailsCode = detailsReference?.found ? detailsReference.verificationCode : null;
+  const loginPath = "/login?next=" + encodeURIComponent("/verificar" + (detailsCode ? "?code=" + detailsCode : ""));
+  const fromDocument = originReturn && originReturn !== "/";
+  const consultationMethods = [
+    { value: "code", label: "Tenho um código", icon: "search" },
+    { value: "file", label: "Tenho o PDF", icon: "file" },
+  ] as const;
+
+  return <div className="hca-public-access hca-verify-page">
+    <PublicHeader verification={{ onStart: resetConsultation, help:
+      <ActionButton ref={helpButtonRef} variant="quiet" compact className="hca-verify-help-button"
+        onClick={() => setHelpOpen(true)}><Icon name="info" width={17} height={17} /> Ajuda</ActionButton>,
+    }} />
+    <main id="workspace-content" className="hca-verify-main">
+      <header className="hca-verify-hero" data-result={Boolean(result)}>
+        <div>
+          <span className="hca-verify-eyebrow"><Icon name="shield" width={15} height={15} /> Verificação de documentos</span>
+          <h1>{result ? "Resultado da verificação" : <>{"Confira a origem "}<br />do documento recebido.</>}</h1>
+          <p>{result ? "Veja o que foi confirmado e o que ainda precisa ser conferido."
+            : "Consulte a emissão ou confira o PDF. Você pode fazer a verificação pública sem entrar no sistema."}</p>
+          {!result ? <div className="hca-verify-traits">
+            <span><Icon name="file" width={14} height={14} /> Código ou PDF</span>
+            <span><Icon name="lock" width={14} height={14} /> Dados preservados</span>
+          </div> : null}
+        </div>
+      </header>
+      <div className="hca-verify-content">
+        {result ? <>
+          <VerificationResult result={result} code={code} file={file} headingRef={headingRef}
+            onEdit={() => changeMethod(method)}
+            onFile={() => { if (method === "file") setFile(null); changeMethod("file"); }} />
+          {detailsCode ? <PrivateVerificationDetails key={detailsCode} code={detailsCode} /> : null}
+        </> : <Tabs.Root value={method} className="hca-verify-form-card" onValueChange={value => {
+          if (value === "code" || value === "file") changeMethod(value);
+        }}>
+          <Tabs.List className="hca-verify-methods" aria-label="Como deseja verificar?">
+            {consultationMethods.map(({ value, label, icon }) => <Tabs.Tab value={value} disabled={busy} key={value}>
+              <Icon name={icon} width={18} height={18} />{label}
+            </Tabs.Tab>)}
+          </Tabs.List>
+          {error ? <p id={errorId} role="alert" className="ui-notice ui-notice-error hca-verify-feedback">{error}</p> : null}
+          <Tabs.Panel value="code">
+            <form className="hca-verify-form" aria-label="Consultar código" noValidate onSubmit={event => {
+              event.preventDefault();
+              void query(code);
+            }}>
+              <header><h2>Consulte o código</h2><p>Localize a emissão registrada pelo Home Care Assistant.</p></header>
+              {codeField("code")}
+              <ActionButton variant="primary" disabled={busy} type="submit"><Icon name="search" /> Consultar código</ActionButton>
+              <p className="hca-verify-form-note"><Icon name="info" width={15} height={15} />A consulta do código não confere o conteúdo do PDF recebido.</p>
+            </form>
+          </Tabs.Panel>
+          <Tabs.Panel value="file">
+            <form className="hca-verify-form" aria-label="Conferir arquivo PDF" onSubmit={event => {
+              event.preventDefault();
+              void upload();
+            }}>
+              <header><h2>Confira o arquivo</h2><p>Compare o PDF recebido com o exemplar registrado e consulte os resultados técnicos.</p></header>
+              <label className={file ? "hca-verify-selected-file" : "hca-verify-file-picker"} htmlFor={fileId}>
+                {file ? <><PdfFormatMark /><span><strong>{file.name}</strong><small>{Math.ceil(file.size / 1024)} KB</small></span>
+                  <Icon name="edit" /></> : <>
+                  <span><Icon name="upload" width={29} height={29} /></span>
+                  <strong>Selecione o PDF recebido</strong><small>PDF · até 4 MB</small>
+                </>}
+                <TextInput ref={fileInputRef} id={fileId} type="file" aria-label="Arquivo PDF para conferir"
+                  disabled={busy} accept="application/pdf,.pdf" onChange={event => {
+                    setFile(event.target.files?.[0] ?? null); setError("");
+                  }}
+                  aria-describedby={helpId + "pdf" + (error && errorField === "file" ? " " + errorId : "")}
+                  aria-invalid={Boolean(error) && errorField === "file"} />
+              </label>
+              <details className="hca-verify-optional-code" open={fileCodeOpen} onToggle={event => setFileCodeOpen(event.currentTarget.open)}>
+                <summary>Também tenho um código<Icon name="down" width={16} height={16} /></summary>
+                {codeField("file")}
+              </details>
+              <ActionButton variant="primary" disabled={busy} type="submit"><Icon name="shield" /> Verificar arquivo PDF</ActionButton>
+              <p className="hca-verify-form-note" id={helpId + "pdf"}><Icon name="lock" width={15} height={15} />O arquivo é usado nesta conferência. O resultado público não expõe dados do paciente.</p>
+            </form>
+          </Tabs.Panel>
+        </Tabs.Root>}
+        <section className="hca-verify-guidance" id="verificacao-ajuda" aria-labelledby={helpId + "title"}>
+          <h2 id={helpId + "title"}>Entenda a conferência</h2>
+          <details><summary>Consultar o código ou enviar o PDF?<Icon name="down" width={16} height={16} /></summary>
+            <p>O código localiza uma emissão. Para comparar o conteúdo e analisar assinatura e carimbo, selecione o PDF recebido.</p></details>
+          <details><summary>O que significa a assinatura técnica?<Icon name="down" width={16} height={16} /></summary>
+            <p>Ela identifica a emissão técnica pelo sistema. A assinatura e o carimbo atuais seguem a política interna do Home Care Assistant. Não representam assinatura pessoal, ICP-Brasil ou horário independente de terceiro.</p></details>
+          <details><summary>Quem pode ver os dados da ficha?<Icon name="down" width={16} height={16} /></summary>
+            <p>Os detalhes da ficha exigem uma conta com permissão para o paciente. A consulta pública não mostra paciente, materiais ou responsáveis.</p></details>
+        </section>
+      </div>
+      <footer className="hca-verify-footer">
+        <strong><Icon name="heart" width={17} height={17} /> Home Care Assistant</strong>
+        <Link href={fromDocument ? originReturn : loginPath} className="btn btn-ghost">
+          <Icon name={fromDocument ? "back" : "user"} />{fromDocument ? "Voltar à ficha" : "Acessar minha conta"}
+        </Link>
+      </footer>
+    </main>
+    <Dialog open={helpOpen} onClose={() => setHelpOpen(false)}
+      title="Como verificar um documento" subtitle="Escolha a conferência que você precisa."
+      headingIcon="info" finalFocus={helpButtonRef}
+      footer={<ActionButton variant="primary" onClick={() => setHelpOpen(false)}>Entendi</ActionButton>}>
+      <div className="hca-form-stack">
+        <div className="hca-verify-help-option"><Icon name="search" width={22} height={22} /><div>
+          <h3>Consultar o código</h3><p>Localiza a emissão registrada. Copie o código completo do documento ou abra o link do QR Code.</p>
+        </div></div>
+        <div className="hca-verify-help-option"><Icon name="file" width={22} height={22} /><div>
+          <h3>Conferir o PDF</h3><p>Compara o arquivo e apresenta os resultados de assinatura, carimbo e confiança. Use o arquivo original recebido.</p>
+        </div></div>
+        <p>Se a consulta estiver indisponível, tente novamente. Uma falha técnica não confirma nem reprova o documento.</p>
+      </div>
+    </Dialog>
+  </div>;
 }

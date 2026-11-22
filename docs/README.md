@@ -21,6 +21,10 @@ L2 é o [laboratório v7](../hca-laboratorio-02-v7.html), com as regras do
 [consolidação intermediária](../HCA_L2_DECISOES_VIGENTES_E_PENDENCIAS.md)
 serve como apoio histórico.
 
+L3 segue o [comando mestre v4](../HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e o
+[laboratório v4 aprovado](../hca-laboratorio-03-v4-aprovado.html) para
+estoque e consumo, plantões e balanços, arquivos e verificação.
+
 **Andamento da D-B:** [acompanhamento principal](../TEMP_D_B_ATUALIZACAO.md),
 com capacidades entregues, trabalho local, fila e responsabilidades. A
 [matriz](audits/D/D-B/ACCEPTANCE_EXECUTION.csv) detalha os 105 critérios.
