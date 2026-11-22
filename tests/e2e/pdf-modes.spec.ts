@@ -14,7 +14,7 @@ const compact=(value:string)=>value.normalize("NFKC").replaceAll(/\s/g,"");
 const hash=(bytes:Uint8Array)=>createHash("sha256").update(bytes).digest("hex");
 const plain=async(bytes:Uint8Array)=>(await PDF.load(bytes)).extractText().flatMap(page=>page.lines.map(line=>line.spans.flatMap(span=>span.chars.map(char=>char.char)).join(""))).join(" ");
 async function login(page:Page,patient:string,email=fixtures.adminA.email){
- await page.goto("/login?next=" + encodeURIComponent("/?careRecipientId=" + patient));await page.getByLabel("E-mail",{exact:true}).fill(email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
+ await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
  await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);
 }
 async function openFiles(page:Page,id:string){await page.goto("/documentos/"+id);await selectDocumentSection(page,"files");await expect(page.getByRole("button",{name:"Escolher conteúdo do PDF",exact:true})).toBeEnabled();}
@@ -50,7 +50,7 @@ test("expanded models use the real chooser and preserve an uncertain selected in
    if(sent.length===1){first=await response.json();return route.abort("failed");}return route.fulfill({response});
   });
   await page.getByRole("button",{name:"Escolher conteúdo do PDF",exact:true}).click();const dialog=page.getByRole("dialog",{name:"Escolher conteúdo do PDF",exact:true});
-  await expect(dialog.getByRole("combobox",{name:"Modalidade documental",exact:true})).toHaveValue("expanded");
+  await expect(dialog.getByRole("radio",{name:"Ficha ampliada",exact:true})).toBeChecked();
   for(const name of ["Comunicações","Confirmações","Detalhes dos vínculos","Histórico operacional de acesso"])await dialog.getByRole("checkbox",{name,exact:true}).check();
   if(kind==="REQ")for(const width of [320,390,768,1024,1440]){await page.setViewportSize({width,height:900});await audit(page,"Seletor de complementos "+width);await info.attach("Seletor de complementos "+width,{body:await dialog.screenshot(),contentType:"image/png"});}
   const creation=kind==="REQ"?null:page.waitForResponse(r=>new URL(r.url()).pathname===endpoint&&r.request().method()==="POST");
@@ -73,11 +73,11 @@ test("expanded models use the real chooser and preserve an uncertain selected in
 test("restricted audit signs every-page identification, verifies original bytes and hides its archive after patient permission loss",async({page,browser})=>{
  const f=await progressPreparationFixture("REQ");for(let index=0;index<24;index++)await note(f,"Registro de auditoria "+index+" · "+"Texto integral preservado. ".repeat(12));
  await login(page,f.patient,fixtures.family.email);await openFiles(page,f.id);await page.getByRole("button",{name:"Escolher conteúdo do PDF",exact:true}).click();
- let dialog=page.getByRole("dialog",{name:"Escolher conteúdo do PDF",exact:true});await expect(dialog.locator('option[value="audit"]')).toBeDisabled();await dialog.getByRole("button",{name:"Voltar",exact:true}).click();
+ let dialog=page.getByRole("dialog",{name:"Escolher conteúdo do PDF",exact:true});await expect(dialog.getByRole("radio",{name:"Relatório de auditoria",exact:true})).toHaveCount(0);await dialog.getByRole("button",{name:"Voltar",exact:true}).click();
  const options={mode:"audit",sections:["progress","access"],period:{from:null,through:null,timeZone:"America/Sao_Paulo"},purpose:"Conferência documental da ficha com autoria e limitações explícitas."},endpoint="/api/documents/"+f.id+"/issuances";
  expect((await page.request.post(endpoint,{ timeout: 60_000,data:{idempotencyKey:randomUUID(),documentOptions:options}})).status()).toBe(403);
  await login(page,f.patient);await openFiles(page,f.id);await page.getByRole("button",{name:"Escolher conteúdo do PDF",exact:true}).click();dialog=page.getByRole("dialog",{name:"Escolher conteúdo do PDF",exact:true});
- await dialog.getByRole("combobox",{name:"Modalidade documental",exact:true}).selectOption("audit");await dialog.getByRole("checkbox",{name:"Histórico operacional de acesso",exact:true}).check();await dialog.getByRole("textbox",{name:"Finalidade da auditoria",exact:true}).fill(options.purpose);
+ await dialog.getByRole("radio",{name:"Relatório de auditoria",exact:true}).check();await dialog.getByRole("checkbox",{name:"Histórico operacional de acesso",exact:true}).check();await dialog.getByRole("textbox",{name:"Finalidade da auditoria",exact:true}).fill(options.purpose);
  const creation=page.waitForResponse(r=>new URL(r.url()).pathname===endpoint&&r.request().method()==="POST");await dialog.getByRole("button",{name:"Emitir exemplar selecionado",exact:true}).click();const response=await creation;expect(response.status(),await response.text()).toBe(200);
  const result=await signed(page,f.id,await response.json(),"audit"),parsed=await PDFDocument.load(result.bytes);expect(parsed.getPageCount()).toBeGreaterThan(3);
  const checked=await page.request.post("/api/verification?code="+result.receipt.verificationCode,{headers:{"content-type":"application/pdf"},data:result.bytes});expect(checked.status(),await checked.text()).toBe(200);expect(await checked.json()).toMatchObject({reference:{found:true,bytesMatch:true,sha256:result.receipt.sha256}});

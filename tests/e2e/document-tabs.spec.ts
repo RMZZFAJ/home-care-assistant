@@ -290,7 +290,7 @@ test("Conferência ENT conserva campos entre abas, descarta ao sair e mantém UR
   await selectDocumentSection(page, "files");
   await page.reload();
   await expect(
-    page.getByRole("tab", { name: "Arquivos gerados", exact: true }),
+    page.getByRole("tab", { name: "Arquivos", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
   await page.goto(
     `/documentos/${ent.id}?historyVersion=1&careRecipientId=${f.patient}`,

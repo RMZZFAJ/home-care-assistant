@@ -1,19 +1,27 @@
 "use client";
-import { useState } from "react";
-import { Dialog } from "@/components/ui/primitives";
+import { useId, useState } from "react";
+import { Dialog, Icon } from "@/components/ui/primitives";
 import { ActionButton, CheckboxField, FormField, SelectField, TextInput, TextAreaField } from "@/components/ui/controls";
 import { Notice } from "@/components/workspace";
 import { pdfDocumentOptionsSchema, pdfSectionLabels, pdfSectionOrder, type PdfDocumentOptions } from "@/lib/documents/pdf-modes";
 
-export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAccess }: {
-  open: boolean; onClose: () => void; onGenerate: (value?: PdfDocumentOptions) => void; canAudit: boolean; canAccess: boolean;
+const modes = [
+  { value: "record", label: "Ficha", description: "Materiais, observações e registros essenciais.", icon: "file" },
+  { value: "expanded", label: "Ficha ampliada", description: "Inclui os andamentos e complementos selecionados.", icon: "note" },
+  { value: "audit", label: "Relatório de auditoria", description: "Consulta de rastreabilidade conforme as permissões da ficha.", icon: "shield" },
+] as const;
+
+export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAccess, code }: {
+  open: boolean; onClose: () => void; onGenerate: (value?: PdfDocumentOptions) => void;
+  canAudit: boolean; canAccess: boolean; code: string;
 }) {
+  const modeGroupId = useId();
   const [mode, setMode] = useState<"record" | "expanded" | "audit">("expanded");
   const [sections, setSections] = useState<PdfDocumentOptions["sections"]>(["progress"]);
   const [interval, setInterval] = useState(false), [from, setFrom] = useState(""), [through, setThrough] = useState("");
   const [purpose, setPurpose] = useState(""), [error, setError] = useState("");
   const denied = mode === "audit" && !canAudit || mode !== "record" && sections.includes("access") && !canAccess;
-  return <Dialog open={open} onClose={onClose} title="Escolher conteúdo do PDF">
+  return <Dialog open={open} onClose={onClose} title="Escolher conteúdo do PDF" subtitle={code} headingIcon="file">
     <form className="hca-form" onSubmit={event => {
       event.preventDefault();
       if (denied) return;
@@ -25,9 +33,18 @@ export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAcc
       if (!parsed.success) { setError(parsed.error.issues[0]?.message ?? "Confira as seções e o período."); return; }
       setError(""); onGenerate(parsed.data);
     }}>
-      <FormField label="Modalidade documental"><SelectField value={mode} onChange={event => setMode(event.currentTarget.value as typeof mode)}>
-        <option value="record">Ficha</option><option value="expanded">Ficha Ampliada</option><option value="audit" disabled={!canAudit}>Relatório de auditoria da ficha</option>
-      </SelectField></FormField>
+      <fieldset className="hca-pdf-mode-choices">
+        <legend>Modalidade documental</legend>
+        {modes.filter(choice => choice.value !== "audit" || canAudit).map(choice => {
+          const descriptionId = modeGroupId + "-" + choice.value;
+          return <label key={choice.value} className="hca-pdf-mode-choice" data-selected={mode === choice.value}>
+            <input type="radio" name={modeGroupId} value={choice.value} checked={mode === choice.value}
+              aria-label={choice.label} aria-describedby={descriptionId} onChange={() => { setMode(choice.value); setError(""); }} />
+            <span className="hca-pdf-mode-icon"><Icon name={choice.icon} width={19} height={19} /></span>
+            <span><strong>{choice.label}</strong><small id={descriptionId}>{choice.description}</small></span>
+          </label>;
+        })}
+      </fieldset>
       <p className="hca-field-help">Todas as modalidades preservam integralmente os materiais, as observações e as exceções essenciais da Ficha. Nenhum filtro retira esse conteúdo.</p>
       {!canAudit ? <p className="hca-field-help">O relatório de auditoria exige competência própria de auditoria deste paciente.</p> : null}
       {mode !== "record" ? <>

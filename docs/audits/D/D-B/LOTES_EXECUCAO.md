@@ -1770,11 +1770,15 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261122195318_l3_versioned_consumption_reads` | Aplicada | Aplicada |
 | `20261122201849_l3_balance_count_admissions` | Aplicada | Aplicada |
 | `20261122212641_l3_stock_review_repairs` | Aplicada | Aplicada |
+| `20261122215240_l3_pdf_archive_revision_filters` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
-com 330 versões. Local e remoto têm 332 versões. A aplicação das duas
-migrations subsequentes foi precedida pelo backup cifrado verificado
-`cbc6795c-3189-4834-a475-7c1f0b09d031`. A fila vinculada ficou vazia.
+com 330 versões. A aplicação das duas migrations subsequentes foi precedida
+pelo backup cifrado verificado `cbc6795c-3189-4834-a475-7c1f0b09d031`.
+A migration de filtros do acervo foi aplicada após o backup verificado
+`a59372d1-ce5a-4021-a05e-cfa9444fa2a6`. Local e remoto têm 333 versões.
+A fila vinculada ficou vazia. O RPC de filtro exige usuário autenticado
+e a função privada de consulta fica indisponível ao papel de aplicação.
 
 L4 aguarda definição.
 
@@ -2124,8 +2128,9 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   autorizados abrem em painel e revalidam o acesso. O resultado público
   omite identificadores internos. A indisponibilidade da política de confiança
   preserva a consulta do registro e a comparação de bytes já concluídas.
-  A retentativa da anexação permanece no modal. Ainda faltam a atualização
-  do acervo e verificações dos outros estados.
+  A retentativa da anexação permanece no modal. Gerados e Anexos foram
+  reunidos em Arquivos. Os filtros do acervo e o seletor de conteúdo
+  usam a revisão atual da ficha e as permissões documentais.
 
 ### Movimentação familiar e histórico geral
 
@@ -2301,6 +2306,24 @@ A consulta pública de E09 usa o esquema existente. A anexação usa a primeira
 migration de L3, registrada na seção de migrations por ambiente. Ela guarda
 o vínculo entre tentativas da mesma pessoa e os bytes já submetidos à mesma
 ficha. A seleção incompleta fica no modal, com recuperação técnica separada.
+
+### Acervo na ficha
+
+- Em REQ, COM, ENT, DEV e BAL, Arquivos reúne Gerados e Anexos. Links
+  existentes para anexos abrem a seção correspondente. O acervo usa a
+  mesma ficha e preserva as ações de geração, consulta e download.
+- A falha de leitura usa o diálogo compartilhado. Fechar o diálogo mantém
+  o aviso e o controle de nova consulta. Os oito casos dirigidos de abas,
+  permissão, falha e recuperação passaram em Chromium e Android emulado.
+- Atuais e Anteriores consultam as versões registradas no banco sem
+  alterar os arquivos. A paginação recusa a continuação quando a versão
+  da ficha muda. A validação de banco conferiu essa recusa, os resultados
+  por revisão e a manutenção da consulta anterior por versão exata.
+- O seletor apresenta Ficha, Ficha ampliada e, quando autorizada,
+  Auditoria. Os casos dirigidos de acervo e auditoria passaram em
+  Chromium e Android emulado. O caso de doação passou nos dois projetos
+  após a correção de contraste do modo selecionado, preservando o conteúdo
+  essencial e o período dos complementos.
 
 ## L4
 

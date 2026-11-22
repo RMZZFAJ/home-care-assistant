@@ -49,6 +49,7 @@ import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "@/componen
 import {
   DocumentTabs,
   DocumentPanel,
+  DocumentFileSections,
   DocumentAuditAccess,
   useDocumentTabs,
 } from "@/components/documents/document-tabs";
@@ -787,9 +788,10 @@ export function RequisitionDocumentContent({
 
         </DocumentPanel>
         <DocumentPanel value="communications"><DocumentCommunications id={id} version={p.version} /></DocumentPanel>
-        <DocumentPanel value="files">
+        <DocumentFileSections value={tabs.value} onSelect={tabs.select} generated={<>
           {data.receipt ? <RequisitionReceiptCard receipt={data.receipt} /> : null}
           <DocumentActions
+            active={tabs.value === "files"}
             generationBlocked={stale}
             readOnly={Boolean(p.archivedAt)}
             actionTarget={fileActionTarget}
@@ -798,14 +800,13 @@ export function RequisitionDocumentContent({
             code={data.code ?? data.protocol}
             version={p.version}
           />
-        </DocumentPanel>
-        <DocumentPanel value="attachments">
+        </>} attachments={
           <Attachments
             patientId={data.care_recipient_id}
             documentId={id}
             writable={!p.archivedAt && can(context, "req.create")}
           />
-        </DocumentPanel>
+        } />
         <DocumentPanel value="history">
           <OpeningHistory id={id} refreshKey={openingRevision} authorized={can(context, "document.access.read")} />
           <DocumentTimeline id={id} version={p.version} events={p.events} />

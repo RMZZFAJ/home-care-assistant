@@ -69,7 +69,7 @@ export function DocumentFileView({
               <DocumentActions
                 id={id}
                 code={currentRecord.code}
-                version={version ?? currentRecord.version}
+                version={currentRecord.version}
                 archiveVersion={version}
                 trackNotices={false}
               />

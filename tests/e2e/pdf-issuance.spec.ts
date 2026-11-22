@@ -74,7 +74,7 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   });
   await selectDocumentSection(page, "overview");
   await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
-  await expect(page.getByRole("tab", {name:"Arquivos gerados",exact:true})).toHaveAttribute("aria-selected","true");
+  await expect(page.getByRole("tab", {name:"Arquivos",exact:true})).toHaveAttribute("aria-selected","true");
   await expect(
     page.getByRole("button", { name: "Recuperar emissão", exact: true }),
   ).toBeEnabled();
@@ -330,8 +330,34 @@ test("Acervo consolidado recusa seletores experimentais e preserva exemplares at
  const inspected=await page.request.post("/api/verification",{headers:{"content-type":"application/pdf"},data:artifact.bytes});
  expect(inspected.status()).toBe(200);expect(await inspected.json()).toMatchObject({reference:{found:false},analysis:{status:"unsigned",documentSignature:"absent"}});
  await page.goto(`/documentos/${f.doc.id}`);await selectDocumentSection(page,"files");
+ const archive=page.getByRole("region",{name:"Arquivos gerados",exact:true});
+ const refresh=archive.getByRole("button",{name:"Atualizar arquivos",exact:true});
+ await page.route("**"+url+"/archive",route=>route.fulfill({
+  status:503,json:{error:{code:"DATABASE_UNAVAILABLE",message:"Consulta temporariamente indisponível."}},
+ }),{times:1});
+ await refresh.click();
+ const unavailable=page.getByRole("dialog",{name:"Não foi possível consultar os arquivos",exact:true});
+ await expect(unavailable).toContainText("Consulta temporariamente indisponível.");
+ await unavailable.getByRole("button",{name:"Voltar aos arquivos",exact:true}).click();
+ await expect(refresh).toBeFocused();
+ await expect(archive.getByRole("alert")).toContainText("Consulta temporariamente indisponível.");
+ await refresh.click();
+ await expect(archive.getByRole("alert")).toHaveCount(0);
+ await selectDocumentSection(page,"attachments");
+ await page.reload();
+ await expect(page.getByRole("tab",{name:"Arquivos",exact:true})).toHaveAttribute("aria-selected","true");
+ await expect(page.getByRole("button",{name:"Anexos",exact:true})).toHaveAttribute("aria-pressed","true");
+ await selectDocumentSection(page,"files");
  await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
  const files=page.getByRole("region",{name:"Arquivos gerados",exact:true});await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
+ const filters=files.getByRole("navigation",{name:"Filtrar exemplares",exact:true});
+ await filters.getByRole("button",{name:"Anteriores",exact:true}).click();
+ await expect(files.getByText("Nenhum exemplar neste filtro.",{exact:true})).toBeVisible();
+ await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(0);
+ await filters.getByRole("button",{name:"Atuais",exact:true}).click();
+ await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
+ await filters.getByRole("button",{name:"Todos",exact:true}).click();
+ await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(1);
  const rows=(await(await page.request.get(url+"/archive")).json()).data;expect(rows).toHaveLength(1);expect(rows[0]).toMatchObject({kind:"issuance",issuance:{rendererRevision:16,state:"ready"}});
  const first=await page.request.get(url+"/pdf?issuance="+rows[0].issuance.id);expect(first.ok()).toBe(true);const digest=hash(await first.body());
  expect(hash(await(await page.request.get(url+"/pdf?issuance="+rows[0].issuance.id)).body())).toBe(digest);

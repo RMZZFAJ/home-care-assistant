@@ -136,7 +136,7 @@ test("background ficha refresh keeps the summary stationary and tabs selectable 
     release();
     await expect(refresh).toHaveAttribute("aria-disabled", "false");
     await expect(refresh).toHaveAttribute("aria-busy", "false");
-    await expect(page.getByRole("tab", { name: "Anexos", exact: true })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("button", { name: "Anexos", exact: true })).toHaveAttribute("aria-pressed", "true");
     expect(physical(f.patient)).toBe(before);
   } finally {
     release();

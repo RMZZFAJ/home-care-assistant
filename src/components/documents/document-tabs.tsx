@@ -23,7 +23,7 @@ const baseTabs: { id: DocumentTab; label: string; icon: IconName; }[] = [
   { id: "materials", label: "Materiais", icon: "stock" },
   { id: "progress", label: "Andamentos", icon: "history" },
   { id: "communications", label: "Comunicações", icon: "bell" },
-  { id: "files", label: "Arquivos gerados", icon: "forms" },
+  { id: "files", label: "Arquivos", icon: "forms" },
   { id: "attachments", label: "Anexos", icon: "link" },
 ];
 
@@ -110,7 +110,7 @@ export function DocumentTabs({
   sections?: readonly DocumentTab[];
 }) {
   const tabs = [
-    ...baseTabs.filter(tab => !sections || sections.includes(tab.id)),
+    ...baseTabs.filter(tab => tab.id !== "attachments" && (!sections || sections.includes(tab.id))),
     ...(auditAllowed
       ? [{ id: "audit" as const, label: "Auditoria", icon: "history" as const }]
       : []),
@@ -118,7 +118,7 @@ export function DocumentTabs({
   return (
     <Tabs.Root
       ref={rootRef}
-      value={value}
+      value={value === "attachments" ? "files" : value}
       onValueChange={(next) => {
         if (typeof next === "string") onSelect(next as DocumentTab);
       }}
@@ -142,6 +142,23 @@ export function DocumentTabs({
       {children}
     </Tabs.Root>
   );
+}
+
+export function DocumentFileSections({ value, onSelect, generated, attachments }: {
+  value: DocumentTab;
+  onSelect: (section: "files" | "attachments") => void;
+  generated: ReactNode;
+  attachments: ReactNode;
+}) {
+  const showingAttachments = value === "attachments";
+  return <DocumentPanel value="files">
+    <nav className="hca-document-file-nav" aria-label="Arquivos da ficha">
+      <button type="button" aria-pressed={!showingAttachments} onClick={() => onSelect("files")}>Gerados</button>
+      <button type="button" aria-pressed={showingAttachments} onClick={() => onSelect("attachments")}>Anexos</button>
+    </nav>
+    <div hidden={showingAttachments}>{generated}</div>
+    <div hidden={!showingAttachments}>{attachments}</div>
+  </DocumentPanel>;
 }
 
 /** Panels stay mounted: navigation cannot discard an edit or an unknown command. */

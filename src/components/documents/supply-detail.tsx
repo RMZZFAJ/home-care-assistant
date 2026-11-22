@@ -87,6 +87,7 @@ import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import {
   DocumentTabs,
   DocumentPanel,
+  DocumentFileSections,
   DocumentAuditAccess,
   useDocumentTabs,
 } from "@/components/documents/document-tabs";
@@ -1708,9 +1709,10 @@ export function SupplyDocumentContent({
             <DocumentPanel value="communications">
               <DocumentDeliveryStatus id={data.id} version={data.version} />
             </DocumentPanel>
-            <DocumentPanel value="files">
-              {data.protocol ? (
+            <DocumentFileSections value={tabs.value} onSelect={tabs.select} generated={
+              data.protocol ? (
                 <DocumentActions
+                  active={tabs.value === "files"}
                   generationBlocked={stale || Boolean(arrivalReadFailure)}
                   readOnly={archived}
                   actionTarget={fileActionTarget}
@@ -1724,9 +1726,8 @@ export function SupplyDocumentContent({
                   Esta declaração ou rascunho ainda não tem emissão documental
                   definitiva.
                 </Notice>
-              )}
-            </DocumentPanel>
-            <DocumentPanel value="attachments">
+              )
+            } attachments={
               <Attachments
                 patientId={data.care_recipient_id}
                 documentId={data.id}
@@ -1738,7 +1739,7 @@ export function SupplyDocumentContent({
                 }
                 onChange={() => setAttempt((value) => value + 1)}
               />
-            </DocumentPanel>
+            } />
             <DocumentPanel value="history">
               {data?.protocol && activeContext ? <DocumentAccessObservation key={`${context.userId}:${data.id}:${data.version}`} id={data.id} version={data.version} onRecorded={setAccessRevision} /> : null}
               <DocumentAccessHistory id={id} refreshKey={`${data.version}:${accessRevision}`} authorized={can(context, "document.access.read")} />

@@ -10,6 +10,7 @@ import { buttonClass, can, Notice } from "@/components/workspace";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { DocumentActionSlot } from "./document-action-slot";
 import { Icon } from "@/components/ui/primitives";
+import { Dialog } from "@/components/ui/overlays";
 import { api, ApiError, TransportError } from "@/lib/client/api";
 import {
   initialPdfStatusSchema,
@@ -18,6 +19,7 @@ import {
 } from "@/lib/documents/pdf-issuance";
 import {
   pdfArchivePageSchema,
+  type pdfArchiveFilter,
   type PdfArchiveEntry,
   type PdfArchiveCursor,
 } from "@/lib/documents/pdf-archive";
@@ -39,10 +41,14 @@ type Props = {
   onAction?: () => void;
   generationBlocked?: boolean;
   readOnly?: boolean;
+  active?: boolean;
 };
 const intentionSchema = z.object({ key: z.uuid(), version: z.number().int().positive().max(2147483647).optional(), documentOptions: pdfDocumentOptionsSchema.optional() }).strict();
 const parseInitialPdf = (raw: unknown) => initialPdfStatusSchema.parse(raw);
 type Intention = z.infer<typeof intentionSchema>;
+type ArchiveFilter = "all" | z.infer<typeof pdfArchiveFilter>;
+type ArchivePage = { cursor: PdfArchiveCursor; basisVersion?: number };
+const archiveFilters = [["all", "Todos"], ["current", "Atuais"], ["previous", "Anteriores"]] as const;
 const steps = {
   reserved: "Solicitação registrada",
   recovering: "Recuperando o exemplar",
@@ -101,6 +107,7 @@ function GeneratedFiles({
   onAction,
   generationBlocked = false,
   readOnly = false,
+  active = true,
 }: Props & { userId: string; canAudit: boolean; canAccess: boolean; }) {
   const headingId = useId(),
     scope = `hca:pdf-intention:${userId}:${id}`,
@@ -111,8 +118,9 @@ function GeneratedFiles({
   const initialProcessing = initial.data?.state === "reserved" || initial.data?.state === "processing";
   const [initialBusy, setInitialBusy] = useState(false);
   const [initialError, setInitialError] = useState("");
+  const [filter, setFilter] = useState<ArchiveFilter>("all");
   const [rows, setRows] = useState<PdfArchiveEntry[]>([]),
-    [next, setNext] = useState<PdfArchiveCursor | null>(null),
+    [next, setNext] = useState<ArchivePage | null>(null),
     [loading, setLoading] = useState(true),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -120,33 +128,43 @@ function GeneratedFiles({
     [readError, setReadError] = useState(""),
     [pending, setPending] = useState<Intention | null>(null);
   const [optionsOpen, setOptionsOpen] = useState(false), [integrityError, setIntegrityError] = useState(false);
+  const [archiveDenied, setArchiveDenied] = useState(false);
+  const [archiveErrorDismissed, setArchiveErrorDismissed] = useState(false);
   const [activityStage, setActivityStage] = useState(0);
   useOperationActivity(busy || initialBusy, { title: initialBusy ? "Recuperando o PDF inicial" : "Emissão de PDF", detail: "Estamos conferindo a mesma solicitação. Aguarde a confirmação do exemplar.", stage: activityStage, steps: [{ label: "Preparando a emissão", icon: "file" }, { label: "Gerando e assinando o exemplar", icon: "shield" }, { label: "Conferindo o arquivo registrado", icon: "check" }] });
   const busyRef = useRef(false),
-    sequenceRef = useRef(0);
+    sequenceRef = useRef(0), archiveRetryRef = useRef<HTMLButtonElement>(null);
   const invalidate = useCallback(() => {
     sequenceRef.current++;
   }, []);
   const load = useCallback(
-    async (cursor?: PdfArchiveCursor, quiet = false) => {
+    async (bookmark?: ArchivePage, quiet = false) => {
+      const cursor = bookmark?.cursor;
       const own = ++sequenceRef.current;
       if (!quiet) setLoading(true);
       try {
         const query = new URLSearchParams();
         if (archiveVersion) query.set("version", String(archiveVersion));
+        else if (filter !== "all") query.set("filter", filter);
         if (cursor) {
           query.set("before", cursor.at);
           query.set("kind", cursor.kind);
           query.set("reference", cursor.reference);
+          if (bookmark?.basisVersion !== undefined) query.set("basis", String(bookmark.basisVersion));
         }
         const raw = await api<unknown>(
           `/api/documents/${id}/archive${query.size ? "?" + query : ""}`,
         );
         const page = pdfArchivePageSchema.safeParse(raw);
-        if (!page.success)
+        if (!page.success || page.data.data.some(entry => entry.issuance.documentId !== id))
           throw new Error(
             "Não foi possível confirmar a lista de arquivos. Consulte novamente.",
           );
+        const basis = page.data.basisVersion;
+        if (filter !== "all" && (page.data.filter !== filter || basis === undefined
+          || bookmark && bookmark.basisVersion !== basis
+          || page.data.data.some(entry => filter === "current" ? entry.issuance.version !== basis : entry.issuance.version >= basis)))
+          throw new Error("A resposta não corresponde ao filtro de exemplares selecionado.");
         if (own !== sequenceRef.current) return;
         setRows((current) =>
           cursor
@@ -161,17 +179,18 @@ function GeneratedFiles({
             ]
             : page.data.data,
         );
-        setNext(page.data.next);
+        setNext(page.data.next ? { cursor: page.data.next, basisVersion: basis } : null);
         setReadError("");
+        setArchiveDenied(false);
       } catch (reason) {
         if (own === sequenceRef.current) {
-          if (
-            reason instanceof ApiError &&
-            [401, 403].includes(reason.status)
-          ) {
+          const denied = reason instanceof ApiError && [401, 403, 404].includes(reason.status);
+          if (denied) {
             setRows([]);
             setNext(null);
           }
+          setArchiveDenied(denied);
+          if (!quiet) setArchiveErrorDismissed(false);
           setReadError(
             reason instanceof Error
               ? reason.message
@@ -182,8 +201,17 @@ function GeneratedFiles({
         if (own === sequenceRef.current) setLoading(false);
       }
     },
-    [id, archiveVersion],
+    [id, archiveVersion, filter],
   );
+  function selectFilter(nextFilter: ArchiveFilter) {
+    if (nextFilter === filter) return;
+    invalidate();
+    setRows([]);
+    setNext(null);
+    setReadError("");
+    setLoading(true);
+    setFilter(nextFilter);
+  }
   useEffect(() => {
     let live = true;
     void Promise.resolve().then(() => {
@@ -195,13 +223,14 @@ function GeneratedFiles({
         setIntegrityError(true);
         setError("Não foi possível conferir a referência da emissão preservada. Nenhuma nova emissão será iniciada; consulte os arquivos e recupere sua referência original.");
       }
-      void load();
     });
-    return () => {
-      live = false;
-      invalidate();
-    };
-  }, [load, scope, invalidate]);
+    return () => { live = false; };
+  }, [scope]);
+  useEffect(() => {
+    let live = true;
+    void Promise.resolve().then(() => { if (live) void load(); });
+    return () => { live = false; invalidate(); };
+  }, [load, invalidate]);
   useEffect(() => {
     if (!busy && !pending) return;
     const timer = setInterval(() => void load(undefined, true), 2000);
@@ -249,9 +278,10 @@ function GeneratedFiles({
     setError("");
     setMessage("Consultando a mesma intenção de emissão…");
     try {
+      const selectedVersion = archiveVersion ?? version;
       const intention = pending ?? {
         key: crypto.randomUUID(),
-        ...(version ? { version } : {}),
+        ...(selectedVersion ? { version: selectedVersion } : {}),
         ...(documentOptions ? { documentOptions } : {}),
       };
       sessionStorage.setItem(scope, JSON.stringify(intention));
@@ -283,7 +313,8 @@ function GeneratedFiles({
         setMessage(
           "A emissão continua em processamento. O andamento aparece abaixo; recupere esta mesma tentativa se necessário.",
         );
-      await load();
+      if (filter === "all") await load();
+      else selectFilter("all");
     } catch (reason) {
       setError(
         reason instanceof Error
@@ -365,6 +396,7 @@ function GeneratedFiles({
           </button>
         </DocumentActionSlot> : null}
         <button
+          ref={archiveRetryRef}
           className={buttonClass}
           type="button"
           disabled={loading}
@@ -374,9 +406,17 @@ function GeneratedFiles({
         </button>
         {!readOnly ? <button className={buttonClass} type="button" disabled={busy || initialBusy || Boolean(pending) || integrityError || generationBlocked} onClick={() => setOptionsOpen(true)}>Escolher conteúdo do PDF</button> : null}
       </div></header>
+      {archiveVersion === undefined ? <nav className="hca-document-file-nav" aria-label="Filtrar exemplares">
+        {archiveFilters.map(([value, label]) => <button key={value} type="button" aria-pressed={filter === value}
+          disabled={busy || initialBusy} onClick={() => selectFilter(value)}>{label}</button>)}
+      </nav> : null}
+      {filter === "previous" ? <div className="doc-card">
+        <strong>O que são exemplares anteriores?</strong>
+        <p>São arquivos gerados com o conteúdo preservado de revisões anteriores da ficha.</p>
+      </div> : null}
       {readOnly ? <p role="status">Os exemplares emitidos estão disponíveis para consulta e download.</p>
         : generationBlocked ? <p role="status">Atualize a ficha para gerar um novo PDF. Os exemplares já emitidos continuam disponíveis.</p> : null}
-      {initial.data ? <div className="doc-card hca-initial-pdf">
+      {initial.data && filter === "all" ? <div className="doc-card hca-initial-pdf">
         <strong>PDF inicial</strong>
         {initial.data.state === "ready" && initial.data.issuanceId ? <a className={buttonClass}
           href={`/api/documents/${id}/pdf?issuance=${initial.data.issuanceId}`} download>
@@ -389,23 +429,34 @@ function GeneratedFiles({
             onClick={() => void retryInitial()}>Recuperar PDF inicial</button>}
         </>}
       </div> : null}
-      <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={!readOnly && optionsOpen} onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} onGenerate={value => { setOptionsOpen(false); onAction?.(); void generate(value); }} />
+      <PdfDocumentOptions key={optionsOpen ? "choosing" : "closed"} open={!readOnly && optionsOpen} onClose={() => setOptionsOpen(false)} canAudit={canAudit} canAccess={canAccess} code={code} onGenerate={value => { setOptionsOpen(false); onAction?.(); void generate(value); }} />
       {message ? <p role="status">{message}</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {readError ? <Notice error>{readError}</Notice> : null}
+      <Dialog open={active && Boolean(readError) && !archiveErrorDismissed && !optionsOpen && !busy && !initialBusy}
+        title={archiveDenied ? "Acesso indisponível" : "Não foi possível consultar os arquivos"}
+        headingIcon={archiveDenied ? "lock" : "alert"} onClose={() => setArchiveErrorDismissed(true)}
+        finalFocus={archiveRetryRef} footer={<>
+          <button type="button" className={buttonClass} onClick={() => setArchiveErrorDismissed(true)}>Voltar aos arquivos</button>
+          <button type="button" className="ui-button ui-button-primary" disabled={loading}
+            onClick={() => void load()}>Consultar novamente</button>
+        </>}>
+        <p>{readError}</p>
+        {loading ? <p role="status">Consultando arquivos…</p> : null}
+      </Dialog>
       {loading ? (
         <p role="status">Consultando arquivos…</p>
-      ) : !visibleRows.length && !initial.data ? (
+      ) : !readError && !visibleRows.length && (filter !== "all" || !initial.data) ? (
         <p>
-          {readOnly ? "Nenhum arquivo registrado nesta consulta." : "Nenhum arquivo registrado nesta consulta. Use Gerar PDF para uma nova emissão explícita."}
+          {filter !== "all" ? "Nenhum exemplar neste filtro." : readOnly ? "Nenhum arquivo registrado nesta consulta." : "Nenhum arquivo registrado nesta consulta. Use Gerar PDF para uma nova emissão explícita."}
         </p>
       ) : null}
       <div className="doc-card doc-file-acervo"><ul className="doc-file-list doc-file-list-compact" aria-label="Exemplares registrados">
         {visibleRows.map((entry) => {
-          const row = entry.issuance;
+          const row = entry.issuance, earlier = version !== undefined && row.version < version;
           return (
             <FileRecord key={row.id} identity={row.id} mime="application/pdf"
-              title={<>{code} · {row.documentOptions ? documentModeLabel(row.documentOptions) : "Ficha"}{row.version < (version ?? row.version) ? <span className="doc-chip">Conteúdo anterior</span> : null}</>}
+              title={<>{code} · {row.documentOptions ? documentModeLabel(row.documentOptions) : "Ficha"}{earlier ? <span className="doc-chip">Conteúdo anterior</span> : null}</>}
               actions={<>              {row.state === "ready" ? (
                 <>
                   <a
@@ -455,6 +506,7 @@ function GeneratedFiles({
               <details className="doc-help-details hca-file-identification">
                 <summary>Identificação do exemplar</summary>
                 <p>Conteúdo da revisão {row.version}. {steps[row.step]}.</p>
+                {earlier ? <p>Este exemplar preserva o conteúdo de uma revisão anterior da ficha. Atualizações posteriores mantêm o conteúdo desta emissão.</p> : null}
                 <p>Solicitado em {formatBrazilDate(row.requestedAt)}.{row.readyAt ? ` Emissão concluída em ${formatBrazilDate(row.readyAt)}. Assinatura técnica e carimbo internos.` : ""}</p>
                 <p className="break-all">
                   Código: HCA-{row.verificationCode.match(/.{4}/g)?.join("-")}

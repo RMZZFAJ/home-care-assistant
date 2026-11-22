@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 export type DocumentSection =
   | "overview"
@@ -16,8 +16,8 @@ const labels = {
   progress: "Andamentos",
   workflow: "Materiais",
   communications: "Comunicações",
-  files: "Arquivos gerados",
-  attachments: "Anexos",
+  files: "Arquivos",
+  attachments: "Arquivos",
   history: "Identificação e registros preservados",
   audit: "Auditoria",
 };
@@ -29,12 +29,7 @@ export async function selectDocumentSection(
   await page.bringToFront();
   if (section === "history") { await openDocumentMore(page); await page.getByRole("menuitem", {name:"Identificação e registros preservados",exact:true}).click(); await expect(page.getByRole("tab", { name: "Identificação e registros preservados", exact: true })).toHaveAttribute("aria-selected", "true"); return; }
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
-  // Horizontal tab scrolling and sticky layout must settle before the press.
-  // Touch projects use their native gesture, rather than an emulated mouse.
-  await tab.scrollIntoViewIfNeeded();
-  await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
-  if (test.info().project.use.hasTouch) await tab.tap();
-  else await tab.click();
+  await pressSectionControl(page, tab);
   try {
     await expect(tab).toHaveAttribute("aria-selected", "true");
   } catch (error) {
@@ -55,7 +50,23 @@ export async function selectDocumentSection(
     }
     throw error;
   }
+  if (section === "files" || section === "attachments") {
+    const destination = page.getByRole("navigation", { name: "Arquivos da ficha", exact: true })
+      .getByRole("button", { name: section === "files" ? "Gerados" : "Anexos", exact: true });
+    if ((await destination.getAttribute("aria-pressed")) !== "true")
+      await pressSectionControl(page, destination);
+    await expect(destination).toHaveAttribute("aria-pressed", "true");
+  }
   await expect(page.getByRole("tabpanel")).toHaveCount(1);
+}
+
+async function pressSectionControl(page: Page, control: Locator) {
+  // Horizontal tab scrolling and sticky layout must settle before the press.
+  // Touch projects use their native gesture, rather than an emulated mouse.
+  await control.scrollIntoViewIfNeeded();
+  await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
+  if (test.info().project.use.hasTouch) await control.tap();
+  else await control.click();
 }
 
 export async function openBalanceComparison(page: Page) {

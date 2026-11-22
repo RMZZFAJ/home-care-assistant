@@ -287,6 +287,18 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 .hca-document-tab[aria-selected=true] { color: var(--hca-teal); border-bottom-color: var(--hca-teal); }
 .hca-document-tab:focus-visible { outline: 3px solid #5aa99a; outline-offset: -3px; }
 .hca-document-tab > svg { width: 16px; height: 16px; }
+.hca-document-file-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 0 14px; }
+.hca-document-file-nav button { border: 1px solid var(--hca-line); border-radius: 999px; padding: 8px 14px; min-height: 40px; background: white; color: var(--hca-muted); font-size: 13px; font-weight: 650; cursor: pointer; }
+.hca-document-file-nav button[aria-pressed=true] { border-color: var(--hca-teal); color: var(--hca-teal); background: var(--hca-tint); }
+.hca-pdf-mode-choices { display: grid; gap: 8px; border: 0; padding: 0; }
+.hca-pdf-mode-choices legend { padding: 0 0 8px; font-size: 13px; font-weight: 650; }
+.hca-pdf-mode-choice { display: grid; grid-template-columns: 16px 34px minmax(0, 1fr); gap: 10px; align-items: center; padding: 11px; border: 1px solid var(--hca-line); border-radius: 12px; background: var(--hca-paper); cursor: pointer; }
+.hca-pdf-mode-choice[data-selected=true] { border-color: var(--hca-teal); background: var(--hca-tint); }
+.hca-pdf-mode-choice input { width: 16px; height: 16px; accent-color: var(--hca-teal); }
+.hca-pdf-mode-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; color: var(--hca-teal); background: var(--hca-tint); }
+.hca-pdf-mode-choice strong, .hca-pdf-mode-choice small { display: block; }
+.hca-pdf-mode-choice small { margin-top: 3px; color: var(--hca-muted); }
+.hca-pdf-mode-choice[data-selected=true] small { color: var(--hca-ink); }
 .hca-document-panel { display: grid; gap: 20px; min-width: 0; }
 .hca-document-panel[hidden], .hca-document-panel[data-hidden], .hca-document-panel[inert] { display: none; }
 .hca-document-action-bar { font-size: 14px; line-height: 1.5; display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin: 13px 0 0; }
