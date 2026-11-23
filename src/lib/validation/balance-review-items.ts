@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { BalanceReviewRecord } from "@/types/documents";
 
 const opinionFields = {
   result: z.enum(["confirmed", "difference"]),
@@ -20,12 +21,19 @@ export const balanceReviewItem = z.object({
   message: "Uma diferença precisa indicar reconto ou ajuste autorizado em ato próprio.",
   path: ["forwarding"],
 });
-export const balanceReviewItems = z.array(balanceReviewItem).max(1000).refine(
+export const balanceReviewItems = z.array(balanceReviewItem).max(1020).refine(
   items => new Set(items.map(item => item.lineId)).size === items.length,
   "Não repita o mesmo material na revisão.",
 );
 export type BalanceReviewItem = z.infer<typeof balanceReviewItem>;
 export type BalanceReviewItemOpinion = z.infer<typeof balanceReviewItemOpinion>;
+
+export function reviewedBalanceMaterial(snapshot: BalanceReviewRecord["reviewed_snapshot"], id: string) {
+  const line = snapshot.lines.find(item => item.id === id);
+  if (line) return { name: line.name_snapshot, unit: line.unit_snapshot, extra: false };
+  const extra = snapshot.extras?.find(item => item.id === id);
+  return extra ? { name: extra.name, unit: extra.unit, extra: true } : undefined;
+}
 
 /** An omitted field is not examined; it must never become an inferred approval. */
 export function balanceReviewItemsFromFields(fields: Record<string, string>) {

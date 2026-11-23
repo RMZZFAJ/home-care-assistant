@@ -103,7 +103,9 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
       semanticFacts[prefix + "/comment"] = review.comment || "Sem comentário adicional.";
       for (const [itemIndex, item] of (review.item_results ?? []).entries()) {
         const line = review.reviewed_snapshot.lines.find(value => value.id === item.lineId);
-        semanticFacts[prefix + "/item/" + itemIndex] = (line?.name_snapshot ?? "Material não identificado") + " · " + (item.result === "confirmed" ? "Confirmado" : "Diferença apontada") + " · " + ({ none: "Sem encaminhamento", recount: "Reconto indicado", adjustment: "Ajuste autorizado indicado" }[item.forwarding]);
+        const extra = review.reviewed_snapshot.extras?.find(value => value.id === item.lineId);
+        const material = line?.name_snapshot ?? (extra ? `${extra.name} (item extra)` : "Material não identificado");
+        semanticFacts[prefix + "/item/" + itemIndex] = material + " · " + (item.result === "confirmed" ? "Confirmado" : "Diferença apontada") + " · " + ({ none: "Sem encaminhamento", recount: "Reconto indicado", adjustment: "Ajuste autorizado indicado" }[item.forwarding]);
         if (item.comment) semanticFacts[prefix + "/itemComment/" + itemIndex] = item.comment;
       }
     }

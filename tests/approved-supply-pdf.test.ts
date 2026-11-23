@@ -71,6 +71,30 @@ it("approved BAL preserves the count, post-application stock and uncatalogued fi
   writeFileSync("output/pdf/approved/bal-controlled.pdf", plan.bytes);
 }, 30000);
 
+it("approved BAL identifies an extra by the reviewed version even after it leaves the current extras", async () => {
+  const source = balance();
+  const extra = { id: id(5), name: "Ponteira da versão revisada", unit: "caixa", quantity: "2" };
+  const recordedAt = "2026-11-11T15:00:00Z";
+  const counter = { id: id(6), name: "Pessoa que contou", source: "count_event", recordedAt };
+  source.balanceReviews = {
+    counter, countVersion: 2, notes: "", legacyApprovals: [],
+    reviews: [{
+      id: id(7), count_version: 1, counter_id: id(6), reviewer_id: id(8), reviewer_name: "Pessoa que revisou",
+      review_group: "family", comment: "", recorded_at: recordedAt, reference_state: "historical",
+      reviewed_document_version: 2,
+      reviewed_snapshot: { counter, notes: null, countVersion: 1, lines: [], extras: [extra], referenceRevision: "5", currentRevision: "6", appliedBeforeReview: true },
+      item_results: [{ lineId: extra.id, result: "difference", forwarding: "recount", comment: "Conferir a segunda caixa." }],
+    }],
+  };
+  source.balanceReviewCorrections = [{ reviewId: id(7), sourceLineId: extra.id, sourceState: "unavailable", acts: [] }];
+  const plan = await composeIssuance(source, "a".repeat(64), emission);
+  const expected = "Ponteira da versão revisada (item extra) · Diferença apontada · Reconto indicado";
+  expect(await plain(plan.bytes)).toContain(compact(expected));
+  expect(plan.semanticFacts?.["review/0/item/0"]).toBe(expected);
+  expect(plan.semanticFacts?.["review/0/itemComment/0"]).toBe("Conferir a segunda caixa.");
+  expect(plan.semanticFacts?.["balance/extra/0"]).toBeUndefined();
+}, 30000);
+
 it("approved BAL distinguishes restricted, unapplied and unavailable balances without turning any state into zero", async () => {
   for (const state of ["restricted", "not_applied", "unavailable"] as const) {
     const source = balance(); source.status = "submitted";

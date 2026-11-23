@@ -261,6 +261,7 @@ export function BalanceReview({
                   </li>
                 ))}
               </ul>
+              <BalanceRecordedExtras extras={row.reviewed_snapshot.extras ?? []} />
             </details>
           </article>
         ))}

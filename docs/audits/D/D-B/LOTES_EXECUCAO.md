@@ -2535,8 +2535,7 @@ extra que entrou no catálogo passa para Materiais. O banco verifica os itens
 da contagem anterior e rejeita confirmação divergente do rascunho. Os extras
 fora do catálogo ficam na ficha e no exemplar gerado da contagem para
 identificação posterior. A conciliação de estoque usa as identidades já
-catalogadas. Pareceres individualizados sobre extras ainda precisam ser
-integrados ao fluxo de revisões.
+catalogadas.
 
 A migration foi aplicada localmente e no Supabase remoto depois do backup
 cifrado verificado `be60068e-10af-4d85-8286-287ed417befb`. A consulta vinculada
@@ -2563,6 +2562,36 @@ retornou a referência de estoque para uma sessão fictícia autenticada, com
 revisão sem emissão e a recontagem em outra janela com o tipo de plantão
 visível na confirmação e na revisão. A recontagem preservou a contagem
 anterior, sua autoria e seus pareceres.
+
+### Revisão por material e item extra do BAL
+
+O formulário reúne a quantidade contada, o progresso da conferência e as
+três escolhas do laboratório V4. Os materiais aparecem por categoria, e
+os extras ficam em seu próprio grupo. A consulta completa da referência
+continua disponível no painel. Cada diferença exige encaminhamento e
+permite comentário. A opção “Não conferi” fica sem resultado individual.
+
+A revisão só aceita itens da versão examinada, com autoria, grupo revisor
+e idempotência do ato. O registro preserva nome, unidade e quantidade dos
+extras daquela contagem. O exemplar usa esse registro para identificar os
+extras revisados, inclusive após a saída do item da lista atual. A
+aplicação ao estoque continua sendo um ato próprio, e o encaminhamento de
+uma diferença permanece no histórico. Falta vincular aos atos posteriores
+o extra que reaparece na recontagem e o que passa a ter identidade de
+catálogo.
+
+A migration `20261123011538_l3_balance_extra_reviews.sql` está no ambiente
+local e no Supabase remoto. O backup cifrado crítico
+`45838270-91ca-4ea7-8ac2-57e3eb13b7b6` foi verificado antes da aplicação.
+A consulta posterior confirmou 342 migrations, fila vazia e ausência de
+execução direta do validador por `authenticated`. Os testes de escrita
+usaram identidades fictícias locais.
+
+Chromium, Android e iOS emulados passaram pelo registro da revisão e pela
+recuperação da aplicação. Os estados “Confere” e “Diferença” passaram pela
+verificação de acessibilidade em 320 px. A composição e a extração do PDF
+confirmaram a identificação de um extra da versão histórica, com seu
+resultado e comentário.
 
 ## L4
 

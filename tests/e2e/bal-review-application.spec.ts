@@ -1,6 +1,7 @@
 import { noPrivateWrites, privateFormCount } from "./l1-decision-policy";
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
 import { legacyBalance } from "../integration/bal-review-fixtures.mjs";
 import { fixtures } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
@@ -18,16 +19,34 @@ async function openReview(page: Page) {
  return page.getByRole("dialog", { name: "Revisar contagem do balanço", exact: true });
 }
 test("BAL keeps an unsaved item review separate from stock application and recovers its committed application by GET after reload", async ({ page }, info) => {
- const f = await legacyBalance({ quantity: "1" }), before = stock(f.patient), writes = noPrivateWrites(page), drafts = privateFormCount(f.patient);
+ const extra = { id: randomUUID(), name: "Conector fora do catálogo", unit: "caixa", quantity: "2" };
+ const f = await legacyBalance({ quantity: "1", balanceExtras: [extra] }), before = stock(f.patient), writes = noPrivateWrites(page), drafts = privateFormCount(f.patient);
  await page.goto("/login");await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);await page.getByRole("button", { name: "Entrar", exact: true }).click();
  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();await selectContext(page, f.patient);
  await page.goto("/fichas/"+f.document.id);
  const dialog = await openReview(page);
  const first = f.document.lines[0], resultLabel = "Resultado da revisão — "+first.name_snapshot;
+ const detailedCount = dialog.getByText("Referência e contagem dos materiais", { exact: true });
+ await detailedCount.click();
+ await expect(dialog.getByRole("table", { name: "Materiais da contagem", exact: true })).toBeVisible();
+ await detailedCount.click();
  await dialog.getByRole("textbox", { name: /^Sua revisão sobre a contagem/ }).fill("Parecer independente; somente um material examinado.");
- await dialog.getByRole("combobox", { name: resultLabel, exact: true }).selectOption("confirmed");
+ await dialog.getByRole("group", { name: resultLabel, exact: true }).getByRole("button", { name: "Confere", exact: true }).click();
  await dialog.getByRole("textbox", { name: "Comentário do material — "+first.name_snapshot, exact: true }).fill("Conferido individualmente.");
+ const extras = dialog.getByRole("region", { name: "Itens extras", exact: true });
+ const extraChoices = extras.getByRole("group", { name: "Resultado da revisão — " + extra.name, exact: true });
+ await expect(extraChoices.getByRole("button", { name: "Não conferi", exact: true })).toHaveAttribute("aria-pressed", "true");
+ await expect(extras).toContainText("2 caixa");
+ await extraChoices.getByRole("button", { name: "Diferença", exact: true }).click();
+ await expect(extras.getByRole("combobox", { name: "Encaminhamento — " + extra.name, exact: true })).toHaveValue("none");
+ await page.setViewportSize({ width: 320, height: 940 });
+ await audit(page, "bal-review-extra-difference-320");
+ await extraChoices.getByRole("button", { name: "Confere", exact: true }).click();
+ await expect(dialog.getByRole("progressbar", { name: "Materiais conferidos" })).toHaveAttribute("value", "2");
+ await audit(page, "bal-review-extra-320");
+ mkdirSync("output/playwright/phase-d", { recursive: true });
+ await extras.screenshot({ path: "output/playwright/phase-d/bal-review-extra-" + info.project.name + ".png" });
  expect(stock(f.patient)).toBe(before); expect(privateFormCount(f.patient)).toBe(drafts);
  await dialog.getByRole("button", { name: "Conferir revisão", exact: true }).click();
  await expect(dialog.getByRole("region", { name: "Materiais incluídos na revisão", exact: true })).toContainText("Os demais materiais não foram declarados como examinados");
@@ -39,7 +58,9 @@ test("BAL keeps an unsaved item review separate from stock application and recov
  expect(stock(f.patient)).toBe(before);
  const reviewed = (await (await page.request.get("/api/documents/"+f.document.id)).json()).data;
  expect(writes).toEqual([]); expect(privateFormCount(f.patient)).toBe(drafts);
- expect(reviewed.status).toBe("submitted");expect(reviewed.balanceReview.reviews[0].item_results).toHaveLength(1);
+ expect(reviewed.status).toBe("submitted");expect(reviewed.balanceReview.reviews[0].item_results).toHaveLength(2);
+ expect(reviewed.balanceReview.reviews[0].item_results).toContainEqual({ lineId: extra.id, result: "confirmed", forwarding: "none", comment: "" });
+ expect(reviewed.balanceReview.reviews[0].reviewed_snapshot.extras).toEqual([extra]);
  expect(reviewed.balanceReview.application.state).toBe("not_applied");
  await page.getByRole("button", { name: "Aplicar contagem pelo grupo familiar", exact: true }).click();
  const applyDialog = page.getByRole("dialog", { name: "Aplicar contagem ao estoque", exact: true });
@@ -66,6 +87,7 @@ test("BAL keeps an unsaved item review separate from stock application and recov
  await expect(page.getByRole("heading", { name: "Aplicação da contagem ao estoque", exact: true })).toBeFocused();
  await expect(page.getByText("Aplicação original recuperada por consulta. Nenhum movimento foi repetido.", { exact: true })).toBeVisible();
  expect(lookups).toBe(1);expect(posts).toBe(1);expect(stock(f.patient)).toBe(applied);
+ await expect(page.getByText(extra.name + " · " + extra.unit + " · Item extra", { exact: true })).toBeVisible();
  await audit(page, "bal-recovered-application-320");
  const pdf = await generatedPdf(page, "/api/documents/"+f.document.id+"/pdf");expect(pdf.status()).toBe(200);
  mkdirSync("output/pdf/phase-d", { recursive: true });writeFileSync("output/pdf/phase-d/bal-separate-application-"+info.project.name+".pdf", await pdf.body());

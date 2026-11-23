@@ -158,6 +158,7 @@ export type BalanceReviewRecord = {
       SupplyLine,
       "id" | "name_snapshot" | "quantity" | "unit_snapshot"
     >[];
+    extras?: BalanceCountExtra[];
     referenceRevision: string | null;
     currentRevision: string;
     appliedBeforeReview: boolean;

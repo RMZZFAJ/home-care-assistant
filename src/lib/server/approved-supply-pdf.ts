@@ -18,6 +18,7 @@ import { formatQuantity, quantity } from "@/lib/quantity";
 import { purchaseArrivalVariance } from "@/lib/documents/purchase";
 import { pendingPurchaseItems } from "@/lib/documents/pending-purchase-items";
 import { issuedBalanceExtras } from "@/lib/validation/balance-count-extras";
+import { reviewedBalanceMaterial } from "@/lib/validation/balance-review-items";
 
 const name = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const unit = (line: Record<string, unknown>) => String(line.unit_snapshot ?? "Unidade não preservada");
@@ -218,8 +219,9 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
       layout.paragraph(review.count_version !== snapshot.balanceReviews?.countVersion ? "Registro de contagem anterior; não é revisão vigente da contagem atual." : eligible.includes(review) ? "Revisão da contagem atual. Não aplica nem corrige estoque." : "Revisão preservada; elegibilidade para a contagem atual não comprovada por este contexto.", prefix + "/scope", { size: 9.5 });
       layout.paragraph(review.comment || "Sem comentário adicional.", prefix + "/comment");
       for (const [itemIndex, item] of (review.item_results ?? []).entries()) {
-        const line = review.reviewed_snapshot.lines.find(value => value.id === item.lineId);
-        layout.paragraph((line?.name_snapshot ?? "Material não identificado") + " · " + (item.result === "confirmed" ? "Confirmado" : "Diferença apontada") + " · " + ({ none: "Sem encaminhamento", recount: "Reconto indicado", adjustment: "Ajuste autorizado indicado" }[item.forwarding]), prefix + "/item/" + itemIndex, { strong: true });
+        const material = reviewedBalanceMaterial(review.reviewed_snapshot, item.lineId);
+        const name = material ? material.name + (material.extra ? " (item extra)" : "") : "Material não identificado";
+        layout.paragraph(name + " · " + (item.result === "confirmed" ? "Confirmado" : "Diferença apontada") + " · " + ({ none: "Sem encaminhamento", recount: "Reconto indicado", adjustment: "Ajuste autorizado indicado" }[item.forwarding]), prefix + "/item/" + itemIndex, { strong: true });
         if (item.comment) layout.paragraph(item.comment, prefix + "/itemComment/" + itemIndex, { size: 9.5 });
       }
     }
