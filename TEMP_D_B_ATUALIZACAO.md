@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — consulta de consumo e faltas.** A lista usa carregamento simples,
+diálogo de recuperação e filtros em modal. O período continua disponível.
+As verificações em Chromium, Android e iOS emulados incluíram paginação de
+102 relatos, recusa de acesso e recuperação sem escrita.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#consulta-e-filtros-de-relatos).
+
 **23/11 — resultado do envio de anexo.** O diálogo **Anexo disponível**
 confirma a gravação ou a recuperação da mesma tentativa. Nove verificações
 passaram em Chromium, Android e iOS emulados.

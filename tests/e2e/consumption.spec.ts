@@ -7,6 +7,7 @@ import {
 import { readFileSync, mkdirSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
   fixtureFile,
   sql,
@@ -20,10 +21,11 @@ async function login(
   page: Page,
   patient: string,
   role: "professional" | "adminA",
+  email?: string,
 ) {
   const identities = JSON.parse(readFileSync(fixtureFile, "utf8"));
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(identities[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email ?? identities[role].email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -814,7 +816,7 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
     `insert into public.consumption_reports(care_recipient_id,reported_by,kind,location,body,lines,idempotency_key) select ${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'shortage','FAMILY','Registro histórico fictício para paginação '||n,'[]'::jsonb,gen_random_uuid() from generate_series(1,101)n;`,
   );
   const order: string[] = JSON.parse(sql(`select jsonb_agg(id::text order by created_at desc,id desc) from public.consumption_reports where care_recipient_id=${sqlLiteral(f.patient)};`));
-  await login(page, f.patient, "adminA");
+  await login(page, f.patient, "adminA", (await shiftWorker(f.patient, "admin")).email);
   let fail = true;
   await page.route("**/api/consumption?*", async (route) => {
     if (fail) {
@@ -895,7 +897,7 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   ).toHaveAttribute("aria-pressed", "true");
   const day = sql(`select to_char(created_at at time zone 'America/Sao_Paulo','YYYY-MM-DD') from public.consumption_reports where id=${sqlLiteral(old)};`);
   const filters = page.getByRole("button", { name: "Filtrar relatos", exact: true });
-  const filterPanel = page.getByRole("dialog", { name: "Filtrar relatos", exact: true });
+  const filterPanel = page.getByRole("dialog", { name: "Filtrar registros", exact: true });
   const openFilters = async () => {
     if (info.project.use.hasTouch) await filters.tap();
     else await filters.click();
@@ -903,9 +905,17 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   };
   await page.getByRole("textbox", { name: "Buscar relato ou material", exact: true }).fill("Relato fictício preservado para decisão");
   await openFilters();
+  const viewport = page.viewportSize();
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 900 });
+    const path = info.outputPath(`consumo-filtros-${width}.png`);
+    await page.screenshot({ path, scale: "css", animations: "disabled" });
+    await info.attach(`Filtros dos relatos em ${width}px`, { path, contentType: "image/png" });
+  }
+  if (viewport) await page.setViewportSize(viewport);
   await filterPanel.getByLabel("Desde", { exact: true }).fill(day);
   await filterPanel.getByLabel("Até", { exact: true }).fill(day);
-  await filterPanel.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await filterPanel.getByRole("button", { name: "Aplicar", exact: true }).click();
   await expect(filters).toBeFocused();
   await expect(page).toHaveURL(/q=Relato/);
   await expect.poll(visibleIds).toEqual([old]);
@@ -913,10 +923,10 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   await openFilters();
   await expect(filterPanel.getByLabel("Desde", { exact: true })).toHaveValue(day);
   await expect(filterPanel.getByLabel("Até", { exact: true })).toHaveValue(day);
-  const status = filterPanel.getByRole("combobox", { name: "Estado", exact: true });
+  const status = filterPanel.getByRole("combobox", { name: "Situação", exact: true });
   await status.selectOption("confirmed");
   await expect(status).toHaveValue("confirmed");
-  await filterPanel.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await filterPanel.getByRole("button", { name: "Aplicar", exact: true }).click();
   await expect(page).toHaveURL(url => url.searchParams.get("status") === "confirmed");
   await expect(page.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible();
   expect((await page.request.get(`/api/consumption?careRecipientId=${f.patient}&from=2026-11-12&to=2026-11-11`)).status()).toBe(400);

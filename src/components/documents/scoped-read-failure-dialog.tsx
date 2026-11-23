@@ -22,6 +22,13 @@ const subjects = {
     loading: "Consultando saldos…",
     preserved: "As movimentações já registradas permanecem preservadas.",
   },
+  consumption: {
+    operation: "Consultar consumo e faltas",
+    code: "RELATOS_CONSULTA_INDISPONIVEL",
+    back: "Voltar aos relatos",
+    loading: "Consultando relatos…",
+    preserved: "Os relatos já registrados permanecem preservados.",
+  },
 };
 
 export function ScopedReadFailureDialog({ subject, open, title, denied, message, cause, attempts, loading, returnFocus, onClose, onRetry }: {

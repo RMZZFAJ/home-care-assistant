@@ -3333,6 +3333,7 @@ WhatsApp ainda requer homologação do provedor.
   original. `stock-history-completeness.spec.ts`, `family-stock-operation.test.mjs`.
   Preenchimentos anteriores em `stock-private-preparation.spec.ts`.
 - **E07-07** — Busca e filtros de Consumo e faltas, restauração e paginação.
+  [Consulta e filtros de relatos](#consulta-e-filtros-de-relatos),
   `team-consumption.spec.ts`, `consumption-list-completeness.spec.ts`.
 - **E07-08** — Seleção de materiais, extras do consumo e aviso sem quantidade.
   `team-consumption.spec.ts` e seção Material do aviso sem quantidade.
@@ -3759,6 +3760,23 @@ WhatsApp ainda requer homologação do provedor.
   arquivo e sua autoria no acervo, a recusa de acesso e a navegação sem
   nova emissão. As capturas do resultado em 360 e 412 px estão em
   `output/playwright/l3/`. O ajuste dispensa migration.
+
+### Consulta e filtros de relatos
+
+- Consumo e faltas usa o carregamento simples ao abrir, buscar ou atualizar
+  a lista. A atualização em segundo plano continua sem sobreposição enquanto
+  a pessoa consulta um relato ou preenche um formulário. A falha da consulta
+  abre o diálogo compartilhado com retorno, nova consulta e diagnóstico
+  copiável depois de duas tentativas.
+- O modal **Filtrar registros** segue a v4. Os campos de data do produto
+  permanecem disponíveis e as ações ficam no rodapé. A paginação e a busca
+  continuam no servidor. Uma nova consulta invalida respostas atrasadas;
+  uma recusa remove os relatos da consulta recusada.
+- Nos três navegadores, os casos dirigidos conferiram as 102 identidades
+  paginadas, a recuperação com a lista vazia ou preenchida, a autorização
+  real de custódia e o retorno de foco e filtros. A transparência da consulta
+  em segundo plano também permitiu ignorar uma paginação atrasada após
+  mudar a busca. A comparação em 360 e 412 px está em `output/playwright/l3/`.
 
 ## L4
 

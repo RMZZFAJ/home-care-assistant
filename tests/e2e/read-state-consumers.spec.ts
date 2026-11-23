@@ -1,15 +1,16 @@
 import { selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
-import { actor, rpc, fixtures, setup } from "../integration/v4-fixtures.mjs";
+import { rpc, fixtures, setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 test.setTimeout(180_000);
 test.afterEach(async ({ page }) => { await page.unrouteAll({ behavior: "wait" }); });
-async function login(page: Page, patient: string) {
-  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+async function login(page: Page, patient: string, email = fixtures.adminA.email) {
+  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
 }
@@ -64,39 +65,74 @@ test("D3 perfil termina carregamento em falha recupera a leitura e preserva edi�
   } finally { release(); }
 });
 
-test("D3 consumo distingue demora vazio dados falha e repetição sem inventar movimentação", async ({ page }) => {
-  const f = await setup(); await login(page, f.patient);
-  let release!: () => void, entered!: () => void, mode: "delay" | "error" | "invalid" | "live" = "delay";
+test("D3 consumo distingue demora vazio dados falha e repetição sem inventar movimentação", async ({ page }, info) => {
+  const f = await setup(), admin = await shiftWorker(f.patient, "admin");
+  await login(page, f.patient, admin.email);
+  let release!: () => void, entered!: () => void, mode: "delay" | "error" | "invalid" | "recover" | "live" = "delay";
   const gate = new Promise<void>(resolve => { release = resolve; }), first = new Promise<void>(resolve => { entered = resolve; });
+  const recoveredRead = Promise.withResolvers<void>();
   await page.route("**/api/consumption?*", async route => {
     if (mode === "delay") { const response = await route.fetch(); entered(); await gate; return route.fulfill({ response }); }
     if (mode === "error") return route.fulfill({ status: 500, json: { code: "INTERNAL_ERROR", error: "Falha controlada na leitura do consumo" } });
     if (mode === "invalid") return route.fulfill({ status: 200, json: { data: null, next: null } });
+    if (mode === "recover") await recoveredRead.promise;
     return route.continue();
   });
   try {
     await page.goto("/consumo?careRecipientId=" + f.patient); await first;
     const panel = page.getByRole("region", { name: "Relatos registrados", exact: true });
-    await expect(panel.getByText("Carregando relatos…", { exact: true })).toBeVisible();
+    const loading = page.getByRole("dialog", { name: "Consultando relatos", exact: true });
+    await expect(loading).toBeVisible();
+    await expect(loading.getByRole("list", { name: "Etapas da operação" })).toHaveCount(0);
+    await expect(page.getByText("Carregando relatos…", { exact: true })).toHaveCount(0);
     await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toHaveCount(0);
     release(); await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible();
     // Keep concurrent background reads in the empty phase until it is observed.
     // Only the following explicit refresh should encounter the injected error.
     mode = "error";
-    await page.getByRole("button", { name: "Atualizar lista", exact: true }).click();
+    const refresh = page.getByRole("button", { name: "Atualizar lista", exact: true });
+    await refresh.click();
+    const failure = page.getByRole("dialog", { name: "Não foi possível consultar os relatos", exact: true });
+    await expect(failure).toContainText("Falha controlada na leitura do consumo");
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      const path = info.outputPath(`consumo-consulta-falhou-${width}.png`);
+      await page.screenshot({ path, scale: "css", animations: "disabled" });
+      await info.attach(`Falha na consulta de relatos em ${width}px`, { path, contentType: "image/png" });
+    }
+    for (let attempts = 1; attempts <= 2; attempts++) {
+      const failed = page.waitForResponse(response => new URL(response.url()).pathname === "/api/consumption" && response.status() === 500);
+      await failure.getByRole("button", { name: "Consultar novamente", exact: true }).click();
+      await failed;
+    }
+    await expect(failure.locator("footer").getByRole("button", { name: "Copiar detalhes", exact: true })).toBeVisible();
+    await failure.locator("summary").click();
+    await expect(failure.locator("pre")).toContainText("Tentativas de consulta: 2");
+    await failure.getByRole("button", { name: "Voltar aos relatos", exact: true }).click();
+    await expect(refresh).toBeFocused();
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do consumo");
-    await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toHaveCount(0); await expect(panel.getByText("Carregando relatos…", { exact: true })).toHaveCount(0);
-    mode = "invalid"; await page.getByRole("button", { name: "Atualizar lista", exact: true }).click();
-    await expect(panel.getByRole("alert")).toContainText("A resposta recebida não corresponde à consulta dos relatos. Atualize a lista.");
-    const admin = await actor("adminA", f.patient), text = "Relato fictício para estados de consulta " + randomUUID().slice(0, 8);
-    await rpc(admin, "report_extraordinary_consumption", { p_patient: f.patient, p_kind: "shortage", p_location: "FAMILY", p_text: text, p_lines: [], p_key: randomUUID() });
-    mode = "live"; await page.getByRole("button", { name: "Atualizar lista", exact: true }).click();
+    await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toHaveCount(0); await expect(loading).toHaveCount(0);
+    mode = "invalid"; await refresh.click();
+    await expect(failure).toContainText("A resposta recebida não corresponde à consulta dos relatos. Atualize a lista.");
+    mode = "recover";
+    await failure.getByRole("button", { name: "Consultar novamente", exact: true }).click();
+    await expect(loading).toBeVisible();
+    mode = "live";
+    recoveredRead.resolve();
+    await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible();
+    const text = "Relato fictício para estados de consulta " + randomUUID().slice(0, 8);
+    await rpc(admin.client, "report_extraordinary_consumption", { p_patient: f.patient, p_kind: "shortage", p_location: "FAMILY", p_text: text, p_lines: [], p_key: randomUUID() });
+    await refresh.click();
     await expect(panel.getByText(text, { exact: true })).toBeVisible(); await expect(panel.getByRole("alert")).toHaveCount(0);
     for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "D3 consumption read " + width); }
-    const query = panel.getByLabel("Buscar relato ou material", { exact: true }); await query.fill("Termo fictício sem correspondência"); await panel.getByRole("button", { name: "Buscar relatos", exact: true }).click();
+    const query = panel.getByLabel("Buscar relato ou material", { exact: true });
+    await query.fill("Termo fictício sem correspondência");
+    await expect(query).toHaveValue("Termo fictício sem correspondência");
+    await query.press("Enter");
+    await expect(page).toHaveURL(url => url.searchParams.get("q") === "Termo fictício sem correspondência");
     await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible(); await expect(panel.getByText(text, { exact: true })).toHaveCount(0);
     const report = (await (await page.request.get("/api/consumption?careRecipientId=" + f.patient)).json()).data;
     expect(report).toHaveLength(1); expect(report[0].body).toBe(text); expect(report[0].status).toBe("reported");
     expect(sql(`select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='consumption';`)).toBe("0");
-  } finally { release(); }
+  } finally { release(); recoveredRead.resolve(); }
 });

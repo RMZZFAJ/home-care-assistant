@@ -4,8 +4,10 @@ import { ActionButton, DefinitionGrid, SelectField, TextInput } from "@/componen
 import { MenuPopup } from "@/components/ui/floating";
 import { Icon } from "@/components/ui/icon";
 import { Dialog, Drawer } from "@/components/ui/overlays";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { ScopedReadFailureDialog } from "@/components/documents/scoped-read-failure-dialog";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -39,6 +41,7 @@ import {
 } from "@/components/notifications/notification-reference";
 
 type Cursor = { at: string; id: string };
+type ReadFailure = { cause: unknown; denied: boolean; interactive: boolean; attempts: number };
 const emptyFilters = { q: "", kind: "", status: "", from: "", to: "" };
 const filterKeys = ["q", "kind", "status", "from", "to"] as const;
 const reportKinds = [
@@ -92,13 +95,17 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [read, setRead] = useState<{
     query: string;
     key: string;
+    attempt: number;
     rows: ConsumptionSummary[] | null;
     next: Cursor | null;
     queriedAt: string | null;
     error: string;
+    failure?: ReadFailure;
   } | null>(null);
   const [attempt, setAttempt] = useState(0),
     [moreRequestKey, setMoreRequestKey] = useState<string | null>(null);
+  const [manual, setManual] = useState<{ query: string; attempt: number; retries: number } | null>(null);
+  const [dismissed, setDismissed] = useState<ReadFailure | null>(null);
   const readKey = JSON.stringify([patient, query, live, attempt]),
     current = read?.query === query ? read : null;
   const rows = current?.rows ?? null,
@@ -119,6 +126,18 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [teamFlow, setTeamFlow] = useState<FlowSubmission>();
   const [issued, setIssued] = useState<IssuedConsumption | null>(null);
   const [shortage, setShortage] = useState<{ opener: HTMLElement; origin?: ReminderOrigin } | null>(null);
+  const listContext = !selected && !panel && !editor && !teamEditor && !issued && !shortage;
+  const manualRead = manual?.query === query && manual.attempt === attempt ? manual : null;
+  const foregroundRead = current === null || (manualRead !== null && current.attempt !== attempt);
+  const showingActivity = reading && foregroundRead;
+  const readActivity = useEffectEvent(() => ({ interactive: foregroundRead, attempts: manualRead?.retries ?? 0 }));
+  useOperationActivity(listContext && showingActivity, {
+    title: "Consultando relatos",
+    detail: "Aguarde enquanto consultamos os registros de consumo e os avisos de falta.",
+  });
+  const failure = current?.failure;
+  const showFailure = Boolean(listContext && !showingActivity && failure?.interactive && failure !== dismissed);
+  const filterFormId = useId();
   const mayRecordTeam = can(context, "consumption.team.write") && context.patient?.is_active !== false;
   const mayReadStock = can(context, "stock.family.read") || can(context, "stock.team.read");
   const mayOpenLegacy = mayReadStock || can(context, "consumption.report");
@@ -134,12 +153,14 @@ function Reports({ context }: { context: WorkspaceContext }) {
   );
   const listHeadingRef = useRef<HTMLHeadingElement>(null),
     filterRef = useRef<HTMLButtonElement>(null),
+    refreshRef = useRef<HTMLButtonElement>(null),
     moreRef = useRef<HTMLButtonElement>(null),
     triggerRef = useRef<HTMLElement | null>(null),
     generationRef = useRef(0),
     moreRequestRef = useRef<{ key: string } | null>(null);
   useEffect(() => {
     const controller = new AbortController();
+    const activity = readActivity();
     generationRef.current++;
     api<unknown>(
       `/api/consumption?careRecipientId=${patient}&${query}`,
@@ -152,6 +173,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           setRead({
             query,
             key: readKey,
+            attempt,
             rows: result.data,
             next: result.next,
             queriedAt: new Date().toISOString(),
@@ -167,6 +189,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           setRead((previous) => ({
             query,
             key: readKey,
+            attempt,
             rows:
               !unavailable && previous?.query === query ? previous.rows : null,
             next:
@@ -177,11 +200,13 @@ function Reports({ context }: { context: WorkspaceContext }) {
               reason instanceof Error
                 ? reason.message
                 : "Não foi possível consultar os relatos.",
+            failure: !activity.interactive && previous?.query === query && previous.attempt === attempt && previous.failure?.denied === unavailable
+              ? previous.failure : { cause: reason, denied: unavailable, ...activity },
           }));
         }
       });
     return () => controller.abort();
-  }, [patient, query, readKey]);
+  }, [patient, query, readKey, attempt]);
   useEffect(() => {
     const controller = new AbortController();
     api<{ data: CatalogProduct[] }>(
@@ -215,6 +240,11 @@ function Reports({ context }: { context: WorkspaceContext }) {
       scroll: false,
     });
   }
+  function refreshList(retries = 0) {
+    const nextAttempt = attempt + 1;
+    setManual({ query, attempt: nextAttempt, retries });
+    setAttempt(nextAttempt);
+  }
   function applyFilters(filters: typeof emptyFilters) {
     const values = new URLSearchParams(query);
     let changed = false;
@@ -226,7 +256,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
     }
     setDraft(filters);
     if (!changed) {
-      setAttempt(value => value + 1);
+      refreshList();
       return;
     }
     values.set("careRecipientId", patient);
@@ -364,8 +394,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
             {rows ? `${rows.length} ${rows.length === 1 ? "registro" : "registros"}${next ? " carregados" : ""}` : ""}
           </span>
           <div className="hca-consumption-list-links">
-            <ActionButton compact variant="quiet" aria-label="Atualizar lista"
-              onClick={() => setAttempt(value => value + 1)}><Icon name="refresh" /></ActionButton>
+            <ActionButton ref={refreshRef} compact variant="quiet" aria-label="Atualizar lista"
+              onClick={() => refreshList()}><Icon name="refresh" /></ActionButton>
             {mayReadStock ? <Link className="hca-control hca-control--compact hca-control--secondary"
               href={`/estoque?careRecipientId=${patient}`}><Icon name="box" /> Estoque</Link> : null}
             <Menu.Root>
@@ -387,14 +417,13 @@ function Reports({ context }: { context: WorkspaceContext }) {
             </Menu.Root>
           </div>
         </div>
-        {error ? (
+        {error && !reading && !showFailure ? (
           <Notice error>
             {error} Use Atualizar lista para repetir a consulta.
           </Notice>
         ) : null}
-        {reading ? <Notice>Carregando relatos…</Notice> : null}
-        {current?.queriedAt ? <p className={reading || error ? "hca-field-hint" : "sr-only"}>
-          {reading || error ? "Última consulta confirmada; aguardando atualização." : "Relatos consultados:"} {formatBrazilDate(current.queriedAt)}.
+        {current?.queriedAt ? <p className={error && !reading ? "hca-field-hint" : "sr-only"}>
+          {error && !reading ? "Última consulta confirmada; aguardando atualização." : "Relatos consultados:"} {formatBrazilDate(current.queriedAt)}.
         </p> : null}
         <ul className="hca-consumption-records" aria-label="Relatos da consulta" aria-busy={reading || moreBusy}>
           {rows?.map(row => <ConsumptionRecord key={row.id} row={row} onOpen={target => { triggerRef.current = target; open(row.id); }} />)}
@@ -423,16 +452,25 @@ function Reports({ context }: { context: WorkspaceContext }) {
           }}><Icon name="plus" /> Registrar consumo</ActionButton>
         </div> : null}
       </section>
-      <Drawer open={panel === "filters"} title="Filtrar relatos" headingIcon="filter"
-        popupClassName="hca-consumption-sheet" onClose={() => setPanel(null)} finalFocus={filterRef}>
-        <form className="grid gap-4" onSubmit={event => {
+      <ScopedReadFailureDialog subject="consumption" open={showFailure}
+        title="Não foi possível consultar os relatos" denied={failure?.denied ?? false} message={error}
+        cause={failure?.cause} attempts={failure?.attempts ?? 0} loading={showingActivity} returnFocus={refreshRef}
+        onClose={() => setDismissed(failure ?? null)}
+        onRetry={() => refreshList(failure?.denied ? 0 : (failure?.attempts ?? 0) + 1)} />
+      <Dialog open={panel === "filters"} title="Filtrar registros" headingIcon="filter"
+        onClose={() => setPanel(null)} finalFocus={filterRef}
+        footer={<>
+          <ActionButton onClick={() => { applyFilters(emptyFilters); setPanel(null); }}>Limpar</ActionButton>
+          <ActionButton type="submit" variant="primary" form={filterFormId}>Aplicar</ActionButton>
+        </>}>
+        <form id={filterFormId} className="grid gap-4" onSubmit={event => {
           event.preventDefault();
           applyFilters(draft);
           setPanel(null);
         }}>
-          <label className="grid gap-1 text-sm">Estado
+          <label className="grid gap-1 text-sm">Situação
             <SelectField value={draft.status} onChange={event => setDraft({ ...draft, status: event.target.value })}>
-              <option value="">Todos</option>
+              <option value="">Todos os registros</option>
               {Object.entries(consumptionStateLabels).map(([status, label]) => <option key={status} value={status}>{label}</option>)}
             </SelectField>
           </label>
@@ -446,12 +484,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
                 onChange={event => setDraft({ ...draft, to: event.target.value })} />
             </label>
           </div>
-          <div className="hca-toolbar">
-            <ActionButton onClick={() => { applyFilters(emptyFilters); setPanel(null); }}>Limpar filtros</ActionButton>
-            <ActionButton type="submit" variant="primary">Aplicar filtros</ActionButton>
-          </div>
         </form>
-      </Drawer>
+      </Dialog>
       <Drawer open={panel === "reference"} title="Consultar referência" headingIcon="link"
         popupClassName="hca-consumption-sheet" onClose={() => setPanel(null)} finalFocus={moreRef}>
         <form className="grid gap-3" onSubmit={event => {
