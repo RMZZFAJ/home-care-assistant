@@ -40,15 +40,17 @@ describe("verified stock read models", () => {
     expect(parseStockBalances({ ...balances, overview: [{ ...product, family: { ...product.family, minimum: 0 } }] }, balanceScope).overview[0].family?.minimum).toBe("0");
   });
   it("validates transit without presenting it as confirmed stock", () => {
-    const document = { id: movementId, code: "ENT-1", status: "disputed", source: "FAMILY", destination: "CARE_TEAM", createdAt: instant,
-      lines: [{ productId: "fralda", name: "Material", unit: "un", dispatched: "2", accepted: "1", reconciled: "0", pending: "1", disputed: true }] };
+    const document = { id: movementId, code: "ENT-1", kind: "ENT", status: "disputed", source: "FAMILY", destination: "CARE_TEAM", createdAt: instant, dispatchedAt: instant,
+      lines: [{ productId: "fralda", name: "Material", unit: "un", dispatched: "2", accepted: "1", reconciled: "0", pending: "1", disputed: true, reported: "1" }] };
     const read = { ...balances, custody: "TRANSIT", data: [], overview: [], metrics: [], transit: [document] };
     const scope = { ...balanceScope, custody: "TRANSIT" };
     expect(parseStockBalances(read, scope).transit[0]).toEqual(document);
-    for (const transit of [[{ ...document, lines: null }], [{ ...document, destination: "FAMILY" }], [document, document]]) {
+    for (const transit of [[{ ...document, lines: null }], [{ ...document, destination: "FAMILY" }], [{ ...document, kind: "DEV" }], [document, document]]) {
       expect(() => parseStockBalances({ ...read, transit }, scope)).toThrow();
     }
     expect(() => parseStockBalances({ ...read, overview: [product] }, scope)).toThrow();
+    const returned = { ...document, kind: "DEV", code: "DEV-1", source: "CARE_TEAM", destination: "FAMILY" };
+    expect(parseStockBalances({ ...read, transit: [returned] }, scope).transit).toEqual([returned]);
   });
   it("keeps history quantities and optional administrative reference intact", () => {
     expect(parseStockHistory(history, historyScope).data).toEqual([movement]);

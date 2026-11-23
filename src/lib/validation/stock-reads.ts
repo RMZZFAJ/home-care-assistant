@@ -33,16 +33,18 @@ const metric = z.object({
   quantity: stockNumber, averagePerDay: stockNumber,
 });
 const transitDocument = z.object({
-  id: z.uuid(), code: z.string().min(1),
+  id: z.uuid(), code: z.string().min(1), kind: z.enum(["ENT", "DEV"]),
   status: z.enum(["pending_receipt", "disputed", "cancellation_pending"]),
   source: z.enum(["FAMILY", "CARE_TEAM"]), destination: z.enum(["FAMILY", "CARE_TEAM"]),
-  createdAt: instant,
+  createdAt: instant, dispatchedAt: instant.nullable(),
   lines: z.array(z.object({
     productId, name: z.string().min(1), unit: z.string().min(1),
     dispatched: stockNumber, accepted: stockNumber, reconciled: stockNumber,
-    pending: stockNumber, disputed: z.boolean(),
+    pending: stockNumber, disputed: z.boolean(), reported: stockNumber.nullable(),
   })).min(1),
-}).refine(document => document.source !== document.destination);
+}).refine(document => document.source !== document.destination &&
+  document.kind === (document.source === "FAMILY" ? "ENT" : "DEV"));
+export type TransitDocument = z.infer<typeof transitDocument>;
 const balance = z.object({ product_id: productId, location: stockLocation, balance: stockNumber });
 const balancesRead = z.object({
   careRecipientId: z.uuid(), custody: stockCustodySelection,

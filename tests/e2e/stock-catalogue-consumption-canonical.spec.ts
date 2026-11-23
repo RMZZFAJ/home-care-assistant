@@ -4,6 +4,7 @@ import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { setup, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { autonomousReturnFixture, declaredAutonomousReturn, transferCommand } from "../integration/autonomous-return-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -39,6 +40,11 @@ async function capture(node: Locator, file: string) {
   mkdirSync("output/playwright/phase-d",{recursive:true});await node.screenshot({path:`output/playwright/phase-d/${file}.png`,animations:"disabled"});
 }
 
+function transitQuantity(card: Locator, label: string) {
+  return card.locator(".hca-transit-quantities > div")
+    .filter({ has: card.page().getByText(label, { exact: true }) }).locator("dd strong");
+}
+
 test("06.4 stock transit and movement cards retain four factual quantities and distinguish current catalogue from preserved origin", async ({page},info) => {
   const originalName="Material histórico "+"com nome preservado ".repeat(5)+randomUUID().slice(0,8),currentName="Nome atual do cadastro "+randomUUID().slice(0,8);
   const f=await setup({catalogue:catalogue(originalName)});
@@ -47,7 +53,12 @@ test("06.4 stock transit and movement cards retain four factual quantities and d
   await login(page,f.patient);const before=facts(f.patient),sent=writes(page);
   await page.goto(`/estoque?careRecipientId=${f.patient}&custody=TRANSIT`);
   const transit=page.locator(".hca-transit-stock"),line=transit.locator(".hca-transit-material");await expect(line).toContainText(originalName);
-  for(const [label,value] of [["Expedido","5 unidade"],["Aceito no destino","0 unidade"],["Conciliado","0 unidade"],["Aguardando conferência","5 unidade"]])await expect(line.locator(".hca-definition-grid > div").filter({has:page.getByText(label,{exact:true})}).locator("dd")).toHaveText(value);
+  await expect(transitQuantity(line, "Expedido")).toHaveText("5 unidade");
+  await expect(transitQuantity(line, "Recebido")).toHaveText("0 unidade");
+  await expect(line.getByText(/Conciliado|Divergência em avaliação/)).toHaveCount(0);
+  const pending = line.locator(".hca-transit-remaining");
+  await expect(pending.getByText("Ainda em trânsito", { exact: true })).toBeVisible();
+  await expect(pending.locator("strong")).toHaveText("5 unidade");
     await page.setViewportSize({width:360,height:850});
     const opener = line.getByRole("button", { name: doc.code, exact: true });
     await opener.click();
@@ -68,6 +79,71 @@ test("06.4 stock transit and movement cards retain four factual quantities and d
     const drawer=page.getByRole("dialog",{name:"Origem da movimentação",exact:true});await expect(drawer.getByRole("region",{name:"Material na ficha de origem",exact:true})).toContainText(originalName);
     expect(facts(f.patient)).toBe(before);
     expect(sent.map(url => new URL(url).pathname)).toEqual([`/api/documents/${doc.id}/access`]);
+});
+
+test("devolução em trânsito mostra a rota própria, a diferença e a mesma ficha de origem", async ({ page }, info) => {
+  const f = await autonomousReturnFixture();
+  const deliveries = [];
+  for (const amount of [2, 4]) {
+    deliveries.push(await rpc(f.admin, "create_supply_document", {
+      p_patient: f.patient, p_type: "ENT", p_key: randomUUID(), p_draft: false,
+      p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id,
+        recipientReason: "Recebedor indicado para conferência das entregas.", lines: [{ productId: f.products[0], quantity: String(amount) }] },
+    }));
+  }
+  const { document } = await declaredAutonomousReturn(f);
+  const agreed = await transferCommand(f.counterparty.client, document.id, "agree", document.version, { reason: "Conferi a declaração de devolução." });
+  expect(agreed.error).toBeNull();
+  const dispatched = await transferCommand(f.initiator.client, document.id, "dispatch", agreed.data.version);
+  expect(dispatched.error).toBeNull();
+  const received = await rpc(f.recipient.client, "supply_document_command", {
+    p_id: document.id, p_action: "receive", p_version: dispatched.data.version, p_key: randomUUID(),
+    p_body: { countedReceipt: { lines: [{ lineId: dispatched.data.lines[0].id, receivedQuantity: "3" }] } },
+  });
+  expect(received.kind).toBe("DEV");
+
+  await login(page, f.patient);
+  const before = facts(f.patient);
+  await page.goto(`/estoque?careRecipientId=${f.patient}&custody=TRANSIT`);
+  const transit = page.getByRole("dialog", { name: "Materiais em trânsito", exact: true });
+  const toTeam = transit.getByRole("region", { name: "Entregas para o estoque da equipe", exact: true });
+  for (const delivery of deliveries) await expect(toTeam.getByRole("button", { name: delivery.code, exact: true })).toBeVisible();
+  await expect(toTeam.getByText("2 fichas vinculadas", { exact: true })).toBeVisible();
+
+  const toFamily = transit.getByRole("region", { name: "Devoluções para o estoque da família", exact: true });
+  await expect(toFamily.getByRole("button", { name: received.code, exact: true })).toBeVisible();
+  await expect(transitQuantity(toFamily, "Expedido")).toHaveText("5 unidade");
+  await expect(transitQuantity(toFamily, "Recebido")).toHaveText("3 unidade");
+  await expect(toFamily.getByText("Falta informada · 2 unidade", { exact: true })).toBeVisible();
+  await expect(toFamily.locator("time")).toHaveAttribute("datetime", dispatched.data.transfer.dispatchedAt);
+  await transit.getByRole("button", { name: "Fechar", exact: true }).click();
+
+  const chip = page.getByRole("button", { name: /2 unidade em trânsito.*Destino · Família/ });
+  await chip.click();
+  const returns = page.getByRole("dialog", { name: "Devoluções em trânsito", exact: true });
+  const opener = returns.getByRole("button", { name: received.code, exact: true });
+  await expect(opener).toBeVisible();
+  await expect(returns.getByRole("region", { name: "Entregas para o estoque da equipe", exact: true })).toHaveCount(0);
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 900 });
+    const metrics = returns.locator(".hca-transit-quantities");
+    expect(await metrics.evaluate(node => {
+      const [first, second] = Array.from(node.querySelectorAll("dt"), item => item.getBoundingClientRect());
+      return first.y === second.y && first.right < second.left && node.scrollWidth <= node.clientWidth;
+    })).toBe(true);
+    const path = info.outputPath(`dev-transito-${width}.png`);
+    await returns.screenshot({ path, animations: "disabled" });
+    await info.attach(`Devolução em trânsito em ${width} px`, { path, contentType: "image/png" });
+  }
+  await opener.click();
+  const complete = page.getByRole("dialog", { name: received.code, exact: true });
+  await expect(complete.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(complete.locator("[data-visit-material=true]")).toContainText("Material consultado");
+  await complete.getByRole("button", { name: "Voltar ao painel", exact: true }).click();
+  await expect(opener).toBeFocused();
+  await returns.getByRole("button", { name: "Fechar", exact: true }).click();
+  await expect(chip).toBeFocused();
+  expect(facts(f.patient)).toBe(before);
 });
 
 test("06.4 catalogue units and presentations retain aliases,precision,leading zero and conversion across canonical table cards", async ({page,browser},info) => {

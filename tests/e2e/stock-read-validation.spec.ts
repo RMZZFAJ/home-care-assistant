@@ -72,12 +72,12 @@ test("stock rejects malformed balances and transit, preserves the last verified 
   await close.click();
   await expect(opener).toBeFocused();
   await opener.click();
-  await expect(transit.getByText("Nenhuma entrega em trânsito", { exact: true })).toBeVisible();
+  await expect(transit.getByText("Nenhuma transferência em trânsito", { exact: true })).toBeVisible();
   mode = "invalidTransit";
   await close.click();
   await opener.click();
   await expect(transit.getByRole("alert")).toContainText("resposta");
-  await expect(transit.getByText("Nenhuma entrega em trânsito", { exact: true })).toHaveCount(0);
+  await expect(transit.getByText("Nenhuma transferência em trânsito", { exact: true })).toHaveCount(0);
   mode = "live";
   await transit.getByRole("button", { name: "Atualizar consulta", exact: true }).click();
   await expect(transit.getByRole("button", { name: delivery.code, exact: true })).toBeVisible();

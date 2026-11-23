@@ -1798,6 +1798,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123130151_l3_schedule_balance_review_contract` | Aplicada | Aplicada |
 | `20261123131427_l3_document_attachment_display_facts` | Aplicada | Aplicada |
 | `20261123142332_l3_family_stock_receipt_scope` | Aplicada | Aplicada |
+| `20261123150554_l3_stock_transit_transfer_facts` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -3321,14 +3322,15 @@ WhatsApp ainda requer homologação do provedor.
   `document-material-panel.spec.ts` e seção Painel compartilhado de material.
 - **E07-03** — Projeções de trânsito e distinção entre movimento e saldo
   disponível. `stock-catalogue-consumption-canonical.spec.ts` e seção Estoques e
-  trânsito em telas estreitas.
+  trânsito em telas estreitas. Entrega e devolução exercitadas no mesmo material.
 - **E07-04** — Agrupamento por ato e origem individual do movimento.
   `stock-history-completeness.spec.ts`, `stock-origins.spec.ts`.
 - **E07-05** — Movimentação familiar multimaterial com uma confirmação.
   `family-stock-operation.test.mjs` e seção Movimentação familiar e histórico
   geral.
 - **E07-06** — Referência alterada, nova revisão e recuperação pela chave
-  original. `stock-private-preparation.spec.ts`, `stock-preparations.test.mjs`.
+  original. `stock-history-completeness.spec.ts`, `family-stock-operation.test.mjs`.
+  Preenchimentos anteriores em `stock-private-preparation.spec.ts`.
 - **E07-07** — Busca e filtros de Consumo e faltas, restauração e paginação.
   `team-consumption.spec.ts`, `consumption-list-completeness.spec.ts`.
 - **E07-08** — Seleção de materiais, extras do consumo e aviso sem quantidade.
@@ -3448,6 +3450,30 @@ WhatsApp ainda requer homologação do provedor.
   de BAL, a revisão completa de ENT e a atualização em segundo plano da
   ficha passaram em iOS emulado. A recontagem reproduzia a demora na
   transição de vínculo com mais de 11 mil cadastros na stack local.
+
+### Entregas e devoluções em trânsito
+
+- O painel de E07-03 separa Família → Equipe e Equipe → Família. A consulta
+  a partir da quantidade a receber abre apenas a direção daquele material.
+  O cabeçalho do painel, a linha de percurso e os cartões seguem a v4.
+  O código abre a ficha completa em Materiais, com destaque para o item e
+  retorno ao botão de origem.
+- Expedido e Recebido usam as quantidades da ficha. A data vem do ato de
+  expedição quando disponível. Pendência física, diferença declarada e
+  quantidade conciliada aparecem quando registradas. A consulta mantém
+  os saldos e os atos de recebimento e satisfação existentes.
+- A migration `20261123150554_l3_stock_transit_transfer_facts.sql` está
+  aplicada nos dois ambientes. Preserva os campos anteriores da projeção
+  e acrescenta o tipo documental, o instante de expedição e a quantidade
+  declarada. O resguardo cifrado `47e8f90b-a7f6-4083-b2af-12ee426dd3c8`
+  preserva a função anterior e suas permissões. O ensaio remoto foi
+  revertido antes da aplicação. Local, remoto e checkout têm 361 versões.
+- Passaram 27 testes de validação das projeções e quatro integrações com
+  autenticação real, incluindo consulta de outro paciente, revogação e
+  recebimento parcial. Os seis casos de navegador em Android e iOS
+  emulados confirmaram as duas ENT e a DEV do mesmo material, o retorno
+  à origem e a recuperação após falha de leitura. As capturas mostram
+  os estados em 360 e 412 px.
 
 ## L4
 

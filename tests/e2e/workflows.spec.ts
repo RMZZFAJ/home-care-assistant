@@ -1116,7 +1116,7 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
     transit.getByRole("button", { name: delivery.code, exact: true }),
   ).toBeVisible();
   await expect(
-    transit.getByText("Aguardando conferência", { exact: true }),
+    transit.getByText("Ainda em trânsito", { exact: true }),
   ).toBeVisible();
   await transit.getByRole("button", { name: "Fechar", exact: true }).click();
   await expect(transit).toHaveCount(0);

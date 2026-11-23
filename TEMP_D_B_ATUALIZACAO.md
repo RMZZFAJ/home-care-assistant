@@ -4,6 +4,11 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — entregas e devoluções em trânsito.** O painel separa os dois
+percursos, mostra o ato de expedição e exibe os valores da ficha sem
+confundir o recebido com o que ainda aguarda decisão. Local e remoto
+registram 361 migrations. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#entregas-e-devoluções-em-trânsito).
+
 **23/11 — revisão e recibo da movimentação familiar.** A v4 exige que a
 pessoa aceite a referência atualizada antes de confirmar. O autor consegue
 conferir a mesma tentativa com acesso de leitura, sem gerar movimento novo.

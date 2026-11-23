@@ -32,7 +32,7 @@ import { EmptyState, Icon } from "@/components/ui/primitives";
 import { StockTransitDrawer } from "./transit-stock";
 import { formatBrazilDate } from "@/lib/receipt";
 
-import { parseStockBalances, parseStockOperationHistory } from "@/lib/validation/stock-reads";
+import { parseStockBalances, parseStockOperationHistory, type TransitDocument } from "@/lib/validation/stock-reads";
 import { StockOverview } from "./stock-overview";
 
 import { useScopedRead } from "@/lib/use-scoped-read";
@@ -118,7 +118,7 @@ function PatientStock({
   const [search, setSearch] = useState("");
   const [balanceFilter, setBalanceFilter] = useState<StockBalanceFilter>("all");
   const [filterEditor, setFilterEditor] = useState<{ value: StockBalanceFilter; opener: HTMLElement } | null>(null);
-  const [transit, setTransit] = useState<{ productId?: string; search: string; opener?: HTMLElement } | null>(
+  const [transit, setTransit] = useState<{ productId?: string; destination?: TransitDocument["destination"]; search: string; opener?: HTMLElement } | null>(
     initialCustody === "TRANSIT" ? { search: "" } : null,
   );
   const [custody, setCustody] = useState(initialCustody === "TRANSIT" ? "" : initialCustody);
@@ -283,7 +283,7 @@ function PatientStock({
             ]}
             metrics={stock.data.metrics}
             queriedAt={stock.queriedAt}
-            onTransit={canReadTransit ? (opener, product) => setTransit({ opener, productId: product?.productId, search: product ? "" : search }) : undefined}
+            onTransit={canReadTransit ? (opener, product, destination) => setTransit({ opener, productId: product?.productId, destination, search: product ? "" : search }) : undefined}
             onClearFilters={() => { setSearch(""); setBalanceFilter("all"); }}
             filter={balanceFilter}
             showEmpty={!stock.loading && !stock.error}
@@ -315,7 +315,7 @@ function PatientStock({
         </FormField>
       </Drawer> : null}
       {transit && canReadTransit ? <StockTransitDrawer patientId={patient} context={context} revision={revision}
-        search={transit.search} productId={transit.productId} onClose={() => setTransit(null)}
+        search={transit.search} productId={transit.productId} destination={transit.destination} onClose={() => setTransit(null)}
         finalFocus={() => transit.opener?.isConnected ? transit.opener : returnFocus()} /> : null}
       {showFamilyArrivals || params.has("arrival") ? <UnlinkedArrivalHistory context={context} revision={revision} arrivalId={params.get("arrival")}
         onReview={(...args) => arrivalReviewRef.current?.(...args)} /> : null}

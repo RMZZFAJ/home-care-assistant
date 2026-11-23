@@ -44,7 +44,7 @@ export function StockOverview({
   allowedCustodies: string[];
   metrics: StockMetric[];
   queriedAt: string | null;
-  onTransit?: (opener: HTMLElement, product?: ProductStock) => void;
+  onTransit?: (opener: HTMLElement, product?: ProductStock, destination?: StockBalanceRow["custody"]) => void;
   onClearFilters: () => void;
   filter?: StockBalanceFilter;
   showEmpty?: boolean;
@@ -103,7 +103,7 @@ export function StockOverview({
           {entries.flatMap(({ custody: key, stock }) => [
             ...(quantity(stock.incoming).gt(0) ? [
               onTransit ? <button key={key + ":transit"} type="button" className="hca-stock-material-pending"
-                onClick={event => onTransit(event.currentTarget, product)}>
+                onClick={event => onTransit(event.currentTarget, product, key)}>
                 <Icon name="truck" width={16} height={16} />
                 <span><strong>{formatQuantity(stock.incoming, product.unit)} em trânsito</strong><small>Destino · {labels[key]}</small></span>
                 <Icon name="chevron" width={15} height={15} />

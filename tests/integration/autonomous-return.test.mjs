@@ -13,6 +13,8 @@ test("an autonomous return needs no original ENT and preserves distinct agreemen
   let d = declaration.document;
   assert.equal(d.transfer.originDocumentId, null); assert.equal(d.protocol, null);
   assert.deepEqual(returnBalances(f), { family: 30, team: 10, transit: 0 });
+  const readTransit = () => rpc(f.admin, "stock_transit", { p_patient: f.patient });
+  assert.deepEqual(await readTransit(), []);
   const replay = await f.initiator.client.rpc("create_transfer_declaration", declaration.args); assert.ifError(replay.error);
   assert.equal(replay.data.id, d.id);
   assert.equal((await transferCommand(f.admin, d.id, "agree", d.version, { reason: "Administrador não substitui a contraparte." })).error?.code, "42501");
@@ -22,6 +24,14 @@ test("an autonomous return needs no original ENT and preserves distinct agreemen
   const dispatch = await transferCommand(f.initiator.client, d.id, "dispatch", d.version); assert.ifError(dispatch.error); d = dispatch.data;
   assert.equal(d.code, "DEV-0001"); assert.ok(d.protocol); assert.equal(d.status, "pending_receipt");
   assert.deepEqual(returnBalances(f), { family: 30, team: 5, transit: 5 });
+  const [inTransit] = await readTransit();
+  assert.equal(inTransit.id, d.id);
+  assert.equal(inTransit.kind, "DEV");
+  assert.equal(inTransit.source, "CARE_TEAM");
+  assert.equal(inTransit.destination, "FAMILY");
+  assert.equal(inTransit.dispatchedAt, d.transfer.dispatchedAt);
+  assert.equal(Number(inTransit.lines[0].pending), 5);
+  assert.equal((await f.initiator.client.rpc("stock_transit", { p_patient: randomUUID() })).error?.code, "42501");
   const request = { p_id: d.id, p_action: "receive", p_version: d.version, p_key: randomUUID(),
     p_body: { divergences: [{ lineId: d.lines[0].id, acceptedQuantity: "3", problem: "shortage", notes: "Recebi três das cinco unidades devolvidas." }] } };
   for (const client of [f.admin, f.counterparty.client]) assert.equal((await client.rpc("supply_document_command", request)).error?.code, "42501");
@@ -31,6 +41,11 @@ test("an autonomous return needs no original ENT and preserves distinct agreemen
   assert.equal((await rpc(f.recipient.client, "supply_document_command", request)).version, d.version);
   assert.equal(transferState(f), received);
   assert.deepEqual(returnBalances(f), { family: 33, team: 5, transit: 2 });
+  const [underReview] = await readTransit();
+  const [line] = underReview.lines;
+  assert.equal(line.disputed, true);
+  assert.deepEqual([line.dispatched, line.accepted, line.pending].map(Number), [5, 3, 2]);
+  assert.equal(transferState(f), received);
   assert.notEqual(transferState(f), before); assert.equal(d.transfer.originDocumentId, null);
   assert.equal(sql("select count(*) from public.requisition_items where care_recipient_id=" + q(f.patient)), "0");
 });
@@ -54,6 +69,7 @@ test("ENT V14 preserves autonomous-return source and exact old intentions while 
   const replay = await reserve(f.initiator.client, d.id, null, key); assert.ifError(replay.error);
   assert.equal(replay.data.rendererRevision, 16); assert.equal(replay.data.id, older.data.id); assert.deepEqual(replay.data.snapshot, older.data.snapshot);
   sql("insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(" + q(f.patient) + "," + q(f.initiator.id) + ",'ent.read',false)");
+  assert.equal((await f.initiator.client.rpc("stock_transit", { p_patient: f.patient })).error?.code, "42501");
   assert.equal((await f.initiator.client.rpc("pdf_issuance", { p_id: current.data.id })).error?.code, "42501");
   assert.equal((await reserve(f.initiator.client, d.id)).error?.code, "42501");
   assert.equal(sql("select has_function_privilege('anon','public.reserve_pdf_issuance(uuid,uuid,integer)','EXECUTE') or has_function_privilege('service_role','public.reserve_pdf_issuance(uuid,uuid,integer)','EXECUTE')"), "f");
