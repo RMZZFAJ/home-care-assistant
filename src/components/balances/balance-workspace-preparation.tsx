@@ -1,7 +1,7 @@
 "use client";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import {
   api,
   ApiError,
@@ -34,7 +34,7 @@ import {
 import type { BalanceWorkspace } from "@/types/balances";
 import { BalancePreparationFields } from "./balance-preparation-fields";
 import { BalanceConfigurationFacts } from "./balance-configuration-facts";
-import { DeferralFacts } from "./balance-deferral-facts";
+import { DeferralAssignmentFacts, DeferralFacts } from "./balance-deferral-facts";
 import { formatZonedDate } from "@/lib/schedules/time";
 
 export type BalancePreparationSelection = {
@@ -122,6 +122,10 @@ export function BalanceWorkspacePreparation({
         : allowDeferral;
   const protectedView =
     referenceForbidden;
+  const deferralCommand = review?.command.action === "request_deferral" || review?.command.action === "defer"
+    ? review.command : null;
+  const requestAssignment = deferralCommand && source?.workspace.assignments.find(item => item.id === deferralCommand.body.assignmentId);
+  const requestTarget = deferralCommand && source?.workspace.targets.find(item => item.id === deferralCommand.body.targetShiftId);
   const requiresReason = balancePreparationRequiresReason(
     purpose,
     source?.workspace.regime?.enabled ?? false,
@@ -457,6 +461,10 @@ export function BalanceWorkspacePreparation({
               data={source.workspace}
             />
           ) : null}
+          {requestAssignment ? <DeferralAssignmentFacts assignment={requestAssignment} timezone={source?.workspace.regime?.timezone} /> : null}
+          {requestTarget ? <DefinitionGrid items={[{
+            label: "Prazo solicitado", value: formatZonedDate(requestTarget.ends_at, source?.workspace.regime?.timezone),
+          }]} /> : null}
           {(purpose === "approve_deferral" || purpose === "reject_deferral") &&
           source?.workspace.deferrals.find((d) => d.id === targetResourceId) ? (
             <DeferralFacts
@@ -559,6 +567,7 @@ export function BalanceWorkspacePreparation({
               onReview={() => void prepare()}
               canReview={!stale && canWrite}
               allowDeferral={allowDeferral}
+              canReadSchedule={can(context, "schedule.read.team") || can(context, "schedule.read.own")}
               reasonRef={reasonRef}
               requiresReason={requiresReason}
               error={fieldError || undefined}

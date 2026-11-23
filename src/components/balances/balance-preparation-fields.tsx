@@ -1,12 +1,14 @@
 "use client";
 import {
   ActionButton,
+  ActionLink,
   CheckboxField,
   FormField,
   SelectField,
   TextAreaField,
   TextInput,
 } from "@/components/ui/controls";
+import { Notice } from "@/components/workspace";
 import { SearchSelect } from "@/components/ui/search-select";
 import { useState, type RefObject } from "react";
 import { formatZonedDate } from "@/lib/schedules/time";
@@ -15,7 +17,7 @@ import type {
   BalancePreparationFields as Values,
   BalancePreparationReference,
 } from "@/lib/validation/balance-preparations";
-import { DeferralFacts } from "./balance-deferral-facts";
+import { DeferralAssignmentFacts, DeferralFacts } from "./balance-deferral-facts";
 import { weekDays } from "./balance-forms";
 const timezones = [
   "America/Sao_Paulo",
@@ -37,6 +39,7 @@ export function BalancePreparationFields({
   onReview,
   canReview,
   allowDeferral,
+  canReadSchedule,
   reasonRef,
   requiresReason,
   error,
@@ -49,6 +52,7 @@ export function BalancePreparationFields({
   onReview: () => void;
   canReview: boolean;
   allowDeferral: boolean;
+  canReadSchedule: boolean;
   reasonRef: RefObject<HTMLTextAreaElement | null>;
   requiresReason: boolean;
   error?: string;
@@ -89,6 +93,8 @@ export function BalancePreparationFields({
     person = (data?.professionals ?? []).find(
       (p) => p.id === values.professionalId,
     );
+  const needsLaterShift = purpose === "defer" || purpose === "request_deferral";
+  const noDestination = Boolean(reference && a && needsLaterShift && !targets.length);
   const label = (t: (typeof targets)[number]) =>
     `${t.professional_name} · ${t.type_name} · ${fmt(t.starts_at)} → ${fmt(t.ends_at)}`;
   const decisionAvailable =
@@ -225,11 +231,9 @@ export function BalancePreparationFields({
           </FormField>
         </>
       ) : null}
-      {purpose === "defer" || purpose === "request_deferral" ? (
+      {needsLaterShift ? (
         <>
-          <p>
-            Plantão atual: {fmt(a?.starts_at)} até {fmt(a?.ends_at)}.
-          </p>
+          {a ? <DeferralAssignmentFacts assignment={a} timezone={zone} /> : null}
           <p>
             {purpose === "request_deferral"
               ? "O adiamento depende de aprovação familiar. A pendência e o prazo originais continuam válidos até a decisão."
@@ -273,7 +277,13 @@ export function BalancePreparationFields({
       {purpose === "assign" ||
       purpose === "defer" ||
       purpose === "request_deferral" ? (
-        <>
+        noDestination ? (
+          <Notice>
+            <strong>Não há outro plantão disponível</strong>
+            <p>Peça à família que cadastre um plantão elegível. O pedido precisa indicar quem fará a contagem e quando.</p>
+            {canReadSchedule && reference ? <ActionLink href={`/escalas?careRecipientId=${reference.patientId}`}>Ver agenda</ActionLink> : null}
+          </Notice>
+        ) : <>
           <FormField
             label="Plantão de destino"
             required
@@ -342,7 +352,7 @@ export function BalancePreparationFields({
           />
         </FormField>
       ) : null}
-      {requiresReason ? (
+      {requiresReason && (!noDestination || values.reason) ? (
         <FormField
           label="Justificativa"
           required

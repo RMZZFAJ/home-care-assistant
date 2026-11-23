@@ -346,6 +346,34 @@ test("BAL por plantão: ativação local, cinco etapas, referência, resposta pe
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar as revisões do balanço");
 });
 
+test("pedido de adiamento sem plantão elegível mantém o prazo e oferece a agenda do paciente", async ({ page }) => {
+  const { patient, pro, today } = await balanceSetup({ stableCurrentWindow: true, durationMinutes: 720, futureDays: 0 });
+  await login(page, pro.email, patient);
+  await page.goto("/balancos");
+  const workspace = async () => (await (await page.request.get("/api/balances?careRecipientId=" + patient)).json()).data;
+  const before = await workspace();
+  expect(before.eligibility.assignment).toBeTruthy();
+  await page.getByRole("button", { name: "Solicitar adiamento", exact: true }).click();
+  const request = page.getByRole("dialog", { name: "Solicitar adiamento", exact: true });
+  await expect(request.getByText("Responsável", { exact: true })).toBeVisible();
+  await expect(request.getByText("Prazo atual", { exact: true })).toBeVisible();
+  await expect(request.getByText("Não há outro plantão disponível", { exact: true })).toBeVisible();
+  await expect(request.getByRole("combobox")).toHaveCount(0);
+  await expect(request.getByRole("button", { name: "Revisar decisão", exact: true })).toBeDisabled();
+  let writes = 0;
+  page.on("request", value => {
+    if (value.method() === "POST" && new URL(value.url()).pathname.startsWith("/api/balances")) writes++;
+  });
+  const agenda = request.getByRole("link", { name: "Ver agenda", exact: true });
+  await expect(agenda).toHaveAttribute("href", "/escalas?careRecipientId=" + patient);
+  await agenda.click();
+  await expect(page.getByLabel("Data de referência", { exact: true })).toHaveValue(today);
+  const after = await workspace();
+  expect(after.eligibility.assignment).toEqual(before.eligibility.assignment);
+  expect(after.deferrals).toEqual(before.deferrals);
+  expect(writes).toBe(0);
+});
+
 test("supervisão solicita adiamento, família decide e o prazo só muda após a aprovação", async ({
   page,
 }, info) => {
@@ -381,6 +409,7 @@ test("supervisão solicita adiamento, família decide e o prazo só muda após a
   await expect(
     form.getByText(/O adiamento depende de aprovação familiar/),
   ).toBeVisible();
+  await expect(form.getByText("Prazo atual", { exact: true })).toBeVisible();
   await form
     .getByRole("textbox", { name: "Justificativa", exact: true })
     .fill("Necessidade de reorganização justificada na equipe.");
@@ -394,8 +423,10 @@ test("supervisão solicita adiamento, família decide e o prazo só muda após a
   await form
     .getByRole("button", { name: "Revisar decisão", exact: true })
     .click();
-  await page
-    .getByRole("dialog", { name: "Revisar decisão do balanço", exact: true })
+  const requestReview = page.getByRole("dialog", { name: "Revisar decisão do balanço", exact: true });
+  await expect(requestReview.getByText("Prazo atual", { exact: true })).toBeVisible();
+  await expect(requestReview.getByText("Prazo solicitado", { exact: true })).toBeVisible();
+  await requestReview
     .getByRole("button", { name: "Confirmar decisão", exact: true })
     .click();
   await expect(form).not.toBeVisible();

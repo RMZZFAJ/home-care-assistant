@@ -3296,6 +3296,101 @@ dados de exemplo adicionais.
   nos dois projetos móveis. A primeira rodada com dois workers perdeu
   a sessão da conta de teste compartilhada em dois casos de configuração.
 
+### Pedido e decisão de adiamento
+
+- O pedido identifica o responsável e o prazo vigente. Na falta de plantão
+  elegível, a revisão fica indisponível e a agenda aparece para quem pode
+  consultá-la. A revisão mostra o prazo solicitado. A decisão conserva a
+  justificativa original e os prazos da versão examinada.
+- Nove casos dirigidos passaram em Chromium, Android e iOS emulados. A
+  verificação cobriu ausência de destino, aprovação com efeito no prazo e
+  mudança concorrente do plantão de destino. Este incremento dispensa migração.
+
+### Rastreabilidade dos 35 cenários da v4
+
+As referências apontam para verificações reproduzíveis e para os resultados
+dirigidos registrados neste lote. A comparação visual do conjunto deve
+considerar as superfícies e estados de cada família. CI, Sonar e Preview
+validam o commit em que forem executados. A integração controlada de
+WhatsApp ainda requer homologação do provedor.
+
+- **E07-01** — Busca, mínimo, saldo por custódia e restrição da equipe.
+  `stock-canonical-layout.spec.ts`.
+- **E07-02** — Painel compartilhado e volta à origem com contexto preservado.
+  `document-material-panel.spec.ts` e seção Painel compartilhado de material.
+- **E07-03** — Projeções de trânsito e distinção entre movimento e saldo
+  disponível. `stock-catalogue-consumption-canonical.spec.ts` e seção Estoques e
+  trânsito em telas estreitas.
+- **E07-04** — Agrupamento por ato e origem individual do movimento.
+  `stock-history-completeness.spec.ts`, `stock-origins.spec.ts`.
+- **E07-05** — Movimentação familiar multimaterial com uma confirmação.
+  `family-stock-operation.test.mjs` e seção Movimentação familiar e histórico
+  geral.
+- **E07-06** — Referência alterada, nova revisão e recuperação pela chave
+  original. `stock-private-preparation.spec.ts`, `stock-preparations.test.mjs`.
+- **E07-07** — Busca e filtros de Consumo e faltas, restauração e paginação.
+  `team-consumption.spec.ts`, `consumption-list-completeness.spec.ts`.
+- **E07-08** — Seleção de materiais, extras do consumo e aviso sem quantidade.
+  `team-consumption.spec.ts` e seção Material do aviso sem quantidade.
+- **E07-09** — Andamentos, correção por diferença e conflito entre duas sessões.
+  `team-consumption.spec.ts`, `team-consumption.test.mjs`.
+- **E07-10** — Baixa direta da equipe e recuperação sem duplicação.
+  `team-consumption.spec.ts`, `team-consumption.test.mjs`.
+- **E07-11** — Reiteração do aviso e compensação única do consumo cancelado.
+  `team-consumption.spec.ts`, `team-consumption.test.mjs`.
+- **E07-12** — Sugestão do WhatsApp e confirmação de consumo vinculada.
+  `flow-preparations.test.mjs`, `team-consumption.test.mjs`.
+- **E07-13** — Falha de consulta, escopo da equipe e retirada de dados sem
+  autorização. `stock-read-validation.spec.ts`,
+  `consumption-list-completeness.spec.ts`.
+- **E08-01** — Navegação integrada, agenda por dia e balanços previstos.
+  `schedule-residence-hours.spec.ts` e seção Calendário diário em Plantões e
+  balanços.
+- **E08-02** — Residência, horário noturno, exceção e recorrência sem fim
+  informado. `schedule-residence-hours.spec.ts`,
+  `schedule-residence-hours.test.mjs`.
+- **E08-03** — Alteração com impacto no BAL, conflito e recuperação.
+  `schedule-residence-hours.spec.ts`, `balance-shifts.test.mjs`.
+- **E08-04** — Pedido de alteração e decisão versionada.
+  `schedule-decisions.spec.ts`, `schedule-resource-preparations.test.mjs`.
+- **E08-05** — Contagem por elegibilidade e pedido de autorização.
+  `bal-count-permissions.spec.ts`, `bal-count-permissions.test.mjs`.
+- **E08-06** — Programação semanal, observação e pausa.
+  `balance-workspace-private-drafts.spec.ts` e seção Balanços previstos e
+  programação semanal.
+- **E08-07** — Designação do responsável e concorrência de referência.
+  `balance-shifts.test.mjs` e seção Balanços previstos e programação semanal.
+- **E08-08** — Pedido de adiamento, prazo vigente e ausência de destino
+  elegível. `balance-shifts.spec.ts`.
+- **E08-09** — Aprovação, recusa, destino alterado e manutenção do prazo
+  original. `bal-deferral-decisions.spec.ts`, `bal-deferral-decisions.test.mjs`.
+- **E08-10** — Contagem com extras, retomada e conclusão após o plantão.
+  `balance-shifts.spec.ts`, `bal-count-admission.test.mjs`.
+- **E08-11** — Revisão da contagem, emissão e regimes de aplicação.
+  `bal-review-application.spec.ts`, `balance-follow-up.spec.ts`.
+- **E08-12** — Revisão independente com papéis e impedimento de autorrevisão.
+  `bal-review.spec.ts`, `bal-review.test.mjs`.
+- **E08-13** — Aplicação, versão concorrente e recuperação da mesma decisão.
+  `bal-review-application.spec.ts`, `bal-review-application.test.mjs`.
+- **E08-14** — Recontagem, sucessão de extras e contagens anteriores.
+  `bal-recount-succession.spec.ts`, `bal-recount-succession.test.mjs`.
+- **E09-01** — Arquivos gerados, anexos, histórico e autorização.
+  `pdf-issuance.spec.ts`, `attachment-attempts.spec.ts` e seção Acervo na ficha.
+- **E09-02** — Modos do PDF, período, complementos e acesso de auditoria.
+  `pdf-modes.spec.ts`, `pdf-issuance-contract.test.ts`.
+- **E09-03** — Geração explícita e recuperação sem trocar os bytes do exemplar.
+  `pdf-issuance.spec.ts`, `pdf-issuance-recovery.test.ts`.
+- **E09-04** — Seleção, tamanho, formato, autoria e consulta do anexo
+  confirmado. `attachment-attempts.spec.ts`, `attachment-attempts.test.mjs`.
+- **E09-05** — Confirmação perdida, reabertura vazia e liberação de reserva.
+  `attachment-attempts.spec.ts`, `attachment-attempts.test.mjs`.
+- **E09-06** — Entrada por código e QR, ausência e falha de serviço.
+  `public-verification.spec.ts` e seção Verificação pública.
+- **E09-07** — Arquivo divergente ou de outra emissão e evidências separadas.
+  `public-verification.spec.ts`, `public-pdf-verification.test.mjs`.
+- **E09-08** — Login contextual, autorização para detalhes e revogação real.
+  `public-verification.spec.ts`, `public-verification-contract.test.ts`.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.
