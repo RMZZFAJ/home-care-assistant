@@ -187,6 +187,7 @@ export const scheduleResourceWorkspaceSchema = z.object({
         name: z.string(),
         starts_local: z.string(),
         duration_minutes: z.number().int(),
+        rest_hours: z.number().int().min(0).max(32767).nullish(),
         is_active: z.boolean(),
         version,
       })

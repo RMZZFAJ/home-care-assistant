@@ -13,6 +13,11 @@ A agenda representa a programação prevista, sem controle de presença.
 Tipos, séries, ocorrências, propostas e eventos são persistentes por paciente.
 Abra **Ações da agenda → Tipos de plantão · configurações** para consultar,
 criar ou editar tipos. Os horários da residência estão na mesma área.
+Configure o fuso e os inícios diurno e noturno da residência antes de
+cadastrar um tipo. O tipo informa as horas de trabalho e de descanso.
+Na repetição por ciclo, o cadastro usa os dois valores do tipo escolhido.
+Horários especiais podem mudar o início, preservando as horas de trabalho
+do ciclo. A edição do tipo vale para as próximas programações.
 **Voltar à agenda** retorna ao dia de referência anterior. As séries já
 publicadas ficam na agenda com suas ações operacionais.
 

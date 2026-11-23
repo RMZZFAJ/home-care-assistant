@@ -5,6 +5,9 @@ const date = z.iso.date();
 const instant = z.iso.datetime({ offset: true });
 const reason = z.string().trim().min(3).max(1000);
 const version = z.number().int().positive().max(2147483647);
+const workHours = z.number().int().min(1).max(24);
+const restHours = z.number().int().min(0).max(32767);
+export const shiftTypeCycle = z.object({ workHours, restHours }).strict();
 export const scheduleBalanceDecisionFields = z.object({
   decision: z.enum(["keep", "assign", "defer"]),
   assignmentId: id,
@@ -33,11 +36,16 @@ export const scheduleBody = z.discriminatedUnion("action", [
         .object({
           id: id.optional(),
           name: z.string().trim().min(2).max(100),
-          startsLocal: z.string().regex(/^\d{2}:\d{2}(?::\d{2})?$/),
+          startsLocal: z.string().regex(/^\d{2}:\d{2}(?::\d{2})?$/).optional(),
           durationMinutes: z.number().int().min(15).max(1440),
+          restHours: restHours.optional(),
           active: z.boolean().optional(),
         })
-        .strict(),
+        .strict()
+        .refine((value) => value.restHours === undefined
+          ? value.startsLocal !== undefined
+          : value.startsLocal === undefined && value.durationMinutes % 60 === 0,
+        "Informe horas inteiras de trabalho e descanso para o tipo de plantão."),
     })
     .strict(),
   z
@@ -57,10 +65,8 @@ export const scheduleBody = z.discriminatedUnion("action", [
             .positive()
             .max(2147483647)
             .optional(),
-          workHours: z.union([z.literal(12), z.literal(24)]).optional(),
-          restHours: z
-            .union([z.literal(24), z.literal(36), z.literal(48)])
-            .optional(),
+          workHours: workHours.optional(),
+          restHours: restHours.optional(),
           anchorDate: date,
           validUntil: date.nullable(),
           notes: z.string().max(2000),
@@ -75,6 +81,10 @@ export const scheduleBody = z.discriminatedUnion("action", [
         })
         .strict()
         .superRefine((value, ctx) => {
+          const hasCycle = value.workHours !== undefined && value.restHours !== undefined;
+          if (value.recurrence === "cycle" ? !hasCycle
+            : value.workHours !== undefined || value.restHours !== undefined)
+            ctx.addIssue({ code: "custom", path: ["workHours"], message: "Confira o ciclo de trabalho e descanso." });
           if (value.validUntil === null && (!value.residenceHours || !["weekly", "cycle"].includes(value.recurrence)))
             ctx.addIssue({ code: "custom", path: ["validUntil"], message: "Informe o último dia desta programação." });
           if (value.residenceHours && (!value.shiftTypeVersion || value.replacesId))

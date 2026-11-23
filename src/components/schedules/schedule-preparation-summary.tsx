@@ -20,11 +20,13 @@ export function SchedulePreparationSummary({
       <DefinitionGrid
         items={[
           { label: "Nome do plantão", value: f.name || "Ainda não preenchido" },
-          { label: "Início local", value: f.start || "Ainda não preenchido" },
-          {
-            label: "Duração em minutos",
-            value: f.duration || "Ainda não preenchido",
-          },
+          ...(f.restHours === undefined ? [
+            { label: "Início local", value: f.start || "Ainda não preenchido" },
+            { label: "Duração em minutos", value: f.duration || "Ainda não preenchido" },
+          ] : [
+            { label: "Horas de trabalho", value: f.duration ? Number(f.duration) / 60 : "Ainda não preenchido" },
+            { label: "Horas de descanso", value: f.restHours || "Ainda não preenchido" },
+          ]),
           {
             label: "Disponível para novas escalas",
             value: f.active ? "Sim" : "Não",
@@ -108,7 +110,7 @@ export function SchedulePreparationSummary({
               ]
             : []),
           ...(f.recurrence === "cycle"
-            ? [{ label: "Regime", value: f.cycle }]
+            ? [{ label: "Regime", value: f.typeCycle ? f.typeCycle.workHours + "h × " + f.typeCycle.restHours + "h" : f.cycle }]
             : []),
           {
             label: "Observações",

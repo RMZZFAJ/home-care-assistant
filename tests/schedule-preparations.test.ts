@@ -243,9 +243,10 @@ describe("preparação de criação de escala", () => {
     expect(initialScheduleType()).toEqual({
       form: "type",
       name: "",
-      start: "07:00",
+      start: "",
       duration: "720",
       active: true,
+      restHours: "",
     });
     expect(
       initialScheduleSeries(workspace, key, false, "2100-03-01"),

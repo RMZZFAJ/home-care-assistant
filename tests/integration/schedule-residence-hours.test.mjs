@@ -4,6 +4,8 @@ import test from "node:test";
 import { rpc, setup } from "./v4-fixtures.mjs";
 import { dayOffset, localToday, shiftCommand, shiftWorker } from "./shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
+import { resourceFixture, saveResource, resourcePacket } from "./schedule-resource-fixtures.mjs";
+import { saveSchedulePreparation, schedulePreparationCommit } from "./schedule-preparation-fixtures.mjs";
 
 const defaultHours = { timezone: "America/Manaus", dayStart: "06:25", nightStart: "20:40" };
 const readHours = (client, patient) => rpc(client, "schedule_residence", { p_patient: patient });
@@ -50,6 +52,93 @@ test("residence hours use patient authority, optimistic versions and the origina
   assert.deepEqual((await saveHours(f.admin, f.patient, update, 1, key)).data, applied.data);
   assert.equal((await saveHours(f.admin, f.patient, update, 1)).error?.code, "PT409");
   assert.equal((await saveHours(f.admin, f.patient, defaultHours, 1, key)).error?.code, "23505");
+});
+
+test("the versioned shift type supplies its cycle and keeps the intervals already published", async () => {
+  const f = await setup(), worker = await shiftWorker(f.patient), day = localDay(9);
+  const command = (action, body, client = f.admin, version = null, key = randomUUID()) =>
+    client.rpc("schedule_command", {
+      p_patient: f.patient, p_action: action, p_body: body, p_version: version, p_key: key,
+    });
+  const typeBody = { name: "Ciclo diurno", durationMinutes: 480, restHours: 40 };
+  assert.equal((await command("type", typeBody, worker.client)).error?.code, "42501");
+  assert.equal((await command("type", typeBody)).error?.code, "PT409");
+  const hours = (await saveHours(f.admin, f.patient, defaultHours)).data.hours;
+  const type = await shiftCommand(f.admin, f.patient, "type", typeBody);
+  assert.equal(type.rest_hours, 40);
+  assert.equal(type.duration_minutes, 480);
+  const continuous = await shiftCommand(f.admin, f.patient, "type", {
+    name: "Sem intervalo entre plantões", durationMinutes: 1440, restHours: 0,
+  });
+  assert.equal(continuous.rest_hours, 0);
+  const request = series({ ...f, type, worker, hours }, day, {
+    recurrence: "cycle", workHours: 8, restHours: 40, validUntil: dayOffset(day, 3),
+  });
+  assert.equal((await command("series", { ...request, restHours: 36 })).error?.code, "22023");
+  const withoutHours = { ...request };
+  delete withoutHours.residenceHours;
+  assert.equal((await command("series", withoutHours)).error?.code, "PT409");
+  const key = randomUUID();
+  const first = await command("series", request, f.admin, null, key);
+  assert.ifError(first.error);
+  const original = [day, dayOffset(day, 2)].map(date => ({
+    start: date + "T10:25", end: date + "T18:25", status: "published",
+  }));
+  assert.deepEqual(queryOccurrences(first.data.id), original);
+  assert.equal((await command("type", { id: type.id, name: type.name, startsLocal: "08:00", durationMinutes: 480 }, f.admin, type.version)).error?.code, "22023");
+  const updated = await command("type", { ...typeBody, id: type.id, durationMinutes: 600, restHours: 38 }, f.admin, type.version);
+  assert.ifError(updated.error);
+  assert.equal(updated.data.version, type.version + 1);
+  assert.equal((await command("series", request)).error?.code, "PT409");
+  assert.deepEqual((await command("series", request, f.admin, null, key)).data, first.data);
+  assert.deepEqual(queryOccurrences(first.data.id), original);
+});
+
+test("the private edit can adopt a cycle on an existing type and return its new reference", async () => {
+  const f = await resourceFixture();
+  assert.ifError((await saveHours(f.admin, f.patient, defaultHours)).error);
+  const fields = { ...f.fields, start: "", duration: "480", restHours: "40" };
+  const saved = await saveResource(f, null, { ...f.content, scheduleAction: fields });
+  const command = { action: "type", body: {
+    id: f.target, name: fields.name, durationMinutes: 480, restHours: 40, active: fields.active,
+  } };
+  const result = await rpc(f.admin, "commit_schedule_resource_preparation", resourcePacket({ ...f, command }, saved));
+  assert.deepEqual(result.receipt.fields, fields);
+  assert.deepEqual(result.receipt.command, command);
+  assert.equal(result.receipt.nativeResult.version, f.reference.version + 1);
+  const { reference } = await rpc(f.admin, "schedule_resource_preparation_reference", f.scope);
+  assert.equal(reference.workspace.types[0].rest_hours, 40);
+  assert.equal(reference.version, f.reference.version + 1);
+  assert.notEqual(reference.hash, f.reference.hash);
+});
+
+test("private preparation preserves and publishes the custom cycle reviewed by the actor", async () => {
+  const f = await residenceFixture(), day = localDay(15);
+  const type = await shiftCommand(f.admin, f.patient, "type", {
+    name: "Ciclo de dez horas", durationMinutes: 600, restHours: 38,
+  });
+  const typeCycle = { workHours: 10, restHours: 38 };
+  const fields = {
+    form: "series", professionalId: f.worker.id, shiftTypeId: type.id, shiftTypeVersion: type.version,
+    recurrence: "cycle", weekdays: [], dates: [], cycle: "12x36", typeCycle,
+    from: day, until: "", timezone: defaultHours.timezone, notes: "", reason: "",
+    residence: { ...f.hours, period: "day", special: false, specialStart: "", specialEnd: "" },
+  };
+  const intent = {
+    ...f,
+    scope: { p_patient: f.patient, p_purpose: "schedule_series_create" },
+    content: { schedule: fields },
+    command: { action: "series", body: series({ ...f, type }, day, { ...typeCycle, recurrence: "cycle", validUntil: null }) },
+  };
+  const saved = await saveSchedulePreparation(intent);
+  const stored = await rpc(f.admin, "schedule_preparation_context", intent.scope);
+  assert.deepEqual(stored.content.schedule.typeCycle, typeCycle);
+  const packet = schedulePreparationCommit(intent, saved);
+  const result = await rpc(f.admin, "commit_schedule_preparation", packet);
+  assert.deepEqual(result.receipt.command, intent.command);
+  assert.deepEqual(queryOccurrences(result.receipt.resourceId).slice(0, 2), [day, dayOffset(day, 2)].map(date => ({
+    start: date + "T10:25", end: date + "T20:25", status: "published",
+  })));
 });
 
 test("new shifts use the residence zone and duration with one-off and special overnight shifts", async () => {

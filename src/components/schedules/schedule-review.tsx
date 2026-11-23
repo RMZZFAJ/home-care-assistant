@@ -166,8 +166,13 @@ export function ScheduleReviewDetails({ review }: { review: ScheduleReview }) {
   if (command.action === "type")
     return <DefinitionGrid items={[
       { label: "Tipo de plantão", value: command.body.name },
-      { label: "Início local", value: command.body.startsLocal },
-      { label: "Duração", value: command.body.durationMinutes + " minutos" },
+      ...(command.body.restHours === undefined ? [
+        { label: "Início local", value: command.body.startsLocal ?? "Indisponível" },
+        { label: "Duração", value: command.body.durationMinutes + " minutos" },
+      ] : [
+        { label: "Horas de trabalho", value: command.body.durationMinutes / 60 },
+        { label: "Horas de descanso", value: command.body.restHours },
+      ]),
       { label: "Uso futuro", value: (command.body.active === false ? "Indisponível" : "Disponível") + ". Ocorrências anteriores conservam seus horários." },
     ]} />;
   if (command.action === "series") {

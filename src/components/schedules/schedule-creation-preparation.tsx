@@ -61,6 +61,7 @@ const sourceSchema = z.object({
         name: z.string(),
         starts_local: z.string(),
         duration_minutes: z.number().int().min(15).max(1440),
+        rest_hours: z.number().int().min(0).max(32767).nullish(),
         version: z.number().int().positive(),
         is_active: z.boolean(),
       }),
@@ -92,8 +93,13 @@ const stored = z.discriminatedUnion("mode", [
     .strict(),
 ]);
 type Stored = z.infer<typeof stored>;
-const equal = (a: unknown, b: unknown) =>
-  JSON.stringify(a) === JSON.stringify(b);
+function equal(a: unknown, b: unknown) {
+  const orderedFields = (_key: string, value: unknown) =>
+    value !== null && typeof value === "object" && !Array.isArray(value)
+      ? Object.fromEntries(Object.entries(value).sort(([left], [right]) => left.localeCompare(right)))
+      : value;
+  return JSON.stringify(a, orderedFields) === JSON.stringify(b, orderedFields);
+}
 function load(
   key: string,
   userId: string,
@@ -187,7 +193,7 @@ export function ScheduleCreationPreparation({
     decodeSource,
   );
   const data = mayRead && !source.loading && !source.error ? source.data : null;
-  const residenceRead = useResidenceHours(patient.id, purpose === "schedule_series_create" && mayRead);
+  const residenceRead = useResidenceHours(patient.id, mayRead);
   const residence = residenceRead.data?.hours;
   const [storedFields, setStoredFields] = useState<ScheduleCreationFields>(
     () =>
@@ -398,6 +404,8 @@ export function ScheduleCreationPreparation({
     try {
       if (purpose === "schedule_series_create" && (residenceRead.loading || residenceRead.error || residenceMismatch))
         throw new Error("Confira os horários atuais da residência antes de revisar.");
+      if (fields.form === "type" && fields.restHours !== undefined && !residence)
+        throw new Error("Preencha os horários em Configurações de plantões → Horários da residência.");
       const command = scheduleCreationCommand(fields);
       if (
         fields.form === "series" &&
@@ -510,7 +518,7 @@ export function ScheduleCreationPreparation({
           if (mountedRef.current) await context.refresh();
         } else {
           source.refresh();
-          if (purpose === "schedule_series_create" && e.status === 409) residenceRead.refresh();
+          if (e.status === 409) residenceRead.refresh();
         }
       }
       setError(
@@ -853,6 +861,10 @@ export function ScheduleCreationPreparation({
                 Os horários da residência estão indisponíveis. Seu preenchimento foi preservado.
                 <ActionButton onClick={residenceRead.refresh}>Consultar horários novamente</ActionButton>
               </Notice> : null}
+              {!residenceRead.loading && !residenceRead.error && !residence
+                && fields.form === "type" && fields.restHours !== undefined ? <Notice>
+                  Para cadastrar um tipo, preencha primeiro os horários em Configurações de plantões → Horários da residência.
+                </Notice> : null}
               {!residenceRead.loading && residence && fields.form === "series" && (!fields.residence || residenceMismatch) ? <Notice>
                 Os horários da residência estão disponíveis para este plantão.
                 <ActionButton onClick={() => {

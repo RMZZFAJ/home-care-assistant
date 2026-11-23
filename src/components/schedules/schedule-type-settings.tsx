@@ -64,7 +64,9 @@ export function ScheduleTypeSettings({
         <article className="hca-record flex-wrap" key={type.id} aria-label={type.name}>
           <div className="hca-record-main wrap-anywhere">
             <strong>{type.name}</strong>
-            <small>{type.duration_minutes} minutos · início registrado às {type.starts_local.slice(0, 5)}</small>
+            <small>{type.rest_hours == null
+              ? type.duration_minutes + " minutos · início registrado às " + type.starts_local.slice(0, 5)
+              : (type.duration_minutes / 60) + "h de trabalho · " + type.rest_hours + "h de descanso"}</small>
           </div>
           <div className="hca-record-actions flex-wrap">
             <Pill tone={type.is_active ? "success" : "neutral"}>{type.is_active ? "Disponível" : "Indisponível"}</Pill>

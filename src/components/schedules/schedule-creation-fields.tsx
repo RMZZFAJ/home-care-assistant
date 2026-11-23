@@ -7,7 +7,7 @@ import {
   TextInput,
 } from "@/components/ui/controls";
 import { SelectedShiftDates } from "./selected-shift-dates";
-import type { ScheduleCreationFields as Fields } from "@/lib/schedules/creation";
+import { scheduleTypeSelection, type ScheduleCreationFields as Fields } from "@/lib/schedules/creation";
 import { shiftDayPeriod, timeAfter } from "@/lib/schedules/residence-hours";
 import { Icon } from "@/components/ui/icon";
 import type { ScheduleWorkspace } from "@/types/schedules";
@@ -46,6 +46,19 @@ export function ScheduleCreationFields({
             onChange={(e) => patch({ name: e.currentTarget.value })}
           />
         </FormField>
+        {value.restHours !== undefined ? (
+          <div className="hca-compact-grid">
+            <FormField label="Horas de trabalho">
+              <TextInput name="workHours" type="number" min={1} max={24} step={1} required
+                value={value.duration ? Number(value.duration) / 60 : ""}
+                onChange={(event) => patch({ duration: event.currentTarget.value ? String(event.currentTarget.valueAsNumber * 60) : "" })} />
+            </FormField>
+            <FormField label="Horas de descanso">
+              <TextInput name="restHours" type="number" min={0} max={32767} step={1} required
+                value={value.restHours} onChange={(event) => patch({ restHours: event.currentTarget.value })} />
+            </FormField>
+          </div>
+        ) : <>
         <FormField label="Início local">
           <TextInput
             name="start"
@@ -67,10 +80,14 @@ export function ScheduleCreationFields({
             value={value.duration}
             onChange={(e) => patch({ duration: e.currentTarget.value })}
           />
-          <small>720 minutos = 12 horas; 1440 minutos = 24 horas.</small>
         </FormField>
+        <button type="button" className="hca-control" onClick={() => patch({ start: "", restHours: "" })}>
+          Definir ciclo com os horários da residência
+        </button>
+        </>}
         <CheckboxField
           name="active"
+          role="switch"
           label="Disponível para novas escalas"
           checked={value.active}
           onChange={(e) => patch({ active: e.currentTarget.checked })}
@@ -131,11 +148,7 @@ export function ScheduleCreationFields({
           value={value.shiftTypeId}
           onChange={(e) => {
             const id = e.currentTarget.value;
-            patch({
-              shiftTypeId: id,
-              shiftTypeVersion:
-                data.types.find((t) => t.id === id)?.version ?? null,
-            });
+            patch(scheduleTypeSelection(data.types.find((t) => t.id === id)));
           }}
         >
           <option value="">Selecione o tipo</option>
@@ -147,8 +160,8 @@ export function ScheduleCreationFields({
           ) : null}
           {types.map((t) => (
             <option key={t.id} value={t.id}>
-              {t.name} · {residence ? "" : t.starts_local.slice(0, 5) + " · "}
-              {t.duration_minutes / 60}h
+              {t.name} · {!residence && t.rest_hours == null ? t.starts_local.slice(0, 5) + " · " : ""}
+              {t.duration_minutes / 60}h{t.rest_hours == null ? "" : " × " + t.rest_hours + "h"}
             </option>
           ))}
         </SelectField>
@@ -164,13 +177,13 @@ export function ScheduleCreationFields({
             <>
               <p>
                 Cadastro atual: {selected.name} ·{" "}
-                {residence ? "" : selected.starts_local.slice(0, 5) + " · "}
-                {selected.duration_minutes} minutos · versão {selected.version}.
+                {!residence && selected.rest_hours == null ? selected.starts_local.slice(0, 5) + " · " : ""}
+                {selected.duration_minutes / 60}h{selected.rest_hours == null ? "" : " × " + selected.rest_hours + "h"} · versão {selected.version}.
               </p>
               <button
                 type="button"
                 className="hca-control"
-                onClick={() => patch({ shiftTypeVersion: selected.version })}
+                onClick={() => patch(scheduleTypeSelection(selected))}
               >
                 Adotar versão atual do tipo, mantendo meu preenchimento
               </button>
@@ -215,7 +228,9 @@ export function ScheduleCreationFields({
           ))}
         </fieldset>
       ) : null}
-      {value.recurrence === "cycle" ? (
+      {value.recurrence === "cycle" && value.typeCycle ? (
+        <p className="hca-muted">{value.typeCycle.workHours}h de trabalho e {value.typeCycle.restHours}h de descanso por ciclo.</p>
+      ) : value.recurrence === "cycle" ? (
         <FormField label="Regime">
           <SelectField
             name="cycle"

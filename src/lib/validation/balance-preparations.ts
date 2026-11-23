@@ -245,6 +245,7 @@ export const balancePreparationReferenceSchema = z
           id,
           name: z.string(),
           starts_local: z.string(),
+          rest_hours: z.number().int().min(0).max(32767).nullish(),
           duration_minutes: z.number().int().positive(),
           is_active: z.boolean(),
         }),

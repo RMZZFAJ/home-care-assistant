@@ -3,6 +3,7 @@ export type ShiftType = {
   name: string;
   starts_local: string;
   duration_minutes: number;
+  rest_hours?: number | null;
   is_active: boolean;
   version: number;
 };

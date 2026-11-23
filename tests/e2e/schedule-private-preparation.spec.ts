@@ -13,6 +13,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 import { openSchedulePrivateArea, openScheduleTypeSettings } from "./schedule-private-area";
+import { rpc } from "../integration/v4-fixtures.mjs";
 test.setTimeout(150_000);
 async function peerContext(browser: Browser) {
   const use = test.info().project.use;
@@ -71,13 +72,21 @@ async function open(page: Page, series = false, own = false) {
 }
 async function fillType(page: Page, name: string) {
   await dialog(page).getByLabel("Nome do plantão", { exact: true }).fill(name);
-  await dialog(page).getByLabel("Início local", { exact: true }).fill("07:00");
-  await dialog(page)
-    .getByLabel("Duração em minutos", { exact: true })
-    .fill("720");
+  await dialog(page).getByLabel("Horas de trabalho", { exact: true }).fill("12");
+  await dialog(page).getByLabel("Horas de descanso", { exact: true }).fill("36");
   await dialog(page)
     .getByLabel("Disponível para novas escalas", { exact: true })
     .uncheck();
+}
+async function configuredTypeFixture() {
+  const f = await fixture();
+  await rpc(f.admin, "set_schedule_residence", {
+    p_patient: f.patient,
+    p_body: { timezone: "America/Sao_Paulo", dayStart: "07:00", nightStart: "19:00" },
+    p_version: null,
+    p_key: crypto.randomUUID(),
+  });
+  return f;
 }
 async function review(page: Page) {
   await button(page, "Revisar alteração").click();
@@ -93,7 +102,7 @@ test("tipo privado retoma entre sessões,compara CAS e continua consultável sem
   page,
   browser,
 }, info) => {
-  const f = await fixture(),
+  const f = await configuredTypeFixture(),
     before = scheduleNativeFacts(f),
     documents = scheduleDocumentFacts(f);
   await login(page, f.patient);
@@ -259,7 +268,7 @@ test("conclusão em outra sessão preserva edição original após reconheciment
   page,
   browser,
 }) => {
-  const f = await fixture();
+  const f = await configuredTypeFixture();
   await login(page, f.patient);
   await open(page);
   await fillType(page, "Minha edição ainda não publicada");

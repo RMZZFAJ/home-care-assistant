@@ -159,7 +159,7 @@ export function BalancePreparationFields({
                 .filter((t) => t.is_active)
                 .map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.name} · {t.starts_local.slice(0, 5)} ·{" "}
+                    {t.name} · {t.rest_hours == null ? t.starts_local.slice(0, 5) + " · " : ""}
                     {t.duration_minutes / 60}h
                   </option>
                 ))}

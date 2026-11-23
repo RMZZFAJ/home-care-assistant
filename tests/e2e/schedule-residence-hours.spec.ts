@@ -86,16 +86,22 @@ test("horários da residência governam plantão isolado, exceção noturna e re
   expect(new Date(one[0].starts_at).toISOString()).toBe(dayOffset(day, 1) + "T01:45:00.000Z");
   expect(new Date(one[0].ends_at).toISOString()).toBe(dayOffset(day, 1) + "T10:15:00.000Z");
 
+  const cycleType = await shiftCommand(admin.client, fixture.patient, "type", {
+    name: "Ciclo de 8 por 40", durationMinutes: 480, restHours: 40,
+  });
   await page.goto("/escalas?day=" + recurringDay);
   await page.getByRole("button", { name: "Nova programação", exact: true }).click();
   await form.getByRole("button", { name: "Reconhecer resultado e começar outro preenchimento", exact: true }).click();
   await form.getByRole("switch", { name: "Com repetição", exact: true }).check();
-  await form.getByLabel("Tipo da escala", { exact: true }).selectOption(type.id);
+  await form.getByLabel("Tipo da escala", { exact: true }).selectOption(cycleType.id);
+  await expect(form).toContainText("8h de trabalho e 40h de descanso por ciclo.");
+  await expect(form.getByLabel("Regime", { exact: true })).toHaveCount(0);
   await form.getByLabel("Profissional", { exact: true }).selectOption(worker.id);
   await expect(form.getByRole("switch", { name: "Definir data de término", exact: true })).not.toBeChecked();
   await expect(form.getByLabel("Último dia", { exact: true })).toHaveCount(0);
   await form.getByRole("button", { name: "Revisar alteração", exact: true }).click();
   await expect(confirmation).toContainText("sem data de término");
+  await expect(confirmation).toContainText("8 horas de trabalho / 40 horas de descanso");
   await confirmation.getByRole("button", { name: "Confirmar gravação", exact: true }).click();
   await expect(page.getByText("Programação de plantões registrada.", { exact: true })).toBeVisible();
   const repeated = await read(recurringDay);
@@ -104,6 +110,7 @@ test("horários da residência governam plantão isolado, exceção noturna e re
   expect(data.series.some((row: { open_ended: boolean; recurrence: string }) => row.open_ended && row.recurrence === "cycle")).toBe(true);
   expect(data.shifts).toHaveLength(2);
   expect(Date.parse(data.shifts[0].starts_at)).toBe(Date.parse(`${recurringDay}T10:25:00Z`));
+  expect(Date.parse(data.shifts[0].ends_at) - Date.parse(data.shifts[0].starts_at)).toBe(8 * 3_600_000);
   expect(Date.parse(data.shifts[1].starts_at) - Date.parse(data.shifts[0].starts_at)).toBe(48 * 3_600_000);
 });
 

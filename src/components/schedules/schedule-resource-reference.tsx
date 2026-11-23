@@ -68,11 +68,13 @@ export function ScheduleResourceReferenceFacts({
     <DefinitionGrid
       items={[
         { label: "Nome registrado", value: type.name },
-        { label: "Início local registrado", value: type.starts_local },
-        {
-          label: "Duração registrada",
-          value: type.duration_minutes + " minutos",
-        },
+        ...(type.rest_hours == null ? [
+          { label: "Início local registrado", value: type.starts_local },
+          { label: "Duração registrada", value: type.duration_minutes + " minutos" },
+        ] : [
+          { label: "Horas de trabalho", value: type.duration_minutes / 60 },
+          { label: "Horas de descanso", value: type.rest_hours },
+        ]),
         {
           label: "Disponível para novas escalas",
           value: type.is_active ? "Sim" : "Não",

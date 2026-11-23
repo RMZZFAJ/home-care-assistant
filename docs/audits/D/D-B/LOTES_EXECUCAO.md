@@ -1774,16 +1774,24 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261122215605_l3_bind_balance_draft_admission` | Aplicada | Aplicada |
 | `20261122222145_l3_material_link_filters` | Aplicada | Aplicada |
 | `20261122223500_l3_material_history_decisions` | Aplicada | Aplicada |
+| `20261122225705_l3_preserve_first_balance_admission` | Aplicada | Aplicada |
 | `20261122232848_l3_residence_schedule_hours` | Aplicada | Aplicada |
 | `20261123000513_l3_schedule_balance_impact` | Aplicada | Aplicada |
 | `20261123001403_l3_reconcile_residence_shift_windows` | Aplicada | Aplicada |
 | `20261123003438_l3_balance_count_materials` | Aplicada | Aplicada |
+| `20261123011538_l3_balance_extra_reviews` | Aplicada | Aplicada |
+| `20261123014442_l3_unscheduled_balance_count` | Aplicada | Aplicada |
+| `20261123021122_l3_balance_count_permission` | Aplicada | Aplicada |
+| `20261123022923_l3_balance_programming_observation` | Aplicada | Aplicada |
+| `20261123025445_l3_balance_extra_recount_links` | Aplicada | Aplicada |
+| `20261123035313_l3_shift_type_cycles` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
 pelo backup cifrado verificado `cbc6795c-3189-4834-a475-7c1f0b09d031`.
 A migration de filtros do acervo foi aplicada após o backup verificado
-`a59372d1-ce5a-4021-a05e-cfa9444fa2a6`. Local e remoto têm 333 versões.
+`a59372d1-ce5a-4021-a05e-cfa9444fa2a6`. Naquele ponto, local e remoto
+tinham 333 versões.
 A fila vinculada ficou vazia. O RPC de filtro exige usuário autenticado
 e a função privada de consulta fica indisponível ao papel de aplicação.
 
@@ -2742,10 +2750,36 @@ permissão, consulta incompleta, horários da residência e encerramento
 de série. O cenário de criação foi repetido nos três projetos com
 um nome longo e auditoria da lista de tipos em 320 px.
 
-Esta mudança usa as APIs existentes. O contrato de tipos ainda registra
-o início local e a duração em minutos. A adoção das horas de trabalho
-e descanso no cadastro e no ciclo requer sua própria alteração de
-contrato, além do tratamento das residências sem horários configurados.
+O cadastro de tipos usa horas inteiras de trabalho e descanso. Ao criar
+uma programação por ciclo, a revisão mostra o ciclo da versão escolhida.
+O banco confere a versão do tipo e dos horários da residência antes de
+gerar as ocorrências. A edição do tipo afeta novas programações, e os
+intervalos publicados continuam ligados aos atos originais.
+
+Uma residência sem horários configurados recebe orientação no cadastro
+de tipos. Tipos anteriores podem adotar o novo ciclo na edição. A
+migration `20261123035313_l3_shift_type_cycles.sql` mantém o horário
+original associado a tipos anteriores e conserva o hash da referência
+de edição quando ainda não há ciclo no tipo.
+
+Passaram 41 testes de integração com Auth real. Eles incluem a recusa
+de um ciclo divergente, a preparação de um ciclo personalizado, a adoção
+de um ciclo em um tipo anterior, o replay e a preservação dos intervalos
+publicados.
+
+O backup crítico cifrado `9aaa4f74-d9ad-418f-aeaf-147295a2f94c` foi
+verificado antes da aplicação remota. A simulação confirmou que a
+única migration pendente era a de ciclos de plantões.
+Local e remoto registram 347 migrations, com a fila vinculada vazia.
+O RPC de agendamento continua restrito ao papel autenticado e o
+validador interno fica indisponível diretamente a esse papel.
+
+Passaram 35 testes unitários de preparação e edição de escala. Os seis
+cenários dirigidos em Chromium, Android e iOS emulados confirmaram
+a criação do tipo, o horário excepcional, o ciclo sem data final,
+a recusa de sobreposição e o retorno à agenda. A confirmação do
+agendamento compara o conteúdo do recibo independentemente da ordem
+em que seus campos são serializados.
 
 ## L4
 

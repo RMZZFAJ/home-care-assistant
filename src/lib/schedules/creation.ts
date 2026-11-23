@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { scheduleBody } from "@/lib/validation/schedules";
+import { scheduleBody, shiftTypeCycle } from "@/lib/validation/schedules";
 import type { ScheduleWorkspace, ShiftType } from "@/types/schedules";
 import { residenceHours, shiftDayPeriod, shiftLocalTime, type ResidenceHours } from "./residence-hours";
 import { civilInstant } from "./time";
@@ -23,6 +23,7 @@ export const scheduleTypeFields = z
       /^(?:-?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?)?$/.test(v),
     ),
     active: z.boolean(),
+    restHours: text(5).refine((value) => /^\d{0,5}$/.test(value) && Number(value) <= 32767).optional(),
   })
   .strict();
 export const scheduleCreationFields = z.discriminatedUnion("form", [
@@ -43,6 +44,7 @@ export const scheduleCreationFields = z.discriminatedUnion("form", [
         .max(367)
         .refine((v) => new Set(v).size === v.length),
       cycle: z.enum(["12x36", "24x48", "24x24"]),
+      typeCycle: shiftTypeCycle.optional(),
       from: civilDate,
       until: civilDate,
       timezone: text(80),
@@ -74,12 +76,24 @@ export function schedulePurpose(
 export function initialScheduleType(
   type?: ShiftType,
 ): Extract<ScheduleCreationFields, { form: "type" }> {
+  const structured = !type || type.rest_hours != null;
   return {
     form: "type",
     name: type?.name ?? "",
-    start: type?.starts_local.replace(/^(\d{2}:\d{2}):00$/, "$1") ?? "07:00",
+    start: structured ? "" : type.starts_local.replace(/^(\d{2}:\d{2}):00$/, "$1"),
     duration: String(type?.duration_minutes ?? 720),
     active: type?.is_active ?? true,
+    ...(structured ? { restHours: type?.rest_hours?.toString() ?? "" } : {}),
+  };
+}
+export function scheduleTypeSelection(type?: ShiftType) {
+  return {
+    shiftTypeId: type?.id ?? "",
+    shiftTypeVersion: type?.version ?? null,
+    typeCycle: type?.rest_hours == null ? undefined : {
+      workHours: type.duration_minutes / 60,
+      restHours: type.rest_hours,
+    },
   };
 }
 export function initialScheduleSeries(
@@ -94,8 +108,7 @@ export function initialScheduleSeries(
   return {
     form: "series",
     professionalId: (team ? data.professionals[0]?.id : ownId) ?? "",
-    shiftTypeId: type?.id ?? "",
-    shiftTypeVersion: type?.version ?? null,
+    ...scheduleTypeSelection(type),
     recurrence: "weekly",
     weekdays: [1],
     dates: [],
@@ -109,14 +122,17 @@ export function initialScheduleSeries(
 }
 export function scheduleCreationCommand(fields: ScheduleCreationFields) {
   if (fields.form === "type") {
-    if (!fields.duration || !Number.isInteger(Number(fields.duration)))
-      throw new Error("Informe uma duração inteira em minutos.");
+    const durationMinutes = Number(fields.duration);
+    const structured = fields.restHours !== undefined;
+    if (!fields.duration || !Number.isInteger(durationMinutes) || structured && durationMinutes % 60 !== 0)
+      throw new Error(structured ? "Informe horas inteiras de trabalho." : "Informe uma duração inteira em minutos.");
+    if (fields.restHours === "") throw new Error("Informe as horas de descanso.");
     return scheduleBody.parse({
       action: "type",
       body: {
         name: fields.name,
-        startsLocal: fields.start,
-        durationMinutes: Number(fields.duration),
+        ...(structured ? { restHours: Number(fields.restHours) } : { startsLocal: fields.start }),
+        durationMinutes,
         active: fields.active,
       },
     });
@@ -126,6 +142,8 @@ export function scheduleCreationCommand(fields: ScheduleCreationFields) {
   const timingIssue = scheduleSpecialHoursIssue(fields);
   if (timingIssue) throw new Error(timingIssue);
   const residence = fields.residence;
+  if (fields.typeCycle && !residence)
+    throw new Error("Configure os horários da residência antes de programar com este tipo.");
   return scheduleBody.parse({
     action: "series",
     body: {
@@ -138,7 +156,7 @@ export function scheduleCreationCommand(fields: ScheduleCreationFields) {
         ? { dates: fields.dates, shiftTypeVersion: fields.shiftTypeVersion }
         : {}),
       ...(fields.recurrence === "cycle"
-        ? {
+        ? fields.typeCycle ?? {
             workHours: Number(fields.cycle.split("x")[0]),
             restHours: Number(fields.cycle.split("x")[1]),
           }
@@ -172,7 +190,7 @@ export function scheduleSpecialHoursIssue(fields: ScheduleCreationFields) {
     const start = civilInstant(`${fields.from}T${specialStart}`, fields.timezone);
     const end = civilInstant(`${day.toISOString().slice(0, 10)}T${specialEnd}`, fields.timezone);
     const minutes = (Date.parse(end) - Date.parse(start)) / 60000;
-    if (fields.recurrence === "cycle" && minutes !== Number(fields.cycle.split("x")[0]) * 60)
+    if (fields.recurrence === "cycle" && minutes !== (fields.typeCycle?.workHours ?? Number(fields.cycle.split("x")[0])) * 60)
       return "O horário especial precisa manter as horas de trabalho da escala escolhida.";
     if (minutes < 15 || minutes > 1440) return "Use um intervalo entre 15 minutos e 24 horas.";
   } catch {
