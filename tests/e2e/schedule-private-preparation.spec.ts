@@ -12,7 +12,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
-import { openSchedulePrivateArea } from "./schedule-private-area";
+import { openSchedulePrivateArea, openScheduleTypeSettings } from "./schedule-private-area";
 test.setTimeout(150_000);
 async function peerContext(browser: Browser) {
   const use = test.info().project.use;
@@ -48,6 +48,7 @@ const panel = (page: Page) =>
 const button = (page: Page, name: string) =>
   page.getByRole("button", { name, exact: true });
 async function open(page: Page, series = false, own = false) {
+  if (!series) await openScheduleTypeSettings(page);
   if (own) {
     await openSchedulePrivateArea(page);
     await button(

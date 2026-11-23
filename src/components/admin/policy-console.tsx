@@ -16,6 +16,8 @@ import { PermissionMatrix } from "./permission-matrix";
 import { NotificationMatrix } from "./notification-matrix";
 import { PolicyRules } from "./policy-rules";
 import { ScheduleResidenceSettings } from "./schedule-residence-settings";
+import { PatientSchedule } from "@/components/schedules/schedule-console";
+import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/primitives";
 import "./administration.css";
 
@@ -65,10 +67,27 @@ const defaults: Record<string, unknown> = {
   patientShortName: "",
 };
 export function PolicyConsole() {
+  const params = useSearchParams();
+  const scheduleArea = params.get("area") === "schedules";
+  const day = params.get("day");
   return (
-    <Workspace title="Permissões, comunicação e regras" administration>
+    <Workspace title={scheduleArea ? "Configurações de plantões" : "Permissões, comunicação e regras"} administration>
       {(context) =>
-        context.patient &&
+        context.patient && scheduleArea ? (
+          <div className="hca-form-stack">
+            {can(context, "access.manage") || context.activeContext?.mode === "global" ? (
+              <PolicyNavigation tab="schedules" scheduleAccess={can(context, "schedule.types.manage")} />
+            ) : null}
+            <Link className="ui-button ui-button-secondary" prefetch={false}
+              href={"/escalas?" + new URLSearchParams({
+                careRecipientId: context.patient.id,
+                ...(day && /^\d{4}-\d{2}-\d{2}$/.test(day) ? { day } : {}),
+              })}>Voltar à agenda</Link>
+            <PatientSchedule key={context.userId + ":" + context.patient.id} context={context} settings />
+            {context.activeContext?.mode === "patient" && can(context, "schedule.types.manage")
+              ? <ScheduleResidenceSettings key={context.patient.id} patientId={context.patient.id} /> : null}
+          </div>
+        ) : context.patient &&
         (can(context, "access.manage") ||
           context.activeContext?.mode === "global") ? (
           <Policies key={context.patient.id} context={context} />
@@ -79,6 +98,31 @@ export function PolicyConsole() {
     </Workspace>
   );
 }
+
+function PolicyNavigation({ tab, scheduleAccess }: { tab: string; scheduleAccess: boolean }) {
+  const params = useSearchParams();
+  const router = useRouter();
+  const areas: [string, string, IconName][] = [
+    ["rules", "Regras", "settings"], ["permissions", "Permissões", "shield"],
+    ["notifications", "Notificações", "bell"], ["people", "Pessoas e propostas", "users"],
+  ];
+  if (scheduleAccess || tab === "schedules") areas.push(["schedules", "Plantões", "calendar"]);
+  return <nav aria-label="Áreas da configuração" className="hca-configuration-tabs hca-document-tab-list">
+    {areas.map(([area, label, icon]) => {
+      const query = new URLSearchParams(params.toString());
+      query.set("area", area);
+      const href = "/configuracoes?" + query;
+      return <a key={area} className="hca-configuration-tab hca-document-tab" href={href}
+        aria-current={tab === area ? "page" : undefined} onClick={event => {
+          if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey && event.button === 0) {
+            event.preventDefault();
+            router.replace(href, { scroll: false });
+          }
+        }}><Icon name={icon} />{label}</a>;
+    })}
+  </nav>;
+}
+
 function Policies({ context }: { context: WorkspaceContext }) {
   const patientId = context.patient!.id;
   const liveRevision = useLiveRevision();
@@ -95,9 +139,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const busy = command.busy || invitationBusy || reviewing || confirming;
   const locked = busy || command.uncertain || conflict;
   const params = useSearchParams();
-  const router = useRouter();
   const tab = ["rules", "permissions", "notifications", "people"].includes(params.get("area") ?? "") ? params.get("area")! : "rules";
-  const setTab = (area: string) => { const query = new URLSearchParams(params.toString()); query.set("area", area); router.replace("/configuracoes?" + query, { scroll: false }); };
   const savingRef = useRef(false);
   const currentVersionRef = useRef<number | null>(null);
   const [invitationUrl, setInvitationUrl] = useState("");
@@ -276,19 +318,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
           />
         </Notice>
       ) : null}
-      <nav aria-label="Áreas da configuração" className="hca-configuration-tabs hca-document-tab-list">{([
-        ["rules", "Regras", "settings"], ["permissions", "Permissões", "shield"],
-        ["notifications", "Notificações", "bell"], ["people", "Pessoas e propostas", "users"],
-      ] satisfies [string, string, IconName][]).map(([area, label, icon]) => {
-        const query = new URLSearchParams(params.toString()); query.set("area", area);
-        return <a key={area} className="hca-configuration-tab hca-document-tab" href={"/configuracoes?" + query} aria-current={tab === area ? "page" : undefined} onClick={(event) => {
-          if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) { event.preventDefault(); setTab(area); }
-        }}><Icon name={icon} />{label}</a>;
-      })}</nav>
+      <PolicyNavigation tab={tab} scheduleAccess={can(context, "schedule.types.manage")} />
       <div hidden={tab !== "rules"}>
         <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={recovery} error={error} message={message} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
-        {tab === "rules" && context.activeContext?.mode === "patient" && can(context, "schedule.types.manage")
-          ? <ScheduleResidenceSettings key={patientId} patientId={patientId} /> : null}
       </div>
       {tab === "permissions" ? (
         <PermissionMatrix

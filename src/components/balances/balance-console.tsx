@@ -24,6 +24,7 @@ import { weekDays, type BalanceEditor } from "./balance-forms";
 import { DeferralFacts } from "./balance-deferral-facts";
 import { BalanceCountPermissionAction, BalanceCountPermissionHistory } from "./balance-count-permissions";
 import { useBalanceWorkspace } from "./use-balance-workspace";
+import { scheduleSettingsHref } from "@/lib/schedules/routes";
 import type { DocumentSummary } from "@/types/documents";
 export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
   const router = useRouter(),
@@ -176,8 +177,13 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
             </Link>
           ) : null}
         </div>
-        {configure && !data.types.length ? (
-          <p>Cadastre os tipos de plantão na escala antes da ativação.</p>
+        {configure && !data.types.some(type => type.is_active) ? (
+          <p>
+            Cadastre um tipo de plantão antes de ativar os balanços.
+            {can(context, "schedule.types.manage") ? (
+              <> <Link href={scheduleSettingsHref(patient.id)} prefetch={false}>Configurar tipos de plantão</Link></>
+            ) : null}
+          </p>
         ) : null}
       </section>
       <section className="ui-card">

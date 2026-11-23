@@ -35,6 +35,12 @@ import {
 import { ScheduleConfirmationPanel } from "./schedule-confirmation-panel";
 import { useScrollableRegion } from "@/components/ui/use-scrollable-region";
 import { useResidenceHours } from "./use-residence-hours";
+import { ScheduleTypeSettings } from "./schedule-type-settings";
+import { Menu } from "@base-ui/react/menu";
+import { MenuPopup } from "@/components/ui/floating";
+import { Icon } from "@/components/ui/icon";
+import Link from "next/link";
+import { scheduleSettingsHref } from "@/lib/schedules/routes";
 
 const today = (timeZone = "America/Sao_Paulo") =>
   new Intl.DateTimeFormat("sv-SE", { timeZone }).format(
@@ -48,11 +54,16 @@ const stateLabels: Record<string, string> = {
   obsolete: "Obsoleto",
 };
 import { ScheduleShift } from "./schedule-shift";
-export function PatientSchedule({ context }: { context: WorkspaceContext }) {
+export function PatientSchedule({ context, settings = false }: {
+  context: WorkspaceContext;
+  settings?: boolean;
+}) {
+  const patientId = context.patient!.id;
+  const mayRead = can(context, "schedule.read.team") || can(context, "schedule.read.own");
   const [creationMessage, setCreationMessage] = useState("");
   const [privateRefresh, setPrivateRefresh] = useState(0);
   const ownSummaryRef = useRef<HTMLElement>(null);
-  const recovery = useScheduleConfirmation(context.userId, context.patient!.id);
+  const recovery = useScheduleConfirmation(context.userId, patientId);
   const [preparation, setPreparation] = useState<{
     purpose: ScheduleCreationPurpose;
     day: string;
@@ -86,8 +97,15 @@ export function PatientSchedule({ context }: { context: WorkspaceContext }) {
   return (
     <>
       {creationMessage ? <Notice>{creationMessage}</Notice> : null}
-      {can(context, "schedule.read.team") ||
-      can(context, "schedule.read.own") ? (
+      {settings ? (
+        <ScheduleTypeSettings
+          context={context}
+          today={today()}
+          recovery={recovery}
+          onCreate={opener => create("shift_type_create", today(), opener)}
+          onEdit={(id, opener) => openResource("shift_type_edit", id, today(), opener)}
+        />
+      ) : mayRead ? (
         <Agenda
           context={context}
           recovery={recovery}
@@ -106,7 +124,7 @@ export function PatientSchedule({ context }: { context: WorkspaceContext }) {
       )}
       <details className="ui-card">
         <summary ref={ownSummaryRef}>
-          Meus preenchimentos privados da agenda
+          {settings ? "Meus preenchimentos de tipos de plantão" : "Meus preenchimentos privados da agenda"}
         </summary>
         <p>
           Consulte, retome, descarte ou reconheça somente seus preenchimentos.
@@ -118,24 +136,18 @@ export function PatientSchedule({ context }: { context: WorkspaceContext }) {
               !recovery.ready || recovery.busy || Boolean(recovery.pending)
             }
             onClick={(e) =>
-              create("shift_type_create", today(), e.currentTarget)
+              create(settings ? "shift_type_create" : "schedule_series_create", today(), e.currentTarget)
             }
           >
-            Retomar meu tipo de plantão
+            {settings ? "Retomar meu tipo de plantão" : "Retomar minha programação"}
           </ActionButton>
-          <ActionButton
-            disabled={
-              !recovery.ready || recovery.busy || Boolean(recovery.pending)
-            }
-            onClick={(e) =>
-              create("schedule_series_create", today(), e.currentTarget)
-            }
-          >
-            Retomar minha programação
-          </ActionButton>
+          {!settings && (!mayRead || !can(context, "schedule.types.manage")) ? (
+            <Link href={scheduleSettingsHref(patientId)} prefetch={false}>Consultar meus preenchimentos de tipos</Link>
+          ) : null}
         </div>
         <ScheduleResourcePreparationsList
           context={context}
+          typeSettings={settings}
           refreshToken={privateRefresh}
           disabled={
             !recovery.ready ||
@@ -261,18 +273,8 @@ function Agenda({
     uncertain = recovery.pending !== null;
   function open(value: ScheduleEditor, target: HTMLElement) {
     if (busy || uncertain) return;
-    if (value.kind === "series" || (value.kind === "type" && !value.type)) {
-      onCreate(
-        value.kind === "series"
-          ? "schedule_series_create"
-          : "shift_type_create",
-        day,
-        target,
-      );
-      return;
-    }
-    if (value.kind === "type" && value.type)
-      onResource("shift_type_edit", value.type.id, day, target);
+    if (value.kind === "series")
+      onCreate("schedule_series_create", day, target);
     else if (value.kind === "shift")
       onResource("schedule_shift_edit", value.shift.id, day, target);
     else if (
@@ -354,12 +356,16 @@ function Agenda({
           </ActionButton>
         ) : null}
         {can(context, "schedule.types.manage") ? (
-          <ActionButton
-            disabled={loading || busy || uncertain || !data}
-            onClick={(event) => open({ kind: "type" }, event.currentTarget)}
-          >
-            Novo tipo de plantão
-          </ActionButton>
+          <Menu.Root>
+            <Menu.Trigger render={<ActionButton variant="quiet" />}>
+              <Icon name="more" /> Ações da agenda
+            </Menu.Trigger>
+            <MenuPopup>
+              <Menu.LinkItem className="hca-menu-item" href={scheduleSettingsHref(patient.id, day)}>
+                <Icon name="settings" /> Tipos de plantão · configurações
+              </Menu.LinkItem>
+            </MenuPopup>
+          </Menu.Root>
         ) : null}
       </div>
       {uncertain ? (
@@ -561,26 +567,8 @@ function Agenda({
                 setDetailsOpen((current) => !current);
               }}
             >
-              Tipos e programações
+              Séries publicadas
             </summary>
-            {currentData.types.map((type) => (
-              <div className="hca-record" key={type.id}>
-                <strong>
-                  {type.name} · {type.starts_local.slice(0, 5)} ·{" "}
-                  {type.duration_minutes / 60}h
-                </strong>
-                {can(context, "schedule.types.manage") ? (
-                  <ActionButton
-                    disabled={busy || uncertain}
-                    onClick={(event) =>
-                      open({ kind: "type", type }, event.currentTarget)
-                    }
-                  >
-                    Editar tipo
-                  </ActionButton>
-                ) : null}
-              </div>
-            ))}
             {currentData.series
               .filter(
                 (series) => series.status === "published" && !series.ended_on

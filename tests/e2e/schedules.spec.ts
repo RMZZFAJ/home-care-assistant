@@ -4,14 +4,20 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { setup } from "../integration/v4-fixtures.mjs";
+import { shiftCommand } from "../integration/shift-fixtures.mjs";
 import { selectContext } from "./auth-context";
 import { audit, auditFromTop } from "./accessibility-audit";
+import { openScheduleTypeSettings } from "./schedule-private-area";
 
 test("agenda publica uma programação real, recusa conflito e preserva contexto no mobile", async ({ page }, info) => {
-  test.setTimeout(60_000);
+  test.setTimeout(90_000);
   // A private creator slot belongs to the account/patient across devices.
   // Each engine must start with its own patient, without erasing another result.
-  const patientA = (await setup()).patient;
+  const { patient: patientA, admin } = await setup();
+  const longName = "Escala" + "Noturna".repeat(12);
+  await shiftCommand(admin, patientA, "type", {
+    name: longName, startsLocal: "21:00", durationMinutes: 480, active: false,
+  });
   const fixture = JSON.parse(readFileSync(fixtureFile, "utf8"));
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixture.adminA.email);
@@ -21,6 +27,11 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   await selectContext(page, patientA);
   await page.goto("/escalas");
   await expect(page.getByRole("heading", { name: "Plantões e balanços", exact: true })).toBeVisible();
+  // Unique future date keeps retained local histories from overlapping test runs.
+  const date = new Date(Date.UTC(2100, 0, 1 + Math.floor(Math.random() * 30000))).toISOString().slice(0, 10);
+  await page.getByLabel("Data de referência", { exact: true }).fill(date);
+  await expect(page.getByRole("button", { name: "Novo tipo de plantão", exact: true })).toHaveCount(0);
+  await openScheduleTypeSettings(page);
   const suffix = randomUUID().slice(0, 8), name = "Plantão fictício " + suffix;
   await page.getByRole("button", { name: "Novo tipo de plantão", exact: true }).click();
   const drawer = page.getByRole("dialog", { name: "Tipo de plantão", exact: true });
@@ -37,8 +48,16 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   await expect(page.getByText("Tipo de plantão registrado.", { exact: true })).toBeVisible();
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  // Unique future date keeps retained local histories from overlapping test runs.
-  const date = new Date(Date.UTC(2100, 0, 1 + Math.floor(Math.random() * 30000))).toISOString().slice(0, 10);
+  await expect(page.getByRole("region", { name: "Tipos de plantão", exact: true })).toContainText(name);
+  const viewport = page.viewportSize()!;
+  await page.setViewportSize({ width: 320, height: 900 });
+  const longType = page.getByRole("article", { name: longName, exact: true });
+  await expect(longType).toContainText("Indisponível");
+  await expect(longType.getByRole("button", { name: "Editar tipo", exact: true })).toBeEnabled();
+  await auditFromTop(page, "configuração de tipos com nome longo em 320 px");
+  await page.setViewportSize(viewport);
+  await page.getByRole("link", { name: "Voltar à agenda", exact: true }).click();
+  await expect(page.getByLabel("Data de referência", { exact: true })).toHaveValue(date);
   await page.getByRole("button", { name: "Nova programação", exact: true }).click();
   const form = page.getByRole("dialog", { name: "Programação de plantões", exact: true });
   await form.getByLabel("Profissional", { exact: true }).selectOption(fixture.professional.id);

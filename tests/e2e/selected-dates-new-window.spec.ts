@@ -431,7 +431,7 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
   ).toEqual(
     before.shifts.filter((row: ScheduledShift) => row.id !== original.id),
   );
-  const summary = page.locator("summary").filter({ hasText: "Tipos e programações" });
+  const summary = page.locator("summary").filter({ hasText: "Séries publicadas" });
   const disclosure = page.locator("details").filter({ has: summary });
   if (!(await disclosure.evaluate((element: HTMLDetailsElement) => element.open))) {
     await summary.scrollIntoViewIfNeeded();

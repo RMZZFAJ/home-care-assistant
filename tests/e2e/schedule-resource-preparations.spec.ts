@@ -12,7 +12,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
-import { openSchedulePrivateArea } from "./schedule-private-area";
+import { openSchedulePrivateArea, openScheduleTypeSettings } from "./schedule-private-area";
 import {
   scheduleResourcePurposes,
   scheduleResourceLabels,
@@ -65,15 +65,16 @@ async function open(
   own = false,
   recovering = false,
 ) {
+  if (purpose === "shift_type_edit") await openScheduleTypeSettings(page);
   if (own) {
     await openSchedulePrivateArea(page);
     await button(page, "Consultar ou retomar este preenchimento").click();
   } else {
-    await page
-      .getByLabel("Data de referência", { exact: true })
-      .fill("2100-04-01");
-    if (purpose === "shift_type_edit" || purpose.startsWith("schedule_series_"))
-      await page.getByText("Tipos e programações", { exact: true }).click();
+    if (purpose !== "shift_type_edit") {
+      await page.getByLabel("Data de referência", { exact: true }).fill("2100-04-01");
+      if (purpose === "schedule_series_end")
+        await page.getByText("Séries publicadas", { exact: true }).click();
+    }
     const names: Record<ScheduleResourcePurpose, string> = {
       shift_type_edit: "Editar tipo",
       schedule_series_end: "Encerrar série",

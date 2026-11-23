@@ -19,11 +19,13 @@ import { localScheduleResourceScopes } from "@/lib/schedules/resource-local";
 type Cursor = { before: string; beforeId: string };
 export function ScheduleResourcePreparationsList({
   context,
+  typeSettings,
   disabled,
   refreshToken,
   onOpen,
 }: {
   context: WorkspaceContext;
+  typeSettings: boolean;
   disabled: boolean;
   refreshToken: number;
   onOpen: (
@@ -78,7 +80,8 @@ export function ScheduleResourcePreparationsList({
     scope + ":" + revision + ":" + refreshToken,
     decode,
   );
-  const rows = !read.loading && !read.error ? read.data : null;
+  const page = !read.loading && !read.error ? read.data : null;
+  const rows = page?.filter(row => (row.purpose === "shift_type_edit") === typeSettings);
   const ready = useClientReady();
   const open = (
     purpose: ScheduleResourcePurpose,
@@ -122,6 +125,7 @@ export function ScheduleResourcePreparationsList({
           key={scope + ":" + revision + ":" + refreshToken}
           user={context.userId}
           patient={patient.id}
+          typeSettings={typeSettings}
           disabled={disabled}
           open={open}
         />
@@ -195,9 +199,9 @@ export function ScheduleResourcePreparationsList({
         </ActionButton>
         <span>Página {cursors.length + 1}</span>
         <ActionButton
-          disabled={read.loading || !rows || rows.length < 20}
+          disabled={read.loading || !page || page.length < 20}
           onClick={() => {
-            const last = rows?.at(-1);
+            const last = page?.at(-1);
             if (last)
               setNavigation({
                 scope,
@@ -218,11 +222,13 @@ export function ScheduleResourcePreparationsList({
 function DeviceReferences({
   user,
   patient,
+  typeSettings,
   disabled,
   open,
 }: {
   user: string;
   patient: string;
+  typeSettings: boolean;
   disabled: boolean;
   open: (
     purpose: ScheduleResourcePurpose,
@@ -232,7 +238,8 @@ function DeviceReferences({
 }) {
   const [rows] = useState(() => {
     try {
-      return localScheduleResourceScopes(sessionStorage, user, patient);
+      return localScheduleResourceScopes(sessionStorage, user, patient)
+        .filter(row => (row.purpose === "shift_type_edit") === typeSettings);
     } catch {
       return [];
     }

@@ -21,6 +21,7 @@ test("horários da residência governam plantão isolado, exceção noturna e re
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await selectContext(page, fixture.patient);
   await page.goto("/configuracoes");
+  await page.getByRole("navigation", { name: "Áreas da configuração" }).getByRole("link", { name: "Plantões", exact: true }).click();
   const settings = page.getByRole("region", { name: "Horários dos plantões", exact: true });
   await settings.getByRole("button", { name: "Editar horários", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "Horários da residência", exact: true });

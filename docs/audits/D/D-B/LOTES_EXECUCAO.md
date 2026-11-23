@@ -2133,8 +2133,9 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   abas próprias para Revisões e Contagens. O cadastro consulta os
   horários por residência onde já configurados. Alterações de plantão que
   atingem uma contagem designada exigem encaminhamento explícito e registram
-  a decisão na mesma transação. Restam completar a administração dos
-  tipos, a transição das residências sem configuração e a conferência
+  a decisão na mesma transação. A administração dos tipos e dos horários
+  fica em Configurações → Plantões. Restam o contrato de duração e ciclo
+  do tipo, a transição das residências sem configuração e a conferência
   visual. A contagem por plantão usa as cinco etapas. Extras têm
   parecer individual e vínculo a recontos comprovados. A programação
   registra observação opcional e o pedido de autorização para contar
@@ -2719,6 +2720,32 @@ a etapa de contagem no BAL avulso. A expectativa passou a aceitar a
 etapa compartilhada e a verificar que as etapas de recebimento e as
 específicas de outro modo são recusadas sem avançar a revisão privada.
 Os quatro testes de integração desse arquivo passaram localmente.
+
+### Tipos de plantão na configuração
+
+A agenda mantém as ações sobre ocorrências e séries. O menu **Ações da
+agenda** abre **Tipos de plantão · configurações** e o retorno preserva
+o paciente e o dia de referência. A aba **Plantões** em Configurações
+reúne os tipos e a edição dos horários da residência. O acompanhamento
+de BAL também abre essa área quando ainda precisa de um tipo disponível.
+
+Os formulários de criação e edição foram reaproveitados. Os
+preenchimentos privados de tipos e seus resultados ficam nessa área,
+inclusive para consulta ou descarte quando a capacidade de alterar tipos
+é retirada. A agenda mantém os preenchimentos de ações operacionais.
+Esse acesso a registros anteriores preserva uma função do sistema que
+o laboratório não exemplifica.
+
+Passaram seis cenários em Chromium, Android e iOS emulados. Eles
+cobriram criação e edição, recuperação entre sessões, revogação de
+permissão, consulta incompleta, horários da residência e encerramento
+de série. O cenário de criação foi repetido nos três projetos com
+um nome longo e auditoria da lista de tipos em 320 px.
+
+Esta mudança usa as APIs existentes. O contrato de tipos ainda registra
+o início local e a duração em minutos. A adoção das horas de trabalho
+e descanso no cadastro e no ciclo requer sua própria alteração de
+contrato, além do tratamento das residências sem horários configurados.
 
 ## L4
 
