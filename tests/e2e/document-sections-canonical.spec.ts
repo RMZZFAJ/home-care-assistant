@@ -79,7 +79,9 @@ test("06.5 native archive attachments and historical facts share canonical rows 
   const bytes=await pdf.body(),issuance=new URL(pdf.url()).searchParams.get("issuance")!;
   await page.goto("/fichas/"+f.doc.id);await selectDocumentSection(page,"attachments");await page.getByRole("button",{name:"Adicionar anexo",exact:true}).click();
   const filename="Ficha física com nome completo e referência preservada "+"na operação ".repeat(6)+".png",source=await sharp({create:{width:8,height:4,channels:3,background:"#123456"}}).png().toBuffer();
-  await page.getByLabel("Adicionar foto ou PDF",{exact:true}).setInputFiles({name:filename,mimeType:"image/png",buffer:source});await page.getByRole("button",{name:"Enviar anexo",exact:true}).click();await expect(page.getByRole("link",{name:filename,exact:true})).toBeVisible();
+  await page.getByLabel("Adicionar foto ou PDF",{exact:true}).setInputFiles({name:filename,mimeType:"image/png",buffer:source});await page.getByRole("button",{name:"Enviar anexo",exact:true}).click();
+  await page.getByRole("dialog",{name:"Anexo disponível",exact:true}).getByRole("button",{name:"Concluir",exact:true}).click();
+  await expect(page.getByRole("link",{name:filename,exact:true})).toBeVisible();
   const hashes=historyHashes(f.doc.id);expect(JSON.parse(hashes).filter((e:{version:number})=>e.version<=f.doc.version)).toEqual(JSON.parse(f.hashes));
   const before=official(f.patient,f.doc.id),count=sql("select count(*) from private.pdf_issuances where document_id="+q(f.doc.id)),sent:string[]=[];
   page.on("request",r=>{if(new URL(r.url()).pathname.startsWith("/api/")&&r.method()!=="GET"&&!isDocumentAccessReport(r))sent.push(r.url());});

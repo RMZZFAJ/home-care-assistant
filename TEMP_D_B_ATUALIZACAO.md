@@ -4,6 +4,11 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — resultado do envio de anexo.** O diálogo **Anexo disponível**
+confirma a gravação ou a recuperação da mesma tentativa. Nove verificações
+passaram em Chromium, Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#resultado-do-envio-de-anexo).
+
 **23/11 — aplicação do balanço e validação no iOS.** A confirmação mostra o
 efeito no estoque da equipe. O carregamento acompanha a gravação e a
 conferência do recibo. A recuperação usa a tentativa preservada. A CI de

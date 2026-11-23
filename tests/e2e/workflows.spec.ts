@@ -354,6 +354,8 @@ test("REQ → planejamento COM → compra → validação → estoque familiar �
     buffer: png,
   });
   await page.getByRole("button", { name: "Enviar anexo", exact: true }).click();
+  await page.getByRole("dialog", { name: "Anexo disponível", exact: true })
+    .getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(
     page.getByRole("link", { name: "ficha-fisica.png", exact: true }),
   ).toBeVisible();

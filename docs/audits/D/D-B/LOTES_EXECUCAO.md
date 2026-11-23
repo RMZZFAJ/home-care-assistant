@@ -3399,7 +3399,8 @@ WhatsApp ainda requer homologação do provedor.
 - **E09-03** — Geração explícita e recuperação sem trocar os bytes do exemplar.
   `pdf-issuance.spec.ts`, `pdf-issuance-recovery.test.ts`.
 - **E09-04** — Seleção, tamanho, formato, autoria e consulta do anexo
-  confirmado. `attachment-attempts.spec.ts`, `attachment-attempts.test.mjs`.
+  confirmado. [Resultado do envio](#resultado-do-envio-de-anexo),
+  `attachment-attempts.spec.ts`, `attachment-attempts.test.mjs`.
 - **E09-05** — Confirmação perdida, reabertura vazia e liberação de reserva.
   `attachment-attempts.spec.ts`, `attachment-attempts.test.mjs`.
 - **E09-06** — Entrada por código e QR, ausência e falha de serviço.
@@ -3697,9 +3698,11 @@ WhatsApp ainda requer homologação do provedor.
   conclusão normal aguardou o mesmo recibo. Ambos os casos verificaram
   um único ajuste. As capturas do produto e do laboratório em 360 e 412 px
   estão em `output/playwright/l3/`.
-- A verificação local do fluxo de reconto parou na preparação da escala,
-  com timeout de execução do banco antes de abrir a ficha. O cenário
-  correspondente no commit anterior passou no iOS da CI.
+- A primeira verificação local do reconto parou na preparação da escala,
+  com timeout do banco antes de abrir a ficha. O reconto completo e a
+  consulta do regime opcional passaram na rodada dirigida seguinte no iOS
+  emulado. O retorno da aba Contagens para Visão geral foi acionado pelo
+  teclado nessa consulta e conferiu a seleção da aba antes de atualizar.
 
 ### CI de e349a92d
 
@@ -3715,6 +3718,34 @@ WhatsApp ainda requer homologação do provedor.
   do mesmo pedido de PDF, um único POST de geração e um único exemplar
   persistido. Esses critérios independem do número de leituras do navegador.
   Os dois testes corrigidos passaram localmente no iOS emulado.
+
+### Preview de eaabb177
+
+- Cinco commits foram publicados em `feat/phase-d-continuation` no
+  [PR 8 em rascunho](https://github.com/RMZZFAJ/home-care-assistant/pull/8).
+  O [deploy do commit](https://vercel.com/rmzzfajs-projects/home-care-assistant/6m1EwEXP9bMHkHGvyYFjBPsSRUFg)
+  respondeu com HTTP 200 em `/login`, `/verificar` e `/api/runtime`.
+  O último confirmou protocolo 1 e esquema 2. O envio de um PDF sintético
+  sem assinatura devolveu análise de arquivo sem assinatura.
+- O escopo Preview contém a configuração do Supabase, assinatura e
+  confiança de PDF e Web Push. As 362 migrations locais correspondem às
+  362 versões registradas no remoto. O commit não adiciona migrations.
+  O SonarCloud passou e o CodeRabbit pulou a revisão automática pelo
+  limite de arquivos. A [CI do commit](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45260446990)
+  estava em execução no momento da conferência do Preview.
+
+### Resultado do envio de anexo
+
+- E09-04 e E09-05 usam **Anexo disponível** quando o servidor confirma
+  o envio ou a recuperação da mesma tentativa. **Concluir** volta aos
+  anexos e restaura o foco para a próxima ação. A nova abertura começa
+  com seleção vazia. A falha ou a incerteza segue na janela do envio,
+  com o arquivo preservado até o usuário fechar ou confirmar o resultado.
+- Nove casos dirigidos passaram em Chromium, Android e iOS emulados.
+  Eles verificaram a gravação, o recibo recuperado sem novo upload, o
+  arquivo e sua autoria no acervo, a recusa de acesso e a navegação sem
+  nova emissão. As capturas do resultado em 360 e 412 px estão em
+  `output/playwright/l3/`. O ajuste dispensa migration.
 
 ## L4
 

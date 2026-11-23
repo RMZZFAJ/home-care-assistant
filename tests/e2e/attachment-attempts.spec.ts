@@ -34,6 +34,10 @@ const picker = (page: Page) => page.getByLabel("Adicionar foto ou PDF", { exact:
 const submit = (page: Page) => page.getByRole("button", { name: /^(Enviar anexo|Conferir envio|Tentar novamente)$/ });
 const add = (page: Page) => page.getByRole("button", { name: "Adicionar anexo", exact: true });
 const close = (page: Page) => page.getByRole("button", { name: "Fechar diálogo", exact: true });
+const available = (page: Page) => page.getByRole("dialog", { name: "Anexo disponível", exact: true });
+async function finishUpload(page: Page) {
+  await available(page).getByRole("button", { name: "Concluir", exact: true }).click();
+}
 function postKey(body: Buffer | null) { const key = body?.toString("latin1").match(/name="idempotencyKey"\r?\n\r?\n([a-f0-9-]{36})/)?.[1]; expect(key).toBeTruthy(); return key!; }
 async function loseConfirmedResponse(page: Page, target: "upload" | "prepareAndAbandon") {
   // Keep the native browser multipart request. WebKit's intercepted request
@@ -61,6 +65,9 @@ async function loseConfirmedResponse(page: Page, target: "upload" | "prepareAndA
 test("anexos ocultam lista recusada e cada nova abertura começa com uma seleção vazia", async ({ page }, info) => {
   const f = await fixture(page);
   await picker(page).setInputFiles(f.file); await submit(page).click();
+  await expect(available(page)).toContainText("O envio foi concluído.");
+  await finishUpload(page);
+  await expect(add(page)).toBeFocused();
   const link = page.getByRole("link", { name: f.file.name, exact: true });
   await expect(link).toBeVisible(); await page.getByRole("button",{name:"Adicionar anexo",exact:true}).click(); await expect(picker(page)).toBeEnabled();
   const pending = { ...f.file, name: "nova-foto-ainda-nao-enviada.png" };
@@ -144,6 +151,15 @@ test("anexo confirmado com resposta perdida congela escolha e GET recupera o mes
     await expect(submit(page)).toBeFocused(); expect(uploadPosts).toBe(1); expect(rows(f.doc.id)).toHaveLength(1);
   }
   await submit(page).click(); await expect(picker(page)).toHaveCount(0);
+  await expect(available(page)).toContainText("O resultado desta tentativa foi confirmado.");
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 860 });
+    const path = info.outputPath(`anexo-confirmado-${width}.png`);
+    await page.screenshot({ path, scale: "css", animations: "disabled" });
+    await info.attach(`Anexo confirmado em ${width}px`, { path, contentType: "image/png" });
+  }
+  await finishUpload(page);
+  await expect(add(page)).toBeFocused();
   expect(uploadPosts).toBe(1); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].sha256).toBe(stored.sha256); expect(facts(f.doc.id)).toBe(before);
   const card = page.locator(`[data-file-id="${stored.id}"]`);
   const author = sql(`select full_name from public.profiles where id=${q(stored.uploaded_by)}`);
@@ -207,7 +223,8 @@ test("perda antes da reserva conserva arquivo e chave e permite concluir a mesma
   });
   await picker(page).setInputFiles(f.file); await submit(page).click(); await expect(page.getByRole("button", { name: "Conferir envio", exact: true })).toBeEnabled();
   expect(rows(f.doc.id)).toHaveLength(0); await expect(picker(page)).toBeDisabled();
-  await submit(page).click(); await expect(page.getByRole("link", { name: f.file.name, exact: true })).toBeVisible(); await expect(picker(page)).toHaveCount(0);
+  await submit(page).click(); await finishUpload(page);
+  await expect(page.getByRole("link", { name: f.file.name, exact: true })).toBeVisible(); await expect(picker(page)).toHaveCount(0);
   expect(new Set(keys).size).toBe(1); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].state).toBe("ready");
 });
 
@@ -237,6 +254,7 @@ test("fechar o modal encerra a reserva sem fila e preserva o histórico", async 
   expect(await picker(page).evaluate(element => (element as HTMLInputElement).files?.length)).toBe(0);
   await picker(page).setInputFiles({ ...f.file, name: "nova-ficha.png" });
   await submit(page).click();
+  await finishUpload(page);
   await expect(page.getByRole("link", { name: "nova-ficha.png", exact: true })).toBeVisible();
   expect(rows(f.doc.id)).toHaveLength(2);
   expect(rows(f.doc.id).filter((row: { state: string }) => row.state === "ready")).toHaveLength(1);
@@ -330,6 +348,7 @@ test("nova seleção encontra o mesmo arquivo e a reconciliação rejeita diverg
   expect(await picker(page).evaluate(element => (element as HTMLInputElement).files?.length)).toBe(0);
   await picker(page).setInputFiles({ ...f.file, name: "copia-renomeada.png" });
   await submit(page).click();
+  await finishUpload(page);
   await expect(page.getByRole("link", { name: f.file.name, exact: true })).toBeVisible();
   expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].id).toBe(a.id);
   const aliases = JSON.parse(sql("select jsonb_agg(request_key) from private.document_attachment_request_keys where attachment_id=" + q(a.id)));
@@ -373,6 +392,7 @@ test("timeout nativo30s depois do commit conserva a intenção e recupera ready 
   expect(Date.now() - started).toBeGreaterThanOrEqual(29_000); expect(await page.evaluate(() => document.documentElement.dataset.attachmentTimeoutUpstream)).toBe("201:confirmed");
   await expect(page.getByText("Não foi possível confirmar o envio. Recupere a mesma tentativa para consultar o resultado.", { exact: true })).toBeVisible(); await expect(picker(page)).toBeDisabled();
   const [stored] = rows(f.doc.id); expect(stored.state).toBe("ready"); await submit(page).click(); await expect(picker(page)).toHaveCount(0);
+  await finishUpload(page);
   expect(uploads).toBe(1); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].sha256).toBe(stored.sha256); expect(facts(f.doc.id)).toBe(before);
   const link = page.getByRole("link", { name: f.file.name, exact: true }), downloaded = await page.request.get((await link.getAttribute("href"))!); expect(downloaded.ok()).toBeTruthy(); expect(digest(await downloaded.body())).toBe(stored.sha256);
 });

@@ -39,6 +39,7 @@ export function Attachments(props: Props) {
 function ScopedAttachments({ patientId, documentId, documentCode, movementId, contingencyId, writable = false, active = true, onChange }: Props) {
   const modalOnly = Boolean(documentId);
   const [adding, setAdding] = useState(false);
+  const [uploadResult, setUploadResult] = useState<"sent" | "recovered" | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [files, setFiles] = useState<Attachment[]>([]), [error, setError] = useState(""), [readError, setReadError] = useState(""), [message, setMessage] = useState("");
   const [archiveFailure, setArchiveFailure] = useState<{ cause: unknown; denied: boolean; dismissed: boolean; attempts: number } | null>(null);
@@ -57,6 +58,10 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
   const resolveAbandonFocus = useCallback(() => {
     const target = abandonFocusRef.current;
     return target?.isConnected && !target.matches(':disabled,[aria-disabled="true"]') ? target : refreshRef.current;
+  }, []);
+  const uploadReturnFocus = useCallback(() => {
+    const button = addButtonRef.current;
+    return button && !button.disabled ? button : refreshRef.current;
   }, []);
   useEffect(() => {
     if (active && readError && (!document.activeElement || document.activeElement === document.body)) refreshRef.current?.focus();
@@ -111,11 +116,16 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
-  function acceptConfirmed(body: unknown, pending: FrozenAttachment) {
+  function acceptConfirmed(body: unknown, pending: FrozenAttachment, recovered = false) {
     const receipt = confirmedAttachment(body, pending.sourceSha256, preparedIdRef.current);
     if (!receipt) throw new Error("A resposta não confirma esta tentativa. Consulte o envio antes de iniciar outro.");
     if (!mountedRef.current) return;
-    clearPending(); setAdding(false); setMessage("Anexo confirmado. O arquivo está disponível na lista."); setAttempt(value => value + 1); onChange?.();
+    clearPending();
+    setAdding(false);
+    if (modalOnly) setUploadResult(recovered ? "recovered" : "sent");
+    else setMessage("Anexo confirmado. O arquivo está disponível na lista.");
+    setAttempt(value => value + 1);
+    onChange?.();
   }
   const commandFor = useCallback((file: Attachment, action: "recover" | "abandon") => {
     return api<unknown>("/api/attachments", { careRecipientId: patientId, documentId, movementId, contingencyId, id: file.id, key: file.uploadKey, action }, undefined, "PATCH");
@@ -183,7 +193,7 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
         if (current) {
           if (current.sourceSha256 && current.sourceSha256 !== pending.sourceSha256) throw new Error("A tentativa pertence a outro arquivo. Preserve o envio e solicite suporte.");
           preparedIdRef.current = current.id;
-          if (current.state === "ready") { acceptConfirmed(await commandFor(current, "recover"), pending); return; }
+          if (current.state === "ready") { acceptConfirmed(await commandFor(current, "recover"), pending, true); return; }
           if (current.state === "abandoned") { clearPending(); setAttempt(value => value + 1); setMessage("A tentativa já foi abandonada. Você pode preparar outro arquivo."); return; }
         }
       }
@@ -201,7 +211,7 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
       }
       phase = "prepare";
       const prepared = await send(true);
-      if (confirmedAttachment(prepared, pending.sourceSha256, preparedIdRef.current)) { acceptConfirmed(prepared, pending); return; }
+      if (confirmedAttachment(prepared, pending.sourceSha256, preparedIdRef.current)) { acceptConfirmed(prepared, pending, true); return; }
       const parsed = attachmentPrepared.safeParse(prepared);
       if (!parsed.success) throw new Error("A preparação não pôde ser confirmada. Consulte a mesma tentativa.");
       const receipt = parsed.data;
@@ -275,7 +285,7 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
     <p className="mt-2 text-xs text-(--muted)">Até dez arquivos ou reservas em andamento. Novos envios de até {attachmentMaxLabel}. Fotos e PDFs são convertidos para leitura segura; confira o arquivo disponível. A foto da ficha física continua como alternativa ao formulário.</p>
     {error && !abandonTarget && !adding && !resumeTarget ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
     {readError ? <Notice error>Não foi possível consultar a lista de anexos. {readError} Atualize esta seção.</Notice> : null}
-    {modalOnly ? <ScopedReadFailureDialog subject="files" open={active && !adding && !busy && Boolean(archiveFailure && !archiveFailure.dismissed)}
+    {modalOnly ? <ScopedReadFailureDialog subject="files" open={active && !adding && !uploadResult && !busy && Boolean(archiveFailure && !archiveFailure.dismissed)}
       title="Não foi possível consultar os anexos" denied={archiveFailure?.denied ?? false} message={readError} loading={loading}
       cause={archiveFailure?.cause} attempts={archiveFailure?.attempts ?? 0}
       returnFocus={refreshRef} onClose={() => setArchiveFailure(current => current && { ...current, dismissed: true })}
@@ -345,6 +355,12 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
         </div>
       </> : null}
     </Dialog>
+    {active && uploadResult ? <Dialog open success title="Anexo disponível"
+      subtitle={uploadResult === "recovered" ? "O resultado desta tentativa foi confirmado. O arquivo já aparece nos anexos da ficha." : "O envio foi concluído. O arquivo já aparece nos anexos da ficha."}
+      finalFocus={uploadReturnFocus} onClose={() => setUploadResult(null)}
+      footer={<ActionButton variant="primary" onClick={() => setUploadResult(null)}><Icon name="check" />Concluir</ActionButton>}>
+      {null}
+    </Dialog> : null}
     {!loading && !visibleFiles.length && !readError ? <p className="mt-4 text-sm text-(--muted)">Nenhum anexo registrado.</p> : null}
     {writable && modalOnly ? <Dialog open={adding} title="Adicionar anexo" subtitle="Vincule um documento à ficha."
       headingIcon="upload" closeDisabled={busy} finalFocus={addButtonRef} onClose={closeUpload}
