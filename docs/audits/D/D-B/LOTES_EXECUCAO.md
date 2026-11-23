@@ -2149,8 +2149,8 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   atingem uma contagem designada exigem encaminhamento explícito e registram
   a decisão na mesma transação. A administração dos tipos e dos horários
   fica em Configurações → Plantões. Os tipos novos definem a duração e o
-  descanso do ciclo. Resta a conferência visual do conjunto. A contagem por plantão usa
-  as cinco etapas. Extras têm
+  descanso do ciclo. Resta a conferência visual do conjunto. A contagem
+  por plantão usa as cinco etapas. Extras têm
   parecer individual e vínculo a recontos comprovados. A programação
   registra observação opcional e o pedido de autorização para contar
   fica no acompanhamento do BAL.
