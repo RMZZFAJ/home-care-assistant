@@ -3339,9 +3339,9 @@ WhatsApp ainda requer homologação do provedor.
 - **E07-09** — Andamentos, correção por diferença e conflito entre duas sessões.
   `team-consumption.spec.ts`, `team-consumption.test.mjs`.
 - **E07-10** — Baixa direta da equipe e recuperação sem duplicação.
-  `team-consumption.spec.ts`, `team-consumption.test.mjs`. A emissão ainda
-  usa o carregamento simples. A v4 apresenta as etapas de conferência,
-  gravação e confirmação. A consulta de resultado usa o modo simples.
+  `team-consumption.spec.ts`, `team-consumption.test.mjs`. A emissão usa
+  as etapas de conferência, gravação e confirmação da v4. A consulta
+  de resultado usa o modo simples.
 - **E07-11** — Reiteração do aviso e compensação única do consumo cancelado.
   `team-consumption.spec.ts`, `team-consumption.test.mjs`.
 - **E07-12** — Sugestão do WhatsApp e confirmação de consumo vinculada.
@@ -3653,6 +3653,27 @@ WhatsApp ainda requer homologação do provedor.
   o carregamento simples. Falha, duas retentativas, diagnóstico e recusa
   preservaram o estoque oficial sem escritas. As capturas do laboratório e
   do produto em 360 e 412 px estão em `output/playwright/l3/`.
+
+### Emissão e recuperação do consumo
+
+- E07-10 usa o carregamento dinâmico compartilhado. A conferência prepara
+  as quantidades e o rascunho, a atualização acompanha a transação oficial
+  e a conclusão acompanha a leitura autorizada do relato após o recibo.
+- A confirmação mostra a referência curta do relato e a data do recibo.
+  Essa referência segue a mesma composição da ficha. Se a leitura adicional
+  falhar, o recibo oficial ainda comprova a baixa e o resultado pode ser
+  concluído para abrir a ficha. A consulta de resultado incerto recupera
+  a mesma chave no modo simples. O diálogo mantém o retorno ao assistente
+  e o suporte ao esgotar as retentativas.
+- Nove casos em Chromium, Android e iOS emulados confirmaram a gravação,
+  as fases da emissão e a baixa única. O ensaio segurou o POST antes da
+  gravação e a leitura do relato após o recibo, com consultas reais em
+  ambos os pontos. Também confirmou o identificador da emissão recuperada
+  e o resultado preservado quando a leitura do código devolve 503.
+  A primeira rodada revelou que a API de detalhe entrega o identificador
+  completo sem o campo de código curto. A apresentação passou a usar a
+  mesma função da ficha. As capturas em 360 e 412 px estão em
+  `output/playwright/l3/`. O ajuste dispensa migration.
 
 ## L4
 

@@ -8,6 +8,10 @@ export const consumptionStateLabels = {
 
 type ReadStamp = Pick<ConsumptionReport, "id" | "care_recipient_id" | "version" | "status">;
 
+export function consumptionRecordLabel(kind: ConsumptionReport["kind"], id: string) {
+  return (kind === "shortage" ? "FAL-" : "CON-") + id.slice(0, 8).toUpperCase();
+}
+
 export function consumptionReadStampMatches(value: ReadStamp | null | undefined, id: string, patient: string) {
   return Boolean(value && value.id === id && value.care_recipient_id === patient
     && Number.isInteger(value.version) && value.version > 0 && value.version <= 2147483647

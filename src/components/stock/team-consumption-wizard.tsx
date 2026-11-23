@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { MaterialReview } from "@/components/documents/material-review";
+import { DocumentOperationFailureDialog, operationRecoveryLimit } from "@/components/documents/document-operation-failure-dialog";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { SupplyWizardIdentity, SupplyWizardReviewIdentity } from "@/components/forms/supply-wizard-identity";
@@ -15,6 +16,7 @@ import { useOperationActivity } from "@/components/ui/operation-activity";
 import { StepNavigator } from "@/components/ui/primitives";
 import { Notice, type WorkspaceContext } from "@/components/workspace";
 import { api, ApiError } from "@/lib/client/api";
+import { consumptionReadStampMatches, consumptionRecordLabel } from "@/lib/consumption/follow-up";
 import { navigationForStep } from "@/lib/forms/draft-navigation";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -25,11 +27,20 @@ import { consumptionPreparationContentSchema, type ConsumptionPreparationContent
 import { exactQuantity } from "@/lib/validation/exact-quantity";
 import { parseFlowPage, type FlowSubmission } from "@/lib/validation/flow-reviews";
 import type { CatalogProduct } from "@/types/documents";
+import type { ConsumptionReport } from "@/types/consumption";
 import { TeamConsumptionMaterials, teamConsumptionStages as stages, type TeamConsumptionLine as Line } from "./team-consumption-materials";
 
 type Issue = Extract<TeamConsumptionCommand, { action: "issue" }>;
 type MaterialBalance = ReturnType<typeof teamConsumptionReference.parse>["materials"][number];
+type ConsumptionActivity = "review" | "reconcile" | "prepare" | "submit" | "confirm";
+export type IssuedConsumption = { id: string; code?: string; recordedAt: string; recovered: boolean };
 const endpoint = "/api/consumption/records";
+const issuanceSteps = [
+  { label: "Conferindo as quantidades", icon: "checklist" },
+  { label: "Atualizando o estoque da equipe", icon: "box" },
+  { label: "Concluindo o registro", icon: "check" },
+] as const;
+const issuanceStages = { prepare: 0, submit: 1, confirm: 2 } as const;
 
 export function TeamConsumptionWizard({ context, products, balances, materialLoading, materialError, retryMaterials, opener, sourceReminder, sourceFlow, onClose, onSaved }: {
   context: WorkspaceContext;
@@ -42,7 +53,7 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
   sourceReminder?: ReminderOrigin;
   sourceFlow?: FlowSubmission;
   onClose: () => void;
-  onSaved: (id: string) => void;
+  onSaved: (result: IssuedConsumption) => void;
 }) {
   const patient = context.patient!;
   const storageKey = `hca:official-team-consumption:${context.userId}:${patient.id}`;
@@ -70,9 +81,12 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
   const [flowId, setFlowId] = useState(sourceFlow?.id);
   const [reference, setReference] = useState<ReturnType<typeof teamConsumptionReference.parse> | null>(null);
   const [previous, setPrevious] = useState<MaterialBalance[]>([]);
-  const [busy, setBusy] = useState(false);
+  const [activity, setActivity] = useState<ConsumptionActivity | null>(null);
+  const busy = activity !== null;
   const [receiptAbsent, setReceiptAbsent] = useState(false);
   const [error, setError] = useState("");
+  const [recoveryAttempts, setRecoveryAttempts] = useState(0);
+  const [uncertain, setUncertain] = useState<{ cause: unknown } | null>(null);
   const activeRef = useRef(false);
   const live = useLiveRevision();
   const flowRead = useScopedRead(flowId && !pending
@@ -114,7 +128,9 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
   const edited = lines.length > 0 || Boolean(observation.trim() || flowId);
   const sameDraft = draft.base?.state === "active" && JSON.stringify(draft.base.content) === JSON.stringify(content);
   useLongDraftAutosave(draft, content, edited && !busy && !pending && sourceReady);
-  useOperationActivity(busy, { title: pending ? "Conferindo o registro" : step === 4 ? "Registrando consumo" : "Conferindo estoque da equipe" });
+  useOperationActivity(busy, activity && activity !== "review" && activity !== "reconcile"
+    ? { title: "Registrando consumo", detail: "Aguarde a confirmação da baixa.", steps: issuanceSteps, stage: issuanceStages[activity] }
+    : { title: activity === "reconcile" ? "Conferindo o registro" : "Conferindo estoque da equipe" });
 
   function retain(packet: Issue | null) {
     setPending(packet);
@@ -144,25 +160,37 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
   }
   async function review() {
     if (activeRef.current || !sourceReady || !validLines()) return;
-    activeRef.current = true; setBusy(true); setError("");
+    activeRef.current = true; setActivity("review"); setError("");
     try {
       setReference(await getReference());
       setPrevious([]);
       setStep(4);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Não foi possível consultar o estoque.");
-    } finally { activeRef.current = false; setBusy(false); }
+    } finally { activeRef.current = false; setActivity(null); }
   }
-  function finish(raw: unknown, packet: Issue) {
+  async function finish(raw: unknown, packet: Issue, recovered: boolean) {
     const receipt = teamConsumptionReceipt.parse(raw);
     if (receipt.careRecipientId !== patient.id || receipt.idempotencyKey !== packet.idempotencyKey || receipt.action !== "issue")
       throw new Error("A confirmação pertence a outra tentativa.");
     retain(null);
-    onSaved(receipt.id);
+    if (!recovered) setActivity("confirm");
+    let code: string | undefined;
+    try {
+      const { data } = await api<{ data: ConsumptionReport }>(`/api/consumption/${receipt.id}`, undefined, undefined, "GET", { timeoutMs: 5_000 });
+      if (consumptionReadStampMatches(data, receipt.id, patient.id) && data.kind === "consumption") {
+        code = consumptionRecordLabel(data.kind, data.id);
+      }
+    } catch { /* The write receipt is authoritative even if its human-readable code cannot be loaded. */ }
+    onSaved({ id: receipt.id, recordedAt: receipt.recordedAt, code, recovered });
   }
   async function submit() {
     if (activeRef.current || (!pending && (!sourceReady || !reference || draft.blocked || draft.backgroundBusy))) return;
-    activeRef.current = true; setBusy(true); setError("");
+    activeRef.current = true;
+    setActivity(pending && !receiptAbsent ? "reconcile" : pending ? "submit" : "prepare");
+    setError("");
+    setUncertain(null);
+    setRecoveryAttempts(pending ? recoveryAttempts + 1 : 0);
     let packet = pending;
     let posted = false;
     try {
@@ -183,11 +211,12 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
           careRecipientId: patient.id, idempotencyKey: packet.idempotencyKey,
         }));
         if (data === null) { setReceiptAbsent(true); return; }
-        finish(data, packet);
+        await finish(data, packet, true);
         return;
       }
       posted = true;
-      finish((await api<{ data: unknown }>(endpoint, packet)).data, packet);
+      setActivity("submit");
+      await finish((await api<{ data: unknown }>(endpoint, packet)).data, packet, false);
     } catch (reason) {
       if (posted && reason instanceof ApiError && reason.code === "DRAFT_VERSION_CONFLICT") {
         retain(null);
@@ -195,11 +224,13 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
         setReference(null);
         setPrevious([]);
         setStep(pending ? 0 : 1);
+        setActivity("review");
         await draft.reportConflict();
         setError("O rascunho foi atualizado. Confira a versão mais recente antes de emitir.");
       } else if (posted && reason instanceof ApiError && reason.code === "VERSION_CONFLICT") {
         retain(null);
         setReceiptAbsent(false);
+        setActivity("review");
         if (reference) {
           setPrevious(reference.materials);
           try { setReference(await getReference()); }
@@ -215,10 +246,10 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
           setReceiptAbsent(false);
           setReference(null);
           setStep(pending ? 0 : 1);
-        }
+        } else if (packet) setUncertain({ cause: reason });
         setError(reason instanceof Error ? reason.message : "Não foi possível confirmar o registro.");
       }
-    } finally { activeRef.current = false; setBusy(false); }
+    } finally { activeRef.current = false; setActivity(null); }
   }
   async function close() {
     if (busy || draft.backgroundBusy) return;
@@ -233,7 +264,7 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
     return !amount.success || quantity(amount.data).gt(material.quantity) || quantity(amount.data).decimalPlaces() > material.decimals;
   });
   const ready = pending || !draft.loading && !draft.offered && !draft.readDenied && !draft.loadError && !draft.protectedReadPending;
-  return <RecordDrawer title={flowId ? "Continuar consumo" : "Registrar consumo"} kicker="Consumo do plantão" subtitle={patient.display_name}
+  return <><RecordDrawer title={flowId ? "Continuar consumo" : "Registrar consumo"} kicker="Consumo do plantão" subtitle={patient.display_name}
     onClose={() => { void close(); }} restoreFocusTo={opener} busy={busy} preventClose={draft.busy || draft.backgroundBusy}
     popupClassName="hca-wizard-dialog hca-team-consumption-wizard" trackChanges={false} keyboardScrollable
     footer={() => <SupplyWizardFooter back={<ActionButton variant="quiet" disabled={busy || Boolean(pending) && step > 0}
@@ -294,5 +325,12 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
         {observation ? <p className="whitespace-pre-wrap">{observation}</p> : null}
       </div> : null}
     </> : <p role="status">Consultando o último preenchimento…</p>}
-  </RecordDrawer>;
+  </RecordDrawer>
+    {uncertain && !busy ? <DocumentOperationFailureDialog
+      title="Vamos conferir o consumo" description="A confirmação não chegou depois do envio. Consulte o resultado da mesma tentativa para evitar registrar o consumo novamente."
+      outcome="uncertain" cause={uncertain.cause} operation="Registrar consumo" fallbackCode="CONSUMO_RESULTADO_INCERTO"
+      attempts={recoveryAttempts} onClose={() => setUncertain(null)} closeLabel="Voltar ao consumo"
+      action={recoveryAttempts < operationRecoveryLimit ? { label: receiptAbsent ? "Reenviar a mesma tentativa" : "Conferir resultado", onClick: () => void submit() } : undefined}
+      exhaustedMessage={recoveryAttempts >= operationRecoveryLimit ? "Copie os detalhes e envie ao responsável pelo sistema para verificar o resultado." : undefined} /> : null}
+  </>;
 }

@@ -1,9 +1,9 @@
 "use client";
 import { Menu } from "@base-ui/react/menu";
-import { ActionButton, SelectField, TextInput } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, SelectField, TextInput } from "@/components/ui/controls";
 import { MenuPopup } from "@/components/ui/floating";
 import { Icon } from "@/components/ui/icon";
-import { Drawer } from "@/components/ui/overlays";
+import { Dialog, Drawer } from "@/components/ui/overlays";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -23,7 +23,7 @@ import { consumptionStateLabels } from "@/lib/consumption/follow-up";
 import type { CatalogProduct } from "@/types/documents";
 import type { ConsumptionSummary } from "@/types/consumption";
 import { ConsumptionEditor } from "./consumption-editor";
-import { TeamConsumptionWizard } from "./team-consumption-wizard";
+import { TeamConsumptionWizard, type IssuedConsumption } from "./team-consumption-wizard";
 import { TeamConsumptionAction } from "./team-consumption-action";
 import { ConsumptionRecord } from "./consumption-record";
 import { ConsumptionDetail } from "./consumption-detail";
@@ -57,7 +57,7 @@ export function ConsumptionConsole() {
     )}>
       {(context) =>
         context.patient ? (
-          <Reports key={context.patient.id} context={context} />
+          <Reports key={`${context.userId}:${context.patient.id}`} context={context} />
         ) : (
           <Notice>Selecione um paciente.</Notice>
         )
@@ -117,6 +117,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [editorOrigin, setEditorOrigin] = useState<ReminderOrigin | null>(null);
   const [teamEditor, setTeamEditor] = useState<HTMLElement | null>(null);
   const [teamFlow, setTeamFlow] = useState<FlowSubmission>();
+  const [issued, setIssued] = useState<IssuedConsumption | null>(null);
   const [shortage, setShortage] = useState<{ opener: HTMLElement; origin?: ReminderOrigin } | null>(null);
   const mayRecordTeam = can(context, "consumption.team.write") && context.patient?.is_active !== false;
   const mayReadStock = can(context, "stock.family.read") || can(context, "stock.team.read");
@@ -299,7 +300,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
       retryMaterials={retryTeamMaterials}
       opener={teamEditor} sourceReminder={editorOrigin ?? undefined} sourceFlow={teamFlow}
       onClose={() => { setTeamEditor(null); setEditorOrigin(null); setTeamFlow(undefined); }}
-      onSaved={id => {
+      onSaved={result => {
         setTeamEditor(null);
         setEditorOrigin(null);
         setTeamFlow(undefined);
@@ -307,11 +308,16 @@ function Reports({ context }: { context: WorkspaceContext }) {
           setPanel(null);
           triggerRef.current = moreRef.current;
         }
-        setMessage("Consumo registrado no estoque da equipe.");
+        setMessage("");
+        setIssued(result);
         setAttempt(value => value + 1);
-        open(id);
       }} />
   ) : null;
+  function concludeIssuance() {
+    if (!issued) return;
+    setIssued(null);
+    open(issued.id);
+  }
   return (
     <div className="space-y-5">
       <NotificationReference
@@ -513,6 +519,15 @@ function Reports({ context }: { context: WorkspaceContext }) {
         />
       ) : null}
       {!teamFlow ? teamWizard : null}
+      {issued ? <Dialog open success title={issued.recovered ? "Consumo encontrado" : "Consumo registrado"}
+        subtitle={issued.recovered ? "A emissão já estava confirmada. O estoque foi descontado uma única vez." : "As quantidades foram descontadas do estoque da equipe."}
+        onClose={concludeIssuance} finalFocus={false}
+        footer={<ActionButton variant="primary" onClick={concludeIssuance}><Icon name="check" />Concluir</ActionButton>}>
+        <DefinitionGrid items={[
+          ...(issued.code ? [{ label: "Registro", value: issued.code }] : []),
+          { label: "Registrado em", value: formatBrazilDate(issued.recordedAt) },
+        ]} />
+      </Dialog> : null}
       {shortage && mayRecordTeam ? <TeamConsumptionAction context={context} kind="shortage" products={products}
         opener={shortage.opener} sourceReminder={shortage.origin} onClose={() => setShortage(null)} onSaved={id => {
           triggerRef.current = shortage.opener;

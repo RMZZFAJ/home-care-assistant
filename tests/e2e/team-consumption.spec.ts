@@ -40,6 +40,9 @@ async function openConsumption(page: Page, f: Awaited<ReturnType<typeof fixture>
   await expect(page.getByRole("heading", { name: "Consumo e faltas", exact: true })).toBeVisible();
 }
 
+const uncertainIssuance = (page: Page) => page.getByRole("dialog", { name: "Vamos conferir o consumo", exact: true });
+const issuanceResult = (page: Page, recovered: boolean) => page.getByRole("dialog", { name: recovered ? "Consumo encontrado" : "Consumo registrado", exact: true });
+
 test("a sugestão do WhatsApp continua no assistente e baixa o estoque uma única vez", async ({ page }, info) => {
   const f = await fixture();
   const original = "Material informado pela equipe na mensagem do plantão.";
@@ -72,14 +75,28 @@ test("a sugestão do WhatsApp continua no assistente e baixa o estoque uma únic
   await wizard.getByRole("button", { name: "Revisar consumo", exact: true }).click();
   await expect(wizard.getByText(/Após o consumo · 7/)).toBeVisible();
   expect(balance()).toBe(10);
+  let issuedId = "", issuedKey = "";
   await page.route("**/api/consumption/records", async route => {
-    expect(route.request().postDataJSON()).toMatchObject({ flowSubmissionId: suggestion, action: "issue" });
+    const intent = route.request().postDataJSON();
+    expect(intent).toMatchObject({ flowSubmissionId: suggestion, action: "issue" });
+    issuedKey = intent.idempotencyKey;
     const stored = await route.fetch();
     expect(stored.status(), await stored.text()).toBe(201);
+    issuedId = (await stored.json()).data.id;
     await route.abort();
   }, { times: 1 });
   await wizard.getByRole("button", { name: "Registrar consumo", exact: true }).click();
-  await wizard.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const retry = uncertainIssuance(page).getByRole("button", { name: "Conferir resultado", exact: true });
+  await expect(retry).toBeEnabled();
+  const lookup = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname === "/api/consumption/records" && response.request().method() === "GET" && url.searchParams.get("idempotencyKey") === issuedKey;
+  });
+  await retry.click();
+  expect((await (await lookup).json()).data.id).toBe(issuedId);
+  const recovered = issuanceResult(page, true);
+  await expect(recovered).toContainText("CON-" + issuedId.slice(0, 8).toUpperCase());
+  await recovered.getByRole("button", { name: "Concluir", exact: true }).click();
   const report = page.getByRole("region", { name: "Detalhe do relato", exact: true });
   await expect(page.getByRole("dialog", { name: "Sugestões do WhatsApp", exact: true })).toHaveCount(0);
   await expect(report.getByText("Sugestão do WhatsApp", { exact: true })).toBeVisible();
@@ -120,7 +137,12 @@ test("consumo preserva o último rascunho, recupera a baixa e permite correção
     await route.abort();
   }, { times: 1 });
   await wizard.getByRole("button", { name: "Registrar consumo", exact: true }).click();
-  await wizard.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await page.route(/\/api\/consumption\/[a-f0-9-]{36}$/, route => route.fulfill({ status: 503, json: { error: "Código temporariamente indisponível." } }), { times: 1 });
+  await uncertainIssuance(page).getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const recovered = issuanceResult(page, true);
+  await expect(recovered).toContainText("A emissão já estava confirmada.");
+  await expect(recovered.getByText(/CON-[0-9A-F]{8}/)).toHaveCount(0);
+  await recovered.getByRole("button", { name: "Concluir", exact: true }).click();
   const detail = page.getByRole("region", { name: "Detalhe do relato", exact: true });
   await expect(detail.getByText("Registrado", { exact: true })).toBeVisible();
   expect(Number(balance())).toBe(6);
@@ -299,7 +321,7 @@ test("aviso de falta preserva o material sem quantidade ao enviar e reiterar", a
   expect(Number(sql(`select private.stock_quantity(${q(f.patient)},${q(f.products[0])},'CARE_TEAM')::text`))).toBe(10);
 });
 
-test("consumo compara a revisão mais recente quando o envio é rejeitado por outro editor", async ({ page }) => {
+test("consumo compara a revisão mais recente quando o envio é rejeitado por outro editor", async ({ page }, info) => {
   const f = await fixture();
   const balance = () => Number(sql(`select private.stock_quantity(${q(f.patient)},${q(f.products[0])},'CARE_TEAM')::text`));
   await openConsumption(page, f);
@@ -348,7 +370,40 @@ test("consumo compara a revisão mais recente quando o envio é rejeitado por ou
   await expect(wizard.getByRole("textbox", { name: "Observações", exact: true })).toHaveValue("Revisão concorrente preservada.");
   await wizard.getByRole("button", { name: "Revisar consumo", exact: true }).click();
   await expect(wizard.getByText(/Após o consumo · 7/)).toBeVisible();
-  await wizard.getByRole("button", { name: "Registrar consumo", exact: true }).click();
+  let releaseWrite!: () => void, releaseDetails!: () => void;
+  const writeGate = new Promise<void>(resolve => { releaseWrite = resolve; });
+  const detailGate = new Promise<void>(resolve => { releaseDetails = resolve; });
+  await page.route("**/api/consumption/records", async route => {
+    expect(route.request().postDataJSON()).toMatchObject({ action: "issue", lines: [{ productId: f.products[0], quantity: "3" }] });
+    await writeGate;
+    await route.continue();
+  }, { times: 1 });
+  await page.route(/\/api\/consumption\/[a-f0-9-]{36}$/, async route => {
+    await detailGate;
+    await route.continue();
+  }, { times: 1 });
+  try {
+    await wizard.getByRole("button", { name: "Registrar consumo", exact: true }).click();
+    const writing = page.getByRole("dialog", { name: "Atualizando o estoque da equipe", exact: true });
+    await expect(writing.getByRole("list", { name: "Etapas da operação", exact: true }).locator("[aria-current='step']")).toContainText("Atualizando o estoque da equipe");
+    expect(balance()).toBe(10);
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 860 });
+      const path = info.outputPath(`consumo-emissao-${width}.png`);
+      await writing.screenshot({ path, scale: "css", animations: "disabled" });
+      await info.attach(`consumo-emissao-${width}`, { path, contentType: "image/png" });
+    }
+    releaseWrite();
+    const confirming = page.getByRole("dialog", { name: "Concluindo o registro", exact: true });
+    await expect(confirming.getByRole("list", { name: "Etapas da operação", exact: true }).locator("[aria-current='step']")).toContainText("Concluindo o registro");
+    expect(balance()).toBe(7);
+  } finally {
+    releaseWrite();
+    releaseDetails();
+  }
+  const registered = issuanceResult(page, false);
+  await expect(registered).toContainText(/CON-[0-9A-F]{8}/);
+  await registered.getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(page.getByRole("region", { name: "Detalhe do relato", exact: true })).toContainText("Registrado");
   expect(balance()).toBe(7);
 });

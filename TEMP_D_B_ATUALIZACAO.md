@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — emissão de consumo.** O carregamento dinâmico acompanha a
+preparação, a baixa e a consulta do relato. A recuperação confere o
+mesmo recibo e o resultado abre a ficha. Nove casos passaram em Chromium,
+Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#emissão-e-recuperação-do-consumo).
+
 **23/11 — falha de consulta no estoque.** O carregamento simples e o
 diálogo da v4 usam a consulta real. A recusa retira saldos e a falha
 transitória mantém a última leitura válida daquela custódia. Passaram

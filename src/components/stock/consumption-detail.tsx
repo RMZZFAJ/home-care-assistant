@@ -28,7 +28,7 @@ import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDecision } from "./consumption-decision";
 import { TeamConsumptionAction, type TeamConsumptionActionKind } from "./team-consumption-action";
 import { TeamConsumptionCorrection } from "./team-consumption-correction";
-import { consumptionFollowUp, consumptionLocationLabel, consumptionReadStampMatches, consumptionStateLabels, mergeConsumptionRead } from "@/lib/consumption/follow-up";
+import { consumptionFollowUp, consumptionLocationLabel, consumptionReadStampMatches, consumptionRecordLabel, consumptionStateLabels, mergeConsumptionRead } from "@/lib/consumption/follow-up";
 
 export function ConsumptionDetail({
   id,
@@ -170,7 +170,7 @@ export function ConsumptionDetail({
   const mayWrite = Boolean(data && !reading && !error && mayWriteTeam);
   const canAmend = mayWrite && data?.status === "recorded" && (data.reported_by === context.userId || can(context, "consumption.team.correct"));
   const progressType = data?.kind === "shortage" ? "FAL" : "CON";
-  const recordLabel = progressType + "-" + id.slice(0, 8).toUpperCase();
+  const recordLabel = consumptionRecordLabel(data?.kind ?? "consumption", id);
   const currentProducts = new Set(data?.current_lines.map(line => line.productId));
   const previousMaterials = data?.revisions.length
     ? [...new Map([data.lines, ...data.revisions.map(revision => revision.lines)].flat()
