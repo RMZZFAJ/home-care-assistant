@@ -28,7 +28,8 @@ export function ScheduleResourceSummary({
   const missing = "Ainda não preenchido";
   const balance = f.balanceImpact;
   const destination = balance && balance.decision !== "keep"
-    ? scheduleBalanceReview(f, content.reference ?? null)?.[balance.decision].find((shift) => shift.id === balance.targetShiftId)
+    ? scheduleBalanceReview(f, content.reference ?? null)?.[balance.decision].find(shift =>
+      shift.id === balance.targetShiftId && shift.version === balance.targetShiftVersion)
     : undefined;
   const operations = {
     end_series: "Encerrar programação",
@@ -93,9 +94,11 @@ export function ScheduleResourceSummary({
       { label: "Encaminhamento do balanço", value: balanceScheduleLabels[f.balanceImpact.decision] },
       { label: "Motivo da decisão sobre o balanço", value: f.balanceImpact.reason || missing },
     ] : []),
-    ...(destination ? [{
+    ...(balance && balance.decision !== "keep" && balance.targetShiftId ? [{
       label: "Plantão de destino da contagem",
-      value: `${destination.professionalName} · ${formatZonedDate(destination.startsAt, destination.timezone)} até ${formatZonedDate(destination.endsAt, destination.timezone)}`,
+      value: destination
+        ? `${destination.professionalName} · ${formatZonedDate(destination.startsAt, destination.timezone)} até ${formatZonedDate(destination.endsAt, destination.timezone)}`
+        : "Destino registrado na tentativa. Horário e responsável indisponíveis nesta consulta.",
     }] : []),
     {
       label: content.reference

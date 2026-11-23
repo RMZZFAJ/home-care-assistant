@@ -24,8 +24,10 @@ export function ScheduleBalanceImpact({ review, value, onChange }: {
       Esta alteração afeta uma contagem de balanço. Uma pessoa da família habilitada precisa decidir como encaminhá-la.
     </Notice>
   );
-  const selected = value?.assignmentId === impact.assignmentId && value.sourceVersion === impact.sourceVersion ? value : undefined;
+  const selected = value?.assignmentId === impact.assignmentId && value.assignmentVersion === impact.assignmentVersion &&
+    value.sourceVersion === impact.sourceVersion ? value : undefined;
   const selectedTarget = selected && selected.decision !== "keep" ? review[selected.decision] : [];
+  const targetAvailable = selectedTarget.some(shift => shift.id === selected?.targetShiftId && shift.version === selected.targetShiftVersion);
 
   return (
     <section className="hca-form-stack hca-schedule-impact" aria-label="Impacto em balanço">
@@ -36,12 +38,13 @@ export function ScheduleBalanceImpact({ review, value, onChange }: {
         <p>{impact.professionalName} · prazo atual {formatZonedDate(impact.endsAt, impact.timezone)}</p>
         {impact.document ? <Link href={`/fichas/${impact.document.id}`}>Consultar ficha de balanço</Link> : null}
       </div>
+      {value && !selected ? <Notice>A referência do balanço mudou. Revise o encaminhamento antes de confirmar.</Notice> : null}
       <FormField label="O que fazer com o balanço" required>
         <SelectField required value={selected?.decision ?? ""} onChange={(event) => {
           const decision = event.currentTarget.value;
           onChange(decision === "keep" || decision === "assign" || decision === "defer" ? {
             decision, assignmentId: impact.assignmentId, assignmentVersion: impact.assignmentVersion,
-            sourceVersion: impact.sourceVersion, reason: selected?.reason ?? "",
+            sourceVersion: impact.sourceVersion, reason: value?.reason ?? "",
           } : undefined);
         }}>
           <option value="">Escolha uma decisão</option>
@@ -54,8 +57,9 @@ export function ScheduleBalanceImpact({ review, value, onChange }: {
         <Notice>Cadastre um plantão elegível para encaminhar a contagem antes de confirmar.</Notice>
       ) : null}
       {selected && selected.decision !== "keep" ? (
-        <FormField label="Plantão de destino da contagem" required>
-          <SelectField required value={selected.targetShiftId ?? ""} onChange={(event) => {
+        <FormField label="Plantão de destino da contagem" required
+          error={selected.targetShiftId && !targetAvailable ? "O plantão selecionado já não está disponível. Escolha outro destino." : undefined}>
+          <SelectField required value={targetAvailable ? selected.targetShiftId : ""} onChange={(event) => {
             const target = selectedTarget.find((shift) => shift.id === event.currentTarget.value);
             onChange({ ...selected, targetShiftId: target?.id, targetShiftVersion: target?.version });
           }}>

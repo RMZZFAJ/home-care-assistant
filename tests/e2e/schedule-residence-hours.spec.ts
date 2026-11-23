@@ -172,12 +172,60 @@ test("cancelar plantão com BAL exige encaminhar a contagem e confirma os dois a
   await impact.getByRole("combobox", { name: "Plantão de destino da contagem", exact: true }).selectOption(target.id);
   const reason = "Cobertura confirmada para o plantão seguinte";
   await impact.getByRole("textbox", { name: "Motivo da decisão sobre o balanço", exact: true }).fill(reason);
-  await review.click();
+  const updateReference = editor.getByRole("button", { name: "Atualizar referência da agenda", exact: true });
+  const balanceAccess = `care_recipient_id=${q(fixture.patient)} and subject_user=${q(admin.id)} and capability='bal.read'`;
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(fixture.patient)},${q(admin.id)},'bal.read',false)`);
+  try {
+    await updateReference.click();
+    await expect(impact).toHaveCount(0);
+    await expect(editor.getByText("Referência atual, versão " + assignment.shift_version, { exact: true })).toBeVisible();
+    await expect(review).toBeDisabled();
+  } finally {
+    sql(`delete from public.capability_overrides where ${balanceAccess}`);
+  }
+  await updateReference.click();
+  await expect(impact.getByRole("textbox", { name: "Motivo da decisão sobre o balanço", exact: true })).toHaveValue(reason);
+  await expect(review).toBeEnabled();
+
+  let releaseRead = () => {};
+  const readHold = new Promise<void>(resolve => { releaseRead = resolve; });
+  let afterSave = false;
+  let markVerification = () => {};
+  const verification = new Promise<void>(resolve => { markVerification = resolve; });
+  await page.route(url => url.pathname === "/api/schedules/resource-preparations", async route => {
+    const request = route.request();
+    if (request.method() === "POST" && request.postDataJSON().action === "save") {
+      const saved = await route.fetch();
+      afterSave = saved.ok();
+      await route.fulfill({ response: saved });
+      return;
+    }
+    if (request.method() === "GET" && afterSave) {
+      afterSave = false;
+      markVerification();
+      await readHold;
+    }
+    await route.continue();
+  });
+  try {
+    await review.click();
+    await verification;
+    await expect(impact.getByRole("combobox", { name: "Plantão de destino da contagem", exact: true })).toBeDisabled();
+  } finally {
+    releaseRead();
+  }
   const confirmation = page.getByRole("dialog", { name: "Revisar escala", exact: true });
   await expect(confirmation).toContainText(reason);
+  await page.route("**/api/schedules/resource-preparations/commit", route => route.abort(), { times: 1 });
+  await confirmation.getByRole("button", { name: "Confirmar gravação", exact: true }).click();
+  const recovery = page.getByRole("dialog", { name: "Recuperar confirmação da escala", exact: true });
+  await expect(recovery.getByText("Plantão de destino da contagem", { exact: true })).toBeVisible();
+  await expect(recovery).toContainText(target.professional_name);
+  await recovery.getByRole("button", { name: "Consultar confirmação da escala", exact: true }).click();
   const response = page.waitForResponse(result => result.request().method() === "POST" &&
     new URL(result.url()).pathname === "/api/schedules/resource-preparations/commit");
-  await confirmation.getByRole("button", { name: "Confirmar gravação", exact: true }).click();
+  await recovery.getByRole("button", { name: "Reenviar explicitamente a mesma tentativa", exact: true }).click();
   expect((await response).ok()).toBe(true);
   const final = await rpc(admin.client, "balance_workspace", { p_patient: fixture.patient });
   expect(final.eligibility.assignment.shift_id).toBe(target.id);

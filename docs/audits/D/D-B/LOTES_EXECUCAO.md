@@ -3202,6 +3202,30 @@ A migration foi aplicada após o backup cifrado verificado
   horários noturnos, edição, divergência de período, cancelamento
   com balanço e navegação pelo alerta de estoque.
 
+### Conferência de alteração de plantão com balanço
+
+A decisão escolhida continua no preenchimento quando uma data fica
+temporariamente incompleta. A confirmação exige a referência autorizada
+do balanço e um destino que ainda esteja dentro do prazo. Se a leitura
+perde autorização, o formulário retira os fatos do balanço, preserva a
+edição própria e bloqueia a confirmação. Durante a conferência da revisão
+salva, os campos de destino ficam bloqueados. A recuperação mostra o
+plantão de destino quando a consulta atual confirma a mesma referência.
+
+O horário especial de uma recorrência semanal ou por datas é conferido
+na primeira ocorrência selecionada. A data inicial do período pode
+pertencer a um dia sem plantão. O servidor continua verificando os demais
+intervalos materializados.
+
+Trinta e sete testes de contrato passaram. A programação de horários e a
+jornada de cancelamento com adiamento passaram em Chromium, Android e iOS
+emulados. O cancelamento cobriu perda real e
+restituição da leitura do BAL, pausa durante a verificação da revisão,
+tentativa sem resposta, reenvio explícito e confirmação da atribuição no
+banco. Um timeout anterior ocorreu ao pausar uma leitura de fundo antes
+da revisão. A última rodada vinculou a pausa ao salvamento confirmado.
+A mudança usa os contratos e as migrations vigentes.
+
 ### Balanços previstos e programação semanal
 
 - A aba Balanços abre com **Previstos**, conforme E08-05. O cartão mostra

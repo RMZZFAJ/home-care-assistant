@@ -32,6 +32,7 @@ import {
 } from "@/lib/schedules/resource-local";
 import { navigationAllowed } from "@/lib/forms/draft-navigation";
 import { ScheduleResourceSummary } from "@/components/schedules/schedule-resource-summary";
+import { scheduleBalanceDecisionReady, scheduleBalanceReview } from "@/lib/schedules/balance-impact";
 import type { ScheduleWorkspace } from "@/types/schedules";
 const actor = "11111111-1111-4111-8111-111111111111",
   patient = "22222222-2222-4222-8222-222222222222",
@@ -284,6 +285,33 @@ function prepared(purpose: ScheduleResourcePurpose = "shift_type_edit") {
   };
 }
 describe("resource schedule private contracts", () => {
+  it("excludes ended balance destinations and rechecks expiry against a held review", () => {
+    const { fields, reference } = prepared("schedule_shift_edit");
+    if (fields.form !== "shift") throw new Error("Expected a shift preparation");
+    const source = reference.workspace.shifts[0];
+    const destination = {
+      id: proposalId, version: 3, professionalName: "Profissional de destino",
+      startsAt: source.ends_at, endsAt: "2100-04-02T19:00:00Z", timezone: "UTC",
+      seriesId, localDate: "2100-04-02",
+    };
+    source.balanceImpact = {
+      restricted: false, assignmentId: draft, assignmentVersion: 1, sourceVersion: 3,
+      shiftId, shiftDate: day, startsAt: source.starts_at, endsAt: source.ends_at, document: null,
+      professionalId: worker, professionalName: source.professional_name, timezone: source.timezone,
+      inProgress: false, canDecide: true, canDefer: true, targets: [destination],
+    };
+    const cancel = { ...fields, operation: "cancel" as const };
+    const decision = {
+      decision: "defer" as const, assignmentId: draft, assignmentVersion: 1, sourceVersion: 3,
+      targetShiftId: destination.id, targetShiftVersion: destination.version, reason: "Cobertura confirmada",
+    };
+    const end = Date.parse(destination.endsAt);
+    const reviewed = scheduleBalanceReview(cancel, reference, end - 1);
+    expect(reviewed?.defer).toEqual([destination]);
+    expect(scheduleBalanceDecisionReady(reviewed, decision, end - 1)).toBe(true);
+    expect(scheduleBalanceDecisionReady(reviewed, decision, end)).toBe(false);
+    expect(scheduleBalanceReview(cancel, reference, end)?.defer).toEqual([]);
+  });
   for (const purpose of scheduleResourcePurposes)
     it(
       purpose + " binds scope,private navigation,source and native result",

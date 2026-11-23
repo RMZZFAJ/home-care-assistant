@@ -184,10 +184,24 @@ export function scheduleSpecialHoursIssue(fields: ScheduleCreationFields) {
   const { specialStart, specialEnd } = fields.residence;
   if (!specialStart || !specialEnd) return "Informe o início e o término do horário especial.";
   if (!fields.from) return null;
-  const day = new Date(fields.from + "T12:00:00Z");
+  let occurrence = fields.from;
+  if (fields.recurrence === "weekly") {
+    if (!fields.weekdays.length) return null;
+    const date = new Date(occurrence + "T12:00:00Z");
+    const offset = Math.min(...fields.weekdays.map(day => (day - date.getUTCDay() + 7) % 7));
+    date.setUTCDate(date.getUTCDate() + offset);
+    occurrence = date.toISOString().slice(0, 10);
+  } else if (fields.recurrence === "dates") {
+    const first = [...fields.dates].sort((a, b) => a.localeCompare(b)).find(date => date >= fields.from);
+    if (!first) return null;
+    occurrence = first;
+  }
+  if (fields.recurrence !== "once" && fields.until && occurrence > fields.until)
+    return "O período escolhido não tem uma ocorrência de plantão.";
+  const day = new Date(occurrence + "T12:00:00Z");
   if (specialEnd <= specialStart) day.setUTCDate(day.getUTCDate() + 1);
   try {
-    const start = civilInstant(`${fields.from}T${specialStart}`, fields.timezone);
+    const start = civilInstant(`${occurrence}T${specialStart}`, fields.timezone);
     const end = civilInstant(`${day.toISOString().slice(0, 10)}T${specialEnd}`, fields.timezone);
     const minutes = (Date.parse(end) - Date.parse(start)) / 60000;
     if (fields.recurrence === "cycle" && minutes !== (fields.typeCycle?.workHours ?? Number(fields.cycle.split("x")[0])) * 60)

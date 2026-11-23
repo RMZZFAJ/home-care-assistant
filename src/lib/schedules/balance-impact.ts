@@ -5,7 +5,7 @@ import type {
 } from "./resource-preparations";
 import { editedCivilInstant } from "./time";
 
-export function scheduleBalanceReview(fields: ScheduleResourceFields, reference: ScheduleResourceReference | null) {
+export function scheduleBalanceReview(fields: ScheduleResourceFields, reference: ScheduleResourceReference | null, now = Date.now()) {
   const workspace = reference?.workspace;
   if (!workspace || fields.form === "type") return null;
 
@@ -45,11 +45,11 @@ export function scheduleBalanceReview(fields: ScheduleResourceFields, reference:
   const oldEnd = Date.parse(impact.endsAt);
   const keep = Boolean(start && end && professional === impact.professionalId &&
     Date.parse(start) <= Date.parse(impact.startsAt) && Date.parse(end) >= oldEnd);
-  const targets = impact.targets.filter((target) => fields.form !== "series" ||
-    target.seriesId !== series?.id || target.localDate < fields.from);
+  const targets = impact.targets.filter(target => Date.parse(target.endsAt) > now &&
+    (fields.form !== "series" || target.seriesId !== series?.id || target.localDate < fields.from));
   const assign = targets.filter((target) => Date.parse(target.endsAt) <= oldEnd);
   if (start && end && professional && professional !== impact.professionalId &&
-    Date.parse(end) <= oldEnd && Date.parse(end) > Date.parse(start) && Date.parse(end) > Date.now()) {
+    Date.parse(end) <= oldEnd && Date.parse(end) > Date.parse(start) && Date.parse(end) > now) {
     assign.unshift({
       id: impact.shiftId,
       version: impact.sourceVersion,
@@ -64,7 +64,7 @@ export function scheduleBalanceReview(fields: ScheduleResourceFields, reference:
 
 export type ScheduleBalanceReview = NonNullable<ReturnType<typeof scheduleBalanceReview>>;
 
-export function scheduleBalanceDecisionReady(review: ScheduleBalanceReview | null, decision?: ScheduleBalanceDecision) {
+export function scheduleBalanceDecisionReady(review: ScheduleBalanceReview | null, decision?: ScheduleBalanceDecision, now = Date.now()) {
   if (!review) return !decision;
   const { impact } = review;
   if (impact.restricted || !impact.canDecide || !decision || decision.reason.trim().length < 3 ||
@@ -72,5 +72,6 @@ export function scheduleBalanceDecisionReady(review: ScheduleBalanceReview | nul
     decision.sourceVersion !== impact.sourceVersion) return false;
   if (decision.decision === "keep") return review.keep;
   if (decision.decision === "defer" && !impact.canDefer) return false;
-  return review[decision.decision].some((target) => target.id === decision.targetShiftId && target.version === decision.targetShiftVersion);
+  return review[decision.decision].some(target => target.id === decision.targetShiftId &&
+    target.version === decision.targetShiftVersion && Date.parse(target.endsAt) > now);
 }
