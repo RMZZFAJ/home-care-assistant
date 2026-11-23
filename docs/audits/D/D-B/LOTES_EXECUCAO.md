@@ -3695,9 +3695,16 @@ WhatsApp ainda requer homologação do provedor.
   a contagem e a autoria. A recuperação consulta a chave preservada em modo
   simples e mantém as opções de nova consulta e diagnóstico de suporte.
 - A confirmação por POST validada pode comprovar o ato se a consulta
-  adicional tiver falha de transporte ou indisponibilidade. A recusa ou
-  a divergência entre os resultados preserva a tentativa para conferência.
+  adicional tiver falha de transporte ou indisponibilidade. A recusa dessa
+  consulta ou a divergência entre os resultados preserva a tentativa.
   O ajuste usa os contratos existentes e dispensa migration.
+- Se o estoque ou a versão mudar durante a confirmação, a recusa da
+  transação encerra aquela tentativa. A mensagem informa que ela não
+  registrou ajuste e leva à ficha atual. A verificação com uma entrega
+  durante a confirmação preservou o estoque da entrega, exibiu a referência
+  alterada e retirou a opção de aplicar a contagem antiga. A última rodada
+  de seis casos em Chromium e iOS emulados incluiu essa recusa, a aplicação
+  normal e a recuperação de resposta perdida em ambos.
 - No iOS emulado, a gravação retida mostrou somente o carregamento sobre a
   ficha e o estoque preservado até o POST. A perda da resposta recuperou
   o ato com o direito de leitura após revogar a aprovação familiar. A

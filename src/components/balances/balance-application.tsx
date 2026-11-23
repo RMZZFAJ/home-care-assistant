@@ -33,7 +33,7 @@ export function BalanceApplication({ data, userId, patientActive, onRefresh, onE
   const [reading, setReading] = useState(false), [stage, setStage] = useState<number | null>(null);
   const [accepted, setAccepted] = useState<Applied | null>(null);
   const [completion, setCompletion] = useState<"registered" | "recovered" | null>(null);
-  const [failure, setFailure] = useState<{ cause: unknown } | null>(null);
+  const [failure, setFailure] = useState<{ cause: unknown; rejected?: boolean } | null>(null);
   const [recoveryAttempts, setRecoveryAttempts] = useState(0);
   const [absent, setAbsent] = useState(false), [obsolete, setObsolete] = useState(false);
   const inFlightRef = useRef(false), openerRef = useRef<HTMLButtonElement | null>(null), headingRef = useRef<HTMLHeadingElement>(null);
@@ -151,8 +151,14 @@ export function BalanceApplication({ data, userId, patientActive, onRefresh, onE
       const receipt = await lookup(packet, applied);
       finishReceipt(packet, receipt?.state === "found" ? receipt.application : applied, "registered");
     } catch (reason) {
-      setGroup(null); setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a aplicação. Consulte a mesma tentativa.");
-      if (submitted) setFailure({ cause: reason });
+      setGroup(null);
+      let cause = reason, rejected = false;
+      if (submitted && reason instanceof ApiError && reason.code === "BALANCE_APPLICATION_REFERENCE_CHANGED") {
+        try { retain(null, packet.idempotencyKey); rejected = true; }
+        catch (storageError) { cause = storageError; }
+      }
+      setError(rejected ? "" : cause instanceof Error ? cause.message : "Não foi possível confirmar a aplicação. Consulte a mesma tentativa.");
+      if (submitted) setFailure({ cause, rejected });
     } finally { setStage(null); inFlightRef.current = false; }
   }
   async function recover() {
@@ -169,6 +175,10 @@ export function BalanceApplication({ data, userId, patientActive, onRefresh, onE
       setFailure({ cause: reason });
     }
     finally { setReading(false); inFlightRef.current = false; }
+  }
+  function refreshAfterRejection() {
+    setFailure(null);
+    onRefresh();
   }
   return <section className="hca-form-stack" aria-label="Aplicação da contagem ao estoque">
     <h3 ref={headingRef} tabIndex={-1}>Aplicação da contagem ao estoque</h3>
@@ -219,7 +229,12 @@ export function BalanceApplication({ data, userId, patientActive, onRefresh, onE
         { label: "Aplicado por", value: accepted.actorName },
       ]} />
     </Dialog> : null}
-    {failure && pending && !busy ? <DocumentOperationFailureDialog
+    {failure?.rejected && !busy ? <DocumentOperationFailureDialog
+      title="A referência do balanço mudou" description="Nenhum ajuste foi registrado nesta tentativa. Atualize a ficha para conferir a referência e a necessidade de recontagem."
+      outcome="rejected" cause={failure.cause} operation="Aplicar contagem" fallbackCode="BALANCE_APPLICATION_REFERENCE_CHANGED"
+      attempts={recoveryAttempts} onClose={refreshAfterRejection} closeLabel="Voltar às revisões"
+      action={{ label: "Atualizar ficha", onClick: refreshAfterRejection }} /> : null}
+    {failure && !failure.rejected && pending && !busy ? <DocumentOperationFailureDialog
       title="Vamos conferir a aplicação" description="Consulte a mesma tentativa antes de enviar outra aplicação da contagem."
       outcome="uncertain" cause={failure.cause} operation="Aplicar contagem" fallbackCode="BAL_APLICACAO_INCERTA"
       attempts={recoveryAttempts} onClose={() => setFailure(null)} closeLabel="Voltar às revisões"

@@ -2,7 +2,7 @@ import { noPrivateWrites, privateFormCount } from "./l1-decision-policy";
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
-import { balCommand, legacyBalance, rpc } from "../integration/bal-review-fixtures.mjs";
+import { balCommand, legacyBalance, receiveBalanceMaterials, rpc } from "../integration/bal-review-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -159,4 +159,31 @@ test("BAL shows the final application phase until the same official receipt is c
  await expect(page.getByRole("button", { name: "Aplicar contagem pelo grupo familiar", exact: true })).toHaveCount(0);
  expect(keys).toHaveLength(1);
  expect(stock(f.patient)).toBe(afterWrite);
+});
+
+test("BAL releases a definitively rejected attempt when the stock reference changes", async ({ page }) => {
+ const f = await legacyBalance({ quantity: "1" }), family = await shiftWorker(f.patient, "family");
+ const document = await rpc(family.client, "operational_document", { p_id: f.document.id });
+ const review = await balCommand(family.client, document, { group: "family", reviewReference: document.balanceReview.referenceHash });
+ expect(review.error).toBeNull();
+ await openBalanceAsFamily(page, f.patient, f.document.id, family.email);
+ await selectDocumentSection(page, "reviews");
+ const begin = page.getByRole("button", { name: "Aplicar contagem pelo grupo familiar", exact: true });
+ await begin.click();
+ const apply = page.getByRole("dialog", { name: "Aplicar contagem ao estoque", exact: true });
+ await expect(apply).toBeVisible();
+ await receiveBalanceMaterials(f);
+ const afterDelivery = stock(f.patient), rejected = page.waitForResponse(response =>
+  response.request().method() === "POST" && new URL(response.url()).pathname === `/api/documents/${f.document.id}`);
+ await apply.getByRole("button", { name: "Confirmar aplicação da contagem", exact: true }).click();
+ const response = await rejected;
+ expect(response.status()).toBe(409);
+ expect(await response.json()).toMatchObject({ code: "BALANCE_APPLICATION_REFERENCE_CHANGED" });
+ const failure = page.getByRole("dialog", { name: "A referência do balanço mudou", exact: true });
+ await expect(failure).toContainText("Nenhum ajuste foi registrado nesta tentativa.");
+ await failure.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
+ await expect(page.locator(".hca-document-header").getByText("Referência alterada", { exact: true }).last()).toBeVisible();
+ await expect(begin).toHaveCount(0);
+ await expect(page.getByRole("button", { name: "Consultar aplicação desta tentativa", exact: true })).toHaveCount(0);
+ expect(stock(f.patient)).toBe(afterDelivery);
 });
