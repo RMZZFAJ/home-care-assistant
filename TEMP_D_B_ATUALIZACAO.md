@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — lembretes de entregas bilaterais.** O agendador registra
+os fatos da transferência com autoria de sistema. O teste confirmou
+um único lembrete em duas execuções e estoque preservado. Local e
+remoto registram 352 migrations.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação).
+
 **23/11 — encerramento de tentativas de programação sem confirmação.**
 O sistema recupera o recibo gravado ou encerra a revisão anterior
 preservando o rascunho. O encerramento pode ser consultado após recarregar.

@@ -71,6 +71,35 @@ test("a bilateral transfer separates Juliana's declaration, Ana's agreement and 
   assert.equal(dispatched.data.kind, "DEV");
   const afterDispatch = JSON.parse(transferState(f));
   assert.equal(afterDispatch.ledger.length, before.ledger.length + 1);
+  const reminder = JSON.parse(sql(`
+    begin;
+    set local request.jwt.claims='{"role":"service_role"}';
+    do $worker$
+    begin
+      perform pg_advisory_xact_lock(hashtextextended('hca:operational-scheduler',0));
+      update public.operational_documents set updated_at='2000-01-01T00:00:00Z'
+        where id=${sqlLiteral(declared.id)};
+      update private.requisition_scheduler_progress set last_patient=(
+        select care_recipient_id from private.operational_scheduler_candidates
+        where care_recipient_id<${sqlLiteral(f.patient)} order by care_recipient_id desc limit 1
+      ) where singleton;
+      perform public.v4_lifecycle_schedule();
+      perform public.v4_lifecycle_schedule();
+    end;
+    $worker$;
+    select jsonb_build_object(
+      'events',(select jsonb_agg(jsonb_build_object('systemActor',actor_id is null,'transfer',body->'transfer'))
+        from public.document_events where document_id=${sqlLiteral(declared.id)} and action='ent.reminder'),
+      'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m
+        where care_recipient_id=${sqlLiteral(f.patient)})
+    );
+    rollback;
+  `));
+  const recordedTransfer = Object.fromEntries(
+    Object.entries(dispatched.data.transfer).filter(([key]) => !["canAgree", "canDispatch", "canWithdraw"].includes(key)),
+  );
+  assert.deepEqual(reminder.events, [{ systemActor: true, transfer: recordedTransfer }]);
+  assert.deepEqual(reminder.ledger, afterDispatch.ledger);
   const accept = {
     p_id: declared.id,
     p_action: "receive",

@@ -1789,6 +1789,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123045130_l3_flow_direct_consumption` | Aplicada | Aplicada |
 | `20261123051802_l3_require_residence_for_new_schedule` | Aplicada | Aplicada |
 | `20261123054301_l3_resolve_schedule_creation_attempt` | Aplicada | Aplicada |
+| `20261123060806_l3_fix_bilateral_delivery_reminders` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2911,12 +2912,26 @@ emissão de PDF, a preservação dos bytes na consulta e a emissão nova
 por ação explícita. Também cobriram chegada via QR sem conta e a
 distinção entre o arquivo apresentado e o código de outra emissão.
 
-### Ocorrência operacional observada no ambiente remoto
+### Lembretes de entregas bilaterais
 
 Durante a captura, o monitor registrou duas entregas pendentes de
 recebimento cujo lembrete automático falhou com SQLSTATE `42501`.
-Os dois destinatários tinham vínculo ativo. A consulta confirmou o
-estado do agendador. A causa específica dessas falhas segue aberta.
+Os dois destinatários tinham vínculo ativo. O caso local revelou que
+o registro do evento chamava a consulta interativa da transferência
+e exigia a permissão `ent.read` de um usuário. A captura interna agora
+usa os mesmos fatos da transferência no evento. A consulta
+interativa mantém a exigência de permissão e calcula suas próprias
+ações autorizadas.
+
+Em duas execuções do agendador no caso bilateral, o teste registrou
+um único lembrete com autoria de sistema e conservou o estoque.
+Passaram os 17 testes de transferência e expedição, além da repetição
+dirigida do caso que passou a conferir o lembrete bilateral.
+As duas entregas remotas ainda aguardam a reexecução normal da rotina.
+
+A migration foi aplicada após o backup cifrado verificado
+`17e256d7-1c6e-4c60-bb8d-9cafd70d3d8a`. Local e remoto registram
+352 versões, com a fila vinculada vazia.
 
 ## L4
 
