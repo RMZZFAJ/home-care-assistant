@@ -1795,6 +1795,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123110027_l3_consumption_list_materials` | Aplicada | Aplicada |
 | `20261123120522_l3_reviewed_consumption_correction` | Aplicada | Aplicada |
 | `20261123123142_l3_shortage_material_without_quantity` | Aplicada | Aplicada |
+| `20261123130151_l3_schedule_balance_review_contract` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -3225,6 +3226,29 @@ tentativa sem resposta, reenvio explícito e confirmação da atribuição no
 banco. Um timeout anterior ocorreu ao pausar uma leitura de fundo antes
 da revisão. A última rodada vinculou a pausa ao salvamento confirmado.
 A mudança usa os contratos e as migrations vigentes.
+
+### Limite de designação do BAL e recuperação dos horários
+
+E08-02 e E08-03 passaram a usar o início original da obrigação para oferecer
+o plantão editado como destino do BAL. A referência fornece esse início às
+pessoas habilitadas a decidir. A confirmação continua validando o intervalo
+e a atribuição no banco. O rascunho mantém a justificativa tal como digitada.
+A revisão, a confirmação e o evento usam a mesma remoção de espaços e
+quebras de linha nas extremidades.
+
+A configuração de horários da residência recupera o recibo pela chave da
+tentativa. Se houve conflito de versão e o banco comprovou a recusa, a
+edição mantém os horários digitados e oferece a adoção da versão atual.
+
+Passaram 38 testes de contrato, 33 integrações com Auth real e seis casos
+dirigidos em Chromium, Android e iOS emulados. A integração conferiu o
+limite do destino e a justificativa no rascunho, recibo e evento. O navegador
+recuperou a tentativa recusada e a confirmação cuja resposta foi perdida.
+
+A migration foi aplicada localmente e no remoto vinculado após o backup
+cifrado verificado `d5f19cb9-a53a-46c7-af44-485fc64d39d8`. As definições e
+permissões verificadas nos dois ambientes coincidem. A mudança dispensa
+dados de exemplo adicionais.
 
 ### Balanços previstos e programação semanal
 

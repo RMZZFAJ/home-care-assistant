@@ -143,6 +143,7 @@ const balanceImpact = z.discriminatedUnion("restricted", [
     professionalName: z.string(),
     startsAt: instant,
     endsAt: instant,
+    obligationStart: instant.nullish(),
     timezone: z.string(),
     document: z.object({ id, protocol: z.string().nullable() }).nullable(),
     inProgress: z.boolean(),

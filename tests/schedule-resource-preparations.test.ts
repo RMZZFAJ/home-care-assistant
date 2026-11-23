@@ -312,6 +312,23 @@ describe("resource schedule private contracts", () => {
     expect(scheduleBalanceDecisionReady(reviewed, decision, end)).toBe(false);
     expect(scheduleBalanceReview(cancel, reference, end)?.defer).toEqual([]);
   });
+
+  it("offers the edited shift as a BAL destination from the obligation's original start", () => {
+    const { fields, reference } = prepared("schedule_shift_edit");
+    if (fields.form !== "shift") throw new Error("Expected a shift preparation");
+    const source = reference.workspace.shifts[0];
+    source.balanceImpact = {
+      restricted: false, assignmentId: draft, assignmentVersion: 1, sourceVersion: source.version,
+      shiftId, shiftDate: day, startsAt: source.starts_at, endsAt: source.ends_at, document: null,
+      professionalId: worker, professionalName: source.professional_name, timezone: source.timezone,
+      obligationStart: "2100-04-01T18:30:00Z", inProgress: false, canDecide: true, canDefer: true, targets: [],
+    };
+    const edit = { ...fields, professionalId: actor };
+    const now = Date.parse("2100-04-01T18:00:00Z");
+    expect(scheduleBalanceReview({ ...edit, start: day + "T18:29" }, reference, now)?.assign).toEqual([]);
+    expect(scheduleBalanceReview({ ...edit, start: day + "T18:30" }, reference, now)?.assign)
+      .toMatchObject([{ id: shiftId, startsAt: "2100-04-01T18:30:00.000Z" }]);
+  });
   for (const purpose of scheduleResourcePurposes)
     it(
       purpose + " binds scope,private navigation,source and native result",

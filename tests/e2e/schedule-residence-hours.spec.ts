@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Request } from "@playwright/test";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { rpc, setup } from "../integration/v4-fixtures.mjs";
 import { balanceSetup, dayOffset, localToday, shiftCommand, shiftWorker } from "../integration/shift-fixtures.mjs";
@@ -51,15 +51,36 @@ test("horários da residência governam plantão isolado, exceção noturna e re
     p_patient: fixture.patient, p_body: { timezone: "America/Manaus", dayStart: "07:10", nightStart: "19:15" },
     p_version: null, p_key: crypto.randomUUID(),
   });
+  const isResidenceWrite = (request: Request) =>
+    request.method() === "POST" && new URL(request.url()).pathname === "/api/schedules/residence";
+  await page.route("**/api/schedules/residence", route => route.abort(), { times: 1 });
+  const firstAttempt = page.waitForRequest(isResidenceWrite);
   await editor.getByRole("button", { name: "Registrar horários", exact: true }).click();
+  const staleAttempt = (await firstAttempt).postDataJSON();
+  const staleResponse = page.waitForResponse(response => isResidenceWrite(response.request()));
+  await editor.getByRole("button", { name: "Recuperar a mesma alteração", exact: true }).click();
+  const recoveryConflict = await staleResponse;
+  expect(recoveryConflict.status()).toBe(409);
+  expect(recoveryConflict.request().postDataJSON()).toEqual(staleAttempt);
   await expect(editor).toContainText("Diurno 07:10 · Noturno 19:15 · America/Manaus");
   await editor.getByRole("button", { name: "Adotar versão atual e manter meus horários", exact: true }).click();
   await expect(editor.getByLabel(/^Início diurno/)).toHaveValue("06:25");
   await expect(editor.getByLabel(/^Início noturno/)).toHaveValue("20:40");
-  const receipt = page.waitForResponse(response => new URL(response.url()).pathname === "/api/schedules/residence"
-    && response.request().method() === "POST");
+  await page.route("**/api/schedules/residence", async route => {
+    const registered = await route.fetch();
+    expect(registered.ok()).toBe(true);
+    await route.abort();
+  }, { times: 1 });
+  const newAttempt = page.waitForRequest(isResidenceWrite);
   await editor.getByRole("button", { name: "Registrar horários", exact: true }).click();
-  expect((await receipt).ok()).toBe(true);
+  const appliedAttempt = (await newAttempt).postDataJSON();
+  expect(appliedAttempt.idempotencyKey).not.toBe(staleAttempt.idempotencyKey);
+  const receipt = page.waitForResponse(response => isResidenceWrite(response.request()));
+  await editor.getByRole("button", { name: "Recuperar a mesma alteração", exact: true }).click();
+  const replayed = await receipt;
+  expect(replayed.ok()).toBe(true);
+  expect(replayed.request().postDataJSON()).toEqual(appliedAttempt);
+  expect((await replayed.json()).hours.version).toBe(2);
   await expect(settings).toContainText("Diurno 06:25 · Noturno 20:40 · America/Manaus");
 
   await page.getByRole("link", { name: "Voltar à agenda", exact: true }).click();

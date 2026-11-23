@@ -22,9 +22,14 @@ function confirmed(value: unknown, packet: Packet) {
   } catch { return false; }
 }
 
+// The residence command checks its receipt under lock before rejecting the version.
+function staleResidenceVersion(reason: unknown) {
+  return reason instanceof ApiError && reason.status === 409 && reason.code === "VERSION_CONFLICT";
+}
+
 export function ScheduleResidenceSettings({ patientId }: { patientId: string }) {
   const read = useResidenceHours(patientId, true);
-  const command = useCommandIntent<Packet, Result>(confirmed);
+  const command = useCommandIntent<Packet, Result>(confirmed, staleResidenceVersion);
   const [editor, setEditor] = useState<{ base: ResidenceHours | null; fields: Packet["hours"]; opener: HTMLButtonElement } | null>(null);
   const [conflict, setConflict] = useState(false);
   const [message, setMessage] = useState("");
@@ -39,6 +44,14 @@ export function ScheduleResidenceSettings({ patientId }: { patientId: string }) 
   }
   function change(field: keyof Packet["hours"], value: string) {
     setEditor((open) => open && { ...open, fields: { ...open.fields, [field]: value } });
+  }
+
+  function showFailure(reason: unknown, fallback: string) {
+    if (staleResidenceVersion(reason)) {
+      setConflict(true);
+      read.refresh();
+    }
+    setError(reason instanceof Error ? reason.message : fallback);
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -56,13 +69,7 @@ export function ScheduleResidenceSettings({ patientId }: { patientId: string }) 
     }
     setError("");
     try { await command.send(read.endpoint, packet.data); finish(); }
-    catch (reason) {
-      if (reason instanceof ApiError && reason.status === 409) {
-        setConflict(true);
-        read.refresh();
-      }
-      setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração.");
-    }
+    catch (reason) { showFailure(reason, "Não foi possível confirmar a alteração."); }
   }
 
   const hours = read.data?.hours;
@@ -110,7 +117,7 @@ export function ScheduleResidenceSettings({ patientId }: { patientId: string }) 
       {command.uncertain ? <ActionButton variant="primary" onClick={async () => {
         setError("");
         try { await command.recover(); finish(); }
-        catch (reason) { setError(reason instanceof Error ? reason.message : "Consulte o resultado novamente."); }
+        catch (reason) { showFailure(reason, "Consulte o resultado novamente."); }
       }}>Recuperar a mesma alteração</ActionButton> : null}
     </RecordDrawer> : null}
   </section>;

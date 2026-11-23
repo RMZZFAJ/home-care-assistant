@@ -1131,6 +1131,17 @@ desligado, com sua própria autoria. O readmodel apresenta efeito BAL e todas
 as ocorrências da série para revisão, sem dispensar a decisão familiar que
 altera sua janela.
 
+A referência de alteração que afeta BAL informa `obligationStart` quando
+quem consulta pode decidir o encaminhamento. O plantão editado pode receber
+a contagem se o novo intervalo respeitar esse início e os demais limites.
+A justificativa do BAL conserva o texto digitado no rascunho. A revisão e o
+registro oficial usam o mesmo texto após remover espaços e quebras de linha
+das extremidades.
+
+Ao reenviar a mesma tentativa para `/api/schedules/residence`, um recibo
+confirmado é devolvido antes da verificação da versão. Um conflito de versão
+comprovado permite adotar a referência atual e revisar os valores mantidos.
+
 `/api/balances` consulta a atribuição, elegibilidade, obrigações, destinos e
 eventos. Comandos configuram o regime por paciente, solicitam/decidem
 adiamento,

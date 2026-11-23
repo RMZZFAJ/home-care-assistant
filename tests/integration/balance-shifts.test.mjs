@@ -178,8 +178,15 @@ test("schedule management cannot defer BAL, while a same-window handoff preserve
   assert.equal(affected.assignmentId,a.id);
   assert.equal(affected.document.id,doc.id);
   assert.equal(affected.canDecide,true);
+  const obligationStart=sql("select min(original_start) from public.bal_obligations where cycle_id="+sqlLiteral(a.cycle_id));
+  assert.equal(Date.parse(affected.obligationStart),Date.parse(obligationStart));
+  const tooEarly={...change,p_key:randomUUID(),p_body:{...change.p_body,
+    startsAt:new Date(Date.parse(obligationStart)-60_000).toISOString()}};
+  assert.equal((await admin.rpc("schedule_command",tooEarly)).error?.code,"PT409");
+  assert.equal((await workspace(admin,patient)).eligibility.assignment.id,a.id);
   const supervisorReference=await rpc(supervisor.client,"schedule_resource_preparation_reference",{p_patient:patient,p_purpose:"schedule_shift_edit",p_target:s.id});
   assert.equal(supervisorReference.reference.workspace.shifts[0].balanceImpact.canDecide,false);
+  assert.equal(supervisorReference.reference.workspace.shifts[0].balanceImpact.obligationStart,null);
   const altered=await rpc(admin,"schedule_command",change);
   assert.equal((await rpc(admin,"schedule_command",change)).version,altered.version);
   const changed=await workspace(supervisor.client,patient),newAssignment=changed.eligibility.assignment;
@@ -249,7 +256,8 @@ test("approving a shift proposal preserves the assigned BAL and its admission wh
   const decision={decision:"keep",assignmentId:a.id,assignmentVersion:a.version,sourceVersion:source.version,
     reason:"A contagem mantém o responsável e o prazo"};
   const reason="Cobertura antecipada aprovada";
-  const fields={form:"decision",operation:"approve",reason,balanceImpact:decision};
+  const rawReason="\t\u00a0\n"+decision.reason+"\r\u2029";
+  const fields={form:"decision",operation:"approve",reason,balanceImpact:{...decision,reason:rawReason}};
   const command={action:"decide_change",body:{id:proposal.id,approve:true,reason,balanceImpact:decision}};
   const fixture={admin,scope,reference,command,content:{scheduleAction:fields,referenceHash:reference.hash,referenceVersion:reference.version}};
   const saved=await saveResource(fixture);
@@ -267,7 +275,8 @@ test("approving a shift proposal preserves the assigned BAL and its admission wh
   assert.equal((await admin.rpc("commit_schedule_resource_preparation",tampered)).error?.code,"22023");
   const approved=await rpc(admin,"commit_schedule_resource_preparation",packet);
   assert.equal(approved.receipt.nativeResult.status,"approved");
-  assert.equal(approved.receipt.fields.balanceImpact.reason,decision.reason);
+  assert.equal(approved.receipt.fields.balanceImpact.reason,rawReason);
+  assert.equal(approved.receipt.command.body.balanceImpact.reason,decision.reason);
   assert.equal((await rpc(admin,"commit_schedule_resource_preparation",packet)).replayed,true);
   const final=await workspace(pro.client,patient);
   assert.equal(final.eligibility.assignment.id,a.id);
@@ -276,6 +285,7 @@ test("approving a shift proposal preserves the assigned BAL and its admission wh
   assert.equal(final.eligibility.assignment.ends_at,a.ends_at);
   assert.equal(final.eligibility.admission.id,admission.id);
   assert.equal(final.events.filter(x=>x.action==="bal.cycle.schedule_impact").length,1);
+  assert.equal(final.events.find(x=>x.action==="bal.cycle.schedule_impact").reason,decision.reason);
 });
 
 test("approved postponement preserves the original due date and does not turn into a historical delay",async()=>{

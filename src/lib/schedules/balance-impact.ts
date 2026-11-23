@@ -48,8 +48,9 @@ export function scheduleBalanceReview(fields: ScheduleResourceFields, reference:
   const targets = impact.targets.filter(target => Date.parse(target.endsAt) > now &&
     (fields.form !== "series" || target.seriesId !== series?.id || target.localDate < fields.from));
   const assign = targets.filter((target) => Date.parse(target.endsAt) <= oldEnd);
-  if (start && end && professional && professional !== impact.professionalId &&
-    Date.parse(end) <= oldEnd && Date.parse(end) > Date.parse(start) && Date.parse(end) > now) {
+  if (start && end && professional && professional !== impact.professionalId && impact.obligationStart &&
+    Date.parse(start) >= Date.parse(impact.obligationStart) && Date.parse(end) <= oldEnd &&
+    Date.parse(end) > Date.parse(start) && Date.parse(end) > now) {
     assign.unshift({
       id: impact.shiftId,
       version: impact.sourceVersion,
