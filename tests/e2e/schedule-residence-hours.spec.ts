@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { rpc, setup } from "../integration/v4-fixtures.mjs";
 import { balanceSetup, dayOffset, localToday, shiftCommand, shiftWorker } from "../integration/shift-fixtures.mjs";
@@ -159,10 +159,11 @@ test("cancelar plantão com BAL exige encaminhar a contagem e confirma os dois a
   await balance.getByRole("button", { name: "Fechar detalhes do balanço", exact: true }).click();
   await expect(linked).toBeFocused();
   await shiftCard.getByRole("button", { name: /^Ações do plantão de / }).click();
-  await page.getByRole("menuitem", { name: "Alterar plantão", exact: true }).click();
-  const editor = page.getByRole("dialog", { name: "Alteração pontual", exact: true });
-  await editor.getByRole("combobox", { name: "Operação", exact: true }).selectOption("cancel");
-  const review = editor.getByRole("button", { name: "Revisar alteração", exact: true });
+  await page.getByRole("dialog", { name: /^Plantão de / }).getByRole("button", { name: "Cancelar este plantão", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "Cancelar este plantão", exact: true });
+  await expect(editor.getByRole("combobox", { name: "Operação", exact: true })).toHaveCount(0);
+  await expect(editor.getByText(/O cancelamento vale para esta ocorrência/)).toBeVisible();
+  const review = editor.getByRole("button", { name: "Continuar cancelamento", exact: true });
   await expect(review).toBeDisabled();
   await editor.getByRole("textbox", { name: "Justificativa", exact: true }).fill("Ausência confirmada pela família");
   const impact = editor.getByRole("region", { name: "Impacto em balanço", exact: true });
@@ -256,4 +257,137 @@ test("atalho do balanço usa a atribuição autorizada e recusa uma referência 
   } finally {
     await otherContext.close();
   }
+});
+
+test("ações da agenda separam troca, horário, encerramento e pedido de alteração", async ({ page, browser }, info) => {
+  test.setTimeout(180_000);
+  const f = await setup();
+  const [admin, worker, substitute] = await Promise.all([
+    shiftWorker(f.patient, "admin"), shiftWorker(f.patient), shiftWorker(f.patient),
+  ]);
+  const firstDay = "2100-07-01", lastDay = dayOffset(firstDay, 3);
+  const type = await shiftCommand(admin.client, f.patient, "type", {
+    name: "Plantão das ações", startsLocal: "07:00", durationMinutes: 720,
+  });
+  const series = await shiftCommand(admin.client, f.patient, "series", {
+    professionalId: worker.id, shiftTypeId: type.id, timezone: "America/Sao_Paulo",
+    recurrence: "weekly", weekdays: [0, 1, 2, 3, 4, 5, 6], anchorDate: firstDay, validUntil: lastDay, notes: "Escala original",
+  });
+  const agenda = (day: string) => "/escalas?" + new URLSearchParams({ careRecipientId: f.patient, day });
+  const shifts = async () => (await rpc(admin.client, "schedule_workspace", {
+    p_patient: f.patient, p_from: firstDay, p_until: lastDay,
+  })).shifts;
+  const before = await shifts();
+  expect(before).toHaveLength(4);
+
+  async function login(actorPage: Page, email: string) {
+    await actorPage.getByLabel("E-mail", { exact: true }).fill(email);
+    await actorPage.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+    await actorPage.getByRole("button", { name: "Entrar", exact: true }).click();
+    await selectContext(actorPage, f.patient);
+  }
+  async function openActions(actorPage: Page, id: string) {
+    await actorPage.locator(`article[data-shift-id="${id}"]`).getByRole("button", { name: /^Ações do plantão de / }).click();
+    return actorPage.getByRole("dialog", { name: /^Plantão de / });
+  }
+  const confirm = async (actorPage: Page) => {
+    const review = actorPage.getByRole("dialog", { name: "Revisar escala", exact: true });
+    const committed = actorPage.waitForResponse(response => response.request().method() === "POST" &&
+      new URL(response.url()).pathname === "/api/schedules/resource-preparations/commit");
+    await review.getByRole("button", { name: "Confirmar gravação", exact: true }).click();
+    expect((await committed).status()).toBe(200);
+    await expect(actorPage.getByRole("dialog")).toHaveCount(0);
+  };
+  await page.goto("/login");
+  await login(page, admin.email);
+  await page.goto(agenda(firstDay));
+  const options = await openActions(page, before[0].id);
+  await expect(options.locator(".hca-shift-action-list button")).toHaveText([
+    "Trocar profissional", "Alterar horário", "Cancelar este plantão", "Encerrar próximos plantões",
+  ]);
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 860 });
+    const firstAction = options.getByRole("button", { name: "Trocar profissional", exact: true });
+    await expect(firstAction).toHaveCSS("display", "grid");
+    await expect(firstAction).toHaveCSS("min-height", "58px");
+    await audit(page, `L3 ações do plantão ${width}`);
+    const path = info.outputPath(`acoes-plantao-${width}.png`);
+    await options.screenshot({ path, animations: "disabled" });
+    await info.attach(`acoes-plantao-${width}`, { path, contentType: "image/png" });
+  }
+  await options.getByRole("button", { name: "Trocar profissional", exact: true }).click();
+  const replace = page.getByRole("dialog", { name: "Trocar profissional", exact: true });
+  await replace.getByLabel("Novo profissional", { exact: true }).selectOption(substitute.id);
+  await replace.getByRole("textbox", { name: "Justificativa", exact: true }).fill("Cobertura pontual confirmada");
+  await replace.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+  let allowCommit!: () => void;
+  const commitGate = new Promise<void>(resolve => { allowCommit = resolve; });
+  const initiated = page.waitForRequest(request => request.method() === "POST" &&
+    new URL(request.url()).pathname === "/api/schedules/resource-preparations/commit");
+  await page.route("**/api/schedules/resource-preparations/commit", async route => {
+    await commitGate;
+    await route.continue();
+  }, { times: 1 });
+  await Promise.all([confirm(page), (async () => {
+    try {
+      await initiated;
+      await expect(page.locator(".hca-activity-overlay")).toBeVisible();
+      await expect(page.getByText("Tentativa de agenda preservada", { exact: true })).toHaveCount(0);
+    } finally { allowCommit(); }
+  })()]);
+  const replaced = await shifts();
+  expect(replaced[0]).toMatchObject({ id: before[0].id, series_id: series.id, professional_id: substitute.id, starts_at: before[0].starts_at, ends_at: before[0].ends_at });
+  expect(replaced.slice(1)).toEqual(before.slice(1));
+
+  const secondDay = dayOffset(firstDay, 1);
+  await page.goto(agenda(secondDay));
+  await (await openActions(page, before[1].id)).getByRole("button", { name: "Alterar horário", exact: true }).click();
+  const change = page.getByRole("dialog", { name: "Alterar horário", exact: true });
+  await expect(change.getByLabel("Profissional de destino", { exact: true })).toHaveCount(0);
+  await change.getByLabel("Início do plantão", { exact: true }).fill(secondDay + "T08:00");
+  await change.getByLabel("Fim do plantão", { exact: true }).fill(secondDay + "T20:00");
+  await change.getByRole("textbox", { name: "Justificativa", exact: true }).fill("Novo horário combinado");
+  await change.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+  await confirm(page);
+  const changed = await shifts();
+  expect(changed[1]).toMatchObject({ id: before[1].id, professional_id: worker.id });
+  expect(new Date(changed[1].starts_at).toISOString()).toBe(secondDay + "T11:00:00.000Z");
+
+  const workerContext = await browser.newContext();
+  try {
+    const ownPage = await workerContext.newPage();
+    await ownPage.goto(new URL("/login", page.url()).href);
+    await login(ownPage, worker.email);
+    await ownPage.goto(new URL(agenda(dayOffset(firstDay, 2)), page.url()).href);
+    const ownActions = await openActions(ownPage, before[2].id);
+    await expect(ownActions.locator(".hca-shift-action-list button")).toHaveText(["Pedir alteração"]);
+    await ownActions.getByRole("button", { name: "Pedir alteração", exact: true }).click();
+    const request = ownPage.getByRole("dialog", { name: "Pedir alteração", exact: true });
+    await request.getByLabel("Início do plantão", { exact: true }).fill(dayOffset(firstDay, 2) + "T08:00");
+    await request.getByRole("textbox", { name: "Justificativa", exact: true }).fill("Solicitação da equipe para rever o horário");
+    await request.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+    await confirm(ownPage);
+    await expect(ownPage.getByText("Proposta de alteração enviada; aguarda decisão autorizada.", { exact: true })).toBeVisible();
+    expect(await shifts()).toEqual(changed);
+  } finally { await workerContext.close(); }
+
+  await page.goto(agenda(lastDay));
+  await (await openActions(page, before[3].id)).getByRole("button", { name: "Encerrar próximos plantões", exact: true }).click();
+  const end = page.getByRole("dialog", { name: "Encerrar próximos plantões", exact: true });
+  const cutoff = end.getByLabel("Encerrar a partir de", { exact: true });
+  await expect(cutoff).toHaveValue(lastDay);
+  await end.getByRole("textbox", { name: "Justificativa", exact: true }).fill("Encerramento das ocorrências restantes");
+  await cutoff.fill(dayOffset(localToday(), -1));
+  const reviewEnd = end.getByRole("button", { name: "Revisar alteração", exact: true });
+  await reviewEnd.click();
+  await expect(end.getByRole("alert").filter({ hasText: "Escolha uma data que preserve os plantões já iniciados." })).toBeVisible();
+  expect(await shifts()).toEqual(changed);
+  await cutoff.fill(lastDay);
+  await reviewEnd.click();
+  const review = page.getByRole("dialog", { name: "Revisar escala", exact: true });
+  await expect(review.getByText(/Encerrar a partir de 04\/07\/2100/)).toBeVisible();
+  await confirm(page);
+  const ended = await shifts();
+  expect(ended.slice(0, 3)).toEqual(changed.slice(0, 3));
+  expect(ended[3]).toMatchObject({ id: before[3].id, status: "cancelled" });
 });

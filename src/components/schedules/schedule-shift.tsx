@@ -1,19 +1,25 @@
-import { useRef } from "react";
-import { Menu } from "@base-ui/react/menu";
+import { useRef, useState } from "react";
 import { ActionButton, Pill } from "@/components/ui/controls";
-import { MenuPopup } from "@/components/ui/floating";
-import { Icon } from "@/components/ui/primitives";
+import { Dialog } from "@/components/ui/overlays";
+import { Icon, type IconName } from "@/components/ui/icon";
+import { scheduleResourceEntryLabels, type ScheduleResourceEntry } from "@/lib/schedules/resource-preparations";
 import { localMinute } from "@/lib/schedules/time";
 import { scheduleStamp } from "./schedule-review";
 import type { ScheduledShift } from "@/types/schedules";
 
-export function ScheduleShift({ shift, stateLabel, earlier, action, disabled, onEdit, daily, recurrence, onEnd, onOpenBalance }: {
+const entryIcons: Record<ScheduleResourceEntry, IconName> = {
+  replace: "user", time: "clock", cancel: "close", request: "comment", end: "calendar",
+};
+
+export function ScheduleShift({ shift, stateLabel, earlier, action, disabled, onEdit, daily, recurrence, entries, onOpenBalance }: {
   shift: ScheduledShift; stateLabel: string; earlier: boolean; action?: string;
-  disabled: boolean; onEdit: (target: HTMLButtonElement) => void;
-  daily?: boolean; recurrence?: string; onEnd?: (target: HTMLButtonElement) => void;
+  disabled: boolean; onEdit: (target: HTMLButtonElement, entry?: ScheduleResourceEntry) => void;
+  daily?: boolean; recurrence?: string; entries: ScheduleResourceEntry[];
   onOpenBalance?: (target: HTMLButtonElement) => void;
 }) {
   const openerRef = useRef<HTMLButtonElement>(null);
+  const openingEditorRef = useRef(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
   const label = `${shift.type_name} · ${shift.professional_name}`;
   const facts = <>
     <small>{scheduleStamp(shift.starts_at, shift.timezone)} → {scheduleStamp(shift.ends_at, shift.timezone)}</small>
@@ -45,16 +51,36 @@ export function ScheduleShift({ shift, stateLabel, earlier, action, disabled, on
           <Icon name="note" width={15} height={15} /> Balanço neste plantão
         </button> : null}
       </div>
-      {action || onEnd ? <Menu.Root>
-        <Menu.Trigger disabled={disabled} render={<ActionButton ref={openerRef} variant="quiet" compact
-          className="hca-agenda-icon" aria-label={`Ações do plantão de ${shift.professional_name}`} />}>
+      {entries.length ? <>
+        <ActionButton ref={openerRef} variant="quiet" compact disabled={disabled} aria-haspopup="dialog"
+          className="hca-agenda-icon" aria-label={`Ações do plantão de ${shift.professional_name}`}
+          onClick={() => { openingEditorRef.current = false; setActionsOpen(true); }}>
           <Icon name="more" />
-        </Menu.Trigger>
-        <MenuPopup>
-          {action ? <Menu.Item className="hca-menu-item" onClick={() => { if (openerRef.current) onEdit(openerRef.current); }}>{action}</Menu.Item> : null}
-          {onEnd ? <Menu.Item className="hca-menu-item" onClick={() => { if (openerRef.current) onEnd(openerRef.current); }}>Encerrar série</Menu.Item> : null}
-        </MenuPopup>
-      </Menu.Root> : null}
+        </ActionButton>
+        {actionsOpen ? <Dialog open
+          kicker="Plantões e balanços" headingIcon="calendar"
+          title={"Plantão de " + new Intl.DateTimeFormat("pt-BR", {
+            timeZone: shift.timezone, day: "numeric", month: "long",
+          }).format(new Date(shift.starts_at))}
+          subtitle={`${shift.professional_name} · ${start.slice(11)}–${end.slice(11)}${start.slice(0, 10) === end.slice(0, 10) ? "" : " do dia seguinte"}`}
+          closeLabel="Fechar ações do plantão" popupClassName="hca-shift-action-picker"
+          onClose={() => setActionsOpen(false)}
+          finalFocus={() => openingEditorRef.current ? false : openerRef.current ?? false}>
+          <div className="hca-shift-action-list">
+            {entries.map(entry => <ActionButton key={entry} variant="quiet" disabled={disabled}
+              onClick={() => {
+                if (!openerRef.current) return;
+                openingEditorRef.current = true;
+                setActionsOpen(false);
+                onEdit(openerRef.current, entry);
+              }}>
+              <Icon name={entryIcons[entry]} />
+              <span>{scheduleResourceEntryLabels[entry]}</span>
+              <Icon name="chevron" width={15} height={15} />
+            </ActionButton>)}
+          </div>
+        </Dialog> : null}
+      </> : null}
     </article>;
   }
   return <article data-shift-id={shift.id} className="hca-shift-card" aria-label={label}>

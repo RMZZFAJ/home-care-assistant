@@ -22,6 +22,14 @@ export const scheduleResourcePurposeSchema = z.enum(scheduleResourcePurposes);
 export type ScheduleResourcePurpose = z.infer<
   typeof scheduleResourcePurposeSchema
 >;
+export type ScheduleResourceEntry = "replace" | "time" | "cancel" | "request" | "end";
+export const scheduleResourceEntryLabels: Record<ScheduleResourceEntry, string> = {
+  replace: "Trocar profissional",
+  time: "Alterar horário",
+  cancel: "Cancelar este plantão",
+  request: "Pedir alteração",
+  end: "Encerrar próximos plantões",
+};
 export const isScheduleResourcePurpose = (
   value: string,
 ): value is ScheduleResourcePurpose =>
@@ -300,6 +308,7 @@ export function initialScheduleResource(
   data: ScheduleWorkspace | null,
   today: string,
   mayPublish: boolean,
+  entry?: ScheduleResourceEntry,
 ): ScheduleResourceFields {
   if (purpose === "shift_type_edit")
     return initialScheduleType(data?.types.find((t) => t.id === target));
@@ -307,7 +316,7 @@ export function initialScheduleResource(
     const s = data?.shifts.find((s) => s.id === target);
     return {
       form: "shift",
-      operation: mayPublish ? "change" : "propose_change",
+      operation: !mayPublish || entry === "request" ? "propose_change" : entry === "cancel" ? "cancel" : "change",
       professionalId: s?.professional_id ?? "",
       start: s ? localMinute(s.starts_at, s.timezone) : "",
       end: s ? localMinute(s.ends_at, s.timezone) : "",

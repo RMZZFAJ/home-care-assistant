@@ -3007,10 +3007,24 @@ A migration foi aplicada após o backup cifrado verificado
   plantões que atravessam a meia-noite, a ocorrência aparece em cada
   dia em que está em andamento. O intervalo integral, o fuso e as
   observações ficam nos detalhes do profissional.
-- O menu do plantão abre o editor de alteração pontual ou a proposta
-  conforme a permissão. O encerramento de uma série aparece quando
-  autorizado, com revisão própria. O cancelamento continua no editor
-  pontual e conserva a decisão sobre eventual balanço vinculado.
+- O menu diário abre um modal com profissional, intervalo e ações
+  autorizadas. Trocar profissional, alterar horário e cancelar uma
+  ocorrência abrem formulários próprios. Encerrar próximos plantões
+  informa a data de corte e confere se ela preserva plantões iniciados
+  ao revisar e ao confirmar pelo modal.
+- O pedido de alteração segue para decisão autorizada. Troca,
+  horário e cancelamento usam a mesma referência, versão, confirmação
+  e recuperação da agenda, incluindo a decisão sobre balanço vinculado.
+  A edição conjunta e a retomada dos campos privados continuam
+  disponíveis pelo editor compartilhado.
+- Enquanto o servidor responde à confirmação pelo modal de ações,
+  a interface mostra o carregamento sobreposto. A recuperação aparece
+  quando o resultado continua sem confirmação.
+- Seis casos dirigidos em Chromium, Android e iOS emulados verificaram
+  a troca com horário preservado, a alteração de horário com o mesmo
+  profissional, o pedido restrito, o corte da série, o cancelamento
+  com balanço e a espera da confirmação. A rodada final conferiu o
+  modal em 360 e 412 px e o retorno de foco ao botão de origem.
 - A interface mantém os modos Semana e Mês, os filtros de profissional
   e situação e as rotas de referência. A lista de propostas e a
   recuperação de operações anteriores continuam na área da agenda.

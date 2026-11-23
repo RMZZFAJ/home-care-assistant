@@ -2,7 +2,7 @@
 import { ScheduleCreationPreparation } from "./schedule-creation-preparation";
 import { ScheduleResourcePreparation } from "./schedule-resource-preparation";
 import { ScheduleResourcePreparationsList } from "./schedule-resource-list";
-import type { ScheduleResourcePurpose } from "@/lib/schedules/resource-preparations";
+import type { ScheduleResourceEntry, ScheduleResourcePurpose } from "@/lib/schedules/resource-preparations";
 import type { ScheduleCreationPurpose } from "@/lib/schedules/creation";
 import {
   ActionButton,
@@ -86,16 +86,18 @@ export function PatientSchedule({ context, settings = false }: {
     target: string;
     day: string;
     opener: HTMLElement;
+    entry?: ScheduleResourceEntry;
   } | null>(null);
   const openResource = (
     purpose: ScheduleResourcePurpose,
     target: string,
     day: string,
     opener: HTMLElement,
+    entry?: ScheduleResourceEntry,
   ) => {
     if (!recovery.ready || recovery.busy || recovery.pending || preparation)
       return;
-    setResource({ purpose, target, day, opener });
+    setResource({ purpose, target, day, opener, entry });
   };
   const create = (
     purpose: ScheduleCreationPurpose,
@@ -198,6 +200,7 @@ export function PatientSchedule({ context, settings = false }: {
           purpose={resource.purpose}
           targetResourceId={resource.target}
           today={resource.day}
+          entry={resource.entry}
           opener={resource.opener}
           fallbackFocus={ownSummaryRef}
           onClose={() => {
@@ -237,6 +240,7 @@ function Agenda({
     target: string,
     day: string,
     opener: HTMLElement,
+    entry?: ScheduleResourceEntry,
   ) => void;
 }) {
   const scrollRegion = useScrollableRegion<HTMLDivElement>();
@@ -294,12 +298,12 @@ function Agenda({
   const eligibility = !read.error && !balanceRead.error ? balanceRead.data?.data.eligibility ?? null : null;
   const busy = recovery.busy || !recovery.ready || loading || Boolean(read.error),
     uncertain = recovery.pending !== null;
-  function open(value: ScheduleEditor, target: HTMLElement) {
+  function open(value: ScheduleEditor, target: HTMLElement, entry?: ScheduleResourceEntry) {
     if (busy || uncertain) return;
     if (value.kind === "series")
       onCreate("schedule_series_create", day, target);
     else if (value.kind === "shift")
-      onResource("schedule_shift_edit", value.shift.id, day, target);
+      onResource("schedule_shift_edit", value.shift.id, day, target, entry);
     else if (
       value.kind === "end" ||
       value.kind === "reject" ||
@@ -348,21 +352,37 @@ function Agenda({
   const renderShift = (shift: ScheduledShift) => {
     const daily = mode === "day", series = seriesById.get(shift.series_id);
     const ownsShift = shift.professional_id === context.userId;
-    const editable = shift.status === "published" && (team || (ownsShift && (can(context, "schedule.propose") || publishOwn)));
+    const published = shift.status === "published";
+    const canEdit = published && (team || (ownsShift && publishOwn));
+    const canRequest = published && can(context, "schedule.propose") && (ownsShift || readTeam);
     const mayEnd = daily && shift.status === "published" && series?.status === "published" && !series.ended_on
-      && (series.recurrence !== "once" || !series.residence_version) && (team || (publishOwn && ownsShift));
+      && series.recurrence !== "once" && (series.open_ended || series.valid_until >= today(series.timezone))
+      && (team || (publishOwn && series.professional_id === context.userId));
+    const entries: ScheduleResourceEntry[] = [];
+    if (canEdit) {
+      if (team) entries.push("replace");
+      entries.push("time", "cancel");
+    }
+    if (mayEnd) entries.push("end");
+    if (canRequest) entries.push("request");
     const linked = daily && scheduleBalanceMatches(eligibility, shift);
     return <ScheduleShift key={shift.id} shift={shift} daily={daily}
       recurrence={series ? recurrenceLabels[series.recurrence] : undefined}
       stateLabel={stateLabels[shift.status]}
       earlier={localMinute(shift.starts_at, shift.timezone).slice(0, 10) < (daily ? day : period.from)}
-      action={editable ? team || publishOwn ? "Alterar plantão" : "Propor alteração" : undefined}
-      disabled={busy || uncertain} onEdit={target => open({ kind: "shift", shift }, target)}
+      action={canEdit ? "Alterar plantão" : canRequest ? "Propor alteração" : undefined}
+      entries={entries} disabled={busy || uncertain} onEdit={(target, entry) => {
+        if (entry === "end" && mayEnd && !busy && !uncertain) {
+          const localToday = today(series.timezone);
+          onResource("schedule_series_end", series.id, day < localToday ? localToday : day, target, entry);
+        } else if (entry !== "end") {
+          open({ kind: "shift", shift }, target, entry ?? (!canEdit && canRequest ? "request" : undefined));
+        }
+      }}
       onOpenBalance={linked ? opener => {
         setBalanceSelection({ shift, opener });
         balanceRead.refresh();
-      } : undefined}
-      onEnd={mayEnd ? target => open({ kind: "end", id: series.id, version: series.version }, target) : undefined} />;
+      } : undefined} />;
   };
   const renderDay = (date: string) => {
     const shifts = byDay.get(date) ?? [];

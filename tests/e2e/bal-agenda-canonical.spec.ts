@@ -164,9 +164,13 @@ test("06.3 agenda canonical records retain overnight dates,timezone and native e
     await page.getByLabel("Visualização", { exact: true }).selectOption("day");
     const actions = row.getByRole("button", { name: /^Ações do plantão de / });
     await actions.focus(); await actions.press("Enter");
-    await page.getByRole("menuitem", { name: "Alterar plantão", exact: true }).click();
-    const dialog = page.getByRole("dialog", { name: "Alteração pontual", exact: true }); await expect(dialog).toBeVisible();
-    await expect(dialog.getByLabel("Profissional de destino", { exact: true })).toHaveValue(pro.id);
+    const picker = page.getByRole("dialog", { name: /^Plantão de / });
+    await expect(picker.getByRole("button", { name: "Encerrar próximos plantões", exact: true })).toHaveCount(0);
+    await picker.getByRole("button", { name: "Trocar profissional", exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: "Trocar profissional", exact: true }); await expect(dialog).toBeVisible();
+    await expect(dialog.getByLabel("Novo profissional", { exact: true })).toHaveValue(pro.id);
+    await expect(dialog.getByLabel("Início do plantão", { exact: true })).toHaveCount(0);
+    await expect(dialog.getByRole("button", { name: "Revisar alteração", exact: true })).toBeDisabled();
     await dialog.getByRole("button", { name: "Fechar edição", exact: true }).click();
     await expect(dialog).toHaveCount(0); await expect(actions).toBeFocused();
     expect(sql(`select jsonb_agg(to_jsonb(s) order by id) from public.scheduled_shifts s where care_recipient_id=${q(f.patient)};`)).toBe(before); expect(sent).toEqual([]);

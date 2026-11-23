@@ -618,6 +618,18 @@ button.hca-stock-material-pending { cursor: pointer; }
 .hca-schedule-balance-facts dd { max-width: 62%; text-align: end; }
 @media (max-width: 500px) { .hca-drawer-viewport > .hca-schedule-balance-sheet { border-radius: 16px 16px 0 0; } }
 .hca-agenda-icon.hca-control { min-width: 36px; min-height: 36px; padding: 5px; }
+.hca-shift-action-picker { width: min(380px, 100%); }
+.hca-shift-action-picker > .hca-modal-head { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 9px; padding: 16px 14px; background: var(--hca-bg); }
+.hca-shift-action-picker .hca-modal-heading-icon { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--hca-line); border-radius: 9px; background: var(--hca-tint); color: var(--hca-teal); }
+.hca-shift-action-picker .hca-modal-kicker { margin-bottom: 4px; text-transform: uppercase; }
+.hca-shift-action-picker > .hca-modal-head button { min-width: 32px; min-height: 34px; }
+.hca-shift-action-picker > .hca-modal-content { padding: 16px 14px 18px; }
+.hca-shift-action-list { display: grid; }
+.hca-l1 .hca-shift-action-picker .hca-shift-action-list > .hca-control { display: grid; grid-template-columns: 19px minmax(0, 1fr) 15px; align-items: center; gap: 10px; width: 100%; min-height: 58px; padding: 9px 4px; border: 0; border-bottom: 1px solid var(--hca-line); border-radius: 0; color: var(--hca-ink); font-size: 14px; font-weight: 500; text-align: left; white-space: normal; }
+.hca-l1 .hca-shift-action-picker .hca-shift-action-list > .hca-control:last-child { border-bottom: 0; }
+.hca-l1 .hca-shift-action-picker .hca-shift-action-list .hca-icon { width: 100%; height: auto; color: var(--hca-muted); }
+.hca-shift-operation-dialog { width: min(510px, 100%); }
+.hca-shift-operation-dialog > .hca-modal-footer > button { min-width: 0; white-space: normal; }
 .hca-agenda-empty { display: grid; justify-items: center; gap: 7px; padding: 24px 12px; text-align: center; background: var(--hca-paper); border: 1px solid var(--hca-line); border-radius: 13px; }
 .hca-agenda-empty p { margin: 0; }
 @media (max-width: 380px) {
