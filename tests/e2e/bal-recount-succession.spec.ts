@@ -2,6 +2,7 @@ import { confirmDecisionAndReconcile } from "./l1-decision-policy";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
+import { finishBalanceMaterials } from "./balance-wizard-stages";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import {
@@ -193,6 +194,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
       await expect(field).toHaveValue("");
       await field.fill(product.id === f.products[0] ? "1" : "0");
     }
+    await finishBalanceMaterials(counter);
     await expect(
       counter.getByLabel("Observações da contagem", { exact: true }),
     ).toHaveValue("");

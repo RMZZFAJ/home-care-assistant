@@ -14,6 +14,7 @@ import {
 import { chooseBalanceTarget } from "./balance-preparation-steps";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { balanceStage, finishBalanceMaterials } from "./balance-wizard-stages";
 
 async function login(page: Page, email: string, patient: string) {
   await page.goto("/login");
@@ -119,7 +120,7 @@ async function capture(page: Page, name: string, operational = false) {
   }
 }
 
-test("BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real", async ({
+test("BAL por plantão: ativação local, cinco etapas, referência, resposta perdida e documento real", async ({
   page,
 }, info) => {
   test.setTimeout(120_000);
@@ -233,14 +234,11 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   await page.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
   await expect(
     page
-      .getByRole("list", {
-        name: "Barra de etapas; use as setas do teclado para rolar",
-        exact: true,
-      })
+      .getByRole("navigation", { name: "Etapas da ficha", exact: true })
       .getByRole("listitem"),
-  ).toHaveCount(2);
-  await expect(page.getByText(/^Referência:/)).toHaveCount(0);
-  await page.getByRole("button", { name: "Revisar", exact: true }).click();
+  ).toHaveCount(5);
+  await expect(page.getByText(/^Referência 0 unidade$/)).toHaveCount(2);
+  await page.getByRole("button", { name: "Avançar", exact: true }).click();
   await expect(page.locator('input[aria-invalid="true"]')).toHaveCount(2);
   const catalogue = (
     await (
@@ -252,13 +250,10 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
       .getByLabel(`${p.name} · ${p.unit}`, { exact: true })
       .fill(index ? "0" : "1");
   await expect(page.locator('input[aria-invalid="true"]')).toHaveCount(0);
-  await page
-    .getByLabel("Observações da contagem", { exact: true })
-    .fill("Conferência física atual; diferença para revisão familiar.");
   const widths =
     info.project.name === "chromium"
-      ? [320, 360, 390, 428, 768, 1024, 1366, 1920]
-      : [390];
+      ? [320, 360, 412, 768, 1024, 1366, 1920]
+      : [360, 412];
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
     expect(
@@ -271,6 +266,10 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   }
   await capture(page, "bal-contagem-" + info.project.name, true);
   await audit(page, "scheduled BAL count");
+  await finishBalanceMaterials(page);
+  await page
+    .getByLabel("Observações da contagem", { exact: true })
+    .fill("Conferência física atual; diferença para revisão familiar.");
   await page.getByRole("button", { name: "Revisar", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Revisão da contagem", exact: true }),
@@ -279,12 +278,13 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
     page.getByRole("table", { name: "Materiais da contagem", exact: true }).locator('td[data-label="Referência"]').filter({ hasText: /^0 unidade$/ }),
   ).toHaveCount(2);
   await audit(page, "scheduled BAL review");
-  await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await balanceStage(page, "Materiais").click();
   await expect(
     page.getByLabel(`${catalogue[0].name} · ${catalogue[0].unit}`, {
       exact: true,
     }),
   ).toHaveValue("1");
+  await finishBalanceMaterials(page);
   await page.getByRole("button", { name: "Revisar", exact: true }).click();
   await capture(page, "bal-revisao-" + info.project.name, true);
   let lost = false;

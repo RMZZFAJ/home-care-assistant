@@ -1777,6 +1777,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261122232848_l3_residence_schedule_hours` | Aplicada | Aplicada |
 | `20261123000513_l3_schedule_balance_impact` | Aplicada | Aplicada |
 | `20261123001403_l3_reconcile_residence_shift_windows` | Aplicada | Aplicada |
+| `20261123003438_l3_balance_count_materials` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2134,8 +2135,9 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   atingem uma contagem designada exigem encaminhamento explícito e registram
   a decisão na mesma transação. Restam completar a
   administração dos tipos e a transição das residências sem configuração,
-  a conferência visual do fluxo e o wizard de contagem com cinco etapas
-  e materiais extras.
+  a conferência visual. A contagem por plantão já usa as cinco etapas e
+  registra extras separados do catálogo. Restam os pareceres por extra e
+  as demais decisões de programação do regime previstas na referência.
 - **E09 — Arquivos e verificação.** Em execução. A consulta pública exibe
   registro, correspondência, assinatura e carimbo separadamente. Os detalhes
   autorizados abrem em painel e revalidam o acesso. O resultado público
@@ -2515,6 +2517,45 @@ obsoleto, retentativa, preservação da autoria, admissão iniciada entre a
 revisão e a confirmação, recorrência vazia e data civil inexistente. O
 conflito de versão dos horários e o cancelamento com adiamento foram
 exercitados em Chromium, Android emulado e iOS emulado.
+
+### Assistente de contagem física do BAL
+
+A contagem por plantão tem confirmação de paciente, autoria e plantão,
+materiais por categoria, itens extras, observações e revisão. As quantidades
+de referência, física e diferença são exibidas separadamente. O rascunho
+conserva a etapa, categoria, quantidades e extras entre sessões. A reconsulta
+de referência mantém as observações anteriores acessíveis e pede uma nova
+conferência física. A admissão registrada continua autorizando a conclusão
+da mesma contagem após o fim do plantão.
+
+A recontagem mantém a versão anterior congelada e começa pelos materiais
+daquela contagem.
+Pode incluir outros materiais do catálogo na categoria correspondente. Um
+extra que entrou no catálogo passa para Materiais. O banco verifica os itens
+da contagem anterior e rejeita confirmação divergente do rascunho. Os extras
+fora do catálogo ficam na ficha e no exemplar gerado da contagem para
+identificação posterior. A conciliação de estoque usa as identidades já
+catalogadas. Pareceres individualizados sobre extras ainda precisam ser
+integrados ao fluxo de revisões.
+
+A migration foi aplicada localmente e no Supabase remoto depois do backup
+cifrado verificado `be60068e-10af-4d85-8286-287ed417befb`. A consulta vinculada
+confirmou 341 migrations e fila vazia. A residência fictícia compartilhada
+tem vínculos com endereços reais e estava sem plantão ativo. Os cenários
+novos com emissão e recontagem usaram pacientes e contas fictícias locais.
+
+A CI de `b94aef86` encontrou um teste com texto antigo sobre a decisão do
+BAL e três casos de troca de profissional sem encaminhamento familiar.
+Os testes foram atualizados para verificar o novo aviso e registrar uma
+decisão autorizada antes da troca. Os recortes locais correspondentes
+passaram.
+
+Os cenários dirigidos em Chromium, Android e iOS emulados verificaram
+retomada após recarregar, referência alterada, emissão após o plantão,
+extra fora do catálogo, recontagem e recuperação após perda de resposta.
+A tela de materiais foi verificada em 360 e 412 px. A composição
+independente do PDF confirmou nome, unidade e quantidade do extra, com os
+saldos do catálogo em seu quadro original.
 
 ## L4
 

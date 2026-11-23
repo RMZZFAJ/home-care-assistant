@@ -10,6 +10,9 @@ import {
   supplyWriteConfirmation,
 } from "@/lib/supply/write-confirmation";
 import { quantity } from "@/lib/quantity";
+import { issuedBalanceExtras } from "@/lib/validation/balance-count-extras";
+import { draftNavigationSchema } from "@/lib/validation/draft-navigation";
+import { navigationAllowed } from "@/lib/forms/draft-navigation";
 
 const reviseUrl = /^\/api\/documents\/([0-9a-f-]{36})\/revise$/;
 const wire = z
@@ -87,11 +90,14 @@ const cache = z
     counts: balanceDraftContent.shape.counts.optional(),
     notes: balanceDraftContent.shape.notes.optional(),
     observationTimes: balanceDraftContent.shape.observationTimes.optional(),
+    navigation: draftNavigationSchema.optional(),
     pending: wire.nullable().optional(),
   })
   .strict();
 export function parseCountCache(raw: string, scope: CountScope) {
   const v = cache.parse(JSON.parse(raw));
+  if (!navigationAllowed("BAL", "create", v.navigation, { context: { mode: "scheduled" } }))
+    throw Error("Wrong preserved balance stage");
   if (
     v.content &&
     (v.content.context.documentId !==
@@ -126,7 +132,8 @@ export function parseCountCache(raw: string, scope: CountScope) {
           !Object.hasOwn(counts, l.productId) ||
           !quantity(counts[l.productId]).eq(l.quantity),
       ) ||
-      notes.trim() !== (payload.notes ?? "")
+      notes.trim() !== (payload.notes ?? "") ||
+      !sameAttempt(issuedBalanceExtras.parse(v.content?.balanceExtras ?? []), payload.balanceExtras ?? [])
     )
       throw Error("Preserved fields differ from the frozen balance attempt");
     return { ...v, counts, notes };
@@ -140,6 +147,7 @@ type CountFields = Pick<
   | "counts"
   | "notes"
   | "observationTimes"
+  | "navigation"
   | "content"
 >;
 export function preserveCountCache(
@@ -249,7 +257,8 @@ export function requireCountConfirmation(
         !quantity(lines.get(l.product_id)!).eq(l.quantity),
     ) ||
     body.payload.balanceAssignment?.admissionId !== result.payload.balanceAssignment?.admissionId ||
-    (result.payload.notes ?? "") !== (body.payload.notes ?? "")
+    (result.payload.notes ?? "") !== (body.payload.notes ?? "") ||
+    !sameAttempt(issuedBalanceExtras.parse(result.payload.balanceExtras ?? []), body.payload.balanceExtras ?? [])
   )
     throw Error(
       "O resultado não confirma os valores desta contagem. Recupere a mesma tentativa.",

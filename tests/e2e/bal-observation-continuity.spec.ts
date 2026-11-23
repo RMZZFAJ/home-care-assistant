@@ -19,6 +19,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { balanceStage, finishBalanceMaterials } from "./balance-wizard-stages";
 
 test.setTimeout(180_000);
 const button = (page: Page, name: string) =>
@@ -85,13 +86,15 @@ test("BAL local scheduled fields survive a stock change,reload and explicit fres
   const f = await balanceSetup();
   await login(page, f.patient, f.pro.email);
   await button(page, "Iniciar contagem").click();
-  await expect(button(page, "Revisar")).toBeEnabled();
-  await page
-    .getByLabel("Material fictício V4 0 · unidade", { exact: true })
-    .fill("1,");
+  await expect(button(page, "Avançar")).toBeEnabled();
+  for (const [index] of f.products.entries())
+    await page.getByLabel(`Material fictício V4 ${index} · unidade`, { exact: true }).fill("0");
+  await finishBalanceMaterials(page);
   await page
     .getByLabel("Observações da contagem", { exact: true })
     .fill("Notas anteriores que não podem sumir");
+  await balanceStage(page, "Materiais").click();
+  await page.getByLabel("Material fictício V4 0 · unidade", { exact: true }).fill("1,");
   const key = `hca:v2:bal-count:${f.pro.id}:${f.patient}:new`;
   await expect
     .poll(
@@ -121,9 +124,6 @@ test("BAL local scheduled fields survive a stock change,reload and explicit fres
   await expect(
     page.getByLabel("Material fictício V4 0 · unidade", { exact: true }),
   ).toHaveValue("");
-  await expect(
-    page.getByLabel("Observações da contagem", { exact: true }),
-  ).toHaveValue(old.notes);
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const saved = await rpc(f.pro.client, "creation_draft_context", {
     p_patient: f.patient,
@@ -131,6 +131,7 @@ test("BAL local scheduled fields survive a stock change,reload and explicit fres
     p_target: null,
   });
   expect(saved.content.counts).toEqual({});
+  expect(saved.content.notes).toEqual(old.notes);
   expect(saved.content.observationTimes).toEqual({});
   expect(saved.content.previousObservations).toEqual([old]);
   expect(saved.content.context.referenceRevision).not.toBe(
@@ -232,7 +233,7 @@ test("BAL scheduled failed source read preserves the exact local copy and recove
   const f = await balanceSetup();
   await login(page, f.patient, f.pro.email);
   await button(page, "Iniciar contagem").click();
-  await expect(button(page, "Revisar")).toBeEnabled();
+  await expect(button(page, "Avançar")).toBeEnabled();
   await page
     .getByLabel("Material fictício V4 0 · unidade", { exact: true })
     .fill("7");
@@ -256,7 +257,7 @@ test("BAL scheduled failed source read preserves the exact local copy and recove
   await expect(
     page.getByLabel("Material fictício V4 0 · unidade", { exact: true }),
   ).toHaveValue("7");
-  await expect(button(page, "Revisar")).toBeEnabled();
+  await expect(button(page, "Avançar")).toBeEnabled();
 });
 
 test("BAL private document version and reassigned shift keep old observations without authorizing another count", async ({
@@ -339,6 +340,9 @@ test("BAL private document version and reassigned shift keep old observations wi
       id: shift.id,
       professionalId: other.id,
       reason: "Substituição real no mesmo período de teste",
+      balanceImpact: { decision: "assign", assignmentId: assignment.id, assignmentVersion: assignment.version,
+        sourceVersion: shift.version, targetShiftId: shift.id, targetShiftVersion: shift.version,
+        reason: "Família encaminhou a contagem para o substituto" },
     },
     shift.version,
   );

@@ -8,6 +8,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import { purchaseArrivalVariance } from "@/lib/documents/purchase";
 import { pendingPurchaseItems } from "@/lib/documents/pending-purchase-items";
+import { issuedBalanceExtras } from "@/lib/validation/balance-count-extras";
 
 const name = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const unit = (line: Record<string, unknown>) => String(line.unit_snapshot ?? "Unidade não preservada");
@@ -83,6 +84,9 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
     }
   } else {
     semanticFacts["balance/countNature"] = Number(snapshot.workflow?.countVersion) > 1 ? "Reconto registrado em ato próprio, mantendo a contagem anterior." : documentVariant("BAL", snapshot.payload, snapshot.workflow).includes("contexto de plantão não preservado") ? "Contexto de plantão não preservado neste registro." : "Primeira contagem desta ficha, sem afirmar primeira contagem da residência.";
+    issuedBalanceExtras.parse(snapshot.payload.balanceExtras ?? []).forEach((extra, index) => {
+      semanticFacts["balance/extra/" + index] = extra.name + " · " + amount(extra.quantity, extra.unit);
+    });
     const application = balanceApplicationFacts.parse(snapshot.balanceApplication);
     snapshot.lines.forEach((line, index) => {
       const prefix = "material/" + index, applied = application.state === "applied" ? application.lines.find(item => item.lineId === line.id) : null;

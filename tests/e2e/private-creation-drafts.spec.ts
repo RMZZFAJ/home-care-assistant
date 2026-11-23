@@ -1,4 +1,5 @@
 import { lastDraftPanel } from "./l1-long-draft-panel";
+import { balanceStage, finishBalanceMaterials } from "./balance-wizard-stages";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { mkdirSync } from "node:fs";
@@ -428,12 +429,14 @@ test("reconto BAL privado retoma em outro aparelho e confirma uma única versão
   await open(page, "BAL", url);
   await page.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
   await expect(page.getByLabel("Material fictício V4 0 · unidade", { exact: true })).toBeEditable();
-  await page
-    .getByLabel("Material fictício V4 0 · unidade", { exact: true })
-    .fill("1,");
+  for (const [i] of f.products.entries())
+    await page.getByLabel(`Material fictício V4 ${i} · unidade`, { exact: true }).fill("0");
+  await finishBalanceMaterials(page);
   await page
     .getByLabel("Observações da contagem", { exact: true })
     .fill("Reconto parcial privado da substituta");
+  await balanceStage(page, "Materiais").click();
+  await page.getByLabel("Material fictício V4 0 · unidade", { exact: true }).fill("1,");
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   expect(
     sql(
@@ -470,6 +473,7 @@ test("reconto BAL privado retoma em outro aparelho e confirma uma única versão
       await second
         .getByLabel(`Material fictício V4 ${i} · unidade`, { exact: true })
         .fill(i ? "0" : "1");
+    await finishBalanceMaterials(second);
     await second.getByRole("button", { name: "Revisar", exact: true }).click();
     await expect(second.getByRole("textbox")).toHaveCount(0);
     await expect(

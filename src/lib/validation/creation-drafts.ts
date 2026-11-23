@@ -25,6 +25,7 @@ import {
 import { z } from "zod";
 import { catalogueExtra, extraMaterialIdentity } from "./extra-material-identity";
 import { materialDocumentReferences } from "./supply-sources";
+import { draftBalanceExtras } from "./balance-count-extras";
 import {
   balancePreparationSaveSchema,
   balancePreparationMutationSchema,
@@ -131,6 +132,8 @@ export const balanceObservationSnapshot = z
       )
       .refine((value) => Object.keys(value).length <= 1000),
     notes: text(3000),
+    balanceExtras: draftBalanceExtras.optional(),
+    materialCategory: z.enum(["medicamentos", "higiene", "dieta"]).optional(),
     materials: z
       .array(
         z

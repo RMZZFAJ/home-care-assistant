@@ -17,6 +17,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { purchaseArrivalVariance } from "@/lib/documents/purchase";
 import { pendingPurchaseItems } from "@/lib/documents/pending-purchase-items";
+import { issuedBalanceExtras } from "@/lib/validation/balance-count-extras";
 
 const name = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const unit = (line: Record<string, unknown>) => String(line.unit_snapshot ?? "Unidade não preservada");
@@ -197,6 +198,11 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
       const reference = (line.metadata as { expectedQuantity?: unknown; } | undefined)?.expectedQuantity;
       return { category: category(line), cells: [{ text: String(index + 1).padStart(2, "0") }, { text: name(line) + "\n" + unit(line), key: "material/" + index + "/name", strong: true }, { text: amount(reference, unit(line)), key: "material/" + index + "/reference" }, { text: amount(line.quantity, unit(line)), key: "material/" + index + "/counted" }, { text: after + (application?.state === "applied" ? "\n" + formatBrazilDate(application.appliedAt) : ""), key: "material/" + index + "/balance" }] };
     })));
+    const extras = issuedBalanceExtras.parse(snapshot.payload.balanceExtras ?? []);
+    if (extras.length) {
+      layout.heading("Itens extras contados", "Quantidades encontradas com a equipe, aguardando identificação no catálogo.");
+      extras.forEach((extra, index) => layout.paragraph(extra.name + " · " + amount(extra.quantity, extra.unit), "balance/extra/" + index));
+    }
     if (snapshot.balanceReviews?.counter) layout.paragraph("Contagem registrada por " + (snapshot.balanceReviews.counter.name ?? "Nome não preservado") + " · " + formatBrazilDate(countAt), "balance/counter", { size: 9.5 });
     if (snapshot.balanceReviews?.notes && snapshot.balanceReviews.notes !== snapshot.payload.notes) {
       layout.heading("Observações desta contagem");

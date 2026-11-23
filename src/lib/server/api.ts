@@ -420,6 +420,10 @@ export function databaseError(
       "A referência da escala mudou. Confira a alteração e o balanço novamente antes de confirmar.",
       409,
     );
+  if (error?.code === "PT409" && message === "BAL extras changed since draft review")
+    throw new ApiError("VERSION_CONFLICT", "Os itens extras mudaram após a revisão. Confira o preenchimento antes de emitir.", 409);
+  if (error?.code === "22023" && /^(BAL extra matches patient catalogue|recount requires (previous materials|incorporated extra|previous extras))$/.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Confira os materiais da contagem anterior e os extras que já entraram no catálogo.", 400);
   if (
     /balance requires family deferral before schedule period change/i.test(
       message,

@@ -60,6 +60,10 @@ export function BalanceObservationSnapshot({
             </li>
           );
         })}
+        {content.balanceExtras?.map(extra => <li className="hca-record min-w-0" key={extra.id}>
+          <div className="hca-record-main wrap-break-word"><strong>{extra.name || "Item extra sem nome"}</strong>
+            <p>Quantidade anterior: {extra.quantity || "Não preenchida"} {extra.unit}</p></div>
+        </li>)}
       </ul>
       {content.notes ? (
         <p className="whitespace-pre-wrap wrap-break-word">{content.notes}</p>

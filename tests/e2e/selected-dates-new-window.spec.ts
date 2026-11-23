@@ -1,4 +1,5 @@
 import { startFocusProbe, attachFocusProbe } from "./focus-diagnostics";
+import { finishBalanceMaterials } from "./balance-wizard-stages";
 import { test, expect, type Page, type Locator } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import {
@@ -561,6 +562,7 @@ test("BAL em janela nova mostra a contagem de Sheila17 e conserva Juliana18 e se
     await page
       .getByLabel(`Material fictício V4 ${i} · unidade`, { exact: true })
       .fill(i ? "0" : "17");
+  await finishBalanceMaterials(page);
   await page
     .getByLabel("Observações da contagem", { exact: true })
     .fill("Contagem2 de Sheila, realizada em outra janela de plantão");

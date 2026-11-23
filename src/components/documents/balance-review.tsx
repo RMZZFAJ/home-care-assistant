@@ -13,7 +13,8 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import type { BalanceReviewContext, SupplyDocument } from "@/types/documents";
 
-import { BalanceMaterials } from "@/components/balances/balance-materials";
+import { BalanceMaterials, BalanceRecordedExtras } from "@/components/balances/balance-materials";
+import { issuedBalanceExtras } from "@/lib/validation/balance-count-extras";
 import { BalanceReviewItemFacts } from "@/components/balances/balance-review-items";
 import { BalanceApplication } from "@/components/balances/balance-application";
 
@@ -28,6 +29,7 @@ function referenceLabel(context: BalanceReviewContext) {
     : "A revisão confirma ou aponta diferenças na contagem. Aplicar a contagem ao estoque exige um ato separado, com referência válida e as revisões previstas.";
 }
 function CountFacts({ data, context }: { data: SupplyDocument; context: BalanceReviewContext; }) {
+  const extras = issuedBalanceExtras.safeParse(data.payload.balanceExtras ?? []);
   return (
     <div className="hca-form-stack hca-balance-facts">
       <DefinitionGrid items={[
@@ -51,6 +53,7 @@ function CountFacts({ data, context }: { data: SupplyDocument; context: BalanceR
       <details className="doc-help-details">
         <summary className="min-h-11"><Icon name="stock" width={16} height={16} />Comparar contagem e referência</summary>
         <BalanceMaterials rows={data.lines.map(line => ({ id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, counted: line.quantity, reference: line.metadata.expectedQuantity as string | number | null | undefined }))} />
+        {extras.success ? <BalanceRecordedExtras extras={extras.data} /> : <Notice error>Os dados dos extras desta contagem estão indisponíveis.</Notice>}
       </details>
     </div>
   );

@@ -1482,6 +1482,8 @@
 
 .hca-supply-wizard-body { padding: var(--supply-wizard-inset); min-width: 0; }
 .hca-supply-wizard-body > h2 { margin-block: 0 14px; font-size: 19px; line-height: 1.35; }
+.hca-balance-count-card .hca-supply-wizard-body { gap: 12px; }
+.hca-balance-count-card .hca-count-scan summary { color: var(--hca-teal); }
 .hca-wizard-intro { margin-block: 0 12px; color: #52685e; font-size: 12px; line-height: 1.6; }
 .hca-wizard-identity { margin-block-end: 14px; }
 .hca-wizard-person {

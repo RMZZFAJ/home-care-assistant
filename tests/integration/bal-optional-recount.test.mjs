@@ -241,6 +241,7 @@ test("legacy recount substitution and loss of eligibility remain actionable with
   assert.ifError((await assignRecount(f.family, f, f.target)).error);
   const before = JSON.parse(recountState(f)),
     replacement = await shiftWorker(f.patient);
+  const assignment = (await workspace(f.admin, f.patient)).eligibility.assignment;
   await shiftCommand(
     f.admin,
     f.patient,
@@ -249,6 +250,9 @@ test("legacy recount substitution and loss of eligibility remain actionable with
       id: f.target.id,
       professionalId: replacement.id,
       reason: "Substituição no mesmo plantão do reconto legado",
+      balanceImpact: { decision: "assign", assignmentId: assignment.id, assignmentVersion: assignment.version,
+        sourceVersion: f.target.version, targetShiftId: f.target.id, targetShiftVersion: f.target.version,
+        reason: "Família encaminhou a contagem para a substituta" },
     },
     f.target.version,
   );

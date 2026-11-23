@@ -15,6 +15,7 @@ export async function pendingRecount({
   referenceQuantity = "5",
   countQuantity = "2",
   stableCurrentWindow = false,
+  balanceExtras,
 } = {}) {
   const f = await balanceSetup({ stableCurrentWindow });
   sql(`update public.profiles set full_name='Juliana fictícia, contadora original' where id=${sqlLiteral(f.pro.id)};
@@ -48,6 +49,7 @@ export async function pendingRecount({
       quantity: i ? "0" : countQuantity,
     })),
     notes: "Observações originais da contagem um, por Juliana fictícia.",
+    ...(balanceExtras ? { balanceExtras } : {}),
     balanceAssignment: {
       id: assignment.id,
       version: assignment.version,
@@ -102,6 +104,8 @@ export async function substitute(f) {
     `update public.profiles set full_name='Sheila fictícia, substituta do reconto' where id=${sqlLiteral(second.id)};`,
   );
   const target = f.initial.targets.find((s) => s.id === f.assignment.shift_id);
+  const { eligibility } = await workspace(f.admin, f.patient);
+  const assignment = eligibility.assignment;
   await shiftCommand(
     f.admin,
     f.patient,
@@ -110,6 +114,10 @@ export async function substitute(f) {
       id: target.id,
       professionalId: second.id,
       reason: "Substituição formal da profissional no mesmo período do reconto",
+      balanceImpact: {
+        decision: "assign", assignmentId: assignment.id, assignmentVersion: assignment.version, sourceVersion: target.version,
+        targetShiftId: target.id, targetShiftVersion: target.version, reason: "Família confirmou a recontagem pela profissional substituta",
+      },
     },
     target.version,
   );

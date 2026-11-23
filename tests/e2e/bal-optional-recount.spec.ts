@@ -1,4 +1,5 @@
 import { selectDocumentSection } from "./document-sections";
+import { finishBalanceMaterials } from "./balance-wizard-stages";
 import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
@@ -108,6 +109,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
       await expect(input).toHaveValue("");
       await input.fill("1");
     }
+    await finishBalanceMaterials(counter);
     const notes = counter.getByLabel("Observações da contagem", {
       exact: true,
     });
