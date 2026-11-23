@@ -138,6 +138,11 @@ const consumptionPage = z.object({
     workflow_mode: z.enum(["legacy", "direct", "shortage"]).optional(),
     body: z.string(), created_at: z.iso.datetime({ offset: true }), version: z.number().int().positive(),
     reported_by: z.uuid(), reported_name: z.string().nullable(),
+    code: z.string().regex(/^(?:CON|FAL)-[A-F0-9]{8}$/).optional(),
+    materials: z.array(z.object({
+      productId: z.string().min(1), name: z.string().min(1),
+      quantity: z.string().max(64).regex(/^\d+(?:\.\d+)?$/), unit: z.string().nullable(),
+    })).max(100).optional(),
   })).max(20),
   next: consumptionCursor.nullable(),
 });

@@ -23,9 +23,8 @@ const drawer = (page: Page) =>
 const panel = (page: Page) =>
   drawer(page).getByRole("region", { name: "Rascunho privado", exact: true });
 async function open(page: Page) {
-  await page
-    .getByRole("button", { name: "Meu preenchimento de relato", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Mais opções de consumo", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Relatos anteriores", exact: true }).click();
   await drawer(page)
     .getByLabel("Custódia", { exact: true })
     .selectOption("FAMILY");

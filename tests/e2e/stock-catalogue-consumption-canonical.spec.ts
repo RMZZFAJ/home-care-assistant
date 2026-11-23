@@ -92,18 +92,39 @@ test("06.4 consumption canonical record preserves original author,complete text 
   sql(`update public.profiles set full_name=${q(author.trim())} where id=${q(reporter.id)};`);
   const id=await rpc(reporter.client,"report_extraordinary_consumption",{p_patient:f.patient,p_kind:"consumption",p_location:"FAMILY",p_text:body.trim(),p_lines:[{productId:f.products[0],quantity:"2"}],p_key:randomUUID()});
   sql(`update public.profiles set full_name='Nome atual diferente do relato' where id=${q(reporter.id)};`);
-  await login(page,f.patient);const before=facts(f.patient),sent=writes(page),ref=await model(browser,"ocorrencias");
+  await login(page,f.patient);
+  const before=facts(f.patient),sent=writes(page),referenceContext=await browser.newContext();
   try{
-    await page.goto(`/consumo?careRecipientId=${f.patient}`);const row=page.locator(`[data-consumption-id="${id}"]`),reference=ref.page.locator(".record").last();await expect(row).toContainText(author.trim());await expect(row).toContainText(body.trim());await expect(row).not.toContainText("Nome atual diferente do relato");
-    for(const width of widths){await page.setViewportSize({width,height:1100});await ref.page.setViewportSize({width,height:1100});for(const p of ["gap","padding-left","padding-top","border-bottom-color"] as const)await expect(row).toHaveCSS(p,await reference.evaluate((n,p)=>getComputedStyle(n).getPropertyValue(p),p));
-      if(width>500)await expect(row).toHaveCSS("display",await reference.evaluate(n=>getComputedStyle(n).display));
-      else {
-        // Full native report text exceeds the model summary. Its mobile variant
-        // uses the model file-record pattern: actions below readable content.
-        await expect(row).toHaveCSS("display","grid");
-        expect(await row.evaluate(n=>{const r=n.getBoundingClientRect(),main=n.querySelector(".hca-consumption-main")!.getBoundingClientRect(),end=n.querySelector(".hca-consumption-end")!.getBoundingClientRect();return main.width>=r.width*.6&&end.top>=main.bottom&&Math.abs(end.left-main.left)<1&&end.right<=r.right;})).toBe(true);
-      }for(const p of ["width","height","border-radius","background-color"] as const)await expect(row.locator(".hca-consumption-icon")).toHaveCSS(p,await reference.locator(".record-icon").evaluate((n,p)=>getComputedStyle(n).getPropertyValue(p),p));await auditFromTop(page,"canonical consumption record "+width);if(width===320)await capture(row,"consumption-record-"+info.project.name);}
+    const lab = await referenceContext.newPage();
+    await lab.route(/^https?:/, route => route.abort());
+    await lab.goto(pathToFileURL(resolve("hca-laboratorio-03-v4-aprovado.html")).href);
+    await lab.evaluate(() => {
+      const reference = (window as unknown as { HCA: { lab: { width: number }; launch: (scenario: string, state: string) => void } }).HCA;
+      reference.lab.width = 360;
+      reference.launch("E07-07", "pending");
+    });
+    const referenceCard = lab.locator(".st-record-card").first();
+    await expect(referenceCard).toBeVisible();
+
+    await page.goto(`/consumo?careRecipientId=${f.patient}`);
+    const row = page.locator(`[data-consumption-id="${id}"]`);
+    const card = row.getByRole("button", { name: "Abrir relato " + id, exact: true });
+    await expect(row).toContainText(author.trim());
+    await expect(row).toContainText(body.trim());
+    await expect(row).toContainText("2 unidade de " + name);
+    await expect(row).not.toContainText("Nome atual diferente do relato");
+    await expect(card).toHaveCSS("border-radius", await referenceCard.evaluate(node => getComputedStyle(node).borderRadius));
+    for (const width of widths) {
+      await page.setViewportSize({width, height:1100});
+      expect(await card.evaluate(node => {
+        const sections = [...node.querySelectorAll(".hca-consumption-card-top, .hca-consumption-card-title, .hca-consumption-card-materials, .hca-consumption-card-footer")];
+        return sections.length === 4 && sections.every((section, index) => index === 0
+          || section.getBoundingClientRect().top >= sections[index - 1].getBoundingClientRect().bottom);
+      })).toBe(true);
+      await auditFromTop(page, "canonical consumption record " + width);
+      if (width === 320) await capture(row, "consumption-record-" + info.project.name);
+    }
     await row.getByRole("button",{name:"Abrir relato "+id,exact:true}).click();const detail=page.getByRole("region",{name:"Detalhe do relato",exact:true});await expect(detail).toContainText(body.trim());await expect(detail.locator(".hca-material-review")).toContainText(name);await expect(detail.locator(".hca-material-review")).toContainText("2 unidade");await expect(detail.getByRole("button",{name:"Conferir consumo",exact:true})).toBeVisible();
     await page.emulateMedia({forcedColors:"active",reducedMotion:"reduce"});await auditFromTop(page,"consumption forced colors");expect(facts(f.patient)).toBe(before);expect(sent).toEqual([]);
-  }finally{await ref.context.close();}
+  }finally{await referenceContext.close();}
 });

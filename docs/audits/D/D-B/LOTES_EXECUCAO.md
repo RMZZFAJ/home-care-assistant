@@ -1792,6 +1792,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123060806_l3_fix_bilateral_delivery_reminders` | Aplicada | Aplicada |
 | `20261123070728_l3_material_stock_context` | Aplicada | Aplicada |
 | `20261123102624_l3_stock_operation_detail` | Aplicada | Aplicada |
+| `20261123110027_l3_consumption_list_materials` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2272,6 +2273,40 @@ O SonarCloud e o job de banco passaram em `acf440ef`. O recorte do Sonar exclui
 somente os dois HTMLs de referência aprovados de L2 e L3. Ambos permanecem
 nas comparações de navegador. O CodeRabbit publicou a primeira revisão
 automática na PR em rascunho.
+
+### Lista de Consumo e faltas
+
+- E07-07 segue a v4 com Todos, Consumos e Faltas, busca, painel de
+  filtros e cartões inteiros clicáveis. Os cartões mostram referência, custódia,
+  situação, materiais vigentes, texto registrado, autoria e horário.
+  Avisar falta e Registrar consumo ficam depois dos registros, conforme a
+  capacidade de escrever no estoque da equipe.
+- A busca consulta texto, referência e materiais no banco antes da paginação.
+  A referência curta é a mesma de Andamentos.
+  A projeção usa os nomes preservados e as quantidades da versão vigente.
+  Para uma linha sem nome preservado, usa o catálogo do paciente.
+  A consulta mantém as restrições de paciente e custódia.
+- O menu oferece a consulta por referência e reúne os dois antigos acessos
+  ao preenchimento de relatos em Relatos anteriores. O Preview e o
+  aplicativo publicado ainda compartilham o banco. As decisões e os
+  relatos do contrato anterior continuam disponíveis, incluindo os atos
+  iniciados nesse fluxo. O encerramento da abertura de novos relatos pelo
+  contrato anterior precisa ser coordenado com a atualização de produção.
+- Passaram seis integrações com Auth real. A busca por um nome ausente da
+  observação encontrou a quantidade corrigida e deixou de retornar o
+  registro quando o vínculo perdeu a leitura da custódia.
+- A migration `20261123110027_l3_consumption_list_materials.sql` foi
+  reconciliada nos dois ambientes. Antes da aplicação remota, a definição
+  anterior e seus grants foram conferidos e guardados no resguardo cifrado
+  verificado `cbada789-f004-41ff-ad4d-4a8cac83c736`. A nova leitura pública
+  continua reservada ao papel autenticado e a função auxiliar é privada.
+- Na rodada inicial, passaram 22 de 24 casos de Chromium, Android e iOS
+  emulados. No iOS, o cenário de 102 relatos esgotou o tempo de teste e
+  um clique na categoria do assistente esgotou o tempo de interação.
+  A paginação passou a conferir os cursores e a ordem usando as respostas
+  da própria navegação. Na rodada dirigida com o build final, passaram
+  os quatro casos de iOS, incluindo os anteriores, a referência curta,
+  o retorno de foco e a largura de 320 px.
 
 ### Início de contagem no plantão
 

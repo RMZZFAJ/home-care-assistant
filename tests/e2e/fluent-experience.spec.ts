@@ -233,7 +233,8 @@ test("ocorrências e notificações preservam saldos e distinguem estados no apl
   await page.goto("/consumo?careRecipientId=" + patientA);
   await expect(page.getByRole("heading", { name: "Relatos registrados", exact: true })).toBeVisible();
   await capture(page, "ocorrencias-lista", info.project.name);
-  await page.getByRole("button", { name: "Registrar ocorrência", exact: true }).click();
+  await page.getByRole("button", { name: "Mais opções de consumo", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Relatos anteriores", exact: true }).click();
   await page.getByRole("dialog",{name:"Registrar relato",exact:true}).getByLabel("Custódia",{exact:true}).selectOption("CARE_TEAM");
   await page.getByLabel("O que aconteceu?", { exact: true }).fill("Rascunho visual de ocorrência sem movimentação");
   await noOverflow(page);

@@ -2,7 +2,6 @@ import {
   expect,
   test,
   type Page,
-  type APIResponse,
   type Locator,
 } from "@playwright/test";
 import { readFileSync, mkdirSync } from "node:fs";
@@ -278,9 +277,8 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
   expect(delivery.lines[0].fully_checked).toBe(true);
   await login(page, f.patient, "professional");
   await page.goto("/consumo");
-  await page
-    .getByRole("button", { name: "Registrar ocorrência", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Mais opções de consumo", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Relatos anteriores", exact: true }).click();
   const drawer = page.getByRole("dialog", {
     name: "Registrar relato",
     exact: true,
@@ -809,6 +807,7 @@ test("falta conferida e rejeição motivada têm revisões próprias e nenhuma b
 test("relato anterior ao centésimo é acessível por referência e por todas as páginas, sem vazio falso em falha de leitura", async ({
   page,
 }) => {
+  test.setTimeout(60_000);
   const f = await setup(),
     old = await seedReport(f, "shortage", false);
   sql(
@@ -844,71 +843,68 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
     }),
   ).toBeVisible();
   fail = false;
+  type Cursor = { at: string; id: string };
+  const listResponse = (before: Cursor | null) => page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname === "/api/consumption"
+      && url.searchParams.get("careRecipientId") === f.patient
+      && url.searchParams.get("beforeAt") === (before?.at ?? null)
+      && url.searchParams.get("beforeId") === (before?.id ?? null);
+  });
+  const visibleIds = () => page.getByRole("button", { name: /^Abrir relato / }).evaluateAll(nodes => nodes.map(node => node.querySelector(".sr-only")!.textContent));
+  let pendingPage = listResponse(null);
   await page
     .getByRole("button", { name: "Atualizar lista", exact: true })
     .click();
-  await expect(
-    page.getByRole("button", { name: /^Abrir relato / }),
-  ).toHaveCount(20);
-  const visibleIds = () => page.getByRole("button", { name: /^Abrir relato / }).evaluateAll(nodes => nodes.map(node => node.querySelector(".sr-only")!.textContent));
-  for (let size = 20; size < order.length; size += 20) {
-    await expect.poll(visibleIds).toEqual(order.slice(0, size));
-    await page.getByRole("button", { name: "Carregar mais relatos", exact: true }).click();
-  }
-  await expect.poll(visibleIds).toEqual(order);
-  await expect(page.getByRole("button", { name: "Carregar mais relatos", exact: true })).toHaveCount(0);
-  let next: null | { at: string; id: string } = null;
   const found = new Set<string>();
-  let pages = 0;
-  do {
-    const query: URLSearchParams = new URLSearchParams({
-      careRecipientId: f.patient,
-      ...(next ? { beforeAt: next.at, beforeId: next.id } : {}),
-    });
-    const response: APIResponse = await page.request.get(
-      "/api/consumption?" + query,
-    );
+  for (let pageIndex = 0; pageIndex < Math.ceil(order.length / 20); pageIndex++) {
+    const response = await pendingPage;
     expect(response.ok()).toBe(true);
     const result: {
-      data: { id: string }[];
-      next: null | { at: string; id: string };
+      data: { id: string; created_at: string }[];
+      next: Cursor | null;
     } = await response.json();
-    if (pages === 0)
-      expect(result.data.some((row) => row.id === old)).toBe(false);
+    expect(result.data.map(row => row.id)).toEqual(order.slice(pageIndex * 20, (pageIndex + 1) * 20));
     for (const row of result.data) {
       expect(found.has(row.id)).toBe(false);
       found.add(row.id);
     }
-    next = result.next;
-    pages++;
-    expect(pages).toBeLessThan(8);
-  } while (next);
+    await expect.poll(visibleIds).toEqual([...found]);
+    if (found.size === order.length) {
+      expect(result.next).toBeNull();
+      break;
+    }
+    const last = result.data.at(-1)!;
+    expect(result.next).toEqual({ at: last.created_at, id: last.id });
+    pendingPage = listResponse(result.next);
+    await page.getByRole("button", { name: "Carregar mais relatos", exact: true }).click();
+  }
   expect(found.size).toBe(102);
   expect(found.has(old)).toBe(true);
   expect([...found]).toEqual(order);
+  await expect(page.getByRole("button", { name: "Carregar mais relatos", exact: true })).toHaveCount(0);
   await page.unroute("**/api/consumption?*");
-  await page
-    .getByRole("combobox", { name: "Tipo", exact: true })
-    .selectOption("shortage");
-  await page
-    .getByRole("button", { name: "Aplicar filtros", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Faltas", exact: true }).click();
   await expect(page).toHaveURL(/kind=shortage/);
   await detail(page)
     .getByRole("button", { name: "Voltar à lista", exact: true })
     .click();
   await expect(page).not.toHaveURL(/ref=/);
   await expect(
-    page.getByRole("combobox", { name: "Tipo", exact: true }),
-  ).toHaveValue("shortage");
+    page.getByRole("button", { name: "Faltas", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   const day = sql(`select to_char(created_at at time zone 'America/Sao_Paulo','YYYY-MM-DD') from public.consumption_reports where id=${sqlLiteral(old)};`);
-  await page.getByRole("textbox", { name: "Buscar no relato original", exact: true }).fill("Relato fictício preservado para decisão");
+  const filters = page.getByRole("button", { name: "Filtrar relatos", exact: true });
+  await page.getByRole("textbox", { name: "Buscar relato ou material", exact: true }).fill("Relato fictício preservado para decisão");
+  await filters.click();
   await page.getByLabel("Desde", { exact: true }).fill(day);
   await page.getByLabel("Até", { exact: true }).fill(day);
   await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await expect(filters).toBeFocused();
   await expect(page).toHaveURL(/q=Relato/);
   await expect.poll(visibleIds).toEqual([old]);
   await page.reload(); await expect.poll(visibleIds).toEqual([old]);
+  await filters.click();
   await expect(page.getByLabel("Desde", { exact: true })).toHaveValue(day);
   await expect(page.getByLabel("Até", { exact: true })).toHaveValue(day);
   await page.getByRole("combobox", { name: "Estado", exact: true }).selectOption("confirmed");

@@ -16,6 +16,8 @@ export type ConsumptionSummary = {
   version: number;
   reported_by: string;
   reported_name: string | null;
+  code?: string;
+  materials?: { productId: string; name: string; quantity: string; unit: string | null }[];
 };
 export type ConsumptionReport = ConsumptionSummary & {
   source_reminder_id?:string|null;

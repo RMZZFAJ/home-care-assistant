@@ -711,25 +711,49 @@ button.hca-stock-material-pending { cursor: pointer; }
 .hca-transit-material { padding: 16px 0; border-bottom: 1px solid #e6ede6; }
 .hca-transit-material:last-child { border-bottom: 0; }
 .hca-transit-material h3 { font-size: 13px; font-weight: 670; margin-bottom: 14px; overflow-wrap: anywhere; }
-.hca-consumption-records { padding: 0; margin: 0; list-style: none; background: var(--hca-paper); border: 1px solid var(--hca-line); border-radius: 15px; overflow: hidden; }
-.hca-consumption-record { display: flex; align-items: center; gap: 13px; padding: 16px 19px; border-bottom: 1px solid #eaf0ec; color: var(--hca-ink); min-width: 0; }
-.hca-consumption-record:last-child { border-bottom: 0; }
-.hca-consumption-icon { display: grid; place-items: center; width: 38px; height: 40px; border-radius: 10px; background: var(--hca-tint); color: var(--hca-teal); flex: none; }
-.hca-consumption-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.hca-consumption-main strong { display: block; font-size: 13px; font-weight: 670; }
-.hca-consumption-main :is(small,p) { display: block; font-size: 11px; margin-top: 3px; color: var(--hca-muted); }
-.hca-consumption-main p { font-size: 13px; line-height: 1.6; }
-.hca-consumption-end { display: grid; justify-items: end; text-align: right; gap: 4px; min-width: 0; }
-.hca-consumption-end .hca-control { white-space: normal; }
-@media (max-width: 500px) {
-  .hca-consumption-record { display: grid; grid-template-columns: 38px minmax(0,1fr); align-items: start; padding: 14px; }
-  .hca-consumption-main small { font-size: 10px; }
-  .hca-consumption-end { grid-column: 2; justify-items: start; text-align: left; }
+.hca-consumption-list { display: grid; gap: 12px; min-width: 0; }
+.hca-consumption-tools { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; align-items: center; }
+.hca-consumption-tools > button { width: 40px; height: 42px; padding: 8px; }
+.hca-consumption-search {
+  display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center;
+  min-width: 0; background: var(--hca-paper); border: 1px solid var(--hca-line); border-radius: 8px;
+}
+.hca-consumption-search .hca-text-input { min-height: 42px; border: 0; padding-inline-end: 0; }
+.hca-consumption-search > button { margin-inline: 3px; padding: 7px; }
+.hca-consumption-list-links { display: flex; align-items: center; gap: 6px; }
+.hca-consumption-records { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
+.hca-consumption-record { min-width: 0; }
+.hca-consumption-card {
+  display: block; width: 100%; padding: 16px; text-align: start; overflow-wrap: anywhere;
+  border: 1px solid var(--hca-line); border-radius: 15px; background: var(--hca-paper);
+  box-shadow: 0 2px 7px #153c2b04; color: var(--hca-ink); cursor: pointer;
+}
+.hca-consumption-card:hover { border-color: var(--hca-teal); }
+.hca-consumption-card:focus-visible, .hca-consumption-list .hca-stock-custody-tabs button:focus-visible {
+  outline: 3px solid #5aa99a; outline-offset: 2px;
+}
+.hca-consumption-card-content { display: grid; gap: 10px; }
+.hca-consumption-card-top, .hca-consumption-card-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--hca-muted); font-size: 12px;
+}
+.hca-consumption-card-top { flex-wrap: wrap; }
+.hca-consumption-card-title { display: flex; gap: 7px; align-items: center; font-size: 15px; }
+.hca-consumption-card-title > svg, .hca-consumption-card-footer > svg { flex: none; color: var(--hca-teal); }
+.hca-consumption-card-materials, .hca-consumption-card-note { display: block; line-height: 1.6; font-size: 13px; }
+.hca-consumption-card-note { white-space: pre-wrap; color: var(--hca-muted); }
+.hca-consumption-card-footer { border-top: 1px solid var(--hca-line); padding-top: 10px; }
+.hca-consumption-card-footer small { display: block; margin-top: 3px; font-size: 12px; }
+.hca-consumption-empty { display: grid; justify-items: center; gap: 8px; padding: 24px 12px; color: var(--hca-muted); text-align: center; }
+.hca-consumption-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 4px; }
+.hca-consumption-actions > button { white-space: normal; }
+@media (max-width: 560px) {
+  .hca-drawer-viewport:has(> .hca-consumption-sheet) { align-items: flex-end; }
+  .hca-drawer-viewport > .hca-consumption-sheet { height: auto; max-height: 87dvh; border-radius: 17px 17px 0 0; }
 }
 @media (forced-colors: active) {
-  .hca-table-frame,.hca-consumption-records,.hca-consumption-record { background: Canvas; color: CanvasText; border-color: CanvasText; }
-  .hca-table-frame td small,.hca-consumption-main :is(small,p),.hca-consumption-icon { color: CanvasText; }
-  .hca-consumption-icon { background: Canvas; border: 1px solid CanvasText; }
+  .hca-table-frame, .hca-consumption-card { background: Canvas; color: CanvasText; border-color: CanvasText; }
+  .hca-table-frame td small, .hca-consumption-card-content :is(small,svg), .hca-consumption-card-note { color: CanvasText; }
+  .hca-consumption-card:focus-visible, .hca-consumption-list .hca-stock-custody-tabs button:focus-visible { outline-color: Highlight; }
 }
 
 .hca-table-frame:focus-visible { outline: 3px solid #5aa99a; outline-offset: 2px; }

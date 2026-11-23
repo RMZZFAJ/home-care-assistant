@@ -124,14 +124,14 @@ a origem preservada sob sua autorização própria. Consulta, compensação,
 referências e atalhos permanecem separados. Trânsito conserva expedido,
 aceito, conciliado e pendente em leitura; esses valores não viram saldo.
 
-ConsumptionRecord reproduz o registro e ícone do modelo. Texto completo,
-autoria histórica, instante, custódia e situação permanecem visíveis. Materiais
-de relato e complemento usam MaterialReview; metadados e decisões usam a grade
-compartilhada. Relatar, complementar, confirmar e debitar continuam atos próprios.
-O texto integral exige a variante móvel de conteúdo longo: ícone e conteúdo
-ficam em duas colunas; situação e ação vêm abaixo do texto, como as ações dos
-registros de arquivos do modelo. Conserva espaçamentos, paleta e componentes,
-sem comprimir o relato numa coluna estreita ou ocultar trechos.
+Em Consumo e faltas, E07-07 usa os cartões inteiros clicáveis da v4,
+com tipo, custódia, situação, resumo dos materiais vigentes, texto preservado,
+autoria e instante. A busca, a paginação e os filtros de estado e período
+consultam os mesmos registros autorizados no banco. O painel de filtros
+abre pela lateral no desktop e pela base no celular. A lista diferencia
+Consumos e Faltas e oferece acesso ao estoque do mesmo paciente.
+Os detalhes usam MaterialReview para relato e complemento e a grade
+compartilhada para os atos preservados.
 
 FileRecord compartilha a composição de arquivos do modelo entre anexos,
 exemplares assinados e arquivos legados. Nome, fatos e ações permanecem

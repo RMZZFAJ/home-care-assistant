@@ -1395,8 +1395,9 @@ test("Flow legado mantém a conferência de relatos quando o autor tem somente p
   expect(reports).toHaveLength(1);
   const report = reports[0];
   const reportRow = page.locator(`[data-consumption-id="${report.id}"]`);
-  await expect(reportRow.locator(".hca-consumption-main strong")).toHaveText("Consumo · Equipe");
-  await expect(reportRow.locator(".hca-consumption-end")).toContainText("Aguardando conferência");
+  await expect(reportRow.getByText("Relato de consumo", { exact: true })).toBeVisible();
+  await expect(reportRow.getByText("Equipe", { exact: true })).toBeVisible();
+  await expect(reportRow.getByText("Aguardando conferência", { exact: true })).toBeVisible();
   expect(report).toMatchObject({
     kind: "consumption",
     location: "CARE_TEAM",
@@ -1418,8 +1419,9 @@ test("Flow legado mantém a conferência de relatos quando o autor tem somente p
   await decision
     .getByRole("button", { name: "Confirmar consumo e descontar", exact: true })
     .click();
-  await expect(reportRow.locator(".hca-consumption-main strong")).toHaveText("Consumo · Equipe");
-  await expect(reportRow.locator(".hca-consumption-end")).toContainText("Confirmado");
+  await expect(reportRow.getByText("Relato de consumo", { exact: true })).toBeVisible();
+  await expect(reportRow.getByText("Equipe", { exact: true })).toBeVisible();
+  await expect(reportRow.getByText("Confirmado", { exact: true })).toBeVisible();
   stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)

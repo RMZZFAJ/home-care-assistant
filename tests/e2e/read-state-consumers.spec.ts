@@ -93,7 +93,7 @@ test("D3 consumo distingue demora vazio dados falha e repetição sem inventar m
     mode = "live"; await page.getByRole("button", { name: "Atualizar lista", exact: true }).click();
     await expect(panel.getByText(text, { exact: true })).toBeVisible(); await expect(panel.getByRole("alert")).toHaveCount(0);
     for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "D3 consumption read " + width); }
-    const query = panel.getByLabel("Buscar no relato original", { exact: true }); await query.fill("Termo fictício sem correspondência"); await panel.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+    const query = panel.getByLabel("Buscar relato ou material", { exact: true }); await query.fill("Termo fictício sem correspondência"); await panel.getByRole("button", { name: "Buscar relatos", exact: true }).click();
     await expect(panel.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible(); await expect(panel.getByText(text, { exact: true })).toHaveCount(0);
     const report = (await (await page.request.get("/api/consumption?careRecipientId=" + f.patient)).json()).data;
     expect(report).toHaveLength(1); expect(report[0].body).toBe(text); expect(report[0].status).toBe("reported");

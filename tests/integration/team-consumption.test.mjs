@@ -128,6 +128,21 @@ test("team consumption issues directly, corrects by differences, and compensates
   const correctedMetrics = await metrics(correctionCutoff);
   assert.deepEqual(metricValues(correctedMetrics), [2, 4]);
   assert.deepEqual(await f.quantities(), started.map((row, i) => ({ ...row, team: row.team - [2, 4][i] })));
+  const expectedMaterials = (await rpc(f.professional, "consumption_record_detail", { p_id: initial.id })).current_lines;
+  const listInput = {
+    p_patient: f.patient, p_kind: "consumption", p_status: "recorded",
+    p_search: expectedMaterials[0].name.toUpperCase(),
+    p_reminder: null, p_from: null, p_until: null, p_before_at: null, p_before_id: null,
+  };
+  const [listed] = await rpc(f.professional, "consumption_record_list", listInput);
+  assert.equal(listed.id, initial.id);
+  assert.equal(listed.version, 2);
+  assert.equal(listed.code, "CON-" + initial.id.slice(0, 8).toUpperCase());
+  assert.deepEqual(listed.materials, expectedMaterials);
+  assert.deepEqual((await rpc(f.professional, "consumption_record_list", {
+    ...listInput, p_search: listed.code.toLowerCase(),
+  })).map(row => row.id), [initial.id]);
+  assert.deepEqual(await rpc(f.professional, "consumption_record_list", { ...listInput, p_kind: "shortage" }), []);
   const cancelled = { action: "cancel", reportId: initial.id, expectedVersion: 2, reason: "Registro substituído pela equipe do plantão." };
   const cancelKey = randomUUID();
   const final = await f.command(cancelled, cancelKey);
@@ -306,7 +321,9 @@ test("Andamentos link real consumption, shortage and document records without ch
     p_patient: f.patient, p_kind: "consumption", p_status: "recorded", p_search: "",
     p_reminder: null, p_from: null, p_until: null, p_before_at: null, p_before_id: null,
   };
-  assert.deepEqual((await rpc(f.professional, "consumption_record_list", listInput)).map(row => row.id), [consumption.id]);
+  const [visible] = await rpc(f.professional, "consumption_record_list", listInput);
+  assert.equal(visible.id, consumption.id);
+  listInput.p_search = visible.materials[0].name;
 
   sql(`insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled)
     values(${q(f.patient)},'stock.team.read',${q(fixtures.professional.id)},false)`);
