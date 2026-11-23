@@ -56,7 +56,40 @@ test("estoque ignora custódia tardia e mantém erro e vazio distintos com saldo
  const f=await setup(),before=official(f.patient);await page.addInitScript(()=>{const native=window.fetch.bind(window);window.fetch=(input,init)=>{const url=new URL(typeof input==="string"?input:input instanceof URL?input.href:input.url,location.origin);return native(input,url.pathname==="/api/stock/balances"?{...init,signal:undefined}:init);};});await login(page,f.patient,"family");
  let release!:()=>void,entered!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve;}),oldEntered=new Promise<void>(resolve=>{entered=resolve;});let mode:"live"|"error"|"empty"="live";
  await page.route("**/api/stock/balances?*",async route=>{const custody=new URL(route.request().url()).searchParams.get("custody");if(custody==="TRANSIT"){const response=await route.fetch();entered();await gate;return route.fulfill({response});}if(mode==="error")return route.fulfill({status:500,json:{code:"INTERNAL_ERROR",error:"Falha controlada na consulta do saldo"}});if(mode==="empty"){const response=await route.fetch();return route.fulfill({response,json:{...await response.json(),overview:[],data:[],metrics:[],transit:[]}});}return route.continue();});
- try{await page.goto(`/estoque?careRecipientId=${f.patient}&custody=FAMILY`);const balances=page.getByRole("region",{name:"Saldos e previsões",exact:true}),row=balances.getByRole("region",{name:"Material fictício V4 0 · Família",exact:true}),filter=page.getByRole("combobox",{name:"Custódia",exact:true});await expect(row).toContainText("30");await filter.focus();await filter.selectOption("TRANSIT");await oldEntered;await expect(balances).toHaveAttribute("aria-busy","true");await expect(row).toHaveCount(0);await filter.selectOption("FAMILY");await expect(row).toContainText("30");await expect(filter).toBeFocused();const oldResponse=page.waitForResponse(response=>new URL(response.url()).pathname==="/api/stock/balances"&&new URL(response.url()).searchParams.get("custody")==="TRANSIT");release();await(await oldResponse).finished();await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));await expect(filter).toHaveValue("FAMILY");await expect(row).toContainText("30");
-  mode="error";await balances.getByRole("button",{name:"Atualizar saldos",exact:true}).click();await expect(balances.getByRole("alert")).toContainText("Falha controlada na consulta do saldo");await expect(balances.getByText("Última consulta válida",{exact:false})).toBeVisible();await expect(row).toContainText("30");mode="empty";await balances.getByRole("button",{name:"Atualizar saldos",exact:true}).click();await expect(balances.getByText("Nenhum material encontrado",{exact:true})).toBeVisible();await expect(balances).toHaveAttribute("aria-busy","false");await widths(page,"D3 stock current filter empty");expect(official(f.patient)).toBe(before);
+ try {
+  await page.goto(`/estoque?careRecipientId=${f.patient}&custody=FAMILY`);
+  const balances = page.getByRole("region", { name: "Saldos e previsões", exact: true });
+  const row = balances.getByRole("region", { name: "Material fictício V4 0 · Família", exact: true });
+  const family = balances.getByRole("button", { name: "Família", exact: true });
+  const opener = balances.getByRole("button", { name: "Em trânsito", exact: true });
+  const transit = page.getByRole("dialog", { name: "Materiais em trânsito", exact: true });
+  const refresh = page.getByRole("button", { name: "Atualizar saldos", exact: true });
+  await expect(row).toContainText("30");
+  await opener.click();
+  await oldEntered;
+  await expect(transit.getByText("Consultando os materiais em trânsito", { exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(transit).toHaveCount(0);
+  await expect(opener).toBeFocused();
+  const oldResponse = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname === "/api/stock/balances" && url.searchParams.get("custody") === "TRANSIT";
+  });
+  release();
+  await (await oldResponse).finished();
+  await expect(family).toHaveAttribute("aria-pressed", "true");
+  await expect(transit).toHaveCount(0);
+  await expect(row).toContainText("30");
+  mode = "error";
+  await refresh.click();
+  await expect(balances.getByRole("alert")).toContainText("Falha controlada na consulta do saldo");
+  await expect(balances.getByText("Última consulta válida", { exact: false })).toBeVisible();
+  await expect(row).toContainText("30");
+  mode = "empty";
+  await refresh.click();
+  await expect(balances.getByText("Nenhum material encontrado", { exact: true })).toBeVisible();
+  await expect(balances).toHaveAttribute("aria-busy", "false");
+  await widths(page, "D3 stock current filter empty");
+  expect(official(f.patient)).toBe(before);
  }finally{release?.();}
 });

@@ -48,6 +48,14 @@ test("06.4 stock transit and movement cards retain four factual quantities and d
   await page.goto(`/estoque?careRecipientId=${f.patient}&custody=TRANSIT`);
   const transit=page.locator(".hca-transit-stock"),line=transit.locator(".hca-transit-material");await expect(line).toContainText(originalName);
   for(const [label,value] of [["Expedido","5 unidade"],["Aceito no destino","0 unidade"],["Conciliado","0 unidade"],["Aguardando conferência","5 unidade"]])await expect(line.locator(".hca-definition-grid > div").filter({has:page.getByText(label,{exact:true})}).locator("dd")).toHaveText(value);
+    await page.setViewportSize({width:360,height:850});
+    const opener = line.getByRole("button", { name: doc.code, exact: true });
+    await opener.click();
+    const complete = page.getByRole("dialog", { name: doc.code, exact: true });
+    await expect(complete.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
+    await expect(complete.locator("[data-visit-material=true]")).toContainText("Material consultado");
+    await complete.getByRole("button", { name: "Voltar ao painel", exact: true }).click();
+    await expect(opener).toBeFocused();
     for(const width of widths){await page.setViewportSize({width,height:1100});await auditFromTop(page,"canonical transit "+width);}
     await page.goto(`/estoque?careRecipientId=${f.patient}&custody=FAMILY`);
     await expect(page.locator("[data-stock-act]")).toHaveCount(2);
@@ -58,7 +66,8 @@ test("06.4 stock transit and movement cards retain four factual quantities and d
     await page.emulateMedia({forcedColors:"active",reducedMotion:"reduce"});await auditFromTop(page,"stock history forced colors");await page.emulateMedia({forcedColors:"none",reducedMotion:"no-preference"});
     await row.getByRole("button",{name:/^Consultar origem ·/}).click();
     const drawer=page.getByRole("dialog",{name:"Origem da movimentação",exact:true});await expect(drawer.getByRole("region",{name:"Material na ficha de origem",exact:true})).toContainText(originalName);
-    expect(facts(f.patient)).toBe(before);expect(sent).toEqual([]);
+    expect(facts(f.patient)).toBe(before);
+    expect(sent.map(url => new URL(url).pathname)).toEqual([`/api/documents/${doc.id}/access`]);
 });
 
 test("06.4 catalogue units and presentations retain aliases,precision,leading zero and conversion across canonical table cards", async ({page,browser},info) => {

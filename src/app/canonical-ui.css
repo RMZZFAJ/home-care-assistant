@@ -441,11 +441,8 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 }
 
 /* Stock rows use the model's single table/card composition at its850px breakpoint. */
-.hca-stock-filters { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)); align-items: start; gap: 12px; margin-block: 16px; }
 .hca-stock-results { display: grid; gap: 12px; min-width: 0; }
 @media (max-width: 850px) {
-  .hca-stock-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
-  .hca-stock-filters > :first-child { grid-column: 1 / -1; }
   .hca-mobile-records { min-width: 0; }
   .hca-mobile-records thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .hca-mobile-records tbody { display: block; }
@@ -456,11 +453,25 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
   .hca-mobile-records tbody td[data-label]::before { content: attr(data-label); display: block; color: var(--hca-muted); font-size: 10px; font-weight: 400; }
   .hca-mobile-records tbody td:last-child { align-self: center; }
 }
-@media (max-width: 500px) {
-  .hca-stock-filters { grid-template-columns: minmax(0, 1fr); }
-}
-
 .hca-stock-console { overflow-wrap: anywhere; }
+.hca-l1 .page-heading.hca-stock-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 8px; }
+.hca-stock-heading > div:first-child { min-width: 0; }
+.hca-stock-subtitle { color: var(--hca-muted); font-size: 13px; line-height: 1.6; margin: 7px 0 0; }
+.hca-stock-heading-actions { display: flex; flex: none; gap: 4px; margin-top: 14px; }
+.hca-stock-heading-actions button, .hca-stock-tools > button { min-width: 40px; min-height: 40px; padding: 8px; }
+.hca-stock-balances { display: grid; gap: 14px; min-width: 0; }
+.hca-stock-custody-tabs { display: flex; flex-wrap: wrap; gap: 20px; border-bottom: 1px solid var(--hca-line); }
+.hca-stock-custody-tabs button { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0 2px; border-bottom: 2px solid transparent; color: var(--hca-muted); font-size: 13px; cursor: pointer; }
+.hca-stock-custody-tabs button[aria-pressed="true"] { color: var(--hca-teal); border-color: currentColor; font-weight: 700; }
+.hca-stock-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.hca-stock-tools .hca-input-adornment > input.hca-text-input { padding-inline-start: 38px; }
+.hca-stock-list-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.hca-stock-list-meta > p { margin: 0; }
+.hca-transit-material-heading { display: flex; align-items: center; gap: 10px; }
+.hca-transit-material-heading > div { min-width: 0; }
+.hca-transit-material-heading small, .hca-transit-record > p { color: var(--hca-muted); font-size: 12px; }
+.hca-transit-record { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--hca-line); }
+.hca-transit-record-heading { display: flex; align-items: start; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
 .hca-stock-ledger { display: grid; gap: 8px; margin-top: 14px; }
 .hca-shift-hub-nav { display: flex; gap: clamp(12px, 5vw, 24px); border-bottom: 1px solid var(--hca-line); }
 .hca-shift-hub-nav a { min-height: 44px; display: inline-flex; align-items: center; padding-inline: 4px; border-bottom: 3px solid transparent; color: var(--hca-muted); font-size: 14px; font-weight: 650; }
@@ -484,7 +495,7 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 .hca-stock-act-links { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 0 0 6px; font-size: 12px; }
 .hca-stock-act-links > a { min-height: 36px; display: inline-flex; align-items: center; padding: 0 6px; }
 .hca-stock-act-reason { font-size: 12px; margin: 0 0 8px; color: var(--hca-muted); white-space: pre-wrap; }
-.hca-stock-material-list { display: grid; gap: 10px; margin-top: 12px; }
+.hca-stock-material-list { display: grid; gap: 10px; }
 .hca-stock-material-card { background: white; border: 1px solid var(--hca-line); border-radius: 14px; padding: 12px; min-width: 0; }
 .hca-stock-material-heading, .hca-stock-material-pending { display: grid; grid-template-columns: auto minmax(0, 1fr) 17px; align-items: center; gap: 10px; width: 100%; text-align: start; }
 .hca-stock-material-heading { border-radius: 9px; cursor: pointer; padding: 2px; }
@@ -501,7 +512,7 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
 .hca-stock-custody-label { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 620; }
 .hca-stock-custody-quantity { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
 .hca-stock-custody-quantity strong { font-size: 22px; }
-.hca-stock-custody-quantity span, .hca-stock-custody small, .hca-stock-custody time { font-size: 11px; color: var(--hca-muted); }
+.hca-stock-custody-quantity span, .hca-stock-custody small, .hca-stock-custody time { font-size: 11px; color: var(--hca-ink); }
 .hca-stock-custody[data-tone="danger"] .hca-stock-custody-quantity strong { color: var(--hca-red); }
 .hca-stock-custody[data-tone="warning"] .hca-stock-custody-quantity strong { color: var(--hca-amber); }
 .hca-stock-material-pending { padding: 9px 3px 3px; margin-top: 8px; border-top: 1px solid var(--hca-line); font-size: 12px; }

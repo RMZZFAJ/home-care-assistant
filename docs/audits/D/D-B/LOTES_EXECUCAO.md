@@ -2933,6 +2933,28 @@ A migration foi aplicada após o backup cifrado verificado
 `17e256d7-1c6e-4c60-bb8d-9cafd70d3d8a`. Local e remoto registram
 352 versões, com a fila vinculada vazia.
 
+### Estoques e trânsito em telas estreitas
+
+- E07-01 segue a composição do laboratório com cabeçalho compacto,
+  custódias em linha, busca, filtro em painel e total ao lado da ação de
+  trânsito. A busca mantém os materiais em primeiro plano. O filtro de
+  saldo continua considerando o saldo confirmado da custódia.
+- Compras, chegadas e movimentações familiares ficam acessíveis pelo
+  menu do estoque e pelos controles autorizados na página. O histórico
+  paginado e o atalho de consumo continuam disponíveis conforme as
+  permissões do vínculo. O aviso de leitura anterior permanece visível
+  quando uma atualização falha.
+- E07-03 agrupa o trânsito por material e conserva os fatos por ficha.
+  A ficha completa abre em Materiais com destaque do item. A volta ao
+  painel conserva a consulta de trânsito e devolve o foco ao acionador.
+  O link existente com `custody=TRANSIT` abre o mesmo painel.
+- O contraste das legendas no card de saldo crítico foi ajustado após
+  as auditorias do navegador identificarem uma relação de 4,3:1.
+- Nas capturas locais de 360 e 412 px, o primeiro material aparece na
+  área visível, com o cabeçalho e as ações na mesma linha. A largura
+  útil fica contida na tela. Fechar a consulta devolve o foco ao item.
+  As capturas são de navegador emulado com dados fictícios.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

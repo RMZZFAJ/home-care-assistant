@@ -16,6 +16,7 @@ const paths = {
   "undo": "M3 4v7h7 M3 11a9 9 0 1 1 1 6",
   "plus": "M12 5v14 M5 12h14",
   "search": "M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0 M15 15l6 6",
+  "filter": "M3 5h18l-7 8v7l-4-2v-5Z",
   "arrow": "M4 12h16 M14 6l6 6-6 6",
   "back": "M20 12H4 M10 6l-6 6 6 6",
   "send": "m22 2-7 20-4-9-9-4Z M22 2 11 13",

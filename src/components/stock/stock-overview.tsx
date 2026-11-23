@@ -36,7 +36,7 @@ function purchaseFacts(stock: StockBalanceRow["stock"]) {
 
 export function StockOverview({
   context, products, custody, allowedCustodies, metrics, queriedAt, onTransit,
-  filter = "all", showEmpty = true,
+  onClearFilters, filter = "all", showEmpty = true,
 }: {
   context: WorkspaceContext;
   products: ProductStock[];
@@ -44,7 +44,8 @@ export function StockOverview({
   allowedCustodies: string[];
   metrics: StockMetric[];
   queriedAt: string | null;
-  onTransit: (product: ProductStock) => void;
+  onTransit?: (opener: HTMLElement, product?: ProductStock) => void;
+  onClearFilters: () => void;
   filter?: StockBalanceFilter;
   showEmpty?: boolean;
 }) {
@@ -65,10 +66,18 @@ export function StockOverview({
   const selected = selection && grouped.get(selection.productId);
   const selectedProduct = selected?.[0]?.product;
   return <div className="hca-stock-results" ref={listRef} tabIndex={-1}>
-    <p className="hca-field-hint" role="status">
-      {groups.length} {groups.length === 1 ? "material neste filtro" : "materiais neste filtro"}.
-      {groups.length > 15 ? ` Exibindo ${(currentPage - 1) * 15 + 1} a ${Math.min(currentPage * 15, groups.length)}.` : ""}
-    </p>
+    <div className="hca-stock-list-meta">
+      <p className="hca-field-hint" role="status">
+        {groups.length} {groups.length === 1 ? "material" : "materiais"}<span className="sr-only"> neste filtro</span>
+        {filter !== "all" ? " · filtro aplicado" : ""}
+        {groups.length > 15 ? <span className="sr-only">
+          { ` · exibindo ${(currentPage - 1) * 15 + 1} a ${Math.min(currentPage * 15, groups.length)}` }
+        </span> : null}
+      </p>
+      {onTransit ? <ActionButton compact onClick={event => onTransit(event.currentTarget)}>
+        <Icon name="truck" width={17} height={17} /> Em trânsito
+      </ActionButton> : null}
+    </div>
     {visible.length ? <section className="hca-stock-material-list" aria-label="Saldos por produto e custódia">
       {visible.map(entries => {
         const product = entries[0].product;
@@ -92,12 +101,17 @@ export function StockOverview({
             })}
           </div>
           {entries.flatMap(({ custody: key, stock }) => [
-            ...(quantity(stock.incoming).gt(0) ? [<button key={key + ":transit"} type="button" className="hca-stock-material-pending"
-              onClick={() => onTransit(product)}>
-              <Icon name="truck" width={16} height={16} />
-              <span><strong>{formatQuantity(stock.incoming, product.unit)} em trânsito</strong><small>Destino · {labels[key]}</small></span>
-              <Icon name="chevron" width={15} height={15} />
-            </button>] : []),
+            ...(quantity(stock.incoming).gt(0) ? [
+              onTransit ? <button key={key + ":transit"} type="button" className="hca-stock-material-pending"
+                onClick={event => onTransit(event.currentTarget, product)}>
+                <Icon name="truck" width={16} height={16} />
+                <span><strong>{formatQuantity(stock.incoming, product.unit)} em trânsito</strong><small>Destino · {labels[key]}</small></span>
+                <Icon name="chevron" width={15} height={15} />
+              </button> : <div key={key + ":transit"} className="hca-stock-material-pending">
+                <Icon name="truck" width={16} height={16} />
+                <span><strong>{formatQuantity(stock.incoming, product.unit)} em trânsito</strong><small>Destino · {labels[key]}</small></span>
+              </div>,
+            ] : []),
             ...(quantity(stock.disputed ?? 0).gt(0) ? [<div className="hca-stock-material-pending" key={key + ":disputed"}>
               <Icon name="alert" width={16} height={16} />
               <span><strong>Divergência pendente</strong><small>{formatQuantity(stock.disputed ?? "0", product.unit)} · {labels[key]}</small></span>
@@ -109,7 +123,10 @@ export function StockOverview({
           ])}
         </article>;
       })}
-    </section> : showEmpty ? <EmptyState title="Nenhum material encontrado">Ajuste a busca ou limpe os filtros.</EmptyState> : null}
+    </section> : showEmpty ? <EmptyState title="Nenhum material encontrado"
+      action={<ActionButton compact onClick={onClearFilters}>Limpar filtros</ActionButton>}>
+      Tente outro nome ou remova os filtros.
+    </EmptyState> : null}
     {pageCount > 1 ? <nav aria-label="Páginas dos saldos" className="hca-pagination">
       <ActionButton disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>Anterior</ActionButton>
       <span>{currentPage} / {pageCount}</span>

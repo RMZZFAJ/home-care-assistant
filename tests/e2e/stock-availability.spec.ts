@@ -175,7 +175,7 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
     }),
   ).toHaveCount(2);
   stockFailure = false;
-  await balances
+  await page
     .getByRole("button", { name: "Atualizar saldos", exact: true })
     .click();
   await expect(
@@ -186,7 +186,7 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
       }),
   ).toContainText("30");
   stockFailure = true;
-  await balances
+  await page
     .getByRole("button", { name: "Atualizar saldos", exact: true })
     .click();
   await expect(
@@ -206,8 +206,8 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
   ).toContainText("30");
   // A failure under another custody must not label old FAMILY data as CARE_TEAM.
   await page
-    .getByRole("combobox", { name: "Custódia", exact: true })
-    .selectOption("CARE_TEAM");
+    .getByRole("group", { name: "Custódia", exact: true })
+    .getByRole("button", { name: "Equipe", exact: true }).click();
   await expect(
     balances.getByText("Saldos ainda não consultados com sucesso.", {
       exact: true,
@@ -226,7 +226,7 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
   ).toHaveCount(0);
   stockFailure = false;
   historyFailure = false;
-  await balances
+  await page
     .getByRole("button", { name: "Atualizar saldos", exact: true })
     .click();
   await history

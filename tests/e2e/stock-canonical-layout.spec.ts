@@ -66,8 +66,17 @@ const row = (page: Page, index: number, custody = "Família") =>
     name: names[index] + " · " + custody,
     exact: true,
   });
+async function filterBalances(page: Page, value: string) {
+  const opener = balances(page).getByRole("button", { name: "Filtrar estoque", exact: true });
+  await opener.click();
+  const dialog = page.getByRole("dialog", { name: "Filtrar estoque", exact: true });
+  await dialog.getByRole("combobox", { name: "Filtro de saldo", exact: true }).selectOption(value);
+  await dialog.getByRole("button", { name: "Aplicar filtro", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(opener).toBeFocused();
+}
 
-test("estoque canônico conserva101 materiais,filtra saldo exato e mantém mínimo,situação e detalhes nas cinco larguras", async ({
+test("estoque canônico conserva 101 materiais, filtra saldo exato e mantém mínimo, situação e detalhes nas larguras de referência", async ({
   page,
 }, info) => {
   await login(page, "adminA");
@@ -124,11 +133,7 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
     .getByRole("textbox", { name: "Buscar produto", exact: true })
     .fill("");
   await expect(pages).toContainText("1 / 7");
-  const filter = balances(page).getByRole("combobox", {
-    name: "Filtro de saldo",
-    exact: true,
-  });
-  await filter.selectOption("low");
+  await filterBalances(page, "low");
   await expect(
     materials(page).getByRole("region", { name: /^Material canônico/ }),
   ).toHaveCount(2);
@@ -137,7 +142,7 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
     has: page.getByRole("region", { name: names[0] + " · Família", exact: true }),
   })).toContainText("Inativo");
   await expect(row(page, 1)).toContainText("No mínimo");
-  await filter.selectOption("zero");
+  await filterBalances(page, "zero");
   await expect(
     materials(page).getByRole("region", { name: /^Material canônico/ }),
   ).toHaveCount(1);
@@ -146,8 +151,9 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
     name: "Consultar " + names[100] + " · Família",
     exact: true,
   });
-  for (const width of [1440, 1150, 850, 500, 320]) {
+  for (const width of [1440, 1150, 850, 500, 320, 360, 412]) {
     await page.setViewportSize({ width, height: 940 });
+    await expect(page.locator(".hca-stock-heading")).toHaveCSS("display", "grid");
     await expect(row(page, 100)).toHaveCSS("display", "grid");
     await expect(row(page, 100)).toHaveAttribute("data-tone", "danger");
     await expect(
@@ -155,7 +161,7 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
         .getByText("Mínimo não definido", { exact: true }),
     ).toBeVisible();
     await auditFromTop(page, `stock-canonical-${width}`);
-    if (width === 1440 || width === 320)
+    if (width === 1440 || width === 360 || width === 412)
       await info.attach(`stock-canonical-${info.project.name}-${width}`, {
         body: await balances(page)
           .locator(".hca-stock-results")
@@ -163,6 +169,7 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
         contentType: "image/png",
       });
   }
+  await page.setViewportSize({ width: 320, height: 940 });
   await opener.click();
   const detail = page.getByRole("dialog", {
     name: names[100],
@@ -173,7 +180,7 @@ test("estoque canônico conserva101 materiais,filtra saldo exato e mantém míni
   ).toHaveText("0 unidade");
   for (const label of [
     "Entrada em trânsito",
-    "Consumo confirmado · 30 dias",
+    "Consumo registrado · 30 dias",
     "Divergência pendente",
   ]) {
     await expect(
@@ -210,12 +217,10 @@ test("filtro de estoque conserva autorização real da equipe e não revela sald
   ).toBe(true);
   await expect(
     balances(page)
-      .getByRole("combobox", { name: "Custódia", exact: true })
-      .getByRole("option", { name: "Família", exact: true }),
+      .getByRole("group", { name: "Custódia", exact: true })
+      .getByRole("button", { name: "Família", exact: true }),
   ).toHaveCount(0);
-  await balances(page)
-    .getByRole("combobox", { name: "Filtro de saldo", exact: true })
-    .selectOption("zero");
+  await filterBalances(page, "zero");
   await expect(
     balances(page)
       .getByRole("status")
