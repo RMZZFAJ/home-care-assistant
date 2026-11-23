@@ -1711,6 +1711,7 @@ export function SupplyDocumentContent({
                   active={tabs.value === "files"}
                   generationBlocked={stale || Boolean(arrivalReadFailure)}
                   readOnly={archived}
+                  consolidatedId={archive?.issuanceId}
                   actionTarget={fileActionTarget}
                   onAction={() => tabs.select("files")}
                   id={id}

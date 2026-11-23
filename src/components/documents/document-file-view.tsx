@@ -4,7 +4,9 @@ import Link from "next/link";
 import { Workspace, Notice } from "@/components/workspace";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { api } from "@/lib/client/api";
+import { activeDocumentArchive } from "@/lib/documents/document-archive";
 import { DocumentActions } from "./document-actions";
+type ArchiveDocument = { id: string; code: string; version: number; workflow_data?: { documentArchive?: unknown } };
 export function DocumentFileView({
   id,
   version,
@@ -16,17 +18,13 @@ export function DocumentFileView({
 }) {
   const { data, loading } = useWorkspaceState(),
     doc = data?.documentContext?.id === id ? data.documentContext : null;
-  const [record, setRecord] = useState<{
-      id: string;
-      code: string;
-      version: number;
-    } | null>(null),
+  const [record, setRecord] = useState<ArchiveDocument | null>(null),
     [error, setError] = useState("");
   const currentRecord = record?.id === id ? record : null;
   useEffect(() => {
     if (!doc) return;
     const controller = new AbortController();
-    void api<{ data: { id: string; code: string; version: number } }>(
+    void api<{ data: ArchiveDocument }>(
       `/api/documents/${id}`,
       undefined,
       controller.signal,
@@ -71,6 +69,7 @@ export function DocumentFileView({
                 code={currentRecord.code}
                 version={currentRecord.version}
                 archiveVersion={version}
+                consolidatedId={activeDocumentArchive(currentRecord.workflow_data?.documentArchive)?.issuanceId}
                 trackNotices={false}
               />
             ) : (

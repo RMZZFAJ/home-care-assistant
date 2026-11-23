@@ -200,10 +200,15 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     ).toHaveCount(1);
     await selectDocumentSection(family, "files");
     await generateStandardPdf(family);
+    const identification = family.getByRole("dialog", { name: "Ficha", exact: true });
+    const more = family.getByRole("list", { name: "Exemplares registrados" })
+      .getByRole("listitem").filter({ has: family.getByRole("link", { name: "Visualizar", exact: true }) }).first()
+      .getByRole("button", { name: "Identificação do exemplar", exact: true });
+    await more.click();
     await expect(
-      family.getByRole("button", { name: "Compartilhar PDF", exact: true }),
+      identification.getByRole("button", { name: "Compartilhar PDF", exact: true }),
     ).toBeEnabled({ timeout: 15000 });
-    await family
+    await identification
       .getByRole("button", { name: "Compartilhar PDF", exact: true })
       .click();
     await expect
@@ -222,6 +227,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
             .header,
       ),
     ).toBe("%PDF-");
+    await identification.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
     await expect(
       family.getByText("Documento salvo.", { exact: false }).first(),
     ).toBeVisible({ timeout: 12000 });
@@ -243,9 +249,11 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     );
     await family.clock.install();
     await family.reload();
+    await more.click();
     await expect(
-      family.getByRole("button", { name: "Compartilhar PDF", exact: true }),
+      identification.getByRole("button", { name: "Compartilhar PDF", exact: true }),
     ).toBeEnabled();
+    await identification.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
     await expect.poll(() => trackingRequests).toBeGreaterThan(0);
     await family.clock.runFor(11_000);
     await expect(

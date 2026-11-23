@@ -15,6 +15,12 @@ e L3 v4 para suas superfícies. No Histórico de Plantões e balanços, as ficha
 usam cartões compactos com código, data, autoria e situação. Os filtros
 abrem no diálogo compartilhado. A navegação conserva a consulta de origem.
 
+Na área Arquivos da ficha, Gerados e Anexos usam cartões com formato,
+identificação, autoria, data, situação e ações. O menu do exemplar abre
+o painel de identificação e compartilhamento. Os botões de visualizar
+e baixar usam a mesma emissão registrada. O diálogo Gerar PDF conserva
+as ações no rodapé enquanto as opções rolam.
+
 Os PDFs têm [referência documental própria](../documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md),
 autorizada em 11/11/2026. A composição impressa não substitui este sistema visual
 da aplicação; autoria, estados e ícones conservam o significado compartilhado.

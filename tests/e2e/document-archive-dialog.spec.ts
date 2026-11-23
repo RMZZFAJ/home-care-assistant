@@ -77,6 +77,13 @@ test("Concluir e arquivar passa pelas duas revisões e permite restaurar a ENT s
   await openDocumentMore(page);
   await expect(page.getByRole("menuitem", { name: "Revisar conclusão", exact: true })).toHaveCount(0);
   await closeDocumentMore(page);
+  const archivedRecord = await (await page.request.get(endpoint)).json();
+  await selectDocumentSection(page, "files");
+  const consolidated = page.getByRole("list", { name: "Exemplares registrados" }).locator(`[data-file-id="${archivedRecord.archive.issuanceId}"]`);
+  await expect(consolidated.getByRole("heading", { name: "Ficha consolidada", exact: true })).toBeVisible();
+  await expect(consolidated.getByText("Consolidado", { exact: true })).toBeVisible();
+  await expect(consolidated.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveAttribute("href",
+    `/api/documents/${document.id}/pdf?issuance=${archivedRecord.archive.issuanceId}`);
   await selectDocumentSection(page, "progress");
   await expect(page.getByRole("button", { name: "Novo andamento", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Revisar encerramento", exact: true }).click();

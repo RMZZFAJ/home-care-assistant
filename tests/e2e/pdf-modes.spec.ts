@@ -10,11 +10,12 @@ import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
 import { audit } from "./accessibility-audit";
 import { pdfIssuanceSchema } from "@/lib/documents/pdf-issuance";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 const compact=(value:string)=>value.normalize("NFKC").replaceAll(/\s/g,"");
 const hash=(bytes:Uint8Array)=>createHash("sha256").update(bytes).digest("hex");
 const plain=async(bytes:Uint8Array)=>(await PDF.load(bytes)).extractText().flatMap(page=>page.lines.map(line=>line.spans.flatMap(span=>span.chars.map(char=>char.char)).join(""))).join(" ");
-async function login(page:Page,patient:string,email=fixtures.adminA.email){
- await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
+async function login(page:Page,patient:string,email=fixtures.adminA.email,next?:string){
+ await page.goto(next ? "/login?" + new URLSearchParams({ next }) : "/login");await page.getByLabel("E-mail",{exact:true}).fill(email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
  await page.getByRole("button",{name:"Entrar",exact:true}).click();await selectContext(page,patient);
 }
 async function openFiles(page:Page,id:string){await page.goto("/documentos/"+id);await selectDocumentSection(page,"files");await expect(page.getByRole("button",{name:"Gerar PDF",exact:true})).toBeEnabled();}
@@ -91,10 +92,14 @@ test("restricted audit signs every-page identification, verifies original bytes 
 
 test("expanded donation keeps its complete base when an explicit UI period contains no Andamentos",async({page})=>{
  const f=await progressPreparationFixture("COM"),family=await actor("family",f.patient),document=await rpc(family,"create_supply_document",{p_patient:f.patient,p_type:"COM",p_key:randomUUID(),p_draft:false,p_payload:{origin:"donation",notes:"Observação original da doação que deve permanecer integral.",lines:[{productId:f.products[0],quantity:"2"}]}});
- await note({...f,id:document.id},"Registro atual fora do intervalo escolhido.");await login(page,f.patient,fixtures.family.email);await openFiles(page,document.id);
+ const viewer=await shiftWorker(f.patient,"family");
+ await note({...f,id:document.id},"Registro atual fora do intervalo escolhido.");await login(page,f.patient,viewer.email,"/documentos/"+document.id);await openFiles(page,document.id);
  await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();const dialog=page.getByRole("dialog",{name:"Gerar PDF",exact:true});
  await dialog.getByRole("combobox",{name:"Período dos complementos",exact:true}).selectOption("interval");await dialog.getByRole("textbox",{name:"Dia inicial",exact:true}).fill("2000-01-01");await dialog.getByRole("textbox",{name:"Dia final",exact:true}).fill("2000-01-02");
  await page.setViewportSize({width:320,height:900});await audit(page,"Período dos complementos da doação");
+ const submit = dialog.getByRole("button",{name:"Gerar PDF",exact:true});
+ await expect(submit).toBeInViewport();
+ expect(await submit.evaluate(node => Boolean(node.closest(".hca-modal-footer")))).toBe(true);
  const endpoint="/api/documents/"+document.id+"/issuances",pending=page.waitForResponse(r=>new URL(r.url()).pathname===endpoint&&r.request().method()==="POST");await dialog.getByRole("button",{name:"Gerar PDF",exact:true}).click();const response=await pending;expect(response.status(),await response.text()).toBe(200);
  const result=await signed(page,document.id,await response.json(),"donation-expanded"),text=compact(await plain(result.bytes));
  for(const value of ["Doação de materiais","Ficha Ampliada","Observação original da doação que deve permanecer integral.","Período: de 01/01/2000 a 02/01/2000, dias completos e inclusivos.","Nenhum andamento neste período."])expect(text).toContain(compact(value));

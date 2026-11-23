@@ -5,7 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from 
 import { z } from "zod";
 import { api, buttonClass, errorMessage, inputClass, Notice, primaryClass } from "@/components/workspace";
 import { FileRecord, PdfFormatMark } from "@/components/ui/file-record";
-import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { ActionButton, ActionLink, DefinitionGrid, Pill } from "@/components/ui/controls";
 import { Dialog, Drawer } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
 import { formatBrazilDate } from "@/lib/receipt";
@@ -261,18 +261,28 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
     {readError ? <Notice error>Não foi possível consultar a lista de anexos. {readError} Atualize esta seção.</Notice> : null}
     {message ? <Notice>{message}</Notice> : null}
     {loading ? <p className="mt-3 text-sm" role="status">Consultando anexos…</p> : null}
-    <ul className="doc-card doc-file-list doc-file-list-compact" aria-label="Arquivos anexados">{visibleFiles.map(file => <FileRecord key={file.id} identity={file.id} mime={file.mime_type} filename={file.filename}
+    {modalOnly && !loading && !readError ? <div className="hca-file-collection-heading">
+      <strong>Arquivos vinculados</strong><span>{writable ? `${visibleFiles.length} de 10 vagas` : `${visibleFiles.length} arquivo(s)`}</span>
+    </div> : null}
+    <ul className={modalOnly ? "hca-file-archive-list" : "doc-card doc-file-list doc-file-list-compact"} aria-label="Arquivos anexados">{visibleFiles.map(file => <FileRecord key={file.id} identity={file.id} mime={file.mime_type} filename={file.filename}
       title={modalOnly || file.url ? <a href={modalOnly ? fileHref(file, "view") : file.url!} target="_blank" rel="noopener noreferrer">{file.filename}</a> : file.filename}
+      archive={modalOnly ? {
+        description: file.uploadedName ? `Adicionado por ${file.uploadedName}` : "Autoria indisponível",
+        details: <ActionButton className="hca-file-record-more hca-control-icon" aria-haspopup="dialog" aria-label={`Detalhes do anexo ${file.filename}`}
+          onClick={event => setFileDetail({ id: file.id, open: true, opener: event.currentTarget })}><Icon name="more" /></ActionButton>,
+        facts: <Pill tone="success">Disponível</Pill>,
+      } : undefined}
       actions={modalOnly ? <>
-        <a className={buttonClass} href={fileHref(file, "view")} target="_blank" rel="noopener noreferrer" aria-label={`Visualizar ${file.filename}`}><Icon name="eye" />Visualizar</a>
-        <a className={`${buttonClass} btn-icon`} href={fileHref(file, "download")} aria-label={`Baixar ${file.filename}`}><Icon name="download" /></a>
-        <ActionButton className="btn-icon" aria-label={`Detalhes do anexo ${file.filename}`}
-          onClick={event => setFileDetail({ id: file.id, open: true, opener: event.currentTarget })}><Icon name="more" /></ActionButton>
+        <ActionLink compact href={fileHref(file, "view")} target="_blank" rel="noopener noreferrer" aria-label={`Visualizar ${file.filename}`}><Icon name="eye" />Visualizar</ActionLink>
+        <ActionLink compact className="hca-control-icon" href={fileHref(file, "download")} aria-label={`Baixar ${file.filename}`}><Icon name="download" /></ActionLink>
       </> : undefined}>
-      {modalOnly ? <p className="doc-line-meta">{file.uploadedName ? `Adicionado por ${file.uploadedName}` : "Autoria indisponível"}
-        {file.confirmedAt ? <> · <time dateTime={file.confirmedAt}>{formatBrazilDate(file.confirmedAt)}</time></> : null}</p> : null}
-      <DefinitionGrid items={[{ label: "Tamanho disponível", value: Math.ceil(file.bytes / 1024) + " KB" }, { label: "Estado", value: file.state === "ready" ? "Validado" : file.state === "rejected" ? "Rejeitado" : file.pending ? "Resultado do envio pendente" : "Preparado; envio não confirmado" }]} />
-      {!modalOnly ? <AttachmentProvenance file={file} /> : null}
+      {modalOnly ? <>
+        {file.confirmedAt ? <time dateTime={file.confirmedAt}>{formatBrazilDate(file.confirmedAt)}</time> : <span>Data de confirmação indisponível</span>}
+        <span>{Math.ceil(file.bytes / 1024)} KB</span>
+      </> : <>
+        <DefinitionGrid items={[{ label: "Tamanho disponível", value: Math.ceil(file.bytes / 1024) + " KB" }, { label: "Estado", value: file.state === "ready" ? "Validado" : file.state === "rejected" ? "Rejeitado" : file.pending ? "Resultado do envio pendente" : "Preparado; envio não confirmado" }]} />
+        <AttachmentProvenance file={file} />
+      </>}
       {writable && file.state === "quarantine" && file.uploadKey && file.tracked ? <div className="mt-2 flex flex-wrap gap-2">
         <button type="button" className={buttonClass} disabled={busy} onClick={() => void recover(file)}>Consultar e recuperar tentativa</button>
         {(!frozen || frozen.key === file.uploadKey) && file.sourceSha256 ? <button type="button" className={buttonClass} disabled={busy} onClick={() => { setResumeTarget(file); if (pendingRef.current?.key === file.uploadKey) void upload(undefined, file); else void recover(file); }}>Retomar envio</button> : null}

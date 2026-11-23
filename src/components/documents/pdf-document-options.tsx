@@ -17,13 +17,18 @@ export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAcc
   blocked: boolean;
 }) {
   const modeGroupId = useId();
+  const formId = useId();
   const [mode, setMode] = useState<"record" | "expanded" | "audit">("expanded");
   const [sections, setSections] = useState<PdfDocumentOptions["sections"]>(["progress"]);
   const [interval, setInterval] = useState(false), [from, setFrom] = useState(""), [through, setThrough] = useState("");
   const [purpose, setPurpose] = useState(""), [error, setError] = useState("");
   const denied = mode === "audit" && !canAudit || mode !== "record" && sections.includes("access") && !canAccess;
-  return <Dialog open={open} onClose={onClose} title="Gerar PDF" subtitle={code + " · Escolha o conteúdo do exemplar"} headingIcon="file">
-    <form className="hca-form" onSubmit={event => {
+  return <Dialog open={open} onClose={onClose} title="Gerar PDF" subtitle={code + " · Escolha o conteúdo do exemplar"} headingIcon="file"
+    keyboardScrollable footer={<>
+      <ActionButton onClick={onClose}>Cancelar</ActionButton>
+      <ActionButton type="submit" form={formId} variant="primary" disabled={denied || blocked}><Icon name="file" />Gerar PDF</ActionButton>
+    </>}>
+    <form id={formId} className="hca-form" onSubmit={event => {
       event.preventDefault();
       if (denied || blocked) return;
       if (mode === "record") { onGenerate(); return; }
@@ -59,7 +64,7 @@ export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAcc
         <FormField label="Período dos complementos"><SelectField value={interval ? "interval" : "all"} onChange={event => setInterval(event.currentTarget.value === "interval")}>
           <option value="all">Todos os registros até a referência da emissão</option><option value="interval">Escolher intervalo de dias</option>
         </SelectField></FormField>
-        {interval ? <div className="hca-compact-grid">
+        {interval ? <div className="hca-pdf-date-fields">
           <FormField label="Dia inicial" required><TextInput type="date" required value={from} onChange={event => setFrom(event.currentTarget.value)} /></FormField>
           <FormField label="Dia final" required><TextInput type="date" required value={through} onChange={event => setThrough(event.currentTarget.value)} /></FormField>
         </div> : null}
@@ -72,7 +77,6 @@ export function PdfDocumentOptions({ open, onClose, onGenerate, canAudit, canAcc
       {denied ? <Notice error>Seu acesso atual não permite a seleção indicada. Escolha uma modalidade e seções autorizadas.</Notice> : null}
       {blocked ? <Notice error>Atualize a ficha e confira se existe uma emissão a recuperar antes de gerar outro exemplar.</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
-      <div className="hca-toolbar"><ActionButton onClick={onClose}>Cancelar</ActionButton><ActionButton type="submit" variant="primary" disabled={denied || blocked}><Icon name="file" />Gerar PDF</ActionButton></div>
     </form>
   </Dialog>;
 }

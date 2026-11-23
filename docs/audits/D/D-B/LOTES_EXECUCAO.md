@@ -3504,6 +3504,21 @@ WhatsApp ainda requer homologação do provedor.
   grupos, com relatórios separados e o mesmo limite por grupo. A coleta
   confirmou 197, 200 e 187 casos, cobrindo os 584 sem duplicação.
 
+### CI publicada em 00e94be0
+
+- Ubuntu, Windows e o banco passaram. Os três grupos de iOS terminaram
+  dentro do limite, com 197, 200 e 187 casos na contagem total.
+- Dos 1.752 casos de navegador, 1.748 passaram na primeira tentativa,
+  dois passaram na retentativa e dois falharam também na retentativa.
+  Chromium-2 e Android-2 falharam no mesmo caso de retomada de tipo de
+  plantão após revogação de escrita. A resposta de leitura HTTP 200
+  confirmou a revisão 3. A captura mostra a interface ainda consultando.
+- O caso de tipo de plantão do iOS-3 passou na retentativa após encontrar
+  dois controles de preenchimentos privados na primeira tentativa.
+  No Chromium-1, um teste de COM passou na retentativa após o diálogo de
+  erro fechar durante o clique em **Tentar novamente**.
+  [Execução e artefatos](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45219839814).
+
 ### Histórico de balanços
 
 - Na aba **Histórico**, os cartões de E08-01 mostram código, data de
@@ -3533,6 +3548,27 @@ WhatsApp ainda requer homologação do provedor.
   O ensaio usa uma conta fictícia com vínculo único para chegar ao histórico
   após o login. O ensaio final em WebKit confirmou também o destino de
   retorno com a página preservada quando o histórico abre por link da agenda.
+
+### Cartões e identificação dos arquivos da ficha
+
+- Gerados e Anexos compartilham a composição de E09-01 e E09-04. Os cartões
+  apresentam o formato, o título e o menu no topo, seguidos pela autoria,
+  pela data e pelas ações. O mesmo acervo distingue **Atual**, **Conteúdo
+  anterior**, **Consolidado** e as emissões ainda em preparação ou a confirmar.
+  O rótulo de consolidado depende do identificador registrado no arquivamento.
+- Visualizar e baixar apontam para a emissão da linha. O menu abre a
+  identificação do exemplar, com a mesma visualização, compartilhamento,
+  dados da emissão e código de verificação. O cartão de recuperação do PDF
+  inicial continua disponível para o processo correspondente.
+- O diálogo Gerar PDF de E09-02 mantém as ações no rodapé e rola o conteúdo
+  internamente. Os dois campos do período se empilham na largura estreita.
+  Os contratos de modalidade, autorização, emissão e recuperação continuam
+  cobertos por 11 testes de unidade e API. Esta mudança dispensa migração.
+- Chromium, Android e iOS emulados passaram na comparação dos cartões em
+  360 e 412 px. O teste confirmou o mesmo hash na visualização, no download
+  e no arquivo passado à folha de compartilhamento simulada, além da
+  preservação do número de emissões. Arquivamento de ENT e seleção de período
+  da doação também passaram nos três navegadores.
 
 ## L4
 

@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — acervo de Arquivos.** Gerados e Anexos seguem os cartões da v4.
+O menu preserva a identificação e o compartilhamento do exemplar.
+O rodapé do formulário Gerar PDF mantém as ações à vista. O ensaio comparou
+os arquivos pela impressão SHA-256, com capturas em 360 e 412 px.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#cartões-e-identificação-dos-arquivos-da-ficha).
+
 **23/11 — histórico de balanços.** A aba Histórico mostra os cartões compactos
 da v4 com situação e autoria preservada. Os filtros ficam em um diálogo e
 voltam ao sair da ficha. A migration está aplicada nos bancos local e remoto,

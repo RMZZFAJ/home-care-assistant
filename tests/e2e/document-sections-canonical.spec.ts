@@ -20,9 +20,12 @@ import { shiftWorker } from "../integration/shift-fixtures.mjs";
 
 test.setTimeout(180_000);
 const widths=[320,390,768,1024,1440],digest=(bytes:Buffer)=>createHash("sha256").update(bytes).digest("hex");
-async function login(page:Page,patient:string,email=fixtures.family.email){
-  await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
-  await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);
+async function login(page:Page,patient:string,email=fixtures.family.email,next?:string){
+  await page.goto(next ? "/login?" + new URLSearchParams({ next }) : "/login");await page.getByLabel("E-mail",{exact:true}).fill(email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
+  await page.getByRole("button",{name:"Entrar",exact:true}).click();
+  if(next) await expect(page).toHaveURL(url => url.pathname + url.search === next, { timeout: 30_000 });
+  else await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();
+  await selectContext(page,patient);
 }
 async function model(browser:Browser){
   const context=await browser.newContext(),page=await context.newPage();await page.route(/^https?:/,r=>r.abort());
@@ -37,14 +40,30 @@ async function model(browser:Browser){
 async function laboratoryModel(browser: Browser) {
   const context = await browser.newContext(), page = await context.newPage();
   await page.route(/^https?:/, route => route.abort());
-  await page.goto(pathToFileURL(resolve("hca-laboratorio-01-v3-final.html")).href + "#/cenario/E03-27");
-  const close = page.locator("#lab-bar [data-action='lab-toggle']");
-  if (await close.getAttribute("aria-expanded") === "true") await close.click();
-  await expect(page.locator(".doc-file-card").first()).toBeVisible();
+  await page.goto(pathToFileURL(resolve("hca-laboratorio-03-v4-aprovado.html")).href);
   return { context, page };
 }
 async function styles(actual:Locator,reference:Locator,properties:readonly string[]){for(const p of properties)await expect(actual).toHaveCSS(p,await reference.evaluate((n,p)=>getComputedStyle(n).getPropertyValue(p),p));}
-async function fileParity(row:Locator,reference:Page){await styles(row,reference.locator(".doc-file-card").first(),["display","gap","padding-left","padding-top","border-bottom-color"]);await styles(row.locator(".doc-pdf-icon"),reference.locator(".doc-pdf-icon").first(),["width","height","border-radius"]);await expect(row.locator(".doc-pdf-icon small")).toHaveText(/PDF|IMG|DOC|ARQ/);}
+async function fileParity(row: Locator, reference: Page, width: number, attachment: boolean, project: string) {
+  await reference.evaluate(({ width, attachment }) => {
+    const hca = (window as unknown as { HCA: { lab: { width: number }; launch: (id: string, state: string) => void } }).HCA;
+    hca.lab.width = width;
+    hca.launch(attachment ? "E09-04" : "E09-01", attachment ? "ready" : "previous");
+  }, { width, attachment });
+  const card = reference.locator(".d3-file-row").first();
+  await expect(card).toBeVisible();
+  await styles(row, card, ["border-radius", "border-top-color"]);
+  await styles(row.locator("h3"), card.locator("h3"), ["font-size"]);
+  await styles(row.locator(".hca-file-record-more"), card.locator(".d3-file-top > button"), ["border-radius"]);
+  if (!attachment) await styles(row.locator(".doc-pdf-icon"), card.locator(".d4-pdf-mark"), ["width", "height", "color"]);
+  expect(await row.evaluate(node => {
+    const [heading, meta, footer] = Array.from(node.children, element => element.getBoundingClientRect());
+    return heading.bottom <= meta.top && meta.bottom <= footer.top;
+  })).toBe(true);
+  const kind = attachment ? "attachment" : "issuance";
+  await capture(row, `l3-${kind}-${project}-${width}`);
+  await card.screenshot({ path: `output/playwright/phase-d/l3-${kind}-v4-${project}-${width}.png`, animations: "disabled" });
+}
 async function capture(node:Locator,file:string){
   await node.evaluate(n=>n.scrollIntoView({block:"center",behavior:"instant"}));
   // Native WebKit can finish a viewport/scroll update after evaluate returns.
@@ -55,7 +74,7 @@ async function capture(node:Locator,file:string){
 const official=(patient:string,id:string)=>sql("select jsonb_build_object('document',(select to_jsonb(d) from public.operational_documents d where id="+q(id)+"),'events',(select jsonb_agg(to_jsonb(e) order by version) from public.document_events e where document_id="+q(id)+"),'ledger',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id="+q(patient)+"));");
 
 test("06.5 native archive attachments and historical facts share canonical rows without issuing on consultation",async({page,browser},info)=>{
-  const f=await versionHistoryFixture(),viewer=await shiftWorker(f.patient,"admin");await login(page,f.patient,viewer.email);
+  const f=await versionHistoryFixture(),viewer=await shiftWorker(f.patient,"admin");await login(page,f.patient,viewer.email,"/fichas/"+f.doc.id);
   const pdf=await generatedPdf(page,"/api/documents/"+f.doc.id+"/pdf?version="+f.approved.version);expect(pdf.status()).toBe(200);
   const bytes=await pdf.body(),issuance=new URL(pdf.url()).searchParams.get("issuance")!;
   await page.goto("/fichas/"+f.doc.id);await selectDocumentSection(page,"attachments");await page.getByRole("button",{name:"Adicionar anexo",exact:true}).click();
@@ -67,15 +86,35 @@ test("06.5 native archive attachments and historical facts share canonical rows 
   const ref=await model(browser),lab=await laboratoryModel(browser);
   try{
     const attachment=page.getByRole("list",{name:"Arquivos anexados",exact:true}).getByRole("listitem");await expect(attachment).toHaveCount(1);
-    for(const width of widths){await page.setViewportSize({width,height:1100});await lab.page.setViewportSize({width,height:1100});await fileParity(attachment,lab.page);await auditFromTop(page,"L1 attachment "+width);if(width===320)await capture(attachment,"attachment-canonical-"+info.project.name);}
+    for(const width of [320,360,412,768,1024,1440]){
+      await page.setViewportSize({width,height:1100});
+      await auditFromTop(page,"L3 attachment "+width);
+      if(width===360 || width===412) await fileParity(attachment,lab.page,width,true,info.project.name);
+    }
     await page.goto("/documentos/"+f.doc.id+"/arquivos?version="+f.approved.version);const row=page.locator('[data-file-id="'+issuance+'"]');
+    const href = await row.getByRole("link", { name: "Visualizar", exact: true }).getAttribute("href");
+    expect(href).toContain("issuance=" + issuance);
     const details = row.getByRole("button", { name: "Identificação do exemplar", exact: true });
     await details.click();
     const panel = page.getByRole("dialog", { name: "Ficha", exact: true });
     await expect(panel).toContainText("Conteúdo da revisão "+f.approved.version);
+    await expect(panel.getByRole("link", { name: "Visualizar", exact: true })).toHaveAttribute("href", href!);
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, "canShare", { configurable: true, value: () => true });
+      Object.defineProperty(navigator, "share", { configurable: true, value: async ({ files }: { files: File[] }) => {
+        const hash = await crypto.subtle.digest("SHA-256", await files[0].arrayBuffer());
+        globalThis.document.documentElement.dataset.sharedPdfHash = Array.from(new Uint8Array(hash), byte => byte.toString(16).padStart(2, "0")).join("");
+      } });
+    });
+    await panel.getByRole("button", { name: "Compartilhar PDF", exact: true }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-shared-pdf-hash", digest(bytes));
     await panel.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
     await expect(details).toBeFocused();
-    for(const width of widths){await page.setViewportSize({width,height:1100});await lab.page.setViewportSize({width,height:1100});await fileParity(row,lab.page);await auditFromTop(page,"L1 issuance "+width);if(width===320)await capture(row,"issuance-canonical-"+info.project.name);}
+    for(const width of [320,360,412,768,1024,1440]){
+      await page.setViewportSize({width,height:1100});
+      await auditFromTop(page,"L3 issuance "+width);
+      if(width===360 || width===412) await fileParity(row,lab.page,width,false,info.project.name);
+    }
     const download=await page.request.get(await row.getByRole("link",{name:"Baixar PDF",exact:true}).getAttribute("href")??"");expect(download.status()).toBe(200);expect(digest(await download.body())).toBe(digest(bytes));
     await page.goto("/fichas/"+f.doc.id);await selectDocumentSection(page,"history");await page.getByRole("button",{name:"Versões e integridade",exact:true}).click();await page.getByRole("button",{name:"Consultar versão "+f.approved.version,exact:true}).click();
     const frozen=page.getByRole("article",{name:"Conteúdo preservado da versão "+f.approved.version,exact:true});await expect(frozen).toContainText(f.oldName);await expect(frozen).toContainText(f.oldProduct);await expect(frozen).not.toContainText(f.newName);

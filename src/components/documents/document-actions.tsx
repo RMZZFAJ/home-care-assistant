@@ -5,6 +5,7 @@ import { PdfDocumentOptions } from "./pdf-document-options";
 import { PdfFileDetails } from "./pdf-file-details";
 import { pdfDocumentOptionsSchema, documentModeLabel, type PdfDocumentOptions as DocumentOptions } from "@/lib/documents/pdf-modes";
 import { FileRecord } from "@/components/ui/file-record";
+import { ActionButton, ActionLink, Pill, type PillTone } from "@/components/ui/controls";
 import Link from "next/link";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { buttonClass, can, Notice } from "@/components/workspace";
@@ -37,6 +38,7 @@ type Props = {
   code: string;
   version?: number;
   archiveVersion?: number;
+  consolidatedId?: string | null;
   trackNotices?: boolean;
   actionTarget?: HTMLElement | null;
   onAction?: () => void;
@@ -59,6 +61,23 @@ const steps = {
   uncertain: "Resultado ainda não confirmado",
   ready: "Arquivo pronto",
 };
+function exemplarPresentation(file: PdfIssuance, currentVersion: number, initialId?: string | null, consolidatedId?: string | null) {
+  const consolidated = file.id === consolidatedId;
+  const previous = currentVersion > 0 && file.version < currentVersion;
+  const title = consolidated ? "Ficha consolidada" : documentModeLabel(file.documentOptions);
+  let origin = "Emissão operacional";
+  if (consolidated) origin = "Arquivamento da ficha";
+  else if (file.id === initialId) origin = "Emissão inicial";
+  else if (file.representation === "derived") origin = "Nova representação de uma versão histórica";
+  else if (file.requestedBy) origin = "Solicitação de exemplar";
+  let status = "Preparando arquivo", tone: PillTone = "warning";
+  if (file.state === "uncertain") status = "A confirmar";
+  if (file.state === "ready") {
+    status = consolidated ? "Consolidado" : previous ? "Conteúdo anterior" : currentVersion > 0 ? "Atual" : "Disponível";
+    tone = previous && !consolidated ? "neutral" : "success";
+  }
+  return { title, origin, status, tone, previous };
+}
 export function DocumentActions(props: Props) {
   const { data, value } = useWorkspaceState();
   return data ? (
@@ -103,6 +122,7 @@ function GeneratedFiles({
   canAudit,
   canAccess,
   archiveVersion,
+  consolidatedId,
   trackNotices = true,
   actionTarget,
   onAction,
@@ -337,43 +357,21 @@ function GeneratedFiles({
       setBusy(false);
     }
   }
+  const fileHref = (file: PdfIssuance) => `/api/documents/${id}/pdf?issuance=${file.id}`;
   async function share(row: PdfIssuance) {
-    setError("");
-    try {
-      const response = await fetch(
-        `/api/documents/${id}/pdf?issuance=${row.id}`,
-        { cache: "no-store" },
-      );
-      if (!response.ok)
-        throw new Error(
-          "Não foi possível recuperar este exemplar para compartilhar. Consulte seu acesso e tente novamente.",
-        );
-      const file = new File(
-        [await response.blob()],
-        `${code}-v${row.version}-${row.id.slice(0, 8)}.pdf`,
-        { type: "application/pdf" },
-      );
-      if (navigator.canShare?.({ files: [file] }))
-        await navigator.share({ title: code, files: [file] });
-      else {
-        const url = URL.createObjectURL(file),
-          anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.download = file.name;
-        anchor.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        setMessage(
-          "PDF baixado. Anexe o exemplar no aplicativo em que deseja compartilhar.",
-        );
-      }
-    } catch (reason) {
-      if (!(reason instanceof DOMException && reason.name === "AbortError"))
-        setError(
-          reason instanceof Error
-            ? reason.message
-            : "Não foi possível compartilhar este exemplar.",
-        );
+    const response = await fetch(fileHref(row), { cache: "no-store" });
+    if (!response.ok) throw new Error("Não foi possível recuperar este exemplar para compartilhar. Consulte seu acesso e tente novamente.");
+    const file = new File([await response.blob()], `${code}-v${row.version}-${row.id.slice(0, 8)}.pdf`, { type: "application/pdf" });
+    if (navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ title: code, files: [file] });
+      return;
     }
+    const url = URL.createObjectURL(file), anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = file.name;
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return "PDF baixado. Anexe o exemplar no aplicativo em que deseja compartilhar.";
   }
   const currentVersion = Math.max(version ?? 0, confirmedVersion);
   const visibleRows = rows.filter(entry => {
@@ -422,9 +420,11 @@ function GeneratedFiles({
         {archiveFilters.map(([value, label]) => <button key={value} type="button" aria-pressed={filter === value}
           disabled={busy || initialBusy} onClick={() => selectFilter(value)}>{label}</button>)}
       </nav> : null}
-      {filter === "previous" ? <div className="doc-card">
-        <strong>O que são exemplares anteriores?</strong>
-        <p>São arquivos gerados com o conteúdo preservado de revisões anteriores da ficha.</p>
+      {filter === "previous" ? <div className="hca-archive-context">
+        <Icon name="history" width={19} height={19} />
+        <div><strong>O que são exemplares anteriores?</strong>
+          <p>São arquivos gerados antes da atualização mais recente desta ficha. Eles conservam o conteúdo daquela emissão e continuam disponíveis para consulta.</p>
+        </div>
       </div> : null}
       {readOnly ? <p role="status">Os exemplares emitidos estão disponíveis para consulta e download.</p>
         : generationBlocked ? <p role="status">Atualize a ficha para gerar um novo PDF. Os exemplares já emitidos continuam disponíveis.</p> : null}
@@ -466,66 +466,38 @@ function GeneratedFiles({
           {filter !== "all" ? "Nenhum exemplar neste filtro." : readOnly ? "Nenhum arquivo registrado nesta consulta." : "Nenhum arquivo registrado nesta consulta. Use Gerar PDF para uma nova emissão explícita."}
         </p>
       ) : null}
-      <div className="doc-card doc-file-acervo"><ul className="doc-file-list doc-file-list-compact" aria-label="Exemplares registrados">
+      <ul className="hca-file-archive-list" aria-label="Exemplares registrados">
         {visibleRows.map((entry) => {
-          const row = entry.issuance, earlier = row.version < currentVersion;
+          const row = entry.issuance;
+          const { title, origin, status, tone } = exemplarPresentation(row, currentVersion, initial.data?.issuanceId, consolidatedId);
+          const instant = row.readyAt ?? row.requestedAt;
           return (
             <FileRecord key={row.id} identity={row.id} mime="application/pdf"
-              title={<>{code} · {row.documentOptions ? documentModeLabel(row.documentOptions) : "Ficha"}{earlier ? <span className="doc-chip">Conteúdo anterior</span> : null}</>}
-              actions={<>{row.state === "ready" ? (
-                <>
-                  <a
-                    className={buttonClass}
-                    href={`/api/documents/${id}/pdf?issuance=${row.id}`}
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    <Icon name="eye" />Visualizar
-                  </a>
-                  <span className="doc-file-icon-actions"><a
-                    className="btn btn-icon"
-                    aria-label="Baixar PDF"
-                    title="Baixar PDF"
-                    href={`/api/documents/${id}/pdf?issuance=${row.id}`}
-                    download
-                  >
-                    <Icon name="download" />
-                  </a>
-                  <button
-                    className="btn btn-icon"
-                    aria-label="Compartilhar PDF"
-                    title="Compartilhar PDF"
-                    type="button"
-                    onClick={() => void share(row)}
-                  >
-                    <Icon name="upload" />
-                  </button></span>
-                </>
-              ) : (
-                <p className="text-sm">
-                  {row.state === "uncertain"
-                    ? "Arquivo ainda não confirmado. O solicitante pode recuperar a mesma emissão."
-                    : "O arquivo ficará disponível após assinatura, validação e confirmação do armazenamento."}
-                </p>
-              )}
-              <button className="btn btn-icon" type="button" aria-haspopup="dialog" aria-label="Identificação do exemplar"
-                title="Identificação do exemplar" onClick={event => setDetail({ id: row.id, opener: event.currentTarget, open: true })}>
-                <Icon name="more" />
-              </button></>}
+              title={title}
+              archive={{
+                description: origin,
+                details: <ActionButton aria-haspopup="dialog" aria-label="Identificação do exemplar" className="hca-file-record-more hca-control-icon"
+                  onClick={event => setDetail({ id: row.id, opener: event.currentTarget, open: true })}><Icon name="more" /></ActionButton>,
+                facts: <><Pill tone={tone}>{status}</Pill>{row.sizeBytes ? <span>{Math.ceil(row.sizeBytes / 1024)} KB</span> : null}</>,
+              }}
+              actions={row.state === "ready" ? <>
+                <ActionLink compact href={fileHref(row)} target="_blank" rel="noopener"><Icon name="eye" />Visualizar</ActionLink>
+                <ActionLink compact className="hca-control-icon" href={fileHref(row)} aria-label="Baixar PDF" download><Icon name="download" /></ActionLink>
+              </> : undefined}
             >
-              <div className="doc-file-meta"><span><Icon name="user" width={13} height={13} />{row.requestedName}</span><span><Icon name="clock" width={13} height={13} /><time dateTime={row.readyAt ?? row.requestedAt}>{formatBrazilDate(row.readyAt ?? row.requestedAt)}</time></span>{row.state !== "ready" ? <span>{steps[row.step]}</span> : null}</div>
-              {row.representation === "derived" ? (
-                <p className="text-sm">
-                  Nova representação de uma versão histórica, gerada no momento
-                  indicado.
-                </p>
-              ) : null}
+              <span><Icon name="user" width={14} height={14} />{row.requestedName}</span>
+              <time dateTime={instant}>{formatBrazilDate(instant)}</time>
+              {row.state !== "ready" ? <p>{steps[row.step]}. {row.state === "uncertain"
+                ? "O solicitante pode recuperar a mesma emissão."
+                : "O arquivo ficará disponível após assinatura, validação e confirmação do armazenamento."}</p> : null}
             </FileRecord>
           );
         })}
-      </ul></div>
+      </ul>
       {selectedFile && detail ? <PdfFileDetails key={selectedFile.id} file={selectedFile} documentCode={code} open={detail.open}
-        status={steps[selectedFile.step]} previous={selectedFile.version < currentVersion} onClose={() => setDetail({ ...detail, open: false })}
+        {...exemplarPresentation(selectedFile, currentVersion, initial.data?.issuanceId, consolidatedId)}
+        href={fileHref(selectedFile)} onShare={() => share(selectedFile)}
+        onClose={() => setDetail({ ...detail, open: false })}
         finalFocus={() => detail.opener.isConnected ? detail.opener : archiveRetryRef.current ?? false} /> : null}
       <p className="doc-footnote"><Icon name="info" width={14} height={14} />Visualizar ou baixar reutiliza o mesmo exemplar. Cada nova geração cria um exemplar.</p>
       {verification ? <Link className="btn btn-ghost" href={`/verificar/emissao/${verification.verificationCode}?returnTo=${encodeURIComponent(`/documentos/${id}?documentTab=files`)}`}><Icon name="shield" />Abrir validação pública</Link> : null}
