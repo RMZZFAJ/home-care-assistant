@@ -265,6 +265,7 @@ test("aviso reiterado confirma o material original sem alterar o saldo", async (
   const detail = page.getByRole("region", { name: "Detalhe do relato", exact: true });
   await detail.getByRole("button", { name: "Avisar novamente", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Avisar falta à família", exact: true });
+  await dialog.getByText("Quantidade em falta · 2", { exact: true }).click();
   await expect(dialog.getByRole("textbox", { name: "Quantidade em falta · " + f.name, exact: true })).toHaveValue("2");
   await expect(dialog.getByRole("textbox", { name: "Mensagem para a família", exact: true })).toHaveValue(
     "O material continua em falta. Precisamos de reposição.",
@@ -274,6 +275,27 @@ test("aviso reiterado confirma o material original sem alterar o saldo", async (
   await expect(page).not.toHaveURL(new RegExp("ref=" + original.id));
   expect(sql(`select count(*) from private.consumption_acts
     where care_recipient_id=${q(f.patient)} and action='shortage' and request->>'repeatedReportId'=${q(original.id)}`)).toBe("1");
+  expect(Number(sql(`select private.stock_quantity(${q(f.patient)},${q(f.products[0])},'CARE_TEAM')::text`))).toBe(10);
+});
+
+test("aviso de falta preserva o material sem quantidade ao enviar e reiterar", async ({ page }) => {
+  const f = await fixture();
+  await openConsumption(page, f);
+  await page.getByRole("button", { name: "Avisar falta", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Avisar falta à família", exact: true });
+  await dialog.getByRole("combobox", { name: "Material em falta", exact: true }).selectOption(f.products[0]);
+  await expect(dialog.getByText(f.name, { exact: true })).toBeVisible();
+  await dialog.getByRole("textbox", { name: "Mensagem para a família", exact: true }).fill("Precisamos deste material para o próximo plantão.");
+  await dialog.getByRole("button", { name: "Enviar aviso", exact: true }).click();
+  const detail = page.getByRole("region", { name: "Detalhe do relato", exact: true });
+  await expect(detail.getByText("Quantidade não informada", { exact: true })).toBeVisible();
+  const original = new URL(page.url()).searchParams.get("ref");
+  expect(original).toBeTruthy();
+  await detail.getByRole("button", { name: "Avisar novamente", exact: true }).click();
+  await expect(dialog.getByText(f.name, { exact: true })).toBeVisible();
+  await dialog.getByRole("button", { name: "Enviar aviso", exact: true }).click();
+  await expect(page).not.toHaveURL(new RegExp("ref=" + original));
+  await expect(detail.getByText("Quantidade não informada", { exact: true })).toBeVisible();
   expect(Number(sql(`select private.stock_quantity(${q(f.patient)},${q(f.products[0])},'CARE_TEAM')::text`))).toBe(10);
 });
 

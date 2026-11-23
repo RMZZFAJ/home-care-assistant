@@ -1794,6 +1794,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123102624_l3_stock_operation_detail` | Aplicada | Aplicada |
 | `20261123110027_l3_consumption_list_materials` | Aplicada | Aplicada |
 | `20261123120522_l3_reviewed_consumption_correction` | Aplicada | Aplicada |
+| `20261123123142_l3_shortage_material_without_quantity` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2975,6 +2976,26 @@ e as regressões de emissão, rascunho e aviso de falta. A migration foi
 aplicada no local e no remoto após o backup cifrado verificado
 `105605ce-6dc7-49d1-903b-a9fc104dd36f`. A conferência comparou as duas
 definições e os grants, incluindo a restrição de acesso ao comando interno.
+
+### Material do aviso sem quantidade
+
+Em E07-08 e E07-11, a seleção do material e a mensagem bastam para
+enviar um aviso conforme a v4. A quantidade permanece opcional. A ficha
+identifica explicitamente sua ausência e a reiteração mantém o material.
+O seletor permite incluir mais de um material. Os avisos com quantidade
+e os avisos só com mensagem continuam disponíveis.
+
+Seis integrações com Auth real verificaram o conjunto de consumo e falta.
+O aviso com material sem quantidade manteve o saldo, a comunicação à
+família e o recibo da tentativa original. O banco recusou duplicatas,
+materiais fora do catálogo, unidade divergente, zero e fração incompatível.
+Seis casos dirigidos em Chromium, Android e iOS emulados cobriram o envio
+sem quantidade e a reiteração de avisos com e sem quantidade.
+
+A migration preserva os registros anteriores. Foi aplicada localmente e
+no remoto vinculado após verificar o backup cifrado da função substituída
+`c9148dec-8d7f-4ad9-a356-37af611336a2`. As definições locais e remotas
+coincidem e as funções internas seguem com execução restrita.
 
 ### Residências sem horários e início da programação
 

@@ -34,7 +34,7 @@ function baseline(report: ConsumptionReport, version: number): Baseline {
   return {
     version: historical ? version : report.version,
     observation: historical ? revision?.body ?? report.body : report.revisions.at(-1)?.body ?? report.body,
-    original: lines.map(line => ({ ...line, name: line.name ?? line.productId })),
+    original: lines.map(line => ({ ...line, name: line.name ?? line.productId, quantity: line.quantity ?? "" })),
   };
 }
 

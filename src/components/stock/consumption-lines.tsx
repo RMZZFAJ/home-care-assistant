@@ -10,7 +10,7 @@ export function ConsumptionLines({ lines, renderConsult, emptyMessage }: {
   return lines.length ? (
     <MaterialReview rows={lines.map(line => ({ id: line.productId, name: line.name ?? "Nome não preservado no relato",
       consult: renderConsult?.(line), details: <>
-          <small>{formatQuantity(line.quantity, line.unit)}</small>
+          <small>{line.quantity === null ? "Quantidade não informada" : formatQuantity(line.quantity, line.unit)}</small>
           {!line.name ? (
             <span className="block text-xs text-(--muted) break-all">
               Referência preservada: {line.productId}

@@ -41,7 +41,6 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
   const [observation, setObservation] = useState(kind === "shortage" && report ? "O material continua em falta. Precisamos de reposição." : "");
   const [reason, setReason] = useState("");
   const [lines, setLines] = useState(kind === "cancel" ? [] : report?.current_lines ?? []);
-  const [choice, setChoice] = useState("");
   const [busy, setBusy] = useState(false);
   const [absent, setAbsent] = useState(false);
   const [error, setError] = useState("");
@@ -75,8 +74,7 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
         ? { ...scope, observation, lines: materials, repeatedReportId: report?.id }
         : { ...scope, reportId: report?.id, expectedVersion: report?.version, reason });
       if (!parsed.success || (parsed.data.action !== "shortage" && parsed.data.action !== "cancel")) {
-        setError(parsed.success ? "Confira os dados." : parsed.error.issues[0]?.message === "Selecione pelo menos um material."
-          ? "Selecione pelo menos um material." : "Confira o motivo, a descrição e as quantidades informadas.");
+        setError(kind === "shortage" ? "Confira a mensagem e as quantidades que você informou." : "Informe o motivo do cancelamento.");
         return;
       }
       packet = parsed.data;
@@ -105,7 +103,7 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
     modal
     restoreFocusTo={opener} exitDialog uncertainOutcome={Boolean(pending)}
     footer={close => <div className="hca-toolbar">
-      <ActionButton disabled={busy} onClick={close}>Voltar</ActionButton>
+      <ActionButton disabled={busy} onClick={close}>{kind === "shortage" ? "Cancelar" : "Voltar"}</ActionButton>
       <ActionButton variant={kind === "cancel" && !pending ? "danger" : "primary"} disabled={busy} onClick={() => void send()}>
         {pending ? absent ? "Reenviar a mesma tentativa" : "Conferir resultado"
           : kind === "shortage" ? "Enviar aviso" : "Cancelar consumo"}
@@ -121,37 +119,45 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
             details: <p>Retorno ao saldo · +{formatQuantity(line.quantity, line.unit)}</p>,
           }))} />
         </section> : null}
-        {kind === "shortage" ? <FormField label="Mensagem para a família">
-          <TextAreaField value={observation} maxLength={2000} rows={4} onChange={event => setObservation(event.currentTarget.value)} />
-        </FormField> : null}
         {kind === "cancel" ? <FormField label="Motivo da alteração">
           <TextAreaField value={reason} maxLength={1000} rows={3} onChange={event => setReason(event.currentTarget.value)} />
         </FormField> : null}
         {kind === "shortage" ? <>
-          {lines.map(line => <div className="ui-card hca-form-stack" key={line.productId}>
-            <FormField label={"Quantidade em falta · " + (line.name ?? line.productId)}>
-              <WizardQuantityInput unit={line.unit} inputMode="decimal" value={line.quantity} maxLength={64}
-                onChange={event => {
-                  const quantity = event.currentTarget.value;
-                  setLines(current => current.map(item => item.productId === line.productId ? { ...item, quantity } : item));
-                }} />
-            </FormField>
-            <ActionButton variant="quiet" onClick={() => setLines(current => current.filter(item => item.productId !== line.productId))}>
-              Remover {line.name ?? "material"}
-            </ActionButton>
-          </div>)}
-          <FormField label="Material">
-            <SelectField value={choice} onChange={event => setChoice(event.currentTarget.value)}>
+          <FormField label="Material em falta">
+            <SelectField value="" disabled={lines.length >= 100} onChange={event => {
+              const product = products.find(item => item.id === event.currentTarget.value);
+              if (product) setLines(current => [...current, {
+                productId: product.id, name: product.name, unit: product.unit, quantity: null,
+              }]);
+            }}>
               <option value="">Selecionar material do catálogo</option>
               {products.filter(item => item.active !== false && !lines.some(line => line.productId === item.id))
                 .map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
             </SelectField>
           </FormField>
-          <ActionButton disabled={!choice} onClick={() => {
-            const product = products.find(item => item.id === choice);
-            if (product) setLines(current => [...current, { productId: product.id, name: product.name, unit: product.unit, quantity: "" }]);
-            setChoice("");
-          }}>Adicionar material</ActionButton>
+          {lines.map(line => <div className="ui-card hca-form-stack" key={line.productId}>
+            <div className="hca-toolbar">
+              <strong>{line.name ?? line.productId}</strong>
+              <ActionButton variant="quiet" onClick={() => setLines(current => current.filter(item => item.productId !== line.productId))}>
+                Remover {line.name ?? "material"}
+              </ActionButton>
+            </div>
+            <details className="doc-help-details">
+              <summary>{line.quantity === null ? "Informar quantidade (opcional)" : "Quantidade em falta · " + (line.quantity || "não informada")}</summary>
+              <FormField label={"Quantidade em falta · " + (line.name ?? line.productId)}>
+                <WizardQuantityInput unit={line.unit} inputMode="decimal" value={line.quantity ?? ""} maxLength={64}
+                  onChange={event => {
+                    const quantity = event.currentTarget.value || null;
+                    setLines(current => current.map(item => item.productId === line.productId ? { ...item, quantity } : item));
+                  }} />
+              </FormField>
+            </details>
+          </div>)}
+          <FormField label="Mensagem para a família">
+            <TextAreaField value={observation} maxLength={2000} rows={4}
+              placeholder="Informe o que está faltando e o contexto."
+              onChange={event => setObservation(event.currentTarget.value)} />
+          </FormField>
         </> : null}
         {kind === "shortage" ? <div className="hca-attention">
           <Icon name="bell" />

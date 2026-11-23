@@ -907,6 +907,14 @@ A referência abre GET `/api/consumption/[id]` mesmo fora da página recente;
 filtros não comandam movimentos. URL, recarga e Voltar/Avançar restauram os
 filtros, sem rascunho de negócio ou nova persistência.
 
+Em `POST /api/consumption/records`, a ação `shortage` aceita a mensagem com
+ou sem materiais. Cada material pode omitir `quantity` ou informar `null`.
+Os dois formatos representam a mesma tentativa. Lista e detalhe retornam
+nome e unidade capturados, com `quantity: null` quando a equipe informa
+somente o material. Uma quantidade presente deve ser positiva e respeitar
+a precisão da unidade. A reiteração aponta para o aviso anterior e publica
+outro aviso, sem decisão de aprovação ou movimento de estoque.
+
 POST action=report conserva texto e linhas originais, autor e nome capturado
 no novo fato. Texto livre sem linhas é um relato válido, sem desconto.
 action=supplement exige id, text, lines, expectedVersion e idempotencyKey;

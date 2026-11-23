@@ -1,6 +1,6 @@
 export type ConsumptionLine = {
   productId: string;
-  quantity: string;
+  quantity: string | null;
   unit: string;
   name?: string;
 };
@@ -17,7 +17,7 @@ export type ConsumptionSummary = {
   reported_by: string;
   reported_name: string | null;
   code?: string;
-  materials?: { productId: string; name: string; quantity: string; unit: string | null }[];
+  materials?: { productId: string; name: string; quantity: string | null; unit: string | null }[];
 };
 export type ConsumptionReport = ConsumptionSummary & {
   source_reminder_id?:string|null;

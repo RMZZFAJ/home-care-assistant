@@ -207,13 +207,42 @@ test("shortages can be repeated without ledger writes and failed or stale comman
   const f = await teamFixture(t);
   const started = await f.quantities();
   const shortage = await f.command({ action: "shortage", observation: "Reserva de material precisa ser reposta." });
-  const repeat = await f.command({ action: "shortage", repeatedReportId: shortage.id, observation: "A equipe segue aguardando a reposição." });
+  const [unknownId, measuredId] = f.products;
+  const repeatIntent = { action: "shortage", repeatedReportId: shortage.id, observation: "A equipe segue aguardando a reposição.",
+    lines: [{ productId: unknownId }, { productId: measuredId, quantity: "2" }] };
+  const repeatKey = randomUUID();
+  const repeat = await f.command(repeatIntent, repeatKey);
+  assert.deepEqual(await f.command({ ...repeatIntent, lines: [repeatIntent.lines[1], { productId: unknownId, quantity: null }] }, repeatKey), repeat);
+  for (const lines of [
+    [{ productId: unknownId, quantity: "0" }],
+    [{ productId: unknownId, quantity: "1.25" }],
+    [{ productId: unknownId, unit: "unidade incorreta" }],
+    [{ productId: unknownId }, { productId: unknownId, quantity: "1" }],
+    [{ productId: "material-ausente-do-catalogo" }],
+  ]) {
+    const rejected = f.args({ ...repeatIntent, lines });
+    assert.equal((await f.professional.rpc("submit_team_consumption", rejected)).error?.code, "22023");
+    assert.equal(await rpc(f.professional, "team_consumption_result", { p_patient: f.patient, p_key: rejected.p_key }), null);
+  }
+  const invalidDebit = f.args({ action: "issue", lines: [{ productId: unknownId, quantity: null }] }, randomUUID(), (await f.reference()).referenceHash);
+  assert.equal((await f.professional.rpc("submit_team_consumption", invalidDebit)).error?.code, "22023");
   assert.notEqual(shortage.id, repeat.id);
   const family = await actor("family", f.patient);
   const familyRead = await rpc(family, "consumption_record_detail", { p_id: repeat.id });
   assert.equal(familyRead.status, "communicated");
   assert.equal(familyRead.acts[0].repeatedReportId, shortage.id);
   assert.deepEqual(familyRead.movements, []);
+  assert.equal(familyRead.decision, null);
+  const material = familyRead.current_lines.find(line => line.productId === unknownId);
+  assert.equal(material.quantity, null);
+  assert.ok(material.name && material.unit);
+  assert.equal(familyRead.current_lines.find(line => line.productId === measuredId).quantity, "2");
+  const [listed] = await rpc(f.professional, "consumption_record_list", {
+    p_patient: f.patient, p_kind: "shortage", p_status: null, p_search: material.name, p_reminder: null,
+    p_from: null, p_until: null, p_before_at: null, p_before_id: null,
+  });
+  assert.equal(listed.id, repeat.id);
+  assert.deepEqual(listed.materials.find(line => line.productId === unknownId), material);
   const familyId = (await family.auth.getUser()).data.user.id;
   const deliveries = JSON.parse(sql(`select jsonb_agg(jsonb_build_object('channel',n.channel,'event',n.event_key,'allowed',private.consumption_notice_allowed(n)))
     from public.requisition_notifications n where n.care_recipient_id=${q(f.patient)}

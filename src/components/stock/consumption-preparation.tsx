@@ -83,7 +83,7 @@ export function ConsumptionPreparation({
           productId: l.productId,
           name: l.name ?? l.productId,
           unit: l.unit,
-          quantity: l.quantity,
+          quantity: l.quantity ?? "",
         })),
   }));
   const [chosenCustody, setChosenCustody] = useState(

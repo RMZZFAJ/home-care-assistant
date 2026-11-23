@@ -3,25 +3,16 @@ import { exactQuantity } from "./exact-quantity";
 import { quantity } from "@/lib/quantity";
 import {reminderReportReceipt} from "./notification-reference";
 
-const lines = z
-  .array(
-    z
-      .object({
-        productId: z.string().min(1).max(120),
-        quantity: exactQuantity.refine(
-          (value) => quantity(value).gt(0),
-          "Informe quantidade positiva.",
-        ),
-        unit: z.string().min(1).max(30).optional(),
-      })
-      .strict(),
-  )
-  .max(100)
-  .refine(
-    (value) =>
-      new Set(value.map((line) => line.productId)).size === value.length,
-    "Não repita materiais.",
-  );
+const material = z.object({
+  productId: z.string().min(1).max(120),
+  quantity: exactQuantity.refine(value => quantity(value).gt(0), "Informe quantidade positiva."),
+  unit: z.string().min(1).max(30).optional(),
+}).strict();
+const uniqueMaterials = (value: { productId: string }[]) =>
+  new Set(value.map(line => line.productId)).size === value.length;
+const lines = z.array(material).max(100).refine(uniqueMaterials, "Não repita materiais.");
+const shortageLines = z.array(material.extend({ quantity: material.shape.quantity.nullish() }))
+  .max(100).refine(uniqueMaterials, "Não repita materiais.");
 const text = z.string().trim().min(3).max(2000);
 const version = z.number().int().positive().max(2147483647);
 export const consumptionStatus = z.enum(["reported", "confirmed", "rejected", "recorded", "cancelled", "communicated"]);
@@ -63,7 +54,7 @@ export const teamConsumptionCommand = z.discriminatedUnion("action", [
     referenceHash: referenceHash.optional(),
   }).strict(),
   z.object({ ...teamScope, ...teamRevision, action: z.literal("cancel") }).strict(),
-  z.object({ ...teamScope, action: z.literal("shortage"), observation: text, repeatedReportId: teamId.optional(), reminderId: teamId.optional(), lines: lines.optional() }).strict(),
+  z.object({ ...teamScope, action: z.literal("shortage"), observation: text, repeatedReportId: teamId.optional(), reminderId: teamId.optional(), lines: shortageLines.optional() }).strict(),
 ]);
 export const teamConsumptionReceipt = z.object({
   id: z.uuid(), operationId: z.uuid(), careRecipientId: z.uuid(), idempotencyKey: z.uuid(),
@@ -153,9 +144,9 @@ const consumptionPage = z.object({
     code: z.string().regex(/^(?:CON|FAL)-[A-F0-9]{8}$/).optional(),
     materials: z.array(z.object({
       productId: z.string().min(1), name: z.string().min(1),
-      quantity: z.string().max(64).regex(/^\d+(?:\.\d+)?$/), unit: z.string().nullable(),
+      quantity: z.string().max(64).regex(/^\d+(?:\.\d+)?$/).nullable(), unit: z.string().nullable(),
     })).max(100).optional(),
-  })).max(20),
+  }).refine(row => row.kind === "shortage" || !row.materials?.some(line => line.quantity === null))).max(20),
   next: consumptionCursor.nullable(),
 });
 export function parseConsumptionPage(value: unknown, patient: string) {
