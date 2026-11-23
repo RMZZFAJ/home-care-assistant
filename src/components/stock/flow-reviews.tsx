@@ -22,11 +22,15 @@ export function FlowReviews({
   context,
   products,
   catalogReady,
+  refreshRevision,
+  onContinueConsumption,
   onChange,
 }: {
   context: WorkspaceContext;
   products: CatalogProduct[];
   catalogReady: boolean;
+  refreshRevision: number;
+  onContinueConsumption?: (source: FlowSubmission, opener: HTMLElement) => void;
   onChange: () => void;
 }) {
   const patientId = context.patient!.id,
@@ -58,7 +62,7 @@ export function FlowReviews({
     } | null>(null),
     [cursors, setCursors] = useState<(Cursor | null)[]>([null]);
   const cursor = cursors[cursors.length - 1],
-    readKey = JSON.stringify([patientId, page, attempt, live]),
+    readKey = JSON.stringify([patientId, page, attempt, refreshRevision, live]),
     privateScope = JSON.stringify([
       context.userId,
       patientId,
@@ -209,16 +213,15 @@ export function FlowReviews({
               <div className="hca-toolbar">
                 <ActionButton
                   disabled={!catalogReady}
-                  onClick={(e) =>
-                    setSelected({
-                      target: row.id,
-                      source: row,
-                      accept: true,
-                      opener: e.currentTarget,
-                    })
-                  }
+                  onClick={(e) => {
+                    if (row.body.kind === "consumption" && onContinueConsumption) {
+                      onContinueConsumption(row, e.currentTarget);
+                      return;
+                    }
+                    setSelected({ target: row.id, source: row, accept: true, opener: e.currentTarget });
+                  }}
                 >
-                  Conferir sugestão
+                  {row.body.kind === "consumption" && onContinueConsumption ? "Continuar consumo" : "Conferir sugestão"}
                 </ActionButton>
                 <ActionButton
                   onClick={(e) =>

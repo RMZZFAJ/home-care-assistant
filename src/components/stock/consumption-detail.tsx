@@ -220,6 +220,8 @@ export function ConsumptionDetail({
             { label: "Situação", value: consumptionStateLabels[data.status] },
             { label: "Versão", value: data.version },
             { label: "Referência", value: recordLabel },
+            ...(data.acts?.some(act => act.source === "whatsapp")
+              ? [{ label: "Origem", value: "Sugestão do WhatsApp" }] : []),
           ]} />
           {canAmend || mayWrite && data.status === "communicated" ? <div className="hca-toolbar">
             {canAmend ? <>

@@ -1786,6 +1786,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123025445_l3_balance_extra_recount_links` | Aplicada | Aplicada |
 | `20261123035313_l3_shift_type_cycles` | Aplicada | Aplicada |
 | `20261123043302_l3_consumption_material_effects` | Aplicada | Aplicada |
+| `20261123045130_l3_flow_direct_consumption` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2135,10 +2136,9 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   das fichas. O painel compartilhado usa o histórico por operação e
   consulta as fichas relacionadas com filtros no servidor. A aba Materiais
   dos registros de consumo e falta abre esse mesmo painel com o contexto
-  do registro. A revisão das sugestões do WhatsApp ainda registra consumo
-  extraordinário pelo fluxo legado. A continuidade E07-12 depende de
-  concluir essa revisão com o mesmo contrato de consumo direto. A
-  conferência visual final da frente continua aberta.
+  do registro. A continuidade E07-12 abre o assistente de consumo direto
+  a partir das sugestões recebidas pelo WhatsApp. A homologação do provedor
+  e a conferência visual final da frente continuam abertas.
 - **E08 — Plantões e balanços.** Em execução. A admissão da contagem
   iniciada no plantão já preserva a retomada. A área reúne Plantões,
   Balanços e Histórico com as permissões de cada leitura. A ficha tem
@@ -2814,6 +2814,37 @@ Antes da aplicação remota, o backup crítico cifrado
 `3904d57a-48c1-41e9-bf41-26aed7e7497b` foi verificado. Local e remoto
 registram 348 versões, com fila vinculada vazia. A leitura da ficha
 continua condicionada à autenticação e à permissão da custódia.
+
+### Consumo a partir de sugestão do WhatsApp
+
+**Continuar consumo** abre o assistente compartilhado em Materiais. A
+mensagem original é consultada pelo vínculo autorizado. Os materiais
+reconhecidos entram selecionados. O formato atual do provedor envia
+identidades de materiais, e a equipe informa as quantidades usadas
+antes de revisar. O rascunho conserva o vínculo com a sugestão e as
+quantidades já preenchidas.
+
+A emissão usa a referência de estoque e a revisão do rascunho. A
+baixa, a confirmação da sugestão, o vínculo com a ficha e a auditoria
+são transacionais. Uma sugestão encerrada em outra sessão impede nova
+emissão, e a resposta incerta usa a chave da tentativa original. A
+ficha indica a origem WhatsApp. O descarte existente preserva a
+mensagem sem movimentar estoque. Vínculos que só podem declarar
+continuam usando a revisão legada com as capacidades existentes.
+
+O assistente reutiliza o canal existente. Os testes usam sugestões
+registradas no ambiente local. A homologação do recebimento externo
+depende da configuração do provedor.
+
+As verificações dirigidas cobriram 14 integrações com Auth real,
+23 testes unitários e nove cenários em Chromium, Android e iOS
+emulados. O cenário de consumo confirmou as quantidades em branco,
+a retomada, a recuperação da resposta perdida e o débito único.
+
+A migration foi aplicada após o backup crítico cifrado verificado
+`f7384b0f-8bc1-4df5-b46f-da00588f374d`. Local e remoto registram
+349 versões, com fila vinculada vazia. O RPC transacional segue restrito
+ao papel autenticado, com autorização por paciente e dono da sugestão.
 
 ## L4
 

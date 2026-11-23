@@ -22,6 +22,7 @@ import { TeamConsumptionAction } from "./team-consumption-action";
 import { ConsumptionRecord } from "./consumption-record";
 import { ConsumptionDetail } from "./consumption-detail";
 import { FlowReviews } from "./flow-reviews";
+import type { FlowSubmission } from "@/lib/validation/flow-reviews";
 import { parseConsumptionListRead } from "@/lib/validation/consumption";
 import { parseStockBalances } from "@/lib/validation/stock-reads";
 import { useScopedRead } from "@/lib/use-scoped-read";
@@ -95,6 +96,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
     [referenceError, setReferenceError] = useState("");
   const [editorOrigin, setEditorOrigin] = useState<ReminderOrigin | null>(null);
   const [teamEditor, setTeamEditor] = useState<HTMLElement | null>(null);
+  const [teamFlow, setTeamFlow] = useState<FlowSubmission>();
   const [shortage, setShortage] = useState<HTMLElement | null>(null);
   const mayRecordTeam = can(context, "consumption.team.write") && context.patient?.is_active !== false;
   const decodeTeamStock = useCallback(
@@ -481,11 +483,12 @@ function Reports({ context }: { context: WorkspaceContext }) {
         materialLoading={stock.loading || catalogLoading}
         materialError={stock.error || catalogError}
         retryMaterials={() => { stock.refresh(); catalogRetry(); }}
-        opener={teamEditor} sourceReminder={editorOrigin ?? undefined}
-        onClose={() => { setTeamEditor(null); setEditorOrigin(null); }}
+        opener={teamEditor} sourceReminder={editorOrigin ?? undefined} sourceFlow={teamFlow}
+        onClose={() => { setTeamEditor(null); setEditorOrigin(null); setTeamFlow(undefined); }}
         onSaved={id => {
           setTeamEditor(null);
           setEditorOrigin(null);
+          setTeamFlow(undefined);
           setMessage("Consumo registrado no estoque da equipe.");
           setAttempt(value => value + 1);
           open(id);
@@ -501,6 +504,12 @@ function Reports({ context }: { context: WorkspaceContext }) {
         context={context}
         products={catalogError ? [] : products}
         catalogReady={!catalogLoading && !catalogError}
+        refreshRevision={attempt}
+        onContinueConsumption={mayRecordTeam ? (source, opener) => {
+          setEditorOrigin(null);
+          setTeamFlow(source);
+          setTeamEditor(opener);
+        } : undefined}
         onChange={() => setAttempt((value) => value + 1)}
       />
     </div>

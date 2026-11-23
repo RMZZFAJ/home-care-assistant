@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { rpc, setup } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { seedFlowSuggestion } from "../integration/flow-preparation-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
@@ -37,6 +38,51 @@ async function openConsumption(page: Page, f: Awaited<ReturnType<typeof fixture>
   await page.goto("/consumo?careRecipientId=" + f.patient);
   await expect(page.getByRole("heading", { name: "Consumo e faltas", exact: true })).toBeVisible();
 }
+
+test("a sugestão do WhatsApp continua no assistente e baixa o estoque uma única vez", async ({ page }, info) => {
+  const f = await fixture();
+  const original = "Material informado pela equipe na mensagem do plantão.";
+  const suggestion = seedFlowSuggestion(f.patient, f.professional.id, [f.products[0]], original);
+  const balance = () => Number(sql(`select private.stock_quantity(${q(f.patient)},${q(f.products[0])},'CARE_TEAM')::text`));
+  const source = page.getByRole("region", { name: "Sugestões pendentes do Flow", exact: true });
+  const launch = source.getByRole("button", { name: "Continuar consumo", exact: true });
+  await openConsumption(page, f);
+  await launch.click();
+  const wizard = page.getByRole("dialog", { name: "Continuar consumo", exact: true });
+  await expect(wizard.getByRole("region", { name: "Sugestão do WhatsApp", exact: true })).toContainText(original);
+  const amount = wizard.getByRole("textbox", { name: "Quantidade consumida · " + f.name, exact: true });
+  await expect(wizard.getByRole("checkbox", { name: f.name, exact: true })).toBeChecked();
+  await expect(amount).toHaveValue("");
+  expect(balance()).toBe(10);
+  await amount.fill("3");
+  await expect(wizard.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  await page.reload();
+  await launch.click();
+  await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(amount).toHaveValue("3");
+  await expect(wizard.getByRole("region", { name: "Sugestão do WhatsApp", exact: true })).toContainText(original);
+  await audit(page, "continuidade da sugestão de consumo");
+  await info.attach("sugestao-whatsapp-no-assistente", { body: await wizard.screenshot(), contentType: "image/png" });
+  await wizard.getByRole("button", { name: "Continuar", exact: true }).click();
+  await wizard.getByRole("button", { name: "Continuar", exact: true }).click();
+  await wizard.getByRole("button", { name: "Revisar consumo", exact: true }).click();
+  await expect(wizard.getByText(/Após o consumo · 7/)).toBeVisible();
+  expect(balance()).toBe(10);
+  await page.route("**/api/consumption/records", async route => {
+    expect(route.request().postDataJSON()).toMatchObject({ flowSubmissionId: suggestion, action: "issue" });
+    const stored = await route.fetch();
+    expect(stored.status(), await stored.text()).toBe(201);
+    await route.abort();
+  }, { times: 1 });
+  await wizard.getByRole("button", { name: "Registrar consumo", exact: true }).click();
+  await wizard.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const report = page.getByRole("region", { name: "Detalhe do relato", exact: true });
+  await expect(report.getByText("Sugestão do WhatsApp", { exact: true })).toBeVisible();
+  await expect(report.getByText("Registrado", { exact: true })).toBeVisible();
+  await expect(launch).toHaveCount(0);
+  expect(balance()).toBe(7);
+  expect(sql(`select status from public.flow_submissions where id=${q(suggestion)}`)).toBe("confirmed");
+});
 
 test("consumo preserva o último rascunho, recupera a baixa e permite correção e cancelamento", async ({ page }, info) => {
   const f = await fixture();

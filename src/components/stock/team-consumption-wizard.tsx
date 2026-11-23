@@ -19,9 +19,13 @@ import { Notice, type WorkspaceContext } from "@/components/workspace";
 import { api, ApiError } from "@/lib/client/api";
 import { navigationForStep } from "@/lib/forms/draft-navigation";
 import { formatQuantity, quantity } from "@/lib/quantity";
+import { formatBrazilDate } from "@/lib/receipt";
+import { useLiveRevision } from "@/lib/use-live-revision";
+import { useScopedRead } from "@/lib/use-scoped-read";
 import { teamConsumptionCommand, teamConsumptionReceipt, teamConsumptionReference, type TeamConsumptionCommand } from "@/lib/validation/consumption";
 import { consumptionPreparationContentSchema, type ConsumptionPreparationContent } from "@/lib/validation/consumption-preparations";
 import { exactQuantity } from "@/lib/validation/exact-quantity";
+import { parseFlowPage, type FlowSubmission } from "@/lib/validation/flow-reviews";
 import type { CatalogProduct } from "@/types/documents";
 
 type Issue = Extract<TeamConsumptionCommand, { action: "issue" }>;
@@ -31,7 +35,7 @@ const stages = ["Confirmação", "Materiais", "Itens extras", "Observações", "
 const endpoint = "/api/consumption/records";
 const categories = new Set<string>(materialCategories.map(entry => entry.id));
 
-export function TeamConsumptionWizard({ context, products, balances, materialLoading, materialError, retryMaterials, opener, sourceReminder, onClose, onSaved }: {
+export function TeamConsumptionWizard({ context, products, balances, materialLoading, materialError, retryMaterials, opener, sourceReminder, sourceFlow, onClose, onSaved }: {
   context: WorkspaceContext;
   products: CatalogProduct[];
   balances: ReadonlyMap<string, string>;
@@ -40,6 +44,7 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
   retryMaterials: () => void;
   opener: HTMLElement;
   sourceReminder?: ReminderOrigin;
+  sourceFlow?: FlowSubmission;
   onClose: () => void;
   onSaved: (id: string) => void;
 }) {
@@ -51,18 +56,34 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
       return value.success && value.data.action === "issue" && value.data.careRecipientId === patient.id ? value.data : null;
     } catch { return null; }
   });
-  const [step, setStep] = useState(pending ? 4 : 0);
-  const [category, setCategory] = useState<WizardMaterialCategory>("medicamentos");
+  const suggested = () => {
+    const ids = new Set(sourceFlow?.body.products);
+    return products.filter(product => ids.has(product.id)).map(product => ({
+      productId: product.id, name: product.name, unit: product.unit, quantity: "",
+    }));
+  };
+  const firstCategory = (items: Line[]) => materialCategories.find(entry =>
+    products.some(product => product.id === items[0]?.productId && product.category === entry.id),
+  )?.id ?? "medicamentos";
+  const [step, setStep] = useState(pending ? 4 : sourceFlow ? 1 : 0);
+  const [lines, setLines] = useState<Line[]>(suggested);
+  const [category, setCategory] = useState<WizardMaterialCategory>(() => firstCategory(lines));
   const [query, setQuery] = useState("");
-  const [lines, setLines] = useState<Line[]>([]);
   const [observation, setObservation] = useState("");
   const [reminder, setReminder] = useState(sourceReminder?.id ?? "");
+  const [flowId, setFlowId] = useState(sourceFlow?.id);
   const [reference, setReference] = useState<ReturnType<typeof teamConsumptionReference.parse> | null>(null);
   const [previous, setPrevious] = useState<MaterialBalance[]>([]);
   const [busy, setBusy] = useState(false);
   const [receiptAbsent, setReceiptAbsent] = useState(false);
   const [error, setError] = useState("");
   const activeRef = useRef(false);
+  const live = useLiveRevision();
+  const flowRead = useScopedRead(flowId && !pending
+    ? "/api/whatsapp/flows/submissions?" + new URLSearchParams({ careRecipientId: patient.id, id: flowId })
+    : null, JSON.stringify([context.userId, patient.capabilities, live]), parseFlowPage);
+  const flow = flowRead.data?.data.find(row => row.id === flowId && row.body.kind === "consumption");
+  const sourceReady = !flowId || Boolean(flow && !flowRead.loading && !flowRead.error);
   const draft = useCreationDraft({
     userId: context.userId, patientId: patient.id, kind: "CONSUMPTION",
     purpose: "consumption_report_team", targetResourceId: patient.id,
@@ -74,18 +95,29 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
       setLines(stored.lines);
       setObservation(stored.text);
       setReminder(stored.reminderId);
+      setFlowId(stored.flowSubmissionId);
+      setCategory(firstCategory(stored.lines));
       setStep(1);
       return true;
     },
-    onDiscard: () => { setLines([]); setObservation(""); setStep(0); },
+    onDiscard: () => {
+      const initial = suggested();
+      setLines(initial);
+      setCategory(firstCategory(initial));
+      setObservation("");
+      setReminder(sourceReminder?.id ?? "");
+      setFlowId(sourceFlow?.id);
+      setStep(sourceFlow ? 1 : 0);
+    },
   });
   const content: ConsumptionPreparationContent = {
-    consumption: { kind: "consumption", location: "CARE_TEAM", text: observation, reason: "", reminderId: reminder, lines },
+    consumption: { kind: "consumption", location: "CARE_TEAM", text: observation, reason: "", reminderId: reminder,
+      ...(flowId ? { flowSubmissionId: flowId } : {}), lines },
     reference: null, referenceHash: null,
   };
-  const edited = lines.length > 0 || Boolean(observation.trim());
+  const edited = lines.length > 0 || Boolean(observation.trim() || flowId);
   const sameDraft = draft.base?.state === "active" && JSON.stringify(draft.base.content) === JSON.stringify(content);
-  useLongDraftAutosave(draft, content, edited && !busy && !pending);
+  useLongDraftAutosave(draft, content, edited && !busy && !pending && sourceReady);
   useOperationActivity(busy, { title: pending ? "Conferindo o registro" : step === 4 ? "Registrando consumo" : "Conferindo estoque da equipe" });
 
   function retain(packet: Issue | null) {
@@ -115,7 +147,7 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
     return true;
   }
   async function review() {
-    if (activeRef.current || !validLines()) return;
+    if (activeRef.current || !sourceReady || !validLines()) return;
     activeRef.current = true; setBusy(true); setError("");
     try {
       setReference(await getReference());
@@ -133,7 +165,7 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
     onSaved(receipt.id);
   }
   async function submit() {
-    if (activeRef.current || (!pending && (!reference || draft.blocked || draft.backgroundBusy))) return;
+    if (activeRef.current || (!pending && (!sourceReady || !reference || draft.blocked || draft.backgroundBusy))) return;
     activeRef.current = true; setBusy(true); setError("");
     let packet = pending;
     let posted = false;
@@ -143,7 +175,7 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
         if (!saved || reference === null) { setError("Confira o salvamento do rascunho antes de emitir."); return; }
         const data = teamConsumptionCommand.parse({
           action: "issue", careRecipientId: patient.id, idempotencyKey: crypto.randomUUID(),
-          observation, reminderId: reminder || undefined,
+          observation, reminderId: reminder || undefined, flowSubmissionId: flowId,
           lines: lines.map(({ productId, quantity, unit }) => ({ productId, quantity, unit })),
           draft: { id: saved.id, revision: saved.revision }, referenceHash: reference.referenceHash,
         });
@@ -182,6 +214,7 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
       } else {
         if (posted && reason instanceof ApiError &&
           ["INVALID_OPERATION", "INSUFFICIENT_STOCK", "VALIDATION_ERROR"].includes(reason.code ?? "")) {
+          if (flowId && reason.code === "INVALID_OPERATION") flowRead.refresh();
           retain(null);
           setReceiptAbsent(false);
           setReference(null);
@@ -214,15 +247,15 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
     return !amount.success || quantity(amount.data).gt(material.quantity) || quantity(amount.data).decimalPlaces() > material.decimals;
   });
   const ready = pending || !draft.loading && !draft.offered && !draft.readDenied && !draft.loadError && !draft.protectedReadPending;
-  return <RecordDrawer title="Registrar consumo" kicker="Consumo do plantão" subtitle={patient.display_name}
+  return <RecordDrawer title={flowId ? "Continuar consumo" : "Registrar consumo"} kicker="Consumo do plantão" subtitle={patient.display_name}
     onClose={() => { void close(); }} restoreFocusTo={opener} busy={busy} preventClose={draft.busy || draft.backgroundBusy}
     popupClassName="hca-wizard-dialog hca-team-consumption-wizard" trackChanges={false} keyboardScrollable
     footer={() => <SupplyWizardFooter back={<ActionButton variant="quiet" disabled={busy || Boolean(pending) && step > 0}
       onClick={() => step ? setStep(step - 1) : void close()}>{step ? "Voltar" : "Sair por agora"}</ActionButton>}
     status={pending ? undefined : { draft, current: content, hasEdits: edited }}>
-      {step === 4 ? <ActionButton variant="primary" disabled={busy || (!pending && (cannotIssue || draft.blocked || draft.backgroundBusy))}
+      {step === 4 ? <ActionButton variant="primary" disabled={busy || (!pending && (!sourceReady || cannotIssue || draft.blocked || draft.backgroundBusy))}
         onClick={() => void submit()}>{pending ? receiptAbsent ? "Reenviar a mesma tentativa" : "Conferir resultado" : "Registrar consumo"}</ActionButton>
-        : <ActionButton variant="primary" disabled={busy || !ready || draft.blocked} onClick={() => {
+        : <ActionButton variant="primary" disabled={busy || !ready || !sourceReady || draft.blocked} onClick={() => {
           setError(""); setQuery("");
           if (step === 3) void review();
           else setStep(step + 1);
@@ -231,10 +264,22 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
     {!pending ? <SimpleDraftPanel draft={draft} current={content} disabled={busy} patientName={patient.display_name}
       authorName={context.fullName} documentLabel="Consumo" statusInFooter onExitDraft={onClose} /> : null}
     {error ? <Notice error>{error}</Notice> : null}
+    {flowId && !pending && !sourceReady ? <Notice error={Boolean(flowRead.error) || !flowRead.loading}>
+      {flowRead.loading ? "Consultando a sugestão do WhatsApp…"
+        : "A sugestão do WhatsApp está indisponível ou já foi resolvida."}
+      {!flowRead.loading ? <ActionButton onClick={flowRead.refresh}>Consultar sugestão novamente</ActionButton> : null}
+    </Notice> : null}
     {pending ? <Notice>{receiptAbsent
       ? "A confirmação ainda não foi encontrada. Você pode reenviar a mesma tentativa com segurança."
       : "Confira o resultado desta tentativa antes de registrar outro consumo."}</Notice> : ready ? <>
       <StepNavigator steps={stages} active={step} onChange={setStep} compact label="Etapas do consumo" disabled={busy || draft.blocked} />
+      {flow && step === 1 ? <section className="hca-attention" aria-label="Sugestão do WhatsApp">
+        <strong>Sugestão recebida pelo WhatsApp · {formatBrazilDate(flow.created_at)}</strong>
+        {flow.body.text ? <p className="whitespace-pre-wrap wrap-break-word">{flow.body.text}</p> : null}
+        <p>Confira os materiais e preencha as quantidades usadas no plantão.</p>
+        {flow.body.products?.some(id => !products.some(product => product.id === id))
+          ? <p>Parte dos materiais da sugestão está indisponível no catálogo atual.</p> : null}
+      </section> : null}
       {step === 0 ? <>
         <SupplyWizardIdentity context={context} kind="CON" />
         {reminder ? <Notice>Consumo vinculado ao lembrete do plantão.</Notice> : null}

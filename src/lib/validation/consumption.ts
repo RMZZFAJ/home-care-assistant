@@ -45,9 +45,10 @@ export const teamConsumptionReference = z.object({
 }).strict();
 export const teamConsumptionCommand = z.discriminatedUnion("action", [
   z.object({
-    ...teamScope, action: z.literal("issue"), observation: teamObservation, reminderId: teamId.optional(),
+    ...teamScope, action: z.literal("issue"), observation: teamObservation, reminderId: teamId.optional(), flowSubmissionId: teamId.optional(),
     lines: requiredLines, referenceHash, draft: z.object({ id: teamId, revision: version }).strict().optional(),
-  }).strict(),
+  }).strict().refine(value => !value.flowSubmissionId || (!!value.draft && !value.reminderId),
+    "A sugestão do WhatsApp precisa do próprio preenchimento."),
   z.object({ ...teamScope, ...teamRevision, action: z.literal("correct"), observation: teamObservation, lines: requiredLines }).strict(),
   z.object({ ...teamScope, ...teamRevision, action: z.literal("cancel") }).strict(),
   z.object({ ...teamScope, action: z.literal("shortage"), observation: text, repeatedReportId: teamId.optional(), reminderId: teamId.optional(), lines: lines.optional() }).strict(),

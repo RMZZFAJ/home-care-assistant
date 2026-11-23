@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { actor, fixtures, issue, rpc, setup } from "./v4-fixtures.mjs";
 import { personalReminderFixture, reminderState, shiftReminder } from "./notice-reference-fixtures.mjs";
+import { seedFlowSuggestion } from "./flow-preparation-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 
 async function teamFixture(t) {
@@ -36,6 +37,62 @@ async function teamFixture(t) {
   const lines = values => f.products.map((productId, i) => ({ productId, quantity: String(values[i]) }));
   return { ...f, professional, command, args, reference, quantities, lines };
 }
+
+test("a WhatsApp suggestion is linked atomically to one reviewed team debit", async t => {
+  const f = await teamFixture(t);
+  const { data: { user } } = await f.professional.auth.getUser();
+  const target = seedFlowSuggestion(f.patient, user.id, [f.products[0]]);
+  const other = seedFlowSuggestion(f.patient, fixtures.adminA.id, [f.products[0]]);
+  const retired = seedFlowSuggestion(f.patient, user.id, [f.products[0]]);
+  const scope = { p_patient: f.patient, p_purpose: "consumption_report_team", p_target: f.patient };
+  const observation = "Utilização dos materiais conferida após a troca.";
+  const lines = [{ productId: f.products[0], quantity: "2" }];
+  const save = (client, flowSubmissionId, base) => rpc(client, "consumption_preparation_command", {
+    ...scope, p_id: base?.id ?? null, p_expected: base?.revision ?? null, p_key: randomUUID(),
+    p_body: { action: "save", navigation: { version: 1, stage: "consumption_preparation" },
+      content: { reference: null, referenceHash: null, consumption: {
+        kind: "consumption", location: "CARE_TEAM", text: observation, reason: "", reminderId: "",
+        flowSubmissionId, lines: lines.map(line => ({ ...line, name: "", unit: "" })),
+      } } },
+  });
+  const initial = await f.reference([f.products[0]]);
+  const stock = (await f.quantities())[0].team;
+  const request = (draft, flowSubmissionId, key = randomUUID(), reference = initial.referenceHash) => ({
+    p_patient: f.patient, p_key: key, p_reference: reference, p_draft_id: draft.id, p_draft_revision: draft.revision,
+    p_body: { action: "issue", observation, lines, ...(flowSubmissionId ? { flowSubmissionId } : {}) },
+  });
+  const draft = await save(f.professional, target);
+  assert.equal((await f.professional.rpc("submit_team_consumption", request(draft))).error?.code, "PT409");
+  const foreign = await save(f.professional, other, draft);
+  assert.equal((await f.professional.rpc("submit_team_consumption", request(foreign, other))).error?.code, "42501");
+  const closed = await save(f.professional, retired, foreign);
+  assert.deepEqual(await rpc(f.professional, "review_flow_submission", {
+    p_id: retired, p_accept: false, p_kind: "shortage", p_text: "Sugestão descartada.", p_lines: [],
+  }), { status: "rejected", reportId: null });
+  assert.equal((await f.professional.rpc("submit_team_consumption", request(closed, retired))).error?.code, "PT409");
+  assert.equal((await f.quantities())[0].team, stock);
+  const ready = await save(f.professional, target, closed);
+  await f.command({ action: "issue", observation: "Consumo diferente registrado enquanto o Flow era conferido.",
+    lines: [{ productId: f.products[0], quantity: "1" }] }, randomUUID());
+  assert.equal((await f.professional.rpc("submit_team_consumption", request(ready, target))).error?.code, "PT409");
+  assert.equal((await f.quantities())[0].team, stock - 1);
+  const reviewed = await f.reference([f.products[0]]);
+  const packet = request(ready, target, randomUUID(), reviewed.referenceHash);
+  const receipt = await rpc(f.professional, "submit_team_consumption", packet);
+  assert.deepEqual(await rpc(f.professional, "team_consumption_result", { p_patient: f.patient, p_key: packet.p_key }), receipt);
+  assert.deepEqual(await rpc(f.professional, "submit_team_consumption", packet), receipt);
+  const withoutOrigin = { ...packet, p_body: { action: "issue", observation, lines } };
+  assert.equal((await f.professional.rpc("submit_team_consumption", withoutOrigin)).error?.code, "23505");
+  assert.equal((await f.quantities())[0].team, stock - 3);
+  const result = await rpc(f.professional, "consumption_record_detail", { p_id: receipt.id });
+  assert.equal(result.workflow_mode, "direct");
+  assert.equal(result.acts[0].source, "whatsapp");
+  assert.equal(sql(`select status || ':' || report_id from public.flow_submissions where id=${q(target)}`), "confirmed:" + receipt.id);
+  assert.deepEqual(await rpc(f.professional, "review_flow_submission", {
+    p_id: target, p_accept: true, p_kind: "consumption", p_text: observation, p_lines: lines,
+  }), { status: "confirmed", reportId: receipt.id });
+  assert.equal((await f.quantities())[0].team, stock - 3);
+});
 
 test("team consumption issues directly, corrects by differences, and compensates only once", async t => {
   const f = await teamFixture(t);

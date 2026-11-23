@@ -60,6 +60,7 @@ export type ConsumptionReport = ConsumptionSummary & {
     at: string;
     reason: string | null;
     repeatedReportId: string | null;
+    source?: "whatsapp" | null;
   }[];
   replayed?: boolean;
 };

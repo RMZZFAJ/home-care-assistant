@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — continuidade de consumo do WhatsApp.** A sugestão abre o
+assistente de consumo. A equipe revisa materiais e quantidades, e o
+registro vincula sugestão e baixa na mesma transação. Local e remoto
+registram 349 migrations.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação).
+
 **23/11 — painel de material no consumo e na falta.** A ficha abre os
 saldos e efeitos do material com os movimentos de baixa, correção e
 compensação identificados por ato. Local e remoto registram 348 migrations.

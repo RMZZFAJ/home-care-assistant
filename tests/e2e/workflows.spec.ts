@@ -1303,11 +1303,13 @@ test("E06-09 troca de recebedor de ENT direta e cancelamento com consentimento p
   expect(Number(stock.family.confirmed)).toBe(30);
 });
 
-test("Flow exige revisão do autor e confirmação autorizada antes de debitar estoque", async ({
+test("Flow legado mantém a conferência de relatos quando o autor tem somente permissão de declarar", async ({
   page,
 }) => {
   await login(page);
   const { patient, products } = await prepare(page);
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${sqlLiteral(patient)},${sqlLiteral(fixtures().professional.id)},'consumption.team.write',false)`);
   const product = products[0];
   await post(page, "/api/stock/movements", {
     careRecipientId: patient,

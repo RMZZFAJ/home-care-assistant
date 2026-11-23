@@ -1,12 +1,18 @@
 import { randomUUID } from "node:crypto";
 import { expect, test, devices, type Page } from "@playwright/test";
 import { fixtures, rpc } from "../integration/v4-fixtures.mjs";
-import { flowPreparationFixture as fixture } from "../integration/flow-preparation-fixtures.mjs";
+import { flowPreparationFixture } from "../integration/flow-preparation-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { auditFromTop } from "./accessibility-audit";
 test.setTimeout(180_000);
+async function fixture(accept = true) {
+  const result = await flowPreparationFixture(accept);
+  sql(`insert into public.capability_overrides(care_recipient_id,capability,subject_user,enabled)
+    values(${q(result.patient)},'consumption.team.write',${q(fixtures.adminA.id)},false)`);
+  return result;
+}
 async function login(page: Page, patient: string) {
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
