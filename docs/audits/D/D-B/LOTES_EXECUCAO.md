@@ -3679,6 +3679,12 @@ WhatsApp ainda requer homologação do provedor.
 
 ### Aplicação da contagem ao estoque
 
+- A ficha distingue os estados **Em revisão**, **Pronto para aplicar** e
+  **Aplicado**. A referência alterada, a diferença sem aplicação e a
+  recontagem aguardada mantêm seus próprios avisos. A faixa compacta
+  durante a rolagem usa o mesmo estado do cabeçalho. Quinze testes
+  unitários passaram e a transição de pronto para aplicado passou em
+  Chromium e iOS emulados com o recibo real.
 - E08-13 mostra os saldos de referência e os valores previstos para o
   estoque da equipe antes da confirmação. O primeiro ajuste aparece no
   diálogo. Os demais ficam na expansão da mesma conferência. A versão da

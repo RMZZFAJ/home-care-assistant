@@ -140,6 +140,8 @@ test("BAL shows the final application phase until the same official receipt is c
  });
  await openBalanceAsFamily(page, f.patient, f.document.id, family.email);
  await selectDocumentSection(page, "reviews");
+ const header = page.locator(".hca-document-header");
+ await expect(header.locator(".hca-status--info").getByText("Pronto para aplicar", { exact: true }).last()).toBeVisible();
  await page.getByRole("button", { name: "Aplicar contagem pelo grupo familiar", exact: true }).click();
  const success = page.getByRole("dialog", { name: "Contagem aplicada", exact: true });
  try {
@@ -153,6 +155,7 @@ test("BAL shows the final application phase until the same official receipt is c
  await expect(success).toContainText(f.document.code);
  await success.getByRole("button", { name: "Concluir", exact: true }).click();
  await expect(page.getByRole("heading", { name: "Aplicação da contagem ao estoque", exact: true })).toBeFocused();
+ await expect(header.locator(".hca-status--success").getByText("Aplicado", { exact: true }).last()).toBeVisible();
  await expect(page.getByRole("button", { name: "Aplicar contagem pelo grupo familiar", exact: true })).toHaveCount(0);
  expect(keys).toHaveLength(1);
  expect(stock(f.patient)).toBe(afterWrite);

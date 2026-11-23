@@ -4,7 +4,7 @@ import { Menu } from "@base-ui/react/menu";
 import Link from "next/link";
 import { Dialog } from "@/components/ui/overlays";
 import { StatusBadge, Icon, type IconName } from "@/components/ui/primitives";
-import { ActionButton, Pill } from "@/components/ui/controls";
+import { ActionButton, Pill, type PillTone } from "@/components/ui/controls";
 import { MenuPopup } from "@/components/ui/floating";
 import { DocumentActions } from "./document-actions";
 import { DocumentShareDialog, documentShareUrl } from "./document-share-dialog";
@@ -37,6 +37,7 @@ export function DocumentHeader({
   code,
   status,
   statusLabel,
+  statusTone,
   protocol,
   version,
   createdAt,
@@ -68,6 +69,7 @@ export function DocumentHeader({
   code: string;
   status: string;
   statusLabel?: string;
+  statusTone?: PillTone;
   protocol: string | null;
   version: number;
   createdAt: string | null;
@@ -117,6 +119,7 @@ export function DocumentHeader({
   const actionClosedRef = useRef(false);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
   useImperativeHandle(moreTriggerRef, () => moreButtonRef.current!);
+  const statusBadge = statusTone && statusLabel ? <Pill tone={statusTone}>{statusLabel}</Pill> : <StatusBadge status={status} label={statusLabel} />;
   const facts = [
     ...metadata.slice(0, 1),
     { label: dateHeading, value: dateLabel ?? (createdAt ? new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short" }).format(new Date(createdAt)) : formatBrazilDate(createdAt)) },
@@ -149,7 +152,7 @@ export function DocumentHeader({
   );
   return (
     <>
-      <div className="hca-document-compact-slot">{compact ? <div className="hca-document-compact" aria-label="Identificação da ficha durante rolagem"><span className="hca-document-type">{code.startsWith("DEV-") ? "DEV" : type}</span><strong>{code}</strong><StatusBadge status={status} label={statusLabel} /><span className="hca-compact-badges">{badges}</span></div> : null}</div>
+      <div className="hca-document-compact-slot">{compact ? <div className="hca-document-compact" aria-label="Identificação da ficha durante rolagem"><span className="hca-document-type">{code.startsWith("DEV-") ? "DEV" : type}</span><strong>{code}</strong>{statusBadge}<span className="hca-compact-badges">{badges}</span></div> : null}</div>
       <section
         className="hca-document-header"
         data-type={code.startsWith("DEV-") ? "DEV" : type}
@@ -168,7 +171,7 @@ export function DocumentHeader({
             </div>
           </div>
           <div className="hca-document-tags">
-            <StatusBadge status={status} label={statusLabel} />
+            {statusBadge}
             {badges}
           </div>
         </div>

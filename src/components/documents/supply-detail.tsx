@@ -1460,6 +1460,7 @@ export function SupplyDocumentContent({
                 : data.status
             }
             statusLabel={archive ? documentArchiveLabel(archive) : followUpState === "reopened" ? "Acompanhamento reaberto" : followUpState === "completed" ? "Acompanhamento concluído" : followUpStep?.statusLabel}
+            statusTone={archive || followUpState ? undefined : balanceStep?.statusTone}
             protocol={data.protocol}
             version={data.version}
             createdAt={data.created_at}

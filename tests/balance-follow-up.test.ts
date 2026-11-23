@@ -16,7 +16,7 @@ it("does not treat a draft or cancelled draft as a completed physical count", ()
   expect(balanceFollowUp({ ...count, status: "cancelled", protocol: null })).toMatchObject({ pending: false, section: "history" });
 });
 it("keeps required review pending without inferring eligibility or stock effect", () => {
-  expect(balanceFollowUp(count)).toMatchObject({ pending: true, heading: "Acompanhar as revisões do balanço" });
+  expect(balanceFollowUp(count)).toMatchObject({ pending: true, heading: "Acompanhar as revisões do balanço", statusLabel: "Em revisão", statusTone: "warning" });
   expect(balanceFollowUp(count).description).toContain("sem presumir conclusão");
 });
 it("keeps historical and unavailable references distinct from zero or approval", () => {
@@ -24,6 +24,8 @@ it("keeps historical and unavailable references distinct from zero or approval",
   const unavailable = balanceFollowUp({ ...count, balanceReview: { ...review!, referenceState: "unavailable" } });
   expect(historical.description).toContain("movimentos posteriores");
   expect(unavailable.description).toContain("não foi presumido saldo zero");
+  expect(historical.statusLabel).toBe("Referência alterada");
+  expect(unavailable.statusLabel).toBe("Referência indisponível");
   expect(historical.pending).toBe(true);
   expect(unavailable.pending).toBe(true);
 });
@@ -33,14 +35,14 @@ it("does not turn an approved status into evidence of reconciliation", () => {
 });
 it("preserves a real past reconciliation after later movements", () => {
   const data: Facts = { ...count, status: "approved", balanceReview: { ...review!, reviewRequired: false, reconciliationApplied: true, referenceState: "historical" } };
-  expect(balanceFollowUp(data)).toMatchObject({ heading: "Consultar a contagem conciliada", pending: false, section: "reviews" });
+  expect(balanceFollowUp(data)).toMatchObject({ heading: "Consultar a contagem conciliada", pending: false, section: "reviews", statusLabel: "Aplicado", statusTone: "success" });
   expect(balanceFollowUp(data).description).toContain("saldo atual é uma consulta distinta");
   expect(balanceFollowUp({ ...data, protocol: null }).heading).toBe("Consultar os fatos da contagem");
   expect(supplyMilestones({ ...data, protocol: null, type: "BAL", totalLines: 1, fullyCheckedLines: 0 })[3].state).not.toBe("done");
 });
 it("keeps designation and the new physical count distinct even after prior approval", () => {
   const data: Facts = { ...count, status: "approved", balanceReview: { ...review!, reconciliationApplied: true }, balanceRecount: { requiresDesignation: true, activeAssignment: null } as SupplyDocument["balanceRecount"] };
-  expect(balanceFollowUp(data)).toMatchObject({ pending: true, heading: "Designar o reconto do balanço" });
+  expect(balanceFollowUp(data)).toMatchObject({ pending: true, heading: "Designar o reconto do balanço", statusLabel: "Aguardando recontagem", statusTone: "warning" });
   expect(balanceFollowUp({ ...data, balanceRecount: { ...data.balanceRecount!, lastAssignment: { cycle_id: "cycle" } as NonNullable<SupplyDocument["balanceRecount"]>["lastAssignment"], activeAssignment: { id: "assignment", kind: "recount", cycle_id: "cycle" } as NonNullable<NonNullable<SupplyDocument["balanceRecount"]>["activeAssignment"]> } })).toMatchObject({ pending: true, heading: "Acompanhar o reconto designado" });
   expect(balanceFollowUp({ ...data, status: "rejected" }).section).toBe("history");
 });
