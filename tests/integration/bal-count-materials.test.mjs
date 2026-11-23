@@ -65,6 +65,7 @@ test("recount requires previous identities, moves incorporated extras into the c
     [{...payload,lines:lines.slice(1)},/previous materials/],
     [{...payload,lines:lines.filter(x=>x.productId!==incorporated.product_id)},/incorporated extra/],
     [{...payload,balanceExtras:[]},/previous extras/],
+    [{...payload,balanceExtras:[{...retained,unit:"outra unidade"}]},/extra identity changed/],
   ]) {
     const rejected = await f.pro.client.rpc("revise_supply_document",{...args,p_payload:input});
     assert.match(rejected.error?.message,message);

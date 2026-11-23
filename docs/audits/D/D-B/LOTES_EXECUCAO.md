@@ -2133,11 +2133,12 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   abas próprias para Revisões e Contagens. O cadastro consulta os
   horários por residência onde já configurados. Alterações de plantão que
   atingem uma contagem designada exigem encaminhamento explícito e registram
-  a decisão na mesma transação. Restam completar a
-  administração dos tipos e a transição das residências sem configuração,
-  a conferência visual. A contagem por plantão já usa as cinco etapas e
-  registra extras separados do catálogo. Restam os pareceres por extra e
-  as demais decisões de programação do regime previstas na referência.
+  a decisão na mesma transação. Restam completar a administração dos
+  tipos, a transição das residências sem configuração e a conferência
+  visual. A contagem por plantão usa as cinco etapas. Extras têm
+  parecer individual e vínculo a recontos comprovados. A programação
+  registra observação opcional e o pedido de autorização para contar
+  fica no acompanhamento do BAL.
 - **E09 — Arquivos e verificação.** Em execução. A consulta pública exibe
   registro, correspondência, assinatura e carimbo separadamente. Os detalhes
   autorizados abrem em painel e revalidam o acesso. O resultado público
@@ -2576,9 +2577,8 @@ e idempotência do ato. O registro preserva nome, unidade e quantidade dos
 extras daquela contagem. O exemplar usa esse registro para identificar os
 extras revisados, inclusive após a saída do item da lista atual. A
 aplicação ao estoque continua sendo um ato próprio, e o encaminhamento de
-uma diferença permanece no histórico. Falta vincular aos atos posteriores
-o extra que reaparece na recontagem e o que passa a ter identidade de
-catálogo.
+uma diferença permanece no histórico. A continuidade após a revisão está
+registrada na seção sobre o vínculo de extras às recontagens.
 
 A migration `20261123011538_l3_balance_extra_reviews.sql` está no ambiente
 local e no Supabase remoto. O backup cifrado crítico
@@ -2681,6 +2681,44 @@ familiar de 5 para 4 unidades, a observação na programação de sexta à
 noite e a preservação do saldo ao programar. A conferência do BAL foi
 avaliada em larguras de 320 a 1440 px. Os seletores antigos da
 movimentação foram atualizados para os controles e o diálogo atuais.
+
+### Vínculo de extras às recontagens
+
+Uma diferença sobre item extra mostra os atos posteriores na revisão
+original. A versão da recontagem preserva a identidade do extra que
+permanece fora do catálogo, com sua quantidade e autoria. Quando há uma
+correspondência única entre o extra que saiu da lista e os materiais
+catalogados contados, a versão registra a identidade do catálogo. Essa
+ligação resiste à alteração posterior do nome. Havendo mais de uma
+correspondência contada, o sistema preserva o parecer original e deixa o
+vínculo em aberto.
+
+O extra que ainda está fora do catálogo não participa da aplicação ao
+estoque. A versão que o conta como material catalogado só apresenta saldo
+de aplicação quando há ato correspondente e permissão de leitura do saldo
+da equipe. A ficha e as novas emissões de PDF mostram autoria, quantidade,
+versão e situação da aplicação de cada ato vinculado.
+
+A migration `20261123025445_l3_balance_extra_recount_links.sql` está
+aplicada no ambiente local e no Supabase remoto. O backup crítico cifrado
+`c8a83d5e-8b3d-4408-bd22-8b1cbacf3081` foi verificado antes da aplicação.
+A conferência remota retornou 346 migrations, fila vazia e funções
+internas sem execução direta pelos papéis da interface.
+
+Oito integrações com Auth real cobriram extras preservados e
+incorporados, renomeação, dois candidatos ambíguos, reutilização do
+identificador, corte por versão, replay e leitura restrita do saldo.
+Dois cenários passaram em Chromium, Android e iOS emulados. A ficha
+mostrou os links de cada versão, e a extração do PDF confirmou o extra
+recontado e a ausência de movimentação para o item ainda sem catálogo.
+O teste de acessibilidade separou a verificação do link focado da
+auditoria da composição iniciada no topo em cada largura.
+
+Na CI do commit `27cbe270`, o teste de navegação privada ainda recusava
+a etapa de contagem no BAL avulso. A expectativa passou a aceitar a
+etapa compartilhada e a verificar que as etapas de recebimento e as
+específicas de outro modo são recusadas sem avançar a revisão privada.
+Os quatro testes de integração desse arquivo passaram localmente.
 
 ## L4
 

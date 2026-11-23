@@ -11,6 +11,35 @@ export async function correctionFixture() {
   p_payload:{lines:f.products.map(productId=>({productId,quantity:productId===line.product_id?"2":"3"})),notes:"Reconto físico posterior com autoria própria."}});
  return {...f,family,original,line,reviewed,recount};
 }
+
+export async function extraCorrectionFixture() {
+  const extra = { id: randomUUID(), name: "Espátula sem cadastro", unit: "caixa", quantity: "2" };
+  const f = await legacyBalance({ quantity: "1", balanceExtras: [extra] });
+  const family = await actor("family", f.patient);
+  const opinion = await balCommand(family, f.document, {
+    group: "family",
+    comment: "Há diferença no item extra.",
+    items: [{ lineId: extra.id, result: "difference", forwarding: "recount", comment: "Conferir a espátula novamente." }],
+  });
+  assert.ifError(opinion.error);
+  const revise = (source, lines, extras) => ({
+    p_id: source.id, p_version: source.version, p_key: randomUUID(), p_recount: true,
+    p_payload: { lines, balanceExtras: extras, notes: "Contagem física da espátula." },
+  });
+  const lines = f.products.map(productId => ({ productId, quantity: "1" }));
+  const carry = revise(opinion.data, lines, [{ ...extra, quantity: "3" }]);
+  const retained = await rpc(f.admin, "revise_supply_document", carry);
+  const productArgs = {
+    p_care_recipient_id: f.patient, p_product_id: null, p_name: extra.name,
+    p_category: "higiene", p_unit: "caixa", p_aliases: [], p_is_active: true,
+  };
+  const product = await rpc(f.admin, "admin_upsert_recipient_product", productArgs);
+  const catalogueLines = [...lines, { productId: product.product_id, quantity: "4" }];
+  const incorporate = revise(retained, catalogueLines, []);
+  const incorporated = await rpc(f.admin, "revise_supply_document", incorporate);
+  return { ...f, family, extra, reviewed: opinion.data, retained, incorporated, incorporate, productArgs, product, catalogueLines, revise };
+}
+
 export async function applyCorrection(f) {
  const current=await rpc(f.family,"operational_document",{p_id:f.document.id});
  const opinion=await balCommand(f.family,current,{group:"family",comment:"Parecer próprio da nova contagem."});assert.ifError(opinion.error);

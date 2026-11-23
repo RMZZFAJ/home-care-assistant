@@ -29,7 +29,7 @@ test("private stage survives another real Auth device, CAS and exact replay with
  assert.equal((await draftContext(f)).navigation,null);
 });
 
-test("database refuses forged metadata and cross-mode stages before storing any private revision",async()=>{
+test("database accepts the shared BAL count stage and rejects forged or unrelated navigation",async()=>{
  const f=await privateDraftFixture(),before=officialState(f),packet=savePacket(f);
  for(const navigation of [null,[],{},nav("count"),{...nav("notes"),role:"admin"},{version:2,stage:"review"},{version:1,stage:"x".repeat(1024)}]){
   const result=await f.pro.rpc("creation_draft_command",{...packet,p_key:randomUUID(),p_body:{...packet.p_body,navigation}});
@@ -37,12 +37,16 @@ test("database refuses forged metadata and cross-mode stages before storing any 
  }
  for(const mode of ["legacy","scheduled"]){
   const content=balContent(f);content.context.mode=mode;
-  const args=savePacket(f,"BAL",content);args.p_body.navigation=nav(mode==="scheduled"?"count":"higiene");
+  const args=savePacket(f,"BAL",content);args.p_body.navigation=nav("count");
   const saved=await rpc(f.pro,"creation_draft_command",args);
   assert.deepEqual((await draftContext(f,"BAL")).navigation,args.p_body.navigation);
-  const invalid={...args,p_id:saved.id,p_expected:1,p_key:randomUUID(),p_body:{...args.p_body,navigation:nav(mode==="scheduled"?"higiene":"count")}};
-  assert.equal((await f.pro.rpc("creation_draft_command",invalid)).error?.code,"22023");
-  await rpc(f.pro,"creation_draft_command",{...invalid,p_body:{action:"discard"},p_key:randomUUID()});
+  const update={...args,p_id:saved.id,p_expected:saved.revision};
+  for (const stage of mode === "scheduled" ? ["receipt", "higiene"] : ["receipt"]) {
+   const invalid={...update,p_key:randomUUID(),p_body:{...args.p_body,navigation:nav(stage)}};
+   assert.equal((await f.pro.rpc("creation_draft_command",invalid)).error?.code,"22023");
+  }
+  assert.equal((await draftContext(f,"BAL")).revision,saved.revision);
+  await rpc(f.pro,"creation_draft_command",{...update,p_body:{action:"discard"},p_key:randomUUID()});
  }
  assert.equal(officialState(f),before);
  assert.equal(sql("select has_function_privilege('authenticated','private.creation_draft_navigation_valid(jsonb,text,text,jsonb)','execute');"),"f");

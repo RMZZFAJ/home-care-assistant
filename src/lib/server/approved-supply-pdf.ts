@@ -235,9 +235,10 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
       layout.heading("Atos posteriores vinculados ao material");
       for (const [actIndex, act] of correction.acts.entries()) {
         const prefix = "correction/" + index + "/" + actIndex;
-        layout.paragraph("Reconto · " + act.line.name + " · " + amount(act.line.quantity, act.line.unit), prefix + "/count", { strong: true });
+        const stillExtra = act.line.id === correction.sourceLineId;
+        layout.paragraph("Reconto · " + act.line.name + (stillExtra ? " (item extra)" : "") + " · " + amount(act.line.quantity, act.line.unit), prefix + "/count", { strong: true });
         layout.paragraph((act.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(act.recordedAt), prefix + "/actor", { size: 9.5 });
-        layout.paragraph(act.application.state === "not_applied" ? "Reconto não aplicado ao estoque." : act.application.state === "unavailable" ? "Resultado da aplicação não disponível no registro." : "Aplicado por " + act.application.actorName + " · " + formatBrazilDate(act.application.appliedAt), prefix + "/application", { size: 9.5 });
+        layout.paragraph(stillExtra ? "Item contado como extra, sem movimentação de estoque." : act.application.state === "not_applied" ? "Reconto não aplicado ao estoque." : act.application.state === "unavailable" ? "Resultado da aplicação não disponível no registro." : "Aplicado por " + act.application.actorName + " · " + formatBrazilDate(act.application.appliedAt), prefix + "/application", { size: 9.5 });
         if (act.application.state === "applied") layout.paragraph("Saldo após este reconto: " + (act.application.lines[0].state === "restricted" ? "Acesso restrito" : amount(act.application.lines[0].quantity, act.line.unit)), prefix + "/balance");
       }
     }

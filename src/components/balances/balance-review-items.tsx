@@ -159,24 +159,27 @@ export function BalanceReviewItemFacts({ review, corrections, documentId, docume
         {item.comment ? <p className="whitespace-pre-wrap wrap-anywhere">{item.comment}</p> : null}
         {item.result === "difference" ? <>
           <p>A revisão não corrige o estoque. O encaminhamento, sozinho, não comprova sua execução.</p>
-          {material?.extra ? <p>Este extra foi registrado como observação física. A revisão preserva o encaminhamento deste item sem ajuste de saldo.</p> : !linked.success ? <Notice error>Não foi possível conferir os atos posteriores vinculados. Consulte novamente esta ficha.</Notice> : (() => {
+          {!linked.success ? <Notice error>Não foi possível conferir os atos posteriores vinculados. Consulte novamente esta ficha.</Notice> : (() => {
             const entry = linked.data.find(row => row.reviewId === review.id && row.sourceLineId === item.lineId);
             if (!entry || entry.acts.some(act => act.documentId !== documentId || act.version > documentVersion || act.version <= review.reviewed_document_version || act.countVersion <= review.count_version || (act.application.state === 'applied' && act.application.documentVersion > documentVersion))) return <Notice error>Os atos posteriores não correspondem à ficha, contagem ou versão consultada. Consulte novamente esta ficha.</Notice>;
             if (entry.sourceState === 'unavailable') return <Notice>Identidade histórica deste material indisponível; nenhum vínculo foi presumido por nome ou quantidade.</Notice>;
             if (!entry.acts.length) return <p>Nenhum reconto posterior vinculado a este material nesta ficha.</p>;
             return <section className="hca-form-stack" aria-label="Atos posteriores vinculados a este material">
               <h5>Atos posteriores vinculados</h5>
-              {entry.acts.map(act => <article className="hca-form-stack" key={act.eventId}>
-                <strong>Reconto {act.countVersion} · versão {act.version}</strong>
-                <p>{act.actorName ?? "Nome histórico não preservado"} · {formatBrazilDate(act.recordedAt)}.</p>
-                <p>{act.line.name} · contado neste reconto: {formatQuantity(act.line.quantity, act.line.unit)}.</p>
-                <Link className="ui-button ui-button-secondary" href={"/documentos/" + act.documentId + "/arquivos?version=" + act.version}>Consultar versão {act.version} do reconto</Link>
-                {act.application.state === 'applied' ? <>
-                  <p>Aplicado por {act.application.actorName} · {formatBrazilDate(act.application.appliedAt)} · versão {act.application.documentVersion}.</p>
-                  <p>Saldo após a aplicação deste reconto: {act.application.lines[0].state === 'restricted' ? 'Acesso restrito' : formatQuantity(act.application.lines[0].quantity, act.line.unit)}.</p>
-                  <Link className="ui-button ui-button-secondary" href={"/documentos/" + act.documentId + "/arquivos?version=" + act.application.documentVersion}>Consultar aplicação na versão {act.application.documentVersion}</Link>
-                </> : <p>{act.application.state === 'not_applied' ? 'Reconto registrado; contagem não aplicada ao estoque.' : 'Saldo após a aplicação: Não disponível no registro.'}</p>}
-              </article>)}
+              {entry.acts.map(act => {
+                const stillExtra = act.line.id === item.lineId;
+                return <article className="hca-form-stack" key={act.eventId}>
+                  <strong>Reconto {act.countVersion} · versão {act.version}</strong>
+                  <p>{act.actorName ?? "Nome histórico não preservado"} · {formatBrazilDate(act.recordedAt)}.</p>
+                  <p>{act.line.name}{stillExtra ? " · Item extra" : material?.extra ? " · Material do catálogo" : ""} · contado neste reconto: {formatQuantity(act.line.quantity, act.line.unit)}.</p>
+                  <Link className="ui-button ui-button-secondary" href={"/documentos/" + act.documentId + "/arquivos?version=" + act.version}>Consultar versão {act.version} do reconto</Link>
+                  {act.application.state === 'applied' ? <>
+                    <p>Aplicado por {act.application.actorName} · {formatBrazilDate(act.application.appliedAt)} · versão {act.application.documentVersion}.</p>
+                    <p>Saldo após a aplicação deste reconto: {act.application.lines[0].state === 'restricted' ? 'Acesso restrito' : formatQuantity(act.application.lines[0].quantity, act.line.unit)}.</p>
+                    <Link className="ui-button ui-button-secondary" href={"/documentos/" + act.documentId + "/arquivos?version=" + act.application.documentVersion}>Consultar aplicação na versão {act.application.documentVersion}</Link>
+                  </> : <p>{stillExtra ? "Item contado como extra, sem movimentação de estoque." : act.application.state === 'not_applied' ? 'Reconto registrado; contagem não aplicada ao estoque.' : 'Saldo após a aplicação: Não disponível no registro.'}</p>}
+                </article>;
+              })}
               <p>Esses atos têm autoria e resultado próprios. Não substituem o Contado nem o saldo da contagem anterior e não declaram esta revisão como confirmação das contagens seguintes.</p>
             </section>;
           })()}

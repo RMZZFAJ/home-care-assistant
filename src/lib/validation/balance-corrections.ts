@@ -15,6 +15,8 @@ export const balanceCorrectionFacts = z.array(z.object({
   reviewId: id, sourceLineId: id, sourceState: z.enum(['known', 'unavailable']), acts: z.array(balanceCorrectionAct),
 }).strict().superRefine((item, ctx) => {
   if (item.sourceState === 'unavailable' && item.acts.length) ctx.addIssue({ code: 'custom', message: 'Uma origem indisponível não comprova atos vinculados.' });
+  if (item.acts.some(act => act.line.id === item.sourceLineId && act.application.state !== 'not_applied'))
+    ctx.addIssue({ code: 'custom', message: 'Um item extra preservado não tem aplicação de estoque.' });
   if (new Set(item.acts.map(act => act.eventId)).size !== item.acts.length
     || item.acts.some((act, i) => i > 0 && act.version <= item.acts[i - 1].version)) ctx.addIssue({ code: 'custom', message: 'A cronologia dos atos vinculados não foi confirmada.' });
 })).superRefine((items, ctx) => {
