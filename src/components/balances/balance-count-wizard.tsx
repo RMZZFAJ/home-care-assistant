@@ -1094,10 +1094,12 @@ function ScheduledCount({
       disabled={busy || uncertain || Boolean(cacheError)}
     />
   );
+  const shiftType = balance.assignments.find((item) => item.id === assignment?.id)?.type_name;
   const identity = <DefinitionGrid items={[
     { label: "Paciente", value: context.patient!.display_name },
     { label: "Quem preenche", value: context.fullName },
     { label: "Plantão", value: `${formatBrazilDate(assignment?.starts_at ?? null)} → ${formatBrazilDate(assignment?.ends_at ?? null)}` },
+    ...(shiftType ? [{ label: "Tipo de plantão", value: shiftType }] : []),
     { label: "Estoque", value: "Equipe" },
     { label: "Contagem", value: recount ? `Recontagem de ${editing?.code ?? "balanço"}` : "Balanço do plantão" },
   ]} />;
@@ -1261,13 +1263,14 @@ function ScheduledCount({
             <h2>Revisão da contagem</h2>
             <p>Confira as quantidades físicas e as diferenças.</p>
             <p className="hca-muted">{context.patient!.display_name} · {context.fullName} · estoque da equipe</p>
+            {shiftType ? <p className="hca-muted">{shiftType} · {formatBrazilDate(assignment?.starts_at ?? null)} → {formatBrazilDate(assignment?.ends_at ?? null)}</p> : null}
             {editing?.workflow_data.reviewPolicy &&
               typeof editing.workflow_data.reviewPolicy === "object" &&
               "balReview" in editing.workflow_data.reviewPolicy ? (
               <Notice>
                 {editing.workflow_data.reviewPolicy.balReview === "optional"
                   ? "Ao confirmar, as diferenças desta nova contagem serão conciliadas no estoque da equipe. A revisão é facultativa; a diferença não será registrada como consumo."
-                  : "Esta contagem usa a revisão exigida na política preservada do balanço. A conciliação aguarda os novas revisões; revisões anteriores não aprovam esta contagem."}
+                  : "Esta contagem usa a revisão exigida na política preservada do balanço. A conciliação aguarda as novas revisões. Revisões anteriores não aprovam esta contagem."}
               </Notice>
             ) : (
               <p>

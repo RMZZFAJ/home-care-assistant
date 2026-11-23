@@ -2557,6 +2557,13 @@ A tela de materiais foi verificada em 360 e 412 px. A composição
 independente do PDF confirmou nome, unidade e quantidade do extra, com os
 saldos do catálogo em seu quadro original.
 
+O Preview de `566a6917` respondeu com o protocolo e o esquema esperados e
+retornou a referência de estoque para uma sessão fictícia autenticada, com
+29 materiais. Os testes adicionais em Chromium confirmaram a retomada da
+revisão sem emissão e a recontagem em outra janela com o tipo de plantão
+visível na confirmação e na revisão. A recontagem preservou a contagem
+anterior, sua autoria e seus pareceres.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

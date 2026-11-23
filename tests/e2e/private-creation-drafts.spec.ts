@@ -61,20 +61,27 @@ async function observations(page: Page) {
   for (let i = 0; i < 3; i++) await next(page);
 }
 
-test("BAL agendado recupera a revisão em leitura com referências salvas sem novo ato oficial",async({page})=>{
-  const f=await balanceSetup(),before=officialState(f);
-  await login(page,f.patient,f.pro.email);await open(page,"BAL");
-  for(let i=0;i<f.products.length;i++)await page.getByLabel(`Material fictício V4 ${i} · unidade`,{exact:true}).fill("0");
-  await next(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
+test("BAL agendado recupera a revisão em leitura com referências salvas sem novo ato oficial", async ({ page }) => {
+  const f = await balanceSetup(), before = officialState(f);
+  await login(page, f.patient, f.pro.email);
+  await open(page, "BAL");
+  await page.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
+  for (const [i] of f.products.entries()) {
+    await page.getByLabel(`Material fictício V4 ${i} · unidade`, { exact: true }).fill("0");
+  }
+  await finishBalanceMaterials(page);
+  await page.getByRole("button", { name: "Revisar", exact: true }).click();
+  await expect(balanceStage(page, "Revisão")).toHaveAttribute("aria-current", "step");
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
-  const saved=await draftContext(f,"BAL",f.pro.client);
-  expect(saved.navigation).toEqual({version:1,stage:"review"});
+  const saved = await draftContext(f, "BAL", f.pro.client);
+  expect(saved.navigation).toEqual({ version: 1, stage: "review" });
   expect(saved.content.context.mode).toBe("scheduled");
   await page.reload();
-  expect((await draftContext(f,"BAL",f.pro.client)).content.context.referenceRevision).toBe(saved.content.context.referenceRevision);
+  expect((await draftContext(f, "BAL", f.pro.client)).content.context.referenceRevision).toBe(saved.content.context.referenceRevision);
   await expect(panel(page)).toBeVisible();
   await expect(panel(page).getByRole("textbox")).toHaveCount(0);
-  await resume(page);await expect(page.locator('[aria-current="step"]')).toContainText("Revisão");
+  await resume(page);
+  await expect(balanceStage(page, "Revisão")).toHaveAttribute("aria-current", "step");
   expect(officialState(f)).toBe(before);
 });
 

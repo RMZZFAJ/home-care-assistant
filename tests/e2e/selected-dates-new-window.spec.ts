@@ -554,10 +554,8 @@ test("BAL em janela nova mostra a contagem de Sheila17 e conserva Juliana18 e se
     before = JSON.parse(recountState(f));
   await login(page, f.patient, f.second.email);
   await page.goto(`/fichas/bal?documentId=${f.document.id}&recount=true`);
+  await expect(page.getByText(f.target.type_name, { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
-  await expect(
-    page.getByText(f.target.type_name, { exact: false }),
-  ).toBeVisible();
   for (const [i] of f.products.entries())
     await page
       .getByLabel(`Material fictício V4 ${i} · unidade`, { exact: true })
@@ -567,6 +565,7 @@ test("BAL em janela nova mostra a contagem de Sheila17 e conserva Juliana18 e se
     .getByLabel("Observações da contagem", { exact: true })
     .fill("Contagem2 de Sheila, realizada em outra janela de plantão");
   await page.getByRole("button", { name: "Revisar", exact: true }).click();
+  await expect(page.getByText(f.target.type_name, { exact: false })).toBeVisible();
   await expect(page.getByRole("textbox")).toHaveCount(0);
   await expect(
     page.getByRole("table", { name: "Materiais da contagem", exact: true }).locator('td[data-label="Referência"]').filter({ hasText: /^20 unidade$/ }),
