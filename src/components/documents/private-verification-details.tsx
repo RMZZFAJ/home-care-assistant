@@ -20,7 +20,7 @@ const response = z.object({ data: z.object({
   documentVersion: z.number(), technicalKey: z.string().nullable(), certificateFingerprint: z.string().nullable(),
 }) });
 
-export function PrivateVerificationDetails({ code }: { code: string }) {
+export function PrivateVerificationDetails({ code, loginHref }: { code: string; loginHref: string }) {
   const [actorId, setActorId] = useState<string | null>(null);
   const [panel, setPanel] = useState<"access" | "details" | null>(null);
   const [busy, setBusy] = useState(false);
@@ -63,7 +63,6 @@ export function PrivateVerificationDetails({ code }: { code: string }) {
   const details = actorId && !read.loading && !read.error ? read.data : null;
   const hasKnownDetails = Boolean(actorId && read.data && !read.error);
   const denied = Boolean(actorId && read.error);
-  const login = "/login?next=" + encodeURIComponent("/verificar?code=" + code);
   const close = () => {
     interactionRef.current++;
     setPanel(null);
@@ -99,7 +98,7 @@ export function PrivateVerificationDetails({ code }: { code: string }) {
       subtitle="Sua consulta pública permanece disponível." headingIcon="lock" finalFocus={openerRef}
       footer={<>
         <ActionButton onClick={close}>Voltar à consulta</ActionButton>
-        {!actorId ? <Link className="ui-button ui-button-primary" href={login}>Entrar e continuar esta verificação</Link>
+        {!actorId ? <Link className="ui-button ui-button-primary" href={loginHref}>Entrar e continuar esta verificação</Link>
           : details ? <ActionButton variant="primary" onClick={() => setPanel("details")}>Consultar detalhes</ActionButton>
             : <ActionButton variant="primary" disabled={busy || read.loading} onClick={() => void select()}>
               {busy ? "Conferindo contexto…" : "Usar o contexto autorizado desta emissão"}

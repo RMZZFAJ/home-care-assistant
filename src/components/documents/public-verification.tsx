@@ -26,6 +26,14 @@ import { PrivateVerificationDetails } from "./private-verification-details";
 import { safeReturnPath } from "@/lib/safe-return-path";
 import { VerificationResult } from "./public-verification-result";
 import "./public-verification.css";
+
+function verificationPath(code?: string, origin?: string | null) {
+  const params = new URLSearchParams();
+  if (code) params.set("code", code);
+  if (origin && origin !== "/") params.set("returnTo", origin);
+  return "/verificar" + (params.size ? "?" + params : "");
+}
+
 export function PublicVerification({
   initialCode = "",
   returnTo,
@@ -88,12 +96,10 @@ export function PublicVerification({
       if (sequence !== sequenceRef.current) return;
       focusResultRef.current = focus ? sequence : null;
       setResult(parsed.data);
-      if (parsed.data.reference.found) {
-        const url = new URL(window.location.href);
-        url.pathname = "/verificar"; url.search = "?code=" + parsed.data.reference.verificationCode;
-        if (originReturn && originReturn !== "/") url.searchParams.set("returnTo", originReturn);
-        window.history.replaceState(null, "", url.pathname + url.search);
-      }
+      const { reference, fileReference } = parsed.data;
+      const registeredCode = reference.found ? reference.verificationCode
+        : fileReference?.found && fileReference.bytesMatch === true ? fileReference.verificationCode : undefined;
+      window.history.replaceState(null, "", verificationPath(registeredCode, originReturn));
     },
     [originReturn],
   );
@@ -260,9 +266,10 @@ export function PublicVerification({
       : "Use para conferir se este PDF pertence à emissão esperada."}</small>
   </div>;
 
-  const detailsReference = result?.fileReference?.found ? result.fileReference : result?.reference;
-  const detailsCode = detailsReference?.found ? detailsReference.verificationCode : null;
-  const loginPath = "/login?next=" + encodeURIComponent("/verificar" + (detailsCode ? "?code=" + detailsCode : ""));
+  const fileReference = result?.fileReference;
+  const detailsReference = fileReference?.found && fileReference.bytesMatch === true ? fileReference : result?.reference;
+  const detailsCode = detailsReference?.found ? detailsReference.verificationCode : undefined;
+  const loginPath = "/login?next=" + encodeURIComponent(verificationPath(detailsCode, originReturn));
   const fromDocument = originReturn && originReturn !== "/";
   const consultationMethods = [
     { value: "code", label: "Tenho um código", icon: "search" },
@@ -291,8 +298,9 @@ export function PublicVerification({
         {result ? <>
           <VerificationResult result={result} code={code} file={file} headingRef={headingRef}
             onEdit={() => changeMethod(method)}
+            onRetry={() => void upload()}
             onFile={() => { if (method === "file") setFile(null); changeMethod("file"); }} />
-          {detailsCode ? <PrivateVerificationDetails key={detailsCode} code={detailsCode} /> : null}
+          {detailsCode ? <PrivateVerificationDetails key={detailsCode} code={detailsCode} loginHref={loginPath} /> : null}
         </> : <Tabs.Root value={method} className="hca-verify-form-card" onValueChange={value => {
           if (value === "code" || value === "file") changeMethod(value);
         }}>

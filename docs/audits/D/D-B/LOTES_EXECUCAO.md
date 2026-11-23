@@ -2142,6 +2142,8 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   do registro. A continuidade E07-12 abre o assistente de consumo direto
   a partir das sugestões recebidas pelo WhatsApp. A homologação do provedor
   e a conferência visual final da frente continuam abertas.
+  Em E07-04, a expansão lista os materiais e abre a origem de cada movimento.
+  Falta o painel da operação inteira previsto no laboratório.
 - **E08 — Plantões e balanços.** Em execução. A admissão da contagem
   iniciada no plantão já preserva a retomada. A área reúne Plantões,
   Balanços e Histórico com as permissões de cada leitura. A ficha tem
@@ -2317,6 +2319,23 @@ automática na PR em rascunho.
   casos em Android e os três em iOS emulados, com uma falha intermitente em
   Chromium corrigida antes da última rodada. Passaram 12 testes do
   verificador e do contrato de dados.
+- O resultado por código de E09-06 usa linhas explicativas em uma coluna.
+  O resultado de E09-07 distingue divergência, falta de exemplar para
+  comparação e correspondência com outra emissão. O painel apresenta a
+  integridade da assinatura, o carimbo, a cobertura dos bytes e a confiança
+  como evidências próprias. A próxima ação acompanha o resultado.
+- Quando a política fica indisponível ou a análise atinge o limite, a interface
+  permite conferir novamente o mesmo arquivo enquanto a consulta está aberta.
+  A primeira comparação de bytes fica visível no resultado recebido.
+  A entrada para os detalhes autorizados conserva o código e o destino
+  interno validado. O serviço e a autorização usam os contratos vigentes.
+- A comparação visual de E09-06 usou a v4 e o produto em 360 px.
+  Passaram 23 testes do verificador e da apresentação e nove casos de
+  navegador em Chromium, Android e iOS emulados. A rodada final confirmou
+  no servidor o SHA-256 do PDF reenviado e usou revogação real de vínculo.
+  A primeira rodada não capturou o corpo do PDF pelo Playwright e atingiu
+  o limite compartilhado de uploads. O teste agora aguarda o limite
+  disponível e compara o hash devolvido pela API.
 
 ### Anexos da ficha
 

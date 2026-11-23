@@ -400,6 +400,16 @@
 .hca-verify-evidence[data-tone="success"] { color: #326645; }
 .hca-verify-evidence[data-tone="warning"] { border-color: #ebdfc7; background: #fffbf1; color: #74551c; }
 .hca-verify-evidence[data-tone="danger"] { border-color: #ebd6cc; background: #fff6f2; color: #8c4737; }
+.hca-verify-evidence-list[data-explained="true"] { grid-template-columns: minmax(0, 1fr); }
+.hca-verify-evidence-list[data-explained="true"] .hca-verify-evidence { padding: 12px 13px; gap: 10px; }
+.hca-verify-evidence-list[data-explained="true"] .hca-verify-evidence-label { font-size: 13px; }
+.hca-verify-evidence-list[data-explained="true"] .hca-verify-evidence-value { font-size: 15px; }
+.hca-verify-evidence-help { margin: 6px 0 0; color: var(--verification-muted); font-size: 13px; line-height: 1.55; }
+
+.hca-verify-sheet-status { display: flex; align-items: center; gap: 9px; padding: 12px 13px; border: 1px solid #d6e3d8; border-radius: 10px; color: #325b4d; background: #f0f5f1; }
+.hca-verify-sheet-status svg { flex: none; }
+.hca-verify-sheet-status[data-tone="warning"] { border-color: #ebdfc7; background: #fffbf1; color: #74551c; }
+.hca-verify-sheet-status[data-tone="danger"] { border-color: #ebd6cc; background: #fff6f2; color: #8c4737; }
 
 .hca-verify-result-actions { padding: 0 19px 19px; display: grid; gap: 7px; }
 .hca-verify-result-actions p { color: var(--verification-muted); font-size: 14px; line-height: 1.65; margin: 0 0 9px; }
