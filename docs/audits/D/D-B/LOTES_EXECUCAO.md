@@ -3475,6 +3475,33 @@ WhatsApp ainda requer homologação do provedor.
   à origem e a recuperação após falha de leitura. As capturas mostram
   os estados em 360 e 412 px.
 
+### Regressões de navegador em 13262f65
+
+- O banco e as validações em Ubuntu e Windows passaram. Chromium-1 e
+  Android-1 passaram com 294 casos cada, sem retentativas. A execução
+  está no [GitHub Actions](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45200021561).
+- Chromium-2, Android-2 e iOS-2 repetiram a falha do teste que buscava o texto
+  antigo do saldo. A asserção agora vincula separadamente Disponível,
+  Saída e Após registrar às quantidades conferidas. Na retomada do tipo
+  de plantão após perder a escrita, Chromium falhou nas duas tentativas
+  e Android passou na segunda. O teste agora espera a leitura autorizada
+  da revisão 3 e mantém os controles de escrita indisponíveis. Os seis
+  casos desses dois fluxos passaram em Chromium, Android e iOS emulados.
+- Android-2 perdeu o foco ao voltar após o conflito de programação. O
+  registro mostrou o botão de revisão desabilitado durante a consulta
+  de horários. O foco agora aguarda a habilitação e respeita a mudança
+  deliberada para outro controle. O teste mantém a consulta pendente
+  durante a volta para reproduzir a condição. Passou em Android e iOS
+  emulados com as doze datas preservadas.
+- iOS-1 passou com uma retentativa na captura da revisão de ENT. A
+  medição passa a aguardar a posição após a rolagem, mantendo a exigência
+  de que o conteúdo esteja livre da navegação fixa. O ensaio de captura
+  passou em Android e iOS emulados.
+- iOS-2 seguia executando casos quando alcançou o limite de 70 minutos.
+  A CI passa a distribuir o mesmo conjunto de testes do iOS em três
+  grupos, com relatórios separados e o mesmo limite por grupo. A coleta
+  confirmou 197, 200 e 187 casos, cobrindo os 584 sem duplicação.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

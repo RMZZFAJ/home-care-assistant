@@ -196,6 +196,12 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await expect(review(page).locator("ol > li").first()).toContainText(
     "15/01/2100 · 19:00 às 07:00 do dia seguinte",
   );
+  // Hold the next residence read until the review has returned to the form.
+  const hours = Promise.withResolvers<void>();
+  await page.route(`**/api/schedules/residence?careRecipientId=${f.patient}`, async route => {
+    await hours.promise;
+    await route.continue();
+  }, { times: 1 });
   const rejected = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname ===
@@ -215,14 +221,14 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await review(page)
     .getByRole("button", { name: "Voltar", exact: true })
     .click();
+  const reviewAgain = edit(page).getByRole("button", { name: "Revisar alteração", exact: true });
   try {
-    await expect(
-      edit(page).getByRole("button", {
-        name: "Revisar alteração",
-        exact: true,
-      }),
-    ).toBeFocused();
+    await expect(reviewAgain).toBeDisabled();
+    await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
+    hours.resolve();
+    await expect(reviewAgain).toBeFocused();
   } finally {
+    hours.resolve();
     await attachFocusProbe(page);
   }
   await expect(

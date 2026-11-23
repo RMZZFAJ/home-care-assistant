@@ -157,8 +157,23 @@ test("tipo privado retoma entre sessões,compara CAS e continua consultável sem
       `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.adminA.id)},'schedule.types.manage',false)`,
     );
     await page.reload();
+    await openScheduleTypeSettings(page);
+    await expect(page.getByRole("region", { name: "Tipos de plantão", exact: true })).toHaveCount(1);
     await expect(button(page, "Novo tipo de plantão")).toHaveCount(0);
-    await open(page, false, true);
+    await openSchedulePrivateArea(page);
+    const resume = button(page, "Retomar meu tipo de plantão");
+    await expect(resume).toBeEnabled();
+    await resume.focus();
+    const ownRead = page.waitForResponse(response => {
+      const url = new URL(response.url());
+      return response.request().method() === "GET" && url.pathname === "/api/schedules/preparations" &&
+        url.searchParams.get("purpose") === "shift_type_create" && url.searchParams.get("careRecipientId") === f.patient;
+    }, { timeout: 35_000 });
+    await resume.press("Enter");
+    const response = await ownRead;
+    expect(response.status()).toBe(200);
+    expect((await response.json()).data.revision).toBe(3);
+    await expect(button(page, "Atualizar preenchimento privado")).toBeEnabled();
     await expect(panel(page)).toContainText("Minha edição antes do conflito");
     await expect(button(page, "Continuar rascunho")).toBeDisabled();
     await expect(dialog(page).locator("input,select,textarea")).toHaveCount(0);

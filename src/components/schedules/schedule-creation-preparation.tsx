@@ -23,6 +23,7 @@ import {
   scheduleCreationFields,
   scheduleCreationCommand,
   schedulePurpose,
+  scheduleSpecialHoursIssue,
   type ScheduleCreationFields,
   type ScheduleCreationPurpose,
 } from "@/lib/schedules/creation";
@@ -366,17 +367,25 @@ export function ScheduleCreationPreparation({
     !draft.conflict &&
     !draft.offered &&
     !draft.pending;
+  const reviewDisabled = needsResidence && !residenceReady;
+  const canRestoreReviewFocus = !hiddenEditor && writable && canEditTiming &&
+    !reviewDisabled && !scheduleSpecialHoursIssue(fields);
   useEffect(() => {
     if (publishing || draft.busy) return;
-    const returning = previousReviewRef.current && !showReview;
-    previousReviewRef.current = showReview;
-    if (!showReview && !returning) return;
+    if (showReview) previousReviewRef.current = true;
+    else if (!previousReviewRef.current || !canRestoreReviewFocus) return;
     const frame = requestAnimationFrame(() => {
-      if (showReview) reviewHeadingRef.current?.focus();
-      else reviewTriggerRef.current?.focus();
+      const target = showReview ? reviewHeadingRef.current : reviewTriggerRef.current;
+      if (!target || target.matches(":disabled")) return;
+      if (!showReview) {
+        previousReviewRef.current = false;
+        const active = document.activeElement;
+        if (active !== document.body && active !== target.closest('[role="dialog"]')) return;
+      }
+      target.focus();
     });
     return () => cancelAnimationFrame(frame);
-  }, [showReview, publishing, draft.busy]);
+  }, [showReview, publishing, draft.busy, canRestoreReviewFocus]);
   const consumedReceipt = draft.consumed?.consumedResult;
   const localDifference = Boolean(
     working &&
@@ -931,7 +940,7 @@ export function ScheduleCreationPreparation({
                   publishOwn={publishOwn}
                   today={today}
                   creationFields={fields}
-                  reviewDisabled={needsResidence && !residenceReady}
+                  reviewDisabled={reviewDisabled}
                   reviewTriggerRef={reviewTriggerRef}
                   datesMonth={datesMonth}
                   onDatesMonthChange={setDatesMonth}

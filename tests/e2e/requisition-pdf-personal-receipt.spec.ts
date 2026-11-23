@@ -478,10 +478,9 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
     exact: true,
   });
   const material = movement.getByRole("article").filter({ hasText: "Material fictício V4 0" });
-  await expect(material).toContainText("Saldo atual · Família");
-  for (const quantity of ["5 unidade", "1 unidade", "4 unidade"]) {
-    await expect(material.getByText(quantity, { exact: true })).toBeVisible();
-  }
+  await expect(material.locator("dt")).toHaveText(["Disponível", "Após registrar"]);
+  await expect(material.locator("dd")).toHaveText(["5 unidade", "4 unidade"]);
+  await expect(material.getByText("Saída · 1 unidade", { exact: true })).toBeVisible();
   await expect(
     movement.locator("input:visible,select:visible,textarea:visible"),
   ).toHaveCount(0);
