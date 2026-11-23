@@ -36,7 +36,8 @@ import { parseStockBalances, parseStockOperationHistory } from "@/lib/validation
 import { StockOverview } from "./stock-overview";
 
 import { useScopedRead } from "@/lib/use-scoped-read";
-import { StockMovementHistory, stockOperationOrigins } from "./stock-movement-history";
+import { StockMovementHistory } from "./stock-movement-history";
+import { stockOperationOrigins } from "./stock-operation-labels";
 import { MovementOrigin } from "./movement-origin";
 import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
 import { NotificationReference } from "@/components/notifications/notification-reference";
@@ -513,7 +514,7 @@ function PatientStock({
             <button type="submit" className={primaryClass}>Aplicar filtros</button>
           </form>
         ) : null}
-        <StockMovementHistory operations={operations} canCorrect={can(context,"stock.family.manage")}
+        <StockMovementHistory patientId={patient} operations={operations} fallbackRef={historyHeadingRef} canCorrect={can(context,"stock.family.manage")}
           onOrigin={(movement,target) => setOrigin({ id: movement.id, opener: target })}
           onCorrect={(movement,target) => {
             setLegacyEditor(false);

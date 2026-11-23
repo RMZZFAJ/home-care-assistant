@@ -13,6 +13,7 @@ export function useScopedRead<T>(url: string | null, revision = "", decode?: (va
     data: T | null;
     queriedAt: string | null;
     error: string;
+    errorStatus?: number;
   } | null>(null);
   useEffect(() => {
     if (!url) return;
@@ -44,6 +45,7 @@ export function useScopedRead<T>(url: string | null, revision = "", decode?: (va
             reason instanceof Error
               ? reason.message
               : "Consulta indisponível. Tente novamente.",
+          errorStatus: reason instanceof ApiError ? reason.status : undefined,
         }));
       });
     return () => controller.abort();
@@ -53,6 +55,7 @@ export function useScopedRead<T>(url: string | null, revision = "", decode?: (va
     data: sameScope ? result.data : null,
     queriedAt: sameScope ? result.queriedAt : null,
     error: sameScope ? result.error : "",
+    errorStatus: sameScope ? result.errorStatus : undefined,
     loading: url !== null && result?.key !== key,
     refresh,
   };

@@ -1,25 +1,18 @@
+"use client";
+
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode, type RefObject } from "react";
 import { ActionButton, Pill } from "@/components/ui/controls";
-import { Icon, type IconName } from "@/components/ui/icon";
+import { Icon } from "@/components/ui/icon";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import type { StockOperationHistory, StockOperationMovement } from "@/lib/validation/stock-reads";
 
-const custodyLabels = { FAMILY: "Família", CARE_TEAM: "Equipe", TRANSIT: "Em trânsito" };
-export const stockOperationOrigins = {
-  manual: { title: "Lançamento manual", icon: "edit" },
-  COM: { title: "Compra e chegada", icon: "box" },
-  CON: { title: "Consumo", icon: "note" },
-  REQ: { title: "Requisição", icon: "file" },
-  ENT: { title: "Entrega", icon: "truck" },
-  DEV: { title: "Devolução", icon: "truck" },
-  BAL: { title: "Balanço", icon: "check-circle" },
-  inventory: { title: "Inventário", icon: "check-circle" },
-  other: { title: "Movimentação", icon: "history" },
-} satisfies Record<StockOperationHistory["origin"], { title: string; icon: IconName }>;
+import { StockOperationDetails } from "./stock-operation-details";
+import { stockCustodyLabels, stockOperationOrigins } from "./stock-operation-labels";
 
-export function StockMovementHistory({ operations, canCorrect = false, onOrigin, onCorrect, renderDocumentLink, expanded, onToggle }: {
+export function StockMovementHistory({ patientId, operations, canCorrect = false, onOrigin, onCorrect, renderDocumentLink, expanded, onToggle, fallbackRef }: {
+  patientId: string;
   operations: StockOperationHistory[];
   canCorrect?: boolean;
   onOrigin: (movement: StockOperationMovement, target: HTMLElement) => void;
@@ -27,14 +20,16 @@ export function StockMovementHistory({ operations, canCorrect = false, onOrigin,
   renderDocumentLink?: (movement: StockOperationMovement, operation: StockOperationHistory) => ReactNode;
   expanded?: readonly string[];
   onToggle?: (id: string, open: boolean) => void;
+  fallbackRef?: RefObject<HTMLElement | null>;
 }) {
+  const [details, setDetails] = useState<{ id: string; opener: HTMLElement } | null>(null);
   return <div className="hca-stock-ledger">
     {operations.map(operation => {
       const origin = stockOperationOrigins[operation.origin];
       const inbound = operation.rows.every(row => row.direction === "inbound");
       const outbound = operation.rows.every(row => row.direction === "outbound");
       const tone = inbound ? "success" : outbound ? "danger" : "neutral";
-      const custody = Array.from(new Set(operation.rows.map(row => custodyLabels[row.custody]))).join(" / ");
+      const custody = Array.from(new Set(operation.rows.map(row => stockCustodyLabels[row.custody]))).join(" / ");
       const materialCount = new Set(operation.rows.map(row => row.product_id)).size;
       return <details key={operation.id} className="hca-stock-act" data-stock-act={operation.id}
         open={expanded?.includes(operation.id)} onToggle={onToggle ? event => onToggle(operation.id, event.currentTarget.open) : undefined}>
@@ -66,8 +61,15 @@ export function StockMovementHistory({ operations, canCorrect = false, onOrigin,
               {canCorrect && onCorrect && row.reference_type === "family_manual" ? <ActionButton variant="quiet" onClick={event => onCorrect(row, event.currentTarget)}>Corrigir este movimento</ActionButton> : null}
             </div> : null}
           </div>)}
+          <div className="hca-stock-act-footer">
+            <ActionButton onClick={event => setDetails({ id: operation.id, opener: event.currentTarget })}>
+              <Icon name="info" width={15} height={15} /> Ver detalhes da operação
+            </ActionButton>
+          </div>
         </div>
       </details>;
     })}
+    {details ? <StockOperationDetails key={patientId + ":" + details.id} patientId={patientId} operationId={details.id}
+      opener={details.opener} fallbackRef={fallbackRef} onClose={() => setDetails(null)} renderDocumentLink={renderDocumentLink} /> : null}
   </div>;
 }

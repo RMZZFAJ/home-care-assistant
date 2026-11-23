@@ -99,7 +99,13 @@ test("stock history paginates acts, keeps distinct entries for the same material
   assert.equal(search.data[0].rows.length, 2);
   const material = await rpc(f.admin, "stock_operation_history", { ...query, p_product: f.products[0] });
   assert.deepEqual(material.data[0].rows.map(row => row.product_id), [f.products[0]]);
+  const selected = { p_patient: f.patient, p_operation: material.data[0].id };
+  assert.deepEqual(await rpc(f.admin, "stock_operation_detail", selected), latest.data[0]);
+  assert.equal(await rpc(f.admin, "stock_operation_detail", { ...selected, p_operation: "family:" + randomUUID() }), null);
+  assert.equal((await f.admin.rpc("stock_operation_detail", { ...selected, p_operation: "family:" })).error?.code, "22023");
+  assert.equal((await f.admin.rpc("stock_operation_detail", { ...selected, p_patient: randomUUID() })).error?.code, "42501");
   const professional = await actor("professional", f.patient);
+  assert.equal(await rpc(professional, "stock_operation_detail", selected), null);
   assert.deepEqual(await rpc(professional, "stock_operation_history", query), { total: 0, data: [] });
   const team = await rpc(professional, "stock_operation_history", { ...query, p_location: null, p_origin: null, p_size: 20 });
   assert.ok(team.data.every(group => group.rows.every(row => row.custody !== "FAMILY")));
@@ -149,6 +155,8 @@ test("dispatch and receipt of the same ENT retain two proven acts with independe
   assert.equal(limited.total, 2);
   assert.ok(limited.data.flatMap(act => act.rows).every(row => row.custody !== "FAMILY"));
   assert.ok(limited.data[1].rows.every(row => row.custody === "TRANSIT" && row.before === null && row.after === null));
+  const dispatch = { p_patient: f.patient, p_operation: history.data[1].id };
+  assert.deepEqual(await rpc(professional, "stock_operation_detail", dispatch), limited.data[1]);
 });
 
 test("approved purchase, physical arrival and available stock use independent quantities", async t => {

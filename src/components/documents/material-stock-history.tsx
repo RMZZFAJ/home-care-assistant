@@ -34,7 +34,7 @@ export function MaterialStockHistory({ patientId, productId, revision, page, onP
     {read.loading ? <LoadingIndicator label="Consultando movimentos" />
       : read.error ? <div role="alert" className="hca-v7-material-read-error">
         <p>{read.error}</p><ActionButton onClick={read.refresh}>Consultar movimentos novamente</ActionButton>
-      </div> : read.data?.data.length ? <StockMovementHistory operations={read.data.data}
+      </div> : read.data?.data.length ? <StockMovementHistory patientId={patientId} operations={read.data.data} fallbackRef={headingRef}
         onOrigin={(movement, opener) => setOrigin({ movement, opener })} renderDocumentLink={renderDocumentLink}
         expanded={expanded} onToggle={onToggle} />
         : <p>Nenhuma movimentação registrada para este material.</p>}

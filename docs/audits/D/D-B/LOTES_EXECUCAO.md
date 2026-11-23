@@ -1790,6 +1790,8 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123051802_l3_require_residence_for_new_schedule` | Aplicada | Aplicada |
 | `20261123054301_l3_resolve_schedule_creation_attempt` | Aplicada | Aplicada |
 | `20261123060806_l3_fix_bilateral_delivery_reminders` | Aplicada | Aplicada |
+| `20261123070728_l3_material_stock_context` | Aplicada | Aplicada |
+| `20261123102624_l3_stock_operation_detail` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2142,8 +2144,8 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   do registro. A continuidade E07-12 abre o assistente de consumo direto
   a partir das sugestões recebidas pelo WhatsApp. A homologação do provedor
   e a conferência visual final da frente continuam abertas.
-  Em E07-04, a expansão lista os materiais e abre a origem de cada movimento.
-  Falta o painel da operação inteira previsto no laboratório.
+  Em E07-04, a expansão lista os materiais, abre a operação inteira e
+  conserva a origem de cada movimento.
 - **E08 — Plantões e balanços.** Em execução. A admissão da contagem
   iniciada no plantão já preserva a retomada. A área reúne Plantões,
   Balanços e Histórico com as permissões de cada leitura. A ficha tem
@@ -2187,6 +2189,24 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
 - Nove casos Chromium passaram no recorte inicial, incluindo criação de
   um ato multimaterial, saldos na consulta granular, recuperação de
   consulta, acesso restrito, paginação e validação defensiva de payload.
+- **Ver detalhes da operação** usa o painel compartilhado no histórico
+  geral e no de cada material. A consulta usa a chave exata do ato e reúne
+  todos os efeitos visíveis ao vínculo atual. Do painel, cada linha abre
+  a origem granular e, quando autorizada, a operação oferece acesso à ficha.
+- A migration `20261123102624_l3_stock_operation_detail.sql` centraliza a
+  projeção no banco e mantém a assinatura pública do histórico. Passaram
+  13 testes de integração com Auth real. A consulta recusou outro paciente
+  e ocultou lançamentos da família e saldos de trânsito conforme o vínculo.
+- Seis regressões de origem passaram em Chromium, Android e iOS emulados.
+  Os três casos do painel passaram após corrigir um seletor do teste.
+  A comparação em 360 px verificou o painel da operação, o erro recuperável,
+  os dois materiais abertos a partir de um só e o retorno de foco em cada
+  nível de consulta.
+- A reconciliação local e remota confirmou a migration e os grants.
+  O backup integral foi descartado após detectar mudanças simultâneas nas
+  tabelas de monitoramento. A comparação confirmou a definição remota
+  anterior e o backup cifrado do esquema afetado foi verificado com o ID
+  `72125aec-2a02-4ee4-899a-2a87f93e1b2b` antes da aplicação da migration.
 
 ### Contrato de consumo da equipe
 

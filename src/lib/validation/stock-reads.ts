@@ -73,13 +73,14 @@ export type StockHistoryScope = {
 };
 
 export const stockOperationFilter = z.enum(["manual", "COM", "CON", "REQ", "ENT", "DEV", "BAL", "inventory", "other"]);
+export const stockOperationId = z.string().regex(/^[a-z_]{1,32}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 const operationMovement = movement.extend({
   name: z.string().nullable(), unit: z.string().nullable(), custody: stockLocation,
   before: stockNumber.nullable(), after: stockNumber.nullable(),
   direction: z.enum(["inbound", "outbound"]),
 });
 const operationGroup = z.object({
-  id: z.string().regex(/^[a-z_]+:[a-f0-9-]{36}$/),
+  id: stockOperationId,
   recordedAt: instant, origin: stockOperationFilter, documentCode: z.string().nullable(),
   actor: z.string().nullable(), rows: z.array(operationMovement).min(1),
 });
@@ -90,6 +91,17 @@ const operationsRead = historyRead.omit({ data: true, balances: true }).extend({
 export type StockOperationHistory = z.infer<typeof operationGroup>;
 export type StockOperationMovement = z.infer<typeof operationMovement>;
 export type StockOperationScope = StockHistoryScope & { origin: string; search: string };
+
+const operationDetail = z.object({ careRecipientId: z.uuid(), data: operationGroup });
+
+export function parseStockOperationDetail(value: unknown, careRecipientId: string, operationId: string) {
+  const parsed = operationDetail.safeParse(value);
+  if (!parsed.success || parsed.data.careRecipientId !== careRecipientId || parsed.data.data.id !== operationId
+    || !unique(parsed.data.data.rows.map(row => row.id))) {
+    throw new Error("A resposta recebida não corresponde à operação. Tente consultar novamente.");
+  }
+  return parsed.data.data;
+}
 
 function unique(values: string[]) {
   return new Set(values).size === values.length;
