@@ -289,12 +289,14 @@ function Reports({ context }: { context: WorkspaceContext }) {
     setCatalogLoading(true);
     setCatalogAttempt((value) => value + 1);
   };
+  const teamBalances = new Map((stock.data?.overview ?? []).flatMap(item => item.team ? [[item.productId, item.team.confirmed] as const] : []));
+  const retryTeamMaterials = () => { stock.refresh(); catalogRetry(); };
   const teamWizard = teamEditor && mayRecordTeam ? (
     <TeamConsumptionWizard context={context} products={products}
-      balances={new Map((stock.data?.overview ?? []).flatMap(item => item.team ? [[item.productId, item.team.confirmed] as const] : []))}
+      balances={teamBalances}
       materialLoading={stock.loading || catalogLoading}
       materialError={stock.error || catalogError}
-      retryMaterials={() => { stock.refresh(); catalogRetry(); }}
+      retryMaterials={retryTeamMaterials}
       opener={teamEditor} sourceReminder={editorOrigin ?? undefined} sourceFlow={teamFlow}
       onClose={() => { setTeamEditor(null); setEditorOrigin(null); setTeamFlow(undefined); }}
       onSaved={id => {
@@ -473,6 +475,10 @@ function Reports({ context }: { context: WorkspaceContext }) {
           catalogError={catalogError}
           catalogLoading={catalogLoading}
           onCatalogRetry={catalogRetry}
+          teamBalances={teamBalances}
+          teamStockLoading={stock.loading}
+          teamStockError={stock.error}
+          onTeamMaterialRetry={retryTeamMaterials}
           onChange={() => setAttempt((value) => value + 1)}
           onOpenRecord={open}
           onClose={() => {

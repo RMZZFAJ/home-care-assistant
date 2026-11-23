@@ -14,9 +14,9 @@ import { teamConsumptionCommand, teamConsumptionReceipt, type TeamConsumptionCom
 import type { ConsumptionReport } from "@/types/consumption";
 import type { CatalogProduct } from "@/types/documents";
 
-type Command = Exclude<TeamConsumptionCommand, { action: "issue" }>;
+type Command = Extract<TeamConsumptionCommand, { action: "shortage" | "cancel" }>;
 export type TeamConsumptionActionKind = Command["action"];
-const labels = { shortage: "Avisar falta à família", correct: "Corrigir consumo", cancel: "Cancelar este consumo?" };
+const labels = { shortage: "Avisar falta à família", cancel: "Cancelar este consumo?" };
 const route = "/api/consumption/records";
 
 export function TeamConsumptionAction({ context, kind, report, products, opener, onClose, onSaved }: {
@@ -38,9 +38,7 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
       return target === report?.id ? stored.data : null;
     } catch { return null; }
   });
-  const [observation, setObservation] = useState(kind === "correct"
-    ? report?.revisions.at(-1)?.body ?? report?.body ?? ""
-    : kind === "shortage" && report ? "O material continua em falta. Precisamos de reposição." : "");
+  const [observation, setObservation] = useState(kind === "shortage" && report ? "O material continua em falta. Precisamos de reposição." : "");
   const [reason, setReason] = useState("");
   const [lines, setLines] = useState(kind === "cancel" ? [] : report?.current_lines ?? []);
   const [choice, setChoice] = useState("");
@@ -75,9 +73,8 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
       const materials = lines.map(({ productId, quantity, unit }) => ({ productId, quantity, unit }));
       const parsed = teamConsumptionCommand.safeParse(kind === "shortage"
         ? { ...scope, observation, lines: materials, repeatedReportId: report?.id }
-        : { ...scope, reportId: report?.id, expectedVersion: report?.version, reason,
-            ...(kind === "correct" ? { observation, lines: materials } : {}) });
-      if (!parsed.success || parsed.data.action === "issue") {
+        : { ...scope, reportId: report?.id, expectedVersion: report?.version, reason });
+      if (!parsed.success || (parsed.data.action !== "shortage" && parsed.data.action !== "cancel")) {
         setError(parsed.success ? "Confira os dados." : parsed.error.issues[0]?.message === "Selecione pelo menos um material."
           ? "Selecione pelo menos um material." : "Confira o motivo, a descrição e as quantidades informadas.");
         return;
@@ -105,13 +102,13 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
     } finally { submitLockRef.current = false; setBusy(false); }
   }
   return <RecordDrawer title={labels[kind]} subtitle={context.patient?.display_name} onClose={onClose} busy={busy}
-    modal={kind !== "correct"}
+    modal
     restoreFocusTo={opener} exitDialog uncertainOutcome={Boolean(pending)}
     footer={close => <div className="hca-toolbar">
       <ActionButton disabled={busy} onClick={close}>Voltar</ActionButton>
       <ActionButton variant={kind === "cancel" && !pending ? "danger" : "primary"} disabled={busy} onClick={() => void send()}>
         {pending ? absent ? "Reenviar a mesma tentativa" : "Conferir resultado"
-          : kind === "shortage" ? "Enviar aviso" : kind === "cancel" ? "Cancelar consumo" : "Confirmar"}
+          : kind === "shortage" ? "Enviar aviso" : "Cancelar consumo"}
       </ActionButton>
     </div>}>
     <div className="hca-form-stack">
@@ -124,15 +121,15 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
             details: <p>Retorno ao saldo · +{formatQuantity(line.quantity, line.unit)}</p>,
           }))} />
         </section> : null}
-        {kind !== "cancel" ? <FormField label={kind === "shortage" ? "Mensagem para a família" : "Observações"}>
+        {kind === "shortage" ? <FormField label="Mensagem para a família">
           <TextAreaField value={observation} maxLength={2000} rows={4} onChange={event => setObservation(event.currentTarget.value)} />
         </FormField> : null}
-        {kind !== "shortage" ? <FormField label="Motivo da alteração">
+        {kind === "cancel" ? <FormField label="Motivo da alteração">
           <TextAreaField value={reason} maxLength={1000} rows={3} onChange={event => setReason(event.currentTarget.value)} />
         </FormField> : null}
-        {kind !== "cancel" ? <>
+        {kind === "shortage" ? <>
           {lines.map(line => <div className="ui-card hca-form-stack" key={line.productId}>
-            <FormField label={(kind === "shortage" ? "Quantidade em falta · " : "Quantidade consumida · ") + (line.name ?? line.productId)}>
+            <FormField label={"Quantidade em falta · " + (line.name ?? line.productId)}>
               <WizardQuantityInput unit={line.unit} inputMode="decimal" value={line.quantity} maxLength={64}
                 onChange={event => {
                   const quantity = event.currentTarget.value;

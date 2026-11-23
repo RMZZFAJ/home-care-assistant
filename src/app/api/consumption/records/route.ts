@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { api, ApiError, authenticate, parseQuery, patientContext, readJson, rpc } from "@/lib/server/api";
-import { teamConsumptionAttempt, teamConsumptionCommand, teamConsumptionProducts, teamConsumptionReceipt, teamConsumptionReference } from "@/lib/validation/consumption";
+import { teamConsumptionAttempt, teamConsumptionCommand, teamConsumptionProducts, teamConsumptionReceipt, teamConsumptionReference, teamCorrectionReference } from "@/lib/validation/consumption";
 
 const headers = { "cache-control": "private, no-store" };
 
@@ -10,6 +10,26 @@ export async function GET(request: Request) {
     const params = new URL(request.url).searchParams;
     const materialIds = params.getAll("productId");
     const auth = await authenticate();
+    if (params.has("reportId")) {
+      if ([...params.keys()].some(key => !["careRecipientId", "reportId", "productId"].includes(key))
+        || params.getAll("careRecipientId").length !== 1 || params.getAll("reportId").length !== 1)
+        throw new ApiError("VALIDATION_ERROR", "Confira a referência da correção.", 400);
+      const ids = z.uuid().transform(value => value.toLowerCase());
+      const patientId = parseQuery(ids, params.get("careRecipientId"));
+      const reportId = parseQuery(ids, params.get("reportId"));
+      const selected = parseQuery(teamConsumptionProducts, materialIds);
+      const patient = await patientContext(auth, patientId, "consumption.team.write", true);
+      const data = teamCorrectionReference.parse(await rpc(auth.client, "team_consumption_correction_reference", {
+        p_patient: patient.id, p_report: reportId, p_products: selected,
+      }));
+      const expected = new Set([...selected, ...data.original.map(item => item.productId)]);
+      if (data.careRecipientId !== patient.id || data.reportId !== reportId
+        || data.materials.length !== expected.size
+        || new Set(data.materials.map(item => item.productId)).size !== expected.size
+        || data.materials.some(item => !expected.has(item.productId)))
+        throw new ApiError("INTERNAL_ERROR", "A consulta não corresponde à ficha de consumo.", 500);
+      return NextResponse.json({ data }, { headers });
+    }
     if (materialIds.length && !params.has("idempotencyKey") &&
       [...params.keys()].every(key => key === "careRecipientId" || key === "productId") &&
       params.getAll("careRecipientId").length === 1) {
@@ -39,13 +59,13 @@ export async function POST(request: Request) {
   return api("consumption.team.commit", async () => {
     const input = await readJson(request, teamConsumptionCommand);
     const { careRecipientId, idempotencyKey, ...intent } = input;
-    const { referenceHash, draft, ...body } = intent.action === "issue"
-      ? intent
-      : { ...intent, referenceHash: null, draft: undefined };
+    const { referenceHash, draft, ...body } = {
+      referenceHash: null, draft: undefined, ...intent,
+    };
     const auth = await authenticate();
     const patient = await patientContext(auth, careRecipientId, "consumption.team.write", true);
     const data = teamConsumptionReceipt.parse(await rpc(auth.client, "submit_team_consumption", {
-      p_patient: patient.id, p_key: idempotencyKey, p_body: body, p_reference: referenceHash,
+      p_patient: patient.id, p_key: idempotencyKey, p_body: body, p_reference: referenceHash ?? null,
       p_draft_id: draft?.id ?? null, p_draft_revision: draft?.revision ?? null,
     }));
     if (data.careRecipientId !== patient.id || data.idempotencyKey !== idempotencyKey || data.action !== body.action

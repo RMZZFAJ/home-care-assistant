@@ -27,6 +27,7 @@ import { ConsumptionMaterialFacts } from "./consumption-material-facts";
 import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDecision } from "./consumption-decision";
 import { TeamConsumptionAction, type TeamConsumptionActionKind } from "./team-consumption-action";
+import { TeamConsumptionCorrection } from "./team-consumption-correction";
 import { consumptionFollowUp, consumptionLocationLabel, consumptionReadStampMatches, consumptionStateLabels, mergeConsumptionRead } from "@/lib/consumption/follow-up";
 
 export function ConsumptionDetail({
@@ -36,6 +37,10 @@ export function ConsumptionDetail({
   catalogError,
   catalogLoading,
   onCatalogRetry,
+  teamBalances,
+  teamStockLoading,
+  teamStockError,
+  onTeamMaterialRetry,
   onChange,
   onOpenRecord,
   onClose,
@@ -46,6 +51,10 @@ export function ConsumptionDetail({
   catalogError: string;
   catalogLoading: boolean;
   onCatalogRetry: () => void;
+  teamBalances: ReadonlyMap<string, string>;
+  teamStockLoading: boolean;
+  teamStockError: string;
+  onTeamMaterialRetry: () => void;
   onChange: () => void;
   onOpenRecord: (id: string) => void;
   onClose: () => void;
@@ -56,7 +65,7 @@ export function ConsumptionDetail({
     [message, setMessage] = useState(""),
     [reading, setReading] = useState(true);
   const [editor, setEditor] = useState<HTMLElement | null>(null),
-    [teamAction, setTeamAction] = useState<{ kind: TeamConsumptionActionKind; opener: HTMLElement; report: ConsumptionReport } | null>(null),
+    [teamAction, setTeamAction] = useState<{ kind: TeamConsumptionActionKind | "correct"; opener: HTMLElement; report: ConsumptionReport } | null>(null),
     [material, setMaterial] = useState<{ line: ConsumptionLine; opener: HTMLElement; scroll: number } | null>(null),
     [decision, setDecision] = useState<{
       report: ConsumptionReport;
@@ -418,7 +427,13 @@ export function ConsumptionDetail({
             material={{ id: material.line.productId, name: material.line.name ?? "Material do relato", unit: material.line.unit }}
             detail={<ConsumptionMaterialFacts report={data} material={material.line} />}
             finalFocus={() => false} onClose={closeMaterial} closeText="Voltar à ficha" /> : null}
-          {teamAction && mayWriteTeam ? <TeamConsumptionAction context={context} kind={teamAction.kind} report={teamAction.report}
+          {teamAction?.kind === "correct" && mayWriteTeam ? (
+            <TeamConsumptionCorrection context={context} report={teamAction.report} products={products}
+              balances={teamBalances} loading={catalogLoading || teamStockLoading} materialError={catalogError || teamStockError}
+              retry={onTeamMaterialRetry} opener={teamAction.opener} onClose={() => setTeamAction(null)}
+              onSaved={() => { setTeamAction(null); onChange(); setReading(true); setAttempt(value => value + 1); }} />
+          ) : null}
+          {teamAction && teamAction.kind !== "correct" && mayWriteTeam ? <TeamConsumptionAction context={context} kind={teamAction.kind} report={teamAction.report}
             products={products} opener={teamAction.opener} onClose={() => setTeamAction(null)} onSaved={recordId => {
               setTeamAction(null);
               onChange();

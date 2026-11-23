@@ -1793,6 +1793,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123070728_l3_material_stock_context` | Aplicada | Aplicada |
 | `20261123102624_l3_stock_operation_detail` | Aplicada | Aplicada |
 | `20261123110027_l3_consumption_list_materials` | Aplicada | Aplicada |
+| `20261123120522_l3_reviewed_consumption_correction` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2946,6 +2947,34 @@ Os seis casos dirigidos de Android e iOS passaram com o ajuste.
 As verificações confirmaram que uma nova falta preserva os materiais
 e o saldo, e que a compensação do cancelamento ocorre uma única vez
 mesmo quando a resposta original se perde.
+
+### Correção assistida do consumo
+
+**Corrigir consumo** usa as cinco etapas da v4 e compartilha a seleção
+de materiais com a emissão. A revisão apresenta quantidade registrada,
+quantidade corrigida, saldo atual, diferença e saldo projetado. A leitura
+inclui os materiais retirados, para que a devolução ao saldo apareça na
+conferência. A edição em aberto fica no assistente, com aviso antes de
+descartar. A tentativa confirmada pode ser recuperada pela chave original.
+
+O banco vincula a revisão à ficha, à versão e às referências de estoque,
+incluindo os materiais retirados. O comando revalida esses dados sob o
+bloqueio do estoque e aplica somente a diferença. Quando a ficha muda,
+o assistente compara as versões e oferece a reaplicação explícita apenas
+das edições feitas pelo usuário. A confirmação passa por nova revisão.
+
+Seis integrações com Auth real passaram. O banco recusou uma correção
+sem revisão, detectou a alteração do estoque mesmo depois de o saldo
+voltar ao valor anterior e admitiu somente uma das duas correções
+concorrentes. O recibo da tentativa vencedora foi recuperado pela
+mesma chave e a retirada de um material devolveu a quantidade correspondente.
+
+Os 15 casos de navegador passaram em Chromium, Android e iOS emulados,
+incluindo a comparação com outra sessão, a revisão antes da devolução
+e as regressões de emissão, rascunho e aviso de falta. A migration foi
+aplicada no local e no remoto após o backup cifrado verificado
+`105605ce-6dc7-49d1-903b-a9fc104dd36f`. A conferência comparou as duas
+definições e os grants, incluindo a restrição de acesso ao comando interno.
 
 ### Residências sem horários e início da programação
 

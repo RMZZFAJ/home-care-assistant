@@ -35,12 +35,21 @@ const teamAction = z.enum(["issue", "correct", "cancel", "shortage"]);
 const referenceHash = z.string().regex(/^[a-f0-9]{64}$/);
 export const teamConsumptionProducts = z.array(z.string().min(1).max(120)).min(1).max(100)
   .refine(items => items.length === new Set(items).size, "Selecione cada material uma única vez.");
+const teamMaterialBalance = z.object({
+  productId: z.string().min(1), name: z.string().min(1), unit: z.string().min(1),
+  decimals: z.number().int().min(0).max(6), quantity: z.string().regex(/^-?\d+(?:\.\d+)?$/),
+  updatedAt: z.iso.datetime({ offset: true }).nullable(),
+});
 export const teamConsumptionReference = z.object({
   careRecipientId: z.uuid(), referenceHash,
-  materials: z.array(z.object({
+  materials: z.array(teamMaterialBalance).min(1).max(100),
+}).strict();
+export const teamCorrectionReference = teamConsumptionReference.extend({
+  reportId: teamId, version, observation: z.string(),
+  materials: z.array(teamMaterialBalance).min(1).max(200),
+  original: z.array(z.object({
     productId: z.string().min(1), name: z.string().min(1), unit: z.string().min(1),
-    decimals: z.number().int().min(0).max(6), quantity: z.string().regex(/^-?\d+(?:\.\d+)?$/),
-    updatedAt: z.iso.datetime({ offset: true }).nullable(),
+    quantity: exactQuantity,
   })).min(1).max(100),
 }).strict();
 export const teamConsumptionCommand = z.discriminatedUnion("action", [
@@ -49,7 +58,10 @@ export const teamConsumptionCommand = z.discriminatedUnion("action", [
     lines: requiredLines, referenceHash, draft: z.object({ id: teamId, revision: version }).strict().optional(),
   }).strict().refine(value => !value.flowSubmissionId || (!!value.draft && !value.reminderId),
     "A sugestão do WhatsApp precisa do próprio preenchimento."),
-  z.object({ ...teamScope, ...teamRevision, action: z.literal("correct"), observation: teamObservation, lines: requiredLines }).strict(),
+  z.object({ ...teamScope, ...teamRevision, action: z.literal("correct"), observation: teamObservation, lines: requiredLines,
+    // Older pending commands can still reconcile their original receipt. A new correction requires a reference in the RPC.
+    referenceHash: referenceHash.optional(),
+  }).strict(),
   z.object({ ...teamScope, ...teamRevision, action: z.literal("cancel") }).strict(),
   z.object({ ...teamScope, action: z.literal("shortage"), observation: text, repeatedReportId: teamId.optional(), reminderId: teamId.optional(), lines: lines.optional() }).strict(),
 ]);

@@ -1,18 +1,16 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { MaterialConsultButton } from "@/components/documents/catalogue-material-panel";
 import { MaterialReview } from "@/components/documents/material-review";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { SupplyWizardIdentity, SupplyWizardReviewIdentity } from "@/components/forms/supply-wizard-identity";
-import { materialCategories, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
+import { materialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { SupplyWizardFooter } from "@/components/forms/wizard-actions";
-import { WizardMaterialSearch, WizardMaterialToolbar, WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import type { ReminderOrigin } from "@/components/notifications/notification-reference";
-import { ActionButton, CheckboxField, FormField, TextAreaField } from "@/components/ui/controls";
+import { ActionButton, FormField, TextAreaField } from "@/components/ui/controls";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { StepNavigator } from "@/components/ui/primitives";
 import { Notice, type WorkspaceContext } from "@/components/workspace";
@@ -27,13 +25,11 @@ import { consumptionPreparationContentSchema, type ConsumptionPreparationContent
 import { exactQuantity } from "@/lib/validation/exact-quantity";
 import { parseFlowPage, type FlowSubmission } from "@/lib/validation/flow-reviews";
 import type { CatalogProduct } from "@/types/documents";
+import { TeamConsumptionMaterials, teamConsumptionStages as stages, type TeamConsumptionLine as Line } from "./team-consumption-materials";
 
 type Issue = Extract<TeamConsumptionCommand, { action: "issue" }>;
-type Line = ConsumptionPreparationContent["consumption"]["lines"][number];
 type MaterialBalance = ReturnType<typeof teamConsumptionReference.parse>["materials"][number];
-const stages = ["Confirmação", "Materiais", "Itens extras", "Observações", "Revisão"];
 const endpoint = "/api/consumption/records";
-const categories = new Set<string>(materialCategories.map(entry => entry.id));
 
 export function TeamConsumptionWizard({ context, products, balances, materialLoading, materialError, retryMaterials, opener, sourceReminder, sourceFlow, onClose, onSaved }: {
   context: WorkspaceContext;
@@ -232,16 +228,6 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
     }
     onClose();
   }
-  function toggle(product: CatalogProduct, selected: boolean) {
-    setLines(items => selected ? [...items, { productId: product.id, name: product.name, unit: product.unit, quantity: "" }]
-      : items.filter(item => item.productId !== product.id));
-    setError("");
-  }
-  const materialStep = step === 1 || step === 2;
-  const choices = products.filter(item =>
-    (step === 1 ? item.category === category : !categories.has(item.category)) &&
-    (quantity(balances.get(item.id) ?? 0).gt(0) || lines.some(line => line.productId === item.id)) &&
-    item.name.toLocaleLowerCase("pt-BR").includes(query.trim().toLocaleLowerCase("pt-BR")));
   const cannotIssue = !reference || reference.materials.some(material => {
     const amount = exactQuantity.safeParse(lines.find(line => line.productId === material.productId)?.quantity);
     return !amount.success || quantity(amount.data).gt(material.quantity) || quantity(amount.data).decimalPlaces() > material.decimals;
@@ -285,34 +271,10 @@ export function TeamConsumptionWizard({ context, products, balances, materialLoa
         {reminder ? <Notice>Consumo vinculado ao lembrete do plantão.</Notice> : null}
         <p>As quantidades registradas serão descontadas do estoque da equipe.</p>
       </> : null}
-      {materialStep ? <div className="hca-form-stack">
-        <h3>{step === 1 ? "Materiais consumidos" : "Itens extras"}</h3>
-        {step === 2 ? <p>Selecione materiais identificados no estoque da equipe fora das categorias anteriores.</p> : null}
-        {step === 1 ? <WizardMaterialCategories category={category} selected={products.filter(item => lines.some(line => line.productId === item.id))}
-          onChange={next => { setCategory(next); setQuery(""); }} /> : null}
-        <WizardMaterialSearch value={query} onChange={setQuery} />
-        <WizardMaterialToolbar count={lines.length} matches={choices.length} />
-        {materialError ? <Notice error>{materialError} <ActionButton onClick={retryMaterials}>Atualizar materiais</ActionButton></Notice>
-          : materialLoading ? <p role="status">Consultando materiais e saldos…</p>
-            : !choices.length ? <p>Nenhum material disponível nesta lista.</p> : null}
-        {choices.map(product => {
-          const line = lines.find(item => item.productId === product.id);
-          return <article key={product.id} className="ui-card hca-form-stack">
-            <div className="hca-wizard-material-head">
-              <CheckboxField label={product.name} checked={Boolean(line)} onChange={event => toggle(product, event.currentTarget.checked)} />
-              <MaterialConsultButton context={context} material={product} menu />
-            </div>
-            {line ? <>
-              <small>Estoque da equipe · {formatQuantity(balances.get(product.id) ?? "0", product.unit)}</small>
-              <FormField label={"Quantidade consumida · " + product.name}><WizardQuantityInput unit={product.unit} inputMode="decimal" maxLength={64}
-                value={line.quantity} onChange={event => {
-                  const value = event.currentTarget.value;
-                  setLines(items => items.map(item => item.productId === product.id ? { ...item, quantity: value } : item));
-                }} /></FormField>
-            </> : null}
-          </article>;
-        })}
-      </div> : null}
+      {step === 1 || step === 2 ? <TeamConsumptionMaterials context={context} products={products}
+        balances={balances} lines={lines} extras={step === 2} category={category} query={query}
+        loading={materialLoading} error={materialError} retry={retryMaterials}
+        onCategory={setCategory} onQuery={setQuery} onChange={value => { setLines(value); setError(""); }} /> : null}
       {step === 3 ? <FormField label="Observações" helpText="Opcional"><TextAreaField rows={5} maxLength={2000}
         value={observation} onChange={event => setObservation(event.currentTarget.value)} /></FormField> : null}
       {step === 4 && reference ? <div className="hca-form-stack">

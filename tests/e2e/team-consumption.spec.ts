@@ -162,9 +162,18 @@ test("consumo preserva o último rascunho, recupera a baixa e permite correção
   await detail.getByRole("tab", { name: "Materiais", exact: true }).click();
   await detail.getByRole("button", { name: "Corrigir consumo", exact: true }).click();
   const correction = page.getByRole("dialog", { name: "Corrigir consumo", exact: true });
+  await correction.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
+  await correction.getByRole("button", { name: /^Higiene/ }).click();
   await correction.getByRole("textbox", { name: "Quantidade consumida · " + f.name, exact: true }).fill("3");
-  await correction.getByRole("textbox", { name: "Motivo da alteração", exact: true }).fill("Conferência após o término do plantão.");
-  await correction.getByRole("button", { name: "Confirmar", exact: true }).click();
+  await correction.getByRole("button", { name: "Continuar", exact: true }).click();
+  await correction.getByRole("button", { name: "Continuar", exact: true }).click();
+  await correction.getByRole("textbox", { name: "Motivo da correção", exact: true }).fill("Conferência após o término do plantão.");
+  await correction.getByRole("button", { name: "Revisar correção", exact: true }).click();
+  const impact = correction.getByRole("region", { name: "Impacto da correção no estoque", exact: true });
+  await expect(impact).toContainText("Retorno ao saldo · 1 unidade");
+  await expect(impact).toContainText("Saldo após a correção · 7 unidade");
+  expect(Number(balance())).toBe(6);
+  await correction.getByRole("button", { name: "Registrar correção", exact: true }).click();
   await expect(detail.getByRole("heading", { name: "Correção · versão 2", exact: true })).toBeVisible();
   expect(Number(balance())).toBe(7);
   await detail.getByRole("button", { name: "Cancelar consumo", exact: true }).click();
@@ -191,6 +200,57 @@ test("consumo preserva o último rascunho, recupera a baixa e permite correção
   await expect(compensation.getByText("7 unidade", { exact: true })).toBeVisible();
   await expect(compensation.getByText("+3 unidade", { exact: true })).toBeVisible();
   await expect(compensation.getByText("10 unidade", { exact: true })).toBeVisible();
+});
+
+test("correção compara a versão concorrente e confirma somente a nova diferença", async ({ page }) => {
+  const f = await fixture();
+  const productId = f.products[0];
+  const initialReference = await rpc(f.professional.client, "team_consumption_reference", {
+    p_patient: f.patient, p_products: [productId],
+  });
+  const issued = await rpc(f.professional.client, "submit_team_consumption", {
+    p_patient: f.patient, p_key: randomUUID(), p_reference: initialReference.referenceHash,
+    p_body: { action: "issue", lines: [{ productId, quantity: "2" }] },
+  });
+  await openConsumption(page, f);
+  await page.goto(`/consumo?careRecipientId=${f.patient}&ref=${issued.id}&refKind=report`);
+  await page.getByRole("button", { name: "Corrigir consumo", exact: true }).click();
+  const correction = page.getByRole("dialog", { name: "Corrigir consumo", exact: true });
+  await correction.getByRole("button", { name: "Selecionar materiais", exact: true }).click();
+  await correction.getByRole("button", { name: /^Higiene/ }).click();
+  await correction.getByRole("textbox", { name: "Quantidade consumida · " + f.name, exact: true }).fill("3");
+  await correction.getByRole("button", { name: "Continuar", exact: true }).click();
+  await correction.getByRole("button", { name: "Continuar", exact: true }).click();
+  const reason = correction.getByRole("textbox", { name: "Motivo da correção", exact: true });
+  await reason.fill("Conferência do plantão preservada.");
+  await correction.getByRole("button", { name: "Revisar correção", exact: true }).click();
+  const impact = correction.getByRole("region", { name: "Impacto da correção no estoque", exact: true });
+  await expect(impact).toContainText("Baixa adicional · 1 unidade");
+
+  const next = await rpc(f.admin, "team_consumption_correction_reference", {
+    p_patient: f.patient, p_report: issued.id, p_products: [productId],
+  });
+  await rpc(f.admin, "submit_team_consumption", {
+    p_patient: f.patient, p_key: randomUUID(), p_reference: next.referenceHash,
+    p_body: { action: "correct", reportId: issued.id, expectedVersion: 1,
+      reason: "Conferência feita em outra sessão.", observation: "Contexto atualizado pela supervisão.",
+      lines: [{ productId, quantity: "4" }] },
+  });
+  await correction.getByRole("button", { name: "Registrar correção", exact: true }).click();
+  await expect(reason).toHaveValue("Conferência do plantão preservada.");
+  await correction.getByRole("button", { name: "Revisar correção", exact: true }).click();
+  const comparison = correction.getByRole("region", { name: "Comparar versões do consumo", exact: true });
+  await expect(comparison).toContainText("Versão 1 · 2 unidade");
+  await expect(comparison).toContainText("Versão 2 · 4 unidade");
+  await expect(comparison).toContainText("Seu ajuste · 3 unidade");
+  await correction.getByRole("button", { name: "Aplicar meus ajustes à versão atual", exact: true }).click();
+  await expect(correction.getByRole("textbox", { name: "Observações", exact: true })).toHaveValue("Contexto atualizado pela supervisão.");
+  await correction.getByRole("button", { name: "Revisar correção", exact: true }).click();
+  await expect(impact).toContainText("Retorno ao saldo · 1 unidade");
+  await expect(impact).toContainText("Saldo após a correção · 7 unidade");
+  await correction.getByRole("button", { name: "Registrar correção", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Correção · versão 3", exact: true })).toBeVisible();
+  expect(Number(sql(`select private.stock_quantity(${q(f.patient)},${q(productId)},'CARE_TEAM')::text`))).toBe(7);
 });
 
 test("aviso reiterado confirma o material original sem alterar o saldo", async ({ page }) => {

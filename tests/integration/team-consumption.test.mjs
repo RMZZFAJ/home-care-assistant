@@ -24,9 +24,16 @@ async function teamFixture(t) {
     p_body: { divergences: [] },
   });
   const reference = (p_products = f.products) => rpc(professional, "team_consumption_reference", { p_patient: f.patient, p_products });
+  const correctionReference = (report, p_products = f.products, client = professional) => rpc(client, "team_consumption_correction_reference", {
+    p_patient: f.patient, p_report: report, p_products,
+  });
   const args = (p_body, p_key = randomUUID(), p_reference = null) => ({ p_patient: f.patient, p_key, p_body, p_reference });
-  const command = async (body, key, client = professional) => rpc(client, "submit_team_consumption", args(body, key,
-    body.action === "issue" ? (await reference(body.lines.map(item => item.productId))).referenceHash : null));
+  const command = async (body, key, client = professional) => {
+    const products = body.lines?.map(item => item.productId);
+    const review = body.action === "issue" ? await reference(products)
+      : body.action === "correct" ? await correctionReference(body.reportId, products, client) : null;
+    return rpc(client, "submit_team_consumption", args(body, key, review?.referenceHash ?? null));
+  };
   const quantities = async () => {
     const products = await rpc(f.admin, "stock_overview", { p_patient: f.patient });
     return f.products.map(id => {
@@ -35,7 +42,7 @@ async function teamFixture(t) {
     });
   };
   const lines = values => f.products.map((productId, i) => ({ productId, quantity: String(values[i]) }));
-  return { ...f, professional, command, args, reference, quantities, lines };
+  return { ...f, professional, command, args, reference, correctionReference, quantities, lines };
 }
 
 test("a WhatsApp suggestion is linked atomically to one reviewed team debit", async t => {
@@ -219,12 +226,32 @@ test("shortages can be repeated without ledger writes and failed or stale comman
   assert.deepEqual(await f.quantities(), started);
 
   const initial = await f.command({ action: "issue", lines: f.lines([1, 1]) });
-  const change = f.args({ action: "correct", reportId: initial.id, expectedVersion: 1, reason: "Revisão da passagem de plantão.", lines: f.lines([2, 3]) });
+  const intent = { action: "correct", reportId: initial.id, expectedVersion: 1, reason: "Revisão da passagem de plantão.", lines: f.lines([2, 3]).slice(0, 1) };
+  assert.equal((await f.professional.rpc("submit_team_consumption", f.args(intent))).error?.code, "22023");
+  const earlier = await f.correctionReference(initial.id, [f.products[0]]);
+  assert.equal(earlier.reportId, initial.id);
+  assert.equal(earlier.version, 1);
+  assert.deepEqual(new Set(earlier.materials.map(row => row.productId)), new Set(f.products));
+  assert.equal((await family.rpc("team_consumption_correction_reference", {
+    p_patient: f.patient, p_report: initial.id, p_products: [f.products[0]],
+  })).error?.code, "42501");
+  const intervening = await f.command({ action: "issue", lines: f.lines([1, 1]).slice(1) });
+  await f.command({ action: "cancel", reportId: intervening.id, expectedVersion: 1, reason: "Regularização da outra operação." });
+  const stale = f.args(intent, randomUUID(), earlier.referenceHash);
+  const before = await f.quantities();
+  assert.equal((await f.professional.rpc("submit_team_consumption", stale)).error?.code, "PT409");
+  assert.equal(await rpc(f.professional, "team_consumption_result", { p_patient: f.patient, p_key: stale.p_key }), null);
+  assert.deepEqual(await f.quantities(), before);
+  const reviewed = await f.correctionReference(initial.id, [f.products[0]]);
+  const change = f.args(intent, randomUUID(), reviewed.referenceHash);
   const concurrent = { ...change, p_key: randomUUID() };
   const results = await Promise.all([f.professional.rpc("submit_team_consumption", change), f.admin.rpc("submit_team_consumption", concurrent)]);
   assert.equal(results.filter(result => result.error === null).length, 1);
   assert.equal(results.find(result => result.error)?.error?.code, "PT409");
-  assert.deepEqual(await f.quantities(), started.map((row, i) => ({ ...row, team: row.team - [2, 3][i] })));
+  const winner = results[0].error ? { client: f.admin, command: concurrent, receipt: results[1].data }
+    : { client: f.professional, command: change, receipt: results[0].data };
+  assert.deepEqual(await rpc(winner.client, "submit_team_consumption", { ...winner.command, p_reference: null }), winner.receipt);
+  assert.deepEqual(await f.quantities(), started.map((row, i) => ({ ...row, team: row.team - [2, 0][i] })));
 });
 
 test("server review revalidates stock and retires only the exact confirmed draft", async t => {
