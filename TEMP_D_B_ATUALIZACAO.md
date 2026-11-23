@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — aplicação do balanço e validação no iOS.** A confirmação mostra o
+efeito no estoque da equipe. O carregamento acompanha a gravação e a
+conferência do recibo. A recuperação usa a tentativa preservada. A CI de
+`e349a92d` encerrou com uma falha e uma retentativa bem-sucedida no iOS-1.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#aplicação-da-contagem-ao-estoque).
+
 **23/11 — emissão de consumo.** O carregamento dinâmico acompanha a
 preparação, a baixa e a consulta do relato. A recuperação confere o
 mesmo recibo e o resultado abre a ficha. Nove casos passaram em Chromium,
@@ -25,7 +31,7 @@ As seis verificações finais passaram em Chromium, Android e iOS emulados.
 O Preview de `e349a92d` respondeu no login, na consulta pública e na
 verificação de compatibilidade do Supabase. A retomada de plantão após
 revogação de escrita e a comparação de chegada da COM passaram em seis
-testes dirigidos. A validação completa desse commit segue no GitHub Actions.
+testes dirigidos. O resultado da validação desse commit está no registro.
 [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#leitura-privada-de-plantão-e-atualização-da-chegada-de-com).
 
 **23/11 — acervo de Arquivos.** Gerados e Anexos seguem os cartões da v4.

@@ -3388,6 +3388,7 @@ WhatsApp ainda requer homologação do provedor.
 - **E08-12** — Revisão independente com papéis e impedimento de autorrevisão.
   `bal-review.spec.ts`, `bal-review.test.mjs`.
 - **E08-13** — Aplicação, versão concorrente e recuperação da mesma decisão.
+  [Carregamento e recibo da aplicação](#aplicação-da-contagem-ao-estoque),
   `bal-review-application.spec.ts`, `bal-review-application.test.mjs`.
 - **E08-14** — Recontagem, sucessão de extras e contagens anteriores.
   `bal-recount-succession.spec.ts`, `bal-recount-succession.test.mjs`.
@@ -3674,6 +3675,46 @@ WhatsApp ainda requer homologação do provedor.
   completo sem o campo de código curto. A apresentação passou a usar a
   mesma função da ficha. As capturas em 360 e 412 px estão em
   `output/playwright/l3/`. O ajuste dispensa migration.
+
+### Aplicação da contagem ao estoque
+
+- E08-13 mostra os saldos de referência e os valores previstos para o
+  estoque da equipe antes da confirmação. O primeiro ajuste aparece no
+  diálogo. Os demais ficam na expansão da mesma conferência. A versão da
+  contagem, o grupo responsável e o controle de referência permanecem no ato.
+- O carregamento dinâmico acompanha a conferência, a transação do ajuste e
+  a consulta do mesmo recibo. Durante a gravação aparece somente o
+  carregamento sobre a ficha. O resultado confirmado identifica a ficha,
+  a contagem e a autoria. A recuperação consulta a chave preservada em modo
+  simples e mantém as opções de nova consulta e diagnóstico de suporte.
+- A confirmação por POST validada pode comprovar o ato se a consulta
+  adicional tiver falha de transporte ou indisponibilidade. A recusa ou
+  a divergência entre os resultados preserva a tentativa para conferência.
+  O ajuste usa os contratos existentes e dispensa migration.
+- No iOS emulado, a gravação retida mostrou somente o carregamento sobre a
+  ficha e o estoque preservado até o POST. A perda da resposta recuperou
+  o ato com o direito de leitura após revogar a aprovação familiar. A
+  conclusão normal aguardou o mesmo recibo. Ambos os casos verificaram
+  um único ajuste. As capturas do produto e do laboratório em 360 e 412 px
+  estão em `output/playwright/l3/`.
+- A verificação local do fluxo de reconto parou na preparação da escala,
+  com timeout de execução do banco antes de abrir a ficha. O cenário
+  correspondente no commit anterior passou no iOS da CI.
+
+### CI de e349a92d
+
+- A [execução 45242608953](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45242608953)
+  passou em Windows, Ubuntu e banco. Os dois grupos Chromium, os dois Mobile
+  e iOS-2 e iOS-3 passaram sem retentativas. No [iOS-1](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45242608953/job/137951344714),
+  a nova avaliação da REQ falhou nas duas execuções: o campo de justificativa
+  ficou vazio ao reabrir o diálogo e o botão seguiu desabilitado. A recuperação
+  do PDF da ENT passou na retentativa. A primeira execução contou duas consultas
+  em vez de uma.
+- O teste da REQ passou a aguardar o foco inicial do diálogo e a conferir
+  a justificativa antes de confirmar. O da ENT verifica a resposta autorizada
+  do mesmo pedido de PDF, um único POST de geração e um único exemplar
+  persistido. Esses critérios independem do número de leituras do navegador.
+  Os dois testes corrigidos passaram localmente no iOS emulado.
 
 ## L4
 
