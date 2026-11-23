@@ -139,6 +139,10 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
     name: "Histórico auditável",
     exact: true,
   });
+  const unavailable = page.getByRole("dialog", { name: "Não foi possível consultar o estoque", exact: true });
+  const backToStock = unavailable.getByRole("button", { name: "Voltar ao estoque", exact: true });
+  await expect(unavailable).toContainText("Saldos indisponíveis no ensaio controlado.");
+  await backToStock.click();
   await expect(
     balances.getByText("Saldos indisponíveis no ensaio controlado.", {
       exact: true,
@@ -189,6 +193,8 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
   await page
     .getByRole("button", { name: "Atualizar saldos", exact: true })
     .click();
+  await expect(unavailable).toContainText("Saldos indisponíveis no ensaio controlado.");
+  await backToStock.click();
   await expect(
     balances.getByText("Saldos indisponíveis no ensaio controlado.", {
       exact: true,
@@ -208,6 +214,8 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
   await page
     .getByRole("group", { name: "Custódia", exact: true })
     .getByRole("button", { name: "Equipe", exact: true }).click();
+  await expect(unavailable).toContainText("Saldos indisponíveis no ensaio controlado.");
+  await backToStock.click();
   await expect(
     balances.getByText("Saldos ainda não consultados com sucesso.", {
       exact: true,

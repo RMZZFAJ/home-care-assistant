@@ -10,7 +10,7 @@ import { Dialog, Drawer } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
 import { formatBrazilDate } from "@/lib/receipt";
 import { attachmentForm, attachmentMaxBytes, attachmentMaxLabel, attachmentPrepared, confirmedAttachment, freezeAttachment, type FrozenAttachment } from "@/lib/documents/attachment-attempt";
-import { FileArchiveReadFailure } from "./file-archive-read-failure";
+import { ScopedReadFailureDialog } from "./scoped-read-failure-dialog";
 
 const hash = z.string().regex(/^[a-f0-9]{64}$/);
 const attachment = z.object({ id: z.uuid(), filename: z.string(), bytes: z.number().int().positive(), mime_type: z.string(), state: z.enum(["quarantine", "ready", "rejected", "abandoned"]), sha256: hash.nullable(), sourceSha256: hash.nullable(), sourceBytes: z.number().nullable(), sourceMime: z.string().nullable(), transformation: z.string().nullable(), uploadKey: z.uuid().nullable(), tracked: z.boolean(), pending: z.boolean(), canAbandon: z.boolean(), url: z.string().nullable(), uploadedName: z.string().nullish(), confirmedAt: z.iso.datetime({ offset: true }).nullish() });
@@ -275,7 +275,7 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
     <p className="mt-2 text-xs text-(--muted)">Até dez arquivos ou reservas em andamento. Novos envios de até {attachmentMaxLabel}. Fotos e PDFs são convertidos para leitura segura; confira o arquivo disponível. A foto da ficha física continua como alternativa ao formulário.</p>
     {error && !abandonTarget && !adding && !resumeTarget ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
     {readError ? <Notice error>Não foi possível consultar a lista de anexos. {readError} Atualize esta seção.</Notice> : null}
-    {modalOnly ? <FileArchiveReadFailure open={active && !adding && !busy && Boolean(archiveFailure && !archiveFailure.dismissed)}
+    {modalOnly ? <ScopedReadFailureDialog subject="files" open={active && !adding && !busy && Boolean(archiveFailure && !archiveFailure.dismissed)}
       title="Não foi possível consultar os anexos" denied={archiveFailure?.denied ?? false} message={readError} loading={loading}
       cause={archiveFailure?.cause} attempts={archiveFailure?.attempts ?? 0}
       returnFocus={refreshRef} onClose={() => setArchiveFailure(current => current && { ...current, dismissed: true })}

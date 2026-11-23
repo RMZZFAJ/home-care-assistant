@@ -82,6 +82,10 @@ test("estoque ignora custódia tardia e mantém erro e vazio distintos com saldo
   await expect(row).toContainText("30");
   mode = "error";
   await refresh.click();
+  const unavailable = page.getByRole("dialog", { name: "Não foi possível consultar o estoque", exact: true });
+  await expect(unavailable).toContainText("Falha controlada na consulta do saldo");
+  await unavailable.getByRole("button", { name: "Voltar ao estoque", exact: true }).click();
+  await expect(refresh).toBeFocused();
   await expect(balances.getByRole("alert")).toContainText("Falha controlada na consulta do saldo");
   await expect(balances.getByText("Última consulta válida", { exact: false })).toBeVisible();
   await expect(row).toContainText("30");

@@ -9,11 +9,13 @@ export function useScopedRead<T>(url: string | null, revision = "", decode?: (va
   const key = JSON.stringify([url, revision, attempt]);
   const [result, setResult] = useState<{
     key: string;
+    revision: string;
     url: string | null;
     data: T | null;
     queriedAt: string | null;
     error: string;
     errorStatus?: number;
+    errorCause?: unknown;
   } | null>(null);
   useEffect(() => {
     if (!url) return;
@@ -24,6 +26,7 @@ export function useScopedRead<T>(url: string | null, revision = "", decode?: (va
         if (!controller.signal.aborted)
           setResult({
             key,
+            revision,
             url,
             data,
             queriedAt: new Date().toISOString(),
@@ -37,6 +40,7 @@ export function useScopedRead<T>(url: string | null, revision = "", decode?: (va
         );
         setResult((previous) => ({
           key,
+          revision,
           url,
           data: mayRetain && previous?.url === url ? previous.data : null,
           queriedAt:
@@ -46,16 +50,19 @@ export function useScopedRead<T>(url: string | null, revision = "", decode?: (va
               ? reason.message
               : "Consulta indisponível. Tente novamente.",
           errorStatus: reason instanceof ApiError ? reason.status : undefined,
+          errorCause: reason,
         }));
       });
     return () => controller.abort();
-  }, [url, key, decode]);
+  }, [url, key, revision, decode]);
   const sameScope = url !== null && result?.url === url;
   return {
     data: sameScope ? result.data : null,
     queriedAt: sameScope ? result.queriedAt : null,
     error: sameScope ? result.error : "",
     errorStatus: sameScope ? result.errorStatus : undefined,
+    errorCause: sameScope ? result.errorCause : undefined,
+    settledRevision: sameScope ? result.revision : null,
     loading: url !== null && result?.key !== key,
     refresh,
   };

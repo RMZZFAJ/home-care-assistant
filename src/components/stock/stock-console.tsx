@@ -28,7 +28,9 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { Attachments } from "@/components/documents/attachments";
+import { ScopedReadFailureDialog } from "@/components/documents/scoped-read-failure-dialog";
 import { EmptyState, Icon } from "@/components/ui/primitives";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { StockTransitDrawer } from "./transit-stock";
 import { formatBrazilDate } from "@/lib/receipt";
 
@@ -46,6 +48,7 @@ export function StockConsole() {
   const params = useSearchParams();
   const [refreshRevision, setRefreshRevision] = useState(0);
   const refreshButtonRef = useRef<HTMLButtonElement>(null);
+  const refreshBalances = () => setRefreshRevision(value => value + 1);
   return (
     <Workspace title="Estoques" heading={(context) => {
       const family = can(context, "stock.family.read");
@@ -59,7 +62,7 @@ export function StockConsole() {
         </div>
         {hasStock || familyActions ? <div className="hca-stock-heading-actions">
           {hasStock ? <ActionButton ref={refreshButtonRef} compact aria-label="Atualizar saldos"
-            onClick={() => setRefreshRevision(value => value + 1)}><Icon name="refresh" /></ActionButton> : null}
+            onClick={refreshBalances}><Icon name="refresh" /></ActionButton> : null}
           <Menu.Root>
             <Menu.Trigger render={<ActionButton compact aria-label="Ações do estoque" />}><Icon name="more" /></Menu.Trigger>
             <MenuPopup>
@@ -89,6 +92,7 @@ export function StockConsole() {
             context={context}
             initialCustody={params.get("custody") ?? ""}
             refreshRevision={refreshRevision}
+            refreshBalances={refreshBalances}
             returnFocus={() => refreshButtonRef.current ?? false}
           />
         ) : (
@@ -102,17 +106,20 @@ function PatientStock({
   context,
   initialCustody,
   refreshRevision,
+  refreshBalances,
   returnFocus,
 }: {
   context: WorkspaceContext;
   initialCustody: string;
   refreshRevision: number;
+  refreshBalances: () => void;
   returnFocus: () => HTMLButtonElement | false;
 }) {
   const patient = context.patient!.id;
   const [pendingMovement, setPendingMovement] = useState(() => readFamilyStockAttempt(context.userId, patient));
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const [balanceRecovery, setBalanceRecovery] = useState<{ round: string; attempts: number; dismissed: boolean } | null>(null);
   const liveRevision = useLiveRevision();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -167,9 +174,16 @@ function PatientStock({
       ? "/api/stock/balances?" +
           new URLSearchParams({ careRecipientId: patient, custody })
       : null,
-    revision + ":" + refreshRevision,
+    `${refreshRevision}:${revision}`,
     decodeBalances,
   );
+  const balanceRound = JSON.stringify([custody, refreshRevision, stock.queriedAt]);
+  const recovery = balanceRecovery?.round === balanceRound ? balanceRecovery : null;
+  const panelOpen = Boolean(origin || transit || movementEditor || filterEditor);
+  const balanceFailureOpen = Boolean(stock.error && !panelOpen && !recovery?.dismissed && (!stock.loading || recovery?.attempts));
+  const balanceLoading = stock.loading && !panelOpen && !balanceFailureOpen
+    && !stock.settledRevision?.startsWith(`${refreshRevision}:`);
+  useOperationActivity(balanceLoading, { title: "Atualizando estoque", detail: "Consultando os saldos disponíveis." });
   const history = useScopedRead(
     hasStock
       ? "/api/stock/movements?" +
@@ -223,6 +237,15 @@ function PatientStock({
         }}
       />
       {message ? <Notice>{message}</Notice> : null}
+      <ScopedReadFailureDialog subject="stock" open={balanceFailureOpen}
+        title="Não foi possível consultar o estoque" denied={[401, 403, 404].includes(stock.errorStatus ?? 0)}
+        message={stock.error} cause={stock.errorCause} attempts={recovery?.attempts ?? 0} loading={stock.loading}
+        returnFocus={returnFocus}
+        onClose={() => setBalanceRecovery({ round: balanceRound, dismissed: true, attempts: 0 })}
+        onRetry={() => {
+          setBalanceRecovery({ round: balanceRound, dismissed: false, attempts: (recovery?.attempts ?? 0) + 1 });
+          stock.refresh();
+        }} />
       {origin ? (
         <MovementOrigin
           patientId={patient}
@@ -239,12 +262,17 @@ function PatientStock({
         aria-busy={stock.loading}
       >
         <h2 id="stock-balances-heading" className="sr-only">Saldos e previsões</h2>
+        {stock.error && stock.data ? <aside className="hca-document-freshness">
+          <Icon name="alert" width={17} height={17} />
+          <span role="alert">{stock.error}</span>
+          <ActionButton variant="quiet" compact disabled={stock.loading} onClick={refreshBalances}>Atualizar</ActionButton>
+        </aside> : null}
         {custodies.length ? <div className="hca-stock-custody-tabs" role="group" aria-label="Custódia">
           {custodies.map(item => <button key={item.value} type="button" aria-pressed={displayedCustody === item.value}
             onClick={() => { setCustody(item.value); setPage(1); }}>{item.label}</button>)}
         </div> : null}
         {stock.loading ? <Notice>Consultando saldos…</Notice> : null}
-        {stock.error ? <Notice error>{stock.error}</Notice> : null}
+        {stock.error && !stock.data ? <Notice error>{stock.error}</Notice> : null}
         {stock.queriedAt ? (
           <p className={stock.loading || stock.error ? "hca-field-hint" : "sr-only"}>
             {stock.loading || stock.error

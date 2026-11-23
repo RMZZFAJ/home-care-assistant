@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — falha de consulta no estoque.** O carregamento simples e o
+diálogo da v4 usam a consulta real. A recusa retira saldos e a falha
+transitória mantém a última leitura válida daquela custódia. Passaram
+quinze testes dirigidos em Chromium, Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#falha-de-consulta-no-estoque).
+
 **23/11 — falha de consulta em Arquivos.** Gerados e Anexos compartilham
 o diálogo, com nova consulta, retorno de foco e diagnóstico de suporte.
 As seis verificações finais passaram em Chromium, Android e iOS emulados.

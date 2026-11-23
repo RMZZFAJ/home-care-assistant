@@ -3339,7 +3339,9 @@ WhatsApp ainda requer homologação do provedor.
 - **E07-09** — Andamentos, correção por diferença e conflito entre duas sessões.
   `team-consumption.spec.ts`, `team-consumption.test.mjs`.
 - **E07-10** — Baixa direta da equipe e recuperação sem duplicação.
-  `team-consumption.spec.ts`, `team-consumption.test.mjs`.
+  `team-consumption.spec.ts`, `team-consumption.test.mjs`. A emissão ainda
+  usa o carregamento simples. A v4 apresenta as etapas de conferência,
+  gravação e confirmação. A consulta de resultado usa o modo simples.
 - **E07-11** — Reiteração do aviso e compensação única do consumo cancelado.
   `team-consumption.spec.ts`, `team-consumption.test.mjs`.
 - **E07-12** — Sugestão do WhatsApp e confirmação de consumo vinculada.
@@ -3354,8 +3356,9 @@ WhatsApp ainda requer homologação do provedor.
   autorização. `stock-read-validation.spec.ts`,
   `consumption-list-completeness.spec.ts`. A leitura já preserva o último
   saldo válido em falhas transitórias e remove os dados em caso de recusa.
-  A consulta de saldos ainda exibe a falha no corpo da tela. Falta aplicar
-  o diálogo sobreposto do laboratório com recuperação e retorno de foco.
+  A consulta de saldos usa o carregamento simples e o diálogo sobreposto
+  da v4. Ao fechar uma falha transitória, a faixa permite atualizar a
+  referência sem perder o último saldo autorizado.
 - **E08-01** — Navegação integrada, agenda por dia, balanços previstos e
   histórico de contagens com filtro e retorno preservados.
   `schedule-residence-hours.spec.ts` e seção Calendário diário em Plantões e
@@ -3634,6 +3637,22 @@ WhatsApp ainda requer homologação do provedor.
   comandos de escrita, preservação do anexo e escolha vazia na reabertura.
   A rodada anterior confirmou a recuperação de upload e a revogação real.
   As comparações em 360 e 412 px ficaram em `output/playwright/l3/`.
+
+### Falha de consulta no estoque
+
+- E07-13 usa o carregamento simples para a leitura inicial e a atualização
+  solicitada. O diálogo de falha compartilha o padrão de Arquivos e permite
+  consultar novamente, voltar ao estoque ou copiar o diagnóstico após duas
+  retentativas. Voltar devolve o foco para **Atualizar saldos**.
+- Uma falha de transporte ou resposta inválida mantém a última leitura
+  válida da mesma custódia. A faixa compacta oferece uma nova consulta.
+  Uma recusa retira os saldos e a data da consulta anterior. O histórico
+  mantém seu próprio estado de leitura. Não há migration neste ajuste.
+- Os quinze casos dirigidos passaram em Chromium, Android e iOS emulados,
+  incluindo os dois consumidores de Arquivos. A espera controlada comprovou
+  o carregamento simples. Falha, duas retentativas, diagnóstico e recusa
+  preservaram o estoque oficial sem escritas. As capturas do laboratório e
+  do produto em 360 e 412 px estão em `output/playwright/l3/`.
 
 ## L4
 

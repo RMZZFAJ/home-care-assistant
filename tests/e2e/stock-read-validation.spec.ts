@@ -4,6 +4,7 @@ import { setup, fixtures, rpc } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
+import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 test.afterEach(async ({ page }) => { await page.unrouteAll({ behavior: "wait" }); });
@@ -22,7 +23,7 @@ const state = (patient: string) => sql(`select encode(sha256(convert_to(jsonb_bu
 )::text,'UTF8')),'hex');`);
 const region = (page: Page, name: string) => page.getByRole("region", { name, exact: true });
 
-test("stock rejects malformed balances and transit, preserves the last verified read and recovers without writes", async ({ page }) => {
+test("stock rejects malformed balances and transit, preserves the last verified read and recovers without writes", async ({ page }, info) => {
   const f = await setup();
   const delivery = await rpc(f.admin, "create_supply_document", { p_patient: f.patient, p_type: "ENT", p_key: randomUUID(),
     p_payload: { source: "FAMILY", destination: "CARE_TEAM", recipientId: fixtures.professional.id,
@@ -33,8 +34,11 @@ test("stock rejects malformed balances and transit, preserves the last verified 
   page.on("request", request => {
     if (request.method() !== "GET" && /^\/api\/(stock|documents)/.test(new URL(request.url()).pathname)) writes.push(request.url());
   });
-  let mode: "live" | "incomplete" | "number" | "patient" | "custody" | "emptyTransit" | "invalidTransit" = "live";
+  let mode: "live" | "incomplete" | "number" | "patient" | "custody" | "emptyTransit" | "invalidTransit" | "unavailable" | "denied" = "live";
+  const reference = randomUUID();
   await page.route("**/api/stock/balances?**", async route => {
+    if (mode === "unavailable") return route.fulfill({ status: 503, json: { error: "Falha controlada ao consultar saldos.", code: "DATABASE_UNAVAILABLE", correlationId: reference } });
+    if (mode === "denied") return route.fulfill({ status: 403, json: { error: "Consulta indisponível para o vínculo atual.", code: "FORBIDDEN" } });
     const response = await route.fetch();
     const body = await response.json();
     if (mode === "incomplete") return route.fulfill({ response, json: { overview: [] } });
@@ -49,19 +53,72 @@ test("stock rejects malformed balances and transit, preserves the last verified 
   const balances = region(page, "Saldos e previsões");
   const row = balances.getByRole("region", { name: "Material fictício V4 0 · Família", exact: true });
   const refresh = page.getByRole("button", { name: "Atualizar saldos", exact: true });
+  const failure = page.getByRole("dialog", { name: "Não foi possível consultar o estoque", exact: true });
+  const back = failure.getByRole("button", { name: "Voltar ao estoque", exact: true });
   await expect(row).toContainText("26");
   for (const invalid of ["incomplete", "number", "patient", "custody"] as const) {
     mode = invalid;
     await refresh.click();
+    await expect(failure).toContainText("resposta");
+    await back.click();
+    await expect(refresh).toBeFocused();
     await expect(balances.getByRole("alert")).toContainText("resposta");
     await expect(balances).toHaveAttribute("aria-busy", "false");
     await expect(balances.getByText("Última consulta válida", { exact: false })).toBeVisible();
     await expect(row).toContainText("26");
     await expect(balances.getByText("Nenhum material encontrado", { exact: true })).toHaveCount(0);
   }
-  mode = "live";
+  mode = "unavailable";
   await refresh.click();
+  await expect(failure).toContainText("Falha controlada ao consultar saldos.");
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 860 });
+    await audit(page, "falha de consulta do estoque em " + width);
+    const path = info.outputPath(`estoque-falha-${width}.png`);
+    await failure.screenshot({ path, scale: "css", animations: "disabled" });
+    await info.attach(`estoque-falha-${width}`, { path, contentType: "image/png" });
+  }
+  const retry = failure.getByRole("button", { name: "Consultar novamente", exact: true });
+  for (let attempts = 1; attempts <= 2; attempts++) {
+    const rejected = page.waitForResponse(response => new URL(response.url()).pathname === "/api/stock/balances" && response.status() === 503);
+    await retry.click();
+    await rejected;
+  }
+  await expect(retry).toHaveCount(0);
+  await expect(failure.locator("footer").getByRole("button", { name: "Copiar detalhes", exact: true })).toBeVisible();
+  await failure.locator("summary").click();
+  await expect(failure.locator("pre")).toContainText(reference);
+  await expect(failure.locator("pre")).toContainText("Tentativas de consulta: 2");
+  await back.click();
+  await expect(refresh).toBeFocused();
+  await expect(row).toContainText("26");
+
+  mode = "denied";
+  await refresh.click();
+  const denied = page.getByRole("dialog", { name: "Acesso indisponível", exact: true });
+  await expect(denied).toContainText("Consulta indisponível para o vínculo atual.");
+  await denied.getByRole("button", { name: "Voltar ao estoque", exact: true }).click();
+  await expect(row).toHaveCount(0);
+  await expect(balances.getByText("Última consulta válida", { exact: false })).toHaveCount(0);
+
+  mode = "live";
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  await page.route("**/api/stock/balances?**", async route => {
+    await gate;
+    await route.continue();
+  }, { times: 1 });
+  const loading = page.getByRole("dialog", { name: "Atualizando estoque", exact: true });
+  try {
+    await refresh.click();
+    await expect(loading).toContainText("Consultando os saldos disponíveis.");
+    await expect(loading.getByRole("list", { name: "Etapas da operação" })).toHaveCount(0);
+  } finally {
+    release();
+  }
+  await expect(loading).toHaveCount(0);
   await expect(balances.getByRole("alert")).toHaveCount(0);
+  await expect(row).toContainText("26");
   const opener = balances.getByRole("button", { name: "Em trânsito", exact: true });
   const transit = page.getByRole("dialog", { name: "Materiais em trânsito", exact: true });
   const close = transit.getByRole("button", { name: "Fechar", exact: true });

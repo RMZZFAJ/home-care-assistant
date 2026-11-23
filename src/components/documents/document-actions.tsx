@@ -3,7 +3,7 @@ import { useOperationActivity } from "@/components/ui/operation-activity";
 import { z } from "zod";
 import { PdfDocumentOptions } from "./pdf-document-options";
 import { PdfFileDetails } from "./pdf-file-details";
-import { FileArchiveReadFailure } from "./file-archive-read-failure";
+import { ScopedReadFailureDialog } from "./scoped-read-failure-dialog";
 import { pdfDocumentOptionsSchema, documentModeLabel, type PdfDocumentOptions as DocumentOptions } from "@/lib/documents/pdf-modes";
 import { FileRecord } from "@/components/ui/file-record";
 import { ActionButton, ActionLink, Pill, type PillTone } from "@/components/ui/controls";
@@ -454,7 +454,7 @@ function GeneratedFiles({
       {message && !busy && !initialBusy ? <p role="status">{message}</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {readError ? <Notice error>{readError}</Notice> : null}
-      <FileArchiveReadFailure open={active && Boolean(readError) && !archiveErrorDismissed && !optionsOpen && !busy && !initialBusy}
+      <ScopedReadFailureDialog subject="files" open={active && Boolean(readError) && !archiveErrorDismissed && !optionsOpen && !busy && !initialBusy}
         title="Não foi possível consultar os arquivos" denied={archiveDenied} message={readError} loading={loading}
         cause={archiveFailureCause} attempts={archiveRetries} returnFocus={archiveRetryRef}
         onClose={() => { setArchiveErrorDismissed(true); setArchiveRetries(0); }}
