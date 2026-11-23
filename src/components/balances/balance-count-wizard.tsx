@@ -34,8 +34,9 @@ import { DocumentActions } from "@/components/documents/document-actions";
 import { BalanceNotice } from "@/components/notifications/balance-notice";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
+import { scanBalancePresentation } from "@/lib/client/balance-scan";
 import { formatZonedDate } from "@/lib/schedules/time";
-import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
+import { quantity, validQuantity } from "@/lib/quantity";
 import type {
   CatalogProduct,
   SupplyDocument,
@@ -46,8 +47,8 @@ import { balanceCountAdmission, parseBalanceCountReference, parseBalanceCountRev
 import { useBalanceWorkspace } from "./use-balance-workspace";
 import { BalanceCountFields, BalanceExtraFields, BalanceReviewRows } from "./balance-count-fields";
 import { BalanceRecordedExtras } from "./balance-materials";
-import { balanceCatalogueMatches, priorBalanceMaterials } from "@/lib/balances/count-materials";
-import { issuedBalanceExtras, type BalanceCountExtra } from "@/lib/validation/balance-count-extras";
+import { balanceCatalogueMatches, confirmedBalanceExtras, priorBalanceMaterials } from "@/lib/balances/count-materials";
+import type { BalanceCountExtra } from "@/lib/validation/balance-count-extras";
 import {
   preserveCountCache,
   clearCountCache,
@@ -621,13 +622,13 @@ function ScheduledCount({
     showProduct(product);
   }
   function confirmedExtras() {
-    const parsed = issuedBalanceExtras.safeParse(extras);
-    if (!parsed.success || extras.some(extra => balanceCatalogueMatches(extra.name, products).length > 0)) {
+    const result = confirmedBalanceExtras(extras, products);
+    if (!result) {
       setError("Confira o nome, a unidade e a quantidade dos extras. Se o item estiver no catálogo, conte-o em Materiais.");
       setStep(2);
       return null;
     }
-    return parsed.data;
+    return result;
   }
   function changeCount(id: string, value: string) {
     setDraftTouched(true);
@@ -970,44 +971,14 @@ function ScheduledCount({
     }
   }
   async function scan(code: string) {
-    const result = await api<{
-      data: { product_id: string; name: string; base_quantity: string; }[];
-    }>(
-      "/api/catalog/presentations?careRecipientId=" +
-      context.patient!.id +
-      "&barcode=" +
-      encodeURIComponent(code),
-    );
-    const presentation = result.data[0];
-    const product = products.find(candidate => candidate.id === presentation?.product_id);
-    if (!presentation || !product)
-      throw new Error(
-        "Código não encontrado no catálogo ativo. Selecione o material manualmente.",
-      );
-    if (
-      !validQuantity(
-        counts[product.id] || "0",
-        product.quantity_decimals ?? 0,
-        true,
-      )
-    )
-      throw new Error(
-        "Corrija a quantidade deste material antes de acrescentar uma apresentação.",
-      );
-    changeCount(
-      product.id,
-      quantity(counts[product.id] || "0")
-        .plus(presentation.base_quantity)
-        .toFixed(),
-    );
+    const { product, quantity: counted, message } = await scanBalancePresentation(context.patient!.id, code, products, counts);
+    changeCount(product.id, counted);
     showProduct(product);
-    setMessage(
-      `${presentation.name}: ${formatQuantity(presentation.base_quantity)} acrescentados à contagem física.`,
-    );
+    setMessage(message);
     requestAnimationFrame(() =>
       document
         .querySelector<HTMLElement>(
-          `[data-product="${CSS.escape(presentation.product_id)}"] input`,
+          `[data-product="${CSS.escape(product.id)}"] input`,
         )
         ?.focus(),
     );

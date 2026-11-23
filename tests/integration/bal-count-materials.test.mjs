@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import test from "node:test";
 import { balanceSetup } from "./shift-fixtures.mjs";
 import { assignRecount, pendingRecount, workspace } from "./bal-recount-fixtures.mjs";
+import { legacyBalance } from "./bal-review-fixtures.mjs";
 import { rpc } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 
@@ -75,4 +76,36 @@ test("recount requires previous identities, moves incorporated extras into the c
   assert.equal(sql(`select count(*) from public.document_events where document_id=${q(document.id)} and action='bal.recount'`),"1");
   const prior = sql(`select body#>'{payload,balanceExtras}' from public.document_events where document_id=${q(document.id)} and action='bal.issued'`);
   assert.deepEqual(JSON.parse(prior),[carried,retained]);
+});
+
+test("off-shift BAL accepts the extras stage and recounts its prior items without newly added catalogue items", async () => {
+  const carry = extra("Item avulso ainda sem cadastro"), incorporated = extra("Item avulso incorporado");
+  const f = await legacyBalance({ balanceExtras: [carry, incorporated] });
+  const priorVersion = f.document.version;
+  const mapped = await addProduct(f, incorporated.name), unrelated = await addProduct(f, "Cadastro que ficou fora da recontagem");
+  const stock = await rpc(f.admin, "balance_count_reference", { p_patient: f.patient });
+  const lines = [...f.products, mapped.product_id].map(productId => ({ productId, quantity: "0" }));
+  const extras = [{ ...carry, quantity: "1.5" }];
+  const content = {
+    counts: Object.fromEntries(lines.map(line => [line.productId, line.quantity])), observationTimes: {}, notes: "",
+    materials: [], balanceExtras: [{ ...carry, quantity: "1,5" }], materialCategory: "higiene",
+    context: { mode: "legacy", documentId: f.document.id, documentVersion: priorVersion, assignmentId: null, assignmentVersion: null, referenceRevision: stock.revision },
+  };
+  const command = { p_patient: f.patient, p_kind: "BAL", p_target: f.document.id, p_id: null,
+    p_expected: null, p_key: randomUUID(), p_body: { action: "save", content, navigation: { version: 1, stage: "bal_extras" } } };
+  await rpc(f.admin, "creation_draft_command", command);
+  const draft = await rpc(f.admin, "creation_draft_context", { p_patient: f.patient, p_kind: "BAL", p_target: f.document.id });
+  assert.deepEqual(draft.navigation, command.p_body.navigation);
+  const payload = { lines, balanceExtras: extras, balanceReferenceRevision: stock.revision };
+  const intent = { p_id: f.document.id, p_payload: payload, p_key: randomUUID(), p_version: priorVersion, p_recount: true };
+  for (const [invalid, message] of [
+    [{ ...payload, lines: lines.slice(1) }, /previous materials/],
+    [{ ...payload, lines: lines.filter(line => line.productId !== mapped.product_id) }, /incorporated extra/],
+    [{ ...payload, balanceExtras: [] }, /previous extras/],
+  ]) assert.match((await f.admin.rpc("revise_supply_document", { ...intent, p_payload: invalid })).error?.message, message);
+  const recounted = await rpc(f.admin, "revise_supply_document", intent);
+  assert.deepEqual(new Set(recounted.lines.map(line => line.product_id)), new Set(lines.map(line => line.productId)));
+  assert.ok(!recounted.lines.some(line => line.product_id === unrelated.product_id));
+  assert.deepEqual(recounted.payload.balanceExtras, extras);
+  assert.deepEqual(JSON.parse(sql(`select body#>'{payload,balanceExtras}' from public.document_events where document_id=${q(f.document.id)} and version=${priorVersion}`)), [carry, incorporated]);
 });

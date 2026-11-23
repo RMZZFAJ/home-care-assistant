@@ -2593,6 +2593,37 @@ verificação de acessibilidade em 320 px. A composição e a extração do PDF
 confirmaram a identificação de um extra da versão histórica, com seu
 resultado e comentário.
 
+### Assistente do BAL avulso
+
+O BAL avulso usa as cinco etapas do laboratório. Compartilha com o BAL
+por plantão os campos de contagem e de extras, a apresentação de referência
+e diferença, a leitura de código de barras e a consulta do material. A
+confirmação identifica paciente, autor, estoque e modalidade da contagem.
+O rascunho conserva etapa, categoria, referências por item e quantidades.
+A adoção de uma referência atual mantém as observações anteriores no
+histórico privado e solicita nova conferência física.
+
+Na recontagem avulsa autorizada, entram os materiais ativos da contagem
+anterior e os extras preservados. Um extra identificado no catálogo passa
+para a categoria correspondente. Materiais novos podem ser escolhidos
+individualmente. A contagem avulsa inicial continua a abranger o catálogo
+ativo, e os balanços sujeitos ao regime por plantão mantêm as regras de
+atribuição e admissão do servidor.
+
+A migration `20261123014442_l3_unscheduled_balance_count.sql` está aplicada
+localmente e no Supabase remoto. O backup crítico cifrado
+`241d062b-050d-480d-a356-5974222a6333` foi verificado antes da aplicação,
+após nova captura por alteração de telemetria durante a primeira tentativa.
+A consulta posterior confirmou 343 migrations, fila vazia e aceitação de
+etapas novas e antigas no contrato do avulso. A validação das etapas do
+regime por plantão permanece vinculada ao modo agendado.
+
+Os testes de integração com Auth real confirmaram a recontagem seletiva,
+a preservação da contagem anterior e a rejeição de omissões. Chromium,
+Android e iOS emulados confirmaram a retomada de um salvamento com
+resposta perdida, o rascunho de extra decimal, a emissão e o acesso aos
+botões da revisão em larguras de 320 a 1440 px.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

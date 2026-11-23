@@ -293,8 +293,7 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   await expect(panel(page)).not.toContainText("Preenchimento privado de ontem");
   await resume(page);
   await next(page);
-  await next(page);
-  const count = page.getByLabel("Quantidade — Material fictício V4 0", {
+  const count = page.getByLabel("Material fictício V4 0 · unidade", {
     exact: true,
   });
   await expect(count).toHaveValue("1,");
@@ -312,7 +311,7 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
       await route.abort("failed");
     } else await route.continue();
   });
-  const otherCount = page.getByLabel("Quantidade — Material fictício V4 1", { exact: true });
+  const otherCount = page.getByLabel("Material fictício V4 1 · unidade", { exact: true });
   await otherCount.fill("0");
   await expect(
     panel(page).getByRole("button", {
@@ -332,8 +331,9 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   expect(packets).toHaveLength(2);
   expect(packets[0]).toEqual(packets[1]);
   const saved = await draftContext(f, "BAL");
-  expect(saved.navigation).toEqual({ version: 1, stage: "higiene" });
-  await expect(page.locator('[aria-current="step"]')).toContainText("Higiene");
+  expect(saved.navigation).toEqual({ version: 1, stage: "count" });
+  expect(saved.content.materialCategory).toBe("higiene");
+  await expect(balanceStage(page, "Materiais")).toHaveAttribute("aria-current", "step");
   await expect(count).toHaveValue("1,");
   expect(saved.content.counts[f.products[0]]).toBe("1,");
   expect(saved.content.counts[f.products[1]]).toBe("0");
@@ -377,9 +377,9 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   }
   await open(page, "BAL");
   await resume(page);
-  await expect(page.locator('[aria-current="step"]')).toContainText("Higiene");
-  const firstCount = page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
-  const secondCount = page.getByLabel("Quantidade — Material fictício V4 1", { exact: true });
+  await expect(balanceStage(page, "Materiais")).toHaveAttribute("aria-current", "step");
+  const firstCount = page.getByLabel("Material fictício V4 0 · unidade", { exact: true });
+  const secondCount = page.getByLabel("Material fictício V4 1 · unidade", { exact: true });
   await firstCount.focus();
   await expect(firstCount).toBeFocused();
   await firstCount.fill("1");
@@ -388,11 +388,24 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   await secondCount.fill("0");
   await expect(firstCount).toHaveValue("1");
   await expect(secondCount).toHaveValue("0");
-  for (let i = 0; i < 3; i++) await next(page);
+  await next(page);
+  await expect(balanceStage(page, "Itens extras")).toHaveAttribute("aria-current", "step");
+  const extras = page.getByRole("region", { name: "Itens extras contados", exact: true });
+  await extras.getByRole("button", { name: "Incluir item extra", exact: true }).click();
+  await extras.getByRole("textbox", { name: "Nome do item extra", exact: true }).fill("Mangueira reservada da equipe");
+  await extras.getByRole("textbox", { name: "Unidade do item extra", exact: true }).fill("metro");
+  await extras.getByRole("textbox", { name: "Quantidade contada", exact: true }).fill("2,5");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  const extraDraft = await draftContext(f, "BAL");
+  expect(extraDraft.navigation).toEqual({ version: 1, stage: "bal_extras" });
+  expect(extraDraft.content.balanceExtras[0].quantity).toBe("2,5");
+  await next(page);
+  await next(page);
   await expect(page.getByRole("textbox")).toHaveCount(0);
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await audit(page, `private-legacy-bal-review-${width}`);
+    if (width === 320) await page.screenshot({ path: test.info().outputPath("bal-avulso-revisao-320.png") });
   }
   const confirmation = page.waitForResponse(
     (response) =>
@@ -405,6 +418,7 @@ test("BAL parcial recupera o mesmo save após resposta perdida; REQ fica separad
   const emitted = await confirmation;
   expect(emitted.ok(), await emitted.text()).toBe(true);
   const official = (await emitted.json()).data;
+  expect(official.payload.balanceExtras).toEqual([{ ...extraDraft.content.balanceExtras[0], quantity: "2.5" }]);
   await expect(
     page.getByText("Documento persistido", { exact: true }),
   ).toBeVisible();
@@ -596,9 +610,8 @@ test("abertura BAL antiga com resposta desconhecida recupera a mesma ficha antes
   expect(result.ok(), await result.text()).toBe(true);
   expect((await result.json()).data.id).toBe(old.id);
   expect(officialState(f)).toBe(before);
-  await next(page);
   await page
-    .getByLabel("Quantidade — Material fictício V4 0", { exact: true })
+    .getByLabel("Material fictício V4 0 · unidade", { exact: true })
     .fill("1,");
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const draft = await rpc(f.pro, "creation_draft_context", {

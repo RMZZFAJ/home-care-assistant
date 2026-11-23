@@ -185,8 +185,7 @@ test("BAL private optional observations survive reference change,new entry and a
   await button(page, "Atualizar referência e iniciar nova conferência").click();
   await expect(review(page)).toHaveCount(0);
   await button(page, "Avançar").click();
-  await button(page, "Avançar").click();
-  const input = page.getByLabel("Quantidade — Material fictício V4 0", {
+  const input = page.getByLabel("Material fictício V4 0 · unidade", {
     exact: true,
   });
   await expect(input).toHaveValue("");
@@ -210,7 +209,7 @@ test("BAL private optional observations survive reference change,new entry and a
       .click();
     await expect(review(other)).toHaveCount(0);
     await expect(
-      other.getByLabel("Quantidade — Material fictício V4 0", { exact: true }),
+      other.getByLabel("Material fictício V4 0 · unidade", { exact: true }),
     ).toHaveValue("2");
     const history = other
       .getByRole("region", {

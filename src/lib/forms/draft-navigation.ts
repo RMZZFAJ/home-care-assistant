@@ -315,7 +315,8 @@ export function navigationAllowed(
   return (
     navigation.version === 1 &&
     flow !== null &&
-    draftFlowStages[flow].some((entry) => entry.id === navigation.stage)
+    (draftFlowStages[flow].some((entry) => entry.id === navigation.stage) ||
+      (kind === "BAL" && flow === "SUPPLY" && draftFlowStages.BAL.some((entry) => entry.id === navigation.stage)))
   );
 }
 /** Old drafts resume at the established first step; their missing stage stays explicit. */

@@ -1,4 +1,5 @@
 import type { CatalogProduct, SupplyDocument } from "@/types/documents";
+import { issuedBalanceExtras, type BalanceCountExtra } from "@/lib/validation/balance-count-extras";
 
 function normalizedName(name: string) {
   return name.trim().normalize("NFD").replaceAll(/\p{M}/gu, "").toLowerCase();
@@ -8,6 +9,12 @@ export function balanceCatalogueMatches(name: string, catalogue: readonly Catalo
   const key = normalizedName(name);
   return key ? catalogue.filter(product => [product.name, ...product.aliases ?? []]
     .some(label => normalizedName(label) === key)) : [];
+}
+
+export function confirmedBalanceExtras(extras: BalanceCountExtra[], catalogue: readonly CatalogProduct[]) {
+  const parsed = issuedBalanceExtras.safeParse(extras);
+  return parsed.success && parsed.data.every(extra => !balanceCatalogueMatches(extra.name, catalogue).length)
+    ? parsed.data : null;
 }
 
 export function priorBalanceMaterials(document: SupplyDocument | null, catalogue: readonly CatalogProduct[]) {
