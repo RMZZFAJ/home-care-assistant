@@ -718,7 +718,8 @@ button.hca-stock-material-pending { cursor: pointer; }
   display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center;
   min-width: 0; background: var(--hca-paper); border: 1px solid var(--hca-line); border-radius: 8px;
 }
-.hca-consumption-search .hca-text-input { min-height: 42px; border: 0; padding-inline-end: 0; }
+.hca-l1 .hca-consumption-search .hca-text-input { min-height: 42px; border: 0; padding-inline: 10px 0; }
+.hca-consumption-search .hca-text-input::placeholder { font-size: 14px; }
 .hca-consumption-search > button { margin-inline: 3px; padding: 7px; }
 .hca-consumption-list-links { display: flex; align-items: center; gap: 6px; }
 .hca-consumption-records { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
@@ -749,6 +750,7 @@ button.hca-stock-material-pending { cursor: pointer; }
 @media (max-width: 560px) {
   .hca-drawer-viewport:has(> .hca-consumption-sheet) { align-items: flex-end; }
   .hca-drawer-viewport > .hca-consumption-sheet { height: auto; max-height: 87dvh; border-radius: 17px 17px 0 0; }
+  .hca-drawer-viewport > .hca-consumption-flow-sheet { height: 87dvh; }
 }
 @media (forced-colors: active) {
   .hca-table-frame, .hca-consumption-card { background: Canvas; color: CanvasText; border-color: CanvasText; }

@@ -227,7 +227,7 @@ export function ConsumptionDetail({
             {canAmend ? <>
               <ActionButton onClick={event => setTeamAction({ kind: "correct", opener: event.currentTarget, report: data })}>Corrigir consumo</ActionButton>
               <ActionButton onClick={event => setTeamAction({ kind: "cancel", opener: event.currentTarget, report: data })}>Cancelar consumo</ActionButton>
-            </> : <ActionButton onClick={event => setTeamAction({ kind: "shortage", opener: event.currentTarget, report: data })}>Reiterar aviso</ActionButton>}
+            </> : <ActionButton onClick={event => setTeamAction({ kind: "shortage", opener: event.currentTarget, report: data })}>Avisar novamente</ActionButton>}
           </div> : null}
           {reading || error ? (
             <p className="text-sm text-(--muted)">

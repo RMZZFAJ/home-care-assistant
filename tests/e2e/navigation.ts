@@ -1,5 +1,11 @@
 import { expect, type Page } from "@playwright/test";
 
+export async function openFlowSuggestions(page: Page) {
+  await page.getByRole("button", { name: "Mais opções de consumo", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sugestões do WhatsApp", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Sugestões do WhatsApp", exact: true })).toBeVisible();
+}
+
 export async function openNavigation(page: Page) {
   const origin = page.url();
   let nav = page.getByRole("navigation", { name: "Navegação principal", exact: true });

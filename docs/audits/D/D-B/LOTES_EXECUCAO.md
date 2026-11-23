@@ -2895,6 +2895,11 @@ continua condicionada à autenticação e à permissão da custódia.
 
 ### Consumo a partir de sugestão do WhatsApp
 
+Em Consumo e faltas, **Mais opções de consumo → Sugestões do WhatsApp**
+abre o painel de consulta, revisão e recuperação. A lista principal fica
+dedicada aos registros emitidos. O painel mantém os preenchimentos e
+resultados pessoais disponíveis sob as permissões existentes.
+
 **Continuar consumo** abre o assistente compartilhado em Materiais. A
 mensagem original é consultada pelo vínculo autorizado. Os materiais
 reconhecidos entram selecionados. O formato atual do provedor envia
@@ -2923,6 +2928,24 @@ A migration foi aplicada após o backup crítico cifrado verificado
 `f7384b0f-8bc1-4df5-b46f-da00588f374d`. Local e remoto registram
 349 versões, com fila vinculada vazia. O RPC transacional segue restrito
 ao papel autenticado, com autorização por paciente e dono da sugestão.
+
+### Reiteração e cancelamento de consumo
+
+**Avisar novamente** abre a mensagem para a família com os materiais
+preservados no aviso original. O novo aviso mantém seu vínculo com o
+anterior e conserva os saldos. **Cancelar consumo** abre o diálogo com
+os materiais e as quantidades que voltarão ao estoque da equipe. O
+motivo e a versão continuam vinculados ao ato. Uma resposta incerta
+é consultada com a mesma chave antes de oferecer nova transmissão.
+
+A rodada com Chromium, Android e iOS emulados passou em 17 de 18
+casos. O fechamento do painel de sugestões após uma revisão falhou no
+Android. O painel passou a ter altura estável no celular e a devolver
+o foco ao botão Atualizar sugestões quando a ação anterior desaparece.
+Os seis casos dirigidos de Android e iOS passaram com o ajuste.
+As verificações confirmaram que uma nova falta preserva os materiais
+e o saldo, e que a compensação do cancelamento ocorre uma única vez
+mesmo quando a resposta original se perde.
 
 ### Residências sem horários e início da programação
 

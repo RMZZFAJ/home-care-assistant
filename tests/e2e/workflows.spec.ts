@@ -5,6 +5,7 @@ import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, open
 import { generatedPdf } from "./generated-pdf";
 import { confirmArrivalReview, openArrivalReview } from "./purchase-arrival-review";
 import { selectContext } from "./auth-context";
+import { openFlowSuggestions } from "./navigation";
 import { selectDeliveryRecipient } from "./delivery-recipient";
 import { openNavigation } from "./navigation";
 import { expect, test, type Page } from "@playwright/test";
@@ -1369,6 +1370,7 @@ test("Flow legado mantém a conferência de relatos quando o autor tem somente p
       "::jsonb)",
   );
   await page.goto("/consumo?careRecipientId=" + patient);
+  await openFlowSuggestions(page);
   await page
     .getByRole("button", { name: "Conferir sugestão", exact: true })
     .click();
@@ -1377,10 +1379,14 @@ test("Flow legado mantém a conferência de relatos quando o autor tem somente p
     .getByRole("button", { name: "Revisar e registrar relato", exact: true })
     .click();
   await page
-    .getByRole("dialog")
+    .getByRole("dialog", { name: "Revisão do Flow", exact: true })
     .getByRole("button", { name: "Confirmar relato conferido", exact: true })
     .click();
-  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Revisão do Flow", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Atualizar sugestões", exact: true })).toBeFocused();
+  await page.getByRole("dialog", { name: "Sugestões do WhatsApp", exact: true })
+    .getByRole("button", { name: "Fechar diálogo", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Mais opções de consumo", exact: true })).toBeFocused();
   let stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)

@@ -1,19 +1,22 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { MaterialReview } from "@/components/documents/material-review";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { ActionButton, FormField, SelectField, TextAreaField } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { Notice, type WorkspaceContext } from "@/components/workspace";
 import { api, ApiError } from "@/lib/client/api";
+import { formatQuantity } from "@/lib/quantity";
 import { teamConsumptionCommand, teamConsumptionReceipt, type TeamConsumptionCommand } from "@/lib/validation/consumption";
 import type { ConsumptionReport } from "@/types/consumption";
 import type { CatalogProduct } from "@/types/documents";
 
 type Command = Exclude<TeamConsumptionCommand, { action: "issue" }>;
 export type TeamConsumptionActionKind = Command["action"];
-const labels = { shortage: "Avisar falta", correct: "Corrigir consumo", cancel: "Cancelar consumo" };
+const labels = { shortage: "Avisar falta à família", correct: "Corrigir consumo", cancel: "Cancelar este consumo?" };
 const route = "/api/consumption/records";
 
 export function TeamConsumptionAction({ context, kind, report, products, opener, onClose, onSaved }: {
@@ -30,12 +33,16 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
   const [pending, setPending] = useState<Command | null>(() => {
     try {
       const stored = teamConsumptionCommand.safeParse(JSON.parse(sessionStorage.getItem(cache) ?? "null"));
-      return stored.success && stored.data.action === kind && stored.data.careRecipientId === patient ? stored.data : null;
+      if (!stored.success || stored.data.action !== kind || stored.data.careRecipientId !== patient) return null;
+      const target = stored.data.action === "shortage" ? stored.data.repeatedReportId : stored.data.reportId;
+      return target === report?.id ? stored.data : null;
     } catch { return null; }
   });
-  const [observation, setObservation] = useState(kind === "correct" ? report?.revisions.at(-1)?.body ?? report?.body ?? "" : "");
+  const [observation, setObservation] = useState(kind === "correct"
+    ? report?.revisions.at(-1)?.body ?? report?.body ?? ""
+    : kind === "shortage" && report ? "O material continua em falta. Precisamos de reposição." : "");
   const [reason, setReason] = useState("");
-  const [lines, setLines] = useState(kind === "correct" ? report?.current_lines ?? [] : []);
+  const [lines, setLines] = useState(kind === "cancel" ? [] : report?.current_lines ?? []);
   const [choice, setChoice] = useState("");
   const [busy, setBusy] = useState(false);
   const [absent, setAbsent] = useState(false);
@@ -53,7 +60,8 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
   function confirmed(raw: unknown, packet: Command) {
     const receipt = teamConsumptionReceipt.parse(raw);
     if (receipt.idempotencyKey !== packet.idempotencyKey || receipt.careRecipientId !== patient ||
-      receipt.action !== packet.action || ("reportId" in packet && receipt.id !== packet.reportId))
+      receipt.action !== packet.action || ("reportId" in packet
+        && (receipt.id !== packet.reportId || receipt.version !== packet.expectedVersion + 1)))
       throw new Error("A confirmação pertence a outra tentativa.");
     remember(null);
     onSaved(receipt.id);
@@ -97,19 +105,26 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
     } finally { submitLockRef.current = false; setBusy(false); }
   }
   return <RecordDrawer title={labels[kind]} subtitle={context.patient?.display_name} onClose={onClose} busy={busy}
+    modal={kind !== "correct"}
     restoreFocusTo={opener} exitDialog uncertainOutcome={Boolean(pending)}
     footer={close => <div className="hca-toolbar">
       <ActionButton disabled={busy} onClick={close}>Voltar</ActionButton>
-      <ActionButton variant="primary" disabled={busy} onClick={() => void send()}>
-        {pending ? absent ? "Reenviar a mesma tentativa" : "Conferir resultado" : kind === "shortage" ? "Enviar aviso" : "Confirmar"}
+      <ActionButton variant={kind === "cancel" && !pending ? "danger" : "primary"} disabled={busy} onClick={() => void send()}>
+        {pending ? absent ? "Reenviar a mesma tentativa" : "Conferir resultado"
+          : kind === "shortage" ? "Enviar aviso" : kind === "cancel" ? "Cancelar consumo" : "Confirmar"}
       </ActionButton>
     </div>}>
     <div className="hca-form-stack">
       {error ? <Notice error>{error}</Notice> : null}
       {pending ? <Notice>Confira o resultado antes de iniciar outro registro.</Notice> : <>
-        {kind === "shortage" ? <p>O aviso aparece para a família e mantém os saldos atuais.</p> : null}
-        {kind === "cancel" ? <p>A confirmação registra a compensação no estoque da equipe e preserva o histórico do consumo.</p> : null}
-        {kind !== "cancel" ? <FormField label={kind === "shortage" ? "O que está faltando?" : "Observações"}>
+        {kind === "cancel" && report ? <section className="hca-form-stack" aria-label="Materiais que voltarão ao estoque">
+          <p>O registro será preservado como cancelado. As quantidades abaixo retornarão ao estoque da equipe.</p>
+          <MaterialReview rows={report.current_lines.map(line => ({
+            id: line.productId, name: line.name ?? line.productId, icon: "undo",
+            details: <p>Retorno ao saldo · +{formatQuantity(line.quantity, line.unit)}</p>,
+          }))} />
+        </section> : null}
+        {kind !== "cancel" ? <FormField label={kind === "shortage" ? "Mensagem para a família" : "Observações"}>
           <TextAreaField value={observation} maxLength={2000} rows={4} onChange={event => setObservation(event.currentTarget.value)} />
         </FormField> : null}
         {kind !== "shortage" ? <FormField label="Motivo da alteração">
@@ -141,6 +156,10 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
             setChoice("");
           }}>Adicionar material</ActionButton>
         </> : null}
+        {kind === "shortage" ? <div className="hca-attention">
+          <Icon name="bell" />
+          <p>O aviso fica disponível à família e pode receber comentários. Você pode avisar novamente quando necessário.</p>
+        </div> : null}
       </>}
     </div>
   </RecordDrawer>;

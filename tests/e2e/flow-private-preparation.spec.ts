@@ -5,6 +5,7 @@ import { flowPreparationFixture } from "../integration/flow-preparation-fixtures
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
+import { openFlowSuggestions } from "./navigation";
 import { auditFromTop } from "./accessibility-audit";
 test.setTimeout(180_000);
 async function fixture(accept = true) {
@@ -23,6 +24,7 @@ async function login(page: Page, patient: string) {
   ).toBeVisible();
   await selectContext(page, patient);
   await page.goto(`/consumo?careRecipientId=${patient}`);
+  await openFlowSuggestions(page);
 }
 const drawer = (page: Page) =>
   page.getByRole("dialog", { name: "Revisão do Flow", exact: true });
@@ -187,8 +189,8 @@ test("Flow privado retoma em outra sessão,preserva quantidade incompleta e recu
       .click();
     await expect(drawer(other)).toHaveCount(0);
     await expect(
-      other.getByRole("heading", {
-        name: "Relatos recebidos por Flow",
+      other.getByRole("button", {
+        name: "Atualizar sugestões",
         exact: true,
       }),
     ).toBeFocused();
@@ -200,6 +202,7 @@ test("Flow privado retoma em outra sessão,preserva quantidade incompleta e recu
     expect(after.reports[0].lines[0].quantity).toBe("1");
     expect(after.ledger).toEqual(before.ledger);
     await other.goto(`/consumo?careRecipientId=${f.patient}`);
+    await openFlowSuggestions(other);
     await own(other)
       .getByRole("button", { name: "Consultar resultado do Flow", exact: true })
       .click();
@@ -380,6 +383,7 @@ test("Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativ
     }),
   ).toBeVisible();
   await page.reload();
+  await openFlowSuggestions(page);
   await own(page)
     .getByRole("button", { name: "Consultar resultado do Flow", exact: true })
     .click();
@@ -410,6 +414,7 @@ test("Flow pessoal permanece recuperável sem catálogo,escrita ou paciente ativ
     },
   );
   await page.reload();
+  await openFlowSuggestions(page);
   await own(page)
     .getByRole("button", { name: "Consultar resultado do Flow", exact: true })
     .click();

@@ -113,7 +113,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [editor, setEditor] = useState<HTMLElement | null>(null),
     [message, setMessage] = useState(""),
     [referenceError, setReferenceError] = useState("");
-  const [panel, setPanel] = useState<"filters" | "reference" | null>(null);
+  const [panel, setPanel] = useState<"filters" | "reference" | "flow" | null>(null);
   const [editorOrigin, setEditorOrigin] = useState<ReminderOrigin | null>(null);
   const [teamEditor, setTeamEditor] = useState<HTMLElement | null>(null);
   const [teamFlow, setTeamFlow] = useState<FlowSubmission>();
@@ -289,6 +289,27 @@ function Reports({ context }: { context: WorkspaceContext }) {
     setCatalogLoading(true);
     setCatalogAttempt((value) => value + 1);
   };
+  const teamWizard = teamEditor && mayRecordTeam ? (
+    <TeamConsumptionWizard context={context} products={products}
+      balances={new Map((stock.data?.overview ?? []).flatMap(item => item.team ? [[item.productId, item.team.confirmed] as const] : []))}
+      materialLoading={stock.loading || catalogLoading}
+      materialError={stock.error || catalogError}
+      retryMaterials={() => { stock.refresh(); catalogRetry(); }}
+      opener={teamEditor} sourceReminder={editorOrigin ?? undefined} sourceFlow={teamFlow}
+      onClose={() => { setTeamEditor(null); setEditorOrigin(null); setTeamFlow(undefined); }}
+      onSaved={id => {
+        setTeamEditor(null);
+        setEditorOrigin(null);
+        setTeamFlow(undefined);
+        if (teamFlow) {
+          setPanel(null);
+          triggerRef.current = moreRef.current;
+        }
+        setMessage("Consumo registrado no estoque da equipe.");
+        setAttempt(value => value + 1);
+        open(id);
+      }} />
+  ) : null;
   return (
     <div className="space-y-5">
       <NotificationReference
@@ -345,6 +366,9 @@ function Reports({ context }: { context: WorkspaceContext }) {
               <MenuPopup>
                 <Menu.Item className="hca-menu-item" onClick={() => { setReferenceError(""); setPanel("reference"); }}>
                   <Icon name="link" /> Consultar referência
+                </Menu.Item>
+                <Menu.Item className="hca-menu-item" onClick={() => setPanel("flow")}>
+                  <Icon name="comment" /> Sugestões do WhatsApp
                 </Menu.Item>
                 {mayOpenLegacy ? <Menu.Item className="hca-menu-item" onClick={() => {
                   setEditorOrigin(null);
@@ -481,40 +505,35 @@ function Reports({ context }: { context: WorkspaceContext }) {
           }}
         />
       ) : null}
-      {teamEditor && mayRecordTeam ? <TeamConsumptionWizard context={context} products={products}
-        balances={new Map((stock.data?.overview ?? []).flatMap(item => item.team ? [[item.productId, item.team.confirmed] as const] : []))}
-        materialLoading={stock.loading || catalogLoading}
-        materialError={stock.error || catalogError}
-        retryMaterials={() => { stock.refresh(); catalogRetry(); }}
-        opener={teamEditor} sourceReminder={editorOrigin ?? undefined} sourceFlow={teamFlow}
-        onClose={() => { setTeamEditor(null); setEditorOrigin(null); setTeamFlow(undefined); }}
-        onSaved={id => {
-          setTeamEditor(null);
-          setEditorOrigin(null);
-          setTeamFlow(undefined);
-          setMessage("Consumo registrado no estoque da equipe.");
-          setAttempt(value => value + 1);
-          open(id);
-        }} /> : null}
+      {!teamFlow ? teamWizard : null}
       {shortage && mayRecordTeam ? <TeamConsumptionAction context={context} kind="shortage" products={products}
         opener={shortage} onClose={() => setShortage(null)} onSaved={id => {
           setShortage(null);
           setAttempt(value => value + 1);
           open(id);
         }} /> : null}
-      <FlowReviews
-        key={context.userId}
-        context={context}
-        products={catalogError ? [] : products}
-        catalogReady={!catalogLoading && !catalogError}
-        refreshRevision={attempt}
-        onContinueConsumption={mayRecordTeam ? (source, opener) => {
-          setEditorOrigin(null);
-          setTeamFlow(source);
-          setTeamEditor(opener);
-        } : undefined}
-        onChange={() => setAttempt((value) => value + 1)}
-      />
+      {panel === "flow" ? <Drawer open title="Sugestões do WhatsApp" headingIcon="comment" keyboardScrollable
+        popupClassName="hca-consumption-sheet hca-consumption-flow-sheet" onClose={() => {
+          setPanel(null);
+          setTeamFlow(undefined);
+          setTeamEditor(null);
+        }} finalFocus={moreRef}
+        closeDisabled={Boolean(teamFlow && teamWizard)}>
+        <FlowReviews
+          key={context.userId}
+          context={context}
+          products={catalogError ? [] : products}
+          catalogReady={!catalogLoading && !catalogError}
+          refreshRevision={attempt}
+          onContinueConsumption={mayRecordTeam ? (source, opener) => {
+            setEditorOrigin(null);
+            setTeamFlow(source);
+            setTeamEditor(opener);
+          } : undefined}
+          onChange={() => setAttempt((value) => value + 1)}
+        />
+        {teamFlow ? teamWizard : null}
+      </Drawer> : null}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { seedFlowSuggestion } from "../integration/flow-preparation-fixtures.mjs
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
+import { openFlowSuggestions } from "./navigation";
 import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
@@ -47,6 +48,8 @@ test("a sugestão do WhatsApp continua no assistente e baixa o estoque uma únic
   const source = page.getByRole("region", { name: "Sugestões pendentes do Flow", exact: true });
   const launch = source.getByRole("button", { name: "Continuar consumo", exact: true });
   await openConsumption(page, f);
+  await expect(source).toHaveCount(0);
+  await openFlowSuggestions(page);
   await launch.click();
   const wizard = page.getByRole("dialog", { name: "Continuar consumo", exact: true });
   await expect(wizard.getByRole("region", { name: "Sugestão do WhatsApp", exact: true })).toContainText(original);
@@ -57,6 +60,7 @@ test("a sugestão do WhatsApp continua no assistente e baixa o estoque uma únic
   await amount.fill("3");
   await expect(wizard.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   await page.reload();
+  await openFlowSuggestions(page);
   await launch.click();
   await page.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
   await expect(amount).toHaveValue("3");
@@ -77,6 +81,7 @@ test("a sugestão do WhatsApp continua no assistente e baixa o estoque uma únic
   await wizard.getByRole("button", { name: "Registrar consumo", exact: true }).click();
   await wizard.getByRole("button", { name: "Conferir resultado", exact: true }).click();
   const report = page.getByRole("region", { name: "Detalhe do relato", exact: true });
+  await expect(page.getByRole("dialog", { name: "Sugestões do WhatsApp", exact: true })).toHaveCount(0);
   await expect(report.getByText("Sugestão do WhatsApp", { exact: true })).toBeVisible();
   await expect(report.getByText("Registrado", { exact: true })).toBeVisible();
   await expect(launch).toHaveCount(0);
@@ -163,9 +168,20 @@ test("consumo preserva o último rascunho, recupera a baixa e permite correção
   await expect(detail.getByRole("heading", { name: "Correção · versão 2", exact: true })).toBeVisible();
   expect(Number(balance())).toBe(7);
   await detail.getByRole("button", { name: "Cancelar consumo", exact: true }).click();
-  const cancellation = page.getByRole("dialog", { name: "Cancelar consumo", exact: true });
+  const cancellation = page.getByRole("dialog", { name: "Cancelar este consumo?", exact: true });
+  const returns = cancellation.getByRole("region", { name: "Materiais que voltarão ao estoque", exact: true });
+  await expect(returns).toContainText(f.name);
+  await expect(returns).toContainText("+3 unidade");
+  expect(Number(balance())).toBe(7);
   await cancellation.getByRole("textbox", { name: "Motivo da alteração", exact: true }).fill("Registro cancelado pela equipe após conferência.");
-  await cancellation.getByRole("button", { name: "Confirmar", exact: true }).click();
+  await page.route("**/api/consumption/records", async route => {
+    expect(route.request().postDataJSON()).toMatchObject({ action: "cancel", expectedVersion: 2 });
+    const response = await route.fetch();
+    expect(response.ok(), await response.text()).toBe(true);
+    await route.abort();
+  }, { times: 1 });
+  await cancellation.getByRole("button", { name: "Cancelar consumo", exact: true }).click();
+  await cancellation.getByRole("button", { name: "Conferir resultado", exact: true }).click();
   await expect(detail.getByText("Cancelado", { exact: true })).toBeVisible();
   expect(Number(balance())).toBe(10);
   await material.click();
@@ -175,6 +191,30 @@ test("consumo preserva o último rascunho, recupera a baixa e permite correção
   await expect(compensation.getByText("7 unidade", { exact: true })).toBeVisible();
   await expect(compensation.getByText("+3 unidade", { exact: true })).toBeVisible();
   await expect(compensation.getByText("10 unidade", { exact: true })).toBeVisible();
+});
+
+test("aviso reiterado confirma o material original sem alterar o saldo", async ({ page }) => {
+  const f = await fixture();
+  const original = await rpc(f.professional.client, "submit_team_consumption", {
+    p_patient: f.patient, p_key: randomUUID(), p_reference: null,
+    p_body: { action: "shortage", observation: "Reposição necessária.",
+      lines: [{ productId: f.products[0], quantity: "2" }] },
+  });
+  await openConsumption(page, f);
+  await page.goto(`/consumo?careRecipientId=${f.patient}&ref=${original.id}&refKind=report`);
+  const detail = page.getByRole("region", { name: "Detalhe do relato", exact: true });
+  await detail.getByRole("button", { name: "Avisar novamente", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Avisar falta à família", exact: true });
+  await expect(dialog.getByRole("textbox", { name: "Quantidade em falta · " + f.name, exact: true })).toHaveValue("2");
+  await expect(dialog.getByRole("textbox", { name: "Mensagem para a família", exact: true })).toHaveValue(
+    "O material continua em falta. Precisamos de reposição.",
+  );
+  await dialog.getByRole("button", { name: "Enviar aviso", exact: true }).click();
+  await expect(detail.getByText("Comunicado à família", { exact: true })).toBeVisible();
+  await expect(page).not.toHaveURL(new RegExp("ref=" + original.id));
+  expect(sql(`select count(*) from private.consumption_acts
+    where care_recipient_id=${q(f.patient)} and action='shortage' and request->>'repeatedReportId'=${q(original.id)}`)).toBe("1");
+  expect(Number(sql(`select private.stock_quantity(${q(f.patient)},${q(f.products[0])},'CARE_TEAM')::text`))).toBe(10);
 });
 
 test("consumo compara a revisão mais recente quando o envio é rejeitado por outro editor", async ({ page }) => {

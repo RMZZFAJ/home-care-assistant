@@ -82,7 +82,7 @@ export function FlowReviews({
       accept: boolean;
       opener: HTMLElement;
     } | null>(null),
-    headingRef = useRef<HTMLHeadingElement>(null);
+    refreshRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!canWrite) return;
     const controller = new AbortController();
@@ -176,18 +176,15 @@ export function FlowReviews({
   }
   return (
     <section
-      className="ui-card hca-form-stack"
+      className="hca-form-stack"
       aria-label="Relatos recebidos por Flow"
     >
-      <h2 ref={headingRef} tabIndex={-1}>
-        Relatos recebidos por Flow
-      </h2>
       <p>
         {result?.data.configured
           ? "Confira os dados recebidos no WhatsApp antes de registrá-los no aplicativo."
           : "O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão."}
       </p>
-      <ActionButton onClick={() => setAttempt((n) => n + 1)}>
+      <ActionButton ref={refreshRef} onClick={() => setAttempt((n) => n + 1)}>
         Atualizar sugestões
       </ActionButton>
       <section
@@ -343,7 +340,7 @@ export function FlowReviews({
           initialAccept={selected.accept}
           products={products}
           restoreFocusTo={selected.opener}
-          restoreFocusFallbackRef={headingRef}
+          restoreFocusFallbackRef={refreshRef}
           onClose={() => setSelected(null)}
           onSaved={refreshed}
         />
