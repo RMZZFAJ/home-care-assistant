@@ -3014,9 +3014,24 @@ A migration foi aplicada após o backup cifrado verificado
 - A interface mantém os modos Semana e Mês, os filtros de profissional
   e situação e as rotas de referência. A lista de propostas e a
   recuperação de operações anteriores continuam na área da agenda.
-- O atalho Balanço neste plantão fica pendente de uma consulta
-  autorizada que relacione ocorrências e balanços na agenda. A consulta
-  atual retorna o vínculo no fluxo de impacto da alteração.
+- O atalho **Balanço neste plantão** abre um painel de consulta quando
+  a atribuição ativa corresponde ao plantão, à sua versão, ao
+  profissional e ao intervalo publicado. O painel mostra responsável,
+  período, prazo e disponibilidade. Iniciar ou retomar abre o wizard
+  existente, que confere a atribuição escolhida.
+- A agenda consulta uma projeção restrita do acompanhamento de
+  balanço. Ela exige leitura de balanços e de plantões, respeita a
+  visibilidade da própria escala e usa o vínculo ativo. Após
+  reatribuição, o atalho acompanha o plantão de destino. A consulta
+  reaproveita a função de banco existente e dispensa migração.
+- A confirmação da escala compara a decisão de balanço no formato
+  validado. A ordem das chaves retornadas pelo banco já não provoca
+  recuperação indevida após um cancelamento confirmado.
+- Foram verificados com Auth real o acesso do responsável, a recusa
+  de uma versão divergente, a omissão para outro profissional com
+  leitura própria e o bloqueio após retirada da leitura de balanços.
+  A transferência confirmou a operação e moveu o atalho. A verificação
+  em 320 px conferiu o painel abaixo do cabeçalho e as ações na base.
 - A rodada encontrou e corrigiu um atributo de acessibilidade inválido
   no contêiner de movimentos aberto a partir do alerta de estoque.
   Este incremento dispensa migração.

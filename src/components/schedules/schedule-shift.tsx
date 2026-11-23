@@ -7,10 +7,11 @@ import { localMinute } from "@/lib/schedules/time";
 import { scheduleStamp } from "./schedule-review";
 import type { ScheduledShift } from "@/types/schedules";
 
-export function ScheduleShift({ shift, stateLabel, earlier, action, disabled, onEdit, daily, recurrence, onEnd }: {
+export function ScheduleShift({ shift, stateLabel, earlier, action, disabled, onEdit, daily, recurrence, onEnd, onOpenBalance }: {
   shift: ScheduledShift; stateLabel: string; earlier: boolean; action?: string;
   disabled: boolean; onEdit: (target: HTMLButtonElement) => void;
   daily?: boolean; recurrence?: string; onEnd?: (target: HTMLButtonElement) => void;
+  onOpenBalance?: (target: HTMLButtonElement) => void;
 }) {
   const openerRef = useRef<HTMLButtonElement>(null);
   const label = `${shift.type_name} · ${shift.professional_name}`;
@@ -39,6 +40,10 @@ export function ScheduleShift({ shift, stateLabel, earlier, action, disabled, on
         <small>{shift.type_name}{recurrence ? " · " + recurrence : ""}</small>
         {shift.is_exception ? <small>Exceção autorizada</small> : null}
         {shift.status !== "published" ? state : null}
+        {onOpenBalance ? <button type="button" className="hca-agenda-balance-link" aria-haspopup="dialog"
+          onClick={event => onOpenBalance(event.currentTarget)}>
+          <Icon name="note" width={15} height={15} /> Balanço neste plantão
+        </button> : null}
       </div>
       {action || onEnd ? <Menu.Root>
         <Menu.Trigger disabled={disabled} render={<ActionButton ref={openerRef} variant="quiet" compact

@@ -87,6 +87,8 @@ export function BalanceEntry() {
               context={context}
               documentId={params.get("documentId")}
               recount={params.get("recount") === "true"}
+              assignmentId={params.get("assignmentId")}
+              assignmentVersion={params.get("assignmentVersion")}
             />
           )
         ) : (
@@ -102,15 +104,20 @@ function Mode({
   context,
   documentId,
   recount,
+  assignmentId,
+  assignmentVersion,
 }: {
   context: WorkspaceContext;
   documentId: string | null;
   recount: boolean;
+  assignmentId: string | null;
+  assignmentVersion: string | null;
 }) {
   const { data, error, reload, hasBeenEligible } = useBalanceWorkspace(
     context.patient!.id,
   );
   const [recoverable, setRecoverable] = useState(false);
+  const [openedAssignment, setOpenedAssignment] = useState(false);
   useEffect(() => {
     let active = true;
     void Promise.resolve().then(() => {
@@ -148,6 +155,13 @@ function Mode({
     );
   if (!data)
     return <LoadingIndicator label="Verificando plantão e disponibilidade" />;
+  if ((assignmentId !== null || assignmentVersion !== null) && !openedAssignment) {
+    const current = data.eligibility.assignment;
+    if (!current || assignmentId !== current.id || assignmentVersion !== String(current.version)
+      || documentId !== data.eligibility.documentId)
+      return <Notice error>A atribuição mudou. Volte a Plantões e balanços para consultar a responsabilidade atual.</Notice>;
+    setOpenedAssignment(true);
+  }
   if (
     !data.regime?.activated_at &&
     !data.eligibility.assignment &&

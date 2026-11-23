@@ -56,6 +56,45 @@ const countReviewRead = z.object({
     }),
   }),
 });
+const dateTime = z.iso.datetime({ offset: true });
+const agendaBalanceRead = z.object({
+  careRecipientId: id,
+  data: z.object({
+    eligibility: z.object({
+      assignment: z.object({
+        id,
+        care_recipient_id: id,
+        shift_id: id,
+        shift_version: admissionScope.assignmentVersion,
+        professional_id: id,
+        starts_at: dateTime,
+        ends_at: dateTime,
+        status: z.literal("active"),
+        version: admissionScope.assignmentVersion,
+        kind: z.enum(["scheduled", "transfer", "deferred", "recount"]),
+      }).nullable(),
+      admission: balanceCountAdmission.nullish(),
+      available: z.boolean(),
+      documentId: id.nullable(),
+      dueAt: dateTime.nullable(),
+    }),
+  }),
+});
+
+export function parseBalanceAgendaRead(value: unknown, patientId: string) {
+  const result = agendaBalanceRead.safeParse(value);
+  if (result.success && result.data.careRecipientId === patientId) {
+    const { assignment, admission, available } = result.data.data.eligibility;
+    if (assignment
+      ? assignment.care_recipient_id === patientId
+        && Date.parse(assignment.ends_at) > Date.parse(assignment.starts_at)
+        && (!admission || (admission.assignmentId === assignment.id && admission.assignmentVersion === assignment.version))
+      : !admission && !available) return result.data;
+  }
+  throw new Error("Não foi possível conferir o balanço vinculado ao plantão.");
+}
+export type BalanceAgendaEligibility = ReturnType<typeof parseBalanceAgendaRead>["data"]["eligibility"];
+
 export function parseBalanceCountReference(value: unknown, patientId: string) {
   const result = countReferenceRead.safeParse(value);
   if (!result.success || result.data.careRecipientId !== patientId) {

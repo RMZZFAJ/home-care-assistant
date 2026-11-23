@@ -31,6 +31,7 @@ import { useLiveRevision } from "@/lib/use-live-revision";
 import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import { scheduleBalanceDecisionReady, scheduleBalanceReview } from "@/lib/schedules/balance-impact";
 import {
+  scheduleResourceFieldsSchema,
   scheduleResourceReferenceSchema,
   checkScheduleResourceReference,
   scheduleResourceLabels,
@@ -238,9 +239,11 @@ export function ScheduleResourcePreparation({
     receipt: ScheduleResourceReceipt,
     original: Extract<Stored, { mode: "pending" }>,
   ) {
+    const preservedFields = scheduleResourceFieldsSchema.safeParse(original.fields);
     if (
       !scheduleResourceReceiptMatches(receipt, original.packet, userId) ||
-      !equal(receipt.fields, original.fields)
+      !preservedFields.success ||
+      !equal(receipt.fields, preservedFields.data)
     )
       throw Error(
         "O resultado não corresponde ao preenchimento preservado. A referência foi mantida.",

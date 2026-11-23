@@ -33,6 +33,7 @@ const paths = {
   "download": "M12 3v13 M8 12l4 4 4-4 M4 18v3h16v-3",
   "upload": "M12 17V4 M8 8l4-4 4 4 M4 18v3h16v-3",
   "calendar": "M4 5h16v16H4z M4 10h16 M8 3v4 M16 3v4 M8 14h2 M14 14h2 M8 18h2",
+  "checklist": "m3 6 2 2 3-4m3 2h10M3 13l2 2 3-4m3 2h10m-18 7h5m3 0h10",
   "heart": "M12 21C-3 12 3 1 12 7c9-6 15 5 0 14",
   "pill": "M5 19a5 5 0 0 1 0-7l7-7a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7 0z M8.5 8.5l7 7",
   "alert": canonicalSymbols.alert,

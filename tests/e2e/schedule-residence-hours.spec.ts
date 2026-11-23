@@ -4,6 +4,7 @@ import { rpc, setup } from "../integration/v4-fixtures.mjs";
 import { balanceSetup, dayOffset, localToday, shiftCommand, shiftWorker } from "../integration/shift-fixtures.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 
 test("horários da residência governam plantão isolado, exceção noturna e repetição sem data final", async ({ page }, info) => {
   test.setTimeout(120_000);
@@ -147,8 +148,17 @@ test("cancelar plantão com BAL exige encaminhar a contagem e confirma os dois a
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await selectContext(page, fixture.patient);
   await page.goto(`/escalas?day=${fixture.today}`);
-  await page.locator(`article[data-shift-id="${assignment.shift_id}"]`)
-    .getByRole("button", { name: /^Ações do plantão de / }).click();
+  const shiftCard = page.locator(`article[data-shift-id="${assignment.shift_id}"]`);
+  const linked = shiftCard.getByRole("button", { name: "Balanço neste plantão", exact: true });
+  await linked.click();
+  const balance = page.getByRole("dialog", { name: /^Balanço de / });
+  await expect(balance.getByText("Responsável", { exact: true })).toBeVisible();
+  await expect(balance.getByText("Prazo atual", { exact: true })).toBeVisible();
+  await expect(balance.getByRole("link", { name: "Iniciar balanço", exact: true })).toHaveCount(0);
+  await expect(balance.getByRole("link", { name: "Acompanhar balanços", exact: true })).toBeVisible();
+  await balance.getByRole("button", { name: "Fechar detalhes do balanço", exact: true }).click();
+  await expect(linked).toBeFocused();
+  await shiftCard.getByRole("button", { name: /^Ações do plantão de / }).click();
   await page.getByRole("menuitem", { name: "Alterar plantão", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "Alteração pontual", exact: true });
   await editor.getByRole("combobox", { name: "Operação", exact: true }).selectOption("cancel");
@@ -171,4 +181,79 @@ test("cancelar plantão com BAL exige encaminhar a contagem e confirma os dois a
   const final = await rpc(admin.client, "balance_workspace", { p_patient: fixture.patient });
   expect(final.eligibility.assignment.shift_id).toBe(target.id);
   expect(final.assignments.find((row: { id: string }) => row.id === assignment.id).status).toBe("deferred");
+  await expect(page.getByText("Operação da agenda registrada e conferida.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(linked).toHaveCount(0);
+  const nextDay = new Intl.DateTimeFormat("sv-SE", { timeZone: target.timezone }).format(new Date(target.starts_at));
+  await page.getByLabel("Data de referência", { exact: true }).fill(nextDay);
+  await expect(page.locator(`article[data-shift-id="${target.id}"]`)
+    .getByRole("button", { name: "Balanço neste plantão", exact: true })).toBeVisible();
+});
+
+test("atalho do balanço usa a atribuição autorizada e recusa uma referência vencida", async ({ page, browser }) => {
+  test.setTimeout(120_000);
+  const f = await balanceSetup({ stableCurrentWindow: true });
+  const workspace = await rpc(f.pro.client, "balance_workspace", { p_patient: f.patient });
+  const expected = workspace.eligibility.assignment;
+  const agendaUrl = "/escalas?" + new URLSearchParams({ careRecipientId: f.patient, day: f.today });
+  const readUrl = "/api/balances?" + new URLSearchParams({ careRecipientId: f.patient, view: "agenda" });
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(f.pro.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await selectContext(page, f.patient);
+  await page.goto(agendaUrl);
+  const read = await page.request.get(readUrl);
+  expect(read.ok()).toBe(true);
+  const snapshot = await read.json();
+  expect(Object.keys(snapshot.data)).toEqual(["eligibility"]);
+  expect(snapshot.data.eligibility.assignment.id).toBe(expected.id);
+  const card = page.locator(`article[data-shift-id="${expected.shift_id}"]`);
+  await card.getByRole("button", { name: "Balanço neste plantão", exact: true }).click();
+  const balance = page.getByRole("dialog", { name: /^Balanço de / });
+  await expect(balance.getByText("Disponível para você", { exact: true })).toBeVisible();
+  const start = balance.getByRole("link", { name: "Iniciar balanço", exact: true });
+  const href = new URL((await start.getAttribute("href"))!, page.url());
+  expect(href.searchParams.get("assignmentId")).toBe(expected.id);
+  expect(href.searchParams.get("assignmentVersion")).toBe(String(expected.version));
+  await page.setViewportSize({ width: 320, height: 860 });
+  await audit(page, "L3 balanço vinculado ao plantão");
+  const frame = await balance.boundingBox();
+  const footer = await balance.locator(".hca-modal-footer").boundingBox();
+  expect(frame).not.toBeNull();
+  expect(footer).not.toBeNull();
+  expect(frame!.y).toBeGreaterThanOrEqual(58);
+  expect(frame!.y + frame!.height - footer!.y - footer!.height).toBeLessThanOrEqual(2);
+  await balance.screenshot({ path: test.info().outputPath("balanco-no-plantao.png"), animations: "disabled" });
+  await start.click();
+  await expect(page.getByRole("button", { name: "Iniciar contagem", exact: true })).toBeVisible();
+  href.searchParams.set("assignmentVersion", String(expected.version + 1));
+  await page.goto(href.href);
+  await expect(page.getByRole("alert").filter({ hasText: "A atribuição mudou" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Iniciar contagem", exact: true })).toHaveCount(0);
+
+  const coworker = await shiftWorker(f.patient);
+  sql(`insert into public.capability_overrides (care_recipient_id,subject_user,capability,enabled) values
+    (${q(f.patient)},${q(coworker.id)},'schedule.read.team',false),
+    (${q(f.patient)},${q(coworker.id)},'schedule.read.own',true);`);
+  const otherContext = await browser.newContext();
+  try {
+    const other = await otherContext.newPage();
+    await other.goto(new URL("/login", page.url()).href);
+    await other.getByLabel("E-mail", { exact: true }).fill(coworker.email);
+    await other.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+    await other.getByRole("button", { name: "Entrar", exact: true }).click();
+    await selectContext(other, f.patient);
+    const endpoint = new URL(readUrl, other.url()).href;
+    const limited = await other.request.get(endpoint);
+    expect(limited.status()).toBe(200);
+    expect((await limited.json()).data.eligibility.assignment).toBeNull();
+    sql(`insert into public.capability_overrides (care_recipient_id,subject_user,capability,enabled)
+      values(${q(f.patient)},${q(coworker.id)},'bal.read',false);`);
+    const denied = await other.request.get(endpoint);
+    expect(denied.status()).toBe(403);
+    expect((await denied.json()).data).toBeUndefined();
+  } finally {
+    await otherContext.close();
+  }
 });

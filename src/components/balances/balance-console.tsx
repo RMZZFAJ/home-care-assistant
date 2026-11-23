@@ -25,6 +25,7 @@ import { DeferralFacts } from "./balance-deferral-facts";
 import { BalanceCountPermissionAction, BalanceCountPermissionHistory } from "./balance-count-permissions";
 import { useBalanceWorkspace } from "./use-balance-workspace";
 import { scheduleSettingsHref } from "@/lib/schedules/routes";
+import { balanceCountHref } from "@/lib/balances/routes";
 import type { DocumentSummary } from "@/types/documents";
 export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
   const router = useRouter(),
@@ -186,7 +187,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
           </p>
         ) : null}
       </section>
-      <section className="ui-card">
+      <section className="ui-card" id="responsabilidade-balanco">
         <h2>Responsabilidade atual</h2>
         {a ? (
           <>
@@ -209,14 +210,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
             <div className="hca-toolbar">
               {data.eligibility.available || data.eligibility.admission ? (
                 <Link
-                  href={
-                    "/fichas/bal" +
-                    (data.eligibility.documentId
-                      ? "?documentId=" +
-                      data.eligibility.documentId +
-                      (a.kind === "recount" ? "&recount=true" : "")
-                      : "")
-                  }
+                  href={balanceCountHref(patient.id, data.eligibility.documentId, a)}
                   className="ui-button ui-button-primary"
                   prefetch={false}
                 >

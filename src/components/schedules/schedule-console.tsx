@@ -25,6 +25,7 @@ import {
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { parseScheduleListRead } from "@/lib/validation/schedule-list";
+import { parseBalanceAgendaRead } from "@/lib/validation/balances";
 import { formatBrazilDate } from "@/lib/receipt";
 import { adjacentPeriod, calendarPeriod, scheduleDisplayDay } from "@/lib/schedules/calendar";
 import { localMinute } from "@/lib/schedules/time";
@@ -46,6 +47,7 @@ import Link from "next/link";
 import { scheduleResidenceSettingsHref, scheduleSettingsHref } from "@/lib/schedules/routes";
 import { ScheduleDayCalendar } from "./schedule-day-calendar";
 import { ScheduleShift } from "./schedule-shift";
+import { ScheduleBalancePreview, scheduleBalanceMatches } from "./schedule-balance-preview";
 
 const today = (timeZone?: string) =>
   new Intl.DateTimeFormat("sv-SE", { timeZone }).format(
@@ -274,6 +276,8 @@ function Agenda({
     [status, setStatus] = useState(""),
     [attempt, setAttempt] = useState(0);
   const [message, setMessage] = useState("");
+  const rosterRef = useRef<HTMLHeadingElement>(null);
+  const [balanceSelection, setBalanceSelection] = useState<{ shift: ScheduledShift; opener: HTMLButtonElement } | null>(null);
   const periodMode = mode === "month" ? "month" : "week";
   const live = useLiveRevision(), period = useMemo(() => calendarPeriod(day, periodMode), [day, periodMode]);
   const decode = useCallback((value: unknown) => parseScheduleListRead(value, {
@@ -282,7 +286,12 @@ function Agenda({
   const read = useScopedRead("/api/schedules?" + new URLSearchParams({
     careRecipientId: patient.id, from: period.from, until: period.until,
   }), String(live) + ":" + attempt, decode);
+  const decodeBalance = useCallback((value: unknown) => parseBalanceAgendaRead(value, patient.id), [patient.id]);
+  const balanceRead = useScopedRead(mode === "day" && !recovery.readDenied && can(context, "bal.read")
+    ? "/api/balances?" + new URLSearchParams({ careRecipientId: patient.id, view: "agenda" }) : null,
+  String(live) + ":" + attempt, decodeBalance);
   const data = read.data?.data ?? null, currentData = data, loading = read.loading;
+  const eligibility = !read.error && !balanceRead.error ? balanceRead.data?.data.eligibility ?? null : null;
   const busy = recovery.busy || !recovery.ready || loading || Boolean(read.error),
     uncertain = recovery.pending !== null;
   function open(value: ScheduleEditor, target: HTMLElement) {
@@ -342,12 +351,17 @@ function Agenda({
     const editable = shift.status === "published" && (team || (ownsShift && (can(context, "schedule.propose") || publishOwn)));
     const mayEnd = daily && shift.status === "published" && series?.status === "published" && !series.ended_on
       && (series.recurrence !== "once" || !series.residence_version) && (team || (publishOwn && ownsShift));
+    const linked = daily && scheduleBalanceMatches(eligibility, shift);
     return <ScheduleShift key={shift.id} shift={shift} daily={daily}
       recurrence={series ? recurrenceLabels[series.recurrence] : undefined}
       stateLabel={stateLabels[shift.status]}
       earlier={localMinute(shift.starts_at, shift.timezone).slice(0, 10) < (daily ? day : period.from)}
       action={editable ? team || publishOwn ? "Alterar plantão" : "Propor alteração" : undefined}
       disabled={busy || uncertain} onEdit={target => open({ kind: "shift", shift }, target)}
+      onOpenBalance={linked ? opener => {
+        setBalanceSelection({ shift, opener });
+        balanceRead.refresh();
+      } : undefined}
       onEnd={mayEnd ? target => open({ kind: "end", id: series.id, version: series.version }, target) : undefined} />;
   };
   const renderDay = (date: string) => {
@@ -372,6 +386,7 @@ function Agenda({
   const createDisabled = busy || uncertain || !residenceReady || !data?.types.some(type => type.is_active);
   const occupied = new Set(period.dates.filter(date => byDay.get(date)?.length));
   const dailyShifts = byDay.get(day) ?? [];
+  const selectedShift = balanceSelection && dailyShifts.find(shift => shift.id === balanceSelection.shift.id);
   return recovery.readDenied ? (
     <ScheduleConfirmationPanel recovery={recovery} onConfirmed={confirmed} />
   ) : (
@@ -419,7 +434,7 @@ function Agenda({
       {message ? <Notice>{message}</Notice> : null}
       {mode === "day" ? <ScheduleDayCalendar selected={day} days={period.dates} occupied={occupied} onSelect={setDay} /> : null}
       <div className="hca-agenda-roster-heading">
-        <h2>{mode === "day" ? "Plantões do dia" : mode === "week" ? "Plantões da semana" : "Plantões do mês"}</h2>
+        <h2 ref={rosterRef} tabIndex={-1}>{mode === "day" ? "Plantões do dia" : mode === "week" ? "Plantões da semana" : "Plantões do mês"}</h2>
         {mayCreate ? <ActionButton compact aria-label="Nova programação" disabled={createDisabled}
           onClick={event => open({ kind: "series" }, event.currentTarget)}><Icon name="plus" /></ActionButton> : null}
       </div>
@@ -427,6 +442,9 @@ function Agenda({
         onChange={event => setOnlyMine(event.target.checked)} /> : null}
       {loading ? <LoadingIndicator label="Carregando escala" /> : null}
       {read.error ? <Notice error>{read.error} Atualize a escala para repetir a consulta.</Notice> : null}
+      {mode === "day" && balanceRead.error && !balanceSelection ? <Notice error>
+        Não foi possível conferir o balanço vinculado à agenda. <ActionButton onClick={balanceRead.refresh}>Consultar balanço novamente</ActionButton>
+      </Notice> : null}
       {currentData && mode === "day" ? (
         dailyShifts.length ? <div className="hca-agenda-roster">{dailyShifts.map(renderShift)}</div> :
           <div className="hca-agenda-empty">
@@ -434,6 +452,15 @@ function Agenda({
             <p className="hca-muted">{selectedPerson || status ? "Ajuste os filtros ou consulte outra data." : "Consulte outra data."}</p>
           </div>
       ) : null}
+      {balanceSelection ? <ScheduleBalancePreview patientId={patient.id} patientName={patient.display_name}
+        shift={selectedShift ?? balanceSelection.shift}
+        eligibility={selectedShift && scheduleBalanceMatches(eligibility, selectedShift) ? eligibility : null}
+        checkedAt={Date.parse(balanceRead.queriedAt ?? "")}
+        loading={loading || balanceRead.loading}
+        error={Boolean(read.error || balanceRead.error)}
+        onRetry={() => read.error ? read.refresh() : balanceRead.refresh()}
+        onClose={() => setBalanceSelection(null)}
+        finalFocus={() => balanceSelection.opener.isConnected ? balanceSelection.opener : rosterRef.current ?? false} /> : null}
       <div className="hca-toolbar">
         <FormField label="Data de referência">
           <TextInput
