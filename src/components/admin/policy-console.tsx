@@ -17,6 +17,7 @@ import { NotificationMatrix } from "./notification-matrix";
 import { PolicyRules } from "./policy-rules";
 import { ScheduleResidenceSettings } from "./schedule-residence-settings";
 import { PatientSchedule } from "@/components/schedules/schedule-console";
+import { canConfigureResidenceHours } from "@/components/schedules/schedule-residence-requirement";
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/primitives";
 import "./administration.css";
@@ -83,9 +84,9 @@ export function PolicyConsole() {
                 careRecipientId: context.patient.id,
                 ...(day && /^\d{4}-\d{2}-\d{2}$/.test(day) ? { day } : {}),
               })}>Voltar à agenda</Link>
-            <PatientSchedule key={context.userId + ":" + context.patient.id} context={context} settings />
-            {context.activeContext?.mode === "patient" && can(context, "schedule.types.manage")
+            {canConfigureResidenceHours(context)
               ? <ScheduleResidenceSettings key={context.patient.id} patientId={context.patient.id} /> : null}
+            <PatientSchedule key={context.userId + ":" + context.patient.id} context={context} settings />
           </div>
         ) : context.patient &&
         (can(context, "access.manage") ||

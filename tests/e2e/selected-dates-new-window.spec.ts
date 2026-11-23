@@ -119,6 +119,12 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await startFocusProbe(page);
   const f = await selectedDatesFixture();
   await conflictingOtherPatient(f);
+  await rpc(f.admin, "set_schedule_residence", {
+    p_patient: f.patient,
+    p_body: { timezone: "America/Sao_Paulo", dayStart: "07:00", nightStart: "19:00" },
+    p_version: null,
+    p_key: crypto.randomUUID(),
+  });
   const before = datesState(f);
   await begin(page, f.patient);
   await page
@@ -130,13 +136,15 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await edit(page)
     .getByLabel("Tipo de plantão", { exact: true })
     .selectOption(f.type.id);
+  await edit(page).getByRole("switch", { name: "Com repetição", exact: true }).check();
   await edit(page)
     .getByLabel("Repetição", { exact: true })
     .selectOption("dates");
   await edit(page)
-    .getByLabel("Primeiro dia / âncora", { exact: true })
+    .getByLabel("Primeiro dia", { exact: true })
     .fill("2100-01-15");
-  await edit(page).getByLabel("Válida até", { exact: true }).fill("2100-02-28");
+  await edit(page).getByLabel("Último dia", { exact: true }).fill("2100-02-28");
+  await edit(page).getByLabel("Período", { exact: true }).selectOption("night");
   const label = (date: string) => "Dia " + date.split("-").reverse().join("/");
   for (const date of chosenDates.filter((day) => day.startsWith("2100-01")))
     await edit(page)
@@ -162,7 +170,7 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
     edit(page).getByText("12 datas selecionadas", { exact: true }),
   ).toBeVisible();
   await edit(page)
-    .getByLabel("Observações", { exact: true })
+    .getByLabel("Informação adicional", { exact: true })
     .fill(
       "Datas preservadas entre meses e depois da recusa; nenhum dado de outro paciente",
     );
@@ -185,7 +193,7 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await expect(review(page).getByRole("textbox")).toHaveCount(0);
   await expect(review(page).locator("ol > li")).toHaveCount(12);
   await expect(review(page).locator("ol > li").first()).toContainText(
-    "15/01/2100, 19:00 → 16/01/2100, 07:00",
+    "15/01/2100 · 19:00 às 07:00 do dia seguinte",
   );
   const rejected = page.waitForResponse(
     (response) =>
@@ -220,7 +228,7 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
     edit(page).getByText("12 datas selecionadas", { exact: true }),
   ).toBeVisible();
   await expect(
-    edit(page).getByLabel("Observações", { exact: true }),
+    edit(page).getByLabel("Informação adicional", { exact: true }),
   ).toHaveValue(
     "Datas preservadas entre meses e depois da recusa; nenhum dado de outro paciente",
   );

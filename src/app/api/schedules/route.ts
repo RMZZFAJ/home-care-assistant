@@ -17,7 +17,10 @@ export async function POST(request: Request) {
   return api("schedules.write", async () => {
     const input = await readJson(request, scheduleCommandSchema), auth = await authenticate();
     await patientContext(auth, input.careRecipientId, "read", true);
-    const data = await rpc(auth.client, "schedule_command", { p_patient: input.careRecipientId, p_action: input.command.action, p_body: input.command.body, p_key: input.idempotencyKey, p_version: input.expectedVersion }) as { status?: string };
+    const args = { p_patient: input.careRecipientId, p_body: input.command.body, p_key: input.idempotencyKey, p_version: input.expectedVersion };
+    const data = (input.command.action === "series"
+      ? await rpc(auth.client, "schedule_residence_command", args)
+      : await rpc(auth.client, "schedule_command", { ...args, p_action: input.command.action })) as { status?: string };
     if (input.command.action === "decide_change" && data.status === "obsolete")
       throw new ApiError("VERSION_CONFLICT", "A proposta ficou obsoleta e foi encerrada. O plantão atual foi preservado; consulte o histórico antes de preparar outra proposta.", 409);
     return NextResponse.json({ data });

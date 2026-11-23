@@ -37,6 +37,7 @@ import {
 } from "@/lib/validation/schedule-preparations";
 import { ScheduleForm } from "./schedule-forms";
 import { useResidenceHours } from "./use-residence-hours";
+import { ScheduleResidenceRequirement } from "./schedule-residence-requirement";
 import { ScheduleReviewDetails } from "./schedule-review";
 import {
   SchedulePreparationSummary,
@@ -193,7 +194,7 @@ export function ScheduleCreationPreparation({
     decodeSource,
   );
   const data = mayRead && !source.loading && !source.error ? source.data : null;
-  const residenceRead = useResidenceHours(patient.id, mayRead);
+  const residenceRead = useResidenceHours(patient.id, mayRead || writable);
   const residence = residenceRead.data?.hours;
   const [storedFields, setStoredFields] = useState<ScheduleCreationFields>(
     () =>
@@ -208,6 +209,12 @@ export function ScheduleCreationPreparation({
     : storedFields;
   const residenceMismatch = fields.form === "series" && fields.residence
     && (!residence || fields.residence.version !== residence.version);
+  const needsResidence = fields.form === "series" || fields.restHours !== undefined;
+  const residenceReady =
+    !residenceRead.loading && !residenceRead.error && Boolean(residence);
+  const canEditTiming = fields.form !== "series" || Boolean(fields.residence && !residenceMismatch);
+  const timingReady = fields.form !== "series" ||
+    (residenceReady && canEditTiming);
   const [datesMonth, setDatesMonth] = useState<string | null>(null);
   const [discardChoice, setDiscardChoice] = useState<{
     draftId: string;
@@ -402,7 +409,7 @@ export function ScheduleCreationPreparation({
     if (!writable || publishing || pending || draft.blocked || integrityError)
       return;
     try {
-      if (purpose === "schedule_series_create" && (residenceRead.loading || residenceRead.error || residenceMismatch))
+      if (!timingReady)
         throw new Error("Confira os horários atuais da residência antes de revisar.");
       if (fields.form === "type" && fields.restHours !== undefined && !residence)
         throw new Error("Preencha os horários em Configurações de plantões → Horários da residência.");
@@ -829,6 +836,7 @@ export function ScheduleCreationPreparation({
                     draft.blocked ||
                     !writable ||
                     reviewRejected ||
+                    !timingReady ||
                     (purpose === "schedule_series_create" && !data) ||
                     Boolean(integrityError)
                   }
@@ -857,23 +865,24 @@ export function ScheduleCreationPreparation({
           ) : null}
           {!hiddenEditor && writable ? (
             <>
-              {residenceRead.error ? <Notice error>
+              {needsResidence && !residenceRead.loading && residenceRead.error ? <Notice error>
                 Os horários da residência estão indisponíveis. Seu preenchimento foi preservado.
                 <ActionButton onClick={residenceRead.refresh}>Consultar horários novamente</ActionButton>
               </Notice> : null}
-              {!residenceRead.loading && !residenceRead.error && !residence
-                && fields.form === "type" && fields.restHours !== undefined ? <Notice>
-                  Para cadastrar um tipo, preencha primeiro os horários em Configurações de plantões → Horários da residência.
-                </Notice> : null}
-              {!residenceRead.loading && residence && fields.form === "series" && (!fields.residence || residenceMismatch) ? <Notice>
-                Os horários da residência estão disponíveis para este plantão.
+              {needsResidence && residenceRead.loading ? <p role="status">Consultando horários da residência…</p> : null}
+              {needsResidence && !residenceRead.loading && !residenceRead.error
+                && residenceRead.data?.hours === null ? (
+                  <ScheduleResidenceRequirement context={context} day={today} />
+              ) : null}
+              {residenceReady && residence && fields.form === "series" && !timingReady ? <Notice>
+                Adote os horários atuais para continuar. O restante do preenchimento será preservado.
                 <ActionButton onClick={() => {
                   setStoredFields(adoptResidenceHours(fields, residence));
                   setWorking(true);
                   setError("");
                 }}>Adotar horários da residência</ActionButton>
               </Notice> : null}
-              <fieldset className="min-w-0" disabled={publishing || draft.busy || residenceRead.loading}>
+              {canEditTiming ? <fieldset className="min-w-0" disabled={publishing || draft.busy}>
                 <ScheduleForm
                   editor={
                     purpose === "shift_type_create"
@@ -886,6 +895,7 @@ export function ScheduleCreationPreparation({
                   publishOwn={publishOwn}
                   today={today}
                   creationFields={fields}
+                  reviewDisabled={needsResidence && !residenceReady}
                   reviewTriggerRef={reviewTriggerRef}
                   datesMonth={datesMonth}
                   onDatesMonthChange={setDatesMonth}
@@ -902,8 +912,8 @@ export function ScheduleCreationPreparation({
                   }}
                   onReview={() => void review()}
                 />
-              </fieldset>
-              <div className="hca-toolbar">
+              </fieldset> : null}
+              {canEditTiming ? <div className="hca-toolbar">
                 <ActionButton
                   disabled={publishing || draft.blocked}
                   onClick={() => void savePersonal()}
@@ -916,7 +926,7 @@ export function ScheduleCreationPreparation({
                 >
                   Guardar rascunho e fechar
                 </ActionButton>
-              </div>
+              </div> : null}
             </>
           ) : null}
         </div>

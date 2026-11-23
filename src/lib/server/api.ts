@@ -150,6 +150,12 @@ export function databaseError(
       "O tipo de plantão mudou. Consulte e revise os horários atuais antes de confirmar.",
       409,
     );
+  if (error?.code === "PT409" && /^(schedule residence hours required|configure residence hours before creating a shift type)$/.test(message))
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "Confira os horários da residência em Configurações de plantões antes de revisar novamente.",
+      409,
+    );
   if (error?.code === "PT409" && message === "stale residence hours")
     throw new ApiError(
       "VERSION_CONFLICT",

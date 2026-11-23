@@ -20,8 +20,25 @@ test("horários da residência governam plantão isolado, exceção noturna e re
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await selectContext(page, fixture.patient);
-  await page.goto("/configuracoes");
-  await page.getByRole("navigation", { name: "Áreas da configuração" }).getByRole("link", { name: "Plantões", exact: true }).click();
+  await page.goto("/escalas?day=" + day);
+  const create = page.getByRole("button", { name: "Nova programação", exact: true });
+  const configure = page.getByRole("link", { name: "Configurar horários da residência", exact: true });
+  await expect(configure).toBeVisible();
+  await expect(create).toBeDisabled();
+  await expect(page.getByLabel("Data de referência", { exact: true })).toHaveValue(day);
+  const rejected = await page.request.post("/api/schedules", {
+    data: {
+      careRecipientId: fixture.patient,
+      idempotencyKey: crypto.randomUUID(),
+      command: { action: "series", body: {
+        professionalId: worker.id, shiftTypeId: type.id, timezone: "America/Sao_Paulo",
+        recurrence: "once", weekdays: [], anchorDate: day, validUntil: day, notes: "",
+      } },
+    },
+  });
+  expect(rejected.status()).toBe(409);
+  await expect(configure).toHaveAttribute("href", new RegExp("day=" + day + "#horarios-da-residencia$"));
+  await configure.click();
   const settings = page.getByRole("region", { name: "Horários dos plantões", exact: true });
   await settings.getByRole("button", { name: "Editar horários", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "Horários da residência", exact: true });
@@ -44,8 +61,10 @@ test("horários da residência governam plantão isolado, exceção noturna e re
   expect((await receipt).ok()).toBe(true);
   await expect(settings).toContainText("Diurno 06:25 · Noturno 20:40 · America/Manaus");
 
-  await page.goto("/escalas?day=" + day);
-  const create = page.getByRole("button", { name: "Nova programação", exact: true });
+  await page.getByRole("link", { name: "Voltar à agenda", exact: true }).click();
+  await expect(page.getByLabel("Data de referência", { exact: true })).toHaveValue(day);
+  await expect(configure).toHaveCount(0);
+  await expect(create).toBeEnabled();
   await create.click();
   const form = page.getByRole("dialog", { name: "Programação de plantões", exact: true });
   await expect(form.getByLabel("Data do plantão", { exact: true })).toHaveValue(day);

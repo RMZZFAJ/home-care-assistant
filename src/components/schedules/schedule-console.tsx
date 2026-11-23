@@ -35,14 +35,15 @@ import {
 import { ScheduleConfirmationPanel } from "./schedule-confirmation-panel";
 import { useScrollableRegion } from "@/components/ui/use-scrollable-region";
 import { useResidenceHours } from "./use-residence-hours";
+import { canConfigureResidenceHours, ScheduleResidenceRequirement } from "./schedule-residence-requirement";
 import { ScheduleTypeSettings } from "./schedule-type-settings";
 import { Menu } from "@base-ui/react/menu";
 import { MenuPopup } from "@/components/ui/floating";
 import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
-import { scheduleSettingsHref } from "@/lib/schedules/routes";
+import { scheduleResidenceSettingsHref, scheduleSettingsHref } from "@/lib/schedules/routes";
 
-const today = (timeZone = "America/Sao_Paulo") =>
+const today = (timeZone?: string) =>
   new Intl.DateTimeFormat("sv-SE", { timeZone }).format(
     new Date(),
   );
@@ -231,7 +232,9 @@ function Agenda({
   const patient = context.patient!,
     team = can(context, "schedule.manage.team"),
     publishOwn = can(context, "schedule.manage.own");
+  const mayCreate = team || publishOwn || can(context, "schedule.propose");
   const residence = useResidenceHours(patient.id, true);
+  const residenceReady = !residence.loading && !residence.error && Boolean(residence.data?.hours);
   const params = useSearchParams(),
     reference = params.get("ref"),
     notice = useNotificationReference(
@@ -341,13 +344,13 @@ function Agenda({
         context={context}
       />
       <div className="hca-command-bar">
-        {team || publishOwn || can(context, "schedule.propose") ? (
+        {mayCreate ? (
           <ActionButton
             variant="primary"
             disabled={
-              loading ||
               busy ||
               uncertain ||
+              !residenceReady ||
               !data?.types.some((type) => type.is_active)
             }
             onClick={(event) => open({ kind: "series" }, event.currentTarget)}
@@ -364,10 +367,24 @@ function Agenda({
               <Menu.LinkItem className="hca-menu-item" href={scheduleSettingsHref(patient.id, day)}>
                 <Icon name="settings" /> Tipos de plantão · configurações
               </Menu.LinkItem>
+              {canConfigureResidenceHours(context) ? (
+                <Menu.LinkItem className="hca-menu-item" href={scheduleResidenceSettingsHref(patient.id, day)}>
+                  <Icon name="clock" /> Horários da residência
+                </Menu.LinkItem>
+              ) : null}
             </MenuPopup>
           </Menu.Root>
         ) : null}
       </div>
+      {mayCreate && residence.error && !residence.loading ? (
+        <Notice error>
+          <p>Não foi possível consultar os horários da residência.</p>
+          <ActionButton onClick={residence.refresh}>Consultar horários novamente</ActionButton>
+        </Notice>
+      ) : null}
+      {mayCreate && !residence.loading && !residence.error && residence.data?.hours === null ? (
+        <ScheduleResidenceRequirement context={context} day={day} />
+      ) : null}
       {uncertain ? (
         <Notice>
           A confirmação não foi recebida. A mesma intenção está preservada;

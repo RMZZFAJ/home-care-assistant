@@ -35,6 +35,7 @@ export function ScheduleForm({
   creationFields,
   onCreationChange,
   reviewTriggerRef,
+  reviewDisabled = false,
   datesMonth,
   onDatesMonthChange,
 }: {
@@ -48,6 +49,7 @@ export function ScheduleForm({
   creationFields?: CreationFields;
   onCreationChange?: (fields: CreationFields) => void;
   reviewTriggerRef?: RefObject<HTMLButtonElement | null>;
+  reviewDisabled?: boolean;
   datesMonth?: string | null;
   onDatesMonthChange?: (month: string) => void;
 }) {
@@ -136,7 +138,7 @@ export function ScheduleForm({
         id="schedule-review-button"
         variant="primary"
         type="submit"
-        disabled={Boolean(timingIssue)}
+        disabled={reviewDisabled || Boolean(timingIssue)}
       >
         Revisar alteração
       </ActionButton>

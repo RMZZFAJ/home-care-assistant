@@ -66,7 +66,7 @@ export function ScheduleResidenceSettings({ patientId }: { patientId: string }) 
   }
 
   const hours = read.data?.hours;
-  return <section aria-label="Horários dos plantões" className="ui-card hca-admin-card">
+  return <section id="horarios-da-residencia" aria-label="Horários dos plantões" className="ui-card hca-admin-card">
     <div className="hca-section-heading"><div><h2>Horários da residência</h2>
       {read.loading ? <p role="status">Consultando horários…</p>
         : hours ? <p>Diurno {hours.dayStart} · Noturno {hours.nightStart} · {hours.timezone}</p>

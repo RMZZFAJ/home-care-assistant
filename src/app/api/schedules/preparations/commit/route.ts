@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const v = await readJson(request, schedulePreparationCommitSchema),
       auth = await authenticate();
     await patientContext(auth, v.careRecipientId);
-    const data = await rpc(auth.client, "commit_schedule_preparation", {
+    const data = await rpc(auth.client, "commit_schedule_residence_preparation", {
       p_patient: v.careRecipientId,
       p_purpose: v.purpose,
       p_id: v.draftCommit.id,

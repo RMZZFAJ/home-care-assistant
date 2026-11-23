@@ -1787,6 +1787,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123035313_l3_shift_type_cycles` | Aplicada | Aplicada |
 | `20261123043302_l3_consumption_material_effects` | Aplicada | Aplicada |
 | `20261123045130_l3_flow_direct_consumption` | Aplicada | Aplicada |
+| `20261123051802_l3_require_residence_for_new_schedule` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2142,13 +2143,13 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
 - **E08 — Plantões e balanços.** Em execução. A admissão da contagem
   iniciada no plantão já preserva a retomada. A área reúne Plantões,
   Balanços e Histórico com as permissões de cada leitura. A ficha tem
-  abas próprias para Revisões e Contagens. O cadastro consulta os
-  horários por residência onde já configurados. Alterações de plantão que
+  abas próprias para Revisões e Contagens. Nova programação exige
+  horários da residência. A agenda guia a configuração e mantém a data
+  consultada na volta. Alterações de plantão que
   atingem uma contagem designada exigem encaminhamento explícito e registram
   a decisão na mesma transação. A administração dos tipos e dos horários
   fica em Configurações → Plantões. Os tipos novos definem a duração e o
-  descanso do ciclo. Restam a transição das residências sem configuração
-  para a programação e a conferência visual. A contagem por plantão usa
+  descanso do ciclo. Resta a conferência visual do conjunto. A contagem por plantão usa
   as cinco etapas. Extras têm
   parecer individual e vínculo a recontos comprovados. A programação
   registra observação opcional e o pedido de autorização para contar
@@ -2845,6 +2846,35 @@ A migration foi aplicada após o backup crítico cifrado verificado
 `f7384b0f-8bc1-4df5-b46f-da00588f374d`. Local e remoto registram
 349 versões, com fila vinculada vazia. O RPC transacional segue restrito
 ao papel autenticado, com autorização por paciente e dono da sugestão.
+
+### Residências sem horários e início da programação
+
+A agenda continua consultável e orienta a administração a definir o
+fuso e os inícios diurno e noturno. Profissionais sem esse acesso
+recebem orientação para falar com a administração. A configuração
+mantém o paciente e a data na volta. O cadastro usa o período da
+residência. Preenchimentos com referência anterior pedem adoção
+explícita e conservam os demais campos.
+
+A migration `20261123051802_l3_require_residence_for_new_schedule.sql`
+exige a referência da residência nas novas programações pela API de
+L3. Os endpoints usam o mesmo contrato de autorização e recibo. O
+banco compartilhado mantém o caminho da versão publicada até o corte
+da produção. Os 43 testes de integração dirigidos cobriram a recusa sem
+efeitos, os recibos já gravados, o isolamento entre pacientes, os
+horários e as ações de agenda. Uma tentativa antiga sem recibo
+confirmado continua dependendo da conferência da operação original.
+
+Cinco cenários passaram em Chromium, Android e iOS emulados. Eles
+cobriram configuração, retorno à data original, acesso profissional,
+adoção de referência e recuperação. O caso das 12 datas passou nos
+três perfis após atualizar a expectativa da prévia noturna. A recusa
+por sobreposição e os horários gravados foram conferidos.
+
+Local e remoto registram 350 migrations, com a fila vinculada vazia.
+O backup crítico cifrado `dc78aeb9-76a7-4a5b-9085-4eb76b784e46`
+foi verificado antes da aplicação. As duas novas funções executam com
+as permissões do papel chamador e o acesso é restrito ao papel autenticado.
 
 ## L4
 

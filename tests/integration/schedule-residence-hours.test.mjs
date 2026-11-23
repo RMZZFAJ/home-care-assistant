@@ -5,7 +5,12 @@ import { rpc, setup } from "./v4-fixtures.mjs";
 import { dayOffset, localToday, shiftCommand, shiftWorker } from "./shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { resourceFixture, saveResource, resourcePacket } from "./schedule-resource-fixtures.mjs";
-import { saveSchedulePreparation, schedulePreparationCommit } from "./schedule-preparation-fixtures.mjs";
+import {
+  saveSchedulePreparation,
+  scheduleNativeFacts,
+  schedulePreparationCommit,
+  schedulePreparationFixture,
+} from "./schedule-preparation-fixtures.mjs";
 
 const defaultHours = { timezone: "America/Manaus", dayStart: "06:25", nightStart: "20:40" };
 const readHours = (client, patient) => rpc(client, "schedule_residence", { p_patient: patient });
@@ -36,6 +41,40 @@ function series(f, day, overrides = {}) {
     ...overrides,
   };
 }
+
+test("L3 requires residence hours for new programming and replays accepted older intentions", async () => {
+  const f = await schedulePreparationFixture("schedule_series_create");
+  const saved = await saveSchedulePreparation(f);
+  const prepared = schedulePreparationCommit(f, saved);
+  const directDay = dayOffset(f.fields.from, 20);
+  const direct = {
+    p_patient: f.patient,
+    p_body: { ...f.command.body, anchorDate: directDay, validUntil: directDay },
+    p_key: randomUUID(),
+    p_version: null,
+  };
+  const before = scheduleNativeFacts(f);
+  assert.equal((await f.admin.rpc("schedule_residence_command", direct)).error?.code, "PT409");
+  assert.equal((await f.admin.rpc("commit_schedule_residence_preparation", prepared)).error?.code, "PT409");
+  assert.equal(scheduleNativeFacts(f), before);
+  assert.equal((await rpc(f.admin, "schedule_preparation_context", f.scope)).revision, saved.revision);
+
+  const legacyDirect = await rpc(f.admin, "schedule_command", { ...direct, p_action: "series" });
+  const legacyPrepared = await rpc(f.admin, "commit_schedule_preparation", prepared);
+  assert.deepEqual(await rpc(f.admin, "schedule_residence_command", direct), legacyDirect);
+  const replay = await rpc(f.admin, "commit_schedule_residence_preparation", prepared);
+  assert.deepEqual(replay, { ...legacyPrepared, replayed: true });
+  assert.ok((await f.admin.rpc("schedule_residence_command", {
+    ...direct, p_body: { ...direct.p_body, notes: "intenção diferente" },
+  })).error);
+  assert.equal((await f.admin.rpc("commit_schedule_residence_preparation", {
+    ...prepared, p_body: { ...prepared.p_body, body: { ...prepared.p_body.body, notes: "intenção diferente" } },
+  })).error?.code, "PT409");
+  const outsider = await shiftWorker((await setup()).patient);
+  assert.equal((await outsider.client.rpc("schedule_residence_command", direct)).error?.code, "42501");
+  assert.equal((await outsider.client.rpc("commit_schedule_residence_preparation", prepared)).error?.code, "42501");
+  assert.equal(JSON.parse(scheduleNativeFacts(f)).series.length, 2);
+});
 
 test("residence hours use patient authority, optimistic versions and the original accepted receipt", async () => {
   const f = await residenceFixture();
@@ -134,7 +173,7 @@ test("private preparation preserves and publishes the custom cycle reviewed by t
   const stored = await rpc(f.admin, "schedule_preparation_context", intent.scope);
   assert.deepEqual(stored.content.schedule.typeCycle, typeCycle);
   const packet = schedulePreparationCommit(intent, saved);
-  const result = await rpc(f.admin, "commit_schedule_preparation", packet);
+  const result = await rpc(f.admin, "commit_schedule_residence_preparation", packet);
   assert.deepEqual(result.receipt.command, intent.command);
   assert.deepEqual(queryOccurrences(result.receipt.resourceId).slice(0, 2), [day, dayOffset(day, 2)].map(date => ({
     start: date + "T10:25", end: date + "T20:25", status: "published",
