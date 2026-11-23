@@ -3398,6 +3398,7 @@ WhatsApp ainda requer homologação do provedor.
 - **E09-02** — Modos do PDF, período, complementos e acesso de auditoria.
   `pdf-modes.spec.ts`, `pdf-issuance-contract.test.ts`.
 - **E09-03** — Geração explícita e recuperação sem trocar os bytes do exemplar.
+  [Emissão e recuperação de PDF](#emissão-e-recuperação-de-pdf),
   `pdf-issuance.spec.ts`, `pdf-issuance-recovery.test.ts`.
 - **E09-04** — Seleção, tamanho, formato, autoria e consulta do anexo
   confirmado. [Resultado do envio](#resultado-do-envio-de-anexo),
@@ -3746,7 +3747,11 @@ WhatsApp ainda requer homologação do provedor.
   362 versões registradas no remoto. O commit não adiciona migrations.
   O SonarCloud passou e o CodeRabbit pulou a revisão automática pelo
   limite de arquivos. A [CI do commit](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45260446990)
-  estava em execução no momento da conferência do Preview.
+  concluiu com sucesso. Os sete grupos de navegador aprovaram 1.758 casos,
+  incluindo duas aprovações em retentativa. Os casos de primeira tentativa
+  foram a abertura de **Avisos e aplicativo** no iOS-3 e a revisão de
+  proposta obsoleta da escala no Chromium-2. O iOS-1 aprovou 198 casos
+  sem retentativa, inclusive os dois casos corrigidos no commit.
 
 ### Resultado do envio de anexo
 
@@ -3777,6 +3782,69 @@ WhatsApp ainda requer homologação do provedor.
   real de custódia e o retorno de foco e filtros. A transparência da consulta
   em segundo plano também permitiu ignorar uma paginação atrasada após
   mudar a busca. A comparação em 360 e 412 px está em `output/playwright/l3/`.
+
+### Preview de 59ab89f2
+
+- Os quatro commits de anexo, balanço e consumo foram publicados no
+  [PR 8 em rascunho](https://github.com/RMZZFAJ/home-care-assistant/pull/8).
+  O [Preview do commit](https://vercel.com/rmzzfajs-projects/home-care-assistant/6yegd2v6JZEp97wCN4Sey6DiibS9)
+  respondeu com HTTP 200 em `/login`, `/verificar` e `/api/runtime`. A
+  compatibilidade com o Supabase retornou protocolo 1 e esquema 2.
+  A verificação pública analisou um PDF de demonstração e confirmou
+  a ausência de assinatura e de registro oficial para a amostra.
+- A Vercel listou as variáveis de Supabase, PDF e Web Push no escopo Preview,
+  com política de confiança de PDF específica desta branch. A conferência
+  usou metadados das variáveis. O incremento dispensa migrations.
+- O SonarCloud passou. O CodeRabbit pulou a revisão automática pelo limite
+  de 100 arquivos, com 362 arquivos alterados no PR na conferência.
+  A [CI deste commit](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45274012944)
+  passou nas validações de Ubuntu e Windows, na instalação limpa e no
+  job de banco com 876 testes de integração. Os sete grupos de navegador
+  aprovaram os 1.761 casos na primeira tentativa.
+
+### Emissão e recuperação de PDF
+
+- **Preparando o PDF** acompanha a emissão até a validação da resposta.
+  A recuperação da mesma solicitação usa **Consultando a solicitação** e
+  **Confirmando o exemplar registrado**. A espera do cliente cobre o limite
+  de execução do endpoint de emissão.
+- **Emissão ainda não confirmada** oferece a consulta da referência
+  preservada. Depois de duas falhas de recuperação, **Não foi possível
+  concluir a emissão** orienta a copiar o diagnóstico para suporte. Voltar
+  mantém a ação de recuperar a mesma emissão no acervo, inclusive após
+  recarregar a página.
+- **Exemplar disponível** e **Exemplar recuperado** aparecem quando o
+  retorno valida solicitante, ficha, modalidade, revisão e registro do
+  exemplar. O diálogo mostra a ficha, a modalidade e a revisão e retorna o
+  foco aos arquivos. A emissão inicial continua com o fluxo próprio.
+- A jornada dirigida verifica a confirmação perdida depois da gravação,
+  as duas falhas de consulta, a restauração após recarregar, os bytes do
+  mesmo exemplar e a chave distinta de uma emissão nova. Seis testes
+  unitários de recuperação passaram. O incremento dispensa migrations.
+- As comparações em 360 e 412 px estão em `output/playwright/l3/`. O painel
+  de confirmação reúne os metadados no cartão da v4. Os rótulos do cartão
+  usam contraste suficiente para leitura no fundo tonalizado.
+- A rodada em Chromium, Android e iOS emulados também verificou as cinco
+  fichas em modo ampliado, o período explícito da doação, a perda de acesso
+  ao PDF de auditoria e o conteúdo recusado antes da assinatura. O teste de
+  PDF lento confirmou que o prazo de acompanhamento de avisos termina sem
+  interromper a emissão.
+
+### Retentativas de PWA e revisão de escala
+
+- O teste do PWA estabiliza a faixa de abas antes de usar toque no iOS.
+  O Chromium ativa a revisão da escala pelo botão com o formulário pronto.
+  Em ambos os casos a confirmação continua exigida em tela.
+- Os casos dirigidos passaram nos três navegadores. A verificação de PWA
+  manteve o fallback público, a ausência de cache privado e a volta à ficha.
+  A revisão confirmou a proposta retomada em outra sessão e conferiu o
+  efeito no banco depois da decisão explícita.
+- O cenário de abas do Perfil excedeu o tempo local na análise de
+  acessibilidade e na troca de foco entre contextos em WebKit. A verificação
+  passou nos três navegadores com uma conta de vínculo único e com a página
+  de referência encerrada antes da interação e da análise do produto. Os
+  cinco tamanhos, a navegação por teclado e os controles de ausência de
+  gravação foram conferidos.
 
 ## L4
 

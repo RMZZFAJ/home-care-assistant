@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — emissão e recuperação de PDF.** A emissão manual usa os
+diálogos e o carregamento da v4. A confirmação perdida recupera a mesma
+referência, sem duplicar o exemplar. A confirmação mostra ficha, modalidade
+e revisão.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#emissão-e-recuperação-de-pdf).
+
 **23/11 — consulta de consumo e faltas.** A lista usa carregamento simples,
 diálogo de recuperação e filtros em modal. O período continua disponível.
 As verificações em Chromium, Android e iOS emulados incluíram paginação de

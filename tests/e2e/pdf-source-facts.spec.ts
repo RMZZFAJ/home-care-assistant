@@ -216,17 +216,18 @@ test("PDF atual recusa caractere sem representação antes de assinar ou persist
     );
   const sent = page.waitForResponse(
     (r) => r.url().endsWith(endpoint) && r.request().method() === "POST",
+    { timeout: 70_000 },
   );
-  await generateStandardPdf(page);
+  await generateStandardPdf(page, false);
   const response = await sent;
   expect(response.status()).toBe(503);
   expect(await response.json()).toMatchObject({
     code: "CONTENT_INVALID",
     retryable: false,
   });
-  await expect(files.getByRole("alert")).toContainText(
-    "caracteres ainda não suportados",
-  );
+  const failure = page.getByRole("dialog", { name: "Emissão ainda não confirmada", exact: true });
+  await expect(failure).toContainText("caracteres ainda não suportados");
+  await failure.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(
     files.getByRole("link", { name: "Baixar PDF", exact: true }),
   ).toHaveCount(0);

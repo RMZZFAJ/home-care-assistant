@@ -1,6 +1,6 @@
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
-import { generateStandardPdf } from "./generated-pdf";
+import { finishGeneratedPdf, generateStandardPdf } from "./generated-pdf";
 import { randomUUID, createHash } from "node:crypto";
 import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import {
@@ -19,10 +19,11 @@ import { audit } from "./accessibility-audit";
 import { createClient } from "@supabase/supabase-js";
 import { legacyPdfFixture } from "../support/legacy-pdf-fixtures.mjs";
 import type { PdfIssuance } from "@/lib/documents/pdf-issuance";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 test.setTimeout(180000);
 const hash = (bytes: Buffer) =>
   createHash("sha256").update(bytes).digest("hex");
-async function fixture(page: Page) {
+async function fixture(page: Page, isolatedViewer = false) {
   const f = await setup(),
     owner = await actor("family", f.patient),
     doc = await rpc(owner, "create_supply_document", {
@@ -35,8 +36,9 @@ async function fixture(page: Page) {
       p_key: randomUUID(),
       p_draft: false,
     });
+  const viewer = isolatedViewer ? await shiftWorker(f.patient, "family") : fixtures.family;
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(viewer.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -50,7 +52,7 @@ async function fixture(page: Page) {
 test("PDF recupera intenção após resposta inválida, mantém bytes e permite nova emissão explícita", async ({
   page,
 }, info) => {
-  const f = await fixture(page),
+  const f = await fixture(page, true),
     endpoint = `/api/documents/${f.doc.id}/issuances`,
     files = page.getByRole("region", { name: "Arquivos gerados", exact: true });
   const manualExemplars = async () => {
@@ -62,14 +64,19 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   await expect(files.getByText("PDF inicial", { exact: true })).toBeVisible();
   expect(await manualExemplars()).toHaveLength(0);
   const keys: string[] = [];
-  let lost = true;
+  let resumeRecovery!: () => void;
+  const recoveryGate = new Promise<void>(resolve => { resumeRecovery = resolve; });
   await page.route(`**${endpoint}`, async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     keys.push(route.request().postDataJSON().idempotencyKey);
-    const response = await route.fetch();
+    const attempt = keys.length;
+    if (attempt === 2 || attempt === 3) {
+      return route.fulfill({ status: 503, json: { code: "ISSUANCE_UNAVAILABLE", error: "Emissão temporariamente indisponível." } });
+    }
+    if (attempt === 4) await recoveryGate;
+    const response = await route.fetch({ timeout: 65_000 });
     expect(response.status(), await response.text()).toBe(200);
-    if (lost) {
-      lost = false;
+    if (attempt === 1) {
       await route.fulfill({ status: 200, json: { state: "ready" } });
     } else await route.fulfill({ response });
   });
@@ -79,11 +86,34 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   await expect(options).toBeVisible();
   await options.getByRole("button", { name: "Cancelar", exact: true }).click();
   expect(keys).toEqual([]);
-  await generateStandardPdf(page);
+  await generateStandardPdf(page, false);
+  const uncertain = page.getByRole("dialog", { name: "Emissão ainda não confirmada", exact: true });
+  await expect(uncertain).toBeVisible({ timeout: 75_000 });
+  await expect(uncertain).toContainText("A solicitação está preservada");
+  await expect(page.getByRole("dialog", { name: "Exemplar disponível", exact: true })).toHaveCount(0);
+  if (info.project.name === "chromium") {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    mkdirSync("output/playwright/l3", { recursive: true });
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect(uncertain).toBeInViewport();
+      if (width === 360) await audit(page, "emissão incerta em 360 px");
+      await page.screenshot({ path: `output/playwright/l3/produto-e09-03-emissao-incerta-${width}.png`, animations: "disabled" });
+    }
+  }
+  const checkResult = uncertain.getByRole("button", { name: "Conferir resultado", exact: true });
+  await checkResult.click();
+  await expect.poll(() => keys.length).toBe(2);
+  await checkResult.click();
+  const exhausted = page.getByRole("dialog", { name: "Não foi possível concluir a emissão", exact: true });
+  await expect(exhausted.getByRole("button", { name: "Copiar detalhes", exact: true })).toBeVisible();
+  await expect(exhausted.getByRole("button", { name: "Conferir resultado", exact: true })).toHaveCount(0);
+  await exhausted.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(page.getByRole("tab", {name:"Arquivos",exact:true})).toHaveAttribute("aria-selected","true");
   await expect(
     page.getByRole("button", { name: "Recuperar emissão", exact: true }),
   ).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Recuperar emissão", exact: true })).toBeFocused();
   await page.reload();
   await expect(
     page.getByRole("button", { name: "Recuperar emissão", exact: true }),
@@ -91,11 +121,30 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   await page
     .getByRole("button", { name: "Recuperar emissão", exact: true })
     .click();
+  try {
+    const activity = page.locator(".hca-activity-overlay");
+    await expect(activity).toContainText("Recuperando o exemplar");
+    await expect(activity).toContainText("Consultando a solicitação");
+  } finally {
+    resumeRecovery();
+  }
+  const recovered = page.getByRole("dialog", { name: "Exemplar recuperado", exact: true });
+  await expect(recovered).toContainText(f.doc.code);
+  await expect(recovered).toContainText("Revisão 1");
+  if (info.project.name === "chromium") {
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect(recovered).toBeInViewport();
+      if (width === 360) await audit(page, "emissão recuperada em 360 px");
+      await page.screenshot({ path: `output/playwright/l3/produto-e09-03-emissao-recuperada-${width}.png`, animations: "disabled" });
+    }
+  }
+  await finishGeneratedPdf(page, true);
   await expect(
     page.getByRole("button", { name: "Gerar PDF", exact: true }),
   ).toBeEnabled();
-  expect(keys).toHaveLength(2);
-  expect(keys[1]).toBe(keys[0]);
+  expect(keys).toHaveLength(4);
+  expect(new Set(keys).size).toBe(1);
   let rows = await manualExemplars();
   expect(rows).toHaveLength(1);
   const first = rows[0];
@@ -118,6 +167,8 @@ test("PDF recupera intenção após resposta inválida, mantém bytes e permite 
   expect(hash(a)).toBe(first.sha256);
   expect(a.equals(b)).toBe(true);
   await generateStandardPdf(page);
+  expect(keys).toHaveLength(5);
+  expect(keys[4]).not.toBe(keys[0]);
   await expect.poll(async () => (await manualExemplars()).map(row => row.state)).toEqual(["ready", "ready"]);
   rows = await manualExemplars();
   expect(rows).toHaveLength(2);

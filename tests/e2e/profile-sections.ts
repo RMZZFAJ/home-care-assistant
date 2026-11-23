@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 export type ProfileSection = "identity" | "security" | "notices" | "devices" | "help";
 const labels: Record<ProfileSection, string> = {
@@ -8,7 +8,11 @@ const labels: Record<ProfileSection, string> = {
 /** Navigate through the actual account controls, retaining all other panels. */
 export async function selectProfileSection(page: Page, section: ProfileSection) {
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
-  await tab.click();
+  await page.bringToFront();
+  await tab.scrollIntoViewIfNeeded();
+  await page.evaluate(() => new Promise<void>(ready => requestAnimationFrame(() => requestAnimationFrame(() => ready()))));
+  if (test.info().project.use.hasTouch) await tab.tap();
+  else await tab.click();
   await expect(tab).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("tabpanel")).toHaveCount(1);
 }

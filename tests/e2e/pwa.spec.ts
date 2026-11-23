@@ -9,6 +9,7 @@ import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
 import { setup, actor, rpc, fixtures, env } from "../integration/v4-fixtures.mjs";
 import { sourceFactsFixture } from "../integration/pdf-source-facts-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
@@ -22,9 +23,9 @@ test.afterEach(async ({ page }) => {
 });
 const pwa = (page: Page) =>
   page.getByRole("region", { name: "Aplicativo neste aparelho", exact: true });
-async function login(page: Page, patient: string) {
+async function login(page: Page, patient: string, email = fixtures.family.email) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -57,7 +58,8 @@ test("PWA real oferece manifesto, ícones e fallback público sem cache de API, 
   context,
 }, info) => {
   const f = await sourceFactsFixture();
-  await login(page, f.patient);
+  const viewer = await shiftWorker(f.patient, "family");
+  await login(page, f.patient, viewer.email);
   await profile(page, f.patient);
   await expect
     .poll(() => page.evaluate(() => navigator.serviceWorker.controller?.state))

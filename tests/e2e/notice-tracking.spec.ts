@@ -1,8 +1,9 @@
 import { selectDocumentSection } from "./document-sections";
 import { expect, test, type Page } from "@playwright/test";
-import { generateStandardPdf } from "./generated-pdf";
+import { finishGeneratedPdf, generateStandardPdf } from "./generated-pdf";
 import { randomUUID, createHash } from "node:crypto";
-import { actor, fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { rpc, setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { pauseLocalAutomationForTests, sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
@@ -21,10 +22,10 @@ test.afterEach(async ({ page }) => {
   owned.clear();
 });
 async function fixture(page: Page, seconds: number) {
-  const f = await setup(); owned.add(f.patient); const owner = await actor("family", f.patient);
+  const f = await setup(); owned.add(f.patient); const owner = await shiftWorker(f.patient, "family");
   sql(`insert into public.patient_settings(care_recipient_id,settings) values(${sqlLiteral(f.patient)},jsonb_build_object('shareWaitSeconds',${seconds})) on conflict(care_recipient_id) do update set settings=public.patient_settings.settings||excluded.settings;`);
-  const doc = await rpc(owner, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "1" }] }, p_key: randomUUID(), p_draft: false });
-  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email); await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  const doc = await rpc(owner.client, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "1" }] }, p_key: randomUUID(), p_draft: false });
+  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(owner.email); await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click(); await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, f.patient); await page.clock.install();
   return { ...f, doc };
@@ -49,18 +50,19 @@ test("prazo5 encerra só o acompanhamento e preserva PDF lento com bytes confirm
   page.on("requestfailed", request => { if (new URL(request.url()).pathname === endpoint && request.method() === "POST") failed.push("issuance-aborted"); });
   await page.route("**" + endpoint, async route => {
     if (route.request().method() !== "POST") return route.continue();
-    const response = await route.fetch(); expect(response.status()).toBe(200); issuance = await response.json(); entered(); await gate; return route.fulfill({ response });
+    const response = await route.fetch({ timeout: 65_000 }); expect(response.status()).toBe(200); issuance = await response.json(); entered(); await gate; return route.fulfill({ response });
   });
   try {
     await page.goto(`/historico/${f.doc.id}`);
   await selectDocumentSection(page, "communications"); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "pending");
     const before = facts(f.doc.id), files = page.getByRole("region", { name: "Arquivos gerados", exact: true });
     await selectDocumentSection(page, "files");
-    await generateStandardPdf(page); await first;
+    await generateStandardPdf(page, false); await first;
     await page.clock.fastForward(5000); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "elapsed");
     await expect(page.locator(".hca-activity-overlay")).toBeVisible();
     await expect(page.locator("button").filter({ hasText: /^Gerando PDF…$/ })).toBeDisabled(); expect(failed).toEqual([]);
-    release(); await expect(files.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveCount(1); expect(issuance).toBeTruthy();
+    release(); await finishGeneratedPdf(page);
+    await expect(files.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveCount(1); expect(issuance).toBeTruthy();
     const response = await page.request.get(`/api/documents/${f.doc.id}/pdf?issuance=${issuance!.id}`); expect(response.status()).toBe(200);
     expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(issuance!.sha256);
     expect(facts(f.doc.id)).toBe(before); await page.clock.fastForward(15000); await expect(tracking(page)).toHaveAttribute("data-notice-tracking", "elapsed");

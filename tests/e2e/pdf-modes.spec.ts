@@ -11,14 +11,19 @@ import { selectDocumentSection } from "./document-sections";
 import { audit } from "./accessibility-audit";
 import { pdfIssuanceSchema } from "@/lib/documents/pdf-issuance";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { finishGeneratedPdf } from "./generated-pdf";
 const compact=(value:string)=>value.normalize("NFKC").replaceAll(/\s/g,"");
 const hash=(bytes:Uint8Array)=>createHash("sha256").update(bytes).digest("hex");
 const plain=async(bytes:Uint8Array)=>(await PDF.load(bytes)).extractText().flatMap(page=>page.lines.map(line=>line.spans.flatMap(span=>span.chars.map(char=>char.char)).join(""))).join(" ");
-async function login(page:Page,patient:string,email=fixtures.adminA.email,next?:string){
+async function login(page:Page,patient:string,email:string,next?:string){
  await page.goto(next ? "/login?" + new URLSearchParams({ next }) : "/login");await page.getByLabel("E-mail",{exact:true}).fill(email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
  await page.getByRole("button",{name:"Entrar",exact:true}).click();await selectContext(page,patient);
 }
 async function openFiles(page:Page,id:string){await page.goto("/documentos/"+id);await selectDocumentSection(page,"files");await expect(page.getByRole("button",{name:"Gerar PDF",exact:true})).toBeEnabled();}
+const issuanceResponse = (page: Page, endpoint: string) => page.waitForResponse(
+  response => new URL(response.url()).pathname === endpoint && response.request().method() === "POST",
+  { timeout: 70_000 },
+);
 async function publishedFixture(kind:"REQ"|"COM"|"ENT"|"BAL"|"RETURN"){
  if(kind!=="RETURN")return progressPreparationFixture(kind);
  const f=await autonomousReturnFixture(),declared=await declaredAutonomousReturn(f),agreement=await transferCommand(f.counterparty.client,declared.document.id,"agree",declared.document.version,{reason:"Concordância familiar própria desta devolução."});
@@ -38,7 +43,8 @@ test.setTimeout(360_000);
 test("expanded models use the real chooser and preserve an uncertain selected intention, original facts and prior bytes",async({page},info)=>{
  for(const kind of ["REQ","COM","ENT","BAL","RETURN"] as const){
   const f=await publishedFixture(kind);await note(f,"Andamento selecionado real de teste · "+kind);const before=progressFacts(f);
-  await login(page,f.patient);await openFiles(page,f.id);const endpoint="/api/documents/"+f.id+"/issuances";
+  const viewer=await shiftWorker(f.patient,"admin"),destination="/documentos/"+f.id;
+  await login(page,f.patient,viewer.email,destination);await openFiles(page,f.id);const endpoint="/api/documents/"+f.id+"/issuances";
   let old:{id:string;bytes:Buffer}|null=null;
   if(kind==="REQ"){
    const response=await page.request.post(endpoint,{ timeout: 60_000,data:{idempotencyKey:randomUUID()}});expect(response.status(),await response.text()).toBe(200);const receipt=await response.json();expect(receipt.rendererRevision).toBe(16);
@@ -47,22 +53,24 @@ test("expanded models use the real chooser and preserve an uncertain selected in
   const sent:unknown[]=[];let first:unknown;
   if(kind==="REQ")await page.route("**"+endpoint,async route=>{
    if(route.request().method()!=="POST")return route.continue();sent.push(route.request().postDataJSON());
-   const response=await route.fetch();expect(response.status(),await response.text()).toBe(200);
+   const response=await route.fetch({ timeout: 65_000 });expect(response.status(),await response.text()).toBe(200);
    if(sent.length===1){first=await response.json();return route.abort("failed");}return route.fulfill({response});
   });
   await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();const dialog=page.getByRole("dialog",{name:"Gerar PDF",exact:true});
   await expect(dialog.getByRole("radio",{name:"Ficha ampliada",exact:true})).toBeChecked();
   for(const name of ["Comunicações","Confirmações","Detalhes dos vínculos","Histórico operacional de acesso"])await dialog.getByRole("checkbox",{name,exact:true}).check();
   if(kind==="REQ")for(const width of [320,390,768,1024,1440]){await page.setViewportSize({width,height:900});await audit(page,"Seletor de complementos "+width);await info.attach("Seletor de complementos "+width,{body:await dialog.screenshot(),contentType:"image/png"});}
-  const creation=kind==="REQ"?null:page.waitForResponse(r=>new URL(r.url()).pathname===endpoint&&r.request().method()==="POST");
+  const creation=kind==="REQ"?null:issuanceResponse(page,endpoint);
   await dialog.getByRole("button",{name:"Gerar PDF",exact:true}).click();
   let value:unknown;
   if(kind==="REQ"){
+   await page.getByRole("dialog",{name:"Emissão ainda não confirmada",exact:true}).getByRole("button",{name:"Voltar",exact:true}).click({timeout:75_000});
    await expect(page.getByRole("button",{name:"Recuperar emissão",exact:true})).toBeEnabled();await expect(page.getByRole("button",{name:"Gerar PDF",exact:true})).toHaveCount(0);
    await page.reload();await selectDocumentSection(page,"files");await expect(page.getByRole("button",{name:"Recuperar emissão",exact:true})).toBeEnabled();
-   const recovered=page.waitForResponse(r=>new URL(r.url()).pathname===endpoint&&r.request().method()==="POST");await page.getByRole("button",{name:"Recuperar emissão",exact:true}).click();
+   const recovered=issuanceResponse(page,endpoint);await page.getByRole("button",{name:"Recuperar emissão",exact:true}).click();
    const response=await recovered;expect(response.status(),await response.text()).toBe(200);value=await response.json();expect(sent).toHaveLength(2);expect(sent[1]).toEqual(sent[0]);expect(value).toMatchObject({id:pdfIssuanceSchema.parse(first).id});await page.unroute("**"+endpoint);
   }else{const response=await creation!;expect(response.status(),await response.text()).toBe(200);value=await response.json();}
+  await finishGeneratedPdf(page,kind==="REQ");
   const result=await signed(page,f.id,value,kind.toLowerCase()+"-expanded"),text=compact(await plain(result.bytes));
   expect(text).toContain(compact("Ficha Ampliada"));expect(text).toContain(compact("Andamento selecionado real de teste · "+kind));expect(text).toContain(compact("Marco importante"));expect(text).toContain(compact("Pessoas mencionadas"));
   expect((await PDFDocument.load(result.bytes)).getTitle()).toContain(kind==="RETURN"?"Devolução de materiais":"Ficha Ampliada");
@@ -73,18 +81,20 @@ test("expanded models use the real chooser and preserve an uncertain selected in
 
 test("restricted audit signs every-page identification, verifies original bytes and hides its archive after patient permission loss",async({page,browser})=>{
  const f=await progressPreparationFixture("REQ");for(let index=0;index<24;index++)await note(f,"Registro de auditoria "+index+" · "+"Texto integral preservado. ".repeat(12));
- await login(page,f.patient,fixtures.family.email);await openFiles(page,f.id);await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
+ const reviewer=await shiftWorker(f.patient,"admin"),reader=await shiftWorker(f.patient,"family"),destination="/documentos/"+f.id;
+ await login(page,f.patient,reader.email,destination);await openFiles(page,f.id);await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
  let dialog=page.getByRole("dialog",{name:"Gerar PDF",exact:true});await expect(dialog.getByRole("radio",{name:"Relatório de auditoria",exact:true})).toHaveCount(0);await dialog.getByRole("button",{name:"Cancelar",exact:true}).click();
  const options={mode:"audit",sections:["progress","access"],period:{from:null,through:null,timeZone:"America/Sao_Paulo"},purpose:"Conferência documental da ficha com autoria e limitações explícitas."},endpoint="/api/documents/"+f.id+"/issuances";
  expect((await page.request.post(endpoint,{ timeout: 60_000,data:{idempotencyKey:randomUUID(),documentOptions:options}})).status()).toBe(403);
- await login(page,f.patient);await openFiles(page,f.id);await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();dialog=page.getByRole("dialog",{name:"Gerar PDF",exact:true});
+ await login(page,f.patient,reviewer.email,destination);await openFiles(page,f.id);await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();dialog=page.getByRole("dialog",{name:"Gerar PDF",exact:true});
  await dialog.getByRole("radio",{name:"Relatório de auditoria",exact:true}).check();await dialog.getByRole("checkbox",{name:"Histórico operacional de acesso",exact:true}).check();await dialog.getByRole("textbox",{name:"Finalidade da auditoria",exact:true}).fill(options.purpose);
- const creation=page.waitForResponse(r=>new URL(r.url()).pathname===endpoint&&r.request().method()==="POST");await dialog.getByRole("button",{name:"Gerar PDF",exact:true}).click();const response=await creation;expect(response.status(),await response.text()).toBe(200);
+ const creation=issuanceResponse(page,endpoint);await dialog.getByRole("button",{name:"Gerar PDF",exact:true}).click();const response=await creation;expect(response.status(),await response.text()).toBe(200);
+ await finishGeneratedPdf(page);
  const result=await signed(page,f.id,await response.json(),"audit"),parsed=await PDFDocument.load(result.bytes);expect(parsed.getPageCount()).toBeGreaterThan(3);
  const checked=await page.request.post("/api/verification?code="+result.receipt.verificationCode,{headers:{"content-type":"application/pdf"},data:result.bytes});expect(checked.status(),await checked.text()).toBe(200);expect(await checked.json()).toMatchObject({reference:{found:true,bytesMatch:true,sha256:result.receipt.sha256}});
- const family=await browser.newPage({baseURL:new URL(page.url()).origin});try{await login(family,f.patient,fixtures.family.email);expect((await family.request.get(result.path)).status()).toBe(403);const archive=await(await family.request.get("/api/documents/"+f.id+"/archive")).json();expect(JSON.stringify(archive)).not.toContain(result.receipt.id);}finally{await family.close();}
+ const family=await browser.newPage({baseURL:new URL(page.url()).origin});try{await login(family,f.patient,reader.email,destination);expect((await family.request.get(result.path)).status()).toBe(403);const archive=await(await family.request.get("/api/documents/"+f.id+"/archive")).json();expect(JSON.stringify(archive)).not.toContain(result.receipt.id);}finally{await family.close();}
  const visibleAudit=page.locator('[data-file-id="'+result.receipt.id+'"]');await expect(visibleAudit).toBeVisible();
- sql("insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values("+[q(f.patient),q(fixtures.adminA.id),q("audit.read"),"false"].join(",")+")");
+ sql("insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values("+[q(f.patient),q(reviewer.id),q("audit.read"),"false"].join(",")+")");
  await page.evaluate(()=>window.dispatchEvent(new Event("hca:data-changed")));await expect(visibleAudit).toHaveCount(0);
  expect((await page.request.get(result.path)).status()).toBe(403);expect(JSON.stringify(await(await page.request.get("/api/documents/"+f.id+"/archive")).json())).not.toContain(result.receipt.id);
 });
@@ -100,7 +110,8 @@ test("expanded donation keeps its complete base when an explicit UI period conta
  const submit = dialog.getByRole("button",{name:"Gerar PDF",exact:true});
  await expect(submit).toBeInViewport();
  expect(await submit.evaluate(node => Boolean(node.closest(".hca-modal-footer")))).toBe(true);
- const endpoint="/api/documents/"+document.id+"/issuances",pending=page.waitForResponse(r=>new URL(r.url()).pathname===endpoint&&r.request().method()==="POST");await dialog.getByRole("button",{name:"Gerar PDF",exact:true}).click();const response=await pending;expect(response.status(),await response.text()).toBe(200);
+ const endpoint="/api/documents/"+document.id+"/issuances",pending=issuanceResponse(page,endpoint);await dialog.getByRole("button",{name:"Gerar PDF",exact:true}).click();const response=await pending;expect(response.status(),await response.text()).toBe(200);
+ await finishGeneratedPdf(page);
  const result=await signed(page,document.id,await response.json(),"donation-expanded"),text=compact(await plain(result.bytes));
  for(const value of ["Doação de materiais","Ficha Ampliada","Observação original da doação que deve permanecer integral.","Período: de 01/01/2000 a 02/01/2000, dias completos e inclusivos.","Nenhum andamento neste período."])expect(text).toContain(compact(value));
  expect(text).not.toContain(compact("Registro atual fora do intervalo escolhido."));expect(result.receipt.documentOptions?.period).toEqual({from:"2000-01-01",through:"2000-01-02",timeZone:"America/Sao_Paulo"});

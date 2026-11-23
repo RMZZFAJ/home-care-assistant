@@ -5,13 +5,14 @@ import { ActionButton } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { ApiError } from "@/lib/client/api";
 
-export function useOperationSupport({ cause, operation, result, fallbackCode, attempts, attemptLabel }: {
+export function useOperationSupport({ cause, operation, result, fallbackCode, attempts, attemptLabel, label = "Detalhes para suporte" }: {
   cause: unknown;
   operation: string;
   result: string;
   fallbackCode: string;
   attempts: number;
   attemptLabel: string;
+  label?: string;
 }) {
   const supportRef = useRef<HTMLDetailsElement>(null);
   const diagnosisRef = useRef<HTMLPreElement>(null);
@@ -48,7 +49,7 @@ export function useOperationSupport({ cause, operation, result, fallbackCode, at
 
   return { copy, details: <>
     <details className="hca-issuance-support" ref={supportRef}>
-      <summary><Icon name="info" width={15} height={15} />Detalhes para suporte<Icon name="down" width={15} height={15} /></summary>
+      <summary><Icon name="info" width={15} height={15} />{label}<Icon name="down" width={15} height={15} /></summary>
       <p>Copie o diagnóstico e envie ao responsável pelo sistema.</p>
       <pre ref={diagnosisRef} tabIndex={-1}>{detail}</pre>
       <ActionButton onClick={() => void copy()}><Icon name="copy" />Copiar detalhes</ActionButton>

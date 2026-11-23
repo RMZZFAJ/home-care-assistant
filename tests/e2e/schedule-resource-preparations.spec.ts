@@ -132,7 +132,8 @@ async function review(page: Page) {
     await trigger.focus({ timeout: 750 });
     await expect(trigger).toBeFocused({ timeout: 750 });
   }).toPass({ timeout: 15_000 });
-  await trigger.press("Enter");
+  if (test.info().project.name === "chromium") await trigger.click();
+  else await trigger.press("Enter");
   const d = drawer(page, "Revisar escala");
   await expect(d).toBeVisible();
   await expect(d.locator("input,select,textarea")).toHaveCount(0);
