@@ -16,6 +16,7 @@ import { PermissionMatrix } from "./permission-matrix";
 import { NotificationMatrix } from "./notification-matrix";
 import { PolicyRules } from "./policy-rules";
 import { ScheduleResidenceSettings } from "./schedule-residence-settings";
+import { BalanceRegimeSettings, canManageBalanceRegime } from "@/components/balances/balance-regime-settings";
 import { PatientSchedule } from "@/components/schedules/schedule-console";
 import { canConfigureResidenceHours } from "@/components/schedules/schedule-residence-requirement";
 import Link from "next/link";
@@ -87,6 +88,9 @@ export function PolicyConsole() {
             {canConfigureResidenceHours(context)
               ? <ScheduleResidenceSettings key={context.patient.id} patientId={context.patient.id} /> : null}
             <PatientSchedule key={context.userId + ":" + context.patient.id} context={context} settings />
+            {canManageBalanceRegime(context) && can(context, "bal.read") ? (
+              <BalanceRegimeSettings key={context.userId + ":" + context.patient.id} context={context} patientId={context.patient.id} />
+            ) : null}
           </div>
         ) : context.patient &&
         (can(context, "access.manage") ||

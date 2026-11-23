@@ -159,7 +159,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   await action(page, "Consultar acompanhamento atual").click();
   await expect(editor(page)).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "Programação do balanço", exact: true }),
+    page.getByRole("heading", { name: "Previstos", exact: true }),
   ).toBeFocused();
   const second = await substitute(f),
     current = await workspace(second.client, f.patient);
@@ -500,7 +500,7 @@ test("BAL reconto sem contador mostra recuperação, preserva motivo no conflito
   await action(page, "Consultar acompanhamento atual").click();
   await expect(editor(page)).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "Programação do balanço", exact: true }),
+    page.getByRole("heading", { name: "Previstos", exact: true }),
   ).toBeFocused();
   await expect(recovery).toHaveCount(0);
 });

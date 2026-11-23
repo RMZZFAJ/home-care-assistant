@@ -498,6 +498,7 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
   ).toBe(4);
   const before = ledger(f.patient);
   await page.goto("/balancos");
+  await page.getByRole("link", { name: "Programação dos balanços", exact: true }).click();
   await page
     .getByRole("button", { name: "Configurar dia e plantão", exact: true })
     .click();

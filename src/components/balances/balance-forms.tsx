@@ -9,7 +9,6 @@ export const weekDays = [
   "Sábado",
 ];
 export type BalanceEditor =
-  | { kind: "configure" }
   | { kind: "defer"; family: boolean }
   | { kind: "decide"; deferral: BalanceDeferral; approve: boolean }
   | { kind: "assign"; cycleId: string; allowDeferral: boolean };

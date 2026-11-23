@@ -9,6 +9,8 @@ for (const raw of preparationPurposes) { const purpose = raw as BalancePreparati
  test(`BAL por plantão ${purpose}: decisão explícita sem preparação persistida e resultado único após resposta perdida`, async ({ page }) => {
   const f = await preparationFixture(purpose), writes = noPrivateWrites(page), count = privateFormCount(f.patient), before = preparationFacts(f);
   await loginDecision(page, f.identity.email, f.patient); await page.goto("/balancos");
+  if (purpose === "configure") await page.getByRole("link", { name: "Programação dos balanços", exact: true }).click();
+  if (purpose === "assign") await expect(page.getByRole("region", { name: "Previstos", exact: true })).toContainText("Escolha necessária");
   await page.getByRole("button", { name: purpose === "configure" ? "Configurar dia e plantão" : purpose === "assign" ? "Resolver atribuição" : balancePreparationTitles[purpose], exact: true }).click();
   if (purpose === "configure") {
     await expect(page.getByRole("textbox", { name: "Justificativa", exact: true })).toHaveCount(0);

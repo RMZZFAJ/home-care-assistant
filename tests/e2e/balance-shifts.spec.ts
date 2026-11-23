@@ -153,6 +153,8 @@ test("BAL por plantão: ativação local, cinco etapas, referência, resposta pe
   });
   await login(page, fixture.adminA.email, patient);
   await page.goto("/balancos");
+  await page.getByRole("link", { name: "Programação dos balanços", exact: true }).click();
+  await expect(page).toHaveURL(/\/configuracoes\?[^#]+#programacao-balancos$/);
   await page
     .getByRole("button", { name: "Configurar dia e plantão", exact: true })
     .click();
@@ -362,7 +364,7 @@ test("supervisão solicita adiamento, família decide e o prazo só muda após a
     }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Configurar dia e plantão", exact: true }),
+    page.getByRole("link", { name: "Programação dos balanços", exact: true }),
   ).toHaveCount(0);
   const before = (
     await (

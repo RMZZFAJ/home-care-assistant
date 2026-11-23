@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useDocumentDecision } from "@/components/documents/use-document-decision";
-import { ActionButton, DefinitionGrid, FormField, Pill, SelectField, TextAreaField } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, FormField, SelectField, TextAreaField } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
 import { Notice, type WorkspaceContext } from "@/components/workspace";
 import { formatZonedDate } from "@/lib/schedules/time";
@@ -71,7 +71,6 @@ export function BalanceCountPermissionAction({ entry, context, timezone, onChang
   const selected = selectedRequest ?? selectedPermission;
   const title = result || (leaving ? "Sair sem confirmar?" : request ? "Pedir autorização para contar" : "Autorizar este profissional?");
   return <>
-    {request?.alreadyPending ? <Pill tone="warning">Autorização solicitada</Pill> : null}
     {available ? <ActionButton ref={openerRef} onClick={open} disabled={decision.busy}>{request ? "Pedir autorização" : "Decidir pedido"}</ActionButton> : null}
     {!snapshot && decision.recoveryMessage ? <Notice error={decision.uncertain}>{decision.recoveryMessage}</Notice> : null}
     {!snapshot && decision.uncertain ? <ActionButton onClick={() => void recover()} disabled={decision.busy}>Conferir resultado</ActionButton> : null}

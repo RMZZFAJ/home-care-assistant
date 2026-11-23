@@ -7,3 +7,7 @@ export function scheduleSettingsHref(patientId: string, day?: string) {
 export function scheduleResidenceSettingsHref(patientId: string, day?: string) {
   return scheduleSettingsHref(patientId, day) + "#horarios-da-residencia";
 }
+
+export function balanceRegimeSettingsHref(patientId: string) {
+  return scheduleSettingsHref(patientId) + "#programacao-balancos";
+}

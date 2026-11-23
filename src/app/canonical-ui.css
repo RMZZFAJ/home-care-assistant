@@ -647,6 +647,33 @@ button.hca-stock-material-pending { cursor: pointer; }
 .hca-balance-console .hca-record:last-child { border-bottom: 0; }
 .hca-balance-console .hca-record-main strong { font-size: 13px; font-weight: 670; }
 .hca-balance-console .hca-record-main small { margin-top: 3px; font-size: 11px; }
+.hca-balance-previews { display: grid; gap: 12px; min-width: 0; }
+.hca-balance-previews, .hca-balance-regime, .hca-balance-console [id^="adiamento-"] { scroll-margin-top: calc(var(--app-header-height) + 16px); }
+.hca-balance-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 34px; }
+.hca-balance-list-heading h2 { margin: 0; font-size: 16px; font-weight: 650; }
+.hca-balance-list-heading .hca-balance-settings-link { display: grid; place-items: center; width: 42px; min-height: 42px; padding: 0; }
+.hca-balance-preview { min-width: 0; padding: 20px; border: 1px solid var(--hca-line); border-radius: 14px; background: var(--hca-paper); box-shadow: 0 4px 15px #173b3a05; overflow-wrap: anywhere; }
+.hca-balance-preview-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 13px; }
+.hca-balance-preview-icon { display: grid; place-items: center; flex: none; width: 41px; height: 41px; border-radius: 12px; color: var(--hca-green); background: var(--hca-green-bg); }
+.hca-balance-preview-top .hca-status, .hca-balance-review-link .hca-status { white-space: normal; text-align: center; }
+.hca-balance-preview h3 { margin: 0; }
+.hca-balance-preview-title { display: block; border: 0; padding: 0; background: none; color: var(--hca-ink); text-align: left; font-size: 19px; font-weight: 650; line-height: 1.4; cursor: pointer; }
+.hca-balance-preview-title:hover { text-decoration: underline; }
+.hca-balance-preview > p { margin-top: 7px; color: var(--hca-muted); font-size: 14px; }
+.hca-balance-preview > .hca-balance-preview-period { display: flex; align-items: center; gap: 7px; margin-top: 12px; font-size: 12px; }
+.hca-balance-preview-period > svg { flex: none; }
+.hca-balance-preview-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.hca-balance-preview-actions > :is(button, a):first-child { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.hca-balance-preview-actions > :is(button, a) { min-width: 0; max-width: 100%; white-space: normal; text-align: center; }
+.hca-balance-next, .hca-balance-review { min-width: 0; border: 1px solid var(--hca-line); border-radius: 12px; background: var(--hca-paper); }
+.hca-balance-next, .hca-balance-review-link { display: flex; align-items: center; gap: 12px; padding: 16px 13px; overflow-wrap: anywhere; }
+.hca-balance-next > div, .hca-balance-review-link > span:nth-child(2) { flex: 1; min-width: 0; }
+.hca-balance-next strong, .hca-balance-review-link strong { display: block; font-size: 14px; font-weight: 650; }
+.hca-balance-next small, .hca-balance-review-link small { display: block; margin-top: 4px; color: var(--hca-muted); font-size: 12px; }
+.hca-balance-review-link { color: var(--hca-ink); }
+.hca-balance-review-link:hover strong { text-decoration: underline; }
+.hca-balance-review > .ui-button { margin: 0 13px 13px; }
+.hca-balance-empty { padding: 12px 0; color: var(--hca-muted); }
 @media (max-width: 500px) { .hca-balance-console .hca-record { padding: 14px; } .hca-balance-console .hca-record-main small { font-size: 10px; } }
 @media (forced-colors: active) { .hca-balance-console .hca-record { background: Canvas; color: CanvasText; border-color: CanvasText; } }
 

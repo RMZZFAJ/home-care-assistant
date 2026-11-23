@@ -1,5 +1,6 @@
 "use client";
-import { ActionButton, DefinitionGrid, LoadingIndicator, Pill } from "@/components/ui/controls";
+import { ActionButton, LoadingIndicator, Pill, type PillTone } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -24,15 +25,24 @@ import { weekDays, type BalanceEditor } from "./balance-forms";
 import { DeferralFacts } from "./balance-deferral-facts";
 import { BalanceCountPermissionAction, BalanceCountPermissionHistory } from "./balance-count-permissions";
 import { useBalanceWorkspace } from "./use-balance-workspace";
-import { scheduleSettingsHref } from "@/lib/schedules/routes";
+import { balanceRegimeSettingsHref } from "@/lib/schedules/routes";
 import { balanceCountHref } from "@/lib/balances/routes";
 import type { DocumentSummary } from "@/types/documents";
+import { BalancePreviewCard } from "./balance-preview-card";
+import { canManageBalanceRegime } from "./balance-regime-settings";
+
+function balanceDateTitle(instant: string, timeZone?: string) {
+  return "Balanço de " + new Intl.DateTimeFormat("pt-BR", {
+    timeZone: timeZone ?? "America/Sao_Paulo", day: "numeric", month: "long",
+  }).format(new Date(instant));
+}
+
 export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
   const router = useRouter(),
     params = useSearchParams(),
     recountDocumentId = params.get("recountDocumentId");
   const patient = context.patient!,
-    { data, error: loadError, reload } = useBalanceWorkspace(patient.id);
+    { data, checkedAt, error: loadError, reload } = useBalanceWorkspace(patient.id);
   const [editor, setEditor] = useState<BalancePreparationSelection | null>(
     null,
   ),
@@ -44,12 +54,11 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
     null,
   );
   const resultRef = useRef<HTMLHeadingElement>(null);
-  const [now] = useState(() => Date.now());
   const formatBrazilDate = (value: string | null) =>
     formatZonedDate(value, data?.regime?.timezone);
   const family = ["family", "admin"].includes(patient.role),
     approve = family && can(context, "bal.defer.approve"),
-    configure = family && can(context, "bal.schedule.manage");
+    configure = canManageBalanceRegime(context);
   const requestedDeferral = params.get("purpose") === "request_deferral";
   useEffect(() => {
     if (!requestedDeferral || !data) return;
@@ -89,9 +98,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
   }, [patient.id, data?.events.length]);
   const open = (value: BalanceEditor, target: HTMLElement) => {
     const purpose =
-      value.kind === "configure"
-        ? "configure"
-        : value.kind === "assign"
+      value.kind === "assign"
           ? "assign"
           : value.kind === "decide"
             ? value.approve
@@ -101,9 +108,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
               ? "defer"
               : "request_deferral";
     const targetResourceId =
-      value.kind === "configure"
-        ? patient.id
-        : value.kind === "assign"
+      value.kind === "assign"
           ? value.cycleId
           : value.kind === "decide"
             ? value.deferral.id
@@ -122,147 +127,117 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
     ) : (
       <LoadingIndicator label="Carregando balanços" />
     );
-  const a = data.eligibility.assignment,
-    current = data.assignments.find((s) => s.id === a?.id),
-    cycle = data.obligations.find((o) => o.state === "pending")?.cycle_id;
+  const { assignment: a, admission, available, documentId, dueAt } = data.eligibility;
+  const current = data.assignments.find((row) => row.id === a?.id);
+  const pending = data.obligations.find((row) => row.state === "pending");
+  const timezone = data.regime?.timezone;
+  const request = data.countPermissions?.request;
+  const deferral = a && data.deferrals.find(row => row.assignment_id === a.id && row.status === "pending" && row.decisionContext?.sourceCurrent);
+  const assignmentEvent = pending && data.events.find(event => event.cycle_id === pending.cycle_id
+    && ["bal.cycle.unassigned", "bal.cycle.assigned", "bal.cycle.invalidated", "bal.cycle.missed"].includes(event.action));
+  const requiresChoice = assignmentEvent?.action === "bal.cycle.unassigned" && assignmentEvent.details.ambiguous === true;
+  const scheduledType = data.types.find(type => type.id === data.regime?.shift_type_id);
+  const optionalCount = !data.regime?.activated_at && !a && !pending && can(context, "bal.count");
+  let state = "Responsável definido", tone: PillTone = "neutral", note: string | undefined;
+  if (admission) {
+    state = "Contagem em andamento";
+    tone = "success";
+    note = "A contagem iniciada no plantão pode ser concluída no mesmo preenchimento.";
+  } else if (request?.alreadyPending) {
+    state = "Autorização solicitada";
+    tone = "warning";
+    note = "Aguarde a decisão da administração para fazer a contagem.";
+  } else if (deferral) {
+    state = "Adiamento solicitado";
+    tone = "warning";
+    note = "O prazo atual permanece vigente até a aprovação do pedido.";
+  } else if (available) {
+    state = "Disponível para contar";
+    tone = "success";
+  } else if (a && Date.parse(a.ends_at) <= checkedAt) {
+    state = "Prazo encerrado";
+    tone = "danger";
+  } else if (a?.kind === "deferred") {
+    state = "Adiado";
+    tone = "info";
+  } else if (a && Date.parse(a.starts_at) > checkedAt) {
+    state = "Programado";
+    note = "O responsável pode iniciar a contagem quando a janela do plantão abrir.";
+  } else if (a && a.professional_id !== context.userId) {
+    state = "Outro responsável";
+  }
+  if (a?.kind === "recount" && !note) note = "A recontagem mantém a ficha e as contagens já registradas.";
   const canRequest =
     can(context, "bal.defer.request") &&
     (a?.professional_id === context.userId || patient.role === "supervisor");
+  const countAction = a && (available || admission) ? (
+    <Link href={balanceCountHref(patient.id, documentId, a)} className="ui-button ui-button-primary" prefetch={false}>
+      <Icon name="checklist" width={17} height={17} />{admission ? "Continuar contagem" : "Fazer balanço"}
+    </Link>
+  ) : request ? (
+    <>
+      {request.alreadyPending ? <a className="ui-button ui-button-secondary" href="#balance-count-permission-history">Ver pedido de autorização</a> : null}
+      <BalanceCountPermissionAction key={request.assignmentId} entry={{ request }} context={context} timezone={timezone} onChanged={reload} />
+    </>
+  ) : null;
   return (
     <div className="hca-form-stack hca-balance-console">
       {loadError ? <Notice error>{loadError}</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      <section className="ui-card">
-        <div className="hca-section-heading">
-          <h2 ref={resultRef} tabIndex={-1}>
-            Programação do balanço
-          </h2>
-          <Pill tone={data.enabled ? "accent" : "neutral"}>
-            {data.enabled ? "Ativa neste paciente" : "Processamento desativado"}
-          </Pill>
-        </div>
-        {data.regime ? (
-          <DefinitionGrid items={[
-            { label: "Dia do balanço", value: weekDays[data.regime.weekday] },
-            { label: "Plantão configurado", value: data.types.find(t => t.id === data.regime?.shift_type_id)?.name ?? "Plantão configurado" },
-            { label: "Fuso", value: data.regime.timezone },
-          ]} />
-        ) : (
-          <p>O novo regime ainda não foi ativado neste paciente.</p>
-        )}
-        {data.regime?.observation ? (
-          <div>
-            <h3>Observação</h3>
-            <p className="whitespace-pre-wrap wrap-anywhere">{data.regime.observation}</p>
-          </div>
-        ) : null}
-        <div className="hca-toolbar">
+      <section className="hca-balance-previews" id="responsabilidade-balanco" aria-labelledby="balance-forecasts-heading">
+        <div className="hca-balance-list-heading">
+          <h2 id="balance-forecasts-heading" ref={resultRef} tabIndex={-1}>Previstos</h2>
           {configure ? (
-            <ActionButton
-              onClick={(e) => open({ kind: "configure" }, e.currentTarget)}
-              disabled={!data.types.some((t) => t.is_active)}
-            >
-              Configurar dia e plantão
-            </ActionButton>
-          ) : null}
-          {!data.regime?.activated_at &&
-            !data.eligibility.assignment &&
-            can(context, "bal.count") ? (
-            <Link
-              href="/fichas/bal"
-              className="ui-button ui-button-primary"
-              prefetch={false}
-            >
-              Nova contagem
+            <Link className="ui-button ui-button-secondary hca-balance-settings-link" href={balanceRegimeSettingsHref(patient.id)}
+              aria-label="Programação dos balanços" title="Programação dos balanços" prefetch={false}>
+              <Icon name="settings" width={18} height={18} />
             </Link>
           ) : null}
         </div>
-        {configure && !data.types.some(type => type.is_active) ? (
-          <p>
-            Cadastre um tipo de plantão antes de ativar os balanços.
-            {can(context, "schedule.types.manage") ? (
-              <> <Link href={scheduleSettingsHref(patient.id)} prefetch={false}>Configurar tipos de plantão</Link></>
-            ) : null}
-          </p>
-        ) : null}
-      </section>
-      <section className="ui-card" id="responsabilidade-balanco">
-        <h2>Responsabilidade atual</h2>
         {a ? (
-          <>
-            <DefinitionGrid items={[
-              { label: "Profissional designado", value: current?.professional_name ?? "Profissional designado" },
-              { label: "Tipo de plantão", value: current?.type_name ?? "Tipo não disponível" },
-              { label: "Período da atribuição", value: formatBrazilDate(a.starts_at) + " → " + formatBrazilDate(a.ends_at), wide: true },
-            ]} />
-            <p>
-              {data.eligibility.admission
-                ? "Contagem iniciada neste plantão. Você pode concluir o mesmo preenchimento."
-                : data.eligibility.available
-                ? "Contagem disponível para você durante este plantão."
-                : new Date(a.starts_at).getTime() > now
-                  ? "Contagem agendada; aguarde o início do plantão."
-                  : a.professional_id !== context.userId
-                    ? "Outro profissional está responsável por este balanço."
-                    : "O prazo ou a atribuição mudou. Aguarde a atualização formal."}
-            </p>
-            <div className="hca-toolbar">
-              {data.eligibility.available || data.eligibility.admission ? (
-                <Link
-                  href={balanceCountHref(patient.id, data.eligibility.documentId, a)}
-                  className="ui-button ui-button-primary"
-                  prefetch={false}
-                >
-                  {data.eligibility.admission ? "Continuar contagem" : "Fazer balanço"}
-                </Link>
-              ) : null}
-              {data.countPermissions?.request ? <BalanceCountPermissionAction key={data.countPermissions.request.assignmentId}
-                entry={{ request: data.countPermissions.request }} context={context} timezone={data.regime?.timezone} onChanged={reload} /> : null}
-              {approve || canRequest ? (
-                <ActionButton
-                  onClick={(e) =>
-                    open({ kind: "defer", family: approve }, e.currentTarget)
-                  }
-                >
-                  {approve
-                    ? "Adiar com decisão familiar"
-                    : "Solicitar adiamento"}
-                </ActionButton>
-              ) : null}
-            </div>
-          </>
-        ) : cycle ? (
-          <>
-            <Notice error>
-              Pendência sem plantão único elegível. Nenhuma pessoa foi escolhida
-              automaticamente.
-            </Notice>
-            {configure ? (
-              <ActionButton
-                onClick={(e) =>
-                  open(
-                    { kind: "assign", cycleId: cycle, allowDeferral: approve },
-                    e.currentTarget,
-                  )
-                }
-              >
-                Resolver atribuição
+          <BalancePreviewCard key={a.id} title={balanceDateTitle(a.starts_at, timezone)} patientName={patient.display_name}
+            state={state} tone={tone} note={note} responsible={current?.professional_name ?? "Profissional designado"}
+            shiftType={current?.type_name} startsAt={a.starts_at} endsAt={a.ends_at} dueAt={dueAt ?? a.ends_at} timezone={timezone}
+            primary={countAction}>
+            {deferral ? (
+              <a className="ui-button ui-button-secondary" href={"#adiamento-" + deferral.id}>Ver pedido de adiamento</a>
+            ) : approve || canRequest ? (
+              <ActionButton onClick={event => open({ kind: "defer", family: approve }, event.currentTarget)}>
+                {approve ? "Adiar com decisão familiar" : "Solicitar adiamento"}
               </ActionButton>
             ) : null}
-          </>
+          </BalancePreviewCard>
+        ) : pending ? (
+          <BalancePreviewCard key={pending.cycle_id} title={balanceDateTitle(pending.original_start, timezone)} patientName={patient.display_name}
+            state={requiresChoice ? "Escolha necessária" : "Sem responsável"} tone="warning"
+            responsible={requiresChoice ? "Mais de um profissional elegível" : "Responsável a definir"}
+            dueAt={pending.effective_due} timezone={timezone}
+            note="Nenhuma pessoa foi escolhida automaticamente. Uma decisão autorizada é necessária."
+            primary={configure ? (
+              <ActionButton onClick={event => open({ kind: "assign", cycleId: pending.cycle_id, allowDeferral: approve }, event.currentTarget)}>
+                Resolver atribuição
+              </ActionButton>
+            ) : null} />
+        ) : optionalCount ? (
+          <BalancePreviewCard title="Balanço de estoque" patientName={patient.display_name} state="Facultativo" tone="info"
+            responsible="Sem programação semanal" note="A ficha registra o responsável quando a contagem é emitida."
+            primary={<Link href="/fichas/bal" className="ui-button ui-button-primary" prefetch={false}>Nova contagem</Link>} />
         ) : data.recountRecovery.total > 0 ? (
-          <Notice>
-            Há reconto aguardando nova designação autorizada. Consulte as
-            pendências abaixo.
-          </Notice>
+          <Notice>Há reconto aguardando nova designação autorizada. Consulte as pendências abaixo.</Notice>
         ) : (
-          <p>
-            {data.regime?.enabled
-              ? "Não há contagem pendente neste momento. A próxima obrigação será disponibilizada no plantão programado."
-              : "Não há contagem pendente neste momento. O regime semanal não está ativo; as contagens anteriores permanecem no histórico."}
-          </p>
+          <p className="hca-balance-empty">Não há contagem pendente neste momento.</p>
         )}
+        {data.regime?.enabled && scheduledType ? (
+          <div className="hca-balance-next">
+            <Icon name="calendar" width={20} height={20} />
+            <div>
+              <strong>Programação semanal</strong>
+              <small>{weekDays[data.regime.weekday]} · {scheduledType.name}</small>
+            </div>
+            <Pill>Ativa</Pill>
+          </div>
+        ) : null}
       </section>
       <BalanceCountPermissionHistory rows={data.countPermissions?.history ?? []} context={context} timezone={data.regime?.timezone} onChanged={reload} />
       {data.recountRecovery.total > 0 ? (
@@ -319,6 +294,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
             <article
               key={d.id}
               className="hca-record"
+              id={"adiamento-" + d.id}
               aria-label="Pedido de adiamento"
             >
               <div className="hca-record-main">
@@ -370,6 +346,38 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
                 </div>
               ) : null}
             </article>
+          ))}
+        </section>
+      ) : null}
+      {documents.length ? (
+        <section className="hca-balance-previews" aria-label="Contagens em revisão">
+          <div className="hca-balance-list-heading"><h2>Em acompanhamento</h2></div>
+          {documents.map((d) => (
+            <div key={d.id} className="hca-balance-review">
+              <Link href={"/documentos/" + d.id} className="hca-balance-review-link" prefetch={false}>
+                <span className="hca-balance-preview-icon"><Icon name="file" width={21} height={21} /></span>
+                <span>
+                  <strong>{d.code ?? "Contagem de estoque"}</strong>
+                  <small>{formatBrazilDate(d.created_at)}</small>
+                </span>
+                <Pill tone="warning">Em revisão</Pill>
+              </Link>
+              {data.obligations.some(
+                (o) =>
+                  o.count_document_id === d.id || o.regularized_by === d.id,
+              ) &&
+                !a &&
+                (can(context, "bal.approve.family") ||
+                  can(context, "bal.approve.supervisor")) ? (
+                <Link
+                  href={recountHref(patient.id, d.id)}
+                  className="ui-button ui-button-secondary"
+                  prefetch={false}
+                >
+                  Designar reconto
+                </Link>
+              ) : null}
+            </div>
           ))}
         </section>
       ) : null}
@@ -428,33 +436,6 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
           </p>
         )}
       </section>
-      {documents.length ? (
-        <section className="ui-card">
-          <h2>Contagens em revisão</h2>
-          {documents.map((d) => (
-            <div key={d.id} className="hca-record">
-              <Link href={"/documentos/" + d.id} prefetch={false}>
-                {d.code} · consultar revisão
-              </Link>
-              {data.obligations.some(
-                (o) =>
-                  o.count_document_id === d.id || o.regularized_by === d.id,
-              ) &&
-                !a &&
-                (can(context, "bal.approve.family") ||
-                  can(context, "bal.approve.supervisor")) ? (
-                <Link
-                  href={recountHref(patient.id, d.id)}
-                  className="ui-button ui-button-secondary"
-                  prefetch={false}
-                >
-                  Designar reconto
-                </Link>
-              ) : null}
-            </div>
-          ))}
-        </section>
-      ) : null}
       {recountDocumentId ? (
         <BalanceRecountAssignment
           context={context}

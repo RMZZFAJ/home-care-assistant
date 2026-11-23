@@ -84,7 +84,7 @@ test("schedule history reaches all202 events beyond the old100 limit with origin
   const area = page.getByRole("navigation", { name: "Plantões e balanços", exact: true });
   await expect(area.getByRole("link", { name: "Plantões", exact: true })).toHaveAttribute("aria-current", "page");
   await area.getByRole("link", { name: "Balanços", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Programação do balanço", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Previstos", exact: true })).toBeVisible();
   await area.getByRole("link", { name: "Histórico", exact: true }).click();
   await expect(area.getByRole("link", { name: "Histórico", exact: true })).toHaveAttribute("aria-current", "page");
   await page.locator("summary").filter({ hasText: /^Histórico de mudanças$/ }).click();

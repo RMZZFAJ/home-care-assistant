@@ -2150,8 +2150,9 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   consultada na volta. Alterações de plantão que
   atingem uma contagem designada exigem encaminhamento explícito e registram
   a decisão na mesma transação. A administração dos tipos e dos horários
-  fica em Configurações → Plantões. Os tipos novos definem a duração e o
-  descanso do ciclo. Resta a conferência visual do conjunto. A contagem
+  fica em Configurações → Plantões, junto à programação dos balanços.
+  Os tipos novos definem a duração e o descanso do ciclo.
+  Resta a conferência visual do conjunto. A contagem
   por plantão usa as cinco etapas. Extras têm
   parecer individual e vínculo a recontos comprovados. A programação
   registra observação opcional e o pedido de autorização para contar
@@ -3053,6 +3054,29 @@ A migration foi aplicada após o backup cifrado verificado
   emulados. Cobriu leitura incompleta, restrição por profissional,
   horários noturnos, edição, divergência de período, cancelamento
   com balanço e navegação pelo alerta de estoque.
+
+### Balanços previstos e programação semanal
+
+- A aba Balanços abre com **Previstos**, conforme E08-05. O cartão mostra
+  o responsável, o intervalo, a disponibilidade e a ação autorizada.
+  O título abre os detalhes com o prazo. Autorização e adiamento
+  pendentes continuam ligados aos respectivos pedidos.
+- A lista usa a atribuição atual e a elegibilidade retornadas pelo banco.
+  A programação semanal mostra dia e tipo de plantão quando configurados.
+  Uma data e um responsável novos só aparecem quando há atribuição oficial.
+  Contagens emitidas em revisão ganham acesso direto à ficha em
+  **Em acompanhamento**.
+- A engrenagem abre a programação em **Configurações → Plantões**.
+  A observação opcional, a pausa motivada, a revisão e a conferência de
+  resultado usam o fluxo transacional existente. A contagem avulsa, os
+  recontos, as decisões pendentes e o histórico conservam seus controles.
+  Este incremento dispensa migração.
+- Dezessete casos dirigidos passaram em Chromium, Android e iOS emulados.
+  A conferência em 360 px comparou o cartão de outro responsável com a v4
+  e verificou o prazo no painel, o retorno de foco e a autorização real.
+  A configuração e a designação após ambiguidade passaram com um worker
+  nos dois projetos móveis. A primeira rodada com dois workers perdeu
+  a sessão da conta de teste compartilhada em dois casos de configuração.
 
 ## L4
 
