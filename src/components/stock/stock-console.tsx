@@ -2,7 +2,7 @@
 import { PurchaseArrivalReview, type OpenUnlinkedArrival } from "@/components/documents/purchase-arrival-review";
 import { UnlinkedArrivalAction, UnlinkedArrivalHistory } from "@/components/documents/unlinked-arrival";
 import { FamilyStockPreparation } from "./family-stock-preparation";
-import { FamilyStockOperation } from "./family-stock-operation";
+import { FamilyStockOperation, readFamilyStockAttempt, storeFamilyStockAttempt } from "./family-stock-operation";
 import type { StockOperationInput } from "@/lib/validation/stock-operation";
 import type { CatalogProduct } from "@/types/documents";
 import {
@@ -85,7 +85,7 @@ export function StockConsole() {
       {(context) =>
         context.patient ? (
           <PatientStock
-            key={context.patient.id + params.toString()}
+            key={context.userId + ":" + context.patient.id + ":" + params.toString()}
             context={context}
             initialCustody={params.get("custody") ?? ""}
             refreshRevision={refreshRevision}
@@ -109,6 +109,8 @@ function PatientStock({
   refreshRevision: number;
   returnFocus: () => HTMLButtonElement | false;
 }) {
+  const patient = context.patient!.id;
+  const [pendingMovement, setPendingMovement] = useState(() => readFamilyStockAttempt(context.userId, patient));
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
   const liveRevision = useLiveRevision();
@@ -143,9 +145,11 @@ function PatientStock({
   const hasStock =
     can(context, "stock.family.read") || can(context, "stock.team.read");
   const hasFamily = can(context, "stock.family.read");
-  const canMoveFamily = can(context, "stock.family.manage");
+  const hasMovementCapability = can(context, "stock.family.manage");
+  const patientActive = context.patient!.is_active !== false;
+  const canMoveFamily = hasMovementCapability && patientActive;
+  const canRecoverMovement = hasFamily || hasMovementCapability;
   const canReadTransit = can(context, "ent.read");
-  const patient = context.patient!.id;
   const params = useSearchParams(),
     notice = useNotificationReference(
       patient,
@@ -184,16 +188,16 @@ function PatientStock({
   const operations = history.data?.data ?? [];
   const movements = operations.flatMap(operation => operation.rows);
   const total = history.data?.total ?? 0;
-  const legacy = useScopedRead<{ data: { id: string } | null }>(hasFamily || canMoveFamily
+  const legacy = useScopedRead<{ data: { id: string } | null }>(canRecoverMovement
     ? "/api/stock/preparations?" + new URLSearchParams({ careRecipientId: patient, targetResourceId: patient, purpose: "family_movement" })
     : null, revision);
   const catalogue = useScopedRead<{ data: CatalogProduct[] }>(canMoveFamily && !hasStock
     ? "/api/catalog?" + new URLSearchParams({ careRecipientId: patient, includeInactive: "true" })
     : null, revision);
   const movementProducts = hasStock ? products : (catalogue.data?.data ?? []).map(item => ({
-    productId: item.id, name: item.name, unit: item.unit, active: item.active !== false,
+    productId: item.id, name: item.name, unit: item.unit, active: item.active !== false, family: null,
   }));
-  const showFamilyArrivals = hasFamily;
+  const showFamilyArrivals = hasFamily && patientActive;
   const hasTeam = can(context, "stock.team.read");
   const custodies = [
     ...(hasFamily && hasTeam ? [{ value: "", label: "Todos" }] : []),
@@ -315,7 +319,16 @@ function PatientStock({
         finalFocus={() => transit.opener?.isConnected ? transit.opener : returnFocus()} /> : null}
       {showFamilyArrivals || params.has("arrival") ? <UnlinkedArrivalHistory context={context} revision={revision} arrivalId={params.get("arrival")}
         onReview={(...args) => arrivalReviewRef.current?.(...args)} /> : null}
-      {canMoveFamily ? (
+      {canRecoverMovement && pendingMovement ? (
+        <div id={showFamilyArrivals || params.has("arrival") ? undefined : "stock-family-actions"} className="hca-toolbar">
+          <ActionButton variant="primary" onClick={event => {
+            setLegacyEditor(false);
+            setMovementEditor(event.currentTarget);
+          }}>
+            <Icon name="history" /> Conferir movimentação enviada
+          </ActionButton>
+        </div>
+      ) : canMoveFamily ? (
         <div id={showFamilyArrivals || params.has("arrival") ? undefined : "stock-family-actions"} className="hca-toolbar">
           <ActionButton
             variant="primary"
@@ -345,18 +358,25 @@ function PatientStock({
           Consultar meu preenchimento familiar
         </ActionButton>
       ) : null}
-      {movementEditor && canMoveFamily && !legacyEditor ? <FamilyStockOperation
+      {movementEditor && (canMoveFamily || (pendingMovement && canRecoverMovement)) && !legacyEditor ? <FamilyStockOperation
         context={context} initial={{ action: operation, productId: movementProductId, referenceId }}
         products={movementProducts} movements={movements} opener={movementEditor} fallbackRef={historyHeadingRef}
+        canWrite={canMoveFamily} pending={pendingMovement}
+        onPending={packet => {
+          setPendingMovement(packet);
+          storeFamilyStockAttempt(context.userId, patient, packet);
+        }}
         onClose={() => setMovementEditor(null)}
-        onCommitted={receipt => {
+        onCommitted={(receipt, recovered) => {
           setSavedMovementIds(receipt.movementIds);
           setSavedMovement(receipt.movementIds[0]);
           setMovementEditor(null);
-          setMessage("Movimentação familiar confirmada. O histórico original foi preservado.");
+          setMessage(recovered
+            ? "Movimentação encontrada. O lançamento já estava registrado. Nenhuma quantidade foi acrescentada novamente."
+            : "Movimentação familiar confirmada. O histórico original foi preservado.");
           setAttempt(value => value + 1);
         }} /> : null}
-      {movementEditor && legacyEditor && (hasFamily || canMoveFamily) ? (
+      {movementEditor && legacyEditor && canRecoverMovement ? (
         <FamilyStockPreparation
           context={context}
           initialValues={{
@@ -392,16 +412,16 @@ function PatientStock({
           }}
         />
       ) : null}
-      {savedMovementIds.length > 1 ? <FormField label="Movimento para anexar comprovante">
+      {savedMovementIds.length > 1 && canMoveFamily ? <FormField label="Movimento para anexar comprovante">
         <SelectField value={savedMovement ?? ""} onChange={event => setSavedMovement(event.currentTarget.value)}>
           {savedMovementIds.map((id, index) => <option key={id} value={id}>Movimento {index + 1} da operação confirmada</option>)}
         </SelectField>
       </FormField> : null}
-      {savedMovement ? (
+      {savedMovement && canRecoverMovement ? (
         <Attachments
           patientId={context.patient!.id}
           movementId={savedMovement}
-          writable
+          writable={canMoveFamily}
         />
       ) : null}
       <section
@@ -514,7 +534,7 @@ function PatientStock({
             <button type="submit" className={primaryClass}>Aplicar filtros</button>
           </form>
         ) : null}
-        <StockMovementHistory patientId={patient} operations={operations} fallbackRef={historyHeadingRef} canCorrect={can(context,"stock.family.manage")}
+        <StockMovementHistory patientId={patient} operations={operations} fallbackRef={historyHeadingRef} canCorrect={canMoveFamily}
           onOrigin={(movement,target) => setOrigin({ id: movement.id, opener: target })}
           onCorrect={(movement,target) => {
             setLegacyEditor(false);

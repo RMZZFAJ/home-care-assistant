@@ -806,8 +806,8 @@ test("falta conferida e rejeição motivada têm revisões próprias e nenhuma b
 
 test("relato anterior ao centésimo é acessível por referência e por todas as páginas, sem vazio falso em falha de leitura", async ({
   page,
-}) => {
-  test.setTimeout(60_000);
+}, info) => {
+  test.setTimeout(process.env.CI ? 60_000 : 100_000);
   const f = await setup(),
     old = await seedReport(f, "shortage", false);
   sql(
@@ -895,20 +895,29 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   ).toHaveAttribute("aria-pressed", "true");
   const day = sql(`select to_char(created_at at time zone 'America/Sao_Paulo','YYYY-MM-DD') from public.consumption_reports where id=${sqlLiteral(old)};`);
   const filters = page.getByRole("button", { name: "Filtrar relatos", exact: true });
+  const filterPanel = page.getByRole("dialog", { name: "Filtrar relatos", exact: true });
+  const openFilters = async () => {
+    if (info.project.use.hasTouch) await filters.tap();
+    else await filters.click();
+    await expect(filterPanel).toBeVisible();
+  };
   await page.getByRole("textbox", { name: "Buscar relato ou material", exact: true }).fill("Relato fictício preservado para decisão");
-  await filters.click();
-  await page.getByLabel("Desde", { exact: true }).fill(day);
-  await page.getByLabel("Até", { exact: true }).fill(day);
-  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await openFilters();
+  await filterPanel.getByLabel("Desde", { exact: true }).fill(day);
+  await filterPanel.getByLabel("Até", { exact: true }).fill(day);
+  await filterPanel.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
   await expect(filters).toBeFocused();
   await expect(page).toHaveURL(/q=Relato/);
   await expect.poll(visibleIds).toEqual([old]);
   await page.reload(); await expect.poll(visibleIds).toEqual([old]);
-  await filters.click();
-  await expect(page.getByLabel("Desde", { exact: true })).toHaveValue(day);
-  await expect(page.getByLabel("Até", { exact: true })).toHaveValue(day);
-  await page.getByRole("combobox", { name: "Estado", exact: true }).selectOption("confirmed");
-  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await openFilters();
+  await expect(filterPanel.getByLabel("Desde", { exact: true })).toHaveValue(day);
+  await expect(filterPanel.getByLabel("Até", { exact: true })).toHaveValue(day);
+  const status = filterPanel.getByRole("combobox", { name: "Estado", exact: true });
+  await status.selectOption("confirmed");
+  await expect(status).toHaveValue("confirmed");
+  await filterPanel.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await expect(page).toHaveURL(url => url.searchParams.get("status") === "confirmed");
   await expect(page.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible();
   expect((await page.request.get(`/api/consumption?careRecipientId=${f.patient}&from=2026-11-12&to=2026-11-11`)).status()).toBe(400);
 });

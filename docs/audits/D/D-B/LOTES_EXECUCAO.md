@@ -1797,6 +1797,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123123142_l3_shortage_material_without_quantity` | Aplicada | Aplicada |
 | `20261123130151_l3_schedule_balance_review_contract` | Aplicada | Aplicada |
 | `20261123131427_l3_document_attachment_display_facts` | Aplicada | Aplicada |
+| `20261123142332_l3_family_stock_receipt_scope` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -3416,6 +3417,37 @@ WhatsApp ainda requer homologação do provedor.
 - A lista remota de migrations coincide com o checkout. As duas novas
   versões do conjunto, `20261123130151` e `20261123131427`, já constam
   no Supabase vinculado. Os ajustes de navegador dispensam migração.
+
+### Conferência do estoque familiar e recuperação do recibo
+
+- Em E07-05 e E07-06, a revisão mostra Disponível e Após registrar
+  lado a lado para cada material, com a quantidade do movimento e o
+  motivo informado. Se o banco devolver uma referência atualizada,
+  a revisão preserva os valores anteriores e exige **Usar saldo atualizado**
+  antes de habilitar a confirmação. A adoção da referência deixa a decisão
+  na revisão e não cria movimentação.
+- A entrada avulsa mantém apenas a tentativa de envio quando falta a
+  confirmação. O autor pode conferir o mesmo recibo com acesso de leitura
+  ao estoque familiar, inclusive após perder a escrita. A consulta verifica
+  paciente, autoria e chave exata. Para movimentar ou repetir o envio,
+  o vínculo mantém as exigências de escrita e cadastro ativo. O painel
+  geral mantém a consulta de Chegadas condicionada ao cadastro ativo.
+- A migration `20261123142332_l3_family_stock_receipt_scope.sql` está
+  aplicada nos dois ambientes. A captura completa não foi confirmada.
+  O resguardo cifrado `079c9bff-98e7-4102-ad8f-3cce923b96d3` preserva
+  a definição anterior da função, a autoria técnica e os grants. O ensaio
+  remoto em transação reverteu a mudança antes da aplicação. A conferência
+  posterior registrou 360 versões e nenhuma migration em fila.
+- Passaram três integrações dirigidas com Auth real. No Android emulado,
+  passaram oito casos da movimentação, dos preenchimentos antigos e da
+  recontagem de BAL. O iOS emulado confirmou a revisão em 360 e 412 px,
+  a recuperação de uma única operação com dois materiais e a leitura
+  paginada de 102 relatos. Esses ensaios usaram o banco local.
+- A atualização de vínculo indexa os cadastros anteriores pelo identificador,
+  conservando a comparação dos dados recebidos do servidor. A recontagem
+  de BAL, a revisão completa de ENT e a atualização em segundo plano da
+  ficha passaram em iOS emulado. A recontagem reproduzia a demora na
+  transição de vínculo com mais de 11 mil cadastros na stack local.
 
 ## L4
 

@@ -16,12 +16,15 @@ export async function GET(request: Request) {
     if (params.getAll("careRecipientId").length !== 1 || params.getAll("attemptKey").length > 1
       || (attemptKey !== null && productIds.length > 0))
       throw new ApiError("VALIDATION_ERROR", "Consulte os materiais ou a tentativa de movimentação.");
-    await patientContext(auth, patientId, "stock.family.manage");
     if (attemptKey !== null) {
       const key = parseQuery(uuid, attemptKey);
+      const { capabilities } = await patientContext(auth, patientId);
+      if (!capabilities["stock.family.read"] && !capabilities["stock.family.manage"])
+        throw new ApiError("FORBIDDEN", "Você não tem autorização para consultar este recibo.", 403);
       const data = stockOperationReceipt.nullable().parse(await rpc(auth.client, "family_stock_operation_result", { p_patient: patientId, p_key: key }));
       return NextResponse.json({ data }, { headers });
     }
+    await patientContext(auth, patientId, "stock.family.manage");
     const products = parseQuery(stockOperationProducts, productIds);
     const data = stockOperationReference.parse(await rpc(auth.client, "family_stock_operation_reference", { p_patient: patientId, p_products: products }));
     return NextResponse.json({ data }, { headers });

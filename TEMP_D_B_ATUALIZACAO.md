@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — revisão e recibo da movimentação familiar.** A v4 exige que a
+pessoa aceite a referência atualizada antes de confirmar. O autor consegue
+conferir a mesma tentativa com acesso de leitura, sem gerar movimento novo.
+A migration está aplicada localmente e no remoto, que registra 360 versões.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#conferência-do-estoque-familiar-e-recuperação-do-recibo).
+
 **23/11 — lembretes de entregas bilaterais.** O agendador registra
 os fatos da transferência com autoria de sistema. O teste confirmou
 um único lembrete em duas execuções e estoque preservado. Local e

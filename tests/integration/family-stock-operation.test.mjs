@@ -79,6 +79,25 @@ test("one insufficient line rolls back the entire operation; independent concurr
   assert.equal(sql("select count(*) from private.family_stock_operation_movements where operation_id=" + q(initial.id)), "2");
 });
 
+test("only the author can recover an existing receipt with current family access after writing is revoked", async t => {
+  const f = await stockFixture(t);
+  const input = await f.command("inbound", [2, 1]);
+  const receipt = await rpc(f.admin, "commit_family_stock_operation", input);
+  const args = { p_patient: f.patient, p_key: input.p_key };
+  const adminId = (await f.admin.auth.getUser()).data.user.id;
+  const family = await actor("family", f.patient);
+  assert.equal(await rpc(family, "family_stock_operation_result", args), null);
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values (${q(f.patient)},${q(adminId)},'stock.family.manage',false);
+    update public.care_recipients set is_active=false where id=${q(f.patient)};`);
+  assert.deepEqual(await rpc(f.admin, "family_stock_operation_result", args), receipt);
+  assert.equal((await f.admin.rpc("commit_family_stock_operation", input)).error?.code, "42501");
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values (${q(f.patient)},${q(adminId)},'stock.family.read',false);`);
+  assert.equal((await f.admin.rpc("family_stock_operation_result", args)).error?.code, "42501");
+  assert.equal(sql("select count(*) from private.family_stock_operations where care_recipient_id=" + q(f.patient)), "1");
+});
+
 test("stock history paginates acts, keeps distinct entries for the same material, and excludes family stock from team reads", async t => {
   const f = await stockFixture(t);
   const first = await rpc(f.admin, "commit_family_stock_operation", await f.command("inbound", [4, 5]));

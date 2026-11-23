@@ -99,12 +99,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
           if (sessionStorage.getItem("hca:patient") === lost.patientId) sessionStorage.removeItem("hca:patient");
         } catch { /* Stored destinations are optional. */ }
       }
-      setData((current) => ({
-        ...result.data, patients: result.data.patients.map((row) => {
-          const previous = current?.patients.find((item) => item.id === row.id);
-          return previous && JSON.stringify(previous) === JSON.stringify(row) ? previous : row;
-        })
-      }));
+      setData(current => {
+        if (!current) return workspace;
+        const previousPatients = new Map(current.patients.map(row => [row.id, row]));
+        return {
+          ...workspace,
+          patients: workspace.patients.map(row => {
+            const previous = previousPatients.get(row.id);
+            return previous && JSON.stringify(previous) === JSON.stringify(row) ? previous : row;
+          }),
+        };
+      });
       setPatientId((current) => {
         if (result.data.activeContext?.mode === "patient") return result.data.activeContext.care_recipient_id ?? "";
         let remembered = "";

@@ -187,8 +187,7 @@ async function issueSupply(
       "Pessoa indicada manualmente para receber estes materiais",
     );
   await next(page);
-  if (type === "BAL") await next(page);
-  else await selectMaterialCategory(page);
+  if (type !== "BAL") await selectMaterialCategory(page);
   if (type === "ENT" && requestId) {
     const assessment = page.getByRole("checkbox", { name: `Atende integralmente à necessidade de ${productName}`, exact: true });
     if (fulfillment === "complete") await assessment.check();
@@ -198,9 +197,7 @@ async function issueSupply(
     await page
       .getByRole("checkbox", { name: new RegExp("^" + productName) })
       .check();
-  await page
-    .getByLabel("Quantidade — " + productName, { exact: true })
-    .fill(amount);
+  await page.getByLabel(type === "BAL" ? productName + " · unidade" : "Quantidade — " + productName, { exact: true }).fill(amount);
   for (let step = 0; step < 3; step++) await next(page);
   if (type === "ENT" && requestId)
     await expect(page.getByText(fulfillment === "complete" ? "Atendimento integral previsto" : "Atendimento parcial previsto", { exact: true })).toBeVisible();
@@ -794,9 +791,8 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
     })
     .click();
   await next(page);
-  await next(page);
   await page
-    .getByLabel("Quantidade — " + product.name, { exact: true })
+    .getByLabel(product.name + " · unidade", { exact: true })
     .fill("1");
   for (let step = 0; step < 3; step++) await next(page);
   await page
@@ -1115,12 +1111,15 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await expect(page).toHaveURL(url => url.pathname === "/fichas/" + delivery.id);
   await emitted.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
   await page.goto("/estoque?careRecipientId=" + patient + "&custody=TRANSIT");
+  const transit = page.getByRole("dialog", { name: "Materiais em trânsito", exact: true });
   await expect(
-    page.getByRole("link", { name: delivery.code, exact: true }),
+    transit.getByRole("button", { name: delivery.code, exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Aguardando conferência", { exact: true }),
+    transit.getByText("Aguardando conferência", { exact: true }),
   ).toBeVisible();
+  await transit.getByRole("button", { name: "Fechar", exact: true }).click();
+  await expect(transit).toHaveCount(0);
   await logout(page);
   await signIn(page, recipient.email, "/fichas/" + delivery.id);
   await confirmCompleteDeliveryReceipt(page);
