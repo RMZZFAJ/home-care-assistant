@@ -359,6 +359,10 @@ documentais também exigem expectedVersion para detectar concorrência.
   do mesmo filtro e a identifica quando a atualização falha. 401/403/404 retiram
   os dados anteriores. Busca e paginação não registram abertura, ciência ou
   operação de estoque. A ordenação nativa é created_at decrescente e id crescente.
+  A consulta explícita `type=BAL` inclui `balanceCounterName` com a autoria
+  preservada da contagem vigente. O valor é nulo quando esse nome não consta
+  do ato histórico. A data filtrada é a de criação da ficha. `submitted`
+  corresponde a Em revisão e `approved` corresponde a Aplicado no BAL.
 
 - **Rota:** /api/documents/:id
 

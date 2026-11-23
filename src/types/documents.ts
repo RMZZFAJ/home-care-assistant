@@ -543,6 +543,7 @@ export type DocumentSummary = {
   status: string;
   created_at: string;
   recipient_id: string | null;
+  balanceCounterName?: string | null;
   task?: { code: string; label: string; } | null;
   document_lines?: {
     id: string;

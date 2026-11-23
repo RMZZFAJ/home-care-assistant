@@ -37,11 +37,11 @@ const filterLabels: Record<string, string> = {
   search: "Busca", type: "Tipo de ficha", status: "Situação", from: "Data inicial", to: "Data final",
 };
 /** Closed technical values have human fallbacks; search remains the person's text. */
-export function historyFilterPresentation(key: string, value: string) {
+export function historyFilterPresentation(key: string, value: string, statusLabel?: string) {
   const name = Object.hasOwn(filterLabels, key) ? filterLabels[key] : "Filtro";
   let display = "Valor não reconhecido";
   if (key === "search") display = value;
-  else if (key === "status") display = Object.hasOwn(historyStatusLabels, value) ? historyStatusLabels[value] : "Situação não reconhecida";
+  else if (key === "status") display = statusLabel ?? (Object.hasOwn(historyStatusLabels, value) ? historyStatusLabels[value] : "Situação não reconhecida");
   else if (key === "type") display = value === "DEV" ? "Devolução de materiais" : Object.hasOwn(documentLabels, value) ? documentLabels[value as keyof typeof documentLabels] : "Tipo de ficha não reconhecido";
   else if (key === "from" || key === "to") {
     const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(value + "T12:00:00Z") : null;

@@ -723,6 +723,13 @@ button.hca-stock-material-pending { cursor: pointer; }
 .hca-balance-review-link { color: var(--hca-ink); }
 .hca-balance-review-link:hover strong { text-decoration: underline; }
 .hca-balance-review > .ui-button { margin: 0 13px 13px; }
+.hca-balance-history-rows { display: grid; gap: 9px; }
+.hca-balance-history .hca-balance-review { border-radius: 13px; }
+.hca-balance-history .hca-balance-review-link { padding: 17px 14px; }
+.hca-balance-history .hca-balance-review-link strong { font-size: 15px; }
+.hca-balance-history .hca-balance-review-link .hca-status { max-width: 82px; flex: none; }
+.hca-balance-history-filter { position: relative; }
+.hca-balance-history-filter > .badge { position: absolute; inset-block-start: -4px; inset-inline-end: -4px; }
 .hca-balance-empty { padding: 12px 0; color: var(--hca-muted); }
 @media (max-width: 500px) { .hca-balance-console .hca-record { padding: 14px; } .hca-balance-console .hca-record-main small { font-size: 10px; } }
 @media (forced-colors: active) { .hca-balance-console .hca-record { background: Canvas; color: CanvasText; border-color: CanvasText; } }

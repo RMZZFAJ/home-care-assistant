@@ -16,6 +16,32 @@ import { whileAdvisoryWaits, whileRowWaits } from "./lock-barrier.mjs";
 import { shiftWorker } from "./shift-fixtures.mjs";
 import { patientB } from "../../scripts/test-constants.mjs";
 
+test("BAL history projects the preserved counter only for an authorized balance page", async () => {
+  const f = await legacyBalance();
+  const family = await actor("family", f.patient);
+  const outside = await actor("adminB", patientB);
+  const document = await rpc(family, "operational_document", { p_id: f.document.id });
+  const name = document.balanceReview.counter.name;
+  assert.ok(name);
+  assert.ok(["count_event", "issued_snapshot"].includes(document.balanceReview.counter.source));
+
+  const base = { p_patient: f.patient, p_type: "BAL", p_size: 1 };
+  const pending = await rpc(family, "operational_document_list", { ...base, p_status: "submitted" });
+  assert.equal(pending.total, 1);
+  assert.equal(pending.data[0].id, document.id);
+  assert.equal(pending.data[0].balanceCounterName, name);
+  assert.ok(!Object.hasOwn(pending.data[0], "balanceReview"));
+  assert.equal((await rpc(family, "operational_document_list", { ...base, p_status: "approved" })).total, 0);
+  const unfiltered = await rpc(family, "operational_document_list", { p_patient: f.patient });
+  assert.ok(!Object.hasOwn(unfiltered.data.find(row => row.id === document.id), "balanceCounterName"));
+  assert.equal((await outside.rpc("operational_document_list", base)).error?.code, "42501");
+
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.family.id)},'bal.read',false);`);
+  const revoked = await rpc(family, "operational_document_list", base);
+  assert.equal(revoked.total, 0);
+  assert.deepEqual(revoked.data, []);
+});
+
 test("legacy BAL counter cannot approve their own count through the missing balanceContext guard", async () => {
   const f = await legacyBalance(),
     before = balState(f.document.id);

@@ -19,6 +19,7 @@ import { parseDocumentListRead } from "@/lib/validation/document-list";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { RequisitionScienceBadge } from "@/components/requisitions/requisition-science-badge";
+import { BalanceHistoryFilters, BalanceHistoryRow, balanceHistoryStatus } from "@/components/balances/balance-history";
 
 export type { DocumentSummary } from "@/types/documents";
 import type { DocumentSummary } from "@/types/documents";
@@ -31,16 +32,21 @@ type Filters = {
 };
 const empty: Filters = { search: "", type: "", status: "", from: "", to: "" };
 const historyFilters = historyStatusLabels;
-export function DocumentRow({ row }: { row: DocumentSummary; }) {
+export function DocumentRow({ row, balanceHistory = false }: { row: DocumentSummary; balanceHistory?: boolean; }) {
   const { value: context } = useWorkspaceState();
   const pathname = usePathname(), params = useSearchParams();
-  const fromHistory = pathname === "/historico" ||
-    (pathname === "/balancos" || pathname === "/escalas") && params.get("view") === "history";
-  const returnTo = fromHistory ? "?returnTo=" + encodeURIComponent(pathname + (params.size ? "?" + params.toString() : "")) : "";
+  const fromHistory = balanceHistory || pathname === "/historico";
+  const historyParams = new URLSearchParams(params);
+  if (balanceHistory) historyParams.set("view", "history");
+  const returnTo = fromHistory ? "?returnTo=" + encodeURIComponent(pathname + (historyParams.size ? "?" + historyParams.toString() : "")) : "";
+  const href = "/documentos/" + row.id + returnTo;
+  if (balanceHistory) {
+    return <div className="hca-balance-review"><BalanceHistoryRow row={row} href={href} /></div>;
+  }
   return (
     <Link
       className="av-record"
-      href={"/documentos/" + row.id + returnTo}
+      href={href}
       prefetch={false}
     >
       <span className={`av-record-kind kind-${(row.kind ?? row.type).toLowerCase()}`}><Icon name={row.type === "ENT" ? "truck" : row.type === "COM" ? "box" : row.type === "BAL" ? "note" : "file"} width={18} height={18} /><small>{row.kind ?? row.type}</small></span>
@@ -130,7 +136,10 @@ export function HistoryContent({
   };
   const setPage = (value: number) => navigate(filters, value);
   const setFilters = (value: Filters) => navigate(value);
-  const active = Object.entries(filters).filter(([key, value]) => value && (!balanceOnly || key !== "type")).map(([key, value]) => ({ key, ...historyFilterPresentation(key, value) }));
+  const active = Object.entries(filters).filter(([key, value]) => value && (!balanceOnly || key !== "type")).map(([key, value]) => ({
+    key,
+    ...historyFilterPresentation(key, value, balanceOnly && key === "status" ? balanceHistoryStatus(value).label : undefined),
+  }));
   function apply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setShowFilters(false);
@@ -138,26 +147,38 @@ export function HistoryContent({
     setFilters({ ...draft });
   }
   const filterCount = active.filter(item => item.key !== "search").length;
-  return <div className="history-v2">
-    <section className="card history-search-card" aria-label="Busca e filtros do histórico"><form onSubmit={apply}>
+  return <div className={balanceOnly ? "hca-balance-previews hca-balance-history" : "history-v2"}>
+    {balanceOnly ? <BalanceHistoryFilters filters={filters} count={active.length} onApply={next => {
+      setPreviousVisible(false);
+      setFilters({ ...next, type: "BAL" });
+    }} /> : null}
+    <section className={balanceOnly ? undefined : "card history-search-card"} aria-label="Busca e filtros do histórico" hidden={balanceOnly && !active.length}>
+      {!balanceOnly ? <form onSubmit={apply}>
       <div className="history-searchbar">
         <div className="search-control"><Icon name="search" width={18} height={18} /><input className="input" type="search" aria-label="Buscar por código ou protocolo" placeholder="Buscar por código ou protocolo" value={draft.search} onChange={event => setDraft({ ...draft, search: event.target.value })} /></div>
         <button className="btn btn-icon" type="submit" aria-label="Buscar"><Icon name="search" /></button>
         <button className="btn history-filter-toggle" type="button" onClick={() => setShowFilters(current => !current)} aria-expanded={showFilters} aria-controls="history-filters"><Icon name="sliders" />Filtros{filterCount ? <span className="badge badge-neutral">{filterCount}</span> : null}</button>
       </div>
       {showFilters ? <div id="history-filters" className="history-filter-fields"><div className="form-grid">
-        {!balanceOnly ? <label className="field">Tipo de ficha<select className="input" aria-label="Tipo de ficha" value={draft.type} onChange={event => setDraft({ ...draft, type: event.target.value })}><option value="">Todas autorizadas</option>{context.patient?.capabilities?.["ent.read"] ? <option value="DEV">DEV · Devolução de materiais</option> : null}{Object.entries(documentLabels).filter(([type]) => context.patient?.capabilities?.[type.toLowerCase() + ".read"]).map(([type, label]) => <option key={type} value={type}>{type} · {label}</option>)}</select></label> : null}
+        <label className="field">Tipo de ficha<select className="input" aria-label="Tipo de ficha" value={draft.type} onChange={event => setDraft({ ...draft, type: event.target.value })}><option value="">Todas autorizadas</option>{context.patient?.capabilities?.["ent.read"] ? <option value="DEV">DEV · Devolução de materiais</option> : null}{Object.entries(documentLabels).filter(([type]) => context.patient?.capabilities?.[type.toLowerCase() + ".read"]).map(([type, label]) => <option key={type} value={type}>{type} · {label}</option>)}</select></label>
         <label className="field">Situação<select className="input" aria-label="Situação" value={draft.status} onChange={event => setDraft({ ...draft, status: event.target.value })}><option value="">Todas</option>{Object.entries(historyFilters).map(([status, label]) => <option key={status} value={status}>{label}</option>)}</select></label>
         <label className="field">De<input className="input" type="date" value={draft.from} onChange={event => setDraft({ ...draft, from: event.target.value })} /></label>
         <label className="field">Até<input className="input" type="date" value={draft.to} min={draft.from} onChange={event => setDraft({ ...draft, to: event.target.value })} /></label>
       </div><div className="filter-actions"><button className="btn btn-ghost" type="button" onClick={() => { setFilters(defaults); setDraft(defaults); setPreviousVisible(false); }}>Limpar filtros</button><button className="btn btn-primary" type="submit">Aplicar filtros</button></div></div> : null}
-    </form>
+    </form> : null}
     <p className="sr-only" role="status">{active.length ? "Filtros ativos: " + active.map(item => item.text).join(". ") + "." : "Nenhum filtro ativo."}</p>
     {active.length ? <div className="filter-chips" aria-label="Filtros ativos" role="group">{active.map(({ key, text, removeLabel }) => <button key={key} className="filter-chip" type="button" aria-label={removeLabel} onClick={() => { setFilters({ ...filters, [key]: "" }); setDraft({ ...draft, [key]: "" }); setPreviousVisible(false); }}>{text}<Icon name="close" width={12} height={12} /></button>)}</div> : null}</section>
     {error ? <Notice error>{error}{read.data && !previousVisible ? <button className={buttonClass} type="button" onClick={() => setPreviousVisible(true)}>Mostrar lista da última consulta</button> : null}<button className={buttonClass} type="button" onClick={read.refresh}>Tentar novamente</button></Notice> : null}
-    {loading ? <Notice>Consultando documentos…</Notice> : null}
-    <div className="history-result-meta"><p>{read.data ? total + " fichas de " + context.patient!.display_name : "Total ainda não confirmado."}</p>{read.queriedAt ? <span>{loading || error ? "Última consulta válida" : "Lista consultada"}: {formatBrazilDate(read.queriedAt)}.{loading || error ? " Os registros preservados podem estar desatualizados." : ""}</span> : null}</div>
-    {read.data && !loading && (!error || previousVisible) ? <section className="card history-results">{error ? <p className="card-body" role="status">Lista anterior, consultada em {formatBrazilDate(read.queriedAt)}. A atualização não foi confirmada.</p> : null}<div className="av-record-list">{rows.length ? rows.map(row => <DocumentRow key={row.id} row={row} />) : !error ? <EmptyState title={active.length ? "Nenhuma ficha encontrada" : "Ainda não há fichas neste paciente"}>{active.length ? "Ajuste ou limpe os filtros para consultar novamente." : "As fichas emitidas neste contexto aparecerão aqui."}</EmptyState> : null}</div></section> : null}
-    {read.data && total > 20 ? <nav className="compact-pagination history-pagination" aria-label="Páginas do histórico"><span>{total} fichas</span><div><button className="btn btn-icon" type="button" aria-label="Anterior" disabled={page <= 1 || loading || Boolean(error)} onClick={() => setPage(page - 1)}><Icon name="chevron" style={{ transform: "rotate(180deg)" }} /></button><span>{page} / {Math.ceil(total / 20)}</span><button className="btn btn-icon" type="button" aria-label="Próxima" disabled={page * 20 >= total || loading || Boolean(error)} onClick={() => setPage(page + 1)}><Icon name="chevron" /></button></div></nav> : null}
+    {loading && !balanceOnly ? <Notice>Consultando documentos…</Notice> : null}
+    {!balanceOnly ? <div className="history-result-meta"><p>{read.data ? total + " fichas de " + context.patient!.display_name : "Total ainda não confirmado."}</p>{read.queriedAt ? <span>{loading || error ? "Última consulta válida" : "Lista consultada"}: {formatBrazilDate(read.queriedAt)}.{loading || error ? " Os registros preservados podem estar desatualizados." : ""}</span> : null}</div> : null}
+    {read.data && !loading && (!error || previousVisible) ? <section className={balanceOnly ? "hca-balance-history-results" : "card history-results"} aria-labelledby={balanceOnly ? "balance-history-heading" : undefined}>
+      {error ? <p className="card-body" role="status">Lista anterior, consultada em {formatBrazilDate(read.queriedAt)}. A atualização não foi confirmada.</p> : null}
+      <div className={balanceOnly ? "hca-balance-history-rows" : "av-record-list"}>{rows.length ? rows.map(row => <DocumentRow key={row.id} row={row} balanceHistory={balanceOnly} />) : !error && balanceOnly ? <EmptyState
+        title={active.length ? "Nenhum balanço neste filtro" : "Nenhum balanço registrado"} icon="history"
+        action={active.length ? <button type="button" className={buttonClass} onClick={() => setFilters(defaults)}>Limpar filtros</button> : undefined}>
+        {active.length ? "Altere o período ou a situação para consultar outros registros." : "As contagens registradas neste paciente aparecerão aqui."}
+      </EmptyState> : !error ? <EmptyState title={active.length ? "Nenhuma ficha encontrada" : "Ainda não há fichas neste paciente"}>{active.length ? "Ajuste ou limpe os filtros para consultar novamente." : "As fichas emitidas neste contexto aparecerão aqui."}</EmptyState> : null}</div>
+    </section> : null}
+    {read.data && total > 20 ? <nav className="compact-pagination history-pagination" aria-label="Páginas do histórico"><span>{total} {balanceOnly ? "balanços" : "fichas"}</span><div><button className="btn btn-icon" type="button" aria-label="Anterior" disabled={page <= 1 || loading || Boolean(error)} onClick={() => setPage(page - 1)}><Icon name="chevron" style={{ transform: "rotate(180deg)" }} /></button><span>{page} / {Math.ceil(total / 20)}</span><button className="btn btn-icon" type="button" aria-label="Próxima" disabled={page * 20 >= total || loading || Boolean(error)} onClick={() => setPage(page + 1)}><Icon name="chevron" /></button></div></nav> : null}
   </div>;
 }

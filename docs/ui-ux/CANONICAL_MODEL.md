@@ -20,6 +20,11 @@ autorizados nas superfícies compartilhadas de L1. A v7 já incorpora os
 comentários aprovados. O [registro de execução](../audits/D/D-B/LOTES_EXECUCAO.md)
 acompanha as comparações feitas e as pendências de implementação.
 
+Em E07–E09, o [laboratório L3 v4](../../hca-laboratorio-03-v4-aprovado.html)
+rege estoque, consumo e faltas, plantões e balanços, arquivos da ficha e
+validação pública. O [comando mestre L3](../../HCA_L3_COMANDO_MESTRE_CODEX_V4.md)
+delimita os impactos nas superfícies de L1/L2 e os contratos preservados.
+
 ## Precedência
 
 Esta ordem posterior substitui as orientações visuais conflitantes. Auditorias,

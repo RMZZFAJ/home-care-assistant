@@ -1799,6 +1799,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123131427_l3_document_attachment_display_facts` | Aplicada | Aplicada |
 | `20261123142332_l3_family_stock_receipt_scope` | Aplicada | Aplicada |
 | `20261123150554_l3_stock_transit_transfer_facts` | Aplicada | Aplicada |
+| `20261123165105_l3_balance_history_count_author` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -3346,9 +3347,10 @@ WhatsApp ainda requer homologação do provedor.
 - **E07-13** — Falha de consulta, escopo da equipe e retirada de dados sem
   autorização. `stock-read-validation.spec.ts`,
   `consumption-list-completeness.spec.ts`.
-- **E08-01** — Navegação integrada, agenda por dia e balanços previstos.
+- **E08-01** — Navegação integrada, agenda por dia, balanços previstos e
+  histórico de contagens com filtro e retorno preservados.
   `schedule-residence-hours.spec.ts` e seção Calendário diário em Plantões e
-  balanços.
+  balanços. Histórico em `operational-history-completeness.spec.ts`.
 - **E08-02** — Residência, horário noturno, exceção e recorrência sem fim
   informado. `schedule-residence-hours.spec.ts`,
   `schedule-residence-hours.test.mjs`.
@@ -3501,6 +3503,36 @@ WhatsApp ainda requer homologação do provedor.
   A CI passa a distribuir o mesmo conjunto de testes do iOS em três
   grupos, com relatórios separados e o mesmo limite por grupo. A coleta
   confirmou 197, 200 e 187 casos, cobrindo os 584 sem duplicação.
+
+### Histórico de balanços
+
+- Na aba **Histórico**, os cartões de E08-01 mostram código, data de
+  registro, autoria da contagem vigente e situação. **Em revisão** e
+  **Aplicado** correspondem ao estado da ficha. O diálogo compartilhado
+  consulta situação e período, com código ou protocolo para busca específica.
+  As atribuições, os atrasos, os eventos auditáveis e o histórico da agenda
+  continuam acessíveis abaixo da lista de BAL.
+- A consulta reutiliza a paginação autorizada de `/api/documents?type=BAL`.
+  A data do filtro é a criação da ficha. A migration
+  `20261123165105_l3_balance_history_count_author.sql` acrescenta o nome
+  preservado do autor da contagem, sem expor o identificador do ato.
+  A ausência de nome histórico é explícita. A consulta geral e a ciência
+  familiar de REQ conservam o contrato anterior.
+- A integração com Auth real confirmou a autoria preservada, a separação dos
+  filtros de revisão e aplicação, a recusa entre pacientes e a retirada da
+  ficha após revogar `bal.read`. A regressão de ciência de L1 passou.
+  O resguardo cifrado `2069c8b3-8d89-4e21-9716-aa9d873da416` preserva a
+  definição e os grants anteriores. A prévia remota selecionou somente esta
+  migration. O ensaio confirmou os grants e foi revertido antes da aplicação.
+  O remoto conservou a consulta restrita ao papel autenticado. As 362 versões
+  conferem com o banco local e com a cadeia do checkout.
+- O teste dirigido passou em Chromium, Android e iOS emulados. Exercitou
+  o diálogo por teclado, a separação dos registros pelo filtro **Aplicado**,
+  o período sem resultado, a limpeza e o retorno da ficha com o filtro
+  ativo. Foram comparados os cartões do produto e da v4 em 360 e 412 px.
+  O ensaio usa uma conta fictícia com vínculo único para chegar ao histórico
+  após o login. O ensaio final em WebKit confirmou também o destino de
+  retorno com a página preservada quando o histórico abre por link da agenda.
 
 ## L4
 

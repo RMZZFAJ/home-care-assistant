@@ -29,6 +29,7 @@ import { balanceRegimeSettingsHref } from "@/lib/schedules/routes";
 import { balanceCountHref } from "@/lib/balances/routes";
 import type { DocumentSummary } from "@/types/documents";
 import { BalancePreviewCard } from "./balance-preview-card";
+import { BalanceHistoryRow } from "./balance-history";
 import { canManageBalanceRegime } from "./balance-regime-settings";
 
 function balanceDateTitle(instant: string, timeZone?: string) {
@@ -354,14 +355,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
           <div className="hca-balance-list-heading"><h2>Em acompanhamento</h2></div>
           {documents.map((d) => (
             <div key={d.id} className="hca-balance-review">
-              <Link href={"/documentos/" + d.id} className="hca-balance-review-link" prefetch={false}>
-                <span className="hca-balance-preview-icon"><Icon name="file" width={21} height={21} /></span>
-                <span>
-                  <strong>{d.code ?? "Contagem de estoque"}</strong>
-                  <small>{formatBrazilDate(d.created_at)}</small>
-                </span>
-                <Pill tone="warning">Em revisão</Pill>
-              </Link>
+              <BalanceHistoryRow row={d} href={"/documentos/" + d.id} />
               {data.obligations.some(
                 (o) =>
                   o.count_document_id === d.id || o.regularized_by === d.id,

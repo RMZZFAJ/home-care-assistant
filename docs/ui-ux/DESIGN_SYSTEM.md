@@ -10,6 +10,11 @@ E01–E03 seguem também a revisão L1 posterior, indicada no
 dessa revisão: materiais unificados, atualização da cópia, Andamentos,
 identificação compacta e cartões do início. Controles de simulação ficam no HTML.
 
+O [contrato canônico](CANONICAL_MODEL.md) também referencia as revisões L2 v7
+e L3 v4 para suas superfícies. No Histórico de Plantões e balanços, as fichas
+usam cartões compactos com código, data, autoria e situação. Os filtros
+abrem no diálogo compartilhado. A navegação conserva a consulta de origem.
+
 Os PDFs têm [referência documental própria](../documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md),
 autorizada em 11/11/2026. A composição impressa não substitui este sistema visual
 da aplicação; autoria, estados e ícones conservam o significado compartilhado.

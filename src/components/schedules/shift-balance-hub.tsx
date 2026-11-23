@@ -63,7 +63,6 @@ function ShiftBalanceContent({ context, entry, requested, scheduleHistoryRequest
     </> : null}
     {view === "history" ? <>
       {balances ? <>
-        <h2>Histórico de balanços</h2>
         <HistoryContent context={context} balanceOnly />
         <BalanceAssignmentHistory patientId={patient.id} />
       </> : null}

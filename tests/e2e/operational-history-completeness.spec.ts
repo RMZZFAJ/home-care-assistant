@@ -1,8 +1,12 @@
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { actor, fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { historyFixture } from "../integration/read-history-fixtures.mjs";
+import { balApply, balCommand, balState, legacyBalance } from "../integration/bal-review-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
@@ -10,15 +14,107 @@ import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
-async function login(page: Page, patient: string, role: "adminA" | "professional" = "adminA") {
-  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures[role].email);
+async function signIn(page: Page, email: string, next?: string) {
+  await page.goto(next ? "/login?" + new URLSearchParams({ next }) : "/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
+}
+async function login(page: Page, patient: string, role: "adminA" | "professional" = "adminA") {
+  await signIn(page, fixtures[role].email);
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
 }
 const auditPanel = (page: Page) => page.getByRole("region", { name: "Histórico de auditoria", exact: true });
 const schedulePanel = (page: Page) => page.getByRole("region", { name: "Histórico da agenda", exact: true });
 const ids = (panel: ReturnType<typeof auditPanel>, attribute: string) => panel.locator(`li[${attribute}]`).evaluateAll((nodes, key) => nodes.map(node => node.getAttribute(key)), attribute);
 const auditFacts = (patient: string) => sql(`select encode(sha256(convert_to(jsonb_agg(to_jsonb(a) order by id)::text,'UTF8')),'hex') from public.audit_events a where metadata->>'care_recipient_id'=${q(patient)};`);
+
+test("balance history uses the v4 records and filters while preserving the authorized return", async ({ page, browser }, info) => {
+  const f = await legacyBalance({ quantity: "1" });
+  const family = await actor("family", f.patient);
+  const source = await rpc(family, "operational_document", { p_id: f.document.id });
+  const review = await balCommand(family, source, { group: "family", reviewReference: source.balanceReview.referenceHash });
+  expect(review.error).toBeNull();
+  const applied = await balApply(family, review.data);
+  expect(applied.error).toBeNull();
+  const pending = await rpc(f.admin, "create_supply_document", {
+    p_patient: f.patient, p_type: "BAL", p_payload: f.payload, p_key: randomUUID(),
+  });
+  const before = [balState(f.document.id), balState(pending.id)];
+
+  const viewer = await shiftWorker(f.patient, "family");
+  const destination = `/balancos?careRecipientId=${f.patient}&view=history`;
+  await signIn(page, viewer.email, destination);
+  await expect(page).toHaveURL(url => url.pathname + url.search === destination, { timeout: 30_000 });
+  const list = page.getByRole("region", { name: "Balanços registrados", exact: true });
+  const appliedRow = list.getByRole("link").filter({ hasText: f.document.code });
+  const pendingRow = list.getByRole("link").filter({ hasText: pending.code });
+  await expect(appliedRow).toContainText("Aplicado");
+  await expect(appliedRow).toContainText(source.balanceReview.counter.name);
+  await expect(pendingRow).toContainText("Em revisão");
+  await expect(appliedRow.locator("time")).toHaveAttribute("datetime", f.document.created_at);
+
+  const labContext = await browser.newContext();
+  try {
+    const lab = await labContext.newPage();
+    await lab.route(/^https?:/, route => route.abort());
+    await lab.goto(pathToFileURL(resolve("hca-laboratorio-03-v4-aprovado.html")).href);
+    mkdirSync("output/playwright/phase-d", { recursive: true });
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 920 });
+      await lab.evaluate(width => {
+        const reference = (window as unknown as { HCA: { lab: { width: number }; launch: (scenario: string, state: string) => void } }).HCA;
+        reference.lab.width = width;
+        reference.launch("E08-01", "day");
+      }, width);
+      await lab.locator('[data-act="b3-hub-tab:history"]').click();
+      const referenceRow = lab.locator(".bv3-record-row").first();
+      await expect(referenceRow).toBeVisible();
+      await expect(appliedRow.locator("..")).toHaveCSS("border-radius", await referenceRow.evaluate(node => getComputedStyle(node).borderRadius));
+      await auditFromTop(page, `balance history ${width}`);
+      await list.screenshot({ path: `output/playwright/phase-d/balance-history-${info.project.name}-${width}.png` });
+      await referenceRow.screenshot({ path: `output/playwright/phase-d/balance-history-v4-${info.project.name}-${width}.png` });
+    }
+  } finally { await labContext.close(); }
+
+  const filter = page.getByRole("button", { name: "Filtrar balanços", exact: true });
+  const dialog = page.getByRole("dialog", { name: "Filtrar balanços", exact: true });
+  await filter.focus();
+  await filter.press("Enter");
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(filter).toBeFocused();
+  await filter.click();
+  await dialog.getByLabel("Situação", { exact: true }).selectOption({ label: "Aplicado" });
+  await dialog.getByRole("button", { name: "Aplicar filtro", exact: true }).click();
+  await expect(page).toHaveURL(/status=approved/);
+  await expect(appliedRow).toBeVisible();
+  await expect(pendingRow).toHaveCount(0);
+  await expect(filter).toBeFocused();
+
+  await appliedRow.click();
+  await expect(page).toHaveURL(new RegExp("/documentos/" + f.document.id));
+  await page.getByRole("navigation", { name: "Localização da ficha" }).getByRole("link", { name: "Fichas" }).click();
+  await expect(page).toHaveURL(/view=history.*status=approved|status=approved.*view=history/);
+  await expect(appliedRow).toBeVisible();
+  await expect(pendingRow).toHaveCount(0);
+
+  await filter.click();
+  await expect(dialog.getByLabel("Situação", { exact: true })).toHaveValue("approved");
+  await dialog.getByLabel("A partir de", { exact: true }).fill("2099-01-01");
+  await dialog.getByRole("button", { name: "Aplicar filtro", exact: true }).click();
+  await expect(list.getByRole("heading", { name: "Nenhum balanço neste filtro" })).toBeVisible();
+  await list.getByRole("button", { name: "Limpar filtros", exact: true }).click();
+  await expect(list.getByRole("link")).toHaveCount(2);
+
+  await page.goto(`/escalas?careRecipientId=${f.patient}&scheduleHistoryPage=1`);
+  await expect(appliedRow).toContainText("Aplicado");
+  const target = new URL((await appliedRow.getAttribute("href"))!, page.url());
+  const returnTo = new URL(target.searchParams.get("returnTo") ?? "/", page.url());
+  expect(returnTo.pathname).toBe("/escalas");
+  expect(returnTo.searchParams.get("view")).toBe("history");
+  expect(returnTo.searchParams.get("scheduleHistoryPage")).toBe("1");
+  expect([balState(f.document.id), balState(pending.id)]).toEqual(before);
+});
 
 test("audit history binds every read to patient and filters,retains valid same-scope data and clears denied content", async ({ page }) => {
   const f = await historyFixture(); await login(page, f.patient); const before = auditFacts(f.patient);
