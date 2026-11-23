@@ -117,7 +117,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [editorOrigin, setEditorOrigin] = useState<ReminderOrigin | null>(null);
   const [teamEditor, setTeamEditor] = useState<HTMLElement | null>(null);
   const [teamFlow, setTeamFlow] = useState<FlowSubmission>();
-  const [shortage, setShortage] = useState<HTMLElement | null>(null);
+  const [shortage, setShortage] = useState<{ opener: HTMLElement; origin?: ReminderOrigin } | null>(null);
   const mayRecordTeam = can(context, "consumption.team.write") && context.patient?.is_active !== false;
   const mayReadStock = can(context, "stock.family.read") || can(context, "stock.team.read");
   const mayOpenLegacy = mayReadStock || can(context, "consumption.report");
@@ -323,6 +323,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           if (mayRecordTeam) setTeamEditor(opener);
           else setEditor(opener);
         }}
+        onShortage={mayRecordTeam ? (origin, opener) => setShortage({ opener, origin }) : undefined}
       />
       {message ? <Notice>{message}</Notice> : null}
       <section className="hca-consumption-list" aria-label="Relatos registrados">
@@ -409,7 +410,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           </ActionButton>
         ) : null}
         {mayRecordTeam ? <div className="hca-consumption-actions">
-          <ActionButton onClick={event => setShortage(event.currentTarget)}><Icon name="bell" /> Avisar falta</ActionButton>
+          <ActionButton onClick={event => setShortage({ opener: event.currentTarget })}><Icon name="bell" /> Avisar falta</ActionButton>
           <ActionButton variant="primary" onClick={event => {
             setEditorOrigin(null);
             setTeamEditor(event.currentTarget);
@@ -513,7 +514,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
       ) : null}
       {!teamFlow ? teamWizard : null}
       {shortage && mayRecordTeam ? <TeamConsumptionAction context={context} kind="shortage" products={products}
-        opener={shortage} onClose={() => setShortage(null)} onSaved={id => {
+        opener={shortage.opener} sourceReminder={shortage.origin} onClose={() => setShortage(null)} onSaved={id => {
+          triggerRef.current = shortage.opener;
           setShortage(null);
           setAttempt(value => value + 1);
           open(id);

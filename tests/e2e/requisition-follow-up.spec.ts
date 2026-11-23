@@ -115,15 +115,18 @@ test("REQ follow-up reaches pending ENT and partial fulfillment; stale reads and
   dialog = page.getByRole("dialog", { name: ent.code, exact: true });
   await expect(dialog.getByRole("alert")).toBeVisible();
   await expect(dialog.getByText("Material fictício V4 0", { exact: false })).toHaveCount(0);
-  const materialRead = page.waitForResponse(response => {
-    const url = new URL(response.url());
-    return url.pathname === `/api/documents/${req.id}/materials` && url.searchParams.has("line");
-  });
   await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
-  expect((await materialRead).ok()).toBe(true);
   await expect(dialog.getByRole("alert")).toBeVisible();
+  await expect(dialog.getByText("Material fictício V4 0", { exact: false })).toHaveCount(0);
   await dialog.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
   await expect(linked).toBeFocused();
+  const materialRead = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname === `/api/documents/${req.id}/materials` && url.searchParams.get("section") === "stock";
+  });
+  await drawer.getByRole("tab", { name: "Estoque", exact: true }).click();
+  expect((await materialRead).ok()).toBe(true);
+  await expect(drawer.getByRole("region", { name: "Estoque atual", exact: true })).toBeVisible();
   expect(writes).toEqual([]);
   expect(facts(f.patient)).toBe(partial);
 });

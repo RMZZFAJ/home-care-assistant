@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { MaterialReview } from "@/components/documents/material-review";
+import type { ReminderOrigin } from "@/components/notifications/notification-reference";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { WizardQuantityInput } from "@/components/forms/wizard-material-tools";
 import { ActionButton, FormField, SelectField, TextAreaField } from "@/components/ui/controls";
@@ -10,6 +11,7 @@ import { useOperationActivity } from "@/components/ui/operation-activity";
 import { Notice, type WorkspaceContext } from "@/components/workspace";
 import { api, ApiError } from "@/lib/client/api";
 import { formatQuantity } from "@/lib/quantity";
+import { formatBrazilDate } from "@/lib/receipt";
 import { teamConsumptionCommand, teamConsumptionReceipt, type TeamConsumptionCommand } from "@/lib/validation/consumption";
 import type { ConsumptionReport } from "@/types/consumption";
 import type { CatalogProduct } from "@/types/documents";
@@ -19,23 +21,25 @@ export type TeamConsumptionActionKind = Command["action"];
 const labels = { shortage: "Avisar falta à família", cancel: "Cancelar este consumo?" };
 const route = "/api/consumption/records";
 
-export function TeamConsumptionAction({ context, kind, report, products, opener, onClose, onSaved }: {
+export function TeamConsumptionAction({ context, kind, report, products, sourceReminder, opener, onClose, onSaved }: {
   context: WorkspaceContext;
   kind: TeamConsumptionActionKind;
   report?: ConsumptionReport;
   products: CatalogProduct[];
+  sourceReminder?: ReminderOrigin;
   opener: HTMLElement;
   onClose: () => void;
   onSaved: (id: string) => void;
 }) {
   const patient = context.patient!.id;
-  const cache = `hca:official-team-consumption:${context.userId}:${patient}:${kind}:${report?.id ?? "new"}`;
+  const cache = `hca:official-team-consumption:${context.userId}:${patient}:${kind}:${report?.id ?? sourceReminder?.id ?? "new"}`;
   const [pending, setPending] = useState<Command | null>(() => {
     try {
       const stored = teamConsumptionCommand.safeParse(JSON.parse(sessionStorage.getItem(cache) ?? "null"));
       if (!stored.success || stored.data.action !== kind || stored.data.careRecipientId !== patient) return null;
       const target = stored.data.action === "shortage" ? stored.data.repeatedReportId : stored.data.reportId;
-      return target === report?.id ? stored.data : null;
+      if (target !== report?.id || stored.data.action === "shortage" && stored.data.reminderId !== sourceReminder?.id) return null;
+      return stored.data;
     } catch { return null; }
   });
   const [observation, setObservation] = useState(kind === "shortage" && report ? "O material continua em falta. Precisamos de reposição." : "");
@@ -71,7 +75,7 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
       const scope = { careRecipientId: patient, idempotencyKey: crypto.randomUUID(), action: kind };
       const materials = lines.map(({ productId, quantity, unit }) => ({ productId, quantity, unit }));
       const parsed = teamConsumptionCommand.safeParse(kind === "shortage"
-        ? { ...scope, observation, lines: materials, repeatedReportId: report?.id }
+        ? { ...scope, observation, lines: materials, repeatedReportId: report?.id, reminderId: sourceReminder?.id }
         : { ...scope, reportId: report?.id, expectedVersion: report?.version, reason });
       if (!parsed.success || (parsed.data.action !== "shortage" && parsed.data.action !== "cancel")) {
         setError(kind === "shortage" ? "Confira a mensagem e as quantidades que você informou." : "Informe o motivo do cancelamento.");
@@ -110,6 +114,10 @@ export function TeamConsumptionAction({ context, kind, report, products, opener,
       </ActionButton>
     </div>}>
     <div className="hca-form-stack">
+      {sourceReminder ? <section aria-label="Origem preservada do relato" className="hca-attention">
+        <div><strong>Lembrete de registro de ocorrências</strong>
+          <p>{formatBrazilDate(sourceReminder.expectedAt)} · Estoque da equipe</p></div>
+      </section> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {pending ? <Notice>Confira o resultado antes de iniciar outro registro.</Notice> : <>
         {kind === "cancel" && report ? <section className="hca-form-stack" aria-label="Materiais que voltarão ao estoque">

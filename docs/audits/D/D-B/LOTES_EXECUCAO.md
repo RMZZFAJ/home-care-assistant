@@ -3405,6 +3405,14 @@ WhatsApp ainda requer homologação do provedor.
   a seleção de custódia na Administração, as abas e os atalhos das fichas,
   a consulta em trânsito e a conferência pública do PDF por código e hash.
   A chave interna do exemplar permanece restrita à consulta autorizada.
+- O caso de aviso de falta acessado pelo lembrete passou em Android
+  emulado com a origem preservada, um único envio e recuperação pelo
+  recibo original, sem baixa de estoque. A REQ continuou exibindo seus
+  dados autorizados depois de negar a consulta da ENT vinculada.
+- A execução anterior de iOS recuperou na retentativa a abertura do filtro
+  de relatos. Também encontrou uma falha de sobreposição na revisão da ENT
+  e esgotou o tempo do primeiro shard. A causa da sobreposição segue em
+  apuração.
 - A lista remota de migrations coincide com o checkout. As duas novas
   versões do conjunto, `20261123130151` e `20261123131427`, já constam
   no Supabase vinculado. Os ajustes de navegador dispensam migração.
