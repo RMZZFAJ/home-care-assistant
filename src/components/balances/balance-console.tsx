@@ -22,6 +22,7 @@ import { formatZonedDate } from "@/lib/schedules/time";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { weekDays, type BalanceEditor } from "./balance-forms";
 import { DeferralFacts } from "./balance-deferral-facts";
+import { BalanceCountPermissionAction, BalanceCountPermissionHistory } from "./balance-count-permissions";
 import { useBalanceWorkspace } from "./use-balance-workspace";
 import type { DocumentSummary } from "@/types/documents";
 export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
@@ -190,7 +191,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
                 : new Date(a.starts_at).getTime() > now
                   ? "Contagem agendada; aguarde o início do plantão."
                   : a.professional_id !== context.userId
-                    ? "A contagem é exclusiva da pessoa designada."
+                    ? "Outro profissional está responsável por este balanço."
                     : "O prazo ou a atribuição mudou. Aguarde a atualização formal."}
             </p>
             <div className="hca-toolbar">
@@ -210,6 +211,8 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
                   {data.eligibility.admission ? "Continuar contagem" : "Fazer balanço"}
                 </Link>
               ) : null}
+              {data.countPermissions?.request ? <BalanceCountPermissionAction key={data.countPermissions.request.assignmentId}
+                entry={{ request: data.countPermissions.request }} context={context} timezone={data.regime?.timezone} onChanged={reload} /> : null}
               {approve || canRequest ? (
                 <ActionButton
                   onClick={(e) =>
@@ -255,6 +258,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
           </p>
         )}
       </section>
+      <BalanceCountPermissionHistory rows={data.countPermissions?.history ?? []} context={context} timezone={data.regime?.timezone} onChanged={reload} />
       {data.recountRecovery.total > 0 ? (
         <section
           className="ui-card space-y-3"

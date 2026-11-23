@@ -2624,6 +2624,33 @@ Android e iOS emulados confirmaram a retomada de um salvamento com
 resposta perdida, o rascunho de extra decimal, a emissão e o acesso aos
 botões da revisão em larguras de 320 a 1440 px.
 
+### Pedido de autorização para contar o BAL
+
+Quem está habilitado a contar pode pedir autorização quando outro
+profissional é responsável. O painel registra a justificativa e mostra o
+pedido à administração do paciente. A decisão usa o mesmo fluxo de
+confirmação e recuperação das demais decisões curtas do BAL. O histórico
+conserva a autoria, as datas, a justificativa e a observação da decisão.
+
+A aprovação vincula o solicitante a um plantão real publicado que cobre o
+prazo original. A seleção confirma a versão desse plantão. Um pedido
+pendente mantém a atribuição vigente. A recusa registra a decisão sem
+transferir a contagem. Uma contagem já admitida impede a aprovação de
+troca. O pedido e a decisão não registram movimentos de estoque.
+
+Três testes de integração com Auth real verificaram escopo, negativa para
+outros papéis, alteração de plantão, idempotência e concorrência entre
+aprovar e iniciar a contagem. Chromium, Android e iOS emulados confirmaram
+a solicitação, a recuperação após resposta perdida, a decisão pela
+administração e a entrada do profissional autorizado no assistente.
+
+A migration `20261123021122_l3_balance_count_permission.sql` foi aplicada
+localmente e no Supabase remoto. O backup crítico cifrado
+`877df471-bae1-45ff-90b0-b2dfca3826ba` foi verificado antes da aplicação.
+A conferência remota confirmou 344 migrations, fila vazia, RLS ativa e
+acesso aos pedidos pelo fluxo autorizado do BAL. Os testes de escrita
+usaram uma residência fictícia no ambiente local.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.
