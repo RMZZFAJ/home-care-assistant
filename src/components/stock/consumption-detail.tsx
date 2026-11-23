@@ -2,7 +2,9 @@
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { FeedbackBanner } from "@/components/ui/feedback";
 import { DocumentProgress } from "@/components/documents/document-progress";
+import { CatalogueMaterialPanel } from "@/components/documents/catalogue-material-panel";
 import { DocumentPanel, DocumentTabs, useDocumentTabs } from "@/components/documents/document-tabs";
+import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
@@ -18,9 +20,10 @@ import { useLiveRevision } from "@/lib/use-live-revision";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import type { CatalogProduct } from "@/types/documents";
-import type { ConsumptionReport } from "@/types/consumption";
+import type { ConsumptionLine, ConsumptionReport } from "@/types/consumption";
 import { ConsumptionPrivateResults } from "./consumption-private-results";
 import { ConsumptionLines } from "./consumption-lines";
+import { ConsumptionMaterialFacts } from "./consumption-material-facts";
 import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDecision } from "./consumption-decision";
 import { TeamConsumptionAction, type TeamConsumptionActionKind } from "./team-consumption-action";
@@ -54,6 +57,7 @@ export function ConsumptionDetail({
     [reading, setReading] = useState(true);
   const [editor, setEditor] = useState<HTMLElement | null>(null),
     [teamAction, setTeamAction] = useState<{ kind: TeamConsumptionActionKind; opener: HTMLElement; report: ConsumptionReport } | null>(null),
+    [material, setMaterial] = useState<{ line: ConsumptionLine; opener: HTMLElement; scroll: number } | null>(null),
     [decision, setDecision] = useState<{
       report: ConsumptionReport;
       accept: boolean;
@@ -105,6 +109,7 @@ export function ConsumptionDetail({
             setMessage("");
             setEditor(null);
             setDecision(null);
+            setMaterial(null);
           }
         }
       })
@@ -157,6 +162,28 @@ export function ConsumptionDetail({
   const canAmend = mayWrite && data?.status === "recorded" && (data.reported_by === context.userId || can(context, "consumption.team.correct"));
   const progressType = data?.kind === "shortage" ? "FAL" : "CON";
   const recordLabel = progressType + "-" + id.slice(0, 8).toUpperCase();
+  const currentProducts = new Set(data?.current_lines.map(line => line.productId));
+  const previousMaterials = data?.revisions.length
+    ? [...new Map([data.lines, ...data.revisions.map(revision => revision.lines)].flat()
+      .filter(line => !currentProducts.has(line.productId)).map(line => [line.productId, line])).values()]
+    : [];
+  function consult(line: ConsumptionLine) {
+    const name = line.name ?? "material com nome não preservado";
+    return <ActionButton variant="quiet" compact className="hca-material-consult-button"
+      aria-label={`Consultar material ${name}`}
+      onClick={event => setMaterial({ line, opener: event.currentTarget, scroll: window.scrollY })}>
+      <Icon name="eye" />Consultar material
+    </ActionButton>;
+  }
+  function closeMaterial() {
+    const origin = material;
+    setMaterial(null);
+    requestAnimationFrame(() => {
+      const field = origin?.opener.isConnected ? origin.opener : headingRef.current;
+      field?.focus({ preventScroll: true });
+      if (origin) window.scrollTo({ top: origin.scroll, behavior: "instant" });
+    });
+  }
   return (
     <section className="ui-card space-y-4" aria-label="Detalhe do relato">
       <div className="hca-toolbar">
@@ -208,6 +235,15 @@ export function ConsumptionDetail({
           <DocumentTabs auditAllowed={false} sections={["materials", "progress"]}
             value={tabs.value === "progress" ? "progress" : "materials"} onSelect={tabs.select} rootRef={tabs.rootRef}>
           <DocumentPanel value="materials">
+          <section>
+            <h3 className="font-semibold">{data.kind === "shortage" ? "Materiais em falta" : "Materiais do consumo"}</h3>
+            <ConsumptionLines lines={data.current_lines} renderConsult={consult}
+              emptyMessage={data.kind === "shortage" ? "O aviso foi registrado sem materiais identificados." : undefined} />
+          </section>
+          {previousMaterials.length ? <section>
+            <h3 className="font-semibold">Materiais de versões anteriores</h3>
+            <ConsumptionLines lines={previousMaterials} renderConsult={consult} />
+          </section> : null}
           <details>
             <summary>Identificação do registro</summary>
             <p className="break-all">{data.id}</p>
@@ -232,7 +268,7 @@ export function ConsumptionDetail({
             <p className="my-2 whitespace-pre-wrap wrap-break-word">
               {data.body}
             </p>
-            <ConsumptionLines lines={data.lines} />
+            {data.revisions.length ? <ConsumptionLines lines={data.lines} /> : null}
           </section>
           {data.revisions.map((revision) => (
             <section
@@ -375,6 +411,11 @@ export function ConsumptionDetail({
               code={recordLabel} readOnly={context.patient?.is_active === false} />
           </DocumentPanel>
           </DocumentTabs>
+          {material ? <CatalogueMaterialPanel key={material.line.productId}
+            context={context} recordCode={recordLabel}
+            material={{ id: material.line.productId, name: material.line.name ?? "Material do relato", unit: material.line.unit }}
+            detail={<ConsumptionMaterialFacts report={data} material={material.line} />}
+            finalFocus={() => false} onClose={closeMaterial} closeText="Voltar à ficha" /> : null}
           {teamAction && mayWriteTeam ? <TeamConsumptionAction context={context} kind={teamAction.kind} report={teamAction.report}
             products={products} opener={teamAction.opener} onClose={() => setTeamAction(null)} onSaved={recordId => {
               setTeamAction(null);

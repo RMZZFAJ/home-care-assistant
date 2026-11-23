@@ -68,7 +68,7 @@ export function DocumentMaterialPanel({
   const { section, page, linked } = position;
   const { kind: linkKind, search: linkSearch } = position.linkFilters ?? allLinkFilters;
   const [linkText, setLinkText] = useState(linkSearch);
-  const contextual = Boolean(documentId);
+  const contextual = Boolean(documentId || documentCode);
   const sections: readonly PanelSection[] = contextual ? documentMaterialSections : materialPanelSections;
   const router = useRouter();
   const inheritedContext = use(MaterialVisitContext);

@@ -5,6 +5,7 @@ import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
+import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 
@@ -23,7 +24,7 @@ async function fixture() {
   await rpc(professional.client, "supply_document_command", {
     p_id: delivery.id, p_action: "receive", p_key: randomUUID(), p_version: delivery.version, p_body: { divergences: [] },
   });
-  return { ...f, professional, name };
+  return { ...f, professional, name, delivery };
 }
 
 async function openConsumption(page: Page, f: Awaited<ReturnType<typeof fixture>>) {
@@ -37,7 +38,7 @@ async function openConsumption(page: Page, f: Awaited<ReturnType<typeof fixture>
   await expect(page.getByRole("heading", { name: "Consumo e faltas", exact: true })).toBeVisible();
 }
 
-test("consumo preserva o último rascunho, recupera a baixa e permite correção e cancelamento", async ({ page }) => {
+test("consumo preserva o último rascunho, recupera a baixa e permite correção e cancelamento", async ({ page }, info) => {
   const f = await fixture();
   const balance = () => sql(`select private.stock_quantity(${q(f.patient)},${q(f.products[0])},'CARE_TEAM')::text`);
   const launch = page.getByRole("button", { name: "Registrar consumo", exact: true });
@@ -72,6 +73,34 @@ test("consumo preserva o último rascunho, recupera a baixa e permite correção
   const detail = page.getByRole("region", { name: "Detalhe do relato", exact: true });
   await expect(detail.getByText("Registrado", { exact: true })).toBeVisible();
   expect(Number(balance())).toBe(6);
+  const material = detail.getByRole("button", { name: "Consultar material " + f.name, exact: true });
+  const panel = page.getByRole("dialog", { name: f.name, exact: true });
+  await material.click();
+  const contextTab = panel.getByRole("tab", { name: /^Nesta ficha · CON-/ });
+  await expect(contextTab).toHaveAttribute("aria-selected", "true");
+  await expect(panel.getByRole("tab").first()).toHaveAccessibleName(/^Nesta ficha · CON-/);
+  await expect(panel.getByRole("heading", { name: "Material nesta ficha", exact: true })).toBeVisible();
+  await expect(panel.getByText("10 unidade", { exact: true })).toBeVisible();
+  await expect(panel.getByText("−4 unidade", { exact: true })).toBeVisible();
+  await expect(panel.getByText("6 unidade", { exact: true })).toBeVisible();
+  await audit(page, "material no consumo");
+  await info.attach("efeito-do-consumo", { body: await panel.screenshot(), contentType: "image/png" });
+  const linked = panel.getByRole("tab", { name: "Fichas", exact: true });
+  await linked.click();
+  const deliveryLink = panel.getByRole("button", { name: f.delivery.code, exact: true });
+  await deliveryLink.click();
+  const relation = page.getByRole("dialog", { name: f.delivery.code, exact: true });
+  const open = relation.getByRole("link", { name: "Abrir " + f.delivery.code, exact: true });
+  await open.click();
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("button", { name: "Voltar ao painel", exact: true }).click();
+  await expect(open).toBeFocused();
+  await relation.getByRole("button", { name: "Voltar ao material", exact: true }).click();
+  await expect(deliveryLink).toBeFocused();
+  await expect(linked).toHaveAttribute("aria-selected", "true");
+  await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
+  await expect(material).toBeFocused();
+  await expect(detail.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
   await detail.getByRole("tab", { name: "Andamentos", exact: true }).click();
   await expect(detail.getByText("Consumo registrado no estoque da equipe", { exact: true })).toBeVisible();
   await detail.getByRole("button", { name: "Novo andamento", exact: true }).click();
@@ -95,6 +124,13 @@ test("consumo preserva o último rascunho, recupera a baixa e permite correção
   await cancellation.getByRole("button", { name: "Confirmar", exact: true }).click();
   await expect(detail.getByText("Cancelado", { exact: true })).toBeVisible();
   expect(Number(balance())).toBe(10);
+  await material.click();
+  const compensation = panel.locator("section").filter({
+    has: page.getByRole("heading", { name: "Compensação do cancelamento · versão 3", exact: true }),
+  }).last();
+  await expect(compensation.getByText("7 unidade", { exact: true })).toBeVisible();
+  await expect(compensation.getByText("+3 unidade", { exact: true })).toBeVisible();
+  await expect(compensation.getByText("10 unidade", { exact: true })).toBeVisible();
 });
 
 test("consumo compara a revisão mais recente quando o envio é rejeitado por outro editor", async ({ page }) => {

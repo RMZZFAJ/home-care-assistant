@@ -48,6 +48,9 @@ export type ConsumptionReport = ConsumptionSummary & {
     source: string | null;
     destination: string | null;
     createdAt: string;
+    actId?: string | null;
+    balanceBefore?: string | null;
+    balanceAfter?: string | null;
   }[];
   acts?: {
     id: string;

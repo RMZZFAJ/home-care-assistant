@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — painel de material no consumo e na falta.** A ficha abre os
+saldos e efeitos do material com os movimentos de baixa, correção e
+compensação identificados por ato. Local e remoto registram 348 migrations.
+O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação)
+reúne os testes e as lacunas abertas.
+
 **22/11 — início de L3.** A branch `feat/phase-d-continuation` recebeu
 o commit `fab595c7` por avanço direto. A ordem e o laboratório v4
 organizam o lote em estoque e consumo, plantões e balanços, e arquivos

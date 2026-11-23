@@ -83,6 +83,17 @@ test("team consumption issues directly, corrects by differences, and compensates
   assert.equal(result.status, "cancelled");
   assert.deepEqual(result.acts.map(row => row.action), ["issue", "correct", "cancel"]);
   assert.equal(result.movements.length, 6);
+  const effects = result.acts.map(act => {
+    const movement = result.movements.find(row => row.actId === act.id && row.productId === f.products[0]);
+    assert.ok(movement);
+    return [act.action, Number(movement.balanceBefore), Number(movement.balanceAfter), Number(movement.quantity)];
+  });
+  const balance = started[0].team;
+  assert.deepEqual(effects, [
+    ["issue", balance, balance - 4, 4],
+    ["correct", balance - 4, balance - 2, 2],
+    ["cancel", balance - 2, balance, 2],
+  ]);
   const history = await rpc(f.professional, "stock_operation_history", {
     p_patient: f.patient, p_product: null, p_from: null, p_to: null, p_location: "CARE_TEAM",
     p_page: 1, p_size: 20, p_search: null, p_origin: "CON",

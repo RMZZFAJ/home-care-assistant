@@ -1785,6 +1785,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123022923_l3_balance_programming_observation` | Aplicada | Aplicada |
 | `20261123025445_l3_balance_extra_recount_links` | Aplicada | Aplicada |
 | `20261123035313_l3_shift_type_cycles` | Aplicada | Aplicada |
+| `20261123043302_l3_consumption_material_effects` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2132,9 +2133,12 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   e o wizard já chamam a API do novo contrato no checkout local.
   Os Andamentos de consumo e falta usam as abas e a publicação compartilhadas
   das fichas. O painel compartilhado usa o histórico por operação e
-  consulta as fichas relacionadas com filtros no servidor. Restam
-  a integração do painel ao detalhe de consumo, a continuidade pelo
-  canal existente e a conferência visual final.
+  consulta as fichas relacionadas com filtros no servidor. A aba Materiais
+  dos registros de consumo e falta abre esse mesmo painel com o contexto
+  do registro. A revisão das sugestões do WhatsApp ainda registra consumo
+  extraordinário pelo fluxo legado. A continuidade E07-12 depende de
+  concluir essa revisão com o mesmo contrato de consumo direto. A
+  conferência visual final da frente continua aberta.
 - **E08 — Plantões e balanços.** Em execução. A admissão da contagem
   iniciada no plantão já preserva a retomada. A área reúne Plantões,
   Balanços e Histórico com as permissões de cada leitura. A ficha tem
@@ -2142,9 +2146,10 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   horários por residência onde já configurados. Alterações de plantão que
   atingem uma contagem designada exigem encaminhamento explícito e registram
   a decisão na mesma transação. A administração dos tipos e dos horários
-  fica em Configurações → Plantões. Restam o contrato de duração e ciclo
-  do tipo, a transição das residências sem configuração e a conferência
-  visual. A contagem por plantão usa as cinco etapas. Extras têm
+  fica em Configurações → Plantões. Os tipos novos definem a duração e o
+  descanso do ciclo. Restam a transição das residências sem configuração
+  para a programação e a conferência visual. A contagem por plantão usa
+  as cinco etapas. Extras têm
   parecer individual e vínculo a recontos comprovados. A programação
   registra observação opcional e o pedido de autorização para contar
   fica no acompanhamento do BAL.
@@ -2780,6 +2785,35 @@ a criação do tipo, o horário excepcional, o ciclo sem data final,
 a recusa de sobreposição e o retorno à agenda. A confirmação do
 agendamento compara o conteúdo do recibo independentemente da ordem
 em que seus campos são serializados.
+
+### Contexto de material nas fichas de consumo e falta
+
+A aba Materiais abre a consulta compartilhada com **Nesta ficha** como
+primeira aba. A quantidade vem da versão atual do registro. Um material
+retirado numa correção permanece consultável em **Materiais de versões
+anteriores**. O painel mostra os atos vinculados, com saldo anterior,
+efeito e saldo posterior da custódia. Correção e compensação aparecem
+com suas próprias versões. Aviso de falta tem o contexto do aviso e os
+saldos ausentes aparecem como indisponíveis.
+
+Estoque, Histórico e Fichas usam as consultas compartilhadas. A ficha
+vinculada abre em Materiais dentro da consulta. O retorno conserva a aba,
+a ficha relacionada e o foco. A migration
+`20261123043302_l3_consumption_material_effects.sql` acrescenta os saldos
+já gravados e a identidade do ato à leitura autorizada.
+
+Passaram 16 testes de integração de consumo direto e de revisão de relatos.
+O teste de baixa, correção e cancelamento conferiu os saldos de cada ato
+e a compensação única.
+Em Chromium, Android e iOS emulados, passaram a consulta do material,
+a visita à entrega vinculada e o retorno com foco restaurado. As
+regressões de revisões legadas e de retorno do painel nas fichas também
+passaram nos três projetos.
+
+Antes da aplicação remota, o backup crítico cifrado
+`3904d57a-48c1-41e9-bf41-26aed7e7497b` foi verificado. Local e remoto
+registram 348 versões, com fila vinculada vazia. A leitura da ficha
+continua condicionada à autenticação e à permissão da custódia.
 
 ## L4
 

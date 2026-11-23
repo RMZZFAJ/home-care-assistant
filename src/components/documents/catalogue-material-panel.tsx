@@ -11,7 +11,7 @@ import { DocumentMaterialPanel, type MaterialPanelPosition } from "./document-ma
 
 type Material = { id: string; name: string; unit?: string | null };
 
-export function CatalogueMaterialPanel({ context, material, finalFocus, onClose, closeText, detail, detailTitle }: {
+export function CatalogueMaterialPanel({ context, material, finalFocus, onClose, closeText, detail, detailTitle, recordCode }: {
   context: WorkspaceContext;
   material: Material;
   finalFocus: () => HTMLElement | false;
@@ -19,14 +19,16 @@ export function CatalogueMaterialPanel({ context, material, finalFocus, onClose,
   closeText: string;
   detail?: ReactNode;
   detailTitle?: string;
+  recordCode?: string;
 }) {
   const revision = useLiveRevision();
   const [position, setPosition] = useState<MaterialPanelPosition>(() => ({
-    lineId: material.id, section: "stock", page: 1, panelScroll: 0, linked: null,
+    lineId: material.id, section: recordCode ? "document" : "stock", page: 1, panelScroll: 0, linked: null,
   }));
   const patient = context.patient;
   if (!patient) return null;
-  return <DocumentMaterialPanel patientId={patient.id} row={{ ...material, unit: material.unit ?? null, detail }}
+  return <DocumentMaterialPanel patientId={patient.id} documentCode={recordCode}
+    row={{ ...material, unit: material.unit ?? null, detail }}
     revision={`${context.userId}:${patient.role}:${revision}`} position={position} onPosition={setPosition}
     inlineContext={context} closeText={closeText} detailTitle={detailTitle} finalFocus={finalFocus} onClose={onClose} />;
 }
