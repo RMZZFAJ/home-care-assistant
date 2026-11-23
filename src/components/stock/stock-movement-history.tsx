@@ -28,7 +28,7 @@ export function StockMovementHistory({ operations, canCorrect = false, onOrigin,
   expanded?: readonly string[];
   onToggle?: (id: string, open: boolean) => void;
 }) {
-  return <div className="hca-stock-ledger" aria-label="Movimentos do estoque">
+  return <div className="hca-stock-ledger">
     {operations.map(operation => {
       const origin = stockOperationOrigins[operation.origin];
       const inbound = operation.rows.every(row => row.direction === "inbound");

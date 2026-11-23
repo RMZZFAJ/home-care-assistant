@@ -93,6 +93,7 @@ test("C-FINAL023 escala recupera leitura e preserva foco sem validar fuso propos
   const original = sql(
     `select to_jsonb(s) from public.scheduled_shifts s where id=${sqlLiteral(f.shift.id)};`,
   );
+  await page.getByLabel("Visualização", { exact: true }).selectOption("week");
   let writes = 0;
   page.on("request", (request) => {
     if (
@@ -116,7 +117,7 @@ test("C-FINAL023 escala recupera leitura e preserva foco sem validar fuso propos
   );
   await page
     .getByRole("group", { name: "Período da escala", exact: true })
-    .getByRole("button", { name: /Próxima semana|Próximo mês/ })
+    .getByRole("button", { name: "Próxima semana", exact: true })
     .click();
   await expect(
     page

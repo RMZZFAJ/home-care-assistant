@@ -2998,6 +2998,33 @@ A migration foi aplicada após o backup cifrado verificado
   Android e iOS emulados. Cobriu a nova tentativa após falha, a
   exigência de ciência e o retorno pelo botão e pelo histórico.
 
+### Calendário diário em Plantões e balanços
+
+- A entrada em Plantões abre o dia selecionado. A faixa semanal
+  permite escolher uma data ou avançar e recuar um dia. Os marcadores
+  vêm dos plantões retornados para o vínculo e os filtros ativos.
+- O cartão compacto apresenta horários, profissional e tipo. Para
+  plantões que atravessam a meia-noite, a ocorrência aparece em cada
+  dia em que está em andamento. O intervalo integral, o fuso e as
+  observações ficam nos detalhes do profissional.
+- O menu do plantão abre o editor de alteração pontual ou a proposta
+  conforme a permissão. O encerramento de uma série aparece quando
+  autorizado, com revisão própria. O cancelamento continua no editor
+  pontual e conserva a decisão sobre eventual balanço vinculado.
+- A interface mantém os modos Semana e Mês, os filtros de profissional
+  e situação e as rotas de referência. A lista de propostas e a
+  recuperação de operações anteriores continuam na área da agenda.
+- O atalho Balanço neste plantão fica pendente de uma consulta
+  autorizada que relacione ocorrências e balanços na agenda. A consulta
+  atual retorna o vínculo no fluxo de impacto da alteração.
+- A rodada encontrou e corrigiu um atributo de acessibilidade inválido
+  no contêiner de movimentos aberto a partir do alerta de estoque.
+  Este incremento dispensa migração.
+- A regressão dirigida passou em 21 casos no Chromium, Android e iOS
+  emulados. Cobriu leitura incompleta, restrição por profissional,
+  horários noturnos, edição, divergência de período, cancelamento
+  com balanço e navegação pelo alerta de estoque.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

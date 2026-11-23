@@ -540,7 +540,7 @@ button.hca-stock-material-pending { cursor: pointer; }
 .hca-schedule-agenda .hca-agenda-day h2 { padding: 13px 19px; margin: 0; font-size: 13px; font-weight: 670; color: var(--hca-teal); background: var(--hca-tint); overflow-wrap: anywhere; }
 .hca-schedule-agenda .hca-agenda-day > .hca-muted { padding: 14px 19px; }
 .hca-schedule-agenda .hca-shift-card { display: grid; grid-template-columns: 38px minmax(0,1fr); align-items: start; gap: 13px; padding: 16px 19px; margin: 0; background: var(--hca-paper); border: 0; border-bottom: 1px solid #eaf0ec; border-radius: 0; color: var(--hca-ink); min-width: 0; }
-.hca-schedule-agenda .hca-shift-card:last-child { border-bottom: 0; }
+.hca-schedule-agenda .hca-agenda-day > .hca-shift-card:last-child { border-bottom: 0; }
 .hca-shift-icon { display: grid; place-items: center; width: 38px; height: 40px; border-radius: 10px; background: var(--hca-tint); color: var(--hca-teal); flex: none; }
 .hca-shift-main { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .hca-shift-main strong { display: block; font-size: 13px; font-weight: 670; }
@@ -561,6 +561,56 @@ button.hca-stock-material-pending { cursor: pointer; }
   .hca-count-row, .hca-schedule-agenda .hca-agenda-desktop, .hca-schedule-agenda .hca-agenda-day, .hca-schedule-agenda .hca-shift-card { background: Canvas; color: CanvasText; border-color: CanvasText; }
   .hca-schedule-agenda .hca-agenda-day h2, .hca-shift-main small, .hca-shift-icon { background: Canvas; color: CanvasText; }
   .hca-shift-icon { border: 1px solid CanvasText; }
+}
+
+.hca-agenda-commands { justify-content: flex-end; }
+.hca-agenda-commands:empty { display: none; }
+.hca-agenda-subtitle { color: var(--hca-muted); font-size: 13px; line-height: 1.6; margin: 7px 0 0; }
+.hca-agenda-calendar { border: 1px solid var(--hca-line); border-radius: 14px; background: var(--hca-paper); }
+.hca-agenda-calendar-heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 13px 12px 9px; text-align: center; }
+.hca-agenda-calendar-heading strong { display: block; font-size: 15px; }
+.hca-agenda-calendar-heading strong::first-letter { text-transform: uppercase; }
+.hca-agenda-calendar-heading small { display: block; margin-top: 3px; font-size: 12px; color: var(--hca-muted); }
+.hca-agenda-calendar-heading .hca-control { min-width: 36px; }
+.hca-agenda-previous { transform: rotate(180deg); }
+.hca-agenda-calendar-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; padding: 8px 10px 12px; }
+.hca-agenda-calendar-week button { display: grid; justify-items: center; align-content: center; gap: 4px; position: relative; min-height: 62px; padding: 5px 2px 11px; border: 0; border-radius: 9px; background: transparent; color: var(--hca-ink); }
+.hca-agenda-calendar-week button small { font-size: 11px; text-transform: capitalize; }
+.hca-agenda-calendar-week button strong { font-size: 16px; line-height: 1.1; font-weight: 650; }
+.hca-agenda-calendar-week button span { position: absolute; bottom: 5px; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+.hca-agenda-calendar-week button[aria-pressed="true"] { background: var(--hca-teal); color: #fff; }
+.hca-agenda-roster-heading { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.hca-agenda-roster-heading h2 { margin: 0; font-size: 16px; }
+.hca-agenda-only-mine { width: fit-content; }
+.hca-agenda-only-mine > input { appearance: none; position: relative; width: 34px; height: 20px; border: 1px solid var(--hca-line); border-radius: 12px; background: var(--hca-tint); }
+.hca-agenda-only-mine > input::before { content: ""; position: absolute; inset: 2px auto 2px 2px; width: 14px; border-radius: 50%; background: var(--hca-muted); }
+.hca-agenda-only-mine > input:checked { background: var(--hca-teal); border-color: var(--hca-teal); }
+.hca-agenda-only-mine > input:checked::before { left: auto; right: 2px; background: #fff; }
+.hca-agenda-roster { display: grid; gap: 9px; }
+.hca-schedule-agenda .hca-shift-card--daily { display: grid; grid-template-columns: minmax(44px, auto) minmax(0, 1fr) auto; align-items: start; gap: 13px; padding: 16px; border: 1px solid var(--hca-line); border-radius: 13px; }
+.hca-agenda-shift-times { padding-top: 2px; font-variant-numeric: tabular-nums; }
+.hca-agenda-shift-times strong { font-size: 17px; font-weight: 650; }
+.hca-agenda-shift-times small, .hca-agenda-shift-person > small, .hca-agenda-shift-details small { display: block; font-size: 12px; line-height: 1.5; color: var(--hca-muted); margin-top: 3px; }
+.hca-agenda-shift-times small span { display: block; }
+.hca-agenda-shift-person { padding-left: 12px; border-left: 2px solid var(--hca-line); overflow-wrap: anywhere; }
+.hca-agenda-shift-person summary { display: block; width: fit-content; cursor: pointer; font-size: 15px; font-weight: 650; line-height: 1.4; }
+.hca-agenda-shift-person summary::-webkit-details-marker { display: none; }
+.hca-l1 .hca-agenda-shift-person details > summary::after { content: none; display: none; }
+.hca-agenda-shift-person summary:hover { text-decoration: underline; text-underline-offset: 3px; }
+.hca-agenda-shift-person .hca-pill { margin-top: 5px; }
+.hca-agenda-shift-details { margin-bottom: 8px; }
+.hca-agenda-icon.hca-control { min-width: 36px; min-height: 36px; padding: 5px; }
+.hca-agenda-empty { display: grid; justify-items: center; gap: 7px; padding: 24px 12px; text-align: center; background: var(--hca-paper); border: 1px solid var(--hca-line); border-radius: 13px; }
+.hca-agenda-empty p { margin: 0; }
+@media (max-width: 380px) {
+  .hca-schedule-agenda .hca-shift-card--daily { gap: 9px; padding: 14px 11px; }
+  .hca-agenda-shift-person { padding-left: 9px; }
+}
+@media (forced-colors: active) {
+  .hca-agenda-calendar, .hca-agenda-empty, .hca-agenda-shift-person { border-color: CanvasText; }
+  .hca-agenda-calendar-week button[aria-pressed="true"] { outline: 2px solid Highlight; outline-offset: -2px; }
+  .hca-agenda-only-mine > input { appearance: auto; width: 19px; height: 19px; }
+  .hca-agenda-only-mine > input::before { content: none; }
 }
 
 .hca-balance-console .hca-record { gap: 13px; padding: 16px 19px; color: var(--hca-ink); background: var(--hca-paper); border-bottom: 1px solid #eaf0ec; overflow-wrap: anywhere; }

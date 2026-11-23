@@ -6,6 +6,7 @@ import type { ScheduleResourcePurpose } from "@/lib/schedules/resource-preparati
 import type { ScheduleCreationPurpose } from "@/lib/schedules/creation";
 import {
   ActionButton,
+  CheckboxField,
   FormField,
   LoadingIndicator,
   SelectField,
@@ -26,6 +27,7 @@ import { useScopedRead } from "@/lib/use-scoped-read";
 import { parseScheduleListRead } from "@/lib/validation/schedule-list";
 import { formatBrazilDate } from "@/lib/receipt";
 import { adjacentPeriod, calendarPeriod, scheduleDisplayDay } from "@/lib/schedules/calendar";
+import { localMinute } from "@/lib/schedules/time";
 import type { ScheduleEditor } from "./schedule-forms";
 import type { ScheduledShift } from "@/types/schedules";
 import {
@@ -42,6 +44,8 @@ import { MenuPopup } from "@/components/ui/floating";
 import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
 import { scheduleResidenceSettingsHref, scheduleSettingsHref } from "@/lib/schedules/routes";
+import { ScheduleDayCalendar } from "./schedule-day-calendar";
+import { ScheduleShift } from "./schedule-shift";
 
 const today = (timeZone?: string) =>
   new Intl.DateTimeFormat("sv-SE", { timeZone }).format(
@@ -54,7 +58,12 @@ const stateLabels: Record<string, string> = {
   rejected: "Recusado",
   obsolete: "Obsoleto",
 };
-import { ScheduleShift } from "./schedule-shift";
+const recurrenceLabels: Record<string, string> = {
+  once: "Plantão único",
+  weekly: "Semanal",
+  dates: "Datas específicas",
+  cycle: "Ciclo de trabalho e descanso",
+};
 export function PatientSchedule({ context, settings = false }: {
   context: WorkspaceContext;
   settings?: boolean;
@@ -258,13 +267,15 @@ function Agenda({
         ? notice.data.referenceDay
         : fallbackDay;
   const setDay = (value: string) => setChosenDay({ reference, day: value });
-  const [mode, setMode] = useState<"week" | "month">("week");
+  const [mode, setMode] = useState<"day" | "week" | "month">("day");
+  const [onlyMine, setOnlyMine] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [person, setPerson] = useState(""),
     [status, setStatus] = useState(""),
     [attempt, setAttempt] = useState(0);
   const [message, setMessage] = useState("");
-  const live = useLiveRevision(), period = useMemo(() => calendarPeriod(day, mode), [day, mode]);
+  const periodMode = mode === "month" ? "month" : "week";
+  const live = useLiveRevision(), period = useMemo(() => calendarPeriod(day, periodMode), [day, periodMode]);
   const decode = useCallback((value: unknown) => parseScheduleListRead(value, {
     careRecipientId: patient.id, from: period.from, until: period.until,
   }), [patient.id, period.from, period.until]);
@@ -302,19 +313,43 @@ function Agenda({
     );
     setAttempt((value) => value + 1);
   }
-  const selectedPerson = can(context, "schedule.read.team") ? person : "";
+  const readTeam = can(context, "schedule.read.team");
+  const selectedPerson = readTeam ? onlyMine ? context.userId : person : "";
   const visible = useMemo(() => currentData?.shifts.filter(
     shift => (!selectedPerson || shift.professional_id === selectedPerson) && (!status || shift.status === status),
   ) ?? [], [currentData, selectedPerson, status]);
   const byDay = useMemo(() => {
     const result = new Map(period.dates.map(date => [date, [] as ScheduledShift[]]));
-    for (const shift of visible) result.get(scheduleDisplayDay(shift.starts_at, shift.timezone, period.from))?.push(shift);
+    for (const shift of visible) {
+      if (mode === "day") {
+        const from = localMinute(shift.starts_at, shift.timezone).slice(0, 10);
+        const until = localMinute(shift.ends_at, shift.timezone);
+        const endAtMidnight = until.endsWith("T00:00") && Date.parse(shift.ends_at) % 60_000 === 0;
+        const lastDay = until.slice(0, 10);
+        for (const [date, rows] of result) {
+          if (date >= from && (date < lastDay || (date === lastDay && !endAtMidnight))) rows.push(shift);
+        }
+      } else {
+        result.get(scheduleDisplayDay(shift.starts_at, shift.timezone, period.from))?.push(shift);
+      }
+    }
     return result;
-  }, [visible, period]);
-  const renderShift = (shift: ScheduledShift) => <ScheduleShift key={shift.id} shift={shift}
-    stateLabel={stateLabels[shift.status]} earlier={new Intl.DateTimeFormat("sv-SE", { timeZone: shift.timezone }).format(new Date(shift.starts_at)) < period.from}
-    action={shift.status === "published" && (team || (shift.professional_id === context.userId && (can(context, "schedule.propose") || publishOwn))) ? team || publishOwn ? "Alterar plantão" : "Propor alteração" : undefined}
-    disabled={busy || uncertain} onEdit={target => open({ kind: "shift", shift }, target)} />;
+  }, [visible, period, mode]);
+  const seriesById = useMemo(() => new Map(currentData?.series.map(series => [series.id, series])), [currentData]);
+  const renderShift = (shift: ScheduledShift) => {
+    const daily = mode === "day", series = seriesById.get(shift.series_id);
+    const ownsShift = shift.professional_id === context.userId;
+    const editable = shift.status === "published" && (team || (ownsShift && (can(context, "schedule.propose") || publishOwn)));
+    const mayEnd = daily && shift.status === "published" && series?.status === "published" && !series.ended_on
+      && (series.recurrence !== "once" || !series.residence_version) && (team || (publishOwn && ownsShift));
+    return <ScheduleShift key={shift.id} shift={shift} daily={daily}
+      recurrence={series ? recurrenceLabels[series.recurrence] : undefined}
+      stateLabel={stateLabels[shift.status]}
+      earlier={localMinute(shift.starts_at, shift.timezone).slice(0, 10) < (daily ? day : period.from)}
+      action={editable ? team || publishOwn ? "Alterar plantão" : "Propor alteração" : undefined}
+      disabled={busy || uncertain} onEdit={target => open({ kind: "shift", shift }, target)}
+      onEnd={mayEnd ? target => open({ kind: "end", id: series.id, version: series.version }, target) : undefined} />;
+  };
   const renderDay = (date: string) => {
     const shifts = byDay.get(date) ?? [];
     return (
@@ -334,6 +369,9 @@ function Agenda({
       </section>
     );
   };
+  const createDisabled = busy || uncertain || !residenceReady || !data?.types.some(type => type.is_active);
+  const occupied = new Set(period.dates.filter(date => byDay.get(date)?.length));
+  const dailyShifts = byDay.get(day) ?? [];
   return recovery.readDenied ? (
     <ScheduleConfirmationPanel recovery={recovery} onConfirmed={confirmed} />
   ) : (
@@ -343,25 +381,11 @@ function Agenda({
         read={notice}
         context={context}
       />
-      <div className="hca-command-bar">
-        {mayCreate ? (
-          <ActionButton
-            variant="primary"
-            disabled={
-              busy ||
-              uncertain ||
-              !residenceReady ||
-              !data?.types.some((type) => type.is_active)
-            }
-            onClick={(event) => open({ kind: "series" }, event.currentTarget)}
-          >
-            Nova programação
-          </ActionButton>
-        ) : null}
+      <div className="hca-command-bar hca-agenda-commands">
         {can(context, "schedule.types.manage") ? (
           <Menu.Root>
-            <Menu.Trigger render={<ActionButton variant="quiet" />}>
-              <Icon name="more" /> Ações da agenda
+            <Menu.Trigger render={<ActionButton variant="quiet" compact aria-label="Ações da agenda" />}>
+              <Icon name="more" />
             </Menu.Trigger>
             <MenuPopup>
               <Menu.LinkItem className="hca-menu-item" href={scheduleSettingsHref(patient.id, day)}>
@@ -393,6 +417,23 @@ function Agenda({
       ) : null}
       <ScheduleConfirmationPanel recovery={recovery} onConfirmed={confirmed} />
       {message ? <Notice>{message}</Notice> : null}
+      {mode === "day" ? <ScheduleDayCalendar selected={day} days={period.dates} occupied={occupied} onSelect={setDay} /> : null}
+      <div className="hca-agenda-roster-heading">
+        <h2>{mode === "day" ? "Plantões do dia" : mode === "week" ? "Plantões da semana" : "Plantões do mês"}</h2>
+        {mayCreate ? <ActionButton compact aria-label="Nova programação" disabled={createDisabled}
+          onClick={event => open({ kind: "series" }, event.currentTarget)}><Icon name="plus" /></ActionButton> : null}
+      </div>
+      {readTeam ? <CheckboxField className="hca-agenda-only-mine" role="switch" label="Só meus plantões" checked={onlyMine}
+        onChange={event => setOnlyMine(event.target.checked)} /> : null}
+      {loading ? <LoadingIndicator label="Carregando escala" /> : null}
+      {read.error ? <Notice error>{read.error} Atualize a escala para repetir a consulta.</Notice> : null}
+      {currentData && mode === "day" ? (
+        dailyShifts.length ? <div className="hca-agenda-roster">{dailyShifts.map(renderShift)}</div> :
+          <div className="hca-agenda-empty">
+            <Icon name="calendar" /><strong>Nenhum plantão neste dia</strong>
+            <p className="hca-muted">{selectedPerson || status ? "Ajuste os filtros ou consulte outra data." : "Consulte outra data."}</p>
+          </div>
+      ) : null}
       <div className="hca-toolbar">
         <FormField label="Data de referência">
           <TextInput
@@ -407,18 +448,18 @@ function Agenda({
         <FormField label="Visualização">
           <SelectField
             value={mode}
-            onChange={(event) =>
-              setMode(event.target.value as "week" | "month")
-            }
+            onChange={event => setMode(event.target.value as typeof mode)}
           >
+            <option value="day">Dia</option>
             <option value="week">Semana</option>
             <option value="month">Mês</option>
           </SelectField>
         </FormField>
-        {can(context, "schedule.read.team") ? (
+        {readTeam ? (
           <FormField label="Profissional">
             <SelectField
-              value={person}
+              value={onlyMine ? context.userId : person}
+              disabled={onlyMine}
               onChange={(event) => setPerson(event.target.value)}
             >
               <option value="">Toda a equipe</option>
@@ -446,7 +487,7 @@ function Agenda({
           </SelectField>
         </FormField>
       </div>
-      <div className="hca-toolbar" role="group" aria-label="Período da escala">
+      {mode !== "day" ? <div className="hca-toolbar" role="group" aria-label="Período da escala">
         <ActionButton onClick={() => setDay(adjacentPeriod(day, mode, -1))}>
           {mode === "month" ? "Mês anterior" : "Semana anterior"}
         </ActionButton>
@@ -457,7 +498,7 @@ function Agenda({
         <ActionButton onClick={() => setDay(adjacentPeriod(day, mode, 1))}>
           {mode === "month" ? "Próximo mês" : "Próxima semana"}
         </ActionButton>
-      </div>
+      </div> : null}
       <ActionButton
         aria-disabled={loading}
         onClick={() => {
@@ -466,19 +507,18 @@ function Agenda({
       >
         Atualizar escala
       </ActionButton>
-      {loading ? <LoadingIndicator label="Carregando escala" /> : null}
-      {read.error ? <Notice error>{read.error} Atualize a escala para repetir a consulta.</Notice> : null}
       {read.queriedAt ? <p className="hca-muted">{loading || read.error ? "Última consulta preservada; ações aguardam atualização." : "Escala consultada:"} {formatBrazilDate(read.queriedAt)}.</p> : null}
       {currentData ? (
         <>
           <p className="hca-muted">
-            Programação prevista, sem registro de presença. O mesmo período
-            aparece em computador e celular.
+            Programação prevista, sem registro de presença.
           </p>
-          <div className="hca-agenda-desktop" {...scrollRegion} role="region" aria-label="Calendário de plantões; rolagem horizontal quando necessária">
-            {period.dates.map(renderDay)}
-          </div>
-          <div className="hca-agenda-mobile">{period.dates.map(renderDay)}</div>
+          {mode !== "day" ? <>
+            <div className="hca-agenda-desktop" {...scrollRegion} role="region" aria-label="Calendário de plantões; rolagem horizontal quando necessária">
+              {period.dates.map(renderDay)}
+            </div>
+            <div className="hca-agenda-mobile">{period.dates.map(renderDay)}</div>
+          </> : null}
           {team ? (
             <section className="ui-card">
               <h2>Propostas pendentes</h2>

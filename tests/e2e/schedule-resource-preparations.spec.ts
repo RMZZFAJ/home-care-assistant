@@ -72,6 +72,7 @@ async function open(
   } else {
     if (purpose !== "shift_type_edit") {
       await page.getByLabel("Data de referência", { exact: true }).fill("2100-04-01");
+      await page.getByLabel("Visualização", { exact: true }).selectOption("week");
       if (purpose === "schedule_series_end")
         await page.getByText("Séries publicadas", { exact: true }).click();
     }

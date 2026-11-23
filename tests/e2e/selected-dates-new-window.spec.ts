@@ -95,6 +95,7 @@ async function begin(page: Page, patient: string) {
   await page
     .getByLabel("Data de referência", { exact: true })
     .fill("2100-01-15");
+  await page.getByLabel("Visualização", { exact: true }).selectOption("week");
 }
 async function chunks(page: Page, patient: string): Promise<ScheduledShift[]> {
   const results = await Promise.all(

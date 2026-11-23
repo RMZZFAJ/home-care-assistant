@@ -75,6 +75,7 @@ test("agenda publica uma programação real, recusa conflito e preserva contexto
   await expect(page.locator(".hca-activity-overlay")).toHaveCount(0);
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.getByLabel("Data de referência", { exact: true }).fill(date);
+  await page.getByLabel("Visualização", { exact: true }).selectOption("week");
   await expect(page.getByRole("article", { name: name + " · Teste professional", exact: true }).filter({ visible: true })).toContainText("Publicado");
   const end = new Date(date + "T12:00:00Z"); end.setUTCDate(end.getUTCDate() + 1);
   const stored = await page.request.get("/api/schedules?" + new URLSearchParams({ careRecipientId: patientA, from: date, until: end.toISOString().slice(0, 10) }));

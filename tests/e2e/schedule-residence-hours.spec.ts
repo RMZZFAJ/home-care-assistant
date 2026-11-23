@@ -147,7 +147,9 @@ test("cancelar plantão com BAL exige encaminhar a contagem e confirma os dois a
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await selectContext(page, fixture.patient);
   await page.goto(`/escalas?day=${fixture.today}`);
-  await page.getByRole("button", { name: "Alterar plantão", exact: true }).first().click();
+  await page.locator(`article[data-shift-id="${assignment.shift_id}"]`)
+    .getByRole("button", { name: /^Ações do plantão de / }).click();
+  await page.getByRole("menuitem", { name: "Alterar plantão", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "Alteração pontual", exact: true });
   await editor.getByRole("combobox", { name: "Operação", exact: true }).selectOption("cancel");
   const review = editor.getByRole("button", { name: "Revisar alteração", exact: true });

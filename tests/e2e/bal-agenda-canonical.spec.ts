@@ -115,6 +115,27 @@ test("06.3 agenda canonical records retain overnight dates,timezone and native e
   const before = sql(`select jsonb_agg(to_jsonb(s) order by id) from public.scheduled_shifts s where care_recipient_id=${q(f.patient)};`);
   await login(page, f.patient); await page.goto("/escalas"); await page.getByLabel("Data de referência", { exact: true }).fill("2100-06-01");
   const sent = writes(page), row = page.getByRole("article", { name: type.name + " · " + name.trim(), exact: true }).filter({ visible: true });
+  const calendar = page.getByRole("group", { name: "Calendário semanal de plantões", exact: true });
+  await expect(calendar.getByRole("button", { name: /1 de junho de 2100, com plantões$/, pressed: true })).toBeVisible();
+  await expect(calendar.locator('button[aria-pressed="false"]')).toHaveCount(6);
+  await expect(row.locator("time")).toHaveText(["19:00", "07:00"]);
+  await expect(row.getByText("dia seguinte", { exact: true })).toBeVisible();
+  await page.setViewportSize({ width: 320, height: 900 });
+  await expect(row).toHaveCSS("align-items", "start");
+  await auditFromTop(page, "L3 daily agenda 320");
+  await capture(calendar, "l3-agenda-calendar-" + info.project.name);
+  await capture(row, "l3-agenda-daily-shift-" + info.project.name);
+  const onlyMine = page.getByRole("switch", { name: "Só meus plantões" });
+  await onlyMine.check(); await expect(page.getByText("Nenhum plantão neste dia", { exact: true })).toBeVisible();
+  await onlyMine.uncheck();
+  await calendar.getByRole("button", { name: "Próximo dia", exact: true }).click();
+  await expect(calendar.getByRole("button", { name: /2 de junho de 2100, com plantões$/, pressed: true })).toBeVisible();
+  await row.locator("summary").click();
+  await expect(row.getByText("Iniciado antes do dia exibido.", { exact: true })).toBeVisible();
+  await calendar.getByRole("button", { name: /3 de junho de 2100$/ }).click();
+  await expect(row).toHaveCount(0);
+  await calendar.getByRole("button", { name: /1 de junho de 2100, com plantões$/ }).click();
+  await page.getByLabel("Visualização", { exact: true }).selectOption("week");
   await expect(row).toContainText("01/06/2100, 19:00"); await expect(row).toContainText("02/06/2100, 07:00"); await expect(row).toContainText("America/Sao_Paulo");
   const ref = await reference(browser, "pessoas/horarios");
   try {
@@ -140,9 +161,14 @@ test("06.3 agenda canonical records retain overnight dates,timezone and native e
     }
     await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" }); await auditFromTop(page, "agenda forced colors reduced motion");
     await page.emulateMedia({ forcedColors: "none", reducedMotion: "no-preference" });
-    await row.getByRole("button", { name: "Alterar plantão", exact: true }).click();
+    await page.getByLabel("Visualização", { exact: true }).selectOption("day");
+    const actions = row.getByRole("button", { name: /^Ações do plantão de / });
+    await actions.focus(); await actions.press("Enter");
+    await page.getByRole("menuitem", { name: "Alterar plantão", exact: true }).click();
     const dialog = page.getByRole("dialog", { name: "Alteração pontual", exact: true }); await expect(dialog).toBeVisible();
     await expect(dialog.getByLabel("Profissional de destino", { exact: true })).toHaveValue(pro.id);
+    await dialog.getByRole("button", { name: "Fechar edição", exact: true }).click();
+    await expect(dialog).toHaveCount(0); await expect(actions).toBeFocused();
     expect(sql(`select jsonb_agg(to_jsonb(s) order by id) from public.scheduled_shifts s where care_recipient_id=${q(f.patient)};`)).toBe(before); expect(sent).toEqual([]);
   } finally { await ref.context.close(); }
 });

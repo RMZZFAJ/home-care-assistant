@@ -15,7 +15,15 @@ export function ShiftBalanceHub({ entry }: { entry: Exclude<View, "history"> }) 
   const params = useSearchParams();
   const scheduleHistoryRequested = [...params.keys()].some(key => key.startsWith("scheduleHistory"));
   const historyRequested = params.get("view") === "history" || scheduleHistoryRequested;
-  return <Workspace title="Plantões e balanços">
+  return <Workspace title="Plantões e balanços" heading={context => (
+    <div className="page-heading">
+      <div>
+        {context.patient ? <p className="eyebrow">{context.patient.display_name}</p> : null}
+        <h1>Plantões e balanços</h1>
+        <p className="hca-agenda-subtitle">A rotina da equipe, no mesmo lugar.</p>
+      </div>
+    </div>
+  )}>
     {context => context.patient ? <ShiftBalanceContent key={context.userId + ":" + context.patient.id}
       context={context} entry={entry} requested={historyRequested ? "history" : entry} scheduleHistoryRequested={scheduleHistoryRequested} /> :
       <Notice>Selecione um paciente para consultar plantões e balanços.</Notice>}
