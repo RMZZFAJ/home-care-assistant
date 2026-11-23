@@ -148,19 +148,32 @@ test("material panel retains its linked consultation, search, and focus after a 
   await code.fill(f.ent.code);
   await code.press("Enter");
   await expect(link).toBeVisible();
-  await panel.screenshot({ path: info.outputPath("fichas-relacionadas.png"), scale: "css", animations: "disabled" });
-  await link.click();
-  const preview = page.getByRole("dialog", { name: f.ent.code, exact: true });
-  await expect(preview.getByRole("heading", { name: "Identificação do registro", exact: true })).toBeVisible();
-  await expect(preview.getByText("Registrado por", { exact: true })).toBeVisible();
-  await expect(preview.getByRole("heading", { name: "Quantidades da movimentação", exact: true })).toBeVisible();
-  await expect(preview).toContainText("Material fictício V4 0");
-  await preview.screenshot({ path: info.outputPath("previa-entre-fichas.png"), scale: "css", animations: "disabled" });
+  const open = panel.getByRole("link", { name: "Ver ficha " + f.ent.code, exact: true });
+  await expect(link).toHaveAttribute("aria-expanded", "false");
+  await expect(open).toHaveCount(0);
+  await page.route(`**/api/documents/${f.ent.id}`, route => route.fulfill({
+    status: 503, json: { code: "DATABASE_UNAVAILABLE", message: "Consulta temporariamente indisponível." },
+  }), { times: 1 });
+  await link.press("Enter");
+  await expect(link).toHaveAttribute("aria-expanded", "true");
+  await expect(panel.getByRole("alert")).toContainText("Não foi possível consultar o material nesta ficha.");
+  await panel.getByRole("button", { name: "Tentar novamente", exact: true }).click();
+  await expect(panel.getByText("Expedido", { exact: true })).toBeVisible();
+  await expect(panel.getByText("2 unidade", { exact: true })).toBeVisible();
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: viewport.height });
+    await expect(link.locator("..")).toHaveCSS("padding", "0px");
+    expect(await panel.evaluate(node => node.scrollWidth - node.clientWidth)).toBeLessThanOrEqual(1);
+    await panel.screenshot({ path: info.outputPath("fichas-acordeao-" + width + ".png"), scale: "css", animations: "disabled" });
+  }
+  await page.setViewportSize(viewport);
+  await open.scrollIntoViewIfNeeded();
+  const relatedScroll = await scroll.evaluate(node => node.scrollTop);
   const destinationSummary = `**/api/documents/${f.ent.id}/materials`;
   await page.route(destinationSummary, route => route.fulfill({
     status: 503, json: { code: "DATABASE_UNAVAILABLE", message: "Saldo temporariamente indisponível." },
   }));
-  await preview.getByRole("link", { name: "Abrir " + f.ent.code, exact: true }).click();
+  await open.click();
   await expect(page).toHaveURL(new RegExp(`/fichas/${f.ent.id}`));
   await expect(page.getByRole("tab", { name: "Visão geral", exact: true })).toBeVisible();
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
@@ -169,12 +182,12 @@ test("material panel retains its linked consultation, search, and focus after a 
   await expect(destination).toHaveAttribute("data-visit-material", "true");
   await expect(destination).toBeFocused();
   await page.getByRole("button", { name: "Voltar ao painel", exact: true }).click();
-  await expect(preview).toBeVisible();
-  await preview.getByRole("button", { name: "Voltar ao material", exact: true }).click();
   await expect(kinds.getByRole("button", { name: "ENT", exact: true })).toHaveAttribute("aria-pressed", "true");
   await expect(code).toHaveValue(f.ent.code.toLowerCase());
   await expect(panel.getByRole("tab", { name: "Fichas", exact: true })).toHaveAttribute("aria-selected", "true");
-  await expect(link).toBeFocused();
+  await expect(link).toHaveAttribute("aria-expanded", "true");
+  await expect(open).toBeFocused();
+  await expect.poll(async () => Math.abs(await scroll.evaluate(node => node.scrollTop) - relatedScroll)).toBeLessThanOrEqual(1);
   await page.unroute(destinationSummary);
   await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await expect(search).toHaveValue("V4 0");
@@ -296,16 +309,18 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   await linksTab.click();
   const requests = consultation.getByRole("region", { name: "Requisições em acompanhamento", exact: true });
   const requestLink = requests.getByRole("button", { name: f.sourceDoc.code, exact: true });
+  await page.route(`**/api/requisitions/${f.source.id}/opening`, route => route.fulfill({
+    json: { data: { requiresDialog: true } },
+  }), { times: 1 });
   await requestLink.click();
-  const requestPreview = page.getByRole("dialog", { name: f.sourceDoc.code, exact: true });
-  await expect(requestPreview.getByRole("heading", { name: "Identificação do registro", exact: true })).toBeVisible();
-  await expect(requestPreview.getByText("Estoque da equipe informado", { exact: true }).first()).toBeVisible();
-  await requestPreview.getByRole("button", { name: "Voltar ao material", exact: true }).click();
-  await expect(requestLink).toBeFocused();
+  await expect(requests.getByText(/confirmar a ciência antes de consultar/)).toBeVisible();
+  await expect(requests.getByText("Estoque da equipe informado", { exact: true })).toHaveCount(0);
+  await requestLink.click();
+  await requestLink.click();
+  await expect(requests.getByText("Estoque da equipe informado", { exact: true })).toBeVisible();
   const reference = consultation.getByRole("button", { name: f.ent.code, exact: true });
   await reference.click();
-  const preview = page.getByRole("dialog", { name: f.ent.code, exact: true });
-  const fullLink = preview.getByRole("link", { name: "Abrir " + f.ent.code, exact: true });
+  const fullLink = consultation.getByRole("link", { name: "Ver ficha " + f.ent.code, exact: true });
   await fullLink.click();
   const full = page.getByRole("dialog", { name: f.ent.code, exact: true });
   await expect(full.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
@@ -314,9 +329,9 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   await info.attach("ficha-completa-na-edicao", { body: await full.screenshot({ animations: "disabled" }), contentType: "image/png" });
   await full.getByRole("button", { name: "Voltar ao painel", exact: true }).click();
   await expect(fullLink).toBeFocused();
-  await preview.getByRole("button", { name: "Voltar ao material", exact: true }).click();
   await expect(linksTab).toHaveAttribute("aria-selected", "true");
-  await expect(reference).toBeFocused();
+  await expect(reference).toHaveAttribute("aria-expanded", "true");
+  await expect(requestLink).toHaveAttribute("aria-expanded", "true");
   await consultation.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
   await expect(opener).toBeFocused();
   await expect(search).toHaveValue("V4 0");
@@ -367,14 +382,17 @@ test("catalogue consultation from a purchase keeps the quantity when using brows
   await page.getByRole("menuitem", { name: "Detalhes do material", exact: true }).click();
   const panel = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
   await panel.getByRole("tab", { name: "Fichas", exact: true }).click();
-  await panel.getByRole("button", { name: f.document.code, exact: true }).click();
-  const preview = page.getByRole("dialog", { name: f.document.code, exact: true });
-  await preview.getByRole("link", { name: "Abrir " + f.document.code, exact: true }).click();
+  const record = panel.getByRole("button", { name: f.document.code, exact: true });
+  await record.click();
+  await expect(panel.getByText("Recebimento validado", { exact: true })).toBeVisible();
+  const open = panel.getByRole("link", { name: "Ver ficha " + f.document.code, exact: true });
+  await open.click();
   await expect(page.getByRole("button", { name: "Voltar ao painel", exact: true })).toBeVisible();
-  await expect(preview.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("dialog", { name: f.document.code, exact: true })
+    .getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
   await page.goBack();
-  await expect(preview.getByRole("link", { name: "Abrir " + f.document.code, exact: true })).toBeFocused();
-  await preview.getByRole("button", { name: "Voltar ao material", exact: true }).click();
+  await expect(open).toBeFocused();
+  await expect(record).toHaveAttribute("aria-expanded", "true");
   await panel.getByRole("tab", { name: "Histórico", exact: true }).click();
   const arrivalLink = panel.getByRole("link", { name: arrival.code, exact: true });
   await arrivalLink.click();

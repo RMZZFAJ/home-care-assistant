@@ -42,6 +42,7 @@ const place = z.object({
   linkFilters: materialLinkFilters.optional(), linkSearchOpen: z.boolean().optional(),
   movementPage: z.number().int().min(1).max(1_000_000).optional(),
   expandedMovements: z.array(z.string().min(1).max(250)).max(100).optional(),
+  expandedLinks: z.array(z.uuid()).max(100).optional(),
   filter: z.enum(filters), search: z.string().max(160),
 });
 

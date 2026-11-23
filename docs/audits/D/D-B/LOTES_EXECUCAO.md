@@ -2979,6 +2979,25 @@ A migration foi aplicada após o backup cifrado verificado
   privada segue restrito. O backup cifrado
   `99cd2b11-2505-47e3-b057-39905521d553` foi verificado antes da aplicação.
 
+### Acordeões de fichas vinculadas
+
+- A aba Fichas usa os filtros no servidor, busca por código e cartões
+  recolhidos com tipo, protocolo e situação. Expandir um cartão
+  consulta os fatos do material na ficha com o vínculo ativo.
+- Ver ficha abre em Materiais e destaca o produto da consulta.
+  Voltar restaura filtro, busca, acordeões expandidos, foco e rolagem.
+  A entrada pelo wizard mantém a quantidade preenchida. As consultas
+  da aba Histórico preservam seus atalhos anteriores.
+- Para uma REQ com confirmação de ciência exigida, o acordeão
+  mostra a orientação. A confirmação continua na abertura da ficha.
+  Quantidade ou identidade indisponível é apresentada explicitamente.
+- O incremento reutiliza as consultas autorizadas de fichas e seus
+  contratos de banco. A forma compacta conserva grupos operacionais,
+  como requisições em acompanhamento e fichas arquivadas.
+- A rodada de regressão passou nos 18 casos executados em Chromium,
+  Android e iOS emulados. Cobriu a nova tentativa após falha, a
+  exigência de ciência e o retorno pelo botão e pelo histórico.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

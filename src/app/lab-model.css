@@ -1727,6 +1727,8 @@
   border-width: 0 0 0 1px; box-shadow: -14px 0 48px #1a3e2a24;
 }
 .hca-l1 .hca-material-sheet > .hca-modal-head { padding: 20px; align-items: flex-start; }
+.hca-l1 .hca-material-sheet > .hca-modal-head:has(> .hca-modal-heading-icon) { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; }
+.hca-l1 .hca-material-sheet .hca-modal-heading-icon { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 10px; background: var(--hca-tint); color: var(--hca-teal); }
 .hca-l1 .hca-material-sheet .hca-modal-kicker { text-transform: uppercase; }
 .hca-l1 .hca-material-sheet > .hca-modal-head > button { background: transparent; border-color: transparent; color: #637469; }
 .hca-l1 .hca-material-sheet > .hca-modal-content { flex: 1; padding: 0; }
@@ -1788,12 +1790,23 @@
 .hca-l1 .hca-material-link-copy { flex: 1; min-width: 0; font-size: 12px; overflow-wrap: anywhere; }
 .hca-l1 .hca-material-link > .ui-badge { max-width: 40%; flex: none; white-space: normal; font-size: 10px; overflow-wrap: anywhere; }
 .hca-l1 .hca-material-link:focus-visible { outline: 2px solid #156f66; outline-offset: 2px; }
-.hca-l1 .hca-material-sheet-body .hca-material-link-group > .hca-material-linked-list { gap: 0; }
-.hca-l1 .hca-material-sheet-body .hca-material-link-group .hca-material-link {
-  min-height: 62px; padding: 12px 0; border: 0; border-radius: 0; background: transparent;
-}
-.hca-l1 .hca-material-sheet-body .hca-material-link-group .hca-material-linked-list > div + div { border-top: 1px solid #e3eae6; }
-.hca-l1 .hca-material-sheet-body .hca-material-link-group .hca-material-link-copy strong { color: #156f66; }
+.hca-l1 .hca-material-link-tools { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+.hca-l1 .hca-material-link-tools > nav { flex: 1; flex-wrap: nowrap; gap: 8px; min-width: 0; margin: 0; overflow-x: auto; }
+.hca-l1 .hca-material-link-tools > nav > button { flex: none; min-height: 40px; padding: 6px 2px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; font-size: 12px; }
+.hca-l1 .hca-material-link-tools > nav > button[aria-pressed="true"] { border-bottom-color: currentColor; color: var(--hca-teal); }
+.hca-l1 .hca-material-link-tools > button { min-width: 40px; min-height: 40px; padding: 8px; }
+.hca-l1 .hca-material-linked-list > .hca-material-linked-record { padding: 0; border: 1px solid var(--hca-line); border-radius: 15px; background: var(--hca-paper); box-shadow: var(--hca-shadow); }
+.hca-l1 .hca-material-linked-summary { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; width: 100%; gap: 12px; padding: 14px; border-radius: 15px; text-align: start; cursor: pointer; }
+.hca-l1 .hca-material-linked-summary strong { display: block; font-size: 15px; font-weight: 680; overflow-wrap: anywhere; }
+.hca-l1 .hca-material-linked-summary > svg { color: var(--hca-muted); }
+.hca-l1 .hca-material-linked-summary[aria-expanded="true"] > svg { transform: rotate(180deg); }
+.hca-l1 .hca-material-linked-kind { display: grid; place-items: center; min-width: 36px; min-height: 36px; padding-inline: 3px; border-radius: 9px; background: var(--hca-tint); color: var(--hca-teal); font-size: 10px; font-weight: 700; }
+.hca-l1 .hca-material-linked-description { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; margin-top: 4px; }
+.hca-l1 .hca-material-linked-description small { color: var(--hca-muted); font-size: 12px; }
+.hca-l1 .hca-material-linked-content { padding: 12px 14px; border-top: 1px solid var(--hca-line); border-radius: 0 0 15px 15px; background: #fbfdfb; overflow-wrap: anywhere; }
+.hca-l1 .hca-material-linked-content .hca-definition-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.hca-l1 .hca-material-linked-author { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-block: 8px; color: var(--hca-muted); font-size: 11px; }
+.hca-l1 .hca-material-linked-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
 .hca-l1 .hca-material-pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
 @media (max-width: 600px) {
   .hca-overlay:has(.hca-material-full) { --material-view-inset: 58px; }

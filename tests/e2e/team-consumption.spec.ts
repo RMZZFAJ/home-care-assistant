@@ -135,14 +135,12 @@ test("consumo preserva o último rascunho, recupera a baixa e permite correção
   await linked.click();
   const deliveryLink = panel.getByRole("button", { name: f.delivery.code, exact: true });
   await deliveryLink.click();
-  const relation = page.getByRole("dialog", { name: f.delivery.code, exact: true });
-  const open = relation.getByRole("link", { name: "Abrir " + f.delivery.code, exact: true });
+  const open = panel.getByRole("link", { name: "Ver ficha " + f.delivery.code, exact: true });
   await open.click();
   await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
   await page.getByRole("button", { name: "Voltar ao painel", exact: true }).click();
   await expect(open).toBeFocused();
-  await relation.getByRole("button", { name: "Voltar ao material", exact: true }).click();
-  await expect(deliveryLink).toBeFocused();
+  await expect(deliveryLink).toHaveAttribute("aria-expanded", "true");
   await expect(linked).toHaveAttribute("aria-selected", "true");
   await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   await expect(material).toBeFocused();
