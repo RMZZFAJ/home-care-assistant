@@ -341,6 +341,64 @@ test("conclusão em outra sessão preserva edição original após reconheciment
     await context.close();
   }
 });
+test("encerra tentativa antiga sem recibo e recupera o encerramento após recarregar", async ({ page }) => {
+  const f = await configuredFixture("schedule_series_create");
+  const saved = await saveSchedulePreparation(f);
+  const original = {
+    careRecipientId: f.patient,
+    purpose: f.purpose,
+    draftCommit: { id: saved.id, revision: saved.revision },
+    command: f.command,
+    idempotencyKey: crypto.randomUUID(),
+  };
+  const storageKey = `hca:schedule-creation:${fixtures.adminA.id}:${f.patient}:${f.purpose}`;
+  await login(page, f.patient);
+  await page.evaluate(({ storageKey, value }) => {
+    sessionStorage.setItem(storageKey, JSON.stringify(value));
+  }, { storageKey, value: { mode: "pending", userId: fixtures.adminA.id, packet: original, fields: f.fields } });
+  await open(page, true, true);
+  await expect(button(page, "Recuperar a mesma confirmação")).toHaveCount(0);
+  await button(page, "Conferir tentativa sem reenviar").click();
+  const keys: string[] = [];
+  await page.route("**/api/schedules/preparations/recovery", async (route) => {
+    const { resolutionKey, packet } = route.request().postDataJSON();
+    expect(packet).toEqual(original);
+    keys.push(resolutionKey);
+    if (keys.length === 1) {
+      const result = await route.fetch();
+      expect(result.ok()).toBe(true);
+      expect((await result.json()).data.reason).toBe("advanced_revision");
+      await route.abort("failed");
+    } else await route.continue();
+  });
+  await button(page, "Encerrar esta tentativa e preservar meus campos").click();
+  await expect(button(page, "Recuperar encerramento da tentativa")).toBeEnabled();
+  const late = await f.admin.rpc("commit_schedule_preparation", {
+    ...f.scope,
+    p_id: saved.id,
+    p_expected: saved.revision,
+    p_key: original.idempotencyKey,
+    p_body: original.command,
+  });
+  expect(late.error?.code).toBe("PT409");
+  expect(JSON.parse(scheduleNativeFacts(f)).series).toHaveLength(0);
+
+  await page.reload();
+  await open(page, true, true);
+  await button(page, "Recuperar encerramento da tentativa").click();
+  await button(page, "Manter minha edição para novo preenchimento").click();
+  expect(keys).toEqual([keys[0], keys[0]]);
+  expect(keys[0]).toMatch(/^[a-f\d-]{36}$/i);
+  await button(page, "Adotar horários da residência").click();
+  const editor = dialog(page, "Programação de plantões");
+  await expect(editor.getByLabel("Informação adicional", { exact: true })).toHaveValue("Texto pessoal fictício");
+  await expect(editor.getByLabel("Data do plantão", { exact: true })).toHaveValue("2100-03-01");
+  await review(page);
+  await button(page, "Confirmar gravação").click();
+  await expect(page.getByText("Programação de plantões registrada.", { exact: true })).toBeVisible();
+  expect(JSON.parse(scheduleNativeFacts(f)).series).toHaveLength(1);
+});
+
 test("mudança do tipo prova tentativa não aplicada sem alterar revisão privada e exige adoção explícita", async ({
   page,
 }) => {

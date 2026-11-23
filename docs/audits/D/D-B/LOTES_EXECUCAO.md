@@ -1788,6 +1788,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123043302_l3_consumption_material_effects` | Aplicada | Aplicada |
 | `20261123045130_l3_flow_direct_consumption` | Aplicada | Aplicada |
 | `20261123051802_l3_require_residence_for_new_schedule` | Aplicada | Aplicada |
+| `20261123054301_l3_resolve_schedule_creation_attempt` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2862,8 +2863,7 @@ L3. Os endpoints usam o mesmo contrato de autorização e recibo. O
 banco compartilhado mantém o caminho da versão publicada até o corte
 da produção. Os 43 testes de integração dirigidos cobriram a recusa sem
 efeitos, os recibos já gravados, o isolamento entre pacientes, os
-horários e as ações de agenda. Uma tentativa antiga sem recibo
-confirmado continua dependendo da conferência da operação original.
+horários e as ações de agenda.
 
 Cinco cenários passaram em Chromium, Android e iOS emulados. Eles
 cobriram configuração, retorno à data original, acesso profissional,
@@ -2875,6 +2875,48 @@ Local e remoto registram 350 migrations, com a fila vinculada vazia.
 O backup crítico cifrado `dc78aeb9-76a7-4a5b-9085-4eb76b784e46`
 foi verificado antes da aplicação. As duas novas funções executam com
 as permissões do papel chamador e o acesso é restrito ao papel autenticado.
+
+### Recuperação de uma programação sem confirmação
+
+O painel consulta a tentativa na origem. Se o resultado ainda estiver
+desconhecido, o usuário pode encerrar a tentativa e conservar o
+preenchimento. O banco serializa a decisão com a publicação original.
+Se o registro já foi gravado, o painel recupera o recibo. Se a decisão
+chegar primeiro, somente a revisão privada avança e um pacote atrasado
+da revisão anterior fica impedido de publicar.
+
+O encerramento pode ser recuperado com a mesma chave após recarregar.
+A retomada confere identidade, revisão e conteúdo do rascunho. Uma
+edição concorrente ainda exige comparação. Um rascunho de programação
+anterior à configuração adota explicitamente os horários atuais
+antes de uma nova revisão.
+
+A migration `20261123054301_l3_resolve_schedule_creation_attempt.sql`
+está aplicada localmente e no remoto, com 351 versões e fila vazia.
+O backup cifrado `1222b230-63e8-44ed-b827-638b47a3ac09` foi verificado.
+O RPC exige uma conta autenticada e confere escopo e autoria no banco.
+Os 21 testes de integração dirigidos
+cobriram também autoria, isolamento, integridade da intenção,
+idempotência e concorrência com o comando original.
+
+Os nove casos em Chromium, Android e iOS emulados incluíram perda da
+resposta do encerramento, recarga, reuso da chave e gravação posterior
+uma única vez com os horários atuais. O teste conferiu no banco que
+uma entrega tardia do comando original foi recusada.
+
+### Regressão móvel de emissão e verificação pública
+
+Quatro casos em Android e iOS emulados conferiram a recuperação da
+emissão de PDF, a preservação dos bytes na consulta e a emissão nova
+por ação explícita. Também cobriram chegada via QR sem conta e a
+distinção entre o arquivo apresentado e o código de outra emissão.
+
+### Ocorrência operacional observada no ambiente remoto
+
+Durante a captura, o monitor registrou duas entregas pendentes de
+recebimento cujo lembrete automático falhou com SQLSTATE `42501`.
+Os dois destinatários tinham vínculo ativo. A consulta confirmou o
+estado do agendador. A causa específica dessas falhas segue aberta.
 
 ## L4
 

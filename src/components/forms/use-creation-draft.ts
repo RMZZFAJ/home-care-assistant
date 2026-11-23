@@ -223,7 +223,7 @@ export function useCreationDraft({
     parseRead,
   ]);
 
-  async function revalidateRead() {
+  async function revalidateRead(acceptRevision?: (draft: CreationDraft) => boolean) {
     if (!active || inFlightRef.current) return false;
     const current = generationRef.current;
     setBusy(true);
@@ -247,7 +247,13 @@ export function useCreationDraft({
             base.id === row.id &&
             base.revision === row.revision &&
             (!base.contentHash || base.contentHash === row.contentHash));
-        if (unchanged) setBase(row);
+        if (row?.state === "active" && acceptRevision?.(row)) {
+          setBase(row);
+          setOffered(null);
+          setComparison(null);
+          setConflict(false);
+          setCompared(false);
+        } else if (unchanged) setBase(row);
         else {
           setComparison(row);
           setOffered(null);

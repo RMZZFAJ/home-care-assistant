@@ -81,6 +81,7 @@ const stored = z.discriminatedUnion("mode", [
       userId: z.uuid(),
       packet: schedulePreparationCommitSchema,
       fields: scheduleCreationFields,
+      resolutionKey: z.uuid().optional(),
     })
     .strict(),
   z
@@ -117,6 +118,7 @@ function load(
       (v.mode === "pending"
         ? v.packet.careRecipientId !== patientId ||
           v.packet.purpose !== purpose ||
+          v.resolutionKey === v.packet.idempotencyKey ||
           !equal(v.packet.command, scheduleCreationCommand(v.fields))
         : v.patientId !== patientId || v.purpose !== purpose)
     )
@@ -222,6 +224,9 @@ export function ScheduleCreationPreparation({
   } | null>(null);
   const pending = local?.mode === "pending" ? local : null,
     carry = local?.mode === "carry" ? local : null;
+  const pendingHasCurrentContract =
+    pending?.packet.command.action !== "series" ||
+    Boolean(pending.packet.command.body.residenceHours);
   function writeLocal(next: Stored | null, expected = localRef.current) {
     const current = load(key, userId, patient.id, purpose);
     if (current.error) throw new Error(current.error);
@@ -477,10 +482,10 @@ export function ScheduleCreationPreparation({
       (!pending && reviewRejected)
     )
       return;
-    const original =
+    const original: Extract<Stored, { mode: "pending" }> | null =
       pending ??
       (packet ? { mode: "pending" as const, userId, packet, fields } : null);
-    if (!original) return;
+    if (!original || original.resolutionKey || (pending && !pendingHasCurrentContract)) return;
     const recovering = Boolean(pending);
     busyRef.current = true;
     setPublishing(true);
@@ -538,16 +543,23 @@ export function ScheduleCreationPreparation({
       if (mountedRef.current) setPublishing(false);
     }
   }
-  async function check() {
+  async function check(resolve = false) {
     if (!pending || busyRef.current || protectedView || integrityError) return;
-    const original = pending;
+    let original = pending;
     busyRef.current = true;
     setPublishing(true);
     setError("");
     try {
+      if (resolve && !original.resolutionKey) {
+        const next = { ...original, resolutionKey: crypto.randomUUID() };
+        writeLocal(next, original);
+        original = next;
+      }
       const raw = await api<{ data: unknown }>(
         "/api/schedules/preparations/recovery",
-        original.packet,
+        original.resolutionKey
+          ? { packet: original.packet, resolutionKey: original.resolutionKey }
+          : original.packet,
       );
       if (!mountedRef.current) return;
       const result = parseScheduleRecovery(raw.data, original.packet, userId);
@@ -569,6 +581,9 @@ export function ScheduleCreationPreparation({
   async function preserveUnapplied() {
     if (!pending || proof?.status !== "not_applied" || busyRef.current) return;
     try {
+      const settledRevision = pending.resolutionKey && proof.reason === "advanced_revision"
+        ? proof.current
+        : null;
       const next: Stored = {
         mode: "carry",
         userId,
@@ -585,7 +600,11 @@ export function ScheduleCreationPreparation({
         "A tentativa não foi aplicada. Sua edição foi preservada por sua escolha; nenhuma nova programação foi enviada.",
       );
       source.refresh();
-      await draft.revalidateRead();
+      await draft.revalidateRead(settledRevision
+        ? (row) => row.id === settledRevision.id
+          && row.revision === settledRevision.revision
+          && equal(row.content, { schedule: next.fields })
+        : undefined);
     } catch (e) {
       setIntegrityError(
         e instanceof Error ? e.message : "A referência foi preservada.",
@@ -763,26 +782,43 @@ export function ScheduleCreationPreparation({
                   disabled={publishing || Boolean(integrityError)}
                   onClick={() => void check()}
                 >
-                  Conferir tentativa sem reenviar
+                  {pending.resolutionKey
+                    ? "Recuperar encerramento da tentativa"
+                    : "Conferir tentativa sem reenviar"}
                 </ActionButton>
-                <ActionButton
-                  disabled={
-                    publishing ||
-                    Boolean(integrityError) ||
-                    proof?.status === "not_applied"
-                  }
-                  onClick={() => void send()}
-                >
-                  Recuperar a mesma confirmação
-                </ActionButton>
+                {pendingHasCurrentContract && !pending.resolutionKey ? (
+                  <ActionButton
+                    disabled={
+                      publishing ||
+                      Boolean(integrityError) ||
+                      proof?.status === "not_applied"
+                    }
+                    onClick={() => void send()}
+                  >
+                    Recuperar a mesma confirmação
+                  </ActionButton>
+                ) : null}
                 <ActionButton disabled={publishing} onClick={onClose}>
                   Fechar guardando referência
                 </ActionButton>
               </div>
               {proof?.status === "unknown" ? (
                 <Notice>
-                  O resultado ainda é desconhecido. A ausência de registro não
-                  comprova falha; a referência foi preservada.
+                  <p>
+                    O resultado ainda é desconhecido. Ao encerrar a tentativa, o
+                    sistema consulta a confirmação original. Se ela já foi
+                    gravada, o resultado será exibido. Caso contrário, o
+                    preenchimento fica salvo e esta revisão deixa de poder
+                    publicar uma programação.
+                  </p>
+                  {!pending.resolutionKey ? (
+                    <ActionButton
+                      disabled={publishing || Boolean(integrityError)}
+                      onClick={() => void check(true)}
+                    >
+                      Encerrar esta tentativa e preservar meus campos
+                    </ActionButton>
+                  ) : null}
                 </Notice>
               ) : null}
               {proof?.status === "not_applied" ? (
