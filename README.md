@@ -2,7 +2,7 @@
 
 **Aparência vigente:** o [Modelo Integral](docs/ui-ux/CANONICAL_MODEL.md) substitui
 Fluent UI. Em E01–E03, a referência posterior é o laboratório L1 com os
-comentários v3, conforme o [lote vigente](HCA_L1_LOTE_CODEX_E01_E03.md).
+comentários v3, conforme o [comando de L1](HCA_L1_LOTE_CODEX_E01_E03.md).
 
 Gestão operacional por paciente com Next.js, React, TypeScript e Supabase.
 REQ, COM, ENT, DEV e BAL distinguem necessidade, aquisição, entrega, devolução,
@@ -14,7 +14,9 @@ clínica.
 **L3 em execução na branch `feat/phase-d-continuation`.** A
 [PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7) foi incorporada
 a `master`. Seu [registro de fechamento](docs/audits/FECHAMENTO_PR7.md)
-reúne a execução A–D, as evidências e a fila de continuidade. L3 segue o
+reúne a execução A–D, as evidências e a fila de continuidade. O
+[PR 8 em rascunho](https://github.com/RMZZFAJ/home-care-assistant/pull/8)
+acompanha L3, que segue o
 [comando mestre v4](HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e o
 [laboratório aprovado](hca-laboratorio-03-v4-aprovado.html).
 

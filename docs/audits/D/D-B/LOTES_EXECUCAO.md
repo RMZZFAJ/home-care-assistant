@@ -3343,10 +3343,19 @@ WhatsApp ainda requer homologação do provedor.
 - **E07-11** — Reiteração do aviso e compensação única do consumo cancelado.
   `team-consumption.spec.ts`, `team-consumption.test.mjs`.
 - **E07-12** — Sugestão do WhatsApp e confirmação de consumo vinculada.
-  `flow-preparations.test.mjs`, `team-consumption.test.mjs`.
+  `team-consumption.spec.ts`, `flow-preparations.test.mjs` e
+  `team-consumption.test.mjs`. O caso de navegador cobre material sugerido
+  sem quantidade, retomada do rascunho e confirmação recuperada com uma
+  única baixa. O transporte do provedor continua fora dessa evidência.
+  O contrato aceita uma mensagem por sessão e preserva seu conteúdo. Uma
+  nova mensagem é outra sugestão. Resolução concorrente da sugestão
+  original encerra sua disponibilidade sem baixar estoque pela segunda vez.
 - **E07-13** — Falha de consulta, escopo da equipe e retirada de dados sem
   autorização. `stock-read-validation.spec.ts`,
-  `consumption-list-completeness.spec.ts`.
+  `consumption-list-completeness.spec.ts`. A leitura já preserva o último
+  saldo válido em falhas transitórias e remove os dados em caso de recusa.
+  A consulta de saldos ainda exibe a falha no corpo da tela. Falta aplicar
+  o diálogo sobreposto do laboratório com recuperação e retorno de foco.
 - **E08-01** — Navegação integrada, agenda por dia, balanços previstos e
   histórico de contagens com filtro e retorno preservados.
   `schedule-residence-hours.spec.ts` e seção Calendário diário em Plantões e
@@ -3608,6 +3617,23 @@ WhatsApp ainda requer homologação do provedor.
   e no arquivo passado à folha de compartilhamento simulada, além da
   preservação do número de emissões. Arquivamento de ENT e seleção de período
   da doação também passaram nos três navegadores.
+
+### Falha de consulta em Arquivos
+
+- Gerados e Anexos usam o mesmo diálogo da consulta de acervo. Na aba
+  Anexos, a recusa esconde a lista e abre **Acesso indisponível**. Uma falha
+  de consulta abre a recuperação na aba ativa e mantém o aviso ao fechar.
+  Voltar restaura o foco para o botão de atualização.
+- O diálogo segue o resultado de falha da v4 e oferece duas tentativas
+  na mesma abertura. Em erro persistente, mostra o diagnóstico copiável
+  com código, referência e tentativas. Um novo acionamento no acervo é
+  uma consulta independente. As ações de envio e o banco continuam com
+  as versões já aplicadas.
+- Os seis casos dirigidos passaram em Chromium, Android e iOS emulados
+  com o diagnóstico e as retentativas. O teste confirmou ausência de
+  comandos de escrita, preservação do anexo e escolha vazia na reabertura.
+  A rodada anterior confirmou a recuperação de upload e a revogação real.
+  As comparações em 360 e 412 px ficaram em `output/playwright/l3/`.
 
 ## L4
 

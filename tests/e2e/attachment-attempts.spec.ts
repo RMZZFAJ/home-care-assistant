@@ -58,7 +58,7 @@ async function loseConfirmedResponse(page: Page, target: "upload" | "prepareAndA
   }, target);
 }
 
-test("anexos ocultam lista recusada e cada nova abertura começa com uma seleção vazia", async ({ page }) => {
+test("anexos ocultam lista recusada e cada nova abertura começa com uma seleção vazia", async ({ page }, info) => {
   const f = await fixture(page);
   await picker(page).setInputFiles(f.file); await submit(page).click();
   const link = page.getByRole("link", { name: f.file.name, exact: true });
@@ -69,16 +69,54 @@ test("anexos ocultam lista recusada e cada nova abertura começa com uma seleç�
   let writes = 0;
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/attachments" && request.method() !== "GET") writes++; });
   const refresh = page.getByRole("button", { name: "Atualizar anexos", exact: true });
+  const supportReference = randomUUID();
+  const faultBody = { error: "Consulta fictícia de anexos indisponível", code: "READ_UNAVAILABLE", correlationId: supportReference };
   for (const fault of [503, 403, 200]) {
-    await page.route("**/api/attachments?**", route => route.fulfill({ status: fault, contentType: "application/json", body: JSON.stringify(fault === 200 ? { data: [{}] } : { error: "Consulta fictícia de anexos indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
+    await page.route("**/api/attachments?**", route => route.fulfill({ status: fault, json: fault === 200 ? { data: [{}] } : faultBody }), { times: 1 });
     await refresh.focus(); await refresh.press("Enter");
-    await expect(page.getByRole("alert").filter({ hasText: /Consulta fictícia de anexos indisponível|A resposta da consulta não pôde ser conferida/ })).toBeVisible();
-    await expect(link).toHaveCount(0);
-    await expect(page.locator('[aria-invalid="true"]')).toHaveCount(0);
-    await expect(picker(page)).toHaveCount(0);
-    await expect(refresh).toBeFocused(); await refresh.press("Enter");
+    const failure = page.getByRole("dialog", { name: fault === 403 ? "Acesso indisponível" : "Não foi possível consultar os anexos", exact: true });
+    const message = /Consulta fictícia de anexos indisponível|A resposta da consulta não pôde ser conferida/;
+    await expect(failure).toBeVisible();
+    await expect(failure).toContainText(message);
+    await expect(page.locator("a").filter({ hasText: f.file.name })).toHaveCount(0);
+    if (fault === 503) {
+      for (const width of [360, 412]) {
+        await page.setViewportSize({ width, height: 860 });
+        await audit(page, "falha na consulta dos anexos em " + width);
+        const path = info.outputPath(`anexos-falha-${width}.png`);
+        await failure.screenshot({ path, scale: "css", animations: "disabled" });
+        await info.attach(`anexos-falha-${width}`, { path, contentType: "image/png" });
+      }
+      await failure.getByRole("button", { name: "Consultar novamente", exact: true }).click();
+    } else {
+      await failure.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
+      await expect(page.getByRole("alert").filter({ hasText: message })).toBeVisible();
+      await expect(page.locator('[aria-invalid="true"]')).toHaveCount(0);
+      await expect(picker(page)).toHaveCount(0);
+      await expect(refresh).toBeFocused(); await refresh.press("Enter");
+    }
     await expect(link).toBeVisible(); await expect(add(page)).toBeEnabled(); await expect(refresh).toBeFocused();
   }
+
+  await page.route("**/api/attachments?**", route => route.fulfill({ status: 503, json: faultBody }), { times: 3 });
+  await refresh.click();
+  const exhausted = page.getByRole("dialog", { name: "Não foi possível consultar os anexos", exact: true });
+  const retry = exhausted.getByRole("button", { name: "Consultar novamente", exact: true });
+  await expect(exhausted).toBeVisible();
+  for (let attempts = 1; attempts <= 2; attempts++) {
+    const rejected = page.waitForResponse(response => new URL(response.url()).pathname === "/api/attachments" && response.status() === 503);
+    await retry.click();
+    await rejected;
+  }
+  await expect(retry).toHaveCount(0);
+  await expect(exhausted.locator("footer").getByRole("button", { name: "Copiar detalhes", exact: true })).toBeVisible();
+  await exhausted.locator("summary").click();
+  await expect(exhausted.locator("pre")).toContainText(supportReference);
+  await expect(exhausted.locator("pre")).toContainText("Tentativas de consulta: 2");
+  await exhausted.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
+  await expect(refresh).toBeFocused();
+  await refresh.press("Enter");
+  await expect(link).toBeVisible();
   expect(writes).toBe(0); expect(rows(f.doc.id)).toEqual(original); expect(facts(f.doc.id)).toBe(official);
   await add(page).click();
   expect(await picker(page).evaluate(element => (element as HTMLInputElement).files?.length)).toBe(0);

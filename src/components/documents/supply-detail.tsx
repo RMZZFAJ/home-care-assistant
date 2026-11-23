@@ -1731,6 +1731,7 @@ export function SupplyDocumentContent({
                 patientId={data.care_recipient_id}
                 documentId={data.id}
                 documentCode={data.protocol ?? undefined}
+                active={tabs.value === "attachments"}
                 writable={
                   activeContext && !archived &&
                   (data.created_by === context.userId ||

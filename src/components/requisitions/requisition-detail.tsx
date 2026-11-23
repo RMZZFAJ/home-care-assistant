@@ -804,6 +804,8 @@ export function RequisitionDocumentContent({
           <Attachments
             patientId={data.care_recipient_id}
             documentId={id}
+            documentCode={data.code ?? data.protocol}
+            active={tabs.value === "attachments"}
             writable={!p.archivedAt && can(context, "req.create")}
           />
         } />

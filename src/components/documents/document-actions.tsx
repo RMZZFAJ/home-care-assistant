@@ -3,6 +3,7 @@ import { useOperationActivity } from "@/components/ui/operation-activity";
 import { z } from "zod";
 import { PdfDocumentOptions } from "./pdf-document-options";
 import { PdfFileDetails } from "./pdf-file-details";
+import { FileArchiveReadFailure } from "./file-archive-read-failure";
 import { pdfDocumentOptionsSchema, documentModeLabel, type PdfDocumentOptions as DocumentOptions } from "@/lib/documents/pdf-modes";
 import { FileRecord } from "@/components/ui/file-record";
 import { ActionButton, ActionLink, Pill, type PillTone } from "@/components/ui/controls";
@@ -12,7 +13,6 @@ import { buttonClass, can, Notice } from "@/components/workspace";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { DocumentActionSlot } from "./document-action-slot";
 import { Icon } from "@/components/ui/primitives";
-import { Dialog } from "@/components/ui/overlays";
 import { api, ApiError, TransportError } from "@/lib/client/api";
 import {
   initialPdfStatusSchema,
@@ -153,6 +153,8 @@ function GeneratedFiles({
   const [detail, setDetail] = useState<{ id: string; opener: HTMLButtonElement; open: boolean } | null>(null);
   const [archiveDenied, setArchiveDenied] = useState(false);
   const [archiveErrorDismissed, setArchiveErrorDismissed] = useState(false);
+  const [archiveFailureCause, setArchiveFailureCause] = useState<unknown>(null);
+  const [archiveRetries, setArchiveRetries] = useState(0);
   const [activityStage, setActivityStage] = useState(0);
   useOperationActivity(busy || initialBusy, { title: initialBusy ? "Recuperando o PDF inicial" : "Emissão de PDF", detail: "Estamos conferindo a mesma solicitação. Aguarde a confirmação do exemplar.", stage: activityStage, steps: [{ label: "Preparando a emissão", icon: "file" }, { label: "Gerando e assinando o exemplar", icon: "shield" }, { label: "Conferindo o arquivo registrado", icon: "check" }] });
   const busyRef = useRef(false),
@@ -209,6 +211,8 @@ function GeneratedFiles({
         setNext(page.data.next ? { cursor: page.data.next, basisVersion: basis } : null);
         setReadError("");
         setArchiveDenied(false);
+        setArchiveFailureCause(null);
+        setArchiveRetries(0);
       } catch (reason) {
         if (own === sequenceRef.current) {
           const denied = reason instanceof ApiError && [401, 403, 404].includes(reason.status);
@@ -217,6 +221,7 @@ function GeneratedFiles({
             setNext(null);
           }
           setArchiveDenied(denied);
+          setArchiveFailureCause(reason);
           if (!quiet) setArchiveErrorDismissed(false);
           setReadError(
             reason instanceof Error
@@ -236,6 +241,7 @@ function GeneratedFiles({
     setRows([]);
     setNext(null);
     setReadError("");
+    setArchiveRetries(0);
     setLoading(true);
     setFilter(nextFilter);
   }
@@ -411,7 +417,7 @@ function GeneratedFiles({
           className={buttonClass}
           type="button"
           disabled={loading}
-          onClick={() => { refreshInitial(); void load(); }}
+          onClick={() => { setArchiveRetries(0); refreshInitial(); void load(); }}
         >
           Atualizar arquivos
         </button>
@@ -448,17 +454,11 @@ function GeneratedFiles({
       {message && !busy && !initialBusy ? <p role="status">{message}</p> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {readError ? <Notice error>{readError}</Notice> : null}
-      <Dialog open={active && Boolean(readError) && !archiveErrorDismissed && !optionsOpen && !busy && !initialBusy}
-        title={archiveDenied ? "Acesso indisponível" : "Não foi possível consultar os arquivos"}
-        headingIcon={archiveDenied ? "lock" : "alert"} onClose={() => setArchiveErrorDismissed(true)}
-        finalFocus={archiveRetryRef} footer={<>
-          <button type="button" className={buttonClass} onClick={() => setArchiveErrorDismissed(true)}>Voltar aos arquivos</button>
-          <button type="button" className="ui-button ui-button-primary" disabled={loading}
-            onClick={() => void load()}>Consultar novamente</button>
-        </>}>
-        <p>{readError}</p>
-        {loading ? <p role="status">Consultando arquivos…</p> : null}
-      </Dialog>
+      <FileArchiveReadFailure open={active && Boolean(readError) && !archiveErrorDismissed && !optionsOpen && !busy && !initialBusy}
+        title="Não foi possível consultar os arquivos" denied={archiveDenied} message={readError} loading={loading}
+        cause={archiveFailureCause} attempts={archiveRetries} returnFocus={archiveRetryRef}
+        onClose={() => { setArchiveErrorDismissed(true); setArchiveRetries(0); }}
+        onRetry={() => { setArchiveRetries(value => value + 1); void load(); }} />
       {loading ? (
         <p role="status">Consultando arquivos…</p>
       ) : !readError && !visibleRows.length && (filter !== "all" || !initial.data) ? (

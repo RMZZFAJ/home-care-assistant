@@ -4,6 +4,18 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**23/11 — falha de consulta em Arquivos.** Gerados e Anexos compartilham
+o diálogo, com nova consulta, retorno de foco e diagnóstico de suporte.
+As seis verificações finais passaram em Chromium, Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#falha-de-consulta-em-arquivos).
+
+**23/11 — Preview de L3 e correções de CI.** O PR 8 está em rascunho.
+O Preview de `e349a92d` respondeu no login, na consulta pública e na
+verificação de compatibilidade do Supabase. A retomada de plantão após
+revogação de escrita e a comparação de chegada da COM passaram em seis
+testes dirigidos. A validação completa desse commit segue no GitHub Actions.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#leitura-privada-de-plantão-e-atualização-da-chegada-de-com).
+
 **23/11 — acervo de Arquivos.** Gerados e Anexos seguem os cartões da v4.
 O menu preserva a identificação e o compartilhamento do exemplar.
 O rodapé do formulário Gerar PDF mantém as ações à vista. O ensaio comparou

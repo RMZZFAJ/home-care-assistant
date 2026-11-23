@@ -10,6 +10,7 @@ import { Dialog, Drawer } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
 import { formatBrazilDate } from "@/lib/receipt";
 import { attachmentForm, attachmentMaxBytes, attachmentMaxLabel, attachmentPrepared, confirmedAttachment, freezeAttachment, type FrozenAttachment } from "@/lib/documents/attachment-attempt";
+import { FileArchiveReadFailure } from "./file-archive-read-failure";
 
 const hash = z.string().regex(/^[a-f0-9]{64}$/);
 const attachment = z.object({ id: z.uuid(), filename: z.string(), bytes: z.number().int().positive(), mime_type: z.string(), state: z.enum(["quarantine", "ready", "rejected", "abandoned"]), sha256: hash.nullable(), sourceSha256: hash.nullable(), sourceBytes: z.number().nullable(), sourceMime: z.string().nullable(), transformation: z.string().nullable(), uploadKey: z.uuid().nullable(), tracked: z.boolean(), pending: z.boolean(), canAbandon: z.boolean(), url: z.string().nullable(), uploadedName: z.string().nullish(), confirmedAt: z.iso.datetime({ offset: true }).nullish() });
@@ -20,7 +21,7 @@ function readList(value: unknown) {
   return result.data;
 }
 type Attachment = z.infer<typeof attachment>;
-type Props = { patientId: string; documentId?: string; documentCode?: string; movementId?: string; contingencyId?: string; writable?: boolean; onChange?: () => void; };
+type Props = { patientId: string; documentId?: string; documentCode?: string; movementId?: string; contingencyId?: string; writable?: boolean; active?: boolean; onChange?: () => void; };
 
 function AttachmentProvenance({ file }: { file: Attachment }) {
   return <details className="doc-help-details"><summary>Origem e conversão do arquivo</summary>
@@ -35,11 +36,12 @@ function AttachmentProvenance({ file }: { file: Attachment }) {
 export function Attachments(props: Props) {
   return <ScopedAttachments key={`${props.patientId}:${props.documentId ?? ""}:${props.movementId ?? ""}:${props.contingencyId ?? ""}`} {...props} />;
 }
-function ScopedAttachments({ patientId, documentId, documentCode, movementId, contingencyId, writable = false, onChange }: Props) {
+function ScopedAttachments({ patientId, documentId, documentCode, movementId, contingencyId, writable = false, active = true, onChange }: Props) {
   const modalOnly = Boolean(documentId);
   const [adding, setAdding] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [files, setFiles] = useState<Attachment[]>([]), [error, setError] = useState(""), [readError, setReadError] = useState(""), [message, setMessage] = useState("");
+  const [archiveFailure, setArchiveFailure] = useState<{ cause: unknown; denied: boolean; dismissed: boolean; attempts: number } | null>(null);
   const [busy, setBusy] = useState(false), [loading, setLoading] = useState(true), [attempt, setAttempt] = useState(0);
   useOperationActivity(busy, { title: "Processando o anexo", detail: "Estamos conferindo a mesma solicitação. Aguarde a confirmação do arquivo." });
   const [fileInvalid, setFileInvalid] = useState(false), [fileValidation, setFileValidation] = useState(0);
@@ -57,8 +59,8 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
     return target?.isConnected && !target.matches(':disabled,[aria-disabled="true"]') ? target : refreshRef.current;
   }, []);
   useEffect(() => {
-    if (readError && (!document.activeElement || document.activeElement === document.body)) refreshRef.current?.focus();
-  }, [readError]);
+    if (active && readError && (!document.activeElement || document.activeElement === document.body)) refreshRef.current?.focus();
+  }, [active, readError]);
   useEffect(() => {
     if (!busy && focusFileRef.current) {
       focusFileRef.current = false;
@@ -81,12 +83,26 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
     const controller = new AbortController();
     api<unknown>("/api/attachments?" + query, undefined, controller.signal).then(result => {
       if (controller.signal.aborted) return;
-      setFiles(readList(result).data); setReadError(""); setLoading(false);
+      setFiles(readList(result).data); setReadError(""); setArchiveFailure(null); setLoading(false);
     }).catch(reason => {
-      if (!controller.signal.aborted) { setFiles([]); setFileDetail(null); setAbandonTarget(null); setReadError(reason instanceof Error ? reason.message : "Não foi possível consultar anexos."); setLoading(false); }
+      if (controller.signal.aborted) return;
+      setFiles([]); setFileDetail(null); setAbandonTarget(null);
+      setReadError(reason instanceof Error ? reason.message : "Não foi possível consultar anexos.");
+      if (modalOnly) setArchiveFailure(current => ({
+        cause: reason,
+        denied: reason instanceof ApiError && [401, 403, 404].includes(reason.status),
+        dismissed: false,
+        attempts: current?.dismissed ? 0 : current?.attempts ?? 0,
+      }));
+      setLoading(false);
     });
     return () => controller.abort();
-  }, [query, attempt]);
+  }, [query, attempt, modalOnly]);
+  function refreshAttachments() {
+    recoveredRef.current.clear();
+    setLoading(true);
+    setAttempt(value => value + 1);
+  }
   function clearPending(keepSelection = false) {
     setFileInvalid(false); focusFileRef.current = false;
     pendingRef.current = null; preparedIdRef.current = undefined; setFrozen(null); setUncertain(false); setResumeTarget(null);
@@ -254,11 +270,19 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
   const closeDetail = () => setFileDetail(current => current && { ...current, open: false });
   const full = modalOnly && visibleFiles.length >= 10;
   const fileHref = (file: Attachment, action: "view" | "download") => `/api/attachments?${query}&fileId=${file.id}&fileAction=${action}`;
-  return <section className="doc-area" aria-label="Anexos e ficha física"><header className="doc-section-heading"><div><h2>Anexos</h2><p>Arquivos vinculados à ficha, separados dos exemplares emitidos.</p></div><div className="doc-heading-actions"><button ref={refreshRef} className={buttonClass} type="button" disabled={busy} onClick={() => { recoveredRef.current.clear(); setLoading(true); setAttempt(value => value + 1); }}><Icon name="refresh" />Atualizar anexos</button>{writable ? <button ref={addButtonRef} className={primaryClass} type="button" disabled={busy || newPreparationBlocked || full} onClick={() => setAdding(true)}><Icon name="plus" />{full ? "Limite de anexos atingido" : !modalOnly && frozen ? "Recuperar envio do anexo" : "Adicionar anexo"}</button> : null}</div></header>
+  return <section className="doc-area" aria-label="Anexos e ficha física"><header className="doc-section-heading"><div><h2>Anexos</h2><p>Arquivos vinculados à ficha, separados dos exemplares emitidos.</p></div><div className="doc-heading-actions"><button ref={refreshRef} className={buttonClass} type="button" disabled={busy} onClick={refreshAttachments}><Icon name="refresh" />Atualizar anexos</button>{writable ? <button ref={addButtonRef} className={primaryClass} type="button" disabled={busy || newPreparationBlocked || full} onClick={() => setAdding(true)}><Icon name="plus" />{full ? "Limite de anexos atingido" : !modalOnly && frozen ? "Recuperar envio do anexo" : "Adicionar anexo"}</button> : null}</div></header>
     {!modalOnly && unresolved && !frozen ? <p role="status">Há uma tentativa em andamento. Consulte ou retome no cartão do arquivo antes de adicionar outro anexo.</p> : null}
     <p className="mt-2 text-xs text-(--muted)">Até dez arquivos ou reservas em andamento. Novos envios de até {attachmentMaxLabel}. Fotos e PDFs são convertidos para leitura segura; confira o arquivo disponível. A foto da ficha física continua como alternativa ao formulário.</p>
     {error && !abandonTarget && !adding && !resumeTarget ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
     {readError ? <Notice error>Não foi possível consultar a lista de anexos. {readError} Atualize esta seção.</Notice> : null}
+    {modalOnly ? <FileArchiveReadFailure open={active && !adding && !busy && Boolean(archiveFailure && !archiveFailure.dismissed)}
+      title="Não foi possível consultar os anexos" denied={archiveFailure?.denied ?? false} message={readError} loading={loading}
+      cause={archiveFailure?.cause} attempts={archiveFailure?.attempts ?? 0}
+      returnFocus={refreshRef} onClose={() => setArchiveFailure(current => current && { ...current, dismissed: true })}
+      onRetry={() => {
+        setArchiveFailure(current => current && { ...current, attempts: current.attempts + 1 });
+        refreshAttachments();
+      }} /> : null}
     {message ? <Notice>{message}</Notice> : null}
     {loading ? <p className="mt-3 text-sm" role="status">Consultando anexos…</p> : null}
     {modalOnly && !loading && !readError ? <div className="hca-file-collection-heading">
