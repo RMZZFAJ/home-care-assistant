@@ -2955,6 +2955,30 @@ A migration foi aplicada após o backup cifrado verificado
   útil fica contida na tela. Fechar a consulta devolve o foco ao item.
   As capturas são de navegador emulado com dados fictícios.
 
+### Saldos e compromissos no painel compartilhado
+
+- E07-02 usa a mesma composição de saldo por custódia ao abrir o
+  material pelo estoque, pela ficha ou pelo wizard. A aba contextual
+  continua na primeira posição quando há uma ficha de origem.
+- A área A receber separa trânsito, divergências, compra a realizar,
+  compra a receber e chegada a validar. Cada quantidade usa o produto
+  selecionado. Os atalhos levam à aba Fichas com o tipo correspondente
+  já selecionado. A consulta está sujeita à permissão de cada ficha.
+- O histórico de estoque informado na REQ permanece disponível. O
+  acesso pelo estoque também conserva o consumo registrado no período.
+- A migration `20261123070728_l3_material_stock_context.sql` reutiliza
+  a projeção da tela de estoque e restringe a leitura ao material da
+  consulta. Nove testes de integração com Auth real passaram, incluindo
+  tentativa com linha de outra ficha, paciente alheio, retirada de
+  permissões e chegada pendente sem efeito no saldo disponível.
+- A permissão contextual de mostrar o saldo familiar na REQ continua
+  independente. Somente a leitura do estoque familiar libera os dados
+  de mínimo, movimentação e compromissos dessa custódia.
+- A migration está aplicada no ambiente local e no remoto. A fila
+  vinculada ficou vazia com 353 versões. O acesso direto à projeção
+  privada segue restrito. O backup cifrado
+  `99cd2b11-2505-47e3-b057-39905521d553` foi verificado antes da aplicação.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

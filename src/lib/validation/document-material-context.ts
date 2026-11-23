@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { stockCustodyProjection } from "./stock-reads";
 
 const scope = z.object({ documentId: z.uuid(), patientId: z.uuid() });
 const quantity = z.string().regex(/^-?\d+(?:\.\d+)?$/);
@@ -47,6 +48,11 @@ export type MaterialHistoryRow = z.infer<typeof materialHistoryRow>;
 export const documentMaterialPanel = z.discriminatedUnion("section", [
   lineScope.extend({
     section: z.literal("stock"), ...balances,
+    positions: z.object({
+      family: stockCustodyProjection.nullable(),
+      team: stockCustodyProjection.nullable(),
+      transfersAvailable: z.boolean(),
+    }).optional(),
     observations: z.array(z.object({
       documentId: z.uuid(), code: z.string().nullable(), createdAt: date,
       quantity: quantity.nullable(), observation: materialHistoryObservation.nullable(),

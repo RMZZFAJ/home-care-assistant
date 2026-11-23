@@ -25,7 +25,9 @@ export async function GET(request: Request) {
     const result = input.section === "links" ? await rpc(auth.client, "material_related_fichas", {
       p_patient: patient.id, p_product: input.productId, p_document: null, p_line: null,
       p_kind: filters.data.kind, p_search: filters.data.search, p_page: input.page,
-    }) : input.section === "history" && params.get("view") === "decisions"
+    }) : input.section === "stock" ? await rpc(auth.client, "material_stock_context", {
+      p_patient: patient.id, p_product: input.productId, p_document: null, p_line: null, p_page: input.page,
+    }) : params.get("view") === "decisions"
       ? await rpc(auth.client, "material_documentary_history", {
         p_patient: patient.id, p_product: input.productId, p_document: null, p_line: null, p_page: input.page,
       }) : await rpc(auth.client, "catalogue_material_context", {

@@ -138,19 +138,13 @@ export function StockOverview({
       material={{ id: selectedProduct.productId, name: selectedProduct.name, unit: selectedProduct.unit }}
       onClose={() => setSelection(null)}
       closeText="Voltar ao estoque"
-      detailTitle="Saldos e compromissos"
+      detailTitle="Consumo no período"
       finalFocus={() => selection.opener.isConnected ? selection.opener : listRef.current ?? false}
-      detail={<div className="hca-form-stack">{selected.map(({ custody: key, stock }) => <section key={key}>
+      detail={<div className="hca-form-stack">{selected.map(({ custody: key }) => <section key={key}>
         <h4>{labels[key]}</h4>
         <DefinitionGrid items={[
-          { label: "Saldo confirmado", value: formatQuantity(stock.confirmed, selectedProduct.unit) },
-          { label: "Mínimo configurado", value: stock.minimum === null ? "Não definido" : formatQuantity(stock.minimum, selectedProduct.unit) },
-          { label: "Entrada em trânsito", value: formatQuantity(stock.incoming, selectedProduct.unit) },
-          { label: "Divergência pendente", value: formatQuantity(stock.disputed ?? "0", selectedProduct.unit) },
-          ...purchaseFacts(stock).map(item => ({ label: item.label, value: formatQuantity(item.value, selectedProduct.unit) })),
           { label: "Consumo registrado · 30 dias", value: formatQuantity(metrics.find(item =>
             item.productId === selectedProduct.productId && item.location === key)?.quantity ?? "0", selectedProduct.unit) },
-          { label: "Atualização do saldo", value: <StockUpdate updatedAt={stock.updatedAt} queriedAt={queriedAt} /> },
         ]} />
       </section>)}</div>} /> : null}
   </div>;

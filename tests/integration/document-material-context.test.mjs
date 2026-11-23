@@ -13,6 +13,9 @@ const read = (client, document, lineId, section, options = {}) => rpc(client, "d
 const timeline = (client, document, line, page = 1) => read(client, document, line, "history", {
   p_include_decisions: true, p_page: page,
 });
+const stockScope = (document, line) => ({
+  p_patient: null, p_product: null, p_document: document, p_line: line, p_page: 1,
+});
 
 test("material context reads current balances and only authorized records for the selected physical line", async () => {
   const f = await remainingNeedFixture();
@@ -30,6 +33,12 @@ test("material context reads current balances and only authorized records for th
 
   const stock = await read(pro, source.id, line.id, "stock");
   assert.ok(stock.observations.some(row => row.documentId === source.id));
+  const material = await rpc(pro, "material_stock_context", stockScope(source.id, line.id));
+  assert.equal(material.productId, f.products[0]);
+  assert.equal(Number(material.positions.team.confirmed), 2);
+  assert.ok(Number(material.positions.team.disputed) > 0);
+  const otherMaterial = await rpc(pro, "material_stock_context", stockScope(source.id, otherLine.id));
+  assert.equal(Number(otherMaterial.positions.team.incoming), 0);
   const links = await read(pro, source.id, line.id, "links");
   assert.ok(links.rows.some(row => row.id === ent.id));
   const unrelatedLine = await read(pro, source.id, otherLine.id, "links");
@@ -45,6 +54,7 @@ test("material context reads current balances and only authorized records for th
   assert.ok(entries.rows.some(row => row.kind === "movement" && row.destination === "CARE_TEAM"));
   const crossLine = await pro.rpc("document_material_context", { p_document: source.id, p_line: ent.lines[0].id });
   assert.equal(crossLine.error?.code, "42501");
+  assert.equal((await pro.rpc("material_stock_context", stockScope(source.id, ent.lines[0].id))).error?.code, "42501");
 
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
     values (${q(patient)},${q(fixtures.professional.id)},'ent.read',false),
@@ -53,6 +63,10 @@ test("material context reads current balances and only authorized records for th
   const limited = await read(pro, source.id, line.id, "stock");
   assert.equal(limited.family, null);
   assert.equal(limited.team, "2");
+  const restrictedMaterial = await rpc(pro, "material_stock_context", stockScope(source.id, line.id));
+  assert.equal(restrictedMaterial.positions.family, null);
+  assert.equal(restrictedMaterial.positions.transfersAvailable, false);
+  assert.equal(Number(restrictedMaterial.positions.team.incoming), 0);
   assert.ok((await read(pro, source.id, line.id, "links")).rows.every(row => row.id !== ent.id));
   assert.ok((await read(pro, source.id, line.id, "history")).rows.every(row => row.document?.id !== ent.id));
   assert.ok((await timeline(pro, source.id, line.id)).rows.every(row => row.document?.id !== ent.id && row.type !== "ent.receive"));
@@ -60,6 +74,7 @@ test("material context reads current balances and only authorized records for th
   const outsider = await actor("family", foreignPatient.patient);
   const wrongContext = await outsider.rpc("document_material_context", { p_document: source.id, p_line: line.id });
   assert.equal(wrongContext.error?.code, "42501");
+  assert.equal((await outsider.rpc("material_stock_context", stockScope(source.id, line.id))).error?.code, "42501");
   assert.equal(physicalState(f), before);
 });
 

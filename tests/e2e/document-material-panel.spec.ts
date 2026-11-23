@@ -5,6 +5,7 @@ import { rpc } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { purchaseBalanceCommand, purchaseBalanceFacts, purchaseBalanceFixture } from "../integration/purchase-entry-balance-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
 
@@ -64,6 +65,9 @@ test("material panel retains its linked consultation, search, and focus after a 
   await page.setViewportSize({ width: 390, height: 620 });
   const f = await remainingNeedFixture();
   const viewer = await shiftWorker(f.patient);
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(viewer.id)},'stock.family.read',false),
+    (${q(f.patient)},${q(viewer.id)},'req.family_stock',false);`);
   const before = physicalState(f);
   await page.goto("/login?next=" + encodeURIComponent(`/fichas/${f.source.id}`));
   await page.getByLabel("E-mail", { exact: true }).fill(viewer.email);
@@ -85,6 +89,14 @@ test("material panel retains its linked consultation, search, and focus after a 
   await panel.getByRole("tab", { name: "Estoque", exact: true }).click();
   await expect(panel.getByRole("heading", { name: "Estoque atual", exact: true })).toBeVisible();
   await expect(panel.getByText("Equipe · disponível", { exact: true })).toBeVisible();
+  await expect(panel.getByText("Família · disponível", { exact: true })).toHaveCount(0);
+  const commitments = panel.getByRole("region", { name: "A receber", exact: true });
+  await expect(commitments.getByText("Destino · Equipe", { exact: true })).toBeVisible();
+  await expect(commitments.getByText("Compra para a família", { exact: true })).toHaveCount(0);
+  await commitments.getByRole("button", { name: "Consultar fichas de entrega", exact: true }).click();
+  await expect(panel.getByRole("tab", { name: "Fichas", exact: true })).toBeFocused();
+  await expect(panel.getByRole("button", { name: "ENT", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await panel.getByRole("tab", { name: "Estoque", exact: true }).click();
   await expect(panel.getByText("Estoque informado nas requisições", { exact: true })).toBeVisible();
   await info.attach("painel-estoque", { body: await panel.screenshot({ animations: "disabled" }), contentType: "image/png" });
   const tabs = panel.getByRole("tablist", { name: "Consulta do material", exact: true });
@@ -316,9 +328,11 @@ test("catalogue consultation preserves a requisition edit through a full linked 
   const stockOpener = page.getByRole("button", { name: "Consultar Material fictício V4 0 · Equipe", exact: true });
   await stockOpener.click();
   const stock = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
-  await expect(stock.getByRole("heading", { name: "Saldos e compromissos", exact: true })).toBeVisible();
+  await expect(stock.getByRole("heading", { name: "A receber", exact: true })).toBeVisible();
+  await expect(stock.getByRole("heading", { name: "Consumo no período", exact: true })).toBeVisible();
   await expect(stock.getByRole("heading", { name: "Equipe", exact: true })).toBeVisible();
-  await expect(stock.getByText("Entrada em trânsito", { exact: true })).toBeVisible();
+  await expect(stock.getByRole("region", { name: "A receber", exact: true })
+    .getByText("Destino · Equipe", { exact: true })).toBeVisible();
   await expect(stock.getByRole("tab", { name: /^Nesta ficha/ })).toHaveCount(0);
   await stock.getByRole("tab", { name: "Histórico", exact: true }).click();
   await expect(stock.getByText("Recebimento conferido", { exact: true })).toBeVisible();

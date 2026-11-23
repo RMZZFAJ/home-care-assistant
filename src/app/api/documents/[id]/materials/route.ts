@@ -22,6 +22,8 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     const result = section === "links" && line ? await rpc(auth.client, "material_related_fichas", {
       p_patient: null, p_product: null, p_document: id, p_line: line,
       p_kind: filters.data.kind, p_search: filters.data.search, p_page: page,
+    }) : line && section === "stock" ? await rpc(auth.client, "material_stock_context", {
+      p_patient: null, p_product: null, p_document: id, p_line: line, p_page: page,
     }) : line && section === "history" && params.get("view") === "decisions"
       ? await rpc(auth.client, "material_documentary_history", {
         p_patient: null, p_product: null, p_document: id, p_line: line, p_page: page,

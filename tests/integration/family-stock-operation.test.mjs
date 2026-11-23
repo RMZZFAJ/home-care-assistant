@@ -176,6 +176,15 @@ test("approved purchase, physical arrival and available stock use independent qu
   assert.equal(Number(pending.purchasePendingValidation), 2);
   assert.equal(pending.confirmed, before.confirmed);
   assert.equal(pending.updatedAt, before.updatedAt);
+  const catalogueScope = productId => ({
+    p_patient: f.patient, p_product: productId, p_document: null, p_line: null, p_page: 1,
+  });
+  const material = await rpc(family, "material_stock_context", catalogueScope(f.products[0]));
+  assert.equal(material.positions.family.confirmed, pending.confirmed);
+  assert.equal(material.positions.family.purchaseAwaiting, pending.purchaseAwaiting);
+  assert.equal(material.positions.family.purchasePendingValidation, pending.purchasePendingValidation);
+  const unrelated = await rpc(family, "material_stock_context", catalogueScope(f.products[1]));
+  assert.equal(Number(unrelated.positions.family.purchaseAwaiting), 0);
   await command(f.admin, "validate_receipt", { receiptId: order.receipts.at(-1).id });
   const approved = await overview();
   assert.equal(Number(approved.purchaseAwaiting), 3);

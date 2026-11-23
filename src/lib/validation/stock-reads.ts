@@ -11,7 +11,7 @@ const stockNumber = z.union([
   z.number().finite(),
 ]).transform(value => quantity(value).toFixed());
 const instant = z.string().datetime({ offset: true });
-const custody = z.object({
+export const stockCustodyProjection = z.object({
   confirmed: stockNumber,
   incoming: stockNumber,
   minimum: stockNumber.nullable(),
@@ -24,8 +24,8 @@ const custody = z.object({
 const product = z.object({
   productId, name: z.string().min(1), unit: z.string().min(1),
   decimals: z.number().int().min(0).max(6), active: z.boolean(),
-  family: custody.extend({ purchasePending: stockNumber }).nullable(),
-  team: custody.extend({ purchasePending: stockNumber.optional() }).nullable(),
+  family: stockCustodyProjection.extend({ purchasePending: stockNumber }).nullable(),
+  team: stockCustodyProjection.extend({ purchasePending: stockNumber.optional() }).nullable(),
   disputed: stockNumber,
 });
 const metric = z.object({

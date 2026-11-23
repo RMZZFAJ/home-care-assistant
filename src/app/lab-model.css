@@ -1752,9 +1752,25 @@
 .hca-l1 .hca-related-materials > :is(li, article) { padding: 12px 0; border: 0; border-radius: 0; overflow-wrap: anywhere; }
 .hca-l1 .hca-related-materials > :is(li, article) + :is(li, article) { border-top: 1px solid #e3eae6; }
 .hca-l1 .hca-related-material-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin-bottom: 12px; }
-.hca-l1 .hca-material-balance-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 12px 0; padding: 15px 0; border-block: 1px solid #e4ece6; }
-.hca-l1 .hca-material-balance-grid dt, .hca-l1 .hca-material-balance-grid .hca-material-balance-note { font-size: 10px; color: #546e62; font-weight: 400; }
-.hca-l1 .hca-material-balance-grid dd { margin: 3px 0 0; font-size: 16px; font-weight: 650; overflow-wrap: anywhere; }
+.hca-l1 .hca-material-custody dd, .hca-l1 .hca-material-commitment dd { margin: 0; overflow-wrap: anywhere; }
+.hca-l1 .hca-material-receivable { border: 1px solid var(--hca-line); border-radius: 14px; overflow: hidden; }
+.hca-l1 .hca-material-receivable > h3 { margin: 0; padding: 14px 16px; border-bottom: 1px solid var(--hca-line); background: #f8fbf9; }
+.hca-l1 .hca-material-commitments { margin: 0; padding-inline: 16px; }
+.hca-l1 .hca-material-commitment { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto); gap: 5px 12px; align-items: start; padding: 11px 0; border-bottom: 1px solid var(--hca-line); }
+.hca-l1 .hca-material-commitment:last-child { border-bottom: 0; }
+.hca-l1 .hca-material-commitment dt:first-child { display: flex; align-items: start; gap: 9px; }
+.hca-l1 .hca-material-commitment-icon { flex: none; display: grid; place-items: center; width: 33px; height: 33px; border-radius: 9px; background: var(--hca-tint); color: var(--hca-teal); }
+.hca-l1 .hca-material-arrival-banner { padding-inline: 16px; }
+.hca-l1 .hca-material-commitment dt small { display: block; margin-top: 3px; color: var(--hca-muted); }
+.hca-l1 .hca-material-commitment dd { text-align: end; font-weight: 650; }
+.hca-l1 .hca-material-commitment :is(.hca-material-commitment-note, .hca-material-commitment-action) { font-size: 12px; }
+.hca-l1 .hca-material-commitment .hca-material-commitment-action { grid-column: 1 / -1; justify-self: start; }
+.hca-l1 .hca-material-context-heading { display: flex; align-items: start; gap: 12px; padding-bottom: 15px; margin-bottom: 12px; border-bottom: 1px solid var(--hca-line); }
+.hca-l1 .hca-material-context-heading > div { min-width: 0; overflow-wrap: anywhere; }
+.hca-l1 .hca-material-context-heading .hca-stock-material-icon { flex: none; }
+.hca-l1 .hca-material-context-heading h3 { margin: 0; font-size: 11px; text-transform: uppercase; font-weight: 650; letter-spacing: .05em; }
+.hca-l1 .hca-material-context-heading strong { display: block; margin-block: 4px; font-size: 20px; }
+.hca-l1 .hca-material-context-heading small { color: var(--hca-muted); }
 .hca-l1 .hca-material-linked-list small { display: block; font-weight: 400; color: #546e62; }
 .hca-l1 .hca-material-timeline { display: grid; margin: 6px 0 0; padding: 0; list-style: none; }
 .hca-l1 .hca-material-timeline li { position: relative; display: flex; align-items: flex-start; gap: 12px; padding-bottom: 22px; }

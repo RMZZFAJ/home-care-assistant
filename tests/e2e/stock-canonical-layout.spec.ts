@@ -176,18 +176,17 @@ test("estoque canônico conserva 101 materiais, filtra saldo exato e mantém mí
     exact: true,
   });
   await expect(
-    detail.locator("dt").filter({ hasText: /^Saldo confirmado$/ }).locator("+ dd"),
+    detail.locator("dt").filter({ hasText: /^Família · disponível$/ }).locator("+ dd"),
   ).toHaveText("0 unidade");
-  for (const label of [
-    "Entrada em trânsito",
-    "Consumo registrado · 30 dias",
-    "Divergência pendente",
-  ]) {
+  await expect(detail.locator("dt").filter({ hasText: "Consumo registrado · 30 dias" }).locator("+ dd")).toHaveText("0 unidade");
+  const commitments = detail.getByRole("region", { name: "A receber", exact: true });
+  for (const label of ["Entrada em trânsito", "Divergência pendente"]) {
     await expect(
-      detail.locator("dt").filter({ hasText: label }).locator("+ dd"),
-    ).toHaveText("0 unidade");
+      commitments.locator("dt").filter({ hasText: label }).locator("+ dd"),
+    ).toHaveText(["0 unidade", "0 unidade"]);
   }
-  await expect(detail.getByText("Não definido", { exact: true })).toBeVisible();
+  await expect(detail.getByRole("region", { name: "Estoque atual", exact: true })
+    .getByText("Não definido", { exact: true }).first()).toBeVisible();
   await audit(page, "stock-canonical-detail320");
   await page.keyboard.press("Escape");
   await expect(detail).toHaveCount(0);
