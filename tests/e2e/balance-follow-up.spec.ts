@@ -2,7 +2,7 @@ import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { legacyBalance, receiveBalanceMaterials, balState } from "../integration/bal-review-fixtures.mjs";
-import { fixtures } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -12,9 +12,9 @@ import { auditFromTop } from "./accessibility-audit";
 test.setTimeout(120_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
 const stock = (patient: string) => sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)};`);
-async function login(page: Page, patient: string) {
+async function login(page: Page, patient: string, email: string) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
@@ -24,7 +24,8 @@ async function login(page: Page, patient: string) {
 for (const policy of ["required", "optional"] as const) {
   test(`BAL follow-up ${policy}: reference, preserved effect, read failure and authorization`, async ({ page }, info) => {
     const f = await legacyBalance({ policy, quantity: policy === "optional" ? "1" : "0" });
-    await login(page, f.patient);
+    const family = await shiftWorker(f.patient, "family");
+    await login(page, f.patient, family.email);
     const writes: string[] = [];
     page.on("request", request => {
       if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET" && !isDocumentAccessReport(request)) writes.push(request.url());
@@ -49,7 +50,11 @@ for (const policy of ["required", "optional"] as const) {
 
     await receiveBalanceMaterials(f);
     const preserved = balState(f.document.id), ledger = stock(f.patient);
-    await selectDocumentSection(page, "overview");
+    const overview = page.getByRole("tab", { name: "Visão geral", exact: true });
+    await overview.focus();
+    await expect(overview).toBeFocused();
+    await overview.press("Enter");
+    await expect(overview).toHaveAttribute("aria-selected", "true");
     const latest = policy === "required" ? "Conferir a referência do balanço" : "Consultar a contagem conciliada";
     // Reload the real reference; subsequent movements cannot undo prior reconciliation.
     await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
@@ -86,7 +91,7 @@ for (const policy of ["required", "optional"] as const) {
     await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByText(latest, { exact: true })).toBeVisible();
 
     const denied = page.waitForResponse(response => target(new URL(response.url())) && response.status() === 403);
-    sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.family.id)},'bal.read',false);`);
+    sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(family.id)},'bal.read',false);`);
     // A genuine Realtime invalidation may already remove the refresh button.
     // Observe before revoking and drive the read consumer's normal invalidation
     // signal; the HTTP request and its Auth/RLS denial remain real.

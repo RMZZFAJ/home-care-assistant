@@ -272,7 +272,9 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   await page.getByRole("button", { name: "Aplicar contagem pelo grupo familiar", exact: true }).click();
   const application = page.getByRole("dialog", { name: "Aplicar contagem ao estoque", exact: true });
   await application.getByRole("button", { name: "Confirmar aplicação da contagem", exact: true }).click();
-  await expect(application).toHaveCount(0);
+  const applied = page.getByRole("dialog", { name: "Contagem aplicada", exact: true });
+  await expect(applied).toContainText(f.document.code);
+  await applied.getByRole("button", { name: "Concluir", exact: true }).click();
   const document = (
     await (await page.request.get("/api/documents/" + f.document.id)).json()
   ).data as SupplyDocument;
