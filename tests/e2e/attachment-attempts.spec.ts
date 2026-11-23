@@ -88,6 +88,7 @@ test("anexos ocultam lista recusada e cada nova abertura começa com uma seleç�
 
 test("anexo confirmado com resposta perdida congela escolha e GET recupera o mesmo arquivo sem outro upload", async ({ page }, info) => {
   const f = await fixture(page), before = facts(f.doc.id); let uploadPosts = 0;
+  f.file.name = "ficha física março.png";
   page.on("request", request => { const url = new URL(request.url()); if (url.pathname === "/api/attachments" && request.method() === "POST" && !url.searchParams.has("prepare")) uploadPosts++; });
   await loseConfirmedResponse(page, "upload");
   await picker(page).setInputFiles(f.file); await submit(page).click(); await expect(picker(page)).toBeDisabled();
@@ -106,9 +107,55 @@ test("anexo confirmado com resposta perdida congela escolha e GET recupera o mes
   }
   await submit(page).click(); await expect(picker(page)).toHaveCount(0);
   expect(uploadPosts).toBe(1); expect(rows(f.doc.id)).toHaveLength(1); expect(rows(f.doc.id)[0].sha256).toBe(stored.sha256); expect(facts(f.doc.id)).toBe(before);
-  const link = page.getByRole("link", { name: f.file.name, exact: true }), download = await page.request.get((await link.getAttribute("href"))!); expect(download.ok()).toBeTruthy(); expect(digest(await download.body())).toBe(stored.sha256);
-  await page.getByText("Origem e conversão do arquivo", { exact: true }).click(); await expect(page.getByText(`SHA-256 do original:`, { exact: false })).toContainText(digest(f.source));
+  const card = page.locator(`[data-file-id="${stored.id}"]`);
+  const author = sql(`select full_name from public.profiles where id=${q(stored.uploaded_by)}`);
+  await expect(card.getByText(`Adicionado por ${author}`, { exact: false })).toBeVisible();
+  expect(Date.parse((await card.locator("time").getAttribute("datetime"))!)).toBe(Date.parse(stored.confirmed_at));
+  const view = (await card.getByRole("link", { name: `Visualizar ${f.file.name}`, exact: true }).getAttribute("href"))!;
+  expect(await card.getByRole("link", { name: f.file.name, exact: true }).getAttribute("href")).toBe(view);
+  const opened = await page.request.get(view);
+  expect(opened.ok()).toBe(true);
+  expect(digest(await opened.body())).toBe(stored.sha256);
+  const download = (await card.getByRole("link", { name: `Baixar ${f.file.name}`, exact: true }).getAttribute("href"))!;
+  const downloadRedirect = await page.request.get(download, { maxRedirects: 0 });
+  expect(downloadRedirect.status()).toBe(307);
+  const downloadLocation = new URL(downloadRedirect.headers().location);
+  expect(downloadLocation.searchParams.get("download")).toBe("ficha física março.jpg");
+  const downloaded = await page.request.get(downloadLocation.href);
+  expect(downloaded.ok()).toBe(true);
+  expect(downloaded.headers()["content-disposition"]).toMatch(/^attachment;/i);
+  expect(digest(await downloaded.body())).toBe(stored.sha256);
+  const other = await rpc(f.owner, "create_supply_document", { p_patient: f.patient, p_type: "COM",
+    p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "1" }] }, p_key: randomUUID(), p_draft: false });
+  const mismatched = new URL(view, page.url());
+  mismatched.searchParams.set("documentId", other.id);
+  const refused = await page.request.get(mismatched.href, { maxRedirects: 0 });
+  expect(refused.status()).toBe(404);
+  expect(refused.headers().location).toBeUndefined();
+  const details = card.getByRole("button", { name: `Detalhes do anexo ${f.file.name}`, exact: true });
+  await details.click();
+  const drawer = page.getByRole("dialog", { name: "Detalhes do anexo", exact: true });
+  await drawer.getByText("Origem e conversão do arquivo", { exact: true }).click();
+  await expect(drawer.getByText(`SHA-256 do original:`, { exact: false })).toContainText(digest(f.source));
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(drawer.getByRole("button", { name: "Voltar aos arquivos", exact: true })).toBeVisible();
+    expect(await drawer.evaluate(panel => panel.scrollWidth <= panel.clientWidth + 1)).toBe(true);
+    await drawer.screenshot({ path: info.outputPath(`detalhes-anexo-${width}.png`), animations: "disabled" });
+  }
+  await drawer.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
+  await expect(details).toBeFocused();
   for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 1000 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true); await page.screenshot({ path: `output/phase-d-work/attachment-layout-${info.project.name}-${width}.png`, fullPage: true }); }
+  const accessFilter = `care_recipient_id=${q(f.patient)} and subject_user=${q(stored.uploaded_by)} and capability='com.read'`;
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${q(f.patient)},${q(stored.uploaded_by)},'com.read',false)`);
+  try {
+    const denied = await page.request.get(view, { maxRedirects: 0 });
+    expect(denied.status()).toBe(403);
+    expect(denied.headers().location).toBeUndefined();
+  } finally {
+    sql(`delete from public.capability_overrides where ${accessFilter}`);
+  }
 });
 
 test("perda antes da reserva conserva arquivo e chave e permite concluir a mesma intenção", async ({ page }) => {

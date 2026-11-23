@@ -1796,6 +1796,7 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261123120522_l3_reviewed_consumption_correction` | Aplicada | Aplicada |
 | `20261123123142_l3_shortage_material_without_quantity` | Aplicada | Aplicada |
 | `20261123130151_l3_schedule_balance_review_contract` | Aplicada | Aplicada |
+| `20261123131427_l3_document_attachment_display_facts` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2417,6 +2418,28 @@ A consulta pública de E09 usa o esquema existente. A anexação usa a primeira
 migration de L3, registrada na seção de migrations por ambiente. Ela guarda
 o vínculo entre tentativas da mesma pessoa e os bytes já submetidos à mesma
 ficha. A seleção incompleta fica no modal, com recuperação técnica separada.
+
+#### Consulta do anexo confirmado
+
+O cartão usa o autor associado ao envio e o instante em que o banco
+confirmou o anexo. O painel reutiliza o componente compartilhado e mostra
+identidade, estado, conversão e dados técnicos. O seletor mostra o protocolo
+da ficha, quando disponível. Dez anexos confirmados ocupam toda a capacidade.
+
+Visualizar e Baixar consultam a ficha autorizada no momento do clique e
+liberam um link temporário para o mesmo objeto validado. O download usa a
+extensão do arquivo disponível e conserva espaços e acentos do nome.
+O conteúdo emitido e o vínculo do anexo permanecem preservados.
+
+Passaram 11 integrações com Auth e Storage reais e nove casos dirigidos
+em Chromium, Android e iOS emulados. A rodada final repetiu a recuperação
+nos três navegadores, comparou os hashes de visualização e download,
+recusou a troca de ficha e a perda real de autorização e conferiu o retorno
+de foco. O painel foi inspecionado em 360 e 412 px.
+
+A migration de metadados foi aplicada localmente e no remoto vinculado
+após verificar o backup cifrado `899081fc-3ba1-4ecf-a69e-063b32265c1c`.
+A definição e as permissões da consulta coincidiram nos dois ambientes.
 
 ### Acervo na ficha
 

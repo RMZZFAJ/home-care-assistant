@@ -430,6 +430,12 @@ documentais também exigem expectedVersion para detectar concorrência.
 
   **Contrato:** Reserva, upload validado, vínculo e links privados
 
+  A lista de anexos da ficha informa o nome do autor e o instante da
+  confirmação quando disponíveis. `fileId` com `fileAction=view` ou
+  `fileAction=download` exige o identificador da ficha e a autorização atual
+  para consultá-la. A resposta libera um link temporário para o mesmo objeto
+  validado. A consulta e o download preservam os bytes e o vínculo do anexo.
+
 - **Rota:** /api/consumption
 
   **Contrato:** Relatos, complementos e decisões versionados; páginas e filtros

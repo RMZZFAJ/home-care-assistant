@@ -5,13 +5,14 @@ import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from 
 import { z } from "zod";
 import { api, buttonClass, errorMessage, inputClass, Notice, primaryClass } from "@/components/workspace";
 import { FileRecord, PdfFormatMark } from "@/components/ui/file-record";
-import { DefinitionGrid } from "@/components/ui/controls";
-import { Dialog } from "@/components/ui/overlays";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
+import { Dialog, Drawer } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
+import { formatBrazilDate } from "@/lib/receipt";
 import { attachmentForm, attachmentMaxBytes, attachmentMaxLabel, attachmentPrepared, confirmedAttachment, freezeAttachment, type FrozenAttachment } from "@/lib/documents/attachment-attempt";
 
 const hash = z.string().regex(/^[a-f0-9]{64}$/);
-const attachment = z.object({ id: z.uuid(), filename: z.string(), bytes: z.number().int().positive(), mime_type: z.string(), state: z.enum(["quarantine", "ready", "rejected", "abandoned"]), sha256: hash.nullable(), sourceSha256: hash.nullable(), sourceBytes: z.number().nullable(), sourceMime: z.string().nullable(), transformation: z.string().nullable(), uploadKey: z.uuid().nullable(), tracked: z.boolean(), pending: z.boolean(), canAbandon: z.boolean(), url: z.string().nullable() });
+const attachment = z.object({ id: z.uuid(), filename: z.string(), bytes: z.number().int().positive(), mime_type: z.string(), state: z.enum(["quarantine", "ready", "rejected", "abandoned"]), sha256: hash.nullable(), sourceSha256: hash.nullable(), sourceBytes: z.number().nullable(), sourceMime: z.string().nullable(), transformation: z.string().nullable(), uploadKey: z.uuid().nullable(), tracked: z.boolean(), pending: z.boolean(), canAbandon: z.boolean(), url: z.string().nullable(), uploadedName: z.string().nullish(), confirmedAt: z.iso.datetime({ offset: true }).nullish() });
 const attachmentList = z.object({ data: z.array(attachment) });
 function readList(value: unknown) {
   const result = attachmentList.safeParse(value);
@@ -19,11 +20,22 @@ function readList(value: unknown) {
   return result.data;
 }
 type Attachment = z.infer<typeof attachment>;
-type Props = { patientId: string; documentId?: string; movementId?: string; contingencyId?: string; writable?: boolean; onChange?: () => void; };
+type Props = { patientId: string; documentId?: string; documentCode?: string; movementId?: string; contingencyId?: string; writable?: boolean; onChange?: () => void; };
+
+function AttachmentProvenance({ file }: { file: Attachment }) {
+  return <details className="doc-help-details"><summary>Origem e conversão do arquivo</summary>
+    {file.sourceSha256 ? <>
+      <p>Original selecionado: {file.sourceMime} · {Math.ceil((file.sourceBytes ?? 0) / 1024)} KB. O original não é armazenado.</p>
+      <p className="break-all">SHA-256 do original: <code>{file.sourceSha256}</code></p>
+      <p>{file.transformation === "image-normalized-v1" ? "Imagem orientada, redimensionada e convertida para JPEG sem metadados." : "PDF com páginas passivas, sem anotações ou campos interativos."}</p>
+    </> : <p>A origem e a transformação deste envio histórico não foram registradas. O hash disponível corresponde ao arquivo armazenado.</p>}
+    {file.sha256 ? <p className="break-all">SHA-256 do arquivo disponível: <code>{file.sha256}</code></p> : null}
+  </details>;
+}
 export function Attachments(props: Props) {
   return <ScopedAttachments key={`${props.patientId}:${props.documentId ?? ""}:${props.movementId ?? ""}:${props.contingencyId ?? ""}`} {...props} />;
 }
-function ScopedAttachments({ patientId, documentId, movementId, contingencyId, writable = false, onChange }: Props) {
+function ScopedAttachments({ patientId, documentId, documentCode, movementId, contingencyId, writable = false, onChange }: Props) {
   const modalOnly = Boolean(documentId);
   const [adding, setAdding] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -37,6 +49,7 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
   const [abandonTarget, setAbandonTarget] = useState<Attachment | null>(null), [resumeTarget, setResumeTarget] = useState<Attachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null), refreshRef = useRef<HTMLButtonElement>(null), pendingRef = useRef<FrozenAttachment | null>(null), preparedIdRef = useRef<string | undefined>(undefined), mountedRef = useRef(true);
   const addButtonRef = useRef<HTMLButtonElement>(null);
+  const [fileDetail, setFileDetail] = useState<{ id: string; open: boolean; opener: HTMLButtonElement } | null>(null);
   const recoveredRef = useRef(new Set<string>());
   const attachmentFormId = useId();
   const resolveAbandonFocus = useCallback(() => {
@@ -70,7 +83,7 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
       if (controller.signal.aborted) return;
       setFiles(readList(result).data); setReadError(""); setLoading(false);
     }).catch(reason => {
-      if (!controller.signal.aborted) { setFiles([]); setAbandonTarget(null); setReadError(reason instanceof Error ? reason.message : "Não foi possível consultar anexos."); setLoading(false); }
+      if (!controller.signal.aborted) { setFiles([]); setFileDetail(null); setAbandonTarget(null); setReadError(reason instanceof Error ? reason.message : "Não foi possível consultar anexos."); setLoading(false); }
     });
     return () => controller.abort();
   }, [query, attempt]);
@@ -127,7 +140,7 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
   }
   function deniedRead(reason: unknown) {
     if (!(reason instanceof ApiError) || ![401, 403, 404].includes(reason.status)) return false;
-    setFiles([]); setAbandonTarget(null); setReadError(reason.message); return true;
+    setFiles([]); setFileDetail(null); setAbandonTarget(null); setReadError(reason.message); return true;
   }
   async function upload(event?: FormEvent<HTMLFormElement>, resuming = resumeTarget, selectedFile?: File) {
     event?.preventDefault(); if (busy || newPreparationBlocked && !resuming) return;
@@ -237,7 +250,11 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     }
   }
   const visibleFiles = modalOnly ? files.filter(file => file.state === "ready") : files;
-  return <section className="doc-area" aria-label="Anexos e ficha física"><header className="doc-section-heading"><div><h2>Anexos</h2><p>Arquivos vinculados à ficha, separados dos exemplares emitidos.</p></div><div className="doc-heading-actions"><button ref={refreshRef} className={buttonClass} type="button" disabled={busy} onClick={() => { recoveredRef.current.clear(); setLoading(true); setAttempt(value => value + 1); }}><Icon name="refresh" />Atualizar anexos</button>{writable ? <button ref={addButtonRef} className={primaryClass} type="button" disabled={busy || newPreparationBlocked} onClick={() => setAdding(true)}><Icon name="plus" />{!modalOnly && frozen ? "Recuperar envio do anexo" : "Adicionar anexo"}</button> : null}</div></header>
+  const detail = visibleFiles.find(file => file.id === fileDetail?.id);
+  const closeDetail = () => setFileDetail(current => current && { ...current, open: false });
+  const full = modalOnly && visibleFiles.length >= 10;
+  const fileHref = (file: Attachment, action: "view" | "download") => `/api/attachments?${query}&fileId=${file.id}&fileAction=${action}`;
+  return <section className="doc-area" aria-label="Anexos e ficha física"><header className="doc-section-heading"><div><h2>Anexos</h2><p>Arquivos vinculados à ficha, separados dos exemplares emitidos.</p></div><div className="doc-heading-actions"><button ref={refreshRef} className={buttonClass} type="button" disabled={busy} onClick={() => { recoveredRef.current.clear(); setLoading(true); setAttempt(value => value + 1); }}><Icon name="refresh" />Atualizar anexos</button>{writable ? <button ref={addButtonRef} className={primaryClass} type="button" disabled={busy || newPreparationBlocked || full} onClick={() => setAdding(true)}><Icon name="plus" />{full ? "Limite de anexos atingido" : !modalOnly && frozen ? "Recuperar envio do anexo" : "Adicionar anexo"}</button> : null}</div></header>
     {!modalOnly && unresolved && !frozen ? <p role="status">Há uma tentativa em andamento. Consulte ou retome no cartão do arquivo antes de adicionar outro anexo.</p> : null}
     <p className="mt-2 text-xs text-(--muted)">Até dez arquivos ou reservas em andamento. Novos envios de até {attachmentMaxLabel}. Fotos e PDFs são convertidos para leitura segura; confira o arquivo disponível. A foto da ficha física continua como alternativa ao formulário.</p>
     {error && !abandonTarget && !adding && !resumeTarget ? <div id={fileErrorId}><Notice error>{error}</Notice></div> : null}
@@ -245,12 +262,17 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
     {message ? <Notice>{message}</Notice> : null}
     {loading ? <p className="mt-3 text-sm" role="status">Consultando anexos…</p> : null}
     <ul className="doc-card doc-file-list doc-file-list-compact" aria-label="Arquivos anexados">{visibleFiles.map(file => <FileRecord key={file.id} identity={file.id} mime={file.mime_type} filename={file.filename}
-      title={file.url ? <a href={file.url} target="_blank" rel="noopener">{file.filename}</a> : file.filename}>
+      title={modalOnly || file.url ? <a href={modalOnly ? fileHref(file, "view") : file.url!} target="_blank" rel="noopener noreferrer">{file.filename}</a> : file.filename}
+      actions={modalOnly ? <>
+        <a className={buttonClass} href={fileHref(file, "view")} target="_blank" rel="noopener noreferrer" aria-label={`Visualizar ${file.filename}`}><Icon name="eye" />Visualizar</a>
+        <a className={`${buttonClass} btn-icon`} href={fileHref(file, "download")} aria-label={`Baixar ${file.filename}`}><Icon name="download" /></a>
+        <ActionButton className="btn-icon" aria-label={`Detalhes do anexo ${file.filename}`}
+          onClick={event => setFileDetail({ id: file.id, open: true, opener: event.currentTarget })}><Icon name="more" /></ActionButton>
+      </> : undefined}>
+      {modalOnly ? <p className="doc-line-meta">{file.uploadedName ? `Adicionado por ${file.uploadedName}` : "Autoria indisponível"}
+        {file.confirmedAt ? <> · <time dateTime={file.confirmedAt}>{formatBrazilDate(file.confirmedAt)}</time></> : null}</p> : null}
       <DefinitionGrid items={[{ label: "Tamanho disponível", value: Math.ceil(file.bytes / 1024) + " KB" }, { label: "Estado", value: file.state === "ready" ? "Validado" : file.state === "rejected" ? "Rejeitado" : file.pending ? "Resultado do envio pendente" : "Preparado; envio não confirmado" }]} />
-      <details className="mt-2"><summary className="cursor-pointer text-xs">Origem e conversão do arquivo</summary>
-        {file.sourceSha256 ? <><p>Original selecionado: {file.sourceMime} · {Math.ceil((file.sourceBytes ?? 0) / 1024)} KB. O original não é armazenado.</p><p className="break-all">SHA-256 do original: <code>{file.sourceSha256}</code></p><p>{file.transformation === "image-normalized-v1" ? "Imagem orientada, redimensionada e convertida para JPEG sem metadados." : "PDF com páginas passivas, sem anotações ou campos interativos."}</p></> : <p>A origem e a transformação deste envio histórico não foram registradas. O hash disponível corresponde ao arquivo armazenado.</p>}
-        {file.sha256 ? <p className="break-all">SHA-256 do arquivo disponível: <code>{file.sha256}</code></p> : null}
-      </details>
+      {!modalOnly ? <AttachmentProvenance file={file} /> : null}
       {writable && file.state === "quarantine" && file.uploadKey && file.tracked ? <div className="mt-2 flex flex-wrap gap-2">
         <button type="button" className={buttonClass} disabled={busy} onClick={() => void recover(file)}>Consultar e recuperar tentativa</button>
         {(!frozen || frozen.key === file.uploadKey) && file.sourceSha256 ? <button type="button" className={buttonClass} disabled={busy} onClick={() => { setResumeTarget(file); if (pendingRef.current?.key === file.uploadKey) void upload(undefined, file); else void recover(file); }}>Retomar envio</button> : null}
@@ -261,6 +283,23 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
         {error ? <p role="alert">{error}</p> : null}
       </div> : null}
     </FileRecord>)}</ul>
+    {modalOnly && detail && fileDetail ? <Drawer open={fileDetail.open} title="Detalhes do anexo" subtitle={`${documentCode ?? "Ficha"} · Arquivo vinculado`}
+      headingIcon="file" keyboardScrollable onClose={closeDetail}
+      finalFocus={() => fileDetail.opener.isConnected ? fileDetail.opener : refreshRef.current ?? false}
+      footer={<><ActionButton onClick={closeDetail}>Voltar aos arquivos</ActionButton>
+        <a className={primaryClass} href={fileHref(detail, "view")} target="_blank" rel="noopener noreferrer"><Icon name="eye" />Visualizar</a></>}>
+      <div className="hca-form-stack">
+        <div className="hca-file-details-lead">{detail.mime_type === "application/pdf" ? <PdfFormatMark /> : <Icon name="image" width={26} height={26} />}
+          <strong>{detail.filename}</strong></div>
+        <DefinitionGrid items={[
+          { label: "Adicionado por", value: detail.uploadedName ?? "Autoria indisponível" },
+          { label: "Envio confirmado em", value: detail.confirmedAt ? formatBrazilDate(detail.confirmedAt) : "Data indisponível" },
+          { label: "Tamanho disponível", value: Math.ceil(detail.bytes / 1024) + " KB" },
+          { label: "Estado", value: "Validado" },
+        ]} />
+        <AttachmentProvenance file={detail} />
+      </div>
+    </Drawer> : null}
     <Dialog open={Boolean(abandonTarget && files.some(file => file.id === abandonTarget.id))} title="Abandonar tentativa incompleta" closeDisabled={busy} finalFocus={resolveAbandonFocus} onClose={() => setAbandonTarget(null)}>
       {abandonTarget ? <>
         <div role="group" aria-label="Confirmar abandono da tentativa" className="hca-form-stack">
@@ -305,7 +344,7 @@ function ScopedAttachments({ patientId, documentId, movementId, contingencyId, w
             disabled={busy || Boolean(frozen) || newPreparationBlocked} required={!frozen}
             onChange={event => { setSelectedFile(event.currentTarget.files?.[0] ?? null); setFileInvalid(false); setError(""); }} />
         </label>
-        <p className="hca-attachment-destination"><Icon name="file" width={16} height={16} />Destino <strong>Esta ficha · Anexos</strong></p>
+        <p className="hca-attachment-destination"><Icon name="file" width={16} height={16} />Destino <strong>{documentCode ?? "Esta ficha"} · Anexos</strong></p>
         <p className="hca-field-help">Se fechar esta janela antes de concluir, será necessário selecionar o arquivo novamente.</p>
       </form>
     </Dialog> : null}
