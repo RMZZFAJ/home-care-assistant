@@ -463,8 +463,9 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
   await page
     .getByRole("button", { name: "Movimentar estoque familiar", exact: true })
     .click();
-  await page.getByLabel("Operação", { exact: true }).selectOption("outbound");
-  await page.getByLabel("Produto", { exact: true }).selectOption(f.products[0]);
+  const stockEditor = page.getByRole("dialog", { name: "Movimentar estoque familiar", exact: true });
+  await stockEditor.getByRole("combobox", { name: "Operação", exact: true }).selectOption("outbound");
+  await stockEditor.getByRole("combobox", { name: "Produto", exact: true }).selectOption(f.products[0]);
   await page.getByLabel("Quantidade", { exact: true }).fill("1");
   await page
     .getByLabel("Motivo", { exact: true })
@@ -472,20 +473,19 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
   await page
     .getByRole("button", { name: "Revisar movimentação", exact: true })
     .click();
-  const movement = page.getByRole("region", {
-    name: "Revisão da movimentação familiar",
+  const movement = page.getByRole("dialog", {
+    name: "Confirmar movimentação familiar",
     exact: true,
   });
-  await expect(movement).toContainText("Material fictício V4 0");
-  await expect(movement).toContainText("1 unidade");
-  await expect(movement).toContainText("familiar");
+  const material = movement.getByRole("article").filter({ hasText: "Material fictício V4 0" });
+  await expect(material).toContainText("Saldo atual · Família");
+  for (const quantity of ["5 unidade", "1 unidade", "4 unidade"]) {
+    await expect(material.getByText(quantity, { exact: true })).toBeVisible();
+  }
   await expect(
     movement.locator("input:visible,select:visible,textarea:visible"),
   ).toHaveCount(0);
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Confirmar", exact: true })
-    .click();
+  await movement.getByRole("button", { name: "Confirmar", exact: true }).click();
   await expect(
     page.getByText("Movimentação familiar confirmada.", { exact: false }),
   ).toBeVisible();
@@ -506,8 +506,8 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
     exact: true,
   });
   await form
-    .getByRole("checkbox", {
-      name: "Processamento automático neste paciente",
+    .getByRole("switch", {
+      name: "Balanços programados",
       exact: true,
     })
     .check();
@@ -522,7 +522,7 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
     .selectOption("America/Sao_Paulo");
   await form.getByLabel("Vigente a partir de", { exact: false }).fill(today);
   await form
-    .getByRole("textbox", { name: "Justificativa", exact: true })
+    .getByRole("textbox", { name: "Observação (opcional)", exact: true })
     .fill("Programação noturna de sexta conforme responsabilidade familiar");
   await form
     .getByRole("button", { name: "Revisar decisão", exact: true })
@@ -542,6 +542,7 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
     "12h",
     "America/Sao_Paulo",
     "Derivar da escala real",
+    "Programação noturna de sexta conforme responsabilidade familiar",
     "não registra contagem nem movimenta estoque",
   ])
     await expect(facts).toContainText(text);
@@ -571,6 +572,7 @@ test("confirmadores mostram retirada familiar5→4 e BAL noturno de sexta em lei
     shift_type_id: type.id,
     starts_on: today,
     enabled: true,
+    observation: "Programação noturna de sexta conforme responsabilidade familiar",
   });
   expect(ledger(f.patient)).toBe(before);
 });

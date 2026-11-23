@@ -2651,6 +2651,37 @@ A conferência remota confirmou 344 migrations, fila vazia, RLS ativa e
 acesso aos pedidos pelo fluxo autorizado do BAL. Os testes de escrita
 usaram uma residência fictícia no ambiente local.
 
+### Observação na programação do BAL
+
+O painel usa o interruptor “Balanços programados” e o campo “Observação
+(opcional)” do laboratório V4. A observação pode ser salva, revisada e
+removida na programação. A conferência mostra o que será gravado e a
+situação do regime. Foram mantidos o fuso, a data de vigência e a
+possibilidade de designar um profissional, que são controles operacionais
+do sistema.
+
+A programação preserva a autoria, a versão e a observação no histórico
+e no comprovante da decisão. Pausar um regime ativo continua exigindo
+motivo e preserva as obrigações existentes. O fluxo não gera rascunhos
+de decisão nem movimentações de estoque. A observação não substitui o
+motivo da pausa, do adiamento, da atribuição ou da decisão sobre um pedido.
+
+A migration `20261123022923_l3_balance_programming_observation.sql` está
+aplicada localmente e no Supabase remoto. O backup crítico cifrado
+`286c2a74-9590-465b-a930-ad2b68a4d515` foi verificado antes da aplicação.
+A conferência remota confirmou 345 migrations, fila vazia, coluna
+opcional, RLS ativa e ausência de execução da operação por `anon`.
+
+Os testes com Auth real verificaram a identificação de quem confirmou,
+a recuperação da mesma tentativa, a remoção explícita da observação e
+a rejeição de uma pausa sem motivo. Os testes de ativação sem observação
+e de pausa com resposta perdida passaram em Chromium, Android e iOS
+emulados. Nos mesmos três projetos, o teste combinado confirmou a saída
+familiar de 5 para 4 unidades, a observação na programação de sexta à
+noite e a preservação do saldo ao programar. A conferência do BAL foi
+avaliada em larguras de 320 a 1440 px. Os seletores antigos da
+movimentação foram atualizados para os controles e o diálogo atuais.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

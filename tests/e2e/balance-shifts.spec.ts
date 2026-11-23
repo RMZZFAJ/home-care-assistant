@@ -161,8 +161,8 @@ test("BAL por plantão: ativação local, cinco etapas, referência, resposta pe
     exact: true,
   });
   await form
-    .getByRole("checkbox", {
-      name: "Processamento automático neste paciente",
+    .getByRole("switch", {
+      name: "Balanços programados",
       exact: true,
     })
     .check();
@@ -172,9 +172,8 @@ test("BAL por plantão: ativação local, cinco etapas, referência, resposta pe
   await form
     .getByRole("combobox", { name: "Plantão responsável", exact: true })
     .selectOption(type.id);
-  await form
-    .getByRole("textbox", { name: "Justificativa", exact: true })
-    .fill("Ativação isolada na homologação fictícia");
+  await expect(form.getByRole("textbox", { name: "Observação (opcional)", exact: true })).toBeVisible();
+  await expect(form.getByRole("textbox", { name: "Justificativa", exact: true })).toHaveCount(0);
   await audit(page, "BAL configuration drawer");
   await form
     .getByRole("button", { name: "Revisar decisão", exact: true })

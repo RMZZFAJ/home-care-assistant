@@ -722,10 +722,11 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   await page
     .getByRole("button", { name: "Movimentar estoque familiar", exact: true })
     .click();
-  await page
-    .getByLabel("Operação", { exact: true })
+  const stockEditor = page.getByRole("dialog", { name: "Movimentar estoque familiar", exact: true });
+  await stockEditor
+    .getByRole("combobox", { name: "Operação", exact: true })
     .selectOption("correction_out");
-  await page.getByLabel("Produto", { exact: true }).selectOption(product.id);
+  await stockEditor.getByRole("combobox", { name: "Produto", exact: true }).selectOption(product.id);
   await page.getByLabel("Quantidade", { exact: true }).fill("1");
   await page
     .getByLabel("Movimento original a compensar")

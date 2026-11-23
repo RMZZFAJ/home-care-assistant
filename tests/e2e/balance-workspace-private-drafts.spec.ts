@@ -10,8 +10,12 @@ for (const raw of preparationPurposes) { const purpose = raw as BalancePreparati
   const f = await preparationFixture(purpose), writes = noPrivateWrites(page), count = privateFormCount(f.patient), before = preparationFacts(f);
   await loginDecision(page, f.identity.email, f.patient); await page.goto("/balancos");
   await page.getByRole("button", { name: purpose === "configure" ? "Configurar dia e plantão" : purpose === "assign" ? "Resolver atribuição" : balancePreparationTitles[purpose], exact: true }).click();
+  if (purpose === "configure") {
+    await expect(page.getByRole("textbox", { name: "Justificativa", exact: true })).toHaveCount(0);
+    await page.getByRole("switch", { name: "Balanços programados", exact: true }).uncheck();
+    await expect(page.getByRole("textbox", { name: "Justificativa", exact: true })).toHaveAttribute("required", "");
+  }
   await page.getByRole("textbox", { name: "Justificativa", exact: true }).fill(f.content.values.reason);
-  if (purpose === "configure") await page.getByRole("checkbox", { name: "Processamento automático neste paciente", exact: true }).uncheck();
   if (["assign", "defer", "request_deferral"].includes(purpose)) { const target = f.source.workspace.targets.find((t: { id: string }) => t.id === f.content.values.targetShiftId); await chooseBalanceTarget(page, page.getByRole("dialog"), target, f.source.workspace.regime?.timezone); }
   await expect(page.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Revisar decisão", exact: true }).click(); expect(preparationFacts(f)).toEqual(before);

@@ -38,6 +38,7 @@ export function BalancePreparationFields({
   canReview,
   allowDeferral,
   reasonRef,
+  requiresReason,
   error,
 }: {
   purpose: BalancePreparationPurpose;
@@ -49,6 +50,7 @@ export function BalancePreparationFields({
   canReview: boolean;
   allowDeferral: boolean;
   reasonRef: RefObject<HTMLTextAreaElement | null>;
+  requiresReason: boolean;
   error?: string;
 }) {
   const [now] = useState(() => Date.now());
@@ -106,11 +108,12 @@ export function BalancePreparationFields({
       {purpose === "configure" ? (
         <>
           <CheckboxField
+            role="switch"
             name="enabled"
-            label="Processamento automático neste paciente"
+            label="Balanços programados"
             checked={values.enabled === "true"}
             onChange={(e) =>
-              onChange({ enabled: String(e.currentTarget.checked) })
+              onChange({ enabled: String(e.currentTarget.checked), reason: "" })
             }
           />
           <p>
@@ -325,22 +328,42 @@ export function BalancePreparationFields({
           ) : null}
         </>
       ) : null}
-      <FormField
-        label="Justificativa"
-        required
-        error={error}
-        helpText={`${(values.reason ?? "").length}/1000 caracteres. Motivo próprio; não substitui o motivo da solicitação original.`}
-      >
-        <TextAreaField
-          ref={reasonRef}
-          name="reason"
-          value={values.reason ?? ""}
-          onChange={(e) => onChange({ reason: e.currentTarget.value })}
+      {purpose === "configure" ? (
+        <FormField
+          label="Observação (opcional)"
+          helpText="Acrescente um detalhe que ajude a entender a rotina de contagem."
+        >
+          <TextAreaField
+            ref={requiresReason ? undefined : reasonRef}
+            name="observation"
+            value={values.observation ?? ""}
+            onChange={(e) => onChange({ observation: e.currentTarget.value })}
+            maxLength={1000}
+          />
+        </FormField>
+      ) : null}
+      {requiresReason ? (
+        <FormField
+          label="Justificativa"
           required
-          minLength={3}
-          maxLength={1000}
-        />
-      </FormField>
+          error={error}
+          helpText={
+            purpose === "configure"
+              ? "Explique por que a programação será pausada."
+              : `${(values.reason ?? "").length}/1000 caracteres. Motivo próprio; não substitui o motivo da solicitação original.`
+          }
+        >
+          <TextAreaField
+            ref={reasonRef}
+            name="reason"
+            value={values.reason ?? ""}
+            onChange={(e) => onChange({ reason: e.currentTarget.value })}
+            required
+            minLength={3}
+            maxLength={1000}
+          />
+        </FormField>
+      ) : null}
       <ActionButton
         variant="primary"
         type="submit"

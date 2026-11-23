@@ -149,6 +149,12 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
         ) : (
           <p>O novo regime ainda não foi ativado neste paciente.</p>
         )}
+        {data.regime?.observation ? (
+          <div>
+            <h3>Observação</h3>
+            <p className="whitespace-pre-wrap wrap-anywhere">{data.regime.observation}</p>
+          </div>
+        ) : null}
         <div className="hca-toolbar">
           {configure ? (
             <ActionButton

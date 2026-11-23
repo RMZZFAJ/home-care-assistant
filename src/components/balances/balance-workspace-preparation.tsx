@@ -19,6 +19,7 @@ import {
 import {
   initialBalancePreparationFields,
   balancePreparationCommand,
+  balancePreparationRequiresReason,
   balancePreparationVersion,
 } from "@/lib/forms/balance-preparation";
 import {
@@ -121,6 +122,11 @@ export function BalanceWorkspacePreparation({
         : allowDeferral;
   const protectedView =
     referenceForbidden;
+  const requiresReason = balancePreparationRequiresReason(
+    purpose,
+    source?.workspace.regime?.enabled ?? false,
+    values,
+  );
   const stale =
     !source ||
     source.referenceHash !== reference.referenceHash ||
@@ -301,7 +307,7 @@ export function BalanceWorkspacePreparation({
   async function prepare() {
     if (busy || !canWrite) return;
     const reason = (values.reason ?? "").trim();
-    if (Array.from(reason).length < 3 || reason.length > 1000) {
+    if (requiresReason && (Array.from(reason).length < 3 || reason.length > 1000)) {
       setFieldError(
         "Informe uma justificativa própria com 3 a 1.000 caracteres.",
       );
@@ -441,7 +447,9 @@ export function BalanceWorkspacePreparation({
                 ? "Rejeitar este pedido com motivo próprio, sem alterar atribuição, prazo ou estoque."
                 : purpose === "approve_deferral"
                   ? "Aprovar somente o destino congelado, se ainda elegível. A alteração do prazo será explícita e auditável."
-                  : "A decisão será registrada com seu responsável e justificativa."}
+                  : purpose === "configure"
+                    ? "A programação será registrada com a identificação de quem confirmou."
+                    : "A decisão será registrada com seu responsável e justificativa."}
           </p>
           {review.command.action === "configure" && source ? (
             <BalanceConfigurationFacts
@@ -463,7 +471,7 @@ export function BalanceWorkspacePreparation({
           {values.targetShiftLabel ? (
             <p className="wrap-anywhere">Destino: {values.targetShiftLabel}.</p>
           ) : null}
-          {"reason" in review.command.body ? (
+          {"reason" in review.command.body && review.command.body.reason ? (
             <div>
               <h3>Sua justificativa</h3>
               <p className="whitespace-pre-wrap wrap-anywhere">
@@ -552,6 +560,7 @@ export function BalanceWorkspacePreparation({
               canReview={!stale && canWrite}
               allowDeferral={allowDeferral}
               reasonRef={reasonRef}
+              requiresReason={requiresReason}
               error={fieldError || undefined}
             />
           </fieldset>
